@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 
-import { ALL_SLUGS } from "@/lib/seo/zodiac-dates";
+import {
+  ALL_ELEMENT_SLUGS,
+  ALL_PAIR_SLUGS,
+  ALL_SLUGS,
+} from "@/lib/seo/zodiac-dates";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -18,6 +22,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: NOW,
     changeFrequency: "monthly",
     priority: 0.7,
+  }));
+
+  const elementPages: MetadataRoute.Sitemap = ALL_ELEMENT_SLUGS.map((el) => ({
+    url: `${BASE}/zodiac/elementebi/${el}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.65,
+  }));
+
+  const pairPages: MetadataRoute.Sitemap = ALL_PAIR_SLUGS.map((slug) => ({
+    url: `${BASE}/zodiac/tavsebadoba/${slug}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.6,
   }));
 
   return [
@@ -57,7 +75,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    {
+      url: `${BASE}/zodiac/elementebi`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE}/zodiac/tavsebadoba`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     ...zodiacSignPages,
+    ...elementPages,
+    ...pairPages,
     {
       url: `${BASE}/login`,
       lastModified: NOW,

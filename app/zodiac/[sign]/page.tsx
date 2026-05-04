@@ -10,11 +10,14 @@ import { Starfield } from "@/components/landing/starfield";
 import {
   SIGNS_CONTENT,
   paragraphs,
+  slugByLabelKa,
   type CompatibilityLevel,
 } from "@/lib/seo/zodiac-content";
 import {
   ALL_SLUGS,
   ZODIAC_DATES,
+  elementSlugForSign,
+  pairSlug,
   signMetaBySlug,
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
@@ -187,7 +190,12 @@ export default async function ZodiacSignPage({
                 {c.tagline}
               </p>
               <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                <Pill label="ელემენტი" value={c.element} accent={accent} />
+                <Link
+                  href={`/zodiac/elementebi/${elementSlugForSign(sign)}`}
+                  className="transition-opacity hover:opacity-80"
+                >
+                  <Pill label="ელემენტი" value={c.element} accent={accent} />
+                </Link>
                 <Pill label="მოდალურობა" value={c.modality} accent={accent} />
                 <Pill label="მმართველი" value={c.ruler} accent={accent} />
               </div>
@@ -255,17 +263,28 @@ export default async function ZodiacSignPage({
 
         {/* Compatibility */}
         <section className="mt-12">
-          <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
-            თავსებადობა სხვა ნიშნებთან
-          </h2>
+          <div className="mb-5 flex items-baseline justify-between gap-3">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              თავსებადობა სხვა ნიშნებთან
+            </h2>
+            <Link
+              href="/zodiac/tavsebadoba"
+              className="shrink-0 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              ყველა წყვილი →
+            </Link>
+          </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {c.compatibility.map((entry, i) => {
               const lvlColor = LEVEL_COLOR[entry.level] ?? accent;
-              return (
-                <article
-                  key={i}
-                  className="rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl"
-                >
+              const otherSlug = slugByLabelKa(entry.signKa);
+              const pairHref = otherSlug
+                ? `/zodiac/tavsebadoba/${pairSlug(sign, otherSlug)}`
+                : null;
+              const cardClass =
+                "block rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all";
+              const inner = (
+                <>
                   <div className="flex items-baseline justify-between gap-3">
                     <h3 className="text-base font-semibold tracking-tight">
                       {entry.signKa}
@@ -284,6 +303,19 @@ export default async function ZodiacSignPage({
                   <p className="mt-2 text-pretty text-sm leading-relaxed text-foreground/85">
                     {entry.note}
                   </p>
+                </>
+              );
+              return pairHref ? (
+                <Link
+                  key={i}
+                  href={pairHref}
+                  className={cn(cardClass, "hover:bg-card/80 hover:ring-foreground/15")}
+                >
+                  {inner}
+                </Link>
+              ) : (
+                <article key={i} className={cardClass}>
+                  {inner}
                 </article>
               );
             })}

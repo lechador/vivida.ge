@@ -208,6 +208,52 @@ export default function ZodiacHubPage() {
           </div>
         </article>
 
+        {/* More to explore */}
+        <section className="mt-16">
+          <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+            ჩაუღრმავდი
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Link
+              href="/zodiac/elementebi"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80"
+            >
+              <div
+                aria-hidden
+                className="absolute -right-12 -top-12 size-40 rounded-full bg-[radial-gradient(circle,oklch(0.72_0.22_30/0.4)_0%,transparent_70%)] blur-3xl"
+              />
+              <div className="relative text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                ცის ელემენტები
+              </div>
+              <h3 className="relative mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+                ცეცხლი · მიწა · ჰაერი · წყალი
+              </h3>
+              <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
+                გაიგე, როგორ აყალიბებს ოთხი ელემენტი ცის ნიშნების ხასიათს.
+              </p>
+            </Link>
+            <Link
+              href="/zodiac/tavsebadoba"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80"
+            >
+              <div
+                aria-hidden
+                className="absolute -right-12 -top-12 size-40 rounded-full bg-[radial-gradient(circle,var(--vivida-pink)_0%,transparent_70%)] opacity-30 blur-3xl"
+              />
+              <div className="relative text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                თავსებადობა
+              </div>
+              <h3 className="relative mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+                ყველა წყვილი — 78 კავშირი
+              </h3>
+              <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
+                ნახე სრული ცხრილი — ვერძი ლომთან, ქალწული თხის რქასთან, ყველა
+                შესაძლო კომბინაცია.
+              </p>
+            </Link>
+          </div>
+        </section>
+
         {/* FAQ */}
         <section className="mt-16 max-w-3xl">
           <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">

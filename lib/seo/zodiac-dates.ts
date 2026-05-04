@@ -144,6 +144,73 @@ export function signMetaBySlug(slug: ZodiacSlug): ZodiacSign | undefined {
   return SIGNS.find((s) => s.key === slug);
 }
 
+// ─── Element helpers (latin slug ↔ Georgian label ↔ signs in element) ─
+
+export type ElementSlug = "fire" | "earth" | "air" | "water";
+
+export const ELEMENT_LABEL_KA: Record<ElementSlug, string> = {
+  fire: "ცეცხლი",
+  earth: "მიწა",
+  air: "ჰაერი",
+  water: "წყალი",
+};
+
+export const ALL_ELEMENT_SLUGS: ElementSlug[] = [
+  "fire",
+  "earth",
+  "air",
+  "water",
+];
+
+export const SIGNS_BY_ELEMENT: Record<ElementSlug, ZodiacSlug[]> = {
+  fire: ["aries", "leo", "sagittarius"],
+  earth: ["taurus", "virgo", "capricorn"],
+  air: ["gemini", "libra", "aquarius"],
+  water: ["cancer", "scorpio", "pisces"],
+};
+
+export function elementSlugForSign(slug: ZodiacSlug): ElementSlug {
+  for (const el of ALL_ELEMENT_SLUGS) {
+    if (SIGNS_BY_ELEMENT[el].includes(slug)) return el;
+  }
+  return "fire";
+}
+
+// ─── Pair helpers ───────────────────────────────────────────────────────
+
+/**
+ * Canonical pair slug — always sorted by canonical sign index so
+ * `aries-leo` and `leo-aries` resolve to the same key.
+ */
+export function pairSlug(a: ZodiacSlug, b: ZodiacSlug): string {
+  const ia = ALL_SLUGS.indexOf(a);
+  const ib = ALL_SLUGS.indexOf(b);
+  return ia <= ib ? `${a}-${b}` : `${b}-${a}`;
+}
+
+/** Parse `aries-leo` into [aries, leo] in canonical order, or null if invalid. */
+export function parsePairSlug(
+  slug: string
+): [ZodiacSlug, ZodiacSlug] | null {
+  const [a, b] = slug.split("-") as [ZodiacSlug, ZodiacSlug];
+  if (!a || !b) return null;
+  if (!ALL_SLUGS.includes(a) || !ALL_SLUGS.includes(b)) return null;
+  // Reject unsorted form so canonical URL is the only valid path.
+  if (ALL_SLUGS.indexOf(a) > ALL_SLUGS.indexOf(b)) return null;
+  return [a, b];
+}
+
+/** All unique unordered pairs including same-sign (i ≤ j). 78 entries. */
+export const ALL_PAIR_SLUGS: string[] = (() => {
+  const out: string[] = [];
+  for (let i = 0; i < ALL_SLUGS.length; i++) {
+    for (let j = i; j < ALL_SLUGS.length; j++) {
+      out.push(`${ALL_SLUGS[i]}-${ALL_SLUGS[j]}`);
+    }
+  }
+  return out;
+})();
+
 /**
  * Resolve the sun sign for a given (month, day). The boundaries follow
  * ZODIAC_DATES — Capricorn wraps across the year boundary so the lookup
