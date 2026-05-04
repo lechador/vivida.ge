@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_Georgian } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import NextTopLoader from "nextjs-toploader";
@@ -15,20 +15,90 @@ const notoGeorgian = Noto_Sans_Georgian({
 // canonical here so OG cards and emails skip the redirect hop.
 const SITE_URL = "https://www.vivida.ge";
 
+const TITLE = "Vivida — შენი კოსმიური რუკა";
+const DESCRIPTION =
+  "პერსონალური ასტროლოგია, ყოველდღიური ჰოროსკოპი და ნატალური რუკა შენი დაბადების ზუსტი მომენტის მიხედვით. გაიგე, რას ამბობენ შენზე ვარსკვლავები.";
+
+/**
+ * Site-wide metadata defaults. Per-page `metadata` exports override these
+ * surgically — e.g. /report sets its own `title` while inheriting OG/Twitter.
+ *
+ * `title.template` lets per-page titles be just the page name; the framework
+ * appends "· Vivida" for us. The home page is the lone exception (uses
+ * `title.default` directly via `title.absolute` in app/page.tsx) so the
+ * brand reads as the primary name in Google's results.
+ */
 export const metadata: Metadata = {
-  title: "Vivida — შენი კოსმიური რუკა",
-  description:
-    "პერსონალური ასტროლოგია, ყოველდღიური ჰოროსკოპი და ნატალური რუკა შენი დაბადების ზუსტი მომენტის მიხედვით. გაიგე, რას ამბობენ შენზე ვარსკვლავები.",
   metadataBase: new URL(SITE_URL),
+  title: {
+    default: TITLE,
+    template: "%s · Vivida",
+  },
+  description: DESCRIPTION,
+  applicationName: "Vivida",
+  authors: [{ name: "Vivida" }],
+  creator: "Vivida",
+  publisher: "Vivida",
+  // Keywords are mostly ignored by Google but Yandex / Bing still weight
+  // them, and the Georgian search ecosystem leans on Yandex more than the
+  // English one. Cheap to include; pick the queries we actually want to win.
+  keywords: [
+    "ნატალური რუკა",
+    "ჰოროსკოპი",
+    "ჰოროსკოპი ქართულად",
+    "ასტროლოგია",
+    "კოსმიური რუკა",
+    "თავსებადობა",
+    "სინასტრია",
+    "ზოდიაქო",
+    "მზის ნიშანი",
+    "მთვარის ნიშანი",
+    "ამომავალი ნიშანი",
+    "vivida",
+  ],
+  alternates: {
+    canonical: SITE_URL,
+    languages: { "ka-GE": SITE_URL },
+  },
   openGraph: {
-    title: "Vivida — შენი კოსმიური რუკა",
-    description:
-      "პერსონალური ასტროლოგია, ყოველდღიური ჰოროსკოპი და ნატალური რუკა შენი დაბადების ზუსტი მომენტის მიხედვით.",
+    title: TITLE,
+    description: DESCRIPTION,
     url: SITE_URL,
     siteName: "Vivida",
     type: "website",
     locale: "ka_GE",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  category: "lifestyle",
+};
+
+/**
+ * Viewport + theme color is its own export in Next 16 (split out from
+ * `metadata` for clearer typing). The dark theme uses our deep cosmic
+ * background — matches `--background` token in globals.css so the
+ * Android URL bar and iOS status bar tint blend with the page chrome.
+ */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0b0814" },
+    { media: "(prefers-color-scheme: light)", color: "#0b0814" },
+  ],
+  colorScheme: "dark",
 };
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;

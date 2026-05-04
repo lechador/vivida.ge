@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -6,6 +7,76 @@ import { Hero } from "@/components/landing/hero";
 import { Starfield } from "@/components/landing/starfield";
 import { SiteFooter } from "@/components/site-footer";
 import { VividaMark } from "@/components/brand/vivida-mark";
+
+const SITE_URL = "https://www.vivida.ge";
+
+/**
+ * Home page is the brand landing — Google-facing copy lives here. Title is
+ * absolute (no "· Vivida" suffix) so the brand reads as the primary name in
+ * results. Description is keyword-tuned around what Georgians actually
+ * search ("ნატალური რუკა", "ჰოროსკოპი ქართულად").
+ */
+export const metadata: Metadata = {
+  title: {
+    absolute: "Vivida — ნატალური რუკა და ყოველდღიური ჰოროსკოპი ქართულად",
+  },
+  description:
+    "Vivida შენი დაბადების ზუსტ მომენტს ცოცხალ კოსმიურ გზამკვლევად აქცევს — ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა საყვარელ ადამიანებთან. დაიწყე უფასოდ.",
+  alternates: {
+    canonical: SITE_URL,
+  },
+  openGraph: {
+    title: "Vivida — ნატალური რუკა ქართულად",
+    description:
+      "ცოცხალი ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობის ანალიზი — შენი დაბადების ზუსტი მომენტის მიხედვით.",
+    url: SITE_URL,
+  },
+  twitter: {
+    title: "Vivida — ნატალური რუკა ქართულად",
+    description:
+      "ცოცხალი ნატალური რუკა და ყოველდღიური ჰოროსკოპი — შენი დაბადების ზუსტი მომენტის მიხედვით.",
+  },
+};
+
+/**
+ * Structured data injected on / so Google can render rich snippets and
+ * the sitelinks search box. Two graphs:
+ *   - Organization: who we are (logo, social, contact)
+ *   - WebSite: the site itself + an internal search action that wires up
+ *     Google's "Search this site" box for branded queries
+ */
+const ORGANIZATION_LD = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Vivida",
+  url: SITE_URL,
+  logo: `${SITE_URL}/icon.svg`,
+  description:
+    "პერსონალური ასტროლოგიური სერვისი — ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა ქართულად.",
+  sameAs: [],
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "hello@vivida.ge",
+    contactType: "customer support",
+    availableLanguage: ["Georgian", "ka"],
+  },
+};
+
+const WEBSITE_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Vivida",
+  url: SITE_URL,
+  inLanguage: "ka-GE",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE_URL}/discover?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
 
 export default async function Home() {
   // If you're already signed in there's nothing for you on the marketing
@@ -17,6 +88,18 @@ export default async function Home() {
   }
   return (
     <>
+      {/* Structured data — search engines parse these inline scripts even
+          though they're hidden from users. Two separate scripts so a
+          parse error in one doesn't void the other. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_LD) }}
+      />
+
       <main className="relative isolate flex-1 overflow-hidden">
         {/* Cosmic backdrop layers */}
         <div
