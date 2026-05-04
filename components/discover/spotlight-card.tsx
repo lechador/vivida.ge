@@ -45,7 +45,7 @@ export function SpotlightCard({ match }: { match: SpotlightMatch }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="relative mb-12 mt-8 overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/40 bg-card/65 ring-1 ring-foreground/10 backdrop-blur-xl"
+      className="relative mb-10 mt-6 overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/40 bg-card/65 ring-1 ring-foreground/10 backdrop-blur-xl"
     >
       <div
         aria-hidden
@@ -59,60 +59,67 @@ export function SpotlightCard({ match }: { match: SpotlightMatch }) {
         }}
       />
 
-      <div className="relative grid sm:grid-cols-[280px_1fr]">
-        {/* Hero photo */}
-        <div className="relative aspect-square overflow-hidden sm:aspect-auto sm:h-full sm:min-h-[320px]">
-          {heroSrc ? (
-            <Image
-              src={heroSrc}
-              alt=""
-              fill
-              sizes="(min-width: 640px) 280px, 100vw"
-              className="object-cover"
-              priority
-            />
-          ) : (
-            <div
-              className="absolute inset-0 grid place-items-center"
-              style={{
-                background: `linear-gradient(135deg, ${accent} 0%, oklch(0.3 0.18 280) 70%)`,
-              }}
-            >
-              <span className="text-7xl font-semibold text-white/85">
-                {card.displayName[0]?.toUpperCase()}
-              </span>
-            </div>
-          )}
-          {/* Edge fade into the right column on desktop */}
+      <div className="relative flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+        {/* Hero — circular avatar on desktop, banner on mobile */}
+        <div className="relative shrink-0 self-start sm:self-center">
           <div
+            className="relative size-32 overflow-hidden rounded-full sm:size-36"
+            style={{
+              boxShadow: `0 0 0 2px color-mix(in oklch, ${accent} 55%, transparent), 0 0 40px -8px ${accent}`,
+            }}
+          >
+            {heroSrc ? (
+              <Image
+                src={heroSrc}
+                alt=""
+                fill
+                sizes="(min-width: 640px) 144px, 128px"
+                className="object-cover"
+                priority
+              />
+            ) : (
+              <div
+                className="grid size-full place-items-center text-4xl font-semibold text-white/90"
+                style={{
+                  background: `linear-gradient(135deg, ${accent} 0%, oklch(0.32 0.18 285) 75%)`,
+                }}
+              >
+                {card.displayName[0]?.toUpperCase()}
+              </div>
+            )}
+          </div>
+          {/* Sign symbol micro-badge bottom-right */}
+          <span
+            className="absolute -bottom-1 -right-1 grid size-9 place-items-center rounded-full border border-background bg-card text-base shadow-sm"
+            style={{ color: accent }}
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 hidden w-24 bg-gradient-to-r from-transparent to-card/65 sm:block"
-          />
+          >
+            {card.sunSign.symbol}
+          </span>
         </div>
 
         {/* Content */}
-        <div className="relative flex flex-col gap-5 p-6 sm:p-8">
+        <div className="relative flex min-w-0 flex-1 flex-col gap-3.5">
           <div className="flex items-center gap-2">
-            <Sparkles className="size-4 text-[var(--vivida-pink)]" />
+            <Sparkles className="size-3.5 text-[var(--vivida-pink)]" />
             <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--vivida-pink)]">
               დღევანდელი მთავარი წყვილი
             </span>
           </div>
 
           <div>
-            <h2 className="text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+            <h2 className="text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
               <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
                 {card.displayName}
               </span>
             </h2>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              <span style={{ color: accent }}>{card.sunSign.symbol}</span>
-              <span className="text-foreground/80">
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground sm:text-sm">
+              <span className="text-foreground/85">
                 {card.sunSign.labelKa}
               </span>
-              <span>·</span>
+              <span className="text-muted-foreground/60">·</span>
               <span>{card.sunElement}</span>
-              <span>·</span>
+              <span className="text-muted-foreground/60">·</span>
               <Link
                 href={`/u/${card.username}`}
                 className="text-muted-foreground transition-colors hover:text-foreground"
@@ -122,20 +129,20 @@ export function SpotlightCard({ match }: { match: SpotlightMatch }) {
             </div>
           </div>
 
-          {/* Big % + verdict */}
-          <div className="flex items-baseline gap-3">
-            <div className="text-5xl font-semibold tabular-nums leading-none tracking-tight sm:text-6xl">
+          {/* % + verdict */}
+          <div className="flex items-baseline gap-2.5">
+            <div className="text-4xl font-semibold tabular-nums leading-none tracking-tight sm:text-5xl">
               <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
                 {synastry.overall}%
               </span>
             </div>
-            <div className="text-sm font-medium text-foreground/85 sm:text-base">
+            <div className="text-sm font-medium text-foreground/85">
               {verdict}
             </div>
           </div>
 
           {/* Top 2 categories with mini bars */}
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {topCategories.map((cat) => {
               const score = synastry.scores[cat];
               const color = CATEGORY_COLOR[cat];
@@ -175,16 +182,13 @@ export function SpotlightCard({ match }: { match: SpotlightMatch }) {
             })}
           </div>
 
-          <div className="mt-1 flex flex-wrap items-center gap-3">
-            <Button asChild variant="mystic" size="lg">
+          <div className="mt-1">
+            <Button asChild variant="mystic" size="default">
               <Link href={`/u/${card.username}`}>
                 ნახე პროფილი
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
-            <span className="text-xs text-muted-foreground">
-              ცა იცვლება — შემოიხედე ხვალაც
-            </span>
           </div>
         </div>
       </div>
