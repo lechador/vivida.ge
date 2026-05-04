@@ -55,7 +55,7 @@ export function FeaturesSection() {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="mb-8 text-center text-2xl font-semibold tracking-tight sm:text-3xl"
       >
-        ფუნქციები, რომლებზე გითხარი
+        ფუნქციები
       </motion.h3>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
