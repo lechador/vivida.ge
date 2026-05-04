@@ -3,7 +3,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { FaqSection } from "@/components/landing/faq-section";
+import { FeaturesSection } from "@/components/landing/features-section";
+import { FinalCta } from "@/components/landing/final-cta";
 import { Hero } from "@/components/landing/hero";
+import { HowItWorksSection } from "@/components/landing/how-it-works-section";
+import { PillarsSection } from "@/components/landing/pillars-section";
 import { Starfield } from "@/components/landing/starfield";
 import { SiteFooter } from "@/components/site-footer";
 import { VividaMark } from "@/components/brand/vivida-mark";
@@ -145,6 +150,11 @@ export default async function Home() {
         </header>
 
         <Hero />
+        <PillarsSection />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <FaqSection />
+        <FinalCta />
 
         {/* Bottom fade into the dark background */}
         <div

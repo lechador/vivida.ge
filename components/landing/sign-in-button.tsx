@@ -7,21 +7,26 @@ import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { signInWithGoogle } from "@/actions/auth";
 
-export function SignInButton() {
+export function SignInButton({
+  label,
+  loadingLabel,
+}: {
+  label?: string;
+  loadingLabel?: string;
+} = {}) {
   const [isPending, startTransition] = useTransition();
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className="relative inline-block"
     >
-      <div
+      <motion.div
         aria-hidden
         className="absolute -inset-1 rounded-2xl bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-60 blur-xl"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
       />
       <Button
         variant="mystic"
@@ -35,7 +40,9 @@ export function SignInButton() {
         className="relative"
       >
         <Sparkles className="size-5" />
-        {isPending ? "ვარსკვლავებს ვალაგებთ…" : "შემოდი Google-ით — გახსენი შენი რუკა"}
+        {isPending
+          ? loadingLabel ?? "ვარსკვლავებს ვალაგებთ…"
+          : label ?? "შემოდი Google-ით — გახსენი შენი რუკა"}
       </Button>
     </motion.div>
   );
