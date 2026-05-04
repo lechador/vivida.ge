@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Apple, Smartphone } from "lucide-react";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 
@@ -139,8 +138,12 @@ export function SiteFooter() {
               მობილური აპი — მალე
             </span>
             <div className="flex flex-wrap items-center gap-2">
-              <StoreBadge icon={<Apple className="size-4" />} brand="App Store" />
-              <StoreBadge icon={<Smartphone className="size-4" />} brand="Google Play" />
+              <StoreBadge>
+                <AppStoreBadge />
+              </StoreBadge>
+              <StoreBadge>
+                <PlayStoreBadge />
+              </StoreBadge>
             </div>
           </div>
         </div>
@@ -164,27 +167,16 @@ function PaymentMark({ children }: { children: React.ReactNode }) {
   );
 }
 
-function StoreBadge({
-  icon,
-  brand,
-}: {
-  icon: React.ReactNode;
-  brand: string;
-}) {
+function StoreBadge({ children }: { children: React.ReactNode }) {
   return (
     <span
       aria-disabled
-      className="inline-flex items-center gap-2 rounded-md border border-border/70 bg-card/40 px-2.5 py-1.5 text-xs text-muted-foreground"
       title="აპი მუშავდება"
+      className="relative inline-flex opacity-65 transition-opacity hover:opacity-90"
     >
-      <span className="text-foreground/70">{icon}</span>
-      <span className="flex flex-col leading-none">
-        <span className="text-[9px] uppercase tracking-wider opacity-80">
-          მუშავდება
-        </span>
-        <span className="mt-0.5 text-[11px] font-medium text-foreground/85">
-          {brand}
-        </span>
+      {children}
+      <span className="absolute -right-1.5 -top-1.5 inline-flex items-center rounded-full border border-[var(--vivida-pink)]/45 bg-background px-1.5 py-px text-[8px] font-semibold uppercase tracking-wider text-[var(--vivida-pink)]">
+        მალე
       </span>
     </span>
   );
@@ -237,33 +229,55 @@ function MastercardMark() {
   );
 }
 
+/**
+ * Google Pay official wordmark — the "G Pay" lockup with the Google
+ * 4-color G in a circle and "Pay" in dark grey. Path data simplified
+ * from the published brand asset.
+ */
 function GooglePayMark() {
   return (
     <svg
-      viewBox="0 0 56 20"
-      className="h-3.5 w-auto"
+      viewBox="0 0 64 24"
+      className="h-4 w-auto"
       role="img"
       aria-label="Google Pay"
     >
+      {/* G in circle — uses Google's 4 brand colors */}
+      <circle cx="11" cy="12" r="10" fill="#fff" />
+      <path
+        d="M16.5 12.2c0-.5-.04-.97-.13-1.42H11v2.7h3.08c-.13.7-.54 1.3-1.15 1.7v1.4h1.86c1.09-1 1.71-2.48 1.71-4.38z"
+        fill="#4285F4"
+      />
+      <path
+        d="M11 17.6c1.55 0 2.86-.51 3.81-1.4l-1.86-1.4c-.52.34-1.18.55-1.95.55-1.5 0-2.77-1.01-3.22-2.37H5.86v1.45c.95 1.88 2.91 3.17 5.14 3.17z"
+        fill="#34A853"
+      />
+      <path
+        d="M7.78 12.98c-.12-.34-.18-.7-.18-1.08s.06-.74.18-1.08V9.37H5.86c-.39.77-.61 1.65-.61 2.53 0 .88.22 1.76.61 2.53l1.92-1.45z"
+        fill="#FBBC04"
+      />
+      <path
+        d="M11 8.05c.84 0 1.6.29 2.2.86l1.65-1.65C13.86 6.32 12.55 5.8 11 5.8c-2.23 0-4.19 1.29-5.14 3.17l1.92 1.45C8.23 9.06 9.5 8.05 11 8.05z"
+        fill="#EA4335"
+      />
+      {/* Pay wordmark */}
       <text
-        x="0"
-        y="15"
-        fontFamily="Arial, sans-serif"
-        fontSize="14"
-        fontWeight="700"
+        x="24"
+        y="17"
+        fontFamily="Arial, Helvetica, sans-serif"
+        fontSize="13"
+        fontWeight="600"
+        className="fill-foreground/85"
       >
-        <tspan fill="#4285F4">G</tspan>
-        <tspan fill="#EA4335">o</tspan>
-        <tspan fill="#FBBC04">o</tspan>
-        <tspan fill="#4285F4">g</tspan>
-        <tspan fill="#34A853">l</tspan>
-        <tspan fill="#EA4335">e</tspan>
-        <tspan fill="currentColor" className="fill-foreground/85"> Pay</tspan>
+        Pay
       </text>
     </svg>
   );
 }
 
+/**
+ * Apple Pay official wordmark — the Apple "" glyph + "Pay".
+ */
 function ApplePayMark() {
   return (
     <svg
@@ -273,17 +287,121 @@ function ApplePayMark() {
       aria-label="Apple Pay"
     >
       <g className="fill-foreground/85">
-        <path d="M9.6 5.5c.5-.6.8-1.4.8-2.2-.7 0-1.5.4-2 1-.4.5-.9 1.4-.7 2.1.8.1 1.5-.4 1.9-.9zM10.5 6.6c-1.1-.1-2 .6-2.5.6-.6 0-1.4-.6-2.3-.6C4.5 6.7 3 7.6 2.3 9.1c-1 1.6-.3 4 .7 5.3.5.6 1 1.3 1.8 1.3.7 0 1-.4 1.9-.4.9 0 1.1.4 1.9.4.8 0 1.3-.6 1.8-1.2.5-.7.8-1.4.8-1.4-.1 0-1.5-.5-1.5-2.1 0-1.3 1.1-1.9 1.1-1.9-.6-.9-1.5-1-1.8-1z" />
+        {/* Apple logo */}
+        <path d="M9.6 5.4c.55-.66.92-1.58.82-2.5-.79.04-1.74.52-2.3 1.18-.5.59-.94 1.55-.83 2.45.88.07 1.78-.45 2.3-1.13zM10.4 6.7c-1.27-.07-2.36.72-2.97.72-.6 0-1.55-.69-2.55-.67-1.31.02-2.52.76-3.19 1.94-1.36 2.36-.35 5.86 1 7.78.65.94 1.43 2 2.45 1.96 1-.04 1.36-.63 2.55-.63 1.18 0 1.5.63 2.55.61 1.05-.02 1.71-.95 2.36-1.9.74-1.09 1.05-2.13 1.06-2.18-.02-.01-2.04-.78-2.06-3.1-.02-1.94 1.59-2.87 1.66-2.92-.91-1.34-2.31-1.49-2.81-1.51z" />
+        {/* Pay text */}
         <text
-          x="14"
-          y="15"
-          fontFamily="Arial, sans-serif"
+          x="18"
+          y="14.5"
+          fontFamily="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif"
           fontSize="13"
-          fontWeight="700"
+          fontWeight="600"
         >
           Pay
         </text>
       </g>
+    </svg>
+  );
+}
+
+/**
+ * Apple App Store badge — black rounded rectangle with the Apple logo,
+ * "Download on the" caption and "App Store" wordmark. Simplified from
+ * Apple's official marketing badge.
+ */
+function AppStoreBadge() {
+  return (
+    <svg
+      viewBox="0 0 124 40"
+      className="h-9 w-auto"
+      role="img"
+      aria-label="Download on the App Store"
+    >
+      <rect
+        width="124"
+        height="40"
+        rx="6"
+        fill="#000"
+        stroke="rgba(255,255,255,0.4)"
+        strokeWidth="0.5"
+      />
+      {/* Apple logo */}
+      <path
+        d="M19.6 13.4c.55-.66.92-1.58.82-2.5-.79.04-1.74.52-2.3 1.18-.5.59-.94 1.55-.83 2.45.88.07 1.78-.45 2.3-1.13zM20.4 14.7c-1.27-.07-2.36.72-2.97.72-.6 0-1.55-.69-2.55-.67-1.31.02-2.52.76-3.19 1.94-1.36 2.36-.35 5.86 1 7.78.65.94 1.43 2 2.45 1.96 1-.04 1.36-.63 2.55-.63 1.18 0 1.5.63 2.55.61 1.05-.02 1.71-.95 2.36-1.9.74-1.09 1.05-2.13 1.06-2.18-.02-.01-2.04-.78-2.06-3.1-.02-1.94 1.59-2.87 1.66-2.92-.91-1.34-2.31-1.49-2.81-1.51z"
+        fill="#fff"
+      />
+      {/* Captions */}
+      <text
+        x="33"
+        y="17"
+        fontFamily="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif"
+        fontSize="7"
+        fill="#fff"
+      >
+        Download on the
+      </text>
+      <text
+        x="33"
+        y="30"
+        fontFamily="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif"
+        fontSize="14"
+        fontWeight="600"
+        fill="#fff"
+      >
+        App Store
+      </text>
+    </svg>
+  );
+}
+
+/**
+ * Google Play (Play Store) badge — black rounded rectangle with the
+ * 4-color Play triangle, "GET IT ON" caption and "Google Play"
+ * wordmark. Simplified from Google's official Play badge.
+ */
+function PlayStoreBadge() {
+  return (
+    <svg
+      viewBox="0 0 134 40"
+      className="h-9 w-auto"
+      role="img"
+      aria-label="Get it on Google Play"
+    >
+      <rect
+        width="134"
+        height="40"
+        rx="6"
+        fill="#000"
+        stroke="rgba(255,255,255,0.4)"
+        strokeWidth="0.5"
+      />
+      {/* Play triangle composed of 4 colored shapes */}
+      <g transform="translate(11.5, 9.5)">
+        <path d="M0 0v21l11.2-10.5L0 0z" fill="#00C2D6" />
+        <path d="M0 0l11.2 10.5L14.7 7 1.7-.7C1-.4.5-.2 0 0z" fill="#FFD400" />
+        <path d="M0 21l11.2-10.5L14.7 14 1.7 21.7c-.7-.3-1.2-.5-1.7-.7z" fill="#FF3946" />
+        <path d="M14.7 7l-3.5 3.5 3.5 3.5L20 11.6c.6-.4 1-.7 1-1.1 0-.4-.4-.7-1-1.1L14.7 7z" fill="#00E676" />
+      </g>
+      {/* Captions */}
+      <text
+        x="40"
+        y="17"
+        fontFamily="-apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif"
+        fontSize="7"
+        fill="#fff"
+      >
+        GET IT ON
+      </text>
+      <text
+        x="40"
+        y="30"
+        fontFamily="-apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif"
+        fontSize="14"
+        fontWeight="600"
+        fill="#fff"
+      >
+        Google Play
+      </text>
     </svg>
   );
 }
