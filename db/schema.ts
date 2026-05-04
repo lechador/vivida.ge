@@ -419,6 +419,41 @@ export type DailyTransitsJson = {
   moonSignEn?: string;
 };
 
+/**
+ * Globally-cached moon phase + Gemini interpretation, one row per UTC date.
+ * Universal (not per-user) — the moon's phase + sign is the same for everyone
+ * on a given day, so a single row is served to all users.
+ *
+ * Cache invalidates by bumping `promptVersion` after a prompt change.
+ */
+export const moonPhases = pgTable("moon_phase", {
+  /** UTC date (YYYY-MM-DD). Single PK, no userId. */
+  date: date("date", { mode: "string" }).primaryKey(),
+  /** "new_moon", "waxing_crescent", ... 8 canonical phases. */
+  phaseKey: text("phase_key").notNull(),
+  phaseLabelKa: text("phase_label_ka").notNull(),
+  /** Sign the moon currently transits. */
+  signEn: text("sign_en").notNull(),
+  signKa: text("sign_ka").notNull(),
+  signIndex: integer("sign_index").notNull(),
+  /** Sun-Moon angular separation in degrees, 0..360. */
+  phaseAngle: doublePrecision("phase_angle").notNull(),
+  /** 0..1, fraction of disk illuminated. */
+  illumination: doublePrecision("illumination").notNull(),
+  /** 0..29.53, days since previous new moon. */
+  ageDays: doublePrecision("age_days").notNull(),
+  headline: text("headline").notNull(),
+  summary: text("summary").notNull(),
+  body: text("body").notNull(),
+  themes: jsonb("themes").$type<string[]>().notNull().default([]),
+  promptVersion: integer("prompt_version").notNull().default(1),
+  model: text("model").notNull(),
+  language: text("language").notNull().default("ka"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
     fields: [users.id],
@@ -515,6 +550,8 @@ export type Payment = typeof payments.$inferSelect;
 export type NewPayment = typeof payments.$inferInsert;
 export type DailyHoroscope = typeof dailyHoroscopes.$inferSelect;
 export type NewDailyHoroscope = typeof dailyHoroscopes.$inferInsert;
+export type MoonPhase = typeof moonPhases.$inferSelect;
+export type NewMoonPhase = typeof moonPhases.$inferInsert;
 export type ProfilePhoto = typeof profilePhotos.$inferSelect;
 export type NewProfilePhoto = typeof profilePhotos.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;

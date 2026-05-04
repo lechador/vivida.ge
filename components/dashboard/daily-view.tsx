@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { ensureChartFor } from "@/actions/chart";
 import { ensureDailyFor } from "@/actions/daily";
+import { ensureMoonPhase } from "@/actions/moon-phase";
 import { Button } from "@/components/ui/button";
 import { LockedCard } from "@/components/paywall/locked-card";
 import { canUseFeature } from "@/lib/features";
@@ -13,6 +14,7 @@ import type { PlanId } from "@/lib/pricing";
 
 import { DailyCard } from "./daily-card";
 import { MiniBigThree } from "./mini-big-three";
+import { MoonPhaseCard } from "./moon-phase-card";
 import { SuggestedPeopleRail } from "./suggested-people-rail";
 
 /**
@@ -56,6 +58,16 @@ export async function DailyView({
     }
   }
 
+  // Universal moon phase — same for everyone, cached globally per UTC date.
+  // Doesn't gate on plan because the celestial event is universal context;
+  // gating it would be like gating "today's date." Errors fail open.
+  let moonPhase = null;
+  try {
+    moonPhase = await ensureMoonPhase();
+  } catch (err) {
+    console.warn("[moon-phase] generation failed:", (err as Error).message);
+  }
+
   return (
     <div className="space-y-8">
       {daily && timezone ? (
@@ -71,6 +83,8 @@ export async function DailyView({
           დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში.
         </div>
       )}
+
+      {moonPhase && <MoonPhaseCard data={moonPhase} />}
 
       <section>
         <header className="mb-3 flex items-baseline justify-between">

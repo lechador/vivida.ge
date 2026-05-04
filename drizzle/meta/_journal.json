@@ -71,6 +71,13 @@
       "when": 1777892312137,
       "tag": "0009_rainy_tusk",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1777927927975,
+      "tag": "0010_smooth_mordo",
+      "breakpoints": true
     }
   ]
 }

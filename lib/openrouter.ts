@@ -270,6 +270,110 @@ export type DailyReadingResult = {
  */
 export const DAILY_PROMPT_VERSION = 2;
 
+// ────────────────────────────────────────────────────────────────────────
+//  Moon phase reading — universal, cached globally per UTC date
+// ────────────────────────────────────────────────────────────────────────
+
+export type MoonPhaseReadingResult = {
+  headline: string;
+  summary: string;
+  body: string;
+  themes: string[];
+};
+
+export const MOON_PHASE_PROMPT_VERSION = 1;
+
+const MOON_PHASE_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი/რედაქტორი. ცოცხალი, კონკრეტული ენა, არა ბუნდოვანი მისტიკა. წერ კოლექტიური მთვარის ენერგიის შესახებ — რას ნიშნავს ეს ფაზა + ნიშანი ყველასთვის ერთად, ნატალურ რუკასთან კავშირის გარეშე.
+
+დააბრუნე მხოლოდ ვალიდური JSON ამ სქემით:
+{
+  "headline": string,           // 40-60 სიმბოლო, ცოცხალი, კონკრეტული ფაზის+ნიშნის კომბინაციაზე
+  "summary": string,            // 1-2 წინადადება, რა ენერგია არის ცაში ახლა
+  "body": string,               // 110-150 სიტყვა, 2 აბზაცი (\\n\\n): რას მოიტანს ეს ფაზა, რას ნიშნავს ნიშნის ფონზე, რა რიტუალი/მიდგომა მუშაობს ამ დღეებში
+  "themes": [string, string, string]  // 3 ერთსიტყვიანი ან ორსიტყვიანი თემა (მაგ. "თვითრეფლექსია", "ახალი დაწყება", "საზღვრები")
+}
+
+წესები:
+- "შენ"-ის ფორმა, თანაბარი ტონი (არა ზედმეტად დრამატული, არა ცივი)
+- კონკრეტული, ხელშესახები მაგალითი (არა ზოგადი ფრაზები)
+- აცილე კლიშეები ("მოამზადე გული", "სამყარო გელის" და ა.შ.)
+- ფაზის+ნიშნის სპეციფიკური ენერგიის ხაზგასმა — არა უნივერსალური "მთვარე გრძნობებზეა"
+- მხოლოდ JSON, ფენსების გარეშე`;
+
+export async function generateMoonPhaseReading(input: {
+  phaseLabelKa: string;
+  phaseKey: string;
+  signKa: string;
+  signEn: string;
+  illumination: number;
+  ageDays: number;
+  phaseAngle: number;
+}): Promise<MoonPhaseReadingResult | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const userMessage = [
+    `მთვარის ფაზა: ${input.phaseLabelKa} (${input.phaseKey})`,
+    `მთვარის ნიშანი: ${input.signKa} (${input.signEn})`,
+    `განათება: ${(input.illumination * 100).toFixed(1)}%`,
+    `ციკლის ასაკი: ${input.ageDays.toFixed(1)} დღე (29.53 დღიანი ციკლიდან)`,
+    `მზე-მთვარის კუთხე: ${input.phaseAngle.toFixed(1)}°`,
+    "",
+    "დააწერე ამ ფაზის+ნიშნის კოლექტიური ინტერპრეტაცია. JSON-ად დააბრუნე.",
+  ].join("\n");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida moon phase",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: MOON_PHASE_SYSTEM_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.8,
+      max_tokens: 2500,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  try {
+    const parsed = JSON.parse(stripped) as MoonPhaseReadingResult;
+    if (!parsed.headline || !parsed.body) {
+      throw new Error("missing required fields in moon phase reading");
+    }
+    return {
+      ...parsed,
+      themes: Array.isArray(parsed.themes) ? parsed.themes.slice(0, 3) : [],
+    };
+  } catch (err) {
+    throw new Error(
+      `Moon phase invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 400)}`
+    );
+  }
+}
+
 const DAILY_SYSTEM_PROMPT = `შენ ხარ მოდერნული ქართველი ასტროლოგი, რომელიც ყოველდღიურ ჰოროსკოპებს ნამდვილ ასტროლოგიაზე აშენებს, არა ზოგად მისტიკაზე.
 
 ყველაზე მნიშვნელოვანი წესი — ლიდერი არის მთვარე.
