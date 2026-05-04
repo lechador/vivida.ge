@@ -13,6 +13,7 @@ import type { PlanId } from "@/lib/pricing";
 
 import { DailyCard } from "./daily-card";
 import { MiniBigThree } from "./mini-big-three";
+import { SuggestedPeopleRail } from "./suggested-people-rail";
 
 /**
  * Home / today view rendered on /dashboard. Time-varying content:
@@ -85,6 +86,8 @@ export async function DailyView({
         </header>
         <MiniBigThree chart={chart.data} />
       </section>
+
+      <SuggestedPeopleRail userId={userId} />
 
       <section className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/10 to-transparent p-6 backdrop-blur-xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
