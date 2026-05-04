@@ -369,6 +369,38 @@ export default async function ZodiacSignPage({
           </div>
         </section>
 
+        {/* Go deeper — moon + rising for the same sign */}
+        <section className="mt-14 grid gap-4 sm:grid-cols-2">
+          <Link
+            href={`/zodiac/mtvare/${sign}`}
+            className="group rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15"
+          >
+            <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              მთვარის ნიშანი
+            </div>
+            <div className="mt-1 text-lg font-semibold tracking-tight">
+              მთვარე {c.labelKa}-ში
+            </div>
+            <p className="mt-1 text-pretty text-sm text-foreground/80">
+              შენი ემოციური ბირთვი და შინაგანი სამყარო.
+            </p>
+          </Link>
+          <Link
+            href={`/zodiac/amomavali/${sign}`}
+            className="group rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15"
+          >
+            <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              ამომავალი ნიშანი
+            </div>
+            <div className="mt-1 text-lg font-semibold tracking-tight">
+              {c.labelKa} ამომავალი
+            </div>
+            <p className="mt-1 text-pretty text-sm text-foreground/80">
+              ნიღაბი, რომელსაც სამყარო ხედავს პირველად.
+            </p>
+          </Link>
+        </section>
+
         {/* Other signs nav */}
         <section className="mt-14">
           <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">

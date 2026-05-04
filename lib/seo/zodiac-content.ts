@@ -100,6 +100,66 @@ export type ElementsHubContent = {
   faq: FaqEntry[];
 };
 
+// ─── Moon sign layer ────────────────────────────────────────────────────
+
+export type MoonSignContent = {
+  slug: ZodiacSlug;
+  labelKa: string;
+  symbol: string;
+  pageTitle: string;
+  metaDescription: string;
+  tagline: string;
+  intro: string;
+  emotionalCore: string;
+  love: string;
+  shadow: string;
+  compatibility: string;
+  famous: string[];
+  faq: FaqEntry[];
+};
+
+export type MoonHubContent = {
+  pageTitle: string;
+  metaDescription: string;
+  h1: string;
+  tagline: string;
+  intro: string;
+  whatItMeans: Section;
+  vsSun: Section;
+  howToFind: Section;
+  faq: FaqEntry[];
+};
+
+// ─── Rising sign layer ──────────────────────────────────────────────────
+
+export type RisingSignContent = {
+  slug: ZodiacSlug;
+  labelKa: string;
+  symbol: string;
+  pageTitle: string;
+  metaDescription: string;
+  tagline: string;
+  intro: string;
+  firstImpression: string;
+  appearance: string;
+  approach: string;
+  bestPaired: string;
+  famous: string[];
+  faq: FaqEntry[];
+};
+
+export type RisingHubContent = {
+  pageTitle: string;
+  metaDescription: string;
+  h1: string;
+  tagline: string;
+  intro: string;
+  whatItMeans: Section;
+  vsSun: Section;
+  howToFind: Section;
+  faq: FaqEntry[];
+};
+
 // ─── Compatibility layer ────────────────────────────────────────────────
 
 export type CompatibilityScore = "ძლიერი" | "ჰარმონიული" | "გამომწვევი";
@@ -146,6 +206,10 @@ type RawShape = {
   elements?: Record<string, ElementContent>;
   compatibilityHub?: CompatibilityHubContent;
   pairs?: Record<string, PairContent>;
+  moonHub?: MoonHubContent;
+  moons?: Record<string, MoonSignContent>;
+  risingHub?: RisingHubContent;
+  risings?: Record<string, RisingSignContent>;
 };
 
 const data = rawData as unknown as RawShape;
@@ -163,6 +227,15 @@ export const COMPATIBILITY_HUB_CONTENT: CompatibilityHubContent | null =
   data.compatibilityHub ?? null;
 export const PAIRS_CONTENT: Record<string, PairContent> | null =
   data.pairs ?? null;
+
+export const MOON_HUB_CONTENT: MoonHubContent | null = data.moonHub ?? null;
+export const MOONS_CONTENT: Record<ZodiacSlug, MoonSignContent> | null =
+  (data.moons as Record<ZodiacSlug, MoonSignContent>) ?? null;
+
+export const RISING_HUB_CONTENT: RisingHubContent | null =
+  data.risingHub ?? null;
+export const RISINGS_CONTENT: Record<ZodiacSlug, RisingSignContent> | null =
+  (data.risings as Record<ZodiacSlug, RisingSignContent>) ?? null;
 
 /** Split a `\n\n`-separated body into paragraphs for rendering. */
 export function paragraphs(body: string): string[] {

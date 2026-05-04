@@ -35,7 +35,16 @@ const args = process.argv.slice(2);
 const force = args.includes("--force");
 const onlyPair = arg("--pair");
 const onlyElement = arg("--element");
-const explicit = args.filter((a) => !a.startsWith("--"));
+const onlyMoon = arg("--moon");
+const onlyRising = arg("--rising");
+const explicit = args.filter(
+  (a, i) =>
+    !a.startsWith("--") &&
+    args[i - 1] !== "--pair" &&
+    args[i - 1] !== "--element" &&
+    args[i - 1] !== "--moon" &&
+    args[i - 1] !== "--rising"
+);
 
 function arg(flag) {
   const i = args.indexOf(flag);
@@ -133,6 +142,76 @@ const COMPAT_HUB_PROMPT = `ქართველი ასტროლოგი/
 }
 
 "შენ"-ის ფორმა, მხოლოდ JSON.`;
+
+const MOON_HUB_PROMPT = `ქართველი ასტროლოგი/რედაქტორი ხარ. დაწერე SEO ჰაბი მთვარის ნიშანზე.
+
+დააბრუნე მხოლოდ ვალიდური JSON:
+{
+  "pageTitle": string,                                       // ~50-60 სიმბოლო, "მთვარის ნიშანი" შემავალი
+  "metaDescription": string,                                 // ~140-155 სიმბოლო
+  "h1": string,
+  "tagline": string,                                         // 1 წინადადება
+  "intro": string,                                           // 100-130 სიტყვა — რა არის მთვარის ნიშანი
+  "whatItMeans": { "title": string, "body": string },        // body 110-140 სიტყვა — რას გვიჩვენებს მთვარის ნიშანი (ემოციური სამყარო, შინაგანი ბავშვი, ოჯახური ხატი)
+  "vsSun": { "title": string, "body": string },              // body 100-130 სიტყვა — განსხვავება მზის ნიშანსა და მთვარის ნიშანს შორის
+  "howToFind": { "title": string, "body": string },          // body 100-130 სიტყვა — როგორ გავიგო ჩემი მთვარის ნიშანი (Vivida-ს ნატალური რუკა — CTA-ზე საუბარი)
+  "faq": [{ "q": string, "a": string }]                      // ზუსტად 5 კითხვა
+}
+
+"შენ"-ის ფორმა, კონკრეტული, ცოცხალი ენა. მხოლოდ JSON.`;
+
+const MOON_DETAIL_PROMPT = `ქართველი ასტროლოგი/რედაქტორი. SEO გვერდი ერთი ნიშანში მდგომარე მთვარის შესახებ — ანუ "მთვარე [ნიშანი]-ში".
+
+დააბრუნე მხოლოდ JSON:
+{
+  "pageTitle": string,                       // ~50-60 სიმბოლო, "მთვარე [ნიშანი]-ში" ან მსგავსი
+  "metaDescription": string,                 // ~140-155 სიმბოლო
+  "tagline": string,                         // 1 წინადადება
+  "intro": string,                           // 90-120 სიტყვა — საერთო სურათი
+  "emotionalCore": string,                   // 2 აბზაცი (\\n\\n) — ემოციური ბირთვი, შინაგანი სამყარო, რა აწყობებს ან აწუხებს
+  "love": string,                            // 2 აბზაცი (\\n\\n) — როგორ უყვარს, რა სჭირდება სიყვარულში
+  "shadow": string,                          // 1 აბზაცი — ჩრდილოვანი მხარე, ემოციური წყლული, თავდაცვის რეფლექსი
+  "compatibility": string,                   // 1 აბზაცი — რომელი მთვარის ნიშნებთან მოდის ყველაზე კარგად
+  "famous": string[],                        // 4-5 მსოფლიოში ცნობილი ადამიანი ამ მთვარის ნიშნით
+  "faq": [{ "q": string, "a": string }]      // ზუსტად 3 კითხვა
+}
+
+წესები: "შენ"-ის ფორმა, კონკრეტული მაგალითები, ცოცხალი ენა, აცილე კლიშეები. მხოლოდ JSON.`;
+
+const RISING_HUB_PROMPT = `ქართველი ასტროლოგი/რედაქტორი ხარ. დაწერე SEO ჰაბი ამომავალ ნიშანზე (ასცენდენტი).
+
+დააბრუნე მხოლოდ ვალიდური JSON:
+{
+  "pageTitle": string,                                       // ~50-60 სიმბოლო, "ამომავალი ნიშანი" ან "ასცენდენტი" შემავალი
+  "metaDescription": string,                                 // ~140-155 სიმბოლო
+  "h1": string,
+  "tagline": string,
+  "intro": string,                                           // 100-130 სიტყვა
+  "whatItMeans": { "title": string, "body": string },        // body 110-140 სიტყვა — რას ნიშნავს ამომავალი (გარეგანი ხატი, ნიღაბი, პირველი შთაბეჭდილება)
+  "vsSun": { "title": string, "body": string },              // body 100-130 სიტყვა — როგორ აფერადებს ამომავალი მზის ნიშანს
+  "howToFind": { "title": string, "body": string },          // body 100-130 სიტყვა — როგორ გავიგო ჩემი ამომავალი (დაბადების ზუსტი დრო და ადგილი — Vivida-ს ნატალური რუკის CTA)
+  "faq": [{ "q": string, "a": string }]                      // ზუსტად 5 კითხვა
+}
+
+"შენ"-ის ფორმა, მხოლოდ JSON.`;
+
+const RISING_DETAIL_PROMPT = `ქართველი ასტროლოგი/რედაქტორი. SEO გვერდი ერთი ნიშანში მდგომარე ამომავალის შესახებ — ანუ "[ნიშანი] ამომავალი" / ასცენდენტი.
+
+დააბრუნე მხოლოდ JSON:
+{
+  "pageTitle": string,                       // ~50-60 სიმბოლო, "[ნიშანი] ამომავალი" ან მსგავსი
+  "metaDescription": string,                 // ~140-155 სიმბოლო
+  "tagline": string,                         // 1 წინადადება
+  "intro": string,                           // 90-120 სიტყვა — როგორ ამძიმებს/აღაფრთოვანებს ეს ამომავალი მთლიან პიროვნებას
+  "firstImpression": string,                 // 2 აბზაცი (\\n\\n) — პირველი შთაბეჭდილება, ენერგიის რომელი ფერი დარბის ოთახში
+  "appearance": string,                      // 1 აბზაცი — ფიზიკური ვაიბი, სტილი, სხეულის სიგნალები (აცილე ვიზუალური სტერეოტიპი)
+  "approach": string,                        // 2 აბზაცი (\\n\\n) — როგორ უდგება ცხოვრებას, რა არის მისი ბუნებრივი მოქმედება
+  "bestPaired": string,                      // 1 აბზაცი — რა მზის/მთვარის ნიშნებთან აკეთებს ყველაზე საინტერესო კომბინაციას
+  "famous": string[],                        // 4-5 ცნობილი ადამიანი ამ ამომავალი ნიშნით
+  "faq": [{ "q": string, "a": string }]      // ზუსტად 3 კითხვა
+}
+
+წესები: "შენ"-ის ფორმა, კონკრეტული, ცოცხალი ენა. მხოლოდ JSON.`;
 
 const PAIR_PROMPT = `ქართველი ასტროლოგი/რედაქტორი. SEO გვერდი ორი ცის ნიშნის თავსებადობაზე.
 
@@ -237,6 +316,38 @@ async function generateCompatHub() {
   );
 }
 
+async function generateMoonHub() {
+  return callOpenRouter(
+    MOON_HUB_PROMPT,
+    "დააწერე SEO ჰაბი მთვარის ნიშანზე ქართულად. JSON-ად დააბრუნე.",
+    "moonHub"
+  );
+}
+
+async function generateMoon(slug) {
+  const m = SIGN_META[slug];
+  const userPrompt = `ნიშანი: ${m.labelKa} (${m.elementKa})
+დაწერე SEO გვერდი მთვარის ${m.labelKa}-ში მდგომარეობის შესახებ.
+JSON-ად დააბრუნე.`;
+  return callOpenRouter(MOON_DETAIL_PROMPT, userPrompt, `moon:${slug}`);
+}
+
+async function generateRisingHub() {
+  return callOpenRouter(
+    RISING_HUB_PROMPT,
+    "დააწერე SEO ჰაბი ამომავალ ნიშანზე (ასცენდენტი) ქართულად. JSON-ად დააბრუნე.",
+    "risingHub"
+  );
+}
+
+async function generateRising(slug) {
+  const m = SIGN_META[slug];
+  const userPrompt = `ნიშანი: ${m.labelKa} (${m.elementKa})
+დაწერე SEO გვერდი ${m.labelKa} ამომავალი (ასცენდენტი)-ის შესახებ.
+JSON-ად დააბრუნე.`;
+  return callOpenRouter(RISING_DETAIL_PROMPT, userPrompt, `rising:${slug}`);
+}
+
 async function generatePair(slugA, slugB) {
   const a = SIGN_META[slugA];
   const b = SIGN_META[slugB];
@@ -256,6 +367,8 @@ const data = existsSync(OUT)
   : { signs: {}, hub: null, byDate: null };
 data.elements ??= {};
 data.pairs ??= {};
+data.moons ??= {};
+data.risings ??= {};
 
 function save() {
   writeFileSync(OUT, JSON.stringify(data, null, 2));
@@ -303,11 +416,48 @@ async function run() {
     console.log(`  ✓ ${el.slug} ${(Date.now() - t0) / 1000}s`);
     return;
   }
+  if (onlyMoon) {
+    if (!SIGN_META[onlyMoon]) throw new Error(`bad sign: ${onlyMoon}`);
+    console.log(`→ moon ${onlyMoon}`);
+    const t0 = Date.now();
+    data.moons[onlyMoon] = {
+      slug: onlyMoon,
+      labelKa: SIGN_META[onlyMoon].labelKa,
+      symbol: SIGN_META[onlyMoon].symbol,
+      ...(await generateMoon(onlyMoon)),
+    };
+    save();
+    console.log(`  ✓ moon:${onlyMoon} ${(Date.now() - t0) / 1000}s`);
+    return;
+  }
+  if (onlyRising) {
+    if (!SIGN_META[onlyRising]) throw new Error(`bad sign: ${onlyRising}`);
+    console.log(`→ rising ${onlyRising}`);
+    const t0 = Date.now();
+    data.risings[onlyRising] = {
+      slug: onlyRising,
+      labelKa: SIGN_META[onlyRising].labelKa,
+      symbol: SIGN_META[onlyRising].symbol,
+      ...(await generateRising(onlyRising)),
+    };
+    save();
+    console.log(`  ✓ rising:${onlyRising} ${(Date.now() - t0) / 1000}s`);
+    return;
+  }
 
   const targets =
     explicit.length > 0
       ? explicit
-      : ["elementsHub", "elements", "compatibilityHub", "pairs"];
+      : [
+          "elementsHub",
+          "elements",
+          "compatibilityHub",
+          "pairs",
+          "moonHub",
+          "moons",
+          "risingHub",
+          "risings",
+        ];
 
   if (targets.includes("elementsHub")) {
     if (!force && data.elementsHub) {
@@ -378,6 +528,70 @@ async function run() {
       console.log(
         `  ✓ ${slug} ${(Date.now() - t0) / 1000}s (${done}/${pairs.length})`
       );
+    });
+  }
+
+  if (targets.includes("moonHub")) {
+    if (!force && data.moonHub) {
+      console.log("✓ skip moonHub");
+    } else {
+      console.log("→ moonHub…");
+      const t0 = Date.now();
+      data.moonHub = await generateMoonHub();
+      save();
+      console.log(`  ✓ moonHub ${(Date.now() - t0) / 1000}s`);
+    }
+  }
+
+  if (targets.includes("moons")) {
+    await runWithConcurrency(ALL_SLUGS, 3, async (slug) => {
+      if (!force && data.moons[slug]) {
+        console.log(`✓ skip moon ${slug}`);
+        return;
+      }
+      console.log(`→ moon ${slug}…`);
+      const t0 = Date.now();
+      const content = await generateMoon(slug);
+      data.moons[slug] = {
+        slug,
+        labelKa: SIGN_META[slug].labelKa,
+        symbol: SIGN_META[slug].symbol,
+        ...content,
+      };
+      save();
+      console.log(`  ✓ moon:${slug} ${(Date.now() - t0) / 1000}s`);
+    });
+  }
+
+  if (targets.includes("risingHub")) {
+    if (!force && data.risingHub) {
+      console.log("✓ skip risingHub");
+    } else {
+      console.log("→ risingHub…");
+      const t0 = Date.now();
+      data.risingHub = await generateRisingHub();
+      save();
+      console.log(`  ✓ risingHub ${(Date.now() - t0) / 1000}s`);
+    }
+  }
+
+  if (targets.includes("risings")) {
+    await runWithConcurrency(ALL_SLUGS, 3, async (slug) => {
+      if (!force && data.risings[slug]) {
+        console.log(`✓ skip rising ${slug}`);
+        return;
+      }
+      console.log(`→ rising ${slug}…`);
+      const t0 = Date.now();
+      const content = await generateRising(slug);
+      data.risings[slug] = {
+        slug,
+        labelKa: SIGN_META[slug].labelKa,
+        symbol: SIGN_META[slug].symbol,
+        ...content,
+      };
+      save();
+      console.log(`  ✓ rising:${slug} ${(Date.now() - t0) / 1000}s`);
     });
   }
 

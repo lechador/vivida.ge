@@ -213,7 +213,43 @@ export default function ZodiacHubPage() {
           <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
             ჩაუღრმავდი
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Link
+              href="/zodiac/mtvare"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80"
+            >
+              <div
+                aria-hidden
+                className="absolute -right-12 -top-12 size-40 rounded-full bg-[radial-gradient(circle,var(--vivida-cyan)_0%,transparent_70%)] opacity-30 blur-3xl"
+              />
+              <div className="relative text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                მთვარის ნიშანი
+              </div>
+              <h3 className="relative mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+                შენი ემოციური ბირთვი
+              </h3>
+              <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
+                მზის ნიშნის ქვეშ მდებარე შინაგანი სამყარო.
+              </p>
+            </Link>
+            <Link
+              href="/zodiac/amomavali"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80"
+            >
+              <div
+                aria-hidden
+                className="absolute -right-12 -top-12 size-40 rounded-full bg-[radial-gradient(circle,oklch(0.78_0.18_60/0.4)_0%,transparent_70%)] blur-3xl"
+              />
+              <div className="relative text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                ამომავალი
+              </div>
+              <h3 className="relative mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+                ნიღაბი, რომელსაც სამყარო ხედავს
+              </h3>
+              <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
+                ასცენდენტი — როგორ შედიხარ ოთახში.
+              </p>
+            </Link>
             <Link
               href="/zodiac/elementebi"
               className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80"

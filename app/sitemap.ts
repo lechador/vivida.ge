@@ -38,6 +38,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  const moonPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
+    url: `${BASE}/zodiac/mtvare/${slug}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  const risingPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
+    url: `${BASE}/zodiac/amomavali/${slug}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   return [
     {
       url: `${BASE}/`,
@@ -87,9 +101,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    {
+      url: `${BASE}/zodiac/mtvare`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE}/zodiac/amomavali`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     ...zodiacSignPages,
     ...elementPages,
     ...pairPages,
+    ...moonPages,
+    ...risingPages,
     {
       url: `${BASE}/login`,
       lastModified: NOW,

@@ -11,6 +11,8 @@ const PRODUCT_LINKS = [
 const LEARN_LINKS = [
   { href: "/zodiac", label: "ცის ნიშნები" },
   { href: "/zodiac/datit", label: "ნიშანი თარიღით" },
+  { href: "/zodiac/mtvare", label: "მთვარის ნიშანი" },
+  { href: "/zodiac/amomavali", label: "ამომავალი ნიშანი" },
   { href: "/zodiac/elementebi", label: "ელემენტები" },
   { href: "/zodiac/tavsebadoba", label: "თავსებადობა" },
 ];
