@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { FriendButton } from "@/components/profile/friend-button";
+import { MessageButton } from "@/components/chat/message-button";
 import { PhotoCarousel } from "@/components/profile/photo-carousel";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 
@@ -229,11 +230,16 @@ export default async function PublicProfilePage({
                   </Link>
                 </Button>
               ) : viewerId ? (
-                <FriendButton
-                  targetUserId={owner.id}
-                  targetUsername={profile.username}
-                  initialStatus={friendshipStatus}
-                />
+                <>
+                  {friendshipStatus === "friends" && (
+                    <MessageButton partnerId={owner.id} />
+                  )}
+                  <FriendButton
+                    targetUserId={owner.id}
+                    targetUsername={profile.username}
+                    initialStatus={friendshipStatus}
+                  />
+                </>
               ) : (
                 <Button asChild variant="mystic">
                   <Link href="/signup">

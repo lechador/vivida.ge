@@ -53,8 +53,12 @@ export default async function DashboardPage() {
           </span>
         </h1>
 
-        <div className="mb-8">
-          <TrialBanner userId={user.id} />
+        {/* Suppress the trial banner on the dashboard until the final
+            stretch — keeps the daily view distraction-free for the bulk
+            of the trial. /account + /pricing still show it full-time so
+            users who actively check status always see the countdown. */}
+        <div className="mb-8 empty:hidden">
+          <TrialBanner userId={user.id} showWithinDays={3} />
         </div>
 
         <Suspense fallback={<CosmicLoader embedded />}>

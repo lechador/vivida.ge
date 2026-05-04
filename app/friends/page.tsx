@@ -13,6 +13,7 @@ import {
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { FriendActions } from "@/components/friends/friend-actions";
+import { MessageButton } from "@/components/chat/message-button";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "მეგობრები · Vivida" };
@@ -164,6 +165,12 @@ function FriendRow({
           </p>
         )}
       </div>
+      {/* Message button for accepted friends only — same gate as the
+          server action enforces. Renders before FriendActions so "remove"
+          (the destructive action) sits last in tab order. */}
+      {variant === "friends" && (
+        <MessageButton partnerId={u.id} variant="icon" />
+      )}
       <FriendActions
         variant={variant}
         otherUserId={u.id}

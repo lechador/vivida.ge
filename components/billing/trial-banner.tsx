@@ -9,16 +9,29 @@ import { getSubscription, isOnTrial, trialDaysLeft } from "@/lib/plan";
  * Renders nothing if the user is on a paid plan, the trial is over, or
  * they don't have a subscription at all.
  *
+ * `showWithinDays` lets a caller suppress the banner until the trial is
+ * close to expiring — e.g. the dashboard passes `3` so the banner only
+ * appears in the final 3 days, when it's actually actionable. Pages
+ * where the banner should always be visible during a trial (account,
+ * pricing, etc.) can omit the prop.
+ *
  * Server component — fetches its own subscription state so caller pages
  * don't have to thread the data through. Intentionally non-dismissible:
  * the days-remaining count is the whole point and disappearing it would
  * lead to surprise expirations.
  */
-export async function TrialBanner({ userId }: { userId: string }) {
+export async function TrialBanner({
+  userId,
+  showWithinDays,
+}: {
+  userId: string;
+  showWithinDays?: number;
+}) {
   const subscription = await getSubscription(userId);
   if (!isOnTrial(subscription)) return null;
   const days = trialDaysLeft(subscription);
   if (days <= 0) return null;
+  if (showWithinDays !== undefined && days > showWithinDays) return null;
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-r from-[var(--vivida-violet)]/15 via-[var(--vivida-pink)]/8 to-[var(--vivida-cyan)]/15 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-5">
