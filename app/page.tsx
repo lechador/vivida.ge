@@ -127,26 +127,38 @@ export default async function Home() {
               vivida
             </span>
           </Link>
-          <nav className="hidden items-center gap-7 text-sm text-muted-foreground sm:flex">
+          <div className="flex items-center gap-3 sm:gap-6">
+            <nav className="hidden items-center gap-7 text-sm text-muted-foreground sm:flex">
+              <Link
+                href="/how-it-works"
+                className="transition-colors hover:text-foreground"
+              >
+                როგორ მუშაობს
+              </Link>
+              <Link
+                href="/features"
+                className="transition-colors hover:text-foreground"
+              >
+                ფუნქციები
+              </Link>
+              <Link
+                href="/pricing"
+                className="transition-colors hover:text-foreground"
+              >
+                ფასები
+              </Link>
+            </nav>
             <Link
-              href="/how-it-works"
-              className="transition-colors hover:text-foreground"
+              href="/login"
+              className="group relative inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-cyan)]/45 bg-[var(--vivida-cyan)]/8 px-4 py-1.5 text-sm font-medium text-[var(--vivida-cyan)] transition-all hover:border-[var(--vivida-cyan)]/70 hover:bg-[var(--vivida-cyan)]/14 hover:text-foreground"
             >
-              როგორ მუშაობს
+              <span
+                aria-hidden
+                className="size-1.5 rounded-full bg-[var(--vivida-cyan)] vivida-pulse"
+              />
+              შესვლა
             </Link>
-            <Link
-              href="/features"
-              className="transition-colors hover:text-foreground"
-            >
-              ფუნქციები
-            </Link>
-            <Link
-              href="/pricing"
-              className="transition-colors hover:text-foreground"
-            >
-              ფასები
-            </Link>
-          </nav>
+          </div>
         </header>
 
         <Hero />
