@@ -97,62 +97,74 @@ export function SynastryDisplay({
             როგორ ვითარდება სხვადასხვა ენერგია შენსა და {partnerName}-ს შორის
           </span>
         </header>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-3">
           {CATEGORIES.map((cat, i) => {
             const score = result.scores[cat];
             return (
               <motion.article
                 key={cat}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{
-                  delay: i * 0.08,
-                  duration: 0.5,
+                  delay: i * 0.06,
+                  duration: 0.45,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80 hover:ring-foreground/15"
+                className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 px-4 py-3.5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15 sm:px-5"
               >
                 <div
                   aria-hidden
-                  className="absolute -right-12 -top-12 size-32 rounded-full opacity-25 blur-2xl transition-opacity group-hover:opacity-50"
+                  className="absolute -right-10 -top-10 size-24 rounded-full opacity-20 blur-2xl transition-opacity group-hover:opacity-40"
                   style={{
                     background: `radial-gradient(circle, ${CATEGORY_RING_COLOR[cat]} 0%, transparent 70%)`,
                   }}
                 />
-                <header className="relative mb-4 flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-2xl">{CATEGORY_EMOJI[cat]}</div>
-                    <div className="mt-2 text-base font-semibold tracking-tight">
-                      {CATEGORY_LABEL_KA[cat]}
-                    </div>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {CATEGORY_DESCRIPTOR_KA[cat]}
-                    </p>
-                  </div>
-                  <span
-                    className="text-2xl font-semibold tabular-nums"
-                    style={{ color: CATEGORY_RING_COLOR[cat] }}
-                  >
-                    {score}%
-                  </span>
-                </header>
-                <div className="relative h-2 overflow-hidden rounded-full bg-card/60">
-                  <motion.div
-                    className={`h-full rounded-full bg-gradient-to-r ${CATEGORY_GRADIENT[cat]}`}
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${score}%` }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{
-                      delay: 0.2 + i * 0.08,
-                      duration: 0.9,
-                      ease: [0.22, 1, 0.36, 1],
+                <div className="relative flex items-center gap-4">
+                  <div
+                    className="grid size-11 shrink-0 place-items-center rounded-xl text-xl"
+                    style={{
+                      background: `color-mix(in oklch, ${CATEGORY_RING_COLOR[cat]} 14%, transparent)`,
+                      boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${CATEGORY_RING_COLOR[cat]} 30%, transparent)`,
                     }}
-                  />
+                  >
+                    {CATEGORY_EMOJI[cat]}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <div className="flex min-w-0 items-baseline gap-2">
+                        <h4 className="text-sm font-semibold tracking-tight sm:text-base">
+                          {CATEGORY_LABEL_KA[cat]}
+                        </h4>
+                        <span className="hidden truncate text-xs text-muted-foreground sm:inline">
+                          {CATEGORY_DESCRIPTOR_KA[cat]}
+                        </span>
+                      </div>
+                      <span
+                        className="text-base font-semibold tabular-nums sm:text-lg"
+                        style={{ color: CATEGORY_RING_COLOR[cat] }}
+                      >
+                        {score}%
+                      </span>
+                    </div>
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-foreground/80 sm:line-clamp-1 sm:text-[13px]">
+                      {narrateCategory(cat as SynastryCategory, score)}
+                    </p>
+                    <div className="relative mt-2 h-1 overflow-hidden rounded-full bg-card/60">
+                      <motion.div
+                        className={`h-full rounded-full bg-gradient-to-r ${CATEGORY_GRADIENT[cat]}`}
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${score}%` }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{
+                          delay: 0.15 + i * 0.06,
+                          duration: 0.8,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <p className="relative mt-4 text-sm leading-relaxed text-foreground/85">
-                  {narrateCategory(cat as SynastryCategory, score)}
-                </p>
               </motion.article>
             );
           })}
