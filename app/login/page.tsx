@@ -7,7 +7,7 @@ import { AuthDivider, AuthLayout } from "@/components/auth/auth-layout";
 import { GoogleButton } from "@/components/auth/google-button";
 import { LoginForm } from "@/components/auth/login-form";
 
-export const metadata = { title: "შესვლა · Vivida" };
+export const metadata = { title: "შესვლა" };
 
 export default async function LoginPage() {
   const session = await auth();

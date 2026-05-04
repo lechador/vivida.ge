@@ -4,7 +4,7 @@ import { CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 
-export const metadata = { title: "გადახდა გაუქმებულია · Vivida" };
+export const metadata = { title: "გადახდა გაუქმებულია" };
 
 export default function BillingCancelPage() {
   return (

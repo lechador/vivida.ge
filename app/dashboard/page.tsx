@@ -12,7 +12,7 @@ import { DailyView } from "@/components/dashboard/daily-view";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import { TrialBanner } from "@/components/billing/trial-banner";
 
-export const metadata = { title: "დღეს · Vivida" };
+export const metadata = { title: "დღეს" };
 
 export default async function DashboardPage() {
   const user = await requireUser();

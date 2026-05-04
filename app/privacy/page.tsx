@@ -2,7 +2,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 
 export const metadata = {
-  title: "კონფიდენციალურობა · Vivida",
+  title: "კონფიდენციალურობა",
   description:
     "Vivida-ს კონფიდენციალურობის პოლიტიკა — როგორ ვაგროვებთ და ვინახავთ თქვენს მონაცემებს.",
 };

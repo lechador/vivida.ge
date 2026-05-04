@@ -16,7 +16,7 @@ import { FriendActions } from "@/components/friends/friend-actions";
 import { MessageButton } from "@/components/chat/message-button";
 import { cn } from "@/lib/utils";
 
-export const metadata = { title: "მეგობრები · Vivida" };
+export const metadata = { title: "მეგობრები" };
 
 type Tab = "friends" | "incoming" | "outgoing";
 

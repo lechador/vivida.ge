@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { VividaMark } from "@/components/brand/vivida-mark";
 
-export const metadata = { title: "გვერდი ვერ მოიძებნა · Vivida" };
+export const metadata = { title: "გვერდი ვერ მოიძებნა" };
 
 export default function NotFound() {
   return (

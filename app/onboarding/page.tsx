@@ -8,7 +8,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { OnboardingWizard } from "@/components/onboarding/wizard";
 import { VividaMark } from "@/components/brand/vivida-mark";
 
-export const metadata = { title: "გაცნობა · Vivida" };
+export const metadata = { title: "გაცნობა" };
 
 export default async function OnboardingPage() {
   const user = await requireUser();

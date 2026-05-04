@@ -6,7 +6,7 @@ import { AuthDivider, AuthLayout } from "@/components/auth/auth-layout";
 import { GoogleButton } from "@/components/auth/google-button";
 import { SignupForm } from "@/components/auth/signup-form";
 
-export const metadata = { title: "რეგისტრაცია · Vivida" };
+export const metadata = { title: "რეგისტრაცია" };
 
 export default async function SignupPage() {
   const session = await auth();

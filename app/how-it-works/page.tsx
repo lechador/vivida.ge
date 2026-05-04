@@ -15,7 +15,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 
 export const metadata = {
-  title: "როგორ მუშაობს · Vivida",
+  title: "როგორ მუშაობს",
   description:
     "ნახე როგორ ქმნის Vivida შენს პერსონალურ კოსმიურ რუკას — დაბადების მონაცემიდან AI ინტერპრეტაციამდე.",
 };

@@ -18,7 +18,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 
 export const metadata = {
-  title: "ფუნქციები · Vivida",
+  title: "ფუნქციები",
   description:
     "ნატალური რუკა, ყოველდღიური პროგნოზი, თავსებადობა, AI ანალიზი, საჯარო პროფილი — Vivida-ს ყველა ფუნქცია ერთ ადგილას.",
 };

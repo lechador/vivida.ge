@@ -16,7 +16,7 @@ import { DangerZone } from "@/components/account/danger-zone";
 import { VisibilityCard } from "@/components/account/visibility-card";
 import { PhotoUploader } from "@/components/account/photo-uploader";
 
-export const metadata = { title: "ანგარიში · Vivida" };
+export const metadata = { title: "ანგარიში" };
 
 export default async function AccountPage() {
   const user = await requireUser();

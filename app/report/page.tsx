@@ -15,7 +15,7 @@ import { ChartSection } from "@/components/dashboard/chart-section";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import { TrialBanner } from "@/components/billing/trial-banner";
 
-export const metadata = { title: "ჩემი რუკა · Vivida" };
+export const metadata = { title: "ჩემი რუკა" };
 
 export default async function ReportPage() {
   const user = await requireUser();

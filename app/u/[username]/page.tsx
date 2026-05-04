@@ -53,12 +53,12 @@ export async function generateMetadata({
     .limit(1);
 
   if (!profile?.isPublic) {
-    return { title: "პროფილი ვერ მოიძებნა · Vivida" };
+    return { title: "პროფილი ვერ მოიძებნა" };
   }
 
   const name = profile.displayName ?? profile.username ?? "vivida user";
   return {
-    title: `${name} · Vivida`,
+    title: name,
     description:
       profile.bio ?? `ნახე ${name}-ის ნატალური რუკა და თქვენი თავსებადობა.`,
   };

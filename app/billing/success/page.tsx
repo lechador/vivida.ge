@@ -4,7 +4,7 @@ import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 
-export const metadata = { title: "გადახდა წარმატებულია · Vivida" };
+export const metadata = { title: "გადახდა წარმატებულია" };
 
 export default function BillingSuccessPage() {
   return (

@@ -2,7 +2,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 
 export const metadata = {
-  title: "წესები და პირობები · Vivida",
+  title: "წესები და პირობები",
   description:
     "Vivida-ს გამოყენების წესები და პირობები — სამომხმარებლო ხელშეკრულება.",
 };

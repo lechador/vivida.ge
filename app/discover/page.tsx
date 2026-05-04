@@ -15,7 +15,7 @@ import {
   type Element,
 } from "@/lib/discover";
 
-export const metadata = { title: "აღმოაჩინე · Vivida" };
+export const metadata = { title: "აღმოაჩინე" };
 
 const ELEMENT_LABEL_KA: Record<Element, string> = {
   ცეცხლი: "ცეცხლი",

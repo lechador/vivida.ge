@@ -7,7 +7,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { PricingCards } from "@/components/pricing/pricing-cards";
 import { SiteFooter } from "@/components/site-footer";
 
-export const metadata = { title: "ფასები · Vivida" };
+export const metadata = { title: "ფასები" };
 
 const KA_DATE = new Intl.DateTimeFormat("ka-GE", {
   day: "numeric",
