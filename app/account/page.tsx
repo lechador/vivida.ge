@@ -59,25 +59,25 @@ export default async function AccountPage() {
         </h1>
 
         {/* Profile */}
-        <div className="mb-6 flex items-center gap-4 rounded-2xl border border-border/60 bg-card/40 p-5 backdrop-blur-xl">
+        <div className="mb-6 flex items-center gap-4 rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
           {user.image && (
             <Image
               src={user.image}
               alt=""
               width={48}
               height={48}
-              className="size-12 rounded-full border border-border/60"
+              className="size-12 rounded-full border border-border"
             />
           )}
           <div className="min-w-0 flex-1">
             <div className="truncate text-base font-medium text-foreground">
               {user.name ?? "ვარსკვლავო"}
             </div>
-            <div className="truncate text-sm text-muted-foreground">
+            <div className="truncate text-sm text-foreground/65">
               {user.email}
             </div>
           </div>
-          <span className="rounded-full border border-border bg-background/40 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <span className="rounded-full border border-border bg-background/60 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-foreground/75">
             Google
           </span>
         </div>
@@ -112,7 +112,7 @@ export default async function AccountPage() {
         </div>
 
         {/* Birth data */}
-        <div className="mb-6 rounded-2xl border border-border/60 bg-card/40 p-6 backdrop-blur-xl">
+        <div className="mb-6 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">დაბადების მონაცემები</h2>
             <Button asChild variant="ghost" size="sm">

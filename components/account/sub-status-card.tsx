@@ -36,7 +36,7 @@ export function SubscriptionStatusCard({
   // Free / no trial / expired — upsell card
   if (!onTrial && !isPaidPro) {
     return (
-      <div className="rounded-2xl border border-border/60 bg-card/40 p-6 backdrop-blur-xl">
+      <div className="rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">

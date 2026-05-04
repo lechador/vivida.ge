@@ -56,14 +56,14 @@ export function DangerZone() {
   };
 
   return (
-    <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6 backdrop-blur-xl">
+    <div className="rounded-2xl border border-destructive/60 bg-destructive/10 p-6 ring-1 ring-destructive/20 backdrop-blur-xl">
       <div className="mb-2 flex items-center gap-2">
         <AlertTriangle className="size-4 text-destructive" />
         <h2 className="text-base font-semibold text-destructive">
           საშიში ზონა
         </h2>
       </div>
-      <p className="mb-5 text-sm text-muted-foreground">
+      <p className="mb-5 text-sm text-foreground/75">
         ანგარიშის წაშლა საბოლოოა და ვერ აღდგება. შენი ყველა მონაცემი
         წაიშლება დაუყოვნებლივ.
       </p>
