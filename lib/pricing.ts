@@ -41,8 +41,8 @@ export const PLANS: Record<PlanId, PlanDef> = {
     tagline: "შენი სრული, პერსონალური კოსმოსი — ყოველდღე, ყოველთვის.",
     ctaLabel: "გადადი Pro-ზე",
     price: {
-      month: 1990, // ₾19.90
-      year: 19900, // ₾199.00 (10 თვის ფასი — 2 თვე უფასოდ)
+      month: 1290, // ₾12.90
+      year: 12900, // ₾129.00 (10 თვის ფასი — 2 თვე უფასოდ)
     },
   },
 };
@@ -103,7 +103,7 @@ export const FEATURES: FeatureRow[] = [
   },
 ];
 
-/** Format tetri as "₾19.90" */
+/** Format tetri as "₾12.90" */
 export function formatPrice(tetri: number): string {
   if (tetri === 0) return "უფასო";
   const lari = tetri / 100;

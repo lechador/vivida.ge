@@ -10,7 +10,7 @@ import type { PlanId } from "./pricing";
  * for live billing. After this window the user falls back to the free
  * tier and the upgrade CTAs become primary.
  */
-export const TRIAL_DAYS = 60;
+export const TRIAL_DAYS = 30;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 /**
