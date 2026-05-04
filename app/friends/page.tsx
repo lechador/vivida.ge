@@ -129,27 +129,49 @@ function FriendRow({
 }) {
   const displayName =
     u.displayName ?? u.name?.split(" ")[0] ?? u.username ?? "user";
+  const profileHref = u.username ? `/u/${u.username}` : null;
+
+  const avatar = u.image ? (
+    <Image
+      src={u.image}
+      alt=""
+      width={48}
+      height={48}
+      className="size-12 shrink-0 rounded-full border border-border/80 object-cover"
+    />
+  ) : (
+    <div className="grid size-12 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-base text-muted-foreground">
+      {displayName[0]?.toUpperCase()}
+    </div>
+  );
 
   return (
     <li className="group flex items-center gap-4 rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15">
-      {u.image ? (
-        <Image
-          src={u.image}
-          alt=""
-          width={48}
-          height={48}
-          className="size-12 shrink-0 rounded-full border border-border/80 object-cover"
-        />
+      {profileHref ? (
+        <Link
+          href={profileHref}
+          aria-label={`${displayName}-ის პროფილი`}
+          className="shrink-0 rounded-full transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
+          {avatar}
+        </Link>
       ) : (
-        <div className="grid size-12 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-base text-muted-foreground">
-          {displayName[0]?.toUpperCase()}
-        </div>
+        avatar
       )}
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-2">
-          <span className="truncate text-base font-medium text-foreground">
-            {displayName}
-          </span>
+          {profileHref ? (
+            <Link
+              href={profileHref}
+              className="truncate text-base font-medium text-foreground transition-colors hover:text-[var(--vivida-violet)]"
+            >
+              {displayName}
+            </Link>
+          ) : (
+            <span className="truncate text-base font-medium text-foreground">
+              {displayName}
+            </span>
+          )}
           {u.username && (
             <Link
               href={`/u/${u.username}`}
