@@ -1,26 +1,230 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Vivida light fallback — app forces dark by default */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --radius: 0.75rem;
+}
+
+.dark {
+  /* Mystical, deep-cosmos palette */
+  --background: oklch(0.13 0.03 280);            /* near-black violet */
+  --foreground: oklch(0.97 0.01 280);            /* moonlight white */
+  --card: oklch(0.17 0.04 280);
+  --card-foreground: oklch(0.97 0.01 280);
+  --popover: oklch(0.17 0.04 280);
+  --popover-foreground: oklch(0.97 0.01 280);
+  --primary: oklch(0.78 0.18 305);               /* vibrant magenta-violet */
+  --primary-foreground: oklch(0.13 0.03 280);
+  --secondary: oklch(0.22 0.05 280);
+  --secondary-foreground: oklch(0.97 0.01 280);
+  --muted: oklch(0.22 0.04 280);
+  --muted-foreground: oklch(0.72 0.04 280);
+  --accent: oklch(0.72 0.18 200);                /* electric cyan */
+  --accent-foreground: oklch(0.13 0.03 280);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.97 0.01 280);
+  --border: oklch(0.27 0.04 280 / 60%);
+  --input: oklch(0.27 0.04 280 / 80%);
+  --ring: oklch(0.78 0.18 305 / 70%);
+
+  /* Brand-only mystic accents (used in gradients, glows) */
+  --vivida-violet: oklch(0.65 0.24 305);
+  --vivida-pink:   oklch(0.72 0.22 350);
+  --vivida-cyan:   oklch(0.78 0.18 200);
+  --vivida-gold:   oklch(0.85 0.16 85);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-vivida-violet: var(--vivida-violet);
+  --color-vivida-pink: var(--vivida-pink);
+  --color-vivida-cyan: var(--vivida-cyan);
+  --color-vivida-gold: var(--vivida-gold);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  /*
+   * Bump the root font size from the browser default (16px) to 18px on
+   * tablet/desktop. Tailwind's spacing/sizing/padding/font scales are all
+   * rem-based, so this proportionally enlarges every layout token in one
+   * place. Mobile keeps the 16px default — at 360px-wide phones, 18px
+   * crushes layouts and forces horizontal scroll.
+   */
+  html {
+    font-size: 16px;
+  }
+  @media (min-width: 640px) {
+    html {
+      font-size: 18px;
+    }
+  }
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background-color: oklch(0.78 0.18 305 / 35%);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Slow drifting starfield used on the landing page.
+ * `contain: paint` isolates this layer so star repaints don't affect siblings;
+ * `will-change: transform` promotes it to its own composite layer (the drift
+ * animation is transform-only, so this is cheap and avoids constant relayout). */
+@keyframes vivida-drift {
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(-2%, -3%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+.vivida-stars {
+  animation: vivida-drift 60s ease-in-out infinite;
+  contain: paint;
+  will-change: transform;
+}
+
+@keyframes vivida-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+.vivida-pulse {
+  animation: vivida-pulse 4s ease-in-out infinite;
+}
+
+/* Shooting-star sweep — fades in, slides diagonally across, fades out */
+@keyframes vivida-shoot {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-25deg) scaleX(0);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  60% {
+    transform: translate3d(220px, 90px, 0) rotate(-25deg) scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(280px, 120px, 0) rotate(-25deg) scaleX(0.6);
+    opacity: 0;
+  }
+}
+
+/* Slow nebula drift on background gradient layers.
+ * `will-change: transform` puts this on its own GPU layer so the 30s drift
+ * doesn't repaint the (expensive, gradient-heavy) backdrop on every frame. */
+@keyframes vivida-nebula-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(2%, -1%, 0) scale(1.05); }
+}
+.vivida-nebula-drift {
+  animation: vivida-nebula-drift 30s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes vivida-float {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-3px); }
+}
+.vivida-float {
+  animation: vivida-float 4s ease-in-out infinite;
+}
+
+@keyframes vivida-typing-bounce {
+  0%, 80%, 100% { transform: translateY(0);    opacity: 0.45; }
+  40%           { transform: translateY(-3px); opacity: 1;    }
+}
+
+/*
+ * Continuous rotation + soft pulse for the cosmic loader. Pulled out of
+ * Framer Motion so the animation runs purely on the compositor (no React
+ * render commits, no rAF callbacks). Shaves measurable CPU off long loads.
+ */
+@keyframes vivida-spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.vivida-spin-slow {
+  animation: vivida-spin-slow 30s linear infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+
+@keyframes vivida-pulse-soft {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.2); }
+}
+.vivida-pulse-soft {
+  animation: vivida-pulse-soft 2.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/*
+ * Mobile compositing hack — `backdrop-filter` is among the most expensive
+ * GPU operations on mobile browsers (especially Safari iOS, where it can
+ * tank scroll FPS). Below 640px we strip every `backdrop-blur-*` utility
+ * site-wide. The cards and overlays still read fine over the dark, layered
+ * gradients; we just lose the frosted-glass bevel.
+ *
+ * Targeting `[class*="backdrop-blur"]` catches all of Tailwind's blur sizes
+ * (sm/md/lg/xl/2xl/3xl) without us having to enumerate them. The `&:not(...)`
+ * exception keeps the dialog overlay frosted — it's a single fixed element,
+ * cheap to blur, and the focus-on-modal UX really benefits.
+ */
+@media (max-width: 640px) {
+  [class*="backdrop-blur"]:not([data-radix-dialog-overlay]) {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }

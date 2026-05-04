@@ -1,0 +1,369 @@
+/**
+ * Deterministic Georgian-language interpretation layer for synastry.
+ *
+ * Pairs with `lib/synastry.ts` (which produces scores + the tightest cross
+ * aspects) and turns those numeric values into prose: per-aspect taglines,
+ * per-aspect detailed breakdowns, per-category narratives, and a
+ * strengths × growth split.
+ *
+ * Grammar note: Georgian verbs that take an indirect object (ერწყმის,
+ * ეხმიანება, ეჯახება, უპირისპირდება) require the object in the dative
+ * case — for these noun stems that means appending "ს". So we keep two
+ * forms of every body-domain word and pick the right one when composing
+ * sentences. Without this, you get ungrammatical strings like "ერწყმის
+ * აზროვნება" instead of the correct "აზროვნებას ერწყმის".
+ */
+
+import type { AspectKind } from "./aspects";
+import type { SynastryAspect, SynastryCategory } from "./synastry";
+
+/** Georgian display name for each chart point. */
+const BODY_LABEL: Record<string, string> = {
+  sun: "მზე",
+  moon: "მთვარე",
+  mercury: "მერკური",
+  venus: "ვენერა",
+  mars: "მარსი",
+  jupiter: "იუპიტერი",
+  saturn: "სატურნი",
+  uranus: "ურანი",
+  neptune: "ნეპტუნი",
+  pluto: "პლუტონი",
+  ascendant: "ამომავალი",
+  midheaven: "ზენიტი",
+  chiron: "ქირონი",
+};
+
+/** What domain each body governs — nominative form. */
+const BODY_DOMAIN_NOM: Record<string, string> = {
+  sun: "ბირთვი",
+  moon: "გრძნობები",
+  mercury: "აზროვნება",
+  venus: "სიყვარული",
+  mars: "ენერგია",
+  jupiter: "ზრდა",
+  saturn: "სიმწიფე",
+  uranus: "თავისუფლება",
+  neptune: "ოცნებები",
+  pluto: "გარდასახვა",
+  ascendant: "თვითგამოხატვა",
+  midheaven: "მიზანი",
+  chiron: "მგრძნობელობა",
+};
+
+/** Same domain words in dative case (object of the aspect verb). */
+const BODY_DOMAIN_DAT: Record<string, string> = {
+  sun: "ბირთვს",
+  moon: "გრძნობებს",
+  mercury: "აზროვნებას",
+  venus: "სიყვარულს",
+  mars: "ენერგიას",
+  jupiter: "ზრდას",
+  saturn: "სიმწიფეს",
+  uranus: "თავისუფლებას",
+  neptune: "ოცნებებს",
+  pluto: "გარდასახვას",
+  ascendant: "თვითგამოხატვას",
+  midheaven: "მიზანს",
+  chiron: "მგრძნობელობას",
+};
+
+/** What each body represents *in a relationship context* — used in the
+ *  detailed breakdown modal. Written so each line stands alone. */
+const BODY_SYN_DESC: Record<string, string> = {
+  sun: "შენი ბირთვი — ვინ ხარ ცხოვრების ცენტრში",
+  moon: "შენი ემოციური სამყარო — როგორ გრძნობ თავს და გჭირდება სიახლოვე",
+  mercury: "როგორ აზროვნებ და ერთმანეთთან საუბრობთ",
+  venus: "რას აფასებ, ვის და როგორ ეფერები",
+  mars: "როგორ მოქმედებ და რა გცეცხლავს",
+  jupiter: "რა გაფართოებს და რას ისწავლი",
+  saturn: "რა გასწავლის ვალდებულებას, რას აშენებ ხანგრძლივად",
+  uranus: "რა გათავისუფლებს და მოულოდნელად გცვლის",
+  neptune: "რას ოცნებობ, რას გრძნობ სიტყვებზე ღრმად",
+  pluto: "რა გცვლის ფუნდამენტურად, ძველი სქემების სიკვდილი",
+  ascendant: "როგორი ჩანხარ პირველი შეხვედრისას",
+  midheaven: "რა მიმართულებას მიჰყევხარ ცხოვრებაში",
+  chiron: "შენი მგრძნობიარე ადგილი — სადაც ცემო და სადაც კურნავ",
+};
+
+const ASPECT_META: Record<
+  AspectKind,
+  {
+    glyph: string;
+    labelKa: string;
+    /** Verb at sentence end. Object goes in dative form. */
+    verbKa: string;
+    valence: "harmonious" | "neutral" | "tense";
+    /** Generic meaning of this aspect type, displayed in the breakdown modal. */
+    meaningKa: string;
+  }
+> = {
+  conjunction: {
+    glyph: "☌",
+    labelKa: "კონიუნქცია",
+    verbKa: "ერწყმის",
+    valence: "neutral",
+    meaningKa:
+      "კონიუნქცია — ორი წერტილის ერთიანობა. ენერგიები ერთმანეთში გადადის და ერთად ცხოვრობს, ძლიერი და კონცენტრირებული ბმა იქმნება.",
+  },
+  trine: {
+    glyph: "△",
+    labelKa: "ტრინი",
+    verbKa: "თავისუფლად ეხმიანება",
+    valence: "harmonious",
+    meaningKa:
+      "ტრინი — ჰარმონიული, ბუნებრივი ნაკადი. ენერგიები ერთმანეთს ხელს უწყობს და თავისუფლად მიედინება, ცდის გარეშე.",
+  },
+  sextile: {
+    glyph: "✶",
+    labelKa: "სექსტილი",
+    verbKa: "მეგობრულად ეხმიანება",
+    valence: "harmonious",
+    meaningKa:
+      "სექსტილი — მეგობრული თანამშრომლობა. მცირე, მაგრამ თბილი შეთავაზებები, რომლებიც ცხოვრებას ამარაგებს.",
+  },
+  square: {
+    glyph: "□",
+    labelKa: "კვადრატი",
+    verbKa: "ეჯახება",
+    valence: "tense",
+    meaningKa:
+      "კვადრატი — დაძაბულობა, რომელიც მოქმედებას იწვევს. სწორედ ეს გრიგალი არის ზრდის ძრავა — გართულება, რომელშიც ძალაც იმალება.",
+  },
+  opposition: {
+    glyph: "☍",
+    labelKa: "ოპოზიცია",
+    verbKa: "უპირისპირდება",
+    valence: "tense",
+    meaningKa:
+      "ოპოზიცია — ორი მხარის სარკული გადაცილება. ერთმანეთში ჩვენი თავი ვხედავთ; ბალანსის გაკვეთილი.",
+  },
+};
+
+export function aspectGlyph(kind: AspectKind): string {
+  return ASPECT_META[kind].glyph;
+}
+
+export function aspectLabel(kind: AspectKind): string {
+  return ASPECT_META[kind].labelKa;
+}
+
+export function aspectMeaning(kind: AspectKind): string {
+  return ASPECT_META[kind].meaningKa;
+}
+
+export function aspectValence(
+  kind: AspectKind
+): "harmonious" | "neutral" | "tense" {
+  return ASPECT_META[kind].valence;
+}
+
+export function bodyLabel(key: string): string {
+  return BODY_LABEL[key] ?? key;
+}
+
+export function bodyDomain(key: string): string {
+  return BODY_DOMAIN_NOM[key] ?? key;
+}
+
+export function bodySynastryDescription(key: string): string {
+  return BODY_SYN_DESC[key] ?? "";
+}
+
+/**
+ * Compose a one-line tagline like "ბირთვი აზროვნებას ერწყმის".
+ * Uses Georgian SOV order with the second body in dative case so the
+ * sentence is grammatically correct.
+ */
+export function describeAspect(asp: SynastryAspect): string {
+  const meta = ASPECT_META[asp.kind];
+  const subject = BODY_DOMAIN_NOM[asp.a] ?? asp.a;
+  const object = BODY_DOMAIN_DAT[asp.b] ?? `${asp.b}ს`;
+  return `${subject} ${object} ${meta.verbKa}`;
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Detailed breakdown for the modal
+// ────────────────────────────────────────────────────────────────────────
+
+export type AspectBreakdown = {
+  /** Headline like "ვენერა △ ამომავალი". */
+  title: string;
+  /** Tightness phrasing for the score panel. */
+  tightnessNote: string;
+  /** Generic meaning of the aspect type. */
+  aspectMeaning: string;
+  /** What body A represents in this relationship. */
+  bodyADescription: string;
+  /** What body B represents. */
+  bodyBDescription: string;
+  /** The dynamic this pairing creates between you. */
+  dynamic: string;
+  /** A practical takeaway or advice. */
+  takeaway: string;
+};
+
+/** "ძალიან ზუსტი" / "მჭიდრო" / "ფართო" — turns orb tightness into Georgian. */
+function tightnessLabel(tightness: number): string {
+  if (tightness >= 0.85) return "ძალიან ზუსტი ასპექტი — ენერგია ბევრ შემთხვევაში გრძნობადია.";
+  if (tightness >= 0.7) return "მჭიდრო ასპექტი — გავლენა ცხადად ჩანს.";
+  if (tightness >= 0.5) return "საშუალო სიმჭიდროვის ასპექტი — გავლენა შეინიშნება.";
+  return "ფართო ორბი — გავლენა მსუბუქია, მაგრამ ფონზე იგრძნობა.";
+}
+
+/** Compose the dynamic + takeaway based on body pairing × aspect valence. */
+function composeDynamic(asp: SynastryAspect): { dynamic: string; takeaway: string } {
+  const valence = ASPECT_META[asp.kind].valence;
+  const aDom = BODY_DOMAIN_NOM[asp.a] ?? asp.a;
+  const bDom = BODY_DOMAIN_NOM[asp.b] ?? asp.b;
+  const bDomDat = BODY_DOMAIN_DAT[asp.b] ?? `${asp.b}ს`;
+  const aDomDat = BODY_DOMAIN_DAT[asp.a] ?? `${asp.a}ს`;
+
+  if (valence === "harmonious") {
+    return {
+      dynamic: `${aDom} და ${bDom} ერთმანეთში ბუნებრივად გადადის. ეს სფერო ერთად გიმარტივდებათ — როცა ერთი იწყებს, მეორე იცის რა გააგრძელოს. დიდი ცდის გარეშე გრძნობთ ერთმანეთის ნაკადს.`,
+      takeaway: `გამოიყენეთ ეს ჰარმონია — გადაუდე, რომ ${bDomDat} თქვენს ცხოვრებაში ${aDom} ბუნებრივად ანიჭებს ენერგიას. ღია გასაუბრება ამ თემებზე კიდევ უფრო ღრმავდება ბმას.`,
+    };
+  }
+  if (valence === "tense") {
+    return {
+      dynamic: `${aDom} და ${bDom} ერთმანეთს ეცილებიან — ერთი ენერგია მეორეს გვერდს გვერდი არ აძლევს. ეს არ ნიშნავს ცუდს: სწორედ ამ დაძაბულობით აღმოაჩენთ რა გჭირდებათ რეალურად, რა აღარ მუშაობს ძველებურად.`,
+      takeaway: `ცნობიერად დაუთმეთ დრო ამ ხახუნს, ვიდრე გვერდს აუხვევთ. როცა ${aDomDat} მუშაობას უწყობთ ხელს, ${bDom} თავადაც წინ მიდის. ეს არის წერტილი, სადაც ცნობიერი მცდელობა ცვლის შაბლონს.`,
+    };
+  }
+  // neutral (conjunction)
+  return {
+    dynamic: `${aDom} და ${bDom} ერთ წერტილში იყრება — ენერგიები ერთობდებიან, ერთმანეთის გარეშე უკვე ვერ ფიქრობთ ამ თემაზე. შერევისგან ხშირად ახალი თვისებები იშვება.`,
+    takeaway: `მნიშვნელოვანია, ცალ-ცალკე გესმოდეთ რა მიგაჩნია შენ ${aDomDat} და რა — პარტნიორს ${bDomDat}. ცნობიერი გამიჯვნით უფრო ღრმად მუშაობს ერთიანობაც.`,
+  };
+}
+
+export function aspectBreakdown(asp: SynastryAspect): AspectBreakdown {
+  const meta = ASPECT_META[asp.kind];
+  const { dynamic, takeaway } = composeDynamic(asp);
+  return {
+    title: `${BODY_LABEL[asp.a] ?? asp.a} ${meta.glyph} ${BODY_LABEL[asp.b] ?? asp.b}`,
+    tightnessNote: tightnessLabel(asp.tightness),
+    aspectMeaning: meta.meaningKa,
+    bodyADescription: BODY_SYN_DESC[asp.a] ?? "",
+    bodyBDescription: BODY_SYN_DESC[asp.b] ?? "",
+    dynamic,
+    takeaway,
+  };
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Per-category narratives, keyed by score tier
+// ────────────────────────────────────────────────────────────────────────
+
+type Tier = "excellent" | "strong" | "good" | "mixed" | "challenging";
+
+function tierFromScore(score: number): Tier {
+  if (score >= 85) return "excellent";
+  if (score >= 70) return "strong";
+  if (score >= 55) return "good";
+  if (score >= 40) return "mixed";
+  return "challenging";
+}
+
+const CATEGORY_NARRATIVE: Record<SynastryCategory, Record<Tier, string>> = {
+  love: {
+    excellent:
+      "გრძნობების შენადნობი იშვიათი ხარისხის — მზე და ვენერა ერთმანეთს თბილ რეზონანსში ხედავენ. სიახლოვე ბუნებრივად მოდის.",
+    strong:
+      "სიყვარული ერთობლივი მელოდიასავით ჟღერს — ერთმანეთის ემოციური ენა გესმით.",
+    good:
+      "კარგი ემოციური საფუძველი. სიახლოვე იღვიძებს მაშინ, როცა დრო და სივრცე ერთად ვითარდება.",
+    mixed:
+      "გრძნობებში ვნებაც არის და გადაკვეთის ხაზიც. ღირს, ერთმანეთი მოლოდინების გარეშე გაეცნოთ.",
+    challenging:
+      "სიყვარულის ენები განსხვავდება — მცირე ნაბიჯები და ღია საუბარი დაგეხმარებათ.",
+  },
+  friendship: {
+    excellent:
+      "ერთად ყოფნა გართობაცაა და დასვენებაც. ბუნებრივად ხდებით ერთმანეთის სანდო წრე.",
+    strong:
+      "მეგობრული ნაკადი — გრძნობთ, რომ ერთმანეთს ხედავთ, ნდობა ნელ-ნელა მტკიცდება.",
+    good: "მეგობრობა ვითარდება მაშინ, როცა საერთო რიტმს იპოვით.",
+    mixed:
+      "ფაზებში გადადიხართ — ხანდახან ახლოს, ხანდახან შორს. ეს არ გიშლით კარგად გაიცნოთ ერთმანეთი.",
+    challenging:
+      "მეგობრობას მეტი ცნობიერი მცდელობა სჭირდება — სხვადასხვაგვარად აღიქვამთ სამყაროს.",
+  },
+  communication: {
+    excellent:
+      "სიტყვების გადაცემა ხდება ისე, თითქოს ერთი ენიდან მეორეზე გადადიხართ. იდეების ნაპერწკლობაა.",
+    strong: "გონება გონებას ხვდება — საუბარი ღრმავდება, არა ცხრება.",
+    good: "კომუნიკაცია ვითარდება, თუ მიენდობით ერთმანეთის რიტმს.",
+    mixed:
+      "ხანდახან ვერ მოიხელთებთ ერთსა და იმავე ტალღას — სიჩუმე უფრო მრავლისმეტყველია, ვიდრე სიტყვა.",
+    challenging:
+      "გადახარისხება მნიშვნელოვანია — ერთმანეთის ენაზე საუბარი ისწავლეთ.",
+  },
+  growth: {
+    excellent:
+      "ერთად ხდებით მეტი, ვიდრე მარტო — ეს კავშირი ცხოვრების მნიშვნელოვან ეტაპებზე გექნებათ ფრთა.",
+    strong: "ერთად ვითარდებით — წინ მიგიწოდებთ ერთმანეთს, არ გიჩერებთ.",
+    good: "ნელი, საფუძვლიანი ზრდის შესაძლებლობა, თუ მცდელობას არ მოიშლით.",
+    mixed:
+      "ერთად ზრდას გადაკვეთები აქვს — ისწავლეთ, რომ სხვადასხვა ტემპით მოძრაობა ნორმალურია.",
+    challenging:
+      "მზადობა ერთმანეთის გავლენისთვის — სწორედ ეს განსაზღვრავს ერთად შორს წახვალთ თუ არა.",
+  },
+  chemistry: {
+    excellent:
+      "მიზიდვა ფიზიკურიც არის და ენერგეტიკულიც — მარსი და ვენერა ერთად ცეცხლავენ ცას.",
+    strong: "ენერგიები ერთმანეთს ხვდებიან — სიახლოვე ცოცხალია.",
+    good: "მცირე, თბილი ნაპერწკლები. ფლირტისთვის თუ დრო გექნებათ, გაუძღოლი.",
+    mixed: "ვნება ცვალებადია — ხან ცეცხლი, ხან ჩუმი.",
+    challenging:
+      "ფიზიკური მიზიდვა ნაკლებად ვლინდება — ეს არ ნიშნავს, რომ კავშირი არ არის.",
+  },
+};
+
+export function narrateCategory(
+  cat: SynastryCategory,
+  score: number
+): string {
+  return CATEGORY_NARRATIVE[cat][tierFromScore(score)];
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Strengths × Growth split
+// ────────────────────────────────────────────────────────────────────────
+
+export type AspectGroup = {
+  strengths: SynastryAspect[];
+  growth: SynastryAspect[];
+};
+
+/**
+ * Split aspects by valence. Conjunctions are filed under whichever bucket
+ * is shorter so the columns stay roughly balanced visually — astrologically
+ * a conjunction is neutral and reads either way depending on the planets.
+ */
+export function splitByValence(aspects: SynastryAspect[]): AspectGroup {
+  const strengths: SynastryAspect[] = [];
+  const growth: SynastryAspect[] = [];
+  for (const a of aspects) {
+    const v = aspectValence(a.kind);
+    if (v === "harmonious") strengths.push(a);
+    else if (v === "tense") growth.push(a);
+    else (strengths.length <= growth.length ? strengths : growth).push(a);
+  }
+  return { strengths, growth };
+}
+
+export function overallNarrative(percent: number): string {
+  if (percent >= 85)
+    return "ცის რუკები ერთიანი ნაკადით ხვდებიან — იშვიათი, ღრმა რეზონანსი.";
+  if (percent >= 75)
+    return "კავშირი ბუნებრივად მუშაობს — გასაკვირი არ იქნება, თუ ერთმანეთს კარგად გრძნობთ.";
+  if (percent >= 65)
+    return "ძლიერი საფუძველი არის — დრო და სიფრთხილე გააძლიერებს ბმას.";
+  if (percent >= 55)
+    return "კარგი პოტენციალი — როცა მცდელობას არ ეშინია, კავშირი ცოცხლდება.";
+  if (percent >= 45)
+    return "ცოცხალი დინამიკა, განსხვავებებითაც — ეს კავშირს არ ანდგრევს, აფერად-აქცევს.";
+  return "გამოწვევაა, რომელშიც ზრდა იმალება — ცნობიერი მუშაობით კავშირი მოულოდნელად ღრმავდება.";
+}

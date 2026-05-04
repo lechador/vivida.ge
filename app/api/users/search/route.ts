@@ -1,0 +1,70 @@
+import { NextResponse } from "next/server";
+import { and, asc, eq, ilike, ne, or, sql } from "drizzle-orm";
+
+import { auth } from "@/auth";
+import { db } from "@/db";
+import { profiles, users } from "@/db/schema";
+
+const MIN_QUERY = 2;
+const MAX_RESULTS = 8;
+
+/**
+ * GET /api/users/search?q=...
+ * Returns up to 8 public-profile matches by username or display name.
+ * Auth required so we don't expose the directory to scrapers.
+ */
+export async function GET(req: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const q = (searchParams.get("q") ?? "").trim();
+
+  if (q.length < MIN_QUERY) {
+    return NextResponse.json({ results: [] });
+  }
+
+  // ILIKE prefix-or-contains match on username, display_name, or user.name
+  const pattern = `%${q.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+
+  const rows = await db
+    .select({
+      userId: users.id,
+      name: users.name,
+      image: users.image,
+      username: profiles.username,
+      displayName: profiles.displayName,
+      bio: profiles.bio,
+    })
+    .from(profiles)
+    .innerJoin(users, eq(users.id, profiles.userId))
+    .where(
+      and(
+        eq(profiles.isPublic, true),
+        ne(users.id, session.user.id),
+        or(
+          ilike(profiles.username, pattern),
+          ilike(profiles.displayName, pattern),
+          ilike(users.name, pattern)
+        )
+      )
+    )
+    // Roughly: exact username matches first, then by username alphabetical
+    .orderBy(
+      sql`CASE WHEN ${profiles.username} ILIKE ${q.toLowerCase()} THEN 0 ELSE 1 END`,
+      asc(profiles.username)
+    )
+    .limit(MAX_RESULTS);
+
+  return NextResponse.json({
+    results: rows.map((r) => ({
+      userId: r.userId,
+      username: r.username,
+      displayName: r.displayName ?? r.name?.split(" ")[0] ?? r.username,
+      image: r.image,
+      bio: r.bio,
+    })),
+  });
+}

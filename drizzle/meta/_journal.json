@@ -1,0 +1,76 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1777811742553,
+      "tag": "0000_useful_cerise",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777815045976,
+      "tag": "0001_legal_captain_cross",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777817701558,
+      "tag": "0002_colossal_mattie_franklin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777819298101,
+      "tag": "0003_slow_jigsaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1777826667927,
+      "tag": "0004_minor_thanos",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1777828739325,
+      "tag": "0005_tough_joystick",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1777830074011,
+      "tag": "0006_nosy_joshua_kane",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1777832994357,
+      "tag": "0007_late_dreadnoughts",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1777834361286,
+      "tag": "0008_high_lady_deathstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1777892312137,
+      "tag": "0009_rainy_tusk",
+      "breakpoints": true
+    }
+  ]
+}

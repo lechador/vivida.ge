@@ -1,0 +1,128 @@
+/**
+ * Single source of truth for plan catalog. Used by:
+ *  - /pricing page (display)
+ *  - /api/flitt/checkout (amount validation)
+ *  - dashboard paywall labels
+ *
+ * Prices in tetri (1 GEL = 100 tetri). Mirror of how Stripe stores cents.
+ */
+
+export type PlanId = "free" | "pro";
+export type IntervalId = "month" | "year";
+
+export type FeatureRow = {
+  /** Short label shown in the comparison table. Georgian. */
+  label: string;
+  free: boolean | string;
+  pro: boolean | string;
+};
+
+export type PlanDef = {
+  id: PlanId;
+  /** Public-facing name (Georgian). */
+  name: string;
+  tagline: string;
+  ctaLabel: string;
+  /** Price in tetri (₾). Free is 0. */
+  price: Record<IntervalId, number>;
+};
+
+export const PLANS: Record<PlanId, PlanDef> = {
+  free: {
+    id: "free",
+    name: "უფასო",
+    tagline: "დაიწყე — შენი პირველი კოსმიური რუკა.",
+    ctaLabel: "უკვე იყენებ",
+    price: { month: 0, year: 0 },
+  },
+  pro: {
+    id: "pro",
+    name: "Pro",
+    tagline: "შენი სრული, პერსონალური კოსმოსი — ყოველდღე, ყოველთვის.",
+    ctaLabel: "გადადი Pro-ზე",
+    price: {
+      month: 1990, // ₾19.90
+      year: 19900, // ₾199.00 (10 თვის ფასი — 2 თვე უფასოდ)
+    },
+  },
+};
+
+/**
+ * Comparison table rows shown on the pricing page.
+ */
+export const FEATURES: FeatureRow[] = [
+  {
+    label: "ნატალური რუკის შედგენა",
+    free: true,
+    pro: true,
+  },
+  {
+    label: "მზე / მთვარე / ამომავალი",
+    free: true,
+    pro: true,
+  },
+  {
+    label: "პლანეტების სრული განლაგება",
+    free: true,
+    pro: true,
+  },
+  {
+    label: "პერსონალური AI ანალიზი",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "დიდი სამეულის AI ანალიზი",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "რუკის უნიკალური აქცენტები (AI)",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "ყოველდღიური პერსონალური ჰოროსკოპი",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "თავსებადობა (სინასტრია) საყვარელ ადამიანებთან",
+    free: "1 პარტნიორი (საცდელად)",
+    pro: "ულიმიტო",
+  },
+  {
+    label: "წლიური ნატალური ანგარიში (PDF)",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "რეკლამის გარეშე",
+    free: false,
+    pro: true,
+  },
+];
+
+/** Format tetri as "₾19.90" */
+export function formatPrice(tetri: number): string {
+  if (tetri === 0) return "უფასო";
+  const lari = tetri / 100;
+  return `₾${lari.toFixed(2)}`;
+}
+
+/**
+ * Effective monthly price for either interval (so we can show
+ * "₾16.59/თვეში" under the yearly toggle).
+ */
+export function effectiveMonthlyPrice(planId: PlanId, interval: IntervalId): number {
+  const tetri = PLANS[planId].price[interval];
+  return interval === "year" ? Math.round(tetri / 12) : tetri;
+}
+
+export function yearlySavingsPercent(planId: PlanId): number {
+  const monthly = PLANS[planId].price.month;
+  const yearly = PLANS[planId].price.year;
+  if (!monthly || !yearly) return 0;
+  const fullYear = monthly * 12;
+  return Math.round(((fullYear - yearly) / fullYear) * 100);
+}
