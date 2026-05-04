@@ -68,23 +68,31 @@ export async function DailyView({
     console.warn("[moon-phase] generation failed:", (err as Error).message);
   }
 
+  const dailySlot = daily && timezone ? (
+    <DailyCard horoscope={daily} timezone={timezone} />
+  ) : !canDaily ? (
+    <LockedCard
+      title="ყოველდღიური ჰოროსკოპი"
+      preview="დღეს შენთვის: მთვარე შენს მე-7 სახლში შედის, მარსი კი შენს პლანეტას ქალწულში ეხება. დღე იდეალურია სამომავლო გეგმებისთვის და მნიშვნელოვანი საუბრებისთვის საყვარელ ადამიანებთან…"
+      description="ყოველდღე ახალი პროგნოზი, შენი პირადი კოსმიური რუკის მიხედვით."
+    />
+  ) : (
+    <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
+      დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში.
+    </div>
+  );
+
   return (
     <div className="space-y-8">
-      {daily && timezone ? (
-        <DailyCard horoscope={daily} timezone={timezone} />
-      ) : !canDaily ? (
-        <LockedCard
-          title="ყოველდღიური ჰოროსკოპი"
-          preview="დღეს შენთვის: მთვარე შენს მე-7 სახლში შედის, მარსი კი შენს პლანეტას ქალწულში ეხება. დღე იდეალურია სამომავლო გეგმებისთვის და მნიშვნელოვანი საუბრებისთვის საყვარელ ადამიანებთან…"
-          description="ყოველდღე ახალი პროგნოზი, შენი პირადი კოსმიური რუკის მიხედვით."
-        />
-      ) : (
-        <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
-          დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში.
-        </div>
-      )}
-
-      {moonPhase && <MoonPhaseCard data={moonPhase} />}
+      {/* Top row: daily horoscope (main) + moon phase (sidebar) */}
+      <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
+        <div className="lg:col-span-8">{dailySlot}</div>
+        {moonPhase && (
+          <div className="lg:col-span-4 lg:sticky lg:top-20">
+            <MoonPhaseCard data={moonPhase} />
+          </div>
+        )}
+      </div>
 
       <section>
         <header className="mb-3 flex items-baseline justify-between">

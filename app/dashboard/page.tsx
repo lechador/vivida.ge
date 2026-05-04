@@ -42,7 +42,7 @@ export default async function DashboardPage() {
 
       <AppHeader authed plan={plan} active="today" />
 
-      <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
+      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           მოგესალმები
         </div>
