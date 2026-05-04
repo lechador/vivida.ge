@@ -223,10 +223,34 @@ export default function PrivacyPage() {
               9. Cookies და ანალიტიკა
             </h2>
             <p className="mt-2 leading-relaxed">
-              Vivida იყენებს მხოლოდ აუცილებელ cookie-ებს (სესიის
-              ავტორიზაცია). ვებ-ანალიტიკის სერვისებს (Google Analytics, Meta
-              Pixel) ჩავართავთ მხოლოდ თანხმობის შემდეგ — ამის შესახებ
-              გაცნობებთ ცალკე.
+              Vivida იყენებს ორი ტიპის cookie-ს:
+            </p>
+            <ul className="mt-3 list-disc space-y-2 pl-6 leading-relaxed">
+              <li>
+                <strong className="text-foreground">აუცილებელი:</strong>{" "}
+                სესიის ავტორიზაცია, უსაფრთხოება, Cloudflare Turnstile-ის
+                ბოტ-პრევენცია. ამ cookie-ების გარეშე საიტი ვერ
+                იფუნქციონირებს.
+              </li>
+              <li>
+                <strong className="text-foreground">ანალიტიკური:</strong>{" "}
+                Google Analytics 4 — ვაგროვებთ ანონიმიზებულ მონაცემებს
+                (გვერდის ნახვები, დაწკაპუნებები, მოწყობილობის ტიპი),
+                რომელიც გვეხმარება სერვისის გაუმჯობესებაში. პერსონალური
+                იდენტიფიკატორები (სახელი, ელფოსტა) GA-ში არ გადაიცემა.
+              </li>
+            </ul>
+            <p className="mt-3 leading-relaxed">
+              ანალიტიკის გათიშვა შეგიძლია ბრაუზერის Do Not Track-ით ან{" "}
+              <a
+                href="https://tools.google.com/dlpage/gaoptout"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--vivida-violet)] underline-offset-2 hover:underline"
+              >
+                Google-ის ოფიციალური Opt-Out დანამატით
+              </a>
+              .
             </p>
           </section>
 

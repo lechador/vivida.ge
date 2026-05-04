@@ -7,7 +7,7 @@ import type { MetadataRoute } from "next";
  * benefit from inclusion but require enumerating the profiles table at
  * build time; punting that to a follow-up dynamic sitemap if SEO needs it.
  */
-const BASE = "https://vivida.ge";
+const BASE = "https://www.vivida.ge";
 const NOW = new Date();
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -24,7 +24,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://vivida.ge/sitemap.xml",
-    host: "https://vivida.ge",
+    sitemap: "https://www.vivida.ge/sitemap.xml",
+    host: "https://www.vivida.ge",
   };
 }
