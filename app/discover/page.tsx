@@ -154,7 +154,7 @@ function Section({
           <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>
         </div>
       </header>
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+      <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         {cards.map((card) => (
           <DiscoverCard key={card.userId} card={card} />
         ))}
