@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import { ALL_SLUGS } from "@/lib/seo/zodiac-dates";
+
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
  * profile editing, etc.) are excluded — they're either not crawlable
@@ -11,6 +13,13 @@ const BASE = "https://www.vivida.ge";
 const NOW = new Date();
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const zodiacSignPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
+    url: `${BASE}/zodiac/${slug}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   return [
     {
       url: `${BASE}/`,
@@ -36,6 +45,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    {
+      url: `${BASE}/zodiac`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE}/zodiac/datit`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    ...zodiacSignPages,
     {
       url: `${BASE}/login`,
       lastModified: NOW,

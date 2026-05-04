@@ -8,6 +8,11 @@ const PRODUCT_LINKS = [
   { href: "/pricing", label: "ფასები" },
 ];
 
+const LEARN_LINKS = [
+  { href: "/zodiac", label: "ცის ნიშნები" },
+  { href: "/zodiac/datit", label: "ნიშანი თარიღით" },
+];
+
 const LEGAL_LINKS = [
   { href: "/terms", label: "წესები და პირობები" },
   { href: "/privacy", label: "კონფიდენციალურობა" },
@@ -43,13 +48,30 @@ export function SiteFooter() {
         </div>
 
         {/* Links */}
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 md:gap-16">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 md:gap-16">
           <div>
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               პროდუქტი
             </h3>
             <ul className="space-y-2 text-sm">
               {PRODUCT_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-foreground/85 transition-colors hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              ისწავლე
+            </h3>
+            <ul className="space-y-2 text-sm">
+              {LEARN_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
