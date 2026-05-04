@@ -4,59 +4,54 @@ import type { MoonPhaseRow } from "@/actions/moon-phase";
 
 /**
  * Render the universal moon-phase card on the dashboard. Server component.
- * Shows the live phase visualization (SVG terminator), the moon's current
- * sign, illumination %, today's headline + summary, and a fold-out body.
+ * Sized to live in a narrow sidebar column — vertical stack with a
+ * compact moon glyph, single-line headline, and a fold-out body.
  */
 export function MoonPhaseCard({ data }: { data: MoonPhaseRow }) {
   const { snapshot } = data;
   const sign = signByIndex(snapshot.signIndex);
   const illumPct = Math.round(snapshot.illumination * 100);
-  const ageRounded = Math.round(snapshot.ageDays * 10) / 10;
 
   return (
     <article
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6",
+        "relative overflow-hidden rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-5",
         "bg-gradient-to-br from-card/65 via-card/55 to-[oklch(0.30_0.10_265/0.45)]"
       )}
     >
       <div
         aria-hidden
-        className="absolute -right-10 -top-10 size-48 rounded-full bg-[radial-gradient(circle,oklch(0.85_0.06_240/0.4)_0%,transparent_70%)] blur-3xl"
+        className="absolute -right-10 -top-10 size-40 rounded-full bg-[radial-gradient(circle,oklch(0.85_0.06_240/0.35)_0%,transparent_70%)] blur-3xl"
       />
 
-      <div className="relative flex items-start gap-5">
-        <MoonGlyph
-          phaseAngle={snapshot.phaseAngle}
-          className="size-20 shrink-0 sm:size-24"
-        />
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+      {/* Hero row — small label + moon glyph aligned right */}
+      <div className="relative mb-3 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             დღევანდელი მთვარე
           </div>
-          <h3 className="mt-1 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-            {data.headline}
-          </h3>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-foreground/70">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/40 px-2.5 py-0.5">
-              {data.phaseLabelKa}
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/40 px-2.5 py-0.5">
-              <span className="text-foreground/85">{sign.symbol}</span>
-              {data.signKa}
-            </span>
-            <span className="rounded-full border border-border/70 bg-background/40 px-2.5 py-0.5">
-              {illumPct}% განათებული
-            </span>
-            <span className="rounded-full border border-border/70 bg-background/40 px-2.5 py-0.5">
-              {ageRounded} დღე ციკლში
-            </span>
+          <div className="mt-1 text-sm font-medium text-foreground/85">
+            {data.phaseLabelKa} ·{" "}
+            <span style={{ color: "oklch(0.85 0.10 240)" }}>{sign.symbol}</span>{" "}
+            {data.signKa}
           </div>
         </div>
+        <MoonGlyph
+          phaseAngle={snapshot.phaseAngle}
+          className="size-14 shrink-0 sm:size-16"
+        />
       </div>
 
-      <p className="relative mt-4 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+      <h3 className="relative text-pretty text-base font-semibold leading-snug tracking-tight sm:text-lg">
+        {data.headline}
+      </h3>
+
+      <div className="relative mt-2 flex flex-wrap gap-1 text-[11px] text-foreground/70">
+        <Pill>{illumPct}% განათებული</Pill>
+        <Pill>{snapshot.ageDays.toFixed(1)} დღე</Pill>
+      </div>
+
+      <p className="relative mt-3 text-pretty text-sm leading-relaxed text-foreground/85">
         {data.summary}
       </p>
 
@@ -65,7 +60,7 @@ export function MoonPhaseCard({ data }: { data: MoonPhaseRow }) {
           {data.themes.map((theme, i) => (
             <span
               key={i}
-              className="inline-flex items-center rounded-full border border-[var(--vivida-violet)]/25 bg-[var(--vivida-violet)]/10 px-2.5 py-0.5 text-[11px] text-foreground/85"
+              className="inline-flex items-center rounded-full border border-[var(--vivida-violet)]/25 bg-[var(--vivida-violet)]/10 px-2 py-0.5 text-[11px] text-foreground/85"
             >
               {theme}
             </span>
@@ -73,12 +68,12 @@ export function MoonPhaseCard({ data }: { data: MoonPhaseRow }) {
         </div>
       )}
 
-      <details className="group relative mt-4 -mx-1 rounded-xl px-1 transition-colors open:bg-foreground/[0.02]">
+      <details className="group relative mt-3 -mx-1 rounded-xl px-1 transition-colors open:bg-foreground/[0.02]">
         <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
           <span>გააგრძელე კითხვა</span>
           <span aria-hidden className="transition-transform group-open:rotate-90">›</span>
         </summary>
-        <div className="mt-3 space-y-3 text-pretty text-sm leading-relaxed text-foreground/85">
+        <div className="mt-3 space-y-2.5 text-pretty text-sm leading-relaxed text-foreground/85">
           {data.body
             .split(/\n{2,}/)
             .map((p) => p.trim())
@@ -89,6 +84,14 @@ export function MoonPhaseCard({ data }: { data: MoonPhaseRow }) {
         </div>
       </details>
     </article>
+  );
+}
+
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-border/70 bg-background/40 px-2 py-0.5">
+      {children}
+    </span>
   );
 }
 
@@ -113,7 +116,7 @@ function MoonGlyph({
   return (
     <svg
       viewBox="-60 -60 120 120"
-      className={cn("drop-shadow-[0_0_30px_rgba(180,180,255,0.25)]", className)}
+      className={cn("drop-shadow-[0_0_24px_rgba(180,180,255,0.25)]", className)}
       aria-hidden
     >
       <defs>
@@ -150,23 +153,18 @@ function MoonGlyph({
 }
 
 function buildShadowPath(phase: number, r: number, xRadius: number): string | null {
-  // No shadow at full moon, full shadow at new moon (handled as full circle).
   if (phase >= 0.49 && phase <= 0.51) return null;
   if (phase < 0.005 || phase > 0.995) {
     return `M ${-r},0 A ${r},${r} 0 1,0 ${r},0 A ${r},${r} 0 1,0 ${-r},0 Z`;
   }
   if (phase < 0.25) {
-    // Waxing crescent — dark on left, terminator bulges right
     return `M 0,${-r} A ${r},${r} 0 0,0 0,${r} A ${xRadius},${r} 0 0,1 0,${-r} Z`;
   }
   if (phase < 0.5) {
-    // Waxing gibbous — small dark on left, terminator bulges left
     return `M 0,${-r} A ${r},${r} 0 0,0 0,${r} A ${xRadius},${r} 0 0,0 0,${-r} Z`;
   }
   if (phase < 0.75) {
-    // Waning gibbous — small dark on right, terminator bulges right
     return `M 0,${-r} A ${r},${r} 0 0,1 0,${r} A ${xRadius},${r} 0 0,1 0,${-r} Z`;
   }
-  // Waning crescent — dark on right, terminator bulges left
   return `M 0,${-r} A ${r},${r} 0 0,1 0,${r} A ${xRadius},${r} 0 0,0 0,${-r} Z`;
 }

@@ -84,11 +84,13 @@ export async function DailyView({
 
   return (
     <div className="space-y-8">
-      {/* Top row: daily horoscope (main) + moon phase (sidebar) */}
-      <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
-        <div className="lg:col-span-8">{dailySlot}</div>
+      {/* Top row: daily horoscope (main) + moon phase (sidebar). The grid
+          only kicks in at xl (1280px+) — below that the moon phase stacks
+          full-width below the daily card so neither gets cramped. */}
+      <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
+        <div className="xl:col-span-7">{dailySlot}</div>
         {moonPhase && (
-          <div className="lg:col-span-4 lg:sticky lg:top-20">
+          <div className="xl:col-span-5 xl:sticky xl:top-20">
             <MoonPhaseCard data={moonPhase} />
           </div>
         )}
