@@ -113,6 +113,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    {
+      url: `${BASE}/zodiac/gzamkvlevi`,
+      lastModified: NOW,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
     ...zodiacSignPages,
     ...elementPages,
     ...pairPages,

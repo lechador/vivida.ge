@@ -15,6 +15,7 @@ const LEARN_LINKS = [
   { href: "/zodiac/amomavali", label: "ამომავალი ნიშანი" },
   { href: "/zodiac/elementebi", label: "ელემენტები" },
   { href: "/zodiac/tavsebadoba", label: "თავსებადობა" },
+  { href: "/zodiac/gzamkvlevi", label: "სრული გზამკვლევი" },
 ];
 
 const LEGAL_LINKS = [
