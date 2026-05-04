@@ -43,10 +43,7 @@ export default async function DashboardPage() {
       <AppHeader authed plan={plan} active="today" />
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
-        <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          მოგესალმები
-        </div>
-        <h1 className="mb-6 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
+        <h1 className="mb-6 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
           სალამი,{" "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
             {firstName}
