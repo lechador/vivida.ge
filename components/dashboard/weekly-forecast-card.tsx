@@ -1,0 +1,301 @@
+"use client";
+
+import { useState } from "react";
+import { ChevronDown, Sparkles, Sparkle } from "lucide-react";
+
+import type { WeeklyForecastDay } from "@/db/schema";
+import { BODIES } from "@/lib/zodiac";
+import { cn } from "@/lib/utils";
+
+const ASPECT_LABEL_KA: Record<string, string> = {
+  conjunction: "შეერთება",
+  sextile: "სექსტილი",
+  square: "კვადრატი",
+  trine: "ტრინი",
+  opposition: "ოპოზიცია",
+};
+
+const FAMILY_HINT_KA: Record<string, string> = {
+  harmonic: "ჰარმონიული",
+  tense: "დაძაბული",
+  neutral: "ნეიტრალური",
+};
+
+const WEEKDAY_SHORT_KA: Record<string, string> = {
+  ორშაბათი: "ორშ",
+  სამშაბათი: "სამ",
+  ოთხშაბათი: "ოთხ",
+  ხუთშაბათი: "ხუთ",
+  პარასკევი: "პარ",
+  შაბათი: "შაბ",
+  კვირა: "კვი",
+};
+
+/**
+ * 7-day forecast card. Each day shows a stacked harmony/challenge bar and
+ * a one-line headline; click to expand the per-day breakdown (why it's
+ * harmonic, why it's challenging, one piece of advice, and the top driving
+ * aspects). The first day defaults open since it's "today" — what most
+ * users come here for.
+ */
+export function WeeklyForecastCard({
+  days,
+}: {
+  days: WeeklyForecastDay[];
+}) {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  return (
+    <article className="relative overflow-hidden rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
+      <div
+        aria-hidden
+        className="absolute -right-16 -top-16 size-48 rounded-full bg-[radial-gradient(circle,var(--vivida-cyan)/0.3_0%,transparent_70%)] opacity-60 blur-3xl"
+      />
+
+      <header className="relative mb-5 flex items-baseline justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            შემდეგი 7 დღე
+          </div>
+          <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight sm:text-xl">
+            შენი კვირის ცის რუკა
+          </h2>
+        </div>
+        <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" aria-hidden />
+      </header>
+
+      <ol className="relative space-y-2">
+        {days.map((day, i) => (
+          <DayRow
+            key={day.dateIso}
+            day={day}
+            open={openIndex === i}
+            onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+          />
+        ))}
+      </ol>
+
+      <p className="relative mt-5 flex items-center gap-1.5 border-t border-border/40 pt-4 text-[11px] text-muted-foreground">
+        <Sparkle className="size-3" aria-hidden />
+        <span>
+          ქულები ეფუძნება ამ დღის ტრანზიტ-ნატალურ ასპექტებს. დააჭირე დღეს, რომ
+          ნახო რატომ.
+        </span>
+      </p>
+    </article>
+  );
+}
+
+function DayRow({
+  day,
+  open,
+  onToggle,
+}: {
+  day: WeeklyForecastDay;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const dayNum = parseDateNum(day.dateIso);
+  const weekShort = WEEKDAY_SHORT_KA[day.weekdayKa] ?? day.weekdayKa.slice(0, 3);
+  const total = day.harmonyScore + day.challengeScore;
+  const harmonicPct = total > 0 ? (day.harmonyScore / total) * 100 : 50;
+  const challengePct = total > 0 ? (day.challengeScore / total) * 100 : 50;
+  // Overall "intensity" — quiet days get a faded bar so the eye sees them as low-energy.
+  const intensity = Math.min(1, Math.max(day.harmonyScore, day.challengeScore) / 70);
+  const tilt: "harmonic" | "challenging" | "balanced" =
+    day.harmonyScore - day.challengeScore > 12
+      ? "harmonic"
+      : day.challengeScore - day.harmonyScore > 12
+        ? "challenging"
+        : "balanced";
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={onToggle}
+        className={cn(
+          "group w-full rounded-xl border border-border/60 bg-background/30 p-3 text-left transition-all hover:border-border hover:bg-background/50 sm:p-4",
+          open && "border-border bg-background/50"
+        )}
+        aria-expanded={open}
+      >
+        <div className="flex items-start gap-3 sm:gap-4">
+          {/* Date pill */}
+          <div className="flex shrink-0 flex-col items-center justify-center rounded-lg border border-border/60 bg-background/60 px-2.5 py-1.5 sm:px-3 sm:py-2">
+            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+              {weekShort}
+            </span>
+            <span className="text-base font-semibold leading-none text-foreground sm:text-lg">
+              {dayNum}
+            </span>
+          </div>
+
+          {/* Content */}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-foreground/95 sm:text-[15px]">
+                  {day.headline || "—"}
+                </p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  მთვარე {day.moonSignKa} · {labelForTilt(tilt)}
+                </p>
+              </div>
+              <ChevronDown
+                aria-hidden
+                className={cn(
+                  "mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform",
+                  open && "rotate-180"
+                )}
+              />
+            </div>
+
+            {/* Stacked harmony / challenge bar */}
+            <div
+              className="relative mt-2.5 h-2 overflow-hidden rounded-full bg-foreground/[0.06]"
+              style={{ opacity: 0.55 + intensity * 0.45 }}
+              role="img"
+              aria-label={`ჰარმონია ${day.harmonyScore}, დაძაბულობა ${day.challengeScore}`}
+            >
+              <div
+                className="absolute inset-y-0 left-0 rounded-l-full bg-[var(--vivida-cyan)]"
+                style={{ width: `${harmonicPct}%`, opacity: 0.85 }}
+              />
+              <div
+                className="absolute inset-y-0 rounded-r-full bg-[var(--vivida-pink)]"
+                style={{
+                  left: `${harmonicPct}%`,
+                  width: `${challengePct}%`,
+                  opacity: 0.85,
+                }}
+              />
+            </div>
+
+            <div className="mt-1.5 flex items-center gap-2 text-[10px] tabular-nums">
+              <span
+                className="inline-flex items-center gap-1 text-[var(--vivida-cyan)]"
+                aria-label="harmonic score"
+              >
+                <Sparkle className="size-3" />
+                {day.harmonyScore}
+              </span>
+              <span className="text-muted-foreground/50">·</span>
+              <span
+                className="inline-flex items-center gap-1 text-[var(--vivida-pink)]"
+                aria-label="challenging score"
+              >
+                <Sparkle className="size-3" />
+                {day.challengeScore}
+              </span>
+            </div>
+          </div>
+        </div>
+      </button>
+
+      {/* Expanded breakdown */}
+      {open && (
+        <div className="mt-1.5 grid gap-3 rounded-xl border border-border/40 bg-background/20 p-3 sm:p-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Block
+              label="ჰარმონიული"
+              dotClass="bg-[var(--vivida-cyan)]"
+              borderClass="border-[var(--vivida-cyan)]/30"
+              text={day.harmonicReason || "—"}
+            />
+            <Block
+              label="დაძაბული"
+              dotClass="bg-[var(--vivida-pink)]"
+              borderClass="border-[var(--vivida-pink)]/30"
+              text={day.challengingReason || "—"}
+            />
+          </div>
+          {day.advice && (
+            <div className="rounded-lg border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-3 py-2 text-sm leading-relaxed text-foreground/90">
+              <span className="mr-1 text-[var(--vivida-violet)]">→</span>
+              {day.advice}
+            </div>
+          )}
+          {day.drivers && day.drivers.length > 0 && (
+            <div>
+              <div className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                მოქმედი ასპექტები
+              </div>
+              <ul className="flex flex-wrap gap-1.5">
+                {day.drivers.slice(0, 4).map((dr, j) => (
+                  <li
+                    key={j}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px]",
+                      dr.family === "harmonic"
+                        ? "border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/10 text-foreground/90"
+                        : dr.family === "tense"
+                          ? "border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/10 text-foreground/90"
+                          : "border-border/60 bg-background/40 text-foreground/80"
+                    )}
+                    title={`${FAMILY_HINT_KA[dr.family] ?? ""} · orb ${dr.orb.toFixed(1)}°`}
+                  >
+                    <span className="font-medium">
+                      {bodyLabel(dr.transit)}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {ASPECT_LABEL_KA[dr.kind] ?? dr.kind}
+                    </span>
+                    <span className="font-medium">
+                      {bodyLabel(dr.natal)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+    </li>
+  );
+}
+
+function Block({
+  label,
+  text,
+  dotClass,
+  borderClass,
+}: {
+  label: string;
+  text: string;
+  dotClass: string;
+  borderClass: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-lg border bg-background/30 px-3 py-2.5",
+        borderClass
+      )}
+    >
+      <div className="mb-1 flex items-center gap-1.5">
+        <span className={cn("size-1.5 rounded-full", dotClass)} aria-hidden />
+        <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          {label}
+        </span>
+      </div>
+      <p className="text-sm leading-relaxed text-foreground/90">{text}</p>
+    </div>
+  );
+}
+
+function labelForTilt(tilt: "harmonic" | "challenging" | "balanced"): string {
+  if (tilt === "harmonic") return "ჰარმონიული დღე";
+  if (tilt === "challenging") return "დაძაბული დღე";
+  return "შერეული დღე";
+}
+
+function bodyLabel(key: string): string {
+  return BODIES[key]?.labelKa ?? key;
+}
+
+function parseDateNum(iso: string): string {
+  // Avoid timezone drift on the day number — slice the YYYY-MM-DD part directly.
+  const [, , dd] = iso.split("-");
+  return dd ? String(parseInt(dd, 10)) : iso;
+}

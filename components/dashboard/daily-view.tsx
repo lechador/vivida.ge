@@ -7,6 +7,7 @@ import { profiles } from "@/db/schema";
 import { ensureChartFor } from "@/actions/chart";
 import { ensureDailyFor } from "@/actions/daily";
 import { ensureMoonPhase } from "@/actions/moon-phase";
+import { ensureWeeklyForecast } from "@/actions/weekly-forecast";
 import { Button } from "@/components/ui/button";
 import { LockedCard } from "@/components/paywall/locked-card";
 import { canUseFeature } from "@/lib/features";
@@ -16,6 +17,7 @@ import { DailyCard } from "./daily-card";
 import { MiniBigThree } from "./mini-big-three";
 import { MoonPhaseCard } from "./moon-phase-card";
 import { SuggestedPeopleRail } from "./suggested-people-rail";
+import { WeeklyForecastCard } from "./weekly-forecast-card";
 
 /**
  * Home / today view rendered on /dashboard. Time-varying content:
@@ -68,6 +70,14 @@ export async function DailyView({
     console.warn("[moon-phase] generation failed:", (err as Error).message);
   }
 
+  // 7-day forecast — personal (transit-to-natal aspects), regenerated daily.
+  let weeklyForecast = null;
+  try {
+    weeklyForecast = await ensureWeeklyForecast(userId, plan);
+  } catch (err) {
+    console.warn("[weekly-forecast] generation failed:", (err as Error).message);
+  }
+
   const dailySlot = daily && timezone ? (
     <DailyCard horoscope={daily} timezone={timezone} />
   ) : !canDaily ? (
@@ -95,6 +105,10 @@ export async function DailyView({
           </div>
         )}
       </div>
+
+      {weeklyForecast && weeklyForecast.days.length > 0 && (
+        <WeeklyForecastCard days={weeklyForecast.days} />
+      )}
 
       <section>
         <header className="mb-3 flex items-baseline justify-between">

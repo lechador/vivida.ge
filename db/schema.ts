@@ -454,6 +454,52 @@ export const moonPhases = pgTable("moon_phase", {
     .notNull(),
 });
 
+/**
+ * 7-day forecast for the dashboard, one row per user. The same row is
+ * overwritten each new local-day — we never need a history of forecasts.
+ * Each entry in `days` is a (computed scores + AI narrative) pair for one
+ * calendar day.
+ */
+export const weeklyForecasts = pgTable("weekly_forecast", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  /** Local date (YYYY-MM-DD) of `days[0]` — the user's "today" when generated. */
+  weekStart: date("week_start", { mode: "string" }).notNull(),
+  days: jsonb("days").$type<WeeklyForecastDay[]>().notNull(),
+  promptVersion: integer("prompt_version").notNull().default(1),
+  /** Cache invalidates if natal data changed since generation. */
+  natalInputHash: text("natal_input_hash").notNull(),
+  model: text("model").notNull(),
+  language: text("language").notNull().default("ka"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type WeeklyForecastDay = {
+  dateIso: string;             // YYYY-MM-DD (user's local TZ)
+  weekdayKa: string;           // ე.ხ. "ორშაბათი"
+  /** 0-100 — intensity-weighted sum of harmonic transit-to-natal aspects. */
+  harmonyScore: number;
+  /** 0-100 — intensity-weighted sum of tense transit-to-natal aspects. */
+  challengeScore: number;
+  moonSignKa: string;
+  moonSignEn: string;
+  headline: string;            // 5-8 words, AI
+  harmonicReason: string;      // why it's supportive
+  challengingReason: string;   // why it's friction
+  advice: string;              // 1 short practical tip
+  /** Top 3 driving aspects (for the "drivers" list under each day). */
+  drivers: Array<{
+    transit: string;
+    natal: string;
+    kind: string;
+    family: "harmonic" | "tense" | "neutral";
+    orb: number;
+  }>;
+};
+
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
     fields: [users.id],
@@ -552,6 +598,8 @@ export type DailyHoroscope = typeof dailyHoroscopes.$inferSelect;
 export type NewDailyHoroscope = typeof dailyHoroscopes.$inferInsert;
 export type MoonPhase = typeof moonPhases.$inferSelect;
 export type NewMoonPhase = typeof moonPhases.$inferInsert;
+export type WeeklyForecast = typeof weeklyForecasts.$inferSelect;
+export type NewWeeklyForecast = typeof weeklyForecasts.$inferInsert;
 export type ProfilePhoto = typeof profilePhotos.$inferSelect;
 export type NewProfilePhoto = typeof profilePhotos.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;

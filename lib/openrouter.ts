@@ -415,6 +415,177 @@ body-ს სტრუქტურა (3 აბზაცი, ცარიელ�
 
 დააბრუნე მხოლოდ ვალიდური JSON. სხვა ტექსტი არ დაგვცე.`;
 
+// ────────────────────────────────────────────────────────────────────────
+//  7-day forecast — per-user, regenerated when the local week-start changes
+// ────────────────────────────────────────────────────────────────────────
+
+export type WeeklyForecastEntry = {
+  dateIso: string;
+  headline: string;
+  harmonicReason: string;
+  challengingReason: string;
+  advice: string;
+};
+
+export type WeeklyForecastResult = {
+  days: WeeklyForecastEntry[];
+};
+
+export const WEEKLY_PROMPT_VERSION = 1;
+
+const WEEKLY_FORECAST_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი. წერ 7 დღის პროგნოზს კონკრეტული ტრანზიტ-ნატალური ასპექტების მიხედვით — *არა* ზოგადი მისტიკით.
+
+შენ ღებულობ:
+- ნატალური რუკის შეჯამებას
+- 7 დღის სია, თითოეულზე — წინასწარ გათვლილი harmonyScore (0-100), challengeScore (0-100), და "drivers" (ამ დღის ყველაზე მნიშვნელოვანი ტრანზიტ-ნატალური ასპექტები — ენგლისურად)
+
+შენ ბრუნდები JSON-ით:
+{
+  "days": [
+    {
+      "dateIso": string,           // ზუსტად იგივე, როგორც input-შია
+      "headline": string,          // 4-7 სიტყვა, ცოცხალი, კონკრეტული
+      "harmonicReason": string,    // 1-2 წინადადება — რა დახმარება არის ამ დღეში, რომელ ასპექტს ეფუძნება
+      "challengingReason": string, // 1-2 წინადადება — რა ხახუნი არის, რომელ ასპექტს ეფუძნება
+      "advice": string             // 1 მოკლე, ხელშესახები რჩევა
+    },
+    // ... 7 ჯამში
+  ]
+}
+
+წესები:
+- "შენ"-ის ფორმა, თბილი მაგრამ მკაფიო
+- ხსენე კონკრეტული ასპექტი, არა ზოგადი ემოცია (✅ "მთვარე შენს ვენერას შეხვდება" ❌ "სამყარო გელის")
+- თუ harmonyScore მაღალია (>50) და challengeScore დაბალი — challengingReason-შიც მაინც დაწერე რაიმე მცირე ხახუნი ან გაფრთხილება (ცა არასოდეს მთლიანად სუფთაა)
+- და პირიქით — დაბალ-harmony დღეებშიც იპოვე ერთი ნატეხი ნათელი
+- მოერიდე: კლიშეები, "ცა", "სამყარო", "ვარსკვლავები გელაპარაკებიან"
+- ენა: ქართული. ბრენდები (Vivida, Pro) — ლათინურად. პლანეტების სახელები — ქართულად (მზე, მთვარე, მერკური, ვენერა, მარსი, იუპიტერი, სატურნი, ურანი, ნეპტუნი, პლუტონი)
+- ყველა 7 დღე უნდა იყოს განსხვავებული ხასიათის — გაიხსენე drivers-ის სხვაობა, არ გამეორო იგივე ფრაზა
+- მხოლოდ JSON, ფენსების გარეშე`;
+
+const PLANET_LABELS_KA: Record<string, string> = {
+  sun: "მზე",
+  moon: "მთვარე",
+  mercury: "მერკური",
+  venus: "ვენერა",
+  mars: "მარსი",
+  jupiter: "იუპიტერი",
+  saturn: "სატურნი",
+  uranus: "ურანი",
+  neptune: "ნეპტუნი",
+  pluto: "პლუტონი",
+  ascendant: "ამომავალი",
+  midheaven: "ცის შუა",
+};
+
+export type WeeklyDayPromptInput = {
+  dateIso: string;
+  promptLabel: string;       // "ორშაბათი, 5 მაისი"
+  moonSignKa: string;
+  harmonyScore: number;
+  challengeScore: number;
+  drivers: Array<{
+    transit: string;
+    natal: string;
+    kind: string;
+    family: string;
+    orb: number;
+  }>;
+};
+
+export async function generateWeeklyForecast(input: {
+  firstName: string | null;
+  chart: NatalChartJson;
+  days: WeeklyDayPromptInput[];
+}): Promise<WeeklyForecastResult | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const sections: string[] = [];
+  if (input.firstName) sections.push(`მომხმარებლის სახელი: ${input.firstName}`);
+  sections.push("\n--- ნატალური რუკა (კონტექსტი) ---");
+  sections.push(summarizeNatalCompact(input.chart));
+
+  sections.push("\n--- 7 დღე ---");
+  for (const day of input.days) {
+    sections.push(
+      `\n${day.promptLabel} · dateIso=${day.dateIso}` +
+        ` · მთვარე ${day.moonSignKa}` +
+        ` · harmonyScore=${day.harmonyScore} · challengeScore=${day.challengeScore}`
+    );
+    if (day.drivers.length === 0) {
+      sections.push("  drivers: (no tight aspects)");
+      continue;
+    }
+    sections.push("  drivers:");
+    for (const d of day.drivers.slice(0, 6)) {
+      const t = PLANET_LABELS_KA[d.transit] ?? d.transit;
+      const n = PLANET_LABELS_KA[d.natal] ?? d.natal;
+      sections.push(
+        `    ${d.family}: transit ${t} ${d.kind} natal ${n} (orb ${d.orb.toFixed(1)}°)`
+      );
+    }
+  }
+
+  sections.push(
+    "\nდააწერე ყოველდღე — JSON ერთი ობიექტი, "
+      + "გასაღები 'days', მასივი ზუსტად 7 ელემენტით input-ის თანმიმდევრობით. "
+      + "dateIso ზუსტად დატოვე ისე, როგორც გადმოგცეთ."
+  );
+
+  const userMessage = sections.join("\n");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida weekly forecast",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: WEEKLY_FORECAST_SYSTEM_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.8,
+      // 7 days × ~5 short Georgian sentences each + JSON overhead, with
+      // headroom for thinking tokens on Gemini reasoning models.
+      max_tokens: 12000,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  try {
+    const parsed = JSON.parse(stripped) as WeeklyForecastResult;
+    if (!Array.isArray(parsed.days) || parsed.days.length === 0) {
+      throw new Error("missing days array in weekly forecast");
+    }
+    return parsed;
+  } catch (err) {
+    throw new Error(
+      `Weekly forecast invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`
+    );
+  }
+}
+
 const PLANET_LABELS_EN: Record<string, string> = {
   sun: "Sun",
   moon: "Moon",
