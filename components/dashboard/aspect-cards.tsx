@@ -240,10 +240,10 @@ export function AspectCards({
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium tracking-tight">
+                        <div className="text-balance text-sm font-medium leading-tight tracking-tight">
                           {left.label} {ASPECT_LABEL_KA[a.kind]} {right.label}
                         </div>
-                        <div className="mt-0.5 text-[11px] text-muted-foreground">
+                        <div className="mt-1 text-[11px] text-muted-foreground">
                           {strengthLabel(a.orb, a.kind)}
                         </div>
                       </div>

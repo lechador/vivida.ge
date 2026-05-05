@@ -87,7 +87,7 @@ export function HouseCards({
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline gap-2">
-                  <h3 className="truncate text-base font-semibold tracking-tight">
+                  <h3 className="text-balance text-sm font-semibold leading-tight tracking-tight sm:text-base">
                     {def.themeKa}
                   </h3>
                   {isAxis && (
@@ -100,7 +100,7 @@ export function HouseCards({
                     </span>
                   )}
                 </div>
-                <div className="mt-0.5 flex items-center gap-2 truncate text-xs text-muted-foreground">
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-snug text-muted-foreground">
                   {cuspSign && (
                     <span>
                       <span aria-hidden className="mr-0.5">
@@ -110,16 +110,13 @@ export function HouseCards({
                     </span>
                   )}
                   {planets.length > 0 && (
-                    <>
-                      <span aria-hidden>·</span>
-                      <span className="flex items-center gap-1">
-                        {planets.map((p) => (
-                          <span key={p.key} title={p.label} aria-hidden>
-                            {p.symbol}
-                          </span>
-                        ))}
-                      </span>
-                    </>
+                    <span className="flex items-center gap-1">
+                      {planets.map((p) => (
+                        <span key={p.key} title={p.label} aria-hidden>
+                          {p.symbol}
+                        </span>
+                      ))}
+                    </span>
                   )}
                 </div>
               </div>

@@ -89,11 +89,11 @@ export function PlanetCards({
                   <span aria-hidden className="text-base">
                     {meta?.symbol ?? "?"}
                   </span>
-                  <h3 className="truncate text-base font-semibold tracking-tight">
+                  <h3 className="text-balance text-base font-semibold leading-tight tracking-tight">
                     {meta?.labelKa ?? key}
                   </h3>
                 </div>
-                <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                <div className="mt-1 text-xs leading-snug text-muted-foreground">
                   {sign.labelKa}-ში{body.house ? ` · მე-${body.house} სახლი` : ""}
                   {body.retrograde ? " · ℞" : ""}
                 </div>
