@@ -44,7 +44,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid_price" }, { status: 400 });
   }
 
-  // Persist the pending payment so we can correlate the webhook
+  // Persist the pending payment so we can correlate the webhook. We store
+  // `interval` here so the webhook doesn't have to infer it from amount —
+  // future price changes would otherwise misclassify in-flight orders.
   const [payment] = await db
     .insert(payments)
     .values({
@@ -52,6 +54,7 @@ export async function POST(req: Request) {
       flittOrderId: `viv_${session.user.id.slice(0, 8)}_${Date.now()}`,
       amountCents: amountMinor,
       currency: "GEL",
+      interval: body.interval,
       status: "pending",
       description: `Vivida Pro · ${body.interval === "year" ? "წლიური" : "თვიური"}`,
     })

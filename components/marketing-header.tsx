@@ -27,7 +27,7 @@ export function MarketingHeader({
   );
 
   return (
-    <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
+    <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
       <Link href="/" className="flex items-center gap-2.5">
         <VividaMark size={40} id="marketing-header" />
         <span

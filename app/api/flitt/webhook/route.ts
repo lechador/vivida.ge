@@ -7,6 +7,20 @@ import { mapFlittStatus, verifyCallback } from "@/lib/flitt";
 import { PLANS, type IntervalId } from "@/lib/pricing";
 
 /**
+ * Resolve the billing interval. Newer payments persist it on the row at
+ * checkout time; legacy rows (pre-interval column) fall back to amount
+ * matching the *current* yearly price. The legacy fallback is now only
+ * for payments that pre-date the migration — once those drain through,
+ * the inference branch is dead code.
+ */
+function resolveInterval(payment: typeof payments.$inferSelect): IntervalId {
+  if (payment.interval === "month" || payment.interval === "year") {
+    return payment.interval;
+  }
+  return payment.amountCents === PLANS.pro.price.year ? "year" : "month";
+}
+
+/**
  * Flitt webhook handler.
  *
  * Flitt POSTs JSON with the same signed-param shape as the checkout request.
@@ -69,11 +83,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  // Approved — activate Pro for this user.
-  // Determine interval from the amount. (We could persist this on the
-  // payment row, but inferring keeps the schema simpler.)
-  const interval: IntervalId =
-    payment.amountCents === PLANS.pro.price.year ? "year" : "month";
+  // Approved — activate Pro for this user. Read interval from the row
+  // (persisted at checkout) with a legacy fallback to amount inference.
+  const interval = resolveInterval(payment);
 
   const periodStart = new Date();
   const periodEnd = new Date(periodStart);

@@ -50,15 +50,29 @@ export default async function SynastryPage() {
             <span className="rounded-full border border-border/70 bg-background/40 px-3 py-1 text-xs text-foreground/80">
               ამ თვეში: {used} / {cap}
             </span>
-            <Button asChild variant="mystic" size="lg" disabled={remaining === 0}>
-              <Link
-                href={remaining > 0 ? "/synastry/new" : "/pricing"}
-                aria-disabled={remaining === 0}
-              >
+            {remaining > 0 ? (
+              <Button asChild variant="mystic" size="lg">
+                <Link href="/synastry/new">
+                  <Plus className="size-4" />
+                  ახალი პარტნიორი
+                </Link>
+              </Button>
+            ) : plan === "free" ? (
+              <Button asChild variant="mystic" size="lg">
+                <Link href="/pricing">
+                  <Plus className="size-4" />
+                  გადადი Pro-ზე
+                </Link>
+              </Button>
+            ) : (
+              // Pro user hit their monthly cap — pricing isn't the answer,
+              // they need to wait. Render a real disabled button (no Link)
+              // so the click can't navigate anywhere unhelpful.
+              <Button variant="outline" size="lg" disabled>
                 <Plus className="size-4" />
-                {remaining > 0 ? "ახალი პარტნიორი" : "გადადი Pro-ზე"}
-              </Link>
-            </Button>
+                შემდეგი თვიდან
+              </Button>
+            )}
           </div>
         </div>
 

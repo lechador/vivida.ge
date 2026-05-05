@@ -28,7 +28,7 @@ export function AuthLayout({
       <Starfield count={100} shooting={2} />
 
       <div className="relative z-10 flex flex-1 flex-col">
-        <header className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
+        <header className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
           <Link href="/" className="inline-flex items-center gap-2.5">
             <VividaMark size={36} id="auth-header" />
             <span

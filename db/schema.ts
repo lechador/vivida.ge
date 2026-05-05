@@ -219,6 +219,9 @@ export const payments = pgTable("payment", {
   flittOrderId: text("flitt_order_id").notNull().unique(),
   amountCents: integer("amount_cents").notNull(),
   currency: text("currency").notNull(),
+  /** 'month' | 'year' — persisted at checkout so the webhook doesn't have to
+   *  guess from amount. Nullable for legacy rows that pre-date this column. */
+  interval: billingIntervalEnum("interval"),
   status: text("status").notNull(), // 'approved' | 'declined' | 'pending' | …
   description: text("description"),
   rawPayload: jsonb("raw_payload"),

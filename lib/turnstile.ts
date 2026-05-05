@@ -24,6 +24,16 @@ export async function verifyTurnstile(
 ): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
+    // In production, a missing secret is a fail-CLOSED situation — otherwise
+    // a forgotten env var rotation silently disables bot protection across
+    // every signup/login/forgot-password endpoint. In dev, fail-open is
+    // convenient so you can build forms without a Cloudflare account.
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "[turnstile] TURNSTILE_SECRET_KEY missing in production — REJECTING request to fail closed"
+      );
+      return false;
+    }
     console.warn(
       "[turnstile] TURNSTILE_SECRET_KEY missing — accepting request without verification (dev-only path)"
     );

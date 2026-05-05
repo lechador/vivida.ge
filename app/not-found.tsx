@@ -16,7 +16,7 @@ export default function NotFound() {
       />
       <Starfield count={100} shooting={2} />
 
-      <header className="relative z-10 mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
+      <header className="relative z-10 mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
         <Link href="/" className="inline-flex items-center gap-2.5">
           <VividaMark size={36} id="not-found" />
           <span
