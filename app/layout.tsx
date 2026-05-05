@@ -3,6 +3,7 @@ import { Noto_Sans_Georgian } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import NextTopLoader from "nextjs-toploader";
 import { ChatShell } from "@/components/chat/chat-shell";
+import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
 import "./globals.css";
 
 const notoGeorgian = Noto_Sans_Georgian({
@@ -129,6 +130,7 @@ export default function RootLayout({
           easing="cubic-bezier(0.22, 1, 0.36, 1)"
           speed={400}
         />
+        <BfcacheRefresher />
         {children}
         <ChatShell />
       </body>
