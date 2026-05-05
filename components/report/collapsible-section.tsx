@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
  */
 export function CollapsibleSection({
   id,
-  number,
   /** Pre-rendered icon JSX, e.g. <Sparkles className="size-5" />. We accept
    *  rendered JSX rather than a component so this client component can be
    *  used from RSC parents — components-as-props don't cross the boundary. */
@@ -25,7 +24,6 @@ export function CollapsibleSection({
   children,
 }: {
   id: string;
-  number: string;
   icon: React.ReactNode;
   title: string;
   subtitle?: string;
@@ -67,14 +65,11 @@ export function CollapsibleSection({
           {icon}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-            სექცია {number}
-          </div>
-          <h2 className="mt-0.5 text-2xl font-semibold tracking-tight">
+          <h2 className="text-2xl font-semibold tracking-tight">
             {title}
           </h2>
           {subtitle && (
-            <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
           )}
         </div>
         <ChevronDown

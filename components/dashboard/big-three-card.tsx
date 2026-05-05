@@ -42,7 +42,10 @@ export function BigThreeCard({
         {/* Hero: zodiac sign glyph — the centerpiece. The Sun/Moon/AC body
             glyph rides as a small corner badge, so identity (sign) reads
             first and role (luminary) reads second. */}
-        <div className="relative">
+        <div
+          className="relative"
+          title={`${formatDegree(point.signDegree)} ${sign.labelKa}-ში`}
+        >
           <SignBadge sign={sign} size="lg" />
           <span
             className="absolute -bottom-1.5 -right-1.5 grid size-8 place-items-center rounded-full border-2 border-background bg-card text-sm font-medium text-foreground/80 shadow-md"
@@ -53,14 +56,19 @@ export function BigThreeCard({
         </div>
 
         <div className="min-w-0 flex-1 pt-1">
-          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <div className="text-sm font-medium text-muted-foreground">
             {KIND_LABEL[kind]}
           </div>
-          <h3 className="mt-1 text-3xl font-semibold tracking-tight">
+          <h3 className="mt-0.5 text-3xl font-semibold tracking-tight">
             {sign.labelKa}
           </h3>
-          <div className="mt-1 text-xs text-muted-foreground">
-            {formatDegree(point.signDegree)} · {sign.element} · {sign.modality}
+          <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+            <span className="rounded-full border border-border/60 bg-background/40 px-2 py-0.5 text-foreground/80">
+              {sign.element}
+            </span>
+            <span className="rounded-full border border-border/60 bg-background/40 px-2 py-0.5 text-foreground/80">
+              {sign.modality}
+            </span>
           </div>
         </div>
       </header>

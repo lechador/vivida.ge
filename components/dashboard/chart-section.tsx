@@ -74,10 +74,7 @@ export async function ChartSection({
             />
             <div className="relative grid gap-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
               <div className="order-2 sm:order-1">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-                  სექცია 01 · ნატალური რუკა
-                </div>
-                <h2 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
+                <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
                   შენი ცის{" "}
                   <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
                     მომენტი
@@ -87,23 +84,16 @@ export async function ChartSection({
                   ცა ზუსტად შენი დაბადების წამში. ამომავალი ნიშანი{" "}
                   {ascSign.labelKa}-შია.
                 </p>
-                <ul className="mt-5 space-y-1.5 text-xs text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span className="inline-block h-px w-6 bg-[oklch(0.78_0.18_200)]" />
-                    სამკუთხა · სექსტილი (ჰარმონიული)
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span
-                      className="inline-block h-px w-6 bg-[oklch(0.72_0.22_350)]"
-                      style={{
-                        backgroundImage:
-                          "linear-gradient(to right, oklch(0.72 0.22 350) 50%, transparent 50%)",
-                        backgroundSize: "6px 1px",
-                      }}
-                    />
-                    კვადრატი · ოპოზიცია (დაძაბულობა)
-                  </li>
-                </ul>
+                <div className="mt-5 flex flex-wrap gap-2 text-xs">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.78_0.18_200/0.4)] bg-[oklch(0.78_0.18_200/0.1)] px-2.5 py-1 text-foreground/85">
+                    <span aria-hidden>✨</span>
+                    ჰარმონიული ბმები
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.72_0.22_350/0.4)] bg-[oklch(0.72_0.22_350/0.1)] px-2.5 py-1 text-foreground/85">
+                    <span aria-hidden>⚡</span>
+                    დაძაბული ბმები
+                  </span>
+                </div>
               </div>
               <div className="order-1 mx-auto w-full max-w-[480px] sm:order-2">
                 <ChartWheel chart={data} />
@@ -118,11 +108,9 @@ export async function ChartSection({
             id="summary"
             className="scroll-mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:scroll-mt-24 sm:p-6"
           >
-            <div className="mb-2 flex items-center gap-2">
-              <Sparkles className="size-4 text-[var(--vivida-violet)]" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-                AI ანალიზი
-              </span>
+            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)]">
+              <Sparkles className="size-4" aria-hidden />
+              <span>შენი რუკის შესახებ</span>
             </div>
             <p className="text-lg leading-relaxed text-foreground/90">
               {interp.summary}
@@ -139,10 +127,9 @@ export async function ChartSection({
         {/* SECTION 02 — Big three (open by default) */}
         <CollapsibleSection
           id="big-three"
-          number="02"
           icon={<Sparkles className="size-5" />}
           title="დიდი სამეული"
-          subtitle="მზე · მთვარე · ამომავალი — შენი ბირთვი"
+          subtitle="მზე, მთვარე და ამომავალი — შენი ბირთვი"
           defaultOpen
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -171,7 +158,6 @@ export async function ChartSection({
         {/* SECTION 03 — Elements (open by default) */}
         <CollapsibleSection
           id="elements"
-          number="03"
           icon={<Flame className="size-5" />}
           title="ელემენტები"
           subtitle="რომელი ენერგიები დომინირებენ შენს ცაში"
@@ -184,10 +170,9 @@ export async function ChartSection({
         {canHighlights && interp?.highlights && interp.highlights.length > 0 && (
           <CollapsibleSection
             id="highlights"
-            number="04"
             icon={<Lightbulb className="size-5" />}
-            title="მნიშვნელოვანი შტრიხები"
-            subtitle="რუკის ის ნაწილები, რომელთაც გამოვყოფდით"
+            title="რა ვამჩნევთ შენს რუკაში"
+            subtitle="ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"
           >
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {interp.highlights.map((h, i) => (
@@ -195,7 +180,7 @@ export async function ChartSection({
                   key={i}
                   className="group rounded-2xl border border-border bg-card/60 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/75 hover:ring-foreground/15"
                 >
-                  <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-[var(--vivida-cyan)]">
+                  <h3 className="mb-2 text-base font-semibold tracking-tight text-[var(--vivida-cyan)]">
                     {h.title}
                   </h3>
                   <p className="text-base leading-relaxed text-foreground/85">
@@ -210,9 +195,8 @@ export async function ChartSection({
         {!canHighlights && (
           <CollapsibleSection
             id="highlights"
-            number="04"
             icon={<Lightbulb className="size-5" />}
-            title="მნიშვნელოვანი შტრიხები"
+            title="რა ვამჩნევთ შენს რუკაში"
           >
             <LockedCard
               title="რუკის უნიკალური აქცენტები"
@@ -226,10 +210,9 @@ export async function ChartSection({
         {/* SECTION 05 — Planets */}
         <CollapsibleSection
           id="planets"
-          number="05"
           icon={<Globe2 className="size-5" />}
           title="პლანეტები"
-          subtitle="მერკური · ვენერა · მარსი · იუპიტერი · სატურნი · ურანი · ნეპტუნი · პლუტონი"
+          subtitle="რვა პლანეტა, რვა ხასიათი — ერთად შენ ხარ"
         >
           <PlanetCards chart={data} interpretations={interp?.planets} />
         </CollapsibleSection>
@@ -237,10 +220,9 @@ export async function ChartSection({
         {/* SECTION 06 — Houses */}
         <CollapsibleSection
           id="houses"
-          number="06"
           icon={<Home className="size-5" />}
-          title="12 სახლი"
-          subtitle="ცხოვრების სფეროები — სად ვლინდება ენერგია"
+          title="ცხოვრების 12 სფერო"
+          subtitle="სად რა ენერგია ვლინდება შენს ცხოვრებაში"
         >
           <HouseCards chart={data} interpretations={interp?.houses} />
         </CollapsibleSection>
@@ -248,10 +230,9 @@ export async function ChartSection({
         {/* SECTION 07 — Aspects */}
         <CollapsibleSection
           id="aspects"
-          number="07"
           icon={<Triangle className="size-5" />}
           title="ასპექტები"
-          subtitle="როგორ ესაუბრებიან პლანეტები ერთმანეთს"
+          subtitle="როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
         >
           <AspectCards chart={data} interpretations={interp?.aspects} />
         </CollapsibleSection>

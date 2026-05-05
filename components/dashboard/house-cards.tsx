@@ -75,7 +75,7 @@ export function HouseCards({
                       ))}
                     </div>
                   ) : (
-                    <span className="shrink-0 rounded-full bg-card/60 px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <span className="shrink-0 rounded-full bg-card/60 px-2 py-0.5 text-[11px] text-muted-foreground">
                       ცარიელი
                     </span>
                   )}
@@ -83,14 +83,17 @@ export function HouseCards({
                 <div className="mt-1 text-xs text-muted-foreground">
                   {def.themeKa}
                 </div>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
                   {cuspSign && (
-                    <span className="text-foreground/70">
-                      კუსპი: {cuspSign.labelKa}
+                    <span className="rounded-full border border-border/60 bg-background/40 px-2 py-0.5 text-foreground/80">
+                      <span aria-hidden className="mr-1">
+                        {cuspSign.symbol}
+                      </span>
+                      {cuspSign.labelKa}
                     </span>
                   )}
                   {isAxis && (
-                    <span className="rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--vivida-violet)]">
+                    <span className="rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/10 px-2 py-0.5 font-semibold text-[var(--vivida-violet)]">
                       ღერძი
                     </span>
                   )}

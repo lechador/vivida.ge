@@ -49,15 +49,15 @@ export default async function ReportPage() {
       <AppHeader authed plan={plan} active="report" />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
-        <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          ნატალური ანგარიში
-        </div>
-        <h1 className="mb-6 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
+        <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
           {firstName}-ის{" "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
             კოსმიური რუკა
           </span>
         </h1>
+        <p className="mb-6 max-w-xl text-sm text-foreground/75 sm:text-base">
+          ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე.
+        </p>
 
         <div className="mb-8">
           <TrialBanner userId={user.id} />
@@ -89,15 +89,22 @@ export default async function ReportPage() {
             />
             <Field label="დაბადების ადგილი" value={profile.cityName} />
             <Field label="დროის სარტყელი" value={profile.timezone} />
-            <Field
-              label="განედი"
-              value={profile.latitude?.toFixed(4) ?? null}
-            />
-            <Field
-              label="გრძედი"
-              value={profile.longitude?.toFixed(4) ?? null}
-            />
           </dl>
+          {(profile.latitude != null || profile.longitude != null) && (
+            <details className="group mt-4 text-xs text-muted-foreground">
+              <summary className="cursor-pointer select-none transition-colors hover:text-foreground">
+                ტექნიკური დეტალები
+              </summary>
+              <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 tabular-nums">
+                {profile.latitude != null && (
+                  <span>განედი: {profile.latitude.toFixed(4)}</span>
+                )}
+                {profile.longitude != null && (
+                  <span>გრძედი: {profile.longitude.toFixed(4)}</span>
+                )}
+              </div>
+            </details>
+          )}
         </div>
       </section>
     </main>
@@ -113,10 +120,8 @@ function Field({
 }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wider text-muted-foreground">
-        {label}
-      </dt>
-      <dd className="mt-1 text-foreground">{value ?? "—"}</dd>
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5 text-foreground">{value ?? "—"}</dd>
     </div>
   );
 }

@@ -38,12 +38,14 @@ export function PlanetCards({
               {/* Sign badge: the zodiac glyph leads, planet symbol rides
                   as a small corner — the sign is the modifier that gives
                   this planet its flavor for this person. */}
-              <div className="relative">
+              <div
+                className="relative"
+                title={`${formatDegree(body.signDegree)} ${sign.labelKa}-ში`}
+              >
                 <SignBadge sign={sign} size="md" />
                 <span
                   aria-hidden
                   className="absolute -bottom-1 -right-1 grid size-6 place-items-center rounded-full border-2 border-background bg-card text-[11px] font-medium text-foreground/80 shadow-sm"
-                  title={meta?.labelKa ?? key}
                 >
                   {meta?.symbol ?? "?"}
                 </span>
@@ -61,21 +63,20 @@ export function PlanetCards({
                 <div className="mt-1 text-xs text-muted-foreground">
                   {meta?.meaningKa}
                 </div>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                  <span className="text-foreground/70">
-                    {formatDegree(body.signDegree)}
-                  </span>
-                  {body.house && (
-                    <span className="rounded-full border border-border/60 bg-card/60 px-2 py-0.5 text-muted-foreground">
-                      {body.house}-ე სახლი
-                    </span>
-                  )}
-                  {body.retrograde && (
-                    <span className="rounded-full bg-[var(--vivida-pink)]/15 px-2 py-0.5 font-semibold text-[var(--vivida-pink)]">
-                      რეტროგრადული
-                    </span>
-                  )}
-                </div>
+                {(body.house || body.retrograde) && (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
+                    {body.house && (
+                      <span className="rounded-full border border-border/60 bg-background/40 px-2 py-0.5 text-foreground/80">
+                        {body.house}-ე სახლი
+                      </span>
+                    )}
+                    {body.retrograde && (
+                      <span className="rounded-full bg-[var(--vivida-pink)]/15 px-2 py-0.5 font-semibold text-[var(--vivida-pink)]">
+                        რეტროგრადული
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </header>
 

@@ -197,7 +197,7 @@ function Stat({
         }}
       />
       <div className="relative">
-        <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <div className="text-xs font-medium text-muted-foreground">
           {label}
         </div>
         <div className="mt-1 flex items-baseline gap-2">
@@ -241,7 +241,7 @@ function BodyModalContent({
   return (
     <>
       <DialogHeader>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
+        <div className="text-sm font-medium text-muted-foreground">
           {meta?.labelKa}
         </div>
         <DialogTitle className="flex items-baseline gap-3">
@@ -249,9 +249,11 @@ function BodyModalContent({
           <span className="text-2xl text-muted-foreground">{sign.symbol}</span>
         </DialogTitle>
         <DialogDescription>
-          {formatDegree(body.signDegree)}
-          {body.house ? ` · ${body.house}-ე სახლი` : ""} ·{" "}
           {sign.element} · {sign.modality}
+          {body.house ? ` · ${body.house}-ე სახლი` : ""}
+          <span className="block text-xs opacity-70">
+            {formatDegree(body.signDegree)}
+          </span>
         </DialogDescription>
       </DialogHeader>
       {text && (
@@ -276,7 +278,7 @@ function AscendantModalContent({
   return (
     <>
       <DialogHeader>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
+        <div className="text-sm font-medium text-muted-foreground">
           ამომავალი
         </div>
         <DialogTitle className="flex items-baseline gap-3">
@@ -284,8 +286,10 @@ function AscendantModalContent({
           <span className="text-2xl text-muted-foreground">{sign.symbol}</span>
         </DialogTitle>
         <DialogDescription>
-          {formatDegree(chart.ascendant.signDegree)} · {sign.element} ·{" "}
-          {sign.modality}
+          {sign.element} · {sign.modality}
+          <span className="block text-xs opacity-70">
+            {formatDegree(chart.ascendant.signDegree)}
+          </span>
         </DialogDescription>
       </DialogHeader>
       {text && (
@@ -313,7 +317,7 @@ function ElementModalContent({
   return (
     <>
       <DialogHeader>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
+        <div className="text-sm font-medium text-muted-foreground">
           დომინანტი ელემენტი
         </div>
         <DialogTitle className="flex items-baseline gap-3">
@@ -331,7 +335,7 @@ function ElementModalContent({
       </DialogHeader>
       {planets.length > 0 && (
         <div>
-          <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <div className="mb-2 text-xs font-medium text-muted-foreground">
             ამ ელემენტში
           </div>
           <ul className="space-y-2 text-sm">

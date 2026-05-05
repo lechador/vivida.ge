@@ -63,9 +63,27 @@ function bodyDisplay(chart: NatalChartJson, key: string) {
   };
 }
 
-function orbBadge(orb: number): string {
+function strengthLabel(orb: number, kind: string): string {
+  // Orb tolerances per aspect kind (mirrors lib/aspects.ts). A small fraction
+  // of the tolerance = exact; over half = wide. Kept as friendly Georgian
+  // adjectives so the card body reads as "feeling," not measurement.
+  const TOL: Record<string, number> = {
+    conjunction: 10,
+    opposition: 10,
+    sextile: 6,
+    square: 8,
+    trine: 8,
+  };
+  const tol = TOL[kind] ?? 8;
   if (orb < 0.5) return "ზუსტი";
-  return `${orb.toFixed(1)}° ორბი`;
+  if (orb < tol * 0.4) return "ძლიერი";
+  if (orb < tol * 0.75) return "საშუალო";
+  return "მსუბუქი";
+}
+
+function orbTooltip(orb: number): string {
+  if (orb < 0.5) return "ზუსტი ბმა";
+  return `ორბი ${orb.toFixed(1)}°`;
 }
 
 /**
@@ -129,6 +147,7 @@ export function AspectCards({
           <article
             key={`${a.a}-${a.b}-${a.kind}`}
             className={`group relative overflow-hidden rounded-2xl border p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:ring-foreground/15 ${tint}`}
+            title={orbTooltip(a.orb)}
           >
             <header className="mb-4 flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
@@ -139,23 +158,19 @@ export function AspectCards({
                   </span>
                   <span title={right.label}>{right.symbol}</span>
                 </div>
-                <div className="mt-1 text-sm font-medium text-foreground">
-                  {left.label} — {ASPECT_LABEL_KA[a.kind]} — {right.label}
+                <div className="mt-1.5 text-sm font-medium text-foreground">
+                  {left.label} {ASPECT_LABEL_KA[a.kind]} {right.label}
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  <span>{orbBadge(a.orb)}</span>
-                  <span>·</span>
-                  <span className={glyphColor}>
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
+                  <span
+                    className={`rounded-full border bg-background/40 px-2 py-0.5 ${glyphColor}`}
+                    style={{ borderColor: "currentColor" }}
+                  >
                     {FAMILY_LABEL_KA[a.family] ?? a.family}
                   </span>
-                  {left.sign && right.sign && (
-                    <>
-                      <span>·</span>
-                      <span>
-                        {left.sign.symbol} ↔ {right.sign.symbol}
-                      </span>
-                    </>
-                  )}
+                  <span className="rounded-full border border-border/60 bg-background/40 px-2 py-0.5 text-foreground/80">
+                    {strengthLabel(a.orb, a.kind)}
+                  </span>
                 </div>
               </div>
             </header>
