@@ -34,7 +34,7 @@ function NavLinkItem({ item, isActive }: { item: NavItem; isActive: boolean }) {
       <Link
         href={item.href}
         className={cn(
-          "group relative inline-flex items-center gap-2 rounded-full px-4 py-2 text-base font-medium transition-colors duration-200",
+          "group relative inline-flex items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-2 text-base font-medium transition-colors duration-200",
           isActive
             ? "text-foreground"
             : "text-muted-foreground hover:text-foreground"
