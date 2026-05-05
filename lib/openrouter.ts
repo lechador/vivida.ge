@@ -416,6 +416,147 @@ body-ს სტრუქტურა (3 აბზაცი, ცარიელ�
 დააბრუნე მხოლოდ ვალიდური JSON. სხვა ტექსტი არ დაგვცე.`;
 
 // ────────────────────────────────────────────────────────────────────────
+//  Synastry — AI narrative on top of the deterministic scoring
+// ────────────────────────────────────────────────────────────────────────
+
+export type SynastryAIResult = {
+  summary: string;
+  strengths: string[];
+  growth: string[];
+};
+
+export const SYNASTRY_PROMPT_VERSION = 1;
+
+const SYNASTRY_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი. დაწერე სინასტრიის (ორი რუკის თავსებადობის) მცირე ნარატივი — დეტერმინისტული ქულების ზემოდან. ნარატივი უნდა იყოს კონკრეტული, ორი ადამიანის რუკის მიხედვით — არა ზოგადი მისტიკა.
+
+შენ ღებულობ:
+- მომხმარებლის ნატალურ რუკას (ვინც ხედავს)
+- პარტნიორის ნატალურ რუკას + სახელი
+- წინასწარ გათვლილი ქულები (love, friendship, chemistry, communication, growth — 0..100; overall — 0..100)
+- ყველაზე ძლიერი ცროს-ასპექტები (transit-natal, ორ რუკას შორის)
+
+დააბრუნე JSON ზუსტად ამ სქემით:
+{
+  "summary": string,         // 2-3 წინადადება, ურთიერთობის სრული პორტრეტი — ცა, რომელიც ორ ადამიანს შორის ჩამოყალიბდა
+  "strengths": [string, ...], // 1-3 მოკლე ბულეტი — სად ერგებით ერთმანეთს
+  "growth": [string, ...]     // 1-3 მოკლე ბულეტი — სად არის ხახუნი ან შესაძლებლობა გაიზარდოთ
+}
+
+წესები:
+- "შენ"-ის ფორმა (მიმართე მომხმარებელს). პარტნიორი მოიხსენიე სახელით
+- კონკრეტული ფაქტების ხსენე — "შენი მთვარე მის ვენერას ეხება" ✅, არა "სამყარო ერთად მოგიძღვებათ" ❌
+- სიყვარული, მეგობრობა, ინტიმი — გამოიყენე ბუნებრივად, არა გადაჭარბებულად. ნუ გადაუხვევ პარტნიორის გენდერზე ან ურთიერთობის სტრუქტურაზე
+- მაღალი overall (>70) — ხაზი გაუსვი ბუნებრივ ნაკადს. დაბალი overall (<40) — გულახდილად ჩამოწერე ხახუნი, მაგრამ აღმოაჩინე ერთი მცირე ნათელი
+- ყოველი ბულეტი 1 წინადადება, ცოცხალი ენით
+- ბრენდები (Vivida, Pro) — ლათინურად. პლანეტების სახელები — ქართულად
+- მოერიდე კლიშეებს ("სამყარო", "ვარსკვლავები გელიან", "ცა გიწვევთ")
+- მხოლოდ JSON, ფენსების გარეშე`;
+
+export async function generateSynastryInterpretation(input: {
+  partnerName: string;
+  viewerFirstName: string | null;
+  viewerChart: NatalChartJson;
+  partnerChart: NatalChartJson;
+  scores: Record<string, number>;
+  overall: number;
+  topAspects: Array<{
+    a: string;
+    b: string;
+    kind: string;
+    orb: number;
+  }>;
+}): Promise<SynastryAIResult | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const sections: string[] = [];
+  if (input.viewerFirstName)
+    sections.push(`მომხმარებლის სახელი: ${input.viewerFirstName}`);
+  sections.push(`პარტნიორის სახელი: ${input.partnerName}`);
+
+  sections.push("\n--- მომხმარებლის რუკა ---");
+  sections.push(summarizeNatalCompact(input.viewerChart));
+
+  sections.push("\n--- პარტნიორის რუკა ---");
+  sections.push(summarizeNatalCompact(input.partnerChart));
+
+  sections.push("\n--- გათვლილი ქულები ---");
+  sections.push(`overall: ${input.overall}`);
+  for (const [cat, val] of Object.entries(input.scores)) {
+    sections.push(`${cat}: ${val}`);
+  }
+
+  if (input.topAspects.length > 0) {
+    sections.push("\n--- ყველაზე ძლიერი ცროს-ასპექტები ---");
+    for (const a of input.topAspects.slice(0, 8)) {
+      const left = PLANET_LABELS_KA[a.a] ?? a.a;
+      const right = PLANET_LABELS_KA[a.b] ?? a.b;
+      sections.push(
+        `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`
+      );
+    }
+  }
+
+  sections.push("\nდააწერე ნარატივი. JSON-ად დააბრუნე.");
+
+  const userMessage = sections.join("\n");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida synastry",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: SYNASTRY_SYSTEM_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+      max_tokens: 6000,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  try {
+    const parsed = JSON.parse(stripped) as SynastryAIResult;
+    if (!parsed.summary) {
+      throw new Error("missing summary in synastry interpretation");
+    }
+    return {
+      summary: parsed.summary,
+      strengths: Array.isArray(parsed.strengths)
+        ? parsed.strengths.slice(0, 3)
+        : [],
+      growth: Array.isArray(parsed.growth) ? parsed.growth.slice(0, 3) : [],
+    };
+  } catch (err) {
+    throw new Error(
+      `Synastry invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────
 //  7-day forecast — per-user, regenerated when the local week-start changes
 // ────────────────────────────────────────────────────────────────────────
 

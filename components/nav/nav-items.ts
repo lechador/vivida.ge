@@ -1,7 +1,12 @@
-import { Compass, Sun, Telescope, Users } from "lucide-react";
+import { Compass, Heart, Sun, Telescope, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-export type NavActiveKey = "today" | "report" | "discover" | "friends";
+export type NavActiveKey =
+  | "today"
+  | "report"
+  | "discover"
+  | "synastry"
+  | "friends";
 
 export type NavItem = {
   key: NavActiveKey;
@@ -33,6 +38,13 @@ export const NAV_ITEMS: NavItem[] = [
     label: "აღმოაჩინე",
     Icon: Telescope,
     hue: "oklch(0.78 0.15 195)",
+  },
+  {
+    key: "synastry",
+    href: "/synastry",
+    label: "თავსებადობა",
+    Icon: Heart,
+    hue: "oklch(0.72 0.22 350)",
   },
   {
     key: "friends",

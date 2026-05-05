@@ -29,6 +29,7 @@ export async function AppHeader({
     | "today"
     | "report"
     | "discover"
+    | "synastry"
     | "friends"
     | "pricing"
     | "account";
