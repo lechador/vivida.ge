@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, type Variants } from "framer-motion";
+import { Check } from "lucide-react";
 
 import { SignInButton } from "./sign-in-button";
-import { ZodiacWheel } from "./zodiac-wheel";
+import { HeroPreview } from "./hero-preview";
 import { HOME_CONTENT } from "@/lib/seo/home-content";
 
 const EASE_OUT_EXPO = [0.22, 1, 0.36, 1] as const;
@@ -45,7 +46,7 @@ export function Hero() {
   return (
     <section
       ref={wrapperRef}
-      className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 pb-24 pt-16 text-center sm:pt-20 lg:pt-24"
+      className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 pb-24 pt-12 text-center sm:pt-20 lg:pt-24"
     >
       {/* Parallax gradient orb behind the hero */}
       <motion.div
@@ -67,22 +68,15 @@ export function Hero() {
         }}
       />
 
-      {/* Animated zodiac wheel — sits above headline */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.4, ease: EASE_OUT_EXPO }}
-        className="relative mb-6 sm:mb-8"
-      >
-        <ZodiacWheel size={140} />
-      </motion.div>
+      {/* Product preview — chart wheel + floating snippet cards */}
+      <HeroPreview />
 
       <motion.span
         custom={0}
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
+        className="mb-5 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
       >
         <span className="size-1.5 rounded-full bg-[var(--vivida-cyan)] vivida-pulse" />
         {c.kicker}
@@ -99,9 +93,13 @@ export function Hero() {
         <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
           {c.headlineGradient}
         </span>
-        <br className="hidden sm:block" />
-        {" "}
-        {c.headlinePost}
+        {c.headlinePost ? (
+          <>
+            <br className="hidden sm:block" />
+            {" "}
+            {c.headlinePost}
+          </>
+        ) : null}
       </motion.h1>
 
       <motion.p
@@ -124,35 +122,42 @@ export function Hero() {
         <SignInButton label={c.ctaPrimary} loadingLabel={c.ctaPrimaryLoading} />
       </motion.div>
 
-      <motion.p
+      {/* Trust chips — promoted from gray micro-text into prominent
+          check-pills. The "no card required" line is the strongest trust
+          signal we have, so it deserves real visual weight on cold
+          ad-driven traffic. */}
+      <motion.div
         custom={4}
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="mt-4 text-xs text-muted-foreground/80"
+        className="mt-5 flex flex-wrap items-center justify-center gap-2"
       >
-        {c.microNotes.join(" · ")}
-      </motion.p>
+        {c.microNotes.map((note) => (
+          <span
+            key={note}
+            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200"
+          >
+            <Check className="size-3.5" strokeWidth={3} />
+            {note}
+          </span>
+        ))}
+      </motion.div>
 
+      {/* Single secondary action — email signup. The header already has
+          "შესვლა" for returning users; one obvious primary action wins. */}
       <motion.p
         custom={5}
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="mt-3 text-sm text-muted-foreground"
+        className="mt-4 text-xs text-muted-foreground"
       >
         <Link
           href="/signup"
-          className="text-foreground underline-offset-2 hover:underline"
+          className="underline-offset-2 hover:text-foreground hover:underline"
         >
           {c.secondary}
-        </Link>
-        {" · "}
-        <Link
-          href="/login"
-          className="text-foreground underline-offset-2 hover:underline"
-        >
-          შესვლა
         </Link>
       </motion.p>
     </section>

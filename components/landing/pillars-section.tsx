@@ -16,7 +16,7 @@ export function PillarsSection() {
   const pillars = HOME_CONTENT.pillars;
 
   return (
-    <section className="relative z-10 mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+    <section className="relative z-10 mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-24">
       <div className="grid gap-4 sm:grid-cols-3 sm:gap-5">
         {pillars.map((p, i) => {
           const Icon = ICONS[i] ?? Sparkles;

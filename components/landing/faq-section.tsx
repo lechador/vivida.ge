@@ -8,7 +8,7 @@ export function FaqSection() {
   const faq = HOME_CONTENT.faq;
 
   return (
-    <section className="relative z-10 mx-auto w-full max-w-3xl px-4 py-20 sm:px-6 sm:py-24">
+    <section className="relative z-10 mx-auto hidden w-full max-w-3xl px-4 py-20 sm:block sm:px-6 sm:py-24">
       <motion.h2
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}

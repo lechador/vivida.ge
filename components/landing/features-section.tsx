@@ -19,14 +19,14 @@ export function FeaturesSection() {
   const what = HOME_CONTENT.whatIsSection;
 
   return (
-    <section className="relative z-10 mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+    <section className="relative z-10 mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-24">
       {/* What is a natal chart — explainer */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="mx-auto mb-16 max-w-3xl text-center sm:mb-20"
+        className="mx-auto mb-10 max-w-3xl text-center sm:mb-20"
       >
         {what.kicker && (
           <div className="mb-3 text-sm font-medium text-muted-foreground">
