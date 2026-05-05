@@ -7,7 +7,6 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { accounts, sessions, users, verificationTokens } from "@/db/schema";
 import { authConfig } from "@/auth.config";
-import { provisionTrialIfMissing } from "@/lib/plan";
 
 /**
  * Credentials provider for the email/password login flow. Lives in
@@ -66,20 +65,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     verificationTokensTable: verificationTokens,
   }),
   providers: [...authConfig.providers, credentialsProvider],
-  events: {
-    /**
-     * Fired exactly once when the Drizzle adapter inserts a new user row
-     * (i.e. the very first Google sign-in). We use it to grant the new
-     * account a 60-day Pro trial up-front — no card capture, no friction.
-     * Errors are swallowed inside provisionTrialIfMissing so a transient
-     * Neon hiccup can't block sign-in.
-     *
-     * Note: this event does NOT fire for the email/password flow because
-     * Credentials provider bypasses the adapter. `signUpWithEmail` calls
-     * provisionTrialIfMissing directly after inserting the user.
-     */
-    async createUser({ user }) {
-      if (user.id) await provisionTrialIfMissing(user.id);
-    },
-  },
+  // No createUser event hook — trial provisioning is handled lazily on
+  // first /dashboard load via getCurrentPlan → provisionTrialIfMissing.
+  // Keeping the OAuth callback path tight makes Google sign-in feel
+  // noticeably faster on cold starts.
 });

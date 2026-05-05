@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { and, eq, gt } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
+import { after } from "next/server";
 
 import { signIn, signOut } from "@/auth";
 import { db } from "@/db";
@@ -11,7 +12,6 @@ import {
   sendPasswordResetEmail,
   sendVerificationEmail,
 } from "@/lib/email";
-import { provisionTrialIfMissing } from "@/lib/plan";
 import { TURNSTILE_ERROR_KA, verifyTurnstile } from "@/lib/turnstile";
 
 // ─── OAuth (existing) ────────────────────────────────────────────────────
@@ -135,25 +135,28 @@ export async function signUpWithEmail(
     };
   }
 
-  // Same trial that Google sign-ups get (the events.createUser hook in
-  // auth.ts doesn't fire for credentials inserts, so we call directly).
-  await provisionTrialIfMissing(created.id);
+  // Trial provisioning is handled lazily on first /dashboard load via
+  // getCurrentPlan → provisionTrialIfMissing, so we don't need to block
+  // the signup response here.
 
-  // Issue verification token and send the email. Best-effort send: if
-  // Resend hiccups we still let signup succeed and the user can resend.
-  const token = await issueToken(created.id, "email_verify", VERIFY_TTL_MS);
-  try {
-    await sendVerificationEmail({
-      to: created.email!,
-      name: created.name,
-      token,
-    });
-  } catch (err) {
-    console.warn(
-      "[signUpWithEmail] verification email send failed (continuing):",
-      (err as Error).message
-    );
-  }
+  // Token issue + verification email are deferred to `after()` so the
+  // user sees the "check your inbox" screen ~1s sooner. Race-free: the
+  // token is written before the email is sent, so when the user clicks
+  // the link it'll always be in the DB.
+  const userId = created.id;
+  const userEmail = created.email!;
+  const userName = created.name;
+  after(async () => {
+    try {
+      const token = await issueToken(userId, "email_verify", VERIFY_TTL_MS);
+      await sendVerificationEmail({ to: userEmail, name: userName, token });
+    } catch (err) {
+      console.warn(
+        "[signUpWithEmail] background verification email failed:",
+        (err as Error).message
+      );
+    }
+  });
 
   return { ok: true };
 }
