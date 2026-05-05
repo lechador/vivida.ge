@@ -87,6 +87,17 @@ export default async function AccountPage() {
           </span>
         </div>
 
+        {/* Profile photos — surfaced near the top so it's easy to find */}
+        <div className="mb-6">
+          <PhotoUploader
+            initial={photos.filter((p) => p.ready).map((p) => ({
+              id: p.id,
+              url: p.url,
+              ready: p.ready,
+            }))}
+          />
+        </div>
+
         {/* Subscription */}
         <div className="mb-6">
           <SubscriptionStatusCard subscription={subscription} />
@@ -102,17 +113,6 @@ export default async function AccountPage() {
               bio: profile?.bio ?? null,
             }}
             defaultName={user.name ?? null}
-          />
-        </div>
-
-        {/* Profile photos */}
-        <div className="mb-6">
-          <PhotoUploader
-            initial={photos.filter((p) => p.ready).map((p) => ({
-              id: p.id,
-              url: p.url,
-              ready: p.ready,
-            }))}
           />
         </div>
 

@@ -150,13 +150,46 @@ export function PhotoUploader({
     }
   }
 
+  const isEmpty = photos.length === 0 && pending.length === 0;
+
+  const dragHandlers = {
+    onDragOver: (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragOver(true);
+    },
+    onDragLeave: () => setDragOver(false),
+    onDrop: (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragOver(false);
+      if (e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+    },
+  };
+
   return (
-    <div className="rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-2xl border bg-card/65 p-6 ring-1 backdrop-blur-xl",
+        isEmpty
+          ? "border-[var(--vivida-violet)]/40 ring-[var(--vivida-violet)]/20"
+          : "border-border ring-foreground/5"
+      )}
+    >
+      {isEmpty && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,oklch(0.32_0.18_305/0.18),transparent_70%)]"
+        />
+      )}
+
       <header className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold">ფოტოები</h2>
+          <h2 className="text-lg font-semibold">
+            {isEmpty ? "დაამატე შენი ფოტოები" : "ფოტოები"}
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            დაამატე 6-მდე ფოტო. პირველი ფოტო ხდება პროფილის ნიღაბი.
+            {isEmpty
+              ? "პირველი ფოტო ხდება შენი მთავარი ნიღაბი — სხვები შენ აღმოგაჩენენ."
+              : "დაამატე 6-მდე ფოტო. პირველი ფოტო ხდება პროფილის ნიღაბი."}
           </p>
         </div>
         <span className="shrink-0 rounded-full border border-border bg-card/60 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -164,66 +197,84 @@ export function PhotoUploader({
         </span>
       </header>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {photos.map((p, i) => (
-          <PhotoTile
-            key={p.id}
-            url={p.url}
-            badge={i === 0 ? "მთავარი" : null}
-            onDelete={() => deletePhoto(p.id)}
-          />
-        ))}
-        <AnimatePresence>
-          {pending.map((p) => (
-            <motion.div
+      {isEmpty ? (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          {...dragHandlers}
+          className={cn(
+            "group flex w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-all",
+            dragOver
+              ? "border-[var(--vivida-violet)] bg-[var(--vivida-violet)]/15 scale-[1.01]"
+              : "border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/[0.04] hover:border-[var(--vivida-violet)] hover:bg-[var(--vivida-violet)]/10"
+          )}
+        >
+          <span className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-[var(--vivida-violet)]/35 to-[var(--vivida-pink)]/35 ring-1 ring-[var(--vivida-violet)]/40">
+            <Camera className="size-7 text-[var(--vivida-violet)]" />
+          </span>
+          <div>
+            <div className="text-base font-semibold">აირჩიე ან ჩააგდე ფოტო</div>
+            <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
+              JPEG · PNG · WebP — მაქს. 5 MB. შეგიძლია 6-მდე ფოტო ერთად ატვირთო.
+            </p>
+          </div>
+          <span className="mt-1 inline-flex items-center rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2 text-sm font-medium text-white shadow-lg shadow-[var(--vivida-violet)]/25">
+            ფაილის არჩევა
+          </span>
+        </button>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {photos.map((p, i) => (
+            <PhotoTile
               key={p.id}
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-            >
-              <PendingTile pending={p} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-        {remaining > 0 && (
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragOver(true);
-            }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setDragOver(false);
-              if (e.dataTransfer.files) handleFiles(e.dataTransfer.files);
-            }}
-            className={cn(
-              "group flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed transition-all",
-              dragOver
-                ? "border-[var(--vivida-violet)] bg-[var(--vivida-violet)]/15 scale-[1.02]"
-                : "border-border bg-card/30 hover:border-[var(--vivida-violet)]/50 hover:bg-card/50"
-            )}
-          >
-            <Camera
-              className={cn(
-                "size-8 transition-colors",
-                dragOver
-                  ? "text-[var(--vivida-violet)]"
-                  : "text-muted-foreground group-hover:text-foreground"
-              )}
+              url={p.url}
+              badge={i === 0 ? "მთავარი" : null}
+              onDelete={() => deletePhoto(p.id)}
             />
-            <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
-              დაამატე ფოტო
-            </span>
-            <span className="text-[10px] text-muted-foreground/70">
-              {remaining} დარჩა
-            </span>
-          </button>
-        )}
-      </div>
+          ))}
+          <AnimatePresence>
+            {pending.map((p) => (
+              <motion.div
+                key={p.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+              >
+                <PendingTile pending={p} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          {remaining > 0 && (
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              {...dragHandlers}
+              className={cn(
+                "group flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed transition-all",
+                dragOver
+                  ? "border-[var(--vivida-violet)] bg-[var(--vivida-violet)]/15 scale-[1.02]"
+                  : "border-border bg-card/30 hover:border-[var(--vivida-violet)]/50 hover:bg-card/50"
+              )}
+            >
+              <Camera
+                className={cn(
+                  "size-8 transition-colors",
+                  dragOver
+                    ? "text-[var(--vivida-violet)]"
+                    : "text-muted-foreground group-hover:text-foreground"
+                )}
+              />
+              <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
+                დაამატე ფოტო
+              </span>
+              <span className="text-[10px] text-muted-foreground/70">
+                {remaining} დარჩა
+              </span>
+            </button>
+          )}
+        </div>
+      )}
 
       <input
         ref={inputRef}
@@ -237,9 +288,11 @@ export function PhotoUploader({
         }}
       />
 
-      <p className="mt-4 text-xs text-muted-foreground">
-        JPEG · PNG · WebP — მაქს. 5 MB / ფოტო
-      </p>
+      {!isEmpty && (
+        <p className="mt-4 text-xs text-muted-foreground">
+          JPEG · PNG · WebP — მაქს. 5 MB / ფოტო
+        </p>
+      )}
     </div>
   );
 }
