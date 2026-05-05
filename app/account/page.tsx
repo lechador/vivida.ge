@@ -7,7 +7,7 @@ import { db } from "@/db";
 import { profiles, profilePhotos } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { asc } from "drizzle-orm";
-import { getCurrentPlan, getSubscription } from "@/lib/plan";
+import { getCurrentPlan, getOrProvisionSubscription } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -21,13 +21,18 @@ export const metadata = { title: "ანგარიში" };
 export default async function AccountPage() {
   const user = await requireUser();
 
-  const [[profile], subscription, plan, photos] = await Promise.all([
+  // `getOrProvisionSubscription` mutates state, so it runs sequentially
+  // before the parallel reads — same idempotent provision used by
+  // /pricing and TrialBanner. /account is a common landing target after
+  // signup, so the trial row must exist before we render plan UI.
+  const subscription = await getOrProvisionSubscription(user.id);
+
+  const [[profile], plan, photos] = await Promise.all([
     db
       .select()
       .from(profiles)
       .where(eq(profiles.userId, user.id))
       .limit(1),
-    getSubscription(user.id),
     getCurrentPlan(user.id),
     db
       .select({

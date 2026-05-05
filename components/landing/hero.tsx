@@ -82,7 +82,7 @@ export function Hero() {
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground backdrop-blur"
+        className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
       >
         <span className="size-1.5 rounded-full bg-[var(--vivida-cyan)] vivida-pulse" />
         {c.kicker}

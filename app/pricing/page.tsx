@@ -1,7 +1,12 @@
 import { Sparkles } from "lucide-react";
 
 import { auth } from "@/auth";
-import { getCurrentPlan, getSubscription, isOnTrial, trialDaysLeft } from "@/lib/plan";
+import {
+  getCurrentPlan,
+  getOrProvisionSubscription,
+  isOnTrial,
+  trialDaysLeft,
+} from "@/lib/plan";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { PricingCards } from "@/components/pricing/pricing-cards";
@@ -18,12 +23,15 @@ const KA_DATE = new Intl.DateTimeFormat("ka-GE", {
 export default async function PricingPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
-  const [currentPlan, subscription] = authed
-    ? await Promise.all([
-        getCurrentPlan(session!.user.id),
-        getSubscription(session!.user.id),
-      ])
-    : (["free", null] as const);
+  // Sequential — the lazy fetch must run before any read that the user
+  // sees, otherwise a freshly-signed-up email user lands on /pricing
+  // with no subscription row and sees "free" instead of their trial.
+  const subscription = authed
+    ? await getOrProvisionSubscription(session!.user.id)
+    : null;
+  const currentPlan = authed
+    ? await getCurrentPlan(session!.user.id)
+    : ("free" as const);
   const onTrial = isOnTrial(subscription);
   const trialEnds = onTrial && subscription?.currentPeriodEnd
     ? KA_DATE.format(subscription.currentPeriodEnd)
@@ -44,7 +52,7 @@ export default async function PricingPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-12 text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground backdrop-blur">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
             <span className="size-1.5 rounded-full bg-[var(--vivida-cyan)] vivida-pulse" />
             ფასები
           </div>
@@ -69,7 +77,7 @@ export default async function PricingPage() {
                 <Sparkles className="size-4 text-[var(--vivida-violet)]" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                <div className="text-xs font-medium text-muted-foreground">
                   თქვენი მიმდინარე გეგმა
                 </div>
                 {onTrial ? (

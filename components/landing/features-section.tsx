@@ -29,7 +29,7 @@ export function FeaturesSection() {
         className="mx-auto mb-16 max-w-3xl text-center sm:mb-20"
       >
         {what.kicker && (
-          <div className="mb-3 text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
+          <div className="mb-3 text-sm font-medium text-muted-foreground">
             {what.kicker}
           </div>
         )}

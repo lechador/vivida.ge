@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
@@ -146,20 +147,25 @@ export async function saveProfile(
     throw err;
   }
 
-  // Pre-generate the natal chart now (best effort) so the dashboard's
-  // first load only has to compute the daily horoscope. Cuts the user's
-  // perceived wait on /dashboard from ~30s to ~4s with Gemini Flash.
-  // Wrapped in try/catch — if it fails for any reason (Gemini hiccup,
-  // network) the dashboard's own ensureChartFor call will retry there.
-  try {
-    const plan = await getCurrentPlan(user.id);
-    await ensureChartFor(user.id, plan);
-  } catch (err) {
-    console.warn(
-      "[saveProfile] chart pre-generation failed; dashboard will retry:",
-      (err as Error).message
-    );
-  }
+  // Pre-generate the natal chart in the background — Gemini interpretation
+  // can take 10-30s on a cold call and was blocking the wizard submit
+  // button. /dashboard renders a CosmicLoader inside <Suspense> for its
+  // own ensureChartFor call, so the user sees progress immediately
+  // instead of a frozen "submit" spinner here. The deferred ensureChartFor
+  // is upsert-safe and will collide-then-merge if the dashboard's call
+  // happens to win the race.
+  const userId = user.id;
+  after(async () => {
+    try {
+      const plan = await getCurrentPlan(userId);
+      await ensureChartFor(userId, plan);
+    } catch (err) {
+      console.warn(
+        "[saveProfile] background chart pre-gen failed; dashboard will retry:",
+        (err as Error).message
+      );
+    }
+  });
 
   revalidatePath("/dashboard");
   revalidatePath("/onboarding");

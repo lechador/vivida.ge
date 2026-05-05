@@ -139,16 +139,21 @@ export async function signUpWithEmail(
   // getCurrentPlan → provisionTrialIfMissing, so we don't need to block
   // the signup response here.
 
-  // Token issue + verification email are deferred to `after()` so the
-  // user sees the "check your inbox" screen ~1s sooner. Race-free: the
-  // token is written before the email is sent, so when the user clicks
-  // the link it'll always be in the DB.
-  const userId = created.id;
+  // Token issue runs INLINE — it's a single fast DB write (~30ms) and
+  // running it inside `after()` would race with `requestVerificationEmail`
+  // ("resend") if the user clicks resend before the deferred work fires:
+  // resend's issueToken does delete-then-insert, then our deferred
+  // delete-then-insert would nuke the freshly-issued resend token.
+  const token = await issueToken(created.id, "email_verify", VERIFY_TTL_MS);
+
+  // Email send is deferred — that's the slow leg (Resend HTTP call) and
+  // it doesn't matter if it lands a few seconds after the user sees
+  // "check your inbox." Token already exists, so when the email arrives
+  // and the user clicks the link it'll resolve correctly.
   const userEmail = created.email!;
   const userName = created.name;
   after(async () => {
     try {
-      const token = await issueToken(userId, "email_verify", VERIFY_TTL_MS);
       await sendVerificationEmail({ to: userEmail, name: userName, token });
     } catch (err) {
       console.warn(

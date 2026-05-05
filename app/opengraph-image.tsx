@@ -135,7 +135,7 @@ export default async function OpengraphImage() {
             justifyContent: "center",
           }}
         >
-          შენი კოსმიური რუკა, ახსნილი ყოველდღე
+          შენი კოსმიური რუკა ყოველდღე ცოცხლდება
         </div>
 
         {/* Tagline */}

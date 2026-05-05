@@ -2,7 +2,11 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { getSubscription, isOnTrial, trialDaysLeft } from "@/lib/plan";
+import {
+  getOrProvisionSubscription,
+  isOnTrial,
+  trialDaysLeft,
+} from "@/lib/plan";
 
 /**
  * Slim banner shown above main content for users on an active trial.
@@ -27,7 +31,7 @@ export async function TrialBanner({
   userId: string;
   showWithinDays?: number;
 }) {
-  const subscription = await getSubscription(userId);
+  const subscription = await getOrProvisionSubscription(userId);
   if (!isOnTrial(subscription)) return null;
   const days = trialDaysLeft(subscription);
   if (days <= 0) return null;

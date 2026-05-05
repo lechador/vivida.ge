@@ -81,6 +81,12 @@ export function trialDaysLeft(sub: Subscription | null | undefined): number {
 /**
  * Fetch the subscription row directly. Returns null when the user has
  * never had one (= effectively free).
+ *
+ * NOTE: Doesn't provision a missing trial. If you're rendering trial
+ * state to the user (TrialBanner, /pricing, /account, etc.) use
+ * `getOrProvisionSubscription` instead — otherwise users who haven't
+ * yet visited /dashboard see "no subscription" even though policy
+ * says trial-on-signup.
  */
 export async function getSubscription(
   userId: string
@@ -91,6 +97,20 @@ export async function getSubscription(
     .where(eq(subscriptions.userId, userId))
     .limit(1);
   return sub ?? null;
+}
+
+/**
+ * Returns the user's subscription row, lazily provisioning a trial if
+ * none exists. Use this whenever the caller is going to *show* the
+ * subscription state to the user — the lazy provision matches the
+ * promise we make on signup ("you start on a trial").
+ */
+export async function getOrProvisionSubscription(
+  userId: string
+): Promise<Subscription | null> {
+  const existing = await getSubscription(userId);
+  if (existing) return existing;
+  return await provisionTrialIfMissing(userId);
 }
 
 /**
