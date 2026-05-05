@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { saveProfile } from "@/actions/profile";
+import { fbTrack } from "@/lib/fb-pixel";
 import { ProgressDots } from "./progress-dots";
 import { StepDate, validateDate } from "./step-date";
 import { StepTime, validateTime } from "./step-time";
@@ -86,6 +87,19 @@ export function OnboardingWizard({
     initialState(initialProfile)
   );
   const [step, setStep] = useState(0);
+
+  // Fire FB Pixel CompleteRegistration the first time a brand-new user
+  // arrives at onboarding — they've just completed Google OAuth or email
+  // verification, which is the conversion FB ads should be optimised for.
+  // localStorage flag prevents re-fires on hard reloads or back-navigation.
+  useEffect(() => {
+    if (initialProfile) return;
+    if (typeof window === "undefined") return;
+    const FLAG = "vivida_fb_registration_fired";
+    if (localStorage.getItem(FLAG)) return;
+    fbTrack("CompleteRegistration");
+    localStorage.setItem(FLAG, "1");
+  }, [initialProfile]);
   const [direction, setDirection] = useState<Direction>(1);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();

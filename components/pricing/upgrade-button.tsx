@@ -5,6 +5,7 @@ import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { fbTrack } from "@/lib/fb-pixel";
 import type { IntervalId } from "@/lib/pricing";
 
 export function UpgradeButton({
@@ -35,6 +36,10 @@ export function UpgradeButton({
           router.push("/?from=pricing");
           return;
         }
+        fbTrack("InitiateCheckout", {
+          currency: "GEL",
+          content_category: interval,
+        });
         startTransition(async () => {
           try {
             const res = await fetch("/api/flitt/checkout", {

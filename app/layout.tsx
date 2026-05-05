@@ -4,6 +4,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import NextTopLoader from "nextjs-toploader";
 import { ChatShell } from "@/components/chat/chat-shell";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
+import { FbPixel } from "@/components/fb-pixel";
 import "./globals.css";
 
 const notoGeorgian = Noto_Sans_Georgian({
@@ -110,6 +111,10 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const GA_ENABLED =
   !!GA_ID && process.env.NODE_ENV === "production";
 
+// Same gate for the Meta Pixel — dev page-reloads would otherwise pollute
+// the audience and conversion data the FB ad algorithm trains on.
+const FB_PIXEL_ENABLED = process.env.NODE_ENV === "production";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -131,6 +136,7 @@ export default function RootLayout({
           speed={400}
         />
         <BfcacheRefresher />
+        {FB_PIXEL_ENABLED && <FbPixel />}
         {children}
         <ChatShell />
       </body>
