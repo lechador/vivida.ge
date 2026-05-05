@@ -1,16 +1,14 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { eq } from "drizzle-orm";
 import { ArrowRight } from "lucide-react";
 
-import { db } from "@/db";
-import { profiles } from "@/db/schema";
-import { ensureChartFor } from "@/actions/chart";
-import { ensureDailyFor } from "@/actions/daily";
-import { ensureMoonPhase } from "@/actions/moon-phase";
-import { ensureWeeklyForecast } from "@/actions/weekly-forecast";
+import { loadDashboardBundle, type DashboardBundle } from "@/actions/dashboard";
 import { Button } from "@/components/ui/button";
 import { LockedCard } from "@/components/paywall/locked-card";
-import { canUseFeature } from "@/lib/features";
+import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import type { PlanId } from "@/lib/pricing";
 
 import { DailyCard } from "./daily-card";
@@ -20,65 +18,57 @@ import { SuggestedPeopleRail } from "./suggested-people-rail";
 import { WeeklyForecastCard } from "./weekly-forecast-card";
 
 /**
- * Home / today view rendered on /dashboard. Time-varying content:
- *  - Daily horoscope card (regenerated each calendar day)
- *  - Compact big-three glance with link to the full /report
+ * Dashboard content loaded after first paint via a server action. The page
+ * shell ships immediately so the browser tab spinner stops while our
+ * internal CosmicLoader covers the AI generation latency.
  */
-export async function DailyView({
+export function DailyDashboard({
   userId,
   plan,
 }: {
   userId: string;
   plan: PlanId;
 }) {
-  const chart = await ensureChartFor(userId, plan);
-  if (!chart) {
+  const router = useRouter();
+  const [bundle, setBundle] = useState<DashboardBundle | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadDashboardBundle(userId, plan)
+      .then((b) => {
+        if (!cancelled) setBundle(b);
+      })
+      .catch((err) => {
+        if (!cancelled) setError((err as Error).message);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, plan]);
+
+  useEffect(() => {
+    if (bundle?.kind === "no-chart") {
+      router.replace("/onboarding");
+    }
+  }, [bundle, router]);
+
+  if (error) {
     return (
       <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
-        შენი დღევანდელი ჰოროსკოპის სანახავად, ჯერ შეავსე დაბადების მონაცემები.
+        ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი.
       </div>
     );
   }
 
-  const canDaily = canUseFeature("dailyHoroscope", plan);
-
-  let daily = null;
-  let timezone: string | null = null;
-  if (canDaily) {
-    try {
-      daily = await ensureDailyFor(userId, plan);
-    } catch (err) {
-      console.warn("[daily] generation failed:", (err as Error).message);
-    }
-    if (daily) {
-      const [profile] = await db
-        .select({ timezone: profiles.timezone })
-        .from(profiles)
-        .where(eq(profiles.userId, userId))
-        .limit(1);
-      timezone = profile?.timezone ?? "UTC";
-    }
+  if (!bundle || bundle.kind === "no-chart") {
+    return <CosmicLoader embedded />;
   }
 
-  // Universal moon phase — same for everyone, cached globally per UTC date.
-  // Doesn't gate on plan because the celestial event is universal context;
-  // gating it would be like gating "today's date." Errors fail open.
-  let moonPhase = null;
-  try {
-    moonPhase = await ensureMoonPhase();
-  } catch (err) {
-    console.warn("[moon-phase] generation failed:", (err as Error).message);
-  }
+  const { chart, daily, moonPhase, weeklyForecast, timezone, canDaily, suggestions } =
+    bundle;
 
-  // 7-day forecast — personal (transit-to-natal aspects), regenerated daily.
-  let weeklyForecast = null;
-  try {
-    weeklyForecast = await ensureWeeklyForecast(userId, plan);
-  } catch (err) {
-    console.warn("[weekly-forecast] generation failed:", (err as Error).message);
-  }
-
-  const dailySlot = daily && timezone ? (
+  const dailySlot = daily ? (
     <DailyCard horoscope={daily} timezone={timezone} />
   ) : !canDaily ? (
     <LockedCard
@@ -94,9 +84,6 @@ export async function DailyView({
 
   return (
     <div className="space-y-8">
-      {/* Top row: daily horoscope (main) + moon phase (sidebar). The grid
-          only kicks in at xl (1280px+) — below that the moon phase stacks
-          full-width below the daily card so neither gets cramped. */}
       <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
         <div className="xl:col-span-7">{dailySlot}</div>
         {moonPhase && (
@@ -125,7 +112,7 @@ export async function DailyView({
         <MiniBigThree chart={chart.data} />
       </section>
 
-      <SuggestedPeopleRail userId={userId} />
+      <SuggestedPeopleRail suggestions={suggestions} />
 
       <section className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/10 to-transparent p-6 backdrop-blur-xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -146,23 +133,6 @@ export async function DailyView({
           </Button>
         </div>
       </section>
-    </div>
-  );
-}
-
-export function DailySkeleton() {
-  return (
-    <div className="space-y-8">
-      <div className="h-72 animate-pulse rounded-2xl border border-border/60 bg-card/40" />
-      <div className="grid grid-cols-3 gap-3">
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="h-24 animate-pulse rounded-2xl border border-border/60 bg-card/40"
-          />
-        ))}
-      </div>
-      <div className="h-32 animate-pulse rounded-2xl border border-border/60 bg-card/40" />
     </div>
   );
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { signByIndex } from "@/lib/zodiac";
 import { cn } from "@/lib/utils";
 import type { MoonPhaseRow } from "@/actions/moon-phase";

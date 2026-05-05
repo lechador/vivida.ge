@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
@@ -8,8 +7,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
-import { DailyView } from "@/components/dashboard/daily-view";
-import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
+import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { TrialBanner } from "@/components/billing/trial-banner";
 
 export const metadata = { title: "დღეს" };
@@ -58,9 +56,11 @@ export default async function DashboardPage() {
           <TrialBanner userId={user.id} showWithinDays={3} />
         </div>
 
-        <Suspense fallback={<CosmicLoader embedded />}>
-          <DailyView userId={user.id} plan={plan} />
-        </Suspense>
+        {/* DailyDashboard is a client component — it fetches the heavy AI
+            data via a server action after first paint, so the response
+            stream closes immediately and the browser tab spinner stops.
+            Our internal CosmicLoader covers the AI generation window. */}
+        <DailyDashboard userId={user.id} plan={plan} />
       </section>
     </main>
   );

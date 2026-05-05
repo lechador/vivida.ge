@@ -1,15 +1,21 @@
+"use client";
+
 import Link from "next/link";
 
-import { getDashboardSuggestions } from "@/lib/suggestions";
+import type { DiscoverCard } from "@/lib/discover";
 import { SuggestedPersonCard } from "./suggested-person-card";
 
 /**
  * Horizontal scroll rail of the most compatible public-profile users.
- * Renders nothing if there are no candidates (e.g. brand-new instance,
- * or every public user is already a connection).
+ * Suggestions are prefetched server-side (see actions/dashboard.ts) and
+ * passed in — keeps this component pure-render so it can live inside
+ * the client-side dashboard wrapper.
  */
-export async function SuggestedPeopleRail({ userId }: { userId: string }) {
-  const suggestions = await getDashboardSuggestions(userId, 8);
+export function SuggestedPeopleRail({
+  suggestions,
+}: {
+  suggestions: DiscoverCard[];
+}) {
   if (suggestions.length === 0) return null;
 
   return (
