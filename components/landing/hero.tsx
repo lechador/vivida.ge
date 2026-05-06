@@ -102,8 +102,18 @@ export function Hero() {
         ) : null}
       </motion.h1>
 
-      <motion.p
+      <motion.div
         custom={2}
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="mt-8"
+      >
+        <SignInButton label={c.ctaPrimary} loadingLabel={c.ctaPrimaryLoading} />
+      </motion.div>
+
+      <motion.p
+        custom={3}
         initial="hidden"
         animate="visible"
         variants={fadeUp}
@@ -111,16 +121,6 @@ export function Hero() {
       >
         {c.subhead}
       </motion.p>
-
-      <motion.div
-        custom={3}
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        className="mt-10"
-      >
-        <SignInButton label={c.ctaPrimary} loadingLabel={c.ctaPrimaryLoading} />
-      </motion.div>
 
       {/* Trust chips — promoted from gray micro-text into prominent
           check-pills. The "no card required" line is the strongest trust

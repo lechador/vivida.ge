@@ -37,12 +37,12 @@ export function SignInButton({
             await signInWithGoogle("/dashboard");
           })
         }
-        className="relative"
+        className="relative bg-[linear-gradient(120deg,var(--vivida-cyan),var(--vivida-pink))] shadow-[0_14px_44px_-10px_oklch(0.78_0.18_200/0.55)]"
       >
         <Sparkles className="size-5" />
         {isPending
           ? loadingLabel ?? "ვარსკვლავებს ვალაგებთ…"
-          : label ?? "შემოდი Google-ით — გახსენი შენი რუკა"}
+          : label ?? "შექმენი შენი რუკა ახლავე"}
       </Button>
     </motion.div>
   );
