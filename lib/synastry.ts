@@ -164,18 +164,20 @@ export function computeSynastry(
     }
   }
 
-  // Sigmoid normalisation. Three deliberate choices:
-  //   - center 64 (vs. 60): a pair with no signal lands slightly above
-  //     50 — feels warm by default, not "we calculated nothing → meh".
-  //   - tanh divisor 3.5 (vs. 6): sharper curve, so good pairs feel
-  //     genuinely good. Old curve compressed everyone into 46–74.
-  //   - floor 38 (vs. 25): low pairs still feel survivable, not cursed.
-  //   - ceiling 98 (vs. 95): truly exceptional pairs can reach the top.
+  // Sigmoid normalisation, tuned for "fun but realistic" spread:
+  //   - center 60: a pair with no signal lands at neutral 60% — neither
+  //     misleadingly warm nor punishingly cold.
+  //   - amplitude 38 + divisor 3 → exceptional pairs reach 90+, rough
+  //     pairs drop into the 30s. Most pairs spread across 35–88, much
+  //     wider than the old 46–74 squish.
+  //   - floor 22: genuinely incompatible charts can read low without
+  //     being a literal zero. Ceiling 98 leaves the top reachable but
+  //     not perfect — synastry is never exactly 100%.
   const scores = {} as Record<SynastryCategory, number>;
   for (const cat of CATEGORIES) {
     const x = raw[cat];
-    const norm = 64 + 30 * Math.tanh(x / 3.5);
-    scores[cat] = Math.max(38, Math.min(98, Math.round(norm)));
+    const norm = 60 + 38 * Math.tanh(x / 3);
+    scores[cat] = Math.max(22, Math.min(98, Math.round(norm)));
   }
 
   const overall = Math.round(
@@ -215,14 +217,15 @@ export const CATEGORY_EMOJI: Record<SynastryCategory, string> = {
   chemistry: "🔥",
 };
 
-/** Human-friendly verdict for an overall percentage. Thresholds are
- *  tuned for the post-2026-05 wider score curve — keep "ციური ბმა"
- *  reserved for genuinely top-tier pairs. */
+/** Human-friendly verdict for an overall percentage. Thresholds calibrated
+ *  for the wide-spread curve — top tier reserved for the rare, bottom
+ *  tier honest about real friction. */
 export function overallVerdict(percent: number): string {
-  if (percent >= 90) return "ციური ბმა";
-  if (percent >= 82) return "ძლიერი თავსებადობა";
-  if (percent >= 72) return "ბუნებრივი ნაკადი";
+  if (percent >= 92) return "ციური ბმა";
+  if (percent >= 84) return "ძლიერი თავსებადობა";
+  if (percent >= 74) return "ბუნებრივი ნაკადი";
   if (percent >= 62) return "კარგი პოტენციალი";
-  if (percent >= 52) return "ცოცხალი დინამიკა";
-  return "გამოწვევა, რომელშიც ზრდაა";
+  if (percent >= 50) return "ცოცხალი დინამიკა";
+  if (percent >= 38) return "გამოწვევა, რომელშიც ზრდაა";
+  return "ხახუნიანი კავშირი";
 }

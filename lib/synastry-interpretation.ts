@@ -356,16 +356,18 @@ export function splitByValence(aspects: SynastryAspect[]): AspectGroup {
 
 export function overallNarrative(percent: number): string {
   // Thresholds mirror overallVerdict() in lib/synastry.ts — keep them
-  // in sync after the score curve was widened.
-  if (percent >= 90)
+  // in sync. Two extra tiers at the bottom reflect the wider spread.
+  if (percent >= 92)
     return "ცის რუკები ერთიანი ნაკადით ხვდებიან — იშვიათი, ღრმა რეზონანსი.";
-  if (percent >= 82)
+  if (percent >= 84)
     return "კავშირი ბუნებრივად მუშაობს — გასაკვირი არ იქნება, თუ ერთმანეთს კარგად გრძნობთ.";
-  if (percent >= 72)
+  if (percent >= 74)
     return "ძლიერი საფუძველი არის — დრო და სიფრთხილე გააძლიერებს ბმას.";
   if (percent >= 62)
     return "კარგი პოტენციალი — როცა მცდელობას არ ეშინია, კავშირი ცოცხლდება.";
-  if (percent >= 52)
+  if (percent >= 50)
     return "ცოცხალი დინამიკა, განსხვავებებითაც — ეს კავშირს არ ანდგრევს, აფერად-აქცევს.";
-  return "გამოწვევაა, რომელშიც ზრდა იმალება — ცნობიერი მუშაობით კავშირი მოულოდნელად ღრმავდება.";
+  if (percent >= 38)
+    return "გამოწვევაა, რომელშიც ზრდა იმალება — ცნობიერი მუშაობით კავშირი მოულოდნელად ღრმავდება.";
+  return "ხახუნიანი ენერგია — ბევრი წინააღმდეგობა, მაგრამ ვინც ერთად გადარჩება, ერთმანეთს ბოლომდე გაიცნობს.";
 }
