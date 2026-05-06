@@ -164,13 +164,18 @@ export function computeSynastry(
     }
   }
 
-  // Sigmoid-style normalisation to a 25–95 range so users always see
-  // some compatibility. tanh maps any input to [-1, 1].
+  // Sigmoid normalisation. Three deliberate choices:
+  //   - center 64 (vs. 60): a pair with no signal lands slightly above
+  //     50 — feels warm by default, not "we calculated nothing → meh".
+  //   - tanh divisor 3.5 (vs. 6): sharper curve, so good pairs feel
+  //     genuinely good. Old curve compressed everyone into 46–74.
+  //   - floor 38 (vs. 25): low pairs still feel survivable, not cursed.
+  //   - ceiling 98 (vs. 95): truly exceptional pairs can reach the top.
   const scores = {} as Record<SynastryCategory, number>;
   for (const cat of CATEGORIES) {
     const x = raw[cat];
-    const norm = 60 + 30 * Math.tanh(x / 6);
-    scores[cat] = Math.max(25, Math.min(95, Math.round(norm)));
+    const norm = 64 + 30 * Math.tanh(x / 3.5);
+    scores[cat] = Math.max(38, Math.min(98, Math.round(norm)));
   }
 
   const overall = Math.round(
@@ -210,12 +215,14 @@ export const CATEGORY_EMOJI: Record<SynastryCategory, string> = {
   chemistry: "🔥",
 };
 
-/** Human-friendly verdict for an overall percentage. */
+/** Human-friendly verdict for an overall percentage. Thresholds are
+ *  tuned for the post-2026-05 wider score curve — keep "ციური ბმა"
+ *  reserved for genuinely top-tier pairs. */
 export function overallVerdict(percent: number): string {
-  if (percent >= 85) return "ციური ბმა";
-  if (percent >= 75) return "ძლიერი თავსებადობა";
-  if (percent >= 65) return "ბუნებრივი ნაკადი";
-  if (percent >= 55) return "კარგი პოტენციალი";
-  if (percent >= 45) return "ცოცხალი დინამიკა";
+  if (percent >= 90) return "ციური ბმა";
+  if (percent >= 82) return "ძლიერი თავსებადობა";
+  if (percent >= 72) return "ბუნებრივი ნაკადი";
+  if (percent >= 62) return "კარგი პოტენციალი";
+  if (percent >= 52) return "ცოცხალი დინამიკა";
   return "გამოწვევა, რომელშიც ზრდაა";
 }
