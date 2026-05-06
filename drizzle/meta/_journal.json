@@ -106,6 +106,13 @@
       "when": 1778062408738,
       "tag": "0014_small_lady_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1778097364273,
+      "tag": "0015_harsh_cardiac",
+      "breakpoints": true
     }
   ]
 }

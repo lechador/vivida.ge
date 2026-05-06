@@ -65,6 +65,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     verificationTokensTable: verificationTokens,
   }),
   providers: [...authConfig.providers, credentialsProvider],
+  events: {
+    // Stamp users.lastLoginAt on every successful sign-in. Wrapped so a
+    // transient DB blip can never break the auth flow itself — losing one
+    // last-login update is much better than refusing the login.
+    async signIn({ user }) {
+      if (!user?.id) return;
+      try {
+        await db
+          .update(users)
+          .set({ lastLoginAt: new Date() })
+          .where(eq(users.id, user.id));
+      } catch (err) {
+        console.warn(
+          "[auth.signIn] failed to update lastLoginAt:",
+          (err as Error).message
+        );
+      }
+    },
+  },
   // No createUser event hook — trial provisioning is handled lazily on
   // first /dashboard load via getCurrentPlan → provisionTrialIfMissing.
   // Keeping the OAuth callback path tight makes Google sign-in feel

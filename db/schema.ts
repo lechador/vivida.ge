@@ -49,6 +49,9 @@ export const users = pgTable("user", {
    *  first send — see lib/unsubscribe.ts. Unique so a token resolves to
    *  at most one user. */
   unsubscribeToken: text("unsubscribe_token").unique(),
+  /** Updated by Auth.js events.signIn whenever the user logs in. NULL
+   *  for users who registered but never came back. */
+  lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -575,6 +578,32 @@ export type SynastryInterpretationJson = {
   /** Where the friction lives, 1-3 short bullets. */
   growth: string[];
 };
+
+/**
+ * Per-user-day visit log. One row per (userId, dateLocal) — the date is
+ * stored as the user's local YYYY-MM-DD so an admin reading the
+ * heatmap sees the same days the user lived. Deliberately schema-light
+ * for the easy version: no per-page time, no session count. Bump later
+ * if we need more granular analytics.
+ */
+export const userActivityDays = pgTable(
+  "user_activity_day",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** YYYY-MM-DD in the user's profile timezone (or UTC fallback). */
+    dateLocal: text("date_local").notNull(),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.dateLocal] }),
+  ]
+);
+
+export type UserActivityDay = typeof userActivityDays.$inferSelect;
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
