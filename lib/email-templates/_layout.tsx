@@ -18,9 +18,13 @@ import * as React from "react";
 export function EmailLayout({
   preview,
   children,
+  unsubscribeUrl,
 }: {
   preview: string;
   children: React.ReactNode;
+  /** Marketing/digest emails pass this. Renders a one-click unsubscribe
+   *  link in the footer. Omit for transactional mail (verification etc). */
+  unsubscribeUrl?: string;
 }) {
   return (
     <Html lang="ka">
@@ -87,6 +91,23 @@ export function EmailLayout({
               ეს წერილი ავტომატურად გამოიგზავნა vivida.ge-დან. თუ არ
               დარეგისტრირებულხარ, უგულებელყავი ეს შეტყობინება.
             </Text>
+            {unsubscribeUrl ? (
+              <Text
+                style={{
+                  color: "#9b94ad",
+                  fontSize: "12px",
+                  lineHeight: "18px",
+                  margin: "8px 0 0",
+                }}
+              >
+                <a
+                  href={unsubscribeUrl}
+                  style={{ color: "#c4b5fd", textDecoration: "underline" }}
+                >
+                  გამოწერის გაუქმება
+                </a>
+              </Text>
+            ) : null}
           </Section>
         </Container>
       </Body>

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Pencil } from "lucide-react";
 
 import { db } from "@/db";
-import { profiles, profilePhotos } from "@/db/schema";
+import { profiles, profilePhotos, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { asc } from "drizzle-orm";
 import { getCurrentPlan, getOrProvisionSubscription } from "@/lib/plan";
@@ -15,6 +15,7 @@ import { SubscriptionStatusCard } from "@/components/account/sub-status-card";
 import { DangerZone } from "@/components/account/danger-zone";
 import { VisibilityCard } from "@/components/account/visibility-card";
 import { PhotoUploader } from "@/components/account/photo-uploader";
+import { EmailPreferencesCard } from "@/components/account/email-preferences-card";
 
 export const metadata = { title: "ანგარიში" };
 
@@ -27,7 +28,7 @@ export default async function AccountPage() {
   // signup, so the trial row must exist before we render plan UI.
   const subscription = await getOrProvisionSubscription(user.id);
 
-  const [[profile], plan, photos] = await Promise.all([
+  const [[profile], plan, photos, [emailPrefs]] = await Promise.all([
     db
       .select()
       .from(profiles)
@@ -43,6 +44,15 @@ export default async function AccountPage() {
       .from(profilePhotos)
       .where(eq(profilePhotos.userId, user.id))
       .orderBy(asc(profilePhotos.sortOrder)),
+    db
+      .select({
+        daily: users.emailDailyHoroscope,
+        marketing: users.emailMarketing,
+        nudges: users.emailNudges,
+      })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1),
   ]);
 
   return (
@@ -101,6 +111,15 @@ export default async function AccountPage() {
         {/* Subscription */}
         <div className="mb-6">
           <SubscriptionStatusCard subscription={subscription} />
+        </div>
+
+        {/* Email preferences */}
+        <div className="mb-6">
+          <EmailPreferencesCard
+            initial={
+              emailPrefs ?? { daily: true, marketing: true, nudges: true }
+            }
+          />
         </div>
 
         {/* Public profile visibility */}

@@ -1,34 +1,37 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { Starfield } from "@/components/landing/starfield";
 
 /**
- * Reusable cosmic loading state. Used both as the Next.js `loading.tsx`
- * for /dashboard (route-level) and as the Suspense fallback inside the
- * page (Daily generation). Animated chart wheel skeleton with a single
- * line of Georgian status text and a heavy starfield.
+ * Reusable cosmic loading state.
+ *
+ * Two visual modes:
+ *  - Default (terse): single status line — used for route-level fallbacks
+ *    where the wait is usually sub-second.
+ *  - `progressive=true`: percentage bar + cycling stage messages — used
+ *    on the dashboard's first-paint loader because cold bundle loads can
+ *    take 10–15s while AI calls warm up. The progress curve is purely
+ *    cosmetic (we have no real percentage from the server) and uses an
+ *    asymptotic ease so the bar never stalls and never hits 100% before
+ *    the bundle actually resolves.
  *
  * `embedded` mode renders without the page chrome (no full-screen layout)
  * so it can sit inside an existing section.
  */
 export function CosmicLoader({
   embedded = false,
+  progressive = false,
 }: {
   embedded?: boolean;
+  progressive?: boolean;
 }) {
   const content = (
-    <div className="relative flex flex-col items-center justify-center px-6 py-10 text-center">
+    <div className="relative flex w-full max-w-md flex-col items-center justify-center px-6 py-10 text-center">
       <SpinningChart />
-      <motion.p
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="mt-8 text-base text-foreground/85 sm:text-lg"
-      >
-        ვარსკვლავებს ვითვლით…
-      </motion.p>
+      {progressive ? <ProgressiveStatus /> : <SimpleStatus />}
     </div>
   );
 
@@ -49,6 +52,107 @@ export function CosmicLoader({
         {content}
       </div>
     </main>
+  );
+}
+
+function SimpleStatus() {
+  return (
+    <motion.p
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="mt-8 text-base text-foreground/85 sm:text-lg"
+    >
+      ვარსკვლავებს ვითვლით…
+    </motion.p>
+  );
+}
+
+/**
+ * Stages tied to the rough progression of `loadDashboardBundle`:
+ *   1. ensureChartFor       (ephemeris + AI interp)
+ *   2. ensureDailyFor       (parallel AI generation)
+ *   3. ensureWeeklyForecast (parallel AI generation)
+ *   4. suggestions + moon
+ *
+ * `at` is the progress threshold (0..1) — the message swaps when the
+ * cosmetic bar crosses it.
+ */
+const STAGES: Array<{ at: number; label: string }> = [
+  { at: 0, label: "ვხსნით შენი დაბადების მომენტს…" },
+  { at: 0.18, label: "ვადგენთ პლანეტების პოზიციებს…" },
+  { at: 0.38, label: "ვითვლით შენს დიდ სამეულს…" },
+  { at: 0.58, label: "AI კითხულობს შენს რუკას…" },
+  { at: 0.78, label: "ვამზადებთ დღევანდელ ჰოროსკოპს…" },
+  { at: 0.92, label: "შენი რუკა თითქმის მზადაა, ცოტაც დაელოდე…" },
+];
+
+function ProgressiveStatus() {
+  const [progress, setProgress] = useState(0);
+
+  // Asymptotic ease — progress = 1 - e^(-t / tau). With tau=5s, the bar
+  // reaches ~95% at 15s and approaches but never hits 100%, which is the
+  // honest signal: we don't actually know when the bundle will resolve.
+  // When the parent unmounts us, the bar disappears — we never need to
+  // animate to 100% explicitly.
+  useEffect(() => {
+    const start = performance.now();
+    let raf = 0;
+    const tick = () => {
+      const t = (performance.now() - start) / 5000;
+      const eased = 1 - Math.exp(-t);
+      setProgress(Math.min(eased * 99, 99));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // Pick the highest stage whose threshold the bar has crossed.
+  const stage = STAGES.reduce(
+    (best, s) => (progress / 100 >= s.at ? s : best),
+    STAGES[0]
+  );
+
+  return (
+    <div className="mt-8 w-full">
+      <div
+        className="relative h-2 w-full overflow-hidden rounded-full bg-card/60 ring-1 ring-foreground/5"
+        role="progressbar"
+        aria-valuenow={Math.round(progress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <motion.div
+          className="absolute inset-y-0 left-0 rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))]"
+          style={{ width: `${progress}%` }}
+          transition={{ ease: "linear" }}
+        />
+        <div
+          aria-hidden
+          className="vivida-pulse-soft absolute inset-y-0 left-0 rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-cyan))] opacity-40 blur-sm"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={stage.label}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="text-left text-sm text-foreground/85"
+          >
+            {stage.label}
+          </motion.span>
+        </AnimatePresence>
+        <span className="shrink-0 font-mono tabular-nums text-foreground/60">
+          {Math.round(progress)}%
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -162,4 +266,3 @@ function SpinningChart() {
     </div>
   );
 }
-

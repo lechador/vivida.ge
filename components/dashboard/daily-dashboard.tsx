@@ -62,7 +62,7 @@ export function DailyDashboard({
   }
 
   if (!bundle || bundle.kind === "no-chart") {
-    return <CosmicLoader embedded />;
+    return <CosmicLoader embedded progressive />;
   }
 
   const { chart, daily, moonPhase, weeklyForecast, timezone, canDaily, suggestions } =

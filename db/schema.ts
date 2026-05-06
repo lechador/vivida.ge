@@ -35,6 +35,20 @@ export const users = pgTable("user", {
    * via the OAuth provider instead of a stored hash.
    */
   passwordHash: text("password_hash"),
+  // ── Email preferences ──────────────────────────────────────────────
+  // Default ON: users registered specifically for an astrology service,
+  // so daily horoscope + nudges are expected. Marketing also defaults ON
+  // because we use admin-side audience filtering and provide a one-click
+  // unsubscribe link in every send.
+  emailDailyHoroscope: boolean("email_daily_horoscope")
+    .notNull()
+    .default(true),
+  emailMarketing: boolean("email_marketing").notNull().default(true),
+  emailNudges: boolean("email_nudges").notNull().default(true),
+  /** Random opaque token used in unsubscribe links. Lazily populated on
+   *  first send — see lib/unsubscribe.ts. Unique so a token resolves to
+   *  at most one user. */
+  unsubscribeToken: text("unsubscribe_token").unique(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
