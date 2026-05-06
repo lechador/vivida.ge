@@ -102,10 +102,13 @@ function DayRow({
   const challengePct = total > 0 ? (day.challengeScore / total) * 100 : 50;
   // Overall "intensity" — quiet days get a faded bar so the eye sees them as low-energy.
   const intensity = Math.min(1, Math.max(day.harmonyScore, day.challengeScore) / 70);
+  // Threshold tuned to the post-amplification curve: tilted days now
+  // produce wider gaps, so 18 keeps "შერეული" honest for genuinely
+  // mixed days instead of every-other-day getting a directional label.
   const tilt: "harmonic" | "challenging" | "balanced" =
-    day.harmonyScore - day.challengeScore > 12
+    day.harmonyScore - day.challengeScore > 18
       ? "harmonic"
-      : day.challengeScore - day.harmonyScore > 12
+      : day.challengeScore - day.harmonyScore > 18
         ? "challenging"
         : "balanced";
 

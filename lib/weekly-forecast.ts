@@ -130,8 +130,20 @@ function scoreDay(aspects: CrossAspect[]) {
       };
     });
 
-  // Calibrate to 0-100. Weighted intensity sum of ~3 saturates the bar — keeps
-  // typical days landing in the visually interesting middle range.
+  // Tilt amplification: preserve the day's total energy but sharpen which
+  // side dominates. A day that's 60/40 raw becomes ~75/25 here — tilted
+  // days feel decisively tilted. Truly balanced days (50/50) stay 50/50.
+  // tanh keeps the response bounded and symmetric.
+  const total = harmony + challenge;
+  if (total > 0.01) {
+    const tilt = (harmony - challenge) / total; // -1..1
+    const sharpened = Math.tanh(2 * tilt);
+    harmony = total * (0.5 + 0.5 * sharpened);
+    challenge = total * (0.5 - 0.5 * sharpened);
+  }
+
+  // Calibrate to 0-100. Weighted intensity sum of ~3 saturates the bar —
+  // keeps typical days landing in the visually interesting middle range.
   const harmonyScore = Math.min(100, Math.round((harmony / 3) * 100));
   const challengeScore = Math.min(100, Math.round((challenge / 3) * 100));
 
