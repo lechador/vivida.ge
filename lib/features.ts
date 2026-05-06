@@ -3,9 +3,9 @@ import type { PlanId } from "./pricing";
 /**
  * Feature gating — single source of truth for which features require Pro.
  *
- * During the build-out phase we keep everything available to all users so
- * we can polish the full experience. Before launch we'll flip individual
- * features to true here and the dashboard / actions will gate them.
+ * Every new signup gets 30 days of trialing Pro automatically, so these
+ * gates only kick in after the trial expires. The pricing page mirrors
+ * this list — keep them in sync.
  *
  * Flipping a flag to `true` is the only change required to lock a feature
  * — every consumer goes through `requiresPro()` / `canUseFeature()`.
@@ -16,18 +16,24 @@ export type Feature =
   | "aiBigThree"       // AI-personalized Sun/Moon/Asc text
   | "aiHighlights"     // AI-generated chart highlights
   | "dailyHoroscope"   // Personalized daily reading
-  | "synastry"         // Compatibility / partner chart
+  | "weeklyForecast"   // 7-day AI forecast
+  | "synastry"         // Unlimited compatibility / partner charts
+  | "privateProfile"   // Hide profile from friend discovery
   | "yearlyPdf"        // Downloadable yearly report
   | "adFree";          // No ads (placeholder until we ship ads)
 
 const REQUIRES_PRO: Record<Feature, boolean> = {
-  aiSummary:      false,
-  aiBigThree:     false,
-  aiHighlights:   false,
-  dailyHoroscope: false,
-  synastry:       false,
-  yearlyPdf:      false,
-  adFree:         false,
+  aiSummary:       true,
+  aiBigThree:      true,
+  aiHighlights:    true,
+  dailyHoroscope:  true,
+  weeklyForecast:  true,
+  synastry:        true,
+  privateProfile:  true,
+  yearlyPdf:       true,
+  // Ads aren't shipped yet — leaving false until we have a Pro-only
+  // suppression to actually skip.
+  adFree:          false,
 };
 
 export function requiresPro(feature: Feature): boolean {

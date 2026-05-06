@@ -65,8 +65,16 @@ export function DailyDashboard({
     return <CosmicLoader embedded progressive />;
   }
 
-  const { chart, daily, moonPhase, weeklyForecast, timezone, canDaily, suggestions } =
-    bundle;
+  const {
+    chart,
+    daily,
+    moonPhase,
+    weeklyForecast,
+    timezone,
+    canDaily,
+    canWeekly,
+    suggestions,
+  } = bundle;
 
   const dailySlot = daily ? (
     <DailyCard horoscope={daily} timezone={timezone} />
@@ -93,9 +101,15 @@ export function DailyDashboard({
         )}
       </div>
 
-      {weeklyForecast && weeklyForecast.days.length > 0 && (
+      {weeklyForecast && weeklyForecast.days.length > 0 ? (
         <WeeklyForecastCard days={weeklyForecast.days} />
-      )}
+      ) : !canWeekly ? (
+        <LockedCard
+          title="კვირეული ფორექასტი"
+          preview="ორშაბათი — ენერგია ცვლილებისთვის. სამშაბათი — სიფრთხილე საუბარში. ოთხშაბათი — შემოქმედებითი ნახტომი ელის. ხუთშაბათი — ფული და გადაწყვეტილებები. პარასკევი — ემოციური სიღრმე…"
+          description="7 დღის პერსონალური პროგნოზი — ყოველ კვირას ახლდება შენი რუკის მიხედვით."
+        />
+      ) : null}
 
       <section>
         <header className="mb-3 flex items-baseline justify-between">

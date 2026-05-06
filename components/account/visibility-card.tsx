@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Eye, EyeOff, ExternalLink, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,10 +10,12 @@ import { Label } from "@/components/ui/label";
 import { updateVisibility } from "@/actions/profile";
 import { suggestUsername, USERNAME_PATTERN } from "@/lib/profile-utils";
 import { cn } from "@/lib/utils";
+import type { PlanId } from "@/lib/pricing";
 
 export function VisibilityCard({
   initial,
   defaultName,
+  plan,
 }: {
   initial: {
     isPublic: boolean;
@@ -23,8 +25,14 @@ export function VisibilityCard({
   };
   /** Current user's name from auth — used as a starter for displayName */
   defaultName: string | null;
+  /** Effective plan — "free" disables the public→private toggle. */
+  plan: PlanId;
 }) {
   const [isPublic, setIsPublic] = useState(initial.isPublic);
+  // Free users can't switch a public profile to private. Legacy already-
+  // private profiles (from a past Pro period) keep the toggle so they
+  // can opt back into public if they want.
+  const canMakePrivate = plan === "pro" || !initial.isPublic;
   const [username, setUsername] = useState(initial.username ?? "");
   const [displayName, setDisplayName] = useState(
     initial.displayName ?? defaultName ?? ""
@@ -39,6 +47,14 @@ export function VisibilityCard({
 
   const onTogglePublic = () => {
     const next = !isPublic;
+    if (!next && !canMakePrivate) {
+      // Public → private is Pro-only. Surface the lock inline rather than
+      // letting them flip and then have the server reject.
+      setError(
+        "პირადი პროფილი მხოლოდ Pro გეგმაშია ხელმისაწვდომი."
+      );
+      return;
+    }
     setIsPublic(next);
     if (next && !username) {
       setUsername(suggestUsername(defaultName));
@@ -112,20 +128,32 @@ export function VisibilityCard({
             </div>
           </div>
         </div>
-        <div
-          className={cn(
-            "relative h-6 w-11 shrink-0 rounded-full transition-colors",
-            isPublic
-              ? "bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-cyan))]"
-              : "bg-card/80"
+        <div className="flex shrink-0 items-center gap-2">
+          {!canMakePrivate && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--vivida-pink)]"
+              title="პირადი პროფილი მხოლოდ Pro გეგმაშია"
+            >
+              <Sparkles className="size-3" />
+              Pro
+            </span>
           )}
-        >
-          <span
+          <div
             className={cn(
-              "absolute top-0.5 size-5 rounded-full bg-background shadow-md transition-all",
-              isPublic ? "left-5" : "left-0.5"
+              "relative h-6 w-11 rounded-full transition-colors",
+              isPublic
+                ? "bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-cyan))]"
+                : "bg-card/80",
+              !canMakePrivate && "opacity-60"
             )}
-          />
+          >
+            <span
+              className={cn(
+                "absolute top-0.5 size-5 rounded-full bg-background shadow-md transition-all",
+                isPublic ? "left-5" : "left-0.5"
+              )}
+            />
+          </div>
         </div>
       </button>
 

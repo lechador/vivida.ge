@@ -11,6 +11,7 @@ import {
   type WeeklyForecastDay,
 } from "@/db/schema";
 import { ensureChartFor } from "@/actions/chart";
+import { canUseFeature } from "@/lib/features";
 import { computeWeeklyForecast } from "@/lib/weekly-forecast";
 import { localDateString } from "@/lib/transits";
 import {
@@ -30,6 +31,9 @@ export async function ensureWeeklyForecast(
   userId: string,
   plan: PlanId
 ): Promise<WeeklyForecast | null> {
+  // Server-side gate: free users never get a forecast generated, even if
+  // a stale row from their trial period still sits in the cache.
+  if (!canUseFeature("weeklyForecast", plan)) return null;
   if (!isOpenRouterConfigured()) return null;
 
   const [profile] = await db

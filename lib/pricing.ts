@@ -49,6 +49,10 @@ export const PLANS: Record<PlanId, PlanDef> = {
 
 /**
  * Comparison table rows shown on the pricing page.
+ *
+ * Mirror of `lib/features.ts` — when you flip a flag there, update the
+ * matching row here so the marketing page doesn't lie about what the
+ * code actually gates.
  */
 export const FEATURES: FeatureRow[] = [
   {
@@ -67,12 +71,22 @@ export const FEATURES: FeatureRow[] = [
     pro: true,
   },
   {
-    label: "პერსონალური AI ანალიზი",
-    free: false,
+    label: "მთვარის ფაზა — დღევანდელი",
+    free: true,
+    pro: true,
+  },
+  {
+    label: "მეგობრების აღმოჩენა (Discover)",
+    free: true,
     pro: true,
   },
   {
     label: "დიდი სამეულის AI ანალიზი",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "პერსონალური AI ნარატივი მთელ რუკაზე",
     free: false,
     pro: true,
   },
@@ -87,17 +101,22 @@ export const FEATURES: FeatureRow[] = [
     pro: true,
   },
   {
-    label: "თავსებადობა (სინასტრია) საყვარელ ადამიანებთან",
-    free: "1 პარტნიორი (საცდელად)",
-    pro: "ულიმიტო",
-  },
-  {
-    label: "წლიური ნატალური ანგარიში (PDF)",
+    label: "კვირეული პერსონალური ფორექასტი",
     free: false,
     pro: true,
   },
   {
-    label: "რეკლამის გარეშე",
+    label: "თავსებადობა (სინასტრია) საყვარელ ადამიანებთან",
+    free: "1 პარტნიორი თვეში",
+    pro: "ულიმიტო",
+  },
+  {
+    label: "პირადი პროფილი (დამალვა)",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "წლიური ნატალური ანგარიში (PDF)",
     free: false,
     pro: true,
   },

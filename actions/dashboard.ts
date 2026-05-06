@@ -28,6 +28,7 @@ export type DashboardBundle =
       weeklyForecast: WeeklyForecast | null;
       timezone: string;
       canDaily: boolean;
+      canWeekly: boolean;
       suggestions: DiscoverCard[];
     };
 
@@ -49,6 +50,7 @@ export async function loadDashboardBundle(
   if (!chart) return { kind: "no-chart" };
 
   const canDaily = canUseFeature("dailyHoroscope", plan);
+  const canWeekly = canUseFeature("weeklyForecast", plan);
 
   const [daily, moonPhase, weeklyForecast, profileRow, suggestions] =
     await Promise.all([
@@ -62,10 +64,12 @@ export async function loadDashboardBundle(
         console.warn("[dashboard:moon]", (err as Error).message);
         return null;
       }),
-      ensureWeeklyForecast(userId, plan).catch((err) => {
-        console.warn("[dashboard:weekly]", (err as Error).message);
-        return null;
-      }),
+      canWeekly
+        ? ensureWeeklyForecast(userId, plan).catch((err) => {
+            console.warn("[dashboard:weekly]", (err as Error).message);
+            return null;
+          })
+        : Promise.resolve(null),
       canDaily
         ? db
             .select({ timezone: profiles.timezone })
@@ -84,6 +88,7 @@ export async function loadDashboardBundle(
     weeklyForecast,
     timezone: profileRow[0]?.timezone ?? "UTC",
     canDaily,
+    canWeekly,
     suggestions,
   };
 }

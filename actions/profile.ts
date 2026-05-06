@@ -10,6 +10,7 @@ import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { invalidateProfileForUser } from "@/lib/header-cache";
 import { ensureChartFor } from "@/actions/chart";
+import { canUseFeature } from "@/lib/features";
 import { getCurrentPlan } from "@/lib/plan";
 
 export type SaveProfileInput = {
@@ -197,6 +198,33 @@ export async function updateVisibility(
   input: UpdateVisibilityInput
 ): Promise<UpdateVisibilityResult> {
   const user = await requireUser();
+
+  // Gate: making a profile private is a Pro feature. Free users can edit
+  // their bio/display name/username freely, but the privacy toggle stays
+  // locked. Legacy private profiles (set during a previous Pro period)
+  // are grandfathered — they keep their state as long as they don't try
+  // to flip it.
+  if (!input.isPublic) {
+    const plan = await getCurrentPlan(user.id);
+    if (!canUseFeature("privateProfile", plan)) {
+      const [current] = await db
+        .select({ isPublic: profiles.isPublic })
+        .from(profiles)
+        .where(eq(profiles.userId, user.id))
+        .limit(1);
+      // Reject only when it's an actual public → private flip. Legacy
+      // already-private accounts can save other field edits while
+      // keeping their current state (the form sends isPublic=false in
+      // that case, and we accept it as a no-op).
+      if (current?.isPublic !== false) {
+        return {
+          ok: false,
+          error:
+            "პირადი პროფილი მხოლოდ Pro გეგმაშია ხელმისაწვდომი. გადადი Pro-ზე ამ პარამეტრის ჩასართავად.",
+        };
+      }
+    }
+  }
 
   // When going public, a username is required
   const username = input.username?.trim().toLowerCase() || null;

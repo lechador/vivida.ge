@@ -132,6 +132,7 @@ export default async function AccountPage() {
               bio: profile?.bio ?? null,
             }}
             defaultName={user.name ?? null}
+            plan={plan}
           />
         </div>
 
