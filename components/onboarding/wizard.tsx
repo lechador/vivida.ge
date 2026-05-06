@@ -14,6 +14,7 @@ import { StepPlace } from "./step-place";
 import { StepVisibility, validateVisibility } from "./step-visibility";
 import type { Profile } from "@/db/schema";
 import type { GeocodeResult } from "@/lib/geocoding";
+import { suggestUsername } from "@/lib/profile-utils";
 import type { WizardData } from "./types";
 
 type StepName = "date" | "time" | "place" | "visibility";
@@ -26,13 +27,20 @@ const FULL_STEPS: readonly StepName[] = [
 
 type Direction = 1 | -1;
 
-function initialState(profile: Profile | null): WizardData {
+function initialState(
+  profile: Profile | null,
+  defaultName: string | null
+): WizardData {
   if (!profile) {
+    // Default new users to a public profile — friends-discovery is the
+    // core social hook, and most users don't realize they're opting out
+    // when "private" is preselected. Seed the username from their name
+    // so they never hit an empty field on the visibility step.
     return {
       date: { day: "", month: "", year: "" },
       time: { hour: "", minute: "", unknown: false },
       place: null,
-      visibility: { isPublic: false, username: "" },
+      visibility: { isPublic: true, username: suggestUsername(defaultName) },
     };
   }
   const [y, m, d] = (profile.dateOfBirth ?? "").split("-");
@@ -84,7 +92,7 @@ export function OnboardingWizard({
   );
 
   const [data, setData] = useState<WizardData>(() =>
-    initialState(initialProfile)
+    initialState(initialProfile, defaultName)
   );
   const [step, setStep] = useState(0);
 
