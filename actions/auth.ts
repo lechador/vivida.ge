@@ -12,6 +12,7 @@ import {
   sendPasswordResetEmail,
   sendVerificationEmail,
 } from "@/lib/email";
+import { provisionTrialIfMissing } from "@/lib/plan";
 import { TURNSTILE_ERROR_KA, verifyTurnstile } from "@/lib/turnstile";
 
 // ─── OAuth (existing) ────────────────────────────────────────────────────
@@ -135,9 +136,13 @@ export async function signUpWithEmail(
     };
   }
 
-  // Trial provisioning is handled lazily on first /dashboard load via
-  // getCurrentPlan → provisionTrialIfMissing, so we don't need to block
-  // the signup response here.
+  // Provision the 30-day Pro trial immediately so it's tied to the
+  // account from t=0, not gated on whether the user ever reaches
+  // /dashboard. Google OAuth users still get it lazily via
+  // getCurrentPlan on first dashboard load. Idempotent (onConflictDoNothing)
+  // and swallows its own errors, so a transient DB blip won't block
+  // the rest of signup.
+  await provisionTrialIfMissing(created.id);
 
   // Token issue runs INLINE — it's a single fast DB write (~30ms) and
   // running it inside `after()` would race with `requestVerificationEmail`
