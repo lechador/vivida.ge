@@ -15,6 +15,8 @@ export type Feature =
   | "aiSummary"        // AI-generated narrative summary on dashboard
   | "aiBigThree"       // AI-personalized Sun/Moon/Asc text
   | "aiHighlights"     // AI-generated chart highlights
+  | "aiHouses"         // 12 houses section + interpretations
+  | "aiAspects"        // Planetary aspects section + interpretations
   | "dailyHoroscope"   // Personalized daily reading
   | "weeklyForecast"   // 7-day AI forecast
   | "synastry"         // Unlimited compatibility / partner charts
@@ -26,6 +28,8 @@ const REQUIRES_PRO: Record<Feature, boolean> = {
   aiSummary:       true,
   aiBigThree:      true,
   aiHighlights:    true,
+  aiHouses:        true,
+  aiAspects:       true,
   dailyHoroscope:  true,
   weeklyForecast:  true,
   synastry:        true,

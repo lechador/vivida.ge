@@ -46,6 +46,8 @@ export async function ChartSection({
 
   const canSummary = canUseFeature("aiSummary", plan);
   const canHighlights = canUseFeature("aiHighlights", plan);
+  const canHouses = canUseFeature("aiHouses", plan);
+  const canAspects = canUseFeature("aiAspects", plan);
 
   const data = chart.data;
   const sun = data.bodies.sun;
@@ -218,24 +220,56 @@ export async function ChartSection({
         </CollapsibleSection>
 
         {/* SECTION 06 — Houses */}
-        <CollapsibleSection
-          id="houses"
-          icon={<Home className="size-5" />}
-          title="ცხოვრების 12 სფერო"
-          subtitle="სად რა ენერგია ვლინდება შენს ცხოვრებაში"
-        >
-          <HouseCards chart={data} interpretations={interp?.houses} />
-        </CollapsibleSection>
+        {canHouses ? (
+          <CollapsibleSection
+            id="houses"
+            icon={<Home className="size-5" />}
+            title="ცხოვრების 12 სფერო"
+            subtitle="სად რა ენერგია ვლინდება შენს ცხოვრებაში"
+          >
+            <HouseCards chart={data} interpretations={interp?.houses} />
+          </CollapsibleSection>
+        ) : (
+          <CollapsibleSection
+            id="houses"
+            icon={<Home className="size-5" />}
+            title="ცხოვრების 12 სფერო"
+            subtitle="სად რა ენერგია ვლინდება შენს ცხოვრებაში"
+            defaultOpen
+          >
+            <LockedCard
+              title="12 სახლი — სრული ახსნა"
+              preview="კარიერა, ურთიერთობები, ფული, ოჯახი — ყოველი სახლი შენი ცხოვრების ერთ სფეროს ფარავს. AI გიჩვენებს, რა ენერგია სად ვლინდება შენს რუკაში."
+              description="გადადი Pro-ზე, რომ ნახო შენი 12 სახლის სრული ანალიზი."
+            />
+          </CollapsibleSection>
+        )}
 
         {/* SECTION 07 — Aspects */}
-        <CollapsibleSection
-          id="aspects"
-          icon={<Triangle className="size-5" />}
-          title="ასპექტები"
-          subtitle="როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
-        >
-          <AspectCards chart={data} interpretations={interp?.aspects} />
-        </CollapsibleSection>
+        {canAspects ? (
+          <CollapsibleSection
+            id="aspects"
+            icon={<Triangle className="size-5" />}
+            title="ასპექტები"
+            subtitle="როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
+          >
+            <AspectCards chart={data} interpretations={interp?.aspects} />
+          </CollapsibleSection>
+        ) : (
+          <CollapsibleSection
+            id="aspects"
+            icon={<Triangle className="size-5" />}
+            title="ასპექტები"
+            subtitle="როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
+            defaultOpen
+          >
+            <LockedCard
+              title="პლანეტთა ასპექტები"
+              preview="მზე ტრიგონშია მთვარესთან — ემოციები და ნება ერთად მუშაობენ. მარსი წინააღმდეგობაშია ვენერასთან — სიყვარულსა და მოქმედებას შორის ბალანსი ხშირად რთულია."
+              description="გადადი Pro-ზე, რომ ნახო ყველა მნიშვნელოვანი ასპექტი და მათი ახსნა."
+            />
+          </CollapsibleSection>
+        )}
       </div>
     </div>
   );

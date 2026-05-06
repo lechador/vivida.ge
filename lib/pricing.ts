@@ -96,6 +96,16 @@ export const FEATURES: FeatureRow[] = [
     pro: true,
   },
   {
+    label: "12 სახლი — სრული ახსნა",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "პლანეტთა ასპექტების ახსნა",
+    free: false,
+    pro: true,
+  },
+  {
     label: "ყოველდღიური პერსონალური ჰოროსკოპი",
     free: false,
     pro: true,
