@@ -4,9 +4,12 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
+import { pickCardFor } from "@/lib/cosmic-cards";
 import { getCurrentPlan } from "@/lib/plan";
+import { getUserStreak } from "@/lib/streak";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { CosmicCard } from "@/components/dashboard/cosmic-card";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { TrialBanner } from "@/components/billing/trial-banner";
 
@@ -15,9 +18,10 @@ export const metadata = { title: "დღეს" };
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [[profile], plan] = await Promise.all([
+  const [[profile], plan, streakInfo] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     getCurrentPlan(user.id),
+    getUserStreak(user.id),
   ]);
 
   if (!profile) {
@@ -25,6 +29,7 @@ export default async function DashboardPage() {
   }
 
   const firstName = user.name?.split(" ")[0] ?? "ვარსკვლავო";
+  const cosmicCard = pickCardFor(user.id, streakInfo.todayLocal);
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -54,6 +59,14 @@ export default async function DashboardPage() {
             users who actively check status always see the countdown. */}
         <div className="mb-8 empty:hidden">
           <TrialBanner userId={user.id} showWithinDays={3} />
+        </div>
+
+        <div className="mb-8">
+          <CosmicCard
+            card={cosmicCard}
+            todayLocal={streakInfo.todayLocal}
+            streak={streakInfo.streak}
+          />
         </div>
 
         {/* DailyDashboard is a client component — it fetches the heavy AI

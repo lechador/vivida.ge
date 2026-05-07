@@ -1,0 +1,192 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Flame, Sparkles } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import {
+  COSMIC_CARD_TONE_COLOR,
+  type CosmicCard as CosmicCardType,
+} from "@/lib/cosmic-cards";
+
+const TONE_LABEL_KA: Record<CosmicCardType["tone"], string> = {
+  love: "გული",
+  growth: "ზრდა",
+  rest: "სიწყნარე",
+  action: "მოქმედება",
+  mystery: "ცა",
+  gratitude: "მადლიერება",
+};
+
+/**
+ * Daily flip card on the dashboard. Defaults face-down; one tap reveals
+ * today's message. The reveal state persists in localStorage keyed by
+ * the local date so a refresh keeps the card open, and tomorrow's card
+ * naturally starts face-down again at midnight.
+ */
+export function CosmicCard({
+  card,
+  todayLocal,
+  streak,
+}: {
+  card: CosmicCardType;
+  todayLocal: string;
+  streak: number;
+}) {
+  const [revealed, setRevealed] = useState(false);
+  const storageKey = `cosmic-card-revealed-${todayLocal}`;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem(storageKey) === "1") setRevealed(true);
+  }, [storageKey]);
+
+  function reveal() {
+    setRevealed(true);
+    try {
+      window.localStorage.setItem(storageKey, "1");
+    } catch {}
+  }
+
+  const accent = COSMIC_CARD_TONE_COLOR[card.tone];
+
+  return (
+    <article
+      className="relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/45 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/65 to-[var(--vivida-pink)]/10 p-5 ring-1 ring-foreground/10 backdrop-blur-xl sm:p-6"
+    >
+      <div
+        aria-hidden
+        className="absolute -right-16 -top-16 size-56 rounded-full bg-[radial-gradient(circle,oklch(0.65_0.24_305/0.35)_0%,transparent_70%)] opacity-60 blur-3xl"
+      />
+
+      <header className="relative mb-4 flex items-baseline justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            დღევანდელი ცის ბანქო
+          </div>
+          <h3 className="mt-1 text-balance text-base font-semibold tracking-tight sm:text-lg">
+            ერთი მცირე ჩურჩული ციდან
+          </h3>
+        </div>
+        {streak > 0 && (
+          <span
+            className="inline-flex items-center gap-1 rounded-full border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--vivida-pink)]"
+            title={`${streak} დღე ზედიზედ ხედავ ცას`}
+          >
+            <Flame className="size-3" />
+            {streak} {streak === 1 ? "დღე" : "დღე"}
+          </span>
+        )}
+      </header>
+
+      <div
+        className="relative mx-auto"
+        style={{ perspective: "1200px" }}
+      >
+        <motion.button
+          type="button"
+          onClick={revealed ? undefined : reveal}
+          aria-pressed={revealed}
+          aria-label={revealed ? "ცის ბანქო — გახსნილი" : "გახსენი ცის ბანქო"}
+          whileHover={!revealed ? { scale: 1.02, y: -2 } : undefined}
+          whileTap={!revealed ? { scale: 0.98 } : undefined}
+          animate={{ rotateY: revealed ? 180 : 0 }}
+          transition={{
+            duration: revealed ? 0.7 : 0,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className={cn(
+            "relative mx-auto block aspect-[3/4] w-full max-w-[260px] cursor-default rounded-2xl",
+            !revealed && "cursor-pointer"
+          )}
+          style={{
+            transformStyle: "preserve-3d",
+          }}
+        >
+          {/* Back face — visible while face-down */}
+          <span
+            className="absolute inset-0 grid place-items-center overflow-hidden rounded-2xl border-2 border-[var(--vivida-violet)]/55 bg-[radial-gradient(circle_at_50%_30%,oklch(0.30_0.16_305/0.6),oklch(0.15_0.06_290/0.95))] shadow-[0_18px_50px_-12px_oklch(0.65_0.24_305/0.55)]"
+            style={{ backfaceVisibility: "hidden" }}
+          >
+            <span
+              aria-hidden
+              className="absolute inset-3 rounded-xl border border-[var(--vivida-violet)]/35"
+            />
+            <span aria-hidden className="absolute inset-0 opacity-60">
+              <Stars />
+            </span>
+            <span className="relative z-10 flex flex-col items-center gap-3">
+              <Sparkles
+                className="size-9 text-[var(--vivida-cyan)]"
+                aria-hidden
+              />
+              <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-foreground/70">
+                შეეხე
+              </span>
+            </span>
+          </span>
+
+          {/* Front face — visible after flip */}
+          <span
+            className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl border-2 px-5 py-6 text-center shadow-[0_18px_50px_-12px_oklch(0.65_0.24_305/0.55)]"
+            style={{
+              backfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+              borderColor: `color-mix(in oklch, ${accent} 55%, transparent)`,
+              background: `linear-gradient(160deg, color-mix(in oklch, ${accent} 18%, oklch(0.18 0.06 290)) 0%, oklch(0.16 0.05 290 / 0.95) 100%)`,
+            }}
+          >
+            <span
+              className="text-[10px] font-semibold uppercase tracking-[0.2em]"
+              style={{ color: accent }}
+            >
+              {TONE_LABEL_KA[card.tone]}
+            </span>
+            <span className="text-5xl" aria-hidden>
+              {card.emoji}
+            </span>
+            <p className="text-pretty text-sm leading-relaxed text-foreground/95">
+              {card.text}
+            </p>
+          </span>
+        </motion.button>
+      </div>
+
+      <p className="relative mt-4 text-center text-[11px] text-muted-foreground/85">
+        {revealed
+          ? "ხვალ ახალი ცა გელის — დაუბრუნდი."
+          : "ერთი შეხება, ერთი მცირე ჩურჩული."}
+      </p>
+    </article>
+  );
+}
+
+/** Decorative dots for the card back. Pure CSS, no JS. */
+function Stars() {
+  const dots = [
+    { x: 18, y: 22, s: 1 },
+    { x: 78, y: 18, s: 1.6 },
+    { x: 32, y: 64, s: 0.8 },
+    { x: 60, y: 78, s: 1.2 },
+    { x: 88, y: 56, s: 0.9 },
+    { x: 12, y: 86, s: 1.1 },
+  ];
+  return (
+    <span aria-hidden className="absolute inset-0">
+      {dots.map((d, i) => (
+        <span
+          key={i}
+          className="absolute rounded-full bg-[var(--vivida-cyan)]"
+          style={{
+            left: `${d.x}%`,
+            top: `${d.y}%`,
+            width: `${d.s * 2}px`,
+            height: `${d.s * 2}px`,
+            boxShadow: `0 0 ${d.s * 4}px oklch(0.78 0.18 200 / 0.7)`,
+          }}
+        />
+      ))}
+    </span>
+  );
+}
