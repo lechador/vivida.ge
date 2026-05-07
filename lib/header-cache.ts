@@ -1,4 +1,4 @@
-import { unstable_cache, updateTag } from "next/cache";
+import { unstable_cache, revalidateTag } from "next/cache";
 import { and, asc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
@@ -73,14 +73,19 @@ export async function getHeaderData(userId: string): Promise<HeaderData> {
 
 /**
  * Bust the header cache after a notification is created, dismissed, or
- * marked read. Call from a Server Action — `updateTag` is the Next 16 API
- * for read-your-own-writes (immediate, blocks next read for fresh data).
+ * marked read. Uses `revalidateTag` rather than `updateTag` because Next
+ * 16's `updateTag` only works inside Server Actions; this helper is also
+ * called from Route Handlers (the photo upload / promote / delete
+ * endpoints). The "max" profile gives stale-while-revalidate semantics
+ * — the next page that reads the tag serves the cached value while the
+ * fresh one regenerates in the background, which is exactly what we
+ * want for a 30s-cached header strip.
  */
 export function invalidateHeaderForUser(userId: string) {
-  updateTag(`header:${userId}`);
+  revalidateTag(`header:${userId}`, "max");
 }
 
 /** Bust the profile portion (username) when the user updates it. */
 export function invalidateProfileForUser(userId: string) {
-  updateTag(`profile:${userId}`);
+  revalidateTag(`profile:${userId}`, "max");
 }
