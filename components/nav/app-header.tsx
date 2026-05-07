@@ -53,7 +53,9 @@ export async function AppHeader({
         id: session.user.id,
         name: session.user.name ?? null,
         email: session.user.email ?? null,
-        image: session.user.image ?? null,
+        // Prefer the user's chosen "main" profile photo over the OAuth
+        // avatar baked into the JWT — falls back when they have none yet.
+        image: data.avatarUrl ?? session.user.image ?? null,
       };
       notifications = data.notifications;
       unread = data.unread;

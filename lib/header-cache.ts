@@ -1,8 +1,8 @@
 import { unstable_cache, updateTag } from "next/cache";
-import { eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { profiles } from "@/db/schema";
+import { profilePhotos, profiles } from "@/db/schema";
 import {
   countUnreadNotifications,
   listRecentNotifications,
@@ -13,6 +13,9 @@ export type HeaderData = {
   username: string | null;
   notifications: NotificationView[];
   unread: number;
+  /** First ready profile photo (sortOrder=0). Overrides the OAuth
+   *  avatar so users see their chosen "main" photo in the navbar. */
+  avatarUrl: string | null;
 };
 
 /**
@@ -27,7 +30,7 @@ export type HeaderData = {
 export async function getHeaderData(userId: string): Promise<HeaderData> {
   return unstable_cache(
     async () => {
-      const [profileRow, notifications, unread] = await Promise.all([
+      const [profileRow, notifications, unread, avatarRow] = await Promise.all([
         db
           .select({ username: profiles.username })
           .from(profiles)
@@ -35,11 +38,23 @@ export async function getHeaderData(userId: string): Promise<HeaderData> {
           .limit(1),
         listRecentNotifications(userId),
         countUnreadNotifications(userId),
+        db
+          .select({ url: profilePhotos.url })
+          .from(profilePhotos)
+          .where(
+            and(
+              eq(profilePhotos.userId, userId),
+              eq(profilePhotos.ready, true)
+            )
+          )
+          .orderBy(asc(profilePhotos.sortOrder))
+          .limit(1),
       ]);
       return {
         username: profileRow[0]?.username ?? null,
         notifications,
         unread,
+        avatarUrl: avatarRow[0]?.url ?? null,
       };
     },
     ["header-data", userId],

@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { profilePhotos } from "@/db/schema";
+import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { deleteObject } from "@/lib/r2";
 
 /** Delete a photo. Owner-only. Removes the R2 object and the DB row. */
@@ -39,6 +40,9 @@ export async function DELETE(
   }
 
   await db.delete(profilePhotos).where(eq(profilePhotos.id, id));
+
+  // Deleting the main photo changes the navbar avatar — refresh.
+  invalidateHeaderForUser(session.user.id);
 
   return NextResponse.json({ ok: true });
 }

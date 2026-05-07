@@ -4,6 +4,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { profilePhotos } from "@/db/schema";
+import { invalidateHeaderForUser } from "@/lib/header-cache";
 
 /**
  * Move a photo to the front of the user's gallery so it becomes the
@@ -51,6 +52,9 @@ export async function POST(
         .where(eq(profilePhotos.id, reordered[i].id));
     }
   });
+
+  // Refresh the cached avatar in the navbar.
+  invalidateHeaderForUser(userId);
 
   return NextResponse.json({ ok: true });
 }

@@ -75,15 +75,21 @@ export default async function AccountPage() {
 
         {/* Profile */}
         <div className="mb-6 flex items-center gap-4 rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
-          {user.image && (
-            <Image
-              src={user.image}
-              alt=""
-              width={48}
-              height={48}
-              className="size-12 rounded-full border border-border"
-            />
-          )}
+          {(() => {
+            // Prefer the user's chosen "main" profile photo (sortOrder=0)
+            // over the OAuth avatar — same precedence as the navbar.
+            const avatar = photos[0]?.url ?? user.image ?? null;
+            if (!avatar) return null;
+            return (
+              <Image
+                src={avatar}
+                alt=""
+                width={48}
+                height={48}
+                className="size-12 rounded-full border border-border"
+              />
+            );
+          })()}
           <div className="min-w-0 flex-1">
             <div className="truncate text-base font-medium text-foreground">
               {user.name ?? "ვარსკვლავო"}

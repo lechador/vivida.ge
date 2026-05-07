@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { profilePhotos } from "@/db/schema";
+import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { objectExists } from "@/lib/r2";
 
 /**
@@ -47,6 +48,9 @@ export async function POST(
     .update(profilePhotos)
     .set({ ready: true })
     .where(eq(profilePhotos.id, id));
+
+  // First-photo uploads become the navbar avatar — refresh the cache.
+  invalidateHeaderForUser(session.user.id);
 
   return NextResponse.json({ ok: true, photo: { ...photo, ready: true } });
 }
