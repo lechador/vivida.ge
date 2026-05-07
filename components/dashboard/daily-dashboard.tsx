@@ -9,8 +9,10 @@ import { loadDashboardBundle, type DashboardBundle } from "@/actions/dashboard";
 import { Button } from "@/components/ui/button";
 import { LockedCard } from "@/components/paywall/locked-card";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
+import type { CosmicCard as CosmicCardData } from "@/lib/cosmic-cards";
 import type { PlanId } from "@/lib/pricing";
 
+import { CosmicCard } from "./cosmic-card";
 import { DailyCard } from "./daily-card";
 import { MiniBigThree } from "./mini-big-three";
 import { MoonPhaseCard } from "./moon-phase-card";
@@ -25,9 +27,15 @@ import { WeeklyForecastCard } from "./weekly-forecast-card";
 export function DailyDashboard({
   userId,
   plan,
+  cosmicCard,
+  cosmicCardTodayLocal,
+  streak,
 }: {
   userId: string;
   plan: PlanId;
+  cosmicCard: CosmicCardData;
+  cosmicCardTodayLocal: string;
+  streak: number;
 }) {
   const router = useRouter();
   const [bundle, setBundle] = useState<DashboardBundle | null>(null);
@@ -61,8 +69,21 @@ export function DailyDashboard({
     );
   }
 
+  // While the bundle loads, still render the cosmic card (it's a tiny
+  // server prop, not part of the bundle) so the user sees something
+  // personal immediately. Suggestions slot in above it once the
+  // bundle arrives.
   if (!bundle || bundle.kind === "no-chart") {
-    return <CosmicLoader embedded progressive />;
+    return (
+      <div className="space-y-6">
+        <CosmicCard
+          card={cosmicCard}
+          todayLocal={cosmicCardTodayLocal}
+          streak={streak}
+        />
+        <CosmicLoader embedded progressive />
+      </div>
+    );
   }
 
   const {
@@ -92,6 +113,16 @@ export function DailyDashboard({
 
   return (
     <div className="space-y-8">
+      {/* Suggested people sit at the very top — finding new people is the
+          stickiest part of the app, surface it before anything else. */}
+      <SuggestedPeopleRail suggestions={suggestions} />
+
+      <CosmicCard
+        card={cosmicCard}
+        todayLocal={cosmicCardTodayLocal}
+        streak={streak}
+      />
+
       <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
         <div className="xl:col-span-7">{dailySlot}</div>
         {moonPhase && (
@@ -125,8 +156,6 @@ export function DailyDashboard({
         </header>
         <MiniBigThree chart={chart.data} />
       </section>
-
-      <SuggestedPeopleRail suggestions={suggestions} />
 
       <section className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/10 to-transparent p-6 backdrop-blur-xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -7,9 +7,9 @@ import { SuggestedPersonCard } from "./suggested-person-card";
 
 /**
  * Horizontal scroll rail of the most compatible public-profile users.
- * Suggestions are prefetched server-side (see actions/dashboard.ts) and
- * passed in — keeps this component pure-render so it can live inside
- * the client-side dashboard wrapper.
+ * The card thumbnails already make it obvious these are people, so we
+ * skip a section title — keeps the dashboard scannable when the rail
+ * lives at the top of the page.
  */
 export function SuggestedPeopleRail({
   suggestions,
@@ -20,17 +20,14 @@ export function SuggestedPeopleRail({
 
   return (
     <section>
-      <header className="mb-3 flex items-baseline justify-between gap-3">
-        <h2 className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          ცის თავსებადი ხალხი
-        </h2>
+      <div className="mb-2 flex justify-end">
         <Link
           href="/discover"
-          className="shrink-0 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          className="text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           ყველა →
         </Link>
-      </header>
+      </div>
 
       {/* Negative margin lets the rail bleed to the screen edge on mobile so
           cards feel like they continue past the viewport. snap-x for natural

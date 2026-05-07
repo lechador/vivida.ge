@@ -9,7 +9,6 @@ import { getCurrentPlan } from "@/lib/plan";
 import { getUserStreak } from "@/lib/streak";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
-import { CosmicCard } from "@/components/dashboard/cosmic-card";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { TrialBanner } from "@/components/billing/trial-banner";
 
@@ -61,19 +60,19 @@ export default async function DashboardPage() {
           <TrialBanner userId={user.id} showWithinDays={3} />
         </div>
 
-        <div className="mb-8">
-          <CosmicCard
-            card={cosmicCard}
-            todayLocal={streakInfo.todayLocal}
-            streak={streakInfo.streak}
-          />
-        </div>
-
         {/* DailyDashboard is a client component — it fetches the heavy AI
             data via a server action after first paint, so the response
             stream closes immediately and the browser tab spinner stops.
-            Our internal CosmicLoader covers the AI generation window. */}
-        <DailyDashboard userId={user.id} plan={plan} />
+            Our internal CosmicLoader covers the AI generation window.
+            CosmicCard / streak are tiny server props passed straight
+            through so they render immediately. */}
+        <DailyDashboard
+          userId={user.id}
+          plan={plan}
+          cosmicCard={cosmicCard}
+          cosmicCardTodayLocal={streakInfo.todayLocal}
+          streak={streakInfo.streak}
+        />
       </section>
     </main>
   );
