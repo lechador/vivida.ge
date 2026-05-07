@@ -1,18 +1,34 @@
 /**
  * Synastry: compatibility scoring between two natal charts.
  *
- * For each pair of bodies (one from each chart), we look for major
- * aspects and award points to one or more "category" buckets — love,
- * friendship, communication, growth, chemistry. Higher orb tightness +
- * harmonious aspects + personally-relevant body pairs all push a
- * category's score up.
+ * Score components (in order of impact):
  *
- * Scores are normalised into a friendly 0–100 percentage via tanh so
- * extreme values are bounded — most pairs land in the 35–85% range.
+ *   1. Cross-aspects — for every pair of bodies (one from each chart) we
+ *      look for the tightest major aspect within tolerance and award
+ *      `valence * tightness^1.5 * bodyMul` to each category whose body
+ *      set contains both endpoints. The 1.5 exponent on tightness biases
+ *      toward exact aspects so a 0.5° conjunction outweighs a 5° one.
+ *
+ *   2. Pair magnifiers — specific body pairs (Sun-Moon, Venus-Mars,
+ *      Mercury-Mercury …) carry extra romantic / friendship weight on
+ *      top of their bodyMul, mirroring how astrologers actually read
+ *      synastry instead of treating every pair the same.
+ *
+ *   3. House overlays — where person A's planets fall in person B's
+ *      house system (and vice versa). Venus in someone's 5th/7th, Mars
+ *      in their 8th, Sun in their 1st, etc. This is a major synastry
+ *      technique that aspect-only scoring misses entirely.
+ *
+ *   4. Element compatibility — Sun and Moon elements (Fire/Earth/Air/
+ *      Water) interacting along classical affinity rules. Small bias,
+ *      but noticeable when the rest of the chart is borderline.
+ *
+ * Scores are normalised through tanh so the spread is realistic
+ * (typical pairs ~30–88%, exceptional ~92+, friction-heavy ~25–35%).
  */
 
 import { ASPECTS, angularDistance, type AspectKind } from "./aspects";
-import type { NatalChartJson } from "@/db/schema";
+import type { HouseJson, NatalChartJson } from "@/db/schema";
 
 export type SynastryCategory =
   | "love"
@@ -68,12 +84,117 @@ const BODY_WEIGHT: Record<string, number> = {
   chiron: 0.5,
 };
 
+/**
+ * Pair-specific magnifiers — applied on top of bodyMul. Keys are sorted
+ * `"a-b"` strings so the lookup is order-independent. These boost the
+ * archetypal "synastry signature" pairs that astrologers weight heavily.
+ */
+const PAIR_MAGNIFIER: Record<string, number> = {
+  // Sun ↔ Moon: identity meets feeling. The single most-cited synastry
+  // contact for long-term resonance.
+  "moon-sun": 1.55,
+  "moon-moon": 1.4,
+  "sun-sun": 1.25,
+  // Venus ↔ Mars: classical chemistry axis.
+  "mars-venus": 1.6,
+  "venus-venus": 1.3,
+  "mars-mars": 1.2,
+  // Mercury ↔ Mercury / Sun: mental wavelength.
+  "mercury-mercury": 1.35,
+  "mercury-sun": 1.15,
+  "mercury-moon": 1.15,
+  // Saturn anchors: stabilising / karmic, weighty when present.
+  "saturn-sun": 1.3,
+  "saturn-moon": 1.3,
+  "saturn-venus": 1.25,
+  // Ascendant contacts: instant attraction.
+  "ascendant-sun": 1.3,
+  "ascendant-moon": 1.3,
+  "ascendant-venus": 1.25,
+  "ascendant-mars": 1.25,
+  // Jupiter: the great expansive blessing.
+  "jupiter-sun": 1.2,
+  "jupiter-moon": 1.2,
+  "jupiter-venus": 1.2,
+};
+
+/**
+ * House overlay scoring: when a body from chart A falls into a house in
+ * chart B, the relationship picks up that house's signature. Values are
+ * "category boost units" added to the raw category sum.
+ */
+const HOUSE_OVERLAY: Record<
+  number,
+  Partial<Record<SynastryCategory, number>>
+> = {
+  1: { love: 0.45, chemistry: 0.4, friendship: 0.3 }, // identity / attraction
+  3: { communication: 0.45, friendship: 0.2 },
+  4: { love: 0.3, friendship: 0.2, growth: 0.2 }, // home / roots
+  5: { love: 0.6, chemistry: 0.5, friendship: 0.2 }, // romance / play
+  7: { love: 0.7, friendship: 0.45, communication: 0.3 }, // partnership
+  8: { love: 0.4, chemistry: 0.7, growth: 0.45 }, // intimacy / transformation
+  9: { growth: 0.45, friendship: 0.25, communication: 0.2 }, // shared horizons
+  11: { friendship: 0.65, growth: 0.3, communication: 0.3 }, // friendship / dreams
+};
+
+/** Bodies whose house-overlay placement we score. We don't bother with
+ *  asteroids or outers in less-personal houses — keeps the signal-to-
+ *  noise ratio high. */
+const OVERLAY_BODY_WEIGHT: Record<string, number> = {
+  sun: 1.4,
+  moon: 1.3,
+  venus: 1.2,
+  mars: 1.1,
+  mercury: 0.9,
+  jupiter: 0.85,
+  saturn: 0.85,
+  ascendant: 1.0,
+};
+
+/** Elemental affinity between the two Suns (and Moons). Classical:
+ *  same element resonates, fire+air and earth+water flow, the two
+ *  cross-pairs friction. Values are added to all categories with a
+ *  small uniform weight. */
+const ELEMENT_AFFINITY: Record<string, Record<string, number>> = {
+  fire: { fire: 0.55, air: 0.7, earth: -0.15, water: -0.05 },
+  earth: { earth: 0.55, water: 0.7, fire: -0.15, air: -0.05 },
+  air: { air: 0.55, fire: 0.7, water: -0.15, earth: -0.05 },
+  water: { water: 0.55, earth: 0.7, air: -0.15, fire: -0.05 },
+};
+
+const ELEMENT_BY_SIGN: Array<"fire" | "earth" | "air" | "water"> = [
+  "fire", "earth", "air", "water",
+  "fire", "earth", "air", "water",
+  "fire", "earth", "air", "water",
+];
+
+export type ChartElement = "fire" | "earth" | "air" | "water";
+
 export type SynastryAspect = {
   a: string;
   b: string;
   kind: AspectKind;
   orb: number;
   tightness: number;
+};
+
+export type SynastryHouseOverlay = {
+  /** Whose body it is — "a" or "b". */
+  source: "a" | "b";
+  body: string;
+  /** Which house in the other chart. */
+  house: number;
+};
+
+export type SynastryBreakdown = {
+  /** Sum of cross-aspect contribution across all categories. */
+  aspectPoints: number;
+  /** Sum of house-overlay contribution across all categories. */
+  housePoints: number;
+  /** Element-affinity contribution (Sun + Moon). */
+  elementPoints: number;
+  /** Up to four most-impactful overlays for storytelling. */
+  topOverlays: SynastryHouseOverlay[];
 };
 
 export type SynastryResult = {
@@ -83,6 +204,15 @@ export type SynastryResult = {
   overall: number;
   /** Tightest cross-aspects, sorted desc by tightness. */
   topAspects: SynastryAspect[];
+  /** Sun + Moon elements per chart so the UI can show "🔥 Fire ↔ 💨 Air". */
+  elements: {
+    sunA: ChartElement;
+    sunB: ChartElement;
+    moonA: ChartElement;
+    moonB: ChartElement;
+  };
+  /** Score breakdown so the UI can show "what made this number". */
+  breakdown: SynastryBreakdown;
 };
 
 const CATEGORY_WEIGHT: Record<SynastryCategory, number> = {
@@ -93,10 +223,37 @@ const CATEGORY_WEIGHT: Record<SynastryCategory, number> = {
   growth: 0.15,
 };
 
+/** Sorted lookup key for pair magnifier table. */
+function pairKey(a: string, b: string): string {
+  return [a, b].sort().join("-");
+}
+
+/** Smaller of the two arcs between two longitudes; signed-positive 0–360. */
+function normLng(lng: number): number {
+  return ((lng % 360) + 360) % 360;
+}
+
+/** Find the house number a longitude falls into, given the 12 cusps. */
+function houseOf(longitude: number, houses: HouseJson[]): number | null {
+  if (!houses || houses.length < 12) return null;
+  // Houses are 1–12 in order; iterate and check whether `longitude` lands
+  // in the arc between cusp[i] and cusp[i+1] (wrap-aware).
+  const sorted = [...houses].sort((a, b) => a.number - b.number);
+  const lng = normLng(longitude);
+  for (let i = 0; i < 12; i++) {
+    const start = normLng(sorted[i].cuspLongitude);
+    const end = normLng(sorted[(i + 1) % 12].cuspLongitude);
+    const inside =
+      start < end ? lng >= start && lng < end : lng >= start || lng < end;
+    if (inside) return sorted[i].number;
+  }
+  return null;
+}
+
 /**
  * Compute synastry between two natal charts.
- * Returns category scores, an overall compatibility number, and the
- * tightest aspects so we can show a few "highlights" if we want.
+ * Returns category scores, an overall compatibility number, the tightest
+ * aspects, and a breakdown so the UI can explain how the number was built.
  */
 export function computeSynastry(
   a: NatalChartJson,
@@ -114,22 +271,21 @@ export function computeSynastry(
   pointsB.ascendant = { longitude: b.ascendant.longitude };
   pointsB.midheaven = { longitude: b.midheaven.longitude };
 
-  // Raw weighted sums per category (un-normalised)
   const raw: Record<SynastryCategory, number> = {
-    love: 0,
-    friendship: 0,
-    communication: 0,
-    growth: 0,
-    chemistry: 0,
+    love: 0, friendship: 0, communication: 0, growth: 0, chemistry: 0,
   };
+
+  let aspectPoints = 0;
+  let housePoints = 0;
+  let elementPoints = 0;
 
   const aspectsFound: SynastryAspect[] = [];
 
+  // ── 1. Cross-aspect contribution ──────────────────────────────────
   for (const [keyA, bodyA] of Object.entries(pointsA)) {
     for (const [keyB, bodyB] of Object.entries(pointsB)) {
       const d = angularDistance(bodyA.longitude, bodyB.longitude);
 
-      // Find the tightest matching aspect for this body pair
       let best: { kind: AspectKind; orb: number; maxOrb: number } | null = null;
       for (const aspect of ASPECTS) {
         const orb = Math.abs(d - aspect.angle);
@@ -139,49 +295,108 @@ export function computeSynastry(
       }
       if (!best) continue;
 
-      const tightness = 1 - best.orb / best.maxOrb;
+      const tightnessLinear = 1 - best.orb / best.maxOrb;
+      // Bias toward exact aspects: 0.5° aspect ≈ tightness 0.93,
+      // 4° aspect ≈ tightness 0.42 (vs. 0.5 linearly).
+      const tightness = Math.pow(tightnessLinear, 1.5);
       aspectsFound.push({
-        a: keyA,
-        b: keyB,
-        kind: best.kind,
-        orb: best.orb,
-        tightness,
+        a: keyA, b: keyB, kind: best.kind, orb: best.orb,
+        tightness: tightnessLinear,
       });
 
       const valence = ASPECT_VALENCE[best.kind];
       const bodyMul =
         (BODY_WEIGHT[keyA] ?? 0.6) * (BODY_WEIGHT[keyB] ?? 0.6);
+      const pairMul = PAIR_MAGNIFIER[pairKey(keyA, keyB)] ?? 1;
 
-      const contribution = valence * tightness * bodyMul;
+      const contribution = valence * tightness * bodyMul * pairMul;
+      aspectPoints += Math.abs(contribution);
 
-      // Add to each category whose body set contains both endpoints
       for (const cat of CATEGORIES) {
         const set = CATEGORY_BODIES[cat];
-        if (set.has(keyA) && set.has(keyB)) {
-          raw[cat] += contribution;
-        }
+        if (set.has(keyA) && set.has(keyB)) raw[cat] += contribution;
       }
     }
   }
 
-  // Sigmoid normalisation, tuned for "fun but realistic" spread:
-  //   - center 60: a pair with no signal lands at neutral 60% — neither
-  //     misleadingly warm nor punishingly cold.
-  //   - amplitude 38 + divisor 3 → exceptional pairs reach 90+, rough
-  //     pairs drop into the 30s. Most pairs spread across 35–88, much
-  //     wider than the old 46–74 squish.
-  //   - floor 22: genuinely incompatible charts can read low without
-  //     being a literal zero. Ceiling 98 leaves the top reachable but
-  //     not perfect — synastry is never exactly 100%.
+  // ── 2. House overlay contribution ─────────────────────────────────
+  const overlays: SynastryHouseOverlay[] = [];
+  for (const [body, point] of Object.entries(pointsA)) {
+    if (!OVERLAY_BODY_WEIGHT[body]) continue;
+    const house = houseOf(point.longitude, b.houses);
+    if (!house) continue;
+    const bonus = HOUSE_OVERLAY[house];
+    if (!bonus) continue;
+    overlays.push({ source: "a", body, house });
+    const w = OVERLAY_BODY_WEIGHT[body];
+    for (const cat of CATEGORIES) {
+      const v = bonus[cat];
+      if (v) {
+        raw[cat] += w * v;
+        housePoints += w * v;
+      }
+    }
+  }
+  for (const [body, point] of Object.entries(pointsB)) {
+    if (!OVERLAY_BODY_WEIGHT[body]) continue;
+    const house = houseOf(point.longitude, a.houses);
+    if (!house) continue;
+    const bonus = HOUSE_OVERLAY[house];
+    if (!bonus) continue;
+    overlays.push({ source: "b", body, house });
+    const w = OVERLAY_BODY_WEIGHT[body];
+    for (const cat of CATEGORIES) {
+      const v = bonus[cat];
+      if (v) {
+        raw[cat] += w * v;
+        housePoints += w * v;
+      }
+    }
+  }
+
+  // ── 3. Element compatibility (Sun + Moon) ─────────────────────────
+  const sunA = ELEMENT_BY_SIGN[a.bodies.sun?.signIndex ?? 0];
+  const sunB = ELEMENT_BY_SIGN[b.bodies.sun?.signIndex ?? 0];
+  const moonA = ELEMENT_BY_SIGN[a.bodies.moon?.signIndex ?? 0];
+  const moonB = ELEMENT_BY_SIGN[b.bodies.moon?.signIndex ?? 0];
+
+  const sunAffinity = ELEMENT_AFFINITY[sunA]?.[sunB] ?? 0;
+  const moonAffinity = ELEMENT_AFFINITY[moonA]?.[moonB] ?? 0;
+
+  // Sun affinity feeds love / friendship / communication.
+  // Moon affinity feeds love / chemistry / growth (emotional resonance).
+  for (const cat of CATEGORIES) {
+    const sBoost =
+      cat === "love" || cat === "friendship" || cat === "communication"
+        ? sunAffinity * 0.85
+        : sunAffinity * 0.4;
+    const mBoost =
+      cat === "love" || cat === "chemistry" || cat === "growth"
+        ? moonAffinity * 0.85
+        : moonAffinity * 0.4;
+    raw[cat] += sBoost + mBoost;
+    elementPoints += sBoost + mBoost;
+  }
+
+  // ── 4. Normalise to 22–98 % via tanh ──────────────────────────────
+  // Divisor is 5 now (was 3) because the new components push raw values
+  // higher; this keeps the spread roughly the same.
   const scores = {} as Record<SynastryCategory, number>;
   for (const cat of CATEGORIES) {
-    const x = raw[cat];
-    const norm = 60 + 38 * Math.tanh(x / 3);
+    const norm = 60 + 38 * Math.tanh(raw[cat] / 5);
     scores[cat] = Math.max(22, Math.min(98, Math.round(norm)));
   }
 
   const overall = Math.round(
     CATEGORIES.reduce((sum, c) => sum + scores[c] * CATEGORY_WEIGHT[c], 0)
+  );
+
+  // Pick the top overlays for storytelling: Sun/Moon/Venus/Mars first,
+  // then by intrinsic body weight.
+  overlays.sort(
+    (x, y) =>
+      (OVERLAY_BODY_WEIGHT[y.body] ?? 0) -
+      (OVERLAY_BODY_WEIGHT[x.body] ?? 0)
   );
 
   return {
@@ -190,6 +405,13 @@ export function computeSynastry(
     topAspects: aspectsFound
       .sort((x, y) => y.tightness - x.tightness)
       .slice(0, 8),
+    elements: { sunA, sunB, moonA, moonB },
+    breakdown: {
+      aspectPoints: Math.round(aspectPoints * 10) / 10,
+      housePoints: Math.round(housePoints * 10) / 10,
+      elementPoints: Math.round(elementPoints * 10) / 10,
+      topOverlays: overlays.slice(0, 4),
+    },
   };
 }
 
@@ -215,6 +437,35 @@ export const CATEGORY_EMOJI: Record<SynastryCategory, string> = {
   communication: "💬",
   growth: "🌱",
   chemistry: "🔥",
+};
+
+export const ELEMENT_LABEL_KA: Record<ChartElement, string> = {
+  fire: "ცეცხლი",
+  earth: "მიწა",
+  air: "ჰაერი",
+  water: "წყალი",
+};
+
+export const ELEMENT_EMOJI: Record<ChartElement, string> = {
+  fire: "🔥",
+  earth: "🪨",
+  air: "🌬️",
+  water: "💧",
+};
+
+export const HOUSE_LABEL_KA: Record<number, string> = {
+  1: "1-ლი — პირადი იდენტობა",
+  2: "მე-2 — ღირებულებები",
+  3: "მე-3 — კომუნიკაცია",
+  4: "მე-4 — სახლი, ფესვები",
+  5: "მე-5 — რომანი, შემოქმედება",
+  6: "მე-6 — ყოველდღიურობა",
+  7: "მე-7 — პარტნიორობა",
+  8: "მე-8 — სიღრმე, გარდასახვა",
+  9: "მე-9 — ჰორიზონტები",
+  10: "მე-10 — გზა, რეპუტაცია",
+  11: "მე-11 — მეგობრები, ოცნებები",
+  12: "მე-12 — შინაგანი სამყარო",
 };
 
 /** Human-friendly verdict for an overall percentage. Thresholds calibrated

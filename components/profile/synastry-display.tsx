@@ -9,7 +9,11 @@ import {
   CATEGORY_DESCRIPTOR_KA,
   CATEGORY_EMOJI,
   CATEGORY_LABEL_KA,
+  ELEMENT_EMOJI,
+  ELEMENT_LABEL_KA,
+  HOUSE_LABEL_KA,
   overallVerdict,
+  type ChartElement,
   type SynastryAspect,
   type SynastryCategory,
   type SynastryResult,
@@ -83,9 +87,17 @@ export function SynastryDisplay({
             <p className="mt-3 max-w-md text-pretty text-base text-foreground/85">
               {narrative}
             </p>
+            <ElementPairing
+              sunA={result.elements.sunA}
+              sunB={result.elements.sunB}
+              moonA={result.elements.moonA}
+              moonB={result.elements.moonB}
+            />
           </div>
         </div>
       </div>
+
+      <ScoreBreakdown breakdown={result.breakdown} />
 
       {/* Per-category cards with narratives */}
       <section>
@@ -498,6 +510,169 @@ function BreakdownBlock({
         {body}
       </p>
     </div>
+  );
+}
+
+function ElementPairing({
+  sunA,
+  sunB,
+  moonA,
+  moonB,
+}: {
+  sunA: ChartElement;
+  sunB: ChartElement;
+  moonA: ChartElement;
+  moonB: ChartElement;
+}) {
+  return (
+    <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+      <ElementChip a={sunA} b={sunB} label="მზე" />
+      <ElementChip a={moonA} b={moonB} label="მთვარე" />
+    </div>
+  );
+}
+
+function ElementChip({
+  a,
+  b,
+  label,
+}: {
+  a: ChartElement;
+  b: ChartElement;
+  label: string;
+}) {
+  const same = a === b;
+  const compatible =
+    (a === "fire" && b === "air") ||
+    (a === "air" && b === "fire") ||
+    (a === "earth" && b === "water") ||
+    (a === "water" && b === "earth");
+  const tone = same
+    ? "border-[var(--vivida-violet)]/45 bg-[var(--vivida-violet)]/10"
+    : compatible
+      ? "border-[var(--vivida-cyan)]/45 bg-[var(--vivida-cyan)]/10"
+      : "border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/10";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs ${tone}`}
+    >
+      <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </span>
+      <span>
+        {ELEMENT_EMOJI[a]} {ELEMENT_LABEL_KA[a]}
+      </span>
+      <span className="text-muted-foreground/70">↔</span>
+      <span>
+        {ELEMENT_EMOJI[b]} {ELEMENT_LABEL_KA[b]}
+      </span>
+    </span>
+  );
+}
+
+function ScoreBreakdown({
+  breakdown,
+}: {
+  breakdown: SynastryResult["breakdown"];
+}) {
+  const total =
+    Math.abs(breakdown.aspectPoints) +
+    Math.abs(breakdown.housePoints) +
+    Math.abs(breakdown.elementPoints) || 1;
+  const rows: Array<{
+    label: string;
+    value: number;
+    accent: string;
+    note: string;
+  }> = [
+    {
+      label: "ცის ასპექტები",
+      value: breakdown.aspectPoints,
+      accent: "oklch(0.78 0.18 305)",
+      note: "ორ რუკაში სწორი კუთხეებით დაკავშირებული პლანეტები — რაც უფრო ზუსტია, მით ძლიერი.",
+    },
+    {
+      label: "სახლების გადაფარვა",
+      value: breakdown.housePoints,
+      accent: "oklch(0.78 0.18 200)",
+      note: "ერთის პლანეტა მეორის რომელ სახლში ხვდება — სად ააქტიურებს ცხოვრების სფეროს.",
+    },
+    {
+      label: "ელემენტების ქიმია",
+      value: breakdown.elementPoints,
+      accent: "oklch(0.85 0.16 85)",
+      note: "მზის და მთვარის ელემენტები — საბაზისო ენერგეტიკული თავსებადობა.",
+    },
+  ];
+  return (
+    <section className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
+      <header className="mb-4">
+        <h3 className="text-base font-semibold tracking-tight">
+          რამ შექმნა ეს რიცხვი
+        </h3>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          სამი დამოუკიდებელი წყარო ერთად ქმნის საერთო თავსებადობის ქულას.
+        </p>
+      </header>
+      <ul className="space-y-3">
+        {rows.map((r) => {
+          const pct = Math.round((Math.abs(r.value) / total) * 100);
+          return (
+            <li key={r.label} className="space-y-1.5">
+              <div className="flex items-baseline justify-between gap-3 text-sm">
+                <span className="font-medium" style={{ color: r.accent }}>
+                  {r.label}
+                </span>
+                <span className="text-xs tabular-nums text-muted-foreground">
+                  {r.value > 0 ? "+" : ""}
+                  {r.value.toFixed(1)}
+                </span>
+              </div>
+              <div className="relative h-1.5 overflow-hidden rounded-full bg-foreground/[0.08]">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${pct}%`, backgroundColor: r.accent }}
+                />
+              </div>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                {r.note}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+
+      {breakdown.topOverlays.length > 0 && (
+        <>
+          <div
+            aria-hidden
+            className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent"
+          />
+          <div>
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              მთავარი სახლების გადაფარვა
+            </h4>
+            <ul className="grid gap-1.5 sm:grid-cols-2">
+              {breakdown.topOverlays.map((o, i) => (
+                <li
+                  key={`${o.source}-${o.body}-${o.house}-${i}`}
+                  className="rounded-lg border border-border/60 bg-card/40 px-3 py-2 text-xs"
+                >
+                  <span className="font-medium">
+                    {o.source === "a" ? "შენი" : "მის"} {bodyLabel(o.body)}
+                  </span>
+                  <span className="text-muted-foreground"> — </span>
+                  <span>
+                    {o.source === "a" ? "მის" : "შენს"}{" "}
+                    {HOUSE_LABEL_KA[o.house] ?? `${o.house}-ე სახლში`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 
