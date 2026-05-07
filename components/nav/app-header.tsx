@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { auth } from "@/auth";
+import { cn } from "@/lib/utils";
 import { getHeaderData } from "@/lib/header-cache";
 import { Button } from "@/components/ui/button";
 import { VividaMark } from "@/components/brand/vivida-mark";
@@ -78,7 +79,13 @@ export async function AppHeader({
 
       <Link
         href={userInfo ? "/dashboard" : "/"}
-        className="flex shrink-0 items-center gap-2.5"
+        className={cn(
+          "flex shrink-0 items-center gap-2.5",
+          // The desktop sidebar has its own logo block; hide the in-header
+          // version on lg+ so the right cluster (search + bell + user)
+          // gets the full breathing room.
+          userInfo && "lg:hidden"
+        )}
       >
         <VividaMark
           size={48}
