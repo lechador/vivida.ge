@@ -116,6 +116,17 @@
     font-family: var(--font-sans), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
+  /*
+   * When the mobile bottom tab bar is mounted (authed pages on phones),
+   * reserve space at the bottom of the viewport so page content isn't
+   * hidden behind it. Uses :has() so the rule is automatic — landing
+   * pages and desktop don't pay the cost.
+   */
+  @media (max-width: 1023px) {
+    body:has([data-mobile-tab-bar]) {
+      padding-bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 0px));
+    }
+  }
   ::selection {
     background-color: oklch(0.78 0.18 305 / 35%);
   }

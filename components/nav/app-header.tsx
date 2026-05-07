@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { MobileNav } from "./mobile-nav";
 import { MobileSearch } from "./mobile-search";
+import { MobileTabBar } from "./mobile-tab-bar";
 import { NavLinks } from "./nav-links";
 import { type NavActiveKey } from "./nav-items";
 import { NotificationsDropdown } from "./notifications-dropdown";
@@ -66,6 +67,7 @@ export async function AppHeader({
   const isPro = plan === "pro";
 
   return (
+    <>
     <header className="relative z-30 mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-4 sm:gap-5 sm:px-6 sm:py-5">
       {/* Mobile hamburger — authed users only (guests don't have nav). */}
       {userInfo && <MobileNav active={active as NavActiveKey | undefined} />}
@@ -132,6 +134,10 @@ export async function AppHeader({
         )}
       </div>
     </header>
+    {userInfo && (
+      <MobileTabBar active={active as NavActiveKey | undefined} />
+    )}
+    </>
   );
 }
 
