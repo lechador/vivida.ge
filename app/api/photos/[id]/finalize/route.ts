@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { profilePhotos } from "@/db/schema";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
-import { objectExists } from "@/lib/r2";
+import { objectExistsDetailed } from "@/lib/r2";
 
 /**
  * Confirm a successful upload — verifies the object exists in R2 and flips
@@ -36,10 +36,32 @@ export async function POST(
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  const exists = await objectExists(photo.key);
-  if (!exists) {
+  // R2 is normally strongly consistent, but read-after-write can lag a
+  // few hundred ms on the edge. Try up to 3 times with brief backoff
+  // before giving up so a transient HEAD miss doesn't fail the upload.
+  let lastResult: Awaited<ReturnType<typeof objectExistsDetailed>> | null = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt > 0) await new Promise((r) => setTimeout(r, 250 * attempt));
+    lastResult = await objectExistsDetailed(photo.key);
+    if (lastResult.ok) break;
+    if (lastResult.reason === "error") {
+      // Auth / CORS / network — retrying won't help, log and bail.
+      console.error("[photos/finalize] HeadObject error", {
+        key: photo.key,
+        detail: lastResult.detail,
+      });
+      return NextResponse.json(
+        { error: "head_failed", detail: lastResult.detail },
+        { status: 500 }
+      );
+    }
+  }
+  if (!lastResult?.ok) {
+    console.warn("[photos/finalize] object missing after retries", {
+      key: photo.key,
+    });
     return NextResponse.json(
-      { error: "object_missing" },
+      { error: "object_missing", key: photo.key },
       { status: 400 }
     );
   }

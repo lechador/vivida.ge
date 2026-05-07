@@ -79,7 +79,19 @@ export async function deleteObject(key: string): Promise<void> {
   );
 }
 
-export async function objectExists(key: string): Promise<boolean> {
+export type ObjectExistsResult =
+  | { ok: true }
+  | { ok: false; reason: "not_found" | "error"; detail?: string };
+
+/**
+ * HeadObject probe with diagnostic detail. Distinguishes a real 404 from
+ * an auth / network / config error so finalize can log something useful
+ * when an upload "vanishes." Older callers expecting a boolean can use
+ * `objectExists()` which preserves the original signature.
+ */
+export async function objectExistsDetailed(
+  key: string
+): Promise<ObjectExistsResult> {
   try {
     await client().send(
       new HeadObjectCommand({
@@ -87,10 +99,24 @@ export async function objectExists(key: string): Promise<boolean> {
         Key: key,
       })
     );
-    return true;
-  } catch {
-    return false;
+    return { ok: true };
+  } catch (err) {
+    const e = err as { name?: string; $metadata?: { httpStatusCode?: number }; message?: string };
+    const status = e?.$metadata?.httpStatusCode;
+    if (status === 404 || e?.name === "NotFound" || e?.name === "NoSuchKey") {
+      return { ok: false, reason: "not_found" };
+    }
+    return {
+      ok: false,
+      reason: "error",
+      detail: `${e?.name ?? "Error"}: ${e?.message ?? "unknown"} (status=${status ?? "n/a"})`,
+    };
   }
+}
+
+export async function objectExists(key: string): Promise<boolean> {
+  const r = await objectExistsDetailed(key);
+  return r.ok;
 }
 
 export function publicUrlFor(key: string): string {

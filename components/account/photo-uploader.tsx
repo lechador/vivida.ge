@@ -134,7 +134,21 @@ export function PhotoUploader({
         method: "POST",
       });
       if (!finalRes.ok) {
-        throw new Error("ვერ დადასტურდა ატვირთვა");
+        // Surface the server-side reason so we know whether R2 said the
+        // object is missing, the HEAD probe blew up on auth, etc. The
+        // user-facing message stays Georgian; the diagnostic goes to
+        // the console for ops to read.
+        const data = (await finalRes.json().catch(() => null)) as {
+          error?: string;
+          detail?: string;
+          key?: string;
+        } | null;
+        console.error("[photo-upload] finalize failed", {
+          status: finalRes.status,
+          ...data,
+        });
+        const reason = data?.error ?? `${finalRes.status}`;
+        throw new Error(`ვერ დადასტურდა ატვირთვა (${reason})`);
       }
 
       finishLocal({ id: photoId, url: publicUrl, ready: true });
