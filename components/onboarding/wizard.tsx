@@ -12,17 +12,19 @@ import { StepDate, validateDate } from "./step-date";
 import { StepTime, validateTime } from "./step-time";
 import { StepPlace } from "./step-place";
 import { StepVisibility, validateVisibility } from "./step-visibility";
+import { StepPhotos } from "./step-photos";
 import type { Profile } from "@/db/schema";
 import type { GeocodeResult } from "@/lib/geocoding";
 import { suggestUsername } from "@/lib/profile-utils";
 import type { WizardData } from "./types";
 
-type StepName = "date" | "time" | "place" | "visibility";
+type StepName = "date" | "time" | "place" | "visibility" | "photos";
 const FULL_STEPS: readonly StepName[] = [
   "date",
   "time",
   "place",
   "visibility",
+  "photos",
 ] as const;
 
 type Direction = 1 | -1;
@@ -85,9 +87,14 @@ export function OnboardingWizard({
   // — see actions/profile.ts). When the user comes back to edit, hide the
   // date step entirely so they don't waste time on a read-only field, and
   // surface a one-line lock notice on the first remaining step instead.
+  // The photos step is also first-run only — returning users manage photos
+  // from /account, not from this wizard.
   const dateLocked = !!initialProfile?.dateOfBirth;
   const STEPS = useMemo<readonly StepName[]>(
-    () => (dateLocked ? FULL_STEPS.filter((s) => s !== "date") : FULL_STEPS),
+    () =>
+      dateLocked
+        ? FULL_STEPS.filter((s) => s !== "date" && s !== "photos")
+        : FULL_STEPS,
     [dateLocked]
   );
 
@@ -119,6 +126,7 @@ export function OnboardingWizard({
     if (currentStep === "time") return validateTime(data.time).ok;
     if (currentStep === "place") return data.place !== null;
     if (currentStep === "visibility") return validateVisibility(data.visibility);
+    if (currentStep === "photos") return true; // photos are optional
     return false;
   }, [currentStep, data]);
 
@@ -219,6 +227,7 @@ export function OnboardingWizard({
                 defaultName={defaultName}
               />
             )}
+            {currentStep === "photos" && <StepPhotos />}
           </motion.div>
         </AnimatePresence>
 
