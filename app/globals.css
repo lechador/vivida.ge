@@ -151,19 +151,25 @@
 
     /*
      * Radix dropdowns / dialogs use react-remove-scroll for scroll lock,
-     * which injects a runtime <style> setting:
-     *   body[data-scroll-locked] { margin-right: <scrollbar>px !important }
-     * (default gapMode='margin') to compensate for the disappearing
-     * scrollbar. With `scrollbar-gutter: stable` on html the scrollbar
-     * gutter is already reserved, so that compensating margin shoves
-     * the centered header ~17px to the left every time a menu opens.
+     * which injects a runtime <style> rule keyed on
+     * body[data-scroll-locked] that:
+     *   - sets padding-left/right/top to whatever the body's MARGIN
+     *     values were (default gapMode='margin'). Body has 0 margin,
+     *     so this *resets* our padding-left:14rem to 0px, jamming the
+     *     entire layout 252px to the left.
+     *   - adds margin-right:<scrollbar>px !important to compensate for
+     *     the disappearing scrollbar, which our scrollbar-gutter:stable
+     *     already handles — so it just shoves things another 17px left.
      *
      * Higher specificity (body[data-scroll-locked]:has(...)) plus
-     * !important wins against the lib's injected rule.
+     * !important on every property the lib touches keeps the layout
+     * stable across open/close.
      */
     body[data-scroll-locked]:has([data-desktop-sidebar]) {
-      margin-right: 0 !important;
+      padding-left: 14rem !important;
       padding-right: 0 !important;
+      margin-right: 0 !important;
+      margin-left: 0 !important;
     }
   }
   ::selection {
