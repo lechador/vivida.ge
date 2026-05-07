@@ -102,21 +102,39 @@ export async function POST(req: Request) {
       publicUrl: url,
     });
   } catch (err) {
-    // Vercel was returning an empty 500 body, hiding what actually broke
-    // (R2 client misconfig, SDK throw, DB hiccup). Surface the message
-    // so the next failed upload tells us the root cause.
-    const e = err as { name?: string; message?: string };
+    // Surface the underlying Postgres / R2 error. Drizzle wraps the real
+    // cause in `err.cause` and just shows "Failed query: …" on the top
+    // message — that hides FK / unique / type violations. Walk the chain
+    // and stitch a useful detail string.
+    const detail = describeError(err);
     console.error("[photos/upload-url] failed", {
-      name: e?.name,
-      message: e?.message,
-      stack: (err as Error)?.stack?.split("\n").slice(0, 4).join("\n"),
+      detail,
+      stack: (err as Error)?.stack?.split("\n").slice(0, 6).join("\n"),
     });
     return NextResponse.json(
-      {
-        error: "presign_failed",
-        detail: `${e?.name ?? "Error"}: ${e?.message ?? "unknown"}`,
-      },
+      { error: "presign_failed", detail },
       { status: 500 }
     );
   }
+}
+
+function describeError(err: unknown): string {
+  const parts: string[] = [];
+  let cur: unknown = err;
+  let depth = 0;
+  while (cur && depth < 4) {
+    const e = cur as {
+      name?: string;
+      message?: string;
+      code?: string;
+      cause?: unknown;
+    };
+    const name = e.name ?? "Error";
+    const code = e.code ? ` [${e.code}]` : "";
+    const msg = e.message ?? "";
+    parts.push(`${name}${code}: ${msg}`);
+    cur = e.cause;
+    depth += 1;
+  }
+  return parts.join(" · cause: ");
 }
