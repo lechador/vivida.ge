@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { recordVisit } from "@/lib/activity";
@@ -11,10 +11,11 @@ import { recordVisit } from "@/lib/activity";
  * Server-side helper for protected pages.
  * Returns the session user or redirects to "/" if not signed in. Also
  * verifies the session's userId still exists in the DB — a JWT cookie
- * can outlive the user row (admin deletes the account, Neon gets reset,
- * etc), and any subsequent insert FK-violates against `users.id`. When
- * we detect a stale session we force sign-out and redirect home so the
- * user gets a clean state instead of a wedged onboarding page.
+ * can outlive its users row (admin deletes the account, Neon gets
+ * reset), and any subsequent insert FK-violates against users.id. When
+ * we detect a stale session we redirect to /api/auth/signout so the
+ * cookie gets cleared properly (Server Components can't mutate cookies
+ * directly, so calling signOut() here would throw).
  *
  * Side effect: schedules a deferred `recordVisit()` write so the admin
  * panel knows which days each user came back. The write happens after
@@ -34,11 +35,10 @@ export async function requireUser() {
     .limit(1);
   if (!row) {
     console.warn(
-      "[requireUser] stale session — userId not in DB, signing out",
+      "[requireUser] stale session — userId not in DB, redirecting to signout",
       { userId }
     );
-    await signOut({ redirect: false });
-    redirect("/");
+    redirect("/api/auth/signout?callbackUrl=/");
   }
 
   after(() => recordVisit(userId));
