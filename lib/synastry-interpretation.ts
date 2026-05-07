@@ -259,10 +259,13 @@ export function aspectBreakdown(asp: SynastryAspect): AspectBreakdown {
 type Tier = "excellent" | "strong" | "good" | "mixed" | "challenging";
 
 function tierFromScore(score: number): Tier {
-  if (score >= 85) return "excellent";
-  if (score >= 70) return "strong";
-  if (score >= 55) return "good";
-  if (score >= 40) return "mixed";
+  // Re-anchored to the new neutral=48 spread so each tier corresponds
+  // to a real qualitative range — no more "70%" pairs reading as if
+  // they're already in the strong band.
+  if (score >= 78) return "excellent";
+  if (score >= 64) return "strong";
+  if (score >= 50) return "good";
+  if (score >= 36) return "mixed";
   return "challenging";
 }
 
@@ -355,19 +358,18 @@ export function splitByValence(aspects: SynastryAspect[]): AspectGroup {
 }
 
 export function overallNarrative(percent: number): string {
-  // Thresholds mirror overallVerdict() in lib/synastry.ts — keep them
-  // in sync. Two extra tiers at the bottom reflect the wider spread.
-  if (percent >= 92)
+  // Thresholds mirror overallVerdict() in lib/synastry.ts — keep in sync.
+  if (percent >= 88)
     return "ცის რუკები ერთიანი ნაკადით ხვდებიან — იშვიათი, ღრმა რეზონანსი.";
-  if (percent >= 84)
+  if (percent >= 78)
     return "კავშირი ბუნებრივად მუშაობს — გასაკვირი არ იქნება, თუ ერთმანეთს კარგად გრძნობთ.";
-  if (percent >= 74)
+  if (percent >= 66)
     return "ძლიერი საფუძველი არის — დრო და სიფრთხილე გააძლიერებს ბმას.";
-  if (percent >= 62)
+  if (percent >= 55)
     return "კარგი პოტენციალი — როცა მცდელობას არ ეშინია, კავშირი ცოცხლდება.";
-  if (percent >= 50)
+  if (percent >= 43)
     return "ცოცხალი დინამიკა, განსხვავებებითაც — ეს კავშირს არ ანდგრევს, აფერად-აქცევს.";
-  if (percent >= 38)
+  if (percent >= 30)
     return "გამოწვევაა, რომელშიც ზრდა იმალება — ცნობიერი მუშაობით კავშირი მოულოდნელად ღრმავდება.";
   return "ხახუნიანი ენერგია — ბევრი წინააღმდეგობა, მაგრამ ვინც ერთად გადარჩება, ერთმანეთს ბოლომდე გაიცნობს.";
 }

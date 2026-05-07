@@ -56,14 +56,15 @@ const CATEGORY_BODIES: Record<SynastryCategory, Set<string>> = {
 };
 
 /** Per-aspect "valence" — how much positive (or negative) signal it carries.
- *  Squares and oppositions still create connection (often passionate), so
- *  we score them mildly negative rather than zeroing them out. */
+ *  Squares and oppositions are real friction, not just "passion lite" —
+ *  scored honestly negative so a chart full of hard aspects can drag the
+ *  number into the 20s the way it should. */
 const ASPECT_VALENCE: Record<AspectKind, number> = {
   conjunction: 0.85,
   trine: 1.0,
   sextile: 0.65,
-  square: -0.25,
-  opposition: -0.15,
+  square: -0.55,
+  opposition: -0.45,
 };
 
 /** Big-three weighting — Sun, Moon, and Ascendant carry the most personal
@@ -120,21 +121,26 @@ const PAIR_MAGNIFIER: Record<string, number> = {
 
 /**
  * House overlay scoring: when a body from chart A falls into a house in
- * chart B, the relationship picks up that house's signature. Values are
- * "category boost units" added to the raw category sum.
+ * chart B, the relationship picks up that house's signature. Both
+ * positive AND negative — overlays into the 6th and 12th houses are
+ * real friction astrologically (service-mode / hidden) and their absence
+ * shouldn't be scored as neutral.
  */
 const HOUSE_OVERLAY: Record<
   number,
   Partial<Record<SynastryCategory, number>>
 > = {
-  1: { love: 0.45, chemistry: 0.4, friendship: 0.3 }, // identity / attraction
-  3: { communication: 0.45, friendship: 0.2 },
-  4: { love: 0.3, friendship: 0.2, growth: 0.2 }, // home / roots
-  5: { love: 0.6, chemistry: 0.5, friendship: 0.2 }, // romance / play
-  7: { love: 0.7, friendship: 0.45, communication: 0.3 }, // partnership
-  8: { love: 0.4, chemistry: 0.7, growth: 0.45 }, // intimacy / transformation
-  9: { growth: 0.45, friendship: 0.25, communication: 0.2 }, // shared horizons
-  11: { friendship: 0.65, growth: 0.3, communication: 0.3 }, // friendship / dreams
+  1: { love: 0.25, chemistry: 0.2, friendship: 0.18 }, // identity / attraction
+  3: { communication: 0.25, friendship: 0.12 },
+  4: { love: 0.18, friendship: 0.12, growth: 0.12 }, // home / roots
+  5: { love: 0.3, chemistry: 0.28, friendship: 0.12 }, // romance / play
+  6: { love: -0.2, chemistry: -0.15 }, // service / work-mode (cold for romance)
+  7: { love: 0.35, friendship: 0.22, communication: 0.18 }, // partnership
+  8: { love: 0.22, chemistry: 0.35, growth: 0.22 }, // intimacy / transformation
+  9: { growth: 0.25, friendship: 0.15, communication: 0.12 }, // shared horizons
+  10: { growth: 0.22, friendship: -0.08 }, // public-facing, less buddy
+  11: { friendship: 0.32, growth: 0.15, communication: 0.18 }, // friendship / dreams
+  12: { love: -0.1, friendship: -0.18, communication: -0.22 }, // hidden / isolating
 };
 
 /** Bodies whose house-overlay placement we score. We don't bother with
@@ -152,14 +158,16 @@ const OVERLAY_BODY_WEIGHT: Record<string, number> = {
 };
 
 /** Elemental affinity between the two Suns (and Moons). Classical:
- *  same element resonates, fire+air and earth+water flow, the two
- *  cross-pairs friction. Values are added to all categories with a
- *  small uniform weight. */
+ *  same element resonates, fire+air and earth+water flow, cross-pairs
+ *  friction. Friction values are now substantial (-0.4 ish) so an
+ *  Aries × Cancer pair really does feel the elemental clash in the
+ *  number, instead of the imbalance being papered over by other
+ *  positives. */
 const ELEMENT_AFFINITY: Record<string, Record<string, number>> = {
-  fire: { fire: 0.55, air: 0.7, earth: -0.15, water: -0.05 },
-  earth: { earth: 0.55, water: 0.7, fire: -0.15, air: -0.05 },
-  air: { air: 0.55, fire: 0.7, water: -0.15, earth: -0.05 },
-  water: { water: 0.55, earth: 0.7, air: -0.15, fire: -0.05 },
+  fire: { fire: 0.5, air: 0.7, earth: -0.45, water: -0.3 },
+  earth: { earth: 0.5, water: 0.7, fire: -0.45, air: -0.3 },
+  air: { air: 0.5, fire: 0.7, water: -0.3, earth: -0.45 },
+  water: { water: 0.5, earth: 0.7, air: -0.45, fire: -0.3 },
 };
 
 const ELEMENT_BY_SIGN: Array<"fire" | "earth" | "air" | "water"> = [
@@ -378,13 +386,17 @@ export function computeSynastry(
     elementPoints += sBoost + mBoost;
   }
 
-  // ── 4. Normalise to 22–98 % via tanh ──────────────────────────────
-  // Divisor is 5 now (was 3) because the new components push raw values
-  // higher; this keeps the spread roughly the same.
+  // ── 4. Normalise to 12–95 % via tanh ──────────────────────────────
+  // Center at 48 so a chart pair with no signal lands slightly below
+  // neutral (real synastry is rarely "totally neutral" — absence of
+  // resonance IS friction). Amplitude 44 with divisor 7 gives a wide
+  // realistic spread: 12% for genuinely hostile pairs, 95% as the cap
+  // (no chart is ever exactly perfect), and the typical pair lands
+  // somewhere in 35–80 instead of clustering at the high end.
   const scores = {} as Record<SynastryCategory, number>;
   for (const cat of CATEGORIES) {
-    const norm = 60 + 38 * Math.tanh(raw[cat] / 5);
-    scores[cat] = Math.max(22, Math.min(98, Math.round(norm)));
+    const norm = 48 + 44 * Math.tanh(raw[cat] / 7);
+    scores[cat] = Math.max(12, Math.min(95, Math.round(norm)));
   }
 
   const overall = Math.round(
@@ -468,15 +480,15 @@ export const HOUSE_LABEL_KA: Record<number, string> = {
   12: "მე-12 — შინაგანი სამყარო",
 };
 
-/** Human-friendly verdict for an overall percentage. Thresholds calibrated
- *  for the wide-spread curve — top tier reserved for the rare, bottom
- *  tier honest about real friction. */
+/** Human-friendly verdict for an overall percentage. Thresholds re-anchored
+ *  around the new neutral=48 curve so each band reflects a real qualitative
+ *  shift instead of stacking near the top. */
 export function overallVerdict(percent: number): string {
-  if (percent >= 92) return "ციური ბმა";
-  if (percent >= 84) return "ძლიერი თავსებადობა";
-  if (percent >= 74) return "ბუნებრივი ნაკადი";
-  if (percent >= 62) return "კარგი პოტენციალი";
-  if (percent >= 50) return "ცოცხალი დინამიკა";
-  if (percent >= 38) return "გამოწვევა, რომელშიც ზრდაა";
+  if (percent >= 88) return "ციური ბმა";
+  if (percent >= 78) return "ძლიერი თავსებადობა";
+  if (percent >= 66) return "ბუნებრივი ნაკადი";
+  if (percent >= 55) return "კარგი პოტენციალი";
+  if (percent >= 43) return "ცოცხალი დინამიკა";
+  if (percent >= 30) return "გამოწვევა, რომელშიც ზრდაა";
   return "ხახუნიანი კავშირი";
 }
