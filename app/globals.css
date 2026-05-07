@@ -143,16 +143,26 @@
    * content right by the sidebar width so the fixed-position rail
    * doesn't overlap page content. Same automatic-via-:has() pattern as
    * the mobile rule above.
-   *
-   * `padding-right: 0 !important` cancels react-remove-scroll's inline
-   * compensation that Radix dropdowns/dialogs add on open. With
-   * `scrollbar-gutter: stable` on html the gutter is already reserved,
-   * so the extra body padding is redundant and was visibly shifting
-   * the centered AppHeader left by ~17px every time a menu opened.
    */
   @media (min-width: 1024px) {
     body:has([data-desktop-sidebar]) {
       padding-left: 14rem; /* matches w-56 on the sidebar */
+    }
+
+    /*
+     * Radix dropdowns / dialogs use react-remove-scroll for scroll lock,
+     * which injects a runtime <style> setting:
+     *   body[data-scroll-locked] { margin-right: <scrollbar>px !important }
+     * (default gapMode='margin') to compensate for the disappearing
+     * scrollbar. With `scrollbar-gutter: stable` on html the scrollbar
+     * gutter is already reserved, so that compensating margin shoves
+     * the centered header ~17px to the left every time a menu opens.
+     *
+     * Higher specificity (body[data-scroll-locked]:has(...)) plus
+     * !important wins against the lib's injected rule.
+     */
+    body[data-scroll-locked]:has([data-desktop-sidebar]) {
+      margin-right: 0 !important;
       padding-right: 0 !important;
     }
   }
