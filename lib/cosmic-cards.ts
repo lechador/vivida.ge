@@ -1,81 +1,43 @@
 /**
- * Daily "ცის ბანქო" — the playful one-tap card on the dashboard.
- * One per user per day, deterministic so the same card stays visible all
- * day and a fresh one appears at midnight. Pure data — the UI does the
- * flip animation + streak display in components/dashboard/cosmic-card.tsx.
+ * The dashboard "ცის ბანქო" — daily flip card backed by real astro data.
+ *
+ * Three resolution paths, in order:
+ *
+ *   1. AI forecast: if a cached weekly forecast exists with today's row,
+ *      use the AI-generated headline + advice. Pro path.
+ *   2. Compute fallback: deterministically score today's transits against
+ *      the user's natal chart (no AI). Picks a tilt-appropriate message
+ *      from a small pool seeded by (userId, date) so it's consistent all
+ *      day but varies tomorrow.
+ *   3. Pure fallback: no natal chart yet (e.g., onboarding incomplete).
+ *      Lightweight gentle nudge with no astro grounding.
  */
 
+import { eq } from "drizzle-orm";
+
+import { db } from "@/db";
+import { profiles, weeklyForecasts } from "@/db/schema";
+import type { NatalChartJson } from "@/db/schema";
+import { computeWeeklyForecast } from "./weekly-forecast";
+import { ensureChartFor } from "@/actions/chart";
+
+export type CosmicCardTilt = "harmonic" | "challenging" | "balanced";
+
 export type CosmicCard = {
-  id: number;
+  /** Tone label that drives accent color in the UI. */
+  tilt: CosmicCardTilt;
   emoji: string;
-  /** Single Georgian sentence — short enough to read at a glance, vivid
-   *  enough to be its own little ritual. */
-  text: string;
-  /** Tone tag — drives the card's accent color in the UI. */
-  tone: "love" | "growth" | "rest" | "action" | "mystery" | "gratitude";
+  /** Small caption above the body — e.g. "მთვარე სასწორში · ჰარმონიული დღე". */
+  caption: string;
+  /** Main message — 1-2 sentences. */
+  body: string;
+  /** Where the message came from, for telemetry / debug. */
+  source: "ai" | "compute" | "fallback";
+  /** Optional one-line advice on top of the body (AI path only). */
+  advice?: string;
+  /** Moon sign in Georgian if known. */
+  moonSignKa: string | null;
 };
-
-const CARDS: CosmicCard[] = [
-  // ── love (warm pink) ──────────────────────────────────────────────
-  { id: 1, emoji: "💞", tone: "love",
-    text: "ერთი წერილი, რომელიც ცოცხალი არ წაგიგზავნია — დღეს კარგი დრო გაქვს." },
-  { id: 2, emoji: "🌹", tone: "love",
-    text: "ვინც დღეს გელოდება, ცას უსმენდა და შენზე ფიქრობდა." },
-  { id: 3, emoji: "💌", tone: "love",
-    text: "მცირე ფლირტი, მცირე ღიმილი, მცირე გაბედვა — ცას სამივე უყვარს დღეს." },
-  { id: 4, emoji: "🪞", tone: "love",
-    text: "გული შენ გხედავს უკეთ, ვიდრე სარკე. დღეს მიხედე." },
-
-  // ── growth (cyan) ────────────────────────────────────────────────
-  { id: 5, emoji: "🌱", tone: "growth",
-    text: "მცირე გადაწყვეტილება დიდი ცვლილების ფესვია — ნუ უკარგავ მნიშვნელობას." },
-  { id: 6, emoji: "🪴", tone: "growth",
-    text: "ერთი ნაბიჯი გადადგი იქით, სადაც გული გეუბნება — ცა გხვდება." },
-  { id: 7, emoji: "🧭", tone: "growth",
-    text: "გადაწყვეტა, რომელიც გვერდზე გქონდა, დღეს უცებ აშკარა იქცევა." },
-  { id: 8, emoji: "🌊", tone: "growth",
-    text: "შეფერხება დღეს არ არის წინააღმდეგობა — ცის მცირე შეჩერებაა, უკეთესი მომართო." },
-
-  // ── rest (lavender) ──────────────────────────────────────────────
-  { id: 9, emoji: "🌙", tone: "rest",
-    text: "თუ გრძნობ, რომ უცაოდ მოგწყინდა — ეს არ არის სიზარმაცე, ეს მთვარის ფაზა." },
-  { id: 10, emoji: "🛌", tone: "rest",
-    text: "ენერგია დღეს ნელია — მცირე საქმე გააკეთე და მერე დაისვენე." },
-  { id: 11, emoji: "🕯️", tone: "rest",
-    text: "სიჩუმე დღეს არ არის სიცარიელე — შენიშვნაა." },
-  { id: 12, emoji: "☁️", tone: "rest",
-    text: "შენი მთვარე ლაქად ფიქრობს — შენი დილის გადაწყვეტა ყველაზე სუფთა იქნება." },
-
-  // ── action (orange) ──────────────────────────────────────────────
-  { id: 13, emoji: "⚡", tone: "action",
-    text: "მცირე საქმე ნუ გადადებ — დღეს ეს მცირე საქმე ბევრს ნიშნავს." },
-  { id: 14, emoji: "🎯", tone: "action",
-    text: "შეცდომის შიში დღეს უფრო ძვირი გიჯდება, ვიდრე თვითონ შეცდომა." },
-  { id: 15, emoji: "🚀", tone: "action",
-    text: "ერთი მცირე ნაბიჯი წინ — დიდი ცვლილების მთიანი წყაროა." },
-  { id: 16, emoji: "🔥", tone: "action",
-    text: "მზე და მთვარე დღეს ერთად მუშაობენ — შენიც ერთად იმუშავე." },
-
-  // ── mystery (violet) ─────────────────────────────────────────────
-  { id: 17, emoji: "🔮", tone: "mystery",
-    text: "ცა დღეს ერთ მცირე საიდუმლოს აჩვენებს — ვინც გესმის, ის გრძნობს." },
-  { id: 18, emoji: "👁️", tone: "mystery",
-    text: "ახალი იდეა შენთან მოვა იქიდან, საიდანაც არ ელოდი. ღია იყავი." },
-  { id: 19, emoji: "✨", tone: "mystery",
-    text: "ცა დღეს ერთ ფანჯარას გხსნის — შენ მხოლოდ შემოხვალ." },
-  { id: 20, emoji: "🌌", tone: "mystery",
-    text: "ვინც დღეს გაიცნო, ალბათ ცის რუკაში უკვე გელოდა." },
-
-  // ── gratitude (gold) ─────────────────────────────────────────────
-  { id: 21, emoji: "🌟", tone: "gratitude",
-    text: "მცდელობა სავსე, შედეგი ცარიელი? ცა მცდელობის ფასს გაჩვენებს მოგვიანებით." },
-  { id: 22, emoji: "🤍", tone: "gratitude",
-    text: "მცირე ჟესტი დიდ ცვლილებას იწვევს. გაუგზავნე ვიღაცას ის სიტყვა, რომელიც ნახევარდრო წერი." },
-  { id: 23, emoji: "🎁", tone: "gratitude",
-    text: "ერთი წერილი დღეს — ცას გადასცემს ის, რასაც სხვათათვის ვერ ეუბნები." },
-  { id: 24, emoji: "🌻", tone: "gratitude",
-    text: "დღეს ვინც გაიღიმებს, შენ ხარ. გადაიტანე ეს ღიმილი ერთ ადამიანამდე." },
-];
 
 /** FNV-1a 32-bit string hash — small, deterministic, no deps. */
 function hash(s: string): number {
@@ -87,18 +49,146 @@ function hash(s: string): number {
   return h;
 }
 
-/** Pick today's card for this user. Same answer all day; new card at
- *  midnight in the user's local timezone. */
-export function pickCardFor(userId: string, dateLocal: string): CosmicCard {
-  const idx = hash(`${userId}|${dateLocal}`) % CARDS.length;
-  return CARDS[idx];
+const HARMONIC_LINES = [
+  "ენერგია გაშლილია — დღეს დაიწყე ის, რასაც სხვა დღეს გადადებდი.",
+  "ცა შენ გხვდება — გული მცირე ნაბიჯისთვის გელის.",
+  "მცირე საქმე დღეს დიდს ფასობს — ფასი მერე მოვა, მცდელობა ახლა.",
+  "ნაკადია — ვინც დღეს გელოდება, ადვილად ხვდები.",
+  "სიხალისე ხელის ქვეშაა — ერთი ღია საუბარი ცას ცოცხლავს.",
+  "გული ხილული ენით ლაპარაკობს — დღეს ვინც გესმის, შენი ცაა.",
+];
+const CHALLENGING_LINES = [
+  "დღეს ცოტა შეჩერდი — სიჩქარე ფასს კარგავს, სიფრთხილე ფასობს.",
+  "დაძაბულობა ერთი მცირე ჯიუტი მოლოდინიდან მოდის — შეცვალე და დაცხრება.",
+  "ცა გხვდება, მაგრამ უნდა გადახარისხო პრიორიტეტი — სხვისი საქმე ჯერ კიდევ არ შენია.",
+  "დაბალი ენერგიის დღე — მხოლოდ ერთი მცირე საქმე გააკეთე.",
+  "სხვისი ემოცია არ წაიღო — დღეს გული მგრძნობიარეა, ფარი დაიდე.",
+  "გადაწყვეტა ნუ ერგება დღეს — ხვალ უფრო სუფთად დაინახავ.",
+];
+const BALANCED_LINES = [
+  "შერეული ცა — ნახევარი ნაკადი, ნახევარი დაკავშირება. დღეს რიტმი შენ ახდი.",
+  "თხელი ხაზი ცას შორის — მიენდე ინტუიციას, არა მოლოდინს.",
+  "ენერგია ცვალებადია — გრძნობას ენდე, არ აიძულო.",
+  "ცის ნელი დღეა — ფიქრი მნიშვნელოვანია, მოქმედება — სელექციური.",
+  "ერთი ნაბიჯი წინ, ერთი უკან — ჯერ კიდევ ვიხილავთ, რომელი მართალი იქნება.",
+  "სიმშვიდე საქმეს არ გამორიცხავს — დღეს ერთი მცირე გადაწყვეტა საკმარისია.",
+];
+
+const TILT_EMOJI: Record<CosmicCardTilt, string[]> = {
+  harmonic: ["🌟", "💞", "✨", "🌻", "🪴"],
+  challenging: ["🌒", "🌪️", "🛡️", "🕯️", "🧭"],
+  balanced: ["☯️", "🌗", "🤍", "🪶", "🌙"],
+};
+
+const TILT_LABEL: Record<CosmicCardTilt, string> = {
+  harmonic: "ჰარმონიული დღე",
+  challenging: "გამოწვევის დღე",
+  balanced: "შერეული დღე",
+};
+
+function tiltFromScores(harmony: number, challenge: number): CosmicCardTilt {
+  const total = harmony + challenge;
+  if (total <= 0.001) return "balanced";
+  const tilt = (harmony - challenge) / total;
+  if (tilt > 0.18) return "harmonic";
+  if (tilt < -0.18) return "challenging";
+  return "balanced";
 }
 
-export const COSMIC_CARD_TONE_COLOR: Record<CosmicCard["tone"], string> = {
-  love: "oklch(0.72 0.22 350)",
-  growth: "oklch(0.78 0.18 200)",
-  rest: "oklch(0.75 0.14 285)",
-  action: "oklch(0.78 0.20 50)",
-  mystery: "oklch(0.65 0.24 305)",
-  gratitude: "oklch(0.82 0.16 80)",
+function pickFromPool<T>(pool: T[], seed: number): T {
+  return pool[seed % pool.length];
+}
+
+export async function buildCosmicCard(
+  userId: string,
+  dateLocal: string
+): Promise<CosmicCard> {
+  const seed = hash(`${userId}|${dateLocal}`);
+
+  // ── Path 1: cached AI forecast ────────────────────────────────────
+  try {
+    const [forecast] = await db
+      .select()
+      .from(weeklyForecasts)
+      .where(eq(weeklyForecasts.userId, userId))
+      .limit(1);
+
+    if (forecast?.days?.length) {
+      const today = forecast.days.find((d) => d.dateIso === dateLocal);
+      if (today && (today.headline || today.advice)) {
+        const tilt = tiltFromScores(today.harmonyScore, today.challengeScore);
+        return {
+          tilt,
+          emoji: pickFromPool(TILT_EMOJI[tilt], seed),
+          caption: `მთვარე ${today.moonSignKa}-ში · ${TILT_LABEL[tilt]}`,
+          body:
+            today.headline ||
+            pickFromPool(linePoolFor(tilt), seed),
+          advice: today.advice || undefined,
+          source: "ai",
+          moonSignKa: today.moonSignKa,
+        };
+      }
+    }
+  } catch {
+    // Swallow — drop to compute path
+  }
+
+  // ── Path 2: deterministic compute (no AI) ─────────────────────────
+  try {
+    const [profile] = await db
+      .select({ tz: profiles.timezone })
+      .from(profiles)
+      .where(eq(profiles.userId, userId))
+      .limit(1);
+    if (profile?.tz) {
+      const chart = await ensureChartFor(userId, "free");
+      if (chart?.data) {
+        const ctx = computeWeeklyForecast(
+          chart.data as NatalChartJson,
+          new Date(),
+          profile.tz
+        );
+        const today = ctx[0];
+        if (today) {
+          const tilt = tiltFromScores(
+            today.harmonyScore,
+            today.challengeScore
+          );
+          return {
+            tilt,
+            emoji: pickFromPool(TILT_EMOJI[tilt], seed),
+            caption: `მთვარე ${today.moonSignKa}-ში · ${TILT_LABEL[tilt]}`,
+            body: pickFromPool(linePoolFor(tilt), seed),
+            source: "compute",
+            moonSignKa: today.moonSignKa,
+          };
+        }
+      }
+    }
+  } catch {
+    // Drop to fallback
+  }
+
+  // ── Path 3: pure fallback (onboarding incomplete) ─────────────────
+  return {
+    tilt: "balanced",
+    emoji: "✨",
+    caption: "ცის რიტმი",
+    body: pickFromPool(BALANCED_LINES, seed),
+    source: "fallback",
+    moonSignKa: null,
+  };
+}
+
+function linePoolFor(tilt: CosmicCardTilt): string[] {
+  if (tilt === "harmonic") return HARMONIC_LINES;
+  if (tilt === "challenging") return CHALLENGING_LINES;
+  return BALANCED_LINES;
+}
+
+export const COSMIC_TILT_COLOR: Record<CosmicCardTilt, string> = {
+  harmonic: "oklch(0.78 0.18 200)",   // cyan
+  challenging: "oklch(0.72 0.22 350)", // pink
+  balanced: "oklch(0.65 0.24 305)",    // violet
 };

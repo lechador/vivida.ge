@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { pickCardFor } from "@/lib/cosmic-cards";
+import { buildCosmicCard } from "@/lib/cosmic-cards";
 import { getCurrentPlan } from "@/lib/plan";
 import { getUserStreak } from "@/lib/streak";
 import { Starfield } from "@/components/landing/starfield";
@@ -29,7 +29,7 @@ export default async function DashboardPage() {
   }
 
   const firstName = user.name?.split(" ")[0] ?? "ვარსკვლავო";
-  const cosmicCard = pickCardFor(user.id, streakInfo.todayLocal);
+  const cosmicCard = await buildCosmicCard(user.id, streakInfo.todayLocal);
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">

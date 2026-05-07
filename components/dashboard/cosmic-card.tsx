@@ -6,31 +6,24 @@ import { Flame, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
-  COSMIC_CARD_TONE_COLOR,
-  type CosmicCard as CosmicCardType,
+  COSMIC_TILT_COLOR,
+  type CosmicCard as CosmicCardData,
 } from "@/lib/cosmic-cards";
-
-const TONE_LABEL_KA: Record<CosmicCardType["tone"], string> = {
-  love: "გული",
-  growth: "ზრდა",
-  rest: "სიწყნარე",
-  action: "მოქმედება",
-  mystery: "ცა",
-  gratitude: "მადლიერება",
-};
 
 /**
  * Daily flip card on the dashboard. Defaults face-down; one tap reveals
- * today's message. The reveal state persists in localStorage keyed by
- * the local date so a refresh keeps the card open, and tomorrow's card
- * naturally starts face-down again at midnight.
+ * today's reading — built from the user's actual transits + moon sign,
+ * with AI advice on top when the cached weekly forecast has it. The
+ * reveal state persists in localStorage keyed by the local date so a
+ * refresh keeps the card open, and tomorrow's card naturally starts
+ * face-down again at midnight.
  */
 export function CosmicCard({
   card,
   todayLocal,
   streak,
 }: {
-  card: CosmicCardType;
+  card: CosmicCardData;
   todayLocal: string;
   streak: number;
 }) {
@@ -49,7 +42,7 @@ export function CosmicCard({
     } catch {}
   }
 
-  const accent = COSMIC_CARD_TONE_COLOR[card.tone];
+  const accent = COSMIC_TILT_COLOR[card.tilt];
 
   return (
     <article
@@ -66,7 +59,7 @@ export function CosmicCard({
             დღევანდელი ცის ბანქო
           </div>
           <h3 className="mt-1 text-balance text-base font-semibold tracking-tight sm:text-lg">
-            ერთი მცირე ჩურჩული ციდან
+            შენი დღე ცის რუკის მიხედვით
           </h3>
         </div>
         {streak > 0 && (
@@ -80,15 +73,14 @@ export function CosmicCard({
         )}
       </header>
 
-      <div
-        className="relative mx-auto"
-        style={{ perspective: "1200px" }}
-      >
+      <div className="relative mx-auto" style={{ perspective: "1200px" }}>
         <motion.button
           type="button"
           onClick={revealed ? undefined : reveal}
           aria-pressed={revealed}
-          aria-label={revealed ? "ცის ბანქო — გახსნილი" : "გახსენი ცის ბანქო"}
+          aria-label={
+            revealed ? "ცის ბანქო — გახსნილი" : "გახსენი ცის ბანქო"
+          }
           whileHover={!revealed ? { scale: 1.02, y: -2 } : undefined}
           whileTap={!revealed ? { scale: 0.98 } : undefined}
           animate={{ rotateY: revealed ? 180 : 0 }}
@@ -97,14 +89,12 @@ export function CosmicCard({
             ease: [0.22, 1, 0.36, 1],
           }}
           className={cn(
-            "relative mx-auto block aspect-[3/4] w-full max-w-[260px] cursor-default rounded-2xl",
+            "relative mx-auto block aspect-[3/4] w-full max-w-[280px] cursor-default rounded-2xl",
             !revealed && "cursor-pointer"
           )}
-          style={{
-            transformStyle: "preserve-3d",
-          }}
+          style={{ transformStyle: "preserve-3d" }}
         >
-          {/* Back face — visible while face-down */}
+          {/* Back face */}
           <span
             className="absolute inset-0 grid place-items-center overflow-hidden rounded-2xl border-2 border-[var(--vivida-violet)]/55 bg-[radial-gradient(circle_at_50%_30%,oklch(0.30_0.16_305/0.6),oklch(0.15_0.06_290/0.95))] shadow-[0_18px_50px_-12px_oklch(0.65_0.24_305/0.55)]"
             style={{ backfaceVisibility: "hidden" }}
@@ -127,9 +117,9 @@ export function CosmicCard({
             </span>
           </span>
 
-          {/* Front face — visible after flip */}
+          {/* Front face */}
           <span
-            className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl border-2 px-5 py-6 text-center shadow-[0_18px_50px_-12px_oklch(0.65_0.24_305/0.55)]"
+            className="absolute inset-0 flex flex-col items-stretch justify-between gap-3 rounded-2xl border-2 px-5 py-5 text-left shadow-[0_18px_50px_-12px_oklch(0.65_0.24_305/0.55)]"
             style={{
               backfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
@@ -137,26 +127,51 @@ export function CosmicCard({
               background: `linear-gradient(160deg, color-mix(in oklch, ${accent} 18%, oklch(0.18 0.06 290)) 0%, oklch(0.16 0.05 290 / 0.95) 100%)`,
             }}
           >
-            <span
-              className="text-[10px] font-semibold uppercase tracking-[0.2em]"
-              style={{ color: accent }}
-            >
-              {TONE_LABEL_KA[card.tone]}
-            </span>
-            <span className="text-5xl" aria-hidden>
-              {card.emoji}
-            </span>
-            <p className="text-pretty text-sm leading-relaxed text-foreground/95">
-              {card.text}
-            </p>
+            <div className="space-y-1">
+              <div
+                className="text-[10px] font-semibold uppercase tracking-[0.18em]"
+                style={{ color: accent }}
+              >
+                {card.caption}
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center gap-2 text-center">
+              <span className="text-4xl" aria-hidden>
+                {card.emoji}
+              </span>
+              <p className="text-pretty text-sm font-medium leading-snug text-foreground/95">
+                {card.body}
+              </p>
+            </div>
+
+            {card.advice ? (
+              <div
+                className="rounded-xl border bg-background/30 px-3 py-2 text-[12px] leading-relaxed text-foreground/85"
+                style={{
+                  borderColor: `color-mix(in oklch, ${accent} 35%, transparent)`,
+                }}
+              >
+                <span style={{ color: accent }} className="mr-1 font-semibold">
+                  →
+                </span>
+                {card.advice}
+              </div>
+            ) : (
+              <div className="text-center text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                ხვალ ახალი ცა გელის
+              </div>
+            )}
           </span>
         </motion.button>
       </div>
 
       <p className="relative mt-4 text-center text-[11px] text-muted-foreground/85">
         {revealed
-          ? "ხვალ ახალი ცა გელის — დაუბრუნდი."
-          : "ერთი შეხება, ერთი მცირე ჩურჩული."}
+          ? card.source === "ai"
+            ? "AI რჩევა შენი ცის რუკიდან — ხვალ ახალს ნახავ."
+            : "შენი დღევანდელი ცა — ხვალ ახალი."
+          : "ერთი შეხება, შენი დღევანდელი ცა."}
       </p>
     </article>
   );
