@@ -35,15 +35,15 @@ const WEEKDAY_SHORT_KA: Record<string, string> = {
  * 7-day forecast card. Each day shows a stacked harmony/challenge bar and
  * a one-line headline; click to expand the per-day breakdown (why it's
  * harmonic, why it's challenging, one piece of advice, and the top driving
- * aspects). The first day defaults open since it's "today" — what most
- * users come here for.
+ * aspects). All rows start collapsed so the week reads as a glanceable
+ * list — users open the days they care about.
  */
 export function WeeklyForecastCard({
   days,
 }: {
   days: WeeklyForecastDay[];
 }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <article className="relative overflow-hidden rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
@@ -64,7 +64,7 @@ export function WeeklyForecastCard({
         <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" aria-hidden />
       </header>
 
-      <ol className="relative space-y-2">
+      <ol className="relative space-y-2.5">
         {days.map((day, i) => (
           <DayRow
             key={day.dateIso}
@@ -118,14 +118,23 @@ function DayRow({
         type="button"
         onClick={onToggle}
         className={cn(
-          "group w-full rounded-xl border border-border/60 bg-background/30 p-3 text-left transition-all hover:border-border hover:bg-background/50 sm:p-4",
-          open && "border-border bg-background/50"
+          "group w-full rounded-xl border bg-[oklch(0.21_0.04_280/0.85)] p-3 text-left transition-all hover:border-[var(--vivida-violet)]/40 hover:bg-[oklch(0.23_0.05_285/0.92)] sm:p-4",
+          open
+            ? "border-[var(--vivida-violet)]/55 bg-[oklch(0.23_0.05_285/0.95)] shadow-[0_0_24px_-8px_oklch(0.65_0.24_305/0.45)]"
+            : "border-border"
         )}
         aria-expanded={open}
       >
         <div className="flex items-start gap-3 sm:gap-4">
           {/* Date pill */}
-          <div className="flex shrink-0 flex-col items-center justify-center rounded-lg border border-border/60 bg-background/60 px-2.5 py-1.5 sm:px-3 sm:py-2">
+          <div
+            className={cn(
+              "flex shrink-0 flex-col items-center justify-center rounded-lg border px-2.5 py-1.5 transition-colors sm:px-3 sm:py-2",
+              open
+                ? "border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/15"
+                : "border-border bg-[oklch(0.27_0.05_285/0.7)]"
+            )}
+          >
             <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
               {weekShort}
             </span>
@@ -198,18 +207,18 @@ function DayRow({
 
       {/* Expanded breakdown */}
       {open && (
-        <div className="mt-1.5 grid gap-3 rounded-xl border border-border/40 bg-background/20 p-3 sm:p-4">
+        <div className="mt-2 grid gap-3 rounded-xl border border-[var(--vivida-violet)]/30 bg-[oklch(0.20_0.04_283/0.7)] p-3 sm:p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <Block
               label="ჰარმონიული"
               dotClass="bg-[var(--vivida-cyan)]"
-              borderClass="border-[var(--vivida-cyan)]/30"
+              borderClass="border-[var(--vivida-cyan)]/45"
               text={day.harmonicReason || "—"}
             />
             <Block
               label="დაძაბული"
               dotClass="bg-[var(--vivida-pink)]"
-              borderClass="border-[var(--vivida-pink)]/30"
+              borderClass="border-[var(--vivida-pink)]/45"
               text={day.challengingReason || "—"}
             />
           </div>
@@ -272,7 +281,7 @@ function Block({
   return (
     <div
       className={cn(
-        "rounded-lg border bg-background/30 px-3 py-2.5",
+        "rounded-lg border bg-[oklch(0.25_0.05_285/0.85)] px-3 py-2.5 ring-1 ring-foreground/5",
         borderClass
       )}
     >
@@ -282,7 +291,7 @@ function Block({
           {label}
         </span>
       </div>
-      <p className="text-sm leading-relaxed text-foreground/90">{text}</p>
+      <p className="text-sm leading-relaxed text-foreground/95">{text}</p>
     </div>
   );
 }
