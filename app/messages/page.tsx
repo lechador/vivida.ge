@@ -9,6 +9,7 @@ import {
   listConversations,
 } from "@/lib/messages";
 import { getCurrentPlan } from "@/lib/plan";
+import { cn } from "@/lib/utils";
 
 export const metadata = { title: "ჩატი" };
 export const dynamic = "force-dynamic";
@@ -48,7 +49,10 @@ export default async function MessagesPage({
   }));
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main
+      data-no-body-bottom-pad
+      className="relative isolate flex h-[100dvh] flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(50%_40%_at_50%_0%,oklch(0.28_0.12_300/0.4),transparent_70%)]"
@@ -57,7 +61,16 @@ export default async function MessagesPage({
 
       <AppHeader authed plan={plan} active="messages" />
 
-      <section className="relative z-10 mx-auto w-full max-w-3xl px-3 pb-6 pt-4 sm:px-6 sm:pb-8 sm:pt-6">
+      <section
+        className={cn(
+          // Mobile: full bleed under the header, with bottom padding equal
+          // to the tab bar so the input never sits behind it.
+          "relative z-10 mx-auto flex w-full min-h-0 flex-1 flex-col overflow-hidden",
+          "pb-[calc(4.5rem+max(env(safe-area-inset-bottom),0.25rem))]",
+          // Desktop: max-width card with breathing room.
+          "sm:max-w-3xl sm:px-6 sm:pb-8 sm:pt-4 lg:pb-8"
+        )}
+      >
         <ChatLauncher
           viewerId={userId}
           initialConversations={initial}

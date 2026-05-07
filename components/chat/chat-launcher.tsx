@@ -506,12 +506,18 @@ export function ChatLauncher({
   // mounting the full chat surface twice.
   if (mode === "background") return null;
 
-  // Page mode: full-bleed chat surface, no float, no animation. The
-  // /messages route renders this. ChatView/ConversationList are reused
-  // unchanged so the modal mode below stays consistent.
+  // Page mode: full-bleed on mobile (no card frame, no rounded edges,
+  // chat fills the whole viewport between the header and the bottom
+  // tab bar), card-styled on desktop. The parent <section> on /messages
+  // already constrains height + width — we just go flex-1 here.
   if (mode === "page") {
     return (
-      <div className="flex h-[calc(100dvh-9rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card/65 ring-1 ring-foreground/5 backdrop-blur-xl sm:h-[calc(100dvh-12rem)]">
+      <div
+        className={cn(
+          "flex min-h-0 flex-1 flex-col overflow-hidden",
+          "sm:rounded-2xl sm:border sm:border-border sm:bg-card/65 sm:ring-1 sm:ring-foreground/5 sm:backdrop-blur-xl"
+        )}
+      >
         {activePartner ? (
           <ChatView
             viewerId={viewerId}

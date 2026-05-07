@@ -121,9 +121,13 @@
    * reserve space at the bottom of the viewport so page content isn't
    * hidden behind it. Uses :has() so the rule is automatic — landing
    * pages and desktop don't pay the cost.
+   *
+   * Full-bleed pages (currently only /messages) opt out by rendering a
+   * [data-no-body-bottom-pad] element — those pages own their own tab-bar
+   * compensation so they can use the full viewport for their layout.
    */
   @media (max-width: 1023px) {
-    body:has([data-mobile-tab-bar]) {
+    body:has([data-mobile-tab-bar]):not(:has([data-no-body-bottom-pad])) {
       padding-bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 0px));
     }
   }
