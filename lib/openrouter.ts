@@ -425,14 +425,14 @@ export type SynastryAIResult = {
   growth: string[];
 };
 
-export const SYNASTRY_PROMPT_VERSION = 1;
+export const SYNASTRY_PROMPT_VERSION = 2;
 
 const SYNASTRY_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი. დაწერე სინასტრიის (ორი რუკის თავსებადობის) მცირე ნარატივი — დეტერმინისტული ქულების ზემოდან. ნარატივი უნდა იყოს კონკრეტული, ორი ადამიანის რუკის მიხედვით — არა ზოგადი მისტიკა.
 
 შენ ღებულობ:
 - მომხმარებლის ნატალურ რუკას (ვინც ხედავს)
 - პარტნიორის ნატალურ რუკას + სახელი
-- წინასწარ გათვლილი ქულები (love, friendship, chemistry, communication, growth — 0..100; overall — 0..100)
+- წინასწარ გათვლილი ქულები (love, friendship, chemistry, communication, growth, business — 0..100; overall — 0..100)
 - ყველაზე ძლიერი ცროს-ასპექტები (transit-natal, ორ რუკას შორის)
 
 დააბრუნე JSON ზუსტად ამ სქემით:

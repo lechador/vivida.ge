@@ -43,6 +43,7 @@ const CATEGORY_GRADIENT: Record<string, string> = {
   communication: "from-[oklch(0.75_0.16_220)] to-[oklch(0.68_0.18_250)]",
   growth: "from-[oklch(0.65_0.13_130)] to-[oklch(0.55_0.15_165)]",
   chemistry: "from-[oklch(0.7_0.22_30)] to-[oklch(0.65_0.22_15)]",
+  business: "from-[oklch(0.72_0.10_270)] to-[oklch(0.62_0.12_245)]",
 };
 
 const CATEGORY_RING_COLOR: Record<string, string> = {
@@ -51,6 +52,7 @@ const CATEGORY_RING_COLOR: Record<string, string> = {
   communication: "oklch(0.75 0.16 220)",
   growth: "oklch(0.65 0.13 130)",
   chemistry: "oklch(0.7 0.22 30)",
+  business: "oklch(0.72 0.10 270)",
 };
 
 export function SynastryDisplay({
@@ -103,7 +105,7 @@ export function SynastryDisplay({
       <section>
         <header className="mb-4 flex items-baseline justify-between gap-3">
           <h3 className="text-xl font-semibold tracking-tight">
-            ხუთი სფერო
+            ექვსი სფერო
           </h3>
           <span className="text-xs text-muted-foreground">
             როგორ ვითარდება სხვადასხვა ენერგია შენსა და {partnerName}-ს შორის

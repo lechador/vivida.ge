@@ -35,7 +35,8 @@ export type SynastryCategory =
   | "friendship"
   | "communication"
   | "growth"
-  | "chemistry";
+  | "chemistry"
+  | "business";
 
 export const CATEGORIES: SynastryCategory[] = [
   "love",
@@ -43,16 +44,27 @@ export const CATEGORIES: SynastryCategory[] = [
   "communication",
   "growth",
   "chemistry",
+  "business",
 ];
 
 /** Bodies that "matter" for each category. An aspect counts toward the
- *  category iff both endpoints live in its set. */
+ *  category iff both endpoints live in its set. Business reads off
+ *  Sun/MC (identity + career), Saturn (structure / commitment), Mercury
+ *  (problem-solving), Jupiter (vision), and Mars (drive). */
 const CATEGORY_BODIES: Record<SynastryCategory, Set<string>> = {
   love: new Set(["sun", "moon", "venus", "mars", "ascendant"]),
   friendship: new Set(["sun", "moon", "mercury", "jupiter", "ascendant"]),
   communication: new Set(["mercury", "sun", "mars", "jupiter", "moon"]),
   growth: new Set(["jupiter", "saturn", "sun", "moon", "midheaven"]),
   chemistry: new Set(["mars", "pluto", "venus", "sun", "moon"]),
+  business: new Set([
+    "sun",
+    "mercury",
+    "mars",
+    "jupiter",
+    "saturn",
+    "midheaven",
+  ]),
 };
 
 /** Per-aspect "valence" — how much positive (or negative) signal it carries.
@@ -130,17 +142,18 @@ const HOUSE_OVERLAY: Record<
   number,
   Partial<Record<SynastryCategory, number>>
 > = {
-  1: { love: 0.25, chemistry: 0.2, friendship: 0.18 }, // identity / attraction
-  3: { communication: 0.25, friendship: 0.12 },
+  1: { love: 0.25, chemistry: 0.2, friendship: 0.18, business: 0.1 }, // identity / attraction
+  2: { business: 0.3 }, // shared resources / values
+  3: { communication: 0.25, friendship: 0.12, business: 0.18 },
   4: { love: 0.18, friendship: 0.12, growth: 0.12 }, // home / roots
   5: { love: 0.3, chemistry: 0.28, friendship: 0.12 }, // romance / play
-  6: { love: -0.2, chemistry: -0.15 }, // service / work-mode (cold for romance)
-  7: { love: 0.35, friendship: 0.22, communication: 0.18 }, // partnership
+  6: { love: -0.2, chemistry: -0.15, business: 0.4 }, // service / work-mode (cold for romance, GREAT for business)
+  7: { love: 0.35, friendship: 0.22, communication: 0.18, business: 0.25 }, // partnership
   8: { love: 0.22, chemistry: 0.35, growth: 0.22 }, // intimacy / transformation
-  9: { growth: 0.25, friendship: 0.15, communication: 0.12 }, // shared horizons
-  10: { growth: 0.22, friendship: -0.08 }, // public-facing, less buddy
-  11: { friendship: 0.32, growth: 0.15, communication: 0.18 }, // friendship / dreams
-  12: { love: -0.1, friendship: -0.18, communication: -0.22 }, // hidden / isolating
+  9: { growth: 0.25, friendship: 0.15, communication: 0.12, business: 0.2 }, // shared horizons
+  10: { growth: 0.22, friendship: -0.08, business: 0.5 }, // public-facing → ideal for business
+  11: { friendship: 0.32, growth: 0.15, communication: 0.18, business: 0.3 }, // friendship / dreams / networks
+  12: { love: -0.1, friendship: -0.18, communication: -0.22, business: -0.2 }, // hidden / isolating
 };
 
 /** Bodies whose house-overlay placement we score. We don't bother with
@@ -224,11 +237,12 @@ export type SynastryResult = {
 };
 
 const CATEGORY_WEIGHT: Record<SynastryCategory, number> = {
-  love: 0.25,
-  friendship: 0.2,
-  chemistry: 0.2,
-  communication: 0.2,
-  growth: 0.15,
+  love: 0.22,
+  friendship: 0.18,
+  chemistry: 0.18,
+  communication: 0.18,
+  growth: 0.13,
+  business: 0.11,
 };
 
 /** Sorted lookup key for pair magnifier table. */
@@ -280,7 +294,12 @@ export function computeSynastry(
   pointsB.midheaven = { longitude: b.midheaven.longitude };
 
   const raw: Record<SynastryCategory, number> = {
-    love: 0, friendship: 0, communication: 0, growth: 0, chemistry: 0,
+    love: 0,
+    friendship: 0,
+    communication: 0,
+    growth: 0,
+    chemistry: 0,
+    business: 0,
   };
 
   let aspectPoints = 0;
@@ -371,11 +390,15 @@ export function computeSynastry(
   const sunAffinity = ELEMENT_AFFINITY[sunA]?.[sunB] ?? 0;
   const moonAffinity = ELEMENT_AFFINITY[moonA]?.[moonB] ?? 0;
 
-  // Sun affinity feeds love / friendship / communication.
-  // Moon affinity feeds love / chemistry / growth (emotional resonance).
+  // Sun affinity feeds love / friendship / communication / business
+  // (identity-driven domains). Moon affinity feeds love / chemistry /
+  // growth (emotional resonance) and only lightly touches business.
   for (const cat of CATEGORIES) {
     const sBoost =
-      cat === "love" || cat === "friendship" || cat === "communication"
+      cat === "love" ||
+      cat === "friendship" ||
+      cat === "communication" ||
+      cat === "business"
         ? sunAffinity * 0.85
         : sunAffinity * 0.4;
     const mBoost =
@@ -433,6 +456,7 @@ export const CATEGORY_LABEL_KA: Record<SynastryCategory, string> = {
   communication: "კომუნიკაცია",
   growth: "ერთობლივი ზრდა",
   chemistry: "ქიმია",
+  business: "საქმიანი თანამშრომლობა",
 };
 
 export const CATEGORY_DESCRIPTOR_KA: Record<SynastryCategory, string> = {
@@ -441,6 +465,7 @@ export const CATEGORY_DESCRIPTOR_KA: Record<SynastryCategory, string> = {
   communication: "სიტყვები, აზრები, რომლებიც ერთმანეთს ხვდებიან",
   growth: "გრძელვადიანი ზრდის და სწავლის პოტენციალი",
   chemistry: "ფიზიკური მიზიდულობა და მძაფრი ენერგია",
+  business: "ერთად საქმის კეთება, მიზნები და სტრუქტურა",
 };
 
 export const CATEGORY_EMOJI: Record<SynastryCategory, string> = {
@@ -449,6 +474,7 @@ export const CATEGORY_EMOJI: Record<SynastryCategory, string> = {
   communication: "💬",
   growth: "🌱",
   chemistry: "🔥",
+  business: "💼",
 };
 
 export const ELEMENT_LABEL_KA: Record<ChartElement, string> = {
