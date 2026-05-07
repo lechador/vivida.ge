@@ -64,7 +64,7 @@ export function WeeklyForecastCard({
         <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" aria-hidden />
       </header>
 
-      <ol className="relative space-y-2.5">
+      <ol className="relative space-y-3.5">
         {days.map((day, i) => (
           <DayRow
             key={day.dateIso}
@@ -112,19 +112,60 @@ function DayRow({
         ? "challenging"
         : "balanced";
 
+  // Tilt-driven palette so each row carries the day's mood as its own
+  // outline color + a saturated left accent stripe. Helps the eye chunk
+  // the list into "this day vs. that day" at a glance.
+  const tone =
+    tilt === "harmonic"
+      ? {
+          stripe: "bg-[var(--vivida-cyan)]",
+          border: "border-[var(--vivida-cyan)]/45",
+          borderHover: "hover:border-[var(--vivida-cyan)]/75",
+          bg: "bg-[oklch(0.24_0.05_220/0.85)]",
+          bgHover: "hover:bg-[oklch(0.27_0.06_220/0.92)]",
+          glow: "shadow-[0_0_24px_-10px_oklch(0.78_0.18_200/0.55)]",
+        }
+      : tilt === "challenging"
+        ? {
+            stripe: "bg-[var(--vivida-pink)]",
+            border: "border-[var(--vivida-pink)]/45",
+            borderHover: "hover:border-[var(--vivida-pink)]/75",
+            bg: "bg-[oklch(0.24_0.06_350/0.85)]",
+            bgHover: "hover:bg-[oklch(0.27_0.07_350/0.92)]",
+            glow: "shadow-[0_0_24px_-10px_oklch(0.72_0.22_350/0.55)]",
+          }
+        : {
+            stripe: "bg-[var(--vivida-violet)]/70",
+            border: "border-[var(--vivida-violet)]/35",
+            borderHover: "hover:border-[var(--vivida-violet)]/60",
+            bg: "bg-[oklch(0.22_0.04_290/0.85)]",
+            bgHover: "hover:bg-[oklch(0.25_0.05_290/0.92)]",
+            glow: "shadow-[0_0_24px_-10px_oklch(0.65_0.24_305/0.45)]",
+          };
+
   return (
     <li>
       <button
         type="button"
         onClick={onToggle}
         className={cn(
-          "group w-full rounded-xl border bg-[oklch(0.21_0.04_280/0.85)] p-3 text-left transition-all hover:border-[var(--vivida-violet)]/40 hover:bg-[oklch(0.23_0.05_285/0.92)] sm:p-4",
-          open
-            ? "border-[var(--vivida-violet)]/55 bg-[oklch(0.23_0.05_285/0.95)] shadow-[0_0_24px_-8px_oklch(0.65_0.24_305/0.45)]"
-            : "border-border"
+          "group relative w-full overflow-hidden rounded-xl border-2 p-3 pl-5 text-left transition-all sm:p-4 sm:pl-6",
+          tone.bg,
+          tone.bgHover,
+          tone.border,
+          tone.borderHover,
+          open && [tone.glow, "ring-1 ring-foreground/10"]
         )}
         aria-expanded={open}
       >
+        <span
+          aria-hidden
+          className={cn(
+            "absolute inset-y-0 left-0 w-1.5",
+            tone.stripe,
+            open && "shadow-[0_0_14px_oklch(0.65_0.24_305/0.7)]"
+          )}
+        />
         <div className="flex items-start gap-3 sm:gap-4">
           {/* Date pill */}
           <div
