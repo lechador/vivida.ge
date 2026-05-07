@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { buildCosmicCard } from "@/lib/cosmic-cards";
+import { buildCosmicCard } from "@/lib/cosmic-cards-server";
 import { getCurrentPlan } from "@/lib/plan";
 import { getUserStreak } from "@/lib/streak";
 import { Starfield } from "@/components/landing/starfield";
