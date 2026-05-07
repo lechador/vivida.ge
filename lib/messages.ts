@@ -18,6 +18,7 @@ import {
   users,
   type Message,
 } from "@/db/schema";
+import { firstReadyPhotoByUser, resolveAvatar } from "./avatars";
 import { listFriends, type FriendshipUser } from "./friendship";
 
 export type ConversationSummary = {
@@ -158,7 +159,12 @@ export async function pollInboundMessages(
     )
     .orderBy(asc(messages.createdAt))
     .limit(50);
-  return rows;
+  if (rows.length === 0) return rows;
+  const photos = await firstReadyPhotoByUser(rows.map((r) => r.senderId));
+  return rows.map((r) => ({
+    ...r,
+    senderImage: resolveAvatar(r.senderId, r.senderImage, photos),
+  }));
 }
 
 /**
@@ -268,5 +274,7 @@ export async function partnerSnippet(userId: string) {
     .leftJoin(profiles, eq(profiles.userId, users.id))
     .where(eq(users.id, userId))
     .limit(1);
-  return row ?? null;
+  if (!row) return null;
+  const photos = await firstReadyPhotoByUser([userId]);
+  return { ...row, image: resolveAvatar(userId, row.image, photos) };
 }

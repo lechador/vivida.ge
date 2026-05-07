@@ -4,6 +4,7 @@ import { and, asc, eq, ilike, ne, or, sql } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { profiles, users } from "@/db/schema";
+import { firstReadyPhotoByUser, resolveAvatar } from "@/lib/avatars";
 
 const MIN_QUERY = 2;
 const MAX_RESULTS = 8;
@@ -58,12 +59,14 @@ export async function GET(req: Request) {
     )
     .limit(MAX_RESULTS);
 
+  const photos = await firstReadyPhotoByUser(rows.map((r) => r.userId));
+
   return NextResponse.json({
     results: rows.map((r) => ({
       userId: r.userId,
       username: r.username,
       displayName: r.displayName ?? r.name?.split(" ")[0] ?? r.username,
-      image: r.image,
+      image: resolveAvatar(r.userId, r.image, photos),
       bio: r.bio,
     })),
   });

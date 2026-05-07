@@ -2,6 +2,7 @@ import { and, count, desc, eq, or } from "drizzle-orm";
 
 import { db } from "@/db";
 import { friendships, profiles, users } from "@/db/schema";
+import { firstReadyPhotoByUser, resolveAvatar } from "./avatars";
 
 export type FriendshipStatus =
   | "none"
@@ -94,12 +95,14 @@ export async function listFriends(userId: string): Promise<FriendshipUser[]> {
       )
     );
 
-  return [...asRequester, ...asRecipient]
+  const merged = [...asRequester, ...asRecipient];
+  const photos = await firstReadyPhotoByUser(merged.map((r) => r.user.id));
+  return merged
     .map((r) => ({
       id: r.user.id,
       name: r.user.name,
       email: r.user.email,
-      image: r.user.image,
+      image: resolveAvatar(r.user.id, r.user.image, photos),
       username: r.profile?.username ?? null,
       displayName: r.profile?.displayName ?? null,
       bio: r.profile?.bio ?? null,
@@ -130,11 +133,12 @@ export async function listIncomingRequests(
     )
     .orderBy(desc(friendships.createdAt));
 
+  const photos = await firstReadyPhotoByUser(rows.map((r) => r.user.id));
   return rows.map((r) => ({
     id: r.user.id,
     name: r.user.name,
     email: r.user.email,
-    image: r.user.image,
+    image: resolveAvatar(r.user.id, r.user.image, photos),
     username: r.profile?.username ?? null,
     displayName: r.profile?.displayName ?? null,
     bio: r.profile?.bio ?? null,
@@ -164,11 +168,12 @@ export async function listOutgoingRequests(
     )
     .orderBy(desc(friendships.createdAt));
 
+  const photos = await firstReadyPhotoByUser(rows.map((r) => r.user.id));
   return rows.map((r) => ({
     id: r.user.id,
     name: r.user.name,
     email: r.user.email,
-    image: r.user.image,
+    image: resolveAvatar(r.user.id, r.user.image, photos),
     username: r.profile?.username ?? null,
     displayName: r.profile?.displayName ?? null,
     bio: r.profile?.bio ?? null,
