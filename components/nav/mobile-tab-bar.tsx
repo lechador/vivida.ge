@@ -26,7 +26,12 @@ export function MobileTabBar({
       aria-label="ძირითადი ნავიგაცია"
       className={cn(
         "fixed inset-x-0 bottom-0 z-40 lg:hidden",
-        "border-t border-border/60 bg-background/85 backdrop-blur-2xl",
+        // Lifted card surface that reads as its own UI layer instead of
+        // bleeding into the page. Dark, opaque, with a violet-tinted top
+        // edge + a soft cosmic glow above it.
+        "border-t border-[var(--vivida-violet)]/35 bg-[oklch(0.18_0.06_290/0.92)] backdrop-blur-2xl",
+        "shadow-[0_-12px_32px_-8px_oklch(0.65_0.24_305/0.18)]",
+        "before:pointer-events-none before:absolute before:inset-x-6 before:-top-px before:h-px before:bg-[linear-gradient(90deg,transparent,oklch(0.78_0.18_305/0.65),transparent)]",
         "pb-[max(env(safe-area-inset-bottom),0.25rem)]"
       )}
     >
@@ -49,7 +54,7 @@ export function MobileTabBar({
                   className={cn(
                     "relative grid size-9 place-items-center rounded-xl transition-all",
                     isActive
-                      ? "bg-[var(--vivida-violet)]/20 ring-1 ring-[var(--vivida-violet)]/40"
+                      ? "bg-[var(--vivida-violet)]/25 ring-1 ring-[var(--vivida-violet)]/60 shadow-[0_0_18px_-4px_oklch(0.65_0.24_305/0.6)]"
                       : "group-active:scale-95"
                   )}
                   style={isActive ? { color: item.hue } : undefined}
