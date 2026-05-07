@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Camera, Loader2, X } from "lucide-react";
+import { Camera, Loader2, Star, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { cn } from "@/lib/utils";
@@ -192,6 +192,23 @@ export function PhotoUploader({
     }
   }
 
+  async function promotePhoto(id: string) {
+    // Optimistic reorder: target first, others keep their relative order.
+    setPhotos((existing) => {
+      const target = existing.find((x) => x.id === id);
+      if (!target) return existing;
+      return [target, ...existing.filter((x) => x.id !== id)];
+    });
+    try {
+      const res = await fetch(`/api/photos/${id}/promote`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error(`promote failed (${res.status})`);
+    } catch {
+      setTopError("მთავარი ფოტოს დაყენება ვერ მოხერხდა");
+    }
+  }
+
   const isEmpty = photos.length === 0 && pending.length === 0;
 
   const dragHandlers = {
@@ -270,8 +287,9 @@ export function PhotoUploader({
             <PhotoTile
               key={p.id}
               url={p.url}
-              badge={i === 0 ? "მთავარი" : null}
+              isMain={i === 0}
               onDelete={() => deletePhoto(p.id)}
+              onPromote={i === 0 ? null : () => promotePhoto(p.id)}
             />
           ))}
           <AnimatePresence>
@@ -347,12 +365,14 @@ export function PhotoUploader({
 
 function PhotoTile({
   url,
-  badge,
+  isMain,
   onDelete,
+  onPromote,
 }: {
   url: string;
-  badge: string | null;
+  isMain: boolean;
   onDelete: () => void;
+  onPromote: (() => void) | null;
 }) {
   return (
     <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-border ring-1 ring-foreground/5">
@@ -367,15 +387,26 @@ function PhotoTile({
         type="button"
         onClick={onDelete}
         aria-label="წაშლა"
-        className="absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-black/70 text-white opacity-0 backdrop-blur transition-opacity hover:bg-black/85 group-hover:opacity-100"
+        className="absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-black/70 text-white backdrop-blur transition-opacity hover:bg-black/85 sm:opacity-0 sm:group-hover:opacity-100"
       >
         <X className="size-3.5" />
       </button>
-      {badge && (
-        <span className="absolute left-2 top-2 rounded-full bg-[var(--vivida-violet)]/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
-          {badge}
+      {isMain ? (
+        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-violet)]/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
+          <Star className="size-3 fill-white" />
+          მთავარი
         </span>
-      )}
+      ) : onPromote ? (
+        <button
+          type="button"
+          onClick={onPromote}
+          aria-label="მთავარ ფოტოდ დაყენება"
+          className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur transition-colors hover:bg-[var(--vivida-violet)]/90"
+        >
+          <Star className="size-3" />
+          მთავარი გახადე
+        </button>
+      ) : null}
     </div>
   );
 }
