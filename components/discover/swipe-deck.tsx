@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Compass, RotateCcw } from "lucide-react";
-import { useMotionValue, animate } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, animate } from "framer-motion";
 
+import { sendFriendRequest } from "@/actions/friendship";
 import { Button } from "@/components/ui/button";
 import type { DiscoverCard } from "@/lib/discover";
 import { SwipeCard } from "./swipe-card";
@@ -17,11 +18,24 @@ import { SwipeCard } from "./swipe-card";
  * the deck empties we show a re-shuffle CTA so the user can keep
  * exploring.
  */
+type Toast = {
+  kind: "ok" | "err" | "info";
+  text: string;
+};
+
 export function SwipeDeck({ cards }: { cards: DiscoverCard[] }) {
   const router = useRouter();
   const [deck, setDeck] = useState(cards);
   const [exhausted, setExhausted] = useState(false);
+  const [toast, setToast] = useState<Toast | null>(null);
   const x = useMotionValue(0);
+
+  // Auto-dismiss toast.
+  useEffect(() => {
+    if (!toast) return;
+    const id = window.setTimeout(() => setToast(null), 1800);
+    return () => window.clearTimeout(id);
+  }, [toast]);
 
   const advance = useCallback(() => {
     setDeck((prev) => {
@@ -42,30 +56,42 @@ export function SwipeDeck({ cards }: { cards: DiscoverCard[] }) {
 
   const handleLike = useCallback(
     (card: DiscoverCard) => {
+      // Fire the friend request optimistically — animation runs in parallel
+      // with the network call so the deck never feels laggy.
+      sendFriendRequest(card.userId, card.username)
+        .then((res) => {
+          if (res.ok) {
+            setToast({
+              kind: "ok",
+              text: `${card.displayName}-ს მეგობრობა გაიგზავნა`,
+            });
+          } else {
+            setToast({ kind: "err", text: res.error });
+          }
+        })
+        .catch(() => {
+          setToast({ kind: "err", text: "ვერ გაიგზავნა — სცადე თავიდან" });
+        });
+
       animate(x, 480, {
         duration: 0.28,
         ease: [0.22, 1, 0.36, 1],
-        onComplete: () => {
-          advance();
-          router.push(`/u/${card.username}`);
-        },
+        onComplete: advance,
       });
     },
-    [advance, router, x]
+    [advance, x]
   );
 
   if (exhausted || deck.length === 0) {
     return <DeckExhausted onReshuffle={() => router.refresh()} />;
   }
 
-  // Render the top card + the next two as a stack. Trim the visible
-  // window aggressively so we don't ship 60 hidden cards in the DOM.
   const visible = deck.slice(0, 3);
 
   return (
-    <div className="relative mx-auto w-full max-w-md">
+    <div className="relative mx-auto flex w-full max-w-md flex-1 flex-col lg:max-h-[760px]">
       <div
-        className="relative aspect-[3/4] w-full"
+        className="relative w-full flex-1 min-h-0"
         style={{ perspective: "1500px" }}
       >
         {visible
@@ -80,14 +106,34 @@ export function SwipeDeck({ cards }: { cards: DiscoverCard[] }) {
               onLike={() => handleLike(card)}
             />
           ))
-          // Render bottom-up so the top card stacks last and naturally
-          // sits on top of the others in the DOM.
           .reverse()}
       </div>
 
-      <p className="mt-4 text-center text-xs text-muted-foreground">
-        გადაიტანე მარჯვნივ პროფილზე გადასასვლელად, მარცხნივ — გასატოვებლად.
+      <p className="mt-3 text-center text-xs text-muted-foreground">
+        მარჯვნივ — მეგობრობის თხოვნა · მარცხნივ — სხვა
       </p>
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key={toast.text}
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.96 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className={
+              "fixed inset-x-4 z-50 mx-auto max-w-sm rounded-full border px-4 py-2.5 text-center text-sm font-medium shadow-[0_18px_50px_-12px_oklch(0.13_0.03_280/0.7)] backdrop-blur-xl bottom-[calc(5.5rem+env(safe-area-inset-bottom))] lg:bottom-6 " +
+              (toast.kind === "ok"
+                ? "border-[var(--vivida-pink)]/55 bg-[oklch(0.22_0.08_350/0.92)] text-foreground"
+                : toast.kind === "err"
+                  ? "border-[var(--destructive)]/55 bg-[oklch(0.22_0.06_25/0.92)] text-foreground"
+                  : "border-border bg-card/85 text-foreground")
+            }
+          >
+            {toast.text}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

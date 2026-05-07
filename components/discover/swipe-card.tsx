@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Sparkles, X } from "lucide-react";
+import { Sparkles, UserPlus, X } from "lucide-react";
 import {
   motion,
   type MotionValue,
@@ -165,7 +165,7 @@ export function SwipeCard({
               style={{ opacity: likeOpacity }}
               className="pointer-events-none absolute left-6 top-8 z-30 rotate-[-12deg] rounded-xl border-4 border-[var(--vivida-pink)] px-3 py-1 text-2xl font-black uppercase tracking-widest text-[var(--vivida-pink)]"
             >
-              მომწონს
+              მეგობრობა
             </motion.div>
             <motion.div
               style={{ opacity: passOpacity }}
@@ -221,10 +221,10 @@ export function SwipeCard({
               <button
                 type="button"
                 onClick={onLike}
-                aria-label="მომწონს"
+                aria-label="მეგობრობის თხოვნა"
                 className="grid size-12 place-items-center rounded-full border-2 border-[var(--vivida-pink)] bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] text-white shadow-[0_10px_28px_-8px_oklch(0.72_0.22_350/0.7)] transition-all hover:scale-105 active:scale-95"
               >
-                <Heart className="size-5 fill-white" />
+                <UserPlus className="size-5" />
               </button>
             </div>
           )}

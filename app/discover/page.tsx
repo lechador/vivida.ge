@@ -33,7 +33,10 @@ export default async function DiscoverPage() {
   stack.sort((a, b) => (b.compatibility ?? 0) - (a.compatibility ?? 0));
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main
+      data-no-body-bottom-pad
+      className="relative isolate flex h-[100dvh] flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.30_0.15_220/0.4),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.34_0.16_350/0.35),transparent_70%)]"
@@ -42,17 +45,7 @@ export default async function DiscoverPage() {
 
       <AppHeader authed plan={plan} active="discover" />
 
-      <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
-        <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          აღმოაჩინე
-        </div>
-        <h1 className="mb-6 text-balance text-2xl font-semibold tracking-tight sm:text-4xl">
-          გადაიტანე{" "}
-          <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            შენი ცა
-          </span>
-        </h1>
-
+      <section className="relative z-10 mx-auto flex w-full min-h-0 max-w-md flex-1 flex-col px-3 pb-[calc(4.5rem+max(env(safe-area-inset-bottom),0.25rem))] pt-2 sm:max-w-2xl sm:px-6 sm:pb-6 lg:pb-8">
         {stack.length === 0 ? (
           <EmptyState hasElement={!!feed.viewerElement} />
         ) : (
