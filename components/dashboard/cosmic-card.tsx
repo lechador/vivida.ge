@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Flame, Sparkles } from "lucide-react";
+import { Flame } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
@@ -89,7 +89,8 @@ export function CosmicCard({
           )}
           style={{ transformStyle: "preserve-3d" }}
         >
-          {/* Back face */}
+          {/* Back face — clean dark surface, decoration removed so it can't
+              bleed through on browsers where backface-visibility is flaky. */}
           <span
             className="absolute inset-0 grid place-items-center overflow-hidden rounded-2xl border-2 border-[var(--vivida-violet)]/55 bg-[radial-gradient(circle_at_50%_30%,oklch(0.30_0.16_305/0.6),oklch(0.15_0.06_290/0.95))] shadow-[0_18px_50px_-12px_oklch(0.65_0.24_305/0.55)]"
             style={{ backfaceVisibility: "hidden" }}
@@ -98,17 +99,8 @@ export function CosmicCard({
               aria-hidden
               className="absolute inset-3 rounded-xl border border-[var(--vivida-violet)]/35"
             />
-            <span aria-hidden className="absolute inset-0 opacity-60">
-              <Stars />
-            </span>
-            <span className="relative z-10 flex flex-col items-center gap-3">
-              <Sparkles
-                className="size-9 text-[var(--vivida-cyan)]"
-                aria-hidden
-              />
-              <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-foreground/70">
-                შეეხე
-              </span>
+            <span className="relative z-10 text-xs font-medium uppercase tracking-[0.28em] text-foreground/85">
+              შეეხე
             </span>
           </span>
 
@@ -166,31 +158,3 @@ export function CosmicCard({
   );
 }
 
-/** Decorative dots for the card back. Pure CSS, no JS. */
-function Stars() {
-  const dots = [
-    { x: 18, y: 22, s: 1 },
-    { x: 78, y: 18, s: 1.6 },
-    { x: 32, y: 64, s: 0.8 },
-    { x: 60, y: 78, s: 1.2 },
-    { x: 88, y: 56, s: 0.9 },
-    { x: 12, y: 86, s: 1.1 },
-  ];
-  return (
-    <span aria-hidden className="absolute inset-0">
-      {dots.map((d, i) => (
-        <span
-          key={i}
-          className="absolute rounded-full bg-[var(--vivida-cyan)]"
-          style={{
-            left: `${d.x}%`,
-            top: `${d.y}%`,
-            width: `${d.s * 2}px`,
-            height: `${d.s * 2}px`,
-            boxShadow: `0 0 ${d.s * 4}px oklch(0.78 0.18 200 / 0.7)`,
-          }}
-        />
-      ))}
-    </span>
-  );
-}
