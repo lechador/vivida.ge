@@ -9,17 +9,11 @@ import { NAV_ITEMS, type NavActiveKey, type NavItem } from "./nav-items";
 export type { NavActiveKey };
 
 export function NavLinks({ active }: { active?: NavActiveKey }) {
-  return (
-    <nav className="hidden items-center gap-1 lg:flex">
-      {NAV_ITEMS.map((item) => (
-        <NavLinkItem
-          key={item.key}
-          item={item}
-          isActive={item.key === active}
-        />
-      ))}
-    </nav>
-  );
+  // Retired in favor of DesktopSidebar (left rail) on lg+ and
+  // MobileTabBar at the bottom on mobile. Kept as a no-op so existing
+  // AppHeader call sites continue to compile without per-page edits.
+  void active;
+  return null;
 }
 
 function NavLinkItem({ item, isActive }: { item: NavItem; isActive: boolean }) {

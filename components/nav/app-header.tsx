@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { getHeaderData } from "@/lib/header-cache";
 import { Button } from "@/components/ui/button";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { DesktopSidebar } from "./desktop-sidebar";
 import { MobileNav } from "./mobile-nav";
 import { MobileSearch } from "./mobile-search";
 import { MobileTabBar } from "./mobile-tab-bar";
@@ -138,10 +139,16 @@ export async function AppHeader({
       </div>
     </header>
     {userInfo && (
-      <MobileTabBar
-        active={active as NavActiveKey | undefined}
-        unreadMessages={unreadMessages}
-      />
+      <>
+        <MobileTabBar
+          active={active as NavActiveKey | undefined}
+          unreadMessages={unreadMessages}
+        />
+        <DesktopSidebar
+          active={active as NavActiveKey | undefined}
+          unreadMessages={unreadMessages}
+        />
+      </>
     )}
     </>
   );

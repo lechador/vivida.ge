@@ -131,6 +131,18 @@
       padding-bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 0px));
     }
   }
+
+  /*
+   * Desktop left sidebar: when DesktopSidebar is mounted, push the body
+   * content right by the sidebar width so the fixed-position rail
+   * doesn't overlap page content. Same automatic-via-:has() pattern as
+   * the mobile rule above.
+   */
+  @media (min-width: 1024px) {
+    body:has([data-desktop-sidebar]) {
+      padding-left: 14rem; /* matches w-56 on the sidebar */
+    }
+  }
   ::selection {
     background-color: oklch(0.78 0.18 305 / 35%);
   }
