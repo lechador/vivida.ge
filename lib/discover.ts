@@ -31,6 +31,12 @@ export type DiscoverCard = {
   image: string | null;
   /** First profile photo, if any. Used as the card hero. */
   photoUrl: string | null;
+  /** All ready profile photos in display order (sortOrder asc). The
+   *  swipe deck flips through these as a carousel; the older compact
+   *  card just uses photoUrl. */
+  photos: string[];
+  /** Age in years from profile.dateOfBirth, or null when unknown. */
+  age: number | null;
   sunSign: ZodiacSign;
   sunElement: Element;
   /** Overall compatibility 0–100 vs the viewer; null if viewer has no chart. */
@@ -141,8 +147,12 @@ export async function getDiscoveryFeed(
     : [];
 
   const firstPhoto = new Map<string, string>();
+  const allPhotos = new Map<string, string[]>();
   for (const p of photos) {
     if (!firstPhoto.has(p.userId)) firstPhoto.set(p.userId, p.url);
+    const arr = allPhotos.get(p.userId);
+    if (arr) arr.push(p.url);
+    else allPhotos.set(p.userId, [p.url]);
   }
 
   // 5. Categorise + score synastry against viewer's chart. We hold on to
@@ -179,6 +189,8 @@ export async function getDiscoveryFeed(
       bio: c.profile.bio,
       image: c.user.image,
       photoUrl: firstPhoto.get(c.user.id) ?? null,
+      photos: allPhotos.get(c.user.id) ?? [],
+      age: ageFromDob(c.profile.dateOfBirth),
       sunSign: sign,
       sunElement: sign.element,
       compatibility: synastry?.overall ?? null,
@@ -232,6 +244,28 @@ export async function getDiscoveryFeed(
     magic: dedupe(magic),
     other: dedupe(other),
   };
+}
+
+/**
+ * Age in completed years from a YYYY-MM-DD birth date string. Returns null
+ * for missing or unparseable input. Computed against UTC noon to avoid
+ * single-day TZ drift right around birthdays.
+ */
+function ageFromDob(dob: string | null | undefined): number | null {
+  if (!dob || dob.length < 10) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(dob);
+  if (!m) return null;
+  const y = parseInt(m[1], 10);
+  const mo = parseInt(m[2], 10);
+  const d = parseInt(m[3], 10);
+  if (!y || !mo || !d) return null;
+  const now = new Date();
+  let age = now.getUTCFullYear() - y;
+  const beforeBirthday =
+    now.getUTCMonth() + 1 < mo ||
+    (now.getUTCMonth() + 1 === mo && now.getUTCDate() < d);
+  if (beforeBirthday) age -= 1;
+  return age >= 0 && age < 130 ? age : null;
 }
 
 /** When excludedList only has the viewer, drizzle's notInArray was awkward.
