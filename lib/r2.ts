@@ -41,6 +41,13 @@ function client(): S3Client {
       accessKeyId: requireEnv("R2_ACCESS_KEY_ID"),
       secretAccessKey: requireEnv("R2_SECRET_ACCESS_KEY"),
     },
+    // AWS SDK v3 (≥3.730) defaults to "WHEN_SUPPORTED" which bakes a
+    // checksum requirement into presigned PUT URLs. Browsers' XHR/fetch
+    // don't send that header, so R2 returns 403 / signature mismatch and
+    // the upload silently dies. Force the SDK back to the legacy
+    // behavior so the URL only requires what the browser actually sends.
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
   return _client;
 }

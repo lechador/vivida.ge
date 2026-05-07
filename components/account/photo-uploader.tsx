@@ -104,11 +104,25 @@ export function PhotoUploader({
             setProgress(0.1 + 0.85 * (e.loaded / e.total));
           }
         };
-        xhr.onload = () =>
-          xhr.status >= 200 && xhr.status < 300
-            ? resolve()
-            : reject(new Error(`R2 upload failed (${xhr.status})`));
-        xhr.onerror = () => reject(new Error("R2 upload failed"));
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) return resolve();
+          // Surface R2's response body — typically an XML <Error><Code>
+          // payload that tells us *why* (SignatureDoesNotMatch, AccessDenied,
+          // etc). Without this the user just sees "R2 upload failed" with
+          // no clue what to fix.
+          console.error("[photo-upload] R2 PUT failed", {
+            status: xhr.status,
+            response: xhr.responseText?.slice(0, 500),
+          });
+          reject(new Error(`ატვირთვა ვერ შესრულდა (${xhr.status})`));
+        };
+        xhr.onerror = () => {
+          // onerror with no status almost always means CORS preflight
+          // rejection (R2 bucket CORS missing / not allowing this origin)
+          // or a network drop.
+          console.error("[photo-upload] R2 PUT network/CORS error");
+          reject(new Error("ქსელის შეცდომა — სცადე თავიდან"));
+        };
         xhr.open("PUT", uploadUrl);
         xhr.setRequestHeader("Content-Type", file.type);
         xhr.send(file);
