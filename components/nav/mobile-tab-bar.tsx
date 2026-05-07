@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS, type NavActiveKey } from "./nav-items";
+import { MessagesTabBadge } from "./messages-tab-badge";
+import { MOBILE_TAB_ITEMS, type NavActiveKey } from "./nav-items";
 
 /**
  * iOS/Android-style fixed bottom tab bar. Mirrors the desktop NavLinks
@@ -12,7 +13,13 @@ import { NAV_ITEMS, type NavActiveKey } from "./nav-items";
  * Respects safe-area insets so it sits above the iOS home indicator
  * instead of being clipped under it.
  */
-export function MobileTabBar({ active }: { active?: NavActiveKey }) {
+export function MobileTabBar({
+  active,
+  unreadMessages = 0,
+}: {
+  active?: NavActiveKey;
+  unreadMessages?: number;
+}) {
   return (
     <nav
       data-mobile-tab-bar
@@ -24,7 +31,7 @@ export function MobileTabBar({ active }: { active?: NavActiveKey }) {
       )}
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around gap-1 px-2 pt-1.5">
-        {NAV_ITEMS.map((item) => {
+        {MOBILE_TAB_ITEMS.map((item) => {
           const isActive = active === item.key;
           return (
             <li key={item.key} className="flex-1">
@@ -40,16 +47,17 @@ export function MobileTabBar({ active }: { active?: NavActiveKey }) {
               >
                 <span
                   className={cn(
-                    "grid size-9 place-items-center rounded-xl transition-all",
+                    "relative grid size-9 place-items-center rounded-xl transition-all",
                     isActive
                       ? "bg-[var(--vivida-violet)]/20 ring-1 ring-[var(--vivida-violet)]/40"
                       : "group-active:scale-95"
                   )}
-                  style={
-                    isActive ? { color: item.hue } : undefined
-                  }
+                  style={isActive ? { color: item.hue } : undefined}
                 >
                   <item.Icon className="size-5" />
+                  {item.key === "messages" && (
+                    <MessagesTabBadge initial={unreadMessages} />
+                  )}
                 </span>
                 <span className="truncate">{item.label}</span>
               </Link>

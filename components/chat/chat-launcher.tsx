@@ -61,7 +61,12 @@ export type ChatNotifyDetail = {
     displayName: string | null;
   };
 };
-export type ChatClearedDetail = { partnerId: string };
+export type ChatClearedDetail = {
+  partnerId: string;
+  /** How many unread messages were cleared, so badge listeners
+   *  can subtract the right amount. */
+  clearedCount: number;
+};
 
 export type ChatPartner = {
   id: string;
@@ -81,6 +86,15 @@ type Props = {
   viewerId: string;
   initialConversations: ChatConversation[];
   initialUnreadTotal: number;
+  /**
+   * "modal"      — legacy floating chat button + animated panel (desktop)
+   * "page"       — render inline as a full-page chat experience (/messages)
+   * "background" — no UI; only run the SSE pump and dispatch badge events
+   *                so the bottom-bar messages tab + bell stay live.
+   */
+  mode?: "modal" | "page" | "background";
+  /** When mounted in "page" mode, optionally auto-open this partner's chat. */
+  initialPartnerId?: string | null;
 };
 
 type SendResult = { ok: true } | { ok: false; error: string };
@@ -89,9 +103,15 @@ export function ChatLauncher({
   viewerId,
   initialConversations,
   initialUnreadTotal,
+  mode = "modal",
+  initialPartnerId = null,
 }: Props) {
-  const [open, setOpen] = useState(false);
-  const [activePartnerId, setActivePartnerId] = useState<string | null>(null);
+  // In "page" mode the panel is always considered open — the route is
+  // the panel. In other modes it's a togglable surface.
+  const [open, setOpen] = useState(mode === "page");
+  const [activePartnerId, setActivePartnerId] = useState<string | null>(
+    initialPartnerId
+  );
   const [conversations, setConversations] = useState(initialConversations);
   const [unreadTotal, setUnreadTotal] = useState(initialUnreadTotal);
   const [messagesByPartner, setMessagesByPartner] = useState<
@@ -344,7 +364,7 @@ export function ChatLauncher({
         setUnreadTotal((t) => Math.max(0, t - wasUnread));
         window.dispatchEvent(
           new CustomEvent<ChatClearedDetail>("vivida:chat-cleared", {
-            detail: { partnerId },
+            detail: { partnerId, clearedCount: wasUnread },
           })
         );
       }
@@ -400,6 +420,14 @@ export function ChatLauncher({
     window.addEventListener("vivida:open-chat", onOpenChat);
     return () => window.removeEventListener("vivida:open-chat", onOpenChat);
   }, [handleSelect]);
+
+  // Page-mode auto-open when a `?with=<partnerId>` query is supplied.
+  // Mount-once effect — handleSelect is stable (empty deps).
+  useEffect(() => {
+    if (!initialPartnerId) return;
+    void handleSelect(initialPartnerId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSend = useCallback(
     async (partnerId: string, text: string): Promise<SendResult> => {
@@ -472,6 +500,41 @@ export function ChatLauncher({
     },
     [viewerId]
   );
+
+  // Background mode: SSE pump + event dispatch only, no UI. Used on every
+  // authed page so the bottom-bar messages badge stays live without
+  // mounting the full chat surface twice.
+  if (mode === "background") return null;
+
+  // Page mode: full-bleed chat surface, no float, no animation. The
+  // /messages route renders this. ChatView/ConversationList are reused
+  // unchanged so the modal mode below stays consistent.
+  if (mode === "page") {
+    return (
+      <div className="flex h-[calc(100dvh-9rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card/65 ring-1 ring-foreground/5 backdrop-blur-xl sm:h-[calc(100dvh-12rem)]">
+        {activePartner ? (
+          <ChatView
+            viewerId={viewerId}
+            partner={activePartner}
+            messages={messagesByPartner[activePartner.id] ?? null}
+            isTyping={!!typingByPartner[activePartner.id]}
+            onBack={() => setActivePartnerId(null)}
+            onSend={(text) => handleSend(activePartner.id, text)}
+            onTyping={() => {
+              void pingTyping(activePartner.id).catch(() => {});
+            }}
+          />
+        ) : (
+          <ConversationList
+            conversations={conversations}
+            viewerId={viewerId}
+            onSelect={handleSelect}
+            onClose={null}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -546,20 +609,23 @@ function ConversationList({
   conversations: ChatConversation[];
   viewerId: string;
   onSelect: (partnerId: string) => void;
-  onClose: () => void;
+  /** null when rendered as a full page — the close affordance is hidden. */
+  onClose: (() => void) | null;
 }) {
   return (
     <>
       <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
         <h2 className="text-base font-semibold tracking-tight">ჩატი</h2>
-        <button
-          type="button"
-          aria-label="დახურვა"
-          onClick={onClose}
-          className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <X className="size-4" />
-        </button>
+        {onClose && (
+          <button
+            type="button"
+            aria-label="დახურვა"
+            onClick={onClose}
+            className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        )}
       </header>
       {conversations.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
@@ -569,7 +635,7 @@ function ConversationList({
           </p>
           <Link
             href="/discover"
-            onClick={onClose}
+            onClick={onClose ?? undefined}
             className="text-xs text-[var(--vivida-cyan)] hover:underline"
           >
             ნახე ვინ რეზონირებს შენთან →

@@ -32,6 +32,7 @@ export async function AppHeader({
     | "discover"
     | "synastry"
     | "friends"
+    | "messages"
     | "pricing"
     | "account";
 }) {
@@ -45,6 +46,7 @@ export async function AppHeader({
     [];
   let unread = 0;
   let username: string | null = null;
+  let unreadMessages = 0;
 
   if (authed) {
     const session = await auth();
@@ -61,6 +63,7 @@ export async function AppHeader({
       notifications = data.notifications;
       unread = data.unread;
       username = data.username;
+      unreadMessages = data.unreadMessages;
     }
   }
 
@@ -135,7 +138,10 @@ export async function AppHeader({
       </div>
     </header>
     {userInfo && (
-      <MobileTabBar active={active as NavActiveKey | undefined} />
+      <MobileTabBar
+        active={active as NavActiveKey | undefined}
+        unreadMessages={unreadMessages}
+      />
     )}
     </>
   );

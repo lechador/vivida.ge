@@ -133,9 +133,7 @@ export function NotificationsDropdown({
   const handleMessageClick = (partnerId: string) => {
     setOpen(false);
     setMsgNotifs((prev) => prev.filter((m) => m.partnerId !== partnerId));
-    window.dispatchEvent(
-      new CustomEvent("vivida:open-chat", { detail: { partnerId } })
-    );
+    window.location.href = `/messages?with=${encodeURIComponent(partnerId)}`;
   };
 
   type DisplayItem =

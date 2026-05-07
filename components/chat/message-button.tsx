@@ -1,19 +1,12 @@
-"use client";
-
+import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * Opens the chat panel directly to a conversation with `partnerId`.
- *
- * Implementation: dispatches the `vivida:open-chat` CustomEvent. The
- * globally-mounted ChatLauncher listens for it (see chat-launcher.tsx)
- * and handles opening the panel + selecting the partner. We use an
- * event instead of context/prop drilling because the chat launcher
- * lives in `app/layout.tsx` (the global ChatShell) — there's no shared
- * React tree to thread state through.
+ * Navigates to the messenger page with `partnerId` preselected. The page
+ * picks the partner up from `?with=...` and auto-opens that conversation.
  *
  * Visual variants:
  *   - "default": full button with label (used inline next to FriendButton)
@@ -28,36 +21,29 @@ export function MessageButton({
   variant?: "default" | "icon";
   className?: string;
 }) {
-  const open = () => {
-    window.dispatchEvent(
-      new CustomEvent("vivida:open-chat", { detail: { partnerId } })
-    );
-  };
+  const href = `/messages?with=${encodeURIComponent(partnerId)}`;
 
   if (variant === "icon") {
     return (
       <Button
-        type="button"
+        asChild
         variant="outline"
         size="icon"
-        onClick={open}
-        aria-label="წერილი"
         className={cn("shrink-0", className)}
       >
-        <MessageCircle className="size-4" />
+        <Link href={href} aria-label="წერილი">
+          <MessageCircle className="size-4" />
+        </Link>
       </Button>
     );
   }
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={open}
-      className={cn("shrink-0", className)}
-    >
-      <MessageCircle className="size-4" />
-      წერილი
+    <Button asChild variant="outline" className={cn("shrink-0", className)}>
+      <Link href={href}>
+        <MessageCircle className="size-4" />
+        წერილი
+      </Link>
     </Button>
   );
 }

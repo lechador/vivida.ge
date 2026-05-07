@@ -3,6 +3,7 @@ import { and, asc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { profilePhotos, profiles } from "@/db/schema";
+import { countUnreadMessages } from "@/lib/messages";
 import {
   countUnreadNotifications,
   listRecentNotifications,
@@ -16,6 +17,8 @@ export type HeaderData = {
   /** First ready profile photo (sortOrder=0). Overrides the OAuth
    *  avatar so users see their chosen "main" photo in the navbar. */
   avatarUrl: string | null;
+  /** Unread chat messages — drives the bottom-bar messages tab badge. */
+  unreadMessages: number;
 };
 
 /**
@@ -30,31 +33,34 @@ export type HeaderData = {
 export async function getHeaderData(userId: string): Promise<HeaderData> {
   return unstable_cache(
     async () => {
-      const [profileRow, notifications, unread, avatarRow] = await Promise.all([
-        db
-          .select({ username: profiles.username })
-          .from(profiles)
-          .where(eq(profiles.userId, userId))
-          .limit(1),
-        listRecentNotifications(userId),
-        countUnreadNotifications(userId),
-        db
-          .select({ url: profilePhotos.url })
-          .from(profilePhotos)
-          .where(
-            and(
-              eq(profilePhotos.userId, userId),
-              eq(profilePhotos.ready, true)
+      const [profileRow, notifications, unread, avatarRow, unreadMessages] =
+        await Promise.all([
+          db
+            .select({ username: profiles.username })
+            .from(profiles)
+            .where(eq(profiles.userId, userId))
+            .limit(1),
+          listRecentNotifications(userId),
+          countUnreadNotifications(userId),
+          db
+            .select({ url: profilePhotos.url })
+            .from(profilePhotos)
+            .where(
+              and(
+                eq(profilePhotos.userId, userId),
+                eq(profilePhotos.ready, true)
+              )
             )
-          )
-          .orderBy(asc(profilePhotos.sortOrder))
-          .limit(1),
-      ]);
+            .orderBy(asc(profilePhotos.sortOrder))
+            .limit(1),
+          countUnreadMessages(userId),
+        ]);
       return {
         username: profileRow[0]?.username ?? null,
         notifications,
         unread,
         avatarUrl: avatarRow[0]?.url ?? null,
+        unreadMessages,
       };
     },
     ["header-data", userId],

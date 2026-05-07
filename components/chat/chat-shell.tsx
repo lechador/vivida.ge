@@ -3,7 +3,7 @@ import {
   countUnreadMessages,
   listConversations,
 } from "@/lib/messages";
-import { ChatLauncher } from "./chat-launcher";
+import { ChatShellClient } from "./chat-shell-client";
 
 /**
  * Server-side shell that decides whether to render the chat at all.
@@ -41,7 +41,7 @@ export async function ChatShell() {
   }));
 
   return (
-    <ChatLauncher
+    <ChatShellClient
       viewerId={userId}
       initialConversations={initial}
       initialUnreadTotal={unreadTotal}
