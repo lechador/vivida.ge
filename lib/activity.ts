@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull, lt, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { profiles, userActivityDays } from "@/db/schema";
+import { profiles, userActivityDays, users } from "@/db/schema";
 
 /**
  * Best-effort "user was active today" record.
@@ -32,6 +32,23 @@ export async function recordVisit(userId: string): Promise<void> {
       .insert(userActivityDays)
       .values({ userId, dateLocal })
       .onConflictDoNothing();
+
+    // Also bump users.lastLoginAt so the admin "last seen" column reflects
+    // continued activity even when the user never explicitly signs in (JWT
+    // sessions can stay valid for weeks). Conditional WHERE throttles to
+    // ~1 write per minute per user so heavy navigation doesn't pummel Neon.
+    await db
+      .update(users)
+      .set({ lastLoginAt: new Date() })
+      .where(
+        and(
+          eq(users.id, userId),
+          or(
+            isNull(users.lastLoginAt),
+            lt(users.lastLoginAt, sql`now() - interval '60 seconds'`)
+          )
+        )
+      );
   } catch (err) {
     // Activity logging is opportunistic — drop the error rather than
     // letting it bubble up into the page response.
