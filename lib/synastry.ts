@@ -409,17 +409,17 @@ export function computeSynastry(
     elementPoints += sBoost + mBoost;
   }
 
-  // ── 4. Normalise to 12–95 % via tanh ──────────────────────────────
-  // Center at 48 so a chart pair with no signal lands slightly below
-  // neutral (real synastry is rarely "totally neutral" — absence of
-  // resonance IS friction). Amplitude 44 with divisor 7 gives a wide
-  // realistic spread: 12% for genuinely hostile pairs, 95% as the cap
-  // (no chart is ever exactly perfect), and the typical pair lands
-  // somewhere in 35–80 instead of clustering at the high end.
+  // ── 4. Normalise to 16–95 % via tanh ──────────────────────────────
+  // Centered at 52 — slightly above neutral so an "OK" pair (a couple
+  // of mild positives) reads as 60-ish instead of 56-ish, which felt
+  // unfairly cool in casual testing. Amplitude 44 / divisor 7 keeps
+  // the wide realistic spread: hostile pairs still hit the teens,
+  // exceptional ones still cap at 95, but everything middle-ground
+  // gets ~+4 of warmth.
   const scores = {} as Record<SynastryCategory, number>;
   for (const cat of CATEGORIES) {
-    const norm = 48 + 44 * Math.tanh(raw[cat] / 7);
-    scores[cat] = Math.max(12, Math.min(95, Math.round(norm)));
+    const norm = 52 + 44 * Math.tanh(raw[cat] / 7);
+    scores[cat] = Math.max(16, Math.min(95, Math.round(norm)));
   }
 
   const overall = Math.round(
