@@ -8,8 +8,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const MAX_PHOTOS = 6;
-const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+// Server-side cap (after client-side recompression). Modern phone cameras
+// produce 5-12 MB originals, so we accept up to ~10 MB pre-compression and
+// shrink everything to a long-side ≤ 2000 px JPEG before uploading.
+const MAX_BYTES = 10 * 1024 * 1024;
+const MAX_LONG_SIDE = 2000;
+const JPEG_QUALITY = 0.85;
 
 type ServerPhoto = { id: string; url: string; ready: boolean };
 
@@ -29,6 +33,7 @@ export function PhotoUploader({
   const [pending, setPending] = useState<PendingUpload[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [topError, setTopError] = useState<string | null>(null);
 
   const totalCount = photos.length + pending.length;
   const remaining = Math.max(0, MAX_PHOTOS - totalCount);
@@ -127,18 +132,41 @@ export function PhotoUploader({
   }
 
   async function handleFiles(files: FileList | File[]) {
+    setTopError(null);
     const arr = Array.from(files);
-    const validated: File[] = [];
-    for (const f of arr) {
-      if (!ALLOWED_TYPES.includes(f.type)) continue;
-      if (f.size > MAX_BYTES) continue;
-      validated.push(f);
-    }
+    if (arr.length === 0) return;
+
     const room = MAX_PHOTOS - totalCount;
-    const accepted = validated.slice(0, Math.max(0, room));
-    accepted.forEach((f) => {
-      void uploadOne(f);
-    });
+    if (room <= 0) {
+      setTopError("მაქსიმალური 6 ფოტო უკვე გყავს");
+      return;
+    }
+
+    const candidates = arr.slice(0, room);
+    let tooBig = 0;
+    let unreadable = 0;
+
+    for (const f of candidates) {
+      if (f.size > MAX_BYTES) {
+        tooBig++;
+        continue;
+      }
+      try {
+        // Always re-encode through canvas: fixes oversized phone photos,
+        // strips EXIF, normalizes orientation, and turns iOS HEIC/HEIF
+        // (when Safari can decode it) into a server-safe JPEG.
+        const compressed = await compressToJpeg(f);
+        void uploadOne(compressed);
+      } catch {
+        unreadable++;
+      }
+    }
+
+    const msgs: string[] = [];
+    if (unreadable > 0)
+      msgs.push("ფაილის ფორმატი არ იხსნება — სცადე JPEG ან PNG");
+    if (tooBig > 0) msgs.push("ფაილი 10 MB-ზე დიდია");
+    if (msgs.length > 0) setTopError(msgs.join(" · "));
   }
 
   async function deletePhoto(id: string) {
@@ -215,7 +243,7 @@ export function PhotoUploader({
           <div>
             <div className="text-base font-semibold">აირჩიე ან ჩააგდე ფოტო</div>
             <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-              JPEG · PNG · WebP — მაქს. 5 MB. შეგიძლია 6-მდე ფოტო ერთად ატვირთო.
+              JPEG · PNG · WebP — მობილურიდანაც. 6-მდე ფოტო ერთად.
             </p>
           </div>
           <span className="mt-1 inline-flex items-center rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2 text-sm font-medium text-white shadow-lg shadow-[var(--vivida-violet)]/25">
@@ -279,7 +307,7 @@ export function PhotoUploader({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept="image/*"
         multiple
         hidden
         onChange={(e) => {
@@ -288,9 +316,15 @@ export function PhotoUploader({
         }}
       />
 
+      {topError && (
+        <p className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          {topError}
+        </p>
+      )}
+
       {!isEmpty && (
         <p className="mt-4 text-xs text-muted-foreground">
-          JPEG · PNG · WebP — მაქს. 5 MB / ფოტო
+          JPEG · PNG · WebP — მობილურიდან ავტომატურად მცირდება
         </p>
       )}
     </div>
@@ -360,6 +394,64 @@ function PendingTile({ pending }: { pending: PendingUpload }) {
       />
     </div>
   );
+}
+
+async function compressToJpeg(file: File): Promise<File> {
+  // Decode. createImageBitmap is fastest and supports HEIC where the
+  // browser does (Safari 17+). Fall back to <img> for older engines.
+  let bitmap: ImageBitmap | null = null;
+  try {
+    bitmap = await createImageBitmap(file, {
+      imageOrientation: "from-image",
+    });
+  } catch {
+    bitmap = await decodeViaImg(file);
+  }
+
+  let { width, height } = bitmap;
+  if (width > MAX_LONG_SIDE || height > MAX_LONG_SIDE) {
+    const ratio = MAX_LONG_SIDE / Math.max(width, height);
+    width = Math.round(width * ratio);
+    height = Math.round(height * ratio);
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("canvas unsupported");
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close?.();
+
+  const blob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error("encode failed"))),
+      "image/jpeg",
+      JPEG_QUALITY
+    );
+  });
+
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "photo";
+  return new File([blob], `${baseName}.jpg`, {
+    type: "image/jpeg",
+    lastModified: Date.now(),
+  });
+}
+
+async function decodeViaImg(file: File): Promise<ImageBitmap> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = document.createElement("img");
+    img.decoding = "async";
+    img.src = url;
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("decode failed"));
+    });
+    return await createImageBitmap(img);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 function errorToMessage(code: string | undefined): string {

@@ -93,6 +93,9 @@ export function publicUrlFor(key: string): string {
 
 export const PHOTO_LIMITS = {
   MAX_PER_USER: 6,
-  MAX_BYTES: 5 * 1024 * 1024, // 5 MB
+  // Pre-compression cap. The browser shrinks every photo to a long-side
+  // ≤ 2000 px JPEG before PUT-ing, so the actual bytes that hit R2 are
+  // typically ~300-700 KB. The 10 MB cap is a safety net for raw input.
+  MAX_BYTES: 10 * 1024 * 1024,
   ALLOWED_TYPES: ["image/jpeg", "image/png", "image/webp"] as const,
 };
