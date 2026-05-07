@@ -13,6 +13,7 @@ import { computeElementBalance } from "@/lib/elements";
 import { computeSynastry } from "@/lib/synastry";
 import { signByIndex } from "@/lib/zodiac";
 import { getFriendshipStatus } from "@/lib/friendship";
+import { ageFromDob } from "@/lib/profile-utils";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -132,6 +133,7 @@ export default async function PublicProfilePage({
 
   const displayName =
     profile.displayName ?? owner.name?.split(" ")[0] ?? username;
+  const age = ageFromDob(profile.dateOfBirth);
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -180,6 +182,11 @@ export default async function PublicProfilePage({
               </div>
               <h1 className="mt-1 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
                 {displayName}
+                {age != null && (
+                  <span className="font-normal text-foreground/70">
+                    , {age}
+                  </span>
+                )}
               </h1>
               {profile.bio && (
                 <p className="mt-2 max-w-md text-pretty text-sm text-foreground/85">
