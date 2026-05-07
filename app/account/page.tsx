@@ -7,6 +7,7 @@ import { db } from "@/db";
 import { profiles, profilePhotos, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { asc } from "drizzle-orm";
+import { getHeaderData } from "@/lib/header-cache";
 import { getCurrentPlan, getOrProvisionSubscription } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
@@ -18,6 +19,7 @@ import { PhotoUploader } from "@/components/account/photo-uploader";
 import { EmailPreferencesCard } from "@/components/account/email-preferences-card";
 
 export const metadata = { title: "ანგარიში" };
+export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
   const user = await requireUser();
@@ -28,7 +30,7 @@ export default async function AccountPage() {
   // signup, so the trial row must exist before we render plan UI.
   const subscription = await getOrProvisionSubscription(user.id);
 
-  const [[profile], plan, photos, [emailPrefs]] = await Promise.all([
+  const [[profile], plan, photos, [emailPrefs], headerData] = await Promise.all([
     db
       .select()
       .from(profiles)
@@ -53,7 +55,10 @@ export default async function AccountPage() {
       .from(users)
       .where(eq(users.id, user.id))
       .limit(1),
+    getHeaderData(user.id),
   ]);
+  // Same avatar resolution as the navbar so they never disagree.
+  const accountAvatar = headerData.avatarUrl ?? user.image ?? null;
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -75,21 +80,15 @@ export default async function AccountPage() {
 
         {/* Profile */}
         <div className="mb-6 flex items-center gap-4 rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
-          {(() => {
-            // Prefer the user's chosen "main" profile photo (sortOrder=0)
-            // over the OAuth avatar — same precedence as the navbar.
-            const avatar = photos[0]?.url ?? user.image ?? null;
-            if (!avatar) return null;
-            return (
-              <Image
-                src={avatar}
-                alt=""
-                width={48}
-                height={48}
-                className="size-12 rounded-full border border-border"
-              />
-            );
-          })()}
+          {accountAvatar && (
+            <Image
+              src={accountAvatar}
+              alt=""
+              width={48}
+              height={48}
+              className="size-12 rounded-full border border-border"
+            />
+          )}
           <div className="min-w-0 flex-1">
             <div className="truncate text-base font-medium text-foreground">
               {user.name ?? "ვარსკვლავო"}
