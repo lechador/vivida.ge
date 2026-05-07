@@ -4,9 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { buildCosmicCard } from "@/lib/cosmic-cards-server";
 import { getCurrentPlan } from "@/lib/plan";
-import { getUserStreak } from "@/lib/streak";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
@@ -17,10 +15,9 @@ export const metadata = { title: "დღეს" };
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [[profile], plan, streakInfo] = await Promise.all([
+  const [[profile], plan] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     getCurrentPlan(user.id),
-    getUserStreak(user.id),
   ]);
 
   if (!profile) {
@@ -28,7 +25,6 @@ export default async function DashboardPage() {
   }
 
   const firstName = user.name?.split(" ")[0] ?? "ვარსკვლავო";
-  const cosmicCard = await buildCosmicCard(user.id, streakInfo.todayLocal);
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -63,16 +59,8 @@ export default async function DashboardPage() {
         {/* DailyDashboard is a client component — it fetches the heavy AI
             data via a server action after first paint, so the response
             stream closes immediately and the browser tab spinner stops.
-            Our internal CosmicLoader covers the AI generation window.
-            CosmicCard / streak are tiny server props passed straight
-            through so they render immediately. */}
-        <DailyDashboard
-          userId={user.id}
-          plan={plan}
-          cosmicCard={cosmicCard}
-          cosmicCardTodayLocal={streakInfo.todayLocal}
-          streak={streakInfo.streak}
-        />
+            Our internal CosmicLoader covers the AI generation window. */}
+        <DailyDashboard userId={user.id} plan={plan} />
       </section>
     </main>
   );
