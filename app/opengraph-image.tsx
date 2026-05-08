@@ -1,27 +1,10 @@
 import { ImageResponse } from "next/og";
 
-/**
- * Default OG image for the entire site (1200×630). Pages that want a
- * tailored card can drop their own `opengraph-image.tsx` next to their
- * `page.tsx`. This file double-serves Twitter via the `twitter` metadata
- * fallback rules in app/layout.tsx — so we don't need a separate
- * twitter-image.tsx unless we want different copy.
- *
- * Renders edge-side via next/og's ImageResponse. Georgian glyphs require
- * an explicit font fetch — system fonts on Vercel's edge don't carry the
- * Georgian script, so without this the headline would render as boxes.
- */
+import { readFontBuffer } from "./_fonts/load";
 
-export const runtime = "edge";
-
-export const alt = "Vivida — შენი კოსმიური რუკა";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
-
-// Self-hosted Noto Sans Georgian — bundled with the function rather
-// than fetched from fonts.gstatic.com because Google's pinned URLs
-// rotate every few months and break this route. The TTFs live in
-// app/_fonts/ (underscored folder, ignored by Next routing).
+// Static URL literals so Webpack copies the .ttf into the function
+// bundle. Don't move these into a helper — a parameterised path makes
+// the asset reference invisible to the bundler.
 const NOTO_REGULAR_URL = new URL(
   "./_fonts/NotoSansGeorgian-Regular.ttf",
   import.meta.url
@@ -31,16 +14,29 @@ const NOTO_BOLD_URL = new URL(
   import.meta.url
 );
 
-async function loadFont(url: URL): Promise<ArrayBuffer> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`font fetch failed: ${url.toString()}`);
-  return res.arrayBuffer();
-}
+/**
+ * Default OG image for the entire site (1200×630). Pages that want a
+ * tailored card can drop their own `opengraph-image.tsx` next to their
+ * `page.tsx`. This file double-serves Twitter via the `twitter` metadata
+ * fallback rules in app/layout.tsx — so we don't need a separate
+ * twitter-image.tsx unless we want different copy.
+ *
+ * Runs on the Node runtime so we can read the bundled Georgian font
+ * from disk. Vercel's Node fetch doesn't support file:// URLs, which
+ * is why we don't use the next/og-typical fetch(import.meta.url)
+ * pattern here.
+ */
+
+export const runtime = "nodejs";
+
+export const alt = "Vivida — შენი კოსმიური რუკა";
+export const size = { width: 1200, height: 630 };
+export const contentType = "image/png";
 
 export default async function OpengraphImage() {
   const [regular, bold] = await Promise.all([
-    loadFont(NOTO_REGULAR_URL),
-    loadFont(NOTO_BOLD_URL),
+    readFontBuffer(NOTO_REGULAR_URL),
+    readFontBuffer(NOTO_BOLD_URL),
   ]);
 
   return new ImageResponse(
