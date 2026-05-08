@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 
 import type { SynastryResult } from "@/lib/synastry";
+import type { CompatibilityCardProps } from "./compatibility-card";
 
 /**
  * Lazy wrapper for SynastryDisplay. The full component is ~600 lines of
@@ -30,7 +31,7 @@ const SynastryDisplay = dynamic(
 export function SynastryDisplayLazy(props: {
   result: SynastryResult;
   partnerName: string;
-  shareUrl?: string;
+  shareCardProps?: CompatibilityCardProps;
 }) {
   return <SynastryDisplay {...props} />;
 }

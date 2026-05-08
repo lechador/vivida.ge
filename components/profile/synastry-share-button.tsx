@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, Download, Loader2, Share2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,83 +13,89 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import {
+  CompatibilityCard,
+  type CompatibilityCardProps,
+} from "./compatibility-card";
 
 /**
- * Shareable compatibility-card button. Opens a preview dialog showing
- * the actual rendered PNG (so the user sees what they're posting before
- * they commit), then offers two actions:
+ * Renders a 1080×1920 compatibility card off-screen via a portal,
+ * screenshots it client-side using html-to-image, and offers either
+ * the OS share sheet (mobile) or a PNG download (desktop).
  *
- * - Share via the Web Share API on devices that can share files
- *   (mobile — user picks Instagram/Facebook/WhatsApp from the native sheet)
- * - Download the PNG as a manual fallback for desktop or browsers
- *   without file-share support.
- *
- * The image is fetched once on dialog open and the blob is cached for
- * reuse on share/download. Auth is enforced server-side; a 401 here
- * means the user's session expired.
+ * We chose client-side rendering after multiple Vercel-side issues
+ * with next/og — bundling, font URLs, and satori hangs — none of
+ * which can affect the user's own browser.
  */
 export function SynastryShareButton({
-  shareUrl,
-  partnerName,
-  overall,
+  cardProps,
 }: {
-  /** Auth-protected image endpoint (e.g. /api/share/synastry?with=ana_2003). */
-  shareUrl: string;
-  /** Used in the share-sheet caption. */
-  partnerName: string;
-  /** Used in the share-sheet caption. */
-  overall: number;
+  cardProps: CompatibilityCardProps;
 }) {
   const [open, setOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
-  const [loadState, setLoadState] = useState<"idle" | "loading" | "ready" | "error">(
-    "idle"
-  );
-  const [actionState, setActionState] = useState<"idle" | "working" | "done">(
-    "idle"
-  );
+  const [loadState, setLoadState] = useState<
+    "idle" | "rendering" | "ready" | "error"
+  >("idle");
+  const [actionState, setActionState] = useState<
+    "idle" | "working" | "done"
+  >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Fetch the preview image when the dialog opens.
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+
+  // Defer portal access to client mount.
+  useEffect(() => {
+    setPortalRoot(document.body);
+  }, []);
+
+  // Render the off-screen card to a PNG when the dialog opens. We hold
+  // on to the blob so subsequent share/download is instant.
   useEffect(() => {
     if (!open) return;
-    if (loadState === "ready" || loadState === "loading") return;
+    if (loadState === "ready" || loadState === "rendering") return;
 
     let cancelled = false;
-    setLoadState("loading");
+    setLoadState("rendering");
     setErrorMessage(null);
 
     (async () => {
       try {
-        // Hard cap at 25s — Vercel functions max out at 30s on Pro and
-        // 10s on Hobby. If we hit this, something on the server is
-        // stuck (font fetch, avatar CDN, etc.) and the user deserves
-        // a real error rather than an infinite spinner.
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000);
-        const res = await fetch(shareUrl, { signal: controller.signal });
-        clearTimeout(timeoutId);
-        if (!res.ok) {
-          const detail = await res.text().catch(() => "");
-          throw new Error(
-            `status ${res.status}${detail ? ` — ${detail.slice(0, 80)}` : ""}`
-          );
+        // Wait two animation frames so React has time to commit the
+        // off-screen card into the DOM. Without this, html-to-image
+        // sometimes captures a half-rendered tree.
+        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        await new Promise((r) => requestAnimationFrame(() => r(null)));
+
+        if (!cardRef.current) {
+          throw new Error("card not mounted");
         }
-        const fetchedBlob = await res.blob();
+
+        // Lazy-import so html-to-image doesn't bloat the initial
+        // bundle for visitors who never click share.
+        const { toBlob } = await import("html-to-image");
+        const fresh = await toBlob(cardRef.current, {
+          // The card is already authored at 1080×1920 CSS pixels, so
+          // pixelRatio:1 captures the native resolution. cacheBust
+          // forces image elements to refetch with proper CORS.
+          pixelRatio: 1,
+          cacheBust: true,
+          backgroundColor: "#0b0814",
+        });
+
         if (cancelled) return;
-        const url = URL.createObjectURL(fetchedBlob);
-        setBlob(fetchedBlob);
-        setPreviewUrl(url);
+        if (!fresh) throw new Error("toBlob returned null");
+
+        setBlob(fresh);
+        setPreviewUrl(URL.createObjectURL(fresh));
         setLoadState("ready");
       } catch (err) {
         if (cancelled) return;
-        const isAbort = (err as DOMException)?.name === "AbortError";
-        const detail = isAbort
-          ? "ძალიან დიდი დრო დასჭირდა"
-          : (err as Error).message ?? "";
-        console.warn("[share preview]", detail);
-        setErrorMessage(`ვერ ჩაიტვირთა (${detail || "უცნობი შეცდომა"})`);
+        const detail = (err as Error).message ?? "";
+        console.warn("[share render]", detail);
+        setErrorMessage(`ვერ მოხერხდა (${detail || "უცნობი შეცდომა"})`);
         setLoadState("error");
       }
     })();
@@ -96,25 +103,17 @@ export function SynastryShareButton({
     return () => {
       cancelled = true;
     };
-  }, [open, shareUrl, loadState]);
+  }, [open, loadState]);
 
-  // Free the object URL when we replace it or unmount.
+  // Free the object URL on unmount or when replaced.
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
-  const fileName = `vivida-${overall}.png`;
+  const fileName = `vivida-${Math.round(cardProps.result.overall)}.png`;
 
-  /**
-   * Attempt the native share. Returns:
-   *   "shared"     — user accepted the share sheet
-   *   "cancelled"  — user dismissed (don't treat as failure)
-   *   "unsupported"— Web Share API or file-share isn't available
-   *   "failed"     — share threw for some other reason; caller should
-   *                  fall back to download
-   */
   const tryNativeShare = async (): Promise<
     "shared" | "cancelled" | "unsupported" | "failed"
   > => {
@@ -122,7 +121,9 @@ export function SynastryShareButton({
     const file = new File([blob], fileName, { type: "image/png" });
     const shareData: ShareData = {
       title: "Vivida — ჩვენი თავსებადობა",
-      text: `${partnerName}-სთან ჩემი თავსებადობა — ${overall}% ✦ vivida.ge`,
+      text: `${cardProps.partnerName}-სთან ჩემი თავსებადობა — ${Math.round(
+        cardProps.result.overall
+      )}% ✦ vivida.ge`,
       files: [file],
     };
 
@@ -139,9 +140,6 @@ export function SynastryShareButton({
     } catch (err) {
       const name = (err as DOMException)?.name;
       if (name === "AbortError") return "cancelled";
-      // Browsers throw various NotAllowedError / DataError flavours when
-      // a share is interrupted or partially supported — log and fall
-      // back so the user still gets the file.
       console.warn("[share native fallback]", name, (err as Error).message);
       return "failed";
     }
@@ -187,8 +185,6 @@ export function SynastryShareButton({
       setActionState("idle");
       return;
     }
-    // Unsupported or failed → fall back to a direct download so the
-    // user still ends up with the image.
     if (downloadBlob()) {
       finishOk();
       return;
@@ -218,13 +214,35 @@ export function SynastryShareButton({
         გააზიარე ბარათი
       </Button>
 
+      {/* Off-screen card mounted only while the dialog is open. The
+          fixed-positioned wrapper lives at top:-99999px so it doesn't
+          affect page layout but is still rendered at full size for
+          html-to-image to capture. */}
+      {open && portalRoot
+        ? createPortal(
+            <div
+              aria-hidden
+              style={{
+                position: "fixed",
+                top: -99999,
+                left: -99999,
+                pointerEvents: "none",
+                zIndex: -1,
+              }}
+            >
+              <div ref={cardRef}>
+                <CompatibilityCard {...cardProps} />
+              </div>
+            </div>,
+            portalRoot
+          )
+        : null}
+
       <Dialog
         open={open}
         onOpenChange={(next) => {
           setOpen(next);
           if (!next) {
-            // Reset action state on close so re-open shows the same
-            // preview (we keep the blob cached).
             setActionState("idle");
             setErrorMessage(null);
           }
@@ -241,18 +259,18 @@ export function SynastryShareButton({
           {/* Preview */}
           <div
             className={cn(
-              "relative mx-auto w-full max-w-[240px] overflow-hidden rounded-xl border border-border bg-card/40",
+              "relative mx-auto w-full max-w-[240px] overflow-hidden rounded-xl border border-border bg-[#0b0814]",
               "aspect-[9/16]"
             )}
           >
-            {loadState === "loading" && (
+            {(loadState === "rendering" || loadState === "idle") && (
               <div className="absolute inset-0 grid place-items-center">
                 <Loader2 className="size-6 animate-spin text-muted-foreground" />
               </div>
             )}
             {loadState === "error" && (
               <div className="absolute inset-0 grid place-items-center px-3 text-center text-xs text-muted-foreground">
-                {errorMessage ?? "ვერ ჩაიტვირთა"}
+                {errorMessage ?? "ვერ მოხერხდა"}
               </div>
             )}
             {previewUrl && loadState === "ready" && (
@@ -302,7 +320,7 @@ export function SynastryShareButton({
           </div>
 
           <p className="text-center text-[11px] text-muted-foreground">
-            მობილურზე ღილაკი „გააზიარე“ პირდაპირ აჩვენებს Instagram/Facebook
+            მობილურზე ღილაკი „გააზიარე" პირდაპირ აჩვენებს Instagram/Facebook
             არჩევანს. დესკტოპზე — ჩამოტვირთავს PNG-ს.
           </p>
         </DialogContent>

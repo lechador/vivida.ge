@@ -10,7 +10,7 @@ import { auth } from "@/auth";
 import { ensureChartFor } from "@/actions/chart";
 import { getCurrentPlan } from "@/lib/plan";
 import { computeElementBalance } from "@/lib/elements";
-import { computeSynastry } from "@/lib/synastry";
+import { computeSynastry, overallVerdict } from "@/lib/synastry";
 import { signByIndex } from "@/lib/zodiac";
 import { getFriendshipStatus } from "@/lib/friendship";
 import { ageFromDob } from "@/lib/profile-utils";
@@ -98,11 +98,16 @@ export default async function PublicProfilePage({
 
   let synastry = null;
   let viewerName: string | null = null;
+  let viewerSunSign = null;
   if (viewerId && !isOwner && ownerChart) {
     const viewerChart = await ensureChartFor(viewerId, viewerPlan);
     if (viewerChart) {
       synastry = computeSynastry(viewerChart.data, ownerChart.data);
       viewerName = session?.user?.name?.split(" ")[0] ?? "შენ";
+      const viewerSunIdx = viewerChart.data?.bodies?.sun?.signIndex;
+      if (typeof viewerSunIdx === "number") {
+        viewerSunSign = signByIndex(viewerSunIdx);
+      }
     }
   }
 
@@ -273,9 +278,20 @@ export default async function PublicProfilePage({
             <SynastryDisplayLazy
               result={synastry}
               partnerName={displayName}
-              shareUrl={`/api/share/synastry?with=${encodeURIComponent(
-                profile.username ?? ""
-              )}`}
+              shareCardProps={
+                viewerName && viewerSunSign && sun
+                  ? {
+                      viewerName,
+                      viewerSignLabel: viewerSunSign.labelKa,
+                      viewerSignSymbol: viewerSunSign.symbol,
+                      partnerName: displayName,
+                      partnerSignLabel: sun.labelKa,
+                      partnerSignSymbol: sun.symbol,
+                      result: synastry,
+                      verdict: overallVerdict(synastry.overall),
+                    }
+                  : undefined
+              }
             />
           </section>
         )}
