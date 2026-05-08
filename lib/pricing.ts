@@ -121,11 +121,6 @@ export const FEATURES: FeatureRow[] = [
     pro: "ულიმიტო",
   },
   {
-    label: "პირადი პროფილი (დამალვა)",
-    free: false,
-    pro: true,
-  },
-  {
     label: "წლიური ნატალური ანგარიში (PDF)",
     free: false,
     pro: true,

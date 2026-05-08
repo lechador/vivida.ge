@@ -10,7 +10,6 @@ import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { invalidateProfileForUser } from "@/lib/header-cache";
 import { ensureChartFor } from "@/actions/chart";
-import { canUseFeature } from "@/lib/features";
 import { getCurrentPlan } from "@/lib/plan";
 
 export type SaveProfileInput = {
@@ -20,8 +19,7 @@ export type SaveProfileInput = {
   latitude: number;
   longitude: number;
   timezone: string;
-  /** Optional visibility — wizard sets these on first save. */
-  isPublic?: boolean;
+  /** Optional username — wizard sets it on first save. */
   username?: string | null;
 };
 
@@ -31,6 +29,7 @@ export type SaveProfileResult =
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^\d{2}:\d{2}$/;
+const USERNAME_RE = /^[a-z0-9_]{3,24}$/;
 
 export async function saveProfile(
   input: SaveProfileInput
@@ -79,20 +78,14 @@ export async function saveProfile(
   // Time stored as HH:MM:SS for Postgres `time` column.
   const timeForDb = input.timeOfBirth ? `${input.timeOfBirth}:00` : null;
 
-  // Visibility — only validate / persist when explicitly set in the call.
-  // Existing profiles editing their birth data won't have visibility passed.
-  const visibilityProvided = input.isPublic !== undefined;
+  // Username — only validate / persist when explicitly set in the call.
+  // Existing profiles editing their birth data won't have username passed.
+  const usernameProvided = input.username !== undefined;
   let username: string | null = null;
-  if (visibilityProvided) {
+  if (usernameProvided) {
     const u = input.username?.trim().toLowerCase() || null;
-    if (input.isPublic) {
-      if (!u) {
-        return {
-          ok: false,
-          error: "საჯარო პროფილისთვის აირჩიე მომხმარებლის სახელი",
-        };
-      }
-      if (!/^[a-z0-9_]{3,24}$/.test(u)) {
+    if (u) {
+      if (!USERNAME_RE.test(u)) {
         return {
           ok: false,
           error: "მომხმარებლის სახელი უნდა იყოს 3-24 სიმბოლო (a-z, 0-9, _)",
@@ -121,9 +114,7 @@ export async function saveProfile(
         longitude: input.longitude,
         cityName: input.cityName.trim(),
         timezone: input.timezone,
-        ...(visibilityProvided
-          ? { isPublic: input.isPublic, username }
-          : {}),
+        ...(usernameProvided ? { username } : {}),
       })
       .onConflictDoUpdate({
         target: profiles.userId,
@@ -135,9 +126,7 @@ export async function saveProfile(
           longitude: input.longitude,
           cityName: input.cityName.trim(),
           timezone: input.timezone,
-          ...(visibilityProvided
-            ? { isPublic: input.isPublic, username }
-            : {}),
+          ...(usernameProvided ? { username } : {}),
           updatedAt: new Date(),
         },
       });
@@ -174,83 +163,46 @@ export async function saveProfile(
 }
 
 // ────────────────────────────────────────────────────────────────────────
-// Public-profile fields: visibility toggle + username + display name + bio
+// Public profile fields: username + display name + bio
 // ────────────────────────────────────────────────────────────────────────
 
-const USERNAME_RE = /^[a-z0-9_]{3,24}$/;
-
-export type UpdateVisibilityInput = {
-  isPublic: boolean;
-  username?: string | null;
+export type UpdateProfileFieldsInput = {
+  username: string;
   displayName?: string | null;
   bio?: string | null;
 };
 
-export type UpdateVisibilityResult =
+export type UpdateProfileFieldsResult =
   | { ok: true }
   | { ok: false; error: string };
 
 /**
- * Toggle public visibility and edit the public-profile fields.
+ * Edit the public-profile fields. Every profile is public, so this just
+ * validates and saves username/displayName/bio.
  * Username must be unique + slug-shaped (3–24 chars, lowercase + digits + _).
  */
-export async function updateVisibility(
-  input: UpdateVisibilityInput
-): Promise<UpdateVisibilityResult> {
+export async function updateProfileFields(
+  input: UpdateProfileFieldsInput
+): Promise<UpdateProfileFieldsResult> {
   const user = await requireUser();
 
-  // Gate: making a profile private is a Pro feature. Free users can edit
-  // their bio/display name/username freely, but the privacy toggle stays
-  // locked. Legacy private profiles (set during a previous Pro period)
-  // are grandfathered — they keep their state as long as they don't try
-  // to flip it.
-  if (!input.isPublic) {
-    const plan = await getCurrentPlan(user.id);
-    if (!canUseFeature("privateProfile", plan)) {
-      const [current] = await db
-        .select({ isPublic: profiles.isPublic })
-        .from(profiles)
-        .where(eq(profiles.userId, user.id))
-        .limit(1);
-      // Reject only when it's an actual public → private flip. Legacy
-      // already-private accounts can save other field edits while
-      // keeping their current state (the form sends isPublic=false in
-      // that case, and we accept it as a no-op).
-      if (current?.isPublic !== false) {
-        return {
-          ok: false,
-          error:
-            "პირადი პროფილი მხოლოდ Pro გეგმაშია ხელმისაწვდომი. გადადი Pro-ზე ამ პარამეტრის ჩასართავად.",
-        };
-      }
-    }
+  const username = input.username.trim().toLowerCase();
+  if (!username) {
+    return { ok: false, error: "აირჩიე მომხმარებლის სახელი" };
   }
-
-  // When going public, a username is required
-  const username = input.username?.trim().toLowerCase() || null;
-  if (input.isPublic) {
-    if (!username) {
-      return {
-        ok: false,
-        error: "საჯარო პროფილისთვის აირჩიე მომხმარებლის სახელი",
-      };
-    }
-    if (!USERNAME_RE.test(username)) {
-      return {
-        ok: false,
-        error:
-          "მომხმარებლის სახელი უნდა იყოს 3-24 სიმბოლო (a-z, 0-9, _)",
-      };
-    }
-    // Uniqueness check (we still rely on the unique index as the floor)
-    const [taken] = await db
-      .select({ userId: profiles.userId })
-      .from(profiles)
-      .where(eq(profiles.username, username))
-      .limit(1);
-    if (taken && taken.userId !== user.id) {
-      return { ok: false, error: "ეს მომხმარებლის სახელი უკვე დაკავებულია" };
-    }
+  if (!USERNAME_RE.test(username)) {
+    return {
+      ok: false,
+      error: "მომხმარებლის სახელი უნდა იყოს 3-24 სიმბოლო (a-z, 0-9, _)",
+    };
+  }
+  const [taken] = await db
+    .select({ userId: profiles.userId })
+    .from(profiles)
+    .where(eq(profiles.username, username))
+    .limit(1);
+  if (taken && taken.userId !== user.id) {
+    return { ok: false, error: "ეს მომხმარებლის სახელი უკვე დაკავებულია" };
   }
 
   const displayName = input.displayName?.trim() || null;
@@ -267,7 +219,6 @@ export async function updateVisibility(
     await db
       .update(profiles)
       .set({
-        isPublic: input.isPublic,
         username,
         displayName,
         bio,
@@ -283,8 +234,7 @@ export async function updateVisibility(
   }
 
   revalidatePath("/account");
-  if (username) revalidatePath(`/u/${username}`);
+  revalidatePath(`/u/${username}`);
   invalidateProfileForUser(user.id);
   return { ok: true };
 }
-

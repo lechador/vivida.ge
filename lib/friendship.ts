@@ -52,7 +52,6 @@ export type FriendshipUser = {
   username: string | null;
   displayName: string | null;
   bio: string | null;
-  isPublic: boolean;
   /** Date of the friendship event (createdAt for pending, respondedAt for friends). */
   since: Date;
 };
@@ -106,7 +105,6 @@ export async function listFriends(userId: string): Promise<FriendshipUser[]> {
       username: r.profile?.username ?? null,
       displayName: r.profile?.displayName ?? null,
       bio: r.profile?.bio ?? null,
-      isPublic: r.profile?.isPublic ?? false,
       since: r.friendship.respondedAt ?? r.friendship.createdAt,
     }))
     .sort((a, b) => b.since.getTime() - a.since.getTime());
@@ -142,7 +140,6 @@ export async function listIncomingRequests(
     username: r.profile?.username ?? null,
     displayName: r.profile?.displayName ?? null,
     bio: r.profile?.bio ?? null,
-    isPublic: r.profile?.isPublic ?? false,
     since: r.friendship.createdAt,
   }));
 }
@@ -177,7 +174,6 @@ export async function listOutgoingRequests(
     username: r.profile?.username ?? null,
     displayName: r.profile?.displayName ?? null,
     bio: r.profile?.bio ?? null,
-    isPublic: r.profile?.isPublic ?? false,
     since: r.friendship.createdAt,
   }));
 }

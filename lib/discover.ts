@@ -108,7 +108,7 @@ export async function getDiscoveryFeed(
   }
   const excludedList = [...excluded];
 
-  // 3. Pull public-profile candidates with their charts
+  // 3. Pull profile candidates with their charts
   const candidates = await db
     .select({
       user: users,
@@ -120,11 +120,10 @@ export async function getDiscoveryFeed(
     .innerJoin(charts, eq(charts.userId, profiles.userId))
     .where(
       and(
-        eq(profiles.isPublic, true),
         ne(users.id, viewerId),
         excludedList.length > 1
           ? inArray(users.id, await pickIncluded(excludedList, viewerId))
-          : eq(profiles.isPublic, true) // tautology when only viewer excluded
+          : undefined
       )
     )
     .limit(CANDIDATE_LIMIT);
@@ -259,8 +258,7 @@ async function pickIncluded(
   const rows = await db
     .selectDistinct({ id: users.id })
     .from(users)
-    .innerJoin(profiles, eq(profiles.userId, users.id))
-    .where(eq(profiles.isPublic, true));
+    .innerJoin(profiles, eq(profiles.userId, users.id));
   const set = new Set(excluded);
   return rows.filter((r) => !set.has(r.id)).map((r) => r.id);
 }

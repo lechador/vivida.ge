@@ -34,15 +34,13 @@ function initialState(
   defaultName: string | null
 ): WizardData {
   if (!profile) {
-    // Default new users to a public profile — friends-discovery is the
-    // core social hook, and most users don't realize they're opting out
-    // when "private" is preselected. Seed the username from their name
-    // so they never hit an empty field on the visibility step.
+    // Seed the username from their name so they never hit an empty field
+    // on the visibility step.
     return {
       date: { day: "", month: "", year: "" },
       time: { hour: "", minute: "", unknown: false },
       place: null,
-      visibility: { isPublic: true, username: suggestUsername(defaultName) },
+      visibility: { username: suggestUsername(defaultName) },
     };
   }
   const [y, m, d] = (profile.dateOfBirth ?? "").split("-");
@@ -70,8 +68,7 @@ function initialState(
           } satisfies GeocodeResult)
         : null,
     visibility: {
-      isPublic: profile.isPublic ?? false,
-      username: profile.username ?? "",
+      username: profile.username ?? suggestUsername(defaultName),
     },
   };
 }
@@ -166,8 +163,7 @@ export function OnboardingWizard({
         latitude: data.place!.latitude,
         longitude: data.place!.longitude,
         timezone: data.place!.timezone,
-        isPublic: data.visibility.isPublic,
-        username: data.visibility.isPublic ? data.visibility.username : null,
+        username: data.visibility.username,
       });
       if (result && !result.ok) {
         setError(result.error);

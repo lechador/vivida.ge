@@ -143,8 +143,6 @@ export const profiles = pgTable("profile", {
   cityName: text("city_name"),
   timezone: text("timezone"),
   // ── Public profile fields ────────────────────────────────────────────
-  /** When true the user has a public profile at /u/{username}. Default false. */
-  isPublic: boolean("is_public").notNull().default(false),
   /** Lowercase, slug-friendly handle used in profile URLs. Unique. */
   username: text("username").unique(),
   /** Public display name (defaults to user.name if not set). */

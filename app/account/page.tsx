@@ -127,17 +127,15 @@ export default async function AccountPage() {
           />
         </div>
 
-        {/* Public profile visibility */}
+        {/* Public profile fields */}
         <div className="mb-6">
           <VisibilityCard
             initial={{
-              isPublic: profile?.isPublic ?? false,
               username: profile?.username ?? null,
               displayName: profile?.displayName ?? null,
               bio: profile?.bio ?? null,
             }}
             defaultName={user.name ?? null}
-            plan={plan}
           />
         </div>
 

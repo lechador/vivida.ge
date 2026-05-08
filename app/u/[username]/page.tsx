@@ -44,7 +44,6 @@ export async function generateMetadata({
   const { username } = await params;
   const [profile] = await db
     .select({
-      isPublic: profiles.isPublic,
       displayName: profiles.displayName,
       bio: profiles.bio,
       username: profiles.username,
@@ -53,7 +52,7 @@ export async function generateMetadata({
     .where(eq(profiles.username, username))
     .limit(1);
 
-  if (!profile?.isPublic) {
+  if (!profile) {
     return { title: "პროფილი ვერ მოიძებნა" };
   }
 
@@ -83,7 +82,7 @@ export default async function PublicProfilePage({
     .where(eq(profiles.username, username))
     .limit(1);
 
-  if (!row || !row.profile.isPublic) {
+  if (!row) {
     notFound();
   }
   const { profile, user: owner } = row;

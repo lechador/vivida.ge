@@ -43,7 +43,6 @@ export async function GET(req: Request) {
     .innerJoin(users, eq(users.id, profiles.userId))
     .where(
       and(
-        eq(profiles.isPublic, true),
         ne(users.id, session.user.id),
         or(
           ilike(profiles.username, pattern),

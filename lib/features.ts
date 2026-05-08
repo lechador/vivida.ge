@@ -20,7 +20,6 @@ export type Feature =
   | "dailyHoroscope"   // Personalized daily reading
   | "weeklyForecast"   // 7-day AI forecast
   | "synastry"         // Unlimited compatibility / partner charts
-  | "privateProfile"   // Hide profile from friend discovery
   | "yearlyPdf"        // Downloadable yearly report
   | "adFree";          // No ads (placeholder until we ship ads)
 
@@ -33,7 +32,6 @@ const REQUIRES_PRO: Record<Feature, boolean> = {
   dailyHoroscope:  true,
   weeklyForecast:  true,
   synastry:        true,
-  privateProfile:  true,
   yearlyPdf:       true,
   // Ads aren't shipped yet — leaving false until we have a Pro-only
   // suppression to actually skip.
