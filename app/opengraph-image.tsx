@@ -18,25 +18,29 @@ export const alt = "Vivida — შენი კოსმიური რუკ�
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Noto Sans Georgian directly from Google Fonts CDN. URLs are stable
-// across font releases for a given filename, and the fetch is cached
-// across builds. We pull two weights so the wordmark and the tagline
-// can have proper visual hierarchy.
-const NOTO_REGULAR =
-  "https://fonts.gstatic.com/s/notosansgeorgian/v46/PlIaFke5O6RzLfvNNVSitxkr76PRHBC4Ytyq-Gof7PUs4S7zWn-8YDB09HFNdpvnzFj-f5WK0OQV.ttf";
-const NOTO_BOLD =
-  "https://fonts.gstatic.com/s/notosansgeorgian/v46/PlIaFke5O6RzLfvNNVSitxkr76PRHBC4Ytyq-Gof7PUs4S7zWn-8YDB09HFNdptnyVj-f5WK0OQV.ttf";
+// Self-hosted Noto Sans Georgian — bundled with the function rather
+// than fetched from fonts.gstatic.com because Google's pinned URLs
+// rotate every few months and break this route. The TTFs live in
+// app/_fonts/ (underscored folder, ignored by Next routing).
+const NOTO_REGULAR_URL = new URL(
+  "./_fonts/NotoSansGeorgian-Regular.ttf",
+  import.meta.url
+);
+const NOTO_BOLD_URL = new URL(
+  "./_fonts/NotoSansGeorgian-Bold.ttf",
+  import.meta.url
+);
 
-async function loadFont(url: string): Promise<ArrayBuffer> {
+async function loadFont(url: URL): Promise<ArrayBuffer> {
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`font fetch failed: ${url}`);
+  if (!res.ok) throw new Error(`font fetch failed: ${url.toString()}`);
   return res.arrayBuffer();
 }
 
 export default async function OpengraphImage() {
   const [regular, bold] = await Promise.all([
-    loadFont(NOTO_REGULAR),
-    loadFont(NOTO_BOLD),
+    loadFont(NOTO_REGULAR_URL),
+    loadFont(NOTO_BOLD_URL),
   ]);
 
   return new ImageResponse(

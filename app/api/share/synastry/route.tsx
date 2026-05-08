@@ -25,14 +25,23 @@ import { signByIndex } from "@/lib/zodiac";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const NOTO_REGULAR =
-  "https://fonts.gstatic.com/s/notosansgeorgian/v46/PlIaFke5O6RzLfvNNVSitxkr76PRHBC4Ytyq-Gof7PUs4S7zWn-8YDB09HFNdpvnzFj-f5WK0OQV.ttf";
-const NOTO_BOLD =
-  "https://fonts.gstatic.com/s/notosansgeorgian/v46/PlIaFke5O6RzLfvNNVSitxkr76PRHBC4Ytyq-Gof7PUs4S7zWn-8YDB09HFNdptnyVj-f5WK0OQV.ttf";
+// Self-hosted Noto Sans Georgian — bundled with the function rather
+// than fetched from fonts.gstatic.com because Google's pinned URLs
+// rotate every few months and break this route. `new URL(...,
+// import.meta.url)` is the next/og-blessed pattern that survives
+// both edge and node runtimes.
+const NOTO_REGULAR_URL = new URL(
+  "../../../_fonts/NotoSansGeorgian-Regular.ttf",
+  import.meta.url
+);
+const NOTO_BOLD_URL = new URL(
+  "../../../_fonts/NotoSansGeorgian-Bold.ttf",
+  import.meta.url
+);
 
-async function loadFont(url: string): Promise<ArrayBuffer> {
-  const res = await fetch(url, { cache: "force-cache" });
-  if (!res.ok) throw new Error(`font fetch failed: ${url}`);
+async function loadFont(url: URL): Promise<ArrayBuffer> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`font fetch failed: ${url.toString()}`);
   return res.arrayBuffer();
 }
 
@@ -160,8 +169,8 @@ async function handle(req: Request): Promise<Response> {
   const overall = Math.round(synastry.overall);
 
   const [regular, bold, viewerAvatar, targetAvatar] = await Promise.all([
-    loadFont(NOTO_REGULAR),
-    loadFont(NOTO_BOLD),
+    loadFont(NOTO_REGULAR_URL),
+    loadFont(NOTO_BOLD_URL),
     safeAvatarToDataUrl(viewerRow.image),
     safeAvatarToDataUrl(targetRow.image),
   ]);
