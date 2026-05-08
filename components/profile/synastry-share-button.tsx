@@ -45,6 +45,12 @@ export function SynastryShareButton({
 
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  // Track latest loadState across renders so the open-effect can read it
+  // without depending on it (and triggering its own cleanup mid-async).
+  const loadStateRef = useRef(loadState);
+  useEffect(() => {
+    loadStateRef.current = loadState;
+  }, [loadState]);
 
   // Defer portal access to client mount.
   useEffect(() => {
@@ -53,15 +59,21 @@ export function SynastryShareButton({
 
   // Render the off-screen card to a PNG when the dialog opens. We hold
   // on to the blob so subsequent share/download is instant.
+  //
+  // IMPORTANT: deps are `[open]` only. If we add `loadState`, calling
+  // setLoadState inside the effect re-runs the cleanup, which flips
+  // cancelled=true on the running closure and silently bails after
+  // toBlob — even though the work succeeded.
   useEffect(() => {
     if (!open) return;
-    if (loadState === "ready" || loadState === "rendering") return;
+    // Cached from a previous open — keep the existing preview.
+    if (loadStateRef.current === "ready") return;
 
     let cancelled = false;
     setLoadState("rendering");
     setErrorMessage(null);
 
-    console.log("[share] effect fired, loadState=", loadState, "open=", open);
+    console.log("[share] effect fired, open=", open);
 
     (async () => {
       try {
@@ -145,7 +157,7 @@ export function SynastryShareButton({
     return () => {
       cancelled = true;
     };
-  }, [open, loadState]);
+  }, [open]);
 
   // Free the object URL on unmount or when replaced.
   useEffect(() => {
