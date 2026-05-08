@@ -113,17 +113,31 @@ export function SuggestedPeopleRail({
       el.scrollLeft = Math.max(0, Math.min(max, next));
     };
 
+    // Without this, mousedown on a card's <img> triggers HTML5
+    // image-drag and on a card's text triggers text selection — both
+    // hijack the cursor and our scroll-drag never runs.
+    const onDragStart = (e: DragEvent) => e.preventDefault();
+    const onSelectStart = (e: Event) => {
+      // Only block selection that originates from a mouse press; keyboard
+      // selection (shift+arrow) is rare here but harmless.
+      if (pointerId !== null) e.preventDefault();
+    };
+
     el.addEventListener("pointerdown", onPointerDown);
     el.addEventListener("pointermove", onPointerMove);
     el.addEventListener("pointerup", endDrag);
     el.addEventListener("pointercancel", endDrag);
     el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("dragstart", onDragStart);
+    el.addEventListener("selectstart", onSelectStart);
     return () => {
       el.removeEventListener("pointerdown", onPointerDown);
       el.removeEventListener("pointermove", onPointerMove);
       el.removeEventListener("pointerup", endDrag);
       el.removeEventListener("pointercancel", endDrag);
       el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("dragstart", onDragStart);
+      el.removeEventListener("selectstart", onSelectStart);
     };
   }, []);
 
@@ -191,7 +205,7 @@ export function SuggestedPeopleRail({
             drag can't accidentally start a Link/Button click mid-drag. */}
         <div
           ref={scrollerRef}
-          className="-mx-4 flex gap-3 overflow-x-auto overscroll-x-contain scroll-smooth px-4 pb-2 [scrollbar-width:none] [&.is-dragging]:scroll-auto [&.is-dragging_*]:pointer-events-none [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:cursor-grab sm:px-6 sm:[&.is-dragging]:cursor-grabbing"
+          className="-mx-4 flex gap-3 overflow-x-auto overscroll-x-contain scroll-smooth px-4 pb-2 [scrollbar-width:none] [&.is-dragging]:scroll-auto [&.is-dragging_*]:pointer-events-none [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:cursor-grab sm:select-none sm:px-6 sm:[&.is-dragging]:cursor-grabbing sm:[&_img]:select-none"
         >
           {suggestions.map((person) => (
             <SuggestedPersonCard key={person.userId} person={person} />
