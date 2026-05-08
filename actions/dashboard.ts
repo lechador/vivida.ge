@@ -77,7 +77,7 @@ export async function loadDashboardBundle(
             .where(eq(profiles.userId, userId))
             .limit(1)
         : Promise.resolve([] as { timezone: string | null }[]),
-      getDashboardSuggestions(userId, 8).catch(() => [] as DiscoverCard[]),
+      getDashboardSuggestions(userId, 20).catch(() => [] as DiscoverCard[]),
     ]);
 
   return {
