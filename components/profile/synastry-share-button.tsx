@@ -90,10 +90,19 @@ export function SynastryShareButton({
           "x",
           cardRef.current.offsetHeight
         );
+        // skipFonts is critical — html-to-image's default behaviour
+        // calls getFontEmbedCSS which fetches every @font-face URL on
+        // the page and inlines it. On vivida.ge that includes Noto
+        // Sans Georgian preload URLs that hang in some browsers, which
+        // stalls toBlob() forever with no timeout. The captured SVG
+        // still uses the page's loaded fonts when the browser
+        // rasterises it, so Georgian text renders correctly without
+        // needing the explicit embed.
         const fresh = await mod.toBlob(cardRef.current, {
           pixelRatio: 1,
-          cacheBust: true,
+          cacheBust: false,
           backgroundColor: "#0b0814",
+          skipFonts: true,
         });
 
         if (cancelled) return;
