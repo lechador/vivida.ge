@@ -43,6 +43,74 @@ export function SuggestedPeopleRail({
     };
   }, [suggestions.length]);
 
+  // Click-drag-to-scroll on desktop. We don't enable this for touch
+  // because the browser's native momentum scroll is better. The DRAG_THRESHOLD
+  // lets short clicks through to the underlying <Link>; once the user has
+  // moved past it we treat the gesture as a drag and swallow the trailing
+  // click so we don't navigate when they meant to scroll.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    const DRAG_THRESHOLD = 5;
+    let pointerId: number | null = null;
+    let startX = 0;
+    let startScroll = 0;
+    let didDrag = false;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      // Only the primary mouse button.
+      if (e.button !== 0) return;
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startScroll = el.scrollLeft;
+      didDrag = false;
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (pointerId !== e.pointerId) return;
+      const dx = e.clientX - startX;
+      if (!didDrag && Math.abs(dx) >= DRAG_THRESHOLD) {
+        didDrag = true;
+        el.setPointerCapture(e.pointerId);
+        el.style.cursor = "grabbing";
+        el.style.userSelect = "none";
+      }
+      if (didDrag) {
+        e.preventDefault();
+        el.scrollLeft = startScroll - dx;
+      }
+    };
+
+    const endDrag = (e: PointerEvent) => {
+      if (pointerId !== e.pointerId) return;
+      pointerId = null;
+      el.style.cursor = "";
+      el.style.userSelect = "";
+      if (didDrag) {
+        // Swallow the click that fires after a drag-release so we don't
+        // navigate into a card that just happened to be under the cursor.
+        const swallow = (ev: MouseEvent) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+        };
+        el.addEventListener("click", swallow, { capture: true, once: true });
+      }
+    };
+
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointermove", onPointerMove);
+    el.addEventListener("pointerup", endDrag);
+    el.addEventListener("pointercancel", endDrag);
+    return () => {
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointermove", onPointerMove);
+      el.removeEventListener("pointerup", endDrag);
+      el.removeEventListener("pointercancel", endDrag);
+    };
+  }, []);
+
   if (suggestions.length === 0) return null;
 
   const scrollByAmount = (dir: 1 | -1) => {
@@ -111,7 +179,7 @@ export function SuggestedPeopleRail({
             tactile scrolling on touch. */}
         <div
           ref={scrollerRef}
-          className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:px-6"
+          className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:cursor-grab sm:px-6 sm:[&:active]:cursor-grabbing"
         >
           {suggestions.map((person) => (
             <SuggestedPersonCard key={person.userId} person={person} />
