@@ -5,7 +5,6 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { charts, profiles, users } from "@/db/schema";
 import {
-  CATEGORIES,
   CATEGORY_EMOJI,
   CATEGORY_LABEL_KA,
   computeSynastry,
@@ -14,22 +13,24 @@ import {
 } from "@/lib/synastry";
 import { signByIndex } from "@/lib/zodiac";
 
+import { readFontBuffer } from "@/app/_fonts/load";
+
 /**
  * GET /api/share/synastry?with={username}
  *
  * Renders a 1080×1920 (Instagram Story) PNG of the viewer's compatibility
  * with the named profile. Auth required so the directory isn't a public
  * scrape vector.
+ *
+ * Layout is intentionally satori-friendly: no `filter: blur`, no nested
+ * radial-gradient backgrounds, no negative `inset`. Those make the
+ * renderer hang in production on Vercel's Node runtime.
  */
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
-import { readFontBuffer } from "@/app/_fonts/load";
-
-// Static URL literals so Webpack copies the .ttf into the function
-// bundle. Don't move these into a helper — a parameterised path makes
-// the asset reference invisible to the bundler.
 const NOTO_REGULAR_URL = new URL(
   "../../../_fonts/NotoSansGeorgian-Regular.ttf",
   import.meta.url
@@ -38,35 +39,6 @@ const NOTO_BOLD_URL = new URL(
   "../../../_fonts/NotoSansGeorgian-Bold.ttf",
   import.meta.url
 );
-
-/**
- * Pre-fetch an external avatar so the ImageResponse never hangs on a
- * slow CDN. Returns a data URL on success, or null if the fetch fails
- * or times out (we render the letter fallback instead). next/og also
- * accepts external URLs natively, but in practice Google avatars and
- * R2 photos sometimes 403/timeout from the serverless region, which
- * leaves the entire response hanging.
- */
-async function safeAvatarToDataUrl(
-  url: string | null | undefined,
-  timeoutMs = 4000
-): Promise<string | null> {
-  if (!url) return null;
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timer);
-    if (!res.ok) return null;
-    const ctype = res.headers.get("content-type") ?? "image/jpeg";
-    const buf = await res.arrayBuffer();
-    if (buf.byteLength > 1_500_000) return null; // skip oversized
-    const b64 = Buffer.from(buf).toString("base64");
-    return `data:${ctype};base64,${b64}`;
-  } catch {
-    return null;
-  }
-}
 
 const TOP_CATEGORIES: SynastryCategory[] = [
   "love",
@@ -79,9 +51,6 @@ export async function GET(req: Request) {
   try {
     return await handle(req);
   } catch (err) {
-    // Surface the underlying error so the client-side preview can show
-    // what went wrong. The route is auth-protected so we're not leaking
-    // to anonymous traffic.
     const message = (err as Error)?.message ?? "unknown";
     console.error("[share/synastry]", err);
     return new Response(`Render failed: ${message}`, { status: 500 });
@@ -101,13 +70,10 @@ async function handle(req: Request): Promise<Response> {
     return new Response("Missing 'with' query param", { status: 400 });
   }
 
-  // Viewer's chart + display info
   const [viewerRow] = await db
     .select({
       name: users.name,
-      image: users.image,
       displayName: profiles.displayName,
-      username: profiles.username,
       chart: charts.data,
     })
     .from(users)
@@ -120,14 +86,11 @@ async function handle(req: Request): Promise<Response> {
     return new Response("Viewer has no chart", { status: 400 });
   }
 
-  // Target user via username
   const [targetRow] = await db
     .select({
       userId: users.id,
       name: users.name,
-      image: users.image,
       displayName: profiles.displayName,
-      username: profiles.username,
       chart: charts.data,
     })
     .from(profiles)
@@ -139,12 +102,13 @@ async function handle(req: Request): Promise<Response> {
   if (!targetRow?.chart) {
     return new Response("Profile not found", { status: 404 });
   }
-
   if (targetRow.userId === viewerId) {
     return new Response("Cannot share self-synastry", { status: 400 });
   }
 
   const synastry = computeSynastry(viewerRow.chart, targetRow.chart);
+  const overall = Math.round(synastry.overall);
+  const verdict = overallVerdict(synastry.overall);
 
   const viewerName =
     viewerRow.displayName ?? viewerRow.name?.split(" ")[0] ?? "შენ";
@@ -159,14 +123,9 @@ async function handle(req: Request): Promise<Response> {
   const viewerSun = signByIndex(viewerSunIdx);
   const targetSun = signByIndex(targetSunIdx);
 
-  const verdict = overallVerdict(synastry.overall);
-  const overall = Math.round(synastry.overall);
-
-  const [regular, bold, viewerAvatar, targetAvatar] = await Promise.all([
+  const [regular, bold] = await Promise.all([
     readFontBuffer(NOTO_REGULAR_URL),
     readFontBuffer(NOTO_BOLD_URL),
-    safeAvatarToDataUrl(viewerRow.image),
-    safeAvatarToDataUrl(targetRow.image),
   ]);
 
   return new ImageResponse(
@@ -181,42 +140,12 @@ async function handle(req: Request): Promise<Response> {
           justifyContent: "space-between",
           backgroundColor: "#0b0814",
           backgroundImage:
-            "radial-gradient(60% 35% at 50% 18%, rgba(167,139,250,0.5), transparent 70%), radial-gradient(50% 30% at 85% 60%, rgba(34,211,238,0.32), transparent 70%), radial-gradient(45% 30% at 15% 80%, rgba(244,114,182,0.32), transparent 70%)",
+            "linear-gradient(160deg, #1a0f33 0%, #0b0814 50%, #2a1145 100%)",
           color: "#ffffff",
           fontFamily: "Noto",
-          padding: "80px 70px",
-          position: "relative",
+          padding: "100px 80px",
         }}
       >
-        {/* Sparkle stars sprinkled across the canvas */}
-        {[
-          { top: 120, left: 160, size: 6 },
-          { top: 200, left: 880, size: 8 },
-          { top: 380, left: 80, size: 5 },
-          { top: 1200, left: 60, size: 6 },
-          { top: 1340, left: 970, size: 9 },
-          { top: 1640, left: 200, size: 5 },
-          { top: 1750, left: 880, size: 7 },
-          { top: 880, left: 1000, size: 4 },
-          { top: 980, left: 70, size: 5 },
-        ].map((s, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              top: s.top,
-              left: s.left,
-              width: s.size,
-              height: s.size,
-              borderRadius: "9999px",
-              backgroundColor: "#ffffff",
-              opacity: 0.85,
-              boxShadow: "0 0 16px rgba(167,139,250,0.8)",
-              display: "flex",
-            }}
-          />
-        ))}
-
         {/* Brand */}
         <div
           style={{
@@ -227,96 +156,47 @@ async function handle(req: Request): Promise<Response> {
         >
           <div
             style={{
-              fontSize: 56,
-              backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-              backgroundClip: "text",
-              color: "transparent",
-              lineHeight: 1,
-            }}
-          >
-            ✦
-          </div>
-          <div
-            style={{
               fontSize: 64,
               fontWeight: 700,
               letterSpacing: "-0.04em",
-              backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-              backgroundClip: "text",
-              color: "transparent",
-              lineHeight: 1,
-            }}
-          >
-            vivida
-          </div>
-        </div>
-
-        {/* Two avatars */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 48,
-            marginTop: -40,
-          }}
-        >
-          <Avatar
-            imageUrl={viewerAvatar}
-            fallback={viewerName}
-            sunSymbol={viewerSun.symbol}
-            tint="#a78bfa"
-          />
-
-          <div
-            style={{
+              color: "#a78bfa",
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 80,
-              backgroundImage:
-                "linear-gradient(135deg, #f472b6 0%, #a78bfa 100%)",
-              backgroundClip: "text",
-              color: "transparent",
               lineHeight: 1,
             }}
           >
-            ✦
+            ✦ vivida
           </div>
-
-          <Avatar
-            imageUrl={targetAvatar}
-            fallback={targetName}
-            sunSymbol={targetSun.symbol}
-            tint="#f472b6"
-          />
         </div>
 
         {/* Names + signs */}
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
+            flexDirection: "column",
             alignItems: "center",
             gap: 32,
-            marginTop: -20,
           }}
         >
-          <NameLabel name={viewerName} signLabel={viewerSun.labelKa} />
+          <NamePill
+            name={viewerName}
+            signLabel={viewerSun.labelKa}
+            tint="#a78bfa"
+          />
           <div
             style={{
-              fontSize: 44,
-              color: "rgba(255,255,255,0.4)",
+              fontSize: 60,
+              color: "#f472b6",
               display: "flex",
-              fontWeight: 300,
+              fontWeight: 700,
             }}
           >
-            ×
+            ✦
           </div>
-          <NameLabel name={targetName} signLabel={targetSun.labelKa} />
+          <NamePill
+            name={targetName}
+            signLabel={targetSun.labelKa}
+            tint="#22d3ee"
+          />
         </div>
 
         {/* Big number */}
@@ -325,16 +205,14 @@ async function handle(req: Request): Promise<Response> {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginTop: 0,
           }}
         >
           <div
             style={{
               fontSize: 32,
-              color: "rgba(255,255,255,0.6)",
+              color: "#c4b5fd",
               letterSpacing: "0.4em",
-              textTransform: "uppercase",
-              marginBottom: 12,
+              marginBottom: 8,
               display: "flex",
             }}
           >
@@ -342,13 +220,10 @@ async function handle(req: Request): Promise<Response> {
           </div>
           <div
             style={{
-              fontSize: 280,
+              fontSize: 320,
               fontWeight: 700,
               letterSpacing: "-0.06em",
-              backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #f472b6 50%, #22d3ee 100%)",
-              backgroundClip: "text",
-              color: "transparent",
+              color: "#f472b6",
               lineHeight: 0.95,
               display: "flex",
             }}
@@ -358,11 +233,8 @@ async function handle(req: Request): Promise<Response> {
           <div
             style={{
               fontSize: 56,
-              fontWeight: 600,
-              backgroundImage:
-                "linear-gradient(135deg, #f472b6 0%, #a78bfa 100%)",
-              backgroundClip: "text",
-              color: "transparent",
+              fontWeight: 700,
+              color: "#a78bfa",
               marginTop: 8,
               display: "flex",
             }}
@@ -377,8 +249,7 @@ async function handle(req: Request): Promise<Response> {
             display: "flex",
             flexDirection: "column",
             width: "100%",
-            gap: 14,
-            marginTop: 0,
+            gap: 18,
           }}
         >
           {TOP_CATEGORIES.map((cat) => {
@@ -394,19 +265,19 @@ async function handle(req: Request): Promise<Response> {
           })}
         </div>
 
-        {/* Footer URL */}
+        {/* Footer */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 6,
+            gap: 4,
           }}
         >
           <div
             style={{
               fontSize: 28,
-              color: "rgba(255,255,255,0.55)",
+              color: "#9ca3af",
               display: "flex",
             }}
           >
@@ -414,13 +285,9 @@ async function handle(req: Request): Promise<Response> {
           </div>
           <div
             style={{
-              fontSize: 38,
+              fontSize: 40,
               fontWeight: 700,
-              backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #22d3ee 100%)",
-              backgroundClip: "text",
-              color: "transparent",
-              letterSpacing: "-0.01em",
+              color: "#22d3ee",
               display: "flex",
             }}
           >
@@ -437,143 +304,20 @@ async function handle(req: Request): Promise<Response> {
         { name: "Noto", data: bold, weight: 700, style: "normal" },
       ],
       headers: {
-        // Browser caches for an hour; CDN can keep it the same. Per-user
-        // image so we keep it private.
         "Cache-Control": "private, max-age=3600",
       },
     }
   );
 }
 
-// ─── Pieces ─────────────────────────────────────────────────────────────
-
-// Avatar circle with conic-gradient ring + sun symbol badge.
-// next/og doesn't support conic-gradient, so we approximate the ring with
-// nested coloured circles + a soft glow.
-function Avatar({
-  imageUrl,
-  fallback,
-  sunSymbol,
-  tint,
-}: {
-  imageUrl: string | null;
-  fallback: string;
-  sunSymbol: string;
-  tint: string;
-}) {
-  const SIZE = 280;
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: SIZE,
-        height: SIZE,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {/* Glow */}
-      <div
-        style={{
-          position: "absolute",
-          inset: -18,
-          borderRadius: 9999,
-          background: `radial-gradient(circle, ${tint}88 0%, transparent 70%)`,
-          filter: "blur(30px)",
-          display: "flex",
-        }}
-      />
-      {/* Outer gradient ring */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: 9999,
-          backgroundImage:
-            "linear-gradient(135deg, #a78bfa 0%, #f472b6 50%, #22d3ee 100%)",
-          padding: 6,
-          display: "flex",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: 9999,
-            backgroundColor: "#0b0814",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            overflow: "hidden",
-          }}
-        >
-          {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageUrl}
-              alt=""
-              width={SIZE - 12}
-              height={SIZE - 12}
-              style={{
-                width: SIZE - 12,
-                height: SIZE - 12,
-                borderRadius: 9999,
-                objectFit: "cover",
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                fontSize: 130,
-                fontWeight: 700,
-                color: "#ffffff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                height: "100%",
-                backgroundImage:
-                  "linear-gradient(135deg, rgba(167,139,250,0.4), rgba(34,211,238,0.3))",
-              }}
-            >
-              {(fallback?.[0] ?? "★").toUpperCase()}
-            </div>
-          )}
-        </div>
-      </div>
-      {/* Sun symbol badge */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: -6,
-          right: -6,
-          width: 86,
-          height: 86,
-          borderRadius: 9999,
-          backgroundColor: "#0b0814",
-          border: "4px solid",
-          borderColor: tint,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 48,
-          color: tint,
-          boxShadow: `0 0 28px ${tint}88`,
-        }}
-      >
-        {sunSymbol}
-      </div>
-    </div>
-  );
-}
-
-function NameLabel({
+function NamePill({
   name,
   signLabel,
+  tint,
 }: {
   name: string;
   signLabel: string;
+  tint: string;
 }) {
   return (
     <div
@@ -581,26 +325,28 @@ function NameLabel({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 4,
-        maxWidth: 380,
+        backgroundColor: "rgba(255,255,255,0.05)",
+        border: `2px solid ${tint}`,
+        borderRadius: 9999,
+        padding: "20px 56px",
       }}
     >
       <div
         style={{
-          fontSize: 56,
+          fontSize: 64,
           fontWeight: 700,
           color: "#ffffff",
           letterSpacing: "-0.02em",
           display: "flex",
-          textAlign: "center",
         }}
       >
-        {truncate(name, 14)}
+        {truncate(name, 16)}
       </div>
       <div
         style={{
-          fontSize: 26,
-          color: "rgba(255,255,255,0.55)",
+          fontSize: 28,
+          color: tint,
+          marginTop: 4,
           display: "flex",
         }}
       >
@@ -631,7 +377,7 @@ function CategoryBar({
       <div
         style={{
           fontSize: 36,
-          width: 50,
+          width: 56,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -641,9 +387,9 @@ function CategoryBar({
       </div>
       <div
         style={{
-          fontSize: 30,
-          color: "rgba(255,255,255,0.85)",
-          width: 240,
+          fontSize: 32,
+          color: "#ffffff",
+          width: 280,
           display: "flex",
         }}
       >
@@ -653,20 +399,17 @@ function CategoryBar({
         style={{
           flex: 1,
           height: 18,
-          backgroundColor: "rgba(255,255,255,0.08)",
+          backgroundColor: "rgba(255,255,255,0.1)",
           borderRadius: 9999,
-          overflow: "hidden",
-          position: "relative",
           display: "flex",
+          overflow: "hidden",
         }}
       >
         <div
           style={{
             width: `${score}%`,
             height: "100%",
-            backgroundImage:
-              "linear-gradient(90deg, #a78bfa, #f472b6, #22d3ee)",
-            borderRadius: 9999,
+            backgroundColor: "#a78bfa",
             display: "flex",
           }}
         />
@@ -676,8 +419,7 @@ function CategoryBar({
           fontSize: 32,
           fontWeight: 700,
           color: "#ffffff",
-          width: 90,
-          textAlign: "right",
+          width: 100,
           display: "flex",
           justifyContent: "flex-end",
         }}
