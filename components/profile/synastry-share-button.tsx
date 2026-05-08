@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, Download, Loader2, Share2 } from "lucide-react";
+import { Check, Download, Instagram, Loader2, Share2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -267,8 +267,8 @@ export function SynastryShareButton({
           setOpen(true);
         }}
       >
-        <Share2 className="size-4" />
-        გააზიარე ბარათი
+        <Instagram className="size-4" />
+        გააზიარე თავსებადობა
       </Button>
 
       {/* Off-screen card mounted only while the dialog is open. The
