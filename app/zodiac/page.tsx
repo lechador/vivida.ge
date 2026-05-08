@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import { PopularSearches } from "@/components/seo/popular-searches";
 import {
   HUB_CONTENT,
   SIGNS_CONTENT,
@@ -16,6 +17,7 @@ import {
   ZODIAC_DATES,
   signMetaBySlug,
 } from "@/lib/seo/zodiac-dates";
+import { HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -44,6 +46,7 @@ const HUB_LD = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: HUB_CONTENT.pageTitle,
+  alternateName: HUB_LATIN_QUERIES,
   description: HUB_CONTENT.metaDescription,
   url: `${SITE_URL}${PATH}`,
   inLanguage: "ka-GE",
@@ -337,6 +340,8 @@ export default function ZodiacHubPage() {
             </Button>
           </div>
         </div>
+
+        <PopularSearches queries={HUB_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Sparkles, Sunrise } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -16,6 +17,7 @@ import {
   signMetaBySlug,
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
+import { risingPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -71,6 +73,7 @@ export default async function RisingSignPage({
   const c = risings[sign];
   const meta = signMetaBySlug(sign);
   const accent = meta ? signColor(meta) : "var(--vivida-violet)";
+  const latinQueries = risingPageLatinQueries(sign);
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -81,6 +84,7 @@ export default async function RisingSignPage({
     mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}${HUB_PATH}/${sign}` },
     author: { "@type": "Organization", name: "Vivida", url: SITE_URL },
     publisher: { "@type": "Organization", name: "Vivida", url: SITE_URL },
+    alternateName: latinQueries,
   };
 
   const faqLd = {
@@ -310,6 +314,8 @@ export default async function RisingSignPage({
             <Link href="/signup">გაიგე ჩემი ამომავალი</Link>
           </Button>
         </div>
+
+        <PopularSearches queries={latinQueries} />
       </section>
 
       <SiteFooter />

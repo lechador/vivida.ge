@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -18,6 +19,7 @@ import {
   parsePairSlug,
   signMetaBySlug,
 } from "@/lib/seo/zodiac-dates";
+import { pairPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -83,6 +85,7 @@ export default async function PairPage({
   const aColor = aMeta ? signColor(aMeta) : "var(--vivida-violet)";
   const bColor = bMeta ? signColor(bMeta) : "var(--vivida-violet)";
   const scoreColor = SCORE_COLOR[c.overallScore];
+  const latinQueries = pairPageLatinQueries(a, b);
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -100,6 +103,7 @@ export default async function PairPage({
       { "@type": "Thing", name: c.labelA },
       { "@type": "Thing", name: c.labelB },
     ],
+    alternateName: latinQueries,
   };
 
   const faqLd = {
@@ -331,6 +335,8 @@ export default async function PairPage({
             <Link href="/signup">დაიწყე უფასოდ</Link>
           </Button>
         </div>
+
+        <PopularSearches queries={latinQueries} />
       </section>
 
       <SiteFooter />

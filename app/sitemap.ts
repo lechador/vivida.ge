@@ -5,6 +5,10 @@ import {
   ALL_PAIR_SLUGS,
   ALL_SLUGS,
 } from "@/lib/seo/zodiac-dates";
+import {
+  ALL_YEARLY_YEARS,
+  yearlyContentFor,
+} from "@/lib/seo/zodiac-content";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -51,6 +55,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly",
     priority: 0.7,
   }));
+
+  const yearlyPages: MetadataRoute.Sitemap = [];
+  for (const year of ALL_YEARLY_YEARS) {
+    for (const slug of ALL_SLUGS) {
+      if (!yearlyContentFor(slug, year)) continue;
+      yearlyPages.push({
+        url: `${BASE}/zodiac/${slug}/${year}`,
+        lastModified: NOW,
+        changeFrequency: "monthly",
+        priority: 0.75,
+      });
+    }
+  }
 
   return [
     {
@@ -124,6 +141,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...pairPages,
     ...moonPages,
     ...risingPages,
+    ...yearlyPages,
     {
       url: `${BASE}/login`,
       lastModified: NOW,

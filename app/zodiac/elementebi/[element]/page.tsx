@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -18,6 +19,7 @@ import {
   signMetaBySlug,
   type ElementSlug,
 } from "@/lib/seo/zodiac-dates";
+import { elementPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -87,6 +89,7 @@ export default async function ElementDetailPage({
 
   const accent = ELEMENT_ACCENT[element];
   const labelKa = ELEMENT_LABEL_KA[element];
+  const latinQueries = elementPageLatinQueries(element);
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -100,7 +103,7 @@ export default async function ElementDetailPage({
     },
     author: { "@type": "Organization", name: "Vivida", url: SITE_URL },
     publisher: { "@type": "Organization", name: "Vivida", url: SITE_URL },
-    about: { "@type": "Thing", name: labelKa },
+    about: { "@type": "Thing", name: labelKa, alternateName: latinQueries },
   };
 
   const faqLd = {
@@ -295,6 +298,8 @@ export default async function ElementDetailPage({
             <Link href="/signup">ჩემი სრული რუკა</Link>
           </Button>
         </div>
+
+        <PopularSearches queries={latinQueries} />
       </section>
 
       <SiteFooter />

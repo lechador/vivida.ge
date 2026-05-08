@@ -4,13 +4,16 @@ import { notFound } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import {
+  ALL_YEARLY_YEARS,
   SIGNS_CONTENT,
   paragraphs,
   slugByLabelKa,
+  yearlyContentFor,
   type CompatibilityLevel,
 } from "@/lib/seo/zodiac-content";
 import {
@@ -21,6 +24,7 @@ import {
   signMetaBySlug,
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
+import { signPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { cn } from "@/lib/utils";
 
@@ -81,6 +85,10 @@ export default async function ZodiacSignPage({
   const meta = signMetaBySlug(sign);
   const accent = meta ? signColor(meta) : "var(--vivida-violet)";
   const dates = ZODIAC_DATES[sign];
+  const latinQueries = signPageLatinQueries(sign);
+  const availableYears = ALL_YEARLY_YEARS.filter((y) =>
+    yearlyContentFor(sign, y)
+  );
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -94,6 +102,7 @@ export default async function ZodiacSignPage({
     about: {
       "@type": "Thing",
       name: c.labelKa,
+      alternateName: latinQueries,
       description: `${c.labelKa} (${dates.rangeEn}) — ${c.tagline}`,
     },
   };
@@ -401,6 +410,37 @@ export default async function ZodiacSignPage({
           </Link>
         </section>
 
+        {/* Yearly horoscope — only when content exists */}
+        {availableYears.length > 0 && (
+          <section className="mt-10">
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              {c.labelKa}-ის წლიური ჰოროსკოპი
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {availableYears.map((y) => (
+                <Link
+                  key={y}
+                  href={`/zodiac/${sign}/${y}`}
+                  className="group inline-flex items-center gap-2 rounded-2xl border border-border bg-card/55 px-4 py-3 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15"
+                >
+                  <span
+                    className="grid size-9 place-items-center rounded-xl text-base font-semibold"
+                    style={{
+                      background: `color-mix(in oklch, ${accent} 18%, transparent)`,
+                      color: accent,
+                    }}
+                  >
+                    {y}
+                  </span>
+                  <span className="text-sm font-medium tracking-tight">
+                    {y} წლის ჰოროსკოპი →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Other signs nav */}
         <section className="mt-14">
           <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -443,6 +483,8 @@ export default async function ZodiacSignPage({
             <Link href="/signup">ჩემი სრული რუკა</Link>
           </Button>
         </div>
+
+        <PopularSearches queries={latinQueries} />
       </section>
 
       <SiteFooter />

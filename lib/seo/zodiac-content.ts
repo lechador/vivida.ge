@@ -196,6 +196,32 @@ export type CompatibilityHubContent = {
   faq: FaqEntry[];
 };
 
+// ─── Yearly horoscope layer ─────────────────────────────────────────────
+
+export type YearlySection = { title: string; body: string };
+
+export type YearlyKeyDate = { date: string; note: string };
+
+export type YearlyContent = {
+  slug: ZodiacSlug;
+  year: number;
+  labelKa: string;
+  pageTitle: string;
+  metaDescription: string;
+  tagline: string;
+  overview: string;            // 2-3 paragraphs separated by \n\n
+  love: YearlySection;
+  career: YearlySection;
+  money: YearlySection;
+  health: YearlySection;
+  growth: YearlySection;
+  bestMonths: string[];        // Georgian month names
+  hardMonths: string[];
+  keyDates: YearlyKeyDate[];
+  advice: string;
+  faq: FaqEntry[];
+};
+
 // ─── Combined shape ─────────────────────────────────────────────────────
 
 type RawShape = {
@@ -210,6 +236,7 @@ type RawShape = {
   moons?: Record<string, MoonSignContent>;
   risingHub?: RisingHubContent;
   risings?: Record<string, RisingSignContent>;
+  yearly?: Record<string, Record<string, YearlyContent>>;
 };
 
 const data = rawData as unknown as RawShape;
@@ -236,6 +263,25 @@ export const RISING_HUB_CONTENT: RisingHubContent | null =
   data.risingHub ?? null;
 export const RISINGS_CONTENT: Record<ZodiacSlug, RisingSignContent> | null =
   (data.risings as Record<ZodiacSlug, RisingSignContent>) ?? null;
+
+export const YEARLY_CONTENT: Record<string, Record<ZodiacSlug, YearlyContent>> =
+  (data.yearly as Record<string, Record<ZodiacSlug, YearlyContent>>) ?? {};
+
+/** Lookup helper for /zodiac/[sign]/[year] — returns null if unfilled. */
+export function yearlyContentFor(
+  sign: ZodiacSlug,
+  year: number
+): YearlyContent | null {
+  const yearMap = YEARLY_CONTENT[String(year)];
+  if (!yearMap) return null;
+  return yearMap[sign] ?? null;
+}
+
+/** Years that have at least one full set of yearly entries. */
+export const ALL_YEARLY_YEARS: number[] = Object.keys(YEARLY_CONTENT)
+  .map((y) => Number(y))
+  .filter((y) => Number.isFinite(y))
+  .sort((a, b) => a - b);
 
 /** Split a `\n\n`-separated body into paragraphs for rendering. */
 export function paragraphs(body: string): string[] {

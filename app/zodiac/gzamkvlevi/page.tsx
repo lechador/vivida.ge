@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 import { Calendar, Compass, Moon, Sparkles, Sunrise, Sun, Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import { GUIDE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import {
   MOONS_CONTENT,
   RISINGS_CONTENT,
@@ -420,6 +422,8 @@ export default function GuideIndexPage() {
             <Link href="/signup">დაიწყე უფასოდ</Link>
           </Button>
         </div>
+
+        <PopularSearches queries={GUIDE_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />
