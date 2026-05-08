@@ -61,7 +61,14 @@ export function SynastryShareButton({
 
     (async () => {
       try {
-        const res = await fetch(shareUrl);
+        // Hard cap at 25s — Vercel functions max out at 30s on Pro and
+        // 10s on Hobby. If we hit this, something on the server is
+        // stuck (font fetch, avatar CDN, etc.) and the user deserves
+        // a real error rather than an infinite spinner.
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+        const res = await fetch(shareUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
         if (!res.ok) {
           const detail = await res.text().catch(() => "");
           throw new Error(
@@ -76,7 +83,10 @@ export function SynastryShareButton({
         setLoadState("ready");
       } catch (err) {
         if (cancelled) return;
-        const detail = (err as Error).message ?? "";
+        const isAbort = (err as DOMException)?.name === "AbortError";
+        const detail = isAbort
+          ? "ძალიან დიდი დრო დასჭირდა"
+          : (err as Error).message ?? "";
         console.warn("[share preview]", detail);
         setErrorMessage(`ვერ ჩაიტვირთა (${detail || "უცნობი შეცდომა"})`);
         setLoadState("error");

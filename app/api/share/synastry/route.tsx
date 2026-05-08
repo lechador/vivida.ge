@@ -36,6 +36,35 @@ async function loadFont(url: string): Promise<ArrayBuffer> {
   return res.arrayBuffer();
 }
 
+/**
+ * Pre-fetch an external avatar so the ImageResponse never hangs on a
+ * slow CDN. Returns a data URL on success, or null if the fetch fails
+ * or times out (we render the letter fallback instead). next/og also
+ * accepts external URLs natively, but in practice Google avatars and
+ * R2 photos sometimes 403/timeout from the serverless region, which
+ * leaves the entire response hanging.
+ */
+async function safeAvatarToDataUrl(
+  url: string | null | undefined,
+  timeoutMs = 4000
+): Promise<string | null> {
+  if (!url) return null;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const ctype = res.headers.get("content-type") ?? "image/jpeg";
+    const buf = await res.arrayBuffer();
+    if (buf.byteLength > 1_500_000) return null; // skip oversized
+    const b64 = Buffer.from(buf).toString("base64");
+    return `data:${ctype};base64,${b64}`;
+  } catch {
+    return null;
+  }
+}
+
 const TOP_CATEGORIES: SynastryCategory[] = [
   "love",
   "chemistry",
@@ -130,9 +159,11 @@ async function handle(req: Request): Promise<Response> {
   const verdict = overallVerdict(synastry.overall);
   const overall = Math.round(synastry.overall);
 
-  const [regular, bold] = await Promise.all([
+  const [regular, bold, viewerAvatar, targetAvatar] = await Promise.all([
     loadFont(NOTO_REGULAR),
     loadFont(NOTO_BOLD),
+    safeAvatarToDataUrl(viewerRow.image),
+    safeAvatarToDataUrl(targetRow.image),
   ]);
 
   return new ImageResponse(
@@ -230,7 +261,7 @@ async function handle(req: Request): Promise<Response> {
           }}
         >
           <Avatar
-            imageUrl={viewerRow.image ?? null}
+            imageUrl={viewerAvatar}
             fallback={viewerName}
             sunSymbol={viewerSun.symbol}
             tint="#a78bfa"
@@ -254,7 +285,7 @@ async function handle(req: Request): Promise<Response> {
           </div>
 
           <Avatar
-            imageUrl={targetRow.image ?? null}
+            imageUrl={targetAvatar}
             fallback={targetName}
             sunSymbol={targetSun.symbol}
             tint="#f472b6"
