@@ -44,6 +44,19 @@ const TOP_CATEGORIES: SynastryCategory[] = [
 ];
 
 export async function GET(req: Request) {
+  try {
+    return await handle(req);
+  } catch (err) {
+    // Surface the underlying error so the client-side preview can show
+    // what went wrong. The route is auth-protected so we're not leaking
+    // to anonymous traffic.
+    const message = (err as Error)?.message ?? "unknown";
+    console.error("[share/synastry]", err);
+    return new Response(`Render failed: ${message}`, { status: 500 });
+  }
+}
+
+async function handle(req: Request): Promise<Response> {
   const session = await auth();
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });
@@ -106,8 +119,13 @@ export async function GET(req: Request) {
   const targetName =
     targetRow.displayName ?? targetRow.name?.split(" ")[0] ?? withUsername;
 
-  const viewerSun = signByIndex(viewerRow.chart.bodies.sun.signIndex);
-  const targetSun = signByIndex(targetRow.chart.bodies.sun.signIndex);
+  const viewerSunIdx = viewerRow.chart.bodies?.sun?.signIndex;
+  const targetSunIdx = targetRow.chart.bodies?.sun?.signIndex;
+  if (typeof viewerSunIdx !== "number" || typeof targetSunIdx !== "number") {
+    return new Response("Chart missing sun position", { status: 400 });
+  }
+  const viewerSun = signByIndex(viewerSunIdx);
+  const targetSun = signByIndex(targetSunIdx);
 
   const verdict = overallVerdict(synastry.overall);
   const overall = Math.round(synastry.overall);

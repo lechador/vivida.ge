@@ -62,7 +62,12 @@ export function SynastryShareButton({
     (async () => {
       try {
         const res = await fetch(shareUrl);
-        if (!res.ok) throw new Error(`status ${res.status}`);
+        if (!res.ok) {
+          const detail = await res.text().catch(() => "");
+          throw new Error(
+            `status ${res.status}${detail ? ` — ${detail.slice(0, 80)}` : ""}`
+          );
+        }
         const fetchedBlob = await res.blob();
         if (cancelled) return;
         const url = URL.createObjectURL(fetchedBlob);
@@ -71,8 +76,9 @@ export function SynastryShareButton({
         setLoadState("ready");
       } catch (err) {
         if (cancelled) return;
-        console.warn("[share preview]", (err as Error).message);
-        setErrorMessage("ვერ ჩაიტვირთა. სცადე ცოტა ხანში.");
+        const detail = (err as Error).message ?? "";
+        console.warn("[share preview]", detail);
+        setErrorMessage(`ვერ ჩაიტვირთა (${detail || "უცნობი შეცდომა"})`);
         setLoadState("error");
       }
     })();
@@ -91,8 +97,18 @@ export function SynastryShareButton({
 
   const fileName = `vivida-${overall}.png`;
 
-  const tryNativeShare = async (): Promise<"shared" | "fallback"> => {
-    if (!blob) return "fallback";
+  /**
+   * Attempt the native share. Returns:
+   *   "shared"     — user accepted the share sheet
+   *   "cancelled"  — user dismissed (don't treat as failure)
+   *   "unsupported"— Web Share API or file-share isn't available
+   *   "failed"     — share threw for some other reason; caller should
+   *                  fall back to download
+   */
+  const tryNativeShare = async (): Promise<
+    "shared" | "cancelled" | "unsupported" | "failed"
+  > => {
+    if (!blob) return "unsupported";
     const file = new File([blob], fileName, { type: "image/png" });
     const shareData: ShareData = {
       title: "Vivida — ჩვენი თავსებადობა",
@@ -100,63 +116,84 @@ export function SynastryShareButton({
       files: [file],
     };
 
-    if (
+    const canTry =
       typeof navigator !== "undefined" &&
       typeof navigator.canShare === "function" &&
-      navigator.canShare(shareData) &&
-      typeof navigator.share === "function"
-    ) {
+      typeof navigator.share === "function" &&
+      navigator.canShare(shareData);
+    if (!canTry) return "unsupported";
+
+    try {
       await navigator.share(shareData);
       return "shared";
+    } catch (err) {
+      const name = (err as DOMException)?.name;
+      if (name === "AbortError") return "cancelled";
+      // Browsers throw various NotAllowedError / DataError flavours when
+      // a share is interrupted or partially supported — log and fall
+      // back so the user still gets the file.
+      console.warn("[share native fallback]", name, (err as Error).message);
+      return "failed";
     }
-    return "fallback";
   };
 
-  const downloadBlob = () => {
-    if (!blob) return;
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(objectUrl);
+  const downloadBlob = (): boolean => {
+    if (!blob) return false;
+    try {
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objectUrl);
+      return true;
+    } catch (err) {
+      console.warn("[share download failed]", (err as Error).message);
+      return false;
+    }
+  };
+
+  const finishOk = () => {
+    setActionState("done");
+    setTimeout(() => {
+      setActionState("idle");
+      setOpen(false);
+    }, 1200);
   };
 
   const onShare = async () => {
     if (actionState === "working" || !blob) return;
     setActionState("working");
     setErrorMessage(null);
-    try {
-      const result = await tryNativeShare();
-      if (result === "fallback") downloadBlob();
-      setActionState("done");
-      setTimeout(() => {
-        setActionState("idle");
-        setOpen(false);
-      }, 1200);
-    } catch (err) {
-      // AbortError fires when the user dismisses the share sheet — just
-      // reset, not an error from our side.
-      if ((err as DOMException)?.name === "AbortError") {
-        setActionState("idle");
-        return;
-      }
-      console.warn("[share]", (err as Error).message);
-      setErrorMessage("ვერ მოხერხდა. სცადე თავიდან.");
-      setActionState("idle");
+
+    const result = await tryNativeShare();
+    if (result === "shared") {
+      finishOk();
+      return;
     }
+    if (result === "cancelled") {
+      setActionState("idle");
+      return;
+    }
+    // Unsupported or failed → fall back to a direct download so the
+    // user still ends up with the image.
+    if (downloadBlob()) {
+      finishOk();
+      return;
+    }
+    setErrorMessage("ვერ მოხერხდა. სცადე თავიდან.");
+    setActionState("idle");
   };
 
   const onDownload = () => {
     if (!blob) return;
-    downloadBlob();
-    setActionState("done");
-    setTimeout(() => {
-      setActionState("idle");
-      setOpen(false);
-    }, 1200);
+    if (downloadBlob()) {
+      finishOk();
+    } else {
+      setErrorMessage("ვერ მოხერხდა. სცადე თავიდან.");
+    }
   };
 
   return (
