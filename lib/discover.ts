@@ -8,7 +8,7 @@
  *   - "other": all the rest
  */
 
-import { and, asc, eq, inArray, ne, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, ne, or } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -121,6 +121,9 @@ export async function getDiscoveryFeed(
     .where(
       and(
         ne(users.id, viewerId),
+        // Profiles that haven't picked a username yet (post-signup, pre-
+        // onboarding) would render with a broken /u/ link. Skip them.
+        isNotNull(profiles.username),
         excludedList.length > 1
           ? inArray(users.id, await pickIncluded(excludedList, viewerId))
           : undefined

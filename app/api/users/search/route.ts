@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { and, asc, eq, ilike, ne, or, sql } from "drizzle-orm";
+import { and, asc, eq, ilike, isNotNull, ne, or, sql } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
@@ -44,6 +44,9 @@ export async function GET(req: Request) {
     .where(
       and(
         ne(users.id, session.user.id),
+        // Hide users who haven't picked a username yet — their card would
+        // link to a broken /u/ URL.
+        isNotNull(profiles.username),
         or(
           ilike(profiles.username, pattern),
           ilike(profiles.displayName, pattern),
