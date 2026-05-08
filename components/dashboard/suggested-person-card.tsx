@@ -27,7 +27,7 @@ export function SuggestedPersonCard({ person }: { person: DiscoverCard }) {
   const avatarSrc = person.photoUrl ?? person.image;
 
   return (
-    <article className="group relative flex w-44 shrink-0 snap-start flex-col items-center overflow-hidden rounded-2xl border border-border bg-card/65 p-3 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15 sm:w-48">
+    <article className="group relative flex w-44 shrink-0 flex-col items-center overflow-hidden rounded-2xl border border-border bg-card/65 p-3 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15 sm:w-48">
       <Link
         href={`/u/${person.username}`}
         className="flex w-full flex-col items-center"

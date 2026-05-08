@@ -10,9 +10,9 @@ import { SuggestedPersonCard } from "./suggested-person-card";
 
 /**
  * Horizontal scroll rail of the most compatible public-profile users.
- * The card thumbnails already make it obvious these are people, so we
- * skip a section title — keeps the dashboard scannable when the rail
- * lives at the top of the page.
+ * Mouse: drag the rail or use the chevron buttons. Vertical wheel is
+ * translated to horizontal scroll while hovering inside.
+ * Touch: native momentum scroll.
  */
 export function SuggestedPeopleRail({
   suggestions,
@@ -43,16 +43,16 @@ export function SuggestedPeopleRail({
     };
   }, [suggestions.length]);
 
-  // Click-drag-to-scroll on desktop. We don't enable this for touch
-  // because the browser's native momentum scroll is better. The DRAG_THRESHOLD
-  // lets short clicks through to the underlying <Link>; once the user has
-  // moved past it we treat the gesture as a drag and swallow the trailing
-  // click so we don't navigate when they meant to scroll.
+  // Mouse drag-to-scroll + vertical-wheel-to-horizontal-scroll. Skipped
+  // for touch where native momentum is better. The 4px DRAG_THRESHOLD
+  // lets a clean click through to the underlying <Link>; once we're past
+  // it we treat the gesture as a drag and swallow the trailing click so
+  // we don't navigate into whichever card the cursor was over on release.
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
 
-    const DRAG_THRESHOLD = 5;
+    const DRAG_THRESHOLD = 4;
     let pointerId: number | null = null;
     let startX = 0;
     let startScroll = 0;
@@ -60,7 +60,6 @@ export function SuggestedPeopleRail({
 
     const onPointerDown = (e: PointerEvent) => {
       if (e.pointerType === "touch") return;
-      // Only the primary mouse button.
       if (e.button !== 0) return;
       pointerId = e.pointerId;
       startX = e.clientX;
@@ -74,11 +73,11 @@ export function SuggestedPeopleRail({
       if (!didDrag && Math.abs(dx) >= DRAG_THRESHOLD) {
         didDrag = true;
         el.setPointerCapture(e.pointerId);
-        el.style.cursor = "grabbing";
-        el.style.userSelect = "none";
+        el.classList.add("is-dragging");
       }
       if (didDrag) {
-        e.preventDefault();
+        // Direct write — auto behavior + no scroll-snap means the rail
+        // tracks the cursor 1:1 without the browser fighting us.
         el.scrollLeft = startScroll - dx;
       }
     };
@@ -86,11 +85,8 @@ export function SuggestedPeopleRail({
     const endDrag = (e: PointerEvent) => {
       if (pointerId !== e.pointerId) return;
       pointerId = null;
-      el.style.cursor = "";
-      el.style.userSelect = "";
+      el.classList.remove("is-dragging");
       if (didDrag) {
-        // Swallow the click that fires after a drag-release so we don't
-        // navigate into a card that just happened to be under the cursor.
         const swallow = (ev: MouseEvent) => {
           ev.preventDefault();
           ev.stopPropagation();
@@ -99,15 +95,35 @@ export function SuggestedPeopleRail({
       }
     };
 
+    // Vertical wheel → horizontal scroll. Honour explicit horizontal
+    // wheel events (trackpad two-finger sideways) by passing through.
+    const onWheel = (e: WheelEvent) => {
+      // If the user is already scrolling horizontally (trackpad), let it
+      // through unmodified.
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      if (e.deltaY === 0) return;
+      const max = el.scrollWidth - el.clientWidth;
+      const next = el.scrollLeft + e.deltaY;
+      // Only intercept if we can actually consume the scroll — otherwise
+      // let the page scroll vertically as the user expects.
+      if ((e.deltaY > 0 && el.scrollLeft >= max) || (e.deltaY < 0 && el.scrollLeft <= 0)) {
+        return;
+      }
+      e.preventDefault();
+      el.scrollLeft = Math.max(0, Math.min(max, next));
+    };
+
     el.addEventListener("pointerdown", onPointerDown);
     el.addEventListener("pointermove", onPointerMove);
     el.addEventListener("pointerup", endDrag);
     el.addEventListener("pointercancel", endDrag);
+    el.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       el.removeEventListener("pointerdown", onPointerDown);
       el.removeEventListener("pointermove", onPointerMove);
       el.removeEventListener("pointerup", endDrag);
       el.removeEventListener("pointercancel", endDrag);
+      el.removeEventListener("wheel", onWheel);
     };
   }, []);
 
@@ -116,8 +132,6 @@ export function SuggestedPeopleRail({
   const scrollByAmount = (dir: 1 | -1) => {
     const el = scrollerRef.current;
     if (!el) return;
-    // Scroll by ~3 cards. clientWidth * 0.7 lands in that zone for both
-    // mobile (small viewport) and desktop (wide rail).
     el.scrollBy({ left: dir * el.clientWidth * 0.7, behavior: "smooth" });
   };
 
@@ -133,8 +147,6 @@ export function SuggestedPeopleRail({
       </div>
 
       <div className="relative">
-        {/* Desktop chevron buttons — fade in only when there's overflow on
-            that side. Hidden below sm because thumb-scrolling is natural. */}
         <button
           type="button"
           onClick={() => scrollByAmount(-1)}
@@ -158,7 +170,6 @@ export function SuggestedPeopleRail({
           <ChevronRight className="size-4" />
         </button>
 
-        {/* Edge fades — visible only while there's content past the edge. */}
         <div
           aria-hidden
           className={cn(
@@ -174,12 +185,13 @@ export function SuggestedPeopleRail({
           )}
         />
 
-        {/* Negative margin lets the rail bleed to the screen edge on mobile so
-            cards feel like they continue past the viewport. snap-x for natural
-            tactile scrolling on touch. */}
+        {/* Negative margin lets the rail bleed to the screen edge on mobile.
+            No scroll-snap on desktop — it fights mouse drag. The
+            `is-dragging` class disables pointer-events on children so the
+            drag can't accidentally start a Link/Button click mid-drag. */}
         <div
           ref={scrollerRef}
-          className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:cursor-grab sm:px-6 sm:[&:active]:cursor-grabbing"
+          className="-mx-4 flex gap-3 overflow-x-auto overscroll-x-contain scroll-smooth px-4 pb-2 [scrollbar-width:none] [&.is-dragging]:scroll-auto [&.is-dragging_*]:pointer-events-none [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:cursor-grab sm:px-6 sm:[&.is-dragging]:cursor-grabbing"
         >
           {suggestions.map((person) => (
             <SuggestedPersonCard key={person.userId} person={person} />
