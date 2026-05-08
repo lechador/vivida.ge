@@ -273,6 +273,9 @@ export default async function PublicProfilePage({
             <SynastryDisplayLazy
               result={synastry}
               partnerName={displayName}
+              shareUrl={`/api/share/synastry?with=${encodeURIComponent(
+                profile.username ?? ""
+              )}`}
             />
           </section>
         )}

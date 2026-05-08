@@ -30,6 +30,7 @@ const SynastryDisplay = dynamic(
 export function SynastryDisplayLazy(props: {
   result: SynastryResult;
   partnerName: string;
+  shareUrl?: string;
 }) {
   return <SynastryDisplay {...props} />;
 }

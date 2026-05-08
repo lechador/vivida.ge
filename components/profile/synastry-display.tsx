@@ -36,6 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { SynastryShareButton } from "./synastry-share-button";
 
 const CATEGORY_GRADIENT: Record<string, string> = {
   love: "from-[oklch(0.72_0.22_350)] to-[oklch(0.65_0.24_305)]",
@@ -58,9 +59,12 @@ const CATEGORY_RING_COLOR: Record<string, string> = {
 export function SynastryDisplay({
   result,
   partnerName,
+  shareUrl,
 }: {
   result: SynastryResult;
   partnerName: string;
+  /** When set, renders the share-card button in the hero. */
+  shareUrl?: string;
 }) {
   const verdict = overallVerdict(result.overall);
   const narrative = overallNarrative(result.overall);
@@ -95,6 +99,15 @@ export function SynastryDisplay({
               moonA={result.elements.moonA}
               moonB={result.elements.moonB}
             />
+            {shareUrl && (
+              <div className="mt-5">
+                <SynastryShareButton
+                  shareUrl={shareUrl}
+                  partnerName={partnerName}
+                  overall={Math.round(result.overall)}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
