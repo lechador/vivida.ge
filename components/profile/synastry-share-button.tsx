@@ -61,6 +61,8 @@ export function SynastryShareButton({
     setLoadState("rendering");
     setErrorMessage(null);
 
+    console.log("[share] effect fired, loadState=", loadState, "open=", open);
+
     (async () => {
       try {
         // Wait two animation frames so React has time to commit the
@@ -69,32 +71,45 @@ export function SynastryShareButton({
         await new Promise((r) => requestAnimationFrame(() => r(null)));
         await new Promise((r) => requestAnimationFrame(() => r(null)));
 
+        console.log(
+          "[share] after rAF, cardRef.current is:",
+          cardRef.current
+        );
+
         if (!cardRef.current) {
           throw new Error("card not mounted");
         }
 
-        // Lazy-import so html-to-image doesn't bloat the initial
-        // bundle for visitors who never click share.
-        const { toBlob } = await import("html-to-image");
-        const fresh = await toBlob(cardRef.current, {
-          // The card is already authored at 1080×1920 CSS pixels, so
-          // pixelRatio:1 captures the native resolution. cacheBust
-          // forces image elements to refetch with proper CORS.
+        console.log("[share] importing html-to-image…");
+        const mod = await import("html-to-image");
+        console.log("[share] html-to-image loaded:", Object.keys(mod));
+
+        console.log(
+          "[share] capturing node, dimensions:",
+          cardRef.current.offsetWidth,
+          "x",
+          cardRef.current.offsetHeight
+        );
+        const fresh = await mod.toBlob(cardRef.current, {
           pixelRatio: 1,
           cacheBust: true,
           backgroundColor: "#0b0814",
         });
 
         if (cancelled) return;
+        console.log("[share] toBlob returned:", fresh);
         if (!fresh) throw new Error("toBlob returned null");
+
+        console.log("[share] blob size:", fresh.size, "type:", fresh.type);
 
         setBlob(fresh);
         setPreviewUrl(URL.createObjectURL(fresh));
         setLoadState("ready");
+        console.log("[share] preview ready");
       } catch (err) {
         if (cancelled) return;
         const detail = (err as Error).message ?? "";
-        console.warn("[share render]", detail);
+        console.error("[share render] failed:", err);
         setErrorMessage(`ვერ მოხერხდა (${detail || "უცნობი შეცდომა"})`);
         setLoadState("error");
       }
@@ -208,7 +223,10 @@ export function SynastryShareButton({
         type="button"
         variant="mystic"
         size="lg"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          console.log("[share] button clicked, opening dialog");
+          setOpen(true);
+        }}
       >
         <Share2 className="size-4" />
         გააზიარე ბარათი
