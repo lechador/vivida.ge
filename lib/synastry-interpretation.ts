@@ -15,6 +15,7 @@
  */
 
 import type { AspectKind } from "./aspects";
+import { aspectDetailContent } from "./synastry-aspects-content";
 import type { SynastryAspect, SynastryCategory } from "./synastry";
 
 /** Georgian display name for each chart point. */
@@ -197,8 +198,10 @@ export type AspectBreakdown = {
   bodyADescription: string;
   /** What body B represents. */
   bodyBDescription: string;
-  /** The dynamic this pairing creates between you. */
-  dynamic: string;
+  /** What this pairing gives the relationship — supportive side. */
+  positive: string;
+  /** What to watch for — friction, shadow, blind spots. */
+  negative: string;
   /** A practical takeaway or advice. */
   takeaway: string;
 };
@@ -211,44 +214,57 @@ function tightnessLabel(tightness: number): string {
   return "ფართო ორბი — გავლენა მსუბუქია, მაგრამ ფონზე იგრძნობა.";
 }
 
-/** Compose the dynamic + takeaway based on body pairing × aspect valence. */
-function composeDynamic(asp: SynastryAspect): { dynamic: string; takeaway: string } {
+/**
+ * Deterministic fallback used only when the JSON content store doesn't
+ * yet have an entry for this (aspect × body × body) combo. Pre-generation
+ * covers all 5 × 91 = 455 possibilities, so this should rarely fire in
+ * practice; keeping it means a missing entry never blanks the modal.
+ */
+function fallbackDetail(asp: SynastryAspect): {
+  positive: string;
+  negative: string;
+  takeaway: string;
+} {
   const valence = ASPECT_META[asp.kind].valence;
   const aDom = BODY_DOMAIN_NOM[asp.a] ?? asp.a;
   const bDom = BODY_DOMAIN_NOM[asp.b] ?? asp.b;
-  const bDomDat = BODY_DOMAIN_DAT[asp.b] ?? `${asp.b}ს`;
   const aDomDat = BODY_DOMAIN_DAT[asp.a] ?? `${asp.a}ს`;
+  const bDomDat = BODY_DOMAIN_DAT[asp.b] ?? `${asp.b}ს`;
 
   if (valence === "harmonious") {
     return {
-      dynamic: `${aDom} და ${bDom} ერთმანეთში ბუნებრივად გადადის. ეს სფერო ერთად გიმარტივდებათ — როცა ერთი იწყებს, მეორე იცის რა გააგრძელოს. დიდი ცდის გარეშე გრძნობთ ერთმანეთის ნაკადს.`,
-      takeaway: `გამოიყენეთ ეს ჰარმონია — გადაუდე, რომ ${bDomDat} თქვენს ცხოვრებაში ${aDom} ბუნებრივად ანიჭებს ენერგიას. ღია გასაუბრება ამ თემებზე კიდევ უფრო ღრმავდება ბმას.`,
+      positive: `${aDom} და ${bDom} ერთმანეთში ბუნებრივად გადადის — ერთი იწყებს, მეორემ იცის გაგრძელება. ცდის გარეშე გრძნობთ ერთმანეთის ნაკადს.`,
+      negative: `ეს ჰარმონია იოლად ხდება ჩვეულებად — შეიძლება ერთმანეთი თავისთავად მიიღოთ და ცოცხალი ძალისხმევა აღარ ჩადოთ. ღირს, ცნობიერად აფასებდეთ ამ ნაკადს.`,
+      takeaway: `${bDomDat} ${aDom} ენერგიას ანიჭებს — არ დაივიწყოთ მადლიერების ღია გამოხატვა და თემაზე ცოცხალი საუბარი.`,
     };
   }
   if (valence === "tense") {
     return {
-      dynamic: `${aDom} და ${bDom} ერთმანეთს ეცილებიან — ერთი ენერგია მეორეს გვერდს გვერდი არ აძლევს. ეს არ ნიშნავს ცუდს: სწორედ ამ დაძაბულობით აღმოაჩენთ რა გჭირდებათ რეალურად, რა აღარ მუშაობს ძველებურად.`,
-      takeaway: `ცნობიერად დაუთმეთ დრო ამ ხახუნს, ვიდრე გვერდს აუხვევთ. როცა ${aDomDat} მუშაობას უწყობთ ხელს, ${bDom} თავადაც წინ მიდის. ეს არის წერტილი, სადაც ცნობიერი მცდელობა ცვლის შაბლონს.`,
+      positive: `${aDom}-სა და ${bDom}-ს შორის სწორედ ხახუნი ქმნის ცოცხალ ენერგიას — ეს დაძაბულობა გაიძულებთ ცნობიერად მოეპყროთ ამ სფეროს, რაც ნელ-ნელა ღრმავდება.`,
+      negative: `${aDom} და ${bDom} ხშირად გვერდს გვერდი ვერ ეტევა — ერთი მეორეს უმარტივებს მცდელობას. თუ უგულებელყოფთ, აქ მუდმივი მოლოდინები და ხახუნი დაგროვდება.`,
+      takeaway: `${aDomDat} ცნობიერად დაუთმეთ დრო, ვიდრე ${bDom}-ს გვერდს აუხვევთ. ხახუნი წერტილია, სადაც ცნობიერი მცდელობა ცვლის შაბლონს.`,
     };
   }
-  // neutral (conjunction)
   return {
-    dynamic: `${aDom} და ${bDom} ერთ წერტილში იყრება — ენერგიები ერთობდებიან, ერთმანეთის გარეშე უკვე ვერ ფიქრობთ ამ თემაზე. შერევისგან ხშირად ახალი თვისებები იშვება.`,
-    takeaway: `მნიშვნელოვანია, ცალ-ცალკე გესმოდეთ რა მიგაჩნია შენ ${aDomDat} და რა — პარტნიორს ${bDomDat}. ცნობიერი გამიჯვნით უფრო ღრმად მუშაობს ერთიანობაც.`,
+    positive: `${aDom} და ${bDom} ერთ წერტილში იყრება — ერთობდებიან, ერთმანეთის გარეშე ამ თემაზე უკვე ვერ ფიქრობთ. ერთად მძლავრი ფოკუსი გექნებათ.`,
+    negative: `ენერგიები ისე ერევა, რომ შეიძლება საკუთარი სახე დაივიწყოთ ამ სფეროში. გრძნობებიც, აზრებიც ერთმანეთს ჩამოაქვს ფერი.`,
+    takeaway: `ცალ-ცალკე გესმოდეთ რა მიგაჩნია თქვენ ${aDomDat} და რა — პარტნიორს ${bDomDat}. ცნობიერი გამიჯვნით ერთიანობაც უფრო ღრმად მუშაობს.`,
   };
 }
 
 export function aspectBreakdown(asp: SynastryAspect): AspectBreakdown {
   const meta = ASPECT_META[asp.kind];
-  const { dynamic, takeaway } = composeDynamic(asp);
+  const generated = aspectDetailContent(asp.kind, asp.a, asp.b);
+  const detail = generated ?? fallbackDetail(asp);
   return {
     title: `${BODY_LABEL[asp.a] ?? asp.a} ${meta.glyph} ${BODY_LABEL[asp.b] ?? asp.b}`,
     tightnessNote: tightnessLabel(asp.tightness),
     aspectMeaning: meta.meaningKa,
     bodyADescription: BODY_SYN_DESC[asp.a] ?? "",
     bodyBDescription: BODY_SYN_DESC[asp.b] ?? "",
-    dynamic,
-    takeaway,
+    positive: detail.positive,
+    negative: detail.negative,
+    takeaway: detail.takeaway,
   };
 }
 

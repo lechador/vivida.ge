@@ -456,11 +456,20 @@ function AspectDialog({
             />
           </div>
 
-          <BreakdownBlock
-            label="რა დინამიკა იქმნება"
-            body={breakdown.dynamic}
-            accent={accent}
-          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <BreakdownBlock
+              label="რა მუშაობს"
+              body={breakdown.positive}
+              accent="oklch(0.78 0.16 200)"
+              tone="positive"
+            />
+            <BreakdownBlock
+              label="რას მიხედო"
+              body={breakdown.negative}
+              accent="oklch(0.7 0.22 25)"
+              tone="negative"
+            />
+          </div>
 
           <BreakdownBlock
             label="რა გავაკეთოთ ამით"
@@ -481,13 +490,21 @@ function BreakdownBlock({
   body,
   accent,
   compact = false,
+  tone,
 }: {
   label: string;
   body: string;
   accent?: string;
   compact?: boolean;
+  tone?: "positive" | "negative";
 }) {
   if (!body) return null;
+  const tinted = tone && accent
+    ? {
+        background: `color-mix(in oklch, ${accent} 8%, transparent)`,
+        borderColor: `color-mix(in oklch, ${accent} 32%, transparent)`,
+      }
+    : undefined;
   return (
     <div
       className={
@@ -495,6 +512,7 @@ function BreakdownBlock({
           ? "rounded-xl border border-border/60 bg-card/40 p-3"
           : "rounded-xl border border-border bg-card/55 p-4"
       }
+      style={tinted}
     >
       <div
         className="text-[10px] font-semibold uppercase tracking-[0.18em]"
