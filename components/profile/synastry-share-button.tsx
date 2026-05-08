@@ -90,20 +90,38 @@ export function SynastryShareButton({
           "x",
           cardRef.current.offsetHeight
         );
-        // skipFonts is critical — html-to-image's default behaviour
-        // calls getFontEmbedCSS which fetches every @font-face URL on
-        // the page and inlines it. On vivida.ge that includes Noto
-        // Sans Georgian preload URLs that hang in some browsers, which
-        // stalls toBlob() forever with no timeout. The captured SVG
-        // still uses the page's loaded fonts when the browser
-        // rasterises it, so Georgian text renders correctly without
-        // needing the explicit embed.
-        const fresh = await mod.toBlob(cardRef.current, {
-          pixelRatio: 1,
-          cacheBust: false,
-          backgroundColor: "#0b0814",
-          skipFonts: true,
-        });
+
+        // Bisect via toCanvas → manual canvas.toBlob, with a hard 15s
+        // timeout, so if html-to-image hangs we get a real error
+        // instead of waiting forever.
+        const captureWithTimeout = (timeoutMs: number) =>
+          Promise.race<HTMLCanvasElement>([
+            mod.toCanvas(cardRef.current!, {
+              pixelRatio: 1,
+              cacheBust: false,
+              backgroundColor: "#0b0814",
+              skipFonts: true,
+            }),
+            new Promise<never>((_, rej) =>
+              setTimeout(
+                () => rej(new Error(`toCanvas timed out after ${timeoutMs}ms`)),
+                timeoutMs
+              )
+            ),
+          ]);
+
+        const canvas = await captureWithTimeout(15000);
+        console.log(
+          "[share] toCanvas returned, dimensions:",
+          canvas.width,
+          "x",
+          canvas.height
+        );
+
+        const fresh = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob((b) => resolve(b), "image/png")
+        );
+        console.log("[share] canvas.toBlob returned:", fresh);
 
         if (cancelled) return;
         console.log("[share] toBlob returned:", fresh);
