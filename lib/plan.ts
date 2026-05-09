@@ -1,7 +1,9 @@
 import { eq } from "drizzle-orm";
+import { after } from "next/server";
 
 import { db } from "@/db";
-import { subscriptions, type Subscription } from "@/db/schema";
+import { subscriptions, users, type Subscription } from "@/db/schema";
+import { sendWelcomeEmail } from "@/lib/email";
 import type { PlanId } from "./pricing";
 
 /**
@@ -148,6 +150,32 @@ export async function provisionTrialIfMissing(
 
     // If onConflictDoNothing skipped the insert, fetch the existing row.
     if (!inserted) return await getSubscription(userId);
+
+    // Fire welcome email after the response returns so signup latency
+    // isn't hit by Resend round-trips. The helper is idempotent at the
+    // email_send_log level — a concurrent provision call won't double-send.
+    after(async () => {
+      try {
+        const [u] = await db
+          .select({ email: users.email, name: users.name })
+          .from(users)
+          .where(eq(users.id, userId))
+          .limit(1);
+        if (!u?.email) return;
+        await sendWelcomeEmail({
+          userId,
+          to: u.email,
+          name: u.name ?? null,
+          trialDays: TRIAL_DAYS,
+        });
+      } catch (err) {
+        console.warn(
+          "[plan] welcome email after-hook failed:",
+          (err as Error).message
+        );
+      }
+    });
+
     return inserted;
   } catch (err) {
     console.warn(

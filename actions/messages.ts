@@ -2,10 +2,12 @@
 
 import { and, eq, isNull, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 
 import { db } from "@/db";
 import { friendships, messages, type Message } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
+import { sendMessageEmail } from "@/lib/email";
 import { recordTyping } from "@/lib/messages";
 
 const MAX_BODY = 2000;
@@ -63,6 +65,25 @@ export async function sendMessage(
       body: trimmed,
     })
     .returning();
+
+  // Fire-and-forget email — only delivers if the recipient has been
+  // absent ≥1h and we haven't emailed them about a message in the last
+  // hour (handled inside the helper).
+  after(async () => {
+    try {
+      await sendMessageEmail({
+        recipientUserId: recipientId,
+        fromUserId: user.id,
+        fromName: user.name ?? "Vivida-ის წევრი",
+        body: trimmed,
+      });
+    } catch (err) {
+      console.warn(
+        "[messages] message email after-hook failed:",
+        (err as Error).message
+      );
+    }
+  });
 
   // Light revalidation — chat panel reads fresh data on next mount
   revalidatePath("/dashboard");

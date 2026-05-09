@@ -127,6 +127,13 @@
       "when": 1778352483744,
       "tag": "0017_lovely_iron_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1778353871907,
+      "tag": "0018_giant_zaladane",
+      "breakpoints": true
     }
   ]
 }

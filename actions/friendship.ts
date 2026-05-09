@@ -2,6 +2,7 @@
 
 import { and, eq, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 
 import { db } from "@/db";
 import {
@@ -13,6 +14,7 @@ import {
   type NotificationPayload,
 } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
+import { sendFriendRequestEmail } from "@/lib/email";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 
 /** Insert a notification for a recipient. Kind-specific payload is captured
@@ -131,6 +133,29 @@ export async function sendFriendRequest(
     toUserId: targetUserId,
     fromUserId: user.id,
     kind: "friend_request",
+  });
+
+  // Fire-and-forget email if the recipient has been absent ≥1h. The
+  // helper itself does the absence + throttle + opt-out checks; we just
+  // hand it the requester's display name and username.
+  after(async () => {
+    try {
+      const [requesterProfile] = await db
+        .select({ username: profiles.username })
+        .from(profiles)
+        .where(eq(profiles.userId, user.id))
+        .limit(1);
+      await sendFriendRequestEmail({
+        recipientUserId: targetUserId,
+        fromName: user.name ?? "Vivida-ის წევრი",
+        fromUsername: requesterProfile?.username ?? null,
+      });
+    } catch (err) {
+      console.warn(
+        "[friendship] friend-request email after-hook failed:",
+        (err as Error).message
+      );
+    }
   });
 
   revalidatePath("/friends");

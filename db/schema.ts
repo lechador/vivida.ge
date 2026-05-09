@@ -475,6 +475,39 @@ export const dailyEmailLog = pgTable(
 );
 
 /**
+ * Append-only log of every transactional email we send. Two purposes:
+ *   1. Idempotency for one-shot emails (e.g. welcome) — we check for an
+ *      existing row before sending.
+ *   2. Per-kind throttling for notification emails (friend-request,
+ *      message) — we suppress a second send within a sliding 1h window
+ *      so a chatty conversation doesn't spam the inbox.
+ *
+ * Resend's Idempotency-Key is the second line of defence; this table is
+ * the application-level guard.
+ */
+export const emailSendLog = pgTable(
+  "email_send_log",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** 'welcome' | 'friend_request' | 'message' (and future kinds). */
+    kind: text("kind").notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("email_send_log_user_kind_sent_idx").on(
+      t.userId,
+      t.kind,
+      t.sentAt
+    ),
+  ]
+);
+
+/**
  * Globally-cached moon phase + Gemini interpretation, one row per UTC date.
  * Universal (not per-user) — the moon's phase + sign is the same for everyone
  * on a given day, so a single row is served to all users.
