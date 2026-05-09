@@ -84,7 +84,10 @@ export default async function OpengraphImage() {
           />
         ))}
 
-        {/* Brand sparkle ✦ + wordmark — gradient text */}
+        {/* Brand sparkle + wordmark. The sparkle is an inline SVG (not the
+            ✦ glyph) because NotoSansGeorgian doesn't ship that codepoint —
+            satori would otherwise try to fetch a dynamic fallback font from
+            Google Fonts and fail with a 400. */}
         <div
           style={{
             display: "flex",
@@ -93,18 +96,24 @@ export default async function OpengraphImage() {
             marginBottom: 40,
           }}
         >
-          <div
-            style={{
-              fontSize: 96,
-              backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-              backgroundClip: "text",
-              color: "transparent",
-              lineHeight: 1,
-            }}
+          <svg
+            width={96}
+            height={96}
+            viewBox="0 0 48 48"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            ✦
-          </div>
+            <defs>
+              <linearGradient id="sparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#a78bfa" />
+                <stop offset="55%" stopColor="#f472b6" />
+                <stop offset="100%" stopColor="#22d3ee" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M24 0 L27 21 L48 24 L27 27 L24 48 L21 27 L0 24 L21 21 Z"
+              fill="url(#sparkle)"
+            />
+          </svg>
           <div
             style={{
               fontSize: 132,
