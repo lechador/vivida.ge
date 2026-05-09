@@ -438,6 +438,43 @@ export type DailyTransitsJson = {
 };
 
 /**
+ * Per-user, per-day delivery log for the daily-horoscope email blast.
+ * The cron at 05:00 / 05:30 UTC enqueues one row per eligible user with
+ * status='pending', then drains them by calling Resend. Re-runs of the
+ * cron pick up rows whose status is still 'pending' or 'failed', so a
+ * crashed/timed-out send is recoverable. Resend's Idempotency-Key uses
+ * (userId, sendDate) so even an at-least-once retry never double-sends.
+ *
+ * Status meaning:
+ *   - pending : freshly enqueued, never attempted
+ *   - sent    : Resend accepted the request
+ *   - failed  : Resend or pre-flight threw — eligible for retry
+ *   - skipped : dispatch returned false (free plan, no chart, etc.) — terminal
+ */
+export const dailyEmailLog = pgTable(
+  "daily_email_log",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Send date in UTC (YYYY-MM-DD). PK with userId. */
+    sendDate: date("send_date", { mode: "string" }).notNull(),
+    status: text("status").notNull().default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    lastError: text("last_error"),
+    lastAttemptAt: timestamp("last_attempt_at", { withTimezone: true }),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.sendDate] }),
+    index("daily_email_log_send_date_status_idx").on(t.sendDate, t.status),
+  ]
+);
+
+/**
  * Globally-cached moon phase + Gemini interpretation, one row per UTC date.
  * Universal (not per-user) — the moon's phase + sign is the same for everyone
  * on a given day, so a single row is served to all users.

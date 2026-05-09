@@ -1,8 +1,8 @@
 import { Resend } from "resend";
-import { and, eq, isNotNull } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { profiles, users } from "@/db/schema";
+import { dailyEmailLog, profiles, users } from "@/db/schema";
 import { DailyHoroscopeEmail } from "@/lib/email-templates/daily-horoscope";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { MarketingEmail } from "@/lib/email-templates/marketing";
@@ -189,7 +189,9 @@ export async function sendBulk(opts: SendOptions): Promise<SendResult> {
  */
 async function dispatch(
   opts: SendOptions,
-  recipient: Recipient
+  recipient: Recipient,
+  /** Optional dedupe key forwarded to Resend so retries can't double-send. */
+  idempotencyKey?: string
 ): Promise<boolean> {
   const c = client();
   if (!c) return false;
@@ -215,25 +217,28 @@ async function dispatch(
 
     const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=daily`);
     const dashboardUrl = absUrl("/dashboard");
-    const result = await c.emails.send({
-      from: FROM,
-      to: recipient.email,
-      subject: `${daily.headline} · შენი დღევანდელი ჰოროსკოპი`,
-      react: DailyHoroscopeEmail({
-        name: recipient.name?.split(" ")[0] ?? null,
-        headline: daily.headline,
-        summary: daily.summary,
-        body: daily.body,
-        themes: daily.themes ?? [],
-        dashboardUrl,
-        unsubscribeUrl: unsubUrl,
-        localizedDate,
-      }),
-      headers: {
-        "List-Unsubscribe": `<${unsubUrl}>`,
-        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    const result = await c.emails.send(
+      {
+        from: FROM,
+        to: recipient.email,
+        subject: `${daily.headline} · შენი დღევანდელი ჰოროსკოპი`,
+        react: DailyHoroscopeEmail({
+          name: recipient.name?.split(" ")[0] ?? null,
+          headline: daily.headline,
+          summary: daily.summary,
+          body: daily.body,
+          themes: daily.themes ?? [],
+          dashboardUrl,
+          unsubscribeUrl: unsubUrl,
+          localizedDate,
+        }),
+        headers: {
+          "List-Unsubscribe": `<${unsubUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
       },
-    });
+      idempotencyKey ? { idempotencyKey } : undefined
+    );
     if (result.error) throw new Error(result.error.message ?? "send failed");
     return true;
   }
@@ -302,4 +307,195 @@ export async function audienceCount(
 ): Promise<number> {
   const audience = await resolveAudience(template);
   return audience.length;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Daily horoscope blast — cron-driven, idempotent, retry-safe.
+// ─────────────────────────────────────────────────────────────────────
+
+export type DailyBlastResult = {
+  /** Total users matching the audience filter for `sendDate`. */
+  audienceTotal: number;
+  /** Newly inserted log rows on this invocation. */
+  enqueued: number;
+  /** Audience rows whose log row already existed (sent/failed/skipped/pending). */
+  alreadyEnqueued: number;
+  /** Successful Resend dispatches in this invocation. */
+  sent: number;
+  /** Dispatch returned false (free plan, no chart, user opted out mid-day). */
+  skipped: number;
+  /** Threw — row left status='failed' for next cron tick to retry. */
+  failed: number;
+  /** Pending+failed log rows still outstanding for `sendDate` after we returned. */
+  remaining: number;
+  durationMs: number;
+};
+
+/**
+ * Run one pass of the daily-horoscope email blast.
+ *
+ * Two-phase, idempotent:
+ *   1. Enqueue: INSERT … ON CONFLICT DO NOTHING for every audience row,
+ *      so safe to call repeatedly.
+ *   2. Drain: pick rows where status ∈ {pending, failed} for sendDate
+ *      and dispatch with concurrency=8 (Resend Pro is 10/s sustained).
+ *      Each Resend call carries Idempotency-Key=`daily:${userId}:${date}`
+ *      so an at-least-once retry from our side never produces a duplicate
+ *      email on Resend's side.
+ *
+ * If Vercel kills the function mid-drain (maxDuration), the next cron
+ * tick (we run a safety cron 30 min later) picks up the remaining rows.
+ */
+export async function sendDailyHoroscopeBlast(opts: {
+  /** YYYY-MM-DD — the calendar day this batch belongs to. Use the UTC date
+   *  for the cron caller; `localizedDate` per recipient is computed inside
+   *  dispatch from their profile timezone. */
+  sendDate: string;
+  concurrency?: number;
+}): Promise<DailyBlastResult> {
+  const start = Date.now();
+  const audience = await resolveAudience("daily_horoscope");
+  const c = client();
+
+  if (audience.length === 0 || !c) {
+    return {
+      audienceTotal: audience.length,
+      enqueued: 0,
+      alreadyEnqueued: 0,
+      sent: 0,
+      skipped: 0,
+      failed: 0,
+      remaining: 0,
+      durationMs: Date.now() - start,
+    };
+  }
+
+  // 1) Enqueue: idempotent insert.
+  const inserted = await db
+    .insert(dailyEmailLog)
+    .values(
+      audience.map((r) => ({
+        userId: r.userId,
+        sendDate: opts.sendDate,
+      }))
+    )
+    .onConflictDoNothing()
+    .returning({ userId: dailyEmailLog.userId });
+  const enqueued = inserted.length;
+  const alreadyEnqueued = audience.length - enqueued;
+
+  // 2) Pick up everything still outstanding for today (covers pending +
+  // any failed rows from a prior tick).
+  const outstanding = await db
+    .select({ userId: dailyEmailLog.userId })
+    .from(dailyEmailLog)
+    .where(
+      and(
+        eq(dailyEmailLog.sendDate, opts.sendDate),
+        inArray(dailyEmailLog.status, ["pending", "failed"])
+      )
+    );
+
+  // Cross-reference with current audience so a user who unsubscribed
+  // between enqueue and drain doesn't get the email anyway.
+  const audienceByUser = new Map(audience.map((r) => [r.userId, r]));
+  const targets = outstanding
+    .map((r) => audienceByUser.get(r.userId))
+    .filter((r): r is Recipient => !!r);
+
+  let sent = 0;
+  let skipped = 0;
+  let failed = 0;
+
+  await pMap(
+    targets,
+    async (recipient) => {
+      const idempotencyKey = `daily:${recipient.userId}:${opts.sendDate}`;
+      try {
+        const ok = await dispatch(
+          { template: "daily_horoscope" },
+          recipient,
+          idempotencyKey
+        );
+        if (ok) {
+          await db
+            .update(dailyEmailLog)
+            .set({
+              status: "sent",
+              attempts: sql`${dailyEmailLog.attempts} + 1`,
+              lastAttemptAt: new Date(),
+              sentAt: new Date(),
+              lastError: null,
+            })
+            .where(
+              and(
+                eq(dailyEmailLog.userId, recipient.userId),
+                eq(dailyEmailLog.sendDate, opts.sendDate)
+              )
+            );
+          sent++;
+        } else {
+          await db
+            .update(dailyEmailLog)
+            .set({
+              status: "skipped",
+              attempts: sql`${dailyEmailLog.attempts} + 1`,
+              lastAttemptAt: new Date(),
+            })
+            .where(
+              and(
+                eq(dailyEmailLog.userId, recipient.userId),
+                eq(dailyEmailLog.sendDate, opts.sendDate)
+              )
+            );
+          skipped++;
+        }
+      } catch (err) {
+        const message = (err as Error).message ?? "unknown";
+        await db
+          .update(dailyEmailLog)
+          .set({
+            status: "failed",
+            attempts: sql`${dailyEmailLog.attempts} + 1`,
+            lastAttemptAt: new Date(),
+            lastError: message.slice(0, 500),
+          })
+          .where(
+            and(
+              eq(dailyEmailLog.userId, recipient.userId),
+              eq(dailyEmailLog.sendDate, opts.sendDate)
+            )
+          );
+        failed++;
+      }
+    },
+    opts.concurrency ?? 8
+  );
+
+  // 3) Final outstanding count for the response.
+  const remainingRows = await db
+    .select({ userId: dailyEmailLog.userId })
+    .from(dailyEmailLog)
+    .where(
+      and(
+        eq(dailyEmailLog.sendDate, opts.sendDate),
+        inArray(dailyEmailLog.status, ["pending", "failed"])
+      )
+    );
+
+  return {
+    audienceTotal: audience.length,
+    enqueued,
+    alreadyEnqueued,
+    sent,
+    skipped,
+    failed,
+    remaining: remainingRows.length,
+    durationMs: Date.now() - start,
+  };
+}
+
+/** UTC date string in YYYY-MM-DD — what the cron should pass as sendDate. */
+export function utcDateKey(d: Date = new Date()): string {
+  return d.toISOString().slice(0, 10);
 }
