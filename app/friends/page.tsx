@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, UserPlus, Users } from "lucide-react";
+import { ArrowRight, Sparkles, UserPlus, Users } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
@@ -10,18 +10,26 @@ import {
   listOutgoingRequests,
   type FriendshipUser,
 } from "@/lib/friendship";
+import {
+  enrichFriendsWithSynastry,
+  type FriendWithSynastry,
+} from "@/lib/friend-synastry";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { FriendActions } from "@/components/friends/friend-actions";
+import { CompatibilityChip } from "@/components/friends/compatibility-chip";
+import { CompatibilityRow } from "@/components/friends/compatibility-row";
 import { MessageButton } from "@/components/chat/message-button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "მეგობრები" };
 
-type Tab = "friends" | "incoming" | "outgoing";
+type Tab = "friends" | "compatibility" | "incoming" | "outgoing";
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: "friends", label: "მეგობრები" },
+  { id: "compatibility", label: "თავსებადობა" },
   { id: "incoming", label: "შემოსული" },
   { id: "outgoing", label: "გაგზავნილი" },
 ];
@@ -34,7 +42,9 @@ export default async function FriendsPage({
   const user = await requireUser();
   const params = await searchParams;
   const tab: Tab =
-    params.tab === "incoming" || params.tab === "outgoing"
+    params.tab === "compatibility" ||
+    params.tab === "incoming" ||
+    params.tab === "outgoing"
       ? params.tab
       : "friends";
 
@@ -45,13 +55,15 @@ export default async function FriendsPage({
     listOutgoingRequests(user.id),
   ]);
 
+  const { viewerHasChart, friends: enrichedFriends } =
+    await enrichFriendsWithSynastry(user.id, friends);
+
   const counts: Record<Tab, number> = {
-    friends: friends.length,
+    friends: enrichedFriends.length,
+    compatibility: enrichedFriends.length,
     incoming: incoming.length,
     outgoing: outgoing.length,
   };
-  const list =
-    tab === "friends" ? friends : tab === "incoming" ? incoming : outgoing;
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -106,17 +118,112 @@ export default async function FriendsPage({
           })}
         </nav>
 
-        {list.length === 0 ? (
-          <EmptyState tab={tab} />
-        ) : (
-          <ul className="grid gap-3">
-            {list.map((u) => (
-              <FriendRow key={u.id} u={u} variant={tab} />
-            ))}
-          </ul>
-        )}
+        {tab === "compatibility" ? (
+          <CompatibilityTab
+            viewerHasChart={viewerHasChart}
+            friends={enrichedFriends}
+          />
+        ) : tab === "friends" ? (
+          <>
+            {!viewerHasChart && enrichedFriends.length > 0 && (
+              <NoChartBanner />
+            )}
+            {enrichedFriends.length === 0 ? (
+              <EmptyState tab="friends" />
+            ) : (
+              <ul className="grid gap-3">
+                {enrichedFriends.map((u) => (
+                  <FriendRow key={u.id} u={u} variant="friends" />
+                ))}
+              </ul>
+            )}
+          </>
+        ) : (() => {
+          const list = tab === "incoming" ? incoming : outgoing;
+          return list.length === 0 ? (
+            <EmptyState tab={tab} />
+          ) : (
+            <ul className="grid gap-3">
+              {list.map((u) => (
+                <FriendRow key={u.id} u={u} variant={tab} />
+              ))}
+            </ul>
+          );
+        })()}
       </section>
     </main>
+  );
+}
+
+/** Compatibility tab — viewer's friends ranked by synastry score. Friends
+ *  without a chart sink to the bottom (sentinel score of -1). */
+function CompatibilityTab({
+  viewerHasChart,
+  friends,
+}: {
+  viewerHasChart: boolean;
+  friends: FriendWithSynastry[];
+}) {
+  if (friends.length === 0) {
+    return <EmptyState tab="compatibility" />;
+  }
+  if (!viewerHasChart) {
+    return <NoChartBanner full />;
+  }
+  const ranked = [...friends].sort((a, b) => {
+    const sa = a.synastry?.overall ?? -1;
+    const sb = b.synastry?.overall ?? -1;
+    return sb - sa;
+  });
+  return (
+    <>
+      <p className="mb-4 text-xs text-muted-foreground sm:text-sm">
+        შენი მეგობრები დალაგებულია ცის რუკების ერთობლივი თავსებადობით. დააჭირე
+        ვინმეს — ნახავ სრულ აღწერას.
+      </p>
+      <ul className="grid gap-3">
+        {ranked.map((u, i) => (
+          <CompatibilityRow key={u.id} u={u} rank={i + 1} />
+        ))}
+      </ul>
+    </>
+  );
+}
+
+/** Inline / full banner urging the viewer to fill out their birth chart so
+ *  synastry can compute. Inline mode sits above the friends list; full
+ *  mode replaces it (used on the compatibility tab). */
+function NoChartBanner({ full = false }: { full?: boolean }) {
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border border-[var(--vivida-violet)]/35 bg-gradient-to-br from-[var(--vivida-violet)]/10 via-card/60 to-[var(--vivida-cyan)]/10 p-5 ring-1 ring-foreground/5 backdrop-blur-xl",
+        full ? "text-center" : "mb-5 sm:mb-6"
+      )}
+    >
+      <div
+        className={cn(
+          "flex items-center gap-3",
+          full && "flex-col text-balance"
+        )}
+      >
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
+          <Sparkles className="size-5" />
+        </span>
+        <div className={cn("flex-1", full && "text-center")}>
+          <h2 className="text-base font-semibold tracking-tight sm:text-lg">
+            შენი ცის რუკა ჯერ არ არის
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+            შეავსე დაბადების მონაცემები — გამოვთვლი თავსებადობას ყველა შენ
+            მეგობართან.
+          </p>
+        </div>
+        <Button asChild variant="mystic" className={cn(full && "mt-2")}>
+          <Link href="/onboarding">შევსება</Link>
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -124,12 +231,14 @@ function FriendRow({
   u,
   variant,
 }: {
-  u: FriendshipUser;
+  u: FriendWithSynastry | FriendshipUser;
   variant: Tab;
 }) {
   const displayName =
     u.displayName ?? u.name?.split(" ")[0] ?? u.username ?? "user";
   const profileHref = u.username ? `/u/${u.username}` : null;
+  const synastry =
+    variant === "friends" && "synastry" in u ? u.synastry : null;
 
   const avatar = u.image ? (
     <Image
@@ -187,6 +296,12 @@ function FriendRow({
           </p>
         )}
       </div>
+      {synastry && (
+        <CompatibilityChip
+          overall={synastry.overall}
+          topCategory={synastry.topCategory}
+        />
+      )}
       {/* Message button for accepted friends only — same gate as the
           server action enforces. Renders before FriendActions so "remove"
           (the destructive action) sits last in tab order. */}
@@ -194,7 +309,7 @@ function FriendRow({
         <MessageButton partnerId={u.id} variant="icon" />
       )}
       <FriendActions
-        variant={variant}
+        variant={variant === "compatibility" ? "friends" : variant}
         otherUserId={u.id}
         otherUsername={u.username}
       />
@@ -217,6 +332,11 @@ function EmptyState({ tab }: { tab: Tab }) {
       Icon: Users,
       title: "ჯერ არცერთი მეგობარი არ გყავს",
       body: "გაუგზავნე მეგობრობის თხოვნა მათ, ვისთანაც გინდა შენი თავსებადობის ნახვა.",
+    },
+    compatibility: {
+      Icon: Sparkles,
+      title: "თავსებადობა ჯერ ცარიელია",
+      body: "დაუმეგობრდი ვინმეს — შემდეგ აქ ნახავ ცის რუკების ერთობლივ ქულას.",
     },
     incoming: {
       Icon: UserPlus,
