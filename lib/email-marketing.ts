@@ -221,13 +221,11 @@ async function dispatch(
       {
         from: FROM,
         to: recipient.email,
-        subject: `${daily.headline} · შენი დღევანდელი ჰოროსკოპი`,
+        subject: "შენი დღევანდელი ჰოროსკოპი",
         react: DailyHoroscopeEmail({
           name: recipient.name?.split(" ")[0] ?? null,
           headline: daily.headline,
           summary: daily.summary,
-          body: daily.body,
-          themes: daily.themes ?? [],
           dashboardUrl,
           unsubscribeUrl: unsubUrl,
           localizedDate,
