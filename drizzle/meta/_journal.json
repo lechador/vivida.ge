@@ -134,6 +134,13 @@
       "when": 1778353871907,
       "tag": "0018_giant_zaladane",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1778865602584,
+      "tag": "0019_solid_quasimodo",
+      "breakpoints": true
     }
   ]
 }

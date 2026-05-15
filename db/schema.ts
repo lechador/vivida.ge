@@ -309,6 +309,7 @@ export const typingIndicators = pgTable(
 export const notificationKindEnum = pgEnum("notification_kind", [
   "friend_request",
   "friend_accepted",
+  "post_comment",
 ]);
 
 /**
@@ -321,6 +322,10 @@ export type NotificationPayload = {
   fromUsername?: string | null;
   fromName?: string | null;
   fromImage?: string | null;
+  /** Set on `post_comment` so the bell-icon row can deep-link to /feed#post-<id>. */
+  postId?: string;
+  /** Optional preview of the comment body for the dropdown. */
+  preview?: string;
 };
 
 export const notifications = pgTable("notification", {
@@ -673,6 +678,104 @@ export const userActivityDays = pgTable(
 
 export type UserActivityDay = typeof userActivityDays.$inferSelect;
 
+/**
+ * Community feed — short text posts visible to every signed-in user.
+ * Hard delete on user removal (cascade) and on post author/admin
+ * action; comments and reactions cascade with the parent post.
+ *
+ * No image uploads, no link parsing — body is plain text only by
+ * product spec. Length cap enforced in `createPost`.
+ */
+export const posts = pgTable(
+  "post",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    // Feed reads are always "newest first"; the explicit index lets
+    // Postgres do an index-only descending scan rather than sorting in
+    // memory once the table grows past a few thousand rows.
+    index("post_created_at_idx").on(t.createdAt),
+    index("post_user_idx").on(t.userId),
+  ]
+);
+
+/**
+ * Comments on a community post. Text only (same product spec). Cascades
+ * with the parent post: when a post is deleted, all comments go too.
+ */
+export const postComments = pgTable(
+  "post_comment",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    postId: text("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    // Loading comments for a single post — always sorted oldest first.
+    index("post_comment_post_idx").on(t.postId, t.createdAt),
+  ]
+);
+
+/**
+ * Reaction taxonomy. Kept short on purpose — adding a kind means
+ * designing a new icon and updating every render site. Enum values are
+ * forever; "haha"/"wow" can be aliased to existing kinds at the UI
+ * level if the product splits later.
+ */
+export const postReactionKindEnum = pgEnum("post_reaction_kind", [
+  "like",
+  "dislike",
+  "funny",
+  "sad",
+]);
+
+/**
+ * Per-user reaction to a post. Composite PK (post, user) enforces
+ * "one reaction per user per post" at the DB level — switching from
+ * `like` to `sad` is a single `INSERT … ON CONFLICT DO UPDATE`, no
+ * race window where a user can stack reactions.
+ */
+export const postReactions = pgTable(
+  "post_reaction",
+  {
+    postId: text("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: postReactionKindEnum("kind").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.postId, t.userId] }),
+    // Per-post aggregate count: GROUP BY post_id, kind → uses this idx.
+    index("post_reaction_post_kind_idx").on(t.postId, t.kind),
+  ]
+);
+
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
     fields: [users.id],
@@ -787,6 +890,13 @@ export type NewAuthToken = typeof authTokens.$inferInsert;
 export type AuthTokenPurpose = (typeof authTokenPurposeEnum.enumValues)[number];
 export type TypingIndicator = typeof typingIndicators.$inferSelect;
 export type NewTypingIndicator = typeof typingIndicators.$inferInsert;
+export type Post = typeof posts.$inferSelect;
+export type NewPost = typeof posts.$inferInsert;
+export type PostComment = typeof postComments.$inferSelect;
+export type NewPostComment = typeof postComments.$inferInsert;
+export type PostReaction = typeof postReactions.$inferSelect;
+export type NewPostReaction = typeof postReactions.$inferInsert;
+export type PostReactionKind = (typeof postReactionKindEnum.enumValues)[number];
 export type Plan = (typeof planEnum.enumValues)[number];
 export type SubscriptionStatus = (typeof subscriptionStatusEnum.enumValues)[number];
 export type BillingInterval = (typeof billingIntervalEnum.enumValues)[number];

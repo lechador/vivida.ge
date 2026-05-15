@@ -6,6 +6,7 @@ import Image from "next/image";
 import {
   Bell,
   MessageCircle,
+  MessageSquare,
   Sparkles,
   UserPlus,
 } from "lucide-react";
@@ -23,11 +24,13 @@ import { cn } from "@/lib/utils";
 const KIND_ICON: Record<string, LucideIcon> = {
   friend_request: UserPlus,
   friend_accepted: Sparkles,
+  post_comment: MessageSquare,
 };
 
 const KIND_LABEL_KA: Record<string, string> = {
   friend_request: "გამოგიგზავნა მეგობრობის თხოვნა",
   friend_accepted: "მიიღო შენი მოთხოვნა",
+  post_comment: "დააკომენტარა შენი პოსტი",
 };
 
 type ChatNotifyDetail = {
@@ -236,7 +239,12 @@ function DbNotificationRow({
 }) {
   const Icon = KIND_ICON[n.kind] ?? Bell;
   const username = n.payload?.fromUsername;
-  const href = username ? `/u/${username}` : "/friends";
+  const href =
+    n.kind === "post_comment" && n.payload?.postId
+      ? `/feed#post-${n.payload.postId}`
+      : username
+        ? `/u/${username}`
+        : "/friends";
   const isUnread = !n.readAt;
   return (
     <li>
@@ -275,6 +283,11 @@ function DbNotificationRow({
               {KIND_LABEL_KA[n.kind] ?? ""}
             </span>
           </div>
+          {n.kind === "post_comment" && n.payload?.preview && (
+            <div className="mt-0.5 line-clamp-2 text-xs text-foreground/80">
+              {n.payload.preview}
+            </div>
+          )}
           <div className="mt-0.5 text-xs text-muted-foreground/80">
             {timeAgo(new Date(n.createdAt))}
           </div>

@@ -2,6 +2,7 @@ import {
   Compass,
   Heart,
   MessageCircle,
+  Sparkles,
   Sun,
   Telescope,
   Users,
@@ -11,6 +12,7 @@ import type { LucideIcon } from "lucide-react";
 export type NavActiveKey =
   | "today"
   | "report"
+  | "feed"
   | "discover"
   | "synastry"
   | "friends"
@@ -41,6 +43,13 @@ export const NAV_ITEMS: NavItem[] = [
     hue: "oklch(0.78 0.18 305)",
   },
   {
+    key: "feed",
+    href: "/feed",
+    label: "ფიდი",
+    Icon: Sparkles,
+    hue: "oklch(0.78 0.18 320)",
+  },
+  {
     key: "discover",
     href: "/discover",
     label: "აღმოაჩინე",
@@ -65,8 +74,8 @@ export const NAV_ITEMS: NavItem[] = [
 
 /**
  * The mobile bottom tab bar shows a curated 5-item subset of the nav.
- * Friends doesn't make this list (it's still reachable from the desktop
- * nav and from each user's profile); messages takes its slot so the
+ * Friends and feed don't make this list (they're still reachable from
+ * the desktop nav and the mobile drawer); messages takes a slot so the
  * messenger is one tap away with a live unread badge.
  */
 export const MOBILE_TAB_ITEMS: NavItem[] = [
@@ -85,11 +94,11 @@ export const MOBILE_TAB_ITEMS: NavItem[] = [
     hue: "oklch(0.78 0.18 305)",
   },
   {
-    key: "discover",
-    href: "/discover",
-    label: "აღმოაჩინე",
-    Icon: Telescope,
-    hue: "oklch(0.78 0.15 195)",
+    key: "feed",
+    href: "/feed",
+    label: "ფიდი",
+    Icon: Sparkles,
+    hue: "oklch(0.78 0.18 320)",
   },
   {
     key: "synastry",
