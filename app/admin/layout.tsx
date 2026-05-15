@@ -41,7 +41,7 @@ export default async function AdminLayout({
             </span>
             <span className="text-muted-foreground/40">·</span>
             <Link
-              href="/dashboard"
+              href="/feed"
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
               დაბრუნება

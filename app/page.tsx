@@ -86,10 +86,11 @@ const WEBSITE_LD = {
 export default async function Home() {
   // If you're already signed in there's nothing for you on the marketing
   // page — straight to the app. Keeps the back-button from leaving authed
-  // users staring at a "Sign in" CTA.
+  // users staring at a "Sign in" CTA. Feed is the in-app home; if the
+  // user hasn't completed onboarding, /feed bounces them to /onboarding.
   const session = await auth();
   if (session?.user?.id) {
-    redirect("/dashboard");
+    redirect("/feed");
   }
   return (
     <>

@@ -18,10 +18,12 @@ import { TURNSTILE_ERROR_KA, verifyTurnstile } from "@/lib/turnstile";
 // ─── OAuth (existing) ────────────────────────────────────────────────────
 
 /**
- * After OAuth, land on /dashboard. Dashboard redirects to /onboarding only
- * when no profile exists, so returning users skip the birth-data form.
+ * After OAuth, land on /feed — that's the community surface and the
+ * default destination once a user is set up. /feed redirects to
+ * /onboarding when the profile is missing, so first-time sign-ins
+ * still get funnelled through birth-data entry.
  */
-export async function signInWithGoogle(callbackUrl: string = "/dashboard") {
+export async function signInWithGoogle(callbackUrl: string = "/feed") {
   await signIn("google", { redirectTo: callbackUrl });
 }
 

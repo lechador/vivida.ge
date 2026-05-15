@@ -61,7 +61,7 @@ export function LoginForm() {
         turnstileToken,
       });
       if (result.ok) {
-        router.push("/dashboard");
+        router.push("/feed");
         router.refresh();
         return;
       }

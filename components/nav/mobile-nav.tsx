@@ -57,7 +57,7 @@ export function MobileNav({ active }: { active?: NavActiveKey }) {
                 {/* Header — logo + close */}
                 <div className="flex items-center justify-between">
                   <Link
-                    href="/dashboard"
+                    href="/feed"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-2.5"
                   >

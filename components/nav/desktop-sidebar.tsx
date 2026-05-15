@@ -53,7 +53,7 @@ export function DesktopSidebar({
       )}
     >
       <Link
-        href="/dashboard"
+        href="/feed"
         className="flex items-center gap-2.5 px-5 pb-5 pt-6"
       >
         <VividaMark size={36} id="sidebar-mark" className="!size-9" />

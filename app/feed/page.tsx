@@ -1,9 +1,10 @@
 import { eq } from "drizzle-orm";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Trophy } from "lucide-react";
 
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
-import Link from "next/link";
-import { Trophy } from "lucide-react";
 
 import { listFeed } from "@/actions/feed";
 import { requireUser } from "@/lib/auth-helpers";
@@ -21,18 +22,27 @@ export const dynamic = "force-dynamic";
 
 export default async function FeedPage() {
   const user = await requireUser();
-  const [plan, posts, viewerProfile, reputation] = await Promise.all([
+
+  // Feed is the post-signin home, so first-time visitors hit it before
+  // they've ever opened /onboarding. Bounce them through onboarding so
+  // the chart and tier system have data to work with — same guard that
+  // /dashboard runs.
+  const [viewerProfile] = await db
+    .select({ dateOfBirth: profiles.dateOfBirth })
+    .from(profiles)
+    .where(eq(profiles.userId, user.id))
+    .limit(1);
+  if (!viewerProfile?.dateOfBirth) {
+    redirect("/onboarding");
+  }
+
+  const [plan, posts, reputation] = await Promise.all([
     getCurrentPlan(user.id),
     listFeed({ limit: 30 }),
-    db
-      .select({ dateOfBirth: profiles.dateOfBirth })
-      .from(profiles)
-      .where(eq(profiles.userId, user.id))
-      .limit(1),
     getReputation(user.id),
   ]);
   const viewerIsAdmin = isAdminEmail(user.email);
-  const viewerSunSign = sunSignFromDob(viewerProfile[0]?.dateOfBirth ?? null);
+  const viewerSunSign = sunSignFromDob(viewerProfile.dateOfBirth);
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">

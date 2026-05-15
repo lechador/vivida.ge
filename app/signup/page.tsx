@@ -10,7 +10,7 @@ export const metadata = { title: "რეგისტრაცია" };
 
 export default async function SignupPage() {
   const session = await auth();
-  if (session?.user?.id) redirect("/dashboard");
+  if (session?.user?.id) redirect("/feed");
 
   return (
     <AuthLayout

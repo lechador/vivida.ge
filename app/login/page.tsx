@@ -11,7 +11,7 @@ export const metadata = { title: "შესვლა" };
 
 export default async function LoginPage() {
   const session = await auth();
-  if (session?.user?.id) redirect("/dashboard");
+  if (session?.user?.id) redirect("/feed");
 
   return (
     <AuthLayout

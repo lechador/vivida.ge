@@ -76,7 +76,7 @@ export async function AppHeader({
       {userInfo && <MobileNav active={active as NavActiveKey | undefined} />}
 
       <Link
-        href={userInfo ? "/dashboard" : "/"}
+        href={userInfo ? "/feed" : "/"}
         className={cn(
           "flex shrink-0 items-center gap-2.5",
           // The desktop sidebar has its own logo block; hide the in-header
