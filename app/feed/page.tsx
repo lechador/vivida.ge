@@ -12,8 +12,10 @@ import { getCurrentPlan } from "@/lib/plan";
 import { getReputation } from "@/lib/reputation";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { getHeaderData } from "@/lib/header-cache";
+import { getDashboardSuggestions } from "@/lib/suggestions";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { SuggestedPeopleRail } from "@/components/dashboard/suggested-people-rail";
 import { FeedList } from "@/components/feed/feed-list";
 import { PostComposer } from "@/components/feed/post-composer";
 import { TierBadge } from "@/components/feed/tier-badge";
@@ -37,7 +39,7 @@ export default async function FeedPage() {
     redirect("/onboarding");
   }
 
-  const [plan, posts, reputation, headerData] = await Promise.all([
+  const [plan, posts, reputation, headerData, suggestions] = await Promise.all([
     getCurrentPlan(user.id),
     listFeed({ limit: 30 }),
     getReputation(user.id),
@@ -45,6 +47,11 @@ export default async function FeedPage() {
     // the viewer's chosen main photo in the composer doesn't add an
     // extra DB roundtrip — it's already memoised for the navbar.
     getHeaderData(user.id),
+    // Same "people you'd vibe with" rail the dashboard uses — flat
+    // top-N from getDiscoveryFeed. Returns [] when the viewer's chart
+    // can't be computed yet (no birth time + place), which we already
+    // gate against above with the onboarding redirect.
+    getDashboardSuggestions(user.id, 8),
   ]);
   const viewerIsAdmin = isAdminEmail(user.email);
   const viewerSunSign = sunSignFromDob(viewerProfile.dateOfBirth);
@@ -81,6 +88,15 @@ export default async function FeedPage() {
               ლიდერბორდი
             </Link>
           </div>
+        </div>
+
+        {/* People-you'd-vibe-with rail. Same component the dashboard
+            uses, fed by the same /discover-derived suggestions. The
+            rail returns null when there's nothing to show (e.g. brand
+            new account, no compatible profiles yet), so we can render
+            it unconditionally without an empty-state gap. */}
+        <div className="mb-6">
+          <SuggestedPeopleRail suggestions={suggestions} />
         </div>
 
         <div className="mb-6">
