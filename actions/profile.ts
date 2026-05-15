@@ -11,6 +11,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import { invalidateProfileForUser } from "@/lib/header-cache";
 import { ensureChartFor } from "@/actions/chart";
 import { getCurrentPlan } from "@/lib/plan";
+import { awardReputation, RepSubject } from "@/lib/reputation";
 
 export type SaveProfileInput = {
   dateOfBirth: string;        // YYYY-MM-DD
@@ -155,6 +156,14 @@ export async function saveProfile(
         (err as Error).message
       );
     }
+    // Reputation — credit the one-shot profile_completed milestone.
+    // Dedup index makes a second save a no-op so editing later doesn't
+    // re-fire the bonus.
+    await awardReputation({
+      userId,
+      kind: "profile_completed",
+      subjectId: RepSubject.oneShot(userId),
+    });
   });
 
   revalidatePath("/dashboard");

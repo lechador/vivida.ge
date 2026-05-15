@@ -1,7 +1,8 @@
 "use server";
 
-import { and, desc, eq, inArray, lt, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 
 import { db } from "@/db";
 import {
@@ -17,6 +18,7 @@ import {
 import { requireUser } from "@/lib/auth-helpers";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
+import { awardReputation, RepSubject } from "@/lib/reputation";
 
 export const POST_BODY_MAX = 500;
 export const COMMENT_BODY_MAX = 280;
@@ -38,8 +40,15 @@ export type FeedReactionCounts = Record<PostReactionKind, number>;
 export type FeedPost = {
   id: string;
   body: string;
+  edited: boolean;
   createdAt: Date;
   author: FeedAuthor;
+  /** Sun-sign index (0-11) of the author, derived from profile.dateOfBirth.
+   *  Null when the author hasn't set a birth date. Used by the
+   *  "ჩემი ნიშნით" filter on /feed without an extra query. */
+  authorSunSign: number | null;
+  /** Author's running reputation total. Drives the inline tier chip. */
+  authorReputation: number;
   reactions: FeedReactionCounts;
   myReaction: PostReactionKind | null;
   commentCount: number;
@@ -85,12 +94,14 @@ export async function listFeed(opts: {
     .select({
       id: posts.id,
       body: posts.body,
+      edited: posts.edited,
       createdAt: posts.createdAt,
       authorId: users.id,
       authorName: users.name,
       authorImage: users.image,
       authorUsername: profiles.username,
       authorDisplayName: profiles.displayName,
+      authorDob: profiles.dateOfBirth,
     })
     .from(posts)
     .innerJoin(users, eq(users.id, posts.userId))
@@ -102,10 +113,12 @@ export async function listFeed(opts: {
   if (rows.length === 0) return [];
 
   const postIds = rows.map((r) => r.id);
+  const authorIds = Array.from(new Set(rows.map((r) => r.authorId)));
 
   // 2. Aggregate reaction counts and the viewer's own reaction. Two
   //    queries instead of N+1 — once per page.
-  const [counts, mine, comments] = await Promise.all([
+  const { getReputationFor } = await import("@/lib/reputation");
+  const [counts, mine, comments, reputations] = await Promise.all([
     db
       .select({
         postId: postReactions.postId,
@@ -135,6 +148,7 @@ export async function listFeed(opts: {
       .from(postComments)
       .where(inArray(postComments.postId, postIds))
       .groupBy(postComments.postId),
+    getReputationFor(authorIds),
   ]);
 
   const countMap = new Map<string, FeedReactionCounts>();
@@ -153,6 +167,7 @@ export async function listFeed(opts: {
   return rows.map((r) => ({
     id: r.id,
     body: r.body,
+    edited: r.edited,
     createdAt: r.createdAt,
     author: {
       id: r.authorId,
@@ -161,10 +176,48 @@ export async function listFeed(opts: {
       username: r.authorUsername,
       displayName: r.authorDisplayName,
     },
+    authorSunSign: sunSignFromDob(r.authorDob),
+    authorReputation: reputations.get(r.authorId) ?? 0,
     reactions: countMap.get(r.id) ?? { ...ZERO_COUNTS },
     myReaction: mineMap.get(r.id) ?? null,
     commentCount: commentMap.get(r.id) ?? 0,
   }));
+}
+
+/** Sun-sign index (0-11) from a YYYY-MM-DD birth date. Tropical zodiac
+ *  with the standard month-day cutoffs. Null when the input is empty or
+ *  unparseable. Defined inline rather than imported from lib/astrology
+ *  to keep this file self-contained for the feed query path. */
+function sunSignFromDob(dob: string | null | undefined): number | null {
+  if (!dob) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+  if (!m) return null;
+  const month = Number(m[2]);
+  const day = Number(m[3]);
+  // (month, day after this start) → sign index
+  const CUTOFFS: Array<[number, number, number]> = [
+    [3, 21, 0],   // Aries
+    [4, 20, 1],   // Taurus
+    [5, 21, 2],   // Gemini
+    [6, 22, 3],   // Cancer
+    [7, 23, 4],   // Leo
+    [8, 23, 5],   // Virgo
+    [9, 23, 6],   // Libra
+    [10, 23, 7],  // Scorpio
+    [11, 22, 8],  // Sagittarius
+    [12, 22, 9],  // Capricorn
+    [1, 20, 10],  // Aquarius
+    [2, 19, 11],  // Pisces
+  ];
+  // Pisces wraps: anything before Mar 21 is Pisces (11) unless it's after Jan 20.
+  for (const [cm, cd, idx] of CUTOFFS) {
+    if (month === cm && day >= cd) return idx;
+    if (month === cm + 1 && day < (CUTOFFS[(idx + 1) % 12]?.[1] ?? 31))
+      return idx;
+  }
+  // Fallback: rough month → sign mapping using start-of-month cutoffs.
+  // Should never hit thanks to the loop above, but defends against bad input.
+  return ((month + 9) % 12);
 }
 
 /** Comments for one post, oldest first. Always returned in full — we
@@ -231,7 +284,80 @@ export async function createPost(rawBody: string): Promise<FeedActionResult> {
     };
   }
 
-  await db.insert(posts).values({ userId: user.id, body });
+  const [inserted] = await db
+    .insert(posts)
+    .values({ userId: user.id, body })
+    .returning({ id: posts.id });
+
+  // Reputation — happens after the response returns so the create call
+  // stays snappy. First-post is a one-shot, post_created is daily-capped.
+  if (inserted) {
+    const postId = inserted.id;
+    const userId = user.id;
+    after(async () => {
+      await awardReputation({
+        userId,
+        kind: "post_created",
+        subjectId: RepSubject.post(postId),
+      });
+      // Detect "first post ever" by counting posts. Cheap because of the
+      // user_id index on `post`.
+      const [{ value: postCount } = { value: 0 }] = await db
+        .select({ value: count() })
+        .from(posts)
+        .where(eq(posts.userId, userId));
+      if (Number(postCount) === 1) {
+        await awardReputation({
+          userId,
+          kind: "first_post",
+          subjectId: RepSubject.oneShot(userId),
+        });
+      }
+    });
+  }
+  revalidatePath("/feed");
+  return { ok: true };
+}
+
+/** Edit a post within the 5-minute grace window. Author only. Sets the
+ *  `edited` flag so the UI can show "(რედაქტირებული)" without storing
+ *  a separate edit timestamp. */
+const POST_EDIT_WINDOW_MS = 5 * 60_000;
+
+export async function editPost(
+  postId: string,
+  rawBody: string
+): Promise<FeedActionResult> {
+  const user = await requireUser();
+  const body = rawBody.trim();
+  if (!body) return { ok: false, error: "ცარიელ პოსტს ვერ შევინახავთ" };
+  if (body.length > POST_BODY_MAX) {
+    return {
+      ok: false,
+      error: `მაქსიმუმ ${POST_BODY_MAX} სიმბოლო — შენ შეიყვანე ${body.length}.`,
+    };
+  }
+
+  const [post] = await db
+    .select({ userId: posts.userId, createdAt: posts.createdAt })
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
+  if (!post) return { ok: false, error: "პოსტი ვერ მოიძებნა" };
+  if (post.userId !== user.id) {
+    return { ok: false, error: "მხოლოდ ავტორი ცვლის თავის პოსტს" };
+  }
+  if (Date.now() - post.createdAt.getTime() > POST_EDIT_WINDOW_MS) {
+    return {
+      ok: false,
+      error: "რედაქტირების დრო (5 წუთი) გავიდა",
+    };
+  }
+
+  await db
+    .update(posts)
+    .set({ body, edited: true })
+    .where(eq(posts.id, postId));
   revalidatePath("/feed");
   return { ok: true };
 }
@@ -333,6 +459,28 @@ export async function addComment(
     invalidateHeaderForUser(post.userId);
   }
 
+  // Reputation — commenter for the act, post author for receiving a
+  // comment (skip when commenting on your own post).
+  if (inserted) {
+    const commentId = inserted.id;
+    const commenterId = user.id;
+    const postAuthorId = post.userId;
+    after(async () => {
+      await awardReputation({
+        userId: commenterId,
+        kind: "comment_created",
+        subjectId: RepSubject.comment(commentId),
+      });
+      if (postAuthorId !== commenterId) {
+        await awardReputation({
+          userId: postAuthorId,
+          kind: "comment_received",
+          subjectId: RepSubject.commentReceived(commentId),
+        });
+      }
+    });
+  }
+
   revalidatePath("/feed");
   return { ok: true, data: inserted ? { commentId: inserted.id } : undefined };
 }
@@ -412,6 +560,57 @@ export async function reactToPost(
       target: [postReactions.postId, postReactions.userId],
       set: { kind, createdAt: new Date() },
     });
+
+  // Notify + award reputation when this is a fresh reaction (no prior
+  // record). Switching kind from like → sad doesn't re-fire either, so
+  // a back-and-forth tap can't spam notifications. The reputation
+  // dedupe also makes switching kinds award only once per reactor-post
+  // pair (subject = `${postId}:${reactorId}`).
+  if (!existing) {
+    const [post] = await db
+      .select({ userId: posts.userId })
+      .from(posts)
+      .where(eq(posts.id, postId))
+      .limit(1);
+    if (post && post.userId !== user.id) {
+      const [actor] = await db
+        .select({
+          name: users.name,
+          image: users.image,
+          displayName: profiles.displayName,
+          username: profiles.username,
+        })
+        .from(users)
+        .leftJoin(profiles, eq(profiles.userId, users.id))
+        .where(eq(users.id, user.id))
+        .limit(1);
+      const payload: NotificationPayload = {
+        fromUserId: user.id,
+        fromUsername: actor?.username ?? null,
+        fromName: actor?.displayName ?? actor?.name ?? null,
+        fromImage: actor?.image ?? null,
+        postId,
+        reaction: kind,
+      };
+      await db.insert(notifications).values({
+        userId: post.userId,
+        kind: "post_reaction",
+        payload,
+      });
+      invalidateHeaderForUser(post.userId);
+
+      const postAuthorId = post.userId;
+      const reactorId = user.id;
+      after(async () => {
+        await awardReputation({
+          userId: postAuthorId,
+          kind: "reaction_received",
+          subjectId: RepSubject.reactionReceived(postId, reactorId),
+        });
+      });
+    }
+  }
+
   revalidatePath("/feed");
   return { ok: true, data: { active: kind } };
 }

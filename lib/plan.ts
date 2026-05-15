@@ -4,6 +4,7 @@ import { after } from "next/server";
 import { db } from "@/db";
 import { subscriptions, users, type Subscription } from "@/db/schema";
 import { sendWelcomeEmail } from "@/lib/email";
+import { awardReputation, RepSubject } from "@/lib/reputation";
 import type { PlanId } from "./pricing";
 
 /**
@@ -173,6 +174,13 @@ export async function provisionTrialIfMissing(
           (err as Error).message
         );
       }
+      // Reputation — one-shot "joined" bonus. Dedup keeps this from
+      // firing twice if provisioning somehow runs again.
+      await awardReputation({
+        userId,
+        kind: "joined",
+        subjectId: RepSubject.oneShot(userId),
+      });
     });
 
     return inserted;

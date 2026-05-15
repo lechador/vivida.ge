@@ -25,13 +25,33 @@ const KIND_ICON: Record<string, LucideIcon> = {
   friend_request: UserPlus,
   friend_accepted: Sparkles,
   post_comment: MessageSquare,
+  post_reaction: Sparkles,
 };
 
-const KIND_LABEL_KA: Record<string, string> = {
-  friend_request: "გამოგიგზავნა მეგობრობის თხოვნა",
-  friend_accepted: "მიიღო შენი მოთხოვნა",
-  post_comment: "დააკომენტარა შენი პოსტი",
+const REACTION_LABEL_KA: Record<string, string> = {
+  like: "მოეწონა შენი პოსტი",
+  funny: "გაეცინა შენი პოსტი",
+  sad: "დაამწუხრე",
+  dislike: "არ მოეწონა შენი პოსტი",
 };
+
+function notificationLabel(kind: string, payload: Notification["payload"]): string {
+  if (kind === "post_reaction" && payload?.reaction) {
+    return REACTION_LABEL_KA[payload.reaction] ?? "გამოეხმაურა შენს პოსტს";
+  }
+  switch (kind) {
+    case "friend_request":
+      return "გამოგიგზავნა მეგობრობის თხოვნა";
+    case "friend_accepted":
+      return "მიიღო შენი მოთხოვნა";
+    case "post_comment":
+      return "დააკომენტარა შენი პოსტი";
+    case "post_reaction":
+      return "გამოეხმაურა შენს პოსტს";
+    default:
+      return "";
+  }
+}
 
 type ChatNotifyDetail = {
   id: string;
@@ -240,7 +260,8 @@ function DbNotificationRow({
   const Icon = KIND_ICON[n.kind] ?? Bell;
   const username = n.payload?.fromUsername;
   const href =
-    n.kind === "post_comment" && n.payload?.postId
+    (n.kind === "post_comment" || n.kind === "post_reaction") &&
+    n.payload?.postId
       ? `/feed#post-${n.payload.postId}`
       : username
         ? `/u/${username}`
@@ -280,7 +301,7 @@ function DbNotificationRow({
               {n.payload?.fromName ?? username ?? "vivida user"}
             </span>{" "}
             <span className="text-muted-foreground">
-              {KIND_LABEL_KA[n.kind] ?? ""}
+              {notificationLabel(n.kind, n.payload)}
             </span>
           </div>
           {n.kind === "post_comment" && n.payload?.preview && (

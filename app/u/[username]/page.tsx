@@ -14,6 +14,7 @@ import { computeSynastry, overallVerdict } from "@/lib/synastry";
 import { signByIndex } from "@/lib/zodiac";
 import { getFriendshipStatus } from "@/lib/friendship";
 import { ageFromDob } from "@/lib/profile-utils";
+import { getReputation } from "@/lib/reputation";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -21,6 +22,7 @@ import { FriendButton } from "@/components/profile/friend-button";
 import { MessageButton } from "@/components/chat/message-button";
 import { PhotoCarousel } from "@/components/profile/photo-carousel";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
+import { TierBadge } from "@/components/feed/tier-badge";
 
 const ELEMENT_GLYPH: Record<string, string> = {
   ცეცხლი: "△",
@@ -89,6 +91,7 @@ export default async function PublicProfilePage({
 
   const ownerPlan = await getCurrentPlan(owner.id);
   const ownerChart = await ensureChartFor(owner.id, ownerPlan);
+  const ownerReputation = await getReputation(owner.id);
 
   // Viewer (may be anonymous, may be the owner, may be a logged-in stranger)
   const session = await auth();
@@ -197,6 +200,9 @@ export default async function PublicProfilePage({
                   {profile.bio}
                 </p>
               )}
+              <div className="mt-4">
+                <TierBadge total={ownerReputation} variant="profile" />
+              </div>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 {sun && (
                   <Pill

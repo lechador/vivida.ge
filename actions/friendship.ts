@@ -16,6 +16,16 @@ import {
 import { requireUser } from "@/lib/auth-helpers";
 import { sendFriendRequestEmail } from "@/lib/email";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
+import { awardReputation, RepSubject } from "@/lib/reputation";
+
+/** Credit both halves of a freshly-accepted friendship with reputation. */
+async function awardFriendshipBoth(a: string, b: string) {
+  const subject = RepSubject.friendPair(a, b);
+  await Promise.all([
+    awardReputation({ userId: a, kind: "friend_added", subjectId: subject }),
+    awardReputation({ userId: b, kind: "friend_added", subjectId: subject }),
+  ]);
+}
 
 /** Insert a notification for a recipient. Kind-specific payload is captured
  *  at emit time so the dropdown can render without joins later. */
@@ -114,6 +124,10 @@ export async function sendFriendRequest(
           fromUserId: user.id,
           kind: "friend_accepted",
         });
+        // Reputation — both sides earn for a mutual friendship.
+        after(async () => {
+          await awardFriendshipBoth(user.id, targetUserId);
+        });
         revalidatePath("/friends");
         if (targetUsername) revalidatePath(`/u/${targetUsername}`);
         return { ok: true };
@@ -184,6 +198,10 @@ export async function acceptFriendRequest(
     toUserId: requesterId,
     fromUserId: user.id,
     kind: "friend_accepted",
+  });
+  // Reputation for both sides on acceptance.
+  after(async () => {
+    await awardFriendshipBoth(user.id, requesterId);
   });
   revalidatePath("/friends");
   if (requesterUsername) revalidatePath(`/u/${requesterUsername}`);

@@ -1,24 +1,38 @@
-import { Sparkles } from "lucide-react";
+import { eq } from "drizzle-orm";
+
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
+import Link from "next/link";
+import { Trophy } from "lucide-react";
 
 import { listFeed } from "@/actions/feed";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
+import { getReputation } from "@/lib/reputation";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
-import { PostCard } from "@/components/feed/post-card";
+import { FeedList } from "@/components/feed/feed-list";
 import { PostComposer } from "@/components/feed/post-composer";
+import { TierBadge } from "@/components/feed/tier-badge";
 
 export const metadata = { title: "ფიდი" };
 export const dynamic = "force-dynamic";
 
 export default async function FeedPage() {
   const user = await requireUser();
-  const [plan, posts] = await Promise.all([
+  const [plan, posts, viewerProfile, reputation] = await Promise.all([
     getCurrentPlan(user.id),
     listFeed({ limit: 30 }),
+    db
+      .select({ dateOfBirth: profiles.dateOfBirth })
+      .from(profiles)
+      .where(eq(profiles.userId, user.id))
+      .limit(1),
+    getReputation(user.id),
   ]);
   const viewerIsAdmin = isAdminEmail(user.email);
+  const viewerSunSign = sunSignFromDob(viewerProfile[0]?.dateOfBirth ?? null);
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -34,12 +48,24 @@ export default async function FeedPage() {
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           საზოგადოება
         </div>
-        <h1 className="mb-6 text-balance text-3xl font-semibold tracking-tight sm:mb-8 sm:text-4xl">
-          ვივიდას{" "}
-          <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            ფიდი
-          </span>
-        </h1>
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3 sm:mb-8">
+          <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+            ვივიდას{" "}
+            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
+              ფიდი
+            </span>
+          </h1>
+          <div className="flex flex-col items-end gap-1">
+            <TierBadge total={reputation} variant="compact" />
+            <Link
+              href="/leaderboard"
+              className="inline-flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Trophy className="size-3" />
+              ლიდერბორდი
+            </Link>
+          </div>
+        </div>
 
         <div className="mb-6">
           <PostComposer
@@ -48,35 +74,44 @@ export default async function FeedPage() {
           />
         </div>
 
-        {posts.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <ul className="space-y-4">
-            {posts.map((p) => (
-              <li key={p.id}>
-                <PostCard
-                  post={p}
-                  viewerId={user.id}
-                  viewerIsAdmin={viewerIsAdmin}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+        <FeedList
+          initial={posts}
+          viewerId={user.id}
+          viewerIsAdmin={viewerIsAdmin}
+          viewerSunSign={viewerSunSign}
+        />
       </section>
     </main>
   );
 }
 
-function EmptyState() {
-  return (
-    <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
-      <Sparkles className="mx-auto mb-3 size-8 text-[var(--vivida-violet)]" />
-      <h2 className="text-lg font-semibold">ფიდი ჯერ ცარიელია</h2>
-      <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-        იყავი პირველი — დაწერე რასაც ფიქრობ, კითხვა, ციტატა, ან უბრალოდ
-        როგორ ხარ.
-      </p>
-    </div>
-  );
+/** Same sun-sign helper as actions/feed.ts. Duplicated here so the page
+ *  can derive the viewer's sign without dragging the server-action
+ *  module's deps into the page bundle. */
+function sunSignFromDob(dob: string | null): number | null {
+  if (!dob) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+  if (!m) return null;
+  const month = Number(m[2]);
+  const day = Number(m[3]);
+  const CUTOFFS: Array<[number, number, number]> = [
+    [3, 21, 0],
+    [4, 20, 1],
+    [5, 21, 2],
+    [6, 22, 3],
+    [7, 23, 4],
+    [8, 23, 5],
+    [9, 23, 6],
+    [10, 23, 7],
+    [11, 22, 8],
+    [12, 22, 9],
+    [1, 20, 10],
+    [2, 19, 11],
+  ];
+  for (const [cm, cd, idx] of CUTOFFS) {
+    if (month === cm && day >= cd) return idx;
+    if (month === cm + 1 && day < (CUTOFFS[(idx + 1) % 12]?.[1] ?? 31))
+      return idx;
+  }
+  return (month + 9) % 12;
 }

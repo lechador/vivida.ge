@@ -1,11 +1,27 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Send } from "lucide-react";
 
 import { createPost, POST_BODY_MAX } from "@/actions/feed";
 import { Button } from "@/components/ui/button";
+
+/**
+ * Rotating placeholder prompts. One is picked per mount so a fresh
+ * /feed page-load shows a new opener — cheap blank-page-friction
+ * killer that doesn't need any state machinery.
+ */
+const PROMPTS = [
+  "რას ფიქრობ ცაში დღეს? გააზიარე...",
+  "რა მთვარის ფაზაში ხარ შენ?",
+  "გააზიარე დღევანდელი ცის რუკის ერთი ემოცია.",
+  "მოგვიყევი, რა შეიცვალა ბოლო რეტროგრადის შემდეგ.",
+  "შენი ნიშანი დღეს — როგორ მუშაობს?",
+  "ერთი წინადადება დღევანდელ კოსმოსზე.",
+  "რომელი პლანეტა გრძნობს ყველაზე მეტად?",
+  "მზე, მთვარე, ამომავალი — შენი დიდი სამეული რას ამბობს?",
+];
 
 /**
  * Top-of-feed composer. Plain textarea + submit. No attachments, no
@@ -24,6 +40,12 @@ export function PostComposer({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  // Picked once per mount. Memo so the choice survives re-renders.
+  const placeholder = useMemo(
+    () => PROMPTS[Math.floor(Math.random() * PROMPTS.length)],
+    []
+  );
 
   const remaining = POST_BODY_MAX - body.length;
   const overflow = remaining < 0;
@@ -66,7 +88,7 @@ export function PostComposer({
             onKeyDown={(e) => {
               if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit();
             }}
-            placeholder="რას ფიქრობ ცაში? გააზიარე..."
+            placeholder={placeholder}
             rows={3}
             maxLength={POST_BODY_MAX + 50 /* let counter go red gently */}
             className="block w-full resize-y rounded-xl border border-border/60 bg-background/40 px-3 py-2.5 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--vivida-violet)]/40"

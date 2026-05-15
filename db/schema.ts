@@ -10,6 +10,7 @@ import {
   jsonb,
   boolean,
   index,
+  uniqueIndex,
   pgEnum,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
@@ -310,6 +311,7 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "friend_request",
   "friend_accepted",
   "post_comment",
+  "post_reaction",
 ]);
 
 /**
@@ -322,10 +324,13 @@ export type NotificationPayload = {
   fromUsername?: string | null;
   fromName?: string | null;
   fromImage?: string | null;
-  /** Set on `post_comment` so the bell-icon row can deep-link to /feed#post-<id>. */
+  /** Set on `post_comment` / `post_reaction` so the bell-icon row can
+   *  deep-link to /feed#post-<id>. */
   postId?: string;
   /** Optional preview of the comment body for the dropdown. */
   preview?: string;
+  /** Reaction kind for `post_reaction` notifications — drives the icon. */
+  reaction?: "like" | "dislike" | "funny" | "sad";
 };
 
 export const notifications = pgTable("notification", {
@@ -696,6 +701,10 @@ export const posts = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     body: text("body").notNull(),
+    /** True once the author has edited the post at least once. The 5-minute
+     *  edit window is enforced in the action; this flag exists so the UI
+     *  can append "(რედაქტირებული)" without a separate timestamp column. */
+    edited: boolean("edited").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -773,6 +782,89 @@ export const postReactions = pgTable(
     primaryKey({ columns: [t.postId, t.userId] }),
     // Per-post aggregate count: GROUP BY post_id, kind → uses this idx.
     index("post_reaction_post_kind_idx").on(t.postId, t.kind),
+  ]
+);
+
+/**
+ * Reputation — gamification layer. `user_reputation` is the running
+ * total, `reputation_event` is the audit log + dedup source. We never
+ * compute the total by SUM'ing events; that would punish frequently-
+ * visited profiles. The trigger-style "increment on insert" lives in
+ * application code (`awardReputation`), kept in sync via the unique
+ * dedupe index.
+ *
+ * Event kinds:
+ *  - post_created        — you posted (cap 9/day)
+ *  - comment_created     — you commented (cap 5/day)
+ *  - reaction_received   — someone reacted to your post (cap 30/day)
+ *  - comment_received    — someone commented on your post (cap 30/day)
+ *  - friend_added        — you accepted a friend request (cap 20/day)
+ *  - daily_visit         — you visited the site today (cap 1/day)
+ *  - profile_completed   — one-shot, on first profile save
+ *  - first_post          — one-shot, on the first post you ever publish
+ *  - joined              — one-shot, on signup
+ */
+export const reputationEventKindEnum = pgEnum("reputation_event_kind", [
+  "post_created",
+  "comment_created",
+  "reaction_received",
+  "comment_received",
+  "friend_added",
+  "daily_visit",
+  "profile_completed",
+  "first_post",
+  "joined",
+]);
+
+export const userReputation = pgTable("user_reputation", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  total: integer("total").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export const reputationEvents = pgTable(
+  "reputation_event",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: reputationEventKindEnum("kind").notNull(),
+    /** Stable identifier for the source of the event so the same one
+     *  can't credit twice. Examples by kind:
+     *   - post_created       → postId
+     *   - comment_created    → commentId
+     *   - reaction_received  → `${postId}:${reactorUserId}`
+     *   - comment_received   → commentId
+     *   - friend_added       → sorted pair `min(a,b):max(a,b)`
+     *   - daily_visit        → `${userId}:YYYY-MM-DD`
+     *   - profile_completed  → `${userId}`
+     *   - first_post         → `${userId}`
+     *   - joined             → `${userId}`
+     *
+     * Always populated — the unique index relies on a non-null value to
+     * enforce dedup. */
+    subjectId: text("subject_id").notNull(),
+    points: integer("points").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    // Daily-cap query: SUM(points) WHERE user_id, kind, created_at > today.
+    index("rep_event_user_kind_created_idx").on(
+      t.userId,
+      t.kind,
+      t.createdAt
+    ),
+    // Dedup: same (kind, subjectId) can never insert twice.
+    uniqueIndex("rep_event_dedupe_idx").on(t.kind, t.subjectId),
   ]
 );
 
@@ -897,6 +989,11 @@ export type NewPostComment = typeof postComments.$inferInsert;
 export type PostReaction = typeof postReactions.$inferSelect;
 export type NewPostReaction = typeof postReactions.$inferInsert;
 export type PostReactionKind = (typeof postReactionKindEnum.enumValues)[number];
+export type UserReputation = typeof userReputation.$inferSelect;
+export type ReputationEvent = typeof reputationEvents.$inferSelect;
+export type NewReputationEvent = typeof reputationEvents.$inferInsert;
+export type ReputationEventKind =
+  (typeof reputationEventKindEnum.enumValues)[number];
 export type Plan = (typeof planEnum.enumValues)[number];
 export type SubscriptionStatus = (typeof subscriptionStatusEnum.enumValues)[number];
 export type BillingInterval = (typeof billingIntervalEnum.enumValues)[number];

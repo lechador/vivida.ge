@@ -2,6 +2,7 @@ import { and, eq, isNull, lt, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { profiles, userActivityDays, users } from "@/db/schema";
+import { awardReputation, RepSubject } from "@/lib/reputation";
 
 /**
  * Best-effort "user was active today" record.
@@ -32,6 +33,15 @@ export async function recordVisit(userId: string): Promise<void> {
       .insert(userActivityDays)
       .values({ userId, dateLocal })
       .onConflictDoNothing();
+
+    // Reputation — one point for showing up today. The dedupe key
+    // includes the local date, so multiple visits in one day collapse
+    // into a single insert at the reputation_event level.
+    await awardReputation({
+      userId,
+      kind: "daily_visit",
+      subjectId: RepSubject.dailyVisit(userId, dateLocal),
+    });
 
     // Also bump users.lastLoginAt so the admin "last seen" column reflects
     // continued activity even when the user never explicitly signs in (JWT
