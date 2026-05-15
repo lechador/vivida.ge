@@ -4,7 +4,8 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Send } from "lucide-react";
 
-import { createPost, POST_BODY_MAX } from "@/actions/feed";
+import { createPost } from "@/actions/feed";
+import { POST_BODY_MAX } from "@/lib/feed-config";
 import { Button } from "@/components/ui/button";
 
 /**

@@ -8,9 +8,9 @@ import { Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import {
   deletePost,
   editPost,
-  POST_BODY_MAX,
   type FeedPost,
 } from "@/actions/feed";
+import { POST_BODY_MAX, POST_EDIT_WINDOW_MS } from "@/lib/feed-config";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,11 +23,6 @@ import { CommentSection } from "./comment-section";
 import { ReactionBar, ReactionSummary } from "./reaction-bar";
 import { TierBadge } from "./tier-badge";
 import { feedTimeAgo } from "./time-ago";
-
-/** Window during which the author can edit a post. Mirrors the
- *  POST_EDIT_WINDOW_MS in actions/feed.ts; kept in sync manually because
- *  the action is "use server" and constants can't be exported. */
-const POST_EDIT_WINDOW_MS = 5 * 60_000;
 
 /**
  * One post card. Composed of byline (avatar + name + @handle + tier

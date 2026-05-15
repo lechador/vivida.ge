@@ -7,11 +7,11 @@ import { Loader2, MessageCircle, Send, Trash2 } from "lucide-react";
 
 import {
   addComment,
-  COMMENT_BODY_MAX,
   deleteComment,
   listComments,
   type FeedComment,
 } from "@/actions/feed";
+import { COMMENT_BODY_MAX } from "@/lib/feed-config";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

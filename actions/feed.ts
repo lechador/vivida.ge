@@ -19,9 +19,12 @@ import { requireUser } from "@/lib/auth-helpers";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { awardReputation, RepSubject } from "@/lib/reputation";
+import {
+  COMMENT_BODY_MAX,
+  POST_BODY_MAX,
+  POST_EDIT_WINDOW_MS,
+} from "@/lib/feed-config";
 
-export const POST_BODY_MAX = 500;
-export const COMMENT_BODY_MAX = 280;
 /** Minimum gap between a user's posts. Prevents accidental double-submits
  *  and casual spam without blocking honest power-users. */
 const POST_THROTTLE_MS = 20_000;
@@ -321,9 +324,9 @@ export async function createPost(rawBody: string): Promise<FeedActionResult> {
 
 /** Edit a post within the 5-minute grace window. Author only. Sets the
  *  `edited` flag so the UI can show "(რედაქტირებული)" without storing
- *  a separate edit timestamp. */
-const POST_EDIT_WINDOW_MS = 5 * 60_000;
-
+ *  a separate edit timestamp. The window itself lives in
+ *  `lib/feed-config.ts` so the client can hide the edit menu after it
+ *  closes without round-tripping. */
 export async function editPost(
   postId: string,
   rawBody: string
