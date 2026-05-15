@@ -1,6 +1,6 @@
 "use server";
 
-import { and, count, desc, eq, inArray, lt, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 
@@ -10,6 +10,7 @@ import {
   postComments,
   postReactions,
   posts,
+  profilePhotos,
   profiles,
   users,
   type NotificationPayload,
@@ -18,12 +19,47 @@ import {
 import { requireUser } from "@/lib/auth-helpers";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
-import { awardReputation, RepSubject } from "@/lib/reputation";
+import {
+  awardReputation,
+  revokeReputationForSubjects,
+  RepSubject,
+} from "@/lib/reputation";
 import {
   COMMENT_BODY_MAX,
   POST_BODY_MAX,
   POST_EDIT_WINDOW_MS,
 } from "@/lib/feed-config";
+
+/**
+ * Batched "main profile photo URL by user id" — same logic the app
+ * header uses: the first ready row from profile_photo (lowest
+ * sortOrder wins) overrides the OAuth avatar in users.image when the
+ * user has uploaded their own.
+ */
+async function loadProfilePhotos(
+  userIds: string[]
+): Promise<Map<string, string>> {
+  if (userIds.length === 0) return new Map();
+  const rows = await db
+    .select({
+      userId: profilePhotos.userId,
+      url: profilePhotos.url,
+    })
+    .from(profilePhotos)
+    .where(
+      and(
+        inArray(profilePhotos.userId, userIds),
+        eq(profilePhotos.ready, true)
+      )
+    )
+    .orderBy(asc(profilePhotos.sortOrder));
+  const map = new Map<string, string>();
+  for (const r of rows) {
+    // First row per user wins thanks to the ASC sortOrder.
+    if (!map.has(r.userId)) map.set(r.userId, r.url);
+  }
+  return map;
+}
 
 /** Minimum gap between a user's posts. Prevents accidental double-submits
  *  and casual spam without blocking honest power-users. */
@@ -120,10 +156,11 @@ export async function listFeed(opts: {
   const postIds = rows.map((r) => r.id);
   const authorIds = Array.from(new Set(rows.map((r) => r.authorId)));
 
-  // 2. Aggregate reaction counts and the viewer's own reaction. Two
+  // 2. Aggregate reaction counts, the viewer's own reaction, comment
+  //    counts, reputation totals, and chosen profile photos. Five
   //    queries instead of N+1 — once per page.
   const { getReputationFor } = await import("@/lib/reputation");
-  const [counts, mine, comments, reputations] = await Promise.all([
+  const [counts, mine, comments, reputations, photos] = await Promise.all([
     db
       .select({
         postId: postReactions.postId,
@@ -154,6 +191,7 @@ export async function listFeed(opts: {
       .where(inArray(postComments.postId, postIds))
       .groupBy(postComments.postId),
     getReputationFor(authorIds),
+    loadProfilePhotos(authorIds),
   ]);
 
   const countMap = new Map<string, FeedReactionCounts>();
@@ -177,7 +215,9 @@ export async function listFeed(opts: {
     author: {
       id: r.authorId,
       name: r.authorName,
-      image: r.authorImage,
+      // Prefer the user's chosen main photo; fall back to the OAuth
+      // avatar only when they haven't uploaded one yet.
+      image: photos.get(r.authorId) ?? r.authorImage,
       username: r.authorUsername,
       displayName: r.authorDisplayName,
     },
@@ -257,6 +297,11 @@ export async function listComments(postId: string): Promise<FeedComment[]> {
     .where(eq(postComments.postId, postId))
     .orderBy(postComments.createdAt);
 
+  // Batched photo lookup — same "chosen main photo wins over OAuth
+  // avatar" rule as the post bylines.
+  const authorIds = Array.from(new Set(rows.map((r) => r.authorId)));
+  const photos = await loadProfilePhotos(authorIds);
+
   const toView = (r: (typeof rows)[number]): FeedComment => ({
     id: r.id,
     postId: r.postId,
@@ -266,7 +311,7 @@ export async function listComments(postId: string): Promise<FeedComment[]> {
     author: {
       id: r.authorId,
       name: r.authorName,
-      image: r.authorImage,
+      image: photos.get(r.authorId) ?? r.authorImage,
       username: r.authorUsername,
       displayName: r.authorDisplayName,
     },
@@ -412,7 +457,16 @@ export async function editPost(
 }
 
 /** Delete a post. Author can delete their own; anyone in the admin
- *  email allow-list can delete any. Comments/reactions cascade via FK. */
+ *  email allow-list can delete any. Comments/reactions cascade via FK.
+ *
+ *  Reputation: every event tied to this post and its descendants is
+ *  reversed — post_created, reaction_received for every reactor, and
+ *  for each cascaded comment its comment_created + comment_received.
+ *  Subjects are collected before the DELETE because the cascade
+ *  removes the source rows. `first_post` is intentionally not
+ *  reversed: it's a one-shot milestone for "you've posted at least
+ *  once," and stripping it on delete would let users farm and then
+ *  re-farm the bonus by yo-yoing posts. */
 export async function deletePost(postId: string): Promise<FeedActionResult> {
   const user = await requireUser();
 
@@ -429,7 +483,51 @@ export async function deletePost(postId: string): Promise<FeedActionResult> {
     return { ok: false, error: "წაშლის უფლება არ გაქვს" };
   }
 
+  // Gather every reputation subject that depends on this post BEFORE
+  // the cascade nukes the source rows.
+  const [reactors, descendantComments] = await Promise.all([
+    db
+      .select({ userId: postReactions.userId })
+      .from(postReactions)
+      .where(eq(postReactions.postId, postId)),
+    db
+      .select({ id: postComments.id })
+      .from(postComments)
+      .where(eq(postComments.postId, postId)),
+  ]);
+  const subjectsToRevoke: Array<{
+    kind:
+      | "post_created"
+      | "reaction_received"
+      | "comment_created"
+      | "comment_received";
+    subjectId: string;
+  }> = [
+    { kind: "post_created", subjectId: RepSubject.post(postId) },
+    ...reactors.map((r) => ({
+      kind: "reaction_received" as const,
+      subjectId: RepSubject.reactionReceived(postId, r.userId),
+    })),
+    ...descendantComments.flatMap((c) => [
+      {
+        kind: "comment_created" as const,
+        subjectId: RepSubject.comment(c.id),
+      },
+      {
+        kind: "comment_received" as const,
+        subjectId: RepSubject.commentReceived(c.id),
+      },
+    ]),
+  ];
+
   await db.delete(posts).where(eq(posts.id, postId));
+
+  // Run the revocation off the response path. Even if it fails (DB
+  // hiccup, etc.), the delete itself has already succeeded.
+  after(async () => {
+    await revokeReputationForSubjects(subjectsToRevoke);
+  });
+
   revalidatePath("/feed");
   revalidatePath("/admin/feed");
   return { ok: true };
@@ -580,7 +678,13 @@ export async function addComment(
 }
 
 /** Delete a comment. Author OR admin OR post-author (so a poster can
- *  clean up under their own thread). */
+ *  clean up under their own thread).
+ *
+ *  Reputation: the commenter's comment_created and the recipient's
+ *  comment_received are both reversed. If the comment had replies
+ *  (top-level → cascade nukes them), each reply's event pair is
+ *  reversed too — same scoring rule that applied when they were
+ *  awarded. */
 export async function deleteComment(
   commentId: string
 ): Promise<FeedActionResult> {
@@ -603,7 +707,30 @@ export async function deleteComment(
     return { ok: false, error: "წაშლის უფლება არ გაქვს" };
   }
 
+  // Gather reply ids before the cascade so their reputation events
+  // can be reversed too. Top-level comments always have parent_id=null
+  // so this query returns the children — for a reply being deleted,
+  // there will be none.
+  const replyIds = await db
+    .select({ id: postComments.id })
+    .from(postComments)
+    .where(eq(postComments.parentId, commentId));
+
+  const allIds = [commentId, ...replyIds.map((r) => r.id)];
+  const subjectsToRevoke = allIds.flatMap((id) => [
+    { kind: "comment_created" as const, subjectId: RepSubject.comment(id) },
+    {
+      kind: "comment_received" as const,
+      subjectId: RepSubject.commentReceived(id),
+    },
+  ]);
+
   await db.delete(postComments).where(eq(postComments.id, commentId));
+
+  after(async () => {
+    await revokeReputationForSubjects(subjectsToRevoke);
+  });
+
   revalidatePath("/feed");
   revalidatePath("/admin/feed");
   return { ok: true };

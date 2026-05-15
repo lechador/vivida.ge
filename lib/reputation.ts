@@ -1,4 +1,4 @@
-import { and, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -143,6 +143,91 @@ export async function getReputationFor(
   for (const id of userIds) map.set(id, 0);
   for (const r of rows) map.set(r.userId, Number(r.total));
   return map;
+}
+
+/**
+ * Reverse previously-awarded reputation when the underlying thing is
+ * deleted (e.g., a post or comment). Reads the matching events from
+ * the audit table, totals the points per user, decrements the
+ * running totals, then removes the audit rows so the same subject
+ * can't be deducted twice.
+ *
+ * The unique `(kind, subject_id)` index guarantees at most one event
+ * row per pair, so the SELECT is bounded by the number of pairs
+ * passed in.
+ *
+ * Clamped at 0 — bookkeeping bugs (e.g. an event that was awarded
+ * but the running total later got reset) shouldn't be able to push a
+ * user into negative reputation.
+ *
+ * Errors are swallowed and logged. Reputation is opportunistic — a
+ * failed revocation shouldn't roll back a successful delete.
+ */
+export async function revokeReputationForSubjects(
+  pairs: Array<{ kind: ReputationEventKind; subjectId: string }>
+): Promise<void> {
+  if (pairs.length === 0) return;
+  try {
+    // OR-combine the (kind, subjectId) pairs into a single WHERE.
+    // Building per-pair AND clauses keeps the dedupe semantics tight
+    // — we never accidentally match a different event with the same
+    // subjectId but a different kind.
+    const conditions = pairs.map((p) =>
+      and(
+        eq(reputationEvents.kind, p.kind),
+        eq(reputationEvents.subjectId, p.subjectId)
+      )
+    );
+    const where = conditions.length === 1 ? conditions[0] : or(...conditions);
+    const rows = await db
+      .select({
+        id: reputationEvents.id,
+        userId: reputationEvents.userId,
+        points: reputationEvents.points,
+      })
+      .from(reputationEvents)
+      .where(where);
+
+    if (rows.length === 0) return;
+
+    // Sum points per recipient so we can do one UPDATE per user.
+    const debitsByUser = new Map<string, number>();
+    for (const r of rows) {
+      debitsByUser.set(r.userId, (debitsByUser.get(r.userId) ?? 0) + r.points);
+    }
+
+    // Apply the decrements. GREATEST(0, …) clamps at zero so we never
+    // end up with a negative total from any quirk in the audit log.
+    await Promise.all(
+      Array.from(debitsByUser.entries()).map(([userId, debit]) =>
+        db
+          .update(userReputation)
+          .set({
+            total: sql`GREATEST(0, ${userReputation.total} - ${debit})`,
+            updatedAt: new Date(),
+          })
+          .where(eq(userReputation.userId, userId))
+      )
+    );
+
+    // Remove the audit rows last so a re-fire of the same subject
+    // (shouldn't happen, but be defensive) doesn't double-deduct.
+    await db
+      .delete(reputationEvents)
+      .where(
+        inArray(
+          reputationEvents.id,
+          rows.map((r) => r.id)
+        )
+      );
+  } catch (err) {
+    console.warn(
+      "[reputation.revoke] failed",
+      pairs.length,
+      "pairs:",
+      (err as Error).message
+    );
+  }
 }
 
 /** Stable dedup keys used as `subjectId`. Keep them here so the call

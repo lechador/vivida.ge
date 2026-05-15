@@ -11,6 +11,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { getReputation } from "@/lib/reputation";
 import { isAdminEmail } from "@/lib/admin-auth";
+import { getHeaderData } from "@/lib/header-cache";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { FeedList } from "@/components/feed/feed-list";
@@ -36,13 +37,18 @@ export default async function FeedPage() {
     redirect("/onboarding");
   }
 
-  const [plan, posts, reputation] = await Promise.all([
+  const [plan, posts, reputation, headerData] = await Promise.all([
     getCurrentPlan(user.id),
     listFeed({ limit: 30 }),
     getReputation(user.id),
+    // Reuses the cached header lookup (also has avatarUrl), so showing
+    // the viewer's chosen main photo in the composer doesn't add an
+    // extra DB roundtrip — it's already memoised for the navbar.
+    getHeaderData(user.id),
   ]);
   const viewerIsAdmin = isAdminEmail(user.email);
   const viewerSunSign = sunSignFromDob(viewerProfile.dateOfBirth);
+  const viewerAvatar = headerData.avatarUrl ?? user.image ?? null;
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -79,7 +85,7 @@ export default async function FeedPage() {
 
         <div className="mb-6">
           <PostComposer
-            authorImage={user.image ?? null}
+            authorImage={viewerAvatar}
             authorName={user.name ?? null}
           />
         </div>

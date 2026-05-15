@@ -1,10 +1,15 @@
-import { desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { Trophy } from "lucide-react";
 
 import { db } from "@/db";
-import { profiles, userReputation, users } from "@/db/schema";
+import {
+  profilePhotos,
+  profiles,
+  userReputation,
+  users,
+} from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { Starfield } from "@/components/landing/starfield";
@@ -40,6 +45,31 @@ export default async function LeaderboardPage() {
     .leftJoin(profiles, eq(profiles.userId, userReputation.userId))
     .orderBy(desc(userReputation.total))
     .limit(50);
+
+  // Pull the chosen "main" profile photo for every leaderboard user
+  // so the avatars match what they see on /account and in the navbar
+  // — falling back to the Google OAuth avatar only when none is set.
+  const topUserIds = top.map((t) => t.userId);
+  const photoRows =
+    topUserIds.length === 0
+      ? []
+      : await db
+          .select({
+            userId: profilePhotos.userId,
+            url: profilePhotos.url,
+          })
+          .from(profilePhotos)
+          .where(
+            and(
+              inArray(profilePhotos.userId, topUserIds),
+              eq(profilePhotos.ready, true)
+            )
+          )
+          .orderBy(asc(profilePhotos.sortOrder));
+  const photoByUser = new Map<string, string>();
+  for (const row of photoRows) {
+    if (!photoByUser.has(row.userId)) photoByUser.set(row.userId, row.url);
+  }
 
   // The viewer's standing — separate query so the main list isn't a
   // window function. Cheap because user_reputation.userId is a PK.
@@ -103,6 +133,7 @@ export default async function LeaderboardPage() {
               const tier = tierFor(row.total);
               const isMe = row.userId === user.id;
               const profileHref = row.username ? `/u/${row.username}` : null;
+              const avatar = photoByUser.get(row.userId) ?? row.image;
               return (
                 <li
                   key={row.userId}
@@ -115,9 +146,9 @@ export default async function LeaderboardPage() {
                   <span className="w-7 shrink-0 text-center text-sm font-semibold tabular-nums text-muted-foreground">
                     {i + 1}
                   </span>
-                  {row.image ? (
+                  {avatar ? (
                     <Image
-                      src={row.image}
+                      src={avatar}
                       alt=""
                       width={40}
                       height={40}
