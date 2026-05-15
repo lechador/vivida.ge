@@ -3,12 +3,11 @@ import type { PlanId } from "./pricing";
 /**
  * Feature gating — single source of truth for which features require Pro.
  *
- * Every new signup gets 30 days of trialing Pro automatically, so these
- * gates only kick in after the trial expires. The pricing page mirrors
- * this list — keep them in sync.
- *
- * Flipping a flag to `true` is the only change required to lock a feature
- * — every consumer goes through `requiresPro()` / `canUseFeature()`.
+ * The site is currently 100% free while we focus on the mobile app launch.
+ * Every flag is `false` so `canUseFeature()` always returns `true`. The
+ * Feature type, PlanId, and `canUseFeature()` API are intentionally kept
+ * intact so flipping any flag back to `true` is the only change required to
+ * re-enable Pro gating when paid plans return.
  */
 
 export type Feature =
@@ -24,17 +23,15 @@ export type Feature =
   | "adFree";          // No ads (placeholder until we ship ads)
 
 const REQUIRES_PRO: Record<Feature, boolean> = {
-  aiSummary:       true,
-  aiBigThree:      true,
-  aiHighlights:    true,
-  aiHouses:        true,
-  aiAspects:       true,
-  dailyHoroscope:  true,
-  weeklyForecast:  true,
-  synastry:        true,
-  yearlyPdf:       true,
-  // Ads aren't shipped yet — leaving false until we have a Pro-only
-  // suppression to actually skip.
+  aiSummary:       false,
+  aiBigThree:      false,
+  aiHighlights:    false,
+  aiHouses:        false,
+  aiAspects:       false,
+  dailyHoroscope:  false,
+  weeklyForecast:  false,
+  synastry:        false,
+  yearlyPdf:       false,
   adFree:          false,
 };
 

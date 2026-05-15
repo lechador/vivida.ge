@@ -136,12 +136,6 @@ export async function createPartner(
   const used = await partnerCreationsThisMonth(user.id);
   const cap = PARTNER_CAP_PER_MONTH[plan];
   if (used >= cap) {
-    if (plan === "free") {
-      return {
-        ok: false,
-        error: `უფასო ვერსიაში 1 პარტნიორი ამ თვეში გამოიყენე. Pro ვერსიაში თვეში ${PARTNER_CAP_PER_MONTH.pro} პარტნიორია.`,
-      };
-    }
     return {
       ok: false,
       error: `ამ თვეში ${cap} პარტნიორი უკვე დაამატე. შემდეგი თვიდან ისევ შეგიძლია.`,

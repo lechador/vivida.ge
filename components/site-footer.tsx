@@ -5,7 +5,6 @@ import { VividaMark } from "@/components/brand/vivida-mark";
 const PRODUCT_LINKS = [
   { href: "/features", label: "ფუნქციები" },
   { href: "/how-it-works", label: "როგორ მუშაობს" },
-  { href: "/pricing", label: "ფასები" },
 ];
 
 const LEARN_LINKS = [

@@ -185,12 +185,10 @@ export async function sendWelcomeEmail({
   userId,
   to,
   name,
-  trialDays,
 }: {
   userId: string;
   to: string;
   name: string | null;
-  trialDays: number;
 }): Promise<void> {
   const c = client();
   if (!c) {
@@ -200,19 +198,16 @@ export async function sendWelcomeEmail({
   if (await hasSentBefore(userId, "welcome")) return;
 
   const dashboardUrl = absUrl("/dashboard");
-  const pricingUrl = absUrl("/pricing");
 
   try {
     const result = await c.emails.send(
       {
         from: FROM,
         to,
-        subject: `${trialDays} დღე Pro საჩუქრად · Vivida`,
+        subject: "შენი კოსმიური მოგზაურობა იწყება · Vivida",
         react: WelcomeEmail({
           name,
           dashboardUrl,
-          trialDays,
-          pricingUrl,
         }),
       },
       { idempotencyKey: `welcome:${userId}` }

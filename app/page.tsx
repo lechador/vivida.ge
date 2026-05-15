@@ -141,12 +141,6 @@ export default async function Home() {
               >
                 ფუნქციები
               </Link>
-              <Link
-                href="/pricing"
-                className="transition-colors hover:text-foreground"
-              >
-                ფასები
-              </Link>
             </nav>
             <Link
               href="/login"

@@ -71,11 +71,6 @@ export default function PrivacyPage() {
                 სხვა მომხმარებლებისთვის თქვენი არჩევანის შესაბამისად.
               </li>
               <li>
-                <strong className="text-foreground">გამოწერის მონაცემები:</strong>{" "}
-                Pro გამოწერის სტატუსი, გადახდის ისტორია (გადახდის ბარათების
-                მონაცემებს არ ვინახავთ — მათ ამუშავებს Flitt).
-              </li>
-              <li>
                 <strong className="text-foreground">აქტივობის მონაცემები:</strong>{" "}
                 შეტყობინებები, მეგობრობის მოთხოვნები, შენიშვნები. სერვისის
                 ფუნქციონირებისთვის აუცილებელია.
@@ -139,10 +134,6 @@ export default function PrivacyPage() {
                 AI ინტერპრეტაციის გენერაცია (გადაიცემა მხოლოდ ნატალური
                 რუკის ნუმერული მონაცემები — სახელი ან საკონტაქტო ინფორმაცია
                 არა).
-              </li>
-              <li>
-                <strong className="text-foreground">Flitt:</strong> გადახდების
-                პროცესინგი.
               </li>
               <li>
                 <strong className="text-foreground">freeastrologyapi.com:</strong> ნატალური

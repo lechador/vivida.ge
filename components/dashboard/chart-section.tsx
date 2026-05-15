@@ -15,11 +15,9 @@ import { ChartWheel } from "./chart-wheel";
 import { ElementsCard } from "./elements-card";
 import { HouseCards } from "./house-cards";
 import { PlanetCards } from "./planet-cards";
-import { LockedCard } from "@/components/paywall/locked-card";
 import { CollapsibleSection } from "@/components/report/collapsible-section";
 import { ReportNav } from "@/components/report/report-nav";
 import { QuickStats } from "@/components/report/quick-stats";
-import { canUseFeature } from "@/lib/features";
 import type { PlanId } from "@/lib/pricing";
 import { signByIndex } from "@/lib/zodiac";
 
@@ -43,11 +41,6 @@ export async function ChartSection({
       </div>
     );
   }
-
-  const canSummary = canUseFeature("aiSummary", plan);
-  const canHighlights = canUseFeature("aiHighlights", plan);
-  const canHouses = canUseFeature("aiHouses", plan);
-  const canAspects = canUseFeature("aiAspects", plan);
 
   const data = chart.data;
   const sun = data.bodies.sun;
@@ -105,7 +98,7 @@ export async function ChartSection({
         </section>
 
         {/* AI summary — inline, between sections */}
-        {canSummary && interp?.summary ? (
+        {interp?.summary && (
           <article
             id="summary"
             className="scroll-mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:scroll-mt-24 sm:p-6"
@@ -118,13 +111,7 @@ export async function ChartSection({
               {interp.summary}
             </p>
           </article>
-        ) : !canSummary ? (
-          <LockedCard
-            title="პერსონალური AI ანალიზი"
-            preview="შენი რუკის ემოციური პორტრეტი, შექმნილი AI-ს მიერ შენი დიდი სამეულისა და პლანეტების განლაგების მიხედვით."
-            description="გადადი Pro-ზე და ნახე შენი კოსმიური რუკის სრული ანალიზი."
-          />
-        ) : null}
+        )}
 
         {/* SECTION 02 — Big three (open by default) */}
         <CollapsibleSection
@@ -169,7 +156,7 @@ export async function ChartSection({
         </CollapsibleSection>
 
         {/* Highlights */}
-        {canHighlights && interp?.highlights && interp.highlights.length > 0 && (
+        {interp?.highlights && interp.highlights.length > 0 && (
           <CollapsibleSection
             id="highlights"
             icon={<Lightbulb className="size-5" />}
@@ -194,21 +181,6 @@ export async function ChartSection({
           </CollapsibleSection>
         )}
 
-        {!canHighlights && (
-          <CollapsibleSection
-            id="highlights"
-            icon={<Lightbulb className="size-5" />}
-            title="რა ვამჩნევთ შენს რუკაში"
-          >
-            <LockedCard
-              title="რუკის უნიკალური აქცენტები"
-              preview="მორიელის სამმაგი ძალა — შენი მზე, ვენერა და მერკური ერთ ნიშანშია."
-              description="Pro ვერსიაში AI შენს რუკაში ყველაზე საინტერესო კავშირებს პოულობს."
-              variant="tall"
-            />
-          </CollapsibleSection>
-        )}
-
         {/* SECTION 05 — Planets */}
         <CollapsibleSection
           id="planets"
@@ -220,56 +192,24 @@ export async function ChartSection({
         </CollapsibleSection>
 
         {/* SECTION 06 — Houses */}
-        {canHouses ? (
-          <CollapsibleSection
-            id="houses"
-            icon={<Home className="size-5" />}
-            title="ცხოვრების 12 სფერო"
-            subtitle="სად რა ენერგია ვლინდება შენს ცხოვრებაში"
-          >
-            <HouseCards chart={data} interpretations={interp?.houses} />
-          </CollapsibleSection>
-        ) : (
-          <CollapsibleSection
-            id="houses"
-            icon={<Home className="size-5" />}
-            title="ცხოვრების 12 სფერო"
-            subtitle="სად რა ენერგია ვლინდება შენს ცხოვრებაში"
-            defaultOpen
-          >
-            <LockedCard
-              title="12 სახლი — სრული ახსნა"
-              preview="კარიერა, ურთიერთობები, ფული, ოჯახი — ყოველი სახლი შენი ცხოვრების ერთ სფეროს ფარავს. AI გიჩვენებს, რა ენერგია სად ვლინდება შენს რუკაში."
-              description="გადადი Pro-ზე, რომ ნახო შენი 12 სახლის სრული ანალიზი."
-            />
-          </CollapsibleSection>
-        )}
+        <CollapsibleSection
+          id="houses"
+          icon={<Home className="size-5" />}
+          title="ცხოვრების 12 სფერო"
+          subtitle="სად რა ენერგია ვლინდება შენს ცხოვრებაში"
+        >
+          <HouseCards chart={data} interpretations={interp?.houses} />
+        </CollapsibleSection>
 
         {/* SECTION 07 — Aspects */}
-        {canAspects ? (
-          <CollapsibleSection
-            id="aspects"
-            icon={<Triangle className="size-5" />}
-            title="ასპექტები"
-            subtitle="როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
-          >
-            <AspectCards chart={data} interpretations={interp?.aspects} />
-          </CollapsibleSection>
-        ) : (
-          <CollapsibleSection
-            id="aspects"
-            icon={<Triangle className="size-5" />}
-            title="ასპექტები"
-            subtitle="როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
-            defaultOpen
-          >
-            <LockedCard
-              title="პლანეტთა ასპექტები"
-              preview="მზე ტრიგონშია მთვარესთან — ემოციები და ნება ერთად მუშაობენ. მარსი წინააღმდეგობაშია ვენერასთან — სიყვარულსა და მოქმედებას შორის ბალანსი ხშირად რთულია."
-              description="გადადი Pro-ზე, რომ ნახო ყველა მნიშვნელოვანი ასპექტი და მათი ახსნა."
-            />
-          </CollapsibleSection>
-        )}
+        <CollapsibleSection
+          id="aspects"
+          icon={<Triangle className="size-5" />}
+          title="ასპექტები"
+          subtitle="როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
+        >
+          <AspectCards chart={data} interpretations={interp?.aspects} />
+        </CollapsibleSection>
       </div>
     </div>
   );

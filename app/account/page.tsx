@@ -8,11 +8,10 @@ import { profiles, profilePhotos, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { asc } from "drizzle-orm";
 import { getHeaderData } from "@/lib/header-cache";
-import { getCurrentPlan, getOrProvisionSubscription } from "@/lib/plan";
+import { getCurrentPlan } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
-import { SubscriptionStatusCard } from "@/components/account/sub-status-card";
 import { DangerZone } from "@/components/account/danger-zone";
 import { VisibilityCard } from "@/components/account/visibility-card";
 import { PhotoUploader } from "@/components/account/photo-uploader";
@@ -23,12 +22,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
   const user = await requireUser();
-
-  // `getOrProvisionSubscription` mutates state, so it runs sequentially
-  // before the parallel reads — same idempotent provision used by
-  // /pricing and TrialBanner. /account is a common landing target after
-  // signup, so the trial row must exist before we render plan UI.
-  const subscription = await getOrProvisionSubscription(user.id);
 
   const [[profile], plan, photos, [emailPrefs], headerData] = await Promise.all([
     db
@@ -111,11 +104,6 @@ export default async function AccountPage() {
               ready: p.ready,
             }))}
           />
-        </div>
-
-        {/* Subscription */}
-        <div className="mb-6">
-          <SubscriptionStatusCard subscription={subscription} />
         </div>
 
         {/* Email preferences */}

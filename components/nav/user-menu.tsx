@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { LogOut, Settings, Sparkles, User } from "lucide-react";
+import { LogOut, Settings, User } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -19,13 +19,11 @@ export function UserMenu({
   email,
   image,
   username,
-  isPro,
 }: {
   name: string | null;
   email: string | null;
   image: string | null;
   username: string | null;
-  isPro: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const display = name?.split(" ")[0] ?? "ვარსკვლავო";
@@ -51,14 +49,6 @@ export function UserMenu({
               {display[0]?.toUpperCase()}
             </span>
           )}
-          {isPro && (
-            <span
-              aria-hidden
-              className="absolute -bottom-0.5 -right-0.5 grid size-[18px] place-items-center rounded-full border border-background bg-[var(--vivida-pink)] text-background"
-            >
-              <Sparkles className="size-2.5" />
-            </span>
-          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64 p-2">
@@ -80,11 +70,6 @@ export function UserMenu({
               </div>
             )}
           </div>
-          {isPro && (
-            <span className="rounded-full border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--vivida-pink)]">
-              Pro
-            </span>
-          )}
         </div>
 
         <DropdownMenuSeparator />
@@ -101,12 +86,6 @@ export function UserMenu({
           <Link href="/account" className="cursor-pointer">
             <Settings className="size-4" />
             ანგარიში
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/pricing" className="cursor-pointer">
-            <Sparkles className="size-4" />
-            ფასები
           </Link>
         </DropdownMenuItem>
 

@@ -13,7 +13,6 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { ChartSection } from "@/components/dashboard/chart-section";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
-import { TrialBanner } from "@/components/billing/trial-banner";
 
 export const metadata = { title: "ჩემი რუკა" };
 
@@ -58,10 +57,6 @@ export default async function ReportPage() {
         <p className="mb-6 max-w-xl text-sm text-foreground/75 sm:text-base">
           ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე.
         </p>
-
-        <div className="mb-8">
-          <TrialBanner userId={user.id} />
-        </div>
 
         <Suspense fallback={<CosmicLoader embedded />}>
           <ChartSection userId={user.id} plan={plan} />

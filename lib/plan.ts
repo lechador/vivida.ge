@@ -166,7 +166,6 @@ export async function provisionTrialIfMissing(
           userId,
           to: u.email,
           name: u.name ?? null,
-          trialDays: TRIAL_DAYS,
         });
       } catch (err) {
         console.warn(

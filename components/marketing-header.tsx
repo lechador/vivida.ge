@@ -11,7 +11,7 @@ import { VividaMark } from "@/components/brand/vivida-mark";
 export function MarketingHeader({
   active,
 }: {
-  active?: "features" | "how-it-works" | "pricing";
+  active?: "features" | "how-it-works";
 }) {
   const link = (href: string, label: string, key: typeof active) => (
     <Link
@@ -44,7 +44,6 @@ export function MarketingHeader({
       <nav className="hidden items-center gap-7 text-sm sm:flex">
         {link("/how-it-works", "როგორ მუშაობს", "how-it-works")}
         {link("/features", "ფუნქციები", "features")}
-        {link("/pricing", "ფასები", "pricing")}
       </nav>
 
       <Button asChild variant="mystic" size="sm">

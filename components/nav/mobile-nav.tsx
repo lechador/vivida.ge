@@ -86,7 +86,7 @@ export function MobileNav({ active }: { active?: NavActiveKey }) {
                 </DialogPrimitive.Title>
 
                 {/* Nav items */}
-                <nav className="flex flex-col gap-1">
+                <nav className="flex flex-col gap-1 mb-2">
                   {NAV_ITEMS.map((item) => {
                     const { Icon } = item;
                     const isActive = item.key === active;
@@ -142,16 +142,6 @@ export function MobileNav({ active }: { active?: NavActiveKey }) {
                     );
                   })}
                 </nav>
-
-                <div className="mt-auto space-y-3 text-xs text-muted-foreground/80">
-                  <Link
-                    href="/pricing"
-                    onClick={() => setOpen(false)}
-                    className="block rounded-xl border border-border/60 bg-card/40 px-4 py-3 text-sm text-foreground/85 transition-colors hover:bg-card/70"
-                  >
-                    ფასები · Pro-ზე გადასვლა
-                  </Link>
-                </div>
               </motion.aside>
             </DialogPrimitive.Content>
           </DialogPrimitive.Portal>

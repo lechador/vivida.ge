@@ -47,9 +47,6 @@ export default async function SynastryPage() {
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-3">
-            <span className="rounded-full border border-border/70 bg-background/40 px-3 py-1 text-xs text-foreground/80">
-              ამ თვეში: {used} / {cap}
-            </span>
             {remaining > 0 ? (
               <Button asChild variant="mystic" size="lg">
                 <Link href="/synastry/new">
@@ -57,17 +54,9 @@ export default async function SynastryPage() {
                   ახალი პარტნიორი
                 </Link>
               </Button>
-            ) : plan === "free" ? (
-              <Button asChild variant="mystic" size="lg">
-                <Link href="/pricing">
-                  <Plus className="size-4" />
-                  გადადი Pro-ზე
-                </Link>
-              </Button>
             ) : (
-              // Pro user hit their monthly cap — pricing isn't the answer,
-              // they need to wait. Render a real disabled button (no Link)
-              // so the click can't navigate anywhere unhelpful.
+              // Monthly cap hit — render a disabled button so the click
+              // can't navigate anywhere unhelpful.
               <Button variant="outline" size="lg" disabled>
                 <Plus className="size-4" />
                 შემდეგი თვიდან
@@ -77,7 +66,7 @@ export default async function SynastryPage() {
         </div>
 
         {partners.length === 0 ? (
-          <EmptyState canAdd={remaining > 0} plan={plan} />
+          <EmptyState canAdd={remaining > 0} />
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {partners.map((p) => (
@@ -97,7 +86,7 @@ export default async function SynastryPage() {
   );
 }
 
-function EmptyState({ canAdd, plan }: { canAdd: boolean; plan: string }) {
+function EmptyState({ canAdd }: { canAdd: boolean }) {
   return (
     <div className="rounded-2xl border border-border/60 bg-card/50 p-10 text-center backdrop-blur-xl">
       <Heart
@@ -108,9 +97,8 @@ function EmptyState({ canAdd, plan }: { canAdd: boolean; plan: string }) {
         ჯერ პარტნიორი არ დაგიმატებია
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-        {plan === "pro"
-          ? `ყოველ თვეში შეგიძლია ${PARTNER_CAP_PER_MONTH.pro} პარტნიორი დაამატო — ახლო ადამიანი, ძველი მეგობარი, თუ ვინც გაინტერესებს.`
-          : `უფასო ვერსიაში შეგიძლია 1 პარტნიორი ამ თვეში. Pro-ში — ${PARTNER_CAP_PER_MONTH.pro}.`}
+        დაამატე ახლო ადამიანი, ძველი მეგობარი, თუ ვინც გაინტერესებს — ნახე
+        თქვენი ცის რუკების ერთობლივი თავსებადობა.
       </p>
       {canAdd && (
         <Button asChild className="mt-6" variant="mystic" size="lg">

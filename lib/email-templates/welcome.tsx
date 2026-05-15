@@ -9,24 +9,22 @@ import {
 } from "./_layout";
 
 /**
- * Sent once when a user finishes signup. Pitches the auto-issued 30-day
- * Pro trial that everyone gets at registration time, then funnels them
- * into the dashboard. No unsubscribe — transactional.
+ * Sent once when a user finishes signup. Pitches what they get from Vivida
+ * and funnels them into the dashboard. No unsubscribe — transactional.
+ *
+ * The site is currently 100% free; copy reflects that. When paid plans
+ * return, swap the body for the upsell version.
  */
 export function WelcomeEmail({
   name,
   dashboardUrl,
-  trialDays,
-  pricingUrl,
 }: {
   name: string | null;
   dashboardUrl: string;
-  trialDays: number;
-  pricingUrl: string;
 }) {
   const greeting = name ? `კეთილი იყოს მობრძანება, ${name}!` : "კეთილი იყოს მობრძანება!";
   return (
-    <EmailLayout preview={`${trialDays} დღე Pro საჩუქრად — შენი კოსმიური მოგზაურობა იწყება`}>
+    <EmailLayout preview="შენი კოსმიური მოგზაურობა იწყება — Vivida">
       <Heading
         as="h1"
         style={{
@@ -38,17 +36,17 @@ export function WelcomeEmail({
           margin: "0 0 16px",
         }}
       >
-        {trialDays} დღე Pro — საჩუქრად
+        შენი კოსმიური მოგზაურობა იწყება
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
       <Text style={paragraphStyle}>
-        გამოწერისთანავე გაჩუქე Pro წვდომა — სულ {trialDays} დღე უფასოდ, ბარათის
-        გარეშე. ეს არის შენი კოსმიური მოგზაურობის დასაწყისი.
+        Vivida-ში ყველა ფუნქცია სრულად ხელმისაწვდომია — ბარათის გარეშე, ლიმიტის
+        გარეშე. შენი კოსმიური მოგზაურობა ერთ დაკლიკვაზე იწყება.
       </Text>
 
       <Text style={{ ...paragraphStyle, fontWeight: 600, color: "#ffffff" }}>
-        Pro-თი ხელმისაწვდომია:
+        ხელმისაწვდომია:
       </Text>
       <ul
         style={{
@@ -82,15 +80,7 @@ export function WelcomeEmail({
       </Button>
 
       <Text style={mutedStyle}>
-        Pro ავტომატურად დასრულდება {trialDays} დღის შემდეგ. გაგრძელება ნებაყოფლობითია —
-        <a
-          href={pricingUrl}
-          style={{ color: "#c4b5fd", textDecoration: "underline" }}
-        >
-          {" "}
-          ფასები
-        </a>
-        .
+        თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს.
       </Text>
     </EmailLayout>
   );

@@ -8,7 +8,6 @@ import { getCurrentPlan } from "@/lib/plan";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
-import { TrialBanner } from "@/components/billing/trial-banner";
 
 export const metadata = { title: "დღეს" };
 
@@ -47,14 +46,6 @@ export default async function DashboardPage() {
             {firstName}
           </span>
         </h1>
-
-        {/* Suppress the trial banner on the dashboard until the final
-            stretch — keeps the daily view distraction-free for the bulk
-            of the trial. /account + /pricing still show it full-time so
-            users who actively check status always see the countdown. */}
-        <div className="mb-8 empty:hidden">
-          <TrialBanner userId={user.id} showWithinDays={3} />
-        </div>
 
         {/* DailyDashboard is a client component — it fetches the heavy AI
             data via a server action after first paint, so the response

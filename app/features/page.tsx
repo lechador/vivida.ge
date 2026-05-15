@@ -28,7 +28,6 @@ type Feature = {
   title: string;
   body: string;
   hue: string;
-  isPro?: boolean;
 };
 
 const FEATURES: Feature[] = [
@@ -55,14 +54,12 @@ const FEATURES: Feature[] = [
     title: "AI ინტერპრეტაცია",
     body: "შენი რუკის ემოციური პორტრეტი, შექმნილი AI-ს მიერ. არა ზოგადი ჰოროსკოპი — შენი მონაცემების მიხედვით პერსონალური ანალიზი.",
     hue: "oklch(0.78 0.15 195)",
-    isPro: true,
   },
   {
     Icon: Sparkles,
     title: "მნიშვნელოვანი შტრიხები",
-    body: "Pro AI შენს რუკაში ყველაზე საინტერესო კავშირებს პოულობს — სტელიუმები, ძლიერი ასპექტები, უნიკალური აქცენტები.",
+    body: "AI შენს რუკაში ყველაზე საინტერესო კავშირებს პოულობს — სტელიუმები, ძლიერი ასპექტები, უნიკალური აქცენტები.",
     hue: "oklch(0.72 0.22 350)",
-    isPro: true,
   },
   {
     Icon: UserCircle,
@@ -157,16 +154,9 @@ export default function FeaturesPage() {
                     }}
                   />
                 </div>
-                <div className="mb-2 flex items-center gap-2">
-                  <h2 className="text-lg font-semibold tracking-tight">
-                    {feature.title}
-                  </h2>
-                  {feature.isPro && (
-                    <span className="rounded-full bg-[var(--vivida-violet)]/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--vivida-violet)] ring-1 ring-[var(--vivida-violet)]/30">
-                      Pro
-                    </span>
-                  )}
-                </div>
+                <h2 className="mb-2 text-lg font-semibold tracking-tight">
+                  {feature.title}
+                </h2>
                 <p className="text-pretty text-sm leading-relaxed text-foreground/85">
                   {feature.body}
                 </p>
@@ -181,15 +171,11 @@ export default function FeaturesPage() {
             ყველაფერი ერთ ადგილას
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            დაიწყე უფასოდ. გადადი Pro-ზე როცა გინდა, რომ უფრო ღრმად შეიცნო შენი
-            კოსმოსი.
+            ყველა ფუნქცია სრულად უფასოა — შენი კოსმოსი ერთ დაკლიკვაზე.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic" size="lg">
               <Link href="/signup">დაიწყე უფასოდ</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/pricing">ფასები</Link>
             </Button>
           </div>
         </div>

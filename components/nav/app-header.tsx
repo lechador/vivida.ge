@@ -35,7 +35,6 @@ export async function AppHeader({
     | "synastry"
     | "friends"
     | "messages"
-    | "pricing"
     | "account";
 }) {
   let userInfo: {
@@ -68,8 +67,6 @@ export async function AppHeader({
       unreadMessages = data.unreadMessages;
     }
   }
-
-  const isPro = plan === "pro";
 
   return (
     <>
@@ -127,21 +124,12 @@ export async function AppHeader({
               email={userInfo.email}
               image={userInfo.image}
               username={username}
-              isPro={isPro}
             />
           </>
         ) : (
-          <>
-            <Link
-              href="/pricing"
-              className="hidden text-base text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
-            >
-              ფასები
-            </Link>
-            <Button asChild variant="ghost">
-              <Link href="/login">შესვლა</Link>
-            </Button>
-          </>
+          <Button asChild variant="ghost">
+            <Link href="/login">შესვლა</Link>
+          </Button>
         )}
       </div>
     </header>

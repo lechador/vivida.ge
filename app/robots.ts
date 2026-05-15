@@ -19,7 +19,6 @@ export default function robots(): MetadataRoute.Robots {
           "/friends",
           "/account",
           "/onboarding",
-          "/billing/",
           "/reset-password",
         ],
       },

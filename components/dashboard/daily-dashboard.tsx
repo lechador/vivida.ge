@@ -7,7 +7,6 @@ import { ArrowRight } from "lucide-react";
 
 import { loadDashboardBundle, type DashboardBundle } from "@/actions/dashboard";
 import { Button } from "@/components/ui/button";
-import { LockedCard } from "@/components/paywall/locked-card";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import type { PlanId } from "@/lib/pricing";
 
@@ -71,19 +70,11 @@ export function DailyDashboard({
     moonPhase,
     weeklyForecast,
     timezone,
-    canDaily,
-    canWeekly,
     suggestions,
   } = bundle;
 
   const dailySlot = daily ? (
     <DailyCard horoscope={daily} timezone={timezone} />
-  ) : !canDaily ? (
-    <LockedCard
-      title="ყოველდღიური ჰოროსკოპი"
-      preview="დღეს შენთვის: მთვარე შენს მე-7 სახლში შედის, მარსი კი შენს პლანეტას ქალწულში ეხება. დღე იდეალურია სამომავლო გეგმებისთვის და მნიშვნელოვანი საუბრებისთვის საყვარელ ადამიანებთან…"
-      description="ყოველდღე ახალი პროგნოზი, შენი პირადი კოსმიური რუკის მიხედვით."
-    />
   ) : (
     <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
       დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში.
@@ -105,15 +96,9 @@ export function DailyDashboard({
         )}
       </div>
 
-      {weeklyForecast && weeklyForecast.days.length > 0 ? (
+      {weeklyForecast && weeklyForecast.days.length > 0 && (
         <WeeklyForecastCard days={weeklyForecast.days} />
-      ) : !canWeekly ? (
-        <LockedCard
-          title="კვირეული ფორექასტი"
-          preview="ორშაბათი — ენერგია ცვლილებისთვის. სამშაბათი — სიფრთხილე საუბარში. ოთხშაბათი — შემოქმედებითი ნახტომი ელის. ხუთშაბათი — ფული და გადაწყვეტილებები. პარასკევი — ემოციური სიღრმე…"
-          description="7 დღის პერსონალური პროგნოზი — ყოველ კვირას ახლდება შენი რუკის მიხედვით."
-        />
-      ) : null}
+      )}
 
       <section>
         <header className="mb-3 flex items-baseline justify-between">
