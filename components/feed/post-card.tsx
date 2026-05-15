@@ -21,17 +21,31 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { CommentSection } from "./comment-section";
-import { ReactionBar } from "./reaction-bar";
+import { PostActions } from "./post-actions";
 import { TierBadge } from "./tier-badge";
 import { feedTimeAgo } from "./time-ago";
 
 /**
- * One post card. Byline + body + action row. The action row groups
- * reactions and the comments button on a single horizontal line so the
- * card doesn't stack into three stripes at the bottom.
+ * Facebook-style post card.
  *
- * The three-dot menu shows delete to owner/admin and edit to the
- * owner within the POST_EDIT_WINDOW. Everyone else sees a clean card.
+ * Layout:
+ *   ┌─────────────────────────────────────────────┐
+ *   │ avatar  Name [tier]              ⋯ menu     │
+ *   │         @handle · 17h                       │
+ *   │                                             │
+ *   │ post body…                                  │
+ *   │                                             │
+ *   │ ❤👍 10                          2 comments   │
+ *   │ ─────────────────────────────────────────── │
+ *   │   ლაიქი    │  კომენტარი  │  გაზიარება        │
+ *   └─────────────────────────────────────────────┘
+ *
+ * Reactions still use the 4 custom icons; hovering "ლაიქი" pops up
+ * the picker, single-tap toggles `like` directly. The comment section
+ * is controlled by this card — the "კომენტარი" button in the action
+ * bar opens/closes the same panel that the count link in the summary
+ * row toggles. Edit (within 5 min) and delete (owner/admin) live in
+ * the three-dot menu.
  */
 export function PostCard({
   post,
@@ -47,6 +61,7 @@ export function PostCard({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(post.body);
   const [editError, setEditError] = useState<string | null>(null);
+  const [commentsOpen, setCommentsOpen] = useState(false);
 
   const isOwner = post.author.id === viewerId;
   const canDelete = isOwner || viewerIsAdmin;
@@ -123,9 +138,6 @@ export function PostCard({
           avatar
         )}
         <div className="min-w-0 flex-1">
-          {/* Single byline row: name + tier chip, then handle + time
-              on a second line. Keeps the tier badge from wrapping
-              awkwardly under longer Georgian display names. */}
           <div className="flex items-center gap-2">
             {profileHref ? (
               <Link
@@ -265,25 +277,21 @@ export function PostCard({
         </p>
       )}
 
-      {/* Action row — reactions + comments on one line. Thin top
-          border separates the body from interactions without adding
-          visual weight. */}
-      <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/40 pt-3">
-        <ReactionBar
-          postId={post.id}
-          initialCounts={post.reactions}
-          initialMine={post.myReaction}
-        />
-      </div>
-      <div className="mt-2">
-        <CommentSection
-          postId={post.id}
-          initialCount={post.commentCount}
-          viewerId={viewerId}
-          viewerIsAdmin={viewerIsAdmin}
-          postAuthorId={post.author.id}
-        />
-      </div>
+      <PostActions
+        postId={post.id}
+        initialCounts={post.reactions}
+        initialMine={post.myReaction}
+        commentCount={post.commentCount}
+        onToggleComments={() => setCommentsOpen((o) => !o)}
+      />
+
+      <CommentSection
+        postId={post.id}
+        viewerId={viewerId}
+        viewerIsAdmin={viewerIsAdmin}
+        postAuthorId={post.author.id}
+        open={commentsOpen}
+      />
     </article>
   );
 }

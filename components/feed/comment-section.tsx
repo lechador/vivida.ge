@@ -12,7 +12,6 @@ import Link from "next/link";
 import {
   CornerDownRight,
   Loader2,
-  MessageCircle,
   Reply,
   Send,
   Trash2,
@@ -30,9 +29,10 @@ import { cn } from "@/lib/utils";
 import { feedTimeAgo } from "./time-ago";
 
 /**
- * Comments live behind a "X comments" button. Click expands, fetches
- * once (no SSR cost for posts the user doesn't open), and renders the
- * tree of comments + their one-level replies.
+ * Comment thread + composer. Renders only when `open` is true so the
+ * post card stays light; loading is lazy on first open. Controlled
+ * by the parent so the action-bar's "კომენტარი" button can toggle
+ * the same panel.
  *
  * Visual hierarchy:
  *   - Top-level comment row: avatar + byline + body inline
@@ -42,20 +42,20 @@ import { feedTimeAgo } from "./time-ago";
  */
 export function CommentSection({
   postId,
-  initialCount,
   viewerId,
   viewerIsAdmin,
   postAuthorId,
+  open,
 }: {
   postId: string;
-  initialCount: number;
   viewerId: string;
   /** Whether the viewer is in the admin allow-list. */
   viewerIsAdmin: boolean;
   postAuthorId: string;
+  /** Controlled open state — parent decides when the panel renders.
+   *  Rendering returns null when `false`. */
+  open: boolean;
 }) {
-  const [open, setOpen] = useState(false);
-  const [count, setCount] = useState(initialCount);
   const [comments, setComments] = useState<FeedComment[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [body, setBody] = useState("");
@@ -73,7 +73,6 @@ export function CommentSection({
     listComments(postId)
       .then((list) => {
         setComments(list);
-        setCount(list.length);
       })
       .finally(() => setLoading(false));
   }, [open, comments, postId]);
@@ -113,7 +112,6 @@ export function CommentSection({
   function refreshComments() {
     return listComments(postId).then((list) => {
       setComments(list);
-      setCount(list.length);
     });
   }
 
@@ -166,23 +164,11 @@ export function CommentSection({
   const overflow = remaining < 0;
   const submitDisabled = isPending || body.trim().length === 0 || overflow;
 
+  if (!open) return null;
+
   return (
     <div className="w-full">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className={cn(
-          "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-muted-foreground transition-all hover:bg-card/60 hover:text-foreground",
-          open && "bg-card/60 text-foreground"
-        )}
-        aria-expanded={open}
-      >
-        <MessageCircle className="size-3.5" />
-        {count > 0 ? `${count}` : "კომენტარი"}
-      </button>
-
-      {open && (
-        <div className="mt-4 space-y-4">
+      <div className="mt-3 space-y-4">
           {loading && (
             <div className="flex justify-center py-4">
               <Loader2 className="size-4 animate-spin text-muted-foreground" />
@@ -300,8 +286,7 @@ export function CommentSection({
               </div>
             </div>
           </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
