@@ -1,9 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, MessageCircle, Send, Trash2 } from "lucide-react";
+import {
+  CornerDownRight,
+  Loader2,
+  MessageCircle,
+  Reply,
+  Send,
+  Trash2,
+} from "lucide-react";
 
 import {
   addComment,
@@ -12,15 +25,20 @@ import {
   type FeedComment,
 } from "@/actions/feed";
 import { COMMENT_BODY_MAX } from "@/lib/feed-config";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { feedTimeAgo } from "./time-ago";
 
 /**
  * Comments live behind a "X comments" button. Click expands, fetches
- * once (no SSR cost for posts the user doesn't open), and shows the
- * inline composer at the bottom.
+ * once (no SSR cost for posts the user doesn't open), and renders the
+ * tree of comments + their one-level replies.
+ *
+ * Visual hierarchy:
+ *   - Top-level comment row: avatar + byline + body inline
+ *   - Replies sit underneath with a left rail and slight indent
+ *   - "უპასუხე" button shown on top-level rows only (one-level cap)
+ *   - Inline reply composer opens directly under the replied-to row
  */
 export function CommentSection({
   postId,
@@ -32,8 +50,7 @@ export function CommentSection({
   postId: string;
   initialCount: number;
   viewerId: string;
-  /** Whether the viewer is in the admin allow-list. Hides the delete
-   *  button from non-admins-non-owners-non-post-authors. */
+  /** Whether the viewer is in the admin allow-list. */
   viewerIsAdmin: boolean;
   postAuthorId: string;
 }) {
@@ -42,9 +59,12 @@ export function CommentSection({
   const [comments, setComments] = useState<FeedComment[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [body, setBody] = useState("");
+  const [replyParentId, setReplyParentId] = useState<string | null>(null);
+  const [replyBody, setReplyBody] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const replyRef = useRef<HTMLTextAreaElement | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -60,10 +80,42 @@ export function CommentSection({
 
   useEffect(() => {
     if (open) {
-      // Focus the input when the panel expands so users can just start typing.
       requestAnimationFrame(() => textareaRef.current?.focus());
     }
   }, [open]);
+
+  useEffect(() => {
+    if (replyParentId) {
+      requestAnimationFrame(() => replyRef.current?.focus());
+    }
+  }, [replyParentId]);
+
+  // Group children by parent id so we can render replies right under
+  // their parent. Memoised so we don't recompute on every keystroke.
+  const repliesByParent = useMemo(() => {
+    const map = new Map<string, FeedComment[]>();
+    if (!comments) return map;
+    for (const c of comments) {
+      if (c.parentId) {
+        const list = map.get(c.parentId) ?? [];
+        list.push(c);
+        map.set(c.parentId, list);
+      }
+    }
+    return map;
+  }, [comments]);
+
+  const topLevel = useMemo(
+    () => (comments ?? []).filter((c) => !c.parentId),
+    [comments]
+  );
+
+  function refreshComments() {
+    return listComments(postId).then((list) => {
+      setComments(list);
+      setCount(list.length);
+    });
+  }
 
   function submit() {
     const trimmed = body.trim();
@@ -76,11 +128,24 @@ export function CommentSection({
         return;
       }
       setBody("");
-      // Refetch comments to pick up the new row (and any concurrent
-      // adds we may have missed).
-      const fresh = await listComments(postId);
-      setComments(fresh);
-      setCount(fresh.length);
+      await refreshComments();
+      router.refresh();
+    });
+  }
+
+  function submitReply() {
+    const trimmed = replyBody.trim();
+    if (!trimmed || !replyParentId || isPending) return;
+    setError(null);
+    startTransition(async () => {
+      const res = await addComment(postId, trimmed, replyParentId);
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
+      setReplyBody("");
+      setReplyParentId(null);
+      await refreshComments();
       router.refresh();
     });
   }
@@ -92,10 +157,7 @@ export function CommentSection({
         setError(res.error);
         return;
       }
-      setComments((prev) =>
-        prev ? prev.filter((c) => c.id !== commentId) : prev
-      );
-      setCount((c) => Math.max(0, c - 1));
+      await refreshComments();
       router.refresh();
     });
   }
@@ -105,92 +167,78 @@ export function CommentSection({
   const submitDisabled = isPending || body.trim().length === 0 || overflow;
 
   return (
-    <div>
+    <div className="w-full">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/30 px-2.5 py-1 text-xs text-muted-foreground transition-all hover:border-foreground/20 hover:bg-card/60 hover:text-foreground",
-          open && "text-foreground"
+          "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-muted-foreground transition-all hover:bg-card/60 hover:text-foreground",
+          open && "bg-card/60 text-foreground"
         )}
         aria-expanded={open}
       >
         <MessageCircle className="size-3.5" />
-        {count > 0 ? `${count} კომენტარი` : "კომენტარი"}
+        {count > 0 ? `${count}` : "კომენტარი"}
       </button>
 
       {open && (
-        <div className="mt-3 space-y-3">
+        <div className="mt-4 space-y-4">
           {loading && (
             <div className="flex justify-center py-4">
               <Loader2 className="size-4 animate-spin text-muted-foreground" />
             </div>
           )}
 
-          {comments && comments.length > 0 && (
-            <ul className="space-y-2.5">
-              {comments.map((c) => {
-                const canDelete =
-                  c.author.id === viewerId ||
-                  postAuthorId === viewerId ||
-                  viewerIsAdmin;
-                const display =
-                  c.author.displayName ??
-                  c.author.name?.split(" ")[0] ??
-                  c.author.username ??
-                  "ვარსკვლავო";
-                const initial = display[0]?.toUpperCase() ?? "?";
-                const profileHref = c.author.username
-                  ? `/u/${c.author.username}`
-                  : null;
+          {topLevel.length > 0 && (
+            <ul className="space-y-3">
+              {topLevel.map((c) => {
+                const replies = repliesByParent.get(c.id) ?? [];
                 return (
-                  <li
-                    key={c.id}
-                    className="flex gap-2.5 rounded-xl border border-border/40 bg-card/30 p-3"
-                  >
-                    {c.author.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={c.author.image}
-                        alt=""
-                        className="size-8 shrink-0 rounded-full border border-border/60 object-cover"
-                      />
-                    ) : (
-                      <div className="grid size-8 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-xs text-muted-foreground">
-                        {initial}
-                      </div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-2">
-                        {profileHref ? (
-                          <Link
-                            href={profileHref}
-                            className="truncate text-sm font-medium text-foreground hover:text-[var(--vivida-violet)]"
-                          >
-                            {display}
-                          </Link>
-                        ) : (
-                          <span className="truncate text-sm font-medium text-foreground">
-                            {display}
-                          </span>
+                  <li key={c.id} className="space-y-2">
+                    <CommentRow
+                      comment={c}
+                      viewerId={viewerId}
+                      viewerIsAdmin={viewerIsAdmin}
+                      postAuthorId={postAuthorId}
+                      isReply={false}
+                      isPending={isPending}
+                      onDelete={removeComment}
+                      onReply={() => {
+                        setReplyParentId(c.id);
+                        setReplyBody("");
+                      }}
+                    />
+
+                    {(replies.length > 0 || replyParentId === c.id) && (
+                      <div className="relative ml-5 space-y-2 border-l border-border/50 pl-4">
+                        {replies.map((r) => (
+                          <CommentRow
+                            key={r.id}
+                            comment={r}
+                            viewerId={viewerId}
+                            viewerIsAdmin={viewerIsAdmin}
+                            postAuthorId={postAuthorId}
+                            isReply
+                            isPending={isPending}
+                            onDelete={removeComment}
+                          />
+                        ))}
+
+                        {replyParentId === c.id && (
+                          <ReplyComposer
+                            ref={replyRef}
+                            value={replyBody}
+                            onChange={setReplyBody}
+                            onSubmit={submitReply}
+                            onCancel={() => {
+                              setReplyParentId(null);
+                              setReplyBody("");
+                            }}
+                            isPending={isPending}
+                            error={error}
+                          />
                         )}
-                        <span className="shrink-0 text-[10px] text-muted-foreground">
-                          {feedTimeAgo(c.createdAt)}
-                        </span>
                       </div>
-                      <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-foreground/85">
-                        {c.body}
-                      </p>
-                    </div>
-                    {canDelete && (
-                      <button
-                        type="button"
-                        onClick={() => removeComment(c.id)}
-                        aria-label="წაშლა"
-                        className="shrink-0 self-start text-muted-foreground/60 transition-colors hover:text-[var(--vivida-pink)]"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </button>
                     )}
                   </li>
                 );
@@ -204,7 +252,8 @@ export function CommentSection({
             </p>
           )}
 
-          <div className="rounded-xl border border-border/60 bg-background/30 p-2.5">
+          {/* Top-level composer */}
+          <div className="rounded-2xl border border-border/60 bg-background/40 p-2.5">
             <textarea
               ref={textareaRef}
               value={body}
@@ -220,25 +269,26 @@ export function CommentSection({
             />
             <div className="mt-1.5 flex items-center justify-between gap-3">
               <span
-                className={`text-[10px] tabular-nums ${
+                className={cn(
+                  "text-[10px] tabular-nums",
                   overflow
                     ? "text-[var(--vivida-pink)]"
                     : "text-muted-foreground/70"
-                }`}
+                )}
               >
                 {remaining}
               </span>
               <div className="flex items-center gap-2">
-                {error && (
+                {error && !replyParentId && (
                   <span className="text-[11px] text-[var(--vivida-pink)]">
                     {error}
                   </span>
                 )}
-                <Button
+                <button
+                  type="button"
                   onClick={submit}
                   disabled={submitDisabled}
-                  variant="mystic"
-                  size="sm"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-3 py-1.5 text-xs font-medium text-background shadow-[0_8px_20px_-8px_oklch(0.72_0.22_350/0.55)] transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
                 >
                   {isPending ? (
                     <Loader2 className="size-3 animate-spin" />
@@ -246,12 +296,228 @@ export function CommentSection({
                     <Send className="size-3" />
                   )}
                   დამატება
-                </Button>
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Single comment row — used for both top-level entries and their
+ *  replies. Reply variant gets a tiny CornerDownRight glyph and a
+ *  smaller avatar so the eye sees "this is nested" before reading. */
+function CommentRow({
+  comment,
+  viewerId,
+  viewerIsAdmin,
+  postAuthorId,
+  isReply,
+  isPending,
+  onDelete,
+  onReply,
+}: {
+  comment: FeedComment;
+  viewerId: string;
+  viewerIsAdmin: boolean;
+  postAuthorId: string;
+  isReply: boolean;
+  isPending: boolean;
+  onDelete: (commentId: string) => void;
+  onReply?: () => void;
+}) {
+  const canDelete =
+    comment.author.id === viewerId ||
+    postAuthorId === viewerId ||
+    viewerIsAdmin;
+  const display =
+    comment.author.displayName ??
+    comment.author.name?.split(" ")[0] ??
+    comment.author.username ??
+    "ვარსკვლავო";
+  const initial = display[0]?.toUpperCase() ?? "?";
+  const profileHref = comment.author.username
+    ? `/u/${comment.author.username}`
+    : null;
+
+  const avatarSize = isReply ? "size-7" : "size-8";
+
+  return (
+    <div className="group flex items-start gap-2.5">
+      {comment.author.image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={comment.author.image}
+          alt=""
+          className={cn(
+            "shrink-0 rounded-full border border-border/80 object-cover",
+            avatarSize
+          )}
+        />
+      ) : (
+        <div
+          className={cn(
+            "grid shrink-0 place-items-center rounded-full border border-border bg-card/60 text-xs text-muted-foreground",
+            avatarSize
+          )}
+        >
+          {initial}
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <div
+          className={cn(
+            "rounded-2xl bg-card/45 px-3 py-2 ring-1 ring-foreground/5",
+            isReply && "bg-card/30"
+          )}
+        >
+          <div className="flex items-baseline gap-2">
+            {isReply && (
+              <CornerDownRight
+                className="size-3 shrink-0 text-muted-foreground/60"
+                aria-hidden
+              />
+            )}
+            {profileHref ? (
+              <Link
+                href={profileHref}
+                className="truncate text-[13px] font-medium text-foreground hover:text-[var(--vivida-violet)]"
+              >
+                {display}
+              </Link>
+            ) : (
+              <span className="truncate text-[13px] font-medium text-foreground">
+                {display}
+              </span>
+            )}
+            <span className="shrink-0 text-[10px] text-muted-foreground">
+              {feedTimeAgo(comment.createdAt)}
+            </span>
+          </div>
+          <p className="mt-0.5 whitespace-pre-wrap break-words text-[14px] leading-relaxed text-foreground/90">
+            {comment.body}
+          </p>
+        </div>
+
+        {/* Sub-actions row — reply + delete. Sits below the body
+            bubble so the bubble itself stays compact. */}
+        {(!isReply || canDelete) && (
+          <div className="mt-1 flex items-center gap-3 pl-2 text-[11px] text-muted-foreground/80">
+            {!isReply && onReply && (
+              <button
+                type="button"
+                onClick={onReply}
+                disabled={isPending}
+                className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+              >
+                <Reply className="size-3" />
+                უპასუხე
+              </button>
+            )}
+            {canDelete && (
+              <button
+                type="button"
+                onClick={() => onDelete(comment.id)}
+                disabled={isPending}
+                aria-label="წაშლა"
+                className="inline-flex items-center gap-1 transition-colors hover:text-[var(--vivida-pink)]"
+              >
+                <Trash2 className="size-3" />
+                წაშლა
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Inline reply composer rendered under the comment being replied to.
+ *  Uses a forwarded ref so the parent can focus the textarea when the
+ *  composer first opens. */
+type ReplyComposerProps = {
+  value: string;
+  onChange: (v: string) => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+  isPending: boolean;
+  error: string | null;
+};
+
+function ReplyComposer({
+  ref,
+  value,
+  onChange,
+  onSubmit,
+  onCancel,
+  isPending,
+  error,
+}: ReplyComposerProps & {
+  ref: React.RefObject<HTMLTextAreaElement | null>;
+}) {
+  const remaining = COMMENT_BODY_MAX - value.length;
+  const overflow = remaining < 0;
+  const disabled = isPending || value.trim().length === 0 || overflow;
+
+  return (
+    <div className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-background/50 p-2.5">
+      <textarea
+        ref={ref}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter") onSubmit();
+          if (e.key === "Escape") onCancel();
+        }}
+        placeholder="დაწერე პასუხი..."
+        rows={2}
+        maxLength={COMMENT_BODY_MAX + 20}
+        className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+        disabled={isPending}
+      />
+      <div className="mt-1.5 flex items-center justify-between gap-3">
+        <span
+          className={cn(
+            "text-[10px] tabular-nums",
+            overflow
+              ? "text-[var(--vivida-pink)]"
+              : "text-muted-foreground/70"
+          )}
+        >
+          {remaining}
+        </span>
+        <div className="flex items-center gap-2">
+          {error && (
+            <span className="text-[11px] text-[var(--vivida-pink)]">
+              {error}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isPending}
+            className="text-[11px] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          >
+            გაუქმება
+          </button>
+          <button
+            type="button"
+            onClick={onSubmit}
+            disabled={disabled}
+            className="inline-flex items-center gap-1.5 rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-3 py-1.5 text-xs font-medium text-background shadow-[0_8px_20px_-8px_oklch(0.72_0.22_350/0.55)] transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+          >
+            {isPending ? (
+              <Loader2 className="size-3 animate-spin" />
+            ) : (
+              <Send className="size-3" />
+            )}
+            პასუხი
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

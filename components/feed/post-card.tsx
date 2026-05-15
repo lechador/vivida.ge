@@ -18,17 +18,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 import { CommentSection } from "./comment-section";
-import { ReactionBar, ReactionSummary } from "./reaction-bar";
+import { ReactionBar } from "./reaction-bar";
 import { TierBadge } from "./tier-badge";
 import { feedTimeAgo } from "./time-ago";
 
 /**
- * One post card. Composed of byline (avatar + name + @handle + tier
- * pill + age), body text, reaction summary preview, reaction bar, and
- * an expandable comment section. The three-dot menu shows delete to
- * owner/admin and edit to the owner within 5 minutes of posting.
+ * One post card. Byline + body + action row. The action row groups
+ * reactions and the comments button on a single horizontal line so the
+ * card doesn't stack into three stripes at the bottom.
+ *
+ * The three-dot menu shows delete to owner/admin and edit to the
+ * owner within the POST_EDIT_WINDOW. Everyone else sees a clean card.
  */
 export function PostCard({
   post,
@@ -98,10 +101,10 @@ export function PostCard({
     <img
       src={post.author.image}
       alt=""
-      className="size-10 shrink-0 rounded-full border border-border/80 object-cover"
+      className="size-11 shrink-0 rounded-full border border-border/80 object-cover"
     />
   ) : (
-    <div className="grid size-10 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-sm text-muted-foreground">
+    <div className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-sm text-muted-foreground">
       {initial}
     </div>
   );
@@ -109,7 +112,7 @@ export function PostCard({
   return (
     <article
       id={`post-${post.id}`}
-      className="rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-5"
+      className="rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:bg-card/75 sm:p-5"
     >
       <header className="flex items-start gap-3">
         {profileHref ? (
@@ -120,38 +123,42 @@ export function PostCard({
           avatar
         )}
         <div className="min-w-0 flex-1">
-          <div className="flex items-baseline flex-wrap gap-x-2 gap-y-1">
+          {/* Single byline row: name + tier chip, then handle + time
+              on a second line. Keeps the tier badge from wrapping
+              awkwardly under longer Georgian display names. */}
+          <div className="flex items-center gap-2">
             {profileHref ? (
               <Link
                 href={profileHref}
-                className="truncate text-sm font-medium text-foreground hover:text-[var(--vivida-violet)]"
+                className="truncate text-[15px] font-semibold text-foreground hover:text-[var(--vivida-violet)]"
               >
                 {display}
               </Link>
             ) : (
-              <span className="truncate text-sm font-medium text-foreground">
+              <span className="truncate text-[15px] font-semibold text-foreground">
                 {display}
               </span>
             )}
+            <TierBadge total={post.authorReputation} variant="byline" />
+          </div>
+          <div className="mt-0.5 flex flex-wrap items-baseline gap-x-1.5 text-[11px] text-muted-foreground/85">
             {post.author.username && (
               <Link
                 href={`/u/${post.author.username}`}
-                className="truncate text-xs text-muted-foreground hover:text-foreground"
+                className="truncate hover:text-foreground"
               >
                 @{post.author.username}
               </Link>
             )}
-            <TierBadge total={post.authorReputation} variant="byline" />
-          </div>
-          <p className="text-[11px] text-muted-foreground/80">
-            {feedTimeAgo(post.createdAt)}
+            {post.author.username && <span>·</span>}
+            <span>{feedTimeAgo(post.createdAt)}</span>
             {post.edited && (
               <>
-                {" "}
-                · <span className="italic">რედაქტირებული</span>
+                <span>·</span>
+                <span className="italic">რედაქტირებული</span>
               </>
             )}
-          </p>
+          </div>
         </div>
         {(canDelete || withinEditWindow) && (
           <DropdownMenu>
@@ -211,11 +218,12 @@ export function PostCard({
           />
           <div className="mt-2 flex items-center justify-between gap-2">
             <span
-              className={`text-xs tabular-nums ${
+              className={cn(
+                "text-xs tabular-nums",
                 draft.length > POST_BODY_MAX
                   ? "text-[var(--vivida-pink)]"
                   : "text-muted-foreground/70"
-              }`}
+              )}
             >
               {POST_BODY_MAX - draft.length}
             </span>
@@ -252,21 +260,22 @@ export function PostCard({
           </div>
         </div>
       ) : (
-        <p className="mt-3 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-foreground/90">
+        <p className="mt-3 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-foreground/95">
           {post.body}
         </p>
       )}
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <ReactionSummary counts={post.reactions} />
-      </div>
-
-      <div className="mt-3 flex flex-wrap items-center gap-3">
+      {/* Action row — reactions + comments on one line. Thin top
+          border separates the body from interactions without adding
+          visual weight. */}
+      <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/40 pt-3">
         <ReactionBar
           postId={post.id}
           initialCounts={post.reactions}
           initialMine={post.myReaction}
         />
+      </div>
+      <div className="mt-2">
         <CommentSection
           postId={post.id}
           initialCount={post.commentCount}

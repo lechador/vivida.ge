@@ -60,6 +60,8 @@ export type FeedPost = {
 export type FeedComment = {
   id: string;
   postId: string;
+  /** Parent comment id when this row is a reply, null for top-level. */
+  parentId: string | null;
   body: string;
   createdAt: Date;
   author: FeedAuthor;
@@ -223,14 +225,24 @@ function sunSignFromDob(dob: string | null | undefined): number | null {
   return ((month + 9) % 12);
 }
 
-/** Comments for one post, oldest first. Always returned in full — we
- *  don't paginate comments in v1 since the cap stays small per post. */
+/**
+ * Comments for one post, returned in tree-render order:
+ *   top-level (oldest first)
+ *     → its replies (oldest first)
+ *   next top-level
+ *     → its replies
+ *
+ * The client can render the list as-is using the `parentId` flag for
+ * indent. No tree state needed on the server side beyond the ordering
+ * — much simpler than nesting in JSON.
+ */
 export async function listComments(postId: string): Promise<FeedComment[]> {
   await requireUser();
   const rows = await db
     .select({
       id: postComments.id,
       postId: postComments.postId,
+      parentId: postComments.parentId,
       body: postComments.body,
       createdAt: postComments.createdAt,
       authorId: users.id,
@@ -245,9 +257,10 @@ export async function listComments(postId: string): Promise<FeedComment[]> {
     .where(eq(postComments.postId, postId))
     .orderBy(postComments.createdAt);
 
-  return rows.map((r) => ({
+  const toView = (r: (typeof rows)[number]): FeedComment => ({
     id: r.id,
     postId: r.postId,
+    parentId: r.parentId,
     body: r.body,
     createdAt: r.createdAt,
     author: {
@@ -257,7 +270,40 @@ export async function listComments(postId: string): Promise<FeedComment[]> {
       username: r.authorUsername,
       displayName: r.authorDisplayName,
     },
-  }));
+  });
+
+  // Two-pass tree ordering: build a parent→children map, then walk
+  // top-level rows in order and inline their children. Avoids needing
+  // a recursive CTE for the simple one-level nesting we allow.
+  const childrenByParent = new Map<string, FeedComment[]>();
+  const topLevel: FeedComment[] = [];
+  for (const r of rows) {
+    const view = toView(r);
+    if (view.parentId) {
+      const list = childrenByParent.get(view.parentId) ?? [];
+      list.push(view);
+      childrenByParent.set(view.parentId, list);
+    } else {
+      topLevel.push(view);
+    }
+  }
+
+  const ordered: FeedComment[] = [];
+  for (const parent of topLevel) {
+    ordered.push(parent);
+    const children = childrenByParent.get(parent.id);
+    if (children) ordered.push(...children);
+  }
+  // Edge case: a parent comment was deleted but a stale reply slipped
+  // through (shouldn't happen thanks to ON DELETE CASCADE, but be
+  // defensive). Append orphaned replies at the end so they don't
+  // disappear silently.
+  for (const [parentId, children] of childrenByParent) {
+    if (!topLevel.some((t) => t.id === parentId)) {
+      ordered.push(...children);
+    }
+  }
+  return ordered;
 }
 
 /** Create a post. Caps at POST_BODY_MAX characters and throttles per
@@ -389,11 +435,19 @@ export async function deletePost(postId: string): Promise<FeedActionResult> {
   return { ok: true };
 }
 
-/** Add a comment to a post. Notifies the post author (skipped when
- *  commenting on your own post) via the in-app notification stream. */
+/**
+ * Add a comment (or reply) to a post.
+ *
+ * When `parentCommentId` is provided the row is a reply to that
+ * comment, and the notification + reputation credit go to that
+ * comment's author instead of the post author. Replies-to-replies are
+ * rejected (one-level nesting cap) so threads never devolve into
+ * unreadable deep chains.
+ */
 export async function addComment(
   postId: string,
-  rawBody: string
+  rawBody: string,
+  parentCommentId: string | null = null
 ): Promise<FeedActionResult<{ commentId: string }>> {
   const user = await requireUser();
   const body = rawBody.trim();
@@ -412,6 +466,33 @@ export async function addComment(
     .limit(1);
   if (!post) return { ok: false, error: "პოსტი ვერ მოიძებნა" };
 
+  // Validate parent if this is a reply. Must belong to the same post,
+  // must itself be top-level (no replies-to-replies).
+  let parent: { id: string; userId: string; parentId: string | null } | null =
+    null;
+  if (parentCommentId) {
+    const [row] = await db
+      .select({
+        id: postComments.id,
+        userId: postComments.userId,
+        parentId: postComments.parentId,
+        postId: postComments.postId,
+      })
+      .from(postComments)
+      .where(eq(postComments.id, parentCommentId))
+      .limit(1);
+    if (!row || row.postId !== postId) {
+      return { ok: false, error: "კომენტარი ვერ მოიძებნა" };
+    }
+    if (row.parentId) {
+      return {
+        ok: false,
+        error: "პასუხების პასუხი ჯერ არ შეიძლება — უპასუხე ძირითად კომენტარს.",
+      };
+    }
+    parent = { id: row.id, userId: row.userId, parentId: row.parentId };
+  }
+
   const cutoff = new Date(Date.now() - COMMENT_THROTTLE_MS);
   const [recent] = await db
     .select({ id: postComments.id })
@@ -429,12 +510,20 @@ export async function addComment(
 
   const [inserted] = await db
     .insert(postComments)
-    .values({ postId, userId: user.id, body })
+    .values({
+      postId,
+      userId: user.id,
+      body,
+      parentId: parent?.id ?? null,
+    })
     .returning({ id: postComments.id });
 
-  // Notify the post author. Skip self-comments — getting a notification
-  // every time you reply on your own post is noise.
-  if (post.userId !== user.id) {
+  // Pick the notification recipient: reply → parent comment author;
+  // top-level comment → post author. Same self-skip rule for both so
+  // commenting on your own post / replying to your own comment stays
+  // silent.
+  const recipientId = parent ? parent.userId : post.userId;
+  if (recipientId !== user.id) {
     const [actor] = await db
       .select({
         name: users.name,
@@ -455,28 +544,30 @@ export async function addComment(
       preview: body.slice(0, 120),
     };
     await db.insert(notifications).values({
-      userId: post.userId,
+      userId: recipientId,
       kind: "post_comment",
       payload,
     });
-    invalidateHeaderForUser(post.userId);
+    invalidateHeaderForUser(recipientId);
   }
 
-  // Reputation — commenter for the act, post author for receiving a
-  // comment (skip when commenting on your own post).
+  // Reputation — commenter always earns; the comment "received" credit
+  // goes to whoever the reply is aimed at (parent author for replies,
+  // post author for top-level comments). Subject = commentId so the
+  // dedupe index makes each event fire at most once.
   if (inserted) {
     const commentId = inserted.id;
     const commenterId = user.id;
-    const postAuthorId = post.userId;
+    const repRecipientId = recipientId;
     after(async () => {
       await awardReputation({
         userId: commenterId,
         kind: "comment_created",
         subjectId: RepSubject.comment(commentId),
       });
-      if (postAuthorId !== commenterId) {
+      if (repRecipientId !== commenterId) {
         await awardReputation({
-          userId: postAuthorId,
+          userId: repRecipientId,
           kind: "comment_received",
           subjectId: RepSubject.commentReceived(commentId),
         });

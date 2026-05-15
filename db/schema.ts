@@ -12,6 +12,7 @@ import {
   index,
   uniqueIndex,
   pgEnum,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import type { AdapterAccountType } from "next-auth/adapters";
@@ -734,6 +735,13 @@ export const postComments = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    /** Self-FK for one-level reply threading. Null = top-level comment;
+     *  non-null = reply to that comment. Replies of replies are
+     *  rejected at the action layer (keeps UI nesting bounded). Cascade
+     *  on delete so removing a parent cleans up its reply subtree. */
+    parentId: text("parent_id").references((): AnyPgColumn => postComments.id, {
+      onDelete: "cascade",
+    }),
     body: text("body").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
@@ -742,6 +750,9 @@ export const postComments = pgTable(
   (t) => [
     // Loading comments for a single post — always sorted oldest first.
     index("post_comment_post_idx").on(t.postId, t.createdAt),
+    // Fetching all replies under one parent (used when expanding a
+    // long thread or counting reply depth in the future).
+    index("post_comment_parent_idx").on(t.parentId),
   ]
 );
 
