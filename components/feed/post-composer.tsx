@@ -53,7 +53,7 @@ export function PostComposer({
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-5">
+    <div className="rounded-2xl border border-foreground/12 bg-[oklch(0.23_0.04_285/0.88)] p-4 shadow-[0_16px_40px_-24px_oklch(0.05_0.05_280/0.85)] ring-1 ring-inset ring-foreground/5 backdrop-blur-xl sm:p-5">
       <div className="flex gap-3">
         {authorImage ? (
           // eslint-disable-next-line @next/next/no-img-element

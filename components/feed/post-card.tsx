@@ -128,7 +128,7 @@ export function PostCard({
   return (
     <article
       id={`post-${post.id}`}
-      className="rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:bg-card/75 sm:p-5"
+      className="rounded-2xl border border-foreground/12 bg-[oklch(0.23_0.04_285/0.88)] p-4 shadow-[0_16px_40px_-24px_oklch(0.05_0.05_280/0.85)] ring-1 ring-inset ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-[oklch(0.25_0.04_285/0.92)] sm:p-5"
     >
       <header className="flex items-start gap-3">
         {profileHref ? (
