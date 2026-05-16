@@ -198,8 +198,8 @@ export default async function PublicProfilePage({
             aria-hidden
             className="absolute -right-20 -top-20 size-72 rounded-full bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-25 blur-3xl"
           />
-          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
-            <div className="relative mx-auto w-full max-w-[260px] shrink-0 sm:mx-0 sm:max-w-none sm:w-72">
+          <div className="relative grid gap-6 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-8">
+            <div className="relative mx-auto w-full max-w-[260px] sm:mx-0 sm:w-64">
               {photos.length > 0 ? (
                 <PhotoCarousel photos={photos} />
               ) : owner.image ? (
@@ -211,45 +211,85 @@ export default async function PublicProfilePage({
                   <Image
                     src={owner.image}
                     alt=""
-                    width={144}
-                    height={144}
-                    className="relative mx-auto size-32 rounded-full border-2 border-background object-cover sm:size-36"
+                    width={160}
+                    height={160}
+                    className="relative mx-auto size-32 rounded-full border-2 border-background object-cover sm:size-40"
                   />
                 </div>
               ) : null}
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                @{profile.username}
+
+            <div className="min-w-0">
+              {/* Identity row: @handle + actions on the same line so the
+                  name underneath gets the full width and never wraps awkwardly. */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  @{profile.username}
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  {isOwner ? (
+                    <Button asChild variant="outline" size="sm">
+                      <Link href="/account">
+                        <Pencil className="size-4" />
+                        რედაქტირება
+                      </Link>
+                    </Button>
+                  ) : viewerId ? (
+                    <>
+                      {friendshipStatus === "friends" && (
+                        <MessageButton partnerId={owner.id} />
+                      )}
+                      <FriendButton
+                        targetUserId={owner.id}
+                        targetUsername={profile.username}
+                        initialStatus={friendshipStatus}
+                      />
+                    </>
+                  ) : (
+                    <Button asChild variant="mystic" size="sm">
+                      <Link href="/signup">
+                        <Sparkles className="size-4" />
+                        შემოდი
+                      </Link>
+                    </Button>
+                  )}
+                </div>
               </div>
-              <h1 className="mt-1 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                {displayName}
-                {age != null && (
-                  <span className="font-normal text-foreground/70">
-                    , {age}
-                  </span>
-                )}
-              </h1>
+
+              <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                  {displayName}
+                  {age != null && (
+                    <span className="ml-1 font-normal text-foreground/70">
+                      , {age}
+                    </span>
+                  )}
+                </h1>
+                <TierBadge total={ownerReputation} variant="byline" />
+              </div>
+
               {profile.bio && (
                 <p className="mt-2 max-w-md text-pretty text-sm text-foreground/85">
                   {profile.bio}
                 </p>
               )}
+
               <ProfileStats
                 friends={ownerFriendsCount}
                 posts={ownerPostsCount}
                 reputation={ownerReputation}
               />
+
               {mutualCount > 0 && (
-                <MutualFriendsPill
-                  count={mutualCount}
-                  preview={mutualPreview}
-                />
+                <div className="mt-3">
+                  <MutualFriendsPill
+                    count={mutualCount}
+                    preview={mutualPreview}
+                  />
+                </div>
               )}
-              <div className="mt-4">
-                <TierBadge total={ownerReputation} variant="profile" />
-              </div>
-              <div className="mt-4 flex flex-wrap items-center gap-3">
+
+              <div className="mt-5 flex flex-wrap items-center gap-2">
                 {sun && (
                   <Pill
                     label="მზე"
@@ -283,34 +323,6 @@ export default async function PublicProfilePage({
                   />
                 )}
               </div>
-            </div>
-            <div className="flex shrink-0 flex-col items-stretch gap-2 sm:flex-row sm:items-start">
-              {isOwner ? (
-                <Button asChild variant="outline">
-                  <Link href="/account">
-                    <Pencil className="size-4" />
-                    რედაქტირება
-                  </Link>
-                </Button>
-              ) : viewerId ? (
-                <>
-                  {friendshipStatus === "friends" && (
-                    <MessageButton partnerId={owner.id} />
-                  )}
-                  <FriendButton
-                    targetUserId={owner.id}
-                    targetUsername={profile.username}
-                    initialStatus={friendshipStatus}
-                  />
-                </>
-              ) : (
-                <Button asChild variant="mystic">
-                  <Link href="/signup">
-                    <Sparkles className="size-4" />
-                    შემოდი თავსებადობისთვის
-                  </Link>
-                </Button>
-              )}
             </div>
           </div>
         </article>
@@ -431,12 +443,12 @@ function Pill({
   accent: string;
 }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/60 px-3 py-1 text-sm">
-      <span className="text-base" style={{ color: accent }}>
+    <div className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/40 px-2.5 py-1 text-xs">
+      <span className="text-sm leading-none" style={{ color: accent }}>
         {glyph}
       </span>
       <span className="text-foreground">{value}</span>
-      <span className="text-xs uppercase tracking-wider text-muted-foreground">
+      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
     </div>
@@ -444,10 +456,11 @@ function Pill({
 }
 
 /**
- * Small profile stat block: friends count, posts count, and reputation
- * total. Sits under the bio. Numbers are plain text — clickable when
- * useful (e.g. friends → /friends for the owner; future: /u/<username>/
- * friends for visitors).
+ * Three-cell stat row (friends · posts · reputation). Numbers are
+ * the headline — stacked above the label like Instagram / Threads —
+ * with thin dividers between cells so the row reads as a single unit
+ * rather than three loose words. Sits between the bio and the social
+ * pills.
  */
 function ProfileStats({
   friends,
@@ -459,7 +472,7 @@ function ProfileStats({
   reputation: number;
 }) {
   return (
-    <dl className="mt-4 flex flex-wrap items-baseline gap-x-5 gap-y-2 text-sm">
+    <dl className="mt-5 inline-flex items-stretch divide-x divide-border/60 rounded-2xl border border-border/60 bg-card/35 px-1 backdrop-blur-xl">
       <Stat label="მეგობრები" value={friends} />
       <Stat label="პოსტი" value={posts} />
       <Stat label="რეპუტაცია" value={reputation} />
@@ -469,13 +482,13 @@ function ProfileStats({
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="inline-flex items-baseline gap-1.5">
-      <dt className="text-xs uppercase tracking-wider text-muted-foreground">
-        {label}
-      </dt>
-      <dd className="font-semibold tabular-nums text-foreground">
+    <div className="flex min-w-[68px] flex-col items-center gap-0.5 px-3 py-2 sm:min-w-[88px] sm:px-4">
+      <dd className="text-base font-semibold tabular-nums leading-none text-foreground sm:text-lg">
         {Intl.NumberFormat("ka-GE").format(value)}
       </dd>
+      <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        {label}
+      </dt>
     </div>
   );
 }
