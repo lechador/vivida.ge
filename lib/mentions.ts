@@ -3,35 +3,9 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles, users } from "@/db/schema";
 
-/**
- * Username rules — must match the validation used when creating a
- * profile (see actions/profile.ts). Lowercase letters/digits/_-, length
- * 3..24. Anchored so partial matches inside longer @runs (like an email
- * address) don't trigger a false mention.
- */
-const USERNAME_TOKEN = /(?:^|[^a-zA-Z0-9_@])@([a-z0-9_-]{3,24})/g;
+import { extractMentionTokens } from "./mentions-parse";
 
-/**
- * Extract the candidate @handles from a piece of body text. Returns
- * lowercased, deduped strings — order is preserved (first occurrence
- * wins) so the order matches how a reader would scan them.
- *
- * NOT a DB lookup — this only validates the syntactic shape. A token
- * may still resolve to no actual user; callers should run
- * `resolveMentions` to filter to real profiles before notifying.
- */
-export function extractMentionTokens(body: string): string[] {
-  if (!body) return [];
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const m of body.matchAll(USERNAME_TOKEN)) {
-    const handle = m[1]?.toLowerCase();
-    if (!handle || seen.has(handle)) continue;
-    seen.add(handle);
-    out.push(handle);
-  }
-  return out;
-}
+export { extractMentionTokens };
 
 export type ResolvedMention = {
   userId: string;

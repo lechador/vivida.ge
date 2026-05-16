@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
 
-import { extractMentionTokens } from "@/lib/mentions";
+import { extractMentionTokens } from "@/lib/mentions-parse";
 
 /**
  * Renders post / comment bodies with `@username` segments turned into
