@@ -338,10 +338,6 @@ export default async function PublicProfilePage({
                 {viewerName} <span className="text-muted-foreground">×</span>{" "}
                 {displayName}
               </h2>
-              <CompatibilityHero
-                overall={synastry.overall}
-                verdict={overallVerdict(synastry.overall)}
-              />
             </header>
             <SynastryDisplayLazy
               result={synastry}
@@ -543,51 +539,3 @@ function MutualFriendsPill({
   );
 }
 
-/**
- * Compatibility headline shown above the full SynastryDisplay — gives
- * a "TL;DR" the visitor can grok in a glance. Color shifts with the
- * verdict tier so a 90%+ match feels visibly different from a 45% one.
- */
-function CompatibilityHero({
-  overall,
-  verdict,
-}: {
-  overall: number;
-  verdict: string;
-}) {
-  const pct = Math.round(overall);
-  // Three colour bands matching the synastry's "verdict thresholds":
-  // strong (~70+) glows violet, moderate cyan-ish, low muted.
-  const band =
-    pct >= 70
-      ? "oklch(0.78 0.20 305)"
-      : pct >= 50
-        ? "oklch(0.78 0.16 220)"
-        : "oklch(0.68 0.10 280)";
-  return (
-    <div
-      className="mt-4 flex items-center gap-3 rounded-2xl border bg-card/40 px-4 py-3 ring-1 ring-foreground/5 backdrop-blur-xl"
-      style={{
-        borderColor: `color-mix(in oklch, ${band} 30%, transparent)`,
-      }}
-    >
-      <div
-        className="grid size-14 shrink-0 place-items-center rounded-full text-base font-semibold tabular-nums"
-        style={{
-          backgroundColor: `color-mix(in oklch, ${band} 18%, transparent)`,
-          color: band,
-        }}
-      >
-        {pct}%
-      </div>
-      <div className="min-w-0">
-        <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          საერთო შეფასება
-        </div>
-        <div className="text-balance text-sm font-medium text-foreground">
-          {verdict}
-        </div>
-      </div>
-    </div>
-  );
-}
