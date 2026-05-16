@@ -153,7 +153,7 @@ export function SuggestedPeopleRail({
     <section>
       <div className="mb-2 flex justify-end">
         <Link
-          href="/discover"
+          href="/people"
           className="text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           ყველა →
