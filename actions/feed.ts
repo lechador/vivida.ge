@@ -19,6 +19,7 @@ import {
 import { requireUser } from "@/lib/auth-helpers";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
+import { resolveMentions } from "@/lib/mentions";
 import {
   awardReputation,
   revokeReputationForSubjects,
@@ -65,6 +66,67 @@ async function loadProfilePhotos(
  *  and casual spam without blocking honest power-users. */
 const POST_THROTTLE_MS = 20_000;
 const COMMENT_THROTTLE_MS = 5_000;
+
+/**
+ * Fan out `mention` notifications for a post or comment. Resolves the
+ * @handles in `body` against real profiles, skips anyone in
+ * `excludeUserIds` (always includes the actor + any user already
+ * getting a `post_comment` / `post_reaction` notification from the
+ * same write — so a comment that pings the post author doesn't
+ * double-notify).
+ *
+ * Best-effort: caller fires-and-forgets inside `after()`. Errors are
+ * caught and logged so a flaky DB write can't break the write that
+ * already succeeded.
+ */
+async function notifyMentions(opts: {
+  body: string;
+  actorId: string;
+  postId: string;
+  context: "post" | "comment";
+  excludeUserIds: string[];
+}): Promise<void> {
+  try {
+    const targets = await resolveMentions(opts.body, {
+      excludeUserIds: [opts.actorId, ...opts.excludeUserIds],
+    });
+    if (targets.length === 0) return;
+
+    const [actor] = await db
+      .select({
+        name: users.name,
+        image: users.image,
+        displayName: profiles.displayName,
+        username: profiles.username,
+      })
+      .from(users)
+      .leftJoin(profiles, eq(profiles.userId, users.id))
+      .where(eq(users.id, opts.actorId))
+      .limit(1);
+
+    const preview = opts.body.slice(0, 120);
+    const rows = targets.map((t) => ({
+      userId: t.userId,
+      kind: "mention" as const,
+      payload: {
+        fromUserId: opts.actorId,
+        fromUsername: actor?.username ?? null,
+        fromName: actor?.displayName ?? actor?.name ?? null,
+        fromImage: actor?.image ?? null,
+        postId: opts.postId,
+        preview,
+        mentionContext: opts.context,
+      } satisfies NotificationPayload,
+    }));
+    await db.insert(notifications).values(rows);
+    for (const t of targets) invalidateHeaderForUser(t.userId);
+  } catch (err) {
+    console.warn(
+      "[feed.notifyMentions] failed:",
+      (err as Error).message
+    );
+  }
+}
 
 export type FeedAuthor = {
   id: string;
@@ -217,6 +279,118 @@ export async function listFeed(opts: {
       name: r.authorName,
       // Prefer the user's chosen main photo; fall back to the OAuth
       // avatar only when they haven't uploaded one yet.
+      image: photos.get(r.authorId) ?? r.authorImage,
+      username: r.authorUsername,
+      displayName: r.authorDisplayName,
+    },
+    authorSunSign: sunSignFromDob(r.authorDob),
+    authorReputation: reputations.get(r.authorId) ?? 0,
+    reactions: countMap.get(r.id) ?? { ...ZERO_COUNTS },
+    myReaction: mineMap.get(r.id) ?? null,
+    commentCount: commentMap.get(r.id) ?? 0,
+  }));
+}
+
+/**
+ * Total posts ever authored by a user. Used on the public profile
+ * stats row. Indexed by `post_user_idx`, so this is a cheap lookup
+ * even on large feeds.
+ */
+export async function countPostsByUser(userId: string): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(posts)
+    .where(eq(posts.userId, userId));
+  return Number(row?.value ?? 0);
+}
+
+/**
+ * The most recent N posts by a single user, in the same shape `listFeed`
+ * returns so the existing PostCard / FeedList can render them as-is.
+ * Used by the "recent activity" section on the public profile.
+ */
+export async function listRecentPostsByUser(
+  userId: string,
+  limit = 5
+): Promise<FeedPost[]> {
+  const viewer = await requireUser();
+  const rows = await db
+    .select({
+      id: posts.id,
+      body: posts.body,
+      edited: posts.edited,
+      createdAt: posts.createdAt,
+      authorId: users.id,
+      authorName: users.name,
+      authorImage: users.image,
+      authorUsername: profiles.username,
+      authorDisplayName: profiles.displayName,
+      authorDob: profiles.dateOfBirth,
+    })
+    .from(posts)
+    .innerJoin(users, eq(users.id, posts.userId))
+    .leftJoin(profiles, eq(profiles.userId, posts.userId))
+    .where(eq(posts.userId, userId))
+    .orderBy(desc(posts.createdAt))
+    .limit(Math.min(Math.max(limit, 1), 20));
+
+  if (rows.length === 0) return [];
+
+  const postIds = rows.map((r) => r.id);
+  const { getReputationFor } = await import("@/lib/reputation");
+  const [counts, mine, comments, reputations, photos] = await Promise.all([
+    db
+      .select({
+        postId: postReactions.postId,
+        kind: postReactions.kind,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(postReactions)
+      .where(inArray(postReactions.postId, postIds))
+      .groupBy(postReactions.postId, postReactions.kind),
+    db
+      .select({
+        postId: postReactions.postId,
+        kind: postReactions.kind,
+      })
+      .from(postReactions)
+      .where(
+        and(
+          inArray(postReactions.postId, postIds),
+          eq(postReactions.userId, viewer.id)
+        )
+      ),
+    db
+      .select({
+        postId: postComments.postId,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(postComments)
+      .where(inArray(postComments.postId, postIds))
+      .groupBy(postComments.postId),
+    getReputationFor([userId]),
+    loadProfilePhotos([userId]),
+  ]);
+
+  const countMap = new Map<string, FeedReactionCounts>();
+  for (const id of postIds) countMap.set(id, { ...ZERO_COUNTS });
+  for (const row of counts) {
+    const bucket = countMap.get(row.postId);
+    if (bucket) bucket[row.kind] = Number(row.count);
+  }
+  const mineMap = new Map<string, PostReactionKind>();
+  for (const row of mine) mineMap.set(row.postId, row.kind);
+  const commentMap = new Map<string, number>();
+  for (const row of comments) commentMap.set(row.postId, Number(row.count));
+
+  return rows.map((r) => ({
+    id: r.id,
+    body: r.body,
+    edited: r.edited,
+    createdAt: r.createdAt,
+    author: {
+      id: r.authorId,
+      name: r.authorName,
       image: photos.get(r.authorId) ?? r.authorImage,
       username: r.authorUsername,
       displayName: r.authorDisplayName,
@@ -383,8 +557,9 @@ export async function createPost(rawBody: string): Promise<FeedActionResult> {
     .values({ userId: user.id, body })
     .returning({ id: posts.id });
 
-  // Reputation — happens after the response returns so the create call
-  // stays snappy. First-post is a one-shot, post_created is daily-capped.
+  // Reputation + mention notifications — happen after the response
+  // returns so the create call stays snappy. First-post is a one-shot,
+  // post_created is daily-capped. Mention fan-out is best-effort.
   if (inserted) {
     const postId = inserted.id;
     const userId = user.id;
@@ -407,6 +582,13 @@ export async function createPost(rawBody: string): Promise<FeedActionResult> {
           subjectId: RepSubject.oneShot(userId),
         });
       }
+      await notifyMentions({
+        body,
+        actorId: userId,
+        postId,
+        context: "post",
+        excludeUserIds: [],
+      });
     });
   }
   revalidatePath("/feed");
@@ -670,6 +852,16 @@ export async function addComment(
           subjectId: RepSubject.commentReceived(commentId),
         });
       }
+      // Mention notifications. Skip the recipient who already gets a
+      // `post_comment` notification from this same write — they don't
+      // need a second ping for being mentioned in the comment.
+      await notifyMentions({
+        body,
+        actorId: commenterId,
+        postId,
+        context: "comment",
+        excludeUserIds: repRecipientId !== commenterId ? [repRecipientId] : [],
+      });
     });
   }
 

@@ -313,6 +313,7 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "friend_accepted",
   "post_comment",
   "post_reaction",
+  "mention",
 ]);
 
 /**
@@ -332,6 +333,9 @@ export type NotificationPayload = {
   preview?: string;
   /** Reaction kind for `post_reaction` notifications — drives the icon. */
   reaction?: "like" | "dislike" | "funny" | "sad";
+  /** "post" | "comment" — only set on `mention` kind so the row can show
+   *  "მოგიხსენიეს კომენტარში" vs. "მოგიხსენიეს პოსტში". */
+  mentionContext?: "post" | "comment";
 };
 
 export const notifications = pgTable("notification", {

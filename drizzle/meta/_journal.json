@@ -155,6 +155,13 @@
       "when": 1778868148821,
       "tag": "0021_famous_leech",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1778960751878,
+      "tag": "0022_superb_shriek",
+      "breakpoints": true
     }
   ]
 }

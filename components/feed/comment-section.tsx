@@ -26,6 +26,8 @@ import {
 import { COMMENT_BODY_MAX } from "@/lib/feed-config";
 import { cn } from "@/lib/utils";
 
+import { MentionInput } from "./mention-input";
+import { MentionText } from "./mention-text";
 import { feedTimeAgo } from "./time-ago";
 
 /**
@@ -240,10 +242,10 @@ export function CommentSection({
 
           {/* Top-level composer */}
           <div className="rounded-2xl border border-border/60 bg-background/40 p-2.5">
-            <textarea
-              ref={textareaRef}
+            <MentionInput
+              textareaRef={textareaRef}
               value={body}
-              onChange={(e) => setBody(e.target.value)}
+              onChange={setBody}
               onKeyDown={(e) => {
                 if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit();
               }}
@@ -382,7 +384,7 @@ function CommentRow({
             </span>
           </div>
           <p className="mt-0.5 whitespace-pre-wrap break-words text-[14px] leading-relaxed text-foreground/90">
-            {comment.body}
+            <MentionText body={comment.body} />
           </p>
         </div>
 
@@ -449,10 +451,10 @@ function ReplyComposer({
 
   return (
     <div className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-background/50 p-2.5">
-      <textarea
-        ref={ref}
+      <MentionInput
+        textareaRef={ref}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange}
         onKeyDown={(e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "Enter") onSubmit();
           if (e.key === "Escape") onCancel();

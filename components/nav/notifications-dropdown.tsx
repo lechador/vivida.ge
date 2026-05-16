@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
+  AtSign,
   Bell,
   MessageCircle,
   MessageSquare,
@@ -26,6 +27,7 @@ const KIND_ICON: Record<string, LucideIcon> = {
   friend_accepted: Sparkles,
   post_comment: MessageSquare,
   post_reaction: Sparkles,
+  mention: AtSign,
 };
 
 const REACTION_LABEL_KA: Record<string, string> = {
@@ -48,6 +50,10 @@ function notificationLabel(kind: string, payload: Notification["payload"]): stri
       return "დააკომენტარა შენი პოსტი";
     case "post_reaction":
       return "გამოეხმაურა შენს პოსტს";
+    case "mention":
+      return payload?.mentionContext === "comment"
+        ? "მოგიხსენიეს კომენტარში"
+        : "მოგიხსენიეს პოსტში";
     default:
       return "";
   }

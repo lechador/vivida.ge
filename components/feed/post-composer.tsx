@@ -8,6 +8,8 @@ import { createPost } from "@/actions/feed";
 import { POST_BODY_MAX } from "@/lib/feed-config";
 import { Button } from "@/components/ui/button";
 
+import { MentionInput } from "./mention-input";
+
 /** Single static composer placeholder. Less cute than the rotating
  *  prompts, more consistent — users now read the same opener every
  *  visit so it stops being a moving target. */
@@ -66,9 +68,9 @@ export function PostComposer({
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <textarea
+          <MentionInput
             value={body}
-            onChange={(e) => setBody(e.target.value)}
+            onChange={setBody}
             onKeyDown={(e) => {
               if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit();
             }}

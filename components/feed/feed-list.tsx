@@ -23,6 +23,7 @@ export function FeedList({
   viewerId,
   viewerIsAdmin,
   viewerSunSign,
+  disablePagination = false,
 }: {
   initial: FeedPost[];
   viewerId: string;
@@ -30,9 +31,15 @@ export function FeedList({
   /** Null when the viewer hasn't entered a birth date. The "ჩემი ნიშნით"
    *  filter is disabled in that case. */
   viewerSunSign: number | null;
+  /** When true, hide the sign filter chips and the "load more" button.
+   *  Used on the profile page where we render a fixed-size "recent posts"
+   *  preview rather than the full paginated feed. */
+  disablePagination?: boolean;
 }) {
   const [posts, setPosts] = useState<FeedPost[]>(initial);
-  const [hasMore, setHasMore] = useState(initial.length >= PAGE_SIZE);
+  const [hasMore, setHasMore] = useState(
+    !disablePagination && initial.length >= PAGE_SIZE
+  );
   const [isPending, startTransition] = useTransition();
   const [filter, setFilter] = useState<"all" | "sign">("all");
 
@@ -41,8 +48,8 @@ export function FeedList({
   // list silently lags the server state.
   useEffect(() => {
     setPosts(initial);
-    setHasMore(initial.length >= PAGE_SIZE);
-  }, [initial]);
+    setHasMore(!disablePagination && initial.length >= PAGE_SIZE);
+  }, [initial, disablePagination]);
 
   const visible = useMemo(() => {
     if (filter === "all" || viewerSunSign === null) return posts;
@@ -64,7 +71,7 @@ export function FeedList({
 
   return (
     <>
-      {viewerSunSign !== null && (
+      {viewerSunSign !== null && !disablePagination && (
         <div className="mb-4 flex items-center gap-1.5">
           <FilterChip
             active={filter === "all"}

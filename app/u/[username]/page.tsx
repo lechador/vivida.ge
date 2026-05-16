@@ -2,17 +2,27 @@ import { and, asc as orderAsc, eq } from "drizzle-orm";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Pencil, Sparkles } from "lucide-react";
+import { Pencil, Sparkles, Users } from "lucide-react";
 
 import { db } from "@/db";
 import { profiles, profilePhotos, users } from "@/db/schema";
 import { auth } from "@/auth";
 import { ensureChartFor } from "@/actions/chart";
+import {
+  countPostsByUser,
+  listRecentPostsByUser,
+} from "@/actions/feed";
 import { getCurrentPlan } from "@/lib/plan";
+import { isAdminEmail } from "@/lib/admin-auth";
 import { computeElementBalance } from "@/lib/elements";
 import { computeSynastry, overallVerdict } from "@/lib/synastry";
 import { signByIndex } from "@/lib/zodiac";
-import { getFriendshipStatus } from "@/lib/friendship";
+import {
+  countFriends,
+  countMutualFriends,
+  getFriendshipStatus,
+  listMutualFriendsPreview,
+} from "@/lib/friendship";
 import { ageFromDob } from "@/lib/profile-utils";
 import { getReputation } from "@/lib/reputation";
 import { Button } from "@/components/ui/button";
@@ -22,6 +32,7 @@ import { FriendButton } from "@/components/profile/friend-button";
 import { MessageButton } from "@/components/chat/message-button";
 import { PhotoCarousel } from "@/components/profile/photo-carousel";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
+import { FeedList } from "@/components/feed/feed-list";
 import { TierBadge } from "@/components/feed/tier-badge";
 
 const ELEMENT_GLYPH: Record<string, string> = {
@@ -91,13 +102,21 @@ export default async function PublicProfilePage({
 
   const ownerPlan = await getCurrentPlan(owner.id);
   const ownerChart = await ensureChartFor(owner.id, ownerPlan);
-  const ownerReputation = await getReputation(owner.id);
 
   // Viewer (may be anonymous, may be the owner, may be a logged-in stranger)
   const session = await auth();
   const viewerId = session?.user?.id ?? null;
   const viewerPlan = viewerId ? await getCurrentPlan(viewerId) : "free";
   const isOwner = viewerId === owner.id;
+  const viewerIsAdmin = viewerId ? isAdminEmail(session?.user?.email) : false;
+
+  // Profile stats — friends + posts always public; reputation drives the tier.
+  const [ownerReputation, ownerFriendsCount, ownerPostsCount] =
+    await Promise.all([
+      getReputation(owner.id),
+      countFriends(owner.id),
+      countPostsByUser(owner.id),
+    ]);
 
   let synastry = null;
   let viewerName: string | null = null;
@@ -118,6 +137,22 @@ export default async function PublicProfilePage({
     viewerId && !isOwner
       ? await getFriendshipStatus(viewerId, owner.id)
       : "none";
+
+  // Mutual friends — only meaningful for a logged-in non-owner viewer.
+  const mutualCount =
+    viewerId && !isOwner ? await countMutualFriends(viewerId, owner.id) : 0;
+  const mutualPreview =
+    mutualCount > 0 && viewerId
+      ? await listMutualFriendsPreview(viewerId, owner.id, 4)
+      : [];
+
+  // Recent posts visible only to signed-in viewers — the read path calls
+  // requireUser() so we can't run it for anonymous visitors. The empty-
+  // state branch hides the section when there's nothing to show.
+  const recentPosts =
+    viewerId && ownerPostsCount > 0
+      ? await listRecentPostsByUser(owner.id, 5)
+      : [];
 
   const photos = await db
     .select({ id: profilePhotos.id, url: profilePhotos.url })
@@ -200,6 +235,17 @@ export default async function PublicProfilePage({
                   {profile.bio}
                 </p>
               )}
+              <ProfileStats
+                friends={ownerFriendsCount}
+                posts={ownerPostsCount}
+                reputation={ownerReputation}
+              />
+              {mutualCount > 0 && (
+                <MutualFriendsPill
+                  count={mutualCount}
+                  preview={mutualPreview}
+                />
+              )}
               <div className="mt-4">
                 <TierBadge total={ownerReputation} variant="profile" />
               </div>
@@ -280,6 +326,10 @@ export default async function PublicProfilePage({
                 {viewerName} <span className="text-muted-foreground">×</span>{" "}
                 {displayName}
               </h2>
+              <CompatibilityHero
+                overall={synastry.overall}
+                verdict={overallVerdict(synastry.overall)}
+              />
             </header>
             <SynastryDisplayLazy
               result={synastry}
@@ -298,6 +348,37 @@ export default async function PublicProfilePage({
                     }
                   : undefined
               }
+            />
+          </section>
+        )}
+
+        {/* Recent activity — viewer-only since the feed list assumes a session */}
+        {viewerId && recentPosts.length > 0 && (
+          <section className="mt-10">
+            <header className="mb-5 flex items-baseline justify-between gap-3">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
+                  ბოლო პოსტები
+                </div>
+                <h2 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+                  {displayName}-ის ფიდი
+                </h2>
+              </div>
+              {ownerPostsCount > recentPosts.length && (
+                <Link
+                  href="/feed"
+                  className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  ფიდზე ნახე ყველა →
+                </Link>
+              )}
+            </header>
+            <FeedList
+              initial={recentPosts}
+              viewerId={viewerId}
+              viewerIsAdmin={viewerIsAdmin}
+              viewerSunSign={null}
+              disablePagination
             />
           </section>
         )}
@@ -358,6 +439,142 @@ function Pill({
       <span className="text-xs uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
+    </div>
+  );
+}
+
+/**
+ * Small profile stat block: friends count, posts count, and reputation
+ * total. Sits under the bio. Numbers are plain text — clickable when
+ * useful (e.g. friends → /friends for the owner; future: /u/<username>/
+ * friends for visitors).
+ */
+function ProfileStats({
+  friends,
+  posts,
+  reputation,
+}: {
+  friends: number;
+  posts: number;
+  reputation: number;
+}) {
+  return (
+    <dl className="mt-4 flex flex-wrap items-baseline gap-x-5 gap-y-2 text-sm">
+      <Stat label="მეგობრები" value={friends} />
+      <Stat label="პოსტი" value={posts} />
+      <Stat label="რეპუტაცია" value={reputation} />
+    </dl>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="inline-flex items-baseline gap-1.5">
+      <dt className="text-xs uppercase tracking-wider text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="font-semibold tabular-nums text-foreground">
+        {Intl.NumberFormat("ka-GE").format(value)}
+      </dd>
+    </div>
+  );
+}
+
+/**
+ * "X საერთო მეგობარი" pill with up to 4 overlapping avatar circles.
+ * Only rendered when the count is > 0; positioned right under the
+ * stats row so it reads as a social-proof signal.
+ */
+function MutualFriendsPill({
+  count,
+  preview,
+}: {
+  count: number;
+  preview: Array<{
+    id: string;
+    name: string | null;
+    image: string | null;
+    username: string | null;
+  }>;
+}) {
+  return (
+    <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/60 px-2.5 py-1 text-xs text-muted-foreground">
+      {preview.length > 0 ? (
+        <div className="flex -space-x-2">
+          {preview.map((p) =>
+            p.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={p.id}
+                src={p.image}
+                alt=""
+                className="size-5 rounded-full border border-background object-cover"
+              />
+            ) : (
+              <div
+                key={p.id}
+                className="grid size-5 place-items-center rounded-full border border-background bg-card/80 text-[9px] text-muted-foreground"
+              >
+                {(p.name ?? p.username ?? "?")[0]?.toUpperCase()}
+              </div>
+            )
+          )}
+        </div>
+      ) : (
+        <Users className="size-3.5" />
+      )}
+      <span className="text-foreground/90">
+        <span className="font-medium">{count}</span> საერთო მეგობარი
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Compatibility headline shown above the full SynastryDisplay — gives
+ * a "TL;DR" the visitor can grok in a glance. Color shifts with the
+ * verdict tier so a 90%+ match feels visibly different from a 45% one.
+ */
+function CompatibilityHero({
+  overall,
+  verdict,
+}: {
+  overall: number;
+  verdict: string;
+}) {
+  const pct = Math.round(overall);
+  // Three colour bands matching the synastry's "verdict thresholds":
+  // strong (~70+) glows violet, moderate cyan-ish, low muted.
+  const band =
+    pct >= 70
+      ? "oklch(0.78 0.20 305)"
+      : pct >= 50
+        ? "oklch(0.78 0.16 220)"
+        : "oklch(0.68 0.10 280)";
+  return (
+    <div
+      className="mt-4 flex items-center gap-3 rounded-2xl border bg-card/40 px-4 py-3 ring-1 ring-foreground/5 backdrop-blur-xl"
+      style={{
+        borderColor: `color-mix(in oklch, ${band} 30%, transparent)`,
+      }}
+    >
+      <div
+        className="grid size-14 shrink-0 place-items-center rounded-full text-base font-semibold tabular-nums"
+        style={{
+          backgroundColor: `color-mix(in oklch, ${band} 18%, transparent)`,
+          color: band,
+        }}
+      >
+        {pct}%
+      </div>
+      <div className="min-w-0">
+        <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          საერთო შეფასება
+        </div>
+        <div className="text-balance text-sm font-medium text-foreground">
+          {verdict}
+        </div>
+      </div>
     </div>
   );
 }

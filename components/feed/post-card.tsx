@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { CommentSection } from "./comment-section";
+import { MentionText } from "./mention-text";
 import { PostActions } from "./post-actions";
 import { TierBadge } from "./tier-badge";
 import { feedTimeAgo } from "./time-ago";
@@ -273,7 +274,7 @@ export function PostCard({
         </div>
       ) : (
         <p className="mt-3 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-foreground/95">
-          {post.body}
+          <MentionText body={post.body} />
         </p>
       )}
 
