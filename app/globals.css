@@ -113,6 +113,18 @@
       font-size: 18px;
     }
   }
+  /*
+   * Hard-clip horizontal overflow on the body. Mobile is the sensitive
+   * surface — a single overflowing child (long un-wrappable token,
+   * transform-translated decoration, edge-bleed rail under a narrow
+   * parent) used to surface a horizontal scrollbar on phones. `clip`
+   * is preferred over `hidden` so it doesn't establish a new scrolling
+   * context — sticky/anchored descendants keep working — and applying
+   * it to body (not html) leaves vertical viewport scrolling untouched.
+   */
+  body {
+    overflow-x: clip;
+  }
   * {
     border-color: var(--border);
   }
