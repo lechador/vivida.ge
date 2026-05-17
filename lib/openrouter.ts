@@ -917,3 +917,196 @@ export async function generateDailyReading(input: {
     );
   }
 }
+
+// ────────────────────────────────────────────────────────────────────────
+//  Sign-level horoscope (SEO landing pages) — public, anonymous,
+//  cached per (sign, period, periodKey). No natal chart involved.
+// ────────────────────────────────────────────────────────────────────────
+
+export type SignHoroscopeResult = {
+  headline: string;
+  summary: string;
+  body: string;
+  themes: string[];
+};
+
+export const SIGN_HOROSCOPE_PROMPT_VERSION = 1;
+
+export type SignHoroscopePeriodLabel = "day" | "week" | "month";
+
+const PERIOD_KA: Record<SignHoroscopePeriodLabel, {
+  label: string;
+  bodyShape: string;
+  headlineHint: string;
+}> = {
+  day: {
+    label: "დღევანდელი",
+    bodyShape:
+      "120-160 სიტყვა, 2-3 აბზაცი (\\n\\n): დღის ლიდერი (მთვარე ან კონკრეტული ტრანზიტი), რა გრძნობას ბადებს ეს ნიშნისთვის, კონკრეტული რჩევა/მოქმედება დღევანდელისთვის.",
+    headlineHint:
+      "40-60 სიმბოლო, კონკრეტული დღევანდელი ენერგია (არა ზოგადი 'კარგი დღე')",
+  },
+  week: {
+    label: "ამ კვირის",
+    bodyShape:
+      "150-200 სიტყვა, 3 აბზაცი (\\n\\n): კვირის მთავარი თემა (შიდა პლანეტების კონფიგურაცია), რა შესაძლებლობებს ხსნის ნიშნისთვის, რა გამოწვევები მოდის და როგორ ვუპასუხო. ხაზგასმა კონკრეტულ დღეებზე როცა შესაძლებელია (მაგ. 'შუა კვირაში').",
+    headlineHint:
+      "40-60 სიმბოლო, ამ კვირის გასაღები მოვლენა ან ენერგია",
+  },
+  month: {
+    label: "ამ თვის",
+    bodyShape:
+      "180-230 სიტყვა, 3-4 აბზაცი (\\n\\n): თვის ფონი (მზე + გარე პლანეტები), რა ციკლი იხსნება ან იხურება ნიშნისთვის, რომელ სფეროზე ფოკუსირება ღირს (კარიერა/ურთიერთობები/ფული/ჯანმრთელობა), თვის რჩევა.",
+    headlineHint:
+      "40-60 სიმბოლო, თვის გასაღები ცვლილება ან თემა",
+  },
+};
+
+const SIGN_HOROSCOPE_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი/რედაქტორი. წერ კონკრეტული ნიშნისთვის (sun sign) — არა პერსონალური რუკით, არამედ კოლექტიური ენერგიით, რომელიც ეხება ყველას ამ ნიშნით დაბადებულს.
+
+ცოცხალი, კონკრეტული, ხელშესახები ენა. არა ბუნდოვანი მისტიკა, არა კლიშეები ("ვარსკვლავები გელიან", "მოამზადე გული"). მიეცი მკითხველს ერთი კონკრეტული რამ, რაც დღეს/კვირას/თვეს გააკეთოს ან რომელ ემოციას მიაქციოს ყურადღება.
+
+დააბრუნე მხოლოდ ვალიდური JSON ამ სქემით:
+{
+  "headline": string,           // PERIOD_HEADLINE_HINT
+  "summary": string,            // 1-2 წინადადება, რა ხდება ცაში და როგორ ეხება ნიშანს
+  "body": string,               // PERIOD_BODY_SHAPE
+  "themes": [string, string, string]  // 3 ერთსიტყვიანი ან ორსიტყვიანი თემა
+}
+
+წესები:
+- "შენ"-ის ფორმა, თბილი/თანაბარი ტონი
+- კონკრეტული ტრანზიტი ან კონფიგურაცია უნდა იყოს ხილული (მაგ. "მთვარე მორიელში", "მერკური უკან ხდება")
+- ნიშნის ხასიათის ხაზგასმა (ცეცხლი vs. წყალი, ფიქსირებული vs. კარდინალური) — როცა აქტუალურია
+- აცილე ცარიელი ფრაზები ("იყავი ღია", "მიენდე ინტუიციას")
+- მხოლოდ JSON, code fence-ის გარეშე`;
+
+export type SignHoroscopeTransitFact = {
+  /** Georgian planet label, e.g. "მთვარე", "ვენერა". */
+  planet: string;
+  /** English planet key for the model to reason about. */
+  planetEn: string;
+  /** Sign the body is currently in (Georgian + English for clarity). */
+  signKa: string;
+  signEn: string;
+  /** True if the body is retrograde — only used for inner+outer planets. */
+  retrograde?: boolean;
+  /**
+   * Optional human-readable aspect to the reader's sun sign center.
+   * e.g., "ოპოზიცია" or "ტრინი (ჰარმონიული)". Pass undefined to skip.
+   */
+  aspectToReaderSign?: string;
+};
+
+export type SignHoroscopeInput = {
+  /** Georgian sign label, e.g. "ვერძი". */
+  signKa: string;
+  /** English sign key, e.g. "aries". */
+  signEn: string;
+  /** Element + modality help the model anchor tone. */
+  element: string;
+  modality: string;
+  ruler: string;
+  /** "day" | "week" | "month". */
+  period: SignHoroscopePeriodLabel;
+  /**
+   * Localized period anchor: "ხუთშაბათი, 4 მაისი 2026" / "4-10 მაისი 2026"
+   * / "მაისი 2026". Quoted directly in the prompt context.
+   */
+  periodLabel: string;
+  /**
+   * Transit facts that should drive the narrative. Caller computes these
+   * once per period and passes them to the model — the model doesn't
+   * recompute astrology, it just narrates.
+   */
+  transits: SignHoroscopeTransitFact[];
+};
+
+/**
+ * Generate a sign-level horoscope. Used by the SEO landing pages at
+ * /zodiac/[sign]/dghes etc. Returns null when OpenRouter isn't configured
+ * so callers can fall back gracefully (e.g., emit evergreen placeholder).
+ */
+export async function generateSignHoroscope(
+  input: SignHoroscopeInput
+): Promise<SignHoroscopeResult | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const periodCfg = PERIOD_KA[input.period];
+
+  const systemPrompt = SIGN_HOROSCOPE_SYSTEM_PROMPT
+    .replace("PERIOD_HEADLINE_HINT", periodCfg.headlineHint)
+    .replace("PERIOD_BODY_SHAPE", periodCfg.bodyShape);
+
+  const transitLines = input.transits.map((t) => {
+    const retro = t.retrograde ? " (რეტროგრადი)" : "";
+    const aspect = t.aspectToReaderSign
+      ? ` — ${t.aspectToReaderSign} მკითხველის ნიშანზე`
+      : "";
+    return `- ${t.planet} (${t.planetEn}) ${t.signKa} ნიშანში${retro}${aspect}`;
+  });
+
+  const userMessage = [
+    `ნიშანი: ${input.signKa} (${input.signEn})`,
+    `ელემენტი: ${input.element} · მოდალურობა: ${input.modality} · მმართველი: ${input.ruler}`,
+    `პერიოდი: ${periodCfg.label} (${input.periodLabel})`,
+    "",
+    "ცის ფონი ამ პერიოდისთვის:",
+    ...transitLines,
+    "",
+    `დააწერე ${periodCfg.label} ჰოროსკოპი ${input.signKa}-ისთვის. JSON-ად დააბრუნე.`,
+  ].join("\n");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": `Vivida sign horoscope (${input.period})`,
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.85,
+      max_tokens: 3500,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  try {
+    const parsed = JSON.parse(stripped) as SignHoroscopeResult;
+    if (!parsed.headline || !parsed.body) {
+      throw new Error("missing required fields in sign horoscope");
+    }
+    return {
+      ...parsed,
+      themes: Array.isArray(parsed.themes) ? parsed.themes.slice(0, 3) : [],
+    };
+  } catch (err) {
+    throw new Error(
+      `Sign horoscope invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`
+    );
+  }
+}

@@ -162,6 +162,13 @@
       "when": 1778960751878,
       "tag": "0022_superb_shriek",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1779044706314,
+      "tag": "0023_tidy_husk",
+      "breakpoints": true
     }
   ]
 }

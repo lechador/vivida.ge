@@ -558,6 +558,45 @@ export const moonPhases = pgTable("moon_phase", {
 });
 
 /**
+ * Per-sun-sign horoscope readings for SEO landing pages. Unlike
+ * dailyHoroscopes (per user, requires natal chart), these are universal
+ * for everyone with that sun sign — generated once per (sign, period,
+ * periodKey) and served to anonymous visitors at /zodiac/[sign]/dghes,
+ * /kviris-horoskopi, /tvis-horoskopi.
+ *
+ * `period` is one of "day" | "week" | "month".
+ * `periodKey` shape per period:
+ *   - day   → "YYYY-MM-DD"            (today in Asia/Tbilisi)
+ *   - week  → "YYYY-Www"              (ISO week, Monday-anchored)
+ *   - month → "YYYY-MM"
+ *
+ * Composite PK on (sign, period, periodKey) makes upsert idempotent;
+ * `promptVersion` lets us invalidate after a prompt-quality change.
+ */
+export const signHoroscopes = pgTable(
+  "sign_horoscope",
+  {
+    /** zodiac slug — see ALL_SLUGS in lib/seo/zodiac-dates */
+    sign: text("sign").notNull(),
+    /** "day" | "week" | "month" */
+    period: text("period").notNull(),
+    /** date / ISO-week / YYYY-MM, see comment above */
+    periodKey: text("period_key").notNull(),
+    headline: text("headline").notNull(),
+    summary: text("summary").notNull(),
+    body: text("body").notNull(),
+    themes: jsonb("themes").$type<string[]>().notNull().default([]),
+    promptVersion: integer("prompt_version").notNull().default(1),
+    model: text("model").notNull(),
+    language: text("language").notNull().default("ka"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.sign, t.period, t.periodKey] })]
+);
+
+/**
  * 7-day forecast for the dashboard, one row per user. The same row is
  * overwritten each new local-day — we never need a history of forecasts.
  * Each entry in `days` is a (computed scores + AI narrative) pair for one
@@ -1007,6 +1046,9 @@ export type PostReactionKind = (typeof postReactionKindEnum.enumValues)[number];
 export type UserReputation = typeof userReputation.$inferSelect;
 export type ReputationEvent = typeof reputationEvents.$inferSelect;
 export type NewReputationEvent = typeof reputationEvents.$inferInsert;
+export type SignHoroscope = typeof signHoroscopes.$inferSelect;
+export type NewSignHoroscope = typeof signHoroscopes.$inferInsert;
+export type SignHoroscopePeriod = "day" | "week" | "month";
 export type ReputationEventKind =
   (typeof reputationEventKindEnum.enumValues)[number];
 export type Plan = (typeof planEnum.enumValues)[number];

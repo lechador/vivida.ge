@@ -23,17 +23,41 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { yearlyPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
+import {
+  anchorForView,
+  periodForView,
+  signHoroscopePeriodLabel,
+  viewFromPath,
+} from "@/lib/sign-horoscope";
+import { HoroscopeView } from "./horoscope-view";
 
 const SITE_URL = "https://www.vivida.ge";
 
-type Params = { sign: string; year: string };
+/**
+ * `[slug]` is a polymorphic segment so we don't have two parallel
+ * dynamic params at the same depth (Next.js prohibits). It matches:
+ *   - 4-digit year ("2026")             → yearly horoscope (static, prebuilt)
+ *   - "dghes" / "kviris-horoskopi" /    → period horoscope (ISR, AI-generated)
+ *     "tvis-horoskopi"
+ * Anything else → notFound().
+ */
+
+type Params = { sign: string; slug: string };
+
+/**
+ * Horoscope (day/week/month) pages refresh hourly. The underlying
+ * (sign, period, periodKey) row is cached in Postgres so the typical
+ * request only re-renders the page chrome; the AI cost is paid once
+ * per period rollover.
+ */
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
-  const out: { sign: string; year: string }[] = [];
+  const out: { sign: string; slug: string }[] = [];
   for (const year of ALL_YEARLY_YEARS) {
     for (const sign of ALL_SLUGS) {
       if (yearlyContentFor(sign, year)) {
-        out.push({ sign, year: String(year) });
+        out.push({ sign, slug: String(year) });
       }
     }
   }
@@ -50,24 +74,56 @@ function parseYear(s: string): number | null {
   return Number.isFinite(y) ? y : null;
 }
 
+const VIEW_TITLE_KA = {
+  today: "დღევანდელი ჰოროსკოპი",
+  tomorrow: "ხვალინდელი ჰოროსკოპი",
+  week: "ამ კვირის ჰოროსკოპი",
+  month: "ამ თვის ჰოროსკოპი",
+} as const;
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
-  const { sign, year } = await params;
+  const { sign, slug } = await params;
   if (!isSlug(sign)) return {};
-  const yearNum = parseYear(year);
+
+  const view = viewFromPath(slug);
+  if (view) {
+    const sc = SIGNS_CONTENT[sign];
+    const url = `${SITE_URL}/zodiac/${sign}/${slug}`;
+    const anchor = anchorForView(view);
+    const periodLabel = signHoroscopePeriodLabel(anchor, periodForView(view));
+    const title = `${sc.labelKa} — ${VIEW_TITLE_KA[view]}`;
+    const description = `${sc.labelKa}-ის ${VIEW_TITLE_KA[view]} (${periodLabel}). ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები.`;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: { canonical: url },
+      openGraph: {
+        type: "article",
+        url,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "ka_GE",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
+
+  const yearNum = parseYear(slug);
   if (yearNum == null) return {};
   const c = yearlyContentFor(sign, yearNum);
   if (!c) return {};
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
-    alternates: { canonical: `${SITE_URL}/zodiac/${sign}/${year}` },
+    alternates: { canonical: `${SITE_URL}/zodiac/${sign}/${slug}` },
     openGraph: {
       type: "article",
-      url: `${SITE_URL}/zodiac/${sign}/${year}`,
+      url: `${SITE_URL}/zodiac/${sign}/${slug}`,
       title: c.pageTitle,
       description: c.metaDescription,
       siteName: "Vivida",
@@ -81,17 +137,24 @@ export async function generateMetadata({
   };
 }
 
-export default async function YearlyHoroscopePage({
+export default async function ZodiacSignSlugPage({
   params,
 }: {
   params: Promise<Params>;
 }) {
-  const { sign, year } = await params;
+  const { sign, slug } = await params;
   if (!isSlug(sign)) notFound();
-  const yearNum = parseYear(year);
+
+  const view = viewFromPath(slug);
+  if (view) {
+    return <HoroscopeView sign={sign} view={view} />;
+  }
+
+  const yearNum = parseYear(slug);
   if (yearNum == null) notFound();
   const c = yearlyContentFor(sign, yearNum);
   if (!c) notFound();
+  const year = slug;
 
   const sc = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign);

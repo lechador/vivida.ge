@@ -9,6 +9,7 @@ import {
   ALL_YEARLY_YEARS,
   yearlyContentFor,
 } from "@/lib/seo/zodiac-content";
+import { ALL_HOROSCOPE_VIEWS, VIEW_PATH } from "@/lib/sign-horoscope";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -19,6 +20,23 @@ import {
  */
 const BASE = "https://www.vivida.ge";
 const NOW = new Date();
+
+const VIEW_CHANGE_FREQ: Record<
+  (typeof ALL_HOROSCOPE_VIEWS)[number],
+  MetadataRoute.Sitemap[number]["changeFrequency"]
+> = {
+  today: "daily",
+  tomorrow: "daily",
+  week: "weekly",
+  month: "monthly",
+};
+
+const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
+  today: 0.9,
+  tomorrow: 0.8,
+  week: 0.85,
+  month: 0.85,
+};
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const zodiacSignPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
@@ -69,12 +87,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
+  // Sign-level daily/tomorrow/weekly/monthly horoscope pages — 48 routes
+  // total (12 signs × 4 views). High-volume Georgian queries; daily ones
+  // get the freshest changeFrequency hint.
+  const signHoroscopePages: MetadataRoute.Sitemap = ALL_SLUGS.flatMap(
+    (slug) =>
+      ALL_HOROSCOPE_VIEWS.map((view) => ({
+        url: `${BASE}/zodiac/${slug}/${VIEW_PATH[view]}`,
+        lastModified: NOW,
+        changeFrequency: VIEW_CHANGE_FREQ[view],
+        priority: VIEW_PRIORITY[view],
+      }))
+  );
+
   return [
     {
       url: `${BASE}/`,
       lastModified: NOW,
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: `${BASE}/horoskopi`,
+      lastModified: NOW,
+      changeFrequency: "daily",
+      priority: 0.95,
+    },
+    {
+      url: `${BASE}/mtvaris-kalendari`,
+      lastModified: NOW,
+      changeFrequency: "daily",
+      priority: 0.85,
     },
     {
       url: `${BASE}/features`,
@@ -136,6 +179,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...moonPages,
     ...risingPages,
     ...yearlyPages,
+    ...signHoroscopePages,
     {
       url: `${BASE}/login`,
       lastModified: NOW,
