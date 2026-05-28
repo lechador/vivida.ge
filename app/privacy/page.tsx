@@ -135,12 +135,12 @@ export default function PrivacyPage() {
                 რუკის ნუმერული მონაცემები — სახელი ან საკონტაქტო ინფორმაცია
                 არა).
               </li>
-              <li>
-                <strong className="text-foreground">freeastrologyapi.com:</strong> ნატალური
-                რუკის გამოთვლა (გადაიცემა დაბადების კოორდინატები +
-                დრო/თარიღი).
-              </li>
             </ul>
+            <p className="mt-3 leading-relaxed">
+              ნატალური რუკის გამოთვლა ხდება ჩვენს სერვერზე, ლოკალურად
+              (Swiss Ephemeris-ის ფორმულებით) — დაბადების კოორდინატები და
+              დრო არ გადაეცემა მესამე მხარეს.
+            </p>
           </section>
 
           <section>
