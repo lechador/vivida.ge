@@ -131,6 +131,64 @@ export const authTokens = pgTable(
 );
 
 /**
+ * Refresh tokens for the mobile (Flutter) API.
+ *
+ * The website uses Auth.js cookie sessions; native apps can't, so the
+ * mobile flow issues a short-lived JWT access token plus a long-lived
+ * refresh token. We never store the raw refresh token — only its SHA-256
+ * hash — so a DB leak can't be replayed. Rotation: each /auth/refresh
+ * call revokes the presented token and issues a new one. Logout (and
+ * "log out everywhere") revokes by setting revokedAt.
+ */
+export const mobileRefreshTokens = pgTable(
+  "mobile_refresh_token",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** SHA-256 hex of the opaque refresh token. Never the raw value. */
+    tokenHash: text("token_hash").notNull().unique(),
+    /** Best-effort device label from the User-Agent, for the sessions list. */
+    userAgent: text("user_agent"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    /** Set when the token is rotated out or explicitly logged out. */
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("mobile_refresh_token_user_idx").on(t.userId)]
+);
+
+/**
+ * Fixed-window rate-limit counters, used to cap abuse on the mobile API's
+ * unauthenticated endpoints (login, register, password reset). One row per
+ * (bucket, identifier, window). The identifier is a SHA-256 hash — never a
+ * raw IP or email — so this table holds no PII. Old windows are dead weight
+ * and pruned by the daily cron (see lib/rate-limit.pruneRateLimits).
+ */
+export const rateLimitHits = pgTable(
+  "rate_limit_hit",
+  {
+    /** Logical limiter, e.g. "login_ip" or "register_email". */
+    bucket: text("bucket").notNull(),
+    /** SHA-256 hex of the IP/email this counter tracks. */
+    identifier: text("identifier").notNull(),
+    /** Start of the fixed window this counter belongs to. */
+    windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
+    count: integer("count").notNull().default(0),
+  },
+  (t) => [
+    primaryKey({
+      columns: [t.bucket, t.identifier, t.windowStart],
+    }),
+  ]
+);
+
+/**
  * Vivida-specific: birth profile, 1:1 with users.
  * Time stored separately so we can render exact birth time independent of TZ.
  */
@@ -1033,6 +1091,10 @@ export type Message = typeof messages.$inferSelect;
 export type NewMessage = typeof messages.$inferInsert;
 export type AuthToken = typeof authTokens.$inferSelect;
 export type NewAuthToken = typeof authTokens.$inferInsert;
+export type MobileRefreshToken = typeof mobileRefreshTokens.$inferSelect;
+export type NewMobileRefreshToken = typeof mobileRefreshTokens.$inferInsert;
+export type RateLimitHit = typeof rateLimitHits.$inferSelect;
+export type NewRateLimitHit = typeof rateLimitHits.$inferInsert;
 export type AuthTokenPurpose = (typeof authTokenPurposeEnum.enumValues)[number];
 export type TypingIndicator = typeof typingIndicators.$inferSelect;
 export type NewTypingIndicator = typeof typingIndicators.$inferInsert;

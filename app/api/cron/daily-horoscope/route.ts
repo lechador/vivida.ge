@@ -4,6 +4,7 @@ import {
   sendDailyHoroscopeBlast,
   utcDateKey,
 } from "@/lib/email-marketing";
+import { pruneRateLimits } from "@/lib/rate-limit";
 
 /**
  * Daily-horoscope email blast — cron-triggered.
@@ -60,6 +61,10 @@ async function run(req: NextRequest) {
 
   const sendDate = utcDateKey();
   const result = await sendDailyHoroscopeBlast({ sendDate, concurrency });
+
+  // Housekeeping: drop expired rate-limit counters. Best-effort, never
+  // blocks or fails the blast (pruneRateLimits swallows its own errors).
+  await pruneRateLimits();
 
   return NextResponse.json({ sendDate, concurrency, ...result });
 }

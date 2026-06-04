@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, count, desc, eq, inArray, lt, sql } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 
@@ -10,7 +10,6 @@ import {
   postComments,
   postReactions,
   posts,
-  profilePhotos,
   profiles,
   users,
   type NotificationPayload,
@@ -30,37 +29,22 @@ import {
   POST_BODY_MAX,
   POST_EDIT_WINDOW_MS,
 } from "@/lib/feed-config";
+import {
+  listFeedPage,
+  listRecentPostsByUserPage,
+  loadProfilePhotos,
+  type FeedAuthor,
+  type FeedPost,
+} from "@/lib/feed-core";
 
-/**
- * Batched "main profile photo URL by user id" — same logic the app
- * header uses: the first ready row from profile_photo (lowest
- * sortOrder wins) overrides the OAuth avatar in users.image when the
- * user has uploaded their own.
- */
-async function loadProfilePhotos(
-  userIds: string[]
-): Promise<Map<string, string>> {
-  if (userIds.length === 0) return new Map();
-  const rows = await db
-    .select({
-      userId: profilePhotos.userId,
-      url: profilePhotos.url,
-    })
-    .from(profilePhotos)
-    .where(
-      and(
-        inArray(profilePhotos.userId, userIds),
-        eq(profilePhotos.ready, true)
-      )
-    )
-    .orderBy(asc(profilePhotos.sortOrder));
-  const map = new Map<string, string>();
-  for (const r of rows) {
-    // First row per user wins thanks to the ASC sortOrder.
-    if (!map.has(r.userId)) map.set(r.userId, r.url);
-  }
-  return map;
-}
+// Feed read types/logic live in lib/feed-core so the mobile API
+// (app/api/v1/feed) shares them. Re-export the public types here so
+// existing component imports from "@/actions/feed" keep working.
+export type {
+  FeedAuthor,
+  FeedPost,
+  FeedReactionCounts,
+} from "@/lib/feed-core";
 
 /** Minimum gap between a user's posts. Prevents accidental double-submits
  *  and casual spam without blocking honest power-users. */
@@ -128,33 +112,6 @@ async function notifyMentions(opts: {
   }
 }
 
-export type FeedAuthor = {
-  id: string;
-  name: string | null;
-  image: string | null;
-  username: string | null;
-  displayName: string | null;
-};
-
-export type FeedReactionCounts = Record<PostReactionKind, number>;
-
-export type FeedPost = {
-  id: string;
-  body: string;
-  edited: boolean;
-  createdAt: Date;
-  author: FeedAuthor;
-  /** Sun-sign index (0-11) of the author, derived from profile.dateOfBirth.
-   *  Null when the author hasn't set a birth date. Used by the
-   *  "ჩემი ნიშნით" filter on /feed without an extra query. */
-  authorSunSign: number | null;
-  /** Author's running reputation total. Drives the inline tier chip. */
-  authorReputation: number;
-  reactions: FeedReactionCounts;
-  myReaction: PostReactionKind | null;
-  commentCount: number;
-};
-
 export type FeedComment = {
   id: string;
   postId: string;
@@ -163,13 +120,6 @@ export type FeedComment = {
   body: string;
   createdAt: Date;
   author: FeedAuthor;
-};
-
-const ZERO_COUNTS: FeedReactionCounts = {
-  like: 0,
-  dislike: 0,
-  funny: 0,
-  sad: 0,
 };
 
 type FeedActionResult<T = undefined> =
@@ -181,114 +131,14 @@ type FeedActionResult<T = undefined> =
  * batched round-trip. Cursor is the createdAt of the last row from the
  * previous page — same shape `/api/feed?cursor=…` would use.
  */
-export async function listFeed(opts: {
-  cursor?: string;
-  limit?: number;
-} = {}): Promise<FeedPost[]> {
+export async function listFeed(
+  opts: {
+    cursor?: string;
+    limit?: number;
+  } = {}
+): Promise<FeedPost[]> {
   const user = await requireUser();
-  const limit = Math.min(Math.max(opts.limit ?? 20, 1), 50);
-
-  const cursorDate = opts.cursor ? new Date(opts.cursor) : null;
-  const where = cursorDate ? lt(posts.createdAt, cursorDate) : undefined;
-
-  // 1. Fetch the posts + author byline in one join. Postgres handles the
-  //    sort via the post_created_at_idx.
-  const rows = await db
-    .select({
-      id: posts.id,
-      body: posts.body,
-      edited: posts.edited,
-      createdAt: posts.createdAt,
-      authorId: users.id,
-      authorName: users.name,
-      authorImage: users.image,
-      authorUsername: profiles.username,
-      authorDisplayName: profiles.displayName,
-      authorDob: profiles.dateOfBirth,
-    })
-    .from(posts)
-    .innerJoin(users, eq(users.id, posts.userId))
-    .leftJoin(profiles, eq(profiles.userId, posts.userId))
-    .where(where)
-    .orderBy(desc(posts.createdAt))
-    .limit(limit);
-
-  if (rows.length === 0) return [];
-
-  const postIds = rows.map((r) => r.id);
-  const authorIds = Array.from(new Set(rows.map((r) => r.authorId)));
-
-  // 2. Aggregate reaction counts, the viewer's own reaction, comment
-  //    counts, reputation totals, and chosen profile photos. Five
-  //    queries instead of N+1 — once per page.
-  const { getReputationFor } = await import("@/lib/reputation");
-  const [counts, mine, comments, reputations, photos] = await Promise.all([
-    db
-      .select({
-        postId: postReactions.postId,
-        kind: postReactions.kind,
-        count: sql<number>`count(*)::int`,
-      })
-      .from(postReactions)
-      .where(inArray(postReactions.postId, postIds))
-      .groupBy(postReactions.postId, postReactions.kind),
-    db
-      .select({
-        postId: postReactions.postId,
-        kind: postReactions.kind,
-      })
-      .from(postReactions)
-      .where(
-        and(
-          inArray(postReactions.postId, postIds),
-          eq(postReactions.userId, user.id)
-        )
-      ),
-    db
-      .select({
-        postId: postComments.postId,
-        count: sql<number>`count(*)::int`,
-      })
-      .from(postComments)
-      .where(inArray(postComments.postId, postIds))
-      .groupBy(postComments.postId),
-    getReputationFor(authorIds),
-    loadProfilePhotos(authorIds),
-  ]);
-
-  const countMap = new Map<string, FeedReactionCounts>();
-  for (const id of postIds) countMap.set(id, { ...ZERO_COUNTS });
-  for (const row of counts) {
-    const bucket = countMap.get(row.postId);
-    if (bucket) bucket[row.kind] = Number(row.count);
-  }
-
-  const mineMap = new Map<string, PostReactionKind>();
-  for (const row of mine) mineMap.set(row.postId, row.kind);
-
-  const commentMap = new Map<string, number>();
-  for (const row of comments) commentMap.set(row.postId, Number(row.count));
-
-  return rows.map((r) => ({
-    id: r.id,
-    body: r.body,
-    edited: r.edited,
-    createdAt: r.createdAt,
-    author: {
-      id: r.authorId,
-      name: r.authorName,
-      // Prefer the user's chosen main photo; fall back to the OAuth
-      // avatar only when they haven't uploaded one yet.
-      image: photos.get(r.authorId) ?? r.authorImage,
-      username: r.authorUsername,
-      displayName: r.authorDisplayName,
-    },
-    authorSunSign: sunSignFromDob(r.authorDob),
-    authorReputation: reputations.get(r.authorId) ?? 0,
-    reactions: countMap.get(r.id) ?? { ...ZERO_COUNTS },
-    myReaction: mineMap.get(r.id) ?? null,
-    commentCount: commentMap.get(r.id) ?? 0,
-  }));
+  return listFeedPage({ viewerId: user.id, ...opts });
 }
 
 /**
@@ -314,129 +164,7 @@ export async function listRecentPostsByUser(
   limit = 5
 ): Promise<FeedPost[]> {
   const viewer = await requireUser();
-  const rows = await db
-    .select({
-      id: posts.id,
-      body: posts.body,
-      edited: posts.edited,
-      createdAt: posts.createdAt,
-      authorId: users.id,
-      authorName: users.name,
-      authorImage: users.image,
-      authorUsername: profiles.username,
-      authorDisplayName: profiles.displayName,
-      authorDob: profiles.dateOfBirth,
-    })
-    .from(posts)
-    .innerJoin(users, eq(users.id, posts.userId))
-    .leftJoin(profiles, eq(profiles.userId, posts.userId))
-    .where(eq(posts.userId, userId))
-    .orderBy(desc(posts.createdAt))
-    .limit(Math.min(Math.max(limit, 1), 20));
-
-  if (rows.length === 0) return [];
-
-  const postIds = rows.map((r) => r.id);
-  const { getReputationFor } = await import("@/lib/reputation");
-  const [counts, mine, comments, reputations, photos] = await Promise.all([
-    db
-      .select({
-        postId: postReactions.postId,
-        kind: postReactions.kind,
-        count: sql<number>`count(*)::int`,
-      })
-      .from(postReactions)
-      .where(inArray(postReactions.postId, postIds))
-      .groupBy(postReactions.postId, postReactions.kind),
-    db
-      .select({
-        postId: postReactions.postId,
-        kind: postReactions.kind,
-      })
-      .from(postReactions)
-      .where(
-        and(
-          inArray(postReactions.postId, postIds),
-          eq(postReactions.userId, viewer.id)
-        )
-      ),
-    db
-      .select({
-        postId: postComments.postId,
-        count: sql<number>`count(*)::int`,
-      })
-      .from(postComments)
-      .where(inArray(postComments.postId, postIds))
-      .groupBy(postComments.postId),
-    getReputationFor([userId]),
-    loadProfilePhotos([userId]),
-  ]);
-
-  const countMap = new Map<string, FeedReactionCounts>();
-  for (const id of postIds) countMap.set(id, { ...ZERO_COUNTS });
-  for (const row of counts) {
-    const bucket = countMap.get(row.postId);
-    if (bucket) bucket[row.kind] = Number(row.count);
-  }
-  const mineMap = new Map<string, PostReactionKind>();
-  for (const row of mine) mineMap.set(row.postId, row.kind);
-  const commentMap = new Map<string, number>();
-  for (const row of comments) commentMap.set(row.postId, Number(row.count));
-
-  return rows.map((r) => ({
-    id: r.id,
-    body: r.body,
-    edited: r.edited,
-    createdAt: r.createdAt,
-    author: {
-      id: r.authorId,
-      name: r.authorName,
-      image: photos.get(r.authorId) ?? r.authorImage,
-      username: r.authorUsername,
-      displayName: r.authorDisplayName,
-    },
-    authorSunSign: sunSignFromDob(r.authorDob),
-    authorReputation: reputations.get(r.authorId) ?? 0,
-    reactions: countMap.get(r.id) ?? { ...ZERO_COUNTS },
-    myReaction: mineMap.get(r.id) ?? null,
-    commentCount: commentMap.get(r.id) ?? 0,
-  }));
-}
-
-/** Sun-sign index (0-11) from a YYYY-MM-DD birth date. Tropical zodiac
- *  with the standard month-day cutoffs. Null when the input is empty or
- *  unparseable. Defined inline rather than imported from lib/astrology
- *  to keep this file self-contained for the feed query path. */
-function sunSignFromDob(dob: string | null | undefined): number | null {
-  if (!dob) return null;
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
-  if (!m) return null;
-  const month = Number(m[2]);
-  const day = Number(m[3]);
-  // (month, day after this start) → sign index
-  const CUTOFFS: Array<[number, number, number]> = [
-    [3, 21, 0],   // Aries
-    [4, 20, 1],   // Taurus
-    [5, 21, 2],   // Gemini
-    [6, 22, 3],   // Cancer
-    [7, 23, 4],   // Leo
-    [8, 23, 5],   // Virgo
-    [9, 23, 6],   // Libra
-    [10, 23, 7],  // Scorpio
-    [11, 22, 8],  // Sagittarius
-    [12, 22, 9],  // Capricorn
-    [1, 20, 10],  // Aquarius
-    [2, 19, 11],  // Pisces
-  ];
-  // Pisces wraps: anything before Mar 21 is Pisces (11) unless it's after Jan 20.
-  for (const [cm, cd, idx] of CUTOFFS) {
-    if (month === cm && day >= cd) return idx;
-    if (month === cm + 1 && day < (CUTOFFS[(idx + 1) % 12]?.[1] ?? 31))
-      return idx;
-  }
-  // Fallback: rough month → sign mapping using start-of-month cutoffs.
-  // Should never hit thanks to the loop above, but defends against bad input.
-  return ((month + 9) % 12);
+  return listRecentPostsByUserPage({ viewerId: viewer.id, userId, limit });
 }
 
 /**
