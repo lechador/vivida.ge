@@ -128,6 +128,76 @@ export async function registerUser(input: {
   };
 }
 
+// ─── OAuth (Google) ──────────────────────────────────────────────────────
+
+export type OAuthUser = {
+  userId: string;
+  email: string;
+  name: string | null;
+  image: string | null;
+};
+
+/**
+ * Find a user by email or create one for a verified OAuth (Google) sign-in.
+ * The email is already proven by the provider, so the account is created
+ * pre-verified. New users get the trial provisioned, same as email signup.
+ *
+ * We intentionally don't write an `accounts` row here — the website's
+ * Auth.js adapter links by email (allowDangerousEmailAccountLinking) if the
+ * same person later signs in with Google on the web.
+ */
+export async function findOrCreateOAuthUser(input: {
+  email: string;
+  name: string | null;
+  image: string | null;
+}): Promise<OAuthUser> {
+  const email = normalizeEmail(input.email);
+
+  const [existing] = await db
+    .select({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+      image: users.image,
+    })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  if (existing) {
+    return {
+      userId: existing.id,
+      email: existing.email!,
+      name: existing.name,
+      image: existing.image,
+    };
+  }
+
+  const [created] = await db
+    .insert(users)
+    .values({
+      email,
+      name: input.name,
+      image: input.image,
+      emailVerified: new Date(),
+    })
+    .returning({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+      image: users.image,
+    });
+
+  await provisionTrialIfMissing(created.id);
+
+  return {
+    userId: created.id,
+    email: created.email!,
+    name: created.name,
+    image: created.image,
+  };
+}
+
 // ─── Resend verification / request reset ─────────────────────────────────
 
 /**
