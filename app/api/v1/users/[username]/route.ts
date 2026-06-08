@@ -118,9 +118,12 @@ export async function GET(
       }
     };
 
-    // Weighted overall synastry between viewer and this user (0–100), plus a
-    // Georgian verdict — same computeSynastry() the website + /synastry use.
-    let compatibility: { overall: number; verdict: string } | null = null;
+    // Weighted overall synastry between viewer and this user (0–100), the
+    // Georgian verdict, and the per-category breakdown (love, chemistry, …) —
+    // same computeSynastry() the website + /synastry use.
+    let compatibility:
+      | { overall: number; verdict: string; scores: Record<string, number> }
+      | null = null;
     if (!isSelf) {
       const [viewerData, targetData] = await Promise.all([
         chartDataFor(viewer.id),
@@ -128,8 +131,15 @@ export async function GET(
       ]);
       if (viewerData && targetData) {
         try {
-          const overall = computeSynastry(viewerData, targetData).overall;
-          compatibility = { overall, verdict: overallVerdict(overall) };
+          const result = computeSynastry(viewerData, targetData);
+          const scores = Object.fromEntries(
+            Object.entries(result.scores).map(([k, v]) => [k, Math.round(v)])
+          );
+          compatibility = {
+            overall: result.overall,
+            verdict: overallVerdict(result.overall),
+            scores,
+          };
         } catch {
           compatibility = null;
         }
