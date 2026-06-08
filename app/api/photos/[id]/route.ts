@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
 
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { profilePhotos } from "@/db/schema";
-import { invalidateHeaderForUser } from "@/lib/header-cache";
-import { deleteObject } from "@/lib/r2";
+import { deletePhoto } from "@/lib/photos-core";
 
 /** Delete a photo. Owner-only. Removes the R2 object and the DB row. */
 export async function DELETE(
@@ -18,31 +14,9 @@ export async function DELETE(
   }
   const { id } = await params;
 
-  const [photo] = await db
-    .select()
-    .from(profilePhotos)
-    .where(
-      and(
-        eq(profilePhotos.id, id),
-        eq(profilePhotos.userId, session.user.id)
-      )
-    )
-    .limit(1);
-  if (!photo) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  const result = await deletePhoto(session.user.id, id);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.code }, { status: 404 });
   }
-
-  // Best-effort R2 delete — don't block the DB cleanup if it fails.
-  try {
-    await deleteObject(photo.key);
-  } catch (err) {
-    console.warn("[photos/delete] R2 delete failed", err);
-  }
-
-  await db.delete(profilePhotos).where(eq(profilePhotos.id, id));
-
-  // Deleting the main photo changes the navbar avatar — refresh.
-  invalidateHeaderForUser(session.user.id);
-
   return NextResponse.json({ ok: true });
 }

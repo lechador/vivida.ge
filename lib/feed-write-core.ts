@@ -13,14 +13,22 @@ import {
   type PostReactionKind,
 } from "@/db/schema";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
+import { isAdminEmail } from "@/lib/admin-auth";
 import { resolveMentions } from "@/lib/mentions";
 import {
   awardReputation,
   revokeReputationForSubjects,
   RepSubject,
 } from "@/lib/reputation";
-import { COMMENT_BODY_MAX, POST_BODY_MAX } from "@/lib/feed-config";
+import {
+  COMMENT_BODY_MAX,
+  POST_BODY_MAX,
+  POST_EDIT_WINDOW_MS,
+} from "@/lib/feed-config";
 import { loadProfilePhotos, type FeedAuthor } from "@/lib/feed-core";
+
+/** Identity an edit/delete acts on — id for ownership, email for admin. */
+export type FeedActor = { id: string; email: string | null | undefined };
 
 /**
  * Framework-agnostic feed *write* logic — the create/comment/react paths
@@ -444,6 +452,145 @@ export async function listCommentsCore(postId: string): Promise<FeedComment[]> {
     }
   }
   return ordered;
+}
+
+/** Edit a post within the grace window. Author only. */
+export async function editPostCore(
+  userId: string,
+  postId: string,
+  rawBody: string
+): Promise<FeedActionResult> {
+  const body = rawBody.trim();
+  if (!body) return { ok: false, error: "ცარიელ პოსტს ვერ შევინახავთ" };
+  if (body.length > POST_BODY_MAX) {
+    return {
+      ok: false,
+      error: `მაქსიმუმ ${POST_BODY_MAX} სიმბოლო — შენ შეიყვანე ${body.length}.`,
+    };
+  }
+
+  const [post] = await db
+    .select({ userId: posts.userId, createdAt: posts.createdAt })
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
+  if (!post) return { ok: false, error: "პოსტი ვერ მოიძებნა" };
+  if (post.userId !== userId) {
+    return { ok: false, error: "მხოლოდ ავტორი ცვლის თავის პოსტს" };
+  }
+  if (Date.now() - post.createdAt.getTime() > POST_EDIT_WINDOW_MS) {
+    return { ok: false, error: "რედაქტირების დრო (5 წუთი) გავიდა" };
+  }
+
+  await db.update(posts).set({ body, edited: true }).where(eq(posts.id, postId));
+  return { ok: true };
+}
+
+/** Delete a post. Author can delete their own; admins can delete any. */
+export async function deletePostCore(
+  actor: FeedActor,
+  postId: string
+): Promise<FeedActionResult> {
+  const [post] = await db
+    .select({ userId: posts.userId })
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
+  if (!post) return { ok: false, error: "პოსტი ვერ მოიძებნა" };
+
+  const isOwner = post.userId === actor.id;
+  const isAdmin = isAdminEmail(actor.email);
+  if (!isOwner && !isAdmin) {
+    return { ok: false, error: "წაშლის უფლება არ გაქვს" };
+  }
+
+  // Gather every reputation subject that depends on this post BEFORE the
+  // cascade nukes the source rows.
+  const [reactors, descendantComments] = await Promise.all([
+    db
+      .select({ userId: postReactions.userId })
+      .from(postReactions)
+      .where(eq(postReactions.postId, postId)),
+    db
+      .select({ id: postComments.id })
+      .from(postComments)
+      .where(eq(postComments.postId, postId)),
+  ]);
+  const subjectsToRevoke: Array<{
+    kind:
+      | "post_created"
+      | "reaction_received"
+      | "comment_created"
+      | "comment_received";
+    subjectId: string;
+  }> = [
+    { kind: "post_created", subjectId: RepSubject.post(postId) },
+    ...reactors.map((r) => ({
+      kind: "reaction_received" as const,
+      subjectId: RepSubject.reactionReceived(postId, r.userId),
+    })),
+    ...descendantComments.flatMap((c) => [
+      { kind: "comment_created" as const, subjectId: RepSubject.comment(c.id) },
+      {
+        kind: "comment_received" as const,
+        subjectId: RepSubject.commentReceived(c.id),
+      },
+    ]),
+  ];
+
+  await db.delete(posts).where(eq(posts.id, postId));
+
+  after(async () => {
+    await revokeReputationForSubjects(subjectsToRevoke);
+  });
+
+  return { ok: true };
+}
+
+/** Delete a comment. Author OR admin OR post-author. */
+export async function deleteCommentCore(
+  actor: FeedActor,
+  commentId: string
+): Promise<FeedActionResult> {
+  const [row] = await db
+    .select({
+      commentUserId: postComments.userId,
+      postUserId: posts.userId,
+    })
+    .from(postComments)
+    .innerJoin(posts, eq(posts.id, postComments.postId))
+    .where(eq(postComments.id, commentId))
+    .limit(1);
+  if (!row) return { ok: false, error: "კომენტარი ვერ მოიძებნა" };
+
+  const isOwner = row.commentUserId === actor.id;
+  const isPostAuthor = row.postUserId === actor.id;
+  const isAdmin = isAdminEmail(actor.email);
+  if (!isOwner && !isPostAuthor && !isAdmin) {
+    return { ok: false, error: "წაშლის უფლება არ გაქვს" };
+  }
+
+  const replyIds = await db
+    .select({ id: postComments.id })
+    .from(postComments)
+    .where(eq(postComments.parentId, commentId));
+
+  const allIds = [commentId, ...replyIds.map((r) => r.id)];
+  const subjectsToRevoke = allIds.flatMap((id) => [
+    { kind: "comment_created" as const, subjectId: RepSubject.comment(id) },
+    {
+      kind: "comment_received" as const,
+      subjectId: RepSubject.commentReceived(id),
+    },
+  ]);
+
+  await db.delete(postComments).where(eq(postComments.id, commentId));
+
+  after(async () => {
+    await revokeReputationForSubjects(subjectsToRevoke);
+  });
+
+  return { ok: true };
 }
 
 export { revokeReputationForSubjects, RepSubject };

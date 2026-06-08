@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-import { and, asc, eq } from "drizzle-orm";
 
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { profilePhotos } from "@/db/schema";
-import { invalidateHeaderForUser } from "@/lib/header-cache";
+import { promotePhoto } from "@/lib/photos-core";
 
 /**
  * Move a photo to the front of the user's gallery so it becomes the
@@ -19,42 +16,11 @@ export async function POST(
   if (!session?.user?.id) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  const userId = session.user.id;
   const { id } = await params;
 
-  const [target] = await db
-    .select({ id: profilePhotos.id })
-    .from(profilePhotos)
-    .where(
-      and(eq(profilePhotos.id, id), eq(profilePhotos.userId, userId))
-    )
-    .limit(1);
-  if (!target) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  const result = await promotePhoto(session.user.id, id);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.code }, { status: 404 });
   }
-
-  await db.transaction(async (tx) => {
-    const all = await tx
-      .select({ id: profilePhotos.id })
-      .from(profilePhotos)
-      .where(eq(profilePhotos.userId, userId))
-      .orderBy(asc(profilePhotos.sortOrder));
-
-    const reordered = [
-      { id: target.id },
-      ...all.filter((p) => p.id !== target.id),
-    ];
-
-    for (let i = 0; i < reordered.length; i++) {
-      await tx
-        .update(profilePhotos)
-        .set({ sortOrder: i })
-        .where(eq(profilePhotos.id, reordered[i].id));
-    }
-  });
-
-  // Refresh the cached avatar in the navbar.
-  invalidateHeaderForUser(userId);
-
   return NextResponse.json({ ok: true });
 }

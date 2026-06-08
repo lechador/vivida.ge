@@ -203,6 +203,23 @@ export async function listFeedPage(opts: {
   return enrichPostRows(opts.viewerId, rows);
 }
 
+/** A single post in the same enriched shape as the feed, or null if gone. */
+export async function getPostForViewer(
+  viewerId: string,
+  postId: string
+): Promise<FeedPost | null> {
+  const rows = await db
+    .select(POST_SELECT)
+    .from(posts)
+    .innerJoin(users, eq(users.id, posts.userId))
+    .leftJoin(profiles, eq(profiles.userId, posts.userId))
+    .where(eq(posts.id, postId))
+    .limit(1);
+
+  const [post] = await enrichPostRows(viewerId, rows);
+  return post ?? null;
+}
+
 /** The most recent N posts by a single user, in the same shape as the feed. */
 export async function listRecentPostsByUserPage(opts: {
   viewerId: string;

@@ -5,6 +5,7 @@ import {
   notifications,
   type Notification,
 } from "@/db/schema";
+import { invalidateHeaderForUser } from "@/lib/header-cache";
 
 export type NotificationView = Notification;
 
@@ -35,4 +36,34 @@ export async function countUnreadNotifications(
       )
     );
   return Number(row?.value ?? 0);
+}
+
+/**
+ * Mark all of a user's unread notifications as read. Framework-agnostic —
+ * shared by the website's Server Action and the mobile API. Invalidates the
+ * in-memory header cache so the bell badge refreshes.
+ */
+export async function markAllNotificationsReadCore(
+  userId: string
+): Promise<{ ok: true }> {
+  await db
+    .update(notifications)
+    .set({ readAt: new Date() })
+    .where(
+      and(eq(notifications.userId, userId), isNull(notifications.readAt))
+    );
+  invalidateHeaderForUser(userId);
+  return { ok: true };
+}
+
+/** Delete a single notification, scoped to the owner. */
+export async function dismissNotificationCore(
+  userId: string,
+  id: string
+): Promise<{ ok: true }> {
+  await db
+    .delete(notifications)
+    .where(and(eq(notifications.id, id), eq(notifications.userId, userId)));
+  invalidateHeaderForUser(userId);
+  return { ok: true };
 }
