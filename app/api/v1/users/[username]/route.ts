@@ -1,13 +1,14 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 import { db } from "@/db";
-import { profiles, users } from "@/db/schema";
+import { charts, profiles, users } from "@/db/schema";
 import { requireMobileUser } from "@/lib/api/auth";
 import { ApiError, handle } from "@/lib/api/errors";
 import { ok } from "@/lib/api/respond";
 import { listRecentPostsByUserPage, loadProfilePhotos, sunSignFromDob } from "@/lib/feed-core";
 import { countFriends, getFriendshipStatus } from "@/lib/friendship";
 import { getReputation } from "@/lib/reputation";
+import { computeSynastry, overallVerdict } from "@/lib/synastry";
 
 export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
@@ -48,7 +49,7 @@ export async function GET(
     }
 
     const isSelf = row.id === viewer.id;
-    const [reputation, friendCount, friendship, photos, recentPosts] =
+    const [reputation, friendCount, friendship, photos, recentPosts, charted] =
       await Promise.all([
         getReputation(row.id),
         countFriends(row.id),
@@ -57,7 +58,29 @@ export async function GET(
           : getFriendshipStatus(viewer.id, row.id),
         loadProfilePhotos([row.id]),
         listRecentPostsByUserPage({ viewerId: viewer.id, userId: row.id, limit: 10 }),
+        // Both charts (viewer + target) for the compatibility preview. Read
+        // straight from the cache — no on-the-fly generation on a profile view.
+        db
+          .select({ userId: charts.userId, data: charts.data })
+          .from(charts)
+          .where(inArray(charts.userId, [viewer.id, row.id])),
       ]);
+
+    // Weighted overall synastry between viewer and this user (0–100), plus a
+    // Georgian verdict — same computeSynastry() the website + /synastry use.
+    let compatibility: { overall: number; verdict: string } | null = null;
+    if (!isSelf) {
+      const viewerData = charted.find((c) => c.userId === viewer.id)?.data;
+      const targetData = charted.find((c) => c.userId === row.id)?.data;
+      if (viewerData && targetData) {
+        try {
+          const overall = computeSynastry(viewerData, targetData).overall;
+          compatibility = { overall, verdict: overallVerdict(overall) };
+        } catch {
+          compatibility = null;
+        }
+      }
+    }
 
     return ok({
       user: {
@@ -73,6 +96,7 @@ export async function GET(
         cityName: row.cityName,
       },
       sunSign: sunSignFromDob(row.dateOfBirth),
+      compatibility,
       reputation,
       friendCount,
       friendship,
