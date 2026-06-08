@@ -6,7 +6,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
-import { partnerCreationsThisMonth } from "@/actions/partners";
+import { partnerCreationsThisMonth } from "@/lib/partners-core";
 import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
 import { PartnerForm } from "@/components/synastry/partner-form";
 

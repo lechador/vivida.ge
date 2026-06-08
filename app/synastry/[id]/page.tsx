@@ -8,7 +8,7 @@ import { ensureChartFor } from "@/actions/chart";
 import {
   ensureSynastryInterpretation,
   getPartnerForViewer,
-} from "@/actions/partners";
+} from "@/lib/partners-core";
 import { computeSynastry } from "@/lib/synastry";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";

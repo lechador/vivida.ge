@@ -6,7 +6,10 @@ import { getCurrentPlan } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
-import { listPartners, partnerCreationsThisMonth } from "@/actions/partners";
+import {
+  listPartners,
+  partnerCreationsThisMonth,
+} from "@/lib/partners-core";
 import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
 import { PartnerCard } from "@/components/synastry/partner-card";
 
