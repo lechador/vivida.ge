@@ -183,6 +183,13 @@
       "when": 1780600059246,
       "tag": "0025_silent_maria_hill",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1781363454952,
+      "tag": "0026_keen_baron_strucker",
+      "breakpoints": true
     }
   ]
 }

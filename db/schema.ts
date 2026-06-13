@@ -372,6 +372,8 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "post_comment",
   "post_reaction",
   "mention",
+  // Mutual like in the match deck — emitted to both users at once.
+  "new_match",
 ]);
 
 /**
@@ -464,6 +466,69 @@ export const friendships = pgTable(
     respondedAt: timestamp("responded_at", { withTimezone: true }),
   },
   (t) => [primaryKey({ columns: [t.requesterId, t.recipientId] })]
+);
+
+/**
+ * Romantic-intent swipes, the foundation of the match deck. Distinct from
+ * `friendships`: a like is one-directional and silent until reciprocated.
+ * One row per (liker → target); `kind` records the swipe direction so a
+ * pass excludes the target from the deck without ever notifying them, and a
+ * later like can overwrite a pass (upsert on the PK).
+ */
+export const likeKindEnum = pgEnum("like_kind", ["like", "pass"]);
+
+export const likes = pgTable(
+  "like",
+  {
+    likerId: text("liker_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetId: text("target_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: likeKindEnum("kind").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.likerId, t.targetId] }),
+    // "Who liked me" + reciprocal-like lookup on a fresh like.
+    index("like_target_kind_idx").on(t.targetId, t.kind),
+  ]
+);
+
+/**
+ * A mutual like. Created when a like is reciprocated; either user can
+ * unmatch (soft delete via `unmatchedAt` so the pair isn't re-surfaced in
+ * the deck and the like rows stay as a record). The pair is stored sorted
+ * (userAId < userBId) so a match is unique regardless of who liked first.
+ */
+export const matches = pgTable(
+  "match",
+  {
+    userAId: text("user_a_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    userBId: text("user_b_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    /** NULL = active match; set when either side unmatches. */
+    unmatchedAt: timestamp("unmatched_at", { withTimezone: true }),
+    /** Who pressed unmatch (for analytics / re-match rules later). */
+    unmatchedBy: text("unmatched_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userAId, t.userBId] }),
+    // List a user's matches: matches where they're either side, active first.
+    index("match_user_a_idx").on(t.userAId, t.unmatchedAt),
+    index("match_user_b_idx").on(t.userBId, t.unmatchedAt),
+  ]
 );
 
 /**
@@ -1089,6 +1154,11 @@ export type NewNotification = typeof notifications.$inferInsert;
 export type NotificationKind = (typeof notificationKindEnum.enumValues)[number];
 export type Message = typeof messages.$inferSelect;
 export type NewMessage = typeof messages.$inferInsert;
+export type Like = typeof likes.$inferSelect;
+export type NewLike = typeof likes.$inferInsert;
+export type LikeKind = (typeof likeKindEnum.enumValues)[number];
+export type Match = typeof matches.$inferSelect;
+export type NewMatch = typeof matches.$inferInsert;
 export type AuthToken = typeof authTokens.$inferSelect;
 export type NewAuthToken = typeof authTokens.$inferInsert;
 export type MobileRefreshToken = typeof mobileRefreshTokens.$inferSelect;

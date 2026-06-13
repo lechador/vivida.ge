@@ -3,6 +3,7 @@ import { and, eq, isNull, or } from "drizzle-orm";
 import { db } from "@/db";
 import { friendships, messages, type Message } from "@/db/schema";
 import { recordTyping } from "@/lib/messages";
+import { areMatched } from "@/lib/match";
 
 /**
  * Framework-agnostic messaging *write* logic, shared by the website (Server
@@ -18,8 +19,12 @@ export type SendMessageResult =
   | { ok: true; message: Message }
   | { ok: false; error: string };
 
-/** Whether two users are mutual (accepted) friends — message gating. */
-async function areFriends(a: string, b: string): Promise<boolean> {
+/**
+ * Whether `a` may message `b` — message gating. Open to mutual (accepted)
+ * friends OR an active match: a match unlocks the conversation, which is the
+ * whole payoff of the match deck. Either relationship is sufficient.
+ */
+async function canMessage(a: string, b: string): Promise<boolean> {
   const [link] = await db
     .select({ status: friendships.status })
     .from(friendships)
@@ -30,7 +35,10 @@ async function areFriends(a: string, b: string): Promise<boolean> {
       )
     )
     .limit(1);
-  return !!link && link.status === "accepted";
+  if (link?.status === "accepted") return true;
+  // A block (recorded in friendships) always wins, even over a match.
+  if (link?.status === "blocked") return false;
+  return areMatched(a, b);
 }
 
 /**
@@ -54,8 +62,8 @@ export async function sendMessageCore(
     return { ok: false, error: "წერილი ძალიან გრძელია" };
   }
 
-  if (!(await areFriends(senderId, recipientId))) {
-    return { ok: false, error: "მხოლოდ მეგობრებს შეგიძლია წერო" };
+  if (!(await canMessage(senderId, recipientId))) {
+    return { ok: false, error: "წერა შეგიძლია მეგობრებს ან დამთხვევებს" };
   }
 
   const [inserted] = await db
@@ -75,8 +83,8 @@ export async function pingTypingCore(
   recipientId: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (recipientId === senderId) return { ok: false, error: "self" };
-  if (!(await areFriends(senderId, recipientId))) {
-    return { ok: false, error: "not_friends" };
+  if (!(await canMessage(senderId, recipientId))) {
+    return { ok: false, error: "not_allowed" };
   }
   await recordTyping(senderId, recipientId);
   return { ok: true };
