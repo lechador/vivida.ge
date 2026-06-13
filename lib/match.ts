@@ -43,6 +43,16 @@ export type MatchView = {
   matchedAt: string;
 };
 
+export type IncomingLikes = {
+  /** How many people have liked the viewer and are awaiting a decision. */
+  count: number;
+  /** True when the viewer's plan hides liker identities (free tier). */
+  locked: boolean;
+  /** The likers' cards — empty when `locked` (identities are withheld
+   *  server-side so a free client can't scrape them). */
+  likers: MatchView[];
+};
+
 const DECK_LIMIT = 30;
 /** Cap candidates scored per deck build so synastry cost stays bounded as the
  *  user base grows (mirrors the candidate cap in discover.ts). */
@@ -248,6 +258,100 @@ export async function listMatches(viewerId: string): Promise<MatchView[]> {
   // Preserve newest-match-first ordering (the join above doesn't guarantee it).
   views.sort((a, b) => b.matchedAt.localeCompare(a.matchedAt));
   return views;
+}
+
+/**
+ * People who have liked the viewer and are still awaiting a decision (the
+ * viewer hasn't liked or passed them back, and they're not blocked). This is
+ * the "who liked you" surface: a count is always returned, but liker
+ * identities are only built when `reveal` is true (Pro tier) — a free client
+ * gets the count and an empty list so it can show blurred teasers without ever
+ * receiving the underlying data.
+ */
+export async function listIncomingLikes(
+  viewerId: string,
+  { reveal }: { reveal: boolean }
+): Promise<IncomingLikes> {
+  const [likedMe, iDecided, blockedRows] = await Promise.all([
+    db
+      .select({ id: likes.likerId })
+      .from(likes)
+      .where(and(eq(likes.targetId, viewerId), eq(likes.kind, "like"))),
+    db.select({ id: likes.targetId }).from(likes).where(eq(likes.likerId, viewerId)),
+    db
+      .select({ a: friendships.requesterId, b: friendships.recipientId })
+      .from(friendships)
+      .where(
+        and(
+          eq(friendships.status, "blocked"),
+          or(
+            eq(friendships.requesterId, viewerId),
+            eq(friendships.recipientId, viewerId)
+          )
+        )
+      ),
+  ]);
+
+  const decided = new Set(iDecided.map((r) => r.id));
+  for (const r of blockedRows) decided.add(r.a === viewerId ? r.b : r.a);
+  const pending = [...new Set(likedMe.map((r) => r.id))].filter(
+    (id) => !decided.has(id)
+  );
+
+  const count = pending.length;
+  if (!reveal || count === 0) {
+    return { count, locked: !reveal, likers: [] };
+  }
+
+  const [viewerChart] = await db
+    .select({ data: charts.data })
+    .from(charts)
+    .where(eq(charts.userId, viewerId))
+    .limit(1);
+
+  const people = await db
+    .select({ user: users, profile: profiles, chart: charts })
+    .from(users)
+    .innerJoin(profiles, eq(profiles.userId, users.id))
+    .leftJoin(charts, eq(charts.userId, users.id))
+    .where(inArray(users.id, pending));
+
+  const photoRows = await db
+    .select({ userId: profilePhotos.userId, url: profilePhotos.url })
+    .from(profilePhotos)
+    .where(and(eq(profilePhotos.ready, true), inArray(profilePhotos.userId, pending)))
+    .orderBy(asc(profilePhotos.sortOrder));
+  const firstPhoto = new Map<string, string>();
+  for (const p of photoRows) {
+    if (!firstPhoto.has(p.userId)) firstPhoto.set(p.userId, p.url);
+  }
+
+  const likers: MatchView[] = people.map((p) => {
+    let compatibility: number | null = null;
+    if (viewerChart?.data && p.chart?.data) {
+      try {
+        compatibility = computeSynastry(viewerChart.data, p.chart.data).overall;
+      } catch {
+        compatibility = null;
+      }
+    }
+    return {
+      userId: p.user.id,
+      username: p.profile.username ?? "",
+      displayName:
+        p.profile.displayName ??
+        p.user.name?.split(" ")[0] ??
+        p.profile.username ??
+        "user",
+      image: p.user.image,
+      photoUrl: firstPhoto.get(p.user.id) ?? null,
+      compatibility,
+      matchedAt: "",
+    };
+  });
+
+  likers.sort((a, b) => (b.compatibility ?? -1) - (a.compatibility ?? -1));
+  return { count, locked: false, likers };
 }
 
 /** Whether two users have an active (non-unmatched) match. */

@@ -155,6 +155,26 @@ export async function likeUserCore(
 }
 
 /**
+ * Undo the viewer's most recent swipe on `targetId`: remove their like/pass so
+ * the candidate can re-surface in the deck. If that swipe had just created a
+ * match, the match row is removed too (a hard delete — it never really
+ * existed from the user's perspective). The *other* user's like is untouched.
+ */
+export async function undoSwipeCore(
+  userId: string,
+  targetId: string
+): Promise<{ ok: true }> {
+  const [a, b] = sortedPair(userId, targetId);
+  await Promise.all([
+    db
+      .delete(likes)
+      .where(and(eq(likes.likerId, userId), eq(likes.targetId, targetId))),
+    db.delete(matches).where(and(eq(matches.userAId, a), eq(matches.userBId, b))),
+  ]);
+  return { ok: true };
+}
+
+/**
  * Unmatch `otherId`. Soft-deletes the match (so it leaves both decks and the
  * matches list and chat re-locks) while keeping the row for analytics. The
  * like rows are left intact, so neither user re-appears in the other's deck.

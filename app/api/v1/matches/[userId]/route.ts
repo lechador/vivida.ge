@@ -4,13 +4,13 @@ import { requireMobileUser } from "@/lib/api/auth";
 import { handle } from "@/lib/api/errors";
 import { ok, fail } from "@/lib/api/respond";
 import { parseBody } from "@/lib/api/validate";
-import { likeUserCore, unmatchCore } from "@/lib/match-core";
+import { likeUserCore, unmatchCore, undoSwipeCore } from "@/lib/match-core";
 
 export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
 
 const Body = z.object({
-  action: z.enum(["like", "pass", "unmatch"]),
+  action: z.enum(["like", "pass", "unmatch", "undo"]),
 });
 
 /**
@@ -35,6 +35,11 @@ export async function POST(
     if (action === "unmatch") {
       const res = await unmatchCore(user.id, userId);
       if (!res.ok) return fail(422, "match_action_rejected", res.error);
+      return ok({ matched: false });
+    }
+
+    if (action === "undo") {
+      await undoSwipeCore(user.id, userId);
       return ok({ matched: false });
     }
 
