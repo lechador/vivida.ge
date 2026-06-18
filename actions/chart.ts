@@ -1,6 +1,7 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { after } from "next/server";
 
 import { db } from "@/db";
 import { charts, profiles, users, type Chart } from "@/db/schema";
@@ -28,14 +29,34 @@ import type { NatalChartJson } from "@/db/schema";
  *   3. If interpretation generation fails, persist the chart anyway so the
  *      static fallback can render.
  */
+/**
+ * How the AI narrative is handled relative to the caller:
+ *  - "wait"  (default): generate + persist AI inline, blocking until done.
+ *            Use where the page genuinely renders the narrative server-side
+ *            (e.g. /report, mobile chart API).
+ *  - "defer": persist the fast static chart, return it immediately, and run
+ *            the AI upgrade in the background via `after()`. Use on the
+ *            dashboard so the user never stares at a spinner — the chart
+ *            renders instantly and the richer text lands on the next view.
+ *  - "skip":  only chart *data* (positions) is needed, never the narrative.
+ *            Neither waits for nor schedules AI. Used by the daily/weekly
+ *            generators, which read positions for transits.
+ */
+type AiUpgradeMode = "wait" | "defer" | "skip";
+
 export async function ensureChartFor(
   userId: string,
-  plan: PlanId = "free"
+  plan: PlanId = "free",
+  opts: { aiUpgrade?: AiUpgradeMode } = {}
 ): Promise<Chart | null> {
+  const mode = opts.aiUpgrade ?? "wait";
   // AI summary gates through the feature flag layer. While the flag is off,
   // every plan gets AI generation — so long as OpenRouter is configured.
-  const aiEnabled =
-    canUseFeature("aiSummary", plan) && isOpenRouterConfigured();
+  // `skip` callers opt out entirely.
+  const wantAi =
+    mode !== "skip" &&
+    canUseFeature("aiSummary", plan) &&
+    isOpenRouterConfigured();
   const [profile] = await db
     .select()
     .from(profiles)
@@ -99,110 +120,45 @@ export async function ensureChartFor(
       Object.keys(interp.houses).length === 0 ||
       Object.keys(interp.aspects).length === 0;
     const canUpgrade =
-      aiEnabled &&
+      wantAi &&
       (existing.interpretationModel === "static" || missingExpansion);
     if (!canUpgrade) return existing;
+    // Positions are already current — only the AI narrative needs work, and
+    // we have the data to do it without recomputing. In "defer" mode we hand
+    // that to the background and return the (renderable) static chart now.
+    if (mode === "defer") {
+      scheduleAiUpgrade(userId, expectedHash, existing.data);
+      return existing;
+    }
+    // "wait" mode falls through to recompute + inline AI below.
   }
 
-  // Compute (or recompute) the natal chart
+  // Compute (or recompute) the natal chart.
   const computed = await computeChart(input);
 
-  // Always seed with the static dictionary; AI augments if available.
-  const ascSign = signByIndex(computed.data.ascendant.signIndex).key;
-  const sunSign =
-    computed.data.bodies.sun &&
-    signByIndex(computed.data.bodies.sun.signIndex).key;
-  const moonSign =
-    computed.data.bodies.moon &&
-    signByIndex(computed.data.bodies.moon.signIndex).key;
+  // Seed with the static dictionary so the chart is fully renderable with
+  // zero AI latency. AI text is layered on top afterwards.
+  const interpretation = buildStaticInterpretation(computed.data);
 
-  const staticBigThree = {
-    sun: sunSign ? staticInterpretation("sun", sunSign) : undefined,
-    moon: moonSign ? staticInterpretation("moon", moonSign) : undefined,
-    ascendant: staticInterpretation("ascendant", ascSign),
-  };
+  // Persist the static chart immediately. Every caller — especially the
+  // dashboard right after signup — gets a fast, complete chart back; the AI
+  // narrative is layered on via a guarded update that never blocks the page.
+  await upsertChartRow(
+    userId,
+    expectedHash,
+    computed.source,
+    computed.data,
+    interpretation,
+    "static"
+  );
 
-  const staticPlanets = buildStaticPlanetTexts(computed.data);
-  const staticHouses = buildStaticHouseTexts(computed.data);
-
-  const staticAspects = buildStaticAspectTexts(computed.data);
-
-  let interpretation: NonNullable<Chart["interpretation"]> = {
-    bigThree: staticBigThree,
-    highlights: [],
-    planets: staticPlanets,
-    houses: staticHouses,
-    aspects: staticAspects,
-  };
-
-  let interpretationModel = "static";
-  const interpretedAt = new Date();
-
-  if (aiEnabled) {
-    try {
-      const [user] = await db
-        .select({ name: users.name })
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
-      const firstName = user?.name?.split(" ")[0] ?? null;
-
-      const ai = await generateInterpretation({
-        firstName,
-        chart: computed.data,
-        staticBigThree,
-      });
-      if (ai) {
-        // Merge AI fields into static defaults so any missing key still has
-        // sensible content. AI text wins where present.
-        interpretation = {
-          summary: ai.summary,
-          bigThree: {
-            sun: ai.bigThree?.sun ?? staticBigThree.sun,
-            moon: ai.bigThree?.moon ?? staticBigThree.moon,
-            ascendant: ai.bigThree?.ascendant ?? staticBigThree.ascendant,
-          },
-          highlights: ai.highlights ?? [],
-          planets: { ...staticPlanets, ...(ai.planets ?? {}) },
-          houses: { ...staticHouses, ...(ai.houses ?? {}) },
-          aspects: { ...staticAspects, ...(ai.aspects ?? {}) },
-        };
-        interpretationModel = OPENROUTER_MODEL;
-      }
-    } catch (err) {
-      console.warn(
-        "[chart] AI interpretation failed; using static fallback:",
-        (err as Error).message
-      );
+  if (wantAi) {
+    if (mode === "defer") {
+      scheduleAiUpgrade(userId, expectedHash, computed.data);
+    } else {
+      await upgradeChartAi(userId, expectedHash, computed.data);
     }
   }
-
-  // Upsert
-  await db
-    .insert(charts)
-    .values({
-      userId,
-      inputHash: expectedHash,
-      source: computed.source,
-      data: computed.data,
-      interpretation,
-      interpretationModel,
-      language: "ka",
-      interpretedAt,
-    })
-    .onConflictDoUpdate({
-      target: charts.userId,
-      set: {
-        inputHash: expectedHash,
-        source: computed.source,
-        data: computed.data,
-        interpretation,
-        interpretationModel,
-        language: "ka",
-        generatedAt: new Date(),
-        interpretedAt,
-      },
-    });
 
   const [fresh] = await db
     .select()
@@ -210,6 +166,169 @@ export async function ensureChartFor(
     .where(eq(charts.userId, userId))
     .limit(1);
   return fresh ?? null;
+}
+
+/** Static (zero-latency) interpretation seed for a freshly computed chart. */
+function buildStaticInterpretation(
+  data: NatalChartJson
+): NonNullable<Chart["interpretation"]> {
+  const ascSign = signByIndex(data.ascendant.signIndex).key;
+  const sunSign = data.bodies.sun && signByIndex(data.bodies.sun.signIndex).key;
+  const moonSign =
+    data.bodies.moon && signByIndex(data.bodies.moon.signIndex).key;
+  return {
+    bigThree: {
+      sun: sunSign ? staticInterpretation("sun", sunSign) : undefined,
+      moon: moonSign ? staticInterpretation("moon", moonSign) : undefined,
+      ascendant: staticInterpretation("ascendant", ascSign),
+    },
+    highlights: [],
+    planets: buildStaticPlanetTexts(data),
+    houses: buildStaticHouseTexts(data),
+    aspects: buildStaticAspectTexts(data),
+  };
+}
+
+async function upsertChartRow(
+  userId: string,
+  inputHash: string,
+  source: string,
+  data: NatalChartJson,
+  interpretation: NonNullable<Chart["interpretation"]>,
+  interpretationModel: string
+): Promise<void> {
+  const now = new Date();
+  await db
+    .insert(charts)
+    .values({
+      userId,
+      inputHash,
+      source,
+      data,
+      interpretation,
+      interpretationModel,
+      language: "ka",
+      interpretedAt: now,
+    })
+    .onConflictDoUpdate({
+      target: charts.userId,
+      set: {
+        inputHash,
+        source,
+        data,
+        interpretation,
+        interpretationModel,
+        language: "ka",
+        generatedAt: now,
+        interpretedAt: now,
+      },
+    });
+}
+
+/**
+ * Run the AI interpretation in the background after the response is sent.
+ * Falls back to fire-and-forget if we're somehow outside a request scope so
+ * the hot path never throws.
+ */
+function scheduleAiUpgrade(
+  userId: string,
+  inputHash: string,
+  data: NatalChartJson
+): void {
+  const run = () =>
+    upgradeChartAi(userId, inputHash, data).catch((err) =>
+      console.warn(
+        "[chart] background AI upgrade failed:",
+        (err as Error).message
+      )
+    );
+  try {
+    after(run);
+  } catch {
+    void run();
+  }
+}
+
+/**
+ * Generate the AI narrative for an already-persisted chart and merge it in.
+ * Guarded so concurrent schedules (e.g. signup pre-gen + dashboard) don't
+ * double-spend an AI call, and so a birth-data change mid-flight can't
+ * clobber the row.
+ */
+async function upgradeChartAi(
+  userId: string,
+  inputHash: string,
+  data: NatalChartJson
+): Promise<void> {
+  const [current] = await db
+    .select()
+    .from(charts)
+    .where(eq(charts.userId, userId))
+    .limit(1);
+  if (!current || current.inputHash !== inputHash) return;
+
+  // Already has a full AI interpretation? Nothing to do.
+  const interp = current.interpretation;
+  const missingExpansion =
+    !interp?.planets ||
+    !interp?.houses ||
+    !interp?.aspects ||
+    Object.keys(interp.planets).length === 0 ||
+    Object.keys(interp.houses).length === 0 ||
+    Object.keys(interp.aspects).length === 0;
+  if (current.interpretationModel !== "static" && !missingExpansion) return;
+
+  const [user] = await db
+    .select({ name: users.name })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  const firstName = user?.name?.split(" ")[0] ?? null;
+
+  const ascSign = signByIndex(data.ascendant.signIndex).key;
+  const sunSign = data.bodies.sun && signByIndex(data.bodies.sun.signIndex).key;
+  const moonSign =
+    data.bodies.moon && signByIndex(data.bodies.moon.signIndex).key;
+  const staticBigThree = {
+    sun: sunSign ? staticInterpretation("sun", sunSign) : undefined,
+    moon: moonSign ? staticInterpretation("moon", moonSign) : undefined,
+    ascendant: staticInterpretation("ascendant", ascSign),
+  };
+  const staticPlanets = buildStaticPlanetTexts(data);
+  const staticHouses = buildStaticHouseTexts(data);
+  const staticAspects = buildStaticAspectTexts(data);
+
+  const ai = await generateInterpretation({
+    firstName,
+    chart: data,
+    staticBigThree,
+  });
+  if (!ai) return;
+
+  // Merge AI fields into static defaults so any missing key still has
+  // sensible content. AI text wins where present.
+  const interpretation: NonNullable<Chart["interpretation"]> = {
+    summary: ai.summary,
+    bigThree: {
+      sun: ai.bigThree?.sun ?? staticBigThree.sun,
+      moon: ai.bigThree?.moon ?? staticBigThree.moon,
+      ascendant: ai.bigThree?.ascendant ?? staticBigThree.ascendant,
+    },
+    highlights: ai.highlights ?? [],
+    planets: { ...staticPlanets, ...(ai.planets ?? {}) },
+    houses: { ...staticHouses, ...(ai.houses ?? {}) },
+    aspects: { ...staticAspects, ...(ai.aspects ?? {}) },
+  };
+
+  // Only write if the chart still matches the positions we interpreted.
+  await db
+    .update(charts)
+    .set({
+      interpretation,
+      interpretationModel: OPENROUTER_MODEL,
+      interpretedAt: new Date(),
+    })
+    .where(and(eq(charts.userId, userId), eq(charts.inputHash, inputHash)));
 }
 
 // ────────────────────────────────────────────────────────────────────────

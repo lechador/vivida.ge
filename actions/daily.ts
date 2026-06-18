@@ -48,7 +48,9 @@ export async function ensureDailyFor(
     .limit(1);
   if (!profile?.timezone) return null;
 
-  const chart = await ensureChartFor(userId, plan);
+  // Only positions are needed here (for transits) — never the AI narrative,
+  // so don't wait on or trigger a chart AI generation.
+  const chart = await ensureChartFor(userId, plan, { aiUpgrade: "skip" });
   if (!chart) return null;
 
   const today = localDateString(new Date(), profile.timezone);

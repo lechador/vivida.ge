@@ -43,7 +43,9 @@ export async function ensureWeeklyForecast(
     .limit(1);
   if (!profile?.timezone) return null;
 
-  const chart = await ensureChartFor(userId, plan);
+  // Only positions are needed here (for transit scoring) — never the AI
+  // narrative, so don't wait on or trigger a chart AI generation.
+  const chart = await ensureChartFor(userId, plan, { aiUpgrade: "skip" });
   if (!chart) return null;
 
   const now = new Date();

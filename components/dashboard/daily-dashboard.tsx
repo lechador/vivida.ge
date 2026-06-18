@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { loadDashboardBundle, type DashboardBundle } from "@/actions/dashboard";
+import {
+  loadDashboardCore,
+  loadDashboardExtras,
+  type DashboardCore,
+  type DashboardExtras,
+} from "@/actions/dashboard";
 import { Button } from "@/components/ui/button";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import type { PlanId } from "@/lib/pricing";
@@ -17,9 +22,11 @@ import { SuggestedPeopleRail } from "./suggested-people-rail";
 import { WeeklyForecastCard } from "./weekly-forecast-card";
 
 /**
- * Dashboard content loaded after first paint via a server action. The page
- * shell ships immediately so the browser tab spinner stops while our
- * internal CosmicLoader covers the AI generation latency.
+ * Dashboard content loaded after first paint via server actions. The page
+ * shell ships immediately; this loads in two waves so the user never waits
+ * on AI latency:
+ *   - core (chart positions + suggestions) renders as soon as it's ready
+ *   - the AI cards (daily / weekly / moon) stream in behind skeletons
  */
 export function DailyDashboard({
   userId,
@@ -29,14 +36,14 @@ export function DailyDashboard({
   plan: PlanId;
 }) {
   const router = useRouter();
-  const [bundle, setBundle] = useState<DashboardBundle | null>(null);
+  const [core, setCore] = useState<DashboardCore | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    loadDashboardBundle(userId, plan)
-      .then((b) => {
-        if (!cancelled) setBundle(b);
+    loadDashboardCore(userId, plan)
+      .then((c) => {
+        if (!cancelled) setCore(c);
       })
       .catch((err) => {
         if (!cancelled) setError((err as Error).message);
@@ -47,10 +54,10 @@ export function DailyDashboard({
   }, [userId, plan]);
 
   useEffect(() => {
-    if (bundle?.kind === "no-chart") {
+    if (core?.kind === "no-chart") {
       router.replace("/onboarding");
     }
-  }, [bundle, router]);
+  }, [core, router]);
 
   if (error) {
     return (
@@ -60,26 +67,11 @@ export function DailyDashboard({
     );
   }
 
-  if (!bundle || bundle.kind === "no-chart") {
+  if (!core || core.kind === "no-chart") {
     return <CosmicLoader embedded progressive />;
   }
 
-  const {
-    chart,
-    daily,
-    moonPhase,
-    weeklyForecast,
-    timezone,
-    suggestions,
-  } = bundle;
-
-  const dailySlot = daily ? (
-    <DailyCard horoscope={daily} timezone={timezone} />
-  ) : (
-    <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
-      დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში.
-    </div>
-  );
+  const { chart, timezone, canDaily, canWeekly, suggestions } = core;
 
   return (
     <div className="space-y-8">
@@ -87,18 +79,15 @@ export function DailyDashboard({
           stickiest part of the app, surface it before anything else. */}
       <SuggestedPeopleRail suggestions={suggestions} />
 
-      <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
-        <div className="xl:col-span-7">{dailySlot}</div>
-        {moonPhase && (
-          <div className="xl:col-span-5 xl:sticky xl:top-20">
-            <MoonPhaseCard data={moonPhase} />
-          </div>
-        )}
-      </div>
-
-      {weeklyForecast && weeklyForecast.days.length > 0 && (
-        <WeeklyForecastCard days={weeklyForecast.days} />
-      )}
+      {/* AI cards stream in here behind skeletons so the page never blocks
+          on generation latency. */}
+      <DashboardExtrasSection
+        userId={userId}
+        plan={plan}
+        timezone={timezone}
+        canDaily={canDaily}
+        canWeekly={canWeekly}
+      />
 
       <section>
         <header className="mb-3 flex items-baseline justify-between">
@@ -135,5 +124,93 @@ export function DailyDashboard({
         </div>
       </section>
     </div>
+  );
+}
+
+/**
+ * Loads + renders the AI-generated cards (daily, moon, weekly) as a second
+ * wave. Shows skeletons in the meantime so the layout is stable and the
+ * page feels finished while generation runs in the background.
+ */
+function DashboardExtrasSection({
+  userId,
+  plan,
+  timezone,
+  canDaily,
+  canWeekly,
+}: {
+  userId: string;
+  plan: PlanId;
+  timezone: string;
+  canDaily: boolean;
+  canWeekly: boolean;
+}) {
+  const [extras, setExtras] = useState<DashboardExtras | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadDashboardExtras(userId, plan)
+      .then((e) => {
+        if (!cancelled) setExtras(e);
+      })
+      .catch(() => {
+        // Degrade silently — the rest of the dashboard is already useful.
+        if (!cancelled) {
+          setExtras({ daily: null, moonPhase: null, weeklyForecast: null });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, plan]);
+
+  const loading = extras === null;
+
+  const dailySlot = loading ? (
+    <CardSkeleton className="min-h-[220px]" />
+  ) : extras.daily ? (
+    <DailyCard horoscope={extras.daily} timezone={timezone} />
+  ) : canDaily ? (
+    <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
+      დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში.
+    </div>
+  ) : null;
+
+  const moonSlot = loading ? (
+    <CardSkeleton className="min-h-[220px]" />
+  ) : extras.moonPhase ? (
+    <MoonPhaseCard data={extras.moonPhase} />
+  ) : null;
+
+  return (
+    <>
+      {(dailySlot || moonSlot) && (
+        <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
+          {dailySlot && <div className="xl:col-span-7">{dailySlot}</div>}
+          {moonSlot && (
+            <div className="xl:col-span-5 xl:sticky xl:top-20">{moonSlot}</div>
+          )}
+        </div>
+      )}
+
+      {loading && canWeekly ? (
+        <CardSkeleton className="min-h-[160px]" />
+      ) : (
+        extras?.weeklyForecast &&
+        extras.weeklyForecast.days.length > 0 && (
+          <WeeklyForecastCard days={extras.weeklyForecast.days} />
+        )
+      )}
+    </>
+  );
+}
+
+/** Generic shimmering card placeholder matching the dashboard card chrome. */
+function CardSkeleton({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`vivida-pulse-soft rounded-2xl border border-border/60 bg-card/40 ${className}`}
+      aria-hidden
+    />
   );
 }
