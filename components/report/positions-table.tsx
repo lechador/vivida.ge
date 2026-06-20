@@ -1,16 +1,12 @@
-import Link from "next/link";
-
 import { bodyMeta, formatDegree, signByIndex, signColor } from "@/lib/zodiac";
 import type { NatalChartJson, PointJson } from "@/db/schema";
 
 /**
  * Compact, scannable planet-positions table — the at-a-glance data layer of
- * the report (astro-seek-style). Every row is dense and flat; navigation is
- * built in:
- *   - the planet name jumps in-page to its interpretation (#planet-<key>),
- *   - the sign links out to its full /zodiac/<sign> deep-dive.
- * Server component — uses native anchors, no client JS (the page sets
- * scroll-behavior + scroll-mt so jumps land cleanly under the sticky nav).
+ * the report. Each whole row is a single in-page anchor that scrolls down to
+ * that point's interpretation (#planet-<key>) — no navigation away. Glyphs sit
+ * in fixed-width boxes so the names line up on a straight vertical edge.
+ * Server component (native anchors, no client JS).
  */
 
 const ROW_KEYS = [
@@ -28,6 +24,8 @@ const ROW_KEYS = [
 ] as const;
 
 const GRID = "grid grid-cols-[1.3fr_1.3fr_auto_2.5rem] items-center gap-x-3";
+// Fixed-width, centered glyph box → every name starts at the same x.
+const GLYPH = "w-6 shrink-0 text-center text-base leading-none";
 
 function pointFor(chart: NatalChartJson, key: string): PointJson | null {
   if (key === "ascendant") return chart.ascendant ?? null;
@@ -55,40 +53,38 @@ export function PositionsTable({ chart }: { chart: NatalChartJson }) {
           const house = key === "ascendant" ? 1 : point.house;
 
           return (
-            <li
-              key={key}
-              className={`${GRID} border-t border-border/50 px-4 py-2.5 text-sm transition-colors hover:bg-card/70 sm:px-5`}
-            >
+            <li key={key} className="border-t border-border/50">
               <a
                 href={`#planet-${key}`}
-                className="flex min-w-0 items-center gap-2 font-medium transition-colors hover:text-[var(--vivida-violet)]"
+                className={`${GRID} px-4 py-2.5 text-sm transition-colors hover:bg-card/70 sm:px-5`}
               >
-                <span aria-hidden style={{ color }} className="w-5 shrink-0 text-center text-base leading-none">
-                  {meta?.symbol ?? "?"}
+                <span className="flex min-w-0 items-center gap-2 font-medium">
+                  <span aria-hidden style={{ color }} className={GLYPH}>
+                    {meta?.symbol ?? "?"}
+                  </span>
+                  <span className="truncate">{meta?.labelKa ?? key}</span>
                 </span>
-                <span className="truncate">{meta?.labelKa ?? key}</span>
+
+                <span className="flex min-w-0 items-center gap-2 text-foreground/85">
+                  <span aria-hidden style={{ color }} className={GLYPH}>
+                    {`${sign.symbol}︎`}
+                  </span>
+                  <span className="truncate">{sign.labelKa}</span>
+                </span>
+
+                <span className="whitespace-nowrap text-right tabular-nums text-foreground/80">
+                  {formatDegree(point.signDegree)}
+                  {point.retrograde && (
+                    <span className="ml-1 text-[11px] text-muted-foreground">
+                      ℞
+                    </span>
+                  )}
+                </span>
+
+                <span className="text-right tabular-nums text-muted-foreground">
+                  {house ?? "—"}
+                </span>
               </a>
-
-              <Link
-                href={`/zodiac/${sign.key}`}
-                className="flex min-w-0 items-center gap-2 text-foreground/85 transition-colors hover:text-[var(--vivida-violet)]"
-              >
-                <span aria-hidden style={{ color }} className="w-5 shrink-0 text-center text-base leading-none">
-                  {`${sign.symbol}\uFE0E`}
-                </span>
-                <span className="truncate">{sign.labelKa}</span>
-              </Link>
-
-              <span className="whitespace-nowrap text-right tabular-nums text-foreground/80">
-                {formatDegree(point.signDegree)}
-                {point.retrograde && (
-                  <span className="ml-1 text-[11px] text-muted-foreground">℞</span>
-                )}
-              </span>
-
-              <span className="text-right tabular-nums text-muted-foreground">
-                {house ?? "—"}
-              </span>
             </li>
           );
         })}
@@ -104,7 +100,10 @@ const HOUSE_LABEL: Record<number, string> = {
   10: "MC",
 };
 
-/** Compact two-column houses list (cusps), signs link to their /zodiac page. */
+/**
+ * Compact two-column houses list (cusps). Each row scrolls in-page to that
+ * house's interpretation (#house-<n>).
+ */
 export function HousesTable({ chart }: { chart: NatalChartJson }) {
   const houses = [...chart.houses].sort((a, b) => a.number - b.number);
   return (
@@ -113,23 +112,19 @@ export function HousesTable({ chart }: { chart: NatalChartJson }) {
         const sign = signByIndex(h.signIndex);
         const color = signColor(sign);
         return (
-          <div
+          <a
             key={h.number}
-            className="flex items-center justify-between gap-3 border-b border-border/50 py-2 text-sm"
+            href={`#house-${h.number}`}
+            className="flex items-center gap-3 border-b border-border/50 py-2 text-sm transition-colors hover:text-[var(--vivida-violet)]"
           >
-            <span className="w-8 shrink-0 font-medium tabular-nums text-muted-foreground">
+            <span className="w-7 shrink-0 font-medium tabular-nums text-muted-foreground">
               {HOUSE_LABEL[h.number] ?? h.number}
             </span>
-            <Link
-              href={`/zodiac/${sign.key}`}
-              className="flex flex-1 items-center justify-end gap-2 transition-colors hover:text-[var(--vivida-violet)]"
-            >
-              <span aria-hidden style={{ color }} className="w-5 shrink-0 text-center text-base leading-none">
-                {`${sign.symbol}\uFE0E`}
-              </span>
-              <span>{sign.labelKa}</span>
-            </Link>
-          </div>
+            <span aria-hidden style={{ color }} className={GLYPH}>
+              {`${sign.symbol}︎`}
+            </span>
+            <span className="truncate">{sign.labelKa}</span>
+          </a>
         );
       })}
     </div>
