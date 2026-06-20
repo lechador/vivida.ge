@@ -58,7 +58,7 @@ export function VividaMark({
       {/* Companion star, upper right — adds asymmetry + cosmic feel */}
       <path
         d="M 50 12 L 51 16 L 55 17 L 51 18 L 50 22 L 49 18 L 45 17 L 49 16 Z"
-        fill="#22d3ee"
+        fill="var(--vivida-cyan)"
         fillOpacity="0.9"
       />
     </svg>
@@ -88,7 +88,7 @@ export function VividaLockup({
           className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
           style={{
             backgroundImage:
-              "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+              "linear-gradient(135deg, var(--vivida-violet) 0%, var(--vivida-pink) 55%, var(--vivida-cyan) 100%)",
           }}
         >
           vivida

@@ -19,9 +19,9 @@ import {
  * broken render.
  */
 
-const VIVIDA_VIOLET = "#a78bfa";
-const VIVIDA_PINK = "#f472b6";
-const VIVIDA_CYAN = "#22d3ee";
+const VIVIDA_VIOLET = "var(--vivida-violet)";
+const VIVIDA_PINK = "var(--vivida-pink)";
+const VIVIDA_CYAN = "var(--vivida-cyan)";
 const TOP_CATEGORIES: SynastryCategory[] = [
   "love",
   "chemistry",
