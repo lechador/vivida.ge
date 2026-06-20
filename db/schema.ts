@@ -1186,3 +1186,84 @@ export type ReputationEventKind =
 export type Plan = (typeof planEnum.enumValues)[number];
 export type SubscriptionStatus = (typeof subscriptionStatusEnum.enumValues)[number];
 export type BillingInterval = (typeof billingIntervalEnum.enumValues)[number];
+
+// ─── Trust & safety ─────────────────────────────────────────────────────
+
+/**
+ * Directional user blocks. A row (blocker → blocked) means `blockerId` has
+ * blocked `blockedId`. Enforced *both ways* at read time (neither party can
+ * message, friend, or see the other in feed/profile). Kept independent of
+ * `friendships` so a block works with no prior relationship and survives
+ * unfriending.
+ */
+export const blocks = pgTable(
+  "block",
+  {
+    blockerId: text("blocker_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    blockedId: text("blocked_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.blockerId, t.blockedId] }),
+    // Reverse lookup: "who has blocked me".
+    index("block_blocked_idx").on(t.blockedId),
+  ]
+);
+
+export const reportTargetTypeEnum = pgEnum("report_target_type", [
+  "user",
+  "post",
+  "comment",
+  "message_thread",
+]);
+
+export const reportStatusEnum = pgEnum("report_status", [
+  "open",
+  "reviewed",
+  "actioned",
+  "dismissed",
+]);
+
+/**
+ * User-submitted abuse reports. Deliberately schema-light — capture enough
+ * to review by hand (who reported what, plus an optional free-text reason)
+ * without a dedicated admin UI yet. `targetId` is the reported user / post /
+ * comment id, or the other participant's user id for a message_thread report.
+ */
+export const reports = pgTable(
+  "report",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    reporterId: text("reporter_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetType: reportTargetTypeEnum("target_type").notNull(),
+    targetId: text("target_id").notNull(),
+    reason: text("reason"),
+    status: reportStatusEnum("status").notNull().default("open"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("report_status_created_idx").on(t.status, t.createdAt),
+    index("report_reporter_target_idx").on(
+      t.reporterId,
+      t.targetType,
+      t.targetId
+    ),
+  ]
+);
+
+export type Block = typeof blocks.$inferSelect;
+export type Report = typeof reports.$inferSelect;
+export type NewReport = typeof reports.$inferInsert;
+export type ReportTargetType = (typeof reportTargetTypeEnum.enumValues)[number];

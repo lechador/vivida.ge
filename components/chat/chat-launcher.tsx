@@ -24,6 +24,7 @@ import {
 } from "@/actions/messages";
 import { cn } from "@/lib/utils";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
+import { SafetyMenu } from "@/components/safety/safety-menu";
 import type { Message } from "@/db/schema";
 
 type TypingEventPayload = {
@@ -868,6 +869,7 @@ function ChatView({
             </Link>
           )}
         </div>
+        <SafetyMenu targetUserId={partner.id} targetType="message_thread" />
       </header>
 
       <div

@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
+import { ageFromDob } from "@/lib/profile-utils";
 
 /**
  * Framework-agnostic profile *write* logic, shared by the website (Server
@@ -16,6 +17,14 @@ import { profiles } from "@/db/schema";
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^\d{2}:\d{2}$/;
 const USERNAME_RE = /^[a-z0-9_]{3,24}$/;
+
+/**
+ * Minimum age to register/use Vivida. The app has 1:1 chat and a social feed
+ * (and shipped with a dating-style match deck), so we gate on adulthood.
+ * Derived from the natal birth date the user already provides — no separate
+ * age field. Adjust this single constant to change the threshold.
+ */
+export const MINIMUM_AGE_YEARS = 18;
 
 export type SaveBirthDataInput = {
   dateOfBirth: string; // YYYY-MM-DD
@@ -78,6 +87,18 @@ export async function saveBirthDataCore(
     .where(eq(profiles.userId, userId))
     .limit(1);
   const lockedDate = existingProfile?.dateOfBirth ?? input.dateOfBirth;
+
+  // Minimum-age gate. Computed from the date that will actually be persisted
+  // (locked on first save), so under-age users can't complete onboarding and
+  // thus can't get a profile/chart or reach chat. Server-enforced — the
+  // client never decides this.
+  const age = ageFromDob(lockedDate);
+  if (age !== null && age < MINIMUM_AGE_YEARS) {
+    return {
+      ok: false,
+      error: `Vivida-ს გამოყენება ${MINIMUM_AGE_YEARS} წლიდან არის შესაძლებელი`,
+    };
+  }
 
   // Time stored as HH:MM:SS for Postgres `time` column.
   const timeForDb = input.timeOfBirth ? `${input.timeOfBirth}:00` : null;

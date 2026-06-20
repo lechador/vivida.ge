@@ -3,6 +3,7 @@ import { and, eq, isNull, or } from "drizzle-orm";
 import { db } from "@/db";
 import { friendships, messages, type Message } from "@/db/schema";
 import { recordTyping } from "@/lib/messages";
+import { isBlockedEitherWay } from "@/lib/block";
 
 /**
  * Framework-agnostic messaging *write* logic, shared by the website (Server
@@ -28,6 +29,8 @@ export type SendMessageResult =
  * the `areMatched(a, b)` fallback here (and re-enable the deck flag).
  */
 async function canMessage(a: string, b: string): Promise<boolean> {
+  // A block in either direction always wins, regardless of friendship.
+  if (await isBlockedEitherWay(a, b)) return false;
   const [link] = await db
     .select({ status: friendships.status })
     .from(friendships)

@@ -11,6 +11,7 @@ import {
   type NotificationPayload,
 } from "@/db/schema";
 import { sendFriendRequestEmail } from "@/lib/email";
+import { isBlockedEitherWay } from "@/lib/block";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { awardReputation, RepSubject } from "@/lib/reputation";
 
@@ -79,6 +80,11 @@ export async function sendFriendRequestCore(
 ): Promise<FriendshipActionResult> {
   if (actor.id === targetUserId) {
     return { ok: false, error: "ვერ გაუგზავნი მოთხოვნას საკუთარ თავს" };
+  }
+
+  // A block in either direction blocks new friend requests outright.
+  if (await isBlockedEitherWay(actor.id, targetUserId)) {
+    return { ok: false, error: "თხოვნის გაგზავნა შეუძლებელია" };
   }
 
   const [existing] = await db
