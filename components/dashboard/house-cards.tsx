@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
 import { HOUSE_NUMBERS, houseDef } from "@/lib/houses";
@@ -9,13 +8,17 @@ import { bodyMeta, signByIndex, signColor } from "@/lib/zodiac";
 import type { NatalChartJson } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
-const AXIS_HOUSES = new Set([1, 4, 7, 10]);
+const HOUSE_LABEL: Record<number, string> = {
+  1: "AC",
+  4: "IC",
+  7: "DC",
+  10: "MC",
+};
 
 /**
- * 12 house stickers — element-tinted by each cusp's sign. Header shows the
- * house number, the theme, the cusp sign chip, and any planets occupying
- * the house. Body interpretation lives behind a tap so the grid reads as
- * a visual map first, a wall of text second.
+ * Flat houses list — one tight row per house (number/axis · theme · cusp sign
+ * · occupant planets), interpretation expands inline. Replaces the old sticker
+ * grid.
  */
 export function HouseCards({
   chart,
@@ -26,8 +29,10 @@ export function HouseCards({
 }) {
   const [openHouse, setOpenHouse] = useState<number | null>(null);
 
-  // Quick lookup of which planets occupy each house
-  const occupants: Record<number, Array<{ key: string; label: string; symbol: string }>> = {};
+  const occupants: Record<
+    number,
+    Array<{ key: string; label: string; symbol: string }>
+  > = {};
   for (const [key, body] of Object.entries(chart.bodies)) {
     if (!body.house) continue;
     const meta = bodyMeta(key);
@@ -39,124 +44,88 @@ export function HouseCards({
   }
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
       {HOUSE_NUMBERS.map((n) => {
         const def = houseDef(n);
         const cusp = chart.houses.find((h) => h.number === n);
         const cuspSign = cusp ? signByIndex(cusp.signIndex) : null;
+        const color = cuspSign ? signColor(cuspSign) : "oklch(0.6 0.1 285)";
         const planets = occupants[n] ?? [];
         const text = interpretations?.[String(n)];
         const open = openHouse === n;
-        const isAxis = AXIS_HOUSES.has(n);
-        const color = cuspSign ? signColor(cuspSign) : "oklch(0.6 0.1 285)";
-        const hasBody = Boolean(text);
 
         return (
-          <article
+          <div
             key={n}
-            className={cn(
-              "group relative overflow-hidden rounded-2xl border ring-1 ring-foreground/5 backdrop-blur-xl transition-all",
-              open ? "border-foreground/20" : "border-border hover:border-foreground/15"
-            )}
-            style={{
-              background: `linear-gradient(140deg, color-mix(in oklch, ${color} 14%, transparent), color-mix(in oklch, ${color} 3%, oklch(0.18 0.04 285 / 0.55)) 70%)`,
-            }}
+            id={`house-${n}`}
+            className="scroll-mt-20 border-t border-border/50 first:border-t-0"
           >
             <button
               type="button"
-              onClick={() => setOpenHouse(open ? null : n)}
-              disabled={!hasBody}
+              onClick={() => text && setOpenHouse(open ? null : n)}
+              disabled={!text}
               aria-expanded={open}
               className={cn(
-                "relative flex w-full items-center gap-3 p-4 text-left",
-                hasBody && "cursor-pointer"
+                "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors sm:px-5",
+                text && "cursor-pointer hover:bg-card/70"
               )}
             >
-              {/* House number anchor — tinted to the cusp's element. */}
-              <div
-                className="grid size-12 shrink-0 place-items-center rounded-xl text-xl font-semibold tabular-nums shadow-[inset_0_0_0_1px_var(--ring)]"
-                style={{
-                  ["--ring" as string]: `color-mix(in oklch, ${color} 35%, transparent)`,
-                  background: `radial-gradient(120% 120% at 30% 20%, color-mix(in oklch, ${color} 28%, transparent), transparent 70%)`,
-                  color,
-                  filter: `drop-shadow(0 0 8px color-mix(in oklch, ${color} 50%, transparent))`,
-                }}
+              <span
+                style={{ color }}
+                className="w-8 shrink-0 text-center text-sm font-semibold tabular-nums"
               >
-                {n}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline gap-2">
-                  <h3 className="text-balance text-sm font-semibold leading-tight tracking-tight sm:text-base">
-                    {def.themeKa}
-                  </h3>
-                  {isAxis && (
-                    <span
-                      aria-label="ღერძი"
-                      title="ღერძი — ოთხი მთავარი წერტილი"
-                      className="shrink-0 text-[var(--vivida-violet)]"
-                    >
-                      ✦
-                    </span>
-                  )}
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-snug text-muted-foreground">
-                  {cuspSign && (
-                    <span>
-                      <span aria-hidden className="mr-0.5">
-                        {cuspSign.symbol}
-                      </span>
-                      {cuspSign.labelKa}
-                    </span>
-                  )}
-                  {planets.length > 0 && (
-                    <span className="flex items-center gap-1">
-                      {planets.map((p) => (
-                        <span key={p.key} title={p.label} aria-hidden>
-                          {p.symbol}
-                        </span>
-                      ))}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {hasBody && (
-                <ChevronDown
-                  aria-hidden
-                  className={cn(
-                    "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
-                    open && "rotate-180"
-                  )}
-                />
+                {HOUSE_LABEL[n] ?? n}
+              </span>
+              <span className="w-28 shrink-0 truncate font-medium sm:w-40">
+                {def.themeKa}
+              </span>
+              {cuspSign && (
+                <span className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
+                  <span aria-hidden style={{ color }}>
+                    {`${cuspSign.symbol}︎`}
+                  </span>
+                  <span className="truncate">{cuspSign.labelKa}</span>
+                </span>
               )}
+              <span className="ml-auto flex shrink-0 items-center gap-2">
+                {planets.length > 0 && (
+                  <span
+                    aria-hidden
+                    className="flex items-center gap-1 text-sm text-foreground/70"
+                  >
+                    {planets.map((p) => (
+                      <span key={p.key} title={p.label}>
+                        {p.symbol}
+                      </span>
+                    ))}
+                  </span>
+                )}
+                {text && (
+                  <ChevronDown
+                    aria-hidden
+                    className={cn(
+                      "size-4 text-muted-foreground transition-transform duration-200",
+                      open && "rotate-180"
+                    )}
+                  />
+                )}
+              </span>
             </button>
 
-            <AnimatePresence initial={false}>
-              {open && hasBody && (
-                <motion.div
-                  key="body"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                  className="overflow-hidden"
-                >
-                  <div
-                    className="border-t px-4 pb-4 pt-3 text-sm leading-relaxed text-foreground/90"
-                    style={{
-                      borderColor: `color-mix(in oklch, ${color} 25%, transparent)`,
-                    }}
-                  >
-                    <div className="mb-1 text-[11px] text-muted-foreground">
-                      {def.labelKa} · {def.meaningKa}
-                    </div>
-                    {text}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </article>
+            {open && text && (
+              <div
+                className="border-t px-4 pb-4 pt-2 text-sm leading-relaxed text-foreground/90 sm:px-5"
+                style={{
+                  borderColor: `color-mix(in oklch, ${color} 20%, transparent)`,
+                }}
+              >
+                <div className="mb-1 text-[11px] text-muted-foreground">
+                  {def.labelKa} · {def.meaningKa}
+                </div>
+                {text}
+              </div>
+            )}
+          </div>
         );
       })}
     </div>

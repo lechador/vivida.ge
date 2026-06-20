@@ -74,7 +74,7 @@ export function PositionsTable({ chart }: { chart: NatalChartJson }) {
                 className="flex min-w-0 items-center gap-2 text-foreground/85 transition-colors hover:text-[var(--vivida-violet)]"
               >
                 <span aria-hidden style={{ color }} className="text-base leading-none">
-                  {sign.symbol}
+                  {`${sign.symbol}\uFE0E`}
                 </span>
                 <span className="truncate">{sign.labelKa}</span>
               </Link>
@@ -125,7 +125,7 @@ export function HousesTable({ chart }: { chart: NatalChartJson }) {
               className="flex flex-1 items-center justify-end gap-2 transition-colors hover:text-[var(--vivida-violet)]"
             >
               <span aria-hidden style={{ color }} className="text-base leading-none">
-                {sign.symbol}
+                {`${sign.symbol}\uFE0E`}
               </span>
               <span>{sign.labelKa}</span>
             </Link>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
 import { bodyMeta, formatDegree, signByIndex, signColor } from "@/lib/zodiac";
@@ -20,11 +19,9 @@ const PLANETS_TO_SHOW = [
 ] as const;
 
 /**
- * Compact planet stickers — one per personal/outer planet, arranged in a
- * dense grid. Each sticker is tinted with its sign's element color and
- * shows a single line of identity ("ვენერა · კურო-ში · მე-3 სახლი"). The
- * full AI interpretation is hidden by default and reveals on tap so the
- * page reads as a glance rather than a wall of text.
+ * Flat planet list — one tight row per planet (glyph · name · sign · degree ·
+ * house), the interpretation expands inline on tap. Replaces the old dense
+ * sticker grid; the positions table links here via #planet-<key> anchors.
  */
 export function PlanetCards({
   chart,
@@ -36,71 +33,54 @@ export function PlanetCards({
   const [openKey, setOpenKey] = useState<string | null>(null);
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
       {PLANETS_TO_SHOW.map((key) => {
         const body = chart.bodies[key];
         if (!body) return null;
         const meta = bodyMeta(key);
         const sign = signByIndex(body.signIndex);
+        const color = signColor(sign);
         const text = interpretations?.[key];
         const open = openKey === key;
-        const color = signColor(sign);
-        const hasBody = Boolean(text);
 
         return (
-          <article
+          <div
             key={key}
             id={`planet-${key}`}
-            className={cn(
-              "group relative scroll-mt-20 overflow-hidden rounded-2xl border ring-1 ring-foreground/5 backdrop-blur-xl transition-all",
-              open ? "border-foreground/20" : "border-border hover:border-foreground/15"
-            )}
-            style={{
-              background: `linear-gradient(140deg, color-mix(in oklch, ${color} 16%, transparent), color-mix(in oklch, ${color} 4%, oklch(0.18 0.04 285 / 0.55)) 70%)`,
-            }}
+            className="scroll-mt-20 border-t border-border/50 first:border-t-0"
           >
             <button
               type="button"
-              onClick={() => setOpenKey(open ? null : key)}
-              disabled={!hasBody}
+              onClick={() => text && setOpenKey(open ? null : key)}
+              disabled={!text}
               aria-expanded={open}
               className={cn(
-                "relative flex w-full items-center gap-3 p-4 text-left",
-                hasBody && "cursor-pointer"
+                "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors sm:px-5",
+                text && "cursor-pointer hover:bg-card/70"
               )}
             >
-              {/* Sign emoji as the visual anchor — element color radiates
-                  through the gradient backing the whole card. */}
-              <div
-                className="grid size-12 shrink-0 place-items-center rounded-xl text-2xl shadow-[inset_0_0_0_1px_var(--ring)]"
-                style={{
-                  ["--ring" as string]: `color-mix(in oklch, ${color} 35%, transparent)`,
-                  background: `radial-gradient(120% 120% at 30% 20%, color-mix(in oklch, ${color} 28%, transparent), transparent 70%)`,
-                  color,
-                  filter: `drop-shadow(0 0 10px color-mix(in oklch, ${color} 60%, transparent))`,
-                }}
-                title={`${formatDegree(body.signDegree)} ${sign.labelKa}-ში`}
+              <span
                 aria-hidden
+                style={{ color }}
+                className="w-5 shrink-0 text-center text-base leading-none"
               >
-                {sign.symbol}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline gap-2">
-                  <span aria-hidden className="text-base">
-                    {meta?.symbol ?? "?"}
-                  </span>
-                  <h3 className="text-balance text-base font-semibold leading-tight tracking-tight">
-                    {meta?.labelKa ?? key}
-                  </h3>
-                </div>
-                <div className="mt-1 text-xs leading-snug text-muted-foreground">
-                  {sign.labelKa}-ში{body.house ? ` · მე-${body.house} სახლი` : ""}
-                  {body.retrograde ? " · ℞" : ""}
-                </div>
-              </div>
-
-              {hasBody && (
+                {meta?.symbol ?? "?"}
+              </span>
+              <span className="w-24 shrink-0 truncate font-medium sm:w-28">
+                {meta?.labelKa ?? key}
+              </span>
+              <span className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
+                <span aria-hidden style={{ color }}>
+                  {`${sign.symbol}︎`}
+                </span>
+                <span className="truncate">{sign.labelKa}</span>
+              </span>
+              <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground sm:text-sm">
+                {formatDegree(body.signDegree)}
+                {body.retrograde ? " ℞" : ""}
+                {body.house ? ` · ${body.house} სახ.` : ""}
+              </span>
+              {text && (
                 <ChevronDown
                   aria-hidden
                   className={cn(
@@ -111,31 +91,20 @@ export function PlanetCards({
               )}
             </button>
 
-            <AnimatePresence initial={false}>
-              {open && hasBody && (
-                <motion.div
-                  key="body"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                  className="overflow-hidden"
-                >
-                  <div
-                    className="border-t px-4 pb-4 pt-3 text-sm leading-relaxed text-foreground/90"
-                    style={{
-                      borderColor: `color-mix(in oklch, ${color} 25%, transparent)`,
-                    }}
-                  >
-                    <div className="mb-1 text-[11px] text-muted-foreground">
-                      {meta?.meaningKa}
-                    </div>
-                    {text}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </article>
+            {open && text && (
+              <div
+                className="border-t px-4 pb-4 pt-2 text-sm leading-relaxed text-foreground/90 sm:px-5"
+                style={{
+                  borderColor: `color-mix(in oklch, ${color} 20%, transparent)`,
+                }}
+              >
+                <div className="mb-1 text-[11px] text-muted-foreground">
+                  {meta?.meaningKa}
+                </div>
+                {text}
+              </div>
+            )}
+          </div>
         );
       })}
     </div>
