@@ -66,12 +66,12 @@ export default async function FriendsPage({
   };
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main className="dawn relative isolate flex min-h-screen flex-1 flex-col overflow-hidden bg-background text-foreground">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_50%_-5%,oklch(0.90_0.06_290/0.6),transparent_70%),radial-gradient(40%_32%_at_85%_65%,oklch(0.90_0.08_45/0.5),transparent_70%),radial-gradient(35%_28%_at_15%_75%,oklch(0.91_0.07_350/0.45),transparent_70%)]"
       />
-      <Starfield count={110} shooting={3} />
+      <Starfield tone="dawn" count={110} shooting={3} />
 
       <AppHeader authed plan={plan} active="friends" />
 
