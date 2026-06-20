@@ -130,7 +130,7 @@ export async function ChartSection({
           subtitle="მზე, მთვარე და ამომავალი — შენი ბირთვი"
           defaultOpen
         >
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
             {sun && (
               <BigThreeCard
                 kind="sun"
@@ -173,19 +173,19 @@ export async function ChartSection({
             subtitle="ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"
             defaultOpen
           >
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
               {interp.highlights.map((h, i) => (
-                <article
+                <div
                   key={i}
-                  className="group rounded-2xl border border-border bg-card/60 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/75 hover:ring-foreground/15"
+                  className="border-t border-border/50 px-4 py-3.5 first:border-t-0 sm:px-5"
                 >
-                  <h3 className="mb-2 text-base font-semibold tracking-tight text-[var(--vivida-cyan)]">
+                  <h3 className="mb-1 text-sm font-semibold tracking-tight text-[var(--vivida-cyan)]">
                     {h.title}
                   </h3>
-                  <p className="text-base leading-relaxed text-foreground/85">
+                  <p className="text-sm leading-relaxed text-foreground/85">
                     {h.body}
                   </p>
-                </article>
+                </div>
               ))}
             </div>
           </CollapsibleSection>
