@@ -1,5 +1,12 @@
 # Safety follow-ups (deferred, not yet built)
 
+> ## 🚨 HARD GATE — photo moderation (#1) before ANY ads or growth push
+> Unmoderated public profile photos become an **acute** risk the moment we
+> pull in strangers. **Do not promote Vivida** — no Facebook/Instagram ads, no
+> growth campaigns, no public launch push — until **#1 (photo moderation)** is
+> built and live. This gate is non-negotiable at any size above the current
+> closed group.
+
 Captured during the low-density safety cleanup (Steps 1–3) so they aren't
 forgotten. None of these are built yet — this is a backlog, not a spec.
 
