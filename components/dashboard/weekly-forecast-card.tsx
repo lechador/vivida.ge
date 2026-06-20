@@ -121,8 +121,8 @@ function DayRow({
           stripe: "bg-[var(--vivida-cyan)]",
           border: "border-[var(--vivida-cyan)]/45",
           borderHover: "hover:border-[var(--vivida-cyan)]/75",
-          bg: "bg-[oklch(0.24_0.05_220/0.85)]",
-          bgHover: "hover:bg-[oklch(0.27_0.06_220/0.92)]",
+          bg: "bg-card/85",
+          bgHover: "hover:bg-card/92",
           glow: "shadow-[0_0_24px_-10px_oklch(0.78_0.18_200/0.55)]",
         }
       : tilt === "challenging"
@@ -130,16 +130,16 @@ function DayRow({
             stripe: "bg-[var(--vivida-pink)]",
             border: "border-[var(--vivida-pink)]/45",
             borderHover: "hover:border-[var(--vivida-pink)]/75",
-            bg: "bg-[oklch(0.24_0.06_350/0.85)]",
-            bgHover: "hover:bg-[oklch(0.27_0.07_350/0.92)]",
+            bg: "bg-card/85",
+            bgHover: "hover:bg-card/92",
             glow: "shadow-[0_0_24px_-10px_oklch(0.72_0.22_350/0.55)]",
           }
         : {
             stripe: "bg-[var(--vivida-violet)]/70",
             border: "border-[var(--vivida-violet)]/35",
             borderHover: "hover:border-[var(--vivida-violet)]/60",
-            bg: "bg-[oklch(0.22_0.04_290/0.85)]",
-            bgHover: "hover:bg-[oklch(0.25_0.05_290/0.92)]",
+            bg: "bg-card/85",
+            bgHover: "hover:bg-card/92",
             glow: "shadow-[0_0_24px_-10px_oklch(0.65_0.24_305/0.45)]",
           };
 
@@ -173,7 +173,7 @@ function DayRow({
               "flex shrink-0 flex-col items-center justify-center rounded-lg border px-2.5 py-1.5 transition-colors sm:px-3 sm:py-2",
               open
                 ? "border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/15"
-                : "border-border bg-[oklch(0.27_0.05_285/0.7)]"
+                : "border-border bg-card/70"
             )}
           >
             <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
@@ -248,7 +248,7 @@ function DayRow({
 
       {/* Expanded breakdown */}
       {open && (
-        <div className="mt-2 grid gap-3 rounded-xl border border-[var(--vivida-violet)]/30 bg-[oklch(0.20_0.04_283/0.7)] p-3 sm:p-4">
+        <div className="mt-2 grid gap-3 rounded-xl border border-[var(--vivida-violet)]/30 bg-card/70 p-3 sm:p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <Block
               label="ჰარმონიული"
@@ -322,7 +322,7 @@ function Block({
   return (
     <div
       className={cn(
-        "rounded-lg border bg-[oklch(0.25_0.05_285/0.85)] px-3 py-2.5 ring-1 ring-foreground/5",
+        "rounded-lg border bg-card/85 px-3 py-2.5 ring-1 ring-foreground/5",
         borderClass
       )}
     >

@@ -124,9 +124,9 @@ export function SwipeDeck({ cards }: { cards: DiscoverCard[] }) {
             className={
               "fixed inset-x-4 z-50 mx-auto max-w-sm rounded-full border px-4 py-2.5 text-center text-sm font-medium shadow-[0_18px_50px_-12px_oklch(0.13_0.03_280/0.7)] backdrop-blur-xl bottom-[calc(5.5rem+env(safe-area-inset-bottom))] lg:bottom-6 " +
               (toast.kind === "ok"
-                ? "border-[var(--vivida-pink)]/55 bg-[oklch(0.22_0.08_350/0.92)] text-foreground"
+                ? "border-[var(--vivida-pink)]/55 bg-card/92 text-foreground"
                 : toast.kind === "err"
-                  ? "border-[var(--destructive)]/55 bg-[oklch(0.22_0.06_25/0.92)] text-foreground"
+                  ? "border-[var(--destructive)]/55 bg-card/92 text-foreground"
                   : "border-border bg-card/85 text-foreground")
             }
           >

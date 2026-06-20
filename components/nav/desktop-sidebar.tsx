@@ -47,7 +47,7 @@ export function DesktopSidebar({
         // Layered surface: deep violet base + a thin gradient line on the
         // right edge so it reads as its own column, not just a darker
         // strip of page background.
-        "flex-col border-r border-[var(--vivida-violet)]/30 bg-[oklch(0.15_0.05_290/0.95)] backdrop-blur-2xl",
+        "flex-col border-r border-[var(--vivida-violet)]/30 bg-card/95 backdrop-blur-2xl",
         "shadow-[8px_0_32px_-12px_oklch(0.65_0.24_305/0.18)]",
         "after:pointer-events-none after:absolute after:inset-y-8 after:right-0 after:w-px after:bg-[linear-gradient(180deg,transparent,oklch(0.78_0.18_305/0.45),transparent)]"
       )}
