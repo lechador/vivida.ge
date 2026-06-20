@@ -123,7 +123,7 @@ export default function RootLayout({
   return (
     <html
       lang="ka"
-      className={`dark ${notoGeorgian.variable} h-full antialiased`}
+      className={`dark scroll-smooth ${notoGeorgian.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">

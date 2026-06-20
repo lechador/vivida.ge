@@ -32,7 +32,10 @@ export function BigThreeCard({
   const sign = signByIndex(point.signIndex);
 
   return (
-    <article className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 shadow-[0_30px_80px_-50px_oklch(0.65_0.24_305/0.5)] ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80 hover:shadow-[0_30px_80px_-30px_oklch(0.65_0.24_305/0.6)] hover:ring-foreground/15">
+    <article
+      id={`planet-${kind}`}
+      className="group relative scroll-mt-20 overflow-hidden rounded-2xl border border-border bg-card/65 p-6 shadow-[0_30px_80px_-50px_oklch(0.65_0.24_305/0.5)] ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80 hover:shadow-[0_30px_80px_-30px_oklch(0.65_0.24_305/0.6)] hover:ring-foreground/15"
+    >
       <div
         aria-hidden
         className={`absolute -right-8 -top-8 size-32 rounded-full bg-gradient-to-br ${KIND_GRADIENT[kind]} opacity-25 blur-2xl transition-opacity group-hover:opacity-40`}

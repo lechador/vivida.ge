@@ -50,8 +50,9 @@ export function PlanetCards({
         return (
           <article
             key={key}
+            id={`planet-${key}`}
             className={cn(
-              "group relative overflow-hidden rounded-2xl border ring-1 ring-foreground/5 backdrop-blur-xl transition-all",
+              "group relative scroll-mt-20 overflow-hidden rounded-2xl border ring-1 ring-foreground/5 backdrop-blur-xl transition-all",
               open ? "border-foreground/20" : "border-border hover:border-foreground/15"
             )}
             style={{

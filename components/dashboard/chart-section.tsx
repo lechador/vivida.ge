@@ -18,6 +18,10 @@ import { PlanetCards } from "./planet-cards";
 import { CollapsibleSection } from "@/components/report/collapsible-section";
 import { ReportNav } from "@/components/report/report-nav";
 import { QuickStats } from "@/components/report/quick-stats";
+import {
+  PositionsTable,
+  HousesTable,
+} from "@/components/report/positions-table";
 import type { PlanId } from "@/lib/pricing";
 import { signByIndex } from "@/lib/zodiac";
 
@@ -95,6 +99,27 @@ export async function ChartSection({
               </div>
             </div>
           </article>
+        </section>
+
+        {/* Positions + houses — the scannable, clickable data layer. Planet
+            rows jump to their interpretation in-page; signs link to /zodiac. */}
+        <section id="positions" className="scroll-mt-16 sm:scroll-mt-24">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start">
+            <div>
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                პოზიციები
+              </h2>
+              <PositionsTable chart={data} />
+            </div>
+            <div>
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                სახლები
+              </h2>
+              <div className="rounded-2xl border border-border bg-card/50 px-4 py-1 ring-1 ring-foreground/5 backdrop-blur-xl sm:px-5">
+                <HousesTable chart={data} />
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* AI summary — inline, between sections */}
@@ -187,6 +212,7 @@ export async function ChartSection({
           icon={<Globe2 className="size-5" />}
           title="პლანეტები"
           subtitle="რვა პლანეტა, რვა ხასიათი — ერთად შენ ხარ"
+          defaultOpen
         >
           <PlanetCards chart={data} interpretations={interp?.planets} />
         </CollapsibleSection>
