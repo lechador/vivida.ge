@@ -36,12 +36,12 @@ export default async function LeaderboardPage() {
     myRankIndex === -1 ? null : `#${myRankIndex + 1}`;
 
   return (
-    <main className="dawn relative isolate flex min-h-screen flex-1 flex-col overflow-hidden bg-background text-foreground">
+    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_50%_-5%,oklch(0.90_0.06_290/0.6),transparent_70%),radial-gradient(40%_32%_at_85%_65%,oklch(0.90_0.08_45/0.5),transparent_70%),radial-gradient(35%_28%_at_15%_75%,oklch(0.91_0.07_350/0.45),transparent_70%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_85/0.45),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%)]"
       />
-      <Starfield tone="dawn" count={90} shooting={2} />
+      <Starfield count={90} shooting={2} />
       <AppHeader authed plan={plan} />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">

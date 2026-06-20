@@ -64,7 +64,7 @@ export function PeopleList({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="მოძებნე სახელით ან @username-ით"
-          className="block w-full rounded-full border border-foreground/12 bg-card/85 py-2.5 pl-10 pr-9 text-sm text-foreground placeholder:text-muted-foreground/70 backdrop-blur-xl focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--vivida-violet)]/30"
+          className="block w-full rounded-full border border-foreground/12 bg-[oklch(0.21_0.04_285/0.85)] py-2.5 pl-10 pr-9 text-sm text-foreground placeholder:text-muted-foreground/70 backdrop-blur-xl focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--vivida-violet)]/30"
         />
         {query && (
           <button

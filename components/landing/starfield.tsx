@@ -28,19 +28,10 @@ interface ShootingStar {
 export function Starfield({
   count = 120,
   shooting = 3,
-  tone = "night",
 }: {
   count?: number;
   shooting?: number;
-  /**
-   * "night" = white/violet/cyan stars on the dark cosmos (default — used by
-   * SEO + dark pages, unchanged). "dawn" = faint warm motes (rose/peach/lilac)
-   * with gentle glow, for the light cosmic-dawn theme where bright white stars
-   * would read as dust on a pale background.
-   */
-  tone?: "night" | "dawn";
 }) {
-  const dawn = tone === "dawn";
   const { stars, shootingStars } = useMemo(() => {
     let s = 0x9e3779b9;
     const rand = () => {
@@ -100,31 +91,22 @@ export function Starfield({
               top: `${star.top}%`,
               width: `${star.size}px`,
               height: `${star.size}px`,
-              opacity: dawn ? star.opacity * 0.6 : star.opacity,
-              background: dawn
-                ? star.hue === 0
-                  ? "oklch(0.86 0.05 20)"
-                  : star.hue === 280
-                    ? "oklch(0.78 0.08 305)"
-                    : "oklch(0.84 0.10 55)"
-                : star.hue === 0
+              opacity: star.opacity,
+              background:
+                star.hue === 0
                   ? "white"
                   : star.hue === 280
                     ? "oklch(0.92 0.05 280)"
                     : "oklch(0.92 0.06 220)",
-              boxShadow: dawn
-                ? star.glow
-                  ? `0 0 ${star.size * 3}px oklch(0.78 0.12 35 / 0.5)`
-                  : undefined
-                : star.glow
-                  ? `0 0 ${star.size * 4}px ${star.hue === 0
-                      ? "oklch(0.95 0.02 280 / 0.7)"
-                      : `oklch(0.85 0.12 ${star.hue} / 0.7)`}, 0 0 ${star.size * 8}px ${star.hue === 0
-                      ? "oklch(0.95 0.02 280 / 0.3)"
-                      : `oklch(0.85 0.12 ${star.hue} / 0.3)`}`
-                  : star.size > 1.4
-                    ? `0 0 ${star.size * 2}px oklch(0.85 0.05 280 / 0.4)`
-                    : undefined,
+              boxShadow: star.glow
+                ? `0 0 ${star.size * 4}px ${star.hue === 0
+                    ? "oklch(0.95 0.02 280 / 0.7)"
+                    : `oklch(0.85 0.12 ${star.hue} / 0.7)`}, 0 0 ${star.size * 8}px ${star.hue === 0
+                    ? "oklch(0.95 0.02 280 / 0.3)"
+                    : `oklch(0.85 0.12 ${star.hue} / 0.3)`}`
+                : star.size > 1.4
+                  ? `0 0 ${star.size * 2}px oklch(0.85 0.05 280 / 0.4)`
+                  : undefined,
               animation: animate
                 ? `vivida-pulse ${star.duration}s ease-in-out ${star.delay}s infinite`
                 : undefined,
@@ -139,9 +121,8 @@ export function Starfield({
           style={{
             top: `${s.top}%`,
             left: `${s.left}%`,
-            background: dawn
-              ? "linear-gradient(90deg, transparent, oklch(0.78 0.12 35 / 0.55), transparent)"
-              : "linear-gradient(90deg, transparent, oklch(0.95 0.05 280 / 0.85), transparent)",
+            background:
+              "linear-gradient(90deg, transparent, oklch(0.95 0.05 280 / 0.85), transparent)",
             animation: `vivida-shoot ${s.duration}s ease-out ${s.delay}s infinite`,
             opacity: 0,
           }}

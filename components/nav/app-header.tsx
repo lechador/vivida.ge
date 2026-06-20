@@ -94,7 +94,7 @@ export async function AppHeader({
           className="hidden bg-clip-text text-transparent text-2xl font-semibold tracking-tight sm:inline"
           style={{
             backgroundImage:
-              "linear-gradient(135deg, var(--vivida-violet) 0%, var(--vivida-pink) 55%, var(--vivida-cyan) 100%)",
+              "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
           }}
         >
           vivida

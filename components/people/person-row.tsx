@@ -16,7 +16,7 @@ export function PersonRowCard({ person }: { person: PersonRow }) {
   const profileHref = person.username ? `/u/${person.username}` : "#";
 
   return (
-    <li className="rounded-2xl border border-foreground/10 bg-card/85 ring-1 ring-inset ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-card/90">
+    <li className="rounded-2xl border border-foreground/10 bg-[oklch(0.21_0.04_285/0.85)] ring-1 ring-inset ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-[oklch(0.24_0.04_285/0.9)]">
       <div className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4">
         <Link
           href={profileHref}

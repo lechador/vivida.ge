@@ -89,7 +89,7 @@ export function SwipeCard({
         else if (info.offset.x < -110) onPass();
       }}
       className={cn(
-        "absolute inset-0 select-none overflow-hidden rounded-3xl border-2 border-[var(--vivida-violet)]/45 bg-card/95 shadow-[0_25px_60px_-12px_oklch(0.13_0.03_280/0.7)]",
+        "absolute inset-0 select-none overflow-hidden rounded-3xl border-2 border-[var(--vivida-violet)]/45 bg-[oklch(0.16_0.05_290/0.95)] shadow-[0_25px_60px_-12px_oklch(0.13_0.03_280/0.7)]",
         isTop ? "cursor-grab active:cursor-grabbing" : "pointer-events-none",
         !isTop && "shadow-none"
       )}

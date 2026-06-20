@@ -34,13 +34,13 @@ export function VividaMark({
     >
       <defs>
         <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="var(--vivida-violet)" />
-          <stop offset="55%" stopColor="var(--vivida-pink)" />
-          <stop offset="100%" stopColor="var(--vivida-cyan)" />
+          <stop offset="0%" stopColor="#a78bfa" />
+          <stop offset="55%" stopColor="#f472b6" />
+          <stop offset="100%" stopColor="#22d3ee" />
         </linearGradient>
         <radialGradient id={glowId} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="var(--vivida-violet)" stopOpacity="0.55" />
-          <stop offset="100%" stopColor="var(--vivida-violet)" stopOpacity="0" />
+          <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
         </radialGradient>
       </defs>
 
@@ -58,7 +58,7 @@ export function VividaMark({
       {/* Companion star, upper right — adds asymmetry + cosmic feel */}
       <path
         d="M 50 12 L 51 16 L 55 17 L 51 18 L 50 22 L 49 18 L 45 17 L 49 16 Z"
-        fill="var(--vivida-cyan)"
+        fill="#22d3ee"
         fillOpacity="0.9"
       />
     </svg>
@@ -88,7 +88,7 @@ export function VividaLockup({
           className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
           style={{
             backgroundImage:
-              "linear-gradient(135deg, var(--vivida-violet) 0%, var(--vivida-pink) 55%, var(--vivida-cyan) 100%)",
+              "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
           }}
         >
           vivida
