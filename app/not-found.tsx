@@ -4,6 +4,7 @@ import { Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { SOCIAL_FEATURES } from "@/lib/social-flags";
 
 export const metadata = { title: "გვერდი ვერ მოიძებნა" };
 
@@ -54,7 +55,11 @@ export default function NotFound() {
               <Link href="/">მთავარი</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/discover">აღმოაჩინე</Link>
+              {SOCIAL_FEATURES.swipeDeck ? (
+                <Link href="/discover">აღმოაჩინე</Link>
+              ) : (
+                <Link href="/feed">ფიდი</Link>
+              )}
             </Button>
           </div>
         </div>

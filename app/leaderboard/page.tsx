@@ -1,17 +1,10 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { Trophy } from "lucide-react";
 
-import { db } from "@/db";
-import {
-  profilePhotos,
-  profiles,
-  userReputation,
-  users,
-} from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
+import { getLeaderboard, getUserReputationTotal } from "@/lib/leaderboard-core";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { TierBadge } from "@/components/feed/tier-badge";
@@ -30,55 +23,14 @@ export default async function LeaderboardPage() {
   const user = await requireUser();
   const plan = await getCurrentPlan(user.id);
 
-  // Top 50 with their byline data. Single join — no N+1.
-  const top = await db
-    .select({
-      userId: userReputation.userId,
-      total: userReputation.total,
-      name: users.name,
-      image: users.image,
-      username: profiles.username,
-      displayName: profiles.displayName,
-    })
-    .from(userReputation)
-    .innerJoin(users, eq(users.id, userReputation.userId))
-    .leftJoin(profiles, eq(profiles.userId, userReputation.userId))
-    .orderBy(desc(userReputation.total))
-    .limit(50);
+  // Top 50 with their byline data + the viewer's own total. The shared core
+  // resolves each avatar to the chosen main profile photo (OAuth fallback),
+  // so this list matches /account, the navbar, and the mobile API.
+  const [top, myTotal] = await Promise.all([
+    getLeaderboard(50),
+    getUserReputationTotal(user.id),
+  ]);
 
-  // Pull the chosen "main" profile photo for every leaderboard user
-  // so the avatars match what they see on /account and in the navbar
-  // — falling back to the Google OAuth avatar only when none is set.
-  const topUserIds = top.map((t) => t.userId);
-  const photoRows =
-    topUserIds.length === 0
-      ? []
-      : await db
-          .select({
-            userId: profilePhotos.userId,
-            url: profilePhotos.url,
-          })
-          .from(profilePhotos)
-          .where(
-            and(
-              inArray(profilePhotos.userId, topUserIds),
-              eq(profilePhotos.ready, true)
-            )
-          )
-          .orderBy(asc(profilePhotos.sortOrder));
-  const photoByUser = new Map<string, string>();
-  for (const row of photoRows) {
-    if (!photoByUser.has(row.userId)) photoByUser.set(row.userId, row.url);
-  }
-
-  // The viewer's standing — separate query so the main list isn't a
-  // window function. Cheap because user_reputation.userId is a PK.
-  const [me] = await db
-    .select({ total: userReputation.total })
-    .from(userReputation)
-    .where(eq(userReputation.userId, user.id))
-    .limit(1);
-  const myTotal = me?.total ?? 0;
   const myRankIndex = top.findIndex((row) => row.userId === user.id);
   const myRankLabel =
     myRankIndex === -1 ? null : `#${myRankIndex + 1}`;
@@ -133,7 +85,7 @@ export default async function LeaderboardPage() {
               const tier = tierFor(row.total);
               const isMe = row.userId === user.id;
               const profileHref = row.username ? `/u/${row.username}` : null;
-              const avatar = photoByUser.get(row.userId) ?? row.image;
+              const avatar = row.image;
               return (
                 <li
                   key={row.userId}

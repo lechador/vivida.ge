@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Flag, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 import {
   deletePost,
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ReportDialog } from "@/components/safety/report-dialog";
 
 import { CommentSection } from "./comment-section";
 import { MentionText } from "./mention-text";
@@ -63,6 +64,7 @@ export function PostCard({
   const [draft, setDraft] = useState(post.body);
   const [editError, setEditError] = useState<string | null>(null);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const isOwner = post.author.id === viewerId;
   const canDelete = isOwner || viewerIsAdmin;
@@ -173,7 +175,7 @@ export function PostCard({
             )}
           </div>
         </div>
-        {(canDelete || withinEditWindow) && (
+        {(canDelete || withinEditWindow || !isOwner) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -214,10 +216,31 @@ export function PostCard({
                   {isOwner ? "წაშლა" : "მოდერაცია: წაშლა"}
                 </DropdownMenuItem>
               )}
+              {!isOwner && (
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setReportOpen(true);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Flag className="size-4" />
+                  დაარეპორტე
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
       </header>
+
+      {!isOwner && (
+        <ReportDialog
+          open={reportOpen}
+          onOpenChange={setReportOpen}
+          targetType="post"
+          targetId={post.id}
+        />
+      )}
 
       {editing ? (
         <div className="mt-3">

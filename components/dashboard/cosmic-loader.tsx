@@ -69,37 +69,34 @@ function SimpleStatus() {
 }
 
 /**
- * Stages tied to the rough progression of `loadDashboardBundle`:
- *   1. ensureChartFor       (ephemeris + AI interp)
- *   2. ensureDailyFor       (parallel AI generation)
- *   3. ensureWeeklyForecast (parallel AI generation)
- *   4. suggestions + moon
+ * Stages tied to the rough progression of `loadDashboardCore` — the fast,
+ * AI-free first wave (chart positions + suggestions). The AI cards (daily,
+ * weekly, moon) load separately behind their own skeletons, so this loader
+ * is usually on screen for ~1s.
  *
  * `at` is the progress threshold (0..1) — the message swaps when the
  * cosmetic bar crosses it.
  */
 const STAGES: Array<{ at: number; label: string }> = [
   { at: 0, label: "ვხსნით შენი დაბადების მომენტს…" },
-  { at: 0.18, label: "ვადგენთ პლანეტების პოზიციებს…" },
-  { at: 0.38, label: "ვითვლით შენს დიდ სამეულს…" },
-  { at: 0.58, label: "AI კითხულობს შენს რუკას…" },
-  { at: 0.78, label: "ვამზადებთ დღევანდელ ჰოროსკოპს…" },
-  { at: 0.92, label: "შენი რუკა თითქმის მზადაა, ცოტაც დაელოდე…" },
+  { at: 0.3, label: "ვადგენთ პლანეტების პოზიციებს…" },
+  { at: 0.6, label: "ვითვლით შენს დიდ სამეულს…" },
+  { at: 0.85, label: "ვალაგებთ შენს დაშბორდს…" },
 ];
 
 function ProgressiveStatus() {
   const [progress, setProgress] = useState(0);
 
-  // Asymptotic ease — progress = 1 - e^(-t / tau). With tau=5s, the bar
-  // reaches ~95% at 15s and approaches but never hits 100%, which is the
-  // honest signal: we don't actually know when the bundle will resolve.
-  // When the parent unmounts us, the bar disappears — we never need to
-  // animate to 100% explicitly.
+  // Asymptotic ease — progress = 1 - e^(-t / tau). With tau≈2s, the bar
+  // reaches ~95% at ~6s and approaches but never hits 100%, which is the
+  // honest signal: we don't know exactly when core resolves. The core wave
+  // is AI-free and usually settles in ~1s, so the bar moves briskly. When
+  // the parent unmounts us, the bar disappears — we never animate to 100%.
   useEffect(() => {
     const start = performance.now();
     let raf = 0;
     const tick = () => {
-      const t = (performance.now() - start) / 5000;
+      const t = (performance.now() - start) / 2000;
       const eased = 1 - Math.exp(-t);
       setProgress(Math.min(eased * 99, 99));
       raf = requestAnimationFrame(tick);

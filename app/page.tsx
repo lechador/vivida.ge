@@ -3,6 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { buildCalculatorData } from "@/lib/compatibility-calculator-data";
+import { CompatibilityCalculator } from "@/components/landing/compatibility-calculator";
 import { FaqSection } from "@/components/landing/faq-section";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { FinalCta } from "@/components/landing/final-cta";
@@ -92,6 +94,7 @@ export default async function Home() {
   if (session?.user?.id) {
     redirect("/feed");
   }
+  const { signs, pairs } = buildCalculatorData();
   return (
     <>
       {/* Structured data — search engines parse these inline scripts even
@@ -157,6 +160,26 @@ export default async function Home() {
         </header>
 
         <Hero />
+
+        {/* Interactive compatibility calculator — an instant, no-signup hook
+            that turns cold traffic into engaged visitors before asking for
+            anything. Shareable results feed the viral loop. */}
+        <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-4 pt-4 sm:px-6">
+          <div className="mb-8 text-center">
+            <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+              შეამოწმე{" "}
+              <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
+                შენი თავსებადობა
+              </span>{" "}
+              ახლავე
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-muted-foreground sm:text-base">
+              აირჩიე ორი ნიშანი — დანარჩენს ვარსკვლავები ამბობენ.
+            </p>
+          </div>
+          <CompatibilityCalculator signs={signs} pairs={pairs} />
+        </section>
+
         <PillarsSection />
         <FeaturesSection />
         <HowItWorksSection />

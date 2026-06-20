@@ -1,7 +1,9 @@
 import { eq } from "drizzle-orm";
+import { after } from "next/server";
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import { recordVisit } from "@/lib/activity";
 
 import { ApiError } from "./errors";
 import { verifyAccessToken } from "./jwt";
@@ -45,6 +47,12 @@ export async function requireMobileUser(req: Request): Promise<PublicUser> {
   if (!user) {
     throw new ApiError(401, "unauthorized", "Account no longer exists");
   }
+
+  // Best-effort "active today" record, mirroring the website's requireUser().
+  // Runs after the response so it never adds latency, and feeds the daily
+  // streak + daily_visit reputation for app-only users (who otherwise never
+  // hit the website's visit logging).
+  after(() => recordVisit(userId));
 
   return toPublicUser(user);
 }

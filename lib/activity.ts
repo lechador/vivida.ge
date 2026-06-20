@@ -71,6 +71,65 @@ export async function recordVisit(userId: string): Promise<void> {
   }
 }
 
+export type StreakInfo = {
+  /** Consecutive active days ending today (today always counts — the caller
+   *  is active right now). */
+  current: number;
+  /** Longest consecutive run ever recorded. */
+  longest: number;
+};
+
+/** Shift a YYYY-MM-DD calendar-date string by `delta` days (no TZ math —
+ *  these are already local date strings). */
+function shiftDate(date: string, delta: number): string {
+  const [y, m, d] = date.split("-").map(Number);
+  const t = Date.UTC(y, m - 1, d) + delta * 86_400_000;
+  return new Date(t).toISOString().slice(0, 10);
+}
+
+/**
+ * The user's daily-visit streak from `userActivityDays`. Today always counts
+ * as active (the request itself is today's activity, and the visit row is
+ * written in an after-hook that may not have landed yet), so `current` is at
+ * least 1. Consecutive days are measured in the user's local timezone.
+ */
+export async function getStreak(userId: string): Promise<StreakInfo> {
+  const [profile] = await db
+    .select({ timezone: profiles.timezone })
+    .from(profiles)
+    .where(eq(profiles.userId, userId))
+    .limit(1);
+  const tz = profile?.timezone ?? "UTC";
+  const today = formatLocalDate(new Date(), tz);
+
+  const rows = await db
+    .select({ d: userActivityDays.dateLocal })
+    .from(userActivityDays)
+    .where(eq(userActivityDays.userId, userId));
+
+  const days = new Set(rows.map((r) => r.d));
+  days.add(today); // the live request is today's activity
+
+  // Current streak: walk back from today while each prior day is present.
+  let current = 0;
+  for (let cursor = today; days.has(cursor); cursor = shiftDate(cursor, -1)) {
+    current++;
+  }
+
+  // Longest streak: sort the dates and scan for the longest consecutive run.
+  const sorted = [...days].sort();
+  let longest = 0;
+  let run = 0;
+  let prev: string | null = null;
+  for (const day of sorted) {
+    run = prev !== null && shiftDate(prev, 1) === day ? run + 1 : 1;
+    if (run > longest) longest = run;
+    prev = day;
+  }
+
+  return { current, longest };
+}
+
 function formatLocalDate(d: Date, timezone: string): string {
   try {
     // en-CA returns YYYY-MM-DD already padded, no manual zero-pad needed.

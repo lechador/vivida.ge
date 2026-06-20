@@ -30,6 +30,8 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { FriendButton } from "@/components/profile/friend-button";
 import { MessageButton } from "@/components/chat/message-button";
+import { SafetyMenu } from "@/components/safety/safety-menu";
+import { isBlockedEitherWay } from "@/lib/block";
 import { PhotoCarousel } from "@/components/profile/photo-carousel";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { FeedList } from "@/components/feed/feed-list";
@@ -109,6 +111,12 @@ export default async function PublicProfilePage({
   const viewerPlan = viewerId ? await getCurrentPlan(viewerId) : "free";
   const isOwner = viewerId === owner.id;
   const viewerIsAdmin = viewerId ? isAdminEmail(session?.user?.email) : false;
+
+  // Block guard: if either party has blocked the other, the profile is hidden
+  // (404) so a blocked user can't view or act on the blocker, and vice versa.
+  if (viewerId && !isOwner && (await isBlockedEitherWay(viewerId, owner.id))) {
+    notFound();
+  }
 
   // Profile stats — friends + posts always public; reputation drives the tier.
   const [ownerReputation, ownerFriendsCount, ownerPostsCount] =
@@ -244,6 +252,7 @@ export default async function PublicProfilePage({
                         targetUsername={profile.username}
                         initialStatus={friendshipStatus}
                       />
+                      <SafetyMenu targetUserId={owner.id} />
                     </>
                   ) : (
                     <Button asChild variant="mystic" size="sm">

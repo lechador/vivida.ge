@@ -1,6 +1,7 @@
-import { and, asc, desc, eq, inArray, lt, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, lt, notInArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
+import { getBlockedUserIds } from "@/lib/block";
 import {
   postComments,
   postReactions,
@@ -189,7 +190,16 @@ export async function listFeedPage(opts: {
 }): Promise<FeedPost[]> {
   const limit = Math.min(Math.max(opts.limit ?? 20, 1), 50);
   const cursorDate = opts.cursor ? new Date(opts.cursor) : null;
-  const where = cursorDate ? lt(posts.createdAt, cursorDate) : undefined;
+
+  // Hide posts authored by anyone in a block relationship with the viewer
+  // (either direction). Cheap at our scale; revisit with a join if blocks
+  // ever number in the thousands per user.
+  const blockedIds = await getBlockedUserIds(opts.viewerId);
+  const conditions = [
+    cursorDate ? lt(posts.createdAt, cursorDate) : undefined,
+    blockedIds.length ? notInArray(posts.userId, blockedIds) : undefined,
+  ].filter(Boolean);
+  const where = conditions.length ? and(...conditions) : undefined;
 
   const rows = await db
     .select(POST_SELECT)
@@ -201,6 +211,23 @@ export async function listFeedPage(opts: {
     .limit(limit);
 
   return enrichPostRows(opts.viewerId, rows);
+}
+
+/** A single post in the same enriched shape as the feed, or null if gone. */
+export async function getPostForViewer(
+  viewerId: string,
+  postId: string
+): Promise<FeedPost | null> {
+  const rows = await db
+    .select(POST_SELECT)
+    .from(posts)
+    .innerJoin(users, eq(users.id, posts.userId))
+    .leftJoin(profiles, eq(profiles.userId, posts.userId))
+    .where(eq(posts.id, postId))
+    .limit(1);
+
+  const [post] = await enrichPostRows(viewerId, rows);
+  return post ?? null;
 }
 
 /** The most recent N posts by a single user, in the same shape as the feed. */

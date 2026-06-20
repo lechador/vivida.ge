@@ -1,10 +1,7 @@
 "use server";
 
-import { eq } from "drizzle-orm";
-
-import { db } from "@/db";
-import { users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
+import { updateEmailPreferencesCore } from "@/lib/account-core";
 
 export type EmailPreferencesInput = {
   daily: boolean;
@@ -20,13 +17,5 @@ export async function updateEmailPreferences(
   input: EmailPreferencesInput
 ): Promise<EmailPreferencesResult> {
   const user = await requireUser();
-  await db
-    .update(users)
-    .set({
-      emailDailyHoroscope: input.daily,
-      emailMarketing: input.marketing,
-      emailNudges: input.nudges,
-    })
-    .where(eq(users.id, user.id));
-  return { ok: true };
+  return updateEmailPreferencesCore(user.id, input);
 }
