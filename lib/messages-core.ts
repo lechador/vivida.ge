@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { friendships, messages, type Message } from "@/db/schema";
 import { recordTyping } from "@/lib/messages";
 import { isBlockedEitherWay } from "@/lib/block";
+import { isAccountRestricted, RESTRICTED_MESSAGE } from "@/lib/restriction";
 
 /**
  * Framework-agnostic messaging *write* logic, shared by the website (Server
@@ -29,6 +30,10 @@ export type SendMessageResult =
  * the `areMatched(a, b)` fallback here (and re-enable the deck flag).
  */
 async function canMessage(a: string, b: string): Promise<boolean> {
+  // A restricted account (under-age, or manually restricted) on either side
+  // closes the conversation in both directions.
+  if (await isAccountRestricted(a)) return false;
+  if (await isAccountRestricted(b)) return false;
   // A block in either direction always wins, regardless of friendship.
   if (await isBlockedEitherWay(a, b)) return false;
   const [link] = await db
@@ -65,6 +70,12 @@ export async function sendMessageCore(
   }
   if (trimmed.length > MAX_BODY) {
     return { ok: false, error: "წერილი ძალიან გრძელია" };
+  }
+
+  // Restricted senders get the specific reason; canMessage also covers the
+  // recipient side and is the authoritative gate.
+  if (await isAccountRestricted(senderId)) {
+    return { ok: false, error: RESTRICTED_MESSAGE };
   }
 
   if (!(await canMessage(senderId, recipientId))) {

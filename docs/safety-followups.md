@@ -21,15 +21,21 @@ blocked user in lower-traffic surfaces:
   `SOCIAL_FEATURES.swipeDeck` / `peopleDirectory` are re-enabled, their queries
   (`getDiscoveryFeed`, `listPeople`) need block filtering added.
 
-## Underage accounts
+## Underage accounts — RESOLVED (Step 3.1)
 
 - `MINIMUM_AGE_YEARS = 18` (in `lib/profile-core.ts`) gates **new/edited**
-  profiles only. A read-only scan exists at `scripts/scan-underage.mjs`.
-- As of the first scan, **3 existing accounts are under 18** (ages 16–17).
-  There is **no account-level suspension/restriction mechanism yet** — a
-  block is per-pair, not global. Handling these requires either a new
-  account-level flag (e.g. `users.restricted`) gated in `requireUser` + the
-  social write cores, or manual offboarding. Decision pending.
+  profiles at onboarding. A read-only scan exists at `scripts/scan-underage.mjs`.
+- Account-level restriction now exists (`lib/restriction.ts`,
+  `isAccountRestricted`): effective restriction = `users.restricted` (manual
+  override) **OR** under-min-age by DOB. Enforced server-side in the shared
+  cores (chat, friend send/accept, post + comment create) → mobile inherits it.
+  Restricted accounts keep read-only astrology; a notice shows on the dashboard.
+- The **3 existing under-18 accounts** (ages 16–17) are restricted **by DOB**,
+  not by the manual flag — so the restriction **auto-lifts at 18** with nothing
+  to remember to clear. The `users.restricted` flag stays `false` for them and
+  is reserved for non-age cases.
+- Remaining: no automated re-scan/alerting for future edge cases (not needed
+  while onboarding blocks under-18).
 
 ## Mobile API parity
 

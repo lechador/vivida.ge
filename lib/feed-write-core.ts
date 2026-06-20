@@ -2,6 +2,7 @@ import { and, count, eq, sql } from "drizzle-orm";
 import { after } from "next/server";
 
 import { db } from "@/db";
+import { isAccountRestricted, RESTRICTED_MESSAGE } from "@/lib/restriction";
 import {
   notifications,
   postComments,
@@ -115,6 +116,9 @@ export async function createPostCore(
   userId: string,
   rawBody: string
 ): Promise<FeedActionResult<{ postId: string }>> {
+  if (await isAccountRestricted(userId)) {
+    return { ok: false, error: RESTRICTED_MESSAGE };
+  }
   const body = rawBody.trim();
   if (!body) return { ok: false, error: "ცარიელ პოსტს ვერ გავგზავნით" };
   if (body.length > POST_BODY_MAX) {
@@ -184,6 +188,9 @@ export async function addCommentCore(
   rawBody: string,
   parentCommentId: string | null = null
 ): Promise<FeedActionResult<{ commentId: string }>> {
+  if (await isAccountRestricted(userId)) {
+    return { ok: false, error: RESTRICTED_MESSAGE };
+  }
   const body = rawBody.trim();
   if (!body) return { ok: false, error: "ცარიელ კომენტარს ვერ გავგზავნით" };
   if (body.length > COMMENT_BODY_MAX) {

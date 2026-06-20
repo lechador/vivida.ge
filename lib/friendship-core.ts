@@ -12,6 +12,7 @@ import {
 } from "@/db/schema";
 import { sendFriendRequestEmail } from "@/lib/email";
 import { isBlockedEitherWay } from "@/lib/block";
+import { isAccountRestricted } from "@/lib/restriction";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { awardReputation, RepSubject } from "@/lib/reputation";
 
@@ -80,6 +81,15 @@ export async function sendFriendRequestCore(
 ): Promise<FriendshipActionResult> {
   if (actor.id === targetUserId) {
     return { ok: false, error: "ვერ გაუგზავნი მოთხოვნას საკუთარ თავს" };
+  }
+
+  // A restricted account (under-age, or manually restricted) on either side
+  // can't send or receive friend requests.
+  if (
+    (await isAccountRestricted(actor.id)) ||
+    (await isAccountRestricted(targetUserId))
+  ) {
+    return { ok: false, error: "თხოვნის გაგზავნა შეუძლებელია" };
   }
 
   // A block in either direction blocks new friend requests outright.
@@ -176,6 +186,13 @@ export async function acceptFriendRequestCore(
   userId: string,
   requesterId: string
 ): Promise<FriendshipActionResult> {
+  // A restricted account on either side can't form the friendship.
+  if (
+    (await isAccountRestricted(userId)) ||
+    (await isAccountRestricted(requesterId))
+  ) {
+    return { ok: false, error: "მოქმედება შეუძლებელია" };
+  }
   await db
     .update(friendships)
     .set({ status: "accepted", respondedAt: new Date() })

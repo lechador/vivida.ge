@@ -54,6 +54,15 @@ export const users = pgTable("user", {
   /** Updated by Auth.js events.signIn whenever the user logs in. NULL
    *  for users who registered but never came back. */
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+  /**
+   * Manual restriction override for trust & safety. The *effective*
+   * restriction (see lib/restriction.ts) is `restricted OR under-min-age`,
+   * so under-age accounts are restricted by their birth date automatically
+   * and auto-lift at adulthood — this flag is for non-age cases (e.g. a bad
+   * actor) and is NOT set for the underage accounts (that would defeat the
+   * auto-reverse).
+   */
+  restricted: boolean("restricted").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
