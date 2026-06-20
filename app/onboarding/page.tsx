@@ -20,12 +20,12 @@ export default async function OnboardingPage() {
     .limit(1);
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main className="dawn relative isolate flex min-h-screen flex-1 flex-col overflow-hidden bg-background text-foreground">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(50%_40%_at_50%_0%,oklch(0.28_0.12_300/0.45),transparent_70%),radial-gradient(35%_30%_at_85%_75%,oklch(0.32_0.13_200/0.35),transparent_70%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_50%_0%,oklch(0.90_0.06_290/0.65),transparent_70%),radial-gradient(40%_32%_at_85%_75%,oklch(0.90_0.08_45/0.55),transparent_70%)]"
       />
-      <Starfield count={90} />
+      <Starfield count={90} tone="dawn" />
 
       <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
         <Link href="/" className="flex items-center gap-2">
@@ -34,7 +34,7 @@ export default async function OnboardingPage() {
             className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
             style={{
               backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+                "linear-gradient(135deg, var(--vivida-violet) 0%, var(--vivida-pink) 55%, var(--vivida-cyan) 100%)",
             }}
           >
             vivida
