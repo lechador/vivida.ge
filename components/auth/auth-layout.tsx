@@ -20,12 +20,12 @@ export function AuthLayout({
   footer?: React.ReactNode;
 }) {
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main className="dawn relative isolate flex min-h-screen flex-col overflow-hidden bg-background text-foreground">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.4),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.35),transparent_70%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(65%_50%_at_50%_-5%,oklch(0.90_0.06_290/0.7),transparent_70%),radial-gradient(45%_35%_at_85%_30%,oklch(0.90_0.08_45/0.6),transparent_70%),radial-gradient(40%_30%_at_15%_75%,oklch(0.91_0.07_350/0.55),transparent_70%)]"
       />
-      <Starfield count={100} shooting={2} />
+      <Starfield count={100} shooting={2} tone="dawn" />
 
       <div className="relative z-10 flex flex-1 flex-col">
         <header className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
@@ -35,7 +35,7 @@ export function AuthLayout({
               className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
               style={{
                 backgroundImage:
-                  "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+                  "linear-gradient(135deg, var(--vivida-violet) 0%, var(--vivida-pink) 55%, var(--vivida-cyan) 100%)",
               }}
             >
               vivida

@@ -56,12 +56,12 @@ export default async function TavsebadobaPage() {
   const { signs, pairs } = buildCalculatorData();
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main className="dawn relative isolate flex min-h-screen flex-col overflow-hidden bg-background text-foreground">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.30_0.16_350/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(35%_25%_at_12%_80%,oklch(0.32_0.16_305/0.35),transparent_70%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(65%_50%_at_50%_-5%,oklch(0.91_0.07_350/0.6),transparent_70%),radial-gradient(45%_35%_at_85%_30%,oklch(0.90_0.06_290/0.6),transparent_70%),radial-gradient(40%_30%_at_12%_80%,oklch(0.90_0.08_45/0.55),transparent_70%)]"
       />
-      <Starfield count={140} shooting={3} />
+      <Starfield count={140} shooting={3} tone="dawn" />
 
       {/* Minimal header — fewer exits on cold ad traffic */}
       <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
@@ -71,7 +71,7 @@ export default async function TavsebadobaPage() {
             className="bg-clip-text text-lg font-semibold tracking-tight text-transparent"
             style={{
               backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+                "linear-gradient(135deg, var(--vivida-violet) 0%, var(--vivida-pink) 55%, var(--vivida-cyan) 100%)",
             }}
           >
             vivida
@@ -106,7 +106,7 @@ export default async function TavsebadobaPage() {
           {TRUST.map(({ icon: Icon, label }) => (
             <span
               key={label}
-              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200"
+              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-600/30 bg-emerald-500/12 px-3 py-1 text-xs font-medium text-emerald-700"
             >
               <Icon className="size-3.5" strokeWidth={2.5} />
               {label}
