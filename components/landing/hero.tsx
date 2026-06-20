@@ -136,7 +136,7 @@ export function Hero() {
         {c.microNotes.map((note) => (
           <span
             key={note}
-            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200"
+            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-600/30 bg-emerald-500/12 px-3 py-1 text-xs font-medium text-emerald-700"
           >
             <Check className="size-3.5" strokeWidth={3} />
             {note}

@@ -34,13 +34,13 @@ export function VividaMark({
     >
       <defs>
         <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#a78bfa" />
-          <stop offset="55%" stopColor="#f472b6" />
-          <stop offset="100%" stopColor="#22d3ee" />
+          <stop offset="0%" stopColor="var(--vivida-violet)" />
+          <stop offset="55%" stopColor="var(--vivida-pink)" />
+          <stop offset="100%" stopColor="var(--vivida-cyan)" />
         </linearGradient>
         <radialGradient id={glowId} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.55" />
-          <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
+          <stop offset="0%" stopColor="var(--vivida-violet)" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="var(--vivida-violet)" stopOpacity="0" />
         </radialGradient>
       </defs>
 

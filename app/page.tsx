@@ -96,7 +96,7 @@ export default async function Home() {
   }
   const { signs, pairs } = buildCalculatorData();
   return (
-    <>
+    <div className="dawn flex min-h-screen flex-col bg-background text-foreground">
       {/* Structured data — search engines parse these inline scripts even
           though they're hidden from users. Two separate scripts so a
           parse error in one doesn't void the other. */}
@@ -110,12 +110,13 @@ export default async function Home() {
       />
 
       <main className="relative isolate flex-1 overflow-hidden">
-        {/* Cosmic backdrop layers */}
+        {/* Soft cosmic dawn backdrop — periwinkle overhead easing into peach
+            and rose toward the horizon. */}
         <div
           aria-hidden
-          className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_0%,oklch(0.28_0.12_300/0.55),transparent_70%),radial-gradient(40%_30%_at_85%_70%,oklch(0.32_0.13_200/0.4),transparent_70%),radial-gradient(35%_25%_at_15%_85%,oklch(0.35_0.15_350/0.35),transparent_70%)]"
+          className="absolute inset-0 -z-10 bg-[radial-gradient(65%_50%_at_50%_0%,oklch(0.90_0.06_290/0.7),transparent_70%),radial-gradient(45%_35%_at_85%_72%,oklch(0.90_0.08_45/0.6),transparent_70%),radial-gradient(40%_30%_at_12%_85%,oklch(0.91_0.07_350/0.55),transparent_70%)]"
         />
-        <Starfield />
+        <Starfield tone="dawn" />
 
         {/* Top nav */}
         <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
@@ -125,7 +126,7 @@ export default async function Home() {
               className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
               style={{
                 backgroundImage:
-                  "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+                  "linear-gradient(135deg, var(--vivida-violet) 0%, var(--vivida-pink) 55%, var(--vivida-cyan) 100%)",
               }}
             >
               vivida
@@ -186,13 +187,13 @@ export default async function Home() {
         <FaqSection />
         <FinalCta />
 
-        {/* Bottom fade into the dark background */}
+        {/* Bottom fade into the page background */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent"
         />
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }
