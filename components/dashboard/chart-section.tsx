@@ -11,7 +11,7 @@ import { ensureChartFor } from "@/actions/chart";
 
 import { AspectCards } from "./aspect-cards";
 import { BigThreeCard } from "./big-three-card";
-import { ChartWheel } from "./chart-wheel";
+import { ChartWheelZoom } from "@/components/report/chart-wheel-zoom";
 import { ElementsCard } from "./elements-card";
 import { HouseCards } from "./house-cards";
 import { PlanetCards } from "./planet-cards";
@@ -79,7 +79,7 @@ export async function ChartSection({
                 </p>
               </div>
               <div className="order-1 mx-auto w-full max-w-[480px] sm:order-2">
-                <ChartWheel chart={data} />
+                <ChartWheelZoom chart={data} />
               </div>
             </div>
           </article>
@@ -110,13 +110,13 @@ export async function ChartSection({
         {interp?.summary && (
           <article
             id="summary"
-            className="scroll-mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:scroll-mt-24 sm:p-6"
+            className="scroll-mt-16 rounded-2xl border border-border bg-card/50 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:scroll-mt-24"
           >
-            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)]">
-              <Sparkles className="size-4" aria-hidden />
-              <span>შენი რუკის შესახებ</span>
+            <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-[var(--vivida-violet)]">
+              <Sparkles className="size-3.5" aria-hidden />
+              შენი რუკის შესახებ
             </div>
-            <p className="text-lg leading-relaxed text-foreground/90">
+            <p className="text-sm leading-relaxed text-foreground/85">
               {interp.summary}
             </p>
           </article>
