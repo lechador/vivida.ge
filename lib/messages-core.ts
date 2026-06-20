@@ -3,7 +3,6 @@ import { and, eq, isNull, or } from "drizzle-orm";
 import { db } from "@/db";
 import { friendships, messages, type Message } from "@/db/schema";
 import { recordTyping } from "@/lib/messages";
-import { areMatched } from "@/lib/match";
 
 /**
  * Framework-agnostic messaging *write* logic, shared by the website (Server
@@ -20,9 +19,13 @@ export type SendMessageResult =
   | { ok: false; error: string };
 
 /**
- * Whether `a` may message `b` — message gating. Open to mutual (accepted)
- * friends OR an active match: a match unlocks the conversation, which is the
- * whole payoff of the match deck. Either relationship is sufficient.
+ * Whether `a` may message `b` — message gating. Restricted to MUTUAL
+ * (accepted) friends only. The match-deck path was intentionally removed as
+ * part of the low-density safety cleanup: with the deck flagged off, matches
+ * no longer form, and any pre-existing match-only threads are now locked
+ * (message history is preserved — only sending is blocked). A `blocked`
+ * friendship row is a hard deny. To re-open match-based chat later, restore
+ * the `areMatched(a, b)` fallback here (and re-enable the deck flag).
  */
 async function canMessage(a: string, b: string): Promise<boolean> {
   const [link] = await db
@@ -35,16 +38,15 @@ async function canMessage(a: string, b: string): Promise<boolean> {
       )
     )
     .limit(1);
-  if (link?.status === "accepted") return true;
-  // A block (recorded in friendships) always wins, even over a match.
+  // A block always wins; otherwise only an accepted friendship unlocks chat.
   if (link?.status === "blocked") return false;
-  return areMatched(a, b);
+  return link?.status === "accepted";
 }
 
 /**
- * Send a message to another user. Restricted to mutual friends — enforced
- * server-side regardless of UI state. Returns the inserted row; the caller
- * handles the (fire-and-forget) notification email.
+ * Send a message to another user. Restricted to mutual (accepted) friends —
+ * enforced server-side regardless of UI state. Returns the inserted row; the
+ * caller handles the (fire-and-forget) notification email.
  */
 export async function sendMessageCore(
   senderId: string,
@@ -63,7 +65,7 @@ export async function sendMessageCore(
   }
 
   if (!(await canMessage(senderId, recipientId))) {
-    return { ok: false, error: "წერა შეგიძლია მეგობრებს ან დამთხვევებს" };
+    return { ok: false, error: "წერა მხოლოდ მეგობრებთან შეგიძლია" };
   }
 
   const [inserted] = await db

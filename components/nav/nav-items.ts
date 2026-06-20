@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { SOCIAL_FEATURES, type SocialFeature } from "@/lib/social-flags";
+
 export type NavActiveKey =
   | "today"
   | "report"
@@ -27,7 +29,21 @@ export type NavItem = {
   hue: string;
 };
 
-export const NAV_ITEMS: NavItem[] = [
+/**
+ * Nav keys that are gated behind a social feature flag. A key absent from
+ * this map is always visible. When the flag is off the entry is filtered
+ * out of every rendered nav (desktop sidebar, mobile drawer, tab bar).
+ */
+const NAV_FEATURE_GATE: Partial<Record<NavActiveKey, SocialFeature>> = {
+  discover: "swipeDeck",
+};
+
+function navVisible(item: NavItem): boolean {
+  const gate = NAV_FEATURE_GATE[item.key];
+  return !gate || SOCIAL_FEATURES[gate];
+}
+
+const ALL_NAV_ITEMS: NavItem[] = [
   {
     key: "today",
     href: "/dashboard",
@@ -78,7 +94,10 @@ export const NAV_ITEMS: NavItem[] = [
  * the desktop nav and the mobile drawer); messages takes a slot so the
  * messenger is one tap away with a live unread badge.
  */
-export const MOBILE_TAB_ITEMS: NavItem[] = [
+/** Visible desktop nav — gated entries (e.g. discover) filtered out when off. */
+export const NAV_ITEMS: NavItem[] = ALL_NAV_ITEMS.filter(navVisible);
+
+const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
   {
     key: "today",
     href: "/dashboard",
@@ -115,3 +134,7 @@ export const MOBILE_TAB_ITEMS: NavItem[] = [
     hue: "oklch(0.78 0.18 200)",
   },
 ];
+
+/** Visible mobile tab bar — same flag filtering as the desktop nav. */
+export const MOBILE_TAB_ITEMS: NavItem[] =
+  ALL_MOBILE_TAB_ITEMS.filter(navVisible);

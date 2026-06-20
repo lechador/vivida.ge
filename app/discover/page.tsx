@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Compass } from "lucide-react";
 
+import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -13,6 +15,9 @@ export const metadata = { title: "აღმოაჩინე" };
 export const dynamic = "force-dynamic";
 
 export default async function DiscoverPage() {
+  // Swipe/match deck is flag-gated off at low user density. Route preserved;
+  // bounce to the dashboard so the entry point degrades gracefully (no 404).
+  if (!SOCIAL_FEATURES.swipeDeck) redirect("/dashboard");
   const user = await requireUser();
   const [plan, feed] = await Promise.all([
     getCurrentPlan(user.id),

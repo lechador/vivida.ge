@@ -23,6 +23,7 @@ import {
   sendMessage,
 } from "@/actions/messages";
 import { cn } from "@/lib/utils";
+import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import type { Message } from "@/db/schema";
 
 type TypingEventPayload = {
@@ -639,12 +640,16 @@ function ConversationList({
           <p className="text-sm text-muted-foreground">
             ჯერ მეგობრები არ გყავს — დაამატე და დაიწყე ჩატი
           </p>
+          {/* Point at the deck when it's enabled; otherwise send users to
+              their friends page (always available) so the CTA never dead-ends. */}
           <Link
-            href="/discover"
+            href={SOCIAL_FEATURES.swipeDeck ? "/discover" : "/friends"}
             onClick={onClose ?? undefined}
             className="text-xs text-[var(--vivida-cyan)] hover:underline"
           >
-            ნახე ვინ რეზონირებს შენთან →
+            {SOCIAL_FEATURES.swipeDeck
+              ? "ნახე ვინ რეზონირებს შენთან →"
+              : "ნახე მეგობრების მოთხოვნები →"}
           </Link>
         </div>
       ) : (

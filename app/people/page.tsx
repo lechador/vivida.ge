@@ -1,6 +1,9 @@
+import { redirect } from "next/navigation";
+
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { listPeople } from "@/lib/people";
+import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { PeopleList } from "@/components/people/people-list";
@@ -15,6 +18,9 @@ export const dynamic = "force-dynamic";
  * so we don't expose the directory to scrapers.
  */
 export default async function PeoplePage() {
+  // Public people directory is flag-gated off at low user density. Route
+  // preserved; bounce to the dashboard so the link degrades gracefully.
+  if (!SOCIAL_FEATURES.peopleDirectory) redirect("/dashboard");
   const user = await requireUser();
   const [plan, firstPage] = await Promise.all([
     getCurrentPlan(user.id),

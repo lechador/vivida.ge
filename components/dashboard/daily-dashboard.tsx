@@ -13,6 +13,7 @@ import {
 } from "@/actions/dashboard";
 import { Button } from "@/components/ui/button";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
+import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import type { PlanId } from "@/lib/pricing";
 
 import { DailyCard } from "./daily-card";
@@ -75,9 +76,14 @@ export function DailyDashboard({
 
   return (
     <div className="space-y-8">
-      {/* Suggested people sit at the very top — finding new people is the
-          stickiest part of the app, surface it before anything else. */}
-      <SuggestedPeopleRail suggestions={suggestions} />
+      {/* Suggested people — a "find strangers to add" surface, flag-gated
+          off at low user density. When off, the dashboard focuses on the
+          user's own chart/transits/reading. `suggestions` is empty in that
+          case (the server skips the query), but we also guard the render so
+          flipping the flag is the single switch. */}
+      {SOCIAL_FEATURES.suggestedPeopleRail && (
+        <SuggestedPeopleRail suggestions={suggestions} />
+      )}
 
       {/* AI cards stream in here behind skeletons so the page never blocks
           on generation latency. */}

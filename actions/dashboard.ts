@@ -10,6 +10,7 @@ import { ensureMoonPhase, type MoonPhaseRow } from "@/actions/moon-phase";
 import { ensureWeeklyForecast } from "@/actions/weekly-forecast";
 import { canUseFeature } from "@/lib/features";
 import { getDashboardSuggestions } from "@/lib/suggestions";
+import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import type { PlanId } from "@/lib/pricing";
 import type {
   Chart,
@@ -53,13 +54,17 @@ export async function loadDashboardCore(
   const chart = await ensureChartFor(userId, plan, { aiUpgrade: "defer" });
   if (!chart) return { kind: "no-chart" };
 
+  // Skip the "suggested people" query entirely when the rail is flagged off
+  // — no point ranking strangers we won't show. Render is also guarded.
   const [profileRow, suggestions] = await Promise.all([
     db
       .select({ timezone: profiles.timezone })
       .from(profiles)
       .where(eq(profiles.userId, userId))
       .limit(1),
-    getDashboardSuggestions(userId, 20).catch(() => [] as DiscoverCard[]),
+    SOCIAL_FEATURES.suggestedPeopleRail
+      ? getDashboardSuggestions(userId, 20).catch(() => [] as DiscoverCard[])
+      : Promise.resolve([] as DiscoverCard[]),
   ]);
 
   return {
