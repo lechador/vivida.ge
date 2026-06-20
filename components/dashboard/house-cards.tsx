@@ -1,12 +1,6 @@
-"use client";
-
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-
 import { HOUSE_NUMBERS, houseDef } from "@/lib/houses";
 import { bodyMeta, signByIndex, signColor } from "@/lib/zodiac";
 import type { NatalChartJson } from "@/db/schema";
-import { cn } from "@/lib/utils";
 
 const HOUSE_LABEL: Record<number, string> = {
   1: "AC",
@@ -16,9 +10,9 @@ const HOUSE_LABEL: Record<number, string> = {
 };
 
 /**
- * Flat houses list — one tight row per house (number/axis · theme · cusp sign
- * · occupant planets), interpretation expands inline. Replaces the old sticker
- * grid.
+ * Flat houses list — one tight, aligned row per house (axis/number · theme ·
+ * cusp sign · occupant planets) with the interpretation inline beneath it
+ * (open by default).
  */
 export function HouseCards({
   chart,
@@ -27,8 +21,6 @@ export function HouseCards({
   chart: NatalChartJson;
   interpretations?: Record<string, string>;
 }) {
-  const [openHouse, setOpenHouse] = useState<number | null>(null);
-
   const occupants: Record<
     number,
     Array<{ key: string; label: string; symbol: string }>
@@ -52,27 +44,17 @@ export function HouseCards({
         const color = cuspSign ? signColor(cuspSign) : "oklch(0.6 0.1 285)";
         const planets = occupants[n] ?? [];
         const text = interpretations?.[String(n)];
-        const open = openHouse === n;
 
         return (
           <div
             key={n}
             id={`house-${n}`}
-            className="scroll-mt-20 border-t border-border/50 first:border-t-0"
+            className="scroll-mt-20 border-t border-border/50 px-4 py-3.5 first:border-t-0 sm:px-5"
           >
-            <button
-              type="button"
-              onClick={() => text && setOpenHouse(open ? null : n)}
-              disabled={!text}
-              aria-expanded={open}
-              className={cn(
-                "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors sm:px-5",
-                text && "cursor-pointer hover:bg-card/70"
-              )}
-            >
+            <div className="flex items-center gap-3 text-sm">
               <span
                 style={{ color }}
-                className="w-8 shrink-0 text-center text-sm font-semibold tabular-nums"
+                className="w-6 shrink-0 text-center font-semibold tabular-nums"
               >
                 {HOUSE_LABEL[n] ?? n}
               </span>
@@ -80,50 +62,34 @@ export function HouseCards({
                 {def.themeKa}
               </span>
               {cuspSign && (
-                <span className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
-                  <span aria-hidden style={{ color }}>
+                <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
+                  <span
+                    aria-hidden
+                    style={{ color }}
+                    className="w-5 shrink-0 text-center leading-none"
+                  >
                     {`${cuspSign.symbol}︎`}
                   </span>
                   <span className="truncate">{cuspSign.labelKa}</span>
                 </span>
               )}
-              <span className="ml-auto flex shrink-0 items-center gap-2">
-                {planets.length > 0 && (
-                  <span
-                    aria-hidden
-                    className="flex items-center gap-1 text-sm text-foreground/70"
-                  >
-                    {planets.map((p) => (
-                      <span key={p.key} title={p.label}>
-                        {p.symbol}
-                      </span>
-                    ))}
-                  </span>
-                )}
-                {text && (
-                  <ChevronDown
-                    aria-hidden
-                    className={cn(
-                      "size-4 text-muted-foreground transition-transform duration-200",
-                      open && "rotate-180"
-                    )}
-                  />
-                )}
-              </span>
-            </button>
-
-            {open && text && (
-              <div
-                className="border-t px-4 pb-4 pt-2 text-sm leading-relaxed text-foreground/90 sm:px-5"
-                style={{
-                  borderColor: `color-mix(in oklch, ${color} 20%, transparent)`,
-                }}
-              >
-                <div className="mb-1 text-[11px] text-muted-foreground">
-                  {def.labelKa} · {def.meaningKa}
-                </div>
+              {planets.length > 0 && (
+                <span
+                  aria-hidden
+                  className="ml-auto flex shrink-0 items-center gap-1 text-foreground/70"
+                >
+                  {planets.map((p) => (
+                    <span key={p.key} title={p.label}>
+                      {p.symbol}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </div>
+            {text && (
+              <p className="mt-2 pl-9 text-sm leading-relaxed text-foreground/85">
                 {text}
-              </div>
+              </p>
             )}
           </div>
         );

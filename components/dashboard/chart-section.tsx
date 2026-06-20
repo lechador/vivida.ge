@@ -17,7 +17,6 @@ import { HouseCards } from "./house-cards";
 import { PlanetCards } from "./planet-cards";
 import { CollapsibleSection } from "@/components/report/collapsible-section";
 import { ReportNav } from "@/components/report/report-nav";
-import { QuickStats } from "@/components/report/quick-stats";
 import {
   PositionsTable,
   HousesTable,
@@ -55,13 +54,8 @@ export async function ChartSection({
 
   return (
     <div>
-      {/* Quick stats — clickable, opens modals */}
-      <QuickStats chart={data} interpretations={interp ?? undefined} />
-
       {/* Sticky in-page navigation with scroll-spy */}
-      <div className="mt-8">
-        <ReportNav />
-      </div>
+      <ReportNav />
 
       <div className="mt-10 space-y-10">
         {/* SECTION 01 — Chart wheel hero (always expanded) */}
@@ -83,16 +77,6 @@ export async function ChartSection({
                   ცა ზუსტად შენი დაბადების წამში. ამომავალი ნიშანი{" "}
                   {ascSign.labelKa}-შია.
                 </p>
-                <div className="mt-5 flex flex-wrap gap-2 text-xs">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.78_0.18_200/0.4)] bg-[oklch(0.78_0.18_200/0.1)] px-2.5 py-1 text-foreground/85">
-                    <span aria-hidden>✨</span>
-                    ჰარმონიული ბმები
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.72_0.22_350/0.4)] bg-[oklch(0.72_0.22_350/0.1)] px-2.5 py-1 text-foreground/85">
-                    <span aria-hidden>⚡</span>
-                    დაძაბული ბმები
-                  </span>
-                </div>
               </div>
               <div className="order-1 mx-auto w-full max-w-[480px] sm:order-2">
                 <ChartWheel chart={data} />
@@ -187,6 +171,7 @@ export async function ChartSection({
             icon={<Lightbulb className="size-5" />}
             title="რა ვამჩნევთ შენს რუკაში"
             subtitle="ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"
+            defaultOpen
           >
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {interp.highlights.map((h, i) => (
@@ -223,6 +208,7 @@ export async function ChartSection({
           icon={<Home className="size-5" />}
           title="ცხოვრების 12 სფერო"
           subtitle="სად რა ენერგია ვლინდება შენს ცხოვრებაში"
+          defaultOpen
         >
           <HouseCards chart={data} interpretations={interp?.houses} />
         </CollapsibleSection>
@@ -233,6 +219,7 @@ export async function ChartSection({
           icon={<Triangle className="size-5" />}
           title="ასპექტები"
           subtitle="როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
+          defaultOpen
         >
           <AspectCards chart={data} interpretations={interp?.aspects} />
         </CollapsibleSection>
