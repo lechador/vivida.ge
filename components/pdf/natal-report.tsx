@@ -202,13 +202,15 @@ const POINTS = [
 ] as const;
 
 function Footer() {
+  // NOTE: a dynamic `render: ({pageNumber}) => …` callback on a fixed element
+  // crashes react-pdf ("unsupported number: -3.9e22") once the document grows
+  // past ~30 pages of block content — a confirmed engine limitation. A static
+  // fixed footer is robust to 100+ pages, so we forgo the page number.
   return e(
     View,
     { style: s.footer, fixed: true },
     e(Text, null, "VIVIDA · ნატალური ანგარიში"),
-    e(Text, {
-      render: ({ pageNumber }: { pageNumber: number }) => `${pageNumber}`,
-    })
+    e(Text, null, "vivida.ge")
   );
 }
 
@@ -348,7 +350,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       ...(narrative?.standout ?? []).map((h, i) =>
         e(
           View,
-          { key: i, style: s.hl, wrap: false },
+          { key: `st-${i}`, style: s.hl, minPresenceAhead: 50 },
           e(Text, { style: s.hlTitle }, h.title),
           e(Text, { style: s.hlBody }, h.body)
         )
@@ -358,7 +360,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       narrative?.signature
         ? e(
             View,
-            { wrap: false },
+            { minPresenceAhead: 80 },
             e(View, { style: s.divider }),
             e(SectionTitle, { kicker: "ბირთვი", title: "შენი რუკის ხელწერა" }),
             e(Text, { style: s.prose }, narrative.signature)
@@ -386,7 +388,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       narrative?.strengths
         ? e(
             View,
-            { wrap: false },
+            { minPresenceAhead: 80 },
             e(View, { style: { height: 16 } }),
             e(Text, { style: s.sectionKicker }, "ნიჭები"),
             e(Text, { style: [s.sectionTitle, { fontSize: 14 }] }, "ძლიერი მხარეები"),
@@ -396,7 +398,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       narrative?.growth
         ? e(
             View,
-            { wrap: false },
+            { minPresenceAhead: 80 },
             e(View, { style: { height: 14 } }),
             e(Text, { style: s.sectionKicker }, "ზრდა"),
             e(Text, { style: [s.sectionTitle, { fontSize: 14 }] }, "ზრდის ზონები"),
@@ -436,7 +438,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       ),
 
       // Big Three
-      e(View, { style: s.divider, break: true }),
+      e(View, { style: s.divider }),
       e(SectionTitle, { kicker: "ბირთვი", title: "დიდი სამეული" }),
       ...(
         [
@@ -450,7 +452,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
         const sign = signByIndex(p.signIndex);
         return e(
           View,
-          { key: i, style: s.entry, wrap: false },
+          { key: `big-${key}`, style: s.entry, minPresenceAhead: 60 },
           e(
             View,
             { style: s.entryHead },
@@ -472,7 +474,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
           const body = content.planets?.[key];
           return e(
             View,
-            { key, style: s.entry, wrap: false },
+            { key, style: s.entry, minPresenceAhead: 60 },
             e(
               View,
               { style: s.entryHead },
@@ -488,7 +490,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
         }),
 
       // Houses
-      e(View, { style: s.divider, break: true }),
+      e(View, { style: s.divider }),
       e(SectionTitle, { kicker: "ცხოვრების სფეროები", title: "12 სახლი" }),
       ...Array.from({ length: 12 }, (_, i) => i + 1)
         .map((n) => {
@@ -498,7 +500,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
           const sign = cusp ? signByIndex(cusp.signIndex) : null;
           return e(
             View,
-            { key: n, style: s.entry, wrap: false },
+            { key: n, style: s.entry, minPresenceAhead: 60 },
             e(
               View,
               { style: s.entryHead },
@@ -513,7 +515,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
         .filter(Boolean),
 
       // Aspects (tightest first)
-      e(View, { style: s.divider, break: true }),
+      e(View, { style: s.divider }),
       e(SectionTitle, { kicker: "ბმები", title: "მთავარი ასპექტები" }),
       ...salience.tightestAspects.map((a, i) => {
         const k = aspectKey(
@@ -525,7 +527,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
         const col = FAMILY_COLOR[a.family] ?? C.violet;
         return e(
           View,
-          { key: i, style: s.entry, wrap: false },
+          { key: `asp-${i}`, style: s.entry, minPresenceAhead: 60 },
           e(
             View,
             { style: s.entryHead },
@@ -544,7 +546,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       narrative?.closing
         ? e(
             View,
-            { wrap: false },
+            { minPresenceAhead: 80 },
             e(View, { style: s.divider }),
             e(SectionTitle, { kicker: "დასკვნა", title: "შენი კოსმიური ხელწერა" }),
             e(Text, { style: s.prose }, narrative.closing)
