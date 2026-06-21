@@ -315,6 +315,61 @@ export const payments = pgTable("payment", {
 });
 
 /**
+ * One-time, paid, downloadable PDF reports (natal / synastry / forecast).
+ * Lifecycle: pending → paid → generating → ready (or failed). Pro users
+ * skip payment and land directly on 'paid'. The PDF lives privately in R2;
+ * `pdfKey` is the object key and we serve it via short-lived signed URLs.
+ */
+export const pdfReportStatusEnum = pgEnum("pdf_report_status", [
+  "pending", // checkout started, awaiting Stripe payment
+  "paid", // payment confirmed (or Pro-comped) — generation queued
+  "generating", // worker is producing the PDF
+  "ready", // PDF stored in R2, downloadable
+  "failed", // generation errored — retryable
+]);
+
+export const pdfReports = pgTable(
+  "pdf_report",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** 'natal' | 'synastry' | 'forecast' — natal is the only one shipped today. */
+    type: text("type").notNull().default("natal"),
+    status: pdfReportStatusEnum("status").notNull().default("pending"),
+    /** chart input hash captured at purchase, so we can flag a stale report
+     *  if the user later changes their birth data. */
+    inputHash: text("input_hash"),
+    amountCents: integer("amount_cents").notNull().default(0),
+    currency: text("currency").notNull().default("GEL"),
+    /** true when comped to a Pro subscriber (no Stripe charge). */
+    comped: boolean("comped").notNull().default(false),
+    stripeSessionId: text("stripe_session_id").unique(),
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+    /** R2 object key once generated. */
+    pdfKey: text("pdf_key"),
+    /** last generation error, for support/retry. */
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    readyAt: timestamp("ready_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("pdf_report_user_created_idx").on(t.userId, t.createdAt),
+    index("pdf_report_status_idx").on(t.status),
+  ]
+);
+
+export type PdfReport = typeof pdfReports.$inferSelect;
+export type NewPdfReport = typeof pdfReports.$inferInsert;
+export type PdfReportStatus = (typeof pdfReportStatusEnum.enumValues)[number];
+
+/**
  * Direct messages between two users. We don't model "conversations"
  * explicitly — a conversation is implicit (any pair of users sharing
  * messages). `readAt` is set on the row when the recipient opens the

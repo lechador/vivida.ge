@@ -6,7 +6,12 @@ const nextConfig: NextConfig = {
   // in that function's bundle (otherwise the font is missing on the deploy and
   // Georgian renders as tofu).
   outputFileTracingIncludes: {
+    // Every route that may render a report PDF reads the Georgian TTFs via fs;
+    // Vercel's tracer won't follow the dynamic path, so bundle them explicitly.
     "/api/dev/report-pdf": ["./app/_fonts/*.ttf"],
+    "/api/stripe/webhook": ["./app/_fonts/*.ttf"],
+    "/api/reports/checkout": ["./app/_fonts/*.ttf"],
+    "/api/reports/[id]": ["./app/_fonts/*.ttf"],
   },
   images: {
     remotePatterns: [

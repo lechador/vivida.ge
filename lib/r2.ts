@@ -8,6 +8,7 @@
 
 import {
   DeleteObjectCommand,
+  GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -66,6 +67,51 @@ export async function presignedUploadUrl({
     Bucket: requireEnv("R2_BUCKET_NAME"),
     Key: key,
     ContentType: contentType,
+  });
+  return getSignedUrl(client(), cmd, { expiresIn });
+}
+
+/**
+ * Upload bytes we generated server-side (e.g. a rendered PDF) straight to R2.
+ * Unlike photos (browser → presigned PUT), report PDFs are produced on the
+ * server, so we PUT them ourselves. Objects are private; serve via
+ * `presignedDownloadUrl`.
+ */
+export async function putObject({
+  key,
+  body,
+  contentType,
+}: {
+  key: string;
+  body: Uint8Array | Buffer;
+  contentType: string;
+}): Promise<void> {
+  await client().send(
+    new PutObjectCommand({
+      Bucket: requireEnv("R2_BUCKET_NAME"),
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+    })
+  );
+}
+
+/** Short-lived signed GET URL for a private object (default 5 min). */
+export async function presignedDownloadUrl({
+  key,
+  expiresIn = 5 * 60,
+  downloadFilename,
+}: {
+  key: string;
+  expiresIn?: number;
+  downloadFilename?: string;
+}): Promise<string> {
+  const cmd = new GetObjectCommand({
+    Bucket: requireEnv("R2_BUCKET_NAME"),
+    Key: key,
+    ResponseContentDisposition: downloadFilename
+      ? `attachment; filename="${downloadFilename}"`
+      : undefined,
   });
   return getSignedUrl(client(), cmd, { expiresIn });
 }
