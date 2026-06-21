@@ -13,12 +13,9 @@ import { bodyMeta, formatDegree, signByIndex } from "@/lib/zodiac";
 import { aspectKey } from "@/lib/aspects";
 import { ELEMENT_ORDER } from "@/lib/elements";
 import { C, ELEMENT_COLOR } from "@/lib/pdf/theme";
-import type {
-  NatalChartJson,
-  ChartInterpretationJson,
-} from "@/db/schema";
+import type { NatalChartJson } from "@/db/schema";
 import type { ChartSalience } from "@/lib/report-salience";
-import type { NatalReportHighlights } from "@/lib/report-content";
+import type { NatalReportContent } from "@/lib/report-content";
 
 const FONT_DIR = path.join(process.cwd(), "app", "_fonts");
 let fontsReady = false;
@@ -41,8 +38,7 @@ export type NatalReportData = {
   birth: { date: string; time: string | null; place: string };
   chart: NatalChartJson;
   salience: ChartSalience;
-  highlights: NatalReportHighlights | null;
-  interpretation: ChartInterpretationJson | null;
+  content: NatalReportContent;
 };
 
 const ASPECT_KA: Record<string, string> = {
@@ -264,7 +260,8 @@ function BalanceBar({
 
 export function NatalReport({ data }: { data: NatalReportData }) {
   registerReportFonts();
-  const { chart, salience, highlights, interpretation } = data;
+  const { chart, salience, content } = data;
+  const narrative = content.narrative;
 
   const sunSign = signByIndex(chart.bodies.sun.signIndex).labelKa;
   const moonSign = signByIndex(chart.bodies.moon.signIndex).labelKa;
@@ -348,7 +345,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
         kicker: "შენი რუკის ხელწერა",
         title: "რა გამოირჩევა",
       }),
-      ...(highlights?.standout ?? []).map((h, i) =>
+      ...(narrative?.standout ?? []).map((h, i) =>
         e(
           View,
           { key: i, style: s.hl, wrap: false },
@@ -356,6 +353,17 @@ export function NatalReport({ data }: { data: NatalReportData }) {
           e(Text, { style: s.hlBody }, h.body)
         )
       ),
+
+      // Chart signature (synthesis)
+      narrative?.signature
+        ? e(
+            View,
+            { wrap: false },
+            e(View, { style: s.divider }),
+            e(SectionTitle, { kicker: "ბირთვი", title: "შენი რუკის ხელწერა" }),
+            e(Text, { style: s.prose }, narrative.signature)
+          )
+        : null,
 
       e(View, { style: s.divider }),
 
@@ -370,8 +378,30 @@ export function NatalReport({ data }: { data: NatalReportData }) {
         data: modalityBar,
         colorOf: (l) => MOD_COLOR[l] ?? C.violet,
       }),
-      highlights?.balance
-        ? e(Text, { style: s.prose }, highlights.balance)
+      narrative?.balance
+        ? e(Text, { style: s.prose }, narrative.balance)
+        : null,
+
+      // Strengths & growth (new depth sections)
+      narrative?.strengths
+        ? e(
+            View,
+            { wrap: false },
+            e(View, { style: { height: 16 } }),
+            e(Text, { style: s.sectionKicker }, "ნიჭები"),
+            e(Text, { style: [s.sectionTitle, { fontSize: 14 }] }, "ძლიერი მხარეები"),
+            e(Text, { style: s.prose }, narrative.strengths)
+          )
+        : null,
+      narrative?.growth
+        ? e(
+            View,
+            { wrap: false },
+            e(View, { style: { height: 14 } }),
+            e(Text, { style: s.sectionKicker }, "ზრდა"),
+            e(Text, { style: [s.sectionTitle, { fontSize: 14 }] }, "ზრდის ზონები"),
+            e(Text, { style: s.prose }, narrative.growth)
+          )
         : null,
 
       e(View, { style: s.divider }),
@@ -410,12 +440,13 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       e(SectionTitle, { kicker: "ბირთვი", title: "დიდი სამეული" }),
       ...(
         [
-          ["sun", "მზე", interpretation?.bigThree?.sun],
-          ["moon", "მთვარე", interpretation?.bigThree?.moon],
-          ["ascendant", "ამომავალი", interpretation?.bigThree?.ascendant],
+          ["sun", "მზე"],
+          ["moon", "მთვარე"],
+          ["ascendant", "ამომავალი"],
         ] as const
-      ).map(([key, label, body], i) => {
+      ).map(([key, label], i) => {
         const p = key === "ascendant" ? chart.ascendant : chart.bodies[key];
+        const body = content.planets?.[key];
         const sign = signByIndex(p.signIndex);
         return e(
           View,
@@ -438,7 +469,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
         .map((key) => {
           const p = chart.bodies[key];
           const sign = signByIndex(p.signIndex);
-          const body = interpretation?.planets?.[key];
+          const body = content.planets?.[key];
           return e(
             View,
             { key, style: s.entry, wrap: false },
@@ -461,7 +492,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       e(SectionTitle, { kicker: "ცხოვრების სფეროები", title: "12 სახლი" }),
       ...Array.from({ length: 12 }, (_, i) => i + 1)
         .map((n) => {
-          const body = interpretation?.houses?.[String(n)];
+          const body = content.houses?.[String(n)];
           if (!body) return null;
           const cusp = chart.houses.find((h) => h.number === n);
           const sign = cusp ? signByIndex(cusp.signIndex) : null;
@@ -490,7 +521,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
           a.b,
           a.kind as Parameters<typeof aspectKey>[2]
         );
-        const body = interpretation?.aspects?.[k];
+        const body = content.aspects?.[k];
         const col = FAMILY_COLOR[a.family] ?? C.violet;
         return e(
           View,
@@ -510,13 +541,13 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       }),
 
       // Closing
-      highlights?.closing
+      narrative?.closing
         ? e(
             View,
-            null,
+            { wrap: false },
             e(View, { style: s.divider }),
             e(SectionTitle, { kicker: "დასკვნა", title: "შენი კოსმიური ხელწერა" }),
-            e(Text, { style: s.prose }, highlights.closing)
+            e(Text, { style: s.prose }, narrative.closing)
           )
         : null
     )

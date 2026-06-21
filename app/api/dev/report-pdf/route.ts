@@ -5,9 +5,8 @@ import { auth } from "@/auth";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { db } from "@/db";
 import { charts, profiles, users } from "@/db/schema";
-import { signByIndex } from "@/lib/zodiac";
 import { computeChartSalience } from "@/lib/report-salience";
-import { generateNatalHighlights } from "@/lib/report-content";
+import { generateNatalReport } from "@/lib/report-content";
 import { NatalReport } from "@/components/pdf/natal-report";
 
 /**
@@ -62,20 +61,10 @@ export async function GET(req: Request) {
   const salience = computeChartSalience(chart);
 
   const firstName = user?.name?.split(" ")[0] ?? null;
-  const sun = signByIndex(chart.bodies.sun.signIndex).labelKa;
-  const moon = signByIndex(chart.bodies.moon.signIndex).labelKa;
-  const ascendant = signByIndex(chart.ascendant.signIndex).labelKa;
 
-  const highlights = await generateNatalHighlights({
-    firstName,
-    sun,
-    moon,
-    ascendant,
-    salience,
-  }).catch((err) => {
-    console.warn("[report-pdf] highlights gen failed:", (err as Error).message);
-    return null;
-  });
+  // Deep, report-grade Georgian content generated specifically for the PDF
+  // (4 parallel Gemini calls) — not the shorter on-site interpretations.
+  const content = await generateNatalReport({ firstName, chart, salience });
 
   const buffer = await renderToBuffer(
     NatalReport({
@@ -88,8 +77,7 @@ export async function GET(req: Request) {
         },
         chart,
         salience,
-        highlights,
-        interpretation: chartRow.interpretation ?? null,
+        content,
       },
     })
   );
