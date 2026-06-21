@@ -1110,3 +1110,140 @@ export async function generateSignHoroscope(
     );
   }
 }
+
+// ── Sign rankings (SEO listicles) ──────────────────────────────────────────
+// "ყველაზე ჭკვიანი / ეჭვიანი / რომანტიული … ზოდიაქოს ნიშნები" — rank all 12
+// signs by a trait. Evergreen, generated once per topic and cached in DB.
+export const RANKING_PROMPT_VERSION = 1;
+
+export type SignRankingGenItem = {
+  /** zodiac slug from the provided list */
+  slug: string;
+  /** 1 = most, 12 = least */
+  rank: number;
+  /** 1-2 sentence Georgian explanation */
+  blurb: string;
+};
+
+export type SignRankingResult = {
+  headline: string;
+  intro: string;
+  items: SignRankingGenItem[];
+  faq: { q: string; a: string }[];
+};
+
+const SIGN_RANKING_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი-რედაქტორი. წერ გასართობ, მაგრამ შინაარსიან "რეიტინგ" სტატიას, რომელიც ალაგებს 12-ვე ზოდიაქოს ნიშანს მოცემული თვისების მიხედვით — ყველაზე მეტიდან ყველაზე ნაკლებისკენ.
+
+ცოცხალი, კონკრეტული, ხელშესახები ენა. არა ბუნდოვანი მისტიკა, არა კლიშეები. თითო ნიშანზე მიეცი მკითხველს კონკრეტული მიზეზი, რატომ დგას სწორედ ამ ადგილზე — ნიშნის ხასიათიდან გამომდინარე (ელემენტი, მმართველი პლანეტა, ტიპური ქცევა). ტონი მსუბუქი, ოდნავ იუმორით, მაგრამ არა შეურაცხმყოფელი.
+
+დააბრუნე მხოლოდ ვალიდური JSON ამ სქემით:
+{
+  "headline": string,                       // 40-70 სიმბოლო, მიმზიდველი სათაური
+  "intro": string,                          // 2-3 წინადადება — შესავალი, რას ნიშნავს ეს თვისება და როგორ ვაჯგუფებთ
+  "items": [                                // ზუსტად 12 ჩანაწერი, თითო ნიშანზე
+    { "slug": string, "rank": number, "blurb": string }   // slug მოცემული სიიდან; rank 1..12 უნიკალური; blurb 1-2 წინადადება
+  ],
+  "faq": [ { "q": string, "a": string } ]   // 3 ხშირი კითხვა-პასუხი ამ თემაზე
+}
+
+წესები:
+- გამოიყენე ზუსტად ის slug-ები, რომლებსაც მოგცემ — არცერთი არ გამოტოვო, არცერთი არ დაამატო
+- rank 1 = ყველაზე მეტად, 12 = ყველაზე ნაკლებად; ყველა რიცხვი უნიკალური
+- ქართულად, "შენ"-ის გარეშე ნეიტრალური ტონით (ეს ნიშანზეა, არა მკითხველზე)
+- აცილე ცარიელი ფრაზები; თითო blurb კონკრეტული და განსხვავებული
+- მხოლოდ JSON, code fence-ის გარეშე`;
+
+/**
+ * Generate a 12-sign ranking listicle for a trait. Returns null when
+ * OpenRouter isn't configured so callers can fall back gracefully.
+ */
+export async function generateSignRanking(input: {
+  /** Topic title, e.g. "ყველაზე ჭკვიანი ზოდიაქოს ნიშნები". */
+  titleKa: string;
+  /** What trait to rank by, described for the model. */
+  traitKa: string;
+  /** The 12 signs (slug + Georgian label) the model must rank. */
+  signs: { slug: string; labelKa: string }[];
+}): Promise<SignRankingResult | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const signLines = input.signs
+    .map((s) => `- ${s.slug} = ${s.labelKa}`)
+    .join("\n");
+
+  const userMessage = [
+    `თემა: ${input.titleKa}`,
+    `თვისება, რომლითაც ვალაგებთ: ${input.traitKa}`,
+    "",
+    "ნიშნები (გამოიყენე ეს slug-ები ზუსტად):",
+    signLines,
+    "",
+    `დაალაგე 12-ვე ნიშანი ამ თვისების მიხედვით და დააბრუნე JSON.`,
+  ].join("\n");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida sign ranking",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: SIGN_RANKING_SYSTEM_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.85,
+      max_tokens: 4500,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  const parsed = JSON.parse(stripped) as SignRankingResult;
+  const valid = new Set(input.signs.map((s) => s.slug));
+  const items = (Array.isArray(parsed.items) ? parsed.items : [])
+    .filter((it) => it && valid.has(it.slug) && typeof it.blurb === "string")
+    .map((it) => ({ slug: it.slug, rank: Number(it.rank) || 0, blurb: it.blurb }));
+
+  // Dedupe by slug (keep first), then ensure all 12 present and re-rank 1..n
+  // by the model's order so the page never shows gaps or duplicates.
+  const seen = new Set<string>();
+  const deduped = items.filter((it) =>
+    seen.has(it.slug) ? false : (seen.add(it.slug), true)
+  );
+  deduped.sort((a, b) => a.rank - b.rank);
+  const ranked = deduped.map((it, i) => ({ ...it, rank: i + 1 }));
+
+  if (ranked.length < input.signs.length || !parsed.headline || !parsed.intro) {
+    throw new Error(
+      `Sign ranking incomplete (${ranked.length}/${input.signs.length})\n--- raw ---\n${raw.slice(0, 500)}`
+    );
+  }
+
+  return {
+    headline: parsed.headline,
+    intro: parsed.intro,
+    items: ranked,
+    faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 4) : [],
+  };
+}

@@ -10,6 +10,7 @@ import {
   yearlyContentFor,
 } from "@/lib/seo/zodiac-content";
 import { ALL_HOROSCOPE_VIEWS, VIEW_PATH } from "@/lib/sign-horoscope";
+import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -100,6 +101,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       }))
   );
 
+  // Trait-ranking listicles ("ყველაზე ჭკვიანი / ეჭვიანი … ნიშნები").
+  const rankingPages: MetadataRoute.Sitemap = ALL_RANKING_SLUGS.map((slug) => ({
+    url: `${BASE}/zodiac/reitingebi/${slug}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   return [
     {
       url: `${BASE}/`,
@@ -173,7 +182,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.85,
     },
+    {
+      url: `${BASE}/zodiac/reitingebi`,
+      lastModified: NOW,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
     ...zodiacSignPages,
+    ...rankingPages,
     ...elementPages,
     ...pairPages,
     ...moonPages,

@@ -784,6 +784,37 @@ export const signHoroscopes = pgTable(
 );
 
 /**
+ * Evergreen "ranking" listicles ("ყველაზე ჭკვიანი / ეჭვიანი … ნიშნები").
+ * One row per topic — all 12 signs ranked by a trait. Generated on-demand
+ * by the SEO page and cached; `promptVersion` invalidates after a prompt
+ * change. `items` is the ordered ranking.
+ */
+export type SignRankingItem = {
+  /** zodiac slug — see ALL_SLUGS */
+  slug: string;
+  /** 1 = most, 12 = least */
+  rank: number;
+  blurb: string;
+};
+
+export const signRankings = pgTable("sign_ranking", {
+  /** topic slug — see RANKING_TOPICS in lib/seo/rankings */
+  topic: text("topic").primaryKey(),
+  headline: text("headline").notNull(),
+  intro: text("intro").notNull(),
+  items: jsonb("items").$type<SignRankingItem[]>().notNull(),
+  faq: jsonb("faq").$type<{ q: string; a: string }[]>().notNull().default([]),
+  promptVersion: integer("prompt_version").notNull().default(1),
+  model: text("model").notNull(),
+  language: text("language").notNull().default("ka"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type SignRanking = typeof signRankings.$inferSelect;
+
+/**
  * 7-day forecast for the dashboard, one row per user. The same row is
  * overwritten each new local-day — we never need a history of forecasts.
  * Each entry in `days` is a (computed scores + AI narrative) pair for one

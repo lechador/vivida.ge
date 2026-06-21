@@ -320,6 +320,29 @@ export default function ZodiacHubPage() {
               </details>
             ))}
           </div>
+
+          <Link
+            href="/zodiac/reitingebi"
+            className="group relative mt-4 flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-[var(--vivida-pink)]/30 bg-gradient-to-br from-[var(--vivida-pink)]/12 via-card/65 to-[var(--vivida-violet)]/12 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5"
+          >
+            <div className="min-w-0">
+              <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                რეიტინგები
+              </div>
+              <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+                ყველაზე ჭკვიანი, ეჭვიანი, რომანტიული ნიშნები
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                12-ვე ნიშანი დალაგებული თვისებების მიხედვით — ნახე, სად დგას შენი.
+              </p>
+            </div>
+            <span
+              aria-hidden
+              className="hidden shrink-0 text-3xl transition-transform group-hover:translate-x-1 sm:block"
+            >
+              →
+            </span>
+          </Link>
         </section>
 
         <ReportPromo className="mt-16" />
