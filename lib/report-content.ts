@@ -49,6 +49,8 @@ async function chatJson<T>(
       temperature: 0.72,
       max_tokens: maxTokens,
     }),
+    // Never let a single call hang the whole request past the function budget.
+    signal: AbortSignal.timeout(110_000),
   });
   if (!res.ok) {
     throw new Error(
