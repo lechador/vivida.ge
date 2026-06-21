@@ -59,15 +59,15 @@ export default async function ReportPage() {
           ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე.
         </p>
 
-        <Suspense fallback={<CosmicLoader embedded />}>
-          <ChartSection userId={user.id} plan={plan} />
-        </Suspense>
-
-        <div className="mt-12">
+        <div className="mb-10">
           <Suspense fallback={null}>
             <ReportPdfPanel userId={user.id} plan={plan} />
           </Suspense>
         </div>
+
+        <Suspense fallback={<CosmicLoader embedded />}>
+          <ChartSection userId={user.id} plan={plan} />
+        </Suspense>
 
         <div className="mt-12 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
