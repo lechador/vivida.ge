@@ -311,7 +311,7 @@ export default async function RisingSignPage({
             სურათს. Vivida უფასოდ შენი სრული რუკის გენერაცია.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/signup">გაიგე ჩემი ამომავალი</Link>
+            <Link href="/nataluri-ruka">გაიგე ჩემი ამომავალი ნიშანი</Link>
           </Button>
         </div>
 

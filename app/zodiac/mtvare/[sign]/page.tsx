@@ -321,7 +321,7 @@ export default async function MoonSignPage({
             Vivida ერთ წუთში გითხრის.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/signup">გაიგე ჩემი მთვარე</Link>
+            <Link href="/nataluri-ruka">გაიგე ჩემი მთვარის ნიშანი</Link>
           </Button>
         </div>
 

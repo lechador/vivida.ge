@@ -120,9 +120,9 @@ export default function ZodiacHubPage() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link href="/signup">
+            <Link href="/nataluri-ruka">
               <Sparkles className="size-4" />
-              ჩემი სრული რუკა
+              ნატალური რუკა ონლაინ
             </Link>
           </Button>
         </div>

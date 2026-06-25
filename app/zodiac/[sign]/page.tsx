@@ -483,7 +483,7 @@ export default async function ZodiacSignPage({
             Vivida უფასოდ ქმნის პერსონალურ ინტერპრეტაციას.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/signup">ჩემი სრული რუკა</Link>
+            <Link href="/nataluri-ruka">ჩემი სრული რუკა</Link>
           </Button>
         </div>
 
