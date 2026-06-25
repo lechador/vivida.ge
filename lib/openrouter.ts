@@ -1247,3 +1247,178 @@ export async function generateSignRanking(input: {
     faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 4) : [],
   };
 }
+
+// ── Chinese zodiac (ჩინური ჰოროსკოპი) ──────────────────────────────────────
+export const CHINESE_ZODIAC_PROMPT_VERSION = 1;
+
+export type ChineseZodiacResult = {
+  pageTitle: string;
+  metaDescription: string;
+  headline: string;
+  intro: string;
+  personality: string;
+  strengths: string[];
+  weaknesses: string[];
+  love: string;
+  career: string;
+  compatibility: { slug: string; level: string; note: string }[];
+  faq: { q: string; a: string }[];
+};
+
+export type ChineseZodiacHubResult = {
+  title: string;
+  metaDescription: string;
+  intro: string;
+  faq: { q: string; a: string }[];
+};
+
+async function openrouterJson<T>(
+  system: string,
+  user: string,
+  title: string,
+  maxTokens = 4500
+): Promise<T | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": title,
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.85,
+      max_tokens: maxTokens,
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+  return JSON.parse(stripped) as T;
+}
+
+const CHINESE_SYSTEM = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი-რედაქტორი, ჩინური ასტროლოგიის (ჩინური ჰოროსკოპის, ე.წ. "ზოდიაქოს წლების მიხედვით") მცოდნე. წერ ერთი ჩინური ნიშნისთვის (ცხოველი) — კოლექტიური ხასიათით, რომელიც ეხება ამ ცხოველის წელს დაბადებულებს.
+
+ცოცხალი, კონკრეტული, ხელშესახები ქართული. არა ბუნდოვანი მისტიკა, არა კლიშეები. ხასიათი დააფუძნე ჩინური ასტროლოგიის რეალურ ცოდნაზე (ცხოველის ბუნება, ფიქსირებული ელემენტი, იან/ინ პოლარობა).
+
+დააბრუნე მხოლოდ ვალიდური JSON ამ სქემით:
+{
+  "pageTitle": string,          // SEO სათაური, ~50-65 სიმბოლო, შეიცავდეს ცხოველის სახელს და "ჩინური ჰოროსკოპი"
+  "metaDescription": string,    // ~140-160 სიმბოლო
+  "headline": string,           // მოკლე, მიმზიდველი ფრაზა ცხოველის შესახებ
+  "intro": string,              // 2-3 აბზაცი (\\n\\n) — შესავალი ცხოველის ბუნებაზე
+  "personality": string,        // 2-3 აბზაცი — დეტალური ხასიათი
+  "strengths": [string, ...],   // 5-6 ძლიერი მხარე (მოკლე)
+  "weaknesses": [string, ...],  // 4-5 სუსტი მხარე (მოკლე)
+  "love": string,               // აბზაცი სიყვარულსა და ურთიერთობებზე
+  "career": string,             // აბზაცი კარიერასა და ფულზე
+  "compatibility": [            // 4-6 სხვა ცხოველთან თავსებადობა
+    { "slug": string, "level": string, "note": string }   // slug მოცემული სიიდან; level "ძლიერი"|"ჰარმონიული"|"გამომწვევი"; note 1 წინადადება
+  ],
+  "faq": [ { "q": string, "a": string } ]   // 4 ხშირი კითხვა
+}
+
+წესები:
+- compatibility-ის slug-ები მხოლოდ მოცემული სიიდან
+- ქართულად, ნეიტრალური ტონით (ნიშანზეა, არა მკითხველზე)
+- კონკრეტული, განსხვავებული ფრაზები; აცილე ცარიელ ფრაზებს
+- მხოლოდ JSON, code fence-ის გარეშე`;
+
+export async function generateChineseZodiac(input: {
+  nameKa: string;
+  slug: string;
+  element: string;
+  polarity: string;
+  yearsText: string;
+  animals: { slug: string; nameKa: string }[];
+}): Promise<ChineseZodiacResult | null> {
+  const user = [
+    `ცხოველი: ${input.nameKa} (${input.slug})`,
+    `ფიქსირებული ელემენტი: ${input.element} · პოლარობა: ${input.polarity}`,
+    `დაბადების წლები: ${input.yearsText}`,
+    "",
+    "ცხოველების სია (გამოიყენე ეს slug-ები compatibility-ში):",
+    ...input.animals.map((a) => `- ${a.slug} = ${a.nameKa}`),
+    "",
+    `დაწერე ${input.nameKa}-ის ჩინური ჰოროსკოპის გვერდი. JSON-ად დააბრუნე.`,
+  ].join("\n");
+
+  const parsed = await openrouterJson<ChineseZodiacResult>(
+    CHINESE_SYSTEM,
+    user,
+    "Vivida chinese zodiac",
+    5000
+  );
+  if (!parsed) return null;
+  if (!parsed.pageTitle || !parsed.metaDescription || !parsed.intro) {
+    throw new Error("Chinese zodiac missing required fields");
+  }
+  const valid = new Set(input.animals.map((a) => a.slug));
+  return {
+    pageTitle: parsed.pageTitle,
+    metaDescription: parsed.metaDescription,
+    headline: parsed.headline ?? "",
+    intro: parsed.intro,
+    personality: parsed.personality ?? "",
+    strengths: Array.isArray(parsed.strengths) ? parsed.strengths.slice(0, 6) : [],
+    weaknesses: Array.isArray(parsed.weaknesses) ? parsed.weaknesses.slice(0, 5) : [],
+    love: parsed.love ?? "",
+    career: parsed.career ?? "",
+    compatibility: (Array.isArray(parsed.compatibility) ? parsed.compatibility : [])
+      .filter((c) => c && valid.has(c.slug))
+      .slice(0, 6),
+    faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 5) : [],
+  };
+}
+
+export async function generateChineseZodiacHub(input: {
+  animals: { slug: string; nameKa: string }[];
+}): Promise<ChineseZodiacHubResult | null> {
+  const system = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი-რედაქტორი. წერ ჩინური ჰოროსკოპის (ზოდიაქოს ნიშნები წლების მიხედვით) მთავარი გვერდის ტექსტს. ცოცხალი, კონკრეტული ქართული, კლიშეების გარეშე.
+
+დააბრუნე მხოლოდ ვალიდური JSON:
+{
+  "title": string,              // SEO სათაური, შეიცავდეს "ჩინური ჰოროსკოპი"
+  "metaDescription": string,    // ~140-160 სიმბოლო
+  "intro": string,              // 2-3 აბზაცი (\\n\\n) — რა არის ჩინური ჰოროსკოპი, 12-წლიანი ციკლი, როგორ მუშაობს
+  "faq": [ { "q": string, "a": string } ]   // 4 ხშირი კითხვა
+}
+მხოლოდ JSON, code fence-ის გარეშე.`;
+  const user = `ცხოველები: ${input.animals.map((a) => a.nameKa).join(", ")}. დაწერე ჩინური ჰოროსკოპის მთავარი გვერდის ტექსტი JSON-ად.`;
+
+  const parsed = await openrouterJson<ChineseZodiacHubResult>(
+    system,
+    user,
+    "Vivida chinese zodiac hub",
+    3000
+  );
+  if (!parsed) return null;
+  if (!parsed.title || !parsed.metaDescription || !parsed.intro) {
+    throw new Error("Chinese zodiac hub missing required fields");
+  }
+  return {
+    title: parsed.title,
+    metaDescription: parsed.metaDescription,
+    intro: parsed.intro,
+    faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 5) : [],
+  };
+}

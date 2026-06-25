@@ -11,6 +11,7 @@ import {
 } from "@/lib/seo/zodiac-content";
 import { ALL_HOROSCOPE_VIEWS, VIEW_PATH } from "@/lib/sign-horoscope";
 import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
+import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -109,6 +110,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+  // Chinese zodiac ("ზოდიაქოს ნიშნები წლების მიხედვით").
+  const chinesePages: MetadataRoute.Sitemap = ALL_CHINESE_SLUGS.map((slug) => ({
+    url: `${BASE}/chinuri-horoskopi/${slug}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   return [
     {
       url: `${BASE}/`,
@@ -121,6 +130,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: NOW,
       changeFrequency: "monthly",
       priority: 0.95,
+    },
+    {
+      url: `${BASE}/chinuri-horoskopi`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.85,
     },
     {
       url: `${BASE}/horoskopi`,
@@ -208,6 +223,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     ...zodiacSignPages,
     ...rankingPages,
+    ...chinesePages,
     ...elementPages,
     ...pairPages,
     ...moonPages,

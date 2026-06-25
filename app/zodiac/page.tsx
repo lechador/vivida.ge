@@ -343,6 +343,29 @@ export default function ZodiacHubPage() {
               →
             </span>
           </Link>
+
+          <Link
+            href="/chinuri-horoskopi"
+            className="group relative mt-4 flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-[var(--vivida-gold)]/30 bg-gradient-to-br from-[var(--vivida-gold)]/10 via-card/65 to-[var(--vivida-cyan)]/12 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5"
+          >
+            <div className="min-w-0">
+              <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                ჩინური ჰოროსკოპი
+              </div>
+              <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+                ზოდიაქოს ნიშნები წლების მიხედვით
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                გაიგე შენი ჩინური ცხოველი დაბადების წლით — ვირთხა, დრაკონი, ვეფხვი…
+              </p>
+            </div>
+            <span
+              aria-hidden
+              className="hidden shrink-0 text-3xl transition-transform group-hover:translate-x-1 sm:block"
+            >
+              →
+            </span>
+          </Link>
         </section>
 
         <ReportPromo className="mt-16" />
