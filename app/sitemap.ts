@@ -117,6 +117,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
+      url: `${BASE}/nataluri-ruka`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.95,
+    },
+    {
       url: `${BASE}/horoskopi`,
       lastModified: NOW,
       changeFrequency: "daily",
