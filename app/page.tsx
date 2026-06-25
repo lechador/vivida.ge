@@ -24,16 +24,19 @@ const SITE_URL = "https://www.vivida.ge";
  * search ("ნატალური რუკა", "ჰოროსკოპი ქართულად").
  */
 export const metadata: Metadata = {
+  // Keyword-first title — Google shows the brand ("vivida.ge") on its own line,
+  // so leading with "ნატალური რუკა" wins the bolded match instead of burying it
+  // behind the brand.
   title: {
-    absolute: "Vivida — ნატალური რუკა და ყოველდღიური ჰოროსკოპი ქართულად",
+    absolute: "ნატალური რუკა, ჰოროსკოპი და თავსებადობა ქართულად — Vivida",
   },
   description:
-    "Vivida შენი დაბადების ზუსტ მომენტს ცოცხალ კოსმიურ გზამკვლევად აქცევს — ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა საყვარელ ადამიანებთან. დაიწყე უფასოდ.",
+    "ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა — შენი დაბადების ზუსტი მომენტის მიხედვით. შექმენი შენი რუკა უფასოდ, ქართულად.",
   alternates: {
     canonical: SITE_URL,
   },
   openGraph: {
-    title: "Vivida — ნატალური რუკა ქართულად",
+    title: "ნატალური რუკა და ჰოროსკოპი ქართულად — Vivida",
     description:
       "ცოცხალი ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობის ანალიზი — შენი დაბადების ზუსტი მომენტის მიხედვით.",
     url: SITE_URL,
