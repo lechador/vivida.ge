@@ -39,6 +39,7 @@ export async function generateMetadata({
   const url = `${SITE_URL}/zodiac/reitingebi/${slug}`;
   const title = topic.titleKa;
   const description = `${topic.titleKa} — 12-ვე ნიშნის სრული რეიტინგი, თითოეულზე ახსნა. ნახე, რომელი ნიშანი დგას პირველ ადგილზე და რატომ.`;
+  const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(title)}&k=${encodeURIComponent("რეიტინგი")}&a=${encodeURIComponent("#eac358")}`;
   return {
     title: { absolute: title },
     description,
@@ -50,8 +51,9 @@ export async function generateMetadata({
       description,
       siteName: "Vivida",
       locale: "ka_GE",
+      images: [{ url: og, width: 1200, height: 630 }],
     },
-    twitter: { card: "summary_large_image", title, description },
+    twitter: { card: "summary_large_image", title, description, images: [og] },
   };
 }
 

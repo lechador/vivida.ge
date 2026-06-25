@@ -27,6 +27,7 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { signPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
+import { ELEMENT_COLOR } from "@/lib/pdf/theme";
 import { cn } from "@/lib/utils";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -49,6 +50,9 @@ export async function generateMetadata({
   const { sign } = await params;
   if (!isSlug(sign)) return {};
   const c = SIGNS_CONTENT[sign];
+  const meta = signMetaBySlug(sign);
+  const accent = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
+  const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(c.labelKa)}&k=${encodeURIComponent("ზოდიაქოს ნიშანი")}&a=${encodeURIComponent(accent)}`;
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
@@ -60,11 +64,13 @@ export async function generateMetadata({
       description: c.metaDescription,
       siteName: "Vivida",
       locale: "ka_GE",
+      images: [{ url: og, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: c.pageTitle,
       description: c.metaDescription,
+      images: [og],
     },
   };
 }

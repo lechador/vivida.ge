@@ -44,6 +44,7 @@ export async function generateMetadata({
   const description =
     content?.metaDescription ??
     `${animal.nameKa} ჩინური ჰოროსკოპის ნიშანი — ხასიათი, დაბადების წლები და თავსებადობა, ქართულად.`;
+  const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(animal.nameKa)}&k=${encodeURIComponent("ჩინური ჰოროსკოპი")}`;
   return {
     title: { absolute: title },
     description,
@@ -55,8 +56,9 @@ export async function generateMetadata({
       description,
       siteName: "Vivida",
       locale: "ka_GE",
+      images: [{ url: og, width: 1200, height: 630 }],
     },
-    twitter: { card: "summary_large_image", title, description },
+    twitter: { card: "summary_large_image", title, description, images: [og] },
   };
 }
 
