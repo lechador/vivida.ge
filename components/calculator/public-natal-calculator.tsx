@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Loader2, Lock, MapPin, Sparkles, X } from "lucide-react";
+import { Check, Loader2, Lock, MapPin, Share2, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,7 +37,28 @@ export function PublicNatalCalculator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [chart, setChart] = useState<NatalChartJson | null>(null);
+  const [copied, setCopied] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
+
+  async function share() {
+    if (!chart) return;
+    const sun = chart.bodies.sun?.signIndex;
+    const moon = chart.bodies.moon?.signIndex;
+    const asc = chart.ascendant?.signIndex;
+    if (sun == null || moon == null || asc == null) return;
+    const url = `${window.location.origin}/nataluri-ruka?big=${sun}.${moon}.${asc}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "ჩემი ნატალური რუკა", url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      /* share sheet dismissed — ignore */
+    }
+  }
 
   async function compute() {
     setError(null);
@@ -175,6 +196,13 @@ export function PublicNatalCalculator() {
       {chart && (
         <div ref={resultRef} className="mt-10 scroll-mt-24 space-y-8">
           <BigThree chart={chart} />
+
+          <div className="flex justify-center">
+            <Button type="button" variant="outline" size="lg" onClick={share}>
+              {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
+              {copied ? "ბმული დაკოპირდა" : "გააზიარე ჩემი რუკა"}
+            </Button>
+          </div>
 
           <div className="mx-auto max-w-xl">
             <ChartWheel chart={chart} />

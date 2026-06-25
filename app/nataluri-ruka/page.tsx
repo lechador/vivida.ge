@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PublicNatalCalculator } from "@/components/calculator/public-natal-calculator";
+import { signByIndex } from "@/lib/zodiac";
 
 const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/nataluri-ruka`;
@@ -19,7 +20,7 @@ const KEYWORDS = [
   "nataluri ruka",
 ];
 
-export const metadata: Metadata = {
+const BASE_META: Metadata = {
   // Keyword-first, brandless title (Google shows "vivida.ge" separately) using
   // the high-intent terms "ონლაინ" + "გამოთვლა".
   title: { absolute: "ნატალური რუკა ონლაინ — უფასო გამოთვლა" },
@@ -42,6 +43,42 @@ export const metadata: Metadata = {
     description: "ნატალური რუკის ონლაინ გამოთვლა უფასოდ, რეგისტრაციის გარეშე.",
   },
 };
+
+/**
+ * When the page is opened from a shared link (`?big=<sun>.<moon>.<asc>`) we
+ * swap in a personalized OG card showing those signs. The <title> and canonical
+ * stay clean (the param is for social previews, not indexing).
+ */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ big?: string }>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  const big = typeof sp.big === "string" ? sp.big : "";
+  const idxs = big.split(".").map((s) => parseInt(s, 10));
+  const valid =
+    idxs.length === 3 &&
+    idxs.every((n) => Number.isInteger(n) && n >= 0 && n < 12);
+  if (!valid) return BASE_META;
+
+  const [sun, moon, asc] = idxs.map((i) => signByIndex(i).labelKa);
+  const ogTitle = `ჩემი ნატალური რუკა: მზე ${sun} · მთვარე ${moon} · ამომავალი ${asc}`;
+  const ogImage = `${SITE_URL}/api/og/chart?big=${encodeURIComponent(big)}`;
+  return {
+    ...BASE_META,
+    openGraph: {
+      ...BASE_META.openGraph,
+      title: ogTitle,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
+    twitter: {
+      ...BASE_META.twitter,
+      title: ogTitle,
+      images: [ogImage],
+    },
+  };
+}
 
 const FAQ = [
   {
