@@ -129,6 +129,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
+      url: `${BASE}/horoskopi/kvireuli`,
+      lastModified: NOW,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE}/horoskopi/tviuri`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
       url: `${BASE}/mtvaris-kalendari`,
       lastModified: NOW,
       changeFrequency: "daily",

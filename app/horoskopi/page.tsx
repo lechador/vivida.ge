@@ -131,6 +131,25 @@ export default async function HoroskopiHubPage() {
           </p>
         </header>
 
+        {/* Period switcher */}
+        <div className="mb-10 flex flex-wrap gap-2">
+          <span className="rounded-full border border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/15 px-4 py-1.5 text-sm text-foreground">
+            დღიური ჰოროსკოპი
+          </span>
+          <Link
+            href="/horoskopi/kvireuli"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            კვირის ჰოროსკოპი
+          </Link>
+          <Link
+            href="/horoskopi/tviuri"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            თვის ჰოროსკოპი
+          </Link>
+        </div>
+
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {horoscopes.map(({ slug, row }) => {
             const sc = SIGNS_CONTENT[slug];
