@@ -31,6 +31,8 @@ const VIEW_LABEL_KA: Record<HoroscopeViewKind, string> = {
   tomorrow: "ხვალინდელი ჰოროსკოპი",
   week: "ამ კვირის ჰოროსკოპი",
   month: "ამ თვის ჰოროსკოპი",
+  nextWeek: "მომავალი კვირის ჰოროსკოპი",
+  nextMonth: "მომავალი თვის ჰოროსკოპი",
 };
 
 /**

@@ -116,13 +116,21 @@ export function signHoroscopePeriodLabel(
  * concept at the URL/UI layer keeps page metadata + sibling-link logic
  * uniform without bloating the schema.
  */
-export type HoroscopeView = "today" | "tomorrow" | "week" | "month";
+export type HoroscopeView =
+  | "today"
+  | "tomorrow"
+  | "week"
+  | "month"
+  | "nextWeek"
+  | "nextMonth";
 
 export const ALL_HOROSCOPE_VIEWS: HoroscopeView[] = [
   "today",
   "tomorrow",
   "week",
   "month",
+  "nextWeek",
+  "nextMonth",
 ];
 
 /** URL path segment per view. */
@@ -131,6 +139,8 @@ export const VIEW_PATH: Record<HoroscopeView, string> = {
   tomorrow: "khval",
   week: "kviris-horoskopi",
   month: "tvis-horoskopi",
+  nextWeek: "momavali-kviris-horoskopi",
+  nextMonth: "momavali-tvis-horoskopi",
 };
 
 /** Inverse of VIEW_PATH for route param parsing. */
@@ -139,24 +149,38 @@ export function viewFromPath(path: string): HoroscopeView | null {
   if (path === "khval") return "tomorrow";
   if (path === "kviris-horoskopi") return "week";
   if (path === "tvis-horoskopi") return "month";
+  if (path === "momavali-kviris-horoskopi") return "nextWeek";
+  if (path === "momavali-tvis-horoskopi") return "nextMonth";
   return null;
 }
 
 /** Map view → DB period. */
 export function periodForView(view: HoroscopeView): SignHoroscopePeriod {
   if (view === "today" || view === "tomorrow") return "day";
-  return view;
+  if (view === "week" || view === "nextWeek") return "week";
+  return "month"; // month | nextMonth
 }
 
 /**
- * Anchor date for the view. "today" uses `now`; "tomorrow" shifts +1
- * day so the cache row's periodKey resolves to tomorrow's UTC date.
+ * Anchor date for the view. "today" uses `now`; the "next" variants shift the
+ * anchor forward (tomorrow +1d, nextWeek +7d, nextMonth → mid next month) so
+ * `periodAnchorDate` + the cache periodKey resolve to the right future period.
  */
 export function anchorForView(view: HoroscopeView, now: Date = new Date()): Date {
-  if (view !== "tomorrow") return now;
-  const tomorrow = new Date(now);
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-  return tomorrow;
+  if (view === "tomorrow") {
+    const d = new Date(now);
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d;
+  }
+  if (view === "nextWeek") {
+    const d = new Date(now);
+    d.setUTCDate(d.getUTCDate() + 7);
+    return d;
+  }
+  if (view === "nextMonth") {
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 15));
+  }
+  return now;
 }
 
 // ─── Back-compat exports (deprecated, will be removed once callers migrate)

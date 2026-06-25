@@ -31,6 +31,8 @@ const VIEW_CHANGE_FREQ: Record<
   tomorrow: "daily",
   week: "weekly",
   month: "monthly",
+  nextWeek: "weekly",
+  nextMonth: "monthly",
 };
 
 const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
@@ -38,6 +40,8 @@ const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
   tomorrow: 0.8,
   week: 0.85,
   month: 0.85,
+  nextWeek: 0.75,
+  nextMonth: 0.75,
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
