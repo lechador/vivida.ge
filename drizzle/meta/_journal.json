@@ -232,6 +232,13 @@
       "when": 1782466419177,
       "tag": "0032_overjoyed_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1782471609040,
+      "tag": "0033_thick_jean_grey",
+      "breakpoints": true
     }
   ]
 }

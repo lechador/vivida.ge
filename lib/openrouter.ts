@@ -1422,3 +1422,69 @@ export async function generateChineseZodiacHub(input: {
     faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 5) : [],
   };
 }
+
+// ── Streaming chat (chart chat / "ჰკითხე ვარსკვლავებს") ─────────────────────
+export type ChatMessage = {
+  role: "system" | "user" | "assistant";
+  content: string;
+};
+
+/**
+ * Stream a chat completion token-by-token. Yields text deltas as they arrive
+ * (parses OpenRouter's SSE). Throws if the key is missing or the upstream errors.
+ */
+export async function* streamChatCompletion(
+  messages: ChatMessage[],
+  opts: { maxTokens?: number; temperature?: number } = {}
+): AsyncGenerator<string> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY is not configured");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida chart chat",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages,
+      stream: true,
+      temperature: opts.temperature ?? 0.85,
+      max_tokens: opts.maxTokens ?? 1000,
+    }),
+  });
+  if (!res.ok || !res.body) {
+    const t = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${t.slice(0, 200)}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    // keep the last (possibly partial) line in the buffer
+    buffer = lines.pop() ?? "";
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith("data:")) continue;
+      const data = trimmed.slice(5).trim();
+      if (data === "[DONE]") return;
+      try {
+        const json = JSON.parse(data) as {
+          choices?: Array<{ delta?: { content?: string } }>;
+        };
+        const delta = json.choices?.[0]?.delta?.content;
+        if (delta) yield delta;
+      } catch {
+        /* keep-alive / partial line — skip */
+      }
+    }
+  }
+}

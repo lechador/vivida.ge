@@ -3,6 +3,7 @@ import {
   Heart,
   MessageCircle,
   Sparkles,
+  Stars,
   Sun,
   Telescope,
   Users,
@@ -14,6 +15,7 @@ import { SOCIAL_FEATURES, type SocialFeature } from "@/lib/social-flags";
 export type NavActiveKey =
   | "today"
   | "report"
+  | "ask"
   | "feed"
   | "discover"
   | "synastry"
@@ -57,6 +59,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "ჩემი რუკა",
     Icon: Compass,
     hue: "oklch(0.78 0.18 305)",
+  },
+  {
+    key: "ask",
+    href: "/ask",
+    label: "ჰკითხე",
+    Icon: Stars,
+    hue: "oklch(0.80 0.16 230)",
   },
   {
     key: "feed",

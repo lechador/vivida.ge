@@ -860,6 +860,32 @@ export const chineseZodiac = pgTable("chinese_zodiac", {
 export type ChineseZodiac = typeof chineseZodiac.$inferSelect;
 
 /**
+ * "Chat with your chart" (ჰკითხე ვარსკვლავებს) — one ongoing thread per user.
+ * Each row is a turn; `role` is 'user' | 'assistant'. The AI is grounded in
+ * the user's natal chart at request time (not stored per message).
+ */
+export const chartChatMessages = pgTable(
+  "chart_chat_message",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** 'user' | 'assistant' */
+    role: text("role").notNull(),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("chart_chat_user_created_idx").on(t.userId, t.createdAt)]
+);
+
+export type ChartChatMessage = typeof chartChatMessages.$inferSelect;
+
+/**
  * 7-day forecast for the dashboard, one row per user. The same row is
  * overwritten each new local-day — we never need a history of forecasts.
  * Each entry in `days` is a (computed scores + AI narrative) pair for one
