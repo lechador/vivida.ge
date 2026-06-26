@@ -47,6 +47,9 @@ export const users = pgTable("user", {
     .default(true),
   emailMarketing: boolean("email_marketing").notNull().default(true),
   emailNudges: boolean("email_nudges").notNull().default(true),
+  /** Preferred voice slug for audio horoscopes (see lib/elevenlabs HOROSCOPE_VOICES).
+   *  NULL → the default voice. Set on first listen / in account settings. */
+  horoscopeVoice: text("horoscope_voice"),
   /** Random opaque token used in unsubscribe links. Lazily populated on
    *  first send — see lib/unsubscribe.ts. Unique so a token resolves to
    *  at most one user. */

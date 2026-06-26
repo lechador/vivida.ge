@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 import { db } from "@/db";
-import { profiles } from "@/db/schema";
+import { profiles, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { isAccountRestricted } from "@/lib/restriction";
@@ -16,9 +16,14 @@ export const metadata = { title: "დღეს" };
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [[profile], plan] = await Promise.all([
+  const [[profile], plan, [userRow]] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     getCurrentPlan(user.id),
+    db
+      .select({ horoscopeVoice: users.horoscopeVoice })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1),
   ]);
 
   if (!profile) {
@@ -55,7 +60,11 @@ export default async function DashboardPage() {
             data via a server action after first paint, so the response
             stream closes immediately and the browser tab spinner stops.
             Our internal CosmicLoader covers the AI generation window. */}
-        <DailyDashboard userId={user.id} plan={plan} />
+        <DailyDashboard
+          userId={user.id}
+          plan={plan}
+          savedVoice={userRow?.horoscopeVoice ?? null}
+        />
       </section>
     </main>
   );

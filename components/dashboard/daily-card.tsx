@@ -3,6 +3,7 @@
 import { Sparkles } from "lucide-react";
 
 import type { DailyHoroscope } from "@/db/schema";
+import { HoroscopeAudioPlayer } from "./horoscope-audio-player";
 
 /**
  * Pro-only daily horoscope hero card. Shown above the chart wheel so it's
@@ -11,9 +12,11 @@ import type { DailyHoroscope } from "@/db/schema";
 export function DailyCard({
   horoscope,
   timezone,
+  savedVoice,
 }: {
   horoscope: DailyHoroscope;
   timezone: string;
+  savedVoice?: string | null;
 }) {
   const date = new Intl.DateTimeFormat("ka-GE", {
     timeZone: timezone,
@@ -49,6 +52,8 @@ export function DailyCard({
           aria-hidden
         />
       </header>
+
+      <HoroscopeAudioPlayer savedVoice={savedVoice} />
 
       {horoscope.themes.length > 0 && (
         <div className="relative mt-4 flex flex-wrap gap-2">

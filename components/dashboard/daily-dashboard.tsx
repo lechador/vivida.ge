@@ -32,9 +32,11 @@ import { WeeklyForecastCard } from "./weekly-forecast-card";
 export function DailyDashboard({
   userId,
   plan,
+  savedVoice,
 }: {
   userId: string;
   plan: PlanId;
+  savedVoice?: string | null;
 }) {
   const router = useRouter();
   const [core, setCore] = useState<DashboardCore | null>(null);
@@ -93,6 +95,7 @@ export function DailyDashboard({
         timezone={timezone}
         canDaily={canDaily}
         canWeekly={canWeekly}
+        savedVoice={savedVoice}
       />
 
       <section>
@@ -144,12 +147,14 @@ function DashboardExtrasSection({
   timezone,
   canDaily,
   canWeekly,
+  savedVoice,
 }: {
   userId: string;
   plan: PlanId;
   timezone: string;
   canDaily: boolean;
   canWeekly: boolean;
+  savedVoice?: string | null;
 }) {
   const [extras, setExtras] = useState<DashboardExtras | null>(null);
 
@@ -175,7 +180,7 @@ function DashboardExtrasSection({
   const dailySlot = loading ? (
     <CardSkeleton className="min-h-[220px]" />
   ) : extras.daily ? (
-    <DailyCard horoscope={extras.daily} timezone={timezone} />
+    <DailyCard horoscope={extras.daily} timezone={timezone} savedVoice={savedVoice} />
   ) : canDaily ? (
     <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
       დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში.
