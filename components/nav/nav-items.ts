@@ -1,4 +1,5 @@
 import {
+  CalendarClock,
   Compass,
   Heart,
   MessageCircle,
@@ -16,6 +17,7 @@ export type NavActiveKey =
   | "today"
   | "report"
   | "ask"
+  | "timing"
   | "feed"
   | "discover"
   | "synastry"
@@ -66,6 +68,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "ჰკითხე",
     Icon: Stars,
     hue: "oklch(0.80 0.16 230)",
+  },
+  {
+    key: "timing",
+    href: "/timing",
+    label: "როდის",
+    Icon: CalendarClock,
+    hue: "oklch(0.82 0.14 90)",
   },
   {
     key: "feed",
