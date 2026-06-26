@@ -18,6 +18,7 @@ import { canUseFeature } from "@/lib/features";
 import type { PlanId } from "@/lib/pricing";
 
 import { DailyCard } from "./daily-card";
+import { HoroscopeLoading } from "./horoscope-loading";
 import { MiniBigThree } from "./mini-big-three";
 import { MoonPhaseCard } from "./moon-phase-card";
 import { SuggestedPeopleRail } from "./suggested-people-rail";
@@ -182,7 +183,7 @@ function DashboardExtrasSection({
   const loading = extras === null;
 
   const dailySlot = loading ? (
-    <CardSkeleton className="min-h-[220px]" />
+    <HoroscopeLoading />
   ) : extras.daily ? (
     <DailyCard
       horoscope={extras.daily}
