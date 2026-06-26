@@ -25,7 +25,8 @@ export type Feature =
   | "audioHoroscope"   // Listen — ElevenLabs audio horoscopes
   | "chartChat"        // Ask — AI astrologer chat
   | "timing"           // Know-when — best-days timing calendar
-  | "deepSynastry";    // Connect — deep AI compatibility report
+  | "deepSynastry"     // Connect — deep AI compatibility report
+  | "natalReport";     // Downloadable deep natal PDF report (now Pro-included)
 
 const REQUIRES_PRO: Record<Feature, boolean> = {
   // Still free during the launch phase — flip to true to gate.
@@ -44,6 +45,7 @@ const REQUIRES_PRO: Record<Feature, boolean> = {
   chartChat:       true,
   timing:          true,
   deepSynastry:    true,
+  natalReport:     true,
 };
 
 export function requiresPro(feature: Feature): boolean {

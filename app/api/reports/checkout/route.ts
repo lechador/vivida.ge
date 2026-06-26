@@ -6,12 +6,7 @@ import { db } from "@/db";
 import { charts, pdfReports } from "@/db/schema";
 import { getCurrentPlan } from "@/lib/plan";
 import { generateAndStoreReport } from "@/lib/reports/generate";
-import {
-  createReportCheckoutSession,
-  isStripeConfigured,
-  reportCurrency,
-  reportPriceCents,
-} from "@/lib/stripe";
+import { reportCurrency } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -70,9 +65,6 @@ export async function POST(req: Request) {
   }
 
   const plan = await getCurrentPlan(userId);
-  const origin =
-    process.env.APP_ORIGIN ?? process.env.AUTH_URL ?? new URL(req.url).origin;
-
   // ── Pro: comped, no payment ──────────────────────────────────────────
   if (plan === "pro") {
     const [row] = await db
@@ -92,38 +84,6 @@ export async function POST(req: Request) {
     return Response.json({ reportId: row.id, url: `/reports/${row.id}` });
   }
 
-  // ── Everyone else: Stripe Checkout ───────────────────────────────────
-  if (!isStripeConfigured()) {
-    return Response.json({ error: "payments_unavailable" }, { status: 503 });
-  }
-
-  const [row] = await db
-    .insert(pdfReports)
-    .values({
-      userId,
-      type,
-      status: "pending",
-      amountCents: reportPriceCents(),
-      currency: reportCurrency().toUpperCase(),
-    })
-    .returning({ id: pdfReports.id });
-
-  try {
-    const checkout = await createReportCheckoutSession({
-      reportId: row.id,
-      userId,
-      type,
-      email: session.user.email,
-      origin,
-    });
-    await db
-      .update(pdfReports)
-      .set({ stripeSessionId: checkout.id })
-      .where(eq(pdfReports.id, row.id));
-    return Response.json({ reportId: row.id, url: checkout.url });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("[reports/checkout] stripe error:", msg);
-    return Response.json({ error: "checkout_failed", detail: msg }, { status: 502 });
-  }
+  // ── Everyone else: the report is a Pro feature now, not a one-time buy. ──
+  return Response.json({ error: "pro_required" }, { status: 403 });
 }

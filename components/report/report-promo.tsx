@@ -4,13 +4,6 @@ import { FileText, Sparkles } from "lucide-react";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 
-function priceLabel(): string {
-  const cents = Number(process.env.REPORT_PRICE_CENTS) || 1990;
-  const cur = (process.env.REPORT_CURRENCY ?? "gel").toLowerCase();
-  const amount = (cents / 100).toFixed(2);
-  return cur === "gel" ? `₾${amount}` : `${amount} ${cur.toUpperCase()}`;
-}
-
 /**
  * Marketing promo for the paid natal PDF report, for public/SEO pages.
  * Server component + auth-aware: signed-in visitors go straight to /report
@@ -53,7 +46,7 @@ export async function ReportPromo({ className }: { className?: string }) {
             </Link>
           </Button>
           <span className="text-center text-xs text-muted-foreground sm:text-right">
-            {priceLabel()}-დან · Pro-სთვის უფასო
+            Vivida Pro-ში შედის
           </span>
         </div>
       </div>

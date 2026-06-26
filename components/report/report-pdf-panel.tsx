@@ -6,6 +6,8 @@ import { db } from "@/db";
 import { pdfReports } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import type { PlanId } from "@/lib/pricing";
+import { canUseFeature } from "@/lib/features";
+import { ProUpsell } from "@/components/paywall/pro-upsell";
 import { BuyReportCta } from "./buy-report-cta";
 
 function priceLabel(): string {
@@ -90,6 +92,15 @@ export async function ReportPdfPanel({
     );
   }
 
-  // None / pending(abandoned) → buy.
+  // None / pending → Pro/trial users generate it (comped); free users get the
+  // subscribe banner (the report is now included in Pro, not a one-time buy).
+  if (!canUseFeature("natalReport", plan)) {
+    return (
+      <ProUpsell
+        title="შენი ნატალური რუკის ღრმა ანალიზი — PDF"
+        description="10+ გვერდიანი პერსონალური ანგარიში: რა გამოირჩევა შენს რუკაში, პლანეტების, სახლებისა და ასპექტების დეტალური ახსნა, ძლიერი მხარეები და ზრდის ზონები — Vivida Pro-ში შედის."
+      />
+    );
+  }
   return <BuyReportCta plan={plan} priceLabel={priceLabel()} />;
 }
