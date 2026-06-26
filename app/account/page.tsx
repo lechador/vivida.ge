@@ -108,6 +108,26 @@ export default async function AccountPage() {
           />
         </div>
 
+        {/* Subscription */}
+        <div className="mb-6">
+          <Link
+            href="/subscription"
+            className="group flex items-center justify-between gap-4 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/10 via-card/60 to-[var(--vivida-cyan)]/8 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5"
+          >
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold tracking-tight">
+                გამოწერა და Pro
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                ნახე გეგმის სტატუსი, განაახლე ბარათი ან გადადი Pro-ზე.
+              </p>
+            </div>
+            <span aria-hidden className="text-2xl text-muted-foreground transition-transform group-hover:translate-x-1">
+              →
+            </span>
+          </Link>
+        </div>
+
         {/* Email preferences */}
         <div className="mb-6">
           <EmailPreferencesCard

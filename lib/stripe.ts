@@ -81,6 +81,69 @@ export async function createReportCheckoutSession(opts: {
   });
 }
 
+// ── Recurring subscription (Vivida Pro) ────────────────────────────────────
+
+/** Monthly Pro price in minor units. Default ₾19.90. */
+export function subPriceCents(): number {
+  const raw = Number(process.env.SUB_PRICE_CENTS);
+  return Number.isFinite(raw) && raw > 0 ? Math.round(raw) : 1990;
+}
+
+/** Currency Stripe charges the subscription in. Default "gel". */
+export function subCurrency(): string {
+  return (process.env.SUB_CURRENCY ?? "gel").toLowerCase();
+}
+
+/**
+ * Hosted Checkout for the monthly Pro subscription. `userId` rides on both the
+ * session and the subscription metadata so every later subscription webhook
+ * can resolve the owner. Reuses an existing Stripe customer when we have one.
+ */
+export async function createSubscriptionCheckout(opts: {
+  userId: string;
+  email?: string | null;
+  customerId?: string | null;
+  origin: string;
+}): Promise<Stripe.Checkout.Session> {
+  const { userId, email, customerId, origin } = opts;
+  return stripe().checkout.sessions.create({
+    mode: "subscription",
+    ...(customerId
+      ? { customer: customerId }
+      : { customer_email: email ?? undefined }),
+    metadata: { userId, kind: "subscription" },
+    subscription_data: { metadata: { userId } },
+    allow_promotion_codes: true,
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: subCurrency(),
+          unit_amount: subPriceCents(),
+          recurring: { interval: "month" },
+          product_data: {
+            name: "Vivida Pro",
+            description: "Vivida Pro — ყოველთვიური გამოწერა",
+          },
+        },
+      },
+    ],
+    success_url: `${origin}/subscription?status=success`,
+    cancel_url: `${origin}/subscription?status=canceled`,
+  });
+}
+
+/** Billing portal session — saved cards, cancel, invoices (Stripe-hosted). */
+export async function createBillingPortal(opts: {
+  customerId: string;
+  returnUrl: string;
+}): Promise<Stripe.BillingPortal.Session> {
+  return stripe().billingPortal.sessions.create({
+    customer: opts.customerId,
+    return_url: opts.returnUrl,
+  });
+}
+
 /** Verify + parse a Stripe webhook payload. Throws on bad signature. */
 export function constructWebhookEvent(
   payload: string | Buffer,

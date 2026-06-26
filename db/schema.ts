@@ -284,6 +284,10 @@ export const subscriptions = pgTable("subscription", {
   flittOrderId: text("flitt_order_id"),
   flittSubscriptionId: text("flitt_subscription_id"),
   flittCustomerId: text("flitt_customer_id"),
+  // Stripe references (recurring subscription). Customer id is reused for the
+  // billing portal (saved cards / cancel).
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
