@@ -177,10 +177,26 @@ export function HoroscopeAudioPlayer({
 
   return (
     <div className="relative mt-5">
-      <Button type="button" variant="outline" size="lg" onClick={onListen}>
-        <Headphones className="size-4" />
-        მოისმინე ჰოროსკოპი
-      </Button>
+      <div className="relative inline-flex w-full sm:w-auto">
+        {/* Soft pulsing glow to draw the eye to the new feature. */}
+        <span
+          aria-hidden
+          className="absolute -inset-1 animate-pulse rounded-2xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] opacity-50 blur-lg"
+        />
+        <Button
+          type="button"
+          variant="mystic"
+          size="lg"
+          onClick={onListen}
+          className="relative w-full justify-center shadow-xl shadow-[var(--vivida-violet)]/40 sm:w-auto"
+        >
+          <Headphones className="size-5" />
+          მოისმინე ჰოროსკოპი
+          <span className="ml-1 rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+            ახალი
+          </span>
+        </Button>
+      </div>
       {status === "error" && error && (
         <p className="mt-2 text-sm text-[var(--vivida-pink)]">{error}</p>
       )}
