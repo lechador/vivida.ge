@@ -3,6 +3,8 @@ import { Noto_Sans_Georgian } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import NextTopLoader from "nextjs-toploader";
 import { ChatShell } from "@/components/chat/chat-shell";
+import { AudioPlayerProvider } from "@/components/audio/audio-provider";
+import { NowPlayingBar } from "@/components/audio/now-playing-bar";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
 import { FbPixel } from "@/components/fb-pixel";
 import "./globals.css";
@@ -137,8 +139,11 @@ export default function RootLayout({
         />
         <BfcacheRefresher />
         {FB_PIXEL_ENABLED && <FbPixel />}
-        {children}
-        <ChatShell />
+        <AudioPlayerProvider>
+          {children}
+          <ChatShell />
+          <NowPlayingBar />
+        </AudioPlayerProvider>
       </body>
       {GA_ENABLED && <GoogleAnalytics gaId={GA_ID!} />}
     </html>
