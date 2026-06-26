@@ -12,9 +12,11 @@ import { getCurrentPlan } from "@/lib/plan";
 import { computeChart, type NatalInput } from "@/lib/astrology";
 import { computeSynastry } from "@/lib/synastry";
 import {
+  generateSynastryDeepReport,
   generateSynastryInterpretation,
   isOpenRouterConfigured,
   OPENROUTER_MODEL,
+  SYNASTRY_DEEP_PROMPT_VERSION,
 } from "@/lib/openrouter";
 import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
 import type { PlanId } from "@/lib/pricing";
@@ -267,6 +269,70 @@ export async function ensureSynastryInterpretation(
       aiViewerHash: viewerChart.inputHash,
       aiModel: OPENROUTER_MODEL,
       aiGeneratedAt: new Date(),
+    })
+    .where(eq(partners.id, partner.id))
+    .returning();
+
+  return updated ?? partner;
+}
+
+/**
+ * On-demand DEEP synastry report (the premium "Connect" read). Generated only
+ * when the user asks (it's a long Gemini call), cached on the partner row and
+ * invalidated when the viewer's chart or the prompt version changes. Fails soft.
+ */
+export async function ensureSynastryDeepReport(
+  partner: Partner,
+  plan: PlanId
+): Promise<Partner> {
+  if (!isOpenRouterConfigured()) return partner;
+
+  const viewerChart = await ensureChartFor(partner.userId, plan);
+  if (!viewerChart) return partner;
+
+  const stamp = `${viewerChart.inputHash}:v${SYNASTRY_DEEP_PROMPT_VERSION}`;
+  if (partner.deepReport && partner.deepViewerHash === stamp) return partner;
+
+  const synastry = computeSynastry(viewerChart.data, partner.chart);
+  const [user] = await db
+    .select({ name: users.name })
+    .from(users)
+    .where(eq(users.id, partner.userId))
+    .limit(1);
+  const viewerFirstName = user?.name?.split(" ")[0] ?? null;
+
+  let report = null;
+  try {
+    report = await generateSynastryDeepReport({
+      partnerName: partner.name,
+      viewerFirstName,
+      viewerChart: viewerChart.data,
+      partnerChart: partner.chart,
+      scores: synastry.scores as unknown as Record<string, number>,
+      overall: synastry.overall,
+      topAspects: synastry.topAspects.slice(0, 10).map((a) => ({
+        a: a.a,
+        b: a.b,
+        kind: a.kind,
+        orb: a.orb,
+      })),
+    });
+  } catch (err) {
+    console.warn(
+      "[partners] AI synastry deep report failed:",
+      (err as Error).message
+    );
+    return partner;
+  }
+  if (!report) return partner;
+
+  const [updated] = await db
+    .update(partners)
+    .set({
+      deepReport: report,
+      deepViewerHash: stamp,
+      deepModel: OPENROUTER_MODEL,
+      deepGeneratedAt: new Date(),
     })
     .where(eq(partners.id, partner.id))
     .returning();

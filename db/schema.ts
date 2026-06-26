@@ -968,6 +968,12 @@ export const partners = pgTable(
     aiViewerHash: text("ai_viewer_hash"),
     aiModel: text("ai_model"),
     aiGeneratedAt: timestamp("ai_generated_at", { withTimezone: true }),
+    /** Cached DEEP AI synastry report (multi-section, on-demand). Same viewer-
+     *  hash invalidation as the short interp. */
+    deepReport: jsonb("deep_report").$type<SynastryDeepReportJson | null>(),
+    deepViewerHash: text("deep_viewer_hash"),
+    deepModel: text("deep_model"),
+    deepGeneratedAt: timestamp("deep_generated_at", { withTimezone: true }),
     /** Soft delete. NULL = active, set = hidden from UI but still counts
      *  toward the monthly creation cap. */
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
@@ -988,6 +994,24 @@ export type SynastryInterpretationJson = {
   strengths: string[];
   /** Where the friction lives, 1-3 short bullets. */
   growth: string[];
+};
+
+/** Deep, long-form AI synastry report (the "Connect" pillar premium read). */
+export type SynastryDeepReportJson = {
+  /** Multi-paragraph overall portrait. */
+  intro: string;
+  /** Love & romance. */
+  love: string;
+  /** Communication & mental connection. */
+  communication: string;
+  /** Friendship, trust & emotional safety. */
+  trust: string;
+  /** Friction & growth — where it's hard and what it teaches. */
+  friction: string;
+  /** Long-term potential. */
+  longTerm: string;
+  /** 3-5 concrete pieces of advice. */
+  advice: string[];
 };
 
 /**
