@@ -5,9 +5,11 @@ import { db } from "@/db";
 import { charts, profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
+import { canUseFeature } from "@/lib/features";
 import { computeTiming, type DayTier } from "@/lib/timing";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { ProUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "საუკეთესო დღეები" };
 export const dynamic = "force-dynamic";
@@ -35,6 +37,24 @@ export default async function TimingPage() {
 
   if (!chart) redirect("/onboarding");
   const timezone = profile?.timezone ?? "Asia/Tbilisi";
+
+  if (!canUseFeature("timing", plan)) {
+    return (
+      <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+        <Starfield count={90} />
+        <AppHeader authed plan={plan} active="timing" />
+        <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-8 sm:px-6">
+          <h1 className="mb-6 text-2xl font-semibold tracking-tight sm:text-3xl">
+            საუკეთესო დღეები
+          </h1>
+          <ProUpsell
+            title="საუკეთესო დღეები"
+            description="პერსონალური დროის კალენდარი — როდის უბერავს ქარი ზურგში და როდის ღირს სიფრთხილე, შენი რუკის ტრანზიტების მიხედვით."
+          />
+        </section>
+      </main>
+    );
+  }
 
   const { days, notable } = computeTiming(chart.data, new Date(), timezone, 28);
 

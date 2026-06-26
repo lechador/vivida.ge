@@ -20,9 +20,15 @@ export type Feature =
   | "weeklyForecast"   // 7-day AI forecast
   | "synastry"         // Unlimited compatibility / partner charts
   | "yearlyPdf"        // Downloadable yearly report
-  | "adFree";          // No ads (placeholder until we ship ads)
+  | "adFree"           // No ads (placeholder until we ship ads)
+  // ── The four Pro pillars (gated) ──
+  | "audioHoroscope"   // Listen — ElevenLabs audio horoscopes
+  | "chartChat"        // Ask — AI astrologer chat
+  | "timing"           // Know-when — best-days timing calendar
+  | "deepSynastry";    // Connect — deep AI compatibility report
 
 const REQUIRES_PRO: Record<Feature, boolean> = {
+  // Still free during the launch phase — flip to true to gate.
   aiSummary:       false,
   aiBigThree:      false,
   aiHighlights:    false,
@@ -33,6 +39,11 @@ const REQUIRES_PRO: Record<Feature, boolean> = {
   synastry:        false,
   yearlyPdf:       false,
   adFree:          false,
+  // The premium pillars — Pro only.
+  audioHoroscope:  true,
+  chartChat:       true,
+  timing:          true,
+  deepSynastry:    true,
 };
 
 export function requiresPro(feature: Feature): boolean {

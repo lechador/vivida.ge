@@ -11,6 +11,8 @@ import {
   type ChatMessage,
 } from "@/lib/openrouter";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { getCurrentPlan } from "@/lib/plan";
+import { canUseFeature } from "@/lib/features";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,6 +30,10 @@ export async function POST(req: Request) {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return Response.json({ error: "unauthorized" }, { status: 401 });
+
+  if (!canUseFeature("chartChat", await getCurrentPlan(userId))) {
+    return Response.json({ error: "pro_required" }, { status: 403 });
+  }
 
   if (!isOpenRouterConfigured()) {
     return Response.json({ error: "unavailable" }, { status: 503 });

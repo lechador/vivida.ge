@@ -10,6 +10,7 @@ import {
   getPartnerForViewer,
 } from "@/lib/partners-core";
 import { computeSynastry } from "@/lib/synastry";
+import { canUseFeature } from "@/lib/features";
 import { SYNASTRY_DEEP_PROMPT_VERSION } from "@/lib/openrouter";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -149,6 +150,7 @@ export default async function SynastryDetailPage({
           partnerId={partner.id}
           partnerName={partner.name}
           initial={initialDeep}
+          canUse={canUseFeature("deepSynastry", plan)}
         />
       </section>
     </main>

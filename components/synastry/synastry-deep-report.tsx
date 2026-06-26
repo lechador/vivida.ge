@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2, Lock, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ProUpsell } from "@/components/paywall/pro-upsell";
 import type { SynastryDeepReportJson } from "@/db/schema";
 
 const ERRORS: Record<string, string> = {
@@ -34,10 +35,12 @@ export function SynastryDeepReport({
   partnerId,
   partnerName,
   initial,
+  canUse,
 }: {
   partnerId: string;
   partnerName: string;
   initial: SynastryDeepReportJson | null;
+  canUse: boolean;
 }) {
   const [report, setReport] = useState<SynastryDeepReportJson | null>(initial);
   const [status, setStatus] = useState<"idle" | "generating" | "error">("idle");
@@ -125,6 +128,18 @@ export function SynastryDeepReport({
           </section>
         )}
       </article>
+    );
+  }
+
+  // Locked for free users (a previously-generated report still shows above).
+  if (!canUse) {
+    return (
+      <div className="mt-8">
+        <ProUpsell
+          title="ღრმა თავსებადობის ანგარიში"
+          description={`${partnerName}-თან თქვენი კავშირის სრული წაკითხვა — სიყვარული, კომუნიკაცია, ნდობა, ხახუნი, გრძელვადიანი პოტენციალი და პრაქტიკული რჩევები.`}
+        />
+      </div>
     );
   }
 

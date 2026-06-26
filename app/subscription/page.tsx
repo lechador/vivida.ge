@@ -70,7 +70,7 @@ export default async function SubscriptionPage({
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_350/0.3),transparent_70%)]"
       />
       <Starfield count={90} />
-      <AppHeader authed plan={pro ? "pro" : "free"} active="account" />
+      <AppHeader authed plan={pro ? "pro" : "free"} active="pro" />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 pt-6 sm:px-6 sm:pt-8">
         <h1 className="mb-6 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">

@@ -1,8 +1,10 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Headphones, Lock, Sparkles } from "lucide-react";
 
 import type { DailyHoroscope } from "@/db/schema";
+import { Button } from "@/components/ui/button";
 import { HoroscopeAudioPlayer } from "./horoscope-audio-player";
 
 /**
@@ -13,10 +15,12 @@ export function DailyCard({
   horoscope,
   timezone,
   savedVoice,
+  canAudio = true,
 }: {
   horoscope: DailyHoroscope;
   timezone: string;
   savedVoice?: string | null;
+  canAudio?: boolean;
 }) {
   const date = new Intl.DateTimeFormat("ka-GE", {
     timeZone: timezone,
@@ -53,7 +57,22 @@ export function DailyCard({
         />
       </header>
 
-      <HoroscopeAudioPlayer savedVoice={savedVoice} />
+      {canAudio ? (
+        <HoroscopeAudioPlayer savedVoice={savedVoice} />
+      ) : (
+        <div className="relative mt-5">
+          <Button asChild variant="outline" size="lg" className="w-full justify-center sm:w-auto">
+            <Link href="/subscription">
+              <Headphones className="size-4" />
+              მოისმინე ჰოროსკოპი
+              <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-gold)]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--vivida-gold)]">
+                <Lock className="size-3" />
+                Pro
+              </span>
+            </Link>
+          </Button>
+        </div>
+      )}
 
       {horoscope.themes.length > 0 && (
         <div className="relative mt-4 flex flex-wrap gap-2">

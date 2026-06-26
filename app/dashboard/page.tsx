@@ -10,6 +10,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
+import { ProUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "დღეს" };
 
@@ -65,6 +66,14 @@ export default async function DashboardPage() {
           plan={plan}
           savedVoice={userRow?.horoscopeVoice ?? null}
         />
+
+        {plan !== "pro" && (
+          <ProUpsell
+            className="mt-8"
+            title="გახსენი Vivida Pro"
+            description="მოისმინე ჰოროსკოპი ხმით, ესაუბრე AI ასტროლოგს შენი რუკის შესახებ, ნახე საუკეთესო დღეები და მიიღე ღრმა თავსებადობის ანგარიში."
+          />
+        )}
       </section>
     </main>
   );

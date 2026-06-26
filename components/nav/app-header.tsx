@@ -38,7 +38,8 @@ export async function AppHeader({
     | "synastry"
     | "friends"
     | "messages"
-    | "account";
+    | "account"
+    | "pro";
 }) {
   let userInfo: {
     id: string;

@@ -4,6 +4,8 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyHoroscopes, profiles, users } from "@/db/schema";
 import { localDateString } from "@/lib/transits";
+import { getCurrentPlan } from "@/lib/plan";
+import { canUseFeature } from "@/lib/features";
 import {
   DEFAULT_VOICE_SLUG,
   generateSpeech,
@@ -32,6 +34,10 @@ export async function POST(req: Request) {
   const userId = session?.user?.id;
   if (!userId) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  if (!canUseFeature("audioHoroscope", await getCurrentPlan(userId))) {
+    return Response.json({ error: "pro_required" }, { status: 403 });
   }
 
   if (!isElevenLabsConfigured()) {

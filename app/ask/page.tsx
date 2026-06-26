@@ -5,9 +5,11 @@ import { db } from "@/db";
 import { charts, chartChatMessages } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
+import { canUseFeature } from "@/lib/features";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { ChartChat } from "@/components/ask/chart-chat";
+import { ProUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "ჰკითხე ვარსკვლავებს" };
 export const dynamic = "force-dynamic";
@@ -62,7 +64,14 @@ export default async function AskPage() {
           </p>
         </header>
 
-        <ChartChat initialMessages={initialMessages} firstName={firstName} />
+        {canUseFeature("chartChat", plan) ? (
+          <ChartChat initialMessages={initialMessages} firstName={firstName} />
+        ) : (
+          <ProUpsell
+            title="ჰკითხე ვარსკვლავებს"
+            description="პერსონალური AI ასტროლოგი, რომელიც შენს ნატალურ რუკას იცნობს და ნებისმიერ შეკითხვას უპასუხებს — ხასიათზე, ურთიერთობებზე, კარიერასა და დროზე."
+          />
+        )}
       </section>
     </main>
   );

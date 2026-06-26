@@ -1,6 +1,7 @@
 import {
   CalendarClock,
   Compass,
+  Crown,
   Heart,
   MessageCircle,
   Sparkles,
@@ -22,7 +23,8 @@ export type NavActiveKey =
   | "discover"
   | "synastry"
   | "friends"
-  | "messages";
+  | "messages"
+  | "pro";
 
 export type NavItem = {
   key: NavActiveKey;
@@ -103,6 +105,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "მეგობრები",
     Icon: Users,
     hue: "oklch(0.72 0.22 0)",
+  },
+  {
+    key: "pro",
+    href: "/subscription",
+    label: "Pro",
+    Icon: Crown,
+    hue: "oklch(0.85 0.16 85)",
   },
 ];
 
