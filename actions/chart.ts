@@ -7,11 +7,17 @@ import { db } from "@/db";
 import { charts, profiles, users, type Chart } from "@/db/schema";
 import { computeAspectsFor, computeChart, hashInput } from "@/lib/astrology";
 import {
-  generateInterpretation,
+  generateChartSummary,
   isOpenRouterConfigured,
   OPENROUTER_MODEL,
 } from "@/lib/openrouter";
 import { staticInterpretation } from "@/lib/interpretations";
+import {
+  ensureLibraryFor,
+  getLibraryEntries,
+  libraryKey,
+  placementsForChart,
+} from "@/lib/interpretation-library";
 import { BODIES, bodyMeta, signByIndex } from "@/lib/zodiac";
 import { HOUSE_NUMBERS, houseDef } from "@/lib/houses";
 import { canUseFeature } from "@/lib/features";
@@ -44,7 +50,7 @@ import type { NatalChartJson } from "@/db/schema";
  */
 type AiUpgradeMode = "wait" | "defer" | "skip";
 
-export async function ensureChartFor(
+async function resolveChart(
   userId: string,
   plan: PlanId = "free",
   opts: { aiUpgrade?: AiUpgradeMode } = {}
@@ -111,17 +117,10 @@ export async function ensureChartFor(
       },
     };
 
-    const interp = existing.interpretation;
-    const missingExpansion =
-      !interp.planets ||
-      !interp.houses ||
-      !interp.aspects ||
-      Object.keys(interp.planets).length === 0 ||
-      Object.keys(interp.houses).length === 0 ||
-      Object.keys(interp.aspects).length === 0;
-    const canUpgrade =
-      wantAi &&
-      (existing.interpretationModel === "static" || missingExpansion);
+    // The only per-user AI work left is the summary + highlights — the
+    // per-placement text comes from the shared library at read time. So we
+    // only need an upgrade when the summary hasn't been generated yet.
+    const canUpgrade = wantAi && !existing.interpretation.summary;
     if (!canUpgrade) return existing;
     // Positions are already current — only the AI narrative needs work, and
     // we have the data to do it without recomputing. In "defer" mode we hand
@@ -166,6 +165,52 @@ export async function ensureChartFor(
     .where(eq(charts.userId, userId))
     .limit(1);
   return fresh ?? null;
+}
+
+/**
+ * Public accessor — resolves the chart, then overlays the shared per-placement
+ * interpretation library (Big Three + planet sections) so every consumer
+ * renders the same reusable text and an admin edit reflects for all users at
+ * once. Falls back to the chart's own static/AI text when a row isn't seeded.
+ */
+export async function ensureChartFor(
+  userId: string,
+  plan: PlanId = "free",
+  opts: { aiUpgrade?: AiUpgradeMode } = {}
+): Promise<Chart | null> {
+  const chart = await resolveChart(userId, plan, opts);
+  return chart ? overlayLibrary(chart) : chart;
+}
+
+async function overlayLibrary(chart: Chart): Promise<Chart> {
+  const interp = chart.interpretation;
+  if (!interp) return chart;
+  const placements = placementsForChart(chart.data);
+  // Never let a library lookup break a chart render — if the table isn't
+  // migrated yet or the query fails, fall back to the chart's own text.
+  let lib: Map<string, string>;
+  try {
+    lib = await getLibraryEntries(
+      placements.map((p) => libraryKey(p.subject, p.sign))
+    );
+  } catch (err) {
+    console.warn("[chart] library overlay skipped:", (err as Error).message);
+    return chart;
+  }
+  if (lib.size === 0) return chart; // nothing seeded yet — keep existing text
+
+  const bigThree = { ...interp.bigThree };
+  const planets = { ...(interp.planets ?? {}) };
+  for (const p of placements) {
+    const body = lib.get(libraryKey(p.subject, p.sign));
+    if (!body) continue;
+    if (p.subject === "sun") bigThree.sun = body;
+    else if (p.subject === "moon") bigThree.moon = body;
+    else if (p.subject === "ascendant") bigThree.ascendant = body;
+    else planets[p.subject] = body;
+  }
+  chart.interpretation = { ...interp, bigThree, planets };
+  return chart;
 }
 
 /** Static (zero-latency) interpretation seed for a freshly computed chart. */
@@ -250,10 +295,12 @@ function scheduleAiUpgrade(
 }
 
 /**
- * Generate the AI narrative for an already-persisted chart and merge it in.
- * Guarded so concurrent schedules (e.g. signup pre-gen + dashboard) don't
- * double-spend an AI call, and so a birth-data change mid-flight can't
- * clobber the row.
+ * Background work for an already-persisted chart:
+ *   1. Populate the shared per-placement interpretation library (no-op once
+ *      seeded) so Big Three + planet text is reused across all users.
+ *   2. Generate the one remaining per-user piece — the summary + highlights.
+ * Guarded so concurrent schedules don't double-spend, and so a birth-data
+ * change mid-flight can't clobber the row.
  */
 async function upgradeChartAi(
   userId: string,
@@ -267,16 +314,14 @@ async function upgradeChartAi(
     .limit(1);
   if (!current || current.inputHash !== inputHash) return;
 
-  // Already has a full AI interpretation? Nothing to do.
-  const interp = current.interpretation;
-  const missingExpansion =
-    !interp?.planets ||
-    !interp?.houses ||
-    !interp?.aspects ||
-    Object.keys(interp.planets).length === 0 ||
-    Object.keys(interp.houses).length === 0 ||
-    Object.keys(interp.aspects).length === 0;
-  if (current.interpretationModel !== "static" && !missingExpansion) return;
+  // Make sure the reusable library covers this chart's placements. Cheap once
+  // the library is seeded; self-heals for new placements otherwise.
+  await ensureLibraryFor(placementsForChart(data)).catch((err) =>
+    console.warn("[chart] library ensure failed:", (err as Error).message)
+  );
+
+  // Summary + highlights are the only per-user AI text. Skip if already done.
+  if (current.interpretation?.summary) return;
 
   const [user] = await db
     .select({ name: users.name })
@@ -285,39 +330,14 @@ async function upgradeChartAi(
     .limit(1);
   const firstName = user?.name?.split(" ")[0] ?? null;
 
-  const ascSign = signByIndex(data.ascendant.signIndex).key;
-  const sunSign = data.bodies.sun && signByIndex(data.bodies.sun.signIndex).key;
-  const moonSign =
-    data.bodies.moon && signByIndex(data.bodies.moon.signIndex).key;
-  const staticBigThree = {
-    sun: sunSign ? staticInterpretation("sun", sunSign) : undefined,
-    moon: moonSign ? staticInterpretation("moon", moonSign) : undefined,
-    ascendant: staticInterpretation("ascendant", ascSign),
-  };
-  const staticPlanets = buildStaticPlanetTexts(data);
-  const staticHouses = buildStaticHouseTexts(data);
-  const staticAspects = buildStaticAspectTexts(data);
-
-  const ai = await generateInterpretation({
-    firstName,
-    chart: data,
-    staticBigThree,
-  });
+  const ai = await generateChartSummary({ firstName, chart: data });
   if (!ai) return;
 
-  // Merge AI fields into static defaults so any missing key still has
-  // sensible content. AI text wins where present.
+  const base = current.interpretation ?? buildStaticInterpretation(data);
   const interpretation: NonNullable<Chart["interpretation"]> = {
+    ...base,
     summary: ai.summary,
-    bigThree: {
-      sun: ai.bigThree?.sun ?? staticBigThree.sun,
-      moon: ai.bigThree?.moon ?? staticBigThree.moon,
-      ascendant: ai.bigThree?.ascendant ?? staticBigThree.ascendant,
-    },
-    highlights: ai.highlights ?? [],
-    planets: { ...staticPlanets, ...(ai.planets ?? {}) },
-    houses: { ...staticHouses, ...(ai.houses ?? {}) },
-    aspects: { ...staticAspects, ...(ai.aspects ?? {}) },
+    highlights: ai.highlights,
   };
 
   // Only write if the chart still matches the positions we interpreted.

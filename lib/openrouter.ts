@@ -254,6 +254,98 @@ export async function generateInterpretation(
 }
 
 // ────────────────────────────────────────────────────────────────────────
+// Chart summary + highlights only
+//
+// The per-placement text (Big Three + planets) now comes from the shared
+// interpretation library, so the only thing that still needs a per-user AI
+// call is the whole-chart synthesis: the summary and highlights. This is a
+// much smaller, faster request than the full interpretation.
+// ────────────────────────────────────────────────────────────────────────
+
+export type ChartSummaryResult = {
+  summary: string;
+  highlights: Array<{ title: string; body: string }>;
+};
+
+const SUMMARY_SYSTEM_PROMPT = `შენ ხარ თბილი, ცოცხალი ქართველი ასტროლოგი. წერ ქართულად, ახალგაზრდა აუდიტორიისთვის — მოდერნული, კონკრეტული ენა, კლიშეების გარეშე.
+
+დააბრუნე მხოლოდ ვალიდური JSON ამ სქემით:
+{
+  "summary": string,                              // 2 წინადადება — ადამიანის მთლიანი რუკის ემოციური სურათი, "შენ"-ის ფორმა
+  "highlights": Array<{ "title": string, "body": string }>  // 2 ან 3 მოკლე მონაკვეთი — ყველაზე მნიშვნელოვანი პლანეტა/კონფიგურაცია + ახსნა
+}
+
+წესები:
+- "შენ"-ის ფორმა, თბილი/თანაბარი ტონი
+- კონკრეტული რუკის მიხედვით (ნიშნები, სახლები, ასპექტები) — არა ზოგადი მისტიკა
+- მხოლოდ JSON, code fence-ის გარეშე`;
+
+/**
+ * Generate just the personalized summary + highlights for a chart. Returns
+ * null when OpenRouter isn't configured.
+ */
+export async function generateChartSummary(input: {
+  firstName?: string | null;
+  chart: NatalChartJson;
+}): Promise<ChartSummaryResult | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const name = input.firstName?.trim() || null;
+  const userMessage = [
+    name ? `მომხმარებლის სახელი: ${name}` : null,
+    "ნატალური რუკის შეჯამება (ინგლისურად, ტექნიკური):",
+    summarizeChart(input.chart),
+    "",
+    "დააწერე summary + highlights. JSON-ად დააბრუნე.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida chart summary",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: SUMMARY_SYSTEM_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+      max_tokens: 4000,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+  const parsed = JSON.parse(stripped) as ChartSummaryResult;
+  if (!parsed.summary) throw new Error("missing summary in chart summary");
+  return {
+    summary: parsed.summary,
+    highlights: Array.isArray(parsed.highlights)
+      ? parsed.highlights.slice(0, 3)
+      : [],
+  };
+}
+
+// ────────────────────────────────────────────────────────────────────────
 // Daily horoscope generator
 // ────────────────────────────────────────────────────────────────────────
 

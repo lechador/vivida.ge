@@ -253,6 +253,13 @@
       "when": 1782476368819,
       "tag": "0035_rainy_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1782578980608,
+      "tag": "0036_chilly_catseye",
+      "breakpoints": true
     }
   ]
 }
