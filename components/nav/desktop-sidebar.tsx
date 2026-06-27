@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { ProBadge } from "@/components/brand/pro-badge";
 import { cn } from "@/lib/utils";
 import type { PlanId } from "@/lib/pricing";
 import { MessagesTabBadge } from "./messages-tab-badge";
@@ -69,6 +70,7 @@ export function DesktopSidebar({
         >
           vivida
         </span>
+        {plan === "pro" && <ProBadge />}
       </Link>
 
       <div

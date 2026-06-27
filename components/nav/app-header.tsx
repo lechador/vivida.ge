@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { getHeaderData } from "@/lib/header-cache";
 import { Button } from "@/components/ui/button";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { ProBadge } from "@/components/brand/pro-badge";
 import { DesktopSidebar } from "./desktop-sidebar";
 import { MobileNav } from "./mobile-nav";
 import { MobileSearch } from "./mobile-search";
@@ -104,6 +105,7 @@ export async function AppHeader({
         >
           vivida
         </span>
+        {userInfo && plan === "pro" && <ProBadge className="hidden sm:inline-flex" />}
       </Link>
 
       {/* Authed nav — central pill links, hidden on mobile (drawer instead) */}

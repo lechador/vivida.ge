@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { ProBadge } from "@/components/brand/pro-badge";
 import type { PlanId } from "@/lib/pricing";
 import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
 
@@ -78,6 +79,7 @@ export function MobileNav({
                     >
                       vivida
                     </span>
+                    {plan === "pro" && <ProBadge />}
                   </Link>
                   <DialogPrimitive.Close
                     aria-label="დახურვა"
