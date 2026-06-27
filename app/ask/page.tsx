@@ -41,7 +41,7 @@ export default async function AskPage() {
   }));
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main className="relative isolate flex h-dvh flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_350/0.3),transparent_70%)]"
