@@ -14,9 +14,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
+import { canUseFeature } from "@/lib/features";
 import type { PlanId } from "@/lib/pricing";
 
 import { DailyCard } from "./daily-card";
+import { HoroscopeLoading } from "./horoscope-loading";
 import { MiniBigThree } from "./mini-big-three";
 import { MoonPhaseCard } from "./moon-phase-card";
 import { SuggestedPeopleRail } from "./suggested-people-rail";
@@ -32,9 +34,11 @@ import { WeeklyForecastCard } from "./weekly-forecast-card";
 export function DailyDashboard({
   userId,
   plan,
+  savedVoice,
 }: {
   userId: string;
   plan: PlanId;
+  savedVoice?: string | null;
 }) {
   const router = useRouter();
   const [core, setCore] = useState<DashboardCore | null>(null);
@@ -92,7 +96,9 @@ export function DailyDashboard({
         plan={plan}
         timezone={timezone}
         canDaily={canDaily}
+        canAudio={canUseFeature("audioHoroscope", plan)}
         canWeekly={canWeekly}
+        savedVoice={savedVoice}
       />
 
       <section>
@@ -144,12 +150,16 @@ function DashboardExtrasSection({
   timezone,
   canDaily,
   canWeekly,
+  savedVoice,
+  canAudio,
 }: {
   userId: string;
   plan: PlanId;
   timezone: string;
   canDaily: boolean;
   canWeekly: boolean;
+  canAudio: boolean;
+  savedVoice?: string | null;
 }) {
   const [extras, setExtras] = useState<DashboardExtras | null>(null);
 
@@ -173,9 +183,14 @@ function DashboardExtrasSection({
   const loading = extras === null;
 
   const dailySlot = loading ? (
-    <CardSkeleton className="min-h-[220px]" />
+    <HoroscopeLoading />
   ) : extras.daily ? (
-    <DailyCard horoscope={extras.daily} timezone={timezone} />
+    <DailyCard
+      horoscope={extras.daily}
+      timezone={timezone}
+      savedVoice={savedVoice}
+      canAudio={canAudio}
+    />
   ) : canDaily ? (
     <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
       დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში.

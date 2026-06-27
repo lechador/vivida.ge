@@ -1,8 +1,11 @@
 import {
+  CalendarClock,
   Compass,
+  Crown,
   Heart,
   MessageCircle,
   Sparkles,
+  Stars,
   Sun,
   Telescope,
   Users,
@@ -14,11 +17,14 @@ import { SOCIAL_FEATURES, type SocialFeature } from "@/lib/social-flags";
 export type NavActiveKey =
   | "today"
   | "report"
+  | "ask"
+  | "timing"
   | "feed"
   | "discover"
   | "synastry"
   | "friends"
-  | "messages";
+  | "messages"
+  | "pro";
 
 export type NavItem = {
   key: NavActiveKey;
@@ -59,6 +65,20 @@ const ALL_NAV_ITEMS: NavItem[] = [
     hue: "oklch(0.78 0.18 305)",
   },
   {
+    key: "ask",
+    href: "/ask",
+    label: "ჰკითხე",
+    Icon: Stars,
+    hue: "oklch(0.80 0.16 230)",
+  },
+  {
+    key: "timing",
+    href: "/timing",
+    label: "როდის",
+    Icon: CalendarClock,
+    hue: "oklch(0.82 0.14 90)",
+  },
+  {
     key: "feed",
     href: "/feed",
     label: "ფიდი",
@@ -85,6 +105,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "მეგობრები",
     Icon: Users,
     hue: "oklch(0.72 0.22 0)",
+  },
+  {
+    key: "pro",
+    href: "/subscription",
+    label: "Pro",
+    Icon: Crown,
+    hue: "oklch(0.85 0.16 85)",
   },
 ];
 

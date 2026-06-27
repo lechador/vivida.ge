@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Calendar, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ReportPromo } from "@/components/report/report-promo";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -119,9 +120,9 @@ export default function ZodiacHubPage() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link href="/signup">
+            <Link href="/nataluri-ruka">
               <Sparkles className="size-4" />
-              ჩემი სრული რუკა
+              ნატალური რუკა ონლაინ
             </Link>
           </Button>
         </div>
@@ -319,7 +320,55 @@ export default function ZodiacHubPage() {
               </details>
             ))}
           </div>
+
+          <Link
+            href="/zodiac/reitingebi"
+            className="group relative mt-4 flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-[var(--vivida-pink)]/30 bg-gradient-to-br from-[var(--vivida-pink)]/12 via-card/65 to-[var(--vivida-violet)]/12 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5"
+          >
+            <div className="min-w-0">
+              <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                რეიტინგები
+              </div>
+              <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+                ყველაზე ჭკვიანი, ეჭვიანი, რომანტიული ნიშნები
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                12-ვე ნიშანი დალაგებული თვისებების მიხედვით — ნახე, სად დგას შენი.
+              </p>
+            </div>
+            <span
+              aria-hidden
+              className="hidden shrink-0 text-3xl transition-transform group-hover:translate-x-1 sm:block"
+            >
+              →
+            </span>
+          </Link>
+
+          <Link
+            href="/chinuri-horoskopi"
+            className="group relative mt-4 flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-[var(--vivida-gold)]/30 bg-gradient-to-br from-[var(--vivida-gold)]/10 via-card/65 to-[var(--vivida-cyan)]/12 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5"
+          >
+            <div className="min-w-0">
+              <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                ჩინური ჰოროსკოპი
+              </div>
+              <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+                ზოდიაქოს ნიშნები წლების მიხედვით
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                გაიგე შენი ჩინური ცხოველი დაბადების წლით — ვირთხა, დრაკონი, ვეფხვი…
+              </p>
+            </div>
+            <span
+              aria-hidden
+              className="hidden shrink-0 text-3xl transition-transform group-hover:translate-x-1 sm:block"
+            >
+              →
+            </span>
+          </Link>
         </section>
+
+        <ReportPromo className="mt-16" />
 
         {/* CTA */}
         <div className="mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">

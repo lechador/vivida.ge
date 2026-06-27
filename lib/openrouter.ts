@@ -560,6 +560,118 @@ export async function generateSynastryInterpretation(input: {
   }
 }
 
+// ── Deep synastry report (the "Connect" pillar premium read) ───────────────
+export const SYNASTRY_DEEP_PROMPT_VERSION = 1;
+
+const SYNASTRY_DEEP_SYSTEM_PROMPT = `შენ ხარ თბილი, ღრმა, თანამედროვე ქართველი ასტროლოგი. დაწერე ვრცელი, პრემიუმ ხარისხის სინასტრიის ანგარიში ორი ადამიანის რუკის მიხედვით — დეტერმინისტული ქულებისა და ცროს-ასპექტების ზემოდან. ეს არ არის მცირე ნარატივი — ეს არის სრული, ღრმა წაკითხვა.
+
+შენ ღებულობ ორივე ნატალურ რუკას, გათვლილ ქულებს და ყველაზე ძლიერ ცროს-ასპექტებს.
+
+დააბრუნე JSON ზუსტად ამ სქემით:
+{
+  "intro": string,          // 2-3 აბზაცი (\\n\\n) — ურთიერთობის სრული პორტრეტი, საერთო ენერგია, რას ქმნით ერთად
+  "love": string,           // 2-3 აბზაცი — სიყვარული და რომანტიკა (ვენერა, მარსი, მე-5/7/8 სახლი)
+  "communication": string,  // 2 აბზაცი — გონებრივი კავშირი, კომუნიკაცია (მერკური, ჰაერი)
+  "trust": string,          // 2 აბზაცი — მეგობრობა, ნდობა, ემოციური უსაფრთხოება (მთვარე, სატურნი)
+  "friction": string,       // 2 აბზაცი — სად არის ხახუნი და რას გასწავლით ეს დაძაბულობა
+  "longTerm": string,       // 2 აბზაცი — გრძელვადიანი პოტენციალი
+  "advice": [string, ...]   // 3-5 კონკრეტული, პრაქტიკული რჩევა
+}
+
+წესები:
+- "შენ"-ის ფორმა; პარტნიორი მოიხსენიე სახელით
+- კონკრეტული ფაქტები — "შენი მთვარე მის ვენერას ტრინში" ✅, არა ზოგადი მისტიკა ❌
+- გულახდილი: მაღალ ქულებზე ხაზი გაუსვი ნაკადს, დაბალზე — პატივი ეცი ხახუნს, მაგრამ აჩვენე გზა
+- ცოცხალი, ხელშესახები ქართული; მოერიდე კლიშეებს ("ვარსკვლავები გელიან")
+- ნუ გადაუხვევ პარტნიორის გენდერზე ან ურთიერთობის ფორმაზე
+- პლანეტები ქართულად, ბრენდები (Vivida) ლათინურად
+- მხოლოდ JSON, code fence-ის გარეშე`;
+
+export async function generateSynastryDeepReport(input: {
+  partnerName: string;
+  viewerFirstName: string | null;
+  viewerChart: NatalChartJson;
+  partnerChart: NatalChartJson;
+  scores: Record<string, number>;
+  overall: number;
+  topAspects: Array<{ a: string; b: string; kind: string; orb: number }>;
+}): Promise<import("@/db/schema").SynastryDeepReportJson | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const sections: string[] = [];
+  if (input.viewerFirstName)
+    sections.push(`მომხმარებლის სახელი: ${input.viewerFirstName}`);
+  sections.push(`პარტნიორის სახელი: ${input.partnerName}`);
+  sections.push("\n--- მომხმარებლის რუკა ---");
+  sections.push(summarizeNatalCompact(input.viewerChart));
+  sections.push("\n--- პარტნიორის რუკა ---");
+  sections.push(summarizeNatalCompact(input.partnerChart));
+  sections.push("\n--- გათვლილი ქულები ---");
+  sections.push(`overall: ${input.overall}`);
+  for (const [cat, val] of Object.entries(input.scores)) {
+    sections.push(`${cat}: ${val}`);
+  }
+  if (input.topAspects.length > 0) {
+    sections.push("\n--- ყველაზე ძლიერი ცროს-ასპექტები ---");
+    for (const a of input.topAspects.slice(0, 10)) {
+      const left = PLANET_LABELS_KA[a.a] ?? a.a;
+      const right = PLANET_LABELS_KA[a.b] ?? a.b;
+      sections.push(
+        `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`
+      );
+    }
+  }
+  sections.push("\nდაწერე სრული, ღრმა ანგარიში. JSON-ად დააბრუნე.");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida synastry deep",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: SYNASTRY_DEEP_SYSTEM_PROMPT },
+        { role: "user", content: sections.join("\n") },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.75,
+      max_tokens: 14000,
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  const parsed = JSON.parse(stripped) as import("@/db/schema").SynastryDeepReportJson;
+  if (!parsed.intro || !parsed.love) {
+    throw new Error("Synastry deep report missing required fields");
+  }
+  return {
+    intro: parsed.intro,
+    love: parsed.love,
+    communication: parsed.communication ?? "",
+    trust: parsed.trust ?? "",
+    friction: parsed.friction ?? "",
+    longTerm: parsed.longTerm ?? "",
+    advice: Array.isArray(parsed.advice) ? parsed.advice.slice(0, 5) : [],
+  };
+}
+
 // ────────────────────────────────────────────────────────────────────────
 //  7-day forecast — per-user, regenerated when the local week-start changes
 // ────────────────────────────────────────────────────────────────────────
@@ -1108,5 +1220,383 @@ export async function generateSignHoroscope(
     throw new Error(
       `Sign horoscope invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`
     );
+  }
+}
+
+// ── Sign rankings (SEO listicles) ──────────────────────────────────────────
+// "ყველაზე ჭკვიანი / ეჭვიანი / რომანტიული … ზოდიაქოს ნიშნები" — rank all 12
+// signs by a trait. Evergreen, generated once per topic and cached in DB.
+export const RANKING_PROMPT_VERSION = 1;
+
+export type SignRankingGenItem = {
+  /** zodiac slug from the provided list */
+  slug: string;
+  /** 1 = most, 12 = least */
+  rank: number;
+  /** 1-2 sentence Georgian explanation */
+  blurb: string;
+};
+
+export type SignRankingResult = {
+  headline: string;
+  intro: string;
+  items: SignRankingGenItem[];
+  faq: { q: string; a: string }[];
+};
+
+const SIGN_RANKING_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი-რედაქტორი. წერ გასართობ, მაგრამ შინაარსიან "რეიტინგ" სტატიას, რომელიც ალაგებს 12-ვე ზოდიაქოს ნიშანს მოცემული თვისების მიხედვით — ყველაზე მეტიდან ყველაზე ნაკლებისკენ.
+
+ცოცხალი, კონკრეტული, ხელშესახები ენა. არა ბუნდოვანი მისტიკა, არა კლიშეები. თითო ნიშანზე მიეცი მკითხველს კონკრეტული მიზეზი, რატომ დგას სწორედ ამ ადგილზე — ნიშნის ხასიათიდან გამომდინარე (ელემენტი, მმართველი პლანეტა, ტიპური ქცევა). ტონი მსუბუქი, ოდნავ იუმორით, მაგრამ არა შეურაცხმყოფელი.
+
+დააბრუნე მხოლოდ ვალიდური JSON ამ სქემით:
+{
+  "headline": string,                       // 40-70 სიმბოლო, მიმზიდველი სათაური
+  "intro": string,                          // 2-3 წინადადება — შესავალი, რას ნიშნავს ეს თვისება და როგორ ვაჯგუფებთ
+  "items": [                                // ზუსტად 12 ჩანაწერი, თითო ნიშანზე
+    { "slug": string, "rank": number, "blurb": string }   // slug მოცემული სიიდან; rank 1..12 უნიკალური; blurb 1-2 წინადადება
+  ],
+  "faq": [ { "q": string, "a": string } ]   // 3 ხშირი კითხვა-პასუხი ამ თემაზე
+}
+
+წესები:
+- გამოიყენე ზუსტად ის slug-ები, რომლებსაც მოგცემ — არცერთი არ გამოტოვო, არცერთი არ დაამატო
+- rank 1 = ყველაზე მეტად, 12 = ყველაზე ნაკლებად; ყველა რიცხვი უნიკალური
+- ქართულად, "შენ"-ის გარეშე ნეიტრალური ტონით (ეს ნიშანზეა, არა მკითხველზე)
+- აცილე ცარიელი ფრაზები; თითო blurb კონკრეტული და განსხვავებული
+- მხოლოდ JSON, code fence-ის გარეშე`;
+
+/**
+ * Generate a 12-sign ranking listicle for a trait. Returns null when
+ * OpenRouter isn't configured so callers can fall back gracefully.
+ */
+export async function generateSignRanking(input: {
+  /** Topic title, e.g. "ყველაზე ჭკვიანი ზოდიაქოს ნიშნები". */
+  titleKa: string;
+  /** What trait to rank by, described for the model. */
+  traitKa: string;
+  /** The 12 signs (slug + Georgian label) the model must rank. */
+  signs: { slug: string; labelKa: string }[];
+}): Promise<SignRankingResult | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const signLines = input.signs
+    .map((s) => `- ${s.slug} = ${s.labelKa}`)
+    .join("\n");
+
+  const userMessage = [
+    `თემა: ${input.titleKa}`,
+    `თვისება, რომლითაც ვალაგებთ: ${input.traitKa}`,
+    "",
+    "ნიშნები (გამოიყენე ეს slug-ები ზუსტად):",
+    signLines,
+    "",
+    `დაალაგე 12-ვე ნიშანი ამ თვისების მიხედვით და დააბრუნე JSON.`,
+  ].join("\n");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida sign ranking",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: SIGN_RANKING_SYSTEM_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.85,
+      max_tokens: 4500,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  const parsed = JSON.parse(stripped) as SignRankingResult;
+  const valid = new Set(input.signs.map((s) => s.slug));
+  const items = (Array.isArray(parsed.items) ? parsed.items : [])
+    .filter((it) => it && valid.has(it.slug) && typeof it.blurb === "string")
+    .map((it) => ({ slug: it.slug, rank: Number(it.rank) || 0, blurb: it.blurb }));
+
+  // Dedupe by slug (keep first), then ensure all 12 present and re-rank 1..n
+  // by the model's order so the page never shows gaps or duplicates.
+  const seen = new Set<string>();
+  const deduped = items.filter((it) =>
+    seen.has(it.slug) ? false : (seen.add(it.slug), true)
+  );
+  deduped.sort((a, b) => a.rank - b.rank);
+  const ranked = deduped.map((it, i) => ({ ...it, rank: i + 1 }));
+
+  if (ranked.length < input.signs.length || !parsed.headline || !parsed.intro) {
+    throw new Error(
+      `Sign ranking incomplete (${ranked.length}/${input.signs.length})\n--- raw ---\n${raw.slice(0, 500)}`
+    );
+  }
+
+  return {
+    headline: parsed.headline,
+    intro: parsed.intro,
+    items: ranked,
+    faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 4) : [],
+  };
+}
+
+// ── Chinese zodiac (ჩინური ჰოროსკოპი) ──────────────────────────────────────
+export const CHINESE_ZODIAC_PROMPT_VERSION = 1;
+
+export type ChineseZodiacResult = {
+  pageTitle: string;
+  metaDescription: string;
+  headline: string;
+  intro: string;
+  personality: string;
+  strengths: string[];
+  weaknesses: string[];
+  love: string;
+  career: string;
+  compatibility: { slug: string; level: string; note: string }[];
+  faq: { q: string; a: string }[];
+};
+
+export type ChineseZodiacHubResult = {
+  title: string;
+  metaDescription: string;
+  intro: string;
+  faq: { q: string; a: string }[];
+};
+
+async function openrouterJson<T>(
+  system: string,
+  user: string,
+  title: string,
+  maxTokens = 4500
+): Promise<T | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": title,
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.85,
+      max_tokens: maxTokens,
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+  return JSON.parse(stripped) as T;
+}
+
+const CHINESE_SYSTEM = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი-რედაქტორი, ჩინური ასტროლოგიის (ჩინური ჰოროსკოპის, ე.წ. "ზოდიაქოს წლების მიხედვით") მცოდნე. წერ ერთი ჩინური ნიშნისთვის (ცხოველი) — კოლექტიური ხასიათით, რომელიც ეხება ამ ცხოველის წელს დაბადებულებს.
+
+ცოცხალი, კონკრეტული, ხელშესახები ქართული. არა ბუნდოვანი მისტიკა, არა კლიშეები. ხასიათი დააფუძნე ჩინური ასტროლოგიის რეალურ ცოდნაზე (ცხოველის ბუნება, ფიქსირებული ელემენტი, იან/ინ პოლარობა).
+
+დააბრუნე მხოლოდ ვალიდური JSON ამ სქემით:
+{
+  "pageTitle": string,          // SEO სათაური, ~50-65 სიმბოლო, შეიცავდეს ცხოველის სახელს და "ჩინური ჰოროსკოპი"
+  "metaDescription": string,    // ~140-160 სიმბოლო
+  "headline": string,           // მოკლე, მიმზიდველი ფრაზა ცხოველის შესახებ
+  "intro": string,              // 2-3 აბზაცი (\\n\\n) — შესავალი ცხოველის ბუნებაზე
+  "personality": string,        // 2-3 აბზაცი — დეტალური ხასიათი
+  "strengths": [string, ...],   // 5-6 ძლიერი მხარე (მოკლე)
+  "weaknesses": [string, ...],  // 4-5 სუსტი მხარე (მოკლე)
+  "love": string,               // აბზაცი სიყვარულსა და ურთიერთობებზე
+  "career": string,             // აბზაცი კარიერასა და ფულზე
+  "compatibility": [            // 4-6 სხვა ცხოველთან თავსებადობა
+    { "slug": string, "level": string, "note": string }   // slug მოცემული სიიდან; level "ძლიერი"|"ჰარმონიული"|"გამომწვევი"; note 1 წინადადება
+  ],
+  "faq": [ { "q": string, "a": string } ]   // 4 ხშირი კითხვა
+}
+
+წესები:
+- compatibility-ის slug-ები მხოლოდ მოცემული სიიდან
+- ქართულად, ნეიტრალური ტონით (ნიშანზეა, არა მკითხველზე)
+- კონკრეტული, განსხვავებული ფრაზები; აცილე ცარიელ ფრაზებს
+- მხოლოდ JSON, code fence-ის გარეშე`;
+
+export async function generateChineseZodiac(input: {
+  nameKa: string;
+  slug: string;
+  element: string;
+  polarity: string;
+  yearsText: string;
+  animals: { slug: string; nameKa: string }[];
+}): Promise<ChineseZodiacResult | null> {
+  const user = [
+    `ცხოველი: ${input.nameKa} (${input.slug})`,
+    `ფიქსირებული ელემენტი: ${input.element} · პოლარობა: ${input.polarity}`,
+    `დაბადების წლები: ${input.yearsText}`,
+    "",
+    "ცხოველების სია (გამოიყენე ეს slug-ები compatibility-ში):",
+    ...input.animals.map((a) => `- ${a.slug} = ${a.nameKa}`),
+    "",
+    `დაწერე ${input.nameKa}-ის ჩინური ჰოროსკოპის გვერდი. JSON-ად დააბრუნე.`,
+  ].join("\n");
+
+  const parsed = await openrouterJson<ChineseZodiacResult>(
+    CHINESE_SYSTEM,
+    user,
+    "Vivida chinese zodiac",
+    5000
+  );
+  if (!parsed) return null;
+  if (!parsed.pageTitle || !parsed.metaDescription || !parsed.intro) {
+    throw new Error("Chinese zodiac missing required fields");
+  }
+  const valid = new Set(input.animals.map((a) => a.slug));
+  return {
+    pageTitle: parsed.pageTitle,
+    metaDescription: parsed.metaDescription,
+    headline: parsed.headline ?? "",
+    intro: parsed.intro,
+    personality: parsed.personality ?? "",
+    strengths: Array.isArray(parsed.strengths) ? parsed.strengths.slice(0, 6) : [],
+    weaknesses: Array.isArray(parsed.weaknesses) ? parsed.weaknesses.slice(0, 5) : [],
+    love: parsed.love ?? "",
+    career: parsed.career ?? "",
+    compatibility: (Array.isArray(parsed.compatibility) ? parsed.compatibility : [])
+      .filter((c) => c && valid.has(c.slug))
+      .slice(0, 6),
+    faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 5) : [],
+  };
+}
+
+export async function generateChineseZodiacHub(input: {
+  animals: { slug: string; nameKa: string }[];
+}): Promise<ChineseZodiacHubResult | null> {
+  const system = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი-რედაქტორი. წერ ჩინური ჰოროსკოპის (ზოდიაქოს ნიშნები წლების მიხედვით) მთავარი გვერდის ტექსტს. ცოცხალი, კონკრეტული ქართული, კლიშეების გარეშე.
+
+დააბრუნე მხოლოდ ვალიდური JSON:
+{
+  "title": string,              // SEO სათაური, შეიცავდეს "ჩინური ჰოროსკოპი"
+  "metaDescription": string,    // ~140-160 სიმბოლო
+  "intro": string,              // 2-3 აბზაცი (\\n\\n) — რა არის ჩინური ჰოროსკოპი, 12-წლიანი ციკლი, როგორ მუშაობს
+  "faq": [ { "q": string, "a": string } ]   // 4 ხშირი კითხვა
+}
+მხოლოდ JSON, code fence-ის გარეშე.`;
+  const user = `ცხოველები: ${input.animals.map((a) => a.nameKa).join(", ")}. დაწერე ჩინური ჰოროსკოპის მთავარი გვერდის ტექსტი JSON-ად.`;
+
+  const parsed = await openrouterJson<ChineseZodiacHubResult>(
+    system,
+    user,
+    "Vivida chinese zodiac hub",
+    3000
+  );
+  if (!parsed) return null;
+  if (!parsed.title || !parsed.metaDescription || !parsed.intro) {
+    throw new Error("Chinese zodiac hub missing required fields");
+  }
+  return {
+    title: parsed.title,
+    metaDescription: parsed.metaDescription,
+    intro: parsed.intro,
+    faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 5) : [],
+  };
+}
+
+// ── Streaming chat (chart chat / "ჰკითხე ვარსკვლავებს") ─────────────────────
+export type ChatMessage = {
+  role: "system" | "user" | "assistant";
+  content: string;
+};
+
+/**
+ * Stream a chat completion token-by-token. Yields text deltas as they arrive
+ * (parses OpenRouter's SSE). Throws if the key is missing or the upstream errors.
+ */
+export async function* streamChatCompletion(
+  messages: ChatMessage[],
+  opts: { maxTokens?: number; temperature?: number } = {}
+): AsyncGenerator<string> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY is not configured");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida chart chat",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages,
+      stream: true,
+      temperature: opts.temperature ?? 0.85,
+      max_tokens: opts.maxTokens ?? 1000,
+    }),
+  });
+  if (!res.ok || !res.body) {
+    const t = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${t.slice(0, 200)}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    // keep the last (possibly partial) line in the buffer
+    buffer = lines.pop() ?? "";
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith("data:")) continue;
+      const data = trimmed.slice(5).trim();
+      if (data === "[DONE]") return;
+      try {
+        const json = JSON.parse(data) as {
+          choices?: Array<{ delta?: { content?: string } }>;
+        };
+        const delta = json.choices?.[0]?.delta?.content;
+        if (delta) yield delta;
+      } catch {
+        /* keep-alive / partial line — skip */
+      }
+    }
   }
 }

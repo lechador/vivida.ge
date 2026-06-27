@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Moon, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ReportPromo } from "@/components/report/report-promo";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -303,6 +304,8 @@ export default async function MoonCalendarPage() {
             გვაჩვენებს, რომელ შენს ცის სახლზე ხდება ეს ციკლი ახლა.
           </p>
         </section>
+
+        <ReportPromo className="mt-16" />
 
         {/* CTA */}
         <div className="mt-6 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">

@@ -13,6 +13,8 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { ChartSection } from "@/components/dashboard/chart-section";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
+import { ReportPdfPanel } from "@/components/report/report-pdf-panel";
+import { ProUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "ჩემი რუკა" };
 
@@ -58,11 +60,17 @@ export default async function ReportPage() {
           ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე.
         </p>
 
+        <div className="mb-10">
+          <Suspense fallback={null}>
+            <ReportPdfPanel userId={user.id} plan={plan} />
+          </Suspense>
+        </div>
+
         <Suspense fallback={<CosmicLoader embedded />}>
           <ChartSection userId={user.id} plan={plan} />
         </Suspense>
 
-        <div className="mt-14 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
+        <div className="mt-12 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">შენი დაბადების მონაცემები</h2>
             <Button asChild variant="ghost" size="sm">
@@ -101,6 +109,15 @@ export default async function ReportPage() {
             </details>
           )}
         </div>
+
+        {plan !== "pro" && (
+          <ProUpsell
+            compact
+            className="mt-10"
+            title="გინდა მეტი შენი რუკიდან?"
+            description="ესაუბრე AI ასტროლოგს, მოისმინე ჰოროსკოპი ხმით და მიიღე ღრმა ანალიზი — Vivida Pro-თი."
+          />
+        )}
       </section>
     </main>
   );

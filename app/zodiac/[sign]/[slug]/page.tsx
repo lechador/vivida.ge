@@ -79,6 +79,8 @@ const VIEW_TITLE_KA = {
   tomorrow: "ხვალინდელი ჰოროსკოპი",
   week: "ამ კვირის ჰოროსკოპი",
   month: "ამ თვის ჰოროსკოპი",
+  nextWeek: "მომავალი კვირის ჰოროსკოპი",
+  nextMonth: "მომავალი თვის ჰოროსკოპი",
 } as const;
 
 export async function generateMetadata({

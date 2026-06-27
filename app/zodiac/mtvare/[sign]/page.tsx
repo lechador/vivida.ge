@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Sparkles, Moon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ReportPromo } from "@/components/report/report-promo";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
@@ -307,6 +308,8 @@ export default async function MoonSignPage({
           </div>
         </section>
 
+        <ReportPromo className="mt-16" />
+
         {/* CTA */}
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
@@ -318,7 +321,7 @@ export default async function MoonSignPage({
             Vivida ერთ წუთში გითხრის.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/signup">გაიგე ჩემი მთვარე</Link>
+            <Link href="/nataluri-ruka">გაიგე ჩემი მთვარის ნიშანი</Link>
           </Button>
         </div>
 

@@ -41,8 +41,8 @@ export const PLANS: Record<PlanId, PlanDef> = {
     tagline: "შენი სრული, პერსონალური კოსმოსი — ყოველდღე, ყოველთვის.",
     ctaLabel: "გადადი Pro-ზე",
     price: {
-      month: 1290, // ₾12.90
-      year: 12900, // ₾129.00 (10 თვის ფასი — 2 თვე უფასოდ)
+      month: 1990, // ₾19.90
+      year: 19900, // ₾199.00 (10 თვის ფასი — 2 თვე უფასოდ)
     },
   },
 };
@@ -121,13 +121,44 @@ export const FEATURES: FeatureRow[] = [
     pro: "ულიმიტო",
   },
   {
-    label: "წლიური ნატალური ანგარიში (PDF)",
+    label: "ნატალური ანგარიში (PDF)",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "ჰოროსკოპის მოსმენა (აუდიო)",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "ჰკითხე ვარსკვლავებს — AI ასტროლოგი ჩატი",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "საუკეთესო დღეები — პერსონალური დროის კალენდარი",
+    free: false,
+    pro: true,
+  },
+  {
+    label: "ღრმა AI თავსებადობის ანგარიში",
     free: false,
     pro: true,
   },
 ];
 
-/** Format tetri as "₾12.90" */
+/** Curated Pro highlights for the subscription page (Georgian). */
+export const PRO_HIGHLIGHTS: string[] = [
+  "ჰკითხე ვარსკვლავებს — AI ასტროლოგი, რომელიც შენს რუკას იცნობს",
+  "ჰოროსკოპის მოსმენა ხმით (აუდიო)",
+  "საუკეთესო დღეები — პერსონალური დროის კალენდარი",
+  "ღრმა AI თავსებადობის ანგარიში ნებისმიერ ადამიანთან",
+  "სრული ნატალური რუკის AI ანალიზი — 12 სახლი, ასპექტები, ყველა პლანეტა",
+  "ყოველდღიური და კვირეული პერსონალური ჰოროსკოპი",
+  "ნატალური რუკის ანგარიში PDF-ში",
+];
+
+/** Format tetri as "₾19.90" */
 export function formatPrice(tetri: number): string {
   if (tetri === 0) return "უფასო";
   const lari = tetri / 100;

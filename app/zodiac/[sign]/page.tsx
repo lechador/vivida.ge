@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ReportPromo } from "@/components/report/report-promo";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
@@ -26,6 +27,7 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { signPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
+import { ELEMENT_COLOR } from "@/lib/pdf/theme";
 import { cn } from "@/lib/utils";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -48,6 +50,9 @@ export async function generateMetadata({
   const { sign } = await params;
   if (!isSlug(sign)) return {};
   const c = SIGNS_CONTENT[sign];
+  const meta = signMetaBySlug(sign);
+  const accent = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
+  const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(c.labelKa)}&k=${encodeURIComponent("ზოდიაქოს ნიშანი")}&a=${encodeURIComponent(accent)}`;
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
@@ -59,11 +64,13 @@ export async function generateMetadata({
       description: c.metaDescription,
       siteName: "Vivida",
       locale: "ka_GE",
+      images: [{ url: og, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: c.pageTitle,
       description: c.metaDescription,
+      images: [og],
     },
   };
 }
@@ -469,6 +476,8 @@ export default async function ZodiacSignPage({
           </div>
         </section>
 
+        <ReportPromo className="mt-16" />
+
         {/* CTA */}
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
@@ -480,7 +489,7 @@ export default async function ZodiacSignPage({
             Vivida უფასოდ ქმნის პერსონალურ ინტერპრეტაციას.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/signup">ჩემი სრული რუკა</Link>
+            <Link href="/nataluri-ruka">ჩემი სრული რუკა</Link>
           </Button>
         </div>
 

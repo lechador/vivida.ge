@@ -203,7 +203,7 @@ export default function ZodiacByDatePage() {
             ))}
           </div>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/signup">
+            <Link href="/nataluri-ruka">
               <Sparkles className="size-4" />
               დაიწყე სრული რუკით
             </Link>

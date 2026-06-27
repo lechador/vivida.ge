@@ -11,13 +11,16 @@ import { ensureChartFor } from "@/actions/chart";
 
 import { AspectCards } from "./aspect-cards";
 import { BigThreeCard } from "./big-three-card";
-import { ChartWheel } from "./chart-wheel";
+import { ChartWheelZoom } from "@/components/report/chart-wheel-zoom";
 import { ElementsCard } from "./elements-card";
 import { HouseCards } from "./house-cards";
 import { PlanetCards } from "./planet-cards";
 import { CollapsibleSection } from "@/components/report/collapsible-section";
 import { ReportNav } from "@/components/report/report-nav";
-import { QuickStats } from "@/components/report/quick-stats";
+import {
+  PositionsTable,
+  HousesTable,
+} from "@/components/report/positions-table";
 import type { PlanId } from "@/lib/pricing";
 import { signByIndex } from "@/lib/zodiac";
 
@@ -51,13 +54,8 @@ export async function ChartSection({
 
   return (
     <div>
-      {/* Quick stats — clickable, opens modals */}
-      <QuickStats chart={data} interpretations={interp ?? undefined} />
-
       {/* Sticky in-page navigation with scroll-spy */}
-      <div className="mt-8">
-        <ReportNav />
-      </div>
+      <ReportNav />
 
       <div className="mt-10 space-y-10">
         {/* SECTION 01 — Chart wheel hero (always expanded) */}
@@ -79,35 +77,46 @@ export async function ChartSection({
                   ცა ზუსტად შენი დაბადების წამში. ამომავალი ნიშანი{" "}
                   {ascSign.labelKa}-შია.
                 </p>
-                <div className="mt-5 flex flex-wrap gap-2 text-xs">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.78_0.18_200/0.4)] bg-[oklch(0.78_0.18_200/0.1)] px-2.5 py-1 text-foreground/85">
-                    <span aria-hidden>✨</span>
-                    ჰარმონიული ბმები
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.72_0.22_350/0.4)] bg-[oklch(0.72_0.22_350/0.1)] px-2.5 py-1 text-foreground/85">
-                    <span aria-hidden>⚡</span>
-                    დაძაბული ბმები
-                  </span>
-                </div>
               </div>
               <div className="order-1 mx-auto w-full max-w-[480px] sm:order-2">
-                <ChartWheel chart={data} />
+                <ChartWheelZoom chart={data} />
               </div>
             </div>
           </article>
+        </section>
+
+        {/* Positions + houses — the scannable, clickable data layer. Planet
+            rows jump to their interpretation in-page; signs link to /zodiac. */}
+        <section id="positions" className="scroll-mt-16 sm:scroll-mt-24">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start">
+            <div>
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                პოზიციები
+              </h2>
+              <PositionsTable chart={data} />
+            </div>
+            <div>
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                სახლები
+              </h2>
+              <div className="rounded-2xl border border-border bg-card/50 px-4 py-1 ring-1 ring-foreground/5 backdrop-blur-xl sm:px-5">
+                <HousesTable chart={data} />
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* AI summary — inline, between sections */}
         {interp?.summary && (
           <article
             id="summary"
-            className="scroll-mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:scroll-mt-24 sm:p-6"
+            className="scroll-mt-16 rounded-2xl border border-border bg-card/50 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:scroll-mt-24"
           >
-            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)]">
-              <Sparkles className="size-4" aria-hidden />
-              <span>შენი რუკის შესახებ</span>
+            <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-[var(--vivida-violet)]">
+              <Sparkles className="size-3.5" aria-hidden />
+              შენი რუკის შესახებ
             </div>
-            <p className="text-lg leading-relaxed text-foreground/90">
+            <p className="text-sm leading-relaxed text-foreground/85">
               {interp.summary}
             </p>
           </article>
@@ -121,7 +130,7 @@ export async function ChartSection({
           subtitle="მზე, მთვარე და ამომავალი — შენი ბირთვი"
           defaultOpen
         >
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
             {sun && (
               <BigThreeCard
                 kind="sun"
@@ -162,20 +171,21 @@ export async function ChartSection({
             icon={<Lightbulb className="size-5" />}
             title="რა ვამჩნევთ შენს რუკაში"
             subtitle="ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"
+            defaultOpen
           >
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
               {interp.highlights.map((h, i) => (
-                <article
+                <div
                   key={i}
-                  className="group rounded-2xl border border-border bg-card/60 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/75 hover:ring-foreground/15"
+                  className="border-t border-border/50 px-4 py-3.5 first:border-t-0 sm:px-5"
                 >
-                  <h3 className="mb-2 text-base font-semibold tracking-tight text-[var(--vivida-cyan)]">
+                  <h3 className="mb-1 text-sm font-semibold tracking-tight text-[var(--vivida-cyan)]">
                     {h.title}
                   </h3>
-                  <p className="text-base leading-relaxed text-foreground/85">
+                  <p className="text-sm leading-relaxed text-foreground/85">
                     {h.body}
                   </p>
-                </article>
+                </div>
               ))}
             </div>
           </CollapsibleSection>
@@ -187,6 +197,7 @@ export async function ChartSection({
           icon={<Globe2 className="size-5" />}
           title="პლანეტები"
           subtitle="რვა პლანეტა, რვა ხასიათი — ერთად შენ ხარ"
+          defaultOpen
         >
           <PlanetCards chart={data} interpretations={interp?.planets} />
         </CollapsibleSection>
@@ -197,6 +208,7 @@ export async function ChartSection({
           icon={<Home className="size-5" />}
           title="ცხოვრების 12 სფერო"
           subtitle="სად რა ენერგია ვლინდება შენს ცხოვრებაში"
+          defaultOpen
         >
           <HouseCards chart={data} interpretations={interp?.houses} />
         </CollapsibleSection>
@@ -207,6 +219,7 @@ export async function ChartSection({
           icon={<Triangle className="size-5" />}
           title="ასპექტები"
           subtitle="როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
+          defaultOpen
         >
           <AspectCards chart={data} interpretations={interp?.aspects} />
         </CollapsibleSection>

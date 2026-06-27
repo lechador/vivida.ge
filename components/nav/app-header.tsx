@@ -31,12 +31,15 @@ export async function AppHeader({
   active?:
     | "today"
     | "report"
+    | "ask"
+    | "timing"
     | "feed"
     | "discover"
     | "synastry"
     | "friends"
     | "messages"
-    | "account";
+    | "account"
+    | "pro";
 }) {
   let userInfo: {
     id: string;

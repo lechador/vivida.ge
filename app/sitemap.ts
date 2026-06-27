@@ -10,6 +10,8 @@ import {
   yearlyContentFor,
 } from "@/lib/seo/zodiac-content";
 import { ALL_HOROSCOPE_VIEWS, VIEW_PATH } from "@/lib/sign-horoscope";
+import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
+import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -29,6 +31,8 @@ const VIEW_CHANGE_FREQ: Record<
   tomorrow: "daily",
   week: "weekly",
   month: "monthly",
+  nextWeek: "weekly",
+  nextMonth: "monthly",
 };
 
 const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
@@ -36,6 +40,8 @@ const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
   tomorrow: 0.8,
   week: 0.85,
   month: 0.85,
+  nextWeek: 0.75,
+  nextMonth: 0.75,
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -100,6 +106,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
       }))
   );
 
+  // Trait-ranking listicles ("ყველაზე ჭკვიანი / ეჭვიანი … ნიშნები").
+  const rankingPages: MetadataRoute.Sitemap = ALL_RANKING_SLUGS.map((slug) => ({
+    url: `${BASE}/zodiac/reitingebi/${slug}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  // Chinese zodiac ("ზოდიაქოს ნიშნები წლების მიხედვით").
+  const chinesePages: MetadataRoute.Sitemap = ALL_CHINESE_SLUGS.map((slug) => ({
+    url: `${BASE}/chinuri-horoskopi/${slug}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   return [
     {
       url: `${BASE}/`,
@@ -108,10 +130,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
+      url: `${BASE}/nataluri-ruka`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.95,
+    },
+    {
+      url: `${BASE}/chinuri-horoskopi`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
       url: `${BASE}/horoskopi`,
       lastModified: NOW,
       changeFrequency: "daily",
       priority: 0.95,
+    },
+    {
+      url: `${BASE}/horoskopi/kvireuli`,
+      lastModified: NOW,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE}/horoskopi/tviuri`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.85,
     },
     {
       url: `${BASE}/mtvaris-kalendari`,
@@ -173,7 +219,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.85,
     },
+    {
+      url: `${BASE}/zodiac/reitingebi`,
+      lastModified: NOW,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
     ...zodiacSignPages,
+    ...rankingPages,
+    ...chinesePages,
     ...elementPages,
     ...pairPages,
     ...moonPages,

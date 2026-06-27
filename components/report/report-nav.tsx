@@ -7,6 +7,7 @@ import {
   Flame,
   Globe2,
   Home,
+  LayoutList,
   Sparkles,
   Triangle,
 } from "lucide-react";
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 type SectionId =
   | "wheel"
+  | "positions"
   | "big-three"
   | "elements"
   | "planets"
@@ -32,6 +34,7 @@ type Section = {
 
 const SECTIONS: Section[] = [
   { id: "wheel", label: "რუკა", Icon: Compass, hue: "oklch(0.78 0.18 305)" },
+  { id: "positions", label: "პოზიციები", Icon: LayoutList, hue: "oklch(0.78 0.16 250)" },
   { id: "big-three", label: "დიდი სამეული", Icon: Sparkles, hue: "oklch(0.85 0.16 85)" },
   { id: "elements", label: "ელემენტები", Icon: Flame, hue: "oklch(0.72 0.22 25)" },
   { id: "planets", label: "პლანეტები", Icon: Globe2, hue: "oklch(0.78 0.15 195)" },

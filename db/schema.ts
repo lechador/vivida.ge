@@ -47,6 +47,9 @@ export const users = pgTable("user", {
     .default(true),
   emailMarketing: boolean("email_marketing").notNull().default(true),
   emailNudges: boolean("email_nudges").notNull().default(true),
+  /** Preferred voice slug for audio horoscopes (see lib/elevenlabs HOROSCOPE_VOICES).
+   *  NULL → the default voice. Set on first listen / in account settings. */
+  horoscopeVoice: text("horoscope_voice"),
   /** Random opaque token used in unsubscribe links. Lazily populated on
    *  first send — see lib/unsubscribe.ts. Unique so a token resolves to
    *  at most one user. */
@@ -281,6 +284,10 @@ export const subscriptions = pgTable("subscription", {
   flittOrderId: text("flitt_order_id"),
   flittSubscriptionId: text("flitt_subscription_id"),
   flittCustomerId: text("flitt_customer_id"),
+  // Stripe references (recurring subscription). Customer id is reused for the
+  // billing portal (saved cards / cancel).
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -313,6 +320,61 @@ export const payments = pgTable("payment", {
     .defaultNow()
     .notNull(),
 });
+
+/**
+ * One-time, paid, downloadable PDF reports (natal / synastry / forecast).
+ * Lifecycle: pending → paid → generating → ready (or failed). Pro users
+ * skip payment and land directly on 'paid'. The PDF lives privately in R2;
+ * `pdfKey` is the object key and we serve it via short-lived signed URLs.
+ */
+export const pdfReportStatusEnum = pgEnum("pdf_report_status", [
+  "pending", // checkout started, awaiting Stripe payment
+  "paid", // payment confirmed (or Pro-comped) — generation queued
+  "generating", // worker is producing the PDF
+  "ready", // PDF stored in R2, downloadable
+  "failed", // generation errored — retryable
+]);
+
+export const pdfReports = pgTable(
+  "pdf_report",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** 'natal' | 'synastry' | 'forecast' — natal is the only one shipped today. */
+    type: text("type").notNull().default("natal"),
+    status: pdfReportStatusEnum("status").notNull().default("pending"),
+    /** chart input hash captured at purchase, so we can flag a stale report
+     *  if the user later changes their birth data. */
+    inputHash: text("input_hash"),
+    amountCents: integer("amount_cents").notNull().default(0),
+    currency: text("currency").notNull().default("GEL"),
+    /** true when comped to a Pro subscriber (no Stripe charge). */
+    comped: boolean("comped").notNull().default(false),
+    stripeSessionId: text("stripe_session_id").unique(),
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+    /** R2 object key once generated. */
+    pdfKey: text("pdf_key"),
+    /** last generation error, for support/retry. */
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    readyAt: timestamp("ready_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("pdf_report_user_created_idx").on(t.userId, t.createdAt),
+    index("pdf_report_status_idx").on(t.status),
+  ]
+);
+
+export type PdfReport = typeof pdfReports.$inferSelect;
+export type NewPdfReport = typeof pdfReports.$inferInsert;
+export type PdfReportStatus = (typeof pdfReportStatusEnum.enumValues)[number];
 
 /**
  * Direct messages between two users. We don't model "conversations"
@@ -729,6 +791,105 @@ export const signHoroscopes = pgTable(
 );
 
 /**
+ * Evergreen "ranking" listicles ("ყველაზე ჭკვიანი / ეჭვიანი … ნიშნები").
+ * One row per topic — all 12 signs ranked by a trait. Generated on-demand
+ * by the SEO page and cached; `promptVersion` invalidates after a prompt
+ * change. `items` is the ordered ranking.
+ */
+export type SignRankingItem = {
+  /** zodiac slug — see ALL_SLUGS */
+  slug: string;
+  /** 1 = most, 12 = least */
+  rank: number;
+  blurb: string;
+};
+
+export const signRankings = pgTable("sign_ranking", {
+  /** topic slug — see RANKING_TOPICS in lib/seo/rankings */
+  topic: text("topic").primaryKey(),
+  headline: text("headline").notNull(),
+  intro: text("intro").notNull(),
+  items: jsonb("items").$type<SignRankingItem[]>().notNull(),
+  faq: jsonb("faq").$type<{ q: string; a: string }[]>().notNull().default([]),
+  promptVersion: integer("prompt_version").notNull().default(1),
+  model: text("model").notNull(),
+  language: text("language").notNull().default("ka"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type SignRanking = typeof signRankings.$inferSelect;
+
+/**
+ * Chinese-zodiac page content (ჩინური ჰოროსკოპი). One row per animal slug
+ * (plus a reserved "_hub" row for the hub intro/FAQ). Creative Georgian prose
+ * is generated by Gemini on demand and cached here; `promptVersion` invalidates
+ * after a prompt change. Factual data (names, years, elements) lives in
+ * lib/seo/chinese-zodiac, not here.
+ */
+export type ChineseCompatItem = {
+  /** animal slug — see ALL_CHINESE_SLUGS */
+  slug: string;
+  /** "ძლიერი" | "ჰარმონიული" | "გამომწვევი" */
+  level: string;
+  note: string;
+};
+
+export const chineseZodiac = pgTable("chinese_zodiac", {
+  /** animal slug, or "_hub" for the hub page */
+  animal: text("animal").primaryKey(),
+  pageTitle: text("page_title").notNull(),
+  metaDescription: text("meta_description").notNull(),
+  headline: text("headline").notNull().default(""),
+  intro: text("intro").notNull(),
+  personality: text("personality").notNull().default(""),
+  strengths: jsonb("strengths").$type<string[]>().notNull().default([]),
+  weaknesses: jsonb("weaknesses").$type<string[]>().notNull().default([]),
+  love: text("love").notNull().default(""),
+  career: text("career").notNull().default(""),
+  compatibility: jsonb("compatibility")
+    .$type<ChineseCompatItem[]>()
+    .notNull()
+    .default([]),
+  faq: jsonb("faq").$type<{ q: string; a: string }[]>().notNull().default([]),
+  promptVersion: integer("prompt_version").notNull().default(1),
+  model: text("model").notNull(),
+  language: text("language").notNull().default("ka"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type ChineseZodiac = typeof chineseZodiac.$inferSelect;
+
+/**
+ * "Chat with your chart" (ჰკითხე ვარსკვლავებს) — one ongoing thread per user.
+ * Each row is a turn; `role` is 'user' | 'assistant'. The AI is grounded in
+ * the user's natal chart at request time (not stored per message).
+ */
+export const chartChatMessages = pgTable(
+  "chart_chat_message",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** 'user' | 'assistant' */
+    role: text("role").notNull(),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("chart_chat_user_created_idx").on(t.userId, t.createdAt)]
+);
+
+export type ChartChatMessage = typeof chartChatMessages.$inferSelect;
+
+/**
  * 7-day forecast for the dashboard, one row per user. The same row is
  * overwritten each new local-day — we never need a history of forecasts.
  * Each entry in `days` is a (computed scores + AI narrative) pair for one
@@ -811,6 +972,12 @@ export const partners = pgTable(
     aiViewerHash: text("ai_viewer_hash"),
     aiModel: text("ai_model"),
     aiGeneratedAt: timestamp("ai_generated_at", { withTimezone: true }),
+    /** Cached DEEP AI synastry report (multi-section, on-demand). Same viewer-
+     *  hash invalidation as the short interp. */
+    deepReport: jsonb("deep_report").$type<SynastryDeepReportJson | null>(),
+    deepViewerHash: text("deep_viewer_hash"),
+    deepModel: text("deep_model"),
+    deepGeneratedAt: timestamp("deep_generated_at", { withTimezone: true }),
     /** Soft delete. NULL = active, set = hidden from UI but still counts
      *  toward the monthly creation cap. */
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
@@ -831,6 +998,24 @@ export type SynastryInterpretationJson = {
   strengths: string[];
   /** Where the friction lives, 1-3 short bullets. */
   growth: string[];
+};
+
+/** Deep, long-form AI synastry report (the "Connect" pillar premium read). */
+export type SynastryDeepReportJson = {
+  /** Multi-paragraph overall portrait. */
+  intro: string;
+  /** Love & romance. */
+  love: string;
+  /** Communication & mental connection. */
+  communication: string;
+  /** Friendship, trust & emotional safety. */
+  trust: string;
+  /** Friction & growth — where it's hard and what it teaches. */
+  friction: string;
+  /** Long-term potential. */
+  longTerm: string;
+  /** 3-5 concrete pieces of advice. */
+  advice: string[];
 };
 
 /**

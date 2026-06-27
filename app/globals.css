@@ -254,6 +254,12 @@
   40%           { transform: translateY(-3px); opacity: 1;    }
 }
 
+/* Equalizer bars for the audio-horoscope player while it's playing. */
+@keyframes vivida-eq {
+  0%, 100% { transform: scaleY(0.35); }
+  50%      { transform: scaleY(1);    }
+}
+
 /*
  * Continuous rotation + soft pulse for the cosmic loader. Pulled out of
  * Framer Motion so the animation runs purely on the compositor (no React

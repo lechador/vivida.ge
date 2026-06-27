@@ -10,9 +10,12 @@ import {
   getPartnerForViewer,
 } from "@/lib/partners-core";
 import { computeSynastry } from "@/lib/synastry";
+import { canUseFeature } from "@/lib/features";
+import { SYNASTRY_DEEP_PROMPT_VERSION } from "@/lib/openrouter";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
+import { SynastryDeepReport } from "@/components/synastry/synastry-deep-report";
 
 export const metadata = { title: "თავსებადობა" };
 
@@ -48,6 +51,14 @@ export default async function SynastryDetailPage({
   // the Gemini call, subsequent visits read the cached row).
   const partnerWithAi = await ensureSynastryInterpretation(partner, plan);
   const ai = partnerWithAi.aiInterpretation;
+
+  // Deep report is cached on the partner row; show it if it's fresh for this
+  // viewer + prompt version, otherwise the component offers to generate it.
+  const deepStamp = `${viewerChart.inputHash}:v${SYNASTRY_DEEP_PROMPT_VERSION}`;
+  const initialDeep =
+    partnerWithAi.deepReport && partnerWithAi.deepViewerHash === deepStamp
+      ? partnerWithAi.deepReport
+      : null;
 
   const viewerName = user.name?.split(" ")[0] ?? null;
 
@@ -134,6 +145,13 @@ export default async function SynastryDetailPage({
         )}
 
         <SynastryDisplayLazy result={synastry} partnerName={partner.name} />
+
+        <SynastryDeepReport
+          partnerId={partner.id}
+          partnerName={partner.name}
+          initial={initialDeep}
+          canUse={canUseFeature("deepSynastry", plan)}
+        />
       </section>
     </main>
   );
