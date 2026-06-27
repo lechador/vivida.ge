@@ -73,7 +73,11 @@ export function DailyDashboard({
   }
 
   if (!core || core.kind === "no-chart") {
-    return <CosmicLoader embedded progressive />;
+    return (
+      <div className="flex min-h-[65vh] items-center justify-center">
+        <CosmicLoader embedded progressive />
+      </div>
+    );
   }
 
   const { chart, timezone, canDaily, canWeekly, suggestions } = core;

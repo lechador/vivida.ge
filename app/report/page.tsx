@@ -66,7 +66,13 @@ export default async function ReportPage() {
           </Suspense>
         </div>
 
-        <Suspense fallback={<CosmicLoader embedded />}>
+        <Suspense
+          fallback={
+            <div className="flex min-h-[65vh] items-center justify-center">
+              <CosmicLoader embedded />
+            </div>
+          }
+        >
           <ChartSection userId={user.id} plan={plan} />
         </Suspense>
 
