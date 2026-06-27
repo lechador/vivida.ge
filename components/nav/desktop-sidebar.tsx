@@ -3,8 +3,9 @@ import { MessageCircle } from "lucide-react";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { cn } from "@/lib/utils";
+import type { PlanId } from "@/lib/pricing";
 import { MessagesTabBadge } from "./messages-tab-badge";
-import { NAV_ITEMS, type NavActiveKey, type NavItem } from "./nav-items";
+import { NAV_ITEMS, navLabel, type NavActiveKey, type NavItem } from "./nav-items";
 
 /**
  * Desktop-only left sidebar. Shows on lg+ as a sticky vertical nav, with
@@ -19,9 +20,11 @@ import { NAV_ITEMS, type NavActiveKey, type NavItem } from "./nav-items";
  */
 export function DesktopSidebar({
   active,
+  plan,
   unreadMessages = 0,
 }: {
   active?: NavActiveKey;
+  plan: PlanId;
   unreadMessages?: number;
 }) {
   // Sidebar shows the full primary nav. Messages goes alongside friends —
@@ -102,7 +105,7 @@ export function DesktopSidebar({
                     <MessagesTabBadge initial={unreadMessages} />
                   )}
                 </span>
-                <span className="truncate">{item.label}</span>
+                <span className="truncate">{navLabel(item, plan)}</span>
                 {isActive && (
                   <span
                     aria-hidden

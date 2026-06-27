@@ -8,13 +8,20 @@ import { Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { NAV_ITEMS, type NavActiveKey } from "./nav-items";
+import type { PlanId } from "@/lib/pricing";
+import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
 
 /**
  * Mobile-only slide-in nav drawer. The desktop NavLinks is `hidden lg:flex`,
  * so phones/tablets need a hamburger entry point. Renders nothing above lg.
  */
-export function MobileNav({ active }: { active?: NavActiveKey }) {
+export function MobileNav({
+  active,
+  plan,
+}: {
+  active?: NavActiveKey;
+  plan: PlanId;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -137,7 +144,7 @@ export function MobileNav({ active }: { active?: NavActiveKey }) {
                               : undefined
                           }
                         />
-                        <span className="relative z-10">{item.label}</span>
+                        <span className="relative z-10">{navLabel(item, plan)}</span>
                       </Link>
                     );
                   })}

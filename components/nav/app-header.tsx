@@ -76,7 +76,9 @@ export async function AppHeader({
     <>
     <header className="relative z-30 mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-4 sm:gap-5 sm:px-6 sm:py-5">
       {/* Mobile hamburger — authed users only (guests don't have nav). */}
-      {userInfo && <MobileNav active={active as NavActiveKey | undefined} />}
+      {userInfo && (
+        <MobileNav active={active as NavActiveKey | undefined} plan={plan} />
+      )}
 
       <Link
         href={userInfo ? "/feed" : "/"}
@@ -145,6 +147,7 @@ export async function AppHeader({
         />
         <DesktopSidebar
           active={active as NavActiveKey | undefined}
+          plan={plan}
           unreadMessages={unreadMessages}
         />
       </>

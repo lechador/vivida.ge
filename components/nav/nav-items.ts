@@ -13,6 +13,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import { SOCIAL_FEATURES, type SocialFeature } from "@/lib/social-flags";
+import type { PlanId } from "@/lib/pricing";
 
 export type NavActiveKey =
   | "today"
@@ -47,6 +48,16 @@ const NAV_FEATURE_GATE: Partial<Record<NavActiveKey, SocialFeature>> = {
 function navVisible(item: NavItem): boolean {
   const gate = NAV_FEATURE_GATE[item.key];
   return !gate || SOCIAL_FEATURES[gate];
+}
+
+/**
+ * Label for the "pro" nav entry. Members — including those on the free
+ * trial (getCurrentPlan returns "pro" while trialing) — see their active
+ * membership ("Vivida Pro"); free users see the plain upsell label.
+ */
+export function navLabel(item: NavItem, plan: PlanId): string {
+  if (item.key === "pro" && plan === "pro") return "Vivida Pro";
+  return item.label;
 }
 
 const ALL_NAV_ITEMS: NavItem[] = [
