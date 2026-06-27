@@ -158,7 +158,7 @@ export const PRO_HIGHLIGHTS: string[] = [
   "ნატალური რუკის ანგარიში PDF-ში",
 ];
 
-/** Format tetri as "₾12.90" */
+/** Format tetri as "₾19.90" */
 export function formatPrice(tetri: number): string {
   if (tetri === 0) return "უფასო";
   const lari = tetri / 100;
