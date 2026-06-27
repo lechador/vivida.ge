@@ -3,6 +3,11 @@ import { bodyMeta, formatDegree, signByIndex } from "@/lib/zodiac";
 import { houseDef, HOUSE_NUMBERS } from "@/lib/houses";
 import { aspectKey } from "@/lib/aspects";
 import type { ChartSalience } from "@/lib/report-salience";
+import {
+  getLibraryEntries,
+  libraryKey,
+  placementsForChart,
+} from "@/lib/interpretation-library";
 
 /**
  * Long-form report content — generated SPECIFICALLY for the premium PDF, not
@@ -250,20 +255,41 @@ export async function generateNatalReport(input: {
   chart: NatalChartJson;
   salience: ChartSalience;
 }): Promise<NatalReportContent> {
+  const { chart } = input;
+
+  // The per-placement (Big Three + planet) section reuses the shared
+  // interpretation library — the same text the website report shows — so the
+  // PDF reads consistently and, when the library covers every placement, we
+  // skip the heavy per-PDF planets AI call entirely (faster). Falls back to
+  // on-the-fly generation if the library isn't seeded.
+  const placements = placementsForChart(chart);
+  const lib = await getLibraryEntries(
+    placements.map((p) => libraryKey(p.subject, p.sign))
+  ).catch(() => new Map<string, string>());
+  const libPlanets: Record<string, string> = {};
+  for (const p of placements) {
+    const body = lib.get(libraryKey(p.subject, p.sign));
+    if (body) libPlanets[p.subject] = body;
+  }
+  const planetsComplete =
+    placements.length > 0 && placements.every((p) => libPlanets[p.subject]);
+
   const [narrative, planets, houses, aspects] = await Promise.all([
     generateNarrative(input).catch((e) => {
       console.warn("[report] narrative failed:", (e as Error).message);
       return null;
     }),
-    generatePlanets(input.chart).catch((e) => {
-      console.warn("[report] planets failed:", (e as Error).message);
-      return null;
-    }),
-    generateHouses(input.chart).catch((e) => {
+    planetsComplete
+      ? Promise.resolve(libPlanets)
+      : generatePlanets(chart).catch((e) => {
+          console.warn("[report] planets failed:", (e as Error).message);
+          return Object.keys(libPlanets).length ? libPlanets : null;
+        }),
+    generateHouses(chart).catch((e) => {
       console.warn("[report] houses failed:", (e as Error).message);
       return null;
     }),
-    generateAspects(input.chart, input.salience).catch((e) => {
+    generateAspects(chart, input.salience).catch((e) => {
       console.warn("[report] aspects failed:", (e as Error).message);
       return null;
     }),
