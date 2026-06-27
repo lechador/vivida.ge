@@ -15,6 +15,9 @@ import { AppHeader } from "@/components/nav/app-header";
 import { DangerZone } from "@/components/account/danger-zone";
 import { VisibilityCard } from "@/components/account/visibility-card";
 import { PhotoUploader } from "@/components/account/photo-uploader";
+import { AiAvatarGenerator } from "@/components/account/ai-avatar-generator";
+import { ProUpsell } from "@/components/paywall/pro-upsell";
+import { canUseFeature } from "@/lib/features";
 import { EmailPreferencesCard } from "@/components/account/email-preferences-card";
 import { HoroscopeVoiceCard } from "@/components/account/horoscope-voice-card";
 
@@ -106,6 +109,18 @@ export default async function AccountPage() {
               ready: p.ready,
             }))}
           />
+        </div>
+
+        {/* AI zodiac avatar — Pro (trial counts as pro); free users see an upsell */}
+        <div className="mb-6">
+          {canUseFeature("aiAvatar", plan) ? (
+            <AiAvatarGenerator initialAvatar={accountAvatar} />
+          ) : (
+            <ProUpsell
+              title="AI ავატარი"
+              description="შექმენი შენი ზოდიაქოს ნიშნის პერსონალური ავატარი Vivida-ს სტილში — Vivida Pro-ით."
+            />
+          )}
         </div>
 
         {/* Subscription */}

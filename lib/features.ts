@@ -26,7 +26,8 @@ export type Feature =
   | "chartChat"        // Ask — AI astrologer chat
   | "timing"           // Know-when — best-days timing calendar
   | "deepSynastry"     // Connect — deep AI compatibility report
-  | "natalReport";     // Downloadable deep natal PDF report (now Pro-included)
+  | "natalReport"      // Downloadable deep natal PDF report (now Pro-included)
+  | "aiAvatar";        // AI-generated zodiac avatar (brand-styled)
 
 const REQUIRES_PRO: Record<Feature, boolean> = {
   // Still free during the launch phase — flip to true to gate.
@@ -46,6 +47,7 @@ const REQUIRES_PRO: Record<Feature, boolean> = {
   timing:          true,
   deepSynastry:    true,
   natalReport:     true,
+  aiAvatar:        true,
 };
 
 export function requiresPro(feature: Feature): boolean {
