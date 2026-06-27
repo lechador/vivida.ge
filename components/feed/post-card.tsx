@@ -53,18 +53,34 @@ export function PostCard({
   post,
   viewerId,
   viewerIsAdmin,
+  mode = "feed",
 }: {
   post: FeedPost;
   viewerId: string;
   viewerIsAdmin: boolean;
+  /** "feed": whole card opens the thread; comments live on the detail page.
+   *  "detail": the thread page — comments shown + replyable inline. */
+  mode?: "feed" | "detail";
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(post.body);
   const [editError, setEditError] = useState<string | null>(null);
-  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(mode === "detail");
   const [reportOpen, setReportOpen] = useState(false);
+
+  // Threads/X-style: clicking anywhere on the card (except a link, button,
+  // input, or while selecting text) opens the post's thread page.
+  function onCardClick(e: React.MouseEvent<HTMLElement>) {
+    if (mode !== "feed" || editing) return;
+    const el = e.target as HTMLElement;
+    if (el.closest('a,button,textarea,input,[role="menuitem"],[data-no-nav]')) {
+      return;
+    }
+    if (window.getSelection()?.toString()) return;
+    router.push(`/feed/${post.id}`);
+  }
 
   const isOwner = post.author.id === viewerId;
   const canDelete = isOwner || viewerIsAdmin;
@@ -130,7 +146,11 @@ export function PostCard({
   return (
     <article
       id={`post-${post.id}`}
-      className="rounded-2xl border border-foreground/12 bg-[oklch(0.23_0.04_285/0.88)] p-4 shadow-[0_16px_40px_-24px_oklch(0.05_0.05_280/0.85)] ring-1 ring-inset ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-[oklch(0.25_0.04_285/0.92)] sm:p-5"
+      onClick={onCardClick}
+      className={cn(
+        "rounded-2xl border border-foreground/12 bg-[oklch(0.23_0.04_285/0.88)] p-4 shadow-[0_16px_40px_-24px_oklch(0.05_0.05_280/0.85)] ring-1 ring-inset ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-[oklch(0.25_0.04_285/0.92)] sm:p-5",
+        mode === "feed" && "cursor-pointer"
+      )}
     >
       <header className="flex items-start gap-3">
         {profileHref ? (
@@ -306,16 +326,22 @@ export function PostCard({
         initialCounts={post.reactions}
         initialMine={post.myReaction}
         commentCount={post.commentCount}
-        onToggleComments={() => setCommentsOpen((o) => !o)}
+        onToggleComments={
+          mode === "detail"
+            ? () => setCommentsOpen((o) => !o)
+            : () => router.push(`/feed/${post.id}`)
+        }
       />
 
-      <CommentSection
-        postId={post.id}
-        viewerId={viewerId}
-        viewerIsAdmin={viewerIsAdmin}
-        postAuthorId={post.author.id}
-        open={commentsOpen}
-      />
+      {mode === "detail" && (
+        <CommentSection
+          postId={post.id}
+          viewerId={viewerId}
+          viewerIsAdmin={viewerIsAdmin}
+          postAuthorId={post.author.id}
+          open={commentsOpen}
+        />
+      )}
     </article>
   );
 }

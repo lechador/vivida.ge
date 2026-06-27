@@ -127,7 +127,7 @@ export function PostActions({
 
   // ── Share ──────────────────────────────────────────────────────────
   async function onShareClick() {
-    const url = `${window.location.origin}/feed#post-${postId}`;
+    const url = `${window.location.origin}/feed/${postId}`;
     try {
       if (navigator.share) {
         await navigator.share({ url });
