@@ -80,9 +80,10 @@ export function ChartChat({
   const empty = messages.length === 0;
 
   return (
-    <div className="flex flex-col">
-      {/* Messages */}
-      <div className="min-h-[40vh] space-y-4">
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* Messages — the only scrolling region, so the header and composer
+          stay put no matter how long the answer gets. */}
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
         {empty && (
           <div className="rounded-2xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
             <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
@@ -127,16 +128,16 @@ export function ChartChat({
       </div>
 
       {error && (
-        <p className="mt-3 text-sm text-[var(--vivida-pink)]">{error}</p>
+        <p className="mt-3 shrink-0 text-sm text-[var(--vivida-pink)]">{error}</p>
       )}
 
-      {/* Composer */}
+      {/* Composer — pinned at the bottom of the chat panel */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           send(input);
         }}
-        className="sticky bottom-4 mt-5"
+        className="mt-4 shrink-0"
       >
         <div className="flex items-end gap-2 rounded-2xl border border-border bg-card/80 p-2 shadow-xl ring-1 ring-foreground/5 backdrop-blur-xl">
           <textarea
