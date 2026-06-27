@@ -102,7 +102,11 @@ export async function enforceAuthRateLimit(opts: {
  */
 export async function pruneRateLimits(): Promise<void> {
   try {
-    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    // 31 days so long-window counters survive their full window before being
+    // pruned — e.g. the AI-avatar monthly cap is a 30-day fixed window, and a
+    // 24h cutoff would reset it daily. Short-window buckets are unaffected;
+    // their stale rows just linger a little longer before cleanup.
+    const cutoff = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000);
     await db.delete(rateLimitHits).where(lt(rateLimitHits.windowStart, cutoff));
   } catch (err) {
     console.warn("[rate-limit] prune failed:", (err as Error).message);

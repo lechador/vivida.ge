@@ -40,11 +40,19 @@ export async function POST() {
   }
 
   try {
+    // Daily cap first: attempts past it throw before the monthly counter is
+    // touched, so hammering the daily limit can't drain the monthly quota.
     await enforceRateLimit({
       bucket: "ai_avatar_user_day",
       identifier: userId,
-      limit: 10,
+      limit: 3,
       windowMs: 24 * 60 * 60 * 1000,
+    });
+    await enforceRateLimit({
+      bucket: "ai_avatar_user_month",
+      identifier: userId,
+      limit: 10,
+      windowMs: 30 * 24 * 60 * 60 * 1000,
     });
   } catch {
     return Response.json({ error: "rate_limited" }, { status: 429 });

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 const ERRORS: Record<string, string> = {
   pro_required: "ეს ფუნქცია Vivida Pro-ს ნაწილია.",
   no_chart: "ჯერ შენი ნატალური რუკა უნდა შეიქმნას.",
-  rate_limited: "დღევანდელი ლიმიტი ამოიწურა. სცადე ხვალ.",
+  rate_limited: "ლიმიტი ამოიწურა (3/დღე, 10/თვე). სცადე მოგვიანებით.",
   unavailable: "სერვისი დროებით მიუწვდომელია.",
   generation_failed: "ვერ მოხერხდა გენერაცია. სცადე ხელახლა.",
 };

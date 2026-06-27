@@ -13,6 +13,7 @@ import {
   listRecentPostsByUser,
 } from "@/actions/feed";
 import { getCurrentPlan } from "@/lib/plan";
+import { canUseFeature } from "@/lib/features";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { computeElementBalance } from "@/lib/elements";
 import { computeSynastry, overallVerdict } from "@/lib/synastry";
@@ -33,6 +34,7 @@ import { MessageButton } from "@/components/chat/message-button";
 import { SafetyMenu } from "@/components/safety/safety-menu";
 import { isBlockedEitherWay } from "@/lib/block";
 import { PhotoCarousel } from "@/components/profile/photo-carousel";
+import { AiAvatarButton } from "@/components/profile/ai-avatar-button";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { FeedList } from "@/components/feed/feed-list";
 import { TierBadge } from "@/components/feed/tier-badge";
@@ -225,6 +227,11 @@ export default async function PublicProfilePage({
                   />
                 </div>
               ) : null}
+
+              {/* Owner-only: regenerate a brand-styled AI avatar in place */}
+              {isOwner && canUseFeature("aiAvatar", viewerPlan) && (
+                <AiAvatarButton />
+              )}
             </div>
 
             <div className="min-w-0">
