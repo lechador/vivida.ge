@@ -136,6 +136,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
+      url: `${BASE}/piradi-ruka`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.95,
+    },
+    {
       url: `${BASE}/chinuri-horoskopi`,
       lastModified: NOW,
       changeFrequency: "monthly",

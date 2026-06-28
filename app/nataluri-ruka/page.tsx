@@ -16,8 +16,10 @@ const KEYWORDS = [
   "ნატალური რუკა ონლაინ",
   "ნატალური რუკა უფასოდ",
   "პირადი ნატალური რუკა",
+  "პირადი რუკა",
   "ნატალური რუკის გამოთვლა",
   "nataluri ruka",
+  "piradi ruka",
 ];
 
 const BASE_META: Metadata = {
@@ -180,8 +182,8 @@ export default function NataluriRukaPage() {
               რა არის ნატალური რუკა?
             </h2>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
-              ნატალური რუკა (ანუ დაბადების რუკა) არის ცის ზუსტი სურათი იმ წამში,
-              როცა დაიბადე — სად იდგა მზე, მთვარე და თითოეული პლანეტა ზოდიაქოს
+              ნატალური რუკა (ანუ პირადი რუკა, დაბადების რუკა) არის ცის ზუსტი
+              სურათი იმ წამში, როცა დაიბადე — სად იდგა მზე, მთვარე და თითოეული პლანეტა ზოდიაქოს
               ნიშნებსა და 12 სახლში. ის ასტროლოგიის საფუძველია: გვიჩვენებს შენს
               ხასიათს, ძლიერ მხარეებს, ემოციურ ბუნებასა და ცხოვრების სფეროებს.
             </p>
@@ -250,6 +252,12 @@ export default function NataluriRukaPage() {
 
           {/* Related */}
           <section className="flex flex-wrap gap-2">
+            <Link
+              href="/piradi-ruka"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              პირადი რუკა
+            </Link>
             <Link
               href="/zodiac"
               className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"

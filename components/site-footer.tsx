@@ -3,6 +3,8 @@ import Link from "next/link";
 import { VividaMark } from "@/components/brand/vivida-mark";
 
 const PRODUCT_LINKS = [
+  { href: "/nataluri-ruka", label: "ნატალური რუკა" },
+  { href: "/piradi-ruka", label: "პირადი რუკა" },
   { href: "/features", label: "ფუნქციები" },
   { href: "/how-it-works", label: "როგორ მუშაობს" },
 ];
