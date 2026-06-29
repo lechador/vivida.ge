@@ -13,6 +13,11 @@ const notoGeorgian = Noto_Sans_Georgian({
   variable: "--font-sans",
   subsets: ["georgian", "latin"],
   display: "swap",
+  // Metric-adjusted fallback (size-adjust/ascent-override) so the system font
+  // shown during the swap window occupies the same space as Noto — minimizes
+  // the layout shift (CLS) when the web font finishes loading on mobile.
+  adjustFontFallback: true,
+  fallback: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
 });
 
 // Vercel routes vivida.ge → www.vivida.ge with a 307. Using www as the

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface Star {
   left: number;
@@ -32,7 +32,36 @@ export function Starfield({
   count?: number;
   shooting?: number;
 }) {
-  const { stars, shootingStars } = useMemo(() => {
+  // Purely decorative (aria-hidden, position:absolute), so we keep it OUT of
+  // the server HTML and first paint and mount it after hydration. That frees
+  // the mobile main thread to paint the LCP text first — and since it never
+  // affects layout, deferring it can't cause CLS. We also thin the field and
+  // drop animations on small screens / reduced-motion to cut paint cost.
+  const [env, setEnv] = useState<{
+    count: number;
+    shooting: number;
+    animate: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    const mobile = window.matchMedia("(max-width: 640px)").matches;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    // Legitimate one-shot environment read (matchMedia is client-only and
+    // unavailable during render/SSR), so the setState here is intentional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setEnv({
+      count: mobile ? Math.max(24, Math.round(count * 0.4)) : count,
+      shooting: reduced ? 0 : mobile ? Math.min(shooting, 1) : shooting,
+      animate: !reduced,
+    });
+  }, [count, shooting]);
+
+  const data = useMemo(() => {
+    if (!env) return null;
+    const count = env.count;
+    const shooting = env.shooting;
     let s = 0x9e3779b9;
     const rand = () => {
       s |= 0;
@@ -42,7 +71,7 @@ export function Starfield({
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
 
-    const stars: Star[] = Array.from({ length: count }).map((_, i) => {
+    const stars: Star[] = Array.from({ length: count }).map(() => {
       const r = rand();
       const isFeature = r > 0.94; // ~6% glowy feature stars
       return {
@@ -70,7 +99,10 @@ export function Starfield({
     );
 
     return { stars, shootingStars };
-  }, [count, shooting]);
+  }, [env]);
+
+  if (!env || !data) return null;
+  const { stars, shootingStars } = data;
 
   return (
     <div
@@ -80,8 +112,8 @@ export function Starfield({
       {stars.map((star, i) => {
         // Only the brightest stars (feature + larger pinpoints) get the
         // pulse animation — the field reads as alive without paying for
-        // 200+ simultaneously animating elements.
-        const animate = star.glow || star.size > 1.4;
+        // 200+ simultaneously animating elements. Reduced-motion drops it.
+        const animate = env.animate && (star.glow || star.size > 1.4);
         return (
           <span
             key={i}
