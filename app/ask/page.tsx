@@ -50,7 +50,7 @@ export default async function AskPage() {
 
       <AppHeader authed plan={plan} active="ask" />
 
-      <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col px-4 pb-6 pt-6 sm:px-6 sm:pt-8">
+      <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col px-4 pb-[calc(4.75rem_+_env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8 lg:pb-6">
         <header className="mb-5 shrink-0">
           <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
             ჰკითხე{" "}

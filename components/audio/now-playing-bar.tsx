@@ -26,7 +26,7 @@ export function NowPlayingBar() {
   const pct = duration ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed inset-x-0 bottom-4 z-40 px-4">
+    <div className="fixed inset-x-0 bottom-[calc(4.75rem_+_env(safe-area-inset-bottom))] z-40 px-4 lg:bottom-4">
       <div className="mx-auto flex max-w-xl items-center gap-3 overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/40 bg-card/85 p-2.5 shadow-2xl ring-1 ring-foreground/10 backdrop-blur-xl sm:gap-4 sm:p-3">
         <button
           type="button"

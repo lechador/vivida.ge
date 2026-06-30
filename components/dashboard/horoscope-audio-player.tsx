@@ -190,7 +190,7 @@ export function HoroscopeAudioPlayer({
   // ── Idle / error ──
   return (
     <div className="relative mt-5">
-      <div className="relative inline-flex w-full sm:w-auto">
+      <div className="relative flex w-full">
         <span
           aria-hidden
           className="absolute -inset-1 animate-pulse rounded-2xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] opacity-50 blur-lg"
@@ -200,7 +200,7 @@ export function HoroscopeAudioPlayer({
           variant="mystic"
           size="lg"
           onClick={onListen}
-          className="relative w-full justify-center shadow-xl shadow-[var(--vivida-violet)]/40 sm:w-auto"
+          className="relative w-full justify-center shadow-xl shadow-[var(--vivida-violet)]/40"
         >
           <Headphones className="size-5" />
           მოისმინე ჰოროსკოპი
