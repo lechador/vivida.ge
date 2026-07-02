@@ -18,7 +18,18 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
   return arr;
 }
 
-type State = "loading" | "unsupported" | "denied" | "off" | "on" | "working";
+type State =
+  | "loading"
+  | "unsupported"
+  | "unconfigured"
+  | "denied"
+  | "off"
+  | "on"
+  | "working";
+
+const isIOS =
+  typeof navigator !== "undefined" &&
+  /iphone|ipad|ipod/i.test(navigator.userAgent);
 
 /**
  * Web-push opt-in. `card` = a settings block (Account); `banner` = a compact
@@ -39,14 +50,19 @@ export function PushOptIn({ variant = "card" }: { variant?: "card" | "banner" })
       } catch {
         /* ignore */
       }
-      const supported =
+      const browserOk =
         typeof window !== "undefined" &&
         "serviceWorker" in navigator &&
         "PushManager" in window &&
-        "Notification" in window &&
-        Boolean(VAPID);
-      if (!supported) {
+        "Notification" in window;
+      if (!browserOk) {
         if (!cancelled) setState("unsupported");
+        return;
+      }
+      // Browser can do push, but our public key isn't in the bundle (env not
+      // set at build time) — a config/deploy issue, not the user's browser.
+      if (!VAPID) {
+        if (!cancelled) setState("unconfigured");
         return;
       }
       if (Notification.permission === "denied") {
@@ -163,8 +179,14 @@ export function PushOptIn({ variant = "card" }: { variant?: "card" | "banner" })
 
           {state === "unsupported" && (
             <p className="mt-3 text-sm text-muted-foreground">
-              ამ ბრაუზერში შეტყობინებები არ არის ხელმისაწვდომი. iPhone-ზე
-              დაამატე Vivida მთავარ ეკრანზე და შემდეგ ჩართე.
+              {isIOS
+                ? "iPhone-ზე ჯერ დაამატე Vivida მთავარ ეკრანზე (Share → „Add to Home Screen“), გახსენი იქიდან და შემდეგ ჩართე შეტყობინებები."
+                : "ამ ბრაუზერში შეტყობინებები არ არის ხელმისაწვდომი. სცადე Chrome-ით."}
+            </p>
+          )}
+          {state === "unconfigured" && (
+            <p className="mt-3 text-sm text-muted-foreground">
+              შეტყობინებები დროებით მიუწვდომელია. სცადე მოგვიანებით.
             </p>
           )}
           {state === "denied" && (
