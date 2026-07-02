@@ -4,6 +4,7 @@ import {
   sendDailyHoroscopeBlast,
   utcDateKey,
 } from "@/lib/email-marketing";
+import { sendDailyPushBlast } from "@/lib/push";
 import { pruneRateLimits } from "@/lib/rate-limit";
 
 /**
@@ -62,11 +63,21 @@ async function run(req: NextRequest) {
   const sendDate = utcDateKey();
   const result = await sendDailyHoroscopeBlast({ sendDate, concurrency });
 
+  // Daily web-push blast — runs after the email so today's headlines are
+  // already generated/cached and the push can carry the personalized line.
+  // Best-effort: a push failure never fails the email job.
+  let push = { recipients: 0, sent: 0 };
+  try {
+    push = await sendDailyPushBlast({ sendDate });
+  } catch (err) {
+    console.warn("[cron] daily push blast failed:", (err as Error).message);
+  }
+
   // Housekeeping: drop expired rate-limit counters. Best-effort, never
   // blocks or fails the blast (pruneRateLimits swallows its own errors).
   await pruneRateLimits();
 
-  return NextResponse.json({ sendDate, concurrency, ...result });
+  return NextResponse.json({ sendDate, concurrency, ...result, push });
 }
 
 // Vercel Cron fires GET; manual reruns from admin can use POST.

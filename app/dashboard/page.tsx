@@ -9,6 +9,7 @@ import { isAccountRestricted } from "@/lib/restriction";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
+import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { ProUpsell } from "@/components/paywall/pro-upsell";
 
@@ -56,6 +57,10 @@ export default async function DashboardPage() {
             {firstName}
           </span>
         </h1>
+
+        {/* Soft prompt to enable daily push — hides itself once enabled,
+            unsupported, or dismissed. */}
+        <PushOptIn variant="banner" />
 
         {/* DailyDashboard is a client component — it fetches the heavy AI
             data via a server action after first paint, so the response

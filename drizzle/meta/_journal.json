@@ -260,6 +260,13 @@
       "when": 1782578980608,
       "tag": "0036_chilly_catseye",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1782983620254,
+      "tag": "0037_unusual_madelyne_pryor",
+      "breakpoints": true
     }
   ]
 }

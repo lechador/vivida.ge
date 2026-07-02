@@ -221,7 +221,9 @@ async function dispatch(
       {
         from: FROM,
         to: recipient.email,
-        subject: "შენი დღევანდელი ჰოროსკოპი",
+        // Use today's actual headline as the subject — a concrete, personal
+        // line opens far better than a static "your daily horoscope".
+        subject: daily.headline?.trim() || "შენი დღევანდელი ჰოროსკოპი",
         react: DailyHoroscopeEmail({
           name: recipient.name?.split(" ")[0] ?? null,
           headline: daily.headline,

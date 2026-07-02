@@ -16,6 +16,7 @@ import { DangerZone } from "@/components/account/danger-zone";
 import { VisibilityCard } from "@/components/account/visibility-card";
 import { PhotoUploader } from "@/components/account/photo-uploader";
 import { AiAvatarGenerator } from "@/components/account/ai-avatar-generator";
+import { PushOptIn } from "@/components/push/push-opt-in";
 import { ProUpsell } from "@/components/paywall/pro-upsell";
 import { canUseFeature } from "@/lib/features";
 import { EmailPreferencesCard } from "@/components/account/email-preferences-card";
@@ -141,6 +142,11 @@ export default async function AccountPage() {
               →
             </span>
           </Link>
+        </div>
+
+        {/* Push notifications */}
+        <div className="mb-6">
+          <PushOptIn />
         </div>
 
         {/* Email preferences */}
