@@ -1,13 +1,13 @@
-import { Button, Heading, Section, Text } from "@react-email/components";
+import { Button, Heading, Hr, Section, Text } from "@react-email/components";
 import * as React from "react";
 
 import { EmailLayout, buttonStyle, paragraphStyle } from "./_layout";
 
 /**
- * Birthday email — warm AI-written body (2 short paragraphs, Georgian) plus
- * a gold gift box announcing the +1 free month of Pro (already applied, no
- * action needed). Transactional (once a year, tied to an account benefit),
- * so no unsubscribe link — mirrors the welcome email.
+ * Birthday email — a celebration, not a promo. The person is the centerpiece:
+ * festive centered opening, warm AI-written body, a heartfelt sign-off from
+ * the team… and the +1 month gift demoted to a quiet P.S. at the very bottom.
+ * Transactional (once a year), so no unsubscribe link — like welcome.
  */
 export function BirthdayEmail({
   name,
@@ -19,65 +19,121 @@ export function BirthdayEmail({
   dashboardUrl: string;
 }) {
   return (
-    <EmailLayout preview="გილოცავ დაბადების დღეს! 🎂 საჩუქარი შიგნით გელოდება">
-      <Heading
-        as="h1"
+    <EmailLayout preview="დღეს შენი დღეა — და მთელი ცა ამას აღნიშნავს ✨">
+      {/* Festive opening — centered, big, personal */}
+      <Section style={{ textAlign: "center", padding: "8px 0 4px" }}>
+        <Text
+          style={{
+            fontSize: "44px",
+            lineHeight: "52px",
+            margin: "0 0 8px",
+          }}
+        >
+          🎂✨🎉
+        </Text>
+        <Heading
+          as="h1"
+          style={{
+            color: "#ffffff",
+            fontSize: "30px",
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            lineHeight: "38px",
+            margin: "0 0 10px",
+          }}
+        >
+          გილოცავ{name ? `, ${name}` : ""}!
+        </Heading>
+        <Text
+          style={{
+            color: "#c4b5fd",
+            fontSize: "16px",
+            lineHeight: "24px",
+            margin: "0 0 4px",
+          }}
+        >
+          დღეს შენი დღეა — და მთელი ცა ამას აღნიშნავს
+        </Text>
+      </Section>
+
+      {/* Star divider */}
+      <Text
         style={{
-          color: "#ffffff",
-          fontSize: "24px",
-          fontWeight: 600,
-          letterSpacing: "-0.01em",
-          lineHeight: "32px",
-          margin: "0 0 16px",
+          color: "#a78bfa",
+          fontSize: "14px",
+          letterSpacing: "12px",
+          margin: "18px 0",
+          textAlign: "center",
         }}
       >
-        გილოცავ დაბადების დღეს{name ? `, ${name}` : ""}! 🎂
-      </Heading>
+        ✦&nbsp;✦&nbsp;✦
+      </Text>
 
+      {/* Warm AI-written body */}
       {paragraphs.map((p, i) => (
-        <Text key={i} style={paragraphStyle}>
+        <Text
+          key={i}
+          style={{
+            ...paragraphStyle,
+            fontSize: "16px",
+            lineHeight: "26px",
+          }}
+        >
           {p}
         </Text>
       ))}
 
-      {/* Gift box — gold accent, same treatment as the launch announcement */}
-      <Section
+      {/* Heartfelt sign-off — the team, by name, celebrating them */}
+      <Text
         style={{
-          backgroundColor: "rgba(234, 195, 88, 0.07)",
-          border: "1px solid rgba(234, 195, 88, 0.35)",
-          borderRadius: "12px",
-          margin: "20px 0",
-          padding: "18px",
+          ...paragraphStyle,
+          fontSize: "16px",
+          lineHeight: "26px",
+          margin: "20px 0 6px",
         }}
       >
-        <Text
-          style={{
-            color: "#eac358",
-            fontSize: "16px",
-            fontWeight: 700,
-            lineHeight: "24px",
-            margin: "0 0 8px",
-          }}
-        >
-          🎁 საჩუქარი: 1 თვე Vivida Pro — უფასოდ
-        </Text>
-        <Text
-          style={{
-            color: "#d8d2ee",
-            fontSize: "14px",
-            lineHeight: "22px",
-            margin: 0,
-          }}
-        >
-          დაბადების დღის საჩუქრად შენს ანგარიშს 1 თვე Vivida Pro დაემატა —
-          უკვე გააქტიურებულია, არაფრის გაკეთება არ გჭირდება. უბრალოდ შედი და
-          ისიამოვნე ✨
-        </Text>
+        გმადლობთ, რომ ვივიდას ვარსკვლავებქვეშ ხარ — შენნაირი ადამიანების გამო
+        ვაკეთებთ ამ საქმეს.
+      </Text>
+      <Text
+        style={{
+          color: "#f0abfc",
+          fontSize: "15px",
+          fontWeight: 600,
+          lineHeight: "24px",
+          margin: "0 0 22px",
+        }}
+      >
+        სითბოთი და აღფრთოვანებით — Vivida-ს გუნდი ❤️
+      </Text>
+
+      <Section style={{ textAlign: "center", padding: "4px 0 8px" }}>
+        <Button href={dashboardUrl} style={buttonStyle}>
+          ნახე, რას გპირდება დღეს შენი ცა
+        </Button>
       </Section>
 
-      <Button href={dashboardUrl} style={buttonStyle}>
-        ნახე დღევანდელი ცა
-      </Button>
+      {/* The gift — a quiet P.S., deliberately not the headline */}
+      <Hr
+        style={{
+          borderColor: "rgba(167, 139, 250, 0.18)",
+          margin: "22px 0 14px",
+        }}
+      />
+      <Text
+        style={{
+          color: "#8d82a6",
+          fontSize: "13px",
+          lineHeight: "21px",
+          margin: 0,
+        }}
+      >
+        P.S. პატარა საჩუქარი ჩვენგან: შენს ანგარიშს დაბადების დღის საპატივცემულოდ{" "}
+        <span style={{ color: "#eac358", fontWeight: 600 }}>
+          1 თვე Vivida Pro
+        </span>{" "}
+        დაემატა — უკვე აქტიურია, არაფერი გჭირდება. 🎁
+      </Text>
     </EmailLayout>
   );
 }
