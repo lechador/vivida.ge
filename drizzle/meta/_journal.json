@@ -267,6 +267,13 @@
       "when": 1782983620254,
       "tag": "0037_unusual_madelyne_pryor",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1783102928800,
+      "tag": "0038_fantastic_karma",
+      "breakpoints": true
     }
   ]
 }

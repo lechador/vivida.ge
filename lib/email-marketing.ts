@@ -2,7 +2,7 @@ import { Resend } from "resend";
 import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { dailyEmailLog, profiles, users } from "@/db/schema";
+import { dailyEmailLog, emailSendLog, profiles, users } from "@/db/schema";
 import { DailyHoroscopeEmail } from "@/lib/email-templates/daily-horoscope";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { MarketingEmail } from "@/lib/email-templates/marketing";
@@ -268,6 +268,13 @@ async function dispatch(
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
     });
+    await logToUnifiedSendLog(
+      recipient.userId,
+      "profile_incomplete",
+      recipient.email,
+      "შენი ნატალური რუკა გელოდება — დაასრულე რეგისტრაცია",
+      result.error?.message
+    );
     if (result.error) throw new Error(result.error.message ?? "send failed");
     return true;
   }
@@ -294,8 +301,41 @@ async function dispatch(
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },
   });
+  await logToUnifiedSendLog(
+    recipient.userId,
+    "marketing",
+    recipient.email,
+    opts.subject,
+    result.error?.message
+  );
   if (result.error) throw new Error(result.error.message ?? "send failed");
   return true;
+}
+
+/**
+ * Best-effort row in the unified email log (admin "Emails" page). The daily
+ * template is NOT logged here — it already has daily_email_log, which the
+ * admin view merges in. Never throws.
+ */
+async function logToUnifiedSendLog(
+  userId: string,
+  kind: string,
+  email: string | null,
+  subject: string,
+  error?: string
+): Promise<void> {
+  try {
+    await db.insert(emailSendLog).values({
+      userId,
+      kind,
+      email,
+      subject,
+      status: error ? "failed" : "sent",
+      error: error ?? null,
+    });
+  } catch {
+    /* logging must never break a send */
+  }
 }
 
 /**

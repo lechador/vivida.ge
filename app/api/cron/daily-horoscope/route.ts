@@ -5,6 +5,7 @@ import {
   utcDateKey,
 } from "@/lib/email-marketing";
 import { sendDailyPushBlast } from "@/lib/push";
+import { sendBirthdayGifts } from "@/lib/birthday";
 import { pruneRateLimits } from "@/lib/rate-limit";
 
 /**
@@ -73,11 +74,20 @@ async function run(req: NextRequest) {
     console.warn("[cron] daily push blast failed:", (err as Error).message);
   }
 
+  // Birthday gifts + emails — once-a-year per user (guarded inside), so the
+  // 05:30 retry tick is safe. Best-effort: never fails the blast.
+  let birthdays = { birthdays: 0, gifted: 0, emailed: 0, failed: 0 };
+  try {
+    birthdays = await sendBirthdayGifts();
+  } catch (err) {
+    console.warn("[cron] birthday gifts failed:", (err as Error).message);
+  }
+
   // Housekeeping: drop expired rate-limit counters. Best-effort, never
   // blocks or fails the blast (pruneRateLimits swallows its own errors).
   await pruneRateLimits();
 
-  return NextResponse.json({ sendDate, concurrency, ...result, push });
+  return NextResponse.json({ sendDate, concurrency, ...result, push, birthdays });
 }
 
 // Vercel Cron fires GET; manual reruns from admin can use POST.

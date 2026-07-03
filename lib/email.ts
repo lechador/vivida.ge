@@ -65,16 +65,19 @@ export async function sendVerificationEmail({
     );
     return;
   }
+  const subject = "დაადასტურე შენი ელფოსტა · Vivida";
   const result = await c.emails.send({
     from: FROM,
     to,
-    subject: "დაადასტურე შენი ელფოსტა · Vivida",
+    subject,
     react: VerificationEmail({ name, verifyUrl }),
   });
   if (result.error) {
     console.error("[email] verification send failed:", result.error);
+    await recordSentByEmail(to, "verification", subject, "failed", result.error.message);
     throw new Error(result.error.message ?? "verification send failed");
   }
+  await recordSentByEmail(to, "verification", subject, "sent");
 }
 
 export async function sendPasswordResetEmail({
@@ -97,16 +100,19 @@ export async function sendPasswordResetEmail({
     );
     return;
   }
+  const subject = "პაროლის აღდგენა · Vivida";
   const result = await c.emails.send({
     from: FROM,
     to,
-    subject: "პაროლის აღდგენა · Vivida",
+    subject,
     react: PasswordResetEmail({ name, resetUrl }),
   });
   if (result.error) {
     console.error("[email] password reset send failed:", result.error);
+    await recordSentByEmail(to, "password_reset", subject, "failed", result.error.message);
     throw new Error(result.error.message ?? "password reset send failed");
   }
+  await recordSentByEmail(to, "password_reset", subject, "sent");
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -157,8 +163,44 @@ async function sentRecently(
   return !!row;
 }
 
-async function recordSent(userId: string, kind: string): Promise<void> {
-  await db.insert(emailSendLog).values({ userId, kind });
+async function recordSent(
+  userId: string,
+  kind: string,
+  extra?: { email?: string | null; subject?: string; status?: string; error?: string }
+): Promise<void> {
+  await db.insert(emailSendLog).values({
+    userId,
+    kind,
+    email: extra?.email ?? null,
+    subject: extra?.subject ?? null,
+    status: extra?.status ?? "sent",
+    error: extra?.error ?? null,
+  });
+}
+
+/**
+ * Best-effort unified-log write for senders that only know the address
+ * (verification / password reset). Resolves the user by email; silently
+ * skips when unknown (the log's user_id is NOT NULL). Never throws.
+ */
+async function recordSentByEmail(
+  to: string,
+  kind: string,
+  subject: string,
+  status: "sent" | "failed",
+  error?: string
+): Promise<void> {
+  try {
+    const [u] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, to))
+      .limit(1);
+    if (!u) return;
+    await recordSent(u.id, kind, { email: to, subject, status, error });
+  } catch {
+    /* logging must never break the send path */
+  }
 }
 
 /** True when the user hasn't logged in / pinged activity for `minutes`. */
@@ -223,7 +265,10 @@ export async function sendWelcomeEmail({
       console.error("[email] welcome send failed:", result.error);
       return;
     }
-    await recordSent(userId, "welcome");
+    await recordSent(userId, "welcome", {
+      email: to,
+      subject: "შენი კოსმიური მოგზაურობა იწყება · Vivida",
+    });
   } catch (err) {
     console.error("[email] welcome threw:", (err as Error).message);
   }
@@ -302,7 +347,10 @@ export async function sendFriendRequestEmail({
       console.error("[email] friend-request send failed:", result.error);
       return;
     }
-    await recordSent(recipientUserId, "friend_request");
+    await recordSent(recipientUserId, "friend_request", {
+      email: recipient.email,
+      subject: `${fromName}-მ მეგობრობა გთხოვა · Vivida`,
+    });
   } catch (err) {
     console.error("[email] friend-request threw:", (err as Error).message);
   }
@@ -391,7 +439,10 @@ export async function sendMessageEmail({
       console.error("[email] message send failed:", result.error);
       return;
     }
-    await recordSent(recipientUserId, "message");
+    await recordSent(recipientUserId, "message", {
+      email: recipient.email,
+      subject: `${fromName}-მ წერილი მოგწერა · Vivida`,
+    });
   } catch (err) {
     console.error("[email] message threw:", (err as Error).message);
   }

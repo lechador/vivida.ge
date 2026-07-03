@@ -701,8 +701,17 @@ export const emailSendLog = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    /** 'welcome' | 'friend_request' | 'message' (and future kinds). */
+    /** 'welcome' | 'friend_request' | 'message' | 'birthday' | 'marketing'
+     *  | 'verification' | 'password_reset' | 'profile_incomplete' … */
     kind: text("kind").notNull(),
+    /** Recipient address at send time (users can change email later). */
+    email: text("email"),
+    /** Subject line as sent — makes the admin log self-explanatory. */
+    subject: text("subject"),
+    /** 'sent' | 'failed'. Historical rows predate the column → null = sent. */
+    status: text("status").default("sent"),
+    /** Error message when status='failed'. */
+    error: text("error"),
     sentAt: timestamp("sent_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
