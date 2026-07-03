@@ -34,10 +34,11 @@ const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
 const GIFT_DAYS = 30;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-const SUBJECT = "გილოცავ დაბადების დღეს! 🎂 საჩუქარი გელოდება";
+export const BIRTHDAY_SUBJECT = "გილოცავ დაბადების დღეს! 🎂 საჩუქარი გელოდება";
+const SUBJECT = BIRTHDAY_SUBJECT;
 
 /** Curated fallback body — used whenever the AI call fails or is unset. */
-const FALLBACK_PARAGRAPHS = [
+export const FALLBACK_PARAGRAPHS = [
   "დღეს შენი დღეა — და მთელი ცა შენკენ იყურება. გვინდა ვივიდას გუნდიდან გულით მოგილოცოთ დაბადების დღე: იყოს ეს წელი შენთვის ნათელი, თბილი და სავსე იმ რამით, რაც ნამდვილად გახარებს.",
   "ვარსკვლავები დღეს შენს პატივსაცემად ანათებენ — ჩვენ კი პატარა საჩუქარი მოგიმზადეთ. ❤️",
 ];
@@ -172,7 +173,7 @@ interface OpenRouterJson {
  * Two short, warm Georgian paragraphs from Gemini. Personalized with the
  * name and (when known) sun sign. Throws on failure — caller falls back.
  */
-async function generateBirthdayCopy(
+export async function generateBirthdayCopy(
   name: string | null,
   sunSignKa: string | null
 ): Promise<string[]> {
