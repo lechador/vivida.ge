@@ -1,19 +1,28 @@
 // Seed the reusable per-aspect interpretation library (aspect_interpretation_library).
 // Generates one rich Georgian text per (planetA, planetB, kind) — every possible
-// major aspect between the 12 chart points — so the report reuses them across
+// major aspect between the 13 chart points — so the report reuses them across
 // all users instead of a per-user AI call. One AI call per entry (Georgian is
 // token-dense; batching truncates).
 //
+// Uses Vertex AI Gemini (not OpenRouter) via the existing GCP project set up
+// for Veo video generation — auth via local ADC (`gcloud auth
+// application-default login`), no API key needed. Only for this local, one-time
+// bulk seed; the live in-app self-heal fallback (lib/aspect-library.ts) still
+// uses OpenRouter since Vertex ADC isn't available in the deployed serverless
+// environment.
+//
 // Usage:
-//   node scripts/seed-aspect-library.mjs                → fill only missing rows (330 total)
+//   node scripts/seed-aspect-library.mjs                → fill only missing rows (390 total)
 //   node scripts/seed-aspect-library.mjs --force         → also overwrite non-edited rows
 //   node scripts/seed-aspect-library.mjs --kind=square,trine
-//   node scripts/seed-aspect-library.mjs --body=sun,moon → only combos involving these bodies
+//   node scripts/seed-aspect-library.mjs --body=chiron   → only combos involving these bodies
 //
-// Reads OPENROUTER_API_KEY / DATABASE_URL from .env.local or the environment.
+// Reads GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION / DATABASE_URL from
+// .env.local or the environment.
 
 import { readFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
+import { GoogleGenAI } from "@google/genai";
 
 try {
   for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
@@ -22,8 +31,7 @@ try {
   }
 } catch {}
 
-const KEY = process.env.OPENROUTER_API_KEY;
-const MODEL = "google/gemini-3.1-pro-preview";
+const MODEL = "gemini-2.5-pro";
 const CONCURRENCY = 5;
 const force = process.argv.includes("--force");
 const kindArg = process.argv.find((a) => a.startsWith("--kind="));
@@ -33,13 +41,13 @@ const onlyBodies = bodyArg ? bodyArg.slice("--body=".length).split(",") : null;
 
 const BODIES = [
   "sun", "moon", "mercury", "venus", "mars", "jupiter",
-  "saturn", "uranus", "neptune", "pluto", "ascendant", "midheaven",
+  "saturn", "uranus", "neptune", "pluto", "chiron", "ascendant", "midheaven",
 ];
 
 const BODY_KA = {
   sun: "მზე", moon: "მთვარე", mercury: "მერკური", venus: "ვენერა", mars: "მარსი",
   jupiter: "იუპიტერი", saturn: "სატურნი", uranus: "ურანი", neptune: "ნეპტუნი",
-  pluto: "პლუტონი", ascendant: "ამომავალი", midheaven: "ზენიტი",
+  pluto: "პლუტონი", chiron: "ქირონი", ascendant: "ამომავალი", midheaven: "ზენიტი",
 };
 const BODY_MEANING_KA = {
   sun: "ბირთვი, იდენტობა, სიცოცხლის ცეცხლი",
@@ -52,6 +60,7 @@ const BODY_MEANING_KA = {
   uranus: "ცვლილება, თავისუფლება, უცხო",
   neptune: "ოცნება, ინტუიცია, წარმოსახვა",
   pluto: "ტრანსფორმაცია, ძალა, განახლება",
+  chiron: "შინაგანი ჭრილობა, განკურნება, სიბრძნე ტკივილიდან",
   ascendant: "სოციალური ნიღაბი, პირველი შთაბეჭდილება",
   midheaven: "კარიერა, საზოგადოებრივი იმიჯი",
 };
@@ -91,37 +100,28 @@ function prompt(a, b, kind) {
   );
 }
 
+const ai = new GoogleGenAI({
+  vertexai: true,
+  project: process.env.GOOGLE_CLOUD_PROJECT,
+  location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+});
+
 async function generate(a, b, kind) {
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${KEY}`,
-      "HTTP-Referer": "https://vivida.ge",
-      "X-Title": "Vivida aspect library seed",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: "system", content: SYSTEM },
-        { role: "user", content: prompt(a, b, kind) },
-      ],
+  const res = await ai.models.generateContent({
+    model: MODEL,
+    contents: prompt(a, b, kind),
+    config: {
+      systemInstruction: SYSTEM,
       temperature: 0.8,
-      // gemini-3.1-pro always reasons; give the answer room beyond the
-      // thinking budget so it isn't truncated.
-      max_tokens: 12000,
-    }),
+    },
   });
-  if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const json = await res.json();
-  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
-  const body = json.choices?.[0]?.message?.content?.trim();
+  const body = res.text?.trim();
   if (!body) throw new Error("empty");
   return body;
 }
 
 async function main() {
-  if (!KEY) throw new Error("OPENROUTER_API_KEY missing");
+  if (!process.env.GOOGLE_CLOUD_PROJECT) throw new Error("GOOGLE_CLOUD_PROJECT missing");
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
   const sql = neon(process.env.DATABASE_URL);
 
@@ -147,7 +147,7 @@ async function main() {
     }
   }
 
-  console.log(`tasks: ${tasks.length} (force=${force}, model=${MODEL})`);
+  console.log(`tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`);
   let done = 0, ok = 0, fail = 0;
 
   async function worker(queue) {

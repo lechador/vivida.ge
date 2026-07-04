@@ -89,6 +89,7 @@ export const BODIES: Record<string, CelestialBody> = {
   neptune:    { key: "neptune",    labelKa: "ნეპტუნი",    symbol: "♆", emoji: "♆",  order: 9,  meaningKa: "ოცნება, ინტუიცია, წარმოსახვა" },
   pluto:      { key: "pluto",      labelKa: "პლუტონი",    symbol: "♇", emoji: "♇",  order: 10, meaningKa: "ტრანსფორმაცია, ძალა, განახლება" },
   midheaven:  { key: "midheaven",  labelKa: "ზენიტი",     symbol: "MC", emoji: "⬆️", order: 11, meaningKa: "კარიერა, საზოგადოებრივი იმიჯი" },
+  chiron:     { key: "chiron",     labelKa: "ქირონი",     symbol: "⚷", emoji: "⚷",  order: 12, meaningKa: "შინაგანი ჭრილობა, განკურნება, სიბრძნე ტკივილიდან" },
 };
 
 export function bodyMeta(key: string): CelestialBody | undefined {

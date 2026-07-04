@@ -2,7 +2,7 @@
  * Reusable per-aspect interpretation library.
  *
  * "Sun conjunction Moon" reads identically for every user who has it — so
- * instead of a per-user AI call, we generate each of the 330 possible
+ * instead of a per-user AI call, we generate each of the 390 possible
  * (planetA, planetB, kind) combinations once, store it here, and reuse it.
  * The report's aspect section reads from here at render time instead of
  * calling the model, the same pattern already used for placements (see
@@ -24,7 +24,7 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 /** Same higher-quality model used for the sign-placement library. */
 export const ASPECT_LIBRARY_MODEL = "google/gemini-3.1-pro-preview";
 
-/** The 12 chart points that can participate in an aspect. */
+/** The 13 chart points that can participate in an aspect. */
 export const ASPECT_BODIES = [
   "sun",
   "moon",
@@ -36,6 +36,7 @@ export const ASPECT_BODIES = [
   "uranus",
   "neptune",
   "pluto",
+  "chiron",
   "ascendant",
   "midheaven",
 ] as const;
@@ -81,7 +82,7 @@ export function aspectLibraryKey(a: string, b: string, kind: AspectKind): string
 
 export type AspectPlacement = { a: string; b: string; kind: AspectKind };
 
-/** Every possible aspect combo: C(12,2) pairs × 5 kinds = 330. */
+/** Every possible aspect combo: C(13,2) pairs × 5 kinds = 390. */
 export function allAspectCombos(): AspectPlacement[] {
   const out: AspectPlacement[] = [];
   for (let i = 0; i < ASPECT_BODIES.length; i++) {
