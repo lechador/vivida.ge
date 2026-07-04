@@ -18,7 +18,7 @@ import { Resend } from "resend";
 import { and, eq, gt, sql as dsql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { emailSendLog, profiles, subscriptions, users } from "@/db/schema";
+import { emailSendLog, subscriptions } from "@/db/schema";
 import { BirthdayEmail } from "@/lib/email-templates/birthday";
 import { signByIndex } from "@/lib/zodiac";
 
@@ -27,8 +27,14 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 // emails a day, so we spend the good model on warmth.
 const BIRTHDAY_MODEL = "google/gemini-3.1-pro-preview";
 
-// Same resolution as lib/email.ts so all mail shows a consistent sender.
-const FROM = process.env.RESEND_FROM ?? "Vivida <onboarding@resend.dev>";
+// RESEND_FROM may be a bare address or a full "Name <email>" string —
+// normalize so the sender always shows "Vivida", never a raw mailbox name.
+function resolveFrom(envVal: string | undefined, fallback: string): string {
+  if (!envVal) return fallback;
+  return envVal.includes("<") ? envVal : `Vivida <${envVal}>`;
+}
+
+const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <onboarding@resend.dev>");
 const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
 
 const GIFT_DAYS = 30;

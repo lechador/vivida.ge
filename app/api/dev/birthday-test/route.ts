@@ -48,8 +48,16 @@ export async function GET(req: Request) {
 
   const origin = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
   const resend = new Resend(key);
+  // RESEND_FROM may be a bare address or a full "Name <email>" string —
+  // normalize so the sender always shows "Vivida", never a raw mailbox name.
+  const envFrom = process.env.RESEND_FROM;
+  const from = envFrom
+    ? envFrom.includes("<")
+      ? envFrom
+      : `Vivida <${envFrom}>`
+    : "Vivida <onboarding@resend.dev>";
   const result = await resend.emails.send({
-    from: process.env.RESEND_FROM ?? "Vivida <onboarding@resend.dev>",
+    from,
     to,
     subject: `[TEST] ${BIRTHDAY_SUBJECT}`,
     react: BirthdayEmail({

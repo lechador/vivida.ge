@@ -25,7 +25,15 @@ function client(): Resend | null {
   return _client;
 }
 
-const FROM = process.env.RESEND_FROM ?? "Vivida <onboarding@resend.dev>";
+// RESEND_FROM may be set as a bare address ("hello@vivida.ge") or a full
+// "Name <email>" string — normalize to always show "Vivida" as the sender
+// name so inboxes never display a raw mailbox name like "hello".
+function resolveFrom(envVal: string | undefined, fallback: string): string {
+  if (!envVal) return fallback;
+  return envVal.includes("<") ? envVal : `Vivida <${envVal}>`;
+}
+
+const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <onboarding@resend.dev>");
 const ORIGIN = process.env.APP_ORIGIN ?? "http://localhost:3000";
 
 export function isEmailConfigured(): boolean {
