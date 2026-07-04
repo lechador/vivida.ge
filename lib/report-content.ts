@@ -12,6 +12,7 @@ import {
   aspectLibraryKey,
   getAspectLibraryEntries,
 } from "@/lib/aspect-library";
+import { getHouseLibraryEntries, houseLibraryKey } from "@/lib/house-library";
 
 /**
  * Long-form report content — generated SPECIFICALLY for the premium PDF, not
@@ -299,6 +300,36 @@ export async function generateNatalReport(input: {
       aspectLib.has(aspectLibraryKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2]))
     );
 
+  // Same idea for houses: compose each house's cusp-sign text + its occupant
+  // planets' texts from the shared house library. Skip the per-PDF houses AI
+  // call only when every cusp AND every occupant this chart needs is covered.
+  const houseCusps: { house: number; sign: string }[] = [];
+  for (const n of HOUSE_NUMBERS) {
+    const cusp = chart.houses.find((h) => h.number === n);
+    if (cusp) houseCusps.push({ house: n, sign: signByIndex(cusp.signIndex).key });
+  }
+  const houseOccupants = Object.entries(chart.bodies)
+    .filter(([, p]) => p.house)
+    .map(([key, p]) => ({ house: p.house as number, planet: key }));
+  const houseLib = await getHouseLibraryEntries([
+    ...houseCusps.map((c) => houseLibraryKey("cusp", c.house, c.sign)),
+    ...houseOccupants.map((o) => houseLibraryKey("occupant", o.house, o.planet)),
+  ]).catch(() => new Map<string, string>());
+  const libHouses: Record<string, string> = {};
+  for (const c of houseCusps) {
+    const cuspBody = houseLib.get(houseLibraryKey("cusp", c.house, c.sign));
+    if (!cuspBody) continue;
+    const occupantBodies = houseOccupants
+      .filter((o) => o.house === c.house)
+      .map((o) => houseLib.get(houseLibraryKey("occupant", o.house, o.planet)))
+      .filter((b): b is string => Boolean(b));
+    libHouses[String(c.house)] = [cuspBody, ...occupantBodies].join(" ");
+  }
+  const housesComplete =
+    houseCusps.length > 0 &&
+    houseCusps.every((c) => houseLib.has(houseLibraryKey("cusp", c.house, c.sign))) &&
+    houseOccupants.every((o) => houseLib.has(houseLibraryKey("occupant", o.house, o.planet)));
+
   const [narrative, planets, houses, aspects] = await Promise.all([
     generateNarrative(input).catch((e) => {
       console.warn("[report] narrative failed:", (e as Error).message);
@@ -310,10 +341,12 @@ export async function generateNatalReport(input: {
           console.warn("[report] planets failed:", (e as Error).message);
           return Object.keys(libPlanets).length ? libPlanets : null;
         }),
-    generateHouses(chart).catch((e) => {
-      console.warn("[report] houses failed:", (e as Error).message);
-      return null;
-    }),
+    housesComplete
+      ? Promise.resolve(libHouses)
+      : generateHouses(chart).catch((e) => {
+          console.warn("[report] houses failed:", (e as Error).message);
+          return Object.keys(libHouses).length ? libHouses : null;
+        }),
     aspectsComplete
       ? Promise.resolve(libAspects)
       : generateAspects(chart, input.salience).catch((e) => {

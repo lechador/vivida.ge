@@ -23,6 +23,13 @@ import {
   ensureAspectLibraryFor,
   getAspectLibraryEntries,
 } from "@/lib/aspect-library";
+import {
+  getHouseLibraryEntries,
+  houseLibraryKey,
+  ensureHouseLibraryFor,
+  type HouseCuspPlacement,
+  type HouseOccupantPlacement,
+} from "@/lib/house-library";
 import { BODIES, bodyMeta, signByIndex } from "@/lib/zodiac";
 import { HOUSE_NUMBERS, houseDef } from "@/lib/houses";
 import { canUseFeature } from "@/lib/features";
@@ -187,28 +194,53 @@ export async function ensureChartFor(
   return chart ? overlayLibrary(chart) : chart;
 }
 
+/** The chart's house cusp signs + occupant planets, for library lookups. */
+function houseCombosForChart(data: NatalChartJson): {
+  cusps: HouseCuspPlacement[];
+  occupants: HouseOccupantPlacement[];
+} {
+  const cusps: HouseCuspPlacement[] = [];
+  for (const n of HOUSE_NUMBERS) {
+    const cusp = data.houses.find((h) => h.number === n);
+    if (cusp) cusps.push({ house: n, sign: signByIndex(cusp.signIndex).key });
+  }
+  const occupants: HouseOccupantPlacement[] = [];
+  for (const [key, body] of Object.entries(data.bodies)) {
+    if (body.house) occupants.push({ house: body.house, planet: key });
+  }
+  return { cusps, occupants };
+}
+
 async function overlayLibrary(chart: Chart): Promise<Chart> {
   const interp = chart.interpretation;
   if (!interp) return chart;
   const placements = placementsForChart(chart.data);
+  const { cusps, occupants } = houseCombosForChart(chart.data);
   // Never let a library lookup break a chart render — if the table isn't
   // migrated yet or the query fails, fall back to the chart's own text.
   let lib: Map<string, string>;
   let aspectLib: Map<string, string>;
+  let houseLib: Map<string, string>;
   try {
-    [lib, aspectLib] = await Promise.all([
+    [lib, aspectLib, houseLib] = await Promise.all([
       getLibraryEntries(placements.map((p) => libraryKey(p.subject, p.sign))),
       getAspectLibraryEntries(
         (chart.data.aspects ?? []).map((a) =>
           aspectLibraryKey(a.a, a.b, a.kind)
         )
       ),
+      getHouseLibraryEntries([
+        ...cusps.map((c) => houseLibraryKey("cusp", c.house, c.sign)),
+        ...occupants.map((o) => houseLibraryKey("occupant", o.house, o.planet)),
+      ]),
     ]);
   } catch (err) {
     console.warn("[chart] library overlay skipped:", (err as Error).message);
     return chart;
   }
-  if (lib.size === 0 && aspectLib.size === 0) return chart; // nothing seeded yet
+  if (lib.size === 0 && aspectLib.size === 0 && houseLib.size === 0) {
+    return chart; // nothing seeded yet
+  }
 
   const bigThree = { ...interp.bigThree };
   const planets = { ...(interp.planets ?? {}) };
@@ -227,7 +259,27 @@ async function overlayLibrary(chart: Chart): Promise<Chart> {
     if (body) aspects[aspectKey(a.a, a.b, a.kind)] = body;
   }
 
-  chart.interpretation = { ...interp, bigThree, planets, aspects };
+  // Houses compose two pieces: the cusp-sign text, plus each occupant
+  // planet's text (a house can hold zero, one, or several planets). Only
+  // override when the cusp is covered — that's the always-present half;
+  // occupant coverage layers on top of it.
+  const houses = { ...(interp.houses ?? {}) };
+  const occupantsByHouse = new Map<number, string[]>();
+  for (const o of occupants) {
+    const list = occupantsByHouse.get(o.house) ?? [];
+    list.push(o.planet);
+    occupantsByHouse.set(o.house, list);
+  }
+  for (const c of cusps) {
+    const cuspBody = houseLib.get(houseLibraryKey("cusp", c.house, c.sign));
+    if (!cuspBody) continue;
+    const occupantBodies = (occupantsByHouse.get(c.house) ?? [])
+      .map((planet) => houseLib.get(houseLibraryKey("occupant", c.house, planet)))
+      .filter((b): b is string => Boolean(b));
+    houses[String(c.house)] = [cuspBody, ...occupantBodies].join(" ");
+  }
+
+  chart.interpretation = { ...interp, bigThree, planets, aspects, houses };
   return chart;
 }
 
@@ -332,8 +384,9 @@ async function upgradeChartAi(
     .limit(1);
   if (!current || current.inputHash !== inputHash) return;
 
-  // Make sure the reusable libraries cover this chart's placements + aspects.
-  // Cheap once seeded; self-heals for new combos otherwise.
+  // Make sure the reusable libraries cover this chart's placements, aspects,
+  // and houses. Cheap once seeded; self-heals for new combos otherwise.
+  const { cusps, occupants } = houseCombosForChart(data);
   await Promise.all([
     ensureLibraryFor(placementsForChart(data)).catch((err) =>
       console.warn("[chart] library ensure failed:", (err as Error).message)
@@ -342,6 +395,9 @@ async function upgradeChartAi(
       (data.aspects ?? []).map((a) => ({ a: a.a, b: a.b, kind: a.kind }))
     ).catch((err) =>
       console.warn("[chart] aspect library ensure failed:", (err as Error).message)
+    ),
+    ensureHouseLibraryFor(cusps, occupants).catch((err) =>
+      console.warn("[chart] house library ensure failed:", (err as Error).message)
     ),
   ]);
 

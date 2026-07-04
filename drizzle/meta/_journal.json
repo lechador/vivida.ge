@@ -281,6 +281,13 @@
       "when": 1783201806423,
       "tag": "0039_omniscient_red_wolf",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1783206009146,
+      "tag": "0040_demonic_iron_monger",
+      "breakpoints": true
     }
   ]
 }

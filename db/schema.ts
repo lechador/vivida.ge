@@ -902,6 +902,51 @@ export type AspectInterpretationLibraryRow =
   typeof aspectInterpretationLibrary.$inferSelect;
 
 /**
+ * Reusable per-house interpretation library — the house counterpart of the
+ * sign/aspect libraries. Unlike a planet-in-sign or a two-planet aspect, a
+ * house's full meaning depends on BOTH its cusp sign AND which (variable,
+ * unbounded) set of planets occupy it, so it isn't a single finite lookup.
+ * We decompose it into two reusable, finite pieces instead:
+ *
+ *   - `kind='cusp'`     — (house, sign): "what this life area looks like
+ *                          under this sign" — 12 houses × 12 signs = 144.
+ *   - `kind='occupant'` — (house, planet): "what it means for this planet's
+ *                          energy to be active in this life area" —
+ *                          12 houses × 11 planets = 132.
+ *
+ * At render time the cusp text + each occupant's text are composed into the
+ * single string the report shows for that house (see actions/chart.ts).
+ * `key` is `${kind}:${house}:${subject}` (subject = sign key or planet key).
+ * `edited=true` marks a human-curated row so regeneration leaves it alone.
+ */
+export const houseInterpretationLibrary = pgTable("house_interpretation_library", {
+  /** `${kind}:${house}:${subject}`, e.g. "cusp:4:cancer", "occupant:4:moon". */
+  key: text("key").primaryKey(),
+  /** 'cusp' | 'occupant' */
+  kind: text("kind").notNull(),
+  /** House number 1-12. */
+  house: integer("house").notNull(),
+  /** Sign key (cusp) or planet key (occupant). */
+  subject: text("subject").notNull(),
+  /** Georgian interpretation text shown in the report. */
+  body: text("body").notNull(),
+  /** Model id that produced it, "curated", or "manual" after an admin edit. */
+  model: text("model").notNull(),
+  /** True once a human edits it — regeneration skips edited rows. */
+  edited: boolean("edited").notNull().default(false),
+  language: text("language").notNull().default("ka"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type HouseInterpretationLibraryRow =
+  typeof houseInterpretationLibrary.$inferSelect;
+
+/**
  * Web Push subscriptions — one row per browser/device a user opted into
  * notifications from. `endpoint` is unique (the push service URL); `p256dh`
  * and `auth` are the client's encryption keys. Presence of a row = the user
