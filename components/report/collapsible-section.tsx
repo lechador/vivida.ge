@@ -51,7 +51,12 @@ export function CollapsibleSection({
       className="scroll-mt-16 sm:scroll-mt-24"
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
+      // "some" = reveal as soon as any part enters the viewport. A ratio
+      // threshold (amount: 0.15) breaks on tall sections: houses/aspects can
+      // exceed viewport_height / 0.15, so 15% of them is never on-screen at
+      // once, whileInView never fires, and the section stays invisible while
+      // still occupying layout space — a giant blank gap in the report.
+      viewport={{ once: true, amount: "some" }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
       <button
