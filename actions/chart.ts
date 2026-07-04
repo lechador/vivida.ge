@@ -276,7 +276,7 @@ async function overlayLibrary(chart: Chart): Promise<Chart> {
     const occupantBodies = (occupantsByHouse.get(c.house) ?? [])
       .map((planet) => houseLib.get(houseLibraryKey("occupant", c.house, planet)))
       .filter((b): b is string => Boolean(b));
-    houses[String(c.house)] = [cuspBody, ...occupantBodies].join(" ");
+    houses[String(c.house)] = [cuspBody, ...occupantBodies].join("\n\n");
   }
 
   chart.interpretation = { ...interp, bigThree, planets, aspects, houses };

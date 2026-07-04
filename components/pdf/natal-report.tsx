@@ -498,9 +498,19 @@ export function NatalReport({ data }: { data: NatalReportData }) {
           if (!body) return null;
           const cusp = chart.houses.find((h) => h.number === n);
           const sign = cusp ? signByIndex(cusp.signIndex) : null;
+          // Composed entries (cusp text + one paragraph per occupant planet)
+          // can run much longer than a single-planet house. Render each
+          // paragraph as its own Text so react-pdf can break the page
+          // between them instead of treating the whole entry as one atomic
+          // block — an oversized single block risks getting deferred whole
+          // to the next page, leaving blank space at the bottom of this one.
+          // minPresenceAhead is dropped here for the same reason: it's an
+          // orphan-prevention heuristic tuned for short entries, and
+          // backfires on these now-variable-length ones.
+          const paragraphs = body.split(/\n{2,}/).filter(Boolean);
           return e(
             View,
-            { key: n, style: s.entry, minPresenceAhead: 60 },
+            { key: n, style: s.entry },
             e(
               View,
               { style: s.entryHead },
@@ -509,7 +519,13 @@ export function NatalReport({ data }: { data: NatalReportData }) {
                 ? e(Text, { style: s.entryMeta }, sign.labelKa)
                 : null
             ),
-            e(Text, { style: s.entryBody }, body)
+            ...paragraphs.map((p, i) =>
+              e(
+                Text,
+                { key: i, style: i > 0 ? [s.entryBody, { marginTop: 6 }] : s.entryBody },
+                p
+              )
+            )
           );
         })
         .filter(Boolean),

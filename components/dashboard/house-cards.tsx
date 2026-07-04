@@ -87,9 +87,14 @@ export function HouseCards({
               )}
             </div>
             {text && (
-              <p className="mt-2 pl-9 text-sm leading-relaxed text-foreground/85">
-                {text}
-              </p>
+              <div className="mt-2 space-y-2 pl-9 text-sm leading-relaxed text-foreground/85">
+                {text
+                  .split(/\n{2,}/)
+                  .filter(Boolean)
+                  .map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+              </div>
             )}
           </div>
         );

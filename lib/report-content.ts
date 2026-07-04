@@ -323,7 +323,7 @@ export async function generateNatalReport(input: {
       .filter((o) => o.house === c.house)
       .map((o) => houseLib.get(houseLibraryKey("occupant", o.house, o.planet)))
       .filter((b): b is string => Boolean(b));
-    libHouses[String(c.house)] = [cuspBody, ...occupantBodies].join(" ");
+    libHouses[String(c.house)] = [cuspBody, ...occupantBodies].join("\n\n");
   }
   const housesComplete =
     houseCusps.length > 0 &&
