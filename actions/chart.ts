@@ -18,6 +18,11 @@ import {
   libraryKey,
   placementsForChart,
 } from "@/lib/interpretation-library";
+import {
+  aspectLibraryKey,
+  ensureAspectLibraryFor,
+  getAspectLibraryEntries,
+} from "@/lib/aspect-library";
 import { BODIES, bodyMeta, signByIndex } from "@/lib/zodiac";
 import { HOUSE_NUMBERS, houseDef } from "@/lib/houses";
 import { canUseFeature } from "@/lib/features";
@@ -189,15 +194,21 @@ async function overlayLibrary(chart: Chart): Promise<Chart> {
   // Never let a library lookup break a chart render — if the table isn't
   // migrated yet or the query fails, fall back to the chart's own text.
   let lib: Map<string, string>;
+  let aspectLib: Map<string, string>;
   try {
-    lib = await getLibraryEntries(
-      placements.map((p) => libraryKey(p.subject, p.sign))
-    );
+    [lib, aspectLib] = await Promise.all([
+      getLibraryEntries(placements.map((p) => libraryKey(p.subject, p.sign))),
+      getAspectLibraryEntries(
+        (chart.data.aspects ?? []).map((a) =>
+          aspectLibraryKey(a.a, a.b, a.kind)
+        )
+      ),
+    ]);
   } catch (err) {
     console.warn("[chart] library overlay skipped:", (err as Error).message);
     return chart;
   }
-  if (lib.size === 0) return chart; // nothing seeded yet — keep existing text
+  if (lib.size === 0 && aspectLib.size === 0) return chart; // nothing seeded yet
 
   const bigThree = { ...interp.bigThree };
   const planets = { ...(interp.planets ?? {}) };
@@ -209,7 +220,14 @@ async function overlayLibrary(chart: Chart): Promise<Chart> {
     else if (p.subject === "ascendant") bigThree.ascendant = body;
     else planets[p.subject] = body;
   }
-  chart.interpretation = { ...interp, bigThree, planets };
+
+  const aspects = { ...(interp.aspects ?? {}) };
+  for (const a of chart.data.aspects ?? []) {
+    const body = aspectLib.get(aspectLibraryKey(a.a, a.b, a.kind));
+    if (body) aspects[aspectKey(a.a, a.b, a.kind)] = body;
+  }
+
+  chart.interpretation = { ...interp, bigThree, planets, aspects };
   return chart;
 }
 
@@ -314,11 +332,18 @@ async function upgradeChartAi(
     .limit(1);
   if (!current || current.inputHash !== inputHash) return;
 
-  // Make sure the reusable library covers this chart's placements. Cheap once
-  // the library is seeded; self-heals for new placements otherwise.
-  await ensureLibraryFor(placementsForChart(data)).catch((err) =>
-    console.warn("[chart] library ensure failed:", (err as Error).message)
-  );
+  // Make sure the reusable libraries cover this chart's placements + aspects.
+  // Cheap once seeded; self-heals for new combos otherwise.
+  await Promise.all([
+    ensureLibraryFor(placementsForChart(data)).catch((err) =>
+      console.warn("[chart] library ensure failed:", (err as Error).message)
+    ),
+    ensureAspectLibraryFor(
+      (data.aspects ?? []).map((a) => ({ a: a.a, b: a.b, kind: a.kind }))
+    ).catch((err) =>
+      console.warn("[chart] aspect library ensure failed:", (err as Error).message)
+    ),
+  ]);
 
   // Summary + highlights are the only per-user AI text. Skip if already done.
   if (current.interpretation?.summary) return;

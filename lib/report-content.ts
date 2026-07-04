@@ -8,6 +8,10 @@ import {
   libraryKey,
   placementsForChart,
 } from "@/lib/interpretation-library";
+import {
+  aspectLibraryKey,
+  getAspectLibraryEntries,
+} from "@/lib/aspect-library";
 
 /**
  * Long-form report content — generated SPECIFICALLY for the premium PDF, not
@@ -274,6 +278,27 @@ export async function generateNatalReport(input: {
   const planetsComplete =
     placements.length > 0 && placements.every((p) => libPlanets[p.subject]);
 
+  // Same idea for the aspect section: when the shared aspect library already
+  // covers every aspect this report would discuss, skip the per-PDF aspects
+  // AI call entirely.
+  const tightest = input.salience.tightestAspects;
+  const aspectLib = await getAspectLibraryEntries(
+    tightest.map((a) =>
+      aspectLibraryKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2])
+    )
+  ).catch(() => new Map<string, string>());
+  const libAspects: Record<string, string> = {};
+  for (const a of tightest) {
+    const kind = a.kind as Parameters<typeof aspectKey>[2];
+    const body = aspectLib.get(aspectLibraryKey(a.a, a.b, kind));
+    if (body) libAspects[aspectKey(a.a, a.b, kind)] = body;
+  }
+  const aspectsComplete =
+    tightest.length > 0 &&
+    tightest.every((a) =>
+      aspectLib.has(aspectLibraryKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2]))
+    );
+
   const [narrative, planets, houses, aspects] = await Promise.all([
     generateNarrative(input).catch((e) => {
       console.warn("[report] narrative failed:", (e as Error).message);
@@ -289,10 +314,12 @@ export async function generateNatalReport(input: {
       console.warn("[report] houses failed:", (e as Error).message);
       return null;
     }),
-    generateAspects(chart, input.salience).catch((e) => {
-      console.warn("[report] aspects failed:", (e as Error).message);
-      return null;
-    }),
+    aspectsComplete
+      ? Promise.resolve(libAspects)
+      : generateAspects(chart, input.salience).catch((e) => {
+          console.warn("[report] aspects failed:", (e as Error).message);
+          return Object.keys(libAspects).length ? libAspects : null;
+        }),
   ]);
   return { narrative, planets, houses, aspects };
 }

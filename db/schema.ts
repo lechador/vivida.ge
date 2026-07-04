@@ -866,6 +866,42 @@ export const interpretationLibrary = pgTable("interpretation_library", {
 export type InterpretationLibraryRow = typeof interpretationLibrary.$inferSelect;
 
 /**
+ * Reusable per-aspect interpretation library — the aspect counterpart of
+ * `interpretation_library`. One row per (planetA, planetB, kind), e.g.
+ * "Sun conjunction Moon" reads identically for every user who has it, so we
+ * generate each once and reuse it. `key` is `aspectKey(a, b, kind)` — the
+ * SAME alphabetically-sorted "<a>-<b>-<kind>" id already used as the map key
+ * in ChartInterpretationJson.aspects, so no translation layer is needed at
+ * the call site. `edited=true` marks a human-curated row so regeneration
+ * leaves it alone. Editable from the admin panel (same DB).
+ */
+export const aspectInterpretationLibrary = pgTable("aspect_interpretation_library", {
+  /** `aspectKey(a, b, kind)`, e.g. "moon-sun-square". */
+  key: text("key").primaryKey(),
+  /** Body keys, alphabetically sorted (a < b) — matches aspectKey's order. */
+  planetA: text("planet_a").notNull(),
+  planetB: text("planet_b").notNull(),
+  /** conjunction | sextile | square | trine | opposition */
+  kind: text("kind").notNull(),
+  /** Georgian interpretation text shown in the report. */
+  body: text("body").notNull(),
+  /** Model id that produced it, "curated", or "manual" after an admin edit. */
+  model: text("model").notNull(),
+  /** True once a human edits it — regeneration skips edited rows. */
+  edited: boolean("edited").notNull().default(false),
+  language: text("language").notNull().default("ka"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type AspectInterpretationLibraryRow =
+  typeof aspectInterpretationLibrary.$inferSelect;
+
+/**
  * Web Push subscriptions — one row per browser/device a user opted into
  * notifications from. `endpoint` is unique (the push service URL); `p256dh`
  * and `auth` are the client's encryption keys. Presence of a row = the user
