@@ -288,6 +288,13 @@
       "when": 1783206009146,
       "tag": "0040_demonic_iron_monger",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1783210454496,
+      "tag": "0041_amazing_king_cobra",
+      "breakpoints": true
     }
   ]
 }

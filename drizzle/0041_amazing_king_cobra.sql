@@ -1,0 +1,1 @@
+ALTER TABLE "profile" ADD COLUMN "discoverable" boolean DEFAULT true NOT NULL;

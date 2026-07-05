@@ -170,6 +170,7 @@ export default async function AccountPage() {
               username: profile?.username ?? null,
               displayName: profile?.displayName ?? null,
               bio: profile?.bio ?? null,
+              discoverable: profile?.discoverable ?? true,
             }}
             defaultName={user.name ?? null}
           />

@@ -48,12 +48,13 @@ export async function listPeople(
   const cursor = opts.cursor ? new Date(opts.cursor) : null;
   const trimmed = (opts.q ?? "").trim();
 
-  // Only surface users who've claimed a public profile (username set).
-  // Skip the viewer themselves so they don't see their own row in the
-  // directory.
+  // Only surface users who've claimed a public profile (username set) AND
+  // haven't opted out of discovery. Skip the viewer themselves so they
+  // don't see their own row in the directory.
   const conditions = [
     ne(users.id, viewerId),
     isNotNull(profiles.username),
+    eq(profiles.discoverable, true),
   ];
   if (cursor) conditions.push(lt(users.createdAt, cursor));
   if (trimmed.length >= 2) {
@@ -126,15 +127,22 @@ export async function listPeople(
   const photos = await firstReadyPhotoByUser(userIds);
 
   return {
-    rows: page.map((r) => ({
-      id: r.id,
-      username: r.username ?? "",
-      displayName: r.displayName ?? r.name?.split(" ")[0] ?? null,
-      bio: r.bio,
-      image: resolveAvatar(r.id, r.image, photos),
-      createdAt: r.createdAt,
-      friendship: statusByPartner.get(r.id) ?? "none",
-    })),
+    rows: page
+      // A block in EITHER direction removes the row entirely — the profile
+      // page already 404s for blocked pairs, so the directory must not keep
+      // showing the person's avatar/bio to someone they blocked (or vice
+      // versa). The cursor still advances past hidden rows, so pagination
+      // is unaffected.
+      .filter((r) => statusByPartner.get(r.id) !== "blocked")
+      .map((r) => ({
+        id: r.id,
+        username: r.username ?? "",
+        displayName: r.displayName ?? r.name?.split(" ")[0] ?? null,
+        bio: r.bio,
+        image: resolveAvatar(r.id, r.image, photos),
+        createdAt: r.createdAt,
+        friendship: statusByPartner.get(r.id) ?? "none",
+      })),
     nextCursor: hasMore ? page[page.length - 1].createdAt.toISOString() : null,
   };
 }

@@ -8,6 +8,7 @@ import {
   Stars,
   Sun,
   Telescope,
+  UserPlus,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -22,6 +23,7 @@ export type NavActiveKey =
   | "timing"
   | "feed"
   | "discover"
+  | "people"
   | "synastry"
   | "friends"
   | "messages"
@@ -43,6 +45,7 @@ export type NavItem = {
  */
 const NAV_FEATURE_GATE: Partial<Record<NavActiveKey, SocialFeature>> = {
   discover: "swipeDeck",
+  people: "peopleDirectory",
 };
 
 function navVisible(item: NavItem): boolean {
@@ -109,6 +112,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "თავსებადობა",
     Icon: Heart,
     hue: "oklch(0.72 0.22 350)",
+  },
+  {
+    key: "people",
+    href: "/people",
+    label: "ხალხი",
+    Icon: UserPlus,
+    hue: "oklch(0.75 0.16 160)",
   },
   {
     key: "friends",

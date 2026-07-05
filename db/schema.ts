@@ -221,6 +221,13 @@ export const profiles = pgTable("profile", {
   displayName: text("display_name"),
   /** Short user-written bio (~280 char). */
   bio: text("bio"),
+  /**
+   * Whether this user appears on stranger-discovery surfaces: the /people
+   * directory, people search, and "suggested people" rails. Default true
+   * (opt-out, toggle in Account). Their /u/[username] page stays reachable
+   * by direct link either way — this only controls being *browsable*.
+   */
+  discoverable: boolean("discoverable").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

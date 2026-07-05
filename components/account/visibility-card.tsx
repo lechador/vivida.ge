@@ -7,7 +7,7 @@ import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateProfileFields } from "@/actions/profile";
+import { setDiscoverable, updateProfileFields } from "@/actions/profile";
 import { suggestUsername, USERNAME_PATTERN } from "@/lib/profile-utils";
 
 export function VisibilityCard({
@@ -18,6 +18,7 @@ export function VisibilityCard({
     username: string | null;
     displayName: string | null;
     bio: string | null;
+    discoverable: boolean;
   };
   /** Current user's name from auth — used as a starter for displayName */
   defaultName: string | null;
@@ -29,9 +30,25 @@ export function VisibilityCard({
     initial.displayName ?? defaultName ?? ""
   );
   const [bio, setBio] = useState(initial.bio ?? "");
+  const [discoverable, setDiscoverableState] = useState(initial.discoverable);
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isTogglePending, startToggleTransition] = useTransition();
+
+  // Instant-save toggle (independent from the Save button) — optimistic,
+  // reverts on failure.
+  const onToggleDiscoverable = () => {
+    const next = !discoverable;
+    setDiscoverableState(next);
+    startToggleTransition(async () => {
+      try {
+        await setDiscoverable(next);
+      } catch {
+        setDiscoverableState(!next);
+      }
+    });
+  };
 
   const usernameInvalid =
     username.length > 0 && !USERNAME_PATTERN.test(username);
@@ -115,6 +132,38 @@ export function VisibilityCard({
           <div className="text-right text-xs text-muted-foreground">
             {bio.length}/280
           </div>
+        </div>
+
+        {/* Discovery opt-out — saves instantly, no Save button needed */}
+        <div className="flex items-start justify-between gap-4 rounded-xl border border-border/70 bg-card/40 p-4">
+          <div className="min-w-0">
+            <div className="text-sm font-medium">აღმოჩენადობა</div>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              გამოჩნდე „ხალხის“ გვერდზე, ძიებასა და შემოთავაზებებში. გამორთვის
+              შემთხვევაში შენი პროფილი მხოლოდ პირდაპირი ბმულით იქნება
+              ხელმისაწვდომი.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={discoverable}
+            aria-label="აღმოჩენადობა"
+            onClick={onToggleDiscoverable}
+            disabled={isTogglePending}
+            className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors ${
+              discoverable
+                ? "bg-[var(--vivida-violet)]"
+                : "bg-foreground/15"
+            } ${isTogglePending ? "opacity-60" : ""}`}
+          >
+            <span
+              aria-hidden
+              className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-[left] ${
+                discoverable ? "left-[22px]" : "left-0.5"
+              }`}
+            />
+          </button>
         </div>
       </div>
 

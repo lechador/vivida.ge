@@ -124,6 +124,9 @@ export async function getDiscoveryFeed(
         // Profiles that haven't picked a username yet (post-signup, pre-
         // onboarding) would render with a broken /u/ link. Skip them.
         isNotNull(profiles.username),
+        // Respect the discovery opt-out — this feed powers both the swipe
+        // deck and the "suggested people" rails.
+        eq(profiles.discoverable, true),
         excludedList.length > 1
           ? inArray(users.id, await pickIncluded(excludedList, viewerId))
           : undefined

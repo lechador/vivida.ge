@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
+import { eq } from "drizzle-orm";
 
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { invalidateProfileForUser } from "@/lib/header-cache";
 import { ensureChartFor } from "@/actions/chart";
@@ -91,4 +94,19 @@ export async function updateProfileFields(
   revalidatePath(`/u/${result.username}`);
   invalidateProfileForUser(user.id);
   return { ok: true };
+}
+
+/**
+ * Toggle discovery opt-out. When off, the user disappears from the /people
+ * directory, people search, and "suggested people" rails — their profile
+ * stays reachable by direct link. Instant-save (no Save button).
+ */
+export async function setDiscoverable(value: boolean): Promise<void> {
+  const user = await requireUser();
+  await db
+    .update(profiles)
+    .set({ discoverable: value, updatedAt: new Date() })
+    .where(eq(profiles.userId, user.id));
+  revalidatePath("/account");
+  revalidatePath("/people");
 }
