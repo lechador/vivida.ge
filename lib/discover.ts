@@ -8,7 +8,7 @@
  *   - "other": all the rest
  */
 
-import { and, asc, eq, inArray, isNotNull, ne, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -132,6 +132,10 @@ export async function getDiscoveryFeed(
           : undefined
       )
     )
+    // Random sample, not "first N by physical row order": once the user base
+    // outgrows CANDIDATE_LIMIT, a stable scan order would mean the same
+    // people enter the pool on every load and the rest never surface.
+    .orderBy(sql`random()`)
     .limit(CANDIDATE_LIMIT);
 
   // 4. First photo per candidate (one query, group in JS)
@@ -269,7 +273,9 @@ async function pickIncluded(
   return rows.filter((r) => !set.has(r.id)).map((r) => r.id);
 }
 
-function shuffle<T>(arr: T[]): T[] {
+/** Fisher-Yates shuffle (non-mutating). Used by the suggestions rail so the
+ *  recommended people rotate instead of showing the same faces every load. */
+export function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
   for (let i = out.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

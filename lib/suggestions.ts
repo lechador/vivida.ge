@@ -1,10 +1,14 @@
-import { getDiscoveryFeed, type DiscoverCard } from "./discover";
+import { getDiscoveryFeed, shuffle, type DiscoverCard } from "./discover";
 
 /**
- * Top-N highest-compatibility candidates for the dashboard rail. Reuses the
- * /discover feed and flattens it: the spotlight is already the global best
- * scorer, and each group is sorted desc by compatibility, so an ordered
- * concat preserves the "most compatible first" ranking we want.
+ * Suggested-people picks for the dashboard/feed rails.
+ *
+ * Quality + rotation, not a fixed leaderboard: taking the top-N by
+ * compatibility verbatim meant the exact same faces in the exact same order
+ * on every load. Instead we pool the strongest candidates (3× the requested
+ * limit, compatibility-ranked — the discovery feed itself samples candidates
+ * randomly, so pool membership rotates too) and shuffle the pool, so every
+ * visit surfaces a fresh mix that still skews compatible.
  */
 export async function getDashboardSuggestions(
   viewerId: string,
@@ -23,5 +27,9 @@ export async function getDashboardSuggestions(
     return true;
   });
 
-  return unique.slice(0, limit);
+  const pool = unique
+    .sort((a, b) => (b.compatibility ?? 0) - (a.compatibility ?? 0))
+    .slice(0, Math.max(limit * 3, limit));
+
+  return shuffle(pool).slice(0, limit);
 }
