@@ -10,6 +10,10 @@ import { SIGNS, signColor } from "@/lib/zodiac";
  * accents. Counter-rotates the symbols so they stay upright while the
  * outer ring spins.
  */
+// Fixed precision keeps SSR and client attribute serialization identical,
+// avoiding hydration mismatches from float rounding differences.
+const round = (n: number) => Number(n.toFixed(4));
+
 export function ZodiacWheel({ size = 160 }: { size?: number }) {
   const r = 50;
   const symbolR = r - 6;
@@ -61,10 +65,10 @@ export function ZodiacWheel({ size = 160 }: { size?: number }) {
         {/* 12 spokes */}
         {Array.from({ length: 12 }).map((_, i) => {
           const angle = (i * 30 * Math.PI) / 180;
-          const x1 = Math.cos(angle) * (r - 12);
-          const y1 = Math.sin(angle) * (r - 12);
-          const x2 = Math.cos(angle) * r;
-          const y2 = Math.sin(angle) * r;
+          const x1 = round(Math.cos(angle) * (r - 12));
+          const y1 = round(Math.sin(angle) * (r - 12));
+          const x2 = round(Math.cos(angle) * r);
+          const y2 = round(Math.sin(angle) * r);
           return (
             <line
               key={i}
@@ -82,8 +86,8 @@ export function ZodiacWheel({ size = 160 }: { size?: number }) {
         {SIGNS.map((sign, i) => {
           const angle = i * 30 - 90; // start Aries at top
           const rad = (angle * Math.PI) / 180;
-          const x = Math.cos(rad) * symbolR;
-          const y = Math.sin(rad) * symbolR;
+          const x = round(Math.cos(rad) * symbolR);
+          const y = round(Math.sin(rad) * symbolR);
           return (
             <g key={sign.key} transform={`translate(${x}, ${y})`}>
               {/* Counter-rotation keeps glyphs upright in viewer frame */}
