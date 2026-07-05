@@ -58,7 +58,9 @@ export function HouseCards({
               >
                 {HOUSE_LABEL[n] ?? n}
               </span>
-              <span className="w-28 shrink-0 truncate font-medium sm:w-40">
+              {/* No truncate: titles are curated to ≤16 chars, and if one ever
+                  outgrows the column it wraps instead of clipping. */}
+              <span className="w-32 shrink-0 font-medium sm:w-44">
                 {def.themeKa}
               </span>
               {cuspSign && (
