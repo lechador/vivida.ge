@@ -24,6 +24,12 @@ export function TierBadge({
 }
 
 function BylinePill({ tier }: { tier: Tier }) {
+  // Everyone starts at "nova" (0 pts), so showing it on every post/profile
+  // byline is noise, not signal — it conveys nothing since it's universal.
+  // Once a user earns a real tier (Bright+), the badge becomes meaningful
+  // and appears.
+  if (tier.key === "nova") return null;
+
   return (
     <span
       className="inline-flex shrink-0 items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide"
