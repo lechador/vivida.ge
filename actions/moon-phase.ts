@@ -15,6 +15,11 @@ import {
   generateMoonPhaseReading,
   isOpenRouterConfigured,
 } from "@/lib/openrouter";
+import {
+  getMoonPhaseLibraryEntry,
+  saveMoonPhaseLibraryEntry,
+} from "@/lib/moon-phase-library";
+import { signByIndex } from "@/lib/zodiac";
 
 export type MoonPhaseRow = MoonPhase & { snapshot: MoonPhaseSnapshot };
 
@@ -44,22 +49,40 @@ export async function ensureMoonPhase(): Promise<MoonPhaseRow | null> {
     return { ...existing, snapshot };
   }
 
-  if (!isOpenRouterConfigured()) {
-    // No API key — return what we have if anything, else null. The UI can
-    // then render a placeholder using just the live snapshot.
-    return existing ? { ...existing, snapshot } : null;
-  }
+  // Fast path: the reading is fully determined by (phase, sign), so copy
+  // today's combo from the pre-generated library — no AI call.
+  const signKey = signByIndex(snapshot.signIndex).key;
+  let reading = await getMoonPhaseLibraryEntry(snapshot.phaseKey, signKey);
+  let model = "library";
 
-  const reading = await generateMoonPhaseReading({
-    phaseLabelKa: snapshot.phaseLabelKa,
-    phaseKey: snapshot.phaseKey,
-    signKa: snapshot.signKa,
-    signEn: snapshot.signEn,
-    illumination: snapshot.illumination,
-    ageDays: snapshot.ageDays,
-    phaseAngle: snapshot.phaseAngle,
-  });
-  if (!reading) return existing ? { ...existing, snapshot } : null;
+  if (!reading) {
+    if (!isOpenRouterConfigured()) {
+      // No API key — return what we have if anything, else null. The UI can
+      // then render a placeholder using just the live snapshot.
+      return existing ? { ...existing, snapshot } : null;
+    }
+
+    reading = await generateMoonPhaseReading({
+      phaseLabelKa: snapshot.phaseLabelKa,
+      phaseKey: snapshot.phaseKey,
+      signKa: snapshot.signKa,
+      signEn: snapshot.signEn,
+      illumination: snapshot.illumination,
+      ageDays: snapshot.ageDays,
+      phaseAngle: snapshot.phaseAngle,
+    });
+    if (!reading) return existing ? { ...existing, snapshot } : null;
+    model = OPENROUTER_MODEL;
+
+    // Self-heal: this one-off reading IS the library entry for this combo —
+    // save it so the same (phase, sign) never generates twice.
+    void saveMoonPhaseLibraryEntry(
+      snapshot.phaseKey,
+      signKey,
+      reading,
+      OPENROUTER_MODEL
+    ).catch(() => {});
+  }
 
   const [inserted] = await db
     .insert(moonPhases)
@@ -78,7 +101,7 @@ export async function ensureMoonPhase(): Promise<MoonPhaseRow | null> {
       body: reading.body,
       themes: reading.themes,
       promptVersion: MOON_PHASE_PROMPT_VERSION,
-      model: OPENROUTER_MODEL,
+      model,
       language: "ka",
     })
     .onConflictDoUpdate({
@@ -97,7 +120,7 @@ export async function ensureMoonPhase(): Promise<MoonPhaseRow | null> {
         body: reading.body,
         themes: reading.themes,
         promptVersion: MOON_PHASE_PROMPT_VERSION,
-        model: OPENROUTER_MODEL,
+        model,
         language: "ka",
       },
     })

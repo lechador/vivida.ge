@@ -1010,6 +1010,46 @@ export type TransitInterpretationLibraryRow =
   typeof transitInterpretationLibrary.$inferSelect;
 
 /**
+ * Reusable moon-phase reading library. A moon-phase reading is collective
+ * (same for everyone) and fully determined by (phase, moon sign) — the
+ * illumination % and cycle age are numeric garnish, not interpretation
+ * inputs. 8 phases × 12 signs = 96 combos, each holding the COMPLETE
+ * reading shape the daily moon_phase row uses (headline/summary/body/
+ * themes), so ensureMoonPhase copies a library row instead of calling the
+ * model. `key` is `${phaseKey}:${signKey}`, e.g. "full_moon:leo".
+ * `edited=true` marks a human-curated row so regeneration leaves it alone.
+ */
+export const moonPhaseInterpretationLibrary = pgTable(
+  "moon_phase_interpretation_library",
+  {
+    /** `${phaseKey}:${signKey}`, e.g. "full_moon:leo". */
+    key: text("key").primaryKey(),
+    /** "new_moon", "waxing_crescent", … 8 canonical phases. */
+    phase: text("phase").notNull(),
+    /** Sign key ("aries"…"pisces"). */
+    sign: text("sign").notNull(),
+    headline: text("headline").notNull(),
+    summary: text("summary").notNull(),
+    body: text("body").notNull(),
+    themes: jsonb("themes").$type<string[]>().notNull().default([]),
+    /** Model id that produced it, "curated", or "manual" after an admin edit. */
+    model: text("model").notNull(),
+    /** True once a human edits it — regeneration skips edited rows. */
+    edited: boolean("edited").notNull().default(false),
+    language: text("language").notNull().default("ka"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  }
+);
+
+export type MoonPhaseInterpretationLibraryRow =
+  typeof moonPhaseInterpretationLibrary.$inferSelect;
+
+/**
  * Web Push subscriptions — one row per browser/device a user opted into
  * notifications from. `endpoint` is unique (the push service URL); `p256dh`
  * and `auth` are the client's encryption keys. Presence of a row = the user
