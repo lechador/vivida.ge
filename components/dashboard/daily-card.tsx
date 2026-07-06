@@ -125,6 +125,13 @@ export function DailyCard({
         {horoscope.body
           .split(/\n{2,}/)
           .filter(Boolean)
+          // Library-composed bodies reuse the same texts the transit
+          // breakdown below shows verbatim — drop those paragraphs here so
+          // nothing reads twice. Surfaces without the breakdown (email,
+          // mobile) keep the full body.
+          .filter(
+            (para) => !transits.some((t) => t.body.trim() === para.trim())
+          )
           .map((para, i) => (
             <p key={i}>{para}</p>
           ))}
