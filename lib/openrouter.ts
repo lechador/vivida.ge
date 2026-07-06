@@ -783,7 +783,9 @@ export type WeeklyForecastResult = {
 // Bumped to 2 when the harmony/challenge tilt amplification shipped —
 // invalidates cached rows so existing users see the new scores + fresh
 // narratives that match them, instead of waiting for week-start rollover.
-export const WEEKLY_PROMPT_VERSION = 2;
+// v3: the window starts tomorrow (today lives on the daily card), and
+// narratives compose from the transit library instead of a model call.
+export const WEEKLY_PROMPT_VERSION = 3;
 
 const WEEKLY_FORECAST_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი. წერ 7 დღის პროგნოზს კონკრეტული ტრანზიტ-ნატალური ასპექტების მიხედვით — *არა* ზოგადი მისტიკით.
 

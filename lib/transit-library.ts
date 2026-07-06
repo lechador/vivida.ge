@@ -479,6 +479,140 @@ export function composeDailyFromLibrary(
 }
 
 // ---------------------------------------------------------------------------
+// Weekly forecast composition
+// ---------------------------------------------------------------------------
+
+export type WeeklyDayDriver = {
+  transit: string;
+  natal: string;
+  kind: string;
+  family: "harmonic" | "tense" | "neutral";
+};
+
+export type WeeklyDayInput = {
+  dateIso: string;
+  moonSignKey: string;
+  drivers: WeeklyDayDriver[];
+};
+
+export type WeeklyDayNarrative = {
+  dateIso: string;
+  headline: string;
+  harmonicReason: string;
+  challengingReason: string;
+  advice: string;
+};
+
+/** Last-resort copy for days genuinely missing a whole aspect family —
+ *  rotated by day index so consecutive quiet days don't repeat. */
+const NO_HARMONIC_KA = [
+  "დიდი შეღავათები ამ დღეს არ ჩანს — მშვიდი, სამუშაო ფონია, სადაც პროგრესს შენ თვითონ ქმნი.",
+  "ცა ამ დღეს ნეიტრალურია — მხარდაჭერა პატარა, შენივე შექმნილი წესრიგიდან მოვა.",
+];
+const NO_TENSE_KA = [
+  "სერიოზული ხახუნი ამ დღეს არ ჩანს — მხოლოდ ნუ გადატვირთავ განრიგს, სიმშვიდე შენს სასარგებლოდ მუშაობს.",
+  "დაძაბული ასპექტები ამ დღეს თითქმის არ არის — ერთადერთი რისკი ზედმეტი თვითკმაყოფილებაა.",
+];
+
+/**
+ * Compose the 7-day narratives purely from library entries — zero AI calls.
+ * Per day: headline = strongest driver's title, reasons = strongest
+ * harmonic/tense drivers' bodies, advice = that day's Moon-sign mood.
+ * Slow transits drive several days in a row, so each pick prefers an entry
+ * not yet used in that field earlier in the week — the week reads varied
+ * instead of repeating one Pluto aspect four times.
+ *
+ * Returns null if any needed entry is missing (caller falls back to AI).
+ */
+export async function composeWeeklyFromLibrary(
+  days: WeeklyDayInput[]
+): Promise<WeeklyDayNarrative[] | null> {
+  const keys = new Set<string>();
+  for (const d of days) {
+    keys.add(transitSignKey("moon", d.moonSignKey));
+    for (const dr of d.drivers) {
+      keys.add(transitAspectKey(dr.transit, dr.kind as AspectKind, dr.natal));
+    }
+  }
+  const entries = await getTransitLibraryEntries([...keys]);
+
+  const usedHeadline = new Set<string>();
+  const usedHarmonic = new Set<string>();
+  const usedTense = new Set<string>();
+
+  // Prefer the strongest driver whose entry hasn't been used for this field
+  // yet this week. When every candidate has already appeared (slow transits
+  // dominate whole weeks), rotate through them by day index instead of
+  // repeating the strongest one every remaining day.
+  const pick = (
+    drivers: WeeklyDayDriver[],
+    used: Set<string>,
+    dayIndex: number
+  ): { key: string; entry: TransitEntry } | null => {
+    const candidates: Array<{ key: string; entry: TransitEntry }> = [];
+    for (const dr of drivers) {
+      const key = transitAspectKey(dr.transit, dr.kind as AspectKind, dr.natal);
+      const entry = entries.get(key);
+      if (!entry) continue;
+      candidates.push({ key, entry });
+      if (!used.has(key)) {
+        used.add(key);
+        return { key, entry };
+      }
+    }
+    if (candidates.length === 0) return null;
+    return candidates[dayIndex % candidates.length];
+  };
+
+  const out: WeeklyDayNarrative[] = [];
+  for (let i = 0; i < days.length; i++) {
+    const d = days[i];
+    const moonSign = entries.get(transitSignKey("moon", d.moonSignKey));
+    if (!moonSign) return null;
+
+    // Any driver missing its library row → abort to the AI path. With the
+    // library fully seeded this only happens for brand-new chart points.
+    for (const dr of d.drivers) {
+      const key = transitAspectKey(dr.transit, dr.kind as AspectKind, dr.natal);
+      if (!entries.has(key)) return null;
+    }
+
+    const harmonic = pick(d.drivers.filter((x) => x.family === "harmonic"), usedHarmonic, i);
+    const tense = pick(d.drivers.filter((x) => x.family === "tense"), usedTense, i);
+    const neutral = d.drivers.filter((x) => x.family === "neutral");
+    const neutralEntry =
+      neutral.length > 0
+        ? entries.get(
+            transitAspectKey(neutral[0].transit, neutral[0].kind as AspectKind, neutral[0].natal)
+          ) ?? null
+        : null;
+
+    const headlinePick = pick(d.drivers, usedHeadline, i);
+    const headline = headlinePick?.entry.title ?? moonSign.title;
+
+    // The neutral entry can stand in for at most ONE missing side — never
+    // both, or the two reasons would read identically.
+    const harmonicReason =
+      harmonic?.entry.body ??
+      neutralEntry?.body ??
+      NO_HARMONIC_KA[i % NO_HARMONIC_KA.length];
+    const challengingReason =
+      tense?.entry.body ??
+      (harmonic ? neutralEntry?.body : null) ??
+      NO_TENSE_KA[i % NO_TENSE_KA.length];
+
+    out.push({
+      dateIso: d.dateIso,
+      headline,
+      harmonicReason,
+      challengingReason,
+      advice: moonSign.body,
+    });
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Read-time overlay for the transit-breakdown UI
 // ---------------------------------------------------------------------------
 

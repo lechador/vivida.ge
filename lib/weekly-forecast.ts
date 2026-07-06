@@ -36,6 +36,8 @@ export type WeeklyDayContext = {
   promptLabel: string;
   moonSignKa: string;
   moonSignEn: string;
+  /** Sign key ("aries"…) — used to look up transit-library sign entries. */
+  moonSignKey: string;
   harmonyScore: number;  // 0..100
   challengeScore: number;
   drivers: Array<{
@@ -95,6 +97,7 @@ export function computeWeeklyForecast(
       promptLabel,
       moonSignKa: moonSign.labelKa,
       moonSignEn: moonSign.labelEn,
+      moonSignKey: moonSign.key,
       harmonyScore,
       challengeScore,
       drivers,

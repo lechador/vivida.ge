@@ -20,6 +20,7 @@ import {
   isOpenRouterConfigured,
   OPENROUTER_MODEL,
 } from "@/lib/openrouter";
+import { composeWeeklyFromLibrary } from "@/lib/transit-library";
 import type { PlanId } from "@/lib/pricing";
 
 /**
@@ -34,7 +35,6 @@ export async function ensureWeeklyForecast(
   // Server-side gate: free users never get a forecast generated, even if
   // a stale row from their trial period still sits in the cache.
   if (!canUseFeature("weeklyForecast", plan)) return null;
-  if (!isOpenRouterConfigured()) return null;
 
   const [profile] = await db
     .select()
@@ -66,40 +66,72 @@ export async function ensureWeeklyForecast(
     return existing;
   }
 
-  // Compute deterministic scores + drivers for each of the next 7 days.
-  const ctx = computeWeeklyForecast(chart.data, now, profile.timezone);
+  // Compute deterministic scores + drivers for each of the next 7 days,
+  // starting TOMORROW — today is already covered by the daily horoscope
+  // card, so the "next 7 days" card shouldn't repeat it.
+  const tomorrow = new Date(now);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const ctx = computeWeeklyForecast(chart.data, tomorrow, profile.timezone);
 
-  const [user] = await db
-    .select({ name: users.name })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  const firstName = user?.name?.split(" ")[0] ?? null;
-
-  const reading = await generateWeeklyForecast({
-    firstName,
-    chart: chart.data,
-    days: ctx.map((d) => ({
+  // Fast path: compose all 7 narratives from the pre-generated transit
+  // library — zero AI calls. Falls back to the model only when a needed
+  // library row is missing.
+  let narratives = await composeWeeklyFromLibrary(
+    ctx.map((d) => ({
       dateIso: d.dateIso,
-      promptLabel: d.promptLabel,
-      moonSignKa: d.moonSignKa,
-      harmonyScore: d.harmonyScore,
-      challengeScore: d.challengeScore,
+      moonSignKey: d.moonSignKey,
       drivers: d.drivers.slice(0, 6).map((dr) => ({
         transit: dr.transit,
         natal: dr.natal,
         kind: dr.kind,
         family: dr.family,
-        orb: dr.orb,
       })),
-    })),
-  });
-  if (!reading) return existing ?? null;
+    }))
+  );
+  let model = "library";
 
-  // Stitch deterministic fields with AI narrative by dateIso. The model is
-  // instructed to preserve dateIso exactly, but we tolerate ordering mismatch
-  // by indexing the response into a map.
-  const byDate = new Map(reading.days.map((d) => [d.dateIso, d]));
+  if (!narratives) {
+    if (!isOpenRouterConfigured()) return existing ?? null;
+    model = OPENROUTER_MODEL;
+
+    const [user] = await db
+      .select({ name: users.name })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    const firstName = user?.name?.split(" ")[0] ?? null;
+
+    const reading = await generateWeeklyForecast({
+      firstName,
+      chart: chart.data,
+      days: ctx.map((d) => ({
+        dateIso: d.dateIso,
+        promptLabel: d.promptLabel,
+        moonSignKa: d.moonSignKa,
+        harmonyScore: d.harmonyScore,
+        challengeScore: d.challengeScore,
+        drivers: d.drivers.slice(0, 6).map((dr) => ({
+          transit: dr.transit,
+          natal: dr.natal,
+          kind: dr.kind,
+          family: dr.family,
+          orb: dr.orb,
+        })),
+      })),
+    });
+    if (!reading) return existing ?? null;
+    narratives = reading.days.map((d) => ({
+      dateIso: d.dateIso,
+      headline: d.headline ?? "",
+      harmonicReason: d.harmonicReason ?? "",
+      challengingReason: d.challengingReason ?? "",
+      advice: d.advice ?? "",
+    }));
+  }
+
+  // Stitch deterministic fields with the narratives by dateIso — tolerant
+  // of ordering mismatch by indexing into a map.
+  const byDate = new Map(narratives.map((d) => [d.dateIso, d]));
   const days: WeeklyForecastDay[] = ctx.map((d) => {
     const ai = byDate.get(d.dateIso);
     return {
@@ -131,7 +163,7 @@ export async function ensureWeeklyForecast(
       days,
       promptVersion: WEEKLY_PROMPT_VERSION,
       natalInputHash: chart.inputHash,
-      model: OPENROUTER_MODEL,
+      model,
       language: "ka",
     })
     .onConflictDoUpdate({
@@ -141,7 +173,7 @@ export async function ensureWeeklyForecast(
         days,
         promptVersion: WEEKLY_PROMPT_VERSION,
         natalInputHash: chart.inputHash,
-        model: OPENROUTER_MODEL,
+        model,
         language: "ka",
       },
     })
