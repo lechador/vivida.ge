@@ -4,8 +4,35 @@ import Link from "next/link";
 import { Headphones, Lock, Sparkles } from "lucide-react";
 
 import type { DailyHoroscope } from "@/db/schema";
+import type { TransitBreakdownItem } from "@/lib/transit-library";
+import { BODIES } from "@/lib/zodiac";
 import { Button } from "@/components/ui/button";
 import { HoroscopeAudioPlayer } from "./horoscope-audio-player";
+
+const ASPECT_GLYPH: Record<string, string> = {
+  conjunction: "☌",
+  sextile: "⚹",
+  square: "□",
+  trine: "△",
+  opposition: "☍",
+};
+
+const ASPECT_KA: Record<string, string> = {
+  conjunction: "შეერთება",
+  sextile: "სექსტილი",
+  square: "კვადრატი",
+  trine: "ტრინი",
+  opposition: "ოპოზიცია",
+};
+
+/** Harmonic aspects get the cyan accent, tense ones pink, neutral violet. */
+const ASPECT_TONE: Record<string, string> = {
+  conjunction: "var(--vivida-violet)",
+  sextile: "var(--vivida-cyan)",
+  trine: "var(--vivida-cyan)",
+  square: "var(--vivida-pink)",
+  opposition: "var(--vivida-pink)",
+};
 
 /**
  * Pro-only daily horoscope hero card. Shown above the chart wheel so it's
@@ -13,11 +40,14 @@ import { HoroscopeAudioPlayer } from "./horoscope-audio-player";
  */
 export function DailyCard({
   horoscope,
+  transits = [],
   timezone,
   savedVoice,
   canAudio = true,
 }: {
   horoscope: DailyHoroscope;
+  /** Today's strongest transit aspects + their library interpretations. */
+  transits?: TransitBreakdownItem[];
   timezone: string;
   savedVoice?: string | null;
   canAudio?: boolean;
@@ -99,6 +129,51 @@ export function DailyCard({
             <p key={i}>{para}</p>
           ))}
       </div>
+
+      {transits.length > 0 && (
+        <section className="relative mt-6 border-t border-border/40 pt-5">
+          <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            დღის ტრანზიტები
+          </h3>
+          <ul className="mt-3 space-y-3">
+            {transits.map((t, i) => {
+              const tone = ASPECT_TONE[t.kind] ?? "var(--vivida-violet)";
+              const transitBody = BODIES[t.transit];
+              const natalBody = BODIES[t.natal];
+              return (
+                <li
+                  key={i}
+                  className="rounded-xl border border-border/50 bg-background/30 p-3.5"
+                >
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-medium"
+                      style={{
+                        color: tone,
+                        borderColor: `color-mix(in oklch, ${tone} 40%, transparent)`,
+                        backgroundColor: `color-mix(in oklch, ${tone} 10%, transparent)`,
+                      }}
+                    >
+                      {transitBody?.symbol} {transitBody?.labelKa ?? t.transit}
+                      <span aria-hidden>{ASPECT_GLYPH[t.kind] ?? "·"}</span>
+                      {natalBody?.symbol} {natalBody?.labelKa ?? t.natal}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {ASPECT_KA[t.kind] ?? t.kind}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm font-medium text-foreground/95">
+                    {t.title}
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-foreground/80">
+                    {t.body}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       <p className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground">
         ხვალ ახალი წინასწარმეტყველება გელოდება.

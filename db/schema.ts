@@ -651,6 +651,9 @@ export type DailyTransitsJson = {
   /** Today's transiting moon — kept for quick UI access. */
   moonHouse?: number | null;
   moonSignEn?: string;
+  /** "library" = composed from transit_interpretation_library (no AI call),
+   *  "ai" (or absent, for older rows) = full per-user model generation. */
+  source?: "library" | "ai";
 };
 
 /**
@@ -952,6 +955,59 @@ export const houseInterpretationLibrary = pgTable("house_interpretation_library"
 
 export type HouseInterpretationLibraryRow =
   typeof houseInterpretationLibrary.$inferSelect;
+
+/**
+ * Reusable per-transit interpretation library — the daily-horoscope
+ * counterpart of the natal libraries above. A transit means the same thing
+ * for every user who has it ("transiting Moon square natal Venus" reads
+ * identically for everyone), so each finite combination is generated once
+ * and the daily reading is COMPOSED from these rows at generation time —
+ * zero per-user AI calls (see actions/daily.ts). Three kinds:
+ *
+ *   - `kind='aspect'` — (transiting body, aspect kind, natal point):
+ *                        10 × 5 × 13 = 650. Direction matters — transiting
+ *                        Moon → natal Venus ≠ transiting Venus → natal Moon.
+ *   - `kind='house'`  — (transiting body, natal house): 10 × 12 = 120,
+ *                        "this energy is moving through this life area".
+ *   - `kind='sign'`   — (fast body sun…mars, zodiac sign): 5 × 12 = 60,
+ *                        the collective daily/weekly mood (same for everyone).
+ *
+ * `key` is `${kind}:${transit}:${subject}` where subject is
+ * `${aspectKind}:${natalBody}`, a house number, or a sign key.
+ * `title` is a short headline used both as the daily reading's headline
+ * (strongest transit wins) and as the label in the transit-breakdown UI.
+ * `edited=true` marks a human-curated row so regeneration leaves it alone.
+ */
+export const transitInterpretationLibrary = pgTable("transit_interpretation_library", {
+  /** e.g. "aspect:moon:square:venus", "house:mars:7", "sign:moon:leo". */
+  key: text("key").primaryKey(),
+  /** 'aspect' | 'house' | 'sign' */
+  kind: text("kind").notNull(),
+  /** Transiting body key (sun…pluto). */
+  transit: text("transit").notNull(),
+  /** Aspect kind for kind='aspect', else null. */
+  aspectKind: text("aspect_kind"),
+  /** Natal point key (aspect), house number as text (house), or sign key (sign). */
+  subject: text("subject").notNull(),
+  /** Short Georgian headline (3-7 words). */
+  title: text("title").notNull(),
+  /** Georgian interpretation text (2-4 sentences). */
+  body: text("body").notNull(),
+  /** Model id that produced it, "curated", or "manual" after an admin edit. */
+  model: text("model").notNull(),
+  /** True once a human edits it — regeneration skips edited rows. */
+  edited: boolean("edited").notNull().default(false),
+  language: text("language").notNull().default("ka"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type TransitInterpretationLibraryRow =
+  typeof transitInterpretationLibrary.$inferSelect;
 
 /**
  * Web Push subscriptions — one row per browser/device a user opted into

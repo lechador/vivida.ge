@@ -4,7 +4,6 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
-  charts,
   dailyHoroscopes,
   profiles,
   users,
@@ -24,6 +23,13 @@ import {
   OPENROUTER_MODEL,
   type DailyDayContext,
 } from "@/lib/openrouter";
+import {
+  combosForDay,
+  composeDailyFromLibrary,
+  ensureTransitLibraryFor,
+  getTransitLibraryEntries,
+  type TransitDayFacts,
+} from "@/lib/transit-library";
 import { canUseFeature } from "@/lib/features";
 import { signByIndex } from "@/lib/zodiac";
 import type { PlanId } from "@/lib/pricing";
@@ -39,7 +45,6 @@ export async function ensureDailyFor(
   plan: PlanId
 ): Promise<DailyHoroscope | null> {
   if (!canUseFeature("dailyHoroscope", plan)) return null;
-  if (!isOpenRouterConfigured()) return null;
 
   const [profile] = await db
     .select()
@@ -163,18 +168,57 @@ export async function ensureDailyFor(
     outerAspects,
   };
 
-  const [user] = await db
-    .select({ name: users.name })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  const firstName = user?.name?.split(" ")[0] ?? null;
+  // Fast path: compose the reading from the pre-generated transit library —
+  // zero AI calls, instant. Falls back to the full per-user model call only
+  // when a needed library row is missing (self-healed in the background).
+  let reading: {
+    headline: string;
+    summary: string;
+    body: string;
+    themes: string[];
+  } | null = null;
+  let model = OPENROUTER_MODEL;
+  let source: "library" | "ai" = "ai";
 
-  const reading = await generateDailyReading({
-    firstName,
-    chart: chart.data,
-    context,
-  });
+  if (moonPos) {
+    const facts: TransitDayFacts = {
+      moon: {
+        sign: signByIndex(Math.floor(moonPos.longitude / 30)).key,
+        house: moonHouse,
+        aspects: moonAspects,
+      },
+      sun: { house: sunHouse },
+      innerAspects,
+      outerAspects,
+    };
+    const combos = combosForDay(facts);
+    const entries = await getTransitLibraryEntries(combos.map((c) => c.key));
+    const composed = composeDailyFromLibrary(facts, entries);
+    if (composed) {
+      reading = composed;
+      model = "library";
+      source = "library";
+    } else {
+      const missing = combos.filter((c) => !entries.has(c.key));
+      void ensureTransitLibraryFor(missing).catch(() => {});
+    }
+  }
+
+  if (!reading) {
+    if (!isOpenRouterConfigured()) return null;
+    const [user] = await db
+      .select({ name: users.name })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    const firstName = user?.name?.split(" ")[0] ?? null;
+
+    reading = await generateDailyReading({
+      firstName,
+      chart: chart.data,
+      context,
+    });
+  }
 
   if (!reading) return null;
 
@@ -193,8 +237,9 @@ export async function ensureDailyFor(
         natalInputHash: chart.inputHash,
         moonHouse,
         moonSignEn: context.moon.signEn,
+        source,
       },
-      model: OPENROUTER_MODEL,
+      model,
       language: "ka",
     })
     .onConflictDoUpdate({
@@ -210,8 +255,9 @@ export async function ensureDailyFor(
           natalInputHash: chart.inputHash,
           moonHouse,
           moonSignEn: context.moon.signEn,
+          source,
         },
-        model: OPENROUTER_MODEL,
+        model,
         language: "ka",
       },
     })

@@ -176,7 +176,12 @@ function DashboardExtrasSection({
       .catch(() => {
         // Degrade silently — the rest of the dashboard is already useful.
         if (!cancelled) {
-          setExtras({ daily: null, moonPhase: null, weeklyForecast: null });
+          setExtras({
+            daily: null,
+            transitBreakdown: [],
+            moonPhase: null,
+            weeklyForecast: null,
+          });
         }
       });
     return () => {
@@ -191,6 +196,7 @@ function DashboardExtrasSection({
   ) : extras.daily ? (
     <DailyCard
       horoscope={extras.daily}
+      transits={extras.transitBreakdown}
       timezone={timezone}
       savedVoice={savedVoice}
       canAudio={canAudio}

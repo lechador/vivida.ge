@@ -10,6 +10,10 @@ import { ensureMoonPhase, type MoonPhaseRow } from "@/actions/moon-phase";
 import { ensureWeeklyForecast } from "@/actions/weekly-forecast";
 import { canUseFeature } from "@/lib/features";
 import { getDashboardSuggestions } from "@/lib/suggestions";
+import {
+  overlayTransitAspects,
+  type TransitBreakdownItem,
+} from "@/lib/transit-library";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import type { PlanId } from "@/lib/pricing";
 import type {
@@ -79,6 +83,9 @@ export async function loadDashboardCore(
 
 export type DashboardExtras = {
   daily: DailyHoroscope | null;
+  /** Today's strongest transit aspects with their library interpretations —
+   *  the "დღის ტრანზიტები" breakdown under the daily reading. */
+  transitBreakdown: TransitBreakdownItem[];
   moonPhase: MoonPhaseRow | null;
   weeklyForecast: WeeklyForecast | null;
 };
@@ -114,5 +121,14 @@ export async function loadDashboardExtras(
       : Promise.resolve(null),
   ]);
 
-  return { daily, moonPhase, weeklyForecast };
+  // Overlay the stored top aspects with library interpretations. Works for
+  // any cached daily (old AI ones too) since topAspects has always been
+  // persisted; aspects without a library row yet are simply skipped.
+  const transitBreakdown = daily?.transits?.topAspects?.length
+    ? await overlayTransitAspects(daily.transits.topAspects).catch(
+        () => [] as TransitBreakdownItem[]
+      )
+    : [];
+
+  return { daily, transitBreakdown, moonPhase, weeklyForecast };
 }

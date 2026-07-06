@@ -1,0 +1,525 @@
+/**
+ * Reusable per-transit interpretation library — powers the daily horoscope.
+ *
+ * "Transiting Moon square natal Venus" means the same thing for every user
+ * who has it today, so each finite combination is generated once with a
+ * high-quality model, stored in transit_interpretation_library, and the
+ * daily reading is COMPOSED from these rows (see composeDailyFromLibrary)
+ * instead of one slow per-user AI call. Three kinds:
+ *
+ *   - aspect: (transiting body, aspect kind, natal point) — 10 × 5 × 13 = 650.
+ *             Directional: the transiting body is today's sky, the natal
+ *             point is the person — so no alphabetical key sorting here.
+ *   - house:  (transiting body, natal house) — 10 × 12 = 120.
+ *   - sign:   (fast body sun…mars, zodiac sign) — 5 × 12 = 60. The
+ *             collective mood; slow bodies' sign is generational noise.
+ *
+ * Rows flagged `edited` are never overwritten by regeneration. The
+ * generators here (OpenRouter) are the live self-heal path only — bulk
+ * seeding uses scripts/seed-transit-library.mjs (Vertex AI).
+ */
+
+import { inArray } from "drizzle-orm";
+
+import { db } from "@/db";
+import { transitInterpretationLibrary } from "@/db/schema";
+import { BODIES } from "./zodiac";
+import { HOUSES } from "./houses";
+import { SIGNS } from "./zodiac";
+import type { AspectKind } from "./aspects";
+import { ASPECT_BODIES, ASPECT_KINDS, libraryKindKa } from "./aspect-library";
+import type { CrossAspect } from "./transits";
+
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+/** Same higher-quality model used for the other libraries. */
+export const TRANSIT_LIBRARY_MODEL = "google/gemini-3.1-pro-preview";
+
+/** Bodies that transit (today's sky). Same 10 as lib/transits.ts computes. */
+export const TRANSIT_LIBRARY_BODIES = [
+  "sun",
+  "moon",
+  "mercury",
+  "venus",
+  "mars",
+  "jupiter",
+  "saturn",
+  "uranus",
+  "neptune",
+  "pluto",
+] as const;
+
+/** Fast movers whose current sign colors the day/week for everyone. */
+export const TRANSIT_SIGN_BODIES = [
+  "sun",
+  "moon",
+  "mercury",
+  "venus",
+  "mars",
+] as const;
+
+/** How long each transit's influence lasts — woven into prompts and copy. */
+const TIMESCALE_KA: Record<string, string> = {
+  moon: "დღეს (მთვარის ტრანზიტი 1-2 დღე გრძელდება)",
+  sun: "ამ დღეებში (მზის ტრანზიტი რამდენიმე დღე გრძელდება)",
+  mercury: "ამ დღეებში (რამდენიმე დღე გრძელდება)",
+  venus: "ამ დღეებში (რამდენიმე დღე გრძელდება)",
+  mars: "ამ კვირაში (დაახლოებით ერთი კვირა გრძელდება)",
+  jupiter: "ამ პერიოდში (კვირები გრძელდება)",
+  saturn: "ამ პერიოდში (კვირები და თვეები გრძელდება)",
+  uranus: "ამ პერიოდში (თვეები გრძელდება)",
+  neptune: "ამ პერიოდში (თვეები გრძელდება)",
+  pluto: "ამ პერიოდში (თვეები გრძელდება)",
+};
+
+// ---------------------------------------------------------------------------
+// Keys + combos
+// ---------------------------------------------------------------------------
+
+export function transitAspectKey(
+  transit: string,
+  kind: AspectKind,
+  natal: string
+): string {
+  return `aspect:${transit}:${kind}:${natal}`;
+}
+
+export function transitHouseKey(transit: string, house: number): string {
+  return `house:${transit}:${house}`;
+}
+
+export function transitSignKey(transit: string, sign: string): string {
+  return `sign:${transit}:${sign}`;
+}
+
+export type TransitCombo = {
+  key: string;
+  kind: "aspect" | "house" | "sign";
+  transit: string;
+  aspectKind: AspectKind | null;
+  subject: string;
+};
+
+/** Every possible combo: 650 aspect + 120 house + 60 sign = 830. */
+export function allTransitCombos(): TransitCombo[] {
+  const out: TransitCombo[] = [];
+  for (const t of TRANSIT_LIBRARY_BODIES) {
+    for (const kind of ASPECT_KINDS) {
+      for (const n of ASPECT_BODIES) {
+        out.push({
+          key: transitAspectKey(t, kind, n),
+          kind: "aspect",
+          transit: t,
+          aspectKind: kind,
+          subject: n,
+        });
+      }
+    }
+    for (let h = 1; h <= 12; h++) {
+      out.push({
+        key: transitHouseKey(t, h),
+        kind: "house",
+        transit: t,
+        aspectKind: null,
+        subject: String(h),
+      });
+    }
+  }
+  for (const t of TRANSIT_SIGN_BODIES) {
+    for (const s of SIGNS) {
+      out.push({
+        key: transitSignKey(t, s.key),
+        kind: "sign",
+        transit: t,
+        aspectKind: null,
+        subject: s.key,
+      });
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Reads
+// ---------------------------------------------------------------------------
+
+export type TransitEntry = { title: string; body: string };
+
+/**
+ * Batched read: key → {title, body} for the requested keys. Pure read —
+ * never generates. Editing a row in the admin reflects on next compose.
+ */
+export async function getTransitLibraryEntries(
+  keys: string[]
+): Promise<Map<string, TransitEntry>> {
+  if (keys.length === 0) return new Map();
+  const rows = await db
+    .select({
+      key: transitInterpretationLibrary.key,
+      title: transitInterpretationLibrary.title,
+      body: transitInterpretationLibrary.body,
+    })
+    .from(transitInterpretationLibrary)
+    .where(inArray(transitInterpretationLibrary.key, keys));
+  return new Map(rows.map((r) => [r.key, { title: r.title, body: r.body }]));
+}
+
+// ---------------------------------------------------------------------------
+// Prompts + live self-heal generation (OpenRouter)
+// ---------------------------------------------------------------------------
+
+const SYSTEM_PROMPT =
+  "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
+  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები " +
+  '("ვარსკვლავები გელიან", "მიენდე სამყაროს"). ' +
+  'დააბრუნე მხოლოდ JSON: {"title": "...", "body": "..."} — title არის ' +
+  "მოკლე სათაური (3-6 სიტყვა, წერტილის გარეშე), body — ტექსტი.";
+
+/** Build the user prompt for one combo. Short daily copy, not natal essays. */
+export function buildTransitPrompt(combo: TransitCombo): string {
+  const t = BODIES[combo.transit];
+  const tLabel = t?.labelKa ?? combo.transit;
+  const tMeaning = t?.meaningKa ?? "";
+  const timescale = TIMESCALE_KA[combo.transit] ?? "ამ პერიოდში";
+
+  if (combo.kind === "aspect") {
+    const n = BODIES[combo.subject];
+    const nLabel = n?.labelKa ?? combo.subject;
+    const nMeaning = n?.meaningKa ?? "";
+    const kindKa = libraryKindKa(combo.aspectKind!);
+    return (
+      `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ტრანზიტული ${tLabel} ${kindKa} ` +
+      `ნატალურ ${nLabel}-სთან.\n` +
+      `ტრანზიტული ${tLabel} — დღევანდელი ცის ენერგია (${tMeaning}). ` +
+      `ნატალური ${nLabel} — ადამიანის თანდაყოლილი თვისება (${nMeaning}).\n` +
+      `დროის მასშტაბი: ${timescale}.\n\n` +
+      `2-4 წინადადება (დაახ. 40-70 სიტყვა), "შენ"-ის ფორმა. ახსენი რა იგრძნობა ` +
+      `დღეს ამ ტრანზიტით და ერთი კონკრეტული, პრაქტიკული რჩევა. ` +
+      `title იყოს ამ დღის განწყობის მოკლე, ცოცხალი ფორმულირება.`
+    );
+  }
+
+  if (combo.kind === "house") {
+    const h = HOUSES[Number(combo.subject)];
+    return (
+      `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ტრანზიტული ${tLabel} გადის ` +
+      `ნატალურ ${h.labelKa}-ში (${h.themeKa}).\n` +
+      `${tLabel} — ${tMeaning}. ${h.labelKa} — ${h.meaningKa}\n` +
+      `დროის მასშტაბი: ${timescale}.\n\n` +
+      `2-3 წინადადება (დაახ. 35-60 სიტყვა), "შენ"-ის ფორმა. რომელი ცხოვრების ` +
+      `სფერო აქტიურდება და როგორ გამოიყენო ეს დღეს. ` +
+      `title იყოს მოკლე და კონკრეტული.`
+    );
+  }
+
+  const s = SIGNS.find((x) => x.key === combo.subject);
+  const sLabel = s?.labelKa ?? combo.subject;
+  return (
+    `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ${tLabel} ახლა ${sLabel}-შია — ` +
+    `ეს ყველასთვის საერთო, კოლექტიური განწყობაა.\n` +
+    `${tLabel} — ${tMeaning}. ${sLabel}-ის ელემენტი: ${s?.element ?? ""}, ` +
+    `მოდალობა: ${s?.modality ?? ""}.\n` +
+    `დროის მასშტაბი: ${timescale}.\n\n` +
+    `2-3 წინადადება (დაახ. 35-60 სიტყვა), "შენ"-ის ფორმა. როგორი ემოციური/` +
+    `ენერგეტიკული ფონია დღეს ამ განლაგებით და რას უწყობს ხელს. ` +
+    `title იყოს დღის განწყობის მოკლე ფორმულირება.`
+  );
+}
+
+interface OpenRouterJson {
+  choices?: Array<{ message?: { content?: string } }>;
+  error?: { message: string };
+}
+
+/** Parse the model's {"title","body"} JSON, tolerating code fences. */
+export function parseTransitEntryJson(raw: string): TransitEntry {
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+  const parsed = JSON.parse(stripped) as Partial<TransitEntry>;
+  if (!parsed.title || !parsed.body) throw new Error("missing title/body");
+  return { title: parsed.title.trim(), body: parsed.body.trim() };
+}
+
+/** Generate one entry via OpenRouter (live self-heal path). Throws on error. */
+export async function generateTransitEntry(
+  combo: TransitCombo
+): Promise<TransitEntry> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida transit library",
+    },
+    body: JSON.stringify({
+      model: TRANSIT_LIBRARY_MODEL,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: buildTransitPrompt(combo) },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.8,
+      // gemini-3.1-pro always reasons — leave headroom past the thinking budget.
+      max_tokens: 8000,
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+  const json = (await res.json()) as OpenRouterJson;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error(`empty entry for ${combo.key}`);
+  return parseTransitEntryJson(raw);
+}
+
+/**
+ * Ensure rows exist for the given combos, generating any missing ones and
+ * persisting them. Background/self-heal path — callers should NOT await this
+ * on a render path; gaps fall back to the full-AI daily instead.
+ */
+export async function ensureTransitLibraryFor(
+  combos: TransitCombo[]
+): Promise<void> {
+  const have = await getTransitLibraryEntries(combos.map((c) => c.key));
+  const missing = combos.filter((c) => !have.has(c.key));
+  for (const c of missing) {
+    try {
+      const entry = await generateTransitEntry(c);
+      await db
+        .insert(transitInterpretationLibrary)
+        .values({
+          key: c.key,
+          kind: c.kind,
+          transit: c.transit,
+          aspectKind: c.aspectKind,
+          subject: c.subject,
+          title: entry.title,
+          body: entry.body,
+          model: TRANSIT_LIBRARY_MODEL,
+        })
+        .onConflictDoNothing();
+    } catch (err) {
+      console.warn(
+        `[transit-library] generate failed for ${c.key}:`,
+        (err as Error).message
+      );
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Daily composition
+// ---------------------------------------------------------------------------
+
+/** The day's computed transit facts, with sign KEYS (not English labels). */
+export type TransitDayFacts = {
+  moon: { sign: string; house: number | null; aspects: CrossAspect[] };
+  sun: { house: number | null };
+  innerAspects: CrossAspect[];
+  outerAspects: CrossAspect[];
+};
+
+/** Theme chip per transiting body — composed dailies pick from these. */
+const BODY_THEME_KA: Record<string, string> = {
+  sun: "იდენტობა",
+  moon: "ემოციები",
+  mercury: "კომუნიკაცია",
+  venus: "ურთიერთობები",
+  mars: "ენერგია",
+  jupiter: "ზრდა",
+  saturn: "სტრუქტურა",
+  uranus: "ცვლილება",
+  neptune: "ინტუიცია",
+  pluto: "ტრანსფორმაცია",
+};
+
+/** How many of each aspect category the composed reading uses. */
+const COMPOSE_LIMITS = { moon: 3, inner: 2, outer: 1 } as const;
+
+function aspectCombo(a: CrossAspect): TransitCombo {
+  return {
+    key: transitAspectKey(a.transit, a.kind, a.natal),
+    kind: "aspect",
+    transit: a.transit,
+    aspectKind: a.kind,
+    subject: a.natal,
+  };
+}
+
+/**
+ * The exact combos composeDailyFromLibrary would use for these facts.
+ * Composition runs only when ALL of them have library rows.
+ */
+export function combosForDay(facts: TransitDayFacts): TransitCombo[] {
+  const out: TransitCombo[] = [];
+  out.push({
+    key: transitSignKey("moon", facts.moon.sign),
+    kind: "sign",
+    transit: "moon",
+    aspectKind: null,
+    subject: facts.moon.sign,
+  });
+  if (facts.moon.house) {
+    out.push({
+      key: transitHouseKey("moon", facts.moon.house),
+      kind: "house",
+      transit: "moon",
+      aspectKind: null,
+      subject: String(facts.moon.house),
+    });
+  }
+  if (facts.sun.house) {
+    out.push({
+      key: transitHouseKey("sun", facts.sun.house),
+      kind: "house",
+      transit: "sun",
+      aspectKind: null,
+      subject: String(facts.sun.house),
+    });
+  }
+  for (const a of facts.moon.aspects.slice(0, COMPOSE_LIMITS.moon))
+    out.push(aspectCombo(a));
+  for (const a of facts.innerAspects.slice(0, COMPOSE_LIMITS.inner))
+    out.push(aspectCombo(a));
+  for (const a of facts.outerAspects.slice(0, COMPOSE_LIMITS.outer))
+    out.push(aspectCombo(a));
+  return out;
+}
+
+export type ComposedDaily = {
+  headline: string;
+  summary: string;
+  body: string;
+  themes: string[];
+};
+
+/**
+ * Compose the daily reading purely from library entries — zero AI calls.
+ * Returns null if any needed entry is missing (caller falls back to the
+ * full-AI path and self-heals the gap in the background).
+ *
+ * Shape mirrors the AI reading: headline from the strongest transit's title,
+ * summary = the collective Moon-sign mood, body = Moon house → Moon aspects
+ * → week background (inner) → long-term backdrop (outer) paragraphs.
+ */
+export function composeDailyFromLibrary(
+  facts: TransitDayFacts,
+  entries: Map<string, TransitEntry>
+): ComposedDaily | null {
+  const need = (key: string): TransitEntry | null => entries.get(key) ?? null;
+
+  const moonSign = need(transitSignKey("moon", facts.moon.sign));
+  if (!moonSign) return null;
+
+  const moonHouse = facts.moon.house
+    ? need(transitHouseKey("moon", facts.moon.house))
+    : null;
+  if (facts.moon.house && !moonHouse) return null;
+
+  const sunHouse = facts.sun.house
+    ? need(transitHouseKey("sun", facts.sun.house))
+    : null;
+  if (facts.sun.house && !sunHouse) return null;
+
+  const collect = (aspects: CrossAspect[], limit: number) => {
+    const out: Array<{ aspect: CrossAspect; entry: TransitEntry }> = [];
+    for (const a of aspects.slice(0, limit)) {
+      const entry = need(transitAspectKey(a.transit, a.kind, a.natal));
+      if (!entry) return null; // any gap → whole composition aborts
+      out.push({ aspect: a, entry });
+    }
+    return out;
+  };
+
+  const moonAspects = collect(facts.moon.aspects, COMPOSE_LIMITS.moon);
+  const innerAspects = collect(facts.innerAspects, COMPOSE_LIMITS.inner);
+  const outerAspects = collect(facts.outerAspects, COMPOSE_LIMITS.outer);
+  if (!moonAspects || !innerAspects || !outerAspects) return null;
+
+  // Headline: the tightest Moon aspect leads the day; quiet days fall back
+  // to the Moon's house, then its sign.
+  const headline =
+    moonAspects[0]?.entry.title ?? moonHouse?.title ?? moonSign.title;
+
+  const paragraphs: string[] = [];
+  if (moonHouse) paragraphs.push(moonHouse.body);
+  for (const m of moonAspects) paragraphs.push(m.entry.body);
+  // Quiet Moon days get the slower Sun-house backdrop as filler context.
+  if (sunHouse && moonAspects.length <= 1) paragraphs.push(sunHouse.body);
+  for (const i of innerAspects) paragraphs.push(i.entry.body);
+  for (const o of outerAspects) paragraphs.push(o.entry.body);
+  if (paragraphs.length === 0) paragraphs.push(moonSign.body);
+
+  // Themes: one chip per distinct transiting body involved, Moon first.
+  const bodies: string[] = ["moon"];
+  for (const { aspect } of [...moonAspects, ...innerAspects, ...outerAspects]) {
+    if (!bodies.includes(aspect.transit)) bodies.push(aspect.transit);
+  }
+  const themes = bodies
+    .map((b) => BODY_THEME_KA[b])
+    .filter(Boolean)
+    .slice(0, 4);
+
+  return {
+    headline,
+    summary: moonSign.body,
+    body: paragraphs.join("\n\n"),
+    themes,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Read-time overlay for the transit-breakdown UI
+// ---------------------------------------------------------------------------
+
+export type TransitBreakdownItem = {
+  transit: string;
+  natal: string;
+  /** Aspect kind — string, matching how topAspects is persisted in jsonb. */
+  kind: string;
+  orb: number;
+  title: string;
+  body: string;
+};
+
+/**
+ * Map stored top aspects (dailyHoroscopes.transits.topAspects) to their
+ * library interpretations for display. Aspects without a library row yet are
+ * skipped — the section simply shows fewer items until the seed completes.
+ */
+export async function overlayTransitAspects(
+  aspects: Array<{ transit: string; natal: string; kind: string; orb: number }>,
+  limit = 5
+): Promise<TransitBreakdownItem[]> {
+  const top = aspects.slice(0, limit * 2); // over-fetch: some may lack rows
+  const entries = await getTransitLibraryEntries(
+    top.map((a) => transitAspectKey(a.transit, a.kind as AspectKind, a.natal))
+  );
+  const out: TransitBreakdownItem[] = [];
+  for (const a of top) {
+    const entry = entries.get(
+      transitAspectKey(a.transit, a.kind as AspectKind, a.natal)
+    );
+    if (!entry) continue;
+    out.push({
+      transit: a.transit,
+      natal: a.natal,
+      kind: a.kind,
+      orb: a.orb,
+      title: entry.title,
+      body: entry.body,
+    });
+    if (out.length >= limit) break;
+  }
+  return out;
+}
