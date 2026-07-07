@@ -465,11 +465,24 @@ export async function sendDailyHoroscopeBlast(opts: {
     async (recipient) => {
       const idempotencyKey = `daily:${recipient.userId}:${opts.sendDate}`;
       try {
-        const ok = await dispatch(
-          { template: "daily_horoscope" },
-          recipient,
-          idempotencyKey
-        );
+        let ok: boolean;
+        try {
+          ok = await dispatch(
+            { template: "daily_horoscope" },
+            recipient,
+            idempotencyKey
+          );
+        } catch (err) {
+          // One in-pass retry for rate-limit blips; the idempotency key
+          // makes the retry safe even if the first send actually landed.
+          if (!/too many requests/i.test((err as Error).message ?? "")) throw err;
+          await new Promise((r) => setTimeout(r, 2000));
+          ok = await dispatch(
+            { template: "daily_horoscope" },
+            recipient,
+            idempotencyKey
+          );
+        }
         if (ok) {
           await db
             .update(dailyEmailLog)

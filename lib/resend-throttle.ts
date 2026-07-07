@@ -15,7 +15,10 @@
  * through without waiting.
  */
 
-const RESEND_MIN_INTERVAL_MS = 600;
+// 2 req/s nominal limit, but 600ms spacing still tripped sporadic 429s —
+// network jitter compresses arrivals so a rolling 1s window at Resend's
+// edge occasionally sees >2. ≥1s spacing keeps every window at 1 request.
+const RESEND_MIN_INTERVAL_MS = 1100;
 
 let nextSendSlot = 0;
 
