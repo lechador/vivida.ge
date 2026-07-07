@@ -285,6 +285,42 @@ export async function sendWelcomeEmail({
 }
 
 /**
+ * Send the welcome email only once the account is a fully onboarded member:
+ * email verified AND birth data (a profile row) present. Called from the
+ * profile-save background hooks (web + mobile) — the moment onboarding
+ * finishes — NOT at registration, so a signup that stops at "check your
+ * inbox" never gets a premature "your cosmic journey begins."
+ *
+ * "Email verified" = a verified password account (emailVerified set) OR an
+ * OAuth account (no passwordHash — Google already proved the address). NB:
+ * web Google users end up with emailVerified NULL in the DB, so gating on
+ * that column alone would wrongly skip every Google signup. This mirrors the
+ * login gate in auth.ts (unverified password users can't sign in at all).
+ *
+ * Idempotent all the way down: sendWelcomeEmail dedups on email_send_log,
+ * so re-running (e.g. a later profile edit) never re-sends.
+ */
+export async function sendWelcomeIfEligible(userId: string): Promise<void> {
+  const [row] = await db
+    .select({
+      email: users.email,
+      name: users.name,
+      emailVerified: users.emailVerified,
+      passwordHash: users.passwordHash,
+      hasProfile: profiles.userId,
+    })
+    .from(users)
+    .leftJoin(profiles, eq(profiles.userId, users.id))
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (!row?.email || !row.hasProfile) return;
+  const emailProven = row.emailVerified !== null || row.passwordHash === null;
+  if (!emailProven) return;
+  await sendWelcomeEmail({ userId, to: row.email, name: row.name });
+}
+
+/**
  * Friend-request email — sent only when the recipient has been absent
  * for ≥1h and we haven't sent them a friend-request email in the last
  * hour. Respects the `emailNudges` preference. Never throws.

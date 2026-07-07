@@ -2,8 +2,7 @@ import { eq } from "drizzle-orm";
 import { after } from "next/server";
 
 import { db } from "@/db";
-import { subscriptions, users, type Subscription } from "@/db/schema";
-import { sendWelcomeEmail } from "@/lib/email";
+import { subscriptions, type Subscription } from "@/db/schema";
 import { awardReputation, RepSubject } from "@/lib/reputation";
 import type { PlanId } from "./pricing";
 
@@ -152,30 +151,13 @@ export async function provisionTrialIfMissing(
     // If onConflictDoNothing skipped the insert, fetch the existing row.
     if (!inserted) return await getSubscription(userId);
 
-    // Fire welcome email after the response returns so signup latency
-    // isn't hit by Resend round-trips. The helper is idempotent at the
-    // email_send_log level — a concurrent provision call won't double-send.
+    // Credit the one-shot "joined" reputation in the background. The welcome
+    // email is intentionally NOT sent here — it fires only once onboarding
+    // completes (email verified + birth data filled), from the profile-save
+    // hooks via sendWelcomeIfEligible. Sending it at trial-provision time
+    // (i.e. at registration) meant a "your cosmic journey begins" landed
+    // before the user had even confirmed their email.
     after(async () => {
-      try {
-        const [u] = await db
-          .select({ email: users.email, name: users.name })
-          .from(users)
-          .where(eq(users.id, userId))
-          .limit(1);
-        if (!u?.email) return;
-        await sendWelcomeEmail({
-          userId,
-          to: u.email,
-          name: u.name ?? null,
-        });
-      } catch (err) {
-        console.warn(
-          "[plan] welcome email after-hook failed:",
-          (err as Error).message
-        );
-      }
-      // Reputation — one-shot "joined" bonus. Dedup keeps this from
-      // firing twice if provisioning somehow runs again.
       await awardReputation({
         userId,
         kind: "joined",

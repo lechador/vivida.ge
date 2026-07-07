@@ -11,6 +11,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import { invalidateProfileForUser } from "@/lib/header-cache";
 import { ensureChartFor } from "@/actions/chart";
 import { getCurrentPlan } from "@/lib/plan";
+import { sendWelcomeIfEligible } from "@/lib/email";
 import { awardReputation, RepSubject } from "@/lib/reputation";
 import {
   saveBirthDataCore,
@@ -61,6 +62,10 @@ export async function saveProfile(
       kind: "profile_completed",
       subjectId: RepSubject.oneShot(userId),
     });
+    // Welcome email — onboarding is now complete (email verified + birth
+    // data saved), so this is the right moment for "your cosmic journey
+    // begins." Idempotent, so later profile edits never re-send.
+    await sendWelcomeIfEligible(userId);
   });
 
   revalidatePath("/dashboard");

@@ -7,6 +7,7 @@ import { ok, fail } from "@/lib/api/respond";
 import { parseBody } from "@/lib/api/validate";
 import { ensureChartFor } from "@/actions/chart";
 import { getCurrentPlan } from "@/lib/plan";
+import { sendWelcomeIfEligible } from "@/lib/email";
 import { invalidateProfileForUser } from "@/lib/header-cache";
 import {
   saveBirthDataCore,
@@ -69,6 +70,9 @@ export async function PUT(req: Request) {
         kind: "profile_completed",
         subjectId: RepSubject.oneShot(userId),
       });
+      // Welcome email fires now — onboarding complete (verified + birth
+      // data), not at registration. Idempotent; edits never re-send.
+      await sendWelcomeIfEligible(userId);
     });
 
     return ok({ ok: true });
