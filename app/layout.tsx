@@ -134,6 +134,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        {/* Scroll-reveal sections start opacity:0 and are shown by JS. With
+            JS disabled, force them visible so content is never hidden. */}
+        <noscript>
+          <style>{`.reveal{opacity:1 !important;transform:none !important}`}</style>
+        </noscript>
         <NextTopLoader
           color="oklch(0.78 0.18 305)"
           height={2.5}

@@ -285,6 +285,43 @@
 }
 
 /*
+ * Scroll-reveal (see components/landing/reveal.tsx) — the CSS replacement for
+ * framer-motion's fade-up on landing sections. Hidden until the shared
+ * IntersectionObserver flips data-revealed; the transition is compositor-only
+ * (opacity + transform), so it doesn't contend with interaction handling the
+ * way per-element JS animations did.
+ */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-y, 24px));
+  transition:
+    opacity var(--reveal-dur, 700ms) cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform var(--reveal-dur, 700ms) cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+}
+.reveal[data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+}
+/* Reduced-motion or no-JS: content is shown immediately, never stuck hidden. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Slow background rotations for the final-CTA aura (were framer-motion
+ * infinite-rotate motion.divs — now pure compositor animations). */
+@keyframes vivida-spin-60 { to { transform: rotate(360deg); } }
+@keyframes vivida-spin-80 { to { transform: rotate(-360deg); } }
+.vivida-spin-60 { animation: vivida-spin-60 60s linear infinite; }
+.vivida-spin-80 { animation: vivida-spin-80 80s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .vivida-spin-60, .vivida-spin-80 { animation: none; }
+}
+
+/*
  * Mobile compositing hack — `backdrop-filter` is among the most expensive
  * GPU operations on mobile browsers (especially Safari iOS, where it can
  * tank scroll FPS). Below 640px we strip every `backdrop-blur-*` utility
