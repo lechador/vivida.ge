@@ -12,12 +12,24 @@ const URL = `${SITE_URL}/piradi-ruka`;
 
 // "პირადი რუკა" is the synonym people search for alongside "ნატალური რუკა".
 // This page targets that term head-on (slug + title + H1 + body), and links
-// to /nataluri-ruka so the two reinforce each other rather than compete.
+// to /nataluri-ruka so the two reinforce each other rather than compete
+// (that page owns "გამოთვლა" phrasing; this one owns "შედგენა").
+//
+// GSC (2026-07): "პირადი რუკის შედგენა [ონლაინ/უფასოდ/ქართულად]" gets real
+// impressions (21 combined) but almost zero clicks — the page never used
+// the word "შედგენა" anywhere, so it wasn't a strong match for that intent.
+// Added below, plus the "რუქა" typo and standalone "ასტროლოგიური რუკა".
 const KEYWORDS = [
   "პირადი რუკა",
   "პირადი რუკა ონლაინ",
   "პირადი ნატალური რუკა",
   "პირადი ასტროლოგიური რუკა",
+  "ასტროლოგიური რუკა",
+  "პირადი რუკის შედგენა",
+  "პირადი რუკის შედგენა ონლაინ",
+  "პირადი რუკის შედგენა უფასოდ",
+  "როგორ შევადგინო პირადი რუკა",
+  "პირადი რუქა",
   "piradi ruka",
   "ნატალური რუკა",
 ];
@@ -46,11 +58,15 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
+    q: "როგორ შევადგინო პირადი რუკა?",
+    a: "პირადი რუკის შედგენა 3 ნაბიჯშია: (1) შეიყვანე დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ კალკულატორში, (2) დააჭირე „გამოთვლას“ — შედეგი მყისიერად გამოჩნდება, (3) ნახე პლანეტების პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები. რეგისტრაცია არ სჭირდება.",
+  },
+  {
     q: "პირადი რუკა და ნატალური რუკა ერთი და იგივეა?",
     a: "დიახ. „პირადი რუკა“ და „ნატალური რუკა“ (დაბადების რუკა) ერთი და იმავე რამის სხვადასხვა სახელია — ცის პერსონალური სურათი შენი დაბადების ზუსტ მომენტში. იგი მხოლოდ შენია, რადგან შენს ზუსტ დროსა და ადგილს ეფუძნება.",
   },
   {
-    q: "უფასოა პირადი რუკის გამოთვლა?",
+    q: "უფასოა პირადი რუკის შედგენა?",
     a: "დიახ. შეიყვანე დაბადების თარიღი, დრო და ქალაქი და მიიღე შენი პირადი რუკის სრული მონაცემები უფასოდ, რეგისტრაციის გარეშე. ღრმა ინტერპრეტაციისა და AI ანალიზისთვის საჭიროა მხოლოდ უფასო რეგისტრაცია.",
   },
   {
@@ -156,6 +172,30 @@ export default function PiradiRukaPage() {
               და სწორედ ამიტომ აჩვენებს შენს პიროვნებას უფრო ღრმად, ვიდრე
               მხოლოდ მზის ნიშანი.
             </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              როგორ შევადგინო პირადი რუკა?
+            </h2>
+            <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
+              პირადი რუკის შედგენა ონლაინ და უფასოდ, 3 ნაბიჯში:
+            </p>
+            <ol className="mt-4 space-y-3 text-base leading-relaxed text-foreground/85">
+              <li>
+                <strong className="text-foreground">1. შეიყვანე მონაცემები</strong>{" "}
+                — დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ
+                კალკულატორში.
+              </li>
+              <li>
+                <strong className="text-foreground">2. გამოთვალე</strong> —
+                შედეგი მყისიერად ჩნდება, რეგისტრაციის გარეშე.
+              </li>
+              <li>
+                <strong className="text-foreground">3. გაეცანი შედეგს</strong> —
+                პლანეტების პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები.
+              </li>
+            </ol>
           </section>
 
           <section>
