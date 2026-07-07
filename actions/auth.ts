@@ -183,17 +183,28 @@ export async function verifyEmailToken(
 
 // ─── Verify-email OTP code (link alternative) ────────────────────────────
 
-export type VerifyCodeResult = { ok: true } | { ok: false; error: string };
+export type VerifyCodeResult =
+  | { ok: true; signedIn: boolean }
+  | { ok: false; error: string };
 
 /**
  * Verify an account by the 6-digit code from the email — the easier path for
  * users who struggle with links. Rate-limited hard (per IP + per email): a
  * 6-digit code is small, so the attempt cap is what makes brute force
- * infeasible. On success the account is verified and the user can sign in.
+ * infeasible.
+ *
+ * When `password` is supplied (the signup / login screens still hold it in
+ * memory), we sign the user in immediately on success — no bounce to the
+ * login page to re-type the password they just used. This is *stronger*
+ * proof than a normal login: they've shown both inbox control (the code) AND
+ * the password. No Turnstile needed for that reason, and it's rate-limited.
+ * `signedIn` tells the client whether a session was established; on any
+ * signin hiccup it stays false and the client falls back to the login page.
  */
 export async function verifyEmailWithCode(input: {
   email: string;
   code: string;
+  password?: string;
 }): Promise<VerifyCodeResult> {
   const email = normalizeEmail(input.email);
   if (!isValidEmail(email)) return { ok: false, error: "არასწორი ელფოსტა" };
@@ -218,14 +229,31 @@ export async function verifyEmailWithCode(input: {
   }
 
   const result = await consumeEmailVerifyCode({ email, code: input.code });
-  if (result.ok) return { ok: true };
-  return {
-    ok: false,
-    error:
-      result.error === "expired"
-        ? "კოდს ვადა გაუვიდა. მოითხოვე ახალი."
-        : "კოდი არასწორია. შეამოწმე და სცადე ხელახლა.",
-  };
+  if (!result.ok) {
+    return {
+      ok: false,
+      error:
+        result.error === "expired"
+          ? "კოდს ვადა გაუვიდა. მოითხოვე ახალი."
+          : "კოდი არასწორია. შეამოწმე და სცადე ხელახლა.",
+    };
+  }
+
+  // Account is now verified. If we have the password, establish a session so
+  // the user lands straight in the app instead of retyping it on /login.
+  if (input.password) {
+    try {
+      await signIn("credentials", {
+        email,
+        password: input.password,
+        redirect: false,
+      });
+      return { ok: true, signedIn: true };
+    } catch {
+      // Verified fine, but auto-signin failed — client falls back to /login.
+    }
+  }
+  return { ok: true, signedIn: false };
 }
 
 // ─── Password reset request ──────────────────────────────────────────────

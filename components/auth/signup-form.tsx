@@ -32,10 +32,13 @@ export function SignupForm() {
     e.preventDefault();
     setCodeError(null);
     startVerify(async () => {
-      const res = await verifyEmailWithCode({ email, code: code.trim() });
+      // Pass the password we still hold so a correct code signs them straight
+      // in — no bounce to /login to retype it. Falls back to /login if the
+      // auto-signin didn't take.
+      const res = await verifyEmailWithCode({ email, code: code.trim(), password });
       if (res.ok) {
-        // Verified — send them to login with the success banner.
-        router.push("/login?verified=1");
+        router.push(res.signedIn ? "/onboarding" : "/login?verified=1");
+        router.refresh();
       } else {
         setCodeError(res.error);
       }

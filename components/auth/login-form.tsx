@@ -90,13 +90,19 @@ export function LoginForm() {
     if (!unverifiedEmail || code.length !== 6) return;
     setCodeError(null);
     startCodeTransition(async () => {
+      // Pass the password they just typed so a correct code both verifies
+      // AND signs them in — straight into the app, no second "შესვლა".
       const res = await verifyEmailWithCode({
         email: unverifiedEmail,
         code: code.trim(),
+        password,
       });
-      if (res.ok) {
-        // Verified — clear the wall so they can sign in with the password
-        // they already typed. They just press "შესვლა" again.
+      if (res.ok && res.signedIn) {
+        router.push("/feed");
+        router.refresh();
+      } else if (res.ok) {
+        // Verified but auto-signin didn't take — clear the wall so they can
+        // press "შესვლა" with the password they already typed.
         setCodeVerified(true);
         setError(null);
         setUnverifiedEmail(null);
