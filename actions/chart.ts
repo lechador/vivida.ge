@@ -180,18 +180,54 @@ async function resolveChart(
 }
 
 /**
+ * True for transient network/connection failures (Neon HTTP driver blips,
+ * DNS hiccups) as opposed to real query errors (bad SQL, constraint
+ * violations) — walks the `.cause` chain since drizzle/neon wrap the
+ * original TypeError a couple of layers deep.
+ */
+function isTransientDbError(err: unknown): boolean {
+  let e: unknown = err;
+  for (let i = 0; i < 4 && e; i++) {
+    const msg = (e as { message?: string }).message ?? "";
+    if (/fetch failed|error connecting to database|econnreset|etimedout/i.test(msg)) {
+      return true;
+    }
+    e = (e as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
+/**
  * Public accessor — resolves the chart, then overlays the shared per-placement
  * interpretation library (Big Three + planet sections) so every consumer
  * renders the same reusable text and an admin edit reflects for all users at
  * once. Falls back to the chart's own static/AI text when a row isn't seeded.
+ *
+ * This is the heaviest DB path in the app on a cache miss — profile select,
+ * chart select/upsert, computeChart, plus a handful of per-placement library
+ * selects — which is exactly the first /report view right after signup. A
+ * single transient Neon connection blip anywhere in that burst previously
+ * surfaced as an opaque Server Component crash ("reload to try again"). One
+ * silent retry recovers the same way the manual reload did.
  */
 export async function ensureChartFor(
   userId: string,
   plan: PlanId = "free",
   opts: { aiUpgrade?: AiUpgradeMode } = {}
 ): Promise<Chart | null> {
-  const chart = await resolveChart(userId, plan, opts);
-  return chart ? overlayLibrary(chart) : chart;
+  try {
+    const chart = await resolveChart(userId, plan, opts);
+    return chart ? overlayLibrary(chart) : chart;
+  } catch (err) {
+    if (!isTransientDbError(err)) throw err;
+    console.warn(
+      "[ensureChartFor] transient DB error, retrying once:",
+      (err as Error).message
+    );
+    await new Promise((r) => setTimeout(r, 300));
+    const chart = await resolveChart(userId, plan, opts);
+    return chart ? overlayLibrary(chart) : chart;
+  }
 }
 
 /** The chart's house cusp signs + occupant planets, for library lookups. */

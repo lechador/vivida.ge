@@ -77,11 +77,21 @@ export async function signUpWithEmail(
   const human = await verifyTurnstile(input.turnstileToken);
   if (!human) return { ok: false, error: TURNSTILE_ERROR_KA };
 
-  const result = await registerUser({
-    name: input.name,
-    email: input.email,
-    password: input.password,
-  });
+  // Any thrown error (transient DB blip, etc.) must land as an inline
+  // "try again" on the form — never a crashed page. Registration is
+  // resumable (see registerUser), so a retry after a mid-register failure
+  // picks up where it left off.
+  let result: Awaited<ReturnType<typeof registerUser>>;
+  try {
+    result = await registerUser({
+      name: input.name,
+      email: input.email,
+      password: input.password,
+    });
+  } catch (err) {
+    console.warn("[signUpWithEmail] register failed:", (err as Error).message);
+    return { ok: false, error: registerErrorKa("failed") };
+  }
   if (!result.ok) {
     return { ok: false, error: registerErrorKa(result.error) };
   }

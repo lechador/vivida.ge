@@ -96,11 +96,39 @@ export async function registerUser(input: {
   }
 
   const [existing] = await db
-    .select({ id: users.id })
+    .select({
+      id: users.id,
+      emailVerified: users.emailVerified,
+      passwordHash: users.passwordHash,
+    })
     .from(users)
     .where(eq(users.email, email))
     .limit(1);
-  if (existing) return { ok: false, error: "email_taken" };
+  if (existing) {
+    // An unverified password stub is a registration that never completed —
+    // either the user abandoned it or a mid-register failure left it
+    // half-created (user row exists, token/email possibly missing). Treat
+    // re-signup as a RESUME: refresh name/password and fall through to
+    // re-issue the verify token + email. Safe because the account was never
+    // usable (login requires verification, verification requires the inbox),
+    // so whoever owns the inbox wins — same guarantee as a fresh signup.
+    // Verified accounts and OAuth accounts (passwordHash null) stay taken.
+    if (existing.emailVerified || !existing.passwordHash) {
+      return { ok: false, error: "email_taken" };
+    }
+    const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    await db
+      .update(users)
+      .set({ name, passwordHash })
+      .where(eq(users.id, existing.id));
+    await provisionTrialIfMissing(existing.id);
+    const verifyToken = await issueAuthToken(
+      existing.id,
+      "email_verify",
+      VERIFY_TTL_MS
+    );
+    return { ok: true, userId: existing.id, email, name, verifyToken };
+  }
 
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const [created] = await db
