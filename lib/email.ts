@@ -34,7 +34,9 @@ function resolveFrom(envVal: string | undefined, fallback: string): string {
 }
 
 const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <onboarding@resend.dev>");
-const ORIGIN = process.env.APP_ORIGIN ?? "http://localhost:3000";
+// Default to production so emails never ship localhost links when APP_ORIGIN
+// is unset (e.g. Vercel cron). Local dev sets APP_ORIGIN to override.
+const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
 
 export function isEmailConfigured(): boolean {
   return !!process.env.RESEND_API_KEY;

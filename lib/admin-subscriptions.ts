@@ -55,7 +55,9 @@ function resolveFrom(envVal: string | undefined, fallback: string): string {
 }
 
 const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <hello@vivida.ge>");
-const ORIGIN = process.env.APP_ORIGIN ?? "http://localhost:3000";
+// Default to production so emails never ship localhost links when APP_ORIGIN
+// is unset. Local dev sets APP_ORIGIN to override.
+const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
 
 function absUrl(path: string): string {
   return `${ORIGIN.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
