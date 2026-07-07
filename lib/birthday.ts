@@ -20,6 +20,7 @@ import { and, eq, gt, sql as dsql } from "drizzle-orm";
 import { db } from "@/db";
 import { emailSendLog, subscriptions } from "@/db/schema";
 import { BirthdayEmail } from "@/lib/email-templates/birthday";
+import { acquireResendSlot } from "@/lib/resend-throttle";
 import { signByIndex } from "@/lib/zodiac";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -308,6 +309,9 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
         paragraphs = FALLBACK_PARAGRAPHS;
       }
 
+      // Shares the 2 req/s Resend budget with the daily blast that runs
+      // just before this in the same cron invocation.
+      await acquireResendSlot();
       const send = await resend.emails.send(
         {
           from: FROM,

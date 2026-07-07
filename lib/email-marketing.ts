@@ -3,6 +3,7 @@ import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { dailyEmailLog, emailSendLog, profiles, users } from "@/db/schema";
+import { acquireResendSlot } from "@/lib/resend-throttle";
 import { DailyHoroscopeEmail } from "@/lib/email-templates/daily-horoscope";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { MarketingEmail } from "@/lib/email-templates/marketing";
@@ -224,6 +225,7 @@ async function dispatch(
 
     const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=daily`);
     const dashboardUrl = absUrl("/dashboard");
+    await acquireResendSlot();
     const result = await c.emails.send(
       {
         from: FROM,
@@ -261,6 +263,7 @@ async function dispatch(
 
     const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`);
     const onboardingUrl = absUrl("/onboarding");
+    await acquireResendSlot();
     const result = await c.emails.send({
       from: FROM,
       to: recipient.email,
@@ -291,6 +294,7 @@ async function dispatch(
     throw new Error("subject and body are required for marketing template");
   }
   const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=marketing`);
+  await acquireResendSlot();
   const result = await c.emails.send({
     from: FROM,
     to: recipient.email,
@@ -385,10 +389,12 @@ export type DailyBlastResult = {
  *   1. Enqueue: INSERT … ON CONFLICT DO NOTHING for every audience row,
  *      so safe to call repeatedly.
  *   2. Drain: pick rows where status ∈ {pending, failed} for sendDate
- *      and dispatch with concurrency=8 (Resend Pro is 10/s sustained).
- *      Each Resend call carries Idempotency-Key=`daily:${userId}:${date}`
- *      so an at-least-once retry from our side never produces a duplicate
- *      email on Resend's side.
+ *      and dispatch with concurrency=8. Concurrency only parallelizes the
+ *      per-user work (horoscope lookup, tokens); the actual Resend calls
+ *      serialize through acquireResendSlot(), staying under the account's
+ *      2 req/s limit. Each Resend call carries
+ *      Idempotency-Key=`daily:${userId}:${date}` so an at-least-once retry
+ *      from our side never produces a duplicate email on Resend's side.
  *
  * If Vercel kills the function mid-drain (maxDuration), the next cron
  * tick (we run a safety cron 30 min later) picks up the remaining rows.

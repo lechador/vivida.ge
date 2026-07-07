@@ -26,9 +26,10 @@ import { pruneRateLimits } from "@/lib/rate-limit";
  * so even an at-least-once retry on our side never produces a duplicate
  * email on Resend's side.
  *
- * Concurrency — defaults to 8 simultaneous Resend requests. Resend Pro
- * is rate-limited to 10/sec sustained; 8 leaves headroom for transient
- * spikes from natural retry. Tunable via `?concurrency=N` query param.
+ * Concurrency — defaults to 8, but this only parallelizes per-user prep
+ * (horoscope lookup, unsubscribe tokens). The Resend calls themselves
+ * serialize through lib/resend-throttle.ts at ~1.7/s, under the account's
+ * 2 req/s limit. Tunable via `?concurrency=N` query param.
  *
  * Date — uses today's UTC date (YYYY-MM-DD) as the send-log partition
  * key, matching what `sendDailyHoroscopeBlast` does internally.
