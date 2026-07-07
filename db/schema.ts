@@ -132,6 +132,11 @@ export const authTokens = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     purpose: authTokenPurposeEnum("purpose").notNull(),
+    /** Short numeric OTP (email_verify only) shown in the email alongside the
+     *  link, so users can type a code instead of clicking. Same row as the
+     *  link token, so verifying by either path invalidates both. Null for
+     *  password_reset (link-only). */
+    code: text("code"),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()

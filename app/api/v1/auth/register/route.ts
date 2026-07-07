@@ -68,10 +68,10 @@ export async function POST(req: Request) {
       return fail(status, result.error, MESSAGES[result.error]);
     }
 
-    const { email, name, verifyToken } = result;
+    const { email, name, verifyToken, verifyCode } = result;
     after(async () => {
       try {
-        await sendVerificationEmail({ to: email, name, token: verifyToken });
+        await sendVerificationEmail({ to: email, name, token: verifyToken, code: verifyCode });
       } catch (err) {
         console.warn(
           "[api/v1/register] verification email failed:",

@@ -41,10 +41,10 @@ export async function POST(req: Request) {
 
     const dispatch = await prepareVerificationResend(email);
     if (dispatch.send) {
-      const { email: to, name, token } = dispatch;
+      const { email: to, name, token, code } = dispatch;
       after(async () => {
         try {
-          await sendVerificationEmail({ to, name, token });
+          await sendVerificationEmail({ to, name, token, code });
         } catch (err) {
           console.warn(
             "[api/v1/resend-verification] send failed:",

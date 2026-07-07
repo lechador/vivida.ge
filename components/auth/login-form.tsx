@@ -12,6 +12,7 @@ import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import {
   requestVerificationEmail,
   signInWithEmail,
+  verifyEmailWithCode,
 } from "@/actions/auth";
 
 const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -34,8 +35,12 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resentMsg, setResentMsg] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [codeVerified, setCodeVerified] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [resendPending, startResendTransition] = useTransition();
+  const [codePending, startCodeTransition] = useTransition();
 
   const submitDisabled =
     isPending || (TURNSTILE_ENABLED && !turnstileToken);
@@ -77,7 +82,27 @@ export function LoginForm() {
     setResentMsg(null);
     startResendTransition(async () => {
       await requestVerificationEmail({ email: unverifiedEmail });
-      setResentMsg("შემოწმე საფოსტო ყუთი — ვერიფიკაციის ლინკი ხელახლა გაიგზავნა.");
+      setResentMsg("შემოწმე საფოსტო ყუთი — ახალი კოდი და ლინკი გაიგზავნა.");
+    });
+  };
+
+  const verifyCode = () => {
+    if (!unverifiedEmail || code.length !== 6) return;
+    setCodeError(null);
+    startCodeTransition(async () => {
+      const res = await verifyEmailWithCode({
+        email: unverifiedEmail,
+        code: code.trim(),
+      });
+      if (res.ok) {
+        // Verified — clear the wall so they can sign in with the password
+        // they already typed. They just press "შესვლა" again.
+        setCodeVerified(true);
+        setError(null);
+        setUnverifiedEmail(null);
+      } else {
+        setCodeError(res.error);
+      }
     });
   };
 
@@ -135,18 +160,54 @@ export function LoginForm() {
       {error && (
         <div className="space-y-2 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           <p>{error}</p>
-          {unverifiedEmail && (
-            <button
+        </div>
+      )}
+
+      {/* Unverified account: enter the emailed code (or resend it). */}
+      {unverifiedEmail && (
+        <div className="space-y-2 rounded-lg border border-border/60 bg-card/40 p-3">
+          <Label htmlFor="login-code" className="text-xs text-muted-foreground">
+            შეიყვანე ელფოსტაზე გამოგზავნილი 6-ნიშნა კოდი
+          </Label>
+          <div className="flex gap-2">
+            <Input
+              id="login-code"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="[0-9]*"
+              maxLength={6}
+              placeholder="123456"
+              value={code}
+              onChange={(e) =>
+                setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+              }
+              disabled={codePending}
+              className="text-center tracking-[0.3em]"
+            />
+            <Button
               type="button"
-              onClick={resend}
-              disabled={resendPending}
-              className="text-xs underline-offset-2 hover:underline disabled:opacity-60"
+              variant="outline"
+              onClick={verifyCode}
+              disabled={codePending || code.length !== 6}
             >
-              {resendPending
-                ? "ვაგზავნი…"
-                : "ხელახლა გამოგვიგზავნე ვერიფიკაციის ლინკი"}
-            </button>
-          )}
+              {codePending ? <Loader2 className="size-4 animate-spin" /> : "დადასტურება"}
+            </Button>
+          </div>
+          {codeError && <p className="text-xs text-destructive">{codeError}</p>}
+          <button
+            type="button"
+            onClick={resend}
+            disabled={resendPending}
+            className="text-xs text-muted-foreground underline-offset-2 hover:underline disabled:opacity-60"
+          >
+            {resendPending ? "ვაგზავნი…" : "ვერ მიიღე? ხელახლა გამოგზავნა"}
+          </button>
+        </div>
+      )}
+
+      {codeVerified && (
+        <div className="rounded-lg border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-3 py-2 text-sm text-[var(--vivida-cyan)]">
+          ელფოსტა დადასტურდა. ახლა დააჭირე „შესვლას“.
         </div>
       )}
       {resentMsg && (

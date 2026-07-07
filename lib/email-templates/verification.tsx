@@ -11,9 +11,12 @@ import {
 export function VerificationEmail({
   name,
   verifyUrl,
+  code,
 }: {
   name: string | null;
   verifyUrl: string;
+  /** 6-digit OTP alternative to the link; omitted (null) → link-only email. */
+  code?: string | null;
 }) {
   const greeting = name ? `სალამი, ${name}!` : "სალამი!";
   return (
@@ -33,10 +36,43 @@ export function VerificationEmail({
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
-      <Text style={paragraphStyle}>
-        მადლობა, რომ Vivida-ს შეუერთდი. დაადასტურე შენი ელფოსტა ქვემოთა
-        ღილაკით — ერთ ნაბიჯში შენი კოსმიური რუკა გელოდება.
-      </Text>
+
+      {code ? (
+        <>
+          <Text style={paragraphStyle}>
+            მადლობა, რომ Vivida-ს შეუერთდი. შეიყვანე ეს კოდი გვერდზე, სადაც
+            რეგისტრაცია დაიწყე:
+          </Text>
+          <div
+            style={{
+              backgroundColor: "#1a1533",
+              border: "1px solid #3b2f66",
+              borderRadius: "12px",
+              padding: "18px",
+              textAlign: "center",
+              margin: "0 0 20px",
+            }}
+          >
+            <span
+              style={{
+                color: "#ffffff",
+                fontSize: "34px",
+                fontWeight: 700,
+                letterSpacing: "0.3em",
+                fontFamily: "monospace",
+              }}
+            >
+              {code}
+            </span>
+          </div>
+          <Text style={paragraphStyle}>ან უბრალოდ დააჭირე ღილაკს:</Text>
+        </>
+      ) : (
+        <Text style={paragraphStyle}>
+          მადლობა, რომ Vivida-ს შეუერთდი. დაადასტურე შენი ელფოსტა ქვემოთა
+          ღილაკით — ერთ ნაბიჯში შენი კოსმიური რუკა გელოდება.
+        </Text>
+      )}
 
       <Button href={verifyUrl} style={buttonStyle}>
         ელფოსტის დადასტურება
@@ -50,8 +86,8 @@ export function VerificationEmail({
       </Text>
 
       <Text style={mutedStyle}>
-        ლინკი მოქმედია 24 საათი. ვადის გასვლის შემდეგ შეგიძლია ხელახლა
-        მოითხოვო ანგარიშის გვერდიდან.
+        {code ? "კოდიც და ლინკიც მოქმედია" : "ლინკი მოქმედია"} 24 საათი. ვადის
+        გასვლის შემდეგ შეგიძლია ხელახლა მოითხოვო შესვლის გვერდიდან.
       </Text>
     </EmailLayout>
   );

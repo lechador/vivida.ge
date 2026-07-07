@@ -32,15 +32,28 @@ export function isValidEmail(email: string): boolean {
   return EMAIL_RE.test(email);
 }
 
+/** A 6-digit numeric OTP (zero-padded, uniform over 000000–999999). */
+export function generateOtpCode(): string {
+  // rejection-sample a uniform 0–999999 to avoid modulo bias
+  let n: number;
+  do {
+    n = randomBytes(3).readUIntBE(0, 3); // 0 .. 16_777_215
+  } while (n >= 16_000_000);
+  return String(n % 1_000_000).padStart(6, "0");
+}
+
 /**
  * Issue a single-use auth token, superseding any existing token of the
  * same purpose for this user (so a second "resend" invalidates the first
- * link rather than leaving both live).
+ * link rather than leaving both live). When `code` is passed it's stored on
+ * the same row, so the link token and the OTP verify to the same record and
+ * consuming either one invalidates both.
  */
 export async function issueAuthToken(
   userId: string,
   purpose: AuthTokenPurpose,
-  ttlMs: number
+  ttlMs: number,
+  code: string | null = null
 ): Promise<string> {
   await db
     .delete(authTokens)
@@ -50,6 +63,7 @@ export async function issueAuthToken(
     token,
     userId,
     purpose,
+    code,
     expiresAt: new Date(Date.now() + ttlMs),
   });
   return token;
@@ -72,6 +86,8 @@ export type RegisterResult =
       name: string | null;
       /** email_verify token — caller is responsible for sending the email. */
       verifyToken: string;
+      /** 6-digit OTP shown in the same email; caller passes it to the sender. */
+      verifyCode: string;
     }
   | { ok: false; error: RegisterError };
 
@@ -122,12 +138,14 @@ export async function registerUser(input: {
       .set({ name, passwordHash })
       .where(eq(users.id, existing.id));
     await provisionTrialIfMissing(existing.id);
+    const verifyCode = generateOtpCode();
     const verifyToken = await issueAuthToken(
       existing.id,
       "email_verify",
-      VERIFY_TTL_MS
+      VERIFY_TTL_MS,
+      verifyCode
     );
-    return { ok: true, userId: existing.id, email, name, verifyToken };
+    return { ok: true, userId: existing.id, email, name, verifyToken, verifyCode };
   }
 
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
@@ -141,10 +159,12 @@ export async function registerUser(input: {
   // self-swallowing, so a transient blip won't block registration.
   await provisionTrialIfMissing(created.id);
 
+  const verifyCode = generateOtpCode();
   const verifyToken = await issueAuthToken(
     created.id,
     "email_verify",
-    VERIFY_TTL_MS
+    VERIFY_TTL_MS,
+    verifyCode
   );
 
   return {
@@ -153,6 +173,7 @@ export async function registerUser(input: {
     email: created.email!,
     name: created.name,
     verifyToken,
+    verifyCode,
   };
 }
 
@@ -235,7 +256,14 @@ export async function findOrCreateOAuthUser(input: {
  * turning the endpoint into an account-existence oracle.
  */
 export type EmailDispatch =
-  | { send: true; email: string; name: string | null; token: string }
+  | {
+      send: true;
+      email: string;
+      name: string | null;
+      token: string;
+      /** OTP for verify emails; null for password reset (link-only). */
+      code: string | null;
+    }
   | { send: false };
 
 /** Prepare a fresh verification email for an unverified password user. */
@@ -252,8 +280,14 @@ export async function prepareVerificationResend(
     .limit(1);
 
   if (user && !user.emailVerified && user.passwordHash) {
-    const token = await issueAuthToken(user.id, "email_verify", VERIFY_TTL_MS);
-    return { send: true, email, name: user.name, token };
+    const code = generateOtpCode();
+    const token = await issueAuthToken(
+      user.id,
+      "email_verify",
+      VERIFY_TTL_MS,
+      code
+    );
+    return { send: true, email, name: user.name, token, code };
   }
   return { send: false };
 }
@@ -273,7 +307,7 @@ export async function preparePasswordReset(
 
   if (user && user.passwordHash) {
     const token = await issueAuthToken(user.id, "password_reset", RESET_TTL_MS);
-    return { send: true, email, name: user.name, token };
+    return { send: true, email, name: user.name, token, code: null };
   }
   return { send: false };
 }
@@ -311,6 +345,59 @@ export async function consumeEmailVerifyToken(
   await db.delete(authTokens).where(eq(authTokens.token, token));
 
   return { ok: true, userId: row.userId };
+}
+
+/**
+ * Verify an unverified password account by (email, 6-digit code) — the OTP
+ * alternative to clicking the link. Both live on the same auth_token row, so
+ * this marks the user verified and deletes the row (invalidating the link
+ * too). Callers MUST rate-limit by email + IP before invoking this: a
+ * 6-digit code is only ~1M-wide, so brute force is infeasible only under a
+ * strict attempt cap. Returns generic "invalid" for a wrong/absent code so
+ * it can't be used as an existence oracle.
+ */
+export async function consumeEmailVerifyCode(input: {
+  email: string;
+  code: string;
+}): Promise<VerifyEmailResult> {
+  const email = normalizeEmail(input.email);
+  const code = input.code.trim();
+  if (!isValidEmail(email) || !/^\d{6}$/.test(code)) {
+    return { ok: false, error: "invalid" };
+  }
+
+  const [user] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+  if (!user) return { ok: false, error: "invalid" };
+
+  const [row] = await db
+    .select()
+    .from(authTokens)
+    .where(
+      and(
+        eq(authTokens.userId, user.id),
+        eq(authTokens.purpose, "email_verify")
+      )
+    )
+    .limit(1);
+
+  if (!row || !row.code) return { ok: false, error: "invalid" };
+  if (row.expiresAt.getTime() < Date.now()) {
+    await db.delete(authTokens).where(eq(authTokens.token, row.token));
+    return { ok: false, error: "expired" };
+  }
+  if (row.code !== code) return { ok: false, error: "invalid" };
+
+  await db
+    .update(users)
+    .set({ emailVerified: new Date() })
+    .where(eq(users.id, user.id));
+  await db.delete(authTokens).where(eq(authTokens.token, row.token));
+
+  return { ok: true, userId: user.id };
 }
 
 export type ResetPasswordResult =

@@ -1,9 +1,11 @@
 "use server";
 
 import { after } from "next/server";
+import { headers } from "next/headers";
 
 import { signIn, signOut } from "@/auth";
 import {
+  consumeEmailVerifyCode,
   consumeEmailVerifyToken,
   consumePasswordReset,
   isValidEmail,
@@ -15,7 +17,20 @@ import {
   type RegisterError,
 } from "@/lib/auth-core";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/email";
+import { enforceAuthRateLimit } from "@/lib/rate-limit";
+import { ApiError } from "@/lib/api/errors";
 import { TURNSTILE_ERROR_KA, verifyTurnstile } from "@/lib/turnstile";
+
+/** Best-effort client IP from the incoming request headers (Vercel proxy). */
+async function clientIpFromHeaders(): Promise<string> {
+  const h = await headers();
+  const fwd = h.get("x-forwarded-for");
+  if (fwd) {
+    const first = fwd.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  return h.get("x-real-ip")?.trim() || "unknown";
+}
 
 /**
  * Web (Server Action) auth surface. The actual DB logic lives in
@@ -99,10 +114,10 @@ export async function signUpWithEmail(
   // Email send is deferred — that's the slow leg (Resend HTTP call) and
   // it doesn't matter if it lands a few seconds after the user sees
   // "check your inbox." The token already exists, so the link resolves.
-  const { email, name, verifyToken } = result;
+  const { email, name, verifyToken, verifyCode } = result;
   after(async () => {
     try {
-      await sendVerificationEmail({ to: email, name, token: verifyToken });
+      await sendVerificationEmail({ to: email, name, token: verifyToken, code: verifyCode });
     } catch (err) {
       console.warn(
         "[signUpWithEmail] background verification email failed:",
@@ -138,6 +153,7 @@ export async function requestVerificationEmail(input: {
         to: dispatch.email,
         name: dispatch.name,
         token: dispatch.token,
+        code: dispatch.code,
       });
     } catch (err) {
       console.warn(
@@ -163,6 +179,53 @@ export async function verifyEmailToken(
   token: string
 ): Promise<VerifyEmailResult> {
   return consumeEmailVerifyToken(token);
+}
+
+// ─── Verify-email OTP code (link alternative) ────────────────────────────
+
+export type VerifyCodeResult = { ok: true } | { ok: false; error: string };
+
+/**
+ * Verify an account by the 6-digit code from the email — the easier path for
+ * users who struggle with links. Rate-limited hard (per IP + per email): a
+ * 6-digit code is small, so the attempt cap is what makes brute force
+ * infeasible. On success the account is verified and the user can sign in.
+ */
+export async function verifyEmailWithCode(input: {
+  email: string;
+  code: string;
+}): Promise<VerifyCodeResult> {
+  const email = normalizeEmail(input.email);
+  if (!isValidEmail(email)) return { ok: false, error: "არასწორი ელფოსტა" };
+
+  try {
+    await enforceAuthRateLimit({
+      action: "verify_code",
+      ip: await clientIpFromHeaders(),
+      email,
+      ipLimit: 30, // generous for shared NATs
+      emailLimit: 8, // ~8 guesses per 10 min per account → brute force hopeless
+      windowMs: 10 * 60 * 1000,
+    });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 429) {
+      return {
+        ok: false,
+        error: "ბევრი მცდელობა იყო. სცადე ცოტა ხანში ხელახლა.",
+      };
+    }
+    throw err;
+  }
+
+  const result = await consumeEmailVerifyCode({ email, code: input.code });
+  if (result.ok) return { ok: true };
+  return {
+    ok: false,
+    error:
+      result.error === "expired"
+        ? "კოდს ვადა გაუვიდა. მოითხოვე ახალი."
+        : "კოდი არასწორია. შეამოწმე და სცადე ხელახლა.",
+  };
 }
 
 // ─── Password reset request ──────────────────────────────────────────────

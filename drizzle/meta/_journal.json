@@ -309,6 +309,13 @@
       "when": 1783326771871,
       "tag": "0043_opposite_charles_xavier",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1783455229483,
+      "tag": "0044_wandering_vargas",
+      "breakpoints": true
     }
   ]
 }

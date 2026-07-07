@@ -59,10 +59,13 @@ export async function sendVerificationEmail({
   to,
   name,
   token,
+  code,
 }: {
   to: string;
   name: string | null;
   token: string;
+  /** 6-digit OTP shown alongside the link so users can type it instead. */
+  code?: string | null;
 }): Promise<void> {
   const c = client();
   const verifyUrl = absUrl(`/api/auth/verify-email?token=${token}`);
@@ -80,7 +83,7 @@ export async function sendVerificationEmail({
     from: FROM,
     to,
     subject,
-    react: VerificationEmail({ name, verifyUrl }),
+    react: VerificationEmail({ name, verifyUrl, code: code ?? null }),
   });
   if (result.error) {
     console.error("[email] verification send failed:", result.error);
