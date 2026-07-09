@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { auth } from "@/auth";
 import { getCurrentPlan } from "@/lib/plan";
+import { getMbtiQuestions } from "@/lib/mbti-questions-db";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -24,6 +25,7 @@ export default async function TestPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
   const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
+  const questions = await getMbtiQuestions();
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -52,7 +54,7 @@ export default async function TestPage() {
           </p>
         </header>
 
-        <MbtiTestClient />
+        <MbtiTestClient questions={questions} />
       </section>
     </main>
   );

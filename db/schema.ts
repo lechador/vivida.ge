@@ -1726,16 +1726,21 @@ export type ReportTargetType = (typeof reportTargetTypeEnum.enumValues)[number];
  * extreme). Drives the four progress bars on the results page.
  */
 export type MbtiAxisScore = {
-  letter: string; // one of E/I, S/N, T/F, J/P depending on the axis
+  letter: string; // one of E/I, S/N, T/F, J/P, A/T depending on the axis
   pct: number; // 50–100
 };
 
-/** All four MBTI axes, keyed by the axis pair. */
+/**
+ * The five MBTI axes, keyed by the axis pair. `AT` (Identity, Assertive/
+ * Turbulent) is optional so rows written before the Identity axis existed still
+ * type-check when read back.
+ */
 export type MbtiScoresJson = {
   EI: MbtiAxisScore;
   SN: MbtiAxisScore;
   TF: MbtiAxisScore;
   JP: MbtiAxisScore;
+  AT?: MbtiAxisScore;
 };
 
 /**
@@ -1825,3 +1830,34 @@ export const mbtiInterpretationLibrary = pgTable("mbti_interpretation_library", 
 
 export type MbtiInterpretationLibraryRow =
   typeof mbtiInterpretationLibrary.$inferSelect;
+
+/**
+ * The Astro-MBTI quiz questions — the editable surface of the test. Seeded from
+ * the canonical list in lib/mbti-questions.ts (`MBTI_QUESTIONS`), which stays
+ * the source of truth for the *structure* (id → axis → pole, 12-per-axis
+ * balance). Admins edit only `textKa` here (wording/grammar fixes), so scoring
+ * can never be broken from the panel. The quiz reads active rows live, so edits
+ * go out immediately; the app falls back to the static list if the table is
+ * empty or unreachable.
+ */
+export const mbtiQuestions = pgTable("mbti_question", {
+  /** Stable 1..60 — matches the id answers are keyed by. */
+  id: integer("id").primaryKey(),
+  /** 'EI' | 'SN' | 'TF' | 'JP' | 'AT' — fixed structural metadata. */
+  axis: text("axis").notNull(),
+  /** The pole agreeing pushes toward (E/I/…/A/T) — fixed structural metadata. */
+  pole: text("pole").notNull(),
+  /** Georgian statement shown to the taker (the editable field). */
+  textKa: text("text_ka").notNull(),
+  /** Presentation order in the quiz. */
+  orderIndex: integer("order_index").notNull(),
+  /** Included in the live test when true. */
+  active: boolean("active").notNull().default(true),
+  /** True once an admin edits the wording (re-seed skips edited rows). */
+  edited: boolean("edited").notNull().default(false),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type MbtiQuestionRow = typeof mbtiQuestions.$inferSelect;

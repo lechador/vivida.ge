@@ -81,6 +81,50 @@ function typeSunPrompt(type, sign) {
   );
 }
 
+// Rich 16Personalities-style profile sections — pre-written per 4-letter type.
+const SECTIONS = [
+  { kind: "strengths", titleKa: "ძლიერი მხარეები", list: true },
+  { kind: "weaknesses", titleKa: "სუსტი მხარეები", list: true },
+  { kind: "romantic", titleKa: "რომანტიკული ურთიერთობები", list: false },
+  { kind: "friendship", titleKa: "მეგობრობა", list: false },
+  { kind: "career", titleKa: "კარიერული გზა", list: false },
+  { kind: "workplace", titleKa: "სამუშაო ჩვევები", list: false },
+  { kind: "growth", titleKa: "პიროვნული ზრდა", list: false },
+];
+const SECTION_KINDS = SECTIONS.map((s) => s.kind);
+
+function sectionPrompt(kind, type) {
+  const label = `MBTI ტიპი ${type} (${ARCHETYPE_KA[type]})`;
+  const listFmt =
+    `ჩამოთვალე 6 პუნქტი. თითოეული ცალკე ხაზზე ფორმატით: **სათაური** — ერთი-ორი ` +
+    `წინადადება ახსნა. არ გამოიყენო ნუმერაცია ან ტირეები დასაწყისში. მხოლოდ ეს პუნქტები.`;
+  const prose = `3-4 აბზაცი, "შენ"-ის ფორმა, თბილი და კონკრეტული. დააბრუნე მხოლოდ ტექსტი.`;
+  switch (kind) {
+    case "strengths":
+      return `დაწერე ${label}-ის ძლიერი მხარეები ქართულად.\n${listFmt}`;
+    case "weaknesses":
+      return `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
+        `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`;
+    case "romantic":
+      return `დაწერე, როგორია ${label} რომანტიკულ ურთიერთობებში: რას ეძებს პარტნიორში, ` +
+        `როგორ გამოხატავს სიყვარულს, რა ურთულდება.\n${prose}`;
+    case "friendship":
+      return `დაწერე, როგორია ${label} მეგობრობაში: როგორ ამყარებს კავშირებს, რას აფასებს ` +
+        `მეგობრებში, რა ტიპის სოციალურ წრეს ქმნის.\n${prose}`;
+    case "career":
+      return `დაწერე ${label}-ის კარიერული გზა: რომელ სფეროებში ისახება ბუნებრივად, რა ` +
+        `ამოძრავებს პროფესიულად, რა გარემო უხდება.\n${prose}`;
+    case "workplace":
+      return `დაწერე ${label}-ის სამუშაო ჩვევები: როგორ იქცევა გუნდში, როგორც ` +
+        `ხელქვეითი, კოლეგა და ლიდერი.\n${prose}`;
+    case "growth":
+      return `დაწერე ${label}-ის პიროვნული ზრდის გზა: რა უნდა გააცნობიეროს და გაივარჯიშოს, ` +
+        `რომ სრულად გაიხსნას თავისი პოტენციალი. დაასრულე გამამხნევებელი ნოტით.\n${prose}`;
+    default:
+      throw new Error(`unknown section ${kind}`);
+  }
+}
+
 const ai = new GoogleGenAI({
   vertexai: true,
   project: process.env.GOOGLE_CLOUD_PROJECT,
@@ -124,6 +168,13 @@ async function main() {
         tasks.push({ kind: "type_sun", type, sign, key });
       }
     }
+    for (const section of SECTIONS) {
+      if (onlyKinds && !onlyKinds.includes(section.kind)) continue;
+      const key = `${section.kind}:${type}`;
+      if (existing.get(key) === true) continue;
+      if (existing.has(key) && !force) continue;
+      tasks.push({ kind: section.kind, type, sign: null, key, titleKa: section.titleKa });
+    }
   }
 
   console.log(`tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`);
@@ -134,8 +185,17 @@ async function main() {
       const t = queue.shift();
       if (!t) return;
       try {
-        const body = t.kind === "type" ? await generate(typePrompt(t.type)) : await generate(typeSunPrompt(t.type, t.sign));
-        const title = t.kind === "type" ? ARCHETYPE_KA[t.type] : null;
+        let body, title;
+        if (t.kind === "type") {
+          body = await generate(typePrompt(t.type));
+          title = ARCHETYPE_KA[t.type];
+        } else if (t.kind === "type_sun") {
+          body = await generate(typeSunPrompt(t.type, t.sign));
+          title = null;
+        } else {
+          body = await generate(sectionPrompt(t.kind, t.type));
+          title = t.titleKa ?? null;
+        }
         await sql`
           INSERT INTO mbti_interpretation_library (key, kind, mbti_type, sign, title, body, model)
           VALUES (${t.key}, ${t.kind}, ${t.type}, ${t.sign}, ${title}, ${body}, ${MODEL})

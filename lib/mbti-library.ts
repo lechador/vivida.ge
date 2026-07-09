@@ -36,9 +36,42 @@ export function mbtiTypeSunKey(type: string, sign: string): string {
   return `type_sun:${type}:${sign}`;
 }
 
+/**
+ * The rich, 16Personalities-style profile sections — pre-written per 4-letter
+ * type (astrology stays in the live synthesis, so these are type-stable and
+ * render with zero per-test cost). `list: true` sections are rendered as a
+ * bulleted "**Title** — body" list; the rest are prose. 7 × 16 = 112 rows.
+ */
+export const MBTI_SECTIONS = [
+  { kind: "strengths", titleKa: "ძლიერი მხარეები", list: true },
+  { kind: "weaknesses", titleKa: "სუსტი მხარეები", list: true },
+  { kind: "romantic", titleKa: "რომანტიკული ურთიერთობები", list: false },
+  { kind: "friendship", titleKa: "მეგობრობა", list: false },
+  { kind: "career", titleKa: "კარიერული გზა", list: false },
+  { kind: "workplace", titleKa: "სამუშაო ჩვევები", list: false },
+  { kind: "growth", titleKa: "პიროვნული ზრდა", list: false },
+] as const;
+
+export type MbtiSectionKind = (typeof MBTI_SECTIONS)[number]["kind"];
+
+export function mbtiSectionKey(kind: MbtiSectionKind, type: string): string {
+  return `${kind}:${type}`;
+}
+
 export type MbtiCombo =
   | { kind: "type"; key: string; mbtiType: string; sign: null }
-  | { kind: "type_sun"; key: string; mbtiType: string; sign: string };
+  | { kind: "type_sun"; key: string; mbtiType: string; sign: string }
+  | { kind: MbtiSectionKind; key: string; mbtiType: string; sign: null };
+
+/** The 7 profile-section combos for one type (used for background self-heal). */
+export function mbtiSectionCombos(type: string): MbtiCombo[] {
+  return MBTI_SECTIONS.map((s) => ({
+    kind: s.kind,
+    key: mbtiSectionKey(s.kind, type),
+    mbtiType: type,
+    sign: null,
+  }));
+}
 
 /** Every combo: 16 type + 192 type×sun = 208. */
 export function allMbtiCombos(): MbtiCombo[] {
@@ -89,6 +122,29 @@ export async function getTypeAndSun(
   };
 }
 
+export type MbtiSection = {
+  kind: MbtiSectionKind;
+  titleKa: string;
+  list: boolean;
+  body: string;
+};
+
+/**
+ * Fetch all present profile sections for a type, in canonical order. Missing
+ * sections are simply omitted (the results page renders whatever exists). Pure
+ * read — never generates.
+ */
+export async function getTypeSections(type: string): Promise<MbtiSection[]> {
+  const map = await getMbtiLibraryEntries(
+    MBTI_SECTIONS.map((s) => mbtiSectionKey(s.kind, type))
+  );
+  return MBTI_SECTIONS.flatMap((s) => {
+    const entry = map.get(mbtiSectionKey(s.kind, type));
+    if (!entry?.body) return [];
+    return [{ kind: s.kind, titleKa: s.titleKa, list: s.list, body: entry.body }];
+  });
+}
+
 // ── Prompts + live self-heal (OpenRouter) ────────────────────────────────────
 
 const SYSTEM_PROMPT =
@@ -115,6 +171,37 @@ export function buildTypeSunPrompt(type: string, signKey: string): string {
     `არბილებს ${signKa}-ის მზე ამ ტიპის ბუნებას — კონკრეტული, ცოცხალი ნიუანსებით. ` +
     `3-4 აბზაცი, "შენ"-ის ფორმა. დააბრუნე მხოლოდ ტექსტი.`
   );
+}
+
+/** Prompt for a rich profile section (strengths/weaknesses/relationships/…). */
+export function buildSectionPrompt(kind: MbtiSectionKind, type: string): string {
+  const label = `MBTI ტიპი ${type} (${mbtiArchetypeKa(type)})`;
+  const listFmt =
+    `ჩამოთვალე 6 პუნქტი. თითოეული ცალკე ხაზზე ფორმატით: **სათაური** — ერთი-ორი ` +
+    `წინადადება ახსნა. არ გამოიყენო ნუმერაცია ან ტირეები დასაწყისში. მხოლოდ ეს პუნქტები.`;
+  const prose = `3-4 აბზაცი, "შენ"-ის ფორმა, თბილი და კონკრეტული. დააბრუნე მხოლოდ ტექსტი.`;
+  switch (kind) {
+    case "strengths":
+      return `დაწერე ${label}-ის ძლიერი მხარეები ქართულად.\n${listFmt}`;
+    case "weaknesses":
+      return `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
+        `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`;
+    case "romantic":
+      return `დაწერე, როგორია ${label} რომანტიკულ ურთიერთობებში: რას ეძებს პარტნიორში, ` +
+        `როგორ გამოხატავს სიყვარულს, რა ურთულდება.\n${prose}`;
+    case "friendship":
+      return `დაწერე, როგორია ${label} მეგობრობაში: როგორ ამყარებს კავშირებს, რას აფასებს ` +
+        `მეგობრებში, რა ტიპის სოციალურ წრეს ქმნის.\n${prose}`;
+    case "career":
+      return `დაწერე ${label}-ის კარიერული გზა: რომელ სფეროებში ისახება ბუნებრივად, რა ` +
+        `ამოძრავებს პროფესიულად, რა გარემო უხდება.\n${prose}`;
+    case "workplace":
+      return `დაწერე ${label}-ის სამუშაო ჩვევები: როგორ იქცევა გუნდში, როგორც ` +
+        `ხელქვეითი, კოლეგა და ლიდერი.\n${prose}`;
+    case "growth":
+      return `დაწერე ${label}-ის პიროვნული ზრდის გზა: რა უნდა გააცნობიეროს და გაივარჯიშოს, ` +
+        `რომ სრულად გაიხსნას თავისი პოტენციალი. დაასრულე გამამხნევებელი ნოტით.\n${prose}`;
+  }
 }
 
 interface OpenRouterJson {
@@ -164,18 +251,26 @@ export async function ensureMbtiLibraryFor(combos: MbtiCombo[]): Promise<void> {
   const missing = combos.filter((c) => !have.has(c.key));
   for (const c of missing) {
     try {
-      const body =
-        c.kind === "type"
-          ? await generateBody(buildTypePrompt(c.mbtiType))
-          : await generateBody(buildTypeSunPrompt(c.mbtiType, c.sign));
+      let body: string;
+      let title: string | null = null;
+      if (c.kind === "type") {
+        body = await generateBody(buildTypePrompt(c.mbtiType));
+        title = mbtiArchetypeKa(c.mbtiType);
+      } else if (c.kind === "type_sun") {
+        body = await generateBody(buildTypeSunPrompt(c.mbtiType, c.sign));
+      } else {
+        const section = MBTI_SECTIONS.find((s) => s.kind === c.kind);
+        body = await generateBody(buildSectionPrompt(c.kind, c.mbtiType));
+        title = section?.titleKa ?? null;
+      }
       await db
         .insert(mbtiInterpretationLibrary)
         .values({
           key: c.key,
           kind: c.kind,
           mbtiType: c.mbtiType,
-          sign: c.sign,
-          title: c.kind === "type" ? mbtiArchetypeKa(c.mbtiType) : null,
+          sign: c.kind === "type_sun" ? c.sign : null,
+          title,
           body,
           model: MBTI_LIBRARY_MODEL,
         })

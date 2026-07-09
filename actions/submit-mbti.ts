@@ -10,6 +10,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { ensureChartFor } from "@/actions/chart";
 import { calculateMbti, mbtiArchetypeKa } from "@/lib/mbti-questions";
+import { getMbtiQuestions } from "@/lib/mbti-questions-db";
 import { generateMbtiSynthesis } from "@/lib/mbti-synthesis";
 import { sendMbtiResultEmail } from "@/lib/email";
 import { enforceAuthRateLimit } from "@/lib/rate-limit";
@@ -62,7 +63,9 @@ export async function submitMbti(
   }
 
   // Server-side scoring is authoritative — never trust a client-sent type.
-  const { type, scores } = calculateMbti(answers);
+  // Score against the live question set (axis/pole come from the invariant
+  // static structure inside getMbtiQuestions, so wording edits can't skew it).
+  const { type, scores } = calculateMbti(answers, await getMbtiQuestions());
 
   const plan = await getCurrentPlan(user.id);
   // Positions only; never wait on / trigger chart AI here.

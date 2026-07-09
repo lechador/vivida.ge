@@ -14,9 +14,9 @@
  */
 
 import type { NatalChartJson } from "@/db/schema";
-import { BODIES, signByIndex } from "@/lib/zodiac";
+import { signByIndex } from "@/lib/zodiac";
 import type { MbtiScores } from "@/lib/mbti-questions";
-import { AXIS_LABEL_KA, mbtiArchetypeKa } from "@/lib/mbti-questions";
+import { AXIS_LABEL_KA, mbtiArchetypeKa, mbtiBaseType } from "@/lib/mbti-questions";
 import { getTypeAndSun } from "@/lib/mbti-library";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -37,29 +37,20 @@ export type MbtiSynthesisInput = {
 };
 
 const SYSTEM_PROMPT =
-  "შენ ხარ პროფესიონალი ფსიქოანალიტიკოსი და ასტროლოგი, რომელიც წერ ბუნებრივ, " +
-  "მდიდარ, ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი, კონკრეტული. " +
-  "მოგეცემა წინასწარ დაწერილი მასალა (ტიპის პორტრეტი და მზის ნიშანთან შერწყმა) — " +
-  "გამოიყენე როგორც საფუძველი, მაგრამ არ გაიმეორო სიტყვასიტყვით: შექმენი ერთიანი, " +
-  "პერსონალიზებული სინთეზი. დააბრუნე მხოლოდ ვალიდური JSON: " +
+  "შენ ხარ გამოცდილი ქართველი ფსიქოლოგი, რომელიც ხსნის პიროვნების ტესტის (MBTI/" +
+  "16Personalities-ის ტიპის) შედეგს. წერ ბუნებრივ, მდიდარ, ლიტერატურულ ქართულად — " +
+  "გრამატიკულად და ორთოგრაფიულად უნაკლო, ცოცხალი და კონკრეტული. აქცენტი — სუფთა " +
+  "ფსიქოლოგიაზე: პიროვნების ტიპი, აზროვნების, გრძნობისა და გადაწყვეტილების წესი, " +
+  "ძლიერი მხარეები და ზრდის წერტილები. ეს ასტროლოგიური რუკის ანალიზი არ არის — " +
+  "ზოდიაქოს ნიშანი მხოლოდ არქეტიპის სახელისა და ერთი მსუბუქი შტრიხისთვის ახსენე, " +
+  "პლანეტების, სახლების ან ასპექტების ჩამოთვლის გარეშე. " +
+  "მოგეცემა წინასწარ დაწერილი ტიპის პორტრეტი — დაეყრდენი, მაგრამ არ გაიმეორო " +
+  "სიტყვასიტყვით. დააბრუნე მხოლოდ ვალიდური JSON: " +
   '{"archetypeNameGe": string, "analysisText": string}. archetypeNameGe — ' +
   "ამ ადამიანის მოკლე, ცოცხალი ქართული არქეტიპი. analysisText — ტექსტი აბზაცებით (\\n\\n).";
 
-function astroDetailKa(chart: NatalChartJson | null): string {
-  if (!chart) return "ასტროლოგიური მონაცემები ჯერ არ არის შევსებული.";
-  const parts: string[] = [];
-  parts.push(`ასცენდენტი — ${signByIndex(chart.ascendant.signIndex).labelKa}`);
-  for (const key of ["sun", "moon", "mercury", "venus", "mars"]) {
-    const b = chart.bodies[key];
-    if (!b) continue;
-    const label = BODIES[key]?.labelKa ?? key;
-    parts.push(`${label} — ${signByIndex(b.signIndex).labelKa}${b.house ? ` (${b.house}-ე სახლი)` : ""}`);
-  }
-  return parts.join(", ");
-}
-
 function scoresSummaryKa(scores: MbtiScores): string {
-  return (["EI", "SN", "TF", "JP"] as const)
+  return (["EI", "SN", "TF", "JP", "AT"] as const)
     .map((axis) => {
       const s = scores[axis];
       const [first, second] = AXIS_LABEL_KA[axis];
@@ -70,34 +61,53 @@ function scoresSummaryKa(scores: MbtiScores): string {
 }
 
 async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
-  const sunSign =
+  const sunSignKa =
     input.chart != null
-      ? signByIndex(input.chart.bodies.sun?.signIndex ?? 0).key
+      ? signByIndex(input.chart.bodies.sun?.signIndex ?? 0).labelKa
       : null;
-  const { typeEntry, sunEntry } = await getTypeAndSun(input.type, sunSign);
+  // Only the type portrait feeds the synthesis now — the astro fusion is
+  // deliberately dropped so the result stays focused on psychology.
+  const { typeEntry } = await getTypeAndSun(mbtiBaseType(input.type), null);
+
+  const identity = input.scores.AT;
+  const [assertiveKa, turbulentKa] = AXIS_LABEL_KA.AT;
+  const identityKa = identity
+    ? identity.letter === "A"
+      ? `${assertiveKa} (A) — ${identity.pct}%`
+      : `${turbulentKa} (T) — ${identity.pct}%`
+    : null;
 
   const lines: string[] = [];
   if (input.firstName) lines.push(`მომხმარებლის სახელი: ${input.firstName}`);
-  lines.push(`MBTI ტიპი: ${input.type} (${mbtiArchetypeKa(input.type)})`);
-  lines.push(`ღერძების ბალანსი: ${scoresSummaryKa(input.scores)}`);
-  lines.push(`სრული ასტროლოგიური მონაცემები: ${astroDetailKa(input.chart)}`);
+  lines.push(`ტიპი: ${input.type} (${mbtiArchetypeKa(input.type)})`);
+  lines.push(`ღერძების ბალანსი (პროცენტებით): ${scoresSummaryKa(input.scores)}`);
+  if (identityKa) {
+    lines.push(
+      `იდენტობის ღერძი (თვითრწმენა): ${identityKa} — ` +
+        "ჩართე ეს ნიუანსი: როგორ ხვდება სტრესს, თვითკრიტიკას, შედეგზე დამოკიდებულებას."
+    );
+  }
+  if (sunSignKa) {
+    lines.push(
+      `ზოდიაქოს ნიშანი: ${sunSignKa} (გამოიყენე მხოლოდ არქეტიპის სახელისთვის, ` +
+        `მაგ. „${sunSignKa} ${mbtiArchetypeKa(input.type)}“, და ერთი მსუბუქი შტრიხისთვის — მეტი არა).`
+    );
+  }
 
   if (typeEntry?.body) {
     lines.push("\n--- ტიპის ფსიქოლოგიური პორტრეტი (საფუძველი) ---");
     lines.push(typeEntry.body);
   }
-  if (sunEntry?.body) {
-    lines.push("\n--- ტიპის შერწყმა მზის ნიშანთან (საფუძველი) ---");
-    lines.push(sunEntry.body);
-  }
 
   lines.push(
-    input.chart
-      ? "\nზემოთ მოცემულ საფუძველზე დააშენე ერთიანი, პერსონალიზებული ფსიქოლოგიურ-ასტროლოგიური " +
-          "სინთეზი. დაიწყე ცოცხალი შესავლით, შემდეგ ჩააქსოვე ამ ადამიანის მთვარე, მერკური და " +
-          "ასცენდენტი — ის ინდივიდუალური ნიუანსი, რაც საფუძველში არ არის. 5-7 აბზაცი."
-      : "\nდაწერე ერთიანი პერსონალიზებული ფსიქოლოგიური სინთეზი ტიპის პორტრეტის საფუძველზე. " +
-          "ბოლო აბზაცში ურჩიე, შეავსოს დაბადების მონაცემები Vivida-ზე, რომ ასტროლოგიური ფენა გაიხსნას. 5-6 აბზაცი."
+    "\nდაწერე ერთიანი, პერსონალიზებული ფსიქოლოგიური სინთეზი ამ ტესტის შედეგზე. " +
+      "ფოკუსი — ტიპი და ღერძების პროცენტები: ვინ არის ეს ადამიანი, როგორ აზროვნებს, " +
+      "გრძნობს და იღებს გადაწყვეტილებებს, რა არის მისი ძალა და ზრდის წერტილი. " +
+      (sunSignKa
+        ? `ზოდიაქოს ${sunSignKa} ჩართე მხოლოდ არქეტიპის სახელსა და ერთ მსუბუქ შტრიხში. `
+        : "") +
+      "პლანეტების, სახლების ან ასპექტების ჩამოთვლა არ არის საჭირო. 5-6 აბზაცი. " +
+      "დაწერე უნაკლო, ბუნებრივი ქართულით."
   );
   return lines.join("\n");
 }

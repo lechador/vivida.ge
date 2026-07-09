@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { MbtiQuiz } from "@/components/mbti-quiz";
-import { MBTI_ANSWERS_STORAGE_KEY } from "@/lib/mbti-questions";
+import { MBTI_ANSWERS_STORAGE_KEY, type MbtiQuestion } from "@/lib/mbti-questions";
 
 /**
  * Public test host. The quiz runs for everyone (no login needed); on finish
@@ -11,10 +11,11 @@ import { MBTI_ANSWERS_STORAGE_KEY } from "@/lib/mbti-questions";
  * authed → generate the result, anonymous → show the teaser gate. No AI runs
  * here, so anonymous takers can't trigger the expensive synthesis.
  */
-export function MbtiTestClient() {
+export function MbtiTestClient({ questions }: { questions: MbtiQuestion[] }) {
   const router = useRouter();
   return (
     <MbtiQuiz
+      questions={questions}
       workingLabel="ვამზადებ შენს შედეგს…"
       onSubmit={async (answers) => {
         try {

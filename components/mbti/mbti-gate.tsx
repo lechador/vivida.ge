@@ -11,6 +11,7 @@ import {
   mbtiArchetypeKa,
   MBTI_ANSWERS_STORAGE_KEY,
   type MbtiResult,
+  type MbtiQuestion,
 } from "@/lib/mbti-questions";
 
 /**
@@ -19,7 +20,7 @@ import {
  * the deep synthesis locked behind login/registration. The CTAs carry
  * `next=/test/claim` so the user returns here and auto-generates after auth.
  */
-export function MbtiGate() {
+export function MbtiGate({ questions }: { questions: MbtiQuestion[] }) {
   const [result, setResult] = useState<MbtiResult | null>(null);
   const [noAnswers, setNoAnswers] = useState(false);
 
@@ -32,12 +33,12 @@ export function MbtiGate() {
         setNoAnswers(true);
         return;
       }
-      setResult(calculateMbti(JSON.parse(raw)));
+      setResult(calculateMbti(JSON.parse(raw), questions));
     } catch {
       setNoAnswers(true);
     }
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
+  }, [questions]);
 
   if (noAnswers) {
     return (

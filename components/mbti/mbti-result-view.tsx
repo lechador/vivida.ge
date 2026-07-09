@@ -2,12 +2,13 @@ import type { MbtiScoresJson } from "@/db/schema";
 import { AXIS_LABEL_KA, type MbtiAxis } from "@/lib/mbti-questions";
 import { cn } from "@/lib/utils";
 
-const AXES: MbtiAxis[] = ["EI", "SN", "TF", "JP"];
+const AXES: MbtiAxis[] = ["EI", "SN", "TF", "JP", "AT"];
 
 /**
- * The visual result block — the 4-letter type, archetype, and the four axis
- * bars. Shared by the full results page and the anonymous teaser gate (which
- * passes `analysis={null}` to keep the deep text locked).
+ * The visual result block — the type code, archetype, and the five axis bars.
+ * Shared by the full results page and the anonymous teaser gate (which passes
+ * `analysis={null}` to keep the deep text locked). Rows written before the
+ * Identity axis existed lack `AT`; that bar is simply skipped for them.
  */
 export function MbtiResultView({
   type,
@@ -39,6 +40,7 @@ export function MbtiResultView({
       <div className="space-y-4 rounded-2xl border border-border bg-card/50 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
         {AXES.map((axis) => {
           const s = scores[axis];
+          if (!s) return null; // pre-Identity rows have no AT bar
           const [firstKa, secondKa] = AXIS_LABEL_KA[axis];
           const firstLetter = axis[0];
           const winnerIsFirst = s.letter === firstLetter;

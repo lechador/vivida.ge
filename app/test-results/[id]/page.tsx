@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -6,10 +7,13 @@ import { db } from "@/db";
 import { mbtiTestResults } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
+import { mbtiBaseType } from "@/lib/mbti-questions";
+import { getTypeSections, mbtiSectionCombos, ensureMbtiLibraryFor } from "@/lib/mbti-library";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { MbtiResultView } from "@/components/mbti/mbti-result-view";
+import { MbtiProfileSections } from "@/components/mbti/mbti-profile-sections";
 
 export const metadata = { title: "Astro-MBTI შედეგი" };
 export const dynamic = "force-dynamic";
@@ -36,6 +40,15 @@ export default async function TestResultPage({
 
   const plan = await getCurrentPlan(user.id);
 
+  // Rich 16Personalities-style sections — pre-written per 4-letter type. If any
+  // are missing (unseeded), self-heal them in the background so the next view
+  // is complete; this render shows whatever already exists.
+  const baseType = mbtiBaseType(result.mbtiType);
+  const sections = await getTypeSections(baseType);
+  if (sections.length < 7) {
+    after(() => ensureMbtiLibraryFor(mbtiSectionCombos(baseType)));
+  }
+
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
@@ -57,6 +70,8 @@ export default async function TestResultPage({
           scores={result.scores}
           analysis={result.aiSynthesisText}
         />
+
+        <MbtiProfileSections sections={sections} />
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-6">
           <p className="text-xs text-muted-foreground">

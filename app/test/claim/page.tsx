@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { getCurrentPlan } from "@/lib/plan";
+import { getMbtiQuestions } from "@/lib/mbti-questions-db";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -22,6 +23,9 @@ export default async function TestClaimPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
   const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
+  // The anonymous teaser recomputes the type client-side from the stored
+  // answers, so it needs the question structure. Only loaded when anon.
+  const questions = authed ? null : await getMbtiQuestions();
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -34,7 +38,7 @@ export default async function TestClaimPage() {
       {authed ? <AppHeader authed plan={plan} /> : <SmartHeader />}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        {authed ? <MbtiClaimRunner /> : <MbtiGate />}
+        {authed ? <MbtiClaimRunner /> : <MbtiGate questions={questions!} />}
       </section>
     </main>
   );

@@ -5,7 +5,7 @@ import { ChevronLeft, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MBTI_QUESTIONS, MBTI_LIKERT } from "@/lib/mbti-questions";
+import { MBTI_LIKERT, type MbtiQuestion } from "@/lib/mbti-questions";
 
 export type MbtiSubmitResult = { ok: true } | { ok: false; error: string };
 
@@ -17,10 +17,12 @@ export type MbtiSubmitResult = { ok: true } | { ok: false; error: string };
  * while that runs, and surfaces an error if it comes back not-ok.
  */
 export function MbtiQuiz({
+  questions,
   onSubmit,
   submitLabel = "დასრულება",
   workingLabel = "ვამუშავებ…",
 }: {
+  questions: MbtiQuestion[];
   onSubmit: (answers: Record<number, number>) => Promise<MbtiSubmitResult>;
   submitLabel?: string;
   workingLabel?: string;
@@ -30,8 +32,8 @@ export function MbtiQuiz({
   const [error, setError] = useState<string | null>(null);
   const [submitting, startSubmit] = useTransition();
 
-  const total = MBTI_QUESTIONS.length;
-  const q = MBTI_QUESTIONS[index];
+  const total = questions.length;
+  const q = questions[index];
   const answeredCount = Object.keys(answers).length;
   const isLast = index === total - 1;
   const allAnswered = answeredCount === total;
@@ -51,7 +53,7 @@ export function MbtiQuiz({
   function submit() {
     if (!allAnswered) {
       // jump to the first unanswered question
-      const missing = MBTI_QUESTIONS.findIndex((qq) => answers[qq.id] === undefined);
+      const missing = questions.findIndex((qq) => answers[qq.id] === undefined);
       if (missing >= 0) setIndex(missing);
       setError("გთხოვ, უპასუხე ყველა კითხვას.");
       return;
