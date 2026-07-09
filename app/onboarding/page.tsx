@@ -10,8 +10,18 @@ import { VividaMark } from "@/components/brand/vivida-mark";
 
 export const metadata = { title: "გაცნობა" };
 
-export default async function OnboardingPage() {
+/** Same-origin relative path only (no open redirect). */
+function safeNext(v: string | undefined): string | undefined {
+  return v && v.startsWith("/") && !v.startsWith("//") ? v : undefined;
+}
+
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
   const user = await requireUser();
+  const { next } = await searchParams;
 
   const [existing] = await db
     .select()
@@ -49,6 +59,7 @@ export default async function OnboardingPage() {
         <OnboardingWizard
           initialProfile={existing ?? null}
           defaultName={user.name ?? null}
+          next={safeNext(next)}
         />
       </section>
     </main>

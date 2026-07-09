@@ -1,8 +1,7 @@
-import { redirect } from "next/navigation";
-
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { ensureChartFor } from "@/actions/chart";
+import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { composeSkyData } from "@/lib/sky";
 import { BODIES } from "@/lib/zodiac";
 import { signByIndex } from "@/lib/zodiac";
@@ -42,7 +41,16 @@ export default async function SkyPage() {
 
   // Positions only — never wait on (or trigger) chart AI here.
   const chart = await ensureChartFor(user.id, plan, { aiUpgrade: "skip" });
-  if (!chart) redirect("/onboarding");
+  if (!chart)
+    return (
+      <AstroLockedMain
+        plan={plan}
+        active="sky"
+        title="ცოცხალი ცა ნატალურ რუკას საჭიროებს"
+        description="შეავსე დაბადების მონაცემები, რომ ნახო, სად არიან პლანეტები ახლა შენს რუკაზე."
+        next="/sky"
+      />
+    );
 
   const sky = await composeSkyData(chart.data);
   const moonSign = signByIndex(sky.moon.signIndex);

@@ -26,8 +26,14 @@ export type SaveProfileResult =
   | { ok: true }
   | { ok: false; error: string };
 
+/** Same-origin relative path only (no open redirect). */
+function safeNext(v: string | undefined): string | null {
+  return v && v.startsWith("/") && !v.startsWith("//") ? v : null;
+}
+
 export async function saveProfile(
-  input: SaveProfileInput
+  input: SaveProfileInput,
+  next?: string
 ): Promise<SaveProfileResult> {
   const user = await requireUser();
 
@@ -68,9 +74,10 @@ export async function saveProfile(
     await sendWelcomeIfEligible(userId);
   });
 
+  const dest = safeNext(next) ?? "/dashboard";
   revalidatePath("/dashboard");
   revalidatePath("/onboarding");
-  redirect("/dashboard");
+  redirect(dest);
 }
 
 // ────────────────────────────────────────────────────────────────────────

@@ -76,9 +76,12 @@ function initialState(
 export function OnboardingWizard({
   initialProfile,
   defaultName,
+  next,
 }: {
   initialProfile: Profile | null;
   defaultName: string | null;
+  /** Where to send the user after saving (relative path). */
+  next?: string;
 }) {
   // Birth date is locked after first registration (the server enforces this
   // — see actions/profile.ts). When the user comes back to edit, hide the
@@ -156,15 +159,18 @@ export function OnboardingWizard({
       return;
     }
     startTransition(async () => {
-      const result = await saveProfile({
-        dateOfBirth: date,
-        timeOfBirth: timeRes.time,
-        cityName: data.place!.displayName,
-        latitude: data.place!.latitude,
-        longitude: data.place!.longitude,
-        timezone: data.place!.timezone,
-        username: data.visibility.username,
-      });
+      const result = await saveProfile(
+        {
+          dateOfBirth: date,
+          timeOfBirth: timeRes.time,
+          cityName: data.place!.displayName,
+          latitude: data.place!.latitude,
+          longitude: data.place!.longitude,
+          timezone: data.place!.timezone,
+          username: data.visibility.username,
+        },
+        next
+      );
       if (result && !result.ok) {
         setError(result.error);
       }

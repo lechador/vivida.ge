@@ -45,7 +45,9 @@ export function SignupForm() {
       const res = await verifyEmailWithCode({ email, code: code.trim(), password });
       if (res.ok) {
         if (res.signedIn) {
-          router.push(safeNext ?? "/onboarding");
+          // Land on the feed (usable without birth data) rather than forcing
+          // onboarding — astrology is opt-in via the astro-profile CTAs.
+          router.push(safeNext ?? "/feed");
         } else {
           // Not auto-signed-in — bounce to login, carrying next along.
           const q = safeNext ? `&next=${encodeURIComponent(safeNext)}` : "";

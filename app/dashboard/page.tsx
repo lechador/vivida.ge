@@ -1,5 +1,4 @@
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 
 import { db } from "@/db";
 import { profiles, users } from "@/db/schema";
@@ -8,6 +7,7 @@ import { getCurrentPlan } from "@/lib/plan";
 import { isAccountRestricted } from "@/lib/restriction";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
@@ -28,8 +28,16 @@ export default async function DashboardPage() {
       .limit(1),
   ]);
 
-  if (!profile) {
-    redirect("/onboarding");
+  if (!profile?.dateOfBirth) {
+    return (
+      <AstroLockedMain
+        plan={plan}
+        active="today"
+        title="დღიური ჰოროსკოპი ნატალურ რუკას საჭიროებს"
+        description="შეავსე დაბადების მონაცემები და ყოველ დღე მიიღებ პერსონალურ ჰოროსკოპსა და ცის მიმოხილვას."
+        next="/dashboard"
+      />
+    );
   }
 
   const restricted = await isAccountRestricted(user.id);

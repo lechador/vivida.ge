@@ -1,5 +1,4 @@
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
@@ -13,6 +12,7 @@ import { getDashboardSuggestions } from "@/lib/suggestions";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { AstroProfileBanner } from "@/components/astro/astro-profile-banner";
 import { SuggestedPeopleRail } from "@/components/dashboard/suggested-people-rail";
 import { FeedList } from "@/components/feed/feed-list";
 import { PostComposer } from "@/components/feed/post-composer";
@@ -23,18 +23,16 @@ export const dynamic = "force-dynamic";
 export default async function FeedPage() {
   const user = await requireUser();
 
-  // Feed is the post-signin home, so first-time visitors hit it before
-  // they've ever opened /onboarding. Bounce them through onboarding so
-  // the chart and tier system have data to work with — same guard that
-  // /dashboard runs.
+  // Feed is the post-signin home and needs no birth data (it's community
+  // content), so it's open to everyone. Accounts without birth data see a
+  // non-blocking banner to create their astro profile instead of being
+  // force-funnelled through onboarding.
   const [viewerProfile] = await db
     .select({ dateOfBirth: profiles.dateOfBirth })
     .from(profiles)
     .where(eq(profiles.userId, user.id))
     .limit(1);
-  if (!viewerProfile?.dateOfBirth) {
-    redirect("/onboarding");
-  }
+  const hasBirthData = !!viewerProfile?.dateOfBirth;
 
   const [plan, posts, headerData, suggestions] = await Promise.all([
     getCurrentPlan(user.id),
@@ -50,7 +48,7 @@ export default async function FeedPage() {
       : Promise.resolve([] as Awaited<ReturnType<typeof getDashboardSuggestions>>),
   ]);
   const viewerIsAdmin = isAdminEmail(user.email);
-  const viewerSunSign = sunSignFromDob(viewerProfile.dateOfBirth);
+  const viewerSunSign = sunSignFromDob(viewerProfile?.dateOfBirth ?? null);
   const viewerAvatar = headerData.avatarUrl ?? user.image ?? null;
 
   return (
@@ -75,6 +73,12 @@ export default async function FeedPage() {
             </span>
           </h1>
         </div>
+
+        {!hasBirthData && (
+          <div className="mb-6">
+            <AstroProfileBanner next="/feed" />
+          </div>
+        )}
 
         {/* People-you'd-vibe-with rail — flag-gated off at low user density
             (same switch as the dashboard rail). When off, the feed focuses on

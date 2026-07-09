@@ -1,5 +1,4 @@
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 
 import { db } from "@/db";
 import { charts, profiles } from "@/db/schema";
@@ -9,6 +8,7 @@ import { canUseFeature } from "@/lib/features";
 import { computeTiming, type DayTier } from "@/lib/timing";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ProUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "საუკეთესო დღეები" };
@@ -35,7 +35,16 @@ export default async function TimingPage() {
     getCurrentPlan(user.id),
   ]);
 
-  if (!chart) redirect("/onboarding");
+  if (!chart)
+    return (
+      <AstroLockedMain
+        plan={plan}
+        active="timing"
+        title="საუკეთესო დღეები ნატალურ რუკას საჭიროებს"
+        description="შეავსე დაბადების მონაცემები, რომ ნახო, რომელი დღეები უბერავს ქარს ზურგში."
+        next="/timing"
+      />
+    );
   const timezone = profile?.timezone ?? "Asia/Tbilisi";
 
   if (!canUseFeature("timing", plan)) {

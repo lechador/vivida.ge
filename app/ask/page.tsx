@@ -1,5 +1,4 @@
 import { asc, eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 
 import { db } from "@/db";
 import { charts, chartChatMessages } from "@/db/schema";
@@ -8,6 +7,7 @@ import { getCurrentPlan } from "@/lib/plan";
 import { canUseFeature } from "@/lib/features";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartChat } from "@/components/ask/chart-chat";
 import { ProUpsell } from "@/components/paywall/pro-upsell";
 
@@ -32,7 +32,16 @@ export default async function AskPage() {
       .limit(50),
   ]);
 
-  if (!chart) redirect("/onboarding");
+  if (!chart)
+    return (
+      <AstroLockedMain
+        plan={plan}
+        active="ask"
+        title="AI ასტროლოგი ნატალურ რუკას საჭიროებს"
+        description="შეავსე დაბადების მონაცემები, რომ ესაუბრო AI ასტროლოგს, რომელიც შენს რუკას იცნობს."
+        next="/ask"
+      />
+    );
 
   const firstName = user.name?.split(" ")[0] ?? null;
   const initialMessages = history.map((m) => ({

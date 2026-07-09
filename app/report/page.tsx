@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Pencil } from "lucide-react";
 
 import { db } from "@/db";
@@ -11,6 +10,7 @@ import { getCurrentPlan } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartSection } from "@/components/dashboard/chart-section";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import { ReportPdfPanel } from "@/components/report/report-pdf-panel";
@@ -26,8 +26,16 @@ export default async function ReportPage() {
     getCurrentPlan(user.id),
   ]);
 
-  if (!profile) {
-    redirect("/onboarding");
+  if (!profile?.dateOfBirth) {
+    return (
+      <AstroLockedMain
+        plan={plan}
+        active="report"
+        title="ნატალური რუკა დაბადების მონაცემებს საჭიროებს"
+        description="შეავსე დაბადების თარიღი, დრო და ადგილი, რომ შედგეს შენი პერსონალური კოსმიური რუკა."
+        next="/report"
+      />
+    );
   }
 
   const firstName = user.name?.split(" ")[0] ?? "ვარსკვლავო";

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import Image from "next/image";
-import { Pencil } from "lucide-react";
+import { Pencil, Sparkles } from "lucide-react";
 
 import { db } from "@/db";
 import { profiles, profilePhotos, users } from "@/db/schema";
@@ -180,14 +180,16 @@ export default async function AccountPage() {
         <div className="mb-6 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">დაბადების მონაცემები</h2>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/onboarding">
-                <Pencil className="size-3.5" />
-                რედაქტირება
-              </Link>
-            </Button>
+            {profile?.dateOfBirth && (
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/onboarding">
+                  <Pencil className="size-3.5" />
+                  რედაქტირება
+                </Link>
+              </Button>
+            )}
           </div>
-          {profile ? (
+          {profile?.dateOfBirth ? (
             <dl className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
               <Field label="დაბადების თარიღი" value={profile.dateOfBirth} />
               <Field
@@ -202,13 +204,18 @@ export default async function AccountPage() {
               <Field label="დროის სარტყელი" value={profile.timezone} />
             </dl>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              შენი მონაცემები ჯერ შენახული არ არის.{" "}
-              <Link href="/onboarding" className="underline">
-                შეავსე ახლავე
-              </Link>
-              .
-            </p>
+            <div>
+              <p className="text-sm text-muted-foreground">
+                ასტრო პროფილი ჯერ არ შეგიქმნია. შეავსე დაბადების მონაცემები და
+                გახსენი რუკა, ჰოროსკოპი და თავსებადობა.
+              </p>
+              <Button asChild variant="mystic" className="mt-4">
+                <Link href="/onboarding?next=/account">
+                  <Sparkles className="size-4" />
+                  ასტრო პროფილის შექმნა
+                </Link>
+              </Button>
+            </div>
           )}
         </div>
 
