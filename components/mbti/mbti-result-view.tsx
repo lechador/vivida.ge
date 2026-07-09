@@ -1,5 +1,8 @@
+import Image from "next/image";
+
 import type { MbtiScoresJson } from "@/db/schema";
 import { AXIS_LABEL_KA, type MbtiAxis } from "@/lib/mbti-questions";
+import { mbtiCharacterSrc } from "@/lib/mbti-characters";
 import { cn } from "@/lib/utils";
 
 const AXES: MbtiAxis[] = ["EI", "SN", "TF", "JP", "AT"];
@@ -26,6 +29,14 @@ export function MbtiResultView({
     <div className="space-y-8">
       {/* Type hero */}
       <div className="rounded-3xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
+        <Image
+          src={mbtiCharacterSrc(type)}
+          alt={archetypeNameGe}
+          width={220}
+          height={220}
+          priority
+          className="mx-auto mb-5 h-40 w-40 object-contain drop-shadow-[0_8px_30px_rgba(167,139,250,0.35)] sm:h-52 sm:w-52"
+        />
         <div className="text-5xl font-bold tracking-[0.15em] sm:text-7xl">
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
             {type}

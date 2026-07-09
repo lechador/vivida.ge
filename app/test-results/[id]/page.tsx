@@ -14,6 +14,8 @@ import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { MbtiResultView } from "@/components/mbti/mbti-result-view";
 import { MbtiProfileSections } from "@/components/mbti/mbti-profile-sections";
+import { MbtiFamousPeople } from "@/components/mbti/mbti-famous-people";
+import { MbtiShareButton } from "@/components/mbti/mbti-share-button";
 
 export const metadata = { title: "Astro-MBTI შედეგი" };
 export const dynamic = "force-dynamic";
@@ -73,13 +75,24 @@ export default async function TestResultPage({
 
         <MbtiProfileSections sections={sections} />
 
+        <div className="mt-4">
+          <MbtiFamousPeople type={result.mbtiType} />
+        </div>
+
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-6">
           <p className="text-xs text-muted-foreground">
             შედეგი გამოგზავნილია შენს ელფოსტაზეც.
           </p>
-          <Button asChild variant="outline">
-            <Link href="/test">თავიდან გავიარო</Link>
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <MbtiShareButton
+              path={`/r/${result.id}`}
+              type={result.mbtiType}
+              archetype={result.archetypeNameGe}
+            />
+            <Button asChild variant="outline">
+              <Link href="/test">თავიდან გავიარო</Link>
+            </Button>
+          </div>
         </div>
       </section>
     </main>

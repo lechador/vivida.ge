@@ -1,0 +1,50 @@
+"use client";
+
+import { useState } from "react";
+import { Check, Share2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+
+/**
+ * Share the result. Uses the native share sheet where available (mobile),
+ * otherwise copies the public share link to the clipboard. The link points at
+ * the public /r/[id] page, which unfurls with a generated social card.
+ */
+export function MbtiShareButton({
+  path,
+  type,
+  archetype,
+}: {
+  path: string; // e.g. "/r/<id>"
+  type: string;
+  archetype: string;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  async function share() {
+    const url = typeof window !== "undefined" ? window.location.origin + path : path;
+    const text = `ჩემი ფსიქოლოგიური ტიპია ${type} — ${archetype}. გაიარე ტესტი Vivida-ზე:`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: "Vivida · Astro-MBTI", text, url });
+        return;
+      } catch {
+        /* user cancelled or unsupported — fall through to copy */
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return (
+    <Button type="button" variant="mystic" onClick={share} className="gap-2">
+      {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
+      {copied ? "ბმული დაკოპირდა" : "გააზიარე"}
+    </Button>
+  );
+}
