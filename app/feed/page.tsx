@@ -76,7 +76,7 @@ export default async function FeedPage() {
 
         {!hasBirthData && (
           <div className="mb-6">
-            <AstroProfileBanner next="/feed" />
+            <AstroProfileBanner />
           </div>
         )}
 

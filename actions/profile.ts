@@ -74,8 +74,12 @@ export async function saveProfile(
     await sendWelcomeIfEligible(userId);
   });
 
-  const dest = safeNext(next) ?? "/dashboard";
+  // Land on the natal chart by default — seeing your freshly-built chart is
+  // the payoff of entering birth data. A feature-specific `next` (e.g. /sky)
+  // still wins when the user unlocked from that feature.
+  const dest = safeNext(next) ?? "/report";
   revalidatePath("/dashboard");
+  revalidatePath("/report");
   revalidatePath("/onboarding");
   redirect(dest);
 }

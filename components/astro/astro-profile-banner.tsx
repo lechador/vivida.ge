@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 /**
  * Slim prompt nudging an account without birth data to create its astro
  * profile. Non-blocking — shown atop the feed (and other open pages) so astrology
- * is opt-in rather than forced at signup.
+ * is opt-in rather than forced at signup. Onboarding lands on /report (the
+ * natal chart) by default, so no `next` is threaded here.
  */
-export function AstroProfileBanner({ next = "/feed" }: { next?: string }) {
+export function AstroProfileBanner() {
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:p-5">
       <div className="flex items-start gap-3">
@@ -23,7 +24,7 @@ export function AstroProfileBanner({ next = "/feed" }: { next?: string }) {
         </div>
       </div>
       <Button asChild variant="mystic" size="sm" className="shrink-0">
-        <Link href={`/onboarding?next=${encodeURIComponent(next)}`}>
+        <Link href="/onboarding">
           <Sparkles className="size-4" />
           შევსება
         </Link>

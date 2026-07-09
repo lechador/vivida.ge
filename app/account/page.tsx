@@ -210,7 +210,7 @@ export default async function AccountPage() {
                 გახსენი რუკა, ჰოროსკოპი და თავსებადობა.
               </p>
               <Button asChild variant="mystic" className="mt-4">
-                <Link href="/onboarding?next=/account">
+                <Link href="/onboarding">
                   <Sparkles className="size-4" />
                   ასტრო პროფილის შექმნა
                 </Link>
