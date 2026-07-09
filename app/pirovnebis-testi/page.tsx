@@ -28,10 +28,10 @@ export const metadata: Metadata = {
     "უფასო პიროვნების ტესტი",
     "ხასიათის ტესტი",
   ],
-  alternates: { canonical: `${SITE_URL}/test` },
+  alternates: { canonical: `${SITE_URL}/pirovnebis-testi` },
   openGraph: {
     type: "website",
-    url: `${SITE_URL}/test`,
+    url: `${SITE_URL}/pirovnebis-testi`,
     title: TITLE,
     description: DESCRIPTION,
     siteName: "Vivida",
@@ -57,7 +57,7 @@ const TEST_FAQ = [
 
 /**
  * Public Astro-MBTI test. Anyone can take it; the deep result is gated behind
- * login (handled at /test/claim). Header adapts to auth state.
+ * login (handled at /pirovnebis-testi/claim). Header adapts to auth state.
  */
 export default async function TestPage() {
   const session = await auth();
@@ -72,7 +72,7 @@ export default async function TestPage() {
       name: "Astro-MBTI პიროვნების ტესტი",
       description: DESCRIPTION,
       inLanguage: "ka-GE",
-      url: `${SITE_URL}/test`,
+      url: `${SITE_URL}/pirovnebis-testi`,
       educationalLevel: "beginner",
       numberOfQuestions: questions.length,
       about: {
@@ -85,7 +85,7 @@ export default async function TestPage() {
     breadcrumbLd([
       { name: "მთავარი", url: SITE_URL },
       { name: "ტესტები", url: `${SITE_URL}/tests` },
-      { name: "პიროვნების ტესტი", url: `${SITE_URL}/test` },
+      { name: "პიროვნების ტესტი", url: `${SITE_URL}/pirovnebis-testi` },
     ]),
   ];
 

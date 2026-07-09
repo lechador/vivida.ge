@@ -13,6 +13,15 @@ const nextConfig: NextConfig = {
     "/api/reports/checkout": ["./app/_fonts/*.ttf"],
     "/api/reports/[id]": ["./app/_fonts/*.ttf"],
   },
+  async redirects() {
+    // The personality test moved from /test to the keyword-rich Georgian slug
+    // /pirovnebis-testi ("პიროვნების ტესტი"). 301 the old paths so any early
+    // links/indexing carry over.
+    return [
+      { source: "/test", destination: "/pirovnebis-testi", permanent: true },
+      { source: "/test/claim", destination: "/pirovnebis-testi/claim", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       // Google avatar images

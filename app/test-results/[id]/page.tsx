@@ -90,7 +90,7 @@ export default async function TestResultPage({
               archetype={result.archetypeNameGe}
             />
             <Button asChild variant="outline">
-              <Link href="/test">თავიდან გავიარო</Link>
+              <Link href="/pirovnebis-testi">თავიდან გავიარო</Link>
             </Button>
           </div>
         </div>

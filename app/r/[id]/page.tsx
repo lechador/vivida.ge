@@ -107,7 +107,7 @@ export default async function MbtiSharePage({
             გაიარე უფასო ტესტი და აღმოაჩინე შენი ფსიქოლოგიური ტიპი.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
-            <Link href="/test">დაიწყე ტესტი</Link>
+            <Link href="/pirovnebis-testi">დაიწყე ტესტი</Link>
           </Button>
         </div>
       </section>

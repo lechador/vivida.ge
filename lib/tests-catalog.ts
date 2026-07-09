@@ -19,7 +19,7 @@ export type TestCatalogEntry = {
 export const TESTS: TestCatalogEntry[] = [
   {
     slug: "astro-mbti",
-    href: "/test",
+    href: "/pirovnebis-testi",
     titleKa: "Astro-MBTI",
     taglineKa: "შენი ფსიქოლოგიური ტიპი",
     descKa:

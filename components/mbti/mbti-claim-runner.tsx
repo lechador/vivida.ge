@@ -10,7 +10,7 @@ import { submitMbti } from "@/actions/submit-mbti";
 import { MBTI_ANSWERS_STORAGE_KEY } from "@/lib/mbti-questions";
 
 /**
- * Runs once the user is authed and lands on /test/claim: reads the stored
+ * Runs once the user is authed and lands on /pirovnebis-testi/claim: reads the stored
  * answers, calls the (auth-gated) synthesis action, and redirects to the
  * result. This is the only place the expensive generation runs. Guards
  * against double-submit (React strict-mode / re-renders) with a ref.
@@ -61,7 +61,7 @@ export function MbtiClaimRunner() {
           პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან.
         </p>
         <Button asChild variant="mystic" className="mt-4">
-          <Link href="/test">ტესტის დაწყება</Link>
+          <Link href="/pirovnebis-testi">ტესტის დაწყება</Link>
         </Button>
       </div>
     );
@@ -72,7 +72,7 @@ export function MbtiClaimRunner() {
       <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-8 text-center">
         <p className="text-sm text-destructive">{error}</p>
         <Button asChild variant="outline" className="mt-4">
-          <Link href="/test">თავიდან ცდა</Link>
+          <Link href="/pirovnebis-testi">თავიდან ცდა</Link>
         </Button>
       </div>
     );

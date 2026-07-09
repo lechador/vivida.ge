@@ -18,7 +18,7 @@ import {
  * Anonymous teaser gate. Computes the type client-side (free — no AI, no
  * server) from the stored answers and shows it with the axis bars, but keeps
  * the deep synthesis locked behind login/registration. The CTAs carry
- * `next=/test/claim` so the user returns here and auto-generates after auth.
+ * `next=/pirovnebis-testi/claim` so the user returns here and auto-generates after auth.
  */
 export function MbtiGate({ questions }: { questions: MbtiQuestion[] }) {
   const [result, setResult] = useState<MbtiResult | null>(null);
@@ -47,14 +47,14 @@ export function MbtiGate({ questions }: { questions: MbtiQuestion[] }) {
           პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან.
         </p>
         <Button asChild variant="mystic" className="mt-4">
-          <Link href="/test">ტესტის დაწყება</Link>
+          <Link href="/pirovnebis-testi">ტესტის დაწყება</Link>
         </Button>
       </div>
     );
   }
   if (!result) return null;
 
-  const next = encodeURIComponent("/test/claim");
+  const next = encodeURIComponent("/pirovnebis-testi/claim");
 
   return (
     <div>

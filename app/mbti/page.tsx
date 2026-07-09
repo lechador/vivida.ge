@@ -117,7 +117,7 @@ export default function MbtiHubPage() {
             გაიგე შენი ტიპი.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
-            <Link href="/test">გაიარე ტესტი</Link>
+            <Link href="/pirovnebis-testi">გაიარე ტესტი</Link>
           </Button>
         </header>
 

@@ -157,7 +157,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${BASE}/test`,
+      url: `${BASE}/pirovnebis-testi`,
       lastModified: NOW,
       changeFrequency: "monthly",
       priority: 0.9,

@@ -158,7 +158,7 @@ export default async function MbtiTypePage({
             {seo.taglineKa}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/test">
+            <Link href="/pirovnebis-testi">
               <Sparkles className="size-4" />
               გაიგე შენი ტიპი — გაიარე ტესტი
             </Link>
@@ -217,7 +217,7 @@ export default async function MbtiTypePage({
             გაიარე უფასო Astro-MBTI ტესტი და აღმოაჩინე შენი ზუსტი ტიპი — 60 კითხვა, 7 წუთი.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
-            <Link href="/test">დაიწყე ტესტი</Link>
+            <Link href="/pirovnebis-testi">დაიწყე ტესტი</Link>
           </Button>
         </div>
 
