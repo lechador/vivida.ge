@@ -55,7 +55,7 @@ export default async function SkyPage() {
       />
       <Starfield count={140} shooting={2} />
 
-      <AppHeader authed plan={plan} />
+      <AppHeader authed plan={plan} active="sky" />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <header className="mb-8">

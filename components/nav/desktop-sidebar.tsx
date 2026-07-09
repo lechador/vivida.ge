@@ -108,6 +108,11 @@ export function DesktopSidebar({
                   )}
                 </span>
                 <span className="truncate">{navLabel(item, plan)}</span>
+                {item.badgeKa && (
+                  <span className="ml-auto shrink-0 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]">
+                    {item.badgeKa}
+                  </span>
+                )}
                 {isActive && (
                   <span
                     aria-hidden

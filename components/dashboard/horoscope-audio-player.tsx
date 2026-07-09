@@ -204,9 +204,6 @@ export function HoroscopeAudioPlayer({
         >
           <Headphones className="size-5" />
           მოისმინე ჰოროსკოპი
-          <span className="ml-1 rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
-            ახალი
-          </span>
         </Button>
       </div>
       {status === "error" && error && (

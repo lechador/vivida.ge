@@ -31,6 +31,7 @@ export async function AppHeader({
   plan: PlanId;
   active?:
     | "today"
+    | "sky"
     | "report"
     | "ask"
     | "timing"

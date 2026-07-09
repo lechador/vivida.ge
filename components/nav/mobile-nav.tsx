@@ -147,6 +147,11 @@ export function MobileNav({
                           }
                         />
                         <span className="relative z-10">{navLabel(item, plan)}</span>
+                        {item.badgeKa && (
+                          <span className="relative z-10 ml-auto rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]">
+                            {item.badgeKa}
+                          </span>
+                        )}
                       </Link>
                     );
                   })}

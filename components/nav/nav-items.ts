@@ -4,6 +4,7 @@ import {
   Crown,
   Heart,
   MessageCircle,
+  Orbit,
   Sparkles,
   Stars,
   Sun,
@@ -18,6 +19,7 @@ import type { PlanId } from "@/lib/pricing";
 
 export type NavActiveKey =
   | "today"
+  | "sky"
   | "report"
   | "ask"
   | "timing"
@@ -36,6 +38,8 @@ export type NavItem = {
   Icon: LucideIcon;
   /** Hue used for the active glow + hover icon tint. Roughly the brand axis. */
   hue: string;
+  /** Small pill next to the label ("ახალი") — drop it once the feature ages. */
+  badgeKa?: string;
 };
 
 /**
@@ -70,6 +74,14 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "დღეს",
     Icon: Sun,
     hue: "oklch(0.82 0.16 80)",
+  },
+  {
+    key: "sky",
+    href: "/sky",
+    label: "ცა ახლა",
+    Icon: Orbit,
+    hue: "oklch(0.80 0.15 200)",
+    badgeKa: "ახალი",
   },
   {
     key: "report",
