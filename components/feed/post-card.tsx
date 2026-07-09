@@ -24,7 +24,6 @@ import { ReportDialog } from "@/components/safety/report-dialog";
 import { CommentSection } from "./comment-section";
 import { MentionText } from "./mention-text";
 import { PostActions } from "./post-actions";
-import { TierBadge } from "./tier-badge";
 import { feedTimeAgo } from "./time-ago";
 
 /**
@@ -174,7 +173,6 @@ export function PostCard({
                 {display}
               </span>
             )}
-            <TierBadge total={post.authorReputation} variant="byline" />
           </div>
           <div className="mt-0.5 flex flex-wrap items-baseline gap-x-1.5 text-[11px] text-muted-foreground/85">
             {post.author.username && (

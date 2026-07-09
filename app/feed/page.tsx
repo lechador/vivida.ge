@@ -1,7 +1,5 @@
 import { eq } from "drizzle-orm";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Trophy } from "lucide-react";
 
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
@@ -9,7 +7,6 @@ import { profiles } from "@/db/schema";
 import { listFeed } from "@/actions/feed";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
-import { getReputation } from "@/lib/reputation";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { getHeaderData } from "@/lib/header-cache";
 import { getDashboardSuggestions } from "@/lib/suggestions";
@@ -19,7 +16,6 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SuggestedPeopleRail } from "@/components/dashboard/suggested-people-rail";
 import { FeedList } from "@/components/feed/feed-list";
 import { PostComposer } from "@/components/feed/post-composer";
-import { TierBadge } from "@/components/feed/tier-badge";
 
 export const metadata = { title: "ფიდი" };
 export const dynamic = "force-dynamic";
@@ -40,10 +36,9 @@ export default async function FeedPage() {
     redirect("/onboarding");
   }
 
-  const [plan, posts, reputation, headerData, suggestions] = await Promise.all([
+  const [plan, posts, headerData, suggestions] = await Promise.all([
     getCurrentPlan(user.id),
     listFeed({ limit: 30 }),
-    getReputation(user.id),
     // Reuses the cached header lookup (also has avatarUrl), so showing
     // the viewer's chosen main photo in the composer doesn't add an
     // extra DB roundtrip — it's already memoised for the navbar.
@@ -72,23 +67,13 @@ export default async function FeedPage() {
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           საზოგადოება
         </div>
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3 sm:mb-8">
+        <div className="mb-6 sm:mb-8">
           <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
             ვივიდას{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
               ფიდი
             </span>
           </h1>
-          <div className="flex flex-col items-end gap-1">
-            <TierBadge total={reputation} variant="compact" />
-            <Link
-              href="/leaderboard"
-              className="inline-flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Trophy className="size-3" />
-              ლიდერბორდი
-            </Link>
-          </div>
         </div>
 
         {/* People-you'd-vibe-with rail — flag-gated off at low user density

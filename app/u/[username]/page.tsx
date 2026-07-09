@@ -25,7 +25,6 @@ import {
   listMutualFriendsPreview,
 } from "@/lib/friendship";
 import { ageFromDob } from "@/lib/profile-utils";
-import { getReputation } from "@/lib/reputation";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -37,7 +36,6 @@ import { PhotoCarousel } from "@/components/profile/photo-carousel";
 import { AiAvatarButton } from "@/components/profile/ai-avatar-button";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { FeedList } from "@/components/feed/feed-list";
-import { TierBadge } from "@/components/feed/tier-badge";
 
 const ELEMENT_GLYPH: Record<string, string> = {
   ცეცხლი: "△",
@@ -120,13 +118,11 @@ export default async function PublicProfilePage({
     notFound();
   }
 
-  // Profile stats — friends + posts always public; reputation drives the tier.
-  const [ownerReputation, ownerFriendsCount, ownerPostsCount] =
-    await Promise.all([
-      getReputation(owner.id),
-      countFriends(owner.id),
-      countPostsByUser(owner.id),
-    ]);
+  // Profile stats — friends + posts, both public.
+  const [ownerFriendsCount, ownerPostsCount] = await Promise.all([
+    countFriends(owner.id),
+    countPostsByUser(owner.id),
+  ]);
 
   let synastry = null;
   let viewerName: string | null = null;
@@ -281,7 +277,6 @@ export default async function PublicProfilePage({
                     </span>
                   )}
                 </h1>
-                <TierBadge total={ownerReputation} variant="byline" />
               </div>
 
               {profile.bio && (
@@ -293,7 +288,6 @@ export default async function PublicProfilePage({
               <ProfileStats
                 friends={ownerFriendsCount}
                 posts={ownerPostsCount}
-                reputation={ownerReputation}
               />
 
               {mutualCount > 0 && (
@@ -477,17 +471,14 @@ function Pill({
 function ProfileStats({
   friends,
   posts,
-  reputation,
 }: {
   friends: number;
   posts: number;
-  reputation: number;
 }) {
   return (
     <dl className="mt-5 inline-flex items-stretch divide-x divide-border/60 rounded-2xl border border-border/60 bg-card/35 px-1 backdrop-blur-xl">
       <Stat label="მეგობრები" value={friends} />
       <Stat label="პოსტი" value={posts} />
-      <Stat label="რეპუტაცია" value={reputation} />
     </dl>
   );
 }
