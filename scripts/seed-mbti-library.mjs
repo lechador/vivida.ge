@@ -63,6 +63,14 @@ const SYSTEM =
   "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. თავიდან აიცილე " +
   "თარგმანის სტილი, გამეორებები და კლიშეები.";
 
+// Structured sections (strengths / weaknesses / the dual life-domains) must obey
+// the exact list format — this system prompt forbids prose so the writer voice
+// above doesn't turn the lists back into paragraphs.
+const SYSTEM_STRUCTURED =
+  "შენ ხარ ქართველი ფსიქოლოგი. წერ გამართულ, უნაკლო ქართულს. მკაცრად დაიცავი " +
+  "მოთხოვნილი ფორმატი: მხოლოდ ის სია/პუნქტები, რასაც გთხოვენ. არ დაწერო შესავალი " +
+  "აბზაცი, დასკვნა ან რაიმე პროზა — მხოლოდ **მუქი სათაური** — მოკლე ახსნა, ხაზობრივად.";
+
 function typePrompt(type) {
   return (
     `დაწერე MBTI ტიპის — ${type} (${ARCHETYPE_KA[type]}) — ღრმა ფსიქოლოგიური პორტრეტი ქართულად.\n` +
@@ -82,14 +90,15 @@ function typeSunPrompt(type, sign) {
 }
 
 // Rich 16Personalities-style profile sections — pre-written per 4-letter type.
+// "list" = one bulleted list; "dual" = a ძლიერი block + a სუსტი block.
 const SECTIONS = [
-  { kind: "strengths", titleKa: "ძლიერი მხარეები", list: true },
-  { kind: "weaknesses", titleKa: "სუსტი მხარეები", list: true },
-  { kind: "romantic", titleKa: "რომანტიკული ურთიერთობები", list: false },
-  { kind: "friendship", titleKa: "მეგობრობა", list: false },
-  { kind: "career", titleKa: "კარიერული გზა", list: false },
-  { kind: "workplace", titleKa: "სამუშაო ჩვევები", list: false },
-  { kind: "growth", titleKa: "პიროვნული ზრდა", list: false },
+  { kind: "strengths", titleKa: "ძლიერი მხარეები", format: "list" },
+  { kind: "weaknesses", titleKa: "სუსტი მხარეები", format: "list" },
+  { kind: "romantic", titleKa: "რომანტიკული ურთიერთობები", format: "dual" },
+  { kind: "friendship", titleKa: "მეგობრობა", format: "dual" },
+  { kind: "career", titleKa: "კარიერული გზა", format: "dual" },
+  { kind: "workplace", titleKa: "სამუშაო ჩვევები", format: "dual" },
+  { kind: "growth", titleKa: "პიროვნული ზრდა", format: "dual" },
 ];
 const SECTION_KINDS = SECTIONS.map((s) => s.kind);
 
@@ -98,7 +107,13 @@ function sectionPrompt(kind, type) {
   const listFmt =
     `ჩამოთვალე 6 პუნქტი. თითოეული ცალკე ხაზზე ფორმატით: **სათაური** — ერთი-ორი ` +
     `წინადადება ახსნა. არ გამოიყენო ნუმერაცია ან ტირეები დასაწყისში. მხოლოდ ეს პუნქტები.`;
-  const prose = `3-4 აბზაცი, "შენ"-ის ფორმა, თბილი და კონკრეტული. დააბრუნე მხოლოდ ტექსტი.`;
+  const dual = (domain) =>
+    `დაწერე, როგორია ${label} ${domain}. მოიყვანე 3 ძლიერი მხარე და 3 სუსტი მხარე/` +
+    `გამოწვევა ამ სფეროში, "შენ"-ის ფორმით, გამართული ქართულით. დააბრუნე ზუსტად ამ ` +
+    `ფორმატში, დამატებითი ტექსტისა და ნუმერაციის გარეშე:\n` +
+    `ძლიერი მხარეები:\n**სათაური** — ერთი წინადადება.\n**სათაური** — ერთი წინადადება.\n` +
+    `**სათაური** — ერთი წინადადება.\n\nსუსტი მხარეები:\n**სათაური** — ერთი წინადადება.\n` +
+    `**სათაური** — ერთი წინადადება.\n**სათაური** — ერთი წინადადება.`;
   switch (kind) {
     case "strengths":
       return `დაწერე ${label}-ის ძლიერი მხარეები ქართულად.\n${listFmt}`;
@@ -106,20 +121,15 @@ function sectionPrompt(kind, type) {
       return `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
         `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`;
     case "romantic":
-      return `დაწერე, როგორია ${label} რომანტიკულ ურთიერთობებში: რას ეძებს პარტნიორში, ` +
-        `როგორ გამოხატავს სიყვარულს, რა ურთულდება.\n${prose}`;
+      return dual("რომანტიკულ ურთიერთობებში (როგორ იქცევა, რას ეძებს პარტნიორში, როგორ იჩენს სიყვარულს)");
     case "friendship":
-      return `დაწერე, როგორია ${label} მეგობრობაში: როგორ ამყარებს კავშირებს, რას აფასებს ` +
-        `მეგობრებში, რა ტიპის სოციალურ წრეს ქმნის.\n${prose}`;
+      return dual("მეგობრობასა და სოციალურ კავშირებში");
     case "career":
-      return `დაწერე ${label}-ის კარიერული გზა: რომელ სფეროებში ისახება ბუნებრივად, რა ` +
-        `ამოძრავებს პროფესიულად, რა გარემო უხდება.\n${prose}`;
+      return dual("კარიერასა და პროფესიულ გზაზე");
     case "workplace":
-      return `დაწერე ${label}-ის სამუშაო ჩვევები: როგორ იქცევა გუნდში, როგორც ` +
-        `ხელქვეითი, კოლეგა და ლიდერი.\n${prose}`;
+      return dual("სამუშაო ადგილზე და გუნდში (როგორც კოლეგა, ხელქვეითი და ლიდერი)");
     case "growth":
-      return `დაწერე ${label}-ის პიროვნული ზრდის გზა: რა უნდა გააცნობიეროს და გაივარჯიშოს, ` +
-        `რომ სრულად გაიხსნას თავისი პოტენციალი. დაასრულე გამამხნევებელი ნოტით.\n${prose}`;
+      return dual("პიროვნული ზრდის თვალსაზრისით (რა არის საყრდენი და რაზე უნდა იმუშაოს)");
     default:
       throw new Error(`unknown section ${kind}`);
   }
@@ -131,11 +141,11 @@ const ai = new GoogleGenAI({
   location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
 });
 
-async function generate(prompt) {
+async function generate(prompt, system = SYSTEM, temperature = 0.8) {
   const res = await ai.models.generateContent({
     model: MODEL,
     contents: prompt,
-    config: { systemInstruction: SYSTEM, temperature: 0.8 },
+    config: { systemInstruction: system, temperature },
   });
   const body = res.text?.trim();
   if (!body) throw new Error("empty");
@@ -193,7 +203,9 @@ async function main() {
           body = await generate(typeSunPrompt(t.type, t.sign));
           title = null;
         } else {
-          body = await generate(sectionPrompt(t.kind, t.type));
+          // Sections are strict lists — use the structured system + low temp so
+          // the writer voice doesn't turn them back into prose.
+          body = await generate(sectionPrompt(t.kind, t.type), SYSTEM_STRUCTURED, 0.4);
           title = t.titleKa ?? null;
         }
         await sql`

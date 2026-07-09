@@ -39,20 +39,25 @@ export function mbtiTypeSunKey(type: string, sign: string): string {
 /**
  * The rich, 16Personalities-style profile sections — pre-written per 4-letter
  * type (astrology stays in the live synthesis, so these are type-stable and
- * render with zero per-test cost). `list: true` sections are rendered as a
- * bulleted "**Title** — body" list; the rest are prose. 7 × 16 = 112 rows.
+ * render with zero per-test cost). 7 × 16 = 112 rows.
+ *
+ * Formats:
+ *   - "list" — one bulleted "**Title** — body" list (strengths / weaknesses).
+ *   - "dual" — a "ძლიერი მხარეები:" list followed by a "სუსტი მხარეები:" list,
+ *     so each life-domain (relationships, career, …) shows both sides.
  */
 export const MBTI_SECTIONS = [
-  { kind: "strengths", titleKa: "ძლიერი მხარეები", list: true },
-  { kind: "weaknesses", titleKa: "სუსტი მხარეები", list: true },
-  { kind: "romantic", titleKa: "რომანტიკული ურთიერთობები", list: false },
-  { kind: "friendship", titleKa: "მეგობრობა", list: false },
-  { kind: "career", titleKa: "კარიერული გზა", list: false },
-  { kind: "workplace", titleKa: "სამუშაო ჩვევები", list: false },
-  { kind: "growth", titleKa: "პიროვნული ზრდა", list: false },
+  { kind: "strengths", titleKa: "ძლიერი მხარეები", format: "list" },
+  { kind: "weaknesses", titleKa: "სუსტი მხარეები", format: "list" },
+  { kind: "romantic", titleKa: "რომანტიკული ურთიერთობები", format: "dual" },
+  { kind: "friendship", titleKa: "მეგობრობა", format: "dual" },
+  { kind: "career", titleKa: "კარიერული გზა", format: "dual" },
+  { kind: "workplace", titleKa: "სამუშაო ჩვევები", format: "dual" },
+  { kind: "growth", titleKa: "პიროვნული ზრდა", format: "dual" },
 ] as const;
 
 export type MbtiSectionKind = (typeof MBTI_SECTIONS)[number]["kind"];
+export type MbtiSectionFormat = "list" | "dual";
 
 export function mbtiSectionKey(kind: MbtiSectionKind, type: string): string {
   return `${kind}:${type}`;
@@ -125,7 +130,7 @@ export async function getTypeAndSun(
 export type MbtiSection = {
   kind: MbtiSectionKind;
   titleKa: string;
-  list: boolean;
+  format: MbtiSectionFormat;
   body: string;
 };
 
@@ -141,7 +146,7 @@ export async function getTypeSections(type: string): Promise<MbtiSection[]> {
   return MBTI_SECTIONS.flatMap((s) => {
     const entry = map.get(mbtiSectionKey(s.kind, type));
     if (!entry?.body) return [];
-    return [{ kind: s.kind, titleKa: s.titleKa, list: s.list, body: entry.body }];
+    return [{ kind: s.kind, titleKa: s.titleKa, format: s.format, body: entry.body }];
   });
 }
 
@@ -179,7 +184,17 @@ export function buildSectionPrompt(kind: MbtiSectionKind, type: string): string 
   const listFmt =
     `ჩამოთვალე 6 პუნქტი. თითოეული ცალკე ხაზზე ფორმატით: **სათაური** — ერთი-ორი ` +
     `წინადადება ახსნა. არ გამოიყენო ნუმერაცია ან ტირეები დასაწყისში. მხოლოდ ეს პუნქტები.`;
-  const prose = `3-4 აბზაცი, "შენ"-ის ფორმა, თბილი და კონკრეტული. დააბრუნე მხოლოდ ტექსტი.`;
+
+  // Each life-domain gets both sides: 3 strengths + 3 challenges, in a strict
+  // parseable shape (a "ძლიერი მხარეები:" block then a "სუსტი მხარეები:" block).
+  const dual = (domain: string) =>
+    `დაწერე, როგორია ${label} ${domain}. მოიყვანე 3 ძლიერი მხარე და 3 სუსტი მხარე/` +
+    `გამოწვევა ამ სფეროში, "შენ"-ის ფორმით, გამართული ქართულით. დააბრუნე ზუსტად ამ ` +
+    `ფორმატში, დამატებითი ტექსტისა და ნუმერაციის გარეშე:\n` +
+    `ძლიერი მხარეები:\n**სათაური** — ერთი წინადადება.\n**სათაური** — ერთი წინადადება.\n` +
+    `**სათაური** — ერთი წინადადება.\n\nსუსტი მხარეები:\n**სათაური** — ერთი წინადადება.\n` +
+    `**სათაური** — ერთი წინადადება.\n**სათაური** — ერთი წინადადება.`;
+
   switch (kind) {
     case "strengths":
       return `დაწერე ${label}-ის ძლიერი მხარეები ქართულად.\n${listFmt}`;
@@ -187,20 +202,15 @@ export function buildSectionPrompt(kind: MbtiSectionKind, type: string): string 
       return `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
         `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`;
     case "romantic":
-      return `დაწერე, როგორია ${label} რომანტიკულ ურთიერთობებში: რას ეძებს პარტნიორში, ` +
-        `როგორ გამოხატავს სიყვარულს, რა ურთულდება.\n${prose}`;
+      return dual("რომანტიკულ ურთიერთობებში (როგორ იქცევა, რას ეძებს პარტნიორში, როგორ იჩენს სიყვარულს)");
     case "friendship":
-      return `დაწერე, როგორია ${label} მეგობრობაში: როგორ ამყარებს კავშირებს, რას აფასებს ` +
-        `მეგობრებში, რა ტიპის სოციალურ წრეს ქმნის.\n${prose}`;
+      return dual("მეგობრობასა და სოციალურ კავშირებში");
     case "career":
-      return `დაწერე ${label}-ის კარიერული გზა: რომელ სფეროებში ისახება ბუნებრივად, რა ` +
-        `ამოძრავებს პროფესიულად, რა გარემო უხდება.\n${prose}`;
+      return dual("კარიერასა და პროფესიულ გზაზე");
     case "workplace":
-      return `დაწერე ${label}-ის სამუშაო ჩვევები: როგორ იქცევა გუნდში, როგორც ` +
-        `ხელქვეითი, კოლეგა და ლიდერი.\n${prose}`;
+      return dual("სამუშაო ადგილზე და გუნდში (როგორც კოლეგა, ხელქვეითი და ლიდერი)");
     case "growth":
-      return `დაწერე ${label}-ის პიროვნული ზრდის გზა: რა უნდა გააცნობიეროს და გაივარჯიშოს, ` +
-        `რომ სრულად გაიხსნას თავისი პოტენციალი. დაასრულე გამამხნევებელი ნოტით.\n${prose}`;
+      return dual("პიროვნული ზრდის თვალსაზრისით (რა არის საყრდენი და რაზე უნდა იმუშაოს)");
   }
 }
 
