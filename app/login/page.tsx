@@ -9,9 +9,20 @@ import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata = { title: "შესვლა" };
 
-export default async function LoginPage() {
+/** Same-origin relative path only (no open redirect). */
+function safeNext(v: string | undefined): string | null {
+  return v && v.startsWith("/") && !v.startsWith("//") ? v : null;
+}
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+  const dest = safeNext(next);
   const session = await auth();
-  if (session?.user?.id) redirect("/feed");
+  if (session?.user?.id) redirect(dest ?? "/feed");
 
   return (
     <AuthLayout
@@ -21,7 +32,7 @@ export default async function LoginPage() {
         <>
           ჯერ არ გაქვს ანგარიში?{" "}
           <Link
-            href="/signup"
+            href={dest ? `/signup?next=${encodeURIComponent(dest)}` : "/signup"}
             className="text-foreground underline-offset-2 hover:underline"
           >
             დარეგისტრირდი
@@ -29,7 +40,7 @@ export default async function LoginPage() {
         </>
       }
     >
-      <GoogleButton />
+      <GoogleButton callbackUrl={dest ?? "/feed"} />
       <AuthDivider />
       {/* useSearchParams in LoginForm requires a Suspense boundary. */}
       <Suspense fallback={null}>

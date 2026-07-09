@@ -28,6 +28,12 @@ export function LoginForm() {
   const router = useRouter();
   const verified = params.get("verified") === "1";
   const verifyError = params.get("verify_error");
+  // Post-login destination — only same-origin relative paths (no open redirect).
+  const nextParam = params.get("next");
+  const dest =
+    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+      ? nextParam
+      : "/feed";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,7 +72,7 @@ export function LoginForm() {
         turnstileToken,
       });
       if (result.ok) {
-        router.push("/feed");
+        router.push(dest);
         router.refresh();
         return;
       }
@@ -98,7 +104,7 @@ export function LoginForm() {
         password,
       });
       if (res.ok && res.signedIn) {
-        router.push("/feed");
+        router.push(dest);
         router.refresh();
       } else if (res.ok) {
         // Verified but auto-signin didn't take — clear the wall so they can

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -8,9 +9,22 @@ import { SignupForm } from "@/components/auth/signup-form";
 
 export const metadata = { title: "რეგისტრაცია" };
 
-export default async function SignupPage() {
+/** Same-origin relative path only (no open redirect). */
+function safeNext(v: string | undefined): string | null {
+  return v && v.startsWith("/") && !v.startsWith("//") ? v : null;
+}
+
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+  const dest = safeNext(next);
   const session = await auth();
-  if (session?.user?.id) redirect("/feed");
+  if (session?.user?.id) redirect(dest ?? "/feed");
+
+  const loginHref = dest ? `/login?next=${encodeURIComponent(dest)}` : "/login";
 
   return (
     <AuthLayout
@@ -20,7 +34,7 @@ export default async function SignupPage() {
         <>
           უკვე გაქვს ანგარიში?{" "}
           <Link
-            href="/login"
+            href={loginHref}
             className="text-foreground underline-offset-2 hover:underline"
           >
             შესვლა
@@ -28,9 +42,12 @@ export default async function SignupPage() {
         </>
       }
     >
-      <GoogleButton label="რეგისტრაცია Google-ით" />
+      <GoogleButton label="რეგისტრაცია Google-ით" callbackUrl={dest ?? "/feed"} />
       <AuthDivider />
-      <SignupForm />
+      {/* useSearchParams in SignupForm requires a Suspense boundary. */}
+      <Suspense fallback={null}>
+        <SignupForm />
+      </Suspense>
     </AuthLayout>
   );
 }

@@ -1719,3 +1719,109 @@ export type Block = typeof blocks.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type NewReport = typeof reports.$inferInsert;
 export type ReportTargetType = (typeof reportTargetTypeEnum.enumValues)[number];
+
+/**
+ * Per-axis MBTI score. `letter` is the winning pole of the axis; `pct` is how
+ * strongly the user leaned toward it (50–100 — 50 is a dead tie, 100 is the
+ * extreme). Drives the four progress bars on the results page.
+ */
+export type MbtiAxisScore = {
+  letter: string; // one of E/I, S/N, T/F, J/P depending on the axis
+  pct: number; // 50–100
+};
+
+/** All four MBTI axes, keyed by the axis pair. */
+export type MbtiScoresJson = {
+  EI: MbtiAxisScore;
+  SN: MbtiAxisScore;
+  TF: MbtiAxisScore;
+  JP: MbtiAxisScore;
+};
+
+/**
+ * "Astro-MBTI" test results — one row per completed test (users can retake,
+ * so history accumulates; the profile lists all of them newest-first).
+ *
+ * `mbtiType` is the 4-letter code (e.g. "ESTJ"); `archetypeNameGe` is the
+ * short Georgian archetype the AI names (e.g. "აღმასრულებელი"); `scores` holds
+ * the per-axis breakdown for the progress bars; `aiSynthesisText` is the
+ * Gemini-generated Georgian psychological + astrological synthesis, personal
+ * to this user's chart. `model` records which model produced the text (same
+ * bookkeeping as every other AI-output table here).
+ */
+export const mbtiTestResults = pgTable(
+  "mbti_test_results",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** 4-letter MBTI code, e.g. "INFP". */
+    mbtiType: text("mbti_type").notNull(),
+    /** Short Georgian archetype name, e.g. "აღმასრულებელი". */
+    archetypeNameGe: text("archetype_name_ge").notNull(),
+    /** Per-axis E/I, S/N, T/F, J/P breakdown. */
+    scores: jsonb("scores").$type<MbtiScoresJson>().notNull(),
+    /** Full Georgian AI synthesis shown on the results page. */
+    aiSynthesisText: text("ai_synthesis_text").notNull(),
+    /** Model id that produced the synthesis. */
+    model: text("model").notNull(),
+    language: text("language").notNull().default("ka"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    // Profile page lists a user's tests newest-first.
+    index("mbti_results_user_created_idx").on(t.userId, t.createdAt),
+  ]
+);
+
+export type MbtiTestResult = typeof mbtiTestResults.$inferSelect;
+export type NewMbtiTestResult = typeof mbtiTestResults.$inferInsert;
+
+/**
+ * Reusable Astro-MBTI interpretation library — the pro-written, pre-generated
+ * bulk that a fast live `flash` call composes over at test time (same pattern
+ * as the transit/house libraries). Two kinds:
+ *
+ *   - `kind='type'`     — (mbtiType): the deep psychological portrait of the
+ *                         type. `title` holds its Georgian archetype name.
+ *                         16 rows.
+ *   - `kind='type_sun'` — (mbtiType, sun sign): "how this type expresses
+ *                         through this Sun sign" — the reducible astro fusion.
+ *                         16 × 12 = 192 rows.
+ *
+ * `key` is `${kind}:${mbtiType}[:${sign}]`, e.g. "type:INFJ", "type_sun:INFJ:leo".
+ * `edited=true` marks a human-curated row so regeneration leaves it alone.
+ */
+export const mbtiInterpretationLibrary = pgTable("mbti_interpretation_library", {
+  /** e.g. "type:INFJ", "type_sun:INFJ:leo". */
+  key: text("key").primaryKey(),
+  /** 'type' | 'type_sun' */
+  kind: text("kind").notNull(),
+  /** 4-letter MBTI code. */
+  mbtiType: text("mbti_type").notNull(),
+  /** Sun sign key for kind='type_sun', else null. */
+  sign: text("sign"),
+  /** Georgian archetype name (kind='type' only), else null. */
+  title: text("title"),
+  /** Georgian interpretation text. */
+  body: text("body").notNull(),
+  /** Model id that produced it, or "manual" after an admin edit. */
+  model: text("model").notNull(),
+  /** True once a human edits it — regeneration skips edited rows. */
+  edited: boolean("edited").notNull().default(false),
+  language: text("language").notNull().default("ka"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type MbtiInterpretationLibraryRow =
+  typeof mbtiInterpretationLibrary.$inferSelect;

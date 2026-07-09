@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Loader2, MailCheck } from "lucide-react";
 
@@ -15,6 +15,13 @@ const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export function SignupForm() {
   const router = useRouter();
+  const params = useSearchParams();
+  // Where to land after signup — same-origin relative paths only.
+  const nextParam = params.get("next");
+  const safeNext =
+    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+      ? nextParam
+      : null;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +44,13 @@ export function SignupForm() {
       // auto-signin didn't take.
       const res = await verifyEmailWithCode({ email, code: code.trim(), password });
       if (res.ok) {
-        router.push(res.signedIn ? "/onboarding" : "/login?verified=1");
+        if (res.signedIn) {
+          router.push(safeNext ?? "/onboarding");
+        } else {
+          // Not auto-signed-in — bounce to login, carrying next along.
+          const q = safeNext ? `&next=${encodeURIComponent(safeNext)}` : "";
+          router.push(`/login?verified=1${q}`);
+        }
         router.refresh();
       } else {
         setCodeError(res.error);

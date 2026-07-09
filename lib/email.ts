@@ -8,6 +8,7 @@ import { PasswordResetEmail } from "@/lib/email-templates/password-reset";
 import { WelcomeEmail } from "@/lib/email-templates/welcome";
 import { FriendRequestEmail } from "@/lib/email-templates/friend-request";
 import { MessageEmail } from "@/lib/email-templates/message";
+import { MbtiResultEmail } from "@/lib/email-templates/mbti-result";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 
 /**
@@ -284,6 +285,63 @@ export async function sendWelcomeEmail({
     });
   } catch (err) {
     console.error("[email] welcome threw:", (err as Error).message);
+  }
+}
+
+/**
+ * Send an Astro-MBTI result email. Transactional (not deduped — a user can
+ * retake the test and each result gets its own email); the result also lives
+ * on the site. `resultId` deep-links to /test-results/[id].
+ */
+export async function sendMbtiResultEmail({
+  userId,
+  to,
+  name,
+  resultId,
+  mbtiType,
+  archetypeNameGe,
+  excerpt,
+}: {
+  userId: string;
+  to: string;
+  name: string | null;
+  resultId: string;
+  mbtiType: string;
+  archetypeNameGe: string;
+  excerpt?: string;
+}): Promise<void> {
+  const c = client();
+  if (!c) {
+    console.warn("[email] RESEND_API_KEY missing — skipping MBTI result to", to);
+    return;
+  }
+  const subject = `შენი ტიპია ${mbtiType} — ${archetypeNameGe} · Vivida`;
+  try {
+    const result = await c.emails.send(
+      {
+        from: FROM,
+        to,
+        subject,
+        react: MbtiResultEmail({
+          name,
+          mbtiType,
+          archetypeNameGe,
+          resultUrl: absUrl(`/test-results/${resultId}`),
+          excerpt:
+            excerpt?.trim() ||
+            "შენი პიროვნების ღრმა ფსიქოლოგიური და ასტროლოგიური ანალიზი მზადაა.",
+        }),
+      },
+      { idempotencyKey: `mbti:${resultId}` }
+    );
+    if (result.error) {
+      console.error("[email] mbti result send failed:", result.error);
+      await recordSent(userId, "mbti_result", { email: to, subject, status: "failed" });
+      return;
+    }
+    await recordSent(userId, "mbti_result", { email: to, subject });
+  } catch (err) {
+    console.error("[email] mbti result threw:", (err as Error).message);
   }
 }
 
