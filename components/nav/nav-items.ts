@@ -1,4 +1,5 @@
 import {
+  Brain,
   CalendarClock,
   Compass,
   Crown,
@@ -24,6 +25,7 @@ export type NavActiveKey =
   | "ask"
   | "timing"
   | "feed"
+  | "tests"
   | "discover"
   | "people"
   | "synastry"
@@ -110,6 +112,14 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "ფიდი",
     Icon: Sparkles,
     hue: "oklch(0.78 0.18 320)",
+  },
+  {
+    key: "tests",
+    href: "/tests",
+    label: "ტესტები",
+    Icon: Brain,
+    hue: "oklch(0.78 0.16 300)",
+    badgeKa: "ახალი",
   },
   {
     key: "discover",

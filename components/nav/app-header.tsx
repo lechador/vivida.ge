@@ -36,6 +36,7 @@ export async function AppHeader({
     | "ask"
     | "timing"
     | "feed"
+    | "tests"
     | "discover"
     | "people"
     | "synastry"
