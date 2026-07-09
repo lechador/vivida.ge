@@ -92,4 +92,9 @@ export function houseDef(number: number): HouseDef {
   return HOUSES[number];
 }
 
+/** "პირველ სახლში" / "მე-5 სახლში" — locative phrase for "in your Nth house". */
+export function houseLocativeKa(n: number): string {
+  return n === 1 ? "პირველ სახლში" : `მე-${n} სახლში`;
+}
+
 export const HOUSE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;

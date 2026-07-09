@@ -182,6 +182,27 @@ export function DailyCard({
         </section>
       )}
 
+      {/* Live sky entry — the "where is everything right now?" pull that
+          gives users a reason to open the app between daily readings. */}
+      <Link
+        href="/sky"
+        className="group relative mt-6 flex items-center justify-between gap-3 rounded-xl border border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/8 px-4 py-3 transition-colors hover:border-[var(--vivida-cyan)]/60 hover:bg-[var(--vivida-cyan)]/15"
+      >
+        <span className="flex items-center gap-2.5 text-sm font-medium">
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--vivida-cyan)] opacity-75" />
+            <span className="relative inline-flex size-2 rounded-full bg-[var(--vivida-cyan)]" />
+          </span>
+          ცოცხალი ცა — სად არიან პლანეტები ახლა?
+        </span>
+        <span
+          aria-hidden
+          className="text-[var(--vivida-cyan)] transition-transform group-hover:translate-x-0.5"
+        >
+          →
+        </span>
+      </Link>
+
       <p className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground">
         ხვალ ახალი წინასწარმეტყველება გელოდება.
       </p>

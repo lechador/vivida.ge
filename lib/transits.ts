@@ -25,20 +25,52 @@ const TRANSIT_BODIES = [
 ] as const;
 
 /**
- * Compute today's transit positions at noon UTC. Lat/lng matters only for
- * the Asc/MC, which we don't use here, so we pass safe defaults.
+ * Compute today's transit positions at noon UTC — the daily-granularity
+ * convention every per-day cache (daily horoscope, weekly forecast) keys on.
+ * Lat/lng matters only for the Asc/MC, which we don't use here, so we pass
+ * safe defaults. For minute-resolution positions (the live sky page), use
+ * `computeTransitsAt` instead.
  */
 export function computeTransits(
   date: Date,
   latitude = 0,
   longitude = 0
 ): TransitPositions {
+  return computeAt(date, 12, 0, latitude, longitude);
+}
+
+/**
+ * Transit positions at the actual moment `date` (UTC hour + minute), not
+ * noon. Powers the live sky: two samples a few hours apart give per-planet
+ * angular speed, and real-time positions extrapolate from there.
+ */
+export function computeTransitsAt(
+  date: Date,
+  latitude = 0,
+  longitude = 0
+): TransitPositions {
+  return computeAt(
+    date,
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    latitude,
+    longitude
+  );
+}
+
+function computeAt(
+  date: Date,
+  hour: number,
+  minute: number,
+  latitude: number,
+  longitude: number
+): TransitPositions {
   const origin = new Origin({
     year: date.getUTCFullYear(),
     month: date.getUTCMonth(), // library uses 0-indexed months
     date: date.getUTCDate(),
-    hour: 12,
-    minute: 0,
+    hour,
+    minute,
     latitude,
     longitude,
   });
