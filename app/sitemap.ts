@@ -12,6 +12,7 @@ import {
 import { ALL_HOROSCOPE_VIEWS, VIEW_PATH } from "@/lib/sign-horoscope";
 import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
 import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
+import { ALL_MBTI_SLUGS } from "@/lib/seo/mbti-seo";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -47,6 +48,14 @@ const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
 export default function sitemap(): MetadataRoute.Sitemap {
   const zodiacSignPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
     url: `${BASE}/zodiac/${slug}`,
+    lastModified: NOW,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  // Psychology tests: the 16 MBTI type landing pages.
+  const mbtiTypePages: MetadataRoute.Sitemap = ALL_MBTI_SLUGS.map((slug) => ({
+    url: `${BASE}/mbti/${slug}`,
     lastModified: NOW,
     changeFrequency: "monthly",
     priority: 0.7,
@@ -142,6 +151,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
+      url: `${BASE}/tests`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE}/test`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE}/mbti`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
       url: `${BASE}/chinuri-horoskopi`,
       lastModified: NOW,
       changeFrequency: "monthly",
@@ -231,6 +258,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    ...mbtiTypePages,
     ...zodiacSignPages,
     ...rankingPages,
     ...chinesePages,

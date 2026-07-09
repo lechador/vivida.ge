@@ -9,15 +9,52 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
+import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 
+const TITLE = "ფსიქოლოგიური ტესტები — პიროვნების ტესტი ქართულად";
+const DESCRIPTION =
+  "უფასო ფსიქოლოგიური ტესტები ქართულად — გაიარე პიროვნების ტესტი (MBTI / 16 ტიპი) და აღმოაჩინე შენი ტიპი, ძლიერი მხარეები, ურთიერთობები და კარიერა.";
+
 export const metadata: Metadata = {
-  title: "ტესტები — ფსიქოლოგიური ტესტები",
-  description:
-    "Vivida-ს ფსიქოლოგიური ტესტები — აღმოაჩინე შენი პიროვნების ტიპი და მეტი, უფასოდ.",
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
+  keywords: [
+    "ფსიქოლოგიური ტესტი",
+    "პიროვნების ტესტი",
+    "პიროვნების ტესტი ქართულად",
+    "mbti ტესტი",
+    "16 personalities ქართულად",
+    "ხასიათის ტესტი",
+    "უფასო ტესტი",
+  ],
   alternates: { canonical: `${SITE_URL}/tests` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/tests`,
+    title: TITLE,
+    description: DESCRIPTION,
+    siteName: "Vivida",
+    locale: "ka_GE",
+  },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
+
+const FAQ = [
+  {
+    q: "რა არის პიროვნების ტესტი?",
+    a: "პიროვნების ტესტი (MBTI / 16Personalities) განსაზღვრავს შენს ფსიქოლოგიურ ტიპს 16-დან — როგორ იღებ ენერგიას, აღიქვამ ინფორმაციას, იღებ გადაწყვეტილებებს და აწყობ ცხოვრებას.",
+  },
+  {
+    q: "ტესტი უფასოა?",
+    a: "დიახ, Astro-MBTI ტესტი სრულიად უფასოა. 60 კითხვა, დაახლოებით 7 წუთი — რეგისტრაციის გარეშეც შეგიძლია გაიარო.",
+  },
+  {
+    q: "რამდენ ხანს გრძელდება ტესტი?",
+    a: "დაახლოებით 5-7 წუთი — 60 კითხვა, თითო წამში.",
+  },
+];
 
 /**
  * The tests hub — one card per test from the catalog. A dedicated page (rather
@@ -29,6 +66,24 @@ export default async function TestsPage() {
   const authed = !!session?.user?.id;
   const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
 
+  const ld = [
+    breadcrumbLd([
+      { name: "მთავარი", url: SITE_URL },
+      { name: "ტესტები", url: `${SITE_URL}/tests` },
+    ]),
+    faqLd(FAQ),
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      itemListElement: TESTS.map((t, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${SITE_URL}${t.href}`,
+        name: `${t.titleKa} — ${t.taglineKa}`,
+      })),
+    },
+  ];
+
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
@@ -36,6 +91,10 @@ export default async function TestsPage() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
       />
       <Starfield count={120} shooting={2} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
+      />
 
       {authed ? <AppHeader authed plan={plan} active="tests" /> : <SmartHeader />}
 
@@ -98,6 +157,43 @@ export default async function TestsPage() {
             </article>
           ))}
         </div>
+
+        {/* Browse the 16 types (internal linking + SEO cluster) */}
+        <div className="mt-6 rounded-2xl border border-border bg-card/40 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
+          <h2 className="text-base font-semibold tracking-tight">16 პიროვნების ტიპი</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            დაათვალიერე ყველა ტიპის სრული აღწერა ქართულად — ტესტის გავლის გარეშეც.
+          </p>
+          <Link
+            href="/mbti"
+            className="mt-3 inline-flex items-center gap-1 text-sm text-[var(--vivida-cyan)] hover:underline"
+          >
+            ყველა ტიპი <ArrowRight className="size-3.5" />
+          </Link>
+        </div>
+
+        {/* FAQ */}
+        <section className="mt-10">
+          <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            ხშირად დასმული კითხვები
+          </h2>
+          <div className="space-y-3">
+            {FAQ.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium [&::-webkit-details-marker]:hidden">
+                  {item.q}
+                  <span className="text-muted-foreground transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
       </section>
     </main>
   );

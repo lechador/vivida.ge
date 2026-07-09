@@ -7,15 +7,53 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { MbtiTestClient } from "@/components/mbti/mbti-test-client";
+import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 
+const TITLE = "პიროვნების ტესტი — Astro-MBTI ქართულად (უფასო)";
+const DESCRIPTION =
+  "გაიარე უფასო პიროვნების ტესტი ქართულად — 60 კითხვა, ~7 წუთი. გაიგე შენი MBTI ტიპი 16-დან, ძლიერი და სუსტი მხარეები, ურთიერთობები და კარიერა. რეგისტრაციის გარეშე.";
+
 export const metadata: Metadata = {
-  title: "Astro-MBTI ტესტი — შენი ფსიქოლოგიური ტიპი",
-  description:
-    "გაიარე 60 კითხვიანი ფსიქოლოგიური ტესტი და გაიგე შენი MBTI ტიპი, შერწყმული ნატალურ რუკასთან — უფასოდ, რეგისტრაციის გარეშე.",
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
+  keywords: [
+    "პიროვნების ტესტი",
+    "პიროვნების ტესტი ქართულად",
+    "mbti ტესტი",
+    "mbti ტესტი ქართულად",
+    "16 personalities ქართულად",
+    "ფსიქოლოგიური ტესტი",
+    "უფასო პიროვნების ტესტი",
+    "ხასიათის ტესტი",
+  ],
   alternates: { canonical: `${SITE_URL}/test` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/test`,
+    title: TITLE,
+    description: DESCRIPTION,
+    siteName: "Vivida",
+    locale: "ka_GE",
+  },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
+
+const TEST_FAQ = [
+  {
+    q: "რამდენი კითხვაა ტესტში?",
+    a: "60 კითხვა, 7-ბალიან სკალაზე (ვეთანხმები ↔ არ ვეთანხმები). სავსებით უფასო.",
+  },
+  {
+    q: "ტესტი უფასოა და საჭიროა თუ არა რეგისტრაცია?",
+    a: "ტესტი უფასოა და შეგიძლია გაიარო რეგისტრაციის გარეშე. სრული, პერსონალური შედეგის სანახავად საჭიროა მხოლოდ ერთი წუთი — შესვლა ან რეგისტრაცია.",
+  },
+  {
+    q: "რას მივიღებ შედეგში?",
+    a: "შენს ზუსტ ტიპს 16-დან, ღერძების პროცენტებს, ძლიერ და სუსტ მხარეებს, ურთიერთობებს, კარიერასა და ცნობილ ადამიანებს იმავე ტიპით.",
+  },
+];
 
 /**
  * Public Astro-MBTI test. Anyone can take it; the deep result is gated behind
@@ -27,6 +65,30 @@ export default async function TestPage() {
   const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
   const questions = await getMbtiQuestions();
 
+  const ld = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Quiz",
+      name: "Astro-MBTI პიროვნების ტესტი",
+      description: DESCRIPTION,
+      inLanguage: "ka-GE",
+      url: `${SITE_URL}/test`,
+      educationalLevel: "beginner",
+      numberOfQuestions: questions.length,
+      about: {
+        "@type": "Thing",
+        name: "პიროვნების ტიპი (MBTI)",
+        alternateName: ["MBTI", "16 personalities", "პიროვნების ტესტი"],
+      },
+    },
+    faqLd(TEST_FAQ),
+    breadcrumbLd([
+      { name: "მთავარი", url: SITE_URL },
+      { name: "ტესტები", url: `${SITE_URL}/tests` },
+      { name: "პიროვნების ტესტი", url: `${SITE_URL}/test` },
+    ]),
+  ];
+
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
@@ -34,6 +96,10 @@ export default async function TestPage() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
       />
       <Starfield count={120} shooting={2} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
+      />
 
       {authed ? <AppHeader authed plan={plan} /> : <SmartHeader />}
 
