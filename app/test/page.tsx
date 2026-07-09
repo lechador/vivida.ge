@@ -12,7 +12,7 @@ const SITE_URL = "https://www.vivida.ge";
 export const metadata: Metadata = {
   title: "Astro-MBTI ტესტი — შენი ფსიქოლოგიური ტიპი",
   description:
-    "გაიარე 16 კითხვიანი ფსიქოლოგიური ტესტი და გაიგე შენი MBTI ტიპი, შერწყმული ნატალურ რუკასთან — უფასოდ, რეგისტრაციის გარეშე.",
+    "გაიარე 60 კითხვიანი ფსიქოლოგიური ტესტი და გაიგე შენი MBTI ტიპი, შერწყმული ნატალურ რუკასთან — უფასოდ, რეგისტრაციის გარეშე.",
   alternates: { canonical: `${SITE_URL}/test` },
 };
 
@@ -47,7 +47,7 @@ export default async function TestPage() {
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-foreground/80 sm:text-base">
-            16 კითხვა. აღმოაჩინე შენი MBTI ტიპი, შერწყმული შენს ნატალურ
+            60 კითხვა. აღმოაჩინე შენი MBTI ტიპი, შერწყმული შენს ნატალურ
             რუკასთან — ღრმა, პერსონალური ანალიზი.
           </p>
         </header>

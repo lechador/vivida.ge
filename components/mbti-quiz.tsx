@@ -106,13 +106,19 @@ export function MbtiQuiz({
         <div
           role="radiogroup"
           aria-label="შენი პასუხი"
-          className="mt-7 flex items-center justify-center gap-3 sm:gap-4"
+          className="mt-7 flex items-center justify-center gap-2 sm:gap-3"
         >
           {MBTI_LIKERT.map((opt) => {
             const selected = current === opt.value;
-            const magnitude = Math.abs(opt.value); // 0,1,2
+            const magnitude = Math.abs(opt.value); // 0,1,2,3
             const size =
-              magnitude === 2 ? "size-14" : magnitude === 1 ? "size-11" : "size-9";
+              magnitude === 3
+                ? "size-12 sm:size-14"
+                : magnitude === 2
+                  ? "size-10 sm:size-12"
+                  : magnitude === 1
+                    ? "size-9 sm:size-10"
+                    : "size-7 sm:size-8";
             const tone =
               opt.value > 0
                 ? "var(--vivida-cyan)"
