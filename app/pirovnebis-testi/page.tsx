@@ -7,6 +7,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { MbtiTestClient } from "@/components/mbti/mbti-test-client";
+import { TestMusicPlayer } from "@/components/mbti/test-music-player";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -93,9 +94,15 @@ export default async function TestPage() {
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_35%_at_15%_80%,oklch(0.30_0.16_350/0.4),transparent_70%)]"
       />
-      <Starfield count={120} shooting={2} />
+      {/* Slow-drifting nebula for extra mystic depth. */}
+      <div
+        aria-hidden
+        className="vivida-nebula-drift absolute inset-0 -z-10 opacity-60 bg-[radial-gradient(45%_40%_at_35%_45%,oklch(0.42_0.18_305/0.16),transparent_70%),radial-gradient(40%_35%_at_75%_60%,oklch(0.42_0.16_210/0.16),transparent_70%)]"
+      />
+      <Starfield count={150} shooting={3} />
+      <TestMusicPlayer />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}

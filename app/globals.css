@@ -260,6 +260,20 @@
   0%, 100% { transform: scaleY(0.35); }
   50%      { transform: scaleY(1);    }
 }
+.vivida-eq-bar {
+  transform-origin: bottom;
+  animation: vivida-eq 0.9s ease-in-out infinite;
+}
+
+/* Soft violet ring pulse inviting the user to turn on the test's ambient music. */
+@keyframes vivida-music-pulse {
+  0%   { box-shadow: 0 0 0 0 oklch(0.65 0.24 305 / 0.55), 0 0 24px -6px oklch(0.65 0.24 305 / 0.7); }
+  70%  { box-shadow: 0 0 0 12px oklch(0.65 0.24 305 / 0), 0 0 24px -6px oklch(0.65 0.24 305 / 0.7); }
+  100% { box-shadow: 0 0 0 0 oklch(0.65 0.24 305 / 0), 0 0 24px -6px oklch(0.65 0.24 305 / 0.7); }
+}
+.vivida-music-pulse {
+  animation: vivida-music-pulse 2.4s ease-out infinite;
+}
 
 /*
  * Continuous rotation + soft pulse for the cosmic loader. Pulled out of
