@@ -275,6 +275,32 @@
   animation: vivida-music-pulse 2.4s ease-out infinite;
 }
 
+/* Focus mode — a slow, breathing violet↔cyan glow around the quiz card so it
+ * reads as the spotlit focal point while the surroundings are dimmed. */
+@keyframes vivida-focus-breathe {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px oklch(0.65 0.24 305 / 0.3),
+      0 0 55px -14px oklch(0.6 0.22 300 / 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px oklch(0.72 0.18 220 / 0.38),
+      0 0 80px -10px oklch(0.62 0.2 285 / 0.72);
+  }
+}
+.vivida-focus-card {
+  animation: vivida-focus-breathe 6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vivida-focus-card {
+    animation: none;
+    box-shadow:
+      0 0 0 1px oklch(0.65 0.24 305 / 0.3),
+      0 0 55px -14px oklch(0.6 0.22 300 / 0.55);
+  }
+}
+
 /*
  * Continuous rotation + soft pulse for the cosmic loader. Pulled out of
  * Framer Motion so the animation runs purely on the compositor (no React
