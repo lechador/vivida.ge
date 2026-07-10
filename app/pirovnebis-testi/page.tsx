@@ -110,20 +110,19 @@ export default async function TestPage() {
 
       {authed ? <AppHeader authed plan={plan} active="tests" /> : <SmartHeader />}
 
-      <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        <header className="mb-8 text-center">
-          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+      <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-4 pb-10 pt-4 sm:px-6 sm:pb-14 sm:pt-6">
+        <header className="mb-5 text-center">
+          <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Astro-MBTI
           </div>
-          <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
             შენი{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
               ფსიქოლოგიური ტიპი
             </span>
           </h1>
-          <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-foreground/80 sm:text-base">
-            60 კითხვა. აღმოაჩინე შენი MBTI ტიპი, შერწყმული შენს ნატალურ
-            რუკასთან — ღრმა, პერსონალური ანალიზი.
+          <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
+            60 კითხვა · ~7 წუთი · ღრმა, პერსონალური ანალიზი
           </p>
         </header>
 
