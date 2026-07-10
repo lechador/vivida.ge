@@ -1,50 +1,46 @@
-import { auth } from "@/auth";
-import {
-  countUnreadMessages,
-  listConversations,
-} from "@/lib/messages";
+"use client";
+
+import { useEffect, useState } from "react";
+
 import { ChatShellClient } from "./chat-shell-client";
+import type { ChatConversation } from "./chat-launcher";
+
+type Bootstrap = {
+  viewerId: string;
+  conversations: ChatConversation[];
+  unreadTotal: number;
+};
 
 /**
- * Server-side shell that decides whether to render the chat at all.
- * Mounted from the root layout — returns null for anonymous visitors so
- * the launcher button doesn't appear on the landing page.
+ * Site-wide chat shell. Client-side on purpose: it fetches its bootstrap data
+ * (viewer + conversations + unread) AFTER hydration instead of reading auth on
+ * the server. Because it's mounted from the root layout, doing that server-side
+ * would force EVERY page (including public/SEO pages) to render dynamically.
+ * Resolving auth client-side lets those pages stay statically prerendered.
+ * Anonymous visitors get a 204 → nothing renders (same as before).
  */
-export async function ChatShell() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) return null;
+export function ChatShell() {
+  const [data, setData] = useState<Bootstrap | null>(null);
 
-  const [conversations, unreadTotal] = await Promise.all([
-    listConversations(userId),
-    countUnreadMessages(userId),
-  ]);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/chat/bootstrap", { headers: { accept: "application/json" } })
+      .then((r) => (r.ok && r.status !== 204 ? r.json() : null))
+      .then((d: Bootstrap | null) => {
+        if (alive && d?.viewerId) setData(d);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
-  // Strip down to the shape the client component needs (avoid sending the
-  // entire user record across the boundary)
-  const initial = conversations.map((c) => ({
-    partner: {
-      id: c.partner.id,
-      name: c.partner.name,
-      image: c.partner.image,
-      username: c.partner.username,
-      displayName: c.partner.displayName,
-    },
-    lastMessage: c.lastMessage
-      ? {
-          body: c.lastMessage.body,
-          createdAt: c.lastMessage.createdAt,
-          senderId: c.lastMessage.senderId,
-        }
-      : null,
-    unreadCount: c.unreadCount,
-  }));
-
+  if (!data) return null;
   return (
     <ChatShellClient
-      viewerId={userId}
-      initialConversations={initial}
-      initialUnreadTotal={unreadTotal}
+      viewerId={data.viewerId}
+      initialConversations={data.conversations}
+      initialUnreadTotal={data.unreadTotal}
     />
   );
 }

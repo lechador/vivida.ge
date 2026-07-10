@@ -109,7 +109,7 @@ export default async function PairPage({
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: c.faq.map((item) => ({
+    mainEntity: (c.faq ?? []).map((item) => ({
       "@type": "Question",
       name: item.q,
       acceptedAnswer: { "@type": "Answer", text: item.a },
@@ -213,12 +213,12 @@ export default async function PairPage({
 
         {/* Overall */}
         <Section title="ზოგადი თავსებადობა">
-          {paragraphs(c.overall).map((p, i) => <p key={i}>{p}</p>)}
+          {paragraphs(c.overall ?? "").map((p, i) => <p key={i}>{p}</p>)}
         </Section>
 
         {/* Love */}
         <Section title="სიყვარული">
-          {paragraphs(c.love).map((p, i) => <p key={i}>{p}</p>)}
+          {paragraphs(c.love ?? "").map((p, i) => <p key={i}>{p}</p>)}
         </Section>
 
         {/* Friendship + communication side-by-side */}
@@ -226,13 +226,13 @@ export default async function PairPage({
           <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
             <h2 className="mb-3 text-lg font-semibold tracking-tight">მეგობრობა</h2>
             <div className="space-y-3 text-sm leading-relaxed text-foreground/90">
-              {paragraphs(c.friendship).map((p, i) => <p key={i}>{p}</p>)}
+              {paragraphs(c.friendship ?? "").map((p, i) => <p key={i}>{p}</p>)}
             </div>
           </article>
           <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
             <h2 className="mb-3 text-lg font-semibold tracking-tight">კომუნიკაცია</h2>
             <div className="space-y-3 text-sm leading-relaxed text-foreground/90">
-              {paragraphs(c.communication).map((p, i) => <p key={i}>{p}</p>)}
+              {paragraphs(c.communication ?? "").map((p, i) => <p key={i}>{p}</p>)}
             </div>
           </article>
         </section>
@@ -242,7 +242,7 @@ export default async function PairPage({
           <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
             <h2 className="mb-3 text-lg font-semibold tracking-tight">რა გამოგდით კარგად</h2>
             <ul className="space-y-2 text-sm leading-relaxed">
-              {c.strengths.map((s, i) => (
+              {(c.strengths ?? []).map((s, i) => (
                 <li key={i} className="flex gap-2">
                   <span style={{ color: scoreColor }}>✦</span>
                   <span className="text-foreground/90">{s}</span>
@@ -253,7 +253,7 @@ export default async function PairPage({
           <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
             <h2 className="mb-3 text-lg font-semibold tracking-tight">რას უნდა მიხედოთ</h2>
             <ul className="space-y-2 text-sm leading-relaxed">
-              {c.challenges.map((w, i) => (
+              {(c.challenges ?? []).map((w, i) => (
                 <li key={i} className="flex gap-2">
                   <span className="text-muted-foreground">·</span>
                   <span className="text-foreground/85">{w}</span>
@@ -265,7 +265,7 @@ export default async function PairPage({
 
         {/* Verdict */}
         <Section title="დასკვნა">
-          {paragraphs(c.verdict).map((p, i) => <p key={i}>{p}</p>)}
+          {paragraphs(c.verdict ?? "").map((p, i) => <p key={i}>{p}</p>)}
         </Section>
 
         {/* FAQ */}
@@ -274,7 +274,7 @@ export default async function PairPage({
             ხშირად დასმული კითხვები
           </h2>
           <div className="space-y-3">
-            {c.faq.map((item, i) => (
+            {(c.faq ?? []).map((item, i) => (
               <details key={i} className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors open:bg-card/80 sm:p-5">
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
                   <span>{item.q}</span>

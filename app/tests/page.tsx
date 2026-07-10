@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Brain, Clock, ArrowRight } from "lucide-react";
 
-import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import { TESTS } from "@/lib/tests-catalog";
-import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
@@ -61,11 +58,7 @@ const FAQ = [
  * than one nav slot per test) so new tests are added without crowding the nav.
  * Public: works signed-out (SmartHeader) and signed-in (AppHeader).
  */
-export default async function TestsPage() {
-  const session = await auth();
-  const authed = !!session?.user?.id;
-  const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
-
+export default function TestsPage() {
   const ld = [
     breadcrumbLd([
       { name: "მთავარი", url: SITE_URL },
@@ -96,7 +89,7 @@ export default async function TestsPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed plan={plan} active="tests" /> : <SmartHeader />}
+      <SmartHeader />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <header className="mb-8 text-center sm:mb-10">

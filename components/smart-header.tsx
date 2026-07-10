@@ -1,31 +1,17 @@
-import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
-import { AppHeader } from "@/components/nav/app-header";
 import { MarketingHeader } from "@/components/marketing-header";
 
-type MarketingActive = "features" | "how-it-works";
+type MarketingActive = "features" | "how-it-works" | "nataluri-ruka" | "zodiac";
 
 /**
- * Header that picks the right variant by auth state.
+ * Header for public marketing + SEO pages. Fully STATIC on purpose: it does
+ * NOT read auth on the server, so every page that renders it stays statically
+ * prerenderable (CDN-served) instead of being forced dynamic. The header shows
+ * the anonymous marketing shell; a small client CTA (MarketingCta) upgrades to
+ * an "open app" link after hydration for signed-in visitors.
  *
- * - Anonymous viewer → lightweight `MarketingHeader` (logo + nav links + CTA)
- * - Authed viewer    → full `AppHeader` (the in-app shell with bell, search, user menu)
- *
- * Used on the public marketing pages (/features, /how-it-works, /terms,
- * /privacy) so a logged-in user reading marketing copy is never stranded
- * outside their app shell. AppHeader's `active` prop intentionally ignores
- * the marketing-only keys — none of the in-app nav tabs should be highlighted
- * while reading marketing content.
+ * In-app authed pages (dashboard, feed, …) render `AppHeader` directly and stay
+ * dynamic — this component is only for the public surface.
  */
-export async function SmartHeader({
-  active: _active,
-}: {
-  active?: MarketingActive;
-} = {}) {
-  const session = await auth();
-  if (session?.user?.id) {
-    const plan = await getCurrentPlan(session.user.id);
-    return <AppHeader authed plan={plan} active={undefined} />;
-  }
-  return <MarketingHeader active={_active} />;
+export function SmartHeader({ active }: { active?: MarketingActive } = {}) {
+  return <MarketingHeader active={active} />;
 }

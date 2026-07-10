@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { MarketingCta } from "@/components/marketing-cta";
 
 /**
  * Lightweight header for public marketing pages (/how-it-works, /features,
@@ -47,9 +47,7 @@ export function MarketingHeader({
         {link("/how-it-works", "როგორ მუშაობს", "how-it-works")}
       </nav>
 
-      <Button asChild variant="mystic" size="sm">
-        <Link href="/signup">დაიწყე უფასოდ</Link>
-      </Button>
+      <MarketingCta />
     </header>
   );
 }

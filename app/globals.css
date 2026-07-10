@@ -158,7 +158,8 @@
    */
   @media (min-width: 1024px) {
     body:has([data-desktop-sidebar]) {
-      padding-left: 14rem; /* matches w-56 on the sidebar */
+      padding-left: 4.5rem; /* matches the collapsed icon-rail width; it
+                               expands over content on hover, not by shifting */
     }
 
     /*
@@ -178,7 +179,7 @@
      * stable across open/close.
      */
     body[data-scroll-locked]:has([data-desktop-sidebar]) {
-      padding-left: 14rem !important;
+      padding-left: 4.5rem !important;
       padding-right: 0 !important;
       margin-right: 0 !important;
       margin-left: 0 !important;

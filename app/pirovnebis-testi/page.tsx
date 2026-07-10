@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 
-import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import { getMbtiQuestions } from "@/lib/mbti-questions-db";
-import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { MbtiTestClient } from "@/components/mbti/mbti-test-client";
@@ -59,10 +56,11 @@ const TEST_FAQ = [
  * Public Astro-MBTI test. Anyone can take it; the deep result is gated behind
  * login (handled at /pirovnebis-testi/claim). Header adapts to auth state.
  */
+// ISR: static shell + questions read from the DB, refreshed hourly so admin
+// edits propagate. No per-request auth — the quiz works for everyone.
+export const revalidate = 3600;
+
 export default async function TestPage() {
-  const session = await auth();
-  const authed = !!session?.user?.id;
-  const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
   const questions = await getMbtiQuestions();
 
   const ld = [
@@ -101,7 +99,7 @@ export default async function TestPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed plan={plan} /> : <SmartHeader />}
+      <SmartHeader />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <header className="mb-8 text-center">

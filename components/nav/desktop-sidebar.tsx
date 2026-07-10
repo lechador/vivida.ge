@@ -9,15 +9,12 @@ import { MessagesTabBadge } from "./messages-tab-badge";
 import { NAV_ITEMS, navLabel, type NavActiveKey, type NavItem } from "./nav-items";
 
 /**
- * Desktop-only left sidebar. Shows on lg+ as a sticky vertical nav, with
- * the same destinations as the mobile bottom tab bar plus "მეგობრები"
- * (which the mobile bar sheds in favor of "ჩატი"). Content gets pushed
- * right via a body padding rule in globals.css that keys off the
- * `[data-desktop-sidebar]` attribute, so individual pages don't need
- * surgical edits — they just gain the extra horizontal space.
- *
- * The legacy AppHeader pill nav becomes redundant on lg, so it's
- * hidden there.
+ * Desktop-only left sidebar — a COMPACT icon rail that expands on hover.
+ * Collapsed it's just icons (4.5rem wide) so pages get most of the width back;
+ * hovering slides it open to 15rem to reveal labels, overlaying content rather
+ * than pushing it (content is offset only by the collapsed width via the
+ * `[data-desktop-sidebar]` body rule in globals.css). Icons/labels reveal via
+ * `group-hover`.
  */
 export function DesktopSidebar({
   active,
@@ -28,8 +25,6 @@ export function DesktopSidebar({
   plan: PlanId;
   unreadMessages?: number;
 }) {
-  // Sidebar shows the full primary nav. Messages goes alongside friends —
-  // we have the vertical room, no reason to drop one for the other here.
   const items: NavItem[] = [
     ...NAV_ITEMS,
     {
@@ -41,41 +36,41 @@ export function DesktopSidebar({
     },
   ];
 
+  // Labels/wordmark fade in when the rail is hovered.
+  const reveal = "opacity-0 transition-opacity duration-150 group-hover:opacity-100";
+
   return (
     <aside
       data-desktop-sidebar
       aria-label="ძირითადი ნავიგაცია"
       className={cn(
-        "hidden lg:flex",
-        "fixed left-0 top-0 z-30 h-[100dvh] w-56",
-        // Layered surface: deep violet base + a thin gradient line on the
-        // right edge so it reads as its own column, not just a darker
-        // strip of page background.
-        "flex-col border-r border-[var(--vivida-violet)]/30 bg-[oklch(0.15_0.05_290/0.95)] backdrop-blur-2xl",
+        "group hidden lg:flex",
+        "fixed left-0 top-0 z-40 h-[100dvh] w-[4.5rem] hover:w-60",
+        "overflow-hidden transition-[width] duration-200 ease-out",
+        "flex-col border-r border-[var(--vivida-violet)]/30 bg-[oklch(0.15_0.05_290/0.97)] backdrop-blur-2xl",
         "shadow-[8px_0_32px_-12px_oklch(0.65_0.24_305/0.18)]",
         "after:pointer-events-none after:absolute after:inset-y-8 after:right-0 after:w-px after:bg-[linear-gradient(180deg,transparent,oklch(0.78_0.18_305/0.45),transparent)]"
       )}
     >
-      <Link
-        href="/feed"
-        className="flex items-center gap-2.5 px-5 pb-5 pt-6"
-      >
-        <VividaMark size={36} id="sidebar-mark" className="!size-9" />
-        <span
-          className="bg-clip-text text-transparent text-xl font-semibold tracking-tight"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-          }}
-        >
-          vivida
+      <Link href="/feed" className="flex items-center gap-2.5 px-[1.15rem] pb-5 pt-6">
+        <VividaMark size={36} id="sidebar-mark" className="!size-9 shrink-0" />
+        <span className={cn("flex items-center gap-2", reveal)}>
+          <span
+            className="bg-clip-text text-transparent text-xl font-semibold tracking-tight"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+            }}
+          >
+            vivida
+          </span>
+          {plan === "pro" && <ProBadge />}
         </span>
-        {plan === "pro" && <ProBadge />}
       </Link>
 
       <div
         aria-hidden
-        className="mx-5 h-px bg-gradient-to-r from-transparent via-border to-transparent"
+        className="mx-4 h-px bg-gradient-to-r from-transparent via-border to-transparent"
       />
 
       <ul className="mt-3 flex flex-col gap-0.5 px-3">
@@ -86,8 +81,9 @@ export function DesktopSidebar({
               <Link
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
+                title={navLabel(item, plan)}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                  "group/link relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-[var(--vivida-violet)]/15 text-foreground"
                     : "text-muted-foreground hover:bg-card/50 hover:text-foreground"
@@ -95,10 +91,10 @@ export function DesktopSidebar({
               >
                 <span
                   className={cn(
-                    "relative grid size-8 place-items-center rounded-lg transition-all",
+                    "relative grid size-8 shrink-0 place-items-center rounded-lg transition-all",
                     isActive
                       ? "bg-[var(--vivida-violet)]/30 ring-1 ring-[var(--vivida-violet)]/55 shadow-[0_0_18px_-4px_oklch(0.65_0.24_305/0.55)]"
-                      : "bg-card/40 ring-1 ring-border/40 group-hover:ring-border"
+                      : "bg-card/40 ring-1 ring-border/40 group-hover/link:ring-border"
                   )}
                   style={isActive ? { color: item.hue } : undefined}
                 >
@@ -107,9 +103,14 @@ export function DesktopSidebar({
                     <MessagesTabBadge initial={unreadMessages} />
                   )}
                 </span>
-                <span className="truncate">{navLabel(item, plan)}</span>
+                <span className={cn("truncate", reveal)}>{navLabel(item, plan)}</span>
                 {item.badgeKa && (
-                  <span className="ml-auto shrink-0 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]">
+                  <span
+                    className={cn(
+                      "ml-auto shrink-0 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]",
+                      reveal
+                    )}
+                  >
                     {item.badgeKa}
                   </span>
                 )}
@@ -132,7 +133,10 @@ export function DesktopSidebar({
         />
         <Link
           href="/account"
-          className="block text-xs text-muted-foreground hover:text-foreground"
+          className={cn(
+            "block whitespace-nowrap text-xs text-muted-foreground hover:text-foreground",
+            reveal
+          )}
         >
           ანგარიში & პარამეტრები →
         </Link>
