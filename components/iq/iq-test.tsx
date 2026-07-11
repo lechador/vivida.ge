@@ -43,7 +43,11 @@ export function IqTestClient() {
     try {
       localStorage.setItem(
         IQ_ANSWERS_STORAGE_KEY,
-        JSON.stringify({ answers, timeUsedSec: IQ_TIME_LIMIT_SEC - timeLeft })
+        JSON.stringify({
+          answers,
+          timeUsedSec: IQ_TIME_LIMIT_SEC - timeLeft,
+          attemptId: crypto.randomUUID(),
+        })
       );
     } catch {
       /* private mode — result page will bounce back if it can't read */

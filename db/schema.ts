@@ -1787,6 +1787,51 @@ export const mbtiTestResults = pgTable(
 export type MbtiTestResult = typeof mbtiTestResults.$inferSelect;
 export type NewMbtiTestResult = typeof mbtiTestResults.$inferInsert;
 
+export type IqDomainScoresJson = {
+  numeric: number;
+  logic: number;
+  spatial: number;
+  pattern: number;
+};
+
+/**
+ * One row per completed IQ test. Kept for *both* signed-in users (history on
+ * their profile) and anonymous takers (`user_id` null) — the anonymous rows are
+ * what let us self-norm: recompute each item's p-value and the θ→IQ mapping from
+ * the real score distribution instead of the provisional item-difficulty guess.
+ * `attempt_id` (client-generated) dedupes result-page refreshes/re-POSTs.
+ */
+export const iqResults = pgTable(
+  "iq_result",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    attemptId: text("attempt_id").notNull().unique(),
+    iq: integer("iq").notNull(),
+    theta: doublePrecision("theta").notNull(),
+    percentile: integer("percentile").notNull(),
+    correct: integer("correct").notNull(),
+    total: integer("total").notNull(),
+    /** Per-domain percent correct, for the breakdown + norming. */
+    domainScores: jsonb("domain_scores").$type<IqDomainScoresJson>().notNull(),
+    /** itemId → chosen option index, the raw data self-norming needs. */
+    answers: jsonb("answers").$type<Record<string, number>>().notNull(),
+    timeUsedSec: integer("time_used_sec"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("iq_results_user_created_idx").on(t.userId, t.createdAt),
+    index("iq_results_created_idx").on(t.createdAt),
+  ]
+);
+
+export type IqResultRow = typeof iqResults.$inferSelect;
+export type NewIqResultRow = typeof iqResults.$inferInsert;
+
 /**
  * Reusable Astro-MBTI interpretation library — the pro-written, pre-generated
  * bulk that a fast live `flash` call composes over at test time (same pattern

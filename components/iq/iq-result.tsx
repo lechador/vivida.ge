@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Brain, Lock, RotateCcw, Sparkles } from "lucide-react";
+import { Brain, Check, Lock, RotateCcw, Share2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,13 @@ import { scoreIq, type IqResult } from "@/lib/iq/scoring";
 import { IQ_ANSWERS_STORAGE_KEY } from "@/lib/iq/items";
 import { IqBellCurve, DomainBar } from "@/components/iq/iq-bell-curve";
 
-type Stored = { answers: Record<string, number>; timeUsedSec?: number };
+type Stored = {
+  answers: Record<string, number>;
+  timeUsedSec?: number;
+  attemptId?: string;
+};
+
+const POSTED_KEY = "vivida_iq_posted";
 
 /**
  * IQ result. The score, band, percentile and bell curve are free; the
@@ -34,6 +40,38 @@ export function IqResultClient() {
       setStored("missing");
     }
   }, []);
+
+  // Persist the attempt once (best-effort). Deduped by attemptId both here
+  // (so a refresh doesn't re-POST) and server-side (unique attempt_id).
+  useEffect(() => {
+    if (!stored || stored === "missing" || !stored.attemptId) return;
+    let posted: string | null = null;
+    try {
+      posted = localStorage.getItem(POSTED_KEY);
+    } catch {
+      /* ignore */
+    }
+    if (posted === stored.attemptId) return;
+    fetch("/api/iq/submit", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        attemptId: stored.attemptId,
+        answers: stored.answers,
+        timeUsedSec: stored.timeUsedSec,
+      }),
+    })
+      .then(() => {
+        try {
+          localStorage.setItem(POSTED_KEY, stored.attemptId!);
+        } catch {
+          /* ignore */
+        }
+      })
+      .catch(() => {
+        /* best-effort */
+      });
+  }, [stored]);
 
   useEffect(() => {
     let alive = true;
@@ -145,6 +183,7 @@ export function IqResultClient() {
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-center gap-3">
+        <ShareButton iq={result.iq} />
         <Button type="button" variant="outline" onClick={retake} className="gap-1.5">
           <RotateCcw className="size-4" />
           თავიდან გავლა
@@ -159,6 +198,35 @@ export function IqResultClient() {
         დაღლილობაზე, გარემოსა და ყურადღებაზე. ეს არ არის კლინიკური დიაგნოზი.
       </p>
     </div>
+  );
+}
+
+function ShareButton({ iq }: { iq: number }) {
+  const [copied, setCopied] = useState(false);
+  async function share() {
+    const url = "https://www.vivida.ge/iq-testi";
+    const text = `ჩემი IQ Vivida-ს ტესტზე: ${iq} 🧠 შენ რას მიიღებ?`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: "Vivida IQ ტესტი", text, url });
+        return;
+      } catch {
+        /* cancelled — fall through to copy */
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }
+  return (
+    <Button type="button" variant="mystic" onClick={share} className="gap-1.5">
+      {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
+      {copied ? "დაკოპირდა" : "გააზიარე"}
+    </Button>
   );
 }
 

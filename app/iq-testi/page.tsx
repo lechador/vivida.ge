@@ -121,6 +121,73 @@ export default async function IqTestPage() {
 
         <IqTestClient />
       </section>
+
+      {/* SEO / informational content — below the fold, indexable. */}
+      <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
+        <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+          <h2 className="text-xl font-semibold tracking-tight">
+            რა არის IQ ტესტი?
+          </h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
+            IQ (ინტელექტის კოეფიციენტი) ზომავს აბსტრაქტულ აზროვნებას — რამდენად
+            კარგად ამჩნევ კანონზომიერებებს, აგებ ლოგიკურ დასკვნებს და აგვარებ
+            ახალ, უცნობ ამოცანებს. Vivida-ს ტესტი <strong>კულტურულად ნეიტრალურია</strong>:
+            დავალებების უმეტესობა ფიგურებსა და რიცხვებზეა აგებული, ასე რომ შედეგი
+            ნაკლებად არის დამოკიდებული ენასა თუ განათლებაზე.
+          </p>
+
+          <h2 className="mt-8 text-xl font-semibold tracking-tight">
+            როგორ ითვლება შენი ქულა?
+          </h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
+            ტესტი აფასებს პასუხების <strong>პატერნს</strong>, და არა უბრალოდ სწორი
+            პასუხების რაოდენობას — რთული დავალების სწორად ამოხსნა უფრო მეტს მატებს
+            შედეგს, ვიდრე მარტივის. ეს არის იგივე პრინციპი (Item Response Theory),
+            რომელსაც პროფესიული ტესტები იყენებენ. შემდეგ ქულა გადაჰყავს
+            სტანდარტულ IQ სკალაზე, სადაც <strong>საშუალო არის 100</strong>, ხოლო
+            მოსახლეობის დაახლოებით 68% თავსდება 85-დან 115-მდე დიაპაზონში.
+          </p>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            {[
+              { t: "რიცხვითი ლოგიკა", d: "რიცხვთა მიმდევრობები და კანონზომიერებები" },
+              { t: "ლოგიკური აზროვნება", d: "დასკვნები, ანალოგიები, გამონაკლისები" },
+              { t: "სივრცითი აზროვნება", d: "ფიგურების ბრუნვა და სივრცული პატერნები" },
+              { t: "პატერნების ამოცნობა", d: "მატრიცული ვიზუალური მსჯელობა (Raven-ის სტილი)" },
+            ].map((x) => (
+              <div
+                key={x.t}
+                className="rounded-2xl border border-border bg-background/40 px-4 py-3.5"
+              >
+                <div className="text-sm font-semibold">{x.t}</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">{x.d}</div>
+              </div>
+            ))}
+          </div>
+
+          <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            ხშირად დასმული კითხვები
+          </h2>
+          <div className="mt-4 space-y-3">
+            {IQ_FAQ.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 font-medium [&::-webkit-details-marker]:hidden">
+                  {item.q}
+                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="px-4 pb-4 text-[15px] leading-relaxed text-foreground/85">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
