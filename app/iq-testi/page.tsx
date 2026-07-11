@@ -6,14 +6,14 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { IqTestClient } from "@/components/iq/iq-test";
-import { IQ_ITEM_COUNT } from "@/lib/iq/items";
+import { IQ_ADAPTIVE_LENGTH } from "@/lib/iq/adaptive";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 
 const TITLE = "IQ ტესტი — უფასო ინტელექტის ტესტი ქართულად";
 const DESCRIPTION =
-  "გაიარე უფასო IQ ტესტი ქართულად — ლოგიკური, რიცხვითი და სივრცითი აზროვნების 36 დავალება, ~30 წუთი. მიიღე შენი IQ ქულა, პროცენტილი და აზროვნების ანალიზი. კულტურულად ნეიტრალური, რეგისტრაციის გარეშე.";
+  "გაიარე უფასო IQ ტესტი ქართულად — ადაპტიური ტესტი, რომელიც შენს დონეს ერგება: ლოგიკური, რიცხვითი და სივრცითი აზროვნების 25 დავალება, ~25 წუთი. მიიღე შენი IQ ქულა, პროცენტილი და აზროვნების ანალიზი. კულტურულად ნეიტრალური, რეგისტრაციის გარეშე.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
@@ -74,7 +74,7 @@ export default async function IqTestPage() {
       inLanguage: "ka-GE",
       url: `${SITE_URL}/iq-testi`,
       educationalLevel: "beginner",
-      numberOfQuestions: IQ_ITEM_COUNT,
+      numberOfQuestions: IQ_ADAPTIVE_LENGTH,
       about: {
         "@type": "Thing",
         name: "ინტელექტის კოეფიციენტი (IQ)",
@@ -115,7 +115,7 @@ export default async function IqTestPage() {
             </span>
           </h1>
           <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-            {IQ_ITEM_COUNT} დავალება · ~30 წუთი · კულტურულად ნეიტრალური
+            {IQ_ADAPTIVE_LENGTH} დავალება · ~25 წუთი · ადაპტიური
           </p>
         </header>
 

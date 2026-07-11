@@ -464,8 +464,9 @@ export const IQ_ITEM_COUNT = IQ_ITEMS.length;
 /** localStorage key the test writes answers to for the result page to read. */
 export const IQ_ANSWERS_STORAGE_KEY = "vivida_iq_answers";
 
-/** Overall time budget (seconds). ~50s/item — brisk but not frantic. */
-export const IQ_TIME_LIMIT_SEC = 30 * 60;
+/** Overall time budget (seconds). ~60s/item over the adaptive 25 — brisk but
+ *  not frantic; adaptive items sit near your ability, so they take longer. */
+export const IQ_TIME_LIMIT_SEC = 25 * 60;
 
 export function iqItemById(id: string): IqItem | undefined {
   return IQ_ITEMS.find((i) => i.id === id);

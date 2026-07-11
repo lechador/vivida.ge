@@ -1,51 +1,72 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Clock, Loader2, Sparkles } from "lucide-react";
+import { Clock, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Figure, FigureBlank } from "@/lib/iq/figures";
 import {
-  IQ_ITEMS,
   IQ_ANSWERS_STORAGE_KEY,
   IQ_TIME_LIMIT_SEC,
   STEM_PROMPT_KA,
   type IqItem,
 } from "@/lib/iq/items";
+import {
+  IQ_ADAPTIVE_LENGTH,
+  firstAdaptiveItem,
+  nextAdaptiveItem,
+} from "@/lib/iq/adaptive";
 
 /**
- * The timed IQ test. One item per screen, a global countdown (auto-submits at
- * zero), free navigation back/forth. Answers are stashed in localStorage and
- * the result is computed on /iq-testi/shedegi — no answer ever needs the
- * server, so anonymous takers can get a score without an AI/DB round-trip.
+ * The timed, *adaptive* IQ test (computerised adaptive testing). One item per
+ * screen; after each answer we re-estimate ability (EAP) and serve the item
+ * whose difficulty best matches it, so strong takers climb into genuinely hard
+ * territory and everyone reaches a precise score in fewer items. Fixed length
+ * (IQ_ADAPTIVE_LENGTH); no going back — that would invalidate the adaptive path.
+ * A global countdown auto-submits at zero. Answers are stashed in localStorage
+ * and scored on /iq-testi/shedegi — no server round-trip needed.
  */
 export function IqTestClient() {
   const router = useRouter();
-  const items = IQ_ITEMS;
-  const total = items.length;
 
+  const [administered, setAdministered] = useState<IqItem[]>(() => [
+    firstAdaptiveItem(),
+  ]);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [index, setIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(IQ_TIME_LIMIT_SEC);
   const [submitting, setSubmitting] = useState(false);
   const submittedRef = useRef(false);
 
-  const q = items[index];
-  const progressPct = Math.round(((index + 1) / total) * 100);
-  const isLast = index === total - 1;
+  const step = administered.length; // 1-based count of items shown so far
+  const q = administered[step - 1];
+  const isLast = step >= IQ_ADAPTIVE_LENGTH;
+  const answered = answers[q.id] !== undefined;
+  const progressPct = Math.round((step / IQ_ADAPTIVE_LENGTH) * 100);
 
-  const finish = useCallback(() => {
+  // Refs so the countdown can finish with the latest state without re-arming.
+  const answersRef = useRef(answers);
+  answersRef.current = answers;
+  const administeredRef = useRef(administered);
+  administeredRef.current = administered;
+  const timeLeftRef = useRef(timeLeft);
+  timeLeftRef.current = timeLeft;
+
+  function finish(finalAnswers: Record<string, number>) {
     if (submittedRef.current) return;
     submittedRef.current = true;
     setSubmitting(true);
+    // Every administered item counts; anything unanswered → -1 (incorrect).
+    const complete: Record<string, number> = { ...finalAnswers };
+    for (const it of administeredRef.current)
+      if (!(it.id in complete)) complete[it.id] = -1;
     try {
       localStorage.setItem(
         IQ_ANSWERS_STORAGE_KEY,
         JSON.stringify({
-          answers,
-          timeUsedSec: IQ_TIME_LIMIT_SEC - timeLeft,
+          answers: complete,
+          timeUsedSec: IQ_TIME_LIMIT_SEC - timeLeftRef.current,
           attemptId: crypto.randomUUID(),
         })
       );
@@ -53,21 +74,45 @@ export function IqTestClient() {
       /* private mode — result page will bounce back if it can't read */
     }
     router.push("/iq-testi/shedegi");
-  }, [answers, timeLeft, router]);
+  }
 
-  // Global countdown.
+  // One stable countdown — never re-armed, so answering never resets it.
   useEffect(() => {
-    if (submittedRef.current) return;
-    if (timeLeft <= 0) {
-      finish();
-      return;
-    }
-    const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [timeLeft, finish]);
+    const id = setInterval(() => {
+      setTimeLeft((s) => {
+        if (s <= 1) {
+          clearInterval(id);
+          finish(answersRef.current);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function pick(optIdx: number) {
     setAnswers((a) => ({ ...a, [q.id]: optIdx }));
+  }
+
+  // Forward-only: record this answer (or -1 skip), re-estimate θ, serve the
+  // next best-matched item — or finish once the fixed length is reached.
+  function advance() {
+    const chosen = answers[q.id] ?? -1;
+    const nextAnswers = { ...answers, [q.id]: chosen };
+    if (step >= IQ_ADAPTIVE_LENGTH) {
+      finish(nextAnswers);
+      return;
+    }
+    const correct = administered.map((it) => nextAnswers[it.id] === it.answer);
+    const next = nextAdaptiveItem(administered, correct);
+    if (!next) {
+      finish(nextAnswers);
+      return;
+    }
+    setAnswers(nextAnswers);
+    setAdministered((prev) => [...prev, next]);
   }
 
   const mm = String(Math.floor(timeLeft / 60)).padStart(2, "0");
@@ -94,7 +139,7 @@ export function IqTestClient() {
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>
-            კითხვა {index + 1} / {total}
+            დავალება {step} / {IQ_ADAPTIVE_LENGTH}
           </span>
           <span
             className={cn(
@@ -128,31 +173,20 @@ export function IqTestClient() {
         <IqOptions item={q} selected={answers[q.id]} onPick={pick} />
       </div>
 
-      {/* Nav */}
-      <div className="mt-8 flex items-center justify-between gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => setIndex((i) => Math.max(0, i - 1))}
-          disabled={index === 0}
-          className="gap-1"
-        >
-          <ChevronLeft className="size-4" />
-          წინა
-        </Button>
-
+      {/* Nav — adaptive: forward only */}
+      <div className="mt-8 flex items-center justify-end gap-3">
         {isLast ? (
-          <Button type="button" variant="mystic" size="lg" onClick={finish}>
+          <Button type="button" variant="mystic" size="lg" onClick={advance}>
             <Sparkles className="size-4" />
             დასრულება
           </Button>
         ) : (
           <Button
             type="button"
-            variant="outline"
-            onClick={() => setIndex((i) => Math.min(total - 1, i + 1))}
+            variant={answered ? "mystic" : "outline"}
+            onClick={advance}
           >
-            {answers[q.id] === undefined ? "გამოტოვება" : "შემდეგი"}
+            {answered ? "შემდეგი" : "გამოტოვება"}
           </Button>
         )}
       </div>

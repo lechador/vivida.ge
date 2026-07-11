@@ -11,11 +11,11 @@ import {
  *
  * 1. Ability θ is estimated with a Rasch (1-parameter IRT) model from the
  *    *pattern* of right/wrong against each item's difficulty `b` — getting a
- *    hard item right lifts θ more than getting an easy one right. (MLE via
- *    Newton–Raphson.)
- * 2. θ is placed on the deviation-IQ scale: IQ = 100 + 15·(θ − θ₀)/σθ, where θ₀
- *    is the mean item difficulty (so a median performance ≈ 100) and σθ is the
- *    assumed population spread in logits.
+ *    hard item right lifts θ more than getting an easy one right. (Bayesian EAP,
+ *    which stays finite at the extremes instead of running off to ±∞.)
+ * 2. θ is placed on the deviation-IQ scale: IQ = 100 + 15·(θ − θ_mean)/σθ, where
+ *    θ_mean and σθ are FIXED constants (not the mean difficulty of the items a
+ *    given person saw), so static and adaptive runs share one scale.
  * 3. We report a *range* (± the measurement error from the test information),
  *    a percentile from the normal curve, a band, and per-domain subscores.
  *
@@ -24,9 +24,12 @@ import {
  * from the actual score distribution (see the self-norming note in the admin).
  */
 
-// Assumed SD of ability (logits) in the taking population. Re-normed from data
-// later; 1.7 keeps the initial spread sensible (most scores land 80–130).
-const THETA_SD = 1.7;
+// θ→IQ mapping constants. FIXED — deliberately NOT derived from which items a
+// taker saw, so a full-bank (static) run and an adaptive subset land on the
+// same scale. Provisional until self-norming replaces them from real data.
+const THETA_MEAN = 0.55; // ability in logits that maps to IQ 100
+const THETA_SD = 1.05; // logits per 15-point (1-SD) IQ block
+const PRIOR_SD = 2.0; // EAP prior N(0, PRIOR_SD), in logits
 const IQ_MIN = 55;
 const IQ_MAX = 145;
 
@@ -78,25 +81,31 @@ function p1pl(theta: number, b: number): number {
   return 1 / (1 + Math.exp(-(theta - b)));
 }
 
-/** Maximum-likelihood θ (Newton–Raphson) + test information at that θ. */
-function estimateTheta(
+/**
+ * Bayesian (EAP) ability estimate: the posterior mean of θ under a Rasch
+ * likelihood and a N(0, PRIOR_SD) prior, computed by grid integration. Chosen
+ * over plain MLE because it stays finite and smooth for perfect / near-perfect
+ * runs (MLE runs off to ±∞ there, which produced a cliff at the top of the
+ * scale) and because a stable interim estimate is exactly what the adaptive
+ * selector needs after only a handful of answers. Also returns Fisher test
+ * information at the estimate, for the measurement-error band.
+ */
+export function estimateTheta(
   items: IqItem[],
   correct: boolean[]
 ): { theta: number; info: number } {
-  let theta = 0;
-  for (let iter = 0; iter < 50; iter++) {
-    let g = 0; // first derivative of log-likelihood
-    let h = 0; // negative second derivative (information)
+  let num = 0;
+  let den = 0;
+  for (let t = -5; t <= 5; t += 0.05) {
+    let like = Math.exp(-(t * t) / (2 * PRIOR_SD * PRIOR_SD)); // prior
     for (let i = 0; i < items.length; i++) {
-      const p = p1pl(theta, items[i].b);
-      g += (correct[i] ? 1 : 0) - p;
-      h += p * (1 - p);
+      const p = p1pl(t, items[i].b);
+      like *= correct[i] ? p : 1 - p;
     }
-    if (h < 1e-6) break;
-    const step = g / h;
-    theta = clamp(theta + step, -6, 6);
-    if (Math.abs(step) < 1e-4) break;
+    num += t * like;
+    den += like;
   }
+  const theta = den > 0 ? num / den : 0;
   let info = 0;
   for (const it of items) {
     const p = p1pl(theta, it.b);
@@ -146,19 +155,21 @@ function bandFor(iq: number): IqBandKey {
  * a missing / -1 entry counts as incorrect (standard for a timed test).
  */
 export function scoreIq(answers: Record<string, number>): IqResult {
-  const items = IQ_ITEMS;
+  // Score only the items actually administered — the whole bank for the static
+  // test, an adaptive subset otherwise. (Skips are recorded as -1, so they stay
+  // in `answers` and count as incorrect; unadministered items are absent.)
+  const items = IQ_ITEMS.filter((it) => it.id in answers);
   const correctArr = items.map((it) => answers[it.id] === it.answer);
   const correct = correctArr.filter(Boolean).length;
   const total = items.length;
 
   const { theta, info } = estimateTheta(items, correctArr);
 
-  const theta0 = items.reduce((s, i) => s + i.b, 0) / items.length;
-  const iqRaw = 100 + (15 * (theta - theta0)) / THETA_SD;
+  const iqRaw = 100 + (15 * (theta - THETA_MEAN)) / THETA_SD;
   const iq = clamp(Math.round(iqRaw), IQ_MIN, IQ_MAX);
 
-  // Measurement error → IQ band.
-  const semTheta = info > 0 ? 1 / Math.sqrt(info) : 1.5;
+  // Measurement error → IQ band. Posterior SD folds in the prior information.
+  const semTheta = 1 / Math.sqrt(info + 1 / (PRIOR_SD * PRIOR_SD));
   const semIq = clamp((15 * semTheta) / THETA_SD, 4, 10);
   const range: [number, number] = [
     clamp(Math.round(iq - semIq), IQ_MIN, IQ_MAX),
