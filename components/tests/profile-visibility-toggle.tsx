@@ -61,14 +61,18 @@ export function ProfileVisibilityToggle({ kind }: { kind: "mbti" | "iq" }) {
         disabled={saving}
         onClick={toggle}
         className={cn(
-          "relative h-6 w-11 shrink-0 rounded-full transition-colors",
-          on ? "bg-[var(--vivida-cyan)]" : "bg-border"
+          "relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200",
+          on
+            ? "bg-[var(--vivida-cyan)] shadow-[0_0_14px_-2px_var(--vivida-cyan)]"
+            : "bg-foreground/15",
+          saving && "opacity-60"
         )}
       >
         <span
+          aria-hidden
           className={cn(
-            "absolute top-0.5 size-5 rounded-full bg-white transition-transform",
-            on ? "translate-x-[22px]" : "translate-x-0.5"
+            "absolute top-0.5 size-5 rounded-full bg-white shadow transition-[left] duration-200",
+            on ? "left-[22px]" : "left-0.5"
           )}
         />
       </button>
