@@ -344,6 +344,13 @@
       "when": 1783752552286,
       "tag": "0048_mushy_butterfly",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1783779012898,
+      "tag": "0049_soft_silhouette",
+      "breakpoints": true
     }
   ]
 }

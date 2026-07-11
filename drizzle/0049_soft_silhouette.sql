@@ -1,0 +1,1 @@
+ALTER TABLE "iq_result" ADD COLUMN "item_correct" jsonb;

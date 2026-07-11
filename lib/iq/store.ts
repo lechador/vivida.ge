@@ -26,6 +26,13 @@ export async function saveIqResult(input: {
   };
   for (const d of r.domains) domainScores[d.domain] = d.pct;
 
+  // Per-item correctness for self-norming (the answer key stays server-side).
+  const answerKey = new Map(IQ_ITEMS.map((i) => [i.id, i.answer]));
+  const itemCorrect: Record<string, boolean> = {};
+  for (const [id, chosen] of Object.entries(input.answers)) {
+    if (answerKey.has(id)) itemCorrect[id] = chosen === answerKey.get(id);
+  }
+
   await db
     .insert(iqResults)
     .values({
@@ -38,6 +45,7 @@ export async function saveIqResult(input: {
       total: r.total,
       domainScores,
       answers: input.answers,
+      itemCorrect,
       timeUsedSec: input.timeUsedSec ?? null,
     })
     .onConflictDoNothing({ target: iqResults.attemptId });

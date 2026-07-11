@@ -1818,6 +1818,10 @@ export const iqResults = pgTable(
     domainScores: jsonb("domain_scores").$type<IqDomainScoresJson>().notNull(),
     /** itemId → chosen option index, the raw data self-norming needs. */
     answers: jsonb("answers").$type<Record<string, number>>().notNull(),
+    /** itemId → was it answered correctly. Stored server-side (the answer key
+     *  never leaves the server) so the admin can compute observed per-item
+     *  pass-rates in SQL and re-calibrate difficulty. */
+    itemCorrect: jsonb("item_correct").$type<Record<string, boolean>>(),
     timeUsedSec: integer("time_used_sec"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()

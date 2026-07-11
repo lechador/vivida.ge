@@ -447,6 +447,67 @@ const RAW_ITEMS: IqItem[] = [
     ],
     0
   ),
+
+  // ── Very-hard ceiling (b 2.6–3.4) ────────────────────────────────────────
+  // Extends the top of the scale so it can actually separate ~130 from ~145;
+  // adaptively, only high-θ takers ever reach these.
+  ns("n17", 2.6, [3, 4, 8, 17, 33, 58], [88, 94, 96, 84], 1), // +1,+4,+9,+16,+25 (squares) → 94
+  ns("n18", 3.2, [2, 3, 6, 18, 108], [648, 1944, 216, 972], 1), // each = product of the two before → 1944
+  logic(
+    "l9",
+    2.8,
+    "ზოგი A არის B. ყველა B არის C. ვერცერთი C არ არის D. რომელი დასკვნა აუცილებლად სწორია?",
+    [
+      "ყველა A არის D",
+      "ზოგი A არ არის D",
+      "ვერცერთი A არ არის C",
+      "ყველა D არის B",
+    ],
+    1
+  ), // some A are B → C → not D ⇒ some A are not D
+  // XOR matrix (hardest Raven rule): col2 = col0 ⊕ col1 by dot position →
+  // (2,2) = a single bottom dot
+  matrix(
+    "p12",
+    "pattern",
+    3.0,
+    (r, c) => {
+      const T: Mark = { shape: "dot", size: 18, y: 34 };
+      const Bm: Mark = { shape: "dot", size: 18, y: 66 };
+      const G: Mark[][][] = [
+        [[T], [Bm], [T, Bm]],
+        [[T, Bm], [Bm], [T]],
+        [[T, Bm], [T], [Bm]],
+      ];
+      return G[r][c];
+    },
+    [
+      [{ shape: "dot", size: 18, y: 66 }],
+      [{ shape: "dot", size: 18, y: 34 }],
+      [
+        { shape: "dot", size: 18, y: 34 },
+        { shape: "dot", size: 18, y: 66 },
+      ],
+      [],
+    ],
+    0
+  ),
+  // two simultaneous transforms — rotate 180° AND add a centre dot
+  analogy(
+    "s5",
+    "spatial",
+    3.4,
+    one("arrow", { rot: 0, size: 54 }),
+    [{ shape: "arrow", rot: 180, size: 54 }, smallDot],
+    one("triangle", { rot: 0, size: 54 }),
+    [
+      [{ shape: "triangle", rot: 180, size: 54 }, smallDot],
+      [{ shape: "triangle", rot: 0, size: 54 }, smallDot],
+      [{ shape: "triangle", rot: 180, size: 54 }],
+      [{ shape: "triangle", rot: 90, size: 54 }, smallDot],
+    ],
+    0
+  ),
 ];
 
 /**
