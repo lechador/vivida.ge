@@ -153,10 +153,8 @@ const smallDot: Mark = { shape: "dot", size: 16 };
 const smallPlus: Mark = { shape: "plus", size: 26, sw: 5 };
 const smallLine: Mark = { shape: "line", size: 40, sw: 6 };
 
-export const IQ_ITEMS: IqItem[] = [
+const RAW_ITEMS: IqItem[] = [
   // ── Numeric (number series) ──────────────────────────────────────────────
-  ns("n1", -2.2, [2, 4, 6, 8], [9, 10, 11, 12], 1),
-  ns("n2", -2.0, [5, 10, 15, 20], [25, 30, 22, 21], 0),
   ns("n3", -0.6, [7, 14, 28, 56], [84, 112, 98, 110], 1),
   ns("n4", -0.3, [81, 27, 9], [6, 3, 1, 4], 1),
   ns("n5", 0.2, [1, 1, 2, 3, 5], [7, 8, 10, 6], 1), // fibonacci
@@ -166,6 +164,11 @@ export const IQ_ITEMS: IqItem[] = [
   ns("n9", 1.2, [2, 6, 12, 20, 30], [40, 42, 44, 36], 1), // +4,+6,+8,+10
   ns("n10", 1.8, [1, 3, 7, 15, 31], [47, 63, 62, 64], 1), // ×2+1
   ns("n11", 0.9, [6, 7, 9, 12, 16], [20, 21, 19, 22], 1), // +1,+2,+3,+4,+5
+  // hard tier — multi-rule / interleaved, to separate high scorers
+  ns("n12", 1.5, [2, 3, 5, 7, 11, 13], [15, 16, 17, 19], 2), // primes → 17
+  ns("n16", 1.9, [2, 100, 4, 90, 8, 80], [16, 70, 12, 32], 0), // two interleaved series → 16
+  ns("n14", 2.1, [3, 5, 10, 12, 24], [26, 36, 48, 28], 0), // +2,×2 alternating → 26
+  ns("n15", 2.4, [1, 2, 6, 24, 120], [600, 720, 840, 240], 1), // ×2,×3,×4,×5 → 720
 
   // ── Logic (verbal / abstract, Georgian, culture-light) ───────────────────
   logic(
@@ -203,6 +206,34 @@ export const IQ_ITEMS: IqItem[] = [
     ["1.5 საათი", "2 საათი", "3 საათი", "6 საათი"],
     0
   ),
+
+  // hard tier — letter series, transitive ordering, syllogism with a trap
+  logic(
+    "l8",
+    1.3,
+    "ა, გ, ე, ზ, … — რომელი ასო მოდის შემდეგ?",
+    ["თ", "ი", "კ", "ლ"],
+    1
+  ), // every 2nd letter of the Georgian alphabet → ი
+  logic(
+    "l7",
+    1.6,
+    "ანა უფროსია ბექოზე. გია უფროსია ანაზე. დათო უმცროსია ბექოზე. ვინ არის ყველაზე უფროსი?",
+    ["ანა", "ბექო", "გია", "დათო"],
+    2
+  ), // გია > ანა > ბექო > დათო
+  logic(
+    "l6",
+    1.9,
+    "ყველა კატა ცხოველია. ზოგიერთი ცხოველი შავია. რომელი დასკვნაა ნამდვილად სწორი?",
+    [
+      "ყველა კატა შავია",
+      "ზოგი კატა შავია",
+      "ვერ დავადგენთ, არის თუ არა კატა შავი",
+      "ვერცერთი კატა არ არის შავი",
+    ],
+    2
+  ), // the valid conclusion is "cannot be determined"
 
   // ── Spatial (rotation) ───────────────────────────────────────────────────
   // arrow rotates by 45° along both axes: rot(r,c) = (r+c)·45 → answer 180°
@@ -243,6 +274,17 @@ export const IQ_ITEMS: IqItem[] = [
       one("arrow", { rot: 270, size: 54 }),
     ],
     2
+  ),
+
+  // hard: two independent rotation rules — rows add 90°, columns add 45°
+  // rot(r,c) = r·90 + c·45 → (2,2) = 180 + 90 = 270°
+  matrix(
+    "s4",
+    "spatial",
+    1.6,
+    (r, c) => one("arrow", { rot: r * 90 + c * 45, size: 54 }),
+    [225, 270, 180, 315].map((rot) => one("arrow", { rot, size: 54 })),
+    1
   ),
 
   // ── Pattern (figural reasoning) ──────────────────────────────────────────
@@ -365,7 +407,56 @@ export const IQ_ITEMS: IqItem[] = [
     ],
     0
   ),
+  // hard: TWO attributes at once — shape distributed by (r+c)%3, fill by
+  // (r+c) parity → (2,2) = filled square
+  matrix(
+    "p10",
+    "pattern",
+    1.6,
+    (r, c) =>
+      one((["circle", "square", "triangle"] as const)[(r + c) % 3], {
+        size: 50,
+        fill: (r + c) % 2 === 0,
+      }),
+    [
+      one("square", { size: 50, fill: true }),
+      one("square", { size: 50 }),
+      one("circle", { size: 50, fill: true }),
+      one("triangle", { size: 50, fill: true }),
+    ],
+    0
+  ),
+  // hard: shape by row + inner dot present in columns 0 & 2 only → (2,2) =
+  // triangle with a centre dot
+  matrix(
+    "p11",
+    "pattern",
+    1.7,
+    (r, c) => {
+      const base: Mark = {
+        shape: (["circle", "square", "triangle"] as const)[r],
+        size: 60,
+      };
+      return c === 1 ? [base] : [base, smallDot];
+    },
+    [
+      [{ shape: "triangle", size: 60 }, smallDot],
+      [{ shape: "triangle", size: 60 }],
+      [{ shape: "circle", size: 60 }, smallDot],
+      [{ shape: "square", size: 60 }, smallDot],
+    ],
+    0
+  ),
 ];
+
+/**
+ * Presented easy → hard (a Raven-style difficulty ramp): gentle warm-ups first,
+ * genuinely hard items last. Scoring uses the response *pattern* against each
+ * item's `b`, not the order, so the ramp only shapes the taker's experience —
+ * it doesn't bias the score. Sorting also interleaves domains naturally, since
+ * difficulties overlap across them.
+ */
+export const IQ_ITEMS: IqItem[] = [...RAW_ITEMS].sort((a, b) => a.b - b.b);
 
 /** How many items — used by the UI and scoring. */
 export const IQ_ITEM_COUNT = IQ_ITEMS.length;
@@ -374,7 +465,7 @@ export const IQ_ITEM_COUNT = IQ_ITEMS.length;
 export const IQ_ANSWERS_STORAGE_KEY = "vivida_iq_answers";
 
 /** Overall time budget (seconds). ~50s/item — brisk but not frantic. */
-export const IQ_TIME_LIMIT_SEC = 25 * 60;
+export const IQ_TIME_LIMIT_SEC = 30 * 60;
 
 export function iqItemById(id: string): IqItem | undefined {
   return IQ_ITEMS.find((i) => i.id === id);
