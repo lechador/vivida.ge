@@ -18,6 +18,16 @@ export type TestCatalogEntry = {
 
 export const TESTS: TestCatalogEntry[] = [
   {
+    slug: "iq",
+    href: "/iq-testi",
+    titleKa: "IQ ტესტი",
+    taglineKa: "შენი ინტელექტის კოეფიციენტი",
+    descKa:
+      "კულტურულად ნეიტრალური, დროზე გათვლილი ტესტი — ლოგიკური, რიცხვითი და სივრცითი აზროვნება. მიიღე შენი IQ ქულა, პროცენტილი და აზროვნების რუკა.",
+    metaKa: "28 დავალება · ~25 წუთი · უფასო",
+    available: true,
+  },
+  {
     slug: "astro-mbti",
     href: "/pirovnebis-testi",
     titleKa: "Astro-MBTI",
