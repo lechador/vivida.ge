@@ -233,6 +233,11 @@ export const profiles = pgTable("profile", {
    * by direct link either way — this only controls being *browsable*.
    */
   discoverable: boolean("discoverable").notNull().default(true),
+  /** Opt-in: show the user's latest test results on their public /u/[username]
+   *  page. Off by default — results are private until the taker chooses to
+   *  display them (toggle on the result page). Per test kind. */
+  showMbtiResult: boolean("show_mbti_result").notNull().default(false),
+  showIqResult: boolean("show_iq_result").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

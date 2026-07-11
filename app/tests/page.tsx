@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Brain, Clock, ArrowRight } from "lucide-react";
+import { Brain, Clock, ArrowRight, RotateCcw } from "lucide-react";
 
 import { auth } from "@/auth";
 import { getCurrentPlan } from "@/lib/plan";
 import { TESTS } from "@/lib/tests-catalog";
+import { getLatestIqResult, getLatestMbtiResult } from "@/lib/test-results";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -66,6 +67,18 @@ export default async function TestsPage() {
   const authed = !!session?.user?.id;
   const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
 
+  // Latest result per test (for "my result" + "retake"), keyed by catalog slug.
+  const myResults: Record<string, string> = {};
+  if (authed) {
+    const uid = session!.user!.id;
+    const [mbti, iq] = await Promise.all([
+      getLatestMbtiResult(uid),
+      getLatestIqResult(uid),
+    ]);
+    if (mbti) myResults["astro-mbti"] = `/test-results/${mbti.id}`;
+    if (iq) myResults["iq"] = `/iq-testi/shedegi/${iq.id}`;
+  }
+
   const ld = [
     breadcrumbLd([
       { name: "მთავარი", url: SITE_URL },
@@ -116,7 +129,9 @@ export default async function TestsPage() {
         </header>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {TESTS.map((test) => (
+          {TESTS.map((test) => {
+            const done = test.available ? myResults[test.slug] : undefined;
+            return (
             <article
               key={test.slug}
               className="flex flex-col rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7"
@@ -140,22 +155,39 @@ export default async function TestsPage() {
                 <span>{test.metaKa}</span>
               </div>
 
-              <div className="mt-5">
-                {test.available ? (
+              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3">
+                {!test.available ? (
+                  <span className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">
+                    მალე
+                  </span>
+                ) : done ? (
+                  <>
+                    <Button asChild variant="outline" className="w-full sm:w-auto">
+                      <Link href={test.href}>
+                        <RotateCcw className="size-4" />
+                        ტესტის თავიდან გავლა
+                      </Link>
+                    </Button>
+                    <Link
+                      href={done}
+                      className="inline-flex items-center gap-1 text-sm font-medium text-[var(--vivida-cyan)] hover:underline"
+                    >
+                      ჩემი შედეგი
+                      <ArrowRight className="size-3.5" />
+                    </Link>
+                  </>
+                ) : (
                   <Button asChild variant="mystic" className="w-full sm:w-auto">
                     <Link href={test.href}>
                       დაწყება
                       <ArrowRight className="size-4" />
                     </Link>
                   </Button>
-                ) : (
-                  <span className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">
-                    მალე
-                  </span>
                 )}
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
 
         {/* Browse the 16 types (internal linking + SEO cluster) */}

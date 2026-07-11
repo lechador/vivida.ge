@@ -351,6 +351,13 @@
       "when": 1783779012898,
       "tag": "0049_soft_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1783800180823,
+      "tag": "0050_neat_rhino",
+      "breakpoints": true
     }
   ]
 }

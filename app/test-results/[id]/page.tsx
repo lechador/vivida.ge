@@ -16,6 +16,7 @@ import { MbtiResultView } from "@/components/mbti/mbti-result-view";
 import { MbtiProfileSections } from "@/components/mbti/mbti-profile-sections";
 import { MbtiFamousPeople } from "@/components/mbti/mbti-famous-people";
 import { MbtiShareButton } from "@/components/mbti/mbti-share-button";
+import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
 
 export const metadata = { title: "Astro-MBTI შედეგი" };
 export const dynamic = "force-dynamic";
@@ -78,6 +79,8 @@ export default async function TestResultPage({
         <div className="mt-4">
           <MbtiFamousPeople type={result.mbtiType} />
         </div>
+
+        <ProfileVisibilityToggle kind="mbti" />
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-6">
           <p className="text-xs text-muted-foreground">

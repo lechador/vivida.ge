@@ -150,6 +150,17 @@ function bandFor(iq: number): IqBandKey {
   return "low";
 }
 
+/** Band (key + Georgian labels) for a raw IQ — for saved-result views that
+ *  render from stored fields instead of re-scoring from answers. */
+export function iqBand(iq: number): {
+  key: IqBandKey;
+  labelKa: string;
+  descKa: string;
+} {
+  const key = bandFor(iq);
+  return { key, ...BANDS[key] };
+}
+
 /**
  * Score a full set of answers. `answers` maps itemId → chosen option index;
  * a missing / -1 entry counts as incorrect (standard for a timed test).

@@ -25,6 +25,7 @@ import {
   listMutualFriendsPreview,
 } from "@/lib/friendship";
 import { ageFromDob } from "@/lib/profile-utils";
+import { getLatestIqResult, getLatestMbtiResult } from "@/lib/test-results";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -104,6 +105,19 @@ export default async function PublicProfilePage({
 
   const ownerPlan = await getCurrentPlan(owner.id);
   const ownerChart = await ensureChartFor(owner.id, ownerPlan);
+
+  // Public test results the owner has opted to display (personality type, IQ).
+  const testBadges: { label: string; value: string; glyph: string }[] = [];
+  if (profile.showMbtiResult) {
+    const m = await getLatestMbtiResult(owner.id);
+    if (m) {
+      testBadges.push({ label: "ტიპი", value: m.mbtiType, glyph: "🧠" });
+    }
+  }
+  if (profile.showIqResult) {
+    const iq = await getLatestIqResult(owner.id);
+    if (iq) testBadges.push({ label: "IQ", value: String(iq.iq), glyph: "🎯" });
+  }
 
   // Viewer (may be anonymous, may be the owner, may be a logged-in stranger)
   const session = await auth();
@@ -332,6 +346,15 @@ export default async function PublicProfilePage({
                     accent={ELEMENT_COLOR[balance.dominant]}
                   />
                 )}
+                {testBadges.map((tb) => (
+                  <Pill
+                    key={tb.label}
+                    label={tb.label}
+                    value={tb.value}
+                    glyph={tb.glyph}
+                    accent="oklch(0.78 0.18 305)"
+                  />
+                ))}
               </div>
             </div>
           </div>

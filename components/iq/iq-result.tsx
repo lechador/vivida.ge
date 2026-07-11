@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { scoreIq, type IqResult } from "@/lib/iq/scoring";
 import { IQ_ANSWERS_STORAGE_KEY } from "@/lib/iq/items";
 import { IqBellCurve, DomainBar } from "@/components/iq/iq-bell-curve";
+import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
 
 type Stored = {
   answers: Record<string, number>;
@@ -180,6 +181,9 @@ export function IqResultClient() {
           </div>
         )}
       </div>
+
+      {/* Show-on-profile opt-in (signed-in only; self-hides otherwise) */}
+      <ProfileVisibilityToggle kind="iq" />
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-center gap-3">
