@@ -3,9 +3,7 @@
  * every user whose birthday is today (Tbilisi time):
  *
  *   1. claims an email_send_log row (kind='birthday') — the once-a-year guard
- *   2. extends their Pro access by one month (trial users and paying
- *      subscribers alike get +30 days on current_period_end; lapsed/free
- *      users get a fresh 30-day trialing period)
+ *   2. gifts them BIRTHDAY_CREDITS credits (fires the usual credit notification)
  *   3. sends a short, warm AI-written email (Gemini via OpenRouter) with the
  *      gift announcement; a curated fallback body means the send never
  *      depends on the AI call succeeding
@@ -18,7 +16,8 @@ import { Resend } from "resend";
 import { and, eq, gt, sql as dsql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { emailSendLog, subscriptions } from "@/db/schema";
+import { emailSendLog } from "@/db/schema";
+import { grantCredits } from "@/lib/credits";
 import { BirthdayEmail } from "@/lib/email-templates/birthday";
 import { acquireResendSlot } from "@/lib/resend-throttle";
 import { signByIndex } from "@/lib/zodiac";
@@ -38,8 +37,10 @@ function resolveFrom(envVal: string | undefined, fallback: string): string {
 const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <onboarding@resend.dev>");
 const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
 
-const GIFT_DAYS = 30;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/** Credits gifted on a user's birthday. */
+export const BIRTHDAY_CREDITS = 30;
 
 // Celebration-first subject — deliberately no gift mention (the gift is a
 // P.S. inside, not the reason for the email).
@@ -114,63 +115,12 @@ async function alreadyGiftedThisYear(userId: string): Promise<boolean> {
 }
 
 /**
- * +30 days of Pro. Active/trialing subs extend from whichever is later —
- * now or their current period end (so time already paid/gifted isn't lost).
- * Lapsed or missing subs get a fresh trialing month.
- *
- * NOTE for Stripe-billed subscribers: this extends access in OUR db; Stripe
- * still bills on its own cycle and a webhook may overwrite currentPeriodEnd.
- * With the current all-trial user base that's fine — revisit with a Stripe
- * coupon/pause flow once real paid subscriptions exist.
+ * The birthday present: BIRTHDAY_CREDITS credits. Routed through grantCredits
+ * so the user also gets a "credit" bell notification. The once-a-year
+ * email_send_log guard (alreadyGiftedThisYear) already prevents double-gifting.
  */
-async function giftOneMonth(userId: string): Promise<void> {
-  const now = new Date();
-  const [sub] = await db
-    .select()
-    .from(subscriptions)
-    .where(eq(subscriptions.userId, userId))
-    .limit(1);
-
-  const isLive =
-    sub &&
-    sub.plan === "pro" &&
-    (sub.status === "active" || sub.status === "trialing") &&
-    (!sub.currentPeriodEnd || sub.currentPeriodEnd.getTime() > now.getTime());
-
-  if (isLive && sub) {
-    const base =
-      sub.currentPeriodEnd && sub.currentPeriodEnd.getTime() > now.getTime()
-        ? sub.currentPeriodEnd
-        : now;
-    await db
-      .update(subscriptions)
-      .set({
-        currentPeriodEnd: new Date(base.getTime() + GIFT_DAYS * MS_PER_DAY),
-      })
-      .where(eq(subscriptions.userId, userId));
-    return;
-  }
-
-  // Lapsed or never had a row → fresh gifted month (trialing semantics).
-  await db
-    .insert(subscriptions)
-    .values({
-      userId,
-      plan: "pro",
-      status: "trialing",
-      currentPeriodStart: now,
-      currentPeriodEnd: new Date(now.getTime() + GIFT_DAYS * MS_PER_DAY),
-      cancelAtPeriodEnd: false,
-    })
-    .onConflictDoUpdate({
-      target: subscriptions.userId,
-      set: {
-        plan: "pro",
-        status: "trialing",
-        currentPeriodStart: now,
-        currentPeriodEnd: new Date(now.getTime() + GIFT_DAYS * MS_PER_DAY),
-      },
-    });
+async function giftBirthdayCredits(userId: string): Promise<void> {
+  await grantCredits(userId, BIRTHDAY_CREDITS, "birthday_gift");
 }
 
 interface OpenRouterJson {
@@ -281,7 +231,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
         })
         .returning({ id: emailSendLog.id });
 
-      await giftOneMonth(u.userId);
+      await giftBirthdayCredits(u.userId);
       result.gifted++;
 
       if (!resend || !u.email) {

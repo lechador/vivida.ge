@@ -79,6 +79,7 @@ export type CreditReason =
   | "purchase"
   | "monthly_bonus"
   | "streak_bonus"
+  | "birthday_gift"
   | "earn_feed_post"
   | "earn_profile_photo"
   | "spend_synastry"
@@ -102,6 +103,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   purchase: "ბალანსის შევსება",
   monthly_bonus: "თვის ბონუსი",
   streak_bonus: "ვიზიტების სერია",
+  birthday_gift: "დაბადების დღის საჩუქარი",
   earn_feed_post: "პოსტი ფიდში",
   earn_profile_photo: "პროფილის ფოტო",
   spend_synastry: "თავსებადობა",

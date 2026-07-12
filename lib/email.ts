@@ -233,12 +233,10 @@ async function userAbsentFor(
 }
 
 /**
- * Welcome email — sent once, on first signup. Triggered from
- * `provisionTrialIfMissing` for both Google OAuth (lazy on first
- * dashboard load) and email signup (inline after account creation).
- * The site is currently 100% free, so the copy is neutral
- * "your cosmic journey begins" framing — no trial pitch. When paid
- * plans return, swap the template body but keep this trigger path.
+ * Welcome email — sent once, on first signup, from the profile-save hooks
+ * (sendWelcomeIfEligible) once the user has verified their email and filled
+ * birth data. The site runs on credits (no paid plans), so the copy is a
+ * neutral "your cosmic journey begins" framing — no trial pitch.
  *
  * Idempotent at the email_send_log level — a second call after the
  * first success is a no-op. Always sends regardless of email

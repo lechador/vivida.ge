@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto";
 
 import { db } from "@/db";
 import { authTokens, users, type AuthTokenPurpose } from "@/db/schema";
-import { provisionTrialIfMissing } from "@/lib/plan";
+import { awardJoinedReputation } from "@/lib/reputation";
 import { onUserSignedUp, qualifyReferral } from "@/lib/referral";
 
 /**
@@ -138,7 +138,7 @@ export async function registerUser(input: {
       .update(users)
       .set({ name, passwordHash })
       .where(eq(users.id, existing.id));
-    await provisionTrialIfMissing(existing.id);
+    await awardJoinedReputation(existing.id);
     const verifyCode = generateOtpCode();
     const verifyToken = await issueAuthToken(
       existing.id,
@@ -156,9 +156,8 @@ export async function registerUser(input: {
     .returning({ id: users.id, email: users.email, name: users.name });
   if (!created) return { ok: false, error: "failed" };
 
-  // Tie the 30-day Pro trial to the account from t=0. Idempotent and
-  // self-swallowing, so a transient blip won't block registration.
-  await provisionTrialIfMissing(created.id);
+  // One-shot "joined" reputation from t=0. Best-effort, never blocks signup.
+  await awardJoinedReputation(created.id);
   // Signup bonus + referral attribution (best-effort, never blocks signup).
   await onUserSignedUp(created.id);
 
@@ -240,7 +239,7 @@ export async function findOrCreateOAuthUser(input: {
       image: users.image,
     });
 
-  await provisionTrialIfMissing(created.id);
+  await awardJoinedReputation(created.id);
   // OAuth accounts are pre-verified, so this may qualify a referral right away
   // once birth data is added; bonus + attribution happen here.
   await onUserSignedUp(created.id);

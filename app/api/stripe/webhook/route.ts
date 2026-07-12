@@ -4,9 +4,8 @@ import { after } from "next/server";
 
 import { db } from "@/db";
 import { pdfReports } from "@/db/schema";
-import { constructWebhookEvent, stripe } from "@/lib/stripe";
+import { constructWebhookEvent } from "@/lib/stripe";
 import { generateAndStoreReport } from "@/lib/reports/generate";
-import { syncStripeSubscription } from "@/lib/subscription-sync";
 import { grantPurchaseCredits } from "@/lib/credits";
 
 export const runtime = "nodejs";
@@ -35,23 +34,6 @@ export async function POST(req: Request) {
 
   if (event.type === "checkout.session.completed") {
     const sessionObj = event.data.object as Stripe.Checkout.Session;
-
-    // Subscription checkout → sync the Pro subscription and we're done.
-    if (sessionObj.mode === "subscription") {
-      const subId =
-        typeof sessionObj.subscription === "string"
-          ? sessionObj.subscription
-          : (sessionObj.subscription?.id ?? null);
-      if (subId) {
-        try {
-          const sub = await stripe().subscriptions.retrieve(subId);
-          await syncStripeSubscription(sub);
-        } catch (err) {
-          console.error("[stripe/webhook] subscription sync failed:", err);
-        }
-      }
-      return new Response("ok", { status: 200 });
-    }
 
     // Credit top-up → award the pack's credits (idempotent on session id).
     if (sessionObj.metadata?.kind === "credits") {
@@ -104,19 +86,6 @@ export async function POST(req: Request) {
         .where(eq(pdfReports.id, reportId));
 
       after(() => generateAndStoreReport(reportId));
-    }
-  }
-
-  // Subscription lifecycle (renewals, cancels, card updates) → keep our row
-  // in sync so getCurrentPlan/isProActive reflect reality.
-  if (
-    event.type === "customer.subscription.updated" ||
-    event.type === "customer.subscription.deleted"
-  ) {
-    try {
-      await syncStripeSubscription(event.data.object as Stripe.Subscription);
-    } catch (err) {
-      console.error("[stripe/webhook] subscription event sync failed:", err);
     }
   }
 

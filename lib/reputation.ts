@@ -233,6 +233,26 @@ export async function revokeReputationForSubjects(
 /** Stable dedup keys used as `subjectId`. Keep them here so the call
  *  sites stay readable and the format is reused at the same call site
  *  for both the award and any future re-award. */
+/**
+ * One-shot "joined Vivida" reputation, awarded once per user at signup. Lives
+ * here (not coupled to the retired subscription/trial provisioning) so the
+ * auth flow can award it directly. Best-effort — never throws.
+ */
+export async function awardJoinedReputation(userId: string): Promise<void> {
+  try {
+    await awardReputation({
+      userId,
+      kind: "joined",
+      subjectId: RepSubject.oneShot(userId),
+    });
+  } catch (err) {
+    console.warn(
+      "[reputation] awardJoinedReputation failed:",
+      (err as Error).message
+    );
+  }
+}
+
 export const RepSubject = {
   post: (postId: string) => postId,
   comment: (commentId: string) => commentId,

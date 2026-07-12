@@ -358,47 +358,13 @@ export const charts = pgTable("chart", {
  * Subscription state, 1:1 with users. Free users either have no row or
  * a row with plan='free'. Pro users have plan='pro' + an active period.
  */
-export const planEnum = pgEnum("plan", ["free", "pro"]);
-export const subscriptionStatusEnum = pgEnum("subscription_status", [
-  "inactive",
-  "trialing",
-  "active",
-  "past_due",
-  "canceled",
-  "incomplete",
-]);
+// The subscription/Pro model has been retired in favour of credits; its table
+// and the plan/status enums were removed. `billingIntervalEnum` stays because
+// the payment audit log below still uses it.
 export const billingIntervalEnum = pgEnum("billing_interval", [
   "month",
   "year",
 ]);
-
-export const subscriptions = pgTable("subscription", {
-  userId: text("user_id")
-    .primaryKey()
-    .references(() => users.id, { onDelete: "cascade" }),
-  plan: planEnum("plan").notNull().default("free"),
-  status: subscriptionStatusEnum("status").notNull().default("inactive"),
-  interval: billingIntervalEnum("interval"),
-  priceCents: integer("price_cents"),
-  currency: text("currency").default("GEL"),
-  currentPeriodStart: timestamp("current_period_start", { withTimezone: true }),
-  currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
-  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false).notNull(),
-  // Flitt references — we keep these denormalized so we can sync state
-  flittOrderId: text("flitt_order_id"),
-  flittSubscriptionId: text("flitt_subscription_id"),
-  flittCustomerId: text("flitt_customer_id"),
-  // Stripe references (recurring subscription). Customer id is reused for the
-  // billing portal (saved cards / cancel).
-  stripeCustomerId: text("stripe_customer_id"),
-  stripeSubscriptionId: text("stripe_subscription_id"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
 
 /**
  * Audit log of every payment we observe (success, fail, pending). Used for
@@ -1658,10 +1624,6 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     fields: [users.id],
     references: [charts.userId],
   }),
-  subscription: one(subscriptions, {
-    fields: [users.id],
-    references: [subscriptions.userId],
-  }),
   accounts: many(accounts),
   sessions: many(sessions),
   payments: many(payments),
@@ -1739,8 +1701,6 @@ export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
 export type Chart = typeof charts.$inferSelect;
 export type NewChart = typeof charts.$inferInsert;
-export type Subscription = typeof subscriptions.$inferSelect;
-export type NewSubscription = typeof subscriptions.$inferInsert;
 export type Payment = typeof payments.$inferSelect;
 export type NewPayment = typeof payments.$inferInsert;
 export type DailyHoroscope = typeof dailyHoroscopes.$inferSelect;
@@ -1787,8 +1747,6 @@ export type NewSignHoroscope = typeof signHoroscopes.$inferInsert;
 export type SignHoroscopePeriod = "day" | "week" | "month";
 export type ReputationEventKind =
   (typeof reputationEventKindEnum.enumValues)[number];
-export type Plan = (typeof planEnum.enumValues)[number];
-export type SubscriptionStatus = (typeof subscriptionStatusEnum.enumValues)[number];
 export type BillingInterval = (typeof billingIntervalEnum.enumValues)[number];
 
 // ─── Trust & safety ─────────────────────────────────────────────────────
