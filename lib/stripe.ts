@@ -81,6 +81,44 @@ export async function createReportCheckoutSession(opts: {
   });
 }
 
+/**
+ * One-time Checkout for a credit top-up pack. The pack's credit count rides on
+ * the session metadata so the webhook can award it (idempotently) on completion.
+ */
+export async function createCreditCheckoutSession(opts: {
+  userId: string;
+  email?: string | null;
+  origin: string;
+  credits: number;
+  tetri: number;
+  gel: number;
+}): Promise<Stripe.Checkout.Session> {
+  const { userId, email, origin, credits, tetri, gel } = opts;
+  return stripe().checkout.sessions.create({
+    mode: "payment",
+    customer_email: email ?? undefined,
+    metadata: { userId, kind: "credits", credits: String(credits) },
+    payment_intent_data: {
+      metadata: { userId, kind: "credits", credits: String(credits) },
+    },
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: reportCurrency(),
+          unit_amount: tetri,
+          product_data: {
+            name: `${credits} კრედიტი`,
+            description: `Vivida · ₾${gel} — ${credits} კრედიტი`,
+          },
+        },
+      },
+    ],
+    success_url: `${origin}/credits?status=success`,
+    cancel_url: `${origin}/credits?status=canceled`,
+  });
+}
+
 // ── Recurring subscription (Vivida Pro) ────────────────────────────────────
 
 /** Monthly Pro price in minor units. Default ₾19.90. */

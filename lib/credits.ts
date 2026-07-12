@@ -145,6 +145,30 @@ export async function spendCredits(
   return true;
 }
 
+/**
+ * Grant purchased credits, idempotent on the Stripe session id — Stripe can
+ * deliver the same `checkout.session.completed` more than once, and we must
+ * never double-credit money.
+ */
+export async function grantPurchaseCredits(
+  userId: string,
+  amount: number,
+  sessionId: string
+): Promise<void> {
+  const [existing] = await db
+    .select({ id: creditTransactions.id })
+    .from(creditTransactions)
+    .where(
+      and(
+        eq(creditTransactions.ref, sessionId),
+        eq(creditTransactions.reason, "purchase")
+      )
+    )
+    .limit(1);
+  if (existing) return; // already credited this session
+  await grantCredits(userId, amount, "purchase", sessionId);
+}
+
 /** Recent ledger rows for the account/history UI. */
 export async function getCreditHistory(userId: string, limit = 30) {
   return db

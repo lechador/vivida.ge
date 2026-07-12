@@ -7,6 +7,7 @@ import { pdfReports } from "@/db/schema";
 import { constructWebhookEvent, stripe } from "@/lib/stripe";
 import { generateAndStoreReport } from "@/lib/reports/generate";
 import { syncStripeSubscription } from "@/lib/subscription-sync";
+import { grantPurchaseCredits } from "@/lib/credits";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -47,6 +48,20 @@ export async function POST(req: Request) {
           await syncStripeSubscription(sub);
         } catch (err) {
           console.error("[stripe/webhook] subscription sync failed:", err);
+        }
+      }
+      return new Response("ok", { status: 200 });
+    }
+
+    // Credit top-up → award the pack's credits (idempotent on session id).
+    if (sessionObj.metadata?.kind === "credits") {
+      const uid = sessionObj.metadata.userId as string | undefined;
+      const credits = Number(sessionObj.metadata.credits);
+      if (uid && Number.isFinite(credits) && credits > 0) {
+        try {
+          await grantPurchaseCredits(uid, credits, sessionObj.id);
+        } catch (err) {
+          console.error("[stripe/webhook] credit grant failed:", err);
         }
       }
       return new Response("ok", { status: 200 });

@@ -8,6 +8,7 @@ import { getReferralStats } from "@/lib/referral";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { InviteCard } from "@/components/invite/invite-card";
+import { TopUpCard } from "@/components/credits/top-up-card";
 
 export const metadata: Metadata = {
   title: "კრედიტები",
@@ -57,12 +58,15 @@ export default async function CreditsPage() {
           </p>
         </div>
 
+        {/* Top-up */}
+        <div className="mt-4">
+          <TopUpCard />
+        </div>
+
         {/* Invite / earn */}
         <div className="mt-4">
           <InviteCard link={link} invited={ref.invited} qualified={ref.qualified} />
         </div>
-
-        {/* Top-up (Phase 3) mount point */}
       </section>
     </main>
   );

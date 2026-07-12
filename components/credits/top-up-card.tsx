@@ -1,0 +1,83 @@
+"use client";
+
+import { useState } from "react";
+import { CreditCard, Loader2, Sparkles } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { CREDIT_PACKS } from "@/lib/credits";
+
+/**
+ * Stripe credit top-up — pick a pack, redirect to Checkout. The webhook awards
+ * the credits on completion, so on return the /credits balance is already
+ * updated.
+ */
+export function TopUpCard() {
+  const [pending, setPending] = useState<string | null>(null);
+
+  async function buy(packId: string) {
+    setPending(packId);
+    try {
+      const r = await fetch("/api/credits/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ packId }),
+      });
+      const data = (await r.json().catch(() => ({}))) as { url?: string };
+      if (data.url) window.location.href = data.url;
+      else setPending(null);
+    } catch {
+      setPending(null);
+    }
+  }
+
+  return (
+    <div className="rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <CreditCard className="size-4 text-[var(--vivida-cyan)]" />
+        ბალანსის შევსება
+      </div>
+      <h2 className="mt-2 text-xl font-semibold tracking-tight">აირჩიე პაკეტი</h2>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        {CREDIT_PACKS.map((p, i) => {
+          const best = i === CREDIT_PACKS.length - 1;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              disabled={pending !== null}
+              onClick={() => buy(p.id)}
+              className={cn(
+                "relative flex flex-col items-center gap-1 rounded-2xl border-2 p-5 transition-all hover:-translate-y-0.5 disabled:opacity-60",
+                best
+                  ? "border-[var(--vivida-cyan)] bg-[var(--vivida-cyan)]/8 shadow-[0_0_28px_-10px_var(--vivida-cyan)]"
+                  : "border-border bg-background/40 hover:border-[var(--vivida-violet)]/50"
+              )}
+            >
+              {best && (
+                <span className="absolute -top-2.5 rounded-full bg-[var(--vivida-cyan)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.14_0.02_260)]">
+                  საუკეთესო
+                </span>
+              )}
+              <div className="flex items-center gap-1.5 text-2xl font-bold tabular-nums">
+                {pending === p.id ? (
+                  <Loader2 className="size-6 animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles className="size-5 text-[var(--vivida-cyan)]" />
+                    {p.credits}
+                  </>
+                )}
+              </div>
+              <div className="text-xs text-muted-foreground">კრედიტი</div>
+              <div className="mt-1 text-lg font-semibold">₾{p.gel}</div>
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-center text-xs text-muted-foreground">
+        გადახდა უსაფრთხოდ, Stripe-ით.
+      </p>
+    </div>
+  );
+}
