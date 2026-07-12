@@ -16,33 +16,18 @@ export const TRIAL_DAYS = 30;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 /**
- * Returns the user's effective plan right now. Pro requires:
- *  - a subscription row with plan='pro'
- *  - status='active' OR 'trialing'
- *  - currentPeriodEnd in the future (or null for trialing)
+ * Returns the user's effective plan. The subscription/Pro model has been
+ * retired in favour of the credit system, so this is now a constant `'free'`
+ * for everyone — every former Pro feature is either free or credit-gated at
+ * its own call site (see lib/features.ts, all flags `false`).
  *
- * Anything else → 'free'. Designed to be safe-by-default — if anything
- * looks off, the user gets free access (we never accidentally upsell).
- *
- * Side effect: if the user has no subscription row at all, we lazily
- * provision a trial. This handles users who existed before the trial
- * system shipped — they each get TRIAL_DAYS from their next visit.
- * Auth.js's events.createUser hook handles the happy-path (new sign-ups
- * get a trial at account-creation time).
+ * Kept as an async function returning PlanId so the many call sites that
+ * thread `plan` around don't have to change, and so plan-based gating can be
+ * reintroduced by restoring the old subscription lookup if ever needed.
+ * `_userId` is unused by design.
  */
-export async function getCurrentPlan(userId: string): Promise<PlanId> {
-  const [sub] = await db
-    .select()
-    .from(subscriptions)
-    .where(eq(subscriptions.userId, userId))
-    .limit(1);
-
-  if (!sub) {
-    // Backfill: existing pre-trial users get one starting now.
-    const provisioned = await provisionTrialIfMissing(userId);
-    return isProActive(provisioned) ? "pro" : "free";
-  }
-  return isProActive(sub) ? "pro" : "free";
+export async function getCurrentPlan(_userId: string): Promise<PlanId> {
+  return "free";
 }
 
 export function isProActive(sub: Subscription | null | undefined): boolean {

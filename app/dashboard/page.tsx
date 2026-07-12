@@ -11,7 +11,6 @@ import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
-import { ProUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "დღეს" };
 
@@ -79,14 +78,6 @@ export default async function DashboardPage() {
           plan={plan}
           savedVoice={userRow?.horoscopeVoice ?? null}
         />
-
-        {plan !== "pro" && (
-          <ProUpsell
-            className="mt-8"
-            title="გახსენი Vivida Pro"
-            description="მოისმინე ჰოროსკოპი ხმით, ესაუბრე AI ასტროლოგს შენი რუკის შესახებ, ნახე საუკეთესო დღეები და მიიღე ღრმა თავსებადობის ანგარიში."
-          />
-        )}
       </section>
     </main>
   );

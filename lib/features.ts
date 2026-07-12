@@ -3,11 +3,12 @@ import type { PlanId } from "./pricing";
 /**
  * Feature gating — single source of truth for which features require Pro.
  *
- * The site is currently 100% free while we focus on the mobile app launch.
- * Every flag is `false` so `canUseFeature()` always returns `true`. The
- * Feature type, PlanId, and `canUseFeature()` API are intentionally kept
- * intact so flipping any flag back to `true` is the only change required to
- * re-enable Pro gating when paid plans return.
+ * The subscription/Pro model has been retired in favour of the credit system:
+ * the former "Pro pillars" (audio, chat, timing, deep synastry, PDF report,
+ * AI avatar) are now paid for with credits at their own call sites, so every
+ * flag here is `false` and `canUseFeature()` always returns `true`. The
+ * Feature type, PlanId, and `canUseFeature()` API are kept intact so a flag
+ * can be flipped back to `true` if plan-based gating ever returns.
  */
 
 export type Feature =
@@ -41,13 +42,14 @@ const REQUIRES_PRO: Record<Feature, boolean> = {
   synastry:        false,
   yearlyPdf:       false,
   adFree:          false,
-  // The premium pillars — Pro only.
-  audioHoroscope:  true,
-  chartChat:       true,
-  timing:          true,
-  deepSynastry:    true,
-  natalReport:     true,
-  aiAvatar:        true,
+  // Formerly Pro pillars — now credit-gated at their own call sites, so these
+  // no longer depend on plan.
+  audioHoroscope:  false,
+  chartChat:       false,
+  timing:          false,
+  deepSynastry:    false,
+  natalReport:     false,
+  aiAvatar:        false,
 };
 
 export function requiresPro(feature: Feature): boolean {

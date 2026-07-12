@@ -14,7 +14,6 @@ import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartSection } from "@/components/dashboard/chart-section";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import { ReportPdfPanel } from "@/components/report/report-pdf-panel";
-import { ProUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "ჩემი რუკა" };
 
@@ -123,15 +122,6 @@ export default async function ReportPage() {
             </details>
           )}
         </div>
-
-        {plan !== "pro" && (
-          <ProUpsell
-            compact
-            className="mt-10"
-            title="გინდა მეტი შენი რუკიდან?"
-            description="ესაუბრე AI ასტროლოგს, მოისმინე ჰოროსკოპი ხმით და მიიღე ღრმა ანალიზი — Vivida Pro-თი."
-          />
-        )}
       </section>
     </main>
   );
