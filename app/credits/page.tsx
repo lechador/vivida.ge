@@ -5,11 +5,13 @@ import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { getBalance } from "@/lib/credits";
 import { getReferralStats } from "@/lib/referral";
+import { getStreakProgress } from "@/lib/streak-credits";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { InviteCard } from "@/components/invite/invite-card";
 import { TopUpCard } from "@/components/credits/top-up-card";
 import { CreditEarnInfo } from "@/components/credits/earn-info";
+import { StreakCard } from "@/components/credits/streak-card";
 
 export const metadata: Metadata = {
   title: "კრედიტები",
@@ -24,10 +26,11 @@ const SITE_URL = "https://www.vivida.ge";
  */
 export default async function CreditsPage() {
   const user = await requireUser();
-  const [plan, balance, ref] = await Promise.all([
+  const [plan, balance, ref, streak] = await Promise.all([
     getCurrentPlan(user.id),
     getBalance(user.id),
     getReferralStats(user.id),
+    getStreakProgress(user.id),
   ]);
   const link = `${SITE_URL}/?ref=${ref.code}`;
 
@@ -57,6 +60,11 @@ export default async function CreditsPage() {
             კრედიტებით ხსნი ტესტების სრულ შედეგებს, ახალ სინასტრიებს, AI-ჩატსა
             და აუდიო-ჰოროსკოპს. მოიწვიე მეგობრები ან შეავსე ბალანსი.
           </p>
+        </div>
+
+        {/* Visit streak — daily-return reward ladder. */}
+        <div className="mt-4">
+          <StreakCard progress={streak} />
         </div>
 
         {/* How to earn (free) — shown before the paid options. */}

@@ -29,10 +29,14 @@ export async function recordVisit(userId: string): Promise<void> {
     const tz = profile?.timezone ?? "UTC";
     const dateLocal = formatLocalDate(new Date(), tz);
 
-    await db
+    const inserted = await db
       .insert(userActivityDays)
       .values({ userId, dateLocal })
-      .onConflictDoNothing();
+      .onConflictDoNothing()
+      .returning({ dateLocal: userActivityDays.dateLocal });
+    // `inserted` is empty when the user already visited today — so the streak
+    // milestone check below runs at most once per local day per user.
+    const firstVisitToday = inserted.length > 0;
 
     // Reputation — one point for showing up today. The dedupe key
     // includes the local date, so multiple visits in one day collapse
@@ -59,6 +63,15 @@ export async function recordVisit(userId: string): Promise<void> {
           )
         )
       );
+
+    // Once per day: recompute the streak and gift any newly-reached milestone.
+    // Dynamic import breaks the module cycle (streak-credits reads getStreak
+    // from here). Best-effort — folded into the surrounding try/catch.
+    if (firstVisitToday) {
+      const { current } = await getStreak(userId);
+      const { awardStreakMilestones } = await import("@/lib/streak-credits");
+      await awardStreakMilestones(userId, current);
+    }
   } catch (err) {
     // Activity logging is opportunistic — drop the error rather than
     // letting it bubble up into the page response.

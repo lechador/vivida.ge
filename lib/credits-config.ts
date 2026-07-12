@@ -14,6 +14,23 @@ export const REFERRAL_REWARD = 10;
 /** Free credits granted to every user on the first day of each month. */
 export const MONTHLY_BONUS = 5;
 
+/**
+ * Daily-visit streak rewards. Each tier is a one-time lifetime achievement:
+ * the first time a user's consecutive-visit streak reaches `days`, they're
+ * gifted `credits`. Ordered ascending — the streak UI reads them in order.
+ */
+export const STREAK_MILESTONES = [
+  { days: 3, credits: 3 },
+  { days: 7, credits: 10 },
+  { days: 14, credits: 15 },
+  { days: 30, credits: 30 },
+  { days: 60, credits: 50 },
+  { days: 90, credits: 80 },
+  { days: 180, credits: 150 },
+  { days: 365, credits: 365 },
+] as const;
+export type StreakMilestone = (typeof STREAK_MILESTONES)[number];
+
 /** Stripe top-up packs. Minimum ₾10 (we only have Stripe for now). `tetri` is
  *  the charge amount in minor units (1 GEL = 100 tetri). */
 export const CREDIT_PACKS = [
@@ -61,6 +78,7 @@ export type CreditReason =
   | "referral"
   | "purchase"
   | "monthly_bonus"
+  | "streak_bonus"
   | "earn_feed_post"
   | "earn_profile_photo"
   | "spend_synastry"
@@ -83,6 +101,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   referral: "მეგობრის მოწვევა",
   purchase: "ბალანსის შევსება",
   monthly_bonus: "თვის ბონუსი",
+  streak_bonus: "ვიზიტების სერია",
   earn_feed_post: "პოსტი ფიდში",
   earn_profile_photo: "პროფილის ფოტო",
   spend_synastry: "თავსებადობა",
