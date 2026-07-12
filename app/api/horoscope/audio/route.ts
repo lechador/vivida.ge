@@ -4,8 +4,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyHoroscopes, profiles, users } from "@/db/schema";
 import { localDateString } from "@/lib/transits";
-import { getCurrentPlan } from "@/lib/plan";
-import { canUseFeature } from "@/lib/features";
+import { CREDIT_COST, spendCredits } from "@/lib/credits";
 import {
   DEFAULT_VOICE_SLUG,
   generateSpeech,
@@ -34,10 +33,6 @@ export async function POST(req: Request) {
   const userId = session?.user?.id;
   if (!userId) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!canUseFeature("audioHoroscope", await getCurrentPlan(userId))) {
-    return Response.json({ error: "pro_required" }, { status: 403 });
   }
 
   if (!isElevenLabsConfigured()) {
@@ -71,6 +66,16 @@ export async function POST(req: Request) {
     .limit(1);
   if (!profile?.timezone) {
     return Response.json({ error: "no_profile" }, { status: 400 });
+  }
+
+  // Credit gate: each audio generation costs CREDIT_COST.audioHoroscope.
+  // Charged here — after validation, right before we spend the ElevenLabs call.
+  const paidAudio = await spendCredits(userId, CREDIT_COST.audioHoroscope, "spend_audio");
+  if (!paidAudio) {
+    return Response.json(
+      { error: "needs_credits", cost: CREDIT_COST.audioHoroscope },
+      { status: 402 }
+    );
   }
 
   const [userRow] = await db
