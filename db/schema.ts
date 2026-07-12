@@ -215,6 +215,13 @@ export const profiles = pgTable("profile", {
     .references(() => users.id, { onDelete: "cascade" }),
   dateOfBirth: date("date_of_birth", { mode: "string" }),
   timeOfBirth: time("time_of_birth"),
+  /** Self-reported or AI-inferred sex — 'male' | 'female' (null = unknown /
+   *  chose to skip). Used only for aggregate audience analytics, never shown
+   *  publicly. */
+  gender: text("gender"),
+  /** How `gender` was set: 'self' (user picked it) or 'ai' (name-inferred
+   *  backfill). Self-reported always wins; the backfill only touches null/ai. */
+  genderSource: text("gender_source"),
   latitude: doublePrecision("latitude"),
   longitude: doublePrecision("longitude"),
   cityName: text("city_name"),

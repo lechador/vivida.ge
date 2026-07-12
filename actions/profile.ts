@@ -126,3 +126,18 @@ export async function setDiscoverable(value: boolean): Promise<void> {
   revalidatePath("/account");
   revalidatePath("/people");
 }
+
+/**
+ * Set the user's sex from Account (instant-save). Self-reported → source
+ * 'self', so the AI backfill never overwrites it. Only accepts a real value;
+ * used solely for aggregate audience analytics.
+ */
+export async function updateGender(value: "male" | "female"): Promise<void> {
+  if (value !== "male" && value !== "female") return;
+  const user = await requireUser();
+  await db
+    .update(profiles)
+    .set({ gender: value, genderSource: "self", updatedAt: new Date() })
+    .where(eq(profiles.userId, user.id));
+  revalidatePath("/account");
+}

@@ -4,14 +4,19 @@ import { useRef } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { DateValue } from "./types";
+import { cn } from "@/lib/utils";
+import type { DateValue, Gender } from "./types";
 
 export function StepDate({
   value,
   onChange,
+  gender,
+  onGenderChange,
 }: {
   value: DateValue;
   onChange: (next: DateValue) => void;
+  gender: Gender | null;
+  onGenderChange: (g: Gender) => void;
 }) {
   const monthRef = useRef<HTMLInputElement>(null);
   const yearRef = useRef<HTMLInputElement>(null);
@@ -79,6 +84,34 @@ export function StepDate({
             }
             className="text-center text-lg tabular-nums"
           />
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-md space-y-1.5">
+        <Label>სქესი</Label>
+        <div className="grid grid-cols-2 gap-3">
+          {(
+            [
+              { key: "female", label: "მდედრობითი", glyph: "♀" },
+              { key: "male", label: "მამრობითი", glyph: "♂" },
+            ] as const
+          ).map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => onGenderChange(opt.key)}
+              aria-pressed={gender === opt.key}
+              className={cn(
+                "flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all",
+                gender === opt.key
+                  ? "border-[var(--vivida-violet)] bg-[var(--vivida-violet)]/10 text-foreground shadow-[0_0_20px_-6px_var(--vivida-violet)]"
+                  : "border-border bg-background/40 text-foreground/80 hover:border-[var(--vivida-violet)]/50 hover:bg-[var(--vivida-violet)]/5"
+              )}
+            >
+              <span className="text-lg text-[var(--vivida-violet)]">{opt.glyph}</span>
+              {opt.label}
+            </button>
+          ))}
         </div>
       </div>
     </div>

@@ -33,6 +33,8 @@ export type SaveBirthDataInput = {
   latitude: number;
   longitude: number;
   timezone: string;
+  /** Self-reported sex; null = skipped. */
+  gender?: "male" | "female" | null;
   /** Optional username — wizard sets it on first save. */
   username?: string | null;
 };
@@ -127,6 +129,14 @@ export async function saveBirthDataCore(
     username = u;
   }
 
+  // Only write gender when the user actually picked one (skipping leaves any
+  // existing value — incl. an AI-inferred one — untouched). Self-reported
+  // overrides AI: source='self'.
+  const genderFields =
+    input.gender === "male" || input.gender === "female"
+      ? { gender: input.gender, genderSource: "self" as const }
+      : {};
+
   try {
     await db
       .insert(profiles)
@@ -138,6 +148,7 @@ export async function saveBirthDataCore(
         longitude: input.longitude,
         cityName: input.cityName.trim(),
         timezone: input.timezone,
+        ...genderFields,
         ...(usernameProvided ? { username } : {}),
       })
       .onConflictDoUpdate({
@@ -149,6 +160,7 @@ export async function saveBirthDataCore(
           longitude: input.longitude,
           cityName: input.cityName.trim(),
           timezone: input.timezone,
+          ...genderFields,
           ...(usernameProvided ? { username } : {}),
           updatedAt: new Date(),
         },

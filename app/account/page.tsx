@@ -14,6 +14,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { DangerZone } from "@/components/account/danger-zone";
 import { VisibilityCard } from "@/components/account/visibility-card";
+import { GenderCard } from "@/components/account/gender-card";
 import { PhotoUploader } from "@/components/account/photo-uploader";
 import { AiAvatarGenerator } from "@/components/account/ai-avatar-generator";
 import { PushOptIn } from "@/components/push/push-opt-in";
@@ -202,6 +203,15 @@ export default async function AccountPage() {
               />
               <Field label="დაბადების ადგილი" value={profile.cityName} />
               <Field label="დროის სარტყელი" value={profile.timezone} />
+              <div className="sm:col-span-2">
+                <GenderCard
+                  initial={
+                    profile.gender === "male" || profile.gender === "female"
+                      ? profile.gender
+                      : null
+                  }
+                />
+              </div>
             </dl>
           ) : (
             <div>

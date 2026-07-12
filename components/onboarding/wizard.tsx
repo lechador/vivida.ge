@@ -40,6 +40,7 @@ function initialState(
       date: { day: "", month: "", year: "" },
       time: { hour: "", minute: "", unknown: false },
       place: null,
+      gender: null,
       visibility: { username: suggestUsername(defaultName) },
     };
   }
@@ -66,6 +67,10 @@ function initialState(
             longitude: profile.longitude,
             timezone: profile.timezone ?? "UTC",
           } satisfies GeocodeResult)
+        : null,
+    gender:
+      profile.gender === "male" || profile.gender === "female"
+        ? profile.gender
         : null,
     visibility: {
       username: profile.username ?? suggestUsername(defaultName),
@@ -122,7 +127,8 @@ export function OnboardingWizard({
   const currentStep = STEPS[step];
 
   const stepValid = useMemo(() => {
-    if (currentStep === "date") return validateDate(data.date) !== null;
+    if (currentStep === "date")
+      return validateDate(data.date) !== null && data.gender !== null;
     if (currentStep === "time") return validateTime(data.time).ok;
     if (currentStep === "place") return data.place !== null;
     if (currentStep === "visibility") return validateVisibility(data.visibility);
@@ -167,6 +173,7 @@ export function OnboardingWizard({
           latitude: data.place!.latitude,
           longitude: data.place!.longitude,
           timezone: data.place!.timezone,
+          gender: data.gender,
           username: data.visibility.username,
         },
         next
@@ -206,6 +213,8 @@ export function OnboardingWizard({
               <StepDate
                 value={data.date}
                 onChange={(date) => setData((d) => ({ ...d, date }))}
+                gender={data.gender}
+                onGenderChange={(gender) => setData((d) => ({ ...d, gender }))}
               />
             )}
             {currentStep === "time" && (
