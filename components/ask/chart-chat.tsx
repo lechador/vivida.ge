@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Send, Sparkles } from "lucide-react";
 
+import { CreditHint } from "@/components/credits/credit-hint";
+
 type Msg = { role: "user" | "assistant"; content: string };
 
 const ERRORS: Record<string, string> = {
@@ -163,7 +165,10 @@ export function ChartChat({
             <Send className="size-4" />
           </button>
         </div>
-        <p className="mt-2 text-center text-[11px] text-muted-foreground">
+        <div className="mt-2 flex justify-center">
+          <CreditHint>დღეში 2 უფასო შეკითხვა, შემდეგ −1 კრედიტი</CreditHint>
+        </div>
+        <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
           AI ასტროლოგი ცდება — გამოიყენე რეფლექსიისთვის, არა გადაწყვეტილებებისთვის.
         </p>
       </form>

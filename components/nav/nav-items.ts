@@ -2,7 +2,6 @@ import {
   Brain,
   CalendarClock,
   Compass,
-  Crown,
   Heart,
   MessageCircle,
   Orbit,
@@ -146,13 +145,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "მეგობრები",
     Icon: Users,
     hue: "oklch(0.72 0.22 0)",
-  },
-  {
-    key: "pro",
-    href: "/credits",
-    label: "კრედიტები",
-    Icon: Crown,
-    hue: "oklch(0.85 0.16 85)",
   },
 ];
 

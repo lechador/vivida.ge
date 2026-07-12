@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { Sparkles } from "lucide-react";
 
 import { auth } from "@/auth";
 import { cn } from "@/lib/utils";
 import { getHeaderData } from "@/lib/header-cache";
+import { getBalance } from "@/lib/credits";
 import { Button } from "@/components/ui/button";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { ProBadge } from "@/components/brand/pro-badge";
@@ -56,11 +58,17 @@ export async function AppHeader({
   let unread = 0;
   let username: string | null = null;
   let unreadMessages = 0;
+  let balance = 0;
 
   if (authed) {
     const session = await auth();
     if (session?.user?.id) {
-      const data = await getHeaderData(session.user.id);
+      // Balance fetched fresh (not via the 30s header cache) so a spend/earn
+      // shows immediately in the navbar chip.
+      const [data, bal] = await Promise.all([
+        getHeaderData(session.user.id),
+        getBalance(session.user.id),
+      ]);
       userInfo = {
         id: session.user.id,
         name: session.user.name ?? null,
@@ -73,6 +81,7 @@ export async function AppHeader({
       unread = data.unread;
       username = data.username;
       unreadMessages = data.unreadMessages;
+      balance = bal;
     }
   }
 
@@ -126,6 +135,14 @@ export async function AppHeader({
         {userInfo ? (
           <>
             <MobileSearch />
+            <Link
+              href="/credits"
+              aria-label={`კრედიტები: ${balance}`}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-2.5 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-[var(--vivida-cyan)]/20"
+            >
+              <Sparkles className="size-3.5 text-[var(--vivida-cyan)]" />
+              {balance}
+            </Link>
             <NotificationsDropdown
               initial={notifications}
               initialUnread={unread}
@@ -135,6 +152,7 @@ export async function AppHeader({
               email={userInfo.email}
               image={userInfo.image}
               username={username}
+              balance={balance}
             />
           </>
         ) : (

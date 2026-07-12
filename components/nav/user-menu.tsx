@@ -19,11 +19,13 @@ export function UserMenu({
   email,
   image,
   username,
+  balance,
 }: {
   name: string | null;
   email: string | null;
   image: string | null;
   username: string | null;
+  balance?: number;
 }) {
   const [isPending, startTransition] = useTransition();
   const display = name?.split(" ")[0] ?? "ვარსკვლავო";
@@ -84,8 +86,13 @@ export function UserMenu({
         )}
         <DropdownMenuItem asChild>
           <Link href="/credits" className="cursor-pointer">
-            <Sparkles className="size-4" />
+            <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
             კრედიტები
+            {typeof balance === "number" && (
+              <span className="ml-auto rounded-full bg-[var(--vivida-cyan)]/15 px-2 py-0.5 text-xs font-semibold tabular-nums text-[var(--vivida-cyan)]">
+                {balance}
+              </span>
+            )}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

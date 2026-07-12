@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, Send } from "lucide-react";
 
 import { createPost } from "@/actions/feed";
+import { CreditHint } from "@/components/credits/credit-hint";
 import { POST_BODY_MAX } from "@/lib/feed-config";
 import { Button } from "@/components/ui/button";
 
@@ -81,15 +82,18 @@ export function PostComposer({
             disabled={isPending}
           />
           <div className="mt-2 flex items-center justify-between gap-3">
-            <span
-              className={`text-xs tabular-nums ${
-                overflow
-                  ? "text-[var(--vivida-pink)]"
-                  : "text-muted-foreground/70"
-              }`}
-            >
-              {remaining}
-            </span>
+            <div className="flex items-center gap-2.5">
+              <CreditHint tone="earn">დღის პირველ პოსტზე +5</CreditHint>
+              <span
+                className={`text-xs tabular-nums ${
+                  overflow
+                    ? "text-[var(--vivida-pink)]"
+                    : "text-muted-foreground/70"
+                }`}
+              >
+                {remaining}
+              </span>
+            </div>
             <div className="flex items-center gap-3">
               {error && (
                 <span className="text-xs text-[var(--vivida-pink)]">

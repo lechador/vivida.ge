@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Headphones, Loader2, Pause, Play, Volume2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { CreditHint } from "@/components/credits/credit-hint";
 import { HOROSCOPE_VOICES } from "@/lib/horoscope-voices";
 import { useAudioPlayer } from "@/components/audio/audio-provider";
 import { EqBars } from "@/components/audio/eq-bars";
@@ -111,6 +112,9 @@ export function HoroscopeAudioPlayer({
         <div className="mb-3 flex items-center gap-2 text-sm font-medium">
           <Volume2 className="size-4 text-[var(--vivida-violet)]" />
           აირჩიე ხმა
+        </div>
+        <div className="mb-2">
+          <CreditHint>ერთი მოსმენა · −2 კრედიტი</CreditHint>
         </div>
         <div className="grid gap-2 sm:grid-cols-3">
           {HOROSCOPE_VOICES.map((v) => (

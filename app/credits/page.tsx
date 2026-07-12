@@ -37,7 +37,7 @@ export default async function CreditsPage() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.4),transparent_70%)]"
       />
       <Starfield count={110} shooting={2} />
-      <AppHeader authed plan={plan} active="pro" />
+      <AppHeader authed plan={plan} />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         {/* Balance */}
