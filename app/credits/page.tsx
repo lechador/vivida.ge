@@ -9,6 +9,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { InviteCard } from "@/components/invite/invite-card";
 import { TopUpCard } from "@/components/credits/top-up-card";
+import { CreditEarnInfo } from "@/components/credits/earn-info";
 
 export const metadata: Metadata = {
   title: "კრედიტები",
@@ -56,6 +57,11 @@ export default async function CreditsPage() {
             კრედიტებით ხსნი ტესტების სრულ შედეგებს, ახალ სინასტრიებს, AI-ჩატსა
             და აუდიო-ჰოროსკოპს. მოიწვიე მეგობრები ან შეავსე ბალანსი.
           </p>
+        </div>
+
+        {/* How to earn (free) — shown before the paid options. */}
+        <div className="mt-4">
+          <CreditEarnInfo />
         </div>
 
         {/* Top-up */}
