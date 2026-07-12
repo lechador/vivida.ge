@@ -54,7 +54,11 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `${SITE_URL}/r/${id}` },
+    // Share landings exist for the OG preview, not for search — thousands of
+    // near-identical result pages would only dilute crawl budget and sit in
+    // GSC as "Crawled – currently not indexed". Point authority at the test.
+    robots: { index: false },
+    alternates: { canonical: `${SITE_URL}/pirovnebis-testi` },
     openGraph: { title, description, url: `${SITE_URL}/r/${id}` },
   };
 }

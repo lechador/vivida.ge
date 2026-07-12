@@ -23,7 +23,17 @@ import { ALL_MBTI_SLUGS } from "@/lib/seo/mbti-seo";
  * build time; punting that to a follow-up dynamic sitemap if SEO needs it.
  */
 const BASE = "https://www.vivida.ge";
+
+/**
+ * lastModified strategy: only pages whose CONTENT actually changes with time
+ * (daily/weekly horoscope surfaces, moon calendar, retrograde tracker) get a
+ * live `NOW` stamp. Evergreen pages get a stable stamp bumped manually on
+ * real content overhauls — stamping everything NOW on every crawl teaches
+ * Google the lastmod is meaningless and slows recrawl of the fresh pages.
+ */
 const NOW = new Date();
+/** Bump when evergreen cluster content meaningfully changes. */
+const EVERGREEN = new Date("2026-07-13");
 
 const VIEW_CHANGE_FREQ: Record<
   (typeof ALL_HOROSCOPE_VIEWS)[number],
@@ -49,7 +59,7 @@ const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
 export default function sitemap(): MetadataRoute.Sitemap {
   const zodiacSignPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
     url: `${BASE}/zodiac/${slug}`,
-    lastModified: NOW,
+    lastModified: EVERGREEN,
     changeFrequency: "monthly",
     priority: 0.7,
   }));
@@ -57,35 +67,35 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Psychology tests: the 16 MBTI type landing pages.
   const mbtiTypePages: MetadataRoute.Sitemap = ALL_MBTI_SLUGS.map((slug) => ({
     url: `${BASE}/mbti/${slug}`,
-    lastModified: NOW,
+    lastModified: EVERGREEN,
     changeFrequency: "monthly",
     priority: 0.7,
   }));
 
   const elementPages: MetadataRoute.Sitemap = ALL_ELEMENT_SLUGS.map((el) => ({
     url: `${BASE}/zodiac/elementebi/${el}`,
-    lastModified: NOW,
+    lastModified: EVERGREEN,
     changeFrequency: "monthly",
     priority: 0.65,
   }));
 
   const pairPages: MetadataRoute.Sitemap = ALL_PAIR_SLUGS.map((slug) => ({
     url: `${BASE}/zodiac/tavsebadoba/${slug}`,
-    lastModified: NOW,
+    lastModified: EVERGREEN,
     changeFrequency: "monthly",
     priority: 0.6,
   }));
 
   const moonPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
     url: `${BASE}/zodiac/mtvare/${slug}`,
-    lastModified: NOW,
+    lastModified: EVERGREEN,
     changeFrequency: "monthly",
     priority: 0.7,
   }));
 
   const risingPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
     url: `${BASE}/zodiac/amomavali/${slug}`,
-    lastModified: NOW,
+    lastModified: EVERGREEN,
     changeFrequency: "monthly",
     priority: 0.7,
   }));
@@ -96,7 +106,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       if (!yearlyContentFor(slug, year)) continue;
       yearlyPages.push({
         url: `${BASE}/zodiac/${slug}/${year}`,
-        lastModified: NOW,
+        lastModified: EVERGREEN,
         changeFrequency: "monthly",
         priority: 0.75,
       });
@@ -110,6 +120,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     (slug) =>
       ALL_HOROSCOPE_VIEWS.map((view) => ({
         url: `${BASE}/zodiac/${slug}/${VIEW_PATH[view]}`,
+        // Horoscope content genuinely regenerates per period — live stamp.
         lastModified: NOW,
         changeFrequency: VIEW_CHANGE_FREQ[view],
         priority: VIEW_PRIORITY[view],
@@ -119,7 +130,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Trait-ranking listicles ("ყველაზე ჭკვიანი / ეჭვიანი … ნიშნები").
   const rankingPages: MetadataRoute.Sitemap = ALL_RANKING_SLUGS.map((slug) => ({
     url: `${BASE}/zodiac/reitingebi/${slug}`,
-    lastModified: NOW,
+    lastModified: EVERGREEN,
     changeFrequency: "monthly",
     priority: 0.7,
   }));
@@ -127,7 +138,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Chinese zodiac ("ზოდიაქოს ნიშნები წლების მიხედვით").
   const chinesePages: MetadataRoute.Sitemap = ALL_CHINESE_SLUGS.map((slug) => ({
     url: `${BASE}/chinuri-horoskopi/${slug}`,
-    lastModified: NOW,
+    lastModified: EVERGREEN,
     changeFrequency: "monthly",
     priority: 0.7,
   }));
@@ -135,55 +146,55 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: `${BASE}/`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "weekly",
       priority: 1,
     },
     {
       url: `${BASE}/nataluri-ruka`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.95,
     },
     {
       url: `${BASE}/piradi-ruka`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.95,
     },
     {
       url: `${BASE}/tests`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${BASE}/pirovnebis-testi`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${BASE}/iq-testi`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${BASE}/tavsebadoba`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.85,
     },
     {
       url: `${BASE}/mbti`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.85,
     },
     {
       url: `${BASE}/chinuri-horoskopi`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.85,
     },
@@ -213,13 +224,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${BASE}/numerologia`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.9,
     },
     ...LIFE_PATH_NUMBERS.map((n) => ({
       url: `${BASE}/numerologia/${n}`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly" as const,
       priority: 0.75,
     })),
@@ -231,61 +242,61 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${BASE}/features`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${BASE}/how-it-works`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${BASE}/zodiac`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.85,
     },
     {
       url: `${BASE}/zodiac/datit`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${BASE}/zodiac/elementebi`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.75,
     },
     {
       url: `${BASE}/zodiac/tavsebadoba`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${BASE}/zodiac/mtvare`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${BASE}/zodiac/amomavali`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${BASE}/zodiac/gzamkvlevi`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "weekly",
       priority: 0.85,
     },
     {
       url: `${BASE}/zodiac/reitingebi`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "weekly",
       priority: 0.8,
     },
@@ -301,25 +312,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...signHoroscopePages,
     {
       url: `${BASE}/login`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "yearly",
       priority: 0.4,
     },
     {
       url: `${BASE}/signup`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "yearly",
       priority: 0.6,
     },
     {
       url: `${BASE}/terms`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
       url: `${BASE}/privacy`,
-      lastModified: NOW,
+      lastModified: EVERGREEN,
       changeFrequency: "yearly",
       priority: 0.3,
     },
