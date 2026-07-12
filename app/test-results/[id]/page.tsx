@@ -17,6 +17,8 @@ import { MbtiProfileSections } from "@/components/mbti/mbti-profile-sections";
 import { MbtiFamousPeople } from "@/components/mbti/mbti-famous-people";
 import { MbtiShareButton } from "@/components/mbti/mbti-share-button";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
+import { UnlockCard } from "@/components/credits/unlock-card";
+import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 
 export const metadata = { title: "Astro-MBTI შედეგი" };
 export const dynamic = "force-dynamic";
@@ -52,6 +54,12 @@ export default async function TestResultPage({
     after(() => ensureMbtiLibraryFor(mbtiSectionCombos(baseType)));
   }
 
+  // Type + archetype are free (shareable); the full portrait unlocks once.
+  const [unlocked, balance] = await Promise.all([
+    isUnlocked(user.id, result.id, "spend_mbti"),
+    getBalance(user.id),
+  ]);
+
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
@@ -67,20 +75,45 @@ export default async function TestResultPage({
           Astro-MBTI · შენი შედეგი
         </div>
 
-        <MbtiResultView
-          type={result.mbtiType}
-          archetypeNameGe={result.archetypeNameGe}
-          scores={result.scores}
-          analysis={result.aiSynthesisText}
-        />
+        {unlocked ? (
+          <>
+            <MbtiResultView
+              type={result.mbtiType}
+              archetypeNameGe={result.archetypeNameGe}
+              scores={result.scores}
+              analysis={result.aiSynthesisText}
+            />
 
-        <MbtiProfileSections sections={sections} />
+            <MbtiProfileSections sections={sections} />
 
-        <div className="mt-4">
-          <MbtiFamousPeople type={result.mbtiType} />
-        </div>
+            <div className="mt-4">
+              <MbtiFamousPeople type={result.mbtiType} />
+            </div>
 
-        <ProfileVisibilityToggle kind="mbti" />
+            <ProfileVisibilityToggle kind="mbti" />
+          </>
+        ) : (
+          <>
+            <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
+              <div className="text-5xl font-bold tracking-tight sm:text-6xl">
+                {result.mbtiType}
+              </div>
+              <div className="mt-2 text-lg font-semibold text-[var(--vivida-cyan)]">
+                {result.archetypeNameGe}
+              </div>
+            </div>
+            <div className="mt-4">
+              <UnlockCard
+                kind="mbti"
+                resultId={result.id}
+                cost={CREDIT_COST.mbtiTest}
+                balance={balance}
+                title="სრული პორტრეტის გახსნა"
+                blurb="ღრმა ანალიზი, ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ცნობილი ადამიანები შენი ტიპით — გადაიხდი ერთხელ, სამუდამოდ შენია."
+              />
+            </div>
+          </>
+        )}
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-6">
           <p className="text-xs text-muted-foreground">

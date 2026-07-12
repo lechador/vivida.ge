@@ -31,8 +31,15 @@ export async function POST(req: Request) {
   const userId = session?.user?.id ?? null;
 
   try {
-    const r = await saveIqResult({ attemptId, answers, timeUsedSec, userId });
-    return NextResponse.json({ ok: true, iq: r.iq, percentile: r.percentile });
+    const { result, id } = await saveIqResult({ attemptId, answers, timeUsedSec, userId });
+    // Only signed-in takers get the id (to route to the gated saved view);
+    // the anonymous saved view is owner-gated and wouldn't be viewable anyway.
+    return NextResponse.json({
+      ok: true,
+      iq: result.iq,
+      percentile: result.percentile,
+      id: userId ? id : null,
+    });
   } catch {
     // Table may not exist yet, or a transient DB error — never surface to the UI.
     return NextResponse.json({ ok: false }, { status: 200 });

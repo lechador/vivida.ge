@@ -16,7 +16,7 @@ export async function saveIqResult(input: {
   answers: Record<string, number>;
   timeUsedSec?: number | null;
   userId?: string | null;
-}): Promise<IqResult> {
+}): Promise<{ result: IqResult; id: string | null }> {
   const r = scoreIq(input.answers);
   const domainScores: IqDomainScoresJson = {
     numeric: 0,
@@ -50,7 +50,15 @@ export async function saveIqResult(input: {
     })
     .onConflictDoNothing({ target: iqResults.attemptId });
 
-  return r;
+  // The row id (just-inserted or the pre-existing one for this attempt) so the
+  // caller can route the taker to the gated saved view.
+  const [row] = await db
+    .select({ id: iqResults.id })
+    .from(iqResults)
+    .where(eq(iqResults.attemptId, input.attemptId))
+    .limit(1);
+
+  return { result: r, id: row?.id ?? null };
 }
 
 /** Only keep answers for items still in the bank, and only integer choices. */

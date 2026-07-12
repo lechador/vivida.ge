@@ -14,6 +14,8 @@ import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { IqBellCurve, DomainBar } from "@/components/iq/iq-bell-curve";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
+import { UnlockCard } from "@/components/credits/unlock-card";
+import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 
 export const metadata = { title: "შენი IQ შედეგი", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -43,6 +45,13 @@ export default async function SavedIqResultPage({
   const plan = await getCurrentPlan(user.id);
   const band = iqBand(row.iq);
   const ds = row.domainScores;
+
+  // The score/percentile/curve are free (shareable); the deep domain profile
+  // unlocks once for CREDIT_COST.iqTest credits.
+  const [unlocked, balance] = await Promise.all([
+    isUnlocked(user.id, row.id, "spend_iq"),
+    getBalance(user.id),
+  ]);
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -86,20 +95,33 @@ export default async function SavedIqResultPage({
           </div>
         </div>
 
-        {/* Per-domain breakdown */}
-        <div className="mt-4 rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
-          <h2 className="mb-4 flex items-center gap-2 text-base font-semibold tracking-tight">
-            <Brain className="size-4 text-[var(--vivida-violet)]" />
-            აზროვნების პროფილი
-          </h2>
-          <div className="space-y-4">
-            {DOMAINS.map((d) => (
-              <DomainBar key={d} label={DOMAIN_LABELS_KA[d]} pct={ds[d] ?? 0} />
-            ))}
+        {/* Per-domain breakdown — gated behind a one-time credit unlock */}
+        {unlocked ? (
+          <div className="mt-4 rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+            <h2 className="mb-4 flex items-center gap-2 text-base font-semibold tracking-tight">
+              <Brain className="size-4 text-[var(--vivida-violet)]" />
+              აზროვნების პროფილი
+            </h2>
+            <div className="space-y-4">
+              {DOMAINS.map((d) => (
+                <DomainBar key={d} label={DOMAIN_LABELS_KA[d]} pct={ds[d] ?? 0} />
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-4">
+            <UnlockCard
+              kind="iq"
+              resultId={row.id}
+              cost={CREDIT_COST.iqTest}
+              balance={balance}
+              title="აზროვნების პროფილის გახსნა"
+              blurb="ნახე შენი ძლიერი მხარეები ოთხ დომენში — ლოგიკა, რიცხვები, სივრცე და პატერნები. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+            />
+          </div>
+        )}
 
-        <ProfileVisibilityToggle kind="iq" />
+        {unlocked && <ProfileVisibilityToggle kind="iq" />}
 
         <div className="mt-6 flex justify-center">
           <Button asChild variant="outline">

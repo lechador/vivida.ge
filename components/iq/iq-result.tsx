@@ -18,7 +18,6 @@ type Stored = {
   attemptId?: string;
 };
 
-const POSTED_KEY = "vivida_iq_posted";
 
 /**
  * IQ result. The score, band, percentile and bell curve are free; the
@@ -42,17 +41,11 @@ export function IqResultClient() {
     }
   }, []);
 
-  // Persist the attempt once (best-effort). Deduped by attemptId both here
-  // (so a refresh doesn't re-POST) and server-side (unique attempt_id).
+  // Persist the attempt (idempotent server-side via unique attempt_id), then
+  // route a signed-in taker to the gated saved view so the deep breakdown is
+  // never shown for free here. Anonymous takers stay and see the login CTA.
   useEffect(() => {
     if (!stored || stored === "missing" || !stored.attemptId) return;
-    let posted: string | null = null;
-    try {
-      posted = localStorage.getItem(POSTED_KEY);
-    } catch {
-      /* ignore */
-    }
-    if (posted === stored.attemptId) return;
     fetch("/api/iq/submit", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -62,17 +55,14 @@ export function IqResultClient() {
         timeUsedSec: stored.timeUsedSec,
       }),
     })
-      .then(() => {
-        try {
-          localStorage.setItem(POSTED_KEY, stored.attemptId!);
-        } catch {
-          /* ignore */
-        }
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.id) router.replace(`/iq-testi/shedegi/${data.id}`);
       })
       .catch(() => {
         /* best-effort */
       });
-  }, [stored]);
+  }, [stored, router]);
 
   useEffect(() => {
     let alive = true;
