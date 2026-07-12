@@ -14,7 +14,7 @@ import { creditAccounts, creditTransactions } from "@/db/schema";
  */
 
 // ── Economy (tune here) ──────────────────────────────────────────────────────
-export const SIGNUP_BONUS = 5;
+export const SIGNUP_BONUS = 20;
 export const REFERRAL_REWARD = 10;
 
 /** Stripe top-up packs. Minimum ₾10 (we only have Stripe for now). `tetri` is
@@ -26,10 +26,27 @@ export const CREDIT_PACKS = [
 ] as const;
 export type CreditPackId = (typeof CREDIT_PACKS)[number]["id"];
 
+/** Credits EARNED by activity (beyond signup/referral/purchase). Capped to
+ *  prevent farming — see the caps below. */
+export const CREDIT_REWARD = {
+  feedPost: 5,
+  profilePhoto: 3,
+} as const;
+
+/** Anti-farming caps for earned credits. */
+export const REWARD_CAP = {
+  /** Only the first N feed posts each day earn credits. */
+  feedPostPerDay: 1,
+  /** Profile-photo reward is one-time (guarded by ledger presence). */
+} as const;
+
 /** What each gated action costs (beyond its free allowance). */
 export const CREDIT_COST = {
   synastry: 5,
   chat: 1,
+  mbtiTest: 5,
+  iqTest: 5,
+  audioHoroscope: 2,
 } as const;
 
 /** Free before credits are needed. */
@@ -44,8 +61,13 @@ export type CreditReason =
   | "signup_bonus"
   | "referral"
   | "purchase"
+  | "earn_feed_post"
+  | "earn_profile_photo"
   | "spend_synastry"
   | "spend_chat"
+  | "spend_mbti"
+  | "spend_iq"
+  | "spend_audio"
   | "grandfather"
   | "admin_grant";
 
