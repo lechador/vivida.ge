@@ -66,10 +66,90 @@ export const users = pgTable("user", {
    * auto-reverse).
    */
   restricted: boolean("restricted").notNull().default(false),
+  /** This user's own referral code (short, unique) — lazily generated the
+   *  first time they open the invite screen. Others sign up via /?ref=code. */
+  referralCode: text("referral_code").unique(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
 });
+
+/**
+ * Credit wallet — one row per user, atomically updated. Balance is authoritative
+ * and always kept in sync with the ledger (credit_transaction). We spend with a
+ * single conditional UPDATE (`balance >= cost`) so two concurrent requests can
+ * never overspend.
+ */
+export const creditAccounts = pgTable("credit_account", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  balance: integer("balance").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+/**
+ * Append-only credit ledger — every grant (+) and spend (−) with a reason, for
+ * audit + the account history. `ref` links to the source (referral's invited
+ * user id, stripe session id, the synastry/partner id spent on, …).
+ */
+export const creditTransactions = pgTable(
+  "credit_transaction",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Signed: positive = earned/bought, negative = spent. */
+    amount: integer("amount").notNull(),
+    /** e.g. 'signup_bonus' | 'referral' | 'purchase' | 'spend_synastry' |
+     *  'spend_chat' | 'grandfather' | 'admin_grant'. */
+    reason: text("reason").notNull(),
+    ref: text("ref"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("credit_tx_user_created_idx").on(t.userId, t.createdAt)]
+);
+
+/**
+ * Referrals — one row per invited user (unique), so a person can be referred by
+ * at most one referrer. `status` goes pending → qualified when the invited user
+ * verifies email AND completes birth data (the anti-fraud gate: a dead/duplicate
+ * signup never qualifies, and only a qualified referral pays out, once).
+ */
+export const referrals = pgTable(
+  "referral",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    referrerId: text("referrer_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Unique: the invited user can only ever be attributed to one referrer. */
+    invitedUserId: text("invited_user_id")
+      .notNull()
+      .unique()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull().default("pending"), // 'pending' | 'qualified'
+    creditedAt: timestamp("credited_at", { withTimezone: true }),
+    qualifiedAt: timestamp("qualified_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("referral_referrer_idx").on(t.referrerId)]
+);
+
+export type CreditAccount = typeof creditAccounts.$inferSelect;
+export type CreditTransaction = typeof creditTransactions.$inferSelect;
+export type Referral = typeof referrals.$inferSelect;
 
 export const accounts = pgTable(
   "account",
