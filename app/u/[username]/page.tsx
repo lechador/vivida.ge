@@ -17,6 +17,7 @@ import { canUseFeature } from "@/lib/features";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { computeElementBalance } from "@/lib/elements";
 import { computeSynastry, overallVerdict } from "@/lib/synastry";
+import { getSynastryInterpretationsFor } from "@/lib/synastry-library";
 import { signByIndex } from "@/lib/zodiac";
 import {
   countFriends,
@@ -139,12 +140,14 @@ export default async function PublicProfilePage({
   ]);
 
   let synastry = null;
+  let synastryTexts: Record<string, string> = {};
   let viewerName: string | null = null;
   let viewerSunSign = null;
   if (viewerId && !isOwner && ownerChart) {
     const viewerChart = await ensureChartFor(viewerId, viewerPlan);
     if (viewerChart) {
       synastry = computeSynastry(viewerChart.data, ownerChart.data);
+      synastryTexts = await getSynastryInterpretationsFor(synastry);
       viewerName = session?.user?.name?.split(" ")[0] ?? "შენ";
       const viewerSunIdx = viewerChart.data?.bodies?.sun?.signIndex;
       if (typeof viewerSunIdx === "number") {
@@ -375,6 +378,7 @@ export default async function PublicProfilePage({
             <SynastryDisplayLazy
               result={synastry}
               partnerName={displayName}
+              interpretations={synastryTexts}
               shareCardProps={
                 viewerName && viewerSunSign && sun
                   ? {

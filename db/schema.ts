@@ -922,6 +922,57 @@ export type AspectInterpretationLibraryRow =
   typeof aspectInterpretationLibrary.$inferSelect;
 
 /**
+ * Reusable synastry (compatibility) interpretation library — the two-chart
+ * counterpart of the natal aspect/house libraries. "One person's Sun square
+ * the other's Moon" reads identically for every pair that has it, so each
+ * finite combination is generated once (rich Georgian, direction-neutral
+ * wording — never "your"/"their", since either partner may be A or B) and
+ * reused on every profile compatibility view. Two kinds:
+ *
+ *   - `kind='aspect'`  — (planetA, planetB, aspectKind): a cross-chart aspect
+ *                        between the two people's planets. Pair is unordered
+ *                        (A's Sun △ B's Moon ≡ A's Moon △ B's Sun), keys use
+ *                        sorted body names: 91 pairs × 5 kinds = 455 rows.
+ *   - `kind='overlay'` — (planetA, house): one person's planet falling in the
+ *                        other's house. 13 bodies × 12 houses = 156 rows.
+ *
+ * `key` is `aspect:${a}-${b}-${kind}` or `overlay:${body}-${house}`.
+ * `edited=true` marks a human-curated row so regeneration leaves it alone.
+ */
+export const synastryInterpretationLibrary = pgTable(
+  "synastry_interpretation_library",
+  {
+    key: text("key").primaryKey(),
+    /** 'aspect' | 'overlay' */
+    kind: text("kind").notNull(),
+    /** Body key; for aspects the alphabetically-first of the pair. */
+    planetA: text("planet_a").notNull(),
+    /** Aspects only: the alphabetically-second body. */
+    planetB: text("planet_b"),
+    /** Aspects only: conjunction | sextile | square | trine | opposition. */
+    aspectKind: text("aspect_kind"),
+    /** Overlays only: 1–12 — whose-ever house the planet lands in. */
+    house: integer("house"),
+    /** Georgian interpretation shown on the compatibility view. */
+    body: text("body").notNull(),
+    /** Model id that produced it, "curated", or "manual" after an admin edit. */
+    model: text("model").notNull(),
+    edited: boolean("edited").notNull().default(false),
+    language: text("language").notNull().default("ka"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("synastry_library_kind_idx").on(t.kind)]
+);
+
+export type SynastryInterpretationLibraryRow =
+  typeof synastryInterpretationLibrary.$inferSelect;
+
+/**
  * Reusable per-house interpretation library — the house counterpart of the
  * sign/aspect libraries. Unlike a planet-in-sign or a two-planet aspect, a
  * house's full meaning depends on BOTH its cusp sign AND which (variable,

@@ -18,6 +18,21 @@ import type { AspectKind } from "./aspects";
 import { aspectDetailContent } from "./synastry-aspects-content";
 import type { SynastryAspect, SynastryCategory } from "./synastry";
 
+/**
+ * Keys into the pre-generated synastry interpretation library
+ * (synastry_interpretation_library). Defined here — not in
+ * lib/synastry-library.ts — so the client-side display component can build
+ * lookup keys without pulling the db module into the browser bundle.
+ */
+export function synastryAspectKey(a: string, b: string, kind: AspectKind): string {
+  const [x, y] = [a, b].sort();
+  return `aspect:${x}-${y}-${kind}`;
+}
+
+export function synastryOverlayKey(body: string, house: number): string {
+  return `overlay:${body}-${house}`;
+}
+
 /** Georgian display name for each chart point. */
 const BODY_LABEL: Record<string, string> = {
   sun: "მზე",

@@ -32,6 +32,8 @@ export function SynastryDisplayLazy(props: {
   result: SynastryResult;
   partnerName: string;
   shareCardProps?: CompatibilityCardProps;
+  /** Pre-generated library texts (see lib/synastry-library.ts). */
+  interpretations?: Record<string, string>;
 }) {
   return <SynastryDisplay {...props} />;
 }

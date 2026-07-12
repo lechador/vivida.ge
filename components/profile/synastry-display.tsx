@@ -16,6 +16,7 @@ import {
   type ChartElement,
   type SynastryAspect,
   type SynastryCategory,
+  type SynastryHouseOverlay,
   type SynastryResult,
 } from "@/lib/synastry";
 import {
@@ -28,6 +29,8 @@ import {
   narrateCategory,
   overallNarrative,
   splitByValence,
+  synastryAspectKey,
+  synastryOverlayKey,
 } from "@/lib/synastry-interpretation";
 import {
   Dialog,
@@ -61,11 +64,18 @@ export function SynastryDisplay({
   result,
   partnerName,
   shareCardProps,
+  interpretations = {},
 }: {
   result: SynastryResult;
   partnerName: string;
   /** When set, renders the share-card button in the hero. */
   shareCardProps?: CompatibilityCardProps;
+  /**
+   * Pre-generated Georgian texts from synastry_interpretation_library, keyed
+   * by synastryAspectKey / synastryOverlayKey. Fetched by the server page;
+   * missing keys fall back to the deterministic template texts.
+   */
+  interpretations?: Record<string, string>;
 }) {
   const verdict = overallVerdict(result.overall);
   const narrative = overallNarrative(result.overall);
@@ -108,8 +118,6 @@ export function SynastryDisplay({
           </div>
         </div>
       </div>
-
-      <ScoreBreakdown breakdown={result.breakdown} />
 
       {/* Per-category cards with narratives */}
       <section>
@@ -212,11 +220,21 @@ export function SynastryDisplay({
                 key={`${a.a}-${a.b}-${a.kind}`}
                 aspect={a}
                 index={i}
+                text={interpretations[synastryAspectKey(a.a, a.b, a.kind)]}
                 onSelect={() => setActiveAspect(a)}
               />
             ))}
           </ul>
         </section>
+      )}
+
+      {/* House overlays — where each one's planets land in the other's life */}
+      {result.breakdown.topOverlays.length > 0 && (
+        <OverlaySection
+          overlays={result.breakdown.topOverlays}
+          partnerName={partnerName}
+          interpretations={interpretations}
+        />
       )}
 
       {/* Strengths × growth */}
@@ -243,8 +261,18 @@ export function SynastryDisplay({
         </section>
       )}
 
+      {/* The meta "how the number is built" — closes the story */}
+      <ScoreBreakdown breakdown={result.breakdown} />
+
       <AspectDialog
         aspect={activeAspect}
+        text={
+          activeAspect
+            ? interpretations[
+                synastryAspectKey(activeAspect.a, activeAspect.b, activeAspect.kind)
+              ]
+            : undefined
+        }
         onClose={() => setActiveAspect(null)}
       />
     </div>
@@ -254,10 +282,13 @@ export function SynastryDisplay({
 function AspectRow({
   aspect,
   index,
+  text,
   onSelect,
 }: {
   aspect: SynastryAspect;
   index: number;
+  /** Library interpretation — shown (clamped) instead of the template line. */
+  text?: string;
   onSelect: () => void;
 }) {
   const valence = aspectValence(aspect.kind);
@@ -304,8 +335,20 @@ function AspectRow({
               {aspect.orb.toFixed(1)}°
             </span>
           </div>
-          <div className="mt-0.5 text-xs leading-relaxed text-foreground/80">
-            {describeAspect(aspect)}
+          <div
+            className={
+              text
+                ? "mt-0.5 line-clamp-2 text-xs leading-relaxed text-foreground/80"
+                : "mt-0.5 text-xs leading-relaxed text-foreground/80"
+            }
+          >
+            {text ?? describeAspect(aspect)}
+          </div>
+          <div
+            className="mt-1.5 text-[11px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
+            style={{ color: accent }}
+          >
+            სრულად ნახვა →
           </div>
         </div>
       </button>
@@ -390,11 +433,98 @@ function ValenceColumn({
   );
 }
 
+/**
+ * "Whose planet lands in whose house" — the house-overlay layer, previously a
+ * bare list inside the score breakdown, now a first-class section with the
+ * pre-generated interpretation under each overlay.
+ */
+function OverlaySection({
+  overlays,
+  partnerName,
+  interpretations,
+}: {
+  overlays: SynastryHouseOverlay[];
+  partnerName: string;
+  interpretations: Record<string, string>;
+}) {
+  return (
+    <section>
+      <header className="mb-4">
+        <h3 className="text-xl font-semibold tracking-tight">
+          სახლების გადაფარვა
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          სად ხვდება ერთის პლანეტები მეორის ცხოვრებაში — და რომელ სფეროს
+          ააქტიურებს
+        </p>
+      </header>
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {overlays.map((o, i) => {
+          const text = interpretations[synastryOverlayKey(o.body, o.house)];
+          const mine = o.source === "a";
+          const accent = mine
+            ? "oklch(0.78 0.18 305)"
+            : "oklch(0.78 0.18 200)";
+          return (
+            <motion.li
+              key={`${o.source}-${o.body}-${o.house}-${i}`}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{
+                delay: i * 0.05,
+                duration: 0.4,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="relative overflow-hidden rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-md"
+            >
+              <div
+                aria-hidden
+                className="absolute -right-8 -top-8 size-20 rounded-full opacity-20 blur-2xl"
+                style={{
+                  background: `radial-gradient(circle, ${accent} 0%, transparent 70%)`,
+                }}
+              />
+              <div className="relative">
+                <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm font-medium">
+                  <span
+                    className="rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                    style={{
+                      background: `color-mix(in oklch, ${accent} 16%, transparent)`,
+                      color: accent,
+                    }}
+                  >
+                    {mine ? "შენი" : `${partnerName}-ის`}
+                  </span>
+                  <span>{bodyLabel(o.body)}</span>
+                  <span className="text-muted-foreground">→</span>
+                  <span className="text-foreground/90">
+                    {mine ? `${partnerName}-ის` : "შენი"}{" "}
+                    {HOUSE_LABEL_KA[o.house] ?? `${o.house}-ე სახლი`}
+                  </span>
+                </div>
+                {text && (
+                  <p className="mt-2 text-xs leading-relaxed text-foreground/80">
+                    {text}
+                  </p>
+                )}
+              </div>
+            </motion.li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 function AspectDialog({
   aspect,
+  text,
   onClose,
 }: {
   aspect: SynastryAspect | null;
+  /** Library interpretation — the dialog's lead text when present. */
+  text?: string;
   onClose: () => void;
 }) {
   if (!aspect) {
@@ -447,6 +577,37 @@ function AspectDialog({
         </DialogHeader>
 
         <div className="space-y-5">
+          {/* Pre-generated library interpretation — the lead when present */}
+          {text && (
+            <div
+              className="rounded-xl border p-4"
+              style={{
+                background: `color-mix(in oklch, ${accent} 7%, transparent)`,
+                borderColor: `color-mix(in oklch, ${accent} 30%, transparent)`,
+              }}
+            >
+              <div
+                className="text-[10px] font-semibold uppercase tracking-[0.18em]"
+                style={{ color: accent }}
+              >
+                რას ნიშნავს ეს წყვილისთვის
+              </div>
+              <div className="mt-1.5 space-y-2.5">
+                {text
+                  .split(/\n{2,}|\n/)
+                  .filter((p) => p.trim())
+                  .map((p, i) => (
+                    <p
+                      key={i}
+                      className="text-sm leading-relaxed text-foreground/90"
+                    >
+                      {p.trim()}
+                    </p>
+                  ))}
+              </div>
+            </div>
+          )}
+
           <BreakdownBlock
             label="ასპექტის არსი"
             body={breakdown.aspectMeaning}
@@ -672,36 +833,6 @@ function ScoreBreakdown({
         })}
       </ul>
 
-      {breakdown.topOverlays.length > 0 && (
-        <>
-          <div
-            aria-hidden
-            className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent"
-          />
-          <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              მთავარი სახლების გადაფარვა
-            </h4>
-            <ul className="grid gap-1.5 sm:grid-cols-2">
-              {breakdown.topOverlays.map((o, i) => (
-                <li
-                  key={`${o.source}-${o.body}-${o.house}-${i}`}
-                  className="rounded-lg border border-border/60 bg-card/40 px-3 py-2 text-xs"
-                >
-                  <span className="font-medium">
-                    {o.source === "a" ? "შენი" : "მის"} {bodyLabel(o.body)}
-                  </span>
-                  <span className="text-muted-foreground"> — </span>
-                  <span>
-                    {o.source === "a" ? "მის" : "შენს"}{" "}
-                    {HOUSE_LABEL_KA[o.house] ?? `${o.house}-ე სახლში`}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </>
-      )}
     </section>
   );
 }

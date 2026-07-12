@@ -10,6 +10,7 @@ import {
   getPartnerForViewer,
 } from "@/lib/partners-core";
 import { computeSynastry } from "@/lib/synastry";
+import { getSynastryInterpretationsFor } from "@/lib/synastry-library";
 import { canUseFeature } from "@/lib/features";
 import { SYNASTRY_DEEP_PROMPT_VERSION } from "@/lib/openrouter";
 import { Starfield } from "@/components/landing/starfield";
@@ -46,6 +47,7 @@ export default async function SynastryDetailPage({
   // Cheap deterministic compute on every visit — keeps the result fresh
   // without a cache while we tune scoring.
   const synastry = computeSynastry(viewerChart.data, partner.chart);
+  const synastryTexts = await getSynastryInterpretationsFor(synastry);
 
   // Ensure AI interpretation exists (lazy generation — first visit pays
   // the Gemini call, subsequent visits read the cached row).
@@ -144,7 +146,11 @@ export default async function SynastryDetailPage({
           </article>
         )}
 
-        <SynastryDisplayLazy result={synastry} partnerName={partner.name} />
+        <SynastryDisplayLazy
+          result={synastry}
+          partnerName={partner.name}
+          interpretations={synastryTexts}
+        />
 
         <SynastryDeepReport
           partnerId={partner.id}
