@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyHoroscopes, profiles, users } from "@/db/schema";
 import { localDateString } from "@/lib/transits";
-import { CREDIT_COST, spendCredits } from "@/lib/credits";
+import { CREDIT_COST, grantCredits, spendCredits } from "@/lib/credits";
 import {
   DEFAULT_VOICE_SLUG,
   generateSpeech,
@@ -107,7 +107,9 @@ export async function POST(req: Request) {
     return Response.json({ error: "no_horoscope" }, { status: 404 });
   }
 
-  const key = `horoscope-audio/${userId}/${today}/${voice.slug}.mp3`;
+  // `v2` = summary-only narration. Bumping this suffix invalidates audio
+  // cached under an older text recipe (v1 read the full transit-laden body).
+  const key = `horoscope-audio/${userId}/${today}/${voice.slug}.v2.mp3`;
 
   // Cached? Serve a fresh signed URL.
   if (await objectExists(key)) {
@@ -117,7 +119,10 @@ export async function POST(req: Request) {
 
   // Generate, store, serve.
   try {
-    const text = `${horoscope.headline}\n\n${horoscope.body}`;
+    // Read only the horoscope reading itself — headline + the concise summary.
+    // The full `body` concatenates every transit paragraph, which makes the
+    // audio far too long; the transit breakdown stays on-screen, not spoken.
+    const text = `${horoscope.headline}\n\n${horoscope.summary}`;
     const mp3 = await generateSpeech(text, voice.voiceId);
     await putObject({ key, body: mp3, contentType: "audio/mpeg" });
     const url = await presignedDownloadUrl({ key, expiresIn: 60 * 60 });
@@ -125,6 +130,15 @@ export async function POST(req: Request) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[horoscope/audio] generation failed:", msg);
+    // Nothing was delivered — refund the credits we charged up front so a
+    // failed synthesis never costs the user.
+    await grantCredits(userId, CREDIT_COST.audioHoroscope, "spend_audio").catch(
+      (e) =>
+        console.error(
+          "[horoscope/audio] refund failed:",
+          e instanceof Error ? e.message : String(e)
+        )
+    );
     return Response.json({ error: "generation_failed" }, { status: 502 });
   }
 }
