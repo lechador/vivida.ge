@@ -21,6 +21,7 @@ import {
   signMetaBySlug,
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
+import { genitiveKa } from "@/lib/georgian";
 import { yearlyPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import {
@@ -97,11 +98,22 @@ export async function generateMetadata({
     const url = `${SITE_URL}/zodiac/${sign}/${slug}`;
     const anchor = anchorForView(view);
     const periodLabel = signHoroscopePeriodLabel(anchor, periodForView(view));
-    const title = `${sc.labelKa} — ${VIEW_TITLE_KA[view]}`;
-    const description = `${sc.labelKa}-ის ${VIEW_TITLE_KA[view]} (${periodLabel}). ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები.`;
+    // Lead with "<sign> ჰოროსკოპი" — the exact shape of the query ("ვერძი
+    // ჰოროსკოპი", "verdzi horoskopi") — then the view + live period label.
+    const title = `${sc.labelKa} ჰოროსკოპი — ${VIEW_TITLE_KA[view]} (${periodLabel})`;
+    const description = `${sc.labelKa}-ის ${VIEW_TITLE_KA[view]} (${periodLabel}). ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები — რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.`;
     return {
       title: { absolute: title },
       description,
+      keywords: [
+        `${sc.labelKa} ჰოროსკოპი`,
+        `${genitiveKa(sc.labelKa)} ჰოროსკოპი`,
+        `${sc.labelKa} ${VIEW_TITLE_KA[view]}`,
+        "ჰოროსკოპი",
+        "დღის ჰოროსკოპი",
+        "ზოდიაქოს ნიშნები",
+        "horoskopi",
+      ],
       alternates: { canonical: url },
       openGraph: {
         type: "article",

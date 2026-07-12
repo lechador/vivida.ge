@@ -7,11 +7,15 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { ensureSignHoroscope } from "@/actions/sign-horoscope";
-import { articleLd, breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
+import { MundaneSkySection } from "@/components/seo/mundane-sky-section";
+import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   VIEW_PATH,
   signHoroscopePeriodLabel,
 } from "@/lib/sign-horoscope";
+import { PopularSearches } from "@/components/seo/popular-searches";
+import { genitiveKa } from "@/lib/georgian";
+import { HOROSKOPI_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import {
   ALL_SLUGS,
@@ -30,13 +34,31 @@ const SITE_URL = "https://www.vivida.ge";
  */
 export const revalidate = 3600;
 
-const TITLE = "ჰოროსკოპი — დღევანდელი ჰოროსკოპი ყველა ნიშნისთვის";
+const TITLE = "ჰოროსკოპი — დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის";
 const DESCRIPTION =
-  "დღევანდელი ჰოროსკოპი ვერძი, კურო, ტყუპები, კირჩხიბი, ლომი, ქალწული, სასწორი, მორიელი, მშვილდოსანი, თხის რქა, მერწყული, თევზები — კონკრეტული რჩევა და ცის ფონი ქართულად, Vivida-ზე.";
+  "დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის — ვერძი, კურო, ტყუპები, კირჩხიბი, ლომი, ქალწული, სასწორი, მორიელი, მშვილდოსანი, თხის რქა, მერწყული, თევზები. დღევანდელი, ხვალინდელი, კვირისა და თვის ჰოროსკოპი რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
+  keywords: [
+    "ჰოროსკოპი",
+    "დღის ჰოროსკოპი",
+    "ჰოროსკოპი დღის",
+    "დღევანდელი ჰოროსკოპი",
+    "ხვალინდელი ჰოროსკოპი",
+    "კვირის ჰოროსკოპი",
+    "თვის ჰოროსკოპი",
+    "ჰოროსკოპი თვის",
+    "ზოდიაქოს ნიშნები",
+    "ზოდიაქოს ნიშანი ჰოროსკოპი",
+    "ჰოროსკოპი ქართულად",
+    "horoskopi",
+    "dgis horoskopi",
+    "dghis horoskopi",
+    "horoskopi qartulad",
+    "zodiaqos nishnebi",
+  ],
   alternates: { canonical: `${SITE_URL}/horoskopi` },
   openGraph: {
     type: "website",
@@ -52,6 +74,25 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
 };
+
+const FAQ = [
+  {
+    q: "როგორ დგება დღის ჰოროსკოპი?",
+    a: "Vivida-ს დღის ჰოროსკოპი რეალურ ასტრონომიულ ტრანზიტებზე დგება — ვანგარიშობთ პლანეტების ზუსტ მდებარეობას (მთვარე, მზე, მერკური, ვენერა, მარსი და სხვები) და დღის მთავარ ასპექტებს, შემდეგ კი თითოეული ზოდიაქოს ნიშნისთვის ვწერთ კონკრეტულ, პრაქტიკულ რჩევას ქართულად.",
+  },
+  {
+    q: "სად ვნახო ხვალინდელი ჰოროსკოპი?",
+    a: "თითოეული ნიშნის გვერდზე დღევანდელთან ერთად ხვალინდელი ჰოროსკოპიც გელოდება — აირჩიე შენი ნიშანი ქვემოთ და გადაერთე „ხვალ“-ზე.",
+  },
+  {
+    q: "რით განსხვავდება კვირის და თვის ჰოროსკოპი დღიურისგან?",
+    a: "დღის ჰოროსკოპი სწრაფ ფონს ჰყვება (განსაკუთრებით მთვარის მოძრაობას), კვირის ჰოროსკოპი უფრო დიდ ტალღებს, თვის ჰოროსკოპი კი თვის მთავარ ციკლებს — ახალმთვარეობას, სავსემთვარეობას და ნელი პლანეტების გადასვლებს.",
+  },
+  {
+    q: "ჰოროსკოპი უფასოა?",
+    a: "დიახ — დღის, კვირისა და თვის ჰოროსკოპი ყველა ნიშნისთვის სრულიად უფასოა. პერსონალური, შენს დაბადების მონაცემებზე მორგებული ჰოროსკოპისთვის კი შექმენი უფასო ნატალური რუკა Vivida-ზე.",
+  },
+];
 
 export default async function HoroskopiHubPage() {
   const now = new Date();
@@ -80,6 +121,7 @@ export default async function HoroskopiHubPage() {
       { name: "მთავარი", url: SITE_URL },
       { name: "ჰოროსკოპი", url: `${SITE_URL}/horoskopi` },
     ]),
+    faqLd(FAQ),
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
@@ -211,6 +253,69 @@ export default async function HoroskopiHubPage() {
           })}
         </div>
 
+        {/* Today's real sky — the transits this horoscope is built on. */}
+        <MundaneSkySection date={now} />
+
+        {/* Per-sign quick links — daily + tomorrow, keyword-rich anchors. */}
+        <section className="mt-12">
+          <h2 className="text-xl font-semibold tracking-tight">
+            ჰოროსკოპი ზოდიაქოს ნიშნების მიხედვით
+          </h2>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            აირჩიე შენი ნიშანი — დღევანდელი და ხვალინდელი ჰოროსკოპი ცალ-ცალკე
+            გვერდებზე.
+          </p>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {ALL_SLUGS.map((slug) => {
+              const sc = SIGNS_CONTENT[slug];
+              return (
+                <div
+                  key={slug}
+                  className="flex items-center justify-between gap-2 rounded-xl border border-border/60 bg-card/40 px-3.5 py-2.5 text-sm"
+                >
+                  <Link
+                    href={`/zodiac/${slug}/${VIEW_PATH.today}`}
+                    className="min-w-0 truncate font-medium text-foreground/90 hover:text-foreground hover:underline"
+                  >
+                    {genitiveKa(sc.labelKa)} ჰოროსკოპი
+                  </Link>
+                  <Link
+                    href={`/zodiac/${slug}/${VIEW_PATH.tomorrow}`}
+                    className="shrink-0 text-xs text-[var(--vivida-cyan)] hover:underline"
+                  >
+                    ხვალ →
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="mt-12">
+          <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            ხშირად დასმული კითხვები
+          </h2>
+          <div className="space-y-3">
+            {FAQ.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium [&::-webkit-details-marker]:hidden">
+                  {item.q}
+                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+
         {/* CTA */}
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
@@ -225,6 +330,8 @@ export default async function HoroskopiHubPage() {
             <Link href="/signup">ჩემი სრული რუკა</Link>
           </Button>
         </div>
+
+        <PopularSearches queries={HOROSKOPI_HUB_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

@@ -6,7 +6,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { ensureSignHoroscope } from "@/actions/sign-horoscope";
-import { articleLd, breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
+import { PopularSearches } from "@/components/seo/popular-searches";
+import { genitiveKa } from "@/lib/georgian";
+import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { PERIOD_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { VIEW_PATH, signHoroscopePeriodLabel } from "@/lib/sign-horoscope";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { ALL_SLUGS, ZODIAC_DATES, signMetaBySlug } from "@/lib/seo/zodiac-dates";
@@ -25,8 +28,11 @@ const CFG: Record<
     h1Lead: string;
     title: string;
     description: string;
+    keywords: string[];
     intro: string;
     cardCta: string;
+    signLinkSuffix: string; // keyword-rich per-sign anchor suffix
+    faq: { q: string; a: string }[];
   }
 > = {
   week: {
@@ -34,24 +40,76 @@ const CFG: Record<
     viewPath: VIEW_PATH.week,
     crumb: "კვირის ჰოროსკოპი",
     h1Lead: "ამ კვირის",
-    title: "კვირის ჰოროსკოპი — ამ კვირის ჰოროსკოპი ყველა ნიშნისთვის",
+    title: "კვირის ჰოროსკოპი — ჰოროსკოპი ამ კვირისთვის, ყველა ზოდიაქოს ნიშანი",
     description:
-      "ამ კვირის ჰოროსკოპი ვერძი, კურო, ტყუპები, კირჩხიბი, ლომი, ქალწული, სასწორი, მორიელი, მშვილდოსანი, თხის რქა, მერწყული, თევზები — ცის ფონი და კონკრეტული რჩევა კვირისთვის, ქართულად.",
+      "კვირის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის — ვერძი, კურო, ტყუპები, კირჩხიბი, ლომი, ქალწული, სასწორი, მორიელი, მშვილდოსანი, თხის რქა, მერწყული, თევზები. ცის ფონი და კონკრეტული რჩევა კვირისთვის, რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.",
+    keywords: [
+      "კვირის ჰოროსკოპი",
+      "ჰოროსკოპი კვირის",
+      "ამ კვირის ჰოროსკოპი",
+      "ყოველკვირეული ჰოროსკოპი",
+      "ჰოროსკოპი",
+      "ზოდიაქოს ნიშნები",
+      "ჰოროსკოპი ქართულად",
+      "kviris horoskopi",
+      "horoskopi",
+    ],
     intro:
       "ცის ფონი ამ კვირისთვის ყველა 12 ნიშნისთვის — რა იხსნება და რას ღირს ყურადღება. დააჭირე ნიშანს სრული კვირის ჰოროსკოპის სანახავად.",
     cardCta: "სრული კვირის ჰოროსკოპი →",
+    signLinkSuffix: "კვირის ჰოროსკოპი",
+    faq: [
+      {
+        q: "როგორ დგება კვირის ჰოროსკოპი?",
+        a: "კვირის ჰოროსკოპი რეალურ ტრანზიტებზე დგება — პლანეტების მოძრაობაზე მომდევნო შვიდი დღის განმავლობაში. ვაფასებთ, რომელი ასპექტები იქნება ყველაზე მჭიდრო, და თითოეული ზოდიაქოს ნიშნისთვის ვწერთ კონკრეტულ რჩევას ქართულად.",
+      },
+      {
+        q: "როდის ახლდება კვირის ჰოროსკოპი?",
+        a: "ყოველ ორშაბათს — კვირის დასაწყისში ყველა 12 ნიშნის ჰოროსკოპი თავიდან იწერება ახალი კვირის ცის ფონზე.",
+      },
+      {
+        q: "სად ვნახო დღის და თვის ჰოროსკოპი?",
+        a: "დღის ჰოროსკოპი /horoskopi გვერდზეა, თვის ჰოროსკოპი კი /horoskopi/tviuri-ზე — ორივე უფასოა ყველა ნიშნისთვის.",
+      },
+    ],
   },
   month: {
     path: "tviuri",
     viewPath: VIEW_PATH.month,
     crumb: "თვის ჰოროსკოპი",
     h1Lead: "ამ თვის",
-    title: "თვის ჰოროსკოპი — ამ თვის ჰოროსკოპი ყველა ნიშნისთვის",
+    title: "თვის ჰოროსკოპი — ჰოროსკოპი ამ თვისთვის, ყველა ზოდიაქოს ნიშანი",
     description:
-      "ამ თვის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის — თვის მთავარი ციკლი, ფოკუსი და რჩევა ვერძიდან თევზებამდე, ქართულად, Vivida-ზე.",
+      "თვის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის — თვის მთავარი ციკლი, ახალმთვარეობა და სავსემთვარეობა, ფოკუსი და რჩევა ვერძიდან თევზებამდე, რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.",
+    keywords: [
+      "თვის ჰოროსკოპი",
+      "ჰოროსკოპი თვის",
+      "ამ თვის ჰოროსკოპი",
+      "ყოველთვიური ჰოროსკოპი",
+      "ჰოროსკოპი",
+      "ზოდიაქოს ნიშნები",
+      "ჰოროსკოპი ქართულად",
+      "tvis horoskopi",
+      "horoskopi",
+    ],
     intro:
       "თვის მთავარი ენერგია ყველა 12 ნიშნისთვის — რომელ სფეროზე ღირს ფოკუსი. დააჭირე ნიშანს სრული თვის ჰოროსკოპის სანახავად.",
     cardCta: "სრული თვის ჰოროსკოპი →",
+    signLinkSuffix: "თვის ჰოროსკოპი",
+    faq: [
+      {
+        q: "როგორ დგება თვის ჰოროსკოპი?",
+        a: "თვის ჰოროსკოპი თვის მთავარ ასტროლოგიურ ციკლებს ეყრდნობა — ახალმთვარეობას, სავსემთვარეობას, პლანეტების ნიშნებში გადასვლებს და თვის ყველაზე მჭიდრო ასპექტებს. ამ ფონზე თითოეული ზოდიაქოს ნიშნისთვის ვწერთ თვის ფოკუსსა და რჩევას.",
+      },
+      {
+        q: "როდის ახლდება თვის ჰოროსკოპი?",
+        a: "ყოველი თვის პირველ დღეს — ყველა 12 ნიშნის ჰოროსკოპი თავიდან იწერება ახალი თვის ცის ფონზე.",
+      },
+      {
+        q: "სად ვნახო დღის და კვირის ჰოროსკოპი?",
+        a: "დღის ჰოროსკოპი /horoskopi გვერდზეა, კვირის ჰოროსკოპი კი /horoskopi/kvireuli-ზე — ორივე უფასოა ყველა ნიშნისთვის.",
+      },
+    ],
   },
 };
 
@@ -67,6 +125,7 @@ export function periodHubMetadata(period: Period) {
   return {
     title: { absolute: cfg.title },
     description: cfg.description,
+    keywords: cfg.keywords,
     alternates: { canonical: url },
     openGraph: {
       type: "website" as const,
@@ -110,6 +169,7 @@ export async function PeriodHoroscopeHub({ period }: { period: Period }) {
       { name: "ჰოროსკოპი", url: `${SITE_URL}/horoskopi` },
       { name: cfg.crumb, url },
     ]),
+    faqLd(cfg.faq),
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
@@ -245,6 +305,49 @@ export async function PeriodHoroscopeHub({ period }: { period: Period }) {
           })}
         </div>
 
+        {/* Per-sign quick links — keyword-rich anchors. */}
+        <section className="mt-12">
+          <h2 className="text-xl font-semibold tracking-tight">
+            {cfg.crumb} ზოდიაქოს ნიშნების მიხედვით
+          </h2>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {ALL_SLUGS.map((slug) => (
+              <Link
+                key={slug}
+                href={`/zodiac/${slug}/${cfg.viewPath}`}
+                className="rounded-xl border border-border/60 bg-card/40 px-3.5 py-2.5 text-sm font-medium text-foreground/90 transition-colors hover:bg-card/70 hover:text-foreground"
+              >
+                {genitiveKa(SIGNS_CONTENT[slug].labelKa)} {cfg.signLinkSuffix}
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="mt-12">
+          <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            ხშირად დასმული კითხვები
+          </h2>
+          <div className="space-y-3">
+            {cfg.faq.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium [&::-webkit-details-marker]:hidden">
+                  {item.q}
+                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+
         {/* CTA → calculator */}
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
@@ -259,6 +362,8 @@ export async function PeriodHoroscopeHub({ period }: { period: Period }) {
             <Link href="/nataluri-ruka">ჩემი ნატალური რუკა</Link>
           </Button>
         </div>
+
+        <PopularSearches queries={PERIOD_HUB_LATIN_QUERIES[period]} />
       </section>
 
       <SiteFooter />

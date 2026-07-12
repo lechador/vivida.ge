@@ -84,6 +84,55 @@ export function signPageLatinQueries(sign: ZodiacSlug): string[] {
   ].filter((s): s is string => Boolean(s));
 }
 
+/** Daily horoscope hub (`/horoskopi`). */
+export const HOROSKOPI_HUB_LATIN_QUERIES = [
+  "horoskopi",
+  "dgis horoskopi",
+  "dghis horoskopi",
+  "dgevandeli horoskopi",
+  "xvalindeli horoskopi",
+  "horoskopi qartulad",
+  "zodiaqos nishnebi horoskopi",
+  "astrologiuri prognozi",
+  "kviris horoskopi",
+  "tvis horoskopi",
+];
+
+/** Weekly / monthly horoscope hubs (`/horoskopi/kvireuli|tviuri`). */
+export const PERIOD_HUB_LATIN_QUERIES: Record<"week" | "month", string[]> = {
+  week: [
+    "kviris horoskopi",
+    "kvireuli horoskopi",
+    "am kviris horoskopi",
+    "horoskopi",
+    "horoskopi qartulad",
+    "zodiaqos nishnebi",
+  ],
+  month: [
+    "tvis horoskopi",
+    "tviuri horoskopi",
+    "am tvis horoskopi",
+    "yoveltviuri horoskopi",
+    "horoskopi",
+    "horoskopi qartulad",
+    "zodiaqos nishnebi",
+  ],
+};
+
+/** Per-sign horoscope views (`/zodiac/[sign]/dgis-horoskopi` etc.). */
+export function signHoroscopeLatinQueries(sign: ZodiacSlug): string[] {
+  const [primary, secondary] = SIGN_LATIN_NAMES[sign];
+  return [
+    `${primary}is horoskopi`,
+    `${primary} horoskopi`,
+    `${primary}is dghis horoskopi`,
+    secondary ? `${secondary} horoskopi` : null,
+    "dgis horoskopi",
+    "horoskopi",
+    "horoskopi qartulad",
+  ].filter((s): s is string => Boolean(s));
+}
+
 /** By-date page (`/zodiac/datit`). */
 export const BY_DATE_LATIN_QUERIES = [
   "zodiaqos nishani datit",
