@@ -5,6 +5,7 @@ import { Headphones, Loader2, Pause, Play, Volume2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
+import { CREDIT_COST } from "@/lib/credits-config";
 import { HOROSCOPE_VOICES } from "@/lib/horoscope-voices";
 import { useAudioPlayer } from "@/components/audio/audio-provider";
 import { EqBars } from "@/components/audio/eq-bars";
@@ -208,6 +209,9 @@ export function HoroscopeAudioPlayer({
         >
           <Headphones className="size-5" />
           მოისმინე ჰოროსკოპი
+          <span className="ml-1.5 inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold tabular-nums">
+            −{CREDIT_COST.audioHoroscope} კრედიტი
+          </span>
         </Button>
       </div>
       {status === "error" && error && (
