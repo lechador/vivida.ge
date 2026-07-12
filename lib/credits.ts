@@ -169,6 +169,86 @@ export async function grantPurchaseCredits(
   await grantCredits(userId, amount, "purchase", sessionId);
 }
 
+/** Has the user already paid to unlock this specific thing (ledger ref match)? */
+export async function isUnlocked(
+  userId: string,
+  ref: string,
+  reason: CreditReason
+): Promise<boolean> {
+  const [row] = await db
+    .select({ id: creditTransactions.id })
+    .from(creditTransactions)
+    .where(
+      and(
+        eq(creditTransactions.userId, userId),
+        eq(creditTransactions.ref, ref),
+        eq(creditTransactions.reason, reason)
+      )
+    )
+    .limit(1);
+  return !!row;
+}
+
+export type UnlockResult = "already" | "unlocked" | "insufficient";
+
+/**
+ * Pay once to unlock `ref` (a test result, etc.). Idempotent: re-opening an
+ * already-unlocked item is free. Returns 'already' if previously unlocked,
+ * 'unlocked' on a fresh successful charge, 'insufficient' if the balance is
+ * too low.
+ */
+export async function spendOnce(
+  userId: string,
+  cost: number,
+  reason: CreditReason,
+  ref: string
+): Promise<UnlockResult> {
+  if (await isUnlocked(userId, ref, reason)) return "already";
+  const ok = await spendCredits(userId, cost, reason, ref);
+  return ok ? "unlocked" : "insufficient";
+}
+
+/**
+ * Grant an activity reward, capped to `cap` per calendar day (feed posts).
+ * Returns true if credited, false if the daily cap was already reached.
+ */
+export async function earnDailyCapped(
+  userId: string,
+  amount: number,
+  reason: CreditReason,
+  cap: number
+): Promise<boolean> {
+  const [row] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(creditTransactions)
+    .where(
+      and(
+        eq(creditTransactions.userId, userId),
+        eq(creditTransactions.reason, reason),
+        sql`${creditTransactions.createdAt} >= date_trunc('day', now())`
+      )
+    );
+  if ((row?.n ?? 0) >= cap) return false;
+  await grantCredits(userId, amount, reason);
+  return true;
+}
+
+/** Grant a one-time reward (profile photo). No-op if already granted. */
+export async function earnOnce(
+  userId: string,
+  amount: number,
+  reason: CreditReason
+): Promise<boolean> {
+  const [row] = await db
+    .select({ id: creditTransactions.id })
+    .from(creditTransactions)
+    .where(and(eq(creditTransactions.userId, userId), eq(creditTransactions.reason, reason)))
+    .limit(1);
+  if (row) return false;
+  await grantCredits(userId, amount, reason);
+  return true;
+}
+
 /** Recent ledger rows for the account/history UI. */
 export async function getCreditHistory(userId: string, limit = 30) {
   return db

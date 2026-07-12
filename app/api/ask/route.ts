@@ -1,8 +1,13 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { charts, chartChatMessages } from "@/db/schema";
+import {
+  CREDIT_COST,
+  FREE_ALLOWANCE,
+  spendCredits,
+} from "@/lib/credits";
 import { computeChartSalience } from "@/lib/report-salience";
 import { buildChartChatSystem } from "@/lib/chart-chat";
 import {
@@ -11,8 +16,6 @@ import {
   type ChatMessage,
 } from "@/lib/openrouter";
 import { enforceRateLimit } from "@/lib/rate-limit";
-import { getCurrentPlan } from "@/lib/plan";
-import { canUseFeature } from "@/lib/features";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,8 +34,27 @@ export async function POST(req: Request) {
   const userId = session?.user?.id;
   if (!userId) return Response.json({ error: "unauthorized" }, { status: 401 });
 
-  if (!canUseFeature("chartChat", await getCurrentPlan(userId))) {
-    return Response.json({ error: "pro_required" }, { status: 403 });
+  // Credit gate: FREE_ALLOWANCE.chatPerDay free messages/day, then spend
+  // CREDIT_COST.chat per message. 402 tells the client to open the credit
+  // unlock screen (invite or buy).
+  const [used] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(chartChatMessages)
+    .where(
+      and(
+        eq(chartChatMessages.userId, userId),
+        eq(chartChatMessages.role, "user"),
+        sql`${chartChatMessages.createdAt} >= date_trunc('day', now())`
+      )
+    );
+  if ((used?.n ?? 0) >= FREE_ALLOWANCE.chatPerDay) {
+    const paid = await spendCredits(userId, CREDIT_COST.chat, "spend_chat");
+    if (!paid) {
+      return Response.json(
+        { error: "needs_credits", cost: CREDIT_COST.chat },
+        { status: 402 }
+      );
+    }
   }
 
   if (!isOpenRouterConfigured()) {

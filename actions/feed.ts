@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { posts, type PostReactionKind } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
+import { CREDIT_REWARD, REWARD_CAP, earnDailyCapped } from "@/lib/credits";
 import {
   listFeedPage,
   listRecentPostsByUserPage,
@@ -83,7 +84,20 @@ export async function listComments(
 export async function createPost(rawBody: string): Promise<FeedActionResult> {
   const user = await requireUser();
   const result = await createPostCore(user.id, rawBody);
-  if (result.ok) revalidatePath("/feed");
+  if (result.ok) {
+    revalidatePath("/feed");
+    // Reward the first post of the day (capped, so posting can't be farmed).
+    try {
+      await earnDailyCapped(
+        user.id,
+        CREDIT_REWARD.feedPost,
+        "earn_feed_post",
+        REWARD_CAP.feedPostPerDay
+      );
+    } catch {
+      /* reward is best-effort */
+    }
+  }
   return result.ok ? { ok: true } : result;
 }
 
