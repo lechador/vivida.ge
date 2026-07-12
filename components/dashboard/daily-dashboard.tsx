@@ -22,7 +22,9 @@ import { HoroscopeLoading } from "./horoscope-loading";
 import { MiniBigThree } from "./mini-big-three";
 import { MoonPhaseCard } from "./moon-phase-card";
 import { SuggestedPeopleRail } from "./suggested-people-rail";
+import { CREDIT_COST } from "@/lib/credits-config";
 import { WeeklyForecastCard } from "./weekly-forecast-card";
+import { WeeklyForecastLocked } from "./weekly-forecast-locked";
 
 /**
  * Dashboard content loaded after first paint via server actions. The page
@@ -80,7 +82,8 @@ export function DailyDashboard({
     );
   }
 
-  const { chart, timezone, canDaily, canWeekly, suggestions } = core;
+  const { chart, timezone, canDaily, weeklyUnlocked, balance, suggestions } =
+    core;
 
   return (
     <div className="space-y-8">
@@ -101,7 +104,8 @@ export function DailyDashboard({
         timezone={timezone}
         canDaily={canDaily}
         canAudio={canUseFeature("audioHoroscope", plan)}
-        canWeekly={canWeekly}
+        weeklyUnlocked={weeklyUnlocked}
+        balance={balance}
         savedVoice={savedVoice}
       />
 
@@ -153,7 +157,8 @@ function DashboardExtrasSection({
   plan,
   timezone,
   canDaily,
-  canWeekly,
+  weeklyUnlocked,
+  balance,
   savedVoice,
   canAudio,
 }: {
@@ -161,7 +166,8 @@ function DashboardExtrasSection({
   plan: PlanId;
   timezone: string;
   canDaily: boolean;
-  canWeekly: boolean;
+  weeklyUnlocked: boolean;
+  balance: number;
   canAudio: boolean;
   savedVoice?: string | null;
 }) {
@@ -224,7 +230,12 @@ function DashboardExtrasSection({
         </div>
       )}
 
-      {loading && canWeekly ? (
+      {!weeklyUnlocked ? (
+        <WeeklyForecastLocked
+          cost={CREDIT_COST.weeklyForecast}
+          balance={balance}
+        />
+      ) : loading ? (
         <CardSkeleton className="min-h-[160px]" />
       ) : (
         extras?.weeklyForecast &&

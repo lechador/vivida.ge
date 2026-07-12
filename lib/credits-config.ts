@@ -43,6 +43,7 @@ export const CREDIT_COST = {
   iqTest: 5,
   audioHoroscope: 2,
   pdfReport: 5,
+  weeklyForecast: 10,
 } as const;
 
 /** Free before credits are needed. */
@@ -65,5 +66,6 @@ export type CreditReason =
   | "spend_iq"
   | "spend_audio"
   | "spend_report"
+  | "spend_weekly"
   | "grandfather"
   | "admin_grant";

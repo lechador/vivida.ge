@@ -9,6 +9,7 @@ import { ensureDailyFor } from "@/actions/daily";
 import { ensureMoonPhase, type MoonPhaseRow } from "@/actions/moon-phase";
 import { ensureWeeklyForecast } from "@/actions/weekly-forecast";
 import { canUseFeature } from "@/lib/features";
+import { getBalance, isUnlocked } from "@/lib/credits";
 import { getDashboardSuggestions } from "@/lib/suggestions";
 import {
   overlayTransitAspects,
@@ -45,7 +46,10 @@ export type DashboardCore =
       chart: Chart;
       timezone: string;
       canDaily: boolean;
-      canWeekly: boolean;
+      /** The 7-day forecast is a one-time credit unlock (not a plan feature). */
+      weeklyUnlocked: boolean;
+      /** Credit balance — used by the locked-forecast unlock CTA. */
+      balance: number;
       suggestions: DiscoverCard[];
     };
 
@@ -60,7 +64,7 @@ export async function loadDashboardCore(
 
   // Skip the "suggested people" query entirely when the rail is flagged off
   // — no point ranking strangers we won't show. Render is also guarded.
-  const [profileRow, suggestions] = await Promise.all([
+  const [profileRow, suggestions, weeklyUnlocked, balance] = await Promise.all([
     db
       .select({ timezone: profiles.timezone })
       .from(profiles)
@@ -69,6 +73,8 @@ export async function loadDashboardCore(
     SOCIAL_FEATURES.suggestedPeopleRail
       ? getDashboardSuggestions(userId, 20).catch(() => [] as DiscoverCard[])
       : Promise.resolve([] as DiscoverCard[]),
+    isUnlocked(userId, "weekly", "spend_weekly"),
+    getBalance(userId),
   ]);
 
   return {
@@ -76,7 +82,8 @@ export async function loadDashboardCore(
     chart,
     timezone: profileRow[0]?.timezone ?? "UTC",
     canDaily: canUseFeature("dailyHoroscope", plan),
-    canWeekly: canUseFeature("weeklyForecast", plan),
+    weeklyUnlocked,
+    balance,
     suggestions,
   };
 }
@@ -100,7 +107,7 @@ export async function loadDashboardExtras(
   plan: PlanId
 ): Promise<DashboardExtras> {
   const canDaily = canUseFeature("dailyHoroscope", plan);
-  const canWeekly = canUseFeature("weeklyForecast", plan);
+  const canWeekly = await isUnlocked(userId, "weekly", "spend_weekly");
 
   const [daily, moonPhase, weeklyForecast] = await Promise.all([
     canDaily

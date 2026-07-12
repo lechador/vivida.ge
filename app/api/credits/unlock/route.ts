@@ -8,25 +8,28 @@ import { CREDIT_COST, spendOnce, type CreditReason } from "@/lib/credits";
 
 export const dynamic = "force-dynamic";
 
-const KINDS = ["iq", "mbti", "synastry"] as const;
+const KINDS = ["iq", "mbti", "synastry", "weekly"] as const;
 type Kind = (typeof KINDS)[number];
 
 const REASON: Record<Kind, CreditReason> = {
   iq: "spend_iq",
   mbti: "spend_mbti",
   synastry: "spend_synastry",
+  weekly: "spend_weekly",
 };
 const COST: Record<Kind, number> = {
   iq: CREDIT_COST.iqTest,
   mbti: CREDIT_COST.mbtiTest,
   synastry: CREDIT_COST.synastry,
+  weekly: CREDIT_COST.weeklyForecast,
 };
 
 /**
- * POST /api/credits/unlock { kind: "iq" | "mbti" | "synastry", resultId } — pay
- * once to unlock a deep result (test result or a partner's synastry). Verifies
- * the row belongs to the caller, then spends credits idempotently (re-unlocking
- * is free). 402 when short.
+ * POST /api/credits/unlock { kind, resultId } — pay once to unlock a deep
+ * result. For "iq" | "mbti" | "synastry", `resultId` identifies the row and is
+ * verified to belong to the caller. "weekly" is a per-user lifetime unlock
+ * (the 7-day forecast) keyed by a fixed ref, so no row lookup is needed.
+ * Spends credits idempotently (re-unlocking is free). 402 when short.
  */
 export async function POST(req: Request) {
   const session = await auth();
@@ -38,37 +41,48 @@ export async function POST(req: Request) {
     resultId?: unknown;
   };
   const kind = KINDS.includes(body.kind as Kind) ? (body.kind as Kind) : null;
-  const resultId = typeof body.resultId === "string" ? body.resultId : null;
-  if (!kind || !resultId) {
+  if (!kind) {
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
 
-  // Ownership check — never let someone unlock (or probe) another's row.
-  const owns =
-    kind === "iq"
-      ? await db
-          .select({ id: iqResults.id })
-          .from(iqResults)
-          .where(and(eq(iqResults.id, resultId), eq(iqResults.userId, userId)))
-          .limit(1)
-      : kind === "mbti"
+  // "weekly" is a per-user lifetime unlock keyed by a fixed ref — no row to
+  // own or verify. The others need a resultId that belongs to the caller.
+  let ref: string;
+  if (kind === "weekly") {
+    ref = "weekly";
+  } else {
+    const resultId = typeof body.resultId === "string" ? body.resultId : null;
+    if (!resultId) {
+      return NextResponse.json({ error: "bad_request" }, { status: 400 });
+    }
+    // Ownership check — never let someone unlock (or probe) another's row.
+    const owns =
+      kind === "iq"
         ? await db
-            .select({ id: mbtiTestResults.id })
-            .from(mbtiTestResults)
-            .where(
-              and(eq(mbtiTestResults.id, resultId), eq(mbtiTestResults.userId, userId))
-            )
+            .select({ id: iqResults.id })
+            .from(iqResults)
+            .where(and(eq(iqResults.id, resultId), eq(iqResults.userId, userId)))
             .limit(1)
-        : await db
-            .select({ id: partners.id })
-            .from(partners)
-            .where(and(eq(partners.id, resultId), eq(partners.userId, userId)))
-            .limit(1);
-  if (!owns.length) return NextResponse.json({ error: "not_found" }, { status: 404 });
+        : kind === "mbti"
+          ? await db
+              .select({ id: mbtiTestResults.id })
+              .from(mbtiTestResults)
+              .where(
+                and(eq(mbtiTestResults.id, resultId), eq(mbtiTestResults.userId, userId))
+              )
+              .limit(1)
+          : await db
+              .select({ id: partners.id })
+              .from(partners)
+              .where(and(eq(partners.id, resultId), eq(partners.userId, userId)))
+              .limit(1);
+    if (!owns.length) return NextResponse.json({ error: "not_found" }, { status: 404 });
+    ref = resultId;
+  }
 
   const reason = REASON[kind];
   const cost = COST[kind];
-  const status = await spendOnce(userId, cost, reason, resultId);
+  const status = await spendOnce(userId, cost, reason, ref);
 
   if (status === "insufficient") {
     return NextResponse.json({ status, cost }, { status: 402 });
