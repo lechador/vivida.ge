@@ -1,9 +1,15 @@
 import { randomBytes } from "node:crypto";
+import { cookies } from "next/headers";
 import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
 import { users, profiles, referrals } from "@/db/schema";
-import { grantCredits, REFERRAL_REWARD } from "@/lib/credits";
+import {
+  ensureCreditAccount,
+  grantCredits,
+  REFERRAL_REWARD,
+  SIGNUP_BONUS,
+} from "@/lib/credits";
 
 /**
  * Referral engine — the credit-earning growth loop.
@@ -96,6 +102,27 @@ export async function qualifyReferral(invitedUserId: string): Promise<void> {
   if (claimed.length === 0) return;
 
   await grantCredits(ref.referrerId, REFERRAL_REWARD, "referral", invitedUserId);
+}
+
+/**
+ * Run once when a brand-new user is created (email or OAuth): grant the signup
+ * bonus and, if they arrived with a ref cookie, attribute the referral. Called
+ * from lib/auth-core's create paths; entirely best-effort so it can never block
+ * registration.
+ */
+export async function onUserSignedUp(userId: string): Promise<void> {
+  try {
+    await ensureCreditAccount(userId);
+    await grantCredits(userId, SIGNUP_BONUS, "signup_bonus");
+  } catch (err) {
+    console.warn("[referral.onUserSignedUp] bonus failed:", (err as Error).message);
+  }
+  try {
+    const ref = (await cookies()).get(REF_COOKIE)?.value;
+    if (ref) await attributeReferral(userId, ref);
+  } catch {
+    /* attribution is best-effort */
+  }
 }
 
 export type ReferralStats = { code: string; invited: number; qualified: number };

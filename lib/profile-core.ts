@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { ageFromDob } from "@/lib/profile-utils";
+import { qualifyReferral } from "@/lib/referral";
 
 /**
  * Framework-agnostic profile *write* logic, shared by the website (Server
@@ -170,6 +171,14 @@ export async function saveBirthDataCore(
       return { ok: false, error: "ეს მომხმარებლის სახელი უკვე დაკავებულია" };
     }
     throw err;
+  }
+
+  // Filling birth data completes "activation" — pay out any pending referral
+  // (the other half of the gate, email verification, is handled on verify).
+  try {
+    await qualifyReferral(userId);
+  } catch {
+    /* referral payout is best-effort */
   }
 
   return { ok: true };

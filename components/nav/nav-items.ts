@@ -60,12 +60,10 @@ function navVisible(item: NavItem): boolean {
 }
 
 /**
- * Label for the "pro" nav entry. Members — including those on the free
- * trial (getCurrentPlan returns "pro" while trialing) — see their active
- * membership ("Vivida Pro"); free users see the plain upsell label.
+ * The former "pro" slot is now the credits hub — the label is the same for
+ * everyone. (Kept as a function so per-plan labels stay easy to reintroduce.)
  */
-export function navLabel(item: NavItem, plan: PlanId): string {
-  if (item.key === "pro" && plan === "pro") return "Vivida Pro";
+export function navLabel(item: NavItem, _plan: PlanId): string {
   return item.label;
 }
 
@@ -151,8 +149,8 @@ const ALL_NAV_ITEMS: NavItem[] = [
   },
   {
     key: "pro",
-    href: "/subscription",
-    label: "Pro",
+    href: "/credits",
+    label: "კრედიტები",
     Icon: Crown,
     hue: "oklch(0.85 0.16 85)",
   },

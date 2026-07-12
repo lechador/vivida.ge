@@ -5,6 +5,7 @@ import { randomBytes } from "node:crypto";
 import { db } from "@/db";
 import { authTokens, users, type AuthTokenPurpose } from "@/db/schema";
 import { provisionTrialIfMissing } from "@/lib/plan";
+import { onUserSignedUp, qualifyReferral } from "@/lib/referral";
 
 /**
  * Framework-agnostic email/password auth logic, shared by the website
@@ -158,6 +159,8 @@ export async function registerUser(input: {
   // Tie the 30-day Pro trial to the account from t=0. Idempotent and
   // self-swallowing, so a transient blip won't block registration.
   await provisionTrialIfMissing(created.id);
+  // Signup bonus + referral attribution (best-effort, never blocks signup).
+  await onUserSignedUp(created.id);
 
   const verifyCode = generateOtpCode();
   const verifyToken = await issueAuthToken(
@@ -238,6 +241,9 @@ export async function findOrCreateOAuthUser(input: {
     });
 
   await provisionTrialIfMissing(created.id);
+  // OAuth accounts are pre-verified, so this may qualify a referral right away
+  // once birth data is added; bonus + attribution happen here.
+  await onUserSignedUp(created.id);
 
   return {
     userId: created.id,
@@ -344,6 +350,11 @@ export async function consumeEmailVerifyToken(
     .where(eq(users.id, row.userId));
   await db.delete(authTokens).where(eq(authTokens.token, token));
 
+  try {
+    await qualifyReferral(row.userId);
+  } catch {
+    /* best-effort */
+  }
   return { ok: true, userId: row.userId };
 }
 
@@ -397,6 +408,11 @@ export async function consumeEmailVerifyCode(input: {
     .where(eq(users.id, user.id));
   await db.delete(authTokens).where(eq(authTokens.token, row.token));
 
+  try {
+    await qualifyReferral(user.id);
+  } catch {
+    /* best-effort */
+  }
   return { ok: true, userId: user.id };
 }
 

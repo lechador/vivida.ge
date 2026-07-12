@@ -6,6 +6,7 @@ import { ChatShell } from "@/components/chat/chat-shell";
 import { AudioPlayerProvider } from "@/components/audio/audio-provider";
 import { NowPlayingBar } from "@/components/audio/now-playing-bar";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
+import { RefCapture } from "@/components/ref-capture";
 import { FbPixel } from "@/components/fb-pixel";
 import "./globals.css";
 
@@ -148,6 +149,7 @@ export default function RootLayout({
           speed={400}
         />
         <BfcacheRefresher />
+        <RefCapture />
         {FB_PIXEL_ENABLED && <FbPixel />}
         <AudioPlayerProvider>
           {children}
