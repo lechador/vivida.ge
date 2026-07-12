@@ -195,6 +195,27 @@ export async function earnOnce(
   return true;
 }
 
+/**
+ * How many distinct items the user has unlocked under `reason` (free + paid).
+ * Used to apply a lifetime free allowance before charging — e.g. the first
+ * synastry is free, then each subsequent one costs credits.
+ */
+export async function countUnlocks(
+  userId: string,
+  reason: CreditReason
+): Promise<number> {
+  const [row] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(creditTransactions)
+    .where(
+      and(
+        eq(creditTransactions.userId, userId),
+        eq(creditTransactions.reason, reason)
+      )
+    );
+  return row?.n ?? 0;
+}
+
 /** Recent ledger rows for the account/history UI. */
 export async function getCreditHistory(userId: string, limit = 30) {
   return db

@@ -42,6 +42,7 @@ export const CREDIT_COST = {
   mbtiTest: 5,
   iqTest: 5,
   audioHoroscope: 2,
+  pdfReport: 5,
 } as const;
 
 /** Free before credits are needed. */
@@ -63,5 +64,6 @@ export type CreditReason =
   | "spend_mbti"
   | "spend_iq"
   | "spend_audio"
+  | "spend_report"
   | "grandfather"
   | "admin_grant";

@@ -2,34 +2,32 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, Loader2, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { FileText, Loader2, Sparkles, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { PlanId } from "@/lib/pricing";
 
 const ERRORS: Record<string, string> = {
   no_chart: "ჯერ შენი რუკა უნდა შეიქმნას. დაასრულე ონბორდინგი.",
-  payments_unavailable: "გადახდა დროებით მიუწვდომელია. სცადე მოგვიანებით.",
-  checkout_failed: "გადახდის გვერდის გახსნა ვერ მოხერხდა. სცადე ხელახლა.",
   unauthorized: "გთხოვ, შეხვიდე სისტემაში.",
 };
 
 /**
- * Buy / generate the full PDF report. Pro users are comped (button kicks off
- * generation and routes to the status page); everyone else is redirected to
- * Stripe Checkout. The endpoint decides which based on the user's plan.
+ * Generate the full PDF report, paid with credits. Spends CREDIT_COST.pdfReport
+ * once via /api/reports/checkout, then routes to the in-app status page. On a
+ * short balance (402) it flips to an invite-or-top-up prompt.
  */
 export function BuyReportCta({
-  plan,
-  priceLabel,
+  cost,
+  balance,
 }: {
-  plan: PlanId;
-  priceLabel: string;
+  cost: number;
+  balance: number;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const isPro = plan === "pro";
+  const [short, setShort] = useState(balance < cost);
 
   async function start() {
     setLoading(true);
@@ -41,14 +39,17 @@ export function BuyReportCta({
         body: JSON.stringify({ type: "natal" }),
       });
       const data = await res.json().catch(() => ({}));
+      if (res.status === 402) {
+        setShort(true);
+        setLoading(false);
+        return;
+      }
       if (!res.ok || !data.url) {
         setError(ERRORS[data.error] ?? "რაღაც ვერ მოხერხდა. სცადე ხელახლა.");
         setLoading(false);
         return;
       }
-      // Internal status page → client nav; Stripe → full redirect.
-      if (data.url.startsWith("/")) router.push(data.url);
-      else window.location.href = data.url;
+      router.push(data.url);
     } catch {
       setError("ქსელის შეცდომა. სცადე ხელახლა.");
       setLoading(false);
@@ -75,25 +76,46 @@ export function BuyReportCta({
             პლანეტების, სახლებისა და ასპექტების დეტალური ახსნა, ძლიერი მხარეები და
             ზრდის ზონები — ლამაზად გაფორმებული, ჩამოსატვირთად.
           </p>
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1 text-sm">
+            <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
+            <span className="font-semibold">{cost} კრედიტი</span>
+            <span className="text-muted-foreground">· ბალანსი {balance}</span>
+          </div>
         </div>
         <div className="flex flex-col items-stretch gap-2 sm:items-end">
-          <Button
-            variant="mystic"
-            size="lg"
-            onClick={start}
-            disabled={loading}
-            className="min-w-44"
-          >
-            {loading ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <FileText className="size-4" />
-            )}
-            {isPro ? "ანგარიშის შექმნა" : `ყიდვა — ${priceLabel}`}
-          </Button>
-          <span className="text-center text-xs text-muted-foreground sm:text-right">
-            {isPro ? "შენი Pro გეგმით უფასოა" : "ერთჯერადი გადახდა · სამუდამო წვდომა"}
-          </span>
+          {!short ? (
+            <>
+              <Button
+                variant="mystic"
+                size="lg"
+                onClick={start}
+                disabled={loading}
+                className="min-w-44"
+              >
+                {loading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <FileText className="size-4" />
+                )}
+                შექმნა — {cost} კრედიტი
+              </Button>
+              <span className="text-center text-xs text-muted-foreground sm:text-right">
+                ერთჯერადი გადახდა · სამუდამო წვდომა
+              </span>
+            </>
+          ) : (
+            <div className="space-y-2 text-center sm:text-right">
+              <p className="text-sm text-[var(--vivida-pink)]">
+                ბალანსი არ არის საკმარისი.
+              </p>
+              <Button asChild variant="mystic" size="lg">
+                <Link href="/credits">
+                  <Users className="size-4" />
+                  მოიწვიე / შეავსე
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       {error && <p className="mt-3 text-sm text-[var(--vivida-pink)]">{error}</p>}

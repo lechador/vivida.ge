@@ -12,9 +12,19 @@ import {
 import { computeSynastry } from "@/lib/synastry";
 import { getSynastryInterpretationsFor } from "@/lib/synastry-library";
 import { canUseFeature } from "@/lib/features";
+import {
+  CREDIT_COST,
+  FREE_ALLOWANCE,
+  countUnlocks,
+  getBalance,
+  isUnlocked,
+  spendOnce,
+} from "@/lib/credits";
 import { SYNASTRY_DEEP_PROMPT_VERSION } from "@/lib/openrouter";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { CreditHint } from "@/components/credits/credit-hint";
+import { UnlockCard } from "@/components/credits/unlock-card";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { SynastryDeepReport } from "@/components/synastry/synastry-deep-report";
 
@@ -32,6 +42,7 @@ export default async function SynastryDetailPage({
   const partner = await getPartnerForViewer(id, user.id);
   if (!partner) notFound();
 
+  const viewerName = user.name?.split(" ")[0] ?? null;
   const viewerChart = await ensureChartFor(user.id, plan);
   if (!viewerChart) {
     return (
@@ -39,6 +50,61 @@ export default async function SynastryDetailPage({
         <AppHeader authed plan={plan} active="synastry" />
         <section className="mx-auto w-full max-w-xl p-8 text-center text-sm text-muted-foreground">
           შენი რუკა ჯერ შედგენილი არ არის. ჯერ <Link href="/onboarding" className="underline">შეავსე დაბადების მონაცემები</Link>.
+        </section>
+      </main>
+    );
+  }
+
+  // ── Credit gate ────────────────────────────────────────────────────────
+  // The first partner's synastry is free; each one after costs credits, paid
+  // once and then permanently unlocked for that partner. Free unlocks are
+  // recorded as zero-cost ledger rows so the allowance is stable across
+  // partners and can't be re-farmed by re-opening the same one.
+  let unlocked = await isUnlocked(user.id, partner.id, "spend_synastry");
+  if (!unlocked) {
+    const used = await countUnlocks(user.id, "spend_synastry");
+    if (used < FREE_ALLOWANCE.synastry) {
+      await spendOnce(user.id, 0, "spend_synastry", partner.id);
+      unlocked = true;
+    }
+  }
+
+  if (!unlocked) {
+    const balance = await getBalance(user.id);
+    return (
+      <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.18_350/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_305/0.3),transparent_70%)]"
+        />
+        <Starfield count={120} shooting={3} />
+        <AppHeader authed plan={plan} active="synastry" />
+        <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
+          <Link
+            href="/synastry"
+            className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="size-3.5" />
+            ყველა პარტნიორი
+          </Link>
+          <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+            {viewerName ?? "შენ"}{" "}
+            <span className="text-muted-foreground">და</span>{" "}
+            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
+              {partner.name}
+            </span>
+          </h1>
+          <p className="mb-6 text-sm text-muted-foreground">
+            {partner.dateOfBirth} · {partner.cityName}
+          </p>
+          <UnlockCard
+            kind="synastry"
+            resultId={partner.id}
+            cost={CREDIT_COST.synastry}
+            balance={balance}
+            title="თქვენი თავსებადობის გახსნა"
+            blurb="ნახე სრული სინასტრია — ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
+          />
         </section>
       </main>
     );
@@ -61,8 +127,6 @@ export default async function SynastryDetailPage({
     partnerWithAi.deepReport && partnerWithAi.deepViewerHash === deepStamp
       ? partnerWithAi.deepReport
       : null;
-
-  const viewerName = user.name?.split(" ")[0] ?? null;
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">

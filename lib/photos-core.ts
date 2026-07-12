@@ -2,6 +2,7 @@ import { and, asc, count, desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { profilePhotos, type ProfilePhoto } from "@/db/schema";
+import { CREDIT_REWARD, earnOnce } from "@/lib/credits";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import {
   PHOTO_LIMITS,
@@ -158,6 +159,17 @@ export async function finalizePhoto(
     .where(eq(profilePhotos.id, photoId));
 
   invalidateHeaderForUser(userId);
+
+  // One-time reward for adding a profile picture. Idempotent — only the very
+  // first ready photo ever pays out (guarded by the ledger reason). Best-effort:
+  // a credit hiccup must never fail the upload finalize.
+  earnOnce(userId, CREDIT_REWARD.profilePhoto, "earn_profile_photo").catch(
+    (err) =>
+      console.warn("[photos/finalize] profile-photo reward failed", {
+        userId,
+        message: (err as Error)?.message,
+      })
+  );
 
   return { ok: true, photo: { ...photo, ready: true } };
 }

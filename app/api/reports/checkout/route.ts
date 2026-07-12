@@ -4,24 +4,22 @@ import { after } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { charts, pdfReports } from "@/db/schema";
-import { getCurrentPlan } from "@/lib/plan";
+import { CREDIT_COST, spendCredits } from "@/lib/credits";
 import { generateAndStoreReport } from "@/lib/reports/generate";
 import { reportCurrency } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// Pro comp path kicks off generation via after() — keep the function alive.
+// Generation is kicked off via after() — keep the function alive.
 export const maxDuration = 300;
 
 const SUPPORTED_TYPES = new Set(["natal"]);
 
 /**
- * Start a report purchase.
- *  - Pro subscribers: comped → report created as 'paid', generation kicked
- *    off immediately, returns the in-app status page URL.
- *  - Everyone else: returns a Stripe Checkout URL to redirect to.
- * Re-clicking when a paid/generating/ready report already exists returns it
- * instead of charging again.
+ * Generate a natal PDF report, paid with credits. Spends CREDIT_COST.pdfReport
+ * once, creates the report row as 'paid', and kicks off generation, returning
+ * the in-app status page URL. Re-clicking when a paid/generating/ready report
+ * already exists returns it instead of charging again. 402 when short.
  */
 export async function POST(req: Request) {
   const session = await auth();
@@ -64,26 +62,34 @@ export async function POST(req: Request) {
     return Response.json({ reportId: existing.id, url: `/reports/${existing.id}` });
   }
 
-  const plan = await getCurrentPlan(userId);
-  // ── Pro: comped, no payment ──────────────────────────────────────────
-  if (plan === "pro") {
-    const [row] = await db
-      .insert(pdfReports)
-      .values({
-        userId,
-        type,
-        status: "paid",
-        comped: true,
-        amountCents: 0,
-        currency: reportCurrency().toUpperCase(),
-        paidAt: new Date(),
-      })
-      .returning({ id: pdfReports.id });
-
-    after(() => generateAndStoreReport(row.id));
-    return Response.json({ reportId: row.id, url: `/reports/${row.id}` });
+  // ── Pay with credits ─────────────────────────────────────────────────
+  // Charge before creating the row; the atomic spend guards the balance so a
+  // short wallet never gets a comped report.
+  const paid = await spendCredits(
+    userId,
+    CREDIT_COST.pdfReport,
+    "spend_report"
+  );
+  if (!paid) {
+    return Response.json(
+      { error: "insufficient_credits", cost: CREDIT_COST.pdfReport },
+      { status: 402 }
+    );
   }
 
-  // ── Everyone else: the report is a Pro feature now, not a one-time buy. ──
-  return Response.json({ error: "pro_required" }, { status: 403 });
+  const [row] = await db
+    .insert(pdfReports)
+    .values({
+      userId,
+      type,
+      status: "paid",
+      comped: false,
+      amountCents: 0,
+      currency: reportCurrency().toUpperCase(),
+      paidAt: new Date(),
+    })
+    .returning({ id: pdfReports.id });
+
+  after(() => generateAndStoreReport(row.id));
+  return Response.json({ reportId: row.id, url: `/reports/${row.id}` });
 }

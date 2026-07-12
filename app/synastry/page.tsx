@@ -6,6 +6,7 @@ import { getCurrentPlan } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
+import { CreditHint } from "@/components/credits/credit-hint";
 import {
   listPartners,
   partnerCreationsThisMonth,
@@ -48,6 +49,9 @@ export default async function SynastryPage() {
               დაამატე ადამიანი, რომელიც შენთვის მნიშვნელოვანია — ნახე, როგორ
               ერთვით ცაში ერთმანეთს.
             </p>
+            <div className="mt-2">
+              <CreditHint>პირველი თავსებადობა უფასოა, შემდეგ −5 კრედიტი</CreditHint>
+            </div>
           </div>
           <div className="flex shrink-0 items-center gap-3">
             {remaining > 0 ? (

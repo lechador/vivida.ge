@@ -6,25 +6,17 @@ import { db } from "@/db";
 import { pdfReports } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import type { PlanId } from "@/lib/pricing";
-import { canUseFeature } from "@/lib/features";
-import { ProUpsell } from "@/components/paywall/pro-upsell";
+import { CREDIT_COST, getBalance } from "@/lib/credits";
 import { BuyReportCta } from "./buy-report-cta";
-
-function priceLabel(): string {
-  const cents = Number(process.env.REPORT_PRICE_CENTS) || 1990;
-  const cur = (process.env.REPORT_CURRENCY ?? "gel").toLowerCase();
-  const amount = (cents / 100).toFixed(2);
-  return cur === "gel" ? `₾${amount}` : `${amount} ${cur.toUpperCase()}`;
-}
 
 /**
  * Report purchase/download surface on /report. Adapts to the user's latest
  * natal report: buy CTA when none/abandoned, a "generating" link while it
- * builds, and a download button once ready.
+ * builds, and a download button once ready. Paid with credits.
  */
 export async function ReportPdfPanel({
   userId,
-  plan,
+  plan: _plan,
 }: {
   userId: string;
   plan: PlanId;
@@ -92,15 +84,7 @@ export async function ReportPdfPanel({
     );
   }
 
-  // None / pending → Pro/trial users generate it (comped); free users get the
-  // subscribe banner (the report is now included in Pro, not a one-time buy).
-  if (!canUseFeature("natalReport", plan)) {
-    return (
-      <ProUpsell
-        title="შენი ნატალური რუკის ღრმა ანალიზი — PDF"
-        description="10+ გვერდიანი პერსონალური ანგარიში: რა გამოირჩევა შენს რუკაში, პლანეტების, სახლებისა და ასპექტების დეტალური ახსნა, ძლიერი მხარეები და ზრდის ზონები — Vivida Pro-ში შედის."
-      />
-    );
-  }
-  return <BuyReportCta plan={plan} priceLabel={priceLabel()} />;
+  // None / pending → pay with credits to generate.
+  const balance = await getBalance(userId);
+  return <BuyReportCta cost={CREDIT_COST.pdfReport} balance={balance} />;
 }
