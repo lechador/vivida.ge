@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, Sparkles, User } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -82,6 +82,12 @@ export function UserMenu({
             </Link>
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem asChild>
+          <Link href="/credits" className="cursor-pointer">
+            <Sparkles className="size-4" />
+            კრედიტები
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/account" className="cursor-pointer">
             <Settings className="size-4" />

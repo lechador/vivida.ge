@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Check, Copy, Share2, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { REFERRAL_REWARD } from "@/lib/credits";
+import { REFERRAL_REWARD } from "@/lib/credits-config";
 
 /**
  * Invite panel — the credit-earning growth loop's UI. Shows the user's personal

@@ -8,68 +8,14 @@ import { creditAccounts, creditTransactions } from "@/db/schema";
  * credits (signup bonus, qualified referrals, Stripe top-ups) and spend them on
  * gated actions beyond each feature's free allowance.
  *
- * The whole economy lives in the constants below — tuning prices is a one-line
- * change here. Spending is a single conditional UPDATE (`balance >= cost`), so
- * concurrent requests can never drive the balance negative.
+ * The economy CONSTANTS live in lib/credits-config.ts (client-safe, no DB
+ * imports) and are re-exported below so server code has one import site.
+ * Spending is a single conditional UPDATE (`balance >= cost`), so concurrent
+ * requests can never drive the balance negative.
  */
 
-// ── Economy (tune here) ──────────────────────────────────────────────────────
-export const SIGNUP_BONUS = 20;
-export const REFERRAL_REWARD = 10;
-
-/** Stripe top-up packs. Minimum ₾10 (we only have Stripe for now). `tetri` is
- *  the charge amount in minor units (1 GEL = 100 tetri). */
-export const CREDIT_PACKS = [
-  { id: "s", gel: 10, tetri: 1000, credits: 20 },
-  { id: "m", gel: 20, tetri: 2000, credits: 45 },
-  { id: "l", gel: 50, tetri: 5000, credits: 130 },
-] as const;
-export type CreditPackId = (typeof CREDIT_PACKS)[number]["id"];
-
-/** Credits EARNED by activity (beyond signup/referral/purchase). Capped to
- *  prevent farming — see the caps below. */
-export const CREDIT_REWARD = {
-  feedPost: 5,
-  profilePhoto: 3,
-} as const;
-
-/** Anti-farming caps for earned credits. */
-export const REWARD_CAP = {
-  /** Only the first N feed posts each day earn credits. */
-  feedPostPerDay: 1,
-  /** Profile-photo reward is one-time (guarded by ledger presence). */
-} as const;
-
-/** What each gated action costs (beyond its free allowance). */
-export const CREDIT_COST = {
-  synastry: 5,
-  chat: 1,
-  mbtiTest: 5,
-  iqTest: 5,
-  audioHoroscope: 2,
-} as const;
-
-/** Free before credits are needed. */
-export const FREE_ALLOWANCE = {
-  /** Lifetime free compatibility charts. */
-  synastry: 1,
-  /** Free AI-chat messages per day. */
-  chatPerDay: 2,
-} as const;
-
-export type CreditReason =
-  | "signup_bonus"
-  | "referral"
-  | "purchase"
-  | "earn_feed_post"
-  | "earn_profile_photo"
-  | "spend_synastry"
-  | "spend_chat"
-  | "spend_mbti"
-  | "spend_iq"
-  | "spend_audio"
-  | "grandfather"
-  | "admin_grant";
+export * from "@/lib/credits-config";
+import type { CreditReason } from "@/lib/credits-config";
 
 // ── Account ──────────────────────────────────────────────────────────────────
 

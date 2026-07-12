@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CreditCard, Loader2, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { CREDIT_PACKS } from "@/lib/credits";
+import { CREDIT_PACKS } from "@/lib/credits-config";
 
 /**
  * Stripe credit top-up — pick a pack, redirect to Checkout. The webhook awards
