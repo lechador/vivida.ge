@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { Brain, Clock, ArrowRight, RotateCcw } from "lucide-react";
+import { Brain, Fingerprint, Clock, ArrowRight, RotateCcw } from "lucide-react";
 
 import { auth } from "@/auth";
 import { getCurrentPlan } from "@/lib/plan";
@@ -14,14 +15,23 @@ import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 
-const TITLE = "ფსიქოლოგიური ტესტები — პიროვნების ტესტი ქართულად";
+/** Per-test visual identity — icon + accent colour, keyed by catalog slug. */
+const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
+  iq: { Icon: Brain, accent: "var(--vivida-cyan)" },
+  "astro-mbti": { Icon: Fingerprint, accent: "var(--vivida-violet)" },
+};
+const FALLBACK_THEME = { Icon: Brain, accent: "var(--vivida-violet)" };
+
+const TITLE = "ტესტები — IQ ტესტი და პიროვნების ტესტი ქართულად";
 const DESCRIPTION =
-  "უფასო ფსიქოლოგიური ტესტები ქართულად — გაიარე პიროვნების ტესტი (MBTI / 16 ტიპი) და აღმოაჩინე შენი ტიპი, ძლიერი მხარეები, ურთიერთობები და კარიერა.";
+  "უფასო ტესტები ქართულად — გაზომე შენი IQ ადაპტიური ტესტით და გაიარე პიროვნების ტესტი (MBTI / 16 ტიპი). მიიღე შენი ქულა, ტიპი და ღრმა პერსონალური ანალიზი.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
+    "iq ტესტი",
+    "iq ტესტი ქართულად",
     "ფსიქოლოგიური ტესტი",
     "პიროვნების ტესტი",
     "პიროვნების ტესტი ქართულად",
@@ -67,16 +77,28 @@ export default async function TestsPage() {
   const authed = !!session?.user?.id;
   const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
 
-  // Latest result per test (for "my result" + "retake"), keyed by catalog slug.
-  const myResults: Record<string, string> = {};
+  // Latest result per test, keyed by catalog slug — shown inline on the card
+  // (the score itself, not just a "my result" link).
+  type TestResult = { href: string; value: string; sub: string };
+  const myResults: Record<string, TestResult> = {};
   if (authed) {
     const uid = session!.user!.id;
     const [mbti, iq] = await Promise.all([
       getLatestMbtiResult(uid),
       getLatestIqResult(uid),
     ]);
-    if (mbti) myResults["astro-mbti"] = `/test-results/${mbti.id}`;
-    if (iq) myResults["iq"] = `/iq-testi/shedegi/${iq.id}`;
+    if (mbti)
+      myResults["astro-mbti"] = {
+        href: `/test-results/${mbti.id}`,
+        value: mbti.mbtiType,
+        sub: mbti.archetypeNameGe,
+      };
+    if (iq)
+      myResults["iq"] = {
+        href: `/iq-testi/shedegi/${iq.id}`,
+        value: `IQ ${iq.iq}`,
+        sub: `პროცენტილი ${iq.percentile}`,
+      };
   }
 
   const ld = [
@@ -117,75 +139,118 @@ export default async function TestsPage() {
             ტესტები
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            ფსიქოლოგიური{" "}
+            აღმოაჩინე შენი{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              ტესტები
+              თავი
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-foreground/80 sm:text-base">
-            აღმოაჩინე მეტი საკუთარ თავზე — გაიარე ტესტი და მიიღე ღრმა, პერსონალური
-            ანალიზი.
+            ინტელექტი, პიროვნება და მეტი — ზუსტი ტესტები ქართულად, ღრმა
+            პერსონალური ანალიზით.
           </p>
         </header>
 
         <div className="grid gap-4 sm:grid-cols-2">
           {TESTS.map((test) => {
             const done = test.available ? myResults[test.slug] : undefined;
+            const { Icon, accent } = THEME[test.slug] ?? FALLBACK_THEME;
             return (
-            <article
-              key={test.slug}
-              className="flex flex-col rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7"
-            >
-              <div className="mb-4 flex items-center gap-3">
-                <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[var(--vivida-violet)]/15 ring-1 ring-[var(--vivida-violet)]/40">
-                  <Brain className="size-5 text-[var(--vivida-violet)]" />
-                </span>
-                <div>
-                  <h2 className="text-lg font-semibold tracking-tight">{test.titleKa}</h2>
-                  <p className="text-sm text-muted-foreground">{test.taglineKa}</p>
-                </div>
-              </div>
-
-              <p className="text-[15px] leading-relaxed text-foreground/85">
-                {test.descKa}
-              </p>
-
-              <div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Clock className="size-3.5" />
-                <span>{test.metaKa}</span>
-              </div>
-
-              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3">
-                {!test.available ? (
-                  <span className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">
-                    მალე
+              <article
+                key={test.slug}
+                className="flex flex-col rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 sm:p-7"
+                style={{ borderTopColor: `color-mix(in oklch, ${accent} 45%, transparent)` }}
+              >
+                <div className="mb-4 flex items-center gap-3">
+                  <span
+                    className="grid size-11 shrink-0 place-items-center rounded-2xl"
+                    style={{
+                      background: `color-mix(in oklch, ${accent} 15%, transparent)`,
+                      boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${accent} 40%, transparent)`,
+                    }}
+                  >
+                    <Icon className="size-5" style={{ color: accent }} />
                   </span>
-                ) : done ? (
+                  <div className="min-w-0">
+                    <h2 className="truncate text-lg font-semibold tracking-tight">
+                      {test.titleKa}
+                    </h2>
+                    <p className="truncate text-sm text-muted-foreground">
+                      {test.taglineKa}
+                    </p>
+                  </div>
+                </div>
+
+                {done ? (
+                  /* Completed — the score is the hero. */
+                  <div
+                    className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5"
+                    style={{
+                      background: `color-mix(in oklch, ${accent} 10%, transparent)`,
+                      boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${accent} 30%, transparent)`,
+                    }}
+                  >
+                    <div className="min-w-0">
+                      <div className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                        შენი შედეგი
+                      </div>
+                      <div
+                        className="mt-0.5 text-2xl font-bold tracking-tight"
+                        style={{ color: accent }}
+                      >
+                        {done.value}
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right text-xs text-foreground/70">
+                      {done.sub}
+                    </div>
+                  </div>
+                ) : (
                   <>
-                    <Button asChild variant="outline" className="w-full sm:w-auto">
+                    <p className="text-[15px] leading-relaxed text-foreground/85">
+                      {test.descKa}
+                    </p>
+                    <div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Clock className="size-3.5" />
+                      <span>{test.metaKa}</span>
+                    </div>
+                  </>
+                )}
+
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  {!test.available ? (
+                    <span className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">
+                      მალე
+                    </span>
+                  ) : done ? (
+                    <>
+                      <Button asChild variant="mystic" className="w-full sm:flex-1">
+                        <Link href={done.href}>
+                          სრული ანალიზი
+                          <ArrowRight className="size-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="icon"
+                        title="ტესტის თავიდან გავლა"
+                        aria-label="ტესტის თავიდან გავლა"
+                      >
+                        <Link href={test.href}>
+                          <RotateCcw className="size-4" />
+                        </Link>
+                      </Button>
+                    </>
+                  ) : (
+                    <Button asChild variant="mystic" className="w-full">
                       <Link href={test.href}>
-                        <RotateCcw className="size-4" />
-                        ტესტის თავიდან გავლა
+                        დაწყება
+                        <ArrowRight className="size-4" />
                       </Link>
                     </Button>
-                    <Link
-                      href={done}
-                      className="inline-flex items-center gap-1 text-sm font-medium text-[var(--vivida-cyan)] hover:underline"
-                    >
-                      ჩემი შედეგი
-                      <ArrowRight className="size-3.5" />
-                    </Link>
-                  </>
-                ) : (
-                  <Button asChild variant="mystic" className="w-full sm:w-auto">
-                    <Link href={test.href}>
-                      დაწყება
-                      <ArrowRight className="size-4" />
-                    </Link>
-                  </Button>
-                )}
-              </div>
-            </article>
+                  )}
+                </div>
+              </article>
             );
           })}
         </div>
