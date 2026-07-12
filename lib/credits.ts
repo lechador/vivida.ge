@@ -1,7 +1,8 @@
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { creditAccounts, creditTransactions } from "@/db/schema";
+import { creditAccounts, creditTransactions, notifications } from "@/db/schema";
+import { invalidateHeaderForUser } from "@/lib/header-cache";
 
 /**
  * Credit wallet — the currency that replaced the subscription model. Users earn
@@ -16,6 +17,38 @@ import { creditAccounts, creditTransactions } from "@/db/schema";
 
 export * from "@/lib/credits-config";
 import type { CreditReason } from "@/lib/credits-config";
+
+// ── Notifications ────────────────────────────────────────────────────────────
+
+/**
+ * Drop a "credit" notification into the bell so the user sees every balance
+ * move (earned or spent) with its reason. Best-effort — a notification failure
+ * must never break the underlying credit operation. `amount` is signed.
+ */
+async function notifyCredit(
+  userId: string,
+  amount: number,
+  reason: CreditReason,
+  balance: number | null
+): Promise<void> {
+  try {
+    await db.insert(notifications).values({
+      userId,
+      kind: "credit",
+      payload: {
+        creditAmount: amount,
+        creditReason: reason,
+        ...(balance != null ? { creditBalance: balance } : {}),
+      },
+    });
+    invalidateHeaderForUser(userId);
+  } catch (err) {
+    console.warn(
+      "[credits] notification failed:",
+      err instanceof Error ? err.message : String(err)
+    );
+  }
+}
 
 // ── Account ──────────────────────────────────────────────────────────────────
 
@@ -44,10 +77,11 @@ export async function grantCredits(
   userId: string,
   amount: number,
   reason: CreditReason,
-  ref?: string
+  ref?: string,
+  opts?: { notify?: boolean }
 ): Promise<void> {
   if (amount <= 0) return;
-  await db
+  const [acct] = await db
     .insert(creditAccounts)
     .values({ userId, balance: amount })
     .onConflictDoUpdate({
@@ -56,10 +90,14 @@ export async function grantCredits(
         balance: sql`${creditAccounts.balance} + ${amount}`,
         updatedAt: new Date(),
       },
-    });
+    })
+    .returning({ balance: creditAccounts.balance });
   await db
     .insert(creditTransactions)
     .values({ userId, amount, reason, ref: ref ?? null });
+  if (opts?.notify !== false) {
+    await notifyCredit(userId, amount, reason, acct?.balance ?? null);
+  }
 }
 
 /**
@@ -71,7 +109,8 @@ export async function spendCredits(
   userId: string,
   amount: number,
   reason: CreditReason,
-  ref?: string
+  ref?: string,
+  opts?: { notify?: boolean }
 ): Promise<boolean> {
   if (amount <= 0) return true;
   const updated = await db
@@ -88,6 +127,9 @@ export async function spendCredits(
   await db
     .insert(creditTransactions)
     .values({ userId, amount: -amount, reason, ref: ref ?? null });
+  if (opts?.notify !== false) {
+    await notifyCredit(userId, -amount, reason, updated[0]?.balance ?? null);
+  }
   return true;
 }
 

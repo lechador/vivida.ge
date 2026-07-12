@@ -549,6 +549,8 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "mention",
   // Mutual like in the match deck — emitted to both users at once.
   "new_match",
+  // Credit balance moved (earned or spent) — deep-links to /credits.
+  "credit",
 ]);
 
 /**
@@ -571,6 +573,13 @@ export type NotificationPayload = {
   /** "post" | "comment" — only set on `mention` kind so the row can show
    *  "მოგიხსენიეს კომენტარში" vs. "მოგიხსენიეს პოსტში". */
   mentionContext?: "post" | "comment";
+  /** Signed credit delta for `credit` kind (positive = earned, negative
+   *  = spent). */
+  creditAmount?: number;
+  /** CreditReason slug for `credit` kind — mapped to a Georgian label + icon. */
+  creditReason?: string;
+  /** Resulting balance after the change, for `credit` kind. */
+  creditBalance?: number;
 };
 
 export const notifications = pgTable("notification", {

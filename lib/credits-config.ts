@@ -11,6 +11,8 @@
 
 export const SIGNUP_BONUS = 20;
 export const REFERRAL_REWARD = 10;
+/** Free credits granted to every user on the first day of each month. */
+export const MONTHLY_BONUS = 5;
 
 /** Stripe top-up packs. Minimum ₾10 (we only have Stripe for now). `tetri` is
  *  the charge amount in minor units (1 GEL = 100 tetri). */
@@ -58,6 +60,7 @@ export type CreditReason =
   | "signup_bonus"
   | "referral"
   | "purchase"
+  | "monthly_bonus"
   | "earn_feed_post"
   | "earn_profile_photo"
   | "spend_synastry"
@@ -69,3 +72,26 @@ export type CreditReason =
   | "spend_weekly"
   | "grandfather"
   | "admin_grant";
+
+/**
+ * Short Georgian label per reason — used in the credit notification row so the
+ * user sees *why* their balance moved. Kept here (client-safe) so the
+ * notifications dropdown can read it without pulling in server code.
+ */
+export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
+  signup_bonus: "მისალმების ბონუსი",
+  referral: "მეგობრის მოწვევა",
+  purchase: "ბალანსის შევსება",
+  monthly_bonus: "თვის ბონუსი",
+  earn_feed_post: "პოსტი ფიდში",
+  earn_profile_photo: "პროფილის ფოტო",
+  spend_synastry: "თავსებადობა",
+  spend_chat: "AI ჩატი",
+  spend_mbti: "პიროვნების ტესტი",
+  spend_iq: "IQ ტესტი",
+  spend_audio: "აუდიო ჰოროსკოპი",
+  spend_report: "PDF რუკა",
+  spend_weekly: "7-დღიანი პროგნოზი",
+  grandfather: "საჩუქარი",
+  admin_grant: "საჩუქარი",
+};

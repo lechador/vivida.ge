@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { markAllNotificationsRead } from "@/actions/notifications";
 import type { Notification } from "@/db/schema";
+import { CREDIT_REASON_LABEL_KA, type CreditReason } from "@/lib/credits-config";
 import { cn } from "@/lib/utils";
 
 const KIND_ICON: Record<string, LucideIcon> = {
@@ -28,6 +29,7 @@ const KIND_ICON: Record<string, LucideIcon> = {
   post_comment: MessageSquare,
   post_reaction: Sparkles,
   mention: AtSign,
+  credit: Sparkles,
 };
 
 const REACTION_LABEL_KA: Record<string, string> = {
@@ -256,6 +258,75 @@ export function NotificationsDropdown({
   );
 }
 
+function CreditNotificationRow({
+  n,
+  onClose,
+}: {
+  n: Notification;
+  onClose: () => void;
+}) {
+  const amount = n.payload?.creditAmount ?? 0;
+  const earned = amount >= 0;
+  const reason = n.payload?.creditReason as CreditReason | undefined;
+  const reasonLabel = reason ? CREDIT_REASON_LABEL_KA[reason] : "";
+  const isUnread = !n.readAt;
+  return (
+    <li>
+      <Link
+        href="/credits"
+        onClick={onClose}
+        className={cn(
+          "flex items-start gap-3 px-3 py-3 transition-colors hover:bg-accent/10",
+          isUnread && "bg-[var(--vivida-violet)]/5"
+        )}
+      >
+        <div
+          className={cn(
+            "grid size-10 shrink-0 place-items-center rounded-full border",
+            earned
+              ? "border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 text-[var(--vivida-cyan)]"
+              : "border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/12 text-[var(--vivida-pink)]"
+          )}
+        >
+          <Sparkles className="size-4" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm leading-snug">
+            <span
+              className={cn(
+                "font-semibold tabular-nums",
+                earned
+                  ? "text-[var(--vivida-cyan)]"
+                  : "text-[var(--vivida-pink)]"
+              )}
+            >
+              {earned ? "+" : "−"}
+              {Math.abs(amount)} კრედიტი
+            </span>{" "}
+            {reasonLabel && (
+              <span className="text-muted-foreground">· {reasonLabel}</span>
+            )}
+          </div>
+          {typeof n.payload?.creditBalance === "number" && (
+            <div className="mt-0.5 text-xs text-muted-foreground/80">
+              ბალანსი: {n.payload.creditBalance}
+            </div>
+          )}
+          <div className="mt-0.5 text-xs text-muted-foreground/80">
+            {timeAgo(new Date(n.createdAt))}
+          </div>
+        </div>
+        {isUnread && (
+          <span
+            aria-hidden
+            className="mt-1.5 size-2 shrink-0 rounded-full bg-[var(--vivida-pink)]"
+          />
+        )}
+      </Link>
+    </li>
+  );
+}
+
 function DbNotificationRow({
   n,
   onClose,
@@ -263,6 +334,9 @@ function DbNotificationRow({
   n: Notification;
   onClose: () => void;
 }) {
+  if (n.kind === "credit") {
+    return <CreditNotificationRow n={n} onClose={onClose} />;
+  }
   const Icon = KIND_ICON[n.kind] ?? Bell;
   const username = n.payload?.fromUsername;
   const href =
