@@ -133,6 +133,30 @@ export function signHoroscopeLatinQueries(sign: ZodiacSlug): string[] {
   ].filter((s): s is string => Boolean(s));
 }
 
+/** Numerology cluster (`/numerologia`). */
+export const NUMEROLOGY_LATIN_QUERIES = [
+  "numerologia",
+  "bedis ricxvi",
+  "bedis rickhvi",
+  "bedis ricxvis gamotvla",
+  "cxovrebis gzis ricxvi",
+  "numerologia qartulad",
+  "ricxvebis mnishvneloba",
+  "master ricxvebi",
+];
+
+/** Mercury retrograde page (`/merkuri-retrogradi`). */
+export const RETROGRADE_LATIN_QUERIES = [
+  "merkuri retrogradshi",
+  "retrograduli merkuri",
+  "merkuri retrogradi",
+  "merkuris retrogradi 2026",
+  "retrogradi ras nishnavs",
+  "planetebis retrogradi",
+  "horoskopi",
+  "astrologia qartulad",
+];
+
 /** By-date page (`/zodiac/datit`). */
 export const BY_DATE_LATIN_QUERIES = [
   "zodiaqos nishani datit",

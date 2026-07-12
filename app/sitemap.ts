@@ -10,6 +10,7 @@ import {
   yearlyContentFor,
 } from "@/lib/seo/zodiac-content";
 import { ALL_HOROSCOPE_VIEWS, VIEW_PATH } from "@/lib/sign-horoscope";
+import { LIFE_PATH_NUMBERS } from "@/lib/numerology";
 import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
 import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
 import { ALL_MBTI_SLUGS } from "@/lib/seo/mbti-seo";
@@ -163,6 +164,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${BASE}/iq-testi`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE}/tavsebadoba`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
       url: `${BASE}/mbti`,
       lastModified: NOW,
       changeFrequency: "monthly",
@@ -196,6 +209,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${BASE}/mtvaris-kalendari`,
       lastModified: NOW,
       changeFrequency: "daily",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE}/numerologia`,
+      lastModified: NOW,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    ...LIFE_PATH_NUMBERS.map((n) => ({
+      url: `${BASE}/numerologia/${n}`,
+      lastModified: NOW,
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
+    })),
+    {
+      url: `${BASE}/merkuri-retrogradi`,
+      lastModified: NOW,
+      changeFrequency: "weekly",
       priority: 0.85,
     },
     {
