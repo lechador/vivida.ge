@@ -5,6 +5,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { users, profiles, referrals } from "@/db/schema";
 import {
+  earnOnce,
   ensureCreditAccount,
   grantCredits,
   REFERRAL_REWARD,
@@ -113,7 +114,10 @@ export async function qualifyReferral(invitedUserId: string): Promise<void> {
 export async function onUserSignedUp(userId: string): Promise<void> {
   try {
     await ensureCreditAccount(userId);
-    await grantCredits(userId, SIGNUP_BONUS, "signup_bonus");
+    // `earnOnce` guards on an existing signup_bonus row, so no matter how many
+    // create paths fire for one user (email registerUser + the Auth.js
+    // createUser event, etc.), the bonus lands exactly once.
+    await earnOnce(userId, SIGNUP_BONUS, "signup_bonus");
   } catch (err) {
     console.warn("[referral.onUserSignedUp] bonus failed:", (err as Error).message);
   }

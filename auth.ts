@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { accounts, sessions, users, verificationTokens } from "@/db/schema";
 import { authConfig } from "@/auth.config";
+import { onUserSignedUp } from "@/lib/referral";
 
 /**
  * Credentials provider for the email/password login flow. Lives in
@@ -83,9 +84,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         );
       }
     },
+    // Web Google sign-ups are created by the DrizzleAdapter (not our
+    // registerUser/findOrCreateOAuthUser paths), so this is the ONLY hook that
+    // fires for them. Without it, adapter-created users never received the
+    // signup bonus or referral attribution. onUserSignedUp is idempotent
+    // (earnOnce) + best-effort, so it can't double-grant or break the callback.
+    async createUser({ user }) {
+      if (!user?.id) return;
+      try {
+        await onUserSignedUp(user.id);
+      } catch (err) {
+        console.warn(
+          "[auth.createUser] signup bonus failed:",
+          (err as Error).message
+        );
+      }
+    },
   },
-  // No createUser event hook — trial provisioning is handled lazily on
-  // first /dashboard load via getCurrentPlan → provisionTrialIfMissing.
-  // Keeping the OAuth callback path tight makes Google sign-in feel
-  // noticeably faster on cold starts.
 });
