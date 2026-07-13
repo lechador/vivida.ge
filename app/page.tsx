@@ -13,6 +13,7 @@ import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { PillarsSection } from "@/components/landing/pillars-section";
 import { Starfield } from "@/components/landing/starfield";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteSearch } from "@/components/search/site-search";
 import { VividaMark } from "@/components/brand/vivida-mark";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -122,7 +123,7 @@ export default async function Home() {
 
         {/* Top nav */}
         <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex shrink-0 items-center gap-2">
             <VividaMark size={40} id="landing" />
             <span
               className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
@@ -134,7 +135,14 @@ export default async function Home() {
               vivida
             </span>
           </Link>
-          <div className="flex items-center gap-3 sm:gap-6">
+
+          <SiteSearch
+            compact
+            placeholder="ძებნა…"
+            className="mx-2 min-w-0 flex-1 sm:mx-4 sm:max-w-xs"
+          />
+
+          <div className="flex shrink-0 items-center gap-3 sm:gap-6">
             <nav className="hidden items-center gap-7 text-sm text-muted-foreground sm:flex">
               <Link
                 href="/how-it-works"

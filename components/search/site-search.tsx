@@ -28,7 +28,17 @@ type Flat =
  * profiles. Full keyboard support (↑/↓/Enter/Esc). Navigating picks the page
  * or /u/<username>.
  */
-export function SiteSearch() {
+export function SiteSearch({
+  className,
+  compact = false,
+  placeholder = "ძებნა — ნიშანი, ტესტი, ჰოროსკოპი, ხალხი…",
+}: {
+  /** Root width/layout override (defaults to a hero-sized max width). */
+  className?: string;
+  /** Slimmer padding for navbar placement. */
+  compact?: boolean;
+  placeholder?: string;
+} = {}) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [pages, setPages] = useState<PageHit[]>([]);
@@ -121,9 +131,16 @@ export function SiteSearch() {
   }
 
   return (
-    <div ref={boxRef} className="relative w-full max-w-lg text-left">
+    <div
+      ref={boxRef}
+      className={`relative text-left ${className ?? "w-full max-w-lg"}`}
+    >
       <div className="relative">
-        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
+        <Search
+          className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted-foreground ${
+            compact ? "left-3 size-4" : "left-4 size-5"
+          }`}
+        />
         <input
           type="text"
           value={q}
@@ -133,12 +150,20 @@ export function SiteSearch() {
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
-          placeholder="ძებნა — ნიშანი, ტესტი, ჰოროსკოპი, ხალხი…"
+          placeholder={placeholder}
           aria-label="ძებნა საიტზე"
-          className="w-full rounded-2xl border border-border bg-card/70 py-3.5 pl-12 pr-11 text-[15px] text-foreground shadow-lg outline-none backdrop-blur-xl transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+          className={
+            compact
+              ? "w-full rounded-full border border-border bg-card/70 py-2 pl-9 pr-9 text-sm text-foreground outline-none backdrop-blur-xl transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+              : "w-full rounded-2xl border border-border bg-card/70 py-3.5 pl-12 pr-11 text-[15px] text-foreground shadow-lg outline-none backdrop-blur-xl transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+          }
         />
         {loading && (
-          <Loader2 className="absolute right-4 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+          <Loader2
+            className={`absolute top-1/2 -translate-y-1/2 animate-spin text-muted-foreground ${
+              compact ? "right-3 size-3.5" : "right-4 size-4"
+            }`}
+          />
         )}
       </div>
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { MarketingCta } from "@/components/marketing-cta";
+import { SiteSearch } from "@/components/search/site-search";
 
 /**
  * Lightweight header for public marketing pages (/how-it-works, /features,
@@ -27,8 +28,8 @@ export function MarketingHeader({
   );
 
   return (
-    <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
-      <Link href="/" className="flex items-center gap-2.5">
+    <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-5 sm:px-6 sm:py-6">
+      <Link href="/" className="flex shrink-0 items-center gap-2.5">
         <VividaMark size={40} id="marketing-header" />
         <span
           className="bg-clip-text text-transparent text-lg font-semibold tracking-tight sm:text-xl"
@@ -41,13 +42,21 @@ export function MarketingHeader({
         </span>
       </Link>
 
-      <nav className="hidden items-center gap-7 text-sm sm:flex">
+      <SiteSearch
+        compact
+        placeholder="ძებნა…"
+        className="mx-2 min-w-0 flex-1 sm:mx-4 sm:max-w-xs"
+      />
+
+      <nav className="hidden shrink-0 items-center gap-7 text-sm sm:flex">
         {link("/nataluri-ruka", "ნატალური რუკა", "nataluri-ruka")}
         {link("/zodiac", "ზოდიაქო", "zodiac")}
         {link("/how-it-works", "როგორ მუშაობს", "how-it-works")}
       </nav>
 
-      <MarketingCta />
+      <div className="shrink-0">
+        <MarketingCta />
+      </div>
     </header>
   );
 }
