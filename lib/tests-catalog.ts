@@ -18,15 +18,6 @@ export type TestCatalogEntry = {
 
 export const TESTS: TestCatalogEntry[] = [
   {
-    slug: "famous-zodiac",
-    href: "/quiz/varskvlavebis-zodiaqo",
-    titleKa: "ვარსკვლავების ზოდიაქო",
-    taglineKa: "გამოიცანი ცნობილი ადამიანების ნიშანი",
-    descKa: "10-კითხვიანი სწრაფი ქვიზი — რამდენად კარგად იცნობ მსახიობების, მომღერლებისა და სპორტსმენების ზოდიაქოს ნიშნებს?",
-    metaKa: "10 კითხვა · ~2 წუთი · უფასო",
-    available: true,
-  },
-  {
     slug: "iq",
     href: "/iq-testi",
     titleKa: "IQ ტესტი",

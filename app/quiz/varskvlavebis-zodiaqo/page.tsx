@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { auth } from "@/auth";
 import { AppHeader } from "@/components/nav/app-header";
@@ -13,10 +14,12 @@ import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
 const SITE_URL = "https://www.vivida.ge";
 const TITLE = "ვარსკვლავების ზოდიაქო — გამოიცანი ცნობილი ადამიანების ნიშანი";
 const DESCRIPTION = "გამოიცანი 10 ცნობილი ადამიანის ზოდიაქოს ნიშანი. სწრაფი, უფასო ქვიზი ქართულად — შედეგი და გაზიარება დასრულებისთანავე.";
+const QUIZ_IS_LIVE = false;
 
 export const metadata: Metadata = { title: { absolute: TITLE }, description: DESCRIPTION, alternates: { canonical: `${SITE_URL}/quiz/varskvlavebis-zodiaqo` }, openGraph: { type: "website", url: `${SITE_URL}/quiz/varskvlavebis-zodiaqo`, title: TITLE, description: DESCRIPTION, siteName: "Vivida", locale: "ka_GE" }, twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION } };
 
 export default async function FamousZodiacQuizPage() {
+  if (!QUIZ_IS_LIVE) notFound();
   const session = await auth();
   const authed = !!session?.user?.id;
   const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
