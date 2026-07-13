@@ -35,6 +35,12 @@ export default async function AdminLayout({
             >
               ფიდი
             </Link>
+            <Link
+              href="/admin/quiz-assets"
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              ქვიზის ფოტოები
+            </Link>
             <span className="text-muted-foreground/40">·</span>
             <span className="text-muted-foreground/80">
               {admin.email}

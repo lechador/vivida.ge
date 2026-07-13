@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { Brain, Fingerprint, Clock, ArrowRight, RotateCcw } from "lucide-react";
+import { Brain, Fingerprint, Clock, ArrowRight, RotateCcw, Sparkles } from "lucide-react";
 
 import { auth } from "@/auth";
 import { getCurrentPlan } from "@/lib/plan";
@@ -19,6 +19,7 @@ const SITE_URL = "https://www.vivida.ge";
 const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
   iq: { Icon: Brain, accent: "var(--vivida-cyan)" },
   "astro-mbti": { Icon: Fingerprint, accent: "var(--vivida-violet)" },
+  "famous-zodiac": { Icon: Sparkles, accent: "var(--vivida-pink)" },
 };
 const FALLBACK_THEME = { Icon: Brain, accent: "var(--vivida-violet)" };
 

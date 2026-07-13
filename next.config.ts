@@ -32,6 +32,8 @@ const nextConfig: NextConfig = {
       // Cloudflare R2 — dev-mode public buckets + custom domains
       { protocol: "https", hostname: "**.r2.dev" },
       { protocol: "https", hostname: "**.r2.cloudflarestorage.com" },
+      // Local fallback before the production R2 seed is run.
+      { protocol: "https", hostname: "upload.wikimedia.org" },
       // Own-domain absolute URLs (the Vivida brand account's avatar points
       // at www.vivida.ge/apple-icon.png; without this its profile page 500s).
       { protocol: "https", hostname: "www.vivida.ge" },
