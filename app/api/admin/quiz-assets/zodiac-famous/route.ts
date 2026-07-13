@@ -12,9 +12,13 @@ export const maxDuration = 60;
  * It only fetches the hard-coded Commons URLs in `zodiac-famous-assets.ts`.
  * Use this after deployment while signed in as an admin.
  */
-export async function POST() {
+export async function POST(request: Request) {
   const session = await auth();
-  if (!isAdminEmail(session?.user?.email)) {
+  const sharedToken = process.env.ADMIN_API_TOKEN;
+  const panelAuthorized = Boolean(
+    sharedToken && request.headers.get("x-admin-token") === sharedToken
+  );
+  if (!panelAuthorized && !isAdminEmail(session?.user?.email)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
   if (!isR2Configured()) {
