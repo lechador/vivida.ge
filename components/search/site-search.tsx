@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Loader2, Search } from "lucide-react";
@@ -46,7 +47,17 @@ export function SiteSearch({
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(
+    null
+  );
   const boxRef = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+
+  // Position the (portalled) panel directly under the input.
+  function place() {
+    const r = boxRef.current?.getBoundingClientRect();
+    if (r) setPos({ top: r.bottom + 8, left: r.left, width: r.width });
+  }
 
   // Debounced fetch.
   useEffect(() => {
@@ -80,16 +91,30 @@ export function SiteSearch({
     };
   }, [q]);
 
-  // Close on outside click.
+  // Close on outside click — the panel is portalled to <body>, so check both
+  // the input box and the panel itself.
   useEffect(() => {
     function onDown(e: MouseEvent) {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
+      const t = e.target as Node;
+      if (!boxRef.current?.contains(t) && !popRef.current?.contains(t)) {
         setOpen(false);
       }
     }
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
+
+  // Keep the panel glued to the input while it's open.
+  useEffect(() => {
+    if (!open) return;
+    place();
+    window.addEventListener("scroll", place, true);
+    window.addEventListener("resize", place);
+    return () => {
+      window.removeEventListener("scroll", place, true);
+      window.removeEventListener("resize", place);
+    };
+  }, [open]);
 
   const flat = useMemo<Flat[]>(
     () => [
@@ -167,8 +192,20 @@ export function SiteSearch({
         )}
       </div>
 
-      {showPanel && (
-        <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-[60vh] overflow-y-auto rounded-2xl border border-border bg-[oklch(0.18_0.04_285/0.97)] p-1.5 shadow-2xl ring-1 ring-foreground/10 backdrop-blur-2xl">
+      {showPanel &&
+        pos &&
+        createPortal(
+        <div
+          ref={popRef}
+          style={{
+            position: "fixed",
+            top: pos.top,
+            left: pos.left,
+            width: pos.width,
+            minWidth: 260,
+          }}
+          className="z-[1000] max-h-[60vh] overflow-y-auto rounded-2xl border border-border bg-[oklch(0.18_0.04_285/0.97)] p-1.5 text-left shadow-2xl ring-1 ring-foreground/10 backdrop-blur-2xl"
+        >
           {flat.length === 0 ? (
             <div className="px-4 py-6 text-center text-sm text-muted-foreground">
               {loading ? "ძებნა…" : "ვერაფერი მოიძებნა"}
@@ -237,8 +274,9 @@ export function SiteSearch({
               })}
             </ul>
           )}
-        </div>
-      )}
+        </div>,
+          document.body
+        )}
     </div>
   );
 }
