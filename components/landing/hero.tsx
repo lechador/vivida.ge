@@ -7,6 +7,7 @@ import { Check } from "lucide-react";
 
 import { SignInButton } from "./sign-in-button";
 import { HeroPreview } from "./hero-preview";
+import { SiteSearch } from "@/components/search/site-search";
 import { HOME_CONTENT } from "@/lib/seo/home-content";
 
 const EASE_OUT_EXPO = [0.22, 1, 0.36, 1] as const;
@@ -107,9 +108,10 @@ export function Hero() {
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="mt-8"
+        className="mt-8 flex w-full flex-col items-center gap-5"
       >
         <SignInButton label={c.ctaPrimary} loadingLabel={c.ctaPrimaryLoading} />
+        <SiteSearch />
       </motion.div>
 
       <motion.p
