@@ -167,7 +167,22 @@ async function resolveChart(
     if (mode === "defer") {
       scheduleAiUpgrade(userId, expectedHash, computed.data);
     } else {
-      await upgradeChartAi(userId, expectedHash, computed.data);
+      // The static chart above is already fully renderable (library/static
+      // text covers every placement); the AI only adds the summary paragraph.
+      // So an AI failure must NEVER crash the page — log it and return the
+      // static chart. This was the "/report errors right after onboarding,
+      // works on refresh" bug: a transient OpenRouter/Gemini error threw
+      // straight through the Server Component with no error boundary to catch
+      // it. A later visit hits the cached static chart and (if the background
+      // upgrade landed) the summary.
+      try {
+        await upgradeChartAi(userId, expectedHash, computed.data);
+      } catch (err) {
+        console.warn(
+          "[resolveChart] inline AI upgrade failed; serving static chart:",
+          (err as Error).message
+        );
+      }
     }
   }
 
