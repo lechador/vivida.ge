@@ -17,6 +17,7 @@ import { MbtiProfileSections } from "@/components/mbti/mbti-profile-sections";
 import { MbtiFamousPeople } from "@/components/mbti/mbti-famous-people";
 import { MbtiShareButton } from "@/components/mbti/mbti-share-button";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
+import { NextTestWidget } from "@/components/tests/next-test-widget";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 
@@ -114,6 +115,8 @@ export default async function TestResultPage({
             </div>
           </>
         )}
+
+        <NextTestWidget completed="astro-mbti" />
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-6">
           <p className="text-xs text-muted-foreground">

@@ -11,6 +11,7 @@ import { scoreIq, type IqResult } from "@/lib/iq/scoring";
 import { IQ_ANSWERS_STORAGE_KEY } from "@/lib/iq/items";
 import { IqBellCurve, DomainBar } from "@/components/iq/iq-bell-curve";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
+import { NextTestWidget } from "@/components/tests/next-test-widget";
 
 type Stored = {
   answers: Record<string, number>;
@@ -186,6 +187,8 @@ export function IqResultClient() {
           <Link href="/tests">სხვა ტესტები</Link>
         </Button>
       </div>
+
+      <NextTestWidget completed="iq" />
 
       <p className="mx-auto max-w-lg text-center text-xs leading-relaxed text-muted-foreground">
         ერთჯერადი ონლაინ ტესტის შედეგი მიახლოებითია (±5 ქულა) და დამოკიდებულია

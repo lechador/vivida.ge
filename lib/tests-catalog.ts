@@ -1,10 +1,10 @@
 /**
- * The catalog of psychological tests shown on the /tests hub. Adding a new test
- * is a single entry here (plus its own pages). Keep the newest/most prominent
- * first — the hub renders them in this order.
+ * The catalog of tests and light quizzes shown on /tests. Featured assessments
+ * remain pinned above the quick, replayable quiz section.
  */
 export type TestCatalogEntry = {
   slug: string;
+  kind: "featured" | "quiz";
   /** Where "start" links to. */
   href: string;
   titleKa: string;
@@ -18,16 +18,8 @@ export type TestCatalogEntry = {
 
 export const TESTS: TestCatalogEntry[] = [
   {
-    slug: "famous-zodiac",
-    href: "/quiz/varskvlavebis-zodiaqo",
-    titleKa: "ვარსკვლავების ზოდიაქო",
-    taglineKa: "გამოიცანი ცნობილი ადამიანების ნიშანი",
-    descKa: "10-კითხვიანი სწრაფი ქვიზი — რამდენად კარგად იცნობ მსახიობების, მომღერლებისა და სპორტსმენების ზოდიაქოს ნიშნებს?",
-    metaKa: "10 კითხვა · ~2 წუთი · უფასო",
-    available: true,
-  },
-  {
     slug: "iq",
+    kind: "featured",
     href: "/iq-testi",
     titleKa: "IQ ტესტი",
     taglineKa: "შენი ინტელექტის კოეფიციენტი",
@@ -38,12 +30,23 @@ export const TESTS: TestCatalogEntry[] = [
   },
   {
     slug: "astro-mbti",
+    kind: "featured",
     href: "/pirovnebis-testi",
     titleKa: "Astro-MBTI",
     taglineKa: "შენი ფსიქოლოგიური ტიპი",
     descKa:
       "აღმოაჩინე შენი პიროვნების ტიპი 16 ტიპიდან — ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ზრდის გზა.",
     metaKa: "60 კითხვა · ~7 წუთი · უფასო",
+    available: true,
+  },
+  {
+    slug: "famous-zodiac",
+    kind: "quiz",
+    href: "/quiz/varskvlavebis-zodiaqo",
+    titleKa: "ვარსკვლავების ზოდიაქო",
+    taglineKa: "გამოიცანი ცნობილი ადამიანების ნიშანი",
+    descKa: "10-კითხვიანი სწრაფი ქვიზი — რამდენად კარგად იცნობ მსახიობების, მომღერლებისა და სპორტსმენების ზოდიაქოს ნიშნებს?",
+    metaKa: "10 კითხვა · ~2 წუთი · უფასო",
     available: true,
   },
 ];

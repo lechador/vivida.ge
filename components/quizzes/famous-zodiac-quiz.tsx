@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { Check, RotateCcw, Share2, Sparkles, Trophy, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { NextTestWidget } from "@/components/tests/next-test-widget";
 import {
   FAMOUS_ZODIAC_QUESTIONS,
   ZODIAC_SIGNS,
@@ -114,6 +115,8 @@ export function FamousZodiacQuiz({ images }: { images: Record<string, string> })
             })}
           </div>
         </section>
+
+        <NextTestWidget completed="famous-zodiac" />
 
         <details className="rounded-2xl border border-border bg-card/40 px-4 py-3 text-xs text-muted-foreground">
           <summary className="cursor-pointer font-medium text-foreground/80">ფოტოების წყაროები და ლიცენზიები</summary>

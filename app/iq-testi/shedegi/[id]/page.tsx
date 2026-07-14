@@ -14,6 +14,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { IqBellCurve, DomainBar } from "@/components/iq/iq-bell-curve";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
+import { NextTestWidget } from "@/components/tests/next-test-widget";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 
@@ -122,6 +123,8 @@ export default async function SavedIqResultPage({
         )}
 
         {unlocked && <ProfileVisibilityToggle kind="iq" />}
+
+        <NextTestWidget completed="iq" />
 
         <div className="mt-6 flex justify-center">
           <Button asChild variant="outline">
