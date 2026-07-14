@@ -1,11 +1,11 @@
 import { auth } from "@/auth";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { FAMOUS_ZODIAC_ASSETS } from "@/lib/zodiac-famous-assets";
-import { isR2Configured, putObject, publicUrlFor } from "@/lib/r2";
+import { isR2Configured, objectExists, putObject, publicUrlFor } from "@/lib/r2";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 /**
  * One-time (and safe-to-repeat) R2 seed for the reviewed celebrity images.
@@ -25,11 +25,17 @@ export async function POST(request: Request) {
     return Response.json({ error: "r2_unavailable" }, { status: 503 });
   }
 
-  const uploaded: { id: string; url: string }[] = [];
+  const ready: { id: string; url: string; status: "uploaded" | "already_present" }[] = [];
   const failed: { id: string; error: string }[] = [];
 
   for (const asset of FAMOUS_ZODIAC_ASSETS) {
     try {
+      // A retry should only request missing files. This avoids repeatedly
+      // downloading the already-seeded images and respects Commons' limits.
+      if (await objectExists(asset.key)) {
+        ready.push({ id: asset.id, url: publicUrlFor(asset.key), status: "already_present" });
+        continue;
+      }
       const response = await fetch(asset.sourceUrl, {
         headers: { "user-agent": "VividaQuizAssets/1.0" },
         signal: AbortSignal.timeout(20_000),
@@ -44,11 +50,14 @@ export async function POST(request: Request) {
         throw new Error("invalid source size");
       }
       await putObject({ key: asset.key, body, contentType });
-      uploaded.push({ id: asset.id, url: publicUrlFor(asset.key) });
+      ready.push({ id: asset.id, url: publicUrlFor(asset.key), status: "uploaded" });
+      // Commons is a shared public service. Keep the fixed asset seed gentle
+      // instead of issuing a burst of image downloads from the Vercel worker.
+      await new Promise((resolve) => setTimeout(resolve, 1_100));
     } catch (error) {
       failed.push({ id: asset.id, error: error instanceof Error ? error.message : "upload_failed" });
     }
   }
 
-  return Response.json({ uploaded, failed });
+  return Response.json({ ready, failed });
 }
