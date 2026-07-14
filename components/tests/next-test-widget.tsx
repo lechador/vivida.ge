@@ -17,7 +17,7 @@ const RECOMMENDATIONS: Record<CompletedKind, {
     description: "ინტელექტის შემდეგ, გაიგე როგორ ფიქრობ, იღებ გადაწყვეტილებებს და ურთიერთობ სხვა ადამიანებთან.",
     items: [
       { href: "/pirovnebis-testi", title: "Astro-MBTI", description: "აღმოაჩინე შენი ფსიქოლოგიური ტიპი", Icon: Fingerprint, accent: "var(--vivida-violet)" },
-      { href: "/quiz/varskvlavebis-zodiaqo", title: "ვარსკვლავების ზოდიაქო", description: "სწრაფი 10-კითხვიანი ქვიზი", Icon: Sparkles, accent: "var(--vivida-pink)" },
+      { href: "/quiz/varskvlavebis-zodiaqo", title: "ვარსკვლავების ზოდიაქო", description: "სწრაფი 20-კითხვიანი ქვიზი", Icon: Sparkles, accent: "var(--vivida-pink)" },
     ],
   },
   "astro-mbti": {
@@ -26,7 +26,7 @@ const RECOMMENDATIONS: Record<CompletedKind, {
     description: "შენი ტიპი უკვე იცი — ახლა გამოსცადე ლოგიკა, პატერნები და ანალიტიკური აზროვნება.",
     items: [
       { href: "/iq-testi", title: "IQ ტესტი", description: "25 ადაპტიური ლოგიკური დავალება", Icon: Brain, accent: "var(--vivida-cyan)" },
-      { href: "/quiz/varskvlavebis-zodiaqo", title: "ვარსკვლავების ზოდიაქო", description: "სწრაფი 10-კითხვიანი ქვიზი", Icon: Sparkles, accent: "var(--vivida-pink)" },
+      { href: "/quiz/varskvlavebis-zodiaqo", title: "ვარსკვლავების ზოდიაქო", description: "სწრაფი 20-კითხვიანი ქვიზი", Icon: Sparkles, accent: "var(--vivida-pink)" },
     ],
   },
   "famous-zodiac": {

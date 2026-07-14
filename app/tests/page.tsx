@@ -163,7 +163,7 @@ export default async function TestsPage() {
         </section>
 
         <section className="mt-9" aria-labelledby="quick-quizzes">
-          <div className="mb-4"><div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">მსუბუქი და სწრაფი</div><h2 id="quick-quizzes" className="mt-1 text-xl font-semibold tracking-tight">ქვიზები</h2><p className="mt-1 text-sm text-muted-foreground">რამდენიმე წუთი, 10 კითხვა და შედეგი მყისიერად.</p></div>
+          <div className="mb-4"><div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">მსუბუქი და სწრაფი</div><h2 id="quick-quizzes" className="mt-1 text-xl font-semibold tracking-tight">ქვიზები</h2><p className="mt-1 text-sm text-muted-foreground">რამდენიმე წუთი, 20 კითხვა და შედეგი მყისიერად.</p></div>
           <div className="grid gap-4 sm:grid-cols-2">{TESTS.filter((test) => test.kind === "quiz").map((test) => <TestCard key={test.slug} test={test} done={test.available ? myResults[test.slug] : undefined} />)}</div>
         </section>
 
