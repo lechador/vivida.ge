@@ -6,6 +6,7 @@ import { after } from "next/server";
 import { type Message } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { sendMessageEmail } from "@/lib/email";
+import { sendMessagePush } from "@/lib/notification-push";
 import {
   markConversationReadCore,
   pingTypingCore,
@@ -41,6 +42,20 @@ export async function sendMessage(
     } catch (err) {
       console.warn(
         "[messages] message email after-hook failed:",
+        (err as Error).message
+      );
+    }
+    // Web push for away recipients — throttled per conversation inside.
+    try {
+      await sendMessagePush({
+        recipientUserId: recipientId,
+        fromUserId: user.id,
+        fromName: user.name ?? "Vivida-ის წევრი",
+        body: trimmed,
+      });
+    } catch (err) {
+      console.warn(
+        "[messages] message push after-hook failed:",
         (err as Error).message
       );
     }

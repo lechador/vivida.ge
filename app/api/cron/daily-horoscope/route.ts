@@ -6,6 +6,7 @@ import {
 } from "@/lib/email-marketing";
 import { sendDailyPushBlast } from "@/lib/push";
 import { sendBirthdayGifts } from "@/lib/birthday";
+import { sendWinbackNudges } from "@/lib/winback";
 import { pruneRateLimits } from "@/lib/rate-limit";
 
 /**
@@ -84,11 +85,20 @@ async function run(req: NextRequest) {
     console.warn("[cron] birthday gifts failed:", (err as Error).message);
   }
 
+  // Winback nudges — users active before, quiet 7-14 days. Once per dormancy
+  // spell (claim-row guard inside), so the retry tick is safe here too.
+  let winback = { dormant: 0, emailed: 0, pushed: 0, skipped: 0, failed: 0 };
+  try {
+    winback = await sendWinbackNudges();
+  } catch (err) {
+    console.warn("[cron] winback nudges failed:", (err as Error).message);
+  }
+
   // Housekeeping: drop expired rate-limit counters. Best-effort, never
   // blocks or fails the blast (pruneRateLimits swallows its own errors).
   await pruneRateLimits();
 
-  return NextResponse.json({ sendDate, concurrency, ...result, push, birthdays });
+  return NextResponse.json({ sendDate, concurrency, ...result, push, birthdays, winback });
 }
 
 // Vercel Cron fires GET; manual reruns from admin can use POST.

@@ -15,6 +15,7 @@ import {
 } from "@/db/schema";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { isAdminEmail } from "@/lib/admin-auth";
+import { queueNotificationPush } from "@/lib/notification-push";
 import { resolveMentions } from "@/lib/mentions";
 import {
   awardReputation,
@@ -106,6 +107,7 @@ async function notifyMentions(opts: {
     }));
     await db.insert(notifications).values(rows);
     for (const t of targets) invalidateHeaderForUser(t.userId);
+    for (const r of rows) queueNotificationPush(r.userId, r.kind, r.payload);
   } catch (err) {
     console.warn("[feed.notifyMentions] failed:", (err as Error).message);
   }
@@ -277,6 +279,7 @@ export async function addCommentCore(
       payload,
     });
     invalidateHeaderForUser(recipientId);
+    queueNotificationPush(recipientId, "post_comment", payload);
   }
 
   if (inserted) {
@@ -377,6 +380,7 @@ export async function reactToPostCore(
         payload,
       });
       invalidateHeaderForUser(post.userId);
+      queueNotificationPush(post.userId, "post_reaction", payload);
 
       const postAuthorId = post.userId;
       after(async () => {

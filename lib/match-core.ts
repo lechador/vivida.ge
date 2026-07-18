@@ -12,6 +12,7 @@ import {
   type NotificationPayload,
 } from "@/db/schema";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
+import { queueNotificationPush } from "@/lib/notification-push";
 
 /**
  * Framework-agnostic match-deck write logic, shared by the mobile API
@@ -79,6 +80,7 @@ async function emitMatchNotification(toUserId: string, aboutUserId: string) {
     .insert(notifications)
     .values({ userId: toUserId, kind: "new_match", payload });
   invalidateHeaderForUser(toUserId);
+  queueNotificationPush(toUserId, "new_match", payload);
 }
 
 /**

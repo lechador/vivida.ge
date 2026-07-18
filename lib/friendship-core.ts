@@ -14,6 +14,7 @@ import { sendFriendRequestEmail } from "@/lib/email";
 import { isBlockedEitherWay } from "@/lib/block";
 import { isAccountRestricted } from "@/lib/restriction";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
+import { queueNotificationPush } from "@/lib/notification-push";
 import { awardReputation, RepSubject } from "@/lib/reputation";
 
 /**
@@ -69,6 +70,7 @@ async function emitNotification({
 
   await db.insert(notifications).values({ userId: toUserId, kind, payload });
   invalidateHeaderForUser(toUserId);
+  queueNotificationPush(toUserId, kind, payload);
 }
 
 /**

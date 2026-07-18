@@ -6,6 +6,7 @@ import { handle } from "@/lib/api/errors";
 import { ok, fail } from "@/lib/api/respond";
 import { parseBody } from "@/lib/api/validate";
 import { sendMessageEmail } from "@/lib/email";
+import { sendMessagePush } from "@/lib/notification-push";
 import { listMessages, partnerSnippet } from "@/lib/messages";
 import { sendMessageCore } from "@/lib/messages-core";
 
@@ -88,6 +89,19 @@ export async function POST(
       } catch (err) {
         console.warn(
           "[api/v1/messages] message email after-hook failed:",
+          (err as Error).message
+        );
+      }
+      try {
+        await sendMessagePush({
+          recipientUserId: userId,
+          fromUserId: user.id,
+          fromName: user.name ?? "Vivida-ის წევრი",
+          body: trimmed,
+        });
+      } catch (err) {
+        console.warn(
+          "[api/v1/messages] message push after-hook failed:",
           (err as Error).message
         );
       }
