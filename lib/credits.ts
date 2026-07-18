@@ -238,6 +238,22 @@ export async function earnOnce(
 }
 
 /**
+ * Record a zero-cost use of a metered feature. grantCredits/spendCredits both
+ * short-circuit on amount<=0 (no ledger row), so a free use has to be logged
+ * explicitly for countUnlocks() to see it — that's how "first one free, then
+ * charge" allowances get consumed. No balance change, no notification.
+ */
+export async function recordFreeUse(
+  userId: string,
+  reason: CreditReason,
+  ref?: string
+): Promise<void> {
+  await db
+    .insert(creditTransactions)
+    .values({ userId, amount: 0, reason, ref: ref ?? null });
+}
+
+/**
  * How many distinct items the user has unlocked under `reason` (free + paid).
  * Used to apply a lifetime free allowance before charging — e.g. the first
  * synastry is free, then each subsequent one costs credits.

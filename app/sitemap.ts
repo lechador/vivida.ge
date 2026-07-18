@@ -14,6 +14,7 @@ import { LIFE_PATH_NUMBERS } from "@/lib/numerology";
 import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
 import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
 import { ALL_MBTI_SLUGS } from "@/lib/seo/mbti-seo";
+import { TAROT_CARDS } from "@/lib/tarot/deck";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -143,6 +144,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+  // Tarot — the 22 Major Arcana card pages ("ტარო [კარტი]").
+  const tarotCardPages: MetadataRoute.Sitemap = TAROT_CARDS.map((c) => ({
+    url: `${BASE}/taro/${c.slug}`,
+    lastModified: EVERGREEN,
+    changeFrequency: "monthly",
+    priority: 0.65,
+  }));
+
   return [
     {
       url: `${BASE}/`,
@@ -221,6 +230,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: NOW,
       changeFrequency: "daily",
       priority: 0.85,
+    },
+    {
+      url: `${BASE}/taro`,
+      lastModified: EVERGREEN,
+      changeFrequency: "weekly",
+      priority: 0.9,
     },
     {
       url: `${BASE}/numerologia`,

@@ -63,6 +63,7 @@ export const CREDIT_COST = {
   audioHoroscope: 2,
   pdfReport: 5,
   weeklyForecast: 10,
+  tarot: 10,
 } as const;
 
 /** Free before credits are needed. */
@@ -71,6 +72,8 @@ export const FREE_ALLOWANCE = {
   synastry: 1,
   /** Free AI-chat messages per day. */
   chatPerDay: 2,
+  /** Lifetime free tarot readings before each costs credits. */
+  tarot: 1,
 } as const;
 
 export type CreditReason =
@@ -89,6 +92,7 @@ export type CreditReason =
   | "spend_audio"
   | "spend_report"
   | "spend_weekly"
+  | "spend_tarot"
   | "grandfather"
   | "admin_grant";
 
@@ -113,6 +117,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   spend_audio: "აუდიო ჰოროსკოპი",
   spend_report: "PDF რუკა",
   spend_weekly: "7-დღიანი პროგნოზი",
+  spend_tarot: "ტარო კითხვა",
   grandfather: "საჩუქარი",
   admin_grant: "საჩუქარი",
 };

@@ -1629,6 +1629,109 @@ export async function generateChineseZodiacHub(input: {
   };
 }
 
+// ── Tarot reading ("ტარო ქართულად") ────────────────────────────────────────
+const TAROT_SYSTEM_PROMPT = `შენ ხარ გამოცდილი, თბილი ქართველი ტაროლოგი. მომხმარებელი გისვამს კითხვას და უშლი 3-კარტიან განლაგებას (წარსული/ფესვი, აწმყო/ბირთვი, მომავალი/გზა). დაწერე ცოცხალი, კონკრეტული და თანამგრძნობი კითხვა ქართულ ენაზე, რომელიც სამივე კარტს აკავშირებს მომხმარებლის შეკითხვასთან.
+
+წესები:
+- ისაუბრე პირდაპირ მომხმარებელთან ("შენ").
+- გამოიყენე მოცემული კარტების მნიშვნელობები (მათ შორის შებრუნებული პოზიცია), ნუ მოიგონებ ახალ კარტებს.
+- იყავი კონკრეტული და პრაქტიკული — მიეცი ხედვა და რჩევა, არა ბუნდოვანი მისტიკა.
+- არ დაჰპირდე გარანტირებულ მომავალს; ტარო ხედვაა, არა წინასწარმეტყველება.
+- არ მისცე კატეგორიული ფინანსური, სამედიცინო ან იურიდიული რჩევა.
+- დააბრუნე მხოლოდ JSON.
+
+JSON ფორმატი: {"headline": "მოკლე, ძლიერი სათაური (3-7 სიტყვა)", "cards": ["თითო კარტის კონკრეტული ინტერპრეტაცია კითხვის კონტექსტში — 3 ელემენტი, თითო 1-2 წინადადება, პოზიციების მიხედვით"], "reading": "1-2 აბზაცი, სამივე კარტის სინთეზი კითხვასთან", "advice": "ერთი კონკრეტული, ქმედითი რჩევა"}`;
+
+export type TarotReadingResult = {
+  headline: string;
+  cards: string[];
+  reading: string;
+  advice: string;
+};
+
+export type TarotCardInput = {
+  positionKa: string;
+  nameKa: string;
+  orientationKa: string;
+  meaningKa: string;
+};
+
+/**
+ * Generate a personalized 3-card tarot reading for the user's question. Returns
+ * null when OpenRouter isn't configured (caller falls back to a composed
+ * reading from the static card meanings — the feature never hard-fails after
+ * a credit charge).
+ */
+export async function generateTarotReading(input: {
+  question: string;
+  cards: TarotCardInput[];
+}): Promise<TarotReadingResult | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const cardLines = input.cards
+    .map(
+      (c, i) =>
+        `${i + 1}. პოზიცია „${c.positionKa}" — ${c.nameKa} (${c.orientationKa}): ${c.meaningKa}`
+    )
+    .join("\n");
+  const userMessage = [
+    `მომხმარებლის კითხვა: „${input.question}"`,
+    "",
+    "გამოსული კარტები:",
+    cardLines,
+    "",
+    "დაწერე კითხვა JSON-ად.",
+  ].join("\n");
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida tarot",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      messages: [
+        { role: "system", content: TAROT_SYSTEM_PROMPT },
+        { role: "user", content: userMessage },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.85,
+      max_tokens: 1600,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  const parsed = JSON.parse(stripped) as TarotReadingResult;
+  if (!parsed.headline || !parsed.reading) {
+    throw new Error("missing required fields in tarot reading");
+  }
+  return {
+    headline: parsed.headline,
+    cards: Array.isArray(parsed.cards) ? parsed.cards.slice(0, 3) : [],
+    reading: parsed.reading,
+    advice: parsed.advice ?? "",
+  };
+}
+
 // ── Streaming chat (chart chat / "ჰკითხე ვარსკვლავებს") ─────────────────────
 export type ChatMessage = {
   role: "system" | "user" | "assistant";

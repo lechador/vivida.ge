@@ -133,6 +133,20 @@ export function signHoroscopeLatinQueries(sign: ZodiacSlug): string[] {
   ].filter((s): s is string => Boolean(s));
 }
 
+/** Tarot cluster (`/taro`). */
+export const TAROT_LATIN_QUERIES = [
+  "taro",
+  "taro qartulad",
+  "onlain taro",
+  "taros gashla",
+  "taro kitxva",
+  "taro cards",
+  "taro kartebi",
+  "ufaso taro",
+  "taro gashla onlain",
+  "astrologia qartulad",
+];
+
 /** Numerology cluster (`/numerologia`). */
 export const NUMEROLOGY_LATIN_QUERIES = [
   "numerologia",
