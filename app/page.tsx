@@ -123,24 +123,26 @@ export default async function Home() {
 
         {/* Top nav */}
         <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
-          <Link href="/" className="flex shrink-0 items-center gap-2">
-            <VividaMark size={40} id="landing" />
-            <span
-              className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
-              style={{
-                backgroundImage:
-                  "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-              }}
-            >
-              vivida
-            </span>
-          </Link>
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+            <Link href="/" className="flex shrink-0 items-center gap-2">
+              <VividaMark size={40} id="landing" />
+              <span
+                className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+                }}
+              >
+                vivida
+              </span>
+            </Link>
 
-          <SiteSearch
-            compact
-            placeholder="ძებნა…"
-            className="mx-2 min-w-0 flex-1 sm:mx-4 sm:max-w-xs"
-          />
+            <SiteSearch
+              compact
+              placeholder="ძებნა…"
+              className="min-w-0 flex-1 sm:max-w-xs"
+            />
+          </div>
 
           <div className="flex shrink-0 items-center gap-3 sm:gap-6">
             <nav className="hidden items-center gap-7 text-sm text-muted-foreground sm:flex">

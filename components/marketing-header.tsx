@@ -28,33 +28,35 @@ export function MarketingHeader({
   );
 
   return (
-    <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-5 sm:px-6 sm:py-6">
-      <Link href="/" className="flex shrink-0 items-center gap-2.5">
-        <VividaMark size={40} id="marketing-header" />
-        <span
-          className="bg-clip-text text-transparent text-lg font-semibold tracking-tight sm:text-xl"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-          }}
-        >
-          vivida
-        </span>
-      </Link>
+    <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
+      <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-4">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
+          <VividaMark size={40} id="marketing-header" />
+          <span
+            className="bg-clip-text text-transparent text-lg font-semibold tracking-tight sm:text-xl"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+            }}
+          >
+            vivida
+          </span>
+        </Link>
 
-      <SiteSearch
-        compact
-        placeholder="ძებნა…"
-        className="mx-2 min-w-0 flex-1 sm:mx-4 sm:max-w-xs"
-      />
+        <SiteSearch
+          compact
+          placeholder="ძებნა…"
+          className="min-w-0 flex-1 sm:max-w-xs"
+        />
+      </div>
 
-      <nav className="hidden shrink-0 items-center gap-7 text-sm sm:flex">
-        {link("/nataluri-ruka", "ნატალური რუკა", "nataluri-ruka")}
-        {link("/zodiac", "ზოდიაქო", "zodiac")}
-        {link("/how-it-works", "როგორ მუშაობს", "how-it-works")}
-      </nav>
+      <div className="flex shrink-0 items-center gap-6 sm:gap-7">
+        <nav className="hidden items-center gap-7 text-sm sm:flex">
+          {link("/nataluri-ruka", "ნატალური რუკა", "nataluri-ruka")}
+          {link("/zodiac", "ზოდიაქო", "zodiac")}
+          {link("/how-it-works", "როგორ მუშაობს", "how-it-works")}
+        </nav>
 
-      <div className="shrink-0">
         <MarketingCta />
       </div>
     </header>
