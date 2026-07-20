@@ -28,16 +28,22 @@ const KEYWORDS = [
   "პირადი რუკის შედგენა",
   "პირადი რუკის შედგენა ონლაინ",
   "პირადი რუკის შედგენა უფასოდ",
+  "პირადი რუკის შედგენა საიტები",
   "როგორ შევადგინო პირადი რუკა",
+  "პირადი რუკა ქართულად",
+  "პირადი ჰოროსკოპი",
+  "ასტროლოგია პირადი რუკა",
   "პირადი რუქა",
   "piradi ruka",
+  "piradi rukis shedgena",
+  "piradi horoskopi",
   "ნატალური რუკა",
 ];
 
 export const metadata: Metadata = {
   title: { absolute: "პირადი რუკა ონლაინ — უფასო გამოთვლა" },
   description:
-    "შენი პირადი რუკა ონლაინ, უფასოდ. შეიყვანე დაბადების თარიღი, დრო და ადგილი და ნახე შენი პერსონალური ასტროლოგიური რუკა — მზე, მთვარე, ასცენდენტი, 12 სახლი და ასპექტები ქართულად, რეგისტრაციის გარეშე.",
+    "პირადი რუკის შედგენა ონლაინ და უფასოდ, ქართულად. შეიყვანე დაბადების თარიღი, დრო და ადგილი — ნახე პირადი ასტროლოგიური რუკა, ასცენდენტი, 12 სახლი და ასპექტები რეგისტრაციის გარეშე.",
   keywords: KEYWORDS,
   alternates: { canonical: URL },
   openGraph: {
@@ -72,6 +78,14 @@ const FAQ = [
   {
     q: "რას აჩვენებს ჩემი პირადი რუკა?",
     a: "შენს ბირთვულ ხასიათს, ემოციურ ბუნებას, ძლიერ მხარეებსა და ცხოვრების სფეროებს — პლანეტების ნიშნების, 12 სახლისა და ასპექტების მეშვეობით.",
+  },
+  {
+    q: "როგორ ავირჩიო პირადი რუკის შესადგენი საიტი?",
+    a: "კარგი საიტი დაბადების ქალაქით ავტომატურად უნდა ადგენდეს კოორდინატებსა და ისტორიულ დროის სარტყელს, ითვლიდეს ასცენდენტს, 12 სახლსა და პლანეტების ასპექტებს და გასაგებად ხსნიდეს შედეგს. Vivida-ზე საბაზისო პირადი რუკის შედგენა უფასოა, ქართულად და რეგისტრაციის გარეშე.",
+  },
+  {
+    q: "პირადი რუკა და პირადი ჰოროსკოპი განსხვავდება?",
+    a: "დიახ. პირადი რუკა დაბადების მომენტის უცვლელი ასტროლოგიური სურათია. პირადი ჰოროსკოპი კი ამ რუკას მიმდინარე პლანეტების მოძრაობას ადარებს და კონკრეტული პერიოდის პერსონალურ ტენდენციებს აღწერს.",
   },
   {
     q: "მჭირდება დაბადების ზუსტი დრო?",
@@ -172,6 +186,49 @@ export default function PiradiRukaPage() {
               და სწორედ ამიტომ აჩვენებს შენს პიროვნებას უფრო ღრმად, ვიდრე
               მხოლოდ მზის ნიშანი.
             </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              პირადი რუკის შედგენა ონლაინ — რა უნდა შეეძლოს კარგ საიტს?
+            </h2>
+            <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
+              პირადი რუკის შესადგენი საიტები მხოლოდ მზის ნიშანს არ უნდა
+              აჩვენებდნენ. ზუსტი ონლაინ კალკულატორი დაბადების ქალაქის მიხედვით
+              ადგენს გეოგრაფიულ კოორდინატებსა და დროის სარტყელს, შემდეგ კი
+              ითვლის პლანეტებს, ასცენდენტს, 12 სახლსა და ასპექტებს. Vivida ამ
+              მონაცემებს ქართულად გაჩვენებს და საბაზისო შედეგისთვის
+              რეგისტრაციას არ მოითხოვს.
+            </p>
+            <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85">
+              თუ პირველად ქმნი რუკას, ნახე დეტალური ინსტრუქცია —{" "}
+              <Link
+                href="/piradi-ruka/rogor-shevadginot"
+                className="text-[var(--vivida-violet)] underline-offset-4 hover:underline"
+              >
+                როგორ შევადგინოთ პირადი რუკა ონლაინ
+              </Link>
+              .
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              პირადი ასტროლოგიური რუკა და პირადი ჰოროსკოპი
+            </h2>
+            <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
+              პირადი ასტროლოგიური რუკა დაბადების მომენტის უცვლელი საფუძველია:
+              ის აღწერს პლანეტების საწყის განლაგებას. პირადი ჰოროსკოპი კი ამ
+              საფუძველს დღევანდელ ან მომავალი პერიოდის ტრანზიტებს ადარებს.
+              ამიტომ ზოგადი ზოდიაქოს პროგნოზისგან განსხვავებით, პერსონალური
+              პროგნოზი შენს დაბადების დროსა და ადგილს ითვალისწინებს.
+            </p>
+            <Link
+              href="/piradi-horoskopi"
+              className="mt-3 inline-flex text-sm font-medium text-[var(--vivida-cyan)] underline-offset-4 hover:underline"
+            >
+              გაიგე, როგორ მუშაობს პირადი ჰოროსკოპი →
+            </Link>
           </section>
 
           <section>
@@ -281,6 +338,18 @@ export default function PiradiRukaPage() {
               className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
             >
               თავსებადობა
+            </Link>
+            <Link
+              href="/piradi-ruka/rogor-shevadginot"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              როგორ შევადგინოთ პირადი რუკა
+            </Link>
+            <Link
+              href="/piradi-horoskopi"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              პირადი ჰოროსკოპი
             </Link>
           </section>
         </article>

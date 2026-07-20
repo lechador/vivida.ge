@@ -305,6 +305,22 @@ export default async function MoonCalendarPage() {
           </p>
         </section>
 
+        <section className="mb-12 rounded-2xl border border-border bg-card/55 p-6">
+          <h2 className="text-xl font-semibold">დღის სრული ასტროლოგიური სურათი</h2>
+          <p className="mt-2 text-sm leading-7 text-foreground/75">
+            მთვარის ფაზასთან ერთად ნახე პლანეტარული ასპექტები და უახლოესი
+            ხელსაყრელი თუ ფრთხილი თარიღები.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link href="/savse-mtvare" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">სავსე მთვარე</Link>
+            <Link href="/akhali-mtvare" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">ახალი მთვარე</Link>
+            <Link href="/dabnelebebi" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">დაბნელებები</Link>
+            <Link href="/astrologiuri-kalendari" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">ასტროლოგიური კალენდარი</Link>
+            <Link href="/ighbliani-dgheebi" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">იღბლიანი დღეები</Link>
+            <Link href="/frtxili-dgheebi" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">ფრთხილი დღეები</Link>
+          </div>
+        </section>
+
         <ReportPromo className="mt-16" />
 
         {/* CTA */}

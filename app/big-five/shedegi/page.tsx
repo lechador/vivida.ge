@@ -10,7 +10,7 @@ import { BigFiveResultClient } from "@/components/big-five/big-five-result";
 export const metadata: Metadata = {
   title: "შენი Big Five შედეგი",
   description:
-    "შენი Big Five (დიდი ხუთეული) ტესტის შედეგი — პიროვნების პროფილი ხუთ თვისებაზე.",
+    "შენი Big Five (დიდი ხუთეული) ტესტის შედეგი — ხუთ თვისებაზე დაფუძნებული პიროვნების პროფილი.",
   robots: { index: false, follow: false },
 };
 

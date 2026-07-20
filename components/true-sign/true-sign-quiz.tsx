@@ -87,7 +87,7 @@ export function TrueSignQuiz() {
           />
           <div className="relative">
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              შენი ნამდვილი ნიშანი
+              შენი ნიშანი ხასიათის მიხედვით
             </div>
             <div className="mt-3 text-7xl leading-none sm:text-8xl">{sign.emoji}</div>
             <h2 className="mt-3 flex items-center justify-center gap-2 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -122,7 +122,7 @@ export function TrueSignQuiz() {
                 დაბადების ნიშანი სხვაა?
               </span>
               <span className="block text-muted-foreground">
-                გაიგე შენი ზუსტი ნიშანი და სრული ნატალური რუკა — უფასოდ.
+                გაიგე შენი დაბადების ზუსტი ნიშანი და ნახე სრული ნატალური რუკა — უფასოდ.
               </span>
             </span>
           </span>

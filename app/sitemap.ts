@@ -16,6 +16,12 @@ import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
 import { ALL_MBTI_SLUGS } from "@/lib/seo/mbti-seo";
 import { TAROT_CARDS } from "@/lib/tarot/deck";
 import { EQ_ARTICLE_SLUGS } from "@/lib/seo/eq-articles";
+import {
+  ALL_HOROSCOPE_THEMES,
+  themeUrl,
+} from "@/lib/seo/thematic-horoscope";
+import { calendarWindow } from "@/lib/seo/astrology-calendar";
+import { ECLIPSES, moonEvents } from "@/lib/seo/moon-events";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -36,7 +42,7 @@ const BASE = "https://www.vivida.ge";
 const NOW = new Date();
 /** Bump when evergreen cluster content meaningfully changes. */
 const EVERGREEN = new Date("2026-07-13");
-const EQ_LIBRARY_PUBLISHED = new Date("2026-07-20");
+const CONTENT_PUBLISHED = new Date("2026-07-20");
 
 const VIEW_CHANGE_FREQ: Record<
   (typeof ALL_HOROSCOPE_VIEWS)[number],
@@ -154,6 +160,39 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.65,
   }));
 
+  const thematicHoroscopePages: MetadataRoute.Sitemap =
+    ALL_HOROSCOPE_THEMES.flatMap((theme) => [
+      {
+        url: `${BASE}${themeUrl(theme)}`,
+        lastModified: CONTENT_PUBLISHED,
+        changeFrequency: "monthly" as const,
+        priority: 0.85,
+      },
+      ...ALL_SLUGS.map((sign) => ({
+        url: `${BASE}${themeUrl(theme, sign)}`,
+        lastModified: CONTENT_PUBLISHED,
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+      })),
+    ]);
+
+  const astrologyCalendarPages: MetadataRoute.Sitemap = calendarWindow().map(
+    (day) => ({
+      url: `${BASE}/astrologiuri-kalendari/${day.iso}`,
+      lastModified: NOW,
+      changeFrequency: "daily" as const,
+      priority: 0.65,
+    })
+  );
+  const moonEventPages: MetadataRoute.Sitemap = (["full", "new"] as const).flatMap(
+    (kind) => moonEvents(kind).map((event) => ({
+      url: `${BASE}/${kind === "full" ? "savse-mtvare" : "akhali-mtvare"}/${event.iso}`,
+      lastModified: CONTENT_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }))
+  );
+
   return [
     {
       url: `${BASE}/`,
@@ -172,6 +211,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.95,
+    },
+    {
+      url: `${BASE}/piradi-ruka/rogor-shevadginot`,
+      lastModified: CONTENT_PUBLISHED,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE}/piradi-horoskopi`,
+      lastModified: CONTENT_PUBLISHED,
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
     {
       url: `${BASE}/tests`,
@@ -199,13 +250,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${BASE}/emociuri-inteleqti`,
-      lastModified: EQ_LIBRARY_PUBLISHED,
+      lastModified: CONTENT_PUBLISHED,
       changeFrequency: "monthly",
       priority: 0.85,
     },
     ...EQ_ARTICLE_SLUGS.map((slug) => ({
       url: `${BASE}/emociuri-inteleqti/${slug}`,
-      lastModified: EQ_LIBRARY_PUBLISHED,
+      lastModified: CONTENT_PUBLISHED,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
@@ -214,6 +265,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.9,
+    },
+    {
+      url: `${BASE}/quiz/namdvili-nishani`,
+      lastModified: EVERGREEN,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
       url: `${BASE}/tavsebadoba`,
@@ -251,12 +308,57 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.85,
     },
+    ...thematicHoroscopePages,
     {
       url: `${BASE}/mtvaris-kalendari`,
       lastModified: NOW,
       changeFrequency: "daily",
       priority: 0.85,
     },
+    {
+      url: `${BASE}/astrologiuri-kalendari`,
+      lastModified: NOW,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE}/ighbliani-dgheebi`,
+      lastModified: NOW,
+      changeFrequency: "daily",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE}/frtxili-dgheebi`,
+      lastModified: NOW,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
+    ...astrologyCalendarPages,
+    {
+      url: `${BASE}/savse-mtvare`,
+      lastModified: NOW,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE}/akhali-mtvare`,
+      lastModified: NOW,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    ...moonEventPages,
+    {
+      url: `${BASE}/dabnelebebi`,
+      lastModified: CONTENT_PUBLISHED,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    ...ECLIPSES.map((eclipse) => ({
+      url: `${BASE}/dabnelebebi/${eclipse.slug}`,
+      lastModified: CONTENT_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.72,
+    })),
     {
       url: `${BASE}/taro`,
       lastModified: EVERGREEN,
@@ -345,6 +447,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...zodiacSignPages,
     ...rankingPages,
     ...chinesePages,
+    ...tarotCardPages,
     ...elementPages,
     ...pairPages,
     ...moonPages,

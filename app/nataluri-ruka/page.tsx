@@ -18,7 +18,11 @@ const KEYWORDS = [
   "პირადი ნატალური რუკა",
   "პირადი რუკა",
   "ნატალური რუკის გამოთვლა",
+  "ნატალური რუკის გაკეთება",
+  "ნატალური რუკის შედგენა",
+  "ნატალური რუკა ქართულად",
   "nataluri ruka",
+  "nataluri rukis shedgena",
   "piradi ruka",
 ];
 
@@ -98,6 +102,10 @@ const FAQ = [
   {
     q: "რა მონაცემები მჭირდება?",
     a: "დაბადების თარიღი, დაბადების დრო (თუ იცი) და დაბადების ქალაქი. ქალაქის მიხედვით ავტომატურად განისაზღვრება გეოგრაფიული კოორდინატები და დროის სარტყელი.",
+  },
+  {
+    q: "როგორ გავაკეთო ნატალური რუკა ქართულად?",
+    a: "ზემოთ მოცემულ კალკულატორში შეიყვანე დაბადების თარიღი, დრო და ქალაქი. Vivida ავტომატურად გამოთვლის პლანეტების ნიშნებს, ასცენდენტს, 12 სახლსა და ასპექტებს და შედეგს ქართულად გაჩვენებს.",
   },
 ];
 
@@ -222,6 +230,30 @@ export default function NataluriRukaPage() {
             </p>
           </section>
 
+          <section>
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              ნატალური რუკის გაკეთება ქართულად
+            </h2>
+            <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
+              ნატალური რუკის გამოთვლას სამი მონაცემი სჭირდება: დაბადების
+              თარიღი, დაბადების ქალაქი და შეძლებისდაგვარად ზუსტი დრო. მათი
+              შეყვანის შემდეგ კალკულატორი ავტომატურად ადგენს ციური სხეულების
+              პოზიციებს და შედეგს ქართულად გაჩვენებს. თუ დაბადების დრო არ იცი,
+              პლანეტების ნიშნებს მაინც მიიღებ, თუმცა ასცენდენტი და სახლები
+              შესაძლოა ზუსტი არ იყოს.
+            </p>
+            <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85">
+              ყოველდღიური ნაბიჯების სანახავად გამოიყენე{" "}
+              <Link
+                href="/piradi-ruka/rogor-shevadginot"
+                className="text-[var(--vivida-violet)] underline-offset-4 hover:underline"
+              >
+                პირადი რუკის შედგენის სრული ინსტრუქცია
+              </Link>
+              .
+            </p>
+          </section>
+
           {/* FAQ */}
           <section>
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -275,6 +307,12 @@ export default function NataluriRukaPage() {
               className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
             >
               დღის ჰოროსკოპი
+            </Link>
+            <Link
+              href="/piradi-horoskopi"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              პირადი ჰოროსკოპი
             </Link>
           </section>
         </article>

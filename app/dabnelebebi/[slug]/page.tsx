@@ -1,0 +1,4 @@
+import type { Metadata } from "next"; import { notFound } from "next/navigation"; import { EclipseDetail } from "@/components/seo/moon-event-pages"; import { ECLIPSES } from "@/lib/seo/moon-events";
+type Props = { params: Promise<{ slug: string }> }; export function generateStaticParams() { return ECLIPSES.map((e) => ({ slug: e.slug })); }
+export async function generateMetadata({ params }: Props): Promise<Metadata> { const { slug } = await params; const e = ECLIPSES.find((x) => x.slug === slug); if (!e) return {}; const url = `https://www.vivida.ge/dabnelebebi/${slug}`; return { title: { absolute: e.title }, description: `${e.description} ხილვადობა, ტიპი, უსაფრთხო დაკვირვება და ასტროლოგიური კონტექსტი.`, alternates: { canonical: url } }; }
+export default async function Page({ params }: Props) { const { slug } = await params; const e = ECLIPSES.find((x) => x.slug === slug); if (!e) notFound(); return <EclipseDetail eclipse={e} />; }

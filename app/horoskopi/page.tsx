@@ -190,6 +190,48 @@ export default async function HoroskopiHubPage() {
           >
             თვის ჰოროსკოპი
           </Link>
+          <Link
+            href="/siyvarulis-horoskopi"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            სიყვარულის ჰოროსკოპი
+          </Link>
+          <Link
+            href="/finansuri-horoskopi"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            ფინანსური ჰოროსკოპი
+          </Link>
+          <Link
+            href="/karieris-horoskopi"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            კარიერის ჰოროსკოპი
+          </Link>
+          <Link
+            href="/astrologiuri-kalendari"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            ასტროლოგიური კალენდარი
+          </Link>
+          <Link
+            href="/ighbliani-dgheebi"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            იღბლიანი დღეები
+          </Link>
+          <Link
+            href="/savse-mtvare"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            სავსე და ახალი მთვარე
+          </Link>
+          <Link
+            href="/dabnelebebi"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            დაბნელებები
+          </Link>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
