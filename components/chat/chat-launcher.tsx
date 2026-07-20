@@ -23,6 +23,7 @@ import {
   sendMessage,
 } from "@/actions/messages";
 import { cn } from "@/lib/utils";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import { SafetyMenu } from "@/components/safety/safety-menu";
 import type { Message } from "@/db/schema";
@@ -698,19 +699,13 @@ function ConversationRow({
           isUnread ? "bg-[var(--vivida-violet)]/8" : "hover:bg-accent/10"
         )}
       >
-        {conv.partner.image ? (
-          <Image
-            src={conv.partner.image}
-            alt=""
-            width={40}
-            height={40}
-            className="size-10 shrink-0 rounded-full border border-border/60 object-cover"
-          />
-        ) : (
-          <div className="grid size-10 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-sm text-muted-foreground">
-            {display[0]?.toUpperCase()}
-          </div>
-        )}
+        <Image
+          src={conv.partner.image || DEFAULT_AVATAR}
+          alt=""
+          width={40}
+          height={40}
+          className="size-10 shrink-0 rounded-full border border-border/60 object-cover"
+        />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
             <span
@@ -845,19 +840,13 @@ function ChatView({
         >
           <ArrowLeft className="size-4" />
         </button>
-        {partner.image ? (
-          <Image
-            src={partner.image}
-            alt=""
-            width={32}
-            height={32}
-            className="size-8 shrink-0 rounded-full border border-border/60 object-cover"
-          />
-        ) : (
-          <div className="grid size-8 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-xs text-muted-foreground">
-            {display[0]?.toUpperCase()}
-          </div>
-        )}
+        <Image
+          src={partner.image || DEFAULT_AVATAR}
+          alt=""
+          width={32}
+          height={32}
+          className="size-8 shrink-0 rounded-full border border-border/60 object-cover"
+        />
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-semibold">{display}</div>
           {partner.username && (
@@ -905,19 +894,13 @@ function ChatView({
                   >
                     {!mine &&
                       (showAvatar ? (
-                        partner.image ? (
-                          <Image
-                            src={partner.image}
-                            alt=""
-                            width={24}
-                            height={24}
-                            className="mb-0.5 size-6 shrink-0 rounded-full border border-border/60 object-cover"
-                          />
-                        ) : (
-                          <div className="mb-0.5 grid size-6 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-[10px] text-muted-foreground">
-                            {display[0]?.toUpperCase()}
-                          </div>
-                        )
+                        <Image
+                          src={partner.image || DEFAULT_AVATAR}
+                          alt=""
+                          width={24}
+                          height={24}
+                          className="mb-0.5 size-6 shrink-0 rounded-full border border-border/60 object-cover"
+                        />
                       ) : (
                         <span aria-hidden className="size-6 shrink-0" />
                       ))}
@@ -938,26 +921,20 @@ function ChatView({
                         title="წაიკითხა"
                         className="inline-flex items-center"
                       >
-                        {partner.image ? (
-                          <Image
-                            src={partner.image}
-                            alt=""
-                            width={14}
-                            height={14}
-                            className="size-3.5 rounded-full ring-1 ring-background"
-                          />
-                        ) : (
-                          <span className="grid size-3.5 place-items-center rounded-full bg-card text-[8px] text-muted-foreground ring-1 ring-background">
-                            {display[0]?.toUpperCase()}
-                          </span>
-                        )}
+                        <Image
+                          src={partner.image || DEFAULT_AVATAR}
+                          alt=""
+                          width={14}
+                          height={14}
+                          className="size-3.5 rounded-full ring-1 ring-background"
+                        />
                       </span>
                     </div>
                   )}
                 </div>
               );
             })}
-            {isTyping && <TypingBubble partner={partner} display={display} />}
+            {isTyping && <TypingBubble partner={partner} />}
           </>
         )}
       </div>
@@ -996,28 +973,16 @@ function ChatView({
   );
 }
 
-function TypingBubble({
-  partner,
-  display,
-}: {
-  partner: ChatPartner;
-  display: string;
-}) {
+function TypingBubble({ partner }: { partner: ChatPartner }) {
   return (
     <div className="flex items-end gap-2 justify-start">
-      {partner.image ? (
-        <Image
-          src={partner.image}
-          alt=""
-          width={24}
-          height={24}
-          className="mb-0.5 size-6 shrink-0 rounded-full border border-border/60 object-cover"
-        />
-      ) : (
-        <div className="mb-0.5 grid size-6 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-[10px] text-muted-foreground">
-          {display[0]?.toUpperCase()}
-        </div>
-      )}
+      <Image
+        src={partner.image || DEFAULT_AVATAR}
+        alt=""
+        width={24}
+        height={24}
+        className="mb-0.5 size-6 shrink-0 rounded-full border border-border/60 object-cover"
+      />
       <div className="rounded-2xl bg-card px-3 py-2 ring-1 ring-foreground/5">
         <div className="flex items-end gap-1">
           <span

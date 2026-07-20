@@ -90,10 +90,7 @@ export default async function FeedPage() {
         )}
 
         <div className="mb-6">
-          <PostComposer
-            authorImage={viewerAvatar}
-            authorName={user.name ?? null}
-          />
+          <PostComposer authorImage={viewerAvatar} />
         </div>
 
         <FeedList

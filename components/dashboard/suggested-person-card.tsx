@@ -7,6 +7,7 @@ import { Check, Sparkles, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { sendFriendRequest } from "@/actions/friendship";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { DiscoverCard } from "@/lib/discover";
 
 export function SuggestedPersonCard({ person }: { person: DiscoverCard }) {
@@ -24,7 +25,7 @@ export function SuggestedPersonCard({ person }: { person: DiscoverCard }) {
     });
   };
 
-  const avatarSrc = person.photoUrl ?? person.image;
+  const avatarSrc = person.photoUrl ?? person.image ?? DEFAULT_AVATAR;
 
   return (
     <article className="group relative flex w-44 shrink-0 flex-col items-center overflow-hidden rounded-2xl border border-border bg-card/65 p-3 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15 sm:w-48">
@@ -38,19 +39,13 @@ export function SuggestedPersonCard({ person }: { person: DiscoverCard }) {
             aria-hidden
             className="absolute -inset-1 rounded-full bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-50 blur-md transition-opacity group-hover:opacity-80"
           />
-          {avatarSrc ? (
-            <Image
-              src={avatarSrc}
-              alt=""
-              width={64}
-              height={64}
-              className="relative size-14 rounded-full border-2 border-background object-cover"
-            />
-          ) : (
-            <div className="relative grid size-14 place-items-center rounded-full border-2 border-background bg-card text-base text-muted-foreground">
-              {person.displayName[0]?.toUpperCase()}
-            </div>
-          )}
+          <Image
+            src={avatarSrc}
+            alt=""
+            width={64}
+            height={64}
+            className="relative size-14 rounded-full border-2 border-background object-cover"
+          />
         </div>
         <h3 className="mt-2 w-full truncate text-center text-sm font-medium text-foreground">
           {person.displayName}

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { CornerDownLeft, Loader2, Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 
 type Result = {
   userId: string;
@@ -163,19 +164,13 @@ export function SearchBar() {
                     : "hover:bg-accent/10"
                 )}
               >
-                {r.image ? (
-                  <Image
-                    src={r.image}
-                    alt=""
-                    width={36}
-                    height={36}
-                    className="size-9 shrink-0 rounded-full border border-border/60 object-cover"
-                  />
-                ) : (
-                  <div className="grid size-9 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-sm text-muted-foreground">
-                    {r.displayName[0]?.toUpperCase()}
-                  </div>
-                )}
+                <Image
+                  src={r.image || DEFAULT_AVATAR}
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="size-9 shrink-0 rounded-full border border-border/60 object-cover"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-foreground">
                     {r.displayName}

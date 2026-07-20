@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, UserPlus, Users } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { getCurrentPlan } from "@/lib/plan";
 import {
   listFriends,
@@ -240,18 +241,14 @@ function FriendRow({
   const synastry =
     variant === "friends" && "synastry" in u ? u.synastry : null;
 
-  const avatar = u.image ? (
+  const avatar = (
     <Image
-      src={u.image}
+      src={u.image || DEFAULT_AVATAR}
       alt=""
       width={48}
       height={48}
       className="size-12 shrink-0 rounded-full border border-border/80 object-cover"
     />
-  ) : (
-    <div className="grid size-12 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-base text-muted-foreground">
-      {displayName[0]?.toUpperCase()}
-    </div>
   );
 
   return (

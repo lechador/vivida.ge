@@ -6,6 +6,7 @@ import {
   CATEGORY_EMOJI,
   CATEGORY_LABEL_KA,
 } from "@/lib/synastry";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { FriendWithSynastry } from "@/lib/friend-synastry";
 
 import { synastryAccent } from "./synastry-visuals";
@@ -31,18 +32,14 @@ export function CompatibilityRow({
   const accent = score == null ? "oklch(0.55 0.05 280)" : synastryAccent(score);
   const isTop = rank === 1 && score != null && score >= 60;
 
-  const avatar = u.image ? (
+  const avatar = (
     <Image
-      src={u.image}
+      src={u.image || DEFAULT_AVATAR}
       alt=""
       width={56}
       height={56}
       className="size-14 shrink-0 rounded-full border border-border/80 object-cover"
     />
-  ) : (
-    <div className="grid size-14 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-lg text-muted-foreground">
-      {displayName[0]?.toUpperCase()}
-    </div>
   );
 
   const cardClass = isTop

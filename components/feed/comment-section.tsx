@@ -23,6 +23,7 @@ import {
   listComments,
   type FeedComment,
 } from "@/actions/feed";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { COMMENT_BODY_MAX } from "@/lib/feed-config";
 import { cn } from "@/lib/utils";
 
@@ -324,7 +325,6 @@ function CommentRow({
     comment.author.name?.split(" ")[0] ??
     comment.author.username ??
     "ვარსკვლავო";
-  const initial = display[0]?.toUpperCase() ?? "?";
   const profileHref = comment.author.username
     ? `/u/${comment.author.username}`
     : null;
@@ -333,26 +333,16 @@ function CommentRow({
 
   return (
     <div className="group flex items-start gap-2.5">
-      {comment.author.image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={comment.author.image}
-          alt=""
-          className={cn(
-            "shrink-0 rounded-full border border-border/80 object-cover",
-            avatarSize
-          )}
-        />
-      ) : (
-        <div
-          className={cn(
-            "grid shrink-0 place-items-center rounded-full border border-border bg-card/60 text-xs text-muted-foreground",
-            avatarSize
-          )}
-        >
-          {initial}
-        </div>
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={comment.author.image || DEFAULT_AVATAR}
+        alt=""
+        className={cn(
+          "shrink-0 rounded-full border border-border/80 object-cover",
+          avatarSize
+        )}
+      />
+
       <div className="min-w-0 flex-1">
         <div
           className={cn(

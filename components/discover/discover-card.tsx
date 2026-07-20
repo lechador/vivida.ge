@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { DiscoverCard as Card } from "@/lib/discover";
 
 const ELEMENT_HEX: Record<string, string> = {
@@ -13,7 +14,6 @@ const ELEMENT_HEX: Record<string, string> = {
 export function DiscoverCard({ card }: { card: Card }) {
   const accent = ELEMENT_HEX[card.sunElement];
   const heroSrc = card.photoUrl ?? card.image;
-  const initial = card.displayName[0]?.toUpperCase() ?? "?";
 
   return (
     <Link
@@ -35,24 +35,13 @@ export function DiscoverCard({ card }: { card: Card }) {
             boxShadow: `0 0 0 2px color-mix(in oklch, ${accent} 55%, transparent), inset 0 0 0 1px oklch(1 0 0 / 0.06)`,
           }}
         >
-          {heroSrc ? (
-            <Image
-              src={heroSrc}
-              alt=""
-              fill
-              sizes="56px"
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-            />
-          ) : (
-            <div
-              className="grid size-full place-items-center text-lg font-semibold text-white/90"
-              style={{
-                background: `linear-gradient(135deg, ${accent} 0%, oklch(0.32 0.18 285) 75%)`,
-              }}
-            >
-              {initial}
-            </div>
-          )}
+          <Image
+            src={heroSrc || DEFAULT_AVATAR}
+            alt=""
+            fill
+            sizes="56px"
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+          />
         </div>
         {/* Sign symbol micro-badge */}
         <span

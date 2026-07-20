@@ -6,6 +6,7 @@ import { Loader2, Send } from "lucide-react";
 
 import { createPost } from "@/actions/feed";
 import { CreditHint } from "@/components/credits/credit-hint";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { POST_BODY_MAX } from "@/lib/feed-config";
 import { Button } from "@/components/ui/button";
 
@@ -24,10 +25,8 @@ const PLACEHOLDER = "გააზიარე ფიქრები";
  */
 export function PostComposer({
   authorImage,
-  authorName,
 }: {
   authorImage: string | null;
-  authorName: string | null;
 }) {
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +36,6 @@ export function PostComposer({
   const remaining = POST_BODY_MAX - body.length;
   const overflow = remaining < 0;
   const disabled = isPending || body.trim().length === 0 || overflow;
-  const initial = (authorName ?? "?")[0]?.toUpperCase() ?? "?";
 
   function submit() {
     if (disabled) return;
@@ -56,18 +54,12 @@ export function PostComposer({
   return (
     <div className="rounded-2xl border border-foreground/12 bg-[oklch(0.23_0.04_285/0.88)] p-4 shadow-[0_16px_40px_-24px_oklch(0.05_0.05_280/0.85)] ring-1 ring-inset ring-foreground/5 backdrop-blur-xl sm:p-5">
       <div className="flex gap-3">
-        {authorImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={authorImage}
-            alt=""
-            className="size-10 shrink-0 rounded-full border border-border/80 object-cover"
-          />
-        ) : (
-          <div className="grid size-10 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-sm text-muted-foreground">
-            {initial}
-          </div>
-        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={authorImage || DEFAULT_AVATAR}
+          alt=""
+          className="size-10 shrink-0 rounded-full border border-border/80 object-cover"
+        />
         <div className="min-w-0 flex-1">
           <MentionInput
             value={body}

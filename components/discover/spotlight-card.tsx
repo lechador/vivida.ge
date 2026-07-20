@@ -12,6 +12,7 @@ import {
   CATEGORY_LABEL_KA,
   overallVerdict,
 } from "@/lib/synastry";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { SpotlightMatch } from "@/lib/discover";
 
 const ELEMENT_HEX: Record<string, string> = {
@@ -68,25 +69,14 @@ export function SpotlightCard({ match }: { match: SpotlightMatch }) {
               boxShadow: `0 0 0 2px color-mix(in oklch, ${accent} 55%, transparent), 0 0 40px -8px ${accent}`,
             }}
           >
-            {heroSrc ? (
-              <Image
-                src={heroSrc}
-                alt=""
-                fill
-                sizes="(min-width: 640px) 144px, 128px"
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <div
-                className="grid size-full place-items-center text-4xl font-semibold text-white/90"
-                style={{
-                  background: `linear-gradient(135deg, ${accent} 0%, oklch(0.32 0.18 285) 75%)`,
-                }}
-              >
-                {card.displayName[0]?.toUpperCase()}
-              </div>
-            )}
+            <Image
+              src={heroSrc || DEFAULT_AVATAR}
+              alt=""
+              fill
+              sizes="(min-width: 640px) 144px, 128px"
+              className="object-cover"
+              priority
+            />
           </div>
           {/* Sign symbol micro-badge bottom-right */}
           <span

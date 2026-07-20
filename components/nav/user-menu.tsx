@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOutAction } from "@/actions/auth";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 
 export function UserMenu({
   name,
@@ -28,7 +29,6 @@ export function UserMenu({
   balance?: number;
 }) {
   const [isPending, startTransition] = useTransition();
-  const display = name?.split(" ")[0] ?? "ვარსკვლავო";
 
   return (
     <DropdownMenu>
@@ -38,32 +38,24 @@ export function UserMenu({
           aria-label="მენიუ"
           className="relative grid size-12 shrink-0 place-items-center rounded-full border border-border bg-card/50 text-foreground/80 transition-all hover:border-foreground/30 hover:bg-card/80"
         >
-          {image ? (
-            <Image
-              src={image}
-              alt=""
-              width={44}
-              height={44}
-              className="size-11 rounded-full object-cover"
-            />
-          ) : (
-            <span className="text-base font-medium">
-              {display[0]?.toUpperCase()}
-            </span>
-          )}
+          <Image
+            src={image || DEFAULT_AVATAR}
+            alt=""
+            width={44}
+            height={44}
+            className="size-11 rounded-full object-cover"
+          />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64 p-2">
         <div className="flex items-center gap-3 px-2 py-2">
-          {image && (
-            <Image
-              src={image}
-              alt=""
-              width={40}
-              height={40}
-              className="size-10 shrink-0 rounded-full border border-border/60 object-cover"
-            />
-          )}
+          <Image
+            src={image || DEFAULT_AVATAR}
+            alt=""
+            width={40}
+            height={40}
+            className="size-10 shrink-0 rounded-full border border-border/60 object-cover"
+          />
           <div className="min-w-0 flex-1">
             <div className="truncate text-sm font-semibold">{name ?? "შენ"}</div>
             {email && (

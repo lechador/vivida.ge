@@ -12,6 +12,7 @@ import {
   countPostsByUser,
   listRecentPostsByUser,
 } from "@/actions/feed";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { getCurrentPlan } from "@/lib/plan";
 import { canUseFeature } from "@/lib/features";
 import { isAdminEmail } from "@/lib/admin-auth";
@@ -225,21 +226,21 @@ export default async function PublicProfilePage({
             <div className="relative mx-auto w-full max-w-[260px] sm:mx-0 sm:w-64">
               {photos.length > 0 ? (
                 <PhotoCarousel photos={photos} />
-              ) : owner.image ? (
+              ) : (
                 <div className="relative">
                   <div
                     aria-hidden
                     className="absolute -inset-1 rounded-full bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-70 blur-md"
                   />
                   <Image
-                    src={owner.image}
+                    src={owner.image || DEFAULT_AVATAR}
                     alt=""
                     width={160}
                     height={160}
                     className="relative mx-auto size-32 rounded-full border-2 border-background object-cover sm:size-40"
                   />
                 </div>
-              ) : null}
+              )}
 
               {/* Owner-only: regenerate a brand-styled AI avatar in place */}
               {isOwner && canUseFeature("aiAvatar", viewerPlan) && (
@@ -544,24 +545,15 @@ function MutualFriendsPill({
     <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/60 px-2.5 py-1 text-xs text-muted-foreground">
       {preview.length > 0 ? (
         <div className="flex -space-x-2">
-          {preview.map((p) =>
-            p.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={p.id}
-                src={p.image}
-                alt=""
-                className="size-5 rounded-full border border-background object-cover"
-              />
-            ) : (
-              <div
-                key={p.id}
-                className="grid size-5 place-items-center rounded-full border border-background bg-card/80 text-[9px] text-muted-foreground"
-              >
-                {(p.name ?? p.username ?? "?")[0]?.toUpperCase()}
-              </div>
-            )
-          )}
+          {preview.map((p) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={p.id}
+              src={p.image || DEFAULT_AVATAR}
+              alt=""
+              className="size-5 rounded-full border border-background object-cover"
+            />
+          ))}
         </div>
       ) : (
         <Users className="size-3.5" />

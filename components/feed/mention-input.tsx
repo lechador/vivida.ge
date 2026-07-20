@@ -13,6 +13,7 @@ import {
 } from "react";
 
 import { cn } from "@/lib/utils";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 
 /**
  * Lightweight `@username` autocomplete wrapper around a plain
@@ -221,18 +222,12 @@ export function MentionInput({
                     : "text-foreground/90 hover:bg-card/80"
                 )}
               >
-                {s.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={s.image}
-                    alt=""
-                    className="size-6 shrink-0 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="grid size-6 shrink-0 place-items-center rounded-full bg-card/80 text-[10px] text-muted-foreground">
-                    {(s.displayName ?? s.username)[0]?.toUpperCase()}
-                  </div>
-                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={s.image || DEFAULT_AVATAR}
+                  alt=""
+                  className="size-6 shrink-0 rounded-full object-cover"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">
                     {s.displayName ?? s.username}

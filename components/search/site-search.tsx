@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Loader2, Search } from "lucide-react";
 
+import { DEFAULT_AVATAR } from "@/lib/avatar";
+
 type PageHit = {
   title: string;
   sub: string;
@@ -248,19 +250,13 @@ export function SiteSearch({
                     onMouseEnter={() => setActive(idx)}
                     onClick={() => go(`/u/${hit.username}`)}
                   >
-                    {hit.image ? (
-                      <Image
-                        src={hit.image}
-                        alt=""
-                        width={32}
-                        height={32}
-                        className="size-8 shrink-0 rounded-full border border-border/60 object-cover"
-                      />
-                    ) : (
-                      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-card text-xs text-muted-foreground">
-                        {display[0]?.toUpperCase()}
-                      </span>
-                    )}
+                    <Image
+                      src={hit.image || DEFAULT_AVATAR}
+                      alt=""
+                      width={32}
+                      height={32}
+                      className="size-8 shrink-0 rounded-full border border-border/60 object-cover"
+                    />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium text-foreground">
                         {display}

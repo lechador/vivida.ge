@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { PersonRow } from "@/lib/people";
 import { FriendButton } from "@/components/profile/friend-button";
 
@@ -12,7 +13,6 @@ import { FriendButton } from "@/components/profile/friend-button";
 export function PersonRowCard({ person }: { person: PersonRow }) {
   const display =
     person.displayName ?? person.username ?? "ვარსკვლავო";
-  const initial = display[0]?.toUpperCase() ?? "?";
   const profileHref = person.username ? `/u/${person.username}` : "#";
 
   return (
@@ -23,18 +23,12 @@ export function PersonRowCard({ person }: { person: PersonRow }) {
           className="shrink-0"
           aria-label={`${display}-ის პროფილი`}
         >
-          {person.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={person.image}
-              alt=""
-              className="size-12 rounded-full border border-border/80 object-cover sm:size-14"
-            />
-          ) : (
-            <div className="grid size-12 place-items-center rounded-full border border-border bg-card/60 text-sm text-muted-foreground sm:size-14">
-              {initial}
-            </div>
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={person.image || DEFAULT_AVATAR}
+            alt=""
+            className="size-12 rounded-full border border-border/80 object-cover sm:size-14"
+          />
         </Link>
 
         <div className="min-w-0 flex-1">

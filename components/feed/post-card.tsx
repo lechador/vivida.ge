@@ -10,6 +10,7 @@ import {
   editPost,
   type FeedPost,
 } from "@/actions/feed";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { POST_BODY_MAX, POST_EDIT_WINDOW_MS } from "@/lib/feed-config";
 import {
   DropdownMenu,
@@ -92,7 +93,6 @@ export function PostCard({
     post.author.name?.split(" ")[0] ??
     post.author.username ??
     "ვარსკვლავო";
-  const initial = display[0]?.toUpperCase() ?? "?";
   const profileHref = post.author.username ? `/u/${post.author.username}` : null;
 
   function handleDelete() {
@@ -129,17 +129,13 @@ export function PostCard({
     });
   }
 
-  const avatar = post.author.image ? (
+  const avatar = (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={post.author.image}
+      src={post.author.image || DEFAULT_AVATAR}
       alt=""
       className="size-11 shrink-0 rounded-full border border-border/80 object-cover"
     />
-  ) : (
-    <div className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-card/60 text-sm text-muted-foreground">
-      {initial}
-    </div>
   );
 
   return (

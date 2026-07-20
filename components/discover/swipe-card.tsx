@@ -11,6 +11,7 @@ import {
 } from "framer-motion";
 
 import { cn } from "@/lib/utils";
+import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { DiscoverCard as Card } from "@/lib/discover";
 
 /**
@@ -40,7 +41,6 @@ export function SwipeCard({
   const [photoIdx, setPhotoIdx] = useState(0);
   const photos = card.photos.length > 0 ? card.photos : card.photoUrl ? [card.photoUrl] : [];
   const heroSrc = photos[photoIdx] ?? card.image ?? null;
-  const initial = card.displayName[0]?.toUpperCase() ?? "?";
 
   // Stack effect: each card behind sits a touch lower and smaller. While
   // the top card drags, the next-up scales up gently to fake "rising up".
@@ -97,27 +97,15 @@ export function SwipeCard({
     >
       {/* Photo / fallback */}
       <div className="relative size-full">
-        {heroSrc ? (
-          <Image
-            key={`${card.userId}-${photoIdx}`}
-            src={heroSrc}
-            alt=""
-            fill
-            sizes="(min-width: 640px) 420px, 100vw"
-            className="object-cover"
-            priority={isTop}
-          />
-        ) : (
-          <div
-            className="grid size-full place-items-center text-7xl font-semibold text-white/95"
-            style={{
-              background:
-                "linear-gradient(135deg, oklch(0.32 0.16 305) 0%, oklch(0.22 0.10 270) 100%)",
-            }}
-          >
-            {initial}
-          </div>
-        )}
+        <Image
+          key={`${card.userId}-${photoIdx}`}
+          src={heroSrc || DEFAULT_AVATAR}
+          alt=""
+          fill
+          sizes="(min-width: 640px) 420px, 100vw"
+          className="object-cover"
+          priority={isTop}
+        />
 
         {/* Photo carousel tap zones */}
         {photos.length > 1 && isTop && (
