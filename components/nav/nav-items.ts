@@ -82,7 +82,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "ცა ახლა",
     Icon: Orbit,
     hue: "oklch(0.80 0.15 200)",
-    badgeKa: "ახალი",
   },
   {
     key: "report",
@@ -126,7 +125,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "ტესტები",
     Icon: Brain,
     hue: "oklch(0.78 0.16 300)",
-    badgeKa: "ახალი",
   },
   {
     key: "discover",
