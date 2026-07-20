@@ -40,6 +40,17 @@ export const TESTS: TestCatalogEntry[] = [
     available: true,
   },
   {
+    slug: "big-five",
+    kind: "featured",
+    href: "/big-five",
+    titleKa: "Big Five (დიდი ხუთეული)",
+    taglineKa: "პიროვნების 5 თვისება",
+    descKa:
+      "პიროვნების ყველაზე მეცნიერულად სანდო ტესტი — ღიაობა, კეთილსინდისიერება, ექსტრავერსია, კეთილგანწყობა და ნევროტიზმი. მიიღე შენი პროფილი და რადარი.",
+    metaKa: "40 კითხვა · ~7 წუთი · უფასო",
+    available: true,
+  },
+  {
     slug: "astro-mbti",
     kind: "featured",
     href: "/pirovnebis-testi",

@@ -159,6 +159,18 @@ export const EQ_LATIN_QUERIES = [
   "psikologiuri testi",
 ];
 
+/** Big Five personality test (`/big-five`). */
+export const BIGFIVE_LATIN_QUERIES = [
+  "big five",
+  "big five testi",
+  "didi xuteuli",
+  "big five qartulad",
+  "pirovnebis testi",
+  "ocean testi",
+  "big five personality test",
+  "xuti tvisebis testi",
+];
+
 /** Numerology cluster (`/numerologia`). */
 export const NUMEROLOGY_LATIN_QUERIES = [
   "numerologia",

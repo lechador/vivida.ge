@@ -7,6 +7,7 @@ import {
   Clock,
   ArrowRight,
   HeartHandshake,
+  Layers,
   RotateCcw,
   Sparkles,
 } from "lucide-react";
@@ -15,12 +16,17 @@ import { auth } from "@/auth";
 import { getCurrentPlan } from "@/lib/plan";
 import { TESTS, type TestCatalogEntry } from "@/lib/tests-catalog";
 import {
+  getLatestBigFiveResult,
   getLatestEqResult,
   getLatestIqResult,
   getLatestMbtiResult,
 } from "@/lib/test-results";
 import { EQ_BAND_META } from "@/lib/eq/scoring";
 import type { EqBand } from "@/lib/eq/scoring";
+import {
+  BIG5_TRAIT_BY_KEY,
+  type BigFiveTraitKey,
+} from "@/lib/big-five/questions";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -33,6 +39,7 @@ const SITE_URL = "https://www.vivida.ge";
 const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
   iq: { Icon: Brain, accent: "var(--vivida-cyan)" },
   eq: { Icon: HeartHandshake, accent: "var(--vivida-pink)" },
+  "big-five": { Icon: Layers, accent: "var(--vivida-violet)" },
   "astro-mbti": { Icon: Fingerprint, accent: "var(--vivida-violet)" },
   "famous-zodiac": { Icon: Sparkles, accent: "var(--vivida-pink)" },
 };
@@ -105,10 +112,11 @@ export default async function TestsPage() {
   const myResults: Record<string, TestResult> = {};
   if (authed) {
     const uid = session!.user!.id;
-    const [mbti, iq, eqRow] = await Promise.all([
+    const [mbti, iq, eqRow, bigFive] = await Promise.all([
       getLatestMbtiResult(uid),
       getLatestIqResult(uid),
       getLatestEqResult(uid),
+      getLatestBigFiveResult(uid),
     ]);
     if (mbti)
       myResults["astro-mbti"] = {
@@ -128,6 +136,17 @@ export default async function TestsPage() {
         value: `EQ ${eqRow.overall}`,
         sub: EQ_BAND_META[eqRow.band as EqBand]?.labelKa ?? "",
       };
+    if (bigFive) {
+      const scores = bigFive.traitScores as Record<string, number>;
+      const topKey = Object.keys(scores).reduce((a, b) =>
+        scores[b] > scores[a] ? b : a
+      ) as BigFiveTraitKey;
+      myResults["big-five"] = {
+        href: `/big-five/shedegi/${bigFive.id}`,
+        value: BIG5_TRAIT_BY_KEY[topKey]?.nameKa ?? "პროფილი",
+        sub: "დომინანტი თვისება",
+      };
+    }
   }
 
   const ld = [

@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { eqResults, iqResults, mbtiTestResults, profiles } from "@/db/schema";
+import { bigFiveResults, eqResults, iqResults, mbtiTestResults, profiles } from "@/db/schema";
 
 /**
  * Shared helpers for "my results" (tests hub, public profile) and the
@@ -10,7 +10,7 @@ import { eqResults, iqResults, mbtiTestResults, profiles } from "@/db/schema";
  * the taker's *latest* result.
  */
 
-export type TestKind = "mbti" | "iq" | "eq";
+export type TestKind = "mbti" | "iq" | "eq" | "big-five";
 
 export async function getLatestMbtiResult(userId: string) {
   const [row] = await db
@@ -42,7 +42,17 @@ export async function getLatestEqResult(userId: string) {
   return row ?? null;
 }
 
-export type TestVisibility = { mbti: boolean; iq: boolean; eq: boolean };
+export async function getLatestBigFiveResult(userId: string) {
+  const [row] = await db
+    .select()
+    .from(bigFiveResults)
+    .where(eq(bigFiveResults.userId, userId))
+    .orderBy(desc(bigFiveResults.createdAt))
+    .limit(1);
+  return row ?? null;
+}
+
+export type TestVisibility = { mbti: boolean; iq: boolean; eq: boolean; "big-five": boolean };
 
 export async function getTestVisibility(userId: string): Promise<TestVisibility> {
   const [p] = await db
@@ -50,11 +60,12 @@ export async function getTestVisibility(userId: string): Promise<TestVisibility>
       mbti: profiles.showMbtiResult,
       iq: profiles.showIqResult,
       eq: profiles.showEqResult,
+      "big-five": profiles.showBigFiveResult,
     })
     .from(profiles)
     .where(eq(profiles.userId, userId))
     .limit(1);
-  return { mbti: !!p?.mbti, iq: !!p?.iq, eq: !!p?.eq };
+  return { mbti: !!p?.mbti, iq: !!p?.iq, eq: !!p?.eq, "big-five": !!p?.["big-five"] };
 }
 
 /**
@@ -72,7 +83,9 @@ export async function setTestVisibility(
       ? { showMbtiResult: visible }
       : kind === "iq"
         ? { showIqResult: visible }
-        : { showEqResult: visible };
+        : kind === "eq"
+          ? { showEqResult: visible }
+          : { showBigFiveResult: visible };
   await db
     .insert(profiles)
     .values({ userId, ...set })

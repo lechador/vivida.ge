@@ -20,7 +20,7 @@ export function UnlockCard({
   title = "სრული შედეგის გახსნა",
   blurb,
 }: {
-  kind: "iq" | "eq" | "mbti" | "synastry";
+  kind: "iq" | "eq" | "big-five" | "mbti" | "synastry";
   resultId: string;
   cost: number;
   balance: number;

@@ -326,6 +326,7 @@ export const profiles = pgTable("profile", {
   showMbtiResult: boolean("show_mbti_result").notNull().default(false),
   showIqResult: boolean("show_iq_result").notNull().default(false),
   showEqResult: boolean("show_eq_result").notNull().default(false),
+  showBigFiveResult: boolean("show_big_five_result").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -1991,6 +1992,48 @@ export const eqResults = pgTable(
 
 export type EqResultRow = typeof eqResults.$inferSelect;
 export type NewEqResultRow = typeof eqResults.$inferInsert;
+
+/** Per-trait Big Five (OCEAN) scores (0–100). */
+export type BigFiveTraitScoresJson = {
+  openness: number;
+  conscientiousness: number;
+  extraversion: number;
+  agreeableness: number;
+  neuroticism: number;
+};
+
+/**
+ * One row per completed Big Five test. Like the other tests, kept for both
+ * signed-in users (history) and anonymous takers (`user_id` null) so the score
+ * distribution can be self-normed later. Big Five is a bipolar profile — no
+ * overall score, just the five trait scores. `attempt_id` dedupes re-POSTs.
+ */
+export const bigFiveResults = pgTable(
+  "big_five_result",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    attemptId: text("attempt_id").notNull().unique(),
+    /** Per-trait 0–100 scores. */
+    traitScores: jsonb("trait_scores")
+      .$type<BigFiveTraitScoresJson>()
+      .notNull(),
+    /** questionId → chosen 1..5, the raw data self-norming needs. */
+    answers: jsonb("answers").$type<Record<string, number>>().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("big_five_results_user_created_idx").on(t.userId, t.createdAt),
+    index("big_five_results_created_idx").on(t.createdAt),
+  ]
+);
+
+export type BigFiveResultRow = typeof bigFiveResults.$inferSelect;
+export type NewBigFiveResultRow = typeof bigFiveResults.$inferInsert;
 
 /**
  * Reusable Astro-MBTI interpretation library — the pro-written, pre-generated

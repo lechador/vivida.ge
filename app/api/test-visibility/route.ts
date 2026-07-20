@@ -29,7 +29,10 @@ export async function POST(req: Request) {
     visible?: unknown;
   } | null;
   const kind =
-    body?.kind === "mbti" || body?.kind === "iq" || body?.kind === "eq"
+    body?.kind === "mbti" ||
+    body?.kind === "iq" ||
+    body?.kind === "eq" ||
+    body?.kind === "big-five"
       ? body.kind
       : null;
   if (!kind || typeof body?.visible !== "boolean") {

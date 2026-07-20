@@ -61,6 +61,7 @@ export const CREDIT_COST = {
   mbtiTest: 5,
   iqTest: 5,
   eqTest: 5,
+  bigFiveTest: 5,
   audioHoroscope: 2,
   pdfReport: 5,
   weeklyForecast: 10,
@@ -91,6 +92,7 @@ export type CreditReason =
   | "spend_mbti"
   | "spend_iq"
   | "spend_eq"
+  | "spend_bigfive"
   | "spend_audio"
   | "spend_report"
   | "spend_weekly"
@@ -117,6 +119,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   spend_mbti: "პიროვნების ტესტი",
   spend_iq: "IQ ტესტი",
   spend_eq: "EQ ტესტი",
+  spend_bigfive: "Big Five ტესტი",
   spend_audio: "აუდიო ჰოროსკოპი",
   spend_report: "PDF რუკა",
   spend_weekly: "7-დღიანი პროგნოზი",

@@ -3,17 +3,18 @@ import { and, eq } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { eqResults, iqResults, mbtiTestResults, partners } from "@/db/schema";
+import { bigFiveResults, eqResults, iqResults, mbtiTestResults, partners } from "@/db/schema";
 import { CREDIT_COST, spendOnce, type CreditReason } from "@/lib/credits";
 
 export const dynamic = "force-dynamic";
 
-const KINDS = ["iq", "eq", "mbti", "synastry", "weekly"] as const;
+const KINDS = ["iq", "eq", "big-five", "mbti", "synastry", "weekly"] as const;
 type Kind = (typeof KINDS)[number];
 
 const REASON: Record<Kind, CreditReason> = {
   iq: "spend_iq",
   eq: "spend_eq",
+  "big-five": "spend_bigfive",
   mbti: "spend_mbti",
   synastry: "spend_synastry",
   weekly: "spend_weekly",
@@ -21,6 +22,7 @@ const REASON: Record<Kind, CreditReason> = {
 const COST: Record<Kind, number> = {
   iq: CREDIT_COST.iqTest,
   eq: CREDIT_COST.eqTest,
+  "big-five": CREDIT_COST.bigFiveTest,
   mbti: CREDIT_COST.mbtiTest,
   synastry: CREDIT_COST.synastry,
   weekly: CREDIT_COST.weeklyForecast,
@@ -71,19 +73,27 @@ export async function POST(req: Request) {
               .from(eqResults)
               .where(and(eq(eqResults.id, resultId), eq(eqResults.userId, userId)))
               .limit(1)
-          : kind === "mbti"
+          : kind === "big-five"
             ? await db
-                .select({ id: mbtiTestResults.id })
-                .from(mbtiTestResults)
+                .select({ id: bigFiveResults.id })
+                .from(bigFiveResults)
                 .where(
-                  and(eq(mbtiTestResults.id, resultId), eq(mbtiTestResults.userId, userId))
+                  and(eq(bigFiveResults.id, resultId), eq(bigFiveResults.userId, userId))
                 )
                 .limit(1)
-            : await db
-                .select({ id: partners.id })
-                .from(partners)
-                .where(and(eq(partners.id, resultId), eq(partners.userId, userId)))
-                .limit(1);
+            : kind === "mbti"
+              ? await db
+                  .select({ id: mbtiTestResults.id })
+                  .from(mbtiTestResults)
+                  .where(
+                    and(eq(mbtiTestResults.id, resultId), eq(mbtiTestResults.userId, userId))
+                  )
+                  .limit(1)
+              : await db
+                  .select({ id: partners.id })
+                  .from(partners)
+                  .where(and(eq(partners.id, resultId), eq(partners.userId, userId)))
+                  .limit(1);
     if (!owns.length) return NextResponse.json({ error: "not_found" }, { status: 404 });
     ref = resultId;
   }
