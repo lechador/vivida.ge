@@ -52,7 +52,7 @@ export function DesktopSidebar({
         "after:pointer-events-none after:absolute after:inset-y-8 after:right-0 after:w-px after:bg-[linear-gradient(180deg,transparent,oklch(0.78_0.18_305/0.45),transparent)]"
       )}
     >
-      <Link href="/feed" className="flex items-center gap-2.5 px-[1.15rem] pb-5 pt-6">
+      <Link href="/feed" className="flex shrink-0 items-center gap-2.5 px-[1.15rem] pb-3 pt-4">
         <VividaMark size={36} id="sidebar-mark" className="!size-9 shrink-0" />
         <span className={cn("flex items-center gap-2", reveal)}>
           <span
@@ -70,10 +70,11 @@ export function DesktopSidebar({
 
       <div
         aria-hidden
-        className="mx-4 h-px bg-gradient-to-r from-transparent via-border to-transparent"
+        className="mx-4 h-px shrink-0 bg-gradient-to-r from-transparent via-border to-transparent"
       />
 
-      <ul className="mt-3 flex flex-col gap-0.5 px-3">
+      <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul className="mt-2 flex flex-col gap-0.5">
         {items.map((item) => {
           const isActive = active === item.key;
           return (
@@ -83,7 +84,7 @@ export function DesktopSidebar({
                 aria-current={isActive ? "page" : undefined}
                 title={navLabel(item, plan)}
                 className={cn(
-                  "group/link relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                  "group/link relative flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-[var(--vivida-violet)]/15 text-foreground"
                     : "text-muted-foreground hover:bg-card/50 hover:text-foreground"
@@ -124,12 +125,13 @@ export function DesktopSidebar({
             </li>
           );
         })}
-      </ul>
+        </ul>
+      </nav>
 
-      <div className="mt-auto px-5 pb-6 pt-4">
+      <div className="shrink-0 px-5 pb-5 pt-3">
         <div
           aria-hidden
-          className="mb-4 h-px bg-gradient-to-r from-transparent via-border to-transparent"
+          className="mb-3 h-px bg-gradient-to-r from-transparent via-border to-transparent"
         />
         <Link
           href="/account"
