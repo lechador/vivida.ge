@@ -3,22 +3,24 @@ import { and, eq } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { iqResults, mbtiTestResults, partners } from "@/db/schema";
+import { eqResults, iqResults, mbtiTestResults, partners } from "@/db/schema";
 import { CREDIT_COST, spendOnce, type CreditReason } from "@/lib/credits";
 
 export const dynamic = "force-dynamic";
 
-const KINDS = ["iq", "mbti", "synastry", "weekly"] as const;
+const KINDS = ["iq", "eq", "mbti", "synastry", "weekly"] as const;
 type Kind = (typeof KINDS)[number];
 
 const REASON: Record<Kind, CreditReason> = {
   iq: "spend_iq",
+  eq: "spend_eq",
   mbti: "spend_mbti",
   synastry: "spend_synastry",
   weekly: "spend_weekly",
 };
 const COST: Record<Kind, number> = {
   iq: CREDIT_COST.iqTest,
+  eq: CREDIT_COST.eqTest,
   mbti: CREDIT_COST.mbtiTest,
   synastry: CREDIT_COST.synastry,
   weekly: CREDIT_COST.weeklyForecast,
@@ -26,7 +28,7 @@ const COST: Record<Kind, number> = {
 
 /**
  * POST /api/credits/unlock { kind, resultId } — pay once to unlock a deep
- * result. For "iq" | "mbti" | "synastry", `resultId` identifies the row and is
+ * result. For "iq" | "eq" | "mbti" | "synastry", `resultId` identifies the row and is
  * verified to belong to the caller. "weekly" is a per-user lifetime unlock
  * (the 7-day forecast) keyed by a fixed ref, so no row lookup is needed.
  * Spends credits idempotently (re-unlocking is free). 402 when short.
@@ -63,19 +65,25 @@ export async function POST(req: Request) {
             .from(iqResults)
             .where(and(eq(iqResults.id, resultId), eq(iqResults.userId, userId)))
             .limit(1)
-        : kind === "mbti"
+        : kind === "eq"
           ? await db
-              .select({ id: mbtiTestResults.id })
-              .from(mbtiTestResults)
-              .where(
-                and(eq(mbtiTestResults.id, resultId), eq(mbtiTestResults.userId, userId))
-              )
+              .select({ id: eqResults.id })
+              .from(eqResults)
+              .where(and(eq(eqResults.id, resultId), eq(eqResults.userId, userId)))
               .limit(1)
-          : await db
-              .select({ id: partners.id })
-              .from(partners)
-              .where(and(eq(partners.id, resultId), eq(partners.userId, userId)))
-              .limit(1);
+          : kind === "mbti"
+            ? await db
+                .select({ id: mbtiTestResults.id })
+                .from(mbtiTestResults)
+                .where(
+                  and(eq(mbtiTestResults.id, resultId), eq(mbtiTestResults.userId, userId))
+                )
+                .limit(1)
+            : await db
+                .select({ id: partners.id })
+                .from(partners)
+                .where(and(eq(partners.id, resultId), eq(partners.userId, userId)))
+                .limit(1);
     if (!owns.length) return NextResponse.json({ error: "not_found" }, { status: 404 });
     ref = resultId;
   }

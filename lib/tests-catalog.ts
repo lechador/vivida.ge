@@ -29,6 +29,17 @@ export const TESTS: TestCatalogEntry[] = [
     available: true,
   },
   {
+    slug: "eq",
+    kind: "featured",
+    href: "/eq-testi",
+    titleKa: "EQ ტესტი",
+    taglineKa: "შენი ემოციური ინტელექტი",
+    descKa:
+      "თვითშეფასების ტესტი ხუთ სფეროში — თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები. მიიღე EQ ქულა და შენი ემოციური რუკა.",
+    metaKa: "40 კითხვა · ~7 წუთი · უფასო",
+    available: true,
+  },
+  {
     slug: "astro-mbti",
     kind: "featured",
     href: "/pirovnebis-testi",

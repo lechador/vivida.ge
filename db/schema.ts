@@ -325,6 +325,7 @@ export const profiles = pgTable("profile", {
    *  display them (toggle on the result page). Per test kind. */
   showMbtiResult: boolean("show_mbti_result").notNull().default(false),
   showIqResult: boolean("show_iq_result").notNull().default(false),
+  showEqResult: boolean("show_eq_result").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -1945,6 +1946,51 @@ export const iqResults = pgTable(
 
 export type IqResultRow = typeof iqResults.$inferSelect;
 export type NewIqResultRow = typeof iqResults.$inferInsert;
+
+/** Per-domain EQ scores (0–100), one key per Goleman domain. */
+export type EqDomainScoresJson = {
+  "self-awareness": number;
+  "self-regulation": number;
+  motivation: number;
+  empathy: number;
+  "social-skills": number;
+};
+
+/**
+ * One row per completed EQ (emotional intelligence) test. Like `iq_result`,
+ * kept for both signed-in users (history) and anonymous takers (`user_id`
+ * null) so the score distribution can be self-normed later. Self-report
+ * Likert, scored server-side; `overall` is 0–100 and `band` its label.
+ * `attempt_id` dedupes result-page refreshes/re-POSTs.
+ */
+export const eqResults = pgTable(
+  "eq_result",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    attemptId: text("attempt_id").notNull().unique(),
+    /** 0–100 overall (mean of the five domain scores). */
+    overall: integer("overall").notNull(),
+    /** Band key: developing | moderate | strong | exceptional. */
+    band: text("band").notNull(),
+    /** Per-domain 0–100 breakdown. */
+    domainScores: jsonb("domain_scores").$type<EqDomainScoresJson>().notNull(),
+    /** questionId → chosen 1..5, the raw data self-norming needs. */
+    answers: jsonb("answers").$type<Record<string, number>>().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("eq_results_user_created_idx").on(t.userId, t.createdAt),
+    index("eq_results_created_idx").on(t.createdAt),
+  ]
+);
+
+export type EqResultRow = typeof eqResults.$inferSelect;
+export type NewEqResultRow = typeof eqResults.$inferInsert;
 
 /**
  * Reusable Astro-MBTI interpretation library — the pro-written, pre-generated

@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  * Self-contained: reads the current preference on mount (and hides itself for
  * anonymous visitors, who have no profile), and writes changes optimistically.
  */
-export function ProfileVisibilityToggle({ kind }: { kind: "mbti" | "iq" }) {
+export function ProfileVisibilityToggle({ kind }: { kind: "mbti" | "iq" | "eq" }) {
   const [on, setOn] = useState<boolean | null>(null); // null = loading/hidden
   const [saving, setSaving] = useState(false);
 

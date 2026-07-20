@@ -190,6 +190,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${BASE}/eq-testi`,
+      lastModified: EVERGREEN,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: `${BASE}/tavsebadoba`,
       lastModified: EVERGREEN,
       changeFrequency: "monthly",

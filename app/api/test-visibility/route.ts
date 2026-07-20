@@ -8,7 +8,7 @@ import {
 } from "@/lib/test-results";
 
 /**
- * GET  /api/test-visibility → { mbti, iq } for the signed-in user (204 if anon).
+ * GET  /api/test-visibility → { mbti, iq, eq } for the signed-in user (204 if anon).
  * POST /api/test-visibility { kind, visible } → set one test's profile opt-in.
  * Backs the "show my result on my public profile" toggle on the result pages.
  */
@@ -28,7 +28,10 @@ export async function POST(req: Request) {
     kind?: unknown;
     visible?: unknown;
   } | null;
-  const kind = body?.kind === "mbti" || body?.kind === "iq" ? body.kind : null;
+  const kind =
+    body?.kind === "mbti" || body?.kind === "iq" || body?.kind === "eq"
+      ? body.kind
+      : null;
   if (!kind || typeof body?.visible !== "boolean") {
     return NextResponse.json({ ok: false }, { status: 400 });
   }

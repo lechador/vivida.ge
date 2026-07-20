@@ -1,12 +1,26 @@
 import type { Metadata } from "next";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { Brain, Fingerprint, Clock, ArrowRight, RotateCcw, Sparkles } from "lucide-react";
+import {
+  Brain,
+  Fingerprint,
+  Clock,
+  ArrowRight,
+  HeartHandshake,
+  RotateCcw,
+  Sparkles,
+} from "lucide-react";
 
 import { auth } from "@/auth";
 import { getCurrentPlan } from "@/lib/plan";
 import { TESTS, type TestCatalogEntry } from "@/lib/tests-catalog";
-import { getLatestIqResult, getLatestMbtiResult } from "@/lib/test-results";
+import {
+  getLatestEqResult,
+  getLatestIqResult,
+  getLatestMbtiResult,
+} from "@/lib/test-results";
+import { EQ_BAND_META } from "@/lib/eq/scoring";
+import type { EqBand } from "@/lib/eq/scoring";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -18,6 +32,7 @@ const SITE_URL = "https://www.vivida.ge";
 /** Per-test visual identity — icon + accent colour, keyed by catalog slug. */
 const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
   iq: { Icon: Brain, accent: "var(--vivida-cyan)" },
+  eq: { Icon: HeartHandshake, accent: "var(--vivida-pink)" },
   "astro-mbti": { Icon: Fingerprint, accent: "var(--vivida-violet)" },
   "famous-zodiac": { Icon: Sparkles, accent: "var(--vivida-pink)" },
 };
@@ -90,9 +105,10 @@ export default async function TestsPage() {
   const myResults: Record<string, TestResult> = {};
   if (authed) {
     const uid = session!.user!.id;
-    const [mbti, iq] = await Promise.all([
+    const [mbti, iq, eqRow] = await Promise.all([
       getLatestMbtiResult(uid),
       getLatestIqResult(uid),
+      getLatestEqResult(uid),
     ]);
     if (mbti)
       myResults["astro-mbti"] = {
@@ -105,6 +121,12 @@ export default async function TestsPage() {
         href: `/iq-testi/shedegi/${iq.id}`,
         value: `IQ ${iq.iq}`,
         sub: `პროცენტილი ${iq.percentile}`,
+      };
+    if (eqRow)
+      myResults["eq"] = {
+        href: `/eq-testi/shedegi/${eqRow.id}`,
+        value: `EQ ${eqRow.overall}`,
+        sub: EQ_BAND_META[eqRow.band as EqBand]?.labelKa ?? "",
       };
   }
 

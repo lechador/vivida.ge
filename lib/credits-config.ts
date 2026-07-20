@@ -60,6 +60,7 @@ export const CREDIT_COST = {
   chat: 1,
   mbtiTest: 5,
   iqTest: 5,
+  eqTest: 5,
   audioHoroscope: 2,
   pdfReport: 5,
   weeklyForecast: 10,
@@ -89,6 +90,7 @@ export type CreditReason =
   | "spend_chat"
   | "spend_mbti"
   | "spend_iq"
+  | "spend_eq"
   | "spend_audio"
   | "spend_report"
   | "spend_weekly"
@@ -114,6 +116,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   spend_chat: "AI ჩატი",
   spend_mbti: "პიროვნების ტესტი",
   spend_iq: "IQ ტესტი",
+  spend_eq: "EQ ტესტი",
   spend_audio: "აუდიო ჰოროსკოპი",
   spend_report: "PDF რუკა",
   spend_weekly: "7-დღიანი პროგნოზი",

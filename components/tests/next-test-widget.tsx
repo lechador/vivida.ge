@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, Brain, Fingerprint, Sparkles } from "lucide-react";
+import { ArrowRight, Brain, Fingerprint, Heart, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-type CompletedKind = "iq" | "astro-mbti" | "famous-zodiac";
+type CompletedKind = "iq" | "eq" | "astro-mbti" | "famous-zodiac";
 
 const RECOMMENDATIONS: Record<CompletedKind, {
   eyebrow: string;
@@ -17,7 +17,17 @@ const RECOMMENDATIONS: Record<CompletedKind, {
     description: "ინტელექტის შემდეგ, გაიგე როგორ ფიქრობ, იღებ გადაწყვეტილებებს და ურთიერთობ სხვა ადამიანებთან.",
     items: [
       { href: "/pirovnebis-testi", title: "Astro-MBTI", description: "აღმოაჩინე შენი ფსიქოლოგიური ტიპი", Icon: Fingerprint, accent: "var(--vivida-violet)" },
+      { href: "/eq-testi", title: "EQ ტესტი", description: "ემოციური ინტელექტის ტესტი", Icon: Heart, accent: "var(--vivida-gold)" },
       { href: "/quiz/varskvlavebis-zodiaqo", title: "ვარსკვლავების ზოდიაქო", description: "სწრაფი 20-კითხვიანი ქვიზი", Icon: Sparkles, accent: "var(--vivida-pink)" },
+    ],
+  },
+  eq: {
+    eyebrow: "შემდეგი ნაბიჯი",
+    title: "შეავსე შენი სურათი",
+    description: "ემოციური ინტელექტის შემდეგ, გამოსცადე შენი ლოგიკა და აღმოაჩინე ფსიქოლოგიური ტიპი.",
+    items: [
+      { href: "/iq-testi", title: "IQ ტესტი", description: "25 ადაპტიური ლოგიკური დავალება", Icon: Brain, accent: "var(--vivida-cyan)" },
+      { href: "/pirovnebis-testi", title: "Astro-MBTI", description: "აღმოაჩინე შენი ფსიქოლოგიური ტიპი", Icon: Fingerprint, accent: "var(--vivida-violet)" },
     ],
   },
   "astro-mbti": {
@@ -26,6 +36,7 @@ const RECOMMENDATIONS: Record<CompletedKind, {
     description: "შენი ტიპი უკვე იცი — ახლა გამოსცადე ლოგიკა, პატერნები და ანალიტიკური აზროვნება.",
     items: [
       { href: "/iq-testi", title: "IQ ტესტი", description: "25 ადაპტიური ლოგიკური დავალება", Icon: Brain, accent: "var(--vivida-cyan)" },
+      { href: "/eq-testi", title: "EQ ტესტი", description: "ემოციური ინტელექტის ტესტი", Icon: Heart, accent: "var(--vivida-gold)" },
       { href: "/quiz/varskvlavebis-zodiaqo", title: "ვარსკვლავების ზოდიაქო", description: "სწრაფი 20-კითხვიანი ქვიზი", Icon: Sparkles, accent: "var(--vivida-pink)" },
     ],
   },
@@ -36,6 +47,7 @@ const RECOMMENDATIONS: Record<CompletedKind, {
     items: [
       { href: "/pirovnebis-testi", title: "Astro-MBTI", description: "60 კითხვა · შენი ფსიქოლოგიური ტიპი", Icon: Fingerprint, accent: "var(--vivida-violet)" },
       { href: "/iq-testi", title: "IQ ტესტი", description: "25 ადაპტიური ლოგიკური დავალება", Icon: Brain, accent: "var(--vivida-cyan)" },
+      { href: "/eq-testi", title: "EQ ტესტი", description: "ემოციური ინტელექტის ტესტი", Icon: Heart, accent: "var(--vivida-gold)" },
     ],
   },
 };

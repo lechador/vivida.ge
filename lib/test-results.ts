@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { iqResults, mbtiTestResults, profiles } from "@/db/schema";
+import { eqResults, iqResults, mbtiTestResults, profiles } from "@/db/schema";
 
 /**
  * Shared helpers for "my results" (tests hub, public profile) and the
@@ -10,7 +10,7 @@ import { iqResults, mbtiTestResults, profiles } from "@/db/schema";
  * the taker's *latest* result.
  */
 
-export type TestKind = "mbti" | "iq";
+export type TestKind = "mbti" | "iq" | "eq";
 
 export async function getLatestMbtiResult(userId: string) {
   const [row] = await db
@@ -32,15 +32,29 @@ export async function getLatestIqResult(userId: string) {
   return row ?? null;
 }
 
-export type TestVisibility = { mbti: boolean; iq: boolean };
+export async function getLatestEqResult(userId: string) {
+  const [row] = await db
+    .select()
+    .from(eqResults)
+    .where(eq(eqResults.userId, userId))
+    .orderBy(desc(eqResults.createdAt))
+    .limit(1);
+  return row ?? null;
+}
+
+export type TestVisibility = { mbti: boolean; iq: boolean; eq: boolean };
 
 export async function getTestVisibility(userId: string): Promise<TestVisibility> {
   const [p] = await db
-    .select({ mbti: profiles.showMbtiResult, iq: profiles.showIqResult })
+    .select({
+      mbti: profiles.showMbtiResult,
+      iq: profiles.showIqResult,
+      eq: profiles.showEqResult,
+    })
     .from(profiles)
     .where(eq(profiles.userId, userId))
     .limit(1);
-  return { mbti: !!p?.mbti, iq: !!p?.iq };
+  return { mbti: !!p?.mbti, iq: !!p?.iq, eq: !!p?.eq };
 }
 
 /**
@@ -54,7 +68,11 @@ export async function setTestVisibility(
   visible: boolean
 ): Promise<void> {
   const set =
-    kind === "mbti" ? { showMbtiResult: visible } : { showIqResult: visible };
+    kind === "mbti"
+      ? { showMbtiResult: visible }
+      : kind === "iq"
+        ? { showIqResult: visible }
+        : { showEqResult: visible };
   await db
     .insert(profiles)
     .values({ userId, ...set })

@@ -147,6 +147,18 @@ export const TAROT_LATIN_QUERIES = [
   "astrologia qartulad",
 ];
 
+/** EQ / emotional-intelligence test (`/eq-testi`). */
+export const EQ_LATIN_QUERIES = [
+  "eq testi",
+  "emociuri inteleqti",
+  "emociuri inteleqtis testi",
+  "eq test qartulad",
+  "emociuri inteligencia",
+  "ra aris emociuri inteleqti",
+  "emociuri inteleqti testi",
+  "psikologiuri testi",
+];
+
 /** Numerology cluster (`/numerologia`). */
 export const NUMEROLOGY_LATIN_QUERIES = [
   "numerologia",
