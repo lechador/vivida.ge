@@ -11,6 +11,7 @@ import { calculateEq, EQ_BAND_META, type EqResult } from "@/lib/eq/scoring";
 import { EqProfile } from "@/components/eq/eq-profile";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
 import { NextTestWidget } from "@/components/tests/next-test-widget";
+import { EqArticleRecommendations } from "@/components/eq/eq-article-recommendations";
 
 type Stored = { answers: Record<number, number>; attemptId?: string };
 
@@ -162,6 +163,8 @@ export function EqResultClient() {
           </div>
         )}
       </div>
+
+      <EqArticleRecommendations result={result} />
 
       <ProfileVisibilityToggle kind="eq" />
 

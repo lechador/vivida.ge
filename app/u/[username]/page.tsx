@@ -27,7 +27,12 @@ import {
   listMutualFriendsPreview,
 } from "@/lib/friendship";
 import { ageFromDob } from "@/lib/profile-utils";
-import { getLatestIqResult, getLatestMbtiResult } from "@/lib/test-results";
+import {
+  getLatestEqResult,
+  getLatestIqResult,
+  getLatestMbtiResult,
+} from "@/lib/test-results";
+import { EQ_BAND_META, type EqBand } from "@/lib/eq/scoring";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -108,7 +113,7 @@ export default async function PublicProfilePage({
   const ownerPlan = await getCurrentPlan(owner.id);
   const ownerChart = await ensureChartFor(owner.id, ownerPlan);
 
-  // Public test results the owner has opted to display (personality type, IQ).
+  // Public test results the owner has opted to display.
   const testBadges: { label: string; value: string; glyph: string }[] = [];
   if (profile.showMbtiResult) {
     const m = await getLatestMbtiResult(owner.id);
@@ -119,6 +124,17 @@ export default async function PublicProfilePage({
   if (profile.showIqResult) {
     const iq = await getLatestIqResult(owner.id);
     if (iq) testBadges.push({ label: "IQ", value: String(iq.iq), glyph: "🎯" });
+  }
+  if (profile.showEqResult) {
+    const result = await getLatestEqResult(owner.id);
+    if (result) {
+      const band = EQ_BAND_META[result.band as EqBand]?.labelKa;
+      testBadges.push({
+        label: "EQ",
+        value: band ? `${result.overall} · ${band}` : String(result.overall),
+        glyph: "💗",
+      });
+    }
   }
 
   // Viewer (may be anonymous, may be the owner, may be a logged-in stranger)
@@ -564,4 +580,3 @@ function MutualFriendsPill({
     </div>
   );
 }
-

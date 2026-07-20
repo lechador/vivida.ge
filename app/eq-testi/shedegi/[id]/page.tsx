@@ -16,6 +16,7 @@ import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-t
 import { NextTestWidget } from "@/components/tests/next-test-widget";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
+import { EqArticleRecommendations } from "@/components/eq/eq-article-recommendations";
 
 export const metadata = { title: "შენი EQ შედეგი", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -98,6 +99,10 @@ export default async function SavedEqResultPage({
             />
           </div>
         )}
+
+        <div className="mt-4">
+          <EqArticleRecommendations result={result} />
+        </div>
 
         {unlocked && <ProfileVisibilityToggle kind="eq" />}
 

@@ -15,6 +15,7 @@ import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
 import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
 import { ALL_MBTI_SLUGS } from "@/lib/seo/mbti-seo";
 import { TAROT_CARDS } from "@/lib/tarot/deck";
+import { EQ_ARTICLE_SLUGS } from "@/lib/seo/eq-articles";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -35,6 +36,7 @@ const BASE = "https://www.vivida.ge";
 const NOW = new Date();
 /** Bump when evergreen cluster content meaningfully changes. */
 const EVERGREEN = new Date("2026-07-13");
+const EQ_LIBRARY_PUBLISHED = new Date("2026-07-20");
 
 const VIEW_CHANGE_FREQ: Record<
   (typeof ALL_HOROSCOPE_VIEWS)[number],
@@ -191,6 +193,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${BASE}/eq-testi`,
+      lastModified: EVERGREEN,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE}/emociuri-inteleqti`,
+      lastModified: EQ_LIBRARY_PUBLISHED,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    ...EQ_ARTICLE_SLUGS.map((slug) => ({
+      url: `${BASE}/emociuri-inteleqti/${slug}`,
+      lastModified: EQ_LIBRARY_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    {
+      url: `${BASE}/big-five`,
       lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.9,
