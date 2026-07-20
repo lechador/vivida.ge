@@ -111,6 +111,29 @@ export function DailyCard({
         </span>
       </Link>
 
+      {/* Tarot entry — the "I have a specific question" hook, which the daily
+          horoscope can't answer. First reading is free, so lead with that. */}
+      <Link
+        href="/taro"
+        className="group relative mt-3 flex items-center justify-between gap-3 rounded-xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/8 px-4 py-3 transition-colors hover:border-[var(--vivida-violet)]/60 hover:bg-[var(--vivida-violet)]/15"
+      >
+        <span className="flex flex-wrap items-center gap-2.5 text-sm font-medium">
+          <span aria-hidden className="text-base leading-none">
+            🔮
+          </span>
+          ტარო — დაუსვი კითხვა კარტებს
+          <span className="rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/15 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-violet)]">
+            პირველი უფასოდ
+          </span>
+        </span>
+        <span
+          aria-hidden
+          className="text-[var(--vivida-violet)] transition-transform group-hover:translate-x-0.5"
+        >
+          →
+        </span>
+      </Link>
+
       {canAudio ? (
         <HoroscopeAudioPlayer savedVoice={savedVoice} />
       ) : (

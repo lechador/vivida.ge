@@ -11,6 +11,7 @@ import {
   Telescope,
   UserPlus,
   Users,
+  Wand2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -22,6 +23,7 @@ export type NavActiveKey =
   | "sky"
   | "report"
   | "ask"
+  | "tarot"
   | "timing"
   | "feed"
   | "tests"
@@ -95,6 +97,14 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: "ჰკითხე",
     Icon: Stars,
     hue: "oklch(0.80 0.16 230)",
+  },
+  {
+    key: "tarot",
+    href: "/taro",
+    label: "ტარო",
+    Icon: Wand2,
+    hue: "oklch(0.78 0.18 305)",
+    badgeKa: "ახალი",
   },
   {
     key: "timing",

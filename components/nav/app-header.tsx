@@ -36,6 +36,7 @@ export async function AppHeader({
     | "sky"
     | "report"
     | "ask"
+    | "tarot"
     | "timing"
     | "feed"
     | "tests"
