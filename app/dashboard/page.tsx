@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { profiles, users } from "@/db/schema";
+import { bigFiveResults, eqResults, iqResults, mbtiTestResults, profiles, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { isAccountRestricted } from "@/lib/restriction";
@@ -11,13 +11,15 @@ import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
+import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
+import { TESTS } from "@/lib/tests-catalog";
 
 export const metadata = { title: "დღეს" };
 
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [[profile], plan, [userRow]] = await Promise.all([
+  const [[profile], plan, [userRow], [mbtiResult], [iqResult], [eqResult], [bigFiveResult]] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     getCurrentPlan(user.id),
     db
@@ -25,6 +27,10 @@ export default async function DashboardPage() {
       .from(users)
       .where(eq(users.id, user.id))
       .limit(1),
+    db.select({ id: mbtiTestResults.id }).from(mbtiTestResults).where(eq(mbtiTestResults.userId, user.id)).limit(1),
+    db.select({ id: iqResults.id }).from(iqResults).where(eq(iqResults.userId, user.id)).limit(1),
+    db.select({ id: eqResults.id }).from(eqResults).where(eq(eqResults.userId, user.id)).limit(1),
+    db.select({ id: bigFiveResults.id }).from(bigFiveResults).where(eq(bigFiveResults.userId, user.id)).limit(1),
   ]);
 
   if (!profile?.dateOfBirth) {
@@ -41,6 +47,20 @@ export default async function DashboardPage() {
 
   const restricted = await isAccountRestricted(user.id);
   const firstName = user.name?.split(" ")[0] ?? "ვარსკვლავო";
+  const completed = new Set([
+    ...(mbtiResult ? ["astro-mbti"] : []),
+    ...(iqResult ? ["iq"] : []),
+    ...(eqResult ? ["eq"] : []),
+    ...(bigFiveResult ? ["big-five"] : []),
+  ]);
+  const primaryTests = TESTS.filter((test) => test.available && test.kind === "featured");
+  const unfinished = primaryTests.filter((test) => !completed.has(test.slug));
+  const pool = unfinished.length > 0 ? unfinished : TESTS.filter((test) => test.available && test.kind === "quiz");
+  // Stable for one civil day, but rotates across users/days instead of always
+  // favoring the first catalog entry.
+  const dailySeed = `${user.id}:${new Date().toISOString().slice(0, 10)}`;
+  const seedValue = [...dailySeed].reduce((sum, char) => (sum * 31 + char.charCodeAt(0)) >>> 0, 0);
+  const suggestedTest = pool[seedValue % pool.length];
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -78,6 +98,10 @@ export default async function DashboardPage() {
           plan={plan}
           savedVoice={userRow?.horoscopeVoice ?? null}
         />
+
+        {suggestedTest && (
+          <DashboardTestPromo test={suggestedTest} allCompleted={unfinished.length === 0} />
+        )}
       </section>
     </main>
   );
