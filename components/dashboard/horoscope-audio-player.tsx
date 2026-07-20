@@ -205,11 +205,11 @@ export function HoroscopeAudioPlayer({
           variant="mystic"
           size="lg"
           onClick={onListen}
-          className="relative w-full justify-center shadow-xl shadow-[var(--vivida-violet)]/40"
+          className="relative h-auto min-h-12 w-full flex-wrap justify-center gap-x-1.5 gap-y-1.5 whitespace-normal px-4 py-2.5 shadow-xl shadow-[var(--vivida-violet)]/40"
         >
-          <Headphones className="size-5" />
-          მოისმინე ჰოროსკოპი
-          <span className="ml-1.5 inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold tabular-nums">
+          <Headphones className="size-5 shrink-0" />
+          <span className="whitespace-nowrap">მოისმინე ჰოროსკოპი</span>
+          <span className="inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold tabular-nums">
             −{CREDIT_COST.audioHoroscope} კრედიტი
           </span>
         </Button>

@@ -87,35 +87,11 @@ export function DailyCard({
         />
       </header>
 
-      {/* Live sky entry — top of the card so "where is everything right
-          now?" is the first tap, the between-readings return hook. */}
-      <Link
-        href="/sky"
-        className="group relative mt-5 flex items-center justify-between gap-3 rounded-xl border border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/8 px-4 py-3 transition-colors hover:border-[var(--vivida-cyan)]/60 hover:bg-[var(--vivida-cyan)]/15"
-      >
-        <span className="flex flex-wrap items-center gap-2.5 text-sm font-medium">
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--vivida-cyan)] opacity-75" />
-            <span className="relative inline-flex size-2 rounded-full bg-[var(--vivida-cyan)]" />
-          </span>
-          ცოცხალი ცა — სად არიან პლანეტები ახლა?
-          <span className="rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/15 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]">
-            ახალი
-          </span>
-        </span>
-        <span
-          aria-hidden
-          className="text-[var(--vivida-cyan)] transition-transform group-hover:translate-x-0.5"
-        >
-          →
-        </span>
-      </Link>
-
       {/* Tarot entry — the "I have a specific question" hook, which the daily
           horoscope can't answer. First reading is free, so lead with that. */}
       <Link
         href="/taro"
-        className="group relative mt-3 flex items-center justify-between gap-3 rounded-xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/8 px-4 py-3 transition-colors hover:border-[var(--vivida-violet)]/60 hover:bg-[var(--vivida-violet)]/15"
+        className="group relative mt-5 flex items-center justify-between gap-3 rounded-xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/8 px-4 py-3 transition-colors hover:border-[var(--vivida-violet)]/60 hover:bg-[var(--vivida-violet)]/15"
       >
         <span className="flex flex-wrap items-center gap-2.5 text-sm font-medium">
           <span aria-hidden className="text-base leading-none">
@@ -133,23 +109,6 @@ export function DailyCard({
           →
         </span>
       </Link>
-
-      {canAudio ? (
-        <HoroscopeAudioPlayer savedVoice={savedVoice} />
-      ) : (
-        <div className="relative mt-5">
-          <Button asChild variant="outline" size="lg" className="w-full justify-center sm:w-auto">
-            <Link href="/subscription">
-              <Headphones className="size-4" />
-              მოისმინე ჰოროსკოპი
-              <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-gold)]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--vivida-gold)]">
-                <Lock className="size-3" />
-                Pro
-              </span>
-            </Link>
-          </Button>
-        </div>
-      )}
 
       {horoscope.themes.length > 0 && (
         <div className="relative mt-4 flex flex-wrap gap-2">
@@ -183,6 +142,26 @@ export function DailyCard({
             <p key={i}>{para}</p>
           ))}
       </div>
+
+      {/* Listen-to-horoscope — placed between the written reading and the
+          transit breakdown so it follows the horoscope itself, not the
+          tarot/entry links at the top of the card. */}
+      {canAudio ? (
+        <HoroscopeAudioPlayer savedVoice={savedVoice} />
+      ) : (
+        <div className="relative mt-5">
+          <Button asChild variant="outline" size="lg" className="w-full justify-center sm:w-auto">
+            <Link href="/subscription">
+              <Headphones className="size-4" />
+              მოისმინე ჰოროსკოპი
+              <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-gold)]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--vivida-gold)]">
+                <Lock className="size-3" />
+                Pro
+              </span>
+            </Link>
+          </Button>
+        </div>
+      )}
 
       {transits.length > 0 && (
         <section className="relative mt-6 border-t border-border/40 pt-5">
