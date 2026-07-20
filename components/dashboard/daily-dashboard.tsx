@@ -223,9 +223,13 @@ function DashboardExtrasSection({
     <>
       {(dailySlot || moonSlot) && (
         <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
-          {dailySlot && <div className="xl:col-span-7">{dailySlot}</div>}
+          {dailySlot && (
+            <div className="min-w-0 xl:col-span-7">{dailySlot}</div>
+          )}
           {moonSlot && (
-            <div className="xl:col-span-5 xl:sticky xl:top-20">{moonSlot}</div>
+            <div className="min-w-0 xl:col-span-5 xl:sticky xl:top-20">
+              {moonSlot}
+            </div>
           )}
         </div>
       )}
