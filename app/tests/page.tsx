@@ -41,6 +41,7 @@ const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
   eq: { Icon: HeartHandshake, accent: "var(--vivida-pink)" },
   "big-five": { Icon: Layers, accent: "var(--vivida-violet)" },
   "astro-mbti": { Icon: Fingerprint, accent: "var(--vivida-violet)" },
+  "true-sign": { Icon: Sparkles, accent: "var(--vivida-cyan)" },
   "famous-zodiac": { Icon: Sparkles, accent: "var(--vivida-pink)" },
 };
 const FALLBACK_THEME = { Icon: Brain, accent: "var(--vivida-violet)" };

@@ -62,6 +62,17 @@ export const TESTS: TestCatalogEntry[] = [
     available: true,
   },
   {
+    slug: "true-sign",
+    kind: "quiz",
+    href: "/quiz/namdvili-nishani",
+    titleKa: "რომელი ნიშანი ხარ სინამდვილეში?",
+    taglineKa: "შენი ზოდიაქო ხასიათით",
+    descKa:
+      "12-კითხვიანი ტესტი, რომელიც შენს პასუხებს ერთ-ერთ ზოდიაქოს ნიშანზე ასახავს — იქნებ დაბადების ნიშანს არც ემთხვეოდეს. სახალისო და გასაზიარებელი.",
+    metaKa: "12 კითხვა · ~3 წუთი · უფასო",
+    available: true,
+  },
+  {
     slug: "famous-zodiac",
     kind: "quiz",
     href: "/quiz/varskvlavebis-zodiaqo",

@@ -159,6 +159,18 @@ export const EQ_LATIN_QUERIES = [
   "psikologiuri testi",
 ];
 
+/** "Which sign are you really" quiz (`/quiz/namdvili-nishani`). */
+export const TRUE_SIGN_LATIN_QUERIES = [
+  "romeli nishani xar",
+  "ra nishani xar testi",
+  "namdvili zodiaqos nishani",
+  "romeli zodiaqo xar",
+  "zodiaqos nishani xasiatit",
+  "ra zodiaqo xar sinamdvileshi",
+  "nishnis testi",
+  "pirovnebis testi zodiaqo",
+];
+
 /** Big Five personality test (`/big-five`). */
 export const BIGFIVE_LATIN_QUERIES = [
   "big five",
