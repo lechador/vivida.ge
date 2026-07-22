@@ -193,6 +193,45 @@ export default async function Home() {
           <CompatibilityCalculator signs={signs} pairs={pairs} />
         </section>
 
+        {/* Explore rail — internal links to every free tool. The homepage is
+            high-traffic + high-bounce and previously linked to nothing
+            SEO-relevant; this distributes crawl paths and gives cold visitors
+            an obvious, low-commitment next step (a 2nd pageview = engaged). */}
+        <section className="relative z-10 mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
+          <h2 className="mb-5 text-center text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            გამოიკვლიე უფასოდ
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {[
+              { href: "/nataluri-ruka", label: "ნატალური რუკა", emoji: "🌌" },
+              { href: "/horoskopi", label: "დღის ჰოროსკოპი", emoji: "☀️" },
+              { href: "/zodiac/tavsebadoba", label: "თავსებადობა", emoji: "💞" },
+              { href: "/taro", label: "ტარო", emoji: "🔮" },
+              { href: "/tests", label: "ტესტები", emoji: "🧠" },
+              { href: "/numerologia", label: "ნუმეროლოგია", emoji: "🔢" },
+              { href: "/chinuri-horoskopi", label: "ჩინური ჰოროსკოპი", emoji: "🐉" },
+              { href: "/zodiac", label: "ზოდიაქოს ნიშნები", emoji: "✨" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex items-center gap-3 rounded-2xl border border-border bg-card/50 px-4 py-3.5 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:border-[var(--vivida-violet)]/50 hover:bg-card/80"
+              >
+                <span aria-hidden className="text-lg">
+                  {item.emoji}
+                </span>
+                <span className="text-sm font-medium">{item.label}</span>
+                <span
+                  aria-hidden
+                  className="ml-auto text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                >
+                  →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         <PillarsSection />
         <FeaturesSection />
         <HowItWorksSection />

@@ -19,6 +19,17 @@ const LEARN_LINKS = [
   { href: "/zodiac/gzamkvlevi", label: "სრული გზამკვლევი" },
 ];
 
+const TOOL_LINKS = [
+  { href: "/horoskopi", label: "დღის ჰოროსკოპი" },
+  { href: "/horoskopi/kvireuli", label: "კვირის ჰოროსკოპი" },
+  { href: "/horoskopi/tviuri", label: "თვის ჰოროსკოპი" },
+  { href: "/taro", label: "ტარო" },
+  { href: "/tests", label: "ტესტები" },
+  { href: "/numerologia", label: "ნუმეროლოგია" },
+  { href: "/chinuri-horoskopi", label: "ჩინური ჰოროსკოპი" },
+  { href: "/astrologiuri-kalendari", label: "ასტროლოგიური კალენდარი" },
+];
+
 const LEGAL_LINKS = [
   { href: "/terms", label: "წესები და პირობები" },
   { href: "/privacy", label: "კონფიდენციალურობა" },
@@ -62,7 +73,7 @@ export function SiteFooter() {
         </div>
 
         {/* Links */}
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 md:gap-16">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 md:gap-10">
           <div>
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               პროდუქტი
@@ -86,6 +97,23 @@ export function SiteFooter() {
             </h3>
             <ul className="space-y-2 text-sm">
               {LEARN_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-foreground/85 transition-colors hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              ხელსაწყოები
+            </h3>
+            <ul className="space-y-2 text-sm">
+              {TOOL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}

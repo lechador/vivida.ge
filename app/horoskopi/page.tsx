@@ -232,6 +232,18 @@ export default async function HoroskopiHubPage() {
           >
             დაბნელებები
           </Link>
+          <Link
+            href="/merkuri-retrogradi"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            მერკური რეტროგრადში
+          </Link>
+          <Link
+            href="/mtvaris-kalendari"
+            className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+          >
+            მთვარის კალენდარი
+          </Link>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

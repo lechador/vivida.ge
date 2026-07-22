@@ -314,6 +314,36 @@ export default function NataluriRukaPage() {
             >
               პირადი ჰოროსკოპი
             </Link>
+            <Link
+              href="/taro"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              ტარო
+            </Link>
+            <Link
+              href="/tests"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              ტესტები
+            </Link>
+            <Link
+              href="/numerologia"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              ნუმეროლოგია
+            </Link>
+            <Link
+              href="/chinuri-horoskopi"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              ჩინური ჰოროსკოპი
+            </Link>
+            <Link
+              href="/astrologiuri-kalendari"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              ასტროლოგიური კალენდარი
+            </Link>
           </section>
         </article>
 

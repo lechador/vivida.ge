@@ -208,6 +208,32 @@ export function TarotReader({
               ახალი კითხვა
             </Button>
           </div>
+
+          {/* Free second-action rail — a next step at the peak-engagement
+              moment, instead of dead-ending at the credit-gated new question. */}
+          <div className="border-t border-border/40 pt-5 text-center">
+            <p className="text-xs text-muted-foreground">ან განაგრძე</p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
+              >
+                დღის ჰოროსკოპი
+              </Link>
+              <Link
+                href="/report"
+                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
+              >
+                ჩემი ნატალური რუკა
+              </Link>
+              <Link
+                href="/tests"
+                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
+              >
+                ტესტები
+              </Link>
+            </div>
+          </div>
         </div>
       )}
     </div>

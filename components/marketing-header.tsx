@@ -12,7 +12,14 @@ import { SiteSearch } from "@/components/search/site-search";
 export function MarketingHeader({
   active,
 }: {
-  active?: "features" | "how-it-works" | "nataluri-ruka" | "zodiac";
+  active?:
+    | "features"
+    | "how-it-works"
+    | "nataluri-ruka"
+    | "zodiac"
+    | "horoskopi"
+    | "taro"
+    | "tests";
 }) {
   const link = (href: string, label: string, key: typeof active) => (
     <Link
@@ -51,10 +58,12 @@ export function MarketingHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-6 sm:gap-7">
-        <nav className="hidden items-center gap-7 text-sm sm:flex">
+        <nav className="hidden items-center gap-5 text-sm lg:flex">
           {link("/nataluri-ruka", "ნატალური რუკა", "nataluri-ruka")}
+          {link("/horoskopi", "ჰოროსკოპი", "horoskopi")}
+          {link("/taro", "ტარო", "taro")}
+          {link("/tests", "ტესტები", "tests")}
           {link("/zodiac", "ზოდიაქო", "zodiac")}
-          {link("/how-it-works", "როგორ მუშაობს", "how-it-works")}
         </nav>
 
         <MarketingCta />
