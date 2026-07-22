@@ -65,7 +65,7 @@ export function MobileNav({
                 {/* Header — logo + close */}
                 <div className="flex items-center justify-between">
                   <Link
-                    href="/feed"
+                    href="/dashboard"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-2.5"
                   >

@@ -157,10 +157,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * The mobile bottom tab bar shows a curated 5-item subset of the nav.
- * Friends and feed don't make this list (they're still reachable from
- * the desktop nav and the mobile drawer); messages takes a slot so the
- * messenger is one tap away with a live unread badge.
+ * The mobile bottom tab bar shows a curated 5-item subset of the nav:
+ * today / chart / tarot / tests / chat. The content funnels (tarot, tests)
+ * that the data shows drive consumption get a slot; the near-dead social
+ * feed and synastry drop to the mobile drawer (still reachable). Messages
+ * keeps a slot — it's the messenger's only mobile entry point, with a live
+ * unread badge.
  */
 /** Visible desktop nav — gated entries (e.g. discover) filtered out when off. */
 export const NAV_ITEMS: NavItem[] = ALL_NAV_ITEMS.filter(navVisible);
@@ -181,18 +183,18 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     hue: "oklch(0.78 0.18 305)",
   },
   {
-    key: "feed",
-    href: "/feed",
-    label: "ფიდი",
-    Icon: Sparkles,
-    hue: "oklch(0.78 0.18 320)",
+    key: "tarot",
+    href: "/taro",
+    label: "ტარო",
+    Icon: Wand2,
+    hue: "oklch(0.78 0.18 305)",
   },
   {
-    key: "synastry",
-    href: "/synastry",
-    label: "თავსებადობა",
-    Icon: Heart,
-    hue: "oklch(0.72 0.22 350)",
+    key: "tests",
+    href: "/tests",
+    label: "ტესტები",
+    Icon: Brain,
+    hue: "oklch(0.78 0.16 300)",
   },
   {
     key: "messages",
