@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Check, Loader2, Lock, MapPin, Share2, Sparkles, X } from "lucide-react";
+import { Check, Loader2, Lock, Mail, MapPin, Share2, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,8 @@ import { ChartWheel } from "@/components/dashboard/chart-wheel";
 import { AspectCards } from "@/components/dashboard/aspect-cards";
 import { PositionsTable, HousesTable } from "@/components/report/positions-table";
 import { signByIndex, signColor, formatDegree } from "@/lib/zodiac";
+import { slugByLabelKa } from "@/lib/seo/zodiac-content";
+import { trackEvent } from "@/lib/analytics";
 import type { GeocodeResult } from "@/lib/geocoding";
 import type { NatalChartJson, PointJson } from "@/db/schema";
 
@@ -96,6 +98,7 @@ export function PublicNatalCalculator() {
         return;
       }
       setChart(data.chart as NatalChartJson);
+      trackEvent("natal_chart_computed", { source: "natal_calculator" });
       setTimeout(
         () => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
         80
@@ -106,6 +109,17 @@ export function PublicNatalCalculator() {
       setLoading(false);
     }
   }
+
+  // Personalize the "continue free" rail to the visitor's own sun sign — a
+  // highly relevant next click (and a 2nd pageview = an engaged, non-bounce
+  // session in GA).
+  const sunIdx = chart?.bodies.sun?.signIndex;
+  const sunSign = sunIdx != null ? signByIndex(sunIdx) : null;
+  const sunSlug = sunSign ? slugByLabelKa(sunSign.labelKa) : null;
+  const bigParam =
+    chart?.bodies.sun && chart?.bodies.moon && chart?.ascendant
+      ? `${chart.bodies.sun.signIndex}.${chart.bodies.moon.signIndex}.${chart.ascendant.signIndex}`
+      : null;
 
   return (
     <div>
@@ -242,15 +256,159 @@ export function PublicNatalCalculator() {
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button asChild variant="mystic" size="lg">
-                <Link href="/signup">უფასო რეგისტრაცია</Link>
+                <Link
+                  href="/signup"
+                  onClick={() =>
+                    trackEvent("register_click", { source: "natal_calculator" })
+                  }
+                >
+                  უფასო რეგისტრაცია
+                </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
                 <Link href="/login">შესვლა</Link>
               </Button>
             </div>
           </div>
+
+          {/* Lower-friction return hook — get the daily horoscope by email
+              without a full signup (the biggest lever on "nobody returns"). */}
+          <HoroscopeEmailCapture sunSign={sunIdx} big={bigParam} />
+
+          {/* Second-action rail — a free next step so a visitor who isn't ready
+              to register still takes a 2nd action (a 2nd pageview is an engaged,
+              non-bounce session) and discovers a reason to return. Personalized
+              to their sun sign for relevance. */}
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              ან განაგრძე უფასოდ
+            </p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              {sunSlug && sunSign && (
+                <Link
+                  href={`/zodiac/${sunSlug}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+                >
+                  <span aria-hidden>{sunSign.symbol}</span>
+                  {sunSign.labelKa} — შენი ნიშანი
+                </Link>
+              )}
+              <Link
+                href="/horoskopi"
+                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+              >
+                დღის ჰოროსკოპი
+              </Link>
+              <Link
+                href="/zodiac/tavsebadoba"
+                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+              >
+                თავსებადობა
+              </Link>
+            </div>
+          </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Compact "get the daily horoscope by email" capture shown on the free result.
+ * A lower-friction alternative to full signup: posts the email + sun sign to
+ * the public subscribe endpoint, which stores the lead and fires an immediate
+ * welcome email. Returns null until a chart (hence a sun sign) exists.
+ */
+function HoroscopeEmailCapture({
+  sunSign,
+  big,
+}: {
+  sunSign: number | undefined;
+  big: string | null;
+}) {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
+    "idle"
+  );
+  const [msg, setMsg] = useState<string | null>(null);
+
+  if (sunSign == null) return null;
+
+  async function submit() {
+    const value = email.trim();
+    if (!value) return;
+    setStatus("loading");
+    setMsg(null);
+    try {
+      const res = await fetch("/api/public/horoscope-subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: value, sunSign, big }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        setStatus("error");
+        setMsg(
+          data.error === "rate_limited"
+            ? "ბევრი მოთხოვნა. სცადე ცოტა ხანში."
+            : (typeof data.error === "string" && data.error) ||
+                "ვერ მოხერხდა. სცადე ხელახლა."
+        );
+        return;
+      }
+      setStatus("done");
+      trackEvent("horoscope_email_subscribed", { sun_sign: sunSign });
+    } catch {
+      setStatus("error");
+      setMsg("ქსელის შეცდომა. სცადე ხელახლა.");
+    }
+  }
+
+  if (status === "done") {
+    return (
+      <div className="flex items-center justify-center gap-2 rounded-2xl border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/8 px-5 py-4 text-center text-sm text-foreground/90 ring-1 ring-foreground/5">
+        <Check className="size-4 shrink-0 text-[var(--vivida-cyan)]" />
+        გამოწერილია! პირველი ჰოროსკოპი უკვე იგზავნება ელფოსტაზე.
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
+      <div className="flex items-center justify-center gap-2 text-sm font-medium">
+        <Mail className="size-4 text-[var(--vivida-cyan)]" />
+        მიიღე დღიური ჰოროსკოპი ელფოსტაზე — უფასოდ
+      </div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          void submit();
+        }}
+        className="mt-3 flex flex-col gap-2 sm:flex-row"
+      >
+        <Input
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          placeholder="შენი ელფოსტა"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="flex-1 text-base"
+        />
+        <Button type="submit" variant="mystic" disabled={status === "loading"}>
+          {status === "loading" ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            "გამოწერა"
+          )}
+        </Button>
+      </form>
+      {msg && (
+        <p className="mt-2 text-center text-sm text-[var(--vivida-pink)]">{msg}</p>
+      )}
+      <p className="mt-2 text-center text-xs text-muted-foreground">
+        რეგისტრაცია არ სჭირდება. გაუქმება — ერთ დაწკაპუნებაზე.
+      </p>
     </div>
   );
 }

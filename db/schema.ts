@@ -1964,6 +1964,43 @@ export type EqDomainScoresJson = {
  * Likert, scored server-side; `overall` is 0–100 and `band` its label.
  * `attempt_id` dedupes result-page refreshes/re-POSTs.
  */
+/**
+ * Anonymous "daily horoscope by email" subscribers captured from the public
+ * natal-chart calculator — a lower-friction alternative to full signup that
+ * still puts them on the daily email loop (the return hook). No account, no
+ * password: just an email + the sun sign from the chart they just computed.
+ * Converting a lead into a real account happens when they click through and
+ * register.
+ */
+export const horoscopeLeads = pgTable(
+  "horoscope_lead",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    email: text("email").notNull().unique(),
+    /** Sun-sign index 0–11 (from the chart they just computed). */
+    sunSign: integer("sun_sign").notNull(),
+    /** "<sun>.<moon>.<asc>" index triple for deep-linking back to their chart. */
+    big: text("big"),
+    /** Where the lead was captured (default: the free natal calculator). */
+    source: text("source").notNull().default("natal_calculator"),
+    /** Opaque one-click unsubscribe token. */
+    unsubscribeToken: text("unsubscribe_token")
+      .notNull()
+      .$defaultFn(() => crypto.randomUUID()),
+    /** YYYY-MM-DD of the last daily send — idempotency guard for the cron. */
+    lastSentDate: text("last_sent_date"),
+    /** Set when they opt out; NULL = active subscriber. */
+    unsubscribedAt: timestamp("unsubscribed_at"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("horoscope_lead_active_idx").on(t.unsubscribedAt)]
+);
+
+export type HoroscopeLead = typeof horoscopeLeads.$inferSelect;
+export type NewHoroscopeLead = typeof horoscopeLeads.$inferInsert;
+
 export const eqResults = pgTable(
   "eq_result",
   {

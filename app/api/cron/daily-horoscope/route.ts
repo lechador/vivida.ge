@@ -7,6 +7,7 @@ import {
 import { sendDailyPushBlast } from "@/lib/push";
 import { sendBirthdayGifts } from "@/lib/birthday";
 import { sendWinbackNudges } from "@/lib/winback";
+import { sendDailyHoroscopeToLeads } from "@/lib/horoscope-leads";
 import { pruneRateLimits } from "@/lib/rate-limit";
 
 /**
@@ -94,11 +95,21 @@ async function run(req: NextRequest) {
     console.warn("[cron] winback nudges failed:", (err as Error).message);
   }
 
+  // Anonymous "daily horoscope by email" leads (captured on the free natal
+  // calculator) — send today's per-sign horoscope. Best-effort; never fails
+  // the user blast.
+  let leads = { audience: 0, sent: 0, skipped: 0, failed: 0 };
+  try {
+    leads = await sendDailyHoroscopeToLeads({ sendDate });
+  } catch (err) {
+    console.warn("[cron] lead horoscope send failed:", (err as Error).message);
+  }
+
   // Housekeeping: drop expired rate-limit counters. Best-effort, never
   // blocks or fails the blast (pruneRateLimits swallows its own errors).
   await pruneRateLimits();
 
-  return NextResponse.json({ sendDate, concurrency, ...result, push, birthdays, winback });
+  return NextResponse.json({ sendDate, concurrency, ...result, push, birthdays, winback, leads });
 }
 
 // Vercel Cron fires GET; manual reruns from admin can use POST.

@@ -2,7 +2,12 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
-import { applyUnsubscribe, isUnsubscribeType } from "@/lib/unsubscribe";
+import {
+  applyUnsubscribe,
+  isUnsubscribeType,
+  type UnsubscribeType,
+} from "@/lib/unsubscribe";
+import { unsubscribeLeadByToken } from "@/lib/horoscope-leads";
 
 export const metadata = { title: "გამოწერის გაუქმება" };
 export const dynamic = "force-dynamic";
@@ -12,6 +17,7 @@ const LABELS: Record<string, string> = {
   marketing: "სიახლეები და სარეკლამო წერილები",
   nudges: "შეხსენებები",
   all: "ყველა მარკეტინგული წერილი",
+  lead: "დღიური ჰოროსკოპის წერილები",
 };
 
 export default async function UnsubscribePage({
@@ -20,12 +26,20 @@ export default async function UnsubscribePage({
   searchParams: Promise<{ token?: string; type?: string }>;
 }) {
   const { token, type: rawType } = await searchParams;
-  const type = rawType && isUnsubscribeType(rawType) ? rawType : "all";
+  // Anonymous horoscope-email leads use their own token space + opt-out path.
+  const isLead = rawType === "lead";
+  const type = isLead
+    ? "lead"
+    : rawType && isUnsubscribeType(rawType)
+      ? rawType
+      : "all";
 
   let status: "missing" | "not_found" | "ok" = "missing";
   let email: string | null = null;
   if (token) {
-    const r = await applyUnsubscribe(token, type);
+    const r = isLead
+      ? await unsubscribeLeadByToken(token)
+      : await applyUnsubscribe(token, type as UnsubscribeType);
     if (r) {
       status = "ok";
       email = r.email;
