@@ -8,6 +8,10 @@ import { sendDailyPushBlast } from "@/lib/push";
 import { sendBirthdayGifts } from "@/lib/birthday";
 import { sendWinbackNudges } from "@/lib/winback";
 import { sendDailyHoroscopeToLeads } from "@/lib/horoscope-leads";
+import {
+  sendVerificationRenudges,
+  sendProfileIncompleteRenudges,
+} from "@/lib/renudge";
 import { pruneRateLimits } from "@/lib/rate-limit";
 
 /**
@@ -105,11 +109,26 @@ async function run(req: NextRequest) {
     console.warn("[cron] lead horoscope send failed:", (err as Error).message);
   }
 
+  // Lifecycle re-nudges — recover abandoned email verifications and prompt
+  // birthdata-less accounts into the personalized daily audience. Low-volume,
+  // capped (max 2 each), idempotent via email_send_log. Best-effort; never
+  // fails the blast.
+  const renudge = {
+    verify: { candidates: 0, sent: 0 },
+    profile: { candidates: 0, sent: 0 },
+  };
+  try {
+    renudge.verify = await sendVerificationRenudges();
+    renudge.profile = await sendProfileIncompleteRenudges();
+  } catch (err) {
+    console.warn("[cron] re-nudge failed:", (err as Error).message);
+  }
+
   // Housekeeping: drop expired rate-limit counters. Best-effort, never
   // blocks or fails the blast (pruneRateLimits swallows its own errors).
   await pruneRateLimits();
 
-  return NextResponse.json({ sendDate, concurrency, ...result, push, birthdays, winback, leads });
+  return NextResponse.json({ sendDate, concurrency, ...result, push, birthdays, winback, leads, renudge });
 }
 
 // Vercel Cron fires GET; manual reruns from admin can use POST.
