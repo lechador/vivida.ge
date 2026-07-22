@@ -22,7 +22,7 @@ export default async function LoginPage({
   const { next } = await searchParams;
   const dest = safeNext(next);
   const session = await auth();
-  if (session?.user?.id) redirect(dest ?? "/feed");
+  if (session?.user?.id) redirect(dest ?? "/dashboard");
 
   return (
     <AuthLayout
@@ -40,7 +40,7 @@ export default async function LoginPage({
         </>
       }
     >
-      <GoogleButton callbackUrl={dest ?? "/feed"} />
+      <GoogleButton callbackUrl={dest ?? "/dashboard"} />
       <AuthDivider />
       {/* useSearchParams in LoginForm requires a Suspense boundary. */}
       <Suspense fallback={null}>

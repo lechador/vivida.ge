@@ -34,7 +34,7 @@ export function SignInButton({
         disabled={isPending}
         onClick={() =>
           startTransition(async () => {
-            await signInWithGoogle("/feed");
+            await signInWithGoogle("/dashboard");
           })
         }
         className="relative bg-[linear-gradient(120deg,var(--vivida-cyan),var(--vivida-pink))] shadow-[0_14px_44px_-10px_oklch(0.78_0.18_200/0.55)]"

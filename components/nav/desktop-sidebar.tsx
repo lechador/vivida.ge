@@ -52,7 +52,7 @@ export function DesktopSidebar({
         "after:pointer-events-none after:absolute after:inset-y-8 after:right-0 after:w-px after:bg-[linear-gradient(180deg,transparent,oklch(0.78_0.18_305/0.45),transparent)]"
       )}
     >
-      <Link href="/feed" className="flex shrink-0 items-center gap-2.5 px-[1.15rem] pb-3 pt-4">
+      <Link href="/dashboard" className="flex shrink-0 items-center gap-2.5 px-[1.15rem] pb-3 pt-4">
         <VividaMark size={36} id="sidebar-mark" className="!size-9 shrink-0" />
         <span className={cn("flex items-center gap-2", reveal)}>
           <span

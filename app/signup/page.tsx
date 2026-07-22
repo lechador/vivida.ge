@@ -22,7 +22,7 @@ export default async function SignupPage({
   const { next } = await searchParams;
   const dest = safeNext(next);
   const session = await auth();
-  if (session?.user?.id) redirect(dest ?? "/feed");
+  if (session?.user?.id) redirect(dest ?? "/dashboard");
 
   const loginHref = dest ? `/login?next=${encodeURIComponent(dest)}` : "/login";
 
@@ -42,7 +42,7 @@ export default async function SignupPage({
         </>
       }
     >
-      <GoogleButton label="რეგისტრაცია Google-ით" callbackUrl={dest ?? "/feed"} />
+      <GoogleButton label="რეგისტრაცია Google-ით" callbackUrl={dest ?? "/dashboard"} />
       <AuthDivider />
       {/* useSearchParams in SignupForm requires a Suspense boundary. */}
       <Suspense fallback={null}>

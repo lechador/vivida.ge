@@ -51,7 +51,7 @@ const TRUST = [
 
 export default async function TavsebadobaPage() {
   const session = await auth();
-  if (session?.user?.id) redirect("/feed");
+  if (session?.user?.id) redirect("/dashboard");
 
   const { signs, pairs } = buildCalculatorData();
 

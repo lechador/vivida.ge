@@ -48,7 +48,7 @@ async function clientIpFromHeaders(): Promise<string> {
  * /onboarding when the profile is missing, so first-time sign-ins
  * still get funnelled through birth-data entry.
  */
-export async function signInWithGoogle(callbackUrl: string = "/feed") {
+export async function signInWithGoogle(callbackUrl: string = "/dashboard") {
   await signIn("google", { redirectTo: callbackUrl });
 }
 

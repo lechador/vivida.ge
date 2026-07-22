@@ -47,7 +47,7 @@ export function SignupForm() {
         if (res.signedIn) {
           // Land on the feed (usable without birth data) rather than forcing
           // onboarding — astrology is opt-in via the astro-profile CTAs.
-          router.push(safeNext ?? "/feed");
+          router.push(safeNext ?? "/dashboard");
         } else {
           // Not auto-signed-in — bounce to login, carrying next along.
           const q = safeNext ? `&next=${encodeURIComponent(safeNext)}` : "";

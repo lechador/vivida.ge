@@ -7,7 +7,7 @@ import { signInWithGoogle } from "@/actions/auth";
 
 /** Compact Google sign-in button for the /login and /signup forms. */
 export function GoogleButton({
-  callbackUrl = "/feed",
+  callbackUrl = "/dashboard",
   label = "შემოდი Google-ით",
 }: {
   callbackUrl?: string;

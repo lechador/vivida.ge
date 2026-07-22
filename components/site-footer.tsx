@@ -43,14 +43,6 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
   return (
     <footer className="relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-md">
-      {/* Test environment notice — kept on top so it can't be missed */}
-      <div className="border-b border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/8">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs text-[var(--vivida-pink)] sm:px-6">
-          <span className="size-1.5 rounded-full bg-[var(--vivida-pink)] vivida-pulse" aria-hidden />
-          ეს არის სატესტო ვერსია — Vivida განვითარების ფაზაშია
-        </div>
-      </div>
-
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 sm:py-14 md:flex-row md:items-start md:justify-between">
         {/* Brand block */}
         <div className="max-w-sm">

@@ -32,7 +32,7 @@ export function MarketingCta() {
   if (authed) {
     return (
       <Button asChild variant="mystic" size="sm">
-        <Link href="/feed">
+        <Link href="/dashboard">
           აპლიკაცია
           <ArrowRight className="size-4" />
         </Link>

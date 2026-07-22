@@ -95,7 +95,7 @@ export async function AppHeader({
       )}
 
       <Link
-        href={userInfo ? "/feed" : "/"}
+        href={userInfo ? "/dashboard" : "/"}
         className={cn(
           "flex shrink-0 items-center gap-2.5",
           // The desktop sidebar has its own logo block; hide the in-header
