@@ -12,6 +12,8 @@ import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
+import { StreakCard } from "@/components/credits/streak-card";
+import { getStreakProgress } from "@/lib/streak-credits";
 import { TESTS } from "@/lib/tests-catalog";
 
 export const metadata = { title: "დღეს" };
@@ -19,7 +21,7 @@ export const metadata = { title: "დღეს" };
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [[profile], plan, [userRow], [mbtiResult], [iqResult], [eqResult], [bigFiveResult]] = await Promise.all([
+  const [[profile], plan, [userRow], [mbtiResult], [iqResult], [eqResult], [bigFiveResult], streak] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     getCurrentPlan(user.id),
     db
@@ -31,6 +33,7 @@ export default async function DashboardPage() {
     db.select({ id: iqResults.id }).from(iqResults).where(eq(iqResults.userId, user.id)).limit(1),
     db.select({ id: eqResults.id }).from(eqResults).where(eq(eqResults.userId, user.id)).limit(1),
     db.select({ id: bigFiveResults.id }).from(bigFiveResults).where(eq(bigFiveResults.userId, user.id)).limit(1),
+    getStreakProgress(user.id),
   ]);
 
   if (!profile?.dateOfBirth) {
@@ -84,6 +87,13 @@ export default async function DashboardPage() {
             {firstName}
           </span>
         </h1>
+
+        {/* Daily-return streak — loss-aversion motivator shown where returning
+            users actually land (previously only on /credits). The single
+            proven mechanic for converting one-and-done visitors into returners. */}
+        <div className="mb-6">
+          <StreakCard progress={streak} />
+        </div>
 
         {/* Soft prompt to enable daily push — hides itself once enabled,
             unsupported, or dismissed. */}
