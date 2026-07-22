@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
 import { accounts, sessions, users, verificationTokens } from "@/db/schema";
@@ -91,6 +91,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // (earnOnce) + best-effort, so it can't double-grant or break the callback.
     async createUser({ user }) {
       if (!user?.id) return;
+      // Adapter-created users are Google OAuth sign-ups (our credentials flow
+      // creates users itself, gated on email verification). Google asserts
+      // email_verified, but NextAuth's default profile mapping doesn't stamp
+      // emailVerified — do it here so these accounts count as verified and any
+      // verification-keyed logic (metrics, future gates) is correct.
+      try {
+        await db
+          .update(users)
+          .set({ emailVerified: new Date() })
+          .where(and(eq(users.id, user.id), isNull(users.emailVerified)));
+      } catch (err) {
+        console.warn(
+          "[auth.createUser] emailVerified stamp failed:",
+          (err as Error).message
+        );
+      }
       try {
         await onUserSignedUp(user.id);
       } catch (err) {
