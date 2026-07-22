@@ -12,7 +12,7 @@ import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
-import { StreakCard } from "@/components/credits/streak-card";
+import { StreakChip } from "@/components/credits/streak-chip";
 import { getStreakProgress } from "@/lib/streak-credits";
 import { TESTS } from "@/lib/tests-catalog";
 
@@ -88,11 +88,10 @@ export default async function DashboardPage() {
           </span>
         </h1>
 
-        {/* Daily-return streak — loss-aversion motivator shown where returning
-            users actually land (previously only on /credits). The single
-            proven mechanic for converting one-and-done visitors into returners. */}
-        <div className="mb-6">
-          <StreakCard progress={streak} />
+        {/* Daily-return streak — a compact loss-aversion nudge where returning
+            users land. The full flame + reward ladder lives on /credits. */}
+        <div className="mb-5">
+          <StreakChip progress={streak} />
         </div>
 
         {/* Soft prompt to enable daily push — hides itself once enabled,
