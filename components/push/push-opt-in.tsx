@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Bell, BellOff, Check, Loader2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const VAPID = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const DISMISS_KEY = "vivida_push_prompt_dismissed";
@@ -35,7 +36,14 @@ const isIOS =
  * Web-push opt-in. `card` = a settings block (Account); `banner` = a compact
  * dismissible dashboard prompt shown only when notifications aren't enabled.
  */
-export function PushOptIn({ variant = "card" }: { variant?: "card" | "banner" }) {
+export function PushOptIn({
+  variant = "card",
+  locale = "ka",
+}: {
+  variant?: "card" | "banner";
+  locale?: UserLocale;
+}) {
+  const en = locale === "en";
   const [state, setState] = useState<State>("loading");
   const [error, setError] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
@@ -105,7 +113,7 @@ export function PushOptIn({ variant = "card" }: { variant?: "card" | "banner" })
       if (!res.ok) throw new Error("save failed");
       setState("on");
     } catch {
-      setError("ვერ ჩაირთო. სცადე ხელახლა.");
+      setError(en ? "Could not enable notifications. Please try again." : "ვერ ჩაირთო. სცადე ხელახლა.");
       setState("off");
     }
   }
@@ -145,14 +153,14 @@ export function PushOptIn({ variant = "card" }: { variant?: "card" | "banner" })
       <div className="mb-6 flex items-center gap-3 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 to-[var(--vivida-cyan)]/8 p-4 ring-1 ring-foreground/5 backdrop-blur-xl">
         <Bell className="size-5 shrink-0 text-[var(--vivida-violet)]" />
         <p className="min-w-0 flex-1 text-sm text-foreground/90">
-          ჩართე შეტყობინებები — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს.
+          {en ? "Enable notifications to receive your daily horoscope each morning." : "ჩართე შეტყობინებები — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."}
         </p>
         <Button type="button" variant="mystic" size="sm" onClick={enable}>
-          ჩართვა
+          {en ? "Enable" : "ჩართვა"}
         </Button>
         <button
           type="button"
-          aria-label="დახურვა"
+          aria-label={en ? "Close" : "დახურვა"}
           onClick={dismiss}
           className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/60 hover:text-foreground"
         >
@@ -170,29 +178,28 @@ export function PushOptIn({ variant = "card" }: { variant?: "card" | "banner" })
           {state === "on" ? <Bell className="size-5" /> : <BellOff className="size-5" />}
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-semibold tracking-tight">შეტყობინებები</h2>
+          <h2 className="text-lg font-semibold tracking-tight">{en ? "Notifications" : "შეტყობინებები"}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {state === "on"
-              ? "ჩართულია — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."
-              : "ჩართე და ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს პირდაპირ ტელეფონზე."}
+              ? en ? "Enabled — your daily horoscope arrives each morning." : "ჩართულია — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."
+              : en ? "Enable notifications to receive your daily horoscope on your phone each morning." : "ჩართე და ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს პირდაპირ ტელეფონზე."}
           </p>
 
           {state === "unsupported" && (
             <p className="mt-3 text-sm text-muted-foreground">
               {isIOS
-                ? "iPhone-ზე ჯერ დაამატე Vivida მთავარ ეკრანზე (Share → „Add to Home Screen“), გახსენი იქიდან და შემდეგ ჩართე შეტყობინებები."
-                : "ამ ბრაუზერში შეტყობინებები არ არის ხელმისაწვდომი. სცადე Chrome-ით."}
+                ? en ? "On iPhone, add Vivida to your Home Screen first, open it there, then enable notifications." : "iPhone-ზე ჯერ დაამატე Vivida მთავარ ეკრანზე (Share → „Add to Home Screen“), გახსენი იქიდან და შემდეგ ჩართე შეტყობინებები."
+                : en ? "Notifications are unavailable in this browser. Try Chrome." : "ამ ბრაუზერში შეტყობინებები არ არის ხელმისაწვდომი. სცადე Chrome-ით."}
             </p>
           )}
           {state === "unconfigured" && (
             <p className="mt-3 text-sm text-muted-foreground">
-              შეტყობინებები დროებით მიუწვდომელია. სცადე მოგვიანებით.
+              {en ? "Notifications are temporarily unavailable. Try again later." : "შეტყობინებები დროებით მიუწვდომელია. სცადე მოგვიანებით."}
             </p>
           )}
           {state === "denied" && (
             <p className="mt-3 text-sm text-[var(--vivida-pink)]">
-              შეტყობინებები დაბლოკილია ბრაუზერში — ჩართე ბრაუზერის
-              პარამეტრებიდან.
+              {en ? "Notifications are blocked in your browser. Enable them in browser settings." : "შეტყობინებები დაბლოკილია ბრაუზერში — ჩართე ბრაუზერის პარამეტრებიდან."}
             </p>
           )}
 
@@ -201,17 +208,17 @@ export function PushOptIn({ variant = "card" }: { variant?: "card" | "banner" })
               {state === "on" ? (
                 <>
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--vivida-violet)]/15 px-3 py-1.5 text-sm font-medium text-[var(--vivida-violet)]">
-                    <Check className="size-4" /> ჩართულია
+                    <Check className="size-4" /> {en ? "Enabled" : "ჩართულია"}
                   </span>
                   <Button type="button" variant="outline" size="sm" onClick={disable}>
-                    გამორთვა
+                    {en ? "Disable" : "გამორთვა"}
                   </Button>
                   <button
                     type="button"
                     onClick={() => fetch("/api/push/test", { method: "POST" })}
                     className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                   >
-                    სატესტო შეტყობინება
+                    {en ? "Send test notification" : "სატესტო შეტყობინება"}
                   </button>
                 </>
               ) : (
@@ -226,7 +233,7 @@ export function PushOptIn({ variant = "card" }: { variant?: "card" | "banner" })
                   ) : (
                     <Bell className="size-4" />
                   )}
-                  ჩართე შეტყობინებები
+                  {en ? "Enable notifications" : "ჩართე შეტყობინებები"}
                 </Button>
               )}
             </div>

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOutAction } from "@/actions/auth";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function UserMenu({
   name,
@@ -21,21 +22,24 @@ export function UserMenu({
   image,
   username,
   balance,
+  locale = "ka",
 }: {
   name: string | null;
   email: string | null;
   image: string | null;
   username: string | null;
   balance?: number;
+  locale?: UserLocale;
 }) {
   const [isPending, startTransition] = useTransition();
+  const en = locale === "en";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="მენიუ"
+          aria-label={en ? "User menu" : "მენიუ"}
           className="relative grid size-12 shrink-0 place-items-center rounded-full border border-border bg-card/50 text-foreground/80 transition-all hover:border-foreground/30 hover:bg-card/80"
         >
           <Image
@@ -57,7 +61,7 @@ export function UserMenu({
             className="size-10 shrink-0 rounded-full border border-border/60 object-cover"
           />
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-semibold">{name ?? "შენ"}</div>
+            <div className="truncate text-sm font-semibold">{name ?? (en ? "You" : "შენ")}</div>
             {email && (
               <div className="truncate text-xs text-muted-foreground">
                 {email}
@@ -72,14 +76,14 @@ export function UserMenu({
           <DropdownMenuItem asChild>
             <Link href={`/u/${username}`} className="cursor-pointer">
               <User className="size-4" />
-              საჯარო პროფილი
+              {en ? "Public profile" : "საჯარო პროფილი"}
             </Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild>
           <Link href="/credits" className="cursor-pointer">
             <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-            კრედიტები
+            {en ? "Credits" : "კრედიტები"}
             {typeof balance === "number" && (
               <span className="ml-auto rounded-full bg-[var(--vivida-cyan)]/15 px-2 py-0.5 text-xs font-semibold tabular-nums text-[var(--vivida-cyan)]">
                 {balance}
@@ -90,7 +94,7 @@ export function UserMenu({
         <DropdownMenuItem asChild>
           <Link href="/account" className="cursor-pointer">
             <Settings className="size-4" />
-            ანგარიში
+            {en ? "Account" : "ანგარიში"}
           </Link>
         </DropdownMenuItem>
 
@@ -105,7 +109,7 @@ export function UserMenu({
           className="cursor-pointer text-destructive focus:text-destructive"
         >
           <LogOut className="size-4" />
-          {isPending ? "გასვლა…" : "გასვლა"}
+          {isPending ? (en ? "Signing out…" : "გასვლა…") : (en ? "Sign out" : "გასვლა")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -2,7 +2,10 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { profilePhotos, users } from "@/db/schema";
-import { DELETE_ACCOUNT_CONFIRM_PHRASE } from "@/lib/account-constants";
+import {
+  DELETE_ACCOUNT_CONFIRM_PHRASE,
+  DELETE_ACCOUNT_CONFIRM_PHRASE_EN,
+} from "@/lib/account-constants";
 import { deleteObject } from "@/lib/r2";
 
 /**
@@ -70,7 +73,10 @@ export async function deleteAccountCore(
   userId: string,
   confirmation: string
 ): Promise<DeleteAccountResult> {
-  if (confirmation !== DELETE_ACCOUNT_CONFIRM_PHRASE) {
+  if (
+    confirmation !== DELETE_ACCOUNT_CONFIRM_PHRASE &&
+    confirmation !== DELETE_ACCOUNT_CONFIRM_PHRASE_EN
+  ) {
     return {
       ok: false,
       error: `დასადასტურებლად შეიყვანე "${DELETE_ACCOUNT_CONFIRM_PHRASE}".`,

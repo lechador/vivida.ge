@@ -13,6 +13,7 @@ import {
 import { blockUser } from "@/actions/moderation";
 import type { ReportTargetType } from "@/db/schema";
 import { ReportDialog } from "./report-dialog";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Report + block menu for another user — used on their profile and in the
@@ -25,13 +26,16 @@ export function SafetyMenu({
   targetType = "user",
   targetId,
   align = "end",
+  locale = "ka",
 }: {
   targetUserId: string;
   targetType?: ReportTargetType;
   /** Defaults to targetUserId (for "user"/"message_thread" reports). */
   targetId?: string;
   align?: "end" | "start";
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const router = useRouter();
   const [reportOpen, setReportOpen] = useState(false);
   const [confirmBlock, setConfirmBlock] = useState(false);
@@ -54,7 +58,7 @@ export function SafetyMenu({
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            aria-label="უსაფრთხოება"
+            aria-label={en ? "Safety" : "უსაფრთხოება"}
             className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
           >
             <ShieldAlert className="size-4" />
@@ -69,7 +73,7 @@ export function SafetyMenu({
             className="cursor-pointer"
           >
             <Flag className="size-4" />
-            დაარეპორტე
+            {en ? "Report" : "დაარეპორტე"}
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={(e) => {
@@ -82,7 +86,7 @@ export function SafetyMenu({
             className="cursor-pointer text-destructive focus:text-destructive"
           >
             <Ban className="size-4" />
-            {confirmBlock ? "დაადასტურე — დაბლოკე" : "დაბლოკე"}
+            {confirmBlock ? (en ? "Confirm block" : "დაადასტურე — დაბლოკე") : (en ? "Block" : "დაბლოკე")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

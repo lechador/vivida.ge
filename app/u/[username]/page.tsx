@@ -44,6 +44,7 @@ import { PhotoCarousel } from "@/components/profile/photo-carousel";
 import { AiAvatarButton } from "@/components/profile/ai-avatar-button";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { FeedList } from "@/components/feed/feed-list";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 
 const ELEMENT_GLYPH: Record<string, string> = {
   ცეცხლი: "△",
@@ -57,6 +58,13 @@ const ELEMENT_COLOR: Record<string, string> = {
   მიწა: "oklch(0.65 0.13 130)",
   ჰაერი: "oklch(0.75 0.16 220)",
   წყალი: "oklch(0.6 0.2 280)",
+};
+
+const ELEMENT_EN: Record<string, string> = {
+  ცეცხლი: "Fire",
+  მიწა: "Earth",
+  ჰაერი: "Air",
+  წყალი: "Water",
 };
 
 export async function generateMetadata({
@@ -141,6 +149,8 @@ export default async function PublicProfilePage({
   const session = await auth();
   const viewerId = session?.user?.id ?? null;
   const viewerPlan = viewerId ? await getCurrentPlan(viewerId) : "free";
+  const locale = viewerId ? await getUserLocale(viewerId) : "ka";
+  const en = locale === "en";
   const isOwner = viewerId === owner.id;
   const viewerIsAdmin = viewerId ? isAdminEmail(session?.user?.email) : false;
 
@@ -165,7 +175,7 @@ export default async function PublicProfilePage({
     if (viewerChart) {
       synastry = computeSynastry(viewerChart.data, ownerChart.data);
       synastryTexts = await getSynastryInterpretationsFor(synastry);
-      viewerName = session?.user?.name?.split(" ")[0] ?? "შენ";
+      viewerName = session?.user?.name?.split(" ")[0] ?? (en ? "You" : "შენ");
       const viewerSunIdx = viewerChart.data?.bodies?.sun?.signIndex;
       if (typeof viewerSunIdx === "number") {
         viewerSunSign = signByIndex(viewerSunIdx);
@@ -218,7 +228,7 @@ export default async function PublicProfilePage({
   const age = ageFromDob(profile.dateOfBirth);
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
@@ -260,7 +270,7 @@ export default async function PublicProfilePage({
 
               {/* Owner-only: regenerate a brand-styled AI avatar in place */}
               {isOwner && canUseFeature("aiAvatar", viewerPlan) && (
-                <AiAvatarButton />
+                <AiAvatarButton locale={locale} />
               )}
             </div>
 
@@ -276,26 +286,27 @@ export default async function PublicProfilePage({
                     <Button asChild variant="outline" size="sm">
                       <Link href="/account">
                         <Pencil className="size-4" />
-                        რედაქტირება
+                        {en ? "Edit" : "რედაქტირება"}
                       </Link>
                     </Button>
                   ) : viewerId ? (
                     <>
                       {friendshipStatus === "friends" && (
-                        <MessageButton partnerId={owner.id} />
+                        <MessageButton partnerId={owner.id} locale={locale} />
                       )}
                       <FriendButton
                         targetUserId={owner.id}
                         targetUsername={profile.username}
                         initialStatus={friendshipStatus}
+                        locale={locale}
                       />
-                      <SafetyMenu targetUserId={owner.id} />
+                      <SafetyMenu targetUserId={owner.id} locale={locale} />
                     </>
                   ) : (
                     <Button asChild variant="mystic" size="sm">
                       <Link href="/signup">
                         <Sparkles className="size-4" />
-                        შემოდი
+                        {en ? "Join" : "შემოდი"}
                       </Link>
                     </Button>
                   )}
@@ -322,6 +333,7 @@ export default async function PublicProfilePage({
               <ProfileStats
                 friends={ownerFriendsCount}
                 posts={ownerPostsCount}
+                locale={locale}
               />
 
               {mutualCount > 0 && (
@@ -329,6 +341,7 @@ export default async function PublicProfilePage({
                   <MutualFriendsPill
                     count={mutualCount}
                     preview={mutualPreview}
+                    locale={locale}
                   />
                 </div>
               )}
@@ -336,32 +349,32 @@ export default async function PublicProfilePage({
               <div className="mt-5 flex flex-wrap items-center gap-2">
                 {sun && (
                   <Pill
-                    label="მზე"
-                    value={sun.labelKa}
+                    label={en ? "Sun" : "მზე"}
+                    value={en ? sun.labelEn : sun.labelKa}
                     glyph={sun.symbol}
                     accent="oklch(0.85 0.16 85)"
                   />
                 )}
                 {moon && (
                   <Pill
-                    label="მთვარე"
-                    value={moon.labelKa}
+                    label={en ? "Moon" : "მთვარე"}
+                    value={en ? moon.labelEn : moon.labelKa}
                     glyph={moon.symbol}
                     accent="oklch(0.78 0.18 200)"
                   />
                 )}
                 {asc && (
                   <Pill
-                    label="ამომავალი"
-                    value={asc.labelKa}
+                    label={en ? "Rising" : "ამომავალი"}
+                    value={en ? asc.labelEn : asc.labelKa}
                     glyph={asc.symbol}
                     accent="oklch(0.78 0.18 305)"
                   />
                 )}
                 {balance && (
                   <Pill
-                    label="დომინანტი"
-                    value={balance.dominant}
+                    label={en ? "Dominant" : "დომინანტი"}
+                    value={en ? ELEMENT_EN[balance.dominant] ?? balance.dominant : balance.dominant}
                     glyph={ELEMENT_GLYPH[balance.dominant]}
                     accent={ELEMENT_COLOR[balance.dominant]}
                   />
@@ -385,7 +398,7 @@ export default async function PublicProfilePage({
           <section className="mt-10">
             <header className="mb-5">
               <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-                თქვენი თავსებადობა
+                {en ? "Your compatibility" : "თქვენი თავსებადობა"}
               </div>
               <h2 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
                 {viewerName} <span className="text-muted-foreground">×</span>{" "}
@@ -420,10 +433,10 @@ export default async function PublicProfilePage({
             <header className="mb-5 flex items-baseline justify-between gap-3">
               <div>
                 <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-                  ბოლო პოსტები
+                  {en ? "Recent posts" : "ბოლო პოსტები"}
                 </div>
                 <h2 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-                  {displayName}-ის ფიდი
+                  {en ? `${displayName}'s feed` : `${displayName}-ის ფიდი`}
                 </h2>
               </div>
               {ownerPostsCount > recentPosts.length && (
@@ -431,7 +444,7 @@ export default async function PublicProfilePage({
                   href="/feed"
                   className="text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  ფიდზე ნახე ყველა →
+                  {en ? "View all in feed →" : "ფიდზე ნახე ყველა →"}
                 </Link>
               )}
             </header>
@@ -450,14 +463,15 @@ export default async function PublicProfilePage({
           <section className="mt-10 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 to-[var(--vivida-cyan)]/12 p-6 text-center backdrop-blur-xl ring-1 ring-foreground/5">
             <Sparkles className="mx-auto mb-3 size-6 text-[var(--vivida-violet)]" />
             <h2 className="text-xl font-semibold tracking-tight">
-              ნახე თქვენი თავსებადობა
+              {en ? "See your compatibility" : "ნახე თქვენი თავსებადობა"}
             </h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-              დარეგისტრირდი — სანამ {displayName}-ის ცის რუკა შენთან ხვდება,
-              ჩვენ შენთვისაც ვითვლით თავსებადობას ხუთ სფეროში.
+              {en
+                ? `Create an account and compare your natal chart with ${displayName} across five areas.`
+                : `დარეგისტრირდი — სანამ ${displayName}-ის ცის რუკა შენთან ხვდება, ჩვენ შენთვისაც ვითვლით თავსებადობას ხუთ სფეროში.`}
             </p>
             <Button asChild variant="mystic" size="lg" className="mt-5">
-              <Link href="/signup">დაიწყე უფასოდ</Link>
+              <Link href="/signup">{en ? "Start free" : "დაიწყე უფასოდ"}</Link>
             </Button>
           </section>
         )}
@@ -466,13 +480,13 @@ export default async function PublicProfilePage({
         {viewerId && !synastry && !isOwner && (
           <section className="mt-10 rounded-2xl border border-border bg-card/65 p-6 text-center backdrop-blur-xl ring-1 ring-foreground/5">
             <h2 className="text-xl font-semibold tracking-tight">
-              თქვენი თავსებადობის სანახავად
+              {en ? "To see your compatibility" : "თქვენი თავსებადობის სანახავად"}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              ჯერ შეავსე დაბადების მონაცემები.
+              {en ? "Add your birth details first." : "ჯერ შეავსე დაბადების მონაცემები."}
             </p>
             <Button asChild variant="mystic" className="mt-4">
-              <Link href="/onboarding">შეავსე ახლავე</Link>
+              <Link href="/onboarding">{en ? "Add details now" : "შეავსე ახლავე"}</Link>
             </Button>
           </section>
         )}
@@ -515,23 +529,25 @@ function Pill({
 function ProfileStats({
   friends,
   posts,
+  locale,
 }: {
   friends: number;
   posts: number;
+  locale: "ka" | "en";
 }) {
   return (
     <dl className="mt-5 inline-flex items-stretch divide-x divide-border/60 rounded-2xl border border-border/60 bg-card/35 px-1 backdrop-blur-xl">
-      <Stat label="მეგობრები" value={friends} />
-      <Stat label="პოსტი" value={posts} />
+      <Stat label={locale === "en" ? "Friends" : "მეგობრები"} value={friends} locale={locale} />
+      <Stat label={locale === "en" ? "Posts" : "პოსტი"} value={posts} locale={locale} />
     </dl>
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({ label, value, locale }: { label: string; value: number; locale: "ka" | "en" }) {
   return (
     <div className="flex min-w-[68px] flex-col items-center gap-0.5 px-3 py-2 sm:min-w-[88px] sm:px-4">
       <dd className="text-base font-semibold tabular-nums leading-none text-foreground sm:text-lg">
-        {Intl.NumberFormat("ka-GE").format(value)}
+        {Intl.NumberFormat(locale === "en" ? "en" : "ka-GE").format(value)}
       </dd>
       <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">
         {label}
@@ -548,6 +564,7 @@ function Stat({ label, value }: { label: string; value: number }) {
 function MutualFriendsPill({
   count,
   preview,
+  locale,
 }: {
   count: number;
   preview: Array<{
@@ -556,6 +573,7 @@ function MutualFriendsPill({
     image: string | null;
     username: string | null;
   }>;
+  locale: "ka" | "en";
 }) {
   return (
     <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/60 px-2.5 py-1 text-xs text-muted-foreground">
@@ -575,7 +593,8 @@ function MutualFriendsPill({
         <Users className="size-3.5" />
       )}
       <span className="text-foreground/90">
-        <span className="font-medium">{count}</span> საერთო მეგობარი
+        <span className="font-medium">{count}</span>{" "}
+        {locale === "en" ? (count === 1 ? "mutual friend" : "mutual friends") : "საერთო მეგობარი"}
       </span>
     </div>
   );

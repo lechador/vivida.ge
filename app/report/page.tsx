@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Pencil } from "lucide-react";
 
 import { db } from "@/db";
-import { profiles } from "@/db/schema";
+import { profiles, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { getCurrentPlan } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
@@ -14,33 +14,37 @@ import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartSection } from "@/components/dashboard/chart-section";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import { ReportPdfPanel } from "@/components/report/report-pdf-panel";
+import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 
 export const metadata = { title: "ჩემი რუკა" };
 
 export default async function ReportPage() {
   const user = await requireUser();
 
-  const [[profile], plan] = await Promise.all([
+  const [[profile], plan, [userPrefs]] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     getCurrentPlan(user.id),
+    db.select({ locale: users.interfaceLanguage }).from(users).where(eq(users.id, user.id)).limit(1),
   ]);
+  const locale = normalizeUserLocale(userPrefs?.locale);
+  const en = locale === "en";
 
   if (!profile?.dateOfBirth) {
     return (
       <AstroLockedMain
         plan={plan}
         active="report"
-        title="ნატალური რუკა დაბადების მონაცემებს საჭიროებს"
-        description="შეავსე დაბადების თარიღი, დრო და ადგილი, რომ შედგეს შენი პერსონალური კოსმიური რუკა."
+        title={en ? "A natal chart needs your birth details" : "ნატალური რუკა დაბადების მონაცემებს საჭიროებს"}
+        description={en ? "Add your birth date, time and place to calculate your personal cosmic map." : "შეავსე დაბადების თარიღი, დრო და ადგილი, რომ შედგეს შენი პერსონალური კოსმიური რუკა."}
         next="/report"
       />
     );
   }
 
-  const firstName = user.name?.split(" ")[0] ?? "ვარსკვლავო";
+  const firstName = user.name?.split(" ")[0] ?? null;
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
       {/* Layered nebula glows — three radial gradients at different points,
           one slowly drifting for life. Together they lift the page out of
           a flat dark, evoking deep cosmos rather than a black screen. */}
@@ -58,13 +62,17 @@ export default async function ReportPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-          {firstName}-ის{" "}
+          {en
+            ? firstName
+              ? `${firstName}'s `
+              : "Your "
+            : `${firstName ?? "ვარსკვლავო"}-ის `}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            კოსმიური რუკა
+            {en ? "cosmic chart" : "კოსმიური რუკა"}
           </span>
         </h1>
         <p className="mb-6 max-w-xl text-sm text-foreground/75 sm:text-base">
-          ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე.
+          {en ? "The sky at your birth moment, explored one layer at a time." : "ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე."}
         </p>
 
         <div className="mb-10">
@@ -85,38 +93,38 @@ export default async function ReportPage() {
 
         <div className="mt-12 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">შენი დაბადების მონაცემები</h2>
+            <h2 className="text-lg font-semibold">{en ? "Your birth details" : "შენი დაბადების მონაცემები"}</h2>
             <Button asChild variant="ghost" size="sm">
               <Link href="/onboarding">
                 <Pencil className="size-3.5" />
-                რედაქტირება
+                {en ? "Edit" : "რედაქტირება"}
               </Link>
             </Button>
           </div>
           <dl className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
-            <Field label="დაბადების თარიღი" value={profile.dateOfBirth} />
+            <Field label={en ? "Date of birth" : "დაბადების თარიღი"} value={profile.dateOfBirth} />
             <Field
-              label="დაბადების დრო"
+              label={en ? "Time of birth" : "დაბადების დრო"}
               value={
                 profile.timeOfBirth
                   ? profile.timeOfBirth.slice(0, 5)
-                  : "უცნობია (გამოყენებულია 12:00)"
+                  : en ? "Unknown (12:00 used)" : "უცნობია (გამოყენებულია 12:00)"
               }
             />
-            <Field label="დაბადების ადგილი" value={profile.cityName} />
-            <Field label="დროის სარტყელი" value={profile.timezone} />
+            <Field label={en ? "Place of birth" : "დაბადების ადგილი"} value={profile.cityName} />
+            <Field label={en ? "Time zone" : "დროის სარტყელი"} value={profile.timezone} />
           </dl>
           {(profile.latitude != null || profile.longitude != null) && (
             <details className="group mt-4 text-xs text-muted-foreground">
               <summary className="cursor-pointer select-none transition-colors hover:text-foreground">
-                ტექნიკური დეტალები
+                {en ? "Technical details" : "ტექნიკური დეტალები"}
               </summary>
               <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 tabular-nums">
                 {profile.latitude != null && (
-                  <span>განედი: {profile.latitude.toFixed(4)}</span>
+                  <span>{en ? "Latitude" : "განედი"}: {profile.latitude.toFixed(4)}</span>
                 )}
                 {profile.longitude != null && (
-                  <span>გრძედი: {profile.longitude.toFixed(4)}</span>
+                  <span>{en ? "Longitude" : "გრძედი"}: {profile.longitude.toFixed(4)}</span>
                 )}
               </div>
             </details>

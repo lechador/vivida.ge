@@ -11,6 +11,7 @@ import { VividaMark } from "@/components/brand/vivida-mark";
 import { ProBadge } from "@/components/brand/pro-badge";
 import type { PlanId } from "@/lib/pricing";
 import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Mobile-only slide-in nav drawer. The desktop NavLinks is `hidden lg:flex`,
@@ -19,9 +20,11 @@ import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
 export function MobileNav({
   active,
   plan,
+  locale = "ka",
 }: {
   active?: NavActiveKey;
   plan: PlanId;
+  locale?: UserLocale;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -30,7 +33,7 @@ export function MobileNav({
       <DialogPrimitive.Trigger asChild>
         <button
           type="button"
-          aria-label="მენიუ"
+          aria-label={locale === "en" ? "Menu" : "მენიუ"}
           className="grid size-11 shrink-0 place-items-center rounded-full text-foreground/85 transition-colors hover:bg-card/60 hover:text-foreground lg:hidden"
         >
           <Menu className="size-5" />
@@ -82,7 +85,7 @@ export function MobileNav({
                     {plan === "pro" && <ProBadge />}
                   </Link>
                   <DialogPrimitive.Close
-                    aria-label="დახურვა"
+                    aria-label={locale === "en" ? "Close" : "დახურვა"}
                     className="grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/60 hover:text-foreground"
                   >
                     <X className="size-5" />
@@ -91,7 +94,7 @@ export function MobileNav({
 
                 {/* For accessibility — Radix requires DialogTitle inside content. */}
                 <DialogPrimitive.Title className="sr-only">
-                  ნავიგაცია
+                  {locale === "en" ? "Navigation" : "ნავიგაცია"}
                 </DialogPrimitive.Title>
 
                 {/* Nav items */}
@@ -146,10 +149,10 @@ export function MobileNav({
                               : undefined
                           }
                         />
-                        <span className="relative z-10">{navLabel(item, plan)}</span>
+                        <span className="relative z-10">{navLabel(item, plan, locale)}</span>
                         {item.badgeKa && (
                           <span className="relative z-10 ml-auto rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]">
-                            {item.badgeKa}
+                            {locale === "en" ? item.badgeEn : item.badgeKa}
                           </span>
                         )}
                       </Link>

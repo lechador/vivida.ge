@@ -20,6 +20,8 @@ import { AiAvatarGenerator } from "@/components/account/ai-avatar-generator";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { EmailPreferencesCard } from "@/components/account/email-preferences-card";
 import { HoroscopeVoiceCard } from "@/components/account/horoscope-voice-card";
+import { LanguageCard } from "@/components/account/language-card";
+import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 
 export const metadata = { title: "ანგარიში" };
 export const dynamic = "force-dynamic";
@@ -49,6 +51,7 @@ export default async function AccountPage() {
         marketing: users.emailMarketing,
         nudges: users.emailNudges,
         voice: users.horoscopeVoice,
+        locale: users.interfaceLanguage,
       })
       .from(users)
       .where(eq(users.id, user.id))
@@ -57,9 +60,11 @@ export default async function AccountPage() {
   ]);
   // Same avatar resolution as the navbar so they never disagree.
   const accountAvatar = headerData.avatarUrl ?? user.image ?? null;
+  const locale = normalizeUserLocale(emailPrefs?.locale);
+  const en = locale === "en";
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(50%_40%_at_50%_0%,oklch(0.28_0.12_300/0.4),transparent_70%)]"
@@ -70,10 +75,14 @@ export default async function AccountPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          ანგარიში
+          {en ? "Account" : "ანგარიში"}
         </div>
         <h1 className="mb-8 text-balance text-3xl font-semibold tracking-tight sm:mb-10 sm:text-5xl">
-          {user.name?.split(" ")[0] ?? "შენი"}-ის ანგარიში
+          {en
+            ? user.name
+              ? `${user.name.split(" ")[0]}'s account`
+              : "Your account"
+            : `${user.name?.split(" ")[0] ?? "შენი"}-ის ანგარიში`}
         </h1>
 
         {/* Profile */}
@@ -100,6 +109,10 @@ export default async function AccountPage() {
           </span>
         </div>
 
+        <div className="mb-6">
+          <LanguageCard initial={locale} />
+        </div>
+
         {/* Profile photos — surfaced near the top so it's easy to find */}
         <div className="mb-6">
           <PhotoUploader
@@ -108,12 +121,13 @@ export default async function AccountPage() {
               url: p.url,
               ready: p.ready,
             }))}
+            locale={locale}
           />
         </div>
 
         {/* AI zodiac avatar */}
         <div className="mb-6">
-          <AiAvatarGenerator initialAvatar={accountAvatar} />
+          <AiAvatarGenerator initialAvatar={accountAvatar} locale={locale} />
         </div>
 
         {/* Credits */}
@@ -124,10 +138,12 @@ export default async function AccountPage() {
           >
             <div className="min-w-0">
               <h2 className="text-lg font-semibold tracking-tight">
-                კრედიტები
+                {en ? "Credits" : "კრედიტები"}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                ნახე ბალანსი, ვიზიტების სერია, შეავსე ან მოიწვიე მეგობარი.
+                {en
+                  ? "View your balance and visit streak, top up, or invite a friend."
+                  : "ნახე ბალანსი, ვიზიტების სერია, შეავსე ან მოიწვიე მეგობარი."}
               </p>
             </div>
             <span aria-hidden className="text-2xl text-muted-foreground transition-transform group-hover:translate-x-1">
@@ -138,12 +154,13 @@ export default async function AccountPage() {
 
         {/* Push notifications */}
         <div className="mb-6">
-          <PushOptIn />
+          <PushOptIn locale={locale} />
         </div>
 
         {/* Email preferences */}
         <div className="mb-6">
           <EmailPreferencesCard
+            locale={locale}
             initial={
               emailPrefs ?? { daily: true, marketing: true, nudges: true }
             }
@@ -152,12 +169,13 @@ export default async function AccountPage() {
 
         {/* Audio horoscope voice */}
         <div className="mb-6">
-          <HoroscopeVoiceCard initial={emailPrefs?.voice ?? null} />
+          <HoroscopeVoiceCard initial={emailPrefs?.voice ?? null} locale={locale} />
         </div>
 
         {/* Public profile fields */}
         <div className="mb-6">
           <VisibilityCard
+            locale={locale}
             initial={{
               username: profile?.username ?? null,
               displayName: profile?.displayName ?? null,
@@ -171,29 +189,29 @@ export default async function AccountPage() {
         {/* Birth data */}
         <div className="mb-6 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">დაბადების მონაცემები</h2>
+            <h2 className="text-lg font-semibold">{en ? "Birth details" : "დაბადების მონაცემები"}</h2>
             {profile?.dateOfBirth && (
               <Button asChild variant="ghost" size="sm">
                 <Link href="/onboarding">
                   <Pencil className="size-3.5" />
-                  რედაქტირება
+                  {en ? "Edit" : "რედაქტირება"}
                 </Link>
               </Button>
             )}
           </div>
           {profile?.dateOfBirth ? (
             <dl className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
-              <Field label="დაბადების თარიღი" value={profile.dateOfBirth} />
+              <Field label={en ? "Date of birth" : "დაბადების თარიღი"} value={profile.dateOfBirth} />
               <Field
-                label="დაბადების დრო"
+                label={en ? "Time of birth" : "დაბადების დრო"}
                 value={
                   profile.timeOfBirth
                     ? profile.timeOfBirth.slice(0, 5)
-                    : "უცნობია (გამოყენებულია 12:00)"
+                    : en ? "Unknown (12:00 used)" : "უცნობია (გამოყენებულია 12:00)"
                 }
               />
-              <Field label="დაბადების ადგილი" value={profile.cityName} />
-              <Field label="დროის სარტყელი" value={profile.timezone} />
+              <Field label={en ? "Place of birth" : "დაბადების ადგილი"} value={profile.cityName} />
+              <Field label={en ? "Time zone" : "დროის სარტყელი"} value={profile.timezone} />
               <div className="sm:col-span-2">
                 <GenderCard
                   initial={
@@ -201,26 +219,28 @@ export default async function AccountPage() {
                       ? profile.gender
                       : null
                   }
+                  locale={locale}
                 />
               </div>
             </dl>
           ) : (
             <div>
               <p className="text-sm text-muted-foreground">
-                ასტრო პროფილი ჯერ არ შეგიქმნია. შეავსე დაბადების მონაცემები და
-                გახსენი რუკა, ჰოროსკოპი და თავსებადობა.
+                {en
+                  ? "You have not created an astrology profile yet. Add your birth details to unlock your chart, horoscope and compatibility."
+                  : "ასტრო პროფილი ჯერ არ შეგიქმნია. შეავსე დაბადების მონაცემები და გახსენი რუკა, ჰოროსკოპი და თავსებადობა."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
                 <Link href="/onboarding">
                   <Sparkles className="size-4" />
-                  ასტრო პროფილის შექმნა
+                  {en ? "Create astrology profile" : "ასტრო პროფილის შექმნა"}
                 </Link>
               </Button>
             </div>
           )}
         </div>
 
-        <DangerZone />
+        <DangerZone locale={locale} />
       </section>
     </main>
   );

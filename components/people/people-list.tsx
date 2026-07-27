@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { PersonRowCard } from "./person-row";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Client wrapper for the /people directory. Owns the search input
@@ -19,10 +20,13 @@ import { PersonRowCard } from "./person-row";
 export function PeopleList({
   initial,
   initialCursor,
+  locale = "ka",
 }: {
   initial: PersonRow[];
   initialCursor: string | null;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [people, setPeople] = useState<PersonRow[]>(initial);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [query, setQuery] = useState("");
@@ -63,14 +67,14 @@ export function PeopleList({
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="მოძებნე სახელით ან @username-ით"
+          placeholder={en ? "Search by name or @username" : "მოძებნე სახელით ან @username-ით"}
           className="block w-full rounded-full border border-foreground/12 bg-[oklch(0.21_0.04_285/0.85)] py-2.5 pl-10 pr-9 text-sm text-foreground placeholder:text-muted-foreground/70 backdrop-blur-xl focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--vivida-violet)]/30"
         />
         {query && (
           <button
             type="button"
             onClick={() => setQuery("")}
-            aria-label="გასუფთავება"
+            aria-label={en ? "Clear" : "გასუფთავება"}
             className="absolute right-2 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:bg-card/80 hover:text-foreground"
           >
             <X className="size-3.5" />
@@ -82,14 +86,14 @@ export function PeopleList({
         <div className="rounded-2xl border border-dashed border-border/80 bg-card/30 p-10 text-center">
           <p className="text-sm text-muted-foreground">
             {query.trim().length >= 2
-              ? "ვერავინ ვერ მოიძებნა — სცადე სხვა სიტყვით."
-              : "ჯერ არავინ შემოსულა."}
+              ? en ? "No one found. Try another search." : "ვერავინ ვერ მოიძებნა — სცადე სხვა სიტყვით."
+              : en ? "No profiles yet." : "ჯერ არავინ შემოსულა."}
           </p>
         </div>
       ) : (
         <ul className={cn("space-y-2", isPending && "opacity-70")}>
           {people.map((p) => (
-            <PersonRowCard key={p.id} person={p} />
+            <PersonRowCard key={p.id} person={p} locale={locale} />
           ))}
         </ul>
       )}
@@ -103,7 +107,7 @@ export function PeopleList({
             disabled={isPending}
           >
             {isPending && <Loader2 className="size-4 animate-spin" />}
-            მეტი ხალხი
+            {en ? "More people" : "მეტი ხალხი"}
           </Button>
         </div>
       )}

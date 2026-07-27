@@ -27,6 +27,7 @@ import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import { SafetyMenu } from "@/components/safety/safety-menu";
 import type { Message } from "@/db/schema";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 type TypingEventPayload = {
   senders: Array<{ senderId: string; expiresAt: string }>;
@@ -98,6 +99,7 @@ type Props = {
   mode?: "modal" | "page" | "background";
   /** When mounted in "page" mode, optionally auto-open this partner's chat. */
   initialPartnerId?: string | null;
+  locale?: UserLocale;
 };
 
 type SendResult = { ok: true } | { ok: false; error: string };
@@ -108,7 +110,9 @@ export function ChatLauncher({
   initialUnreadTotal,
   mode = "modal",
   initialPartnerId = null,
+  locale = "ka",
 }: Props) {
+  const en = locale === "en";
   // In "page" mode the panel is always considered open — the route is
   // the panel. In other modes it's a togglable surface.
   const [open, setOpen] = useState(mode === "page");
@@ -428,9 +432,11 @@ export function ChatLauncher({
   // Mount-once effect — handleSelect is stable (empty deps).
   useEffect(() => {
     if (!initialPartnerId) return;
-    void handleSelect(initialPartnerId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const timeout = window.setTimeout(() => {
+      void handleSelect(initialPartnerId);
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [handleSelect, initialPartnerId]);
 
   const handleSend = useCallback(
     async (partnerId: string, text: string): Promise<SendResult> => {
@@ -532,6 +538,7 @@ export function ChatLauncher({
             onTyping={() => {
               void pingTyping(activePartner.id).catch(() => {});
             }}
+            locale={locale}
           />
         ) : (
           <ConversationList
@@ -539,6 +546,7 @@ export function ChatLauncher({
             viewerId={viewerId}
             onSelect={handleSelect}
             onClose={null}
+            locale={locale}
           />
         )}
       </div>
@@ -550,7 +558,7 @@ export function ChatLauncher({
       {/* Floating launcher button */}
       <motion.button
         type="button"
-        aria-label="ჩატი"
+        aria-label={en ? "Chat" : "ჩატი"}
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -593,6 +601,7 @@ export function ChatLauncher({
                 onTyping={() => {
                   void pingTyping(activePartner.id).catch(() => {});
                 }}
+                locale={locale}
               />
             ) : (
               <ConversationList
@@ -600,6 +609,7 @@ export function ChatLauncher({
                 viewerId={viewerId}
                 onSelect={handleSelect}
                 onClose={() => setOpen(false)}
+                locale={locale}
               />
             )}
           </motion.div>
@@ -614,21 +624,24 @@ function ConversationList({
   viewerId,
   onSelect,
   onClose,
+  locale,
 }: {
   conversations: ChatConversation[];
   viewerId: string;
   onSelect: (partnerId: string) => void;
   /** null when rendered as a full page — the close affordance is hidden. */
   onClose: (() => void) | null;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   return (
     <>
       <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-        <h2 className="text-base font-semibold tracking-tight">ჩატი</h2>
+        <h2 className="text-base font-semibold tracking-tight">{en ? "Chat" : "ჩატი"}</h2>
         {onClose && (
           <button
             type="button"
-            aria-label="დახურვა"
+            aria-label={en ? "Close" : "დახურვა"}
             onClick={onClose}
             className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
           >
@@ -640,7 +653,7 @@ function ConversationList({
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
           <MessageCircle className="size-8 text-muted-foreground/50" />
           <p className="text-sm text-muted-foreground">
-            ჯერ მეგობრები არ გყავს — დაამატე და დაიწყე ჩატი
+            {en ? "You have no friends yet. Add someone to start chatting." : "ჯერ მეგობრები არ გყავს — დაამატე და დაიწყე ჩატი"}
           </p>
           {/* Point at the deck when it's enabled; otherwise send users to
               their friends page (always available) so the CTA never dead-ends. */}
@@ -650,8 +663,8 @@ function ConversationList({
             className="text-xs text-[var(--vivida-cyan)] hover:underline"
           >
             {SOCIAL_FEATURES.swipeDeck
-              ? "ნახე ვინ რეზონირებს შენთან →"
-              : "ნახე მეგობრების მოთხოვნები →"}
+              ? en ? "See who resonates with you →" : "ნახე ვინ რეზონირებს შენთან →"
+              : en ? "View friend requests →" : "ნახე მეგობრების მოთხოვნები →"}
           </Link>
         </div>
       ) : (
@@ -662,6 +675,7 @@ function ConversationList({
               conv={c}
               viewerId={viewerId}
               onSelect={() => onSelect(c.partner.id)}
+              locale={locale}
             />
           ))}
         </ul>
@@ -674,10 +688,12 @@ function ConversationRow({
   conv,
   viewerId,
   onSelect,
+  locale,
 }: {
   conv: ChatConversation;
   viewerId: string;
   onSelect: () => void;
+  locale: UserLocale;
 }) {
   const display =
     conv.partner.displayName ??
@@ -685,8 +701,8 @@ function ConversationRow({
     conv.partner.username ??
     "user";
   const preview = conv.lastMessage
-    ? `${conv.lastMessage.senderId === viewerId ? "შენ: " : ""}${conv.lastMessage.body}`
-    : "ჩატი ჯერ არ დაგიწყიათ";
+    ? `${conv.lastMessage.senderId === viewerId ? (locale === "en" ? "You: " : "შენ: ") : ""}${conv.lastMessage.body}`
+    : locale === "en" ? "No messages yet" : "ჩატი ჯერ არ დაგიწყიათ";
   const isUnread = conv.unreadCount > 0;
 
   return (
@@ -720,7 +736,7 @@ function ConversationRow({
             </span>
             {conv.lastMessage && (
               <span className="shrink-0 text-[10px] text-muted-foreground/80">
-                {timeAgo(conv.lastMessage.createdAt)}
+                {timeAgo(conv.lastMessage.createdAt, locale)}
               </span>
             )}
           </div>
@@ -752,6 +768,7 @@ function ChatView({
   onBack,
   onSend,
   onTyping,
+  locale,
 }: {
   viewerId: string;
   partner: ChatPartner;
@@ -761,7 +778,9 @@ function ChatView({
   onBack: () => void;
   onSend: (text: string) => Promise<SendResult>;
   onTyping: () => void;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
@@ -834,7 +853,7 @@ function ChatView({
       <header className="flex items-center gap-3 border-b border-border/60 px-3 py-3">
         <button
           type="button"
-          aria-label="უკან"
+          aria-label={en ? "Back" : "უკან"}
           onClick={onBack}
           className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
         >
@@ -858,7 +877,7 @@ function ChatView({
             </Link>
           )}
         </div>
-        <SafetyMenu targetUserId={partner.id} targetType="message_thread" />
+        <SafetyMenu targetUserId={partner.id} targetType="message_thread" locale={locale} />
       </header>
 
       <div
@@ -873,7 +892,7 @@ function ChatView({
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
             <MessageCircle className="size-6 text-muted-foreground/50" />
             <p className="text-xs text-muted-foreground">
-              დაიწყე საუბარი — გამოგზავნე პირველი წერილი
+              {en ? "Start the conversation by sending the first message." : "დაიწყე საუბარი — გამოგზავნე პირველი წერილი"}
             </p>
           </div>
         ) : (
@@ -918,7 +937,7 @@ function ChatView({
                   {showReadPip && (
                     <div className="mt-0.5 flex justify-end">
                       <span
-                        title="წაიკითხა"
+                        title={en ? "Read" : "წაიკითხა"}
                         className="inline-flex items-center"
                       >
                         <Image
@@ -953,7 +972,7 @@ function ChatView({
                 send();
               }
             }}
-            placeholder="დაწერე…"
+            placeholder={en ? "Write a message…" : "დაწერე…"}
             rows={1}
             disabled={isSending}
             className="max-h-32 min-h-9 flex-1 resize-none rounded-xl border border-border bg-input/40 px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-ring"
@@ -962,7 +981,7 @@ function ChatView({
             type="button"
             onClick={send}
             disabled={isSending || draft.trim().length === 0}
-            aria-label="გაგზავნა"
+            aria-label={en ? "Send" : "გაგზავნა"}
             className="grid size-9 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-[0_8px_24px_-8px_oklch(0.65_0.24_305/0.6)] transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
           >
             <Send className="size-4" />
@@ -1012,17 +1031,18 @@ function TypingBubble({ partner }: { partner: ChatPartner }) {
   );
 }
 
-function timeAgo(date: Date | string): string {
+function timeAgo(date: Date | string, locale: UserLocale): string {
+  const en = locale === "en";
   const d = new Date(date);
   const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (seconds < 60) return "ახლა";
+  if (seconds < 60) return en ? "now" : "ახლა";
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}წთ`;
+  if (minutes < 60) return en ? `${minutes}m` : `${minutes}წთ`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}სთ`;
+  if (hours < 24) return en ? `${hours}h` : `${hours}სთ`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}დ`;
-  return new Intl.DateTimeFormat("ka-GE", {
+  if (days < 7) return en ? `${days}d` : `${days}დ`;
+  return new Intl.DateTimeFormat(en ? "en" : "ka-GE", {
     day: "numeric",
     month: "short",
   }).format(d);

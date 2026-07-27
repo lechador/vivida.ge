@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { DiscoverCard } from "@/lib/discover";
 import { cn } from "@/lib/utils";
 import { SuggestedPersonCard } from "./suggested-person-card";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Horizontal scroll rail of the most compatible public-profile users.
@@ -16,8 +17,10 @@ import { SuggestedPersonCard } from "./suggested-person-card";
  */
 export function SuggestedPeopleRail({
   suggestions,
+  locale = "ka",
 }: {
   suggestions: DiscoverCard[];
+  locale?: UserLocale;
 }) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [canLeft, setCanLeft] = useState(false);
@@ -156,7 +159,7 @@ export function SuggestedPeopleRail({
           href="/people"
           className="text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
-          ყველა →
+          {locale === "en" ? "View all →" : "ყველა →"}
         </Link>
       </div>
 
@@ -164,7 +167,7 @@ export function SuggestedPeopleRail({
         <button
           type="button"
           onClick={() => scrollByAmount(-1)}
-          aria-label="უკან"
+          aria-label={locale === "en" ? "Previous" : "უკან"}
           className={cn(
             "absolute left-0 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background/90 p-2 text-foreground shadow-lg backdrop-blur transition-opacity hover:bg-background sm:flex",
             canLeft ? "opacity-100" : "pointer-events-none opacity-0"
@@ -175,7 +178,7 @@ export function SuggestedPeopleRail({
         <button
           type="button"
           onClick={() => scrollByAmount(1)}
-          aria-label="წინ"
+          aria-label={locale === "en" ? "Next" : "წინ"}
           className={cn(
             "absolute right-0 top-1/2 z-10 hidden translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background/90 p-2 text-foreground shadow-lg backdrop-blur transition-opacity hover:bg-background sm:flex",
             canRight ? "opacity-100" : "pointer-events-none opacity-0"
@@ -208,7 +211,7 @@ export function SuggestedPeopleRail({
           className="-mx-4 flex gap-3 overflow-x-auto overscroll-x-contain scroll-smooth px-4 pb-2 [scrollbar-width:none] [&.is-dragging]:scroll-auto [&.is-dragging_*]:pointer-events-none [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:cursor-grab sm:select-none sm:px-6 sm:[&.is-dragging]:cursor-grabbing sm:[&_img]:select-none"
         >
           {suggestions.map((person) => (
-            <SuggestedPersonCard key={person.userId} person={person} />
+            <SuggestedPersonCard key={person.userId} person={person} locale={locale} />
           ))}
         </div>
       </div>

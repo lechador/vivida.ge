@@ -23,6 +23,7 @@ import { CompatibilityRow } from "@/components/friends/compatibility-row";
 import { MessageButton } from "@/components/chat/message-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 
 export const metadata = { title: "მეგობრები" };
 
@@ -34,6 +35,12 @@ const TABS: Array<{ id: Tab; label: string }> = [
   { id: "incoming", label: "შემოსული" },
   { id: "outgoing", label: "გაგზავნილი" },
 ];
+const TAB_LABEL_EN: Record<Tab, string> = {
+  friends: "Friends",
+  compatibility: "Compatibility",
+  incoming: "Incoming",
+  outgoing: "Sent",
+};
 
 export default async function FriendsPage({
   searchParams,
@@ -49,12 +56,14 @@ export default async function FriendsPage({
       ? params.tab
       : "friends";
 
-  const [plan, friends, incoming, outgoing] = await Promise.all([
+  const [plan, friends, incoming, outgoing, locale] = await Promise.all([
     getCurrentPlan(user.id),
     listFriends(user.id),
     listIncomingRequests(user.id),
     listOutgoingRequests(user.id),
+    getUserLocale(user.id),
   ]);
+  const en = locale === "en";
 
   const { viewerHasChart, friends: enrichedFriends } =
     await enrichFriendsWithSynastry(user.id, friends);
@@ -67,7 +76,7 @@ export default async function FriendsPage({
   };
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%)]"
@@ -78,12 +87,12 @@ export default async function FriendsPage({
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          ხალხი
+          {en ? "People" : "ხალხი"}
         </div>
         <h1 className="mb-6 text-balance text-3xl font-semibold tracking-tight sm:mb-8 sm:text-5xl">
-          შენი{" "}
+          {en ? "Your " : "შენი "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            წრე
+            {en ? "circle" : "წრე"}
           </span>
         </h1>
 
@@ -103,7 +112,7 @@ export default async function FriendsPage({
                     : "border-border bg-card/40 text-muted-foreground hover:border-foreground/20 hover:text-foreground"
                 )}
               >
-                {label}
+                {en ? TAB_LABEL_EN[id] : label}
                 <span
                   className={cn(
                     "rounded-full px-1.5 text-[10px] font-semibold leading-tight tabular-nums",
@@ -123,18 +132,19 @@ export default async function FriendsPage({
           <CompatibilityTab
             viewerHasChart={viewerHasChart}
             friends={enrichedFriends}
+            locale={locale}
           />
         ) : tab === "friends" ? (
           <>
             {!viewerHasChart && enrichedFriends.length > 0 && (
-              <NoChartBanner />
+              <NoChartBanner locale={locale} />
             )}
             {enrichedFriends.length === 0 ? (
-              <EmptyState tab="friends" />
+              <EmptyState tab="friends" locale={locale} />
             ) : (
               <ul className="grid gap-3">
                 {enrichedFriends.map((u) => (
-                  <FriendRow key={u.id} u={u} variant="friends" />
+                  <FriendRow key={u.id} u={u} variant="friends" locale={locale} />
                 ))}
               </ul>
             )}
@@ -142,11 +152,11 @@ export default async function FriendsPage({
         ) : (() => {
           const list = tab === "incoming" ? incoming : outgoing;
           return list.length === 0 ? (
-            <EmptyState tab={tab} />
+            <EmptyState tab={tab} locale={locale} />
           ) : (
             <ul className="grid gap-3">
               {list.map((u) => (
-                <FriendRow key={u.id} u={u} variant={tab} />
+                <FriendRow key={u.id} u={u} variant={tab} locale={locale} />
               ))}
             </ul>
           );
@@ -161,15 +171,17 @@ export default async function FriendsPage({
 function CompatibilityTab({
   viewerHasChart,
   friends,
+  locale,
 }: {
   viewerHasChart: boolean;
   friends: FriendWithSynastry[];
+  locale: UserLocale;
 }) {
   if (friends.length === 0) {
-    return <EmptyState tab="compatibility" />;
+    return <EmptyState tab="compatibility" locale={locale} />;
   }
   if (!viewerHasChart) {
-    return <NoChartBanner full />;
+    return <NoChartBanner full locale={locale} />;
   }
   const ranked = [...friends].sort((a, b) => {
     const sa = a.synastry?.overall ?? -1;
@@ -179,8 +191,9 @@ function CompatibilityTab({
   return (
     <>
       <p className="mb-4 text-xs text-muted-foreground sm:text-sm">
-        შენი მეგობრები დალაგებულია ცის რუკების ერთობლივი თავსებადობით. დააჭირე
-        ვინმეს — ნახავ სრულ აღწერას.
+        {locale === "en"
+          ? "Friends are ranked by combined chart compatibility. Select someone to view the detailed Georgian interpretation."
+          : "შენი მეგობრები დალაგებულია ცის რუკების ერთობლივი თავსებადობით. დააჭირე ვინმეს — ნახავ სრულ აღწერას."}
       </p>
       <ul className="grid gap-3">
         {ranked.map((u, i) => (
@@ -194,7 +207,8 @@ function CompatibilityTab({
 /** Inline / full banner urging the viewer to fill out their birth chart so
  *  synastry can compute. Inline mode sits above the friends list; full
  *  mode replaces it (used on the compatibility tab). */
-function NoChartBanner({ full = false }: { full?: boolean }) {
+function NoChartBanner({ full = false, locale }: { full?: boolean; locale: UserLocale }) {
+  const en = locale === "en";
   return (
     <div
       className={cn(
@@ -213,15 +227,14 @@ function NoChartBanner({ full = false }: { full?: boolean }) {
         </span>
         <div className={cn("flex-1", full && "text-center")}>
           <h2 className="text-base font-semibold tracking-tight sm:text-lg">
-            შენი ცის რუკა ჯერ არ არის
+            {en ? "Your natal chart is not ready" : "შენი ცის რუკა ჯერ არ არის"}
           </h2>
           <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
-            შეავსე დაბადების მონაცემები — გამოვთვლი თავსებადობას ყველა შენ
-            მეგობართან.
+            {en ? "Add your birth details to calculate compatibility with your friends." : "შეავსე დაბადების მონაცემები — გამოვთვლი თავსებადობას ყველა შენ მეგობართან."}
           </p>
         </div>
         <Button asChild variant="mystic" className={cn(full && "mt-2")}>
-          <Link href="/onboarding">შევსება</Link>
+          <Link href="/onboarding">{en ? "Add details" : "შევსება"}</Link>
         </Button>
       </div>
     </div>
@@ -231,9 +244,11 @@ function NoChartBanner({ full = false }: { full?: boolean }) {
 function FriendRow({
   u,
   variant,
+  locale,
 }: {
   u: FriendWithSynastry | FriendshipUser;
   variant: Tab;
+  locale: UserLocale;
 }) {
   const displayName =
     u.displayName ?? u.name?.split(" ")[0] ?? u.username ?? "user";
@@ -256,7 +271,7 @@ function FriendRow({
       {profileHref ? (
         <Link
           href={profileHref}
-          aria-label={`${displayName}-ის პროფილი`}
+          aria-label={locale === "en" ? `${displayName}'s profile` : `${displayName}-ის პროფილი`}
           className="shrink-0 rounded-full transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {avatar}
@@ -303,17 +318,18 @@ function FriendRow({
           server action enforces. Renders before FriendActions so "remove"
           (the destructive action) sits last in tab order. */}
       {variant === "friends" && (
-        <MessageButton partnerId={u.id} variant="icon" />
+        <MessageButton partnerId={u.id} variant="icon" locale={locale} />
       )}
       <FriendActions
         variant={variant === "compatibility" ? "friends" : variant}
         otherUserId={u.id}
         otherUsername={u.username}
+        locale={locale}
       />
       {u.username && (
         <Link
           href={`/u/${u.username}`}
-          aria-label={`${displayName}-ის პროფილი`}
+          aria-label={locale === "en" ? `${displayName}'s profile` : `${displayName}-ის პროფილი`}
           className="hidden shrink-0 text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
         >
           <ArrowRight className="size-4" />
@@ -323,8 +339,8 @@ function FriendRow({
   );
 }
 
-function EmptyState({ tab }: { tab: Tab }) {
-  const copy = {
+function EmptyState({ tab, locale }: { tab: Tab; locale: UserLocale }) {
+  const copyKa = {
     friends: {
       Icon: Users,
       title: "ჯერ არცერთი მეგობარი არ გყავს",
@@ -346,6 +362,13 @@ function EmptyState({ tab }: { tab: Tab }) {
       body: "გახსნა შენ მიერ გაგზავნილი თხოვნები ჩანს, სანამ მეორე მხარე უპასუხებდეს.",
     },
   }[tab];
+  const copyEn = {
+    friends: { Icon: Users, title: "You do not have any friends yet", body: "Send a request to people whose compatibility you want to explore." },
+    compatibility: { Icon: Sparkles, title: "Compatibility is empty", body: "Add a friend to see your combined natal-chart score here." },
+    incoming: { Icon: UserPlus, title: "No incoming requests", body: "New friend requests will appear here." },
+    outgoing: { Icon: UserPlus, title: "No sent requests", body: "Requests you send remain here until the other person responds." },
+  }[tab];
+  const copy = locale === "en" ? copyEn : copyKa;
 
   return (
     <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">

@@ -17,6 +17,7 @@ import type { LucideIcon } from "lucide-react";
 
 import { SOCIAL_FEATURES, type SocialFeature } from "@/lib/social-flags";
 import type { PlanId } from "@/lib/pricing";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export type NavActiveKey =
   | "today"
@@ -38,11 +39,13 @@ export type NavItem = {
   key: NavActiveKey;
   href: string;
   label: string;
+  labelEn: string;
   Icon: LucideIcon;
   /** Hue used for the active glow + hover icon tint. Roughly the brand axis. */
   hue: string;
   /** Small pill next to the label ("ახალი") — drop it once the feature ages. */
   badgeKa?: string;
+  badgeEn?: string;
 };
 
 /**
@@ -64,8 +67,8 @@ function navVisible(item: NavItem): boolean {
  * The former "pro" slot is now the credits hub — the label is the same for
  * everyone. (Kept as a function so per-plan labels stay easy to reintroduce.)
  */
-export function navLabel(item: NavItem, _plan: PlanId): string {
-  return item.label;
+export function navLabel(item: NavItem, _plan: PlanId, locale: UserLocale = "ka"): string {
+  return locale === "en" ? item.labelEn : item.label;
 }
 
 const ALL_NAV_ITEMS: NavItem[] = [
@@ -73,6 +76,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "today",
     href: "/dashboard",
     label: "დღეს",
+    labelEn: "Today",
     Icon: Sun,
     hue: "oklch(0.82 0.16 80)",
   },
@@ -80,6 +84,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "sky",
     href: "/sky",
     label: "ცა ახლა",
+    labelEn: "Sky now",
     Icon: Orbit,
     hue: "oklch(0.80 0.15 200)",
   },
@@ -87,6 +92,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "report",
     href: "/report",
     label: "ჩემი რუკა",
+    labelEn: "My chart",
     Icon: Compass,
     hue: "oklch(0.78 0.18 305)",
   },
@@ -94,6 +100,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "ask",
     href: "/ask",
     label: "ჰკითხე",
+    labelEn: "Ask",
     Icon: Stars,
     hue: "oklch(0.80 0.16 230)",
   },
@@ -101,14 +108,17 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "tarot",
     href: "/taro",
     label: "ტარო",
+    labelEn: "Tarot",
     Icon: Wand2,
     hue: "oklch(0.78 0.18 305)",
     badgeKa: "ახალი",
+    badgeEn: "New",
   },
   {
     key: "timing",
     href: "/timing",
     label: "როდის",
+    labelEn: "Timing",
     Icon: CalendarClock,
     hue: "oklch(0.82 0.14 90)",
   },
@@ -116,6 +126,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "feed",
     href: "/feed",
     label: "ფიდი",
+    labelEn: "Feed",
     Icon: Sparkles,
     hue: "oklch(0.78 0.18 320)",
   },
@@ -123,6 +134,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "tests",
     href: "/tests",
     label: "ტესტები",
+    labelEn: "Tests",
     Icon: Brain,
     hue: "oklch(0.78 0.16 300)",
   },
@@ -130,6 +142,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "discover",
     href: "/discover",
     label: "აღმოაჩინე",
+    labelEn: "Discover",
     Icon: Telescope,
     hue: "oklch(0.78 0.15 195)",
   },
@@ -137,6 +150,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "synastry",
     href: "/synastry",
     label: "თავსებადობა",
+    labelEn: "Compatibility",
     Icon: Heart,
     hue: "oklch(0.72 0.22 350)",
   },
@@ -144,6 +158,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "people",
     href: "/people",
     label: "ხალხი",
+    labelEn: "People",
     Icon: UserPlus,
     hue: "oklch(0.75 0.16 160)",
   },
@@ -151,6 +166,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     key: "friends",
     href: "/friends",
     label: "მეგობრები",
+    labelEn: "Friends",
     Icon: Users,
     hue: "oklch(0.72 0.22 0)",
   },
@@ -172,6 +188,7 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     key: "today",
     href: "/dashboard",
     label: "დღეს",
+    labelEn: "Today",
     Icon: Sun,
     hue: "oklch(0.82 0.16 80)",
   },
@@ -179,6 +196,7 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     key: "report",
     href: "/report",
     label: "ჩემი რუკა",
+    labelEn: "My chart",
     Icon: Compass,
     hue: "oklch(0.78 0.18 305)",
   },
@@ -186,6 +204,7 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     key: "tarot",
     href: "/taro",
     label: "ტარო",
+    labelEn: "Tarot",
     Icon: Wand2,
     hue: "oklch(0.78 0.18 305)",
   },
@@ -193,6 +212,7 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     key: "tests",
     href: "/tests",
     label: "ტესტები",
+    labelEn: "Tests",
     Icon: Brain,
     hue: "oklch(0.78 0.16 300)",
   },
@@ -200,6 +220,7 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     key: "messages",
     href: "/messages",
     label: "ჩატი",
+    labelEn: "Chat",
     Icon: MessageCircle,
     hue: "oklch(0.78 0.18 200)",
   },

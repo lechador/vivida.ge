@@ -10,6 +10,7 @@ import { CornerDownLeft, Loader2, Search, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 type Result = {
   userId: string;
@@ -24,7 +25,7 @@ type Result = {
  * and live results. Shown md:hidden so the desktop SearchBar still owns
  * larger viewports.
  */
-export function MobileSearch() {
+export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -32,7 +33,7 @@ export function MobileSearch() {
       <DialogPrimitive.Trigger asChild>
         <button
           type="button"
-          aria-label="ძებნა"
+          aria-label={locale === "en" ? "Search" : "ძებნა"}
           className="grid size-11 shrink-0 place-items-center rounded-full text-foreground/85 transition-colors hover:bg-card/60 hover:text-foreground md:hidden"
         >
           <Search className="size-5" />
@@ -63,9 +64,9 @@ export function MobileSearch() {
                 className="fixed inset-x-2 top-2 z-50 flex max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card/95 shadow-2xl ring-1 ring-foreground/10 backdrop-blur-xl"
               >
                 <DialogPrimitive.Title className="sr-only">
-                  ძებნა
+                  {locale === "en" ? "Search" : "ძებნა"}
                 </DialogPrimitive.Title>
-                <SearchPanel onClose={() => setOpen(false)} />
+                <SearchPanel onClose={() => setOpen(false)} locale={locale} />
               </motion.div>
             </DialogPrimitive.Content>
           </DialogPrimitive.Portal>
@@ -75,7 +76,8 @@ export function MobileSearch() {
   );
 }
 
-function SearchPanel({ onClose }: { onClose: () => void }) {
+function SearchPanel({ onClose, locale }: { onClose: () => void; locale: UserLocale }) {
+  const en = locale === "en";
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
@@ -140,7 +142,7 @@ function SearchPanel({ onClose }: { onClose: () => void }) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="სახელი ან @"
+          placeholder={en ? "Name or @" : "სახელი ან @"}
           className="h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/60"
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
@@ -163,7 +165,7 @@ function SearchPanel({ onClose }: { onClose: () => void }) {
         ) : hasQuery && results[highlight] ? (
           <button
             type="button"
-            aria-label="გადასვლა"
+            aria-label={en ? "Go" : "გადასვლა"}
             onClick={() => navigate(results[highlight].username)}
             className="grid size-9 shrink-0 place-items-center rounded-full bg-card/60 text-foreground/80 ring-1 ring-foreground/10 transition-colors hover:bg-card hover:text-foreground"
           >
@@ -171,7 +173,7 @@ function SearchPanel({ onClose }: { onClose: () => void }) {
           </button>
         ) : (
           <DialogPrimitive.Close
-            aria-label="დახურვა"
+            aria-label={en ? "Close" : "დახურვა"}
             className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/60 hover:text-foreground"
           >
             <X className="size-5" />
@@ -217,11 +219,11 @@ function SearchPanel({ onClose }: { onClose: () => void }) {
           </ul>
         ) : hasQuery && !loading ? (
           <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-            არცერთი საჯარო პროფილი არ მოიძებნა
+            {en ? "No public profiles found" : "არცერთი საჯარო პროფილი არ მოიძებნა"}
           </div>
         ) : (
           <div className="px-4 py-8 text-center text-xs text-muted-foreground/70">
-            მოძებნე სახელით ან @username-ით
+            {en ? "Search by name or @username" : "მოძებნე სახელით ან @username-ით"}
           </div>
         )}
       </div>

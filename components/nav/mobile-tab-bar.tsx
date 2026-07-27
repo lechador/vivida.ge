@@ -3,6 +3,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { MessagesTabBadge } from "./messages-tab-badge";
 import { MOBILE_TAB_ITEMS, type NavActiveKey } from "./nav-items";
+import { navLabel } from "./nav-items";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * iOS/Android-style fixed bottom tab bar. Mirrors the desktop NavLinks
@@ -16,14 +18,16 @@ import { MOBILE_TAB_ITEMS, type NavActiveKey } from "./nav-items";
 export function MobileTabBar({
   active,
   unreadMessages = 0,
+  locale = "ka",
 }: {
   active?: NavActiveKey;
   unreadMessages?: number;
+  locale?: UserLocale;
 }) {
   return (
     <nav
       data-mobile-tab-bar
-      aria-label="ძირითადი ნავიგაცია"
+      aria-label={locale === "en" ? "Main navigation" : "ძირითადი ნავიგაცია"}
       className={cn(
         "fixed inset-x-0 bottom-0 z-40 lg:hidden",
         // Lifted card surface that reads as its own UI layer instead of
@@ -64,7 +68,7 @@ export function MobileTabBar({
                     <MessagesTabBadge initial={unreadMessages} />
                   )}
                 </span>
-                <span className="truncate">{item.label}</span>
+                <span className="truncate">{navLabel(item, "free", locale)}</span>
               </Link>
             </li>
           );

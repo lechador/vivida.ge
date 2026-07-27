@@ -9,8 +9,10 @@ import { Button } from "@/components/ui/button";
 import { sendFriendRequest } from "@/actions/friendship";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { DiscoverCard } from "@/lib/discover";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
-export function SuggestedPersonCard({ person }: { person: DiscoverCard }) {
+export function SuggestedPersonCard({ person, locale = "ka" }: { person: DiscoverCard; locale?: UserLocale }) {
+  const en = locale === "en";
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -32,7 +34,7 @@ export function SuggestedPersonCard({ person }: { person: DiscoverCard }) {
       <Link
         href={`/u/${person.username}`}
         className="flex w-full flex-col items-center"
-        aria-label={`${person.displayName}-ის პროფილი`}
+        aria-label={en ? `${person.displayName}'s profile` : `${person.displayName}-ის პროფილი`}
       >
         <div className="relative">
           <div
@@ -52,7 +54,7 @@ export function SuggestedPersonCard({ person }: { person: DiscoverCard }) {
         </h3>
         <div className="mt-0.5 text-[11px] text-muted-foreground">
           <span className="mr-1">{person.sunSign.symbol}</span>
-          {person.sunSign.labelKa}
+          {en ? person.sunSign.labelEn : person.sunSign.labelKa}
         </div>
       </Link>
 
@@ -62,7 +64,7 @@ export function SuggestedPersonCard({ person }: { person: DiscoverCard }) {
           <span className="font-semibold tabular-nums text-foreground">
             {person.compatibility}%
           </span>
-          <span className="text-muted-foreground">თავსებადი</span>
+          <span className="text-muted-foreground">{en ? "compatible" : "თავსებადი"}</span>
         </div>
       )}
 
@@ -76,12 +78,12 @@ export function SuggestedPersonCard({ person }: { person: DiscoverCard }) {
         {sent ? (
           <>
             <Check className="size-3.5" />
-            გაგზავნილი
+            {en ? "Sent" : "გაგზავნილი"}
           </>
         ) : (
           <>
             <UserPlus className="size-3.5" />
-            {isPending ? "იგზავნება…" : "დამატება"}
+            {isPending ? (en ? "Sending…" : "იგზავნება…") : (en ? "Add" : "დამატება")}
           </>
         )}
       </Button>

@@ -18,6 +18,7 @@ import { NotificationsDropdown } from "./notifications-dropdown";
 import { SearchBar } from "./search-bar";
 import { UserMenu } from "./user-menu";
 import type { PlanId } from "@/lib/pricing";
+import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * App-wide top navigation. Server component that fetches its own session
@@ -60,15 +61,17 @@ export async function AppHeader({
   let username: string | null = null;
   let unreadMessages = 0;
   let balance = 0;
+  let locale: UserLocale = "ka";
 
   if (authed) {
     const session = await auth();
     if (session?.user?.id) {
       // Balance fetched fresh (not via the 30s header cache) so a spend/earn
       // shows immediately in the navbar chip.
-      const [data, bal] = await Promise.all([
+      const [data, bal, preferredLocale] = await Promise.all([
         getHeaderData(session.user.id),
         getBalance(session.user.id),
+        getUserLocale(session.user.id),
       ]);
       userInfo = {
         id: session.user.id,
@@ -83,6 +86,7 @@ export async function AppHeader({
       username = data.username;
       unreadMessages = data.unreadMessages;
       balance = bal;
+      locale = preferredLocale;
     }
   }
 
@@ -91,7 +95,7 @@ export async function AppHeader({
     <header className="relative z-30 mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-4 sm:gap-5 sm:px-6 sm:py-5">
       {/* Mobile hamburger — authed users only (guests don't have nav). */}
       {userInfo && (
-        <MobileNav active={active as NavActiveKey | undefined} plan={plan} />
+        <MobileNav active={active as NavActiveKey | undefined} plan={plan} locale={locale} />
       )}
 
       <Link
@@ -126,7 +130,7 @@ export async function AppHeader({
 
       {/* Search bar — desktop inline; mobile uses MobileSearch icon below. */}
       <div className="hidden flex-1 items-center justify-center md:flex">
-        {userInfo && <SearchBar />}
+        {userInfo && <SearchBar locale={locale} />}
       </div>
       {/* Pure spacer when inline search is hidden, so right cluster floats right */}
       <div className="flex-1 md:hidden" />
@@ -135,10 +139,10 @@ export async function AppHeader({
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-2.5">
         {userInfo ? (
           <>
-            <MobileSearch />
+            <MobileSearch locale={locale} />
             <Link
               href="/credits"
-              aria-label={`კრედიტები: ${balance}`}
+              aria-label={`${locale === "en" ? "Credits" : "კრედიტები"}: ${balance}`}
               className="inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-2.5 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-[var(--vivida-cyan)]/20"
             >
               <Sparkles className="size-3.5 text-[var(--vivida-cyan)]" />
@@ -147,6 +151,7 @@ export async function AppHeader({
             <NotificationsDropdown
               initial={notifications}
               initialUnread={unread}
+              locale={locale}
             />
             <UserMenu
               name={userInfo.name}
@@ -154,11 +159,12 @@ export async function AppHeader({
               image={userInfo.image}
               username={username}
               balance={balance}
+              locale={locale}
             />
           </>
         ) : (
           <Button asChild variant="ghost">
-            <Link href="/login">შესვლა</Link>
+            <Link href="/login">{locale === "en" ? "Sign in" : "შესვლა"}</Link>
           </Button>
         )}
       </div>
@@ -168,15 +174,16 @@ export async function AppHeader({
         <MobileTabBar
           active={active as NavActiveKey | undefined}
           unreadMessages={unreadMessages}
+          locale={locale}
         />
         <DesktopSidebar
           active={active as NavActiveKey | undefined}
           plan={plan}
           unreadMessages={unreadMessages}
+          locale={locale}
         />
       </>
     )}
     </>
   );
 }
-

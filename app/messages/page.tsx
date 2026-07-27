@@ -10,6 +10,7 @@ import {
 } from "@/lib/messages";
 import { getCurrentPlan } from "@/lib/plan";
 import { cn } from "@/lib/utils";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 
 export const metadata = { title: "ჩატი" };
 export const dynamic = "force-dynamic";
@@ -23,11 +24,12 @@ export default async function MessagesPage({
   const userId = session?.user?.id;
   if (!userId) redirect("/");
 
-  const [{ with: partnerId }, conversations, unread, plan] = await Promise.all([
+  const [{ with: partnerId }, conversations, unread, plan, locale] = await Promise.all([
     searchParams,
     listConversations(userId),
     countUnreadMessages(userId),
     getCurrentPlan(userId),
+    getUserLocale(userId),
   ]);
 
   const initial = conversations.map((c) => ({
@@ -51,6 +53,7 @@ export default async function MessagesPage({
   return (
     <main
       data-no-body-bottom-pad
+      lang={locale}
       className="relative isolate flex h-[100dvh] flex-col overflow-hidden"
     >
       <div
@@ -77,6 +80,7 @@ export default async function MessagesPage({
           initialUnreadTotal={unread}
           mode="page"
           initialPartnerId={partnerId ?? null}
+          locale={locale}
         />
       </section>
     </main>

@@ -4,12 +4,14 @@ import { useState, useTransition } from "react";
 
 import { updateGender } from "@/actions/profile";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Compact sex selector for Account — instant-save (no Save button), mirrors
  * the discoverability toggle. Only used for aggregate audience analytics.
  */
-export function GenderCard({ initial }: { initial: "male" | "female" | null }) {
+export function GenderCard({ initial, locale = "ka" }: { initial: "male" | "female" | null; locale?: UserLocale }) {
+  const en = locale === "en";
   const [value, setValue] = useState(initial);
   const [pending, startTransition] = useTransition();
 
@@ -22,16 +24,16 @@ export function GenderCard({ initial }: { initial: "male" | "female" | null }) {
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="min-w-0">
-        <div className="text-sm font-medium">სქესი</div>
+        <div className="text-sm font-medium">{en ? "Sex" : "სქესი"}</div>
         <div className="text-xs text-muted-foreground">
-          გამოიყენება მხოლოდ ანონიმური, ჯამური სტატისტიკისთვის.
+          {en ? "Used only for anonymous aggregate statistics." : "გამოიყენება მხოლოდ ანონიმური, ჯამური სტატისტიკისთვის."}
         </div>
       </div>
       <div className={cn("flex gap-2", pending && "opacity-60")}>
         {(
           [
-            { key: "female", label: "მდედრობითი", glyph: "♀" },
-            { key: "male", label: "მამრობითი", glyph: "♂" },
+            { key: "female", label: en ? "Female" : "მდედრობითი", glyph: "♀" },
+            { key: "male", label: en ? "Male" : "მამრობითი", glyph: "♂" },
           ] as const
         ).map((opt) => (
           <button

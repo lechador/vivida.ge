@@ -6,10 +6,12 @@ import { Mail, Sparkles, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updateEmailPreferences } from "@/actions/email-preferences";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 type Prefs = { daily: boolean; marketing: boolean; nudges: boolean };
 
-export function EmailPreferencesCard({ initial }: { initial: Prefs }) {
+export function EmailPreferencesCard({ initial, locale = "ka" }: { initial: Prefs; locale?: UserLocale }) {
+  const en = locale === "en";
   const [prefs, setPrefs] = useState<Prefs>(initial);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -29,31 +31,31 @@ export function EmailPreferencesCard({ initial }: { initial: Prefs }) {
   return (
     <div className="rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
       <header className="mb-5">
-        <h2 className="text-lg font-semibold">ელფოსტის შეტყობინებები</h2>
+        <h2 className="text-lg font-semibold">{en ? "Email notifications" : "ელფოსტის შეტყობინებები"}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          აირჩიე, რა ტიპის წერილები გინდა მიიღო vivida.ge-დან.
+          {en ? "Choose which emails you want to receive from Vivida." : "აირჩიე, რა ტიპის წერილები გინდა მიიღო vivida.ge-დან."}
         </p>
       </header>
 
       <div className="space-y-3">
         <ToggleRow
           icon={<Sparkles className="size-5" />}
-          title="ყოველდღიური ჰოროსკოპი"
-          subtitle="დილით — შენი დღევანდელი მცირე ანალიზი ელფოსტაზე."
+          title={en ? "Daily horoscope" : "ყოველდღიური ჰოროსკოპი"}
+          subtitle={en ? "A short daily reading delivered in the morning." : "დილით — შენი დღევანდელი მცირე ანალიზი ელფოსტაზე."}
           on={prefs.daily}
           onChange={(v) => setPrefs((p) => ({ ...p, daily: v }))}
         />
         <ToggleRow
           icon={<UserPlus className="size-5" />}
-          title="შეხსენებები"
-          subtitle="თუ შენი დაბადების მონაცემები არ შეგივსია — გეტყვი, რომ გააქტიურო."
+          title={en ? "Reminders" : "შეხსენებები"}
+          subtitle={en ? "Helpful reminders when your birth profile is incomplete." : "თუ შენი დაბადების მონაცემები არ შეგივსია — გეტყვი, რომ გააქტიურო."}
           on={prefs.nudges}
           onChange={(v) => setPrefs((p) => ({ ...p, nudges: v }))}
         />
         <ToggleRow
           icon={<Mail className="size-5" />}
-          title="სიახლეები და სარეკლამო წერილები"
-          subtitle="ახალი ფუნქციები, აქციები და მოსაწვევები."
+          title={en ? "News and promotional emails" : "სიახლეები და სარეკლამო წერილები"}
+          subtitle={en ? "New features, offers and invitations." : "ახალი ფუნქციები, აქციები და მოსაწვევები."}
           on={prefs.marketing}
           onChange={(v) => setPrefs((p) => ({ ...p, marketing: v }))}
         />
@@ -61,7 +63,7 @@ export function EmailPreferencesCard({ initial }: { initial: Prefs }) {
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="text-xs text-muted-foreground">
-          {savedAt && !isPending && !dirty && "შენახულია ✓"}
+          {savedAt && !isPending && !dirty && (en ? "Saved ✓" : "შენახულია ✓")}
         </div>
         <Button
           type="button"
@@ -69,7 +71,7 @@ export function EmailPreferencesCard({ initial }: { initial: Prefs }) {
           disabled={isPending || !dirty}
           size="sm"
         >
-          {isPending ? "ინახება…" : "შენახვა"}
+          {isPending ? (en ? "Saving…" : "ინახება…") : (en ? "Save" : "შენახვა")}
         </Button>
       </div>
     </div>

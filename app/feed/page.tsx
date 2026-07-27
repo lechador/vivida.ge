@@ -17,6 +17,7 @@ import { SuggestedPeopleRail } from "@/components/dashboard/suggested-people-rai
 import { FeedList } from "@/components/feed/feed-list";
 import { PostComposer } from "@/components/feed/post-composer";
 import { PushOptIn } from "@/components/push/push-opt-in";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 
 export const metadata = { title: "ფიდი" };
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ export default async function FeedPage() {
     .limit(1);
   const hasBirthData = !!viewerProfile?.dateOfBirth;
 
-  const [plan, posts, headerData, suggestions] = await Promise.all([
+  const [plan, posts, headerData, suggestions, locale] = await Promise.all([
     getCurrentPlan(user.id),
     listFeed({ limit: 30 }),
     // Reuses the cached header lookup (also has avatarUrl), so showing
@@ -47,13 +48,15 @@ export default async function FeedPage() {
     SOCIAL_FEATURES.suggestedPeopleRail
       ? getDashboardSuggestions(user.id, 8)
       : Promise.resolve([] as Awaited<ReturnType<typeof getDashboardSuggestions>>),
+    getUserLocale(user.id),
   ]);
+  const en = locale === "en";
   const viewerIsAdmin = isAdminEmail(user.email);
   const viewerSunSign = sunSignFromDob(viewerProfile?.dateOfBirth ?? null);
   const viewerAvatar = headerData.avatarUrl ?? user.image ?? null;
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%)]"
@@ -64,24 +67,24 @@ export default async function FeedPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          საზოგადოება
+          {en ? "Community" : "საზოგადოება"}
         </div>
         <div className="mb-6 sm:mb-8">
           <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            ვივიდას{" "}
+            {en ? "Vivida " : "ვივიდას "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              ფიდი
+              {en ? "feed" : "ფიდი"}
             </span>
           </h1>
         </div>
 
         {/* Soft daily-push prompt — hides itself once enabled/dismissed.
             Strongest same-day return trigger; also fires for feed visitors. */}
-        <PushOptIn variant="banner" />
+        <PushOptIn variant="banner" locale={locale} />
 
         {!hasBirthData && (
           <div className="mb-6">
-            <AstroProfileBanner />
+            <AstroProfileBanner locale={locale} />
           </div>
         )}
 
@@ -90,12 +93,12 @@ export default async function FeedPage() {
             community posts only. */}
         {SOCIAL_FEATURES.suggestedPeopleRail && (
           <div className="mb-6">
-            <SuggestedPeopleRail suggestions={suggestions} />
+            <SuggestedPeopleRail suggestions={suggestions} locale={locale} />
           </div>
         )}
 
         <div className="mb-6">
-          <PostComposer authorImage={viewerAvatar} />
+          <PostComposer authorImage={viewerAvatar} locale={locale} />
         </div>
 
         <FeedList

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Sparkles, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ERRORS: Record<string, string> = {
   pro_required: "ეს ფუნქცია Vivida Pro-ს ნაწილია.",
@@ -19,7 +20,8 @@ const ERRORS: Record<string, string> = {
  * same endpoint as the account-page generator (which sets the new image as
  * the main avatar) and refreshes so the carousel/header update in place.
  */
-export function AiAvatarButton() {
+export function AiAvatarButton({ locale = "ka" }: { locale?: UserLocale }) {
+  const en = locale === "en";
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,12 +34,12 @@ export function AiAvatarButton() {
       const res = await fetch("/api/avatar/generate", { method: "POST" });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setError(ERRORS[data.error ?? ""] ?? "რაღაც ვერ მოხერხდა.");
+        setError(en ? "Avatar generation failed. Please try again." : (ERRORS[data.error ?? ""] ?? "რაღაც ვერ მოხერხდა."));
         return;
       }
       router.refresh();
     } catch {
-      setError("ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
     } finally {
       setBusy(false);
     }
@@ -58,7 +60,7 @@ export function AiAvatarButton() {
         ) : (
           <Sparkles className="size-4" />
         )}
-        {busy ? "იქმნება…" : "AI ავატარი"}
+        {busy ? (en ? "Creating…" : "იქმნება…") : (en ? "AI avatar" : "AI ავატარი")}
       </Button>
       {error && (
         <p className="mt-2 text-center text-xs text-[var(--vivida-pink)]">

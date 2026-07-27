@@ -15,7 +15,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { deleteAccount } from "@/actions/account";
-import { DELETE_ACCOUNT_CONFIRM_PHRASE } from "@/lib/account-constants";
+import {
+  DELETE_ACCOUNT_CONFIRM_PHRASE,
+  DELETE_ACCOUNT_CONFIRM_PHRASE_EN,
+} from "@/lib/account-constants";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const DELETION_LIST = [
   "შენი პროფილი, ფოტოები და ბიო",
@@ -23,14 +27,24 @@ const DELETION_LIST = [
   "მიმოწერა და მეგობრობის კავშირები",
   "გამოწერის ისტორია (ფინანსური ჩანაწერების გარდა)",
 ];
+const DELETION_LIST_EN = [
+  "Your profile, photos and bio",
+  "Your natal chart and AI analyses",
+  "Messages and friend connections",
+  "Subscription history (except required financial records)",
+];
 
-export function DangerZone() {
+export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
+  const en = locale === "en";
+  const confirmPhrase = en
+    ? DELETE_ACCOUNT_CONFIRM_PHRASE_EN
+    : DELETE_ACCOUNT_CONFIRM_PHRASE;
   const [open, setOpen] = useState(false);
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const matches = confirmation.trim() === DELETE_ACCOUNT_CONFIRM_PHRASE;
+  const matches = confirmation.trim() === confirmPhrase;
 
   const handleDelete = () => {
     setError(null);
@@ -49,7 +63,7 @@ export function DangerZone() {
         // other error is real and worth surfacing.
         const message = (err as Error).message;
         if (!message?.includes("NEXT_REDIRECT")) {
-          setError("რაღაც შეცდომა მოხდა. სცადე თავიდან.");
+          setError(en ? "Something went wrong. Please try again." : "რაღაც შეცდომა მოხდა. სცადე თავიდან.");
         }
       }
     });
@@ -60,37 +74,39 @@ export function DangerZone() {
       <div className="mb-2 flex items-center gap-2">
         <AlertTriangle className="size-4 text-destructive" />
         <h2 className="text-base font-semibold text-destructive">
-          საშიში ზონა
+          {en ? "Danger zone" : "საშიში ზონა"}
         </h2>
       </div>
       <p className="mb-5 text-sm text-foreground/75">
-        ანგარიშის წაშლა საბოლოოა და ვერ აღდგება. შენი ყველა მონაცემი
-        წაიშლება დაუყოვნებლივ.
+        {en
+          ? "Deleting your account is permanent and cannot be undone. Your data will be removed immediately."
+          : "ანგარიშის წაშლა საბოლოოა და ვერ აღდგება. შენი ყველა მონაცემი წაიშლება დაუყოვნებლივ."}
       </p>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="destructive">
             <Trash2 className="size-4" />
-            ანგარიშის წაშლა
+            {en ? "Delete account" : "ანგარიშის წაშლა"}
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>ანგარიშის წაშლა</DialogTitle>
+            <DialogTitle>{en ? "Delete account" : "ანგარიშის წაშლა"}</DialogTitle>
             <DialogDescription>
-              ეს მოქმედება შეუქცევადია. მოწმდება, რომ მართლაც გსურს ანგარიშის
-              წაშლა.
+              {en
+                ? "This action cannot be undone. Confirm that you really want to delete your account."
+                : "ეს მოქმედება შეუქცევადია. მოწმდება, რომ მართლაც გსურს ანგარიშის წაშლა."}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 text-sm">
             <div>
               <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                წაიშლება
+                {en ? "Will be deleted" : "წაიშლება"}
               </div>
               <ul className="space-y-1.5 text-foreground/85">
-                {DELETION_LIST.map((item) => (
+                {(en ? DELETION_LIST_EN : DELETION_LIST).map((item) => (
                   <li key={item} className="flex items-start gap-2">
                     <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-destructive/70" />
                     {item}
@@ -101,9 +117,9 @@ export function DangerZone() {
 
             <div className="space-y-2">
               <Label htmlFor="delete-confirm">
-                დადასტურებისთვის შეიყვანე{" "}
+                {en ? "To confirm, enter" : "დადასტურებისთვის შეიყვანე"}{" "}
                 <span className="font-mono font-semibold text-destructive">
-                  {DELETE_ACCOUNT_CONFIRM_PHRASE}
+                  {confirmPhrase}
                 </span>
               </Label>
               <Input
@@ -111,7 +127,7 @@ export function DangerZone() {
                 value={confirmation}
                 onChange={(e) => setConfirmation(e.target.value)}
                 autoComplete="off"
-                placeholder={DELETE_ACCOUNT_CONFIRM_PHRASE}
+                placeholder={confirmPhrase}
                 disabled={isPending}
               />
             </div>
@@ -133,7 +149,7 @@ export function DangerZone() {
               }}
               disabled={isPending}
             >
-              გაუქმება
+              {en ? "Cancel" : "გაუქმება"}
             </Button>
             <Button
               variant="destructive"
@@ -143,12 +159,12 @@ export function DangerZone() {
               {isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  იშლება…
+                  {en ? "Deleting…" : "იშლება…"}
                 </>
               ) : (
                 <>
                   <Trash2 className="size-4" />
-                  დიახ, წაშალე
+                  {en ? "Yes, delete it" : "დიახ, წაშალე"}
                 </>
               )}
             </Button>

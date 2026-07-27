@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import type { PlanId } from "@/lib/pricing";
 import { MessagesTabBadge } from "./messages-tab-badge";
 import { NAV_ITEMS, navLabel, type NavActiveKey, type NavItem } from "./nav-items";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Desktop-only left sidebar — a COMPACT icon rail that expands on hover.
@@ -20,10 +21,12 @@ export function DesktopSidebar({
   active,
   plan,
   unreadMessages = 0,
+  locale = "ka",
 }: {
   active?: NavActiveKey;
   plan: PlanId;
   unreadMessages?: number;
+  locale?: UserLocale;
 }) {
   const items: NavItem[] = [
     ...NAV_ITEMS,
@@ -31,6 +34,7 @@ export function DesktopSidebar({
       key: "messages",
       href: "/messages",
       label: "ჩატი",
+      labelEn: "Chat",
       Icon: MessageCircle,
       hue: "oklch(0.78 0.18 200)",
     },
@@ -42,7 +46,7 @@ export function DesktopSidebar({
   return (
     <aside
       data-desktop-sidebar
-      aria-label="ძირითადი ნავიგაცია"
+      aria-label={locale === "en" ? "Main navigation" : "ძირითადი ნავიგაცია"}
       className={cn(
         "group hidden lg:flex",
         "fixed left-0 top-0 z-40 h-[100dvh] w-[4.5rem] hover:w-60",
@@ -82,7 +86,7 @@ export function DesktopSidebar({
               <Link
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                title={navLabel(item, plan)}
+                title={navLabel(item, plan, locale)}
                 className={cn(
                   "group/link relative flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors",
                   isActive
@@ -104,7 +108,7 @@ export function DesktopSidebar({
                     <MessagesTabBadge initial={unreadMessages} />
                   )}
                 </span>
-                <span className={cn("truncate", reveal)}>{navLabel(item, plan)}</span>
+                <span className={cn("truncate", reveal)}>{navLabel(item, plan, locale)}</span>
                 {item.badgeKa && (
                   <span
                     className={cn(
@@ -112,7 +116,7 @@ export function DesktopSidebar({
                       reveal
                     )}
                   >
-                    {item.badgeKa}
+                    {locale === "en" ? item.badgeEn : item.badgeKa}
                   </span>
                 )}
                 {isActive && (
@@ -140,7 +144,7 @@ export function DesktopSidebar({
             reveal
           )}
         >
-          ანგარიში & პარამეტრები →
+          {locale === "en" ? "Account & settings →" : "ანგარიში & პარამეტრები →"}
         </Link>
       </div>
     </aside>

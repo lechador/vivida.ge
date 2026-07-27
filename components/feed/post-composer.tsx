@@ -11,6 +11,7 @@ import { POST_BODY_MAX } from "@/lib/feed-config";
 import { Button } from "@/components/ui/button";
 
 import { MentionInput } from "./mention-input";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /** Single static composer placeholder. Less cute than the rotating
  *  prompts, more consistent — users now read the same opener every
@@ -25,9 +26,12 @@ const PLACEHOLDER = "გააზიარე ფიქრები";
  */
 export function PostComposer({
   authorImage,
+  locale = "ka",
 }: {
   authorImage: string | null;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -67,7 +71,7 @@ export function PostComposer({
             onKeyDown={(e) => {
               if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit();
             }}
-            placeholder={PLACEHOLDER}
+            placeholder={en ? "Share your thoughts" : PLACEHOLDER}
             rows={3}
             maxLength={POST_BODY_MAX + 50 /* let counter go red gently */}
             className="block w-full resize-y rounded-xl border border-border/60 bg-background/40 px-3 py-2.5 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--vivida-violet)]/40"
@@ -75,7 +79,7 @@ export function PostComposer({
           />
           <div className="mt-2 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <CreditHint tone="earn">დღის პირველ პოსტზე +5</CreditHint>
+              <CreditHint tone="earn">{en ? "+5 for your first post today" : "დღის პირველ პოსტზე +5"}</CreditHint>
               <span
                 className={`text-xs tabular-nums ${
                   overflow
@@ -103,7 +107,7 @@ export function PostComposer({
                 ) : (
                   <Send className="size-3.5" />
                 )}
-                გაგზავნა
+                {en ? "Post" : "გაგზავნა"}
               </Button>
             </div>
           </div>

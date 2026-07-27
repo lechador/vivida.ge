@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   AtSign,
   Bell,
@@ -20,8 +21,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { markAllNotificationsRead } from "@/actions/notifications";
 import type { Notification } from "@/db/schema";
-import { CREDIT_REASON_LABEL_KA, type CreditReason } from "@/lib/credits-config";
+import { CREDIT_REASON_LABEL_EN, CREDIT_REASON_LABEL_KA, type CreditReason } from "@/lib/credits-config";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const KIND_ICON: Record<string, LucideIcon> = {
   friend_request: UserPlus,
@@ -38,24 +40,31 @@ const REACTION_LABEL_KA: Record<string, string> = {
   sad: "დაამწუხრე",
   dislike: "არ მოეწონა შენი პოსტი",
 };
+const REACTION_LABEL_EN: Record<string, string> = {
+  like: "liked your post",
+  funny: "laughed at your post",
+  sad: "reacted sadly to your post",
+  dislike: "disliked your post",
+};
 
-function notificationLabel(kind: string, payload: Notification["payload"]): string {
+function notificationLabel(kind: string, payload: Notification["payload"], locale: UserLocale): string {
+  const en = locale === "en";
   if (kind === "post_reaction" && payload?.reaction) {
-    return REACTION_LABEL_KA[payload.reaction] ?? "გამოეხმაურა შენს პოსტს";
+    return (en ? REACTION_LABEL_EN : REACTION_LABEL_KA)[payload.reaction] ?? (en ? "reacted to your post" : "გამოეხმაურა შენს პოსტს");
   }
   switch (kind) {
     case "friend_request":
-      return "გამოგიგზავნა მეგობრობის თხოვნა";
+      return en ? "sent you a friend request" : "გამოგიგზავნა მეგობრობის თხოვნა";
     case "friend_accepted":
-      return "მიიღო შენი მოთხოვნა";
+      return en ? "accepted your request" : "მიიღო შენი მოთხოვნა";
     case "post_comment":
-      return "დააკომენტარა შენი პოსტი";
+      return en ? "commented on your post" : "დააკომენტარა შენი პოსტი";
     case "post_reaction":
-      return "გამოეხმაურა შენს პოსტს";
+      return en ? "reacted to your post" : "გამოეხმაურა შენს პოსტს";
     case "mention":
       return payload?.mentionContext === "comment"
-        ? "მოგიხსენიეს კომენტარში"
-        : "მოგიხსენიეს პოსტში";
+        ? en ? "mentioned you in a comment" : "მოგიხსენიეს კომენტარში"
+        : en ? "mentioned you in a post" : "მოგიხსენიეს პოსტში";
     default:
       return "";
   }
@@ -83,16 +92,17 @@ type MessageNotif = {
   sender: ChatNotifyDetail["sender"];
 };
 
-function timeAgo(date: Date): string {
+function timeAgo(date: Date, locale: UserLocale): string {
+  const en = locale === "en";
   const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (seconds < 60) return "ახლახან";
+  if (seconds < 60) return en ? "just now" : "ახლახან";
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} წუთის წინ`;
+  if (minutes < 60) return en ? `${minutes}m ago` : `${minutes} წუთის წინ`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} საათის წინ`;
+  if (hours < 24) return en ? `${hours}h ago` : `${hours} საათის წინ`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} დღის წინ`;
-  return new Intl.DateTimeFormat("ka-GE", {
+  if (days < 7) return en ? `${days}d ago` : `${days} დღის წინ`;
+  return new Intl.DateTimeFormat(en ? "en" : "ka-GE", {
     day: "numeric",
     month: "short",
   }).format(new Date(date));
@@ -101,10 +111,14 @@ function timeAgo(date: Date): string {
 export function NotificationsDropdown({
   initial,
   initialUnread,
+  locale = "ka",
 }: {
   initial: Notification[];
   initialUnread: number;
+  locale?: UserLocale;
 }) {
+  const router = useRouter();
+  const en = locale === "en";
   const [items, setItems] = useState(initial);
   const [unread, setUnread] = useState(initialUnread);
   const [msgNotifs, setMsgNotifs] = useState<MessageNotif[]>([]);
@@ -164,7 +178,7 @@ export function NotificationsDropdown({
   const handleMessageClick = (partnerId: string) => {
     setOpen(false);
     setMsgNotifs((prev) => prev.filter((m) => m.partnerId !== partnerId));
-    window.location.href = `/messages?with=${encodeURIComponent(partnerId)}`;
+    router.push(`/messages?with=${encodeURIComponent(partnerId)}`);
   };
 
   type DisplayItem =
@@ -196,7 +210,7 @@ export function NotificationsDropdown({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="შეტყობინებები"
+          aria-label={en ? "Notifications" : "შეტყობინებები"}
           className="relative grid size-12 place-items-center rounded-full border border-border bg-card/50 text-foreground/80 transition-all hover:border-foreground/20 hover:bg-card/80 hover:text-foreground"
         >
           <Bell className="size-5" />
@@ -209,7 +223,7 @@ export function NotificationsDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 sm:w-96 p-0">
         <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-          <span className="text-sm font-semibold">შეტყობინებები</span>
+          <span className="text-sm font-semibold">{en ? "Notifications" : "შეტყობინებები"}</span>
           {sortedItems.length > 0 && (
             <span className="text-xs text-muted-foreground">
               {sortedItems.length}
@@ -220,7 +234,7 @@ export function NotificationsDropdown({
           <div className="px-6 py-10 text-center">
             <Bell className="mx-auto mb-2 size-6 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">
-              ჯერ შეტყობინებები არ გაქვს
+              {en ? "You have no notifications yet" : "ჯერ შეტყობინებები არ გაქვს"}
             </p>
           </div>
         ) : (
@@ -231,12 +245,14 @@ export function NotificationsDropdown({
                   key={item.key}
                   n={item.node}
                   onClose={() => setOpen(false)}
+                  locale={locale}
                 />
               ) : (
                 <MessageNotificationRow
                   key={item.key}
                   n={item.node}
                   onSelect={() => handleMessageClick(item.node.partnerId)}
+                  locale={locale}
                 />
               )
             )}
@@ -249,7 +265,7 @@ export function NotificationsDropdown({
               onClick={() => setOpen(false)}
               className="text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
-              ყველას ნახვა · მეგობრების მართვა
+              {en ? "View all · Manage friends" : "ყველას ნახვა · მეგობრების მართვა"}
             </Link>
           </footer>
         )}
@@ -261,14 +277,17 @@ export function NotificationsDropdown({
 function CreditNotificationRow({
   n,
   onClose,
+  locale,
 }: {
   n: Notification;
   onClose: () => void;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const amount = n.payload?.creditAmount ?? 0;
   const earned = amount >= 0;
   const reason = n.payload?.creditReason as CreditReason | undefined;
-  const reasonLabel = reason ? CREDIT_REASON_LABEL_KA[reason] : "";
+  const reasonLabel = reason ? (en ? CREDIT_REASON_LABEL_EN : CREDIT_REASON_LABEL_KA)[reason] : "";
   const isUnread = !n.readAt;
   return (
     <li>
@@ -301,7 +320,7 @@ function CreditNotificationRow({
               )}
             >
               {earned ? "+" : "−"}
-              {Math.abs(amount)} კრედიტი
+              {Math.abs(amount)} {en ? "credits" : "კრედიტი"}
             </span>{" "}
             {reasonLabel && (
               <span className="text-muted-foreground">· {reasonLabel}</span>
@@ -309,11 +328,11 @@ function CreditNotificationRow({
           </div>
           {typeof n.payload?.creditBalance === "number" && (
             <div className="mt-0.5 text-xs text-muted-foreground/80">
-              ბალანსი: {n.payload.creditBalance}
+              {en ? "Balance" : "ბალანსი"}: {n.payload.creditBalance}
             </div>
           )}
           <div className="mt-0.5 text-xs text-muted-foreground/80">
-            {timeAgo(new Date(n.createdAt))}
+            {timeAgo(new Date(n.createdAt), locale)}
           </div>
         </div>
         {isUnread && (
@@ -330,12 +349,14 @@ function CreditNotificationRow({
 function DbNotificationRow({
   n,
   onClose,
+  locale,
 }: {
   n: Notification;
   onClose: () => void;
+  locale: UserLocale;
 }) {
   if (n.kind === "credit") {
-    return <CreditNotificationRow n={n} onClose={onClose} />;
+    return <CreditNotificationRow n={n} onClose={onClose} locale={locale} />;
   }
   const Icon = KIND_ICON[n.kind] ?? Bell;
   const username = n.payload?.fromUsername;
@@ -381,7 +402,7 @@ function DbNotificationRow({
               {n.payload?.fromName ?? username ?? "vivida user"}
             </span>{" "}
             <span className="text-muted-foreground">
-              {notificationLabel(n.kind, n.payload)}
+              {notificationLabel(n.kind, n.payload, locale)}
             </span>
           </div>
           {n.kind === "post_comment" && n.payload?.preview && (
@@ -390,7 +411,7 @@ function DbNotificationRow({
             </div>
           )}
           <div className="mt-0.5 text-xs text-muted-foreground/80">
-            {timeAgo(new Date(n.createdAt))}
+            {timeAgo(new Date(n.createdAt), locale)}
           </div>
         </div>
         {isUnread && (
@@ -407,9 +428,11 @@ function DbNotificationRow({
 function MessageNotificationRow({
   n,
   onSelect,
+  locale,
 }: {
   n: MessageNotif;
   onSelect: () => void;
+  locale: UserLocale;
 }) {
   const display =
     n.sender.displayName ??
@@ -444,13 +467,13 @@ function MessageNotificationRow({
         <div className="min-w-0 flex-1">
           <div className="text-sm leading-snug">
             <span className="font-medium text-foreground">{display}</span>{" "}
-            <span className="text-muted-foreground">მოგწერა</span>
+            <span className="text-muted-foreground">{locale === "en" ? "messaged you" : "მოგწერა"}</span>
           </div>
           <div className="mt-0.5 line-clamp-2 text-xs text-foreground/80">
             {n.body}
           </div>
           <div className="mt-0.5 text-[10px] text-muted-foreground/80">
-            {timeAgo(n.createdAt)}
+            {timeAgo(n.createdAt, locale)}
           </div>
         </div>
         <span

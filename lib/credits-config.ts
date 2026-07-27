@@ -127,3 +127,26 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   grandfather: "საჩუქარი",
   admin_grant: "საჩუქარი",
 };
+
+export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
+  signup_bonus: "Welcome bonus",
+  referral: "Friend referral",
+  purchase: "Balance top-up",
+  monthly_bonus: "Monthly bonus",
+  streak_bonus: "Visit streak",
+  birthday_gift: "Birthday gift",
+  earn_feed_post: "Feed post",
+  earn_profile_photo: "Profile photo",
+  spend_synastry: "Compatibility",
+  spend_chat: "AI chat",
+  spend_mbti: "Personality test",
+  spend_iq: "IQ test",
+  spend_eq: "EQ test",
+  spend_bigfive: "Big Five test",
+  spend_audio: "Audio horoscope",
+  spend_report: "PDF chart",
+  spend_weekly: "7-day forecast",
+  spend_tarot: "Tarot reading",
+  grandfather: "Gift",
+  admin_grant: "Gift",
+};

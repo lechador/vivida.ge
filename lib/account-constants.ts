@@ -7,3 +7,4 @@
 
 /** Phrase the user must type verbatim to confirm account deletion. */
 export const DELETE_ACCOUNT_CONFIRM_PHRASE = "ვშლი";
+export const DELETE_ACCOUNT_CONFIRM_PHRASE_EN = "DELETE";

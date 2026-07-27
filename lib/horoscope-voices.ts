@@ -11,14 +11,16 @@ export type HoroscopeVoice = {
   slug: string;
   labelKa: string;
   descKa: string;
+  labelEn: string;
+  descEn: string;
   /** ElevenLabs voice id (not secret). */
   voiceId: string;
 };
 
 export const HOROSCOPE_VOICES: HoroscopeVoice[] = [
-  { slug: "jessica", labelKa: "ჯესიკა", descKa: "თბილი, ნათელი ქალის ხმა", voiceId: "cgSgspJ2msm6clMCkdW9" },
-  { slug: "sarah", labelKa: "სარა", descKa: "მშვიდი, დამამშვიდებელი ქალის ხმა", voiceId: "EXAVITQu4vr4xnSDxMaL" },
-  { slug: "george", labelKa: "ჯორჯი", descKa: "თბილი მამრობითი, მთხრობელი", voiceId: "JBFqnCBsd6RMkjVDRZzb" },
+  { slug: "jessica", labelKa: "ჯესიკა", descKa: "თბილი, ნათელი ქალის ხმა", labelEn: "Jessica", descEn: "Warm, bright female voice", voiceId: "cgSgspJ2msm6clMCkdW9" },
+  { slug: "sarah", labelKa: "სარა", descKa: "მშვიდი, დამამშვიდებელი ქალის ხმა", labelEn: "Sarah", descEn: "Calm, soothing female voice", voiceId: "EXAVITQu4vr4xnSDxMaL" },
+  { slug: "george", labelKa: "ჯორჯი", descKa: "თბილი მამრობითი, მთხრობელი", labelEn: "George", descEn: "Warm male narrator", voiceId: "JBFqnCBsd6RMkjVDRZzb" },
 ];
 
 export const DEFAULT_VOICE_SLUG = "jessica";

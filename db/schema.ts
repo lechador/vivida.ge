@@ -47,6 +47,9 @@ export const users = pgTable("user", {
     .default(true),
   emailMarketing: boolean("email_marketing").notNull().default(true),
   emailNudges: boolean("email_nudges").notNull().default(true),
+  /** Preferred interface language for authenticated pages. Public SEO routes
+   * keep their explicit URL language; this setting controls the signed-in UI. */
+  interfaceLanguage: text("interface_language").notNull().default("ka"),
   /** Preferred voice slug for audio horoscopes (see lib/elevenlabs HOROSCOPE_VOICES).
    *  NULL → the default voice. Set on first listen / in account settings. */
   horoscopeVoice: text("horoscope_voice"),

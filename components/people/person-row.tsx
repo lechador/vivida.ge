@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { PersonRow } from "@/lib/people";
 import { FriendButton } from "@/components/profile/friend-button";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Thin Facebook-style directory row: avatar, name + handle (+ short
@@ -10,9 +11,9 @@ import { FriendButton } from "@/components/profile/friend-button";
  * the friend button stops propagation so the action doesn't leak into
  * a navigation.
  */
-export function PersonRowCard({ person }: { person: PersonRow }) {
+export function PersonRowCard({ person, locale = "ka" }: { person: PersonRow; locale?: UserLocale }) {
   const display =
-    person.displayName ?? person.username ?? "ვარსკვლავო";
+    person.displayName ?? person.username ?? (locale === "en" ? "Stargazer" : "ვარსკვლავო");
   const profileHref = person.username ? `/u/${person.username}` : "#";
 
   return (
@@ -21,7 +22,7 @@ export function PersonRowCard({ person }: { person: PersonRow }) {
         <Link
           href={profileHref}
           className="shrink-0"
-          aria-label={`${display}-ის პროფილი`}
+          aria-label={locale === "en" ? `${display}'s profile` : `${display}-ის პროფილი`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -53,6 +54,7 @@ export function PersonRowCard({ person }: { person: PersonRow }) {
             targetUserId={person.id}
             targetUsername={person.username}
             initialStatus={person.friendship}
+            locale={locale}
           />
         </div>
       </div>

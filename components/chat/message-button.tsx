@@ -3,6 +3,7 @@ import { MessageCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Navigates to the messenger page with `partnerId` preselected. The page
@@ -16,10 +17,12 @@ export function MessageButton({
   partnerId,
   variant = "default",
   className,
+  locale = "ka",
 }: {
   partnerId: string;
   variant?: "default" | "icon";
   className?: string;
+  locale?: UserLocale;
 }) {
   const href = `/messages?with=${encodeURIComponent(partnerId)}`;
 
@@ -31,7 +34,7 @@ export function MessageButton({
         size="icon"
         className={cn("shrink-0", className)}
       >
-        <Link href={href} aria-label="წერილი">
+        <Link href={href} aria-label={locale === "en" ? "Message" : "წერილი"}>
           <MessageCircle className="size-4" />
         </Link>
       </Button>
@@ -42,7 +45,7 @@ export function MessageButton({
     <Button asChild variant="outline" className={cn("shrink-0", className)}>
       <Link href={href}>
         <MessageCircle className="size-4" />
-        წერილი
+        {locale === "en" ? "Message" : "წერილი"}
       </Link>
     </Button>
   );

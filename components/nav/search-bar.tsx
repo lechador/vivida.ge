@@ -8,6 +8,7 @@ import { CornerDownLeft, Loader2, Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 type Result = {
   userId: string;
@@ -21,7 +22,8 @@ type Result = {
  * Header search input. Debounced fetch to /api/users/search, keyboard nav
  * with arrow keys + Enter to navigate to the highlighted result.
  */
-export function SearchBar() {
+export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
+  const en = locale === "en";
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [open, setOpen] = useState(false);
@@ -101,7 +103,7 @@ export function SearchBar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder="სახელი ან @"
+          placeholder={en ? "Name or @" : "სახელი ან @"}
           className="h-12 w-full rounded-full border border-border bg-card/50 pl-11 pr-10 text-base outline-none ring-offset-background backdrop-blur transition-colors placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-ring"
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
@@ -127,7 +129,7 @@ export function SearchBar() {
         ) : (
           <button
             type="button"
-            aria-label="გადასვლა"
+            aria-label={en ? "Go" : "გადასვლა"}
             tabIndex={-1}
             onClick={() => {
               const target = results[highlight];
@@ -187,7 +189,7 @@ export function SearchBar() {
 
       {open && hasQuery && !loading && results.length === 0 && (
         <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 rounded-xl border border-border bg-popover/95 p-4 text-center text-sm text-muted-foreground shadow-2xl backdrop-blur-md">
-          არცერთი საჯარო პროფილი არ მოიძებნა
+          {en ? "No public profiles found" : "არცერთი საჯარო პროფილი არ მოიძებნა"}
         </div>
       )}
     </div>

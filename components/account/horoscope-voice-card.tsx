@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { setHoroscopeVoice } from "@/actions/horoscope-voice";
 import { HOROSCOPE_VOICES, DEFAULT_VOICE_SLUG } from "@/lib/horoscope-voices";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const LS_KEY = "vivida_horoscope_voice";
 
-export function HoroscopeVoiceCard({ initial }: { initial: string | null }) {
+export function HoroscopeVoiceCard({ initial, locale = "ka" }: { initial: string | null; locale?: UserLocale }) {
+  const en = locale === "en";
   const start = initial ?? DEFAULT_VOICE_SLUG;
   const [voice, setVoice] = useState(start);
   const [savedAt, setSavedAt] = useState<number | null>(null);
@@ -36,10 +38,10 @@ export function HoroscopeVoiceCard({ initial }: { initial: string | null }) {
       <header className="mb-5">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           <Headphones className="size-5 text-[var(--vivida-violet)]" />
-          ჰოროსკოპის ხმა
+          {en ? "Horoscope voice" : "ჰოროსკოპის ხმა"}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          რომელი ხმით მოგისმინო დღევანდელი ჰოროსკოპი.
+          {en ? "Choose the voice for your daily horoscope." : "რომელი ხმით მოგისმინო დღევანდელი ჰოროსკოპი."}
         </p>
       </header>
 
@@ -59,8 +61,8 @@ export function HoroscopeVoiceCard({ initial }: { initial: string | null }) {
               )}
             >
               <div className="min-w-0">
-                <div className="text-sm font-medium">{v.labelKa}</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">{v.descKa}</div>
+                <div className="text-sm font-medium">{en ? v.labelEn : v.labelKa}</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">{en ? v.descEn : v.descKa}</div>
               </div>
               {on && <Check className="size-5 shrink-0 text-[var(--vivida-cyan)]" />}
             </button>
@@ -70,10 +72,10 @@ export function HoroscopeVoiceCard({ initial }: { initial: string | null }) {
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="text-xs text-muted-foreground">
-          {savedAt && !isPending && !dirty && "შენახულია ✓"}
+          {savedAt && !isPending && !dirty && (en ? "Saved ✓" : "შენახულია ✓")}
         </div>
         <Button type="button" onClick={onSave} disabled={isPending || !dirty} size="sm">
-          {isPending ? "ინახება…" : "შენახვა"}
+          {isPending ? (en ? "Saving…" : "ინახება…") : (en ? "Save" : "შენახვა")}
         </Button>
       </div>
     </div>

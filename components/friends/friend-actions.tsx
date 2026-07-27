@@ -11,6 +11,7 @@ import {
   removeFriend,
 } from "@/actions/friendship";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Inline action buttons used inside friend / request cards on /friends.
@@ -20,17 +21,20 @@ export function FriendActions({
   variant,
   otherUserId,
   otherUsername,
+  locale = "ka",
 }: {
   variant: "incoming" | "outgoing" | "friends";
   otherUserId: string;
   otherUsername: string | null;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [isPending, startTransition] = useTransition();
   const [removed, setRemoved] = useState(false);
 
   if (removed) {
     return (
-      <span className="text-xs text-muted-foreground">წაიშალა</span>
+      <span className="text-xs text-muted-foreground">{en ? "Removed" : "წაიშალა"}</span>
     );
   }
 
@@ -49,7 +53,7 @@ export function FriendActions({
             }
           >
             <Check className="size-3.5" />
-            მიიღე
+            {en ? "Accept" : "მიიღე"}
           </Button>
           <Button
             size="sm"
@@ -63,7 +67,7 @@ export function FriendActions({
             }
           >
             <X className="size-3.5" />
-            უარი
+            {en ? "Decline" : "უარი"}
           </Button>
         </>
       )}
@@ -80,7 +84,7 @@ export function FriendActions({
           }
         >
           <Clock className="size-3.5" />
-          გაუქმება
+          {en ? "Cancel" : "გაუქმება"}
         </Button>
       )}
       {variant === "friends" && (
@@ -89,7 +93,7 @@ export function FriendActions({
           variant="outline"
           disabled={isPending}
           onClick={() => {
-            const sure = window.confirm("მართლა წავშალოთ?");
+            const sure = window.confirm(en ? "Remove this friend?" : "მართლა წავშალოთ?");
             if (!sure) return;
             startTransition(async () => {
               await removeFriend(otherUserId, otherUsername);
@@ -98,7 +102,7 @@ export function FriendActions({
           }}
         >
           <UserMinus className="size-3.5" />
-          წაშლა
+          {en ? "Remove" : "წაშლა"}
         </Button>
       )}
     </div>

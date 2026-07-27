@@ -25,6 +25,7 @@ import { SuggestedPeopleRail } from "./suggested-people-rail";
 import { CREDIT_COST } from "@/lib/credits-config";
 import { WeeklyForecastCard } from "./weekly-forecast-card";
 import { WeeklyForecastLocked } from "./weekly-forecast-locked";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Dashboard content loaded after first paint via server actions. The page
@@ -37,11 +38,14 @@ export function DailyDashboard({
   userId,
   plan,
   savedVoice,
+  locale = "ka",
 }: {
   userId: string;
   plan: PlanId;
   savedVoice?: string | null;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const router = useRouter();
   const [core, setCore] = useState<DashboardCore | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +73,7 @@ export function DailyDashboard({
   if (error) {
     return (
       <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
-        ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი.
+        {en ? "Could not load. Please refresh the page." : "ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი."}
       </div>
     );
   }
@@ -93,7 +97,7 @@ export function DailyDashboard({
           case (the server skips the query), but we also guard the render so
           flipping the flag is the single switch. */}
       {SOCIAL_FEATURES.suggestedPeopleRail && (
-        <SuggestedPeopleRail suggestions={suggestions} />
+        <SuggestedPeopleRail suggestions={suggestions} locale={locale} />
       )}
 
       {/* AI cards stream in here behind skeletons so the page never blocks
@@ -107,18 +111,19 @@ export function DailyDashboard({
         weeklyUnlocked={weeklyUnlocked}
         balance={balance}
         savedVoice={savedVoice}
+        locale={locale}
       />
 
       <section>
         <header className="mb-3 flex items-baseline justify-between">
           <h2 className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            შენი დიდი სამეული
+            {en ? "Your big three" : "შენი დიდი სამეული"}
           </h2>
           <Link
             href="/report"
             className="text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            სრული რუკა →
+            {en ? "Full chart →" : "სრული რუკა →"}
           </Link>
         </header>
         <MiniBigThree chart={chart.data} />
@@ -128,16 +133,17 @@ export function DailyDashboard({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-lg font-semibold tracking-tight">
-              შენი სრული ნატალური რუკა
+              {en ? "Your complete natal chart" : "შენი სრული ნატალური რუკა"}
             </h3>
             <p className="mt-1 max-w-md text-sm text-muted-foreground">
-              ცის რუკის ბორბალი, AI ანალიზი, 12 სახლი, ასპექტები და ყველა
-              პლანეტა — დეტალურად, ერთად.
+              {en
+                ? "Chart wheel, AI analysis, twelve houses, aspects and every planet in one place. Detailed interpretations remain in Georgian."
+                : "ცის რუკის ბორბალი, AI ანალიზი, 12 სახლი, ასპექტები და ყველა პლანეტა — დეტალურად, ერთად."}
             </p>
           </div>
           <Button asChild variant="mystic" size="lg" className="shrink-0">
             <Link href="/report">
-              ნახე რუკა
+              {en ? "View chart" : "ნახე რუკა"}
               <ArrowRight className="size-4" />
             </Link>
           </Button>
@@ -161,6 +167,7 @@ function DashboardExtrasSection({
   balance,
   savedVoice,
   canAudio,
+  locale,
 }: {
   userId: string;
   plan: PlanId;
@@ -170,7 +177,9 @@ function DashboardExtrasSection({
   balance: number;
   canAudio: boolean;
   savedVoice?: string | null;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const [extras, setExtras] = useState<DashboardExtras | null>(null);
 
   useEffect(() => {
@@ -209,7 +218,7 @@ function DashboardExtrasSection({
     />
   ) : canDaily ? (
     <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
-      დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში.
+      {en ? "Today's horoscope is being prepared. Try again shortly." : "დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში."}
     </div>
   ) : null;
 

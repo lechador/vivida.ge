@@ -15,6 +15,7 @@ import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
 import { StreakChip } from "@/components/credits/streak-chip";
 import { getStreakProgress } from "@/lib/streak-credits";
 import { TESTS } from "@/lib/tests-catalog";
+import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 
 export const metadata = { title: "დღეს" };
 
@@ -25,7 +26,7 @@ export default async function DashboardPage() {
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     getCurrentPlan(user.id),
     db
-      .select({ horoscopeVoice: users.horoscopeVoice })
+      .select({ horoscopeVoice: users.horoscopeVoice, locale: users.interfaceLanguage })
       .from(users)
       .where(eq(users.id, user.id))
       .limit(1),
@@ -35,21 +36,23 @@ export default async function DashboardPage() {
     db.select({ id: bigFiveResults.id }).from(bigFiveResults).where(eq(bigFiveResults.userId, user.id)).limit(1),
     getStreakProgress(user.id),
   ]);
+  const locale = normalizeUserLocale(userRow?.locale);
+  const en = locale === "en";
 
   if (!profile?.dateOfBirth) {
     return (
       <AstroLockedMain
         plan={plan}
         active="today"
-        title="დღიური ჰოროსკოპი ნატალურ რუკას საჭიროებს"
-        description="შეავსე დაბადების მონაცემები და ყოველ დღე მიიღებ პერსონალურ ჰოროსკოპსა და ცის მიმოხილვას."
+        title={en ? "Your daily horoscope needs a natal chart" : "დღიური ჰოროსკოპი ნატალურ რუკას საჭიროებს"}
+        description={en ? "Add your birth details to receive a personalized horoscope and sky overview every day." : "შეავსე დაბადების მონაცემები და ყოველ დღე მიიღებ პერსონალურ ჰოროსკოპსა და ცის მიმოხილვას."}
         next="/dashboard"
       />
     );
   }
 
   const restricted = await isAccountRestricted(user.id);
-  const firstName = user.name?.split(" ")[0] ?? "ვარსკვლავო";
+  const firstName = user.name?.split(" ")[0] ?? (en ? "stargazer" : "ვარსკვლავო");
   const completed = new Set([
     ...(mbtiResult ? ["astro-mbti"] : []),
     ...(iqResult ? ["iq"] : []),
@@ -66,7 +69,7 @@ export default async function DashboardPage() {
   const suggestedTest = pool[seedValue % pool.length];
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_350/0.3),transparent_70%)]"
@@ -82,7 +85,7 @@ export default async function DashboardPage() {
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         {restricted && <RestrictedNotice />}
         <h1 className="mb-6 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-          სალამი,{" "}
+          {en ? "Hello," : "სალამი,"}{" "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
             {firstName}
           </span>
@@ -96,7 +99,7 @@ export default async function DashboardPage() {
 
         {/* Soft prompt to enable daily push — hides itself once enabled,
             unsupported, or dismissed. */}
-        <PushOptIn variant="banner" />
+        <PushOptIn variant="banner" locale={locale} />
 
         {/* DailyDashboard is a client component — it fetches the heavy AI
             data via a server action after first paint, so the response
@@ -106,6 +109,7 @@ export default async function DashboardPage() {
           userId={user.id}
           plan={plan}
           savedVoice={userRow?.horoscopeVoice ?? null}
+          locale={locale}
         />
 
         {suggestedTest && (

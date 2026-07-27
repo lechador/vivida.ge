@@ -6,6 +6,7 @@ import { Camera, Loader2, Star, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const MAX_PHOTOS = 6;
 // Server-side cap (after client-side recompression). Modern phone cameras
@@ -26,9 +27,12 @@ type PendingUpload = {
 
 export function PhotoUploader({
   initial,
+  locale = "ka",
 }: {
   initial: ServerPhoto[];
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [photos, setPhotos] = useState<ServerPhoto[]>(initial);
   const [pending, setPending] = useState<PendingUpload[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -86,7 +90,7 @@ export function PhotoUploader({
         const data = (await presignRes.json().catch(() => ({}))) as {
           error?: string;
         };
-        throw new Error(errorToMessage(data.error));
+        throw new Error(errorToMessage(data.error, locale));
       }
       const { photoId, uploadUrl, publicUrl } = (await presignRes.json()) as {
         photoId: string;
@@ -114,14 +118,14 @@ export function PhotoUploader({
             status: xhr.status,
             response: xhr.responseText?.slice(0, 500),
           });
-          reject(new Error(`ატვირთვა ვერ შესრულდა (${xhr.status})`));
+          reject(new Error(en ? `Upload failed (${xhr.status})` : `ატვირთვა ვერ შესრულდა (${xhr.status})`));
         };
         xhr.onerror = () => {
           // onerror with no status almost always means CORS preflight
           // rejection (R2 bucket CORS missing / not allowing this origin)
           // or a network drop.
           console.error("[photo-upload] R2 PUT network/CORS error");
-          reject(new Error("ქსელის შეცდომა — სცადე თავიდან"));
+          reject(new Error(en ? "Network error — please try again" : "ქსელის შეცდომა — სცადე თავიდან"));
         };
         xhr.open("PUT", uploadUrl);
         xhr.setRequestHeader("Content-Type", file.type);
@@ -148,7 +152,7 @@ export function PhotoUploader({
           ...data,
         });
         const reason = data?.error ?? `${finalRes.status}`;
-        throw new Error(`ვერ დადასტურდა ატვირთვა (${reason})`);
+        throw new Error(en ? `Could not verify upload (${reason})` : `ვერ დადასტურდა ატვირთვა (${reason})`);
       }
 
       finishLocal({ id: photoId, url: publicUrl, ready: true });
@@ -166,7 +170,7 @@ export function PhotoUploader({
 
     const room = MAX_PHOTOS - totalCount;
     if (room <= 0) {
-      setTopError("მაქსიმალური 6 ფოტო უკვე გყავს");
+      setTopError(en ? "You already have the maximum of 6 photos" : "მაქსიმალური 6 ფოტო უკვე გყავს");
       return;
     }
 
@@ -192,8 +196,8 @@ export function PhotoUploader({
 
     const msgs: string[] = [];
     if (unreadable > 0)
-      msgs.push("ფაილის ფორმატი არ იხსნება — სცადე JPEG ან PNG");
-    if (tooBig > 0) msgs.push("ფაილი 10 MB-ზე დიდია");
+      msgs.push(en ? "This file format cannot be opened — try JPEG or PNG" : "ფაილის ფორმატი არ იხსნება — სცადე JPEG ან PNG");
+    if (tooBig > 0) msgs.push(en ? "The file is larger than 10 MB" : "ფაილი 10 MB-ზე დიდია");
     if (msgs.length > 0) setTopError(msgs.join(" · "));
   }
 
@@ -219,7 +223,7 @@ export function PhotoUploader({
       });
       if (!res.ok) throw new Error(`promote failed (${res.status})`);
     } catch {
-      setTopError("მთავარი ფოტოს დაყენება ვერ მოხერხდა");
+      setTopError(en ? "Could not set the main photo" : "მთავარი ფოტოს დაყენება ვერ მოხერხდა");
     }
   }
 
@@ -257,12 +261,16 @@ export function PhotoUploader({
       <header className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">
-            {isEmpty ? "დაამატე შენი ფოტოები" : "ფოტოები"}
+            {en ? (isEmpty ? "Add your photos" : "Photos") : (isEmpty ? "დაამატე შენი ფოტოები" : "ფოტოები")}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {isEmpty
-              ? "პირველი ფოტო ხდება შენი მთავარი ნიღაბი — სხვები შენ აღმოგაჩენენ."
-              : "დაამატე 6-მდე ფოტო. პირველი ფოტო ხდება პროფილის ნიღაბი."}
+            {en
+              ? isEmpty
+                ? "Your first photo becomes your main profile image."
+                : "Add up to 6 photos. The first is your main profile image."
+              : isEmpty
+                ? "პირველი ფოტო ხდება შენი მთავარი ნიღაბი — სხვები შენ აღმოგაჩენენ."
+                : "დაამატე 6-მდე ფოტო. პირველი ფოტო ხდება პროფილის ნიღაბი."}
           </p>
         </div>
         <span className="shrink-0 rounded-full border border-border bg-card/60 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -286,13 +294,13 @@ export function PhotoUploader({
             <Camera className="size-7 text-[var(--vivida-violet)]" />
           </span>
           <div>
-            <div className="text-base font-semibold">აირჩიე ან ჩააგდე ფოტო</div>
+            <div className="text-base font-semibold">{en ? "Choose or drop a photo" : "აირჩიე ან ჩააგდე ფოტო"}</div>
             <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-              JPEG · PNG · WebP — მობილურიდანაც. 6-მდე ფოტო ერთად.
+              {en ? "JPEG · PNG · WebP — including mobile photos. Up to 6 at once." : "JPEG · PNG · WebP — მობილურიდანაც. 6-მდე ფოტო ერთად."}
             </p>
           </div>
           <span className="mt-1 inline-flex items-center rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2 text-sm font-medium text-white shadow-lg shadow-[var(--vivida-violet)]/25">
-            ფაილის არჩევა
+            {en ? "Choose files" : "ფაილის არჩევა"}
           </span>
         </button>
       ) : (
@@ -304,6 +312,7 @@ export function PhotoUploader({
               isMain={i === 0}
               onDelete={() => deletePhoto(p.id)}
               onPromote={i === 0 ? null : () => promotePhoto(p.id)}
+              locale={locale}
             />
           ))}
           <AnimatePresence>
@@ -340,10 +349,10 @@ export function PhotoUploader({
                 )}
               />
               <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
-                დაამატე ფოტო
+                {en ? "Add photo" : "დაამატე ფოტო"}
               </span>
               <span className="text-[10px] text-muted-foreground/70">
-                {remaining} დარჩა
+                {en ? `${remaining} left` : `${remaining} დარჩა`}
               </span>
             </button>
           )}
@@ -370,7 +379,7 @@ export function PhotoUploader({
 
       {!isEmpty && (
         <p className="mt-4 text-xs text-muted-foreground">
-          JPEG · PNG · WebP — მობილურიდან ავტომატურად მცირდება
+          {en ? "JPEG · PNG · WebP — mobile photos are resized automatically" : "JPEG · PNG · WebP — მობილურიდან ავტომატურად მცირდება"}
         </p>
       )}
     </div>
@@ -382,12 +391,15 @@ function PhotoTile({
   isMain,
   onDelete,
   onPromote,
+  locale,
 }: {
   url: string;
   isMain: boolean;
   onDelete: () => void;
   onPromote: (() => void) | null;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   return (
     <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-border ring-1 ring-foreground/5">
       <Image
@@ -400,7 +412,7 @@ function PhotoTile({
       <button
         type="button"
         onClick={onDelete}
-        aria-label="წაშლა"
+        aria-label={en ? "Delete" : "წაშლა"}
         className="absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-black/70 text-white backdrop-blur transition-opacity hover:bg-black/85 sm:opacity-0 sm:group-hover:opacity-100"
       >
         <X className="size-3.5" />
@@ -408,17 +420,17 @@ function PhotoTile({
       {isMain ? (
         <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-violet)]/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
           <Star className="size-3 fill-white" />
-          მთავარი
+          {en ? "Main" : "მთავარი"}
         </span>
       ) : onPromote ? (
         <button
           type="button"
           onClick={onPromote}
-          aria-label="მთავარ ფოტოდ დაყენება"
+          aria-label={en ? "Set as main photo" : "მთავარ ფოტოდ დაყენება"}
           className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur transition-colors hover:bg-[var(--vivida-violet)]/90"
         >
           <Star className="size-3" />
-          მთავარი გახადე
+          {en ? "Make main" : "მთავარი გახადე"}
         </button>
       ) : null}
     </div>
@@ -513,19 +525,20 @@ async function decodeViaImg(file: File): Promise<ImageBitmap> {
   }
 }
 
-function errorToMessage(code: string | undefined): string {
+function errorToMessage(code: string | undefined, locale: UserLocale): string {
+  const en = locale === "en";
   switch (code) {
     case "limit_reached":
-      return "მაქსიმალური 6 ფოტო უკვე გყავს";
+      return en ? "You already have the maximum of 6 photos" : "მაქსიმალური 6 ფოტო უკვე გყავს";
     case "invalid_type":
-      return "ფაილის ფორმატი არასწორია";
+      return en ? "Invalid file format" : "ფაილის ფორმატი არასწორია";
     case "too_large":
-      return "ფაილი 5 MB-ზე დიდია";
+      return en ? "The file is larger than 5 MB" : "ფაილი 5 MB-ზე დიდია";
     case "storage_not_configured":
-      return "შენახვა ჯერ არ არის ჩართული";
+      return en ? "Photo storage is not configured" : "შენახვა ჯერ არ არის ჩართული";
     case "unauthorized":
-      return "გთხოვ, ხელახლა შემოდი";
+      return en ? "Please sign in again" : "გთხოვ, ხელახლა შემოდი";
     default:
-      return "ატვირთვის შეცდომა";
+      return en ? "Upload error" : "ატვირთვის შეცდომა";
   }
 }
