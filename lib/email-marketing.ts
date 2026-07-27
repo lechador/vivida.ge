@@ -28,9 +28,9 @@ function resolveFrom(envVal: string | undefined, fallback: string): string {
 }
 
 const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <hello@vivida.ge>");
-// Default to production so emails never ship localhost links when APP_ORIGIN
-// is unset (e.g. Vercel cron). Local dev sets APP_ORIGIN to override.
-const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
+// Email links must always use the public production site. APP_ORIGIN is often
+// localhost in local admin/dev sessions and must never leak into a real send.
+const ORIGIN = process.env.EMAIL_ORIGIN ?? "https://vivida.ge";
 
 function absUrl(path: string): string {
   return `${ORIGIN.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
@@ -161,7 +161,23 @@ async function pMap<T, R>(
 
 export async function sendBulk(opts: SendOptions): Promise<SendResult> {
   const c = client();
-  const audience = await resolveAudience(opts.template);
+  let audience = await resolveAudience(opts.template);
+  // Marketing campaigns can outlive a server/request window. Make retries
+  // resumable by excluding every recipient already attempted for the same
+  // subject, so a partial retry never duplicates accepted deliveries.
+  if (opts.template === "marketing" && opts.subject?.trim()) {
+    const attempted = await db
+      .select({ userId: emailSendLog.userId })
+      .from(emailSendLog)
+      .where(
+        and(
+          eq(emailSendLog.kind, "marketing"),
+          eq(emailSendLog.subject, opts.subject.trim())
+        )
+      );
+    const attemptedIds = new Set(attempted.map((row) => row.userId));
+    audience = audience.filter((recipient) => !attemptedIds.has(recipient.userId));
+  }
   if (opts.dryRun || !c) {
     return {
       audienceTotal: audience.length,
@@ -190,6 +206,24 @@ export async function sendBulk(opts: SendOptions): Promise<SendResult> {
   });
 
   return { audienceTotal: audience.length, sent, skipped, failed };
+}
+
+/** Send one real marketing preview without resolving or touching the bulk audience. */
+export async function sendMarketingTestEmail(
+  to: string,
+  opts: Omit<SendOptions, "template" | "dryRun">
+): Promise<boolean> {
+  const [recipient] = await db
+    .select({ userId: users.id, email: users.email, name: users.name })
+    .from(users)
+    .where(eq(users.email, to.trim().toLowerCase()))
+    .limit(1);
+  if (!recipient?.email) throw new Error("test recipient is not a registered user");
+  return dispatch(
+    { ...opts, template: "marketing" },
+    { userId: recipient.userId, email: recipient.email, name: recipient.name },
+    `marketing-test:new-tests:${recipient.userId}`
+  );
 }
 
 /**

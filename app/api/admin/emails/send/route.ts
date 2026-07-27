@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   audienceCount,
   sendBulk,
+  sendMarketingTestEmail,
   type EmailTemplateKind,
 } from "@/lib/email-marketing";
 
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
     ctaLabel?: string;
     ctaUrl?: string;
     dryRun?: boolean;
+    testEmail?: string;
   } | null;
 
   if (!body || typeof body.template !== "string") {
@@ -82,6 +84,16 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+  }
+
+  if (template === "marketing" && body.testEmail?.trim()) {
+    const sent = await sendMarketingTestEmail(body.testEmail, {
+      subject: body.subject,
+      body: body.body,
+      ctaLabel: body.ctaLabel ?? null,
+      ctaUrl: body.ctaUrl ?? null,
+    });
+    return NextResponse.json({ testEmail: body.testEmail, sent });
   }
 
   const result = await sendBulk({

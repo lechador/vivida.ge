@@ -241,3 +241,39 @@ export async function updatePublicProfileCore(
 
   return { ok: true, username };
 }
+
+export type AccountSettingsInput = {
+  /** Discovery opt-out toggle. */
+  discoverable?: boolean;
+  /** Self-reported sex; only 'male' | 'female' are accepted. */
+  gender?: "male" | "female";
+};
+
+/**
+ * Update lightweight account/privacy settings (discoverability + self-reported
+ * gender) in one call. Only fields that are present are written; gender is
+ * always stamped source='self' so the AI name-inference backfill never
+ * overwrites it. Upserts the profile row so a user who registered without
+ * birth data still gets one. Backs the mobile PATCH /api/v1/me/settings
+ * endpoint; mirrors the website's setDiscoverable / updateGender Server
+ * Actions.
+ */
+export async function updateAccountSettingsCore(
+  userId: string,
+  input: AccountSettingsInput
+): Promise<void> {
+  const set: Partial<typeof profiles.$inferInsert> = {};
+  if (typeof input.discoverable === "boolean") {
+    set.discoverable = input.discoverable;
+  }
+  if (input.gender === "male" || input.gender === "female") {
+    set.gender = input.gender;
+    set.genderSource = "self";
+  }
+  if (Object.keys(set).length === 0) return;
+  set.updatedAt = new Date();
+  await db
+    .insert(profiles)
+    .values({ userId, ...set })
+    .onConflictDoUpdate({ target: profiles.userId, set });
+}
