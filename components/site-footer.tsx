@@ -17,6 +17,8 @@ const LEARN_LINKS = [
   { href: "/zodiac/elementebi", label: "ელემენტები" },
   { href: "/zodiac/tavsebadoba", label: "თავსებადობა" },
   { href: "/zodiac/gzamkvlevi", label: "სრული გზამკვლევი" },
+  { href: "/astrologiuri-saxlebi", label: "ასტროლოგიური სახლები" },
+  { href: "/planetebi", label: "პლანეტები" },
 ];
 
 const TOOL_LINKS = [

@@ -23,6 +23,7 @@ import {
 import { calendarWindow } from "@/lib/seo/astrology-calendar";
 import { ECLIPSES, moonEvents } from "@/lib/seo/moon-events";
 import { CORE_LANGUAGE_PAIRS } from "@/lib/seo/locales";
+import { HOUSE_NUMBERS, PLANET_SLUGS } from "@/lib/seo/astrology-guides";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -45,6 +46,7 @@ const NOW = new Date();
 const EVERGREEN = new Date("2026-07-13");
 const CONTENT_PUBLISHED = new Date("2026-07-20");
 const ENGLISH_PUBLISHED = new Date("2026-07-27");
+const ASTROLOGY_GUIDES_PUBLISHED = new Date("2026-07-27");
 
 const VIEW_CHANGE_FREQ: Record<
   (typeof ALL_HOROSCOPE_VIEWS)[number],
@@ -385,6 +387,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.85,
     },
+    {
+      url: `${BASE}/astrologiuri-saxlebi`,
+      lastModified: ASTROLOGY_GUIDES_PUBLISHED,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    ...HOUSE_NUMBERS.map((number) => ({
+      url: `${BASE}/astrologiuri-saxlebi/${number}`,
+      lastModified: ASTROLOGY_GUIDES_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    {
+      url: `${BASE}/planetebi`,
+      lastModified: ASTROLOGY_GUIDES_PUBLISHED,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    ...PLANET_SLUGS.map((planet) => ({
+      url: `${BASE}/planetebi/${planet}`,
+      lastModified: ASTROLOGY_GUIDES_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     {
       url: `${BASE}/features`,
       lastModified: EVERGREEN,
