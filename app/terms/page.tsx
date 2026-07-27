@@ -1,10 +1,12 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 export const metadata = {
   title: "წესები და პირობები",
   description:
     "Vivida-ს გამოყენების წესები და პირობები — სამომხმარებლო ხელშეკრულება.",
+  alternates: localizedAlternates("/terms", "/en/terms", "ka"),
 };
 
 const LAST_UPDATED = "2026-05-04";

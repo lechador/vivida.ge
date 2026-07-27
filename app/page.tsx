@@ -15,6 +15,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteSearch } from "@/components/search/site-search";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -33,9 +34,7 @@ export const metadata: Metadata = {
   },
   description:
     "ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა — შენი დაბადების ზუსტი მომენტის მიხედვით. შექმენი შენი რუკა უფასოდ, ქართულად.",
-  alternates: {
-    canonical: SITE_URL,
-  },
+  alternates: localizedAlternates("", "/en", "ka"),
   openGraph: {
     title: "ნატალური რუკა და ჰოროსკოპი ქართულად — Vivida",
     description:
@@ -69,7 +68,7 @@ const ORGANIZATION_LD = {
     "@type": "ContactPoint",
     email: "hello@vivida.ge",
     contactType: "customer support",
-    availableLanguage: ["Georgian", "ka"],
+    availableLanguage: ["Georgian", "English", "ka", "en"],
   },
 };
 
@@ -159,6 +158,14 @@ export default async function Home() {
                 ფუნქციები
               </Link>
             </nav>
+            <Link
+              href="/en"
+              hrefLang="en"
+              className="rounded-full border border-border/70 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              aria-label="English version"
+            >
+              EN
+            </Link>
             <Link
               href="/login"
               className="group relative inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-cyan)]/45 bg-[var(--vivida-cyan)]/8 px-4 py-1.5 text-sm font-medium text-[var(--vivida-cyan)] transition-all hover:border-[var(--vivida-cyan)]/70 hover:bg-[var(--vivida-cyan)]/14 hover:text-foreground"

@@ -20,6 +20,7 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac";
@@ -27,7 +28,7 @@ const PATH = "/zodiac";
 export const metadata: Metadata = {
   title: { absolute: HUB_CONTENT.pageTitle },
   description: HUB_CONTENT.metaDescription,
-  alternates: { canonical: `${SITE_URL}${PATH}` },
+  alternates: localizedAlternates(PATH, "/en/zodiac", "ka"),
   openGraph: {
     type: "website",
     url: `${SITE_URL}${PATH}`,

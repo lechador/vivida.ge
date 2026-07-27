@@ -22,6 +22,7 @@ import {
 } from "@/lib/seo/thematic-horoscope";
 import { calendarWindow } from "@/lib/seo/astrology-calendar";
 import { ECLIPSES, moonEvents } from "@/lib/seo/moon-events";
+import { CORE_LANGUAGE_PAIRS } from "@/lib/seo/locales";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -43,6 +44,7 @@ const NOW = new Date();
 /** Bump when evergreen cluster content meaningfully changes. */
 const EVERGREEN = new Date("2026-07-13");
 const CONTENT_PUBLISHED = new Date("2026-07-20");
+const ENGLISH_PUBLISHED = new Date("2026-07-27");
 
 const VIEW_CHANGE_FREQ: Record<
   (typeof ALL_HOROSCOPE_VIEWS)[number],
@@ -193,7 +195,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 
-  return [
+  const georgianPages: MetadataRoute.Sitemap = [
     {
       url: `${BASE}/`,
       lastModified: EVERGREEN,
@@ -479,4 +481,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
   ];
+
+  const pairByKaPath = new Map(CORE_LANGUAGE_PAIRS.map((pair) => [pair.ka, pair]));
+  const georgianWithAlternates = georgianPages.map((entry) => {
+    const path = new URL(entry.url).pathname;
+    const pair = pairByKaPath.get(path);
+    if (!pair) return entry;
+    return {
+      ...entry,
+      alternates: {
+        languages: {
+          "ka-GE": `${BASE}${pair.ka}`,
+          en: `${BASE}${pair.en}`,
+          "x-default": `${BASE}${pair.ka}`,
+        },
+      },
+    };
+  });
+
+  const englishPages: MetadataRoute.Sitemap = [
+    ...CORE_LANGUAGE_PAIRS.map((pair) => ({
+      url: `${BASE}${pair.en}`,
+      lastModified: ENGLISH_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: pair.en === "/en" ? 0.9 : 0.7,
+      alternates: {
+        languages: {
+          "ka-GE": `${BASE}${pair.ka}`,
+          en: `${BASE}${pair.en}`,
+          "x-default": `${BASE}${pair.ka}`,
+        },
+      },
+    })),
+    {
+      url: `${BASE}/en/about`,
+      lastModified: ENGLISH_PUBLISHED,
+      changeFrequency: "yearly",
+      priority: 0.5,
+      alternates: { languages: { en: `${BASE}/en/about`, "x-default": `${BASE}/` } },
+    },
+  ];
+
+  return [...georgianWithAlternates, ...englishPages];
 }

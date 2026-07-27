@@ -1,10 +1,12 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 export const metadata = {
   title: "კონფიდენციალურობა",
   description:
     "Vivida-ს კონფიდენციალურობის პოლიტიკა — როგორ ვაგროვებთ და ვინახავთ თქვენს მონაცემებს.",
+  alternates: localizedAlternates("/privacy", "/en/privacy", "ka"),
 };
 
 const LAST_UPDATED = "2026-05-04";

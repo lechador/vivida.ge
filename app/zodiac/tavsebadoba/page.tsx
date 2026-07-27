@@ -22,6 +22,7 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { COMPAT_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/tavsebadoba";
@@ -36,7 +37,7 @@ export const metadata: Metadata = COMPATIBILITY_HUB_CONTENT
   ? {
       title: { absolute: COMPATIBILITY_HUB_CONTENT.pageTitle },
       description: COMPATIBILITY_HUB_CONTENT.metaDescription,
-      alternates: { canonical: `${SITE_URL}${PATH}` },
+      alternates: localizedAlternates(PATH, "/en/compatibility", "ka"),
       openGraph: {
         type: "website",
         url: `${SITE_URL}${PATH}`,

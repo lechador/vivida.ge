@@ -32,6 +32,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -66,7 +67,7 @@ export const metadata: Metadata = {
     "ქვიზი ქართულად",
     "ზოდიაქოს ქვიზი",
   ],
-  alternates: { canonical: `${SITE_URL}/tests` },
+  alternates: localizedAlternates("/tests", "/en/tests", "ka"),
   openGraph: {
     type: "website",
     url: `${SITE_URL}/tests`,

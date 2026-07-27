@@ -7,6 +7,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PublicNatalCalculator } from "@/components/calculator/public-natal-calculator";
 import { signByIndex } from "@/lib/zodiac";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/nataluri-ruka`;
@@ -33,7 +34,7 @@ const BASE_META: Metadata = {
   description:
     "ნატალური რუკის ონლაინ გამოთვლა უფასოდ. შეიყვანე დაბადების თარიღი, დრო და ადგილი — მიიღე პლანეტების ზუსტი პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები ქართულად, რეგისტრაციის გარეშე.",
   keywords: KEYWORDS,
-  alternates: { canonical: URL },
+  alternates: localizedAlternates("/nataluri-ruka", "/en/natal-chart", "ka"),
   openGraph: {
     type: "website",
     url: URL,

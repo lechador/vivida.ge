@@ -1,0 +1,64 @@
+import Link from "next/link";
+
+import { VividaMark } from "@/components/brand/vivida-mark";
+
+const NAV = [
+  { href: "/en/natal-chart", label: "Natal chart" },
+  { href: "/en/horoscope", label: "Horoscope" },
+  { href: "/en/zodiac", label: "Zodiac" },
+  { href: "/en/tests", label: "Tests" },
+];
+
+export function EnglishHeader({ georgianPath = "/" }: { georgianPath?: string }) {
+  return (
+    <header className="relative z-20 border-b border-border/30 bg-background/45 backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+        <Link href="/en" className="flex shrink-0 items-center gap-2.5" aria-label="Vivida English home">
+          <VividaMark size={38} id="english-header" />
+          <span
+            className="bg-clip-text text-lg font-semibold tracking-tight text-transparent sm:text-xl"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+            }}
+          >
+            vivida
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-5 text-sm text-muted-foreground lg:flex" aria-label="English navigation">
+          {NAV.map((item) => (
+            <Link key={item.href} href={item.href} className="transition-colors hover:text-foreground">
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href={georgianPath}
+            hrefLang="ka-GE"
+            className="rounded-full border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+            aria-label="Switch to Georgian"
+          >
+            ქართული
+          </Link>
+          <Link
+            href="/login"
+            className="rounded-full border border-[var(--vivida-cyan)]/45 bg-[var(--vivida-cyan)]/8 px-3.5 py-1.5 text-sm font-medium text-[var(--vivida-cyan)] transition-colors hover:bg-[var(--vivida-cyan)]/14 hover:text-foreground"
+          >
+            Sign in
+          </Link>
+        </div>
+      </div>
+
+      <nav className="mx-auto flex w-full max-w-7xl gap-4 overflow-x-auto px-4 pb-3 text-xs text-muted-foreground lg:hidden" aria-label="English mobile navigation">
+        {NAV.map((item) => (
+          <Link key={item.href} href={item.href} className="shrink-0 hover:text-foreground">
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+    </header>
+  );
+}

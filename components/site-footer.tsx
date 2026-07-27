@@ -33,6 +33,7 @@ const TOOL_LINKS = [
 const LEGAL_LINKS = [
   { href: "/terms", label: "წესები და პირობები" },
   { href: "/privacy", label: "კონფიდენციალურობა" },
+  { href: "/en", label: "English" },
 ];
 
 /**

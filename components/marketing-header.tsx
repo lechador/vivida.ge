@@ -21,6 +21,17 @@ export function MarketingHeader({
     | "taro"
     | "tests";
 }) {
+  const englishHref =
+    active === "nataluri-ruka"
+      ? "/en/natal-chart"
+      : active === "horoskopi"
+        ? "/en/horoscope"
+        : active === "zodiac"
+          ? "/en/zodiac"
+          : active === "tests"
+            ? "/en/tests"
+            : "/en";
+
   const link = (href: string, label: string, key: typeof active) => (
     <Link
       href={href}
@@ -65,6 +76,15 @@ export function MarketingHeader({
           {link("/tests", "ტესტები", "tests")}
           {link("/zodiac", "ზოდიაქო", "zodiac")}
         </nav>
+
+        <Link
+          href={englishHref}
+          hrefLang="en"
+          className="rounded-full border border-border/70 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          aria-label="English version"
+        >
+          EN
+        </Link>
 
         <MarketingCta />
       </div>

@@ -23,6 +23,7 @@ import {
   signMetaBySlug,
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -59,7 +60,7 @@ export const metadata: Metadata = {
     "horoskopi qartulad",
     "zodiaqos nishnebi",
   ],
-  alternates: { canonical: `${SITE_URL}/horoskopi` },
+  alternates: localizedAlternates("/horoskopi", "/en/horoscope", "ka"),
   openGraph: {
     type: "website",
     url: `${SITE_URL}/horoskopi`,
