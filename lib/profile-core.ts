@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { ageFromDob } from "@/lib/profile-utils";
 import { qualifyReferral } from "@/lib/referral";
+import { completeEligibleEmailCampaigns } from "@/lib/email-campaigns";
 
 /**
  * Framework-agnostic profile *write* logic, shared by the website (Server
@@ -180,6 +181,9 @@ export async function saveBirthDataCore(
   } catch {
     /* referral payout is best-effort */
   }
+
+  // Attribute the conversion and pay any promised campaign reward once.
+  await completeEligibleEmailCampaigns(userId);
 
   return { ok: true };
 }

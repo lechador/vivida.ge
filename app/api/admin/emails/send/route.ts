@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import {
   audienceCount,
+  ensureBirthDetailsCampaign,
+  sendBirthDetailsCampaignTest,
   sendBulk,
   sendMarketingTestEmail,
   type EmailTemplateKind,
@@ -54,6 +56,7 @@ export async function POST(req: NextRequest) {
     ctaUrl?: string;
     dryRun?: boolean;
     testEmail?: string;
+    campaign?: boolean;
   } | null;
 
   if (!body || typeof body.template !== "string") {
@@ -96,12 +99,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ testEmail: body.testEmail, sent });
   }
 
+  if (template === "profile_incomplete" && body.testEmail?.trim()) {
+    const sent = await sendBirthDetailsCampaignTest(body.testEmail);
+    return NextResponse.json({ testEmail: body.testEmail, sent });
+  }
+
+  const campaign =
+    template === "profile_incomplete" && body.campaign === true
+      ? await ensureBirthDetailsCampaign()
+      : null;
+
   const result = await sendBulk({
     template,
     subject: body.subject,
     body: body.body,
     ctaLabel: body.ctaLabel ?? null,
     ctaUrl: body.ctaUrl ?? null,
+    campaignId: campaign?.id,
   });
   return NextResponse.json(result);
 }

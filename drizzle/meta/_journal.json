@@ -421,6 +421,20 @@
       "when": 1785167158066,
       "tag": "0059_damp_chameleon",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1785258036260,
+      "tag": "0060_dizzy_elektra",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1785258227483,
+      "tag": "0061_workable_leopardon",
+      "breakpoints": true
     }
   ]
 }

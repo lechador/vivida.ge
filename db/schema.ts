@@ -812,6 +812,49 @@ export const emailSendLog = pgTable(
   ]
 );
 
+/** Admin-created lifecycle/marketing sends whose conversion can be measured. */
+export const emailCampaigns = pgTable("email_campaign", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  slug: text("slug").notNull().unique(),
+  name: text("name").notNull(),
+  template: text("template").notNull(),
+  subject: text("subject").notNull(),
+  body: text("body"),
+  ctaLabel: text("cta_label"),
+  ctaUrl: text("cta_url"),
+  rewardCredits: integer("reward_credits").notNull().default(0),
+  status: text("status").notNull().default("draft"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  launchedAt: timestamp("launched_at", { withTimezone: true }),
+});
+
+/** One row per addressed user; completed_at is the campaign conversion event. */
+export const emailCampaignRecipients = pgTable(
+  "email_campaign_recipient",
+  {
+    campaignId: text("campaign_id")
+      .notNull()
+      .references(() => emailCampaigns.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    isTest: boolean("is_test").notNull().default(false),
+    status: text("status").notNull().default("pending"),
+    error: text("error"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    rewardedAt: timestamp("rewarded_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.campaignId, t.userId] }),
+    index("email_campaign_recipient_user_idx").on(t.userId, t.completedAt),
+  ]
+);
+
 /**
  * Globally-cached moon phase + Gemini interpretation, one row per UTC date.
  * Universal (not per-user) — the moon's phase + sign is the same for everyone

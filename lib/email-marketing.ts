@@ -2,7 +2,14 @@ import { Resend } from "resend";
 import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { dailyEmailLog, emailSendLog, profiles, users } from "@/db/schema";
+import {
+  dailyEmailLog,
+  emailCampaignRecipients,
+  emailCampaigns,
+  emailSendLog,
+  profiles,
+  users,
+} from "@/db/schema";
 import { acquireResendSlot } from "@/lib/resend-throttle";
 import { DailyHoroscopeEmail } from "@/lib/email-templates/daily-horoscope";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
@@ -53,6 +60,10 @@ export type SendOptions = {
   ctaUrl?: string | null;
   /** When true, resolve the audience but don't actually send. Returns counts only. */
   dryRun?: boolean;
+  /** Persist recipients and conversions under this campaign. */
+  campaignId?: string;
+  /** Preview sends must render even when the test account already has a profile. */
+  allowCompletedProfile?: boolean;
 };
 
 export type SendResult = {
@@ -135,6 +146,29 @@ async function resolveAudience(
     );
 }
 
+export const BIRTH_DETAILS_CAMPAIGN_SLUG = "birth-details-50-credits-2026";
+
+export async function ensureBirthDetailsCampaign(): Promise<{ id: string }> {
+  const [campaign] = await db
+    .insert(emailCampaigns)
+    .values({
+      slug: BIRTH_DETAILS_CAMPAIGN_SLUG,
+      name: "Birth details · 50 credits",
+      template: "profile_incomplete",
+      subject: "შეავსე დაბადების დეტალები და მიიღე 50 კრედიტი",
+      rewardCredits: 50,
+      status: "draft",
+      ctaLabel: "შეავსე მონაცემები",
+      ctaUrl: "/onboarding",
+    })
+    .onConflictDoUpdate({
+      target: emailCampaigns.slug,
+      set: { rewardCredits: 50 },
+    })
+    .returning({ id: emailCampaigns.id });
+  return campaign;
+}
+
 /**
  * Send-with-concurrency-cap. Resend's free tier rate-limits at 2 req/s,
  * but the paid tier accepts much more. We default to 5 concurrent
@@ -193,6 +227,13 @@ export async function sendBulk(opts: SendOptions): Promise<SendResult> {
 
   await pMap(audience, async (recipient) => {
     try {
+      if (opts.campaignId) {
+        await db.insert(emailCampaignRecipients).values({
+          campaignId: opts.campaignId,
+          userId: recipient.userId,
+          email: recipient.email,
+        }).onConflictDoNothing();
+      }
       const dispatched = await dispatch(opts, recipient);
       if (dispatched) sent++;
       else skipped++;
@@ -206,6 +247,32 @@ export async function sendBulk(opts: SendOptions): Promise<SendResult> {
   });
 
   return { audienceTotal: audience.length, sent, skipped, failed };
+}
+
+/** Send the birth-details incentive only to the explicit test recipient. */
+export async function sendBirthDetailsCampaignTest(to: string): Promise<boolean> {
+  const [recipient] = await db
+    .select({ userId: users.id, email: users.email, name: users.name })
+    .from(users)
+    .where(eq(users.email, to.trim().toLowerCase()))
+    .limit(1);
+  if (!recipient?.email) throw new Error("test recipient is not a registered user");
+  const testRecipient: Recipient = { ...recipient, email: recipient.email };
+  const campaign = await ensureBirthDetailsCampaign();
+  await db.insert(emailCampaignRecipients).values({
+    campaignId: campaign.id,
+    userId: recipient.userId,
+    email: recipient.email,
+    isTest: true,
+  }).onConflictDoUpdate({
+    target: [emailCampaignRecipients.campaignId, emailCampaignRecipients.userId],
+    set: { email: recipient.email },
+  });
+  return dispatch(
+    { template: "profile_incomplete", campaignId: campaign.id, allowCompletedProfile: true },
+    testRecipient,
+    `campaign:${campaign.id}:${recipient.userId}`
+  );
 }
 
 /** Send one real marketing preview without resolving or touching the bulk audience. */
@@ -295,15 +362,18 @@ async function dispatch(
       .from(profiles)
       .where(eq(profiles.userId, recipient.userId))
       .limit(1);
-    if (profile?.dateOfBirth) return false; // user just completed onboarding
+    if (profile?.dateOfBirth && !opts.allowCompletedProfile) return false;
 
     const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`);
     const onboardingUrl = absUrl("/onboarding");
+    const subject = opts.campaignId
+      ? "შეავსე დაბადების დეტალები და მიიღე 50 კრედიტი"
+      : "შენი ნატალური რუკა გელოდება — დაასრულე რეგისტრაცია";
     await acquireResendSlot();
     const result = await c.emails.send({
       from: FROM,
       to: recipient.email,
-      subject: "შენი ნატალური რუკა გელოდება — დაასრულე რეგისტრაცია",
+      subject,
       react: ProfileIncompleteEmail({
         name: recipient.name?.split(" ")[0] ?? null,
         onboardingUrl,
@@ -313,12 +383,22 @@ async function dispatch(
         "List-Unsubscribe": `<${unsubUrl}>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
-    });
+    }, idempotencyKey ? { idempotencyKey } : undefined);
+    if (opts.campaignId) {
+      await db.update(emailCampaignRecipients).set({
+        status: result.error ? "failed" : "sent",
+        error: result.error?.message ?? null,
+        sentAt: result.error ? null : new Date(),
+      }).where(and(
+        eq(emailCampaignRecipients.campaignId, opts.campaignId),
+        eq(emailCampaignRecipients.userId, recipient.userId)
+      ));
+    }
     await logToUnifiedSendLog(
       recipient.userId,
       "profile_incomplete",
       recipient.email,
-      "შენი ნატალური რუკა გელოდება — დაასრულე რეგისტრაცია",
+      subject,
       result.error?.message
     );
     if (result.error) throw new Error(result.error.message ?? "send failed");

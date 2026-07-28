@@ -1,0 +1,1 @@
+ALTER TABLE "email_campaign_recipient" ADD COLUMN "is_test" boolean DEFAULT false NOT NULL;
