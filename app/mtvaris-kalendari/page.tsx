@@ -1,344 +1,295 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Moon, Sparkles } from "lucide-react";
+import { ArrowRight, Moon, Sparkles } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Starfield } from "@/components/landing/starfield";
 import { ReportPromo } from "@/components/report/report-promo";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
-import { Starfield } from "@/components/landing/starfield";
-import { articleLd, breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
-import { computeMoonPhase, type MoonPhaseSnapshot } from "@/lib/moon-phase";
-import { ALL_SLUGS, signMetaBySlug } from "@/lib/seo/zodiac-dates";
-import { signColor } from "@/lib/zodiac";
+import { Button } from "@/components/ui/button";
+import { computeMoonPhase, type MoonPhaseSnapshot, type PhaseKey } from "@/lib/moon-phase";
+import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
+const PAGE_URL = `${SITE_URL}/mtvaris-kalendari`;
+const TBILISI_OFFSET_MS = 4 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-/**
- * 30-day moon calendar — universal data (geocentric moon longitudes),
- * so we can ISR it daily and serve from cache. The query
- * "მთვარის კალენდარი" is a high-volume recurring search with thin
- * Georgian-language competition; this page captures it.
- */
 export const revalidate = 86400;
 
-const TITLE = "მთვარის კალენდარი — მთვარის ფაზები და ნიშნები 30 დღეზე";
-const DESCRIPTION =
-  "მთვარის ფაზები, ნიშანი ყოველ დღეს, ახალი მთვარე, სავსე მთვარე და მეოთხედები — შემდეგი 30 დღის სრული მთვარის კალენდარი ქართულად. გაიგე როდის ხდება სავსე მთვარე და რომელ ნიშანშია.";
+const CURRENT_YEAR = new Date(Date.now() + TBILISI_OFFSET_MS).getUTCFullYear();
+const TITLE = `მთვარის კალენდარი ${CURRENT_YEAR} — ფაზა დღეს, ახალი და სავსე მთვარე`;
+const DESCRIPTION = `მთვარის კალენდარი ${CURRENT_YEAR}: გაიგე მთვარის ფაზა დღეს, განათება და ნიშანი; ნახე ახალი და სავსე მთვარის თარიღები საქართველოს დროით.`;
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
-  alternates: { canonical: `${SITE_URL}/mtvaris-kalendari` },
+  keywords: [
+    "მთვარის კალენდარი",
+    `მთვარის კალენდარი ${CURRENT_YEAR}`,
+    `მთვარის დღეების კალენდარი ${CURRENT_YEAR}`,
+    "მთვარე დღეს",
+    "მთვარის ფაზა დღეს",
+    "მთვარის ფაზები",
+    "ახალი მთვარის კალენდარი",
+    "ახალი მთვარე კალენდარი",
+    "სავსე მთვარის კალენდარი",
+    `სავსე მთვარე რომელ რიცხვშია ${CURRENT_YEAR}`,
+    "mtvaris kalendari",
+  ],
+  alternates: { canonical: PAGE_URL },
+  robots: { index: true, follow: true },
   openGraph: {
-    type: "article",
-    url: `${SITE_URL}/mtvaris-kalendari`,
+    type: "website",
+    url: PAGE_URL,
     title: TITLE,
     description: DESCRIPTION,
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
-  },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 const MONTHS_KA = [
   "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
   "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი",
 ];
-
-const WEEKDAYS_KA = [
-  "კვ", "ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ",
-];
-
-const PHASE_SYMBOL: Record<string, string> = {
-  new_moon: "🌑",
-  waxing_crescent: "🌒",
-  first_quarter: "🌓",
-  waxing_gibbous: "🌔",
-  full_moon: "🌕",
-  waning_gibbous: "🌖",
-  last_quarter: "🌗",
-  waning_crescent: "🌘",
+const WEEKDAYS_KA = ["კვ", "ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ"];
+const PHASE_SYMBOL: Record<PhaseKey, string> = {
+  new_moon: "🌑", waxing_crescent: "🌒", first_quarter: "🌓", waxing_gibbous: "🌔",
+  full_moon: "🌕", waning_gibbous: "🌖", last_quarter: "🌗", waning_crescent: "🌘",
 };
 
-const KEY_PHASES = new Set([
-  "new_moon",
-  "first_quarter",
-  "full_moon",
-  "last_quarter",
-]);
+type Day = { date: Date; snapshot: MoonPhaseSnapshot | null };
+type MajorEvent = { kind: "new" | "full"; date: Date; snapshot: MoonPhaseSnapshot };
 
-type Day = {
-  date: Date;
-  snapshot: MoonPhaseSnapshot | null;
-};
+function tbilisiParts(date: Date) {
+  const local = new Date(date.getTime() + TBILISI_OFFSET_MS);
+  return {
+    year: local.getUTCFullYear(), month: local.getUTCMonth(), day: local.getUTCDate(),
+    weekday: local.getUTCDay(), hour: local.getUTCHours(), minute: local.getUTCMinutes(),
+  };
+}
 
-export default async function MoonCalendarPage() {
-  const today = new Date();
-  today.setUTCHours(12, 0, 0, 0);
+function formatDateKa(date: Date, includeYear = true) {
+  const p = tbilisiParts(date);
+  return `${p.day} ${MONTHS_KA[p.month]}${includeYear ? ` ${p.year}` : ""}`;
+}
 
-  // 30-day window — current day + 29 forward. Two months max, never more
-  // than ~60 days of work for computeMoonPhase below.
-  const days: Day[] = [];
-  for (let i = 0; i < 30; i++) {
-    const d = new Date(today);
-    d.setUTCDate(d.getUTCDate() + i);
-    days.push({ date: d, snapshot: computeMoonPhase(d) });
+const SYNODIC_MONTH_MS = 29.530588853 * DAY_MS;
+const KNOWN_NEW_MOON_MS = Date.UTC(2000, 0, 6, 18, 14);
+
+function eventScore(snapshot: MoonPhaseSnapshot | null, kind: MajorEvent["kind"]) {
+  if (!snapshot) return -1;
+  return kind === "full" ? snapshot.illumination : 1 - snapshot.illumination;
+}
+
+/** Selects the strongest daily sample around a mean-lunation estimate. */
+function refineEvent(estimate: Date, kind: MajorEvent["kind"]) {
+  let best = estimate;
+  let bestScore = -1;
+  for (let offset = -2; offset <= 2; offset++) {
+    const candidate = new Date(estimate.getTime() + offset * DAY_MS);
+    const score = eventScore(computeMoonPhase(candidate), kind);
+    if (score > bestScore) { best = candidate; bestScore = score; }
   }
+  return best;
+}
 
-  // Pull out the upcoming "key" phases (new/full/quarters) to feature
-  // at the top. Crawlers love the explicit "next full moon" callout.
-  const keyEvents: Day[] = [];
-  let prevKey: string | null = null;
-  for (const d of days) {
-    const k = d.snapshot?.phaseKey;
-    if (!k) continue;
-    if (KEY_PHASES.has(k) && k !== prevKey) {
-      keyEvents.push(d);
-      prevKey = k;
-    } else if (!KEY_PHASES.has(k)) {
-      prevKey = null;
+/** Seeds each lunation from a known epoch, then refines it with project ephemerides. */
+function majorEventsForYears(startYear: number, endYear: number): MajorEvent[] {
+  const start = Date.UTC(startYear, 0, 1) - 2 * DAY_MS;
+  const end = Date.UTC(endYear + 1, 0, 1) + 2 * DAY_MS;
+  const firstCycle = Math.floor((start - KNOWN_NEW_MOON_MS) / SYNODIC_MONTH_MS) - 1;
+  const lastCycle = Math.ceil((end - KNOWN_NEW_MOON_MS) / SYNODIC_MONTH_MS) + 1;
+  const events: MajorEvent[] = [];
+  for (let cycle = firstCycle; cycle <= lastCycle; cycle++) {
+    for (const kind of ["new", "full"] as const) {
+      const offset = kind === "new" ? 0 : SYNODIC_MONTH_MS / 2;
+      const estimate = new Date(KNOWN_NEW_MOON_MS + cycle * SYNODIC_MONTH_MS + offset);
+      const date = refineEvent(estimate, kind);
+      const snapshot = computeMoonPhase(date);
+      const year = tbilisiParts(date).year;
+      if (snapshot && year >= startYear && year <= endYear) events.push({ kind, date, snapshot });
     }
   }
+  return events.sort((a, b) => a.date.getTime() - b.date.getTime());
+}
 
-  // Group days by month to render a clean header per chunk.
-  const months: Array<{ key: string; label: string; days: Day[] }> = [];
-  for (const d of days) {
-    const key = `${d.date.getUTCFullYear()}-${d.date.getUTCMonth()}`;
-    const last = months[months.length - 1];
-    if (last && last.key === key) {
-      last.days.push(d);
-    } else {
-      months.push({
-        key,
-        label: `${MONTHS_KA[d.date.getUTCMonth()]} ${d.date.getUTCFullYear()}`,
-        days: [d],
-      });
-    }
-  }
+function EventList({ events, label }: { events: MajorEvent[]; label: string }) {
+  return (
+    <ul aria-label={label} className="mt-5 grid gap-3 sm:grid-cols-2">
+      {events.map((event) => (
+        <li key={`${event.kind}-${event.date.toISOString()}`} className="rounded-2xl border border-border bg-card/50 p-4 ring-1 ring-foreground/5">
+          <div className="flex items-start gap-3">
+            <span aria-hidden className="text-3xl">{event.kind === "new" ? "🌑" : "🌕"}</span>
+            <div>
+              <p className="font-semibold">{formatDateKa(event.date)}</p>
+              <p className="mt-1 text-sm text-foreground/70">საქართველოს კალენდარული თარიღი · {event.snapshot.signSymbol} {event.snapshot.signKa}-ში</p>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
+export default function MoonCalendarPage() {
+  const now = new Date();
+  const localToday = tbilisiParts(now);
+  const todayNoonUtc = new Date(Date.UTC(localToday.year, localToday.month, localToday.day, 8));
+  const todaySnapshot = computeMoonPhase(now);
+  const days: Day[] = Array.from({ length: 30 }, (_, i) => {
+    const date = new Date(todayNoonUtc.getTime() + i * DAY_MS);
+    return { date, snapshot: computeMoonPhase(date) };
+  });
+  const annualEvents = majorEventsForYears(CURRENT_YEAR, CURRENT_YEAR + 1);
+  const yearEvents = annualEvents.filter((event) => tbilisiParts(event.date).year === CURRENT_YEAR);
+  const newMoons = yearEvents.filter((event) => event.kind === "new");
+  const fullMoons = yearEvents.filter((event) => event.kind === "full");
+  const nextNew = annualEvents.find((event) => event.kind === "new" && event.date >= now);
+  const nextFull = annualEvents.find((event) => event.kind === "full" && event.date >= now);
+
+  const faq = [
+    {
+      q: "მთვარის რომელი ფაზაა დღეს?",
+      a: todaySnapshot
+        ? `${formatDateKa(now)}-ს მთვარის ფაზაა ${todaySnapshot.phaseLabelKa}; განათებულია დაახლოებით ${Math.round(todaySnapshot.illumination * 100)}% და მთვარე ${todaySnapshot.signKa}-შია.`
+        : "დღევანდელი ფაზა კალენდრის ზედა ნაწილში ყოველდღიურად ახლდება.",
+    },
+    {
+      q: `სავსე მთვარე რომელ რიცხვშია ${CURRENT_YEAR} წელს?`,
+      a: `${CURRENT_YEAR} წლის სავსე მთვარის ყველა თარიღი მოცემულია ამ გვერდის „სავსე მთვარის თარიღების“ სექციაში. უახლოესი სავსე მთვარეა ${nextFull ? formatDateKa(nextFull.date) : "კალენდარში მითითებულ თარიღში"}.`,
+    },
+    {
+      q: "როდის არის შემდეგი ახალი მთვარე?",
+      a: nextNew ? `შემდეგი ახალი მთვარეა ${formatDateKa(nextNew.date)}, საქართველოს კალენდარული თარიღით, ${nextNew.snapshot.signKa}-ში.` : "თარიღი კალენდარში ყოველდღიურად ახლდება.",
+    },
+    {
+      q: "რამდენ ხანს გრძელდება მთვარის სრული ციკლი?",
+      a: "ახალი მთვარიდან მომდევნო ახალ მთვარემდე საშუალოდ 29.5 დღე გადის. ფაზის ზუსტი პიკი კონკრეტული მომენტია, თუმცა ვიზუალურად ცვლილება თანდათანობით ჩანს.",
+    },
+    {
+      q: "mtvaris kalendari და მთვარის კალენდარი ერთსა და იმავეს ნიშნავს?",
+      a: "დიახ. „mtvaris kalendari“ ქართული ფრაზის ლათინური ასოებით დაწერილი ფორმაა; ამ გვერდზე ორივე ძიების შესაბამისი ინფორმაციაა ქართულად.",
+    },
+  ];
+
+  const webPageLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": PAGE_URL,
+    url: PAGE_URL,
+    name: TITLE,
+    description: DESCRIPTION,
+    inLanguage: "ka-GE",
+    dateModified: now.toISOString(),
+    about: { "@type": "Thing", name: "მთვარის ფაზები" },
+  };
   const ld = [
-    articleLd({
-      url: `${SITE_URL}/mtvaris-kalendari`,
-      headline: TITLE,
-      description: DESCRIPTION,
-      datePublished: today.toISOString(),
-    }),
-    breadcrumbLd([
-      { name: "მთავარი", url: SITE_URL },
-      { name: "მთვარის კალენდარი", url: `${SITE_URL}/mtvaris-kalendari` },
-    ]),
+    webPageLd,
+    breadcrumbLd([{ name: "მთავარი", url: SITE_URL }, { name: "მთვარის კალენდარი", url: PAGE_URL }]),
+    faqLd(faq),
   ];
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
-      />
+      <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" />
       <Starfield count={120} shooting={3} />
       <SmartHeader />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeLd(ld) }} />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
-      />
-
-      <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-        <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/" className="hover:text-foreground">
-            მთავარი
-          </Link>
-          <span>/</span>
-          <span className="text-foreground/80">მთვარის კალენდარი</span>
+      <article className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
+        <nav aria-label="სანავიგაციო ბილიკი" className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
+          <Link href="/" className="hover:text-foreground">მთავარი</Link><span aria-hidden>/</span>
+          <span aria-current="page" className="text-foreground/80">მთვარის კალენდარი</span>
         </nav>
 
-        <header className="mb-10 max-w-3xl">
-          <div className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            <Moon className="size-3.5" />
-            ცის რიტმი
-          </div>
+        <header className="mb-8 max-w-3xl">
+          <div className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground"><Moon aria-hidden className="size-3.5" />ცის რიტმი</div>
           <h1 className="mt-2 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-            მთვარის{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              კალენდარი
-            </span>
+            მთვარის კალენდარი <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">{CURRENT_YEAR}</span>
           </h1>
-          <p className="mt-4 text-pretty text-base text-foreground/85 sm:text-lg">
-            შემდეგი 30 დღის მთვარის ფაზები და ნიშნები. ახალი მთვარე, სავსე
-            მთვარე, პირველი და ბოლო მეოთხედი — ცის რიტმი ერთ ხედვაში.
-          </p>
+          <p className="mt-4 text-pretty text-base leading-7 text-foreground/85 sm:text-lg">მთვარის დღეების კალენდარი: დღევანდელი ფაზა, განათება და ზოდიაქოს ნიშანი, სრული წლის ახალი და სავსე მთვარის თარიღები, ასევე მომდევნო 30 დღის ყოველდღიური მიმოხილვა.</p>
         </header>
 
-        {/* Key upcoming events */}
-        {keyEvents.length > 0 && (
-          <section className="mb-10">
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              უახლოესი მნიშვნელოვანი ფაზები
-            </h2>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {keyEvents.slice(0, 4).map((d, i) => {
-                const s = d.snapshot;
-                if (!s) return null;
-                const meta = ALL_SLUGS
-                  .map((slug) => signMetaBySlug(slug))
-                  .find((m) => m && m.labelEn === s.signEn);
-                const accent = meta ? signColor(meta) : "var(--vivida-violet)";
-                return (
-                  <li
-                    key={i}
-                    className="flex gap-4 rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-5"
-                  >
-                    <div
-                      className="grid size-12 shrink-0 place-items-center rounded-xl text-3xl"
-                      style={{
-                        background: `color-mix(in oklch, ${accent} 18%, transparent)`,
-                        boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${accent} 35%, transparent)`,
-                      }}
-                      aria-hidden
-                    >
-                      {PHASE_SYMBOL[s.phaseKey] ?? "🌙"}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold tracking-tight text-foreground">
-                        {s.phaseLabelKa}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {d.date.getUTCDate()} {MONTHS_KA[d.date.getUTCMonth()]}
-                        {" · "}
-                        <span style={{ color: accent }}>{s.signKa}</span>
-                      </div>
-                      <div className="mt-1.5 text-[11px] text-muted-foreground">
-                        განათება {(s.illumination * 100).toFixed(0)}%
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+        {todaySnapshot && (
+          <section aria-labelledby="moon-today" className="mb-10 rounded-3xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/10 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">განახლებულია ყოველდღიურად</p>
+            <h2 id="moon-today" className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">მთვარის რომელი ფაზაა დღეს?</h2>
+            <p className="mt-3 text-lg leading-8 text-foreground/90">დღეს, <strong>{formatDateKa(now)}</strong>, მთვარის ფაზაა <strong>{todaySnapshot.phaseLabelKa}</strong>. განათებულია <strong>{Math.round(todaySnapshot.illumination * 100)}%</strong> და მდებარეობს <strong>{todaySnapshot.signSymbol} {todaySnapshot.signKa}-ში</strong>.</p>
+            <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-border/70 bg-background/25 p-4"><dt className="text-xs text-muted-foreground">უახლოესი ახალი მთვარე</dt><dd className="mt-1 font-semibold">{nextNew ? formatDateKa(nextNew.date) : "—"}</dd><dd className="text-xs text-muted-foreground">საქართველოს კალენდარული თარიღი</dd></div>
+              <div className="rounded-xl border border-border/70 bg-background/25 p-4"><dt className="text-xs text-muted-foreground">უახლოესი სავსე მთვარე</dt><dd className="mt-1 font-semibold">{nextFull ? formatDateKa(nextFull.date) : "—"}</dd><dd className="text-xs text-muted-foreground">საქართველოს კალენდარული თარიღი</dd></div>
+            </dl>
           </section>
         )}
 
-        {/* Calendar grid */}
-        {months.map((m) => (
-          <section key={m.key} className="mb-10">
-            <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
-              {m.label}
-            </h2>
-            <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-              {m.days.map((d, i) => {
-                const s = d.snapshot;
-                const isKey = s && KEY_PHASES.has(s.phaseKey);
-                const meta = ALL_SLUGS
-                  .map((slug) => signMetaBySlug(slug))
-                  .find((mm) => mm && mm.labelEn === s?.signEn);
-                const accent = meta
-                  ? signColor(meta)
-                  : "var(--vivida-violet)";
-                return (
-                  <li
-                    key={i}
-                    className={`rounded-xl border bg-card/45 p-3 ring-1 ring-foreground/5 backdrop-blur-xl ${
-                      isKey
-                        ? "border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/10"
-                        : "border-border"
-                    }`}
-                  >
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-lg font-semibold tabular-nums text-foreground">
-                        {d.date.getUTCDate()}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">
-                        {WEEKDAYS_KA[d.date.getUTCDay()]}
-                      </span>
-                    </div>
-                    {s ? (
-                      <>
-                        <div className="mt-1 flex items-center gap-1 text-sm">
-                          <span aria-hidden>{PHASE_SYMBOL[s.phaseKey] ?? "🌙"}</span>
-                          <span
-                            className={`text-[11px] ${
-                              isKey ? "font-medium text-foreground" : "text-foreground/85"
-                            }`}
-                          >
-                            {s.phaseLabelKa}
-                          </span>
-                        </div>
-                        <div
-                          className="mt-0.5 text-[11px]"
-                          style={{ color: accent }}
-                        >
-                          {s.signKa}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="mt-1 text-[11px] text-muted-foreground">—</div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        ))}
-
-        {/* What is moon calendar */}
-        <section className="mb-12 max-w-3xl space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            როგორ მუშაობს მთვარის კალენდარი
-          </h2>
-          <p>
-            მთვარე დედამიწის ირგვლივ დაახლოებით 29.5 დღეში სრულდება ერთი
-            ციკლი — ახალი მთვარიდან ახალ მთვარემდე. ამ ციკლის რვა ძირითადი
-            ფაზაა: ახალი მთვარე, მზარდი ნამგალი, პირველი მეოთხედი, მზარდი
-            გიბუსი, სავსე მთვარე, კლებადი გიბუსი, ბოლო მეოთხედი და კლებადი
-            ნამგალი.
-          </p>
-          <p>
-            მთვარის ფაზა + ნიშანი ერთად ქმნის დღის &ldquo;ენერგიის
-            ხელწერას&rdquo; — ახალი მთვარე ფიქსირებულ ნიშანში სხვა ტონალობას
-            იძლევა, ვიდრე იგივე ფაზა მუტაბელურ ნიშანში. სრული ნატალური რუკა
-            გვაჩვენებს, რომელ შენს ცის სახლზე ხდება ეს ციკლი ახლა.
-          </p>
-        </section>
-
-        <section className="mb-12 rounded-2xl border border-border bg-card/55 p-6">
-          <h2 className="text-xl font-semibold">დღის სრული ასტროლოგიური სურათი</h2>
-          <p className="mt-2 text-sm leading-7 text-foreground/75">
-            მთვარის ფაზასთან ერთად ნახე პლანეტარული ასპექტები და უახლოესი
-            ხელსაყრელი თუ ფრთხილი თარიღები.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Link href="/savse-mtvare" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">სავსე მთვარე</Link>
-            <Link href="/akhali-mtvare" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">ახალი მთვარე</Link>
-            <Link href="/dabnelebebi" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">დაბნელებები</Link>
-            <Link href="/astrologiuri-kalendari" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">ასტროლოგიური კალენდარი</Link>
-            <Link href="/ighbliani-dgheebi" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">იღბლიანი დღეები</Link>
-            <Link href="/frtxili-dgheebi" className="rounded-full border border-border px-4 py-2 text-sm hover:bg-card/80">ფრთხილი დღეები</Link>
+        <section aria-labelledby="year-calendar" className="mb-14">
+          <h2 id="year-calendar" className="text-3xl font-semibold tracking-tight">{CURRENT_YEAR} წლის მთვარის კალენდარი</h2>
+          <p className="mt-3 max-w-3xl leading-7 text-foreground/80">ქვემოთ მოცემულია წლის ყველა ახალი და სავსე მთვარის გამოთვლილი თარიღი და ზოდიაქოს ნიშანი საქართველოსთვის. არსებული ძრავა დღიური სიზუსტით მუშაობს, ამიტომ საათს არ ვუთითებთ.</p>
+          <div className="mt-8 grid gap-10 lg:grid-cols-2">
+            <section aria-labelledby="new-moon-dates">
+              <h3 id="new-moon-dates" className="text-2xl font-semibold">ახალი მთვარის თარიღები</h3>
+              <EventList events={newMoons} label={`${CURRENT_YEAR} წლის ახალი მთვარის კალენდარი`} />
+              <Link href="/akhali-mtvare" className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)] hover:underline">ახალი მთვარის სრული კალენდარი და მნიშვნელობა <ArrowRight aria-hidden className="size-4" /></Link>
+            </section>
+            <section aria-labelledby="full-moon-dates">
+              <h3 id="full-moon-dates" className="text-2xl font-semibold">სავსე მთვარის თარიღები</h3>
+              <EventList events={fullMoons} label={`${CURRENT_YEAR} წლის სავსე მთვარის კალენდარი`} />
+              <Link href="/savse-mtvare" className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)] hover:underline">სავსე მთვარის სრული კალენდარი და მნიშვნელობა <ArrowRight aria-hidden className="size-4" /></Link>
+            </section>
           </div>
         </section>
 
+        <section aria-labelledby="next-days" className="mb-14">
+          <h2 id="next-days" className="text-3xl font-semibold tracking-tight">მთვარის ფაზები — შემდეგი 30 დღე</h2>
+          <p className="mt-3 max-w-3xl leading-7 text-foreground/80">ყოველდღიური სია აჩვენებს რვაფაზიან კატეგორიას და მთვარის ზოდიაქოს ნიშანს. ფაზის ზუსტი პიკებისთვის გამოიყენე ზემოთ მოცემული წლიური თარიღები.</p>
+          <ul className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
+            {days.map((day) => {
+              const p = tbilisiParts(day.date); const snapshot = day.snapshot;
+              return <li key={day.date.toISOString()} className="rounded-xl border border-border bg-card/45 p-3 ring-1 ring-foreground/5">
+                <div className="flex items-baseline gap-1.5"><time dateTime={`${p.year}-${String(p.month + 1).padStart(2, "0")}-${String(p.day).padStart(2, "0")}`} className="text-lg font-semibold tabular-nums">{p.day}</time><span className="text-[11px] text-muted-foreground">{MONTHS_KA[p.month]} · {WEEKDAYS_KA[p.weekday]}</span></div>
+                {snapshot ? <><p className="mt-1 text-xs text-foreground/85"><span aria-hidden>{PHASE_SYMBOL[snapshot.phaseKey]}</span> {snapshot.phaseLabelKa}</p><p className="mt-1 text-[11px] text-[var(--vivida-cyan)]">{snapshot.signSymbol} {snapshot.signKa}</p></> : <p className="mt-1 text-xs text-muted-foreground">—</p>}
+              </li>;
+            })}
+          </ul>
+        </section>
+
+        <section className="mb-14 grid gap-5 md:grid-cols-2">
+          <div className="rounded-2xl border border-border bg-card/50 p-6"><h2 className="text-2xl font-semibold">რას ნიშნავს მთვარის ფაზები</h2><p className="mt-4 leading-8 text-foreground/80">მთვარის ფაზა არის დედამიწიდან დანახული განათებული ნაწილის ცვლილება. ციკლი იწყება ახალი მთვარით, გადის მზარდ ნამგალს, პირველ მეოთხედსა და მზარდ გიბუსს, აღწევს სავსე მთვარეს და შემდეგ კლებადი გიბუსის, ბოლო მეოთხედისა და კლებადი ნამგლის გავლით კვლავ ახალ მთვარეს უბრუნდება.</p></div>
+          <div className="rounded-2xl border border-border bg-card/50 p-6"><h2 className="text-2xl font-semibold">როგორ გამოვიყენოთ მთვარის კალენდარი</h2><p className="mt-4 leading-8 text-foreground/80">ასტრონომიული დაკვირვებისთვის შეარჩიე ფაზა: სუსტი მთვარის შუქი ბნელი ცის სანახავად გამოგადგება, სავსე მთვარე კი თავად მთვარის მარტივად დასაკვირვებლად. ასტროლოგიურ პრაქტიკაში ზოგი ადამიანი ახალ მთვარეს მიზნების დასახვას, სავსეს კი შეჯამებას უკავშირებს — ეს სიმბოლური ტრადიციაა.</p></div>
+        </section>
+
+        <section className="mb-14 rounded-2xl border border-border bg-card/55 p-6 sm:p-8">
+          <h2 className="text-2xl font-semibold">ასტრონომიული მონაცემი და ასტროლოგიური ინტერპრეტაცია</h2>
+          <p className="mt-4 max-w-3xl leading-8 text-foreground/80"><strong className="text-foreground">ასტრონომიული მონაცემებია</strong> ფაზის პიკის დრო, განათების პროცენტი და მთვარის ცაზე მდებარეობა. <strong className="text-foreground">ასტროლოგიური ინტერპრეტაცია</strong> კი ფაზასა და ზოდიაქოს ნიშანს სიმბოლურ მნიშვნელობას ანიჭებს; ის მეცნიერულ პროგნოზად ან მნიშვნელოვანი გადაწყვეტილების ერთადერთ საფუძვლად არ უნდა მივიჩნიოთ.</p>
+        </section>
+
+        <aside aria-labelledby="related-guides" className="mb-14 rounded-2xl border border-border bg-card/55 p-6">
+          <h2 id="related-guides" className="text-2xl font-semibold">დაკავშირებული კალენდრები და გზამკვლევები</h2>
+          <nav aria-label="მთვარესთან დაკავშირებული გვერდები" className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["/akhali-mtvare", "ახალი მთვარის კალენდარი"], ["/savse-mtvare", "სავსე მთვარის კალენდარი"],
+              ["/astrologiuri-kalendari", "დღის ასტროლოგიური კალენდარი"], ["/dabnelebebi", "მზისა და მთვარის დაბნელებები"],
+              ["/nataluri-ruka", "ნატალური რუკა და მთვარის ნიშანი"], ["/zodiac/mtvare", "მთვარე ზოდიაქოს ნიშნებში"],
+            ].map(([href, label]) => <Link key={href} href={href} className="flex items-center justify-between rounded-xl border border-border px-4 py-3 text-sm transition hover:border-[var(--vivida-violet)]/50 hover:bg-card/80"><span>{label}</span><ArrowRight aria-hidden className="size-4" /></Link>)}
+          </nav>
+        </aside>
+
+        <section aria-labelledby="faq-heading" className="mb-14 max-w-3xl">
+          <h2 id="faq-heading" className="text-3xl font-semibold tracking-tight">ხშირად დასმული კითხვები</h2>
+          <div className="mt-5 space-y-4">{faq.map((item) => <details key={item.q} className="rounded-2xl border border-border bg-card/45 p-5"><summary className="cursor-pointer font-semibold">{item.q}</summary><p className="mt-3 leading-7 text-foreground/80">{item.a}</p></details>)}</div>
+        </section>
+
         <ReportPromo className="mt-16" />
-
-        {/* CTA */}
-        <div className="mt-6 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
-          <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            შენი მთვარის ნიშანი
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ნამდვილი მთვარის რიტმი იწყება იქიდან, თუ რომელ ნიშანში იყო მთვარე
-            შენი დაბადებისას. Vivida უფასოდ ანგარიშობს ამას ნატალურ რუკაში.
-          </p>
-          <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/signup">ჩემი მთვარის ნიშანი</Link>
-          </Button>
+        <div className="mt-6 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10">
+          <Sparkles aria-hidden className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
+          <h2 className="text-balance text-2xl font-semibold sm:text-3xl">იპოვე შენი მთვარის ნიშანი</h2>
+          <p className="mx-auto mt-3 max-w-md text-pretty text-muted-foreground">დაბადების თარიღი, ზუსტი დრო და ადგილი გვიჩვენებს, რომელ ნიშანში იყო მთვარე შენი დაბადებისას.</p>
+          <Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/nataluri-ruka">ნატალური რუკის შექმნა</Link></Button>
         </div>
-      </section>
-
+      </article>
       <SiteFooter />
     </main>
   );
