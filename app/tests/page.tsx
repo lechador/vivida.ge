@@ -31,6 +31,9 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
+import { PopularSearches } from "@/components/seo/popular-searches";
+import { SiteFooter } from "@/components/site-footer";
+import { TESTS_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { localizedAlternates } from "@/lib/seo/locales";
 
@@ -55,6 +58,10 @@ export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
+    "ტესტები",
+    "ტესტები ქართულად",
+    "ონლაინ ტესტები",
+    "ფსიქოლოგიური ტესტები",
     "iq ტესტი",
     "iq ტესტი ქართულად",
     "ფსიქოლოგიური ტესტი",
@@ -66,6 +73,8 @@ export const metadata: Metadata = {
     "უფასო ტესტი",
     "ქვიზი ქართულად",
     "ზოდიაქოს ქვიზი",
+    "testebi qartulad",
+    "psikologiuri testebi",
   ],
   alternates: localizedAlternates("/tests", "/en/tests", "ka"),
   openGraph: {
@@ -246,7 +255,11 @@ export default async function TestsPage() {
             ))}
           </div>
         </section>
+
+        <PopularSearches queries={TESTS_HUB_LATIN_QUERIES} />
       </section>
+
+      <SiteFooter />
     </main>
   );
 }

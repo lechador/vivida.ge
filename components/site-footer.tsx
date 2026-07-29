@@ -24,10 +24,13 @@ const LEARN_LINKS = [
 const TOOL_LINKS = [
   { href: "/horoskopi", label: "დღის ჰოროსკოპი" },
   { href: "/horoskopi/kvireuli", label: "კვირის ჰოროსკოპი" },
-  { href: "/horoskopi/tviuri", label: "თვის ჰოროსკოპი" },
-  { href: "/taro", label: "ტარო" },
+  { href: "/taro", label: "ტაროზე მკითხაობა" },
+  { href: "/mkitxaoba", label: "მკითხაობა ონლაინ" },
+  { href: "/sizmris-akhsna", label: "სიზმრის ახსნა" },
   { href: "/tests", label: "ტესტები" },
+  { href: "/iq-testi", label: "IQ ტესტი" },
   { href: "/numerologia", label: "ნუმეროლოგია" },
+  { href: "/angeluri-ricxvebi", label: "ანგელოზური რიცხვები" },
   { href: "/chinuri-horoskopi", label: "ჩინური ჰოროსკოპი" },
   { href: "/astrologiuri-kalendari", label: "ასტროლოგიური კალენდარი" },
 ];

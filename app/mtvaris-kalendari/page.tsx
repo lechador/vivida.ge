@@ -8,6 +8,13 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Button } from "@/components/ui/button";
 import { computeMoonPhase, type MoonPhaseSnapshot, type PhaseKey } from "@/lib/moon-phase";
+import { PopularSearches } from "@/components/seo/popular-searches";
+import {
+  LUNAR_DAY_NOTES,
+  MOON_LATIN_QUERIES,
+  PHASE_GUIDE,
+  lunarDayFromAge,
+} from "@/lib/seo/moon-reference";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -18,8 +25,16 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export const revalidate = 86400;
 
 const CURRENT_YEAR = new Date(Date.now() + TBILISI_OFFSET_MS).getUTCFullYear();
-const TITLE = `მთვარის კალენდარი ${CURRENT_YEAR} — ფაზა დღეს, ახალი და სავსე მთვარე`;
-const DESCRIPTION = `მთვარის კალენდარი ${CURRENT_YEAR}: გაიგე მთვარის ფაზა დღეს, განათება და ნიშანი; ნახე ახალი და სავსე მთვარის თარიღები საქართველოს დროით.`;
+const TITLE = `მთვარის კალენდარი ${CURRENT_YEAR} — მთვარე დღეს, ფაზა და ნიშანი`;
+/**
+ * The Latin spelling is in the description on purpose: GSC shows this page
+ * sitting at position ~9 for "mtvaris kalendari" (168 impressions / 1 click
+ * in 28 days). The hypothesis is that people who type Latin don't recognise
+ * an all-Georgian snippet, so Google has nothing to bold for them. Keeping
+ * the token here — not in the title — tests that without uglifying the SERP
+ * line for the far larger Georgian-script audience.
+ */
+const DESCRIPTION = `მთვარის კალენდარი ${CURRENT_YEAR} (mtvaris kalendari): რომელ ფაზაშია მთვარე დღეს, რომელ ნიშანშია და რამდენად არის განათებული. ახალი და სავსე მთვარის თარიღები საქართველოს დროით, თვე-თვე.`;
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
@@ -170,6 +185,20 @@ export default function MoonCalendarPage() {
       a: "ახალი მთვარიდან მომდევნო ახალ მთვარემდე საშუალოდ 29.5 დღე გადის. ფაზის ზუსტი პიკი კონკრეტული მომენტია, თუმცა ვიზუალურად ცვლილება თანდათანობით ჩანს.",
     },
     {
+      q: "რამდენი ფაზა აქვს მთვარეს?",
+      a: `მთვარეს რვა ფაზა აქვს: ${PHASE_GUIDE.map((p) => p.labelKa).join(", ")}. თითოეულის განათების დიაპაზონი და მნიშვნელობა ამ გვერდის „მთვარის ფაზები“ სექციაშია.`,
+    },
+    {
+      q: "რა განსხვავებაა მთვარის დღესა და მთვარის ფაზას შორის?",
+      a: "მთვარის ფაზა აღწერს, დისკოს რა ნაწილი ჩანს განათებული — სულ რვა ფაზაა. მთვარის დღე კი ახალი მთვარიდან გასული დღეების ნომერია და 1-დან 29-ან 30-მდე იცვლება. ერთი ფაზა რამდენიმე მთვარის დღეს მოიცავს.",
+    },
+    {
+      q: "დღეს მერამდენე მთვარის დღეა?",
+      a: todaySnapshot
+        ? `დღეს ${lunarDayFromAge(todaySnapshot.ageDays)}-ე მთვარის დღეა. ნომერი ყოველდღიურად ახლდება, ხოლო მომდევნო 30 დღის მთვარის დღეები კალენდრის სიაშია მითითებული.`
+        : "მთვარის დღის ნომერი გვერდის ზედა ნაწილში ყოველდღიურად ახლდება.",
+    },
+    {
       q: "mtvaris kalendari და მთვარის კალენდარი ერთსა და იმავეს ნიშნავს?",
       a: "დიახ. „mtvaris kalendari“ ქართული ფრაზის ლათინური ასოებით დაწერილი ფორმაა; ამ გვერდზე ორივე ძიების შესაბამისი ინფორმაციაა ქართულად.",
     },
@@ -218,7 +247,8 @@ export default function MoonCalendarPage() {
             <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">განახლებულია ყოველდღიურად</p>
             <h2 id="moon-today" className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">მთვარის რომელი ფაზაა დღეს?</h2>
             <p className="mt-3 text-lg leading-8 text-foreground/90">დღეს, <strong>{formatDateKa(now)}</strong>, მთვარის ფაზაა <strong>{todaySnapshot.phaseLabelKa}</strong>. განათებულია <strong>{Math.round(todaySnapshot.illumination * 100)}%</strong> და მდებარეობს <strong>{todaySnapshot.signSymbol} {todaySnapshot.signKa}-ში</strong>.</p>
-            <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+            <dl className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border border-border/70 bg-background/25 p-4"><dt className="text-xs text-muted-foreground">დღეს მთვარის დღეა</dt><dd className="mt-1 font-semibold tabular-nums">{lunarDayFromAge(todaySnapshot.ageDays)}-ე</dd><dd className="text-xs text-muted-foreground">ახალი მთვარიდან დათვლილი</dd></div>
               <div className="rounded-xl border border-border/70 bg-background/25 p-4"><dt className="text-xs text-muted-foreground">უახლოესი ახალი მთვარე</dt><dd className="mt-1 font-semibold">{nextNew ? formatDateKa(nextNew.date) : "—"}</dd><dd className="text-xs text-muted-foreground">საქართველოს კალენდარული თარიღი</dd></div>
               <div className="rounded-xl border border-border/70 bg-background/25 p-4"><dt className="text-xs text-muted-foreground">უახლოესი სავსე მთვარე</dt><dd className="mt-1 font-semibold">{nextFull ? formatDateKa(nextFull.date) : "—"}</dd><dd className="text-xs text-muted-foreground">საქართველოს კალენდარული თარიღი</dd></div>
             </dl>
@@ -250,10 +280,51 @@ export default function MoonCalendarPage() {
               const p = tbilisiParts(day.date); const snapshot = day.snapshot;
               return <li key={day.date.toISOString()} className="rounded-xl border border-border bg-card/45 p-3 ring-1 ring-foreground/5">
                 <div className="flex items-baseline gap-1.5"><time dateTime={`${p.year}-${String(p.month + 1).padStart(2, "0")}-${String(p.day).padStart(2, "0")}`} className="text-lg font-semibold tabular-nums">{p.day}</time><span className="text-[11px] text-muted-foreground">{MONTHS_KA[p.month]} · {WEEKDAYS_KA[p.weekday]}</span></div>
-                {snapshot ? <><p className="mt-1 text-xs text-foreground/85"><span aria-hidden>{PHASE_SYMBOL[snapshot.phaseKey]}</span> {snapshot.phaseLabelKa}</p><p className="mt-1 text-[11px] text-[var(--vivida-cyan)]">{snapshot.signSymbol} {snapshot.signKa}</p></> : <p className="mt-1 text-xs text-muted-foreground">—</p>}
+                {snapshot ? <><p className="mt-1 text-xs text-foreground/85"><span aria-hidden>{PHASE_SYMBOL[snapshot.phaseKey]}</span> {snapshot.phaseLabelKa}</p><p className="mt-1 text-[11px] text-[var(--vivida-cyan)]">{snapshot.signSymbol} {snapshot.signKa}</p><p className="mt-0.5 text-[11px] text-muted-foreground tabular-nums">{lunarDayFromAge(snapshot.ageDays)}-ე მთვარის დღე</p></> : <p className="mt-1 text-xs text-muted-foreground">—</p>}
               </li>;
             })}
           </ul>
+        </section>
+
+        {/* Eight-phase reference. The page ranked ~p16 for "მთვარის ფაზები"
+            while only offering a single paragraph on it — this section is
+            the actual answer to that query. */}
+        <section aria-labelledby="phase-guide" className="mb-14">
+          <h2 id="phase-guide" className="text-3xl font-semibold tracking-tight">მთვარის ფაზები — რვავე ფაზა თანმიმდევრობით</h2>
+          <p className="mt-3 max-w-3xl leading-7 text-foreground/80">სრული ციკლი დაახლოებით 29.5 დღეს გრძელდება და რვა ფაზას მოიცავს. თითოეულთან მითითებულია განათების დიაპაზონი, ციკლის რომელ დღეებზე მოდის და რას ნიშნავს ტრადიციულად.</p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {PHASE_GUIDE.map((p) => (
+              <article key={p.key} className={`rounded-2xl border p-5 ring-1 ring-foreground/5 ${todaySnapshot?.phaseKey === p.key ? "border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/10" : "border-border bg-card/45"}`}>
+                <div className="flex items-center gap-2.5">
+                  <span aria-hidden className="text-2xl">{p.symbol}</span>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold tracking-tight">{p.labelKa}</h3>
+                    <p className="text-[11px] text-muted-foreground">{p.labelEn} · {p.illuminationKa} · {p.daysKa}</p>
+                  </div>
+                  {todaySnapshot?.phaseKey === p.key && <span className="ml-auto shrink-0 rounded-full bg-[var(--vivida-violet)]/20 px-2 py-0.5 text-[10px] font-medium text-[var(--vivida-violet)]">დღეს</span>}
+                </div>
+                <p className="mt-3 text-[14px] leading-relaxed text-foreground/85">{p.meaningKa}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* Lunar days — a distinct traditional system the page never covered,
+            yet it ranked ~p23 for "მთვარის დღეების კალენდარი". */}
+        <section aria-labelledby="lunar-days" className="mb-14">
+          <h2 id="lunar-days" className="text-3xl font-semibold tracking-tight">მთვარის დღეები — რა არის და როგორ ითვლება</h2>
+          <p className="mt-3 max-w-3xl leading-7 text-foreground/80">მთვარის დღე ფაზის სინონიმი არ არის. ეს ახალი მთვარიდან გასული დღეების ათვლაა: ახალი მთვარის დღეს იწყება პირველი მთვარის დღე და ციკლი 29-ე ან 30-ე დღეს სრულდება. ზემოთ, 30-დღიან სიაში, თითოეულ თარიღთან სწორედ ეს ნომერია მითითებული.</p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {LUNAR_DAY_NOTES.map((d) => (
+              <article key={d.range} className="rounded-2xl border border-border bg-card/45 p-5 ring-1 ring-foreground/5">
+                <div className="flex items-baseline gap-2.5">
+                  <span className="rounded-lg bg-[var(--vivida-cyan)]/15 px-2.5 py-1 text-sm font-semibold tabular-nums text-[var(--vivida-cyan)]">{d.range}</span>
+                  <h3 className="font-semibold tracking-tight">{d.titleKa}</h3>
+                </div>
+                <p className="mt-3 text-[14px] leading-relaxed text-foreground/85">{d.bodyKa}</p>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="mb-14 grid gap-5 md:grid-cols-2">
@@ -281,6 +352,8 @@ export default function MoonCalendarPage() {
           <h2 id="faq-heading" className="text-3xl font-semibold tracking-tight">ხშირად დასმული კითხვები</h2>
           <div className="mt-5 space-y-4">{faq.map((item) => <details key={item.q} className="rounded-2xl border border-border bg-card/45 p-5"><summary className="cursor-pointer font-semibold">{item.q}</summary><p className="mt-3 leading-7 text-foreground/80">{item.a}</p></details>)}</div>
         </section>
+
+        <PopularSearches queries={MOON_LATIN_QUERIES} className="mb-14 mt-0" />
 
         <ReportPromo className="mt-16" />
         <div className="mt-6 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10">

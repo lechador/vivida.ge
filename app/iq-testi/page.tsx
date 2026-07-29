@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { auth } from "@/auth";
 import { getCurrentPlan } from "@/lib/plan";
@@ -7,6 +8,9 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { IqTestClient } from "@/components/iq/iq-test";
 import { IQ_ADAPTIVE_LENGTH } from "@/lib/iq/adaptive";
+import { PopularSearches } from "@/components/seo/popular-searches";
+import { SiteFooter } from "@/components/site-footer";
+import { IQ_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -24,9 +28,15 @@ export const metadata: Metadata = {
     "ინტელექტის ტესტი",
     "ინტელექტის ტესტი ქართულად",
     "აიქიუ ტესტი",
+    "ჭკუის ტესტი",
     "უფასო iq ტესტი",
+    "iq ტესტი ონლაინ",
     "ლოგიკური ტესტი",
     "ინტელექტის კოეფიციენტი",
+    "iq testi",
+    "iq testi qartulad",
+    "inteleqtis testi",
+    "chkuis testi",
   ],
   alternates: { canonical: `${SITE_URL}/iq-testi` },
   openGraph: {
@@ -187,7 +197,56 @@ export default async function IqTestPage() {
             ))}
           </div>
         </div>
+
+        {/* Sibling tests — this page had no outbound links at all, which
+            left the rest of the tests cluster orphaned from it. */}
+        <section className="mt-10">
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            სხვა ტესტები
+          </h2>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[
+              {
+                href: "/pirovnebis-testi",
+                label: "პიროვნების ტესტი",
+                sub: "MBTI — 16 ტიპიდან რომელი ხარ",
+              },
+              {
+                href: "/eq-testi",
+                label: "EQ ტესტი",
+                sub: "ემოციური ინტელექტის შეფასება",
+              },
+              {
+                href: "/big-five",
+                label: "Big Five ტესტი",
+                sub: "დიდი ხუთეული — 5 ძირითადი თვისება",
+              },
+              {
+                href: "/tests",
+                label: "ყველა ტესტი",
+                sub: "ტესტებისა და ქვიზების სრული სია",
+              },
+            ].map((t) => (
+              <Link
+                key={t.href}
+                href={t.href}
+                className="rounded-xl border border-border/60 bg-card/40 px-4 py-3 transition-colors hover:bg-card/70"
+              >
+                <div className="text-sm font-medium text-foreground/90">
+                  {t.label}
+                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  {t.sub}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <PopularSearches queries={IQ_LATIN_QUERIES} />
       </section>
+
+      <SiteFooter />
     </main>
   );
 }

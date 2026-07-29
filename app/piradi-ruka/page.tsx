@@ -291,6 +291,56 @@ export default function PiradiRukaPage() {
             </p>
           </section>
 
+          {/* Contextual hand-off into the horoscope hub.
+              GSC: this page ranks p4.0 with 2,514 impressions — it's the
+              strongest page on the site — while /horoskopi sits at p36 for
+              its head term. It linked here to nataluri-ruka and zodiac but
+              never to the horoscope hub, so none of that authority reached
+              it. Descriptive in-content anchors, not just a pill. */}
+          <section className="rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              რუკა და ყოველდღიური პროგნოზი — როგორ უკავშირდება
+            </h2>
+            <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
+              პირადი რუკა შენს მუდმივ სურათს ხატავს: სად იდგა თითოეული
+              პლანეტა შენი დაბადების წუთს. ის არ იცვლება. რაც იცვლება, ის
+              პლანეტების დღევანდელი მდებარეობაა — და სწორედ ამ მოძრაობას
+              აღწერს{" "}
+              <Link
+                href="/horoskopi"
+                className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
+              >
+                დღის ჰოროსკოპი
+              </Link>
+              . ორივე ერთად ბევრად მეტს ამბობს, ვიდრე ცალ-ცალკე: რუკა
+              გეუბნება, <em>ვინ ხარ</em>, ჰოროსკოპი კი — <em>რა ხდება ახლა</em>.
+            </p>
+            <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
+              თუ მხოლოდ დღევანდელი პროგნოზი გაინტერესებს, გადადი{" "}
+              <Link
+                href="/horoskopi"
+                className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
+              >
+                ჰოროსკოპზე ყველა ზოდიაქოს ნიშნისთვის
+              </Link>
+              ; კვირისა და თვის ხედვისთვის კი —{" "}
+              <Link
+                href="/horoskopi/kvireuli"
+                className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
+              >
+                კვირის ჰოროსკოპი
+              </Link>{" "}
+              და{" "}
+              <Link
+                href="/horoskopi/tviuri"
+                className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
+              >
+                თვის ჰოროსკოპი
+              </Link>
+              .
+            </p>
+          </section>
+
           {/* FAQ */}
           <section>
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -350,6 +400,18 @@ export default function PiradiRukaPage() {
               className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
             >
               პირადი ჰოროსკოპი
+            </Link>
+            <Link
+              href="/horoskopi"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              დღის ჰოროსკოპი
+            </Link>
+            <Link
+              href="/mtvaris-kalendari"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              მთვარის კალენდარი
             </Link>
           </section>
         </article>

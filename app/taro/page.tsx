@@ -18,9 +18,9 @@ import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 export const dynamic = "force-dynamic";
 
 const SITE_URL = "https://www.vivida.ge";
-const TITLE = "ტარო ქართულად — ონლაინ ტარო კითხვა და გაშლა";
+const TITLE = "ტარო ქართულად — ტაროზე მკითხაობა და ონლაინ გაშლა";
 const DESCRIPTION =
-  "დაუსვი კითხვა ტაროს და მიიღე ცოცხალი, პერსონალური პასუხი ქართულად. ონლაინ ტარო გაშლა 22 დიდი არკანით — პირველი კითხვა უფასო. აღმოაჩინე, რას ამბობს ცა.";
+  "ტაროზე მკითხაობა ონლაინ, ქართულად: დაუსვი კითხვა და მიიღე ცოცხალი, პერსონალური პასუხი. ტაროს გაშლა 22 დიდი არკანით — პირველი კითხვა უფასო, რეგისტრაციის გარეშე.";
 
 const FAQ = [
   {
@@ -47,15 +47,21 @@ export const metadata: Metadata = {
   keywords: [
     "ტარო",
     "ტარო ქართულად",
+    "ტაროზე მკითხაობა",
+    "მკითხაობა ტაროზე ონლაინ",
     "ონლაინ ტარო",
     "ტარო კითხვა",
     "ტაროს გაშლა",
     "ტარო კარტები",
+    "კარტებზე მკითხაობა",
     "უფასო ტარო",
+    "უფასო მკითხაობა",
     "taro",
     "taro qartulad",
     "onlain taro",
     "taros gashla",
+    "taroze mkitxaoba",
+    "mkitxaoba",
   ],
   alternates: { canonical: `${SITE_URL}/taro` },
   openGraph: {
@@ -123,7 +129,7 @@ export default async function TaroHubPage() {
 
         <header className="mb-6 text-center">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            ონლაინ ტარო
+            ონლაინ ტარო · ტაროზე მკითხაობა
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
             ტარო{" "}
@@ -132,8 +138,8 @@ export default async function TaroHubPage() {
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
-            დაუსვი კითხვა კარტებს და მიიღე ცოცხალი, პერსონალური პასუხი. პირველი
-            კითხვა უფასოა.
+            ტაროზე მკითხაობა ონლაინ — დაუსვი კითხვა კარტებს და მიიღე ცოცხალი,
+            პერსონალური პასუხი. პირველი კითხვა უფასოა.
           </p>
         </header>
 

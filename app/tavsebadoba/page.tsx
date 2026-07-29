@@ -26,6 +26,17 @@ export const metadata: Metadata = {
   },
   description:
     "გაიგე რამდენად თავსებადი ხართ შენ და შენი სიყვარული ზოდიაქოს ნიშნების მიხედვით — უფასოდ, 10 წამში. შემდეგ ნახე სრული ნატალური თავსებადობა Vivida-ზე.",
+  keywords: [
+    "თავსებადობა",
+    "ზოდიაქოს თავსებადობა",
+    "სიყვარულის თავსებადობა",
+    "ნიშნების თავსებადობა",
+    "თავსებადობის ტესტი",
+    "ვის ვუხდები",
+    "tavsebadoba",
+    "siyvarulis tavsebadoba",
+    "nishnebis tavsebadoba",
+  ],
   alternates: { canonical: `${SITE_URL}${PATH}` },
   openGraph: {
     type: "website",

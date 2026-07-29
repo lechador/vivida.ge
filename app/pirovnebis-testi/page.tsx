@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { auth } from "@/auth";
 import { getCurrentPlan } from "@/lib/plan";
@@ -8,6 +9,9 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { MbtiTestClient } from "@/components/mbti/mbti-test-client";
 import { TestMusicPlayer } from "@/components/mbti/test-music-player";
+import { PopularSearches } from "@/components/seo/popular-searches";
+import { SiteFooter } from "@/components/site-footer";
+import { PERSONALITY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -28,6 +32,11 @@ export const metadata: Metadata = {
     "ფსიქოლოგიური ტესტი",
     "უფასო პიროვნების ტესტი",
     "ხასიათის ტესტი",
+    "ტესტი ხასიათზე",
+    "რომელი ტიპი ვარ",
+    "pirovnebis testi",
+    "mbti testi qartulad",
+    "psikologiuri testi",
   ],
   alternates: { canonical: `${SITE_URL}/pirovnebis-testi` },
   openGraph: {
@@ -128,6 +137,134 @@ export default async function TestPage() {
 
         <MbtiTestClient questions={questions} />
       </section>
+
+      {/* SEO / informational content — below the fold, indexable. The page
+          previously ended at the test client, so it had no crawlable body
+          copy and no outbound links at all. */}
+      <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
+        <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+          <h2 className="text-xl font-semibold tracking-tight">
+            რა არის პიროვნების ტესტი?
+          </h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
+            პიროვნების ტესტი (ცნობილი როგორც <strong>MBTI</strong> ან
+            16&nbsp;Personalities) შენს ფსიქოლოგიურ ტიპს განსაზღვრავს ოთხი
+            ღერძის მიხედვით. ეს არ არის „კარგი“ ან „ცუდი“ შედეგი — ტიპი აღწერს
+            იმას, <em>როგორ</em> ფიქრობ და იღებ გადაწყვეტილებას, და არა იმას,
+            რამდენად ჭკვიანი ხარ.
+          </p>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {[
+              {
+                t: "E ↔ I — ენერგია",
+                d: "ენერგიას ადამიანებისგან იღებ თუ მარტოობისგან",
+              },
+              {
+                t: "S ↔ N — აღქმა",
+                d: "კონკრეტულ ფაქტებს ენდობი თუ იდეებსა და შესაძლებლობებს",
+              },
+              {
+                t: "T ↔ F — გადაწყვეტილება",
+                d: "ლოგიკით წყვეტ თუ ღირებულებებითა და ადამიანებით",
+              },
+              {
+                t: "J ↔ P — ცხოვრების წესი",
+                d: "გეგმა გირჩევნია თუ მოქნილობა და ღია ვარიანტები",
+              },
+            ].map((x) => (
+              <div
+                key={x.t}
+                className="rounded-2xl border border-border bg-background/40 px-4 py-3.5"
+              >
+                <div className="text-sm font-semibold">{x.t}</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  {x.d}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <h2 className="mt-8 text-xl font-semibold tracking-tight">
+            რით განსხვავდება Astro-MBTI?
+          </h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
+            კლასიკური ტესტი მხოლოდ პასუხებს აფასებს. Vivida-ზე შედეგს ემატება
+            ასტროლოგიური ფენა — შენი ნიშნის ტემპერამენტი ისე ეხმიანება ტიპს,
+            რომ აღწერა უფრო ცოცხალი და ამოსაცნობი ხდება. ორივე ნაწილი ცალკეც
+            იკითხება, თუ მხოლოდ ერთი გაინტერესებს.
+          </p>
+
+          <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            ხშირად დასმული კითხვები
+          </h2>
+          <div className="mt-4 space-y-3">
+            {TEST_FAQ.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 font-medium [&::-webkit-details-marker]:hidden">
+                  {item.q}
+                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="px-4 pb-4 text-[15px] leading-relaxed text-foreground/85">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+
+        <section className="mt-10">
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            16 ტიპი და სხვა ტესტები
+          </h2>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[
+              {
+                href: "/mbti",
+                label: "16 პიროვნების ტიპი",
+                sub: "ყველა ტიპის სრული აღწერა",
+              },
+              {
+                href: "/iq-testi",
+                label: "IQ ტესტი",
+                sub: "ადაპტიური ინტელექტის ტესტი",
+              },
+              {
+                href: "/eq-testi",
+                label: "EQ ტესტი",
+                sub: "ემოციური ინტელექტის შეფასება",
+              },
+              {
+                href: "/big-five",
+                label: "Big Five ტესტი",
+                sub: "დიდი ხუთეული — 5 თვისება",
+              },
+            ].map((t) => (
+              <Link
+                key={t.href}
+                href={t.href}
+                className="rounded-xl border border-border/60 bg-card/40 px-4 py-3 transition-colors hover:bg-card/70"
+              >
+                <div className="text-sm font-medium text-foreground/90">
+                  {t.label}
+                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  {t.sub}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <PopularSearches queries={PERSONALITY_LATIN_QUERIES} />
+      </section>
+
+      <SiteFooter />
     </main>
   );
 }

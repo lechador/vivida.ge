@@ -140,11 +140,54 @@ export const TAROT_LATIN_QUERIES = [
   "onlain taro",
   "taros gashla",
   "taro kitxva",
+  "taroze mkitxaoba",
+  "mkitxaoba taroze",
+  "kartebze mkitxaoba",
   "taro cards",
   "taro kartebi",
   "ufaso taro",
   "taro gashla onlain",
-  "astrologia qartulad",
+];
+
+/** IQ test (`/iq-testi`). */
+export const IQ_LATIN_QUERIES = [
+  "iq testi",
+  "iq testi qartulad",
+  "iq test qartulad",
+  "ufaso iq testi",
+  "aiqiu testi",
+  "inteleqtis testi",
+  "chkuis testi",
+  "logikuri testi",
+  "iq testi onlain",
+  "inteleqtis koeficienti",
+];
+
+/** Personality / MBTI test (`/pirovnebis-testi`). */
+export const PERSONALITY_LATIN_QUERIES = [
+  "pirovnebis testi",
+  "pirovnebis testi qartulad",
+  "mbti testi",
+  "mbti testi qartulad",
+  "16 personalities qartulad",
+  "xasiatis testi",
+  "psikologiuri testi",
+  "ufaso pirovnebis testi",
+  "romeli tipi var",
+];
+
+/** Tests hub (`/tests`). */
+export const TESTS_HUB_LATIN_QUERIES = [
+  "testebi",
+  "testebi qartulad",
+  "psikologiuri testebi",
+  "onlain testebi",
+  "ufaso testebi",
+  "qvizi qartulad",
+  "iq testi",
+  "pirovnebis testi",
+  "eq testi",
+  "testi chemze",
 ];
 
 /** EQ / emotional-intelligence test (`/eq-testi`). */

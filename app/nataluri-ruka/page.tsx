@@ -255,6 +255,34 @@ export default function NataluriRukaPage() {
             </p>
           </section>
 
+          {/* Contextual hand-off into the horoscope hub — see the same note
+              on /piradi-ruka. This page carries 1,816 impressions at p6.5
+              and previously reached /horoskopi only through a pill. */}
+          <section className="rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              რუკის შემდეგ — ყოველდღიური ცა
+            </h2>
+            <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
+              ნატალური რუკა ერთხელ იქმნება და აღარ იცვლება. პლანეტები კი
+              დღეს-დღეზე მოძრაობენ და შენს რუკას სხვადასხვა კუთხით ეხებიან —
+              ამას ტრანზიტი ჰქვია და სწორედ ამაზეა აგებული{" "}
+              <Link
+                href="/horoskopi"
+                className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
+              >
+                დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის
+              </Link>
+              . შეადარე რუკაში ნანახი მთვარის ნიშანი{" "}
+              <Link
+                href="/mtvaris-kalendari"
+                className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
+              >
+                მთვარის დღევანდელ ფაზას
+              </Link>{" "}
+              — ხშირად სწორედ აქ ჩანს, რატომ გრძნობ თავს ასე კონკრეტულ დღეს.
+            </p>
+          </section>
+
           {/* FAQ */}
           <section>
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">

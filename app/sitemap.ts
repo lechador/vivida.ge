@@ -24,6 +24,8 @@ import { calendarWindow } from "@/lib/seo/astrology-calendar";
 import { ECLIPSES, moonEvents } from "@/lib/seo/moon-events";
 import { CORE_LANGUAGE_PAIRS } from "@/lib/seo/locales";
 import { HOUSE_NUMBERS, PLANET_SLUGS } from "@/lib/seo/astrology-guides";
+import { ALL_DREAM_SLUGS } from "@/lib/seo/dreams";
+import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -47,6 +49,8 @@ const EVERGREEN = new Date("2026-07-13");
 const CONTENT_PUBLISHED = new Date("2026-07-20");
 const ENGLISH_PUBLISHED = new Date("2026-07-27");
 const ASTROLOGY_GUIDES_PUBLISHED = new Date("2026-07-27");
+/** მკითხაობა / სიზმრის ახსნა / ანგელოზური რიცხვები clusters. */
+const NEW_CLUSTERS_PUBLISHED = new Date("2026-07-29");
 
 const VIEW_CHANGE_FREQ: Record<
   (typeof ALL_HOROSCOPE_VIEWS)[number],
@@ -370,6 +374,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${BASE}/mkitxaoba`,
+      lastModified: NEW_CLUSTERS_PUBLISHED,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE}/sizmris-akhsna`,
+      lastModified: NEW_CLUSTERS_PUBLISHED,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...ALL_DREAM_SLUGS.map((slug) => ({
+      url: `${BASE}/sizmris-akhsna/${slug}`,
+      lastModified: NEW_CLUSTERS_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    {
       url: `${BASE}/numerologia`,
       lastModified: EVERGREEN,
       changeFrequency: "monthly",
@@ -380,6 +402,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: EVERGREEN,
       changeFrequency: "monthly" as const,
       priority: 0.75,
+    })),
+    {
+      url: `${BASE}/angeluri-ricxvebi`,
+      lastModified: NEW_CLUSTERS_PUBLISHED,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    ...ALL_ANGEL_SLUGS.map((slug) => ({
+      url: `${BASE}/angeluri-ricxvebi/${slug}`,
+      lastModified: NEW_CLUSTERS_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
     })),
     {
       url: `${BASE}/merkuri-retrogradi`,
