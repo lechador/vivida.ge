@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TurnstileWidget } from "@/components/auth/turnstile-widget";
+import { trackEvent } from "@/lib/analytics";
 import { signUpWithEmail, verifyEmailWithCode } from "@/actions/auth";
 
 const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -44,6 +45,10 @@ export function SignupForm() {
       // auto-signin didn't take.
       const res = await verifyEmailWithCode({ email, code: code.trim(), password });
       if (res.ok) {
+        trackEvent("sign_up_verified", {
+          method: "email",
+          auto_signed_in: res.signedIn ? 1 : 0,
+        });
         if (res.signedIn) {
           // Land on the feed (usable without birth data) rather than forcing
           // onboarding — astrology is opt-in via the astro-profile CTAs.
@@ -76,6 +81,10 @@ export function SignupForm() {
         turnstileToken,
       });
       if (result.ok) {
+        // Account created, but email is not verified yet — a distinct step
+        // from sign_up_verified below. Tracking both is what makes the
+        // credential-signup abandonment rate visible in GA4.
+        trackEvent("sign_up_submitted", { method: "email" });
         setDone(true);
       } else {
         setError(result.error);

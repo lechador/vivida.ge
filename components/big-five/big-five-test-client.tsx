@@ -6,6 +6,7 @@ import {
   LikertQuiz,
   type LikertSubmitResult,
 } from "@/components/tests/likert-quiz";
+import { trackEvent } from "@/lib/analytics";
 import {
   BIG5_ANSWERS_STORAGE_KEY,
   BIG5_LIKERT,
@@ -35,6 +36,10 @@ export function BigFiveTestClient() {
     } catch {
       /* ignore — the result page falls back to a "retake" prompt */
     }
+    trackEvent("test_completed", {
+      test: "big_five",
+      items: BIG5_QUESTIONS.length,
+    });
     router.push("/big-five/shedegi");
     return { ok: true };
   }

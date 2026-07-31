@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Clock, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { Figure, FigureBlank } from "@/lib/iq/figures";
 import {
@@ -73,6 +74,11 @@ export function IqTestClient() {
     } catch {
       /* private mode — result page will bounce back if it can't read */
     }
+    trackEvent("test_completed", {
+      test: "iq",
+      items: administeredRef.current.length,
+      time_used_sec: IQ_TIME_LIMIT_SEC - timeLeftRef.current,
+    });
     router.push("/iq-testi/shedegi");
   }
 
