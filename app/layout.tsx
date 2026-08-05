@@ -49,6 +49,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Vivida" }],
   creator: "Vivida",
   publisher: "Vivida",
+  other: {
+    "google-adsense-account": "ca-pub-2236599310864557",
+  },
   // Keywords are mostly ignored by Google but Yandex / Bing still weight
   // them, and the Georgian search ecosystem leans on Yandex more than the
   // English one. Cheap to include; pick the queries we actually want to win.
