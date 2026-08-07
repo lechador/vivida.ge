@@ -1,6 +1,7 @@
 "use client"; // Error boundaries must be Client Components
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 /**
  * App-wide error boundary — the last line of defense. It catches errors that
@@ -38,9 +39,12 @@ export default function GlobalError({
     } catch {
       /* ignore */
     }
-    setRetrying(true);
-    const t = setTimeout(() => unstable_retry(), 1000);
-    return () => clearTimeout(t);
+    const stateTimer = setTimeout(() => setRetrying(true), 0);
+    const retryTimer = setTimeout(() => unstable_retry(), 1000);
+    return () => {
+      clearTimeout(stateTimer);
+      clearTimeout(retryTimer);
+    };
   }, [error, unstable_retry]);
 
   function manualRetry() {
@@ -113,9 +117,9 @@ export default function GlobalError({
               <button type="button" onClick={manualRetry} style={primaryBtn}>
                 ხელახლა ცდა
               </button>
-              <a href="/" style={secondaryBtn}>
+              <Link href="/" style={secondaryBtn}>
                 მთავარზე
-              </a>
+              </Link>
             </div>
           </>
         )}

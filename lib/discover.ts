@@ -128,7 +128,7 @@ export async function getDiscoveryFeed(
         // deck and the "suggested people" rails.
         eq(profiles.discoverable, true),
         excludedList.length > 1
-          ? inArray(users.id, await pickIncluded(excludedList, viewerId))
+          ? inArray(users.id, await pickIncluded(excludedList))
           : undefined
       )
     )
@@ -256,21 +256,14 @@ export async function getDiscoveryFeed(
   };
 }
 
-/** When excludedList only has the viewer, drizzle's notInArray was awkward.
- *  Helper: return the include set as everything-not-excluded. We don't
- *  actually call this; this is here to leave the code self-explanatory. */
-async function pickIncluded(
-  excluded: string[],
-  _viewerId: string
-): Promise<string[]> {
-  // Pull candidate IDs explicitly so we can use inArray (more reliable than
-  // notInArray + nullable lists). Keep the return small via select-distinct.
+/** Return candidate ids that are not present in the exclusion list. */
+async function pickIncluded(excluded: string[]): Promise<string[]> {
   const rows = await db
     .selectDistinct({ id: users.id })
     .from(users)
     .innerJoin(profiles, eq(profiles.userId, users.id));
   const set = new Set(excluded);
-  return rows.filter((r) => !set.has(r.id)).map((r) => r.id);
+  return rows.filter((row) => !set.has(row.id)).map((row) => row.id);
 }
 
 /** Fisher-Yates shuffle (non-mutating). Used by the suggestions rail so the

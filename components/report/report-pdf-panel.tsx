@@ -16,7 +16,6 @@ import { BuyReportCta } from "./buy-report-cta";
  */
 export async function ReportPdfPanel({
   userId,
-  plan: _plan,
 }: {
   userId: string;
   plan: PlanId;

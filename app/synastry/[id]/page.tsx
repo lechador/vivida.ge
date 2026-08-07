@@ -23,7 +23,6 @@ import {
 import { SYNASTRY_DEEP_PROMPT_VERSION } from "@/lib/openrouter";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
-import { CreditHint } from "@/components/credits/credit-hint";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { SynastryDeepReport } from "@/components/synastry/synastry-deep-report";

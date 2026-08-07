@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Flag, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react";
@@ -70,6 +70,28 @@ export function PostCard({
   const [commentsOpen, setCommentsOpen] = useState(mode === "detail");
   const [reportOpen, setReportOpen] = useState(false);
 
+  const isOwner = post.author.id === viewerId;
+  const canDelete = isOwner || viewerIsAdmin;
+  const [withinEditWindow, setWithinEditWindow] = useState(false);
+
+  useEffect(() => {
+    const remaining =
+      POST_EDIT_WINDOW_MS -
+      (Date.now() - new Date(post.createdAt).getTime());
+    const revealTimer = setTimeout(
+      () => setWithinEditWindow(isOwner && remaining > 0),
+      0
+    );
+    const expiryTimer =
+      isOwner && remaining > 0
+        ? setTimeout(() => setWithinEditWindow(false), remaining)
+        : null;
+    return () => {
+      clearTimeout(revealTimer);
+      if (expiryTimer !== null) clearTimeout(expiryTimer);
+    };
+  }, [isOwner, post.createdAt]);
+
   // Threads/X-style: clicking anywhere on the card (except a link, button,
   // input, or while selecting text) opens the post's thread page.
   function onCardClick(e: React.MouseEvent<HTMLElement>) {
@@ -81,12 +103,6 @@ export function PostCard({
     if (window.getSelection()?.toString()) return;
     router.push(`/feed/${post.id}`);
   }
-
-  const isOwner = post.author.id === viewerId;
-  const canDelete = isOwner || viewerIsAdmin;
-  const withinEditWindow =
-    isOwner &&
-    Date.now() - new Date(post.createdAt).getTime() < POST_EDIT_WINDOW_MS;
 
   const display =
     post.author.displayName ??

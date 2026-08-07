@@ -100,8 +100,6 @@ const SECTIONS = [
   { kind: "workplace", titleKa: "სამუშაო ჩვევები", format: "dual" },
   { kind: "growth", titleKa: "პიროვნული ზრდა", format: "dual" },
 ];
-const SECTION_KINDS = SECTIONS.map((s) => s.kind);
-
 function sectionPrompt(kind, type) {
   const label = `MBTI ტიპი ${type} (${ARCHETYPE_KA[type]})`;
   const listFmt =

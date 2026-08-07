@@ -20,24 +20,32 @@ import type {
  * truth for "what's new".
  */
 export function MessagesTabBadge({ initial }: { initial: number }) {
-  const [count, setCount] = useState(initial);
+  const [badge, setBadge] = useState({ initial, count: initial });
 
-  useEffect(() => {
-    setCount(initial);
-  }, [initial]);
+  if (badge.initial !== initial) {
+    setBadge({ initial, count: initial });
+  }
+
+  const count = badge.count;
 
   useEffect(() => {
     const onMsg = (e: Event) => {
       const detail = (e as CustomEvent<ChatNotifyDetail>).detail;
       if (!detail?.id) return;
-      setCount((c) => c + 1);
+      setBadge((current) => ({
+        ...current,
+        count: current.count + 1,
+      }));
     };
     const onCleared = (e: Event) => {
       const detail = (e as CustomEvent<ChatClearedDetail>).detail;
       if (!detail) return;
       const drop = Math.max(0, detail.clearedCount ?? 0);
       if (drop === 0) return;
-      setCount((c) => Math.max(0, c - drop));
+      setBadge((current) => ({
+        ...current,
+        count: Math.max(0, current.count - drop),
+      }));
     };
     window.addEventListener("vivida:chat-message", onMsg);
     window.addEventListener("vivida:chat-cleared", onCleared);

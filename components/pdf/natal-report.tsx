@@ -446,7 +446,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
           ["moon", "მთვარე"],
           ["ascendant", "ამომავალი"],
         ] as const
-      ).map(([key, label], i) => {
+      ).map(([key, label]) => {
         const p = key === "ascendant" ? chart.ascendant : chart.bodies[key];
         const body = content.planets?.[key];
         const sign = signByIndex(p.signIndex);

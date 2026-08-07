@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, RotateCcw, Share2, Sparkles, Trophy, X } from "lucide-react";
 
@@ -36,26 +36,27 @@ function resultCopy(score: number, total: number) {
   return ["ვარსკვლავები ცოტა საიდუმლოს ინახავენ.", "შეამოწმე სწორი პასუხები და სცადე თავიდან."];
 }
 
+const subscribeToClient = () => () => {};
+
 export function FamousZodiacQuiz({ images }: { images: Record<string, string> }) {
-  // Deterministic order for SSR + first client render — shuffling here would
-  // run Math.random() twice (server ≠ client) and blow up hydration. The real
-  // shuffle happens once on mount, below.
+  const mounted = useSyncExternalStore(
+    subscribeToClient,
+    () => true,
+    () => false
+  );
+
+  if (!mounted) return <QuizSkeleton />;
+  return <FamousZodiacQuizGame images={images} />;
+}
+
+function FamousZodiacQuizGame({ images }: { images: Record<string, string> }) {
   const [questions, setQuestions] = useState(() =>
-    FAMOUS_ZODIAC_QUESTIONS.slice(0, FAMOUS_ZODIAC_ROUND)
+    shuffle(FAMOUS_ZODIAC_QUESTIONS).slice(0, FAMOUS_ZODIAC_ROUND)
   );
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  // Shuffle after hydration so every attempt is randomized without a mismatch
-  // (question order AND the per-question answer options both use Math.random,
-  // which would diverge server vs client). Until mounted we show a skeleton.
-  useEffect(() => {
-    setQuestions(shuffle(FAMOUS_ZODIAC_QUESTIONS).slice(0, FAMOUS_ZODIAC_ROUND));
-    setMounted(true);
-  }, []);
   const question = questions[index];
   const options = useMemo(() => (question ? optionsFor(question) : []), [question]);
   const score = answers.filter((answer) => answer.selected === answer.question.sign).length;
@@ -163,23 +164,6 @@ export function FamousZodiacQuiz({ images }: { images: Record<string, string> })
     );
   }
 
-  // Pre-mount skeleton — deterministic markup that matches on the server and
-  // the first client render, so the random shuffle can happen mount-side only.
-  if (!mounted) {
-    return (
-      <div className="rounded-3xl border border-border bg-card/60 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
-        <div className="mb-6 h-1.5 w-full overflow-hidden rounded-full bg-border/60" />
-        <div className="mx-auto aspect-square max-w-md animate-pulse rounded-3xl bg-background/40" />
-        <div className="mx-auto mt-6 h-6 w-3/4 animate-pulse rounded bg-background/40" />
-        <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-12 animate-pulse rounded-2xl bg-background/40" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   const correct = selected === question.sign;
   return <div className="rounded-3xl border border-border bg-card/60 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
     <div className="mb-6"><div className="mb-2 flex justify-between text-xs font-medium text-muted-foreground"><span>კითხვა {index + 1} / {questions.length}</span><span>{Math.round(((index + 1) / questions.length) * 100)}%</span></div><div className="h-1.5 overflow-hidden rounded-full bg-border/60"><div className="h-full rounded-full bg-[linear-gradient(90deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] transition-[width] duration-300" style={{ width: `${((index + 1) / questions.length) * 100}%` }} /></div></div>
@@ -202,4 +186,19 @@ export function FamousZodiacQuiz({ images }: { images: Record<string, string> })
     {selected && <div className={`mt-5 rounded-2xl border px-4 py-3 text-center text-sm ${correct ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-300" : "border-rose-400/35 bg-rose-400/10 text-rose-300"}`}>{correct ? "სწორია!" : `სწორი პასუხია — ${signFor(question.sign).glyph} ${signFor(question.sign).nameKa}`}</div>}
     <div className="mt-6 flex justify-end"><Button type="button" variant={selected ? "mystic" : "outline"} onClick={next} disabled={!selected}>{index === questions.length - 1 ? <><Sparkles className="size-4" />შედეგის ნახვა</> : "შემდეგი"}</Button></div>
   </div>;
+}
+
+function QuizSkeleton() {
+  return (
+    <div className="rounded-3xl border border-border bg-card/60 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+      <div className="mb-6 h-1.5 w-full overflow-hidden rounded-full bg-border/60" />
+      <div className="mx-auto aspect-square max-w-md animate-pulse rounded-3xl bg-background/40" />
+      <div className="mx-auto mt-6 h-6 w-3/4 animate-pulse rounded bg-background/40" />
+      <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-12 animate-pulse rounded-2xl bg-background/40" />
+        ))}
+      </div>
+    </div>
+  );
 }

@@ -10,7 +10,7 @@
  */
 
 import { config } from "dotenv";
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
+import { writeFileSync, existsSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
 
 config({ path: ".env.local" });

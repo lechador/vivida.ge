@@ -35,9 +35,12 @@ export default function ReportError({
     } catch {
       /* ignore */
     }
-    setRetrying(true);
-    const t = setTimeout(() => unstable_retry(), 1200);
-    return () => clearTimeout(t);
+    const stateTimer = setTimeout(() => setRetrying(true), 0);
+    const retryTimer = setTimeout(() => unstable_retry(), 1200);
+    return () => {
+      clearTimeout(stateTimer);
+      clearTimeout(retryTimer);
+    };
   }, [error, unstable_retry]);
 
   function manualRetry() {

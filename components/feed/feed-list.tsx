@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { Loader2, Sparkles } from "lucide-react";
 
@@ -40,16 +40,20 @@ export function FeedList({
   const [hasMore, setHasMore] = useState(
     !disablePagination && initial.length >= PAGE_SIZE
   );
+  const [source, setSource] = useState({ initial, disablePagination });
   const [isPending, startTransition] = useTransition();
   const [filter, setFilter] = useState<"all" | "sign">("all");
 
-  // Keep state in sync if the server passes a fresh `initial` after a
-  // router.refresh() (e.g., after createPost). Without this, the local
-  // list silently lags the server state.
-  useEffect(() => {
+  // React's supported "adjust state while rendering" pattern keeps local
+  // pagination in sync after a server refresh without an extra effect render.
+  if (
+    source.initial !== initial ||
+    source.disablePagination !== disablePagination
+  ) {
+    setSource({ initial, disablePagination });
     setPosts(initial);
     setHasMore(!disablePagination && initial.length >= PAGE_SIZE);
-  }, [initial, disablePagination]);
+  }
 
   const visible = useMemo(() => {
     if (filter === "all" || viewerSunSign === null) return posts;

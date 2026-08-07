@@ -32,15 +32,16 @@ export function BigFiveResultClient() {
   const [authed, setAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(BIG5_ANSWERS_STORAGE_KEY);
-      const parsed = raw ? (JSON.parse(raw) as Stored) : null;
-      /* eslint-disable-next-line react-hooks/set-state-in-effect */
-      setStored(parsed && parsed.answers ? parsed : "missing");
-    } catch {
-      /* eslint-disable-next-line react-hooks/set-state-in-effect */
-      setStored("missing");
-    }
+    const timer = setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(BIG5_ANSWERS_STORAGE_KEY);
+        const parsed = raw ? (JSON.parse(raw) as Stored) : null;
+        setStored(parsed && parsed.answers ? parsed : "missing");
+      } catch {
+        setStored("missing");
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {

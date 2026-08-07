@@ -10,6 +10,7 @@ import type { PlanId } from "./pricing";
  * thread `plan` around (AppHeader, page props, etc.) don't have to change.
  * `_userId` is unused by design.
  */
-export async function getCurrentPlan(_userId: string): Promise<PlanId> {
+export async function getCurrentPlan(userId: string): Promise<PlanId> {
+  void userId;
   return "free";
 }

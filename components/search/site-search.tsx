@@ -44,9 +44,11 @@ export function SiteSearch({
 } = {}) {
   const router = useRouter();
   const [q, setQ] = useState("");
-  const [pages, setPages] = useState<PageHit[]>([]);
-  const [users, setUsers] = useState<UserHit[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{
+    term: string;
+    pages: PageHit[];
+    users: UserHit[];
+  }>({ term: "", pages: [], users: [] });
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(
@@ -54,6 +56,16 @@ export function SiteSearch({
   );
   const boxRef = useRef<HTMLDivElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
+  const term = q.trim();
+  const currentResult = result.term === term;
+  const { pages, users } = useMemo(
+    () =>
+      currentResult
+        ? { pages: result.pages, users: result.users }
+        : { pages: [], users: [] },
+    [currentResult, result.pages, result.users]
+  );
+  const loading = term.length >= 2 && !currentResult;
 
   // Position the (portalled) panel directly under the input.
   function place() {
@@ -63,14 +75,7 @@ export function SiteSearch({
 
   // Debounced fetch.
   useEffect(() => {
-    const term = q.trim();
-    if (term.length < 2) {
-      setPages([]);
-      setUsers([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
+    if (term.length < 2) return;
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
       try {
@@ -78,20 +83,23 @@ export function SiteSearch({
           signal: ctrl.signal,
         });
         const data = (await res.json()) as { pages: PageHit[]; users: UserHit[] };
-        setPages(data.pages ?? []);
-        setUsers(data.users ?? []);
+        setResult({
+          term,
+          pages: data.pages ?? [],
+          users: data.users ?? [],
+        });
         setActive(0);
       } catch {
-        /* aborted or failed — keep prior results */
-      } finally {
-        setLoading(false);
+        if (!ctrl.signal.aborted) {
+          setResult({ term, pages: [], users: [] });
+        }
       }
     }, 200);
     return () => {
       clearTimeout(t);
       ctrl.abort();
     };
-  }, [q]);
+  }, [term]);
 
   // Close on outside click — the panel is portalled to <body>, so check both
   // the input box and the panel itself.

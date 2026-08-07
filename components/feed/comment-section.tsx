@@ -60,7 +60,6 @@ export function CommentSection({
   open: boolean;
 }) {
   const [comments, setComments] = useState<FeedComment[] | null>(null);
-  const [loading, setLoading] = useState(false);
   const [body, setBody] = useState("");
   const [replyParentId, setReplyParentId] = useState<string | null>(null);
   const [replyBody, setReplyBody] = useState("");
@@ -72,13 +71,13 @@ export function CommentSection({
 
   useEffect(() => {
     if (!open || comments !== null) return;
-    setLoading(true);
     listComments(postId)
       .then((list) => {
         setComments(list);
-      })
-      .finally(() => setLoading(false));
+      });
   }, [open, comments, postId]);
+
+  const loading = open && comments === null;
 
   useEffect(() => {
     if (open) {

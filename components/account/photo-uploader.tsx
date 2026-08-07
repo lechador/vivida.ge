@@ -440,10 +440,13 @@ function PhotoTile({
 function PendingTile({ pending }: { pending: PendingUpload }) {
   return (
     <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-border ring-1 ring-foreground/5">
-      <img
+      <Image
         src={pending.preview}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover opacity-50"
+        fill
+        unoptimized
+        sizes="(max-width: 640px) 50vw, 240px"
+        className="object-cover opacity-50"
       />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/30 backdrop-blur-sm">
         {pending.error ? (

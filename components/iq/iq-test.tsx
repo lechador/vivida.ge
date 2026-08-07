@@ -48,11 +48,20 @@ export function IqTestClient() {
 
   // Refs so the countdown can finish with the latest state without re-arming.
   const answersRef = useRef(answers);
-  answersRef.current = answers;
   const administeredRef = useRef(administered);
-  administeredRef.current = administered;
   const timeLeftRef = useRef(timeLeft);
-  timeLeftRef.current = timeLeft;
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    administeredRef.current = administered;
+  }, [administered]);
+
+  useEffect(() => {
+    timeLeftRef.current = timeLeft;
+  }, [timeLeft]);
 
   function finish(finalAnswers: Record<string, number>) {
     if (submittedRef.current) return;

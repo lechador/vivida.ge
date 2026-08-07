@@ -69,18 +69,13 @@ export function SynastryShareButton({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  const portalRoot = open && typeof document !== "undefined" ? document.body : null;
   // Track latest loadState across renders so the open-effect can read it
   // without depending on it (and triggering its own cleanup mid-async).
   const loadStateRef = useRef(loadState);
   useEffect(() => {
     loadStateRef.current = loadState;
   }, [loadState]);
-
-  // Defer portal access to client mount.
-  useEffect(() => {
-    setPortalRoot(document.body);
-  }, []);
 
   // Render the off-screen card to a PNG when the dialog opens. We hold
   // on to the blob so subsequent share/download is instant.
@@ -402,7 +397,7 @@ export function SynastryShareButton({
           </div>
 
           <p className="text-center text-[11px] text-muted-foreground">
-            მობილურზე ღილაკი „გააზიარე" პირდაპირ აჩვენებს Instagram/Facebook
+            მობილურზე ღილაკი „გააზიარე“ პირდაპირ აჩვენებს Instagram/Facebook
             არჩევანს. დესკტოპზე — ჩამოტვირთავს PNG-ს.
           </p>
         </DialogContent>

@@ -28,15 +28,16 @@ export function EqResultClient() {
   const [authed, setAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(EQ_ANSWERS_STORAGE_KEY);
-      const parsed = raw ? (JSON.parse(raw) as Stored) : null;
-      /* eslint-disable-next-line react-hooks/set-state-in-effect */
-      setStored(parsed && parsed.answers ? parsed : "missing");
-    } catch {
-      /* eslint-disable-next-line react-hooks/set-state-in-effect */
-      setStored("missing");
-    }
+    const timer = setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(EQ_ANSWERS_STORAGE_KEY);
+        const parsed = raw ? (JSON.parse(raw) as Stored) : null;
+        setStored(parsed && parsed.answers ? parsed : "missing");
+      } catch {
+        setStored("missing");
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Persist (idempotent via unique attemptId), then route a signed-in taker to
