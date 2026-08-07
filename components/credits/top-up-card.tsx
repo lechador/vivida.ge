@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Loader2, Sparkles } from "lucide-react";
+import { Check, CreditCard, Loader2, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { CREDIT_PACKS } from "@/lib/credits-config";
@@ -23,7 +23,7 @@ export function TopUpCard() {
         body: JSON.stringify({ packId }),
       });
       const data = (await r.json().catch(() => ({}))) as { url?: string };
-      if (data.url) window.location.href = data.url;
+      if (data.url) window.location.assign(data.url);
       else setPending(null);
     } catch {
       setPending(null);
@@ -32,15 +32,21 @@ export function TopUpCard() {
 
   return (
     <div className="rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        <CreditCard className="size-4 text-[var(--vivida-cyan)]" />
-        ბალანსის შევსება
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <CreditCard className="size-4 text-[var(--vivida-cyan)]" />
+          ბალანსის შევსება
+        </div>
+        <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+          <Check className="size-3.5 text-[var(--vivida-cyan)]" />
+          ერთჯერადი უსაფრთხო გადახდა
+        </span>
       </div>
-      <h2 className="mt-2 text-xl font-semibold tracking-tight">აირჩიე პაკეტი</h2>
+      <h2 className="mt-2 text-xl font-semibold tracking-tight">რამდენი კრედიტი გჭირდება?</h2>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
         {CREDIT_PACKS.map((p, i) => {
-          const best = i === CREDIT_PACKS.length - 1;
+          const featured = i === 0;
           return (
             <button
               key={p.id}
@@ -48,15 +54,16 @@ export function TopUpCard() {
               disabled={pending !== null}
               onClick={() => buy(p.id)}
               className={cn(
-                "relative flex flex-col items-center gap-1 rounded-2xl border-2 p-5 transition-all hover:-translate-y-0.5 disabled:opacity-60",
-                best
+                "relative flex min-w-0 flex-col items-center gap-1 rounded-2xl border-2 px-2 py-4 transition-all hover:-translate-y-0.5 disabled:opacity-60 sm:p-5",
+                featured
                   ? "border-[var(--vivida-cyan)] bg-[var(--vivida-cyan)]/8 shadow-[0_0_28px_-10px_var(--vivida-cyan)]"
                   : "border-border bg-background/40 hover:border-[var(--vivida-violet)]/50"
               )}
             >
-              {best && (
+              {featured && (
                 <span className="absolute -top-2.5 rounded-full bg-[var(--vivida-cyan)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.14_0.02_260)]">
-                  საუკეთესო
+                  <span className="sm:hidden">რჩეული</span>
+                  <span className="hidden sm:inline">ყველაზე ხშირად ირჩევენ</span>
                 </span>
               )}
               <div className="flex items-center gap-1.5 text-2xl font-bold tabular-nums">
@@ -70,13 +77,13 @@ export function TopUpCard() {
                 )}
               </div>
               <div className="text-xs text-muted-foreground">კრედიტი</div>
-              <div className="mt-1 text-lg font-semibold">₾{p.gel}</div>
+              <div className="mt-1 text-lg font-semibold">{p.gel} ₾</div>
             </button>
           );
         })}
       </div>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        გადახდა უსაფრთხოდ, Stripe-ით.
+        ღილაკზე დაჭერით პირდაპირ გადახდაზე გადახვალ.
       </p>
     </div>
   );

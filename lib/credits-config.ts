@@ -34,7 +34,7 @@ export type StreakMilestone = (typeof STREAK_MILESTONES)[number];
 /** Stripe top-up packs. Minimum ₾10 (we only have Stripe for now). `tetri` is
  *  the charge amount in minor units (1 GEL = 100 tetri). */
 export const CREDIT_PACKS = [
-  { id: "s", gel: 10, tetri: 1000, credits: 20 },
+  { id: "s", gel: 10, tetri: 1000, credits: 30 },
   { id: "m", gel: 20, tetri: 2000, credits: 45 },
   { id: "l", gel: 50, tetri: 5000, credits: 130 },
 ] as const;

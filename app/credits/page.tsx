@@ -62,19 +62,19 @@ export default async function CreditsPage() {
           </p>
         </div>
 
+        {/* Top-up is kept directly below the balance so there is no hunt or scroll. */}
+        <div className="mt-4">
+          <TopUpCard />
+        </div>
+
         {/* Visit streak — daily-return reward ladder. */}
         <div className="mt-4">
           <StreakCard progress={streak} />
         </div>
 
-        {/* How to earn (free) — shown before the paid options. */}
+        {/* How to earn for free. */}
         <div className="mt-4">
           <CreditEarnInfo />
-        </div>
-
-        {/* Top-up */}
-        <div className="mt-4">
-          <TopUpCard />
         </div>
 
         {/* Invite / earn */}

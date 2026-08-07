@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
 
 import { auth } from "@/auth";
 import { cn } from "@/lib/utils";
@@ -17,6 +16,7 @@ import { type NavActiveKey } from "./nav-items";
 import { NotificationsDropdown } from "./notifications-dropdown";
 import { SearchBar } from "./search-bar";
 import { UserMenu } from "./user-menu";
+import { CreditBalanceMenu } from "@/components/credits/credit-balance-menu";
 import type { PlanId } from "@/lib/pricing";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 
@@ -140,14 +140,7 @@ export async function AppHeader({
         {userInfo ? (
           <>
             <MobileSearch locale={locale} />
-            <Link
-              href="/credits"
-              aria-label={`${locale === "en" ? "Credits" : "კრედიტები"}: ${balance}`}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-2.5 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-[var(--vivida-cyan)]/20"
-            >
-              <Sparkles className="size-3.5 text-[var(--vivida-cyan)]" />
-              {balance}
-            </Link>
+            <CreditBalanceMenu balance={balance} locale={locale} />
             <NotificationsDropdown
               initial={notifications}
               initialUnread={unread}
