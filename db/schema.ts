@@ -117,7 +117,10 @@ export const creditTransactions = pgTable(
       .defaultNow()
       .notNull(),
   },
-  (t) => [index("credit_tx_user_created_idx").on(t.userId, t.createdAt)]
+  (t) => [
+    index("credit_tx_user_created_idx").on(t.userId, t.createdAt),
+    index("credit_tx_user_reason_ref_idx").on(t.userId, t.reason, t.ref),
+  ]
 );
 
 /**
@@ -359,13 +362,8 @@ export const charts = pgTable("chart", {
   interpretedAt: timestamp("interpreted_at", { withTimezone: true }),
 });
 
-/**
- * Subscription state, 1:1 with users. Free users either have no row or
- * a row with plan='free'. Pro users have plan='pro' + an active period.
- */
-// The subscription/Pro model has been retired in favour of credits; its table
-// and the plan/status enums were removed. `billingIntervalEnum` stays because
-// the payment audit log below still uses it.
+// Retained for the historical Flitt payment audit log below. New purchases use
+// Stripe Checkout and the credit ledger.
 export const billingIntervalEnum = pgEnum("billing_interval", [
   "month",
   "year",
@@ -398,13 +396,12 @@ export const payments = pgTable("payment", {
 
 /**
  * One-time, paid, downloadable PDF reports (natal / synastry / forecast).
- * Lifecycle: pending → paid → generating → ready (or failed). Pro users
- * skip payment and land directly on 'paid'. The PDF lives privately in R2;
+ * Lifecycle: pending → paid → generating → ready (or failed). The PDF lives privately in R2;
  * `pdfKey` is the object key and we serve it via short-lived signed URLs.
  */
 export const pdfReportStatusEnum = pgEnum("pdf_report_status", [
   "pending", // checkout started, awaiting Stripe payment
-  "paid", // payment confirmed (or Pro-comped) — generation queued
+  "paid", // credit spend confirmed — generation queued
   "generating", // worker is producing the PDF
   "ready", // PDF stored in R2, downloadable
   "failed", // generation errored — retryable
@@ -427,7 +424,7 @@ export const pdfReports = pgTable(
     inputHash: text("input_hash"),
     amountCents: integer("amount_cents").notNull().default(0),
     currency: text("currency").notNull().default("GEL"),
-    /** true when comped to a Pro subscriber (no Stripe charge). */
+    /** Legacy compatibility field; new credit-funded reports are always false. */
     comped: boolean("comped").notNull().default(false),
     stripeSessionId: text("stripe_session_id").unique(),
     stripePaymentIntentId: text("stripe_payment_intent_id"),
@@ -745,7 +742,7 @@ export type DailyTransitsJson = {
  *   - pending : freshly enqueued, never attempted
  *   - sent    : Resend accepted the request
  *   - failed  : Resend or pre-flight threw — eligible for retry
- *   - skipped : dispatch returned false (free plan, no chart, etc.) — terminal
+ *   - skipped : dispatch returned false (no chart, opted out, etc.) — terminal
  */
 export const dailyEmailLog = pgTable(
   "daily_email_log",

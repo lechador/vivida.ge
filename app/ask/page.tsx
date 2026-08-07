@@ -3,13 +3,10 @@ import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { charts, chartChatMessages } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
-import { canUseFeature } from "@/lib/features";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartChat } from "@/components/ask/chart-chat";
-import { CreditUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "ჰკითხე ვარსკვლავებს" };
 export const dynamic = "force-dynamic";
@@ -17,13 +14,12 @@ export const dynamic = "force-dynamic";
 export default async function AskPage() {
   const user = await requireUser();
 
-  const [[chart], plan, history] = await Promise.all([
+  const [[chart], history] = await Promise.all([
     db
       .select({ userId: charts.userId })
       .from(charts)
       .where(eq(charts.userId, user.id))
       .limit(1),
-    getCurrentPlan(user.id),
     db
       .select({ role: chartChatMessages.role, content: chartChatMessages.content })
       .from(chartChatMessages)
@@ -35,7 +31,6 @@ export default async function AskPage() {
   if (!chart)
     return (
       <AstroLockedMain
-        plan={plan}
         active="ask"
         title="AI ასტროლოგი ნატალურ რუკას საჭიროებს"
         description="შეავსე დაბადების მონაცემები, რომ ესაუბრო AI ასტროლოგს, რომელიც შენს რუკას იცნობს."
@@ -57,7 +52,7 @@ export default async function AskPage() {
       />
       <Starfield count={110} shooting={3} />
 
-      <AppHeader authed plan={plan} active="ask" />
+      <AppHeader authed active="ask" />
 
       <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col px-4 pb-[calc(4.75rem_+_env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8 lg:pb-6">
         <header className="mb-5 shrink-0">
@@ -73,14 +68,7 @@ export default async function AskPage() {
           </p>
         </header>
 
-        {canUseFeature("chartChat", plan) ? (
-          <ChartChat initialMessages={initialMessages} firstName={firstName} />
-        ) : (
-          <CreditUpsell
-            title="ჰკითხე ვარსკვლავებს"
-            description="პერსონალური AI ასტროლოგი, რომელიც შენს ნატალურ რუკას იცნობს და ნებისმიერ შეკითხვას უპასუხებს — ხასიათზე, ურთიერთობებზე, კარიერასა და დროზე."
-          />
-        )}
+        <ChartChat initialMessages={initialMessages} firstName={firstName} />
       </section>
     </main>
   );

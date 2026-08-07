@@ -7,7 +7,6 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { mbtiTestResults, users, profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { ensureChartFor } from "@/actions/chart";
 import { calculateMbti, mbtiArchetypeKa } from "@/lib/mbti-questions";
 import { getMbtiQuestions } from "@/lib/mbti-questions-db";
@@ -67,9 +66,8 @@ export async function submitMbti(
   // static structure inside getMbtiQuestions, so wording edits can't skew it).
   const { type, scores } = calculateMbti(answers, await getMbtiQuestions());
 
-  const plan = await getCurrentPlan(user.id);
   // Positions only; never wait on / trigger chart AI here.
-  const chart = await ensureChartFor(user.id, plan, { aiUpgrade: "skip" }).catch(
+  const chart = await ensureChartFor(user.id, { aiUpgrade: "skip" }).catch(
     () => null
   );
 

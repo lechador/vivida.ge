@@ -1,12 +1,10 @@
 import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import {
   ensureSynastryDeepReport,
   getPartnerForViewer,
 } from "@/lib/partners-core";
 import { isOpenRouterConfigured } from "@/lib/openrouter";
 import { enforceRateLimit } from "@/lib/rate-limit";
-import { canUseFeature } from "@/lib/features";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,11 +22,6 @@ export async function POST(_req: Request, ctx: Params) {
     return Response.json({ error: "unavailable" }, { status: 503 });
   }
 
-  const plan = await getCurrentPlan(userId);
-  if (!canUseFeature("deepSynastry", plan)) {
-    return Response.json({ error: "pro_required" }, { status: 403 });
-  }
-
   const { id } = await ctx.params;
   const partner = await getPartnerForViewer(id, userId);
   if (!partner) return Response.json({ error: "not_found" }, { status: 404 });
@@ -44,7 +37,7 @@ export async function POST(_req: Request, ctx: Params) {
     return Response.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  const updated = await ensureSynastryDeepReport(partner, plan);
+  const updated = await ensureSynastryDeepReport(partner);
   if (!updated.deepReport) {
     return Response.json({ error: "generation_failed" }, { status: 502 });
   }

@@ -3,7 +3,6 @@ import type { ComponentProps } from "react";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { AstroGate } from "@/components/astro/astro-gate";
-import type { PlanId } from "@/lib/pricing";
 
 /**
  * Full-page "this feature needs an astro profile" shell — keeps the header and
@@ -11,13 +10,11 @@ import type { PlanId } from "@/lib/pricing";
  * Rendered in place of a birth-data-gated page for accounts without birth data.
  */
 export function AstroLockedMain({
-  plan,
   active,
   title,
   description,
   next,
 }: {
-  plan: PlanId;
   active?: ComponentProps<typeof AppHeader>["active"];
   title?: string;
   description?: string;
@@ -31,7 +28,7 @@ export function AstroLockedMain({
       />
       <Starfield count={110} shooting={2} />
 
-      <AppHeader authed plan={plan} active={active} />
+      <AppHeader authed active={active} />
 
       <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 items-center justify-center px-4 pb-20 pt-10 sm:px-6">
         <AstroGate title={title} description={description} next={next} />

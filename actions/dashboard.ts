@@ -8,7 +8,6 @@ import { ensureChartFor } from "@/actions/chart";
 import { ensureDailyFor } from "@/actions/daily";
 import { ensureMoonPhase, type MoonPhaseRow } from "@/actions/moon-phase";
 import { ensureWeeklyForecast } from "@/actions/weekly-forecast";
-import { canUseFeature } from "@/lib/features";
 import { getBalance, isUnlocked } from "@/lib/credits";
 import { getDashboardSuggestions } from "@/lib/suggestions";
 import {
@@ -16,7 +15,6 @@ import {
   type TransitBreakdownItem,
 } from "@/lib/transit-library";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
-import type { PlanId } from "@/lib/pricing";
 import type {
   Chart,
   DailyHoroscope,
@@ -46,20 +44,17 @@ export type DashboardCore =
       chart: Chart;
       timezone: string;
       canDaily: boolean;
-      /** The 7-day forecast is a one-time credit unlock (not a plan feature). */
+      /** The 7-day forecast is a one-time credit unlock. */
       weeklyUnlocked: boolean;
       /** Credit balance — used by the locked-forecast unlock CTA. */
       balance: number;
       suggestions: DiscoverCard[];
     };
 
-export async function loadDashboardCore(
-  userId: string,
-  plan: PlanId
-): Promise<DashboardCore> {
+export async function loadDashboardCore(userId: string): Promise<DashboardCore> {
   // Fast path: returns the static chart immediately, AI narrative lands in
   // the background. Positions + big-three render with zero AI latency.
-  const chart = await ensureChartFor(userId, plan, { aiUpgrade: "defer" });
+  const chart = await ensureChartFor(userId, { aiUpgrade: "defer" });
   if (!chart) return { kind: "no-chart" };
 
   // Skip the "suggested people" query entirely when the rail is flagged off
@@ -81,7 +76,7 @@ export async function loadDashboardCore(
     kind: "ok",
     chart,
     timezone: profileRow[0]?.timezone ?? "UTC",
-    canDaily: canUseFeature("dailyHoroscope", plan),
+    canDaily: true,
     weeklyUnlocked,
     balance,
     suggestions,
@@ -102,26 +97,20 @@ export type DashboardExtras = {
  * one slow/failed generator never blocks the others. Called after the core
  * has already painted, so its latency is hidden behind per-card skeletons.
  */
-export async function loadDashboardExtras(
-  userId: string,
-  plan: PlanId
-): Promise<DashboardExtras> {
-  const canDaily = canUseFeature("dailyHoroscope", plan);
+export async function loadDashboardExtras(userId: string): Promise<DashboardExtras> {
   const canWeekly = await isUnlocked(userId, "weekly", "spend_weekly");
 
   const [daily, moonPhase, weeklyForecast] = await Promise.all([
-    canDaily
-      ? ensureDailyFor(userId, plan).catch((err) => {
+    ensureDailyFor(userId).catch((err) => {
           console.warn("[dashboard:daily]", (err as Error).message);
           return null;
-        })
-      : Promise.resolve(null),
+        }),
     ensureMoonPhase().catch((err) => {
       console.warn("[dashboard:moon]", (err as Error).message);
       return null;
     }),
     canWeekly
-      ? ensureWeeklyForecast(userId, plan).catch((err) => {
+      ? ensureWeeklyForecast(userId).catch((err) => {
           console.warn("[dashboard:weekly]", (err as Error).message);
           return null;
         })

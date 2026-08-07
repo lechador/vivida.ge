@@ -6,7 +6,6 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import { EQ_ARTICLES } from "@/lib/seo/eq-articles";
 import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
 
@@ -23,13 +22,12 @@ export const metadata: Metadata = {
 export default async function EqArticlesPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
-  const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
   const categories = [...new Set(EQ_ARTICLES.map((item) => item.category))];
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden">
       <Starfield count={90} shooting={1} />
-      {authed ? <AppHeader authed plan={plan} active="tests" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeLd(breadcrumbLd([{ name: "მთავარი", url: "https://www.vivida.ge" }, { name: "ემოციური ინტელექტი", url: URL }])) }} />
       <section className="relative z-10 mx-auto max-w-6xl px-4 pb-24 pt-10 sm:px-6">
         <header className="mx-auto max-w-3xl text-center">

@@ -10,7 +10,6 @@ import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { invalidateProfileForUser } from "@/lib/header-cache";
 import { ensureChartFor } from "@/actions/chart";
-import { getCurrentPlan } from "@/lib/plan";
 import { sendWelcomeIfEligible } from "@/lib/email";
 import { awardReputation, RepSubject } from "@/lib/reputation";
 import {
@@ -52,8 +51,7 @@ export async function saveProfile(
   const userId = user.id;
   after(async () => {
     try {
-      const plan = await getCurrentPlan(userId);
-      await ensureChartFor(userId, plan);
+      await ensureChartFor(userId);
     } catch (err) {
       console.warn(
         "[saveProfile] background chart pre-gen failed; dashboard will retry:",

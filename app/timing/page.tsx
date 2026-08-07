@@ -3,13 +3,10 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { charts, profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
-import { canUseFeature } from "@/lib/features";
 import { computeTiming, type DayTier } from "@/lib/timing";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { AstroLockedMain } from "@/components/astro/astro-locked-main";
-import { CreditUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "საუკეთესო დღეები" };
 export const dynamic = "force-dynamic";
@@ -29,16 +26,14 @@ const FAMILY_COLOR: Record<string, string> = {
 export default async function TimingPage() {
   const user = await requireUser();
 
-  const [[chart], [profile], plan] = await Promise.all([
+  const [[chart], [profile]] = await Promise.all([
     db.select({ data: charts.data }).from(charts).where(eq(charts.userId, user.id)).limit(1),
     db.select({ timezone: profiles.timezone }).from(profiles).where(eq(profiles.userId, user.id)).limit(1),
-    getCurrentPlan(user.id),
   ]);
 
   if (!chart)
     return (
       <AstroLockedMain
-        plan={plan}
         active="timing"
         title="საუკეთესო დღეები ნატალურ რუკას საჭიროებს"
         description="შეავსე დაბადების მონაცემები, რომ ნახო, რომელი დღეები უბერავს ქარს ზურგში."
@@ -46,24 +41,6 @@ export default async function TimingPage() {
       />
     );
   const timezone = profile?.timezone ?? "Asia/Tbilisi";
-
-  if (!canUseFeature("timing", plan)) {
-    return (
-      <main className="relative isolate flex flex-1 flex-col overflow-hidden">
-        <Starfield count={90} />
-        <AppHeader authed plan={plan} active="timing" />
-        <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-8 sm:px-6">
-          <h1 className="mb-6 text-2xl font-semibold tracking-tight sm:text-3xl">
-            საუკეთესო დღეები
-          </h1>
-          <CreditUpsell
-            title="საუკეთესო დღეები"
-            description="პერსონალური დროის კალენდარი — როდის უბერავს ქარი ზურგში და როდის ღირს სიფრთხილე, შენი რუკის ტრანზიტების მიხედვით."
-          />
-        </section>
-      </main>
-    );
-  }
 
   const { days, notable } = computeTiming(chart.data, new Date(), timezone, 28);
 
@@ -85,7 +62,7 @@ export default async function TimingPage() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_350/0.3),transparent_70%)]"
       />
       <Starfield count={110} shooting={3} />
-      <AppHeader authed plan={plan} active="timing" />
+      <AppHeader authed active="timing" />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-6 sm:px-6 sm:pt-8">
         <header className="mb-6">

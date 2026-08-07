@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -42,7 +41,6 @@ export const metadata: Metadata = {
 export default async function TrueSignQuizPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
-  const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
 
   const ld = [
     {
@@ -78,7 +76,7 @@ export default async function TrueSignQuizPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed plan={plan} active="tests" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <header className="mb-6 text-center">

@@ -16,7 +16,6 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import { SOCIAL_FEATURES, type SocialFeature } from "@/lib/social-flags";
-import type { PlanId } from "@/lib/pricing";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export type NavActiveKey =
@@ -32,8 +31,7 @@ export type NavActiveKey =
   | "people"
   | "synastry"
   | "friends"
-  | "messages"
-  | "pro";
+  | "messages";
 
 export type NavItem = {
   key: NavActiveKey;
@@ -64,10 +62,9 @@ function navVisible(item: NavItem): boolean {
 }
 
 /**
- * The former "pro" slot is now the credits hub — the label is the same for
- * everyone. (Kept as a function so per-plan labels stay easy to reintroduce.)
+ * Resolve the visible label for the current interface language.
  */
-export function navLabel(item: NavItem, _plan: PlanId, locale: UserLocale = "ka"): string {
+export function navLabel(item: NavItem, locale: UserLocale = "ka"): string {
   return locale === "en" ? item.labelEn : item.label;
 }
 

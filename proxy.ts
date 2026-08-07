@@ -11,11 +11,10 @@ export const config = {
     /*
      * Match all routes except:
      *  - api/auth (Auth.js handlers — they manage their own auth)
-     *  - api/flitt (payment webhooks — no session, signature-verified instead)
      *  - api/v1 (mobile API — bearer-token auth + its own CORS, no cookie session)
      *  - _next (static / image)
      *  - public files (favicon, svg, png, etc.)
      */
-    "/((?!api/auth|api/flitt|api/v1|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!api/auth|api/v1|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

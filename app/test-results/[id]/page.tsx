@@ -6,7 +6,6 @@ import Link from "next/link";
 import { db } from "@/db";
 import { mbtiTestResults } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { mbtiBaseType } from "@/lib/mbti-questions";
 import { getTypeSections, mbtiSectionCombos, ensureMbtiLibraryFor } from "@/lib/mbti-library";
 import { AppHeader } from "@/components/nav/app-header";
@@ -44,8 +43,6 @@ export default async function TestResultPage({
   // Not found OR not the owner → 404 (don't leak that the id exists).
   if (!result) notFound();
 
-  const plan = await getCurrentPlan(user.id);
-
   // Rich 16Personalities-style sections — pre-written per 4-letter type. If any
   // are missing (unseeded), self-heal them in the background so the next view
   // is complete; this render shows whatever already exists.
@@ -69,7 +66,7 @@ export default async function TestResultPage({
       />
       <Starfield count={120} shooting={2} />
 
-      <AppHeader authed plan={plan} />
+      <AppHeader authed />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">

@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { partnerCreationsThisMonth } from "@/lib/partners-core";
@@ -14,12 +13,10 @@ export const metadata = { title: "ახალი პარტნიორი" }
 
 export default async function NewPartnerPage() {
   const user = await requireUser();
-  const plan = await getCurrentPlan(user.id);
-
   // Server-side cap check — keeps unauthorised users from bypassing the
   // client-side disabled CTA.
   const used = await partnerCreationsThisMonth(user.id);
-  const cap = PARTNER_CAP_PER_MONTH[plan];
+  const cap = PARTNER_CAP_PER_MONTH;
   if (used >= cap) {
     redirect("/synastry");
   }
@@ -32,7 +29,7 @@ export default async function NewPartnerPage() {
       />
       <Starfield count={120} shooting={3} />
 
-      <AppHeader authed plan={plan} active="synastry" />
+      <AppHeader authed active="synastry" />
 
       <section className="relative z-10 mx-auto w-full max-w-xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <Link

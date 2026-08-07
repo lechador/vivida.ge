@@ -143,18 +143,22 @@ export async function grantPurchaseCredits(
   amount: number,
   sessionId: string
 ): Promise<void> {
-  const [existing] = await db
-    .select({ id: creditTransactions.id })
-    .from(creditTransactions)
-    .where(
-      and(
-        eq(creditTransactions.ref, sessionId),
-        eq(creditTransactions.reason, "purchase")
-      )
+  if (amount <= 0) return;
+  const result = await db.execute<{
+    was_granted: boolean;
+    resulting_balance: number;
+  }>(sql`
+    SELECT * FROM vivida_grant_purchase_credits(
+      ${userId},
+      ${amount},
+      ${sessionId},
+      ${crypto.randomUUID()}
     )
-    .limit(1);
-  if (existing) return; // already credited this session
-  await grantCredits(userId, amount, "purchase", sessionId);
+  `);
+  const row = result.rows[0];
+  if (row?.was_granted) {
+    await notifyCredit(userId, amount, "purchase", row.resulting_balance);
+  }
 }
 
 /** Has the user already paid to unlock this specific thing (ledger ref match)? */
@@ -191,9 +195,24 @@ export async function spendOnce(
   reason: CreditReason,
   ref: string
 ): Promise<UnlockResult> {
-  if (await isUnlocked(userId, ref, reason)) return "already";
-  const ok = await spendCredits(userId, cost, reason, ref);
-  return ok ? "unlocked" : "insufficient";
+  const result = await db.execute<{
+    result_status: UnlockResult;
+    resulting_balance: number;
+  }>(sql`
+    SELECT * FROM vivida_spend_credits_once(
+      ${userId},
+      ${cost},
+      ${reason},
+      ${ref},
+      ${crypto.randomUUID()}
+    )
+  `);
+  const row = result.rows[0];
+  if (!row) throw new Error("credit unlock returned no result");
+  if (row.result_status === "unlocked" && cost > 0) {
+    await notifyCredit(userId, -cost, reason, row.resulting_balance);
+  }
+  return row.result_status;
 }
 
 /**

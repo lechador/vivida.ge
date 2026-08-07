@@ -5,7 +5,6 @@ import { profiles } from "@/db/schema";
 
 import { listFeed } from "@/actions/feed";
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { getHeaderData } from "@/lib/header-cache";
 import { getDashboardSuggestions } from "@/lib/suggestions";
@@ -36,8 +35,7 @@ export default async function FeedPage() {
     .limit(1);
   const hasBirthData = !!viewerProfile?.dateOfBirth;
 
-  const [plan, posts, headerData, suggestions, locale] = await Promise.all([
-    getCurrentPlan(user.id),
+  const [posts, headerData, suggestions, locale] = await Promise.all([
     listFeed({ limit: 30 }),
     // Reuses the cached header lookup (also has avatarUrl), so showing
     // the viewer's chosen main photo in the composer doesn't add an
@@ -63,7 +61,7 @@ export default async function FeedPage() {
       />
       <Starfield count={100} shooting={2} />
 
-      <AppHeader authed plan={plan} active="feed" />
+      <AppHeader authed active="feed" />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">

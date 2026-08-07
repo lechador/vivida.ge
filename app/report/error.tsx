@@ -1,5 +1,6 @@
 "use client"; // Error boundaries must be Client Components
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect, useState } from "react";
 import { Loader2, RotateCcw } from "lucide-react";
 
@@ -22,6 +23,10 @@ export default function ReportError({
   const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
+    Sentry.withScope((scope) => {
+      scope.setTag("error_boundary", "report");
+      Sentry.captureException(error);
+    });
     console.error("[/report] render error:", error);
     let alreadyRetried = false;
     try {

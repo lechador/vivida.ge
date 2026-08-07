@@ -21,21 +21,14 @@ import {
   PositionsTable,
   HousesTable,
 } from "@/components/report/positions-table";
-import type { PlanId } from "@/lib/pricing";
 import { signByIndex } from "@/lib/zodiac";
 
 /**
  * Static natal report content. Computes once per user (cached) and never
  * changes after — we render this on /report.
  */
-export async function ChartSection({
-  userId,
-  plan,
-}: {
-  userId: string;
-  plan: PlanId;
-}) {
-  const chart = await ensureChartFor(userId, plan);
+export async function ChartSection({ userId }: { userId: string }) {
+  const chart = await ensureChartFor(userId);
 
   if (!chart) {
     return (

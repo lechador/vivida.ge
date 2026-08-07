@@ -8,7 +8,6 @@ import {
   type SynastryInterpretationJson,
 } from "@/db/schema";
 import { ensureChartFor } from "@/actions/chart";
-import { getCurrentPlan } from "@/lib/plan";
 import { computeChart, type NatalInput } from "@/lib/astrology";
 import { computeSynastry } from "@/lib/synastry";
 import {
@@ -19,7 +18,6 @@ import {
   SYNASTRY_DEEP_PROMPT_VERSION,
 } from "@/lib/openrouter";
 import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
-import type { PlanId } from "@/lib/pricing";
 
 /**
  * Framework-agnostic synastry-partner logic, shared by the website (Server
@@ -97,15 +95,12 @@ export async function getPartnerForViewer(
 /**
  * Validate input, compute the partner's natal chart, enforce the monthly
  * cap, and insert. Doesn't trigger AI generation here — that happens lazily
- * on first synastry view. Resolves the user's plan internally so callers
- * don't have to.
+ * on first synastry view.
  */
 export async function createPartnerCore(
   userId: string,
   input: CreatePartnerInput
 ): Promise<CreatePartnerResult> {
-  const plan = await getCurrentPlan(userId);
-
   // Validation
   const name = input.name.trim();
   if (!name) return { ok: false, error: "ჩაწერე პარტნიორის სახელი" };
@@ -140,7 +135,7 @@ export async function createPartnerCore(
 
   // Cap enforcement — atomic-enough for a single user.
   const used = await partnerCreationsThisMonth(userId);
-  const cap = PARTNER_CAP_PER_MONTH[plan];
+  const cap = PARTNER_CAP_PER_MONTH;
   if (used >= cap) {
     return {
       ok: false,
@@ -209,12 +204,11 @@ export async function softDeletePartnerCore(
  * (or the input partner) on any error, never throws.
  */
 export async function ensureSynastryInterpretation(
-  partner: Partner,
-  plan: PlanId
+  partner: Partner
 ): Promise<Partner> {
   if (!isOpenRouterConfigured()) return partner;
 
-  const viewerChart = await ensureChartFor(partner.userId, plan);
+  const viewerChart = await ensureChartFor(partner.userId);
   if (!viewerChart) return partner;
 
   // Cache hit?
@@ -282,12 +276,11 @@ export async function ensureSynastryInterpretation(
  * invalidated when the viewer's chart or the prompt version changes. Fails soft.
  */
 export async function ensureSynastryDeepReport(
-  partner: Partner,
-  plan: PlanId
+  partner: Partner
 ): Promise<Partner> {
   if (!isOpenRouterConfigured()) return partner;
 
-  const viewerChart = await ensureChartFor(partner.userId, plan);
+  const viewerChart = await ensureChartFor(partner.userId);
   if (!viewerChart) return partner;
 
   const stamp = `${viewerChart.inputHash}:v${SYNASTRY_DEEP_PROMPT_VERSION}`;

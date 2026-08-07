@@ -435,6 +435,13 @@
       "when": 1785258227483,
       "tag": "0061_workable_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1786100120406,
+      "tag": "0062_fuzzy_vapor",
+      "breakpoints": true
     }
   ]
 }

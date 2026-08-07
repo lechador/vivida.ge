@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 /**
@@ -16,7 +17,17 @@ import { fileURLToPath } from "node:url";
  * helper would silently fail to bundle the .ttf.
  */
 export async function readFontBuffer(url: URL): Promise<ArrayBuffer> {
-  const filePath = fileURLToPath(url);
+  // Build workers can create the URL in a different VM realm, where Node's
+  // `instanceof URL` check rejects an otherwise valid URL object. Passing the
+  // serialized file URL avoids that cross-realm mismatch.
+  const href = url.href;
+  const filePath = href.startsWith("/_next/")
+    ? resolve(
+        process.cwd(),
+        ".next/server/chunks",
+        href.slice("/_next/".length)
+      )
+    : fileURLToPath(href);
   const buf = await readFile(filePath);
   return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
 }

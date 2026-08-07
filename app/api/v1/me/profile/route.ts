@@ -6,7 +6,6 @@ import { handle } from "@/lib/api/errors";
 import { ok, fail } from "@/lib/api/respond";
 import { parseBody } from "@/lib/api/validate";
 import { ensureChartFor } from "@/actions/chart";
-import { getCurrentPlan } from "@/lib/plan";
 import { sendWelcomeIfEligible } from "@/lib/email";
 import { invalidateProfileForUser } from "@/lib/header-cache";
 import {
@@ -57,8 +56,7 @@ export async function PUT(req: Request) {
     const userId = user.id;
     after(async () => {
       try {
-        const plan = await getCurrentPlan(userId);
-        await ensureChartFor(userId, plan);
+        await ensureChartFor(userId);
       } catch (err) {
         console.warn(
           "[api/v1/me/profile] background chart pre-gen failed:",

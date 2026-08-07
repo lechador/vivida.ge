@@ -8,7 +8,6 @@ import { profiles, profilePhotos, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { asc } from "drizzle-orm";
 import { getHeaderData } from "@/lib/header-cache";
-import { getCurrentPlan } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -29,13 +28,12 @@ export const dynamic = "force-dynamic";
 export default async function AccountPage() {
   const user = await requireUser();
 
-  const [[profile], plan, photos, [emailPrefs], headerData] = await Promise.all([
+  const [[profile], photos, [emailPrefs], headerData] = await Promise.all([
     db
       .select()
       .from(profiles)
       .where(eq(profiles.userId, user.id))
       .limit(1),
-    getCurrentPlan(user.id),
     db
       .select({
         id: profilePhotos.id,
@@ -71,7 +69,7 @@ export default async function AccountPage() {
       />
       <Starfield count={70} />
 
-      <AppHeader authed plan={plan} active="account" />
+      <AppHeader authed active="account" />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">

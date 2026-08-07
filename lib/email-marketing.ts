@@ -15,7 +15,6 @@ import { DailyHoroscopeEmail } from "@/lib/email-templates/daily-horoscope";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { MarketingEmail } from "@/lib/email-templates/marketing";
 import { ensureDailyFor } from "@/actions/daily";
-import { getCurrentPlan } from "@/lib/plan";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 
 let _client: Resend | null = null;
@@ -310,9 +309,8 @@ async function dispatch(
   const token = await getOrCreateUnsubscribeToken(recipient.userId);
 
   if (opts.template === "daily_horoscope") {
-    const plan = await getCurrentPlan(recipient.userId);
-    const daily = await ensureDailyFor(recipient.userId, plan);
-    if (!daily) return false; // No chart, free plan, or generation failed — skip silently
+    const daily = await ensureDailyFor(recipient.userId);
+    if (!daily) return false; // No chart or generation failed — skip silently
     const [profile] = await db
       .select({ timezone: profiles.timezone })
       .from(profiles)
@@ -489,7 +487,7 @@ export type DailyBlastResult = {
   alreadyEnqueued: number;
   /** Successful Resend dispatches in this invocation. */
   sent: number;
-  /** Dispatch returned false (free plan, no chart, user opted out mid-day). */
+  /** Dispatch returned false (no chart or user opted out mid-day). */
   skipped: number;
   /** Threw — row left status='failed' for next cron tick to retry. */
   failed: number;

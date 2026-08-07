@@ -2,7 +2,7 @@ import { BIG5_LEVEL_LABEL, type BigFiveResult } from "@/lib/big-five/scoring";
 import { TraitRadar, type RadarPoint } from "@/components/tests/trait-radar";
 
 /**
- * The free tier of the Big Five result — the radar + a labelled score bar per
+ * The summary section of the Big Five result — the radar + a labelled score bar per
  * trait. This is the "profile shape"; the written per-trait analysis lives in
  * BigFiveDetail (gated).
  */

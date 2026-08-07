@@ -3,7 +3,6 @@ import { handle } from "@/lib/api/errors";
 import { ok } from "@/lib/api/respond";
 import { ensureWeeklyForecast } from "@/actions/weekly-forecast";
 import { isUnlocked } from "@/lib/credits";
-import { getCurrentPlan } from "@/lib/plan";
 
 export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
@@ -22,8 +21,7 @@ export async function GET(req: Request) {
     const user = await requireMobileUser(req);
     const unlocked = await isUnlocked(user.id, "weekly", "spend_weekly");
     if (!unlocked) return ok({ forecast: null, locked: true });
-    const plan = await getCurrentPlan(user.id);
-    const forecast = await ensureWeeklyForecast(user.id, plan);
+    const forecast = await ensureWeeklyForecast(user.id);
     return ok({ forecast: forecast ?? null });
   });
 }

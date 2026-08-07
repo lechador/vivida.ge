@@ -6,7 +6,6 @@ import { Pencil } from "lucide-react";
 import { db } from "@/db";
 import { profiles, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -21,9 +20,8 @@ export const metadata = { title: "ჩემი რუკა" };
 export default async function ReportPage() {
   const user = await requireUser();
 
-  const [[profile], plan, [userPrefs]] = await Promise.all([
+  const [[profile], [userPrefs]] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
-    getCurrentPlan(user.id),
     db.select({ locale: users.interfaceLanguage }).from(users).where(eq(users.id, user.id)).limit(1),
   ]);
   const locale = normalizeUserLocale(userPrefs?.locale);
@@ -32,7 +30,6 @@ export default async function ReportPage() {
   if (!profile?.dateOfBirth) {
     return (
       <AstroLockedMain
-        plan={plan}
         active="report"
         title={en ? "A natal chart needs your birth details" : "ნატალური რუკა დაბადების მონაცემებს საჭიროებს"}
         description={en ? "Add your birth date, time and place to calculate your personal cosmic map." : "შეავსე დაბადების თარიღი, დრო და ადგილი, რომ შედგეს შენი პერსონალური კოსმიური რუკა."}
@@ -58,7 +55,7 @@ export default async function ReportPage() {
       />
       <Starfield count={160} shooting={3} />
 
-      <AppHeader authed plan={plan} active="report" />
+      <AppHeader authed active="report" />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
@@ -77,7 +74,7 @@ export default async function ReportPage() {
 
         <div className="mb-10">
           <Suspense fallback={null}>
-            <ReportPdfPanel userId={user.id} plan={plan} />
+            <ReportPdfPanel userId={user.id} />
           </Suspense>
         </div>
 
@@ -88,7 +85,7 @@ export default async function ReportPage() {
             </div>
           }
         >
-          <ChartSection userId={user.id} plan={plan} />
+          <ChartSection userId={user.id} />
         </Suspense>
 
         <div className="mt-12 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">

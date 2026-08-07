@@ -6,7 +6,6 @@ import { Brain, RotateCcw } from "lucide-react";
 import { db } from "@/db";
 import { iqResults } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { iqBand } from "@/lib/iq/scoring";
 import { DOMAIN_LABELS_KA, type IqDomain } from "@/lib/iq/items";
 import { AppHeader } from "@/components/nav/app-header";
@@ -43,7 +42,6 @@ export default async function SavedIqResultPage({
     .limit(1);
   if (!row) notFound(); // not found OR not the owner
 
-  const plan = await getCurrentPlan(user.id);
   const band = iqBand(row.iq);
   const ds = row.domainScores;
 
@@ -61,7 +59,7 @@ export default async function SavedIqResultPage({
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_265/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_190/0.4),transparent_70%)]"
       />
       <Starfield count={110} shooting={2} />
-      <AppHeader authed plan={plan} active="tests" />
+      <AppHeader authed active="tests" />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">

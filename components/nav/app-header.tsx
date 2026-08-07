@@ -6,7 +6,6 @@ import { getHeaderData } from "@/lib/header-cache";
 import { getBalance } from "@/lib/credits";
 import { Button } from "@/components/ui/button";
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { ProBadge } from "@/components/brand/pro-badge";
 import { DesktopSidebar } from "./desktop-sidebar";
 import { MobileNav } from "./mobile-nav";
 import { MobileSearch } from "./mobile-search";
@@ -17,21 +16,18 @@ import { NotificationsDropdown } from "./notifications-dropdown";
 import { SearchBar } from "./search-bar";
 import { UserMenu } from "./user-menu";
 import { CreditBalanceMenu } from "@/components/credits/credit-balance-menu";
-import type { PlanId } from "@/lib/pricing";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * App-wide top navigation. Server component that fetches its own session
- * and notification feed when the user is authed. Pages just pass their
- * computed plan + the active section.
+ * and notification feed when the user is authed. Pages only pass auth state
+ * and the active section.
  */
 export async function AppHeader({
   authed,
-  plan,
   active,
 }: {
   authed: boolean;
-  plan: PlanId;
   active?:
     | "today"
     | "sky"
@@ -46,8 +42,7 @@ export async function AppHeader({
     | "synastry"
     | "friends"
     | "messages"
-    | "account"
-    | "pro";
+    | "account";
 }) {
   let userInfo: {
     id: string;
@@ -95,7 +90,7 @@ export async function AppHeader({
     <header className="relative z-30 mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-4 sm:gap-5 sm:px-6 sm:py-5">
       {/* Mobile hamburger — authed users only (guests don't have nav). */}
       {userInfo && (
-        <MobileNav active={active as NavActiveKey | undefined} plan={plan} locale={locale} />
+        <MobileNav active={active as NavActiveKey | undefined} locale={locale} />
       )}
 
       <Link
@@ -122,7 +117,6 @@ export async function AppHeader({
         >
           vivida
         </span>
-        {userInfo && plan === "pro" && <ProBadge className="hidden sm:inline-flex" />}
       </Link>
 
       {/* Authed nav — central pill links, hidden on mobile (drawer instead) */}
@@ -171,7 +165,6 @@ export async function AppHeader({
         />
         <DesktopSidebar
           active={active as NavActiveKey | undefined}
-          plan={plan}
           unreadMessages={unreadMessages}
           locale={locale}
         />

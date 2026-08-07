@@ -4,7 +4,6 @@ import { ArrowRight, Sparkles, UserPlus, Users } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
-import { getCurrentPlan } from "@/lib/plan";
 import {
   listFriends,
   listIncomingRequests,
@@ -56,8 +55,7 @@ export default async function FriendsPage({
       ? params.tab
       : "friends";
 
-  const [plan, friends, incoming, outgoing, locale] = await Promise.all([
-    getCurrentPlan(user.id),
+  const [friends, incoming, outgoing, locale] = await Promise.all([
     listFriends(user.id),
     listIncomingRequests(user.id),
     listOutgoingRequests(user.id),
@@ -83,7 +81,7 @@ export default async function FriendsPage({
       />
       <Starfield count={110} shooting={3} />
 
-      <AppHeader authed plan={plan} active="friends" />
+      <AppHeader authed active="friends" />
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">

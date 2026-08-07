@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 
 import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import { TESTS, type TestCatalogEntry } from "@/lib/tests-catalog";
 import {
   getLatestBigFiveResult,
@@ -115,7 +114,6 @@ const FAQ = [
 export default async function TestsPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
-  const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
 
   // Latest result per test, keyed by catalog slug — shown inline on the card
   // (the score itself, not just a "my result" link).
@@ -190,7 +188,7 @@ export default async function TestsPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed plan={plan} active="tests" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <header className="mb-8 text-center sm:mb-10">

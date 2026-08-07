@@ -64,7 +64,7 @@ export type DeleteAccountResult =
 /**
  * Permanently delete the user and everything that references them. Best-
  * effort R2 photo cleanup, then a single DELETE FROM "user" — every related
- * table has ON DELETE CASCADE on the user FK (profile, subscription,
+ * table has ON DELETE CASCADE on the user FK (profile, credit account,
  * friendships, notifications, messages, charts, sessions, OAuth accounts,
  * photos, refresh tokens, typing indicators all go in one shot). The caller
  * is responsible for clearing the client's own session/tokens afterward.

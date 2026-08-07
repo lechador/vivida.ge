@@ -32,9 +32,7 @@ import {
 } from "@/lib/house-library";
 import { BODIES, bodyMeta, signByIndex } from "@/lib/zodiac";
 import { HOUSE_NUMBERS, houseDef } from "@/lib/houses";
-import { canUseFeature } from "@/lib/features";
 import { aspectKey } from "@/lib/aspects";
-import type { PlanId } from "@/lib/pricing";
 import type { NatalChartJson } from "@/db/schema";
 
 /**
@@ -64,16 +62,13 @@ type AiUpgradeMode = "wait" | "defer" | "skip";
 
 async function resolveChart(
   userId: string,
-  plan: PlanId = "free",
   opts: { aiUpgrade?: AiUpgradeMode } = {}
 ): Promise<Chart | null> {
   const mode = opts.aiUpgrade ?? "wait";
-  // AI summary gates through the feature flag layer. While the flag is off,
-  // every plan gets AI generation — so long as OpenRouter is configured.
+  // AI summaries are available to every account when OpenRouter is configured.
   // `skip` callers opt out entirely.
   const wantAi =
     mode !== "skip" &&
-    canUseFeature("aiSummary", plan) &&
     isOpenRouterConfigured();
   const [profile] = await db
     .select()
@@ -227,11 +222,10 @@ function isTransientDbError(err: unknown): boolean {
  */
 export async function ensureChartFor(
   userId: string,
-  plan: PlanId = "free",
   opts: { aiUpgrade?: AiUpgradeMode } = {}
 ): Promise<Chart | null> {
   try {
-    const chart = await resolveChart(userId, plan, opts);
+    const chart = await resolveChart(userId, opts);
     return chart ? overlayLibrary(chart) : chart;
   } catch (err) {
     if (!isTransientDbError(err)) throw err;
@@ -240,7 +234,7 @@ export async function ensureChartFor(
       (err as Error).message
     );
     await new Promise((r) => setTimeout(r, 300));
-    const chart = await resolveChart(userId, plan, opts);
+    const chart = await resolveChart(userId, opts);
     return chart ? overlayLibrary(chart) : chart;
   }
 }

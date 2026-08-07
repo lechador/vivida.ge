@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -53,7 +52,6 @@ export const metadata: Metadata = {
 export default async function BigFiveTestPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
-  const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
 
   const ld = [
     {
@@ -91,7 +89,7 @@ export default async function BigFiveTestPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed plan={plan} active="tests" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
 
       <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-4 pb-10 pt-4 sm:px-6 sm:pb-14 sm:pt-6">
         <header className="mb-5 text-center">

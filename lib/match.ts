@@ -46,7 +46,7 @@ export type MatchView = {
 export type IncomingLikes = {
   /** How many people have liked the viewer and are awaiting a decision. */
   count: number;
-  /** True when the viewer's plan hides liker identities (free tier). */
+  /** Kept for mobile response compatibility; always false. */
   locked: boolean;
   /** The likers' cards — empty when `locked` (identities are withheld
    *  server-side so a free client can't scrape them). */
@@ -263,15 +263,10 @@ export async function listMatches(viewerId: string): Promise<MatchView[]> {
 /**
  * People who have liked the viewer and are still awaiting a decision (the
  * viewer hasn't liked or passed them back, and they're not blocked). This is
- * the "who liked you" surface: a count is always returned, but liker
- * identities are only built when `reveal` is true (Pro tier) — a free client
- * gets the count and an empty list so it can show blurred teasers without ever
- * receiving the underlying data.
+ * the "who liked you" surface. The retired Pro gate no longer hides liker
+ * identities; authenticated users receive their pending likers directly.
  */
-export async function listIncomingLikes(
-  viewerId: string,
-  { reveal }: { reveal: boolean }
-): Promise<IncomingLikes> {
+export async function listIncomingLikes(viewerId: string): Promise<IncomingLikes> {
   const [likedMe, iDecided, blockedRows] = await Promise.all([
     db
       .select({ id: likes.likerId })
@@ -299,8 +294,8 @@ export async function listIncomingLikes(
   );
 
   const count = pending.length;
-  if (!reveal || count === 0) {
-    return { count, locked: !reveal, likers: [] };
+  if (count === 0) {
+    return { count, locked: false, likers: [] };
   }
 
   const [viewerChart] = await db

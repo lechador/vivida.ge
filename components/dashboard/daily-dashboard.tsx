@@ -14,8 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
-import { canUseFeature } from "@/lib/features";
-import type { PlanId } from "@/lib/pricing";
 
 import { DailyCard } from "./daily-card";
 import { HoroscopeLoading } from "./horoscope-loading";
@@ -36,12 +34,10 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function DailyDashboard({
   userId,
-  plan,
   savedVoice,
   locale = "ka",
 }: {
   userId: string;
-  plan: PlanId;
   savedVoice?: string | null;
   locale?: UserLocale;
 }) {
@@ -52,7 +48,7 @@ export function DailyDashboard({
 
   useEffect(() => {
     let cancelled = false;
-    loadDashboardCore(userId, plan)
+    loadDashboardCore(userId)
       .then((c) => {
         if (!cancelled) setCore(c);
       })
@@ -62,7 +58,7 @@ export function DailyDashboard({
     return () => {
       cancelled = true;
     };
-  }, [userId, plan]);
+  }, [userId]);
 
   useEffect(() => {
     if (core?.kind === "no-chart") {
@@ -104,10 +100,9 @@ export function DailyDashboard({
           on generation latency. */}
       <DashboardExtrasSection
         userId={userId}
-        plan={plan}
         timezone={timezone}
         canDaily={canDaily}
-        canAudio={canUseFeature("audioHoroscope", plan)}
+        canAudio
         weeklyUnlocked={weeklyUnlocked}
         balance={balance}
         savedVoice={savedVoice}
@@ -160,7 +155,6 @@ export function DailyDashboard({
  */
 function DashboardExtrasSection({
   userId,
-  plan,
   timezone,
   canDaily,
   weeklyUnlocked,
@@ -170,7 +164,6 @@ function DashboardExtrasSection({
   locale,
 }: {
   userId: string;
-  plan: PlanId;
   timezone: string;
   canDaily: boolean;
   weeklyUnlocked: boolean;
@@ -184,7 +177,7 @@ function DashboardExtrasSection({
 
   useEffect(() => {
     let cancelled = false;
-    loadDashboardExtras(userId, plan)
+    loadDashboardExtras(userId)
       .then((e) => {
         if (!cancelled) setExtras(e);
       })
@@ -202,7 +195,7 @@ function DashboardExtrasSection({
     return () => {
       cancelled = true;
     };
-  }, [userId, plan]);
+  }, [userId]);
 
   const loading = extras === null;
 

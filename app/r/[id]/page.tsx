@@ -11,7 +11,6 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import { MbtiResultView } from "@/components/mbti/mbti-result-view";
 import { MbtiFamousPeople } from "@/components/mbti/mbti-famous-people";
 
@@ -74,7 +73,6 @@ export default async function MbtiSharePage({
 
   const session = await auth();
   const authed = !!session?.user?.id;
-  const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -84,7 +82,7 @@ export default async function MbtiSharePage({
       />
       <Starfield count={110} shooting={2} />
 
-      {authed ? <AppHeader authed plan={plan} /> : <SmartHeader />}
+      {authed ? <AppHeader authed /> : <SmartHeader />}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">

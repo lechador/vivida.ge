@@ -5,7 +5,6 @@ import { CheckCircle2, Download, Loader2 } from "lucide-react";
 import { db } from "@/db";
 import { pdfReports } from "@/db/schema";
 import { Button } from "@/components/ui/button";
-import type { PlanId } from "@/lib/pricing";
 import { CREDIT_COST, getBalance } from "@/lib/credits";
 import { BuyReportCta } from "./buy-report-cta";
 
@@ -18,7 +17,6 @@ export async function ReportPdfPanel({
   userId,
 }: {
   userId: string;
-  plan: PlanId;
 }) {
   const [report] = await db
     .select()

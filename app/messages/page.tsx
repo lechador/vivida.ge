@@ -8,7 +8,6 @@ import {
   countUnreadMessages,
   listConversations,
 } from "@/lib/messages";
-import { getCurrentPlan } from "@/lib/plan";
 import { cn } from "@/lib/utils";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 
@@ -24,11 +23,10 @@ export default async function MessagesPage({
   const userId = session?.user?.id;
   if (!userId) redirect("/");
 
-  const [{ with: partnerId }, conversations, unread, plan, locale] = await Promise.all([
+  const [{ with: partnerId }, conversations, unread, locale] = await Promise.all([
     searchParams,
     listConversations(userId),
     countUnreadMessages(userId),
-    getCurrentPlan(userId),
     getUserLocale(userId),
   ]);
 
@@ -62,7 +60,7 @@ export default async function MessagesPage({
       />
       <Starfield count={70} />
 
-      <AppHeader authed plan={plan} active="messages" />
+      <AppHeader authed active="messages" />
 
       <section
         className={cn(

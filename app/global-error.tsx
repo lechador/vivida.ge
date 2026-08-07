@@ -1,5 +1,6 @@
 "use client"; // Error boundaries must be Client Components
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -26,6 +27,10 @@ export default function GlobalError({
   const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
+    Sentry.withScope((scope) => {
+      scope.setTag("error_boundary", "global");
+      Sentry.captureException(error);
+    });
     console.error("[global-error]", error);
     let alreadyRetried = false;
     try {

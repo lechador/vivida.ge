@@ -2,9 +2,7 @@ import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { ProBadge } from "@/components/brand/pro-badge";
 import { cn } from "@/lib/utils";
-import type { PlanId } from "@/lib/pricing";
 import { MessagesTabBadge } from "./messages-tab-badge";
 import { NAV_ITEMS, navLabel, type NavActiveKey, type NavItem } from "./nav-items";
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -19,12 +17,10 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function DesktopSidebar({
   active,
-  plan,
   unreadMessages = 0,
   locale = "ka",
 }: {
   active?: NavActiveKey;
-  plan: PlanId;
   unreadMessages?: number;
   locale?: UserLocale;
 }) {
@@ -68,7 +64,6 @@ export function DesktopSidebar({
           >
             vivida
           </span>
-          {plan === "pro" && <ProBadge />}
         </span>
       </Link>
 
@@ -86,7 +81,7 @@ export function DesktopSidebar({
               <Link
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                title={navLabel(item, plan, locale)}
+                title={navLabel(item, locale)}
                 className={cn(
                   "group/link relative flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors",
                   isActive
@@ -108,7 +103,7 @@ export function DesktopSidebar({
                     <MessagesTabBadge initial={unreadMessages} />
                   )}
                 </span>
-                <span className={cn("truncate", reveal)}>{navLabel(item, plan, locale)}</span>
+                <span className={cn("truncate", reveal)}>{navLabel(item, locale)}</span>
                 {item.badgeKa && (
                   <span
                     className={cn(

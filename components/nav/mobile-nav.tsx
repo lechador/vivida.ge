@@ -8,8 +8,6 @@ import { Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { ProBadge } from "@/components/brand/pro-badge";
-import type { PlanId } from "@/lib/pricing";
 import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -19,11 +17,9 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function MobileNav({
   active,
-  plan,
   locale = "ka",
 }: {
   active?: NavActiveKey;
-  plan: PlanId;
   locale?: UserLocale;
 }) {
   const [open, setOpen] = useState(false);
@@ -82,7 +78,6 @@ export function MobileNav({
                     >
                       vivida
                     </span>
-                    {plan === "pro" && <ProBadge />}
                   </Link>
                   <DialogPrimitive.Close
                     aria-label={locale === "en" ? "Close" : "დახურვა"}
@@ -149,7 +144,7 @@ export function MobileNav({
                               : undefined
                           }
                         />
-                        <span className="relative z-10">{navLabel(item, plan, locale)}</span>
+                        <span className="relative z-10">{navLabel(item, locale)}</span>
                         {item.badgeKa && (
                           <span className="relative z-10 ml-auto rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]">
                             {locale === "en" ? item.badgeEn : item.badgeKa}

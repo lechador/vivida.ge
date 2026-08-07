@@ -68,7 +68,7 @@ export function MobileTabBar({
                     <MessagesTabBadge initial={unreadMessages} />
                   )}
                 </span>
-                <span className="truncate">{navLabel(item, "free", locale)}</span>
+                <span className="truncate">{navLabel(item, locale)}</span>
               </Link>
             </li>
           );

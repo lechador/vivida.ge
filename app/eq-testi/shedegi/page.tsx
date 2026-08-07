@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -22,7 +21,6 @@ export const metadata: Metadata = {
 export default async function EqResultPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
-  const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -32,7 +30,7 @@ export default async function EqResultPage() {
       />
       <Starfield count={110} shooting={2} />
 
-      {authed ? <AppHeader authed plan={plan} active="tests" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <EqResultClient />

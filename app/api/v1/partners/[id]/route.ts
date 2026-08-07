@@ -1,7 +1,6 @@
 import { requireMobileUser } from "@/lib/api/auth";
 import { handle } from "@/lib/api/errors";
 import { ok, fail } from "@/lib/api/respond";
-import { getCurrentPlan } from "@/lib/plan";
 import {
   ensureSynastryInterpretation,
   getPartnerForViewer,
@@ -31,8 +30,7 @@ export async function GET(
       return fail(404, "partner_not_found", "Partner not found");
     }
 
-    const plan = await getCurrentPlan(user.id);
-    const enriched = await ensureSynastryInterpretation(partner, plan);
+    const enriched = await ensureSynastryInterpretation(partner);
     return ok({ partner: enriched });
   });
 }

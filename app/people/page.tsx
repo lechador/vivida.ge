@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { listPeople } from "@/lib/people";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import { Starfield } from "@/components/landing/starfield";
@@ -23,8 +22,7 @@ export default async function PeoplePage() {
   // preserved; bounce to the dashboard so the link degrades gracefully.
   if (!SOCIAL_FEATURES.peopleDirectory) redirect("/dashboard");
   const user = await requireUser();
-  const [plan, firstPage, locale] = await Promise.all([
-    getCurrentPlan(user.id),
+  const [firstPage, locale] = await Promise.all([
     listPeople(user.id, { limit: 30 }),
     getUserLocale(user.id),
   ]);
@@ -38,7 +36,7 @@ export default async function PeoplePage() {
       />
       <Starfield count={90} shooting={2} />
 
-      <AppHeader authed plan={plan} active="people" />
+      <AppHeader authed active="people" />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">

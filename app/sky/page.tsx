@@ -1,5 +1,4 @@
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { ensureChartFor } from "@/actions/chart";
 import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { composeSkyData } from "@/lib/sky";
@@ -37,14 +36,11 @@ const ASPECT_TONE: Record<string, string> = {
  */
 export default async function SkyPage() {
   const user = await requireUser();
-  const plan = await getCurrentPlan(user.id);
-
   // Positions only — never wait on (or trigger) chart AI here.
-  const chart = await ensureChartFor(user.id, plan, { aiUpgrade: "skip" });
+  const chart = await ensureChartFor(user.id, { aiUpgrade: "skip" });
   if (!chart)
     return (
       <AstroLockedMain
-        plan={plan}
         active="sky"
         title="ცოცხალი ცა ნატალურ რუკას საჭიროებს"
         description="შეავსე დაბადების მონაცემები, რომ ნახო, სად არიან პლანეტები ახლა შენს რუკაზე."
@@ -63,7 +59,7 @@ export default async function SkyPage() {
       />
       <Starfield count={140} shooting={2} />
 
-      <AppHeader authed plan={plan} active="sky" />
+      <AppHeader authed active="sky" />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <header className="mb-8">

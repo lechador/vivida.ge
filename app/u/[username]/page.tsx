@@ -13,8 +13,6 @@ import {
   listRecentPostsByUser,
 } from "@/actions/feed";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
-import { getCurrentPlan } from "@/lib/plan";
-import { canUseFeature } from "@/lib/features";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { computeElementBalance } from "@/lib/elements";
 import { computeSynastry, overallVerdict } from "@/lib/synastry";
@@ -118,8 +116,7 @@ export default async function PublicProfilePage({
   }
   const { profile, user: owner } = row;
 
-  const ownerPlan = await getCurrentPlan(owner.id);
-  const ownerChart = await ensureChartFor(owner.id, ownerPlan);
+  const ownerChart = await ensureChartFor(owner.id);
 
   // Public test results the owner has opted to display.
   const testBadges: { label: string; value: string; glyph: string }[] = [];
@@ -148,7 +145,6 @@ export default async function PublicProfilePage({
   // Viewer (may be anonymous, may be the owner, may be a logged-in stranger)
   const session = await auth();
   const viewerId = session?.user?.id ?? null;
-  const viewerPlan = viewerId ? await getCurrentPlan(viewerId) : "free";
   const locale = viewerId ? await getUserLocale(viewerId) : "ka";
   const en = locale === "en";
   const isOwner = viewerId === owner.id;
@@ -171,7 +167,7 @@ export default async function PublicProfilePage({
   let viewerName: string | null = null;
   let viewerSunSign = null;
   if (viewerId && !isOwner && ownerChart) {
-    const viewerChart = await ensureChartFor(viewerId, viewerPlan);
+    const viewerChart = await ensureChartFor(viewerId);
     if (viewerChart) {
       synastry = computeSynastry(viewerChart.data, ownerChart.data);
       synastryTexts = await getSynastryInterpretationsFor(synastry);
@@ -239,7 +235,7 @@ export default async function PublicProfilePage({
       />
       <Starfield count={140} shooting={3} />
 
-      <AppHeader authed={!!viewerId} plan={viewerPlan} />
+      <AppHeader authed={!!viewerId} />
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         {/* Profile hero */}
@@ -269,7 +265,7 @@ export default async function PublicProfilePage({
               )}
 
               {/* Owner-only: regenerate a brand-styled AI avatar in place */}
-              {isOwner && canUseFeature("aiAvatar", viewerPlan) && (
+              {isOwner && (
                 <AiAvatarButton locale={locale} />
               )}
             </div>

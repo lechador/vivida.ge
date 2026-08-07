@@ -134,6 +134,7 @@ export default function RootLayout({
   return (
     <html
       lang="ka"
+      data-scroll-behavior="smooth"
       className={`dark scroll-smooth ${notoGeorgian.variable} h-full antialiased`}
       suppressHydrationWarning
     >
@@ -143,6 +144,12 @@ export default function RootLayout({
         <noscript>
           <style>{`.reveal{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
+        <a
+          href="#main-content"
+          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-xl border border-[var(--vivida-violet)]/60 bg-background px-4 py-2.5 text-sm font-semibold text-foreground shadow-xl transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[var(--vivida-violet)] focus:ring-offset-2 focus:ring-offset-background"
+        >
+          მთავარ კონტენტზე გადასვლა
+        </a>
         <NextTopLoader
           color="oklch(0.78 0.18 305)"
           height={2.5}
@@ -155,7 +162,13 @@ export default function RootLayout({
         <RefCapture />
         {FB_PIXEL_ENABLED && <FbPixel />}
         <AudioPlayerProvider>
-          {children}
+          <div
+            id="main-content"
+            tabIndex={-1}
+            className="flex min-h-0 flex-1 flex-col focus:outline-none"
+          >
+            {children}
+          </div>
           <ChatShell />
           <NowPlayingBar />
         </AudioPlayerProvider>

@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { ensureChartFor } from "@/actions/chart";
 import {
   ensureSynastryInterpretation,
@@ -11,7 +10,6 @@ import {
 } from "@/lib/partners-core";
 import { computeSynastry } from "@/lib/synastry";
 import { getSynastryInterpretationsFor } from "@/lib/synastry-library";
-import { canUseFeature } from "@/lib/features";
 import {
   CREDIT_COST,
   FREE_ALLOWANCE,
@@ -36,17 +34,15 @@ export default async function SynastryDetailPage({
 }) {
   const { id } = await params;
   const user = await requireUser();
-  const plan = await getCurrentPlan(user.id);
-
   const partner = await getPartnerForViewer(id, user.id);
   if (!partner) notFound();
 
   const viewerName = user.name?.split(" ")[0] ?? null;
-  const viewerChart = await ensureChartFor(user.id, plan);
+  const viewerChart = await ensureChartFor(user.id);
   if (!viewerChart) {
     return (
       <main className="relative isolate flex flex-1 flex-col overflow-hidden">
-        <AppHeader authed plan={plan} active="synastry" />
+        <AppHeader authed active="synastry" />
         <section className="mx-auto w-full max-w-xl p-8 text-center text-sm text-muted-foreground">
           შენი რუკა ჯერ შედგენილი არ არის. ჯერ <Link href="/onboarding" className="underline">შეავსე დაბადების მონაცემები</Link>.
         </section>
@@ -77,7 +73,7 @@ export default async function SynastryDetailPage({
           className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.18_350/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_305/0.3),transparent_70%)]"
         />
         <Starfield count={120} shooting={3} />
-        <AppHeader authed plan={plan} active="synastry" />
+        <AppHeader authed active="synastry" />
         <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
           <Link
             href="/synastry"
@@ -116,7 +112,7 @@ export default async function SynastryDetailPage({
 
   // Ensure AI interpretation exists (lazy generation — first visit pays
   // the Gemini call, subsequent visits read the cached row).
-  const partnerWithAi = await ensureSynastryInterpretation(partner, plan);
+  const partnerWithAi = await ensureSynastryInterpretation(partner);
   const ai = partnerWithAi.aiInterpretation;
 
   // Deep report is cached on the partner row; show it if it's fresh for this
@@ -135,7 +131,7 @@ export default async function SynastryDetailPage({
       />
       <Starfield count={120} shooting={3} />
 
-      <AppHeader authed plan={plan} active="synastry" />
+      <AppHeader authed active="synastry" />
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <Link
@@ -219,7 +215,6 @@ export default async function SynastryDetailPage({
           partnerId={partner.id}
           partnerName={partner.name}
           initial={initialDeep}
-          canUse={canUseFeature("deepSynastry", plan)}
         />
       </section>
     </main>

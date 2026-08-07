@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import { auth } from "@/auth";
-import { getCurrentPlan } from "@/lib/plan";
 import { CREDIT_COST } from "@/lib/credits-config";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
@@ -78,7 +77,6 @@ export const metadata: Metadata = {
 export default async function TaroHubPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
-  const plan = authed ? await getCurrentPlan(session!.user!.id) : "free";
 
   const ld = [
     articleLd({
@@ -111,7 +109,7 @@ export default async function TaroHubPage() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
       />
       <Starfield count={120} shooting={2} />
-      {authed ? <AppHeader authed plan={plan} active="tarot" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tarot" /> : <SmartHeader />}
 
       <script
         type="application/ld+json"

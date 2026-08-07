@@ -3,7 +3,6 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { bigFiveResults, eqResults, iqResults, mbtiTestResults, profiles, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { isAccountRestricted } from "@/lib/restriction";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -22,9 +21,8 @@ export const metadata = { title: "დღეს" };
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [[profile], plan, [userRow], [mbtiResult], [iqResult], [eqResult], [bigFiveResult], streak] = await Promise.all([
+  const [[profile], [userRow], [mbtiResult], [iqResult], [eqResult], [bigFiveResult], streak] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
-    getCurrentPlan(user.id),
     db
       .select({ horoscopeVoice: users.horoscopeVoice, locale: users.interfaceLanguage })
       .from(users)
@@ -42,7 +40,6 @@ export default async function DashboardPage() {
   if (!profile?.dateOfBirth) {
     return (
       <AstroLockedMain
-        plan={plan}
         active="today"
         title={en ? "Your daily horoscope needs a natal chart" : "დღიური ჰოროსკოპი ნატალურ რუკას საჭიროებს"}
         description={en ? "Add your birth details to receive a personalized horoscope and sky overview every day." : "შეავსე დაბადების მონაცემები და ყოველ დღე მიიღებ პერსონალურ ჰოროსკოპსა და ცის მიმოხილვას."}
@@ -80,7 +77,7 @@ export default async function DashboardPage() {
       />
       <Starfield count={120} shooting={3} />
 
-      <AppHeader authed plan={plan} active="today" />
+      <AppHeader authed active="today" />
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         {restricted && <RestrictedNotice />}
@@ -107,7 +104,6 @@ export default async function DashboardPage() {
             Our internal CosmicLoader covers the AI generation window. */}
         <DailyDashboard
           userId={user.id}
-          plan={plan}
           savedVoice={userRow?.horoscopeVoice ?? null}
           locale={locale}
         />

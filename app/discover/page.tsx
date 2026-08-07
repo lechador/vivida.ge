@@ -8,7 +8,6 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { SwipeDeck } from "@/components/discover/swipe-deck";
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { getDiscoveryFeed, type DiscoverCard } from "@/lib/discover";
 
 export const metadata = { title: "აღმოაჩინე" };
@@ -19,10 +18,7 @@ export default async function DiscoverPage() {
   // bounce to the dashboard so the entry point degrades gracefully (no 404).
   if (!SOCIAL_FEATURES.swipeDeck) redirect("/dashboard");
   const user = await requireUser();
-  const [plan, feed] = await Promise.all([
-    getCurrentPlan(user.id),
-    getDiscoveryFeed(user.id),
-  ]);
+  const feed = await getDiscoveryFeed(user.id);
 
   // Flatten the feed into a single ranked stack: spotlight first
   // (highest synastry), then the user's tribe, then magic, then the
@@ -48,7 +44,7 @@ export default async function DiscoverPage() {
       />
       <Starfield count={130} shooting={3} />
 
-      <AppHeader authed plan={plan} active="discover" />
+      <AppHeader authed active="discover" />
 
       <section className="relative z-10 mx-auto flex w-full min-h-0 max-w-md flex-1 flex-col px-3 pb-[calc(4.5rem+max(env(safe-area-inset-bottom),0.25rem))] pt-2 sm:max-w-2xl sm:px-6 sm:pb-6 lg:pb-8">
         {stack.length === 0 ? (

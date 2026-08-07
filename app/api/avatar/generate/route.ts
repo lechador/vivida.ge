@@ -3,8 +3,6 @@ import { eq, inArray } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { charts, profilePhotos } from "@/db/schema";
-import { getCurrentPlan } from "@/lib/plan";
-import { canUseFeature } from "@/lib/features";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { generateZodiacAvatar, isAvatarGenConfigured } from "@/lib/avatar-gen";
 import {
@@ -30,10 +28,6 @@ export async function POST() {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return Response.json({ error: "unauthorized" }, { status: 401 });
-
-  if (!canUseFeature("aiAvatar", await getCurrentPlan(userId))) {
-    return Response.json({ error: "pro_required" }, { status: 403 });
-  }
 
   if (!isAvatarGenConfigured() || !isR2Configured()) {
     return Response.json({ error: "unavailable" }, { status: 503 });

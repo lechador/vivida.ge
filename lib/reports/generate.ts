@@ -1,8 +1,8 @@
 /**
  * Report generation worker. Given a paid pdf_report row, it produces the
  * deep Georgian PDF and stores it privately in R2. Invoked fire-and-forget
- * via `after()` from the Stripe webhook (paid) and the checkout route (Pro
- * comp), so it must own its own error handling and never throw to the caller.
+ * via `after()` after a confirmed credit spend, so it must own its own error
+ * handling and never throw to the caller.
  */
 import { eq } from "drizzle-orm";
 

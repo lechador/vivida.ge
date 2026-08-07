@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { getPostForViewer } from "@/lib/feed-core";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { Starfield } from "@/components/landing/starfield";
@@ -26,10 +25,7 @@ export default async function PostThreadPage({
   const { postId } = await params;
   const user = await requireUser();
 
-  const [plan, post] = await Promise.all([
-    getCurrentPlan(user.id),
-    getPostForViewer(user.id, postId),
-  ]);
+  const post = await getPostForViewer(user.id, postId);
 
   if (!post) notFound();
 
@@ -41,7 +37,7 @@ export default async function PostThreadPage({
       />
       <Starfield count={70} shooting={1} />
 
-      <AppHeader authed plan={plan} active="feed" />
+      <AppHeader authed active="feed" />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <Link

@@ -30,9 +30,7 @@ import {
   getTransitLibraryEntries,
   type TransitDayFacts,
 } from "@/lib/transit-library";
-import { canUseFeature } from "@/lib/features";
 import { signByIndex } from "@/lib/zodiac";
-import type { PlanId } from "@/lib/pricing";
 
 /**
  * Returns today's horoscope for the user, generating + caching it on first
@@ -40,12 +38,7 @@ import type { PlanId } from "@/lib/pricing";
  *  - User's birth data changes (via natal inputHash)
  *  - We bump DAILY_PROMPT_VERSION after a prompt-quality change
  */
-export async function ensureDailyFor(
-  userId: string,
-  plan: PlanId
-): Promise<DailyHoroscope | null> {
-  if (!canUseFeature("dailyHoroscope", plan)) return null;
-
+export async function ensureDailyFor(userId: string): Promise<DailyHoroscope | null> {
   const [profile] = await db
     .select()
     .from(profiles)
@@ -55,7 +48,7 @@ export async function ensureDailyFor(
 
   // Only positions are needed here (for transits) — never the AI narrative,
   // so don't wait on or trigger a chart AI generation.
-  const chart = await ensureChartFor(userId, plan, { aiUpgrade: "skip" });
+  const chart = await ensureChartFor(userId, { aiUpgrade: "skip" });
   if (!chart) return null;
 
   const today = localDateString(new Date(), profile.timezone);

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Heart, Plus } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
-import { getCurrentPlan } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -18,13 +17,11 @@ export const metadata = { title: "თავსებადობა" };
 
 export default async function SynastryPage() {
   const user = await requireUser();
-  const plan = await getCurrentPlan(user.id);
-
   const [partners, used] = await Promise.all([
     listPartners(user.id),
     partnerCreationsThisMonth(user.id),
   ]);
-  const cap = PARTNER_CAP_PER_MONTH[plan];
+  const cap = PARTNER_CAP_PER_MONTH;
   const remaining = Math.max(0, cap - used);
 
   return (
@@ -35,7 +32,7 @@ export default async function SynastryPage() {
       />
       <Starfield count={120} shooting={3} />
 
-      <AppHeader authed plan={plan} active="synastry" />
+      <AppHeader authed active="synastry" />
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
