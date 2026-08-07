@@ -9,7 +9,7 @@ import { computeTiming, type DayTier } from "@/lib/timing";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { AstroLockedMain } from "@/components/astro/astro-locked-main";
-import { ProUpsell } from "@/components/paywall/pro-upsell";
+import { CreditUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "საუკეთესო დღეები" };
 export const dynamic = "force-dynamic";
@@ -56,7 +56,7 @@ export default async function TimingPage() {
           <h1 className="mb-6 text-2xl font-semibold tracking-tight sm:text-3xl">
             საუკეთესო დღეები
           </h1>
-          <ProUpsell
+          <CreditUpsell
             title="საუკეთესო დღეები"
             description="პერსონალური დროის კალენდარი — როდის უბერავს ქარი ზურგში და როდის ღირს სიფრთხილე, შენი რუკის ტრანზიტების მიხედვით."
           />

@@ -3,6 +3,7 @@ import { FileText, Sparkles } from "lucide-react";
 
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { CREDIT_COST } from "@/lib/credits-config";
 
 /**
  * Marketing promo for the paid natal PDF report, for public/SEO pages.
@@ -46,7 +47,7 @@ export async function ReportPromo({ className }: { className?: string }) {
             </Link>
           </Button>
           <span className="text-center text-xs text-muted-foreground sm:text-right">
-            Vivida Pro-ში შედის
+            {CREDIT_COST.pdfReport} კრედიტი · ყოველთვიური გამოწერის გარეშე
           </span>
         </div>
       </div>

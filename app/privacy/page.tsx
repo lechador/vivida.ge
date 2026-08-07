@@ -9,7 +9,7 @@ export const metadata = {
   alternates: localizedAlternates("/privacy", "/en/privacy", "ka"),
 };
 
-const LAST_UPDATED = "2026-05-04";
+const LAST_UPDATED = "2026-08-07";
 
 export default function PrivacyPage() {
   return (
@@ -82,6 +82,12 @@ export default function PrivacyPage() {
                 IP მისამართი, ბრაუზერის ტიპი, მოწყობილობის ინფორმაცია — სერვისის
                 უსაფრთხოებისთვის და ხარვეზების დიაგნოსტიკისთვის.
               </li>
+              <li>
+                <strong className="text-foreground">გადახდის მონაცემები:</strong>{" "}
+                შეძენილი კრედიტების პაკეტი, თანხა, ვალუტა და ტრანზაქციის
+                იდენტიფიკატორი. საბანკო ბარათის სრული მონაცემები მუშავდება
+                გადახდის მომწოდებლის მიერ და Vivida-ში არ ინახება.
+              </li>
             </ul>
           </section>
 
@@ -125,6 +131,10 @@ export default function PrivacyPage() {
                 <strong className="text-foreground">Google (OAuth):</strong> ავტორიზაცია.
               </li>
               <li>
+                <strong className="text-foreground">Vercel:</strong> ვებ-აპლიკაციის
+                ჰოსტინგი და მოთხოვნების ტექნიკური დამუშავება.
+              </li>
+              <li>
                 <strong className="text-foreground">Neon (Postgres):</strong> ბაზის ჰოსტინგი
                 (აშშ/EU სერვერები).
               </li>
@@ -137,11 +147,32 @@ export default function PrivacyPage() {
                 რუკის ნუმერული მონაცემები — სახელი ან საკონტაქტო ინფორმაცია
                 არა).
               </li>
+              <li>
+                <strong className="text-foreground">Stripe:</strong> კრედიტების
+                ერთჯერადი შეძენის გადახდის დამუშავება. Vivida ბარათის სრულ
+                მონაცემებს არ იღებს და არ ინახავს.
+              </li>
+              <li>
+                <strong className="text-foreground">Resend:</strong> ანგარიშისა და
+                სერვისის ტრანზაქციული ელფოსტების გაგზავნა.
+              </li>
+              <li>
+                <strong className="text-foreground">Google Analytics და Meta:</strong>{" "}
+                საიტის გამოყენებისა და სარეკლამო კამპანიების გაზომვა, როცა ეს
+                ხელსაწყოები ჩართულია. მათ არ გადავცემთ სახელს, ელფოსტას ან
+                დაბადების ზუსტ მონაცემებს.
+              </li>
+              <li>
+                <strong className="text-foreground">Cloudflare Turnstile:</strong>{" "}
+                ბოტებისა და ბოროტად გამოყენების პრევენცია.
+              </li>
             </ul>
             <p className="mt-3 leading-relaxed">
               ნატალური რუკის გამოთვლა ხდება ჩვენს სერვერზე, ლოკალურად
               (Swiss Ephemeris-ის ფორმულებით) — დაბადების კოორდინატები და
-              დრო არ გადაეცემა მესამე მხარეს.
+              დრო არ გადაეცემა AI მომწოდებელს. AI ინტერპრეტაციის მოთხოვნაში
+              გამოიყენება უკვე გამოთვლილი რუკის მონაცემები, არასაჭირო
+              იდენტიფიკატორების გარეშე.
             </p>
           </section>
 
@@ -252,10 +283,10 @@ export default function PrivacyPage() {
               10. საერთაშორისო გადაცემები
             </h2>
             <p className="mt-2 leading-relaxed">
-              ჩვენი ზოგიერთი დამუშავებელი (Google, Cloudflare, OpenRouter)
-              ოპერირებს საქართველოს გარეთ. გადაცემები ხდება სტანდარტული
-              საკონტრაქტო პუნქტების ან მსგავსი დაცვის მექანიზმების
-              საფუძველზე.
+              ჩვენი ზოგიერთი დამუშავებელი (მათ შორის Google, Vercel,
+              Cloudflare, Neon, OpenRouter, Stripe და Resend) ოპერირებს
+              საქართველოს გარეთ. გადაცემები ხდება სტანდარტული საკონტრაქტო
+              პუნქტების ან მსგავსი დაცვის მექანიზმების საფუძველზე.
             </p>
           </section>
 

@@ -2,23 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
 import { SignInButton } from "./sign-in-button";
 import { HeroPreview } from "./hero-preview";
 import { HOME_CONTENT } from "@/lib/seo/home-content";
-
-const EASE_OUT_EXPO = [0.22, 1, 0.36, 1] as const;
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.7, ease: EASE_OUT_EXPO },
-  }),
-};
 
 export function Hero() {
   const c = HOME_CONTENT.hero;
@@ -46,7 +35,7 @@ export function Hero() {
   return (
     <section
       ref={wrapperRef}
-      className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 pb-24 pt-12 text-center sm:pt-20 lg:pt-24"
+      className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 pb-16 pt-8 text-center sm:pb-24 sm:pt-20 lg:pt-24"
     >
       {/* Parallax gradient orb behind the hero */}
       <motion.div
@@ -68,26 +57,17 @@ export function Hero() {
         }}
       />
 
-      {/* Product preview — chart wheel + floating snippet cards */}
-      <HeroPreview />
-
-      <motion.span
-        custom={0}
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        className="mb-5 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
+      {/* Keep the promise and primary action first in the DOM and on mobile.
+          Desktop retains the product preview above the copy via flex order. */}
+      <span
+        className="order-1 mb-4 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur sm:order-2 sm:mb-5"
       >
         <span className="size-1.5 rounded-full bg-[var(--vivida-cyan)] vivida-pulse" />
         {c.kicker}
-      </motion.span>
+      </span>
 
-      <motion.h1
-        custom={1}
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl"
+      <h1
+        className="order-2 text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:order-3 sm:text-6xl md:text-7xl"
       >
         {c.headlinePre}{" "}
         <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
@@ -100,38 +80,24 @@ export function Hero() {
             {c.headlinePost}
           </>
         ) : null}
-      </motion.h1>
+      </h1>
 
-      <motion.div
-        custom={2}
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        className="mt-8"
-      >
+      <div className="order-3 mt-6 sm:order-4 sm:mt-8">
         <SignInButton label={c.ctaPrimary} loadingLabel={c.ctaPrimaryLoading} />
-      </motion.div>
+      </div>
 
-      <motion.p
-        custom={3}
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        className="mt-6 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg"
+      <p
+        className="order-4 mt-5 max-w-2xl text-pretty text-base text-muted-foreground sm:order-5 sm:mt-6 sm:text-lg"
       >
         {c.subhead}
-      </motion.p>
+      </p>
 
       {/* Trust chips — promoted from gray micro-text into prominent
           check-pills. The "no card required" line is the strongest trust
           signal we have, so it deserves real visual weight on cold
           ad-driven traffic. */}
-      <motion.div
-        custom={4}
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        className="mt-5 flex flex-wrap items-center justify-center gap-2"
+      <div
+        className="order-5 mt-4 flex flex-wrap items-center justify-center gap-2 sm:order-6 sm:mt-5"
       >
         {c.microNotes.map((note) => (
           <span
@@ -142,16 +108,12 @@ export function Hero() {
             {note}
           </span>
         ))}
-      </motion.div>
+      </div>
 
       {/* Single secondary action — email signup. The header already has
           "შესვლა" for returning users; one obvious primary action wins. */}
-      <motion.p
-        custom={5}
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        className="mt-4 text-xs text-muted-foreground"
+      <p
+        className="order-6 mt-4 text-xs text-muted-foreground sm:order-7"
       >
         <Link
           href="/signup"
@@ -159,7 +121,11 @@ export function Hero() {
         >
           {c.secondary}
         </Link>
-      </motion.p>
+      </p>
+
+      <div className="order-7 mt-10 w-full sm:order-1 sm:mt-0">
+        <HeroPreview />
+      </div>
     </section>
   );
 }

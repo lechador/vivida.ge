@@ -9,14 +9,14 @@ import { Button } from "@/components/ui/button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ERRORS: Record<string, string> = {
-  pro_required: "ეს ფუნქცია Vivida Pro-ს ნაწილია.",
+  pro_required: "ეს ფუნქცია შენი ანგარიშისთვის ჯერ ხელმისაწვდომი არ არის.",
   no_chart: "ჯერ შენი ნატალური რუკა უნდა შეიქმნას.",
   rate_limited: "ლიმიტი ამოიწურა (3/დღე, 10/თვე). სცადე მოგვიანებით.",
   unavailable: "სერვისი დროებით მიუწვდომელია.",
   generation_failed: "ვერ მოხერხდა გენერაცია. სცადე ხელახლა.",
 };
 const ERRORS_EN: Record<string, string> = {
-  pro_required: "This feature is part of Vivida Pro.",
+  pro_required: "This feature is not yet available for your account.",
   no_chart: "Create your natal chart first.",
   rate_limited: "You have reached the limit (3/day, 10/month). Try again later.",
   unavailable: "The service is temporarily unavailable.",

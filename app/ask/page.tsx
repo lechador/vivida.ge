@@ -9,7 +9,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartChat } from "@/components/ask/chart-chat";
-import { ProUpsell } from "@/components/paywall/pro-upsell";
+import { CreditUpsell } from "@/components/paywall/pro-upsell";
 
 export const metadata = { title: "ჰკითხე ვარსკვლავებს" };
 export const dynamic = "force-dynamic";
@@ -76,7 +76,7 @@ export default async function AskPage() {
         {canUseFeature("chartChat", plan) ? (
           <ChartChat initialMessages={initialMessages} firstName={firstName} />
         ) : (
-          <ProUpsell
+          <CreditUpsell
             title="ჰკითხე ვარსკვლავებს"
             description="პერსონალური AI ასტროლოგი, რომელიც შენს ნატალურ რუკას იცნობს და ნებისმიერ შეკითხვას უპასუხებს — ხასიათზე, ურთიერთობებზე, კარიერასა და დროზე."
           />

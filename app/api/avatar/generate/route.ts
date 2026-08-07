@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 /**
- * Generate an AI zodiac avatar (Pro / trial only), store it in R2, and set
+ * Generate an AI zodiac avatar, store it in R2, and set
  * it as the user's main profile photo so it appears everywhere the avatar
  * shows. A daily per-user cap keeps the ~$0.04/image cost bounded.
  */

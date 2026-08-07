@@ -5,6 +5,7 @@ import { Headphones, Lock, Sparkles } from "lucide-react";
 
 import type { DailyHoroscope } from "@/db/schema";
 import type { TransitBreakdownItem } from "@/lib/transit-library";
+import { CREDIT_COST } from "@/lib/credits-config";
 import { BODIES } from "@/lib/zodiac";
 import { Button } from "@/components/ui/button";
 import { HoroscopeAudioPlayer } from "./horoscope-audio-player";
@@ -35,7 +36,7 @@ const ASPECT_TONE: Record<string, string> = {
 };
 
 /**
- * Pro-only daily horoscope hero card. Shown above the chart wheel so it's
+ * Daily horoscope hero card. Shown above the chart wheel so it's
  * the first thing returning users see — the engagement loop.
  */
 export function DailyCard({
@@ -151,12 +152,12 @@ export function DailyCard({
       ) : (
         <div className="relative mt-5">
           <Button asChild variant="outline" size="lg" className="w-full justify-center sm:w-auto">
-            <Link href="/subscription">
+            <Link href="/credits">
               <Headphones className="size-4" />
               მოისმინე ჰოროსკოპი
               <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-gold)]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--vivida-gold)]">
                 <Lock className="size-3" />
-                Pro
+                {CREDIT_COST.audioHoroscope} კრედიტი
               </span>
             </Link>
           </Button>

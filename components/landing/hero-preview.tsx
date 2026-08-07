@@ -15,7 +15,7 @@ const EASE_OUT_EXPO = [0.22, 1, 0.36, 1] as const;
  */
 export function HeroPreview() {
   return (
-    <div className="relative mx-auto mb-8 grid w-full place-items-center sm:mb-10">
+    <div className="relative mx-auto grid w-full place-items-center sm:mb-10">
       {/* Soft glow halo behind the wheel */}
       <div
         aria-hidden

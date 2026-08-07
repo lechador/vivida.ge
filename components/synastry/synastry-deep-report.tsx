@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2, Lock, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { ProUpsell } from "@/components/paywall/pro-upsell";
+import { CreditUpsell } from "@/components/paywall/pro-upsell";
 import type { SynastryDeepReportJson } from "@/db/schema";
 
 const ERRORS: Record<string, string> = {
@@ -135,7 +135,7 @@ export function SynastryDeepReport({
   if (!canUse) {
     return (
       <div className="mt-8">
-        <ProUpsell
+        <CreditUpsell
           title="ღრმა თავსებადობის ანგარიში"
           description={`${partnerName}-თან თქვენი კავშირის სრული წაკითხვა — სიყვარული, კომუნიკაცია, ნდობა, ხახუნი, გრძელვადიანი პოტენციალი და პრაქტიკული რჩევები.`}
         />

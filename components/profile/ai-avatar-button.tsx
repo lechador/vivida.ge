@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ERRORS: Record<string, string> = {
-  pro_required: "ეს ფუნქცია Vivida Pro-ს ნაწილია.",
+  pro_required: "ეს ფუნქცია შენი ანგარიშისთვის ჯერ ხელმისაწვდომი არ არის.",
   no_chart: "ჯერ შენი ნატალური რუკა უნდა შეიქმნას.",
   rate_limited: "ლიმიტი ამოიწურა (3/დღე, 10/თვე). სცადე მოგვიანებით.",
   unavailable: "სერვისი დროებით მიუწვდომელია.",
