@@ -31,7 +31,6 @@ export function DailyRitual({
   horoscope,
   transits,
   moonPhase,
-  timezone,
   savedVoice,
   canAudio,
   streak,
@@ -41,7 +40,6 @@ export function DailyRitual({
   horoscope: DailyHoroscope;
   transits: TransitBreakdownItem[];
   moonPhase: MoonPhaseRow | null;
-  timezone: string;
   savedVoice?: string | null;
   canAudio: boolean;
   streak: StreakProgress;
@@ -280,7 +278,6 @@ export function DailyRitual({
           <DailyCard
             horoscope={horoscope}
             transits={transits}
-            timezone={timezone}
             savedVoice={savedVoice}
             canAudio={canAudio}
             onRead={markHoroscopeRead}
