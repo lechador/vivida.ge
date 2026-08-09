@@ -11,9 +11,17 @@ const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/piradi-ruka`;
 
 // "პირადი რუკა" is the synonym people search for alongside "ნატალური რუკა".
-// This page targets that term head-on (slug + title + H1 + body), and links
-// to /nataluri-ruka so the two reinforce each other rather than compete
-// (that page owns "გამოთვლა" phrasing; this one owns "შედგენა").
+// This page targets that term head-on (slug + title + H1 + body) and owns it
+// cleanly: GSC 2026-08 has it at position 2.3 with 46.8% CTR.
+//
+// The old split — this page owning "შედგენა", /nataluri-ruka owning
+// "გამოთვლა" — did not hold. Three pages now surface for "ნატალური რუკა"
+// (homepage 2.8, this page 4.5, /nataluri-ruka 6.4), so the term earns 23.6%
+// CTR against 28.9% for the cleanly-owned "პირადი რუკა". Step one of merging
+// them is to give this page the ნატალური vocabulary — description, keywords
+// and an FAQ entry using "გამოთვლა" phrasing — while leaving the title and H1
+// alone, since they are what earns the 46.8%. If this page takes the head
+// term, /nataluri-ruka gets 301'd here; if not, nothing has been lost.
 //
 // GSC (2026-07): "პირადი რუკის შედგენა [ონლაინ/უფასოდ/ქართულად]" gets real
 // impressions (21 combined) but almost zero clicks — the page never used
@@ -38,12 +46,19 @@ const KEYWORDS = [
   "piradi rukis shedgena",
   "piradi horoskopi",
   "ნატალური რუკა",
+  // ნატალური variants /nataluri-ruka currently ranks 2.1–5.3 for; this page
+  // needs to cover them before that page can be merged in.
+  "ნატალური რუკა ონლაინ",
+  "ნატალური რუკის გამოთვლა",
+  "ნატალური რუკის შედგენა",
+  "ნატალური რუკის",
+  "nataluri ruka",
 ];
 
 export const metadata: Metadata = {
   title: { absolute: "პირადი რუკა ონლაინ — უფასო გამოთვლა" },
   description:
-    "პირადი რუკის შედგენა ონლაინ და უფასოდ, ქართულად. შეიყვანე დაბადების თარიღი, დრო და ადგილი — ნახე პირადი ასტროლოგიური რუკა, ასცენდენტი, 12 სახლი და ასპექტები რეგისტრაციის გარეშე.",
+    "პირადი რუკის (ნატალური რუკის) შედგენა და გამოთვლა ონლაინ, უფასოდ და ქართულად. შეიყვანე დაბადების თარიღი, დრო და ადგილი — ნახე პლანეტები, ასცენდენტი, 12 სახლი და ასპექტები რეგისტრაციის გარეშე.",
   keywords: KEYWORDS,
   alternates: { canonical: URL },
   openGraph: {
@@ -70,6 +85,10 @@ const FAQ = [
   {
     q: "პირადი რუკა და ნატალური რუკა ერთი და იგივეა?",
     a: "დიახ. „პირადი რუკა“ და „ნატალური რუკა“ (დაბადების რუკა) ერთი და იმავე რამის სხვადასხვა სახელია — ცის პერსონალური სურათი შენი დაბადების ზუსტ მომენტში. იგი მხოლოდ შენია, რადგან შენს ზუსტ დროსა და ადგილს ეფუძნება.",
+  },
+  {
+    q: "როგორ გამოვთვალო ნატალური რუკა ონლაინ?",
+    a: "ნატალური რუკის გამოთვლა იგივეა, რაც პირადი რუკის შედგენა — შეიყვანე დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ კალკულატორში და შედეგს მყისიერად მიიღებ: პლანეტების პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები, ქართულად და უფასოდ, რეგისტრაციის გარეშე.",
   },
   {
     q: "უფასოა პირადი რუკის შედგენა?",
