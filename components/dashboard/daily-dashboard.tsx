@@ -89,8 +89,7 @@ export function DailyDashboard({
     );
   }
 
-  const { chart, timezone, canDaily, weeklyUnlocked, balance, suggestions } =
-    core;
+  const { chart, canDaily, weeklyUnlocked, balance, suggestions } = core;
 
   return (
     <div className="space-y-8">
@@ -107,7 +106,6 @@ export function DailyDashboard({
           on generation latency. */}
       <DashboardExtrasSection
         userId={userId}
-        timezone={timezone}
         canDaily={canDaily}
         canAudio
         weeklyUnlocked={weeklyUnlocked}
@@ -163,7 +161,6 @@ export function DailyDashboard({
  */
 function DashboardExtrasSection({
   userId,
-  timezone,
   canDaily,
   weeklyUnlocked,
   balance,
@@ -173,7 +170,6 @@ function DashboardExtrasSection({
   locale,
 }: {
   userId: string;
-  timezone: string;
   canDaily: boolean;
   weeklyUnlocked: boolean;
   balance: number;
@@ -232,7 +228,6 @@ function DashboardExtrasSection({
           horoscope={extras.daily}
           transits={extras.transitBreakdown}
           moonPhase={extras.moonPhase}
-          timezone={timezone}
           savedVoice={savedVoice}
           canAudio={canAudio}
           streak={streak}

@@ -24,6 +24,7 @@ import type { Notification } from "@/db/schema";
 import { CREDIT_REASON_LABEL_EN, CREDIT_REASON_LABEL_KA, type CreditReason } from "@/lib/credits-config";
 import { cn } from "@/lib/utils";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { kaShortDate } from "@/lib/i18n/ka-date";
 
 const KIND_ICON: Record<string, LucideIcon> = {
   friend_request: UserPlus,
@@ -102,10 +103,10 @@ function timeAgo(date: Date, locale: UserLocale): string {
   if (hours < 24) return en ? `${hours}h ago` : `${hours} საათის წინ`;
   const days = Math.floor(hours / 24);
   if (days < 7) return en ? `${days}d ago` : `${days} დღის წინ`;
-  return new Intl.DateTimeFormat(en ? "en" : "ka-GE", {
-    day: "numeric",
-    month: "short",
-  }).format(new Date(date));
+  const d = new Date(date);
+  return en
+    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(d)
+    : kaShortDate(d);
 }
 
 export function NotificationsDropdown({

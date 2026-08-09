@@ -28,6 +28,7 @@ import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import { SafetyMenu } from "@/components/safety/safety-menu";
 import type { Message } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { kaShortDate } from "@/lib/i18n/ka-date";
 
 type TypingEventPayload = {
   senders: Array<{ senderId: string; expiresAt: string }>;
@@ -1042,8 +1043,7 @@ function timeAgo(date: Date | string, locale: UserLocale): string {
   if (hours < 24) return en ? `${hours}h` : `${hours}სთ`;
   const days = Math.floor(hours / 24);
   if (days < 7) return en ? `${days}d` : `${days}დ`;
-  return new Intl.DateTimeFormat(en ? "en" : "ka-GE", {
-    day: "numeric",
-    month: "short",
-  }).format(d);
+  return en
+    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(d)
+    : kaShortDate(d);
 }
