@@ -159,21 +159,21 @@ export function DailyRitual({
   const steps = [
     {
       key: "horoscope",
-      label: en ? "Read your horoscope" : "წაიკითხე ჰოროსკოპი",
+      label: en ? "Horoscope" : "ჰოროსკოპი",
       complete: state.horoscopeRead,
     },
     ...(moonRequired
       ? [
           {
             key: "moon",
-            label: en ? "Open the Moon message" : "გახსენი მთვარის გზავნილი",
+            label: en ? "Moon message" : "მთვარის გზავნილი",
             complete: state.moonRead,
           },
         ]
       : []),
     {
       key: "focus",
-      label: en ? "Choose today's focus" : "აირჩიე დღის ფოკუსი",
+      label: en ? "Today's focus" : "დღის ფოკუსი",
       complete: !!state.focus,
     },
   ];
@@ -183,116 +183,95 @@ export function DailyRitual({
 
   return (
     <section aria-labelledby="daily-ritual-title" className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl border border-[var(--vivida-gold)]/30 bg-gradient-to-br from-[var(--vivida-gold)]/10 via-card/65 to-[var(--vivida-violet)]/10 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
-        <div
-          aria-hidden
-          className="absolute -right-14 -top-16 size-44 rounded-full bg-[radial-gradient(circle,var(--vivida-gold),transparent_68%)] opacity-15 blur-2xl"
-        />
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
-              <Sparkles className="size-3.5" />
-              {en ? "Daily ritual" : "დღის რიტუალი"}
-            </div>
-            <h2 id="daily-ritual-title" className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-              {complete
-                ? en
-                  ? "Today's ritual is complete"
-                  : "დღევანდელი რიტუალი დასრულებულია"
-                : en
-                  ? `${steps.length} small steps for today`
-                  : `${steps.length === 3 ? "სამი" : "ორი"} მცირე ნაბიჯი დღევანდელი დღისთვის`}
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {complete
-                ? en
-                  ? "Come back tomorrow for a new personal message."
-                  : "ხვალ ახალი პერსონალური გზავნილი დაგხვდება."
-                : en
-                  ? "Read, notice the sky, and choose what to carry into your day."
-                  : "წაიკითხე, დააკვირდი ცას და აირჩიე, რას წაიღებ დღეში."}
-            </p>
-            {rewardCredits > 0 && (
-              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-gold)]/35 bg-[var(--vivida-gold)]/12 px-2.5 py-1 text-xs font-semibold text-[var(--vivida-gold)]">
-                <Sparkles className="size-3.5" />
-                {en
-                  ? `Weekly reward: +${rewardCredits} credits`
-                  : `კვირის ჯილდო: +${rewardCredits} კრედიტი`}
-              </div>
-            )}
-          </div>
-          <StreakChip progress={streakState} locale={locale} />
-        </div>
-
-        <div className="relative mt-5">
-          <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
-            <span>{en ? "Today's progress" : "დღევანდელი პროგრესი"}</span>
-            <span className="tabular-nums">{completedSteps}/{steps.length}</span>
-          </div>
-          <div
-            className="h-2 overflow-hidden rounded-full bg-foreground/10"
-            role="progressbar"
-            aria-label={en ? "Daily ritual progress" : "დღის რიტუალის პროგრესი"}
-            aria-valuemin={0}
-            aria-valuemax={steps.length}
-            aria-valuenow={completedSteps}
+      <div className="rounded-2xl border border-[var(--vivida-gold)]/25 bg-gradient-to-br from-[var(--vivida-gold)]/8 via-card/60 to-[var(--vivida-violet)]/8 px-4 py-3.5 ring-1 ring-foreground/5 backdrop-blur-xl">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
+          <h2
+            id="daily-ritual-title"
+            className="flex items-center gap-1.5 text-sm font-semibold tracking-tight"
           >
-            <div
-              className="h-full rounded-full bg-[linear-gradient(90deg,var(--vivida-gold),var(--vivida-pink),var(--vivida-violet))] transition-[width] duration-500"
-              style={{ width: `${pct}%` }}
-            />
-          </div>
+            <Sparkles className="size-4 shrink-0 text-[var(--vivida-gold)]" />
+            {en ? "Daily ritual" : "დღის რიტუალი"}
+          </h2>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium tabular-nums",
+              complete
+                ? "bg-[var(--vivida-cyan)]/12 text-[var(--vivida-cyan)]"
+                : "bg-foreground/10 text-muted-foreground"
+            )}
+          >
+            {complete && <Check className="size-3 shrink-0" />}
+            {completedSteps}/{steps.length}
+          </span>
+          {rewardCredits > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-[var(--vivida-gold)]/35 bg-[var(--vivida-gold)]/12 px-2 py-0.5 text-[11px] font-semibold text-[var(--vivida-gold)]">
+              +{rewardCredits} {en ? "credits" : "კრედიტი"}
+            </span>
+          )}
+          <span className="ml-auto">
+            <StreakChip progress={streakState} locale={locale} />
+          </span>
         </div>
 
-        <ol className="relative mt-4 grid gap-2 sm:grid-cols-3">
-          {steps.map((step) => (
-            <li
-              key={step.key}
-              className={cn(
-                "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium",
-                step.complete
-                  ? "border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/10 text-foreground"
-                  : "border-border/60 bg-background/25 text-muted-foreground"
-              )}
-            >
-              {step.complete ? (
-                <Check className="size-4 shrink-0 text-[var(--vivida-cyan)]" />
-              ) : (
-                <Circle className="size-4 shrink-0" />
-              )}
-              {step.label}
-            </li>
-          ))}
-        </ol>
+        <div
+          className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-foreground/10"
+          role="progressbar"
+          aria-label={en ? "Daily ritual progress" : "დღის რიტუალის პროგრესი"}
+          aria-valuemin={0}
+          aria-valuemax={steps.length}
+          aria-valuenow={completedSteps}
+        >
+          <div
+            className="h-full rounded-full bg-[linear-gradient(90deg,var(--vivida-gold),var(--vivida-pink),var(--vivida-violet))] transition-[width] duration-500"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
 
-        <div className="relative mt-5 border-t border-border/50 pt-4">
-          <div className="text-xs font-medium text-foreground/85">
-            {en ? "What will you carry into today?" : "რას წაიღებ დღევანდელ დღეში?"}
-          </div>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {focusOptions.map((focus) => (
-              <button
-                key={focus}
-                type="button"
-                disabled={!hydrated}
-                aria-pressed={state.focus === focus}
-                onClick={() =>
-                  updateState(
-                    { focus },
-                    ANALYTICS_EVENT.dailyFocusSelected
-                  )
-                }
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs">
+          {steps
+            .filter((step) => step.key !== "focus")
+            .map((step) => (
+              <span
+                key={step.key}
                 className={cn(
-                  "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-wait disabled:opacity-60",
-                  state.focus === focus
-                    ? "border-[var(--vivida-gold)]/60 bg-[var(--vivida-gold)]/15 text-[var(--vivida-gold)]"
-                    : "border-border/70 bg-background/30 text-muted-foreground hover:border-foreground/25 hover:text-foreground"
+                  "inline-flex items-center gap-1 font-medium",
+                  step.complete
+                    ? "text-[var(--vivida-cyan)]"
+                    : "text-muted-foreground"
                 )}
               >
-                {state.focus === focus ? "✓ " : ""}{focus}
-              </button>
+                {step.complete ? (
+                  <Check className="size-3.5 shrink-0" />
+                ) : (
+                  <Circle className="size-3.5 shrink-0" />
+                )}
+                {step.label}
+              </span>
             ))}
-          </div>
+          <span aria-hidden className="hidden h-3.5 w-px bg-border/70 sm:block" />
+          <span className="text-muted-foreground">
+            {en ? "Today's focus:" : "დღის ფოკუსი:"}
+          </span>
+          {focusOptions.map((focus) => (
+            <button
+              key={focus}
+              type="button"
+              disabled={!hydrated}
+              aria-pressed={state.focus === focus}
+              onClick={() =>
+                updateState({ focus }, ANALYTICS_EVENT.dailyFocusSelected)
+              }
+              className={cn(
+                "rounded-full border px-2.5 py-0.5 font-medium transition-colors disabled:cursor-wait disabled:opacity-60",
+                state.focus === focus
+                  ? "border-[var(--vivida-gold)]/60 bg-[var(--vivida-gold)]/15 text-[var(--vivida-gold)]"
+                  : "border-border/70 bg-background/30 text-muted-foreground hover:border-foreground/25 hover:text-foreground"
+              )}
+            >
+              {state.focus === focus ? "✓ " : ""}
+              {focus}
+            </button>
+          ))}
         </div>
       </div>
 

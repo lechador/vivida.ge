@@ -277,19 +277,19 @@ function DailyRitualLoading({
 }) {
   const en = locale === "en";
   return (
-    <div className="rounded-2xl border border-[var(--vivida-gold)]/25 bg-gradient-to-br from-[var(--vivida-gold)]/8 via-card/60 to-[var(--vivida-violet)]/8 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
-            {en ? "Daily ritual" : "დღის რიტუალი"}
-          </div>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight">
-            {en ? "Preparing today's message…" : "დღევანდელი გზავნილი მზადდება…"}
-          </h2>
+    <div className="rounded-2xl border border-[var(--vivida-gold)]/25 bg-gradient-to-br from-[var(--vivida-gold)]/8 via-card/60 to-[var(--vivida-violet)]/8 px-4 py-3.5 ring-1 ring-foreground/5 backdrop-blur-xl">
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
+        <div className="flex items-center gap-1.5 text-sm font-semibold tracking-tight">
+          {en ? "Daily ritual" : "დღის რიტუალი"}
         </div>
-        <StreakChip progress={streak} locale={locale} />
+        <span className="text-xs text-muted-foreground">
+          {en ? "preparing…" : "მზადდება…"}
+        </span>
+        <span className="ml-auto">
+          <StreakChip progress={streak} locale={locale} />
+        </span>
       </div>
-      <div className="vivida-pulse-soft mt-5 h-2 rounded-full bg-foreground/10" />
+      <div className="vivida-pulse-soft mt-2.5 h-1.5 rounded-full bg-foreground/10" />
     </div>
   );
 }
