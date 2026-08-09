@@ -19,10 +19,10 @@ import Link from "next/link";
  */
 export default function GlobalError({
   error,
-  unstable_retry,
+  retry,
 }: {
   error: Error & { digest?: string };
-  unstable_retry: () => void;
+  retry: () => void;
 }) {
   const [retrying, setRetrying] = useState(false);
 
@@ -45,12 +45,20 @@ export default function GlobalError({
       /* ignore */
     }
     const stateTimer = setTimeout(() => setRetrying(true), 0);
-    const retryTimer = setTimeout(() => unstable_retry(), 1000);
+    const retryTimer = setTimeout(() => {
+      // If retry() is ever missing or throws, fall back to the manual UI rather
+      // than stranding the user on a spinner that never resolves.
+      try {
+        retry();
+      } catch {
+        setRetrying(false);
+      }
+    }, 1000);
     return () => {
       clearTimeout(stateTimer);
       clearTimeout(retryTimer);
     };
-  }, [error, unstable_retry]);
+  }, [error, retry]);
 
   function manualRetry() {
     try {
@@ -59,7 +67,11 @@ export default function GlobalError({
       /* ignore */
     }
     setRetrying(true);
-    unstable_retry();
+    try {
+      retry();
+    } catch {
+      setRetrying(false);
+    }
   }
 
   return (
