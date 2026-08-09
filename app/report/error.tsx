@@ -15,10 +15,10 @@ import { Loader2, RotateCcw } from "lucide-react";
  */
 export default function ReportError({
   error,
-  unstable_retry,
+  retry,
 }: {
   error: Error & { digest?: string };
-  unstable_retry: () => void;
+  retry: () => void;
 }) {
   const [retrying, setRetrying] = useState(false);
 
@@ -41,12 +41,20 @@ export default function ReportError({
       /* ignore */
     }
     const stateTimer = setTimeout(() => setRetrying(true), 0);
-    const retryTimer = setTimeout(() => unstable_retry(), 1200);
+    const retryTimer = setTimeout(() => {
+      // If retry() is ever missing or throws, fall back to the manual UI rather
+      // than stranding the user on a spinner that never resolves.
+      try {
+        retry();
+      } catch {
+        setRetrying(false);
+      }
+    }, 1200);
     return () => {
       clearTimeout(stateTimer);
       clearTimeout(retryTimer);
     };
-  }, [error, unstable_retry]);
+  }, [error, retry]);
 
   function manualRetry() {
     try {
@@ -55,7 +63,11 @@ export default function ReportError({
       /* ignore */
     }
     setRetrying(true);
-    unstable_retry();
+    try {
+      retry();
+    } catch {
+      setRetrying(false);
+    }
   }
 
   return (
