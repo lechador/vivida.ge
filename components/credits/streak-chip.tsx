@@ -20,6 +20,10 @@ export function StreakChip({
 }) {
   const { current, next, todayComplete, cycle } = progress;
   const en = locale === "en";
+  /** Spelled out for the tooltip + screen readers; the pill itself stays terse. */
+  const reward = en
+    ? `${next.daysLeft} more day${next.daysLeft === 1 ? "" : "s"} in a row earns +${next.credits} credits.`
+    : `კიდევ ${next.daysLeft} დღე ზედიზედ და მიიღებ +${next.credits} კრედიტს.`;
   return (
     <Link
       href="/credits"
@@ -29,31 +33,37 @@ export function StreakChip({
           next_days: next?.days ?? null,
         })
       }
-      className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-gold)]/30 bg-[var(--vivida-gold)]/8 px-3 py-1 text-xs font-medium ring-1 ring-foreground/5 transition-colors hover:bg-[var(--vivida-gold)]/14 sm:text-sm"
+      title={reward}
+      aria-label={
+        en
+          ? `${current}-day ritual streak. ${reward}`
+          : `რიტუალის სერია: ${current} დღე. ${reward}`
+      }
+      className="group inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[var(--vivida-gold)]/30 bg-[var(--vivida-gold)]/8 px-2.5 py-0.5 text-xs font-medium ring-1 ring-foreground/5 transition-colors hover:bg-[var(--vivida-gold)]/14"
     >
       <Flame className="size-3.5 shrink-0 text-[var(--vivida-gold)]" />
       <span className="tabular-nums text-foreground">
         {current > 0
           ? en
-            ? `${current}-day ritual streak`
-            : `${current}-დღიანი რიტუალის სერია`
+            ? `${current}-day streak`
+            : `სერია: ${current} დღე`
           : en
-            ? "Start your ritual streak"
-            : "დაიწყე რიტუალის სერია"}
+            ? "Start a streak"
+            : "დაიწყე სერია"}
       </span>
       {cycle.rewardEarnedToday ? (
         <span className="text-[var(--vivida-gold)]">
-          {en ? "· Weekly reward!" : "· კვირის ჯილდო!"}
+          {en ? `· +${next.credits} credits!` : `· +${next.credits} კრედიტი!`}
         </span>
       ) : !todayComplete ? (
         <span className="text-muted-foreground">
-          {en ? "· Complete today" : "· დაასრულე დღეს"}
+          {en ? "· Finish today" : "· დაასრულე დღეს"}
         </span>
       ) : (
-        <span className="text-muted-foreground">
+        <span className="hidden text-muted-foreground sm:inline">
           {en
-            ? `· ${next.daysLeft} more day${next.daysLeft === 1 ? "" : "s"} +${next.credits}`
-            : `· კიდევ ${next.daysLeft} დღე +${next.credits}`}
+            ? `· +${next.credits} in ${next.daysLeft}d`
+            : `· +${next.credits} კრედიტი ${next.daysLeft} დღეში`}
         </span>
       )}
     </Link>
