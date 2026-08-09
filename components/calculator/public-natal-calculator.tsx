@@ -98,7 +98,7 @@ export function PublicNatalCalculator() {
         return;
       }
       setChart(data.chart as NatalChartJson);
-      trackEvent("natal_chart_computed", { source: "natal_calculator" });
+      trackEvent("natal_chart_computed", { widget: "natal_calculator" });
       setTimeout(
         () => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
         80
@@ -259,7 +259,7 @@ export function PublicNatalCalculator() {
                 <Link
                   href="/signup"
                   onClick={() =>
-                    trackEvent("register_click", { source: "natal_calculator" })
+                    trackEvent("register_click", { widget: "natal_calculator" })
                   }
                 >
                   უფასო რეგისტრაცია
