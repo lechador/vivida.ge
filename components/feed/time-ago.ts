@@ -1,3 +1,5 @@
+import { kaShortDate } from "@/lib/i18n/ka-date";
+
 /**
  * Short relative time formatter — "ახლახან / X წუთის წინ / X საათის წინ /
  * X დღის წინ" until a week passes, then a localised short date. Lives in
@@ -16,8 +18,5 @@ export function feedTimeAgo(date: Date | string): string {
   if (hours < 24) return `${hours} საათის წინ`;
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days} დღის წინ`;
-  return new Intl.DateTimeFormat("ka-GE", {
-    day: "numeric",
-    month: "short",
-  }).format(ts);
+  return kaShortDate(ts);
 }

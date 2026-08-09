@@ -7,6 +7,7 @@ import { Headphones, Lock, Sparkles } from "lucide-react";
 import type { DailyHoroscope } from "@/db/schema";
 import type { TransitBreakdownItem } from "@/lib/transit-library";
 import { CREDIT_COST } from "@/lib/credits-config";
+import { kaLongDate } from "@/lib/i18n/ka-date";
 import { BODIES } from "@/lib/zodiac";
 import { Button } from "@/components/ui/button";
 import { HoroscopeAudioPlayer } from "./horoscope-audio-player";
@@ -44,7 +45,6 @@ const ASPECT_TONE: Record<string, string> = {
 export function DailyCard({
   horoscope,
   transits = [],
-  timezone,
   savedVoice,
   canAudio = true,
   onRead,
@@ -52,7 +52,6 @@ export function DailyCard({
   horoscope: DailyHoroscope;
   /** Today's strongest transit aspects + their library interpretations. */
   transits?: TransitBreakdownItem[];
-  timezone: string;
   savedVoice?: string | null;
   canAudio?: boolean;
   onRead?: () => void;
@@ -88,12 +87,10 @@ export function DailyCard({
     return () => observer.disconnect();
   }, [canAudio, horoscope.date, onRead, transits.length]);
 
-  const date = new Intl.DateTimeFormat("ka-GE", {
-    timeZone: timezone,
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  }).format(new Date(horoscope.date + "T12:00:00Z"));
+  // `horoscope.date` is already the user's local date, so it is rendered
+  // verbatim — no timezone shift, and no dependence on the browser shipping
+  // Georgian locale data.
+  const date = kaLongDate(horoscope.date);
 
   return (
     <article className="relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-7 backdrop-blur-xl sm:p-9">
