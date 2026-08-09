@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq } from "drizzle-orm";
+import { and, asc, count, desc, eq, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { profilePhotos, type ProfilePhoto } from "@/db/schema";
@@ -189,25 +189,30 @@ export async function promotePhoto(
     .limit(1);
   if (!target) return { ok: false, code: "not_found" };
 
-  await db.transaction(async (tx) => {
-    const all = await tx
-      .select({ id: profilePhotos.id })
-      .from(profilePhotos)
-      .where(eq(profilePhotos.userId, userId))
-      .orderBy(asc(profilePhotos.sortOrder));
-
-    const reordered = [
-      { id: target.id },
-      ...all.filter((p) => p.id !== target.id),
-    ];
-
-    for (let i = 0; i < reordered.length; i++) {
-      await tx
-        .update(profilePhotos)
-        .set({ sortOrder: i })
-        .where(eq(profilePhotos.id, reordered[i].id));
-    }
-  });
+  // Renumber every one of this user's photos in a single statement rather than
+  // a transaction of per-row updates: the production driver is neon-http,
+  // which throws "No transactions support in neon-http driver" outright. One
+  // UPDATE is atomic on its own, so the gallery can never be observed
+  // half-renumbered. Safe to permute sort_order in place because
+  // (user_id, sort_order) carries no unique constraint.
+  //
+  // Ordering: the promoted photo sorts first, the rest keep their relative
+  // order, and id breaks ties so equal sort_order values (e.g. rows still at
+  // the default 0) renumber deterministically.
+  await db.execute(sql`
+    UPDATE ${profilePhotos} AS p
+    SET sort_order = v.new_order
+    FROM (
+      SELECT
+        id,
+        (ROW_NUMBER() OVER (
+          ORDER BY (id = ${target.id}) DESC, sort_order ASC, id ASC
+        ) - 1)::int AS new_order
+      FROM ${profilePhotos}
+      WHERE user_id = ${userId}
+    ) AS v
+    WHERE p.id = v.id
+  `);
 
   invalidateHeaderForUser(userId);
   return { ok: true };
