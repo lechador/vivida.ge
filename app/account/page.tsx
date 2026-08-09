@@ -140,8 +140,8 @@ export default async function AccountPage() {
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {en
-                  ? "View your balance and visit streak, top up, or invite a friend."
-                  : "ნახე ბალანსი, ვიზიტების სერია, შეავსე ან მოიწვიე მეგობარი."}
+                  ? "View your balance and ritual streak, top up, or invite a friend."
+                  : "ნახე ბალანსი, რიტუალის სერია, შეავსე ან მოიწვიე მეგობარი."}
               </p>
             </div>
             <span aria-hidden className="text-2xl text-muted-foreground transition-transform group-hover:translate-x-1">

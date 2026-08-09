@@ -101,6 +101,37 @@ export async function grantCredits(
 }
 
 /**
+ * Atomically grant a ref-keyed reward once. The database advisory lock keeps
+ * the account increment and ledger insert together under concurrent retries.
+ */
+export async function grantCreditsOnce(
+  userId: string,
+  amount: number,
+  reason: CreditReason,
+  ref: string,
+  opts?: { notify?: boolean }
+): Promise<boolean> {
+  if (amount <= 0 || !ref) return false;
+  const result = await db.execute<{
+    was_granted: boolean;
+    resulting_balance: number;
+  }>(sql`
+    SELECT * FROM vivida_grant_credits_once(
+      ${userId},
+      ${amount},
+      ${reason},
+      ${ref},
+      ${crypto.randomUUID()}
+    )
+  `);
+  const row = result.rows[0];
+  if (row?.was_granted && opts?.notify !== false) {
+    await notifyCredit(userId, amount, reason, row.resulting_balance);
+  }
+  return row?.was_granted ?? false;
+}
+
+/**
  * Try to spend `amount`. Atomic: the conditional UPDATE only succeeds if the
  * balance is sufficient, so it can never go negative under concurrency. Returns
  * true if charged (ledger appended), false if the balance was too low.

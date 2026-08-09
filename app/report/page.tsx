@@ -14,6 +14,7 @@ import { ChartSection } from "@/components/dashboard/chart-section";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import { ReportPdfPanel } from "@/components/report/report-pdf-panel";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { ClearPendingNatalProfile } from "@/components/onboarding/clear-pending-natal-profile";
 
 export const metadata = { title: "ჩემი რუკა" };
 
@@ -42,6 +43,7 @@ export default async function ReportPage() {
 
   return (
     <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
+      <ClearPendingNatalProfile />
       {/* Layered nebula glows — three radial gradients at different points,
           one slowly drifting for life. Together they lift the page out of
           a flat dark, evoking deep cosmos rather than a black screen. */}

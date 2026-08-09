@@ -118,7 +118,7 @@ export function CreditBalanceMenu({
           href="/credits"
           className="mt-2 flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent/15 hover:text-foreground"
         >
-          {en ? "Credits, rewards and visit streak" : "კრედიტები, ბონუსები და ვიზიტების სერია"}
+          {en ? "Credits, rewards and ritual streak" : "კრედიტები, ბონუსები და რიტუალის სერია"}
           <ArrowRight className="size-3.5" />
         </Link>
       </DropdownMenuContent>

@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
-import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { signInWithGoogle } from "@/actions/auth";
 
 /** Compact Google sign-in button for the /login and /signup forms. */
@@ -27,7 +27,7 @@ export function GoogleButton({
           // the bulk of sign-ups, and the OAuth round-trip means we never
           // get a client-side "verified" event for them — so this click is
           // the only GA4 signal for that path.
-          trackEvent("sign_up_google_click", { method: "google" });
+          trackEvent(ANALYTICS_EVENT.signUpGoogleClick, { method: "google" });
           await signInWithGoogle(callbackUrl);
         })
       }

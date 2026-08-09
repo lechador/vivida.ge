@@ -14,9 +14,10 @@ import { AspectCards } from "@/components/dashboard/aspect-cards";
 import { PositionsTable, HousesTable } from "@/components/report/positions-table";
 import { signByIndex, signColor, formatDegree } from "@/lib/zodiac";
 import { slugByLabelKa } from "@/lib/seo/zodiac-content";
-import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import type { GeocodeResult } from "@/lib/geocoding";
 import type { NatalChartJson, PointJson } from "@/db/schema";
+import { savePendingNatalProfile } from "@/lib/pending-natal-profile";
 
 const ERRORS: Record<string, string> = {
   invalid_date: "შეამოწმე დაბადების თარიღი.",
@@ -26,6 +27,10 @@ const ERRORS: Record<string, string> = {
   rate_limited: "ბევრი მოთხოვნა მცირე დროში. სცადე ცოტა ხანში.",
   compute_failed: "გამოთვლა ვერ მოხერხდა. სცადე ხელახლა.",
 };
+
+const CALCULATOR_ONBOARDING_PATH = "/onboarding?next=/report";
+const CALCULATOR_SIGNUP_HREF = `/signup?next=${encodeURIComponent(CALCULATOR_ONBOARDING_PATH)}`;
+const CALCULATOR_LOGIN_HREF = `/login?next=${encodeURIComponent(CALCULATOR_ONBOARDING_PATH)}`;
 
 export function PublicNatalCalculator() {
   const [day, setDay] = useState("");
@@ -52,8 +57,12 @@ export function PublicNatalCalculator() {
     try {
       if (navigator.share) {
         await navigator.share({ title: "ჩემი ნატალური რუკა", url });
+        trackEvent(ANALYTICS_EVENT.natalChartShared, { method: "native" });
       } else {
         await navigator.clipboard.writeText(url);
+        trackEvent(ANALYTICS_EVENT.natalChartShared, {
+          method: "clipboard",
+        });
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }
@@ -98,7 +107,15 @@ export function PublicNatalCalculator() {
         return;
       }
       setChart(data.chart as NatalChartJson);
-      trackEvent("natal_chart_computed", { widget: "natal_calculator" });
+      savePendingNatalProfile({
+        dateOfBirth: date,
+        timeOfBirth: t.time,
+        place,
+      });
+      trackEvent(ANALYTICS_EVENT.natalChartComputed, {
+        widget: "natal_calculator",
+        exact_time: t.time ? 1 : 0,
+      });
       setTimeout(
         () => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
         80
@@ -257,16 +274,18 @@ export function PublicNatalCalculator() {
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button asChild variant="mystic" size="lg">
                 <Link
-                  href="/signup"
+                  href={CALCULATOR_SIGNUP_HREF}
                   onClick={() =>
-                    trackEvent("register_click", { widget: "natal_calculator" })
+                    trackEvent(ANALYTICS_EVENT.registerClick, {
+                      widget: "natal_calculator",
+                    })
                   }
                 >
                   უფასო რეგისტრაცია
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href="/login">შესვლა</Link>
+                <Link href={CALCULATOR_LOGIN_HREF}>შესვლა</Link>
               </Button>
             </div>
           </div>
@@ -357,7 +376,9 @@ function HoroscopeEmailCapture({
         return;
       }
       setStatus("done");
-      trackEvent("horoscope_email_subscribed", { sun_sign: sunSign });
+      trackEvent(ANALYTICS_EVENT.horoscopeEmailSubscribed, {
+        sun_sign: sunSign,
+      });
     } catch {
       setStatus("error");
       setMsg("ქსელის შეცდომა. სცადე ხელახლა.");

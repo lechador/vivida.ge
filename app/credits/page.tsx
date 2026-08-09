@@ -65,7 +65,7 @@ export default async function CreditsPage() {
           <TopUpCard />
         </div>
 
-        {/* Visit streak — daily-return reward ladder. */}
+        {/* Completed-ritual streak — repeatable weekly reward cycle. */}
         <div className="mt-4">
           <StreakCard progress={streak} />
         </div>

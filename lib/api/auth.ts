@@ -48,10 +48,8 @@ export async function requireMobileUser(req: Request): Promise<PublicUser> {
     throw new ApiError(401, "unauthorized", "Account no longer exists");
   }
 
-  // Best-effort "active today" record, mirroring the website's requireUser().
-  // Runs after the response so it never adds latency, and feeds the daily
-  // streak + daily_visit reputation for app-only users (who otherwise never
-  // hit the website's visit logging).
+  // Best-effort admin activity record, mirroring the website's requireUser().
+  // Ritual completion and its streak are recorded by /api/v1/me/ritual.
   after(() => recordVisit(userId));
 
   return toPublicUser(user);

@@ -11,7 +11,6 @@ import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
-import { StreakChip } from "@/components/credits/streak-chip";
 import { getStreakProgress } from "@/lib/streak-credits";
 import { TESTS } from "@/lib/tests-catalog";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
@@ -88,12 +87,6 @@ export default async function DashboardPage() {
           </span>
         </h1>
 
-        {/* Daily-return streak — a compact loss-aversion nudge where returning
-            users land. The full flame + reward ladder lives on /credits. */}
-        <div className="mb-5">
-          <StreakChip progress={streak} />
-        </div>
-
         {/* Soft prompt to enable daily push — hides itself once enabled,
             unsupported, or dismissed. */}
         <PushOptIn variant="banner" locale={locale} />
@@ -105,6 +98,7 @@ export default async function DashboardPage() {
         <DailyDashboard
           userId={user.id}
           savedVoice={userRow?.horoscopeVoice ?? null}
+          streak={streak}
           locale={locale}
         />
 

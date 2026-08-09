@@ -13,9 +13,9 @@ import {
 } from "@/actions/dashboard";
 import { Button } from "@/components/ui/button";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
+import { StreakChip } from "@/components/credits/streak-chip";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
 
-import { DailyCard } from "./daily-card";
 import { HoroscopeLoading } from "./horoscope-loading";
 import { MiniBigThree } from "./mini-big-three";
 import { MoonPhaseCard } from "./moon-phase-card";
@@ -24,6 +24,8 @@ import { CREDIT_COST } from "@/lib/credits-config";
 import { WeeklyForecastCard } from "./weekly-forecast-card";
 import { WeeklyForecastLocked } from "./weekly-forecast-locked";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import type { StreakProgress } from "@/lib/streak-credits";
+import { DailyRitual } from "./daily-ritual";
 
 /**
  * Dashboard content loaded after first paint via server actions. The page
@@ -35,10 +37,12 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function DailyDashboard({
   userId,
   savedVoice,
+  streak,
   locale = "ka",
 }: {
   userId: string;
   savedVoice?: string | null;
+  streak: StreakProgress;
   locale?: UserLocale;
 }) {
   const en = locale === "en";
@@ -76,8 +80,11 @@ export function DailyDashboard({
 
   if (!core || core.kind === "no-chart") {
     return (
-      <div className="flex min-h-[65vh] items-center justify-center">
-        <CosmicLoader embedded progressive />
+      <div className="space-y-6">
+        <DailyRitualLoading streak={streak} locale={locale} />
+        <div className="flex min-h-[45vh] items-center justify-center">
+          <CosmicLoader embedded progressive />
+        </div>
       </div>
     );
   }
@@ -106,6 +113,7 @@ export function DailyDashboard({
         weeklyUnlocked={weeklyUnlocked}
         balance={balance}
         savedVoice={savedVoice}
+        streak={streak}
         locale={locale}
       />
 
@@ -161,6 +169,7 @@ function DashboardExtrasSection({
   balance,
   savedVoice,
   canAudio,
+  streak,
   locale,
 }: {
   userId: string;
@@ -169,6 +178,7 @@ function DashboardExtrasSection({
   weeklyUnlocked: boolean;
   balance: number;
   canAudio: boolean;
+  streak: StreakProgress;
   savedVoice?: string | null;
   locale: UserLocale;
 }) {
@@ -201,15 +211,7 @@ function DashboardExtrasSection({
 
   const dailySlot = loading ? (
     <HoroscopeLoading />
-  ) : extras.daily ? (
-    <DailyCard
-      horoscope={extras.daily}
-      transits={extras.transitBreakdown}
-      timezone={timezone}
-      savedVoice={savedVoice}
-      canAudio={canAudio}
-    />
-  ) : canDaily ? (
+  ) : extras.daily ? null : canDaily ? (
     <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
       {en ? "Today's horoscope is being prepared. Try again shortly." : "დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში."}
     </div>
@@ -223,7 +225,20 @@ function DashboardExtrasSection({
 
   return (
     <>
-      {(dailySlot || moonSlot) && (
+      {loading && <DailyRitualLoading streak={streak} locale={locale} />}
+      {!loading && extras.daily ? (
+        <DailyRitual
+          userId={userId}
+          horoscope={extras.daily}
+          transits={extras.transitBreakdown}
+          moonPhase={extras.moonPhase}
+          timezone={timezone}
+          savedVoice={savedVoice}
+          canAudio={canAudio}
+          streak={streak}
+          locale={locale}
+        />
+      ) : (dailySlot || moonSlot) ? (
         <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
           {dailySlot && (
             <div className="min-w-0 xl:col-span-7">{dailySlot}</div>
@@ -234,7 +249,7 @@ function DashboardExtrasSection({
             </div>
           )}
         </div>
-      )}
+      ) : null}
 
       {!weeklyUnlocked ? (
         <WeeklyForecastLocked
@@ -250,6 +265,32 @@ function DashboardExtrasSection({
         )
       )}
     </>
+  );
+}
+
+function DailyRitualLoading({
+  streak,
+  locale,
+}: {
+  streak: StreakProgress;
+  locale: UserLocale;
+}) {
+  const en = locale === "en";
+  return (
+    <div className="rounded-2xl border border-[var(--vivida-gold)]/25 bg-gradient-to-br from-[var(--vivida-gold)]/8 via-card/60 to-[var(--vivida-violet)]/8 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
+            {en ? "Daily ritual" : "დღის რიტუალი"}
+          </div>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight">
+            {en ? "Preparing today's message…" : "დღევანდელი გზავნილი მზადდება…"}
+          </h2>
+        </div>
+        <StreakChip progress={streak} locale={locale} />
+      </div>
+      <div className="vivida-pulse-soft mt-5 h-2 rounded-full bg-foreground/10" />
+    </div>
   );
 }
 

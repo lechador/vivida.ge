@@ -17,9 +17,9 @@ import { recordVisit } from "@/lib/activity";
  * cookie gets cleared properly (Server Components can't mutate cookies
  * directly, so calling signOut() here would throw).
  *
- * Side effect: schedules a deferred `recordVisit()` write so the admin
- * panel knows which days each user came back. The write happens after
- * the response streams, so it can't add any latency to the page.
+ * Side effect: schedules a deferred `recordVisit()` write for admin activity
+ * reporting. Streaks and rewards are recorded separately when the user
+ * completes the Today ritual.
  */
 export async function requireUser() {
   const session = await auth();

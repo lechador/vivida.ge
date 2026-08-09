@@ -7,7 +7,7 @@ import { Loader2, RotateCcw, Sparkles, Users, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
-import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
 type SpreadCard = {
   slug: string;
@@ -53,7 +53,9 @@ export function TarotReader({
       // The sign-in wall is the single biggest drop-off on this funnel —
       // track it separately from a completed reading so the two are
       // distinguishable in GA4.
-      trackEvent("tarot_login_required", { widget: "tarot_reader" });
+      trackEvent(ANALYTICS_EVENT.tarotLoginRequired, {
+        widget: "tarot_reader",
+      });
       router.push(`/login?next=${encodeURIComponent("/taro")}`);
       return;
     }
@@ -66,7 +68,9 @@ export function TarotReader({
         body: JSON.stringify({ question: q }),
       });
       if (res.status === 402) {
-        trackEvent("tarot_credits_short", { widget: "tarot_reader" });
+        trackEvent(ANALYTICS_EVENT.tarotCreditsShort, {
+          widget: "tarot_reader",
+        });
         setStatus("short");
         return;
       }
@@ -75,7 +79,9 @@ export function TarotReader({
         return;
       }
       const next = (await res.json()) as Reading;
-      trackEvent("tarot_reading_completed", { free: next.free ? 1 : 0 });
+      trackEvent(ANALYTICS_EVENT.tarotReadingCompleted, {
+        free: next.free ? 1 : 0,
+      });
       setReading(next);
       setStatus("idle");
     } catch {

@@ -8,7 +8,70 @@
  * (chart computed → email subscribed → register clicked), which — unlike raw
  * bounce rate — actually tell you whether the free tools convert.
  */
-type GtagParams = Record<string, string | number | boolean | null | undefined>;
+export type GtagParams = Record<
+  string,
+  string | number | boolean | null | undefined
+>;
+
+/**
+ * Canonical product-event names. Keep these stable: GA4 explorations,
+ * audiences, and retention cohorts depend on the exact strings.
+ *
+ * Event payloads must stay aggregate and non-identifying. Never send email,
+ * names, user IDs, birth dates/times, city names, free-text questions, or
+ * profile content through this client analytics layer.
+ */
+export const ANALYTICS_EVENT = {
+  homePrimaryCtaClick: "home_primary_cta_click",
+  compatibilityCheckCompleted: "compatibility_check_completed",
+  compatibilityShare: "compatibility_share",
+  natalChartComputed: "natal_chart_computed",
+  natalChartShared: "natal_chart_shared",
+  horoscopeEmailSubscribed: "horoscope_email_subscribed",
+  registerClick: "register_click",
+  signUpGoogleClick: "sign_up_google_click",
+  signUpSubmitted: "sign_up_submitted",
+  signUpVerified: "sign_up_verified",
+  onboardingStarted: "onboarding_started",
+  onboardingStepViewed: "onboarding_step_viewed",
+  onboardingStepCompleted: "onboarding_step_completed",
+  onboardingPrefilled: "onboarding_prefilled",
+  onboardingSubmitted: "onboarding_submitted",
+  publicHoroscopeRead: "public_horoscope_read",
+  dailyHoroscopeViewed: "daily_horoscope_viewed",
+  dailyHoroscopeRead: "daily_horoscope_read",
+  dailyRitualViewed: "daily_ritual_viewed",
+  dailyMoonRead: "daily_moon_read",
+  dailyFocusSelected: "daily_focus_selected",
+  dailyRitualCompleted: "daily_ritual_completed",
+  streakOpened: "streak_opened",
+  pushPromptViewed: "push_prompt_viewed",
+  pushEnabled: "push_enabled",
+  pushDismissed: "push_dismissed",
+  pushPermissionDenied: "push_permission_denied",
+  tarotLoginRequired: "tarot_login_required",
+  tarotCreditsShort: "tarot_credits_short",
+  tarotReadingCompleted: "tarot_reading_completed",
+  testCompleted: "test_completed",
+} as const;
+
+export type AnalyticsEventName =
+  (typeof ANALYTICS_EVENT)[keyof typeof ANALYTICS_EVENT];
+
+/**
+ * Events that prove a user received or created product value. `trackEvent`
+ * mirrors these as one normalized `value_action` event, making the north-star
+ * "valuable sessions" metric easy to build without a brittle GA4 OR-list.
+ */
+const VALUE_ACTION_EVENTS = new Set<AnalyticsEventName>([
+  ANALYTICS_EVENT.compatibilityCheckCompleted,
+  ANALYTICS_EVENT.natalChartComputed,
+  ANALYTICS_EVENT.publicHoroscopeRead,
+  ANALYTICS_EVENT.dailyHoroscopeRead,
+  ANALYTICS_EVENT.dailyRitualCompleted,
+  ANALYTICS_EVENT.tarotReadingCompleted,
+  ANALYTICS_EVENT.testCompleted,
+]);
 
 /**
  * GA4 reserves these event-parameter names for campaign attribution. Sending
@@ -45,7 +108,10 @@ function stripCampaignParams(params: GtagParams): GtagParams {
   return safe;
 }
 
-export function trackEvent(name: string, params?: GtagParams): void {
+export function trackEvent(
+  name: AnalyticsEventName,
+  params?: GtagParams
+): void {
   if (typeof window === "undefined") return;
   const gtag = (
     window as unknown as {
@@ -54,7 +120,14 @@ export function trackEvent(name: string, params?: GtagParams): void {
   ).gtag;
   if (typeof gtag !== "function") return;
   try {
-    gtag("event", name, params && stripCampaignParams(params));
+    const safeParams = params && stripCampaignParams(params);
+    gtag("event", name, safeParams);
+    if (VALUE_ACTION_EVENTS.has(name)) {
+      gtag("event", "value_action", {
+        ...safeParams,
+        action: name,
+      });
+    }
   } catch {
     /* analytics must never break the app */
   }

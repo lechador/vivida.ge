@@ -25,6 +25,7 @@ import {
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
+import { PublicHoroscopeReadTracker } from "@/components/analytics/public-horoscope-read-tracker";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -180,6 +181,10 @@ export async function HoroscopeView({
               {periodLabelKa} მზადდება — სცადე ცოტა ხანში.
             </p>
           </section>
+        )}
+
+        {bodyParagraphs.length > 0 && (
+          <PublicHoroscopeReadTracker sign={sign} view={view} />
         )}
 
         {horoscope?.themes && horoscope.themes.length > 0 && (

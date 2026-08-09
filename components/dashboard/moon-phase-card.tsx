@@ -5,11 +5,17 @@ import { cn } from "@/lib/utils";
 import type { MoonPhaseRow } from "@/actions/moon-phase";
 
 /**
- * Render the universal moon-phase card on the dashboard. Server component.
+ * Render the universal moon-phase card on the dashboard.
  * Sized to live in a narrow sidebar column — vertical stack with a
  * compact moon glyph, single-line headline, and a fold-out body.
  */
-export function MoonPhaseCard({ data }: { data: MoonPhaseRow }) {
+export function MoonPhaseCard({
+  data,
+  onRead,
+}: {
+  data: MoonPhaseRow;
+  onRead?: () => void;
+}) {
   const { snapshot } = data;
   const sign = signByIndex(snapshot.signIndex);
   const illumPct = Math.round(snapshot.illumination * 100);
@@ -70,7 +76,12 @@ export function MoonPhaseCard({ data }: { data: MoonPhaseRow }) {
         </div>
       )}
 
-      <details className="group relative mt-3 -mx-1 rounded-xl px-1 transition-colors open:bg-foreground/[0.02]">
+      <details
+        className="group relative mt-3 -mx-1 rounded-xl px-1 transition-colors open:bg-foreground/[0.02]"
+        onToggle={(event) => {
+          if (event.currentTarget.open) onRead?.();
+        }}
+      >
         <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
           <span>გააგრძელე კითხვა</span>
           <span aria-hidden className="transition-transform group-open:rotate-90">›</span>

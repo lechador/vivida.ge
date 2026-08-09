@@ -9,10 +9,8 @@ export { OPTIONS } from "@/lib/api/cors";
 /**
  * GET /api/v1/me/streak
  *
- * The viewer's daily-visit streak (current + longest), for the Today screen's
- * streak chip. `requireMobileUser` records today's visit in an after-hook, and
- * `getStreak` counts today as active regardless, so a first visit reads as a
- * 1-day streak immediately.
+ * The viewer's completed daily-ritual streak. An unfinished today preserves
+ * yesterday's active run so the UI can show that the streak is still saveable.
  */
 export async function GET(req: Request) {
   return handle(async () => {

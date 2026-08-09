@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { EqQuiz, type EqSubmitResult } from "@/components/eq/eq-quiz";
-import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { EQ_ANSWERS_STORAGE_KEY, EQ_QUESTIONS } from "@/lib/eq/questions";
 
 /**
@@ -30,7 +30,10 @@ export function EqTestClient() {
     } catch {
       /* ignore — the result page falls back to a "retake" prompt */
     }
-    trackEvent("test_completed", { test: "eq", items: EQ_QUESTIONS.length });
+    trackEvent(ANALYTICS_EVENT.testCompleted, {
+      test: "eq",
+      items: EQ_QUESTIONS.length,
+    });
     router.push("/eq-testi/shedegi");
     return { ok: true };
   }

@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { saveProfile } from "@/actions/profile";
 import { fbTrack } from "@/lib/fb-pixel";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { ProgressDots } from "./progress-dots";
 import { StepDate, validateDate } from "./step-date";
 import { StepTime, validateTime } from "./step-time";
@@ -17,6 +18,10 @@ import type { Profile } from "@/db/schema";
 import type { GeocodeResult } from "@/lib/geocoding";
 import { suggestUsername } from "@/lib/profile-utils";
 import type { WizardData } from "./types";
+import {
+  clearPendingNatalProfile,
+  readPendingNatalProfile,
+} from "@/lib/pending-natal-profile";
 
 type StepName = "date" | "time" | "place" | "visibility" | "photos";
 const FULL_STEPS: readonly StepName[] = [
@@ -107,6 +112,7 @@ export function OnboardingWizard({
     initialState(initialProfile, defaultName)
   );
   const [step, setStep] = useState(0);
+  const flow = dateLocked ? "edit" : "new";
 
   // Fire FB Pixel CompleteRegistration the first time a brand-new user
   // arrives at onboarding — they've just completed Google OAuth or email
@@ -120,6 +126,55 @@ export function OnboardingWizard({
     fbTrack("CompleteRegistration");
     localStorage.setItem(FLAG, "1");
   }, [initialProfile]);
+
+  useEffect(() => {
+    if (initialProfile) {
+      clearPendingNatalProfile();
+      return;
+    }
+    const pending = readPendingNatalProfile();
+    if (!pending) return;
+
+    const [year, month, day] = pending.dateOfBirth.split("-");
+    const [hour = "", minute = ""] = pending.timeOfBirth?.split(":") ?? [];
+    const frame = window.requestAnimationFrame(() => {
+      setData((current) => ({
+        ...current,
+        date: { day, month, year },
+        time: {
+          hour,
+          minute,
+          unknown: pending.timeOfBirth === null,
+        },
+        place: pending.place,
+      }));
+      trackEvent(ANALYTICS_EVENT.onboardingPrefilled, {
+        origin: "natal_calculator",
+        exact_time: pending.timeOfBirth ? 1 : 0,
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [initialProfile]);
+
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENT.onboardingStarted, {
+      flow,
+      total_steps: STEPS.length,
+    });
+    // A new wizard mount is the funnel start. Step changes are tracked by the
+    // separate effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENT.onboardingStepViewed, {
+      flow,
+      step_name: STEPS[step],
+      step_number: step + 1,
+      total_steps: STEPS.length,
+    });
+  }, [flow, step, STEPS]);
   const [direction, setDirection] = useState<Direction>(1);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -138,6 +193,12 @@ export function OnboardingWizard({
 
   const goNext = () => {
     if (!stepValid) return;
+    trackEvent(ANALYTICS_EVENT.onboardingStepCompleted, {
+      flow,
+      step_name: currentStep,
+      step_number: step + 1,
+      total_steps: STEPS.length,
+    });
     if (step < STEPS.length - 1) {
       setDirection(1);
       setStep((s) => s + 1);
@@ -164,6 +225,11 @@ export function OnboardingWizard({
       setError("გთხოვ, ყველა ველი შეავსო.");
       return;
     }
+    trackEvent(ANALYTICS_EVENT.onboardingSubmitted, {
+      flow,
+      total_steps: STEPS.length,
+      exact_time: timeRes.time ? 1 : 0,
+    });
     startTransition(async () => {
       const result = await saveProfile(
         {

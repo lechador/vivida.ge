@@ -25,7 +25,8 @@ export const REPUTATION_RULES: Record<
   post_created: { points: 3, dailyCap: 9 },
   comment_created: { points: 1, dailyCap: 5 },
   friend_added: { points: 5, dailyCap: 20 },
-  daily_visit: { points: 1, dailyCap: null }, // dedupe by date
+  // Legacy enum name retained for migration safety; awarded on ritual completion.
+  daily_visit: { points: 1, dailyCap: null },
   // What others do to you
   reaction_received: { points: 2, dailyCap: 30 },
   comment_received: { points: 3, dailyCap: 30 },
@@ -263,7 +264,7 @@ export const RepSubject = {
     const [x, y] = [a, b].sort();
     return `${x}:${y}`;
   },
-  dailyVisit: (userId: string, dateLocal: string) =>
+  dailyRitual: (userId: string, dateLocal: string) =>
     `${userId}:${dateLocal}`,
   oneShot: (userId: string) => userId,
 };

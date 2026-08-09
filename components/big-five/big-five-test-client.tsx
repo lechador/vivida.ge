@@ -6,7 +6,7 @@ import {
   LikertQuiz,
   type LikertSubmitResult,
 } from "@/components/tests/likert-quiz";
-import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import {
   BIG5_ANSWERS_STORAGE_KEY,
   BIG5_LIKERT,
@@ -36,7 +36,7 @@ export function BigFiveTestClient() {
     } catch {
       /* ignore — the result page falls back to a "retake" prompt */
     }
-    trackEvent("test_completed", {
+    trackEvent(ANALYTICS_EVENT.testCompleted, {
       test: "big_five",
       items: BIG5_QUESTIONS.length,
     });

@@ -6,6 +6,7 @@ import { useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { signInWithGoogle } from "@/actions/auth";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
 export function SignInButton({
   label,
@@ -34,6 +35,10 @@ export function SignInButton({
         disabled={isPending}
         onClick={() =>
           startTransition(async () => {
+            trackEvent(ANALYTICS_EVENT.homePrimaryCtaClick, {
+              surface: "home_hero",
+              method: "google",
+            });
             await signInWithGoogle("/dashboard");
           })
         }

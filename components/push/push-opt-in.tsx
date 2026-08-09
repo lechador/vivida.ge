@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bell, BellOff, Check, Loader2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
 const VAPID = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const DISMISS_KEY = "vivida_push_prompt_dismissed";
@@ -47,6 +48,7 @@ export function PushOptIn({
   const [state, setState] = useState<State>("loading");
   const [error, setError] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const promptTracked = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -90,12 +92,29 @@ export function PushOptIn({
     };
   }, []);
 
+  useEffect(() => {
+    if (
+      variant === "banner" &&
+      state === "off" &&
+      !dismissed &&
+      !promptTracked.current
+    ) {
+      promptTracked.current = true;
+      trackEvent(ANALYTICS_EVENT.pushPromptViewed, { surface: variant });
+    }
+  }, [dismissed, state, variant]);
+
   async function enable() {
     setError(null);
     setState("working");
     try {
       const perm = await Notification.requestPermission();
       if (perm !== "granted") {
+        if (perm === "denied") {
+          trackEvent(ANALYTICS_EVENT.pushPermissionDenied, {
+            surface: variant,
+          });
+        }
         setState(perm === "denied" ? "denied" : "off");
         return;
       }
@@ -111,6 +130,7 @@ export function PushOptIn({
         body: JSON.stringify({ subscription: sub.toJSON() }),
       });
       if (!res.ok) throw new Error("save failed");
+      trackEvent(ANALYTICS_EVENT.pushEnabled, { surface: variant });
       setState("on");
     } catch {
       setError(en ? "Could not enable notifications. Please try again." : "ვერ ჩაირთო. სცადე ხელახლა.");
@@ -143,6 +163,7 @@ export function PushOptIn({
     } catch {
       /* ignore */
     }
+    trackEvent(ANALYTICS_EVENT.pushDismissed, { surface: variant });
     setDismissed(true);
   }
 

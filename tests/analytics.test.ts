@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { trackEvent } from "../lib/analytics";
+import { ANALYTICS_EVENT, trackEvent } from "../lib/analytics";
 
 type Hit = { name: string; params?: Record<string, unknown> };
 
@@ -28,9 +28,43 @@ describe("trackEvent", () => {
 
   it("passes ordinary params through untouched", () => {
     const hits = installGtag();
-    trackEvent("test_completed", { test: "iq", items: 20 });
+    trackEvent(ANALYTICS_EVENT.testCompleted, { test: "iq", items: 20 });
     expect(hits).toEqual([
       { name: "test_completed", params: { test: "iq", items: 20 } },
+      {
+        name: "value_action",
+        params: { action: "test_completed", test: "iq", items: 20 },
+      },
+    ]);
+  });
+
+  it("does not mirror non-value funnel events as value actions", () => {
+    const hits = installGtag();
+    trackEvent(ANALYTICS_EVENT.signUpSubmitted, { method: "email" });
+    expect(hits).toEqual([
+      { name: "sign_up_submitted", params: { method: "email" } },
+    ]);
+  });
+
+  it("counts a completed daily ritual as a value action", () => {
+    const hits = installGtag();
+    trackEvent(ANALYTICS_EVENT.dailyRitualCompleted, {
+      date: "2026-08-09",
+      total_steps: 3,
+    });
+    expect(hits).toEqual([
+      {
+        name: "daily_ritual_completed",
+        params: { date: "2026-08-09", total_steps: 3 },
+      },
+      {
+        name: "value_action",
+        params: {
+          action: "daily_ritual_completed",
+          date: "2026-08-09",
+          total_steps: 3,
+        },
+      },
     ]);
   });
 
@@ -39,7 +73,7 @@ describe("trackEvent", () => {
     const hits = installGtag();
     // The exact shape that put ~150 sessions/2wk into "Unassigned" as
     // `natal_calculator / (not set)`.
-    trackEvent("natal_chart_computed", {
+    trackEvent(ANALYTICS_EVENT.natalChartComputed, {
       source: "natal_calculator",
       medium: "widget",
       campaign: "launch",
@@ -53,10 +87,19 @@ describe("trackEvent", () => {
     });
     expect(hits).toEqual([
       { name: "natal_chart_computed", params: { widget: "natal_calculator" } },
+      {
+        name: "value_action",
+        params: {
+          action: "natal_chart_computed",
+          widget: "natal_calculator",
+        },
+      },
     ]);
   });
 
   it("is a no-op when gtag is not loaded", () => {
-    expect(() => trackEvent("register_click", { widget: "x" })).not.toThrow();
+    expect(() =>
+      trackEvent(ANALYTICS_EVENT.registerClick, { widget: "x" })
+    ).not.toThrow();
   });
 });

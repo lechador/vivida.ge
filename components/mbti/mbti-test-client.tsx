@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { MbtiQuiz } from "@/components/mbti-quiz";
-import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { MBTI_ANSWERS_STORAGE_KEY, type MbtiQuestion } from "@/lib/mbti-questions";
 
 /**
@@ -28,7 +28,7 @@ export function MbtiTestClient({ questions }: { questions: MbtiQuestion[] }) {
           /* private mode / storage disabled — fall through to claim, which
              will bounce back to /pirovnebis-testi if it can't read the answers */
         }
-        trackEvent("test_completed", {
+        trackEvent(ANALYTICS_EVENT.testCompleted, {
           test: "mbti",
           items: questions.length,
         });

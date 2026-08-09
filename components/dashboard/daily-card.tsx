@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Headphones, Lock, Sparkles } from "lucide-react";
 
@@ -9,6 +10,7 @@ import { CREDIT_COST } from "@/lib/credits-config";
 import { BODIES } from "@/lib/zodiac";
 import { Button } from "@/components/ui/button";
 import { HoroscopeAudioPlayer } from "./horoscope-audio-player";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
 const ASPECT_GLYPH: Record<string, string> = {
   conjunction: "☌",
@@ -45,6 +47,7 @@ export function DailyCard({
   timezone,
   savedVoice,
   canAudio = true,
+  onRead,
 }: {
   horoscope: DailyHoroscope;
   /** Today's strongest transit aspects + their library interpretations. */
@@ -52,7 +55,39 @@ export function DailyCard({
   timezone: string;
   savedVoice?: string | null;
   canAudio?: boolean;
+  onRead?: () => void;
 }) {
+  const readSentinelRef = useRef<HTMLParagraphElement>(null);
+  const readTrackedRef = useRef(false);
+
+  useEffect(() => {
+    readTrackedRef.current = false;
+    trackEvent(ANALYTICS_EVENT.dailyHoroscopeViewed, {
+      date: horoscope.date,
+      has_transits: transits.length > 0 ? 1 : 0,
+      audio_available: canAudio ? 1 : 0,
+    });
+
+    const sentinel = readSentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting) || readTrackedRef.current)
+          return;
+        readTrackedRef.current = true;
+        trackEvent(ANALYTICS_EVENT.dailyHoroscopeRead, {
+          date: horoscope.date,
+          has_transits: transits.length > 0 ? 1 : 0,
+        });
+        onRead?.();
+        observer.disconnect();
+      },
+      { threshold: 0.6 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [canAudio, horoscope.date, onRead, transits.length]);
+
   const date = new Intl.DateTimeFormat("ka-GE", {
     timeZone: timezone,
     weekday: "long",
@@ -209,7 +244,10 @@ export function DailyCard({
         </section>
       )}
 
-      <p className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground">
+      <p
+        ref={readSentinelRef}
+        className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground"
+      >
         ხვალ ახალი წინასწარმეტყველება გელოდება.
       </p>
     </article>

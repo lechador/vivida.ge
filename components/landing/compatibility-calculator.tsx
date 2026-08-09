@@ -8,6 +8,7 @@ import { Check, Heart, RotateCcw, Share2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pairSlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { fbTrack, fbTrackCustom } from "@/lib/fb-pixel";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import type { CalcPair, CalcSign } from "@/lib/compatibility-calculator-data";
 
 const SCORE_COLOR: Record<string, string> = {
@@ -62,6 +63,12 @@ export function CompatibilityCalculator({
     fbTrackCustom("CompatibilityCheck", {
       pair: slug,
       percent: pair.percent,
+    });
+    trackEvent(ANALYTICS_EVENT.compatibilityCheckCompleted, {
+      pair: slug,
+      percent: pair.percent,
+      score: pair.score,
+      surface: "home_calculator",
     });
     // Let the reveal mount, then scroll it into view on small screens.
     requestAnimationFrame(() => {
@@ -244,6 +251,10 @@ function ResultCard({
     try {
       if (navigator.share) {
         await navigator.share({ title: "Vivida თავსებადობა", text, url });
+        trackEvent(ANALYTICS_EVENT.compatibilityShare, {
+          pair: result.slug,
+          method: "native",
+        });
         return;
       }
     } catch {
@@ -252,6 +263,10 @@ function ResultCard({
     }
     try {
       await navigator.clipboard.writeText(`${text}\n${url}`);
+      trackEvent(ANALYTICS_EVENT.compatibilityShare, {
+        pair: result.slug,
+        method: "clipboard",
+      });
     } catch {
       // clipboard blocked — silently ignore, the full-analysis link remains.
     }

@@ -1457,9 +1457,18 @@ export const userActivityDays = pgTable(
     firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
+    /** Set only after the user completes the Today ritual. Historical visit
+     *  rows are grandfathered by the rollout migration to preserve streaks. */
+    ritualCompletedAt: timestamp("ritual_completed_at", { withTimezone: true }),
+    /** 0 = grandfathered visit, 1+ = actual ritual product version. */
+    ritualVersion: integer("ritual_version"),
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.dateLocal] }),
+    index("user_activity_ritual_completed_idx").on(
+      t.userId,
+      t.ritualCompletedAt
+    ),
   ]
 );
 
@@ -1591,7 +1600,7 @@ export const postReactions = pgTable(
  *  - reaction_received   — someone reacted to your post (cap 30/day)
  *  - comment_received    — someone commented on your post (cap 30/day)
  *  - friend_added        — you accepted a friend request (cap 20/day)
- *  - daily_visit         — you visited the site today (cap 1/day)
+ *  - daily_visit         — legacy enum name; now awarded for completing the daily ritual
  *  - profile_completed   — one-shot, on first profile save
  *  - first_post          — one-shot, on the first post you ever publish
  *  - joined              — one-shot, on signup
@@ -1635,7 +1644,7 @@ export const reputationEvents = pgTable(
      *   - reaction_received  → `${postId}:${reactorUserId}`
      *   - comment_received   → commentId
      *   - friend_added       → sorted pair `min(a,b):max(a,b)`
-     *   - daily_visit        → `${userId}:YYYY-MM-DD`
+     *   - daily_visit        → `${userId}:YYYY-MM-DD` after ritual completion
      *   - profile_completed  → `${userId}`
      *   - first_post         → `${userId}`
      *   - joined             → `${userId}`
