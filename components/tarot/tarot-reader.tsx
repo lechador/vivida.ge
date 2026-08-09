@@ -53,7 +53,7 @@ export function TarotReader({
       // The sign-in wall is the single biggest drop-off on this funnel —
       // track it separately from a completed reading so the two are
       // distinguishable in GA4.
-      trackEvent("tarot_login_required", { source: "tarot_reader" });
+      trackEvent("tarot_login_required", { widget: "tarot_reader" });
       router.push(`/login?next=${encodeURIComponent("/taro")}`);
       return;
     }
@@ -66,7 +66,7 @@ export function TarotReader({
         body: JSON.stringify({ question: q }),
       });
       if (res.status === 402) {
-        trackEvent("tarot_credits_short", { source: "tarot_reader" });
+        trackEvent("tarot_credits_short", { widget: "tarot_reader" });
         setStatus("short");
         return;
       }
