@@ -118,7 +118,11 @@ export function saveDailyRitual(
 
 export function isDailyRitualComplete(
   state: DailyRitualState,
-  moonRequired: boolean
+  moonRequired: boolean,
+  accountComplete = false
 ): boolean {
-  return state.horoscopeRead && (!moonRequired || state.moonRead) && !!state.focus;
+  return (
+    accountComplete ||
+    (state.horoscopeRead && (!moonRequired || state.moonRead) && !!state.focus)
+  );
 }

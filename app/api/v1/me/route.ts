@@ -39,6 +39,10 @@ export async function GET(req: Request) {
         timezone: profiles.timezone,
         latitude: profiles.latitude,
         longitude: profiles.longitude,
+        // Account/privacy settings the app's settings screen renders and
+        // writes back via PATCH /api/v1/me/settings.
+        discoverable: profiles.discoverable,
+        gender: profiles.gender,
       })
       .from(profiles)
       .where(eq(profiles.userId, user.id))

@@ -1,5 +1,8 @@
+import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
+import { db } from "@/db";
+import { blocks, profiles, users } from "@/db/schema";
 import { requireMobileUser } from "@/lib/api/auth";
 import { handle } from "@/lib/api/errors";
 import { ok, fail } from "@/lib/api/respond";
@@ -11,6 +14,36 @@ export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
 
 const Body = z.object({ targetUserId: z.string().min(1) });
+
+/**
+ * GET /api/v1/moderation/block → the users *you* have blocked
+ *
+ * Backs the app's "blocked users" settings list, which is where the block
+ * confirmation tells people they can undo it. Only outgoing blocks are
+ * listed — who blocked *you* stays private.
+ */
+export async function GET(req: Request) {
+  return handle(async () => {
+    const user = await requireMobileUser(req);
+
+    const rows = await db
+      .select({
+        userId: blocks.blockedId,
+        createdAt: blocks.createdAt,
+        name: users.name,
+        image: users.image,
+        username: profiles.username,
+        displayName: profiles.displayName,
+      })
+      .from(blocks)
+      .innerJoin(users, eq(users.id, blocks.blockedId))
+      .leftJoin(profiles, eq(profiles.userId, blocks.blockedId))
+      .where(eq(blocks.blockerId, user.id))
+      .orderBy(desc(blocks.createdAt));
+
+    return ok({ blocked: rows });
+  });
+}
 
 /**
  * POST   /api/v1/moderation/block   { targetUserId }  → block a user

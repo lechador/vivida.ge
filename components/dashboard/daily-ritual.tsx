@@ -18,7 +18,10 @@ import {
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { StreakChip } from "@/components/credits/streak-chip";
-import { completeDailyRitual } from "@/actions/daily-ritual";
+import {
+  completeDailyRitual,
+  getDailyRitualProgress,
+} from "@/actions/daily-ritual";
 
 import { DailyCard } from "./daily-card";
 import { MoonPhaseCard } from "./moon-phase-card";
@@ -56,6 +59,14 @@ export function DailyRitual({
   const [rewardCredits, setRewardCredits] = useState(0);
   const syncingRef = useRef(false);
 
+  const refreshAccountProgress = useCallback(async () => {
+    try {
+      setStreakState(await getDailyRitualProgress());
+    } catch {
+      // Keep the last known status. A later focus/visibility event retries.
+    }
+  }, []);
+
   const syncCompletion = useCallback(async () => {
     if (syncingRef.current) return;
     syncingRef.current = true;
@@ -72,6 +83,21 @@ export function DailyRitual({
       syncingRef.current = false;
     }
   }, []);
+
+  useEffect(() => {
+    const refresh = () => void refreshAccountProgress();
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+
+    refresh();
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [refreshAccountProgress]);
 
   const focusOptions = useMemo(() => {
     const fallback = en ? DEFAULT_FOCUS_EN : DEFAULT_FOCUS_KA;
@@ -158,25 +184,32 @@ export function DailyRitual({
     {
       key: "horoscope",
       label: en ? "Horoscope" : "ჰოროსკოპი",
-      complete: state.horoscopeRead,
+      complete: state.horoscopeRead || streakState.todayComplete,
     },
     ...(moonRequired
       ? [
           {
             key: "moon",
             label: en ? "Moon message" : "მთვარის გზავნილი",
-            complete: state.moonRead,
+            complete: state.moonRead || streakState.todayComplete,
           },
         ]
       : []),
     {
       key: "focus",
       label: en ? "Today's focus" : "დღის ფოკუსი",
-      complete: !!state.focus,
+      complete: !!state.focus || streakState.todayComplete,
     },
   ];
   const completedSteps = steps.filter((step) => step.complete).length;
-  const complete = isDailyRitualComplete(state, moonRequired);
+  const complete = isDailyRitualComplete(
+    state,
+    moonRequired,
+    streakState.todayComplete
+  );
+  const completedOnAnotherDevice =
+    streakState.todayComplete &&
+    !isDailyRitualComplete(state, moonRequired);
   const pct = (completedSteps / steps.length) * 100;
 
   return (
@@ -250,26 +283,32 @@ export function DailyRitual({
           <span className="text-muted-foreground">
             {en ? "Today's focus:" : "დღის ფოკუსი:"}
           </span>
-          {focusOptions.map((focus) => (
-            <button
-              key={focus}
-              type="button"
-              disabled={!hydrated}
-              aria-pressed={state.focus === focus}
-              onClick={() =>
-                updateState({ focus }, ANALYTICS_EVENT.dailyFocusSelected)
-              }
-              className={cn(
-                "rounded-full border px-2.5 py-0.5 font-medium transition-colors disabled:cursor-wait disabled:opacity-60",
-                state.focus === focus
-                  ? "border-[var(--vivida-gold)]/60 bg-[var(--vivida-gold)]/15 text-[var(--vivida-gold)]"
-                  : "border-border/70 bg-background/30 text-muted-foreground hover:border-foreground/25 hover:text-foreground"
-              )}
-            >
-              {state.focus === focus ? "✓ " : ""}
-              {focus}
-            </button>
-          ))}
+          {completedOnAnotherDevice ? (
+            <span className="rounded-full border border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/10 px-2.5 py-0.5 font-medium text-[var(--vivida-cyan)]">
+              ✓ {en ? "Synced from your account" : "ანგარიშიდან სინქრონიზებულია"}
+            </span>
+          ) : (
+            focusOptions.map((focus) => (
+              <button
+                key={focus}
+                type="button"
+                disabled={!hydrated}
+                aria-pressed={state.focus === focus}
+                onClick={() =>
+                  updateState({ focus }, ANALYTICS_EVENT.dailyFocusSelected)
+                }
+                className={cn(
+                  "rounded-full border px-2.5 py-0.5 font-medium transition-colors disabled:cursor-wait disabled:opacity-60",
+                  state.focus === focus
+                    ? "border-[var(--vivida-gold)]/60 bg-[var(--vivida-gold)]/15 text-[var(--vivida-gold)]"
+                    : "border-border/70 bg-background/30 text-muted-foreground hover:border-foreground/25 hover:text-foreground"
+                )}
+              >
+                {state.focus === focus ? "✓ " : ""}
+                {focus}
+              </button>
+            ))
+          )}
         </div>
       </div>
 

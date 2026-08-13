@@ -105,8 +105,9 @@ parameters are the draft origin and whether an exact time was supplied.
 The Today dashboard now presents the personalized horoscope, Moon message,
 daily focus, ritual streak, and next streak reward as one routine. Reading the
 horoscope, opening the Moon message, and selecting one bounded content theme
-advance a visible progress bar. Completion is retained per user and civil date
-in browser `localStorage`, then resets on the next daily reading.
+advance a visible progress bar. Step details are retained per user and civil
+date in browser `localStorage`, then reset on the next daily reading. Completed
+rituals are restored from the account-backed server record across devices.
 
 Browser state provides immediate progress feedback, while an idempotent server
 completion record is the source of truth for streaks and credits. A page visit

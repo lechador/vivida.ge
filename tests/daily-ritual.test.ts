@@ -86,4 +86,9 @@ describe("daily ritual browser state", () => {
       isDailyRitualComplete({ ...withoutMoon, moonRead: true }, true)
     ).toBe(true);
   });
+
+  it("uses the account completion as the cross-device source of truth", () => {
+    expect(isDailyRitualComplete(EMPTY_DAILY_RITUAL, true, true)).toBe(true);
+    expect(isDailyRitualComplete(EMPTY_DAILY_RITUAL, true, false)).toBe(false);
+  });
 });
