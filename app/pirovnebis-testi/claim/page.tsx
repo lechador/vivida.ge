@@ -41,7 +41,7 @@ export default async function TestClaimPage() {
       />
       <Starfield count={110} shooting={2} />
 
-      {authed ? <AppHeader authed /> : <SmartHeader />}
+      {authed ? <AppHeader authed /> : <SmartHeader active="tests" locale={locale} georgianPath="/pirovnebis-testi/claim" />}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         {authed ? <MbtiClaimRunner locale={locale} /> : <MbtiGate questions={questions!} locale={locale} />}

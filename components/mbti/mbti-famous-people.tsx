@@ -8,17 +8,18 @@ import { mbtiCharacterSrc, mbtiFamousFor } from "@/lib/mbti-characters";
  * character avatar (we don't render real faces). Framed as popular, unofficial
  * associations rather than fact.
  */
-export function MbtiFamousPeople({ type }: { type: string }) {
+export function MbtiFamousPeople({ type, locale = "ka" }: { type: string; locale?: "ka" | "en" }) {
+  const en = locale === "en";
   const people = mbtiFamousFor(type);
   if (people.length === 0) return null;
 
   return (
     <div className="mt-4 rounded-2xl border border-border bg-card/50 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
       <h3 className="text-lg font-semibold tracking-tight">
-        ცნობილი {mbtiBaseType(type)}-ები
+        {en ? `Famous people often associated with ${mbtiBaseType(type)}` : `ცნობილი ${mbtiBaseType(type)}-ები`}
       </h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        პიროვნებები, რომლებსაც ხშირად ამ ტიპს მიაწერენ.
+        {en ? "Unofficial public-figure typings for comparison and entertainment." : "პიროვნებები, რომლებსაც ხშირად ამ ტიპს მიაწერენ."}
       </p>
       <ul className="mt-5 grid gap-3 sm:grid-cols-2">
         {people.map((name) => (

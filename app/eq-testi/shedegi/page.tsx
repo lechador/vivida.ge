@@ -34,7 +34,7 @@ export default async function EqResultPage() {
       />
       <Starfield count={110} shooting={2} />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/eq-testi/shedegi" />}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <EqResultClient locale={locale} />

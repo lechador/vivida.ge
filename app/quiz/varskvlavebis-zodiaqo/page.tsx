@@ -8,18 +8,38 @@ import { FamousZodiacQuiz } from "@/components/quizzes/famous-zodiac-quiz";
 import { FAMOUS_ZODIAC_ASSETS } from "@/lib/zodiac-famous-assets";
 import { isR2Configured, objectExists, publicUrlFor } from "@/lib/r2";
 import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
-const SITE_URL = "https://www.vivida.ge";
-const TITLE = "ვარსკვლავების ზოდიაქო — გამოიცანი ცნობილი ადამიანების ნიშანი";
-const DESCRIPTION = "გამოიცანი 20 ცნობილი ადამიანის ზოდიაქოს ნიშანი. სწრაფი, უფასო ქვიზი ქართულად — შედეგი და გაზიარება დასრულებისთანავე.";
+const TITLE_KA = "ვარსკვლავების ზოდიაქო — გამოიცანი ცნობილი ადამიანების ნიშანი";
+const DESCRIPTION_KA = "გამოიცანი 20 ცნობილი ადამიანის ზოდიაქოს ნიშანი. სწრაფი, უფასო ქვიზი ქართულად — შედეგი და გაზიარება დასრულებისთანავე.";
+const TITLE_EN = "Celebrity Zodiac Quiz — Guess Their Star Signs";
+const DESCRIPTION_EN = "Can you guess the zodiac signs of 20 famous actors, musicians, athletes and public figures? Play free and see every correct answer.";
 
-export const metadata: Metadata = { title: { absolute: TITLE }, description: DESCRIPTION, alternates: { canonical: `${SITE_URL}/quiz/varskvlavebis-zodiaqo` }, openGraph: { type: "website", url: `${SITE_URL}/quiz/varskvlavebis-zodiaqo`, title: TITLE, description: DESCRIPTION, siteName: "Vivida", locale: "ka_GE" }, twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION } };
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = en ? TITLE_EN : TITLE_KA;
+  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
+  const url = `${siteUrl}/quiz/varskvlavebis-zodiaqo`;
+  return {
+    title: { absolute: title },
+    description,
+    keywords: en ? ["celebrity zodiac quiz", "guess the star sign", "famous people zodiac signs", "astrology quiz"] : undefined,
+    alternates: { canonical: url, languages: { en: `${ENGLISH_SITE_URL}/quiz/varskvlavebis-zodiaqo`, "ka-GE": `${GEORGIAN_SITE_URL}/quiz/varskvlavebis-zodiaqo`, "x-default": `${ENGLISH_SITE_URL}/quiz/varskvlavebis-zodiaqo` } },
+    openGraph: { type: "website", url, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export default async function FamousZodiacQuizPage() {
-  const session = await auth();
+  const [session, locale] = await Promise.all([auth(), getRequestLocale()]);
   const authed = !!session?.user?.id;
-  // After the admin panel has seeded R2, serve its CDN URLs directly. Until
-  // then, retain a working public quiz by using the reviewed Commons sources.
+  const en = locale === "en";
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = en ? TITLE_EN : TITLE_KA;
+  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
+
   const r2Ready = isR2Configured();
   const imageUrls = Object.fromEntries(
     await Promise.all(
@@ -28,9 +48,40 @@ export default async function FamousZodiacQuizPage() {
         r2Ready && (await objectExists(asset.key))
           ? publicUrlFor(asset.key)
           : asset.sourceUrl,
-      ])
-    )
+      ]),
+    ),
   );
-  const ld = [{ "@context": "https://schema.org", "@type": "Quiz", name: TITLE, description: DESCRIPTION, inLanguage: "ka-GE", url: `${SITE_URL}/quiz/varskvlavebis-zodiaqo`, numberOfQuestions: 20 }, breadcrumbLd([{ name: "მთავარი", url: SITE_URL }, { name: "ტესტები", url: `${SITE_URL}/tests` }, { name: "ვარსკვლავების ზოდიაქო", url: `${SITE_URL}/quiz/varskvlavebis-zodiaqo` }])];
-  return <main className="relative isolate flex min-h-screen flex-col overflow-hidden"><div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" /><Starfield count={120} shooting={2} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeLd(ld) }} />{authed ? <AppHeader authed active="tests" /> : <SmartHeader />}<section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10"><header className="mb-6 text-center"><div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Vivida Quiz</div><h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">რომელი ზოდიაქოს ნიშანია <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">ვარსკვლავი?</span></h1><p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">გამოიცანი ცნობილი მსახიობების, მომღერლებისა და სპორტსმენების ზოდიაქოს ნიშნები.</p></header><FamousZodiacQuiz images={imageUrls} /></section></main>;
+
+  const ld = [
+    { "@context": "https://schema.org", "@type": "Quiz", name: title, description, inLanguage: en ? "en" : "ka-GE", url: `${siteUrl}/quiz/varskvlavebis-zodiaqo`, numberOfQuestions: 20 },
+    breadcrumbLd([
+      { name: en ? "Home" : "მთავარი", url: siteUrl },
+      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
+      { name: en ? "Celebrity Zodiac Quiz" : "ვარსკვლავების ზოდიაქო", url: `${siteUrl}/quiz/varskvlavebis-zodiaqo` },
+    ]),
+  ];
+
+  return (
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+      <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" />
+      <Starfield count={120} shooting={2} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeLd(ld) }} />
+      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/quiz/varskvlavebis-zodiaqo" />}
+      <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
+        <header className="mb-6 text-center">
+          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Vivida Quiz</div>
+          <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+            {en ? "Can you guess the" : "რომელი ზოდიაქოს ნიშანია"}{" "}
+            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
+              {en ? "celebrity’s zodiac sign?" : "ვარსკვლავი?"}
+            </span>
+          </h1>
+          <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
+            {en ? "Guess the star signs of famous actors, musicians, athletes and public figures." : "გამოიცანი ცნობილი მსახიობების, მომღერლებისა და სპორტსმენების ზოდიაქოს ნიშნები."}
+          </p>
+        </header>
+        <FamousZodiacQuiz images={imageUrls} locale={locale} />
+      </section>
+    </main>
+  );
 }

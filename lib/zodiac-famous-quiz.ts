@@ -1,6 +1,7 @@
 export type ZodiacSign = {
   key: string;
   nameKa: string;
+  nameEn: string;
   glyph: string;
 };
 
@@ -14,18 +15,18 @@ export type FamousZodiacQuestion = {
 };
 
 export const ZODIAC_SIGNS: ZodiacSign[] = [
-  { key: "aries", nameKa: "ვერძი", glyph: "♈" },
-  { key: "taurus", nameKa: "კურო", glyph: "♉" },
-  { key: "gemini", nameKa: "ტყუპები", glyph: "♊" },
-  { key: "cancer", nameKa: "კირჩხიბი", glyph: "♋" },
-  { key: "leo", nameKa: "ლომი", glyph: "♌" },
-  { key: "virgo", nameKa: "ქალწული", glyph: "♍" },
-  { key: "libra", nameKa: "სასწორი", glyph: "♎" },
-  { key: "scorpio", nameKa: "მორიელი", glyph: "♏" },
-  { key: "sagittarius", nameKa: "მშვილდოსანი", glyph: "♐" },
-  { key: "capricorn", nameKa: "თხის რქა", glyph: "♑" },
-  { key: "aquarius", nameKa: "მერწყული", glyph: "♒" },
-  { key: "pisces", nameKa: "თევზები", glyph: "♓" },
+  { key: "aries", nameKa: "ვერძი", nameEn: "Aries", glyph: "♈" },
+  { key: "taurus", nameKa: "კურო", nameEn: "Taurus", glyph: "♉" },
+  { key: "gemini", nameKa: "ტყუპები", nameEn: "Gemini", glyph: "♊" },
+  { key: "cancer", nameKa: "კირჩხიბი", nameEn: "Cancer", glyph: "♋" },
+  { key: "leo", nameKa: "ლომი", nameEn: "Leo", glyph: "♌" },
+  { key: "virgo", nameKa: "ქალწული", nameEn: "Virgo", glyph: "♍" },
+  { key: "libra", nameKa: "სასწორი", nameEn: "Libra", glyph: "♎" },
+  { key: "scorpio", nameKa: "მორიელი", nameEn: "Scorpio", glyph: "♏" },
+  { key: "sagittarius", nameKa: "მშვილდოსანი", nameEn: "Sagittarius", glyph: "♐" },
+  { key: "capricorn", nameKa: "თხის რქა", nameEn: "Capricorn", glyph: "♑" },
+  { key: "aquarius", nameKa: "მერწყული", nameEn: "Aquarius", glyph: "♒" },
+  { key: "pisces", nameKa: "თევზები", nameEn: "Pisces", glyph: "♓" },
 ];
 
 /** Twenty public-figure questions, shuffled + trimmed to a fixed round length
@@ -59,4 +60,17 @@ export const FAMOUS_ZODIAC_ROUND = 20;
 
 export function signFor(key: string) {
   return ZODIAC_SIGNS.find((sign) => sign.key === key)!;
+}
+
+const PROFESSION_EN: Record<string, string> = {
+  "მომღერალი": "Singer",
+  "მსახიობი": "Actor",
+  "ფეხბურთელი": "Footballer",
+  "კალათბურთელი": "Basketball player",
+  "პოლიტიკოსი": "Politician",
+  "ბიზნესვუმენი": "Entrepreneur",
+};
+
+export function professionEn(question: FamousZodiacQuestion): string {
+  return PROFESSION_EN[question.professionKa] ?? "Public figure";
 }

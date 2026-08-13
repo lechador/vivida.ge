@@ -24,6 +24,9 @@ import {
   MBTI_LIKERT,
   MBTI_QUESTIONS_EN,
 } from "@/lib/mbti-questions";
+import { MBTI_CONTENT_EN } from "@/lib/mbti-content-en";
+import { TS_QUESTIONS_EN, TS_SIGN_BLURB_EN } from "@/lib/true-sign/quiz";
+import { FAMOUS_ZODIAC_QUESTIONS, ZODIAC_SIGNS, professionEn } from "@/lib/zodiac-famous-quiz";
 
 const GEORGIAN = /[ა-ჰ]/;
 
@@ -110,5 +113,30 @@ describe("English test content", () => {
       archetypes: MBTI_ARCHETYPE_EN,
       scale: MBTI_LIKERT.map(({ labelEn }) => labelEn),
     })).not.toMatch(GEORGIAN);
+  });
+
+  it("provides a complete English guide for all sixteen personality types", () => {
+    expect(Object.keys(MBTI_CONTENT_EN)).toHaveLength(16);
+    for (const [type, profile] of Object.entries(MBTI_CONTENT_EN)) {
+      expect(profile.summary).toHaveLength(2);
+      expect(profile.strengths).toHaveLength(4);
+      expect(profile.challenges).toHaveLength(4);
+      expect(type).toMatch(/^[EI][NS][TF][JP]$/);
+      expect(JSON.stringify(profile)).not.toMatch(GEORGIAN);
+    }
+  });
+
+  it("provides complete English copy for both zodiac quizzes", () => {
+    expect(TS_QUESTIONS_EN).toHaveLength(12);
+    for (const question of TS_QUESTIONS_EN) {
+      expect(question.textEn).toBeTruthy();
+      expect(question.options.every((option) => Boolean(option.textEn))).toBe(true);
+      expect(JSON.stringify({ text: question.textEn, options: question.options.map((option) => option.textEn) })).not.toMatch(GEORGIAN);
+    }
+    expect(JSON.stringify(TS_SIGN_BLURB_EN)).not.toMatch(GEORGIAN);
+    expect(ZODIAC_SIGNS).toHaveLength(12);
+    expect(JSON.stringify(ZODIAC_SIGNS.map(({ nameEn }) => nameEn))).not.toMatch(GEORGIAN);
+    expect(FAMOUS_ZODIAC_QUESTIONS).toHaveLength(20);
+    expect(JSON.stringify(FAMOUS_ZODIAC_QUESTIONS.map((question) => professionEn(question)))).not.toMatch(GEORGIAN);
   });
 });

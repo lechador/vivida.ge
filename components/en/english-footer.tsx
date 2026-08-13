@@ -21,7 +21,7 @@ export function EnglishFooter() {
             <span className="text-xl font-semibold">vivida</span>
           </Link>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Personal astrology, natal charts and self-discovery tools. Core guidance is available in English; detailed personalized interpretations currently remain in Georgian.
+            Personal astrology, natal charts and self-discovery tools, with core assessments and personalized readings available in English.
           </p>
           <a href="mailto:hello@vivida.ge" className="mt-3 inline-block text-sm text-[var(--vivida-cyan)] hover:underline">
             hello@vivida.ge

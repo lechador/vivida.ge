@@ -10,7 +10,6 @@ import { MbtiTestClient } from "@/components/mbti/mbti-test-client";
 import { TestMusicPlayer } from "@/components/mbti/test-music-player";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
-import { EnglishFooter } from "@/components/en/english-footer";
 import { PERSONALITY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -134,7 +133,7 @@ export default async function TestPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/pirovnebis-testi" />}
 
       <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-4 pb-10 pt-4 sm:px-6 sm:pb-14 sm:pt-6">
         <header className="mb-5 text-center">
@@ -288,7 +287,7 @@ export default async function TestPage() {
         <PopularSearches queries={en ? ["free personality type test", "16 personalities test", "MBTI style test", "discover my personality type"] : PERSONALITY_LATIN_QUERIES} />
       </section>
 
-      {en ? <EnglishFooter /> : <SiteFooter />}
+      <SiteFooter locale={locale} />
     </main>
   );
 }

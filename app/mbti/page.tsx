@@ -9,16 +9,16 @@ import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { MBTI_TYPES } from "@/lib/mbti-library";
 import { mbtiCharacterSrc } from "@/lib/mbti-characters";
-import { buildMbtiSeo, MBTI_GROUP } from "@/lib/seo/mbti-seo";
+import { buildMbtiSeo, buildMbtiSeoEn, MBTI_GROUP } from "@/lib/seo/mbti-seo";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-
-const SITE_URL = "https://www.vivida.ge";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 const TITLE = "16 პიროვნების ტიპი — MBTI ტიპები ქართულად";
 const DESCRIPTION =
   "16 პიროვნების ტიპის სრული ჩამონათვალი ქართულად (MBTI / 16Personalities). აღწერა, ძლიერი და სუსტი მხარეები, ურთიერთობები და კარიერა — გაიარე უფასო პიროვნების ტესტი.";
 
-export const metadata: Metadata = {
+const METADATA_KA: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
     "პიროვნების ტესტი",
     "ფსიქოლოგიური ტიპები",
   ],
-  alternates: { canonical: `${SITE_URL}/mbti` },
+  alternates: { canonical: `${GEORGIAN_SITE_URL}/mbti` },
   openGraph: {
     type: "website",
-    url: `${SITE_URL}/mbti`,
+    url: `${GEORGIAN_SITE_URL}/mbti`,
     title: TITLE,
     description: DESCRIPTION,
     siteName: "Vivida",
@@ -42,22 +42,44 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  if (!en) return METADATA_KA;
+  const title = "16 Personality Types — Explore Every Type";
+  const description = "Explore all 16 MBTI-style personality types, including preferences, strengths, challenges, relationships, careers and practical growth ideas.";
+  return {
+    title: { absolute: title },
+    description,
+    keywords: ["16 personality types", "MBTI personality types", "personality type descriptions", "free personality test"],
+    alternates: { canonical: `${ENGLISH_SITE_URL}/mbti`, languages: { en: `${ENGLISH_SITE_URL}/mbti`, "ka-GE": `${GEORGIAN_SITE_URL}/mbti`, "x-default": `${ENGLISH_SITE_URL}/mbti` } },
+    openGraph: { type: "website", url: `${ENGLISH_SITE_URL}/mbti`, title, description, siteName: "Vivida", locale: "en_US" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
+
 const GROUP_ORDER = ["analysts", "diplomats", "sentinels", "explorers"] as const;
-const GROUP_LABEL: Record<string, { labelKa: string; blurbKa: string }> = {
-  analysts: { labelKa: "ანალიტიკოსები", blurbKa: "ლოგიკა, სტრატეგია და დამოუკიდებელი აზროვნება." },
-  diplomats: { labelKa: "დიპლომატები", blurbKa: "ემპათია, იდეალიზმი და ღრმა ღირებულებები." },
-  sentinels: { labelKa: "მცველები", blurbKa: "წესრიგი, საიმედოობა და პრაქტიკულობა." },
-  explorers: { labelKa: "მკვლევრები", blurbKa: "სპონტანურობა, ხელოვნება და მოქმედება." },
+const GROUP_LABEL: Record<string, { labelKa: string; blurbKa: string; labelEn: string; blurbEn: string }> = {
+  analysts: { labelKa: "ანალიტიკოსები", blurbKa: "ლოგიკა, სტრატეგია და დამოუკიდებელი აზროვნება.", labelEn: "Analysts", blurbEn: "Logic, strategy and independent thinking." },
+  diplomats: { labelKa: "დიპლომატები", blurbKa: "ემპათია, იდეალიზმი და ღრმა ღირებულებები.", labelEn: "Diplomats", blurbEn: "Empathy, imagination and values-led connection." },
+  sentinels: { labelKa: "მცველები", blurbKa: "წესრიგი, საიმედოობა და პრაქტიკულობა.", labelEn: "Sentinels", blurbEn: "Structure, reliability and practical care." },
+  explorers: { labelKa: "მკვლევრები", blurbKa: "სპონტანურობა, ხელოვნება და მოქმედება.", labelEn: "Explorers", blurbEn: "Adaptability, direct experience and action." },
 };
 
-export default function MbtiHubPage() {
+export default async function MbtiHubPage() {
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const byGroup = GROUP_ORDER.map((g) => ({
     group: g,
     ...GROUP_LABEL[g],
     types: (MBTI_TYPES as readonly string[]).filter((t) => MBTI_GROUP[t]?.key === g),
   }));
 
-  const faq = [
+  const faq = en ? [
+    { q: "What are the 16 personality types?", a: "The framework combines preferences across four paired dimensions: Extraversion or Introversion, Sensing or Intuition, Thinking or Feeling, and Judging or Prospecting. Their combinations form sixteen type codes." },
+    { q: "How can I find my personality type?", a: "Take Vivida’s free 60-question personality test. It takes about seven minutes and gives you a type plus percentages across five dimensions." },
+    { q: "Is a personality type a diagnosis?", a: "No. A type is a vocabulary for recurring preferences, not a diagnosis, fixed identity or measure of ability." },
+  ] : [
     {
       q: "რა არის 16 პიროვნების ტიპი?",
       a: "16 პიროვნების ტიპი (MBTI / 16Personalities) ხასიათს აღწერს ოთხი ღერძით: ინტროვერსია/ექსტრავერსია, სენსორიკა/ინტუიცია, ლოგიკა/გრძნობა და ორგანიზებულობა/სპონტანურობა. მათი კომბინაცია ქმნის 16 უნიკალურ ტიპს.",
@@ -70,9 +92,9 @@ export default function MbtiHubPage() {
 
   const ld = [
     breadcrumbLd([
-      { name: "მთავარი", url: SITE_URL },
-      { name: "ტესტები", url: `${SITE_URL}/tests` },
-      { name: "პიროვნების ტიპები", url: `${SITE_URL}/mbti` },
+      { name: en ? "Home" : "მთავარი", url: siteUrl },
+      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
+      { name: en ? "Personality types" : "პიროვნების ტიპები", url: `${siteUrl}/mbti` },
     ]),
     faqLd(faq),
     {
@@ -81,14 +103,14 @@ export default function MbtiHubPage() {
       itemListElement: (MBTI_TYPES as readonly string[]).map((t, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: `${SITE_URL}/mbti/${t.toLowerCase()}`,
-        name: `${t} — ${buildMbtiSeo(t).archetypeKa}`,
+        url: `${siteUrl}/mbti/${t.toLowerCase()}`,
+        name: `${t} — ${en ? buildMbtiSeoEn(t).archetype : buildMbtiSeo(t).archetypeKa}`,
       })),
     },
   ];
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
@@ -99,7 +121,7 @@ export default function MbtiHubPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      <SmartHeader />
+      <SmartHeader active="tests" locale={locale} georgianPath="/mbti" />
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
         <header className="mb-8 text-center sm:mb-10">
@@ -107,17 +129,16 @@ export default function MbtiHubPage() {
             MBTI · 16Personalities
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            16 პიროვნების{" "}
+            {en ? "16 personality" : "16 პიროვნების"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              ტიპი
+              {en ? "types" : "ტიპი"}
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-pretty text-sm text-foreground/80 sm:text-base">
-            აირჩიე ტიპი და წაიკითხე სრული აღწერა ქართულად — ან გაიარე ტესტი და
-            გაიგე შენი ტიპი.
+            {en ? "Choose a type to explore its preferences, strengths, relationships and growth—or take the test to discover your own." : "აირჩიე ტიპი და წაიკითხე სრული აღწერა ქართულად — ან გაიარე ტესტი და გაიგე შენი ტიპი."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
-            <Link href="/pirovnebis-testi">გაიარე ტესტი</Link>
+            <Link href="/pirovnebis-testi">{en ? "Take the personality test" : "გაიარე ტესტი"}</Link>
           </Button>
         </header>
 
@@ -125,8 +146,8 @@ export default function MbtiHubPage() {
           {byGroup.map((g) => (
             <div key={g.group}>
               <div className="mb-3">
-                <h2 className="text-lg font-semibold tracking-tight">{g.labelKa}</h2>
-                <p className="text-sm text-muted-foreground">{g.blurbKa}</p>
+                <h2 className="text-lg font-semibold tracking-tight">{en ? g.labelEn : g.labelKa}</h2>
+                <p className="text-sm text-muted-foreground">{en ? g.blurbEn : g.blurbKa}</p>
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {g.types.map((t) => {
@@ -139,13 +160,13 @@ export default function MbtiHubPage() {
                     >
                       <Image
                         src={mbtiCharacterSrc(t)}
-                        alt={`${t} — ${s.archetypeKa}`}
+                        alt={`${t} — ${en ? buildMbtiSeoEn(t).archetype : s.archetypeKa}`}
                         width={96}
                         height={96}
                         className="h-20 w-20 object-contain"
                       />
                       <span className="mt-2 text-base font-bold tracking-wide">{t}</span>
-                      <span className="text-xs text-muted-foreground">{s.archetypeKa}</span>
+                      <span className="text-xs text-muted-foreground">{en ? buildMbtiSeoEn(t).archetype : s.archetypeKa}</span>
                     </Link>
                   );
                 })}
@@ -157,7 +178,7 @@ export default function MbtiHubPage() {
         {/* FAQ */}
         <section className="mt-12">
           <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            ხშირად დასმული კითხვები
+            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="space-y-3">
             {faq.map((item) => (
@@ -178,7 +199,7 @@ export default function MbtiHubPage() {
         </section>
 
         <PopularSearches
-          queries={[
+          queries={en ? ["16 personality types", "MBTI type descriptions", "free personality test", "personality type strengths", "discover my personality type"] : [
             "16 პიროვნების ტიპი",
             "პიროვნების ტესტი",
             "mbti ქართულად",
@@ -188,7 +209,7 @@ export default function MbtiHubPage() {
         />
       </section>
 
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

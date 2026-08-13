@@ -18,10 +18,11 @@ export type TsModality = ZodiacSign["modality"]; // კარდინალუ�
 /** An option carries EITHER an element (element questions) or a modality. */
 export type TsOption = {
   textKa: string;
+  textEn?: string;
   element?: TsElement;
   modality?: TsModality;
 };
-export type TsQuestion = { id: number; textKa: string; options: TsOption[] };
+export type TsQuestion = { id: number; textKa: string; textEn?: string; options: TsOption[] };
 
 const F: TsElement = "ცეცხლი";
 const E: TsElement = "მიწა";
@@ -152,6 +153,42 @@ export const TS_QUESTIONS: TsQuestion[] = [
   },
 ];
 
+const TS_TEXT_EN = [
+  "You are at a party. Where are people most likely to find you?",
+  "What throws you off balance most quickly?",
+  "You usually make a decision…",
+  "What sounds like an ideal break?",
+  "Your friends are most likely to describe you as…",
+  "What attracts you most strongly to another person?",
+  "When you are under stress…",
+  "A new project begins. What role do you take?",
+  "Plans change at the last minute. What do you do?",
+  "How do you relate to your habits?",
+  "During a disagreement…",
+  "In life, you are more likely to…",
+];
+
+const TS_OPTIONS_EN = [
+  ["In the middle of the dance floor, energizing everyone", "Talking to everyone and meeting new people", "In a corner, having a deep conversation with one person", "Helping the host—or leaving early"],
+  ["A slow, drawn-out pace", "Chaos and unexpected changes", "A dull, repetitive routine", "Coldness and emotional distance"],
+  ["Quickly, by instinct", "By relying on facts and practical considerations", "Logically, after weighing every side", "By following my feelings and intuition"],
+  ["Adventure, adrenaline and a new country", "Comfort, nature and excellent food", "New people, festivals and conversation", "Peace by the water with someone close"],
+  ["Bold and energetic", "Reliable and grounded", "Clever and entertaining", "Warm and considerate"],
+  ["Passion and confidence", "Stability and honesty", "Intelligence and humor", "Depth and sensitivity"],
+  ["I act and burn off the energy", "I return to familiar, comforting activities", "I talk a lot or analyze everything", "I withdraw and feel everything intensely"],
+  ["I start it and lead others", "I carry it through and refuse to give up", "I adapt and revise the plan as needed"],
+  ["I quickly take the initiative", "I get irritated—I like plans to stay settled", "I take it calmly and adapt with ease"],
+  ["I am always setting a new goal", "I stick firmly to my routine", "I change them with circumstances and mood"],
+  ["I state my position first and set the direction", "I hold firmly to my view", "I try to understand both sides"],
+  ["Take initiative and create the direction", "Choose a path and follow it steadily", "Adapt to circumstances and move with the flow"],
+];
+
+export const TS_QUESTIONS_EN: TsQuestion[] = TS_QUESTIONS.map((question, index) => ({
+  ...question,
+  textEn: TS_TEXT_EN[index],
+  options: question.options.map((option, optionIndex) => ({ ...option, textEn: TS_OPTIONS_EN[index]?.[optionIndex] })),
+}));
+
 export const TS_QUESTION_COUNT = TS_QUESTIONS.length;
 
 /** One punchy, flattering line per sign — the "why you're really this" reveal. */
@@ -182,11 +219,27 @@ export const TS_SIGN_BLURB: Record<ZodiacSign["key"], string> = {
     "შენში წყლის სიღრმე და წარმოსახვა ერთიანდება — მგრძნობიარე, თანამგრძნობი და შემოქმედებითი ხარ, მდიდარი შინაგანი სამყარო გაქვს. თევზების სული გაქვს.",
 };
 
+export const TS_SIGN_BLURB_EN: Record<ZodiacSign["key"], string> = {
+  aries: "Fire and initiative meet in you: you face a challenge first, move boldly and create momentum. Your personality carries unmistakable Aries energy.",
+  leo: "Fire and steadiness meet in you: you are expressive, generous and naturally ready to lead. Your personality carries the warm confidence of Leo.",
+  sagittarius: "Fire and freedom meet in you: you are candid, curious and drawn toward discovery. Your personality carries the adventurous spirit of Sagittarius.",
+  capricorn: "Earth and initiative meet in you: you are ambitious, disciplined and willing to climb patiently. Your personality carries Capricorn determination.",
+  taurus: "Earth and steadiness meet in you: you are reliable, patient and appreciative of real comfort. Your personality carries the grounded resolve of Taurus.",
+  virgo: "Earth and adaptability meet in you: you notice details, improve what is practical and readily make yourself useful. Your personality carries Virgo precision.",
+  libra: "Air and initiative meet in you: you seek fairness, create connection and notice the balance within a room. Your personality carries Libra diplomacy.",
+  aquarius: "Air and steadiness meet in you: you think independently, hold to original ideas and look toward the future. Your personality carries Aquarius vision.",
+  gemini: "Air and adaptability meet in you: you are quick-minded, communicative and interested in many directions at once. Your personality carries Gemini curiosity.",
+  cancer: "Water and initiative meet in you: you are intuitive, protective and deeply loyal to the people you trust. Your personality carries the caring heart of Cancer.",
+  scorpio: "Water and steadiness meet in you: you feel intensely, commit deeply and rarely accept a surface-level answer. Your personality carries Scorpio focus.",
+  pisces: "Water and adaptability meet in you: you are sensitive, imaginative and naturally receptive to other people. Your personality carries the creative spirit of Pisces.",
+};
+
 export type TsResult = {
   sign: ZodiacSign;
   element: TsElement;
   modality: TsModality;
   blurbKa: string;
+  blurbEn: string;
 };
 
 const ELEMENT_ORDER: TsElement[] = ["ცეცხლი", "მიწა", "ჰაერი", "წყალი"];
@@ -227,8 +280,11 @@ export function scoreTrueSign(answers: Record<number, number>): TsResult {
   const sign =
     SIGNS.find((s) => s.element === element && s.modality === modality) ?? SIGNS[0];
 
-  return { sign, element, modality, blurbKa: TS_SIGN_BLURB[sign.key] };
+  return { sign, element, modality, blurbKa: TS_SIGN_BLURB[sign.key], blurbEn: TS_SIGN_BLURB_EN[sign.key] };
 }
+
+export const TS_ELEMENT_EN: Record<TsElement, string> = { ცეცხლი: "Fire", მიწა: "Earth", ჰაერი: "Air", წყალი: "Water" };
+export const TS_MODALITY_EN: Record<TsModality, string> = { კარდინალური: "Cardinal", ფიქსირებული: "Fixed", მუტაბელური: "Mutable" };
 
 /** localStorage key so a share-back link or refresh can reopen the result. */
 export const TS_ANSWERS_STORAGE_KEY = "vivida_truesign_answers";

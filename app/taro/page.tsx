@@ -130,7 +130,7 @@ export default async function TaroHubPage() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
       />
       <Starfield count={120} shooting={2} />
-      {authed ? <AppHeader authed active="tarot" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tarot" /> : <SmartHeader active="taro" locale={locale} georgianPath="/taro" />}
 
       <script
         type="application/ld+json"
@@ -251,7 +251,7 @@ export default async function TaroHubPage() {
         />
       </section>
 
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

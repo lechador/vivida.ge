@@ -26,7 +26,7 @@ const GUIDES = [
 ];
 
 const FAQ = [
-  { q: "Is Vivida available in English?", a: "Vivida now offers its core public guides and navigation in English. Detailed personalized readings, generated interpretations and several interactive experiences remain in Georgian during the first stage of translation." },
+  { q: "Is Vivida available in English?", a: "Yes. Core public guides, account setup, personalized natal reports, Tarot and the main self-discovery assessments are available in English. We are still translating the larger reference library and a few interactive experiences." },
   { q: "Is a natal chart the same as a horoscope?", a: "A natal chart maps the sky for one birth moment and remains fixed. A horoscope compares current planetary movements with a sign or natal chart, so it changes with time." },
   { q: "Do I need an exact birth time?", a: "An exact time is important for the Ascendant and house positions. Many planetary sign placements can still be calculated without it, but the chart will be less specific." },
   { q: "Is astrology scientific advice?", a: "No. Vivida presents astrology for entertainment, reflection and cultural interest. It is not medical, psychological, legal or financial advice." },
@@ -61,7 +61,7 @@ export default function EnglishHomePage() {
             Explore zodiac signs
           </Link>
         </div>
-        <p className="mt-4 text-xs text-muted-foreground">Free to explore · No card required · Detailed readings currently in Georgian</p>
+        <p className="mt-4 text-xs text-muted-foreground">Free to explore · No card required · English reports and assessments available</p>
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-20">

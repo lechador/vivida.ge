@@ -74,7 +74,7 @@ export default async function BigFiveTestPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
+      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/big-five" />}
 
       <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-4 pb-10 pt-4 sm:px-6 sm:pb-14 sm:pt-6">
         <header className="mb-5 text-center">

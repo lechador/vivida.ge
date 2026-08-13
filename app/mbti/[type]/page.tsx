@@ -11,6 +11,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { MbtiProfileSections } from "@/components/mbti/mbti-profile-sections";
 import { MbtiFamousPeople } from "@/components/mbti/mbti-famous-people";
+import { MbtiEnglishTypeDetails } from "@/components/mbti/mbti-english-type-details";
 import { mbtiCharacterSrc } from "@/lib/mbti-characters";
 import {
   getMbtiLibraryEntries,
@@ -18,10 +19,10 @@ import {
   mbtiTypeKey,
   MBTI_TYPES,
 } from "@/lib/mbti-library";
-import { ALL_MBTI_SLUGS, buildMbtiSeo, mbtiCodeFromSlug } from "@/lib/seo/mbti-seo";
+import { ALL_MBTI_SLUGS, buildMbtiSeo, buildMbtiSeoEn, mbtiCodeFromSlug } from "@/lib/seo/mbti-seo";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-
-const SITE_URL = "https://www.vivida.ge";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 // Library-backed content is stable; refresh daily so admin edits propagate.
 export const revalidate = 86400;
@@ -38,27 +39,33 @@ export async function generateMetadata({
   const { type } = await params;
   const code = mbtiCodeFromSlug(type);
   if (!code) return {};
-  const seo = buildMbtiSeo(code);
-  const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(`${code} · ${seo.archetypeKa}`)}&k=${encodeURIComponent("პიროვნების ტიპი")}&a=${encodeURIComponent("#a78bfa")}`;
-  const url = `${SITE_URL}/mbti/${seo.slug}`;
+  const en = (await getRequestLocale()) === "en";
+  const seoKa = buildMbtiSeo(code);
+  const seoEn = buildMbtiSeoEn(code);
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = en ? seoEn.pageTitle : seoKa.pageTitle;
+  const description = en ? seoEn.metaDescription : seoKa.metaDescription;
+  const archetype = en ? seoEn.archetype : seoKa.archetypeKa;
+  const og = `${siteUrl}/api/og/page?t=${encodeURIComponent(`${code} · ${archetype}`)}&k=${encodeURIComponent(en ? "Personality type" : "პიროვნების ტიპი")}&a=${encodeURIComponent("#a78bfa")}`;
+  const url = `${siteUrl}/mbti/${seoKa.slug}`;
   return {
-    title: { absolute: seo.pageTitle },
-    description: seo.metaDescription,
-    keywords: seo.queries,
-    alternates: { canonical: url },
+    title: { absolute: title },
+    description,
+    keywords: en ? seoEn.queries : seoKa.queries,
+    alternates: { canonical: url, languages: { en: `${ENGLISH_SITE_URL}/mbti/${seoKa.slug}`, "ka-GE": `${GEORGIAN_SITE_URL}/mbti/${seoKa.slug}`, "x-default": `${ENGLISH_SITE_URL}/mbti/${seoKa.slug}` } },
     openGraph: {
       type: "article",
       url,
-      title: seo.pageTitle,
-      description: seo.metaDescription,
+      title,
+      description,
       siteName: "Vivida",
-      locale: "ka_GE",
+      locale: en ? "en_US" : "ka_GE",
       images: [{ url: og, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
-      title: seo.pageTitle,
-      description: seo.metaDescription,
+      title,
+      description,
       images: [og],
     },
   };
@@ -76,14 +83,27 @@ export default async function MbtiTypePage({
   const { type } = await params;
   const code = mbtiCodeFromSlug(type);
   if (!code) notFound();
-  const seo = buildMbtiSeo(code);
-  const url = `${SITE_URL}/mbti/${seo.slug}`;
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const seoKa = buildMbtiSeo(code);
+  const seoEn = buildMbtiSeoEn(code);
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const url = `${siteUrl}/mbti/${seoKa.slug}`;
+  const archetype = en ? seoEn.archetype : seoKa.archetypeKa;
+  const tagline = en ? seoEn.tagline : seoKa.taglineKa;
+  const pageTitle = en ? seoEn.pageTitle : seoKa.pageTitle;
+  const metaDescription = en ? seoEn.metaDescription : seoKa.metaDescription;
+  const faq = en ? seoEn.faq : seoKa.faq;
+  const queries = en ? seoEn.queries : seoKa.queries;
 
-  const [entries, sections] = await Promise.all([
-    getMbtiLibraryEntries([mbtiTypeKey(code)]),
-    getTypeSections(code),
-  ]);
-  const portrait = entries.get(mbtiTypeKey(code))?.body ?? "";
+  const library = en
+    ? null
+    : await Promise.all([
+        getMbtiLibraryEntries([mbtiTypeKey(code)]),
+        getTypeSections(code),
+      ]);
+  const portrait = library?.[0].get(mbtiTypeKey(code))?.body ?? "";
+  const sections = library?.[1] ?? [];
 
   // Sibling types for internal linking (the other 15).
   const others = (MBTI_TYPES as readonly string[]).filter((t) => t !== code);
@@ -91,26 +111,26 @@ export default async function MbtiTypePage({
   const ld = [
     articleLd({
       url,
-      headline: seo.pageTitle,
-      description: seo.metaDescription,
+      headline: pageTitle,
+      description: metaDescription,
       about: {
         "@type": "Thing",
-        name: `${code} — ${seo.archetypeKa}`,
-        alternateName: seo.queries,
-        description: seo.taglineKa,
+        name: `${code} — ${archetype}`,
+        alternateName: queries,
+        description: tagline,
       },
     }),
-    faqLd(seo.faq),
+    faqLd(faq),
     breadcrumbLd([
-      { name: "მთავარი", url: SITE_URL },
-      { name: "ტესტები", url: `${SITE_URL}/tests` },
-      { name: "პიროვნების ტიპები", url: `${SITE_URL}/mbti` },
+      { name: en ? "Home" : "მთავარი", url: siteUrl },
+      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
+      { name: en ? "Personality types" : "პიროვნების ტიპები", url: `${siteUrl}/mbti` },
       { name: code, url },
     ]),
   ];
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
@@ -121,14 +141,14 @@ export default async function MbtiTypePage({
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      <SmartHeader />
+      <SmartHeader active="tests" locale={locale} georgianPath={`/mbti/${seoKa.slug}`} />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
         {/* Breadcrumb */}
         <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-          <Link href="/tests" className="hover:text-foreground">ტესტები</Link>
+          <Link href="/tests" className="hover:text-foreground">{en ? "Tests" : "ტესტები"}</Link>
           <span>/</span>
-          <Link href="/mbti" className="hover:text-foreground">პიროვნების ტიპები</Link>
+          <Link href="/mbti" className="hover:text-foreground">{en ? "Personality types" : "პიროვნების ტიპები"}</Link>
           <span>/</span>
           <span className="text-foreground">{code}</span>
         </nav>
@@ -137,14 +157,14 @@ export default async function MbtiTypePage({
         <header className="rounded-3xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Image
             src={mbtiCharacterSrc(code)}
-            alt={`${code} — ${seo.archetypeKa}`}
+            alt={`${code} — ${archetype}`}
             width={220}
             height={220}
             priority
             className="mx-auto mb-5 h-40 w-40 object-contain drop-shadow-[0_8px_30px_rgba(167,139,250,0.35)] sm:h-52 sm:w-52"
           />
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {seo.group.labelKa}
+            {en ? seoEn.group.labelEn : seoKa.group.labelKa}
           </div>
           <h1 className="mt-1 text-5xl font-bold tracking-[0.12em] sm:text-7xl">
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
@@ -152,24 +172,24 @@ export default async function MbtiTypePage({
             </span>
           </h1>
           <div className="mt-2 text-lg font-medium text-foreground/90 sm:text-xl">
-            {seo.archetypeKa}
+            {archetype}
           </div>
           <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-foreground/80 sm:text-base">
-            {seo.taglineKa}
+            {tagline}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/pirovnebis-testi">
               <Sparkles className="size-4" />
-              გაიგე შენი ტიპი — გაიარე ტესტი
+              {en ? "Discover your type — take the test" : "გაიგე შენი ტიპი — გაიარე ტესტი"}
             </Link>
           </Button>
         </header>
 
         {/* Portrait */}
-        {portrait && (
+        {!en && portrait && (
           <article className="mt-8 space-y-4 rounded-2xl border border-border bg-card/50 p-6 text-[15px] leading-relaxed text-foreground/90 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
             <h2 className="text-lg font-semibold tracking-tight">
-              {code} ({seo.archetypeKa}) — ვინ არის ეს ტიპი
+              {code} ({seoKa.archetypeKa}) — ვინ არის ეს ტიპი
             </h2>
             {paragraphs(portrait).map((p, i) => (
               <p key={i}>{p}</p>
@@ -178,20 +198,20 @@ export default async function MbtiTypePage({
         )}
 
         {/* Strengths/weaknesses + life-domain sections */}
-        <MbtiProfileSections sections={sections} />
+        {en ? <MbtiEnglishTypeDetails type={code} /> : <MbtiProfileSections sections={sections} />}
 
         {/* Famous people */}
         <div className="mt-4">
-          <MbtiFamousPeople type={code} />
+          <MbtiFamousPeople type={code} locale={locale} />
         </div>
 
         {/* FAQ */}
         <section className="mt-10">
           <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            ხშირად დასმული კითხვები
+            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="space-y-3">
-            {seo.faq.map((item) => (
+            {faq.map((item) => (
               <details
                 key={item.q}
                 className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl"
@@ -211,19 +231,19 @@ export default async function MbtiTypePage({
         {/* CTA */}
         <div className="mt-10 rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
-            რომელი ტიპი ხარ შენ?
+            {en ? "Which personality type are you?" : "რომელი ტიპი ხარ შენ?"}
           </h2>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-            გაიარე უფასო Astro-MBTI ტესტი და აღმოაჩინე შენი ზუსტი ტიპი — 60 კითხვა, 7 წუთი.
+            {en ? "Take the free 60-question personality test and discover your preferences in about seven minutes." : "გაიარე უფასო Astro-MBTI ტესტი და აღმოაჩინე შენი ზუსტი ტიპი — 60 კითხვა, 7 წუთი."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
-            <Link href="/pirovnebis-testi">დაიწყე ტესტი</Link>
+            <Link href="/pirovnebis-testi">{en ? "Start the test" : "დაიწყე ტესტი"}</Link>
           </Button>
         </div>
 
         {/* Internal links — the other 15 types */}
         <section className="mt-10">
-          <h2 className="mb-4 text-sm font-semibold tracking-tight">16 პიროვნების ტიპი</h2>
+          <h2 className="mb-4 text-sm font-semibold tracking-tight">{en ? "The 16 personality types" : "16 პიროვნების ტიპი"}</h2>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {others.map((t) => (
               <Link
@@ -233,7 +253,7 @@ export default async function MbtiTypePage({
               >
                 <span className="text-sm font-semibold">{t}</span>
                 <span className="text-xs text-muted-foreground">
-                  {buildMbtiSeo(t).archetypeKa}
+                  {en ? buildMbtiSeoEn(t).archetype : buildMbtiSeo(t).archetypeKa}
                 </span>
               </Link>
             ))}
@@ -243,15 +263,15 @@ export default async function MbtiTypePage({
               href="/mbti"
               className="inline-flex items-center gap-1 text-sm text-[var(--vivida-cyan)] hover:underline"
             >
-              ყველა ტიპი <ArrowRight className="size-3.5" />
+              {en ? "View all types" : "ყველა ტიპი"} <ArrowRight className="size-3.5" />
             </Link>
           </div>
         </section>
 
-        <PopularSearches queries={seo.queries} />
+        <PopularSearches queries={queries} />
       </section>
 
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

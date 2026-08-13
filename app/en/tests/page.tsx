@@ -82,7 +82,7 @@ export default function EnglishTestsPage() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
       />
       <Starfield count={120} shooting={2} />
-      <SmartHeader />
+      <SmartHeader active="tests" locale="en" georgianPath="/tests" />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
         <header className="mb-10 text-center">
@@ -138,7 +138,7 @@ export default function EnglishTestsPage() {
         </section>
       </section>
 
-      <SiteFooter />
+      <SiteFooter locale="en" />
     </main>
   );
 }

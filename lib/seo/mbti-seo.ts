@@ -9,6 +9,7 @@
 import { MBTI_TYPES } from "@/lib/mbti-library";
 import { mbtiArchetypeKa } from "@/lib/mbti-questions";
 import { mbtiFamousFor } from "@/lib/mbti-characters";
+import { mbtiEnglishContent } from "@/lib/mbti-content-en";
 
 export const ALL_MBTI_SLUGS: string[] = MBTI_TYPES.map((t) => t.toLowerCase());
 
@@ -19,23 +20,23 @@ export function mbtiCodeFromSlug(slug: string): string | null {
 }
 
 /** The four 16Personalities groups, with Georgian labels. */
-export const MBTI_GROUP: Record<string, { key: string; labelKa: string }> = {
-  INTJ: { key: "analysts", labelKa: "ანალიტიკოსები" },
-  INTP: { key: "analysts", labelKa: "ანალიტიკოსები" },
-  ENTJ: { key: "analysts", labelKa: "ანალიტიკოსები" },
-  ENTP: { key: "analysts", labelKa: "ანალიტიკოსები" },
-  INFJ: { key: "diplomats", labelKa: "დიპლომატები" },
-  INFP: { key: "diplomats", labelKa: "დიპლომატები" },
-  ENFJ: { key: "diplomats", labelKa: "დიპლომატები" },
-  ENFP: { key: "diplomats", labelKa: "დიპლომატები" },
-  ISTJ: { key: "sentinels", labelKa: "მცველები" },
-  ISFJ: { key: "sentinels", labelKa: "მცველები" },
-  ESTJ: { key: "sentinels", labelKa: "მცველები" },
-  ESFJ: { key: "sentinels", labelKa: "მცველები" },
-  ISTP: { key: "explorers", labelKa: "მკვლევრები" },
-  ISFP: { key: "explorers", labelKa: "მკვლევრები" },
-  ESTP: { key: "explorers", labelKa: "მკვლევრები" },
-  ESFP: { key: "explorers", labelKa: "მკვლევრები" },
+export const MBTI_GROUP: Record<string, { key: string; labelKa: string; labelEn: string }> = {
+  INTJ: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts" },
+  INTP: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts" },
+  ENTJ: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts" },
+  ENTP: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts" },
+  INFJ: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats" },
+  INFP: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats" },
+  ENFJ: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats" },
+  ENFP: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats" },
+  ISTJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels" },
+  ISFJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels" },
+  ESTJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels" },
+  ESFJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels" },
+  ISTP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers" },
+  ISFP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers" },
+  ESTP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers" },
+  ESFP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers" },
 };
 
 /** Short evocative tagline per type — used in hero + meta. */
@@ -113,5 +114,49 @@ export function buildMbtiSeo(code: string): MbtiSeo {
       "პიროვნების ტესტი",
       "16 personalities ქართულად",
     ],
+  };
+}
+
+export type MbtiSeoEn = {
+  code: string;
+  slug: string;
+  archetype: string;
+  tagline: string;
+  group: { key: string; labelEn: string };
+  pageTitle: string;
+  metaDescription: string;
+  faq: { q: string; a: string }[];
+  queries: string[];
+};
+
+export function buildMbtiSeoEn(code: string): MbtiSeoEn {
+  const content = mbtiEnglishContent(code);
+  const group = MBTI_GROUP[code] ?? { key: "", labelKa: "", labelEn: "" };
+  const famous = mbtiFamousFor(code).slice(0, 3).join(", ");
+  return {
+    code,
+    slug: code.toLowerCase(),
+    archetype: content.archetype,
+    tagline: content.tagline,
+    group: { key: group.key, labelEn: group.labelEn },
+    pageTitle: `${code} — ${content.archetype} Personality Type`,
+    metaDescription: `Explore the ${code} (${content.archetype}) personality type: core preferences, strengths, challenges, relationships, career patterns and practical growth ideas.`,
+    faq: [
+      {
+        q: `What does the ${code} personality type mean?`,
+        a: `${code}, often called the ${content.archetype}, is one of sixteen MBTI-style preference patterns. ${content.tagline} It describes common tendencies, not fixed ability or a diagnosis.`,
+      },
+      {
+        q: `How can I find out whether I am ${code}?`,
+        a: "Take Vivida’s free 60-question personality test. You will receive a type, dimension percentages and a personalized profile in about seven minutes.",
+      },
+      {
+        q: `Which famous people are commonly typed as ${code}?`,
+        a: famous
+          ? `${famous} are among the public figures often associated with ${code}. These typings are informal interpretations, not verified facts.`
+          : `Public-figure personality typings are informal interpretations rather than verified facts.`,
+      },
+    ],
+    queries: [code, `${code} personality type`, `${code} strengths`, `${code} relationships`, `MBTI ${code}`, "16 personality types", "personality test"],
   };
 }

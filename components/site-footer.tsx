@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { EnglishFooter } from "@/components/en/english-footer";
+import type { UserLocale } from "@/lib/i18n/locale";
 
 const PRODUCT_LINKS = [
   { href: "/nataluri-ruka", label: "ნატალური რუკა" },
@@ -45,7 +47,8 @@ const LEGAL_LINKS = [
  * Site-wide footer for public marketing pages. Authed app pages skip this
  * — they have their own bottom UI density and the chat launcher.
  */
-export function SiteFooter() {
+export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
+  if (locale === "en") return <EnglishFooter />;
   const year = new Date().getFullYear();
   return (
     <footer className="relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-md">

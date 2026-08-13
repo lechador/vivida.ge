@@ -1,6 +1,15 @@
 import { MarketingHeader } from "@/components/marketing-header";
+import { EnglishHeader } from "@/components/en/english-header";
+import type { UserLocale } from "@/lib/i18n/locale";
 
-type MarketingActive = "features" | "how-it-works" | "nataluri-ruka" | "zodiac";
+type MarketingActive =
+  | "features"
+  | "how-it-works"
+  | "nataluri-ruka"
+  | "zodiac"
+  | "horoskopi"
+  | "taro"
+  | "tests";
 
 /**
  * Header for public marketing + SEO pages. Fully STATIC on purpose: it does
@@ -12,6 +21,17 @@ type MarketingActive = "features" | "how-it-works" | "nataluri-ruka" | "zodiac";
  * In-app authed pages (dashboard, feed, …) render `AppHeader` directly and stay
  * dynamic — this component is only for the public surface.
  */
-export function SmartHeader({ active }: { active?: MarketingActive } = {}) {
+export function SmartHeader({
+  active,
+  locale = "ka",
+  georgianPath = "/",
+}: {
+  active?: MarketingActive;
+  locale?: UserLocale;
+  georgianPath?: string;
+} = {}) {
+  if (locale === "en") {
+    return <EnglishHeader georgianPath={georgianPath} />;
+  }
   return <MarketingHeader active={active} />;
 }
