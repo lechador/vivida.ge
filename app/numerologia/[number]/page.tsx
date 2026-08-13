@@ -5,13 +5,17 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { PopularSearches } from "@/components/seo/popular-searches";
+import { LifePathNumberPageEn } from "@/components/seo/numerology-en";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { LIFE_PATH_NUMBERS, isLifePathNumber } from "@/lib/numerology";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { LIFE_PATH_CONTENT } from "@/lib/seo/numerology-content";
+import { LIFE_PATH_CONTENT_EN } from "@/lib/seo/numerology-content-en";
 import { NUMEROLOGY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -28,6 +32,20 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { number } = await params;
   if (!isLifePathNumber(number)) return {};
+  const locale = await getRequestLocale();
+  if (locale === "en") {
+    const content = LIFE_PATH_CONTENT_EN[number];
+    const path = `/numerologia/${number}`;
+    const title = `${content.title}: Meaning, Love, Career and Strengths`;
+    const description = `${content.essence} Explore Life Path ${number} strengths, challenges, relationships, career themes, and practical advice.`;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: { type: "article", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   const c = LIFE_PATH_CONTENT[number];
   const url = `${SITE_URL}/numerologia/${number}`;
   const title = `${c.titleKa} — მნიშვნელობა ნუმეროლოგიაში`;
@@ -44,7 +62,7 @@ export async function generateMetadata({
       "numerologia",
       "bedis ricxvi",
     ],
-    alternates: { canonical: url },
+    alternates: localizedAlternates(`/numerologia/${number}`, `/numerologia/${number}`, "ka"),
     openGraph: {
       type: "article",
       url,
@@ -64,6 +82,9 @@ export default async function LifePathNumberPage({
 }) {
   const { number } = await params;
   if (!isLifePathNumber(number)) notFound();
+  if ((await getRequestLocale()) === "en") {
+    return <LifePathNumberPageEn number={number} content={LIFE_PATH_CONTENT_EN[number]} />;
+  }
   const c = LIFE_PATH_CONTENT[number];
   const master = number.length > 1;
   const url = `${SITE_URL}/numerologia/${number}`;

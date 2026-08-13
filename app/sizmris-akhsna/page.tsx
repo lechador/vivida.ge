@@ -6,6 +6,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
+import { DREAMS_HUB_EN, DreamsHubEn } from "@/components/seo/dreams-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   DREAMS_FAQ,
   DREAMS_LATIN_QUERIES,
@@ -13,6 +15,7 @@ import {
   dreamsByLetter,
 } from "@/lib/seo/dreams";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -20,7 +23,7 @@ const TITLE = "სიზმრის ახსნა ანბანის მ�
 const DESCRIPTION =
   "სიზმრის ახსნა ქართულად და უფასოდ: გველი, წყალი, კბილი, ბავშვი, მიცვალებული, ფული და კიდევ ათეულობით სიმბოლო ანბანის მიხედვით. თითოეულს აქვს ზოგადი მნიშვნელობაც და კონკრეტული ვარიანტებიც — იპოვე, რას ნიშნავს ის, რაც სიზმრად ნახე.";
 
-export const metadata: Metadata = {
+const KA_METADATA: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
@@ -36,7 +39,7 @@ export const metadata: Metadata = {
     "sizmrebis axsna",
     "sizmris axsna anbanis mixedvit",
   ],
-  alternates: { canonical: `${SITE_URL}/sizmris-akhsna` },
+  alternates: localizedAlternates("/sizmris-akhsna", "/sizmris-akhsna", "ka"),
   openGraph: {
     type: "website",
     url: `${SITE_URL}/sizmris-akhsna`,
@@ -48,13 +51,27 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) !== "en") return KA_METADATA;
+  const path = "/sizmris-akhsna";
+  return {
+    title: { absolute: DREAMS_HUB_EN.title },
+    description: DREAMS_HUB_EN.description,
+    keywords: ["dream dictionary", "dream meanings", "dream interpretation", "common dream symbols"],
+    alternates: localizedAlternates(path, path, "en"),
+    openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+    twitter: { card: "summary_large_image", title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description },
+  };
+}
+
 /**
  * Dream-dictionary hub. Structured as an A–Z index on purpose: "ანბანის
  * მიხედვით" is the dominant modifier on this query family, and it's also
  * genuinely the fastest way for someone to find the symbol they woke up
  * thinking about.
  */
-export default function DreamsHubPage() {
+export default async function DreamsHubPage() {
+  if ((await getRequestLocale()) === "en") return <DreamsHubEn />;
   const groups = dreamsByLetter();
 
   const ld = [

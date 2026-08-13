@@ -7,13 +7,17 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
+import { DreamSymbolPageEn } from "@/components/seo/dreams-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   ALL_DREAM_SLUGS,
   DREAM_BY_SLUG,
   DREAM_SYMBOLS,
   isDreamSlug,
 } from "@/lib/seo/dreams";
+import { DREAM_EN_BY_SLUG } from "@/lib/seo/dreams-en";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -31,6 +35,21 @@ export async function generateMetadata({
   const { symbol } = await params;
   if (!isDreamSlug(symbol)) return {};
   const s = DREAM_BY_SLUG[symbol];
+  const locale = await getRequestLocale();
+  if (locale === "en") {
+    const content = DREAM_EN_BY_SLUG[symbol];
+    if (!content) return {};
+    const path = `/sizmris-akhsna/${symbol}`;
+    const title = `${content.title} Dream Meaning: Symbolism and Common Scenarios`;
+    const description = `${content.summary} Explore common scenarios, a positive reading, and what the dream may invite you to notice.`;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: { type: "article", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   const url = `${SITE_URL}/sizmris-akhsna/${s.slug}`;
   const title = `${s.titleKa} სიზმარში — რას ნიშნავს, სიზმრის ახსნა`;
   const description = `${s.summaryKa} ${s.meaningKa.slice(0, 110)}… ნახე ყველა ვარიანტი: ${s.variantsKa
@@ -51,7 +70,7 @@ export async function generateMetadata({
       ...s.latin,
       "sizmris axsna",
     ],
-    alternates: { canonical: url },
+    alternates: localizedAlternates(`/sizmris-akhsna/${symbol}`, `/sizmris-akhsna/${symbol}`, "ka"),
     openGraph: {
       type: "article",
       url,
@@ -77,6 +96,11 @@ export default async function DreamSymbolPage({
   const { symbol } = await params;
   if (!isDreamSlug(symbol)) notFound();
   const s = DREAM_BY_SLUG[symbol];
+  if ((await getRequestLocale()) === "en") {
+    const content = DREAM_EN_BY_SLUG[symbol];
+    if (!content) notFound();
+    return <DreamSymbolPageEn base={s} content={content} />;
+  }
   const url = `${SITE_URL}/sizmris-akhsna/${s.slug}`;
 
   // The variants double as an FAQ — same content, but eligible for the

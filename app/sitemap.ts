@@ -165,6 +165,12 @@ function englishSitemap(): MetadataRoute.Sitemap {
   const chinesePages = ALL_CHINESE_SLUGS.map((slug) =>
     samePathEntry(`/chinuri-horoskopi/${slug}`, "monthly", 0.7),
   );
+  const dreamPages = ALL_DREAM_SLUGS.map((slug) =>
+    samePathEntry(`/sizmris-akhsna/${slug}`, "monthly", 0.68),
+  );
+  const numerologyPages = LIFE_PATH_NUMBERS.map((number) =>
+    samePathEntry(`/numerologia/${number}`, "monthly", 0.7),
+  );
 
   return [
     ...CORE_LANGUAGE_PAIRS.map((pair) => {
@@ -217,6 +223,8 @@ function englishSitemap(): MetadataRoute.Sitemap {
     samePathEntry("/mbti", "monthly", 0.78),
     samePathEntry("/zodiac/reitingebi", "monthly", 0.78),
     samePathEntry("/chinuri-horoskopi", "monthly", 0.78),
+    samePathEntry("/sizmris-akhsna", "weekly", 0.76),
+    samePathEntry("/numerologia", "monthly", 0.78),
     ...signPages,
     ...moonPages,
     ...risingPages,
@@ -234,6 +242,8 @@ function englishSitemap(): MetadataRoute.Sitemap {
     ...mbtiPages,
     ...rankingPages,
     ...chinesePages,
+    ...dreamPages,
+    ...numerologyPages,
   ];
 }
 

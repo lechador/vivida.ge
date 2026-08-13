@@ -5,16 +5,19 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LifePathCalculator } from "@/components/seo/life-path-calculator";
 import { PopularSearches } from "@/components/seo/popular-searches";
+import { NUMEROLOGY_HUB_EN, NumerologyHubEn } from "@/components/seo/numerology-en";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { LIFE_PATH_NUMBERS } from "@/lib/numerology";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   LIFE_PATH_CONTENT,
   NUMEROLOGY_FAQ,
 } from "@/lib/seo/numerology-content";
 import { NUMEROLOGY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -22,7 +25,7 @@ const TITLE = "ნუმეროლოგია — ბედის რიც�
 const DESCRIPTION =
   "ნუმეროლოგია ქართულად — გამოთვალე შენი ბედის რიცხვი დაბადების თარიღით (უფასო კალკულატორი) და წაიკითხე ყველა რიცხვის მნიშვნელობა: 1-დან 9-მდე და მასტერ-რიცხვები 11, 22, 33.";
 
-export const metadata: Metadata = {
+const KA_METADATA: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
@@ -37,7 +40,7 @@ export const metadata: Metadata = {
     "bedis ricxvi",
     "bedis rickhvi",
   ],
-  alternates: { canonical: `${SITE_URL}/numerologia` },
+  alternates: localizedAlternates("/numerologia", "/numerologia", "ka"),
   openGraph: {
     type: "website",
     url: `${SITE_URL}/numerologia`,
@@ -49,7 +52,21 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-export default function NumerologiaHubPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) !== "en") return KA_METADATA;
+  const path = "/numerologia";
+  return {
+    title: { absolute: NUMEROLOGY_HUB_EN.title },
+    description: NUMEROLOGY_HUB_EN.description,
+    keywords: ["life path number", "life path calculator", "numerology meanings", "master numbers"],
+    alternates: localizedAlternates(path, path, "en"),
+    openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+    twitter: { card: "summary_large_image", title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description },
+  };
+}
+
+export default async function NumerologiaHubPage() {
+  if ((await getRequestLocale()) === "en") return <NumerologyHubEn />;
   const archetypes = Object.fromEntries(
     LIFE_PATH_NUMBERS.map((n) => [n, LIFE_PATH_CONTENT[n].archetypeKa])
   );
