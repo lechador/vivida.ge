@@ -13,6 +13,9 @@ import {
 } from "@/lib/retrograde";
 import { RETROGRADE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { MERCURY_RETROGRADE_EN, MercuryRetrogradePageEn } from "@/components/seo/mercury-retrograde-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -24,7 +27,7 @@ const TITLE = "მერკური რეტროგრადში — თ�
 const DESCRIPTION =
   "როდის არის მერკური რეტროგრადული — ზუსტი თარიღები ასტრონომიული გამოთვლით, რას ნიშნავს რეტროგრადული მერკური, რაზე მოქმედებს და როგორ გაუმკლავდე. ქართულად, Vivida-ზე.";
 
-export const metadata: Metadata = {
+const KA_METADATA: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
@@ -37,7 +40,7 @@ export const metadata: Metadata = {
     "merkuri retrogradshi",
     "retrograduli merkuri",
   ],
-  alternates: { canonical: `${SITE_URL}/merkuri-retrogradi` },
+  alternates: localizedAlternates("/merkuri-retrogradi", "/merkuri-retrogradi", "ka"),
   openGraph: {
     type: "website",
     url: `${SITE_URL}/merkuri-retrogradi`,
@@ -48,6 +51,12 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) !== "en") return KA_METADATA;
+  const path = "/merkuri-retrogradi"; const { title, description } = MERCURY_RETROGRADE_EN;
+  return { title: { absolute: title }, description, keywords: ["Mercury retrograde", "Mercury retrograde dates", "is Mercury retrograde", "Mercury retrograde meaning"], alternates: localizedAlternates(path, path, "en"), openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+}
 
 const FAQ = [
   {
@@ -77,7 +86,8 @@ function formatKa(isoDate: string): string {
   return KA_DATE.format(new Date(`${isoDate}T12:00:00Z`));
 }
 
-export default function MercuryRetrogradePage() {
+export default async function MercuryRetrogradePage() {
+  if ((await getRequestLocale()) === "en") return <MercuryRetrogradePageEn />;
   const now = new Date();
   const year = now.getUTCFullYear();
   const retroNow = isMercuryRetrogradeNow(now);

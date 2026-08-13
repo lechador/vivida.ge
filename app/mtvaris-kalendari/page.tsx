@@ -16,6 +16,9 @@ import {
   lunarDayFromAge,
 } from "@/lib/seo/moon-reference";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { MOON_CALENDAR_EN, MoonCalendarPageEn } from "@/components/seo/moon-calendar-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PAGE_URL = `${SITE_URL}/mtvaris-kalendari`;
@@ -36,7 +39,7 @@ const TITLE = `მთვარის კალენდარი ${CURRENT_YEAR}
  */
 const DESCRIPTION = `მთვარის კალენდარი ${CURRENT_YEAR} (mtvaris kalendari): რომელ ფაზაშია მთვარე დღეს, რომელ ნიშანშია და რამდენად არის განათებული. ახალი და სავსე მთვარის თარიღები საქართველოს დროით, თვე-თვე.`;
 
-export const metadata: Metadata = {
+const KA_METADATA: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
@@ -52,7 +55,7 @@ export const metadata: Metadata = {
     `სავსე მთვარე რომელ რიცხვშია ${CURRENT_YEAR}`,
     "mtvaris kalendari",
   ],
-  alternates: { canonical: PAGE_URL },
+  alternates: localizedAlternates("/mtvaris-kalendari", "/mtvaris-kalendari", "ka"),
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
@@ -64,6 +67,12 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) !== "en") return KA_METADATA;
+  const path = "/mtvaris-kalendari"; const { title, description } = MOON_CALENDAR_EN;
+  return { title: { absolute: title }, description, keywords: ["moon calendar", `moon calendar ${CURRENT_YEAR}`, "moon phase today", "next full moon", "next new moon"], alternates: localizedAlternates(path, path, "en"), openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+}
 
 const MONTHS_KA = [
   "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
@@ -149,7 +158,8 @@ function EventList({ events, label }: { events: MajorEvent[]; label: string }) {
   );
 }
 
-export default function MoonCalendarPage() {
+export default async function MoonCalendarPage() {
+  if ((await getRequestLocale()) === "en") return <MoonCalendarPageEn />;
   const now = new Date();
   const localToday = tbilisiParts(now);
   const todayNoonUtc = new Date(Date.UTC(localToday.year, localToday.month, localToday.day, 8));

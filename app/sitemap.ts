@@ -142,6 +142,23 @@ function englishSitemap(): MetadataRoute.Sitemap {
   const planetPages = PLANET_SLUGS.map((planet) =>
     samePathEntry(`/planetebi/${planet}`, "monthly", 0.68),
   );
+  const astrologyCalendarPages = calendarWindow().map((day) =>
+    samePathEntry(`/astrologiuri-kalendari/${day.iso}`, "daily", 0.65, NOW),
+  );
+  const moonEventPages = (["full", "new"] as const).flatMap((kind) =>
+    moonEvents(kind).map((event) =>
+      samePathEntry(`/${kind === "full" ? "savse-mtvare" : "akhali-mtvare"}/${event.iso}`, "monthly", 0.7),
+    ),
+  );
+  const eclipsePages = ECLIPSES.map((eclipse) =>
+    samePathEntry(`/dabnelebebi/${eclipse.slug}`, "monthly", 0.7),
+  );
+  const tarotPages = TAROT_CARDS.map((card) =>
+    samePathEntry(`/taro/${card.slug}`, "monthly", 0.7),
+  );
+  const mbtiPages = ALL_MBTI_SLUGS.map((type) =>
+    samePathEntry(`/mbti/${type}`, "monthly", 0.7),
+  );
 
   return [
     ...CORE_LANGUAGE_PAIRS.map((pair) => {
@@ -182,6 +199,16 @@ function englishSitemap(): MetadataRoute.Sitemap {
     samePathEntry("/zodiac/gzamkvlevi", "monthly", 0.72),
     samePathEntry("/astrologiuri-saxlebi", "monthly", 0.76),
     samePathEntry("/planetebi", "monthly", 0.76),
+    samePathEntry("/astrologiuri-kalendari", "daily", 0.84, NOW),
+    samePathEntry("/ighbliani-dgheebi", "daily", 0.76, NOW),
+    samePathEntry("/frtxili-dgheebi", "daily", 0.72, NOW),
+    samePathEntry("/mtvaris-kalendari", "daily", 0.82, NOW),
+    samePathEntry("/savse-mtvare", "daily", 0.82, NOW),
+    samePathEntry("/akhali-mtvare", "daily", 0.82, NOW),
+    samePathEntry("/dabnelebebi", "monthly", 0.78),
+    samePathEntry("/merkuri-retrogradi", "weekly", 0.78, NOW),
+    samePathEntry("/taro", "weekly", 0.78),
+    samePathEntry("/mbti", "monthly", 0.78),
     ...signPages,
     ...moonPages,
     ...risingPages,
@@ -192,6 +219,11 @@ function englishSitemap(): MetadataRoute.Sitemap {
     ...signHoroscopePages,
     ...housePages,
     ...planetPages,
+    ...astrologyCalendarPages,
+    ...moonEventPages,
+    ...eclipsePages,
+    ...tarotPages,
+    ...mbtiPages,
   ];
 }
 

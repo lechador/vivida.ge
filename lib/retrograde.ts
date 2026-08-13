@@ -16,6 +16,8 @@ export type RetrogradePeriod = {
   startSignKa: string;
   /** Georgian sign label where it ends (station direct). */
   endSignKa: string;
+  startSignEn: string;
+  endSignEn: string;
 };
 
 function iso(d: Date): string {
@@ -27,8 +29,8 @@ function signedMotion(a: number, b: number): number {
   return ((b - a + 540) % 360) - 180;
 }
 
-function signKaOf(longitude: number): string {
-  return signByIndex(Math.floor((((longitude % 360) + 360) % 360) / 30)).labelKa;
+function signOf(longitude: number) {
+  return signByIndex(Math.floor((((longitude % 360) + 360) % 360) / 30));
 }
 
 /**
@@ -57,8 +59,10 @@ export function mercuryRetrogradePeriods(year: number): RetrogradePeriod[] {
         periods.push({
           startIso: iso(current.start),
           endIso: iso(new Date(t - DAY)),
-          startSignKa: signKaOf(current.startLon),
-          endSignKa: signKaOf(prevLon),
+          startSignKa: signOf(current.startLon).labelKa,
+          endSignKa: signOf(prevLon).labelKa,
+          startSignEn: signOf(current.startLon).labelEn,
+          endSignEn: signOf(prevLon).labelEn,
         });
         current = null;
       }
