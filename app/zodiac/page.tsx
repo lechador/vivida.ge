@@ -21,28 +21,39 @@ import {
 import { HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { localizedAlternates } from "@/lib/seo/locales";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ZodiacHubEn } from "@/components/seo/zodiac-hub-en";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac";
 
-export const metadata: Metadata = {
-  title: { absolute: HUB_CONTENT.pageTitle },
-  description: HUB_CONTENT.metaDescription,
-  alternates: localizedAlternates(PATH, "/en/zodiac", "ka"),
-  openGraph: {
-    type: "website",
-    url: `${SITE_URL}${PATH}`,
-    title: HUB_CONTENT.pageTitle,
-    description: HUB_CONTENT.metaDescription,
-    siteName: "Vivida",
-    locale: "ka_GE",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: HUB_CONTENT.pageTitle,
-    description: HUB_CONTENT.metaDescription,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  const title = en
+    ? "The 12 Zodiac Signs — Dates, Traits and Meanings"
+    : HUB_CONTENT.pageTitle;
+  const description = en
+    ? "Explore all 12 zodiac signs, their dates, symbols, elements, modalities, personality traits, and compatibility. Find your sign and calculate your full birth chart."
+    : HUB_CONTENT.metaDescription;
+  return {
+    title: { absolute: title },
+    description,
+    alternates: localizedAlternates(PATH, "/en/zodiac", en ? "en" : "ka"),
+    openGraph: {
+      type: "website",
+      url: `${en ? "https://vividaastro.com" : SITE_URL}${PATH}`,
+      title,
+      description,
+      siteName: "Vivida",
+      locale: en ? "en_US" : "ka_GE",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 const HUB_LD = {
   "@context": "https://schema.org",
@@ -73,7 +84,8 @@ const FAQ_LD = {
   })),
 };
 
-export default function ZodiacHubPage() {
+export default async function ZodiacHubPage() {
+  if ((await getRequestLocale()) === "en") return <ZodiacHubEn />;
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
@@ -334,7 +346,8 @@ export default function ZodiacHubPage() {
                 ყველაზე ჭკვიანი, ეჭვიანი, რომანტიული ნიშნები
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-                12-ვე ნიშანი დალაგებული თვისებების მიხედვით — ნახე, სად დგას შენი.
+                12-ვე ნიშანი დალაგებული თვისებების მიხედვით — ნახე, სად დგას
+                შენი.
               </p>
             </div>
             <span
@@ -357,7 +370,8 @@ export default function ZodiacHubPage() {
                 ზოდიაქოს ნიშნები წლების მიხედვით
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-                გაიგე შენი ჩინური ცხოველი დაბადების წლით — ვირთხა, დრაკონი, ვეფხვი…
+                გაიგე შენი ჩინური ცხოველი დაბადების წლით — ვირთხა, დრაკონი,
+                ვეფხვი…
               </p>
             </div>
             <span
@@ -402,8 +416,8 @@ export default function ZodiacHubPage() {
             შენი ნიშანი ცის რუკის მცირე ნაწილია
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            მთვარე, ამომავალი, 12 სახლი, ყველა პლანეტა — ცოცხალ რუკაში.
-            დაიწყე უფასოდ.
+            მთვარე, ამომავალი, 12 სახლი, ყველა პლანეტა — ცოცხალ რუკაში. დაიწყე
+            უფასოდ.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button asChild variant="mystic" size="lg">
