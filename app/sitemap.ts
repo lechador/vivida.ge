@@ -54,6 +54,7 @@ const NOW = new Date();
 const EVERGREEN = new Date("2026-07-13");
 const CONTENT_PUBLISHED = new Date("2026-07-20");
 const ENGLISH_PUBLISHED = new Date("2026-07-27");
+const ENGLISH_ASTROLOGY_PUBLISHED = new Date("2026-08-13");
 const ASTROLOGY_GUIDES_PUBLISHED = new Date("2026-07-27");
 /** მკითხაობა / სიზმრის ახსნა / ანგელოზური რიცხვები clusters. */
 const NEW_CLUSTERS_PUBLISHED = new Date("2026-07-29");
@@ -80,6 +81,62 @@ const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
 };
 
 function englishSitemap(): MetadataRoute.Sitemap {
+  const samePathEntry = (
+    path: string,
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"],
+    priority: number,
+    lastModified: Date = ENGLISH_ASTROLOGY_PUBLISHED,
+  ): MetadataRoute.Sitemap[number] => ({
+    url: `${ENGLISH_SITE_URL}${path}`,
+    lastModified,
+    changeFrequency,
+    priority,
+    alternates: {
+      languages: {
+        "ka-GE": `${GEORGIAN_SITE_URL}${path}`,
+        en: `${ENGLISH_SITE_URL}${path}`,
+        "x-default": `${ENGLISH_SITE_URL}${path}`,
+      },
+    },
+  });
+
+  const signPages = ALL_SLUGS.map((slug) =>
+    samePathEntry(`/zodiac/${slug}`, "monthly", 0.78),
+  );
+  const moonPages = ALL_SLUGS.map((slug) =>
+    samePathEntry(`/zodiac/mtvare/${slug}`, "monthly", 0.72),
+  );
+  const risingPages = ALL_SLUGS.map((slug) =>
+    samePathEntry(`/zodiac/amomavali/${slug}`, "monthly", 0.72),
+  );
+  const elementPages = ALL_ELEMENT_SLUGS.map((element) =>
+    samePathEntry(`/zodiac/elementebi/${element}`, "monthly", 0.68),
+  );
+  const pairPages = ALL_PAIR_SLUGS.map((pair) =>
+    samePathEntry(`/zodiac/tavsebadoba/${pair}`, "monthly", 0.7),
+  );
+  const thematicPages = ALL_HOROSCOPE_THEMES.flatMap((theme) => [
+    samePathEntry(themeUrl(theme), "monthly", 0.78),
+    ...ALL_SLUGS.map((sign) =>
+      samePathEntry(themeUrl(theme, sign), "monthly", 0.68),
+    ),
+  ]);
+  const yearlyPages = ALL_YEARLY_YEARS.flatMap((year) =>
+    ALL_SLUGS.filter((slug) => yearlyContentFor(slug, year)).map((slug) =>
+      samePathEntry(`/zodiac/${slug}/${year}`, "monthly", 0.76),
+    ),
+  );
+  const signHoroscopePages = ALL_SLUGS.flatMap((slug) =>
+    ALL_HOROSCOPE_VIEWS.map((view) =>
+      samePathEntry(
+        `/zodiac/${slug}/${VIEW_PATH[view]}`,
+        VIEW_CHANGE_FREQ[view],
+        VIEW_PRIORITY[view],
+        NOW,
+      ),
+    ),
+  );
+
   return [
     ...CORE_LANGUAGE_PAIRS.map((pair) => {
       const englishUrl = `${ENGLISH_SITE_URL}${pair.en === "/" ? "" : pair.en}`;
@@ -110,6 +167,17 @@ function englishSitemap(): MetadataRoute.Sitemap {
         },
       },
     },
+    samePathEntry("/zodiac/mtvare", "monthly", 0.78),
+    samePathEntry("/zodiac/amomavali", "monthly", 0.78),
+    samePathEntry("/zodiac/elementebi", "monthly", 0.74),
+    ...signPages,
+    ...moonPages,
+    ...risingPages,
+    ...elementPages,
+    ...pairPages,
+    ...thematicPages,
+    ...yearlyPages,
+    ...signHoroscopePages,
   ];
 }
 

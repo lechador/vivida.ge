@@ -21,6 +21,10 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { pairPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
+import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
+import { ZodiacPairPageEn } from "@/components/seo/zodiac-pair-page-en";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -45,10 +49,24 @@ export async function generateMetadata({
   if (!PAIRS_CONTENT) return {};
   const c = PAIRS_CONTENT[pair];
   if (!c) return {};
+  const parsed = parsePairSlug(pair);
+  if (!parsed) return {};
+  const path = `/zodiac/tavsebadoba/${pair}`;
+  if ((await getRequestLocale()) === "en") {
+    const english = zodiacPairEnglish(...parsed);
+    const url = `https://vividaastro.com${path}`;
+    return {
+      title: { absolute: english.title },
+      description: english.description,
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: { type: "article", url, title: english.title, description: english.description, siteName: "Vivida", locale: "en_US" },
+      twitter: { card: "summary_large_image", title: english.title, description: english.description },
+    };
+  }
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
-    alternates: { canonical: `${SITE_URL}/zodiac/tavsebadoba/${pair}` },
+    alternates: localizedAlternates(path, path, "ka"),
     openGraph: {
       type: "article",
       url: `${SITE_URL}/zodiac/tavsebadoba/${pair}`,
@@ -78,6 +96,8 @@ export default async function PairPage({
   if (!c) notFound();
 
   const [a, b] = parsed;
+  if ((await getRequestLocale()) === "en")
+    return <ZodiacPairPageEn a={a} b={b} />;
   const aSign = SIGNS_CONTENT[a];
   const bSign = SIGNS_CONTENT[b];
   const aMeta = signMetaBySlug(a);

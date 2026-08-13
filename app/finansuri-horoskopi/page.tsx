@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
 import { ThematicHoroscopeHub, thematicHubMetadata } from "@/components/seo/thematic-horoscope-pages";
-export const metadata: Metadata = thematicHubMetadata("finance");
-export default function FinanceHoroscopePage() { return <ThematicHoroscopeHub theme="finance" />; }
+import { ThematicHoroscopeHubEn, thematicHubMetadataEn } from "@/components/seo/thematic-horoscope-pages-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+export async function generateMetadata(): Promise<Metadata> { return (await getRequestLocale()) === "en" ? thematicHubMetadataEn("finance") : thematicHubMetadata("finance"); }
+export default async function FinanceHoroscopePage() { return (await getRequestLocale()) === "en" ? <ThematicHoroscopeHubEn theme="finance" /> : <ThematicHoroscopeHub theme="finance" />; }

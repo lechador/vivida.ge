@@ -38,6 +38,7 @@ import {
 } from "@/components/seo/sign-horoscope-page-en";
 import { YearlyHoroscopePageEn } from "@/components/seo/yearly-horoscope-page-en";
 import { yearlyHoroscopeEnglish } from "@/lib/yearly-horoscope-en";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -134,9 +135,11 @@ export async function generateMetadata({
             "ზოდიაქოს ნიშნები",
             "horoskopi",
           ],
-      alternates: {
-        canonical: en ? `https://vividaastro.com/zodiac/${sign}/${slug}` : url,
-      },
+      alternates: localizedAlternates(
+        `/zodiac/${sign}/${slug}`,
+        `/zodiac/${sign}/${slug}`,
+        en ? "en" : "ka",
+      ),
       openGraph: {
         type: "article",
         url: en ? `https://vividaastro.com/zodiac/${sign}/${slug}` : url,
@@ -159,7 +162,11 @@ export async function generateMetadata({
     return {
       title: { absolute: english.title },
       description: english.description,
-      alternates: { canonical: url },
+      alternates: localizedAlternates(
+        `/zodiac/${sign}/${slug}`,
+        `/zodiac/${sign}/${slug}`,
+        "en",
+      ),
       openGraph: {
         type: "article",
         url,
@@ -178,7 +185,11 @@ export async function generateMetadata({
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
-    alternates: { canonical: `${SITE_URL}/zodiac/${sign}/${slug}` },
+    alternates: localizedAlternates(
+      `/zodiac/${sign}/${slug}`,
+      `/zodiac/${sign}/${slug}`,
+      "ka",
+    ),
     openGraph: {
       type: "article",
       url: `${SITE_URL}/zodiac/${sign}/${slug}`,

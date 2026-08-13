@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacSignPageEn } from "@/components/seo/zodiac-sign-page-en";
 import { ZODIAC_SIGN_EN } from "@/lib/zodiac-sign-en";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -62,7 +63,7 @@ export async function generateMetadata({
     return {
       title: { absolute: title },
       description,
-      alternates: { canonical: `https://vividaastro.com/zodiac/${sign}` },
+      alternates: localizedAlternates(`/zodiac/${sign}`, `/zodiac/${sign}`, "en"),
       openGraph: {
         type: "article",
         url: `https://vividaastro.com/zodiac/${sign}`,
@@ -79,7 +80,7 @@ export async function generateMetadata({
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
-    alternates: { canonical: `${SITE_URL}/zodiac/${sign}` },
+    alternates: localizedAlternates(`/zodiac/${sign}`, `/zodiac/${sign}`, "ka"),
     openGraph: {
       type: "article",
       url: `${SITE_URL}/zodiac/${sign}`,
