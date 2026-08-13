@@ -2,7 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Check, Loader2, Lock, Mail, MapPin, Share2, Sparkles, X } from "lucide-react";
+import {
+  Check,
+  Loader2,
+  Lock,
+  Mail,
+  MapPin,
+  Share2,
+  Sparkles,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +20,10 @@ import { validateDate } from "@/components/onboarding/step-date";
 import { validateTime } from "@/components/onboarding/step-time";
 import { ChartWheel } from "@/components/dashboard/chart-wheel";
 import { AspectCards } from "@/components/dashboard/aspect-cards";
-import { PositionsTable, HousesTable } from "@/components/report/positions-table";
+import {
+  PositionsTable,
+  HousesTable,
+} from "@/components/report/positions-table";
 import { signByIndex, signColor, formatDegree } from "@/lib/zodiac";
 import { slugByLabelKa } from "@/lib/seo/zodiac-content";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
@@ -27,12 +39,26 @@ const ERRORS: Record<string, string> = {
   rate_limited: "ბევრი მოთხოვნა მცირე დროში. სცადე ცოტა ხანში.",
   compute_failed: "გამოთვლა ვერ მოხერხდა. სცადე ხელახლა.",
 };
+const ERRORS_EN: Record<string, string> = {
+  invalid_date: "Check your birth date.",
+  invalid_time: "Check your birth time.",
+  invalid_location: "Choose your birth city from the list.",
+  invalid_timezone: "Choose your birth city from the list.",
+  rate_limited: "Too many requests in a short time. Please try again soon.",
+  compute_failed: "We couldn't calculate the chart. Please try again.",
+};
 
 const CALCULATOR_ONBOARDING_PATH = "/onboarding?next=/report";
 const CALCULATOR_SIGNUP_HREF = `/signup?next=${encodeURIComponent(CALCULATOR_ONBOARDING_PATH)}`;
 const CALCULATOR_LOGIN_HREF = `/login?next=${encodeURIComponent(CALCULATOR_ONBOARDING_PATH)}`;
 
-export function PublicNatalCalculator() {
+export function PublicNatalCalculator({
+  locale = "ka",
+}: {
+  locale?: "ka" | "en";
+}) {
+  const en = locale === "en";
+  const errors = en ? ERRORS_EN : ERRORS;
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
@@ -56,7 +82,10 @@ export function PublicNatalCalculator() {
     const url = `${window.location.origin}/nataluri-ruka?big=${sun}.${moon}.${asc}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: "ჩემი ნატალური რუკა", url });
+        await navigator.share({
+          title: en ? "My birth chart" : "ჩემი ნატალური რუკა",
+          url,
+        });
         trackEvent(ANALYTICS_EVENT.natalChartShared, { method: "native" });
       } else {
         await navigator.clipboard.writeText(url);
@@ -75,16 +104,16 @@ export function PublicNatalCalculator() {
     setError(null);
     const date = validateDate({ day, month, year });
     if (!date) {
-      setError(ERRORS.invalid_date);
+      setError(errors.invalid_date);
       return;
     }
     const t = validateTime({ hour, minute, unknown: unknownTime });
     if (!t.ok) {
-      setError(ERRORS.invalid_time);
+      setError(errors.invalid_time);
       return;
     }
     if (!place) {
-      setError(ERRORS.invalid_location);
+      setError(errors.invalid_location);
       return;
     }
 
@@ -103,7 +132,12 @@ export function PublicNatalCalculator() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.chart) {
-        setError(ERRORS[data.error] ?? "რაღაც ვერ მოხერხდა. სცადე ხელახლა.");
+        setError(
+          errors[data.error] ??
+            (en
+              ? "Something went wrong. Please try again."
+              : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
+        );
         return;
       }
       setChart(data.chart as NatalChartJson);
@@ -117,11 +151,19 @@ export function PublicNatalCalculator() {
         exact_time: t.time ? 1 : 0,
       });
       setTimeout(
-        () => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
-        80
+        () =>
+          resultRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          }),
+        80,
       );
     } catch {
-      setError("ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(
+        en
+          ? "Network error. Please try again."
+          : "ქსელის შეცდომა. სცადე ხელახლა.",
+      );
     } finally {
       setLoading(false);
     }
@@ -151,18 +193,36 @@ export function PublicNatalCalculator() {
         >
           {/* Date */}
           <div className="space-y-2">
-            <Label>დაბადების თარიღი</Label>
+            <Label>{en ? "Birth date" : "დაბადების თარიღი"}</Label>
             <div className="grid grid-cols-3 gap-3">
-              <NumField value={day} onChange={setDay} max={2} placeholder="დღე" aria="დღე" />
-              <NumField value={month} onChange={setMonth} max={2} placeholder="თვე" aria="თვე" />
-              <NumField value={year} onChange={setYear} max={4} placeholder="წელი" aria="წელი" />
+              <NumField
+                value={day}
+                onChange={setDay}
+                max={2}
+                placeholder={en ? "Day" : "დღე"}
+                aria={en ? "Day" : "დღე"}
+              />
+              <NumField
+                value={month}
+                onChange={setMonth}
+                max={2}
+                placeholder={en ? "Month" : "თვე"}
+                aria={en ? "Month" : "თვე"}
+              />
+              <NumField
+                value={year}
+                onChange={setYear}
+                max={4}
+                placeholder={en ? "Year" : "წელი"}
+                aria={en ? "Year" : "წელი"}
+              />
             </div>
           </div>
 
           {/* Time */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>დაბადების დრო</Label>
+              <Label>{en ? "Birth time" : "დაბადების დრო"}</Label>
               <button
                 type="button"
                 onClick={() => setUnknownTime((v) => !v)}
@@ -172,39 +232,45 @@ export function PublicNatalCalculator() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {unknownTime ? "✓ " : ""}არ ვიცი ზუსტი დრო
+                {unknownTime ? "✓ " : ""}
+                {en ? "I don't know the exact time" : "არ ვიცი ზუსტი დრო"}
               </button>
             </div>
-            <div className={`grid grid-cols-2 gap-3 ${unknownTime ? "opacity-40" : ""}`}>
+            <div
+              className={`grid grid-cols-2 gap-3 ${unknownTime ? "opacity-40" : ""}`}
+            >
               <NumField
                 value={hour}
                 onChange={setHour}
                 max={2}
-                placeholder="საათი"
-                aria="საათი"
+                placeholder={en ? "Hour" : "საათი"}
+                aria={en ? "Hour" : "საათი"}
                 disabled={unknownTime}
               />
               <NumField
                 value={minute}
                 onChange={setMinute}
                 max={2}
-                placeholder="წუთი"
-                aria="წუთი"
+                placeholder={en ? "Minute" : "წუთი"}
+                aria={en ? "Minute" : "წუთი"}
                 disabled={unknownTime}
               />
             </div>
             {unknownTime && (
               <p className="text-xs text-muted-foreground">
-                დროს 12:00-ად ჩავთვლით — მზე და პლანეტები ზუსტი იქნება, ამომავალი
-                და სახლები შესაძლოა არა.
+                {en
+                  ? "We'll use 12:00 noon. Most planetary signs will remain accurate, but the rising sign and houses may not be."
+                  : "დროს 12:00-ად ჩავთვლით — მზე და პლანეტები ზუსტი იქნება, ამომავალი და სახლები შესაძლოა არა."}
               </p>
             )}
           </div>
 
           {/* Place */}
-          <PlacePicker value={place} onChange={setPlace} />
+          <PlacePicker value={place} onChange={setPlace} locale={locale} />
 
-          {error && <p className="text-sm text-[var(--vivida-pink)]">{error}</p>}
+          {error && (
+            <p className="text-sm text-[var(--vivida-pink)]">{error}</p>
+          )}
 
           <Button
             type="submit"
@@ -218,7 +284,13 @@ export function PublicNatalCalculator() {
             ) : (
               <Sparkles className="size-4" />
             )}
-            {chart ? "ხელახლა გამოთვლა" : "გამოთვალე ჩემი რუკა"}
+            {chart
+              ? en
+                ? "Calculate again"
+                : "ხელახლა გამოთვლა"
+              : en
+                ? "Calculate my chart"
+                : "გამოთვალე ჩემი რუკა"}
           </Button>
         </form>
       </div>
@@ -226,36 +298,50 @@ export function PublicNatalCalculator() {
       {/* Results */}
       {chart && (
         <div ref={resultRef} className="mt-10 scroll-mt-24 space-y-8">
-          <BigThree chart={chart} />
+          <BigThree chart={chart} locale={locale} />
 
           <div className="flex justify-center">
             <Button type="button" variant="outline" size="lg" onClick={share}>
-              {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-              {copied ? "ბმული დაკოპირდა" : "გააზიარე ჩემი რუკა"}
+              {copied ? (
+                <Check className="size-4" />
+              ) : (
+                <Share2 className="size-4" />
+              )}
+              {copied
+                ? en
+                  ? "Link copied"
+                  : "ბმული დაკოპირდა"
+                : en
+                  ? "Share my chart"
+                  : "გააზიარე ჩემი რუკა"}
             </Button>
           </div>
 
           <div className="mx-auto max-w-xl">
-            <ChartWheel chart={chart} />
+            <ChartWheel chart={chart} locale={locale} />
           </div>
 
           <section>
             <h3 className="mb-3 text-lg font-semibold tracking-tight">
-              პლანეტების პოზიციები
+              {en ? "Planet positions" : "პლანეტების პოზიციები"}
             </h3>
-            <PositionsTable chart={chart} />
+            <PositionsTable chart={chart} locale={locale} />
           </section>
 
           <section>
-            <h3 className="mb-3 text-lg font-semibold tracking-tight">12 სახლი</h3>
+            <h3 className="mb-3 text-lg font-semibold tracking-tight">
+              {en ? "12 houses" : "12 სახლი"}
+            </h3>
             <div className="rounded-2xl border border-border bg-card/50 px-4 py-3 ring-1 ring-foreground/5 backdrop-blur-xl sm:px-5">
-              <HousesTable chart={chart} />
+              <HousesTable chart={chart} locale={locale} />
             </div>
           </section>
 
           <section>
-            <h3 className="mb-3 text-lg font-semibold tracking-tight">ასპექტები</h3>
-            <AspectCards chart={chart} />
+            <h3 className="mb-3 text-lg font-semibold tracking-tight">
+              {en ? "Aspects" : "ასპექტები"}
+            </h3>
+            <AspectCards chart={chart} locale={locale} />
           </section>
 
           {/* Unlock CTA */}
@@ -264,12 +350,12 @@ export function PublicNatalCalculator() {
               <Lock className="size-5" />
             </div>
             <h3 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              რას ნიშნავს ეს შენთვის?
+              {en ? "What does this mean for you?" : "რას ნიშნავს ეს შენთვის?"}
             </h3>
             <p className="mx-auto mt-3 max-w-lg text-pretty text-base text-muted-foreground">
-              ეს არის შენი რუკის სუფთა მონაცემები. დარეგისტრირდი უფასოდ და ნახე
-              თითოეული პლანეტის, სახლისა და ასპექტის პერსონალური ინტერპრეტაცია,
-              AI ანალიზი და სრული PDF ანგარიში.
+              {en
+                ? "These are the precise placements in your chart. Create a free account to unlock personal interpretations for every planet, house, and aspect, plus AI insights and a complete PDF report."
+                : "ეს არის შენი რუკის სუფთა მონაცემები. დარეგისტრირდი უფასოდ და ნახე თითოეული პლანეტის, სახლისა და ასპექტის პერსონალური ინტერპრეტაცია, AI ანალიზი და სრული PDF ანგარიში."}
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button asChild variant="mystic" size="lg">
@@ -281,18 +367,24 @@ export function PublicNatalCalculator() {
                     })
                   }
                 >
-                  უფასო რეგისტრაცია
+                  {en ? "Create free account" : "უფასო რეგისტრაცია"}
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href={CALCULATOR_LOGIN_HREF}>შესვლა</Link>
+                <Link href={CALCULATOR_LOGIN_HREF}>
+                  {en ? "Log in" : "შესვლა"}
+                </Link>
               </Button>
             </div>
           </div>
 
           {/* Lower-friction return hook — get the daily horoscope by email
               without a full signup (the biggest lever on "nobody returns"). */}
-          <HoroscopeEmailCapture sunSign={sunIdx} big={bigParam} />
+          <HoroscopeEmailCapture
+            sunSign={sunIdx}
+            big={bigParam}
+            locale={locale}
+          />
 
           {/* Second-action rail — a free next step so a visitor who isn't ready
               to register still takes a 2nd action (a 2nd pageview is an engaged,
@@ -300,7 +392,7 @@ export function PublicNatalCalculator() {
               to their sun sign for relevance. */}
           <div className="text-center">
             <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-              ან განაგრძე უფასოდ
+              {en ? "Or keep exploring for free" : "ან განაგრძე უფასოდ"}
             </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               {sunSlug && sunSign && (
@@ -309,20 +401,21 @@ export function PublicNatalCalculator() {
                   className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
                 >
                   <span aria-hidden>{sunSign.symbol}</span>
-                  {sunSign.labelKa} — შენი ნიშანი
+                  {en ? sunSign.labelEn : sunSign.labelKa} —{" "}
+                  {en ? "your sign" : "შენი ნიშანი"}
                 </Link>
               )}
               <Link
                 href="/horoskopi"
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
               >
-                დღის ჰოროსკოპი
+                {en ? "Daily horoscope" : "დღის ჰოროსკოპი"}
               </Link>
               <Link
                 href="/zodiac/tavsebadoba"
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
               >
-                თავსებადობა
+                {en ? "Compatibility" : "თავსებადობა"}
               </Link>
             </div>
           </div>
@@ -341,13 +434,16 @@ export function PublicNatalCalculator() {
 function HoroscopeEmailCapture({
   sunSign,
   big,
+  locale,
 }: {
   sunSign: number | undefined;
   big: string | null;
+  locale: "ka" | "en";
 }) {
+  const en = locale === "en";
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
-    "idle"
+    "idle",
   );
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -369,9 +465,13 @@ function HoroscopeEmailCapture({
         setStatus("error");
         setMsg(
           data.error === "rate_limited"
-            ? "ბევრი მოთხოვნა. სცადე ცოტა ხანში."
+            ? en
+              ? "Too many requests. Please try again soon."
+              : "ბევრი მოთხოვნა. სცადე ცოტა ხანში."
             : (typeof data.error === "string" && data.error) ||
-                "ვერ მოხერხდა. სცადე ხელახლა."
+                (en
+                  ? "It didn't work. Please try again."
+                  : "ვერ მოხერხდა. სცადე ხელახლა."),
         );
         return;
       }
@@ -381,7 +481,11 @@ function HoroscopeEmailCapture({
       });
     } catch {
       setStatus("error");
-      setMsg("ქსელის შეცდომა. სცადე ხელახლა.");
+      setMsg(
+        en
+          ? "Network error. Please try again."
+          : "ქსელის შეცდომა. სცადე ხელახლა.",
+      );
     }
   }
 
@@ -389,7 +493,9 @@ function HoroscopeEmailCapture({
     return (
       <div className="flex items-center justify-center gap-2 rounded-2xl border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/8 px-5 py-4 text-center text-sm text-foreground/90 ring-1 ring-foreground/5">
         <Check className="size-4 shrink-0 text-[var(--vivida-cyan)]" />
-        გამოწერილია! პირველი ჰოროსკოპი უკვე იგზავნება ელფოსტაზე.
+        {en
+          ? "Subscribed! Your first horoscope is on its way."
+          : "გამოწერილია! პირველი ჰოროსკოპი უკვე იგზავნება ელფოსტაზე."}
       </div>
     );
   }
@@ -398,7 +504,9 @@ function HoroscopeEmailCapture({
     <div className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
       <div className="flex items-center justify-center gap-2 text-sm font-medium">
         <Mail className="size-4 text-[var(--vivida-cyan)]" />
-        მიიღე დღიური ჰოროსკოპი ელფოსტაზე — უფასოდ
+        {en
+          ? "Get your daily horoscope by email—free"
+          : "მიიღე დღიური ჰოროსკოპი ელფოსტაზე — უფასოდ"}
       </div>
       <form
         onSubmit={(e) => {
@@ -411,7 +519,7 @@ function HoroscopeEmailCapture({
           type="email"
           inputMode="email"
           autoComplete="email"
-          placeholder="შენი ელფოსტა"
+          placeholder={en ? "Your email" : "შენი ელფოსტა"}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="flex-1 text-base"
@@ -419,16 +527,22 @@ function HoroscopeEmailCapture({
         <Button type="submit" variant="mystic" disabled={status === "loading"}>
           {status === "loading" ? (
             <Loader2 className="size-4 animate-spin" />
+          ) : en ? (
+            "Subscribe"
           ) : (
             "გამოწერა"
           )}
         </Button>
       </form>
       {msg && (
-        <p className="mt-2 text-center text-sm text-[var(--vivida-pink)]">{msg}</p>
+        <p className="mt-2 text-center text-sm text-[var(--vivida-pink)]">
+          {msg}
+        </p>
       )}
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        რეგისტრაცია არ სჭირდება. გაუქმება — ერთ დაწკაპუნებაზე.
+        {en
+          ? "No account required. Unsubscribe in one click."
+          : "რეგისტრაცია არ სჭირდება. გაუქმება — ერთ დაწკაპუნებაზე."}
       </p>
     </div>
   );
@@ -456,17 +570,30 @@ function NumField({
       placeholder={placeholder}
       value={value}
       disabled={disabled}
-      onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, max))}
+      onChange={(e) =>
+        onChange(e.target.value.replace(/\D/g, "").slice(0, max))
+      }
       className="text-center text-base tabular-nums"
     />
   );
 }
 
-function BigThree({ chart }: { chart: NatalChartJson }) {
-  const items: { label: string; glyph: string; point: PointJson | undefined }[] = [
-    { label: "მზე", glyph: "☉", point: chart.bodies.sun },
-    { label: "მთვარე", glyph: "☽", point: chart.bodies.moon },
-    { label: "ამომავალი", glyph: "AC", point: chart.ascendant },
+function BigThree({
+  chart,
+  locale,
+}: {
+  chart: NatalChartJson;
+  locale: "ka" | "en";
+}) {
+  const en = locale === "en";
+  const items: {
+    label: string;
+    glyph: string;
+    point: PointJson | undefined;
+  }[] = [
+    { label: en ? "Sun" : "მზე", glyph: "☉", point: chart.bodies.sun },
+    { label: en ? "Moon" : "მთვარე", glyph: "☽", point: chart.bodies.moon },
+    { label: en ? "Rising" : "ამომავალი", glyph: "AC", point: chart.ascendant },
   ];
   return (
     <div className="grid gap-3 sm:grid-cols-3">
@@ -487,7 +614,7 @@ function BigThree({ chart }: { chart: NatalChartJson }) {
                 {sign.symbol}
               </span>
               <span className="text-lg font-semibold tracking-tight">
-                {sign.labelKa}
+                {en ? sign.labelEn : sign.labelKa}
               </span>
             </div>
             <div className="mt-0.5 text-xs tabular-nums text-muted-foreground">
@@ -503,10 +630,13 @@ function BigThree({ chart }: { chart: NatalChartJson }) {
 function PlacePicker({
   value,
   onChange,
+  locale,
 }: {
   value: GeocodeResult | null;
   onChange: (v: GeocodeResult | null) => void;
+  locale: "ka" | "en";
 }) {
+  const en = locale === "en";
   const [query, setQuery] = useState(value?.displayName ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -523,9 +653,12 @@ function PlacePicker({
     const t = setTimeout(async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/public/geocode?q=${encodeURIComponent(trimmed)}`, {
-          signal: ctrl.signal,
-        });
+        const res = await fetch(
+          `/api/public/geocode?q=${encodeURIComponent(trimmed)}`,
+          {
+            signal: ctrl.signal,
+          },
+        );
         if (!res.ok) throw new Error("geocode failed");
         const data = (await res.json()) as { results: GeocodeResult[] };
         setResults(data.results ?? []);
@@ -544,7 +677,8 @@ function PlacePicker({
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node))
+        setOpen(false);
     }
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
@@ -552,12 +686,16 @@ function PlacePicker({
 
   return (
     <div className="space-y-2" ref={wrapRef}>
-      <Label htmlFor="calc-place">დაბადების ქალაქი</Label>
+      <Label htmlFor="calc-place">
+        {en ? "Birth city" : "დაბადების ქალაქი"}
+      </Label>
       <div className="relative">
         <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           id="calc-place"
-          placeholder="თბილისი, ბათუმი, ქუთაისი…"
+          placeholder={
+            en ? "London, Paris, New York…" : "თბილისი, ბათუმი, ქუთაისი…"
+          }
           className="pl-9 pr-10 text-base"
           value={query}
           onChange={(e) => {
@@ -572,7 +710,7 @@ function PlacePicker({
         ) : value ? (
           <button
             type="button"
-            aria-label="წაშლა"
+            aria-label={en ? "Clear" : "წაშლა"}
             onClick={() => {
               onChange(null);
               setQuery("");
@@ -598,10 +736,14 @@ function PlacePicker({
                 >
                   <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate font-medium text-foreground">{r.name}</div>
+                    <div className="truncate font-medium text-foreground">
+                      {r.name}
+                    </div>
                     <div className="truncate text-xs text-muted-foreground">
                       {[r.admin1, r.country].filter(Boolean).join(", ")}
-                      <span className="ml-2 text-muted-foreground/60">{r.timezone}</span>
+                      <span className="ml-2 text-muted-foreground/60">
+                        {r.timezone}
+                      </span>
                     </div>
                   </div>
                 </button>

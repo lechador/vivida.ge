@@ -8,6 +8,8 @@ import { Starfield } from "@/components/landing/starfield";
 import { PublicNatalCalculator } from "@/components/calculator/public-natal-calculator";
 import { signByIndex } from "@/lib/zodiac";
 import { localizedAlternates } from "@/lib/seo/locales";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { NatalChartPageEn } from "@/components/seo/natal-chart-page-en";
 
 const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/nataluri-ruka`;
@@ -51,6 +53,35 @@ const BASE_META: Metadata = {
   },
 };
 
+const BASE_META_EN: Metadata = {
+  title: { absolute: "Free Birth Chart Calculator — Natal Chart Online" },
+  description:
+    "Calculate your natal chart online for free. Discover exact planet positions, your rising sign, 12 houses, and major aspects—no registration required.",
+  keywords: [
+    "free birth chart",
+    "birth chart calculator",
+    "natal chart",
+    "astrology chart",
+    "rising sign calculator",
+    "12 houses astrology",
+  ],
+  alternates: localizedAlternates("/nataluri-ruka", "/en/natal-chart", "en"),
+  openGraph: {
+    type: "website",
+    url: "https://vividaastro.com/natal-chart",
+    title: "Free Birth Chart Calculator",
+    description:
+      "Calculate your planets, rising sign, houses, and aspects online for free.",
+    siteName: "Vivida",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Free Birth Chart Calculator",
+    description: "Calculate your natal chart online for free.",
+  },
+};
+
 /**
  * When the page is opened from a shared link (`?big=<sun>.<moon>.<asc>`) we
  * swap in a personalized OG card showing those signs. The <title> and canonical
@@ -61,26 +92,31 @@ export async function generateMetadata({
 }: {
   searchParams: Promise<{ big?: string }>;
 }): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
   const sp = await searchParams;
   const big = typeof sp.big === "string" ? sp.big : "";
   const idxs = big.split(".").map((s) => parseInt(s, 10));
   const valid =
     idxs.length === 3 &&
     idxs.every((n) => Number.isInteger(n) && n >= 0 && n < 12);
-  if (!valid) return BASE_META;
+  if (!valid) return en ? BASE_META_EN : BASE_META;
 
-  const [sun, moon, asc] = idxs.map((i) => signByIndex(i).labelKa);
-  const ogTitle = `ჩემი ნატალური რუკა: მზე ${sun} · მთვარე ${moon} · ამომავალი ${asc}`;
-  const ogImage = `${SITE_URL}/api/og/chart?big=${encodeURIComponent(big)}`;
+  const [sun, moon, asc] = idxs.map((i) =>
+    en ? signByIndex(i).labelEn : signByIndex(i).labelKa,
+  );
+  const ogTitle = en
+    ? `My birth chart: Sun ${sun} · Moon ${moon} · Rising ${asc}`
+    : `ჩემი ნატალური რუკა: მზე ${sun} · მთვარე ${moon} · ამომავალი ${asc}`;
+  const ogImage = `${en ? "https://vividaastro.com" : SITE_URL}/api/og/chart?big=${encodeURIComponent(big)}`;
   return {
-    ...BASE_META,
+    ...(en ? BASE_META_EN : BASE_META),
     openGraph: {
-      ...BASE_META.openGraph,
+      ...(en ? BASE_META_EN.openGraph : BASE_META.openGraph),
       title: ogTitle,
       images: [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
-      ...BASE_META.twitter,
+      ...(en ? BASE_META_EN.twitter : BASE_META.twitter),
       title: ogTitle,
       images: [ogImage],
     },
@@ -110,7 +146,8 @@ const FAQ = [
   },
 ];
 
-export default function NataluriRukaPage() {
+export default async function NataluriRukaPage() {
+  if ((await getRequestLocale()) === "en") return <NatalChartPageEn />;
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -192,9 +229,10 @@ export default function NataluriRukaPage() {
             </h2>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
               ნატალური რუკა (ანუ პირადი რუკა, დაბადების რუკა) არის ცის ზუსტი
-              სურათი იმ წამში, როცა დაიბადე — სად იდგა მზე, მთვარე და თითოეული პლანეტა ზოდიაქოს
-              ნიშნებსა და 12 სახლში. ის ასტროლოგიის საფუძველია: გვიჩვენებს შენს
-              ხასიათს, ძლიერ მხარეებს, ემოციურ ბუნებასა და ცხოვრების სფეროებს.
+              სურათი იმ წამში, როცა დაიბადე — სად იდგა მზე, მთვარე და თითოეული
+              პლანეტა ზოდიაქოს ნიშნებსა და 12 სახლში. ის ასტროლოგიის საფუძველია:
+              გვიჩვენებს შენს ხასიათს, ძლიერ მხარეებს, ემოციურ ბუნებასა და
+              ცხოვრების სფეროებს.
             </p>
           </section>
 
@@ -213,8 +251,8 @@ export default function NataluriRukaPage() {
                 გამოხატავს თავს ეს ენერგია (ვერძი, კურო… თევზები).
               </li>
               <li>
-                <strong className="text-foreground">სახლები</strong> —
-                ცხოვრების რომელ სფეროში ვლინდება (კარიერა, ურთიერთობები, ფული…).
+                <strong className="text-foreground">სახლები</strong> — ცხოვრების
+                რომელ სფეროში ვლინდება (კარიერა, ურთიერთობები, ფული…).
               </li>
               <li>
                 <strong className="text-foreground">ასპექტები</strong> — როგორ
@@ -224,7 +262,10 @@ export default function NataluriRukaPage() {
             <p className="mt-4 text-pretty text-base leading-relaxed text-foreground/85">
               ზემოთ კალკულატორი გაძლევს ამ ყველაფრის სუფთა მონაცემებს.
               პერსონალური ინტერპრეტაციისა და AI ანალიზისთვის{" "}
-              <Link href="/signup" className="text-[var(--vivida-violet)] underline-offset-4 hover:underline">
+              <Link
+                href="/signup"
+                className="text-[var(--vivida-violet)] underline-offset-4 hover:underline"
+              >
                 დარეგისტრირდი უფასოდ
               </Link>
               .
@@ -236,12 +277,12 @@ export default function NataluriRukaPage() {
               ნატალური რუკის გაკეთება ქართულად
             </h2>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
-              ნატალური რუკის გამოთვლას სამი მონაცემი სჭირდება: დაბადების
-              თარიღი, დაბადების ქალაქი და შეძლებისდაგვარად ზუსტი დრო. მათი
-              შეყვანის შემდეგ კალკულატორი ავტომატურად ადგენს ციური სხეულების
-              პოზიციებს და შედეგს ქართულად გაჩვენებს. თუ დაბადების დრო არ იცი,
-              პლანეტების ნიშნებს მაინც მიიღებ, თუმცა ასცენდენტი და სახლები
-              შესაძლოა ზუსტი არ იყოს.
+              ნატალური რუკის გამოთვლას სამი მონაცემი სჭირდება: დაბადების თარიღი,
+              დაბადების ქალაქი და შეძლებისდაგვარად ზუსტი დრო. მათი შეყვანის
+              შემდეგ კალკულატორი ავტომატურად ადგენს ციური სხეულების პოზიციებს და
+              შედეგს ქართულად გაჩვენებს. თუ დაბადების დრო არ იცი, პლანეტების
+              ნიშნებს მაინც მიიღებ, თუმცა ასცენდენტი და სახლები შესაძლოა ზუსტი
+              არ იყოს.
             </p>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85">
               ყოველდღიური ნაბიჯების სანახავად გამოიყენე{" "}

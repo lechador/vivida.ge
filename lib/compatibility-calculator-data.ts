@@ -38,13 +38,16 @@ export type CalculatorData = {
   pairs: Record<string, CalcPair>;
 };
 
-export function buildCalculatorData(): CalculatorData {
+export function buildCalculatorData(
+  locale: "ka" | "en" = "ka",
+): CalculatorData {
+  const en = locale === "en";
   const signs: CalcSign[] = ALL_SLUGS.map((slug) => {
     const meta = signMetaBySlug(slug);
     const c = SIGNS_CONTENT[slug];
     return {
       slug,
-      label: c.labelKa,
+      label: en ? (meta?.labelEn ?? slug) : c.labelKa,
       symbol: c.symbol,
       color: meta ? signColor(meta) : "var(--vivida-violet)",
     };
@@ -53,14 +56,35 @@ export function buildCalculatorData(): CalculatorData {
   const pairs: Record<string, CalcPair> = {};
   if (PAIRS_CONTENT) {
     for (const [slug, c] of Object.entries(PAIRS_CONTENT)) {
+      const percent = pairPercent(slug, c.overallScore);
+      const scoreEn =
+        percent >= 75 ? "Strong" : percent >= 58 ? "Harmonious" : "Dynamic";
       pairs[slug] = {
         slug,
-        percent: pairPercent(slug, c.overallScore),
-        score: c.overallScore,
-        tagline: c.tagline,
-        strengths: c.strengths.slice(0, 3),
-        labelA: c.labelA,
-        labelB: c.labelB,
+        percent,
+        score: en ? scoreEn : c.overallScore,
+        tagline: en
+          ? percent >= 75
+            ? "A naturally magnetic match with plenty of shared momentum."
+            : percent >= 58
+              ? "A promising connection that balances common ground with useful differences."
+              : "A lively pairing where patience and curiosity can turn differences into growth."
+          : c.tagline,
+        strengths: en
+          ? [
+              "A distinct energy you can build on",
+              "Different perspectives that keep the connection moving",
+              "Room for honest communication and shared growth",
+            ]
+          : c.strengths.slice(0, 3),
+        labelA: en
+          ? (signMetaBySlug(slug.split("-")[0] as ZodiacSlug)?.labelEn ??
+            c.labelA)
+          : c.labelA,
+        labelB: en
+          ? (signMetaBySlug(slug.split("-")[1] as ZodiacSlug)?.labelEn ??
+            c.labelB)
+          : c.labelB,
       };
     }
   }

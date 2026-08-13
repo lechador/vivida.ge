@@ -9,10 +9,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { ensureSignHoroscope } from "@/actions/sign-horoscope";
 import { MundaneSkySection } from "@/components/seo/mundane-sky-section";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import {
-  VIEW_PATH,
-  signHoroscopePeriodLabel,
-} from "@/lib/sign-horoscope";
+import { VIEW_PATH, signHoroscopePeriodLabel } from "@/lib/sign-horoscope";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { genitiveKa } from "@/lib/georgian";
 import { HOROSKOPI_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
@@ -24,6 +21,8 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { localizedAlternates } from "@/lib/seo/locales";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { HoroscopeHubEn } from "@/components/seo/horoscope-hub-en";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -39,42 +38,62 @@ const TITLE = "ჰოროსკოპი — დღის ჰოროსკ�
 const DESCRIPTION =
   "დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის — ვერძი, კურო, ტყუპები, კირჩხიბი, ლომი, ქალწული, სასწორი, მორიელი, მშვილდოსანი, თხის რქა, მერწყული, თევზები. დღევანდელი, ხვალინდელი, კვირისა და თვის ჰოროსკოპი რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.";
 
-export const metadata: Metadata = {
-  title: { absolute: TITLE },
-  description: DESCRIPTION,
-  keywords: [
-    "ჰოროსკოპი",
-    "დღის ჰოროსკოპი",
-    "ჰოროსკოპი დღის",
-    "დღევანდელი ჰოროსკოპი",
-    "ხვალინდელი ჰოროსკოპი",
-    "კვირის ჰოროსკოპი",
-    "თვის ჰოროსკოპი",
-    "ჰოროსკოპი თვის",
-    "ზოდიაქოს ნიშნები",
-    "ზოდიაქოს ნიშანი ჰოროსკოპი",
-    "ჰოროსკოპი ქართულად",
-    "horoskopi",
-    "dgis horoskopi",
-    "dghis horoskopi",
-    "horoskopi qartulad",
-    "zodiaqos nishnebi",
-  ],
-  alternates: localizedAlternates("/horoskopi", "/en/horoscope", "ka"),
-  openGraph: {
-    type: "website",
-    url: `${SITE_URL}/horoskopi`,
-    title: TITLE,
-    description: DESCRIPTION,
-    siteName: "Vivida",
-    locale: "ka_GE",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  const title = en ? "Daily Horoscope Today — All Zodiac Signs" : TITLE;
+  const description = en
+    ? "Read today's horoscope for every zodiac sign, with practical guidance based on the current sky. Explore daily, weekly, and monthly astrology forecasts."
+    : DESCRIPTION;
+  return {
+    title: { absolute: title },
+    description,
+    keywords: en
+      ? [
+          "daily horoscope",
+          "today horoscope",
+          "zodiac horoscope",
+          "weekly horoscope",
+          "monthly horoscope",
+          "horoscope today",
+        ]
+      : [
+          "ჰოროსკოპი",
+          "დღის ჰოროსკოპი",
+          "ჰოროსკოპი დღის",
+          "დღევანდელი ჰოროსკოპი",
+          "ხვალინდელი ჰოროსკოპი",
+          "კვირის ჰოროსკოპი",
+          "თვის ჰოროსკოპი",
+          "ჰოროსკოპი თვის",
+          "ზოდიაქოს ნიშნები",
+          "ზოდიაქოს ნიშანი ჰოროსკოპი",
+          "ჰოროსკოპი ქართულად",
+          "horoskopi",
+          "dgis horoskopi",
+          "dghis horoskopi",
+          "horoskopi qartulad",
+          "zodiaqos nishnebi",
+        ],
+    alternates: localizedAlternates(
+      "/horoskopi",
+      "/en/horoscope",
+      en ? "en" : "ka",
+    ),
+    openGraph: {
+      type: "website",
+      url: `${en ? "https://vividaastro.com" : SITE_URL}/horoskopi`,
+      title,
+      description,
+      siteName: "Vivida",
+      locale: en ? "en_US" : "ka_GE",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 const FAQ = [
   {
@@ -96,6 +115,7 @@ const FAQ = [
 ];
 
 export default async function HoroskopiHubPage() {
+  if ((await getRequestLocale()) === "en") return <HoroscopeHubEn />;
   const now = new Date();
   const todayLabel = signHoroscopePeriodLabel(now, "day");
 
@@ -108,7 +128,7 @@ export default async function HoroskopiHubPage() {
     ALL_SLUGS.map(async (slug) => ({
       slug,
       row: await ensureSignHoroscope(slug, "day", now),
-    }))
+    })),
   );
 
   const ld = [
@@ -169,8 +189,8 @@ export default async function HoroskopiHubPage() {
             </span>
           </h1>
           <p className="mt-4 text-pretty text-base text-foreground/85 sm:text-lg">
-            ცის დღევანდელი ფონი ყველა 12 ნიშნისთვის — კონკრეტული, ცოცხალი
-            ენით, ქართულად. დააჭირე ნიშანს სრული ჰოროსკოპის სანახავად.
+            ცის დღევანდელი ფონი ყველა 12 ნიშნისთვის — კონკრეტული, ცოცხალი ენით,
+            ქართულად. დააჭირე ნიშანს სრული ჰოროსკოპის სანახავად.
           </p>
         </header>
 
@@ -253,8 +273,8 @@ export default async function HoroskopiHubPage() {
             const meta = signMetaBySlug(slug);
             const accent = meta ? signColor(meta) : "var(--vivida-violet)";
             const dates = ZODIAC_DATES[slug];
-            const summary = row?.summary
-              ?? "ჰოროსკოპი მზადდება — სცადე ცოტა ხანში.";
+            const summary =
+              row?.summary ?? "ჰოროსკოპი მზადდება — სცადე ცოტა ხანში.";
 
             return (
               <Link

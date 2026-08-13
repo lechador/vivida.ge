@@ -9,6 +9,8 @@ import { CompatibilityCalculator } from "@/components/landing/compatibility-calc
 import { SiteFooter } from "@/components/site-footer";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { buildCalculatorData } from "@/lib/compatibility-calculator-data";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/tavsebadoba";
@@ -20,39 +22,49 @@ const PATH = "/tavsebadoba";
  * CTA into the product. Kept separate from the SEO hub at
  * /zodiac/tavsebadoba so the ad message → page → action stays tight.
  */
-export const metadata: Metadata = {
-  title: {
-    absolute: "ზოდიაქოს თავსებადობა — შეამოწმე შენი წყვილი | Vivida",
-  },
-  description:
-    "გაიგე რამდენად თავსებადი ხართ შენ და შენი სიყვარული ზოდიაქოს ნიშნების მიხედვით — უფასოდ, 10 წამში. შემდეგ ნახე სრული ნატალური თავსებადობა Vivida-ზე.",
-  keywords: [
-    "თავსებადობა",
-    "ზოდიაქოს თავსებადობა",
-    "სიყვარულის თავსებადობა",
-    "ნიშნების თავსებადობა",
-    "თავსებადობის ტესტი",
-    "ვის ვუხდები",
-    "tavsebadoba",
-    "siyvarulis tavsebadoba",
-    "nishnebis tavsebadoba",
-  ],
-  alternates: { canonical: `${SITE_URL}${PATH}` },
-  openGraph: {
-    type: "website",
-    url: `${SITE_URL}${PATH}`,
-    title: "ზოდიაქოს თავსებადობა — შეამოწმე შენი წყვილი",
-    description:
-      "აირჩიე ორი ნიშანი და გაიგე თქვენი თავსებადობა მყისიერად. უფასოდ.",
-    siteName: "Vivida",
-    locale: "ka_GE",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "ზოდიაქოს თავსებადობა — შეამოწმე შენი წყვილი",
-    description: "აირჩიე ორი ნიშანი და გაიგე თქვენი თავსებადობა მყისიერად.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  const title = en
+    ? "Zodiac Compatibility Calculator — Check Your Match | Vivida"
+    : "ზოდიაქოს თავსებადობა — შეამოწმე შენი წყვილი | Vivida";
+  const description = en
+    ? "Choose two zodiac signs and check your love compatibility instantly, free and without registration. Then explore complete natal-chart compatibility on Vivida."
+    : "გაიგე რამდენად თავსებადი ხართ შენ და შენი სიყვარული ზოდიაქოს ნიშნების მიხედვით — უფასოდ, 10 წამში. შემდეგ ნახე სრული ნატალური თავსებადობა Vivida-ზე.";
+  return {
+    title: { absolute: title },
+    description,
+    keywords: en
+      ? [
+          "zodiac compatibility",
+          "love compatibility calculator",
+          "astrology compatibility",
+          "zodiac match",
+        ]
+      : [
+          "თავსებადობა",
+          "ზოდიაქოს თავსებადობა",
+          "სიყვარულის თავსებადობა",
+          "ნიშნების თავსებადობა",
+          "თავსებადობის ტესტი",
+          "ვის ვუხდები",
+          "tavsebadoba",
+        ],
+    alternates: localizedAlternates(
+      PATH,
+      "/en/compatibility",
+      en ? "en" : "ka",
+    ),
+    openGraph: {
+      type: "website",
+      url: `${en ? "https://vividaastro.com" : SITE_URL}${PATH}`,
+      title,
+      description,
+      siteName: "Vivida",
+      locale: en ? "en_US" : "ka_GE",
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 const TRUST = [
   { icon: Check, label: "უფასო, ბარათის გარეშე" },
@@ -61,13 +73,18 @@ const TRUST = [
 ];
 
 export default async function TavsebadobaPage() {
+  const locale = await getRequestLocale();
+  const en = locale === "en";
   const session = await auth();
   if (session?.user?.id) redirect("/dashboard");
 
-  const { signs, pairs } = buildCalculatorData();
+  const { signs, pairs } = buildCalculatorData(locale);
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.30_0.16_350/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(35%_25%_at_12%_80%,oklch(0.32_0.16_305/0.35),transparent_70%)]"
@@ -92,29 +109,41 @@ export default async function TavsebadobaPage() {
           href="/login"
           className="text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          შესვლა
+          {en ? "Log in" : "შესვლა"}
         </Link>
       </header>
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 text-center sm:px-6 sm:pt-12">
         <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
-          <Heart className="size-3.5 text-[var(--vivida-pink)]" fill="currentColor" />
-          ზოდიაქოს თავსებადობა
+          <Heart
+            className="size-3.5 text-[var(--vivida-pink)]"
+            fill="currentColor"
+          />
+          {en ? "Zodiac compatibility" : "ზოდიაქოს თავსებადობა"}
         </span>
 
         <h1 className="text-balance text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
-          რამდენად თავსებადი ხართ{" "}
+          {en ? "How compatible are " : "რამდენად თავსებადი ხართ "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            შენ და შენი სიყვარული?
+            {en ? "you and your person?" : "შენ და შენი სიყვარული?"}
           </span>
         </h1>
 
         <p className="mx-auto mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg">
-          აირჩიე ორი ნიშანი და გაიგე თქვენი თავსებადობა მყისიერად — უფასოდ.
+          {en
+            ? "Choose two zodiac signs and discover your compatibility instantly—free."
+            : "აირჩიე ორი ნიშანი და გაიგე თქვენი თავსებადობა მყისიერად — უფასოდ."}
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-          {TRUST.map(({ icon: Icon, label }) => (
+          {(en
+            ? [
+                { icon: Check, label: "Free—no card required" },
+                { icon: Lock, label: "No registration" },
+                { icon: Sparkles, label: "Instant result" },
+              ]
+            : TRUST
+          ).map(({ icon: Icon, label }) => (
             <span
               key={label}
               className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200"
@@ -126,7 +155,11 @@ export default async function TavsebadobaPage() {
         </div>
 
         <div className="mt-10">
-          <CompatibilityCalculator signs={signs} pairs={pairs} />
+          <CompatibilityCalculator
+            signs={signs}
+            pairs={pairs}
+            locale={locale}
+          />
         </div>
       </section>
 

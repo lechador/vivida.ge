@@ -15,6 +15,9 @@ const SCORE_COLOR: Record<string, string> = {
   ძლიერი: "oklch(0.78 0.18 305)",
   ჰარმონიული: "oklch(0.78 0.16 200)",
   გამომწვევი: "oklch(0.72 0.20 30)",
+  Strong: "oklch(0.78 0.18 305)",
+  Harmonious: "oklch(0.78 0.16 200)",
+  Dynamic: "oklch(0.72 0.20 30)",
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -24,10 +27,13 @@ type Slot = "a" | "b";
 export function CompatibilityCalculator({
   signs,
   pairs,
+  locale = "ka",
 }: {
   signs: CalcSign[];
   pairs: Record<string, CalcPair>;
+  locale?: "ka" | "en";
 }) {
+  const en = locale === "en";
   const [a, setA] = useState<ZodiacSlug | null>(null);
   const [b, setB] = useState<ZodiacSlug | null>(null);
   const [active, setActive] = useState<Slot>("a");
@@ -72,7 +78,10 @@ export function CompatibilityCalculator({
     });
     // Let the reveal mount, then scroll it into view on small screens.
     requestAnimationFrame(() => {
-      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      resultRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     });
   }
 
@@ -88,7 +97,7 @@ export function CompatibilityCalculator({
       {/* Chosen-pair slots */}
       <div className="flex items-stretch gap-3 sm:gap-4">
         <Slot
-          label="შენი ნიშანი"
+          label={en ? "Your sign" : "შენი ნიშანი"}
           sign={signA}
           active={active === "a"}
           onClick={() => setActive("a")}
@@ -100,7 +109,7 @@ export function CompatibilityCalculator({
           />
         </div>
         <Slot
-          label="მისი ნიშანი"
+          label={en ? "Their sign" : "მისი ნიშანი"}
           sign={signB}
           active={active === "b"}
           onClick={() => setActive("b")}
@@ -154,7 +163,13 @@ export function CompatibilityCalculator({
           className="bg-[linear-gradient(120deg,var(--vivida-cyan),var(--vivida-pink))]"
         >
           <Sparkles className="size-5" />
-          {result ? "ხელახლა გამოთვალე" : "გამოთვალე თავსებადობა"}
+          {result
+            ? en
+              ? "Calculate again"
+              : "ხელახლა გამოთვალე"
+            : en
+              ? "Calculate compatibility"
+              : "გამოთვალე თავსებადობა"}
         </Button>
         {(a || b) && (
           <button
@@ -163,7 +178,7 @@ export function CompatibilityCalculator({
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <RotateCcw className="size-4" />
-            თავიდან
+            {en ? "Reset" : "თავიდან"}
           </button>
         )}
       </div>
@@ -180,7 +195,12 @@ export function CompatibilityCalculator({
             transition={{ duration: 0.6, ease: EASE }}
             className="mt-8"
           >
-            <ResultCard result={result} signA={signA} signB={signB} />
+            <ResultCard
+              result={result}
+              signA={signA}
+              signB={signB}
+              locale={locale}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -236,21 +256,30 @@ function ResultCard({
   result,
   signA,
   signB,
+  locale,
 }: {
   result: CalcPair;
   signA: CalcSign;
   signB: CalcSign;
+  locale: "ka" | "en";
 }) {
+  const en = locale === "en";
   const color = SCORE_COLOR[result.score] ?? "var(--vivida-violet)";
   const percent = useCountUp(result.percent);
 
   async function share() {
-    const url = `https://www.vivida.ge/zodiac/tavsebadoba/${result.slug}`;
-    const text = `${signA.label} × ${signB.label} — ${result.percent}% თავსებადობა Vivida-ზე ✨`;
+    const url = `${en ? "https://vividaastro.com" : "https://www.vivida.ge"}/zodiac/tavsebadoba/${result.slug}`;
+    const text = en
+      ? `${signA.label} × ${signB.label} — ${result.percent}% compatibility on Vivida ✨`
+      : `${signA.label} × ${signB.label} — ${result.percent}% თავსებადობა Vivida-ზე ✨`;
     fbTrackCustom("CompatibilityShare", { pair: result.slug });
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Vivida თავსებადობა", text, url });
+        await navigator.share({
+          title: en ? "Vivida compatibility" : "Vivida თავსებადობა",
+          text,
+          url,
+        });
         trackEvent(ANALYTICS_EVENT.compatibilityShare, {
           pair: result.slug,
           method: "native",
@@ -345,7 +374,9 @@ function ResultCard({
         }}
       >
         <span className="font-semibold">{result.score}</span>
-        <span className="text-foreground/70">თავსებადობა</span>
+        <span className="text-foreground/70">
+          {en ? "compatibility" : "თავსებადობა"}
+        </span>
       </div>
 
       <p className="relative mx-auto mt-4 max-w-md text-pretty text-base text-foreground/90 sm:text-lg">
@@ -355,8 +386,15 @@ function ResultCard({
       {result.strengths.length > 0 && (
         <ul className="relative mx-auto mt-5 flex max-w-md flex-col gap-2 text-left">
           {result.strengths.map((s, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-foreground/85">
-              <Check className="mt-0.5 size-4 shrink-0" style={{ color }} strokeWidth={3} />
+            <li
+              key={i}
+              className="flex items-start gap-2 text-sm text-foreground/85"
+            >
+              <Check
+                className="mt-0.5 size-4 shrink-0"
+                style={{ color }}
+                strokeWidth={3}
+              />
               <span>{s}</span>
             </li>
           ))}
@@ -368,7 +406,7 @@ function ResultCard({
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Button asChild variant="outline" size="default">
             <Link href={`/zodiac/tavsebadoba/${result.slug}`}>
-              ნახე სრული ანალიზი
+              {en ? "View full analysis" : "ნახე სრული ანალიზი"}
             </Link>
           </Button>
           <button
@@ -377,16 +415,30 @@ function ResultCard({
             className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/60 px-4 py-2 text-sm font-medium text-foreground/90 transition-colors hover:bg-card"
           >
             <Share2 className="size-4" />
-            გააზიარე
+            {en ? "Share" : "გააზიარე"}
           </button>
         </div>
 
         {/* The hook into the actual product */}
         <div className="mt-4 w-full rounded-2xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/8 p-5">
           <p className="text-pretty text-sm text-foreground/85">
-            ეს მხოლოდ <strong className="text-foreground">მზის ნიშანია</strong> — ზედაპირი.
-            შენი ნამდვილი თავსებადობა მთვარეებსა და ვენერებზე იწერება. Vivida ითვლის
-            სრულ ნატალურ რუკას და გაცნობს ადამიანებს, ვისთანაც მართლა ემთხვევი.
+            {en ? (
+              <>
+                This compares only your{" "}
+                <strong className="text-foreground">Sun signs</strong>—the
+                surface layer. Deeper compatibility includes the Moon, Venus,
+                Mars, houses, and cross-chart aspects. Vivida calculates the
+                complete picture.
+              </>
+            ) : (
+              <>
+                ეს მხოლოდ{" "}
+                <strong className="text-foreground">მზის ნიშანია</strong> —
+                ზედაპირი. შენი ნამდვილი თავსებადობა მთვარეებსა და ვენერებზე
+                იწერება. Vivida ითვლის სრულ ნატალურ რუკას და გაცნობს ადამიანებს,
+                ვისთანაც მართლა ემთხვევი.
+              </>
+            )}
           </p>
           <Button
             asChild
@@ -396,7 +448,7 @@ function ResultCard({
           >
             <Link href="/signup">
               <Sparkles className="size-5" />
-              შექმენი პროფილი უფასოდ
+              {en ? "Create a free profile" : "შექმენი პროფილი უფასოდ"}
             </Link>
           </Button>
         </div>
