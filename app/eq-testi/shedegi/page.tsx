@@ -5,13 +5,16 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { EqResultClient } from "@/components/eq/eq-result";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 
-export const metadata: Metadata = {
-  title: "შენი EQ შედეგი",
-  description:
-    "შენი ემოციური ინტელექტის ტესტის შედეგი — EQ ქულა და ემოციური რუკა ხუთ სფეროში.",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  return {
+    title: en ? "Your EQ Result" : "შენი EQ შედეგი",
+    description: en ? "Your emotional intelligence score and five-domain emotional profile." : "შენი ემოციური ინტელექტის ტესტის შედეგი — EQ ქულა და ემოციური რუკა ხუთ სფეროში.",
+    robots: { index: false, follow: false },
+  };
+}
 
 /**
  * EQ result page. The result is computed client-side from the answers stashed
@@ -21,9 +24,10 @@ export const metadata: Metadata = {
 export default async function EqResultPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
+  const locale = await getRequestLocale();
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_350/0.4),transparent_70%)]"
@@ -33,7 +37,7 @@ export default async function EqResultPage() {
       {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        <EqResultClient />
+        <EqResultClient locale={locale} />
       </section>
     </main>
   );

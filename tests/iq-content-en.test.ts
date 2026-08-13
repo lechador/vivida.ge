@@ -6,6 +6,16 @@ import {
   STEM_PROMPT_EN,
 } from "@/lib/iq/items";
 import { TESTS } from "@/lib/tests-catalog";
+import {
+  EQ_DOMAINS,
+  EQ_LIKERT,
+  EQ_QUESTIONS_EN,
+} from "@/lib/eq/questions";
+import {
+  EQ_BAND_META,
+  EQ_DOMAIN_INTERP_EN,
+  EQ_DOMAIN_TIP_EN,
+} from "@/lib/eq/scoring";
 
 const GEORGIAN = /[ა-ჰ]/;
 
@@ -38,5 +48,27 @@ describe("English test content", () => {
       expect(copy.every(Boolean)).toBe(true);
       expect(JSON.stringify(copy)).not.toMatch(GEORGIAN);
     }
+  });
+
+  it("provides all forty EQ statements in English without changing scoring keys", () => {
+    expect(EQ_QUESTIONS_EN).toHaveLength(40);
+    expect(EQ_QUESTIONS_EN.map((question) => question.id)).toEqual(
+      Array.from({ length: 40 }, (_, index) => index + 1),
+    );
+    for (const question of EQ_QUESTIONS_EN) {
+      expect(question.textEn).toBeTruthy();
+      expect(question.textEn).not.toMatch(GEORGIAN);
+    }
+  });
+
+  it("provides complete English EQ result copy", () => {
+    const copy = {
+      domains: EQ_DOMAINS.map(({ nameEn, taglineEn }) => ({ nameEn, taglineEn })),
+      likert: EQ_LIKERT.map(({ labelEn }) => labelEn),
+      bands: Object.values(EQ_BAND_META).map(({ labelEn, summaryEn }) => ({ labelEn, summaryEn })),
+      interpretations: EQ_DOMAIN_INTERP_EN,
+      tips: EQ_DOMAIN_TIP_EN,
+    };
+    expect(JSON.stringify(copy)).not.toMatch(GEORGIAN);
   });
 });

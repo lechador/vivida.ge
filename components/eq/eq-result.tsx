@@ -22,8 +22,9 @@ type Stored = { answers: Record<number, number>; attemptId?: string };
  * routed to the persistent /eq-testi/shedegi/[id] view (deep profile behind a
  * one-time credit unlock).
  */
-export function EqResultClient() {
+export function EqResultClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
   const router = useRouter();
+  const en = locale === "en";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
 
@@ -84,9 +85,9 @@ export function EqResultClient() {
   if (stored === "missing") {
     return (
       <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
-        <p className="text-foreground/85">ჯერ ტესტი უნდა გაიარო.</p>
+        <p className="text-foreground/85">{en ? "Take the test first to see your result." : "ჯერ ტესტი უნდა გაიარო."}</p>
         <Button asChild variant="mystic" className="mt-5">
-          <Link href="/eq-testi">ტესტის დაწყება</Link>
+          <Link href="/eq-testi">{en ? "Start the test" : "ტესტის დაწყება"}</Link>
         </Button>
       </div>
     );
@@ -116,7 +117,7 @@ export function EqResultClient() {
       {/* Score card (free) */}
       <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
         <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          შენი EQ ქულა
+          {en ? "Your EQ score" : "შენი EQ ქულა"}
         </div>
         <div className="mt-2 bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-7xl font-bold leading-none tracking-tight text-transparent sm:text-8xl">
           {result.overall}
@@ -130,10 +131,10 @@ export function EqResultClient() {
           }}
         >
           <Sparkles className="size-3.5" />
-          {bandMeta.labelKa}
+          {en ? bandMeta.labelEn : bandMeta.labelKa}
         </div>
         <p className="mx-auto mt-4 max-w-md text-pretty text-sm text-foreground/80">
-          {bandMeta.summaryKa}
+          {en ? bandMeta.summaryEn : bandMeta.summaryKa}
         </p>
       </div>
 
@@ -144,7 +145,7 @@ export function EqResultClient() {
             authed === false ? "pointer-events-none select-none blur-[7px]" : ""
           }
         >
-          <EqProfile result={result} />
+          <EqProfile result={result} locale={locale} />
         </div>
 
         {authed === false && (
@@ -154,50 +155,55 @@ export function EqResultClient() {
                 <Lock className="size-5 text-[var(--vivida-violet)]" />
               </div>
               <p className="mx-auto mt-3 max-w-xs text-pretty text-sm text-foreground/85">
-                დარეგისტრირდი უფასოდ და ნახე შენი ემოციური რუკა ხუთივე
-                სფეროში — და შეინახე შედეგი.
+                {en
+                  ? "Create a free account to save your result and explore all five areas of your emotional profile."
+                  : "დარეგისტრირდი უფასოდ და ნახე შენი ემოციური რუკა ხუთივე სფეროში — და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
-                <Link href="/signup?from=eq">უფასო რეგისტრაცია</Link>
+                <Link href="/signup?from=eq">{en ? "Create free account" : "უფასო რეგისტრაცია"}</Link>
               </Button>
             </div>
           </div>
         )}
       </div>
 
-      <EqArticleRecommendations result={result} />
+      {!en && <EqArticleRecommendations result={result} />}
 
-      <ProfileVisibilityToggle kind="eq" />
+      <ProfileVisibilityToggle kind="eq" locale={locale} />
 
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <ShareButton overall={result.overall} />
+        <ShareButton overall={result.overall} locale={locale} />
         <Button type="button" variant="outline" onClick={retake} className="gap-1.5">
           <RotateCcw className="size-4" />
-          თავიდან გავლა
+          {en ? "Retake" : "თავიდან გავლა"}
         </Button>
         <Button asChild variant="ghost">
-          <Link href="/tests">სხვა ტესტები</Link>
+          <Link href="/tests">{en ? "Other tests" : "სხვა ტესტები"}</Link>
         </Button>
       </div>
 
-      <NextTestWidget completed="eq" />
+      <NextTestWidget completed="eq" locale={locale} />
 
       <p className="mx-auto max-w-lg text-center text-xs leading-relaxed text-muted-foreground">
-        ეს არის თვითშეფასების ტესტი — ის ასახავს იმას, როგორ აღიქვამ საკუთარ
-        ემოციურ უნარებს. ეს არ არის კლინიკური დიაგნოზი.
+        {en
+          ? "This is a self-report assessment and reflects how you perceive your own emotional skills. It is not a clinical diagnosis."
+          : "ეს არის თვითშეფასების ტესტი — ის ასახავს იმას, როგორ აღიქვამ საკუთარ ემოციურ უნარებს. ეს არ არის კლინიკური დიაგნოზი."}
       </p>
     </div>
   );
 }
 
-function ShareButton({ overall }: { overall: number }) {
+function ShareButton({ overall, locale }: { overall: number; locale: "ka" | "en" }) {
+  const en = locale === "en";
   const [copied, setCopied] = useState(false);
   async function share() {
-    const url = "https://www.vivida.ge/eq-testi";
-    const text = `ჩემი ემოციური ინტელექტი (EQ) Vivida-ზე: ${overall} 💗 შენ რას მიიღებ?`;
+    const url = en ? "https://www.vividaastro.com/eq-testi" : "https://www.vivida.ge/eq-testi";
+    const text = en
+      ? `My emotional intelligence score on Vivida: ${overall} 💗 What will you get?`
+      : `ჩემი ემოციური ინტელექტი (EQ) Vivida-ზე: ${overall} 💗 შენ რას მიიღებ?`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: "Vivida EQ ტესტი", text, url });
+        await navigator.share({ title: en ? "Vivida EQ Test" : "Vivida EQ ტესტი", text, url });
         return;
       } catch {
         /* cancelled */
@@ -214,7 +220,7 @@ function ShareButton({ overall }: { overall: number }) {
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-1.5">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? "დაკოპირდა" : "გააზიარე"}
+      {copied ? (en ? "Copied" : "დაკოპირდა") : en ? "Share" : "გააზიარე"}
     </Button>
   );
 }

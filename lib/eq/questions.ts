@@ -27,7 +27,9 @@ export type EqDomainKey =
 export type EqDomain = {
   key: EqDomainKey;
   nameKa: string;
+  nameEn: string;
   taglineKa: string;
+  taglineEn: string;
   /** Fallback glyph + radar/accent hue (oklch) — 5 distinct hues. */
   glyph: string;
   hue: string;
@@ -38,52 +40,63 @@ export type EqQuestion = {
   id: number;
   domain: EqDomainKey;
   textKa: string;
+  textEn?: string;
   /** Reverse-keyed: disagreement indicates higher EQ (scored 6 - raw). */
   reverse: boolean;
 };
 
 /** 5-point agreement scale (value → Georgian label). */
-export const EQ_LIKERT: { value: number; labelKa: string }[] = [
-  { value: 1, labelKa: "სრულიად არ ვეთანხმები" },
-  { value: 2, labelKa: "არ ვეთანხმები" },
-  { value: 3, labelKa: "ნეიტრალურად" },
-  { value: 4, labelKa: "ვეთანხმები" },
-  { value: 5, labelKa: "სრულიად ვეთანხმები" },
+export const EQ_LIKERT: { value: number; labelKa: string; labelEn: string }[] = [
+  { value: 1, labelKa: "სრულიად არ ვეთანხმები", labelEn: "Strongly disagree" },
+  { value: 2, labelKa: "არ ვეთანხმები", labelEn: "Disagree" },
+  { value: 3, labelKa: "ნეიტრალურად", labelEn: "Neither agree nor disagree" },
+  { value: 4, labelKa: "ვეთანხმები", labelEn: "Agree" },
+  { value: 5, labelKa: "სრულიად ვეთანხმები", labelEn: "Strongly agree" },
 ];
 
 export const EQ_DOMAINS: EqDomain[] = [
   {
     key: "self-awareness",
     nameKa: "თვითშემეცნება",
+    nameEn: "Self-awareness",
     taglineKa: "საკუთარი ემოციების ამოცნობა და გაცნობიერება",
+    taglineEn: "Recognizing and understanding your emotions",
     glyph: "🪞",
     hue: "oklch(0.78 0.18 305)",
   },
   {
     key: "self-regulation",
     nameKa: "თვითრეგულაცია",
+    nameEn: "Self-regulation",
     taglineKa: "ემოციების მართვა და იმპულსების კონტროლი",
+    taglineEn: "Managing emotions and controlling impulses",
     glyph: "⚓",
     hue: "oklch(0.80 0.15 200)",
   },
   {
     key: "motivation",
     nameKa: "მოტივაცია",
+    nameEn: "Motivation",
     taglineKa: "შინაგანი ბიძგი, ოპტიმიზმი და მიზანდასახულობა",
+    taglineEn: "Inner drive, optimism and persistence",
     glyph: "🔥",
     hue: "oklch(0.82 0.16 85)",
   },
   {
     key: "empathy",
     nameKa: "ემპათია",
+    nameEn: "Empathy",
     taglineKa: "სხვისი ემოციების აღქმა და გაგება",
+    taglineEn: "Recognizing and understanding others' emotions",
     glyph: "💗",
     hue: "oklch(0.75 0.20 350)",
   },
   {
     key: "social-skills",
     nameKa: "სოციალური უნარები",
+    nameEn: "Social skills",
     taglineKa: "ურთიერთობების აგება და მართვა",
+    taglineEn: "Building and navigating relationships",
     glyph: "🤝",
     hue: "oklch(0.78 0.16 160)",
   },
@@ -144,6 +157,54 @@ export const EQ_QUESTIONS: EqQuestion[] = [
   { id: 39, domain: "social-skills", reverse: true, textKa: "ჯგუფურ გარემოში ხშირად უხერხულად ვგრძნობ თავს." },
   { id: 40, domain: "social-skills", reverse: false, textKa: "სხვების დარწმუნება შემიძლია იმის გაგებით, რაც მათთვის მნიშვნელოვანია." },
 ];
+
+const EQ_QUESTION_TEXT_EN: Record<number, string> = {
+  1: "I can usually name exactly what I am feeling and why.",
+  2: "I notice changes in my mood before they fully take over.",
+  3: "I understand how my emotions affect the people around me.",
+  4: "My own emotional reactions often surprise me.",
+  5: "I know which situations tend to trigger strong emotions in me.",
+  6: "I can distinguish between similar feelings, such as anxiety and excitement.",
+  7: "I rarely pause to consider why I feel the way I do.",
+  8: "I have a realistic view of my emotional strengths and limitations.",
+  9: "When I become upset, I can calm myself before reacting.",
+  10: "I remain composed under pressure.",
+  11: "When I am angry, I often say things that I later regret.",
+  12: "I recover from a bad mood relatively quickly.",
+  13: "I adapt my behavior when a situation calls for it.",
+  14: "When something annoys me, it can spoil my entire day.",
+  15: "I think before acting, even when my emotions are intense.",
+  16: "I can resist an impulse when acting on it would be poorly timed.",
+  17: "I remain hopeful even when things are going badly.",
+  18: "I keep working toward a goal despite setbacks.",
+  19: "When I fail at something, I tend to give up.",
+  20: "I can use my emotions as energy to move forward.",
+  21: "I find ways to stay motivated even during boring tasks.",
+  22: "I regain momentum quickly after disappointment.",
+  23: "I lose interest as soon as something becomes difficult.",
+  24: "I set goals for myself and pursue them with energy.",
+  25: "I can usually sense how someone feels even when they do not say it.",
+  26: "I quickly pick up on the overall mood in a room.",
+  27: "I try to see situations from other people's perspectives.",
+  28: "I find it difficult to notice when someone is upset.",
+  29: "People often come to me when they need to feel understood.",
+  30: "I notice small changes in a person's tone or facial expression.",
+  31: "I rarely consider how my actions may affect other people.",
+  32: "I can feel what a friend is going through when they share something painful.",
+  33: "I connect easily with new people.",
+  34: "I can help calm a tense situation between people.",
+  35: "I can express what I need without needlessly hurting someone else.",
+  36: "I find it difficult to start and sustain a conversation.",
+  37: "I handle disagreements without damaging the relationship.",
+  38: "People generally find it easy to talk with me.",
+  39: "I often feel awkward in group settings.",
+  40: "I can persuade people by understanding what matters to them.",
+};
+
+export const EQ_QUESTIONS_EN: EqQuestion[] = EQ_QUESTIONS.map((question) => ({
+  ...question,
+  textEn: EQ_QUESTION_TEXT_EN[question.id],
+}));
 
 export const EQ_QUESTION_COUNT = EQ_QUESTIONS.length;
 

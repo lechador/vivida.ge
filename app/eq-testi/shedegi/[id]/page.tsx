@@ -16,8 +16,12 @@ import { NextTestWidget } from "@/components/tests/next-test-widget";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 import { EqArticleRecommendations } from "@/components/eq/eq-article-recommendations";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 
-export const metadata = { title: "შენი EQ შედეგი", robots: { index: false } };
+export async function generateMetadata() {
+  const en = (await getRequestLocale()) === "en";
+  return { title: en ? "Your EQ Result" : "შენი EQ შედეგი", robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
 /**
@@ -34,6 +38,8 @@ export default async function SavedEqResultPage({
 }) {
   const { id } = await params;
   const user = await requireUser();
+  const locale = await getRequestLocale();
+  const en = locale === "en";
 
   const [row] = await db
     .select()
@@ -51,7 +57,7 @@ export default async function SavedEqResultPage({
   ]);
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_350/0.4),transparent_70%)]"
@@ -73,17 +79,17 @@ export default async function SavedEqResultPage({
             style={{ color: bandMeta.hue }}
           >
             <Sparkles className="size-4" />
-            {bandMeta.labelKa}
+            {en ? bandMeta.labelEn : bandMeta.labelKa}
           </div>
           <p className="mx-auto mt-2 max-w-md text-sm text-foreground/75">
-            {bandMeta.summaryKa}
+            {en ? bandMeta.summaryEn : bandMeta.summaryKa}
           </p>
         </div>
 
         {/* Deep 5-domain profile — gated behind a one-time credit unlock */}
         {unlocked ? (
           <div className="mt-4">
-            <EqProfile result={result} />
+            <EqProfile result={result} locale={locale} />
           </div>
         ) : (
           <div className="mt-4">
@@ -92,25 +98,24 @@ export default async function SavedEqResultPage({
               resultId={row.id}
               cost={CREDIT_COST.eqTest}
               balance={balance}
-              title="ემოციური რუკის გახსნა"
-              blurb="ნახე შენი პროფილი ხუთ სფეროში — თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები, თითოეულის ანალიზითა და რჩევებით. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+              title={en ? "Unlock your emotional profile" : "ემოციური რუკის გახსნა"}
+              blurb={en ? "Explore all five areas—self-awareness, self-regulation, motivation, empathy and social skills—with interpretations and practical suggestions. Pay once and keep the result." : "ნახე შენი პროფილი ხუთ სფეროში — თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები, თითოეულის ანალიზითა და რჩევებით. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."}
+              locale={locale}
             />
           </div>
         )}
 
-        <div className="mt-4">
-          <EqArticleRecommendations result={result} />
-        </div>
+        {!en && <div className="mt-4"><EqArticleRecommendations result={result} /></div>}
 
-        {unlocked && <ProfileVisibilityToggle kind="eq" />}
+        {unlocked && <ProfileVisibilityToggle kind="eq" locale={locale} />}
 
-        <NextTestWidget completed="eq" />
+        <NextTestWidget completed="eq" locale={locale} />
 
         <div className="mt-6 flex justify-center">
           <Button asChild variant="outline">
             <Link href="/eq-testi">
               <RotateCcw className="size-4" />
-              ტესტის თავიდან გავლა
+              {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
             </Link>
           </Button>
         </div>

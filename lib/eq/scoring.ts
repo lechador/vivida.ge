@@ -23,7 +23,9 @@ export type EqBand = "developing" | "moderate" | "strong" | "exceptional";
 export type EqDomainScore = {
   key: EqDomainKey;
   nameKa: string;
+  nameEn: string;
   taglineKa: string;
+  taglineEn: string;
   glyph: string;
   hue: string;
   /** 0–100. */
@@ -54,31 +56,39 @@ export function eqBandKey(score: number): EqBand {
 
 export const EQ_BAND_META: Record<
   EqBand,
-  { labelKa: string; hue: string; summaryKa: string }
+  { labelKa: string; labelEn: string; hue: string; summaryKa: string; summaryEn: string }
 > = {
   developing: {
     labelKa: "განვითარებადი",
+    labelEn: "Developing",
     hue: "oklch(0.72 0.20 15)",
     summaryKa:
       "შენი ემოციური ინტელექტი განვითარების ეტაპზეა — ეს კუნთივით ვარჯიშდება და იზრდება. მცირე ყოველდღიური დაკვირვება დიდ ცვლილებას მოიტანს.",
+    summaryEn: "Your emotional skills have meaningful room to grow. Like a muscle, they respond to deliberate, repeated practice.",
   },
   moderate: {
     labelKa: "საშუალო",
+    labelEn: "Moderate",
     hue: "oklch(0.82 0.16 85)",
     summaryKa:
       "მყარი საფუძველი გაქვს — ზოგ სფეროში ბუნებრივად ძლიერი ხარ, ზოგში კი წინსვლის კარგი სივრცე რჩება.",
+    summaryEn: "You have a solid foundation, with natural strengths in some areas and clear opportunities to develop others.",
   },
   strong: {
     labelKa: "მაღალი",
+    labelEn: "Strong",
     hue: "oklch(0.80 0.15 200)",
     summaryKa:
       "მაღალი ემოციური ინტელექტი — კარგად აღიქვამ და მართავ ემოციებს, საკუთარსაც და სხვისასაც. ეს რეალური უპირატესობაა ურთიერთობებში.",
+    summaryEn: "You report strong emotional skills and generally navigate both your own feelings and other people's emotions effectively.",
   },
   exceptional: {
     labelKa: "გამორჩეული",
+    labelEn: "Exceptional",
     hue: "oklch(0.78 0.18 305)",
     summaryKa:
       "გამორჩეულად მაღალი ემოციური ინტელექტი — იშვიათი და ძვირფასი უნარი, რომელიც ლიდერობასა და ღრმა კავშირებში ბრწყინავს.",
+    summaryEn: "You report exceptionally developed emotional skills that can support leadership, resilience and deep relationships.",
   },
 };
 
@@ -128,6 +138,39 @@ export const EQ_DOMAIN_INTERP: Record<EqDomainKey, Record<EqBand, string>> = {
   },
 };
 
+export const EQ_DOMAIN_INTERP_EN: Record<EqDomainKey, Record<EqBand, string>> = {
+  "self-awareness": {
+    developing: "Recognizing emotions in real time may be difficult. Pause and ask yourself, “What am I feeling, and what changed?”",
+    moderate: "You often understand what you feel, although some emotions can still pass unnoticed until they become intense.",
+    strong: "You usually recognize your emotions and understand what triggered them.",
+    exceptional: "You report unusually clear insight into your inner experience, which supports every other emotional skill.",
+  },
+  "self-regulation": {
+    developing: "Strong emotions may frequently direct your behavior. A deliberate pause can help turn reaction into choice.",
+    moderate: "You generally regulate yourself well, although intense stress can sometimes overwhelm your usual strategies.",
+    strong: "You tend to maintain composure and make considered choices even under pressure.",
+    exceptional: "You report exceptional control of impulses and difficult feelings without suppressing what those feelings communicate.",
+  },
+  motivation: {
+    developing: "Maintaining momentum after a setback may be difficult. Smaller, reachable goals can help rebuild confidence.",
+    moderate: "You pursue your goals, although motivation can fluctuate when progress is slow or repetitive.",
+    strong: "You generally move forward with optimism and persistence despite obstacles.",
+    exceptional: "You report a powerful inner drive and an ability to turn setbacks into renewed energy.",
+  },
+  empathy: {
+    developing: "Reading other people's emotions may require more conscious attention to tone, expression and context.",
+    moderate: "You often sense how others feel, though subtle or unfamiliar signals may occasionally be missed.",
+    strong: "You tend to recognize and understand other people's emotions accurately.",
+    exceptional: "You report deep sensitivity to others' experiences, and people may naturally feel understood around you.",
+  },
+  "social-skills": {
+    developing: "New or tense social situations may feel uncomfortable. Small, repeated acts of connection can build confidence.",
+    moderate: "You generally relate well to people, while conflict or unfamiliar groups can still be challenging.",
+    strong: "You tend to build rapport easily and navigate disagreement constructively.",
+    exceptional: "You report a natural ability to connect people, communicate needs and guide relationships through tension.",
+  },
+};
+
 /** Sum of a domain's items (reverse-keyed applied), normalised to 0–100. */
 function domainScore(domain: EqDomainKey, answers: Record<number, number>): number {
   const items = EQ_QUESTIONS.filter((q) => q.domain === domain);
@@ -147,7 +190,9 @@ export function calculateEq(answers: Record<number, number>): EqResult {
     return {
       key: d.key,
       nameKa: d.nameKa,
+      nameEn: d.nameEn,
       taglineKa: d.taglineKa,
+      taglineEn: d.taglineEn,
       glyph: d.glyph,
       hue: d.hue,
       score,
@@ -188,6 +233,14 @@ export const EQ_DOMAIN_TIP: Record<EqDomainKey, string> = {
     "საუბრისას ერთი წუთით მხოლოდ მოსმენაზე გადართე ყურადღება — არა პასუხის მოფიქრებაზე — და დააკვირდი ტონსა და სახეს.",
   "social-skills":
     "უთანხმოებისას ჯერ მეორე მხარის პოზიცია გაიმეორე შენი სიტყვებით — ეს დაძაბულობას ხსნის და ნდობას აჩენს.",
+};
+
+export const EQ_DOMAIN_TIP_EN: Record<EqDomainKey, string> = {
+  "self-awareness": "Once a day, write one sentence naming an emotion and what prompted it. After a week, look for recurring patterns.",
+  "self-regulation": "When emotion spikes, count slowly to six and exhale before responding. The pause gives your values time to catch up.",
+  motivation: "Break one large goal into a step you can finish today. Visible progress creates energy for the next step.",
+  empathy: "During one conversation, listen for a full minute without planning your reply. Notice tone, pace and expression.",
+  "social-skills": "During disagreement, restate the other person's position in your own words before explaining yours.",
 };
 
 /** Short headline built from the standout domain. */
