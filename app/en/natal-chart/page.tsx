@@ -3,10 +3,10 @@ import Link from "next/link";
 
 import { EnglishGuide } from "@/components/en/english-guide";
 import { GeorgianContentNote } from "@/components/en/georgian-content-note";
-import { localizedAlternates, SITE_URL } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const PATH = "/en/natal-chart";
-const URL = `${SITE_URL}${PATH}`;
+const URL = `${ENGLISH_SITE_URL}/natal-chart`;
 const TITLE = "What Is a Natal Chart? A Beginner's Birth Chart Guide";
 const DESCRIPTION = "Learn what a natal chart shows, why birth time matters, and how planets, zodiac signs, houses and aspects combine in a birth chart.";
 
@@ -65,7 +65,7 @@ export default function EnglishNatalChartPage() {
         </div>
       </section>
 
-      <p className="text-sm text-muted-foreground">Continue with the <Link href="/en/zodiac" className="text-[var(--vivida-cyan)] hover:underline">English zodiac guide</Link> or learn how a <Link href="/en/horoscope" className="text-[var(--vivida-cyan)] hover:underline">horoscope differs from a birth chart</Link>.</p>
+      <p className="text-sm text-muted-foreground">Continue with the <Link href="/zodiac" className="text-[var(--vivida-cyan)] hover:underline">English zodiac guide</Link> or learn how a <Link href="/horoscope" className="text-[var(--vivida-cyan)] hover:underline">horoscope differs from a birth chart</Link>.</p>
     </EnglishGuide>
   );
 }

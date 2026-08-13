@@ -1,17 +1,28 @@
 import type { Metadata } from "next";
 
-export const SITE_URL = "https://www.vivida.ge";
+export const GEORGIAN_SITE_URL = "https://www.vivida.ge";
+export const ENGLISH_SITE_URL = "https://www.vividaastro.com";
+
+export const GEORGIAN_HOSTS = ["vivida.ge", "www.vivida.ge"] as const;
+export const ENGLISH_HOSTS = [
+  "vividaastro.com",
+  "www.vividaastro.com",
+] as const;
 
 export type CoreEnglishPath =
+  | "/"
+  | "/about"
+  | "/natal-chart"
+  | "/horoscope"
+  | "/zodiac"
+  | "/compatibility"
+  | "/tests"
+  | "/privacy"
+  | "/terms";
+
+export type CoreEnglishInternalPath =
   | "/en"
-  | "/en/about"
-  | "/en/natal-chart"
-  | "/en/horoscope"
-  | "/en/zodiac"
-  | "/en/compatibility"
-  | "/en/tests"
-  | "/en/privacy"
-  | "/en/terms";
+  | `/en${Exclude<CoreEnglishPath, "/">}`;
 
 /**
  * Explicit pairs keep hreflang honest: only pages with a real English version
@@ -20,31 +31,67 @@ export type CoreEnglishPath =
 export const CORE_LANGUAGE_PAIRS: ReadonlyArray<{
   ka: string;
   en: CoreEnglishPath;
+  internalEn: CoreEnglishInternalPath;
 }> = [
-  { ka: "/", en: "/en" },
-  { ka: "/nataluri-ruka", en: "/en/natal-chart" },
-  { ka: "/horoskopi", en: "/en/horoscope" },
-  { ka: "/zodiac", en: "/en/zodiac" },
-  { ka: "/zodiac/tavsebadoba", en: "/en/compatibility" },
-  { ka: "/tests", en: "/en/tests" },
-  { ka: "/privacy", en: "/en/privacy" },
-  { ka: "/terms", en: "/en/terms" },
+  { ka: "/", en: "/", internalEn: "/en" },
+  { ka: "/nataluri-ruka", en: "/natal-chart", internalEn: "/en/natal-chart" },
+  { ka: "/horoskopi", en: "/horoscope", internalEn: "/en/horoscope" },
+  { ka: "/zodiac", en: "/zodiac", internalEn: "/en/zodiac" },
+  { ka: "/zodiac/tavsebadoba", en: "/compatibility", internalEn: "/en/compatibility" },
+  { ka: "/tests", en: "/tests", internalEn: "/en/tests" },
+  { ka: "/privacy", en: "/privacy", internalEn: "/en/privacy" },
+  { ka: "/terms", en: "/terms", internalEn: "/en/terms" },
 ];
+
+export const ENGLISH_ONLY_ROUTES: ReadonlyArray<{
+  en: CoreEnglishPath;
+  internalEn: CoreEnglishInternalPath;
+}> = [{ en: "/about", internalEn: "/en/about" }];
+
+export const ENGLISH_PUBLIC_ROUTES: ReadonlyArray<{
+  en: CoreEnglishPath;
+  internalEn: CoreEnglishInternalPath;
+}> = [
+  ...CORE_LANGUAGE_PAIRS.map(({ en, internalEn }) => ({ en, internalEn })),
+  ...ENGLISH_ONLY_ROUTES,
+];
+
+export function publicEnglishPath(path: string): string {
+  if (path === "/en" || path === "/en/") return "/";
+  return path.startsWith("/en/") ? path.slice(3) : path;
+}
+
+export function isEnglishHost(host: string | null | undefined): boolean {
+  const normalized = host?.toLowerCase().split(":", 1)[0];
+  return ENGLISH_HOSTS.some((candidate) => candidate === normalized);
+}
+
+export function siteOriginForHost(host: string | null | undefined): string {
+  return isEnglishHost(host) ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+}
 
 export function localizedAlternates(
   canonicalPath: string,
   pairedPath: string,
   locale: "ka" | "en",
 ): NonNullable<Metadata["alternates"]> {
-  const kaPath = locale === "ka" ? canonicalPath : pairedPath;
-  const enPath = locale === "en" ? canonicalPath : pairedPath;
+  const kaPath = locale === "ka" ? canonicalPath || "/" : pairedPath;
+  const enPath = publicEnglishPath(
+    locale === "en" ? canonicalPath : pairedPath,
+  );
+  const canonical =
+    locale === "en"
+      ? `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`
+      : `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
+  const englishUrl = `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
+  const georgianUrl = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
 
   return {
-    canonical: `${SITE_URL}${canonicalPath}`,
+    canonical,
     languages: {
-      "ka-GE": `${SITE_URL}${kaPath}`,
-      en: `${SITE_URL}${enPath}`,
-      "x-default": `${SITE_URL}${kaPath}`,
+      "ka-GE": georgianUrl,
+      en: englishUrl,
+      "x-default": englishUrl,
     },
   };
 }

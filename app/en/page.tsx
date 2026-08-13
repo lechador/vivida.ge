@@ -3,9 +3,9 @@ import Link from "next/link";
 import { ArrowRight, Compass, Heart, Languages, Orbit, Sparkles } from "lucide-react";
 
 import { EnglishShell } from "@/components/en/english-shell";
-import { localizedAlternates, SITE_URL } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
-const URL = `${SITE_URL}/en`;
+const URL = ENGLISH_SITE_URL;
 const TITLE = "Natal Charts, Horoscopes and Zodiac Guides — Vivida";
 const DESCRIPTION =
   "Understand your natal chart, zodiac signs and compatibility through clear English astrology guides. Vivida combines astronomical chart data with practical self-reflection tools.";
@@ -19,10 +19,10 @@ export const metadata: Metadata = {
 };
 
 const GUIDES = [
-  { href: "/en/natal-chart", icon: Orbit, title: "Natal chart", text: "Learn what a birth chart contains and how planets, signs, houses and aspects work together." },
-  { href: "/en/horoscope", icon: Sparkles, title: "Horoscope", text: "Understand how daily forecasts are created from current planetary movements." },
-  { href: "/en/zodiac", icon: Compass, title: "Zodiac signs", text: "Explore the twelve signs, their elements, modalities and traditional ruling planets." },
-  { href: "/en/compatibility", icon: Heart, title: "Compatibility", text: "See why meaningful compatibility considers more than two Sun signs." },
+  { href: "/natal-chart", icon: Orbit, title: "Natal chart", text: "Learn what a birth chart contains and how planets, signs, houses and aspects work together." },
+  { href: "/horoscope", icon: Sparkles, title: "Horoscope", text: "Understand how daily forecasts are created from current planetary movements." },
+  { href: "/zodiac", icon: Compass, title: "Zodiac signs", text: "Explore the twelve signs, their elements, modalities and traditional ruling planets." },
+  { href: "/compatibility", icon: Heart, title: "Compatibility", text: "See why meaningful compatibility considers more than two Sun signs." },
 ];
 
 const FAQ = [
@@ -54,10 +54,10 @@ export default function EnglishHomePage() {
           Explore the structure of your natal chart, the twelve zodiac signs, planetary cycles and relationship patterns through clear, practical English guides.
         </p>
         <div className="mt-9 flex flex-wrap justify-center gap-3">
-          <Link href="/en/natal-chart" className="inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-950/30">
+          <Link href="/natal-chart" className="inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-950/30">
             Start with your natal chart <ArrowRight className="size-4" />
           </Link>
-          <Link href="/en/zodiac" className="inline-flex items-center gap-2 rounded-xl border border-border bg-card/60 px-5 py-3 text-sm font-semibold hover:bg-card">
+          <Link href="/zodiac" className="inline-flex items-center gap-2 rounded-xl border border-border bg-card/60 px-5 py-3 text-sm font-semibold hover:bg-card">
             Explore zodiac signs
           </Link>
         </div>

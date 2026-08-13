@@ -9,7 +9,7 @@ export const metadata = {
   alternates: localizedAlternates("/terms", "/en/terms", "ka"),
 };
 
-const LAST_UPDATED = "2026-08-07";
+const LAST_UPDATED = "2026-08-13";
 
 export default function TermsPage() {
   return (
@@ -38,7 +38,7 @@ export default function TermsPage() {
               1. ხელშეკრულების მიღება
             </h2>
             <p className="mt-2 leading-relaxed">
-              Vivida-ს ვებ-აპლიკაციის (vivida.ge) გამოყენებით თქვენ
+              Vivida-ს ვებ-აპლიკაციის (vivida.ge ან vividaastro.com) გამოყენებით თქვენ
               ეთანხმებით წინამდებარე წესებსა და პირობებს. თუ არ ეთანხმებით,
               გთხოვთ არ ისარგებლოთ სერვისით.
             </p>

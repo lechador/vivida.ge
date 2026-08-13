@@ -4,7 +4,7 @@ import Link from "next/link";
 import { EnglishGuide } from "@/components/en/english-guide";
 import { GeorgianContentNote } from "@/components/en/georgian-content-note";
 import { SIGNS } from "@/lib/zodiac";
-import { localizedAlternates, SITE_URL } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const PATH = "/en/horoscope";
 const TITLE = "How Daily Horoscopes Work — Vivida";
@@ -13,7 +13,7 @@ const DESCRIPTION = "Learn how daily, weekly and monthly horoscopes use current 
 export const metadata: Metadata = {
   title: { absolute: TITLE }, description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/horoskopi", "en"),
-  openGraph: { title: TITLE, description: DESCRIPTION, url: `${SITE_URL}${PATH}`, locale: "en_US", alternateLocale: ["ka_GE"] },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/horoscope`, locale: "en_US", alternateLocale: ["ka_GE"] },
 };
 
 export default function EnglishHoroscopePage() {
@@ -38,7 +38,7 @@ export default function EnglishHoroscopePage() {
         <p>Vivida’s generated daily interpretations remain Georgian in this release. Choose a sign below to open its current reading:</p>
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {SIGNS.map((sign) => (
-            <Link key={sign.key} href={`/zodiac/${sign.key}/dghes`} hrefLang="ka-GE" className="flex items-center gap-3 rounded-2xl border border-border bg-card/50 p-4 hover:border-[var(--vivida-violet)]/45 hover:bg-card">
+            <Link key={sign.key} href={`${GEORGIAN_SITE_URL}/zodiac/${sign.key}/dghes`} hrefLang="ka-GE" className="flex items-center gap-3 rounded-2xl border border-border bg-card/50 p-4 hover:border-[var(--vivida-violet)]/45 hover:bg-card">
               <span className="text-2xl text-[var(--vivida-violet)]">{sign.symbol}</span>
               <span><strong className="block text-sm text-foreground">{sign.labelEn}</strong><span className="text-xs text-muted-foreground">Georgian reading</span></span>
             </Link>

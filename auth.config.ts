@@ -9,6 +9,9 @@ import Google from "next-auth/providers/google";
  * Node runtime route handler.
  */
 export const authConfig = {
+  // Vercel supplies a trusted Host header. Keeping Auth.js request-aware is
+  // required because the same deployment serves vivida.ge and vividaastro.com.
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/",

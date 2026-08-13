@@ -47,8 +47,8 @@ export function isEmailConfigured(): boolean {
  * Build an absolute URL inside an email. Relative paths break in some
  * mail clients, so every link must include scheme + host.
  */
-function absUrl(path: string): string {
-  return `${ORIGIN.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+function absUrl(path: string, origin: string = ORIGIN): string {
+  return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 /**
@@ -61,15 +61,18 @@ export async function sendVerificationEmail({
   name,
   token,
   code,
+  origin,
 }: {
   to: string;
   name: string | null;
   token: string;
   /** 6-digit OTP shown alongside the link so users can type it instead. */
   code?: string | null;
+  /** Recognized request origin; lets one deployment serve both brand domains. */
+  origin?: string;
 }): Promise<void> {
   const c = client();
-  const verifyUrl = absUrl(`/api/auth/verify-email?token=${token}`);
+  const verifyUrl = absUrl(`/api/auth/verify-email?token=${token}`, origin);
   if (!c) {
     console.warn(
       "[email] RESEND_API_KEY missing — would have sent verification to",
@@ -98,13 +101,15 @@ export async function sendPasswordResetEmail({
   to,
   name,
   token,
+  origin,
 }: {
   to: string;
   name: string | null;
   token: string;
+  origin?: string;
 }): Promise<void> {
   const c = client();
-  const resetUrl = absUrl(`/reset-password?token=${token}`);
+  const resetUrl = absUrl(`/reset-password?token=${token}`, origin);
   if (!c) {
     console.warn(
       "[email] RESEND_API_KEY missing — would have sent reset to",

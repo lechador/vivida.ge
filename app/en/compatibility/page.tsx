@@ -4,7 +4,7 @@ import { ArrowRight, Heart } from "lucide-react";
 
 import { EnglishGuide } from "@/components/en/english-guide";
 import { GeorgianContentNote } from "@/components/en/georgian-content-note";
-import { localizedAlternates, SITE_URL } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const PATH = "/en/compatibility";
 const TITLE = "Astrology Compatibility Beyond Sun Signs";
@@ -13,7 +13,7 @@ const DESCRIPTION = "Learn how synastry compares two natal charts through the Su
 export const metadata: Metadata = {
   title: { absolute: `${TITLE} — Vivida` }, description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/zodiac/tavsebadoba", "en"),
-  openGraph: { title: TITLE, description: DESCRIPTION, url: `${SITE_URL}${PATH}`, locale: "en_US", alternateLocale: ["ka_GE"] },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/compatibility`, locale: "en_US", alternateLocale: ["ka_GE"] },
 };
 
 export default function EnglishCompatibilityPage() {
@@ -43,7 +43,7 @@ export default function EnglishCompatibilityPage() {
         <Heart className="mx-auto size-7 text-[var(--vivida-pink)]" />
         <h2 className="mt-3">Try the free Sun-sign calculator</h2>
         <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">The tool and its interpretations currently remain Georgian. Your zodiac sign names and result will be displayed in Georgian.</p>
-        <Link href="/zodiac/tavsebadoba" hrefLang="ka-GE" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-3 text-sm font-semibold text-white">Open calculator <ArrowRight className="size-4" /></Link>
+        <Link href={`${GEORGIAN_SITE_URL}/zodiac/tavsebadoba`} hrefLang="ka-GE" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-3 text-sm font-semibold text-white">Open calculator <ArrowRight className="size-4" /></Link>
       </div>
     </EnglishGuide>
   );

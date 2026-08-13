@@ -1,11 +1,19 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
+
+import { siteOriginForHost } from "@/lib/seo/locales";
 
 /**
  * robots.txt — allow all public pages, block authed app surfaces and any
  * API routes from being indexed (they only return JSON or auth-required
  * HTML, both useless to search engines and noisy in results).
  */
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const requestHeaders = await headers();
+  const host =
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  const origin = siteOriginForHost(host);
+
   return {
     rules: [
       {
@@ -23,7 +31,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://www.vivida.ge/sitemap.xml",
-    host: "https://www.vivida.ge",
+    sitemap: `${origin}/sitemap.xml`,
+    host: origin,
   };
 }

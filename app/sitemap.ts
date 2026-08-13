@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 
 import {
   ALL_ELEMENT_SLUGS,
@@ -22,7 +23,12 @@ import {
 } from "@/lib/seo/thematic-horoscope";
 import { calendarWindow } from "@/lib/seo/astrology-calendar";
 import { ECLIPSES, moonEvents } from "@/lib/seo/moon-events";
-import { CORE_LANGUAGE_PAIRS } from "@/lib/seo/locales";
+import {
+  CORE_LANGUAGE_PAIRS,
+  ENGLISH_SITE_URL,
+  GEORGIAN_SITE_URL,
+  isEnglishHost,
+} from "@/lib/seo/locales";
 import { HOUSE_NUMBERS, PLANET_SLUGS } from "@/lib/seo/astrology-guides";
 import { ALL_DREAM_SLUGS } from "@/lib/seo/dreams";
 import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
@@ -34,7 +40,7 @@ import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
  * benefit from inclusion but require enumerating the profiles table at
  * build time; punting that to a follow-up dynamic sitemap if SEO needs it.
  */
-const BASE = "https://www.vivida.ge";
+const BASE = GEORGIAN_SITE_URL;
 
 /**
  * lastModified strategy: only pages whose CONTENT actually changes with time
@@ -73,7 +79,46 @@ const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
   nextMonth: 0.75,
 };
 
-export default function sitemap(): MetadataRoute.Sitemap {
+function englishSitemap(): MetadataRoute.Sitemap {
+  return [
+    ...CORE_LANGUAGE_PAIRS.map((pair) => {
+      const englishUrl = `${ENGLISH_SITE_URL}${pair.en === "/" ? "" : pair.en}`;
+      const georgianUrl = `${GEORGIAN_SITE_URL}${pair.ka === "/" ? "" : pair.ka}`;
+      return {
+        url: englishUrl,
+        lastModified: ENGLISH_PUBLISHED,
+        changeFrequency: "monthly" as const,
+        priority: pair.en === "/" ? 0.9 : 0.7,
+        alternates: {
+          languages: {
+            "ka-GE": georgianUrl,
+            en: englishUrl,
+            "x-default": englishUrl,
+          },
+        },
+      };
+    }),
+    {
+      url: `${ENGLISH_SITE_URL}/about`,
+      lastModified: ENGLISH_PUBLISHED,
+      changeFrequency: "yearly" as const,
+      priority: 0.5,
+      alternates: {
+        languages: {
+          en: `${ENGLISH_SITE_URL}/about`,
+          "x-default": `${ENGLISH_SITE_URL}/about`,
+        },
+      },
+    },
+  ];
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const requestHeaders = await headers();
+  const host =
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  if (isEnglishHost(host)) return englishSitemap();
+
   const zodiacSignPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
     url: `${BASE}/zodiac/${slug}`,
     lastModified: EVERGREEN,
@@ -552,35 +597,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       alternates: {
         languages: {
           "ka-GE": `${BASE}${pair.ka}`,
-          en: `${BASE}${pair.en}`,
-          "x-default": `${BASE}${pair.ka}`,
+          en: `${ENGLISH_SITE_URL}${pair.en === "/" ? "" : pair.en}`,
+          "x-default": `${ENGLISH_SITE_URL}${pair.en === "/" ? "" : pair.en}`,
         },
       },
     };
   });
 
-  const englishPages: MetadataRoute.Sitemap = [
-    ...CORE_LANGUAGE_PAIRS.map((pair) => ({
-      url: `${BASE}${pair.en}`,
-      lastModified: ENGLISH_PUBLISHED,
-      changeFrequency: "monthly" as const,
-      priority: pair.en === "/en" ? 0.9 : 0.7,
-      alternates: {
-        languages: {
-          "ka-GE": `${BASE}${pair.ka}`,
-          en: `${BASE}${pair.en}`,
-          "x-default": `${BASE}${pair.ka}`,
-        },
-      },
-    })),
-    {
-      url: `${BASE}/en/about`,
-      lastModified: ENGLISH_PUBLISHED,
-      changeFrequency: "yearly",
-      priority: 0.5,
-      alternates: { languages: { en: `${BASE}/en/about`, "x-default": `${BASE}/` } },
-    },
-  ];
-
-  return [...georgianWithAlternates, ...englishPages];
+  return georgianWithAlternates;
 }

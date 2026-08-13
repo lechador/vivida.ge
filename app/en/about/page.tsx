@@ -3,16 +3,15 @@ import Link from "next/link";
 import { Mail, MapPin, ShieldCheck } from "lucide-react";
 
 import { EnglishGuide } from "@/components/en/english-guide";
-import { SITE_URL } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
-const PATH = "/en/about";
 const TITLE = "About Vivida";
 const DESCRIPTION = "Learn what Vivida is, how its astrology and self-discovery content is created, and how to contact the team in Georgia.";
 
 export const metadata: Metadata = {
   title: { absolute: `${TITLE} — Astrology and Self-Discovery` }, description: DESCRIPTION,
-  alternates: { canonical: `${SITE_URL}${PATH}`, languages: { en: `${SITE_URL}${PATH}`, "x-default": SITE_URL } },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: `${SITE_URL}${PATH}`, locale: "en_US" },
+  alternates: { canonical: `${ENGLISH_SITE_URL}/about`, languages: { en: `${ENGLISH_SITE_URL}/about`, "x-default": `${ENGLISH_SITE_URL}/about` } },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/about`, locale: "en_US" },
 };
 
 export default function EnglishAboutPage() {
@@ -32,7 +31,7 @@ export default function EnglishAboutPage() {
         <h2>Transparency and contact</h2>
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl border border-border bg-card/50 p-5"><MapPin className="size-5 text-[var(--vivida-violet)]" /><h3 className="mt-3">Based in Georgia</h3><p className="mt-2 text-sm text-muted-foreground">Vivida is operated from Georgia and serves a growing multilingual audience.</p></div>
-          <div className="rounded-2xl border border-border bg-card/50 p-5"><ShieldCheck className="size-5 text-[var(--vivida-violet)]" /><h3 className="mt-3">Privacy information</h3><p className="mt-2 text-sm text-muted-foreground">Read what data we collect and how it is handled in our <Link href="/en/privacy" className="text-[var(--vivida-cyan)] hover:underline">privacy policy</Link>.</p></div>
+          <div className="rounded-2xl border border-border bg-card/50 p-5"><ShieldCheck className="size-5 text-[var(--vivida-violet)]" /><h3 className="mt-3">Privacy information</h3><p className="mt-2 text-sm text-muted-foreground">Read what data we collect and how it is handled in our <Link href="/privacy" className="text-[var(--vivida-cyan)] hover:underline">privacy policy</Link>.</p></div>
           <div className="rounded-2xl border border-border bg-card/50 p-5"><Mail className="size-5 text-[var(--vivida-violet)]" /><h3 className="mt-3">Contact</h3><p className="mt-2 text-sm text-muted-foreground">Questions or corrections: <a href="mailto:hello@vivida.ge" className="text-[var(--vivida-cyan)] hover:underline">hello@vivida.ge</a>.</p></div>
         </div>
       </section>

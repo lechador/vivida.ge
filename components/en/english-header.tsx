@@ -1,19 +1,20 @@
 import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 const NAV = [
-  { href: "/en/natal-chart", label: "Natal chart" },
-  { href: "/en/horoscope", label: "Horoscope" },
-  { href: "/en/zodiac", label: "Zodiac" },
-  { href: "/en/tests", label: "Tests" },
+  { href: "/natal-chart", label: "Natal chart" },
+  { href: "/horoscope", label: "Horoscope" },
+  { href: "/zodiac", label: "Zodiac" },
+  { href: "/tests", label: "Tests" },
 ];
 
 export function EnglishHeader({ georgianPath = "/" }: { georgianPath?: string }) {
   return (
     <header className="relative z-20 border-b border-border/30 bg-background/45 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link href="/en" className="flex shrink-0 items-center gap-2.5" aria-label="Vivida English home">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Vivida English home">
           <VividaMark size={38} id="english-header" />
           <span
             className="bg-clip-text text-lg font-semibold tracking-tight text-transparent sm:text-xl"
@@ -36,7 +37,7 @@ export function EnglishHeader({ georgianPath = "/" }: { georgianPath?: string })
 
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
-            href={georgianPath}
+            href={`${GEORGIAN_SITE_URL}${georgianPath === "/" ? "" : georgianPath}`}
             hrefLang="ka-GE"
             className="rounded-full border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
             aria-label="Switch to Georgian"

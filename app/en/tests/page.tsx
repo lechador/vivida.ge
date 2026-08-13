@@ -4,7 +4,7 @@ import { Brain, Fingerprint, HeartHandshake, Layers } from "lucide-react";
 
 import { EnglishGuide } from "@/components/en/english-guide";
 import { GeorgianContentNote } from "@/components/en/georgian-content-note";
-import { localizedAlternates, SITE_URL } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const PATH = "/en/tests";
 const TITLE = "Personality, IQ and Emotional Intelligence Tests";
@@ -13,7 +13,7 @@ const DESCRIPTION = "Explore Vivida's personality, IQ, EQ and Big Five self-disc
 export const metadata: Metadata = {
   title: { absolute: `${TITLE} — Vivida` }, description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/tests", "en"),
-  openGraph: { title: TITLE, description: DESCRIPTION, url: `${SITE_URL}${PATH}`, locale: "en_US", alternateLocale: ["ka_GE"] },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/tests`, locale: "en_US", alternateLocale: ["ka_GE"] },
 };
 
 const TESTS = [
@@ -31,7 +31,7 @@ export default function EnglishTestsPage() {
         <h2>Choose a test</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {TESTS.map(({ href, Icon, title, text }) => (
-            <Link key={href} href={href} hrefLang="ka-GE" className="rounded-2xl border border-border bg-card/50 p-5 transition-colors hover:border-[var(--vivida-violet)]/45 hover:bg-card">
+            <Link key={href} href={`${GEORGIAN_SITE_URL}${href}`} hrefLang="ka-GE" className="rounded-2xl border border-border bg-card/50 p-5 transition-colors hover:border-[var(--vivida-violet)]/45 hover:bg-card">
               <Icon className="size-6 text-[var(--vivida-violet)]" /><h3 className="mt-4">{title}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{text}</p><span className="mt-4 inline-block text-xs font-medium text-[var(--vivida-cyan)]">Start in Georgian →</span>
             </Link>
           ))}

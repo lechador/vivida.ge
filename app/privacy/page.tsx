@@ -9,7 +9,7 @@ export const metadata = {
   alternates: localizedAlternates("/privacy", "/en/privacy", "ka"),
 };
 
-const LAST_UPDATED = "2026-08-07";
+const LAST_UPDATED = "2026-08-13";
 
 export default function PrivacyPage() {
   return (
@@ -38,7 +38,7 @@ export default function PrivacyPage() {
               1. ვინც ვართ
             </h2>
             <p className="mt-2 leading-relaxed">
-              Vivida არის ვებ-აპლიკაცია (vivida.ge), რომელიც მომხმარებელს
+              Vivida არის ვებ-აპლიკაცია (vivida.ge და vividaastro.com), რომელიც მომხმარებელს
               აწვდის პერსონალურ ასტროლოგიურ ინსტრუმენტებს — ნატალურ რუკას,
               ყოველდღიურ პროგნოზებს, თავსებადობის ანალიზს. ჩვენ ვართ თქვენი
               მონაცემების კონტროლერი.

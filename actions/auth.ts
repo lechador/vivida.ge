@@ -20,6 +20,12 @@ import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/email";
 import { enforceAuthRateLimit } from "@/lib/rate-limit";
 import { ApiError } from "@/lib/api/errors";
 import { TURNSTILE_ERROR_KA, verifyTurnstile } from "@/lib/turnstile";
+import { siteOriginForHost } from "@/lib/seo/locales";
+
+async function siteOriginFromHeaders(): Promise<string> {
+  const h = await headers();
+  return siteOriginForHost(h.get("x-forwarded-host") ?? h.get("host"));
+}
 
 /** Best-effort client IP from the incoming request headers (Vercel proxy). */
 async function clientIpFromHeaders(): Promise<string> {
@@ -115,9 +121,16 @@ export async function signUpWithEmail(
   // it doesn't matter if it lands a few seconds after the user sees
   // "check your inbox." The token already exists, so the link resolves.
   const { email, name, verifyToken, verifyCode } = result;
+  const origin = await siteOriginFromHeaders();
   after(async () => {
     try {
-      await sendVerificationEmail({ to: email, name, token: verifyToken, code: verifyCode });
+      await sendVerificationEmail({
+        to: email,
+        name,
+        token: verifyToken,
+        code: verifyCode,
+        origin,
+      });
     } catch (err) {
       console.warn(
         "[signUpWithEmail] background verification email failed:",
@@ -154,6 +167,7 @@ export async function requestVerificationEmail(input: {
         name: dispatch.name,
         token: dispatch.token,
         code: dispatch.code,
+        origin: await siteOriginFromHeaders(),
       });
     } catch (err) {
       console.warn(
@@ -278,6 +292,7 @@ export async function requestPasswordReset(input: {
         to: dispatch.email,
         name: dispatch.name,
         token: dispatch.token,
+        origin: await siteOriginFromHeaders(),
       });
     } catch (err) {
       console.warn(

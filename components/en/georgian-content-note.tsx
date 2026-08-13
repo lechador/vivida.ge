@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { Languages } from "lucide-react";
 
+import { GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+
 export function GeorgianContentNote({ href, label = "Open the Georgian version" }: { href: string; label?: string }) {
+  const georgianHref = href.startsWith("http")
+    ? href
+    : `${GEORGIAN_SITE_URL}${href === "/" ? "" : href}`;
+
   return (
     <aside className="rounded-2xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/8 p-4 text-sm text-foreground/85 sm:p-5">
       <div className="flex items-start gap-3">
@@ -11,7 +17,7 @@ export function GeorgianContentNote({ href, label = "Open the Georgian version" 
           <p className="mt-1 leading-relaxed text-muted-foreground">
             The core guide is translated, while personalized interpretations and some interactive tools remain in Georgian during this first release.
           </p>
-          <Link href={href} hrefLang="ka-GE" className="mt-2 inline-block font-medium text-[var(--vivida-cyan)] hover:underline">
+          <Link href={georgianHref} hrefLang="ka-GE" className="mt-2 inline-block font-medium text-[var(--vivida-cyan)] hover:underline">
             {label} →
           </Link>
         </div>

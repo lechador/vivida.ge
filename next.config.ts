@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
+import {
+  ENGLISH_HOSTS,
+  ENGLISH_PUBLIC_ROUTES,
+  ENGLISH_SITE_URL,
+  GEORGIAN_HOSTS,
+} from "./lib/seo/locales";
+
 const nextConfig: NextConfig = {
   // The PDF report route reads the Georgian TTFs at runtime via fs — Vercel's
   // tracer won't pick up a dynamic path on its own, so include them explicitly
@@ -18,10 +25,43 @@ const nextConfig: NextConfig = {
     // The personality test moved from /test to the keyword-rich Georgian slug
     // /pirovnebis-testi ("პიროვნების ტესტი"). 301 the old paths so any early
     // links/indexing carry over.
+    const legacyEnglishRedirects = [
+      ...GEORGIAN_HOSTS,
+      ...ENGLISH_HOSTS,
+    ].flatMap((host) =>
+      ENGLISH_PUBLIC_ROUTES.map((route) => ({
+        source: route.internalEn,
+        has: [{ type: "host" as const, value: host }],
+        destination: `${ENGLISH_SITE_URL}${route.en === "/" ? "" : route.en}`,
+        permanent: true,
+      })),
+    );
+
     return [
+      ...legacyEnglishRedirects,
       { source: "/test", destination: "/pirovnebis-testi", permanent: true },
       { source: "/test/claim", destination: "/pirovnebis-testi/claim", permanent: true },
     ];
+  },
+  async rewrites() {
+    return {
+      // Keep the public global URLs clean while reusing the established /en
+      // route tree internally. Shared authenticated/API routes are untouched.
+      beforeFiles: ENGLISH_HOSTS.flatMap((host) =>
+        ENGLISH_PUBLIC_ROUTES.map((route) => ({
+          source: route.en,
+          has: [{ type: "host" as const, value: host }],
+          destination: route.internalEn,
+        })),
+      ),
+    };
+  },
+  async headers() {
+    return ENGLISH_HOSTS.map((host) => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value: host }],
+      headers: [{ key: "Content-Language", value: "en" }],
+    }));
   },
   images: {
     remotePatterns: [
@@ -38,6 +78,7 @@ const nextConfig: NextConfig = {
       // Own-domain absolute URLs (the Vivida brand account's avatar points
       // at www.vivida.ge/apple-icon.png; without this its profile page 500s).
       { protocol: "https", hostname: "www.vivida.ge" },
+      { protocol: "https", hostname: "www.vividaastro.com" },
     ],
   },
 };
