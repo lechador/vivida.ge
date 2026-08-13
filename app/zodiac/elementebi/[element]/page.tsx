@@ -21,6 +21,9 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { elementPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ZodiacElementPageEn } from "@/components/seo/zodiac-elements-en";
+import { ELEMENT_ENGLISH } from "@/lib/zodiac-element-en";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -55,6 +58,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { element } = await params;
   if (!isElement(element) || !ELEMENTS_CONTENT) return {};
+  if ((await getRequestLocale()) === "en") {
+    const c = ELEMENT_ENGLISH[element];
+    const title = `${c.name}: Traits, Love and Compatibility`;
+    const description = `${c.tagline} Explore personality, strengths, challenges, relationships, career, and compatibility with the other elements.`;
+    const url = `https://vividaastro.com/zodiac/elementebi/${element}`;
+    return { title: { absolute: title }, description, alternates: { canonical: url }, openGraph: { type: "article", url, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  }
   const c = ELEMENTS_CONTENT[element];
   if (!c) return {};
   return {
@@ -84,6 +94,7 @@ export default async function ElementDetailPage({
 }) {
   const { element } = await params;
   if (!isElement(element) || !ELEMENTS_CONTENT) notFound();
+  if ((await getRequestLocale()) === "en") return <ZodiacElementPageEn element={element} />;
   const c = ELEMENTS_CONTENT[element];
   if (!c) notFound();
 

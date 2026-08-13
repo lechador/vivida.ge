@@ -22,6 +22,8 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { ELEMENTS_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ZodiacElementsHubEn } from "@/components/seo/zodiac-elements-en";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/elementebi";
@@ -47,8 +49,13 @@ const BLURB_KEY: Record<ElementSlug, "fireBlurb" | "earthBlurb" | "airBlurb" | "
   water: "waterBlurb",
 };
 
-export const metadata: Metadata = ELEMENTS_HUB_CONTENT
-  ? {
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) === "en") {
+    const title = "The Four Zodiac Elements: Fire, Earth, Air and Water";
+    const description = "Understand the four zodiac elements and their signs, personality traits, strengths, challenges, love style, career patterns, and compatibility.";
+    return { title: { absolute: title }, description, alternates: { canonical: "https://vividaastro.com/zodiac/elementebi" }, openGraph: { type: "website", url: "https://vividaastro.com/zodiac/elementebi", title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  return ELEMENTS_HUB_CONTENT ? {
       title: { absolute: ELEMENTS_HUB_CONTENT.pageTitle },
       description: ELEMENTS_HUB_CONTENT.metaDescription,
       alternates: { canonical: `${SITE_URL}${PATH}` },
@@ -65,10 +72,11 @@ export const metadata: Metadata = ELEMENTS_HUB_CONTENT
         title: ELEMENTS_HUB_CONTENT.pageTitle,
         description: ELEMENTS_HUB_CONTENT.metaDescription,
       },
-    }
-  : {};
+    } : {};
+}
 
-export default function ElementsHubPage() {
+export default async function ElementsHubPage() {
+  if ((await getRequestLocale()) === "en") return <ZodiacElementsHubEn />;
   if (!ELEMENTS_HUB_CONTENT) notFound();
   const c = ELEMENTS_HUB_CONTENT;
 

@@ -36,6 +36,8 @@ import {
   SignHoroscopePageEn,
   VIEW_LABEL_EN,
 } from "@/components/seo/sign-horoscope-page-en";
+import { YearlyHoroscopePageEn } from "@/components/seo/yearly-horoscope-page-en";
+import { yearlyHoroscopeEnglish } from "@/lib/yearly-horoscope-en";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -151,6 +153,28 @@ export async function generateMetadata({
   if (yearNum == null) return {};
   const c = yearlyContentFor(sign, yearNum);
   if (!c) return {};
+  if (en) {
+    const english = yearlyHoroscopeEnglish(sign, yearNum);
+    const url = `https://vividaastro.com/zodiac/${sign}/${slug}`;
+    return {
+      title: { absolute: english.title },
+      description: english.description,
+      alternates: { canonical: url },
+      openGraph: {
+        type: "article",
+        url,
+        title: english.title,
+        description: english.description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: english.title,
+        description: english.description,
+      },
+    };
+  }
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
@@ -190,6 +214,8 @@ export default async function ZodiacSignSlugPage({
   if (yearNum == null) notFound();
   const c = yearlyContentFor(sign, yearNum);
   if (!c) notFound();
+  if ((await getRequestLocale()) === "en")
+    return <YearlyHoroscopePageEn sign={sign} year={yearNum} />;
   const year = slug;
 
   const sc = SIGNS_CONTENT[sign];
