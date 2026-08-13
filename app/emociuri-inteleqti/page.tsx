@@ -6,20 +6,36 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { auth } from "@/auth";
+import { EQ_HUB_EN, EqArticlesHubEn } from "@/components/seo/eq-articles-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { EQ_ARTICLES } from "@/lib/seo/eq-articles";
 import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const URL = "https://www.vivida.ge/emociuri-inteleqti";
 
-export const metadata: Metadata = {
+const KA_METADATA: Metadata = {
   title: "ემოციური ინტელექტი — სტატიები, სავარჯიშოები და EQ გზამკვლევი",
   description: "ემოციური ინტელექტის ქართული ბიბლიოთეკა: ემპათია, ემოციების მართვა, თვითშემეცნება, მოტივაცია, კომუნიკაცია და ურთიერთობები.",
   keywords: ["ემოციური ინტელექტი", "EQ", "ემპათია", "ემოციების მართვა", "თვითშემეცნება", "სოციალური უნარები"],
-  alternates: { canonical: URL },
+  alternates: localizedAlternates("/emociuri-inteleqti", "/emociuri-inteleqti", "ka"),
   openGraph: { title: "ემოციური ინტელექტის გზამკვლევი", description: "პრაქტიკული, კვლევაზე დაფუძნებული სტატიები EQ-ის გასავითარებლად.", url: URL, type: "website", locale: "ka_GE" },
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) !== "en") return KA_METADATA;
+  const path = "/emociuri-inteleqti";
+  return {
+    title: { absolute: EQ_HUB_EN.title }, description: EQ_HUB_EN.description,
+    keywords: ["emotional intelligence", "EQ skills", "empathy", "emotion regulation", "self-awareness"],
+    alternates: localizedAlternates(path, path, "en"),
+    openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title: EQ_HUB_EN.title, description: EQ_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+    twitter: { card: "summary_large_image", title: EQ_HUB_EN.title, description: EQ_HUB_EN.description },
+  };
+}
+
 export default async function EqArticlesPage() {
+  if ((await getRequestLocale()) === "en") return <EqArticlesHubEn />;
   const session = await auth();
   const authed = !!session?.user?.id;
   const categories = [...new Set(EQ_ARTICLES.map((item) => item.category))];

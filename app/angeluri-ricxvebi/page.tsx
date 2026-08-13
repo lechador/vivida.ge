@@ -6,12 +6,15 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
+import { ANGEL_HUB_EN, AngelNumbersHubEn } from "@/components/seo/angel-numbers-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   ANGEL_FAQ,
   ANGEL_LATIN_QUERIES,
   ANGEL_NUMBERS,
 } from "@/lib/seo/angel-numbers";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -19,7 +22,7 @@ const TITLE = "ანგელოზური რიცხვები — 111, 
 const DESCRIPTION =
   "რას ნიშნავს ერთნაირი ციფრები საათზე: 111, 222, 333, 444, 555, 777, 888, 999, 11:11 და 12:12. თითოეული ანგელოზური რიცხვის მნიშვნელობა ქართულად — სიყვარულში, საქმეში და რა ნაბიჯი გადადგა, როცა მას ხედავ.";
 
-export const metadata: Metadata = {
+const KA_METADATA: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
@@ -36,7 +39,7 @@ export const metadata: Metadata = {
     "angeluri ricxvebi",
     "11 11 ras nishnavs",
   ],
-  alternates: { canonical: `${SITE_URL}/angeluri-ricxvebi` },
+  alternates: localizedAlternates("/angeluri-ricxvebi", "/angeluri-ricxvebi", "ka"),
   openGraph: {
     type: "website",
     url: `${SITE_URL}/angeluri-ricxvebi`,
@@ -48,7 +51,21 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-export default function AngelNumbersHubPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) !== "en") return KA_METADATA;
+  const path = "/angeluri-ricxvebi";
+  return {
+    title: { absolute: ANGEL_HUB_EN.title },
+    description: ANGEL_HUB_EN.description,
+    keywords: ["angel numbers", "111 meaning", "222 meaning", "11:11 meaning", "repeating numbers"],
+    alternates: localizedAlternates(path, path, "en"),
+    openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+    twitter: { card: "summary_large_image", title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description },
+  };
+}
+
+export default async function AngelNumbersHubPage() {
+  if ((await getRequestLocale()) === "en") return <AngelNumbersHubEn />;
   const ld = [
     articleLd({
       url: `${SITE_URL}/angeluri-ricxvebi`,

@@ -7,13 +7,17 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
+import { AngelNumberPageEn } from "@/components/seo/angel-numbers-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   ALL_ANGEL_SLUGS,
   ANGEL_BY_SLUG,
   ANGEL_NUMBERS,
   isAngelSlug,
 } from "@/lib/seo/angel-numbers";
+import { ANGEL_EN_BY_SLUG } from "@/lib/seo/angel-numbers-en";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -31,6 +35,19 @@ export async function generateMetadata({
   const { number } = await params;
   if (!isAngelSlug(number)) return {};
   const a = ANGEL_BY_SLUG[number];
+  if ((await getRequestLocale()) === "en") {
+    const content = ANGEL_EN_BY_SLUG[number];
+    if (!content) return {};
+    const path = `/angeluri-ricxvebi/${number}`;
+    const title = `${content.title}: Meaning in Love, Career and Life`;
+    const description = `${content.essence} Explore the modern symbolic meaning of ${number}, relationship and career themes, and a grounded action prompt.`;
+    return {
+      title: { absolute: title }, description,
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: { type: "article", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   const url = `${SITE_URL}/angeluri-ricxvebi/${a.slug}`;
   const clock = a.clockKa ? ` და ${a.clockKa}` : "";
   const title = `${a.slug}${clock} — რას ნიშნავს ანგელოზური რიცხვი`;
@@ -48,7 +65,7 @@ export async function generateMetadata({
       `${a.slug} mnishvneloba`,
       "angeluri ricxvebi",
     ],
-    alternates: { canonical: url },
+    alternates: localizedAlternates(`/angeluri-ricxvebi/${number}`, `/angeluri-ricxvebi/${number}`, "ka"),
     openGraph: {
       type: "article",
       url,
@@ -69,6 +86,11 @@ export default async function AngelNumberPage({
   const { number } = await params;
   if (!isAngelSlug(number)) notFound();
   const a = ANGEL_BY_SLUG[number];
+  if ((await getRequestLocale()) === "en") {
+    const content = ANGEL_EN_BY_SLUG[number];
+    if (!content) notFound();
+    return <AngelNumberPageEn base={a} content={content} />;
+  }
   const url = `${SITE_URL}/angeluri-ricxvebi/${a.slug}`;
 
   const faq = [

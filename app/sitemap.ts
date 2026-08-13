@@ -171,6 +171,12 @@ function englishSitemap(): MetadataRoute.Sitemap {
   const numerologyPages = LIFE_PATH_NUMBERS.map((number) =>
     samePathEntry(`/numerologia/${number}`, "monthly", 0.7),
   );
+  const angelNumberPages = ALL_ANGEL_SLUGS.map((number) =>
+    samePathEntry(`/angeluri-ricxvebi/${number}`, "monthly", 0.68),
+  );
+  const eqArticlePages = EQ_ARTICLE_SLUGS.map((slug) =>
+    samePathEntry(`/emociuri-inteleqti/${slug}`, "monthly", 0.68),
+  );
 
   return [
     ...CORE_LANGUAGE_PAIRS.map((pair) => {
@@ -225,6 +231,8 @@ function englishSitemap(): MetadataRoute.Sitemap {
     samePathEntry("/chinuri-horoskopi", "monthly", 0.78),
     samePathEntry("/sizmris-akhsna", "weekly", 0.76),
     samePathEntry("/numerologia", "monthly", 0.78),
+    samePathEntry("/angeluri-ricxvebi", "monthly", 0.76),
+    samePathEntry("/emociuri-inteleqti", "monthly", 0.76),
     ...signPages,
     ...moonPages,
     ...risingPages,
@@ -244,6 +252,8 @@ function englishSitemap(): MetadataRoute.Sitemap {
     ...chinesePages,
     ...dreamPages,
     ...numerologyPages,
+    ...angelNumberPages,
+    ...eqArticlePages,
   ];
 }
 

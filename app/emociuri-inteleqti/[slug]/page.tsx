@@ -5,8 +5,12 @@ import { ArrowLeft, ArrowRight, BookOpen, Check, ExternalLink } from "lucide-rea
 
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import { EqArticlePageEn } from "@/components/seo/eq-articles-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { EQ_ARTICLES, eqArticleBySlug } from "@/lib/seo/eq-articles";
+import { eqArticleEnBySlug } from "@/lib/seo/eq-articles-en";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const BASE = "https://www.vivida.ge/emociuri-inteleqti";
 
@@ -16,6 +20,18 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  if ((await getRequestLocale()) === "en") {
+    const item = eqArticleEnBySlug(slug);
+    if (!item) return { title: "Article not found" };
+    const path = `/emociuri-inteleqti/${slug}`;
+    return {
+      title: { absolute: item.title }, description: item.description,
+      keywords: [item.category, "emotional intelligence", "EQ", ...item.domains],
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: { title: item.title, description: item.description, url: `https://www.vividaastro.com${path}`, type: "article", locale: "en_US", publishedTime: "2026-07-20T00:00:00.000Z", modifiedTime: "2026-08-14T00:00:00.000Z" },
+      twitter: { card: "summary_large_image", title: item.title, description: item.description },
+    };
+  }
   const item = eqArticleBySlug(slug);
   if (!item) return { title: "სტატია ვერ მოიძებნა" };
   const url = `${BASE}/${item.slug}`;
@@ -23,13 +39,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: item.title,
     description: item.description,
     keywords: [item.category, "ემოციური ინტელექტი", "EQ", ...item.domains],
-    alternates: { canonical: url },
+    alternates: localizedAlternates(`/emociuri-inteleqti/${slug}`, `/emociuri-inteleqti/${slug}`, "ka"),
     openGraph: { title: item.title, description: item.description, url, type: "article", locale: "ka_GE", publishedTime: "2026-07-20T00:00:00+04:00", modifiedTime: "2026-07-20T00:00:00+04:00" },
   };
 }
 
 export default async function EqArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if ((await getRequestLocale()) === "en") {
+    const englishItem = eqArticleEnBySlug(slug);
+    if (!englishItem) notFound();
+    return <EqArticlePageEn item={englishItem} />;
+  }
   const item = eqArticleBySlug(slug);
   if (!item) notFound();
   const url = `${BASE}/${item.slug}`;
