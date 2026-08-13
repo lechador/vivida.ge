@@ -16,7 +16,7 @@
 import type { NatalChartJson } from "@/db/schema";
 import { signByIndex } from "@/lib/zodiac";
 import type { MbtiScores } from "@/lib/mbti-questions";
-import { AXIS_LABEL_KA, mbtiArchetypeKa, mbtiBaseType } from "@/lib/mbti-questions";
+import { AXIS_LABEL_EN, AXIS_LABEL_KA, mbtiArchetypeEn, mbtiArchetypeKa, mbtiBaseType } from "@/lib/mbti-questions";
 import { getTypeAndSun } from "@/lib/mbti-library";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -34,6 +34,7 @@ export type MbtiSynthesisInput = {
   scores: MbtiScores;
   /** Null when the user hasn't entered birth data yet. */
   chart: NatalChartJson | null;
+  locale?: "ka" | "en";
 };
 
 const SYSTEM_PROMPT =
@@ -49,6 +50,12 @@ const SYSTEM_PROMPT =
   '{"archetypeNameGe": string, "analysisText": string}. archetypeNameGe — ' +
   "ამ ადამიანის მოკლე, ცოცხალი ქართული არქეტიპი. analysisText — ტექსტი აბზაცებით (\\n\\n).";
 
+const SYSTEM_PROMPT_EN =
+  "You are an experienced personality-profile writer. Explain an MBTI-style result in natural, precise and warm English. " +
+  "Focus on preferences, thinking, decision-making, strengths and growth opportunities. Do not present the framework as a diagnosis or fixed identity. " +
+  "Astrology may appear only as one light metaphor when a Sun sign is provided; do not list planets, houses or aspects. " +
+  'Return valid JSON only: {"archetypeNameGe": string, "analysisText": string}. archetypeNameGe is a short English archetype label; analysisText uses paragraphs separated by \\n\\n.';
+
 function scoresSummaryKa(scores: MbtiScores): string {
   return (["EI", "SN", "TF", "JP", "AT"] as const)
     .map((axis) => {
@@ -60,7 +67,34 @@ function scoresSummaryKa(scores: MbtiScores): string {
     .join(", ");
 }
 
+function scoresSummaryEn(scores: MbtiScores): string {
+  return (["EI", "SN", "TF", "JP", "AT"] as const)
+    .map((axis) => {
+      const score = scores[axis];
+      const [first, second] = AXIS_LABEL_EN[axis];
+      const name = score.letter === axis[0] ? first : second;
+      return `${score.letter} (${name}) — ${score.pct}%`;
+    })
+    .join(", ");
+}
+
 async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
+  if (input.locale === "en") {
+    const sunSign = input.chart != null
+      ? signByIndex(input.chart.bodies.sun?.signIndex ?? 0).labelEn
+      : null;
+    const lines: string[] = [];
+    if (input.firstName) lines.push(`First name: ${input.firstName}`);
+    lines.push(`Type: ${input.type} (${mbtiArchetypeEn(input.type)})`);
+    lines.push(`Dimension strengths: ${scoresSummaryEn(input.scores)}`);
+    if (sunSign) lines.push(`Sun sign: ${sunSign}. Use this only as one subtle metaphor, not as evidence or a second assessment.`);
+    lines.push(
+      "Write a cohesive, individualized portrait in 5–6 short paragraphs. Explain how this pattern may appear in thought, emotion, relationships, work and stress; include concrete strengths and balanced growth suggestions. " +
+      "Use careful language such as ‘tends to’ and ‘may’, avoid stereotypes, and mention that close-to-midpoint scores can indicate flexibility."
+    );
+    return lines.join("\n");
+  }
+
   const sunSignKa =
     input.chart != null
       ? signByIndex(input.chart.bodies.sun?.signIndex ?? 0).labelKa
@@ -126,7 +160,7 @@ function parseSynthesis(raw: string): MbtiSynthesis {
   };
 }
 
-async function viaOpenRouter(prompt: string): Promise<MbtiSynthesis> {
+async function viaOpenRouter(prompt: string, locale: "ka" | "en"): Promise<MbtiSynthesis> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
   const res = await fetch(OPENROUTER_URL, {
@@ -140,7 +174,7 @@ async function viaOpenRouter(prompt: string): Promise<MbtiSynthesis> {
     body: JSON.stringify({
       model: OPENROUTER_MODEL,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: locale === "en" ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT },
         { role: "user", content: prompt },
       ],
       response_format: { type: "json_object" },
@@ -164,7 +198,7 @@ async function viaOpenRouter(prompt: string): Promise<MbtiSynthesis> {
   return parseSynthesis(raw);
 }
 
-async function viaGoogle(prompt: string): Promise<MbtiSynthesis> {
+async function viaGoogle(prompt: string, locale: "ka" | "en"): Promise<MbtiSynthesis> {
   const { GoogleGenAI } = await import("@google/genai");
   const apiKey = process.env.GEMINI_API_KEY;
   const ai = apiKey
@@ -178,7 +212,7 @@ async function viaGoogle(prompt: string): Promise<MbtiSynthesis> {
     model: GOOGLE_MODEL,
     contents: prompt,
     config: {
-      systemInstruction: SYSTEM_PROMPT,
+      systemInstruction: locale === "en" ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT,
       temperature: 0.85,
       responseMimeType: "application/json",
       // This is a compose-over-pre-written-material task, not deep reasoning —
@@ -204,11 +238,12 @@ function preferGoogle(): boolean {
 export async function generateMbtiSynthesis(
   input: MbtiSynthesisInput
 ): Promise<(MbtiSynthesis & { model: string }) | null> {
+  const locale = input.locale ?? "ka";
   const prompt = await buildUserPrompt(input);
 
   if (preferGoogle()) {
     try {
-      const r = await viaGoogle(prompt);
+      const r = await viaGoogle(prompt, locale);
       return { ...r, model: `google:${GOOGLE_MODEL}` };
     } catch (err) {
       console.warn(
@@ -218,7 +253,7 @@ export async function generateMbtiSynthesis(
     }
   }
   try {
-    const r = await viaOpenRouter(prompt);
+    const r = await viaOpenRouter(prompt, locale);
     return { ...r, model: OPENROUTER_MODEL };
   } catch (err) {
     console.error("[mbti-synthesis] all providers failed:", (err as Error).message);

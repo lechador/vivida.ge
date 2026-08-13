@@ -15,7 +15,8 @@ import { MBTI_ANSWERS_STORAGE_KEY } from "@/lib/mbti-questions";
  * result. This is the only place the expensive generation runs. Guards
  * against double-submit (React strict-mode / re-renders) with a ref.
  */
-export function MbtiClaimRunner() {
+export function MbtiClaimRunner({ locale = "ka" }: { locale?: "ka" | "en" }) {
+  const en = locale === "en";
   const router = useRouter();
   const started = useRef(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,19 +50,19 @@ export function MbtiClaimRunner() {
         }
         router.replace(`/test-results/${res.id}`);
       } else {
-        setError(res.error);
+        setError(en ? "We could not create your profile. Please try again." : res.error);
       }
     })();
-  }, [router]);
+  }, [en, router]);
 
   if (noAnswers) {
     return (
       <div className="rounded-2xl border border-border bg-card/50 p-8 text-center">
         <p className="text-sm text-muted-foreground">
-          პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან.
+          {en ? "No saved answers were found. Please take the test again." : "პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან."}
         </p>
         <Button asChild variant="mystic" className="mt-4">
-          <Link href="/pirovnebis-testi">ტესტის დაწყება</Link>
+          <Link href="/pirovnebis-testi">{en ? "Start the test" : "ტესტის დაწყება"}</Link>
         </Button>
       </div>
     );
@@ -72,7 +73,7 @@ export function MbtiClaimRunner() {
       <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-8 text-center">
         <p className="text-sm text-destructive">{error}</p>
         <Button asChild variant="outline" className="mt-4">
-          <Link href="/pirovnebis-testi">თავიდან ცდა</Link>
+          <Link href="/pirovnebis-testi">{en ? "Try again" : "თავიდან ცდა"}</Link>
         </Button>
       </div>
     );
@@ -84,11 +85,12 @@ export function MbtiClaimRunner() {
         <Sparkles className="size-7 animate-pulse text-[var(--vivida-violet)]" />
       </div>
       <h2 className="mt-5 text-xl font-semibold tracking-tight">
-        ვქმნი შენს პიროვნულ ანალიზს…
+        {en ? "Creating your personality profile…" : "ვქმნი შენს პიროვნულ ანალიზს…"}
       </h2>
       <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-        ვაერთიანებ შენს ფსიქოლოგიურ ტიპსა და ნატალურ რუკას. ეს რამდენიმე წამს
-        გრძელდება — გვერდი არ დახურო.
+        {en
+          ? "We are preparing your detailed personality portrait. This may take a few seconds—please keep this page open."
+          : "ვაერთიანებ შენს ფსიქოლოგიურ ტიპსა და ნატალურ რუკას. ეს რამდენიმე წამს გრძელდება — გვერდი არ დახურო."}
       </p>
       <Loader2 className="mx-auto mt-6 size-5 animate-spin text-muted-foreground" />
     </div>

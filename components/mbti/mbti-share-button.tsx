@@ -14,16 +14,21 @@ export function MbtiShareButton({
   path,
   type,
   archetype,
+  locale = "ka",
 }: {
   path: string; // e.g. "/r/<id>"
   type: string;
   archetype: string;
+  locale?: "ka" | "en";
 }) {
+  const en = locale === "en";
   const [copied, setCopied] = useState(false);
 
   async function share() {
     const url = typeof window !== "undefined" ? window.location.origin + path : path;
-    const text = `ჩემი ფსიქოლოგიური ტიპია ${type} — ${archetype}. გაიარე ტესტი Vivida-ზე:`;
+    const text = en
+      ? `My personality type is ${type} — ${archetype}. Take the test on Vivida:`
+      : `ჩემი ფსიქოლოგიური ტიპია ${type} — ${archetype}. გაიარე ტესტი Vivida-ზე:`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({ title: "Vivida · Astro-MBTI", text, url });
@@ -44,7 +49,7 @@ export function MbtiShareButton({
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-2">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? "ბმული დაკოპირდა" : "გააზიარე"}
+      {copied ? (en ? "Link copied" : "ბმული დაკოპირდა") : (en ? "Share" : "გააზიარე")}
     </Button>
   );
 }

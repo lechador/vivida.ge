@@ -316,6 +316,8 @@ export async function sendMbtiResultEmail({
   mbtiType,
   archetypeNameGe,
   excerpt,
+  locale = "ka",
+  origin,
 }: {
   userId: string;
   to: string;
@@ -324,13 +326,17 @@ export async function sendMbtiResultEmail({
   mbtiType: string;
   archetypeNameGe: string;
   excerpt?: string;
+  locale?: "ka" | "en";
+  origin?: string;
 }): Promise<void> {
   const c = client();
   if (!c) {
     console.warn("[email] RESEND_API_KEY missing — skipping MBTI result to", to);
     return;
   }
-  const subject = `შენი ტიპია ${mbtiType} — ${archetypeNameGe} · Vivida`;
+  const subject = locale === "en"
+    ? `Your type is ${mbtiType} — ${archetypeNameGe} · Vivida`
+    : `შენი ტიპია ${mbtiType} — ${archetypeNameGe} · Vivida`;
   try {
     const result = await c.emails.send(
       {
@@ -341,10 +347,13 @@ export async function sendMbtiResultEmail({
           name,
           mbtiType,
           archetypeNameGe,
-          resultUrl: absUrl(`/test-results/${resultId}`),
+          resultUrl: absUrl(`/test-results/${resultId}`, origin),
+          locale,
           excerpt:
             excerpt?.trim() ||
-            "შენი პიროვნების ღრმა ფსიქოლოგიური და ასტროლოგიური ანალიზი მზადაა.",
+            (locale === "en"
+              ? "Your detailed personality profile is ready."
+              : "შენი პიროვნების ღრმა ფსიქოლოგიური და ასტროლოგიური ანალიზი მზადაა."),
         }),
       },
       { idempotencyKey: `mbti:${resultId}` }

@@ -1,4 +1,5 @@
 import { after } from "next/server";
+import type { Metadata } from "next";
 import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -6,13 +7,15 @@ import Link from "next/link";
 import { db } from "@/db";
 import { mbtiTestResults } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { mbtiBaseType } from "@/lib/mbti-questions";
+import { mbtiArchetypeEn, mbtiBaseType } from "@/lib/mbti-questions";
 import { getTypeSections, mbtiSectionCombos, ensureMbtiLibraryFor } from "@/lib/mbti-library";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { MbtiResultView } from "@/components/mbti/mbti-result-view";
 import { MbtiProfileSections } from "@/components/mbti/mbti-profile-sections";
+import { MbtiEnglishProfile } from "@/components/mbti/mbti-english-profile";
 import { MbtiFamousPeople } from "@/components/mbti/mbti-famous-people";
 import { MbtiShareButton } from "@/components/mbti/mbti-share-button";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
@@ -20,7 +23,10 @@ import { NextTestWidget } from "@/components/tests/next-test-widget";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 
-export const metadata = { title: "Astro-MBTI შედეგი" };
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  return { title: en ? "Your Astro-MBTI result" : "Astro-MBTI შედეგი" };
+}
 export const dynamic = "force-dynamic";
 
 /**
@@ -33,7 +39,8 @@ export default async function TestResultPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const user = await requireUser();
+  const [user, locale] = await Promise.all([requireUser(), getRequestLocale()]);
+  const en = locale === "en";
 
   const [result] = await db
     .select()
@@ -47,10 +54,12 @@ export default async function TestResultPage({
   // are missing (unseeded), self-heal them in the background so the next view
   // is complete; this render shows whatever already exists.
   const baseType = mbtiBaseType(result.mbtiType);
-  const sections = await getTypeSections(baseType);
-  if (sections.length < 7) {
+  const sections = en ? [] : await getTypeSections(baseType);
+  if (!en && sections.length < 7) {
     after(() => ensureMbtiLibraryFor(mbtiSectionCombos(baseType)));
   }
+  const archetype = en ? mbtiArchetypeEn(result.mbtiType) : result.archetypeNameGe;
+  const resultLocale = result.model?.startsWith("en:") ? "en" : "ka";
 
   // Type + archetype are free (shareable); the full portrait unlocks once.
   const [unlocked, balance] = await Promise.all([
@@ -70,25 +79,31 @@ export default async function TestResultPage({
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          Astro-MBTI · შენი შედეგი
+          {en ? "Astro-MBTI · Your result" : "Astro-MBTI · შენი შედეგი"}
         </div>
 
         {unlocked ? (
           <>
             <MbtiResultView
               type={result.mbtiType}
-              archetypeNameGe={result.archetypeNameGe}
+              archetypeNameGe={archetype}
               scores={result.scores}
-              analysis={result.aiSynthesisText}
+              analysis={resultLocale === locale ? result.aiSynthesisText : null}
+              locale={locale}
             />
 
-            <MbtiProfileSections sections={sections} />
+            {en ? (
+              <MbtiEnglishProfile type={result.mbtiType} scores={result.scores} />
+            ) : (
+              <>
+                <MbtiProfileSections sections={sections} />
+                <div className="mt-4">
+                  <MbtiFamousPeople type={result.mbtiType} />
+                </div>
+              </>
+            )}
 
-            <div className="mt-4">
-              <MbtiFamousPeople type={result.mbtiType} />
-            </div>
-
-            <ProfileVisibilityToggle kind="mbti" />
+            <ProfileVisibilityToggle kind="mbti" locale={locale} />
           </>
         ) : (
           <>
@@ -97,7 +112,7 @@ export default async function TestResultPage({
                 {result.mbtiType}
               </div>
               <div className="mt-2 text-lg font-semibold text-[var(--vivida-cyan)]">
-                {result.archetypeNameGe}
+                {archetype}
               </div>
             </div>
             <div className="mt-4">
@@ -106,27 +121,29 @@ export default async function TestResultPage({
                 resultId={result.id}
                 cost={CREDIT_COST.mbtiTest}
                 balance={balance}
-                title="სრული პორტრეტის გახსნა"
-                blurb="ღრმა ანალიზი, ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ცნობილი ადამიანები შენი ტიპით — გადაიხდი ერთხელ, სამუდამოდ შენია."
+                title={en ? "Unlock your full portrait" : "სრული პორტრეტის გახსნა"}
+                blurb={en ? "Explore your core preferences, strengths, relationships and working style. Unlock once and keep it in your account." : "ღრმა ანალიზი, ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ცნობილი ადამიანები შენი ტიპით — გადაიხდი ერთხელ, სამუდამოდ შენია."}
+                locale={locale}
               />
             </div>
           </>
         )}
 
-        <NextTestWidget completed="astro-mbti" />
+        <NextTestWidget completed="astro-mbti" locale={locale} />
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-6">
           <p className="text-xs text-muted-foreground">
-            შედეგი გამოგზავნილია შენს ელფოსტაზეც.
+            {en ? "Your result is saved to your account." : "შედეგი გამოგზავნილია შენს ელფოსტაზეც."}
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <MbtiShareButton
               path={`/r/${result.id}`}
               type={result.mbtiType}
-              archetype={result.archetypeNameGe}
+              archetype={archetype}
+              locale={locale}
             />
             <Button asChild variant="outline">
-              <Link href="/pirovnebis-testi">თავიდან გავიარო</Link>
+              <Link href="/pirovnebis-testi">{en ? "Retake test" : "თავიდან გავიარო"}</Link>
             </Button>
           </div>
         </div>

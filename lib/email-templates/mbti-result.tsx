@@ -13,6 +13,7 @@ export function MbtiResultEmail({
   archetypeNameGe,
   resultUrl,
   excerpt,
+  locale = "ka",
 }: {
   name: string | null;
   mbtiType: string;
@@ -20,10 +21,14 @@ export function MbtiResultEmail({
   resultUrl: string;
   /** First ~2 sentences of the analysis, for a teaser in the inbox. */
   excerpt: string;
+  locale?: "ka" | "en";
 }) {
-  const greeting = name ? `${name}, შენი შედეგი მზადაა!` : "შენი შედეგი მზადაა!";
+  const en = locale === "en";
+  const greeting = en
+    ? (name ? `${name}, your result is ready!` : "Your result is ready!")
+    : (name ? `${name}, შენი შედეგი მზადაა!` : "შენი შედეგი მზადაა!");
   return (
-    <EmailLayout preview={`შენი ტიპია ${mbtiType} — ${archetypeNameGe}`}>
+    <EmailLayout preview={en ? `Your type is ${mbtiType} — ${archetypeNameGe}` : `შენი ტიპია ${mbtiType} — ${archetypeNameGe}`}>
       <Heading
         as="h1"
         style={{
@@ -35,7 +40,7 @@ export function MbtiResultEmail({
           margin: "0 0 16px",
         }}
       >
-        Astro-MBTI შედეგი
+        {en ? "Your Astro-MBTI result" : "Astro-MBTI შედეგი"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
@@ -69,12 +74,13 @@ export function MbtiResultEmail({
       <Text style={paragraphStyle}>{excerpt}</Text>
 
       <Button href={resultUrl} style={buttonStyle}>
-        ნახე სრული ანალიზი
+        {en ? "View your full profile" : "ნახე სრული ანალიზი"}
       </Button>
 
       <Text style={mutedStyle}>
-        შედეგი ხელმისაწვდომია შენს პროფილზეც. თუ შეკითხვა გაქვს, უპასუხე ამ
-        წერილს.
+        {en
+          ? "This result is also saved to your profile. If you have a question, reply to this email."
+          : "შედეგი ხელმისაწვდომია შენს პროფილზეც. თუ შეკითხვა გაქვს, უპასუხე ამ წერილს."}
       </Text>
     </EmailLayout>
   );

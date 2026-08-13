@@ -6,11 +6,14 @@ import sharp from "sharp";
 import { db } from "@/db";
 import { mbtiTestResults } from "@/db/schema";
 import {
+  AXIS_LABEL_EN,
   AXIS_LABEL_KA,
   AXIS_POLES,
+  mbtiArchetypeEn,
   mbtiBaseType,
   type MbtiAxis,
 } from "@/lib/mbti-questions";
+import { isEnglishHost } from "@/lib/seo/locales";
 import { readFontBuffer } from "../../_fonts/load";
 
 const NOTO_REGULAR_URL = new URL(
@@ -23,7 +26,7 @@ const NOTO_BOLD_URL = new URL(
 );
 
 export const runtime = "nodejs";
-export const alt = "Astro-MBTI შედეგი";
+export const alt = "Astro-MBTI personality result";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -52,6 +55,8 @@ export default async function OgImage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const requestHeaders = await headers();
+  const en = isEnglishHost(requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host"));
   const [r] = await db
     .select({
       mbtiType: mbtiTestResults.mbtiType,
@@ -69,7 +74,7 @@ export default async function OgImage({
   ]);
 
   const type = r?.mbtiType ?? "";
-  const archetype = r?.archetypeNameGe ?? "";
+  const archetype = r ? (en ? mbtiArchetypeEn(r.mbtiType) : r.archetypeNameGe) : "";
   const scores = r?.scores;
 
   return new ImageResponse(
@@ -132,7 +137,7 @@ export default async function OgImage({
               ? AXES.map((axis) => {
                   const s = scores[axis];
                   if (!s) return null;
-                  const [firstKa, secondKa] = AXIS_LABEL_KA[axis];
+                  const [firstKa, secondKa] = (en ? AXIS_LABEL_EN : AXIS_LABEL_KA)[axis];
                   const winnerIsFirst = s.letter === AXIS_POLES[axis][0];
                   const label = winnerIsFirst ? firstKa : secondKa;
                   const firstPct = winnerIsFirst ? s.pct : 100 - s.pct;

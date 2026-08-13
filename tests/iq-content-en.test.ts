@@ -18,6 +18,12 @@ import {
 } from "@/lib/eq/scoring";
 import { BIG5_LIKERT, BIG5_QUESTIONS_EN, BIG5_TRAITS } from "@/lib/big-five/questions";
 import { BIG5_LEVEL_LABEL_EN, BIG5_TRAIT_INTERP_EN } from "@/lib/big-five/scoring";
+import {
+  AXIS_LABEL_EN,
+  MBTI_ARCHETYPE_EN,
+  MBTI_LIKERT,
+  MBTI_QUESTIONS_EN,
+} from "@/lib/mbti-questions";
 
 const GEORGIAN = /[ა-ჰ]/;
 
@@ -87,5 +93,22 @@ describe("English test content", () => {
       interpretations: BIG5_TRAIT_INTERP_EN,
     };
     expect(JSON.stringify(copy)).not.toMatch(GEORGIAN);
+  });
+
+  it("provides all sixty Astro-MBTI statements and result labels in English", () => {
+    expect(MBTI_QUESTIONS_EN).toHaveLength(60);
+    expect(MBTI_QUESTIONS_EN.map((question) => question.id)).toEqual(
+      Array.from({ length: 60 }, (_, index) => index + 1),
+    );
+    for (const question of MBTI_QUESTIONS_EN) {
+      expect(question.textEn).toBeTruthy();
+      expect(question.textEn).not.toMatch(GEORGIAN);
+    }
+    expect(Object.keys(MBTI_ARCHETYPE_EN)).toHaveLength(16);
+    expect(JSON.stringify({
+      axes: AXIS_LABEL_EN,
+      archetypes: MBTI_ARCHETYPE_EN,
+      scale: MBTI_LIKERT.map(({ labelEn }) => labelEn),
+    })).not.toMatch(GEORGIAN);
   });
 });

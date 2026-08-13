@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import type { MbtiScoresJson } from "@/db/schema";
-import { AXIS_LABEL_KA, type MbtiAxis } from "@/lib/mbti-questions";
+import { AXIS_LABEL_EN, AXIS_LABEL_KA, type MbtiAxis } from "@/lib/mbti-questions";
 import { mbtiCharacterSrc } from "@/lib/mbti-characters";
 import { cn } from "@/lib/utils";
 
@@ -18,12 +18,14 @@ export function MbtiResultView({
   archetypeNameGe,
   scores,
   analysis,
+  locale = "ka",
 }: {
   type: string;
   archetypeNameGe: string;
   scores: MbtiScoresJson;
   /** Full synthesis text, or null to lock it (anonymous teaser). */
   analysis: string | null;
+  locale?: "ka" | "en";
 }) {
   return (
     <div className="space-y-8">
@@ -52,7 +54,7 @@ export function MbtiResultView({
         {AXES.map((axis) => {
           const s = scores[axis];
           if (!s) return null; // pre-Identity rows have no AT bar
-          const [firstKa, secondKa] = AXIS_LABEL_KA[axis];
+          const [firstKa, secondKa] = (locale === "en" ? AXIS_LABEL_EN : AXIS_LABEL_KA)[axis];
           const firstLetter = axis[0];
           const winnerIsFirst = s.letter === firstLetter;
           // pct is the winner's strength; render as the first-pole share.

@@ -17,7 +17,8 @@ const VOLUME = 0.32;
  * resume (works when arriving via an in-app navigation, which counts as a
  * gesture).
  */
-export function TestMusicPlayer() {
+export function TestMusicPlayer({ locale = "ka" }: { locale?: "ka" | "en" }) {
+  const en = locale === "en";
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [hinted, setHinted] = useState(false); // pulse to invite, once
@@ -89,8 +90,8 @@ export function TestMusicPlayer() {
       <button
         type="button"
         onClick={playing ? stop : start}
-        aria-label={playing ? "მუსიკის გამორთვა" : "მისტიკური მუსიკის ჩართვა"}
-        title={playing ? "მუსიკის გამორთვა" : "მისტიკური მუსიკა"}
+        aria-label={playing ? (en ? "Turn music off" : "მუსიკის გამორთვა") : (en ? "Turn ambient music on" : "მისტიკური მუსიკის ჩართვა")}
+        title={playing ? (en ? "Turn music off" : "მუსიკის გამორთვა") : (en ? "Ambient music" : "მისტიკური მუსიკა")}
         className={cn(
           "fixed right-4 bottom-24 z-40 grid size-12 place-items-center rounded-full sm:right-6 sm:bottom-6",
           "border border-[var(--vivida-violet)]/50 bg-[oklch(0.16_0.06_300/0.8)] text-[var(--vivida-cyan)] backdrop-blur-xl",

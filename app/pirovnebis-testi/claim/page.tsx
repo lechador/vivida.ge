@@ -1,12 +1,19 @@
+import type { Metadata } from "next";
+
 import { auth } from "@/auth";
 import { getMbtiQuestions } from "@/lib/mbti-questions-db";
+import { MBTI_QUESTIONS_EN } from "@/lib/mbti-questions";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { MbtiGate } from "@/components/mbti/mbti-gate";
 import { MbtiClaimRunner } from "@/components/mbti/mbti-claim-runner";
 
-export const metadata = { title: "შენი შედეგი" };
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  return { title: en ? "Your Astro-MBTI result" : "შენი შედეგი" };
+}
 export const dynamic = "force-dynamic";
 // The synthesis (flash) runs here and can take ~20s — well above the default
 // serverless budget, so give the action room.
@@ -19,11 +26,12 @@ export const maxDuration = 60;
  *                     redirect to /test-results/[id]
  */
 export default async function TestClaimPage() {
-  const session = await auth();
+  const [session, locale] = await Promise.all([auth(), getRequestLocale()]);
+  const en = locale === "en";
   const authed = !!session?.user?.id;
   // The anonymous teaser recomputes the type client-side from the stored
   // answers, so it needs the question structure. Only loaded when anon.
-  const questions = authed ? null : await getMbtiQuestions();
+  const questions = authed ? null : en ? MBTI_QUESTIONS_EN : await getMbtiQuestions();
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -36,7 +44,7 @@ export default async function TestClaimPage() {
       {authed ? <AppHeader authed /> : <SmartHeader />}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        {authed ? <MbtiClaimRunner /> : <MbtiGate questions={questions!} />}
+        {authed ? <MbtiClaimRunner locale={locale} /> : <MbtiGate questions={questions!} locale={locale} />}
       </section>
     </main>
   );

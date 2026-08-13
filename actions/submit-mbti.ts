@@ -8,8 +8,10 @@ import { db } from "@/db";
 import { mbtiTestResults, users, profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { ensureChartFor } from "@/actions/chart";
-import { calculateMbti, mbtiArchetypeKa } from "@/lib/mbti-questions";
+import { calculateMbti, mbtiArchetypeEn, mbtiArchetypeKa } from "@/lib/mbti-questions";
 import { getMbtiQuestions } from "@/lib/mbti-questions-db";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 import { generateMbtiSynthesis } from "@/lib/mbti-synthesis";
 import { sendMbtiResultEmail } from "@/lib/email";
 import { enforceAuthRateLimit } from "@/lib/rate-limit";
@@ -44,6 +46,8 @@ export async function submitMbti(
   answers: Record<number, number>
 ): Promise<SubmitMbtiResult> {
   const user = await requireUser();
+  const locale = await getRequestLocale();
+  const en = locale === "en";
 
   try {
     await enforceAuthRateLimit({
@@ -81,19 +85,21 @@ export async function submitMbti(
   const synthesis = await generateMbtiSynthesis({
     firstName,
     type,
-    scores,
-    chart: chart?.data ?? null,
+      scores,
+      chart: chart?.data ?? null,
+      locale,
   });
 
   // Graceful floor: if every AI path fails, still save a result using the
   // static archetype + a short deterministic note, so the user isn't blocked.
   const archetypeNameGe =
-    synthesis?.archetypeNameGe?.trim() || mbtiArchetypeKa(type);
+    synthesis?.archetypeNameGe?.trim() || (en ? mbtiArchetypeEn(type) : mbtiArchetypeKa(type));
   const aiSynthesisText =
     synthesis?.analysisText ??
-    `შენი ფსიქოლოგიური ტიპია ${type} — ${mbtiArchetypeKa(type)}. ` +
-      "დეტალური ანალიზი მალე დაემატება.";
-  const model = synthesis?.model ?? "fallback";
+    (en
+      ? `Your personality type is ${type} — ${mbtiArchetypeEn(type)}. A detailed analysis will be added soon.`
+      : `შენი ფსიქოლოგიური ტიპია ${type} — ${mbtiArchetypeKa(type)}. დეტალური ანალიზი მალე დაემატება.`);
+  const model = `${locale}:${synthesis?.model ?? "fallback"}`;
 
   const [inserted] = await db
     .insert(mbtiTestResults)
@@ -107,7 +113,7 @@ export async function submitMbti(
     })
     .returning({ id: mbtiTestResults.id });
 
-  if (!inserted) return { ok: false, error: "შენახვა ვერ მოხერხდა. სცადე თავიდან." };
+  if (!inserted) return { ok: false, error: en ? "We could not save your result. Please try again." : "შენახვა ვერ მოხერხდა. სცადე თავიდან." };
 
   // Email the result in the background — the "sent to email" requirement.
   const resultId = inserted.id;
@@ -125,7 +131,9 @@ export async function submitMbti(
           name: firstName,
           resultId,
           mbtiType: type,
-          archetypeNameGe,
+          archetypeNameGe: en ? mbtiArchetypeEn(type) : archetypeNameGe,
+          locale,
+          origin: en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL,
         });
       }
     } catch (err) {

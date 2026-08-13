@@ -12,12 +12,15 @@ import { MBTI_ANSWERS_STORAGE_KEY, type MbtiQuestion } from "@/lib/mbti-question
  * authed → generate the result, anonymous → show the teaser gate. No AI runs
  * here, so anonymous takers can't trigger the expensive synthesis.
  */
-export function MbtiTestClient({ questions }: { questions: MbtiQuestion[] }) {
+export function MbtiTestClient({ questions, locale = "ka" }: { questions: MbtiQuestion[]; locale?: "ka" | "en" }) {
   const router = useRouter();
+  const en = locale === "en";
   return (
     <MbtiQuiz
       questions={questions}
-      workingLabel="ვამზადებ შენს შედეგს…"
+      locale={locale}
+      submitLabel={en ? "See my result" : "დასრულება"}
+      workingLabel={en ? "Preparing your result…" : "ვამზადებ შენს შედეგს…"}
       onSubmit={async (answers) => {
         try {
           window.localStorage.setItem(

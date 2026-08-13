@@ -35,6 +35,9 @@ export const AXIS_LABEL_KA: Record<MbtiAxis, readonly [string, string]> = {
   JP: ["ორგანიზებულობა", "სპონტანურობა"],
   AT: ["თავდაჯერებული", "მშფოთვარე"],
 };
+export const AXIS_LABEL_EN: Record<MbtiAxis, readonly [string, string]> = {
+  EI: ["Extraversion", "Introversion"], SN: ["Sensing", "Intuition"], TF: ["Thinking", "Feeling"], JP: ["Judging", "Prospecting"], AT: ["Assertive", "Turbulent"],
+};
 
 export type MbtiQuestion = {
   id: number;
@@ -43,6 +46,7 @@ export type MbtiQuestion = {
   pole: string;
   /** Georgian statement. */
   textKa: string;
+  textEn?: string;
 };
 
 export const MBTI_QUESTIONS: MbtiQuestion[] = [
@@ -117,16 +121,26 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   { id: 60, axis: "AT", pole: "T", textKa: "სტრესის დროს დასვენება და დამშვიდება მიჭირს." },
 ];
 
+const MBTI_TEXT_EN = [
+  "Crowded events energize me, and I rarely want to leave early.", "After prolonged social interaction, I need time alone to recharge.", "Starting a conversation with a stranger feels natural and easy to me.", "I prefer a few close friends to a large circle of acquaintances.", "Thinking aloud helps me; ideas often emerge while I speak.", "I prefer a deep one-to-one conversation to a large, noisy group.", "I make new acquaintances easily.", "I have a rich inner world and rarely become bored when alone.", "Being active at the center of events stimulates me.", "Being the center of attention for a long time drains me.", "At the end of the day, interaction with people tends to energize rather than exhaust me.", "I need time alone to think before making an important decision.",
+  "I trust concrete facts and experience more than theories.", "I often think about the future and possibilities that do not exist yet.", "I prefer focusing on details and practical steps to considering abstract ideas.", "I enjoy searching for symbols, hidden meanings and deeper connections.", "I prefer clear instructions that specify exactly what to do.", "I often notice the overall pattern before the individual details.", "I prefer attending to the present and tangible tasks rather than daydreaming.", "My imagination often leads me to ask, “What if?”", "I trust proven approaches more than new, untested ideas.", "New and unusual ideas excite me even when they initially seem impractical.", "I prefer a sequential, step-by-step approach to large leaps.", "I often think about meaning and purpose in life.",
+  "When deciding, I favor logic and objective analysis over emotion.", "Considering other people's feelings is often more important to me than following a strict rule.", "I give and receive criticism directly, without much softening.", "I easily notice when someone near me is in a bad mood.", "Fairness is often more important to me than compassion.", "Harmony is one of my highest priorities in relationships.", "I try to set emotion aside when making an important decision.", "Helping and supporting others comes naturally to me.", "In an argument, I care more about whether the reasoning is correct than who may feel hurt.", "I often make decisions by following what my heart tells me.", "Logical inconsistencies bother me, even when they are minor.", "I readily empathize with another person's pain as though it were my own.",
+  "I like plans and lists, and feel comfortable when things are arranged in advance.", "I prefer to keep my options open and decide at the last moment.", "I finish tasks ahead of deadlines and dislike waiting until the last minute.", "Spontaneity and unexpected changes excite rather than irritate me.", "An orderly environment and a clear schedule help me feel calm.", "Strict schedules feel restrictive; I prefer freedom.", "Reaching a decision brings relief, while unresolved matters bother me.", "I often change a plan when a better option appears along the way.", "I finish my work before allowing myself to relax.", "I tend to work better under time pressure.", "I like rules and expectations to be clear.", "Flexibility and adaptability are among my strengths.",
+  "I remain calm even in stressful situations.", "I often worry about what might go wrong.", "I trust myself and rarely doubt the soundness of my decisions.", "Other people's opinions of me concern me deeply.", "I cope with failure well and regain momentum quickly.", "I dwell on mistakes and criticize myself for a long time.", "My mood is stable and changes infrequently.", "I am a perfectionist and want everything to be flawless.", "I rarely worry about the future because I trust myself to cope.", "I often compare myself with others and worry that I may not be good enough.", "Criticism does not unsettle me for long; I consider it and move forward.", "When stressed, I find it difficult to relax and calm down.",
+];
+
+export const MBTI_QUESTIONS_EN: MbtiQuestion[] = MBTI_QUESTIONS.map((question, index) => ({ ...question, textEn: MBTI_TEXT_EN[index] }));
+
 /** 7-point Likert scale (16Personalities-style), +3 strongly-agree → −3
  *  strongly-disagree with a neutral middle. */
-export const MBTI_LIKERT: { value: number; labelKa: string }[] = [
-  { value: 3, labelKa: "სრულიად ვეთანხმები" },
-  { value: 2, labelKa: "ვეთანხმები" },
-  { value: 1, labelKa: "ნაწილობრივ ვეთანხმები" },
-  { value: 0, labelKa: "ნეიტრალური" },
-  { value: -1, labelKa: "ნაწილობრივ არ ვეთანხმები" },
-  { value: -2, labelKa: "არ ვეთანხმები" },
-  { value: -3, labelKa: "სრულიად არ ვეთანხმები" },
+export const MBTI_LIKERT: { value: number; labelKa: string; labelEn: string }[] = [
+  { value: 3, labelKa: "სრულიად ვეთანხმები", labelEn: "Strongly agree" },
+  { value: 2, labelKa: "ვეთანხმები", labelEn: "Agree" },
+  { value: 1, labelKa: "ნაწილობრივ ვეთანხმები", labelEn: "Slightly agree" },
+  { value: 0, labelKa: "ნეიტრალური", labelEn: "Neutral" },
+  { value: -1, labelKa: "ნაწილობრივ არ ვეთანხმები", labelEn: "Slightly disagree" },
+  { value: -2, labelKa: "არ ვეთანხმები", labelEn: "Disagree" },
+  { value: -3, labelKa: "სრულიად არ ვეთანხმები", labelEn: "Strongly disagree" },
 ];
 
 /** Canonical Georgian archetype names — the AI names one too, but this is the
@@ -149,6 +163,12 @@ export const MBTI_ARCHETYPE_KA: Record<string, string> = {
   ENFJ: "პროტაგონისტი",
   ENTJ: "მეთაური",
 };
+export const MBTI_ARCHETYPE_EN: Record<string, string> = {
+  ISTJ: "Logistician", ISFJ: "Defender", INFJ: "Advocate", INTJ: "Architect",
+  ISTP: "Virtuoso", ISFP: "Adventurer", INFP: "Mediator", INTP: "Logician",
+  ESTP: "Entrepreneur", ESFP: "Entertainer", ENFP: "Campaigner", ENTP: "Debater",
+  ESTJ: "Executive", ESFJ: "Consul", ENFJ: "Protagonist", ENTJ: "Commander",
+};
 
 /** The 4-letter Jungian base of a type, dropping any "-A/-T" Identity suffix. */
 export function mbtiBaseType(type: string): string {
@@ -158,6 +178,10 @@ export function mbtiBaseType(type: string): string {
 export function mbtiArchetypeKa(type: string): string {
   const base = mbtiBaseType(type);
   return MBTI_ARCHETYPE_KA[base] ?? base;
+}
+export function mbtiArchetypeEn(type: string): string {
+  const base = mbtiBaseType(type);
+  return MBTI_ARCHETYPE_EN[base] ?? base;
 }
 
 // ── Scoring ────────────────────────────────────────────────────────────────
