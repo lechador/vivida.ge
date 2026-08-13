@@ -29,6 +29,9 @@ import { signPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { ELEMENT_COLOR } from "@/lib/pdf/theme";
 import { cn } from "@/lib/utils";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ZodiacSignPageEn } from "@/components/seo/zodiac-sign-page-en";
+import { ZODIAC_SIGN_EN } from "@/lib/zodiac-sign-en";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -51,6 +54,26 @@ export async function generateMetadata({
   if (!isSlug(sign)) return {};
   const c = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign);
+  const en = (await getRequestLocale()) === "en";
+  if (en && meta) {
+    const name = meta.labelEn;
+    const title = `${name} Zodiac Sign: Dates, Traits, Love and Compatibility`;
+    const description = `${name} zodiac sign guide: ${ZODIAC_SIGN_EN[sign].tagline} Explore dates, personality traits, strengths, challenges, love, career, and compatibility.`;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: { canonical: `https://vividaastro.com/zodiac/${sign}` },
+      openGraph: {
+        type: "article",
+        url: `https://vividaastro.com/zodiac/${sign}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   const accent = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
   const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(c.labelKa)}&k=${encodeURIComponent("ზოდიაქოს ნიშანი")}&a=${encodeURIComponent(accent)}`;
   return {
@@ -88,13 +111,15 @@ export default async function ZodiacSignPage({
 }) {
   const { sign } = await params;
   if (!isSlug(sign)) notFound();
+  if ((await getRequestLocale()) === "en")
+    return <ZodiacSignPageEn sign={sign} />;
   const c = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign);
   const accent = meta ? signColor(meta) : "var(--vivida-violet)";
   const dates = ZODIAC_DATES[sign];
   const latinQueries = signPageLatinQueries(sign);
   const availableYears = ALL_YEARLY_YEARS.filter((y) =>
-    yearlyContentFor(sign, y)
+    yearlyContentFor(sign, y),
   );
 
   const articleLd = {
@@ -103,7 +128,10 @@ export default async function ZodiacSignPage({
     headline: c.pageTitle,
     description: c.metaDescription,
     inLanguage: "ka-GE",
-    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/zodiac/${sign}` },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}/zodiac/${sign}`,
+    },
     author: { "@type": "Organization", name: "Vivida", url: SITE_URL },
     publisher: { "@type": "Organization", name: "Vivida", url: SITE_URL },
     about: {
@@ -325,7 +353,10 @@ export default async function ZodiacSignPage({
                 <Link
                   key={i}
                   href={pairHref}
-                  className={cn(cardClass, "hover:bg-card/80 hover:ring-foreground/15")}
+                  className={cn(
+                    cardClass,
+                    "hover:bg-card/80 hover:ring-foreground/15",
+                  )}
                 >
                   {inner}
                 </Link>
@@ -465,7 +496,7 @@ export default async function ZodiacSignPage({
                   key={s}
                   href={`/zodiac/${s}`}
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+                    "inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80",
                   )}
                 >
                   <span style={{ color: otherAccent }}>{other.symbol}</span>
@@ -485,8 +516,8 @@ export default async function ZodiacSignPage({
             ეს მხოლოდ მზის ნიშანია
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            შენი სრული რუკა მთვარეს, ამომავალს და ცის 12 სახლს მოიცავს.
-            Vivida უფასოდ ქმნის პერსონალურ ინტერპრეტაციას.
+            შენი სრული რუკა მთვარეს, ამომავალს და ცის 12 სახლს მოიცავს. Vivida
+            უფასოდ ქმნის პერსონალურ ინტერპრეტაციას.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/nataluri-ruka">ჩემი სრული რუკა</Link>

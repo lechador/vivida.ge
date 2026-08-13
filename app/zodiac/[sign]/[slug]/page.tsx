@@ -31,6 +31,11 @@ import {
   viewFromPath,
 } from "@/lib/sign-horoscope";
 import { HoroscopeView } from "./horoscope-view";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import {
+  SignHoroscopePageEn,
+  VIEW_LABEL_EN,
+} from "@/components/seo/sign-horoscope-page-en";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -91,6 +96,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { sign, slug } = await params;
   if (!isSlug(sign)) return {};
+  const en = (await getRequestLocale()) === "en";
 
   const view = viewFromPath(slug);
   if (view) {
@@ -100,28 +106,42 @@ export async function generateMetadata({
     const periodLabel = signHoroscopePeriodLabel(anchor, periodForView(view));
     // Lead with "<sign> ჰოროსკოპი" — the exact shape of the query ("ვერძი
     // ჰოროსკოპი", "verdzi horoskopi") — then the view + live period label.
-    const title = `${sc.labelKa} ჰოროსკოპი — ${VIEW_TITLE_KA[view]} (${periodLabel})`;
-    const description = `${sc.labelKa}-ის ${VIEW_TITLE_KA[view]} (${periodLabel}). ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები — რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.`;
+    const name = en ? (signMetaBySlug(sign)?.labelEn ?? sign) : sc.labelKa;
+    const title = en
+      ? `${name} Horoscope — ${VIEW_LABEL_EN[view]}`
+      : `${sc.labelKa} ჰოროსკოპი — ${VIEW_TITLE_KA[view]} (${periodLabel})`;
+    const description = en
+      ? `${name} ${VIEW_LABEL_EN[view].toLowerCase()}: practical guidance for relationships, priorities, work, and personal growth.`
+      : `${sc.labelKa}-ის ${VIEW_TITLE_KA[view]} (${periodLabel}). ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები — რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.`;
     return {
       title: { absolute: title },
       description,
-      keywords: [
-        `${sc.labelKa} ჰოროსკოპი`,
-        `${genitiveKa(sc.labelKa)} ჰოროსკოპი`,
-        `${sc.labelKa} ${VIEW_TITLE_KA[view]}`,
-        "ჰოროსკოპი",
-        "დღის ჰოროსკოპი",
-        "ზოდიაქოს ნიშნები",
-        "horoskopi",
-      ],
-      alternates: { canonical: url },
+      keywords: en
+        ? [
+            `${name} horoscope`,
+            `${name} horoscope today`,
+            VIEW_LABEL_EN[view],
+            "daily horoscope",
+          ]
+        : [
+            `${sc.labelKa} ჰოროსკოპი`,
+            `${genitiveKa(sc.labelKa)} ჰოროსკოპი`,
+            `${sc.labelKa} ${VIEW_TITLE_KA[view]}`,
+            "ჰოროსკოპი",
+            "დღის ჰოროსკოპი",
+            "ზოდიაქოს ნიშნები",
+            "horoskopi",
+          ],
+      alternates: {
+        canonical: en ? `https://vividaastro.com/zodiac/${sign}/${slug}` : url,
+      },
       openGraph: {
         type: "article",
-        url,
+        url: en ? `https://vividaastro.com/zodiac/${sign}/${slug}` : url,
         title,
         description,
         siteName: "Vivida",
-        locale: "ka_GE",
+        locale: en ? "en_US" : "ka_GE",
       },
       twitter: { card: "summary_large_image", title, description },
     };
@@ -161,6 +181,8 @@ export default async function ZodiacSignSlugPage({
 
   const view = viewFromPath(slug);
   if (view) {
+    if ((await getRequestLocale()) === "en")
+      return <SignHoroscopePageEn sign={sign} view={view} />;
     return <HoroscopeView sign={sign} view={view} />;
   }
 
@@ -439,8 +461,8 @@ export default async function ZodiacSignSlugPage({
             წლიური ჰოროსკოპი მზის ნიშანზე საუბრობს
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            სრული წლის სცენარი ნატალურ რუკაშია — მთვარე, ვენერა, მარსი და ცის
-            12 სახლი. Vivida უფასოდ აერთიანებს ყველაფერს.
+            სრული წლის სცენარი ნატალურ რუკაშია — მთვარე, ვენერა, მარსი და ცის 12
+            სახლი. Vivida უფასოდ აერთიანებს ყველაფერს.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/signup">ჩემი სრული რუკა</Link>
