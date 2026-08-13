@@ -20,6 +20,9 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { moonPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ZodiacPlacementPageEn } from "@/components/seo/zodiac-placement-page-en";
+import { placementEnglish } from "@/lib/zodiac-placement-en";
 
 const SITE_URL = "https://www.vivida.ge";
 const HUB_PATH = "/zodiac/mtvare";
@@ -41,6 +44,28 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { sign } = await params;
   if (!isSlug(sign) || !MOONS_CONTENT) return {};
+  if ((await getRequestLocale()) === "en") {
+    const c = placementEnglish("moon", sign);
+    const url = `https://vividaastro.com${HUB_PATH}/${sign}`;
+    return {
+      title: { absolute: c.title },
+      description: c.description,
+      alternates: { canonical: url },
+      openGraph: {
+        type: "article",
+        url,
+        title: c.title,
+        description: c.description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: c.title,
+        description: c.description,
+      },
+    };
+  }
   const c = MOONS_CONTENT[sign];
   return {
     title: { absolute: c.pageTitle },
@@ -69,6 +94,8 @@ export default async function MoonSignPage({
 }) {
   const { sign } = await params;
   if (!isSlug(sign)) notFound();
+  if ((await getRequestLocale()) === "en")
+    return <ZodiacPlacementPageEn kind="moon" sign={sign} />;
   if (!MOONS_CONTENT) notFound();
   const moons = MOONS_CONTENT;
   const c = moons[sign];

@@ -214,7 +214,7 @@ export function LegalPageEn({
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.28_0.14_300/0.4),transparent_70%)]"
       />
-      <SmartHeader />
+      <SmartHeader locale="en" />
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           Legal
@@ -268,7 +268,7 @@ export function LegalPageEn({
           ))}
         </article>
       </section>
-      <SiteFooter />
+      <SiteFooter locale="en" />
     </main>
   );
 }

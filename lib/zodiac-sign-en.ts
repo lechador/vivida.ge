@@ -252,6 +252,10 @@ export const ELEMENT_EN: Record<string, string> = {
   earth: "Earth",
   air: "Air",
   water: "Water",
+  ცეცხლი: "Fire",
+  მიწა: "Earth",
+  ჰაერი: "Air",
+  წყალი: "Water",
 };
 export const MODALITY_EN: Record<string, string> = {
   კარდინალური: "Cardinal",

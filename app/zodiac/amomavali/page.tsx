@@ -17,12 +17,34 @@ import {
   signMetaBySlug,
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ZodiacPlacementHubEn } from "@/components/seo/zodiac-placement-hub-en";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/amomavali";
 
-export const metadata: Metadata = RISING_HUB_CONTENT
-  ? {
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) === "en") {
+    const title = "Rising Signs: Ascendant Meaning and First Impressions";
+    const description =
+      "Explore what your rising sign reveals about first impressions, outward style, life approach, relationships, and the structure of your birth chart.";
+    return {
+      title: { absolute: title },
+      description,
+      alternates: { canonical: "https://vividaastro.com/zodiac/amomavali" },
+      openGraph: {
+        type: "website",
+        url: "https://vividaastro.com/zodiac/amomavali",
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
+  return RISING_HUB_CONTENT
+    ? {
       title: { absolute: RISING_HUB_CONTENT.pageTitle },
       description: RISING_HUB_CONTENT.metaDescription,
       alternates: { canonical: `${SITE_URL}${PATH}` },
@@ -39,10 +61,13 @@ export const metadata: Metadata = RISING_HUB_CONTENT
         title: RISING_HUB_CONTENT.pageTitle,
         description: RISING_HUB_CONTENT.metaDescription,
       },
-    }
-  : {};
+      }
+    : {};
+}
 
-export default function RisingHubPage() {
+export default async function RisingHubPage() {
+  if ((await getRequestLocale()) === "en")
+    return <ZodiacPlacementHubEn kind="rising" />;
   if (!RISING_HUB_CONTENT || !RISINGS_CONTENT) notFound();
   const c = RISING_HUB_CONTENT;
   const risings = RISINGS_CONTENT;

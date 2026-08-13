@@ -75,7 +75,7 @@ export function NatalChartPageEn() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
       />
       <Starfield count={150} shooting={3} />
-      <SmartHeader />
+      <SmartHeader locale="en" />
       {ld.map((item, index) => (
         <script
           key={index}
@@ -243,7 +243,7 @@ export function NatalChartPageEn() {
           ]}
         />
       </section>
-      <SiteFooter />
+      <SiteFooter locale="en" />
     </main>
   );
 }

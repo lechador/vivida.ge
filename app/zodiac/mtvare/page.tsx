@@ -17,12 +17,34 @@ import {
   signMetaBySlug,
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ZodiacPlacementHubEn } from "@/components/seo/zodiac-placement-hub-en";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/mtvare";
 
-export const metadata: Metadata = MOON_HUB_CONTENT
-  ? {
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) === "en") {
+    const title = "Moon Signs: Meaning, Emotional Traits and Love";
+    const description =
+      "Discover what your Moon sign reveals about emotional needs, instinctive reactions, love, compatibility, and your private inner world.";
+    return {
+      title: { absolute: title },
+      description,
+      alternates: { canonical: "https://vividaastro.com/zodiac/mtvare" },
+      openGraph: {
+        type: "website",
+        url: "https://vividaastro.com/zodiac/mtvare",
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
+  return MOON_HUB_CONTENT
+    ? {
       title: { absolute: MOON_HUB_CONTENT.pageTitle },
       description: MOON_HUB_CONTENT.metaDescription,
       alternates: { canonical: `${SITE_URL}${PATH}` },
@@ -39,10 +61,13 @@ export const metadata: Metadata = MOON_HUB_CONTENT
         title: MOON_HUB_CONTENT.pageTitle,
         description: MOON_HUB_CONTENT.metaDescription,
       },
-    }
-  : {};
+      }
+    : {};
+}
 
-export default function MoonHubPage() {
+export default async function MoonHubPage() {
+  if ((await getRequestLocale()) === "en")
+    return <ZodiacPlacementHubEn kind="moon" />;
   if (!MOON_HUB_CONTENT || !MOONS_CONTENT) notFound();
   const c = MOON_HUB_CONTENT;
   const moons = MOONS_CONTENT;
