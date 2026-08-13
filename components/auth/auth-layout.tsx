@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { Starfield } from "@/components/landing/starfield";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Shared chrome for /login, /signup, /forgot-password, /reset-password,
@@ -13,14 +14,16 @@ export function AuthLayout({
   subtitle,
   children,
   footer,
+  locale = "ka",
 }: {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  locale?: UserLocale;
 }) {
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.4),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.35),transparent_70%)]"
@@ -73,11 +76,11 @@ export function AuthLayout({
 }
 
 /** Branded "or continue with" divider used between Google and email forms. */
-export function AuthDivider() {
+export function AuthDivider({ locale = "ka" }: { locale?: UserLocale }) {
   return (
     <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-muted-foreground/70">
       <span className="h-px flex-1 bg-border/60" />
-      ან
+      {locale === "en" ? "or" : "ან"}
       <span className="h-px flex-1 bg-border/60" />
     </div>
   );

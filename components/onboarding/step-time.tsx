@@ -7,25 +7,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { TimeValue } from "./types";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function StepTime({
   value,
   onChange,
+  locale = "ka",
 }: {
   value: TimeValue;
   onChange: (next: TimeValue) => void;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const minuteRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="space-y-6">
       <header className="space-y-2 text-center">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          ზუსტი დროც მნიშვნელოვანია.
+          {en ? "The exact time matters too." : "ზუსტი დროც მნიშვნელოვანია."}
         </h2>
         <p className="text-muted-foreground">
-          დაბადების დრო ხსნის შენს ამომავალ ნიშანსა და სახლებს — რუკის ყველაზე
-          ღრმა შრეს.
+          {en
+            ? "Your birth time reveals your rising sign and houses—the chart's deepest layer."
+            : "დაბადების დრო ხსნის შენს ამომავალ ნიშანსა და სახლებს — რუკის ყველაზე ღრმა შრეს."}
         </p>
       </header>
 
@@ -36,7 +41,7 @@ export function StepTime({
         )}
       >
         <div className="space-y-1.5">
-          <Label htmlFor="hour">საათი</Label>
+          <Label htmlFor="hour">{en ? "Hour" : "საათი"}</Label>
           <Input
             id="hour"
             inputMode="numeric"
@@ -54,7 +59,7 @@ export function StepTime({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="minute">წუთი</Label>
+          <Label htmlFor="minute">{en ? "Minute" : "წუთი"}</Label>
           <Input
             id="minute"
             ref={minuteRef}
@@ -93,14 +98,14 @@ export function StepTime({
               : "border-muted-foreground"
           )}
         />
-        არ ვიცი ზუსტი დრო
+        {en ? "I don't know the exact time" : "არ ვიცი ზუსტი დრო"}
       </motion.button>
 
       {value.unknown && (
         <p className="mx-auto max-w-sm text-center text-xs text-muted-foreground/80">
-          ამ შემთხვევაში, დროს 12:00-ად ჩავთვლით. შენი მზე და პლანეტების
-          უმეტესობა ზუსტი იქნება, თუმცა ამომავალი ნიშანი და სახლები, შესაძლოა,
-          არ იყოს ზუსტი.
+          {en
+            ? "We'll use 12:00 in this case. Your Sun and most planets will remain accurate, but your rising sign and houses may not be."
+            : "ამ შემთხვევაში, დროს 12:00-ად ჩავთვლით. შენი მზე და პლანეტების უმეტესობა ზუსტი იქნება, თუმცა ამომავალი ნიშანი და სახლები, შესაძლოა, არ იყოს ზუსტი."}
         </p>
       )}
     </div>

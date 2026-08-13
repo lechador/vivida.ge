@@ -10,6 +10,7 @@ import { FriendRequestEmail } from "@/lib/email-templates/friend-request";
 import { MessageEmail } from "@/lib/email-templates/message";
 import { MbtiResultEmail } from "@/lib/email-templates/mbti-result";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
+import { isEnglishHost } from "@/lib/seo/locales";
 
 /**
  * Resend client. Lazily-instantiated so dev environments without the API
@@ -51,6 +52,15 @@ function absUrl(path: string, origin: string = ORIGIN): string {
   return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+function localeForOrigin(origin: string | undefined): "ka" | "en" {
+  if (!origin) return "ka";
+  try {
+    return isEnglishHost(new URL(origin).hostname) ? "en" : "ka";
+  } catch {
+    return "ka";
+  }
+}
+
 /**
  * Send the post-signup verification email. Returns silently on success;
  * logs and rethrows on failure so the calling action can surface a
@@ -82,12 +92,13 @@ export async function sendVerificationEmail({
     );
     return;
   }
-  const subject = "დაადასტურე შენი ელფოსტა · Vivida";
+  const locale = localeForOrigin(origin);
+  const subject = locale === "en" ? "Verify your email · Vivida" : "დაადასტურე შენი ელფოსტა · Vivida";
   const result = await c.emails.send({
     from: FROM,
     to,
     subject,
-    react: VerificationEmail({ name, verifyUrl, code: code ?? null }),
+    react: VerificationEmail({ name, verifyUrl, code: code ?? null, locale }),
   });
   if (result.error) {
     console.error("[email] verification send failed:", result.error);
@@ -119,12 +130,13 @@ export async function sendPasswordResetEmail({
     );
     return;
   }
-  const subject = "პაროლის აღდგენა · Vivida";
+  const locale = localeForOrigin(origin);
+  const subject = locale === "en" ? "Reset your password · Vivida" : "პაროლის აღდგენა · Vivida";
   const result = await c.emails.send({
     from: FROM,
     to,
     subject,
-    react: PasswordResetEmail({ name, resetUrl }),
+    react: PasswordResetEmail({ name, resetUrl, locale }),
   });
   if (result.error) {
     console.error("[email] password reset send failed:", result.error);

@@ -2,17 +2,18 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import {
+  normalizeUserLocale,
+  type UserLocale,
+} from "./locale";
+import { getRequestLocale } from "./request-locale";
 
-export const USER_LOCALES = ["ka", "en"] as const;
-export type UserLocale = (typeof USER_LOCALES)[number];
-
-export function normalizeUserLocale(value: string | null | undefined): UserLocale {
-  return value === "en" ? "en" : "ka";
-}
-
-export function isEnglish(locale: UserLocale): boolean {
-  return locale === "en";
-}
+export {
+  isEnglish,
+  normalizeUserLocale,
+  USER_LOCALES,
+  type UserLocale,
+} from "./locale";
 
 export async function getUserLocale(userId: string): Promise<UserLocale> {
   const [row] = await db
@@ -20,5 +21,5 @@ export async function getUserLocale(userId: string): Promise<UserLocale> {
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
-  return normalizeUserLocale(row?.locale);
+  return getRequestLocale(normalizeUserLocale(row?.locale));
 }

@@ -138,6 +138,18 @@ export default function RootLayout({
       className={`dark scroll-smooth ${notoGeorgian.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        {/* The same deployment serves two language domains. Keep the root
+            layout static, but set the document language before the body is
+            parsed so shared/authenticated routes on .com are announced as
+            English without a hydration flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'if(/(^|\\.)vividaastro\\.com$/i.test(location.hostname)){document.documentElement.lang="en"}',
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {/* Scroll-reveal sections start opacity:0 and are shown by JS. With
             JS disabled, force them visible so content is never hidden. */}
@@ -148,7 +160,8 @@ export default function RootLayout({
           href="#main-content"
           className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-xl border border-[var(--vivida-violet)]/60 bg-background px-4 py-2.5 text-sm font-semibold text-foreground shadow-xl transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[var(--vivida-violet)] focus:ring-offset-2 focus:ring-offset-background"
         >
-          მთავარ კონტენტზე გადასვლა
+          <span className="locale-ka-only">მთავარ კონტენტზე გადასვლა</span>
+          <span className="locale-en-only">Skip to main content</span>
         </a>
         <NextTopLoader
           color="oklch(0.78 0.18 305)"

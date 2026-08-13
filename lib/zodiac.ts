@@ -68,28 +68,30 @@ export function signColor(sign: ZodiacSign): string {
 export type CelestialBody = {
   key: string;
   labelKa: string;
+  labelEn: string;
   symbol: string;
   emoji: string;
   /** display order on the dashboard */
   order: number;
   /** One-line description of what this planet represents (Georgian). */
   meaningKa: string;
+  meaningEn: string;
 };
 
 export const BODIES: Record<string, CelestialBody> = {
-  sun:        { key: "sun",        labelKa: "მზე",       symbol: "☉", emoji: "☀️", order: 0,  meaningKa: "ბირთვი, იდენტობა, სიცოცხლის ცეცხლი" },
-  moon:       { key: "moon",       labelKa: "მთვარე",    symbol: "☽", emoji: "🌙", order: 1,  meaningKa: "ემოციები, შინაგანი სამყარო, ინსტინქტები" },
-  ascendant:  { key: "ascendant",  labelKa: "ამომავალი",  symbol: "AC", emoji: "⬆️", order: 2,  meaningKa: "სოციალური ნიღაბი, პირველი შთაბეჭდილება" },
-  mercury:    { key: "mercury",    labelKa: "მერკური",    symbol: "☿", emoji: "☿",  order: 3,  meaningKa: "გონება, აზროვნება, კომუნიკაცია" },
-  venus:      { key: "venus",      labelKa: "ვენერა",     symbol: "♀", emoji: "♀",  order: 4,  meaningKa: "სიყვარული, სილამაზე, ღირებულებები" },
-  mars:       { key: "mars",       labelKa: "მარსი",      symbol: "♂", emoji: "♂",  order: 5,  meaningKa: "მოქმედება, ენერგია, ვნება" },
-  jupiter:    { key: "jupiter",    labelKa: "იუპიტერი",   symbol: "♃", emoji: "♃",  order: 6,  meaningKa: "ზრდა, შესაძლებლობები, ფილოსოფია" },
-  saturn:     { key: "saturn",     labelKa: "სატურნი",    symbol: "♄", emoji: "♄",  order: 7,  meaningKa: "დისციპლინა, საზღვრები, ხანგრძლივი მიზანი" },
-  uranus:     { key: "uranus",     labelKa: "ურანი",      symbol: "♅", emoji: "♅",  order: 8,  meaningKa: "ცვლილება, თავისუფლება, უცხო" },
-  neptune:    { key: "neptune",    labelKa: "ნეპტუნი",    symbol: "♆", emoji: "♆",  order: 9,  meaningKa: "ოცნება, ინტუიცია, წარმოსახვა" },
-  pluto:      { key: "pluto",      labelKa: "პლუტონი",    symbol: "♇", emoji: "♇",  order: 10, meaningKa: "ტრანსფორმაცია, ძალა, განახლება" },
-  midheaven:  { key: "midheaven",  labelKa: "ზენიტი",     symbol: "MC", emoji: "⬆️", order: 11, meaningKa: "კარიერა, საზოგადოებრივი იმიჯი" },
-  chiron:     { key: "chiron",     labelKa: "ქირონი",     symbol: "⚷", emoji: "⚷",  order: 12, meaningKa: "შინაგანი ჭრილობა, განკურნება, სიბრძნე ტკივილიდან" },
+  sun:        { key: "sun", labelKa: "მზე", labelEn: "Sun", symbol: "☉", emoji: "☀️", order: 0, meaningKa: "ბირთვი, იდენტობა, სიცოცხლის ცეცხლი", meaningEn: "core identity, vitality and purpose" },
+  moon:       { key: "moon", labelKa: "მთვარე", labelEn: "Moon", symbol: "☽", emoji: "🌙", order: 1, meaningKa: "ემოციები, შინაგანი სამყარო, ინსტინქტები", meaningEn: "emotions, instincts and inner life" },
+  ascendant:  { key: "ascendant", labelKa: "ამომავალი", labelEn: "Ascendant", symbol: "AC", emoji: "⬆️", order: 2, meaningKa: "სოციალური ნიღაბი, პირველი შთაბეჭდილება", meaningEn: "first impressions and outward style" },
+  mercury:    { key: "mercury", labelKa: "მერკური", labelEn: "Mercury", symbol: "☿", emoji: "☿", order: 3, meaningKa: "გონება, აზროვნება, კომუნიკაცია", meaningEn: "thinking, learning and communication" },
+  venus:      { key: "venus", labelKa: "ვენერა", labelEn: "Venus", symbol: "♀", emoji: "♀", order: 4, meaningKa: "სიყვარული, სილამაზე, ღირებულებები", meaningEn: "love, attraction, beauty and values" },
+  mars:       { key: "mars", labelKa: "მარსი", labelEn: "Mars", symbol: "♂", emoji: "♂", order: 5, meaningKa: "მოქმედება, ენერგია, ვნება", meaningEn: "action, drive, energy and desire" },
+  jupiter:    { key: "jupiter", labelKa: "იუპიტერი", labelEn: "Jupiter", symbol: "♃", emoji: "♃", order: 6, meaningKa: "ზრდა, შესაძლებლობები, ფილოსოფია", meaningEn: "growth, opportunity and perspective" },
+  saturn:     { key: "saturn", labelKa: "სატურნი", labelEn: "Saturn", symbol: "♄", emoji: "♄", order: 7, meaningKa: "დისციპლინა, საზღვრები, ხანგრძლივი მიზანი", meaningEn: "discipline, boundaries and long-term growth" },
+  uranus:     { key: "uranus", labelKa: "ურანი", labelEn: "Uranus", symbol: "♅", emoji: "♅", order: 8, meaningKa: "ცვლილება, თავისუფლება, უცხო", meaningEn: "change, freedom and innovation" },
+  neptune:    { key: "neptune", labelKa: "ნეპტუნი", labelEn: "Neptune", symbol: "♆", emoji: "♆", order: 9, meaningKa: "ოცნება, ინტუიცია, წარმოსახვა", meaningEn: "dreams, intuition and imagination" },
+  pluto:      { key: "pluto", labelKa: "პლუტონი", labelEn: "Pluto", symbol: "♇", emoji: "♇", order: 10, meaningKa: "ტრანსფორმაცია, ძალა, განახლება", meaningEn: "transformation, power and renewal" },
+  midheaven:  { key: "midheaven", labelKa: "ზენიტი", labelEn: "Midheaven", symbol: "MC", emoji: "⬆️", order: 11, meaningKa: "კარიერა, საზოგადოებრივი იმიჯი", meaningEn: "career, reputation and public direction" },
+  chiron:     { key: "chiron", labelKa: "ქირონი", labelEn: "Chiron", symbol: "⚷", emoji: "⚷", order: 12, meaningKa: "შინაგანი ჭრილობა, განკურნება, სიბრძნე ტკივილიდან", meaningEn: "wounds, healing and hard-won wisdom" },
 };
 
 export function bodyMeta(key: string): CelestialBody | undefined {

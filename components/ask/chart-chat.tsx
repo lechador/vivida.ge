@@ -4,30 +4,48 @@ import { useEffect, useRef, useState } from "react";
 import { Send, Sparkles } from "lucide-react";
 
 import { CreditHint } from "@/components/credits/credit-hint";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-const ERRORS: Record<string, string> = {
+const ERRORS_KA: Record<string, string> = {
   rate_limited: "დღევანდელი ლიმიტი ამოიწურა. სცადე ხვალ.",
   no_chart: "ჯერ შენი რუკა უნდა შეიქმნას.",
   unavailable: "სერვისი დროებით მიუწვდომელია.",
   invalid_message: "შეტყობინება ცარიელია ან ძალიან გრძელია.",
 };
 
-const STARTERS = [
+const STARTERS_KA = [
   "რა არის ჩემი ძლიერი მხარეები?",
   "რას ამბობს ჩემი მთვარე ემოციებზე?",
   "როგორი ვარ ურთიერთობებში?",
   "რა მირჩევნია კარიერაში?",
 ];
+const STARTERS_EN = [
+  "What are my greatest strengths?",
+  "What does my Moon say about my emotions?",
+  "What am I like in relationships?",
+  "What kind of career suits me?",
+];
+const ERRORS_EN: Record<string, string> = {
+  rate_limited: "You've reached today's limit. Try again tomorrow.",
+  no_chart: "Create your natal chart first.",
+  unavailable: "The service is temporarily unavailable.",
+  invalid_message: "Your message is empty or too long.",
+  needs_credits: "You need more credits to ask another question.",
+};
 
 export function ChartChat({
   initialMessages,
   firstName,
+  locale = "ka",
 }: {
   initialMessages: Msg[];
   firstName: string | null;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
+  const starters = en ? STARTERS_EN : STARTERS_KA;
   const [messages, setMessages] = useState<Msg[]>(initialMessages);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -54,7 +72,10 @@ export function ChartChat({
       });
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => ({}));
-        setError(ERRORS[data.error] ?? "რაღაც ვერ მოხერხდა. სცადე ხელახლა.");
+        setError(
+          (en ? ERRORS_EN : ERRORS_KA)[data.error] ??
+            (en ? "Something went wrong. Please try again." : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
+        );
         setMessages((prev) => prev.slice(0, -1)); // drop empty assistant bubble
         return;
       }
@@ -72,7 +93,7 @@ export function ChartChat({
         });
       }
     } catch {
-      setError("ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
       setMessages((prev) => prev.slice(0, -1));
     } finally {
       setSending(false);
@@ -90,11 +111,13 @@ export function ChartChat({
           <div className="rounded-2xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
             <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
             <p className="text-pretty text-base text-foreground/85">
-              {firstName ? `${firstName}, ` : ""}დამისვი შეკითხვა შენი რუკის შესახებ —
-              ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო.
+              {firstName ? `${firstName}, ` : ""}
+              {en
+                ? "ask me anything about your chart—personality, emotions, relationships, career or timing."
+                : "დამისვი შეკითხვა შენი რუკის შესახებ — ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო."}
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {STARTERS.map((q) => (
+              {starters.map((q) => (
                 <button
                   key={q}
                   type="button"
@@ -152,24 +175,28 @@ export function ChartChat({
               }
             }}
             rows={1}
-            placeholder="დაწერე შეკითხვა…"
+            placeholder={en ? "Write your question…" : "დაწერე შეკითხვა…"}
             disabled={sending}
             className="max-h-32 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground"
           />
           <button
             type="submit"
             disabled={sending || !input.trim()}
-            aria-label="გაგზავნა"
+            aria-label={en ? "Send" : "გაგზავნა"}
             className="grid size-10 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-md transition-opacity disabled:opacity-40"
           >
             <Send className="size-4" />
           </button>
         </div>
         <div className="mt-2 flex justify-center">
-          <CreditHint>დღეში 2 უფასო შეკითხვა, შემდეგ −1 კრედიტი</CreditHint>
+          <CreditHint>
+            {en ? "2 free questions per day, then −1 credit" : "დღეში 2 უფასო შეკითხვა, შემდეგ −1 კრედიტი"}
+          </CreditHint>
         </div>
         <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
-          AI ასტროლოგი ცდება — გამოიყენე რეფლექსიისთვის, არა გადაწყვეტილებებისთვის.
+          {en
+            ? "AI astrologers can be wrong—use this for reflection, not decisions."
+            : "AI ასტროლოგი ცდება — გამოიყენე რეფლექსიისთვის, არა გადაწყვეტილებებისთვის."}
         </p>
       </form>
     </div>

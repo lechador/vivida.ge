@@ -1,4 +1,16 @@
 @import "tailwindcss";
+
+.locale-en-only {
+  display: none;
+}
+
+html[lang="en"] .locale-en-only {
+  display: inline;
+}
+
+html[lang="en"] .locale-ka-only {
+  display: none;
+}
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));

@@ -6,8 +6,13 @@ import { auth } from "@/auth";
 import { AuthDivider, AuthLayout } from "@/components/auth/auth-layout";
 import { GoogleButton } from "@/components/auth/google-button";
 import { LoginForm } from "@/components/auth/login-form";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "შესვლა" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  return { title: locale === "en" ? "Sign in" : "შესვლა" };
+}
 
 /** Same-origin relative path only (no open redirect). */
 function safeNext(v: string | undefined): string | null {
@@ -21,30 +26,33 @@ export default async function LoginPage({
 }) {
   const { next } = await searchParams;
   const dest = safeNext(next);
+  const locale = await getRequestLocale();
+  const en = locale === "en";
   const session = await auth();
   if (session?.user?.id) redirect(dest ?? "/dashboard");
 
   return (
     <AuthLayout
-      title="კეთილი იყოს შენი დაბრუნება"
-      subtitle="შემოდი შენს კოსმიურ რუკაში."
+      locale={locale}
+      title={en ? "Welcome back" : "კეთილი იყოს შენი დაბრუნება"}
+      subtitle={en ? "Step back into your cosmic map." : "შემოდი შენს კოსმიურ რუკაში."}
       footer={
         <>
-          ჯერ არ გაქვს ანგარიში?{" "}
+          {en ? "New to Vivida?" : "ჯერ არ გაქვს ანგარიში?"}{" "}
           <Link
             href={dest ? `/signup?next=${encodeURIComponent(dest)}` : "/signup"}
             className="text-foreground underline-offset-2 hover:underline"
           >
-            დარეგისტრირდი
+            {en ? "Create an account" : "დარეგისტრირდი"}
           </Link>
         </>
       }
     >
-      <GoogleButton callbackUrl={dest ?? "/dashboard"} />
-      <AuthDivider />
+      <GoogleButton locale={locale} callbackUrl={dest ?? "/dashboard"} />
+      <AuthDivider locale={locale} />
       {/* useSearchParams in LoginForm requires a Suspense boundary. */}
       <Suspense fallback={null}>
-        <LoginForm />
+        <LoginForm locale={locale} />
       </Suspense>
     </AuthLayout>
   );

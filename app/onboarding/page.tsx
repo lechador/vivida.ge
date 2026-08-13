@@ -7,8 +7,13 @@ import { requireUser } from "@/lib/auth-helpers";
 import { Starfield } from "@/components/landing/starfield";
 import { OnboardingWizard } from "@/components/onboarding/wizard";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "გაცნობა" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  return { title: locale === "en" ? "Set up your chart" : "გაცნობა" };
+}
 
 /** Same-origin relative path only (no open redirect). */
 function safeNext(v: string | undefined): string | undefined {
@@ -21,6 +26,8 @@ export default async function OnboardingPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const user = await requireUser();
+  const locale = await getRequestLocale();
+  const en = locale === "en";
   const { next } = await searchParams;
 
   const [existing] = await db
@@ -30,7 +37,7 @@ export default async function OnboardingPage({
     .limit(1);
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(50%_40%_at_50%_0%,oklch(0.28_0.12_300/0.45),transparent_70%),radial-gradient(35%_30%_at_85%_75%,oklch(0.32_0.13_200/0.35),transparent_70%)]"
@@ -51,7 +58,7 @@ export default async function OnboardingPage({
           </span>
         </Link>
         <div className="text-right text-xs text-muted-foreground">
-          სალამი, {user.name?.split(" ")[0] ?? "ვარსკვლავო"} ✨
+          {en ? "Hi" : "სალამი"}, {user.name?.split(" ")[0] ?? (en ? "stargazer" : "ვარსკვლავო")} ✨
         </div>
       </header>
 
@@ -60,6 +67,7 @@ export default async function OnboardingPage({
           initialProfile={existing ?? null}
           defaultName={user.name ?? null}
           next={safeNext(next)}
+          locale={locale}
         />
       </section>
     </main>

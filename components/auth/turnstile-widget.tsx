@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Thin wrapper around @marsidev/react-turnstile that:
@@ -18,9 +19,11 @@ import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 export function TurnstileWidget({
   onChange,
   className,
+  locale = "ka",
 }: {
   onChange: (token: string | null) => void;
   className?: string;
+  locale?: UserLocale;
 }) {
   const ref = useRef<TurnstileInstance | null>(null);
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -35,7 +38,7 @@ export function TurnstileWidget({
         options={{
           theme: "dark",
           size: "flexible",
-          language: "ka",
+          language: locale,
         }}
         onSuccess={(token) => onChange(token)}
         onExpire={() => {

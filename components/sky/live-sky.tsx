@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { SkyData } from "@/lib/sky";
 import { BODIES, signByIndex } from "@/lib/zodiac";
 import { HOUSES, houseLocativeKa } from "@/lib/houses";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const SIZE = 520;
 const CX = SIZE / 2;
@@ -87,7 +88,14 @@ function formatDegrees(lng: number, withSeconds: boolean): string {
   return `${deg}°${String(min).padStart(2, "0")}′${String(sec).padStart(2, "0")}″`;
 }
 
-export function LiveSky({ data }: { data: SkyData }) {
+export function LiveSky({
+  data,
+  locale = "ka",
+}: {
+  data: SkyData;
+  locale?: UserLocale;
+}) {
+  const en = locale === "en";
   // One shared 1s clock drives every readout + the wheel positions. The
   // planets move sub-pixel per tick (CSS transition smooths it), but the
   // Moon's arcsecond readout visibly counts up — that's the "it's alive"
@@ -131,7 +139,7 @@ export function LiveSky({ data }: { data: SkyData }) {
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           className="h-auto w-full drop-shadow-[0_0_60px_oklch(0.4_0.18_300/0.35)]"
           role="img"
-          aria-label="ცოცხალი ცის რუკა — პლანეტების ამჟამინდელი პოზიციები შენს ნატალურ სახლებში"
+          aria-label={en ? "Live sky chart—current planetary positions in your natal houses" : "ცოცხალი ცის რუკა — პლანეტების ამჟამინდელი პოზიციები შენს ნატალურ სახლებში"}
         >
           <defs>
             <radialGradient id="sky-center" cx="50%" cy="50%" r="50%">
@@ -302,7 +310,11 @@ export function LiveSky({ data }: { data: SkyData }) {
           const accent = PLANET_ACCENT[p.key] ?? "oklch(0.85 0.05 300)";
           const isMoon = p.key === "moon";
           const degPerDay = Math.abs(p.speedDegPerHour * 24);
-          const text = p.houseText ?? p.signText;
+          const text = en
+            ? p.house
+              ? `${meta?.labelEn ?? p.key} highlights ${HOUSES[p.house]?.themeEn.toLowerCase()}. ${HOUSES[p.house]?.meaningEn}`
+              : `${meta?.labelEn ?? p.key} reflects ${meta?.meaningEn ?? "a current planetary theme"}.`
+            : p.houseText ?? p.signText;
           return (
             <details
               key={p.key}
@@ -322,25 +334,29 @@ export function LiveSky({ data }: { data: SkyData }) {
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-baseline gap-x-2">
-                    <span className="font-semibold">{meta?.labelKa ?? p.key}</span>
+                    <span className="font-semibold">{en ? meta?.labelEn ?? p.key : meta?.labelKa ?? p.key}</span>
                     <span className="text-sm text-muted-foreground">
-                      {sign.labelKa}{" "}
+                      {en ? sign.labelEn : sign.labelKa}{" "}
                       <span className="tabular-nums">{formatDegrees(lng, isMoon)}</span>
                     </span>
                     {p.retrograde && (
                       <span className="rounded-full border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/10 px-1.5 text-[10px] font-medium text-[var(--vivida-pink)]">
-                        ℞ რეტროგრადული
+                        ℞ {en ? "retrograde" : "რეტროგრადული"}
                       </span>
                     )}
                   </span>
                   <span className="mt-0.5 block text-xs text-muted-foreground">
                     {p.house
-                      ? `ახლა შენს ${houseLocativeKa(p.house)}ა · ${HOUSES[p.house]?.themeKa ?? ""}`
-                      : "სახლის გარეშე (დაბადების დრო უცნობია)"}
+                      ? en
+                        ? `Now in your ${HOUSES[p.house]?.labelEn} · ${HOUSES[p.house]?.themeEn ?? ""}`
+                        : `ახლა შენს ${houseLocativeKa(p.house)}ა · ${HOUSES[p.house]?.themeKa ?? ""}`
+                      : en
+                        ? "No house placement (birth time unknown)"
+                        : "სახლის გარეშე (დაბადების დრო უცნობია)"}
                     {" · "}
                     {degPerDay >= 0.1
-                      ? `${degPerDay.toFixed(1)}°/დღეში`
-                      : `${(degPerDay * 60).toFixed(1)}′/დღეში`}
+                      ? `${degPerDay.toFixed(1)}°/${en ? "day" : "დღეში"}`
+                      : `${(degPerDay * 60).toFixed(1)}′/${en ? "day" : "დღეში"}`}
                   </span>
                 </span>
                 <span
@@ -355,7 +371,7 @@ export function LiveSky({ data }: { data: SkyData }) {
                   {text}
                 </p>
               )}
-              {p.houseText && p.signText && (
+              {!en && p.houseText && p.signText && (
                 <p className="mt-2 text-sm leading-relaxed text-foreground/70">
                   {p.signText}
                 </p>

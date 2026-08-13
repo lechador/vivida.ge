@@ -5,14 +5,17 @@ import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { signInWithGoogle } from "@/actions/auth";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /** Compact Google sign-in button for the /login and /signup forms. */
 export function GoogleButton({
   callbackUrl = "/dashboard",
-  label = "შემოდი Google-ით",
+  label,
+  locale = "ka",
 }: {
   callbackUrl?: string;
   label?: string;
+  locale?: UserLocale;
 }) {
   const [isPending, startTransition] = useTransition();
   return (
@@ -34,7 +37,11 @@ export function GoogleButton({
       className="w-full"
     >
       <GoogleGlyph />
-      {isPending ? "ვაკავშირდებით…" : label}
+      {isPending
+        ? locale === "en"
+          ? "Connecting…"
+          : "ვაკავშირდებით…"
+        : label ?? (locale === "en" ? "Continue with Google" : "შემოდი Google-ით")}
     </Button>
   );
 }

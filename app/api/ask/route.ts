@@ -16,6 +16,7 @@ import {
   type ChatMessage,
 } from "@/lib/openrouter";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -87,10 +88,12 @@ export async function POST(req: Request) {
   if (!chartRow) return Response.json({ error: "no_chart" }, { status: 400 });
 
   const salience = computeChartSalience(chartRow.data);
+  const locale = await getUserLocale(userId);
   const system = buildChartChatSystem(
     session.user?.name?.split(" ")[0] ?? null,
     chartRow.data,
-    salience
+    salience,
+    locale,
   );
 
   // Recent history (oldest→newest) for conversational continuity.
@@ -128,7 +131,11 @@ export async function POST(req: Request) {
         console.error("[ask] stream failed:", err);
         if (!full) {
           controller.enqueue(
-            encoder.encode("ბოდიში, პასუხის გენერაცია ვერ მოხერხდა. სცადე ხელახლა.")
+            encoder.encode(
+              locale === "en"
+                ? "Sorry, I couldn't generate a response. Please try again."
+                : "ბოდიში, პასუხის გენერაცია ვერ მოხერხდა. სცადე ხელახლა.",
+            )
           );
         }
       } finally {

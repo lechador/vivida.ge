@@ -14,6 +14,7 @@ import {
   signInWithEmail,
   verifyEmailWithCode,
 } from "@/actions/auth";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -23,7 +24,8 @@ const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
  * here with a status banner. Lets the user resend the verification email
  * inline if their account is unverified.
  */
-export function LoginForm() {
+export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
+  const en = locale === "en";
   const params = useSearchParams();
   const router = useRouter();
   const verified = params.get("verified") === "1";
@@ -77,7 +79,7 @@ export function LoginForm() {
         return;
       }
       setError(result.error);
-      if (result.error.includes("არ არის დადასტურებული")) {
+      if (result.code === "email_unverified") {
         setUnverifiedEmail(email);
       }
     });
@@ -88,7 +90,11 @@ export function LoginForm() {
     setResentMsg(null);
     startResendTransition(async () => {
       await requestVerificationEmail({ email: unverifiedEmail });
-      setResentMsg("შემოწმე საფოსტო ყუთი — ახალი კოდი და ლინკი გაიგზავნა.");
+      setResentMsg(
+        en
+          ? "Check your inbox—a new code and link have been sent."
+          : "შემოწმე საფოსტო ყუთი — ახალი კოდი და ლინკი გაიგზავნა.",
+      );
     });
   };
 
@@ -123,19 +129,23 @@ export function LoginForm() {
       {verified && (
         <div className="flex items-start gap-2 rounded-lg border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-3 py-2 text-sm text-[var(--vivida-cyan)]">
           <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
-          ელფოსტა დადასტურებულია. შედი ანგარიშში.
+          {en ? "Your email is verified. Sign in to continue." : "ელფოსტა დადასტურებულია. შედი ანგარიშში."}
         </div>
       )}
       {verifyError && (
         <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {verifyError === "expired"
-            ? "ლინკი ვადაგასულია. შესვლის შემდეგ მოითხოვე ახალი ანგარიშის გვერდიდან."
-            : "ლინკი არასწორია ან უკვე გამოყენებულია."}
+            ? en
+              ? "This link has expired. Request a new one after signing in."
+              : "ლინკი ვადაგასულია. შესვლის შემდეგ მოითხოვე ახალი ანგარიშის გვერდიდან."
+            : en
+              ? "This link is invalid or has already been used."
+              : "ლინკი არასწორია ან უკვე გამოყენებულია."}
         </div>
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="email">ელფოსტა</Label>
+        <Label htmlFor="email">{en ? "Email" : "ელფოსტა"}</Label>
         <Input
           id="email"
           name="email"
@@ -149,12 +159,12 @@ export function LoginForm() {
       </div>
       <div className="space-y-1.5">
         <div className="flex items-baseline justify-between">
-          <Label htmlFor="password">პაროლი</Label>
+          <Label htmlFor="password">{en ? "Password" : "პაროლი"}</Label>
           <Link
             href="/forgot-password"
             className="text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            დაგავიწყდა?
+            {en ? "Forgot it?" : "დაგავიწყდა?"}
           </Link>
         </div>
         <Input
@@ -179,7 +189,7 @@ export function LoginForm() {
       {unverifiedEmail && (
         <div className="space-y-2 rounded-lg border border-border/60 bg-card/40 p-3">
           <Label htmlFor="login-code" className="text-xs text-muted-foreground">
-            შეიყვანე ელფოსტაზე გამოგზავნილი 6-ნიშნა კოდი
+            {en ? "Enter the 6-digit code sent to your email" : "შეიყვანე ელფოსტაზე გამოგზავნილი 6-ნიშნა კოდი"}
           </Label>
           <div className="flex gap-2">
             <Input
@@ -202,7 +212,7 @@ export function LoginForm() {
               onClick={verifyCode}
               disabled={codePending || code.length !== 6}
             >
-              {codePending ? <Loader2 className="size-4 animate-spin" /> : "დადასტურება"}
+              {codePending ? <Loader2 className="size-4 animate-spin" /> : en ? "Verify" : "დადასტურება"}
             </Button>
           </div>
           {codeError && <p className="text-xs text-destructive">{codeError}</p>}
@@ -212,14 +222,20 @@ export function LoginForm() {
             disabled={resendPending}
             className="text-xs text-muted-foreground underline-offset-2 hover:underline disabled:opacity-60"
           >
-            {resendPending ? "ვაგზავნი…" : "ვერ მიიღე? ხელახლა გამოგზავნა"}
+            {resendPending
+              ? en
+                ? "Sending…"
+                : "ვაგზავნი…"
+              : en
+                ? "Didn't receive it? Send again"
+                : "ვერ მიიღე? ხელახლა გამოგზავნა"}
           </button>
         </div>
       )}
 
       {codeVerified && (
         <div className="rounded-lg border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-3 py-2 text-sm text-[var(--vivida-cyan)]">
-          ელფოსტა დადასტურდა. ახლა დააჭირე „შესვლას“.
+          {en ? "Your email is verified. You can sign in now." : "ელფოსტა დადასტურდა. ახლა დააჭირე „შესვლას“."}
         </div>
       )}
       {resentMsg && (
@@ -228,7 +244,7 @@ export function LoginForm() {
         </div>
       )}
 
-      <TurnstileWidget onChange={setTurnstileToken} />
+      <TurnstileWidget locale={locale} onChange={setTurnstileToken} />
 
       <Button
         type="submit"
@@ -238,7 +254,7 @@ export function LoginForm() {
         disabled={submitDisabled}
       >
         {isPending && <Loader2 className="size-4 animate-spin" />}
-        {isPending ? "შესვლა…" : "შესვლა"}
+        {isPending ? (en ? "Signing in…" : "შესვლა…") : en ? "Sign in" : "შესვლა"}
       </Button>
     </form>
   );

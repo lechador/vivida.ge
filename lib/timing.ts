@@ -7,6 +7,7 @@
 import type { NatalChartJson } from "@/db/schema";
 import { computeTransits, detectCrossAspects, localDateString } from "./transits";
 import { ASPECTS, type AspectFamily } from "./aspects";
+import type { UserLocale } from "./i18n/user-locale";
 
 const ASPECT_FAMILY: Record<string, AspectFamily> = Object.fromEntries(
   ASPECTS.map((a) => [a.kind, a.family])
@@ -44,9 +45,14 @@ const TRANSIT_WEIGHT: Record<string, number> = {
 };
 
 const WEEKDAYS_KA = ["კვ", "ორ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ"];
+const WEEKDAYS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS_KA = [
   "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
   "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი",
+];
+const MONTHS_EN = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
 
 export type DayTier = "great" | "good" | "calm" | "tough";
@@ -112,6 +118,26 @@ const FAMILY_TONE: Record<AspectFamily, string> = {
   tense: "შესაძლო დაძაბულობა — იყავი მოქნილი და მომთმენი.",
   neutral: "მნიშვნელოვანი აქცენტი — მიაქციე ყურადღება.",
 };
+const PLANET_MEANING_EN: Record<string, string> = {
+  venus: "Love, harmony and pleasure",
+  mars: "Energy, initiative and action",
+  jupiter: "Growth, opportunity and confidence",
+  saturn: "Responsibility, structure and sustained effort",
+};
+const NATAL_AREA_EN: Record<string, string> = {
+  sun: "your identity and vitality",
+  moon: "your emotions and inner world",
+  mercury: "your thinking and communication",
+  venus: "your relationships and values",
+  mars: "your drive and actions",
+  ascendant: "your self-expression and outward style",
+  midheaven: "your career and public direction",
+};
+const FAMILY_TONE_EN: Record<AspectFamily, string> = {
+  harmonic: "This is a supportive opening—use it consciously.",
+  tense: "This can bring friction; stay flexible and patient.",
+  neutral: "This is a meaningful emphasis worth noticing.",
+};
 
 const NOTABLE_TRANSITS = new Set(["venus", "mars", "jupiter", "saturn"]);
 const NOTABLE_NATALS = new Set([
@@ -138,8 +164,10 @@ export function computeTiming(
   natal: NatalChartJson,
   startDate: Date,
   timezone: string,
-  days = 28
+  days = 28,
+  locale: UserLocale = "ka",
 ): { days: TimingDay[]; notable: NotableTransit[] } {
+  const en = locale === "en";
   const natalPoints: Record<string, { longitude: number }> = {};
   for (const [k, v] of Object.entries(natal.bodies)) {
     natalPoints[k] = { longitude: v.longitude };
@@ -180,7 +208,7 @@ export function computeTiming(
     out.push({
       dateIso,
       dom: local.getUTCDate(),
-      weekdayKa: WEEKDAYS_KA[local.getUTCDay()],
+      weekdayKa: (en ? WEEKDAYS_EN : WEEKDAYS_KA)[local.getUTCDay()],
       score,
       tier: tierFor(score),
     });
@@ -197,13 +225,17 @@ export function computeTiming(
         orb: a.orb,
         item: {
           dateIso,
-          dateLabelKa: `${local.getUTCDate()} ${MONTHS_KA[local.getUTCMonth()]}`,
+          dateLabelKa: `${local.getUTCDate()} ${(en ? MONTHS_EN : MONTHS_KA)[local.getUTCMonth()]}`,
           transit: a.transit,
           natal: a.natal,
           kind: a.kind,
           family: fam,
-          title: `${TRANSIT_KA[a.transit]} ${KIND_KA[a.kind]} ${NATAL_KA[a.natal]}-თან`,
-          meaning: `${PLANET_MEANING[a.transit]} ხვდება ${NATAL_AREA[a.natal]}. ${FAMILY_TONE[fam]}`,
+          title: en
+            ? `${a.transit[0].toUpperCase() + a.transit.slice(1)} ${a.kind} natal ${a.natal[0].toUpperCase() + a.natal.slice(1)}`
+            : `${TRANSIT_KA[a.transit]} ${KIND_KA[a.kind]} ${NATAL_KA[a.natal]}-თან`,
+          meaning: en
+            ? `${PLANET_MEANING_EN[a.transit]} meets ${NATAL_AREA_EN[a.natal]}. ${FAMILY_TONE_EN[fam]}`
+            : `${PLANET_MEANING[a.transit]} ხვდება ${NATAL_AREA[a.natal]}. ${FAMILY_TONE[fam]}`,
         },
       });
     }

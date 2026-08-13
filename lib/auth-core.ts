@@ -101,6 +101,7 @@ export async function registerUser(input: {
   name: string;
   email: string;
   password: string;
+  interfaceLanguage?: "ka" | "en";
 }): Promise<RegisterResult> {
   const name = input.name.trim();
   const email = normalizeEmail(input.email);
@@ -136,7 +137,13 @@ export async function registerUser(input: {
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
     await db
       .update(users)
-      .set({ name, passwordHash })
+      .set({
+        name,
+        passwordHash,
+        ...(input.interfaceLanguage
+          ? { interfaceLanguage: input.interfaceLanguage }
+          : {}),
+      })
       .where(eq(users.id, existing.id));
     await awardJoinedReputation(existing.id);
     const verifyCode = generateOtpCode();
@@ -152,7 +159,12 @@ export async function registerUser(input: {
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const [created] = await db
     .insert(users)
-    .values({ name, email, passwordHash })
+    .values({
+      name,
+      email,
+      passwordHash,
+      interfaceLanguage: input.interfaceLanguage ?? "ka",
+    })
     .returning({ id: users.id, email: users.email, name: users.name });
   if (!created) return { ok: false, error: "failed" };
 

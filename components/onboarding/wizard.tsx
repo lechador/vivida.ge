@@ -18,6 +18,7 @@ import type { Profile } from "@/db/schema";
 import type { GeocodeResult } from "@/lib/geocoding";
 import { suggestUsername } from "@/lib/profile-utils";
 import type { WizardData } from "./types";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import {
   clearPendingNatalProfile,
   readPendingNatalProfile,
@@ -87,12 +88,15 @@ export function OnboardingWizard({
   initialProfile,
   defaultName,
   next,
+  locale = "ka",
 }: {
   initialProfile: Profile | null;
   defaultName: string | null;
   /** Where to send the user after saving (relative path). */
   next?: string;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   // Birth date is locked after first registration (the server enforces this
   // — see actions/profile.ts). When the user comes back to edit, hide the
   // date step entirely so they don't waste time on a read-only field, and
@@ -222,7 +226,7 @@ export function OnboardingWizard({
     const date = validateDate(data.date);
     const timeRes = validateTime(data.time);
     if (!date || !timeRes.ok || !data.place) {
-      setError("გთხოვ, ყველა ველი შეავსო.");
+      setError(en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.");
       return;
     }
     trackEvent(ANALYTICS_EVENT.onboardingSubmitted, {
@@ -260,8 +264,9 @@ export function OnboardingWizard({
 
       {dateLocked && (
         <p className="mb-6 rounded-xl border border-border/60 bg-card/40 px-4 py-3 text-center text-sm text-muted-foreground">
-          დაბადების თარიღი ფიქსირდება რეგისტრაციაზე და ვერ შეიცვლება.
-          დროის და ადგილის შესწორება შესაძლებელია.
+          {en
+            ? "Your birth date is fixed when you register and cannot be changed. You can still update the time and place."
+            : "დაბადების თარიღი ფიქსირდება რეგისტრაციაზე და ვერ შეიცვლება. დროის და ადგილის შესწორება შესაძლებელია."}
         </p>
       )}
 
@@ -281,18 +286,21 @@ export function OnboardingWizard({
                 onChange={(date) => setData((d) => ({ ...d, date }))}
                 gender={data.gender}
                 onGenderChange={(gender) => setData((d) => ({ ...d, gender }))}
+                locale={locale}
               />
             )}
             {currentStep === "time" && (
               <StepTime
                 value={data.time}
                 onChange={(time) => setData((d) => ({ ...d, time }))}
+                locale={locale}
               />
             )}
             {currentStep === "place" && (
               <StepPlace
                 value={data.place}
                 onChange={(place) => setData((d) => ({ ...d, place }))}
+                locale={locale}
               />
             )}
             {currentStep === "visibility" && (
@@ -302,9 +310,10 @@ export function OnboardingWizard({
                   setData((d) => ({ ...d, visibility }))
                 }
                 defaultName={defaultName}
+                locale={locale}
               />
             )}
-            {currentStep === "photos" && <StepPhotos />}
+            {currentStep === "photos" && <StepPhotos locale={locale} />}
           </motion.div>
         </AnimatePresence>
 
@@ -321,7 +330,7 @@ export function OnboardingWizard({
             className={step === 0 ? "invisible" : ""}
           >
             <ArrowLeft />
-            უკან
+            {en ? "Back" : "უკან"}
           </Button>
 
           <Button
@@ -334,11 +343,17 @@ export function OnboardingWizard({
             {isLast ? (
               <>
                 <Sparkles />
-                {isPending ? "ვხატავთ შენს რუკას…" : "მაჩვენე ჩემი რუკა"}
+                {isPending
+                  ? en
+                    ? "Drawing your chart…"
+                    : "ვხატავთ შენს რუკას…"
+                  : en
+                    ? "Show me my chart"
+                    : "მაჩვენე ჩემი რუკა"}
               </>
             ) : (
               <>
-                გაგრძელება
+                {en ? "Continue" : "გაგრძელება"}
                 <ArrowRight />
               </>
             )}

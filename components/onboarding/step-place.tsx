@@ -9,14 +9,18 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { GeocodeResult } from "@/lib/geocoding";
 import type { PlaceValue } from "./types";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function StepPlace({
   value,
   onChange,
+  locale = "ka",
 }: {
   value: PlaceValue;
   onChange: (next: PlaceValue) => void;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [query, setQuery] = useState(value?.displayName ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -79,20 +83,22 @@ export function StepPlace({
     <div className="space-y-6">
       <header className="space-y-2 text-center">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          სად დაიბადე?
+          {en ? "Where were you born?" : "სად დაიბადე?"}
         </h2>
         <p className="text-muted-foreground">
-          დაბადების ადგილი შენს რუკას იმ მომენტის ცასთან აკავშირებს.
+          {en
+            ? "Your birthplace connects your chart to the sky at that exact moment."
+            : "დაბადების ადგილი შენს რუკას იმ მომენტის ცასთან აკავშირებს."}
         </p>
       </header>
 
       <div className="mx-auto max-w-md space-y-2" ref={wrapperRef}>
-        <Label htmlFor="place">დაბადების ქალაქი</Label>
+        <Label htmlFor="place">{en ? "Birth city" : "დაბადების ქალაქი"}</Label>
         <div className="relative">
           <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="place"
-            placeholder="თბილისი, ნიუ-იორკი, ტოკიო…"
+            placeholder={en ? "London, New York, Tokyo…" : "თბილისი, ნიუ-იორკი, ტოკიო…"}
             className="pl-9 pr-10 text-base"
             value={query}
             onChange={(e) => {
@@ -108,7 +114,7 @@ export function StepPlace({
           ) : value ? (
             <button
               type="button"
-              aria-label="წაშლა"
+              aria-label={en ? "Clear" : "წაშლა"}
               onClick={() => {
                 onChange(null);
                 setQuery("");

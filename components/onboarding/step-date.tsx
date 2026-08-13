@@ -6,18 +6,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { DateValue, Gender } from "./types";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function StepDate({
   value,
   onChange,
   gender,
   onGenderChange,
+  locale = "ka",
 }: {
   value: DateValue;
   onChange: (next: DateValue) => void;
   gender: Gender | null;
   onGenderChange: (g: Gender) => void;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const monthRef = useRef<HTMLInputElement>(null);
   const yearRef = useRef<HTMLInputElement>(null);
 
@@ -25,16 +29,18 @@ export function StepDate({
     <div className="space-y-6">
       <header className="space-y-2 text-center">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          როდის დაიწყო შენი ისტორია?
+          {en ? "When did your story begin?" : "როდის დაიწყო შენი ისტორია?"}
         </h2>
         <p className="text-muted-foreground">
-          დაბადების დღე განსაზღვრავს შენს მზეს, მთვარეს და ძირითად არქეტიპებს.
+          {en
+            ? "Your birth date determines your Sun, Moon and core archetypes."
+            : "დაბადების დღე განსაზღვრავს შენს მზეს, მთვარეს და ძირითად არქეტიპებს."}
         </p>
       </header>
 
       <div className="mx-auto grid max-w-md grid-cols-[1fr_1fr_1.4fr] gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="day">რიცხვი</Label>
+          <Label htmlFor="day">{en ? "Day" : "რიცხვი"}</Label>
           <Input
             id="day"
             inputMode="numeric"
@@ -51,7 +57,7 @@ export function StepDate({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="month">თვე</Label>
+          <Label htmlFor="month">{en ? "Month" : "თვე"}</Label>
           <Input
             id="month"
             ref={monthRef}
@@ -68,7 +74,7 @@ export function StepDate({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="year">წელი</Label>
+          <Label htmlFor="year">{en ? "Year" : "წელი"}</Label>
           <Input
             id="year"
             ref={yearRef}
@@ -88,12 +94,12 @@ export function StepDate({
       </div>
 
       <div className="mx-auto max-w-md space-y-1.5">
-        <Label>სქესი</Label>
+        <Label>{en ? "Gender" : "სქესი"}</Label>
         <div className="grid grid-cols-2 gap-3">
           {(
             [
-              { key: "female", label: "მდედრობითი", glyph: "♀" },
-              { key: "male", label: "მამრობითი", glyph: "♂" },
+              { key: "female", label: en ? "Female" : "მდედრობითი", glyph: "♀" },
+              { key: "male", label: en ? "Male" : "მამრობითი", glyph: "♂" },
             ] as const
           ).map((opt) => (
             <button

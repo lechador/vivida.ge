@@ -14,8 +14,13 @@ import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
 import { getStreakProgress } from "@/lib/streak-credits";
 import { TESTS } from "@/lib/tests-catalog";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "დღეს" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  return { title: locale === "en" ? "Today" : "დღეს" };
+}
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -33,7 +38,7 @@ export default async function DashboardPage() {
     db.select({ id: bigFiveResults.id }).from(bigFiveResults).where(eq(bigFiveResults.userId, user.id)).limit(1),
     getStreakProgress(user.id),
   ]);
-  const locale = normalizeUserLocale(userRow?.locale);
+  const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
   const en = locale === "en";
 
   if (!profile?.dateOfBirth) {

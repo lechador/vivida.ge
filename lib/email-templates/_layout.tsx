@@ -19,15 +19,18 @@ export function EmailLayout({
   preview,
   children,
   unsubscribeUrl,
+  locale = "ka",
 }: {
   preview: string;
   children: React.ReactNode;
   /** Marketing/digest emails pass this. Renders a one-click unsubscribe
    *  link in the footer. Omit for transactional mail (verification etc). */
   unsubscribeUrl?: string;
+  locale?: "ka" | "en";
 }) {
+  const en = locale === "en";
   return (
-    <Html lang="ka">
+    <Html lang={locale}>
       <Head />
       <Preview>{preview}</Preview>
       <Body
@@ -88,8 +91,9 @@ export function EmailLayout({
                 margin: 0,
               }}
             >
-              ეს წერილი ავტომატურად გამოიგზავნა vivida.ge-დან. თუ არ
-              დარეგისტრირებულხარ, უგულებელყავი ეს შეტყობინება.
+              {en
+                ? "This email was sent automatically by Vivida. If you did not create an account, you can ignore this message."
+                : "ეს წერილი ავტომატურად გამოიგზავნა vivida.ge-დან. თუ არ დარეგისტრირებულხარ, უგულებელყავი ეს შეტყობინება."}
             </Text>
             {unsubscribeUrl ? (
               <Text
@@ -104,7 +108,7 @@ export function EmailLayout({
                   href={unsubscribeUrl}
                   style={{ color: "#c4b5fd", textDecoration: "underline" }}
                 >
-                  გამოწერის გაუქმება
+                  {en ? "Unsubscribe" : "გამოწერის გაუქმება"}
                 </a>
               </Text>
             ) : null}

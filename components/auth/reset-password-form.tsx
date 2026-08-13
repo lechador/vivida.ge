@@ -9,8 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { resetPassword } from "@/actions/auth";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
-export function ResetPasswordForm({ token }: { token: string }) {
+export function ResetPasswordForm({
+  token,
+  locale = "ka",
+}: {
+  token: string;
+  locale?: UserLocale;
+}) {
+  const en = locale === "en";
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -22,7 +30,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
     e.preventDefault();
     setError(null);
     if (password !== confirm) {
-      setError("პაროლები არ ემთხვევა");
+      setError(en ? "Passwords do not match" : "პაროლები არ ემთხვევა");
       return;
     }
     startTransition(async () => {
@@ -48,10 +56,10 @@ export function ResetPasswordForm({ token }: { token: string }) {
         </div>
         <div>
           <h3 className="text-lg font-semibold tracking-tight">
-            პაროლი შეიცვალა
+            {en ? "Password updated" : "პაროლი შეიცვალა"}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            ახლავე გადაგამისამართებთ შესვლის გვერდზე…
+            {en ? "Taking you to the sign-in page…" : "ახლავე გადაგამისამართებთ შესვლის გვერდზე…"}
           </p>
         </div>
       </div>
@@ -62,13 +70,13 @@ export function ResetPasswordForm({ token }: { token: string }) {
     return (
       <div className="space-y-3 text-center">
         <p className="text-sm text-destructive">
-          ლინკი არასწორია ან ვადაგასულია.
+          {en ? "This link is invalid or has expired." : "ლინკი არასწორია ან ვადაგასულია."}
         </p>
         <Link
           href="/forgot-password"
           className="inline-block text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
         >
-          მოითხოვე ახალი ლინკი
+          {en ? "Request a new link" : "მოითხოვე ახალი ლინკი"}
         </Link>
       </div>
     );
@@ -77,7 +85,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
   return (
     <form onSubmit={submit} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="password">ახალი პაროლი</Label>
+        <Label htmlFor="password">{en ? "New password" : "ახალი პაროლი"}</Label>
         <Input
           id="password"
           name="password"
@@ -89,10 +97,12 @@ export function ResetPasswordForm({ token }: { token: string }) {
           onChange={(e) => setPassword(e.target.value)}
           disabled={isPending}
         />
-        <p className="text-xs text-muted-foreground">მინიმუმ 8 სიმბოლო.</p>
+        <p className="text-xs text-muted-foreground">
+          {en ? "At least 8 characters." : "მინიმუმ 8 სიმბოლო."}
+        </p>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="confirm">გაიმეორე პაროლი</Label>
+        <Label htmlFor="confirm">{en ? "Confirm password" : "გაიმეორე პაროლი"}</Label>
         <Input
           id="confirm"
           name="confirm"
@@ -120,7 +130,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
         disabled={isPending}
       >
         {isPending && <Loader2 className="size-4 animate-spin" />}
-        {isPending ? "ინახება…" : "პაროლის დაყენება"}
+        {isPending ? (en ? "Saving…" : "ინახება…") : en ? "Set password" : "პაროლის დაყენება"}
       </Button>
     </form>
   );

@@ -21,6 +21,8 @@ import { enforceAuthRateLimit } from "@/lib/rate-limit";
 import { ApiError } from "@/lib/api/errors";
 import { TURNSTILE_ERROR_KA, verifyTurnstile } from "@/lib/turnstile";
 import { siteOriginForHost } from "@/lib/seo/locales";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 async function siteOriginFromHeaders(): Promise<string> {
   const h = await headers();
@@ -62,20 +64,38 @@ export async function signOutAction() {
   await signOut({ redirectTo: "/" });
 }
 
-// ─── Georgian copy for core error codes ──────────────────────────────────
+const TURNSTILE_ERROR_EN = "We could not verify that you are human. Please try again.";
 
-function registerErrorKa(error: RegisterError): string {
+function localized(locale: UserLocale, ka: string, en: string): string {
+  return locale === "en" ? en : ka;
+}
+
+// ─── Localized copy for core error codes ─────────────────────────────────
+
+function registerError(error: RegisterError, locale: UserLocale): string {
   switch (error) {
     case "invalid_name":
-      return "შეიყვანე შენი სახელი";
+      return localized(locale, "შეიყვანე შენი სახელი", "Enter your name");
     case "invalid_email":
-      return "არასწორი ელფოსტა";
+      return localized(locale, "არასწორი ელფოსტა", "Enter a valid email address");
     case "weak_password":
-      return `პაროლი მინიმუმ ${MIN_PASSWORD_LEN} სიმბოლო უნდა იყოს`;
+      return localized(
+        locale,
+        `პაროლი მინიმუმ ${MIN_PASSWORD_LEN} სიმბოლო უნდა იყოს`,
+        `Password must be at least ${MIN_PASSWORD_LEN} characters`,
+      );
     case "email_taken":
-      return "ეს ელფოსტა უკვე დარეგისტრირებულია. სცადე შესვლა ან პაროლის აღდგენა.";
+      return localized(
+        locale,
+        "ეს ელფოსტა უკვე დარეგისტრირებულია. სცადე შესვლა ან პაროლის აღდგენა.",
+        "This email is already registered. Try signing in or resetting your password.",
+      );
     case "failed":
-      return "ანგარიშის შექმნა ვერ მოხერხდა. სცადე თავიდან.";
+      return localized(
+        locale,
+        "ანგარიშის შექმნა ვერ მოხერხდა. სცადე თავიდან.",
+        "We could not create your account. Please try again.",
+      );
   }
 }
 
@@ -94,9 +114,15 @@ export type SignUpResult = { ok: true } | { ok: false; error: string };
 export async function signUpWithEmail(
   input: SignUpInput
 ): Promise<SignUpResult> {
+  const locale = await getRequestLocale();
   // Bot gate first — fast path before we touch the DB or hash anything.
   const human = await verifyTurnstile(input.turnstileToken);
-  if (!human) return { ok: false, error: TURNSTILE_ERROR_KA };
+  if (!human) {
+    return {
+      ok: false,
+      error: locale === "en" ? TURNSTILE_ERROR_EN : TURNSTILE_ERROR_KA,
+    };
+  }
 
   // Any thrown error (transient DB blip, etc.) must land as an inline
   // "try again" on the form — never a crashed page. Registration is
@@ -108,13 +134,14 @@ export async function signUpWithEmail(
       name: input.name,
       email: input.email,
       password: input.password,
+      interfaceLanguage: locale,
     });
   } catch (err) {
     console.warn("[signUpWithEmail] register failed:", (err as Error).message);
-    return { ok: false, error: registerErrorKa("failed") };
+    return { ok: false, error: registerError("failed", locale) };
   }
   if (!result.ok) {
-    return { ok: false, error: registerErrorKa(result.error) };
+    return { ok: false, error: registerError(result.error, locale) };
   }
 
   // Email send is deferred — that's the slow leg (Resend HTTP call) and
@@ -156,8 +183,14 @@ export type RequestVerificationResult =
 export async function requestVerificationEmail(input: {
   email: string;
 }): Promise<RequestVerificationResult> {
+  const locale = await getRequestLocale();
   const email = normalizeEmail(input.email);
-  if (!isValidEmail(email)) return { ok: false, error: "არასწორი ელფოსტა" };
+  if (!isValidEmail(email)) {
+    return {
+      ok: false,
+      error: localized(locale, "არასწორი ელფოსტა", "Enter a valid email address"),
+    };
+  }
 
   const dispatch = await prepareVerificationResend(email);
   if (dispatch.send) {
@@ -220,8 +253,14 @@ export async function verifyEmailWithCode(input: {
   code: string;
   password?: string;
 }): Promise<VerifyCodeResult> {
+  const locale = await getRequestLocale();
   const email = normalizeEmail(input.email);
-  if (!isValidEmail(email)) return { ok: false, error: "არასწორი ელფოსტა" };
+  if (!isValidEmail(email)) {
+    return {
+      ok: false,
+      error: localized(locale, "არასწორი ელფოსტა", "Enter a valid email address"),
+    };
+  }
 
   try {
     await enforceAuthRateLimit({
@@ -236,7 +275,11 @@ export async function verifyEmailWithCode(input: {
     if (err instanceof ApiError && err.status === 429) {
       return {
         ok: false,
-        error: "ბევრი მცდელობა იყო. სცადე ცოტა ხანში ხელახლა.",
+        error: localized(
+          locale,
+          "ბევრი მცდელობა იყო. სცადე ცოტა ხანში ხელახლა.",
+          "Too many attempts. Please try again in a few minutes.",
+        ),
       };
     }
     throw err;
@@ -248,8 +291,8 @@ export async function verifyEmailWithCode(input: {
       ok: false,
       error:
         result.error === "expired"
-          ? "კოდს ვადა გაუვიდა. მოითხოვე ახალი."
-          : "კოდი არასწორია. შეამოწმე და სცადე ხელახლა.",
+          ? localized(locale, "კოდს ვადა გაუვიდა. მოითხოვე ახალი.", "This code has expired. Request a new one.")
+          : localized(locale, "კოდი არასწორია. შეამოწმე და სცადე ხელახლა.", "That code is incorrect. Check it and try again."),
     };
   }
 
@@ -278,12 +321,23 @@ export async function requestPasswordReset(input: {
   email: string;
   turnstileToken: string | null;
 }): Promise<RequestResetResult> {
+  const locale = await getRequestLocale();
   // Bot gate first — without it this endpoint is a free email-bomb tool.
   const human = await verifyTurnstile(input.turnstileToken);
-  if (!human) return { ok: false, error: TURNSTILE_ERROR_KA };
+  if (!human) {
+    return {
+      ok: false,
+      error: locale === "en" ? TURNSTILE_ERROR_EN : TURNSTILE_ERROR_KA,
+    };
+  }
 
   const email = normalizeEmail(input.email);
-  if (!isValidEmail(email)) return { ok: false, error: "არასწორი ელფოსტა" };
+  if (!isValidEmail(email)) {
+    return {
+      ok: false,
+      error: localized(locale, "არასწორი ელფოსტა", "Enter a valid email address"),
+    };
+  }
 
   const dispatch = await preparePasswordReset(email);
   if (dispatch.send) {
@@ -312,14 +366,15 @@ export async function resetPassword(input: {
   token: string;
   password: string;
 }): Promise<ResetPasswordResult> {
+  const locale = await getRequestLocale();
   const result = await consumePasswordReset(input);
   if (!result.ok) {
     return {
       ok: false,
       error:
         result.error === "weak_password"
-          ? `პაროლი მინიმუმ ${MIN_PASSWORD_LEN} სიმბოლო უნდა იყოს`
-          : "ლინკი არასწორია ან ვადაგასულია",
+          ? localized(locale, `პაროლი მინიმუმ ${MIN_PASSWORD_LEN} სიმბოლო უნდა იყოს`, `Password must be at least ${MIN_PASSWORD_LEN} characters`)
+          : localized(locale, "ლინკი არასწორია ან ვადაგასულია", "This link is invalid or has expired"),
     };
   }
   return { ok: true };
@@ -333,15 +388,23 @@ export type SignInInput = {
   turnstileToken: string | null;
 };
 
-export type SignInResult = { ok: true } | { ok: false; error: string };
+export type SignInResult =
+  | { ok: true }
+  | { ok: false; error: string; code?: "email_unverified" };
 
 export async function signInWithEmail(
   input: SignInInput
 ): Promise<SignInResult> {
+  const locale = await getRequestLocale();
   // Bot gate before we even hit the password-hash compare — keeps
   // credential-stuffing attempts from burning bcrypt CPU.
   const human = await verifyTurnstile(input.turnstileToken);
-  if (!human) return { ok: false, error: TURNSTILE_ERROR_KA };
+  if (!human) {
+    return {
+      ok: false,
+      error: locale === "en" ? TURNSTILE_ERROR_EN : TURNSTILE_ERROR_KA,
+    };
+  }
 
   try {
     await signIn("credentials", {
@@ -355,10 +418,18 @@ export async function signInWithEmail(
     if (message.includes("EMAIL_NOT_VERIFIED")) {
       return {
         ok: false,
-        error: "ელფოსტა ჯერ არ არის დადასტურებული. შეამოწმე საფოსტო ყუთი.",
+        code: "email_unverified",
+        error: localized(
+          locale,
+          "ელფოსტა ჯერ არ არის დადასტურებული. შეამოწმე საფოსტო ყუთი.",
+          "Your email has not been verified yet. Check your inbox.",
+        ),
       };
     }
     // Auth.js wraps everything as "CredentialsSignin" — treat as bad creds.
-    return { ok: false, error: "ელფოსტა ან პაროლი არასწორია" };
+    return {
+      ok: false,
+      error: localized(locale, "ელფოსტა ან პაროლი არასწორია", "Incorrect email or password"),
+    };
   }
 }

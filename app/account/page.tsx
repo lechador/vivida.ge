@@ -21,8 +21,13 @@ import { EmailPreferencesCard } from "@/components/account/email-preferences-car
 import { HoroscopeVoiceCard } from "@/components/account/horoscope-voice-card";
 import { LanguageCard } from "@/components/account/language-card";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "ანგარიში" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  return { title: locale === "en" ? "Account" : "ანგარიში" };
+}
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
@@ -58,7 +63,7 @@ export default async function AccountPage() {
   ]);
   // Same avatar resolution as the navbar so they never disagree.
   const accountAvatar = headerData.avatarUrl ?? user.image ?? null;
-  const locale = normalizeUserLocale(emailPrefs?.locale);
+  const locale = await getRequestLocale(normalizeUserLocale(emailPrefs?.locale));
   const en = locale === "en";
 
   return (
