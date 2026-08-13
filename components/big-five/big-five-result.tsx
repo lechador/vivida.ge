@@ -10,6 +10,7 @@ import { BIG5_ANSWERS_STORAGE_KEY } from "@/lib/big-five/questions";
 import {
   calculateBigFive,
   big5HeadlineKa,
+  big5HeadlineEn,
   type BigFiveResult,
 } from "@/lib/big-five/scoring";
 import { BigFiveChart } from "@/components/big-five/big-five-chart";
@@ -26,8 +27,9 @@ type Stored = { answers: Record<number, number>; attemptId?: string };
  * taker is routed to the persistent /big-five/shedegi/[id] view (analysis behind
  * a one-time credit unlock).
  */
-export function BigFiveResultClient() {
+export function BigFiveResultClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
   const router = useRouter();
+  const en = locale === "en";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
 
@@ -86,9 +88,9 @@ export function BigFiveResultClient() {
   if (stored === "missing") {
     return (
       <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
-        <p className="text-foreground/85">ჯერ ტესტი უნდა გაიარო.</p>
+        <p className="text-foreground/85">{en ? "Take the test first to see your result." : "ჯერ ტესტი უნდა გაიარო."}</p>
         <Button asChild variant="mystic" className="mt-5">
-          <Link href="/big-five">ტესტის დაწყება</Link>
+          <Link href="/big-five">{en ? "Start the test" : "ტესტის დაწყება"}</Link>
         </Button>
       </div>
     );
@@ -114,7 +116,7 @@ export function BigFiveResultClient() {
   return (
     <div className="space-y-5">
       {/* Profile chart (free) */}
-      <BigFiveChart result={result} />
+      <BigFiveChart result={result} locale={locale} />
 
       {/* Per-trait analysis — gated behind login here */}
       <div className="relative overflow-hidden rounded-3xl">
@@ -123,7 +125,7 @@ export function BigFiveResultClient() {
             authed === false ? "pointer-events-none select-none blur-[7px]" : ""
           }
         >
-          <BigFiveDetail result={result} />
+          <BigFiveDetail result={result} locale={locale} />
         </div>
 
         {authed === false && (
@@ -133,48 +135,47 @@ export function BigFiveResultClient() {
                 <Lock className="size-5 text-[var(--vivida-violet)]" />
               </div>
               <p className="mx-auto mt-3 max-w-xs text-pretty text-sm text-foreground/85">
-                დარეგისტრირდი უფასოდ და ნახე თითოეული თვისების დეტალური
-                ანალიზი — და შეინახე შედეგი.
+                {en ? "Create a free account to save your result and read the detailed interpretation of every trait." : "დარეგისტრირდი უფასოდ და ნახე თითოეული თვისების დეტალური ანალიზი — და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
-                <Link href="/signup?from=big-five">უფასო რეგისტრაცია</Link>
+                <Link href="/signup?from=big-five">{en ? "Create free account" : "უფასო რეგისტრაცია"}</Link>
               </Button>
             </div>
           </div>
         )}
       </div>
 
-      <ProfileVisibilityToggle kind="big-five" />
+      <ProfileVisibilityToggle kind="big-five" locale={locale} />
 
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <ShareButton headline={big5HeadlineKa(result)} />
+        <ShareButton headline={en ? big5HeadlineEn(result) : big5HeadlineKa(result)} locale={locale} />
         <Button type="button" variant="outline" onClick={retake} className="gap-1.5">
           <RotateCcw className="size-4" />
-          თავიდან გავლა
+          {en ? "Retake" : "თავიდან გავლა"}
         </Button>
         <Button asChild variant="ghost">
-          <Link href="/tests">სხვა ტესტები</Link>
+          <Link href="/tests">{en ? "Other tests" : "სხვა ტესტები"}</Link>
         </Button>
       </div>
 
-      <NextTestWidget completed="big-five" />
+      <NextTestWidget completed="big-five" locale={locale} />
 
       <p className="mx-auto max-w-lg text-center text-xs leading-relaxed text-muted-foreground">
-        ეს არის თვითშეფასების ტესტი — ის ასახავს იმას, თუ როგორ აღიქვამ საკუთარ
-        თავს. ეს არ არის კლინიკური დიაგნოზი.
+        {en ? "This is a self-report assessment reflecting how you perceive yourself. It is not a clinical diagnosis." : "ეს არის თვითშეფასების ტესტი — ის ასახავს იმას, თუ როგორ აღიქვამ საკუთარ თავს. ეს არ არის კლინიკური დიაგნოზი."}
       </p>
     </div>
   );
 }
 
-function ShareButton({ headline }: { headline: string }) {
+function ShareButton({ headline, locale }: { headline: string; locale: "ka" | "en" }) {
+  const en = locale === "en";
   const [copied, setCopied] = useState(false);
   async function share() {
-    const url = "https://www.vivida.ge/big-five";
-    const text = `${headline} — ჩემი Big Five პროფილი Vivida-ზე 🧬 შენ რას მიიღებ?`;
+    const url = en ? "https://www.vividaastro.com/big-five" : "https://www.vivida.ge/big-five";
+    const text = en ? `${headline} — my Big Five profile on Vivida 🧬 What will you get?` : `${headline} — ჩემი Big Five პროფილი Vivida-ზე 🧬 შენ რას მიიღებ?`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: "Vivida Big Five ტესტი", text, url });
+        await navigator.share({ title: en ? "Vivida Big Five Test" : "Vivida Big Five ტესტი", text, url });
         return;
       } catch {
         /* cancelled */
@@ -191,7 +192,7 @@ function ShareButton({ headline }: { headline: string }) {
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-1.5">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? "დაკოპირდა" : "გააზიარე"}
+      {copied ? (en ? "Copied" : "დაკოპირდა") : en ? "Share" : "გააზიარე"}
     </Button>
   );
 }

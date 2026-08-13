@@ -2,7 +2,10 @@ import { Sparkles } from "lucide-react";
 
 import {
   BIG5_LEVEL_LABEL,
+  BIG5_LEVEL_LABEL_EN,
   BIG5_TRAIT_INTERP,
+  BIG5_TRAIT_INTERP_EN,
+  big5HeadlineEn,
   big5HeadlineKa,
   type BigFiveResult,
 } from "@/lib/big-five/scoring";
@@ -13,12 +16,13 @@ import {
  * personality. Pure/server-safe so it renders on the saved page and (blurred)
  * on the anonymous teaser.
  */
-export function BigFiveDetail({ result }: { result: BigFiveResult }) {
+export function BigFiveDetail({ result, locale = "ka" }: { result: BigFiveResult; locale?: "ka" | "en" }) {
+  const en = locale === "en";
   return (
     <div className="space-y-3">
       <div className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/8 p-4 text-center ring-1 ring-foreground/5">
         <Sparkles className="mx-auto mb-1.5 size-5 text-[var(--vivida-violet)]" />
-        <p className="text-base font-semibold">{big5HeadlineKa(result)}</p>
+        <p className="text-base font-semibold">{en ? big5HeadlineEn(result) : big5HeadlineKa(result)}</p>
       </div>
 
       {result.traits.map((t) => (
@@ -30,8 +34,8 @@ export function BigFiveDetail({ result }: { result: BigFiveResult }) {
             <div className="flex items-center gap-2.5">
               <span className="text-xl">{t.glyph}</span>
               <div>
-                <h3 className="font-semibold leading-tight">{t.nameKa}</h3>
-                <p className="text-[11px] text-muted-foreground">{t.taglineKa}</p>
+                <h3 className="font-semibold leading-tight">{en ? t.nameEn : t.nameKa}</h3>
+                <p className="text-[11px] text-muted-foreground">{en ? t.taglineEn : t.taglineKa}</p>
               </div>
             </div>
             <div className="text-right">
@@ -48,12 +52,12 @@ export function BigFiveDetail({ result }: { result: BigFiveResult }) {
                   background: `color-mix(in oklch, ${t.hue} 16%, transparent)`,
                 }}
               >
-                {BIG5_LEVEL_LABEL[t.level]}
+                {(en ? BIG5_LEVEL_LABEL_EN : BIG5_LEVEL_LABEL)[t.level]}
               </div>
             </div>
           </div>
           <p className="mt-3 text-sm leading-relaxed text-foreground/90">
-            {BIG5_TRAIT_INTERP[t.key][t.level]}
+            {(en ? BIG5_TRAIT_INTERP_EN : BIG5_TRAIT_INTERP)[t.key][t.level]}
           </p>
         </article>
       ))}

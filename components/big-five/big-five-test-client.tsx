@@ -11,6 +11,7 @@ import {
   BIG5_ANSWERS_STORAGE_KEY,
   BIG5_LIKERT,
   BIG5_QUESTIONS,
+  BIG5_QUESTIONS_EN,
 } from "@/lib/big-five/questions";
 
 /**
@@ -18,8 +19,10 @@ import {
  * to localStorage and routes to the result page — no scoring runs here, so an
  * anonymous taker can complete the test without an account.
  */
-export function BigFiveTestClient() {
+export function BigFiveTestClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
   const router = useRouter();
+  const en = locale === "en";
+  const questions = en ? BIG5_QUESTIONS_EN : BIG5_QUESTIONS;
 
   async function onSubmit(
     answers: Record<number, number>
@@ -38,13 +41,13 @@ export function BigFiveTestClient() {
     }
     trackEvent(ANALYTICS_EVENT.testCompleted, {
       test: "big_five",
-      items: BIG5_QUESTIONS.length,
+      items: questions.length,
     });
     router.push("/big-five/shedegi");
     return { ok: true };
   }
 
   return (
-    <LikertQuiz questions={BIG5_QUESTIONS} scale={BIG5_LIKERT} onSubmit={onSubmit} />
+    <LikertQuiz questions={questions} scale={BIG5_LIKERT} onSubmit={onSubmit} locale={locale} submitLabel={en ? "See my result" : "ნახე შედეგი"} workingLabel={en ? "Calculating your profile…" : "ვთვლი შენს პროფილს…"} />
   );
 }

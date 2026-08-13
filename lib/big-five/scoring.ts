@@ -17,7 +17,9 @@ export type BigFiveTraitScore = {
   key: BigFiveTraitKey;
   letter: string;
   nameKa: string;
+  nameEn: string;
   taglineKa: string;
+  taglineEn: string;
   glyph: string;
   hue: string;
   /** 0–100. */
@@ -46,6 +48,7 @@ export const BIG5_LEVEL_LABEL: Record<BigFiveLevel, string> = {
   mid: "საშუალო",
   high: "მაღალი",
 };
+export const BIG5_LEVEL_LABEL_EN: Record<BigFiveLevel, string> = { low: "Low", mid: "Moderate", high: "High" };
 
 /**
  * Neutral interpretation for each (trait × level). Both poles are valid
@@ -82,6 +85,34 @@ export const BIG5_TRAIT_INTERP: Record<
   },
 };
 
+export const BIG5_TRAIT_INTERP_EN: typeof BIG5_TRAIT_INTERP = {
+  openness: {
+    high: "You are curious, imaginative and open to novelty, with an appetite for ideas, art and unfamiliar experiences.",
+    mid: "You balance curiosity with practicality, welcoming new ideas while still valuing familiar and proven approaches.",
+    low: "You tend to be practical and grounded, preferring concrete work and familiar, tested approaches.",
+  },
+  conscientiousness: {
+    high: "You tend to be organized, disciplined and dependable, making plans and following tasks through to completion.",
+    mid: "You balance structure with flexibility, acting responsibly while leaving room for spontaneity.",
+    low: "You tend to be flexible and spontaneous, preferring freedom and adaptation over strict plans and routines.",
+  },
+  extraversion: {
+    high: "You tend to be energetic and sociable, gaining energy from interaction and taking initiative comfortably.",
+    mid: "You balance social connection with solitude, enjoying people while also needing private time to recharge.",
+    low: "You tend to be introverted and observant, restoring energy in quiet settings, alone or with a small circle.",
+  },
+  agreeableness: {
+    high: "You tend to be warm, compassionate and cooperative, trusting people and caring about their well-being.",
+    mid: "You balance warmth with directness, cooperating readily while still protecting your own interests when needed.",
+    low: "You tend to be direct, skeptical and independent, valuing candor and firm positions over easy agreement.",
+  },
+  neuroticism: {
+    high: "You are emotionally sensitive and may experience stress intensely, needing more time to regain balance after pressure.",
+    mid: "You are reasonably emotionally balanced, noticing stress but usually returning to equilibrium without prolonged difficulty.",
+    low: "You tend to be emotionally stable and calm, rarely losing your balance even in stressful circumstances.",
+  },
+};
+
 /** Sum of a trait's items (reverse-keyed applied), normalised to 0–100. */
 function traitScore(trait: BigFiveTraitKey, answers: Record<number, number>): number {
   const items = BIG5_QUESTIONS.filter((q) => q.trait === trait);
@@ -102,7 +133,9 @@ export function calculateBigFive(answers: Record<number, number>): BigFiveResult
       key: t.key,
       letter: t.letter,
       nameKa: t.nameKa,
+      nameEn: t.nameEn,
       taglineKa: t.taglineKa,
+      taglineEn: t.taglineEn,
       glyph: t.glyph,
       hue: t.hue,
       score,
@@ -124,4 +157,9 @@ export function calculateBigFive(answers: Record<number, number>): BigFiveResult
 export function big5HeadlineKa(result: BigFiveResult): string {
   const top = result.traits.find((t) => t.key === result.topKey);
   return top ? `შენი ყველაზე გამოკვეთილი თვისებაა ${top.nameKa}` : "შენი პიროვნების პროფილი";
+}
+
+export function big5HeadlineEn(result: BigFiveResult): string {
+  const top = result.traits.find((trait) => trait.key === result.topKey);
+  return top ? `Your most pronounced trait is ${top.nameEn}` : "Your personality profile";
 }

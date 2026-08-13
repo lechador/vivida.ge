@@ -25,7 +25,9 @@ export type BigFiveTrait = {
   /** One-letter OCEAN code, e.g. "O". */
   letter: string;
   nameKa: string;
+  nameEn: string;
   taglineKa: string;
+  taglineEn: string;
   glyph: string;
   hue: string;
 };
@@ -34,17 +36,18 @@ export type BigFiveQuestion = {
   id: number;
   trait: BigFiveTraitKey;
   textKa: string;
+  textEn?: string;
   /** Reverse-keyed: agreement indicates a LOWER level of the trait. */
   reverse: boolean;
 };
 
 /** 5-point agreement scale. */
-export const BIG5_LIKERT: { value: number; labelKa: string }[] = [
-  { value: 1, labelKa: "სრულიად არ ვეთანხმები" },
-  { value: 2, labelKa: "არ ვეთანხმები" },
-  { value: 3, labelKa: "არც ვეთანხმები, არც არ ვეთანხმები" },
-  { value: 4, labelKa: "ვეთანხმები" },
-  { value: 5, labelKa: "სრულიად ვეთანხმები" },
+export const BIG5_LIKERT: { value: number; labelKa: string; labelEn: string }[] = [
+  { value: 1, labelKa: "სრულიად არ ვეთანხმები", labelEn: "Strongly disagree" },
+  { value: 2, labelKa: "არ ვეთანხმები", labelEn: "Disagree" },
+  { value: 3, labelKa: "არც ვეთანხმები, არც არ ვეთანხმები", labelEn: "Neither agree nor disagree" },
+  { value: 4, labelKa: "ვეთანხმები", labelEn: "Agree" },
+  { value: 5, labelKa: "სრულიად ვეთანხმები", labelEn: "Strongly agree" },
 ];
 
 export const BIG5_TRAITS: BigFiveTrait[] = [
@@ -52,7 +55,9 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     key: "openness",
     letter: "O",
     nameKa: "ღიაობა",
+    nameEn: "Openness",
     taglineKa: "წარმოსახვა, ცნობისმოყვარეობა, ახლის ძიება",
+    taglineEn: "Imagination, curiosity and openness to novelty",
     glyph: "🎨",
     hue: "oklch(0.78 0.18 305)",
   },
@@ -60,7 +65,9 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     key: "conscientiousness",
     letter: "C",
     nameKa: "კეთილსინდისიერება",
+    nameEn: "Conscientiousness",
     taglineKa: "ორგანიზებულობა, დისციპლინა, პასუხისმგებლობა",
+    taglineEn: "Organization, discipline and responsibility",
     glyph: "📐",
     hue: "oklch(0.80 0.15 200)",
   },
@@ -68,7 +75,9 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     key: "extraversion",
     letter: "E",
     nameKa: "ექსტრავერსია",
+    nameEn: "Extraversion",
     taglineKa: "სოციალურობა, ენერგიულობა, თავდაჯერებულობა",
+    taglineEn: "Sociability, energy and assertiveness",
     glyph: "⚡",
     hue: "oklch(0.82 0.16 85)",
   },
@@ -76,7 +85,9 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     key: "agreeableness",
     letter: "A",
     nameKa: "კეთილგანწყობა",
+    nameEn: "Agreeableness",
     taglineKa: "თანაგრძნობა, ნდობა, თანამშრომლობა",
+    taglineEn: "Compassion, trust and cooperation",
     glyph: "🤲",
     hue: "oklch(0.75 0.20 350)",
   },
@@ -84,7 +95,9 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     key: "neuroticism",
     letter: "N",
     nameKa: "ნევროტიზმი",
+    nameEn: "Neuroticism",
     taglineKa: "ემოციური მგრძნობელობა, სტრესისადმი მიდრეკილება",
+    taglineEn: "Emotional sensitivity and stress reactivity",
     glyph: "🌊",
     hue: "oklch(0.78 0.16 160)",
   },
@@ -147,6 +160,19 @@ export const BIG5_QUESTIONS: BigFiveQuestion[] = [
   { id: 39, trait: "neuroticism", reverse: false, textKa: "თავს ხშირად დაუცველად ან მოწყვლადად ვგრძნობ." },
   { id: 40, trait: "neuroticism", reverse: true, textKa: "ემოციურად სტაბილური და მდგრადი ვარ." },
 ];
+
+const BIG5_TEXT_EN = [
+  "I enjoy exploring new ideas and considering different perspectives.", "I have a vivid imagination.", "I am drawn to art, music and beauty.", "I prefer familiar activities to trying something new.", "I often think about abstract or philosophical questions.", "I am interested in different cultures and ways of life.", "I rarely have creative ideas.", "Curiosity drives me to learn about unfamiliar subjects.",
+  "I follow through on my promises.", "I like order and planning ahead.", "I finish what I start before moving to something new.", "I often procrastinate.", "I pay close attention to details.", "My belongings are often disorganized.", "I work with discipline toward my goals.", "I am a dependable and responsible person.",
+  "I find it easy to meet new people.", "Interacting with people gives me energy.", "I prefer being alone to spending time in a large group.", "I often take the initiative in conversations or activities.", "I have an energetic and lively manner.", "I am a quiet and reserved person.", "I enjoy being the center of attention.", "I feel comfortable at social events.",
+  "Other people's feelings matter to me.", "I empathize easily with what others are experiencing.", "I try to treat everyone with kindness and respect.", "I can sometimes be cold or inattentive toward others.", "I am willing to help someone who is struggling.", "I often question other people's intentions.", "During conflict, I look for compromise and dialogue.", "I want the people around me to be well.",
+  "I often feel worried or nervous.", "My mood changes quickly.", "I rarely feel sad or tense.", "Even small problems can upset me easily.", "I remain calm under stress.", "I often worry that something may go wrong.", "I frequently feel vulnerable or insecure.", "I am emotionally stable and resilient.",
+];
+
+export const BIG5_QUESTIONS_EN: BigFiveQuestion[] = BIG5_QUESTIONS.map((question, index) => ({
+  ...question,
+  textEn: BIG5_TEXT_EN[index],
+}));
 
 export const BIG5_QUESTION_COUNT = BIG5_QUESTIONS.length;
 

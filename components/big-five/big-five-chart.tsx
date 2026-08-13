@@ -1,4 +1,4 @@
-import { BIG5_LEVEL_LABEL, type BigFiveResult } from "@/lib/big-five/scoring";
+import { BIG5_LEVEL_LABEL, BIG5_LEVEL_LABEL_EN, type BigFiveResult } from "@/lib/big-five/scoring";
 import { TraitRadar, type RadarPoint } from "@/components/tests/trait-radar";
 
 /**
@@ -6,10 +6,11 @@ import { TraitRadar, type RadarPoint } from "@/components/tests/trait-radar";
  * trait. This is the "profile shape"; the written per-trait analysis lives in
  * BigFiveDetail (gated).
  */
-export function BigFiveChart({ result }: { result: BigFiveResult }) {
+export function BigFiveChart({ result, locale = "ka" }: { result: BigFiveResult; locale?: "ka" | "en" }) {
+  const en = locale === "en";
   const points: RadarPoint[] = result.traits.map((t) => ({
     key: t.key,
-    label: t.nameKa,
+    label: en ? t.nameEn : t.nameKa,
     score: t.score,
     hue: t.hue,
   }));
@@ -17,7 +18,7 @@ export function BigFiveChart({ result }: { result: BigFiveResult }) {
   return (
     <div className="rounded-3xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
       <h2 className="mb-2 text-center text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        შენი პიროვნების პროფილი
+        {en ? "Your personality profile" : "შენი პიროვნების პროფილი"}
       </h2>
       <TraitRadar points={points} />
 
@@ -27,7 +28,7 @@ export function BigFiveChart({ result }: { result: BigFiveResult }) {
             <div className="mb-1 flex items-center justify-between gap-2 text-sm">
               <span className="flex items-center gap-2 font-medium">
                 <span>{t.glyph}</span>
-                {t.nameKa}
+                {en ? t.nameEn : t.nameKa}
               </span>
               <span className="flex items-center gap-2">
                 <span
@@ -37,7 +38,7 @@ export function BigFiveChart({ result }: { result: BigFiveResult }) {
                     background: `color-mix(in oklch, ${t.hue} 15%, transparent)`,
                   }}
                 >
-                  {BIG5_LEVEL_LABEL[t.level]}
+                  {(en ? BIG5_LEVEL_LABEL_EN : BIG5_LEVEL_LABEL)[t.level]}
                 </span>
                 <span
                   className="tabular-nums font-bold"

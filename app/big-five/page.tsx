@@ -7,42 +7,22 @@ import { Starfield } from "@/components/landing/starfield";
 import { BigFiveTestClient } from "@/components/big-five/big-five-test-client";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { BIG5_QUESTION_COUNT, BIG5_TRAITS } from "@/lib/big-five/questions";
-import { BIG5_META_DESCRIPTION, BIG5_INTRO, BIG5_FAQ } from "@/lib/big-five/content";
+import { BIG5_META_DESCRIPTION, BIG5_META_DESCRIPTION_EN, BIG5_INTRO, BIG5_INTRO_EN, BIG5_FAQ, BIG5_FAQ_EN } from "@/lib/big-five/content";
 import { BIGFIVE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
-const SITE_URL = "https://www.vivida.ge";
+const TITLE_KA = "Big Five ტესტი — დიდი ხუთეული, პიროვნების ტესტი ქართულად";
+const TITLE_EN = "Free Big Five Personality Test — OCEAN Profile";
 
-const TITLE = "Big Five ტესტი — დიდი ხუთეული, პიროვნების ტესტი ქართულად";
-
-export const metadata: Metadata = {
-  title: { absolute: TITLE },
-  description: BIG5_META_DESCRIPTION,
-  keywords: [
-    "big five ტესტი",
-    "დიდი ხუთეული",
-    "big five ქართულად",
-    "პიროვნების ტესტი",
-    "პიროვნების ტესტი ქართულად",
-    "ocean ტესტი",
-    "big five personality test",
-    "ხასიათის ტესტი",
-  ],
-  alternates: { canonical: `${SITE_URL}/big-five` },
-  openGraph: {
-    type: "website",
-    url: `${SITE_URL}/big-five`,
-    title: TITLE,
-    description: BIG5_META_DESCRIPTION,
-    siteName: "Vivida",
-    locale: "ka_GE",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: BIG5_META_DESCRIPTION,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  const title = en ? TITLE_EN : TITLE_KA;
+  const description = en ? BIG5_META_DESCRIPTION_EN : BIG5_META_DESCRIPTION;
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  return { title: { absolute: title }, description, keywords: en ? ["free Big Five test", "Big Five personality test", "OCEAN personality test", "personality traits test"] : ["big five ტესტი", "დიდი ხუთეული", "პიროვნების ტესტი", "ocean ტესტი"], alternates: { canonical: `${siteUrl}/big-five`, languages: { en: `${ENGLISH_SITE_URL}/big-five`, "ka-GE": `${GEORGIAN_SITE_URL}/big-five`, "x-default": `${ENGLISH_SITE_URL}/big-five` } }, openGraph: { type: "website", url: `${siteUrl}/big-five`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" }, twitter: { card: "summary_large_image", title, description } };
+}
 
 /**
  * Free Big Five (OCEAN) personality test. Anyone can take it; the profile is
@@ -52,33 +32,38 @@ export const metadata: Metadata = {
 export default async function BigFiveTestPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const description = en ? BIG5_META_DESCRIPTION_EN : BIG5_META_DESCRIPTION;
+  const faq = en ? BIG5_FAQ_EN : BIG5_FAQ;
 
   const ld = [
     {
       "@context": "https://schema.org",
       "@type": "Quiz",
-      name: "Vivida Big Five ტესტი",
-      description: BIG5_META_DESCRIPTION,
-      inLanguage: "ka-GE",
-      url: `${SITE_URL}/big-five`,
+      name: en ? "Vivida Big Five Personality Test" : "Vivida Big Five ტესტი",
+      description,
+      inLanguage: en ? "en" : "ka-GE",
+      url: `${siteUrl}/big-five`,
       educationalLevel: "beginner",
       numberOfQuestions: BIG5_QUESTION_COUNT,
       about: {
         "@type": "Thing",
-        name: "დიდი ხუთეული (Big Five)",
-        alternateName: ["Big Five", "OCEAN", "დიდი ხუთეული", "პიროვნების ტესტი"],
+        name: en ? "Big Five personality traits" : "დიდი ხუთეული (Big Five)",
+        alternateName: en ? ["Big Five", "OCEAN", "personality traits"] : ["Big Five", "OCEAN", "დიდი ხუთეული", "პიროვნების ტესტი"],
       },
     },
-    faqLd(BIG5_FAQ),
+    faqLd(faq),
     breadcrumbLd([
-      { name: "მთავარი", url: SITE_URL },
-      { name: "ტესტები", url: `${SITE_URL}/tests` },
-      { name: "Big Five ტესტი", url: `${SITE_URL}/big-five` },
+      { name: en ? "Home" : "მთავარი", url: siteUrl },
+      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
+      { name: en ? "Big Five Test" : "Big Five ტესტი", url: `${siteUrl}/big-five` },
     ]),
   ];
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_265/0.4),transparent_70%),radial-gradient(40%_35%_at_15%_80%,oklch(0.30_0.15_200/0.35),transparent_70%)]"
@@ -97,26 +82,26 @@ export default async function BigFiveTestPage() {
             Vivida · Big Five
           </div>
           <h1 className="mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-            დიდი{" "}
+            {en ? "Your " : "დიდი"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              ხუთეული
+              {en ? "Big Five profile" : "ხუთეული"}
             </span>
           </h1>
           <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-            {BIG5_QUESTION_COUNT} კითხვა · ~7 წუთი · უფასო
+            {en ? `${BIG5_QUESTION_COUNT} questions · about 7 minutes · free` : `${BIG5_QUESTION_COUNT} კითხვა · ~7 წუთი · უფასო`}
           </p>
         </header>
 
-        <BigFiveTestClient />
+        <BigFiveTestClient locale={locale} />
       </section>
 
       {/* SEO / informational content — below the fold, indexable. */}
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
-            რა არის დიდი ხუთეული?
+            {en ? "What is the Big Five?" : "რა არის დიდი ხუთეული?"}
           </h2>
-          {BIG5_INTRO.map((p, i) => (
+          {(en ? BIG5_INTRO_EN : BIG5_INTRO).map((p, i) => (
             <p
               key={i}
               className="mt-3 text-[15px] leading-relaxed text-foreground/85"
@@ -126,7 +111,7 @@ export default async function BigFiveTestPage() {
           ))}
 
           <h2 className="mt-8 text-xl font-semibold tracking-tight">
-            ხუთი თვისება, რომელსაც ტესტი ზომავს
+            {en ? "The five traits" : "ხუთი თვისება, რომელსაც ტესტი ზომავს"}
           </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {BIG5_TRAITS.map((t) => (
@@ -136,20 +121,20 @@ export default async function BigFiveTestPage() {
               >
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <span>{t.glyph}</span>
-                  {t.nameKa}
+                  {en ? t.nameEn : t.nameKa}
                 </div>
                 <div className="mt-0.5 text-xs text-muted-foreground">
-                  {t.taglineKa}
+                  {en ? t.taglineEn : t.taglineKa}
                 </div>
               </div>
             ))}
           </div>
 
           <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            ხშირად დასმული კითხვები
+            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="mt-4 space-y-3">
-            {BIG5_FAQ.map((item) => (
+            {faq.map((item) => (
               <details
                 key={item.q}
                 className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5"
@@ -167,7 +152,7 @@ export default async function BigFiveTestPage() {
             ))}
           </div>
 
-          <PopularSearches queries={BIGFIVE_LATIN_QUERIES} />
+          <PopularSearches queries={en ? ["free Big Five personality test", "OCEAN personality test", "five personality traits", "Big Five profile"] : BIGFIVE_LATIN_QUERIES} />
         </div>
       </section>
     </main>

@@ -34,3 +34,18 @@ export const BIG5_FAQ: { q: string; a: string }[] = [
     a: "ეს თვითშეფასების ტესტია — ის ასახავს იმას, თუ როგორ აღიქვამ საკუთარ თავს. შედეგი სანდო ორიენტირს გაძლევს, თუმცა ის კლინიკური დიაგნოზი არ არის.",
   },
 ];
+
+export const BIG5_META_DESCRIPTION_EN = "Take a free 40-question Big Five personality test and explore your openness, conscientiousness, extraversion, agreeableness and neuroticism profile.";
+
+export const BIG5_INTRO_EN = [
+  "The Big Five, also known as OCEAN, is one of the most widely researched models of personality. Rather than assigning a fixed type, it measures five broad traits on continuous scales.",
+  "There are no correct or incorrect answers. Both ends of every trait describe valid tendencies, and the result shows the distinctive shape of your five-trait profile.",
+];
+
+export const BIG5_FAQ_EN = [
+  { q: "What is the Big Five personality model?", a: "The Big Five describes personality through openness, conscientiousness, extraversion, agreeableness and neuroticism. It is widely used in contemporary personality research." },
+  { q: "How is the result calculated?", a: "Each statement uses a five-point agreement scale. Reverse-keyed items balance agreement bias, and each trait is scored independently from 0 to 100. There is no single overall score." },
+  { q: "How is Big Five different from MBTI?", a: "MBTI assigns one of sixteen types, while Big Five measures five traits on continuous scales. That makes it easier to represent nuance and mixed tendencies." },
+  { q: "Is the test free?", a: "The assessment and core five-trait profile are free. An account lets you save the result, while any optional deeper analysis is clearly marked before using credits." },
+  { q: "Is this a clinical assessment?", a: "No. It is a self-report tool for reflection and is not a diagnosis or substitute for professionally administered assessment." },
+];

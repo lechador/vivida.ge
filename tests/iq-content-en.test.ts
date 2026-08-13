@@ -16,6 +16,8 @@ import {
   EQ_DOMAIN_INTERP_EN,
   EQ_DOMAIN_TIP_EN,
 } from "@/lib/eq/scoring";
+import { BIG5_LIKERT, BIG5_QUESTIONS_EN, BIG5_TRAITS } from "@/lib/big-five/questions";
+import { BIG5_LEVEL_LABEL_EN, BIG5_TRAIT_INTERP_EN } from "@/lib/big-five/scoring";
 
 const GEORGIAN = /[ა-ჰ]/;
 
@@ -68,6 +70,21 @@ describe("English test content", () => {
       bands: Object.values(EQ_BAND_META).map(({ labelEn, summaryEn }) => ({ labelEn, summaryEn })),
       interpretations: EQ_DOMAIN_INTERP_EN,
       tips: EQ_DOMAIN_TIP_EN,
+    };
+    expect(JSON.stringify(copy)).not.toMatch(GEORGIAN);
+  });
+
+  it("provides complete English Big Five assessment and result copy", () => {
+    expect(BIG5_QUESTIONS_EN).toHaveLength(40);
+    for (const question of BIG5_QUESTIONS_EN) {
+      expect(question.textEn).toBeTruthy();
+      expect(question.textEn).not.toMatch(GEORGIAN);
+    }
+    const copy = {
+      traits: BIG5_TRAITS.map(({ nameEn, taglineEn }) => ({ nameEn, taglineEn })),
+      scale: BIG5_LIKERT.map(({ labelEn }) => labelEn),
+      levels: BIG5_LEVEL_LABEL_EN,
+      interpretations: BIG5_TRAIT_INTERP_EN,
     };
     expect(JSON.stringify(copy)).not.toMatch(GEORGIAN);
   });

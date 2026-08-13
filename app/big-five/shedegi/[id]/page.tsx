@@ -16,8 +16,9 @@ import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-t
 import { NextTestWidget } from "@/components/tests/next-test-widget";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 
-export const metadata = { title: "შენი Big Five შედეგი", robots: { index: false } };
+export async function generateMetadata() { const en = (await getRequestLocale()) === "en"; return { title: en ? "Your Big Five Result" : "შენი Big Five შედეგი", robots: { index: false } }; }
 export const dynamic = "force-dynamic";
 
 /**
@@ -33,6 +34,8 @@ export default async function SavedBigFiveResultPage({
 }) {
   const { id } = await params;
   const user = await requireUser();
+  const locale = await getRequestLocale();
+  const en = locale === "en";
 
   const [row] = await db
     .select()
@@ -49,7 +52,7 @@ export default async function SavedBigFiveResultPage({
   ]);
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_265/0.4),transparent_70%)]"
@@ -59,12 +62,12 @@ export default async function SavedBigFiveResultPage({
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         {/* Profile chart — free */}
-        <BigFiveChart result={result} />
+        <BigFiveChart result={result} locale={locale} />
 
         {/* Per-trait analysis — gated behind a one-time credit unlock */}
         {unlocked ? (
           <div className="mt-4">
-            <BigFiveDetail result={result} />
+            <BigFiveDetail result={result} locale={locale} />
           </div>
         ) : (
           <div className="mt-4">
@@ -73,21 +76,22 @@ export default async function SavedBigFiveResultPage({
               resultId={row.id}
               cost={CREDIT_COST.bigFiveTest}
               balance={balance}
-              title="დეტალური ანალიზის გახსნა"
-              blurb="ნახე თითოეული თვისების სრული ანალიზი — რას ნიშნავს შენი დონე ხუთივე თვისებაზე. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+              title={en ? "Unlock the detailed analysis" : "დეტალური ანალიზის გახსნა"}
+              blurb={en ? "Read what your level means for each of the five traits. Pay once and keep the result." : "ნახე თითოეული თვისების სრული ანალიზი — რას ნიშნავს შენი დონე ხუთივე თვისებაზე. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."}
+              locale={locale}
             />
           </div>
         )}
 
-        {unlocked && <ProfileVisibilityToggle kind="big-five" />}
+        {unlocked && <ProfileVisibilityToggle kind="big-five" locale={locale} />}
 
-        <NextTestWidget completed="big-five" />
+        <NextTestWidget completed="big-five" locale={locale} />
 
         <div className="mt-6 flex justify-center">
           <Button asChild variant="outline">
             <Link href="/big-five">
               <RotateCcw className="size-4" />
-              ტესტის თავიდან გავლა
+              {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
             </Link>
           </Button>
         </div>
