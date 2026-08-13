@@ -4,6 +4,7 @@ import {
   type Element,
 } from "@/lib/elements";
 import type { NatalChartJson } from "@/db/schema";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ELEMENT_VIS: Record<Element, { glyph: string; color: string }> = {
   ცეცხლი: { glyph: "△", color: "oklch(0.7 0.22 30)" },
@@ -11,12 +12,24 @@ const ELEMENT_VIS: Record<Element, { glyph: string; color: string }> = {
   ჰაერი: { glyph: "△", color: "oklch(0.75 0.16 220)" },
   წყალი: { glyph: "▽", color: "oklch(0.6 0.2 280)" },
 };
+const ELEMENT_EN: Record<Element, string> = {
+  ცეცხლი: "Fire",
+  მიწა: "Earth",
+  ჰაერი: "Air",
+  წყალი: "Water",
+};
 
 /**
  * Slim element-balance bar — a single segmented bar (fire/earth/air/water by
  * proportion) plus a one-line legend. Replaces the old full-height panel.
  */
-export function ElementsCard({ chart }: { chart: NatalChartJson }) {
+export function ElementsCard({
+  chart,
+  locale = "ka",
+}: {
+  chart: NatalChartJson;
+  locale?: UserLocale;
+}) {
   const balance = computeElementBalance(chart);
 
   return (
@@ -44,7 +57,7 @@ export function ElementsCard({ chart }: { chart: NatalChartJson }) {
                 el === balance.dominant ? "font-medium" : "text-foreground/80"
               }
             >
-              {el}
+              {locale === "en" ? ELEMENT_EN[el] : el}
             </span>
             <span className="tabular-nums text-muted-foreground">
               {Math.round(balance.percentages[el])}%

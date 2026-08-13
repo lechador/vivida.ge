@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { performReading } from "@/lib/tarot/reading";
 
 export const runtime = "nodejs";
@@ -23,7 +24,8 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as { question?: unknown };
   const question = typeof body.question === "string" ? body.question : "";
 
-  const result = await performReading(userId, question);
+  const locale = await getRequestLocale();
+  const result = await performReading(userId, question, locale);
   if (!result.ok) {
     if (result.error === "insufficient") {
       return NextResponse.json(

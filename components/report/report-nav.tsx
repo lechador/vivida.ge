@@ -14,6 +14,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 type SectionId =
   | "wheel"
@@ -27,19 +28,20 @@ type SectionId =
 type Section = {
   id: SectionId;
   label: string;
+  labelEn: string;
   Icon: LucideIcon;
   /** Per-tab hue for the active glow — keeps the nav playful but cohesive. */
   hue: string;
 };
 
 const SECTIONS: Section[] = [
-  { id: "wheel", label: "რუკა", Icon: Compass, hue: "oklch(0.78 0.18 305)" },
-  { id: "positions", label: "პოზიციები", Icon: LayoutList, hue: "oklch(0.78 0.16 250)" },
-  { id: "big-three", label: "დიდი სამეული", Icon: Sparkles, hue: "oklch(0.85 0.16 85)" },
-  { id: "elements", label: "ელემენტები", Icon: Flame, hue: "oklch(0.72 0.22 25)" },
-  { id: "planets", label: "პლანეტები", Icon: Globe2, hue: "oklch(0.78 0.15 195)" },
-  { id: "houses", label: "სახლები", Icon: Home, hue: "oklch(0.72 0.18 145)" },
-  { id: "aspects", label: "ასპექტები", Icon: Triangle, hue: "oklch(0.72 0.22 350)" },
+  { id: "wheel", label: "რუკა", labelEn: "Chart", Icon: Compass, hue: "oklch(0.78 0.18 305)" },
+  { id: "positions", label: "პოზიციები", labelEn: "Positions", Icon: LayoutList, hue: "oklch(0.78 0.16 250)" },
+  { id: "big-three", label: "დიდი სამეული", labelEn: "Big three", Icon: Sparkles, hue: "oklch(0.85 0.16 85)" },
+  { id: "elements", label: "ელემენტები", labelEn: "Elements", Icon: Flame, hue: "oklch(0.72 0.22 25)" },
+  { id: "planets", label: "პლანეტები", labelEn: "Planets", Icon: Globe2, hue: "oklch(0.78 0.15 195)" },
+  { id: "houses", label: "სახლები", labelEn: "Houses", Icon: Home, hue: "oklch(0.72 0.18 145)" },
+  { id: "aspects", label: "ასპექტები", labelEn: "Aspects", Icon: Triangle, hue: "oklch(0.72 0.22 350)" },
 ];
 
 // Pixel offsets matching `scroll-mt-*` so smooth-scrolls land below the
@@ -53,7 +55,7 @@ const SCROLL_OFFSET_MOBILE = 72;
  * smooth-scroll on click without a browser hash-jump, and the active pill
  * auto-scrolls into the nav viewport so it's always visible.
  */
-export function ReportNav() {
+export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
   const [active, setActive] = useState<SectionId>("wheel");
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const tabRefs = useRef<Map<SectionId, HTMLAnchorElement>>(new Map());
@@ -129,7 +131,7 @@ export function ReportNav() {
 
   return (
     <nav
-      aria-label="რუკის ნავიგაცია"
+      aria-label={locale === "en" ? "Chart navigation" : "რუკის ნავიგაცია"}
       className="sticky top-0 z-30 -mx-4 border-b border-border/40 bg-background/80 px-4 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 sm:-mx-6 sm:px-6 sm:py-3"
     >
       <div className="relative mx-auto max-w-6xl">
@@ -157,6 +159,7 @@ export function ReportNav() {
                 if (el) tabRefs.current.set(section.id, el);
                 else tabRefs.current.delete(section.id);
               }}
+              locale={locale}
             />
           ))}
         </div>
@@ -170,11 +173,13 @@ function NavPill({
   isActive,
   onClick,
   registerRef,
+  locale,
 }: {
   section: Section;
   isActive: boolean;
   onClick: (e: React.MouseEvent, id: SectionId) => void;
   registerRef: (el: HTMLAnchorElement | null) => void;
+  locale: UserLocale;
 }) {
   const { Icon } = section;
   return (
@@ -222,7 +227,9 @@ function NavPill({
             : undefined
         }
       />
-      <span className="relative z-10">{section.label}</span>
+      <span className="relative z-10">
+        {locale === "en" ? section.labelEn : section.label}
+      </span>
     </a>
   );
 }

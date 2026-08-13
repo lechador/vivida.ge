@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { detectAspects } from "@/lib/aspects";
 import { bodyMeta, signByIndex } from "@/lib/zodiac";
 import type { NatalChartJson } from "@/db/schema";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const SIZE = 480;
 const CX = SIZE / 2;
@@ -116,7 +117,13 @@ function staggerOffsets(
   return out;
 }
 
-export function ChartWheel({ chart }: { chart: NatalChartJson }) {
+export function ChartWheel({
+  chart,
+  locale = "ka",
+}: {
+  chart: NatalChartJson;
+  locale?: UserLocale;
+}) {
   const ascLng = chart.ascendant.longitude;
 
   // Aspects + planet placement are O(n²) over the bodies and never change
@@ -137,7 +144,7 @@ export function ChartWheel({ chart }: { chart: NatalChartJson }) {
       width="100%"
       height="100%"
       role="img"
-      aria-label="ნატალური რუკის ბორბალი"
+      aria-label={locale === "en" ? "Natal chart wheel" : "ნატალური რუკის ბორბალი"}
       className="select-none"
     >
       <defs>

@@ -10,16 +10,18 @@ import { useState } from "react";
  */
 export function CardImage({
   slug,
-  nameKa,
+  name,
   glyph,
   className,
   priority,
+  locale = "ka",
 }: {
   slug: string;
-  nameKa: string;
+  name: string;
   glyph: string;
   className?: string;
   priority?: boolean;
+  locale?: "ka" | "en";
 }) {
   const [ok, setOk] = useState(true);
   return (
@@ -33,7 +35,7 @@ export function CardImage({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={`/tarot/${slug}.webp`}
-            alt={`ტაროს კარტი — ${nameKa}`}
+            alt={locale === "en" ? `${name} tarot card` : `ტაროს კარტი — ${name}`}
             loading={priority ? "eager" : "lazy"}
             onError={() => setOk(false)}
             className="size-full object-cover"
@@ -42,7 +44,7 @@ export function CardImage({
           <div className="flex size-full flex-col items-center justify-center gap-3 bg-[radial-gradient(70%_60%_at_50%_30%,oklch(0.32_0.14_300/0.6),transparent_70%)] p-4 text-center">
             <span className="text-6xl">{glyph}</span>
             <span className="text-sm font-medium text-foreground/85">
-              {nameKa}
+              {name}
             </span>
           </div>
         )}

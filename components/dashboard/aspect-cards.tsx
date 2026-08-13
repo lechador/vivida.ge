@@ -7,6 +7,7 @@ import { aspectKey } from "@/lib/aspects";
 import { bodyMeta } from "@/lib/zodiac";
 import type { NatalChartJson, NatalAspectJson } from "@/db/schema";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ASPECT_SYMBOL: Record<string, string> = {
   conjunction: "☌",
@@ -23,20 +24,28 @@ const ASPECT_LABEL_KA: Record<string, string> = {
   trine: "ტრინი",
   opposition: "ოპოზიცია",
 };
+const ASPECT_LABEL_EN: Record<string, string> = {
+  conjunction: "conjunction",
+  sextile: "sextile",
+  square: "square",
+  trine: "trine",
+  opposition: "opposition",
+};
 
 const FAMILY_ORDER = ["harmonic", "tense", "neutral"] as const;
 type Family = (typeof FAMILY_ORDER)[number];
 
-const FAMILY_META: Record<Family, { color: string; labelKa: string }> = {
-  harmonic: { color: "oklch(0.78 0.18 200)", labelKa: "ჰარმონიული" },
-  tense: { color: "oklch(0.72 0.22 350)", labelKa: "დაძაბული" },
-  neutral: { color: "oklch(0.85 0.16 85)", labelKa: "შერწყმული" },
+const FAMILY_META: Record<Family, { color: string; labelKa: string; labelEn: string }> = {
+  harmonic: { color: "oklch(0.78 0.18 200)", labelKa: "ჰარმონიული", labelEn: "Harmonious" },
+  tense: { color: "oklch(0.72 0.22 350)", labelKa: "დაძაბული", labelEn: "Dynamic" },
+  neutral: { color: "oklch(0.85 0.16 85)", labelKa: "შერწყმული", labelEn: "Concentrated" },
 };
 
-function bodyLabel(key: string): string {
-  if (key === "ascendant") return "ამომავალი";
-  if (key === "midheaven") return "ზენიტი";
-  return bodyMeta(key)?.labelKa ?? key;
+function bodyLabel(key: string, locale: UserLocale): string {
+  if (key === "ascendant") return locale === "en" ? "Ascendant" : "ამომავალი";
+  if (key === "midheaven") return locale === "en" ? "Midheaven" : "ზენიტი";
+  const meta = bodyMeta(key);
+  return locale === "en" ? meta?.labelEn ?? key : meta?.labelKa ?? key;
 }
 
 /**
@@ -47,17 +56,20 @@ function bodyLabel(key: string): string {
 export function AspectCards({
   chart,
   interpretations,
+  locale = "ka",
 }: {
   chart: NatalChartJson;
   interpretations?: Record<string, string>;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [openKey, setOpenKey] = useState<string | null>(null);
   const aspects = chart.aspects ?? [];
 
   if (aspects.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        მნიშვნელოვანი ასპექტები ვერ მოიძებნა.
+        {en ? "No major aspects were found." : "მნიშვნელოვანი ასპექტები ვერ მოიძებნა."}
       </p>
     );
   }
@@ -85,7 +97,7 @@ export function AspectCards({
               className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider"
               style={{ color: meta.color }}
             >
-              {meta.labelKa}
+              {en ? meta.labelEn : meta.labelKa}
               <span className="text-muted-foreground">· {items.length}</span>
             </div>
             <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
@@ -115,11 +127,11 @@ export function AspectCards({
                       >
                         {ASPECT_SYMBOL[a.kind] ?? "·"}
                       </span>
-                      <span className="font-medium">{bodyLabel(a.a)}</span>
+                      <span className="font-medium">{bodyLabel(a.a, locale)}</span>
                       <span className="text-muted-foreground">
-                        {ASPECT_LABEL_KA[a.kind] ?? a.kind}
+                        {(en ? ASPECT_LABEL_EN : ASPECT_LABEL_KA)[a.kind] ?? a.kind}
                       </span>
-                      <span className="font-medium">{bodyLabel(a.b)}</span>
+                      <span className="font-medium">{bodyLabel(a.b, locale)}</span>
                       <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
                         {a.orb.toFixed(1)}°
                       </span>

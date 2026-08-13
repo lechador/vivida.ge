@@ -1,10 +1,16 @@
 import { signByIndex, formatDegree, signColor } from "@/lib/zodiac";
 import type { PointJson } from "@/db/schema";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const KIND_LABEL: Record<"sun" | "moon" | "ascendant", string> = {
   sun: "მზე",
   moon: "მთვარე",
   ascendant: "ამომავალი",
+};
+const KIND_LABEL_EN: Record<"sun" | "moon" | "ascendant", string> = {
+  sun: "Sun",
+  moon: "Moon",
+  ascendant: "Ascendant",
 };
 
 const KIND_GLYPH: Record<"sun" | "moon" | "ascendant", string> = {
@@ -22,11 +28,14 @@ export function BigThreeCard({
   kind,
   point,
   interpretation,
+  locale = "ka",
 }: {
   kind: "sun" | "moon" | "ascendant";
   point: PointJson;
   interpretation?: string;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const sign = signByIndex(point.signIndex);
   const color = signColor(sign);
 
@@ -44,7 +53,7 @@ export function BigThreeCard({
           {KIND_GLYPH[kind]}
         </span>
         <span className="w-24 shrink-0 font-medium sm:w-28">
-          {KIND_LABEL[kind]}
+          {en ? KIND_LABEL_EN[kind] : KIND_LABEL[kind]}
         </span>
         <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
           <span
@@ -54,11 +63,11 @@ export function BigThreeCard({
           >
             {`${sign.symbol}︎`}
           </span>
-          <span className="truncate">{sign.labelKa}</span>
+          <span className="truncate">{en ? sign.labelEn : sign.labelKa}</span>
         </span>
         <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
           {formatDegree(point.signDegree)}
-          {point.house ? ` · ${point.house} სახ.` : ""}
+          {point.house ? ` · ${point.house} ${en ? "house" : "სახ."}` : ""}
         </span>
       </div>
       {interpretation && (

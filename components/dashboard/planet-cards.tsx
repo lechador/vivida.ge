@@ -1,5 +1,6 @@
 import { bodyMeta, formatDegree, signByIndex, signColor } from "@/lib/zodiac";
 import type { NatalChartJson } from "@/db/schema";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const PLANETS_TO_SHOW = [
   "mercury",
@@ -20,10 +21,13 @@ const PLANETS_TO_SHOW = [
 export function PlanetCards({
   chart,
   interpretations,
+  locale = "ka",
 }: {
   chart: NatalChartJson;
   interpretations?: Record<string, string>;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
       {PLANETS_TO_SHOW.map((key) => {
@@ -49,7 +53,7 @@ export function PlanetCards({
                 {meta?.symbol ?? "?"}
               </span>
               <span className="w-24 shrink-0 font-medium sm:w-28">
-                {meta?.labelKa ?? key}
+                {en ? meta?.labelEn ?? key : meta?.labelKa ?? key}
               </span>
               <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
                 <span
@@ -59,12 +63,12 @@ export function PlanetCards({
                 >
                   {`${sign.symbol}︎`}
                 </span>
-                <span className="truncate">{sign.labelKa}</span>
+                <span className="truncate">{en ? sign.labelEn : sign.labelKa}</span>
               </span>
               <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
                 {formatDegree(body.signDegree)}
                 {body.retrograde ? " ℞" : ""}
-                {body.house ? ` · ${body.house} სახ.` : ""}
+                {body.house ? ` · ${body.house} ${en ? "house" : "სახ."}` : ""}
               </span>
             </div>
             {text && (

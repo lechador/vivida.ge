@@ -8,14 +8,15 @@ import { Loader2, RotateCcw, Sparkles, Users, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import type { UserLocale } from "@/lib/i18n/locale";
 
 type SpreadCard = {
   slug: string;
-  nameKa: string;
+  name: string;
   glyph: string;
   reversed: boolean;
-  positionKa: string;
-  interpretationKa: string;
+  position: string;
+  interpretation: string;
 };
 type Reading = {
   headline: string;
@@ -35,10 +36,13 @@ type Reading = {
 export function TarotReader({
   authed,
   cost,
+  locale,
 }: {
   authed: boolean;
   cost: number;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const router = useRouter();
   const [question, setQuestion] = useState("");
   const [reading, setReading] = useState<Reading | null>(null);
@@ -99,7 +103,7 @@ export function TarotReader({
     <div className="rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/10 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
       {/* Question box */}
       <label className="block text-sm font-medium text-foreground/90">
-        დაუსვი კითხვა კარტებს
+        {en ? "Ask the cards a question" : "დაუსვი კითხვა კარტებს"}
       </label>
       <div className="mt-2 flex flex-col gap-3 sm:flex-row">
         <input
@@ -110,7 +114,11 @@ export function TarotReader({
             if (e.key === "Enter") ask();
           }}
           maxLength={300}
-          placeholder="მაგ: რას მიპირებს ეს ურთიერთობა?"
+          placeholder={
+            en
+              ? "For example: What should I understand about this relationship?"
+              : "მაგ: რას მიპირებს ეს ურთიერთობა?"
+          }
           className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
         />
         <Button
@@ -125,30 +133,38 @@ export function TarotReader({
           ) : (
             <Wand2 className="size-4" />
           )}
-          გაშალე კარტები
+          {en ? "Draw the cards" : "გაშალე კარტები"}
         </Button>
       </div>
       <div className="mt-2">
-        <CreditHint>პირველი კითხვა უფასოა, შემდეგ −{cost} კრედიტი</CreditHint>
+        <CreditHint>
+          {en
+            ? `Your first question is free, then ${cost} credits`
+            : `პირველი კითხვა უფასოა, შემდეგ −${cost} კრედიტი`}
+        </CreditHint>
       </div>
 
       {/* Short-balance prompt */}
       {status === "short" && (
         <div className="mt-5 rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
           <p className="text-[var(--vivida-pink)]">
-            ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი.
+            {en
+              ? "You do not have enough credits. Invite a friend or top up your balance."
+              : "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი."}
           </p>
           <Button asChild variant="mystic" className="mt-3">
             <Link href="/credits">
               <Users className="size-4" />
-              მოიწვიე / შეავსე
+              {en ? "Invite / top up" : "მოიწვიე / შეავსე"}
             </Link>
           </Button>
         </div>
       )}
       {status === "error" && (
         <p className="mt-4 text-sm text-[var(--vivida-pink)]">
-          რაღაც ვერ მოხერხდა — სცადე ხელახლა.
+          {en
+            ? "Something went wrong. Please try again."
+            : "რაღაც ვერ მოხერხდა — სცადე ხელახლა."}
         </p>
       )}
 
@@ -175,7 +191,7 @@ export function TarotReader({
 
           <div className="text-center">
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              შენი კითხვა
+              {en ? "Your reading" : "შენი კითხვა"}
             </div>
             <h3 className="mt-1 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
               {reading.headline}
@@ -189,11 +205,11 @@ export function TarotReader({
                 className="rounded-2xl border border-border bg-background/35 px-4 py-3"
               >
                 <div className="text-xs font-medium text-[var(--vivida-violet)]">
-                  {c.positionKa} · {c.nameKa}
-                  {c.reversed && " (შებრუნებული)"}
+                  {c.position} · {c.name}
+                  {c.reversed && (en ? " (reversed)" : " (შებრუნებული)")}
                 </div>
                 <p className="mt-1 text-sm leading-relaxed text-foreground/90">
-                  {c.interpretationKa}
+                  {c.interpretation}
                 </p>
               </div>
             ))}
@@ -214,37 +230,43 @@ export function TarotReader({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-xs text-muted-foreground">
               {reading.free
-                ? "პირველი კითხვა — უფასო ✦"
-                : `−${reading.charged} კრედიტი · ბალანსი ${reading.balance}`}
+                ? en
+                  ? "First reading — free ✦"
+                  : "პირველი კითხვა — უფასო ✦"
+                : en
+                  ? `−${reading.charged} credits · ${reading.balance} remaining`
+                  : `−${reading.charged} კრედიტი · ბალანსი ${reading.balance}`}
             </span>
             <Button type="button" variant="outline" onClick={reset} className="gap-1.5">
               <RotateCcw className="size-4" />
-              ახალი კითხვა
+              {en ? "New question" : "ახალი კითხვა"}
             </Button>
           </div>
 
           {/* Free second-action rail — a next step at the peak-engagement
               moment, instead of dead-ending at the credit-gated new question. */}
           <div className="border-t border-border/40 pt-5 text-center">
-            <p className="text-xs text-muted-foreground">ან განაგრძე</p>
+            <p className="text-xs text-muted-foreground">
+              {en ? "Or keep exploring" : "ან განაგრძე"}
+            </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               <Link
                 href="/dashboard"
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
               >
-                დღის ჰოროსკოპი
+                {en ? "Daily horoscope" : "დღის ჰოროსკოპი"}
               </Link>
               <Link
                 href="/report"
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
               >
-                ჩემი ნატალური რუკა
+                {en ? "My natal chart" : "ჩემი ნატალური რუკა"}
               </Link>
               <Link
                 href="/tests"
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
               >
-                ტესტები
+                {en ? "Tests" : "ტესტები"}
               </Link>
             </div>
           </div>
@@ -269,7 +291,7 @@ function TarotCardFace({ card, delayMs }: { card: SpreadCard; delayMs: number })
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={`/tarot/${card.slug}.webp`}
-            alt={card.nameKa}
+            alt={card.name}
             loading="lazy"
             onError={() => setImgOk(false)}
             className="size-full object-cover"
@@ -278,7 +300,7 @@ function TarotCardFace({ card, delayMs }: { card: SpreadCard; delayMs: number })
           <div className="flex size-full flex-col items-center justify-center gap-2 bg-[radial-gradient(70%_60%_at_50%_30%,oklch(0.32_0.14_300/0.6),transparent_70%)] p-2 text-center">
             <span className="text-3xl">{card.glyph}</span>
             <span className="text-[10px] font-medium leading-tight text-foreground/80">
-              {card.nameKa}
+              {card.name}
             </span>
           </div>
         )}
@@ -288,7 +310,7 @@ function TarotCardFace({ card, delayMs }: { card: SpreadCard; delayMs: number })
           card.reversed ? "" : ""
         }`}
       >
-        {card.nameKa}
+        {card.name}
       </figcaption>
     </figure>
   );

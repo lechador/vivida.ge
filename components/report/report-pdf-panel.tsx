@@ -7,6 +7,7 @@ import { pdfReports } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import { CREDIT_COST, getBalance } from "@/lib/credits";
 import { BuyReportCta } from "./buy-report-cta";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Report purchase/download surface on /report. Adapts to the user's latest
@@ -15,9 +16,12 @@ import { BuyReportCta } from "./buy-report-cta";
  */
 export async function ReportPdfPanel({
   userId,
+  locale = "ka",
 }: {
   userId: string;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [report] = await db
     .select()
     .from(pdfReports)
@@ -33,16 +37,18 @@ export async function ReportPdfPanel({
           <div className="flex items-start gap-3">
             <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-[var(--vivida-cyan)]" />
             <div>
-              <h3 className="text-lg font-semibold">შენი სრული ანგარიში მზადაა</h3>
+              <h3 className="text-lg font-semibold">
+                {en ? "Your complete report is ready" : "შენი სრული ანგარიში მზადაა"}
+              </h3>
               <p className="mt-0.5 text-sm text-foreground/75">
-                ჩამოტვირთე PDF — ხელმისაწვდომია ნებისმიერ დროს.
+                {en ? "Download your PDF whenever you need it." : "ჩამოტვირთე PDF — ხელმისაწვდომია ნებისმიერ დროს."}
               </p>
             </div>
           </div>
           <Button asChild variant="mystic" size="lg" className="min-w-44">
             <a href={`/api/reports/${report.id}/download`}>
               <Download className="size-4" />
-              ჩამოტვირთე PDF
+              {en ? "Download PDF" : "ჩამოტვირთე PDF"}
             </a>
           </Button>
         </div>
@@ -64,17 +70,27 @@ export async function ReportPdfPanel({
             )}
             <div>
               <h3 className="text-lg font-semibold">
-                {failed ? "გენერაცია შეფერხდა" : "შენი ანგარიში მზადდება"}
+                {failed
+                  ? en
+                    ? "Generation was interrupted"
+                    : "გენერაცია შეფერხდა"
+                  : en
+                    ? "Your report is being prepared"
+                    : "შენი ანგარიში მზადდება"}
               </h3>
               <p className="mt-0.5 text-sm text-foreground/75">
                 {failed
-                  ? "სცადე ხელახლა — დამატებითი გადახდა საჭირო არ არის."
-                  : "ეს ჩვეულებრივ ერთ წუთზე ნაკლებს ანდომებს."}
+                  ? en
+                    ? "Try again—there is no additional charge."
+                    : "სცადე ხელახლა — დამატებითი გადახდა საჭირო არ არის."
+                  : en
+                    ? "This usually takes less than a minute."
+                    : "ეს ჩვეულებრივ ერთ წუთზე ნაკლებს ანდომებს."}
               </p>
             </div>
           </div>
           <Button asChild variant="outline" size="lg">
-            <Link href={`/reports/${report.id}`}>ნახე სტატუსი</Link>
+            <Link href={`/reports/${report.id}`}>{en ? "View status" : "ნახე სტატუსი"}</Link>
           </Button>
         </div>
       </div>
@@ -83,5 +99,5 @@ export async function ReportPdfPanel({
 
   // None / pending → pay with credits to generate.
   const balance = await getBalance(userId);
-  return <BuyReportCta cost={CREDIT_COST.pdfReport} balance={balance} />;
+  return <BuyReportCta cost={CREDIT_COST.pdfReport} balance={balance} locale={locale} />;
 }

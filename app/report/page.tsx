@@ -14,9 +14,14 @@ import { ChartSection } from "@/components/dashboard/chart-section";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
 import { ReportPdfPanel } from "@/components/report/report-pdf-panel";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ClearPendingNatalProfile } from "@/components/onboarding/clear-pending-natal-profile";
+import type { Metadata } from "next";
 
-export const metadata = { title: "ჩემი რუკა" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  return { title: locale === "en" ? "My natal chart" : "ჩემი რუკა" };
+}
 
 export default async function ReportPage() {
   const user = await requireUser();
@@ -25,7 +30,7 @@ export default async function ReportPage() {
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     db.select({ locale: users.interfaceLanguage }).from(users).where(eq(users.id, user.id)).limit(1),
   ]);
-  const locale = normalizeUserLocale(userPrefs?.locale);
+  const locale = await getRequestLocale(normalizeUserLocale(userPrefs?.locale));
   const en = locale === "en";
 
   if (!profile?.dateOfBirth) {
@@ -76,7 +81,7 @@ export default async function ReportPage() {
 
         <div className="mb-10">
           <Suspense fallback={null}>
-            <ReportPdfPanel userId={user.id} />
+            <ReportPdfPanel userId={user.id} locale={locale} />
           </Suspense>
         </div>
 
@@ -87,7 +92,7 @@ export default async function ReportPage() {
             </div>
           }
         >
-          <ChartSection userId={user.id} />
+          <ChartSection userId={user.id} locale={locale} />
         </Suspense>
 
         <div className="mt-12 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">

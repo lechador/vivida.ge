@@ -1,6 +1,7 @@
 import { HOUSE_NUMBERS, houseDef } from "@/lib/houses";
 import { bodyMeta, signByIndex, signColor } from "@/lib/zodiac";
 import type { NatalChartJson } from "@/db/schema";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const HOUSE_LABEL: Record<number, string> = {
   1: "AC",
@@ -17,10 +18,13 @@ const HOUSE_LABEL: Record<number, string> = {
 export function HouseCards({
   chart,
   interpretations,
+  locale = "ka",
 }: {
   chart: NatalChartJson;
   interpretations?: Record<string, string>;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const occupants: Record<
     number,
     Array<{ key: string; label: string; symbol: string }>
@@ -30,7 +34,7 @@ export function HouseCards({
     const meta = bodyMeta(key);
     (occupants[body.house] ??= []).push({
       key,
-      label: meta?.labelKa ?? key,
+      label: en ? meta?.labelEn ?? key : meta?.labelKa ?? key,
       symbol: meta?.symbol ?? "?",
     });
   }
@@ -61,7 +65,7 @@ export function HouseCards({
               {/* No truncate: titles are curated to ≤16 chars, and if one ever
                   outgrows the column it wraps instead of clipping. */}
               <span className="w-32 shrink-0 font-medium sm:w-44">
-                {def.themeKa}
+                {en ? def.themeEn : def.themeKa}
               </span>
               {cuspSign && (
                 <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
@@ -72,7 +76,7 @@ export function HouseCards({
                   >
                     {`${cuspSign.symbol}︎`}
                   </span>
-                  <span className="truncate">{cuspSign.labelKa}</span>
+                  <span className="truncate">{en ? cuspSign.labelEn : cuspSign.labelKa}</span>
                 </span>
               )}
               {planets.length > 0 && (

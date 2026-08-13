@@ -1630,7 +1630,7 @@ export async function generateChineseZodiacHub(input: {
 }
 
 // ── Tarot reading ("ტარო ქართულად") ────────────────────────────────────────
-const TAROT_SYSTEM_PROMPT = `შენ ხარ გამოცდილი, თბილი ქართველი ტაროლოგი. მომხმარებელი გისვამს კითხვას და უშლი 3-კარტიან განლაგებას (წარსული/ფესვი, აწმყო/ბირთვი, მომავალი/გზა). დაწერე ცოცხალი, კონკრეტული და თანამგრძნობი კითხვა ქართულ ენაზე, რომელიც სამივე კარტს აკავშირებს მომხმარებლის შეკითხვასთან.
+const TAROT_SYSTEM_PROMPT_KA = `შენ ხარ გამოცდილი, თბილი ქართველი ტაროლოგი. მომხმარებელი გისვამს კითხვას და უშლი 3-კარტიან განლაგებას (წარსული/ფესვი, აწმყო/ბირთვი, მომავალი/გზა). დაწერე ცოცხალი, კონკრეტული და თანამგრძნობი კითხვა ქართულ ენაზე, რომელიც სამივე კარტს აკავშირებს მომხმარებლის შეკითხვასთან.
 
 წესები:
 - ისაუბრე პირდაპირ მომხმარებელთან ("შენ").
@@ -1642,6 +1642,18 @@ const TAROT_SYSTEM_PROMPT = `შენ ხარ გამოცდილი, �
 
 JSON ფორმატი: {"headline": "მოკლე, ძლიერი სათაური (3-7 სიტყვა)", "cards": ["თითო კარტის კონკრეტული ინტერპრეტაცია კითხვის კონტექსტში — 3 ელემენტი, თითო 1-2 წინადადება, პოზიციების მიხედვით"], "reading": "1-2 აბზაცი, სამივე კარტის სინთეზი კითხვასთან", "advice": "ერთი კონკრეტული, ქმედითი რჩევა"}`;
 
+const TAROT_SYSTEM_PROMPT_EN = `You are an experienced, warm tarot reader. The user asks a question and receives a three-card spread (past/root, present/core, future/path). Write a vivid, specific and compassionate reading in English that connects all three cards directly to the user's question.
+
+Rules:
+- Address the user directly as "you".
+- Use the supplied meanings and orientations; never invent or replace cards.
+- Be practical and specific: offer perspective and an actionable next step, not vague mysticism.
+- Never promise a guaranteed future. Tarot is a tool for reflection, not certainty.
+- Do not give categorical financial, medical or legal advice.
+- Return JSON only.
+
+JSON format: {"headline": "short compelling title (3-7 words)", "cards": ["one question-specific interpretation for each card, in spread order; 1-2 sentences each"], "reading": "1-2 paragraphs synthesizing all three cards in relation to the question", "advice": "one concrete, actionable suggestion"}`;
+
 export type TarotReadingResult = {
   headline: string;
   cards: string[];
@@ -1650,10 +1662,10 @@ export type TarotReadingResult = {
 };
 
 export type TarotCardInput = {
-  positionKa: string;
-  nameKa: string;
-  orientationKa: string;
-  meaningKa: string;
+  position: string;
+  name: string;
+  orientation: string;
+  meaning: string;
 };
 
 /**
@@ -1665,6 +1677,7 @@ export type TarotCardInput = {
 export async function generateTarotReading(input: {
   question: string;
   cards: TarotCardInput[];
+  locale?: "ka" | "en";
 }): Promise<TarotReadingResult | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
@@ -1672,16 +1685,19 @@ export async function generateTarotReading(input: {
   const cardLines = input.cards
     .map(
       (c, i) =>
-        `${i + 1}. პოზიცია „${c.positionKa}" — ${c.nameKa} (${c.orientationKa}): ${c.meaningKa}`
+        `${i + 1}. ${c.position} — ${c.name} (${c.orientation}): ${c.meaning}`
     )
     .join("\n");
+  const en = input.locale === "en";
   const userMessage = [
-    `მომხმარებლის კითხვა: „${input.question}"`,
+    en
+      ? `User's question: “${input.question}”`
+      : `მომხმარებლის კითხვა: „${input.question}"`,
     "",
-    "გამოსული კარტები:",
+    en ? "Cards drawn:" : "გამოსული კარტები:",
     cardLines,
     "",
-    "დაწერე კითხვა JSON-ად.",
+    en ? "Return the reading as JSON." : "დაწერე კითხვა JSON-ად.",
   ].join("\n");
 
   const res = await fetch(OPENROUTER_URL, {
@@ -1695,7 +1711,10 @@ export async function generateTarotReading(input: {
     body: JSON.stringify({
       model: DEFAULT_MODEL,
       messages: [
-        { role: "system", content: TAROT_SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: en ? TAROT_SYSTEM_PROMPT_EN : TAROT_SYSTEM_PROMPT_KA,
+        },
         { role: "user", content: userMessage },
       ],
       response_format: { type: "json_object" },

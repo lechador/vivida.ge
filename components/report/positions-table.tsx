@@ -1,5 +1,6 @@
 import { bodyMeta, formatDegree, signByIndex, signColor } from "@/lib/zodiac";
 import type { NatalChartJson, PointJson } from "@/db/schema";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Compact, scannable planet-positions table — the at-a-glance data layer of
@@ -32,16 +33,23 @@ function pointFor(chart: NatalChartJson, key: string): PointJson | null {
   return chart.bodies[key] ?? null;
 }
 
-export function PositionsTable({ chart }: { chart: NatalChartJson }) {
+export function PositionsTable({
+  chart,
+  locale = "ka",
+}: {
+  chart: NatalChartJson;
+  locale?: UserLocale;
+}) {
+  const en = locale === "en";
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
       <div
         className={`${GRID} px-4 py-2.5 text-[11px] uppercase tracking-wider text-muted-foreground sm:px-5`}
       >
-        <span>პლანეტა</span>
-        <span>ნიშანი</span>
-        <span className="text-right">გრადუსი</span>
-        <span className="text-right">სახლი</span>
+        <span>{en ? "Planet" : "პლანეტა"}</span>
+        <span>{en ? "Sign" : "ნიშანი"}</span>
+        <span className="text-right">{en ? "Degree" : "გრადუსი"}</span>
+        <span className="text-right">{en ? "House" : "სახლი"}</span>
       </div>
       <ul>
         {ROW_KEYS.map((key) => {
@@ -62,14 +70,14 @@ export function PositionsTable({ chart }: { chart: NatalChartJson }) {
                   <span aria-hidden style={{ color }} className={GLYPH}>
                     {meta?.symbol ?? "?"}
                   </span>
-                  <span className="truncate">{meta?.labelKa ?? key}</span>
+                  <span className="truncate">{en ? meta?.labelEn ?? key : meta?.labelKa ?? key}</span>
                 </span>
 
                 <span className="flex min-w-0 items-center gap-2 text-foreground/85">
                   <span aria-hidden style={{ color }} className={GLYPH}>
                     {`${sign.symbol}︎`}
                   </span>
-                  <span className="truncate">{sign.labelKa}</span>
+                  <span className="truncate">{en ? sign.labelEn : sign.labelKa}</span>
                 </span>
 
                 <span className="whitespace-nowrap text-right tabular-nums text-foreground/80">
@@ -104,7 +112,13 @@ const HOUSE_LABEL: Record<number, string> = {
  * Compact two-column houses list (cusps). Each row scrolls in-page to that
  * house's interpretation (#house-<n>).
  */
-export function HousesTable({ chart }: { chart: NatalChartJson }) {
+export function HousesTable({
+  chart,
+  locale = "ka",
+}: {
+  chart: NatalChartJson;
+  locale?: UserLocale;
+}) {
   const houses = [...chart.houses].sort((a, b) => a.number - b.number);
   return (
     <div className="grid gap-x-8 sm:grid-cols-2">
@@ -123,7 +137,7 @@ export function HousesTable({ chart }: { chart: NatalChartJson }) {
             <span aria-hidden style={{ color }} className={GLYPH}>
               {`${sign.symbol}︎`}
             </span>
-            <span className="truncate">{sign.labelKa}</span>
+            <span className="truncate">{locale === "en" ? sign.labelEn : sign.labelKa}</span>
           </a>
         );
       })}

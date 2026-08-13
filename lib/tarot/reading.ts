@@ -14,6 +14,11 @@ import {
   TAROT_CARDS,
   type DrawnCard,
 } from "@/lib/tarot/deck";
+import {
+  SPREAD_POSITIONS_EN,
+  TAROT_EN_BY_SLUG,
+} from "@/lib/tarot/deck-en";
+import type { UserLocale } from "@/lib/i18n/locale";
 
 /**
  * The tarot Q&A engine. Draws a 3-card spread, charges credits (first reading
@@ -24,12 +29,12 @@ import {
 
 export type TarotSpreadCard = {
   slug: string;
-  nameKa: string;
+  name: string;
   glyph: string;
   reversed: boolean;
-  positionKa: string;
+  position: string;
   /** AI's per-card interpretation for this question, or the static fallback. */
-  interpretationKa: string;
+  interpretation: string;
 };
 
 export type TarotReading = {
@@ -60,16 +65,39 @@ function drawSpread(): DrawnCard[] {
 }
 
 /** Compose a readable fallback answer purely from the static card meanings. */
-function fallbackReading(drawn: DrawnCard[]): {
+function cardCopy(drawn: DrawnCard, locale: UserLocale) {
+  if (locale === "en") {
+    const card = TAROT_EN_BY_SLUG[drawn.card.slug];
+    return {
+      name: card.name,
+      meaning: drawn.reversed ? card.reversed : card.upright,
+    };
+  }
+  return {
+    name: drawn.card.nameKa,
+    meaning: drawn.reversed ? drawn.card.reversedKa : drawn.card.uprightKa,
+  };
+}
+
+function fallbackReading(drawn: DrawnCard[], locale: UserLocale): {
   headline: string;
   cards: string[];
   reading: string;
   advice: string;
 } {
-  const perCard = drawn.map((d) =>
-    d.reversed ? d.card.reversedKa : d.card.uprightKa
-  );
-  const [past, present, future] = drawn.map((d) => d.card.nameKa);
+  const copy = drawn.map((card) => cardCopy(card, locale));
+  const perCard = copy.map((card) => card.meaning);
+  const [past, present, future] = copy.map((card) => card.name);
+  if (locale === "en") {
+    return {
+      headline: `In the light of ${present}`,
+      cards: perCard,
+      reading:
+        `Three cards speak to your question. ${past} stands at the root, ${present} defines the present, and ${future} opens the path ahead. ` +
+        perCard.join(" "),
+      advice: perCard[1],
+    };
+  }
   return {
     headline: `${present}ის შუქზე`,
     cards: perCard,
@@ -87,7 +115,8 @@ function fallbackReading(drawn: DrawnCard[]): {
  */
 export async function performReading(
   userId: string,
-  question: string
+  question: string,
+  locale: UserLocale = "ka",
 ): Promise<TarotResult> {
   const q = question.trim().slice(0, 300);
   if (q.length < 3) return { ok: false, error: "bad_request" };
@@ -110,14 +139,23 @@ export async function performReading(
 
   // ── Draw + interpret ─────────────────────────────────────────────────────
   const drawn = drawSpread();
+  const positions = locale === "en" ? SPREAD_POSITIONS_EN : SPREAD_POSITIONS_KA;
   const aiInput = {
     question: q,
     cards: drawn.map((d, i) => ({
-      positionKa: SPREAD_POSITIONS_KA[i],
-      nameKa: d.card.nameKa,
-      orientationKa: d.reversed ? "შებრუნებული" : "პირდაპირი",
-      meaningKa: d.reversed ? d.card.reversedKa : d.card.uprightKa,
+      position: positions[i],
+      name: cardCopy(d, locale).name,
+      orientation:
+        locale === "en"
+          ? d.reversed
+            ? "reversed"
+            : "upright"
+          : d.reversed
+            ? "შებრუნებული"
+            : "პირდაპირი",
+      meaning: cardCopy(d, locale).meaning,
     })),
+    locale,
   };
 
   let ai: Awaited<ReturnType<typeof generateTarotReading>> = null;
@@ -126,17 +164,15 @@ export async function performReading(
   } catch (err) {
     console.warn("[tarot] AI reading failed, using fallback:", (err as Error).message);
   }
-  const composed = ai ?? fallbackReading(drawn);
+  const composed = ai ?? fallbackReading(drawn, locale);
 
   const cards: TarotSpreadCard[] = drawn.map((d, i) => ({
     slug: d.card.slug,
-    nameKa: d.card.nameKa,
+    name: cardCopy(d, locale).name,
     glyph: d.card.glyph,
     reversed: d.reversed,
-    positionKa: SPREAD_POSITIONS_KA[i],
-    interpretationKa:
-      composed.cards[i] ??
-      (d.reversed ? d.card.reversedKa : d.card.uprightKa),
+    position: positions[i],
+    interpretation: composed.cards[i] ?? cardCopy(d, locale).meaning,
   }));
 
   const balance = await getBalance(userId);
