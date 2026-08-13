@@ -3,21 +3,36 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { FaqList, GuideBreadcrumbs, GuideShell, NatalCta } from "@/components/seo/astrology-guide-shell";
+import { AstrologyHousePageEn } from "@/components/seo/astrology-guides-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { HOUSE_GUIDES, HOUSE_NUMBERS, houseByNumber } from "@/lib/seo/astrology-guides";
+import { houseByNumberEn } from "@/lib/seo/astrology-guides-en";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const BASE = "https://www.vivida.ge";
 type Props = { params: Promise<{ number: string }> };
 export function generateStaticParams() { return HOUSE_NUMBERS.map((number) => ({ number })); }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const house = houseByNumber((await params).number); if (!house) return {};
+  const number = (await params).number;
+  const locale = await getRequestLocale();
+  if (locale === "en") {
+    const house = houseByNumberEn(number); if (!house) return {};
+    const title = `${house.number}${house.number === 1 ? "st" : house.number === 2 ? "nd" : house.number === 3 ? "rd" : "th"} House in Astrology: Meaning in Your Birth Chart`;
+    const description = `Learn what the ${house.number}${house.number === 1 ? "st" : house.number === 2 ? "nd" : house.number === 3 ? "rd" : "th"} house means in astrology: ${house.area.toLowerCase()}, its natural sign and ruler, and how to interpret it.`;
+    const path = `/astrologiuri-saxlebi/${house.number}`;
+    return { title: { absolute: title }, description, keywords: [`${house.number} house astrology`, `${house.name} birth chart`, ...house.keywords], alternates: localizedAlternates(path, path, "en"), openGraph: { title, description, url: `https://www.vividaastro.com${path}`, type: "article", locale: "en_US", siteName: "Vivida" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  const house = houseByNumber(number); if (!house) return {};
   const title = `${house.number}-ე სახლი ასტროლოგიაში — ${house.name}`;
   const description = `რას ნიშნავს ${house.number}-ე სახლი ნატალურ რუკაში: ${house.area}. მმართველი, საკვანძო თემები და ინტერპრეტაცია ქართულად.`;
   const url = `${BASE}/astrologiuri-saxlebi/${house.number}`;
-  return { title: { absolute: title }, description, keywords: [`${house.number}-ე სახლი ასტროლოგიაში`, `${house.number} სახლი ნატალურ რუკაში`, house.name, ...house.keywords], alternates: { canonical: url }, openGraph: { title, description, url, type: "article", locale: "ka_GE", siteName: "Vivida" } };
+  return { title: { absolute: title }, description, keywords: [`${house.number}-ე სახლი ასტროლოგიაში`, `${house.number} სახლი ნატალურ რუკაში`, house.name, ...house.keywords], alternates: localizedAlternates(`/astrologiuri-saxlebi/${house.number}`, `/astrologiuri-saxlebi/${house.number}`, "ka"), openGraph: { title, description, url, type: "article", locale: "ka_GE", siteName: "Vivida" } };
 }
 export default async function HousePage({ params }: Props) {
-  const house = houseByNumber((await params).number); if (!house) notFound();
+  const number = (await params).number;
+  if ((await getRequestLocale()) === "en") { const house = houseByNumberEn(number); if (!house) notFound(); return <AstrologyHousePageEn house={house} />; }
+  const house = houseByNumber(number); if (!house) notFound();
   const url = `${BASE}/astrologiuri-saxlebi/${house.number}`; const title = `${house.number}-ე სახლი ასტროლოგიაში — ${house.name}`; const description = `რას ნიშნავს ${house.number}-ე სახლი ნატალურ რუკაში: ${house.area}.`;
   const faq = [{ q: `რას ნიშნავს ${house.number}-ე სახლი ნატალურ რუკაში?`, a: house.meaning }, { q: `რომელი ნიშანი და პლანეტა უკავშირდება ${house.number}-ე სახლს?`, a: `ბუნებრივ ზოდიაქოს ანალოგიაში ${house.number}-ე სახლს უკავშირდება ${house.sign}, ხოლო მმართველ სიმბოლოდ — ${house.planet}. პირად რუკაში კი სახლის რეალური ნიშანი დაბადების დროსა და ადგილზეა დამოკიდებული.` }, { q: `რას ნიშნავს ბევრი პლანეტა ${house.number}-ე სახლში?`, a: house.strong }, { q: `როგორ წავიკითხო ჩემი ${house.number}-ე სახლი?`, a: house.reading }];
   const current = HOUSE_GUIDES.findIndex((item) => item.number === house.number); const prev = HOUSE_GUIDES[(current + 11) % 12]; const next = HOUSE_GUIDES[(current + 1) % 12];

@@ -26,6 +26,9 @@ import {
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
+import { ZodiacGuideIndexEn } from "@/components/seo/zodiac-guides-en";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/gzamkvlevi";
@@ -34,10 +37,10 @@ const PAGE_TITLE = "ცის სრული გზამკვლევი —
 const META_DESCRIPTION =
   "ცის ნიშნები, მთვარის ნიშანი, ამომავალი, ელემენტები და 78 თავსებადობის წყვილი — ვივიდას სრული ასტროლოგიური გზამკვლევი ერთ გვერდზე.";
 
-export const metadata: Metadata = {
+const KA_METADATA: Metadata = {
   title: { absolute: PAGE_TITLE },
   description: META_DESCRIPTION,
-  alternates: { canonical: `${SITE_URL}${PATH}` },
+  alternates: localizedAlternates(PATH, PATH, "ka"),
   openGraph: {
     type: "website",
     url: `${SITE_URL}${PATH}`,
@@ -53,6 +56,13 @@ export const metadata: Metadata = {
   },
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) !== "en") return KA_METADATA;
+  const title = "Complete Zodiac Guide: Signs, Moon, Rising and Compatibility";
+  const description = "Explore all zodiac signs, Moon signs, rising signs, four elements, horoscope periods, calculators, and all 78 compatibility pairings.";
+  return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { type: "website", url: `https://vividaastro.com${PATH}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+}
+
 const ELEMENT_ACCENT: Record<string, string> = {
   fire: "oklch(0.72 0.22 30)",
   earth: "oklch(0.65 0.13 130)",
@@ -60,7 +70,8 @@ const ELEMENT_ACCENT: Record<string, string> = {
   water: "oklch(0.65 0.20 285)",
 };
 
-export default function GuideIndexPage() {
+export default async function GuideIndexPage() {
+  if ((await getRequestLocale()) === "en") return <ZodiacGuideIndexEn />;
   // Build a flat list of all canonical pages for the JSON-LD ItemList.
   const allUrls: Array<{ url: string; name: string }> = [
     { url: `${SITE_URL}/zodiac`, name: "ცის ნიშნები — ჰაბი" },

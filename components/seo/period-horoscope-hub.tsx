@@ -14,6 +14,7 @@ import { VIEW_PATH, signHoroscopePeriodLabel } from "@/lib/sign-horoscope";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { ALL_SLUGS, ZODIAC_DATES, signMetaBySlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -126,7 +127,7 @@ export function periodHubMetadata(period: Period) {
     title: { absolute: cfg.title },
     description: cfg.description,
     keywords: cfg.keywords,
-    alternates: { canonical: url },
+    alternates: localizedAlternates(`/horoskopi/${cfg.path}`, `/horoskopi/${cfg.path}`, "ka"),
     openGraph: {
       type: "website" as const,
       url,

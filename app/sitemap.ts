@@ -136,6 +136,12 @@ function englishSitemap(): MetadataRoute.Sitemap {
       ),
     ),
   );
+  const housePages = HOUSE_NUMBERS.map((number) =>
+    samePathEntry(`/astrologiuri-saxlebi/${number}`, "monthly", 0.68),
+  );
+  const planetPages = PLANET_SLUGS.map((planet) =>
+    samePathEntry(`/planetebi/${planet}`, "monthly", 0.68),
+  );
 
   return [
     ...CORE_LANGUAGE_PAIRS.map((pair) => {
@@ -170,6 +176,12 @@ function englishSitemap(): MetadataRoute.Sitemap {
     samePathEntry("/zodiac/mtvare", "monthly", 0.78),
     samePathEntry("/zodiac/amomavali", "monthly", 0.78),
     samePathEntry("/zodiac/elementebi", "monthly", 0.74),
+    samePathEntry("/horoskopi/kvireuli", "weekly", 0.86, NOW),
+    samePathEntry("/horoskopi/tviuri", "monthly", 0.84, NOW),
+    samePathEntry("/zodiac/datit", "monthly", 0.74),
+    samePathEntry("/zodiac/gzamkvlevi", "monthly", 0.72),
+    samePathEntry("/astrologiuri-saxlebi", "monthly", 0.76),
+    samePathEntry("/planetebi", "monthly", 0.76),
     ...signPages,
     ...moonPages,
     ...risingPages,
@@ -178,6 +190,8 @@ function englishSitemap(): MetadataRoute.Sitemap {
     ...thematicPages,
     ...yearlyPages,
     ...signHoroscopePages,
+    ...housePages,
+    ...planetPages,
   ];
 }
 

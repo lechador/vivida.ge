@@ -4,12 +4,19 @@ import {
   PeriodHoroscopeHub,
   periodHubMetadata,
 } from "@/components/seo/period-horoscope-hub";
+import { PERIOD_EN, PeriodHoroscopeHubEn } from "@/components/seo/period-horoscope-hub-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 // ISR hourly — the underlying monthly horoscope rows are cached per month.
 export const revalidate = 3600;
 
-export const metadata: Metadata = periodHubMetadata("month");
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await getRequestLocale()) !== "en") return periodHubMetadata("month");
+  const config = PERIOD_EN.month;
+  return { title: { absolute: config.title }, description: config.description, alternates: localizedAlternates(config.path, config.path, "en"), openGraph: { type: "website", url: `https://vividaastro.com${config.path}`, title: config.title, description: config.description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: config.title, description: config.description } };
+}
 
-export default function MonthlyHoroscopeHubPage() {
-  return <PeriodHoroscopeHub period="month" />;
+export default async function MonthlyHoroscopeHubPage() {
+  return (await getRequestLocale()) === "en" ? <PeriodHoroscopeHubEn period="month" /> : <PeriodHoroscopeHub period="month" />;
 }
