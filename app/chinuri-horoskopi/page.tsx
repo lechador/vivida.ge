@@ -6,8 +6,14 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { ChineseYearFinder } from "@/components/calculator/chinese-year-finder";
+import {
+  CHINESE_HUB_EN,
+  ChineseZodiacHubEn,
+} from "@/components/seo/chinese-zodiac-en";
 import { ensureChineseZodiacHub } from "@/actions/chinese-zodiac";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { CHINESE_ANIMALS, yearsForAnimal } from "@/lib/seo/chinese-zodiac";
+import { localizedAlternates } from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -21,13 +27,45 @@ const FALLBACK_DESC =
 export const revalidate = 604800;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  if (locale === "en") {
+    const path = "/chinuri-horoskopi";
+    return {
+      title: { absolute: CHINESE_HUB_EN.title },
+      description: CHINESE_HUB_EN.description,
+      keywords: [
+        "Chinese zodiac",
+        "Chinese zodiac signs",
+        "Chinese zodiac by year",
+        "Chinese horoscope animals",
+      ],
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: {
+        type: "website",
+        url: `https://www.vividaastro.com${path}`,
+        title: CHINESE_HUB_EN.title,
+        description: CHINESE_HUB_EN.description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: CHINESE_HUB_EN.title,
+        description: CHINESE_HUB_EN.description,
+      },
+    };
+  }
   const hub = await ensureChineseZodiacHub();
   const title = hub?.pageTitle ?? FALLBACK_TITLE;
   const description = hub?.metaDescription ?? FALLBACK_DESC;
   return {
     title: { absolute: title },
     description,
-    alternates: { canonical: URL },
+    alternates: localizedAlternates(
+      "/chinuri-horoskopi",
+      "/chinuri-horoskopi",
+      "ka",
+    ),
     openGraph: {
       type: "website",
       url: URL,
@@ -49,6 +87,9 @@ const HUB_QUERIES = [
 ];
 
 export default async function ChineseZodiacHubPage() {
+  const locale = await getRequestLocale();
+  if (locale === "en") return <ChineseZodiacHubEn />;
+
   const hub = await ensureChineseZodiacHub();
 
   const itemListLd = {

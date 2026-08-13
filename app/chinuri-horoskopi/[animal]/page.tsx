@@ -7,13 +7,17 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
+import { ChineseAnimalPageEn } from "@/components/seo/chinese-zodiac-en";
 import { ensureChineseZodiac } from "@/actions/chinese-zodiac";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   ALL_CHINESE_SLUGS,
   CHINESE_ANIMALS,
   chineseAnimalBySlug,
   yearsForAnimal,
 } from "@/lib/seo/chinese-zodiac";
+import { chineseZodiacContentEnBySlug } from "@/lib/seo/chinese-zodiac-en";
+import { localizedAlternates } from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -37,6 +41,28 @@ export async function generateMetadata({
   const { animal: slug } = await params;
   const animal = chineseAnimalBySlug(slug);
   if (!animal) return {};
+  const locale = await getRequestLocale();
+  if (locale === "en") {
+    const content = chineseZodiacContentEnBySlug(slug);
+    if (!content) return {};
+    const path = `/chinuri-horoskopi/${slug}`;
+    const title = `${animal.nameEn} Chinese Zodiac: Years, Personality and Compatibility`;
+    const description = `${content.headline}. Discover ${animal.nameEn} birth years, personality traits, strengths, love compatibility, and career style.`;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: {
+        type: "article",
+        url: `https://www.vividaastro.com${path}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   const content = await ensureChineseZodiac(slug);
   const url = `${SITE_URL}/chinuri-horoskopi/${slug}`;
   const title =
@@ -48,7 +74,11 @@ export async function generateMetadata({
   return {
     title: { absolute: title },
     description,
-    alternates: { canonical: url },
+    alternates: localizedAlternates(
+      `/chinuri-horoskopi/${slug}`,
+      `/chinuri-horoskopi/${slug}`,
+      "ka",
+    ),
     openGraph: {
       type: "article",
       url,
@@ -70,6 +100,13 @@ export default async function ChineseAnimalPage({
   const { animal: slug } = await params;
   const animal = chineseAnimalBySlug(slug);
   if (!animal) notFound();
+
+  const locale = await getRequestLocale();
+  if (locale === "en") {
+    const content = chineseZodiacContentEnBySlug(slug);
+    if (!content) notFound();
+    return <ChineseAnimalPageEn animal={animal} content={content} />;
+  }
 
   const c = await ensureChineseZodiac(slug);
   const years = yearsForAnimal(slug);

@@ -17,6 +17,10 @@ import {
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { ALL_SLUGS, signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
+import { RankingTopicPageEn } from "@/components/seo/rankings-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { rankingTopicEnBySlug } from "@/lib/seo/rankings-en";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -34,6 +38,13 @@ export async function generateMetadata({
   params: Promise<{ topic: string }>;
 }): Promise<Metadata> {
   const { topic: slug } = await params;
+  const locale = await getRequestLocale();
+  if (locale === "en") {
+    const topic = rankingTopicEnBySlug(slug); if (!topic) return {};
+    const description = `${topic.title}: all 12 Sun signs compared through ${topic.trait}, with an explanation for every placement.`;
+    const path = `/zodiac/reitingebi/${slug}`;
+    return { title: { absolute: topic.title }, description, alternates: localizedAlternates(path, path, "en"), openGraph: { type: "article", url: `https://www.vividaastro.com${path}`, title: topic.title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: topic.title, description } };
+  }
   const topic = rankingTopicBySlug(slug);
   if (!topic) return {};
   const url = `${SITE_URL}/zodiac/reitingebi/${slug}`;
@@ -43,7 +54,7 @@ export async function generateMetadata({
   return {
     title: { absolute: title },
     description,
-    alternates: { canonical: url },
+    alternates: localizedAlternates(`/zodiac/reitingebi/${slug}`, `/zodiac/reitingebi/${slug}`, "ka"),
     openGraph: {
       type: "article",
       url,
@@ -63,6 +74,7 @@ export default async function RankingTopicPage({
   params: Promise<{ topic: string }>;
 }) {
   const { topic: slug } = await params;
+  if ((await getRequestLocale()) === "en") { const topic = rankingTopicEnBySlug(slug); if (!topic) notFound(); return <RankingTopicPageEn topic={topic} />; }
   const topic = rankingTopicBySlug(slug);
   if (!topic) notFound();
 

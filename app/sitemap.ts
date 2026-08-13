@@ -159,6 +159,12 @@ function englishSitemap(): MetadataRoute.Sitemap {
   const mbtiPages = ALL_MBTI_SLUGS.map((type) =>
     samePathEntry(`/mbti/${type}`, "monthly", 0.7),
   );
+  const rankingPages = ALL_RANKING_SLUGS.map((slug) =>
+    samePathEntry(`/zodiac/reitingebi/${slug}`, "monthly", 0.7),
+  );
+  const chinesePages = ALL_CHINESE_SLUGS.map((slug) =>
+    samePathEntry(`/chinuri-horoskopi/${slug}`, "monthly", 0.7),
+  );
 
   return [
     ...CORE_LANGUAGE_PAIRS.map((pair) => {
@@ -209,6 +215,8 @@ function englishSitemap(): MetadataRoute.Sitemap {
     samePathEntry("/merkuri-retrogradi", "weekly", 0.78, NOW),
     samePathEntry("/taro", "weekly", 0.78),
     samePathEntry("/mbti", "monthly", 0.78),
+    samePathEntry("/zodiac/reitingebi", "monthly", 0.78),
+    samePathEntry("/chinuri-horoskopi", "monthly", 0.78),
     ...signPages,
     ...moonPages,
     ...risingPages,
@@ -224,6 +232,8 @@ function englishSitemap(): MetadataRoute.Sitemap {
     ...eclipsePages,
     ...tarotPages,
     ...mbtiPages,
+    ...rankingPages,
+    ...chinesePages,
   ];
 }
 

@@ -15,11 +15,14 @@ export type ChineseAnimal = {
   slug: string;
   /** Georgian animal name, e.g. "ვირთხა". */
   nameKa: string;
+  nameEn: string;
   emoji: string;
   /** Fixed earthly-branch element (wu xing), Georgian. */
   element: string;
+  elementEn: string;
   /** "იანი" (yang) | "ინი" (yin), Georgian. */
   polarity: string;
+  polarityEn: "Yang" | "Yin";
 };
 
 /**
@@ -27,18 +30,18 @@ export type ChineseAnimal = {
  * order, so do not reorder.
  */
 export const CHINESE_ANIMALS: ChineseAnimal[] = [
-  { slug: "rat", nameKa: "ვირთხა", emoji: "🐀", element: "წყალი", polarity: "იანი" },
-  { slug: "ox", nameKa: "ხარი", emoji: "🐂", element: "მიწა", polarity: "ინი" },
-  { slug: "tiger", nameKa: "ვეფხვი", emoji: "🐅", element: "ხე", polarity: "იანი" },
-  { slug: "rabbit", nameKa: "კურდღელი", emoji: "🐇", element: "ხე", polarity: "ინი" },
-  { slug: "dragon", nameKa: "დრაკონი", emoji: "🐉", element: "მიწა", polarity: "იანი" },
-  { slug: "snake", nameKa: "გველი", emoji: "🐍", element: "ცეცხლი", polarity: "ინი" },
-  { slug: "horse", nameKa: "ცხენი", emoji: "🐎", element: "ცეცხლი", polarity: "იანი" },
-  { slug: "goat", nameKa: "თხა", emoji: "🐐", element: "მიწა", polarity: "ინი" },
-  { slug: "monkey", nameKa: "მაიმუნი", emoji: "🐒", element: "ლითონი", polarity: "იანი" },
-  { slug: "rooster", nameKa: "მამალი", emoji: "🐓", element: "ლითონი", polarity: "ინი" },
-  { slug: "dog", nameKa: "ძაღლი", emoji: "🐕", element: "მიწა", polarity: "იანი" },
-  { slug: "pig", nameKa: "ღორი", emoji: "🐖", element: "წყალი", polarity: "ინი" },
+  { slug: "rat", nameKa: "ვირთხა", nameEn: "Rat", emoji: "🐀", element: "წყალი", elementEn: "Water", polarity: "იანი", polarityEn: "Yang" },
+  { slug: "ox", nameKa: "ხარი", nameEn: "Ox", emoji: "🐂", element: "მიწა", elementEn: "Earth", polarity: "ინი", polarityEn: "Yin" },
+  { slug: "tiger", nameKa: "ვეფხვი", nameEn: "Tiger", emoji: "🐅", element: "ხე", elementEn: "Wood", polarity: "იანი", polarityEn: "Yang" },
+  { slug: "rabbit", nameKa: "კურდღელი", nameEn: "Rabbit", emoji: "🐇", element: "ხე", elementEn: "Wood", polarity: "ინი", polarityEn: "Yin" },
+  { slug: "dragon", nameKa: "დრაკონი", nameEn: "Dragon", emoji: "🐉", element: "მიწა", elementEn: "Earth", polarity: "იანი", polarityEn: "Yang" },
+  { slug: "snake", nameKa: "გველი", nameEn: "Snake", emoji: "🐍", element: "ცეცხლი", elementEn: "Fire", polarity: "ინი", polarityEn: "Yin" },
+  { slug: "horse", nameKa: "ცხენი", nameEn: "Horse", emoji: "🐎", element: "ცეცხლი", elementEn: "Fire", polarity: "იანი", polarityEn: "Yang" },
+  { slug: "goat", nameKa: "თხა", nameEn: "Goat", emoji: "🐐", element: "მიწა", elementEn: "Earth", polarity: "ინი", polarityEn: "Yin" },
+  { slug: "monkey", nameKa: "მაიმუნი", nameEn: "Monkey", emoji: "🐒", element: "ლითონი", elementEn: "Metal", polarity: "იანი", polarityEn: "Yang" },
+  { slug: "rooster", nameKa: "მამალი", nameEn: "Rooster", emoji: "🐓", element: "ლითონი", elementEn: "Metal", polarity: "ინი", polarityEn: "Yin" },
+  { slug: "dog", nameKa: "ძაღლი", nameEn: "Dog", emoji: "🐕", element: "მიწა", elementEn: "Earth", polarity: "იანი", polarityEn: "Yang" },
+  { slug: "pig", nameKa: "ღორი", nameEn: "Pig", emoji: "🐖", element: "წყალი", elementEn: "Water", polarity: "ინი", polarityEn: "Yin" },
 ];
 
 export const ALL_CHINESE_SLUGS = CHINESE_ANIMALS.map((a) => a.slug);
