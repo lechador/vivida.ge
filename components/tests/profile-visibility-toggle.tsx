@@ -10,7 +10,14 @@ import { cn } from "@/lib/utils";
  * Self-contained: reads the current preference on mount (and hides itself for
  * anonymous visitors, who have no profile), and writes changes optimistically.
  */
-export function ProfileVisibilityToggle({ kind }: { kind: "mbti" | "iq" | "eq" | "big-five" }) {
+export function ProfileVisibilityToggle({
+  kind,
+  locale = "ka",
+}: {
+  kind: "mbti" | "iq" | "eq" | "big-five";
+  locale?: "ka" | "en";
+}) {
+  const en = locale === "en";
   const [on, setOn] = useState<boolean | null>(null); // null = loading/hidden
   const [saving, setSaving] = useState(false);
 
@@ -51,13 +58,13 @@ export function ProfileVisibilityToggle({ kind }: { kind: "mbti" | "iq" | "eq" |
     <div className="mt-6 flex items-center justify-between gap-4 rounded-2xl border border-border bg-card/50 px-4 py-3.5 ring-1 ring-foreground/5 backdrop-blur-xl">
       <span className="flex items-center gap-2.5 text-sm text-foreground/85">
         <Eye className="size-4 shrink-0 text-[var(--vivida-cyan)]" />
-        გამოაჩინე შედეგი ჩემ საჯარო პროფილზე
+        {en ? "Show this result on my public profile" : "გამოაჩინე შედეგი ჩემ საჯარო პროფილზე"}
       </span>
       <button
         type="button"
         role="switch"
         aria-checked={on}
-        aria-label="საჯარო პროფილზე ჩვენება"
+        aria-label={en ? "Show on public profile" : "საჯარო პროფილზე ჩვენება"}
         disabled={saving}
         onClick={toggle}
         className={cn(

@@ -11,43 +11,39 @@ import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { IQ_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
-const SITE_URL = "https://www.vivida.ge";
-
-const TITLE = "IQ ტესტი — უფასო ინტელექტის ტესტი ქართულად";
-const DESCRIPTION =
+const TITLE_KA = "IQ ტესტი — უფასო ინტელექტის ტესტი ქართულად";
+const DESCRIPTION_KA =
   "გაიარე უფასო IQ ტესტი ქართულად — ადაპტიური ტესტი, რომელიც შენს დონეს ერგება: ლოგიკური, რიცხვითი და სივრცითი აზროვნების 25 დავალება, ~25 წუთი. მიიღე შენი IQ ქულა, პროცენტილი და აზროვნების ანალიზი. კულტურულად ნეიტრალური, რეგისტრაციის გარეშე.";
+const TITLE_EN = "Free Online IQ Test — Adaptive Reasoning Assessment";
+const DESCRIPTION_EN =
+  "Take a free, adaptive 25-task IQ test covering numerical, logical, spatial and pattern reasoning. Receive an estimated IQ score and percentile in about 25 minutes.";
 
-export const metadata: Metadata = {
-  title: { absolute: TITLE },
-  description: DESCRIPTION,
-  keywords: [
-    "iq ტესტი",
-    "iq ტესტი ქართულად",
-    "ინტელექტის ტესტი",
-    "ინტელექტის ტესტი ქართულად",
-    "აიქიუ ტესტი",
-    "ჭკუის ტესტი",
-    "უფასო iq ტესტი",
-    "iq ტესტი ონლაინ",
-    "ლოგიკური ტესტი",
-    "ინტელექტის კოეფიციენტი",
-    "iq testi",
-    "iq testi qartulad",
-    "inteleqtis testi",
-    "chkuis testi",
-  ],
-  alternates: { canonical: `${SITE_URL}/iq-testi` },
-  openGraph: {
-    type: "website",
-    url: `${SITE_URL}/iq-testi`,
-    title: TITLE,
-    description: DESCRIPTION,
-    siteName: "Vivida",
-    locale: "ka_GE",
-  },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  const title = en ? TITLE_EN : TITLE_KA;
+  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  return {
+    title: { absolute: title },
+    description,
+    keywords: en
+      ? ["free IQ test", "online IQ test", "adaptive IQ test", "logic test", "reasoning test", "intelligence test"]
+      : ["iq ტესტი", "iq ტესტი ქართულად", "ინტელექტის ტესტი", "უფასო iq ტესტი", "iq ტესტი ონლაინ", "ლოგიკური ტესტი"],
+    alternates: {
+      canonical: `${siteUrl}/iq-testi`,
+      languages: {
+        en: `${ENGLISH_SITE_URL}/iq-testi`,
+        "ka-GE": `${GEORGIAN_SITE_URL}/iq-testi`,
+        "x-default": `${ENGLISH_SITE_URL}/iq-testi`,
+      },
+    },
+    openGraph: { type: "website", url: `${siteUrl}/iq-testi`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 const IQ_FAQ = [
   {
@@ -64,6 +60,21 @@ const IQ_FAQ = [
   },
 ];
 
+const IQ_FAQ_EN = [
+  {
+    q: "How is the IQ score calculated?",
+    a: "Your response pattern is evaluated against each task's difficulty using a Rasch-style item response model, then mapped to the familiar IQ scale with a mean of 100 and standard deviation of 15.",
+  },
+  {
+    q: "Is the test free, and do I need an account?",
+    a: "The assessment and core IQ estimate are free, and you can complete them without an account. Creating a free account lets you save the result; the optional deeper profile is clearly priced in credits.",
+  },
+  {
+    q: "How accurate is an online IQ test?",
+    a: "A single online attempt has meaningful uncertainty and can be affected by fatigue, distractions and familiarity with the format. Treat the score as an estimate, not a clinical or professionally administered assessment.",
+  },
+];
+
 /**
  * Free, timed, culture-fair IQ test. Anyone can take it; the score is computed
  * client-side (see /iq-testi/shedegi), the deep domain breakdown is gated
@@ -72,33 +83,38 @@ const IQ_FAQ = [
 export default async function IqTestPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
+  const faq = en ? IQ_FAQ_EN : IQ_FAQ;
 
   const ld = [
     {
       "@context": "https://schema.org",
       "@type": "Quiz",
-      name: "Vivida IQ ტესტი",
-      description: DESCRIPTION,
-      inLanguage: "ka-GE",
-      url: `${SITE_URL}/iq-testi`,
+      name: en ? "Vivida IQ Test" : "Vivida IQ ტესტი",
+      description,
+      inLanguage: en ? "en" : "ka-GE",
+      url: `${siteUrl}/iq-testi`,
       educationalLevel: "beginner",
       numberOfQuestions: IQ_ADAPTIVE_LENGTH,
       about: {
         "@type": "Thing",
-        name: "ინტელექტის კოეფიციენტი (IQ)",
-        alternateName: ["IQ", "ინტელექტის ტესტი", "iq ტესტი"],
+        name: en ? "Intelligence quotient (IQ)" : "ინტელექტის კოეფიციენტი (IQ)",
+        alternateName: en ? ["IQ", "intelligence test", "reasoning test"] : ["IQ", "ინტელექტის ტესტი", "iq ტესტი"],
       },
     },
-    faqLd(IQ_FAQ),
+    faqLd(faq),
     breadcrumbLd([
-      { name: "მთავარი", url: SITE_URL },
-      { name: "ტესტები", url: `${SITE_URL}/tests` },
-      { name: "IQ ტესტი", url: `${SITE_URL}/iq-testi` },
+      { name: en ? "Home" : "მთავარი", url: siteUrl },
+      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
+      { name: en ? "IQ Test" : "IQ ტესტი", url: `${siteUrl}/iq-testi` },
     ]),
   ];
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_265/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_190/0.4),transparent_70%),radial-gradient(40%_35%_at_15%_80%,oklch(0.30_0.16_300/0.35),transparent_70%)]"
@@ -117,52 +133,60 @@ export default async function IqTestPage() {
             Vivida IQ
           </div>
           <h1 className="mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-            შენი{" "}
+            {en ? "Your " : "შენი"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              ინტელექტის ტესტი
+              {en ? "adaptive IQ test" : "ინტელექტის ტესტი"}
             </span>
           </h1>
           <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-            {IQ_ADAPTIVE_LENGTH} დავალება · ~25 წუთი · ადაპტიური
+            {en
+              ? `${IQ_ADAPTIVE_LENGTH} tasks · about 25 minutes · adaptive`
+              : `${IQ_ADAPTIVE_LENGTH} დავალება · ~25 წუთი · ადაპტიური`}
           </p>
         </header>
 
-        <IqTestClient />
+        <IqTestClient locale={locale} />
       </section>
 
       {/* SEO / informational content — below the fold, indexable. */}
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
-            რა არის IQ ტესტი?
+            {en ? "What does an IQ test measure?" : "რა არის IQ ტესტი?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            IQ (ინტელექტის კოეფიციენტი) ზომავს აბსტრაქტულ აზროვნებას — რამდენად
-            კარგად ამჩნევ კანონზომიერებებს, აგებ ლოგიკურ დასკვნებს და აგვარებ
-            ახალ, უცნობ ამოცანებს. Vivida-ს ტესტი <strong>კულტურულად ნეიტრალურია</strong>:
-            დავალებების უმეტესობა ფიგურებსა და რიცხვებზეა აგებული, ასე რომ შედეგი
-            ნაკლებად არის დამოკიდებული ენასა თუ განათლებაზე.
+            {en ? (
+              <>IQ tests estimate aspects of abstract reasoning: how well you identify patterns, draw logical conclusions and solve unfamiliar problems. Vivida uses mostly figures and numbers to reduce dependence on language and specific learned knowledge.</>
+            ) : (
+              <>IQ (ინტელექტის კოეფიციენტი) ზომავს აბსტრაქტულ აზროვნებას — რამდენად კარგად ამჩნევ კანონზომიერებებს, აგებ ლოგიკურ დასკვნებს და აგვარებ ახალ, უცნობ ამოცანებს. Vivida-ს ტესტი <strong>კულტურულად ნეიტრალურია</strong>: დავალებების უმეტესობა ფიგურებსა და რიცხვებზეა აგებული, ასე რომ შედეგი ნაკლებად არის დამოკიდებული ენასა თუ განათლებაზე.</>
+            )}
           </p>
 
           <h2 className="mt-8 text-xl font-semibold tracking-tight">
-            როგორ ითვლება შენი ქულა?
+            {en ? "How is your score estimated?" : "როგორ ითვლება შენი ქულა?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            ტესტი აფასებს პასუხების <strong>პატერნს</strong>, და არა უბრალოდ სწორი
-            პასუხების რაოდენობას — რთული დავალების სწორად ამოხსნა უფრო მეტს მატებს
-            შედეგს, ვიდრე მარტივის. ეს არის იგივე პრინციპი (Item Response Theory),
-            რომელსაც პროფესიული ტესტები იყენებენ. შემდეგ ქულა გადაჰყავს
-            სტანდარტულ IQ სკალაზე, სადაც <strong>საშუალო არის 100</strong>, ხოლო
-            მოსახლეობის დაახლოებით 68% თავსდება 85-დან 115-მდე დიაპაზონში.
+            {en ? (
+              <>The test evaluates the <strong>pattern of responses</strong> against task difficulty, rather than only counting correct answers. The estimate is then mapped to the conventional IQ scale, where the mean is <strong>100</strong> and roughly 68% of people fall between 85 and 115.</>
+            ) : (
+              <>ტესტი აფასებს პასუხების <strong>პატერნს</strong>, და არა უბრალოდ სწორი პასუხების რაოდენობას — რთული დავალების სწორად ამოხსნა უფრო მეტს მატებს შედეგს, ვიდრე მარტივის. ეს არის იგივე პრინციპი (Item Response Theory), რომელსაც პროფესიული ტესტები იყენებენ. შემდეგ ქულა გადაჰყავს სტანდარტულ IQ სკალაზე, სადაც <strong>საშუალო არის 100</strong>, ხოლო მოსახლეობის დაახლოებით 68% თავსდება 85-დან 115-მდე დიაპაზონში.</>
+            )}
           </p>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            {[
-              { t: "რიცხვითი ლოგიკა", d: "რიცხვთა მიმდევრობები და კანონზომიერებები" },
-              { t: "ლოგიკური აზროვნება", d: "დასკვნები, ანალოგიები, გამონაკლისები" },
-              { t: "სივრცითი აზროვნება", d: "ფიგურების ბრუნვა და სივრცული პატერნები" },
-              { t: "პატერნების ამოცნობა", d: "მატრიცული ვიზუალური მსჯელობა (Raven-ის სტილი)" },
-            ].map((x) => (
+            {(en
+              ? [
+                  { t: "Numerical reasoning", d: "Sequences, quantities and numerical rules" },
+                  { t: "Logical reasoning", d: "Deductions, analogies and exceptions" },
+                  { t: "Spatial reasoning", d: "Rotation and spatial transformations" },
+                  { t: "Pattern recognition", d: "Matrix-style visual reasoning" },
+                ]
+              : [
+                  { t: "რიცხვითი ლოგიკა", d: "რიცხვთა მიმდევრობები და კანონზომიერებები" },
+                  { t: "ლოგიკური აზროვნება", d: "დასკვნები, ანალოგიები, გამონაკლისები" },
+                  { t: "სივრცითი აზროვნება", d: "ფიგურების ბრუნვა და სივრცული პატერნები" },
+                  { t: "პატერნების ამოცნობა", d: "მატრიცული ვიზუალური მსჯელობა (Raven-ის სტილი)" },
+                ]).map((x) => (
               <div
                 key={x.t}
                 className="rounded-2xl border border-border bg-background/40 px-4 py-3.5"
@@ -174,10 +198,10 @@ export default async function IqTestPage() {
           </div>
 
           <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            ხშირად დასმული კითხვები
+            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="mt-4 space-y-3">
-            {IQ_FAQ.map((item) => (
+            {faq.map((item) => (
               <details
                 key={item.q}
                 className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5"
@@ -200,10 +224,15 @@ export default async function IqTestPage() {
             left the rest of the tests cluster orphaned from it. */}
         <section className="mt-10">
           <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            სხვა ტესტები
+            {en ? "Other tests" : "სხვა ტესტები"}
           </h2>
           <div className="grid gap-2 sm:grid-cols-2">
-            {[
+            {(en ? [
+              { href: "/pirovnebis-testi", label: "Astro-MBTI", sub: "Discover your personality type" },
+              { href: "/eq-testi", label: "EQ Test", sub: "Explore emotional intelligence" },
+              { href: "/big-five", label: "Big Five Test", sub: "Five broad personality traits" },
+              { href: "/tests", label: "All tests", sub: "Browse every test and quiz" },
+            ] : [
               {
                 href: "/pirovnebis-testi",
                 label: "პიროვნების ტესტი",
@@ -224,7 +253,7 @@ export default async function IqTestPage() {
                 label: "ყველა ტესტი",
                 sub: "ტესტებისა და ქვიზების სრული სია",
               },
-            ].map((t) => (
+            ]).map((t) => (
               <Link
                 key={t.href}
                 href={t.href}
@@ -241,7 +270,13 @@ export default async function IqTestPage() {
           </div>
         </section>
 
-        <PopularSearches queries={IQ_LATIN_QUERIES} />
+        <PopularSearches
+          queries={
+            en
+              ? ["free online IQ test", "adaptive IQ test", "logic and pattern test", "estimated IQ score"]
+              : IQ_LATIN_QUERIES
+          }
+        />
       </section>
 
       <SiteFooter />

@@ -7,7 +7,7 @@ import { db } from "@/db";
 import { iqResults } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { iqBand } from "@/lib/iq/scoring";
-import { DOMAIN_LABELS_KA, type IqDomain } from "@/lib/iq/items";
+import { DOMAIN_LABELS_EN, DOMAIN_LABELS_KA, type IqDomain } from "@/lib/iq/items";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,12 @@ import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-t
 import { NextTestWidget } from "@/components/tests/next-test-widget";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 
-export const metadata = { title: "შენი IQ შედეგი", robots: { index: false } };
+export async function generateMetadata() {
+  const en = (await getRequestLocale()) === "en";
+  return { title: en ? "Your IQ Result" : "შენი IQ შედეგი", robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
 const DOMAINS: IqDomain[] = ["numeric", "logic", "spatial", "pattern"];
@@ -34,6 +38,8 @@ export default async function SavedIqResultPage({
 }) {
   const { id } = await params;
   const user = await requireUser();
+  const locale = await getRequestLocale();
+  const en = locale === "en";
 
   const [row] = await db
     .select()
@@ -53,7 +59,7 @@ export default async function SavedIqResultPage({
   ]);
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_265/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_190/0.4),transparent_70%)]"
@@ -70,23 +76,23 @@ export default async function SavedIqResultPage({
             {row.iq}
           </div>
           <div className="mt-1 text-lg font-semibold text-[var(--vivida-cyan)]">
-            {band.labelKa}
+            {en ? band.labelEn : band.labelKa}
           </div>
           <p className="mx-auto mt-2 max-w-md text-sm text-foreground/75">
-            {band.descKa}
+            {en ? band.descEn : band.descKa}
           </p>
 
           <div className="mx-auto mt-6 w-full max-w-lg">
-            <IqBellCurve iq={row.iq} />
+            <IqBellCurve iq={row.iq} locale={locale} />
           </div>
 
           <div className="mt-4 flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <span>
-              ჯობნი მოსახლეობის{" "}
-              <span className="font-semibold text-foreground">{row.percentile}%</span>-ს
+              {en ? "Percentile " : "ჯობნი მოსახლეობის "}
+              <span className="font-semibold text-foreground">{row.percentile}{en ? "th" : "%"}</span>{!en && "-ს"}
             </span>
             <span>
-              სწორი პასუხი{" "}
+              {en ? "Correct answers " : "სწორი პასუხი "}
               <span className="font-semibold text-foreground">
                 {row.correct} / {row.total}
               </span>
@@ -99,11 +105,11 @@ export default async function SavedIqResultPage({
           <div className="mt-4 rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
             <h2 className="mb-4 flex items-center gap-2 text-base font-semibold tracking-tight">
               <Brain className="size-4 text-[var(--vivida-violet)]" />
-              აზროვნების პროფილი
+              {en ? "Reasoning profile" : "აზროვნების პროფილი"}
             </h2>
             <div className="space-y-4">
               {DOMAINS.map((d) => (
-                <DomainBar key={d} label={DOMAIN_LABELS_KA[d]} pct={ds[d] ?? 0} />
+                <DomainBar key={d} label={(en ? DOMAIN_LABELS_EN : DOMAIN_LABELS_KA)[d]} pct={ds[d] ?? 0} />
               ))}
             </div>
           </div>
@@ -114,21 +120,22 @@ export default async function SavedIqResultPage({
               resultId={row.id}
               cost={CREDIT_COST.iqTest}
               balance={balance}
-              title="აზროვნების პროფილის გახსნა"
-              blurb="ნახე შენი ძლიერი მხარეები ოთხ დომენში — ლოგიკა, რიცხვები, სივრცე და პატერნები. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+              title={en ? "Unlock your reasoning profile" : "აზროვნების პროფილის გახსნა"}
+              blurb={en ? "See your strengths across logic, numbers, spatial reasoning and patterns. Pay once and keep the result." : "ნახე შენი ძლიერი მხარეები ოთხ დომენში — ლოგიკა, რიცხვები, სივრცე და პატერნები. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."}
+              locale={locale}
             />
           </div>
         )}
 
-        {unlocked && <ProfileVisibilityToggle kind="iq" />}
+        {unlocked && <ProfileVisibilityToggle kind="iq" locale={locale} />}
 
-        <NextTestWidget completed="iq" />
+        <NextTestWidget completed="iq" locale={locale} />
 
         <div className="mt-6 flex justify-center">
           <Button asChild variant="outline">
             <Link href="/iq-testi">
               <RotateCcw className="size-4" />
-              ტესტის თავიდან გავლა
+              {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
             </Link>
           </Button>
         </div>

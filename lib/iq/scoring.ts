@@ -1,5 +1,6 @@
 import {
   IQ_ITEMS,
+  DOMAIN_LABELS_EN,
   DOMAIN_LABELS_KA,
   type IqDomain,
   type IqItem,
@@ -38,6 +39,7 @@ export type IqBandKey = "very_high" | "high" | "above" | "average" | "below" | "
 export type IqDomainScore = {
   domain: IqDomain;
   labelKa: string;
+  labelEn: string;
   correct: number;
   total: number;
   /** 0–100 percent correct within the domain. */
@@ -52,7 +54,7 @@ export type IqResult = {
   percentile: number;
   /** For high scorers: "top X%". 100 − percentile, clamped ≥1. */
   topPercent: number;
-  band: { key: IqBandKey; labelKa: string; descKa: string };
+  band: { key: IqBandKey; labelKa: string; descKa: string; labelEn: string; descEn: string };
   correct: number;
   total: number;
   theta: number;
@@ -114,30 +116,42 @@ export function estimateTheta(
   return { theta, info };
 }
 
-const BANDS: Record<IqBandKey, { labelKa: string; descKa: string }> = {
+const BANDS: Record<IqBandKey, { labelKa: string; descKa: string; labelEn: string; descEn: string }> = {
   very_high: {
     labelKa: "ძალიან მაღალი",
     descKa: "მოსახლეობის მხოლოდ მცირე ნაწილი აღწევს ამ დონეს — გამორჩეული აბსტრაქტული აზროვნება.",
+    labelEn: "Very high",
+    descEn: "Only a small share of the population reaches this range, indicating exceptional performance on abstract reasoning tasks.",
   },
   high: {
     labelKa: "მაღალი",
     descKa: "საშუალოზე მკვეთრად მაღალი შედეგი — ძლიერი ლოგიკური და ანალიტიკური უნარი.",
+    labelEn: "High",
+    descEn: "A result clearly above the population average, with strong logical and analytical performance.",
   },
   above: {
     labelKa: "საშუალოზე მაღალი",
     descKa: "საშუალოზე მაღალი შედეგი — კარგად ართმევ თავს რთულ, არასტანდარტულ ამოცანებს.",
+    labelEn: "Above average",
+    descEn: "An above-average result, suggesting confidence with complex and unfamiliar reasoning problems.",
   },
   average: {
     labelKa: "საშუალო",
     descKa: "მოსახლეობის უმეტესობა სწორედ ამ დიაპაზონშია — დაბალანსებული აზროვნება.",
+    labelEn: "Average",
+    descEn: "Most people fall within this range, reflecting a balanced performance across reasoning tasks.",
   },
   below: {
     labelKa: "საშუალოზე დაბალი",
     descKa: "ზოგიერთი ტიპის ამოცანა უფრო მეტ დროსა და ვარჯიშს ითხოვს — ეს სავსებით ნორმალურია.",
+    labelEn: "Below average",
+    descEn: "Some task types may benefit from more time or practice. A single result does not define your ability.",
   },
   low: {
     labelKa: "დაბალი",
     descKa: "ერთ ჯერზე გავლილი ონლაინ ტესტი ბევრ ფაქტორზეა დამოკიდებული — არ იჩქარო დასკვნებით.",
+    labelEn: "Low",
+    descEn: "One online attempt is affected by many factors, so avoid drawing broad conclusions from this score alone.",
   },
 };
 
@@ -156,6 +170,8 @@ export function iqBand(iq: number): {
   key: IqBandKey;
   labelKa: string;
   descKa: string;
+  labelEn: string;
+  descEn: string;
 } {
   const key = bandFor(iq);
   return { key, ...BANDS[key] };
@@ -201,6 +217,7 @@ export function scoreIq(answers: Record<string, number>): IqResult {
     return {
       domain: d,
       labelKa: DOMAIN_LABELS_KA[d],
+      labelEn: DOMAIN_LABELS_EN[d],
       correct: c,
       total: t,
       pct: t > 0 ? Math.round((c / t) * 100) : 0,

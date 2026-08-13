@@ -24,8 +24,15 @@ export const DOMAIN_LABELS_KA: Record<IqDomain, string> = {
   pattern: "პატერნების ამოცნობა",
 };
 
+export const DOMAIN_LABELS_EN: Record<IqDomain, string> = {
+  numeric: "Numerical reasoning",
+  logic: "Logical reasoning",
+  spatial: "Spatial reasoning",
+  pattern: "Pattern recognition",
+};
+
 export type IqOption =
-  | { kind: "text"; text: string }
+  | { kind: "text"; text: string; textEn?: string }
   | { kind: "figure"; spec: FigureSpec };
 
 export type IqStem =
@@ -33,7 +40,7 @@ export type IqStem =
   | { type: "matrix"; cells: (FigureSpec | null)[] } // 9 cells, row-major, one null
   | { type: "analogy"; a: FigureSpec; b: FigureSpec; c: FigureSpec }
   | { type: "odd-one-out" } // the options themselves are the figures
-  | { type: "logic"; textKa: string };
+  | { type: "logic"; textKa: string; textEn: string };
 
 export type IqItem = {
   id: string;
@@ -53,9 +60,21 @@ export const STEM_PROMPT_KA: Record<IqStem["type"], string> = {
   logic: "", // the stem text is the prompt
 };
 
+export const STEM_PROMPT_EN: Record<IqStem["type"], string> = {
+  "number-series": "Which number continues the sequence?",
+  matrix: "Which figure belongs in the missing cell?",
+  analogy: "Apply the first pair's rule to the second pair. Which figure is missing?",
+  "odd-one-out": "Choose the figure that does not belong.",
+  logic: "",
+};
+
 // ── figure helpers ─────────────────────────────────────────────────────────
 const fig = (spec: FigureSpec): IqOption => ({ kind: "figure", spec });
-const txt = (t: string): IqOption => ({ kind: "text", text: t });
+const txt = (t: string, textEn?: string): IqOption => ({
+  kind: "text",
+  text: t,
+  textEn,
+});
 const one = (shape: ShapeKind, extra: Partial<Mark> = {}): FigureSpec => [
   { shape, size: 56, ...extra },
 ];
@@ -82,15 +101,17 @@ function logic(
   id: string,
   b: number,
   textKa: string,
+  textEn: string,
   options: string[],
+  optionsEn: string[],
   answer: number
 ): IqItem {
   return {
     id,
     domain: "logic",
     b,
-    stem: { type: "logic", textKa },
-    options: options.map(txt),
+    stem: { type: "logic", textKa, textEn },
+    options: options.map((option, index) => txt(option, optionsEn[index])),
     answer,
   };
 }
@@ -175,13 +196,17 @@ const RAW_ITEMS: IqItem[] = [
     "l1",
     -0.4,
     "თუ A > B და B > C, მაშინ რომელი მტკიცებაა ჭეშმარიტი?",
+    "If A > B and B > C, which statement must be true?",
     ["A > C", "C > A", "A = C", "ვერ დავადგენთ"],
+    ["A > C", "C > A", "A = C", "Cannot be determined"],
     0
   ),
   logic(
     "l2",
     0.4,
     "თუ „მზე“ = 3 და „გზა“ = 3, მაშინ „ბაღი“ = ?",
+    'If "sun" = 3 and "way" = 3, then "park" = ?',
+    ["3", "4", "5", "6"],
     ["3", "4", "5", "6"],
     1
   ), // count the letters
@@ -189,13 +214,17 @@ const RAW_ITEMS: IqItem[] = [
     "l3",
     0.5,
     "ორშაბათი, ოთხშაბათი, პარასკევი, … — რომელი დღე მოდის შემდეგ?",
+    "Monday, Wednesday, Friday, … — which day comes next?",
     ["შაბათი", "კვირა", "ორშაბათი", "ხუთშაბათი"],
+    ["Saturday", "Sunday", "Monday", "Thursday"],
     1
   ), // every 2 days → Sunday
   logic(
     "l4",
     1.0,
     "რომელი რიცხვია ზედმეტი? 3, 5, 7, 9, 11",
+    "Which number does not belong? 3, 5, 7, 9, 11",
+    ["3", "7", "9", "11"],
     ["3", "7", "9", "11"],
     2
   ), // 9 is the only non-prime
@@ -203,7 +232,9 @@ const RAW_ITEMS: IqItem[] = [
     "l5",
     1.1,
     "3 მუშა სამუშაოს 3 საათში ასრულებს. რამდენ ხანში დაასრულებს იმავე სამუშაოს 6 მუშა?",
+    "Three workers complete a job in three hours. How long would six equally productive workers take?",
     ["1.5 საათი", "2 საათი", "3 საათი", "6 საათი"],
+    ["1.5 hours", "2 hours", "3 hours", "6 hours"],
     0
   ),
 
@@ -212,25 +243,36 @@ const RAW_ITEMS: IqItem[] = [
     "l8",
     1.3,
     "ა, გ, ე, ზ, … — რომელი ასო მოდის შემდეგ?",
+    "A, C, E, G, … — which letter comes next?",
     ["თ", "ი", "კ", "ლ"],
+    ["H", "I", "J", "K"],
     1
   ), // every 2nd letter of the Georgian alphabet → ი
   logic(
     "l7",
     1.6,
     "ანა უფროსია ბექოზე. გია უფროსია ანაზე. დათო უმცროსია ბექოზე. ვინ არის ყველაზე უფროსი?",
+    "Anna is older than Ben. George is older than Anna. Daniel is younger than Ben. Who is the oldest?",
     ["ანა", "ბექო", "გია", "დათო"],
+    ["Anna", "Ben", "George", "Daniel"],
     2
   ), // გია > ანა > ბექო > დათო
   logic(
     "l6",
     1.9,
     "ყველა კატა ცხოველია. ზოგიერთი ცხოველი შავია. რომელი დასკვნაა ნამდვილად სწორი?",
+    "All cats are animals. Some animals are black. Which conclusion is definitely valid?",
     [
       "ყველა კატა შავია",
       "ზოგიერთი კატა შავია",
       "ვერ დავადგენთ, არის თუ არა რომელიმე კატა შავი",
       "არცერთი კატა არ არის შავი",
+    ],
+    [
+      "All cats are black",
+      "Some cats are black",
+      "It cannot be determined whether any cats are black",
+      "No cats are black",
     ],
     2
   ), // the valid conclusion is "cannot be determined"
@@ -457,11 +499,18 @@ const RAW_ITEMS: IqItem[] = [
     "l9",
     2.8,
     "ზოგიერთი A არის B. ყველა B არის C. არცერთი C არ არის D. რომელი დასკვნაა აუცილებლად სწორი?",
+    "Some A are B. All B are C. No C are D. Which conclusion must be true?",
     [
       "ყველა A არის D",
       "ზოგიერთი A არ არის D",
       "არცერთი A არ არის C",
       "ყველა D არის B",
+    ],
+    [
+      "All A are D",
+      "Some A are not D",
+      "No A are C",
+      "All D are B",
     ],
     1
   ), // some A are B → C → not D ⇒ some A are not D

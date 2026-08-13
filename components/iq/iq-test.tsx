@@ -11,6 +11,7 @@ import { Figure, FigureBlank } from "@/lib/iq/figures";
 import {
   IQ_ANSWERS_STORAGE_KEY,
   IQ_TIME_LIMIT_SEC,
+  STEM_PROMPT_EN,
   STEM_PROMPT_KA,
   type IqItem,
 } from "@/lib/iq/items";
@@ -29,8 +30,9 @@ import {
  * A global countdown auto-submits at zero. Answers are stashed in localStorage
  * and scored on /iq-testi/shedegi — no server round-trip needed.
  */
-export function IqTestClient() {
+export function IqTestClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
   const router = useRouter();
+  const en = locale === "en";
 
   const [administered, setAdministered] = useState<IqItem[]>(() => [
     firstAdaptiveItem(),
@@ -141,7 +143,7 @@ export function IqTestClient() {
           <Sparkles className="size-7 animate-pulse text-[var(--vivida-violet)]" />
         </div>
         <h2 className="mt-5 text-xl font-semibold tracking-tight">
-          ვთვლი შენს შედეგს…
+          {en ? "Calculating your result…" : "ვთვლი შენს შედეგს…"}
         </h2>
         <Loader2 className="mx-auto mt-6 size-5 animate-spin text-muted-foreground" />
       </div>
@@ -154,7 +156,7 @@ export function IqTestClient() {
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>
-            დავალება {step} / {IQ_ADAPTIVE_LENGTH}
+            {en ? "Task" : "დავალება"} {step} / {IQ_ADAPTIVE_LENGTH}
           </span>
           <span
             className={cn(
@@ -176,16 +178,21 @@ export function IqTestClient() {
 
       {/* Stem */}
       <div key={q.id} className="animate-in fade-in duration-300">
-        <IqStem item={q} />
+        <IqStem item={q} locale={locale} />
 
-        {STEM_PROMPT_KA[q.stem.type] && (
+        {(en ? STEM_PROMPT_EN : STEM_PROMPT_KA)[q.stem.type] && (
           <p className="mb-4 mt-6 text-center text-sm text-foreground/80">
-            {STEM_PROMPT_KA[q.stem.type]}
+            {(en ? STEM_PROMPT_EN : STEM_PROMPT_KA)[q.stem.type]}
           </p>
         )}
 
         {/* Options */}
-        <IqOptions item={q} selected={answers[q.id]} onPick={pick} />
+        <IqOptions
+          item={q}
+          selected={answers[q.id]}
+          onPick={pick}
+          locale={locale}
+        />
       </div>
 
       {/* Nav — adaptive: forward only */}
@@ -193,7 +200,7 @@ export function IqTestClient() {
         {isLast ? (
           <Button type="button" variant="mystic" size="lg" onClick={advance}>
             <Sparkles className="size-4" />
-            დასრულება
+            {en ? "Finish" : "დასრულება"}
           </Button>
         ) : (
           <Button
@@ -201,7 +208,13 @@ export function IqTestClient() {
             variant={answered ? "mystic" : "outline"}
             onClick={advance}
           >
-            {answered ? "შემდეგი" : "გამოტოვება"}
+            {answered
+              ? en
+                ? "Next"
+                : "შემდეგი"
+              : en
+                ? "Skip"
+                : "გამოტოვება"}
           </Button>
         )}
       </div>
@@ -231,13 +244,13 @@ function Cell({
   );
 }
 
-function IqStem({ item }: { item: IqItem }) {
+function IqStem({ item, locale }: { item: IqItem; locale: "ka" | "en" }) {
   const s = item.stem;
 
   if (s.type === "logic") {
     return (
       <p className="min-h-[3.5rem] text-balance text-center text-lg font-medium leading-snug sm:text-xl">
-        {s.textKa}
+        {locale === "en" ? s.textEn : s.textKa}
       </p>
     );
   }
@@ -302,10 +315,12 @@ function IqOptions({
   item,
   selected,
   onPick,
+  locale,
 }: {
   item: IqItem;
   selected: number | undefined;
   onPick: (i: number) => void;
+  locale: "ka" | "en";
 }) {
   const isFigure = item.options[0]?.kind === "figure";
 
@@ -348,7 +363,7 @@ function IqOptions({
                 >
                   {String.fromCharCode(65 + i)}
                 </span>
-                {opt.text}
+                {locale === "en" ? opt.textEn ?? opt.text : opt.text}
               </span>
             )}
           </button>

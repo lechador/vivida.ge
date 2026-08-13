@@ -5,12 +5,18 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { IqResultClient } from "@/components/iq/iq-result";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 
-export const metadata: Metadata = {
-  title: "შენი IQ შედეგი",
-  description: "შენი ინტელექტის ტესტის შედეგი — IQ ქულა, პროცენტილი და აზროვნების ანალიზი.",
-  robots: { index: false, follow: false }, // per-session result, nothing to index
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  return {
+    title: en ? "Your IQ Result" : "შენი IQ შედეგი",
+    description: en
+      ? "Your estimated IQ score, percentile and reasoning profile."
+      : "შენი ინტელექტის ტესტის შედეგი — IQ ქულა, პროცენტილი და აზროვნების ანალიზი.",
+    robots: { index: false, follow: false },
+  };
+}
 
 /**
  * IQ result page. The result is computed client-side from the answers stashed
@@ -20,9 +26,10 @@ export const metadata: Metadata = {
 export default async function IqResultPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
+  const locale = await getRequestLocale();
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_265/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_190/0.4),transparent_70%)]"
@@ -32,7 +39,7 @@ export default async function IqResultPage() {
       {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        <IqResultClient />
+        <IqResultClient locale={locale} />
       </section>
     </main>
   );

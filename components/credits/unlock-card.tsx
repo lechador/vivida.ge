@@ -17,8 +17,9 @@ export function UnlockCard({
   resultId,
   cost,
   balance,
-  title = "სრული შედეგის გახსნა",
+  title,
   blurb,
+  locale = "ka",
 }: {
   kind: "iq" | "eq" | "big-five" | "mbti" | "synastry";
   resultId: string;
@@ -26,7 +27,9 @@ export function UnlockCard({
   balance: number;
   title?: string;
   blurb?: string;
+  locale?: "ka" | "en";
 }) {
+  const en = locale === "en";
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);
@@ -56,16 +59,20 @@ export function UnlockCard({
       <div className="mx-auto grid size-14 place-items-center rounded-full bg-[var(--vivida-violet)]/15 ring-1 ring-[var(--vivida-violet)]/40">
         <Lock className="size-7 text-[var(--vivida-violet)]" />
       </div>
-      <h3 className="mt-4 text-xl font-semibold tracking-tight">{title}</h3>
+      <h3 className="mt-4 text-xl font-semibold tracking-tight">
+        {title ?? (en ? "Unlock the full result" : "სრული შედეგის გახსნა")}
+      </h3>
       <p className="mx-auto mt-1.5 max-w-md text-sm text-foreground/80">
         {blurb ??
-          "გახსენი სრული, ღრმა ანალიზი. გადაიხდი ერთხელ — შემდეგ ეს შედეგი სამუდამოდ შენია."}
+          (en
+            ? "Unlock the complete analysis with a one-time payment. This result remains yours."
+            : "გახსენი სრული, ღრმა ანალიზი. გადაიხდი ერთხელ — შემდეგ ეს შედეგი სამუდამოდ შენია.")}
       </p>
 
       <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1 text-sm">
         <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-        <span className="font-semibold">{cost} კრედიტი</span>
-        <span className="text-muted-foreground">· ბალანსი {balance}</span>
+        <span className="font-semibold">{cost} {en ? "credits" : "კრედიტი"}</span>
+        <span className="text-muted-foreground">· {en ? "balance" : "ბალანსი"} {balance}</span>
       </div>
 
       {!short ? (
@@ -79,19 +86,21 @@ export function UnlockCard({
             className="gap-1.5"
           >
             {pending ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
-            გახსნა {cost} კრედიტით
+            {en ? `Unlock for ${cost} credits` : `გახსნა ${cost} კრედიტით`}
           </Button>
         </div>
       ) : (
         <div className="mt-5 space-y-3">
           <p className="text-sm text-[var(--vivida-pink)]">
-            ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი.
+            {en
+              ? "You do not have enough credits. Invite a friend or top up your balance."
+              : "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი."}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic">
               <Link href="/credits">
                 <Users className="size-4" />
-                მოიწვიე / შეავსე
+                {en ? "Invite / top up" : "მოიწვიე / შეავსე"}
               </Link>
             </Button>
           </div>
