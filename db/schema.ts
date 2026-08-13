@@ -2198,3 +2198,45 @@ export const mbtiQuestions = pgTable("mbti_question", {
 });
 
 export type MbtiQuestionRow = typeof mbtiQuestions.$inferSelect;
+
+/**
+ * One-shot in-app surveys — one row per (user, survey).
+ *
+ * The row's *existence* is what keeps the popup from coming back, so it is
+ * written the moment the modal is shown and then updated in place when the
+ * user answers or closes it. That way a user who never interacts still only
+ * ever sees the survey once. `surveyKey` scopes it, so the next campaign is a
+ * new key rather than a new table.
+ */
+export const surveyResponses = pgTable(
+  "survey_response",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Which survey this answers, e.g. 'app_launch_2026_09'. */
+    surveyKey: text("survey_key").notNull(),
+    /** 'shown' → seen but not acted on | 'dismissed' → closed | 'submitted'. */
+    status: text("status").notNull().default("shown"),
+    /** Structured single-choice answer (survey-specific), null if skipped. */
+    choice: text("choice"),
+    /** Free-text answer, null if skipped. */
+    feedback: text("feedback"),
+    shownAt: timestamp("shown_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    /** When the user closed or submitted — null while status='shown'. */
+    respondedAt: timestamp("responded_at", { withTimezone: true }),
+  },
+  (t) => [
+    // One row per user per survey — the upsert target, and the guarantee that
+    // a double-render can never produce two rows.
+    uniqueIndex("survey_response_user_survey_uq").on(t.userId, t.surveyKey),
+    index("survey_response_survey_status_idx").on(t.surveyKey, t.status),
+  ]
+);
+
+export type SurveyResponseRow = typeof surveyResponses.$inferSelect;
