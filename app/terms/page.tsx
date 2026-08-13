@@ -1,17 +1,27 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { localizedAlternates } from "@/lib/seo/locales";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { LegalPageEn } from "@/components/legal/legal-page-en";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "წესები და პირობები",
-  description:
-    "Vivida-ს გამოყენების წესები და პირობები — სამომხმარებლო ხელშეკრულება.",
-  alternates: localizedAlternates("/terms", "/en/terms", "ka"),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  return {
+    title: en ? "Terms and Conditions" : "წესები და პირობები",
+    description: en
+      ? "Terms and Conditions governing your use of Vivida."
+      : "Vivida-ს გამოყენების წესები და პირობები — სამომხმარებლო ხელშეკრულება.",
+    alternates: localizedAlternates("/terms", "/en/terms", locale),
+  };
+}
 
 const LAST_UPDATED = "2026-08-13";
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  if ((await getRequestLocale()) === "en")
+    return <LegalPageEn kind="terms" lastUpdated={LAST_UPDATED} />;
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
@@ -38,9 +48,9 @@ export default function TermsPage() {
               1. ხელშეკრულების მიღება
             </h2>
             <p className="mt-2 leading-relaxed">
-              Vivida-ს ვებ-აპლიკაციის (vivida.ge ან vividaastro.com) გამოყენებით თქვენ
-              ეთანხმებით წინამდებარე წესებსა და პირობებს. თუ არ ეთანხმებით,
-              გთხოვთ არ ისარგებლოთ სერვისით.
+              Vivida-ს ვებ-აპლიკაციის (vivida.ge ან vividaastro.com) გამოყენებით
+              თქვენ ეთანხმებით წინამდებარე წესებსა და პირობებს. თუ არ
+              ეთანხმებით, გთხოვთ არ ისარგებლოთ სერვისით.
             </p>
             <p className="mt-3 leading-relaxed">
               სერვისს ოპერირებს ინდივიდუალური მეწარმე, საიდენტიფიკაციო ნომერი{" "}
@@ -88,8 +98,8 @@ export default function TermsPage() {
             <p className="mt-3 leading-relaxed">
               მოქმედების ღირებულება კრედიტებში და კრედიტების პაკეტის ფასი
               ნაჩვენებია დადასტურებამდე. უფასო ლიმიტები, ბონუსები, კრედიტების
-              ღირებულება და ხელმისაწვდომი ფუნქციები შეიძლება შეიცვალოს;
-              არსებითი ცვლილების შესახებ წინასწარ გაცნობებთ. გადახდებთან და
+              ღირებულება და ხელმისაწვდომი ფუნქციები შეიძლება შეიცვალოს; არსებითი
+              ცვლილების შესახებ წინასწარ გაცნობებთ. გადახდებთან და
               ანაზღაურებასთან დაკავშირებული სავალდებულო უფლებები რეგულირდება
               მოქმედი კანონმდებლობით.
             </p>
@@ -106,9 +116,7 @@ export default function TermsPage() {
               ლიცენზიას, შეინახოს და აჩვენოს ეს შინაარსი მხოლოდ სერვისის
               ფუნქციონირებისთვის.
             </p>
-            <p className="mt-3 leading-relaxed">
-              აკრძალულია:
-            </p>
+            <p className="mt-3 leading-relaxed">აკრძალულია:</p>
             <ul className="mt-2 list-disc space-y-1 pl-6 leading-relaxed">
               <li>სხვისი ფოტოს ატვირთვა მათი თანხმობის გარეშე</li>
               <li>შეურაცხმყოფელი, ძალადობრივი ან უკანონო შინაარსი</li>
@@ -125,11 +133,11 @@ export default function TermsPage() {
               Vivida-ს ასტროლოგიური ინტერპრეტაციები განკუთვნილია გართობისა და
               თვითშემეცნების მიზნებისთვის. ისინი{" "}
               <strong className="text-foreground">
-                არ წარმოადგენს სამედიცინო, ფსიქოლოგიურ, ფინანსურ ან
-                იურიდიულ რჩევას.
+                არ წარმოადგენს სამედიცინო, ფსიქოლოგიურ, ფინანსურ ან იურიდიულ
+                რჩევას.
               </strong>{" "}
-              მნიშვნელოვანი გადაწყვეტილებები მიიღეთ კვალიფიციური
-              სპეციალისტების კონსულტაციით.
+              მნიშვნელოვანი გადაწყვეტილებები მიიღეთ კვალიფიციური სპეციალისტების
+              კონსულტაციით.
             </p>
           </section>
 
@@ -139,8 +147,8 @@ export default function TermsPage() {
             </h2>
             <p className="mt-2 leading-relaxed">
               Vivida-ს ბრენდი, ლოგო, დიზაინი, კოდი და AI ინტერპრეტაციების
-              ალგორითმები არის Vivida-ს საკუთრება. მათი კოპირება, რეპროდუქცია
-              ან კომერციული გამოყენება ნებართვის გარეშე აკრძალულია.
+              ალგორითმები არის Vivida-ს საკუთრება. მათი კოპირება, რეპროდუქცია ან
+              კომერციული გამოყენება ნებართვის გარეშე აკრძალულია.
             </p>
           </section>
 
@@ -178,9 +186,9 @@ export default function TermsPage() {
             <p className="mt-2 leading-relaxed">
               Vivida მიეწოდება „როგორც არის“ პრინციპით. კანონის მიერ ნებადართულ
               ფარგლებში Vivida არ აგებს პასუხს არაპირდაპირ, შემთხვევით ან
-              შედეგობრივ ზიანზე, რომელიც დაკავშირებულია სერვისის
-              გამოყენებასთან. ეს არ ზღუდავს იმ პასუხისმგებლობას, რომელიც
-              კანონით არ შეიძლება გამოირიცხოს.
+              შედეგობრივ ზიანზე, რომელიც დაკავშირებულია სერვისის გამოყენებასთან.
+              ეს არ ზღუდავს იმ პასუხისმგებლობას, რომელიც კანონით არ შეიძლება
+              გამოირიცხოს.
             </p>
           </section>
 
