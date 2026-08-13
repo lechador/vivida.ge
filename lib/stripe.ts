@@ -92,8 +92,10 @@ export async function createCreditCheckoutSession(opts: {
   credits: number;
   tetri: number;
   gel: number;
+  locale?: "ka" | "en";
 }): Promise<Stripe.Checkout.Session> {
-  const { userId, email, origin, credits, tetri, gel } = opts;
+  const { userId, email, origin, credits, tetri, gel, locale = "ka" } = opts;
+  const en = locale === "en";
   return stripe().checkout.sessions.create({
     mode: "payment",
     customer_email: email ?? undefined,
@@ -108,8 +110,10 @@ export async function createCreditCheckoutSession(opts: {
           currency: reportCurrency(),
           unit_amount: tetri,
           product_data: {
-            name: `${credits} კრედიტი`,
-            description: `Vivida · ₾${gel} — ${credits} კრედიტი`,
+            name: en ? `${credits} Vivida credits` : `${credits} კრედიტი`,
+            description: en
+              ? `Vivida · GEL ${gel} — ${credits} credits`
+              : `Vivida · ₾${gel} — ${credits} კრედიტი`,
           },
         },
       },
@@ -122,7 +126,7 @@ export async function createCreditCheckoutSession(opts: {
 /** Verify + parse a Stripe webhook payload. Throws on bad signature. */
 export function constructWebhookEvent(
   payload: string | Buffer,
-  signature: string
+  signature: string,
 ): Stripe.Event {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) throw new Error("STRIPE_WEBHOOK_SECRET is not configured");

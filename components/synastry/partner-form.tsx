@@ -24,7 +24,8 @@ import { cn } from "@/lib/utils";
  * something the user types in once and forgets, so the slow-paced
  * multi-step ceremony isn't appropriate here.
  */
-export function PartnerForm() {
+export function PartnerForm({ locale }: { locale: "ka" | "en" }) {
+  const en = locale === "en";
   const router = useRouter();
   const [name, setName] = useState("");
   const [date, setDate] = useState<DateValue>({ day: "", month: "", year: "" });
@@ -43,13 +44,16 @@ export function PartnerForm() {
 
   const dateValid = validateDate(date) !== null;
   const timeRes = validateTime(time);
-  const ready = name.trim().length > 0 && dateValid && timeRes.ok && place !== null;
+  const ready =
+    name.trim().length > 0 && dateValid && timeRes.ok && place !== null;
 
   const submit = () => {
     setError(null);
     const dateStr = validateDate(date);
     if (!name.trim() || !dateStr || !timeRes.ok || !place) {
-      setError("გთხოვ, ყველა ველი შეავსო.");
+      setError(
+        en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.",
+      );
       return;
     }
     startTransition(async () => {
@@ -73,11 +77,11 @@ export function PartnerForm() {
   return (
     <div className="space-y-6">
       {/* Name */}
-      <Section label="პარტნიორის სახელი">
+      <Section label={en ? "Partner's name" : "პარტნიორის სახელი"}>
         <Input
           value={name}
           onChange={(e) => setName(e.target.value.slice(0, 60))}
-          placeholder="მაგ. ნინო"
+          placeholder={en ? "e.g. Alex" : "მაგ. ნინო"}
           maxLength={60}
           autoFocus
         />
@@ -85,8 +89,12 @@ export function PartnerForm() {
 
       {/* Date */}
       <Section
-        label="დაბადების თარიღი"
-        hint="მზე, მთვარე და ძირითადი არქეტიპები — აქედან იწყება."
+        label={en ? "Birth date" : "დაბადების თარიღი"}
+        hint={
+          en
+            ? "Your Sun, Moon, and core chart patterns begin here."
+            : "მზე, მთვარე და ძირითადი არქეტიპები — აქედან იწყება."
+        }
       >
         <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-3">
           <Input
@@ -131,8 +139,12 @@ export function PartnerForm() {
 
       {/* Time */}
       <Section
-        label="დაბადების დრო"
-        hint="ამომავალი ნიშანი და სახლების განლაგება დროითაა განსაზღვრული. თუ არ ვიცი, გამოვიყენებთ შუადღეს."
+        label={en ? "Birth time" : "დაბადების დრო"}
+        hint={
+          en
+            ? "Birth time determines the rising sign and houses. If you don't know it, we'll use noon."
+            : "ამომავალი ნიშანი და სახლების განლაგება დროითაა განსაზღვრული. თუ არ ვიცი, გამოვიყენებთ შუადღეს."
+        }
       >
         <div className="grid grid-cols-[1fr_1fr] gap-3">
           <Input
@@ -175,7 +187,7 @@ export function PartnerForm() {
             "mt-3 flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-all",
             time.unknown
               ? "border-[var(--vivida-cyan)]/60 bg-[var(--vivida-cyan)]/10 text-[var(--vivida-cyan)]"
-              : "border-border text-muted-foreground hover:text-foreground"
+              : "border-border text-muted-foreground hover:text-foreground",
           )}
         >
           <span
@@ -183,21 +195,26 @@ export function PartnerForm() {
               "size-3 rounded-full border-2 transition-colors",
               time.unknown
                 ? "border-[var(--vivida-cyan)] bg-[var(--vivida-cyan)]"
-                : "border-muted-foreground"
+                : "border-muted-foreground",
             )}
           />
-          ზუსტი დრო არ ვიცი
+          {en ? "I don't know the exact time" : "ზუსტი დრო არ ვიცი"}
         </button>
       </Section>
 
       {/* Place */}
-      <Section label="დაბადების ადგილი" hint="ქართულად ან ლათინურად — ყველანაირი ვარიანტი მუშაობს.">
-        <PlaceField value={place} onChange={setPlace} />
+      <Section
+        label={en ? "Birthplace" : "დაბადების ადგილი"}
+        hint={
+          en
+            ? "Search in any language."
+            : "ქართულად ან ლათინურად — ყველანაირი ვარიანტი მუშაობს."
+        }
+      >
+        <PlaceField value={place} onChange={setPlace} locale={locale} />
       </Section>
 
-      {error && (
-        <p className="text-center text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-center text-sm text-destructive">{error}</p>}
 
       <Button
         type="button"
@@ -208,7 +225,13 @@ export function PartnerForm() {
         className="w-full"
       >
         <Sparkles />
-        {isPending ? "ვითვლით..." : "გამოთვალე თავსებადობა"}
+        {isPending
+          ? en
+            ? "Calculating..."
+            : "ვითვლით..."
+          : en
+            ? "Calculate compatibility"
+            : "გამოთვალე თავსებადობა"}
       </Button>
     </div>
   );
@@ -236,10 +259,13 @@ function Section({
 function PlaceField({
   value,
   onChange,
+  locale,
 }: {
   value: PlaceValue;
   onChange: (next: PlaceValue) => void;
+  locale: "ka" | "en";
 }) {
+  const en = locale === "en";
   const [query, setQuery] = useState(value?.displayName ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -259,7 +285,7 @@ function PlaceField({
       try {
         const res = await fetch(
           `/api/geocode?q=${encodeURIComponent(trimmed)}`,
-          { signal: ctrl.signal }
+          { signal: ctrl.signal },
         );
         if (!res.ok) throw new Error("geocode failed");
         const data = (await res.json()) as { results: GeocodeResult[] };
@@ -300,7 +326,9 @@ function PlaceField({
             setQuery(e.target.value);
             if (value) onChange(null);
           }}
-          placeholder="თბილისი, Tbilisi, ნიუ-იორკი..."
+          placeholder={
+            en ? "London, Paris, New York..." : "თბილისი, Tbilisi, ნიუ-იორკი..."
+          }
           className="pl-9 pr-9"
         />
         {query && (
@@ -313,7 +341,7 @@ function PlaceField({
               onChange(null);
             }}
             className="absolute right-2 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
-            aria-label="გასუფთავება"
+            aria-label={en ? "Clear" : "გასუფთავება"}
           >
             <X className="size-3.5" />
           </button>
@@ -335,12 +363,14 @@ function PlaceField({
                   onChange(r);
                 }}
                 className={cn(
-                  "flex w-full items-start gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-foreground/5"
+                  "flex w-full items-start gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-foreground/5",
                 )}
               >
                 <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-foreground">{r.displayName}</div>
+                  <div className="truncate text-foreground">
+                    {r.displayName}
+                  </div>
                   <div className="truncate text-xs text-muted-foreground">
                     {r.country} · {r.timezone}
                   </div>

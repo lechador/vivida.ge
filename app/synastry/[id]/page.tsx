@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
+import type { Metadata } from "next";
 
 import { requireUser } from "@/lib/auth-helpers";
 import { ensureChartFor } from "@/actions/chart";
@@ -24,14 +25,24 @@ import { AppHeader } from "@/components/nav/app-header";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { SynastryDeepReport } from "@/components/synastry/synastry-deep-report";
+import { SynastryDisplayEn } from "@/components/synastry/synastry-display-en";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 
-export const metadata = { title: "თავსებადობა" };
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  return {
+    title: en ? "Compatibility" : "თავსებადობა",
+    robots: { index: false },
+  };
+}
 
 export default async function SynastryDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const locale = await getRequestLocale();
+  const en = locale === "en";
   const { id } = await params;
   const user = await requireUser();
   const partner = await getPartnerForViewer(id, user.id);
@@ -41,10 +52,19 @@ export default async function SynastryDetailPage({
   const viewerChart = await ensureChartFor(user.id);
   if (!viewerChart) {
     return (
-      <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+      <main
+        lang={locale}
+        className="relative isolate flex flex-1 flex-col overflow-hidden"
+      >
         <AppHeader authed active="synastry" />
         <section className="mx-auto w-full max-w-xl p-8 text-center text-sm text-muted-foreground">
-          შენი რუკა ჯერ შედგენილი არ არის. ჯერ <Link href="/onboarding" className="underline">შეავსე დაბადების მონაცემები</Link>.
+          {en
+            ? "Your chart hasn't been created yet. "
+            : "შენი რუკა ჯერ შედგენილი არ არის. ჯერ "}
+          <Link href="/onboarding" className="underline">
+            {en ? "Add your birth details" : "შეავსე დაბადების მონაცემები"}
+          </Link>
+          .
         </section>
       </main>
     );
@@ -67,7 +87,10 @@ export default async function SynastryDetailPage({
   if (!unlocked) {
     const balance = await getBalance(user.id);
     return (
-      <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+      <main
+        lang={locale}
+        className="relative isolate flex flex-1 flex-col overflow-hidden"
+      >
         <div
           aria-hidden
           className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.18_350/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_305/0.3),transparent_70%)]"
@@ -80,11 +103,11 @@ export default async function SynastryDetailPage({
             className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="size-3.5" />
-            ყველა პარტნიორი
+            {en ? "All partners" : "ყველა პარტნიორი"}
           </Link>
           <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            {viewerName ?? "შენ"}{" "}
-            <span className="text-muted-foreground">და</span>{" "}
+            {viewerName ?? (en ? "You" : "შენ")}{" "}
+            <span className="text-muted-foreground">{en ? "and" : "და"}</span>{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
               {partner.name}
             </span>
@@ -97,8 +120,17 @@ export default async function SynastryDetailPage({
             resultId={partner.id}
             cost={CREDIT_COST.synastry}
             balance={balance}
-            title="თქვენი თავსებადობის გახსნა"
-            blurb="ნახე სრული სინასტრია — ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
+            title={
+              en
+                ? "Unlock your compatibility reading"
+                : "თქვენი თავსებადობის გახსნა"
+            }
+            blurb={
+              en
+                ? "See the complete synastry reading—key aspects, strengths, and points of friction. Pay once and this partner remains unlocked."
+                : "ნახე სრული სინასტრია — ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
+            }
+            locale={locale}
           />
         </section>
       </main>
@@ -108,23 +140,26 @@ export default async function SynastryDetailPage({
   // Cheap deterministic compute on every visit — keeps the result fresh
   // without a cache while we tune scoring.
   const synastry = computeSynastry(viewerChart.data, partner.chart);
-  const synastryTexts = await getSynastryInterpretationsFor(synastry);
+  const synastryTexts = en ? {} : await getSynastryInterpretationsFor(synastry);
 
   // Ensure AI interpretation exists (lazy generation — first visit pays
   // the Gemini call, subsequent visits read the cached row).
-  const partnerWithAi = await ensureSynastryInterpretation(partner);
+  const partnerWithAi = await ensureSynastryInterpretation(partner, locale);
   const ai = partnerWithAi.aiInterpretation;
 
   // Deep report is cached on the partner row; show it if it's fresh for this
   // viewer + prompt version, otherwise the component offers to generate it.
-  const deepStamp = `${viewerChart.inputHash}:v${SYNASTRY_DEEP_PROMPT_VERSION}`;
+  const deepStamp = `${viewerChart.inputHash}:${locale}:v${SYNASTRY_DEEP_PROMPT_VERSION}`;
   const initialDeep =
     partnerWithAi.deepReport && partnerWithAi.deepViewerHash === deepStamp
       ? partnerWithAi.deepReport
       : null;
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex flex-1 flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.18_350/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_305/0.3),transparent_70%)]"
@@ -139,12 +174,12 @@ export default async function SynastryDetailPage({
           className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-3.5" />
-          ყველა პარტნიორი
+          {en ? "All partners" : "ყველა პარტნიორი"}
         </Link>
 
         <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-          {viewerName ?? "შენ"}{" "}
-          <span className="text-muted-foreground">და</span>{" "}
+          {viewerName ?? (en ? "You" : "შენ")}{" "}
+          <span className="text-muted-foreground">{en ? "and" : "და"}</span>{" "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
             {partner.name}
           </span>
@@ -157,7 +192,9 @@ export default async function SynastryDetailPage({
           <article className="mb-8 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-pink)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
             <div className="mb-3 flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)]">
               <Sparkles className="size-4" aria-hidden />
-              <span>AI-ს მცირე ნარატივი</span>
+              <span>
+                {en ? "Personalized chart narrative" : "AI-ს მცირე ნარატივი"}
+              </span>
             </div>
             <p className="text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
               {ai.summary}
@@ -168,12 +205,17 @@ export default async function SynastryDetailPage({
                   <div className="rounded-xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/5 p-4">
                     <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-[var(--vivida-cyan)]">
                       <span aria-hidden>✨</span>
-                      <span>რას გაერთიანებთ</span>
+                      <span>
+                        {en ? "What brings you together" : "რას გაერთიანებთ"}
+                      </span>
                     </div>
                     <ul className="space-y-1.5 text-sm leading-relaxed text-foreground/90">
                       {ai.strengths.map((s, i) => (
                         <li key={i} className="flex gap-2">
-                          <span aria-hidden className="mt-0.5 text-[var(--vivida-cyan)]">
+                          <span
+                            aria-hidden
+                            className="mt-0.5 text-[var(--vivida-cyan)]"
+                          >
                             ◆
                           </span>
                           {s}
@@ -186,12 +228,17 @@ export default async function SynastryDetailPage({
                   <div className="rounded-xl border border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/5 p-4">
                     <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-[var(--vivida-pink)]">
                       <span aria-hidden>⚡</span>
-                      <span>სად არის ხახუნი</span>
+                      <span>
+                        {en ? "Where friction appears" : "სად არის ხახუნი"}
+                      </span>
                     </div>
                     <ul className="space-y-1.5 text-sm leading-relaxed text-foreground/90">
                       {ai.growth.map((g, i) => (
                         <li key={i} className="flex gap-2">
-                          <span aria-hidden className="mt-0.5 text-[var(--vivida-pink)]">
+                          <span
+                            aria-hidden
+                            className="mt-0.5 text-[var(--vivida-pink)]"
+                          >
                             ◆
                           </span>
                           {g}
@@ -205,16 +252,21 @@ export default async function SynastryDetailPage({
           </article>
         )}
 
-        <SynastryDisplayLazy
-          result={synastry}
-          partnerName={partner.name}
-          interpretations={synastryTexts}
-        />
+        {en ? (
+          <SynastryDisplayEn result={synastry} partnerName={partner.name} />
+        ) : (
+          <SynastryDisplayLazy
+            result={synastry}
+            partnerName={partner.name}
+            interpretations={synastryTexts}
+          />
+        )}
 
         <SynastryDeepReport
           partnerId={partner.id}
           partnerName={partner.name}
           initial={initialDeep}
+          locale={locale}
         />
       </section>
     </main>

@@ -17,18 +17,23 @@ export function PartnerCard({
   name,
   cityName,
   dateOfBirth,
+  locale,
 }: {
   id: string;
   name: string;
   cityName: string;
   dateOfBirth: string;
+  locale: "ka" | "en";
 }) {
   const [isPending, startTransition] = useTransition();
 
   const onDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!window.confirm(`წავშალოთ ${name}?`)) return;
+    if (
+      !window.confirm(locale === "en" ? `Remove ${name}?` : `წავშალოთ ${name}?`)
+    )
+      return;
     startTransition(async () => {
       await softDeletePartner(id);
     });
@@ -39,7 +44,7 @@ export function PartnerCard({
       href={`/synastry/${id}`}
       className={cn(
         "group relative flex items-start gap-3 overflow-hidden rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:border-foreground/15 hover:bg-card/80",
-        isPending && "opacity-50 pointer-events-none"
+        isPending && "opacity-50 pointer-events-none",
       )}
     >
       <div
@@ -62,8 +67,8 @@ export function PartnerCard({
         onClick={onDelete}
         disabled={isPending}
         className="relative grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
-        aria-label={`წაშლა — ${name}`}
-        title="წაშლა"
+        aria-label={locale === "en" ? `Remove ${name}` : `წაშლა — ${name}`}
+        title={locale === "en" ? "Remove" : "წაშლა"}
       >
         <Trash2 className="size-4" />
       </button>

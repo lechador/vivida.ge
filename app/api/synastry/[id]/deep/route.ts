@@ -5,6 +5,7 @@ import {
 } from "@/lib/partners-core";
 import { isOpenRouterConfigured } from "@/lib/openrouter";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { localeForHost } from "@/lib/i18n/request-locale";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,7 +14,7 @@ export const maxDuration = 300;
 type Params = { params: Promise<{ id: string }> };
 
 /** Generate (or return cached) the deep AI synastry report for a partner. */
-export async function POST(_req: Request, ctx: Params) {
+export async function POST(req: Request, ctx: Params) {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return Response.json({ error: "unauthorized" }, { status: 401 });
@@ -37,7 +38,10 @@ export async function POST(_req: Request, ctx: Params) {
     return Response.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  const updated = await ensureSynastryDeepReport(partner);
+  const locale = localeForHost(
+    req.headers.get("x-forwarded-host") ?? new URL(req.url).host,
+  );
+  const updated = await ensureSynastryDeepReport(partner, locale);
   if (!updated.deepReport) {
     return Response.json({ error: "generation_failed" }, { status: 502 });
   }

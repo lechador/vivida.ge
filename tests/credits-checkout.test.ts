@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
 vi.mock("@/lib/credits", async () => {
   const config = await vi.importActual<typeof import("@/lib/credits-config")>(
-    "@/lib/credits-config"
+    "@/lib/credits-config",
   );
   return { CREDIT_PACKS: config.CREDIT_PACKS };
 });
@@ -34,7 +34,9 @@ describe("POST /api/credits/checkout", () => {
       user: { id: "user-1", email: "user@example.com" },
     });
     mocks.isStripeConfigured.mockReturnValue(true);
-    mocks.createCheckout.mockResolvedValue({ url: "https://checkout.stripe.test/1" });
+    mocks.createCheckout.mockResolvedValue({
+      url: "https://checkout.stripe.test/1",
+    });
   });
 
   it("rejects anonymous checkout attempts", async () => {
@@ -49,7 +51,7 @@ describe("POST /api/credits/checkout", () => {
 
   it("rejects unknown packs without trusting client prices", async () => {
     const response = await POST(
-      request({ packId: "custom", credits: 999_999, tetri: 1 })
+      request({ packId: "custom", credits: 999_999, tetri: 1 }),
     );
 
     expect(response.status).toBe(400);
@@ -71,7 +73,23 @@ describe("POST /api/credits/checkout", () => {
       credits: 30,
       tetri: 1000,
       gel: 10,
+      locale: "ka",
     });
+  });
+
+  it("creates an English Checkout session on the international domain", async () => {
+    const response = await POST(
+      new Request("https://vividaastro.com/api/credits/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ packId: "m" }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.createCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({ locale: "en", credits: 45, gel: 20 }),
+    );
   });
 
   it("reports unavailable payments before creating a session", async () => {

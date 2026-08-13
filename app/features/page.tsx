@@ -11,17 +11,23 @@ import {
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { Metadata } from "next";
 
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 
-export const metadata = {
-  title: "ფუნქციები",
-  description:
-    "ნატალური რუკა, ყოველდღიური პროგნოზი, თავსებადობა, AI ანალიზი, საჯარო პროფილი — Vivida-ს ყველა ფუნქცია ერთ ადგილას.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  return {
+    title: en ? "Features" : "ფუნქციები",
+    description: en
+      ? "Birth charts, daily forecasts, compatibility, AI insights, and a public profile—explore every Vivida feature."
+      : "ნატალური რუკა, ყოველდღიური პროგნოზი, თავსებადობა, AI ანალიზი, საჯარო პროფილი — Vivida-ს ყველა ფუნქცია ერთ ადგილას.",
+  };
+}
 
 type Feature = {
   Icon: LucideIcon;
@@ -87,9 +93,72 @@ const FEATURES: Feature[] = [
   },
 ];
 
-export default function FeaturesPage() {
+const FEATURES_EN: Feature[] = [
+  {
+    Icon: Sun,
+    title: "Daily forecast",
+    body: "Your personal sky for today, generated from your natal chart—emotional tone, opportunity, and an area to focus on.",
+    hue: "oklch(0.82 0.16 80)",
+  },
+  {
+    Icon: Compass,
+    title: "Complete birth chart",
+    body: "An interactive chart with 12 signs, 12 houses, 10+ planets, and every major aspect. Your Sun, Moon, and rising sign take center stage.",
+    hue: "oklch(0.78 0.18 305)",
+  },
+  {
+    Icon: Heart,
+    title: "Compatibility (synastry)",
+    body: "Explore romantic, friendship, communication, growth, chemistry, and work compatibility—with clear scores and detailed explanations.",
+    hue: "oklch(0.72 0.22 0)",
+  },
+  {
+    Icon: Brain,
+    title: "AI interpretation",
+    body: "A personalized emotional portrait of your chart. This is not a generic horoscope; every insight is grounded in your birth data.",
+    hue: "oklch(0.78 0.15 195)",
+  },
+  {
+    Icon: Sparkles,
+    title: "Chart highlights",
+    body: "Vivida finds the most distinctive patterns in your chart—stelliums, powerful aspects, and the placements that deserve a closer look.",
+    hue: "oklch(0.72 0.22 350)",
+  },
+  {
+    Icon: UserCircle,
+    title: "Public profile",
+    body: "Choose a username, add photos and a bio, and let people discover your signs and instantly see your shared compatibility.",
+    hue: "oklch(0.72 0.18 145)",
+  },
+  {
+    Icon: Globe2,
+    title: "Discover people",
+    body: "Meet people through shared elements, zodiac signs, and meaningful chart connections—or simply see who is nearby.",
+    hue: "oklch(0.78 0.15 195)",
+  },
+  {
+    Icon: Users,
+    title: "Friends circle",
+    body: "Invite friends, manage requests, and open your compatibility in one tap. Your people and your shared sky stay together.",
+    hue: "oklch(0.72 0.22 0)",
+  },
+  {
+    Icon: MessageCircle,
+    title: "Direct messages",
+    body: "Talk with friends in real time, with read receipts, typing indicators, and notifications that keep conversations moving.",
+    hue: "oklch(0.78 0.18 305)",
+  },
+];
+
+export default async function FeaturesPage() {
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const features = en ? FEATURES_EN : FEATURES;
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
@@ -104,22 +173,23 @@ export default function FeaturesPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          ფუნქციები
+          {en ? "Features" : "ფუნქციები"}
         </div>
         <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-          ყველაფერი, რაც{" "}
+          {en ? "Everything that makes " : "ყველაფერი, რაც "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            შენს რუკას
+            {en ? "your chart" : "შენს რუკას"}
           </span>{" "}
-          ცოცხალს ხდის
+          {en ? " come alive" : " ცოცხალს ხდის"}
         </h1>
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
-          Vivida არ არის უბრალო ჰოროსკოპის აპი. ეს არის შენი პერსონალური
-          კოსმიური თანამგზავრი — დაბადებიდან ყოველდღიურ გადაწყვეტილებებამდე.
+          {en
+            ? "Vivida goes beyond a horoscope app. It is a personal guide from the moment of your birth to the choices you make every day."
+            : "Vivida არ არის უბრალო ჰოროსკოპის აპი. ეს არის შენი პერსონალური კოსმიური თანამგზავრი — დაბადებიდან ყოველდღიურ გადაწყვეტილებებამდე."}
         </p>
 
         <div className="mt-12 grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((feature) => (
+          {features.map((feature) => (
             <article
               key={feature.title}
               className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80 hover:ring-foreground/15"
@@ -168,14 +238,18 @@ export default function FeaturesPage() {
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            ყველაფერი ერთ ადგილას
+            {en ? "Everything in one place" : "ყველაფერი ერთ ადგილას"}
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ყველა ფუნქცია სრულად უფასოა — შენი კოსმოსი ერთ დაკლიკვაზე.
+            {en
+              ? "Start with Vivida for free and keep your personal sky within reach."
+              : "ყველა ფუნქცია სრულად უფასოა — შენი კოსმოსი ერთ დაკლიკვაზე."}
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic" size="lg">
-              <Link href="/signup">დაიწყე უფასოდ</Link>
+              <Link href="/signup">
+                {en ? "Start for free" : "დაიწყე უფასოდ"}
+              </Link>
             </Button>
           </div>
         </div>

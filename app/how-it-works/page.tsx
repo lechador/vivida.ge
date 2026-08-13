@@ -8,17 +8,23 @@ import {
   UserPlus,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { Metadata } from "next";
 
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 
-export const metadata = {
-  title: "როგორ მუშაობს",
-  description:
-    "ნახე როგორ ქმნის Vivida შენს პერსონალურ კოსმიურ რუკას — დაბადების მონაცემიდან AI ინტერპრეტაციამდე.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const en = (await getRequestLocale()) === "en";
+  return {
+    title: en ? "How Vivida works" : "როგორ მუშაობს",
+    description: en
+      ? "See how Vivida turns your birth details into a personal chart, forecast, and AI-powered interpretation."
+      : "ნახე როგორ ქმნის Vivida შენს პერსონალურ კოსმიურ რუკას — დაბადების მონაცემიდან AI ინტერპრეტაციამდე.",
+  };
+}
 
 type Step = {
   number: string;
@@ -73,9 +79,60 @@ const STEPS: Step[] = [
   },
 ];
 
-export default function HowItWorksPage() {
+const STEPS_EN: Step[] = [
+  {
+    number: "01",
+    Icon: UserPlus,
+    title: "Create your account",
+    body: "Sign up with Google or email and begin in moments. Your account keeps your chart and readings available across devices.",
+    hue: "oklch(0.78 0.18 305)",
+  },
+  {
+    number: "02",
+    Icon: Calendar,
+    title: "Enter your birth details",
+    body: "Add your date, time, and place of birth. Vivida finds the coordinates and time zone needed for an accurate chart.",
+    hue: "oklch(0.85 0.16 85)",
+  },
+  {
+    number: "03",
+    Icon: Compass,
+    title: "Explore your birth chart",
+    body: "See the sky at the moment you were born—your Sun, Moon, rising sign, 12 houses, and major aspects in an interactive chart.",
+    hue: "oklch(0.78 0.15 195)",
+  },
+  {
+    number: "04",
+    Icon: Sparkles,
+    title: "Receive a personal interpretation",
+    body: "Vivida turns the chart into a readable portrait of your big three, strengths, tensions, and recurring life themes.",
+    hue: "oklch(0.72 0.22 0)",
+  },
+  {
+    number: "05",
+    Icon: Telescope,
+    title: "Discover compatibility",
+    body: "Compare two charts across love, friendship, communication, growth, chemistry, and working together.",
+    hue: "oklch(0.72 0.22 350)",
+  },
+  {
+    number: "06",
+    Icon: MapPin,
+    title: "Share on your terms",
+    body: "Build a public profile so people can find you by sign or username. You remain in control of what you share.",
+    hue: "oklch(0.72 0.18 145)",
+  },
+];
+
+export default async function HowItWorksPage() {
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const steps = en ? STEPS_EN : STEPS;
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
@@ -90,21 +147,22 @@ export default function HowItWorksPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          როგორ მუშაობს
+          {en ? "How it works" : "როგორ მუშაობს"}
         </div>
         <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-          ექვსი ნაბიჯი{" "}
+          {en ? "Six steps to " : "ექვსი ნაბიჯი "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            შენს კოსმოსამდე
+            {en ? "your personal sky" : "შენს კოსმოსამდე"}
           </span>
         </h1>
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
-          Vivida გადააქცევს შენი დაბადების ზუსტ მომენტს ცოცხალ, პირად
-          გზამკვლევად. გზა რამდენიმე წუთიანია — შედეგი მთელი ცხოვრებისთვის.
+          {en
+            ? "Vivida transforms the exact moment of your birth into a living personal guide. It takes only a few minutes to begin."
+            : "Vivida გადააქცევს შენი დაბადების ზუსტ მომენტს ცოცხალ, პირად გზამკვლევად. გზა რამდენიმე წუთიანია — შედეგი მთელი ცხოვრებისთვის."}
         </p>
 
         <div className="mt-12 space-y-4 sm:space-y-5">
-          {STEPS.map((step) => (
+          {steps.map((step) => (
             <article
               key={step.number}
               className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15 sm:p-7"
@@ -159,14 +217,17 @@ export default function HowItWorksPage() {
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            მზად ხარ შენი ცის სანახავად?
+            {en ? "Ready to see your sky?" : "მზად ხარ შენი ცის სანახავად?"}
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            დაიწყე უფასოდ. ნატალური რუკა, ყოველდღიური პროგნოზი და თავსებადობა
-            ყოველთვის შენთან.
+            {en
+              ? "Start for free. Keep your birth chart, daily forecast, and compatibility readings close at hand."
+              : "დაიწყე უფასოდ. ნატალური რუკა, ყოველდღიური პროგნოზი და თავსებადობა ყოველთვის შენთან."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/signup">დაიწყე უფასოდ</Link>
+            <Link href="/signup">
+              {en ? "Start for free" : "დაიწყე უფასოდ"}
+            </Link>
           </Button>
         </div>
       </section>

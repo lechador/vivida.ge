@@ -15,7 +15,7 @@ type EarnRow = {
  * top-up options so users see they don't have to pay. Amounts read straight
  * from the economy config so copy never drifts from the real rewards.
  */
-const ROWS: EarnRow[] = [
+const ROWS_KA: EarnRow[] = [
   {
     Icon: UserPlus,
     title: "მოიწვიე მეგობარი",
@@ -36,21 +36,46 @@ const ROWS: EarnRow[] = [
   },
 ];
 
-export function CreditEarnInfo() {
+const ROWS_EN: EarnRow[] = [
+  {
+    Icon: UserPlus,
+    title: "Invite a friend",
+    detail: "When they sign up and complete their profile",
+    amount: REFERRAL_REWARD,
+  },
+  {
+    Icon: PenLine,
+    title: "Write a feed post",
+    detail: "For your first post each day",
+    amount: CREDIT_REWARD.feedPost,
+  },
+  {
+    Icon: Camera,
+    title: "Add a profile photo",
+    detail: "Once, when you upload a quality photo",
+    amount: CREDIT_REWARD.profilePhoto,
+  },
+];
+
+export function CreditEarnInfo({ locale }: { locale: "ka" | "en" }) {
+  const en = locale === "en";
+  const rows = en ? ROWS_EN : ROWS_KA;
   return (
     <div className="rounded-3xl border border-[var(--vivida-cyan)]/30 bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
       <div className="mb-1 flex items-center gap-2">
         <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
         <h2 className="text-base font-semibold tracking-tight">
-          როგორ დააგროვო კრედიტები უფასოდ
+          {en ? "How to earn free credits" : "როგორ დააგროვო კრედიტები უფასოდ"}
         </h2>
       </div>
       <p className="mb-4 text-sm text-muted-foreground">
-        კრედიტების ყიდვა სავალდებულო არ არის — შეგიძლია დააგროვო აქტიურობით.
+        {en
+          ? "You don't have to buy credits—you can earn them by being active."
+          : "კრედიტების ყიდვა სავალდებულო არ არის — შეგიძლია დააგროვო აქტიურობით."}
       </p>
 
       <ul className="space-y-2.5">
-        {ROWS.map((r) => (
+        {rows.map((r) => (
           <li
             key={r.title}
             className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background/40 p-3 sm:p-3.5"

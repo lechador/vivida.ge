@@ -36,7 +36,9 @@ type GenerateInput = {
 function summarizeChart(chart: NatalChartJson): string {
   const lines: string[] = [];
   const ascSign = signByIndex(chart.ascendant.signIndex);
-  lines.push(`Ascendant: ${ascSign.labelEn} (${chart.ascendant.signDegree.toFixed(1)}°)`);
+  lines.push(
+    `Ascendant: ${ascSign.labelEn} (${chart.ascendant.signDegree.toFixed(1)}°)`,
+  );
 
   const order = [
     "sun",
@@ -57,7 +59,7 @@ function summarizeChart(chart: NatalChartJson): string {
     const retro = body.retrograde ? " (R)" : "";
     const house = body.house ? `, house ${body.house}` : "";
     lines.push(
-      `${key}: ${sign.labelEn} ${body.signDegree.toFixed(1)}°${retro}${house}`
+      `${key}: ${sign.labelEn} ${body.signDegree.toFixed(1)}°${retro}${house}`,
     );
   }
 
@@ -74,7 +76,7 @@ function summarizeChart(chart: NatalChartJson): string {
       const cuspSign = signByIndex(h.signIndex);
       const occ = occupants[h.number]?.join(", ") || "(empty)";
       lines.push(
-        `  H${h.number}: cusp ${cuspSign.labelEn} — occupants: ${occ}`
+        `  H${h.number}: cusp ${cuspSign.labelEn} — occupants: ${occ}`,
       );
     }
   }
@@ -114,7 +116,7 @@ const SYSTEM_PROMPT = `შენ ხარ თბილი, ცოცხალ�
 /** Pick the most personally-relevant aspects for AI interpretation. */
 function selectAspectsToInterpret(
   chart: NatalChartJson,
-  limit = 12
+  limit = 12,
 ): Array<{
   key: string;
   a: string;
@@ -178,11 +180,11 @@ function buildUserPrompt(input: GenerateInput): string {
   if (aspects.length > 0) {
     parts.push(
       "",
-      "Aspects to interpret (return one entry per key; copy the key verbatim):"
+      "Aspects to interpret (return one entry per key; copy the key verbatim):",
     );
     for (const a of aspects) {
       parts.push(
-        `  ${a.key}  →  ${a.a} ${a.kind} ${a.b} (${a.family}, orb ${a.orb.toFixed(1)}°)`
+        `  ${a.key}  →  ${a.a} ${a.kind} ${a.b} (${a.family}, orb ${a.orb.toFixed(1)}°)`,
       );
     }
   }
@@ -197,7 +199,7 @@ interface OpenRouterResponse {
 }
 
 export async function generateInterpretation(
-  input: GenerateInput
+  input: GenerateInput,
 ): Promise<ChartInterpretationJson | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
@@ -248,7 +250,7 @@ export async function generateInterpretation(
     return parsed;
   } catch (err) {
     throw new Error(
-      `OpenRouter returned invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`
+      `OpenRouter returned invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`,
     );
   }
 }
@@ -461,7 +463,7 @@ export async function generateMoonPhaseReading(input: {
     };
   } catch (err) {
     throw new Error(
-      `Moon phase invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 400)}`
+      `Moon phase invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 400)}`,
     );
   }
 }
@@ -548,6 +550,24 @@ const SYNASTRY_SYSTEM_PROMPT = `შენ ხარ თბილი, თან�
 - მოერიდე კლიშეებს ("სამყარო", "ვარსკვლავები გელიან", "ცა გიწვევთ")
 - მხოლოდ JSON, ფენსების გარეშე`;
 
+const SYNASTRY_SYSTEM_PROMPT_EN = `You are a warm, modern astrologer writing a concise synastry narrative for two specific natal charts. Build on the deterministic compatibility scores and chart contacts; avoid vague mysticism.
+
+Return valid JSON in exactly this shape:
+{
+  "summary": string,
+  "strengths": [string, ...],
+  "growth": [string, ...]
+}
+
+Rules:
+- Address the viewer as "you" and refer to the other person by name.
+- Mention concrete chart contacts such as "your Moon trines their Venus".
+- Keep the language inclusive and do not assume gender or relationship structure.
+- If overall is above 70, describe the natural ease. If it is below 40, be honest about friction while identifying a constructive opening.
+- Write 2–3 sentences for the summary and 1–3 one-sentence bullets in each list.
+- Avoid cosmic clichés and deterministic claims. Use Vivida in Latin characters.
+- English only. Return JSON without code fences.`;
+
 export async function generateSynastryInterpretation(input: {
   partnerName: string;
   viewerFirstName: string | null;
@@ -561,39 +581,65 @@ export async function generateSynastryInterpretation(input: {
     kind: string;
     orb: number;
   }>;
+  locale?: "ka" | "en";
 }): Promise<SynastryAIResult | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
+  const en = input.locale === "en";
   const sections: string[] = [];
   if (input.viewerFirstName)
-    sections.push(`მომხმარებლის სახელი: ${input.viewerFirstName}`);
-  sections.push(`პარტნიორის სახელი: ${input.partnerName}`);
+    sections.push(
+      en
+        ? `Viewer's name: ${input.viewerFirstName}`
+        : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
+    );
+  sections.push(
+    en
+      ? `Partner's name: ${input.partnerName}`
+      : `პარტნიორის სახელი: ${input.partnerName}`,
+  );
 
-  sections.push("\n--- მომხმარებლის რუკა ---");
+  sections.push(
+    en ? "\n--- Viewer's natal chart ---" : "\n--- მომხმარებლის რუკა ---",
+  );
   sections.push(summarizeNatalCompact(input.viewerChart));
 
-  sections.push("\n--- პარტნიორის რუკა ---");
+  sections.push(
+    en ? "\n--- Partner's natal chart ---" : "\n--- პარტნიორის რუკა ---",
+  );
   sections.push(summarizeNatalCompact(input.partnerChart));
 
-  sections.push("\n--- გათვლილი ქულები ---");
+  sections.push(
+    en ? "\n--- Calculated scores ---" : "\n--- გათვლილი ქულები ---",
+  );
   sections.push(`overall: ${input.overall}`);
   for (const [cat, val] of Object.entries(input.scores)) {
     sections.push(`${cat}: ${val}`);
   }
 
   if (input.topAspects.length > 0) {
-    sections.push("\n--- ყველაზე ძლიერი ცროს-ასპექტები ---");
+    sections.push(
+      en
+        ? "\n--- Strongest cross-chart aspects ---"
+        : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
+    );
     for (const a of input.topAspects.slice(0, 8)) {
-      const left = PLANET_LABELS_KA[a.a] ?? a.a;
-      const right = PLANET_LABELS_KA[a.b] ?? a.b;
+      const left = en ? a.a : (PLANET_LABELS_KA[a.a] ?? a.a);
+      const right = en ? a.b : (PLANET_LABELS_KA[a.b] ?? a.b);
       sections.push(
-        `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`
+        en
+          ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right} — orb ${a.orb.toFixed(1)}°`
+          : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`,
       );
     }
   }
 
-  sections.push("\nდააწერე ნარატივი. JSON-ად დააბრუნე.");
+  sections.push(
+    en
+      ? "\nWrite the narrative and return JSON."
+      : "\nდააწერე ნარატივი. JSON-ად დააბრუნე.",
+  );
 
   const userMessage = sections.join("\n");
 
@@ -608,7 +654,10 @@ export async function generateSynastryInterpretation(input: {
     body: JSON.stringify({
       model: DEFAULT_MODEL,
       messages: [
-        { role: "system", content: SYNASTRY_SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: en ? SYNASTRY_SYSTEM_PROMPT_EN : SYNASTRY_SYSTEM_PROMPT,
+        },
         { role: "user", content: userMessage },
       ],
       response_format: { type: "json_object" },
@@ -647,7 +696,7 @@ export async function generateSynastryInterpretation(input: {
     };
   } catch (err) {
     throw new Error(
-      `Synastry invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`
+      `Synastry invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`,
     );
   }
 }
@@ -679,6 +728,21 @@ const SYNASTRY_DEEP_SYSTEM_PROMPT = `შენ ხარ თბილი, ღრ
 - პლანეტები ქართულად, ბრენდები (Vivida) ლათინურად
 - მხოლოდ JSON, code fence-ის გარეშე`;
 
+const SYNASTRY_DEEP_SYSTEM_PROMPT_EN = `You are a warm, thoughtful modern astrologer. Write an in-depth premium synastry report based on two natal charts, their deterministic compatibility scores, and strongest cross-chart aspects.
+
+Return valid JSON in exactly this shape:
+{
+  "intro": string,
+  "love": string,
+  "communication": string,
+  "trust": string,
+  "friction": string,
+  "longTerm": string,
+  "advice": [string, ...]
+}
+
+Write 2–3 paragraphs for intro and love, around 2 paragraphs for every other prose section, and 3–5 practical pieces of advice. Address the viewer as "you", name the partner, cite concrete chart contacts, and remain candid without being fatalistic. Do not assume gender or relationship structure. Avoid cosmic clichés. English only. Return JSON without code fences.`;
+
 export async function generateSynastryDeepReport(input: {
   partnerName: string;
   viewerFirstName: string | null;
@@ -687,34 +751,60 @@ export async function generateSynastryDeepReport(input: {
   scores: Record<string, number>;
   overall: number;
   topAspects: Array<{ a: string; b: string; kind: string; orb: number }>;
+  locale?: "ka" | "en";
 }): Promise<import("@/db/schema").SynastryDeepReportJson | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
+  const en = input.locale === "en";
   const sections: string[] = [];
   if (input.viewerFirstName)
-    sections.push(`მომხმარებლის სახელი: ${input.viewerFirstName}`);
-  sections.push(`პარტნიორის სახელი: ${input.partnerName}`);
-  sections.push("\n--- მომხმარებლის რუკა ---");
+    sections.push(
+      en
+        ? `Viewer's name: ${input.viewerFirstName}`
+        : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
+    );
+  sections.push(
+    en
+      ? `Partner's name: ${input.partnerName}`
+      : `პარტნიორის სახელი: ${input.partnerName}`,
+  );
+  sections.push(
+    en ? "\n--- Viewer's natal chart ---" : "\n--- მომხმარებლის რუკა ---",
+  );
   sections.push(summarizeNatalCompact(input.viewerChart));
-  sections.push("\n--- პარტნიორის რუკა ---");
+  sections.push(
+    en ? "\n--- Partner's natal chart ---" : "\n--- პარტნიორის რუკა ---",
+  );
   sections.push(summarizeNatalCompact(input.partnerChart));
-  sections.push("\n--- გათვლილი ქულები ---");
+  sections.push(
+    en ? "\n--- Calculated scores ---" : "\n--- გათვლილი ქულები ---",
+  );
   sections.push(`overall: ${input.overall}`);
   for (const [cat, val] of Object.entries(input.scores)) {
     sections.push(`${cat}: ${val}`);
   }
   if (input.topAspects.length > 0) {
-    sections.push("\n--- ყველაზე ძლიერი ცროს-ასპექტები ---");
+    sections.push(
+      en
+        ? "\n--- Strongest cross-chart aspects ---"
+        : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
+    );
     for (const a of input.topAspects.slice(0, 10)) {
-      const left = PLANET_LABELS_KA[a.a] ?? a.a;
-      const right = PLANET_LABELS_KA[a.b] ?? a.b;
+      const left = en ? a.a : (PLANET_LABELS_KA[a.a] ?? a.a);
+      const right = en ? a.b : (PLANET_LABELS_KA[a.b] ?? a.b);
       sections.push(
-        `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`
+        en
+          ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right} — orb ${a.orb.toFixed(1)}°`
+          : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`,
       );
     }
   }
-  sections.push("\nდაწერე სრული, ღრმა ანგარიში. JSON-ად დააბრუნე.");
+  sections.push(
+    en
+      ? "\nWrite the complete in-depth report and return JSON."
+      : "\nდაწერე სრული, ღრმა ანგარიში. JSON-ად დააბრუნე.",
+  );
 
   const res = await fetch(OPENROUTER_URL, {
     method: "POST",
@@ -727,7 +817,12 @@ export async function generateSynastryDeepReport(input: {
     body: JSON.stringify({
       model: DEFAULT_MODEL,
       messages: [
-        { role: "system", content: SYNASTRY_DEEP_SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: en
+            ? SYNASTRY_DEEP_SYSTEM_PROMPT_EN
+            : SYNASTRY_DEEP_SYSTEM_PROMPT,
+        },
         { role: "user", content: sections.join("\n") },
       ],
       response_format: { type: "json_object" },
@@ -749,7 +844,9 @@ export async function generateSynastryDeepReport(input: {
     .replace(/\s*```$/, "")
     .trim();
 
-  const parsed = JSON.parse(stripped) as import("@/db/schema").SynastryDeepReportJson;
+  const parsed = JSON.parse(
+    stripped,
+  ) as import("@/db/schema").SynastryDeepReportJson;
   if (!parsed.intro || !parsed.love) {
     throw new Error("Synastry deep report missing required fields");
   }
@@ -834,7 +931,7 @@ const PLANET_LABELS_KA: Record<string, string> = {
 
 export type WeeklyDayPromptInput = {
   dateIso: string;
-  promptLabel: string;       // "ორშაბათი, 5 მაისი"
+  promptLabel: string; // "ორშაბათი, 5 მაისი"
   moonSignKa: string;
   harmonyScore: number;
   challengeScore: number;
@@ -865,7 +962,7 @@ export async function generateWeeklyForecast(input: {
     sections.push(
       `\n${day.promptLabel} · dateIso=${day.dateIso}` +
         ` · მთვარე ${day.moonSignKa}` +
-        ` · harmonyScore=${day.harmonyScore} · challengeScore=${day.challengeScore}`
+        ` · harmonyScore=${day.harmonyScore} · challengeScore=${day.challengeScore}`,
     );
     if (day.drivers.length === 0) {
       sections.push("  drivers: (no tight aspects)");
@@ -876,15 +973,15 @@ export async function generateWeeklyForecast(input: {
       const t = PLANET_LABELS_KA[d.transit] ?? d.transit;
       const n = PLANET_LABELS_KA[d.natal] ?? d.natal;
       sections.push(
-        `    ${d.family}: transit ${t} ${d.kind} natal ${n} (orb ${d.orb.toFixed(1)}°)`
+        `    ${d.family}: transit ${t} ${d.kind} natal ${n} (orb ${d.orb.toFixed(1)}°)`,
       );
     }
   }
 
   sections.push(
-    "\nდააწერე ყოველდღე — JSON ერთი ობიექტი, "
-      + "გასაღები 'days', მასივი ზუსტად 7 ელემენტით input-ის თანმიმდევრობით. "
-      + "dateIso ზუსტად დატოვე ისე, როგორც გადმოგცეთ."
+    "\nდააწერე ყოველდღე — JSON ერთი ობიექტი, " +
+      "გასაღები 'days', მასივი ზუსტად 7 ელემენტით input-ის თანმიმდევრობით. " +
+      "dateIso ზუსტად დატოვე ისე, როგორც გადმოგცეთ.",
   );
 
   const userMessage = sections.join("\n");
@@ -935,7 +1032,7 @@ export async function generateWeeklyForecast(input: {
     return parsed;
   } catch (err) {
     throw new Error(
-      `Weekly forecast invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`
+      `Weekly forecast invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`,
     );
   }
 }
@@ -957,11 +1054,24 @@ function summarizeNatalCompact(chart: NatalChartJson): string {
   const lines: string[] = [];
   const asc = signByIndex(chart.ascendant.signIndex);
   lines.push(`Ascendant: ${asc.labelEn}`);
-  for (const key of ["sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto"]) {
+  for (const key of [
+    "sun",
+    "moon",
+    "mercury",
+    "venus",
+    "mars",
+    "jupiter",
+    "saturn",
+    "uranus",
+    "neptune",
+    "pluto",
+  ]) {
     const body = chart.bodies[key];
     if (!body) continue;
     const sign = signByIndex(body.signIndex);
-    lines.push(`${PLANET_LABELS_EN[key] ?? key}: ${sign.labelEn}${body.house ? ` (h${body.house})` : ""}${body.retrograde ? " R" : ""}`);
+    lines.push(
+      `${PLANET_LABELS_EN[key] ?? key}: ${sign.labelEn}${body.house ? ` (h${body.house})` : ""}${body.retrograde ? " R" : ""}`,
+    );
   }
   return lines.join("\n");
 }
@@ -977,7 +1087,7 @@ function aspectLine(a: CrossAspect): string {
 export type DailyDayContext = {
   /** Localized date label, e.g. "ხუთშაბათი, 4 მაისი 2026". */
   localizedDate: string;
-  weekday: string;          // Georgian weekday name, also embedded in localizedDate
+  weekday: string; // Georgian weekday name, also embedded in localizedDate
   /** Today's transiting Moon position. */
   moon: {
     signEn: string;
@@ -1025,11 +1135,12 @@ export async function generateDailyReading(input: {
       ctx.moon.natalHouse
         ? `, transiting natal house ${ctx.moon.natalHouse}`
         : ""
-    }.`
+    }.`,
   );
   if (ctx.moon.aspectsToNatal.length) {
     sections.push("Moon aspects to natal (today only):");
-    for (const a of ctx.moon.aspectsToNatal) sections.push(`  ${aspectLine(a)}`);
+    for (const a of ctx.moon.aspectsToNatal)
+      sections.push(`  ${aspectLine(a)}`);
   } else {
     sections.push("(No tight Moon-natal aspects today.)");
   }
@@ -1037,15 +1148,13 @@ export async function generateDailyReading(input: {
   sections.push("\n--- ამ კვირის ფონი (Sun + inner planets) ---");
   sections.push(
     `Today's Sun is in ${ctx.sun.signEn}${
-      ctx.sun.natalHouse
-        ? `, transiting natal house ${ctx.sun.natalHouse}`
-        : ""
-    }.`
+      ctx.sun.natalHouse ? `, transiting natal house ${ctx.sun.natalHouse}` : ""
+    }.`,
   );
   for (const p of ctx.innerPlanets) {
     const planet = PLANET_LABELS_EN[p.key];
     sections.push(
-      `${planet} in ${p.signEn}${p.natalHouse ? `, natal house ${p.natalHouse}` : ""}${p.retrograde ? " (Retrograde)" : ""}.`
+      `${planet} in ${p.signEn}${p.natalHouse ? `, natal house ${p.natalHouse}` : ""}${p.retrograde ? " (Retrograde)" : ""}.`,
     );
   }
   if (ctx.innerAspects.length) {
@@ -1057,7 +1166,7 @@ export async function generateDailyReading(input: {
   sections.push("\n--- გრძელვადიანი ფონი (outer planet aspects) ---");
   if (ctx.outerAspects.length) {
     sections.push(
-      "(These are background only — true for weeks/months. Do NOT headline them.)"
+      "(These are background only — true for weeks/months. Do NOT headline them.)",
     );
     for (const a of ctx.outerAspects.slice(0, 3))
       sections.push(`  ${aspectLine(a)}`);
@@ -1066,7 +1175,7 @@ export async function generateDailyReading(input: {
   }
 
   sections.push(
-    "\nდააწერე დღევანდელი ჰოროსკოპი, მთვარით ლიდერობით. JSON-ად დააბრუნე."
+    "\nდააწერე დღევანდელი ჰოროსკოპი, მთვარით ლიდერობით. JSON-ად დააბრუნე.",
   );
 
   const userMessage = sections.join("\n");
@@ -1119,7 +1228,7 @@ export async function generateDailyReading(input: {
     };
   } catch (err) {
     throw new Error(
-      `Daily reading invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`
+      `Daily reading invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`,
     );
   }
 }
@@ -1140,11 +1249,14 @@ export const SIGN_HOROSCOPE_PROMPT_VERSION = 1;
 
 export type SignHoroscopePeriodLabel = "day" | "week" | "month";
 
-const PERIOD_KA: Record<SignHoroscopePeriodLabel, {
-  label: string;
-  bodyShape: string;
-  headlineHint: string;
-}> = {
+const PERIOD_KA: Record<
+  SignHoroscopePeriodLabel,
+  {
+    label: string;
+    bodyShape: string;
+    headlineHint: string;
+  }
+> = {
   day: {
     label: "დღევანდელი",
     bodyShape:
@@ -1156,15 +1268,13 @@ const PERIOD_KA: Record<SignHoroscopePeriodLabel, {
     label: "ამ კვირის",
     bodyShape:
       "150-200 სიტყვა, 3 აბზაცი (\\n\\n): კვირის მთავარი თემა (შიდა პლანეტების კონფიგურაცია), რა შესაძლებლობებს ხსნის ნიშნისთვის, რა გამოწვევები მოდის და როგორ ვუპასუხო. ხაზგასმა კონკრეტულ დღეებზე როცა შესაძლებელია (მაგ. 'შუა კვირაში').",
-    headlineHint:
-      "40-60 სიმბოლო, ამ კვირის გასაღები მოვლენა ან ენერგია",
+    headlineHint: "40-60 სიმბოლო, ამ კვირის გასაღები მოვლენა ან ენერგია",
   },
   month: {
     label: "ამ თვის",
     bodyShape:
       "180-230 სიტყვა, 3-4 აბზაცი (\\n\\n): თვის ფონი (მზე + გარე პლანეტები), რა ციკლი იხსნება ან იხურება ნიშნისთვის, რომელ სფეროზე ფოკუსირება ღირს (კარიერა/ურთიერთობები/ფული/ჯანმრთელობა), თვის რჩევა.",
-    headlineHint:
-      "40-60 სიმბოლო, თვის გასაღები ცვლილება ან თემა",
+    headlineHint: "40-60 სიმბოლო, თვის გასაღები ცვლილება ან თემა",
   },
 };
 
@@ -1234,16 +1344,17 @@ export type SignHoroscopeInput = {
  * so callers can fall back gracefully (e.g., emit evergreen placeholder).
  */
 export async function generateSignHoroscope(
-  input: SignHoroscopeInput
+  input: SignHoroscopeInput,
 ): Promise<SignHoroscopeResult | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
   const periodCfg = PERIOD_KA[input.period];
 
-  const systemPrompt = SIGN_HOROSCOPE_SYSTEM_PROMPT
-    .replace("PERIOD_HEADLINE_HINT", periodCfg.headlineHint)
-    .replace("PERIOD_BODY_SHAPE", periodCfg.bodyShape);
+  const systemPrompt = SIGN_HOROSCOPE_SYSTEM_PROMPT.replace(
+    "PERIOD_HEADLINE_HINT",
+    periodCfg.headlineHint,
+  ).replace("PERIOD_BODY_SHAPE", periodCfg.bodyShape);
 
   const transitLines = input.transits.map((t) => {
     const retro = t.retrograde ? " (რეტროგრადი)" : "";
@@ -1312,7 +1423,7 @@ export async function generateSignHoroscope(
     };
   } catch (err) {
     throw new Error(
-      `Sign horoscope invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`
+      `Sign horoscope invalid JSON: ${(err as Error).message}\n--- raw ---\n${raw.slice(0, 500)}`,
     );
   }
 }
@@ -1429,20 +1540,24 @@ export async function generateSignRanking(input: {
   const valid = new Set(input.signs.map((s) => s.slug));
   const items = (Array.isArray(parsed.items) ? parsed.items : [])
     .filter((it) => it && valid.has(it.slug) && typeof it.blurb === "string")
-    .map((it) => ({ slug: it.slug, rank: Number(it.rank) || 0, blurb: it.blurb }));
+    .map((it) => ({
+      slug: it.slug,
+      rank: Number(it.rank) || 0,
+      blurb: it.blurb,
+    }));
 
   // Dedupe by slug (keep first), then ensure all 12 present and re-rank 1..n
   // by the model's order so the page never shows gaps or duplicates.
   const seen = new Set<string>();
   const deduped = items.filter((it) =>
-    seen.has(it.slug) ? false : (seen.add(it.slug), true)
+    seen.has(it.slug) ? false : (seen.add(it.slug), true),
   );
   deduped.sort((a, b) => a.rank - b.rank);
   const ranked = deduped.map((it, i) => ({ ...it, rank: i + 1 }));
 
   if (ranked.length < input.signs.length || !parsed.headline || !parsed.intro) {
     throw new Error(
-      `Sign ranking incomplete (${ranked.length}/${input.signs.length})\n--- raw ---\n${raw.slice(0, 500)}`
+      `Sign ranking incomplete (${ranked.length}/${input.signs.length})\n--- raw ---\n${raw.slice(0, 500)}`,
     );
   }
 
@@ -1482,7 +1597,7 @@ async function openrouterJson<T>(
   system: string,
   user: string,
   title: string,
-  maxTokens = 4500
+  maxTokens = 4500,
 ): Promise<T | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
@@ -1572,7 +1687,7 @@ export async function generateChineseZodiac(input: {
     CHINESE_SYSTEM,
     user,
     "Vivida chinese zodiac",
-    5000
+    5000,
   );
   if (!parsed) return null;
   if (!parsed.pageTitle || !parsed.metaDescription || !parsed.intro) {
@@ -1585,11 +1700,18 @@ export async function generateChineseZodiac(input: {
     headline: parsed.headline ?? "",
     intro: parsed.intro,
     personality: parsed.personality ?? "",
-    strengths: Array.isArray(parsed.strengths) ? parsed.strengths.slice(0, 6) : [],
-    weaknesses: Array.isArray(parsed.weaknesses) ? parsed.weaknesses.slice(0, 5) : [],
+    strengths: Array.isArray(parsed.strengths)
+      ? parsed.strengths.slice(0, 6)
+      : [],
+    weaknesses: Array.isArray(parsed.weaknesses)
+      ? parsed.weaknesses.slice(0, 5)
+      : [],
     love: parsed.love ?? "",
     career: parsed.career ?? "",
-    compatibility: (Array.isArray(parsed.compatibility) ? parsed.compatibility : [])
+    compatibility: (Array.isArray(parsed.compatibility)
+      ? parsed.compatibility
+      : []
+    )
       .filter((c) => c && valid.has(c.slug))
       .slice(0, 6),
     faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 5) : [],
@@ -1615,7 +1737,7 @@ export async function generateChineseZodiacHub(input: {
     system,
     user,
     "Vivida chinese zodiac hub",
-    3000
+    3000,
   );
   if (!parsed) return null;
   if (!parsed.title || !parsed.metaDescription || !parsed.intro) {
@@ -1685,7 +1807,7 @@ export async function generateTarotReading(input: {
   const cardLines = input.cards
     .map(
       (c, i) =>
-        `${i + 1}. ${c.position} — ${c.name} (${c.orientation}): ${c.meaning}`
+        `${i + 1}. ${c.position} — ${c.name} (${c.orientation}): ${c.meaning}`,
     )
     .join("\n");
   const en = input.locale === "en";
@@ -1763,7 +1885,7 @@ export type ChatMessage = {
  */
 export async function* streamChatCompletion(
   messages: ChatMessage[],
-  opts: { maxTokens?: number; temperature?: number } = {}
+  opts: { maxTokens?: number; temperature?: number } = {},
 ): AsyncGenerator<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY is not configured");

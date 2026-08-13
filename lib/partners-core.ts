@@ -16,8 +16,10 @@ import {
   isOpenRouterConfigured,
   OPENROUTER_MODEL,
   SYNASTRY_DEEP_PROMPT_VERSION,
+  SYNASTRY_PROMPT_VERSION,
 } from "@/lib/openrouter";
 import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
+import type { UserLocale } from "@/lib/i18n/locale";
 
 /**
  * Framework-agnostic synastry-partner logic, shared by the website (Server
@@ -56,7 +58,7 @@ function startOfCurrentMonth(): Date {
  * too so the cap is non-gameable.
  */
 export async function partnerCreationsThisMonth(
-  userId: string
+  userId: string,
 ): Promise<number> {
   const since = startOfCurrentMonth();
   const [row] = await db
@@ -76,7 +78,7 @@ export async function listPartners(userId: string): Promise<Partner[]> {
 
 export async function getPartnerForViewer(
   partnerId: string,
-  userId: string
+  userId: string,
 ): Promise<Partner | null> {
   const [row] = await db
     .select()
@@ -85,8 +87,8 @@ export async function getPartnerForViewer(
       and(
         eq(partners.id, partnerId),
         eq(partners.userId, userId),
-        isNull(partners.deletedAt)
-      )
+        isNull(partners.deletedAt),
+      ),
     )
     .limit(1);
   return row ?? null;
@@ -99,22 +101,39 @@ export async function getPartnerForViewer(
  */
 export async function createPartnerCore(
   userId: string,
-  input: CreatePartnerInput
+  input: CreatePartnerInput,
+  locale: UserLocale = "ka",
 ): Promise<CreatePartnerResult> {
+  const en = locale === "en";
   // Validation
   const name = input.name.trim();
-  if (!name) return { ok: false, error: "ჩაწერე პარტნიორის სახელი" };
+  if (!name)
+    return {
+      ok: false,
+      error: en ? "Enter your partner's name" : "ჩაწერე პარტნიორის სახელი",
+    };
   if (name.length > NAME_MAX) {
-    return { ok: false, error: `სახელი მაქს. ${NAME_MAX} სიმბოლო` };
+    return {
+      ok: false,
+      error: en
+        ? `Name can contain up to ${NAME_MAX} characters`
+        : `სახელი მაქს. ${NAME_MAX} სიმბოლო`,
+    };
   }
   if (!DATE_RE.test(input.dateOfBirth)) {
-    return { ok: false, error: "დაბადების თარიღი არასწორია" };
+    return {
+      ok: false,
+      error: en ? "Birth date is invalid" : "დაბადების თარიღი არასწორია",
+    };
   }
   if (input.timeOfBirth !== null && !TIME_RE.test(input.timeOfBirth)) {
-    return { ok: false, error: "დაბადების დრო არასწორია" };
+    return {
+      ok: false,
+      error: en ? "Birth time is invalid" : "დაბადების დრო არასწორია",
+    };
   }
   if (!input.cityName.trim()) {
-    return { ok: false, error: "აირჩიე ქალაქი" };
+    return { ok: false, error: en ? "Choose a city" : "აირჩიე ქალაქი" };
   }
   if (
     Number.isNaN(input.latitude) ||
@@ -122,15 +141,26 @@ export async function createPartnerCore(
     Math.abs(input.latitude) > 90 ||
     Math.abs(input.longitude) > 180
   ) {
-    return { ok: false, error: "კოორდინატები არასწორია" };
+    return {
+      ok: false,
+      error: en ? "Location coordinates are invalid" : "კოორდინატები არასწორია",
+    };
   }
   if (!input.timezone.trim()) {
-    return { ok: false, error: "მიუთითე დროის სარტყელი" };
+    return {
+      ok: false,
+      error: en ? "Choose a time zone" : "მიუთითე დროის სარტყელი",
+    };
   }
   const year = Number(input.dateOfBirth.slice(0, 4));
   const currentYear = new Date().getUTCFullYear();
   if (year < 1900 || year > currentYear) {
-    return { ok: false, error: "დაბადების წელი უნდა იყოს 1900-დან დღემდე" };
+    return {
+      ok: false,
+      error: en
+        ? "Birth year must be between 1900 and today"
+        : "დაბადების წელი უნდა იყოს 1900-დან დღემდე",
+    };
   }
 
   // Cap enforcement — atomic-enough for a single user.
@@ -139,7 +169,9 @@ export async function createPartnerCore(
   if (used >= cap) {
     return {
       ok: false,
-      error: `ამ თვეში ${cap} პარტნიორი უკვე დაამატე. შემდეგი თვიდან ისევ შეგიძლია.`,
+      error: en
+        ? `You have already added ${cap} partners this month. You can add more next month.`
+        : `ამ თვეში ${cap} პარტნიორი უკვე დაამატე. შემდეგი თვიდან ისევ შეგიძლია.`,
     };
   }
 
@@ -171,7 +203,11 @@ export async function createPartnerCore(
     })
     .returning({ id: partners.id });
 
-  if (!inserted) return { ok: false, error: "შენახვა ვერ მოხერხდა" };
+  if (!inserted)
+    return {
+      ok: false,
+      error: en ? "Could not save this partner" : "შენახვა ვერ მოხერხდა",
+    };
 
   return { ok: true, id: inserted.id };
 }
@@ -182,7 +218,7 @@ export async function createPartnerCore(
  */
 export async function softDeletePartnerCore(
   userId: string,
-  partnerId: string
+  partnerId: string,
 ): Promise<{ ok: true }> {
   await db
     .update(partners)
@@ -191,8 +227,8 @@ export async function softDeletePartnerCore(
       and(
         eq(partners.id, partnerId),
         eq(partners.userId, userId),
-        isNull(partners.deletedAt)
-      )
+        isNull(partners.deletedAt),
+      ),
     );
   return { ok: true };
 }
@@ -204,7 +240,8 @@ export async function softDeletePartnerCore(
  * (or the input partner) on any error, never throws.
  */
 export async function ensureSynastryInterpretation(
-  partner: Partner
+  partner: Partner,
+  locale: UserLocale = "ka",
 ): Promise<Partner> {
   if (!isOpenRouterConfigured()) return partner;
 
@@ -212,10 +249,8 @@ export async function ensureSynastryInterpretation(
   if (!viewerChart) return partner;
 
   // Cache hit?
-  if (
-    partner.aiInterpretation &&
-    partner.aiViewerHash === viewerChart.inputHash
-  ) {
+  const stamp = `${viewerChart.inputHash}:${locale}:v${SYNASTRY_PROMPT_VERSION}`;
+  if (partner.aiInterpretation && partner.aiViewerHash === stamp) {
     return partner;
   }
 
@@ -245,11 +280,12 @@ export async function ensureSynastryInterpretation(
         kind: a.kind,
         orb: a.orb,
       })),
+      locale,
     });
   } catch (err) {
     console.warn(
       "[partners] AI synastry generation failed:",
-      (err as Error).message
+      (err as Error).message,
     );
     return partner;
   }
@@ -260,7 +296,7 @@ export async function ensureSynastryInterpretation(
     .update(partners)
     .set({
       aiInterpretation: interp,
-      aiViewerHash: viewerChart.inputHash,
+      aiViewerHash: stamp,
       aiModel: OPENROUTER_MODEL,
       aiGeneratedAt: new Date(),
     })
@@ -276,14 +312,15 @@ export async function ensureSynastryInterpretation(
  * invalidated when the viewer's chart or the prompt version changes. Fails soft.
  */
 export async function ensureSynastryDeepReport(
-  partner: Partner
+  partner: Partner,
+  locale: UserLocale = "ka",
 ): Promise<Partner> {
   if (!isOpenRouterConfigured()) return partner;
 
   const viewerChart = await ensureChartFor(partner.userId);
   if (!viewerChart) return partner;
 
-  const stamp = `${viewerChart.inputHash}:v${SYNASTRY_DEEP_PROMPT_VERSION}`;
+  const stamp = `${viewerChart.inputHash}:${locale}:v${SYNASTRY_DEEP_PROMPT_VERSION}`;
   if (partner.deepReport && partner.deepViewerHash === stamp) return partner;
 
   const synastry = computeSynastry(viewerChart.data, partner.chart);
@@ -309,11 +346,12 @@ export async function ensureSynastryDeepReport(
         kind: a.kind,
         orb: a.orb,
       })),
+      locale,
     });
   } catch (err) {
     console.warn(
       "[partners] AI synastry deep report failed:",
-      (err as Error).message
+      (err as Error).message,
     );
     return partner;
   }
