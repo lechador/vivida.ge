@@ -25,7 +25,13 @@ export async function ReportPdfPanel({
   const [report] = await db
     .select()
     .from(pdfReports)
-    .where(and(eq(pdfReports.userId, userId), eq(pdfReports.type, "natal")))
+    .where(
+      and(
+        eq(pdfReports.userId, userId),
+        eq(pdfReports.type, "natal"),
+        eq(pdfReports.language, locale),
+      ),
+    )
     .orderBy(desc(pdfReports.createdAt))
     .limit(1);
 

@@ -10,7 +10,8 @@ import { FriendRequestEmail } from "@/lib/email-templates/friend-request";
 import { MessageEmail } from "@/lib/email-templates/message";
 import { MbtiResultEmail } from "@/lib/email-templates/mbti-result";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
-import { isEnglishHost } from "@/lib/seo/locales";
+import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { ENGLISH_SITE_URL, isEnglishHost } from "@/lib/seo/locales";
 
 /**
  * Resend client. Lazily-instantiated so dev environments without the API
@@ -50,6 +51,10 @@ export function isEmailConfigured(): boolean {
  */
 function absUrl(path: string, origin: string = ORIGIN): string {
   return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+function originForLocale(locale: "ka" | "en"): string {
+  return locale === "en" ? ENGLISH_SITE_URL : ORIGIN;
 }
 
 function localeForOrigin(origin: string | undefined): "ka" | "en" {
@@ -263,10 +268,12 @@ export async function sendWelcomeEmail({
   userId,
   to,
   name,
+  locale = "ka",
 }: {
   userId: string;
   to: string;
   name: string | null;
+  locale?: "ka" | "en";
 }): Promise<void> {
   const c = client();
   if (!c) {
@@ -275,17 +282,21 @@ export async function sendWelcomeEmail({
   }
   if (await hasSentBefore(userId, "welcome")) return;
 
-  const dashboardUrl = absUrl("/dashboard");
+  const dashboardUrl = absUrl("/dashboard", originForLocale(locale));
+  const subject = locale === "en"
+    ? "Your cosmic journey begins · Vivida"
+    : "შენი კოსმიური მოგზაურობა იწყება · Vivida";
 
   try {
     const result = await c.emails.send(
       {
         from: FROM,
         to,
-        subject: "შენი კოსმიური მოგზაურობა იწყება · Vivida",
+        subject,
         react: WelcomeEmail({
           name,
           dashboardUrl,
+          locale,
         }),
       },
       { idempotencyKey: `welcome:${userId}` }
@@ -296,7 +307,7 @@ export async function sendWelcomeEmail({
     }
     await recordSent(userId, "welcome", {
       email: to,
-      subject: "შენი კოსმიური მოგზაურობა იწყება · Vivida",
+      subject,
     });
   } catch (err) {
     console.error("[email] welcome threw:", (err as Error).message);
@@ -393,6 +404,7 @@ export async function sendWelcomeIfEligible(userId: string): Promise<void> {
       emailVerified: users.emailVerified,
       passwordHash: users.passwordHash,
       hasProfile: profiles.userId,
+      locale: users.interfaceLanguage,
     })
     .from(users)
     .leftJoin(profiles, eq(profiles.userId, users.id))
@@ -402,7 +414,12 @@ export async function sendWelcomeIfEligible(userId: string): Promise<void> {
   if (!row?.email || !row.hasProfile) return;
   const emailProven = row.emailVerified !== null || row.passwordHash === null;
   if (!emailProven) return;
-  await sendWelcomeEmail({ userId, to: row.email, name: row.name });
+  await sendWelcomeEmail({
+    userId,
+    to: row.email,
+    name: row.name,
+    locale: normalizeUserLocale(row.locale),
+  });
 }
 
 /**
@@ -427,6 +444,7 @@ export async function sendFriendRequestEmail({
       email: users.email,
       name: users.name,
       emailNudges: users.emailNudges,
+      locale: users.interfaceLanguage,
     })
     .from(users)
     .where(eq(users.id, recipientUserId))
@@ -445,21 +463,27 @@ export async function sendFriendRequestEmail({
   }
 
   const token = await getOrCreateUnsubscribeToken(recipientUserId);
-  const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`);
-  const friendsUrl = absUrl("/friends");
+  const locale = normalizeUserLocale(recipient.locale);
+  const origin = originForLocale(locale);
+  const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`, origin);
+  const friendsUrl = absUrl("/friends", origin);
+  const subject = locale === "en"
+    ? `${fromName} sent you a friend request · Vivida`
+    : `${fromName}-მ მეგობრობა გთხოვა · Vivida`;
 
   try {
     const result = await c.emails.send(
       {
         from: FROM,
         to: recipient.email,
-        subject: `${fromName}-მ მეგობრობა გთხოვა · Vivida`,
+        subject,
         react: FriendRequestEmail({
           recipientName: recipient.name?.split(" ")[0] ?? null,
           fromName,
           fromUsername,
           friendsUrl,
           unsubscribeUrl: unsubUrl,
+          locale,
         }),
         headers: {
           "List-Unsubscribe": `<${unsubUrl}>`,
@@ -480,7 +504,7 @@ export async function sendFriendRequestEmail({
     }
     await recordSent(recipientUserId, "friend_request", {
       email: recipient.email,
-      subject: `${fromName}-მ მეგობრობა გთხოვა · Vivida`,
+      subject,
     });
   } catch (err) {
     console.error("[email] friend-request threw:", (err as Error).message);
@@ -510,6 +534,7 @@ export async function sendMessageEmail({
       email: users.email,
       name: users.name,
       emailNudges: users.emailNudges,
+      locale: users.interfaceLanguage,
     })
     .from(users)
     .where(eq(users.id, recipientUserId))
@@ -532,11 +557,17 @@ export async function sendMessageEmail({
     .limit(1);
 
   const token = await getOrCreateUnsubscribeToken(recipientUserId);
-  const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`);
+  const locale = normalizeUserLocale(recipient.locale);
+  const origin = originForLocale(locale);
+  const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`, origin);
   // The chat page reads `?with=<partnerId>` — see components/chat/message-button.tsx.
   const conversationUrl = absUrl(
-    `/messages?with=${encodeURIComponent(fromUserId)}`
+    `/messages?with=${encodeURIComponent(fromUserId)}`,
+    origin,
   );
+  const subject = locale === "en"
+    ? `${fromName} sent you a message · Vivida`
+    : `${fromName}-მ წერილი მოგწერა · Vivida`;
 
   const snippet =
     body.length > 140 ? `${body.slice(0, 140).trimEnd()}…` : body;
@@ -546,7 +577,7 @@ export async function sendMessageEmail({
       {
         from: FROM,
         to: recipient.email,
-        subject: `${fromName}-მ წერილი მოგწერა · Vivida`,
+        subject,
         react: MessageEmail({
           recipientName: recipient.name?.split(" ")[0] ?? null,
           fromName,
@@ -554,6 +585,7 @@ export async function sendMessageEmail({
           snippet,
           conversationUrl,
           unsubscribeUrl: unsubUrl,
+          locale,
         }),
         headers: {
           "List-Unsubscribe": `<${unsubUrl}>`,
@@ -572,7 +604,7 @@ export async function sendMessageEmail({
     }
     await recordSent(recipientUserId, "message", {
       email: recipient.email,
-      subject: `${fromName}-მ წერილი მოგწერა · Vivida`,
+      subject,
     });
   } catch (err) {
     console.error("[email] message threw:", (err as Error).message);

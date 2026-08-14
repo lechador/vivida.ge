@@ -11,25 +11,29 @@ import { EmailLayout, buttonStyle, paragraphStyle } from "./_layout";
  */
 export function WinbackEmail({
   name,
-  signLineKa,
+  signLabel,
   horoscopeHeadline,
   balance,
   dashboardUrl,
   unsubscribeUrl,
+  locale = "ka",
 }: {
   name: string | null;
-  /** e.g. "ლომი" — the user's sun sign, null when birth data is missing. */
-  signLineKa: string | null;
+  /** The user's localized sun-sign label, null when birth data is missing. */
+  signLabel: string | null;
   /** Today's headline for their sign, when the cache had one. */
   horoscopeHeadline: string | null;
   balance: number;
   dashboardUrl: string;
   unsubscribeUrl: string;
+  locale?: "ka" | "en";
 }) {
+  const en = locale === "en";
   return (
     <EmailLayout
-      preview="ვარსკვლავები ისევ შენზე საუბრობენ ✨"
+      preview={en ? "The stars are still speaking to you ✨" : "ვარსკვლავები ისევ შენზე საუბრობენ ✨"}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
       <Section style={{ textAlign: "center", padding: "8px 0 4px" }}>
         <Text style={{ fontSize: "40px", lineHeight: "48px", margin: "0 0 8px" }}>
@@ -46,13 +50,14 @@ export function WinbackEmail({
             margin: "0 0 10px",
           }}
         >
-          {name ? `${name}, ` : ""}ცა შენს გარეშე არ ჩერდება
+          {name ? `${name}, ` : ""}{en ? "the sky keeps moving" : "ცა შენს გარეშე არ ჩერდება"}
         </Heading>
       </Section>
 
       <Text style={{ ...paragraphStyle, fontSize: "16px", lineHeight: "26px" }}>
-        ერთი კვირაა არ გვინახიხარ — ამასობაში კი პლანეტები ადგილს იცვლიდნენ და
-        შენი ჰოროსკოპი ყოველ დილით ახლდებოდა.
+        {en
+          ? "It has been a week since your last visit. The planets kept moving, and your personal horoscope continued to update each morning."
+          : "ერთი კვირაა არ გვინახიხარ — ამასობაში კი პლანეტები ადგილს იცვლიდნენ და შენი ჰოროსკოპი ყოველ დილით ახლდებოდა."}
       </Text>
 
       {horoscopeHeadline && (
@@ -74,7 +79,7 @@ export function WinbackEmail({
               textTransform: "uppercase",
             }}
           >
-            დღეს {signLineKa ? `${signLineKa}სთვის` : "შენთვის"}
+            {en ? `Today for ${signLabel ?? "you"}` : `დღეს ${signLabel ? `${signLabel}სთვის` : "შენთვის"}`}
           </Text>
           <Text
             style={{
@@ -92,18 +97,19 @@ export function WinbackEmail({
 
       {balance > 0 && (
         <Text style={{ ...paragraphStyle, fontSize: "15px", lineHeight: "25px" }}>
-          შენს ბალანსზე{" "}
+          {en ? "Your balance still has " : "შენს ბალანსზე "}
           <span style={{ color: "#eac358", fontWeight: 700 }}>
-            {balance} კრედიტი
+            {balance} {en ? "credits" : "კრედიტი"}
           </span>{" "}
-          გელოდება — შეგიძლია გახსნა აუდიო-ჰოროსკოპი, ღრმა თავსებადობა ან
-          7-დღიანი პროგნოზი.
+          {en
+            ? "waiting for you — use them for audio horoscopes, deep compatibility, or a seven-day forecast."
+            : "გელოდება — შეგიძლია გახსნა აუდიო-ჰოროსკოპი, ღრმა თავსებადობა ან 7-დღიანი პროგნოზი."}
         </Text>
       )}
 
       <Section style={{ textAlign: "center", padding: "10px 0 8px" }}>
         <Button href={dashboardUrl} style={buttonStyle}>
-          ნახე დღევანდელი ჰოროსკოპი
+          {en ? "Read today's horoscope" : "ნახე დღევანდელი ჰოროსკოპი"}
         </Button>
       </Section>
     </EmailLayout>

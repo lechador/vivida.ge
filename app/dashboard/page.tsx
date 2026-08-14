@@ -48,6 +48,7 @@ export default async function DashboardPage() {
         title={en ? "Your daily horoscope needs a natal chart" : "დღიური ჰოროსკოპი ნატალურ რუკას საჭიროებს"}
         description={en ? "Add your birth details to receive a personalized horoscope and sky overview every day." : "შეავსე დაბადების მონაცემები და ყოველ დღე მიიღებ პერსონალურ ჰოროსკოპსა და ცის მიმოხილვას."}
         next="/dashboard"
+        locale={locale}
       />
     );
   }
@@ -84,7 +85,7 @@ export default async function DashboardPage() {
       <AppHeader authed active="today" />
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
-        {restricted && <RestrictedNotice />}
+        {restricted && <RestrictedNotice locale={locale} />}
         <h1 className="mb-6 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
           {en ? "Hello," : "სალამი,"}{" "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
@@ -108,7 +109,7 @@ export default async function DashboardPage() {
         />
 
         {suggestedTest && (
-          <DashboardTestPromo test={suggestedTest} allCompleted={unfinished.length === 0} />
+          <DashboardTestPromo test={suggestedTest} allCompleted={unfinished.length === 0} locale={locale} />
         )}
       </section>
     </main>

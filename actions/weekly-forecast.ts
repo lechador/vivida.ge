@@ -20,13 +20,18 @@ import {
   OPENROUTER_MODEL,
 } from "@/lib/openrouter";
 import { composeWeeklyFromLibrary } from "@/lib/transit-library";
+import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Returns the user's 7-day forecast, regenerating + caching it whenever the
  * local week-start (= today, in the user's TZ) rolls forward. One row per
  * user — the forecast slides daily, no history kept.
  */
-export async function ensureWeeklyForecast(userId: string): Promise<WeeklyForecast | null> {
+export async function ensureWeeklyForecast(
+  userId: string,
+  requestedLocale?: UserLocale,
+): Promise<WeeklyForecast | null> {
+  const locale = requestedLocale ?? (await getUserLocale(userId));
   const [profile] = await db
     .select()
     .from(profiles)
@@ -52,7 +57,8 @@ export async function ensureWeeklyForecast(userId: string): Promise<WeeklyForeca
     existing &&
     existing.weekStart === weekStart &&
     existing.promptVersion === WEEKLY_PROMPT_VERSION &&
-    existing.natalInputHash === chart.inputHash
+    existing.natalInputHash === chart.inputHash &&
+    existing.language === locale
   ) {
     return existing;
   }
@@ -77,7 +83,8 @@ export async function ensureWeeklyForecast(userId: string): Promise<WeeklyForeca
         kind: dr.kind,
         family: dr.family,
       })),
-    }))
+    })),
+    locale,
   );
   let model = "library";
 
@@ -155,7 +162,7 @@ export async function ensureWeeklyForecast(userId: string): Promise<WeeklyForeca
       promptVersion: WEEKLY_PROMPT_VERSION,
       natalInputHash: chart.inputHash,
       model,
-      language: "ka",
+      language: locale,
     })
     .onConflictDoUpdate({
       target: weeklyForecasts.userId,
@@ -165,7 +172,7 @@ export async function ensureWeeklyForecast(userId: string): Promise<WeeklyForeca
         promptVersion: WEEKLY_PROMPT_VERSION,
         natalInputHash: chart.inputHash,
         model,
-        language: "ka",
+        language: locale,
       },
     })
     .returning();

@@ -23,8 +23,14 @@ import { MessageButton } from "@/components/chat/message-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "მეგობრები" };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: (await getRequestLocale()) === "en" ? "Friends" : "მეგობრები",
+  };
+}
 
 type Tab = "friends" | "compatibility" | "incoming" | "outgoing";
 
@@ -190,12 +196,17 @@ function CompatibilityTab({
     <>
       <p className="mb-4 text-xs text-muted-foreground sm:text-sm">
         {locale === "en"
-          ? "Friends are ranked by combined chart compatibility. Select someone to view the detailed Georgian interpretation."
+          ? "Friends are ranked by combined chart compatibility. Select someone to view the complete English interpretation."
           : "შენი მეგობრები დალაგებულია ცის რუკების ერთობლივი თავსებადობით. დააჭირე ვინმეს — ნახავ სრულ აღწერას."}
       </p>
       <ul className="grid gap-3">
         {ranked.map((u, i) => (
-          <CompatibilityRow key={u.id} u={u} rank={i + 1} />
+          <CompatibilityRow
+            key={u.id}
+            u={u}
+            rank={i + 1}
+            locale={locale}
+          />
         ))}
       </ul>
     </>

@@ -12,14 +12,23 @@ import {
   CATEGORY_LABEL_KA,
   overallVerdict,
 } from "@/lib/synastry";
+import { CATEGORY_LABEL_EN, overallVerdictEn } from "@/lib/synastry-en";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { SpotlightMatch } from "@/lib/discover";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ELEMENT_HEX: Record<string, string> = {
   ცეცხლი: "oklch(0.7 0.22 30)",
   მიწა: "oklch(0.65 0.13 130)",
   ჰაერი: "oklch(0.75 0.16 220)",
   წყალი: "oklch(0.6 0.2 280)",
+};
+
+const ELEMENT_EN: Record<string, string> = {
+  ცეცხლი: "Fire",
+  მიწა: "Earth",
+  ჰაერი: "Air",
+  წყალი: "Water",
 };
 
 const CATEGORY_COLOR: Record<string, string> = {
@@ -30,9 +39,18 @@ const CATEGORY_COLOR: Record<string, string> = {
   chemistry: "oklch(0.7 0.22 30)",
 };
 
-export function SpotlightCard({ match }: { match: SpotlightMatch }) {
+export function SpotlightCard({
+  match,
+  locale = "ka",
+}: {
+  match: SpotlightMatch;
+  locale?: UserLocale;
+}) {
+  const en = locale === "en";
   const { card, synastry } = match;
-  const verdict = overallVerdict(synastry.overall);
+  const verdict = en
+    ? overallVerdictEn(synastry.overall)
+    : overallVerdict(synastry.overall);
   const accent = ELEMENT_HEX[card.sunElement];
   const heroSrc = card.photoUrl ?? card.image;
 
@@ -93,7 +111,7 @@ export function SpotlightCard({ match }: { match: SpotlightMatch }) {
           <div className="flex items-center gap-2">
             <Sparkles className="size-3.5 text-[var(--vivida-pink)]" />
             <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--vivida-pink)]">
-              დღევანდელი მთავარი წყვილი
+              {en ? "Today’s top match" : "დღევანდელი მთავარი წყვილი"}
             </span>
           </div>
 
@@ -105,10 +123,12 @@ export function SpotlightCard({ match }: { match: SpotlightMatch }) {
             </h2>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground sm:text-sm">
               <span className="text-foreground/85">
-                {card.sunSign.labelKa}
+                {en ? card.sunSign.labelEn : card.sunSign.labelKa}
               </span>
               <span className="text-muted-foreground/60">·</span>
-              <span>{card.sunElement}</span>
+              <span>
+                {en ? ELEMENT_EN[card.sunElement] ?? card.sunElement : card.sunElement}
+              </span>
               <span className="text-muted-foreground/60">·</span>
               <Link
                 href={`/u/${card.username}`}
@@ -143,7 +163,7 @@ export function SpotlightCard({ match }: { match: SpotlightMatch }) {
                       <span className="text-sm leading-none">
                         {CATEGORY_EMOJI[cat]}
                       </span>
-                      {CATEGORY_LABEL_KA[cat]}
+                      {en ? CATEGORY_LABEL_EN[cat] : CATEGORY_LABEL_KA[cat]}
                     </span>
                     <span
                       className="font-semibold tabular-nums"
@@ -175,7 +195,7 @@ export function SpotlightCard({ match }: { match: SpotlightMatch }) {
           <div className="mt-1">
             <Button asChild variant="mystic" size="default">
               <Link href={`/u/${card.username}`}>
-                ნახე პროფილი
+                {en ? "View profile" : "ნახე პროფილი"}
                 <ArrowRight className="size-4" />
               </Link>
             </Button>

@@ -8,6 +8,8 @@ import { charts, profiles, users } from "@/db/schema";
 import { computeChartSalience } from "@/lib/report-salience";
 import { generateNatalReport } from "@/lib/report-content";
 import { NatalReport } from "@/components/pdf/natal-report";
+import { buildEnglishNatalReportContent } from "@/lib/report-content-pdf-en";
+import { normalizeUserLocale } from "@/lib/i18n/locale";
 
 /**
  * Admin-only PDF generation trigger. Lets us review report OUTPUT QUALITY on a
@@ -45,6 +47,7 @@ async function handle(req: Request) {
   const url = new URL(req.url);
   const username = url.searchParams.get("u");
   const debug = url.searchParams.get("debug") === "1";
+  const locale = normalizeUserLocale(url.searchParams.get("lang"));
 
   // Resolve a chart: by username, else the most recent chart on file.
   let userId: string | null = null;
@@ -80,10 +83,13 @@ async function handle(req: Request) {
 
   const firstName = user?.name?.split(" ")[0] ?? null;
 
-  // Deep, report-grade Georgian content generated specifically for the PDF
-  // (4 parallel Gemini calls) — not the shorter on-site interpretations.
+  // Georgian keeps the deep AI/library report path. English is assembled
+  // deterministically from the exact chart so no Georgian cache can leak.
   const t0 = Date.now();
-  const content = await generateNatalReport({ firstName, chart, salience });
+  const content =
+    locale === "en"
+      ? buildEnglishNatalReportContent(chart, salience, firstName)
+      : await generateNatalReport({ firstName, chart, salience });
   const genMs = Date.now() - t0;
 
   if (debug) {
@@ -117,6 +123,7 @@ async function handle(req: Request) {
         chart,
         salience,
         content,
+        locale,
       },
     })
   );

@@ -180,7 +180,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
               Compatibility with other signs
             </h2>
             <Link
-              href="/zodiac/tavsebadoba"
+              href="/compatibility"
               className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
             >
               All pairings →

@@ -65,7 +65,10 @@ export function MobileTabBar({
                 >
                   <item.Icon className="size-5" />
                   {item.key === "messages" && (
-                    <MessagesTabBadge initial={unreadMessages} />
+                    <MessagesTabBadge
+                      initial={unreadMessages}
+                      locale={locale}
+                    />
                   )}
                 </span>
                 <span className="truncate">{navLabel(item, locale)}</span>

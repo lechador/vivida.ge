@@ -3,6 +3,14 @@ import Link from "next/link";
 
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { DiscoverCard as Card } from "@/lib/discover";
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
+const ELEMENT_EN: Record<string, string> = {
+  ცეცხლი: "Fire",
+  მიწა: "Earth",
+  ჰაერი: "Air",
+  წყალი: "Water",
+};
 
 const ELEMENT_HEX: Record<string, string> = {
   ცეცხლი: "oklch(0.7 0.22 30)",
@@ -11,7 +19,14 @@ const ELEMENT_HEX: Record<string, string> = {
   წყალი: "oklch(0.6 0.2 280)",
 };
 
-export function DiscoverCard({ card }: { card: Card }) {
+export function DiscoverCard({
+  card,
+  locale = "ka",
+}: {
+  card: Card;
+  locale?: UserLocale;
+}) {
+  const en = locale === "en";
   const accent = ELEMENT_HEX[card.sunElement];
   const heroSrc = card.photoUrl ?? card.image;
 
@@ -58,9 +73,13 @@ export function DiscoverCard({ card }: { card: Card }) {
           {card.displayName}
         </div>
         <div className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
-          <span className="text-foreground/85">{card.sunSign.labelKa}</span>
+          <span className="text-foreground/85">
+            {en ? card.sunSign.labelEn : card.sunSign.labelKa}
+          </span>
           <span className="text-muted-foreground/60">·</span>
-          <span>{card.sunElement}</span>
+          <span>
+            {en ? ELEMENT_EN[card.sunElement] ?? card.sunElement : card.sunElement}
+          </span>
         </div>
         {card.bio && (
           <div className="mt-0.5 truncate text-xs text-foreground/65">

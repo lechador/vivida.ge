@@ -26,6 +26,7 @@ import {
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { COMMENT_BODY_MAX } from "@/lib/feed-config";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 import { MentionInput } from "./mention-input";
 import { MentionText } from "./mention-text";
@@ -49,6 +50,7 @@ export function CommentSection({
   viewerIsAdmin,
   postAuthorId,
   open,
+  locale = "ka",
 }: {
   postId: string;
   viewerId: string;
@@ -58,7 +60,9 @@ export function CommentSection({
   /** Controlled open state — parent decides when the panel renders.
    *  Rendering returns null when `false`. */
   open: boolean;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [comments, setComments] = useState<FeedComment[] | null>(null);
   const [body, setBody] = useState("");
   const [replyParentId, setReplyParentId] = useState<string | null>(null);
@@ -124,7 +128,7 @@ export function CommentSection({
     startTransition(async () => {
       const res = await addComment(postId, trimmed);
       if (!res.ok) {
-        setError(res.error);
+        setError(en ? "Could not add the comment. Please try again." : res.error);
         return;
       }
       setBody("");
@@ -140,7 +144,7 @@ export function CommentSection({
     startTransition(async () => {
       const res = await addComment(postId, trimmed, replyParentId);
       if (!res.ok) {
-        setError(res.error);
+        setError(en ? "Could not add the reply. Please try again." : res.error);
         return;
       }
       setReplyBody("");
@@ -154,7 +158,7 @@ export function CommentSection({
     startTransition(async () => {
       const res = await deleteComment(commentId);
       if (!res.ok) {
-        setError(res.error);
+        setError(en ? "Could not delete the comment. Please try again." : res.error);
         return;
       }
       await refreshComments();
@@ -195,6 +199,7 @@ export function CommentSection({
                         setReplyParentId(c.id);
                         setReplyBody("");
                       }}
+                      locale={locale}
                     />
 
                     {(replies.length > 0 || replyParentId === c.id) && (
@@ -209,6 +214,7 @@ export function CommentSection({
                             isReply
                             isPending={isPending}
                             onDelete={removeComment}
+                            locale={locale}
                           />
                         ))}
 
@@ -224,6 +230,7 @@ export function CommentSection({
                             }}
                             isPending={isPending}
                             error={error}
+                            locale={locale}
                           />
                         )}
                       </div>
@@ -236,7 +243,7 @@ export function CommentSection({
 
           {comments && comments.length === 0 && !loading && (
             <p className="px-1 text-xs text-muted-foreground/80">
-              ჯერ კომენტარი არ არის — დაიწყე საუბარი.
+              {en ? "No comments yet—start the conversation." : "ჯერ კომენტარი არ არის — დაიწყე საუბარი."}
             </p>
           )}
 
@@ -246,10 +253,11 @@ export function CommentSection({
               textareaRef={textareaRef}
               value={body}
               onChange={setBody}
+              locale={locale}
               onKeyDown={(e) => {
                 if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit();
               }}
-              placeholder="დაწერე კომენტარი..."
+              placeholder={en ? "Write a comment…" : "დაწერე კომენტარი..."}
               rows={2}
               maxLength={COMMENT_BODY_MAX + 20}
               className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
@@ -283,7 +291,7 @@ export function CommentSection({
                   ) : (
                     <Send className="size-3" />
                   )}
-                  დამატება
+                  {en ? "Add" : "დამატება"}
                 </button>
               </div>
             </div>
@@ -305,6 +313,7 @@ function CommentRow({
   isPending,
   onDelete,
   onReply,
+  locale,
 }: {
   comment: FeedComment;
   viewerId: string;
@@ -314,7 +323,9 @@ function CommentRow({
   isPending: boolean;
   onDelete: (commentId: string) => void;
   onReply?: () => void;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const canDelete =
     comment.author.id === viewerId ||
     postAuthorId === viewerId ||
@@ -323,7 +334,7 @@ function CommentRow({
     comment.author.displayName ??
     comment.author.name?.split(" ")[0] ??
     comment.author.username ??
-    "ვარსკვლავო";
+    (en ? "Stargazer" : "ვარსკვლავო");
   const profileHref = comment.author.username
     ? `/u/${comment.author.username}`
     : null;
@@ -369,7 +380,7 @@ function CommentRow({
               </span>
             )}
             <span className="shrink-0 text-[10px] text-muted-foreground">
-              {feedTimeAgo(comment.createdAt)}
+              {feedTimeAgo(comment.createdAt, locale)}
             </span>
           </div>
           <p className="mt-0.5 whitespace-pre-wrap break-words text-[14px] leading-relaxed text-foreground/90">
@@ -389,7 +400,7 @@ function CommentRow({
                 className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
               >
                 <Reply className="size-3" />
-                უპასუხე
+                {en ? "Reply" : "უპასუხე"}
               </button>
             )}
             {canDelete && (
@@ -397,11 +408,11 @@ function CommentRow({
                 type="button"
                 onClick={() => onDelete(comment.id)}
                 disabled={isPending}
-                aria-label="წაშლა"
+                aria-label={en ? "Delete" : "წაშლა"}
                 className="inline-flex items-center gap-1 transition-colors hover:text-[var(--vivida-pink)]"
               >
                 <Trash2 className="size-3" />
-                წაშლა
+                {en ? "Delete" : "წაშლა"}
               </button>
             )}
           </div>
@@ -431,9 +442,12 @@ function ReplyComposer({
   onCancel,
   isPending,
   error,
+  locale,
 }: ReplyComposerProps & {
   ref: React.RefObject<HTMLTextAreaElement | null>;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const remaining = COMMENT_BODY_MAX - value.length;
   const overflow = remaining < 0;
   const disabled = isPending || value.trim().length === 0 || overflow;
@@ -444,11 +458,12 @@ function ReplyComposer({
         textareaRef={ref}
         value={value}
         onChange={onChange}
+        locale={locale}
         onKeyDown={(e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "Enter") onSubmit();
           if (e.key === "Escape") onCancel();
         }}
-        placeholder="დაწერე პასუხი..."
+        placeholder={en ? "Write a reply…" : "დაწერე პასუხი..."}
         rows={2}
         maxLength={COMMENT_BODY_MAX + 20}
         className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
@@ -477,7 +492,7 @@ function ReplyComposer({
             disabled={isPending}
             className="text-[11px] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
           >
-            გაუქმება
+            {en ? "Cancel" : "გაუქმება"}
           </button>
           <button
             type="button"
@@ -490,7 +505,7 @@ function ReplyComposer({
             ) : (
               <Send className="size-3" />
             )}
-            პასუხი
+            {en ? "Reply" : "პასუხი"}
           </button>
         </div>
       </div>

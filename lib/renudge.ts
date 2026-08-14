@@ -8,6 +8,8 @@ import { sendVerificationEmail } from "@/lib/email";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { acquireResendSlot } from "@/lib/resend-throttle";
+import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
 /**
  * Lifecycle re-nudges, fired best-effort from the daily-horoscope cron. Two
@@ -45,8 +47,9 @@ function resolveFrom(v: string | undefined, fb: string): string {
 }
 const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <hello@vivida.ge>");
 const ORIGIN = process.env.EMAIL_ORIGIN ?? "https://vivida.ge";
-function absUrl(p: string): string {
-  return `${ORIGIN.replace(/\/$/, "")}${p.startsWith("/") ? p : `/${p}`}`;
+function absUrlForLocale(p: string, locale: "ka" | "en"): string {
+  const origin = locale === "en" ? ENGLISH_SITE_URL : ORIGIN;
+  return `${origin.replace(/\/$/, "")}${p.startsWith("/") ? p : `/${p}`}`;
 }
 
 /** Prior sends of a given kind for a user — count + most-recent timestamp. */
@@ -71,7 +74,7 @@ export type RenudgeResult = { candidates: number; sent: number };
 export async function sendVerificationRenudges(): Promise<RenudgeResult> {
   const now = Date.now();
   const candidates = await db
-    .select({ id: users.id, email: users.email })
+    .select({ id: users.id, email: users.email, locale: users.interfaceLanguage })
     .from(users)
     .where(
       and(
@@ -93,18 +96,23 @@ export async function sendVerificationRenudges(): Promise<RenudgeResult> {
     // Re-issues a fresh verify token; returns send:false if already verified.
     const dispatch = await prepareVerificationResend(u.email);
     if (!dispatch.send) continue;
+    const locale = normalizeUserLocale(u.locale);
+    const subject = locale === "en"
+      ? "Complete your registration — verify your email"
+      : "დაასრულე რეგისტრაცია — დაადასტურე ელფოსტა";
     try {
       await sendVerificationEmail({
         to: dispatch.email,
         name: dispatch.name,
         token: dispatch.token,
         code: dispatch.code,
+        origin: locale === "en" ? ENGLISH_SITE_URL : ORIGIN,
       });
       await db.insert(emailSendLog).values({
         userId: u.id,
         kind: "verify_reminder",
         email: u.email,
-        subject: "დაასრულე რეგისტრაცია — დაადასტურე ელფოსტა",
+        subject,
         status: "sent",
       });
       sent++;
@@ -129,6 +137,7 @@ export async function sendProfileIncompleteRenudges(): Promise<RenudgeResult> {
       email: users.email,
       name: users.name,
       createdAt: users.createdAt,
+      locale: users.interfaceLanguage,
     })
     .from(users)
     .leftJoin(profiles, eq(profiles.userId, users.id))
@@ -155,8 +164,11 @@ export async function sendProfileIncompleteRenudges(): Promise<RenudgeResult> {
     }
 
     const token = await getOrCreateUnsubscribeToken(u.id);
-    const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`);
-    const subject = "შენი ნატალური რუკა გელოდება — დაასრულე პროფილი";
+    const locale = normalizeUserLocale(u.locale);
+    const unsubUrl = absUrlForLocale(`/unsubscribe?token=${token}&type=nudges`, locale);
+    const subject = locale === "en"
+      ? "Your birth chart is waiting — complete your profile"
+      : "შენი ნატალური რუკა გელოდება — დაასრულე პროფილი";
     try {
       await acquireResendSlot();
       const res = await c.emails.send({
@@ -165,8 +177,9 @@ export async function sendProfileIncompleteRenudges(): Promise<RenudgeResult> {
         subject,
         react: ProfileIncompleteEmail({
           name: u.name?.split(" ")[0] ?? null,
-          onboardingUrl: absUrl("/onboarding"),
+          onboardingUrl: absUrlForLocale("/onboarding", locale),
           unsubscribeUrl: unsubUrl,
+          locale,
         }),
         headers: {
           "List-Unsubscribe": `<${unsubUrl}>`,

@@ -184,7 +184,7 @@ export default async function EqTestPage() {
             ))}
           </div>
 
-          <PopularSearches queries={en ? ["free emotional intelligence test", "online EQ test", "empathy and self awareness test", "emotional intelligence score"] : EQ_LATIN_QUERIES} />
+          <PopularSearches queries={en ? ["free emotional intelligence test", "online EQ test", "empathy and self awareness test", "emotional intelligence score"] : EQ_LATIN_QUERIES} locale={locale} />
         </div>
       </section>
     </main>

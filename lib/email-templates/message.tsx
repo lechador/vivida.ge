@@ -21,6 +21,7 @@ export function MessageEmail({
   snippet,
   conversationUrl,
   unsubscribeUrl,
+  locale = "ka",
 }: {
   recipientName: string | null;
   fromName: string;
@@ -29,13 +30,18 @@ export function MessageEmail({
   snippet: string;
   conversationUrl: string;
   unsubscribeUrl: string;
+  locale?: "ka" | "en";
 }) {
-  const greeting = recipientName ? `სალამი, ${recipientName}!` : "სალამი!";
+  const en = locale === "en";
+  const greeting = recipientName
+    ? en ? `Hello, ${recipientName}!` : `სალამი, ${recipientName}!`
+    : en ? "Hello!" : "სალამი!";
   const fromHandle = fromUsername ? `@${fromUsername}` : null;
   return (
     <EmailLayout
-      preview={`${fromName}-მ წერილი მოგწერა`}
+      preview={en ? `${fromName} sent you a message` : `${fromName}-მ წერილი მოგწერა`}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
       <Heading
         as="h1"
@@ -48,7 +54,7 @@ export function MessageEmail({
           margin: "0 0 16px",
         }}
       >
-        ახალი წერილი
+        {en ? "New message" : "ახალი წერილი"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
@@ -57,7 +63,7 @@ export function MessageEmail({
         {fromHandle ? (
           <span style={{ color: "#9b94ad" }}> ({fromHandle})</span>
         ) : null}{" "}
-        წერილი მოგწერა Vivida-ზე:
+        {en ? " sent you a message on Vivida:" : " წერილი მოგწერა Vivida-ზე:"}
       </Text>
 
       {/* Message snippet block */}
@@ -78,11 +84,11 @@ export function MessageEmail({
       </div>
 
       <Button href={conversationUrl} style={buttonStyle}>
-        წაიკითხე და უპასუხე
+        {en ? "Read and reply" : "წაიკითხე და უპასუხე"}
       </Button>
 
       <Text style={mutedStyle}>
-        ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს.
+        {en ? "You received this notification because you have not visited Vivida recently." : "ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს."}
       </Text>
     </EmailLayout>
   );

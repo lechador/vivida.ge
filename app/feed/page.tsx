@@ -17,8 +17,12 @@ import { FeedList } from "@/components/feed/feed-list";
 import { PostComposer } from "@/components/feed/post-composer";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { getUserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "ფიდი" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getRequestLocale()) === "en" ? "Feed" : "ფიდი" };
+}
 export const dynamic = "force-dynamic";
 
 export default async function FeedPage() {
@@ -104,6 +108,7 @@ export default async function FeedPage() {
           viewerId={user.id}
           viewerIsAdmin={viewerIsAdmin}
           viewerSunSign={viewerSunSign}
+          locale={locale}
         />
       </section>
     </main>

@@ -26,6 +26,7 @@ import {
   TRANSIT_SIGN_BODIES,
   type TransitBreakdownItem,
 } from "./transit-library";
+import type { UserLocale } from "./i18n/locale";
 
 const SPEED_SAMPLE_HOURS = 6;
 
@@ -59,7 +60,10 @@ export type SkyData = {
   aspects: TransitBreakdownItem[];
 };
 
-export async function composeSkyData(natal: NatalChartJson): Promise<SkyData> {
+export async function composeSkyData(
+  natal: NatalChartJson,
+  locale: UserLocale = "ka",
+): Promise<SkyData> {
   const now = new Date();
   const later = new Date(now.getTime() + SPEED_SAMPLE_HOURS * 3600_000);
 
@@ -78,7 +82,7 @@ export async function composeSkyData(natal: NatalChartJson): Promise<SkyData> {
     }
     return { key, pos, house, signIndex };
   });
-  const entries = await getTransitLibraryEntries(keys);
+  const entries = await getTransitLibraryEntries(keys, locale);
 
   const planets: SkyPlanet[] = placements.map(({ key, pos, house, signIndex }) => {
     const fut = future[key]?.longitude ?? pos.longitude;
@@ -111,7 +115,7 @@ export async function composeSkyData(natal: NatalChartJson): Promise<SkyData> {
   const active = detectCrossAspects(current, natalBodies).filter(
     (a) => a.orb <= 3
   );
-  const aspects = await overlayTransitAspects(active, 6);
+  const aspects = await overlayTransitAspects(active, 6, locale);
 
   const moon = planets.find((p) => p.key === "moon");
 

@@ -268,7 +268,7 @@ export default async function MbtiTypePage({
           </div>
         </section>
 
-        <PopularSearches queries={queries} />
+        <PopularSearches queries={queries} locale={locale} />
       </section>
 
       <SiteFooter locale={locale} />

@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { users, type NotificationKind, type NotificationPayload } from "@/db/schema";
+import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { isPushConfigured, sendPushToUser } from "@/lib/push";
 import { enforceRateLimit } from "@/lib/rate-limit";
 
@@ -32,46 +33,60 @@ const REACTION_KA: Record<string, string> = {
   dislike: "არ მოეწონა შენი პოსტი",
 };
 
+const REACTION_EN: Record<string, string> = {
+  like: "liked your post",
+  funny: "found your post funny",
+  sad: "reacted sadly to your post",
+  dislike: "disliked your post",
+};
+
 function copyFor(
   kind: NotificationKind,
-  payload: NotificationPayload
+  payload: NotificationPayload,
+  locale: UserLocale,
 ): { title: string; body: string; url: string; tag: string } | null {
-  const name = payload.fromName ?? payload.fromUsername ?? "Vivida-ის წევრი";
+  const en = locale === "en";
+  const name = payload.fromName ?? payload.fromUsername ?? (en ? "A Vivida member" : "Vivida-ის წევრი");
   const postUrl = payload.postId ? `/feed#post-${payload.postId}` : "/feed";
   switch (kind) {
     case "friend_request":
       return {
-        title: "მეგობრობის თხოვნა ➕",
-        body: `${name} გთხოვს დამეგობრებას`,
+        title: en ? "Friend request ➕" : "მეგობრობის თხოვნა ➕",
+        body: en ? `${name} sent you a friend request` : `${name} გთხოვს დამეგობრებას`,
         url: "/friends?tab=incoming",
         tag: "friend-request",
       };
     case "friend_accepted":
       return {
-        title: "მოთხოვნა მიღებულია ✨",
-        body: `${name}-მ მიიღო შენი მეგობრობის თხოვნა`,
+        title: en ? "Request accepted ✨" : "მოთხოვნა მიღებულია ✨",
+        body: en ? `${name} accepted your friend request` : `${name}-მ მიიღო შენი მეგობრობის თხოვნა`,
         url: payload.fromUsername ? `/u/${payload.fromUsername}` : "/friends",
         tag: "friend-accepted",
       };
     case "post_comment":
       return {
-        title: `💬 ${name} დააკომენტარა შენს პოსტს`,
+        title: en ? `💬 ${name} commented on your post` : `💬 ${name} დააკომენტარა შენს პოსტს`,
         body: payload.preview ?? "",
         url: postUrl,
         tag: `post-${payload.postId ?? "x"}`,
       };
     case "post_reaction":
       return {
-        title: "შენს პოსტს გამოეხმაურნენ",
-        body: `${name} — ${REACTION_KA[payload.reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"}`,
+        title: en ? "New reaction to your post" : "შენს პოსტს გამოეხმაურნენ",
+        body: en
+          ? `${name} ${REACTION_EN[payload.reaction ?? ""] ?? "reacted to your post"}`
+          : `${name} — ${REACTION_KA[payload.reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"}`,
         url: postUrl,
         // Collapse repeated reactions on the same post into one banner.
         tag: `reactions-${payload.postId ?? "x"}`,
       };
     case "mention":
       return {
-        title:
-          payload.mentionContext === "comment"
+        title: en
+          ? payload.mentionContext === "comment"
+            ? `@ ${name} mentioned you in a comment`
+            : `@ ${name} mentioned you in a post`
+          : payload.mentionContext === "comment"
             ? `@ ${name} მოგიხსენია კომენტარში`
             : `@ ${name} მოგიხსენია პოსტში`,
         body: payload.preview ?? "",
@@ -80,8 +95,8 @@ function copyFor(
       };
     case "new_match":
       return {
-        title: "ახალი მეჩი ✨",
-        body: `თქვენ და ${name} მოეწონეთ ერთმანეთს`,
+        title: en ? "New match ✨" : "ახალი მეჩი ✨",
+        body: en ? `You and ${name} liked each other` : `თქვენ და ${name} მოეწონეთ ერთმანეთს`,
         url: "/messages",
         tag: "new-match",
       };
@@ -101,10 +116,15 @@ export function queueNotificationPush(
   payload: NotificationPayload
 ): void {
   if (!isPushConfigured()) return;
-  const copy = copyFor(kind, payload);
-  if (!copy) return;
   const task = async () => {
     try {
+      const [recipient] = await db
+        .select({ locale: users.interfaceLanguage })
+        .from(users)
+        .where(eq(users.id, recipientId))
+        .limit(1);
+      const copy = copyFor(kind, payload, normalizeUserLocale(recipient?.locale));
+      if (!copy) return;
       await sendPushToUser(recipientId, copy);
     } catch (err) {
       console.warn(

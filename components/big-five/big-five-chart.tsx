@@ -20,7 +20,7 @@ export function BigFiveChart({ result, locale = "ka" }: { result: BigFiveResult;
       <h2 className="mb-2 text-center text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
         {en ? "Your personality profile" : "შენი პიროვნების პროფილი"}
       </h2>
-      <TraitRadar points={points} />
+      <TraitRadar points={points} locale={locale} />
 
       <div className="mt-5 space-y-3">
         {result.traits.map((t) => (

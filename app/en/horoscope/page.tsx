@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EnglishGuide } from "@/components/en/english-guide";
-import { GeorgianContentNote } from "@/components/en/georgian-content-note";
 import { SIGNS } from "@/lib/zodiac";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const PATH = "/en/horoscope";
 const TITLE = "How Daily Horoscopes Work — Vivida";
-const DESCRIPTION = "Learn how daily, weekly and monthly horoscopes use current planetary transits, and access Vivida's Georgian readings for all twelve zodiac signs.";
+const DESCRIPTION = "Learn how daily, weekly and monthly horoscopes use current planetary transits, and read Vivida's English forecasts for all twelve zodiac signs.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE }, description: DESCRIPTION,
@@ -19,7 +18,6 @@ export const metadata: Metadata = {
 export default function EnglishHoroscopePage() {
   return (
     <EnglishGuide eyebrow="Current sky" title="How horoscopes work" intro="A horoscope connects current planetary movements—called transits—with a zodiac sign or a complete natal chart. It changes as the sky changes." georgianPath="/horoskopi">
-      <GeorgianContentNote href="/horoskopi" label="Read today's horoscopes in Georgian" />
       <section>
         <h2>Sun-sign and personalized horoscopes</h2>
         <p>A general horoscope is usually written for the twelve Sun signs. It can describe broad collective themes, but everyone born under one sign does not have the same chart. A personalized horoscope can compare current transits with the exact degrees, houses and aspects in an individual natal chart, making the interpretation more specific.</p>
@@ -34,13 +32,13 @@ export default function EnglishHoroscopePage() {
         <p>No forecast should be treated as a command or guarantee. A useful horoscope offers context and questions while leaving decisions with the reader.</p>
       </section>
       <section>
-        <h2>Today’s Georgian readings by sign</h2>
-        <p>Vivida’s generated daily interpretations remain Georgian in this release. Choose a sign below to open its current reading:</p>
+        <h2>Today’s English readings by sign</h2>
+        <p>Choose a sign below to open its current English forecast, including the day’s main theme, practical guidance, and key areas of focus:</p>
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {SIGNS.map((sign) => (
-            <Link key={sign.key} href={`${GEORGIAN_SITE_URL}/zodiac/${sign.key}/dghes`} hrefLang="ka-GE" className="flex items-center gap-3 rounded-2xl border border-border bg-card/50 p-4 hover:border-[var(--vivida-violet)]/45 hover:bg-card">
+            <Link key={sign.key} href={`/zodiac/${sign.key}/dghes`} className="flex items-center gap-3 rounded-2xl border border-border bg-card/50 p-4 hover:border-[var(--vivida-violet)]/45 hover:bg-card">
               <span className="text-2xl text-[var(--vivida-violet)]">{sign.symbol}</span>
-              <span><strong className="block text-sm text-foreground">{sign.labelEn}</strong><span className="text-xs text-muted-foreground">Georgian reading</span></span>
+              <span><strong className="block text-sm text-foreground">{sign.labelEn}</strong><span className="text-xs text-muted-foreground">English reading</span></span>
             </Link>
           ))}
         </div>

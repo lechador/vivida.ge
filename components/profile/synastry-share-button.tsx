@@ -38,6 +38,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import {
   CompatibilityCard,
   type CompatibilityCardProps,
@@ -54,9 +55,12 @@ import {
  */
 export function SynastryShareButton({
   cardProps,
+  locale = "ka",
 }: {
   cardProps: CompatibilityCardProps;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [open, setOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -169,7 +173,11 @@ export function SynastryShareButton({
         if (cancelled) return;
         const detail = (err as Error).message ?? "";
         console.error("[share render] failed:", err);
-        setErrorMessage(`ვერ მოხერხდა (${detail || "უცნობი შეცდომა"})`);
+        setErrorMessage(
+          en
+            ? `Could not create the card (${detail || "unknown error"})`
+            : `ვერ მოხერხდა (${detail || "უცნობი შეცდომა"})`
+        );
         setLoadState("error");
       }
     })();
@@ -177,7 +185,7 @@ export function SynastryShareButton({
     return () => {
       cancelled = true;
     };
-  }, [open]);
+  }, [en, open]);
 
   // Free the object URL on unmount or when replaced.
   useEffect(() => {
@@ -194,10 +202,14 @@ export function SynastryShareButton({
     if (!blob) return "unsupported";
     const file = new File([blob], fileName, { type: "image/png" });
     const shareData: ShareData = {
-      title: "Vivida — ჩვენი თავსებადობა",
-      text: `${cardProps.partnerName}-სთან ჩემი თავსებადობა — ${Math.round(
-        cardProps.result.overall
-      )}% ✦ vivida.ge`,
+      title: en ? "Vivida — our compatibility" : "Vivida — ჩვენი თავსებადობა",
+      text: en
+        ? `My compatibility with ${cardProps.partnerName} — ${Math.round(
+            cardProps.result.overall
+          )}% ✦ vivida.ge`
+        : `${cardProps.partnerName}-სთან ჩემი თავსებადობა — ${Math.round(
+            cardProps.result.overall
+          )}% ✦ vivida.ge`,
       files: [file],
     };
 
@@ -263,7 +275,9 @@ export function SynastryShareButton({
       finishOk();
       return;
     }
-    setErrorMessage("ვერ მოხერხდა. სცადე თავიდან.");
+    setErrorMessage(
+      en ? "Something went wrong. Please try again." : "ვერ მოხერხდა. სცადე თავიდან."
+    );
     setActionState("idle");
   };
 
@@ -272,7 +286,9 @@ export function SynastryShareButton({
     if (downloadBlob()) {
       finishOk();
     } else {
-      setErrorMessage("ვერ მოხერხდა. სცადე თავიდან.");
+      setErrorMessage(
+        en ? "Something went wrong. Please try again." : "ვერ მოხერხდა. სცადე თავიდან."
+      );
     }
   };
 
@@ -288,7 +304,7 @@ export function SynastryShareButton({
         }}
       >
         <InstagramIcon className="size-4" />
-        გააზიარე თავსებადობა
+        {en ? "Share compatibility" : "გააზიარე თავსებადობა"}
       </Button>
 
       {/* Off-screen card mounted only while the dialog is open. The
@@ -308,7 +324,7 @@ export function SynastryShareButton({
               }}
             >
               <div ref={cardRef}>
-                <CompatibilityCard {...cardProps} />
+                <CompatibilityCard {...cardProps} locale={locale} />
               </div>
             </div>,
             portalRoot
@@ -327,9 +343,13 @@ export function SynastryShareButton({
       >
         <DialogContent className="max-w-sm gap-4 p-5 sm:p-6">
           <DialogHeader className="text-left">
-            <DialogTitle className="text-lg">თავსებადობის ბარათი</DialogTitle>
+            <DialogTitle className="text-lg">
+              {en ? "Compatibility card" : "თავსებადობის ბარათი"}
+            </DialogTitle>
             <DialogDescription>
-              ასე გამოჩნდება შენი ბარათი Instagram-სა და Facebook-ზე.
+              {en
+                ? "This is how your card will appear on Instagram and Facebook."
+                : "ასე გამოჩნდება შენი ბარათი Instagram-სა და Facebook-ზე."}
             </DialogDescription>
           </DialogHeader>
 
@@ -347,14 +367,14 @@ export function SynastryShareButton({
             )}
             {loadState === "error" && (
               <div className="absolute inset-0 grid place-items-center px-3 text-center text-xs text-muted-foreground">
-                {errorMessage ?? "ვერ მოხერხდა"}
+                {errorMessage ?? (en ? "Could not create the card" : "ვერ მოხერხდა")}
               </div>
             )}
             {previewUrl && loadState === "ready" && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={previewUrl}
-                alt="ჩვენი თავსებადობის ბარათი"
+                alt={en ? "Our compatibility card" : "ჩვენი თავსებადობის ბარათი"}
                 className="absolute inset-0 size-full object-cover"
               />
             )}
@@ -382,7 +402,13 @@ export function SynastryShareButton({
               ) : (
                 <Share2 className="size-4" />
               )}
-              {actionState === "done" ? "მზადაა ✓" : "გააზიარე"}
+              {actionState === "done"
+                ? en
+                  ? "Done ✓"
+                  : "მზადაა ✓"
+                : en
+                  ? "Share"
+                  : "გააზიარე"}
             </Button>
             <Button
               type="button"
@@ -392,13 +418,14 @@ export function SynastryShareButton({
               disabled={loadState !== "ready"}
             >
               <Download className="size-4" />
-              ჩამოტვირთვა
+              {en ? "Download" : "ჩამოტვირთვა"}
             </Button>
           </div>
 
           <p className="text-center text-[11px] text-muted-foreground">
-            მობილურზე ღილაკი „გააზიარე“ პირდაპირ აჩვენებს Instagram/Facebook
-            არჩევანს. დესკტოპზე — ჩამოტვირთავს PNG-ს.
+            {en
+              ? "On mobile, Share opens the Instagram/Facebook options. On desktop, it downloads a PNG."
+              : "მობილურზე ღილაკი „გააზიარე“ პირდაპირ აჩვენებს Instagram/Facebook არჩევანს. დესკტოპზე — ჩამოტვირთავს PNG-ს."}
           </p>
         </DialogContent>
       </Dialog>

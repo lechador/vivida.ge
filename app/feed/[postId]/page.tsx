@@ -8,8 +8,13 @@ import { isAdminEmail } from "@/lib/admin-auth";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { PostCard } from "@/components/feed/post-card";
+import { getUserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "პოსტი" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getRequestLocale()) === "en" ? "Post" : "პოსტი" };
+}
 export const dynamic = "force-dynamic";
 
 /**
@@ -25,12 +30,16 @@ export default async function PostThreadPage({
   const { postId } = await params;
   const user = await requireUser();
 
-  const post = await getPostForViewer(user.id, postId);
+  const [post, locale] = await Promise.all([
+    getPostForViewer(user.id, postId),
+    getUserLocale(user.id),
+  ]);
+  const en = locale === "en";
 
   if (!post) notFound();
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%)]"
@@ -45,7 +54,7 @@ export default async function PostThreadPage({
           className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          ფიდზე დაბრუნება
+          {en ? "Back to feed" : "ფიდზე დაბრუნება"}
         </Link>
 
         <PostCard
@@ -53,6 +62,7 @@ export default async function PostThreadPage({
           viewerId={user.id}
           viewerIsAdmin={isAdminEmail(user.email)}
           mode="detail"
+          locale={locale}
         />
       </section>
     </main>

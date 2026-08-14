@@ -26,7 +26,7 @@ const GUIDES = [
 ];
 
 const FAQ = [
-  { q: "Is Vivida available in English?", a: "Yes. Core public guides, account setup, personalized natal reports, Tarot and the main self-discovery assessments are available in English. We are still translating the larger reference library and a few interactive experiences." },
+  { q: "Is Vivida available in English?", a: "Yes. Public guides, account features, personalized natal reports, daily and weekly forecasts, compatibility readings, Tarot, and the main self-discovery assessments are available in English." },
   { q: "Is a natal chart the same as a horoscope?", a: "A natal chart maps the sky for one birth moment and remains fixed. A horoscope compares current planetary movements with a sign or natal chart, so it changes with time." },
   { q: "Do I need an exact birth time?", a: "An exact time is important for the Ascendant and house positions. Many planetary sign placements can still be calculated without it, but the chart will be less specific." },
   { q: "Is astrology scientific advice?", a: "No. Vivida presents astrology for entertainment, reflection and cultural interest. It is not medical, psychological, legal or financial advice." },

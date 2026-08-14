@@ -21,6 +21,7 @@ export function DailyHoroscopeEmail({
   dashboardUrl,
   unsubscribeUrl,
   localizedDate,
+  locale = "ka",
 }: {
   name: string | null;
   /** Short, evocative title for today (from the AI generation). */
@@ -33,13 +34,18 @@ export function DailyHoroscopeEmail({
   unsubscribeUrl: string;
   /** Localised date string the dashboard would show, e.g. "ორშაბათი, 6 მაისი". */
   localizedDate: string;
+  locale?: "ka" | "en";
 }) {
-  const greeting = name ? `სალამი, ${name}!` : "სალამი!";
+  const en = locale === "en";
+  const greeting = name
+    ? en ? `Hello, ${name}!` : `სალამი, ${name}!`
+    : en ? "Hello!" : "სალამი!";
 
   return (
     <EmailLayout
       preview={summary.slice(0, 110)}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
       <Text
         style={{
@@ -74,7 +80,7 @@ export function DailyHoroscopeEmail({
 
       <div style={{ marginTop: 22 }}>
         <Button href={dashboardUrl} style={buttonStyle}>
-          ნახე სრული ჰოროსკოპი
+          {en ? "Read your full horoscope" : "ნახე სრული ჰოროსკოპი"}
         </Button>
       </div>
     </EmailLayout>

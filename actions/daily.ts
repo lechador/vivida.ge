@@ -31,6 +31,7 @@ import {
   type TransitDayFacts,
 } from "@/lib/transit-library";
 import { signByIndex } from "@/lib/zodiac";
+import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Returns today's horoscope for the user, generating + caching it on first
@@ -38,7 +39,11 @@ import { signByIndex } from "@/lib/zodiac";
  *  - User's birth data changes (via natal inputHash)
  *  - We bump DAILY_PROMPT_VERSION after a prompt-quality change
  */
-export async function ensureDailyFor(userId: string): Promise<DailyHoroscope | null> {
+export async function ensureDailyFor(
+  userId: string,
+  requestedLocale?: UserLocale,
+): Promise<DailyHoroscope | null> {
+  const locale = requestedLocale ?? (await getUserLocale(userId));
   const [profile] = await db
     .select()
     .from(profiles)
@@ -68,7 +73,8 @@ export async function ensureDailyFor(userId: string): Promise<DailyHoroscope | n
     const meta = existing.transits;
     const versionMatches = meta?.promptVersion === DAILY_PROMPT_VERSION;
     const chartMatches = meta?.natalInputHash === chart.inputHash;
-    if (versionMatches && chartMatches) return existing;
+    const languageMatches = existing.language === locale;
+    if (versionMatches && chartMatches && languageMatches) return existing;
     // Otherwise fall through and regenerate (upsert below)
   }
 
@@ -128,14 +134,15 @@ export async function ensureDailyFor(userId: string): Promise<DailyHoroscope | n
       natalHouse: houseFor(transits[k].longitude),
     }));
 
-  const localizedDate = new Intl.DateTimeFormat("ka-GE", {
+  const dateLocale = locale === "en" ? "en-US" : "ka-GE";
+  const localizedDate = new Intl.DateTimeFormat(dateLocale, {
     timeZone: profile.timezone,
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
   }).format(now);
-  const weekday = new Intl.DateTimeFormat("ka-GE", {
+  const weekday = new Intl.DateTimeFormat(dateLocale, {
     timeZone: profile.timezone,
     weekday: "long",
   }).format(now);
@@ -185,8 +192,11 @@ export async function ensureDailyFor(userId: string): Promise<DailyHoroscope | n
       outerAspects,
     };
     const combos = combosForDay(facts);
-    const entries = await getTransitLibraryEntries(combos.map((c) => c.key));
-    const composed = composeDailyFromLibrary(facts, entries);
+    const entries = await getTransitLibraryEntries(
+      combos.map((c) => c.key),
+      locale,
+    );
+    const composed = composeDailyFromLibrary(facts, entries, locale);
     if (composed) {
       reading = composed;
       model = "library";
@@ -233,7 +243,7 @@ export async function ensureDailyFor(userId: string): Promise<DailyHoroscope | n
         source,
       },
       model,
-      language: "ka",
+      language: locale,
     })
     .onConflictDoUpdate({
       target: [dailyHoroscopes.userId, dailyHoroscopes.date],
@@ -251,7 +261,7 @@ export async function ensureDailyFor(userId: string): Promise<DailyHoroscope | n
           source,
         },
         model,
-        language: "ka",
+        language: locale,
       },
     })
     .returning();

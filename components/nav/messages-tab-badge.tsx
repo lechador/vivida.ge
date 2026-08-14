@@ -6,6 +6,7 @@ import type {
   ChatClearedDetail,
   ChatNotifyDetail,
 } from "@/components/chat/chat-launcher";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Tiny live counter for the bottom-bar messages tab. Seeded from the
@@ -19,7 +20,13 @@ import type {
  * launcher in background mode, or the /messages page) is the source of
  * truth for "what's new".
  */
-export function MessagesTabBadge({ initial }: { initial: number }) {
+export function MessagesTabBadge({
+  initial,
+  locale = "ka",
+}: {
+  initial: number;
+  locale?: UserLocale;
+}) {
   const [badge, setBadge] = useState({ initial, count: initial });
 
   if (badge.initial !== initial) {
@@ -58,7 +65,11 @@ export function MessagesTabBadge({ initial }: { initial: number }) {
   if (count <= 0) return null;
   return (
     <span
-      aria-label={`${count} ახალი წერილი`}
+      aria-label={
+        locale === "en"
+          ? `${count} new ${count === 1 ? "message" : "messages"}`
+          : `${count} ახალი წერილი`
+      }
       className="absolute -right-0.5 -top-0.5 grid size-4 min-w-4 place-items-center rounded-full bg-[var(--vivida-pink)] px-1 text-[9px] font-semibold leading-none text-white ring-2 ring-background"
     >
       {count > 9 ? "9+" : count}

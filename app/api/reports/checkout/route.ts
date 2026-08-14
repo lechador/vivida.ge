@@ -7,6 +7,7 @@ import { charts, pdfReports } from "@/db/schema";
 import { CREDIT_COST, spendCredits } from "@/lib/credits";
 import { generateAndStoreReport } from "@/lib/reports/generate";
 import { reportCurrency } from "@/lib/stripe";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
   if (!userId) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
+  const locale = await getUserLocale(userId);
 
   let type = "natal";
   try {
@@ -53,7 +55,13 @@ export async function POST(req: Request) {
   const [existing] = await db
     .select()
     .from(pdfReports)
-    .where(and(eq(pdfReports.userId, userId), eq(pdfReports.type, type)))
+    .where(
+      and(
+        eq(pdfReports.userId, userId),
+        eq(pdfReports.type, type),
+        eq(pdfReports.language, locale),
+      ),
+    )
     .orderBy(desc(pdfReports.createdAt))
     .limit(1);
   // Already paid (incl. failed → retryable on the status page) or done:
@@ -82,6 +90,7 @@ export async function POST(req: Request) {
     .values({
       userId,
       type,
+      language: locale,
       status: "paid",
       comped: false,
       amountCents: 0,

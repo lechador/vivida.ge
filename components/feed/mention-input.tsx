@@ -14,6 +14,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Lightweight `@username` autocomplete wrapper around a plain
@@ -51,11 +52,13 @@ export function MentionInput({
   onKeyDown,
   className,
   disabled,
+  locale = "ka",
   ...textareaProps
 }: Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "onChange"> & {
   value: string;
   onChange: (next: string) => void;
   textareaRef?: RefObject<HTMLTextAreaElement | null>;
+  locale?: UserLocale;
 }) {
   const localRef = useRef<HTMLTextAreaElement | null>(null);
   const ref = textareaRef ?? localRef;
@@ -243,7 +246,9 @@ export function MentionInput({
       )}
       {showHint && (
         <div className="pointer-events-none absolute left-0 right-0 top-full z-20 mt-1 rounded-lg border border-border/60 bg-card/80 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur-xl">
-          ჩაწერე მინიმუმ 2 სიმბოლო მეგობრის მოსაძებნად…
+          {locale === "en"
+            ? "Enter at least 2 characters to find someone…"
+            : "ჩაწერე მინიმუმ 2 სიმბოლო მეგობრის მოსაძებნად…"}
         </div>
       )}
     </div>

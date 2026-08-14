@@ -308,6 +308,7 @@ export function ZodiacHubEn() {
           </Button>
         </div>
         <PopularSearches
+          locale="en"
           queries={[
             "zodiac signs",
             "12 zodiac signs",

@@ -83,7 +83,7 @@ export function DailyDashboard({
       <div className="space-y-6">
         <DailyRitualLoading streak={streak} locale={locale} />
         <div className="flex min-h-[45vh] items-center justify-center">
-          <CosmicLoader embedded progressive />
+          <CosmicLoader embedded progressive locale={locale} />
         </div>
       </div>
     );
@@ -127,7 +127,7 @@ export function DailyDashboard({
             {en ? "Full chart →" : "სრული რუკა →"}
           </Link>
         </header>
-        <MiniBigThree chart={chart.data} />
+        <MiniBigThree chart={chart.data} locale={locale} />
       </section>
 
       <section className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/10 to-transparent p-6 backdrop-blur-xl">
@@ -138,7 +138,7 @@ export function DailyDashboard({
             </h3>
             <p className="mt-1 max-w-md text-sm text-muted-foreground">
               {en
-                ? "Chart wheel, AI analysis, twelve houses, aspects and every planet in one place. Detailed interpretations remain in Georgian."
+                ? "Chart wheel, personal analysis, twelve houses, aspects and every planet in one place—with complete English interpretations."
                 : "ცის რუკის ბორბალი, AI ანალიზი, 12 სახლი, ასპექტები და ყველა პლანეტა — დეტალურად, ერთად."}
             </p>
           </div>
@@ -183,7 +183,7 @@ function DashboardExtrasSection({
 
   useEffect(() => {
     let cancelled = false;
-    loadDashboardExtras(userId)
+    loadDashboardExtras(userId, locale)
       .then((e) => {
         if (!cancelled) setExtras(e);
       })
@@ -201,12 +201,12 @@ function DashboardExtrasSection({
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, locale]);
 
   const loading = extras === null;
 
   const dailySlot = loading ? (
-    <HoroscopeLoading />
+    <HoroscopeLoading locale={locale} />
   ) : extras.daily ? null : canDaily ? (
     <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
       {en ? "Today's horoscope is being prepared. Try again shortly." : "დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში."}
@@ -216,7 +216,7 @@ function DashboardExtrasSection({
   const moonSlot = loading ? (
     <CardSkeleton className="min-h-[220px]" />
   ) : extras.moonPhase ? (
-    <MoonPhaseCard data={extras.moonPhase} />
+    <MoonPhaseCard data={extras.moonPhase} locale={locale} />
   ) : null;
 
   return (
@@ -250,13 +250,14 @@ function DashboardExtrasSection({
         <WeeklyForecastLocked
           cost={CREDIT_COST.weeklyForecast}
           balance={balance}
+          locale={locale}
         />
       ) : loading ? (
         <CardSkeleton className="min-h-[160px]" />
       ) : (
         extras?.weeklyForecast &&
         extras.weeklyForecast.days.length > 0 && (
-          <WeeklyForecastCard days={extras.weeklyForecast.days} />
+          <WeeklyForecastCard days={extras.weeklyForecast.days} locale={locale} />
         )
       )}
     </>

@@ -320,12 +320,14 @@ export function DailyRitual({
             savedVoice={savedVoice}
             canAudio={canAudio}
             onRead={markHoroscopeRead}
+            locale={locale}
           />
         </div>
         {moonPhase && (
           <div className="min-w-0 xl:col-span-5 xl:sticky xl:top-20">
             <MoonPhaseCard
               data={moonPhase}
+              locale={locale}
               onRead={() =>
                 updateState(
                   { moonRead: true },

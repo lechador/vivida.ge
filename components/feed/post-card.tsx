@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ReportDialog } from "@/components/safety/report-dialog";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 import { CommentSection } from "./comment-section";
 import { MentionText } from "./mention-text";
@@ -54,6 +55,7 @@ export function PostCard({
   viewerId,
   viewerIsAdmin,
   mode = "feed",
+  locale = "ka",
 }: {
   post: FeedPost;
   viewerId: string;
@@ -61,7 +63,9 @@ export function PostCard({
   /** "feed": whole card opens the thread; comments live on the detail page.
    *  "detail": the thread page — comments shown + replyable inline. */
   mode?: "feed" | "detail";
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editing, setEditing] = useState(false);
@@ -108,15 +112,15 @@ export function PostCard({
     post.author.displayName ??
     post.author.name?.split(" ")[0] ??
     post.author.username ??
-    "ვარსკვლავო";
+    (en ? "Stargazer" : "ვარსკვლავო");
   const profileHref = post.author.username ? `/u/${post.author.username}` : null;
 
   function handleDelete() {
-    if (!confirm("წავშალო ეს პოსტი?")) return;
+    if (!confirm(en ? "Delete this post?" : "წავშალო ეს პოსტი?")) return;
     startTransition(async () => {
       const res = await deletePost(post.id);
       if (!res.ok) {
-        alert(res.error);
+        alert(en ? "Could not delete the post. Please try again." : res.error);
         return;
       }
       router.refresh();
@@ -137,7 +141,7 @@ export function PostCard({
     startTransition(async () => {
       const res = await editPost(post.id, draft);
       if (!res.ok) {
-        setEditError(res.error);
+        setEditError(en ? "Could not save your changes. Please try again." : res.error);
         return;
       }
       setEditing(false);
@@ -165,7 +169,7 @@ export function PostCard({
     >
       <header className="flex items-start gap-3">
         {profileHref ? (
-          <Link href={profileHref} aria-label={`${display}-ის პროფილი`}>
+          <Link href={profileHref} aria-label={en ? `${display}'s profile` : `${display}-ის პროფილი`}>
             {avatar}
           </Link>
         ) : (
@@ -196,11 +200,11 @@ export function PostCard({
               </Link>
             )}
             {post.author.username && <span>·</span>}
-            <span>{feedTimeAgo(post.createdAt)}</span>
+            <span>{feedTimeAgo(post.createdAt, locale)}</span>
             {post.edited && (
               <>
                 <span>·</span>
-                <span className="italic">რედაქტირებული</span>
+                <span className="italic">{en ? "Edited" : "რედაქტირებული"}</span>
               </>
             )}
           </div>
@@ -210,7 +214,7 @@ export function PostCard({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                aria-label="მენიუ"
+                aria-label={en ? "Menu" : "მენიუ"}
                 className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
               >
                 {isPending ? (
@@ -230,7 +234,7 @@ export function PostCard({
                   className="cursor-pointer"
                 >
                   <Pencil className="size-4" />
-                  რედაქტირება
+                  {en ? "Edit" : "რედაქტირება"}
                 </DropdownMenuItem>
               )}
               {canDelete && (
@@ -243,7 +247,7 @@ export function PostCard({
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <Trash2 className="size-4" />
-                  {isOwner ? "წაშლა" : "მოდერაცია: წაშლა"}
+                  {isOwner ? (en ? "Delete" : "წაშლა") : (en ? "Moderation: delete" : "მოდერაცია: წაშლა")}
                 </DropdownMenuItem>
               )}
               {!isOwner && (
@@ -255,7 +259,7 @@ export function PostCard({
                   className="cursor-pointer"
                 >
                   <Flag className="size-4" />
-                  დაარეპორტე
+                  {en ? "Report" : "დაარეპორტე"}
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -269,6 +273,7 @@ export function PostCard({
           onOpenChange={setReportOpen}
           targetType="post"
           targetId={post.id}
+          locale={locale}
         />
       )}
 
@@ -305,7 +310,7 @@ export function PostCard({
                 onClick={() => setEditing(false)}
                 disabled={isPending}
               >
-                გაუქმება
+                {en ? "Cancel" : "გაუქმება"}
               </Button>
               <Button
                 variant="mystic"
@@ -320,7 +325,7 @@ export function PostCard({
                 {isPending ? (
                   <Loader2 className="size-3 animate-spin" />
                 ) : null}
-                შენახვა
+                {en ? "Save" : "შენახვა"}
               </Button>
             </div>
           </div>
@@ -336,6 +341,7 @@ export function PostCard({
         initialCounts={post.reactions}
         initialMine={post.myReaction}
         commentCount={post.commentCount}
+        locale={locale}
         onToggleComments={
           mode === "detail"
             ? () => setCommentsOpen((o) => !o)
@@ -350,6 +356,7 @@ export function PostCard({
           viewerIsAdmin={viewerIsAdmin}
           postAuthorId={post.author.id}
           open={commentsOpen}
+          locale={locale}
         />
       )}
     </article>

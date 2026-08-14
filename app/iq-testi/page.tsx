@@ -271,6 +271,7 @@ export default async function IqTestPage() {
         </section>
 
         <PopularSearches
+          locale={locale}
           queries={
             en
               ? ["free online IQ test", "adaptive IQ test", "logic and pattern test", "estimated IQ score"]

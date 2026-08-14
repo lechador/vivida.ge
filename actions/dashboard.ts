@@ -21,6 +21,7 @@ import type {
   WeeklyForecast,
 } from "@/db/schema";
 import type { DiscoverCard } from "@/lib/discover";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * The dashboard loads in two waves so the page never blocks on AI latency:
@@ -97,20 +98,23 @@ export type DashboardExtras = {
  * one slow/failed generator never blocks the others. Called after the core
  * has already painted, so its latency is hidden behind per-card skeletons.
  */
-export async function loadDashboardExtras(userId: string): Promise<DashboardExtras> {
+export async function loadDashboardExtras(
+  userId: string,
+  locale: UserLocale = "ka",
+): Promise<DashboardExtras> {
   const canWeekly = await isUnlocked(userId, "weekly", "spend_weekly");
 
   const [daily, moonPhase, weeklyForecast] = await Promise.all([
-    ensureDailyFor(userId).catch((err) => {
+    ensureDailyFor(userId, locale).catch((err) => {
           console.warn("[dashboard:daily]", (err as Error).message);
           return null;
         }),
-    ensureMoonPhase().catch((err) => {
+    ensureMoonPhase(locale).catch((err) => {
       console.warn("[dashboard:moon]", (err as Error).message);
       return null;
     }),
     canWeekly
-      ? ensureWeeklyForecast(userId).catch((err) => {
+      ? ensureWeeklyForecast(userId, locale).catch((err) => {
           console.warn("[dashboard:weekly]", (err as Error).message);
           return null;
         })
@@ -121,7 +125,7 @@ export async function loadDashboardExtras(userId: string): Promise<DashboardExtr
   // any cached daily (old AI ones too) since topAspects has always been
   // persisted; aspects without a library row yet are simply skipped.
   const transitBreakdown = daily?.transits?.topAspects?.length
-    ? await overlayTransitAspects(daily.transits.topAspects).catch(
+    ? await overlayTransitAspects(daily.transits.topAspects, 5, locale).catch(
         () => [] as TransitBreakdownItem[]
       )
     : [];

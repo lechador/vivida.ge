@@ -8,6 +8,24 @@ import {
   GEORGIAN_HOSTS,
 } from "./lib/seo/locales";
 
+/**
+ * Georgian keyword landing pages that overlap an established English page.
+ *
+ * Serving the Georgian page on the international host would create a
+ * language-mismatched, competing URL. A host-scoped permanent redirect keeps
+ * the Georgian URLs intact on vivida.ge while consolidating English signals
+ * on the existing canonical page.
+ */
+const ENGLISH_LEGACY_CONTENT_REDIRECTS = [
+  { source: "/piradi-ruka", destination: "/natal-chart" },
+  {
+    source: "/piradi-ruka/rogor-shevadginot",
+    destination: "/natal-chart",
+  },
+  { source: "/piradi-horoskopi", destination: "/horoscope" },
+  { source: "/mkitxaoba", destination: "/taro" },
+] as const;
+
 const nextConfig: NextConfig = {
   // The PDF report route reads the Georgian TTFs at runtime via fs — Vercel's
   // tracer won't pick up a dynamic path on its own, so include them explicitly
@@ -37,8 +55,18 @@ const nextConfig: NextConfig = {
       })),
     );
 
+    const legacyContentRedirects = ENGLISH_HOSTS.flatMap((host) =>
+      ENGLISH_LEGACY_CONTENT_REDIRECTS.map(({ source, destination }) => ({
+        source,
+        has: [{ type: "host" as const, value: host }],
+        destination: `${ENGLISH_SITE_URL}${destination}`,
+        permanent: true,
+      })),
+    );
+
     return [
       ...legacyEnglishRedirects,
+      ...legacyContentRedirects,
       { source: "/test", destination: "/pirovnebis-testi", permanent: true },
       { source: "/test/claim", destination: "/pirovnebis-testi/claim", permanent: true },
     ];

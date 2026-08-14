@@ -8,9 +8,11 @@ export type RadarPoint = { key: string; label: string; score: number; hue: strin
 export function TraitRadar({
   points,
   size = 340,
+  locale = "ka",
 }: {
   points: RadarPoint[];
   size?: number;
+  locale?: "ka" | "en";
 }) {
   const cx = size / 2;
   const cy = size / 2;
@@ -34,7 +36,11 @@ export function TraitRadar({
       viewBox={`0 0 ${size} ${size}`}
       className="mx-auto h-auto w-full max-w-[360px]"
       role="img"
-      aria-label="პიროვნების თვისებების რადარი"
+      aria-label={
+        locale === "en"
+          ? "Personality trait radar chart"
+          : "პიროვნების თვისებების რადარი"
+      }
     >
       <defs>
         <linearGradient id="trait-radar-fill" x1="0" y1="0" x2="1" y2="1">

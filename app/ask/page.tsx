@@ -43,6 +43,7 @@ export default async function AskPage() {
         title={en ? "Your AI astrologer needs a natal chart" : "AI ასტროლოგი ნატალურ რუკას საჭიროებს"}
         description={en ? "Add your birth details to talk to an AI astrologer who knows your chart." : "შეავსე დაბადების მონაცემები, რომ ესაუბრო AI ასტროლოგს, რომელიც შენს რუკას იცნობს."}
         next="/ask"
+        locale={locale}
       />
     );
 

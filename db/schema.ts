@@ -418,6 +418,8 @@ export const pdfReports = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     /** 'natal' | 'synastry' | 'forecast' — natal is the only one shipped today. */
     type: text("type").notNull().default("natal"),
+    /** Language captured at purchase so retries always reproduce the same PDF. */
+    language: text("language").notNull().default("ka"),
     status: pdfReportStatusEnum("status").notNull().default("pending"),
     /** chart input hash captured at purchase, so we can flag a stale report
      *  if the user later changes their birth data. */

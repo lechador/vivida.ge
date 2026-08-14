@@ -7,8 +7,14 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { PeopleList } from "@/components/people/people-list";
 import { getUserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "ხალხი" };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: (await getRequestLocale()) === "en" ? "People" : "ხალხი",
+  };
+}
 export const dynamic = "force-dynamic";
 
 /**

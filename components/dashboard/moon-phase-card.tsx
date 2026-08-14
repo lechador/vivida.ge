@@ -3,6 +3,8 @@
 import { signByIndex } from "@/lib/zodiac";
 import { cn } from "@/lib/utils";
 import type { MoonPhaseRow } from "@/actions/moon-phase";
+import { PHASE_LABEL_EN } from "@/lib/moon-phase";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Render the universal moon-phase card on the dashboard.
@@ -12,10 +14,13 @@ import type { MoonPhaseRow } from "@/actions/moon-phase";
 export function MoonPhaseCard({
   data,
   onRead,
+  locale = "ka",
 }: {
   data: MoonPhaseRow;
   onRead?: () => void;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const { snapshot } = data;
   const sign = signByIndex(snapshot.signIndex);
   const illumPct = Math.round(snapshot.illumination * 100);
@@ -36,12 +41,12 @@ export function MoonPhaseCard({
       <div className="relative mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            დღევანდელი მთვარე
+            {en ? "Today's Moon" : "დღევანდელი მთვარე"}
           </div>
           <div className="mt-1 text-sm font-medium text-foreground/85">
-            {data.phaseLabelKa} ·{" "}
+            {en ? PHASE_LABEL_EN[data.snapshot.phaseKey] : data.phaseLabelKa} ·{" "}
             <span style={{ color: "oklch(0.85 0.10 240)" }}>{sign.symbol}</span>{" "}
-            {data.signKa}
+            {en ? sign.labelEn : data.signKa}
           </div>
         </div>
         <MoonGlyph
@@ -55,8 +60,8 @@ export function MoonPhaseCard({
       </h3>
 
       <div className="relative mt-2 flex flex-wrap gap-1 text-[11px] text-foreground/70">
-        <Pill>{illumPct}% განათებული</Pill>
-        <Pill>{snapshot.ageDays.toFixed(1)} დღე</Pill>
+        <Pill>{en ? `${illumPct}% illuminated` : `${illumPct}% განათებული`}</Pill>
+        <Pill>{snapshot.ageDays.toFixed(1)} {en ? "days" : "დღე"}</Pill>
       </div>
 
       <p className="relative mt-3 text-pretty text-sm leading-relaxed text-foreground/85">
@@ -83,7 +88,7 @@ export function MoonPhaseCard({
         }}
       >
         <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
-          <span>გააგრძელე კითხვა</span>
+          <span>{en ? "Continue reading" : "გააგრძელე კითხვა"}</span>
           <span aria-hidden className="transition-transform group-open:rotate-90">›</span>
         </summary>
         <div className="mt-3 space-y-2.5 text-pretty text-sm leading-relaxed text-foreground/85">

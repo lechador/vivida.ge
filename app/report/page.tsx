@@ -40,6 +40,7 @@ export default async function ReportPage() {
         title={en ? "A natal chart needs your birth details" : "ნატალური რუკა დაბადების მონაცემებს საჭიროებს"}
         description={en ? "Add your birth date, time and place to calculate your personal cosmic map." : "შეავსე დაბადების თარიღი, დრო და ადგილი, რომ შედგეს შენი პერსონალური კოსმიური რუკა."}
         next="/report"
+        locale={locale}
       />
     );
   }
@@ -88,7 +89,7 @@ export default async function ReportPage() {
         <Suspense
           fallback={
             <div className="flex min-h-[65vh] items-center justify-center">
-              <CosmicLoader embedded />
+              <CosmicLoader embedded locale={locale} />
             </div>
           }
         >

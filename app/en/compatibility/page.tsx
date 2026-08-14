@@ -3,8 +3,9 @@ import Link from "next/link";
 import { ArrowRight, Heart } from "lucide-react";
 
 import { EnglishGuide } from "@/components/en/english-guide";
-import { GeorgianContentNote } from "@/components/en/georgian-content-note";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { CompatibilityCalculator } from "@/components/landing/compatibility-calculator";
+import { buildCalculatorData } from "@/lib/compatibility-calculator-data";
+import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const PATH = "/en/compatibility";
 const TITLE = "Astrology Compatibility Beyond Sun Signs";
@@ -17,9 +18,17 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishCompatibilityPage() {
+  const { signs, pairs } = buildCalculatorData("en");
   return (
     <EnglishGuide eyebrow="Relationships and synastry" title="Compatibility is more than two Sun signs" intro="Astrological compatibility, often called synastry, compares two complete natal charts. It explores patterns of ease, attraction, difference and growth without deciding whether a relationship will succeed." georgianPath="/zodiac/tavsebadoba">
-      <GeorgianContentNote href="/zodiac/tavsebadoba" label="Open the compatibility calculator in Georgian" />
+      <section className="not-prose rounded-3xl border border-border bg-card/40 p-4 sm:p-7">
+        <div className="mb-6 text-center">
+          <Heart className="mx-auto size-7 text-[var(--vivida-pink)]" />
+          <h2 className="mt-3 text-2xl font-semibold">Try the free Sun-sign calculator</h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">Choose two signs for an instant English compatibility reading, then open the full pair analysis.</p>
+        </div>
+        <CompatibilityCalculator signs={signs} pairs={pairs} locale="en" />
+      </section>
       <section>
         <h2>What a compatibility reading compares</h2>
         <ul className="mt-4 list-disc">
@@ -42,8 +51,8 @@ export default function EnglishCompatibilityPage() {
       <div className="rounded-3xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-6 text-center sm:p-8">
         <Heart className="mx-auto size-7 text-[var(--vivida-pink)]" />
         <h2 className="mt-3">Try the free Sun-sign calculator</h2>
-        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">The tool and its interpretations currently remain Georgian. Your zodiac sign names and result will be displayed in Georgian.</p>
-        <Link href={`${GEORGIAN_SITE_URL}/zodiac/tavsebadoba`} hrefLang="ka-GE" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-3 text-sm font-semibold text-white">Open calculator <ArrowRight className="size-4" /></Link>
+        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">Create a free profile to compare complete birth charts, including the Moon, Venus, Mars, houses, and cross-chart aspects—in English.</p>
+        <Link href="/signup" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-3 text-sm font-semibold text-white">Create my profile <ArrowRight className="size-4" /></Link>
       </div>
     </EnglishGuide>
   );

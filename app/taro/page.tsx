@@ -243,6 +243,7 @@ export default async function TaroHubPage() {
         </div>
 
         <PopularSearches
+          locale={locale}
           queries={
             en
               ? ["free online tarot reading", "three card tarot spread", "Major Arcana meanings", "upright and reversed tarot cards"]

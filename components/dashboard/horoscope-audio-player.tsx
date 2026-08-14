@@ -9,6 +9,7 @@ import { CREDIT_COST } from "@/lib/credits-config";
 import { HOROSCOPE_VOICES } from "@/lib/horoscope-voices";
 import { useAudioPlayer } from "@/components/audio/audio-provider";
 import { EqBars } from "@/components/audio/eq-bars";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 type Status = "idle" | "choosing" | "generating" | "ready" | "error";
 
@@ -22,8 +23,16 @@ const ERRORS: Record<string, string> = {
   generation_failed: "ხმის შექმნა ვერ მოხერხდა. სცადე ხელახლა.",
   no_profile: "პროფილი ვერ მოიძებნა.",
 };
+const ERRORS_EN: Record<string, string> = {
+  no_horoscope: "Today's horoscope is still being prepared. Try again shortly.",
+  audio_unavailable: "Audio is temporarily unavailable.",
+  rate_limited: "Too many requests. Try again shortly.",
+  generation_failed: "Could not create the audio. Please try again.",
+  no_profile: "Profile not found.",
+};
 
 const GEN_MESSAGES = ["ვამზადებთ აუდიოს…", "ხმა იწერება…", "თითქმის მზადაა…"];
+const GEN_MESSAGES_EN = ["Preparing audio…", "Recording the voice…", "Almost ready…"];
 
 /**
  * "Listen to today's horoscope" trigger. Generates ElevenLabs audio on demand
@@ -33,9 +42,14 @@ const GEN_MESSAGES = ["ვამზადებთ აუდიოს…", "ხ�
  */
 export function HoroscopeAudioPlayer({
   savedVoice,
+  locale = "ka",
 }: {
   savedVoice?: string | null;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
+  const title = en ? "Today's horoscope" : TITLE;
+  const generationMessages = en ? GEN_MESSAGES_EN : GEN_MESSAGES;
   const audio = useAudioPlayer();
   const [status, setStatus] = useState<Status>("idle");
   const [voice, setVoice] = useState<string | null>(() => {
@@ -53,7 +67,10 @@ export function HoroscopeAudioPlayer({
   const [myUrl, setMyUrl] = useState<string | null>(null);
 
   const voiceLabel =
-    HOROSCOPE_VOICES.find((v) => v.slug === voice)?.labelKa ?? "";
+    (() => {
+      const selected = HOROSCOPE_VOICES.find((v) => v.slug === voice);
+      return selected ? (en ? selected.labelEn : selected.labelKa) : "";
+    })();
 
   // Eased progress crawl + rotating message while generating.
   useEffect(() => {
@@ -61,12 +78,12 @@ export function HoroscopeAudioPlayer({
     const bar = setInterval(() => {
       setProgress((p) => (p >= 92 ? 92 : p + (92 - p) * 0.06));
     }, 300);
-    const msg = setInterval(() => setStage((s) => (s + 1) % GEN_MESSAGES.length), 3000);
+    const msg = setInterval(() => setStage((s) => (s + 1) % generationMessages.length), 3000);
     return () => {
       clearInterval(bar);
       clearInterval(msg);
     };
-  }, [status]);
+  }, [generationMessages.length, status]);
 
   async function generate(v: string | null) {
     setError(null);
@@ -80,7 +97,7 @@ export function HoroscopeAudioPlayer({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.url) {
-        setError(ERRORS[data.error] ?? "რაღაც ვერ მოხერხდა. სცადე ხელახლა.");
+        setError((en ? ERRORS_EN : ERRORS)[data.error] ?? (en ? "Something went wrong. Please try again." : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."));
         setStatus("error");
         return;
       }
@@ -92,11 +109,14 @@ export function HoroscopeAudioPlayer({
       }
       setMyUrl(data.url);
       const label =
-        HOROSCOPE_VOICES.find((x) => x.slug === data.voice)?.labelKa ?? "";
-      audio.play({ url: data.url, title: TITLE, subtitle: label });
+        (() => {
+          const selected = HOROSCOPE_VOICES.find((x) => x.slug === data.voice);
+          return selected ? (en ? selected.labelEn : selected.labelKa) : "";
+        })();
+      audio.play({ url: data.url, title, subtitle: label });
       setStatus("ready");
     } catch {
-      setError("ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
       setStatus("error");
     }
   }
@@ -112,10 +132,10 @@ export function HoroscopeAudioPlayer({
       <div className="relative mt-5 rounded-xl border border-[var(--vivida-violet)]/30 bg-card/50 p-4">
         <div className="mb-3 flex items-center gap-2 text-sm font-medium">
           <Volume2 className="size-4 text-[var(--vivida-violet)]" />
-          აირჩიე ხმა
+          {en ? "Choose a voice" : "აირჩიე ხმა"}
         </div>
         <div className="mb-2">
-          <CreditHint>ერთი მოსმენა · −2 კრედიტი</CreditHint>
+          <CreditHint>{en ? "One listen · −2 credits" : "ერთი მოსმენა · −2 კრედიტი"}</CreditHint>
         </div>
         <div className="grid gap-2 sm:grid-cols-3">
           {HOROSCOPE_VOICES.map((v) => (
@@ -128,8 +148,8 @@ export function HoroscopeAudioPlayer({
               }}
               className="rounded-lg border border-border bg-card/60 p-3 text-left transition-colors hover:border-[var(--vivida-violet)]/50 hover:bg-card/90"
             >
-              <div className="text-sm font-semibold">{v.labelKa}</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">{v.descKa}</div>
+              <div className="text-sm font-semibold">{en ? v.labelEn : v.labelKa}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{en ? v.descEn : v.descKa}</div>
             </button>
           ))}
         </div>
@@ -143,8 +163,8 @@ export function HoroscopeAudioPlayer({
       <div className="relative mt-5 rounded-xl border border-[var(--vivida-violet)]/30 bg-card/50 p-4">
         <div className="flex items-center gap-2 text-sm text-foreground/85">
           <Loader2 className="size-4 animate-spin text-[var(--vivida-violet)]" />
-          {GEN_MESSAGES[stage]}
-          <span className="ml-auto text-xs text-muted-foreground">დაიწყება ~10 წამში</span>
+          {generationMessages[stage]}
+          <span className="ml-auto text-xs text-muted-foreground">{en ? "Starts in ~10 seconds" : "დაიწყება ~10 წამში"}</span>
         </div>
         <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
           <div
@@ -164,11 +184,11 @@ export function HoroscopeAudioPlayer({
       <div className="relative mt-5 flex items-center gap-3 rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/12 to-[var(--vivida-cyan)]/8 p-3 ring-1 ring-foreground/5 backdrop-blur-xl">
         <button
           type="button"
-          aria-label={isPlaying ? "პაუზა" : "დაკვრა"}
+          aria-label={isPlaying ? (en ? "Pause" : "პაუზა") : (en ? "Play" : "დაკვრა")}
           onClick={() => {
             if (mine) audio.toggle();
             else if (myUrl)
-              audio.play({ url: myUrl, title: TITLE, subtitle: voiceLabel });
+              audio.play({ url: myUrl, title, subtitle: voiceLabel });
           }}
           className="grid size-11 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-lg shadow-[var(--vivida-violet)]/40 transition-transform hover:scale-105 active:scale-95"
         >
@@ -177,7 +197,7 @@ export function HoroscopeAudioPlayer({
         <div className="flex min-w-0 flex-1 items-center gap-2 text-sm font-medium text-foreground/90">
           <EqBars playing={isPlaying} />
           <span className="truncate">
-            {TITLE}
+            {title}
             {voiceLabel ? <span className="text-muted-foreground"> · {voiceLabel}</span> : null}
           </span>
         </div>
@@ -186,7 +206,7 @@ export function HoroscopeAudioPlayer({
           onClick={() => setStatus("choosing")}
           className="shrink-0 text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
-          ხმის შეცვლა
+          {en ? "Change voice" : "ხმის შეცვლა"}
         </button>
       </div>
     );
@@ -208,9 +228,9 @@ export function HoroscopeAudioPlayer({
           className="relative h-auto min-h-12 w-full flex-wrap justify-center gap-x-1.5 gap-y-1.5 whitespace-normal px-4 py-2.5 shadow-xl shadow-[var(--vivida-violet)]/40"
         >
           <Headphones className="size-5 shrink-0" />
-          <span className="whitespace-nowrap">მოისმინე ჰოროსკოპი</span>
+          <span className="whitespace-nowrap">{en ? "Listen to horoscope" : "მოისმინე ჰოროსკოპი"}</span>
           <span className="inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold tabular-nums">
-            −{CREDIT_COST.audioHoroscope} კრედიტი
+            −{CREDIT_COST.audioHoroscope} {en ? "credits" : "კრედიტი"}
           </span>
         </Button>
       </div>

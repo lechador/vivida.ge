@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Starfield } from "@/components/landing/starfield";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Reusable cosmic loading state.
@@ -24,14 +25,16 @@ import { Starfield } from "@/components/landing/starfield";
 export function CosmicLoader({
   embedded = false,
   progressive = false,
+  locale = "ka",
 }: {
   embedded?: boolean;
   progressive?: boolean;
+  locale?: UserLocale;
 }) {
   const content = (
     <div className="relative flex w-full max-w-md flex-col items-center justify-center px-6 py-10 text-center">
       <SpinningChart />
-      {progressive ? <ProgressiveStatus /> : <SimpleStatus />}
+      {progressive ? <ProgressiveStatus locale={locale} /> : <SimpleStatus locale={locale} />}
     </div>
   );
 
@@ -55,7 +58,7 @@ export function CosmicLoader({
   );
 }
 
-function SimpleStatus() {
+function SimpleStatus({ locale }: { locale: UserLocale }) {
   return (
     <motion.p
       initial={{ opacity: 0, y: 8 }}
@@ -63,7 +66,7 @@ function SimpleStatus() {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="mt-8 text-base text-foreground/85 sm:text-lg"
     >
-      ვარსკვლავებს ვითვლით…
+      {locale === "en" ? "Calculating the stars…" : "ვარსკვლავებს ვითვლით…"}
     </motion.p>
   );
 }
@@ -83,8 +86,14 @@ const STAGES: Array<{ at: number; label: string }> = [
   { at: 0.6, label: "ვითვლით შენს დიდ სამეულს…" },
   { at: 0.85, label: "ვალაგებთ შენს დაშბორდს…" },
 ];
+const STAGES_EN: Array<{ at: number; label: string }> = [
+  { at: 0, label: "Opening your birth moment…" },
+  { at: 0.3, label: "Calculating planetary positions…" },
+  { at: 0.6, label: "Finding your big three…" },
+  { at: 0.85, label: "Preparing your dashboard…" },
+];
 
-function ProgressiveStatus() {
+function ProgressiveStatus({ locale }: { locale: UserLocale }) {
   const [progress, setProgress] = useState(0);
 
   // Asymptotic ease — progress = 1 - e^(-t / tau). With tau≈2s, the bar
@@ -106,9 +115,10 @@ function ProgressiveStatus() {
   }, []);
 
   // Pick the highest stage whose threshold the bar has crossed.
-  const stage = STAGES.reduce(
+  const stages = locale === "en" ? STAGES_EN : STAGES;
+  const stage = stages.reduce(
     (best, s) => (progress / 100 >= s.at ? s : best),
-    STAGES[0]
+    stages[0]
   );
 
   return (

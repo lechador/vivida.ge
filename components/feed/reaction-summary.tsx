@@ -1,4 +1,5 @@
 import type { FeedReactionCounts } from "@/actions/feed";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 import { ReactionIcon, REACTIONS } from "./reaction-icons";
 
@@ -12,8 +13,10 @@ import { ReactionIcon, REACTIONS } from "./reaction-icons";
  */
 export function ReactionSummary({
   counts,
+  locale = "ka",
 }: {
   counts: FeedReactionCounts;
+  locale?: UserLocale;
 }) {
   const total =
     counts.like + counts.dislike + counts.funny + counts.sad;
@@ -35,7 +38,7 @@ export function ReactionSummary({
             style={{
               backgroundColor: `color-mix(in oklch, ${r.hue} 45%, var(--background))`,
             }}
-            aria-label={r.labelKa}
+            aria-label={locale === "en" ? r.labelEn : r.labelKa}
           >
             <ReactionIcon kind={r.kind} size={11} active />
           </span>

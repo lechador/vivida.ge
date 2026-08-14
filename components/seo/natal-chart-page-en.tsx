@@ -177,7 +177,7 @@ export function NatalChartPageEn() {
               Your natal chart stays fixed, while the planets keep moving. Those
               current movements are called transits. Explore the{" "}
               <Link
-                href="/horoskopi"
+                href="/horoscope"
                 className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
               >
                 daily horoscope
@@ -217,10 +217,9 @@ export function NatalChartPageEn() {
           <section className="flex flex-wrap gap-2">
             {[
               { href: "/zodiac", label: "Zodiac signs" },
-              { href: "/zodiac/tavsebadoba", label: "Compatibility" },
-              { href: "/horoskopi", label: "Daily horoscope" },
+              { href: "/compatibility", label: "Compatibility" },
+              { href: "/horoscope", label: "Daily horoscope" },
               { href: "/tests", label: "Personality tests" },
-              { href: "/numerologia", label: "Numerology" },
             ].map((item) => (
               <Link
                 key={item.href}
@@ -234,6 +233,7 @@ export function NatalChartPageEn() {
         </article>
 
         <PopularSearches
+          locale="en"
           queries={[
             "free birth chart",
             "natal chart calculator",

@@ -9,8 +9,15 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SwipeDeck } from "@/components/discover/swipe-deck";
 import { requireUser } from "@/lib/auth-helpers";
 import { getDiscoveryFeed, type DiscoverCard } from "@/lib/discover";
+import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "აღმოაჩინე" };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: (await getRequestLocale()) === "en" ? "Discover" : "აღმოაჩინე",
+  };
+}
 export const dynamic = "force-dynamic";
 
 export default async function DiscoverPage() {
@@ -18,7 +25,10 @@ export default async function DiscoverPage() {
   // bounce to the dashboard so the entry point degrades gracefully (no 404).
   if (!SOCIAL_FEATURES.swipeDeck) redirect("/dashboard");
   const user = await requireUser();
-  const feed = await getDiscoveryFeed(user.id);
+  const [feed, locale] = await Promise.all([
+    getDiscoveryFeed(user.id),
+    getUserLocale(user.id),
+  ]);
 
   // Flatten the feed into a single ranked stack: spotlight first
   // (highest synastry), then the user's tribe, then magic, then the
@@ -35,6 +45,7 @@ export default async function DiscoverPage() {
 
   return (
     <main
+      lang={locale}
       data-no-body-bottom-pad
       className="relative isolate flex h-[100dvh] flex-col overflow-hidden"
     >
@@ -48,28 +59,43 @@ export default async function DiscoverPage() {
 
       <section className="relative z-10 mx-auto flex w-full min-h-0 max-w-md flex-1 flex-col px-3 pb-[calc(4.5rem+max(env(safe-area-inset-bottom),0.25rem))] pt-2 sm:max-w-2xl sm:px-6 sm:pb-6 lg:pb-8">
         {stack.length === 0 ? (
-          <EmptyState hasElement={!!feed.viewerElement} />
+          <EmptyState hasElement={!!feed.viewerElement} locale={locale} />
         ) : (
-          <SwipeDeck cards={stack} />
+          <SwipeDeck cards={stack} locale={locale} />
         )}
       </section>
     </main>
   );
 }
 
-function EmptyState({ hasElement }: { hasElement: boolean }) {
+function EmptyState({
+  hasElement,
+  locale,
+}: {
+  hasElement: boolean;
+  locale: UserLocale;
+}) {
+  const en = locale === "en";
   return (
     <div className="mx-auto mt-12 max-w-md rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
       <Compass className="mx-auto mb-3 size-8 text-muted-foreground" />
-      <h2 className="text-lg font-semibold">ჯერ ცარიელია</h2>
+      <h2 className="text-lg font-semibold">
+        {en ? "Nothing here yet" : "ჯერ ცარიელია"}
+      </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
         {hasElement
-          ? "სხვა საჯარო პროფილები ჯერ არ არიან. დაბრუნდი ცოტა ხანში — ცა იცვლება."
-          : "შეავსე დაბადების მონაცემები, რომ აღმოაჩინო შენთან თავსებადი ხალხი."}
+          ? en
+            ? "There are no other public profiles yet. Check back soon — the sky changes."
+            : "სხვა საჯარო პროფილები ჯერ არ არიან. დაბრუნდი ცოტა ხანში — ცა იცვლება."
+          : en
+            ? "Add your birth details to discover compatible people."
+            : "შეავსე დაბადების მონაცემები, რომ აღმოაჩინო შენთან თავსებადი ხალხი."}
       </p>
       {!hasElement && (
         <Button asChild variant="mystic" className="mt-4">
-          <Link href="/onboarding">შეავსე ახლავე</Link>
+          <Link href="/onboarding">
+            {en ? "Add details" : "შეავსე ახლავე"}
+          </Link>
         </Button>
       )}
     </div>

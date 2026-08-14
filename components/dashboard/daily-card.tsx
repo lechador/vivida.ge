@@ -12,6 +12,7 @@ import { BODIES } from "@/lib/zodiac";
 import { Button } from "@/components/ui/button";
 import { HoroscopeAudioPlayer } from "./horoscope-audio-player";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ASPECT_GLYPH: Record<string, string> = {
   conjunction: "☌",
@@ -27,6 +28,13 @@ const ASPECT_KA: Record<string, string> = {
   square: "კვადრატი",
   trine: "ტრინი",
   opposition: "ოპოზიცია",
+};
+const ASPECT_EN: Record<string, string> = {
+  conjunction: "conjunction",
+  sextile: "sextile",
+  square: "square",
+  trine: "trine",
+  opposition: "opposition",
 };
 
 /** Harmonic aspects get the cyan accent, tense ones pink, neutral violet. */
@@ -48,6 +56,7 @@ export function DailyCard({
   savedVoice,
   canAudio = true,
   onRead,
+  locale = "ka",
 }: {
   horoscope: DailyHoroscope;
   /** Today's strongest transit aspects + their library interpretations. */
@@ -55,7 +64,9 @@ export function DailyCard({
   savedVoice?: string | null;
   canAudio?: boolean;
   onRead?: () => void;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const readSentinelRef = useRef<HTMLParagraphElement>(null);
   const readTrackedRef = useRef(false);
 
@@ -90,7 +101,9 @@ export function DailyCard({
   // `horoscope.date` is already the user's local date, so it is rendered
   // verbatim — no timezone shift, and no dependence on the browser shipping
   // Georgian locale data.
-  const date = kaLongDate(horoscope.date);
+  const date = en
+    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${horoscope.date}T00:00:00Z`))
+    : kaLongDate(horoscope.date);
 
   return (
     <article className="relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-7 backdrop-blur-xl sm:p-9">
@@ -106,7 +119,7 @@ export function DailyCard({
       <header className="relative flex items-center justify-between gap-4">
         <div>
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            დღევანდელი დღე · {date}
+            {en ? "Today" : "დღევანდელი დღე"} · {date}
           </div>
           <h2 className="mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
@@ -130,9 +143,9 @@ export function DailyCard({
           <span aria-hidden className="text-base leading-none">
             🔮
           </span>
-          ტარო — დაუსვი კითხვა კარტებს
+          {en ? "Tarot—ask the cards a question" : "ტარო — დაუსვი კითხვა კარტებს"}
           <span className="rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/15 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-violet)]">
-            პირველი უფასოდ
+            {en ? "First free" : "პირველი უფასოდ"}
           </span>
         </span>
         <span
@@ -180,16 +193,16 @@ export function DailyCard({
           transit breakdown so it follows the horoscope itself, not the
           tarot/entry links at the top of the card. */}
       {canAudio ? (
-        <HoroscopeAudioPlayer savedVoice={savedVoice} />
+        <HoroscopeAudioPlayer savedVoice={savedVoice} locale={locale} />
       ) : (
         <div className="relative mt-5">
           <Button asChild variant="outline" size="lg" className="w-full justify-center sm:w-auto">
             <Link href="/credits">
               <Headphones className="size-4" />
-              მოისმინე ჰოროსკოპი
+              {en ? "Listen to horoscope" : "მოისმინე ჰოროსკოპი"}
               <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-gold)]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--vivida-gold)]">
                 <Lock className="size-3" />
-                {CREDIT_COST.audioHoroscope} კრედიტი
+                {CREDIT_COST.audioHoroscope} {en ? "credits" : "კრედიტი"}
               </span>
             </Link>
           </Button>
@@ -199,7 +212,7 @@ export function DailyCard({
       {transits.length > 0 && (
         <section className="relative mt-6 border-t border-border/40 pt-5">
           <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            დღის ტრანზიტები
+            {en ? "Today's transits" : "დღის ტრანზიტები"}
           </h3>
           <ul className="mt-3 space-y-3">
             {transits.map((t, i) => {
@@ -220,12 +233,12 @@ export function DailyCard({
                         backgroundColor: `color-mix(in oklch, ${tone} 10%, transparent)`,
                       }}
                     >
-                      {transitBody?.symbol} {transitBody?.labelKa ?? t.transit}
+                      {transitBody?.symbol} {(en ? transitBody?.labelEn : transitBody?.labelKa) ?? t.transit}
                       <span aria-hidden>{ASPECT_GLYPH[t.kind] ?? "·"}</span>
-                      {natalBody?.symbol} {natalBody?.labelKa ?? t.natal}
+                      {natalBody?.symbol} {(en ? natalBody?.labelEn : natalBody?.labelKa) ?? t.natal}
                     </span>
                     <span className="text-muted-foreground">
-                      {ASPECT_KA[t.kind] ?? t.kind}
+                      {(en ? ASPECT_EN : ASPECT_KA)[t.kind] ?? t.kind}
                     </span>
                   </div>
                   <p className="mt-2 text-sm font-medium text-foreground/95">
@@ -245,7 +258,7 @@ export function DailyCard({
         ref={readSentinelRef}
         className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground"
       >
-        ხვალ ახალი წინასწარმეტყველება გელოდება.
+        {en ? "A new reading will be waiting tomorrow." : "ხვალ ახალი წინასწარმეტყველება გელოდება."}
       </p>
     </article>
   );

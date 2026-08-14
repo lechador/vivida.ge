@@ -80,7 +80,8 @@ export default function ReportError({
         <>
           <Loader2 className="size-8 animate-spin text-[var(--vivida-violet)]" />
           <p className="mt-4 text-sm text-muted-foreground">
-            შენი რუკა მზადდება — ერთი წამი…
+            <span className="locale-ka-only">შენი რუკა მზადდება — ერთი წამი…</span>
+            <span className="locale-en-only">Your chart is being prepared — one moment…</span>
           </p>
         </>
       ) : (
@@ -89,10 +90,16 @@ export default function ReportError({
             <RotateCcw className="size-7 text-[var(--vivida-violet)]" />
           </div>
           <h2 className="mt-4 text-xl font-semibold tracking-tight">
-            რუკა ვერ ჩაიტვირთა
+            <span className="locale-ka-only">რუკა ვერ ჩაიტვირთა</span>
+            <span className="locale-en-only">Your chart could not load</span>
           </h2>
           <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
-            შესაძლოა ჯერ მზადდება. სცადე ხელახლა — ჩვეულებრივ მაშინვე ეშველება.
+            <span className="locale-ka-only">
+              შესაძლოა ჯერ მზადდება. სცადე ხელახლა — ჩვეულებრივ მაშინვე ეშველება.
+            </span>
+            <span className="locale-en-only">
+              It may still be generating. Try again — this usually resolves immediately.
+            </span>
           </p>
           <button
             type="button"
@@ -100,7 +107,8 @@ export default function ReportError({
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90"
           >
             <RotateCcw className="size-4" />
-            ხელახლა ცდა
+            <span className="locale-ka-only">ხელახლა ცდა</span>
+            <span className="locale-en-only">Try again</span>
           </button>
         </>
       )}

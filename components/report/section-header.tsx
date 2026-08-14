@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Common section header for /report. Numbered icon container + title +
@@ -10,12 +11,14 @@ export function SectionHeader({
   Icon,
   title,
   subtitle,
+  locale = "ka",
 }: {
   /** Two-digit string like "01", "02" — for visual rhythm */
   number: string;
   Icon: LucideIcon;
   title: string;
   subtitle?: string;
+  locale?: UserLocale;
 }) {
   return (
     <header className="mb-6 flex items-center gap-4">
@@ -24,7 +27,7 @@ export function SectionHeader({
       </div>
       <div className="min-w-0">
         <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-          სექცია {number}
+          {locale === "en" ? "Section" : "სექცია"} {number}
         </div>
         <h2 className="mt-0.5 text-2xl font-semibold tracking-tight">
           {title}

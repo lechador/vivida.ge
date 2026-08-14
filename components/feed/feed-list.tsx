@@ -7,6 +7,7 @@ import { Loader2, Sparkles } from "lucide-react";
 import { listFeed, type FeedPost } from "@/actions/feed";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 import { PostCard } from "./post-card";
 
@@ -24,6 +25,7 @@ export function FeedList({
   viewerIsAdmin,
   viewerSunSign,
   disablePagination = false,
+  locale = "ka",
 }: {
   initial: FeedPost[];
   viewerId: string;
@@ -35,7 +37,9 @@ export function FeedList({
    *  Used on the profile page where we render a fixed-size "recent posts"
    *  preview rather than the full paginated feed. */
   disablePagination?: boolean;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [posts, setPosts] = useState<FeedPost[]>(initial);
   const [hasMore, setHasMore] = useState(
     !disablePagination && initial.length >= PAGE_SIZE
@@ -81,22 +85,22 @@ export function FeedList({
             active={filter === "all"}
             onClick={() => setFilter("all")}
           >
-            ყველა
+            {en ? "All" : "ყველა"}
           </FilterChip>
           <FilterChip
             active={filter === "sign"}
             onClick={() => setFilter("sign")}
           >
-            ჩემი ნიშნით
+            {en ? "My sign" : "ჩემი ნიშნით"}
           </FilterChip>
         </div>
       )}
 
       {visible.length === 0 ? (
         filter === "sign" ? (
-          <SignEmptyState />
+          <SignEmptyState locale={locale} />
         ) : (
-          <EmptyState />
+          <EmptyState locale={locale} />
         )
       ) : (
         <ul className="space-y-4">
@@ -106,6 +110,7 @@ export function FeedList({
                 post={p}
                 viewerId={viewerId}
                 viewerIsAdmin={viewerIsAdmin}
+                locale={locale}
               />
             </li>
           ))}
@@ -125,7 +130,7 @@ export function FeedList({
             ) : (
               <Sparkles className="size-4" />
             )}
-            მეტი პოსტი
+            {en ? "More posts" : "მეტი პოსტი"}
           </Button>
         </div>
       )}
@@ -158,30 +163,33 @@ function FilterChip({
   );
 }
 
-function EmptyState() {
+function EmptyState({ locale }: { locale: UserLocale }) {
+  const en = locale === "en";
   return (
     <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
       <Sparkles className="mx-auto mb-3 size-8 text-[var(--vivida-violet)]" />
-      <h2 className="text-lg font-semibold">ფიდი ჯერ ცარიელია</h2>
+      <h2 className="text-lg font-semibold">{en ? "The feed is empty" : "ფიდი ჯერ ცარიელია"}</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-        იყავი პირველი — დაწერე რასაც ფიქრობ, კითხვა, ციტატა, ან უბრალოდ
-        როგორ ხარ.
+        {en
+          ? "Be the first to share a thought, question, quote, or simply how you feel."
+          : "იყავი პირველი — დაწერე რასაც ფიქრობ, კითხვა, ციტატა, ან უბრალოდ როგორ ხარ."}
       </p>
     </div>
   );
 }
 
-function SignEmptyState() {
+function SignEmptyState({ locale }: { locale: UserLocale }) {
+  const en = locale === "en";
   return (
     <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-8 text-center">
       <p className="text-sm text-muted-foreground">
-        ჯერ შენი ნიშნით არავის დაუპოსტავს — შენ თუ პირველი იქნები?
+        {en ? "No one with your sign has posted yet—will you be first?" : "ჯერ შენი ნიშნით არავის დაუპოსტავს — შენ თუ პირველი იქნები?"}
       </p>
       <Link
         href="/feed"
         className="mt-2 inline-block text-xs text-[var(--vivida-violet)] hover:underline"
       >
-        ნახე ყველა
+        {en ? "View all" : "ნახე ყველა"}
       </Link>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import type { PostReactionKind } from "@/db/schema";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 import { ReactionIcon, REACTIONS } from "./reaction-icons";
 
@@ -24,10 +25,12 @@ export function ReactionPicker({
   open,
   onPick,
   onRequestClose,
+  locale = "ka",
 }: {
   open: boolean;
   onPick: (kind: PostReactionKind) => void;
   onRequestClose: () => void;
+  locale?: UserLocale;
 }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -62,7 +65,7 @@ export function ReactionPicker({
               e.stopPropagation();
               onPick(r.kind);
             }}
-            aria-label={r.labelKa}
+            aria-label={locale === "en" ? r.labelEn : r.labelKa}
             className="group/btn relative grid size-9 place-items-center rounded-full transition-transform hover:scale-125"
             style={
               {

@@ -100,7 +100,10 @@ export function DesktopSidebar({
                 >
                   <item.Icon className="size-4" />
                   {item.key === "messages" && (
-                    <MessagesTabBadge initial={unreadMessages} />
+                    <MessagesTabBadge
+                      initial={unreadMessages}
+                      locale={locale}
+                    />
                   )}
                 </span>
                 <span className={cn("truncate", reveal)}>{navLabel(item, locale)}</span>

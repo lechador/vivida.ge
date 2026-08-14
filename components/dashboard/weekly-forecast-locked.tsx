@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Loader2, Lock, Sparkles, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Locked state for the 7-day forecast. The forecast is a one-time credit
@@ -16,10 +17,13 @@ import { Button } from "@/components/ui/button";
 export function WeeklyForecastLocked({
   cost,
   balance,
+  locale = "ka",
 }: {
   cost: number;
   balance: number;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);
 
@@ -54,10 +58,10 @@ export function WeeklyForecastLocked({
       <header className="relative mb-5 flex items-baseline justify-between gap-3">
         <div>
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            შემდეგი 7 დღე
+            {en ? "Next 7 days" : "შემდეგი 7 დღე"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight sm:text-xl">
-            შენი კვირის ცის რუკა
+            {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
         <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" aria-hidden />
@@ -76,7 +80,7 @@ export function WeeklyForecastLocked({
             >
               <div className="flex flex-col items-center rounded-lg border border-border bg-[oklch(0.27_0.05_285/0.7)] px-3 py-2">
                 <span className="text-[10px] uppercase text-muted-foreground">
-                  {["ორშ", "სამ", "ოთხ", "ხუთ"][i]}
+                  {(en ? ["Mon", "Tue", "Wed", "Thu"] : ["ორშ", "სამ", "ოთხ", "ხუთ"])[i]}
                 </span>
                 <span className="text-lg font-semibold">{12 + i}</span>
               </div>
@@ -95,13 +99,14 @@ export function WeeklyForecastLocked({
             <Lock className="size-6 text-[var(--vivida-violet)]" />
           </div>
           <p className="max-w-xs text-sm text-foreground/85">
-            გახსენი მომდევნო 7 დღის დეტალური პროგნოზი — ჰარმონიისა და
-            დაძაბულობის ქულები ყოველ დღეს, მიზეზებით და რჩევებით.
+            {en
+              ? "Unlock a detailed seven-day forecast with daily harmony and challenge scores, reasons, and guidance."
+              : "გახსენი მომდევნო 7 დღის დეტალური პროგნოზი — ჰარმონიისა და დაძაბულობის ქულები ყოველ დღეს, მიზეზებით და რჩევებით."}
           </p>
           <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-3 py-1 text-sm">
             <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-            <span className="font-semibold">{cost} კრედიტი</span>
-            <span className="text-muted-foreground">· ერთჯერადად · ბალანსი {balance}</span>
+            <span className="font-semibold">{cost} {en ? "credits" : "კრედიტი"}</span>
+            <span className="text-muted-foreground">· {en ? "one time · balance" : "ერთჯერადად · ბალანსი"} {balance}</span>
           </div>
 
           {!short ? (
@@ -118,17 +123,17 @@ export function WeeklyForecastLocked({
               ) : (
                 <Lock className="size-4" />
               )}
-              გახსნა {cost} კრედიტით
+              {en ? `Unlock for ${cost} credits` : `გახსნა ${cost} კრედიტით`}
             </Button>
           ) : (
             <div className="space-y-2">
               <p className="text-sm text-[var(--vivida-pink)]">
-                ბალანსი არ არის საკმარისი.
+                {en ? "Your balance is too low." : "ბალანსი არ არის საკმარისი."}
               </p>
               <Button asChild variant="mystic">
                 <Link href="/credits">
                   <Users className="size-4" />
-                  მოიწვიე / შეავსე
+                  {en ? "Invite / top up" : "მოიწვიე / შეავსე"}
                 </Link>
               </Button>
             </div>

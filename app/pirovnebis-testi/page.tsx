@@ -284,7 +284,7 @@ export default async function TestPage() {
           </div>
         </section>
 
-        <PopularSearches queries={en ? ["free personality type test", "16 personalities test", "MBTI style test", "discover my personality type"] : PERSONALITY_LATIN_QUERIES} />
+        <PopularSearches queries={en ? ["free personality type test", "16 personalities test", "MBTI style test", "discover my personality type"] : PERSONALITY_LATIN_QUERIES} locale={locale} />
       </section>
 
       <SiteFooter locale={locale} />

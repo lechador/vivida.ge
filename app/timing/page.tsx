@@ -46,6 +46,7 @@ export default async function TimingPage() {
         title={en ? "Your best days need a natal chart" : "საუკეთესო დღეები ნატალურ რუკას საჭიროებს"}
         description={en ? "Add your birth details to see which days support your momentum and which call for care." : "შეავსე დაბადების მონაცემები, რომ ნახო, რომელი დღეები უბერავს ქარს ზურგში."}
         next="/timing"
+        locale={locale}
       />
     );
   const timezone = profile?.timezone ?? "Asia/Tbilisi";

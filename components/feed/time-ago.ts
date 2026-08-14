@@ -1,4 +1,5 @@
 import { kaShortDate } from "@/lib/i18n/ka-date";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Short relative time formatter — "ახლახან / X წუთის წინ / X საათის წინ /
@@ -8,15 +9,18 @@ import { kaShortDate } from "@/lib/i18n/ka-date";
  * Pure function — safe to call from server or client; no Date.now()
  * snapshot is taken at module load.
  */
-export function feedTimeAgo(date: Date | string): string {
+export function feedTimeAgo(date: Date | string, locale: UserLocale = "ka"): string {
+  const en = locale === "en";
   const ts = typeof date === "string" ? new Date(date) : date;
   const seconds = Math.floor((Date.now() - ts.getTime()) / 1000);
-  if (seconds < 45) return "ახლახან";
+  if (seconds < 45) return en ? "just now" : "ახლახან";
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} წუთის წინ`;
+  if (minutes < 60) return en ? `${minutes}m ago` : `${minutes} წუთის წინ`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} საათის წინ`;
+  if (hours < 24) return en ? `${hours}h ago` : `${hours} საათის წინ`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} დღის წინ`;
-  return kaShortDate(ts);
+  if (days < 7) return en ? `${days}d ago` : `${days} დღის წინ`;
+  return en
+    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(ts)
+    : kaShortDate(ts);
 }

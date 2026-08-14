@@ -6,6 +6,8 @@ import {
   type SynastryCategory,
   type SynastryResult,
 } from "@/lib/synastry";
+import { CATEGORY_LABEL_EN } from "@/lib/synastry-en";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * 1080×1920 (Instagram Story) compatibility card. Rendered as plain
@@ -38,6 +40,7 @@ export type CompatibilityCardProps = {
   partnerSignSymbol: string;
   result: SynastryResult;
   verdict: string;
+  locale?: UserLocale;
 };
 
 export function CompatibilityCard({
@@ -49,7 +52,9 @@ export function CompatibilityCard({
   partnerSignSymbol,
   result,
   verdict,
+  locale = "ka",
 }: CompatibilityCardProps) {
+  const en = locale === "en";
   const overall = Math.round(result.overall);
 
   return (
@@ -197,7 +202,7 @@ export function CompatibilityCard({
             marginBottom: 12,
           }}
         >
-          თავსებადობა
+          {en ? "COMPATIBILITY" : "თავსებადობა"}
         </div>
         <div
           style={{
@@ -245,7 +250,7 @@ export function CompatibilityCard({
             <CategoryBar
               key={cat}
               emoji={CATEGORY_EMOJI[cat]}
-              label={CATEGORY_LABEL_KA[cat]}
+              label={en ? CATEGORY_LABEL_EN[cat] : CATEGORY_LABEL_KA[cat]}
               score={score}
             />
           );
@@ -269,7 +274,7 @@ export function CompatibilityCard({
             color: "rgba(255,255,255,0.6)",
           }}
         >
-          გაიგე შენი თავსებადობა
+          {en ? "Discover your compatibility" : "გაიგე შენი თავსებადობა"}
         </div>
         <div
           style={{

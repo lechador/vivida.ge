@@ -20,6 +20,7 @@ export function MarketingEmail({
   ctaLabel,
   ctaUrl,
   unsubscribeUrl,
+  locale = "ka",
 }: {
   name: string | null;
   heading: string;
@@ -27,11 +28,15 @@ export function MarketingEmail({
   ctaLabel?: string | null;
   ctaUrl?: string | null;
   unsubscribeUrl: string;
+  locale?: "ka" | "en";
 }) {
-  const greeting = name ? `სალამი, ${name}!` : "სალამი!";
+  const en = locale === "en";
+  const greeting = name
+    ? en ? `Hello, ${name}!` : `სალამი, ${name}!`
+    : en ? "Hello!" : "სალამი!";
   const paragraphs = body.split(/\n\n+/).filter(Boolean);
   return (
-    <EmailLayout preview={heading} unsubscribeUrl={unsubscribeUrl}>
+    <EmailLayout preview={heading} unsubscribeUrl={unsubscribeUrl} locale={locale}>
       <Heading
         as="h1"
         style={{

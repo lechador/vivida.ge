@@ -96,6 +96,7 @@ export function SafetyMenu({
         onOpenChange={setReportOpen}
         targetType={targetType}
         targetId={targetId ?? targetUserId}
+        locale={locale}
       />
     </>
   );

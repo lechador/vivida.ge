@@ -19,19 +19,25 @@ export function FriendRequestEmail({
   fromUsername,
   friendsUrl,
   unsubscribeUrl,
+  locale = "ka",
 }: {
   recipientName: string | null;
   fromName: string;
   fromUsername: string | null;
   friendsUrl: string;
   unsubscribeUrl: string;
+  locale?: "ka" | "en";
 }) {
-  const greeting = recipientName ? `სალამი, ${recipientName}!` : "სალამი!";
+  const en = locale === "en";
+  const greeting = recipientName
+    ? en ? `Hello, ${recipientName}!` : `სალამი, ${recipientName}!`
+    : en ? "Hello!" : "სალამი!";
   const fromHandle = fromUsername ? `@${fromUsername}` : null;
   return (
     <EmailLayout
-      preview={`${fromName}-მ მეგობრობის მოთხოვნა გამოგიგზავნა`}
+      preview={en ? `${fromName} sent you a friend request` : `${fromName}-მ მეგობრობის მოთხოვნა გამოგიგზავნა`}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
       <Heading
         as="h1"
@@ -44,7 +50,7 @@ export function FriendRequestEmail({
           margin: "0 0 16px",
         }}
       >
-        ახალი მეგობრობის მოთხოვნა
+        {en ? "New friend request" : "ახალი მეგობრობის მოთხოვნა"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
@@ -53,16 +59,17 @@ export function FriendRequestEmail({
         {fromHandle ? (
           <span style={{ color: "#9b94ad" }}> ({fromHandle})</span>
         ) : null}{" "}
-        გსურს დაგიმეგობრდეს Vivida-ზე. დაამატე და გაიგე, რამდენად თავსებადი
-        ხართ ერთმანეთთან.
+        {en
+          ? " wants to connect with you on Vivida. Accept the request to explore your compatibility."
+          : " გსურს დაგიმეგობრდეს Vivida-ზე. დაამატე და გაიგე, რამდენად თავსებადი ხართ ერთმანეთთან."}
       </Text>
 
       <Button href={friendsUrl} style={buttonStyle}>
-        ნახე მოთხოვნა
+        {en ? "View request" : "ნახე მოთხოვნა"}
       </Button>
 
       <Text style={mutedStyle}>
-        ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს.
+        {en ? "You received this notification because you have not visited Vivida recently." : "ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს."}
       </Text>
     </EmailLayout>
   );

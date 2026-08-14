@@ -29,6 +29,7 @@ import { SIGNS } from "./zodiac";
 import type { AspectKind } from "./aspects";
 import { ASPECT_BODIES, ASPECT_KINDS, libraryKindKa } from "./aspect-library";
 import type { CrossAspect } from "./transits";
+import type { UserLocale } from "./i18n/locale";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
@@ -145,14 +146,109 @@ export function allTransitCombos(): TransitCombo[] {
 
 export type TransitEntry = { title: string; body: string };
 
+const ASPECT_EN: Record<AspectKind, { label: string; dynamic: string; advice: string }> = {
+  conjunction: {
+    label: "conjunct",
+    dynamic: "The two themes become concentrated and difficult to separate.",
+    advice: "Give the combined energy one clear, constructive outlet.",
+  },
+  sextile: {
+    label: "sextile",
+    dynamic: "A useful opening appears, but it works best when you choose to use it.",
+    advice: "Take the small opportunity instead of waiting for a perfect one.",
+  },
+  square: {
+    label: "square",
+    dynamic: "Friction makes the underlying need harder to ignore and asks for an adjustment.",
+    advice: "Pause before reacting, then turn the pressure into one practical action.",
+  },
+  trine: {
+    label: "trine",
+    dynamic: "The two themes cooperate naturally and can restore momentum with less resistance.",
+    advice: "Use the ease deliberately rather than assuming it will carry the day by itself.",
+  },
+  opposition: {
+    label: "opposite",
+    dynamic: "Two valid needs pull in different directions and become visible through contrast.",
+    advice: "Make room for both sides before choosing the next step.",
+  },
+};
+
+const TRANSIT_TIMESCALE_EN: Record<string, string> = {
+  moon: "today and into tomorrow",
+  sun: "over the next few days",
+  mercury: "over the next several days",
+  venus: "over the next several days",
+  mars: "through this week",
+  jupiter: "over the coming weeks",
+  saturn: "over the coming weeks and months",
+  uranus: "as a longer-term background influence",
+  neptune: "as a longer-term background influence",
+  pluto: "as a longer-term background influence",
+};
+
+function titleCase(value: string): string {
+  return value ? value[0].toUpperCase() + value.slice(1) : value;
+}
+
+function englishTransitEntry(key: string): TransitEntry | null {
+  const [kind, transit, subjectA, subjectB] = key.split(":");
+  const transitMeta = BODIES[transit];
+  const transitLabel = transitMeta?.labelEn ?? titleCase(transit);
+  const transitMeaning = transitMeta?.meaningEn ?? "the way you direct this energy";
+  const timescale = TRANSIT_TIMESCALE_EN[transit] ?? "during this period";
+
+  if (kind === "aspect") {
+    const aspectKind = subjectA as AspectKind;
+    const aspect = ASPECT_EN[aspectKind];
+    if (!aspect || !subjectB) return null;
+    const natalMeta = BODIES[subjectB];
+    const natalLabel = natalMeta?.labelEn ?? titleCase(subjectB);
+    const natalMeaning = natalMeta?.meaningEn ?? "an established part of your natal pattern";
+    return {
+      title: `${transitLabel} ${aspect.label} natal ${natalLabel}`,
+      body: `Transiting ${transitLabel} forms a ${aspect.label} aspect to your natal ${natalLabel} ${timescale}. ${transitLabel} activates ${transitMeaning.toLowerCase()}, while natal ${natalLabel} describes ${natalMeaning.toLowerCase()}. ${aspect.dynamic} ${aspect.advice}`,
+    };
+  }
+
+  if (kind === "house") {
+    const houseNumber = Number(subjectA);
+    const house = HOUSES[houseNumber];
+    if (!house) return null;
+    return {
+      title: `${transitLabel} activates your ${houseNumber}${houseNumber === 1 ? "st" : houseNumber === 2 ? "nd" : houseNumber === 3 ? "rd" : "th"} house`,
+      body: `Transiting ${transitLabel} moves through your ${house.labelEn} ${timescale}, drawing attention to ${house.themeEn.toLowerCase()}. ${transitMeaning} becomes easier to notice through this area of life. Choose one concrete way to engage with it instead of spreading your attention too widely.`,
+    };
+  }
+
+  if (kind === "sign") {
+    const sign = SIGNS.find((item) => item.key === subjectA);
+    if (!sign) return null;
+    return {
+      title: `${transitLabel} in ${sign.labelEn}`,
+      body: `${transitLabel} is moving through ${sign.labelEn} ${timescale}, giving the shared atmosphere a more ${sign.labelEn}-like rhythm. ${transitMeaning} is expressed with greater emphasis on ${sign.element === "ცეცხლი" ? "initiative and expression" : sign.element === "მიწა" ? "stability and practical results" : sign.element === "ჰაერი" ? "ideas, exchange, and perspective" : "feeling, intuition, and emotional context"}. Work with the mood consciously rather than treating it as a fixed prediction.`,
+    };
+  }
+
+  return null;
+}
+
 /**
  * Batched read: key → {title, body} for the requested keys. Pure read —
  * never generates. Editing a row in the admin reflects on next compose.
  */
 export async function getTransitLibraryEntries(
-  keys: string[]
+  keys: string[],
+  locale: UserLocale = "ka",
 ): Promise<Map<string, TransitEntry>> {
   if (keys.length === 0) return new Map();
+  if (locale === "en") {
+    return new Map(
+      keys
+        .map((key) => [key, englishTransitEntry(key)] as const)
+        .filter((entry): entry is readonly [string, TransitEntry] => Boolean(entry[1])),
+    );
+  }
   const rows = await db
     .select({
       key: transitInterpretationLibrary.key,
@@ -343,6 +439,19 @@ const BODY_THEME_KA: Record<string, string> = {
   pluto: "ტრანსფორმაცია",
 };
 
+const BODY_THEME_EN: Record<string, string> = {
+  sun: "Identity",
+  moon: "Emotions",
+  mercury: "Communication",
+  venus: "Relationships",
+  mars: "Energy",
+  jupiter: "Growth",
+  saturn: "Structure",
+  uranus: "Change",
+  neptune: "Intuition",
+  pluto: "Transformation",
+};
+
 /** How many of each aspect category the composed reading uses. */
 const COMPOSE_LIMITS = { moon: 3, inner: 2, outer: 1 } as const;
 
@@ -414,7 +523,8 @@ export type ComposedDaily = {
  */
 export function composeDailyFromLibrary(
   facts: TransitDayFacts,
-  entries: Map<string, TransitEntry>
+  entries: Map<string, TransitEntry>,
+  locale: UserLocale = "ka",
 ): ComposedDaily | null {
   const need = (key: string): TransitEntry | null => entries.get(key) ?? null;
 
@@ -466,7 +576,7 @@ export function composeDailyFromLibrary(
     if (!bodies.includes(aspect.transit)) bodies.push(aspect.transit);
   }
   const themes = bodies
-    .map((b) => BODY_THEME_KA[b])
+    .map((b) => (locale === "en" ? BODY_THEME_EN[b] : BODY_THEME_KA[b]))
     .filter(Boolean)
     .slice(0, 4);
 
@@ -513,6 +623,14 @@ const NO_TENSE_KA = [
   "სერიოზული ხახუნი ამ დღეს არ ჩანს — მხოლოდ ნუ გადატვირთავ განრიგს, სიმშვიდე შენს სასარგებლოდ მუშაობს.",
   "დაძაბული ასპექტები ამ დღეს თითქმის არ არის — ერთადერთი რისკი ზედმეტი თვითკმაყოფილებაა.",
 ];
+const NO_HARMONIC_EN = [
+  "No major supportive aspect dominates this day, so progress comes through your own pacing, preparation, and steady follow-through.",
+  "The background is relatively neutral; small routines and clear priorities will provide more support than waiting for a dramatic opening.",
+];
+const NO_TENSE_EN = [
+  "No major tense aspect dominates this day. Keep the schedule realistic and let the calmer rhythm work in your favor.",
+  "Friction is comparatively light today; the main risk is overconfidence or taking an easy opening for granted.",
+];
 
 /**
  * Compose the 7-day narratives purely from library entries — zero AI calls.
@@ -525,7 +643,8 @@ const NO_TENSE_KA = [
  * Returns null if any needed entry is missing (caller falls back to AI).
  */
 export async function composeWeeklyFromLibrary(
-  days: WeeklyDayInput[]
+  days: WeeklyDayInput[],
+  locale: UserLocale = "ka",
 ): Promise<WeeklyDayNarrative[] | null> {
   const keys = new Set<string>();
   for (const d of days) {
@@ -534,7 +653,7 @@ export async function composeWeeklyFromLibrary(
       keys.add(transitAspectKey(dr.transit, dr.kind as AspectKind, dr.natal));
     }
   }
-  const entries = await getTransitLibraryEntries([...keys]);
+  const entries = await getTransitLibraryEntries([...keys], locale);
 
   const usedHeadline = new Set<string>();
   const usedHarmonic = new Set<string>();
@@ -595,11 +714,15 @@ export async function composeWeeklyFromLibrary(
     const harmonicReason =
       harmonic?.entry.body ??
       neutralEntry?.body ??
-      NO_HARMONIC_KA[i % NO_HARMONIC_KA.length];
+      (locale === "en"
+        ? NO_HARMONIC_EN[i % NO_HARMONIC_EN.length]
+        : NO_HARMONIC_KA[i % NO_HARMONIC_KA.length]);
     const challengingReason =
       tense?.entry.body ??
       (harmonic ? neutralEntry?.body : null) ??
-      NO_TENSE_KA[i % NO_TENSE_KA.length];
+      (locale === "en"
+        ? NO_TENSE_EN[i % NO_TENSE_EN.length]
+        : NO_TENSE_KA[i % NO_TENSE_KA.length]);
 
     out.push({
       dateIso: d.dateIso,
@@ -633,11 +756,13 @@ export type TransitBreakdownItem = {
  */
 export async function overlayTransitAspects(
   aspects: Array<{ transit: string; natal: string; kind: string; orb: number }>,
-  limit = 5
+  limit = 5,
+  locale: UserLocale = "ka",
 ): Promise<TransitBreakdownItem[]> {
   const top = aspects.slice(0, limit * 2); // over-fetch: some may lack rows
   const entries = await getTransitLibraryEntries(
-    top.map((a) => transitAspectKey(a.transit, a.kind as AspectKind, a.natal))
+    top.map((a) => transitAspectKey(a.transit, a.kind as AspectKind, a.natal)),
+    locale,
   );
   const out: TransitBreakdownItem[] = [];
   for (const a of top) {

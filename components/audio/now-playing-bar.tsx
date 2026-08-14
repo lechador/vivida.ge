@@ -21,6 +21,8 @@ function fmt(s: number): string {
 export function NowPlayingBar() {
   const { track, playing, currentTime, duration, toggle, seekRatio, stop } =
     useAudioPlayer();
+  const en =
+    typeof document !== "undefined" && document.documentElement.lang === "en";
 
   if (!track) return null;
   const pct = duration ? (currentTime / duration) * 100 : 0;
@@ -31,7 +33,7 @@ export function NowPlayingBar() {
         <button
           type="button"
           onClick={toggle}
-          aria-label={playing ? "პაუზა" : "დაკვრა"}
+          aria-label={playing ? (en ? "Pause" : "პაუზა") : en ? "Play" : "დაკვრა"}
           className="grid size-11 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-lg shadow-[var(--vivida-violet)]/40 transition-transform hover:scale-105 active:scale-95"
         >
           {playing ? <Pause className="size-5" /> : <Play className="size-5 translate-x-0.5" />}
@@ -54,7 +56,7 @@ export function NowPlayingBar() {
           </div>
           <div
             role="slider"
-            aria-label="დაკვრის პოზიცია"
+            aria-label={en ? "Playback position" : "დაკვრის პოზიცია"}
             aria-valuenow={Math.round(pct)}
             tabIndex={0}
             onClick={(e) => {
@@ -73,7 +75,7 @@ export function NowPlayingBar() {
         <button
           type="button"
           onClick={stop}
-          aria-label="დახურვა"
+          aria-label={en ? "Close" : "დახურვა"}
           className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
         >
           <X className="size-4" />

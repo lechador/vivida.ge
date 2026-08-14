@@ -20,6 +20,15 @@ import {
   type SynastryResult,
 } from "@/lib/synastry";
 import {
+  ASPECT_LABEL_EN,
+  BODY_LABEL_EN,
+  CATEGORY_DESCRIPTOR_EN,
+  CATEGORY_LABEL_EN,
+  ELEMENT_LABEL_EN,
+  HOUSE_LABEL_EN,
+  overallVerdictEn,
+} from "@/lib/synastry-en";
+import {
   aspectBreakdown,
   aspectGlyph,
   aspectLabel,
@@ -41,6 +50,7 @@ import {
 } from "@/components/ui/dialog";
 import { SynastryShareButton } from "./synastry-share-button";
 import type { CompatibilityCardProps } from "./compatibility-card";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const CATEGORY_GRADIENT: Record<string, string> = {
   love: "from-[oklch(0.72_0.22_350)] to-[oklch(0.65_0.24_305)]",
@@ -60,11 +70,20 @@ const CATEGORY_RING_COLOR: Record<string, string> = {
   business: "oklch(0.72 0.10 270)",
 };
 
+function bodyLabelFor(body: string, en: boolean): string {
+  return en ? BODY_LABEL_EN[body] ?? body : bodyLabel(body);
+}
+
+function aspectLabelFor(kind: SynastryAspect["kind"], en: boolean): string {
+  return en ? ASPECT_LABEL_EN[kind] ?? kind : aspectLabel(kind);
+}
+
 export function SynastryDisplay({
   result,
   partnerName,
   shareCardProps,
   interpretations = {},
+  locale = "ka",
 }: {
   result: SynastryResult;
   partnerName: string;
@@ -76,8 +95,12 @@ export function SynastryDisplay({
    * missing keys fall back to the deterministic template texts.
    */
   interpretations?: Record<string, string>;
+  locale?: UserLocale;
 }) {
-  const verdict = overallVerdict(result.overall);
+  const en = locale === "en";
+  const verdict = en
+    ? overallVerdictEn(result.overall)
+    : overallVerdict(result.overall);
   const narrative = overallNarrative(result.overall);
   const { strengths, growth } = splitByValence(result.topAspects);
   const [activeAspect, setActiveAspect] = useState<SynastryAspect | null>(null);
@@ -94,7 +117,7 @@ export function SynastryDisplay({
           <OverallRing percent={result.overall} />
           <div className="text-center sm:text-left">
             <div className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-              ერთობლივი თავსებადობა
+              {en ? "Overall compatibility" : "ერთობლივი თავსებადობა"}
             </div>
             <h2 className="mt-1 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
               <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
@@ -109,10 +132,14 @@ export function SynastryDisplay({
               sunB={result.elements.sunB}
               moonA={result.elements.moonA}
               moonB={result.elements.moonB}
+              locale={locale}
             />
             {shareCardProps && (
               <div className="mt-5">
-                <SynastryShareButton cardProps={shareCardProps} />
+                <SynastryShareButton
+                  cardProps={shareCardProps}
+                  locale={locale}
+                />
               </div>
             )}
           </div>
@@ -123,10 +150,12 @@ export function SynastryDisplay({
       <section>
         <header className="mb-4 flex items-baseline justify-between gap-3">
           <h3 className="text-xl font-semibold tracking-tight">
-            ექვსი სფერო
+            {en ? "Six areas" : "ექვსი სფერო"}
           </h3>
           <span className="text-xs text-muted-foreground">
-            როგორ ვითარდება სხვადასხვა ენერგია შენსა და {partnerName}-ს შორის
+            {en
+              ? `How different energies develop between you and ${partnerName}`
+              : `როგორ ვითარდება სხვადასხვა ენერგია შენსა და ${partnerName}-ს შორის`}
           </span>
         </header>
         <div className="space-y-3">
@@ -166,10 +195,12 @@ export function SynastryDisplay({
                     <div className="flex items-baseline justify-between gap-3">
                       <div className="flex min-w-0 items-baseline gap-2">
                         <h4 className="text-sm font-semibold tracking-tight sm:text-base">
-                          {CATEGORY_LABEL_KA[cat]}
+                          {en ? CATEGORY_LABEL_EN[cat] : CATEGORY_LABEL_KA[cat]}
                         </h4>
                         <span className="hidden truncate text-xs text-muted-foreground sm:inline">
-                          {CATEGORY_DESCRIPTOR_KA[cat]}
+                          {en
+                            ? CATEGORY_DESCRIPTOR_EN[cat]
+                            : CATEGORY_DESCRIPTOR_KA[cat]}
                         </span>
                       </div>
                       <span
@@ -208,10 +239,12 @@ export function SynastryDisplay({
         <section>
           <header className="mb-4">
             <h3 className="text-xl font-semibold tracking-tight">
-              მთავარი კავშირები
+              {en ? "Key connections" : "მთავარი კავშირები"}
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              ცის წერტილები, რომლებიც ერთმანეთს ყველაზე ახლოს ეხმიანებიან
+              {en
+                ? "The closest links between the two natal charts"
+                : "ცის წერტილები, რომლებიც ერთმანეთს ყველაზე ახლოს ეხმიანებიან"}
             </p>
           </header>
           <ul className="grid gap-3 sm:grid-cols-2">
@@ -222,6 +255,7 @@ export function SynastryDisplay({
                 index={i}
                 text={interpretations[synastryAspectKey(a.a, a.b, a.kind)]}
                 onSelect={() => setActiveAspect(a)}
+                locale={locale}
               />
             ))}
           </ul>
@@ -234,6 +268,7 @@ export function SynastryDisplay({
           overlays={result.breakdown.topOverlays}
           partnerName={partnerName}
           interpretations={interpretations}
+          locale={locale}
         />
       )}
 
@@ -241,28 +276,46 @@ export function SynastryDisplay({
       {(strengths.length > 0 || growth.length > 0) && (
         <section className="grid gap-6 sm:grid-cols-2">
           <ValenceColumn
-            title="ძლიერი მხარეები"
-            description="ჰარმონიული კავშირები — სადაც ენერგია თავისუფლად მიედინება"
+            title={en ? "Strengths" : "ძლიერი მხარეები"}
+            description={
+              en
+                ? "Harmonious links where energy flows more freely"
+                : "ჰარმონიული კავშირები — სადაც ენერგია თავისუფლად მიედინება"
+            }
             icon={<Sparkles className="size-4" />}
             accent="oklch(0.78 0.18 200)"
             aspects={strengths}
-            empty="ცის რუკაში ჰარმონიული ასპექტები ნაკლებია — ეს ნიშნავს, რომ კავშირი მცდელობით აშენდება."
+            empty={
+              en
+                ? "There are fewer harmonious aspects, so this connection grows through conscious effort."
+                : "ცის რუკაში ჰარმონიული ასპექტები ნაკლებია — ეს ნიშნავს, რომ კავშირი მცდელობით აშენდება."
+            }
             onSelect={setActiveAspect}
+            locale={locale}
           />
           <ValenceColumn
-            title="ზრდის წერტილები"
-            description="დაძაბულობა, რომელიც სწორად მიდგომისას სიღრმეს აჩენს"
+            title={en ? "Growth points" : "ზრდის წერტილები"}
+            description={
+              en
+                ? "Tension that can create depth when handled with care"
+                : "დაძაბულობა, რომელიც სწორად მიდგომისას სიღრმეს აჩენს"
+            }
             icon={<Heart className="size-4" />}
             accent="oklch(0.72 0.22 350)"
             aspects={growth}
-            empty="ბოლო ცის რუკას მძაფრი დაძაბულობა არ ახლავს — ბუნებრივად მშვიდი დინამიკა."
+            empty={
+              en
+                ? "No major tense aspects stand out, suggesting a naturally calmer dynamic."
+                : "ბოლო ცის რუკას მძაფრი დაძაბულობა არ ახლავს — ბუნებრივად მშვიდი დინამიკა."
+            }
             onSelect={setActiveAspect}
+            locale={locale}
           />
         </section>
       )}
 
       {/* The meta "how the number is built" — closes the story */}
-      <ScoreBreakdown breakdown={result.breakdown} />
+      <ScoreBreakdown breakdown={result.breakdown} locale={locale} />
 
       <AspectDialog
         aspect={activeAspect}
@@ -274,6 +327,7 @@ export function SynastryDisplay({
             : undefined
         }
         onClose={() => setActiveAspect(null)}
+        locale={locale}
       />
     </div>
   );
@@ -284,13 +338,16 @@ function AspectRow({
   index,
   text,
   onSelect,
+  locale,
 }: {
   aspect: SynastryAspect;
   index: number;
   /** Library interpretation — shown (clamped) instead of the template line. */
   text?: string;
   onSelect: () => void;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const valence = aspectValence(aspect.kind);
   const accent =
     valence === "harmonious"
@@ -313,7 +370,7 @@ function AspectRow({
         type="button"
         onClick={onSelect}
         className="group flex w-full items-start gap-3 rounded-2xl border border-border bg-card/55 p-4 text-left ring-1 ring-foreground/5 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-card/75 hover:ring-foreground/15 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-        aria-label={`${bodyLabel(aspect.a)} ${aspectLabel(aspect.kind)} ${bodyLabel(aspect.b)} — დეტალები`}
+        aria-label={`${bodyLabelFor(aspect.a, en)} ${aspectLabelFor(aspect.kind, en)} ${bodyLabelFor(aspect.b, en)} — ${en ? "details" : "დეტალები"}`}
       >
         <span
           className="grid size-10 shrink-0 place-items-center rounded-xl text-lg"
@@ -322,15 +379,15 @@ function AspectRow({
             boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${accent} 35%, transparent)`,
             color: accent,
           }}
-          title={aspectLabel(aspect.kind)}
+          title={aspectLabelFor(aspect.kind, en)}
         >
           {aspectGlyph(aspect.kind)}
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-1.5 text-sm font-medium">
-            <span>{bodyLabel(aspect.a)}</span>
+            <span>{bodyLabelFor(aspect.a, en)}</span>
             <span style={{ color: accent }}>{aspectGlyph(aspect.kind)}</span>
-            <span>{bodyLabel(aspect.b)}</span>
+            <span>{bodyLabelFor(aspect.b, en)}</span>
             <span className="ml-auto text-[11px] tabular-nums text-muted-foreground/80">
               {aspect.orb.toFixed(1)}°
             </span>
@@ -348,7 +405,7 @@ function AspectRow({
             className="mt-1.5 text-[11px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
             style={{ color: accent }}
           >
-            სრულად ნახვა →
+            {en ? "View details →" : "სრულად ნახვა →"}
           </div>
         </div>
       </button>
@@ -364,6 +421,7 @@ function ValenceColumn({
   aspects,
   empty,
   onSelect,
+  locale,
 }: {
   title: string;
   description: string;
@@ -372,7 +430,9 @@ function ValenceColumn({
   aspects: SynastryAspect[];
   empty: string;
   onSelect: (a: SynastryAspect) => void;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   return (
     <article
       className="relative overflow-hidden rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl"
@@ -417,12 +477,12 @@ function ValenceColumn({
                   {aspectGlyph(a.kind)}
                 </span>
                 <span className="font-medium">
-                  {bodyLabel(a.a)}
+                  {bodyLabelFor(a.a, en)}
                   <span className="mx-1 text-muted-foreground">·</span>
-                  {bodyLabel(a.b)}
+                  {bodyLabelFor(a.b, en)}
                 </span>
                 <span className="ml-auto text-[11px] text-muted-foreground/80">
-                  {aspectLabel(a.kind)}
+                  {aspectLabelFor(a.kind, en)}
                 </span>
               </button>
             </li>
@@ -442,20 +502,24 @@ function OverlaySection({
   overlays,
   partnerName,
   interpretations,
+  locale,
 }: {
   overlays: SynastryHouseOverlay[];
   partnerName: string;
   interpretations: Record<string, string>;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   return (
     <section>
       <header className="mb-4">
         <h3 className="text-xl font-semibold tracking-tight">
-          სახლების გადაფარვა
+          {en ? "House overlays" : "სახლების გადაფარვა"}
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          სად ხვდება ერთის პლანეტები მეორის ცხოვრებაში — და რომელ სფეროს
-          ააქტიურებს
+          {en
+            ? "Where one person’s planets activate areas of the other person’s life"
+            : "სად ხვდება ერთის პლანეტები მეორის ცხოვრებაში — და რომელ სფეროს ააქტიურებს"}
         </p>
       </header>
       <ul className="grid gap-3 sm:grid-cols-2">
@@ -494,13 +558,15 @@ function OverlaySection({
                       color: accent,
                     }}
                   >
-                    {mine ? "შენი" : `${partnerName}-ის`}
+                    {mine ? (en ? "Yours" : "შენი") : en ? partnerName : `${partnerName}-ის`}
                   </span>
-                  <span>{bodyLabel(o.body)}</span>
+                  <span>{bodyLabelFor(o.body, en)}</span>
                   <span className="text-muted-foreground">→</span>
                   <span className="text-foreground/90">
-                    {mine ? `${partnerName}-ის` : "შენი"}{" "}
-                    {HOUSE_LABEL_KA[o.house] ?? `${o.house}-ე სახლი`}
+                    {mine ? (en ? partnerName : `${partnerName}-ის`) : en ? "Yours" : "შენი"}{" "}
+                    {en
+                      ? HOUSE_LABEL_EN[o.house] ?? `House ${o.house}`
+                      : HOUSE_LABEL_KA[o.house] ?? `${o.house}-ე სახლი`}
                   </span>
                 </div>
                 {text && (
@@ -521,11 +587,13 @@ function AspectDialog({
   aspect,
   text,
   onClose,
+  locale,
 }: {
   aspect: SynastryAspect | null;
   /** Library interpretation — the dialog's lead text when present. */
   text?: string;
   onClose: () => void;
+  locale: UserLocale;
 }) {
   if (!aspect) {
     return (
@@ -536,6 +604,7 @@ function AspectDialog({
   }
 
   const breakdown = aspectBreakdown(aspect);
+  const en = locale === "en";
   const valence = aspectValence(aspect.kind);
   const accent =
     valence === "harmonious"
@@ -565,11 +634,11 @@ function AspectDialog({
               </DialogTitle>
               <DialogDescription className="mt-0.5 flex items-center gap-2 text-xs">
                 <span style={{ color: accent }}>
-                  {aspectLabel(aspect.kind)}
+                  {aspectLabelFor(aspect.kind, en)}
                 </span>
                 <span className="text-muted-foreground/60">·</span>
                 <span className="tabular-nums text-muted-foreground/80">
-                  ორბი {aspect.orb.toFixed(2)}°
+                  {en ? "Orb" : "ორბი"} {aspect.orb.toFixed(2)}°
                 </span>
               </DialogDescription>
             </div>
@@ -590,7 +659,7 @@ function AspectDialog({
                 className="text-[10px] font-semibold uppercase tracking-[0.18em]"
                 style={{ color: accent }}
               >
-                რას ნიშნავს ეს წყვილისთვის
+                {en ? "What this means for the pair" : "რას ნიშნავს ეს წყვილისთვის"}
               </div>
               <div className="mt-1.5 space-y-2.5">
                 {text
@@ -609,19 +678,19 @@ function AspectDialog({
           )}
 
           <BreakdownBlock
-            label="ასპექტის არსი"
+            label={en ? "Aspect meaning" : "ასპექტის არსი"}
             body={breakdown.aspectMeaning}
             accent={accent}
           />
 
           <div className="grid gap-3 sm:grid-cols-2">
             <BreakdownBlock
-              label={bodyLabel(aspect.a)}
+              label={bodyLabelFor(aspect.a, en)}
               body={breakdown.bodyADescription}
               compact
             />
             <BreakdownBlock
-              label={bodyLabel(aspect.b)}
+              label={bodyLabelFor(aspect.b, en)}
               body={breakdown.bodyBDescription}
               compact
             />
@@ -629,13 +698,13 @@ function AspectDialog({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <BreakdownBlock
-              label="რა მუშაობს"
+              label={en ? "What works" : "რა მუშაობს"}
               body={breakdown.positive}
               accent="oklch(0.78 0.16 200)"
               tone="positive"
             />
             <BreakdownBlock
-              label="რას მიხედო"
+              label={en ? "What needs attention" : "რას მიხედო"}
               body={breakdown.negative}
               accent="oklch(0.7 0.22 25)"
               tone="negative"
@@ -643,7 +712,7 @@ function AspectDialog({
           </div>
 
           <BreakdownBlock
-            label="რა გავაკეთოთ ამით"
+            label={en ? "How to use this" : "რა გავაკეთოთ ამით"}
             body={breakdown.takeaway}
           />
 
@@ -709,16 +778,19 @@ function ElementPairing({
   sunB,
   moonA,
   moonB,
+  locale,
 }: {
   sunA: ChartElement;
   sunB: ChartElement;
   moonA: ChartElement;
   moonB: ChartElement;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   return (
     <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-      <ElementChip a={sunA} b={sunB} label="მზე" />
-      <ElementChip a={moonA} b={moonB} label="მთვარე" />
+      <ElementChip a={sunA} b={sunB} label={en ? "Sun" : "მზე"} locale={locale} />
+      <ElementChip a={moonA} b={moonB} label={en ? "Moon" : "მთვარე"} locale={locale} />
     </div>
   );
 }
@@ -727,11 +799,14 @@ function ElementChip({
   a,
   b,
   label,
+  locale,
 }: {
   a: ChartElement;
   b: ChartElement;
   label: string;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const same = a === b;
   const compatible =
     (a === "fire" && b === "air") ||
@@ -751,11 +826,11 @@ function ElementChip({
         {label}
       </span>
       <span>
-        {ELEMENT_EMOJI[a]} {ELEMENT_LABEL_KA[a]}
+        {ELEMENT_EMOJI[a]} {en ? ELEMENT_LABEL_EN[a] : ELEMENT_LABEL_KA[a]}
       </span>
       <span className="text-muted-foreground/70">↔</span>
       <span>
-        {ELEMENT_EMOJI[b]} {ELEMENT_LABEL_KA[b]}
+        {ELEMENT_EMOJI[b]} {en ? ELEMENT_LABEL_EN[b] : ELEMENT_LABEL_KA[b]}
       </span>
     </span>
   );
@@ -763,9 +838,12 @@ function ElementChip({
 
 function ScoreBreakdown({
   breakdown,
+  locale,
 }: {
   breakdown: SynastryResult["breakdown"];
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const total =
     Math.abs(breakdown.aspectPoints) +
     Math.abs(breakdown.housePoints) +
@@ -777,32 +855,40 @@ function ScoreBreakdown({
     note: string;
   }> = [
     {
-      label: "ცის ასპექტები",
+      label: en ? "Chart aspects" : "ცის ასპექტები",
       value: breakdown.aspectPoints,
       accent: "oklch(0.78 0.18 305)",
-      note: "ორ რუკაში სწორი კუთხეებით დაკავშირებული პლანეტები — რაც უფრო ზუსტია, მით ძლიერი.",
+      note: en
+        ? "Planets connected by meaningful angles across the two charts—the tighter the aspect, the stronger it tends to feel."
+        : "ორ რუკაში სწორი კუთხეებით დაკავშირებული პლანეტები — რაც უფრო ზუსტია, მით ძლიერი.",
     },
     {
-      label: "სახლების გადაფარვა",
+      label: en ? "House overlays" : "სახლების გადაფარვა",
       value: breakdown.housePoints,
       accent: "oklch(0.78 0.18 200)",
-      note: "ერთის პლანეტა მეორის რომელ სახლში ხვდება — სად ააქტიურებს ცხოვრების სფეროს.",
+      note: en
+        ? "Where one person’s planets fall in the other person’s houses and activate an area of life."
+        : "ერთის პლანეტა მეორის რომელ სახლში ხვდება — სად ააქტიურებს ცხოვრების სფეროს.",
     },
     {
-      label: "ელემენტების ქიმია",
+      label: en ? "Element chemistry" : "ელემენტების ქიმია",
       value: breakdown.elementPoints,
       accent: "oklch(0.85 0.16 85)",
-      note: "მზის და მთვარის ელემენტები — საბაზისო ენერგეტიკული თავსებადობა.",
+      note: en
+        ? "The Sun and Moon elements provide a baseline picture of energetic compatibility."
+        : "მზის და მთვარის ელემენტები — საბაზისო ენერგეტიკული თავსებადობა.",
     },
   ];
   return (
     <section className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
       <header className="mb-4">
         <h3 className="text-base font-semibold tracking-tight">
-          რამ შექმნა ეს რიცხვი
+          {en ? "What shapes this score" : "რამ შექმნა ეს რიცხვი"}
         </h3>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          სამი დამოუკიდებელი წყარო ერთად ქმნის საერთო თავსებადობის ქულას.
+          {en
+            ? "Three independent sources combine to create the overall compatibility score."
+            : "სამი დამოუკიდებელი წყარო ერთად ქმნის საერთო თავსებადობის ქულას."}
         </p>
       </header>
       <ul className="space-y-3">

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, Download, Loader2, RefreshCw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 type Status = "pending" | "paid" | "generating" | "ready" | "failed";
 
@@ -16,6 +17,15 @@ const STAGE_MESSAGES = [
   "ვაფორმებთ ლამაზ PDF-ს…",
 ];
 
+const STAGE_MESSAGES_EN = [
+  "Confirming your payment…",
+  "Analyzing your natal chart…",
+  "Reading the language of the planets…",
+  "Writing your personal interpretation…",
+  "Analyzing houses and aspects…",
+  "Designing your PDF…",
+];
+
 /**
  * Live status for a report. Generation is opaque (parallel LLM calls + PDF
  * render), so we show an eased "crawl" progress bar with rotating Georgian
@@ -25,10 +35,14 @@ const STAGE_MESSAGES = [
 export function ReportProgress({
   reportId,
   initialStatus,
+  locale = "ka",
 }: {
   reportId: string;
   initialStatus: Status;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
+  const stageMessages = en ? STAGE_MESSAGES_EN : STAGE_MESSAGES;
   const [status, setStatus] = useState<Status>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(initialStatus === "ready" ? 100 : 6);
@@ -71,13 +85,13 @@ export function ReportProgress({
       setProgress((p) => (p >= 92 ? 92 : p + (92 - p) * 0.035));
     }, 350);
     const msg = setInterval(() => {
-      setStage((s) => (s + 1) % STAGE_MESSAGES.length);
+      setStage((s) => (s + 1) % stageMessages.length);
     }, 3500);
     return () => {
       clearInterval(bar);
       clearInterval(msg);
     };
-  }, [terminal]);
+  }, [stageMessages.length, terminal]);
 
   async function retry() {
     setRetrying(true);
@@ -99,24 +113,30 @@ export function ReportProgress({
           <div className="mb-4 grid size-14 place-items-center rounded-full bg-[var(--vivida-cyan)]/15 text-[var(--vivida-cyan)]">
             <CheckCircle2 className="size-7" />
           </div>
-          <h2 className="text-2xl font-semibold">ანგარიში მზადაა! 🌟</h2>
+          <h2 className="text-2xl font-semibold">
+            {en ? "Your report is ready! 🌟" : "ანგარიში მზადაა! 🌟"}
+          </h2>
           <p className="mt-2 max-w-md text-sm text-foreground/75">
-            შენი პერსონალური ნატალური ანგარიში დასრულდა. ჩამოტვირთე — ის
-            სამუდამოდ შენთან რჩება.
+            {en
+              ? "Your personal natal report is complete. Download it and keep it forever."
+              : "შენი პერსონალური ნატალური ანგარიში დასრულდა. ჩამოტვირთე — ის სამუდამოდ შენთან რჩება."}
           </p>
           <Button asChild variant="mystic" size="xl" className="mt-6 min-w-56">
             <a href={`/api/reports/${reportId}/download`}>
               <Download className="size-5" />
-              ჩამოტვირთე PDF
+              {en ? "Download PDF" : "ჩამოტვირთე PDF"}
             </a>
           </Button>
         </div>
       ) : failed ? (
         <div className="flex flex-col items-center text-center">
-          <h2 className="text-2xl font-semibold">გენერაცია შეფერხდა</h2>
+          <h2 className="text-2xl font-semibold">
+            {en ? "Report generation was interrupted" : "გენერაცია შეფერხდა"}
+          </h2>
           <p className="mt-2 max-w-md text-sm text-foreground/75">
-            რაღაც ვერ მოხერხდა PDF-ის შექმნისას. გადახდა შენახულია — სცადე
-            ხელახლა დამატებითი საფასურის გარეშე.
+            {en
+              ? "Something went wrong while creating the PDF. Your payment is saved, so you can retry at no extra cost."
+              : "რაღაც ვერ მოხერხდა PDF-ის შექმნისას. გადახდა შენახულია — სცადე ხელახლა დამატებითი საფასურის გარეშე."}
           </p>
           {error && <p className="mt-2 text-xs text-muted-foreground">{error}</p>}
           <Button
@@ -131,7 +151,7 @@ export function ReportProgress({
             ) : (
               <RefreshCw className="size-4" />
             )}
-            სცადე ხელახლა
+            {en ? "Try again" : "სცადე ხელახლა"}
           </Button>
         </div>
       ) : (
@@ -139,9 +159,11 @@ export function ReportProgress({
           <div className="mb-5 grid size-14 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
             <Loader2 className="size-7 animate-spin" />
           </div>
-          <h2 className="text-2xl font-semibold">ვქმნით შენს ანგარიშს</h2>
+          <h2 className="text-2xl font-semibold">
+            {en ? "Creating your report" : "ვქმნით შენს ანგარიშს"}
+          </h2>
           <p className="mt-2 h-5 text-sm text-foreground/75 transition-opacity">
-            {status === "pending" ? STAGE_MESSAGES[0] : STAGE_MESSAGES[stage]}
+            {status === "pending" ? stageMessages[0] : stageMessages[stage]}
           </p>
           <div className="mt-6 h-2.5 w-full max-w-md overflow-hidden rounded-full bg-foreground/10">
             <div
@@ -150,7 +172,9 @@ export function ReportProgress({
             />
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            გთხოვ, არ დახურო ეს გვერდი — ჩვეულებრივ ერთ წუთზე ნაკლები სჭირდება.
+            {en
+              ? "Please keep this page open. It usually takes less than a minute."
+              : "გთხოვ, არ დახურო ეს გვერდი — ჩვეულებრივ ერთ წუთზე ნაკლები სჭირდება."}
           </p>
         </div>
       )}

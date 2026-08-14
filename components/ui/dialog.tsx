@@ -51,7 +51,7 @@ const DialogContent = React.forwardRef<
       {children}
       <DialogPrimitive.Close
         className="absolute right-4 top-4 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        aria-label="დახურვა"
+        aria-label="Close / დახურვა"
       >
         <X className="size-4" />
       </DialogPrimitive.Close>

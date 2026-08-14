@@ -16,6 +16,7 @@ import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { computeElementBalance } from "@/lib/elements";
 import { computeSynastry, overallVerdict } from "@/lib/synastry";
+import { overallVerdictEn } from "@/lib/synastry-en";
 import { getSynastryInterpretationsFor } from "@/lib/synastry-library";
 import { signByIndex } from "@/lib/zodiac";
 import {
@@ -41,8 +42,10 @@ import { isBlockedEitherWay } from "@/lib/block";
 import { PhotoCarousel } from "@/components/profile/photo-carousel";
 import { AiAvatarButton } from "@/components/profile/ai-avatar-button";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
+import { SynastryDisplayEn } from "@/components/synastry/synastry-display-en";
 import { FeedList } from "@/components/feed/feed-list";
 import { getUserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 const ELEMENT_GLYPH: Record<string, string> = {
   ცეცხლი: "△",
@@ -71,6 +74,8 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
+  const locale = await getRequestLocale();
+  const en = locale === "en";
   const [profile] = await db
     .select({
       displayName: profiles.displayName,
@@ -82,14 +87,17 @@ export async function generateMetadata({
     .limit(1);
 
   if (!profile) {
-    return { title: "პროფილი ვერ მოიძებნა" };
+    return { title: en ? "Profile not found" : "პროფილი ვერ მოიძებნა" };
   }
 
   const name = profile.displayName ?? profile.username ?? "vivida user";
   return {
     title: name,
     description:
-      profile.bio ?? `ნახე ${name}-ის ნატალური რუკა და თქვენი თავსებადობა.`,
+      profile.bio ??
+      (en
+        ? `View ${name}'s natal chart and explore your compatibility.`
+        : `ნახე ${name}-ის ნატალური რუკა და თქვენი თავსებადობა.`),
   };
 }
 
@@ -118,12 +126,25 @@ export default async function PublicProfilePage({
 
   const ownerChart = await ensureChartFor(owner.id);
 
+  // Viewer (may be anonymous, may be the owner, may be a logged-in stranger).
+  // Anonymous visitors still inherit the request host language.
+  const session = await auth();
+  const viewerId = session?.user?.id ?? null;
+  const locale = viewerId
+    ? await getUserLocale(viewerId)
+    : await getRequestLocale();
+  const en = locale === "en";
+
   // Public test results the owner has opted to display.
   const testBadges: { label: string; value: string; glyph: string }[] = [];
   if (profile.showMbtiResult) {
     const m = await getLatestMbtiResult(owner.id);
     if (m) {
-      testBadges.push({ label: "ტიპი", value: m.mbtiType, glyph: "🧠" });
+      testBadges.push({
+        label: en ? "Type" : "ტიპი",
+        value: m.mbtiType,
+        glyph: "🧠",
+      });
     }
   }
   if (profile.showIqResult) {
@@ -133,7 +154,8 @@ export default async function PublicProfilePage({
   if (profile.showEqResult) {
     const result = await getLatestEqResult(owner.id);
     if (result) {
-      const band = EQ_BAND_META[result.band as EqBand]?.labelKa;
+      const bandMeta = EQ_BAND_META[result.band as EqBand];
+      const band = en ? bandMeta?.labelEn : bandMeta?.labelKa;
       testBadges.push({
         label: "EQ",
         value: band ? `${result.overall} · ${band}` : String(result.overall),
@@ -142,11 +164,6 @@ export default async function PublicProfilePage({
     }
   }
 
-  // Viewer (may be anonymous, may be the owner, may be a logged-in stranger)
-  const session = await auth();
-  const viewerId = session?.user?.id ?? null;
-  const locale = viewerId ? await getUserLocale(viewerId) : "ka";
-  const en = locale === "en";
   const isOwner = viewerId === owner.id;
   const viewerIsAdmin = viewerId ? isAdminEmail(session?.user?.email) : false;
 
@@ -170,7 +187,9 @@ export default async function PublicProfilePage({
     const viewerChart = await ensureChartFor(viewerId);
     if (viewerChart) {
       synastry = computeSynastry(viewerChart.data, ownerChart.data);
-      synastryTexts = await getSynastryInterpretationsFor(synastry);
+      if (!en) {
+        synastryTexts = await getSynastryInterpretationsFor(synastry);
+      }
       viewerName = session?.user?.name?.split(" ")[0] ?? (en ? "You" : "შენ");
       const viewerSunIdx = viewerChart.data?.bodies?.sun?.signIndex;
       if (typeof viewerSunIdx === "number") {
@@ -247,7 +266,7 @@ export default async function PublicProfilePage({
           <div className="relative grid gap-6 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-8">
             <div className="relative mx-auto w-full max-w-[260px] sm:mx-0 sm:w-64">
               {photos.length > 0 ? (
-                <PhotoCarousel photos={photos} />
+                <PhotoCarousel photos={photos} locale={locale} />
               ) : (
                 <div className="relative">
                   <div
@@ -401,25 +420,53 @@ export default async function PublicProfilePage({
                 {displayName}
               </h2>
             </header>
-            <SynastryDisplayLazy
-              result={synastry}
-              partnerName={displayName}
-              interpretations={synastryTexts}
-              shareCardProps={
+            {en ? (
+              <SynastryDisplayEn
+                result={synastry}
+                partnerName={displayName}
+                shareCardProps={
+                  viewerName && viewerSunSign && sun
+                    ? {
+                        viewerName,
+                        viewerSignLabel: viewerSunSign.labelEn,
+                        viewerSignSymbol: viewerSunSign.symbol,
+                        partnerName: displayName,
+                        partnerSignLabel: sun.labelEn,
+                        partnerSignSymbol: sun.symbol,
+                        result: synastry,
+                        verdict: overallVerdictEn(synastry.overall),
+                        locale,
+                      }
+                    : undefined
+                }
+              />
+            ) : (
+              <SynastryDisplayLazy
+                result={synastry}
+                partnerName={displayName}
+                interpretations={synastryTexts}
+                locale={locale}
+                shareCardProps={
                 viewerName && viewerSunSign && sun
                   ? {
                       viewerName,
-                      viewerSignLabel: viewerSunSign.labelKa,
+                      viewerSignLabel: en
+                        ? viewerSunSign.labelEn
+                        : viewerSunSign.labelKa,
                       viewerSignSymbol: viewerSunSign.symbol,
                       partnerName: displayName,
-                      partnerSignLabel: sun.labelKa,
+                      partnerSignLabel: en ? sun.labelEn : sun.labelKa,
                       partnerSignSymbol: sun.symbol,
                       result: synastry,
-                      verdict: overallVerdict(synastry.overall),
+                      verdict: en
+                        ? overallVerdictEn(synastry.overall)
+                        : overallVerdict(synastry.overall),
+                      locale,
                     }
                   : undefined
-              }
-            />
+                }
+              />
+            )}
           </section>
         )}
 
@@ -450,6 +497,7 @@ export default async function PublicProfilePage({
               viewerIsAdmin={viewerIsAdmin}
               viewerSunSign={null}
               disablePagination
+              locale={locale}
             />
           </section>
         )}

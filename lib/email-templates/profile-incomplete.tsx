@@ -12,16 +12,22 @@ export function ProfileIncompleteEmail({
   name,
   onboardingUrl,
   unsubscribeUrl,
+  locale = "ka",
 }: {
   name: string | null;
   onboardingUrl: string;
   unsubscribeUrl: string;
+  locale?: "ka" | "en";
 }) {
-  const greeting = name ? `სალამი, ${name}!` : "სალამი!";
+  const en = locale === "en";
+  const greeting = name
+    ? en ? `Hello, ${name}!` : `სალამი, ${name}!`
+    : en ? "Hello!" : "სალამი!";
   return (
     <EmailLayout
-      preview="დაასრულე რეგისტრაცია — შენი ნატალური რუკა გელოდება"
+      preview={en ? "Complete your profile — your birth chart is waiting" : "დაასრულე რეგისტრაცია — შენი ნატალური რუკა გელოდება"}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
       <Heading
         as="h1"
@@ -34,13 +40,14 @@ export function ProfileIncompleteEmail({
           margin: "0 0 16px",
         }}
       >
-        შენი რუკა ჯერ კიდევ გელოდება
+        {en ? "Your chart is still waiting" : "შენი რუკა ჯერ კიდევ გელოდება"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
       <Text style={paragraphStyle}>
-        შენ vivida.ge-ზე დარეგისტრირდი, მაგრამ ჯერ არ შეგიყვანია დაბადების
-        თარიღი, დრო და ადგილი — ამიტომ ვერ ვუშვით შენი ნატალური რუკა.
+        {en
+          ? "You created a Vivida account but have not added your birth date, time, and place yet, so we cannot calculate your natal chart."
+          : "შენ vivida.ge-ზე დარეგისტრირდი, მაგრამ ჯერ არ შეგიყვანია დაბადების თარიღი, დრო და ადგილი — ამიტომ ვერ ვუშვით შენი ნატალური რუკა."}
       </Text>
       <Section
         style={{
@@ -60,7 +67,7 @@ export function ProfileIncompleteEmail({
             margin: "0 0 6px",
           }}
         >
-          ✦ 50 კრედიტი საჩუქრად
+          {en ? "✦ 50 bonus credits" : "✦ 50 კრედიტი საჩუქრად"}
         </Text>
         <Text
           style={{
@@ -70,12 +77,14 @@ export function ProfileIncompleteEmail({
             margin: 0,
           }}
         >
-          შეავსე დაბადების დეტალები და ბონუსი ავტომატურად დაგერიცხება.
+          {en
+            ? "Complete your birth details and the bonus will be added automatically."
+            : "შეავსე დაბადების დეტალები და ბონუსი ავტომატურად დაგერიცხება."}
         </Text>
       </Section>
 
       <Text style={{ ...paragraphStyle, fontWeight: 600, color: "#ffffff" }}>
-        სულ 60 წამში მიიღებ:
+        {en ? "In about 60 seconds, you will unlock:" : "სულ 60 წამში მიიღებ:"}
       </Text>
 
       <ul
@@ -87,19 +96,19 @@ export function ProfileIncompleteEmail({
           paddingLeft: 22,
         }}
       >
-        <li>შენი დიდი სამეული — მზე, მთვარე და ასცენდენტი</li>
-        <li>სრული ნატალური რუკა და ინტერპრეტაცია</li>
-        <li>ყოველდღიური ჰოროსკოპი, შენს რუკაზე მორგებული</li>
-        <li>თავსებადობა მეგობრებთან და პარტნიორებთან</li>
+        <li>{en ? "Your big three — Sun, Moon, and rising sign" : "შენი დიდი სამეული — მზე, მთვარე და ასცენდენტი"}</li>
+        <li>{en ? "A complete natal chart and interpretation" : "სრული ნატალური რუკა და ინტერპრეტაცია"}</li>
+        <li>{en ? "A daily horoscope personalized to your chart" : "ყოველდღიური ჰოროსკოპი, შენს რუკაზე მორგებული"}</li>
+        <li>{en ? "Compatibility with friends and partners" : "თავსებადობა მეგობრებთან და პარტნიორებთან"}</li>
       </ul>
 
       <div style={{ marginTop: 22 }}>
         <Button href={onboardingUrl} style={buttonStyle}>
-          შეავსე მონაცემები და მიიღე 50 კრედიტი
+          {en ? "Complete my profile and get 50 credits" : "შეავსე მონაცემები და მიიღე 50 კრედიტი"}
         </Button>
       </div>
 
-      <Text style={mutedStyle}>თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს.</Text>
+      <Text style={mutedStyle}>{en ? "If you have a question, simply reply to this email." : "თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს."}</Text>
     </EmailLayout>
   );
 }

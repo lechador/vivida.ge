@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "გვერდი ვერ მოიძებნა" };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title:
+      (await getRequestLocale()) === "en"
+        ? "Page not found"
+        : "გვერდი ვერ მოიძებნა",
+  };
+}
 
-export default function NotFound() {
+export default async function NotFound() {
+  const locale = await getRequestLocale();
+  const en = locale === "en";
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.4),transparent_70%)]"
@@ -41,24 +52,25 @@ export default function NotFound() {
             404
           </div>
           <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            ეს გვერდი{" "}
+            {en ? "This page is " : "ეს გვერდი "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              შავ ხვრელშია
+              {en ? "inside a black hole" : "შავ ხვრელშია"}
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-pretty text-base text-muted-foreground">
-            ან არასწორი ლინკი, ან გვერდი წაშლილია. დავაბრუნოთ შენი კოსმოსის
-            გზაზე.
+            {en
+              ? "The link may be incorrect or the page may have moved. Let’s get you back on course."
+              : "ან არასწორი ლინკი, ან გვერდი წაშლილია. დავაბრუნოთ შენი კოსმოსის გზაზე."}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic" size="lg">
-              <Link href="/">მთავარი</Link>
+              <Link href="/">{en ? "Home" : "მთავარი"}</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
               {SOCIAL_FEATURES.swipeDeck ? (
-                <Link href="/discover">აღმოაჩინე</Link>
+                <Link href="/discover">{en ? "Discover" : "აღმოაჩინე"}</Link>
               ) : (
-                <Link href="/feed">ფიდი</Link>
+                <Link href="/feed">{en ? "Feed" : "ფიდი"}</Link>
               )}
             </Button>
           </div>

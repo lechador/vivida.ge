@@ -16,6 +16,8 @@ import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete
 import { MarketingEmail } from "@/lib/email-templates/marketing";
 import { ensureDailyFor } from "@/actions/daily";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
+import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
 let _client: Resend | null = null;
 function client(): Resend | null {
@@ -38,8 +40,9 @@ const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <hello@vivida.ge>");
 // localhost in local admin/dev sessions and must never leak into a real send.
 const ORIGIN = process.env.EMAIL_ORIGIN ?? "https://vivida.ge";
 
-function absUrl(path: string): string {
-  return `${ORIGIN.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+function localizedAbsUrl(path: string, locale: "ka" | "en"): string {
+  const origin = locale === "en" ? ENGLISH_SITE_URL : ORIGIN;
+  return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 /** Type of bulk-send the admin can trigger. */
@@ -76,6 +79,7 @@ type Recipient = {
   userId: string;
   email: string;
   name: string | null;
+  locale: string;
 };
 
 /**
@@ -94,6 +98,7 @@ async function resolveAudience(
         userId: users.id,
         email: users.email,
         name: users.name,
+        locale: users.interfaceLanguage,
       })
       .from(users)
       .innerJoin(profiles, eq(profiles.userId, users.id))
@@ -113,6 +118,7 @@ async function resolveAudience(
         userId: users.id,
         email: users.email,
         name: users.name,
+        locale: users.interfaceLanguage,
         dateOfBirth: profiles.dateOfBirth,
       })
       .from(users)
@@ -121,13 +127,12 @@ async function resolveAudience(
       .then((rows) =>
         rows
           .filter((r) => !r.dateOfBirth)
-          .filter((r): r is { userId: string; email: string; name: string | null; dateOfBirth: null } =>
-            !!r.email
-          )
+          .filter((r) => !!r.email)
           .map((r) => ({
             userId: r.userId,
-            email: r.email,
+            email: r.email!,
             name: r.name,
+            locale: r.locale,
           }))
       );
   }
@@ -137,6 +142,7 @@ async function resolveAudience(
       userId: users.id,
       email: users.email,
       name: users.name,
+      locale: users.interfaceLanguage,
     })
     .from(users)
     .where(eq(users.emailMarketing, true))
@@ -251,7 +257,7 @@ export async function sendBulk(opts: SendOptions): Promise<SendResult> {
 /** Send the birth-details incentive only to the explicit test recipient. */
 export async function sendBirthDetailsCampaignTest(to: string): Promise<boolean> {
   const [recipient] = await db
-    .select({ userId: users.id, email: users.email, name: users.name })
+    .select({ userId: users.id, email: users.email, name: users.name, locale: users.interfaceLanguage })
     .from(users)
     .where(eq(users.email, to.trim().toLowerCase()))
     .limit(1);
@@ -280,14 +286,14 @@ export async function sendMarketingTestEmail(
   opts: Omit<SendOptions, "template" | "dryRun">
 ): Promise<boolean> {
   const [recipient] = await db
-    .select({ userId: users.id, email: users.email, name: users.name })
+    .select({ userId: users.id, email: users.email, name: users.name, locale: users.interfaceLanguage })
     .from(users)
     .where(eq(users.email, to.trim().toLowerCase()))
     .limit(1);
   if (!recipient?.email) throw new Error("test recipient is not a registered user");
   return dispatch(
     { ...opts, template: "marketing" },
-    { userId: recipient.userId, email: recipient.email, name: recipient.name },
+    { userId: recipient.userId, email: recipient.email, name: recipient.name, locale: recipient.locale },
     `marketing-test:new-tests:${recipient.userId}`
   );
 }
@@ -307,9 +313,10 @@ async function dispatch(
   if (!c) return false;
 
   const token = await getOrCreateUnsubscribeToken(recipient.userId);
+  const locale = normalizeUserLocale(recipient.locale);
 
   if (opts.template === "daily_horoscope") {
-    const daily = await ensureDailyFor(recipient.userId);
+    const daily = await ensureDailyFor(recipient.userId, locale);
     if (!daily) return false; // No chart or generation failed — skip silently
     const [profile] = await db
       .select({ timezone: profiles.timezone })
@@ -317,15 +324,15 @@ async function dispatch(
       .where(eq(profiles.userId, recipient.userId))
       .limit(1);
     const tz = profile?.timezone ?? "UTC";
-    const localizedDate = new Intl.DateTimeFormat("ka-GE", {
+    const localizedDate = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ka-GE", {
       timeZone: tz,
       weekday: "long",
       day: "numeric",
       month: "long",
     }).format(new Date());
 
-    const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=daily`);
-    const dashboardUrl = absUrl("/dashboard");
+    const unsubUrl = localizedAbsUrl(`/unsubscribe?token=${token}&type=daily`, locale);
+    const dashboardUrl = localizedAbsUrl("/dashboard", locale);
     await acquireResendSlot();
     const result = await c.emails.send(
       {
@@ -333,7 +340,7 @@ async function dispatch(
         to: recipient.email,
         // Use today's actual headline as the subject — a concrete, personal
         // line opens far better than a static "your daily horoscope".
-        subject: daily.headline?.trim() || "შენი დღევანდელი ჰოროსკოპი",
+        subject: daily.headline?.trim() || (locale === "en" ? "Your daily horoscope" : "შენი დღევანდელი ჰოროსკოპი"),
         react: DailyHoroscopeEmail({
           name: recipient.name?.split(" ")[0] ?? null,
           headline: daily.headline,
@@ -341,6 +348,7 @@ async function dispatch(
           dashboardUrl,
           unsubscribeUrl: unsubUrl,
           localizedDate,
+          locale,
         }),
         headers: {
           "List-Unsubscribe": `<${unsubUrl}>`,
@@ -362,11 +370,15 @@ async function dispatch(
       .limit(1);
     if (profile?.dateOfBirth && !opts.allowCompletedProfile) return false;
 
-    const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`);
-    const onboardingUrl = absUrl("/onboarding");
-    const subject = opts.campaignId
-      ? "შეავსე დაბადების დეტალები და მიიღე 50 კრედიტი"
-      : "შენი ნატალური რუკა გელოდება — დაასრულე რეგისტრაცია";
+    const unsubUrl = localizedAbsUrl(`/unsubscribe?token=${token}&type=nudges`, locale);
+    const onboardingUrl = localizedAbsUrl("/onboarding", locale);
+    const subject = locale === "en"
+      ? opts.campaignId
+        ? "Complete your birth details and get 50 credits"
+        : "Your birth chart is waiting — complete your profile"
+      : opts.campaignId
+        ? "შეავსე დაბადების დეტალები და მიიღე 50 კრედიტი"
+        : "შენი ნატალური რუკა გელოდება — დაასრულე რეგისტრაცია";
     await acquireResendSlot();
     const result = await c.emails.send({
       from: FROM,
@@ -376,6 +388,7 @@ async function dispatch(
         name: recipient.name?.split(" ")[0] ?? null,
         onboardingUrl,
         unsubscribeUrl: unsubUrl,
+        locale,
       }),
       headers: {
         "List-Unsubscribe": `<${unsubUrl}>`,
@@ -407,7 +420,7 @@ async function dispatch(
   if (!opts.subject || !opts.body) {
     throw new Error("subject and body are required for marketing template");
   }
-  const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=marketing`);
+  const unsubUrl = localizedAbsUrl(`/unsubscribe?token=${token}&type=marketing`, locale);
   await acquireResendSlot();
   const result = await c.emails.send({
     from: FROM,
@@ -420,6 +433,7 @@ async function dispatch(
       ctaLabel: opts.ctaLabel ?? null,
       ctaUrl: opts.ctaUrl ?? null,
       unsubscribeUrl: unsubUrl,
+      locale,
     }),
     headers: {
       "List-Unsubscribe": `<${unsubUrl}>`,

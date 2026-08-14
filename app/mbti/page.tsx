@@ -199,6 +199,7 @@ export default async function MbtiHubPage() {
         </section>
 
         <PopularSearches
+          locale={locale}
           queries={en ? ["16 personality types", "MBTI type descriptions", "free personality test", "personality type strengths", "discover my personality type"] : [
             "16 პიროვნების ტიპი",
             "პიროვნების ტესტი",

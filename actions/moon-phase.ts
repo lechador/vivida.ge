@@ -20,6 +20,8 @@ import {
   saveMoonPhaseLibraryEntry,
 } from "@/lib/moon-phase-library";
 import { signByIndex } from "@/lib/zodiac";
+import { englishMoonPhaseReading } from "@/lib/moon-phase-en";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export type MoonPhaseRow = MoonPhase & { snapshot: MoonPhaseSnapshot };
 
@@ -32,12 +34,38 @@ export type MoonPhaseRow = MoonPhase & { snapshot: MoonPhaseSnapshot };
  * Cache invalidates when MOON_PHASE_PROMPT_VERSION is bumped after a prompt
  * change.
  */
-export async function ensureMoonPhase(): Promise<MoonPhaseRow | null> {
+export async function ensureMoonPhase(
+  locale: UserLocale = "ka",
+): Promise<MoonPhaseRow | null> {
   const now = new Date();
   const snapshot = computeMoonPhase(now);
   if (!snapshot) return null;
 
   const today = utcDateString(now);
+
+  if (locale === "en") {
+    const reading = englishMoonPhaseReading(snapshot);
+    return {
+      date: today,
+      phaseKey: snapshot.phaseKey,
+      phaseLabelKa: snapshot.phaseLabelKa,
+      signEn: snapshot.signEn,
+      signKa: snapshot.signKa,
+      signIndex: snapshot.signIndex,
+      phaseAngle: snapshot.phaseAngle,
+      illumination: snapshot.illumination,
+      ageDays: snapshot.ageDays,
+      headline: reading.headline,
+      summary: reading.summary,
+      body: reading.body,
+      themes: reading.themes,
+      promptVersion: MOON_PHASE_PROMPT_VERSION,
+      model: "deterministic-en",
+      language: "en",
+      createdAt: now,
+      snapshot,
+    };
+  }
 
   const [existing] = await db
     .select()

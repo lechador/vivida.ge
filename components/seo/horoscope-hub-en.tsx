@@ -231,6 +231,7 @@ export function HoroscopeHubEn() {
           </Button>
         </div>
         <PopularSearches
+          locale="en"
           queries={[
             "daily horoscope",
             "today horoscope",

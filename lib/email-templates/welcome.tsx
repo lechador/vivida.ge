@@ -18,13 +18,18 @@ import {
 export function WelcomeEmail({
   name,
   dashboardUrl,
+  locale = "ka",
 }: {
   name: string | null;
   dashboardUrl: string;
+  locale?: "ka" | "en";
 }) {
-  const greeting = name ? `კეთილი იყოს მობრძანება, ${name}!` : "კეთილი იყოს მობრძანება!";
+  const en = locale === "en";
+  const greeting = name
+    ? en ? `Welcome, ${name}!` : `კეთილი იყოს მობრძანება, ${name}!`
+    : en ? "Welcome!" : "კეთილი იყოს მობრძანება!";
   return (
-    <EmailLayout preview="შენი კოსმიური მოგზაურობა იწყება — Vivida">
+    <EmailLayout preview={en ? "Your cosmic journey begins — Vivida" : "შენი კოსმიური მოგზაურობა იწყება — Vivida"} locale={locale}>
       <Heading
         as="h1"
         style={{
@@ -36,17 +41,18 @@ export function WelcomeEmail({
           margin: "0 0 16px",
         }}
       >
-        შენი კოსმიური მოგზაურობა იწყება
+        {en ? "Your cosmic journey begins" : "შენი კოსმიური მოგზაურობა იწყება"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
       <Text style={paragraphStyle}>
-        Vivida-ში ყველა ფუნქცია სრულად ხელმისაწვდომია — ბარათის გარეშე, ლიმიტის
-        გარეშე. შენი კოსმიური მოგზაურობა ერთ დაკლიკვაზე იწყება.
+        {en
+          ? "Your personal astrology experience is ready. Open your dashboard to explore your chart, forecasts, compatibility, and current cosmic events."
+          : "Vivida-ში ყველა ფუნქცია სრულად ხელმისაწვდომია — ბარათის გარეშე, ლიმიტის გარეშე. შენი კოსმიური მოგზაურობა ერთ დაკლიკვაზე იწყება."}
       </Text>
 
       <Text style={{ ...paragraphStyle, fontWeight: 600, color: "#ffffff" }}>
-        ხელმისაწვდომია:
+        {en ? "Available now:" : "ხელმისაწვდომია:"}
       </Text>
       <ul
         style={{
@@ -57,30 +63,18 @@ export function WelcomeEmail({
           paddingLeft: 22,
         }}
       >
-        <li>
-          <strong>ნატალური რუკა</strong> — სრული ინტერპრეტაცია, პლანეტები,
-          სახლები და ასპექტები
-        </li>
-        <li>
-          <strong>ყოველდღიური ჰოროსკოპი</strong> — შენს რუკაზე მორგებული, AI-ით
-          გენერირებული
-        </li>
-        <li>
-          <strong>თავსებადობა</strong> — შეადარე თავი მეგობრებს, პარტნიორებს,
-          ცნობილ ადამიანებს
-        </li>
-        <li>
-          <strong>კოსმიური მოვლენები</strong> — ახალმთვარეები, რეტროგრადები,
-          ტრანზიტები
-        </li>
+        <li><strong>{en ? "Natal chart" : "ნატალური რუკა"}</strong> — {en ? "complete interpretations of planets, houses, and aspects" : "სრული ინტერპრეტაცია, პლანეტები, სახლები და ასპექტები"}</li>
+        <li><strong>{en ? "Daily horoscope" : "ყოველდღიური ჰოროსკოპი"}</strong> — {en ? "personalized to your chart" : "შენს რუკაზე მორგებული, AI-ით გენერირებული"}</li>
+        <li><strong>{en ? "Compatibility" : "თავსებადობა"}</strong> — {en ? "compare charts with friends and partners" : "შეადარე თავი მეგობრებს, პარტნიორებს, ცნობილ ადამიანებს"}</li>
+        <li><strong>{en ? "Cosmic events" : "კოსმიური მოვლენები"}</strong> — {en ? "new moons, retrogrades, and transits" : "ახალმთვარეები, რეტროგრადები, ტრანზიტები"}</li>
       </ul>
 
       <Button href={dashboardUrl} style={buttonStyle}>
-        ნახე შენი რუკა
+        {en ? "Open your chart" : "ნახე შენი რუკა"}
       </Button>
 
       <Text style={mutedStyle}>
-        თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს.
+        {en ? "If you have a question, simply reply to this email." : "თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს."}
       </Text>
     </EmailLayout>
   );

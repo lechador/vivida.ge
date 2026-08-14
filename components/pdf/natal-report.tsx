@@ -16,6 +16,7 @@ import { C, ELEMENT_COLOR } from "@/lib/pdf/theme";
 import type { NatalChartJson } from "@/db/schema";
 import type { ChartSalience } from "@/lib/report-salience";
 import type { NatalReportContent } from "@/lib/report-content";
+import type { UserLocale } from "@/lib/i18n/locale";
 
 const FONT_DIR = path.join(process.cwd(), "app", "_fonts");
 let fontsReady = false;
@@ -39,6 +40,7 @@ export type NatalReportData = {
   chart: NatalChartJson;
   salience: ChartSalience;
   content: NatalReportContent;
+  locale?: UserLocale;
 };
 
 const ASPECT_KA: Record<string, string> = {
@@ -201,7 +203,7 @@ const POINTS = [
   "pluto",
 ] as const;
 
-function Footer() {
+function Footer({ locale }: { locale: UserLocale }) {
   // NOTE: a dynamic `render: ({pageNumber}) => …` callback on a fixed element
   // crashes react-pdf ("unsupported number: -3.9e22") once the document grows
   // past ~30 pages of block content — a confirmed engine limitation. A static
@@ -209,8 +211,8 @@ function Footer() {
   return e(
     View,
     { style: s.footer, fixed: true },
-    e(Text, null, "VIVIDA · ნატალური ანგარიში"),
-    e(Text, null, "vivida.ge")
+    e(Text, null, locale === "en" ? "VIVIDA · NATAL REPORT" : "VIVIDA · ნატალური ანგარიში"),
+    e(Text, null, locale === "en" ? "vividaastro.com" : "vivida.ge")
   );
 }
 
@@ -263,11 +265,16 @@ function BalanceBar({
 export function NatalReport({ data }: { data: NatalReportData }) {
   registerReportFonts();
   const { chart, salience, content } = data;
+  const locale = data.locale ?? "ka";
+  const en = locale === "en";
   const narrative = content.narrative;
 
-  const sunSign = signByIndex(chart.bodies.sun.signIndex).labelKa;
-  const moonSign = signByIndex(chart.bodies.moon.signIndex).labelKa;
-  const ascSign = signByIndex(chart.ascendant.signIndex).labelKa;
+  const sunMeta = signByIndex(chart.bodies.sun.signIndex);
+  const moonMeta = signByIndex(chart.bodies.moon.signIndex);
+  const ascMeta = signByIndex(chart.ascendant.signIndex);
+  const sunSign = en ? sunMeta.labelEn : sunMeta.labelKa;
+  const moonSign = en ? moonMeta.labelEn : moonMeta.labelKa;
+  const ascSign = en ? ascMeta.labelEn : ascMeta.labelKa;
 
   const rows = POINTS.map((key) => {
     const p = key === "ascendant" ? chart.ascendant : chart.bodies[key];
@@ -275,8 +282,8 @@ export function NatalReport({ data }: { data: NatalReportData }) {
     const sign = signByIndex(p.signIndex);
     return {
       key,
-      label: bodyMeta(key)?.labelKa ?? key,
-      sign: sign.labelKa,
+      label: en ? (bodyMeta(key)?.labelEn ?? key) : (bodyMeta(key)?.labelKa ?? key),
+      sign: en ? sign.labelEn : sign.labelKa,
       color: ELEMENT_COLOR[sign.element] ?? C.violet,
       degree: formatDegree(p.signDegree),
       retro: !!p.retrograde,
@@ -292,17 +299,27 @@ export function NatalReport({ data }: { data: NatalReportData }) {
     house: number | null;
   }>;
 
+  const ELEMENT_LABEL_EN: Record<string, string> = { ცეცხლი: "Fire", მიწა: "Earth", ჰაერი: "Air", წყალი: "Water" };
   const elementsBar = ELEMENT_ORDER.map((el) => ({
-    label: el,
+    label: en ? ELEMENT_LABEL_EN[el] : el,
     pct: salience.elements.percentages[el],
   }));
   const modalityBar = (["კარდინალური", "ფიქსირებული", "მუტაბელური"] as const).map(
-    (m) => ({ label: m, pct: salience.modality.percentages[m] })
+    (m) => ({ label: en ? ({ კარდინალური: "Cardinal", ფიქსირებული: "Fixed", მუტაბელური: "Mutable" } as const)[m] : m, pct: salience.modality.percentages[m] })
   );
   const MOD_COLOR: Record<string, string> = {
     კარდინალური: C.pink,
     ფიქსირებული: C.cyan,
     მუტაბელური: C.gold,
+    Cardinal: C.pink,
+    Fixed: C.cyan,
+    Mutable: C.gold,
+  };
+  const elementColor = (label: string) => {
+    const kaLabel = en
+      ? Object.entries(ELEMENT_LABEL_EN).find(([, value]) => value === label)?.[0] ?? label
+      : label;
+    return ELEMENT_COLOR[kaLabel] ?? C.violet;
   };
 
   const planetKeys = [
@@ -318,34 +335,34 @@ export function NatalReport({ data }: { data: NatalReportData }) {
 
   return e(
     Document,
-    { title: "ნატალური ანგარიში", author: "Vivida" },
+    { title: en ? "Natal Report" : "ნატალური ანგარიში", author: "Vivida" },
 
     // ── Cover ──
     e(
       Page,
       { size: "A4", style: s.cover },
-      e(Text, { style: s.coverKicker }, "ვივიდა · პერსონალური ანგარიში"),
-      e(Text, { style: s.coverTitle }, "ნატალური\nრუკა"),
+      e(Text, { style: s.coverKicker }, en ? "VIVIDA · PERSONAL REPORT" : "ვივიდა · პერსონალური ანგარიში"),
+      e(Text, { style: s.coverTitle }, en ? "NATAL\nCHART" : "ნატალური\nრუკა"),
       data.name ? e(Text, { style: s.coverName }, data.name) : null,
       e(View, { style: s.coverRule }),
       e(
         Text,
         { style: s.coverMeta },
-        `${data.birth.date}${data.birth.time ? ` · ${data.birth.time}` : ""}\n${data.birth.place}\n\nმზე ${sunSign} · მთვარე ${moonSign} · ამომავალი ${ascSign}`
+        `${data.birth.date}${data.birth.time ? ` · ${data.birth.time}` : ""}\n${data.birth.place}\n\n${en ? `Sun ${sunSign} · Moon ${moonSign} · Ascendant ${ascSign}` : `მზე ${sunSign} · მთვარე ${moonSign} · ამომავალი ${ascSign}`}`
       ),
-      e(Text, { style: s.coverBrand }, "vivida.ge")
+      e(Text, { style: s.coverBrand }, en ? "vividaastro.com" : "vivida.ge")
     ),
 
     // ── Content ──
     e(
       Page,
       { size: "A4", style: s.page, wrap: true },
-      Footer(),
+      Footer({ locale }),
 
       // What stands out (salience-led)
       e(SectionTitle, {
-        kicker: "შენი რუკის ხელწერა",
-        title: "რა გამოირჩევა",
+        kicker: en ? "YOUR CHART SIGNATURE" : "შენი რუკის ხელწერა",
+        title: en ? "What stands out" : "რა გამოირჩევა",
       }),
       ...(narrative?.standout ?? []).map((h, i) =>
         e(
@@ -362,7 +379,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
             View,
             { minPresenceAhead: 80 },
             e(View, { style: s.divider }),
-            e(SectionTitle, { kicker: "ბირთვი", title: "შენი რუკის ხელწერა" }),
+            e(SectionTitle, { kicker: en ? "CORE" : "ბირთვი", title: en ? "Your chart signature" : "შენი რუკის ხელწერა" }),
             e(Text, { style: s.prose }, narrative.signature)
           )
         : null,
@@ -370,10 +387,10 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       e(View, { style: s.divider }),
 
       // Balance
-      e(SectionTitle, { kicker: "ენერგია", title: "ელემენტები და მოდალობა" }),
+      e(SectionTitle, { kicker: en ? "ENERGY" : "ენერგია", title: en ? "Elements and modality" : "ელემენტები და მოდალობა" }),
       e(BalanceBar, {
         data: elementsBar,
-        colorOf: (l) => ELEMENT_COLOR[l] ?? C.violet,
+        colorOf: elementColor,
       }),
       e(View, { style: { height: 10 } }),
       e(BalanceBar, {
@@ -390,8 +407,8 @@ export function NatalReport({ data }: { data: NatalReportData }) {
             View,
             { minPresenceAhead: 80 },
             e(View, { style: { height: 16 } }),
-            e(Text, { style: s.sectionKicker }, "ნიჭები"),
-            e(Text, { style: [s.sectionTitle, { fontSize: 14 }] }, "ძლიერი მხარეები"),
+            e(Text, { style: s.sectionKicker }, en ? "GIFTS" : "ნიჭები"),
+            e(Text, { style: [s.sectionTitle, { fontSize: 14 }] }, en ? "Strengths" : "ძლიერი მხარეები"),
             e(Text, { style: s.prose }, narrative.strengths)
           )
         : null,
@@ -400,8 +417,8 @@ export function NatalReport({ data }: { data: NatalReportData }) {
             View,
             { minPresenceAhead: 80 },
             e(View, { style: { height: 14 } }),
-            e(Text, { style: s.sectionKicker }, "ზრდა"),
-            e(Text, { style: [s.sectionTitle, { fontSize: 14 }] }, "ზრდის ზონები"),
+            e(Text, { style: s.sectionKicker }, en ? "GROWTH" : "ზრდა"),
+            e(Text, { style: [s.sectionTitle, { fontSize: 14 }] }, en ? "Growth areas" : "ზრდის ზონები"),
             e(Text, { style: s.prose }, narrative.growth)
           )
         : null,
@@ -409,17 +426,17 @@ export function NatalReport({ data }: { data: NatalReportData }) {
       e(View, { style: s.divider }),
 
       // Positions table
-      e(SectionTitle, { kicker: "მონაცემები", title: "პოზიციები" }),
+      e(SectionTitle, { kicker: en ? "DATA" : "მონაცემები", title: en ? "Positions" : "პოზიციები" }),
       e(
         View,
         { style: s.table },
         e(
           View,
           { style: s.thead },
-          e(Text, { style: [s.th, s.cName] }, "პლანეტა"),
-          e(Text, { style: [s.th, s.cSign] }, "ნიშანი"),
-          e(Text, { style: [s.th, s.cDeg] }, "გრადუსი"),
-          e(Text, { style: [s.th, s.cHouse] }, "სახლი")
+          e(Text, { style: [s.th, s.cName] }, en ? "Planet" : "პლანეტა"),
+          e(Text, { style: [s.th, s.cSign] }, en ? "Sign" : "ნიშანი"),
+          e(Text, { style: [s.th, s.cDeg] }, en ? "Degree" : "გრადუსი"),
+          e(Text, { style: [s.th, s.cHouse] }, en ? "House" : "სახლი")
         ),
         ...rows.map((r) =>
           e(
@@ -439,12 +456,12 @@ export function NatalReport({ data }: { data: NatalReportData }) {
 
       // Big Three
       e(View, { style: s.divider }),
-      e(SectionTitle, { kicker: "ბირთვი", title: "დიდი სამეული" }),
+      e(SectionTitle, { kicker: en ? "CORE" : "ბირთვი", title: en ? "The big three" : "დიდი სამეული" }),
       ...(
         [
-          ["sun", "მზე"],
-          ["moon", "მთვარე"],
-          ["ascendant", "ამომავალი"],
+          ["sun", en ? "Sun" : "მზე"],
+          ["moon", en ? "Moon" : "მთვარე"],
+          ["ascendant", en ? "Ascendant" : "ამომავალი"],
         ] as const
       ).map(([key, label]) => {
         const p = key === "ascendant" ? chart.ascendant : chart.bodies[key];
@@ -457,7 +474,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
             View,
             { style: s.entryHead },
             e(Text, { style: s.entryName }, label),
-            e(Text, { style: s.entryMeta }, `${sign.labelKa} · ${formatDegree(p.signDegree)}`)
+            e(Text, { style: s.entryMeta }, `${en ? sign.labelEn : sign.labelKa} · ${formatDegree(p.signDegree)}`)
           ),
           body ? e(Text, { style: s.entryBody }, body) : null
         );
@@ -465,7 +482,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
 
       // Planets
       e(View, { style: s.divider }),
-      e(SectionTitle, { kicker: "პლანეტები", title: "პლანეტარული განლაგება" }),
+      e(SectionTitle, { kicker: en ? "PLANETS" : "პლანეტები", title: en ? "Planetary placements" : "პლანეტარული განლაგება" }),
       ...planetKeys
         .filter((k) => chart.bodies[k])
         .map((key) => {
@@ -478,11 +495,11 @@ export function NatalReport({ data }: { data: NatalReportData }) {
             e(
               View,
               { style: s.entryHead },
-              e(Text, { style: s.entryName }, bodyMeta(key)?.labelKa ?? key),
+              e(Text, { style: s.entryName }, en ? (bodyMeta(key)?.labelEn ?? key) : (bodyMeta(key)?.labelKa ?? key)),
               e(
                 Text,
                 { style: s.entryMeta },
-                `${sign.labelKa} · ${formatDegree(p.signDegree)}${p.house ? ` · მე-${p.house} სახლი` : ""}${p.retrograde ? " · ℞" : ""}`
+                `${en ? sign.labelEn : sign.labelKa} · ${formatDegree(p.signDegree)}${p.house ? en ? ` · House ${p.house}` : ` · მე-${p.house} სახლი` : ""}${p.retrograde ? " · ℞" : ""}`
               )
             ),
             body ? e(Text, { style: s.entryBody }, body) : null
@@ -491,7 +508,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
 
       // Houses
       e(View, { style: s.divider }),
-      e(SectionTitle, { kicker: "ცხოვრების სფეროები", title: "12 სახლი" }),
+      e(SectionTitle, { kicker: en ? "LIFE AREAS" : "ცხოვრების სფეროები", title: en ? "The 12 houses" : "12 სახლი" }),
       ...Array.from({ length: 12 }, (_, i) => i + 1)
         .map((n) => {
           const body = content.houses?.[String(n)];
@@ -514,9 +531,9 @@ export function NatalReport({ data }: { data: NatalReportData }) {
             e(
               View,
               { style: s.entryHead },
-              e(Text, { style: s.entryName }, `მე-${n} სახლი`),
+              e(Text, { style: s.entryName }, en ? `House ${n}` : `მე-${n} სახლი`),
               sign
-                ? e(Text, { style: s.entryMeta }, sign.labelKa)
+                ? e(Text, { style: s.entryMeta }, en ? sign.labelEn : sign.labelKa)
                 : null
             ),
             ...paragraphs.map((p, i) =>
@@ -532,7 +549,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
 
       // Aspects (tightest first)
       e(View, { style: s.divider }),
-      e(SectionTitle, { kicker: "ბმები", title: "მთავარი ასპექტები" }),
+      e(SectionTitle, { kicker: en ? "CONNECTIONS" : "ბმები", title: en ? "Key aspects" : "მთავარი ასპექტები" }),
       ...salience.tightestAspects.map((a, i) => {
         const k = aspectKey(
           a.a,
@@ -547,11 +564,11 @@ export function NatalReport({ data }: { data: NatalReportData }) {
           e(
             View,
             { style: s.entryHead },
-            e(Text, { style: s.entryName }, `${a.aLabel} – ${a.bLabel}`),
+            e(Text, { style: s.entryName }, en ? `${bodyMeta(a.a)?.labelEn ?? a.a} – ${bodyMeta(a.b)?.labelEn ?? a.b}` : `${a.aLabel} – ${a.bLabel}`),
             e(
               Text,
               { style: [s.aspectChip, { backgroundColor: col }] },
-              `${ASPECT_KA[a.kind] ?? a.kind} ${a.orb.toFixed(1)}°`
+              `${en ? ({ conjunction: "Conjunction", sextile: "Sextile", square: "Square", trine: "Trine", opposition: "Opposition" } as Record<string, string>)[a.kind] ?? a.kind : ASPECT_KA[a.kind] ?? a.kind} ${a.orb.toFixed(1)}°`
             )
           ),
           body ? e(Text, { style: s.entryBody }, body) : null
@@ -564,7 +581,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
             View,
             { minPresenceAhead: 80 },
             e(View, { style: s.divider }),
-            e(SectionTitle, { kicker: "დასკვნა", title: "შენი კოსმიური ხელწერა" }),
+            e(SectionTitle, { kicker: en ? "CLOSING" : "დასკვნა", title: en ? "Your cosmic signature" : "შენი კოსმიური ხელწერა" }),
             e(Text, { style: s.prose }, narrative.closing)
           )
         : null

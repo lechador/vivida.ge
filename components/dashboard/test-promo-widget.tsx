@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Brain, Clock3, Fingerprint, Heart, Radar, Sparkles } from "lucide-react";
 
 import type { TestCatalogEntry } from "@/lib/tests-catalog";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ICONS: Record<string, typeof Brain> = {
   iq: Brain,
@@ -22,7 +23,8 @@ const ACCENTS: Record<string, string> = {
 };
 
 /** Compact dashboard cross-sell: one relevant unfinished test, never a grid. */
-export function DashboardTestPromo({ test, allCompleted }: { test: TestCatalogEntry; allCompleted: boolean }) {
+export function DashboardTestPromo({ test, allCompleted, locale = "ka" }: { test: TestCatalogEntry; allCompleted: boolean; locale?: UserLocale }) {
+  const en = locale === "en";
   const Icon = ICONS[test.slug] ?? Sparkles;
   const accent = ACCENTS[test.slug] ?? "var(--vivida-violet)";
 
@@ -37,16 +39,16 @@ export function DashboardTestPromo({ test, allCompleted }: { test: TestCatalogEn
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-            {allCompleted ? "სწრაფი ქვიზი შენთვის" : "შეავსე შენი პროფილი"}
+            {allCompleted ? (en ? "A quick quiz for you" : "სწრაფი ქვიზი შენთვის") : (en ? "Complete your profile" : "შეავსე შენი პროფილი")}
           </span>
-          <span className="mt-0.5 block font-semibold tracking-tight">{test.titleKa}</span>
-          <span className="mt-1 block line-clamp-1 text-xs text-muted-foreground sm:text-sm">{test.taglineKa}</span>
+          <span className="mt-0.5 block font-semibold tracking-tight">{en ? test.titleEn : test.titleKa}</span>
+          <span className="mt-1 block line-clamp-1 text-xs text-muted-foreground sm:text-sm">{en ? test.taglineEn : test.taglineKa}</span>
           <span className="mt-2 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-            <Clock3 className="size-3" /> {test.metaKa}
+            <Clock3 className="size-3" /> {en ? test.metaEn : test.metaKa}
           </span>
         </span>
         <span className="hidden shrink-0 items-center gap-1 text-sm font-medium sm:flex" style={{ color: accent }}>
-          დაწყება <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+          {en ? "Start" : "დაწყება"} <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
         </span>
         <ArrowRight className="size-4 shrink-0 text-muted-foreground sm:hidden" />
       </Link>

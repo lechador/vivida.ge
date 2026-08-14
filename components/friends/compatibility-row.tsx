@@ -6,8 +6,10 @@ import {
   CATEGORY_EMOJI,
   CATEGORY_LABEL_KA,
 } from "@/lib/synastry";
+import { CATEGORY_LABEL_EN, overallVerdictEn } from "@/lib/synastry-en";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { FriendWithSynastry } from "@/lib/friend-synastry";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 import { synastryAccent } from "./synastry-visuals";
 
@@ -19,12 +21,15 @@ import { synastryAccent } from "./synastry-visuals";
 export function CompatibilityRow({
   u,
   rank,
+  locale = "ka",
 }: {
   u: FriendWithSynastry;
   /** 1-based rank in the sorted list. Rank 1 with a real score gets a
    *  hero treatment to celebrate the "best match" feeling. */
   rank: number;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const displayName =
     u.displayName ?? u.name?.split(" ")[0] ?? u.username ?? "user";
   const profileHref = u.username ? `/u/${u.username}` : null;
@@ -59,7 +64,7 @@ export function CompatibilityRow({
         {profileHref ? (
           <Link
             href={profileHref}
-            aria-label={`${displayName}-ის პროფილი`}
+            aria-label={en ? `${displayName}'s profile` : `${displayName}-ის პროფილი`}
             className="shrink-0 rounded-full transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {avatar}
@@ -93,12 +98,14 @@ export function CompatibilityRow({
           {score != null && u.synastry ? (
             <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs">
               <span className="text-muted-foreground">
-                {u.synastry.verdict}
+                {en ? overallVerdictEn(u.synastry.overall) : u.synastry.verdict}
               </span>
               <span className="text-muted-foreground/60">·</span>
               <span className="text-muted-foreground">
                 {CATEGORY_EMOJI[u.synastry.topCategory]}{" "}
-                {CATEGORY_LABEL_KA[u.synastry.topCategory]}{" "}
+                {en
+                  ? CATEGORY_LABEL_EN[u.synastry.topCategory]
+                  : CATEGORY_LABEL_KA[u.synastry.topCategory]}{" "}
                 <span className="tabular-nums text-foreground/85">
                   {u.synastry.topScore}%
                 </span>
@@ -106,7 +113,9 @@ export function CompatibilityRow({
             </div>
           ) : (
             <p className="mt-1 truncate text-xs text-muted-foreground">
-              ცის რუკა ჯერ არ აქვს — დაიცადე, სანამ შეავსებს
+              {en
+                ? "Natal chart not available yet"
+                : "ცის რუკა ჯერ არ აქვს — დაიცადე, სანამ შეავსებს"}
             </p>
           )}
         </div>
@@ -114,7 +123,7 @@ export function CompatibilityRow({
         {profileHref && (
           <Link
             href={profileHref}
-            aria-label="დეტალური თავსებადობა"
+            aria-label={en ? "Detailed compatibility" : "დეტალური თავსებადობა"}
             className="hidden shrink-0 text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
           >
             <ArrowRight className="size-4" />

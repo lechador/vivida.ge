@@ -152,7 +152,7 @@ export default async function BigFiveTestPage() {
             ))}
           </div>
 
-          <PopularSearches queries={en ? ["free Big Five personality test", "OCEAN personality test", "five personality traits", "Big Five profile"] : BIGFIVE_LATIN_QUERIES} />
+          <PopularSearches queries={en ? ["free Big Five personality test", "OCEAN personality test", "five personality traits", "Big Five profile"] : BIGFIVE_LATIN_QUERIES} locale={locale} />
         </div>
       </section>
     </main>

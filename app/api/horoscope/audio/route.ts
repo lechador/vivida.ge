@@ -25,8 +25,9 @@ export const maxDuration = 120;
 
 /**
  * Generate (or fetch cached) audio for the user's today horoscope.
- * Free while we test. The MP3 is cached in R2 keyed by (user, date, voice),
- * so each (user, day, voice) is synthesized at most once. Body: { voice? }.
+ * Free while we test. The MP3 is cached in R2 keyed by
+ * (user, date, language, voice), so switching interface language can never
+ * replay an older recording in the wrong language. Body: { voice? }.
  */
 export async function POST(req: Request) {
   const session = await auth();
@@ -109,7 +110,7 @@ export async function POST(req: Request) {
 
   // `v2` = summary-only narration. Bumping this suffix invalidates audio
   // cached under an older text recipe (v1 read the full transit-laden body).
-  const key = `horoscope-audio/${userId}/${today}/${voice.slug}.v2.mp3`;
+  const key = `horoscope-audio/${userId}/${today}/${horoscope.language}/${voice.slug}.v3.mp3`;
 
   // Cached? Serve a fresh signed URL.
   if (await objectExists(key)) {

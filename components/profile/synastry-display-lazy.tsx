@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 
 import type { SynastryResult } from "@/lib/synastry";
 import type { CompatibilityCardProps } from "./compatibility-card";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Lazy wrapper for SynastryDisplay. The full component is ~600 lines of
@@ -34,6 +35,7 @@ export function SynastryDisplayLazy(props: {
   shareCardProps?: CompatibilityCardProps;
   /** Pre-generated library texts (see lib/synastry-library.ts). */
   interpretations?: Record<string, string>;
+  locale?: UserLocale;
 }) {
   return <SynastryDisplay {...props} />;
 }

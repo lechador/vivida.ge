@@ -8,7 +8,8 @@ import webpush from "web-push";
 import { and, eq, inArray } from "drizzle-orm";
 
 import { db } from "@/db";
-import { pushSubscriptions, dailyHoroscopes } from "@/db/schema";
+import { pushSubscriptions, dailyHoroscopes, users } from "@/db/schema";
+import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 
 let configured = false;
 
@@ -96,6 +97,7 @@ export async function sendPushToUser(
 }
 
 const GENERIC_BODY = "შენი დღევანდელი ჰოროსკოპი მზადაა — გახსენი და ნახე ✨";
+const GENERIC_BODY_EN = "Your daily horoscope is ready — open it to read more ✨";
 
 /**
  * Daily push blast. One notification per subscribed user, using today's
@@ -108,14 +110,19 @@ export async function sendDailyPushBlast(opts: {
 }): Promise<{ recipients: number; sent: number }> {
   if (!ensureConfigured()) return { recipients: 0, sent: 0 };
 
-  const users = await db
-    .selectDistinct({ userId: pushSubscriptions.userId })
-    .from(pushSubscriptions);
+  const recipients = await db
+    .selectDistinct({
+      userId: pushSubscriptions.userId,
+      locale: users.interfaceLanguage,
+    })
+    .from(pushSubscriptions)
+    .innerJoin(users, eq(users.id, pushSubscriptions.userId));
 
   let sent = 0;
-  for (const { userId } of users) {
+  for (const { userId, locale: rawLocale } of recipients) {
+    const locale = normalizeUserLocale(rawLocale);
     const [h] = await db
-      .select({ headline: dailyHoroscopes.headline })
+      .select({ headline: dailyHoroscopes.headline, language: dailyHoroscopes.language })
       .from(dailyHoroscopes)
       .where(
         and(
@@ -126,10 +133,12 @@ export async function sendDailyPushBlast(opts: {
       .limit(1);
     sent += await sendPushToUser(userId, {
       title: "Vivida ✨",
-      body: h?.headline ?? GENERIC_BODY,
+      body: h?.language === locale
+        ? h.headline
+        : locale === "en" ? GENERIC_BODY_EN : GENERIC_BODY,
       url: "/dashboard",
       tag: `daily-${opts.sendDate}`,
     });
   }
-  return { recipients: users.length, sent };
+  return { recipients: recipients.length, sent };
 }

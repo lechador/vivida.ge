@@ -22,6 +22,10 @@ import {
   overallNarrativeEn,
   overallVerdictEn,
 } from "@/lib/synastry-en";
+import {
+  SynastryShareButton,
+} from "@/components/profile/synastry-share-button";
+import type { CompatibilityCardProps } from "@/components/profile/compatibility-card";
 
 const CATEGORY_COLOR: Record<string, string> = {
   love: "oklch(0.72 0.22 350)",
@@ -44,9 +48,11 @@ function aspectAccent(aspect: SynastryAspect): string {
 export function SynastryDisplayEn({
   result,
   partnerName,
+  shareCardProps,
 }: {
   result: SynastryResult;
   partnerName: string;
+  shareCardProps?: CompatibilityCardProps;
 }) {
   const harmonious = result.topAspects.filter(
     (a) => aspectTone(a.kind) === "harmonious",
@@ -280,6 +286,12 @@ export function SynastryDisplayEn({
           </div>
         </dl>
       </section>
+
+      {shareCardProps && (
+        <div className="flex justify-center">
+          <SynastryShareButton cardProps={shareCardProps} locale="en" />
+        </div>
+      )}
     </div>
   );
 }

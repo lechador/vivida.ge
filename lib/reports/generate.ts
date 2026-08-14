@@ -10,8 +10,10 @@ import { db } from "@/db";
 import { charts, pdfReports, profiles, users } from "@/db/schema";
 import { computeChartSalience } from "@/lib/report-salience";
 import { generateNatalReport } from "@/lib/report-content";
+import { buildEnglishNatalReportContent } from "@/lib/report-content-pdf-en";
 import { NatalReport } from "@/components/pdf/natal-report";
 import { putObject } from "@/lib/r2";
+import { normalizeUserLocale } from "@/lib/i18n/locale";
 
 export function reportPdfKey(userId: string, reportId: string): string {
   return `reports/${userId}/${reportId}.pdf`;
@@ -71,8 +73,12 @@ export async function generateAndStoreReport(reportId: string): Promise<boolean>
     const chart = chartRow.data;
     const salience = computeChartSalience(chart);
     const firstName = user?.name?.split(" ")[0] ?? null;
+    const locale = normalizeUserLocale(report.language);
 
-    const content = await generateNatalReport({ firstName, chart, salience });
+    const content =
+      locale === "en"
+        ? buildEnglishNatalReportContent(chart, salience, firstName)
+        : await generateNatalReport({ firstName, chart, salience });
 
     const buffer = await renderToBuffer(
       NatalReport({
@@ -86,6 +92,7 @@ export async function generateAndStoreReport(reportId: string): Promise<boolean>
           chart,
           salience,
           content,
+          locale,
         },
       })
     );

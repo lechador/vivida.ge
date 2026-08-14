@@ -6,6 +6,7 @@ import { Share2 } from "lucide-react";
 import { reactToPost, type FeedReactionCounts } from "@/actions/feed";
 import type { PostReactionKind } from "@/db/schema";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 import { ReactionIcon, REACTION_BY_KIND } from "./reaction-icons";
 import { ReactionPicker } from "./reaction-picker";
@@ -35,13 +36,16 @@ export function PostActions({
   initialMine,
   commentCount,
   onToggleComments,
+  locale = "ka",
 }: {
   postId: string;
   initialCounts: FeedReactionCounts;
   initialMine: PostReactionKind | null;
   commentCount: number;
   onToggleComments: () => void;
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [counts, setCounts] = useState<FeedReactionCounts>(initialCounts);
   const [mine, setMine] = useState<PostReactionKind | null>(initialMine);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -134,7 +138,7 @@ export function PostActions({
         return;
       }
       await navigator.clipboard.writeText(url);
-      setShareLabel("ბმული დაკოპირდა");
+      setShareLabel(en ? "Link copied" : "ბმული დაკოპირდა");
       setTimeout(() => setShareLabel(null), 1800);
     } catch {
       // User cancelled the share sheet, or clipboard write blocked.
@@ -143,7 +147,13 @@ export function PostActions({
   }
 
   const activeMeta = mine ? REACTION_BY_KIND[mine] : null;
-  const likeLabel = activeMeta?.labelKa ?? "ლაიქი";
+  const likeLabel = activeMeta
+    ? en
+      ? activeMeta.labelEn
+      : activeMeta.labelKa
+    : en
+      ? "Like"
+      : "ლაიქი";
   const likeColor = activeMeta?.hue;
 
   return (
@@ -153,14 +163,14 @@ export function PostActions({
       {(counts.like + counts.dislike + counts.funny + counts.sad > 0 ||
         commentCount > 0) && (
         <div className="mt-3 flex items-center justify-between gap-2 px-1 text-xs text-muted-foreground">
-          <ReactionSummary counts={counts} />
+          <ReactionSummary counts={counts} locale={locale} />
           {commentCount > 0 && (
             <button
               type="button"
               onClick={onToggleComments}
               className="tabular-nums transition-colors hover:text-foreground"
             >
-              {commentCount} კომენტარი
+              {commentCount} {en ? (commentCount === 1 ? "comment" : "comments") : "კომენტარი"}
             </button>
           )}
         </div>
@@ -178,6 +188,7 @@ export function PostActions({
             open={pickerOpen}
             onPick={applyReaction}
             onRequestClose={() => setPickerOpen(false)}
+            locale={locale}
           />
           <button
             type="button"
@@ -217,7 +228,7 @@ export function PostActions({
           className="flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-card/70 hover:text-foreground"
         >
           <CommentGlyph />
-          კომენტარი
+          {en ? "Comment" : "კომენტარი"}
         </button>
 
         {/* Share */}
@@ -227,7 +238,7 @@ export function PostActions({
           className="flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-card/70 hover:text-foreground"
         >
           <Share2 className="size-[18px]" />
-          {shareLabel ?? "გაზიარება"}
+          {shareLabel ?? (en ? "Share" : "გაზიარება")}
         </button>
       </div>
     </>

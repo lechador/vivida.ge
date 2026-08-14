@@ -10,8 +10,14 @@ import {
 } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 import { getUserLocale } from "@/lib/i18n/user-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { Metadata } from "next";
 
-export const metadata = { title: "ჩატი" };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: (await getRequestLocale()) === "en" ? "Messages" : "ჩატი",
+  };
+}
 export const dynamic = "force-dynamic";
 
 export default async function MessagesPage({

@@ -23,6 +23,7 @@ import { and, eq, gte, inArray, sql as dsql } from "drizzle-orm";
 import { db } from "@/db";
 import { emailSendLog, profiles, userActivityDays, users } from "@/db/schema";
 import { ensureSignHoroscope } from "@/actions/sign-horoscope";
+import { ensureDailyFor } from "@/actions/daily";
 import { getBalance } from "@/lib/credits";
 import { WinbackEmail } from "@/lib/email-templates/winback";
 import { isPushConfigured, sendPushToUser } from "@/lib/push";
@@ -31,6 +32,8 @@ import { localDateString } from "@/lib/transits";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { signMetaBySlug, signSlugByDate } from "@/lib/seo/zodiac-dates";
 import type { ZodiacSlug } from "@/lib/seo/zodiac-dates";
+import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
 const TZ = "Asia/Tbilisi";
 const DORMANT_MIN_DAYS = 7;
@@ -46,6 +49,7 @@ function resolveFrom(envVal: string | undefined, fallback: string): string {
 const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <onboarding@resend.dev>");
 
 export const WINBACK_SUBJECT = "ვარსკვლავები ისევ შენზე საუბრობენ ✨";
+export const WINBACK_SUBJECT_EN = "The stars are still speaking to you ✨";
 
 function dateKey(daysAgo: number): string {
   return localDateString(new Date(Date.now() - daysAgo * 86_400_000), TZ);
@@ -57,6 +61,7 @@ type DormantUser = {
   name: string | null;
   emailNudges: boolean | null;
   dateOfBirth: string | null;
+  locale: string;
 };
 
 /** Users whose most recent visit falls inside the dormancy window. */
@@ -86,6 +91,7 @@ async function findDormantUsers(): Promise<DormantUser[]> {
       name: users.name,
       emailNudges: users.emailNudges,
       dateOfBirth: profiles.dateOfBirth,
+      locale: users.interfaceLanguage,
     })
     .from(users)
     .leftJoin(profiles, eq(profiles.userId, users.id))
@@ -163,6 +169,10 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
 
   for (const u of found) {
     try {
+      const locale = normalizeUserLocale(u.locale);
+      const en = locale === "en";
+      const origin = en ? ENGLISH_SITE_URL : ORIGIN;
+      const subject = en ? WINBACK_SUBJECT_EN : WINBACK_SUBJECT;
       if (await recentlyNudged(u.userId)) {
         result.skipped++;
         continue;
@@ -176,15 +186,23 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
           userId: u.userId,
           kind: "winback",
           email: u.email,
-          subject: WINBACK_SUBJECT,
+          subject,
           status: "pending",
         })
         .returning({ id: emailSendLog.id });
 
       // Personalization (best-effort).
       const slug = sunSlugFromDob(u.dateOfBirth);
-      const signKa = slug ? (signMetaBySlug(slug)?.labelKa ?? null) : null;
-      const headline = slug ? await headlineFor(slug) : null;
+      const signMeta = slug ? signMetaBySlug(slug) : null;
+      const signLabel = en ? (signMeta?.labelEn ?? null) : (signMeta?.labelKa ?? null);
+      let headline: string | null = null;
+      try {
+        headline = en
+          ? (await ensureDailyFor(u.userId, "en"))?.headline ?? null
+          : slug ? await headlineFor(slug) : null;
+      } catch {
+        /* horoscope is garnish — never block the nudge */
+      }
       let balance = 0;
       try {
         balance = await getBalance(u.userId);
@@ -197,10 +215,14 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
       if (isPushConfigured()) {
         try {
           const sent = await sendPushToUser(u.userId, {
-            title: "შენ გვაკლიხარ ✨",
+            title: en ? "We miss you ✨" : "შენ გვაკლიხარ ✨",
             body: headline
-              ? `დღეს ${signKa ?? "შენთვის"}: ${headline}`
-              : "შენი დღევანდელი ჰოროსკოპი გელოდება",
+              ? en
+                ? `Today for ${signLabel ?? "you"}: ${headline}`
+                : `დღეს ${signLabel ?? "შენთვის"}: ${headline}`
+              : en
+                ? "Your daily horoscope is waiting"
+                : "შენი დღევანდელი ჰოროსკოპი გელოდება",
             url: "/dashboard",
             tag: "winback",
           });
@@ -228,20 +250,21 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
       }
 
       const token = await getOrCreateUnsubscribeToken(u.userId);
-      const unsubUrl = `${ORIGIN}/unsubscribe?token=${token}&type=nudges`;
+      const unsubUrl = `${origin}/unsubscribe?token=${token}&type=nudges`;
 
       await acquireResendSlot();
       const sendResult = await resend.emails.send({
         from: FROM,
         to: u.email,
-        subject: WINBACK_SUBJECT,
+        subject,
         react: WinbackEmail({
           name: firstName,
-          signLineKa: signKa,
+          signLabel,
           horoscopeHeadline: headline,
           balance,
-          dashboardUrl: `${ORIGIN}/dashboard`,
+          dashboardUrl: `${origin}/dashboard`,
           unsubscribeUrl: unsubUrl,
+          locale,
         }),
         headers: {
           "List-Unsubscribe": `<${unsubUrl}>`,

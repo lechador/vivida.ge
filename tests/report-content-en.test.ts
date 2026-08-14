@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import type { NatalChartJson } from "@/db/schema";
 import { buildEnglishChartInterpretation } from "@/lib/report-content-en";
+import { buildEnglishNatalReportContent } from "@/lib/report-content-pdf-en";
+import { computeChartSalience } from "@/lib/report-salience";
 
 const chart: NatalChartJson = {
   ascendant: { longitude: 180, signIndex: 6, signDegree: 0, house: 1 },
@@ -46,6 +48,22 @@ describe("buildEnglishChartInterpretation", () => {
     expect(Object.keys(result.houses ?? {})).toHaveLength(12);
     expect(Object.keys(result.aspects ?? {})).toEqual(["moon-sun-sextile"]);
     expect(result.highlights?.length).toBeGreaterThanOrEqual(3);
+    expect(serialized).not.toMatch(/[ა-ჰ]/);
+  });
+
+  it("builds the complete paid PDF narrative without Georgian prose", () => {
+    const result = buildEnglishNatalReportContent(
+      chart,
+      computeChartSalience(chart),
+      "Alex",
+    );
+    const serialized = JSON.stringify(result);
+
+    expect(result.narrative).not.toBeNull();
+    expect(result.narrative!.signature).toContain("Aries Sun");
+    expect(result.narrative!.closing).toContain("Alex, your natal chart");
+    expect(Object.keys(result.planets ?? {})).toHaveLength(11);
+    expect(Object.keys(result.houses ?? {})).toHaveLength(12);
     expect(serialized).not.toMatch(/[ა-ჰ]/);
   });
 });

@@ -54,10 +54,11 @@ export default async function SkyPage() {
         title={en ? "The live sky needs your natal chart" : "ცოცხალი ცა ნატალურ რუკას საჭიროებს"}
         description={en ? "Add your birth details to see where today's planets fall in your chart." : "შეავსე დაბადების მონაცემები, რომ ნახო, სად არიან პლანეტები ახლა შენს რუკაზე."}
         next="/sky"
+        locale={locale}
       />
     );
 
-  const sky = await composeSkyData(chart.data);
+  const sky = await composeSkyData(chart.data, locale);
   const moonSign = signByIndex(sky.moon.signIndex);
 
   return (

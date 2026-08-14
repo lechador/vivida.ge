@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EnglishGuide } from "@/components/en/english-guide";
-import { GeorgianContentNote } from "@/components/en/georgian-content-note";
 import { SIGNS } from "@/lib/zodiac";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const PATH = "/en/zodiac";
 const TITLE = "The 12 Zodiac Signs: Elements, Modalities and Rulers";
@@ -34,7 +33,6 @@ const DETAILS: Record<string, { dates: string; element: string; modality: string
 export default function EnglishZodiacPage() {
   return (
     <EnglishGuide eyebrow="Zodiac reference" title="The twelve zodiac signs" intro="The zodiac is a twelve-part framework used to describe styles of expression. Every natal chart contains all twelve signs, even when only a few receive strong emphasis." georgianPath="/zodiac">
-      <GeorgianContentNote href="/zodiac" label="Open Vivida’s detailed zodiac guides" />
       <section>
         <h2>Signs are more than Sun-sign labels</h2>
         <p>Your Sun sign is based on the Sun’s position at birth, but the Moon, Mercury, Venus, Mars and every other chart factor also occupy signs. A person can therefore express several sign styles in different contexts. Houses and aspects further change how a placement is experienced.</p>
@@ -49,7 +47,7 @@ export default function EnglishZodiacPage() {
               <article key={sign.key} className="rounded-2xl border border-border bg-card/50 p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3"><span className="text-3xl text-[var(--vivida-violet)]">{sign.symbol}</span><div><h3>{sign.labelEn}</h3><p className="text-xs text-muted-foreground">{d.dates}</p></div></div>
-                  <Link href={`${GEORGIAN_SITE_URL}/zodiac/${sign.key}`} hrefLang="ka-GE" className="text-xs text-[var(--vivida-cyan)] hover:underline">Georgian guide</Link>
+                  <Link href={`/zodiac/${sign.key}`} className="text-xs text-[var(--vivida-cyan)] hover:underline">Complete guide</Link>
                 </div>
                 <p className="mt-4 text-sm text-foreground/80">Traditionally {d.summary}.</p>
                 <dl className="mt-4 grid grid-cols-3 gap-2 text-xs"><div><dt className="text-muted-foreground">Element</dt><dd className="font-medium text-foreground">{d.element}</dd></div><div><dt className="text-muted-foreground">Modality</dt><dd className="font-medium text-foreground">{d.modality}</dd></div><div><dt className="text-muted-foreground">Ruler</dt><dd className="font-medium text-foreground">{d.ruler}</dd></div></dl>

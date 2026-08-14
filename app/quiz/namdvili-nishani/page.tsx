@@ -129,7 +129,7 @@ export default async function TrueSignQuizPage() {
             განისაზღვრება — მას უფასო ნატალურ რუკაში ნახავ.</>}
           </p>
 
-          <PopularSearches queries={en ? ["zodiac personality quiz", "which zodiac sign am I", "zodiac element quiz", "zodiac sign test"] : TRUE_SIGN_LATIN_QUERIES} />
+          <PopularSearches queries={en ? ["zodiac personality quiz", "which zodiac sign am I", "zodiac element quiz", "zodiac sign test"] : TRUE_SIGN_LATIN_QUERIES} locale={locale} />
         </div>
       </section>
     </main>

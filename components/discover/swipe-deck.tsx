@@ -9,6 +9,7 @@ import { AnimatePresence, motion, useMotionValue, animate } from "framer-motion"
 import { sendFriendRequest } from "@/actions/friendship";
 import { Button } from "@/components/ui/button";
 import type { DiscoverCard } from "@/lib/discover";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import { SwipeCard } from "./swipe-card";
 
 /**
@@ -23,7 +24,14 @@ type Toast = {
   text: string;
 };
 
-export function SwipeDeck({ cards }: { cards: DiscoverCard[] }) {
+export function SwipeDeck({
+  cards,
+  locale = "ka",
+}: {
+  cards: DiscoverCard[];
+  locale?: UserLocale;
+}) {
+  const en = locale === "en";
   const router = useRouter();
   const [deck, setDeck] = useState(cards);
   const [exhausted, setExhausted] = useState(false);
@@ -63,14 +71,21 @@ export function SwipeDeck({ cards }: { cards: DiscoverCard[] }) {
           if (res.ok) {
             setToast({
               kind: "ok",
-              text: `${card.displayName}-ს მეგობრობა გაიგზავნა`,
+              text: en
+                ? `Friend request sent to ${card.displayName}`
+                : `${card.displayName}-ს მეგობრობა გაიგზავნა`,
             });
           } else {
             setToast({ kind: "err", text: res.error });
           }
         })
         .catch(() => {
-          setToast({ kind: "err", text: "ვერ გაიგზავნა — სცადე თავიდან" });
+          setToast({
+            kind: "err",
+            text: en
+              ? "Could not send the request — please try again"
+              : "ვერ გაიგზავნა — სცადე თავიდან",
+          });
         });
 
       animate(x, 480, {
@@ -79,11 +94,16 @@ export function SwipeDeck({ cards }: { cards: DiscoverCard[] }) {
         onComplete: advance,
       });
     },
-    [advance, x]
+    [advance, en, x]
   );
 
   if (exhausted || deck.length === 0) {
-    return <DeckExhausted onReshuffle={() => router.refresh()} />;
+    return (
+      <DeckExhausted
+        locale={locale}
+        onReshuffle={() => router.refresh()}
+      />
+    );
   }
 
   const visible = deck.slice(0, 3);
@@ -104,13 +124,16 @@ export function SwipeDeck({ cards }: { cards: DiscoverCard[] }) {
               x={x}
               onPass={handlePass}
               onLike={() => handleLike(card)}
+              locale={locale}
             />
           ))
           .reverse()}
       </div>
 
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        მარჯვნივ — მეგობრობის თხოვნა · მარცხნივ — სხვა
+        {en
+          ? "Swipe right to connect · swipe left to pass"
+          : "მარჯვნივ — მეგობრობის თხოვნა · მარცხნივ — სხვა"}
       </p>
 
       <AnimatePresence>
@@ -138,21 +161,34 @@ export function SwipeDeck({ cards }: { cards: DiscoverCard[] }) {
   );
 }
 
-function DeckExhausted({ onReshuffle }: { onReshuffle: () => void }) {
+function DeckExhausted({
+  onReshuffle,
+  locale,
+}: {
+  onReshuffle: () => void;
+  locale: UserLocale;
+}) {
+  const en = locale === "en";
   return (
     <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
       <Compass className="mx-auto mb-3 size-8 text-muted-foreground" />
-      <h2 className="text-lg font-semibold">დღეს ეს იყო</h2>
+      <h2 className="text-lg font-semibold">
+        {en ? "That is everyone for today" : "დღეს ეს იყო"}
+      </h2>
       <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-        ცა მომდევნო ხალხს გელის — ცოტა მოგვიანებით ახალი პროფილები გამოჩნდება.
+        {en
+          ? "More people are on the horizon. Check back later for new profiles."
+          : "ცა მომდევნო ხალხს გელის — ცოტა მოგვიანებით ახალი პროფილები გამოჩნდება."}
       </p>
       <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
         <Button onClick={onReshuffle} variant="outline" size="sm">
           <RotateCcw className="size-4" />
-          ხელახლა
+          {en ? "Refresh" : "ხელახლა"}
         </Button>
         <Button asChild variant="ghost" size="sm">
-          <Link href="/friends">ჩემი მეგობრები →</Link>
+          <Link href="/friends">
+            {en ? "My friends →" : "ჩემი მეგობრები →"}
+          </Link>
         </Button>
       </div>
     </div>

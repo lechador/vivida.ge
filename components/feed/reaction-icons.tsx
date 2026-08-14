@@ -17,15 +17,16 @@ import type { PostReactionKind } from "@/db/schema";
 export type ReactionMeta = {
   kind: PostReactionKind;
   labelKa: string;
+  labelEn: string;
   /** Hue applied as the icon fill/stroke when the user has picked it. */
   hue: string;
 };
 
 export const REACTIONS: ReactionMeta[] = [
-  { kind: "like", labelKa: "მომწონს", hue: "oklch(0.78 0.18 350)" },
-  { kind: "funny", labelKa: "სასაცილო", hue: "oklch(0.85 0.16 85)" },
-  { kind: "sad", labelKa: "მწუხარე", hue: "oklch(0.78 0.15 220)" },
-  { kind: "dislike", labelKa: "არ მომწონს", hue: "oklch(0.7 0.06 280)" },
+  { kind: "like", labelKa: "მომწონს", labelEn: "Like", hue: "oklch(0.78 0.18 350)" },
+  { kind: "funny", labelKa: "სასაცილო", labelEn: "Funny", hue: "oklch(0.85 0.16 85)" },
+  { kind: "sad", labelKa: "მწუხარე", labelEn: "Sad", hue: "oklch(0.78 0.15 220)" },
+  { kind: "dislike", labelKa: "არ მომწონს", labelEn: "Dislike", hue: "oklch(0.7 0.06 280)" },
 ];
 
 export const REACTION_BY_KIND: Record<PostReactionKind, ReactionMeta> =

@@ -20,7 +20,7 @@ export default function EnglishAboutPage() {
       <section>
         <h2>What we build</h2>
         <p>Our public guides explain the basic structure of natal charts, zodiac signs, planetary cycles and relationship synastry. Registered users can also access personalized chart features and community tools. The original product was created in Georgian; the English section is being introduced carefully, beginning with core navigation and educational material.</p>
-        <p>We intentionally label any destination that still uses Georgian. We would rather publish a smaller, complete English section than present untranslated interpretations as if they were localized.</p>
+        <p>The international experience includes English navigation, guides, assessments, personal astrology interpretations, forecasts, compatibility readings, and downloadable reports.</p>
       </section>
       <section>
         <h2>How to use our content</h2>

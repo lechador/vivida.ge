@@ -6,6 +6,7 @@ import { ChevronDown, Sparkles, Sparkle } from "lucide-react";
 import type { WeeklyForecastDay } from "@/db/schema";
 import { BODIES } from "@/lib/zodiac";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ASPECT_LABEL_KA: Record<string, string> = {
   conjunction: "შეერთება",
@@ -14,11 +15,23 @@ const ASPECT_LABEL_KA: Record<string, string> = {
   trine: "ტრინი",
   opposition: "ოპოზიცია",
 };
+const ASPECT_LABEL_EN: Record<string, string> = {
+  conjunction: "conjunction",
+  sextile: "sextile",
+  square: "square",
+  trine: "trine",
+  opposition: "opposition",
+};
 
 const FAMILY_HINT_KA: Record<string, string> = {
   harmonic: "ჰარმონიული",
   tense: "დაძაბული",
   neutral: "ნეიტრალური",
+};
+const FAMILY_HINT_EN: Record<string, string> = {
+  harmonic: "harmonious",
+  tense: "challenging",
+  neutral: "neutral",
 };
 
 const WEEKDAY_SHORT_KA: Record<string, string> = {
@@ -40,9 +53,12 @@ const WEEKDAY_SHORT_KA: Record<string, string> = {
  */
 export function WeeklyForecastCard({
   days,
+  locale = "ka",
 }: {
   days: WeeklyForecastDay[];
+  locale?: UserLocale;
 }) {
+  const en = locale === "en";
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
@@ -55,10 +71,10 @@ export function WeeklyForecastCard({
       <header className="relative mb-5 flex items-baseline justify-between gap-3">
         <div>
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            შემდეგი 7 დღე
+            {en ? "Next 7 days" : "შემდეგი 7 დღე"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight sm:text-xl">
-            შენი კვირის ცის რუკა
+            {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
         <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" aria-hidden />
@@ -71,6 +87,7 @@ export function WeeklyForecastCard({
             day={day}
             open={openIndex === i}
             onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+            locale={locale}
           />
         ))}
       </ol>
@@ -78,8 +95,9 @@ export function WeeklyForecastCard({
       <p className="relative mt-5 flex items-center gap-1.5 border-t border-border/40 pt-4 text-[11px] text-muted-foreground">
         <Sparkle className="size-3" aria-hidden />
         <span>
-          ქულები ეფუძნება ამ დღის ტრანზიტ-ნატალურ ასპექტებს. დააჭირე დღეს, რომ
-          ნახო რატომ.
+          {en
+            ? "Scores reflect each day's transit-to-natal aspects. Select a day to see why."
+            : "ქულები ეფუძნება ამ დღის ტრანზიტ-ნატალურ ასპექტებს. დააჭირე დღეს, რომ ნახო რატომ."}
         </span>
       </p>
     </article>
@@ -90,13 +108,18 @@ function DayRow({
   day,
   open,
   onToggle,
+  locale,
 }: {
   day: WeeklyForecastDay;
   open: boolean;
   onToggle: () => void;
+  locale: UserLocale;
 }) {
+  const en = locale === "en";
   const dayNum = parseDateNum(day.dateIso);
-  const weekShort = WEEKDAY_SHORT_KA[day.weekdayKa] ?? day.weekdayKa.slice(0, 3);
+  const weekShort = en
+    ? new Intl.DateTimeFormat("en", { weekday: "short", timeZone: "UTC" }).format(new Date(`${day.dateIso}T00:00:00Z`))
+    : WEEKDAY_SHORT_KA[day.weekdayKa] ?? day.weekdayKa.slice(0, 3);
   const total = day.harmonyScore + day.challengeScore;
   const harmonicPct = total > 0 ? (day.harmonyScore / total) * 100 : 50;
   const challengePct = total > 0 ? (day.challengeScore / total) * 100 : 50;
@@ -192,7 +215,7 @@ function DayRow({
                   {day.headline || "—"}
                 </p>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  მთვარე {day.moonSignKa} · {labelForTilt(tilt)}
+                  {en ? "Moon" : "მთვარე"} {en ? day.moonSignEn : day.moonSignKa} · {labelForTilt(tilt, locale)}
                 </p>
               </div>
               <ChevronDown
@@ -209,7 +232,7 @@ function DayRow({
               className="relative mt-2.5 h-2 overflow-hidden rounded-full bg-foreground/[0.06]"
               style={{ opacity: 0.55 + intensity * 0.45 }}
               role="img"
-              aria-label={`ჰარმონია ${day.harmonyScore}, დაძაბულობა ${day.challengeScore}`}
+              aria-label={en ? `Harmony ${day.harmonyScore}, challenge ${day.challengeScore}` : `ჰარმონია ${day.harmonyScore}, დაძაბულობა ${day.challengeScore}`}
             >
               <div
                 className="absolute inset-y-0 left-0 rounded-l-full bg-[var(--vivida-cyan)]"
@@ -251,13 +274,13 @@ function DayRow({
         <div className="mt-2 grid gap-3 rounded-xl border border-[var(--vivida-violet)]/30 bg-[oklch(0.20_0.04_283/0.7)] p-3 sm:p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <Block
-              label="ჰარმონიული"
+              label={en ? "Supportive" : "ჰარმონიული"}
               dotClass="bg-[var(--vivida-cyan)]"
               borderClass="border-[var(--vivida-cyan)]/45"
               text={day.harmonicReason || "—"}
             />
             <Block
-              label="დაძაბული"
+              label={en ? "Challenging" : "დაძაბული"}
               dotClass="bg-[var(--vivida-pink)]"
               borderClass="border-[var(--vivida-pink)]/45"
               text={day.challengingReason || "—"}
@@ -272,7 +295,7 @@ function DayRow({
           {day.drivers && day.drivers.length > 0 && (
             <div>
               <div className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                მოქმედი ასპექტები
+                {en ? "Active aspects" : "მოქმედი ასპექტები"}
               </div>
               <ul className="flex flex-wrap gap-1.5">
                 {day.drivers.slice(0, 4).map((dr, j) => (
@@ -286,16 +309,16 @@ function DayRow({
                           ? "border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/10 text-foreground/90"
                           : "border-border/60 bg-background/40 text-foreground/80"
                     )}
-                    title={`${FAMILY_HINT_KA[dr.family] ?? ""} · orb ${dr.orb.toFixed(1)}°`}
+                    title={`${(en ? FAMILY_HINT_EN : FAMILY_HINT_KA)[dr.family] ?? ""} · orb ${dr.orb.toFixed(1)}°`}
                   >
                     <span className="font-medium">
-                      {bodyLabel(dr.transit)}
+                      {bodyLabel(dr.transit, locale)}
                     </span>
                     <span className="text-muted-foreground">
-                      {ASPECT_LABEL_KA[dr.kind] ?? dr.kind}
+                      {(en ? ASPECT_LABEL_EN : ASPECT_LABEL_KA)[dr.kind] ?? dr.kind}
                     </span>
                     <span className="font-medium">
-                      {bodyLabel(dr.natal)}
+                      {bodyLabel(dr.natal, locale)}
                     </span>
                   </li>
                 ))}
@@ -337,14 +360,20 @@ function Block({
   );
 }
 
-function labelForTilt(tilt: "harmonic" | "challenging" | "balanced"): string {
+function labelForTilt(tilt: "harmonic" | "challenging" | "balanced", locale: UserLocale): string {
+  if (locale === "en") {
+    if (tilt === "harmonic") return "supportive day";
+    if (tilt === "challenging") return "challenging day";
+    return "mixed day";
+  }
   if (tilt === "harmonic") return "ჰარმონიული დღე";
   if (tilt === "challenging") return "დაძაბული დღე";
   return "შერეული დღე";
 }
 
-function bodyLabel(key: string): string {
-  return BODIES[key]?.labelKa ?? key;
+function bodyLabel(key: string, locale: UserLocale): string {
+  const body = BODIES[key];
+  return (locale === "en" ? body?.labelEn : body?.labelKa) ?? key;
 }
 
 function parseDateNum(iso: string): string {

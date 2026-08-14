@@ -390,6 +390,7 @@ export default async function TarotCardPage({
         </section>
 
         <PopularSearches
+          locale={locale}
           queries={
             en
               ? [`${card.name} tarot meaning`, `${card.name} reversed`, `${card.name} love meaning`, "Major Arcana meanings"]
