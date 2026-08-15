@@ -27,7 +27,7 @@ const PRIVACY_SECTIONS: Section[] = [
       "Birth data: date, time, and place of birth, including coordinates and time zone, which are required to calculate a natal chart.",
       "Public profile data: username, biography, and photos you choose to upload. Visibility depends on your profile settings.",
       "Activity data: messages, friendship requests, notes, test results, and other information required to provide the service.",
-      "Technical data: IP address, browser type, and device information used for security and troubleshooting.",
+      "Technical and campaign data: IP address, browser type, device information, referral parameters, cookie identifiers, and interaction events used for security, analytics, and campaign measurement when you consent.",
       "Payment data: the credit pack purchased, amount, currency, and transaction identifier. Full card details are processed by the payment provider and are not stored by Vivida.",
     ],
   },
@@ -52,9 +52,9 @@ const PRIVACY_SECTIONS: Section[] = [
       "Neon Postgres for database hosting in the United States or European Union.",
       "Cloudflare R2 for photo storage and Cloudflare Turnstile for bot and abuse prevention.",
       "OpenRouter and Google Gemini for AI interpretations. Only the numerical chart information needed for the reading is sent; names and contact details are excluded.",
-      "Stripe for one-time payment processing. Vivida neither receives nor stores full card information.",
+      "Stripe for one-time credit payments and automatically renewing PRO subscriptions. Vivida neither receives nor stores full card information.",
       "Resend for account and transactional email.",
-      "Google Analytics and Meta for product and campaign measurement when enabled. We do not send them your name, email address, or exact birth details.",
+      "Google Analytics and Meta for product and campaign measurement only after you consent. Meta may receive browser identifiers, campaign data, IP address and user agent, and hashed matching data such as email, internal account ID and country for checkout events. We never send exact birth details, chart inputs, messages, or card details.",
     ],
   },
   {
@@ -84,14 +84,14 @@ const PRIVACY_SECTIONS: Section[] = [
   {
     title: "8. Children's privacy",
     paragraphs: [
-      "Vivida is not intended for users under 16. If we learn that we collected a child's data without the required parental consent, we will delete it.",
+      "Vivida is intended for adults aged 18 or older. Registration and birth-data validation enforce this requirement.",
     ],
   },
   {
     title: "9. Cookies and analytics",
     paragraphs: [
-      "Vivida uses essential cookies for authentication, security, and bot prevention. These are necessary for the service to function. When enabled, Google Analytics 4 collects measurement data such as page views, interactions, and device type. We do not send your name or email address to Google Analytics.",
-      "You can limit analytics through browser controls, Do Not Track settings, or Google's official Analytics opt-out browser add-on.",
+      "Vivida uses essential cookies for authentication, security, and bot prevention. Analytics, Meta Pixel, campaign attribution cookies, and server-side Meta conversion measurement are activated only after you choose Allow analytics & Meta.",
+      "Essential only is equally available in the consent panel. You can reopen Privacy choices on any page, withdraw consent, and remove non-essential browser cookies. Withdrawal applies to future measurement and does not affect the lawfulness of earlier processing.",
     ],
   },
   {
@@ -125,7 +125,7 @@ const TERMS_SECTIONS: Section[] = [
   {
     title: "2. Who may use Vivida",
     paragraphs: [
-      "Vivida is intended for people aged 16 or older. If you are under 16, consent from a parent or legal guardian is required. By registering, you confirm that these requirements are satisfied.",
+      "Vivida is intended for adults aged 18 or older. By registering, you confirm that you are at least 18.",
     ],
   },
   {

@@ -38,6 +38,7 @@ describe("POST /api/credits/checkout", () => {
     mocks.isStripeConfigured.mockReturnValue(true);
     mocks.getBillingIdentity.mockResolvedValue({ countryCode: "GE" });
     mocks.createCheckout.mockResolvedValue({
+      id: "cs_test_1",
       url: "https://checkout.stripe.test/1",
     });
   });
@@ -68,8 +69,12 @@ describe("POST /api/credits/checkout", () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
       url: "https://checkout.stripe.test/1",
+      eventId: "cs_test_1:initiate_checkout",
+      value: 10,
+      currency: "GEL",
+      contentId: "credits_30",
     });
-    expect(mocks.createCheckout).toHaveBeenCalledWith({
+    expect(mocks.createCheckout).toHaveBeenCalledWith(expect.objectContaining({
       userId: "user-1",
       email: "user@example.com",
       origin: "https://vivida.ge",
@@ -77,7 +82,8 @@ describe("POST /api/credits/checkout", () => {
       amountMinor: 1000,
       currency: "gel",
       locale: "ka",
-    });
+      trackingMetadata: { tracking_consent: "denied" },
+    }));
   });
 
   it("creates an English Checkout session on the international domain", async () => {

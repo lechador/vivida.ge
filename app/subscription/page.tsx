@@ -11,6 +11,8 @@ import { formatBillingAmount, premiumPlanForCountry } from "@/lib/billing-config
 import { getBillingIdentity, getPremiumSubscription, isPremiumUser } from "@/lib/premium";
 import { countryCodeFromHeaders, countryDisplayName, setResidenceCountryIfMissing } from "@/lib/residence";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { Suspense } from "react";
+import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +45,7 @@ export default async function SubscriptionPage() {
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.36_0.16_70/0.28),transparent_70%),radial-gradient(45%_35%_at_85%_45%,oklch(0.30_0.16_300/0.4),transparent_70%)]" />
       <Starfield count={100} shooting={2} />
       <AppHeader authed />
+      <Suspense fallback={null}><CheckoutSuccessTracker /></Suspense>
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-7 sm:px-6 sm:pt-10">
         <div className="mb-6">

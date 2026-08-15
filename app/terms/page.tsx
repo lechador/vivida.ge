@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const LAST_UPDATED = "2026-08-13";
+const LAST_UPDATED = "2026-08-16";
 
 export default async function TermsPage() {
   if ((await getRequestLocale()) === "en")

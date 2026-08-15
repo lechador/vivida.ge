@@ -49,15 +49,20 @@ const ERRORS_EN: Record<string, string> = {
 };
 
 const CALCULATOR_ONBOARDING_PATH = "/onboarding?next=/report";
-const CALCULATOR_SIGNUP_HREF = `/signup?next=${encodeURIComponent(CALCULATOR_ONBOARDING_PATH)}`;
-const CALCULATOR_LOGIN_HREF = `/login?next=${encodeURIComponent(CALCULATOR_ONBOARDING_PATH)}`;
 
 export function PublicNatalCalculator({
   locale = "ka",
+  acquisitionMode = false,
 }: {
   locale?: "ka" | "en";
+  acquisitionMode?: boolean;
 }) {
   const en = locale === "en";
+  const onboardingPath = acquisitionMode
+    ? "/onboarding?fast=1&next=/report?offer=uk"
+    : CALCULATOR_ONBOARDING_PATH;
+  const signupHref = `/signup?next=${encodeURIComponent(onboardingPath)}`;
+  const loginHref = `/login?next=${encodeURIComponent(onboardingPath)}`;
   const errors = en ? ERRORS_EN : ERRORS;
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
@@ -321,6 +326,19 @@ export function PublicNatalCalculator({
             <ChartWheel chart={chart} locale={locale} />
           </div>
 
+          {acquisitionMode && (
+            <div className="relative overflow-hidden rounded-3xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-violet)]/16 via-card/70 to-[var(--vivida-gold)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-9">
+              <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]"><Lock className="size-5" /></div>
+              <h3 className="text-balance text-2xl font-semibold sm:text-3xl">Save your chart & unlock personal readings</h3>
+              <p className="mx-auto mt-3 max-w-lg text-muted-foreground">Create a free account to reveal what every placement means for you, then choose PRO unlimited or pay-as-you-go credits.</p>
+              <div className="mt-5 flex flex-wrap justify-center gap-3">
+                <Button asChild variant="mystic" size="lg"><Link href={signupHref} onClick={() => trackEvent(ANALYTICS_EVENT.registerClick, { widget: "uk_landing_chart" })}>Save my chart free</Link></Button>
+                <Button asChild variant="outline" size="lg"><Link href={loginHref}>Log in</Link></Button>
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">Free account · No card required</p>
+            </div>
+          )}
+
           <section>
             <h3 className="mb-3 text-lg font-semibold tracking-tight">
               {en ? "Planet positions" : "პლანეტების პოზიციები"}
@@ -345,6 +363,7 @@ export function PublicNatalCalculator({
           </section>
 
           {/* Unlock CTA */}
+          {!acquisitionMode && (
           <div className="relative overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/14 via-card/65 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
             <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
               <Lock className="size-5" />
@@ -360,7 +379,7 @@ export function PublicNatalCalculator({
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button asChild variant="mystic" size="lg">
                 <Link
-                  href={CALCULATOR_SIGNUP_HREF}
+                  href={signupHref}
                   onClick={() =>
                     trackEvent(ANALYTICS_EVENT.registerClick, {
                       widget: "natal_calculator",
@@ -371,12 +390,13 @@ export function PublicNatalCalculator({
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href={CALCULATOR_LOGIN_HREF}>
+                <Link href={loginHref}>
                   {en ? "Log in" : "შესვლა"}
                 </Link>
               </Button>
             </div>
           </div>
+          )}
 
           {/* Lower-friction return hook — get the daily horoscope by email
               without a full signup (the biggest lever on "nobody returns"). */}

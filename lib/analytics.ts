@@ -48,6 +48,9 @@ export const ANALYTICS_EVENT = {
   tarotCreditsShort: "tarot_credits_short",
   tarotReadingCompleted: "tarot_reading_completed",
   testCompleted: "test_completed",
+  checkoutStarted: "checkout_started",
+  purchaseCompleted: "purchase_completed",
+  subscriptionStarted: "subscription_started",
 } as const;
 
 export type AnalyticsEventName =

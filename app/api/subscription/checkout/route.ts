@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { premiumPlanForCountry } from "@/lib/billing-config";
@@ -7,6 +7,7 @@ import {
   createPremiumCheckoutSession,
   isStripeConfigured,
 } from "@/lib/stripe";
+import { checkoutTrackingFromRequest, checkoutTrackingMetadata, trackCheckoutStarted } from "@/lib/checkout-tracking";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,14 +30,32 @@ export async function POST(req: Request) {
   }
 
   try {
+    const tracking = checkoutTrackingFromRequest(req);
     const checkout = await createPremiumCheckoutSession({
       userId,
       email: identity?.email ?? session.user.email ?? null,
       stripeCustomerId: identity?.stripeCustomerId ?? null,
       origin: new URL(req.url).origin,
       plan,
+      trackingMetadata: checkoutTrackingMetadata(tracking),
     });
-    return NextResponse.json({ url: checkout.url });
+    if (tracking.allowed) after(() => trackCheckoutStarted({
+      session: checkout,
+      tracking,
+      userId,
+      email: identity?.email ?? session.user.email,
+      countryCode: identity?.countryCode,
+      value: plan.amountMinor / 100,
+      currency: plan.currency,
+      contentId: plan.key,
+    }));
+    return NextResponse.json({
+      url: checkout.url,
+      eventId: `${checkout.id}:initiate_checkout`,
+      value: plan.amountMinor / 100,
+      currency: plan.currency.toUpperCase(),
+      contentId: plan.key,
+    });
   } catch (err) {
     console.error("[subscription/checkout] failed:", err);
     return NextResponse.json({ error: "failed" }, { status: 500 });

@@ -2,13 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { requestIsEnglish } from "@/lib/i18n/request-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { Noto_Sans_Georgian } from "next/font/google";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import NextTopLoader from "nextjs-toploader";
 import { ChatShell } from "@/components/chat/chat-shell";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
 import { RefCapture } from "@/components/ref-capture";
-import { FbPixel } from "@/components/fb-pixel";
-import { VercelObservability } from "@/components/vercel-observability";
+import { TrackingConsentManager } from "@/components/privacy/tracking-consent-manager";
 import "./globals.css";
 
 const notoGeorgian = Noto_Sans_Georgian({
@@ -120,12 +118,8 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 // of the analytics pipeline (otherwise our own page reloads pollute the
 // real numbers). Vercel preview deploys ship as NODE_ENV=production, so
 // gate additionally on whether this is the canonical host. Cheap & safe.
-const GA_ENABLED =
-  !!GA_ID && process.env.NODE_ENV === "production";
-
-// Same gate for the Meta Pixel — dev page-reloads would otherwise pollute
-// the audience and conversion data the FB ad algorithm trains on.
-const FB_PIXEL_ENABLED = process.env.NODE_ENV === "production";
+const TRACKING_ENABLED = process.env.NODE_ENV === "production";
+const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
 
 export default async function RootLayout({
   children,
@@ -168,7 +162,11 @@ export default async function RootLayout({
         />
         <BfcacheRefresher />
         <RefCapture />
-        {FB_PIXEL_ENABLED && <FbPixel />}
+        <TrackingConsentManager
+          gaId={GA_ID}
+          fbPixelId={FB_PIXEL_ID}
+          trackingEnabled={TRACKING_ENABLED}
+        />
         <div
           id="main-content"
           tabIndex={-1}
@@ -177,9 +175,7 @@ export default async function RootLayout({
           {children}
         </div>
         <ChatShell />
-        <VercelObservability />
       </body>
-      {GA_ENABLED && <GoogleAnalytics gaId={GA_ID!} />}
     </html>
   );
 }

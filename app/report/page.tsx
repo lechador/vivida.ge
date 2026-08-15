@@ -17,14 +17,18 @@ import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ClearPendingNatalProfile } from "@/components/onboarding/clear-pending-natal-profile";
 import type { Metadata } from "next";
+import { PremiumPlanCard } from "@/components/subscription/premium-plan-card";
+import { premiumPlanForCountry } from "@/lib/billing-config";
+import { isPremiumUser } from "@/lib/premium";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return { title: locale === "en" ? "My natal chart" : "ჩემი რუკა" };
 }
 
-export default async function ReportPage() {
+export default async function ReportPage({ searchParams }: { searchParams: Promise<{ offer?: string }> }) {
   const user = await requireUser();
+  const { offer } = await searchParams;
 
   const [[profile], [userPrefs]] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
@@ -32,6 +36,7 @@ export default async function ReportPage() {
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userPrefs?.locale));
   const en = locale === "en";
+  const showUkOffer = offer === "uk" && !(await isPremiumUser(user.id));
 
   if (!profile?.dateOfBirth) {
     return (
@@ -79,6 +84,15 @@ export default async function ReportPage() {
         <p className="mb-6 max-w-xl text-sm text-foreground/75 sm:text-base">
           {en ? "The sky at your birth moment, explored one layer at a time." : "ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე."}
         </p>
+
+        {showUkOffer && (
+          <div className="mb-6">
+            <div className="mb-3 rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 px-5 py-4 text-sm text-foreground/80">
+              <strong className="text-foreground">Your chart is ready.</strong> Go unlimited with PRO, or scroll to explore your free chart first.
+            </div>
+            <PremiumPlanCard plan={premiumPlanForCountry("GB")!} locale="en" />
+          </div>
+        )}
 
         <div className="mb-10">
           <Suspense fallback={null}>

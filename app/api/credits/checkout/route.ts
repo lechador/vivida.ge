@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { creditPackForCountry } from "@/lib/credits";
 import { getBillingIdentity } from "@/lib/premium";
 import { createCreditCheckoutSession, isStripeConfigured } from "@/lib/stripe";
 import { localeForHost } from "@/lib/i18n/request-locale";
+import { checkoutTrackingFromRequest, checkoutTrackingMetadata, trackCheckoutStarted } from "@/lib/checkout-tracking";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -32,6 +33,7 @@ export async function POST(req: Request) {
     req.headers.get("x-forwarded-host") ?? new URL(req.url).host,
   );
   try {
+    const tracking = checkoutTrackingFromRequest(req);
     const checkout = await createCreditCheckoutSession({
       userId,
       email: session.user?.email ?? null,
@@ -40,8 +42,25 @@ export async function POST(req: Request) {
       amountMinor: pack.amountMinor,
       currency: pack.currency,
       locale,
+      trackingMetadata: checkoutTrackingMetadata(tracking),
     });
-    return NextResponse.json({ url: checkout.url });
+    if (tracking.allowed) after(() => trackCheckoutStarted({
+      session: checkout,
+      tracking,
+      userId,
+      email: session.user?.email,
+      countryCode: billingUser?.countryCode,
+      value: pack.amountMinor / 100,
+      currency: pack.currency,
+      contentId: `credits_${pack.credits}`,
+    }));
+    return NextResponse.json({
+      url: checkout.url,
+      eventId: `${checkout.id}:initiate_checkout`,
+      value: pack.amountMinor / 100,
+      currency: pack.currency.toUpperCase(),
+      contentId: `credits_${pack.credits}`,
+    });
   } catch (err) {
     console.error("[credits/checkout] failed:", err);
     return NextResponse.json({ error: "failed" }, { status: 500 });

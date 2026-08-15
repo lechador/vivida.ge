@@ -9,8 +9,10 @@ import { generateAndStoreReport } from "@/lib/reports/generate";
 import { grantPurchaseCredits } from "@/lib/credits";
 import {
   activatePremiumFromCheckout,
+  getBillingIdentity,
   syncPremiumSubscription,
 } from "@/lib/premium";
+import { trackCheckoutCompleted } from "@/lib/checkout-tracking";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -46,6 +48,14 @@ export async function POST(req: Request) {
         console.error("[stripe/webhook] premium activation failed:", err);
         return new Response("premium sync failed", { status: 500 });
       }
+      after(async () => {
+        const identity = await getBillingIdentity(sessionObj.metadata?.userId ?? "");
+        await trackCheckoutCompleted({
+          session: sessionObj,
+          email: identity?.email,
+          countryCode: identity?.countryCode,
+        });
+      });
       return new Response("ok", { status: 200 });
     }
 
@@ -59,6 +69,14 @@ export async function POST(req: Request) {
         } catch (err) {
           console.error("[stripe/webhook] credit grant failed:", err);
         }
+        after(async () => {
+          const identity = await getBillingIdentity(uid);
+          await trackCheckoutCompleted({
+            session: sessionObj,
+            email: identity?.email,
+            countryCode: identity?.countryCode,
+          });
+        });
       }
       return new Response("ok", { status: 200 });
     }

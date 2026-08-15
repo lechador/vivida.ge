@@ -9,6 +9,8 @@ import { OnboardingWizard } from "@/components/onboarding/wizard";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { FastOnboarding } from "@/components/onboarding/fast-onboarding";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -23,18 +25,21 @@ function safeNext(v: string | undefined): string | undefined {
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; fast?: string }>;
 }) {
   const user = await requireUser();
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const { next } = await searchParams;
+  const { next, fast } = await searchParams;
 
   const [existing] = await db
     .select()
     .from(profiles)
     .where(eq(profiles.userId, user.id))
     .limit(1);
+
+  const destination = safeNext(next);
+  if (fast === "1" && existing) redirect(destination ?? "/report");
 
   return (
     <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -63,12 +68,16 @@ export default async function OnboardingPage({
       </header>
 
       <section className="relative z-10 flex flex-1 items-center justify-center px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
-        <OnboardingWizard
-          initialProfile={existing ?? null}
-          defaultName={user.name ?? null}
-          next={safeNext(next)}
-          locale={locale}
-        />
+        {fast === "1" ? (
+          <FastOnboarding next={destination} locale={locale} />
+        ) : (
+          <OnboardingWizard
+            initialProfile={existing ?? null}
+            defaultName={user.name ?? null}
+            next={destination}
+            locale={locale}
+          />
+        )}
       </section>
     </main>
   );

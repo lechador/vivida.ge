@@ -4,7 +4,7 @@ import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
-import { FB_PIXEL_ID, fbTrack } from "@/lib/fb-pixel";
+import { fbTrack, flushFbQueue } from "@/lib/fb-pixel";
 
 /**
  * Meta / Facebook Pixel loader + route-change PageView tracker.
@@ -17,14 +17,15 @@ import { FB_PIXEL_ID, fbTrack } from "@/lib/fb-pixel";
  * Wrapped in <Suspense> because `useSearchParams()` requires a Suspense
  * boundary somewhere in the tree per Next 16 conventions.
  */
-export function FbPixel() {
-  if (!FB_PIXEL_ID) return null;
+export function FbPixel({ pixelId }: { pixelId: string }) {
+  if (!pixelId) return null;
 
   return (
     <>
       <Script
         id="fb-pixel"
         strategy="afterInteractive"
+        onReady={flushFbQueue}
         dangerouslySetInnerHTML={{
           __html: `
 !function(f,b,e,v,n,t,s)
@@ -35,23 +36,10 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window,document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '${FB_PIXEL_ID}');
-fbq('track', 'PageView');
+fbq('init', '${pixelId}');
           `,
         }}
       />
-      {/* <noscript> fallback so visitors with JS disabled still register a
-          hit. The 1×1 pixel image makes a request to Meta directly. */}
-      <noscript>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          alt=""
-          height={1}
-          width={1}
-          style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
-        />
-      </noscript>
       <Suspense fallback={null}>
         <RouteChangeTracker />
       </Suspense>

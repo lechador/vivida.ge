@@ -7,6 +7,8 @@ import { Check, Crown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatBillingAmount, type PremiumPlan } from "@/lib/billing-config";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { fbTrack } from "@/lib/fb-pixel";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
 const FEATURES_EN = [
   "Unlimited access to every credit-gated feature",
@@ -39,8 +41,12 @@ export function PremiumPlanCard({
     setError(false);
     try {
       const response = await fetch("/api/subscription/checkout", { method: "POST" });
-      const data = (await response.json().catch(() => ({}))) as { url?: string };
+      const data = (await response.json().catch(() => ({}))) as {
+        url?: string; eventId?: string; value?: number; currency?: string; contentId?: string;
+      };
       if (data.url) {
+        fbTrack("InitiateCheckout", { value: data.value, currency: data.currency, content_ids: [data.contentId], content_type: "product" }, data.eventId);
+        trackEvent(ANALYTICS_EVENT.checkoutStarted, { product: data.contentId, value: data.value, currency: data.currency });
         window.location.assign(data.url);
         return;
       }
@@ -89,6 +95,11 @@ export function PremiumPlanCard({
           {error && (
             <p className="mt-2 text-xs text-destructive">
               {en ? "Checkout could not start." : "გადახდა ვერ დაიწყო."}
+            </p>
+          )}
+          {!active && (
+            <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+              {en ? "Renews automatically each month. Cancel anytime." : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
             </p>
           )}
         </div>

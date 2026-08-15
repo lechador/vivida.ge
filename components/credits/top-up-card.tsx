@@ -8,6 +8,8 @@ import {
   creditPacksForCountry,
   formatBillingAmount,
 } from "@/lib/credits-config";
+import { fbTrack } from "@/lib/fb-pixel";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
 /**
  * Stripe credit top-up — pick a pack, redirect to Checkout. The webhook awards
@@ -33,8 +35,15 @@ export function TopUpCard({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ packId }),
       });
-      const data = (await r.json().catch(() => ({}))) as { url?: string };
-      if (data.url) window.location.assign(data.url);
+      const data = (await r.json().catch(() => ({}))) as {
+        url?: string; eventId?: string; value?: number; currency?: string; contentId?: string;
+      };
+      if (data.url) {
+        const params = { value: data.value, currency: data.currency, content_ids: [data.contentId], content_type: "product" };
+        fbTrack("InitiateCheckout", params, data.eventId);
+        trackEvent(ANALYTICS_EVENT.checkoutStarted, { product: data.contentId, value: data.value, currency: data.currency });
+        window.location.assign(data.url);
+      }
       else setPending(null);
     } catch {
       setPending(null);
@@ -59,7 +68,8 @@ export function TopUpCard({
 
       <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
         {packs.map((p, i) => {
-          const featured = i === 0;
+          const featured = i === 1;
+          const badge = i === 0 ? (en ? "Starter" : "საწყისი") : i === 1 ? (en ? "Most popular" : "რჩეული") : (en ? "Best value" : "საუკეთესო ფასი");
           return (
             <button
               key={p.id}
@@ -73,14 +83,7 @@ export function TopUpCard({
                   : "border-border bg-background/40 hover:border-[var(--vivida-violet)]/50",
               )}
             >
-              {featured && (
-                <span className="absolute -top-2.5 rounded-full bg-[var(--vivida-cyan)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.14_0.02_260)]">
-                  <span className="sm:hidden">{en ? "Popular" : "რჩეული"}</span>
-                  <span className="hidden sm:inline">
-                    {en ? "Most popular" : "ყველაზე ხშირად ირჩევენ"}
-                  </span>
-                </span>
-              )}
+              <span className={cn("absolute -top-2.5 rounded-full px-2 py-0.5 text-[10px] font-semibold", featured ? "bg-[var(--vivida-cyan)] text-[oklch(0.14_0.02_260)]" : "border border-border bg-background text-muted-foreground")}>{badge}</span>
               <div className="flex items-center gap-1.5 text-2xl font-bold tabular-nums">
                 {pending === p.id ? (
                   <Loader2 className="size-6 animate-spin" />
@@ -97,6 +100,7 @@ export function TopUpCard({
               <div className="mt-1 text-lg font-semibold">
                 {formatBillingAmount(p.amountMinor, p.currency, locale)}
               </div>
+              <div className="text-[10px] text-muted-foreground">≈ {Math.floor(p.credits / 5)} {en ? "unlocks" : "გახსნა"}</div>
             </button>
           );
         })}

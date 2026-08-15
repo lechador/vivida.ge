@@ -92,6 +92,7 @@ export async function createCreditCheckoutSession(opts: {
   amountMinor: number;
   currency: string;
   locale?: "ka" | "en";
+  trackingMetadata?: Record<string, string>;
 }): Promise<Stripe.Checkout.Session> {
   const {
     userId,
@@ -101,6 +102,7 @@ export async function createCreditCheckoutSession(opts: {
     amountMinor,
     currency,
     locale = "ka",
+    trackingMetadata = {},
   } = opts;
   const en = locale === "en";
   const formatted = new Intl.NumberFormat(en ? "en-GB" : "ka-GE", {
@@ -110,7 +112,7 @@ export async function createCreditCheckoutSession(opts: {
   return stripe().checkout.sessions.create({
     mode: "payment",
     customer_email: email ?? undefined,
-    metadata: { userId, kind: "credits", credits: String(credits) },
+    metadata: { userId, kind: "credits", credits: String(credits), ...trackingMetadata },
     payment_intent_data: {
       metadata: { userId, kind: "credits", credits: String(credits) },
     },
@@ -129,7 +131,7 @@ export async function createCreditCheckoutSession(opts: {
         },
       },
     ],
-    success_url: `${origin}/credits?status=success`,
+    success_url: `${origin}/credits?status=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/credits?status=canceled`,
   });
 }
@@ -160,14 +162,16 @@ export async function createPremiumCheckoutSession(opts: {
   stripeCustomerId?: string | null;
   origin: string;
   plan: PremiumPlan;
+  trackingMetadata?: Record<string, string>;
 }): Promise<Stripe.Checkout.Session> {
-  const { userId, email, stripeCustomerId, origin, plan } = opts;
+  const { userId, email, stripeCustomerId, origin, plan, trackingMetadata = {} } = opts;
   const price = await priceForPlan(plan);
   const metadata = {
     kind: "premium",
     userId,
     planKey: plan.key,
     countryCode: plan.countryCode,
+    ...trackingMetadata,
   };
 
   return stripe().checkout.sessions.create({
@@ -184,7 +188,7 @@ export async function createPremiumCheckoutSession(opts: {
     line_items: [{ price: price.id, quantity: 1 }],
     allow_promotion_codes: true,
     billing_address_collection: "auto",
-    success_url: `${origin}/subscription?status=success`,
+    success_url: `${origin}/subscription?status=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/subscription?status=canceled`,
   });
 }
