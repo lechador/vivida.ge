@@ -1,12 +1,5 @@
 import { cn } from "@/lib/utils";
-
-function flagEmoji(countryCode: string): string {
-  const code = countryCode.trim().toUpperCase();
-  if (!/^[A-Z]{2}$/.test(code)) return "🌍";
-  return String.fromCodePoint(
-    ...[...code].map((letter) => letter.charCodeAt(0) + 127397),
-  );
-}
+import { countryFlagEmoji } from "@/lib/countries";
 
 /** Compact residence-country marker for user profile identity surfaces. */
 export function CountryBadge({
@@ -30,7 +23,7 @@ export function CountryBadge({
       )}
     >
       <span aria-hidden className="text-sm leading-none">
-        {flagEmoji(countryCode)}
+        {countryFlagEmoji(countryCode)}
       </span>
       <span className="hidden sm:inline">{countryName}</span>
     </span>

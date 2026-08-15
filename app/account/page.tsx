@@ -187,7 +187,7 @@ export default async function AccountPage() {
 
         <div className="mb-6">
           <ResidenceCard
-            country={countryDisplayName(emailPrefs?.countryCode, locale)}
+            initialCountryCode={emailPrefs?.countryCode ?? null}
             initialCity={emailPrefs?.city ?? null}
             locale={locale}
           />

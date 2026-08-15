@@ -1,24 +1,27 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { MapPin } from "lucide-react";
 
-import { updateResidenceCity } from "@/actions/residence";
+import { updateResidence } from "@/actions/residence";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { countryFlagEmoji, countryOptions } from "@/lib/countries";
 
 export function ResidenceCard({
-  country,
+  initialCountryCode,
   initialCity,
   locale,
 }: {
-  country: string;
+  initialCountryCode: string | null;
   initialCity: string | null;
   locale: UserLocale;
 }) {
   const en = locale === "en";
+  const options = useMemo(() => countryOptions(locale), [locale]);
+  const [countryCode, setCountryCode] = useState(initialCountryCode ?? "");
   const [city, setCity] = useState(initialCity ?? "");
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +31,17 @@ export function ResidenceCard({
     setError(null);
     setSaved(false);
     startTransition(async () => {
-      const result = await updateResidenceCity(city);
+      const result = await updateResidence(countryCode, city);
       if (!result.ok) {
-        setError(en ? "City is too long." : "ქალაქის დასახელება ძალიან გრძელია.");
+        setError(
+          result.error === "invalid_country"
+            ? en
+              ? "Choose a valid country."
+              : "აირჩიე სწორი ქვეყანა."
+            : en
+              ? "City is too long."
+              : "ქალაქის დასახელება ძალიან გრძელია.",
+        );
       } else {
         setSaved(true);
       }
@@ -47,18 +58,30 @@ export function ResidenceCard({
           <h2 className="text-lg font-semibold">{en ? "Residence" : "საცხოვრებელი ადგილი"}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {en
-              ? "Your country was determined securely when you registered. Add your current city."
-              : "ქვეყანა რეგისტრაციისას უსაფრთხოდ განისაზღვრა. მიუთითე მიმდინარე ქალაქი."}
+              ? "Your country was detected at registration. You can update it and your current city here."
+              : "ქვეყანა რეგისტრაციისას განისაზღვრა. აქ შეგიძლია შეცვალო ქვეყანა და მიმდინარე ქალაქი."}
           </p>
         </div>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label>{en ? "Country" : "ქვეყანა"}</Label>
-          <div className="flex h-10 items-center rounded-lg border border-border bg-background/35 px-3 text-sm text-foreground/85">
-            {country}
-          </div>
+          <Label htmlFor="residence-country">{en ? "Country" : "ქვეყანა"}</Label>
+          <select
+            id="residence-country"
+            value={countryCode}
+            onChange={(event) => setCountryCode(event.target.value)}
+            className="h-10 w-full rounded-lg border border-border bg-background/35 px-3 text-sm text-foreground outline-none transition-colors focus:border-[var(--vivida-violet)] focus:ring-2 focus:ring-[var(--vivida-violet)]/20"
+          >
+            <option value="" disabled>
+              {en ? "Choose country" : "აირჩიე ქვეყანა"}
+            </option>
+            {options.map((option) => (
+              <option key={option.code} value={option.code}>
+                {countryFlagEmoji(option.code)} {option.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="residence-city">{en ? "City" : "ქალაქი"}</Label>
@@ -77,7 +100,7 @@ export function ResidenceCard({
           {error ?? (saved ? (en ? "Saved ✓" : "შენახულია ✓") : "")}
         </p>
         <Button type="button" size="sm" onClick={save} disabled={pending}>
-          {pending ? (en ? "Saving…" : "ინახება…") : (en ? "Save city" : "ქალაქის შენახვა")}
+          {pending ? (en ? "Saving…" : "ინახება…") : (en ? "Save residence" : "საცხოვრებელი ადგილის შენახვა")}
         </Button>
       </div>
     </section>
