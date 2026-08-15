@@ -50,6 +50,10 @@ export function metaEventPayload(input: MetaConversionInput) {
 
 /** Best-effort CAPI delivery; commerce must never fail because Meta is down. */
 export async function sendMetaConversion(input: MetaConversionInput): Promise<boolean> {
+  // Preview deployments can carry server-only secrets, but must never pollute
+  // the production Meta dataset with test checkout or purchase events.
+  if (process.env.VERCEL && process.env.VERCEL_ENV !== "production") return false;
+
   const token = process.env.META_CONVERSIONS_API_TOKEN;
   const datasetId = process.env.META_DATASET_ID ?? process.env.NEXT_PUBLIC_FB_PIXEL_ID;
   if (!token || !datasetId) return false;

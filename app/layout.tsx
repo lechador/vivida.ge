@@ -114,11 +114,10 @@ export const viewport: Viewport = {
 };
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-// Only load GA in production builds — keeps dev / preview / Storybook out
-// of the analytics pipeline (otherwise our own page reloads pollute the
-// real numbers). Vercel preview deploys ship as NODE_ENV=production, so
-// gate additionally on whether this is the canonical host. Cheap & safe.
-const TRACKING_ENABLED = process.env.NODE_ENV === "production";
+// Keep analytics and advertising scripts limited to the real production
+// deployment. Vercel preview deploys also ship as NODE_ENV=production.
+const TRACKING_ENABLED =
+  process.env.NODE_ENV === "production" && process.env.VERCEL_ENV === "production";
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
 
 export default async function RootLayout({
