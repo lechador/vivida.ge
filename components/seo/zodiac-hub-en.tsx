@@ -14,6 +14,8 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signColor } from "@/lib/zodiac";
+import { breadcrumbLd } from "@/lib/seo/jsonld";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
 const ELEMENT_EN: Record<string, string> = {
   ცეცხლი: "Fire",
@@ -25,6 +27,23 @@ const MODALITY_EN: Record<string, string> = {
   კარდინალური: "Cardinal",
   ფიქსირებული: "Fixed",
   მუტაბელური: "Mutable",
+};
+/**
+ * Ruling planets are stored in Georgian on SIGNS, like element and modality.
+ * The page title promises "Elements, Modalities and Rulers", so the sign
+ * cards carry all three.
+ */
+const RULER_EN: Record<string, string> = {
+  მზე: "Sun",
+  მთვარე: "Moon",
+  მერკური: "Mercury",
+  ვენერა: "Venus",
+  მარსი: "Mars",
+  იუპიტერი: "Jupiter",
+  სატურნი: "Saturn",
+  ურანი: "Uranus",
+  ნეპტუნი: "Neptune",
+  პლუტონი: "Pluto",
 };
 
 const FAQ = [
@@ -48,6 +67,10 @@ const FAQ = [
 
 export function ZodiacHubEn() {
   const ld = [
+    breadcrumbLd([
+      { name: "Home", url: ENGLISH_SITE_URL },
+      { name: "Zodiac", url: `${ENGLISH_SITE_URL}/zodiac` },
+    ]),
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
@@ -177,6 +200,11 @@ export function ZodiacHubEn() {
                   {ELEMENT_EN[content.element] ?? content.element} ·{" "}
                   {MODALITY_EN[content.modality] ?? content.modality}
                 </div>
+                {meta?.ruler && (
+                  <div className="relative mt-0.5 text-xs text-muted-foreground/70">
+                    Ruler: {RULER_EN[meta.ruler] ?? meta.ruler}
+                  </div>
+                )}
               </Link>
             );
           })}
@@ -241,7 +269,10 @@ export function ZodiacHubEn() {
                 body: "See how the four elements shape every zodiac sign.",
               },
               {
-                href: "/zodiac/tavsebadoba",
+                // /zodiac/tavsebadoba 308s to /compatibility on the English
+                // hosts (ENGLISH_LEGACY_CONTENT_REDIRECTS) — link the
+                // destination directly rather than spending a hop.
+                href: "/compatibility",
                 eyebrow: "Compatibility",
                 title: "Every zodiac pairing",
                 body: "Explore love compatibility across all 78 unique sign combinations.",

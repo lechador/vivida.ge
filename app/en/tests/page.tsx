@@ -19,6 +19,7 @@ import {
   ENGLISH_SITE_URL,
   localizedAlternates,
 } from "@/lib/seo/locales";
+import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const PATH = "/en/tests";
 const TITLE = "Free Personality, IQ and Emotional Intelligence Tests";
@@ -75,6 +76,28 @@ const FAQ = [
 ];
 
 export default function EnglishTestsPage() {
+  const url = `${ENGLISH_SITE_URL}/tests`;
+  const ld = [
+    articleLd({ url, headline: TITLE, description: DESCRIPTION }),
+    breadcrumbLd([
+      { name: "Home", url: ENGLISH_SITE_URL },
+      { name: "Tests", url },
+    ]),
+    faqLd(FAQ),
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Vivida tests and quizzes",
+      itemListElement: TESTS.filter((test) => test.available).map(
+        (test, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: test.titleEn,
+          url: `${ENGLISH_SITE_URL}${test.href}`,
+        }),
+      ),
+    },
+  ];
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
@@ -83,6 +106,11 @@ export default function EnglishTestsPage() {
       />
       <Starfield count={120} shooting={2} />
       <SmartHeader active="tests" locale="en" georgianPath="/tests" />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
+      />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
         <header className="mb-10 text-center">

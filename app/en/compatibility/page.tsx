@@ -6,6 +6,7 @@ import { EnglishGuide } from "@/components/en/english-guide";
 import { CompatibilityCalculator } from "@/components/landing/compatibility-calculator";
 import { buildCalculatorData } from "@/lib/compatibility-calculator-data";
 import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { articleLd, breadcrumbLd } from "@/lib/seo/jsonld";
 
 const PATH = "/en/compatibility";
 const TITLE = "Astrology Compatibility Beyond Sun Signs";
@@ -19,8 +20,16 @@ export const metadata: Metadata = {
 
 export default function EnglishCompatibilityPage() {
   const { signs, pairs } = buildCalculatorData("en");
+  const url = `${ENGLISH_SITE_URL}/compatibility`;
+  const ld = [
+    articleLd({ url, headline: TITLE, description: DESCRIPTION }),
+    breadcrumbLd([
+      { name: "Home", url: ENGLISH_SITE_URL },
+      { name: "Compatibility", url },
+    ]),
+  ];
   return (
-    <EnglishGuide eyebrow="Relationships and synastry" title="Compatibility is more than two Sun signs" intro="Astrological compatibility, often called synastry, compares two complete natal charts. It explores patterns of ease, attraction, difference and growth without deciding whether a relationship will succeed." georgianPath="/zodiac/tavsebadoba">
+    <EnglishGuide eyebrow="Relationships and synastry" title="Compatibility is more than two Sun signs" intro="Astrological compatibility, often called synastry, compares two complete natal charts. It explores patterns of ease, attraction, difference and growth without deciding whether a relationship will succeed." georgianPath="/zodiac/tavsebadoba" jsonLd={ld}>
       <section className="not-prose rounded-3xl border border-border bg-card/40 p-4 sm:p-7">
         <div className="mb-6 text-center">
           <Heart className="mx-auto size-7 text-[var(--vivida-pink)]" />
