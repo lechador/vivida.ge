@@ -28,6 +28,7 @@ export type PersonRow = {
   bio: string | null;
   image: string | null;
   createdAt: Date;
+  verified: boolean;
   friendship: FriendshipStatus;
 };
 
@@ -76,6 +77,8 @@ export async function listPeople(
       username: profiles.username,
       displayName: profiles.displayName,
       bio: profiles.bio,
+      isPremium: users.isPremium,
+      premiumUntil: users.premiumUntil,
     })
     .from(profiles)
     .innerJoin(users, eq(users.id, profiles.userId))
@@ -141,6 +144,9 @@ export async function listPeople(
         bio: r.bio,
         image: resolveAvatar(r.id, r.image, photos),
         createdAt: r.createdAt,
+        verified: Boolean(
+          r.isPremium && r.premiumUntil && r.premiumUntil.getTime() > Date.now(),
+        ),
         friendship: statusByPartner.get(r.id) ?? "none",
       })),
     nextCursor: hasMore ? page[page.length - 1].createdAt.toISOString() : null,

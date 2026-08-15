@@ -23,6 +23,7 @@ import { TURNSTILE_ERROR_KA, verifyTurnstile } from "@/lib/turnstile";
 import { siteOriginForHost } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { countryCodeFromHeaders } from "@/lib/residence";
 
 async function siteOriginFromHeaders(): Promise<string> {
   const h = await headers();
@@ -130,11 +131,13 @@ export async function signUpWithEmail(
   // picks up where it left off.
   let result: Awaited<ReturnType<typeof registerUser>>;
   try {
+    const requestHeaders = await headers();
     result = await registerUser({
       name: input.name,
       email: input.email,
       password: input.password,
       interfaceLanguage: locale,
+      residenceCountryCode: countryCodeFromHeaders(requestHeaders),
     });
   } catch (err) {
     console.warn("[signUpWithEmail] register failed:", (err as Error).message);

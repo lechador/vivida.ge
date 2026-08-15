@@ -23,6 +23,7 @@ import {
   listComments,
   type FeedComment,
 } from "@/actions/feed";
+import { VerifiedBadge } from "@/components/profile/verified-badge";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { COMMENT_BODY_MAX } from "@/lib/feed-config";
 import { cn } from "@/lib/utils";
@@ -379,6 +380,7 @@ function CommentRow({
                 {display}
               </span>
             )}
+            {comment.author.verified && <VerifiedBadge className="scale-90" />}
             <span className="shrink-0 text-[10px] text-muted-foreground">
               {feedTimeAgo(comment.createdAt, locale)}
             </span>

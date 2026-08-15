@@ -1,17 +1,16 @@
 /**
- * Stripe integration for one-time paid PDF reports.
+ * Stripe integration for one-time purchases and Vivida PRO subscriptions.
  *
  * We use **hosted Checkout** (redirect) — no client-side Stripe.js, no PCI
  * surface. The flow is:
- *   1. createReportCheckoutSession() → redirect user to Stripe.
+ *   1. create a hosted Checkout Session → redirect user to Stripe.
  *   2. Stripe redirects back to success_url; the `checkout.session.completed`
- *      webhook is the source of truth that marks the report paid.
+ *      webhook is the source of truth for purchases and entitlements.
  *
- * Note on currency: Stripe does not onboard Georgian entities and may reject
- * GEL. Price + currency are env-configurable (REPORT_PRICE_CENTS /
- * REPORT_CURRENCY) so you can switch to usd/eur without code changes.
+ * Country catalogues are server-owned; clients send only stable product keys.
  */
 import Stripe from "stripe";
+import type { PremiumPlan } from "@/lib/billing-config";
 
 let _stripe: Stripe | null = null;
 
@@ -90,12 +89,24 @@ export async function createCreditCheckoutSession(opts: {
   email?: string | null;
   origin: string;
   credits: number;
-  tetri: number;
-  gel: number;
+  amountMinor: number;
+  currency: string;
   locale?: "ka" | "en";
 }): Promise<Stripe.Checkout.Session> {
-  const { userId, email, origin, credits, tetri, gel, locale = "ka" } = opts;
+  const {
+    userId,
+    email,
+    origin,
+    credits,
+    amountMinor,
+    currency,
+    locale = "ka",
+  } = opts;
   const en = locale === "en";
+  const formatted = new Intl.NumberFormat(en ? "en-GB" : "ka-GE", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(amountMinor / 100);
   return stripe().checkout.sessions.create({
     mode: "payment",
     customer_email: email ?? undefined,
@@ -107,19 +118,84 @@ export async function createCreditCheckoutSession(opts: {
       {
         quantity: 1,
         price_data: {
-          currency: reportCurrency(),
-          unit_amount: tetri,
+          currency,
+          unit_amount: amountMinor,
           product_data: {
             name: en ? `${credits} Vivida credits` : `${credits} კრედიტი`,
             description: en
-              ? `Vivida · GEL ${gel} — ${credits} credits`
-              : `Vivida · ₾${gel} — ${credits} კრედიტი`,
+              ? `Vivida · ${formatted} — ${credits} credits`
+              : `Vivida · ${formatted} — ${credits} კრედიტი`,
           },
         },
       },
     ],
     success_url: `${origin}/credits?status=success`,
     cancel_url: `${origin}/credits?status=canceled`,
+  });
+}
+
+async function priceForPlan(plan: PremiumPlan): Promise<Stripe.Price> {
+  const prices = await stripe().prices.list({
+    active: true,
+    lookup_keys: [plan.stripeLookupKey],
+    limit: 1,
+  });
+  const price = prices.data[0];
+  if (!price) {
+    throw new Error(`Stripe price is missing for ${plan.stripeLookupKey}`);
+  }
+  if (
+    price.currency !== plan.currency ||
+    price.unit_amount !== plan.amountMinor ||
+    price.recurring?.interval !== plan.interval
+  ) {
+    throw new Error(`Stripe price does not match catalogue for ${plan.key}`);
+  }
+  return price;
+}
+
+export async function createPremiumCheckoutSession(opts: {
+  userId: string;
+  email?: string | null;
+  stripeCustomerId?: string | null;
+  origin: string;
+  plan: PremiumPlan;
+}): Promise<Stripe.Checkout.Session> {
+  const { userId, email, stripeCustomerId, origin, plan } = opts;
+  const price = await priceForPlan(plan);
+  const metadata = {
+    kind: "premium",
+    userId,
+    planKey: plan.key,
+    countryCode: plan.countryCode,
+  };
+
+  return stripe().checkout.sessions.create({
+    mode: "subscription",
+    client_reference_id: userId,
+    ...(stripeCustomerId
+      ? { customer: stripeCustomerId }
+      : { customer_email: email ?? undefined }),
+    metadata,
+    subscription_data: {
+      metadata,
+      description: "Vivida PRO · unlimited access",
+    },
+    line_items: [{ price: price.id, quantity: 1 }],
+    allow_promotion_codes: true,
+    billing_address_collection: "auto",
+    success_url: `${origin}/subscription?status=success`,
+    cancel_url: `${origin}/subscription?status=canceled`,
+  });
+}
+
+export async function createBillingPortalSession(opts: {
+  customerId: string;
+  origin: string;
+}): Promise<Stripe.BillingPortal.Session> {
+  return stripe().billingPortal.sessions.create({
+    customer: opts.customerId,
+    return_url: `${opts.origin}/subscription`,
   });
 }
 

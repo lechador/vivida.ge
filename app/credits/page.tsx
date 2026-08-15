@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
-import { Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Crown, Sparkles } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
 import { getBalance } from "@/lib/credits";
 import { getReferralStats } from "@/lib/referral";
-import { getStreakProgress } from "@/lib/streak-credits";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { InviteCard } from "@/components/invite/invite-card";
 import { TopUpCard } from "@/components/credits/top-up-card";
 import { CreditEarnInfo } from "@/components/credits/earn-info";
-import { StreakCard } from "@/components/credits/streak-card";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
+import { premiumPlanForCountry } from "@/lib/billing-config";
+import { PremiumPlanCard } from "@/components/subscription/premium-plan-card";
 
 export async function generateMetadata(): Promise<Metadata> {
   const en = (await getRequestLocale()) === "en";
@@ -31,12 +33,14 @@ export default async function CreditsPage() {
   const locale = await getRequestLocale();
   const en = locale === "en";
   const user = await requireUser();
-  const [balance, ref, streak] = await Promise.all([
+  const [balance, ref, identity, premium] = await Promise.all([
     getBalance(user.id),
     getReferralStats(user.id),
-    getStreakProgress(user.id),
+    getBillingIdentity(user.id),
+    isPremiumUser(user.id),
   ]);
   const link = `${SITE_URL[locale]}/?ref=${ref.code}`;
+  const premiumPlan = premiumPlanForCountry(identity?.countryCode);
 
   return (
     <main
@@ -67,19 +71,31 @@ export default async function CreditsPage() {
           </div>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/75">
             {en
-              ? "Use credits to unlock full test results, new compatibility readings, AI chat, and audio horoscopes. Invite friends or top up your balance."
-              : "კრედიტებით ხსნი ტესტების სრულ შედეგებს, ახალ სინასტრიებს, AI-ჩატსა და აუდიო-ჰოროსკოპს. მოიწვიე მეგობრები ან შეავსე ბალანსი."}
+              ? "Use credits to unlock full test results, compatibility readings, AI chat, forecasts, and reports. Invite friends or top up your balance."
+              : "კრედიტებით ხსნი ტესტების სრულ შედეგებს, სინასტრიებს, AI-ჩატს, პროგნოზებსა და რეპორტებს. მოიწვიე მეგობრები ან შეავსე ბალანსი."}
           </p>
         </div>
 
+        {premium ? (
+          <Link
+            href="/subscription"
+            className="mt-4 flex items-center justify-between rounded-3xl border border-[var(--vivida-gold)]/35 bg-[var(--vivida-gold)]/8 p-6 transition-colors hover:bg-[var(--vivida-gold)]/12"
+          >
+            <span className="flex items-center gap-3 font-semibold">
+              <Crown className="size-5 text-[var(--vivida-gold)]" />
+              {en ? "Manage your Vivida PRO subscription" : "Vivida PRO გამოწერის მართვა"}
+            </span>
+            <span aria-hidden>→</span>
+          </Link>
+        ) : premiumPlan ? (
+          <div className="mt-4">
+            <PremiumPlanCard plan={premiumPlan} locale={locale} />
+          </div>
+        ) : null}
+
         {/* Top-up is kept directly below the balance so there is no hunt or scroll. */}
         <div className="mt-4">
-          <TopUpCard locale={locale} />
-        </div>
-
-        {/* Completed-ritual streak — repeatable weekly reward cycle. */}
-        <div className="mt-4">
-          <StreakCard progress={streak} locale={locale} />
+          <TopUpCard locale={locale} countryCode={identity?.countryCode} />
         </div>
 
         {/* How to earn for free. */}

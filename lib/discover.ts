@@ -42,6 +42,7 @@ export type DiscoverCard = {
   sunElement: Element;
   /** Overall compatibility 0–100 vs the viewer; null if viewer has no chart. */
   compatibility: number | null;
+  verified: boolean;
 };
 
 export type SpotlightMatch = {
@@ -204,6 +205,11 @@ export async function getDiscoveryFeed(
       sunSign: sign,
       sunElement: sign.element,
       compatibility: synastry?.overall ?? null,
+      verified: Boolean(
+        c.user.isPremium &&
+          c.user.premiumUntil &&
+          c.user.premiumUntil.getTime() > Date.now(),
+      ),
     };
 
     const entry: Scored = { card, synastry };

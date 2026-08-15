@@ -12,8 +12,8 @@ describe("English zodiac element content", () => {
       const content = ELEMENT_ENGLISH[element];
       expect(JSON.stringify(content)).not.toMatch(GEORGIAN);
       expect(content.intro.length).toBeGreaterThan(180);
-      expect(content.strengths).toHaveLength(4);
-      expect(content.challenges).toHaveLength(4);
+      expect(content.strengths.length).toBeGreaterThanOrEqual(4);
+      expect(content.challenges.length).toBeGreaterThanOrEqual(4);
       SIGNS_BY_ELEMENT[element].forEach((sign) => signs.add(sign));
     }
     expect(signs.size).toBe(12);

@@ -5,10 +5,7 @@ import { Noto_Sans_Georgian } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import NextTopLoader from "nextjs-toploader";
 import { ChatShell } from "@/components/chat/chat-shell";
-import { AudioPlayerProvider } from "@/components/audio/audio-provider";
-import { NowPlayingBar } from "@/components/audio/now-playing-bar";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
-import { AppLaunchSurvey } from "@/components/survey/app-launch-survey";
 import { RefCapture } from "@/components/ref-capture";
 import { FbPixel } from "@/components/fb-pixel";
 import { VercelObservability } from "@/components/vercel-observability";
@@ -172,18 +169,14 @@ export default async function RootLayout({
         <BfcacheRefresher />
         <RefCapture />
         {FB_PIXEL_ENABLED && <FbPixel />}
-        <AudioPlayerProvider>
-          <div
-            id="main-content"
-            tabIndex={-1}
-            className="flex min-h-0 flex-1 flex-col focus:outline-none"
-          >
-            {children}
-          </div>
-          <ChatShell />
-          <AppLaunchSurvey />
-          <NowPlayingBar />
-        </AudioPlayerProvider>
+        <div
+          id="main-content"
+          tabIndex={-1}
+          className="flex min-h-0 flex-1 flex-col focus:outline-none"
+        >
+          {children}
+        </div>
+        <ChatShell />
         <VercelObservability />
       </body>
       {GA_ENABLED && <GoogleAnalytics gaId={GA_ID!} />}

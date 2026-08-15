@@ -2,7 +2,7 @@ import { unstable_cache, revalidateTag } from "next/cache";
 import { and, asc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { profilePhotos, profiles } from "@/db/schema";
+import { profilePhotos, profiles, users } from "@/db/schema";
 import { countUnreadMessages } from "@/lib/messages";
 import {
   countUnreadNotifications,
@@ -19,6 +19,8 @@ export type HeaderData = {
   avatarUrl: string | null;
   /** Unread chat messages — drives the bottom-bar messages tab badge. */
   unreadMessages: number;
+  isPremium: boolean;
+  residenceCountryCode: string | null;
 };
 
 /**
@@ -33,7 +35,7 @@ export type HeaderData = {
 export async function getHeaderData(userId: string): Promise<HeaderData> {
   return unstable_cache(
     async () => {
-      const [profileRow, notifications, unread, avatarRow, unreadMessages] =
+      const [profileRow, notifications, unread, avatarRow, unreadMessages, userRow] =
         await Promise.all([
           db
             .select({ username: profiles.username })
@@ -54,13 +56,29 @@ export async function getHeaderData(userId: string): Promise<HeaderData> {
             .orderBy(asc(profilePhotos.sortOrder))
             .limit(1),
           countUnreadMessages(userId),
+          db
+            .select({
+              isPremium: users.isPremium,
+              premiumUntil: users.premiumUntil,
+              residenceCountryCode: users.residenceCountryCode,
+            })
+            .from(users)
+            .where(eq(users.id, userId))
+            .limit(1),
         ]);
+      const premiumUntil = userRow[0]?.premiumUntil;
       return {
         username: profileRow[0]?.username ?? null,
         notifications,
         unread,
         avatarUrl: avatarRow[0]?.url ?? null,
         unreadMessages,
+        isPremium: Boolean(
+          userRow[0]?.isPremium &&
+            premiumUntil &&
+            premiumUntil.getTime() > Date.now(),
+        ),
+        residenceCountryCode: userRow[0]?.residenceCountryCode ?? null,
       };
     },
     ["header-data", userId],

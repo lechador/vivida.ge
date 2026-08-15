@@ -18,8 +18,7 @@ import { recordVisit } from "@/lib/activity";
  * directly, so calling signOut() here would throw).
  *
  * Side effect: schedules a deferred `recordVisit()` write for admin activity
- * reporting. Streaks and rewards are recorded separately when the user
- * completes the Today ritual.
+ * reporting.
  */
 export async function requireUser() {
   const session = await auth();

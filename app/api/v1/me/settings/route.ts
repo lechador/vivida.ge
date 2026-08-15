@@ -1,5 +1,8 @@
 import { z } from "zod";
+import { eq } from "drizzle-orm";
 
+import { db } from "@/db";
+import { users } from "@/db/schema";
 import { requireMobileUser } from "@/lib/api/auth";
 import { handle } from "@/lib/api/errors";
 import { ok } from "@/lib/api/respond";
@@ -14,6 +17,7 @@ export { OPTIONS } from "@/lib/api/cors";
 const Body = z.object({
   discoverable: z.boolean().optional(),
   gender: z.enum(["male", "female"]).optional(),
+  residenceCity: z.string().trim().max(100).nullable().optional(),
   testVisibility: z
     .object({
       mbti: z.boolean().optional(),
@@ -42,6 +46,13 @@ export async function PATCH(req: Request) {
       discoverable: input.discoverable,
       gender: input.gender,
     });
+
+    if (input.residenceCity !== undefined) {
+      await db
+        .update(users)
+        .set({ residenceCity: input.residenceCity || null })
+        .where(eq(users.id, user.id));
+    }
 
     if (input.testVisibility) {
       for (const [kind, visible] of Object.entries(input.testVisibility)) {

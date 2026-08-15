@@ -4,6 +4,7 @@ import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { PersonRow } from "@/lib/people";
 import { FriendButton } from "@/components/profile/friend-button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { VerifiedBadge } from "@/components/profile/verified-badge";
 
 /**
  * Thin Facebook-style directory row: avatar, name + handle (+ short
@@ -33,12 +34,15 @@ export function PersonRowCard({ person, locale = "ka" }: { person: PersonRow; lo
         </Link>
 
         <div className="min-w-0 flex-1">
-          <Link
-            href={profileHref}
-            className="block truncate text-[15px] font-semibold text-foreground transition-colors hover:text-[var(--vivida-violet)]"
-          >
-            {display}
-          </Link>
+          <div className="flex items-center gap-1.5">
+            <Link
+              href={profileHref}
+              className="truncate text-[15px] font-semibold text-foreground transition-colors hover:text-[var(--vivida-violet)]"
+            >
+              {display}
+            </Link>
+            {person.verified && <VerifiedBadge />}
+          </div>
           <div className="truncate text-xs text-muted-foreground">
             @{person.username}
           </div>

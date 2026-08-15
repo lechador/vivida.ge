@@ -46,28 +46,6 @@ describe("trackEvent", () => {
     ]);
   });
 
-  it("counts a completed daily ritual as a value action", () => {
-    const hits = installGtag();
-    trackEvent(ANALYTICS_EVENT.dailyRitualCompleted, {
-      date: "2026-08-09",
-      total_steps: 3,
-    });
-    expect(hits).toEqual([
-      {
-        name: "daily_ritual_completed",
-        params: { date: "2026-08-09", total_steps: 3 },
-      },
-      {
-        name: "value_action",
-        params: {
-          action: "daily_ritual_completed",
-          date: "2026-08-09",
-          total_steps: 3,
-        },
-      },
-    ]);
-  });
-
   it("drops GA4 reserved campaign params that would rewrite session attribution", () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
     const hits = installGtag();

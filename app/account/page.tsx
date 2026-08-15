@@ -18,10 +18,13 @@ import { PhotoUploader } from "@/components/account/photo-uploader";
 import { AiAvatarGenerator } from "@/components/account/ai-avatar-generator";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { EmailPreferencesCard } from "@/components/account/email-preferences-card";
-import { HoroscopeVoiceCard } from "@/components/account/horoscope-voice-card";
 import { LanguageCard } from "@/components/account/language-card";
+import { ResidenceCard } from "@/components/account/residence-card";
+import { VerifiedBadge } from "@/components/profile/verified-badge";
+import { CountryBadge } from "@/components/profile/country-badge";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { countryDisplayName } from "@/lib/residence";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -53,8 +56,9 @@ export default async function AccountPage() {
         daily: users.emailDailyHoroscope,
         marketing: users.emailMarketing,
         nudges: users.emailNudges,
-        voice: users.horoscopeVoice,
         locale: users.interfaceLanguage,
+        countryCode: users.residenceCountryCode,
+        city: users.residenceCity,
       })
       .from(users)
       .where(eq(users.id, user.id))
@@ -100,8 +104,15 @@ export default async function AccountPage() {
             />
           )}
           <div className="min-w-0 flex-1">
-            <div className="truncate text-base font-medium text-foreground">
-              {user.name ?? "ვარსკვლავო"}
+            <div className="flex items-center gap-1.5 text-base font-medium text-foreground">
+              <span className="truncate">{user.name ?? "ვარსკვლავო"}</span>
+              {headerData.isPremium && (
+                <VerifiedBadge label={en ? "Vivida PRO verified" : "Vivida PRO ვერიფიცირებული"} />
+              )}
+              <CountryBadge
+                countryCode={emailPrefs?.countryCode}
+                countryName={countryDisplayName(emailPrefs?.countryCode, locale)}
+              />
             </div>
             <div className="truncate text-sm text-foreground/65">
               {user.email}
@@ -133,20 +144,24 @@ export default async function AccountPage() {
           <AiAvatarGenerator initialAvatar={accountAvatar} locale={locale} />
         </div>
 
-        {/* Credits */}
+        {/* Billing */}
         <div className="mb-6">
           <Link
-            href="/credits"
+            href={headerData.isPremium ? "/subscription" : "/credits"}
             className="group flex items-center justify-between gap-4 rounded-2xl border border-[var(--vivida-cyan)]/30 bg-gradient-to-br from-[var(--vivida-cyan)]/10 via-card/60 to-[var(--vivida-violet)]/8 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5"
           >
             <div className="min-w-0">
               <h2 className="text-lg font-semibold tracking-tight">
-                {en ? "Credits" : "კრედიტები"}
+                {headerData.isPremium ? "Vivida PRO" : en ? "Credits" : "კრედიტები"}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {en
-                  ? "View your balance and ritual streak, top up, or invite a friend."
-                  : "ნახე ბალანსი, რიტუალის სერია, შეავსე ან მოიწვიე მეგობარი."}
+                {headerData.isPremium
+                  ? en
+                    ? "Manage your subscription, billing, and renewal."
+                    : "მართე გამოწერა, გადახდა და განახლება."
+                  : en
+                    ? "View your balance, top up, or invite a friend."
+                    : "ნახე ბალანსი, შეავსე ან მოიწვიე მეგობარი."}
               </p>
             </div>
             <span aria-hidden className="text-2xl text-muted-foreground transition-transform group-hover:translate-x-1">
@@ -170,9 +185,12 @@ export default async function AccountPage() {
           />
         </div>
 
-        {/* Audio horoscope voice */}
         <div className="mb-6">
-          <HoroscopeVoiceCard initial={emailPrefs?.voice ?? null} locale={locale} />
+          <ResidenceCard
+            country={countryDisplayName(emailPrefs?.countryCode, locale)}
+            initialCity={emailPrefs?.city ?? null}
+            locale={locale}
+          />
         </div>
 
         {/* Public profile fields */}

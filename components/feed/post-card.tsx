@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ReportDialog } from "@/components/safety/report-dialog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { VerifiedBadge } from "@/components/profile/verified-badge";
 
 import { CommentSection } from "./comment-section";
 import { MentionText } from "./mention-text";
@@ -189,6 +190,7 @@ export function PostCard({
                 {display}
               </span>
             )}
+            {post.author.verified && <VerifiedBadge />}
           </div>
           <div className="mt-0.5 flex flex-wrap items-baseline gap-x-1.5 text-[11px] text-muted-foreground/85">
             {post.author.username && (

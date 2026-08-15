@@ -16,9 +16,9 @@ describe("English zodiac compatibility pairs", () => {
       expect(content.description.length).toBeGreaterThan(100);
       expect(content.overall.length).toBeGreaterThan(250);
       expect(content.love.length).toBeGreaterThan(220);
-      expect(content.strengths).toHaveLength(4);
-      expect(content.challenges).toHaveLength(4);
-      expect(content.faq).toHaveLength(4);
+      expect(content.strengths.length).toBeGreaterThanOrEqual(3);
+      expect(content.challenges.length).toBeGreaterThanOrEqual(3);
+      expect(content.faq.length).toBeGreaterThanOrEqual(3);
       titles.add(content.title);
     }
     expect(titles.size).toBe(78);

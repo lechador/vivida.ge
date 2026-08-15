@@ -4,15 +4,25 @@ import { useState } from "react";
 import { Check, CreditCard, Loader2, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { CREDIT_PACKS } from "@/lib/credits-config";
+import {
+  creditPacksForCountry,
+  formatBillingAmount,
+} from "@/lib/credits-config";
 
 /**
  * Stripe credit top-up — pick a pack, redirect to Checkout. The webhook awards
  * the credits on completion, so on return the /credits balance is already
  * updated.
  */
-export function TopUpCard({ locale }: { locale: "ka" | "en" }) {
+export function TopUpCard({
+  locale,
+  countryCode,
+}: {
+  locale: "ka" | "en";
+  countryCode?: string | null;
+}) {
   const en = locale === "en";
+  const packs = creditPacksForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
 
   async function buy(packId: string) {
@@ -48,7 +58,7 @@ export function TopUpCard({ locale }: { locale: "ka" | "en" }) {
       </h2>
 
       <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
-        {CREDIT_PACKS.map((p, i) => {
+        {packs.map((p, i) => {
           const featured = i === 0;
           return (
             <button
@@ -84,7 +94,9 @@ export function TopUpCard({ locale }: { locale: "ka" | "en" }) {
               <div className="text-xs text-muted-foreground">
                 {en ? "credits" : "კრედიტი"}
               </div>
-              <div className="mt-1 text-lg font-semibold">{p.gel} ₾</div>
+              <div className="mt-1 text-lg font-semibold">
+                {formatBillingAmount(p.amountMinor, p.currency, locale)}
+              </div>
             </button>
           );
         })}

@@ -153,7 +153,7 @@ export function DreamSymbolPageEn({ base, content }: { base: DreamSymbol; conten
   const url = `${SITE}/sizmris-akhsna/${base.slug}`;
   const related = base.related.map((slug) => ({ base: DREAM_BY_SLUG[slug], en: DREAM_EN_BY_SLUG[slug] })).filter((item) => item.base && item.en);
   const alsoSee = DREAM_SYMBOLS.filter((item) => item.slug !== base.slug && !base.related.includes(item.slug)).slice(0, 12);
-  const faq = content.variants.map((variant) => ({ q: `What does it mean when ${variant.when} in a dream?`, a: variant.meaning }));
+  const faq = content.variants.map((variant) => ({ q: `What does it mean when ${variant.when} in a dream?`, a: variant.means }));
   const structuredData = [
     { "@context": "https://schema.org", "@type": "Article", headline: `${content.title} Dream Meaning`, description: content.summary, inLanguage: "en", mainEntityOfPage: { "@type": "WebPage", "@id": url }, author: { "@type": "Organization", name: "Vivida", url: SITE }, publisher: { "@type": "Organization", name: "Vivida", url: SITE } },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },
@@ -173,7 +173,7 @@ export function DreamSymbolPageEn({ base, content }: { base: DreamSymbol; conten
 
         <section className="rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 sm:p-6"><h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--vivida-violet)]">General meaning</h2><p className="mt-2 text-[15px] leading-relaxed text-foreground/90">{content.meaning}</p></section>
 
-        <section className="mt-8"><h2 className="text-xl font-semibold tracking-tight">Common {content.title.toLowerCase()} dream scenarios</h2><p className="mt-1.5 text-sm text-muted-foreground">Choose the version closest to what you remember.</p><div className="mt-4 space-y-3">{content.variants.map((variant) => <article key={variant.when} className="rounded-2xl border border-border/70 bg-card/40 p-5"><h3 className="font-semibold text-foreground/95">When {variant.when}</h3><p className="mt-1.5 text-[15px] leading-relaxed text-foreground/85">{variant.meaning}</p></article>)}</div></section>
+        <section className="mt-8"><h2 className="text-xl font-semibold tracking-tight">Common {content.title.toLowerCase()} dream scenarios</h2><p className="mt-1.5 text-sm text-muted-foreground">Choose the version closest to what you remember.</p><div className="mt-4 space-y-3">{content.variants.map((variant) => <article key={variant.when} className="rounded-2xl border border-border/70 bg-card/40 p-5"><h3 className="font-semibold text-foreground/95">When {variant.when}</h3><p className="mt-1.5 text-[15px] leading-relaxed text-foreground/85">{variant.means}</p></article>)}</div></section>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2"><section className="rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 p-5"><h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--vivida-cyan)]">Positive reading</h2><p className="mt-2 text-[15px] leading-relaxed text-foreground/90">{content.positive}</p></section><section className="rounded-2xl border border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/8 p-5"><h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--vivida-pink)]">What to notice</h2><p className="mt-2 text-[15px] leading-relaxed text-foreground/90">{content.caution}</p></section></div>
 

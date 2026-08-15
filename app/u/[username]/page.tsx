@@ -33,6 +33,10 @@ import {
 } from "@/lib/test-results";
 import { EQ_BAND_META, type EqBand } from "@/lib/eq/scoring";
 import { Button } from "@/components/ui/button";
+import { VerifiedBadge } from "@/components/profile/verified-badge";
+import { CountryBadge } from "@/components/profile/country-badge";
+import { isPremiumUser } from "@/lib/premium";
+import { countryDisplayName } from "@/lib/residence";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { FriendButton } from "@/components/profile/friend-button";
@@ -240,6 +244,7 @@ export default async function PublicProfilePage({
 
   const displayName =
     profile.displayName ?? owner.name?.split(" ")[0] ?? username;
+  const ownerVerified = await isPremiumUser(owner.id);
   const age = ageFromDob(profile.dateOfBirth);
 
   return (
@@ -331,12 +336,19 @@ export default async function PublicProfilePage({
               <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
                 <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
                   {displayName}
+                  {ownerVerified && (
+                    <VerifiedBadge className="ml-2 inline-flex align-middle" />
+                  )}
                   {age != null && (
                     <span className="ml-1 font-normal text-foreground/70">
                       , {age}
                     </span>
                   )}
                 </h1>
+                <CountryBadge
+                  countryCode={owner.residenceCountryCode}
+                  countryName={countryDisplayName(owner.residenceCountryCode, locale)}
+                />
               </div>
 
               {profile.bio && (

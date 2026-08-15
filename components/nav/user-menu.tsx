@@ -22,6 +22,7 @@ export function UserMenu({
   image,
   username,
   balance,
+  isPremium = false,
   locale = "ka",
 }: {
   name: string | null;
@@ -29,6 +30,7 @@ export function UserMenu({
   image: string | null;
   username: string | null;
   balance?: number;
+  isPremium?: boolean;
   locale?: UserLocale;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -91,6 +93,14 @@ export function UserMenu({
             )}
           </Link>
         </DropdownMenuItem>
+        {isPremium && (
+          <DropdownMenuItem asChild>
+            <Link href="/subscription" className="cursor-pointer">
+              <Sparkles className="size-4 text-[var(--vivida-gold)]" />
+              PRO
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
           <Link href="/account" className="cursor-pointer">
             <Settings className="size-4" />

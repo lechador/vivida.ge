@@ -14,37 +14,14 @@ export const REFERRAL_REWARD = 10;
 /** Free credits granted to every user on the first day of each month. */
 export const MONTHLY_BONUS = 5;
 
-/** Repeatable reward for each seven consecutive completed daily rituals. */
-export const RITUAL_STREAK_REWARD = { days: 7, credits: 10 } as const;
-
-export function ritualCycleProgress(currentStreak: number, todayComplete: boolean) {
-  const current = Math.max(0, Math.floor(currentStreak));
-  const rewardEarnedToday =
-    todayComplete && current > 0 && current % RITUAL_STREAK_REWARD.days === 0;
-  const remainder = current % RITUAL_STREAK_REWARD.days;
-  const completedDays = rewardEarnedToday
-    ? RITUAL_STREAK_REWARD.days
-    : remainder;
-  const daysLeft = rewardEarnedToday
-    ? RITUAL_STREAK_REWARD.days
-    : RITUAL_STREAK_REWARD.days - remainder;
-
-  return {
-    completedDays,
-    daysLeft,
-    targetDays: current + daysLeft,
-    rewardEarnedToday,
-  };
-}
-
-/** Stripe top-up packs. Minimum ₾10 (we only have Stripe for now). `tetri` is
- *  the charge amount in minor units (1 GEL = 100 tetri). */
-export const CREDIT_PACKS = [
-  { id: "s", gel: 10, tetri: 1000, credits: 30 },
-  { id: "m", gel: 20, tetri: 2000, credits: 45 },
-  { id: "l", gel: 50, tetri: 5000, credits: 130 },
-] as const;
-export type CreditPackId = (typeof CREDIT_PACKS)[number]["id"];
+export {
+  creditPackForCountry,
+  creditPacksForCountry,
+  formatBillingAmount,
+  premiumPlanForCountry,
+  type CreditPack,
+  type PremiumPlan,
+} from "@/lib/billing-config";
 
 /** Credits EARNED by activity (beyond signup/referral/purchase). Capped to
  *  prevent farming — see the caps below. */
@@ -68,7 +45,6 @@ export const CREDIT_COST = {
   iqTest: 5,
   eqTest: 5,
   bigFiveTest: 5,
-  audioHoroscope: 2,
   pdfReport: 5,
   weeklyForecast: 10,
   tarot: 10,
@@ -117,7 +93,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   referral: "მეგობრის მოწვევა",
   purchase: "ბალანსის შევსება",
   monthly_bonus: "თვის ბონუსი",
-  streak_bonus: "რიტუალის 7-დღიანი სერია",
+  streak_bonus: "წარსული ბონუსი",
   birthday_gift: "დაბადების დღის საჩუქარი",
   campaign_reward: "დაბადების დეტალების შევსების ბონუსი",
   earn_feed_post: "პოსტი ფიდში",
@@ -141,7 +117,7 @@ export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
   referral: "Friend referral",
   purchase: "Balance top-up",
   monthly_bonus: "Monthly bonus",
-  streak_bonus: "7-day ritual streak",
+  streak_bonus: "Past bonus",
   birthday_gift: "Birthday gift",
   campaign_reward: "Birth details completion bonus",
   earn_feed_post: "Feed post",

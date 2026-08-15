@@ -413,6 +413,8 @@ export async function listCommentsCore(postId: string): Promise<FeedComment[]> {
       authorImage: users.image,
       authorUsername: profiles.username,
       authorDisplayName: profiles.displayName,
+      authorIsPremium: users.isPremium,
+      authorPremiumUntil: users.premiumUntil,
     })
     .from(postComments)
     .innerJoin(users, eq(users.id, postComments.userId))
@@ -435,6 +437,11 @@ export async function listCommentsCore(postId: string): Promise<FeedComment[]> {
       image: photos.get(r.authorId) ?? r.authorImage,
       username: r.authorUsername,
       displayName: r.authorDisplayName,
+      verified: Boolean(
+        r.authorIsPremium &&
+          r.authorPremiumUntil &&
+          r.authorPremiumUntil.getTime() > Date.now(),
+      ),
     },
   });
 

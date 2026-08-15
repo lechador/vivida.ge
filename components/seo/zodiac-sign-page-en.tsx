@@ -14,7 +14,7 @@ import {
   signMetaBySlug,
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
-import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
+import { SIGNS_CONTENT_EN } from "@/lib/seo/zodiac-content-en";
 import { signColor } from "@/lib/zodiac";
 import {
   COMPATIBILITY_EN,
@@ -24,14 +24,23 @@ import {
   ZODIAC_SIGN_EN,
 } from "@/lib/zodiac-sign-en";
 
+const LEVEL_COLOR: Record<string, string> = {
+  Strong: "oklch(0.78 0.18 305)",
+  Harmonious: "oklch(0.78 0.16 200)",
+  Challenging: "oklch(0.7 0.22 30)",
+  ძლიერი: "oklch(0.78 0.18 305)",
+  ჰარმონიული: "oklch(0.78 0.16 200)",
+  გამომწვევი: "oklch(0.7 0.22 30)",
+};
+
 export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
-  const content = ZODIAC_SIGN_EN[sign];
-  const chartContent = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign)!;
+  const c = SIGNS_CONTENT_EN[sign] || ZODIAC_SIGN_EN[sign];
+  const signEn = SIGNS_CONTENT_EN[sign];
   const name = meta.labelEn;
   const accent = signColor(meta);
   const dates = ZODIAC_DATES[sign];
-  const faq = [
+  const faq = signEn?.faq?.length ? signEn.faq : [
     {
       q: `What dates are ${name}?`,
       a: `${name} is conventionally associated with ${dates.rangeEn}. If you were born at the beginning or end of this range, calculate your birth chart because the exact solar ingress varies by year and time zone.`,
@@ -40,18 +49,19 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
       q: `What element is ${name}?`,
       a: `${name} is a ${ELEMENT_EN[meta.element]} sign. Its element describes the basic style through which the sign processes experience and expresses energy.`,
     },
-    { q: `What is ${name} like in love?`, a: content.love },
+    { q: `What is ${name} like in love?`, a: signEn?.love || ZODIAC_SIGN_EN[sign].love },
     {
       q: `Is a Sun sign the whole personality?`,
       a: `No. ${name} describes the Sun's placement, while the Moon, rising sign, planets, houses, and aspects add essential layers to a complete natal chart.`,
     },
   ];
+
   const ld = [
     {
       "@context": "https://schema.org",
       "@type": "Article",
       headline: `${name} Zodiac Sign: Dates, Traits, Love and Compatibility`,
-      description: content.tagline,
+      description: signEn?.tagline || c.tagline,
       inLanguage: "en",
       mainEntityOfPage: {
         "@type": "WebPage",
@@ -61,7 +71,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
       about: {
         "@type": "Thing",
         name,
-        description: `${name} (${dates.rangeEn}) — ${content.tagline}`,
+        description: `${name} (${dates.rangeEn}) — ${signEn?.tagline || c.tagline}`,
       },
     },
     {
@@ -74,6 +84,26 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
       })),
     },
   ];
+
+  const introParagraphs = (signEn?.intro || ZODIAC_SIGN_EN[sign].core)
+    .split("\n\n")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  const personalityParagraphs = (signEn?.personality || "")
+    .split("\n\n")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  const loveParagraphs = (signEn?.love || ZODIAC_SIGN_EN[sign].love)
+    .split("\n\n")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  const careerParagraphs = (signEn?.career || ZODIAC_SIGN_EN[sign].career)
+    .split("\n\n")
+    .map((p) => p.trim())
+    .filter(Boolean);
 
   return (
     <main
@@ -118,7 +148,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
                 color: accent,
               }}
             >
-              {chartContent.symbol}
+              {signEn?.symbol || "✦"}
             </div>
             <div>
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -128,7 +158,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
                 {name}
               </h1>
               <p className="mt-3 max-w-xl text-pretty text-base text-foreground/85 sm:text-lg">
-                {content.tagline}
+                {signEn?.tagline || c.tagline}
               </p>
               <div className="mt-4 flex flex-wrap gap-2 text-xs">
                 <Link href={`/zodiac/elementebi/${elementSlugForSign(sign)}`}>
@@ -141,7 +171,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
                 <Pill
                   label="Modality"
                   value={
-                    MODALITY_EN[chartContent.modality] ?? chartContent.modality
+                    MODALITY_EN[signEn?.modality || ""] ?? (signEn?.modality || "Cardinal")
                   }
                   accent={accent}
                 />
@@ -151,29 +181,66 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
           </div>
         </article>
 
-        <section className="mt-12 max-w-3xl text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
-          <p>{content.core}</p>
+        {/* Intro */}
+        <section className="mt-12 max-w-3xl space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
+          {introParagraphs.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
         </section>
-        <TextSection
-          title={`${name} personality`}
-          body={`${name} expresses its ${ELEMENT_EN[meta.element].toLowerCase()} element through a ${MODALITY_EN[chartContent.modality]?.toLowerCase() ?? "distinct"} rhythm. ${content.core}`}
-        />
 
+        {/* Deep Personality */}
+        {personalityParagraphs.length > 0 && (
+          <section className="mt-12 max-w-3xl">
+            <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+              {name} Personality & Core Character
+            </h2>
+            <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
+              {personalityParagraphs.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Strengths & Challenges */}
         <section className="mt-12 grid gap-6 sm:grid-cols-2">
           <ListCard
             title="Strengths"
-            items={content.strengths}
+            items={signEn?.strengths?.length ? signEn.strengths : ZODIAC_SIGN_EN[sign].strengths}
             accent={accent}
           />
           <ListCard
-            title="Growth areas"
-            items={content.challenges}
+            title="Growth Areas & Challenges"
+            items={signEn?.weaknesses?.length ? signEn.weaknesses : ZODIAC_SIGN_EN[sign].challenges}
             accent="var(--muted-foreground)"
           />
         </section>
-        <TextSection title={`${name} in love`} body={content.love} />
-        <TextSection title={`${name} at work`} body={content.career} />
 
+        {/* Love */}
+        <section className="mt-12 max-w-3xl">
+          <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+            {name} in Love & Relationships
+          </h2>
+          <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
+            {loveParagraphs.map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
+          </div>
+        </section>
+
+        {/* Career */}
+        <section className="mt-12 max-w-3xl">
+          <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+            {name} in Career & Financial Path
+          </h2>
+          <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
+            {careerParagraphs.map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
+          </div>
+        </section>
+
+        {/* Compatibility Matrix with specific notes */}
         <section className="mt-12">
           <div className="mb-5 flex items-baseline justify-between gap-3">
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -187,32 +254,42 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {COMPATIBILITY_EN[sign].map((otherSign, index) => {
-              const other = signMetaBySlug(otherSign)!;
-              const strong = index < 2;
+            {(signEn?.compatibility?.length
+              ? signEn.compatibility
+              : COMPATIBILITY_EN[sign].map((otherSign) => ({
+                  signEn: signMetaBySlug(otherSign)!.labelEn,
+                  level: "Harmonious",
+                  note: `Explore connection between ${name} and ${signMetaBySlug(otherSign)!.labelEn}.`,
+                }))
+            ).map((item) => {
+              const matchedSlug = ALL_SLUGS.find(
+                (s) =>
+                  signMetaBySlug(s)!.labelEn.toLowerCase() ===
+                  (item.signEn || "").toLowerCase()
+              );
+              const otherSlug = matchedSlug || sign;
+              const otherMeta = signMetaBySlug(otherSlug);
+              const otherLabel = item.signEn || otherMeta?.labelEn || otherSlug;
+              const levelStr = String(item.level);
+              const badgeColor = LEVEL_COLOR[levelStr] || "var(--vivida-cyan)";
+
               return (
                 <Link
-                  key={otherSign}
-                  href={`/zodiac/tavsebadoba/${pairSlug(sign, otherSign)}`}
+                  key={otherLabel}
+                  href={`/zodiac/tavsebadoba/${pairSlug(sign, otherSlug)}`}
                   className="rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 transition-all hover:bg-card/80"
                 >
                   <div className="flex items-baseline justify-between">
-                    <h3 className="font-semibold">{other.labelEn}</h3>
+                    <h3 className="font-semibold">{otherLabel}</h3>
                     <span
                       className="rounded-full border border-border px-2 py-0.5 text-[11px]"
-                      style={{
-                        color: strong
-                          ? "var(--vivida-cyan)"
-                          : "var(--vivida-violet)",
-                      }}
+                      style={{ color: badgeColor }}
                     >
-                      {strong ? "Natural flow" : "Magnetic growth"}
+                      {levelStr}
                     </span>
                   </div>
                   <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-                    {strong
-                      ? `Shared elemental instincts can make ${name} and ${other.labelEn} feel quickly understood.`
-                      : `${name} and ${other.labelEn} bring contrasting strengths that can create attraction and meaningful learning.`}
+                    {item.note}
                   </p>
                 </Link>
               );
@@ -220,6 +297,26 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
           </div>
         </section>
 
+        {/* Famous Personalities */}
+        {signEn?.famous && signEn.famous.length > 0 && (
+          <section className="mt-12 rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 sm:p-8">
+            <h2 className="mb-4 text-xl font-semibold tracking-tight sm:text-2xl">
+              Famous {name} Personalities
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {signEn.famous.map((person) => (
+                <span
+                  key={person}
+                  className="inline-flex items-center rounded-full border border-border/80 bg-background/50 px-3 py-1 text-xs text-foreground/90"
+                >
+                  ✦ {person}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* FAQ */}
         <section className="mt-12 max-w-3xl">
           <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
             Frequently asked questions
@@ -247,6 +344,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
           </div>
         </section>
 
+        {/* Moon & Rising links */}
         <section className="mt-14 grid gap-4 sm:grid-cols-2">
           <Link
             href={`/zodiac/mtvare/${sign}`}
@@ -274,6 +372,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
           </Link>
         </section>
 
+        {/* Other signs */}
         <section className="mt-14">
           <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Other zodiac signs
@@ -281,14 +380,14 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
           <div className="flex flex-wrap gap-2">
             {ALL_SLUGS.filter((slug) => slug !== sign).map((slug) => {
               const other = signMetaBySlug(slug)!;
-              const otherContent = SIGNS_CONTENT[slug];
+              const otherEn = SIGNS_CONTENT_EN[slug];
               return (
                 <Link
                   key={slug}
                   href={`/zodiac/${slug}`}
                   className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm hover:bg-card/80"
                 >
-                  <span>{otherContent.symbol}</span>
+                  <span>{otherEn?.symbol || "✦"}</span>
                   {other.labelEn}
                 </Link>
               );
@@ -338,18 +437,7 @@ function Pill({
     </span>
   );
 }
-function TextSection({ title, body }: { title: string; body: string }) {
-  return (
-    <section className="mt-12 max-w-3xl">
-      <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-        {title}
-      </h2>
-      <p className="text-pretty text-base leading-relaxed text-foreground/90">
-        {body}
-      </p>
-    </section>
-  );
-}
+
 function ListCard({
   title,
   items,

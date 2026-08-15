@@ -14,7 +14,7 @@ import {
  * insert is a no-op.
  *
  * `dailyCap: null` means "one-shot or rate-managed by uniqueness alone"
- * (e.g. joined / profile_completed / first_post / daily_visit are
+ * (e.g. joined / profile_completed / first_post are
  * deduplicated by their subjectId, so no cap math needed).
  */
 export const REPUTATION_RULES: Record<
@@ -25,7 +25,7 @@ export const REPUTATION_RULES: Record<
   post_created: { points: 3, dailyCap: 9 },
   comment_created: { points: 1, dailyCap: 5 },
   friend_added: { points: 5, dailyCap: 20 },
-  // Legacy enum name retained for migration safety; awarded on ritual completion.
+  // Legacy enum value retained for migration and historical-event safety.
   daily_visit: { points: 1, dailyCap: null },
   // What others do to you
   reaction_received: { points: 2, dailyCap: 30 },
@@ -264,7 +264,5 @@ export const RepSubject = {
     const [x, y] = [a, b].sort();
     return `${x}:${y}`;
   },
-  dailyRitual: (userId: string, dateLocal: string) =>
-    `${userId}:${dateLocal}`,
   oneShot: (userId: string) => userId,
 };

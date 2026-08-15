@@ -4,15 +4,17 @@ const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   createCheckout: vi.fn(),
   isStripeConfigured: vi.fn(),
+  getBillingIdentity: vi.fn(),
 }));
 
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
 vi.mock("@/lib/credits", async () => {
-  const config = await vi.importActual<typeof import("@/lib/credits-config")>(
-    "@/lib/credits-config",
+  const config = await vi.importActual<typeof import("@/lib/billing-config")>(
+    "@/lib/billing-config",
   );
-  return { CREDIT_PACKS: config.CREDIT_PACKS };
+  return { creditPackForCountry: config.creditPackForCountry };
 });
+vi.mock("@/lib/premium", () => ({ getBillingIdentity: mocks.getBillingIdentity }));
 vi.mock("@/lib/stripe", () => ({
   createCreditCheckoutSession: mocks.createCheckout,
   isStripeConfigured: mocks.isStripeConfigured,
@@ -34,6 +36,7 @@ describe("POST /api/credits/checkout", () => {
       user: { id: "user-1", email: "user@example.com" },
     });
     mocks.isStripeConfigured.mockReturnValue(true);
+    mocks.getBillingIdentity.mockResolvedValue({ countryCode: "GE" });
     mocks.createCheckout.mockResolvedValue({
       url: "https://checkout.stripe.test/1",
     });
@@ -71,8 +74,8 @@ describe("POST /api/credits/checkout", () => {
       email: "user@example.com",
       origin: "https://vivida.ge",
       credits: 30,
-      tetri: 1000,
-      gel: 10,
+      amountMinor: 1000,
+      currency: "gel",
       locale: "ka",
     });
   });
@@ -88,7 +91,18 @@ describe("POST /api/credits/checkout", () => {
 
     expect(response.status).toBe(200);
     expect(mocks.createCheckout).toHaveBeenCalledWith(
-      expect.objectContaining({ locale: "en", credits: 45, gel: 20 }),
+      expect.objectContaining({ locale: "en", credits: 45, amountMinor: 2000, currency: "gel" }),
+    );
+  });
+
+  it("uses the UK credit catalogue for UK residents", async () => {
+    mocks.getBillingIdentity.mockResolvedValue({ countryCode: "GB" });
+
+    const response = await POST(request({ packId: "m" }));
+
+    expect(response.status).toBe(200);
+    expect(mocks.createCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({ credits: 75, amountMinor: 599, currency: "gbp" }),
     );
   });
 

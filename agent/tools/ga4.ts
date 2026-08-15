@@ -10,7 +10,6 @@ const VALUE_EVENTS = [
   "natal_chart_computed",
   "public_horoscope_read",
   "daily_horoscope_read",
-  "daily_ritual_completed",
   "tarot_reading_completed",
   "test_completed",
   "value_action",

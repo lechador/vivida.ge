@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { profiles } from "@/db/schema";
+import { profiles, users } from "@/db/schema";
 import { requireMobileUser } from "@/lib/api/auth";
 import { handle } from "@/lib/api/errors";
 import { ok, fail } from "@/lib/api/respond";
@@ -28,7 +28,8 @@ export async function GET(req: Request) {
   return handle(async () => {
     const user = await requireMobileUser(req);
 
-    const [profile] = await db
+    const [[profile], [account]] = await Promise.all([
+      db
       .select({
         username: profiles.username,
         displayName: profiles.displayName,
@@ -46,9 +47,34 @@ export async function GET(req: Request) {
       })
       .from(profiles)
       .where(eq(profiles.userId, user.id))
-      .limit(1);
+      .limit(1),
+      db
+        .select({
+          residenceCountryCode: users.residenceCountryCode,
+          residenceCity: users.residenceCity,
+          verified: users.isPremium,
+          premiumUntil: users.premiumUntil,
+        })
+        .from(users)
+        .where(eq(users.id, user.id))
+        .limit(1),
+    ]);
 
-    return ok({ user, profile: profile ?? null });
+    const verified = Boolean(
+      account?.verified &&
+        account.premiumUntil &&
+        account.premiumUntil.getTime() > Date.now(),
+    );
+
+    return ok({
+      user: {
+        ...user,
+        residenceCountryCode: account?.residenceCountryCode ?? null,
+        residenceCity: account?.residenceCity ?? null,
+        verified,
+      },
+      profile: profile ?? null,
+    });
   });
 }
 

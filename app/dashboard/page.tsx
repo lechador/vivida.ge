@@ -11,7 +11,6 @@ import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
-import { getStreakProgress } from "@/lib/streak-credits";
 import { TESTS } from "@/lib/tests-catalog";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -25,10 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [[profile], [userRow], [mbtiResult], [iqResult], [eqResult], [bigFiveResult], streak] = await Promise.all([
+  const [[profile], [userRow], [mbtiResult], [iqResult], [eqResult], [bigFiveResult]] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     db
-      .select({ horoscopeVoice: users.horoscopeVoice, locale: users.interfaceLanguage })
+      .select({ locale: users.interfaceLanguage })
       .from(users)
       .where(eq(users.id, user.id))
       .limit(1),
@@ -36,7 +35,6 @@ export default async function DashboardPage() {
     db.select({ id: iqResults.id }).from(iqResults).where(eq(iqResults.userId, user.id)).limit(1),
     db.select({ id: eqResults.id }).from(eqResults).where(eq(eqResults.userId, user.id)).limit(1),
     db.select({ id: bigFiveResults.id }).from(bigFiveResults).where(eq(bigFiveResults.userId, user.id)).limit(1),
-    getStreakProgress(user.id),
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
   const en = locale === "en";
@@ -101,12 +99,7 @@ export default async function DashboardPage() {
             data via a server action after first paint, so the response
             stream closes immediately and the browser tab spinner stops.
             Our internal CosmicLoader covers the AI generation window. */}
-        <DailyDashboard
-          userId={user.id}
-          savedVoice={userRow?.horoscopeVoice ?? null}
-          streak={streak}
-          locale={locale}
-        />
+        <DailyDashboard userId={user.id} locale={locale} />
 
         {suggestedTest && (
           <DashboardTestPromo test={suggestedTest} allCompleted={unfinished.length === 0} locale={locale} />

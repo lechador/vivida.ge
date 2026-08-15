@@ -2,15 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { Headphones, Lock, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import type { DailyHoroscope } from "@/db/schema";
 import type { TransitBreakdownItem } from "@/lib/transit-library";
-import { CREDIT_COST } from "@/lib/credits-config";
 import { kaLongDate } from "@/lib/i18n/ka-date";
 import { BODIES } from "@/lib/zodiac";
-import { Button } from "@/components/ui/button";
-import { HoroscopeAudioPlayer } from "./horoscope-audio-player";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -53,16 +50,12 @@ const ASPECT_TONE: Record<string, string> = {
 export function DailyCard({
   horoscope,
   transits = [],
-  savedVoice,
-  canAudio = true,
   onRead,
   locale = "ka",
 }: {
   horoscope: DailyHoroscope;
   /** Today's strongest transit aspects + their library interpretations. */
   transits?: TransitBreakdownItem[];
-  savedVoice?: string | null;
-  canAudio?: boolean;
   onRead?: () => void;
   locale?: UserLocale;
 }) {
@@ -75,7 +68,6 @@ export function DailyCard({
     trackEvent(ANALYTICS_EVENT.dailyHoroscopeViewed, {
       date: horoscope.date,
       has_transits: transits.length > 0 ? 1 : 0,
-      audio_available: canAudio ? 1 : 0,
     });
 
     const sentinel = readSentinelRef.current;
@@ -96,7 +88,7 @@ export function DailyCard({
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [canAudio, horoscope.date, onRead, transits.length]);
+  }, [horoscope.date, onRead, transits.length]);
 
   // `horoscope.date` is already the user's local date, so it is rendered
   // verbatim — no timezone shift, and no dependence on the browser shipping
@@ -188,26 +180,6 @@ export function DailyCard({
             <p key={i}>{para}</p>
           ))}
       </div>
-
-      {/* Listen-to-horoscope — placed between the written reading and the
-          transit breakdown so it follows the horoscope itself, not the
-          tarot/entry links at the top of the card. */}
-      {canAudio ? (
-        <HoroscopeAudioPlayer savedVoice={savedVoice} locale={locale} />
-      ) : (
-        <div className="relative mt-5">
-          <Button asChild variant="outline" size="lg" className="w-full justify-center sm:w-auto">
-            <Link href="/credits">
-              <Headphones className="size-4" />
-              {en ? "Listen to horoscope" : "მოისმინე ჰოროსკოპი"}
-              <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-gold)]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--vivida-gold)]">
-                <Lock className="size-3" />
-                {CREDIT_COST.audioHoroscope} {en ? "credits" : "კრედიტი"}
-              </span>
-            </Link>
-          </Button>
-        </div>
-      )}
 
       {transits.length > 0 && (
         <section className="relative mt-6 border-t border-border/40 pt-5">

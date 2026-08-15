@@ -15,130 +15,238 @@ export type LifePathContentEn = {
 
 export const LIFE_PATH_CONTENT_EN: Record<LifePathNumber, LifePathContentEn> = {
   "1": {
-    number: "1", title: "Life Path 1 — The Leader", archetype: "The Leader",
-    essence: "Independence, initiative, and the instinct to create a path where none existed before.",
-    traits: ["Independent", "Initiating", "Determined", "Confident", "Pioneering"],
-    strengths: "Life Path 1 is comfortable starting, deciding, and accepting responsibility. Originality and self-direction make this number effective when a situation needs courage, momentum, or a clear first move.",
-    challenges: "Independence can become isolation, impatience, or an assumption that asking for help is weakness. The deeper lesson is to lead without controlling and to recognize other people's pace and contribution.",
-    love: "A 1 needs respect, attraction, and enough autonomy to remain fully itself. Relationships become stronger when competition gives way to mutual encouragement and vulnerability is treated as trust rather than dependence.",
-    career: "Entrepreneurship, leadership, product creation, management, sport, and other self-directed fields can suit a 1. Ownership of decisions matters, but finishing and collaborating determine whether an idea becomes durable.",
-    advice: "Your gift is beginning. Choose a direction worth completing, invite capable people into the process, and let consistency turn bold intention into a real body of work.",
+    number: "1",
+    title: "Life Path Number 1 — The Leader",
+    archetype: "The Leader",
+    essence:
+      "Independence, initiative, and a natural instinct to lead — 1 starts where others are still hesitating.",
+    traits: ["Independent", "Initiative-driven", "Determined", "Self-confident", "Pioneer"],
+    strengths:
+      "You naturally take responsibility and never need another person's permission to begin. Creating something new, blazing a fresh trail, and leading a team forward is your natural element.",
+    challenges:
+      "Be mindful of ego and impatience — when you try to do everything alone, you lose the collective strength of a team. Learn the art of delegation and respect the natural pace of others.",
+    love:
+      "In a relationship, 1 needs a partner who respects their independence and maintains their own rich inner world. Competition inside a couple drains you; genuine partnership and mutual backing empower you. Best compatibility: 3, 5, and 9.",
+    career:
+      "You thrive best where the decisions are in your hands: entrepreneurship, executive management, product creation, sports, or politics. A purely subordinate role cannot hold you for long.",
+    advice:
+      "Your greatest power lies in starting — but truly great achievements demand finishing. Choose one defining direction and see it through to the end; the result will make your name memorable.",
   },
   "2": {
-    number: "2", title: "Life Path 2 — The Diplomat", archetype: "The Diplomat",
-    essence: "Cooperation, emotional intelligence, and the ability to notice what relationships need before conflict makes it obvious.",
-    traits: ["Empathetic", "Diplomatic", "Patient", "Sensitive", "Cooperative"],
-    strengths: "Life Path 2 understands nuance, timing, and the unspoken emotional layer of a group. Mediation, listening, partnership, and careful attention help this number create trust where force would fail.",
-    challenges: "Sensitivity can lead to people-pleasing, indecision, or resentment when needs remain unspoken. Clear boundaries and direct requests allow kindness to remain a strength instead of becoming self-erasure.",
-    love: "A 2 values emotional safety, thoughtful rituals, and a partner who takes feelings seriously. Stable intimacy grows when harmony includes honest disagreement rather than avoiding every difficult conversation.",
-    career: "Counseling, human resources, healthcare, design, diplomacy, and partnership-based work can fit a 2. The role may be quiet, but the ability to coordinate people often determines the outcome.",
-    advice: "Your gentleness carries influence when it has a clear boundary. Say what you know and need; other people cannot value insight that you continually keep invisible.",
+    number: "2",
+    title: "Life Path Number 2 — The Diplomat",
+    archetype: "The Diplomat",
+    essence:
+      "Harmony, empathy, and the delicate art of connection — 2 senses what others only notice after a conflict has erupted.",
+    traits: ["Empathetic", "Diplomatic", "Patient", "Perceptive", "Collaborative"],
+    strengths:
+      "You understand people beyond their spoken words. Mediation, partnership, and thoughtful attention to nuance are your natural gifts; people feel an immediate calming reassurance in your presence.",
+    challenges:
+      "Holding personal boundaries can be challenging — you often say 'yes' when you truly mean 'no'. Excessive sensitivity turns into accumulated resentment; practice open and direct communication.",
+    love:
+      "Love for you is safe emotional closeness — thoughtful rituals, attentive listening, and remembering the small things that matter. You need a partner who never invalidates your emotions. Best compatibility: 4, 6, and 8.",
+    career:
+      "Human resources, psychology, design, healthcare, advisory roles, and co-founded ventures — anywhere relationship dynamics determine the outcome. A skilled second-in-command often shapes more than the figurehead.",
+    advice:
+      "Your softness is a profound strength, not a weakness — provided it is paired with firm boundaries. Speak your mind aloud: the world cannot value what it cannot hear.",
   },
   "3": {
-    number: "3", title: "Life Path 3 — The Creator", archetype: "The Creator",
-    essence: "Expression, imagination, humor, and a natural ability to change the atmosphere through words or art.",
-    traits: ["Expressive", "Creative", "Optimistic", "Social", "Playful"],
-    strengths: "Life Path 3 generates ideas, tells memorable stories, and helps people see possibility. Communication and creativity become powerful tools for connection when this number gives them a consistent form.",
-    challenges: "Energy may scatter across too many interests, leaving promising work unfinished. Avoiding difficult feelings through humor or distraction can also keep expression lively but emotionally shallow.",
-    love: "A 3 brings laughter, spontaneity, and verbal affection to relationships. The best bond makes room for play while providing enough steadiness for honesty, follow-through, and deeper emotional presence.",
-    career: "Media, marketing, writing, performance, teaching, sales, and creative work can suit a 3. Talent grows most when deadlines and craft support inspiration rather than waiting for the perfect mood.",
-    advice: "Discipline is not the enemy of creativity; it is how creativity becomes visible. Select one meaningful project and carry it beyond excitement into completion.",
+    number: "3",
+    title: "Life Path Number 3 — The Creator",
+    archetype: "The Creator",
+    essence:
+      "Self-expression, joy, and the magnetic gift of communication — when 3 enters the room, the entire atmosphere shifts.",
+    traits: ["Communicative", "Creative", "Optimistic", "Artistic", "Playful"],
+    strengths:
+      "Generating original ideas, storytelling, and inspiring people — your enthusiasm is delightfully contagious. You shine brilliantly wherever creative expression and originality are valued.",
+    challenges:
+      "Your energy easily scatters across too many different directions — starting many things, finishing few. Counter the temptation of superficiality with depth: take one core talent to genuine mastery.",
+    love:
+      "Being in a relationship with you is an adventure — full of laughter, spontaneity, and vibrant colors. You need a partner who joins in the fun while gently keeping you grounded. Best compatibility: 1, 5, and 7.",
+    career:
+      "Media, marketing, performing arts, writing, education, and creative sales — any stage, large or small. Monotonous, isolated desk work extinguishes your inner light.",
+    advice:
+      "Discipline is the best friend of your natural talent. Choose one core project and bring it to completion — one finished creation speaks ten times louder than ten brilliant ideas.",
   },
   "4": {
-    number: "4", title: "Life Path 4 — The Builder", archetype: "The Builder",
-    essence: "Structure, reliability, and the patient work required to create something that can endure.",
+    number: "4",
+    title: "Life Path Number 4 — The Builder",
+    archetype: "The Builder",
+    essence:
+      "Order, diligence, and the power of a solid foundation — 4 builds what will still be standing decades from now.",
     traits: ["Reliable", "Practical", "Disciplined", "Methodical", "Patient"],
-    strengths: "Life Path 4 turns disorder into systems and plans into dependable results. This number values accuracy, responsibility, and foundations strong enough to support long-term growth.",
-    challenges: "Commitment to order can harden into rigidity, overwork, or fear of change. A plan should provide direction without becoming more important than new information, wellbeing, or human needs.",
-    love: "A 4 usually expresses love through loyalty, practical help, and consistency. Affection becomes easier to feel when dependable action is paired with spoken appreciation and occasional flexibility.",
-    career: "Engineering, finance, operations, architecture, logistics, law, and skilled technical work can fit a 4. Complex long-term projects reward its patience and standards.",
-    advice: "You already know how to work. Learn to rest, revise, and improvise without treating flexibility as failure; a resilient structure can move without collapsing.",
+    strengths:
+      "You can be completely relied upon — an exceptionally rare and valuable quality. Building systems, executing plans step by step, and bringing structure to chaos is your natural realm.",
+    challenges:
+      "Rigidity and fear of unexpected change — do not make the plan an idol. Sometimes the best move is mindful improvisation; flexibility does not weaken your foundation, it reinforces it.",
+    love:
+      "You prove your love through tangible actions — stability, attentive care, and unshakable loyalty. You need a partner who understands this language and occasionally invites you out of your comfort zone. Best compatibility: 2, 6, and 8.",
+    career:
+      "Engineering, finance, architecture, logistics, project governance, and law — domains where precision and systematic execution are decisive. Long-term, complex projects are your element.",
+    advice:
+      "You already know how to work hard — learn how to rest just as intentionally. Life is a living process, not merely an end result; make time for what cannot be scheduled on a spreadsheet.",
   },
   "5": {
-    number: "5", title: "Life Path 5 — The Explorer", archetype: "The Explorer",
-    essence: "Freedom, experience, change, and the curiosity to learn through direct contact with life.",
-    traits: ["Curious", "Adaptable", "Energetic", "Independent", "Versatile"],
-    strengths: "Life Path 5 adapts quickly to new people, places, tools, and possibilities. It brings courage to transition and can translate broad experience into persuasive communication and practical improvisation.",
-    challenges: "Fear of boredom can produce impulsive choices or abandonment of something valuable just as depth becomes possible. Freedom gains meaning through conscious commitments, not endless escape.",
-    love: "A 5 needs movement, honesty, and a partner who does not confuse closeness with control. Trust grows when independence is balanced by consistency and clear agreements.",
-    career: "Travel, journalism, sales, technology, events, media, entrepreneurship, and project-based work can suit a 5. Variety is motivating, while a simple structure protects focus.",
-    advice: "If every door must remain open, none becomes a real path. Choose a few people and purposes worthy of loyalty, and let freedom include the power to stay.",
+    number: "5",
+    title: "Life Path Number 5 — The Freedom Seeker",
+    archetype: "The Freedom Seeker",
+    essence:
+      "Change, lived experience, and an unquenchable thirst for movement — for 5, standing still feels like moving backward.",
+    traits: ["Curious", "Adaptable", "Energetic", "Free-spirited", "Versatile"],
+    strengths:
+      "You find your footing faster than anyone in a new environment — new language, new city, new career. The unpredictable shifts that terrify others make you feel truly alive.",
+    challenges:
+      "Fear of boredom can make you abandon truly valuable things prematurely — relationships, meaningful projects, or places. Freedom is not the opposite of commitment; deep roots do not prevent flight.",
+    love:
+      "A relationship with you is a voyage — often unplanned, but richly rewarding. You need a companion who neither clips your wings nor loses their own identity in the process. Best compatibility: 1, 3, and 7.",
+    career:
+      "Journalism, dynamic sales, travel, technology, consulting, and fast-paced entrepreneurship — rigid routine is your greatest adversary. Project-based and flexible work suits you perfectly.",
+    advice:
+      "If you leave every single door open, you never truly step inside any room. Choose a few non-negotiable commitments to stay loyal to — true freedom is the power of deliberate choice.",
   },
   "6": {
-    number: "6", title: "Life Path 6 — The Nurturer", archetype: "The Nurturer",
-    essence: "Care, responsibility, harmony, and the desire to make people and places feel supported.",
-    traits: ["Caring", "Responsible", "Protective", "Harmonizing", "Aesthetic"],
-    strengths: "Life Path 6 creates belonging through attention, reliability, and an instinct for what could be made healthier or more beautiful. People often trust this number with both practical and emotional responsibility.",
-    challenges: "Care can become control, perfectionism, or self-sacrifice when a 6 assumes responsibility for everyone's choices. Receiving help and allowing imperfection are essential parts of balanced service.",
-    love: "A 6 is devoted and home-oriented, often expressing affection through care and shared responsibility. The healthiest bond does not make one partner the permanent rescuer or parent.",
-    career: "Education, healthcare, counseling, design, hospitality, community leadership, and people management can suit a 6. Work feels meaningful when quality of life improves for others.",
-    advice: "Offer care without making yourself indispensable. Boundaries protect generosity, and your needs deserve the same seriousness you give to everyone else's wellbeing.",
+    number: "6",
+    title: "Life Path Number 6 — The Nurturer",
+    archetype: "The Nurturer",
+    essence:
+      "Love, responsibility, and an innate sense of harmony and beauty — people naturally gather and settle around 6.",
+    traits: ["Loving", "Responsible", "Harmonious", "Aesthetic", "Protective"],
+    strengths:
+      "Family, team, community — you unite, heal, and bring peace. An eye for beauty combined with a genuine gift for nurturing is rare: people simply want to be in your presence and your space.",
+    challenges:
+      "Placing everyone else's needs above your own leads straight to emotional exhaustion. Do not let perfectionism toward loved ones turn into subtle control; perfection is never a prerequisite for love.",
+    love:
+      "Relationships are the beating heart of your life — faithful, deeply warm, and home-building. Beware of only one trap: falling into martyrdom. Best compatibility: 2, 4, and 9.",
+    career:
+      "Medicine, counseling, teaching, interior design, hospitality, wellness, and culinary arts — where care and aesthetic sensibility combine. You make an exceptional leader whose team feels like family.",
+    advice:
+      "Care for yourself with the same devotion you shower upon others. Giving from an overflowing cup sustains far more life than straining from an empty one.",
   },
   "7": {
-    number: "7", title: "Life Path 7 — The Seeker", archetype: "The Seeker",
-    essence: "Analysis, inner depth, and the need to understand what lies beneath appearances.",
-    traits: ["Analytical", "Private", "Intuitive", "Reflective", "Independent-minded"],
-    strengths: "Life Path 7 combines careful observation with a strong inner compass. Research, contemplation, and pattern recognition help this number develop expertise rather than settling for convenient explanations.",
-    challenges: "Privacy can become isolation, skepticism, or endless analysis that postpones participation. Not every truth arrives through thought alone; trust and lived experience also carry information.",
-    love: "A 7 needs intellectual depth, emotional honesty, and enough solitude to remain centered. Opening slowly is natural, but a partner cannot respond to needs that stay permanently hidden.",
-    career: "Research, science, technology, psychology, writing, strategy, philosophy, and specialist roles can fit a 7. Independence and time for deep work are important.",
-    advice: "Your inner world is a laboratory, not a permanent hiding place. Share what you discover and allow real relationships to test, deepen, and humanize your conclusions.",
+    number: "7",
+    title: "Life Path Number 7 — The Seeker",
+    archetype: "The Seeker",
+    essence:
+      "Depth, analytical brilliance, and a rich inner world — 7 reads what lies beneath the visible surface.",
+    traits: ["Analytical", "Intuitive", "Independent", "Reflective", "Spiritual"],
+    strengths:
+      "You perceive hidden patterns and laws that others completely overlook. Research, scholarship, and the pursuit of fundamental truth — your mind is a finely tuned instrument.",
+    challenges:
+      "Solitude is necessary, but isolation is a trap. Analyzing everything can turn even emotions into spreadsheets; remember that sometimes the answer lives in the heart rather than the data.",
+    love:
+      "Your trust is earned slowly and holds immense value. You need a partner who does not fear silence and genuinely appreciates intellectual and emotional depth. Best compatibility: 3, 5, and 7.",
+    career:
+      "Scientific research, data analytics, software architecture, philosophy, and specialized investigation — fields where depth triumphs over speed. Noisy, political workplaces quickly drain your energy.",
+    advice:
+      "Knowledge multiplies only when shared. Step out of your mental library and into the world — your discoveries need an audience to create real impact.",
   },
   "8": {
-    number: "8", title: "Life Path 8 — The Strategist", archetype: "The Strategist",
-    essence: "Power, scale, resource management, and the ability to translate ambition into material results.",
-    traits: ["Ambitious", "Organized", "Influential", "Practical", "Resilient"],
-    strengths: "Life Path 8 understands systems, leverage, accountability, and the decisions behind large outcomes. It can manage pressure and recover from setbacks with unusual determination.",
-    challenges: "Achievement can become the only measure of worth, encouraging control, work obsession, or emotional distance. Ethical influence is more sustainable than domination and includes responsibility for consequences.",
-    love: "An 8 respects strength and often seeks an equal with goals of their own. Providing stability is meaningful, but intimacy also needs time, tenderness, and a willingness to be known beyond performance.",
-    career: "Business, finance, law, real estate, executive leadership, investment, and large-scale operations can suit an 8. Stewardship matters as much as winning.",
-    advice: "Think about legacy, not only profit. Build power that improves the system around you and relationships that remain valuable when status and achievement are temporarily absent.",
+    number: "8",
+    title: "Life Path Number 8 — The Strategist",
+    archetype: "The Strategist",
+    essence:
+      "Power, scale, and fluency in the language of the material world — 8 thinks big and calculates with precision.",
+    traits: ["Ambitious", "Organized", "Authoritative", "Pragmatic", "Resilient"],
+    strengths:
+      "Resource management, structural foresight, and relentless focus on results — you operate at a scale that makes others dizzy. Rising stronger after a fall is your personal signature.",
+    challenges:
+      "Never use material metrics as the sole yardstick for human relationships. An obsession with control and a cult of work can alienate those closest to you; the highest form of power is inspiring influence, not commanding authority.",
+    love:
+      "You look for an equal in a partner — strong-willed, capable, with distinct goals of their own. Remember that love requires dedicated time and presence, not merely material provision. Best compatibility: 2, 4, and 6.",
+    career:
+      "Business leadership, finance, corporate law, real estate development, and executive management — capital and scale are your natural playing field. Building your own enterprise is almost inevitable.",
+    advice:
+      "Think about lasting legacy rather than short-term gain alone. What you construct will outlive you — make sure it is something you can look upon with profound pride.",
   },
   "9": {
-    number: "9", title: "Life Path 9 — The Humanitarian", archetype: "The Humanitarian",
-    essence: "Compassion, perspective, completion, and a desire to contribute to something larger than personal comfort.",
-    traits: ["Generous", "Idealistic", "Wise", "Empathetic", "Inspiring"],
-    strengths: "Life Path 9 sees shared humanity across differences and can turn experience into empathy, art, teaching, or service. Its broad perspective helps others connect individual struggles with a larger meaning.",
-    challenges: "Idealism may become disappointment, martyrdom, or difficulty releasing people and projects whose cycle is complete. Compassion works best with limits and realistic expectations.",
-    love: "A 9 loves deeply and generously, sometimes beyond its own capacity. A supportive relationship honors its ideals while keeping daily needs, reciprocity, and practical boundaries visible.",
-    career: "Education, medicine, psychology, art, nonprofit work, advocacy, and international or community service can fit a 9. Purpose strongly affects motivation.",
-    advice: "You do not have to rescue everyone to make a meaningful contribution. Give compassion a boundary, a method, and enough self-care to remain useful over time.",
+    number: "9",
+    title: "Life Path Number 9 — The Humanitarian",
+    archetype: "The Humanitarian",
+    essence:
+      "Compassion, wisdom, and a panoramic view of humanity — 9 lives for a purpose far larger than personal comfort.",
+    traits: ["Generous", "Idealistic", "Wise", "Empathetic", "Inspirational"],
+    strengths:
+      "You intuitively understand people across differences in culture, age, and background. Giving, teaching, and elevating others is the natural direction of your energy.",
+    challenges:
+      "Do not let high ideals turn into chronic disillusionment — the world transforms slowly, and that too is part of life. Master the art of closing chapters: 9 is the final number of the cycle, and letting go is your core lesson.",
+    love:
+      "You love deeply and unstintingly, sometimes at the expense of your own needs. You need a partner who shares your ideals while keeping you tethered to practical reality. Best compatibility: 1, 6, and 9.",
+    career:
+      "Higher education, healthcare, the arts, non-profit initiatives, international advocacy, and psychology — when your work carries moral meaning, your output doubles.",
+    advice:
+      "Healing the world begins with honoring yourself. Give your compassion clear boundaries and focused direction — only then does it become a mighty force rather than an exhausting burden.",
   },
   "11": {
-    number: "11", title: "Life Path 11 — The Inspired Intuitive", archetype: "The Inspired Intuitive",
-    essence: "Heightened perception, imagination, and the challenge of giving practical form to inspiration.",
-    traits: ["Intuitive", "Sensitive", "Visionary", "Inspiring", "Charismatic"],
-    strengths: "Master Number 11 is often described as an intensified 2: relational sensitivity combined with unusual imaginative or symbolic awareness. Its words and creative work can help people recognize something they already feel but cannot yet name.",
-    challenges: "High sensitivity can become nervous tension, self-doubt, or overstimulation. Grounding routines, sleep, physical care, and realistic structure are necessities rather than limits on inspiration.",
-    love: "An 11 seeks emotional and spiritual depth and may find superficial connection exhausting. A calm, honest partner can support intensity without idealizing or dismissing it.",
-    career: "Psychology, art, writing, teaching, design, spiritual care, and visionary leadership can suit an 11. Inspiration becomes valuable when translated into a repeatable practice.",
-    advice: "Treat intuition as a signal to explore, not unquestionable proof. Write, test, teach, and build so that insight gains clarity and does not remain undirected anxiety.",
+    number: "11",
+    title: "Life Path Number 11 — The Master Intuitive",
+    archetype: "The Master Intuitive",
+    essence:
+      "Heightened perception and a direct channel for inspiration — 11 feels what has not yet been spoken aloud.",
+    traits: ["Intuitive", "Sensitive", "Inspiring", "Visionary", "Charismatic"],
+    strengths:
+      "Master Number 11 is an amplified 2: the quiet diplomacy of two elevated by near-prophetic perception. People recognize themselves in your words — a rare and subtle form of leadership.",
+    challenges:
+      "High emotional sensitivity can easily accumulate into nervous tension — grounding routines, quality sleep, and quiet time are non-negotiable necessities. Do not doubt your inner vision: it is real.",
+    love:
+      "You crave genuine depth in intimacy — superficial connections drain you rapidly. You need a calm, steady partner who can hold space for your emotional intensity. Best compatibility: 2, 4, and 6.",
+    career:
+      "Psychology, creative writing, artistic direction, spiritual exploration, counseling, and visionary leadership — anywhere intuition functions as a professional instrument.",
+    advice:
+      "Your antenna is always receiving — you must consciously decide what you channel. Inspiration demands physical form: write it, teach it, build it, otherwise ungrounded energy turns into anxiety.",
   },
   "22": {
-    number: "22", title: "Life Path 22 — The Master Builder", archetype: "The Master Builder",
-    essence: "Large-scale vision joined with the discipline to turn an ambitious idea into a durable system.",
-    traits: ["Visionary", "Practical", "Disciplined", "Resilient", "System-minded"],
-    strengths: "Master Number 22 is often described as an intensified 4: the builder's patience combined with an unusually broad horizon. It can coordinate people, resources, and structure around work designed to last.",
-    challenges: "The weight of potential may produce perfectionism, procrastination, or retreat into small safe tasks. Scale still begins with ordinary steps, tested assumptions, and willingness to learn publicly.",
-    love: "A 22 is dependable and serious about shared foundations, but major goals can consume the attention a relationship also needs. Partnership deserves daily construction, not only future provision.",
-    career: "Infrastructure, organizational leadership, platforms, architecture, social enterprise, policy, and complex long-term projects can fit a 22. Real impact requires both vision and governance.",
-    advice: "Do not wait for a flawless blueprint. Build a sound foundation, test one section, and expand responsibly; disciplined iteration is how a large vision becomes trustworthy.",
+    number: "22",
+    title: "Life Path Number 22 — The Master Builder",
+    archetype: "The Master Builder",
+    essence:
+      "Vision coupled with monumental execution — 22 has the capacity to turn lofty dreams into concrete structures and lasting systems.",
+    traits: ["Visionary", "Practical", "Resilient", "Strategic", "Disciplined"],
+    strengths:
+      "Master Number 22 is an amplified 4: the unshakable bedrock of four elevated by global vision. You are equipped to construct what will endure for generations — institutions, platforms, and transformative organizations.",
+    challenges:
+      "The sheer weight of your potential can sometimes feel paralyzing — showing up as procrastination or getting buried in trivial details. Every colossal vision starts with one small, concrete step; take it.",
+    love:
+      "You are a loyal and rock-solid partner, though work frequently demands first priority. Remind yourself: a relationship is also a grand construction that requires laying emotional bricks every day. Best compatibility: 4, 6, and 8.",
+    career:
+      "Building in the broadest sense — large-scale enterprises, digital platforms, infrastructure, social architecture, and international institutions. Your natural horizon is global.",
+    advice:
+      "Never settle for mere 'good' when you are capable of 'extraordinary' — but do not wait for ideal conditions either. Build phase by phase: foundation, walls, roof.",
   },
   "33": {
-    number: "33", title: "Life Path 33 — The Master Teacher", archetype: "The Master Teacher",
-    essence: "Compassion, teaching, and the responsibility to support growth without losing yourself in service.",
-    traits: ["Compassionate", "Devoted", "Wise", "Healing", "Encouraging"],
-    strengths: "Master Number 33 is often described as an intensified 6: the nurturer's responsibility combined with a broad teaching or healing impulse. It can make people feel seen and translate hard experience into humane guidance.",
-    challenges: "The desire to help can become martyrdom, impossible standards, or responsibility for people who must choose their own path. Sustainable care includes limits, rest, and the ability to receive.",
-    love: "A 33 offers profound care and commitment, but one-way nurturing eventually becomes depletion. The right partnership supports the teacher too and makes room for ordinary imperfection.",
-    career: "Teaching, healthcare, therapy, social work, community leadership, ministry, and mission-driven creative work can suit a 33. Human development is often the central result.",
-    advice: "Your contribution is a marathon. Protect the body, relationships, and resources that make service possible, and remember that saying no can preserve the quality of a deeper yes.",
+    number: "33",
+    title: "Life Path Number 33 — The Master Teacher",
+    archetype: "The Master Teacher",
+    essence:
+      "Selfless love and the gift of deep healing — 33 lives to nurture, elevate, and guide others toward higher consciousness.",
+    traits: ["Compassionate", "Devoted", "Wise", "Healer", "Uplifting"],
+    strengths:
+      "Master Number 33 is an amplified 6: the nurturing heart of six fused with the calling of a profound teacher. Your mere presence brings comfort — people leave conversations with you feeling renewed and elevated.",
+    challenges:
+      "You cannot rescue everyone — nor is that your duty. The temptation of self-sacrifice is the central test of 33; master the ability to say 'no' and allow yourself to receive as graciously as you give.",
+    love:
+      "You give everything in love — which can sometimes be overwhelming. You need a reciprocal bond where you are also held, listened to, and cared for; one-sided devotion slowly burns you out. Best compatibility: 6, 9, and 2.",
+    career:
+      "Transformative teaching, medicine, trauma therapy, social reform, spiritual leadership, and creative advocacy — fields where human growth is the core outcome, not an afterthought.",
+    advice:
+      "Your mission is a marathon, not a sprint. Guard your own emotional reserves as conscientiously as you tend to the wounds of others — a master teacher must maintain a healthy, thriving heart.",
   },
 };
 
 export const NUMEROLOGY_FAQ_EN = [
-  { q: "What is a life path number?", a: "A life path number is a numerology value calculated from a birth date. Numerology interprets it as a broad life theme or archetype; it is a reflective tradition, not a scientific personality measurement." },
-  { q: "How do I calculate my life path number?", a: "Reduce the day, month, and year of your birth date by adding their digits, then reduce the total to 1–9 unless it is 11, 22, or 33. The calculator on this page handles the steps automatically." },
-  { q: "What are Master Numbers 11, 22, and 33?", a: "Numerology keeps 11, 22, and 33 unreduced and treats them as intensified versions of 2, 4, and 6. They are traditionally associated with inspiration, large-scale building, and compassionate teaching." },
-  { q: "Is numerology scientifically proven?", a: "No. Numerology is a symbolic and spiritual tradition rather than an evidence-based method for measuring personality or predicting events. Use it as a prompt for reflection, not a diagnosis or certainty." },
+  {
+    q: "What is a Life Path Number?",
+    a: "The Life Path Number is the core indicator in numerology — calculated from your full date of birth, it describes your fundamental archetype, innate talents, life challenges, and primary growth lessons.",
+  },
+  {
+    q: "How do I calculate my Life Path Number?",
+    a: "Every digit of your birth date is summed and reduced down to a single digit, with the exception of Master Numbers 11, 22, and 33 which are preserved. For instance: November 24, 1995 → Day: 2+4=6; Month: 1+1=2; Year: 1+9+9+5=24→2+4=6; Total: 6+2+6=14→1+4=5. Use our free calculator on this page for an exact calculation.",
+  },
+  {
+    q: "What do Master Numbers 11, 22, and 33 mean?",
+    a: "Master Numbers represent amplified vibrations: 11 is the Master Intuitive and visionary; 22 is the Master Builder of enduring systems; 33 is the Master Teacher of selfless compassion. They bring heightened creative potential alongside deeper personal responsibility.",
+  },
+  {
+    q: "How do numerology and astrology connect?",
+    a: "Both systems interpret human character and timing from birth data — numerology through the vibrational geometry of numbers in your date, astrology through planetary positions across the sky. Together they provide a rich, multi-dimensional view: explore both on Vivida.",
+  },
 ];

@@ -8,6 +8,11 @@ import { db } from "@/db";
 import { accounts, sessions, users, verificationTokens } from "@/db/schema";
 import { authConfig } from "@/auth.config";
 import { onUserSignedUp } from "@/lib/referral";
+import { headers } from "next/headers";
+import {
+  countryCodeFromHeaders,
+  setResidenceCountryIfMissing,
+} from "@/lib/residence";
 
 /**
  * Credentials provider for the email/password login flow. Lives in
@@ -105,6 +110,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         console.warn(
           "[auth.createUser] emailVerified stamp failed:",
           (err as Error).message
+        );
+      }
+      try {
+        const requestHeaders = await headers();
+        await setResidenceCountryIfMissing(
+          user.id,
+          countryCodeFromHeaders(requestHeaders),
+        );
+      } catch (err) {
+        console.warn(
+          "[auth.createUser] residence country stamp failed:",
+          (err as Error).message,
         );
       }
       try {

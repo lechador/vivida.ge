@@ -7,6 +7,10 @@ import { pdfReports } from "@/db/schema";
 import { constructWebhookEvent } from "@/lib/stripe";
 import { generateAndStoreReport } from "@/lib/reports/generate";
 import { grantPurchaseCredits } from "@/lib/credits";
+import {
+  activatePremiumFromCheckout,
+  syncPremiumSubscription,
+} from "@/lib/premium";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,6 +38,16 @@ export async function POST(req: Request) {
 
   if (event.type === "checkout.session.completed") {
     const sessionObj = event.data.object as Stripe.Checkout.Session;
+
+    if (sessionObj.metadata?.kind === "premium") {
+      try {
+        await activatePremiumFromCheckout(sessionObj);
+      } catch (err) {
+        console.error("[stripe/webhook] premium activation failed:", err);
+        return new Response("premium sync failed", { status: 500 });
+      }
+      return new Response("ok", { status: 200 });
+    }
 
     // Credit top-up → award the pack's credits (idempotent on session id).
     if (sessionObj.metadata?.kind === "credits") {
@@ -86,6 +100,19 @@ export async function POST(req: Request) {
         .where(eq(pdfReports.id, reportId));
 
       after(() => generateAndStoreReport(reportId));
+    }
+  }
+
+  if (
+    event.type === "customer.subscription.created" ||
+    event.type === "customer.subscription.updated" ||
+    event.type === "customer.subscription.deleted"
+  ) {
+    try {
+      await syncPremiumSubscription(event.data.object as Stripe.Subscription);
+    } catch (err) {
+      console.error("[stripe/webhook] subscription sync failed:", err);
+      return new Response("subscription sync failed", { status: 500 });
     }
   }
 

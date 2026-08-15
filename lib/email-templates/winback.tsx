@@ -102,8 +102,8 @@ export function WinbackEmail({
             {balance} {en ? "credits" : "კრედიტი"}
           </span>{" "}
           {en
-            ? "waiting for you — use them for audio horoscopes, deep compatibility, or a seven-day forecast."
-            : "გელოდება — შეგიძლია გახსნა აუდიო-ჰოროსკოპი, ღრმა თავსებადობა ან 7-დღიანი პროგნოზი."}
+            ? "waiting for you — use them for deep compatibility, AI chat, or a seven-day forecast."
+            : "გელოდება — შეგიძლია გახსნა ღრმა თავსებადობა, AI-ჩატი ან 7-დღიანი პროგნოზი."}
         </Text>
       )}
 

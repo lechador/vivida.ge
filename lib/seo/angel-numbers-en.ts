@@ -19,27 +19,152 @@ const angel = (
 ): AngelNumberEn => ({ slug, title, essence, meaning, love, career, action });
 
 export const ANGEL_NUMBERS_EN: AngelNumberEn[] = [
-  angel("000", "000 — A Reset and Open Possibility", "Zero represents the space before a beginning: an unwritten page with more than one possible direction.", "In contemporary angel-number symbolism, 000 is associated with completion, reset, and potential. It can be used as a prompt to pause between chapters rather than rushing to fill uncertainty with the first available answer.", "In relationships, 000 can invite a reset: a more honest phase within an existing bond or a clean beginning after one has ended. The useful question is what you would choose without pressure to preserve appearances.", "At work, 000 can reflect a transition before a new direction becomes clear. Exploration and review may be more valuable now than forcing an exhausted plan to continue.", "Leave a little space before deciding. Write down what has ended, what remains important, and what you would genuinely like to begin."),
-  angel("111", "111 and 11:11 — Focus and New Intention", "111 is commonly interpreted as a symbol of beginnings, attention, and the direction of your most repeated thoughts.", "The popular 11:11 ritual turns a coincidence into a moment of intention. Psychologically, noticing the pattern can interrupt autopilot; symbolically, 111 is linked with initiative and a new chapter. Neither interpretation means thoughts automatically create events.", "In love, 111 can prompt openness to a new connection or a more direct phase in an existing relationship. Intention matters, but honest behavior matters more than waiting for a sign.", "For career questions, 111 favors the first concrete step: write the proposal, make the call, or test the idea that has remained only in your head.", "Notice what you were thinking when the number appeared. Decide whether that thought deserves more attention, a practical action, or a deliberate change of focus."),
-  angel("222", "222 and 22:22 — Balance, Patience, and Partnership", "222 is associated with cooperation and the patience required while early effort has not yet produced visible results.", "The repeated two is traditionally read as a reminder that two sides can coexist and that progress often depends on timing, trust, and collaboration. Use it to review whether you are abandoning a sound process simply because results are still quiet.", "In relationships, 222 highlights reciprocity, listening, reconciliation, and the quality of partnership. Balance does not require avoiding disagreement; it requires both people having a voice.", "At work, the pattern can suggest that partnership, feedback, or a team approach will be more useful than continuing to struggle alone.", "Do not demand proof too early. Choose one sound process, clarify the next shared step, and give it a realistic amount of time."),
-  angel("333", "333 — Creativity and Self-Expression", "333 is linked with communication, imagination, and the need to give an inner idea a visible form.", "Three is traditionally associated with expression and creative movement. Repeated as 333, it can serve as a prompt to notice where fear of judgment has kept you silent, unfinished, or dependent on permission from other people.", "In love, 333 favors a candid conversation. Naming a need respectfully is usually kinder to a relationship than expecting someone to guess it.", "For work, this number can point toward presenting, publishing, teaching, making, or giving a creative project a real deadline.", "Express one important idea today in a form another person can understand: a message, sketch, draft, conversation, or prototype."),
-  angel("444", "444 — Stability, Support, and Strong Foundations", "444 is commonly read as reassurance: progress may be slow, but a dependable foundation is being built.", "Four symbolizes structure, boundaries, and practical stability. Seeing 444 can become a reminder to assess the support already present instead of letting fear erase evidence of progress. It is not a guarantee that risk has disappeared.", "In love, 444 emphasizes consistency, safety, loyalty, and whether affection is supported by reliable everyday behavior.", "At work, it favors systems, patient practice, and the kind of effort whose value becomes visible only after repetition.", "List what is already stable, then strengthen the weakest practical support: a budget, routine, boundary, backup plan, or honest agreement."),
-  angel("555", "555 — Change, Movement, and Adaptation", "555 is associated with change that has already begun and the need to respond with flexibility instead of reflexive resistance.", "Five represents movement, variety, and freedom. Repeated as 555, it can be used to examine a transition in work, relationships, place, or identity. The number does not tell you which choice is correct; it highlights the cost of remaining unchanged.", "In relationships, 555 can mark a turning point, renegotiation, greater freedom, or an ending. Clear conversation is more useful than assuming change has only one outcome.", "Career themes include a new role, move, offer, or a need to update skills. Compare risks with evidence rather than romanticizing either stability or disruption.", "Write two columns: what the old situation protects and what it prevents. Then choose one reversible step that gives you better information."),
-  angel("666", "666 — Restoring Balance, Not a Bad Omen", "In modern numerology, 666 is often interpreted as a reminder to rebalance care, work, money, home, and personal wellbeing.", "Popular culture gives 666 a threatening reputation, but angel-number interpretations usually connect repeated sixes with responsibility and care becoming excessive or uneven. Treat the sighting as a reflection prompt, not evidence of supernatural danger.", "In love, 666 can draw attention to rescuing, over-functioning, or a relationship in which care is no longer reciprocal.", "At work, it may highlight overwork, material anxiety, or a schedule that has displaced health and personal life.", "Ask when you last did something restorative without earning it first. Reclaim one practical boundary around time, money, care, or availability."),
-  angel("777", "777 — Reflection, Learning, and Inner Trust", "777 is traditionally linked with insight, study, intuition, and confidence in a path chosen after serious reflection.", "Seven represents analysis, inward attention, and the search for meaning. Repeated as 777, it is often described as lucky, but a grounded reading emphasizes preparation and the opportunities that become visible when knowledge and judgment improve.", "In relationships, 777 values authenticity and depth. It can prompt you to ask whether the bond allows both closeness and a truthful inner life.", "Career themes include study, specialist work, exams, research, and the moment when long preparation begins to produce recognition.", "Listen to your first impression, then test it against facts. Intuition is most useful when it guides inquiry rather than replacing evidence."),
-  angel("888", "888 — Abundance, Reciprocity, and Results", "888 is associated with material flow, return on effort, responsibility, and the balance between giving and receiving.", "Eight resembles an infinity symbol and is often linked with cycles, resources, and power. Seeing 888 can invite a review of what sustained effort is beginning to return and whether you are prepared to receive, manage, and share results responsibly.", "In love, 888 focuses on reciprocity. Time, care, decision-making, and practical support should not consistently move in only one direction.", "At work, it can symbolize compensation, a contract, a profitable project, or the need for more mature financial management.", "Acknowledge the result without minimizing it. Decide how to allocate the resource—money, time, influence, or attention—in a way that remains sustainable."),
-  angel("999", "999 — Completion and Release", "999 represents the end of a cycle and the space created when an exhausted chapter is completed deliberately.", "Nine closes the single-digit sequence and is traditionally associated with culmination, compassion, and letting go. Repeated as 999, it can prompt an honest assessment of a role, habit, relationship, or project that may already have given what it can.", "In relationships, 999 may point to ending an old dynamic, whether the bond continues in a healthier form or closes with honesty.", "At work, it favors finishing, documenting, handing over, and making room rather than extending a project only because completion feels emotional.", "Complete one task or conversation you have carried past its useful life. Closure is a practical action, not only a feeling."),
-  angel("1010", "1010 and 10:10 — Conscious New Direction", "1010 combines initiative with open possibility and is often read as encouragement to begin with greater awareness.", "One symbolizes action and zero amplifies the space around it. Together, 1010 can become a checkpoint between intention and choice: a reminder that a new direction still needs values, evidence, and repeated behavior to become real.", "In love, 1010 can suggest a new phase that benefits from clearer expectations rather than repeating an old pattern under a new label.", "Career themes include training, a new role, or a fresh method. A beginning becomes stronger when you define how progress will be measured.", "State the new direction in one sentence and choose a small action you can repeat this week. Momentum is more useful than a dramatic promise."),
-  angel("1111", "1111 — Alignment and Deliberate Intention", "1111 is the best-known repeating number and is widely used as a moment to pause, clarify desire, and reset attention.", "Seeing 11:11 is common partly because symmetrical patterns are memorable and clocks are checked frequently. Symbolically, 1111 magnifies the themes of initiative and focus. Its practical value lies in turning recognition into a conscious question, not assuming a wish is guaranteed.", "In love, 1111 can prompt clarity about the relationship you want to build and the behaviors required to participate in it.", "At work, it favors choosing a priority and aligning daily decisions with it instead of scattering energy across competing ambitions.", "Make the wish specific enough to act on. Write one outcome, one reason it matters, and the next behavior within your control."),
-  angel("1212", "1212 and 12:12 — Progress Through Cooperation", "1212 alternates initiative and partnership, symbolizing forward movement that balances personal action with support.", "The pattern combines one, associated with starting, and two, associated with cooperation. It can serve as a reminder that meaningful progress rarely comes from either total dependence or total isolation; it needs personal responsibility and useful collaboration.", "In love, 1212 highlights maintaining identity while building a shared direction. Cooperation should not require either person to disappear.", "Career themes include partnerships, mentoring, team projects, and a plan that advances through alternating independent and shared work.", "Identify which part is yours to initiate and which part needs another person's input. Make one clear request instead of hoping support appears automatically."),
-  angel("1234", "1234 — Step-by-Step Progress", "1234 symbolizes sequence, simplification, and progress made through the next clear step rather than a dramatic leap.", "Because the digits form an ascending sequence, 1234 is often interpreted as reassurance that growth can be orderly. It is especially useful when a large goal feels overwhelming and needs to be reduced to dependencies, milestones, and a realistic first action.", "In relationships, 1234 favors gradual trust and practical development. Let consistency reveal compatibility instead of forcing a future before the present is stable.", "At work, the message is procedural: define the order, remove unnecessary complexity, and complete the prerequisite before chasing the final outcome.", "Write the next four steps in order. Ignore step four until step one is finished, then update the sequence with what you learn."),
+  angel(
+    "000",
+    "000 — A New Cycle and Infinite Possibility",
+    "Zero is the beginning before the beginning — a clean slate where nothing is written yet.",
+    "000 appears when one chapter has ended and the next has not yet begun. This empty space can feel unsettling, but it is precisely what gives you freedom of choice — you have nothing to defend, which means you can begin anything.",
+    "In relationships, 000 is a sign of a reset: either a fresh chapter with the same person or a clean slate on your own. Both paths are healthy if chosen with genuine honesty.",
+    "In work and career, this is a moment of pause. Seeking a new direction is far more worthwhile now than fighting to keep an exhausted old path alive.",
+    "Do not rush to fill the void. Give yourself a few days to ask 'What do I truly want?' — and only then make your decision."
+  ),
+  angel(
+    "111",
+    "111 and 11:11 — Thoughts Are Materializing",
+    "The most famous angel number: your thoughts are turning into reality with unusual speed right now.",
+    "111 is an amplifier number. Seeing it frequently means the door to a new stage has opened and what you think about most is taking tangible shape. That is why making a wish at 11:11 is considered worthwhile — the direction of your mind is what matters most.",
+    "In love, 111 heralds a new acquaintance or a brand-new stage in a relationship. If you are single, it is a call for emotional openness.",
+    "An idea that has been circling in your mind for a long time should now be written down and started. 111 is a number of beginning, not endless planning.",
+    "Notice what you were thinking about the moment you saw the number — that exact topic is what needs to be strengthened or adjusted."
+  ),
+  angel(
+    "222",
+    "222 and 22:22 — Balance, Trust and Partnership",
+    "222 is a number of patience: the seed has been planted, now growth needs time.",
+    "The number two is about harmony, diplomacy, and equilibrium between two sides. Frequently seeing 222 means you are on the right path, but visible results have not arrived yet — and that is completely normal. It is a test of trust.",
+    "In relationships, 222 is one of the kindest signs: reconciliation, deepening intimacy, or an important conversation that brings two people closer together.",
+    "Collaboration is far more fruitful right now than fighting alone. A partnership or team project is well worth pursuing.",
+    "Do not abandon what you started recently. 222 reminds you that it is too early to demand the final harvest."
+  ),
+  angel(
+    "333",
+    "333 — Creativity and Self-Expression",
+    "Three is the voice: 333 tells you that what is inside you must come out.",
+    "333 is the number of creativity, communication, and authentic self-expression. It often appears when someone is holding their true thoughts back — hiding their talent, keeping quiet, or waiting for external approval. The three repeated is an amplification of that inner voice.",
+    "In love, 333 is a call for candid conversation. What you leave unsaid hurts a relationship far more than speaking the truth.",
+    "A creative project, presentation, or starting your own venture — now is the time to raise your voice and be heard.",
+    "Speak one thing today that you have been holding back for a long time. 333 is asking for exactly that."
+  ),
+  angel(
+    "444",
+    "444 — Protection and a Solid Foundation",
+    "444 is one of the most reassuring numbers: you are not alone, and your foundation is sturdy.",
+    "Four represents stability — four walls, four directions, four elements. 444 usually appears during challenging periods as a sign of support: what you are building is durable, even if it does not feel that way in this moment.",
+    "In relationships, 444 points to reliability — loyalty and emotional safety that matter far more than fleeting drama.",
+    "Effort that seems to show no immediate result is actually laying a deep foundation. Keep going — results will soon become visible.",
+    "When you see 444, look back at everything you have already built. Often the fear in our heads is far larger than the actual risk."
+  ),
+  angel(
+    "555",
+    "555 — A Major Shift Is Coming",
+    "Five is movement: 555 means change has already begun, whether you are ready or not.",
+    "555 is one of the most energetic angel numbers. It appears when life is shifting direction — career, relationship, location, or inner outlook. Resisting at this stage only makes the process painful.",
+    "In love, 555 is a turning point: either the relationship moves to a new level, or it reaches its conclusion. Both outcomes offer freedom and growth.",
+    "An offer, transition, or complete change in direction. Taking a calculated risk is far more justified now than usual.",
+    "Do not cling to the old simply because it is familiar. Write down what you stand to lose and what you stand to gain — and make your choice."
+  ),
+  angel(
+    "666",
+    "666 — Restoring Balance (Not a Bad Omen)",
+    "666 is not a scary number — it points to an imbalance between material demands and inner wellbeing.",
+    "In popular culture 666 has a bad reputation, but in numerology its meaning is entirely different. Six is about family, care, and home. Repeated three times, it indicates that balance has tipped: you are either buried in money and work, or over-giving to others while forgetting yourself.",
+    "In relationships, 666 serves as an explicit warning against chronic self-sacrifice — caring has become noticeably one-sided, and you must restore equal balance.",
+    "Work and professional duties have completely displaced personal life, joy, and restful peace. This number urgently asks you to reclaim healthy emotional boundaries.",
+    "Return to a simple question: when was the last time you did something purely for yourself? The answer usually explains everything."
+  ),
+  angel(
+    "777",
+    "777 — Luck, Intuition and the Right Path",
+    "Seven is the number of spirituality: 777 is confirmation that you are heading in the right direction.",
+    "777 usually appears when you have made a difficult but correct decision. It signifies good fortune, but not random luck — the kind prepared by your own conscious choices. It also marks a period of heightened intuition.",
+    "In love, 777 points toward a profound, genuine connection — a sacred bond where you do not need to pretend, perform, or wear an emotional mask.",
+    "Knowledge, preparation, and study pay off now. It is a favorable time for exams, learning, or stepping into an expert role.",
+    "Trust your first instinct. During 777 sightings, intuition is far more precise than overthinking."
+  ),
+  angel(
+    "888",
+    "888 — Abundance and Returned Effort",
+    "Eight is the infinity symbol: 888 means what was sown is now yielding its harvest.",
+    "888 is the number of financial and energetic abundance. It often appears after a long period of disciplined work — when the reward is already on its way. Eight is also cyclical: what you give to the world returns to you in kind.",
+    "In relationships, 888 is all about balanced reciprocity and mutual appreciation — the dynamic of giving and receiving has finally aligned in harmony.",
+    "A raise, a solid contract, or a project that finally pays off. It is a favorable time for important financial decisions.",
+    "Allow yourself to receive what comes your way — many people start diminishing their own worth at the very moment success arrives."
+  ),
+  angel(
+    "999",
+    "999 — Completion and Closing a Chapter",
+    "Nine is the final single digit: 999 means a major chapter is coming to an end.",
+    "999 is the number of completion — and ending here is not a loss, but liberation. It appears when a relationship, job, or lifestyle has exhausted its purpose, even if you are not yet willing to admit it.",
+    "In relationships, 999 often signifies an honest conclusion — either of an old unhealthy dynamic or of the relationship itself.",
+    "A project is reaching its natural end. Dragging it out only occupies space meant for fresh opportunities.",
+    "Finish and close one thing you have been dragging out for months. Space will immediately open up."
+  ),
+  angel(
+    "1010",
+    "1010 and 10:10 — A Fresh Start on Your Path",
+    "1010 combines the initiative of one and the potential of zero: beginning on a clean slate.",
+    "One is beginning, zero is infinite potential. Together they mean that a new stage is not just starting, but aligning directly with your deeper aspirations. 10:10 on the clock often appears right before a decisive choice.",
+    "In love, 1010 is a call to open your heart — postponing your choice out of fear is no longer serving you.",
+    "A promising new role or venture that aligns far more authentically with your core values and life purpose than previous commitments.",
+    "Ask yourself: 'If fear did not exist, what would I do?' — 1010 is pointing directly to that answer."
+  ),
+  angel(
+    "1111",
+    "1111 — Awakening and Alignment",
+    "1111 is the most frequently noticed clock synchronicity — a classic sign of alignment.",
+    "1111 is a quadruple one, representing the maximum energy of beginning. Traditionally called a 'gateway': a moment when the gap between thought and reality narrows. That is why making a wish at 11:11 is one of the most widespread rituals worldwide.",
+    "In love, 1111 is often associated with a fateful meeting or a decisive turning point in a relationship.",
+    "A clear and unmistakable signal for a fresh career direction — especially if you have harbored the idea in secret for a long time.",
+    "When you see 11:11, formulate in one precise sentence what you desire. Clarity is the primary requirement of this number."
+  ),
+  angel(
+    "1212",
+    "1212 and 12:12 — Trusting the Journey",
+    "1212 combines balance and forward motion: take the step, and the rest will fall into place.",
+    "One is initiating, two is patience and trust. 1212 means you are moving toward a new chapter, but you do not need to control every single detail. This number appears especially often to those who over-plan.",
+    "In relationships, 1212 represents a stage of growth — taking a shared step forward is worth far more than waiting for the perfect moment.",
+    "A project that is not yet fully defined is still worth starting. Action will bring the clarity you seek.",
+    "Choose one small step that you can take today. 1212 is about beginning, not waiting for perfection."
+  ),
+  angel(
+    "1234",
+    "1234 — Step-by-Step Progress",
+    "1234 is the number of sequence: everything is in order, simply keep going.",
+    "An ascending sequence represents natural, orderly progress — one step after another, without skipping stages. 1234 often appears when someone feels they are moving too slowly. In truth, the pace is just right.",
+    "Your relationship is developing naturally and organically — trying to rush emotional milestones will only create unnecessary friction.",
+    "Breaking down your big goal into small, concrete milestones is the most effective approach right now.",
+    "Write down the next three steps and execute only the first one today. The rest will follow in due time."
+  ),
 ];
 
 export const ANGEL_EN_BY_SLUG: Record<string, AngelNumberEn> =
   Object.fromEntries(ANGEL_NUMBERS_EN.map((number) => [number.slug, number]));
 
 export const ANGEL_FAQ_EN = [
-  { q: "What are angel numbers?", a: "Angel numbers are repeating or patterned number sequences given symbolic meanings in modern numerology. They are a spiritual or reflective practice, not a scientifically validated communication system." },
-  { q: "Why do I keep seeing the same number?", a: "Selective attention and pattern recognition can make a sequence feel more frequent after it first becomes meaningful. You can still use the moment as a practical prompt to pause and reflect." },
-  { q: "Do angel numbers predict events?", a: "No reliable evidence shows that repeating numbers predict future events. Avoid making financial, medical, legal, or relationship decisions on a number alone." },
+  {
+    q: "What are angel numbers?",
+    a: "Angel numbers are repeating number sequences you notice frequently — on clocks, license plates, or receipts. In numerological tradition, they are viewed as prompts about where you are in life right now. They are not supernatural predictions; they are practical tools for attention and self-reflection.",
+  },
+  {
+    q: "Why do I see repeating numbers on the clock so often?",
+    a: "Partly this is selective attention: once a pattern becomes meaningful, your brain notices and filters it out immediately. Traditional lore adds that you are actively engaging with the theme represented by that number. Both explanations complement each other.",
+  },
+  {
+    q: "What is the difference between an angel number and a life path number?",
+    a: "A life path number is calculated from your birth date and remains constant throughout your life — it describes your core character. An angel number is about the current moment: it shifts depending on the phase and questions you are navigating right now.",
+  },
+  {
+    q: "Is 666 a bad sign?",
+    a: "No. While popular culture gave it a threatening reputation, in numerology six is about family, care, and home. 666 simply points to an imbalance — typically that you are overwhelmed by material concerns or over-giving to others while neglecting yourself.",
+  },
 ];

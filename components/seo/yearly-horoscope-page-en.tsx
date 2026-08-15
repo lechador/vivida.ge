@@ -35,6 +35,21 @@ export function YearlyHoroscopePageEn({ sign, year }: { sign: ZodiacSlug; year: 
         <section className="mt-12 max-w-3xl space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">{content.overview.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</section>
         <section className="mt-10 grid gap-4 sm:grid-cols-2"><MonthCard title="Supportive months" months={content.supportiveMonths} accent={accent} /><MonthCard title="Months for review" months={content.reflectiveMonths} accent="var(--muted-foreground)" /></section>
         {content.sections.map((section) => <section key={section.title} className="mt-12 max-w-3xl"><h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">{section.title}</h2><p className="text-pretty text-base leading-relaxed text-foreground/90">{section.body}</p></section>)}
+        {content.keyDates && content.keyDates.length > 0 && (
+          <section className="mt-12 max-w-3xl rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 sm:p-8">
+            <h2 className="mb-4 text-xl font-semibold tracking-tight sm:text-2xl">
+              Key Astrological Dates in {year}
+            </h2>
+            <div className="space-y-3">
+              {content.keyDates.map((kd) => (
+                <div key={kd.date} className="rounded-xl border border-border/70 bg-background/40 p-3.5 sm:p-4">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-[var(--vivida-cyan)]">{kd.date}</div>
+                  <p className="mt-1 text-sm leading-relaxed text-foreground/85">{kd.note}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
         <section className="mt-14 max-w-3xl rounded-2xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 sm:p-7"><div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Guidance for the year</div><p className="mt-3 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">{content.advice}</p></section>
         <section className="mt-12 max-w-3xl"><h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">Frequently asked questions</h2><div className="space-y-3">{content.faq.map((item) => <details key={item.q} className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 open:bg-card/80 sm:p-5"><summary className="flex cursor-pointer list-none justify-between gap-4 font-medium"><span>{item.q}</span><span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-45">✦</span></summary><p className="mt-3 text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p></details>)}</div></section>
         <ReportPromo className="mt-16" />

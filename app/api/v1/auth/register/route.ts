@@ -8,6 +8,7 @@ import { getClientIp, requireTurnstile } from "@/lib/api/security";
 import { parseBody } from "@/lib/api/validate";
 import { sendVerificationEmail } from "@/lib/email";
 import { enforceAuthRateLimit } from "@/lib/rate-limit";
+import { countryCodeFromHeaders } from "@/lib/residence";
 
 export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
@@ -62,6 +63,7 @@ export async function POST(req: Request) {
       name: body.name,
       email: body.email,
       password: body.password,
+      residenceCountryCode: countryCodeFromHeaders(req.headers),
     });
     if (!result.ok) {
       const status = result.error === "email_taken" ? 409 : 422;

@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { DiscoverCard as Card } from "@/lib/discover";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { VerifiedBadge } from "@/components/profile/verified-badge";
 
 const ELEMENT_EN: Record<string, string> = {
   ცეცხლი: "Fire",
@@ -180,6 +181,7 @@ export function SwipeCard({
           <div className="flex flex-wrap items-end gap-x-2 gap-y-1">
             <h3 className="text-pretty text-2xl font-semibold tracking-tight text-foreground">
               {card.displayName}
+              {card.verified && <VerifiedBadge className="ml-1.5 inline-flex align-middle" />}
               <span className="text-foreground/85">{ageLabel}</span>
             </h3>
           </div>

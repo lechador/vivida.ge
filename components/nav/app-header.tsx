@@ -57,6 +57,8 @@ export async function AppHeader({
   let unreadMessages = 0;
   let balance = 0;
   let locale: UserLocale = "ka";
+  let isPremium = false;
+  let residenceCountryCode: string | null = null;
 
   if (authed) {
     const session = await auth();
@@ -82,6 +84,8 @@ export async function AppHeader({
       unreadMessages = data.unreadMessages;
       balance = bal;
       locale = preferredLocale;
+      isPremium = data.isPremium;
+      residenceCountryCode = data.residenceCountryCode;
     }
   }
 
@@ -134,7 +138,12 @@ export async function AppHeader({
         {userInfo ? (
           <>
             <MobileSearch locale={locale} />
-            <CreditBalanceMenu balance={balance} locale={locale} />
+            <CreditBalanceMenu
+              balance={balance}
+              locale={locale}
+              isPremium={isPremium}
+              countryCode={residenceCountryCode}
+            />
             <NotificationsDropdown
               initial={notifications}
               initialUnread={unread}
@@ -146,6 +155,7 @@ export async function AppHeader({
               image={userInfo.image}
               username={username}
               balance={balance}
+              isPremium={isPremium}
               locale={locale}
             />
           </>

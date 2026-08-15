@@ -1,8 +1,7 @@
-import { and, eq, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
+import { and, eq, isNull, lt, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { profiles, userActivityDays, users } from "@/db/schema";
-import { calculateStreak, type StreakInfo } from "@/lib/streak";
 
 /**
  * Best-effort "user was active today" record.
@@ -61,35 +60,6 @@ export async function recordVisit(userId: string): Promise<void> {
       (err as Error).message
     );
   }
-}
-
-/**
- * The user's daily-ritual streak. An unfinished today does not erase the run:
- * `current` counts back from yesterday until today's ritual is completed.
- */
-export async function getStreak(userId: string): Promise<StreakInfo> {
-  const [profile] = await db
-    .select({ timezone: profiles.timezone })
-    .from(profiles)
-    .where(eq(profiles.userId, userId))
-    .limit(1);
-  const tz = profile?.timezone ?? "UTC";
-  const today = formatLocalDate(new Date(), tz);
-
-  const rows = await db
-    .select({ d: userActivityDays.dateLocal })
-    .from(userActivityDays)
-    .where(
-      and(
-        eq(userActivityDays.userId, userId),
-        isNotNull(userActivityDays.ritualCompletedAt)
-      )
-    );
-
-  return calculateStreak(
-    rows.map((row) => row.d),
-    today
-  );
 }
 
 export function formatLocalDate(d: Date, timezone: string): string {

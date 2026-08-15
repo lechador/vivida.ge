@@ -4,6 +4,7 @@ import Link from "next/link";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { DiscoverCard as Card } from "@/lib/discover";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { VerifiedBadge } from "@/components/profile/verified-badge";
 
 const ELEMENT_EN: Record<string, string> = {
   ცეცხლი: "Fire",
@@ -69,8 +70,9 @@ export function DiscoverCard({
       </div>
 
       <div className="relative min-w-0 flex-1">
-        <div className="truncate text-sm font-semibold tracking-tight sm:text-base">
-          {card.displayName}
+        <div className="flex items-center gap-1 text-sm font-semibold tracking-tight sm:text-base">
+          <span className="truncate">{card.displayName}</span>
+          {card.verified && <VerifiedBadge className="scale-90" />}
         </div>
         <div className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
           <span className="text-foreground/85">

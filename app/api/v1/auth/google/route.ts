@@ -7,6 +7,7 @@ import { ACCESS_TTL_SECONDS, signAccessToken } from "@/lib/api/jwt";
 import { issueRefreshToken } from "@/lib/api/refresh";
 import { ok, fail } from "@/lib/api/respond";
 import { parseBody } from "@/lib/api/validate";
+import { countryCodeFromHeaders } from "@/lib/residence";
 
 export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
@@ -75,6 +76,7 @@ export async function POST(req: Request) {
       email,
       name: typeof payload.name === "string" ? payload.name : null,
       image: typeof payload.picture === "string" ? payload.picture : null,
+      residenceCountryCode: countryCodeFromHeaders(req.headers),
     });
 
     const accessToken = await signAccessToken(user.userId);

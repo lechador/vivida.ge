@@ -50,9 +50,16 @@ export const users = pgTable("user", {
   /** Preferred interface language for authenticated pages. Public SEO routes
    * keep their explicit URL language; this setting controls the signed-in UI. */
   interfaceLanguage: text("interface_language").notNull().default("ka"),
-  /** Preferred voice slug for audio horoscopes (see lib/elevenlabs HOROSCOPE_VOICES).
-   *  NULL → the default voice. Set on first listen / in account settings. */
-  horoscopeVoice: text("horoscope_voice"),
+  /** ISO 3166-1 alpha-2 residence country captured from the registration IP. */
+  residenceCountryCode: text("residence_country_code"),
+  /** User-entered residence city; intentionally blank at registration. */
+  residenceCity: text("residence_city"),
+  /** Stripe customer is kept on the user so canceled subscribers can return. */
+  stripeCustomerId: text("stripe_customer_id").unique(),
+  /** Denormalized entitlement flag maintained only by verified Stripe events. */
+  isPremium: boolean("is_premium").notNull().default(false),
+  /** Last paid entitlement boundary, shown in account/subscription UI. */
+  premiumUntil: timestamp("premium_until", { withTimezone: true }),
   /** Random opaque token used in unsubscribe links. Lazily populated on
    *  first send — see lib/unsubscribe.ts. Unique so a token resolves to
    *  at most one user. */
@@ -156,6 +163,45 @@ export const referrals = pgTable(
 export type CreditAccount = typeof creditAccounts.$inferSelect;
 export type CreditTransaction = typeof creditTransactions.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
+
+/**
+ * Stripe-backed Premium entitlement. One current subscription per user keeps
+ * the app-side access check cheap while Stripe remains the billing authority.
+ */
+export const premiumSubscriptions = pgTable(
+  "premium_subscription",
+  {
+    userId: text("user_id")
+      .primaryKey()
+      .references(() => users.id, { onDelete: "cascade" }),
+    planKey: text("plan_key").notNull(),
+    countryCode: text("country_code").notNull(),
+    stripeSubscriptionId: text("stripe_subscription_id").notNull().unique(),
+    stripePriceId: text("stripe_price_id").notNull(),
+    status: text("status").notNull(),
+    currency: text("currency").notNull(),
+    amountMinor: integer("amount_minor").notNull(),
+    currentPeriodStart: timestamp("current_period_start", {
+      withTimezone: true,
+    }).notNull(),
+    currentPeriodEnd: timestamp("current_period_end", {
+      withTimezone: true,
+    }).notNull(),
+    cancelAtPeriodEnd: boolean("cancel_at_period_end")
+      .notNull()
+      .default(false),
+    canceledAt: timestamp("canceled_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("premium_subscription_status_idx").on(t.status)],
+);
+
+export type PremiumSubscription = typeof premiumSubscriptions.$inferSelect;
 
 export const accounts = pgTable(
   "account",
@@ -1459,10 +1505,9 @@ export const userActivityDays = pgTable(
     firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
-    /** Set only after the user completes the Today ritual. Historical visit
-     *  rows are grandfathered by the rollout migration to preserve streaks. */
+    /** Retired ritual-completion field retained for historical data. */
     ritualCompletedAt: timestamp("ritual_completed_at", { withTimezone: true }),
-    /** 0 = grandfathered visit, 1+ = actual ritual product version. */
+    /** Retired ritual product version retained for historical data. */
     ritualVersion: integer("ritual_version"),
   },
   (t) => [
@@ -1602,7 +1647,7 @@ export const postReactions = pgTable(
  *  - reaction_received   — someone reacted to your post (cap 30/day)
  *  - comment_received    — someone commented on your post (cap 30/day)
  *  - friend_added        — you accepted a friend request (cap 20/day)
- *  - daily_visit         — legacy enum name; now awarded for completing the daily ritual
+ *  - daily_visit         — retired legacy event kind
  *  - profile_completed   — one-shot, on first profile save
  *  - first_post          — one-shot, on the first post you ever publish
  *  - joined              — one-shot, on signup
@@ -1646,7 +1691,7 @@ export const reputationEvents = pgTable(
      *   - reaction_received  → `${postId}:${reactorUserId}`
      *   - comment_received   → commentId
      *   - friend_added       → sorted pair `min(a,b):max(a,b)`
-     *   - daily_visit        → `${userId}:YYYY-MM-DD` after ritual completion
+     *   - daily_visit        → retired legacy event subject
      *   - profile_completed  → `${userId}`
      *   - first_post         → `${userId}`
      *   - joined             → `${userId}`

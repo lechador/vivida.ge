@@ -11,9 +11,11 @@ import { signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { zodiacPairEnglish, type PairRating } from "@/lib/zodiac-pair-en";
 
-const RATING_COLOR: Record<PairRating, string> = {
-  "Natural flow": "oklch(0.78 0.18 305)",
+const RATING_COLOR: Record<string, string> = {
+  Strong: "oklch(0.78 0.18 305)",
   Harmonious: "oklch(0.78 0.16 200)",
+  Challenging: "oklch(0.72 0.18 45)",
+  "Natural flow": "oklch(0.78 0.18 305)",
   "Growth-oriented": "oklch(0.72 0.18 45)",
   "Powerful mirror": "oklch(0.74 0.18 330)",
 };

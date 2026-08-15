@@ -79,10 +79,28 @@ export function ZodiacPlacementPageEn({ kind, sign }: { kind: PlacementKind; sig
           </section>
         ))}
 
+        {copy.famous && copy.famous.length > 0 && (
+          <section className="mt-12 rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 sm:p-8">
+            <h2 className="mb-4 text-xl font-semibold tracking-tight sm:text-2xl">
+              Famous People with {pageName}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {copy.famous.map((person) => (
+                <span
+                  key={person}
+                  className="inline-flex items-center rounded-full border border-border/80 bg-background/50 px-3 py-1 text-xs text-foreground/90"
+                >
+                  ✦ {person}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="mt-12 max-w-3xl">
           <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">Frequently asked questions</h2>
           <div className="space-y-3">
-            {faq.map((item) => (
+            {(copy.faq?.length ? copy.faq : faq).map((item) => (
               <details key={item.q} className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 open:bg-card/80 sm:p-5">
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-medium"><span>{item.q}</span><span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-45">✦</span></summary>
                 <p className="mt-3 text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p>

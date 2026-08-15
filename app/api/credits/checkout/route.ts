@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
-import { CREDIT_PACKS } from "@/lib/credits";
+import { creditPackForCountry } from "@/lib/credits";
+import { getBillingIdentity } from "@/lib/premium";
 import { createCreditCheckoutSession, isStripeConfigured } from "@/lib/stripe";
 import { localeForHost } from "@/lib/i18n/request-locale";
 
@@ -22,7 +23,8 @@ export async function POST(req: Request) {
   }
 
   const body = (await req.json().catch(() => ({}))) as { packId?: unknown };
-  const pack = CREDIT_PACKS.find((p) => p.id === body.packId);
+  const billingUser = await getBillingIdentity(userId);
+  const pack = creditPackForCountry(billingUser?.countryCode, body.packId);
   if (!pack) return NextResponse.json({ error: "bad_pack" }, { status: 400 });
 
   const origin = new URL(req.url).origin;
@@ -35,8 +37,8 @@ export async function POST(req: Request) {
       email: session.user?.email ?? null,
       origin,
       credits: pack.credits,
-      tetri: pack.tetri,
-      gel: pack.gel,
+      amountMinor: pack.amountMinor,
+      currency: pack.currency,
       locale,
     });
     return NextResponse.json({ url: checkout.url });

@@ -3,6 +3,7 @@ import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { creditAccounts, creditTransactions, notifications } from "@/db/schema";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
+import { isPremiumUser } from "@/lib/premium";
 
 /**
  * Credit wallet — the currency that replaced the subscription model. Users earn
@@ -144,6 +145,7 @@ export async function spendCredits(
   opts?: { notify?: boolean }
 ): Promise<boolean> {
   if (amount <= 0) return true;
+  if (await isPremiumUser(userId)) return true;
   const updated = await db
     .update(creditAccounts)
     .set({
@@ -198,6 +200,9 @@ export async function isUnlocked(
   ref: string,
   reason: CreditReason
 ): Promise<boolean> {
+  if (reason.startsWith("spend_") && (await isPremiumUser(userId))) {
+    return true;
+  }
   const [row] = await db
     .select({ id: creditTransactions.id })
     .from(creditTransactions)
@@ -226,6 +231,7 @@ export async function spendOnce(
   reason: CreditReason,
   ref: string
 ): Promise<UnlockResult> {
+  if (await isPremiumUser(userId)) return "already";
   const result = await db.execute<{
     result_status: UnlockResult;
     resulting_balance: number;

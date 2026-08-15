@@ -43,6 +43,69 @@ export type ThematicHoroscopeEnglish = {
   advice: string;
 };
 
+const FINANCE_EN: Record<ZodiacSlug, { focus: string; risk: string; advice: string }> = {
+  aries: {
+    focus: "You grow income through bold initiative, competitive drive, and decisive action. Entrepreneurship and performance-linked compensation suit your nature well.",
+    risk: "Impulsive financial decisions and spending on immediate gratification can easily destabilize your budget.",
+    advice: "Take a 24-hour cooling pause before large discretionary purchases, and automate savings transfers the moment income arrives.",
+  },
+  taurus: {
+    focus: "Stability, enduring quality, and long-term value are your financial bedrock. You preserve and compound carefully built resources with admirable patience.",
+    risk: "An appetite for luxury and premium comfort can sometimes drift into overspending or an excessive reluctance to adapt to new opportunities.",
+    advice: "Pre-allocate a dedicated comfort allowance in your monthly budget, and periodically review your investments with calm detachment.",
+  },
+  gemini: {
+    focus: "Information, agile communication, and skillfully managing multiple revenue streams expand your financial potential.",
+    risk: "Rapidly shifting interests and launching too many ideas simultaneously can scatter your time and capital.",
+    advice: "Commit to one primary financial milestone for 90 consecutive days, keeping incoming new project ideas logged in a separate ideas notebook.",
+  },
+  cancer: {
+    focus: "A deep-seated need for emotional and domestic security fuels a highly responsible long-term savings plan for your household.",
+    risk: "Emotional spending during stressful periods or bailing out loved ones at the expense of your own financial health.",
+    advice: "Establish a robust emergency reserve, and set clear, pre-defined boundaries on personal loans and financial assistance.",
+  },
+  leo: {
+    focus: "Confidence, creative flair, and authentic personal branding help you command premium rates and expand earnings.",
+    risk: "Spending to project status, make a grand impression, or offer lavish gestures can sometimes outpace your actual disposable income.",
+    advice: "Tie major prestige purchases strictly to achieved annual milestones, maintaining a disciplined cap until new revenue is locked in.",
+  },
+  virgo: {
+    focus: "Meticulous attention to detail, analytical rigor, and practical budgeting give you natural financial discipline and clean order.",
+    risk: "Over-analyzing decisions to the point of paralysis, or feeling disproportionate anxiety over small, routine expenses.",
+    advice: "Implement a streamlined automated tracking system, and restrict detailed financial reviews to once a week.",
+  },
+  libra: {
+    focus: "Diplomatic negotiation, collaborative partnerships, and refined aesthetic judgment unlock profitable opportunities.",
+    risk: "Spending excessively to preserve social harmony or avoiding necessary but uncomfortable financial discussions with partners.",
+    advice: "Put all shared expenses and business agreements in writing, establishing clear maximum spending limits on joint ventures.",
+  },
+  scorpio: {
+    focus: "Strategic foresight, investigative research, and managing complex resources give you exceptional financial resilience and leverage.",
+    risk: "A desire for total control or secretive financial habits can undermine mutual trust in partnerships and marriages.",
+    advice: "Map out your multi-year strategy in clear numbers, scheduling regular, transparent check-ins regarding shared accounts.",
+  },
+  sagittarius: {
+    focus: "A broad visionary horizon, higher education, and international perspectives open up expansive, unconventional avenues of revenue.",
+    risk: "Unbounded optimism and heavy travel or adventure expenses can lead you to underestimate downside financial risk.",
+    advice: "Evaluate big ventures using best- and worst-case scenarios, and maintain a dedicated, separate travel fund.",
+  },
+  capricorn: {
+    focus: "Disciplined execution, organizational responsibility, and steadfast long-term vision build durable, compounding wealth over time.",
+    risk: "An exclusive focus on defensive security can needlessly restrict your quality of life or cause you to bypass calculated growth moves.",
+    advice: "Allocate a fixed percentage of income for leisure, health, and skill upgrades alongside your primary savings reserves.",
+  },
+  aquarius: {
+    focus: "Innovation, technology, and unorthodox business models help you discover unique, non-traditional avenues of income.",
+    risk: "Falling in love with abstract concepts while overlooking practical daily operational details, positive cash flow, and market demand.",
+    advice: "Earmark a modest budget for experimental ventures, scaling up investment only after seeing measurable, validated results.",
+  },
+  pisces: {
+    focus: "Sharp intuition, artistic talent, and deep empathy for human needs connect you with meaningful work and rewarding compensation.",
+    risk: "Ambiguous agreements, chronic underpricing of your services, or loose emotional generosity eroding your financial safety.",
+    advice: "Formalize pricing, deliverables, and payment deadlines in written contracts upfront, and automate your monthly savings.",
+  },
+};
+
 export function thematicHoroscopeEnglish(theme: HoroscopeTheme, sign: ZodiacSlug): ThematicHoroscopeEnglish {
   const meta = signMetaBySlug(sign)!;
   const profile = ZODIAC_SIGN_EN[sign];
@@ -71,13 +134,14 @@ export function thematicHoroscopeEnglish(theme: HoroscopeTheme, sign: ZodiacSlug
       advice: `Choose one skill to deepen, one measurable result to own, and one working condition that protects your energy. A good career fit is built through evidence as well as self-knowledge.`,
     };
   }
+  const f = FINANCE_EN[sign];
   return {
     main: [
-      `${name}'s approach to money often reflects its wider ${element.toLowerCase()} style: ${profile.core} These traits can influence earning, spending, saving, and how quickly financial decisions are made.`,
-      `Astrology does not determine income or replace financial planning. For ${name}, the useful reflection is how to apply ${profile.strengths.slice(0, 2).join(" and ").toLowerCase()} to real numbers while preventing ${profile.challenges.slice(0, 2).join(" and ").toLowerCase()} from shaping costly habits.`,
+      `${name}'s approach to money reflects its core strengths and decision pace: ${f.focus}`,
+      `Financial growth does not rely on horoscope superstition, but on conscious daily habits, a clear measurable plan, and disciplined risk management. For ${name}, the key is applying natural strengths while keeping spending risks well managed.`,
     ],
-    focus: `${name}'s financial strengths include ${profile.strengths.slice(0, 3).join(", ").toLowerCase()}, especially when goals are specific and progress is reviewed consistently.`,
-    watch: `Watch for ${profile.challenges.slice(0, 2).join(" and ").toLowerCase()} in spending, negotiation, or risk decisions.`,
-    advice: `Use a written budget, automate a realistic reserve, and pause before major commitments. Base important financial decisions on evidence and qualified advice, not a horoscope alone.`,
+    focus: f.focus,
+    watch: f.risk,
+    advice: f.advice,
   };
 }

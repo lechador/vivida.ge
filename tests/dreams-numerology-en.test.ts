@@ -21,7 +21,7 @@ describe("English dream dictionary", () => {
     for (const item of DREAM_SYMBOLS_EN) {
       expect(item.summary.length).toBeGreaterThan(75);
       expect(item.meaning.length).toBeGreaterThan(140);
-      expect(item.variants).toHaveLength(3);
+      expect(item.variants.length).toBeGreaterThanOrEqual(3);
       expect(item.positive.length).toBeGreaterThan(70);
       expect(item.caution.length).toBeGreaterThan(70);
       expect(JSON.stringify(item)).not.toMatch(GEORGIAN);

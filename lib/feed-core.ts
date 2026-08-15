@@ -25,6 +25,7 @@ export type FeedAuthor = {
   image: string | null;
   username: string | null;
   displayName: string | null;
+  verified: boolean;
 };
 
 export type FeedReactionCounts = Record<PostReactionKind, number>;
@@ -61,6 +62,8 @@ const POST_SELECT = {
   authorImage: users.image,
   authorUsername: profiles.username,
   authorDisplayName: profiles.displayName,
+  authorIsPremium: users.isPremium,
+  authorPremiumUntil: users.premiumUntil,
   authorDob: profiles.dateOfBirth,
 };
 
@@ -74,6 +77,8 @@ type PostRow = {
   authorImage: string | null;
   authorUsername: string | null;
   authorDisplayName: string | null;
+  authorIsPremium: boolean;
+  authorPremiumUntil: Date | null;
   authorDob: string | null;
 };
 
@@ -170,6 +175,11 @@ async function enrichPostRows(
       image: photos.get(r.authorId) ?? r.authorImage,
       username: r.authorUsername,
       displayName: r.authorDisplayName,
+      verified: Boolean(
+        r.authorIsPremium &&
+          r.authorPremiumUntil &&
+          r.authorPremiumUntil.getTime() > Date.now(),
+      ),
     },
     authorSunSign: sunSignFromDob(r.authorDob),
     authorReputation: reputations.get(r.authorId) ?? 0,

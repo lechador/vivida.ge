@@ -137,7 +137,7 @@ const TERMS_SECTIONS: Section[] = [
   {
     title: "4. Free features, credits, and payments",
     paragraphs: [
-      "Vivida provides free features and additional actions available through credits. New accounts receive starting credits; more may be earned through activities described in the service or purchased through a one-time payment. Vivida does not currently use an automatically renewing monthly subscription.",
+      "Vivida provides free features, one-time credit packs, and country-specific Vivida PRO plans. PRO is an automatically renewing subscription unless you cancel it; its price, billing interval, included access, and renewal date are shown before purchase and on the subscription page.",
       "The credit cost of an action and the price of a credit pack are shown before confirmation. Free limits, bonuses, prices, and available features may change. We will give advance notice of material changes. Mandatory payment and refund rights remain governed by applicable law.",
     ],
   },

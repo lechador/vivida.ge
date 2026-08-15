@@ -16,6 +16,7 @@ import { CATEGORY_LABEL_EN, overallVerdictEn } from "@/lib/synastry-en";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { SpotlightMatch } from "@/lib/discover";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { VerifiedBadge } from "@/components/profile/verified-badge";
 
 const ELEMENT_HEX: Record<string, string> = {
   ცეცხლი: "oklch(0.7 0.22 30)",
@@ -120,6 +121,7 @@ export function SpotlightCard({
               <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
                 {card.displayName}
               </span>
+              {card.verified && <VerifiedBadge className="ml-1.5 inline-flex align-middle" />}
             </h2>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground sm:text-sm">
               <span className="text-foreground/85">

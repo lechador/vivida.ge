@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CreditCard, Loader2, Plus, Sparkles } from "lucide-react";
+import { ArrowRight, CreditCard, Crown, Loader2, Plus, Sparkles } from "lucide-react";
 
-import { CREDIT_PACKS } from "@/lib/credits-config";
+import {
+  creditPacksForCountry,
+  formatBillingAmount,
+} from "@/lib/credits-config";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import {
   DropdownMenu,
@@ -19,13 +22,31 @@ import {
 export function CreditBalanceMenu({
   balance,
   locale,
+  isPremium = false,
+  countryCode,
 }: {
   balance: number;
   locale: UserLocale;
+  isPremium?: boolean;
+  countryCode?: string | null;
 }) {
   const [pending, setPending] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const en = locale === "en";
+  const packs = creditPacksForCountry(countryCode);
+
+  if (isPremium) {
+    return (
+      <Link
+        href="/subscription"
+        aria-label={en ? "Open PRO subscription" : "PRO გამოწერის გახსნა"}
+        className="inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-gold)]/45 bg-[var(--vivida-gold)]/12 px-3 py-1 text-sm font-bold tracking-wide text-[var(--vivida-gold)] transition-colors hover:bg-[var(--vivida-gold)]/20"
+      >
+        <Crown className="size-3.5" />
+        PRO
+      </Link>
+    );
+  }
 
   async function buy(packId: string) {
     setPending(packId);
@@ -82,7 +103,7 @@ export function CreditBalanceMenu({
         </div>
 
         <div className="grid grid-cols-3 gap-2">
-          {CREDIT_PACKS.map((pack, index) => (
+          {packs.map((pack, index) => (
             <button
               key={pack.id}
               type="button"
@@ -103,7 +124,9 @@ export function CreditBalanceMenu({
               <span className="text-[10px] text-muted-foreground">
                 {en ? "credits" : "კრედიტი"}
               </span>
-              <span className="mt-1 text-sm font-semibold tabular-nums">{pack.gel} ₾</span>
+              <span className="mt-1 text-sm font-semibold tabular-nums">
+                {formatBillingAmount(pack.amountMinor, pack.currency, locale)}
+              </span>
             </button>
           ))}
         </div>
@@ -118,7 +141,7 @@ export function CreditBalanceMenu({
           href="/credits"
           className="mt-2 flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent/15 hover:text-foreground"
         >
-          {en ? "Credits, rewards and ritual streak" : "კრედიტები, ბონუსები და რიტუალის სერია"}
+          {en ? "Credits and rewards" : "კრედიტები და ბონუსები"}
           <ArrowRight className="size-3.5" />
         </Link>
       </DropdownMenuContent>

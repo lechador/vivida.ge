@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, isNull } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
 
 import { db } from "@/db";
@@ -102,6 +102,7 @@ export async function registerUser(input: {
   email: string;
   password: string;
   interfaceLanguage?: "ka" | "en";
+  residenceCountryCode?: string | null;
 }): Promise<RegisterResult> {
   const name = input.name.trim();
   const email = normalizeEmail(input.email);
@@ -118,6 +119,7 @@ export async function registerUser(input: {
       id: users.id,
       emailVerified: users.emailVerified,
       passwordHash: users.passwordHash,
+      residenceCountryCode: users.residenceCountryCode,
     })
     .from(users)
     .where(eq(users.email, email))
@@ -143,6 +145,9 @@ export async function registerUser(input: {
         ...(input.interfaceLanguage
           ? { interfaceLanguage: input.interfaceLanguage }
           : {}),
+        ...(!existing.residenceCountryCode && input.residenceCountryCode
+          ? { residenceCountryCode: input.residenceCountryCode }
+          : {}),
       })
       .where(eq(users.id, existing.id));
     await awardJoinedReputation(existing.id);
@@ -164,6 +169,7 @@ export async function registerUser(input: {
       email,
       passwordHash,
       interfaceLanguage: input.interfaceLanguage ?? "ka",
+      residenceCountryCode: input.residenceCountryCode ?? null,
     })
     .returning({ id: users.id, email: users.email, name: users.name });
   if (!created) return { ok: false, error: "failed" };
@@ -213,6 +219,7 @@ export async function findOrCreateOAuthUser(input: {
   email: string;
   name: string | null;
   image: string | null;
+  residenceCountryCode?: string | null;
 }): Promise<OAuthUser> {
   const email = normalizeEmail(input.email);
 
@@ -228,6 +235,17 @@ export async function findOrCreateOAuthUser(input: {
     .limit(1);
 
   if (existing) {
+    if (input.residenceCountryCode) {
+      await db
+        .update(users)
+        .set({ residenceCountryCode: input.residenceCountryCode })
+        .where(
+          and(
+            eq(users.id, existing.id),
+            isNull(users.residenceCountryCode),
+          ),
+        );
+    }
     return {
       userId: existing.id,
       email: existing.email!,
@@ -243,6 +261,7 @@ export async function findOrCreateOAuthUser(input: {
       name: input.name,
       image: input.image,
       emailVerified: new Date(),
+      residenceCountryCode: input.residenceCountryCode ?? null,
     })
     .returning({
       id: users.id,

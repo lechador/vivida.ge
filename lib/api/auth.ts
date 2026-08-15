@@ -49,7 +49,6 @@ export async function requireMobileUser(req: Request): Promise<PublicUser> {
   }
 
   // Best-effort admin activity record, mirroring the website's requireUser().
-  // Ritual completion and its streak are recorded by /api/v1/me/ritual.
   after(() => recordVisit(userId));
 
   return toPublicUser(user);

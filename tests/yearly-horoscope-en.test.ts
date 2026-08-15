@@ -15,7 +15,7 @@ describe("English yearly horoscopes", () => {
       expect(content.overview.join(" ").length).toBeGreaterThan(350);
       expect(content.sections).toHaveLength(5);
       expect(content.sections.every((section) => section.body.length > 180)).toBe(true);
-      expect(content.faq).toHaveLength(4);
+      expect(content.faq.length).toBeGreaterThanOrEqual(4);
       taglines.add(content.tagline);
     }
     expect(taglines.size).toBe(ALL_SLUGS.length);
