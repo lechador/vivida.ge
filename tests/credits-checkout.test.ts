@@ -70,7 +70,7 @@ describe("POST /api/credits/checkout", () => {
     await expect(response.json()).resolves.toEqual({
       url: "https://checkout.stripe.test/1",
       eventId: "cs_test_1:initiate_checkout",
-      value: 10,
+      value: 6.9,
       currency: "GEL",
       contentId: "credits_30",
     });
@@ -79,7 +79,7 @@ describe("POST /api/credits/checkout", () => {
       email: "user@example.com",
       origin: "https://vivida.ge",
       credits: 30,
-      amountMinor: 1000,
+      amountMinor: 690,
       currency: "gel",
       locale: "ka",
       trackingMetadata: { tracking_consent: "denied" },
@@ -97,7 +97,7 @@ describe("POST /api/credits/checkout", () => {
 
     expect(response.status).toBe(200);
     expect(mocks.createCheckout).toHaveBeenCalledWith(
-      expect.objectContaining({ locale: "en", credits: 45, amountMinor: 2000, currency: "gel" }),
+      expect.objectContaining({ locale: "en", credits: 75, amountMinor: 1490, currency: "gel" }),
     );
   });
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { headers } from "next/headers";
 import { Crown, Sparkles } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
@@ -13,6 +14,7 @@ import { CreditEarnInfo } from "@/components/credits/earn-info";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 import { premiumPlanForCountry } from "@/lib/billing-config";
+import { countryCodeFromHeaders, setResidenceCountryIfMissing } from "@/lib/residence";
 import { PremiumPlanCard } from "@/components/subscription/premium-plan-card";
 import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
@@ -35,12 +37,21 @@ export default async function CreditsPage() {
   const locale = await getRequestLocale();
   const en = locale === "en";
   const user = await requireUser();
-  const [balance, ref, identity, premium] = await Promise.all([
+  const [balance, ref, storedIdentity, premium] = await Promise.all([
     getBalance(user.id),
     getReferralStats(user.id),
     getBillingIdentity(user.id),
     isPremiumUser(user.id),
   ]);
+  // Accounts created before residence tracking have no country, which would
+  // hide PRO and fall the packs back to GEL by luck rather than by geo. Same
+  // one-time backfill /subscription does.
+  let identity = storedIdentity;
+  if (identity && !identity.countryCode) {
+    const detected = countryCodeFromHeaders(await headers());
+    await setResidenceCountryIfMissing(user.id, detected);
+    identity = { ...identity, countryCode: detected };
+  }
   const link = `${SITE_URL[locale]}/?ref=${ref.code}`;
   const premiumPlan = premiumPlanForCountry(identity?.countryCode);
 

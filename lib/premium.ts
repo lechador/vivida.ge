@@ -86,55 +86,45 @@ export async function syncPremiumSubscription(
   const periodEnd = new Date(item.current_period_end * 1000);
   const active = statusHasPremiumAccess(subscription.status);
 
-  await db.transaction(async (tx) => {
-    await tx
-      .insert(premiumSubscriptions)
-      .values({
-        userId,
-        planKey,
-        countryCode,
-        stripeSubscriptionId: subscription.id,
-        stripePriceId: price.id,
-        status: subscription.status,
-        currency: price.currency,
-        amountMinor,
-        currentPeriodStart: periodStart,
-        currentPeriodEnd: periodEnd,
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        canceledAt: subscription.canceled_at
-          ? new Date(subscription.canceled_at * 1000)
-          : null,
-        updatedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: premiumSubscriptions.userId,
-        set: {
-          planKey,
-          countryCode,
-          stripeSubscriptionId: subscription.id,
-          stripePriceId: price.id,
-          status: subscription.status,
-          currency: price.currency,
-          amountMinor,
-          currentPeriodStart: periodStart,
-          currentPeriodEnd: periodEnd,
-          cancelAtPeriodEnd: subscription.cancel_at_period_end,
-          canceledAt: subscription.canceled_at
-            ? new Date(subscription.canceled_at * 1000)
-            : null,
-          updatedAt: new Date(),
-        },
-      });
+  // Two sequential writes rather than a transaction: production runs the
+  // neon-http driver, which throws "No transactions support in neon-http
+  // driver" the moment db.transaction() is called — so every PRO checkout
+  // failed to entitle its buyer in prod while CI (node-postgres) stayed green.
+  // Both statements are idempotent, and any throw here propagates to the
+  // webhook route, which answers 500 so Stripe redelivers until both land.
+  const record = {
+    planKey,
+    countryCode,
+    stripeSubscriptionId: subscription.id,
+    stripePriceId: price.id,
+    status: subscription.status,
+    currency: price.currency,
+    amountMinor,
+    currentPeriodStart: periodStart,
+    currentPeriodEnd: periodEnd,
+    cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    canceledAt: subscription.canceled_at
+      ? new Date(subscription.canceled_at * 1000)
+      : null,
+    updatedAt: new Date(),
+  };
 
-    await tx
-      .update(users)
-      .set({
-        ...(customerId ? { stripeCustomerId: customerId } : {}),
-        isPremium: active,
-        premiumUntil: periodEnd,
-      })
-      .where(eq(users.id, userId));
-  });
+  await db
+    .insert(premiumSubscriptions)
+    .values({ userId, ...record })
+    .onConflictDoUpdate({
+      target: premiumSubscriptions.userId,
+      set: record,
+    });
+
+  await db
+    .update(users)
+    .set({
+      ...(customerId ? { stripeCustomerId: customerId } : {}),
+      isPremium: active,
+      premiumUntil: periodEnd,
+    })
+    .where(eq(users.id, userId));
 
   invalidateHeaderForUser(userId);
   return userId;

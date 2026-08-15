@@ -10,7 +10,7 @@
  * Country catalogues are server-owned; clients send only stable product keys.
  */
 import Stripe from "stripe";
-import type { PremiumPlan } from "@/lib/billing-config";
+import { formatBillingAmount, type PremiumPlan } from "@/lib/billing-config";
 
 let _stripe: Stripe | null = null;
 
@@ -105,10 +105,9 @@ export async function createCreditCheckoutSession(opts: {
     trackingMetadata = {},
   } = opts;
   const en = locale === "en";
-  const formatted = new Intl.NumberFormat(en ? "en-GB" : "ka-GE", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(amountMinor / 100);
+  // Same formatter the top-up card uses, so the price on the button and the
+  // price on the Stripe page are written identically.
+  const formatted = formatBillingAmount(amountMinor, currency, locale);
   return stripe().checkout.sessions.create({
     mode: "payment",
     customer_email: email ?? undefined,
