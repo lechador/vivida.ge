@@ -68,12 +68,23 @@ test.describe("public smoke flows", () => {
         name: /Your birth chart, made more understandable/i,
       })
     ).toBeVisible();
+    // Since vividaastro.com launched, the public English URL is the clean
+    // /natal-chart; next.config.ts rewrites it onto the internal /en tree on
+    // the English hosts. Asserting the clean href is what guards the contract
+    // — a regression to an internal /en/* link would ship the wrong URL into
+    // every English page's markup.
     const natalGuideLink = page.getByRole("link", {
       name: /Start with your natal chart/i,
     });
-    await expect(natalGuideLink).toHaveAttribute("href", "/en/natal-chart");
-    await natalGuideLink.click();
-    await page.waitForURL("**/en/natal-chart");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(natalGuideLink).toHaveAttribute("href", "/natal-chart");
+
+    // The link can't be *followed* here: that rewrite is host-scoped, and the
+    // suite runs against 127.0.0.1, where /natal-chart has no route at all.
+    // Visit the internal path the rewrite targets to prove the page it
+    // resolves to actually renders.
+    await page.goto("/en/natal-chart");
+    await expect(
+      page.getByRole("heading", { level: 1, name: /birth chart/i }),
+    ).toBeVisible();
   });
 });
