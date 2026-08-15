@@ -6,8 +6,13 @@ import type {
 } from "@/db/schema";
 import { aspectKey } from "@/lib/aspects";
 import { computeElementBalance, type Element } from "@/lib/elements";
-import { houseDef } from "@/lib/houses";
+import { houseDef, HOUSE_NUMBERS } from "@/lib/houses";
 import { bodyMeta, signByIndex } from "@/lib/zodiac";
+import {
+  getLibraryEntryEn,
+  getHouseLibraryEntryEn,
+  getAspectLibraryEntryEn,
+} from "@/lib/natal-library-en";
 
 const ELEMENT_EN: Record<Element, string> = {
   ცეცხლი: "fire",
@@ -60,7 +65,7 @@ function bodyName(key: string): string {
   return bodyMeta(key)?.labelEn ?? key[0].toUpperCase() + key.slice(1);
 }
 
-function placementText(
+function fallbackPlacementText(
   key: string,
   point: PointJson,
   options: { role?: string; includeHouse?: boolean } = {},
@@ -82,7 +87,7 @@ function placementText(
   return text;
 }
 
-function aspectText(aspect: NatalAspectJson): string {
+function fallbackAspectText(aspect: NatalAspectJson): string {
   const a = bodyMeta(aspect.a);
   const b = bodyMeta(aspect.b);
   const tightness =
@@ -96,9 +101,8 @@ function aspectText(aspect: NatalAspectJson): string {
 }
 
 /**
- * Complete English interpretation generated from the chart itself.
- * This keeps the international experience independent from Georgian text
- * already cached in the database while preserving exact chart positions.
+ * Complete English interpretation generated from the chart itself using the
+ * translated natal interpretation library (Big Three, planets, houses, aspects).
  */
 export function buildEnglishChartInterpretation(
   chart: NatalChartJson,
@@ -112,6 +116,25 @@ export function buildEnglishChartInterpretation(
   const moonSign = signByIndex(moon.signIndex);
   const ascSign = signByIndex(asc.signIndex);
 
+  // Big Three with full multi-paragraph English prose
+  const sunText =
+    getLibraryEntryEn("sun", sunSign.key) ??
+    fallbackPlacementText("sun", sun, {
+      role: "identity, vitality and the direction of growth",
+    });
+  const moonText =
+    getLibraryEntryEn("moon", moonSign.key) ??
+    fallbackPlacementText("moon", moon, {
+      role: "emotional needs, instincts and the way you restore yourself",
+    });
+  const ascText =
+    getLibraryEntryEn("ascendant", ascSign.key) ??
+    fallbackPlacementText("ascendant", asc, {
+      role: "your first response to life and the style others initially meet",
+      includeHouse: false,
+    });
+
+  // 8 Planets with full multi-paragraph English prose
   const planets: Record<string, string> = {};
   for (const key of [
     "mercury",
@@ -124,32 +147,51 @@ export function buildEnglishChartInterpretation(
     "pluto",
   ]) {
     const point = chart.bodies[key];
-    if (point) planets[key] = placementText(key, point);
+    if (point) {
+      const sign = signByIndex(point.signIndex);
+      planets[key] =
+        getLibraryEntryEn(key, sign.key) ?? fallbackPlacementText(key, point);
+    }
   }
 
-  const occupants = new Map<number, string[]>();
+  // Houses composed of Cusp Sign + Occupant Planets (multi-paragraph)
+  const occupantsByHouse = new Map<number, string[]>();
   for (const [key, point] of Object.entries(chart.bodies)) {
     if (!point.house) continue;
-    const list = occupants.get(point.house) ?? [];
-    list.push(bodyName(key));
-    occupants.set(point.house, list);
+    const list = occupantsByHouse.get(point.house) ?? [];
+    list.push(key);
+    occupantsByHouse.set(point.house, list);
   }
 
   const houses: Record<string, string> = {};
-  for (const cusp of chart.houses) {
-    const def = houseDef(cusp.number);
+  for (const n of HOUSE_NUMBERS) {
+    const cusp = chart.houses.find((h) => h.number === n);
+    if (!cusp) continue;
     const sign = signByIndex(cusp.signIndex);
-    const present = occupants.get(cusp.number) ?? [];
-    houses[String(cusp.number)] =
-      `Your ${def.labelEn} begins in ${sign.labelEn}, bringing a ${ELEMENT_STYLE[sign.element]} approach to ${def.themeEn.toLowerCase()}. ${def.meaningEn}` +
-      (present.length > 0
-        ? ` ${present.join(", ")} ${present.length === 1 ? "is" : "are"} placed here, making this area especially active and personally significant.`
-        : " With no natal planets here, this area is still meaningful; its cusp sign describes how you tend to approach it.");
+    const cuspBody = getHouseLibraryEntryEn("cusp", n, sign.key);
+    const occupantBodies = (occupantsByHouse.get(n) ?? [])
+      .map((planet) => getHouseLibraryEntryEn("occupant", n, planet))
+      .filter((b): b is string => Boolean(b));
+
+    if (cuspBody) {
+      houses[String(n)] = [cuspBody, ...occupantBodies].join("\n\n");
+    } else {
+      const def = houseDef(n);
+      const presentNames = (occupantsByHouse.get(n) ?? []).map(bodyName);
+      houses[String(n)] =
+        `Your ${def.labelEn} begins in ${sign.labelEn}, bringing a ${ELEMENT_STYLE[sign.element]} approach to ${def.themeEn.toLowerCase()}. ${def.meaningEn}` +
+        (presentNames.length > 0
+          ? ` ${presentNames.join(", ")} ${presentNames.length === 1 ? "is" : "are"} placed here, making this area especially active and personally significant.`
+          : " With no natal planets here, this area is still meaningful; its cusp sign describes how you tend to approach it.");
+    }
   }
 
+  // Aspects with full multi-paragraph English prose
   const aspects: Record<string, string> = {};
   for (const aspect of chart.aspects ?? []) {
-    aspects[aspectKey(aspect.a, aspect.b, aspect.kind)] = aspectText(aspect);
+    const key = aspectKey(aspect.a, aspect.b, aspect.kind);
+    const aspectBody = getAspectLibraryEntryEn(aspect.a, aspect.b, aspect.kind);
+    aspects[key] = aspectBody ?? fallbackAspectText(aspect);
   }
 
   const tightest = [...(chart.aspects ?? [])].sort((a, b) => a.orb - b.orb)[0];
@@ -164,9 +206,10 @@ export function buildEnglishChartInterpretation(
     },
   ];
   if (tightest) {
+    const aspectBody = getAspectLibraryEntryEn(tightest.a, tightest.b, tightest.kind);
     highlights.push({
       title: `${bodyName(tightest.a)} ${ASPECT_EN[tightest.kind]} ${bodyName(tightest.b)}`,
-      body: aspectText(tightest),
+      body: aspectBody ? aspectBody.slice(0, 320) + "..." : fallbackAspectText(tightest),
     });
   } else {
     highlights.push({
@@ -179,16 +222,9 @@ export function buildEnglishChartInterpretation(
     summary: `Your chart combines a ${sunSign.labelEn} Sun, ${moonSign.labelEn} Moon and ${ascSign.labelEn} Ascendant. The Sun describes the direction in which you become more fully yourself, the Moon shows what restores emotional safety, and the Ascendant shapes how you enter situations and begin new chapters. ${ELEMENT_EN[dominant][0].toUpperCase() + ELEMENT_EN[dominant].slice(1)} is the strongest element in the weighted chart, giving the whole pattern a ${ELEMENT_STYLE[dominant]} tone. Read these placements as a system: no single sign defines you on its own.`,
     highlights,
     bigThree: {
-      sun: placementText("sun", sun, {
-        role: "identity, vitality and the direction of growth",
-      }),
-      moon: placementText("moon", moon, {
-        role: "emotional needs, instincts and the way you restore yourself",
-      }),
-      ascendant: placementText("ascendant", asc, {
-        role: "your first response to life and the style others initially meet",
-        includeHouse: false,
-      }),
+      sun: sunText,
+      moon: moonText,
+      ascendant: ascText,
     },
     planets,
     houses,

@@ -43,7 +43,9 @@ describe("buildEnglishChartInterpretation", () => {
     const serialized = JSON.stringify(result);
 
     expect(result.summary).toContain("Aries Sun");
-    expect(result.bigThree?.moon).toContain("Moon in Gemini");
+    expect(result.bigThree?.moon?.length).toBeGreaterThan(200);
+    expect(result.bigThree?.sun?.length).toBeGreaterThan(200);
+    expect(result.bigThree?.ascendant?.length).toBeGreaterThan(200);
     expect(Object.keys(result.planets ?? {})).toHaveLength(8);
     expect(Object.keys(result.houses ?? {})).toHaveLength(12);
     expect(Object.keys(result.aspects ?? {})).toEqual(["moon-sun-sextile"]);

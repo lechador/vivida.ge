@@ -13,8 +13,6 @@
 
 import { inArray } from "drizzle-orm";
 
-import { db } from "@/db";
-import { synastryInterpretationLibrary } from "@/db/schema";
 import {
   bodyLabel,
   synastryAspectKey,
@@ -83,6 +81,22 @@ export function allSynastryOverlayCombos(): SynastryOverlayCombo[] {
   return out;
 }
 
+import synastryLibEn from "./seo/synastry-library-en.json";
+
+/**
+ * Batched read for English: Map of key → English text from pre-generated JSON.
+ */
+export function getSynastryLibraryEntriesEn(
+  keys: string[]
+): Map<string, string> {
+  const dict = synastryLibEn as Record<string, string>;
+  const out = new Map<string, string>();
+  for (const k of keys) {
+    if (dict[k]) out.set(k, dict[k]);
+  }
+  return out;
+}
+
 /**
  * Batched read: Map of key → Georgian text for the requested keys. Pure read,
  * never generates. Resilient: if the table doesn't exist yet (migration not
@@ -92,8 +106,10 @@ export function allSynastryOverlayCombos(): SynastryOverlayCombo[] {
 export async function getSynastryLibraryEntries(
   keys: string[]
 ): Promise<Map<string, string>> {
-  if (keys.length === 0) return new Map();
+  if (keys.length === 0 || !process.env.DATABASE_URL) return new Map();
   try {
+    const { db } = await import("@/db");
+    const { synastryInterpretationLibrary } = await import("@/db/schema");
     const rows = await db
       .select({
         key: synastryInterpretationLibrary.key,
@@ -113,14 +129,21 @@ export async function getSynastryLibraryEntries(
  * looks them up. Returns a plain object so it can cross the server→client
  * boundary as a prop.
  */
-export async function getSynastryInterpretationsFor(result: {
-  topAspects: { a: string; b: string; kind: AspectKind }[];
-  breakdown: { topOverlays: { body: string; house: number }[] };
-}): Promise<Record<string, string>> {
+export async function getSynastryInterpretationsFor(
+  result: {
+    topAspects: { a: string; b: string; kind: AspectKind }[];
+    breakdown: { topOverlays: { body: string; house: number }[] };
+  },
+  locale: "ka" | "en" = "ka"
+): Promise<Record<string, string>> {
   const keys = [
     ...result.topAspects.map((x) => synastryAspectKey(x.a, x.b, x.kind)),
     ...result.breakdown.topOverlays.map((o) => synastryOverlayKey(o.body, o.house)),
   ];
+  if (locale === "en") {
+    const map = getSynastryLibraryEntriesEn([...new Set(keys)]);
+    return Object.fromEntries(map);
+  }
   const map = await getSynastryLibraryEntries([...new Set(keys)]);
   return Object.fromEntries(map);
 }

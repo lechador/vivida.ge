@@ -191,9 +191,7 @@ export default async function PublicProfilePage({
     const viewerChart = await ensureChartFor(viewerId);
     if (viewerChart) {
       synastry = computeSynastry(viewerChart.data, ownerChart.data);
-      if (!en) {
-        synastryTexts = await getSynastryInterpretationsFor(synastry);
-      }
+      synastryTexts = await getSynastryInterpretationsFor(synastry, locale);
       viewerName = session?.user?.name?.split(" ")[0] ?? (en ? "You" : "შენ");
       const viewerSunIdx = viewerChart.data?.bodies?.sun?.signIndex;
       if (typeof viewerSunIdx === "number") {

@@ -140,7 +140,7 @@ export default async function SynastryDetailPage({
   // Cheap deterministic compute on every visit — keeps the result fresh
   // without a cache while we tune scoring.
   const synastry = computeSynastry(viewerChart.data, partner.chart);
-  const synastryTexts = en ? {} : await getSynastryInterpretationsFor(synastry);
+  const synastryTexts = await getSynastryInterpretationsFor(synastry, locale);
 
   // Ensure AI interpretation exists (lazy generation — first visit pays
   // the Gemini call, subsequent visits read the cached row).

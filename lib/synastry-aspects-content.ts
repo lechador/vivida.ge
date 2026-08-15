@@ -13,6 +13,7 @@
  */
 
 import rawContent from "./seo/synastry-aspects.json";
+import rawContentEn from "./seo/synastry-aspects-en.json";
 import type { AspectKind } from "./aspects";
 
 export type AspectDetailContent = {
@@ -60,13 +61,16 @@ export function aspectDetailKey(
 }
 
 const CONTENT = rawContent as Record<string, AspectDetailContent>;
+const CONTENT_EN = rawContentEn as Record<string, AspectDetailContent>;
 
 export function aspectDetailContent(
   kind: AspectKind,
   a: string,
-  b: string
+  b: string,
+  locale: "ka" | "en" = "ka"
 ): AspectDetailContent | null {
-  return CONTENT[aspectDetailKey(kind, a, b)] ?? null;
+  const table = locale === "en" ? CONTENT_EN : CONTENT;
+  return table[aspectDetailKey(kind, a, b)] ?? null;
 }
 
 /** All keys present in the generated JSON. Useful for the generator script. */

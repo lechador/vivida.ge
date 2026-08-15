@@ -101,7 +101,7 @@ export function SynastryDisplay({
   const verdict = en
     ? overallVerdictEn(result.overall)
     : overallVerdict(result.overall);
-  const narrative = overallNarrative(result.overall);
+  const narrative = overallNarrative(result.overall, locale);
   const { strengths, growth } = splitByValence(result.topAspects);
   const [activeAspect, setActiveAspect] = useState<SynastryAspect | null>(null);
 
@@ -211,7 +211,7 @@ export function SynastryDisplay({
                       </span>
                     </div>
                     <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-foreground/80 sm:line-clamp-1 sm:text-[13px]">
-                      {narrateCategory(cat as SynastryCategory, score)}
+                      {narrateCategory(cat as SynastryCategory, score, locale)}
                     </p>
                     <div className="relative mt-2 h-1 overflow-hidden rounded-full bg-card/60">
                       <motion.div
@@ -399,7 +399,7 @@ function AspectRow({
                 : "mt-0.5 text-xs leading-relaxed text-foreground/80"
             }
           >
-            {text ?? describeAspect(aspect)}
+            {text ?? describeAspect(aspect, locale)}
           </div>
           <div
             className="mt-1.5 text-[11px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
@@ -603,7 +603,7 @@ function AspectDialog({
     );
   }
 
-  const breakdown = aspectBreakdown(aspect);
+  const breakdown = aspectBreakdown(aspect, locale);
   const en = locale === "en";
   const valence = aspectValence(aspect.kind);
   const accent =

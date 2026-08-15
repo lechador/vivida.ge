@@ -17,6 +17,13 @@
 import type { AspectKind } from "./aspects";
 import { aspectDetailContent } from "./synastry-aspects-content";
 import type { SynastryAspect, SynastryCategory } from "./synastry";
+import {
+  BODY_LABEL_EN,
+  categoryNarrativeEn,
+  describeAspectEn,
+  overallNarrativeEn,
+} from "./synastry-en";
+import type { UserLocale } from "./i18n/user-locale";
 
 /**
  * Keys into the pre-generated synastry interpretation library
@@ -102,6 +109,35 @@ const BODY_SYN_DESC: Record<string, string> = {
   chiron: "შენი მგრძნობიარე ადგილი — სადაც ცემო და სადაც კურნავ",
 };
 
+const BODY_SYN_DESC_EN: Record<string, string> = {
+  sun: "Your core identity — who you are at the center of life",
+  moon: "Your emotional world — how you feel and what makes you feel safe",
+  mercury: "How you think, communicate, and share ideas",
+  venus: "What you value, who you love, and how you express affection",
+  mars: "How you take action, assert yourself, and ignite passion",
+  jupiter: "What expands your horizons and what you learn together",
+  saturn: "What teaches commitment and what you build for the long term",
+  uranus: "What liberates you and brings sudden breakthroughs",
+  neptune: "What you dream of and feel deeper than words",
+  pluto: "What transforms you fundamentally and dissolves old patterns",
+  ascendant: "How you present yourself and meet the world",
+  midheaven: "Your direction, shared purpose, and life goals",
+  chiron: "Your tender spot — where vulnerability becomes healing",
+};
+
+const ASPECT_MEANING_EN: Record<AspectKind, string> = {
+  conjunction:
+    "Conjunction — a union of two energies. They blend together into a concentrated, potent focal point in the relationship.",
+  trine:
+    "Trine — a harmonious, natural flow. Energies support one another easily and circulate without strain or resistance.",
+  sextile:
+    "Sextile — friendly cooperation and supportive opportunities that nourish shared growth.",
+  square:
+    "Square — dynamic tension that prompts action. This friction acts as an engine of growth, revealing hidden strength through conscious effort.",
+  opposition:
+    "Opposition — a mirrored dynamic across the chart. You see reflections of yourself in each other; a profound lesson in balance.",
+};
+
 const ASPECT_META: Record<
   AspectKind,
   {
@@ -164,8 +200,10 @@ export function aspectLabel(kind: AspectKind): string {
   return ASPECT_META[kind].labelKa;
 }
 
-export function aspectMeaning(kind: AspectKind): string {
-  return ASPECT_META[kind].meaningKa;
+export function aspectMeaning(kind: AspectKind, locale: UserLocale = "ka"): string {
+  return locale === "en"
+    ? ASPECT_MEANING_EN[kind]
+    : ASPECT_META[kind].meaningKa;
 }
 
 export function aspectValence(
@@ -174,16 +212,21 @@ export function aspectValence(
   return ASPECT_META[kind].valence;
 }
 
-export function bodyLabel(key: string): string {
-  return BODY_LABEL[key] ?? key;
+export function bodyLabel(key: string, locale: UserLocale = "ka"): string {
+  return locale === "en" ? BODY_LABEL_EN[key] ?? key : BODY_LABEL[key] ?? key;
 }
 
 export function bodyDomain(key: string): string {
   return BODY_DOMAIN_NOM[key] ?? key;
 }
 
-export function bodySynastryDescription(key: string): string {
-  return BODY_SYN_DESC[key] ?? "";
+export function bodySynastryDescription(
+  key: string,
+  locale: UserLocale = "ka"
+): string {
+  return locale === "en"
+    ? BODY_SYN_DESC_EN[key] ?? ""
+    : BODY_SYN_DESC[key] ?? "";
 }
 
 /**
@@ -191,7 +234,11 @@ export function bodySynastryDescription(key: string): string {
  * Uses Georgian SOV order with the second body in dative case so the
  * sentence is grammatically correct.
  */
-export function describeAspect(asp: SynastryAspect): string {
+export function describeAspect(
+  asp: SynastryAspect,
+  locale: UserLocale = "ka"
+): string {
+  if (locale === "en") return describeAspectEn(asp);
   const meta = ASPECT_META[asp.kind];
   const subject = BODY_DOMAIN_NOM[asp.a] ?? asp.a;
   const object = BODY_DOMAIN_DAT[asp.b] ?? `${asp.b}ს`;
@@ -221,8 +268,14 @@ export type AspectBreakdown = {
   takeaway: string;
 };
 
-/** "ძალიან ზუსტი" / "მჭიდრო" / "ფართო" — turns orb tightness into Georgian. */
-function tightnessLabel(tightness: number): string {
+/** "ძალიან ზუსტი" / "მჭიდრო" / "ფართო" — turns orb tightness into Georgian/English. */
+function tightnessLabel(tightness: number, locale: UserLocale = "ka"): string {
+  if (locale === "en") {
+    if (tightness >= 0.85) return "Very exact aspect — energy is strongly felt in most situations.";
+    if (tightness >= 0.7) return "Tight aspect — influence is clearly visible.";
+    if (tightness >= 0.5) return "Moderate tightness — noticeable influence.";
+    return "Wide orb — gentle background influence.";
+  }
   if (tightness >= 0.85) return "ძალიან ზუსტი ასპექტი — ენერგია ბევრ შემთხვევაში გრძნობადია.";
   if (tightness >= 0.7) return "მჭიდრო ასპექტი — გავლენა ცხადად ჩანს.";
   if (tightness >= 0.5) return "საშუალო სიმჭიდროვის ასპექტი — გავლენა შეინიშნება.";
@@ -235,12 +288,41 @@ function tightnessLabel(tightness: number): string {
  * covers all 5 × 91 = 455 possibilities, so this should rarely fire in
  * practice; keeping it means a missing entry never blanks the modal.
  */
-function fallbackDetail(asp: SynastryAspect): {
+function fallbackDetail(
+  asp: SynastryAspect,
+  locale: UserLocale = "ka"
+): {
   positive: string;
   negative: string;
   takeaway: string;
 } {
+  const en = locale === "en";
   const valence = ASPECT_META[asp.kind].valence;
+  const aName = en ? (BODY_LABEL_EN[asp.a] ?? asp.a) : (BODY_DOMAIN_NOM[asp.a] ?? asp.a);
+  const bName = en ? (BODY_LABEL_EN[asp.b] ?? asp.b) : (BODY_DOMAIN_NOM[asp.b] ?? asp.b);
+
+  if (en) {
+    if (valence === "harmonious") {
+      return {
+        positive: `${aName} and ${bName} flow together naturally — one begins, and the other instinctively responds. You easily catch each other's wave without forced effort.`,
+        negative: `This ease can quickly become taken for granted — you might assume harmony requires no ongoing active care. It is worth consciously cherishing this connection.`,
+        takeaway: `Actively voice your gratitude and keep open conversations flowing around what ${aName} and ${bName} inspire in your partnership.`,
+      };
+    }
+    if (valence === "tense") {
+      return {
+        positive: `The friction between ${aName} and ${bName} generates vital spark and motivation — this tension invites you both to handle this area of life with conscious presence.`,
+        negative: `${aName} and ${bName} can pull in contrasting directions. If ignored, unspoken expectations and irritation can build up over time.`,
+        takeaway: `Give mindful patience to ${aName} before reacting to ${bName}. Friction is where conscious dialogue transforms relational patterns into deep growth.`,
+      };
+    }
+    return {
+      positive: `${aName} and ${bName} concentrate at a single focal point — uniting your energy into a shared, powerful focal point.`,
+      negative: `The energies blend so intensely that boundaries can blur. Make sure each partner's unique voice is not lost in this shared intensity.`,
+      takeaway: `Clearly understand what ${aName} represents for you and what ${bName} means for your partner. Mindful individuality enriches your unity.`,
+    };
+  }
+
   const aDom = BODY_DOMAIN_NOM[asp.a] ?? asp.a;
   const bDom = BODY_DOMAIN_NOM[asp.b] ?? asp.b;
   const aDomDat = BODY_DOMAIN_DAT[asp.a] ?? `${asp.a}ს`;
@@ -267,16 +349,23 @@ function fallbackDetail(asp: SynastryAspect): {
   };
 }
 
-export function aspectBreakdown(asp: SynastryAspect): AspectBreakdown {
+export function aspectBreakdown(
+  asp: SynastryAspect,
+  locale: UserLocale = "ka"
+): AspectBreakdown {
+  const en = locale === "en";
   const meta = ASPECT_META[asp.kind];
-  const generated = aspectDetailContent(asp.kind, asp.a, asp.b);
-  const detail = generated ?? fallbackDetail(asp);
+  const generated = aspectDetailContent(asp.kind, asp.a, asp.b, locale);
+  const detail = generated ?? fallbackDetail(asp, locale);
+  const titleA = en ? (BODY_LABEL_EN[asp.a] ?? asp.a) : (BODY_LABEL[asp.a] ?? asp.a);
+  const titleB = en ? (BODY_LABEL_EN[asp.b] ?? asp.b) : (BODY_LABEL[asp.b] ?? asp.b);
+
   return {
-    title: `${BODY_LABEL[asp.a] ?? asp.a} ${meta.glyph} ${BODY_LABEL[asp.b] ?? asp.b}`,
-    tightnessNote: tightnessLabel(asp.tightness),
-    aspectMeaning: meta.meaningKa,
-    bodyADescription: BODY_SYN_DESC[asp.a] ?? "",
-    bodyBDescription: BODY_SYN_DESC[asp.b] ?? "",
+    title: `${titleA} ${meta.glyph} ${titleB}`,
+    tightnessNote: tightnessLabel(asp.tightness, locale),
+    aspectMeaning: en ? ASPECT_MEANING_EN[asp.kind] : meta.meaningKa,
+    bodyADescription: en ? (BODY_SYN_DESC_EN[asp.a] ?? "") : (BODY_SYN_DESC[asp.a] ?? ""),
+    bodyBDescription: en ? (BODY_SYN_DESC_EN[asp.b] ?? "") : (BODY_SYN_DESC[asp.b] ?? ""),
     positive: detail.positive,
     negative: detail.negative,
     takeaway: detail.takeaway,
@@ -369,8 +458,10 @@ const CATEGORY_NARRATIVE: Record<SynastryCategory, Record<Tier, string>> = {
 
 export function narrateCategory(
   cat: SynastryCategory,
-  score: number
+  score: number,
+  locale: UserLocale = "ka"
 ): string {
+  if (locale === "en") return categoryNarrativeEn(cat, score);
   return CATEGORY_NARRATIVE[cat][tierFromScore(score)];
 }
 
@@ -400,7 +491,11 @@ export function splitByValence(aspects: SynastryAspect[]): AspectGroup {
   return { strengths, growth };
 }
 
-export function overallNarrative(percent: number): string {
+export function overallNarrative(
+  percent: number,
+  locale: UserLocale = "ka"
+): string {
+  if (locale === "en") return overallNarrativeEn(percent);
   // Thresholds mirror overallVerdict() in lib/synastry.ts — keep in sync.
   if (percent >= 88)
     return "ცის რუკები ერთიანი ნაკადით ხვდებიან — იშვიათი, ღრმა რეზონანსი.";
