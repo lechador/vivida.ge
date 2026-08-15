@@ -27,7 +27,7 @@ export function ZodiacPairPageEn({ a, b }: { a: ZodiacSlug; b: ZodiacSlug }) {
   const aColor = signColor(aMeta);
   const bColor = signColor(bMeta);
   const ratingColor = RATING_COLOR[content.rating];
-  const url = `https://vividaastro.com/zodiac/tavsebadoba/${a}-${b}`;
+  const url = `https://www.vividaastro.com/zodiac/tavsebadoba/${a}-${b}`;
   const ld = [
     { "@context": "https://schema.org", "@type": "Article", headline: content.title, description: content.description, inLanguage: "en", mainEntityOfPage: { "@type": "WebPage", "@id": url }, author: { "@type": "Organization", name: "Vivida" }, about: [{ "@type": "Thing", name: aName }, { "@type": "Thing", name: bName }] },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: content.faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },
@@ -35,7 +35,7 @@ export function ZodiacPairPageEn({ a, b }: { a: ZodiacSlug; b: ZodiacSlug }) {
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" />
-      <Starfield count={130} shooting={3} /><SmartHeader locale="en" />
+      <Starfield count={130} shooting={3} /><SmartHeader locale="en" georgianPath={`/zodiac/tavsebadoba/${a}-${b}`} />
       {ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground"><Link href="/zodiac">Zodiac signs</Link><span>/</span><Link href="/compatibility">Compatibility</Link><span>/</span><span className="text-foreground/80">{aName} × {bName}</span></nav>

@@ -23,6 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: en
       ? "See how Vivida turns your birth details into a personal chart, forecast, and AI-powered interpretation."
       : "ნახე როგორ ქმნის Vivida შენს პერსონალურ კოსმიურ რუკას — დაბადების მონაცემიდან AI ინტერპრეტაციამდე.",
+    alternates: { canonical: "/how-it-works" },
   };
 }
 
@@ -143,7 +144,11 @@ export default async function HowItWorksPage() {
       />
       <Starfield count={120} shooting={3} />
 
-      <SmartHeader active="how-it-works" />
+      <SmartHeader
+        active="how-it-works"
+        locale={locale}
+        georgianPath="/how-it-works"
+      />
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -232,7 +237,7 @@ export default async function HowItWorksPage() {
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

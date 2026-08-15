@@ -47,7 +47,7 @@ export async function generateMetadata({
   if (!isSlug(sign) || !MOONS_CONTENT) return {};
   if ((await getRequestLocale()) === "en") {
     const c = placementEnglish("moon", sign);
-    const url = `https://vividaastro.com${HUB_PATH}/${sign}`;
+    const url = `https://www.vividaastro.com${HUB_PATH}/${sign}`;
     return {
       title: { absolute: c.title },
       description: c.description,

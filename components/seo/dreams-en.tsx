@@ -77,7 +77,7 @@ export function DreamsHubEn() {
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <Background />
       <Starfield count={130} shooting={3} />
-      <SmartHeader locale="en" />
+      <SmartHeader locale="en" georgianPath="/sizmris-akhsna" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
@@ -162,7 +162,7 @@ export function DreamSymbolPageEn({ base, content }: { base: DreamSymbol; conten
 
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <Background /><Starfield count={110} shooting={2} /><SmartHeader locale="en" />
+      <Background /><Starfield count={110} shooting={2} /><SmartHeader locale="en" georgianPath={`/sizmris-akhsna/${base.slug}`} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <nav className="mb-6 flex flex-wrap items-center gap-2 text-xs text-muted-foreground"><Link href="/">Home</Link><span>/</span><Link href="/sizmris-akhsna">Dream dictionary</Link><span>/</span><span className="text-foreground/80">{content.title}</span></nav>

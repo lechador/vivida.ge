@@ -30,7 +30,16 @@ const METADATA_KA: Metadata = {
     "პიროვნების ტესტი",
     "ფსიქოლოგიური ტიპები",
   ],
-  alternates: { canonical: `${GEORGIAN_SITE_URL}/mbti` },
+  // hreflang must be reciprocal — the English /mbti already points here, so
+  // Google discards the pair unless this side points back.
+  alternates: {
+    canonical: `${GEORGIAN_SITE_URL}/mbti`,
+    languages: {
+      en: `${ENGLISH_SITE_URL}/mbti`,
+      "ka-GE": `${GEORGIAN_SITE_URL}/mbti`,
+      "x-default": `${ENGLISH_SITE_URL}/mbti`,
+    },
+  },
   openGraph: {
     type: "website",
     url: `${GEORGIAN_SITE_URL}/mbti`,

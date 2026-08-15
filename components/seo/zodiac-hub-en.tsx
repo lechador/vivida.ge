@@ -54,14 +54,14 @@ export function ZodiacHubEn() {
       name: "The 12 Zodiac Signs",
       description:
         "Explore all 12 zodiac signs, their dates, elements, modalities, and meanings.",
-      url: "https://vividaastro.com/zodiac",
+      url: "https://www.vividaastro.com/zodiac",
       inLanguage: "en",
       mainEntity: {
         "@type": "ItemList",
         itemListElement: ALL_SLUGS.map((slug, index) => ({
           "@type": "ListItem",
           position: index + 1,
-          url: `https://vividaastro.com/zodiac/${slug}`,
+          url: `https://www.vividaastro.com/zodiac/${slug}`,
           name: signMetaBySlug(slug)?.labelEn ?? slug,
         })),
       },
@@ -87,7 +87,7 @@ export function ZodiacHubEn() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
       />
       <Starfield count={140} shooting={3} />
-      <SmartHeader locale="en" />
+      <SmartHeader locale="en" georgianPath="/zodiac" />
       {ld.map((item, index) => (
         <script
           key={index}
@@ -120,7 +120,7 @@ export function ZodiacHubEn() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link href="/nataluri-ruka">
+            <Link href="/natal-chart">
               <Sparkles className="size-4" />
               Calculate my birth chart
             </Link>
@@ -304,7 +304,7 @@ export function ZodiacHubEn() {
             one interactive birth chart.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/nataluri-ruka">Calculate my chart for free</Link>
+            <Link href="/natal-chart">Calculate my chart for free</Link>
           </Button>
         </div>
         <PopularSearches

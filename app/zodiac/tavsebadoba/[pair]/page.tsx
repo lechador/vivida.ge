@@ -54,7 +54,7 @@ export async function generateMetadata({
   const path = `/zodiac/tavsebadoba/${pair}`;
   if ((await getRequestLocale()) === "en") {
     const english = zodiacPairEnglish(...parsed);
-    const url = `https://vividaastro.com${path}`;
+    const url = `https://www.vividaastro.com${path}`;
     return {
       title: { absolute: english.title },
       description: english.description,

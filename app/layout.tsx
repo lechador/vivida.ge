@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { requestIsEnglish } from "@/lib/i18n/request-locale";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { Noto_Sans_Georgian } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import NextTopLoader from "nextjs-toploader";
@@ -9,6 +11,7 @@ import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
 import { AppLaunchSurvey } from "@/components/survey/app-launch-survey";
 import { RefCapture } from "@/components/ref-capture";
 import { FbPixel } from "@/components/fb-pixel";
+import { VercelObservability } from "@/components/vercel-observability";
 import "./globals.css";
 
 const notoGeorgian = Noto_Sans_Georgian({
@@ -30,6 +33,12 @@ const TITLE = "Vivida — შენი კოსმიური რუკა";
 const DESCRIPTION =
   "პერსონალური ასტროლოგია, ყოველდღიური ჰოროსკოპი და ნატალური რუკა შენი დაბადების ზუსტი მომენტის მიხედვით. გაიგე, რას ამბობენ შენზე ვარსკვლავები.";
 
+// Fallbacks for the international domain — only surface on pages that set no
+// title/description of their own, which would otherwise inherit Georgian.
+const TITLE_EN = "Vivida — Natal Charts, Horoscopes and Zodiac Guides";
+const DESCRIPTION_EN =
+  "Personal astrology, daily horoscopes and a free natal chart built from your exact birth moment. Understand what your chart actually says about you.";
+
 /**
  * Site-wide metadata defaults. Per-page `metadata` exports override these
  * surgically — e.g. /report sets its own `title` while inheriting OG/Twitter.
@@ -39,50 +48,61 @@ const DESCRIPTION =
  * `title.default` directly via `title.absolute` in app/page.tsx) so the
  * brand reads as the primary name in Google's results.
  */
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: TITLE,
-    template: "%s · Vivida",
-  },
-  description: DESCRIPTION,
-  applicationName: "Vivida",
-  authors: [{ name: "Vivida" }],
-  creator: "Vivida",
-  publisher: "Vivida",
-  other: {
-    "google-adsense-account": "ca-pub-2236599310864557",
-  },
-  alternates: {
-    canonical: SITE_URL,
-    languages: { "ka-GE": SITE_URL },
-  },
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    url: SITE_URL,
-    siteName: "Vivida",
-    type: "website",
-    locale: "ka_GE",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+export async function generateMetadata(): Promise<Metadata> {
+  const en = await requestIsEnglish();
+  const origin = en ? ENGLISH_SITE_URL : SITE_URL;
+  const title = en ? TITLE_EN : TITLE;
+  const description = en ? DESCRIPTION_EN : DESCRIPTION;
+
+  return {
+    // Host-aware so relative canonicals and OG/image URLs in child pages
+    // resolve to the domain actually being served, not always vivida.ge.
+    metadataBase: new URL(origin),
+    title: {
+      default: title,
+      template: "%s · Vivida",
+    },
+    description,
+    applicationName: "Vivida",
+    authors: [{ name: "Vivida" }],
+    creator: "Vivida",
+    publisher: "Vivida",
+    other: {
+      "google-adsense-account": "ca-pub-2236599310864557",
+    },
+    // Deliberately NO `alternates` here. A root-level canonical is inherited
+    // by every page that doesn't set its own, which made unrelated pages
+    // (e.g. /features, /login) claim to be the Georgian homepage — and on the
+    // .com host that pointed the English domain at vivida.ge. Pages own their
+    // canonical/hreflang; without one, engines self-canonicalize correctly.
+    openGraph: {
+      title,
+      description,
+      url: origin,
+      siteName: "Vivida",
+      type: "website",
+      locale: en ? "en_US" : "ka_GE",
+      alternateLocale: en ? ["ka_GE"] : ["en_US"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
-  },
-  category: "lifestyle",
-};
+    category: "lifestyle",
+  };
+}
 
 /**
  * Viewport + theme color is its own export in Next 16 (split out from
@@ -110,30 +130,24 @@ const GA_ENABLED =
 // the audience and conversion data the FB ad algorithm trains on.
 const FB_PIXEL_ENABLED = process.env.NODE_ENV === "production";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The same deployment serves two language domains. Resolving the locale on
+  // the server puts the correct `lang` in the delivered HTML — the previous
+  // inline script only patched it after parse, so crawlers that don't run JS
+  // (and every social/AI scraper) saw the English domain declared Georgian.
+  const en = await requestIsEnglish();
+
   return (
     <html
-      lang="ka"
+      lang={en ? "en" : "ka"}
       data-scroll-behavior="smooth"
       className={`dark scroll-smooth ${notoGeorgian.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        {/* The same deployment serves two language domains. Keep the root
-            layout static, but set the document language before the body is
-            parsed so shared/authenticated routes on .com are announced as
-            English without a hydration flash. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              'if(/(^|\\.)vividaastro\\.com$/i.test(location.hostname)){document.documentElement.lang="en"}',
-          }}
-        />
-      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {/* Scroll-reveal sections start opacity:0 and are shown by JS. With
             JS disabled, force them visible so content is never hidden. */}
@@ -170,6 +184,7 @@ export default function RootLayout({
           <AppLaunchSurvey />
           <NowPlayingBar />
         </AudioPlayerProvider>
+        <VercelObservability />
       </body>
       {GA_ENABLED && <GoogleAnalytics gaId={GA_ID!} />}
     </html>

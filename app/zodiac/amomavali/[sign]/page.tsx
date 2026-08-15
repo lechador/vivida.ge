@@ -46,7 +46,7 @@ export async function generateMetadata({
   if (!isSlug(sign) || !RISINGS_CONTENT) return {};
   if ((await getRequestLocale()) === "en") {
     const c = placementEnglish("rising", sign);
-    const url = `https://vividaastro.com${HUB_PATH}/${sign}`;
+    const url = `https://www.vividaastro.com${HUB_PATH}/${sign}`;
     return {
       title: { absolute: c.title },
       description: c.description,

@@ -26,6 +26,9 @@ export async function generateMetadata(): Promise<Metadata> {
     description: en
       ? "Birth charts, daily forecasts, compatibility, AI insights, and a public profile—explore every Vivida feature."
       : "ნატალური რუკა, ყოველდღიური პროგნოზი, თავსებადობა, AI ანალიზი, საჯარო პროფილი — Vivida-ს ყველა ფუნქცია ერთ ადგილას.",
+    // Relative — resolves against the host-aware metadataBase in the root
+    // layout, so each domain self-canonicalizes instead of inheriting one.
+    alternates: { canonical: "/features" },
   };
 }
 
@@ -169,7 +172,7 @@ export default async function FeaturesPage() {
       />
       <Starfield count={120} shooting={3} />
 
-      <SmartHeader active="features" />
+      <SmartHeader active="features" locale={locale} georgianPath="/features" />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -255,7 +258,7 @@ export default async function FeaturesPage() {
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

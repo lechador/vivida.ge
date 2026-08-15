@@ -35,7 +35,6 @@ export const CORE_LANGUAGE_PAIRS: ReadonlyArray<{
 }> = [
   { ka: "/", en: "/", internalEn: "/en" },
   { ka: "/nataluri-ruka", en: "/natal-chart", internalEn: "/en/natal-chart" },
-  { ka: "/horoskopi", en: "/horoscope", internalEn: "/en/horoscope" },
   { ka: "/zodiac", en: "/zodiac", internalEn: "/en/zodiac" },
   { ka: "/zodiac/tavsebadoba", en: "/compatibility", internalEn: "/en/compatibility" },
   { ka: "/tests", en: "/tests", internalEn: "/en/tests" },
@@ -46,7 +45,16 @@ export const CORE_LANGUAGE_PAIRS: ReadonlyArray<{
 export const ENGLISH_ONLY_ROUTES: ReadonlyArray<{
   en: CoreEnglishPath;
   internalEn: CoreEnglishInternalPath;
-}> = [{ en: "/about", internalEn: "/en/about" }];
+}> = [
+  { en: "/about", internalEn: "/en/about" },
+  // "How daily horoscopes work" — an explainer with no Georgian equivalent.
+  // It previously held the hreflang pair with the Georgian /horoskopi, but
+  // that is the Georgian *daily hub*, whose real English counterpart is the
+  // English /horoskopi (same-path, like its /kvireuli and /tviuri siblings).
+  // Pairing an explainer with a daily hub mismatched the content on both
+  // sides and left the English daily hub with no counterpart at all.
+  { en: "/horoscope", internalEn: "/en/horoscope" },
+];
 
 export const ENGLISH_PUBLIC_ROUTES: ReadonlyArray<{
   en: CoreEnglishPath;

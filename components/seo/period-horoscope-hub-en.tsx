@@ -51,14 +51,14 @@ export function PeriodHoroscopeHubEn({ period }: { period: EnglishPeriod }) {
   const dateLabel = period === "week"
     ? `Week of ${new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric" }).format(startOfWeek(new Date()))}`
     : new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(new Date());
-  const url = `https://vividaastro.com${config.path}`;
+  const url = `https://www.vividaastro.com${config.path}`;
   const ld = [
-    { "@context": "https://schema.org", "@type": "CollectionPage", name: config.title, description: config.description, url, inLanguage: "en", mainEntity: { "@type": "ItemList", itemListElement: ALL_SLUGS.map((sign, index) => ({ "@type": "ListItem", position: index + 1, name: `${signMetaBySlug(sign)!.labelEn} ${config.cadence.toLowerCase()}`, url: `https://vividaastro.com/zodiac/${sign}/${config.viewPath}` })) } },
+    { "@context": "https://schema.org", "@type": "CollectionPage", name: config.title, description: config.description, url, inLanguage: "en", mainEntity: { "@type": "ItemList", itemListElement: ALL_SLUGS.map((sign, index) => ({ "@type": "ListItem", position: index + 1, name: `${signMetaBySlug(sign)!.labelEn} ${config.cadence.toLowerCase()}`, url: `https://www.vividaastro.com/zodiac/${sign}/${config.viewPath}` })) } },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: config.faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },
   ];
   return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
     <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" />
-    <Starfield count={120} shooting={3} /><SmartHeader locale="en" />
+    <Starfield count={120} shooting={3} /><SmartHeader locale="en" georgianPath={config.path} />
     {ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
     <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
       <nav className="mb-6 flex gap-2 text-xs text-muted-foreground"><Link href="/">Home</Link><span>/</span><Link href="/horoscope">Horoscope</Link><span>/</span><span className="text-foreground/80">{config.cadence}</span></nav>

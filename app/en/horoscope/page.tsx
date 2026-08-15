@@ -3,16 +3,18 @@ import Link from "next/link";
 
 import { EnglishGuide } from "@/components/en/english-guide";
 import { SIGNS } from "@/lib/zodiac";
-import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
-const PATH = "/en/horoscope";
 const TITLE = "How Daily Horoscopes Work — Vivida";
 const DESCRIPTION = "Learn how daily, weekly and monthly horoscopes use current planetary transits, and read Vivida's English forecasts for all twelve zodiac signs.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE }, description: DESCRIPTION,
-  alternates: localizedAlternates(PATH, "/horoskopi", "en"),
-  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/horoscope`, locale: "en_US", alternateLocale: ["ka_GE"] },
+  // English-only explainer, like /about. The Georgian /horoskopi is a daily
+  // hub, not an equivalent of this page — it now pairs with the English
+  // /horoskopi instead.
+  alternates: { canonical: `${ENGLISH_SITE_URL}/horoscope`, languages: { en: `${ENGLISH_SITE_URL}/horoscope`, "x-default": `${ENGLISH_SITE_URL}/horoscope` } },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/horoscope`, locale: "en_US" },
 };
 
 export default function EnglishHoroscopePage() {

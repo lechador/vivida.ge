@@ -12,7 +12,12 @@ import { MbtiClaimRunner } from "@/components/mbti/mbti-claim-runner";
 
 export async function generateMetadata(): Promise<Metadata> {
   const en = (await getRequestLocale()) === "en";
-  return { title: en ? "Your Astro-MBTI result" : "შენი შედეგი" };
+  // Transient per-user result state, like the /shedegi pages — keep it out of
+  // the index rather than letting it self-canonicalize as content.
+  return {
+    title: en ? "Your Astro-MBTI result" : "შენი შედეგი",
+    robots: { index: false },
+  };
 }
 export const dynamic = "force-dynamic";
 // The synthesis (flash) runs here and can take ~20s — well above the default

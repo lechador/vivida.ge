@@ -21,7 +21,7 @@ export function EqArticlesHubEn() {
   ];
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <Starfield count={90} shooting={1} /><SmartHeader locale="en" />
+      <Starfield count={90} shooting={1} /><SmartHeader locale="en" georgianPath="/emociuri-inteleqti" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-24 pt-10 sm:px-6">
         <nav className="mb-8 flex items-center gap-2 text-xs text-muted-foreground"><Link href="/">Home</Link><span>/</span><span className="text-foreground/80">Emotional intelligence</span></nav>
@@ -46,7 +46,7 @@ export function EqArticlePageEn({ item }: { item: EqArticleEn }) {
   ];
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <Starfield count={70} shooting={1} /><SmartHeader locale="en" />
+      <Starfield count={70} shooting={1} /><SmartHeader locale="en" georgianPath={`/emociuri-inteleqti/${item.slug}`} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <article className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-8 sm:px-6 sm:pt-12">
         <Link href="/emociuri-inteleqti" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="size-4" />All EQ guides</Link>

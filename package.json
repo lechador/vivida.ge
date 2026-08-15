@@ -2,6 +2,9 @@
   "name": "vivida.ge",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,6 +16,8 @@
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "eve:info": "eve info",
+    "eve:build": "eve build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -32,11 +37,14 @@
     "@react-email/components": "^1.0.12",
     "@react-pdf/renderer": "^4.5.1",
     "@sentry/nextjs": "^10.69.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "circular-natal-horoscope-js": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
+    "eve": "^0.38.1",
     "framer-motion": "^12.38.0",
     "html-to-image": "^1.11.13",
     "jose": "^6.2.3",

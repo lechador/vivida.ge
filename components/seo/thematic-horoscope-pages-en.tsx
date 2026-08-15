@@ -16,7 +16,7 @@ import { localizedAlternates } from "@/lib/seo/locales";
 export function thematicHubMetadataEn(theme: HoroscopeTheme) {
   const config = THEME_CONFIG_EN[theme];
   const path = themeUrl(theme);
-  const url = `https://vividaastro.com${path}`;
+  const url = `https://www.vividaastro.com${path}`;
   return {
     title: { absolute: config.title },
     description: config.description,
@@ -31,7 +31,7 @@ export function thematicDetailMetadataEn(theme: HoroscopeTheme, sign: ZodiacSlug
   const content = thematicHoroscopeEnglish(theme, sign);
   const name = signMetaBySlug(sign)!.labelEn;
   const path = themeUrl(theme, sign);
-  const url = `https://vividaastro.com${path}`;
+  const url = `https://www.vividaastro.com${path}`;
   const title = `${name} ${config.label}: Traits and Practical Guidance`;
   const description = `${name} ${config.label.toLowerCase()}: explore natural strengths, growth areas, patterns, and practical guidance for ${config.shortLabel.toLowerCase()}.`;
   return {
@@ -56,12 +56,12 @@ function themeFaq(theme: HoroscopeTheme) {
 export function ThematicHoroscopeHubEn({ theme }: { theme: HoroscopeTheme }) {
   const config = THEME_CONFIG_EN[theme];
   const faq = themeFaq(theme);
-  const url = `https://vividaastro.com${themeUrl(theme)}`;
+  const url = `https://www.vividaastro.com${themeUrl(theme)}`;
   const ld = [
-    { "@context": "https://schema.org", "@type": "CollectionPage", name: config.title, description: config.description, url, inLanguage: "en", mainEntity: { "@type": "ItemList", itemListElement: ALL_SLUGS.map((sign, index) => ({ "@type": "ListItem", position: index + 1, name: `${signMetaBySlug(sign)!.labelEn} ${config.label}`, url: `https://vividaastro.com${themeUrl(theme, sign)}` })) } },
+    { "@context": "https://schema.org", "@type": "CollectionPage", name: config.title, description: config.description, url, inLanguage: "en", mainEntity: { "@type": "ItemList", itemListElement: ALL_SLUGS.map((sign, index) => ({ "@type": "ListItem", position: index + 1, name: `${signMetaBySlug(sign)!.labelEn} ${config.label}`, url: `https://www.vividaastro.com${themeUrl(theme, sign)}` })) } },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },
   ];
-  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={110} shooting={2} /><SmartHeader locale="en" />{ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
+  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={110} shooting={2} /><SmartHeader locale="en" georgianPath={themeUrl(theme)} />{ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
     <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
       <nav className="mb-6 flex gap-2 text-xs text-muted-foreground"><Link href="/horoscope">Horoscope</Link><span>/</span><span className="text-foreground/80">{config.label}</span></nav>
       <header className="max-w-3xl"><div className="text-4xl" aria-hidden>{config.glyph}</div><h1 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">{config.title}</h1><p className="mt-4 text-pretty text-lg leading-8 text-foreground/80">{config.intro}</p></header>
@@ -84,12 +84,12 @@ export function ThematicHoroscopeDetailEn({ theme, sign }: { theme: HoroscopeThe
     { q: `What is ${name}'s main strength?`, a: content.focus },
     { q: `What should ${name} watch for?`, a: content.watch },
   ];
-  const url = `https://vividaastro.com${themeUrl(theme, sign)}`;
+  const url = `https://www.vividaastro.com${themeUrl(theme, sign)}`;
   const ld = [
     { "@context": "https://schema.org", "@type": "Article", headline: `${name} ${config.label}: Traits and Guidance`, description: content.focus, inLanguage: "en", mainEntityOfPage: { "@type": "WebPage", "@id": url }, author: { "@type": "Organization", name: "Vivida" } },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },
   ];
-  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={90} shooting={1} /><SmartHeader locale="en" />{ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
+  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={90} shooting={1} /><SmartHeader locale="en" georgianPath={themeUrl(theme, sign)} />{ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
     <article className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
       <nav className="text-xs text-muted-foreground"><Link href={themeUrl(theme)}>{config.label}</Link> / {name}</nav>
       <header className="mt-6 rounded-3xl border border-border bg-card/60 p-6 sm:p-9"><div className="flex items-start gap-4"><div className="grid size-16 place-items-center rounded-2xl text-4xl" style={{ color: accent, background: `color-mix(in oklch, ${accent} 16%, transparent)` }}>{SIGNS_CONTENT[sign].symbol}</div><div><p className="text-xs text-muted-foreground">{ZODIAC_DATES[sign].rangeEn}</p><h1 className="mt-1 text-balance text-3xl font-semibold sm:text-4xl">{name} {config.label}</h1></div></div><p className="mt-5 text-lg leading-8 text-foreground/82">{content.focus}</p></header>

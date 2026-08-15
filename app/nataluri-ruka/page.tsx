@@ -68,7 +68,7 @@ const BASE_META_EN: Metadata = {
   alternates: localizedAlternates("/nataluri-ruka", "/en/natal-chart", "en"),
   openGraph: {
     type: "website",
-    url: "https://vividaastro.com/natal-chart",
+    url: "https://www.vividaastro.com/natal-chart",
     title: "Free Birth Chart Calculator",
     description:
       "Calculate your planets, rising sign, houses, and aspects online for free.",
@@ -107,7 +107,7 @@ export async function generateMetadata({
   const ogTitle = en
     ? `My birth chart: Sun ${sun} · Moon ${moon} · Rising ${asc}`
     : `ჩემი ნატალური რუკა: მზე ${sun} · მთვარე ${moon} · ამომავალი ${asc}`;
-  const ogImage = `${en ? "https://vividaastro.com" : SITE_URL}/api/og/chart?big=${encodeURIComponent(big)}`;
+  const ogImage = `${en ? "https://www.vividaastro.com" : SITE_URL}/api/og/chart?big=${encodeURIComponent(big)}`;
   return {
     ...(en ? BASE_META_EN : BASE_META),
     openGraph: {

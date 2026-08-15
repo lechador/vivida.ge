@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import { withEve } from "eve/next";
 
 import {
   ENGLISH_HOSTS,
@@ -17,6 +18,11 @@ import {
  * on the existing canonical page.
  */
 const ENGLISH_LEGACY_CONTENT_REDIRECTS = [
+  // Renders the identical <NatalChartPageEn /> as /natal-chart, so on the
+  // international host it was a straight duplicate of the canonical English
+  // URL — two self-canonicalling copies competing for the same query. The
+  // Georgian /nataluri-ruka is untouched: this is host-scoped.
+  { source: "/nataluri-ruka", destination: "/natal-chart" },
   { source: "/piradi-ruka", destination: "/natal-chart" },
   {
     source: "/piradi-ruka/rogor-shevadginot",
@@ -24,6 +30,7 @@ const ENGLISH_LEGACY_CONTENT_REDIRECTS = [
   },
   { source: "/piradi-horoskopi", destination: "/horoscope" },
   { source: "/mkitxaoba", destination: "/taro" },
+  { source: "/zodiac/tavsebadoba", destination: "/compatibility" },
 ] as const;
 
 const nextConfig: NextConfig = {
@@ -43,10 +50,11 @@ const nextConfig: NextConfig = {
     // The personality test moved from /test to the keyword-rich Georgian slug
     // /pirovnebis-testi ("პიროვნების ტესტი"). 301 the old paths so any early
     // links/indexing carry over.
-    const legacyEnglishRedirects = [
-      ...GEORGIAN_HOSTS,
-      ...ENGLISH_HOSTS,
-    ].flatMap((host) =>
+    // Only the Georgian hosts expose /en as a legacy public URL. On the
+    // English hosts, clean public paths are internally rewritten to /en/*;
+    // redirecting those internal destinations back to the clean URL creates
+    // a self-redirect loop (most visibly on vividaastro.com/).
+    const legacyEnglishRedirects = GEORGIAN_HOSTS.flatMap((host) =>
       ENGLISH_PUBLIC_ROUTES.map((route) => ({
         source: route.internalEn,
         has: [{ type: "host" as const, value: host }],
@@ -117,7 +125,7 @@ const canUploadSentrySourceMaps = Boolean(
     process.env.SENTRY_PROJECT,
 );
 
-export default withSentryConfig(nextConfig, {
+const nextConfigWithSentry = withSentryConfig(nextConfig, {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
@@ -134,3 +142,5 @@ export default withSentryConfig(nextConfig, {
     },
   },
 });
+
+export default withEve(nextConfigWithSentry);

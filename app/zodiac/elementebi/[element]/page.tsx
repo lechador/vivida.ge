@@ -63,7 +63,7 @@ export async function generateMetadata({
     const c = ELEMENT_ENGLISH[element];
     const title = `${c.name}: Traits, Love and Compatibility`;
     const description = `${c.tagline} Explore personality, strengths, challenges, relationships, career, and compatibility with the other elements.`;
-    const url = `https://vividaastro.com/zodiac/elementebi/${element}`;
+    const url = `https://www.vividaastro.com/zodiac/elementebi/${element}`;
     return { title: { absolute: title }, description, alternates: localizedAlternates(`/zodiac/elementebi/${element}`, `/zodiac/elementebi/${element}`, "en"), openGraph: { type: "article", url, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
   }
   const c = ELEMENTS_CONTENT[element];

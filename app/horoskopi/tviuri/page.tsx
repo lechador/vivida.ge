@@ -14,7 +14,7 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   if ((await getRequestLocale()) !== "en") return periodHubMetadata("month");
   const config = PERIOD_EN.month;
-  return { title: { absolute: config.title }, description: config.description, alternates: localizedAlternates(config.path, config.path, "en"), openGraph: { type: "website", url: `https://vividaastro.com${config.path}`, title: config.title, description: config.description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: config.title, description: config.description } };
+  return { title: { absolute: config.title }, description: config.description, alternates: localizedAlternates(config.path, config.path, "en"), openGraph: { type: "website", url: `https://www.vividaastro.com${config.path}`, title: config.title, description: config.description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: config.title, description: config.description } };
 }
 
 export default async function MonthlyHoroscopeHubPage() {

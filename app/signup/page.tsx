@@ -11,7 +11,10 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale === "en" ? "Create an account" : "რეგისტრაცია" };
+  return {
+    title: locale === "en" ? "Create an account" : "რეგისტრაცია",
+    alternates: { canonical: "/signup" },
+  };
 }
 
 /** Same-origin relative path only (no open redirect). */

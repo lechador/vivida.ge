@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 
 const SITE_URL = {
   ka: "https://www.vivida.ge",
-  en: "https://vividaastro.com",
+  en: "https://www.vividaastro.com",
 } as const;
 
 /**

@@ -98,7 +98,7 @@ export function SignHoroscopePageEn({
   const reading = forecast(sign, view);
   const label = VIEW_LABEL_EN[view];
   const period = dateLabel(view);
-  const url = `https://vividaastro.com/zodiac/${sign}/${VIEW_PATH[view]}`;
+  const url = `https://www.vividaastro.com/zodiac/${sign}/${VIEW_PATH[view]}`;
   const ld = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -120,7 +120,7 @@ export function SignHoroscopePageEn({
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
       />
       <Starfield count={130} shooting={3} />
-      <SmartHeader locale="en" />
+      <SmartHeader locale="en" georgianPath={`/zodiac/${sign}/${VIEW_PATH[view]}`} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
@@ -257,7 +257,7 @@ export function SignHoroscopePageEn({
             sign, and all 12 houses.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/nataluri-ruka">Calculate my complete chart</Link>
+            <Link href="/natal-chart">Calculate my complete chart</Link>
           </Button>
         </div>
       </section>

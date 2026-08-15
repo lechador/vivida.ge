@@ -22,7 +22,7 @@ export function AngelNumbersHubEn() {
   ];
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <Background /><Starfield count={120} shooting={3} /><SmartHeader locale="en" />
+      <Background /><Starfield count={120} shooting={3} /><SmartHeader locale="en" georgianPath="/angeluri-ricxvebi" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground"><Link href="/">Home</Link><span>/</span><span className="text-foreground/80">Angel numbers</span></nav>
@@ -63,7 +63,7 @@ export function AngelNumberPageEn({ base, content }: { base: AngelNumber; conten
   ];
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <Background /><Starfield count={110} shooting={2} /><SmartHeader locale="en" />
+      <Background /><Starfield count={110} shooting={2} /><SmartHeader locale="en" georgianPath={`/angeluri-ricxvebi/${base.slug}`} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <nav className="mb-6 flex flex-wrap items-center gap-2 text-xs text-muted-foreground"><Link href="/">Home</Link><span>/</span><Link href="/angeluri-ricxvebi">Angel numbers</Link><span>/</span><span className="text-foreground/80">{base.slug}</span></nav>

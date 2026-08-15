@@ -74,14 +74,15 @@ export async function generateMetadata(): Promise<Metadata> {
           "horoskopi qartulad",
           "zodiaqos nishnebi",
         ],
-    alternates: localizedAlternates(
-      "/horoskopi",
-      "/en/horoscope",
-      en ? "en" : "ka",
-    ),
+    // Same-path pair: this daily hub exists in both languages at /horoskopi,
+    // exactly like its /kvireuli and /tviuri siblings. (It used to pass
+    // "/en/horoscope" as the paired path, which on the English branch emitted
+    // ka-GE -> vivida.ge/en/horoscope — an internal English path, on the
+    // Georgian domain, that only 301s back here.)
+    alternates: localizedAlternates("/horoskopi", "/horoskopi", en ? "en" : "ka"),
     openGraph: {
       type: "website",
-      url: `${en ? "https://vividaastro.com" : SITE_URL}/horoskopi`,
+      url: `${en ? "https://www.vividaastro.com" : SITE_URL}/horoskopi`,
       title,
       description,
       siteName: "Vivida",

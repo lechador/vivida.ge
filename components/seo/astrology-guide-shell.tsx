@@ -8,12 +8,12 @@ import { Starfield } from "@/components/landing/starfield";
 
 type GuideLocale = "ka" | "en";
 
-export function GuideShell({ children, locale = "ka" }: { children: React.ReactNode; locale?: GuideLocale }) {
+export function GuideShell({ children, locale = "ka", georgianPath }: { children: React.ReactNode; locale?: GuideLocale; georgianPath?: string }) {
   return (
     <main lang={locale} className="relative isolate min-h-screen overflow-hidden">
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(55%_38%_at_50%_-5%,oklch(0.31_0.17_300/0.5),transparent_75%),radial-gradient(38%_28%_at_90%_24%,oklch(0.27_0.13_220/0.38),transparent_75%)]" />
       <Starfield count={90} shooting={1} />
-      <SmartHeader locale={locale} />
+      <SmartHeader locale={locale} georgianPath={georgianPath} />
       {children}
       <SiteFooter locale={locale} />
     </main>

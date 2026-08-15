@@ -49,14 +49,17 @@ export async function generateMetadata(): Promise<Metadata> {
           "ვის ვუხდები",
           "tavsebadoba",
         ],
-    alternates: localizedAlternates(
-      PATH,
-      "/en/compatibility",
-      en ? "en" : "ka",
-    ),
+    // Same-path pair: this ad landing page exists in both languages at
+    // /tavsebadoba. It used to pass "/en/compatibility" as the paired path,
+    // which was wrong twice over — on the English branch it emitted
+    // ka-GE -> vivida.ge/en/compatibility (an internal English path on the
+    // Georgian domain), and /compatibility is already the declared English
+    // counterpart of the SEO hub /zodiac/tavsebadoba, so this page was
+    // competing for a pairing that belongs to a different URL.
+    alternates: localizedAlternates(PATH, PATH, en ? "en" : "ka"),
     openGraph: {
       type: "website",
-      url: `${en ? "https://vividaastro.com" : SITE_URL}${PATH}`,
+      url: `${en ? "https://www.vividaastro.com" : SITE_URL}${PATH}`,
       title,
       description,
       siteName: "Vivida",
@@ -167,7 +170,9 @@ export default async function TavsebadobaPage() {
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent"
       />
-      <SiteFooter />
+      {/* Without an explicit locale the footer falls back to Georgian, which
+          was the entire source of Georgian text on the English page. */}
+      <SiteFooter locale={locale} />
     </main>
   );
 }

@@ -66,7 +66,7 @@ export async function generateMetadata({
       alternates: localizedAlternates(`/zodiac/${sign}`, `/zodiac/${sign}`, "en"),
       openGraph: {
         type: "article",
-        url: `https://vividaastro.com/zodiac/${sign}`,
+        url: `https://www.vividaastro.com/zodiac/${sign}`,
         title,
         description,
         siteName: "Vivida",

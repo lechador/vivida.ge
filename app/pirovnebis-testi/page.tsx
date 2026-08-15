@@ -46,7 +46,16 @@ export async function generateMetadata(): Promise<Metadata> {
     "mbti testi qartulad",
     "psikologiuri testi",
   ],
-  alternates: { canonical: `${SITE_URL}/pirovnebis-testi` },
+  // Reciprocal — the English side already points here, and hreflang pairs
+  // are discarded unless both directions agree.
+  alternates: {
+    canonical: `${SITE_URL}/pirovnebis-testi`,
+    languages: {
+      en: `${ENGLISH_SITE_URL}/pirovnebis-testi`,
+      "ka-GE": `${SITE_URL}/pirovnebis-testi`,
+      "x-default": `${ENGLISH_SITE_URL}/pirovnebis-testi`,
+    },
+  },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/pirovnebis-testi`,

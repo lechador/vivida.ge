@@ -35,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
       alternates: localizedAlternates(PATH, PATH, "en"),
       openGraph: {
         type: "website",
-        url: "https://vividaastro.com/zodiac/amomavali",
+        url: "https://www.vividaastro.com/zodiac/amomavali",
         title,
         description,
         siteName: "Vivida",

@@ -25,6 +25,7 @@ import { calendarWindow } from "@/lib/seo/astrology-calendar";
 import { ECLIPSES, moonEvents } from "@/lib/seo/moon-events";
 import {
   CORE_LANGUAGE_PAIRS,
+  ENGLISH_ONLY_ROUTES,
   ENGLISH_SITE_URL,
   GEORGIAN_SITE_URL,
   isEnglishHost,
@@ -196,18 +197,44 @@ function englishSitemap(): MetadataRoute.Sitemap {
         },
       };
     }),
-    {
-      url: `${ENGLISH_SITE_URL}/about`,
-      lastModified: ENGLISH_PUBLISHED,
-      changeFrequency: "yearly" as const,
-      priority: 0.5,
-      alternates: {
-        languages: {
-          en: `${ENGLISH_SITE_URL}/about`,
-          "x-default": `${ENGLISH_SITE_URL}/about`,
-        },
-      },
-    },
+    // English-only pages (no Georgian equivalent, so no ka-GE alternate).
+    // Driven off the shared table rather than hardcoded, so moving a route
+    // into ENGLISH_ONLY_ROUTES can't silently drop it from this sitemap.
+    ...ENGLISH_ONLY_ROUTES.map((route) => {
+      const url = `${ENGLISH_SITE_URL}${route.en}`;
+      return {
+        url,
+        lastModified: ENGLISH_PUBLISHED,
+        changeFrequency: (route.en === "/about" ? "yearly" : "monthly") as
+          | "yearly"
+          | "monthly",
+        priority: route.en === "/about" ? 0.5 : 0.7,
+        alternates: { languages: { en: url, "x-default": url } },
+      };
+    }),
+    // Tests and quizzes. These render fully in English at their Georgian
+    // slugs and are linked from the English /tests hub, but were missing
+    // from this sitemap — the strongest English commercial queries we have
+    // ("free personality test", "online IQ test") had no declared URL.
+    samePathEntry("/pirovnebis-testi", "monthly", 0.9, ENGLISH_PUBLISHED),
+    samePathEntry("/iq-testi", "monthly", 0.9, ENGLISH_PUBLISHED),
+    samePathEntry("/eq-testi", "monthly", 0.9, ENGLISH_PUBLISHED),
+    samePathEntry("/big-five", "monthly", 0.9, ENGLISH_PUBLISHED),
+    samePathEntry("/quiz/namdvili-nishani", "monthly", 0.8, ENGLISH_PUBLISHED),
+    samePathEntry(
+      "/quiz/varskvlavebis-zodiaqo",
+      "monthly",
+      0.75,
+      ENGLISH_PUBLISHED,
+    ),
+    // The English daily-horoscope hub — same-path pair with the Georgian
+    // daily hub, matching its /kvireuli and /tviuri siblings below.
+    samePathEntry("/horoskopi", "daily", 0.95, NOW),
+    // Compatibility calculator landing page — listed in the Georgian sitemap
+    // too, and distinct from the /compatibility guide.
+    samePathEntry("/tavsebadoba", "monthly", 0.85, ENGLISH_PUBLISHED),
+    samePathEntry("/features", "monthly", 0.85, ENGLISH_PUBLISHED),
+    samePathEntry("/how-it-works", "monthly", 0.85, ENGLISH_PUBLISHED),
     samePathEntry("/zodiac/mtvare", "monthly", 0.78),
     samePathEntry("/zodiac/amomavali", "monthly", 0.78),
     samePathEntry("/zodiac/elementebi", "monthly", 0.74),
@@ -392,7 +419,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const georgianPages: MetadataRoute.Sitemap = [
     {
-      url: `${BASE}/`,
+      url: `${BASE}`,
       lastModified: EVERGREEN,
       changeFrequency: "weekly",
       priority: 1,
@@ -468,6 +495,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: EVERGREEN,
       changeFrequency: "monthly",
       priority: 0.8,
+    },
+    {
+      url: `${BASE}/quiz/varskvlavebis-zodiaqo`,
+      lastModified: EVERGREEN,
+      changeFrequency: "monthly",
+      priority: 0.75,
     },
     {
       url: `${BASE}/tavsebadoba`,
@@ -731,7 +764,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const pairByKaPath = new Map(CORE_LANGUAGE_PAIRS.map((pair) => [pair.ka, pair]));
+  /**
+   * Georgian pages whose English version lives at the same path rather than
+   * on a translated slug. /horoskopi belongs here (not in CORE_LANGUAGE_PAIRS)
+   * because the English daily hub is /horoskopi too — the translated-slug
+   * /horoscope is a separate English-only explainer.
+   */
+  const SAME_PATH_PAIRS = ["/horoskopi"] as const;
+
+  const pairByKaPath = new Map<string, { ka: string; en: string }>([
+    ...CORE_LANGUAGE_PAIRS.map(
+      (pair) => [pair.ka, { ka: pair.ka, en: pair.en as string }] as const,
+    ),
+    ...SAME_PATH_PAIRS.map((path) => [path, { ka: path, en: path }] as const),
+  ]);
   const georgianWithAlternates = georgianPages.map((entry) => {
     const path = new URL(entry.url).pathname;
     const pair = pairByKaPath.get(path);

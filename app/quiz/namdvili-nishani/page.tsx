@@ -27,7 +27,15 @@ const METADATA_KA: Metadata = {
     "პიროვნების ტესტი",
     "ზოდიაქოს ტესტი ქართულად",
   ],
-  alternates: { canonical: `${GEORGIAN_SITE_URL}/quiz/namdvili-nishani` },
+  // Reciprocal — the English side already points here.
+  alternates: {
+    canonical: `${GEORGIAN_SITE_URL}/quiz/namdvili-nishani`,
+    languages: {
+      en: `${ENGLISH_SITE_URL}/quiz/namdvili-nishani`,
+      "ka-GE": `${GEORGIAN_SITE_URL}/quiz/namdvili-nishani`,
+      "x-default": `${ENGLISH_SITE_URL}/quiz/namdvili-nishani`,
+    },
+  },
   openGraph: {
     type: "website",
     url: `${GEORGIAN_SITE_URL}/quiz/namdvili-nishani`,

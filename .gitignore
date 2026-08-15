@@ -20,6 +20,10 @@
 /.next/
 /out/
 
+# eve generated build/discovery artifacts
+/.eve/
+/.output/
+
 # production
 /build
 

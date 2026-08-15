@@ -54,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
   if ((await getRequestLocale()) === "en") {
     const title = "The Four Zodiac Elements: Fire, Earth, Air and Water";
     const description = "Understand the four zodiac elements and their signs, personality traits, strengths, challenges, love style, career patterns, and compatibility.";
-    return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { type: "website", url: "https://vividaastro.com/zodiac/elementebi", title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+    return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { type: "website", url: "https://www.vividaastro.com/zodiac/elementebi", title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
   }
   return ELEMENTS_HUB_CONTENT ? {
       title: { absolute: ELEMENTS_HUB_CONTENT.pageTitle },

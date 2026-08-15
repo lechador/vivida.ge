@@ -26,7 +26,7 @@ export function NumerologyHubEn() {
 
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <Background /><Starfield count={120} shooting={2} /><SmartHeader locale="en" />
+      <Background /><Starfield count={120} shooting={2} /><SmartHeader locale="en" georgianPath="/numerologia" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground"><Link href="/">Home</Link><span>/</span><span className="text-foreground/80">Numerology</span></nav>
@@ -64,7 +64,7 @@ export function LifePathNumberPageEn({ number, content }: { number: LifePathNumb
 
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <Background /><Starfield count={110} shooting={2} /><SmartHeader locale="en" />
+      <Background /><Starfield count={110} shooting={2} /><SmartHeader locale="en" georgianPath={`/numerologia/${number}`} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground"><Link href="/">Home</Link><span>/</span><Link href="/numerologia">Numerology</Link><span>/</span><span className="text-foreground/80">Life Path {number}</span></nav>

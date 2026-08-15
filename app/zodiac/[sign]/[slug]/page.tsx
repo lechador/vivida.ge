@@ -142,7 +142,7 @@ export async function generateMetadata({
       ),
       openGraph: {
         type: "article",
-        url: en ? `https://vividaastro.com/zodiac/${sign}/${slug}` : url,
+        url: en ? `https://www.vividaastro.com/zodiac/${sign}/${slug}` : url,
         title,
         description,
         siteName: "Vivida",
@@ -158,7 +158,7 @@ export async function generateMetadata({
   if (!c) return {};
   if (en) {
     const english = yearlyHoroscopeEnglish(sign, yearNum);
-    const url = `https://vividaastro.com/zodiac/${sign}/${slug}`;
+    const url = `https://www.vividaastro.com/zodiac/${sign}/${slug}`;
     return {
       title: { absolute: english.title },
       description: english.description,

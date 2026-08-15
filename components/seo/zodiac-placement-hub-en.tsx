@@ -81,14 +81,14 @@ export function ZodiacPlacementHubEn({ kind }: { kind: PlacementKind }) {
       "@type": "CollectionPage",
       name: c.title,
       description: c.tagline,
-      url: `https://vividaastro.com${c.path}`,
+      url: `https://www.vividaastro.com${c.path}`,
       inLanguage: "en",
       mainEntity: {
         "@type": "ItemList",
         itemListElement: ALL_SLUGS.map((slug, index) => ({
           "@type": "ListItem",
           position: index + 1,
-          url: `https://vividaastro.com${c.path}/${slug}`,
+          url: `https://www.vividaastro.com${c.path}/${slug}`,
           name: c.cardName(signMetaBySlug(slug)!.labelEn),
         })),
       },
@@ -108,7 +108,7 @@ export function ZodiacPlacementHubEn({ kind }: { kind: PlacementKind }) {
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" />
       <Starfield count={130} shooting={3} />
-      <SmartHeader locale="en" />
+      <SmartHeader locale="en" georgianPath={c.path} />
       {ld.map((item, index) => (
         <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />
       ))}
@@ -173,7 +173,7 @@ export function ZodiacPlacementHubEn({ kind }: { kind: PlacementKind }) {
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">{c.ctaTitle}</h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">{c.ctaBody}</p>
-          <Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/nataluri-ruka">{c.cta}</Link></Button>
+          <Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/natal-chart">{c.cta}</Link></Button>
         </div>
       </section>
       <SiteFooter locale="en" />

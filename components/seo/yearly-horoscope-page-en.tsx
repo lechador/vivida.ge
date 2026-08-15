@@ -16,7 +16,7 @@ export function YearlyHoroscopePageEn({ sign, year }: { sign: ZodiacSlug; year: 
   const meta = signMetaBySlug(sign)!;
   const name = meta.labelEn;
   const accent = signColor(meta);
-  const url = `https://vividaastro.com/zodiac/${sign}/${year}`;
+  const url = `https://www.vividaastro.com/zodiac/${sign}/${year}`;
   const ld = [
     { "@context": "https://schema.org", "@type": "Article", headline: content.title, description: content.description, inLanguage: "en", mainEntityOfPage: { "@type": "WebPage", "@id": url }, author: { "@type": "Organization", name: "Vivida" }, publisher: { "@type": "Organization", name: "Vivida" }, datePublished: `${year}-01-01` },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: content.faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },
@@ -24,7 +24,7 @@ export function YearlyHoroscopePageEn({ sign, year }: { sign: ZodiacSlug; year: 
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" />
-      <Starfield count={130} shooting={3} /><SmartHeader locale="en" />
+      <Starfield count={130} shooting={3} /><SmartHeader locale="en" georgianPath={`/zodiac/${sign}/${year}`} />
       {ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground"><Link href="/zodiac">Zodiac signs</Link><span>/</span><Link href={`/zodiac/${sign}`}>{name}</Link><span>/</span><span className="text-foreground/80">{year}</span></nav>
@@ -38,7 +38,7 @@ export function YearlyHoroscopePageEn({ sign, year }: { sign: ZodiacSlug; year: 
         <section className="mt-14 max-w-3xl rounded-2xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 sm:p-7"><div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Guidance for the year</div><p className="mt-3 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">{content.advice}</p></section>
         <section className="mt-12 max-w-3xl"><h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">Frequently asked questions</h2><div className="space-y-3">{content.faq.map((item) => <details key={item.q} className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 open:bg-card/80 sm:p-5"><summary className="flex cursor-pointer list-none justify-between gap-4 font-medium"><span>{item.q}</span><span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-45">✦</span></summary><p className="mt-3 text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p></details>)}</div></section>
         <ReportPromo className="mt-16" />
-        <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10"><Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" /><h2 className="text-2xl font-semibold sm:text-3xl">Go beyond your Sun sign</h2><p className="mx-auto mt-3 max-w-md text-muted-foreground">A personal forecast considers your exact birth chart, including the rising sign, houses, planets, and aspects.</p><Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/nataluri-ruka">Calculate my birth chart</Link></Button></div>
+        <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10"><Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" /><h2 className="text-2xl font-semibold sm:text-3xl">Go beyond your Sun sign</h2><p className="mx-auto mt-3 max-w-md text-muted-foreground">A personal forecast considers your exact birth chart, including the rising sign, houses, planets, and aspects.</p><Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/natal-chart">Calculate my birth chart</Link></Button></div>
         <section className="mt-14"><h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">Other {year} horoscopes</h2><div className="flex flex-wrap gap-2">{ALL_SLUGS.filter((item) => item !== sign && yearlyContentFor(item, year)).map((item) => { const other = signMetaBySlug(item)!; return <Link key={item} href={`/zodiac/${item}/${year}`} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm hover:bg-card/80"><span>{SIGNS_CONTENT[item].symbol}</span>{other.labelEn}</Link>; })}</div></section>
       </section><SiteFooter locale="en" />
     </main>

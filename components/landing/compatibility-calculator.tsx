@@ -268,7 +268,7 @@ function ResultCard({
   const percent = useCountUp(result.percent);
 
   async function share() {
-    const url = `${en ? "https://vividaastro.com" : "https://www.vivida.ge"}/zodiac/tavsebadoba/${result.slug}`;
+    const url = `${en ? "https://www.vividaastro.com" : "https://www.vivida.ge"}/zodiac/tavsebadoba/${result.slug}`;
     const text = en
       ? `${signA.label} × ${signB.label} — ${result.percent}% compatibility on Vivida ✨`
       : `${signA.label} × ${signB.label} — ${result.percent}% თავსებადობა Vivida-ზე ✨`;

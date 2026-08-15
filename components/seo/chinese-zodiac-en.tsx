@@ -78,7 +78,7 @@ export function ChineseZodiacHubEn() {
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <PageBackground />
       <Starfield count={140} shooting={3} />
-      <SmartHeader locale="en" />
+      <SmartHeader locale="en" georgianPath="/chinuri-horoskopi" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -229,7 +229,7 @@ export function ChineseAnimalPageEn({
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <PageBackground />
       <Starfield count={120} shooting={3} />
-      <SmartHeader locale="en" />
+      <SmartHeader locale="en" georgianPath={`/chinuri-horoskopi/${animal}`} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

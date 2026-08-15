@@ -29,13 +29,13 @@ export function ZodiacElementsHubEn() {
     { q: "Do I have only one element?", a: "No. Your Sun sign has one element, but every planet and angle occupies a sign. A complete birth chart shows the balance of all four elements." },
   ];
   const ld = [
-    { "@context": "https://schema.org", "@type": "CollectionPage", name: "The Four Zodiac Elements", description: "Understand Fire, Earth, Air, and Water signs, including personality, strengths, challenges, love, career, and compatibility.", url: `https://vividaastro.com${PATH}`, inLanguage: "en" },
+    { "@context": "https://schema.org", "@type": "CollectionPage", name: "The Four Zodiac Elements", description: "Understand Fire, Earth, Air, and Water signs, including personality, strengths, challenges, love, career, and compatibility.", url: `https://www.vividaastro.com${PATH}`, inLanguage: "en" },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },
   ];
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" />
-      <Starfield count={130} shooting={3} /><SmartHeader locale="en" />
+      <Starfield count={130} shooting={3} /><SmartHeader locale="en" georgianPath={PATH} />
       {ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground"><Link href="/zodiac" className="hover:text-foreground">Zodiac signs</Link><span>/</span><span className="text-foreground/80">Elements</span></nav>
@@ -55,7 +55,7 @@ export function ZodiacElementsHubEn() {
           })}
         </div>
         <Faq items={faq} />
-        <div className="mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10"><Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" /><h2 className="text-2xl font-semibold sm:text-3xl">See your elemental balance</h2><p className="mx-auto mt-3 max-w-md text-muted-foreground">A complete birth chart shows how much Fire, Earth, Air, and Water your planetary placements contain.</p><Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/nataluri-ruka">Calculate my birth chart</Link></Button></div>
+        <div className="mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10"><Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" /><h2 className="text-2xl font-semibold sm:text-3xl">See your elemental balance</h2><p className="mx-auto mt-3 max-w-md text-muted-foreground">A complete birth chart shows how much Fire, Earth, Air, and Water your planetary placements contain.</p><Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/natal-chart">Calculate my birth chart</Link></Button></div>
       </section><SiteFooter locale="en" />
     </main>
   );
@@ -69,7 +69,7 @@ export function ZodiacElementPageEn({ element }: { element: ElementSlug }) {
     { q: `What are ${content.name.toLowerCase()} like?`, a: content.personality },
     { q: `Are ${content.name.toLowerCase()} compatible with other elements?`, a: content.compatibility },
   ];
-  const url = `https://vividaastro.com${PATH}/${element}`;
+  const url = `https://www.vividaastro.com${PATH}/${element}`;
   const ld = [
     { "@context": "https://schema.org", "@type": "Article", headline: `${content.name}: Traits, Love and Compatibility`, description: content.tagline, inLanguage: "en", mainEntityOfPage: { "@type": "WebPage", "@id": url }, author: { "@type": "Organization", name: "Vivida" } },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },
@@ -77,7 +77,7 @@ export function ZodiacElementPageEn({ element }: { element: ElementSlug }) {
   return (
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" />
-      <Starfield count={130} shooting={3} /><SmartHeader locale="en" />
+      <Starfield count={130} shooting={3} /><SmartHeader locale="en" georgianPath={`${PATH}/${element}`} />
       {ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground"><Link href="/zodiac">Zodiac signs</Link><span>/</span><Link href={PATH}>Elements</Link><span>/</span><span className="text-foreground/80">{content.name}</span></nav>
@@ -93,7 +93,7 @@ export function ZodiacElementPageEn({ element }: { element: ElementSlug }) {
         <Faq items={faq} />
         <section className="mt-14"><h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">Other elements</h2><div className="flex flex-wrap gap-2">{ALL_ELEMENT_SLUGS.filter((item) => item !== element).map((item) => <Link key={item} href={`${PATH}/${item}`} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm hover:bg-card/80"><span style={{ color: ACCENT[item] }}>{GLYPH[item]}</span>{ELEMENT_ENGLISH[item].name}</Link>)}</div></section>
         <ReportPromo className="mt-16" />
-        <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10"><Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" /><h2 className="text-2xl font-semibold sm:text-3xl">Your chart is a blend of all four elements</h2><p className="mx-auto mt-3 max-w-md text-muted-foreground">Calculate every planetary placement to understand your complete elemental balance.</p><Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/nataluri-ruka">Calculate my birth chart</Link></Button></div>
+        <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10"><Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" /><h2 className="text-2xl font-semibold sm:text-3xl">Your chart is a blend of all four elements</h2><p className="mx-auto mt-3 max-w-md text-muted-foreground">Calculate every planetary placement to understand your complete elemental balance.</p><Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/natal-chart">Calculate my birth chart</Link></Button></div>
       </section><SiteFooter locale="en" />
     </main>
   );

@@ -10,7 +10,24 @@
  * snippets, so we keep them composable instead.
  */
 
+import { isEnglishHost } from "./locales";
+
 const SITE_URL = "https://www.vivida.ge";
+
+/**
+ * The same builders serve both language domains, so the page URL is the
+ * only reliable locale signal available to a synchronous helper. Deriving
+ * it here keeps `inLanguage` correct without every call site threading a
+ * locale through — English pages already pass their vividaastro.com URL.
+ */
+function inLanguageFor(url: string): "en" | "ka-GE" {
+  try {
+    return isEnglishHost(new URL(url).host) ? "en" : "ka-GE";
+  } catch {
+    return "ka-GE";
+  }
+}
+
 const ORG = {
   "@type": "Organization" as const,
   name: "Vivida",
@@ -43,7 +60,7 @@ export function articleLd(input: ArticleInput): JsonLd {
     "@type": "Article",
     headline: input.headline,
     description: input.description,
-    inLanguage: "ka-GE",
+    inLanguage: inLanguageFor(input.url),
     mainEntityOfPage: { "@type": "WebPage", "@id": input.url },
     author: ORG,
     publisher: ORG,

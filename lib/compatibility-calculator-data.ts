@@ -7,7 +7,11 @@
  * pass the result into <CompatibilityCalculator />.
  */
 
-import { PAIRS_CONTENT, SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
+import {
+  PAIRS_CONTENT,
+  SIGNS_CONTENT,
+  type CompatibilityScore,
+} from "@/lib/seo/zodiac-content";
 import {
   ALL_SLUGS,
   signMetaBySlug,
@@ -15,6 +19,20 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { pairPercent } from "@/lib/compatibility-score";
+import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
+
+/**
+ * The editorial category is what drives `percent` (see compatibility-score),
+ * so the English label has to be a direct translation of it. Deriving the
+ * label from the percentage instead lets the two disagree at a band edge —
+ * a ჰარმონიული pair scoring 80 would read "Strong" in English but
+ * "ჰარმონიული" in Georgian for the same couple.
+ */
+const SCORE_EN: Record<CompatibilityScore, string> = {
+  ძლიერი: "Strong",
+  ჰარმონიული: "Harmonious",
+  გამომწვევი: "Dynamic",
+};
 
 export type CalcSign = {
   slug: ZodiacSlug;
@@ -57,33 +75,26 @@ export function buildCalculatorData(
   if (PAIRS_CONTENT) {
     for (const [slug, c] of Object.entries(PAIRS_CONTENT)) {
       const percent = pairPercent(slug, c.overallScore);
-      const scoreEn =
-        percent >= 75 ? "Strong" : percent >= 58 ? "Harmonious" : "Dynamic";
+      const [aSlug, bSlug] = slug.split("-") as [ZodiacSlug, ZodiacSlug];
+      // Every pair previously shared one of three canned taglines and an
+      // identical strengths list, so all 78 English results read the same.
+      // This is the per-pair copy already used by /zodiac/tavsebadoba/[pair],
+      // which is also where the "View full analysis" link goes — so the
+      // teaser and the page it opens now agree.
+      const enContent = en ? zodiacPairEnglish(aSlug, bSlug) : null;
       pairs[slug] = {
         slug,
         percent,
-        score: en ? scoreEn : c.overallScore,
-        tagline: en
-          ? percent >= 75
-            ? "A naturally magnetic match with plenty of shared momentum."
-            : percent >= 58
-              ? "A promising connection that balances common ground with useful differences."
-              : "A lively pairing where patience and curiosity can turn differences into growth."
-          : c.tagline,
-        strengths: en
-          ? [
-              "A distinct energy you can build on",
-              "Different perspectives that keep the connection moving",
-              "Room for honest communication and shared growth",
-            ]
+        score: en ? SCORE_EN[c.overallScore] : c.overallScore,
+        tagline: enContent ? enContent.tagline : c.tagline,
+        strengths: enContent
+          ? enContent.strengths.slice(0, 3)
           : c.strengths.slice(0, 3),
         labelA: en
-          ? (signMetaBySlug(slug.split("-")[0] as ZodiacSlug)?.labelEn ??
-            c.labelA)
+          ? (signMetaBySlug(aSlug)?.labelEn ?? c.labelA)
           : c.labelA,
         labelB: en
-          ? (signMetaBySlug(slug.split("-")[1] as ZodiacSlug)?.labelEn ??
-            c.labelB)
+          ? (signMetaBySlug(bSlug)?.labelEn ?? c.labelB)
           : c.labelB,
       };
     }

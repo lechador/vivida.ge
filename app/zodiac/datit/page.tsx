@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
   if ((await getRequestLocale()) !== "en") return KA_METADATA;
   const title = "What Is My Zodiac Sign? Find Your Sign by Birth Date";
   const description = "Choose your birth month and day to find your zodiac Sun sign, explore all zodiac date ranges, and learn how cusp birthdays work.";
-  return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { type: "website", url: `https://vividaastro.com${PATH}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { type: "website", url: `https://www.vividaastro.com${PATH}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
 }
 
 const FAQ_LD = {

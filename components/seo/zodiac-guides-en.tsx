@@ -19,7 +19,7 @@ export function ZodiacByDatePageEn() {
     { q: "Is my zodiac sign my whole birth chart?", a: "No. It is your Sun sign. The Moon, rising sign, planets, houses, and aspects add essential layers." },
   ];
   const ld = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) };
-  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={130} shooting={3} /><SmartHeader locale="en" /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={130} shooting={3} /><SmartHeader locale="en" georgianPath="/zodiac/datit" /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
     <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
       <nav className="mb-6 flex gap-2 text-xs text-muted-foreground"><Link href="/zodiac">Zodiac signs</Link><span>/</span><span className="text-foreground/80">Sign by date</span></nav>
       <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Sun sign calculator</div><h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">What Is My Zodiac Sign?</h1><p className="max-w-2xl text-pretty text-lg text-muted-foreground">Choose your birth month and day to find your conventional Western tropical Sun sign.</p>
@@ -34,10 +34,10 @@ export function ZodiacByDatePageEn() {
 }
 
 export function ZodiacGuideIndexEn() {
-  const url = "https://vividaastro.com/zodiac/gzamkvlevi";
+  const url = "https://www.vividaastro.com/zodiac/gzamkvlevi";
   const links = ["/zodiac", "/zodiac/datit", "/zodiac/mtvare", "/zodiac/amomavali", "/zodiac/elementebi", "/compatibility"];
-  const ld = { "@context": "https://schema.org", "@type": "CollectionPage", name: "Complete Zodiac Guide", description: "Explore zodiac signs, Moon signs, rising signs, elements, horoscope periods, and all 78 compatibility pairings.", url, inLanguage: "en", mainEntity: { "@type": "ItemList", itemListElement: links.map((item, index) => ({ "@type": "ListItem", position: index + 1, url: `https://vividaastro.com${item}` })) } };
-  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={130} shooting={3} /><SmartHeader locale="en" /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+  const ld = { "@context": "https://schema.org", "@type": "CollectionPage", name: "Complete Zodiac Guide", description: "Explore zodiac signs, Moon signs, rising signs, elements, horoscope periods, and all 78 compatibility pairings.", url, inLanguage: "en", mainEntity: { "@type": "ItemList", itemListElement: links.map((item, index) => ({ "@type": "ListItem", position: index + 1, url: `https://www.vividaastro.com${item}` })) } };
+  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={130} shooting={3} /><SmartHeader locale="en" georgianPath="/zodiac/gzamkvlevi" /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
     <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
       <nav className="mb-6 flex gap-2 text-xs text-muted-foreground"><Link href="/zodiac">Zodiac signs</Link><span>/</span><span className="text-foreground/80">Complete guide</span></nav>
       <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground"><Compass className="size-3.5" />Astrology library</div><h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">Complete Zodiac Guide</h1><p className="max-w-2xl text-pretty text-lg text-muted-foreground">Explore all 12 signs, Moon and rising placements, four elements, horoscope periods, and every zodiac compatibility pairing.</p>

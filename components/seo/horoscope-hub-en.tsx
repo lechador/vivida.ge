@@ -71,7 +71,7 @@ export function HoroscopeHubEn() {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Daily Horoscope for Every Zodiac Sign",
-    url: "https://vividaastro.com/horoscope",
+    url: "https://www.vividaastro.com/horoskopi",
     inLanguage: "en",
     mainEntity: {
       "@type": "ItemList",
@@ -79,7 +79,7 @@ export function HoroscopeHubEn() {
         "@type": "ListItem",
         position: index + 1,
         name: signMetaBySlug(slug)?.labelEn ?? slug,
-        url: `https://vividaastro.com/zodiac/${slug}/${VIEW_PATH.today}`,
+        url: `https://www.vividaastro.com/zodiac/${slug}/${VIEW_PATH.today}`,
       })),
     },
   };
@@ -94,7 +94,7 @@ export function HoroscopeHubEn() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
       />
       <Starfield count={120} shooting={3} />
-      <SmartHeader locale="en" />
+      <SmartHeader locale="en" georgianPath="/horoskopi" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
@@ -227,7 +227,7 @@ export function HoroscopeHubEn() {
             every natal planet. Calculate your complete chart for free.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/nataluri-ruka">Calculate my birth chart</Link>
+            <Link href="/natal-chart">Calculate my birth chart</Link>
           </Button>
         </div>
         <PopularSearches
