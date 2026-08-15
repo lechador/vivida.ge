@@ -7,13 +7,17 @@ import { AuthDivider, AuthLayout } from "@/components/auth/auth-layout";
 import { GoogleButton } from "@/components/auth/google-button";
 import { LoginForm } from "@/components/auth/login-form";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
     title: locale === "en" ? "Sign in" : "შესვლა",
-    alternates: { canonical: "/login" },
+    // Both hosts serve this path in their own language, and both were
+    // indexable while self-canonicalizing — without hreflang that reads as
+    // two duplicates rather than one page in two languages.
+    alternates: localizedAlternates("/login", "/login", locale === "en" ? "en" : "ka"),
   };
 }
 

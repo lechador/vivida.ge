@@ -15,6 +15,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const en = (await getRequestLocale()) === "en";
@@ -23,7 +24,13 @@ export async function generateMetadata(): Promise<Metadata> {
     description: en
       ? "See how Vivida turns your birth details into a personal chart, forecast, and AI-powered interpretation."
       : "ნახე როგორ ქმნის Vivida შენს პერსონალურ კოსმიურ რუკას — დაბადების მონაცემიდან AI ინტერპრეტაციამდე.",
-    alternates: { canonical: "/how-it-works" },
+    // Same-path pair — see the note in app/features/page.tsx: the sitemap
+    // declared this pair from the English side only, so it never held.
+    alternates: localizedAlternates(
+      "/how-it-works",
+      "/how-it-works",
+      en ? "en" : "ka",
+    ),
   };
 }
 

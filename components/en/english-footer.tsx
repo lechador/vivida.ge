@@ -3,18 +3,56 @@ import Link from "next/link";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
+/**
+ * The Georgian footer carries three link columns into every content cluster;
+ * this one carried five links total, so ~590 of the 599 English URLs had no
+ * sitewide internal link at all and depended entirely on the sitemap for
+ * discovery. On a domain with no backlinks yet, that is the binding
+ * constraint on crawling. Every href below is verified live on the English
+ * host — Georgian slugs are intentional (the English site reuses them).
+ */
 const EXPLORE = [
   { href: "/natal-chart", label: "Natal chart" },
-  { href: "/horoscope", label: "Daily horoscope" },
-  { href: "/zodiac", label: "Zodiac signs" },
+  { href: "/horoscope", label: "How horoscopes work" },
+  { href: "/horoskopi", label: "Daily horoscope" },
+  { href: "/horoskopi/kvireuli", label: "Weekly horoscope" },
+  { href: "/horoskopi/tviuri", label: "Monthly horoscope" },
   { href: "/compatibility", label: "Compatibility" },
-  { href: "/tests", label: "Tests" },
+  { href: "/features", label: "Features" },
+  { href: "/how-it-works", label: "How it works" },
+];
+
+const LEARN = [
+  { href: "/zodiac", label: "Zodiac signs" },
+  { href: "/zodiac/datit", label: "Sign by birth date" },
+  { href: "/zodiac/mtvare", label: "Moon sign" },
+  { href: "/zodiac/amomavali", label: "Rising sign" },
+  { href: "/zodiac/elementebi", label: "Elements" },
+  { href: "/zodiac/gzamkvlevi", label: "Complete guide" },
+  { href: "/zodiac/reitingebi", label: "Sign rankings" },
+  { href: "/astrologiuri-saxlebi", label: "Astrological houses" },
+  { href: "/planetebi", label: "Planets" },
+  { href: "/astrologiuri-kalendari", label: "Astrology calendar" },
+  { href: "/dabnelebebi", label: "Eclipses" },
+];
+
+const TOOLS = [
+  { href: "/taro", label: "Tarot reading" },
+  { href: "/sizmris-akhsna", label: "Dream interpretation" },
+  { href: "/numerologia", label: "Numerology" },
+  { href: "/angeluri-ricxvebi", label: "Angel numbers" },
+  { href: "/chinuri-horoskopi", label: "Chinese zodiac" },
+  { href: "/tests", label: "Tests and quizzes" },
+  { href: "/iq-testi", label: "IQ test" },
+  { href: "/pirovnebis-testi", label: "Personality test" },
+  { href: "/mbti", label: "MBTI types" },
+  { href: "/emociuri-inteleqti", label: "Emotional intelligence" },
 ];
 
 export function EnglishFooter() {
   return (
     <footer className="relative z-10 border-t border-border/40 bg-background/65 backdrop-blur-md">
-      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div className="max-w-md">
           <Link href="/" className="inline-flex items-center gap-2.5">
             <VividaMark size={36} id="english-footer" />
@@ -32,6 +70,24 @@ export function EnglishFooter() {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Explore</h2>
           <ul className="space-y-2 text-sm">
             {EXPLORE.map((item) => (
+              <li key={item.href}><Link href={item.href} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Learn</h2>
+          <ul className="space-y-2 text-sm">
+            {LEARN.map((item) => (
+              <li key={item.href}><Link href={item.href} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Tools</h2>
+          <ul className="space-y-2 text-sm">
+            {TOOLS.map((item) => (
               <li key={item.href}><Link href={item.href} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
             ))}
           </ul>

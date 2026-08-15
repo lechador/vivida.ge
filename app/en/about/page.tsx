@@ -4,6 +4,7 @@ import { Mail, MapPin, ShieldCheck } from "lucide-react";
 
 import { EnglishGuide } from "@/components/en/english-guide";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import { breadcrumbLd } from "@/lib/seo/jsonld";
 
 const TITLE = "About Vivida";
 const DESCRIPTION = "Learn what Vivida is, how its astrology and self-discovery content is created, and how to contact the team in Georgia.";
@@ -15,8 +16,31 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishAboutPage() {
+  const url = `${ENGLISH_SITE_URL}/about`;
+  const ld = [
+    {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      name: TITLE,
+      description: DESCRIPTION,
+      url,
+      inLanguage: "en",
+      mainEntity: {
+        "@type": "Organization",
+        name: "Vivida",
+        url: ENGLISH_SITE_URL,
+        email: "hello@vivida.ge",
+        address: { "@type": "PostalAddress", addressCountry: "GE" },
+        sameAs: ["https://www.vivida.ge"],
+      },
+    },
+    breadcrumbLd([
+      { name: "Home", url: ENGLISH_SITE_URL },
+      { name: "About", url },
+    ]),
+  ];
   return (
-    <EnglishGuide eyebrow="About us" title="Vivida makes complex chart ideas easier to explore" intro="Vivida is a Georgia-based astrology and self-discovery platform that combines natal-chart calculations, educational guides and reflective tools in one experience." georgianPath="/">
+    <EnglishGuide eyebrow="About us" title="Vivida makes complex chart ideas easier to explore" intro="Vivida is a Georgia-based astrology and self-discovery platform that combines natal-chart calculations, educational guides and reflective tools in one experience." georgianPath="/" jsonLd={ld}>
       <section>
         <h2>What we build</h2>
         <p>Our public guides explain the basic structure of natal charts, zodiac signs, planetary cycles and relationship synastry. Registered users can also access personalized chart features and community tools. The original product was created in Georgian; the English section is being introduced carefully, beginning with core navigation and educational material.</p>

@@ -7,13 +7,15 @@ import { AuthDivider, AuthLayout } from "@/components/auth/auth-layout";
 import { GoogleButton } from "@/components/auth/google-button";
 import { SignupForm } from "@/components/auth/signup-form";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
     title: locale === "en" ? "Create an account" : "რეგისტრაცია",
-    alternates: { canonical: "/signup" },
+    // Same-path language pair — see the note in app/login/page.tsx.
+    alternates: localizedAlternates("/signup", "/signup", locale === "en" ? "en" : "ka"),
   };
 }
 

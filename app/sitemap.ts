@@ -770,7 +770,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * because the English daily hub is /horoskopi too — the translated-slug
    * /horoscope is a separate English-only explainer.
    */
-  const SAME_PATH_PAIRS = ["/horoskopi"] as const;
+  const SAME_PATH_PAIRS = [
+    "/horoskopi",
+    // These four render one tree in both languages at the same path. The
+    // English sitemap already named vivida.ge as their Georgian partner, but
+    // this side named nobody — a one-way annotation, which Google discards.
+    "/features",
+    "/how-it-works",
+    "/login",
+    "/signup",
+  ] as const;
 
   const pairByKaPath = new Map<string, { ka: string; en: string }>([
     ...CORE_LANGUAGE_PAIRS.map(

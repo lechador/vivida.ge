@@ -1,20 +1,34 @@
 import { EnglishShell } from "@/components/en/english-shell";
+import { serializeLd, type JsonLd } from "@/lib/seo/jsonld";
 
 export function EnglishGuide({
   eyebrow,
   title,
   intro,
   georgianPath,
+  jsonLd,
   children,
 }: {
   eyebrow: string;
   title: string;
   intro: string;
   georgianPath: string;
+  /**
+   * Structured data for this guide. The Georgian counterparts of these pages
+   * have shipped JSON-LD for a while; the English core pages had none, so
+   * they were the only part of the site Google had to read unaided.
+   */
+  jsonLd?: JsonLd | JsonLd[];
   children: React.ReactNode;
 }) {
   return (
     <EnglishShell georgianPath={georgianPath}>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeLd(jsonLd) }}
+        />
+      )}
       <article className="mx-auto w-full max-w-4xl px-4 pb-20 pt-12 sm:px-6 sm:pb-28 sm:pt-20">
         <header className="max-w-3xl">
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-[var(--vivida-cyan)]">{eyebrow}</p>

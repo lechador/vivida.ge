@@ -18,6 +18,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedAlternates } from "@/lib/seo/locales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const en = (await getRequestLocale()) === "en";
@@ -26,9 +27,12 @@ export async function generateMetadata(): Promise<Metadata> {
     description: en
       ? "Birth charts, daily forecasts, compatibility, AI insights, and a public profile—explore every Vivida feature."
       : "ნატალური რუკა, ყოველდღიური პროგნოზი, თავსებადობა, AI ანალიზი, საჯარო პროფილი — Vivida-ს ყველა ფუნქცია ერთ ადგილას.",
-    // Relative — resolves against the host-aware metadataBase in the root
-    // layout, so each domain self-canonicalizes instead of inheriting one.
-    alternates: { canonical: "/features" },
+    // Same-path pair: the English version lives at /features on the
+    // international host. Self-canonicalizes per domain AND declares the
+    // reciprocal hreflang — the sitemap alone was one-way (only the English
+    // side named a Georgian partner), so Google dropped the pair and treated
+    // the two domains as competing duplicates.
+    alternates: localizedAlternates("/features", "/features", en ? "en" : "ka"),
   };
 }
 
