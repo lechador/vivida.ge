@@ -80,18 +80,22 @@ test.describe("public surface sweep", () => {
 
       // Horizontal overflow — the classic mobile break. Georgian words are
       // long and do not hyphenate, so this catches real regressions.
-      // Horizontal overflow is measured on the document, not per element:
-      // decorative glows are routinely positioned past the viewport edge and
-      // clipped by an `overflow-hidden` ancestor, which is not a defect. The
-      // per-element list is collected only to name a culprit when it is.
+      // Ground truth for "does this page scroll sideways" is whether it can
+      // actually be scrolled — NOT `scrollWidth - clientWidth`. That delta
+      // reports several harmless things as overflow: decorative glows placed
+      // past the edge and clipped by an `overflow-hidden` ancestor, and text
+      // overhanging its column by a pixel or two once webfonts swap in (a long
+      // Georgian word in the footer did exactly that, intermittently, because
+      // it depends on font-load timing). Try to scroll and see if it moves.
       const overflow = await page.evaluate(() => {
         const de = document.documentElement;
-        // Negative when a vertical scrollbar is present — only a positive
-        // delta means the page actually scrolls sideways.
-        const overflowPx = Math.max(0, de.scrollWidth - de.clientWidth);
-        if (overflowPx === 0) return { overflowPx, offenders: [] as string[] };
+        const startX = window.scrollX;
+        window.scrollTo(99999, window.scrollY);
+        const scrolledTo = window.scrollX;
+        window.scrollTo(startX, window.scrollY);
+        if (scrolledTo <= startX) return { scrolledBy: 0, offenders: [] as string[] };
         return {
-          overflowPx,
+          scrolledBy: scrolledTo - startX,
           offenders: [...document.querySelectorAll("body *")]
             .filter((el) => {
               const r = el.getBoundingClientRect();
@@ -102,8 +106,8 @@ test.describe("public surface sweep", () => {
         };
       });
       expect(
-        overflow.overflowPx,
-        `${path} scrolls horizontally; widest elements: ${overflow.offenders.join(", ")}`,
+        overflow.scrolledBy,
+        `${path} scrolls horizontally by ${overflow.scrolledBy}px; widest elements: ${overflow.offenders.join(", ")}`,
       ).toBe(0);
 
       expect(consoleErrors, `${path} console errors`).toEqual([]);

@@ -109,11 +109,19 @@ export function TrackingConsentManager({
       {ready && consent !== null && !settingsOpen && (
         <button
           type="button"
+          data-privacy-reopen
           onClick={() => setSettingsOpen(true)}
-          className="fixed bottom-3 left-3 z-[90] inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/85 px-3 py-1.5 text-[11px] text-muted-foreground shadow-lg backdrop-blur transition-colors hover:text-foreground"
+          // Icon-only on phones: the Georgian label ("კონფიდენციალურობა") is
+          // wide enough to sit over two tab-bar items. globals.css lifts this
+          // clear of the bar whenever the bar is mounted.
+          className="fixed bottom-3 left-3 z-[90] inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/85 p-2 text-[11px] text-muted-foreground shadow-lg backdrop-blur transition-colors hover:text-foreground lg:px-3 lg:py-1.5"
         >
-          <ShieldCheck className="size-3.5" />
-          {en ? "Privacy choices" : "კონფიდენციალურობა"}
+          <ShieldCheck className="size-3.5 shrink-0" />
+          {/* Kept in the DOM at every size so the button always has an
+              accessible name, visible only where there is room for it. */}
+          <span className="sr-only lg:not-sr-only">
+            {en ? "Privacy choices" : "კონფიდენციალურობა"}
+          </span>
         </button>
       )}
 

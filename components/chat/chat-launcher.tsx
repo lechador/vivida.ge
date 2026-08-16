@@ -576,6 +576,7 @@ export function ChatLauncher({
       <motion.button
         type="button"
         aria-label={en ? "Chat" : "ჩატი"}
+        data-chat-launcher
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
