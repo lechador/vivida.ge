@@ -1,13 +1,37 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { MarketingCta } from "@/components/marketing-cta";
 import { SiteSearch } from "@/components/search/site-search";
+import { CORE_LANGUAGE_PAIRS, ENGLISH_SITE_URL } from "@/lib/seo/locales";
+
+/** Only these few routes change slug across languages; every other public page
+ * is published at the same path on the English domain (see englishSitemap()). */
+const EN_PATH_BY_KA = new Map(
+  CORE_LANGUAGE_PAIRS.map(({ ka, en }) => [ka, en as string]),
+);
+
+/**
+ * English counterpart of the page currently being viewed. Absolute on purpose,
+ * mirroring EnglishHeader's ქართული switch: the /en/* internal paths only
+ * 301-redirect to this domain anyway.
+ */
+function englishHrefFor(pathname: string): string {
+  const kaPath = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  const enPath = EN_PATH_BY_KA.get(kaPath) ?? kaPath;
+  return `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
+}
 
 /**
  * Lightweight header for public marketing pages (/how-it-works, /features,
  * /terms, /privacy). The authed AppHeader is over-featured for these — we
  * just need brand + a few nav links + a CTA.
+ *
+ * Client-side only because of usePathname: the EN switcher has to point at the
+ * English version of the current page, and most call sites pass no `active`.
  */
 export function MarketingHeader({
   active,
@@ -21,16 +45,7 @@ export function MarketingHeader({
     | "taro"
     | "tests";
 }) {
-  const englishHref =
-    active === "nataluri-ruka"
-      ? "/en/natal-chart"
-      : active === "horoskopi"
-        ? "/en/horoscope"
-        : active === "zodiac"
-          ? "/en/zodiac"
-          : active === "tests"
-            ? "/en/tests"
-            : "/en";
+  const englishHref = englishHrefFor(usePathname() || "/");
 
   const link = (href: string, label: string, key: typeof active) => (
     <Link

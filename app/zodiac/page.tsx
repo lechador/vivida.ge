@@ -20,7 +20,7 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacHubEn } from "@/components/seo/zodiac-hub-en";
 
@@ -40,6 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     alternates: localizedAlternates(PATH, "/en/zodiac", en ? "en" : "ka"),
     openGraph: {
+      images: [DEFAULT_OG_IMAGE],
       type: "website",
       url: `${en ? "https://www.vividaastro.com" : SITE_URL}${PATH}`,
       title,

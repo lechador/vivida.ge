@@ -5,7 +5,7 @@ import { ArrowRight, Heart } from "lucide-react";
 import { EnglishGuide } from "@/components/en/english-guide";
 import { CompatibilityCalculator } from "@/components/landing/compatibility-calculator";
 import { buildCalculatorData } from "@/lib/compatibility-calculator-data";
-import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 import { articleLd, breadcrumbLd } from "@/lib/seo/jsonld";
 
 const PATH = "/en/compatibility";
@@ -15,7 +15,7 @@ const DESCRIPTION = "Learn how synastry compares two natal charts through the Su
 export const metadata: Metadata = {
   title: { absolute: `${TITLE} — Vivida` }, description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/zodiac/tavsebadoba", "en"),
-  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/compatibility`, locale: "en_US", alternateLocale: ["ka_GE"] },
+  openGraph: { images: [DEFAULT_OG_IMAGE], title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/compatibility`, locale: "en_US", alternateLocale: ["ka_GE"] },
 };
 
 export default function EnglishCompatibilityPage() {

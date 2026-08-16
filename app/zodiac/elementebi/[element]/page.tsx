@@ -24,7 +24,7 @@ import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacElementPageEn } from "@/components/seo/zodiac-elements-en";
 import { ELEMENT_ENGLISH } from "@/lib/zodiac-element-en";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -64,7 +64,7 @@ export async function generateMetadata({
     const title = `${c.name}: Traits, Love and Compatibility`;
     const description = `${c.tagline} Explore personality, strengths, challenges, relationships, career, and compatibility with the other elements.`;
     const url = `https://www.vividaastro.com/zodiac/elementebi/${element}`;
-    return { title: { absolute: title }, description, alternates: localizedAlternates(`/zodiac/elementebi/${element}`, `/zodiac/elementebi/${element}`, "en"), openGraph: { type: "article", url, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+    return { title: { absolute: title }, description, alternates: localizedAlternates(`/zodiac/elementebi/${element}`, `/zodiac/elementebi/${element}`, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
   }
   const c = ELEMENTS_CONTENT[element];
   if (!c) return {};
@@ -73,6 +73,7 @@ export async function generateMetadata({
     description: c.metaDescription,
     alternates: localizedAlternates(`/zodiac/elementebi/${element}`, `/zodiac/elementebi/${element}`, "ka"),
     openGraph: {
+      images: [DEFAULT_OG_IMAGE],
       type: "article",
       url: `${SITE_URL}/zodiac/elementebi/${element}`,
       title: c.pageTitle,

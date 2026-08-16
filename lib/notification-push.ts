@@ -47,7 +47,9 @@ function copyFor(
 ): { title: string; body: string; url: string; tag: string } | null {
   const en = locale === "en";
   const name = payload.fromName ?? payload.fromUsername ?? (en ? "A Vivida member" : "Vivida-ის წევრი");
-  const postUrl = payload.postId ? `/feed#post-${payload.postId}` : "/feed";
+  // Single-post route, not /feed#post-<id>: the anchor only exists while the
+  // post is inside the feed's first page.
+  const postUrl = payload.postId ? `/feed/${payload.postId}` : "/feed";
   switch (kind) {
     case "friend_request":
       return {

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { EnglishGuide } from "@/components/en/english-guide";
 import { SIGNS } from "@/lib/zodiac";
-import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { articleLd, breadcrumbLd, faqLd } from "@/lib/seo/jsonld";
 
 const TITLE = "How Daily Horoscopes Work — Vivida";
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   // hub, not an equivalent of this page — it now pairs with the English
   // /horoskopi instead.
   alternates: { canonical: `${ENGLISH_SITE_URL}/horoscope`, languages: { en: `${ENGLISH_SITE_URL}/horoscope`, "x-default": `${ENGLISH_SITE_URL}/horoscope` } },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/horoscope`, locale: "en_US" },
+  openGraph: { images: [DEFAULT_OG_IMAGE], title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/horoscope`, locale: "en_US" },
 };
 
 export default function EnglishHoroscopePage() {

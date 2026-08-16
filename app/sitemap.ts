@@ -230,9 +230,10 @@ function englishSitemap(): MetadataRoute.Sitemap {
     // The English daily-horoscope hub — same-path pair with the Georgian
     // daily hub, matching its /kvireuli and /tviuri siblings below.
     samePathEntry("/horoskopi", "daily", 0.95, NOW),
-    // Compatibility calculator landing page — listed in the Georgian sitemap
-    // too, and distinct from the /compatibility guide.
-    samePathEntry("/tavsebadoba", "monthly", 0.85, ENGLISH_PUBLISHED),
+    // NOTE: /tavsebadoba is deliberately absent here. It is a paid-ad landing
+    // page with no internal link from any English surface, so submitting the
+    // vividaastro.com URL advertises an orphan. It stays in the Georgian
+    // sitemap below, where it is linked.
     samePathEntry("/features", "monthly", 0.85, ENGLISH_PUBLISHED),
     samePathEntry("/how-it-works", "monthly", 0.85, ENGLISH_PUBLISHED),
     samePathEntry("/zodiac/mtvare", "monthly", 0.78),

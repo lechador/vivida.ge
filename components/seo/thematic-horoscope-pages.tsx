@@ -13,7 +13,7 @@ import { ALL_SLUGS, ZODIAC_DATES, signMetaBySlug, type ZodiacSlug } from "@/lib/
 import { ALL_HOROSCOPE_THEMES, THEME_CONFIG, themeContent, themeUrl, type HoroscopeTheme } from "@/lib/seo/thematic-horoscope";
 import { SIGN_LATIN_NAMES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -35,7 +35,7 @@ export function thematicHubMetadata(theme: HoroscopeTheme) {
     description: cfg.description,
     keywords: cfg.keywords,
     alternates: localizedAlternates(`/${cfg.slug}`, `/${cfg.slug}`, "ka"),
-    openGraph: { type: "website" as const, url, title: cfg.title, description: cfg.description, siteName: "Vivida", locale: "ka_GE" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website" as const, url, title: cfg.title, description: cfg.description, siteName: "Vivida", locale: "ka_GE" },
     twitter: { card: "summary_large_image" as const, title: cfg.title, description: cfg.description },
   };
 }
@@ -52,7 +52,7 @@ export function thematicDetailMetadata(theme: HoroscopeTheme, sign: ZodiacSlug) 
     description,
     keywords: [`${genitiveKa(sc.labelKa)} ${cfg.label}`, `${sc.labelKa} ${cfg.shortLabel}`, `${latin} ${cfg.slug.replaceAll("-", " ")}`, ...cfg.keywords],
     alternates: localizedAlternates(themeUrl(theme, sign), themeUrl(theme, sign), "ka"),
-    openGraph: { type: "article" as const, url, title, description, siteName: "Vivida", locale: "ka_GE" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "article" as const, url, title, description, siteName: "Vivida", locale: "ka_GE" },
     twitter: { card: "summary_large_image" as const, title, description },
   };
 }

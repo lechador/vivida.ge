@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacSignPageEn } from "@/components/seo/zodiac-sign-page-en";
 import { ZODIAC_SIGN_EN } from "@/lib/zodiac-sign-en";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -56,26 +56,28 @@ export async function generateMetadata({
   const c = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign);
   const en = (await getRequestLocale()) === "en";
+  const accent = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
   if (en && meta) {
     const name = meta.labelEn;
     const title = `${name} Zodiac Sign: Dates, Traits, Love and Compatibility`;
     const description = `${name} zodiac sign guide: ${ZODIAC_SIGN_EN[sign].tagline} Explore dates, personality traits, strengths, challenges, love, career, and compatibility.`;
+    const ogEn = `${ENGLISH_SITE_URL}/api/og/page?t=${encodeURIComponent(name)}&k=${encodeURIComponent("Zodiac sign")}&a=${encodeURIComponent(accent)}`;
     return {
       title: { absolute: title },
       description,
       alternates: localizedAlternates(`/zodiac/${sign}`, `/zodiac/${sign}`, "en"),
       openGraph: {
         type: "article",
-        url: `https://www.vividaastro.com/zodiac/${sign}`,
+        url: `${ENGLISH_SITE_URL}/zodiac/${sign}`,
         title,
         description,
         siteName: "Vivida",
         locale: "en_US",
+        images: [{ url: ogEn, width: 1200, height: 630 }],
       },
-      twitter: { card: "summary_large_image", title, description },
+      twitter: { card: "summary_large_image", title, description, images: [ogEn] },
     };
   }
-  const accent = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
   const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(c.labelKa)}&k=${encodeURIComponent("ზოდიაქოს ნიშანი")}&a=${encodeURIComponent(accent)}`;
   return {
     title: { absolute: c.pageTitle },

@@ -10,7 +10,7 @@ import { EQ_HUB_EN, EqArticlesHubEn } from "@/components/seo/eq-articles-en";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { EQ_ARTICLES } from "@/lib/seo/eq-articles";
 import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const URL = "https://www.vivida.ge/emociuri-inteleqti";
 
@@ -19,7 +19,7 @@ const KA_METADATA: Metadata = {
   description: "ემოციური ინტელექტის ქართული ბიბლიოთეკა: ემპათია, ემოციების მართვა, თვითშემეცნება, მოტივაცია, კომუნიკაცია და ურთიერთობები.",
   keywords: ["ემოციური ინტელექტი", "EQ", "ემპათია", "ემოციების მართვა", "თვითშემეცნება", "სოციალური უნარები"],
   alternates: localizedAlternates("/emociuri-inteleqti", "/emociuri-inteleqti", "ka"),
-  openGraph: { title: "ემოციური ინტელექტის გზამკვლევი", description: "პრაქტიკული, კვლევაზე დაფუძნებული სტატიები EQ-ის გასავითარებლად.", url: URL, type: "website", locale: "ka_GE" },
+  openGraph: { images: [DEFAULT_OG_IMAGE], title: "ემოციური ინტელექტის გზამკვლევი", description: "პრაქტიკული, კვლევაზე დაფუძნებული სტატიები EQ-ის გასავითარებლად.", url: URL, type: "website", locale: "ka_GE" },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { absolute: EQ_HUB_EN.title }, description: EQ_HUB_EN.description,
     keywords: ["emotional intelligence", "EQ skills", "empathy", "emotion regulation", "self-awareness"],
     alternates: localizedAlternates(path, path, "en"),
-    openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title: EQ_HUB_EN.title, description: EQ_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: EQ_HUB_EN.title, description: EQ_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
     twitter: { card: "summary_large_image", title: EQ_HUB_EN.title, description: EQ_HUB_EN.description },
   };
 }

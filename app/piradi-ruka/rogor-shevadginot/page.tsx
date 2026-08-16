@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
 
 const SITE = "https://www.vivida.ge";
 const URL = `${SITE}/piradi-ruka/rogor-shevadginot`;
@@ -39,6 +40,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: URL },
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "article",
     url: URL,
     title: "როგორ შევადგინოთ პირადი რუკა ონლაინ",

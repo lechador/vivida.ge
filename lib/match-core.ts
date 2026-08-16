@@ -1,8 +1,7 @@
-import { and, eq, or } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
-  friendships,
   likes,
   matches,
   notifications,
@@ -11,6 +10,7 @@ import {
   type LikeKind,
   type NotificationPayload,
 } from "@/db/schema";
+import { isBlockedEitherWay } from "@/lib/block";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { queueNotificationPush } from "@/lib/notification-push";
 
@@ -35,21 +35,6 @@ export type LikeResult =
 /** Sorted pair so a match is unique regardless of who liked first. */
 function sortedPair(a: string, b: string): [string, string] {
   return a < b ? [a, b] : [b, a];
-}
-
-/** Are these two users blocked (either direction)? Blocks veto matching. */
-async function isBlocked(a: string, b: string): Promise<boolean> {
-  const [row] = await db
-    .select({ status: friendships.status })
-    .from(friendships)
-    .where(
-      or(
-        and(eq(friendships.requesterId, a), eq(friendships.recipientId, b)),
-        and(eq(friendships.requesterId, b), eq(friendships.recipientId, a))
-      )
-    )
-    .limit(1);
-  return row?.status === "blocked";
 }
 
 /**
@@ -109,7 +94,10 @@ export async function likeUserCore(
     return { ok: false, error: "მომხმარებელი ვერ მოიძებნა" };
   }
 
-  if (await isBlocked(actor.id, targetId)) {
+  // Blocks veto matching in either direction. They live in `blocks` (the
+  // block also deletes the friendship row), so this must not be read off
+  // friendship.status.
+  if (await isBlockedEitherWay(actor.id, targetId)) {
     return { ok: false, error: "მოქმედება შეუძლებელია" };
   }
 

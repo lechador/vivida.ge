@@ -20,7 +20,7 @@ import {
   signMetaBySlug,
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { HoroscopeHubEn } from "@/components/seo/horoscope-hub-en";
 
@@ -81,6 +81,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // Georgian domain, that only 301s back here.)
     alternates: localizedAlternates("/horoskopi", "/horoskopi", en ? "en" : "ka"),
     openGraph: {
+      images: [DEFAULT_OG_IMAGE],
       type: "website",
       url: `${en ? "https://www.vividaastro.com" : SITE_URL}/horoskopi`,
       title,

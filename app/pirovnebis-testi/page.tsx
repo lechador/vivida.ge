@@ -14,7 +14,7 @@ import { PERSONALITY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { MBTI_QUESTIONS_EN } from "@/lib/mbti-questions";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -27,7 +27,7 @@ const DESCRIPTION_EN = "Take a free 60-question personality test and explore you
 
 export async function generateMetadata(): Promise<Metadata> {
   const en = (await getRequestLocale()) === "en";
-  if (en) return { title: { absolute: TITLE_EN }, description: DESCRIPTION_EN, keywords: ["free personality test", "16 personalities test", "MBTI style test", "personality type test"], alternates: { canonical: `${ENGLISH_SITE_URL}/pirovnebis-testi`, languages: { en: `${ENGLISH_SITE_URL}/pirovnebis-testi`, "ka-GE": `${GEORGIAN_SITE_URL}/pirovnebis-testi`, "x-default": `${ENGLISH_SITE_URL}/pirovnebis-testi` } }, openGraph: { type: "website", url: `${ENGLISH_SITE_URL}/pirovnebis-testi`, title: TITLE_EN, description: DESCRIPTION_EN, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: TITLE_EN, description: DESCRIPTION_EN } };
+  if (en) return { title: { absolute: TITLE_EN }, description: DESCRIPTION_EN, keywords: ["free personality test", "16 personalities test", "MBTI style test", "personality type test"], alternates: { canonical: `${ENGLISH_SITE_URL}/pirovnebis-testi`, languages: { en: `${ENGLISH_SITE_URL}/pirovnebis-testi`, "ka-GE": `${GEORGIAN_SITE_URL}/pirovnebis-testi`, "x-default": `${ENGLISH_SITE_URL}/pirovnebis-testi` } }, openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${ENGLISH_SITE_URL}/pirovnebis-testi`, title: TITLE_EN, description: DESCRIPTION_EN, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: TITLE_EN, description: DESCRIPTION_EN } };
   return {
   title: { absolute: TITLE },
   description: DESCRIPTION,
@@ -57,6 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
   },
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${SITE_URL}/pirovnebis-testi`,
     title: TITLE,

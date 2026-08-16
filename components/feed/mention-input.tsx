@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -62,14 +61,24 @@ export function MentionInput({
 }) {
   const localRef = useRef<HTMLTextAreaElement | null>(null);
   const ref = textareaRef ?? localRef;
-  const [suggestions, setSuggestions] = useState<MentionSuggestion[]>([]);
+  // Results are stored WITH the token they were fetched for, and only shown
+  // when that token still matches the live one. Clearing them on every query
+  // change instead would leave the previous token's handles selectable during
+  // the debounce + round-trip window, so Enter inserted the wrong username.
+  const [fetched, setFetched] = useState<{
+    q: string;
+    items: MentionSuggestion[];
+  }>({ q: "", items: [] });
   const [active, setActive] = useState(0);
   const [query, setQuery] = useState<string | null>(null);
   const fetchSeq = useRef(0);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Recompute the "current @token" whenever value or caret moves.
-  const detectQuery = useCallback(() => {
+  // Not manually memoized: it reads `ref.current`, which the React Compiler
+  // cannot reconcile with a [ref, value] dependency list, and it is only ever
+  // called directly or passed as an event handler — never a hook dependency.
+  function detectQuery() {
     const ta = ref.current;
     if (!ta) return;
     const caret = ta.selectionStart ?? value.length;
@@ -80,7 +89,7 @@ export function MentionInput({
       return;
     }
     setQuery(match[1] ?? "");
-  }, [ref, value]);
+  }
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
     onChange(e.target.value);
@@ -142,10 +151,7 @@ export function MentionInput({
     });
   }
 
-  // Debounced fetch when the query changes. Suggestions are only used
-  // when `open` is true (gated on query !== null and length > 0), so
-  // we don't synchronously clear them on every keystroke — the
-  // popover already hides itself in the gap.
+  // Debounced fetch when the query changes.
   useEffect(() => {
     if (query === null || query.length < MIN_QUERY) return;
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
@@ -160,7 +166,10 @@ export function MentionInput({
           results?: MentionSuggestion[];
         };
         if (seq !== fetchSeq.current) return; // stale
-        setSuggestions((data.results ?? []).slice(0, MAX_SUGGESTIONS));
+        setFetched({
+          q: query,
+          items: (data.results ?? []).slice(0, MAX_SUGGESTIONS),
+        });
         setActive(0);
       } catch {
         // network blip — silently swallow; user can keep typing.
@@ -170,6 +179,8 @@ export function MentionInput({
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, [query]);
+
+  const suggestions = query !== null && fetched.q === query ? fetched.items : [];
 
   const open =
     query !== null &&

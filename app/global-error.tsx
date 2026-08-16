@@ -1,8 +1,13 @@
 "use client"; // Error boundaries must be Client Components
 
 import * as Sentry from "@sentry/nextjs";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+
+import { isEnglishHost } from "@/lib/seo/locales";
+
+/** The host never changes for the lifetime of the document. */
+const subscribeNever = () => () => {};
 
 /**
  * App-wide error boundary — the last line of defense. It catches errors that
@@ -16,6 +21,9 @@ import Link from "next/link";
  * Behaviour mirrors app/report/error.tsx: one automatic retry (transient blips
  * self-heal), guarded by a one-shot sessionStorage flag so a genuinely broken
  * state can't reload-loop, then a manual "try again" + a link home.
+ *
+ * Replacing the root layout also discards its host-aware `lang` and the
+ * .locale-*-only CSS, so the locale is re-derived here from the browser host.
  */
 export default function GlobalError({
   error,
@@ -25,6 +33,14 @@ export default function GlobalError({
   retry: () => void;
 }) {
   const [retrying, setRetrying] = useState(false);
+  // The host can only be sniffed in the browser, and this page also renders on
+  // the server — so the two snapshots are declared separately instead of
+  // reconciled in an effect. Georgian stays the server-side fallback.
+  const en = useSyncExternalStore(
+    subscribeNever,
+    () => isEnglishHost(window.location.hostname),
+    () => false,
+  );
 
   useEffect(() => {
     Sentry.withScope((scope) => {
@@ -75,8 +91,10 @@ export default function GlobalError({
   }
 
   return (
-    <html lang="ka">
-      <title>რაღაც ვერ მოხერხდა · Vivida</title>
+    <html lang={en ? "en" : "ka"}>
+      <title>
+        {en ? "Something went wrong · Vivida" : "რაღაც ვერ მოხერხდა · Vivida"}
+      </title>
       <body
         style={{
           margin: 0,
@@ -110,13 +128,13 @@ export default function GlobalError({
           <>
             <div style={spinnerStyle} aria-hidden />
             <p style={{ color: "#c2bcdd", fontSize: 14, margin: 0 }}>
-              ვცდილობთ ხელახლა…
+              {en ? "Trying again…" : "ვცდილობთ ხელახლა…"}
             </p>
           </>
         ) : (
           <>
             <h1 style={{ fontSize: 20, fontWeight: 700, margin: "6px 0 0" }}>
-              რაღაც ვერ მოხერხდა
+              {en ? "Something went wrong" : "რაღაც ვერ მოხერხდა"}
             </h1>
             <p
               style={{
@@ -127,15 +145,16 @@ export default function GlobalError({
                 maxWidth: 360,
               }}
             >
-              დროებითი შეფერხება იყო. სცადე ხელახლა — ჩვეულებრივ მაშინვე
-              ეშველება.
+              {en
+                ? "This was a temporary glitch. Try again — this usually resolves immediately."
+                : "დროებითი შეფერხება იყო. სცადე ხელახლა — ჩვეულებრივ მაშინვე ეშველება."}
             </p>
             <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
               <button type="button" onClick={manualRetry} style={primaryBtn}>
-                ხელახლა ცდა
+                {en ? "Try again" : "ხელახლა ცდა"}
               </button>
               <Link href="/" style={secondaryBtn}>
-                მთავარზე
+                {en ? "Go home" : "მთავარზე"}
               </Link>
             </div>
           </>

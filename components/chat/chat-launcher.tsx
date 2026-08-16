@@ -105,6 +105,8 @@ type Props = {
 
 type SendResult = { ok: true } | { ok: false; error: string };
 
+type ThreadStatus = "loading" | "ready" | "error";
+
 export function ChatLauncher({
   viewerId,
   initialConversations,
@@ -128,6 +130,11 @@ export function ChatLauncher({
   // Map of partnerId → expiry epoch ms; non-empty means "is typing".
   const [typingByPartner, setTypingByPartner] = useState<
     Record<string, number>
+  >({});
+  // Per-thread load outcome — a failed /api/messages fetch must render a
+  // retry row, not the indefinite spinner that `messages === null` gives.
+  const [threadStatus, setThreadStatus] = useState<
+    Record<string, ThreadStatus>
   >({});
 
   // Refs read by the SSE callback so they always see fresh values.
@@ -173,8 +180,11 @@ export function ChatLauncher({
         activePartnerRef.current === msg.senderId;
 
       setMessagesByPartner((prev) => {
-        const list = prev[partnerId];
-        if (!list) return prev;
+        // Seed the array when the thread hasn't loaded yet: the id is already
+        // in seenIdsRef, so dropping it here would lose the message for good
+        // (the stream's 30s lookback can never redeliver it). handleSelect's
+        // merge dedupes by id and re-sorts, so a seeded array is safe.
+        const list = prev[partnerId] ?? [];
         if (list.some((m) => m.id === msg.id)) return prev;
         return { ...prev, [partnerId]: [...list, msg] };
       });
@@ -383,12 +393,14 @@ export function ChatLauncher({
 
       if (loadedRef.current.has(partnerId)) return;
       loadedRef.current.add(partnerId);
+      setThreadStatus((prev) => ({ ...prev, [partnerId]: "loading" }));
       try {
         const res = await fetch(
           `/api/messages?with=${encodeURIComponent(partnerId)}`
         );
         if (!res.ok) {
           loadedRef.current.delete(partnerId);
+          setThreadStatus((prev) => ({ ...prev, [partnerId]: "error" }));
           return;
         }
         const data = (await res.json()) as { messages: Message[] };
@@ -409,8 +421,10 @@ export function ChatLauncher({
           );
           return { ...prev, [partnerId]: merged };
         });
+        setThreadStatus((prev) => ({ ...prev, [partnerId]: "ready" }));
       } catch {
         loadedRef.current.delete(partnerId);
+        setThreadStatus((prev) => ({ ...prev, [partnerId]: "error" }));
       }
     },
     []
@@ -533,8 +547,10 @@ export function ChatLauncher({
             viewerId={viewerId}
             partner={activePartner}
             messages={messagesByPartner[activePartner.id] ?? null}
+            status={threadStatus[activePartner.id]}
             isTyping={!!typingByPartner[activePartner.id]}
             onBack={() => setActivePartnerId(null)}
+            onRetry={() => void handleSelect(activePartner.id)}
             onSend={(text) => handleSend(activePartner.id, text)}
             onTyping={() => {
               void pingTyping(activePartner.id).catch(() => {});
@@ -596,8 +612,10 @@ export function ChatLauncher({
                 viewerId={viewerId}
                 partner={activePartner}
                 messages={messagesByPartner[activePartner.id] ?? null}
+                status={threadStatus[activePartner.id]}
                 isTyping={!!typingByPartner[activePartner.id]}
                 onBack={() => setActivePartnerId(null)}
+                onRetry={() => void handleSelect(activePartner.id)}
                 onSend={(text) => handleSend(activePartner.id, text)}
                 onTyping={() => {
                   void pingTyping(activePartner.id).catch(() => {});
@@ -765,8 +783,10 @@ function ChatView({
   viewerId,
   partner,
   messages,
+  status,
   isTyping,
   onBack,
+  onRetry,
   onSend,
   onTyping,
   locale,
@@ -775,8 +795,11 @@ function ChatView({
   partner: ChatPartner;
   /** null while initial load is in flight, [] when loaded but empty. */
   messages: Message[] | null;
+  /** undefined until the first load starts. */
+  status: ThreadStatus | undefined;
   isTyping: boolean;
   onBack: () => void;
+  onRetry: () => void;
   onSend: (text: string) => Promise<SendResult>;
   onTyping: () => void;
   locale: UserLocale;
@@ -885,7 +908,22 @@ function ChatView({
         ref={scrollRef}
         className="flex-1 space-y-2 overflow-y-auto px-3 py-3"
       >
-        {messages === null ? (
+        {status === "error" ? (
+          <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+            <p className="text-xs text-muted-foreground">
+              {en
+                ? "Could not load this conversation."
+                : "საუბარი ვერ ჩაიტვირთა."}
+            </p>
+            <button
+              type="button"
+              onClick={onRetry}
+              className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-card"
+            >
+              {en ? "Try again" : "სცადე ხელახლა"}
+            </button>
+          </div>
+        ) : messages === null || status === "loading" ? (
           <div className="flex h-full items-center justify-center">
             <span className="size-5 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-[var(--vivida-cyan)]" />
           </div>

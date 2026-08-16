@@ -27,7 +27,7 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { ZodiacGuideIndexEn } from "@/components/seo/zodiac-guides-en";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -42,6 +42,7 @@ const KA_METADATA: Metadata = {
   description: META_DESCRIPTION,
   alternates: localizedAlternates(PATH, PATH, "ka"),
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${SITE_URL}${PATH}`,
     title: PAGE_TITLE,
@@ -60,7 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
   if ((await getRequestLocale()) !== "en") return KA_METADATA;
   const title = "Complete Zodiac Guide: Signs, Moon, Rising and Compatibility";
   const description = "Explore all zodiac signs, Moon signs, rising signs, four elements, horoscope periods, calculators, and all 78 compatibility pairings.";
-  return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { type: "website", url: `https://www.vividaastro.com${PATH}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${PATH}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
 }
 
 const ELEMENT_ACCENT: Record<string, string> = {

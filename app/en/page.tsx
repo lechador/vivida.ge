@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Compass, Heart, Languages, Orbit, Sparkles } from "lucide-react";
 
 import { EnglishShell } from "@/components/en/english-shell";
-import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const URL = ENGLISH_SITE_URL;
 const TITLE = "Natal Charts, Horoscopes and Zodiac Guides — Vivida";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   alternates: localizedAlternates("/en", "/", "en"),
-  openGraph: { title: TITLE, description: DESCRIPTION, url: URL, locale: "en_US", alternateLocale: ["ka_GE"] },
+  openGraph: { images: [DEFAULT_OG_IMAGE], title: TITLE, description: DESCRIPTION, url: URL, locale: "en_US", alternateLocale: ["ka_GE"] },
   twitter: { title: TITLE, description: DESCRIPTION },
 };
 

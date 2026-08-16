@@ -7,7 +7,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PublicNatalCalculator } from "@/components/calculator/public-natal-calculator";
 import { signByIndex } from "@/lib/zodiac";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { NatalChartPageEn } from "@/components/seo/natal-chart-page-en";
 
@@ -38,6 +38,7 @@ const BASE_META: Metadata = {
   keywords: KEYWORDS,
   alternates: localizedAlternates("/nataluri-ruka", "/en/natal-chart", "ka"),
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: URL,
     title: "ნატალური რუკა ონლაინ — უფასო გამოთვლა",
@@ -65,8 +66,11 @@ const BASE_META_EN: Metadata = {
     "rising sign calculator",
     "12 houses astrology",
   ],
-  alternates: localizedAlternates("/nataluri-ruka", "/en/natal-chart", "en"),
+  // Canonical path comes first: for the English rendering that is the English
+  // route, otherwise this self-canonicalises to a URL that 301-redirects.
+  alternates: localizedAlternates("/en/natal-chart", "/nataluri-ruka", "en"),
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: "https://www.vividaastro.com/natal-chart",
     title: "Free Birth Chart Calculator",

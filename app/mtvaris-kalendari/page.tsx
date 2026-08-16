@@ -18,7 +18,7 @@ import {
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { MOON_CALENDAR_EN, MoonCalendarPageEn } from "@/components/seo/moon-calendar-en";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PAGE_URL = `${SITE_URL}/mtvaris-kalendari`;
@@ -58,6 +58,7 @@ const KA_METADATA: Metadata = {
   alternates: localizedAlternates("/mtvaris-kalendari", "/mtvaris-kalendari", "ka"),
   robots: { index: true, follow: true },
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: PAGE_URL,
     title: TITLE,
@@ -71,7 +72,7 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   if ((await getRequestLocale()) !== "en") return KA_METADATA;
   const path = "/mtvaris-kalendari"; const { title, description } = MOON_CALENDAR_EN;
-  return { title: { absolute: title }, description, keywords: ["moon calendar", `moon calendar ${CURRENT_YEAR}`, "moon phase today", "next full moon", "next new moon"], alternates: localizedAlternates(path, path, "en"), openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  return { title: { absolute: title }, description, keywords: ["moon calendar", `moon calendar ${CURRENT_YEAR}`, "moon phase today", "next full moon", "next new moon"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
 }
 
 const MONTHS_KA = [

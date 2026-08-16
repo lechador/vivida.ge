@@ -14,7 +14,9 @@ export function feedTimeAgo(date: Date | string, locale: UserLocale = "ka"): str
   const ts = typeof date === "string" ? new Date(date) : date;
   const seconds = Math.floor((Date.now() - ts.getTime()) / 1000);
   if (seconds < 45) return en ? "just now" : "ახლახან";
-  const minutes = Math.floor(seconds / 60);
+  // 45–59s falls past "ახლახან" but floors to 0 — clamp so we never
+  // render "0 წუთის წინ".
+  const minutes = Math.max(1, Math.floor(seconds / 60));
   if (minutes < 60) return en ? `${minutes}m ago` : `${minutes} წუთის წინ`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return en ? `${hours}h ago` : `${hours} საათის წინ`;

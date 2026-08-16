@@ -68,9 +68,42 @@ export async function partnerCreationsThisMonth(
   return row?.n ?? 0;
 }
 
-export async function listPartners(userId: string): Promise<Partner[]> {
+/**
+ * A partner row without the credit-gated AI payloads.
+ *
+ * The list is served unauthenticated-by-entitlement (you own the row, but you
+ * have not necessarily unlocked its reading), and `GET /api/v1/partners`
+ * returns it verbatim to the mobile client — so `db.select()` here handed out
+ * the paid `aiInterpretation`/`deepReport` for free. The per-partner routes
+ * gate those two fields; the list must not carry them at all.
+ */
+export type PartnerListItem = Omit<Partner, "aiInterpretation" | "deepReport">;
+
+export async function listPartners(
+  userId: string,
+): Promise<PartnerListItem[]> {
   return await db
-    .select()
+    .select({
+      id: partners.id,
+      userId: partners.userId,
+      name: partners.name,
+      dateOfBirth: partners.dateOfBirth,
+      timeOfBirth: partners.timeOfBirth,
+      latitude: partners.latitude,
+      longitude: partners.longitude,
+      cityName: partners.cityName,
+      timezone: partners.timezone,
+      chart: partners.chart,
+      inputHash: partners.inputHash,
+      aiViewerHash: partners.aiViewerHash,
+      aiModel: partners.aiModel,
+      aiGeneratedAt: partners.aiGeneratedAt,
+      deepViewerHash: partners.deepViewerHash,
+      deepModel: partners.deepModel,
+      deepGeneratedAt: partners.deepGeneratedAt,
+      deletedAt: partners.deletedAt,
+      createdAt: partners.createdAt,
+    })
     .from(partners)
     .where(and(eq(partners.userId, userId), isNull(partners.deletedAt)))
     .orderBy(desc(partners.createdAt));

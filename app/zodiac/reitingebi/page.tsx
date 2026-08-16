@@ -8,7 +8,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { RANKINGS_HUB_EN, RankingsHubEn } from "@/components/seo/rankings-en";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import {
   RANKING_CATEGORIES,
   RANKING_CATEGORY_ORDER,
@@ -23,6 +23,7 @@ const KA_METADATA: Metadata = {
     "ზოდიაქოს ნიშნების რეიტინგები: ყველაზე ჭკვიანი, ეჭვიანი, რომანტიული, ერთგული, ძლიერი და სხვა. 12-ვე ნიშანი დალაგებული თვისებების მიხედვით, ქართულად.",
   alternates: localizedAlternates("/zodiac/reitingebi", "/zodiac/reitingebi", "ka"),
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${SITE_URL}/zodiac/reitingebi`,
     title: "ზოდიაქოს ნიშნების რეიტინგები",
@@ -36,7 +37,7 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   if ((await getRequestLocale()) !== "en") return KA_METADATA;
   const path = "/zodiac/reitingebi"; const { title, description } = RANKINGS_HUB_EN;
-  return { title: { absolute: title }, description, keywords: ["zodiac sign rankings", "best zodiac signs", "smartest zodiac signs", "most romantic zodiac signs"], alternates: localizedAlternates(path, path, "en"), openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  return { title: { absolute: title }, description, keywords: ["zodiac sign rankings", "best zodiac signs", "smartest zodiac signs", "most romantic zodiac signs"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
 }
 
 const HUB_QUERIES = [

@@ -12,7 +12,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { IQ_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 const TITLE_KA = "IQ ტესტი — უფასო ინტელექტის ტესტი ქართულად";
 const DESCRIPTION_KA =
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
         "x-default": `${ENGLISH_SITE_URL}/iq-testi`,
       },
     },
-    openGraph: { type: "website", url: `${siteUrl}/iq-testi`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/iq-testi`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
     twitter: { card: "summary_large_image", title, description },
   };
 }

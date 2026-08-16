@@ -1,6 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 
@@ -18,14 +17,11 @@ export async function updateInterfaceLanguage(value: UserLocale): Promise<{ ok: 
     .set({ interfaceLanguage: locale })
     .where(eq(users.id, user.id));
 
-  const cookieStore = await cookies();
-  cookieStore.set("vivida-locale", locale, {
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
-
+  // No locale cookie is written any more. It existed so public pages could
+  // honour this preference without a DB read, but that made indexable Georgian
+  // URLs render English — and emit English canonicals — for cookie holders.
+  // The signed-in surfaces that legitimately switch language read
+  // `users.interfaceLanguage` directly instead.
   revalidatePath("/account");
   revalidatePath("/dashboard");
   return { ok: true };

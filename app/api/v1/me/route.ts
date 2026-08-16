@@ -82,21 +82,22 @@ export async function GET(req: Request) {
  * DELETE /api/v1/me  { confirmation }
  *
  * Permanently delete the account. Shares deleteAccountCore() with the
- * website (R2 cleanup + cascading DB delete). We also revoke every refresh
- * token first so no device can mint a fresh access token; the current access
- * token simply expires (≤15 min). The client should discard its stored
- * tokens on success.
+ * website (R2 cleanup + cascading DB delete), which also validates the
+ * confirmation phrase — so we only revoke the refresh tokens once the delete
+ * has succeeded (a rejected phrase must not log the user out everywhere).
+ * The current access token simply expires (≤15 min); the client should
+ * discard its stored tokens on success.
  */
 export async function DELETE(req: Request) {
   return handle(async () => {
     const user = await requireMobileUser(req);
     const { confirmation } = await parseBody(req, DeleteBody);
 
-    await revokeAllForUser(user.id);
     const result = await deleteAccountCore(user.id, confirmation);
     if (!result.ok) {
       return fail(422, "delete_rejected", result.error);
     }
+    await revokeAllForUser(user.id);
     return ok({ ok: true });
   });
 }

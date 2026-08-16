@@ -13,7 +13,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { TAROT_CARDS } from "@/lib/tarot/deck";
 import { TAROT_CARDS_EN } from "@/lib/tarot/deck-en";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 import { TAROT_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
@@ -83,7 +83,7 @@ export async function generateMetadata(): Promise<Metadata> {
         "x-default": `${ENGLISH_SITE_URL}/taro`,
       },
     },
-    openGraph: { type: "website", url: `${siteUrl}/taro`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/taro`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
     twitter: { card: "summary_large_image", title, description },
   };
 }

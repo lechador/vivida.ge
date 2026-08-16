@@ -32,7 +32,9 @@ const ORG = {
   "@type": "Organization" as const,
   name: "Vivida",
   url: SITE_URL,
-  logo: `${SITE_URL}/brand/logo-512.png`,
+  // app/apple-icon.png is the only raster brand asset we actually serve;
+  // Google needs publisher.logo to be a fetchable image, not a 404.
+  logo: `${SITE_URL}/apple-icon.png`,
 };
 
 export type JsonLd = Record<string, unknown>;

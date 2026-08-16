@@ -9,7 +9,7 @@ import { FAMOUS_ZODIAC_ASSETS } from "@/lib/zodiac-famous-assets";
 import { isR2Configured, objectExists, publicUrlFor } from "@/lib/r2";
 import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 const TITLE_KA = "ვარსკვლავების ზოდიაქო — გამოიცანი ცნობილი ადამიანების ნიშანი";
 const DESCRIPTION_KA = "გამოიცანი 20 ცნობილი ადამიანის ზოდიაქოს ნიშანი. სწრაფი, უფასო ქვიზი ქართულად — შედეგი და გაზიარება დასრულებისთანავე.";
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     keywords: en ? ["celebrity zodiac quiz", "guess the star sign", "famous people zodiac signs", "astrology quiz"] : undefined,
     alternates: { canonical: url, languages: { en: `${ENGLISH_SITE_URL}/quiz/varskvlavebis-zodiaqo`, "ka-GE": `${GEORGIAN_SITE_URL}/quiz/varskvlavebis-zodiaqo`, "x-default": `${ENGLISH_SITE_URL}/quiz/varskvlavebis-zodiaqo` } },
-    openGraph: { type: "website", url, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
     twitter: { card: "summary_large_image", title, description },
   };
 }

@@ -8,7 +8,18 @@
  *   - "other": all the rest
  */
 
-import { and, asc, eq, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  ne,
+  notInArray,
+  or,
+  sql,
+} from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -18,6 +29,7 @@ import {
   profiles,
   users,
 } from "@/db/schema";
+import { getResidenceCountryCode, sameCountryFirst } from "./residence";
 import { signByIndex, type ZodiacSign } from "./zodiac";
 import { ageFromDob } from "./profile-utils";
 import { computeSynastry, type SynastryResult } from "./synastry";
@@ -88,6 +100,9 @@ export async function getDiscoveryFeed(
       ? signByIndex(viewerSunIndex).element
       : null;
 
+  // Viewer's residence country — recommendations are ranked country-first.
+  const viewerCountry = await getResidenceCountryCode(viewerId);
+
   // 2. Build the exclusion set — self + anyone we already have a row with
   //    (friends, pending, blocked).
   const friendRows = await db
@@ -128,15 +143,24 @@ export async function getDiscoveryFeed(
         // Respect the discovery opt-out — this feed powers both the swipe
         // deck and the "suggested people" rails.
         eq(profiles.discoverable, true),
+        // Exclude in SQL rather than materialising every user id in Node —
+        // the list is bounded by the viewer's own relationships.
         excludedList.length > 1
-          ? inArray(users.id, await pickIncluded(excludedList))
+          ? notInArray(users.id, excludedList)
           : undefined
       )
     )
-    // Random sample, not "first N by physical row order": once the user base
-    // outgrows CANDIDATE_LIMIT, a stable scan order would mean the same
-    // people enter the pool on every load and the rest never surface.
-    .orderBy(sql`random()`)
+    // Country first, then a random sample within each bucket.
+    //
+    // The country term has to be HERE rather than in the ranking below: this
+    // sample is what the ranking sees, so re-ordering afterwards would be
+    // powerless. With ~all users in Georgia, a UK viewer's handful of
+    // compatriots would essentially never survive a plain random draw of
+    // CANDIDATE_LIMIT rows, and the "suggested people" rail built on this feed
+    // would show them nobody local. Random within the bucket still keeps the
+    // rotation the sample exists for — once the user base outgrows
+    // CANDIDATE_LIMIT a stable scan order would surface the same faces forever.
+    .orderBy(desc(sameCountryFirst(viewerCountry)), sql`random()`)
     .limit(CANDIDATE_LIMIT);
 
   // 4. First photo per candidate (one query, group in JS)
@@ -260,16 +284,6 @@ export async function getDiscoveryFeed(
     magic: dedupe(magic),
     other: dedupe(other),
   };
-}
-
-/** Return candidate ids that are not present in the exclusion list. */
-async function pickIncluded(excluded: string[]): Promise<string[]> {
-  const rows = await db
-    .selectDistinct({ id: users.id })
-    .from(users)
-    .innerJoin(profiles, eq(profiles.userId, users.id));
-  const set = new Set(excluded);
-  return rows.filter((row) => !set.has(row.id)).map((row) => row.id);
 }
 
 /** Fisher-Yates shuffle (non-mutating). Used by the suggestions rail so the

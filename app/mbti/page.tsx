@@ -12,7 +12,7 @@ import { mbtiCharacterSrc } from "@/lib/mbti-characters";
 import { buildMbtiSeo, buildMbtiSeoEn, MBTI_GROUP } from "@/lib/seo/mbti-seo";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 const TITLE = "16 პიროვნების ტიპი — MBTI ტიპები ქართულად";
 const DESCRIPTION =
@@ -41,6 +41,7 @@ const METADATA_KA: Metadata = {
     },
   },
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${GEORGIAN_SITE_URL}/mbti`,
     title: TITLE,
@@ -61,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     keywords: ["16 personality types", "MBTI personality types", "personality type descriptions", "free personality test"],
     alternates: { canonical: `${ENGLISH_SITE_URL}/mbti`, languages: { en: `${ENGLISH_SITE_URL}/mbti`, "ka-GE": `${GEORGIAN_SITE_URL}/mbti`, "x-default": `${ENGLISH_SITE_URL}/mbti` } },
-    openGraph: { type: "website", url: `${ENGLISH_SITE_URL}/mbti`, title, description, siteName: "Vivida", locale: "en_US" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${ENGLISH_SITE_URL}/mbti`, title, description, siteName: "Vivida", locale: "en_US" },
     twitter: { card: "summary_large_image", title, description },
   };
 }

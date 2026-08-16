@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { GEORGIAN_SITE_URL, englishSiteHref } from "@/lib/seo/locales";
+import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
 
 /**
  * The Georgian footer carries three link columns into every content cluster;
@@ -49,12 +50,17 @@ const TOOLS = [
   { href: "/emociuri-inteleqti", label: "Emotional intelligence" },
 ];
 
-export function EnglishFooter() {
+export async function EnglishFooter() {
+  // Rendered on the Georgian host too (signed-in user reading English), where
+  // a bare English path either 404s or serves Georgian — so content links are
+  // resolved against the English domain whenever this is not that domain.
+  const onEnglishHost = await requestIsEnglishHost();
+  const href = (path: string) => englishSiteHref(path, onEnglishHost);
   return (
     <footer className="relative z-10 border-t border-border/40 bg-background/65 backdrop-blur-md">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div className="max-w-md">
-          <Link href="/" className="inline-flex items-center gap-2.5">
+          <Link href={href("/")} className="inline-flex items-center gap-2.5">
             <VividaMark size={36} id="english-footer" />
             <span className="text-xl font-semibold">vivida</span>
           </Link>
@@ -70,7 +76,7 @@ export function EnglishFooter() {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Explore</h2>
           <ul className="space-y-2 text-sm">
             {EXPLORE.map((item) => (
-              <li key={item.href}><Link href={item.href} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
+              <li key={item.href}><Link href={href(item.href)} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
             ))}
           </ul>
         </div>
@@ -79,7 +85,7 @@ export function EnglishFooter() {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Learn</h2>
           <ul className="space-y-2 text-sm">
             {LEARN.map((item) => (
-              <li key={item.href}><Link href={item.href} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
+              <li key={item.href}><Link href={href(item.href)} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
             ))}
           </ul>
         </div>
@@ -88,7 +94,7 @@ export function EnglishFooter() {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Tools</h2>
           <ul className="space-y-2 text-sm">
             {TOOLS.map((item) => (
-              <li key={item.href}><Link href={item.href} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
+              <li key={item.href}><Link href={href(item.href)} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
             ))}
           </ul>
         </div>
@@ -96,9 +102,9 @@ export function EnglishFooter() {
         <div>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Company</h2>
           <ul className="space-y-2 text-sm">
-            <li><Link href="/about" className="text-foreground/85 hover:text-foreground">About Vivida</Link></li>
-            <li><Link href="/privacy" className="text-foreground/85 hover:text-foreground">Privacy policy</Link></li>
-            <li><Link href="/terms" className="text-foreground/85 hover:text-foreground">Terms and conditions</Link></li>
+            <li><Link href={href("/about")} className="text-foreground/85 hover:text-foreground">About Vivida</Link></li>
+            <li><Link href={href("/privacy")} className="text-foreground/85 hover:text-foreground">Privacy policy</Link></li>
+            <li><Link href={href("/terms")} className="text-foreground/85 hover:text-foreground">Terms and conditions</Link></li>
             <li><Link href={GEORGIAN_SITE_URL} hrefLang="ka-GE" className="text-foreground/85 hover:text-foreground">ქართული ვერსია</Link></li>
           </ul>
         </div>

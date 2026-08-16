@@ -1,14 +1,16 @@
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { MONTHLY_BONUS, grantCredits, isUnlocked } from "@/lib/credits";
+import { MONTHLY_BONUS, grantCreditsOnce } from "@/lib/credits";
 import { localDateString } from "@/lib/transits";
 
 /**
  * Monthly free-credit drop. On the first of each month every user is gifted
  * MONTHLY_BONUS credits. Idempotent per month: the grant is keyed by the
  * `YYYY-MM` ref under the `monthly_bonus` reason, so re-running the cron (or a
- * safety-retry tick) never double-grants. Each grant flows through
- * grantCredits, so the user also gets a "credit" bell notification.
+ * safety-retry tick) never double-grants — grantCreditsOnce checks the ledger
+ * and increments the balance inside one advisory-locked statement, so even two
+ * overlapping runs cannot both grant. Each grant still emits a "credit" bell
+ * notification.
  *
  * The month key is computed in Asia/Tbilisi so "first of the month" lines up
  * with the audience's local calendar, independent of the UTC cron time.
@@ -35,11 +37,11 @@ export async function grantMonthlyCredits(
   for (let i = 0; i < rows.length; i += CHUNK) {
     const batch = rows.slice(i, i + CHUNK);
     const results = await Promise.all(
-      batch.map(async (u) => {
-        if (await isUnlocked(u.id, key, "monthly_bonus")) return "skip";
-        await grantCredits(u.id, MONTHLY_BONUS, "monthly_bonus", key);
-        return "grant";
-      })
+      batch.map(async (u) =>
+        (await grantCreditsOnce(u.id, MONTHLY_BONUS, "monthly_bonus", key))
+          ? "grant"
+          : "skip"
+      )
     );
     for (const r of results) {
       if (r === "grant") granted++;

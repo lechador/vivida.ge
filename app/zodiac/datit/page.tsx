@@ -17,7 +17,7 @@ import { BY_DATE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 
 import { SignByDatePicker } from "./sign-by-date-picker";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { ZodiacByDatePageEn } from "@/components/seo/zodiac-guides-en";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -28,6 +28,7 @@ const KA_METADATA: Metadata = {
   description: BY_DATE_CONTENT.metaDescription,
   alternates: localizedAlternates(PATH, PATH, "ka"),
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${SITE_URL}${PATH}`,
     title: BY_DATE_CONTENT.pageTitle,
@@ -46,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
   if ((await getRequestLocale()) !== "en") return KA_METADATA;
   const title = "What Is My Zodiac Sign? Find Your Sign by Birth Date";
   const description = "Choose your birth month and day to find your zodiac Sun sign, explore all zodiac date ranges, and learn how cusp birthdays work.";
-  return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { type: "website", url: `https://www.vividaastro.com${PATH}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${PATH}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
 }
 
 const FAQ_LD = {

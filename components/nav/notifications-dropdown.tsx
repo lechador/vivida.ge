@@ -32,6 +32,7 @@ const KIND_ICON: Record<string, LucideIcon> = {
   post_comment: MessageSquare,
   post_reaction: Sparkles,
   mention: AtSign,
+  new_match: Sparkles,
   credit: Sparkles,
 };
 
@@ -66,6 +67,8 @@ function notificationLabel(kind: string, payload: Notification["payload"], local
       return payload?.mentionContext === "comment"
         ? en ? "mentioned you in a comment" : "მოგიხსენიეს კომენტარში"
         : en ? "mentioned you in a post" : "მოგიხსენიეს პოსტში";
+    case "new_match":
+      return en ? "matched with you" : "დაგემთხვათ";
     default:
       return "";
   }
@@ -364,10 +367,14 @@ function DbNotificationRow({
   const href =
     (n.kind === "post_comment" || n.kind === "post_reaction") &&
     n.payload?.postId
-      ? `/feed#post-${n.payload.postId}`
-      : username
-        ? `/u/${username}`
-        : "/friends";
+      ? // Single-post route, not /feed#post-<id>: the anchor only exists
+        // while the post is inside the feed's first page.
+        `/feed/${n.payload.postId}`
+      : n.kind === "new_match"
+        ? "/messages"
+        : username
+          ? `/u/${username}`
+          : "/friends";
   const isUnread = !n.readAt;
   return (
     <li>

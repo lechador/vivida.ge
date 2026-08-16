@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Send, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Send, Sparkles, Users } from "lucide-react";
 
 import { CreditHint } from "@/components/credits/credit-hint";
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -13,6 +14,7 @@ const ERRORS_KA: Record<string, string> = {
   no_chart: "ჯერ შენი რუკა უნდა შეიქმნას.",
   unavailable: "სერვისი დროებით მიუწვდომელია.",
   invalid_message: "შეტყობინება ცარიელია ან ძალიან გრძელია.",
+  needs_credits: "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი.",
 };
 
 const STARTERS_KA = [
@@ -50,6 +52,9 @@ export function ChartChat({
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Tracked separately from the message so the 402 branch can also offer
+  // the standard invite/top-up CTA, like every other credit gate.
+  const [needsCredits, setNeedsCredits] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,6 +65,7 @@ export function ChartChat({
     const msg = text.trim();
     if (!msg || sending) return;
     setError(null);
+    setNeedsCredits(false);
     setInput("");
     setMessages((prev) => [...prev, { role: "user", content: msg }, { role: "assistant", content: "" }]);
     setSending(true);
@@ -76,6 +82,7 @@ export function ChartChat({
           (en ? ERRORS_EN : ERRORS_KA)[data.error] ??
             (en ? "Something went wrong. Please try again." : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
         );
+        setNeedsCredits(data.error === "needs_credits");
         setMessages((prev) => prev.slice(0, -1)); // drop empty assistant bubble
         return;
       }
@@ -153,7 +160,18 @@ export function ChartChat({
       </div>
 
       {error && (
-        <p className="mt-3 shrink-0 text-sm text-[var(--vivida-pink)]">{error}</p>
+        <div className="mt-3 shrink-0">
+          <p className="text-sm text-[var(--vivida-pink)]">{error}</p>
+          {needsCredits && (
+            <Link
+              href="/credits"
+              className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/12 px-3 py-1.5 text-sm text-foreground/90 transition-colors hover:bg-[var(--vivida-violet)]/20"
+            >
+              <Users className="size-4" />
+              {en ? "Invite / top up" : "მოიწვიე / შეავსე"}
+            </Link>
+          )}
+        </div>
       )}
 
       {/* Composer — pinned at the bottom of the chat panel */}

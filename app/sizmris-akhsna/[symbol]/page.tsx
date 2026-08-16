@@ -17,7 +17,7 @@ import {
 } from "@/lib/seo/dreams";
 import { DREAM_EN_BY_SLUG } from "@/lib/seo/dreams-en";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -46,7 +46,7 @@ export async function generateMetadata({
       title: { absolute: title },
       description,
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { type: "article", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" },
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" },
       twitter: { card: "summary_large_image", title, description },
     };
   }
@@ -72,6 +72,7 @@ export async function generateMetadata({
     ],
     alternates: localizedAlternates(`/sizmris-akhsna/${symbol}`, `/sizmris-akhsna/${symbol}`, "ka"),
     openGraph: {
+      images: [DEFAULT_OG_IMAGE],
       type: "article",
       url,
       title,

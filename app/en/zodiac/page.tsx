@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { ZodiacHubEn } from "@/components/seo/zodiac-hub-en";
-import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const PATH = "/en/zodiac";
 const TITLE = "The 12 Zodiac Signs: Elements, Modalities and Rulers";
@@ -10,7 +10,7 @@ const DESCRIPTION = "A clear English introduction to all twelve zodiac signs, th
 export const metadata: Metadata = {
   title: { absolute: `${TITLE} — Vivida` }, description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/zodiac", "en"),
-  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/zodiac`, locale: "en_US", alternateLocale: ["ka_GE"] },
+  openGraph: { images: [DEFAULT_OG_IMAGE], title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/zodiac`, locale: "en_US", alternateLocale: ["ka_GE"] },
 };
 
 /**

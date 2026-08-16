@@ -17,7 +17,7 @@ import {
 } from "@/lib/seo/numerology-content";
 import { NUMEROLOGY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -42,6 +42,7 @@ const KA_METADATA: Metadata = {
   ],
   alternates: localizedAlternates("/numerologia", "/numerologia", "ka"),
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${SITE_URL}/numerologia`,
     title: TITLE,
@@ -60,7 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: NUMEROLOGY_HUB_EN.description,
     keywords: ["life path number", "life path calculator", "numerology meanings", "master numbers"],
     alternates: localizedAlternates(path, path, "en"),
-    openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
     twitter: { card: "summary_large_image", title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description },
   };
 }

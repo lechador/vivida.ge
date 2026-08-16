@@ -38,7 +38,7 @@ import {
 } from "@/components/seo/sign-horoscope-page-en";
 import { YearlyHoroscopePageEn } from "@/components/seo/yearly-horoscope-page-en";
 import { yearlyHoroscopeEnglish } from "@/lib/yearly-horoscope-en";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -141,6 +141,7 @@ export async function generateMetadata({
         en ? "en" : "ka",
       ),
       openGraph: {
+        images: [DEFAULT_OG_IMAGE],
         type: "article",
         url: en ? `https://www.vividaastro.com/zodiac/${sign}/${slug}` : url,
         title,
@@ -168,6 +169,7 @@ export async function generateMetadata({
         "en",
       ),
       openGraph: {
+        images: [DEFAULT_OG_IMAGE],
         type: "article",
         url,
         title: english.title,
@@ -191,6 +193,7 @@ export async function generateMetadata({
       "ka",
     ),
     openGraph: {
+      images: [DEFAULT_OG_IMAGE],
       type: "article",
       url: `${SITE_URL}/zodiac/${sign}/${slug}`,
       title: c.pageTitle,

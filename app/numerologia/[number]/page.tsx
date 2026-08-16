@@ -15,7 +15,7 @@ import { LIFE_PATH_CONTENT } from "@/lib/seo/numerology-content";
 import { LIFE_PATH_CONTENT_EN } from "@/lib/seo/numerology-content-en";
 import { NUMEROLOGY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -42,7 +42,7 @@ export async function generateMetadata({
       title: { absolute: title },
       description,
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { type: "article", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" },
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" },
       twitter: { card: "summary_large_image", title, description },
     };
   }
@@ -64,6 +64,7 @@ export async function generateMetadata({
     ],
     alternates: localizedAlternates(`/numerologia/${number}`, `/numerologia/${number}`, "ka"),
     openGraph: {
+      images: [DEFAULT_OG_IMAGE],
       type: "article",
       url,
       title,

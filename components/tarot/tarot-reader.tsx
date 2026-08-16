@@ -51,6 +51,9 @@ export function TarotReader({
   );
 
   async function ask() {
+    // A second Enter while the first request is in flight would spend the
+    // credits twice — the API has no dedupe, so the guard lives here.
+    if (status === "drawing") return;
     const q = question.trim();
     if (q.length < 3) return;
     if (!authed) {
@@ -102,17 +105,22 @@ export function TarotReader({
   return (
     <div className="rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/10 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
       {/* Question box */}
-      <label className="block text-sm font-medium text-foreground/90">
+      <label
+        htmlFor="tarot-question"
+        className="block text-sm font-medium text-foreground/90"
+      >
         {en ? "Ask the cards a question" : "დაუსვი კითხვა კარტებს"}
       </label>
       <div className="mt-2 flex flex-col gap-3 sm:flex-row">
         <input
+          id="tarot-question"
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") ask();
           }}
+          disabled={status === "drawing"}
           maxLength={300}
           placeholder={
             en

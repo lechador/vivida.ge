@@ -11,7 +11,7 @@ import { BIG5_META_DESCRIPTION, BIG5_META_DESCRIPTION_EN, BIG5_INTRO, BIG5_INTRO
 import { BIGFIVE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 const TITLE_KA = "Big Five ტესტი — დიდი ხუთეული, პიროვნების ტესტი ქართულად";
 const TITLE_EN = "Free Big Five Personality Test — OCEAN Profile";
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = en ? TITLE_EN : TITLE_KA;
   const description = en ? BIG5_META_DESCRIPTION_EN : BIG5_META_DESCRIPTION;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  return { title: { absolute: title }, description, keywords: en ? ["free Big Five test", "Big Five personality test", "OCEAN personality test", "personality traits test"] : ["big five ტესტი", "დიდი ხუთეული", "პიროვნების ტესტი", "ocean ტესტი"], alternates: { canonical: `${siteUrl}/big-five`, languages: { en: `${ENGLISH_SITE_URL}/big-five`, "ka-GE": `${GEORGIAN_SITE_URL}/big-five`, "x-default": `${ENGLISH_SITE_URL}/big-five` } }, openGraph: { type: "website", url: `${siteUrl}/big-five`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" }, twitter: { card: "summary_large_image", title, description } };
+  return { title: { absolute: title }, description, keywords: en ? ["free Big Five test", "Big Five personality test", "OCEAN personality test", "personality traits test"] : ["big five ტესტი", "დიდი ხუთეული", "პიროვნების ტესტი", "ocean ტესტი"], alternates: { canonical: `${siteUrl}/big-five`, languages: { en: `${ENGLISH_SITE_URL}/big-five`, "ka-GE": `${GEORGIAN_SITE_URL}/big-five`, "x-default": `${ENGLISH_SITE_URL}/big-five` } }, openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/big-five`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" }, twitter: { card: "summary_large_image", title, description } };
 }
 
 /**

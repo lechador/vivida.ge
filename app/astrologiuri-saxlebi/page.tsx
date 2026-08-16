@@ -7,7 +7,7 @@ import { AstrologyHousesHubEn, HOUSES_EN } from "@/components/seo/astrology-guid
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { HOUSE_GUIDES } from "@/lib/seo/astrology-guides";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const URL = "https://www.vivida.ge/astrologiuri-saxlebi";
 const TITLE = "ასტროლოგიური სახლები — ნატალური რუკის 12 სახლის მნიშვნელობა";
@@ -21,8 +21,8 @@ const FAQ = [
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "en") return { title: { absolute: HOUSES_EN.title }, description: HOUSES_EN.description, keywords: ["houses in astrology", "12 astrological houses", "birth chart houses", "astrology house meanings"], alternates: localizedAlternates("/astrologiuri-saxlebi", "/astrologiuri-saxlebi", "en"), openGraph: { title: HOUSES_EN.title, description: HOUSES_EN.description, url: "https://www.vividaastro.com/astrologiuri-saxlebi", type: "article", locale: "en_US", siteName: "Vivida" }, twitter: { card: "summary_large_image", title: HOUSES_EN.title, description: HOUSES_EN.description } };
-  return { title: { absolute: TITLE }, description: DESCRIPTION, keywords: ["ასტროლოგიური სახლები", "ნატალური რუკის სახლები", "12 სახლი ასტროლოგიაში", "სახლები ჰოროსკოპში"], alternates: localizedAlternates("/astrologiuri-saxlebi", "/astrologiuri-saxlebi", "ka"), openGraph: { title: TITLE, description: DESCRIPTION, url: URL, type: "article", locale: "ka_GE", siteName: "Vivida" } };
+  if (locale === "en") return { title: { absolute: HOUSES_EN.title }, description: HOUSES_EN.description, keywords: ["houses in astrology", "12 astrological houses", "birth chart houses", "astrology house meanings"], alternates: localizedAlternates("/astrologiuri-saxlebi", "/astrologiuri-saxlebi", "en"), openGraph: { images: [DEFAULT_OG_IMAGE], title: HOUSES_EN.title, description: HOUSES_EN.description, url: "https://www.vividaastro.com/astrologiuri-saxlebi", type: "article", locale: "en_US", siteName: "Vivida" }, twitter: { card: "summary_large_image", title: HOUSES_EN.title, description: HOUSES_EN.description } };
+  return { title: { absolute: TITLE }, description: DESCRIPTION, keywords: ["ასტროლოგიური სახლები", "ნატალური რუკის სახლები", "12 სახლი ასტროლოგიაში", "სახლები ჰოროსკოპში"], alternates: localizedAlternates("/astrologiuri-saxlebi", "/astrologiuri-saxlebi", "ka"), openGraph: { images: [DEFAULT_OG_IMAGE], title: TITLE, description: DESCRIPTION, url: URL, type: "article", locale: "ka_GE", siteName: "Vivida" } };
 }
 
 export default async function AstrologyHousesPage() {

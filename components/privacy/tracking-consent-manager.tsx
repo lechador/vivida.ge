@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ShieldCheck } from "lucide-react";
 
@@ -51,6 +51,7 @@ export function TrackingConsentManager({
   const [consent, setConsent] = useState<TrackingConsent>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const panelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -72,6 +73,25 @@ export function TrackingConsentManager({
   const en = typeof document !== "undefined" && document.documentElement.lang === "en";
   const showPanel = ready && (consent === null || settingsOpen);
   const trackingAllowed = trackingEnabled && consent === "granted";
+
+  // Reserve document space equal to the panel's height while it is open. The
+  // panel is `fixed`, so without this it sits on top of whatever is at the
+  // bottom of the page and that content can never be scrolled clear — on
+  // /login that was the submit button and the sign-up link.
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    const apply = () => {
+      document.body.style.paddingBottom = `${el.offsetHeight + 24}px`;
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      document.body.style.paddingBottom = "";
+    };
+  }, [showPanel]);
 
   return (
     <>
@@ -97,28 +117,49 @@ export function TrackingConsentManager({
         </button>
       )}
 
+      {/* The panel is deliberately compact on mobile: at 375px the roomier
+          desktop treatment grew tall enough to cover the whole /login form —
+          fields, submit and the sign-up link — so a first-time visitor could
+          neither sign in nor register until they dismissed it. Georgian copy
+          runs ~30% longer than English, which made it worse on the primary
+          domain. Height is also hard-capped as a backstop. */}
       {showPanel && (
-        <div className="fixed inset-x-3 bottom-3 z-[100] mx-auto max-w-2xl rounded-2xl border border-border bg-background/95 p-5 shadow-2xl backdrop-blur-xl sm:bottom-5 sm:p-6">
+        <div
+          ref={panelRef}
+          className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-h-[60svh] max-w-2xl flex-col overflow-y-auto rounded-2xl border border-border bg-background/95 p-4 shadow-2xl backdrop-blur-xl sm:bottom-5 sm:p-6">
           <div className="flex items-start gap-3">
-            <div className="grid size-9 shrink-0 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
+            <div className="hidden size-9 shrink-0 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)] sm:grid">
               <ShieldCheck className="size-4.5" />
             </div>
             <div>
-              <h2 className="font-semibold">
+              <h2 className="text-sm font-semibold sm:text-base">
                 {en ? "Your privacy choices" : "შენი კონფიდენციალურობის არჩევანი"}
               </h2>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
                 {en
                   ? "Essential cookies keep Vivida working. With your permission, analytics and Meta cookies help us measure which campaigns lead to useful visits and purchases."
                   : "აუცილებელი cookie-ები Vivida-ს მუშაობას უზრუნველყოფს. შენი თანხმობით, ანალიტიკა და Meta cookie-ები გვეხმარება გავიგოთ რომელი კამპანია იწვევს სასარგებლო ვიზიტებსა და ყიდვებს."}
               </p>
             </div>
           </div>
-          <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" onClick={() => choose("denied")}>
+          {/* Stacked on mobile: the Georgian labels do not fit two-across at
+              375px and were overflowing the viewport. `sm` sizing keeps the
+              stack short enough to leave the page's own controls reachable. */}
+          <div className="mt-3 flex flex-col-reverse gap-2 sm:mt-4 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => choose("denied")}
+            >
               {en ? "Essential only" : "მხოლოდ აუცილებელი"}
             </Button>
-            <Button type="button" variant="mystic" onClick={() => choose("granted")}>
+            <Button
+              type="button"
+              variant="mystic"
+              size="sm"
+              onClick={() => choose("granted")}
+            >
               {en ? "Allow analytics & Meta" : "ანალიტიკისა და Meta-ს დაშვება"}
             </Button>
           </div>

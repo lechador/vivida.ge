@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EnglishGuide } from "@/components/en/english-guide";
-import {
-  ENGLISH_SITE_URL,
-  GEORGIAN_SITE_URL,
-  localizedAlternates,
-} from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const PATH = "/en/privacy";
 const TITLE = "Privacy Policy";
@@ -16,7 +12,7 @@ const LAST_UPDATED = "August 16, 2026";
 export const metadata: Metadata = {
   title: { absolute: `${TITLE} — Vivida` }, description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/privacy", "en"),
-  openGraph: { title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/privacy`, locale: "en_US", alternateLocale: ["ka_GE"] },
+  openGraph: { images: [DEFAULT_OG_IMAGE], title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/privacy`, locale: "en_US", alternateLocale: ["ka_GE"] },
 };
 
 export default function EnglishPrivacyPage() {

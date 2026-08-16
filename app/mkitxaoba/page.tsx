@@ -13,6 +13,7 @@ import {
   MKITXAOBA_LATIN_QUERIES,
 } from "@/lib/seo/fortune-telling";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
   keywords: MKITXAOBA_KEYWORDS_KA,
   alternates: { canonical: `${SITE_URL}/mkitxaoba` },
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${SITE_URL}/mkitxaoba`,
     title: TITLE,

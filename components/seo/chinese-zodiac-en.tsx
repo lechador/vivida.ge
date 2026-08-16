@@ -229,7 +229,7 @@ export function ChineseAnimalPageEn({
     <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <PageBackground />
       <Starfield count={120} shooting={3} />
-      <SmartHeader locale="en" georgianPath={`/chinuri-horoskopi/${animal}`} />
+      <SmartHeader locale="en" georgianPath={`/chinuri-horoskopi/${animal.slug}`} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

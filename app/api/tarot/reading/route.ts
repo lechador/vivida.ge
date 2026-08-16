@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { performReading } from "@/lib/tarot/reading";
 
 export const runtime = "nodejs";
@@ -23,6 +24,19 @@ export async function POST(req: Request) {
 
   const body = (await req.json().catch(() => ({}))) as { question?: unknown };
   const question = typeof body.question === "string" ? body.question : "";
+
+  // Daily cap on the AI call, matching the other LLM routes. Credits alone are
+  // not a bound: spendCredits is a no-op for premium accounts.
+  try {
+    await enforceRateLimit({
+      bucket: "tarot_reading_user_day",
+      identifier: userId,
+      limit: 20,
+      windowMs: 24 * 60 * 60 * 1000,
+    });
+  } catch {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
 
   const locale = await getRequestLocale();
   const result = await performReading(userId, question, locale);

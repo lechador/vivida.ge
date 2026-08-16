@@ -15,10 +15,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { SmartHeader } from "@/components/smart-header";
 import { SiteFooter } from "@/components/site-footer";
 import { TESTS, type TestCatalogEntry } from "@/lib/tests-catalog";
-import {
-  ENGLISH_SITE_URL,
-  localizedAlternates,
-} from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const PATH = "/en/tests";
@@ -39,6 +36,7 @@ export const metadata: Metadata = {
   ],
   alternates: localizedAlternates(PATH, "/tests", "en"),
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     title: TITLE,
     description: DESCRIPTION,
     url: `${ENGLISH_SITE_URL}/tests`,

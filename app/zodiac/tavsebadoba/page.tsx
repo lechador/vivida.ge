@@ -22,7 +22,7 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { COMPAT_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/tavsebadoba";
@@ -39,6 +39,7 @@ export const metadata: Metadata = COMPATIBILITY_HUB_CONTENT
       description: COMPATIBILITY_HUB_CONTENT.metaDescription,
       alternates: localizedAlternates(PATH, "/en/compatibility", "ka"),
       openGraph: {
+        images: [DEFAULT_OG_IMAGE],
         type: "website",
         url: `${SITE_URL}${PATH}`,
         title: COMPATIBILITY_HUB_CONTENT.pageTitle,

@@ -25,6 +25,13 @@ export function StepPlace({
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  // "empty" / "error" drive the visible panels below — without them a
+  // village the geocoder doesn't know renders nothing at all and the
+  // wizard's Continue button stays disabled with no explanation.
+  const [status, setStatus] = useState<"idle" | "ok" | "empty" | "error">(
+    "idle"
+  );
+  const [retryKey, setRetryKey] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Debounced fetch — only when the trimmed query is long enough and the
@@ -49,11 +56,15 @@ export function StepPlace({
         );
         if (!res.ok) throw new Error("geocode failed");
         const data = (await res.json()) as { results: GeocodeResult[] };
-        setResults(data.results ?? []);
+        const list = data.results ?? [];
+        setResults(list);
+        setStatus(list.length > 0 ? "ok" : "empty");
         setOpen(true);
       } catch (e) {
         if ((e as Error).name !== "AbortError") {
           setResults([]);
+          setStatus("error");
+          setOpen(true);
         }
       } finally {
         setLoading(false);
@@ -63,7 +74,7 @@ export function StepPlace({
       clearTimeout(t);
       ctrl.abort();
     };
-  }, [trimmed, shouldFetch]);
+  }, [trimmed, shouldFetch, retryKey]);
 
   // Click-outside to close dropdown
   useEffect(() => {
@@ -103,9 +114,13 @@ export function StepPlace({
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
+              setStatus("idle");
               if (value) onChange(null);
             }}
-            onFocus={() => results.length > 0 && setOpen(true)}
+            onFocus={() =>
+              (results.length > 0 || status === "empty" || status === "error") &&
+              setOpen(true)
+            }
             autoComplete="off"
             autoFocus
           />
@@ -128,6 +143,7 @@ export function StepPlace({
           <AnimatePresence>
             {open && shouldFetch && results.length > 0 && (
               <motion.ul
+                key="results"
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
@@ -164,6 +180,53 @@ export function StepPlace({
                   </li>
                 ))}
               </motion.ul>
+            )}
+
+            {open && shouldFetch && !loading && status === "empty" && (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 rounded-lg border border-border bg-popover/95 px-3 py-2.5 text-sm shadow-2xl backdrop-blur-md"
+              >
+                <p className="text-foreground">
+                  {en ? "No place found" : "ვერაფერი მოიძებნა"}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {en
+                    ? "Try a different spelling, or pick the nearest larger city — it does not change your chart."
+                    : "სცადე სხვა დაწერილობა ან აირჩიე უახლოესი დიდი ქალაქი — რუკას ეს არ ცვლის."}
+                </p>
+              </motion.div>
+            )}
+
+            {open && shouldFetch && !loading && status === "error" && (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 rounded-lg border border-border bg-popover/95 px-3 py-2.5 text-sm shadow-2xl backdrop-blur-md"
+              >
+                <p className="text-foreground">
+                  {en
+                    ? "Could not reach the search service."
+                    : "საძიებო სერვისს ვერ დავუკავშირდით."}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStatus("idle");
+                    setRetryKey((k) => k + 1);
+                  }}
+                  className="mt-2 rounded-full border border-border px-3 py-1 text-xs text-foreground transition-colors hover:bg-accent/15"
+                >
+                  {en ? "Try again" : "სცადე ხელახლა"}
+                </button>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>

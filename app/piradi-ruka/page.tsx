@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PublicNatalCalculator } from "@/components/calculator/public-natal-calculator";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/piradi-ruka`;
@@ -62,6 +63,7 @@ export const metadata: Metadata = {
   keywords: KEYWORDS,
   alternates: { canonical: URL },
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: URL,
     title: "პირადი რუკა ონლაინ — უფასო გამოთვლა",

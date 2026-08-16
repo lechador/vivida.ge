@@ -69,20 +69,24 @@ export function CommentSection({
   const [replyParentId, setReplyParentId] = useState<string | null>(null);
   const [replyBody, setReplyBody] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const replyRef = useRef<HTMLTextAreaElement | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    if (!open || comments !== null) return;
+    // `loadFailed` parks the effect after a rejection; clearing it from
+    // the retry button is what re-triggers the fetch.
+    if (!open || comments !== null || loadFailed) return;
     listComments(postId)
       .then((list) => {
         setComments(list);
-      });
-  }, [open, comments, postId]);
+      })
+      .catch(() => setLoadFailed(true));
+  }, [open, comments, postId, loadFailed]);
 
-  const loading = open && comments === null;
+  const loading = open && comments === null && !loadFailed;
 
   useEffect(() => {
     if (open) {
@@ -179,6 +183,23 @@ export function CommentSection({
           {loading && (
             <div className="flex justify-center py-4">
               <Loader2 className="size-4 animate-spin text-muted-foreground" />
+            </div>
+          )}
+
+          {loadFailed && (
+            <div className="flex flex-col items-center gap-2 py-4 text-center">
+              <p className="text-xs text-muted-foreground">
+                {en
+                  ? "Could not load the comments."
+                  : "კომენტარები ვერ ჩაიტვირთა."}
+              </p>
+              <button
+                type="button"
+                onClick={() => setLoadFailed(false)}
+                className="rounded-full border border-border px-3 py-1.5 text-[11px] text-foreground transition-colors hover:bg-card/80"
+              >
+                {en ? "Try again" : "სცადე ხელახლა"}
+              </button>
             </div>
           )}
 

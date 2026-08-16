@@ -13,7 +13,7 @@ import {
 import { ensureChineseZodiacHub } from "@/actions/chinese-zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { CHINESE_ANIMALS, yearsForAnimal } from "@/lib/seo/chinese-zodiac";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -41,6 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
       alternates: localizedAlternates(path, path, "en"),
       openGraph: {
+        images: [DEFAULT_OG_IMAGE],
         type: "website",
         url: `https://www.vividaastro.com${path}`,
         title: CHINESE_HUB_EN.title,
@@ -67,6 +68,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "ka",
     ),
     openGraph: {
+      images: [DEFAULT_OG_IMAGE],
       type: "website",
       url: URL,
       title,

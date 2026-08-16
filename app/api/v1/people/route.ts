@@ -15,14 +15,16 @@ const Query = z.object({
 });
 
 /**
- * GET /api/v1/people?cursor=<ISO>&q=<search>&limit=<n>
+ * GET /api/v1/people?cursor=<opaque>&q=<search>&limit=<n>
  *
  * One page of the public user directory, mirroring the website's /people
  * list. Shares listPeople() with the web Server Action so the row shape
- * (handle, display name, bio, avatar, friendship state) stays identical.
+ * (handle, display name, bio, avatar, friendship state) stays identical,
+ * including its country-first ordering.
  *
- * `nextCursor` is the `createdAt` boundary of the last row, or null at the
- * end of the list — drives infinite scroll on the client.
+ * `nextCursor` is an OPAQUE token — echo it back verbatim, never parse it.
+ * It encodes the residence-country bucket alongside the `createdAt`
+ * boundary, so its format is not a date and is free to change.
  */
 export async function GET(req: Request) {
   return handle(async () => {

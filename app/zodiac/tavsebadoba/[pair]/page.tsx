@@ -22,7 +22,7 @@ import {
 import { pairPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
 import { ZodiacPairPageEn } from "@/components/seo/zodiac-pair-page-en";
 
@@ -59,7 +59,7 @@ export async function generateMetadata({
       title: { absolute: english.title },
       description: english.description,
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { type: "article", url, title: english.title, description: english.description, siteName: "Vivida", locale: "en_US" },
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url, title: english.title, description: english.description, siteName: "Vivida", locale: "en_US" },
       twitter: { card: "summary_large_image", title: english.title, description: english.description },
     };
   }
@@ -68,6 +68,7 @@ export async function generateMetadata({
     description: c.metaDescription,
     alternates: localizedAlternates(path, path, "ka"),
     openGraph: {
+      images: [DEFAULT_OG_IMAGE],
       type: "article",
       url: `${SITE_URL}/zodiac/tavsebadoba/${pair}`,
       title: c.pageTitle,

@@ -10,7 +10,7 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { EQ_ARTICLES, eqArticleBySlug } from "@/lib/seo/eq-articles";
 import { eqArticleEnBySlug } from "@/lib/seo/eq-articles-en";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const BASE = "https://www.vivida.ge/emociuri-inteleqti";
 
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: { absolute: item.title }, description: item.description,
       keywords: [item.category, "emotional intelligence", "EQ", ...item.domains],
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { title: item.title, description: item.description, url: `https://www.vividaastro.com${path}`, type: "article", locale: "en_US", publishedTime: "2026-07-20T00:00:00.000Z", modifiedTime: "2026-08-14T00:00:00.000Z" },
+      openGraph: { images: [DEFAULT_OG_IMAGE], title: item.title, description: item.description, url: `https://www.vividaastro.com${path}`, type: "article", locale: "en_US", publishedTime: "2026-07-20T00:00:00.000Z", modifiedTime: "2026-08-14T00:00:00.000Z" },
       twitter: { card: "summary_large_image", title: item.title, description: item.description },
     };
   }
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: item.description,
     keywords: [item.category, "ემოციური ინტელექტი", "EQ", ...item.domains],
     alternates: localizedAlternates(`/emociuri-inteleqti/${slug}`, `/emociuri-inteleqti/${slug}`, "ka"),
-    openGraph: { title: item.title, description: item.description, url, type: "article", locale: "ka_GE", publishedTime: "2026-07-20T00:00:00+04:00", modifiedTime: "2026-07-20T00:00:00+04:00" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], title: item.title, description: item.description, url, type: "article", locale: "ka_GE", publishedTime: "2026-07-20T00:00:00+04:00", modifiedTime: "2026-07-20T00:00:00+04:00" },
   };
 }
 

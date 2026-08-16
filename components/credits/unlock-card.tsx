@@ -33,9 +33,11 @@ export function UnlockCard({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);
+  const [failed, setFailed] = useState(false);
 
   async function unlock() {
     setPending(true);
+    setFailed(false);
     try {
       const r = await fetch("/api/credits/unlock", {
         method: "POST",
@@ -47,8 +49,11 @@ export function UnlockCard({
         return;
       }
       if (r.status === 402) setShort(true);
+      // Any other status is a server-side failure — say so, otherwise a
+      // spend action looks like it silently did nothing.
+      else setFailed(true);
     } catch {
-      /* ignore */
+      setFailed(true);
     } finally {
       setPending(false);
     }
@@ -88,6 +93,13 @@ export function UnlockCard({
             {pending ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
             {en ? `Unlock for ${cost} credits` : `გახსნა ${cost} კრედიტით`}
           </Button>
+          {failed && (
+            <p className="mt-3 text-sm text-[var(--vivida-pink)]">
+              {en
+                ? "Could not unlock — no credits were charged. Please try again."
+                : "გახსნა ვერ მოხერხდა — კრედიტი არ ჩამოგეჭრა. სცადე ხელახლა."}
+            </p>
+          )}
         </div>
       ) : (
         <div className="mt-5 space-y-3">

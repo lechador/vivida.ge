@@ -103,3 +103,38 @@ export function localizedAlternates(
     },
   };
 }
+
+/**
+ * Fallback social card for pages that define their own `openGraph` block.
+ *
+ * Next merges metadata **shallowly**: a page-level `openGraph` object replaces
+ * the parent's wholesale, which silently drops the `images` that the root
+ * `app/opengraph-image.tsx` contributes to the root segment. Pages therefore
+ * have to restate an image or they ship with none, and every share of that URL
+ * renders as a bare text link.
+ *
+ * Relative on purpose — `metadataBase` in the root layout is host-aware, so
+ * this resolves to vivida.ge or vividaastro.com to match the domain served.
+ * Pages with a tailored card (`/api/og/page?t=…`) should keep using it; this is
+ * only the branded default for the rest.
+ */
+export const DEFAULT_OG_IMAGE = "/opengraph-image";
+
+/**
+ * Resolve an English-site content link for whichever host is serving.
+ *
+ * The English chrome also renders on the Georgian host — a signed-in user
+ * whose `interfaceLanguage` is English — and there a bare path is wrong twice
+ * over. `/natal-chart`, `/horoscope`, `/compatibility` and `/about` are not
+ * route files at all (they are `beforeFiles` rewrites in next.config gated on
+ * `has: host in ENGLISH_HOSTS`), so they 404 outright on vivida.ge; and every
+ * other path resolves but renders Georgian, since locale now follows the host.
+ * Sending English chrome's content links to the English domain fixes both.
+ *
+ * Auth-bound links (/login, /dashboard, /account) must NOT go through this —
+ * the session cookie is per-domain, so crossing over would sign the user out.
+ */
+export function englishSiteHref(path: string, onEnglishHost: boolean): string {
+  if (onEnglishHost) return path;
+  return `${ENGLISH_SITE_URL}${path === "/" ? "" : path}`;
+}

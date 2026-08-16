@@ -13,6 +13,7 @@ import {
   countryCodeFromHeaders,
   setResidenceCountryIfMissing,
 } from "@/lib/residence";
+import { isEnglishHost } from "@/lib/seo/locales";
 
 /**
  * Credentials provider for the email/password login flow. Lives in
@@ -121,6 +122,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } catch (err) {
         console.warn(
           "[auth.createUser] residence country stamp failed:",
+          (err as Error).message,
+        );
+      }
+      // Only the credentials flow passes a locale (actions/auth.ts), so a Google
+      // sign-up on the English domain would keep the 'ka' schema default — and
+      // every email/push reads that column, not the host. Guarded on the default
+      // so a later /account choice is never overwritten.
+      try {
+        const requestHeaders = await headers();
+        const host =
+          requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+        if (isEnglishHost(host)) {
+          await db
+            .update(users)
+            .set({ interfaceLanguage: "en" })
+            .where(
+              and(eq(users.id, user.id), eq(users.interfaceLanguage, "ka")),
+            );
+        }
+      } catch (err) {
+        console.warn(
+          "[auth.createUser] interface language stamp failed:",
           (err as Error).message,
         );
       }

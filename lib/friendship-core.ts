@@ -12,6 +12,7 @@ import {
 } from "@/db/schema";
 import { sendFriendRequestEmail } from "@/lib/email";
 import { isBlockedEitherWay } from "@/lib/block";
+import type { UserLocale } from "@/lib/i18n/locale";
 import { isAccountRestricted } from "@/lib/restriction";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { queueNotificationPush } from "@/lib/notification-push";
@@ -75,15 +76,28 @@ async function emitNotification({
 
 /**
  * Send a friend request from `actor` to `targetUserId`. If the target has
- * already requested the actor, auto-accept (mutual interest).
+ * already requested the actor, auto-accept (mutual interest). `locale` picks
+ * the language of the returned error, which callers render verbatim.
  */
 export async function sendFriendRequestCore(
   actor: FriendActor,
-  targetUserId: string
+  targetUserId: string,
+  locale: UserLocale = "ka"
 ): Promise<FriendshipActionResult> {
+  const en = locale === "en";
+
   if (actor.id === targetUserId) {
-    return { ok: false, error: "ვერ გაუგზავნი მოთხოვნას საკუთარ თავს" };
+    return {
+      ok: false,
+      error: en
+        ? "You can't send yourself a request"
+        : "ვერ გაუგზავნი მოთხოვნას საკუთარ თავს",
+    };
   }
+
+  const cannotSend = en
+    ? "The request can't be sent"
+    : "თხოვნის გაგზავნა შეუძლებელია";
 
   // A restricted account (under-age, or manually restricted) on either side
   // can't send or receive friend requests.
@@ -91,12 +105,12 @@ export async function sendFriendRequestCore(
     (await isAccountRestricted(actor.id)) ||
     (await isAccountRestricted(targetUserId))
   ) {
-    return { ok: false, error: "თხოვნის გაგზავნა შეუძლებელია" };
+    return { ok: false, error: cannotSend };
   }
 
   // A block in either direction blocks new friend requests outright.
   if (await isBlockedEitherWay(actor.id, targetUserId)) {
-    return { ok: false, error: "თხოვნის გაგზავნა შეუძლებელია" };
+    return { ok: false, error: cannotSend };
   }
 
   const [existing] = await db
@@ -118,10 +132,13 @@ export async function sendFriendRequestCore(
 
   if (existing) {
     if (existing.status === "blocked") {
-      return { ok: false, error: "თხოვნის გაგზავნა შეუძლებელია" };
+      return { ok: false, error: cannotSend };
     }
     if (existing.status === "accepted") {
-      return { ok: false, error: "უკვე მეგობრები ხართ" };
+      return {
+        ok: false,
+        error: en ? "You're already friends" : "უკვე მეგობრები ხართ",
+      };
     }
     if (existing.status === "pending") {
       if (existing.requesterId === targetUserId) {
@@ -144,7 +161,10 @@ export async function sendFriendRequestCore(
         });
         return { ok: true };
       }
-      return { ok: false, error: "მოთხოვნა უკვე გაგზავნილია" };
+      return {
+        ok: false,
+        error: en ? "The request is already sent" : "მოთხოვნა უკვე გაგზავნილია",
+      };
     }
   }
 
@@ -186,16 +206,25 @@ export async function sendFriendRequestCore(
 /** Accept a pending request that someone sent to me. */
 export async function acceptFriendRequestCore(
   userId: string,
-  requesterId: string
+  requesterId: string,
+  locale: UserLocale = "ka"
 ): Promise<FriendshipActionResult> {
+  const en = locale === "en";
+
   // A restricted account on either side can't form the friendship.
   if (
     (await isAccountRestricted(userId)) ||
     (await isAccountRestricted(requesterId))
   ) {
-    return { ok: false, error: "მოქმედება შეუძლებელია" };
+    return {
+      ok: false,
+      error: en ? "This action isn't available" : "მოქმედება შეუძლებელია",
+    };
   }
-  await db
+  // Only a row that actually transitioned pending -> accepted may notify and
+  // award reputation; without the row-count check any user id could be spammed
+  // with a "friend_accepted" notification for a request that never existed.
+  const accepted = await db
     .update(friendships)
     .set({ status: "accepted", respondedAt: new Date() })
     .where(
@@ -204,7 +233,14 @@ export async function acceptFriendRequestCore(
         eq(friendships.recipientId, userId),
         eq(friendships.status, "pending")
       )
-    );
+    )
+    .returning({ requesterId: friendships.requesterId });
+  if (accepted.length === 0) {
+    return {
+      ok: false,
+      error: en ? "The request no longer exists" : "მოთხოვნა ვერ მოიძებნა",
+    };
+  }
   await emitNotification({
     toUserId: requesterId,
     fromUserId: userId,

@@ -17,7 +17,7 @@ import {
   yearsForAnimal,
 } from "@/lib/seo/chinese-zodiac";
 import { chineseZodiacContentEnBySlug } from "@/lib/seo/chinese-zodiac-en";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -48,19 +48,21 @@ export async function generateMetadata({
     const path = `/chinuri-horoskopi/${slug}`;
     const title = `${animal.nameEn} Chinese Zodiac: Years, Personality and Compatibility`;
     const description = `${content.headline}. Discover ${animal.nameEn} birth years, personality traits, strengths, love compatibility, and career style.`;
+    const ogEn = `${ENGLISH_SITE_URL}/api/og/page?t=${encodeURIComponent(animal.nameEn)}&k=${encodeURIComponent("Chinese zodiac")}`;
     return {
       title: { absolute: title },
       description,
       alternates: localizedAlternates(path, path, "en"),
       openGraph: {
         type: "article",
-        url: `https://www.vividaastro.com${path}`,
+        url: `${ENGLISH_SITE_URL}${path}`,
         title,
         description,
         siteName: "Vivida",
         locale: "en_US",
+        images: [{ url: ogEn, width: 1200, height: 630 }],
       },
-      twitter: { card: "summary_large_image", title, description },
+      twitter: { card: "summary_large_image", title, description, images: [ogEn] },
     };
   }
   const content = await ensureChineseZodiac(slug);

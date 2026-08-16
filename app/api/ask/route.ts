@@ -35,29 +35,6 @@ export async function POST(req: Request) {
   const userId = session?.user?.id;
   if (!userId) return Response.json({ error: "unauthorized" }, { status: 401 });
 
-  // Credit gate: FREE_ALLOWANCE.chatPerDay free messages/day, then spend
-  // CREDIT_COST.chat per message. 402 tells the client to open the credit
-  // unlock screen (invite or buy).
-  const [used] = await db
-    .select({ n: sql<number>`count(*)::int` })
-    .from(chartChatMessages)
-    .where(
-      and(
-        eq(chartChatMessages.userId, userId),
-        eq(chartChatMessages.role, "user"),
-        sql`${chartChatMessages.createdAt} >= date_trunc('day', now())`
-      )
-    );
-  if ((used?.n ?? 0) >= FREE_ALLOWANCE.chatPerDay) {
-    const paid = await spendCredits(userId, CREDIT_COST.chat, "spend_chat");
-    if (!paid) {
-      return Response.json(
-        { error: "needs_credits", cost: CREDIT_COST.chat },
-        { status: 402 }
-      );
-    }
-  }
-
   if (!isOpenRouterConfigured()) {
     return Response.json({ error: "unavailable" }, { status: 503 });
   }
@@ -105,6 +82,30 @@ export async function POST(req: Request) {
       .orderBy(desc(chartChatMessages.createdAt))
       .limit(HISTORY_LIMIT)
   ).reverse();
+
+  // Credit gate: FREE_ALLOWANCE.chatPerDay free messages/day, then spend
+  // CREDIT_COST.chat per message. 402 tells the client to open the credit
+  // unlock screen (invite or buy). Kept last so a request rejected by any of
+  // the checks above (503/429/400) is never charged — there is no refund path.
+  const [used] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(chartChatMessages)
+    .where(
+      and(
+        eq(chartChatMessages.userId, userId),
+        eq(chartChatMessages.role, "user"),
+        sql`${chartChatMessages.createdAt} >= date_trunc('day', now())`
+      )
+    );
+  if ((used?.n ?? 0) >= FREE_ALLOWANCE.chatPerDay) {
+    const paid = await spendCredits(userId, CREDIT_COST.chat, "spend_chat");
+    if (!paid) {
+      return Response.json(
+        { error: "needs_credits", cost: CREDIT_COST.chat },
+        { status: 402 }
+      );
+    }
+  }
 
   // Persist the user's turn before we stream the answer.
   await db.insert(chartChatMessages).values({ userId, role: "user", content: message });

@@ -3,18 +3,30 @@
  * pass / unmatch) lives in lib/match-core.ts.
  */
 
-import { and, asc, desc, eq, inArray, isNotNull, isNull, ne, or } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 
 import { db } from "@/db";
 import {
   charts,
-  friendships,
   likes,
   matches,
   profilePhotos,
   profiles,
   users,
 } from "@/db/schema";
+import { getBlockedUserIds } from "./block";
+import { getResidenceCountryCode, sameCountryFirst } from "./residence";
 import { signByIndex, type ZodiacSign } from "./zodiac";
 import { ageFromDob } from "./profile-utils";
 import { computeSynastry } from "./synastry";
@@ -64,7 +76,7 @@ const CANDIDATE_LIMIT = 80;
  * (active or unmatched — don't resurface), and anyone blocked either way.
  */
 async function deckExclusions(viewerId: string): Promise<Set<string>> {
-  const [decided, matchRows, blockedRows] = await Promise.all([
+  const [decided, matchRows, blockedIds] = await Promise.all([
     db
       .select({ id: likes.targetId })
       .from(likes)
@@ -73,31 +85,23 @@ async function deckExclusions(viewerId: string): Promise<Set<string>> {
       .select({ a: matches.userAId, b: matches.userBId })
       .from(matches)
       .where(or(eq(matches.userAId, viewerId), eq(matches.userBId, viewerId))),
-    db
-      .select({ a: friendships.requesterId, b: friendships.recipientId })
-      .from(friendships)
-      .where(
-        and(
-          eq(friendships.status, "blocked"),
-          or(
-            eq(friendships.requesterId, viewerId),
-            eq(friendships.recipientId, viewerId)
-          )
-        )
-      ),
+    // Blocks live in `blocks`, not on friendship.status — blocking also
+    // deletes the friendship row, so there is nothing to read there.
+    getBlockedUserIds(viewerId),
   ]);
 
   const excluded = new Set<string>([viewerId]);
   for (const r of decided) excluded.add(r.id);
   for (const r of matchRows) excluded.add(r.a === viewerId ? r.b : r.a);
-  for (const r of blockedRows) excluded.add(r.a === viewerId ? r.b : r.a);
+  for (const id of blockedIds) excluded.add(id);
   return excluded;
 }
 
 /**
  * The swipe deck — public-profile users the viewer hasn't decided on yet,
  * sorted by astrological compatibility (highest first). Friends are eligible
- * (you can match a friend); only decided/matched/blocked users are filtered.
+ * (you can match a friend); decided/matched/blocked users and anyone who
+ * turned off discoverability are filtered.
  */
 export async function getMatchDeck(viewerId: string): Promise<DeckCard[]> {
   const [viewerChart] = await db
@@ -107,6 +111,7 @@ export async function getMatchDeck(viewerId: string): Promise<DeckCard[]> {
     .limit(1);
 
   const excluded = await deckExclusions(viewerId);
+  const viewerCountry = await getResidenceCountryCode(viewerId);
 
   // Resolve the include set explicitly (notInArray with large/empty sets is
   // awkward in drizzle; an inArray over candidates is reliable).
@@ -114,11 +119,12 @@ export async function getMatchDeck(viewerId: string): Promise<DeckCard[]> {
     .selectDistinct({ id: profiles.userId })
     .from(profiles)
     .innerJoin(charts, eq(charts.userId, profiles.userId))
-    .where(isNotNull(profiles.username));
+    .where(
+      and(isNotNull(profiles.username), eq(profiles.discoverable, true))
+    );
   const includeIds = allCandidates
     .map((r) => r.id)
-    .filter((id) => !excluded.has(id))
-    .slice(0, CANDIDATE_LIMIT);
+    .filter((id) => !excluded.has(id));
 
   if (includeIds.length === 0) return [];
 
@@ -127,7 +133,19 @@ export async function getMatchDeck(viewerId: string): Promise<DeckCard[]> {
     .from(profiles)
     .innerJoin(users, eq(users.id, profiles.userId))
     .innerJoin(charts, eq(charts.userId, profiles.userId))
-    .where(and(ne(users.id, viewerId), inArray(users.id, includeIds)));
+    .where(
+      and(
+        ne(users.id, viewerId),
+        eq(profiles.discoverable, true),
+        inArray(users.id, includeIds)
+      )
+    )
+    // Country first, then a random sample within each bucket. Applied to the
+    // sample rather than after it, for the same reason as discover.ts: this is
+    // what gets scored, so a viewer in a market with few users would otherwise
+    // never draw a local candidate into the deck at all.
+    .orderBy(desc(sameCountryFirst(viewerCountry)), sql`random()`)
+    .limit(CANDIDATE_LIMIT);
 
   // All ready photos per candidate, grouped in JS (one query).
   const candidateIds = candidates.map((c) => c.user.id);
@@ -267,28 +285,17 @@ export async function listMatches(viewerId: string): Promise<MatchView[]> {
  * identities; authenticated users receive their pending likers directly.
  */
 export async function listIncomingLikes(viewerId: string): Promise<IncomingLikes> {
-  const [likedMe, iDecided, blockedRows] = await Promise.all([
+  const [likedMe, iDecided, blockedIds] = await Promise.all([
     db
       .select({ id: likes.likerId })
       .from(likes)
       .where(and(eq(likes.targetId, viewerId), eq(likes.kind, "like"))),
     db.select({ id: likes.targetId }).from(likes).where(eq(likes.likerId, viewerId)),
-    db
-      .select({ a: friendships.requesterId, b: friendships.recipientId })
-      .from(friendships)
-      .where(
-        and(
-          eq(friendships.status, "blocked"),
-          or(
-            eq(friendships.requesterId, viewerId),
-            eq(friendships.recipientId, viewerId)
-          )
-        )
-      ),
+    getBlockedUserIds(viewerId),
   ]);
 
   const decided = new Set(iDecided.map((r) => r.id));
-  for (const r of blockedRows) decided.add(r.a === viewerId ? r.b : r.a);
+  for (const id of blockedIds) decided.add(id);
   const pending = [...new Set(likedMe.map((r) => r.id))].filter(
     (id) => !decided.has(id)
   );

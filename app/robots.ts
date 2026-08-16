@@ -18,7 +18,10 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        // /api/og/* renders the og:image every social card points at, so it
+        // has to stay crawlable despite the blanket /api/ block — the longer
+        // Allow prefix wins over the shorter Disallow for Google and Bing.
+        allow: ["/", "/api/og/"],
         disallow: [
           "/admin",
           "/api/",

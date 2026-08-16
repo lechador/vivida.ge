@@ -11,7 +11,7 @@ import { ALL_SLUGS, ZODIAC_DATES, signMetaBySlug, type ZodiacSlug } from "@/lib/
 import { ALL_HOROSCOPE_THEMES, themeUrl, type HoroscopeTheme } from "@/lib/seo/thematic-horoscope";
 import { THEME_CONFIG_EN, thematicHoroscopeEnglish } from "@/lib/thematic-horoscope-en";
 import { signColor } from "@/lib/zodiac";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 export function thematicHubMetadataEn(theme: HoroscopeTheme) {
   const config = THEME_CONFIG_EN[theme];
@@ -21,7 +21,7 @@ export function thematicHubMetadataEn(theme: HoroscopeTheme) {
     title: { absolute: config.title },
     description: config.description,
     alternates: localizedAlternates(path, path, "en"),
-    openGraph: { type: "website" as const, url, title: config.title, description: config.description, siteName: "Vivida", locale: "en_US" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website" as const, url, title: config.title, description: config.description, siteName: "Vivida", locale: "en_US" },
     twitter: { card: "summary_large_image" as const, title: config.title, description: config.description },
   };
 }
@@ -39,7 +39,7 @@ export function thematicDetailMetadataEn(theme: HoroscopeTheme, sign: ZodiacSlug
     description,
     keywords: [`${name} ${config.label.toLowerCase()}`, `${name} ${config.shortLabel.toLowerCase()}`, content.focus],
     alternates: localizedAlternates(path, path, "en"),
-    openGraph: { type: "article" as const, url, title, description, siteName: "Vivida", locale: "en_US" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "article" as const, url, title, description, siteName: "Vivida", locale: "en_US" },
     twitter: { card: "summary_large_image" as const, title, description },
   };
 }

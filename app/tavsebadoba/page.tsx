@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { buildCalculatorData } from "@/lib/compatibility-calculator-data";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/tavsebadoba";
@@ -58,6 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // competing for a pairing that belongs to a different URL.
     alternates: localizedAlternates(PATH, PATH, en ? "en" : "ka"),
     openGraph: {
+      images: [DEFAULT_OG_IMAGE],
       type: "website",
       url: `${en ? "https://www.vividaastro.com" : SITE_URL}${PATH}`,
       title,

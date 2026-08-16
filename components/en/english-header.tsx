@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { GEORGIAN_SITE_URL, englishSiteHref } from "@/lib/seo/locales";
+import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
 
 const NAV = [
   { href: "/natal-chart", label: "Natal chart" },
@@ -10,11 +11,16 @@ const NAV = [
   { href: "/tests", label: "Tests" },
 ];
 
-export function EnglishHeader({ georgianPath = "/" }: { georgianPath?: string }) {
+export async function EnglishHeader({ georgianPath = "/" }: { georgianPath?: string }) {
+  // Also rendered on the Georgian host (signed-in user reading English), where
+  // /natal-chart, /horoscope and /compatibility are hard 404s. `/login` is
+  // deliberately left relative — the session cookie is per-domain.
+  const onEnglishHost = await requestIsEnglishHost();
+  const href = (path: string) => englishSiteHref(path, onEnglishHost);
   return (
     <header className="relative z-20 border-b border-border/30 bg-background/45 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Vivida English home">
+        <Link href={href("/")} className="flex shrink-0 items-center gap-2.5" aria-label="Vivida English home">
           <VividaMark size={38} id="english-header" />
           <span
             className="bg-clip-text text-lg font-semibold tracking-tight text-transparent sm:text-xl"
@@ -29,7 +35,7 @@ export function EnglishHeader({ georgianPath = "/" }: { georgianPath?: string })
 
         <nav className="hidden items-center gap-5 text-sm text-muted-foreground lg:flex" aria-label="English navigation">
           {NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="transition-colors hover:text-foreground">
+            <Link key={item.href} href={href(item.href)} className="transition-colors hover:text-foreground">
               {item.label}
             </Link>
           ))}
@@ -55,7 +61,7 @@ export function EnglishHeader({ georgianPath = "/" }: { georgianPath?: string })
 
       <nav className="mx-auto flex w-full max-w-7xl gap-4 overflow-x-auto px-4 pb-3 text-xs text-muted-foreground lg:hidden" aria-label="English mobile navigation">
         {NAV.map((item) => (
-          <Link key={item.href} href={item.href} className="shrink-0 hover:text-foreground">
+          <Link key={item.href} href={href(item.href)} className="shrink-0 hover:text-foreground">
             {item.label}
           </Link>
         ))}

@@ -15,7 +15,7 @@ import {
   dreamsByLetter,
 } from "@/lib/seo/dreams";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -41,6 +41,7 @@ const KA_METADATA: Metadata = {
   ],
   alternates: localizedAlternates("/sizmris-akhsna", "/sizmris-akhsna", "ka"),
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${SITE_URL}/sizmris-akhsna`,
     title: TITLE,
@@ -59,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: DREAMS_HUB_EN.description,
     keywords: ["dream dictionary", "dream meanings", "dream interpretation", "common dream symbols"],
     alternates: localizedAlternates(path, path, "en"),
-    openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
     twitter: { card: "summary_large_image", title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description },
   };
 }

@@ -10,7 +10,7 @@ import { TS_QUESTION_COUNT } from "@/lib/true-sign/quiz";
 import { TRUE_SIGN_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 const TITLE = "რომელი ზოდიაქოს ნიშანი ხარ სინამდვილეში? — ტესტი";
 const DESCRIPTION =
@@ -37,6 +37,7 @@ const METADATA_KA: Metadata = {
     },
   },
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${GEORGIAN_SITE_URL}/quiz/namdvili-nishani`,
     title: TITLE,
@@ -53,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = "Which Zodiac Sign Matches Your Personality? — Quiz";
   const description = "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality. Free and instant.";
   const url = `${ENGLISH_SITE_URL}/quiz/namdvili-nishani`;
-  return { title: { absolute: title }, description, keywords: ["zodiac personality quiz", "which zodiac sign am I", "zodiac sign test", "free astrology quiz"], alternates: { canonical: url, languages: { en: url, "ka-GE": `${GEORGIAN_SITE_URL}/quiz/namdvili-nishani`, "x-default": url } }, openGraph: { type: "website", url, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  return { title: { absolute: title }, description, keywords: ["zodiac personality quiz", "which zodiac sign am I", "zodiac sign test", "free astrology quiz"], alternates: { canonical: url, languages: { en: url, "ka-GE": `${GEORGIAN_SITE_URL}/quiz/namdvili-nishani`, "x-default": url } }, openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
 }
 
 export default async function TrueSignQuizPage() {

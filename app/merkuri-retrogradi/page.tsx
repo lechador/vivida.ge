@@ -15,7 +15,7 @@ import { RETROGRADE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { MERCURY_RETROGRADE_EN, MercuryRetrogradePageEn } from "@/components/seo/mercury-retrograde-en";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -42,6 +42,7 @@ const KA_METADATA: Metadata = {
   ],
   alternates: localizedAlternates("/merkuri-retrogradi", "/merkuri-retrogradi", "ka"),
   openGraph: {
+    images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: `${SITE_URL}/merkuri-retrogradi`,
     title: TITLE,
@@ -55,7 +56,7 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   if ((await getRequestLocale()) !== "en") return KA_METADATA;
   const path = "/merkuri-retrogradi"; const { title, description } = MERCURY_RETROGRADE_EN;
-  return { title: { absolute: title }, description, keywords: ["Mercury retrograde", "Mercury retrograde dates", "is Mercury retrograde", "Mercury retrograde meaning"], alternates: localizedAlternates(path, path, "en"), openGraph: { type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  return { title: { absolute: title }, description, keywords: ["Mercury retrograde", "Mercury retrograde dates", "is Mercury retrograde", "Mercury retrograde meaning"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
 }
 
 const FAQ = [

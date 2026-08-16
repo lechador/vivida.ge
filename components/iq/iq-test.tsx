@@ -339,6 +339,16 @@ function IqOptions({
             type="button"
             onClick={() => onPick(i)}
             aria-pressed={active}
+            // Figure options render only an aria-hidden SVG, so the button
+            // would otherwise reach screen readers with no name at all. The
+            // letter is the same identity the text options show in their badge.
+            aria-label={
+              opt.kind === "figure"
+                ? locale === "en"
+                  ? `Option ${String.fromCharCode(65 + i)}`
+                  : `ვარიანტი ${String.fromCharCode(65 + i)}`
+                : undefined
+            }
             className={cn(
               "group relative rounded-xl border-2 transition-all",
               isFigure

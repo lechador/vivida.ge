@@ -19,7 +19,7 @@ import {
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacPlacementHubEn } from "@/components/seo/zodiac-placement-hub-en";
-import { localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/amomavali";
@@ -34,6 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       alternates: localizedAlternates(PATH, PATH, "en"),
       openGraph: {
+        images: [DEFAULT_OG_IMAGE],
         type: "website",
         url: "https://www.vividaastro.com/zodiac/amomavali",
         title,
@@ -50,6 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: RISING_HUB_CONTENT.metaDescription,
       alternates: localizedAlternates(PATH, PATH, "ka"),
       openGraph: {
+        images: [DEFAULT_OG_IMAGE],
         type: "website",
         url: `${SITE_URL}${PATH}`,
         title: RISING_HUB_CONTENT.pageTitle,

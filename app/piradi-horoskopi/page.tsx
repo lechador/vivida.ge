@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
 
 const SITE = "https://www.vivida.ge";
 const URL = `${SITE}/piradi-horoskopi`;
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
   description: "რა არის პირადი ჰოროსკოპი და რით განსხვავდება ზოგადი პროგნოზისგან. შექმენი პირადი რუკა და მიიღე დაბადების მონაცემებზე მორგებული ასტროლოგიური ანალიზი ქართულად.",
   keywords: ["პირადი ჰოროსკოპი", "პერსონალური ჰოროსკოპი", "პირადი ასტროლოგიური პროგნოზი", "ჰოროსკოპი დაბადების თარიღით", "პირადი რუკა"],
   alternates: { canonical: URL },
-  openGraph: { type: "article", url: URL, title: "პირადი ჰოროსკოპი — შენს რუკაზე მორგებული პროგნოზი", description: "გაიგე, როგორ იქმნება პერსონალური ჰოროსკოპი დაბადების რუკისა და მიმდინარე ტრანზიტების მიხედვით.", locale: "ka_GE", siteName: "Vivida" },
+  openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url: URL, title: "პირადი ჰოროსკოპი — შენს რუკაზე მორგებული პროგნოზი", description: "გაიგე, როგორ იქმნება პერსონალური ჰოროსკოპი დაბადების რუკისა და მიმდინარე ტრანზიტების მიხედვით.", locale: "ka_GE", siteName: "Vivida" },
 };
 
 export default function PersonalHoroscopePage() {

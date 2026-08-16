@@ -100,8 +100,14 @@ export function LiveSky({
   // planets move sub-pixel per tick (CSS transition smooths it), but the
   // Moon's arcsecond readout visibly counts up — that's the "it's alive"
   // moment this page exists for.
-  const [now, setNow] = useState(() => Date.now());
+  // Seeded from the server sample, not Date.now(): this initializer runs on
+  // the server too, and any clock difference would change the rendered
+  // arcseconds and transforms and break hydration. The clock starts on mount.
+  const [now, setNow] = useState(data.sampledAt);
   useEffect(() => {
+    // The first tick is left to the interval rather than written synchronously
+    // here: the seeded server sample is at most a second stale, and a sync
+    // setState in an effect body cascades an extra render on every mount.
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);

@@ -10,7 +10,7 @@ import { EQ_QUESTION_COUNT, EQ_DOMAINS } from "@/lib/eq/questions";
 import { EQ_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 const TITLE_KA = "EQ ტესტი — ემოციური ინტელექტის ტესტი ქართულად";
 const DESCRIPTION_KA =
@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { absolute: title }, description,
     keywords: en ? ["free EQ test", "emotional intelligence test", "empathy test", "self awareness test", "emotional intelligence assessment"] : ["eq ტესტი", "ემოციური ინტელექტი", "ემოციური ინტელექტის ტესტი", "უფასო eq ტესტი", "ემპათიის ტესტი"],
     alternates: { canonical: `${siteUrl}/eq-testi`, languages: { en: `${ENGLISH_SITE_URL}/eq-testi`, "ka-GE": `${GEORGIAN_SITE_URL}/eq-testi`, "x-default": `${ENGLISH_SITE_URL}/eq-testi` } },
-    openGraph: { type: "website", url: `${siteUrl}/eq-testi`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
+    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/eq-testi`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
     twitter: { card: "summary_large_image", title, description },
   };
 }
