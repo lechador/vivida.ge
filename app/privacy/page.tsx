@@ -2,8 +2,9 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { LegalPageEn } from "@/components/legal/legal-page-en";
 import type { Metadata } from "next";
+
+import { LEGAL_ENTITY } from "@/lib/legal-entity";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -20,8 +21,6 @@ export async function generateMetadata(): Promise<Metadata> {
 const LAST_UPDATED = "2026-08-16";
 
 export default async function PrivacyPage() {
-  if ((await getRequestLocale()) === "en")
-    return <LegalPageEn kind="privacy" lastUpdated={LAST_UPDATED} />;
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
@@ -54,8 +53,11 @@ export default async function PrivacyPage() {
               თქვენი მონაცემების კონტროლერი.
             </p>
             <p className="mt-3 leading-relaxed">
-              სერვისს ოპერირებს ინდივიდუალური მეწარმე, საიდენტიფიკაციო ნომერი{" "}
-              <strong className="text-foreground">09001026676</strong>.
+              სერვისს ოპერირებს{" "}
+              <strong className="text-foreground">{LEGAL_ENTITY.name}</strong> —
+              ვაიომინგის შტატში (აშშ) რეგისტრირებული კომპანია, სარეგისტრაციო
+              ნომერი {LEGAL_ENTITY.filingId}. იურიდიული მისამართი:{" "}
+              {LEGAL_ENTITY.addressKa}.
             </p>
           </section>
 
@@ -261,6 +263,18 @@ export default async function PrivacyPage() {
               </a>
               .
             </p>
+            <p className="mt-3 leading-relaxed">
+              ასევე უფლება გაქვთ საჩივრით მიმართოთ ზედამხედველ ორგანოს — 
+              საქართველოში ეს არის სახელმწიფო აუდიტის სამსახური{" "}
+              <a
+                href="https://pdp.sao.ge"
+                className="text-[var(--vivida-violet)] underline-offset-2 hover:underline"
+              >
+                pdp.sao.ge
+              </a>
+              , რომელმაც პერსონალურ მონაცემთა დაცვის ზედამხედველობა 2026 წლის
+              მარტიდან იტვირთა.
+            </p>
           </section>
 
           <section>
@@ -326,10 +340,17 @@ export default async function PrivacyPage() {
               10. საერთაშორისო გადაცემები
             </h2>
             <p className="mt-2 leading-relaxed">
-              ჩვენი ზოგიერთი დამუშავებელი (მათ შორის Google, Vercel, Cloudflare,
-              Neon, OpenRouter, Stripe და Resend) ოპერირებს საქართველოს გარეთ.
-              გადაცემები ხდება სტანდარტული საკონტრაქტო პუნქტების ან მსგავსი
-              დაცვის მექანიზმების საფუძველზე.
+              {LEGAL_ENTITY.name} დაფუძნებულია აშშ-ში, ხოლო ჩვენი დამუშავებელი
+              პარტნიორები (მათ შორის Google, Vercel, Cloudflare, Neon,
+              OpenRouter, Stripe და Resend) ოპერირებენ საქართველოს გარეთ.
+              შესაბამისად, Vivida-ს გამოყენება გულისხმობს თქვენი მონაცემების
+              საქართველოსა და გაერთიანებული სამეფოს ფარგლებს გარეთ გადაცემას.
+              აშშ ზოგადად არ არის აღიარებული ადეკვატური დაცვის მქონე ქვეყნად,
+              ამიტომ გადაცემა ხორციელდება თქვენ მიერ მოთხოვნილი სერვისის
+              მიწოდების აუცილებლობიდან გამომდინარე, ხოლო ჩვენი პარტნიორებისგან
+              ვითხოვთ შესაბამის საკონტრაქტო დაცვის მექანიზმებს. კონკრეტული
+              გადაცემის დაცვის მექანიზმების შესახებ ინფორმაციის მიღება
+              შეგიძლიათ ჩვენთან დაკავშირებით.
             </p>
           </section>
 

@@ -2,8 +2,9 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { LegalPageEn } from "@/components/legal/legal-page-en";
 import type { Metadata } from "next";
+
+import { LEGAL_ENTITY } from "@/lib/legal-entity";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -20,8 +21,6 @@ export async function generateMetadata(): Promise<Metadata> {
 const LAST_UPDATED = "2026-08-16";
 
 export default async function TermsPage() {
-  if ((await getRequestLocale()) === "en")
-    return <LegalPageEn kind="terms" lastUpdated={LAST_UPDATED} />;
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
@@ -53,8 +52,11 @@ export default async function TermsPage() {
               ეთანხმებით, გთხოვთ არ ისარგებლოთ სერვისით.
             </p>
             <p className="mt-3 leading-relaxed">
-              სერვისს ოპერირებს ინდივიდუალური მეწარმე, საიდენტიფიკაციო ნომერი{" "}
-              <strong className="text-foreground">09001026676</strong>.
+              სერვისს ოპერირებს{" "}
+              <strong className="text-foreground">{LEGAL_ENTITY.name}</strong> —
+              ვაიომინგის შტატში (აშშ) რეგისტრირებული კომპანია, სარეგისტრაციო
+              ნომერი {LEGAL_ENTITY.filingId}. იურიდიული მისამართი:{" "}
+              {LEGAL_ENTITY.addressKa}.
             </p>
           </section>
 
@@ -102,6 +104,18 @@ export default async function TermsPage() {
               ცვლილების შესახებ წინასწარ გაცნობებთ. გადახდებთან და
               ანაზღაურებასთან დაკავშირებული სავალდებულო უფლებები რეგულირდება
               მოქმედი კანონმდებლობით.
+            </p>
+            <p className="mt-3 leading-relaxed">
+              <strong className="text-foreground">გაუქმება და ანაზღაურება.</strong>{" "}
+              თუ მომხმარებელი ხარ გაერთიანებულ სამეფოში ან ევროკავშირში,
+              დისტანციურ ხელშეკრულებაზე უარის თქმის 14-დღიანი ვადა გაქვს.
+              კრედიტები და PRO წვდომა ციფრული პროდუქტია, რომლის მიწოდებასაც
+              გადახდისთანავე ვიწყებთ — შეკვეთის დასრულებით ითხოვ მიწოდების
+              დაუყოვნებლივ დაწყებას და ეთანხმები, რომ უკვე მიწოდებულ ნაწილზე
+              14-დღიანი უარის თქმის უფლება აღარ ვრცელდება. PRO-ს გამოუყენებელი
+              პერიოდი ნებისმიერ დროს შეგიძლია გააუქმო. ეს პუნქტი არ ზღუდავს
+              სავალდებულო სამომხმარებლო უფლებებს, მათ შორის როცა პროდუქტი
+              ხარვეზიანია, აღწერას არ შეესაბამება ან საერთოდ არ მოგეწოდა.
             </p>
           </section>
 
