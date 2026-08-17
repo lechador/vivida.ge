@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { accounts, sessions, users, verificationTokens } from "@/db/schema";
 import { authConfig } from "@/auth.config";
 import { onUserSignedUp } from "@/lib/referral";
+import { ensureUsername } from "@/lib/username";
 import { headers } from "next/headers";
 import {
   countryCodeFromHeaders,
@@ -152,6 +153,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } catch (err) {
         console.warn(
           "[auth.createUser] signup bonus failed:",
+          (err as Error).message
+        );
+      }
+      // Assign the username here too — the adapter creates these users, so
+      // registerUser/findOrCreateOAuthUser never run for them. Without it a
+      // web Google sign-up who skips onboarding has no profile row at all and
+      // is invisible in /people, site search and @mentions. See lib/username.ts.
+      try {
+        await ensureUsername(user.id, user.name ?? null);
+      } catch (err) {
+        console.warn(
+          "[auth.createUser] username assignment failed:",
           (err as Error).message
         );
       }

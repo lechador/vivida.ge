@@ -47,6 +47,10 @@ export async function GET(req: Request) {
         // Hide users who haven't picked a username yet — their card would
         // link to a broken /u/ URL.
         isNotNull(profiles.username),
+        // Usernames now come with the account, so they no longer imply an
+        // onboarded profile — gate on birth data so @mention autocomplete only
+        // offers real profiles. Same rule as lib/people.ts.
+        isNotNull(profiles.dateOfBirth),
         // Respect the discovery opt-out: opted-out users aren't findable
         // via search either (existing friends are already in the friends
         // list / messenger, which don't go through this endpoint).

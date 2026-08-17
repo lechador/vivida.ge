@@ -1,57 +1,11 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { profiles, users } from "@/db/schema";
-import { ageFromDob, suggestUsername } from "@/lib/profile-utils";
+import { profiles } from "@/db/schema";
+import { ageFromDob } from "@/lib/profile-utils";
 import { qualifyReferral } from "@/lib/referral";
 import { completeEligibleEmailCampaigns } from "@/lib/email-campaigns";
-
-/**
- * Guarantee the profile ends up with a username.
- *
- * Every people surface — /people, the discovery feed, the match deck, site
- * search and @mention autocomplete — filters on `username IS NOT NULL`, so a
- * profile without one is invisible to everybody and unreachable at /u/<name>.
- *
- * The onboarding wizard collects a username, but the fast path behind the paid
- * landing funnel (components/onboarding/fast-onboarding.tsx) calls saveProfile
- * with no `username` at all, and this function only persists the column when a
- * caller provides one. Those users got a chart and were then undiscoverable.
- *
- * Assign a suggestion rather than leaving the column NULL; it is the same
- * `name_1234` shape the wizard pre-fills, and the user can still change it from
- * their profile page. Best-effort: a save must not fail over this.
- */
-async function ensureUsername(userId: string): Promise<void> {
-  const [existing] = await db
-    .select({ username: profiles.username })
-    .from(profiles)
-    .where(eq(profiles.userId, userId))
-    .limit(1);
-  if (existing?.username) return;
-
-  const [user] = await db
-    .select({ name: users.name })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-
-  // suggestUsername appends a random 4-digit suffix, so each retry is a fresh
-  // candidate. The isNull guard keeps a concurrent write from being clobbered.
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    try {
-      await db
-        .update(profiles)
-        .set({ username: suggestUsername(user?.name) })
-        .where(and(eq(profiles.userId, userId), isNull(profiles.username)));
-      return;
-    } catch (err) {
-      if ((err as { code?: string }).code === "23505") continue;
-      throw err;
-    }
-  }
-}
-
+import { ensureUsername } from "@/lib/username";
 
 /**
  * Framework-agnostic profile *write* logic, shared by the website (Server
@@ -334,4 +288,12 @@ export async function updateAccountSettingsCore(
     .insert(profiles)
     .values({ userId, ...set })
     .onConflictDoUpdate({ target: profiles.userId, set });
+  // Same reason as in setTestVisibility: this upsert can mint a bare profile
+  // row for a legacy user, and a row without a username is invisible on every
+  // people surface. Best-effort — never fail the settings write over it.
+  try {
+    await ensureUsername(userId);
+  } catch {
+    /* the settings change is what the user asked for */
+  }
 }

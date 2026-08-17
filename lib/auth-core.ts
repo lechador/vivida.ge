@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { authTokens, users, type AuthTokenPurpose } from "@/db/schema";
 import { awardJoinedReputation } from "@/lib/reputation";
 import { onUserSignedUp, qualifyReferral } from "@/lib/referral";
+import { ensureUsername } from "@/lib/username";
 
 /**
  * Framework-agnostic email/password auth logic, shared by the website
@@ -151,6 +152,13 @@ export async function registerUser(input: {
       })
       .where(eq(users.id, existing.id));
     await awardJoinedReputation(existing.id);
+    // The stub may predate usernames-at-signup, and the refreshed name is a
+    // better slug source than whatever the abandoned attempt used.
+    try {
+      await ensureUsername(existing.id, name);
+    } catch {
+      /* best-effort — never block the resume */
+    }
     const verifyCode = generateOtpCode();
     const verifyToken = await issueAuthToken(
       existing.id,
@@ -178,6 +186,17 @@ export async function registerUser(input: {
   await awardJoinedReputation(created.id);
   // Signup bonus + referral attribution (best-effort, never blocks signup).
   await onUserSignedUp(created.id);
+  // Every account gets a username from t=0, not on first profile save — users
+  // who never finished onboarding used to have no profile row at all, which
+  // made them invisible in /people, search and @mentions. See lib/username.ts.
+  try {
+    await ensureUsername(created.id, created.name);
+  } catch (err) {
+    console.warn(
+      "[registerUser] username assignment failed:",
+      (err as Error).message
+    );
+  }
 
   const verifyCode = generateOtpCode();
   const verifyToken = await issueAuthToken(
@@ -274,6 +293,15 @@ export async function findOrCreateOAuthUser(input: {
   // OAuth accounts are pre-verified, so this may qualify a referral right away
   // once birth data is added; bonus + attribution happen here.
   await onUserSignedUp(created.id);
+  // Same as the email path: a username from t=0, never lazily on first save.
+  try {
+    await ensureUsername(created.id, created.name);
+  } catch (err) {
+    console.warn(
+      "[findOrCreateOAuthUser] username assignment failed:",
+      (err as Error).message
+    );
+  }
 
   return {
     userId: created.id,

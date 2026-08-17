@@ -88,9 +88,15 @@ export async function listPeople(
   // Only surface users who've claimed a public profile (username set) AND
   // haven't opted out of discovery. Skip the viewer themselves so they
   // don't see their own row in the directory.
+  //
+  // Birth data is the real "has a profile worth browsing" signal: every user
+  // gets a username at signup now (lib/username.ts), so username alone no
+  // longer distinguishes an onboarded user from someone who registered and
+  // stopped. Without this the directory fills with chart-less rows.
   const conditions = [
     ne(users.id, viewerId),
     isNotNull(profiles.username),
+    isNotNull(profiles.dateOfBirth),
     eq(profiles.discoverable, true),
   ];
   // A block in EITHER direction removes the row entirely — the profile page

@@ -2,6 +2,7 @@ import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { bigFiveResults, eqResults, iqResults, mbtiTestResults, profiles } from "@/db/schema";
+import { ensureUsername } from "@/lib/username";
 
 /**
  * Shared helpers for "my results" (tests hub, public profile) and the
@@ -90,4 +91,12 @@ export async function setTestVisibility(
     .insert(profiles)
     .values({ userId, ...set })
     .onConflictDoUpdate({ target: profiles.userId, set });
+  // Keep "every profile row has a username" true no matter which path created
+  // the row — this one can mint a bare row for a legacy user who predates
+  // usernames being assigned at signup. Best-effort; never fail the toggle.
+  try {
+    await ensureUsername(userId);
+  } catch {
+    /* the visibility toggle is what the user asked for */
+  }
 }

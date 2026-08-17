@@ -75,6 +75,10 @@ export async function searchPublicUsers(
     .where(
       and(
         isNotNull(profiles.username),
+        // Usernames are assigned at signup, so they no longer imply an
+        // onboarded profile — gate on birth data to keep registered-but-never-
+        // onboarded accounts out of search results. Same rule as lib/people.ts.
+        isNotNull(profiles.dateOfBirth),
         eq(profiles.discoverable, true),
         or(
           ilike(profiles.username, pattern),
