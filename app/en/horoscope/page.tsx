@@ -44,7 +44,7 @@ export default function EnglishHoroscopePage() {
     ]),
   ];
   return (
-    <EnglishGuide eyebrow="Current sky" title="How horoscopes work" intro="A horoscope connects current planetary movements—called transits—with a zodiac sign or a complete natal chart. It changes as the sky changes." georgianPath="/horoskopi" jsonLd={ld}>
+    <EnglishGuide eyebrow="Current sky" title="How horoscopes work" intro="A horoscope connects current planetary movements—called transits—with a zodiac sign or a complete natal chart. It changes as the sky changes." georgianPath="/horoskopi" armenianPath="/horoscope" jsonLd={ld}>
       <section>
         <h2>Sun-sign and personalized horoscopes</h2>
         <p>A general horoscope is usually written for the twelve Sun signs. It can describe broad collective themes, but everyone born under one sign does not have the same chart. A personalized horoscope can compare current transits with the exact degrees, houses and aspects in an individual natal chart, making the interpretation more specific.</p>

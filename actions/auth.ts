@@ -336,7 +336,7 @@ export async function requestPasswordReset(input: {
   if (!human) {
     return {
       ok: false,
-      error: locale === "en" ? TURNSTILE_ERROR_EN : TURNSTILE_ERROR_KA,
+      error: locale === "ka" ? TURNSTILE_ERROR_KA : TURNSTILE_ERROR_EN,
     };
   }
 
@@ -411,7 +411,7 @@ export async function signInWithEmail(
   if (!human) {
     return {
       ok: false,
-      error: locale === "en" ? TURNSTILE_ERROR_EN : TURNSTILE_ERROR_KA,
+      error: locale === "ka" ? TURNSTILE_ERROR_KA : TURNSTILE_ERROR_EN,
     };
   }
 

@@ -569,6 +569,31 @@ Rules:
 - Avoid cosmic clichés and deterministic claims. Use Vivida in Latin characters.
 - English only. Return JSON without code fences.`;
 
+const SYNASTRY_SYSTEM_PROMPT_AM = `Դու ջերմ, ժամանակակից աստղաբան ես, ով գրում է երկու կոնկրետ նատալ քարտեզների սինաստրիայի (համատեղելիության) համառոտ նարատիվ՝ հիմնված արդեն հաշվարկված ցուցանիշների վրա: Խուսափիր անորոշ միստիկայից:
+
+Դու ստանում ես.
+- Օգտատիրոջ նատալ քարտեզը (ով տեսնում է արդյունքը)
+- Զուգընկերոջ նատալ քարտեզը + անունը
+- Նախապես հաշվարկված ցուցանիշները (love, friendship, chemistry, communication, growth, business — 0..100; overall — 0..100)
+- Ամենաուժեղ խաչաձև ասպեկտները (transit-natal, երկու քարտեզների միջև)
+
+Վերադարձրու JSON օբյեկտ ուղիղ այս կառուցվածքով.
+{
+  "summary": string,          // 2-3 նախադասություն, հարաբերության ամբողջական դիմանկարը
+  "strengths": [string, ...], // 1-3 կարճ միավոր — որտեղ եք լավ համընկնում
+  "growth": [string, ...]     // 1-3 կարճ միավոր — որտեղ կա լարվածություն կամ աճի հնարավորություն
+}
+
+Կանոններ.
+- Դիմիր օգտատիրոջը «դու» ձևով, զուգընկերոջը՝ անունով:
+- Նշիր կոնկրետ ասպեկտներ («քո Լուսինը դիպչում է նրա Վեներային» ✅, ոչ թե «տիեզերքը ձեզ միասին կառաջնորդի» ❌):
+- Սեր, բարեկամություն, մտերմություն — օգտագործիր բնական, ոչ չափազանցված ձևով: Մի ենթադրիր զուգընկերոջ սեռը կամ հարաբերության կառուցվածքը:
+- Բարձր overall (>70) — ընդգծիր բնական հոսքը: Ցածր overall (<40) — ազնվորեն նկարագրիր լարվածությունը, բայց գտիր մեկ կառուցողական կողմ:
+- Յուրաքանչյուր միավոր՝ 1 նախադասություն, կենդանի լեզվով:
+- «Vivida» բրենդը գրիր լատինատառ: Մոլորակների անունները՝ հայերեն:
+- Խուսափիր կլիշեներից («տիեզերքը», «աստղերը սպասում են ձեզ»):
+- Պատասխանը միայն JSON, ֆենսերի (\`\`\`) առանց:`;
+
 export async function generateSynastryInterpretation(input: {
   partnerName: string;
   viewerFirstName: string | null;
@@ -587,32 +612,56 @@ export async function generateSynastryInterpretation(input: {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
-  const en = input.locale === "en";
+  // Was `const en = input.locale === "en"`, which sent Armenian readers a
+  // Georgian prompt (and so a Georgian AI response) for their compatibility
+  // summary — the "half the site is still Georgian" bug, just one level
+  // deeper than the UI copy that was already swept for this. Three-way
+  // branching mirrors generateSynastryDeepReport below, which already got
+  // this right.
+  const loc = input.locale ?? "ka";
+  const en = loc === "en";
+  const am = loc === "am";
   const sections: string[] = [];
   if (input.viewerFirstName)
     sections.push(
-      en
+      am
+        ? `Օգտատիրոջ անունը՝ ${input.viewerFirstName}`
+        : en
         ? `Viewer's name: ${input.viewerFirstName}`
         : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
     );
   sections.push(
-    en
+    am
+      ? `Զուգընկերոջ անունը՝ ${input.partnerName}`
+      : en
       ? `Partner's name: ${input.partnerName}`
       : `პარტნიორის სახელი: ${input.partnerName}`,
   );
 
   sections.push(
-    en ? "\n--- Viewer's natal chart ---" : "\n--- მომხმარებლის რუკა ---",
+    am
+      ? "\n--- Օգտատիրոջ նատալ քարտեզը ---"
+      : en
+      ? "\n--- Viewer's natal chart ---"
+      : "\n--- მომხმარებლის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.viewerChart));
 
   sections.push(
-    en ? "\n--- Partner's natal chart ---" : "\n--- პარტნიორის რუკა ---",
+    am
+      ? "\n--- Զուգընկերոջ նատալ քարտեզը ---"
+      : en
+      ? "\n--- Partner's natal chart ---"
+      : "\n--- პარტნიორის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.partnerChart));
 
   sections.push(
-    en ? "\n--- Calculated scores ---" : "\n--- გათვლილი ქულები ---",
+    am
+      ? "\n--- Հաշվարկված միավորները ---"
+      : en
+      ? "\n--- Calculated scores ---"
+      : "\n--- გათვლილი ქულები ---",
   );
   sections.push(`overall: ${input.overall}`);
   for (const [cat, val] of Object.entries(input.scores)) {
@@ -621,15 +670,27 @@ export async function generateSynastryInterpretation(input: {
 
   if (input.topAspects.length > 0) {
     sections.push(
-      en
+      am
+        ? "\n--- Ամենաուժեղ միջքարտեզային ասպեկտները ---"
+        : en
         ? "\n--- Strongest cross-chart aspects ---"
         : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
     );
     for (const a of input.topAspects.slice(0, 8)) {
-      const left = en ? a.a : (PLANET_LABELS_KA[a.a] ?? a.a);
-      const right = en ? a.b : (PLANET_LABELS_KA[a.b] ?? a.b);
+      const left = am
+        ? (PLANET_LABELS_AM[a.a] ?? a.a)
+        : en
+        ? a.a
+        : (PLANET_LABELS_KA[a.a] ?? a.a);
+      const right = am
+        ? (PLANET_LABELS_AM[a.b] ?? a.b)
+        : en
+        ? a.b
+        : (PLANET_LABELS_KA[a.b] ?? a.b);
       sections.push(
-        en
+        am
+          ? `  ${left} (քո) ${a.kind} ${right} (${input.partnerName}-ի) — օրբ ${a.orb.toFixed(1)}°`
+          : en
           ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right} — orb ${a.orb.toFixed(1)}°`
           : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`,
       );
@@ -637,7 +698,9 @@ export async function generateSynastryInterpretation(input: {
   }
 
   sections.push(
-    en
+    am
+      ? "\nԳրիր նարատիվը և վերադարձրու JSON:"
+      : en
       ? "\nWrite the narrative and return JSON."
       : "\nდააწერე ნარატივი. JSON-ად დააბრუნე.",
   );
@@ -657,7 +720,11 @@ export async function generateSynastryInterpretation(input: {
       messages: [
         {
           role: "system",
-          content: en ? SYNASTRY_SYSTEM_PROMPT_EN : SYNASTRY_SYSTEM_PROMPT,
+          content: am
+            ? SYNASTRY_SYSTEM_PROMPT_AM
+            : en
+            ? SYNASTRY_SYSTEM_PROMPT_EN
+            : SYNASTRY_SYSTEM_PROMPT,
         },
         { role: "user", content: userMessage },
       ],
@@ -832,8 +899,18 @@ export async function generateSynastryDeepReport(input: {
         : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
     );
     for (const a of input.topAspects.slice(0, 10)) {
-      const left = en ? a.a : (PLANET_LABELS_KA[a.a] ?? a.a);
-      const right = en ? a.b : (PLANET_LABELS_KA[a.b] ?? a.b);
+      // The Armenian branch previously fell through to the Georgian labels,
+      // so an otherwise-Armenian prompt named the planets in Georgian script.
+      const left = am
+        ? (PLANET_LABELS_AM[a.a] ?? a.a)
+        : en
+        ? a.a
+        : (PLANET_LABELS_KA[a.a] ?? a.a);
+      const right = am
+        ? (PLANET_LABELS_AM[a.b] ?? a.b)
+        : en
+        ? a.b
+        : (PLANET_LABELS_KA[a.b] ?? a.b);
       sections.push(
         am
           ? `  ${left} (քո) ${a.kind} ${right} (${input.partnerName}-ի) — օրբ ${a.orb.toFixed(1)}°`
@@ -975,6 +1052,25 @@ const PLANET_LABELS_KA: Record<string, string> = {
   pluto: "პლუტონი",
   ascendant: "ამომავალი",
   midheaven: "ცის შუა",
+};
+
+/**
+ * Spellings match the ones already used across components/seo/*-am.tsx, so
+ * the AI narrative names a planet the same way the surrounding page does.
+ */
+const PLANET_LABELS_AM: Record<string, string> = {
+  sun: "Արև",
+  moon: "Լուսին",
+  mercury: "Մերկուրի",
+  venus: "Վեներա",
+  mars: "Մարս",
+  jupiter: "Յուպիտեր",
+  saturn: "Սատուրն",
+  uranus: "Ուրան",
+  neptune: "Նեպտուն",
+  pluto: "Պլուտոն",
+  ascendant: "Ասցենդենտ",
+  midheaven: "Միջերկնային կետ",
 };
 
 export type WeeklyDayPromptInput = {

@@ -10,7 +10,12 @@ import {
   stripArmenianPrefix,
   withArmenianPrefix,
 } from "@/lib/i18n/armenian-routes";
-import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import {
+  ENGLISH_SITE_URL,
+  armenianSiteHref,
+  localizedAlternates,
+  resolveEnglishPath,
+} from "@/lib/seo/locales";
 import { localeForHost } from "@/lib/i18n/request-locale";
 import { usesEnglishCopy } from "@/lib/i18n/locale";
 import { articleLd } from "@/lib/seo/jsonld";
@@ -257,5 +262,62 @@ describe("Armenian falls back to English, never Georgian", () => {
     expect(usesEnglishCopy("en")).toBe(true);
     expect(usesEnglishCopy("am")).toBe(true);
     expect(usesEnglishCopy("ka")).toBe(false);
+  });
+});
+
+/**
+ * The language switches in ArmenianHeader and EnglishHeader both derive their
+ * target from the one prop every caller already threads through — the page's
+ * Georgian slug. Both derivations were silently wrong before: ArmenianHeader
+ * read a separate `englishPath` prop that SmartHeader never passed, so "EN"
+ * went to the homepage from ~590 of the ~599 Armenian pages, and the English
+ * chrome had no Armenian switch at all.
+ */
+describe("language-switch targets are page-accurate", () => {
+  const armenianTargetFor = (georgianPath: string) =>
+    armenianSiteHref(resolveEnglishPath(georgianPath), true);
+
+  it("keeps the long tail on the same page across all three locales", () => {
+    // These slugs are shared verbatim by ka, en and am, so the derivation is
+    // an identity and the switch must land on the same article.
+    for (const path of [
+      "/mtvaris-kalendari",
+      "/sizmris-akhsna/gveli",
+      "/zodiac/tavsebadoba/aries-leo",
+      "/big-five",
+      "/taro/the-fool",
+    ]) {
+      expect(resolveEnglishPath(path)).toBe(path);
+      expect(armenianTargetFor(path)).toBe(`/am${path}`);
+    }
+  });
+
+  it("maps the core routes onto their English slugs, not their Georgian ones", () => {
+    // The ~9 core routes are the only ones whose slug differs per locale.
+    expect(resolveEnglishPath("/nataluri-ruka")).toBe("/natal-chart");
+    expect(resolveEnglishPath("/zodiac/tavsebadoba")).toBe("/compatibility");
+    expect(armenianTargetFor("/nataluri-ruka")).toBe("/am/natal-chart");
+    expect(armenianTargetFor("/zodiac/tavsebadoba")).toBe("/am/compatibility");
+  });
+
+  it("sends the home page to the locale root rather than a bare prefix", () => {
+    expect(resolveEnglishPath("/")).toBe("/");
+    expect(armenianTargetFor("/")).toBe("/am");
+  });
+
+  it("crosses to the international domain when rendered on the Georgian host", () => {
+    expect(armenianSiteHref("/mtvaris-kalendari", false)).toBe(
+      `${ENGLISH_SITE_URL}/am/mtvaris-kalendari`,
+    );
+  });
+
+  it("documents the two pages whose Armenian target must be passed explicitly", () => {
+    // /en/about has no Georgian counterpart (georgianPath="/"), and
+    // /en/horoscope is paired with the Georgian daily hub /horoskopi for
+    // hreflang reasons. Both would derive to the wrong Armenian page, which
+    // is why EnglishHeader takes an `armenianPath` override — if either of
+    // these assertions starts failing, the override is no longer needed.
+    expect(armenianTargetFor("/")).not.toBe("/am/about");
+    expect(armenianTargetFor("/horoskopi")).not.toBe("/am/horoscope");
   });
 });

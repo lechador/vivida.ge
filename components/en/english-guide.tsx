@@ -6,6 +6,7 @@ export function EnglishGuide({
   title,
   intro,
   georgianPath,
+  armenianPath,
   jsonLd,
   children,
 }: {
@@ -13,6 +14,13 @@ export function EnglishGuide({
   title: string;
   intro: string;
   georgianPath: string;
+  /**
+   * Override for the header's Armenian switch link — see EnglishHeader for
+   * why most pages don't need this. Required precisely where georgianPath
+   * doesn't round-trip through resolveEnglishPath back to this page's own
+   * English path (currently /en/about and /en/horoscope).
+   */
+  armenianPath?: string;
   /**
    * Structured data for this guide. The Georgian counterparts of these pages
    * have shipped JSON-LD for a while; the English core pages had none, so
@@ -22,7 +30,7 @@ export function EnglishGuide({
   children: React.ReactNode;
 }) {
   return (
-    <EnglishShell georgianPath={georgianPath}>
+    <EnglishShell georgianPath={georgianPath} armenianPath={armenianPath}>
       {jsonLd && (
         <script
           type="application/ld+json"

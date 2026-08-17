@@ -29,7 +29,7 @@ import { SIGNS } from "./zodiac";
 import type { AspectKind } from "./aspects";
 import { ASPECT_BODIES, ASPECT_KINDS, libraryKindKa } from "./aspect-library";
 import type { CrossAspect } from "./transits";
-import type { UserLocale } from "./i18n/locale";
+import { usesEnglishCopy, type UserLocale } from "./i18n/locale";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
@@ -242,7 +242,14 @@ export async function getTransitLibraryEntries(
   locale: UserLocale = "ka",
 ): Promise<Map<string, TransitEntry>> {
   if (keys.length === 0) return new Map();
-  if (locale === "en") {
+  // The DB rows below are Georgian: `key` is the primary key, so the table
+  // physically cannot hold a second row per key, and its `language` column is
+  // "ka" for every row. Testing `locale === "en"` therefore sent Armenian
+  // readers down the Georgian path — their daily horoscope body and headline
+  // came back in Georgian script, on a site that was otherwise Armenian. This
+  // is the same `usesEnglishCopy` policy the ~175 UI files already follow:
+  // English is a legible fallback for an untranslated surface, Georgian is not.
+  if (usesEnglishCopy(locale)) {
     return new Map(
       keys
         .map((key) => [key, englishTransitEntry(key)] as const)
@@ -576,7 +583,7 @@ export function composeDailyFromLibrary(
     if (!bodies.includes(aspect.transit)) bodies.push(aspect.transit);
   }
   const themes = bodies
-    .map((b) => (locale === "en" ? BODY_THEME_EN[b] : BODY_THEME_KA[b]))
+    .map((b) => (usesEnglishCopy(locale) ? BODY_THEME_EN[b] : BODY_THEME_KA[b]))
     .filter(Boolean)
     .slice(0, 4);
 
@@ -714,13 +721,13 @@ export async function composeWeeklyFromLibrary(
     const harmonicReason =
       harmonic?.entry.body ??
       neutralEntry?.body ??
-      (locale === "en"
+      (usesEnglishCopy(locale)
         ? NO_HARMONIC_EN[i % NO_HARMONIC_EN.length]
         : NO_HARMONIC_KA[i % NO_HARMONIC_KA.length]);
     const challengingReason =
       tense?.entry.body ??
       (harmonic ? neutralEntry?.body : null) ??
-      (locale === "en"
+      (usesEnglishCopy(locale)
         ? NO_TENSE_EN[i % NO_TENSE_EN.length]
         : NO_TENSE_KA[i % NO_TENSE_KA.length]);
 

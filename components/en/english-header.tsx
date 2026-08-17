@@ -1,7 +1,12 @@
 import Link from "next/link";
 
+import {
+  GEORGIAN_SITE_URL,
+  armenianSiteHref,
+  englishSiteHref,
+  resolveEnglishPath,
+} from "@/lib/seo/locales";
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { GEORGIAN_SITE_URL, englishSiteHref } from "@/lib/seo/locales";
 import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
 
 const NAV = [
@@ -11,12 +16,36 @@ const NAV = [
   { href: "/tests", label: "Tests" },
 ];
 
-export async function EnglishHeader({ georgianPath = "/" }: { georgianPath?: string }) {
+export async function EnglishHeader({
+  georgianPath = "/",
+  armenianPath,
+}: {
+  georgianPath?: string;
+  armenianPath?: string;
+}) {
   // Also rendered on the Georgian host (signed-in user reading English), where
   // /natal-chart, /horoscope and /compatibility are hard 404s. `/login` is
   // deliberately left relative — the session cookie is per-domain.
   const onEnglishHost = await requestIsEnglishHost();
   const href = (path: string) => englishSiteHref(path, onEnglishHost);
+  // ArmenianHeader has always offered a way back to English and Georgian.
+  // Nothing on the English chrome offered a way *to* Armenian — the only
+  // routes in were a direct /am link, the once-per-browser geo redirect, or
+  // already being signed in with the preference set.
+  //
+  // `armenianPath` is an optional override, same shape as ArmenianHeader's
+  // `englishPath`: resolveEnglishPath(georgianPath) is the right derivation
+  // for every regular page (the long tail shares its slug across all three
+  // locales; the ~9 core routes have an explicit pairing table), but two
+  // EnglishGuide pages are irregular and must override it explicitly —
+  // /en/about has no Georgian page at all (georgianPath="/", which would
+  // derive back to the homepage, not /about), and /en/horoscope's
+  // georgianPath is "/horoskopi" (paired with the Georgian daily-horoscope
+  // hub for hreflang reasons — see the comment on ENGLISH_ONLY_ROUTES in
+  // lib/seo/locales.ts), which would derive to the Armenian daily hub
+  // instead of the explainer /am/horoscope actually mirrors.
+  const resolvedArmenianPath = armenianPath ?? resolveEnglishPath(georgianPath);
+  const armenianHref = armenianSiteHref(resolvedArmenianPath, onEnglishHost);
   return (
     <header className="relative z-20 border-b border-border/30 bg-background/45 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
@@ -42,6 +71,14 @@ export async function EnglishHeader({ georgianPath = "/" }: { georgianPath?: str
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href={armenianHref}
+            hrefLang="hy-AM"
+            className="rounded-full border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+            aria-label="Switch to Armenian"
+          >
+            Հայերեն
+          </Link>
           <Link
             href={`${GEORGIAN_SITE_URL}${georgianPath === "/" ? "" : georgianPath}`}
             hrefLang="ka-GE"

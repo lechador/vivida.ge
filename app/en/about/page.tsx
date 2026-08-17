@@ -40,7 +40,7 @@ export default function EnglishAboutPage() {
     ]),
   ];
   return (
-    <EnglishGuide eyebrow="About us" title="Vivida makes complex chart ideas easier to explore" intro="Vivida is a Georgia-based astrology and self-discovery platform that combines natal-chart calculations, educational guides and reflective tools in one experience." georgianPath="/" jsonLd={ld}>
+    <EnglishGuide eyebrow="About us" title="Vivida makes complex chart ideas easier to explore" intro="Vivida is a Georgia-based astrology and self-discovery platform that combines natal-chart calculations, educational guides and reflective tools in one experience." georgianPath="/" armenianPath="/about" jsonLd={ld}>
       <section>
         <h2>What we build</h2>
         <p>Our public guides explain the basic structure of natal charts, zodiac signs, planetary cycles and relationship synastry. Registered users can also access personalized chart features and community tools. The original product was created in Georgian; the English section is being introduced carefully, beginning with core navigation and educational material.</p>

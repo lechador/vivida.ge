@@ -1,7 +1,12 @@
 import Link from "next/link";
 
+import {
+  GEORGIAN_SITE_URL,
+  ENGLISH_SITE_URL,
+  armenianSiteHref,
+  resolveEnglishPath,
+} from "@/lib/seo/locales";
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { GEORGIAN_SITE_URL, ENGLISH_SITE_URL, armenianSiteHref } from "@/lib/seo/locales";
 import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
 
 const NAV = [
@@ -14,13 +19,33 @@ const NAV = [
 
 export async function ArmenianHeader({
   georgianPath = "/",
-  englishPath = "/",
+  englishPath,
 }: {
   georgianPath?: string;
   englishPath?: string;
 }) {
   const onEnglishHost = await requestIsEnglishHost();
   const href = (path: string) => armenianSiteHref(path, onEnglishHost);
+  // Every caller already threads the real Georgian slug of the current page
+  // through for the KA switch below — the long tail shares that slug across
+  // all three locales, so the same prop derives an equally page-accurate
+  // English target via resolveEnglishPath's ~9-route pairing table.
+  //
+  // `englishPath` stays a real, optional override rather than being replaced
+  // outright: ArmenianShell's core-route callers (app/am/{about,compatibility,
+  // horoscope,privacy,terms}) already pass a correct explicit value, and one
+  // of them is irregular in a way resolveEnglishPath can't reconstruct —
+  // /am/horoscope's Georgian pairing is /horoskopi (the daily-horoscope hub,
+  // paired for hreflang reasons — see CORE_LANGUAGE_PAIRS/ENGLISH_ONLY_ROUTES
+  // in lib/seo/locales.ts), which would derive back to English /horoskopi, not
+  // the /horoscope explainer /am/horoscope actually mirrors.
+  //
+  // Every long-tail SEO guide, though, reaches this header through
+  // SmartHeader, whose props never included englishPath at all — so on
+  // ~590 of the ~599 Armenian pages, "EN" silently landed on the homepage
+  // no matter which article you clicked it from. The derived fallback below
+  // fixes those; the explicit prop still wins where a caller supplies one.
+  const resolvedEnglishPath = englishPath ?? resolveEnglishPath(georgianPath);
 
   return (
     <header className="relative z-20 border-b border-border/30 bg-background/45 backdrop-blur-xl">
@@ -59,7 +84,7 @@ export async function ArmenianHeader({
 
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
-            href={`${ENGLISH_SITE_URL}${englishPath === "/" ? "" : englishPath}`}
+            href={`${ENGLISH_SITE_URL}${resolvedEnglishPath === "/" ? "" : resolvedEnglishPath}`}
             hrefLang="en"
             className="rounded-full border border-border/70 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
             aria-label="Switch to English"
