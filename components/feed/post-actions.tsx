@@ -46,6 +46,7 @@ export function PostActions({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [counts, setCounts] = useState<FeedReactionCounts>(initialCounts);
   const [mine, setMine] = useState<PostReactionKind | null>(initialMine);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -138,7 +139,7 @@ export function PostActions({
         return;
       }
       await navigator.clipboard.writeText(url);
-      setShareLabel(en ? "Link copied" : "ბმული დაკოპირდა");
+      setShareLabel(am ? "Հղումը պատճենված է" : en ? "Link copied" : "ბმული დაკოპირდა");
       setTimeout(() => setShareLabel(null), 1800);
     } catch {
       // User cancelled the share sheet, or clipboard write blocked.
@@ -228,7 +229,7 @@ export function PostActions({
           className="flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-card/70 hover:text-foreground"
         >
           <CommentGlyph />
-          {en ? "Comment" : "კომენტარი"}
+          {am ? "Մեկնաբանել" : en ? "Comment" : "კომენტარი"}
         </button>
 
         {/* Share */}
@@ -238,7 +239,7 @@ export function PostActions({
           className="flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-card/70 hover:text-foreground"
         >
           <Share2 className="size-[18px]" />
-          {shareLabel ?? (en ? "Share" : "გაზიარება")}
+          {shareLabel ?? (am ? "Կիսվել" : en ? "Share" : "გაზიარება")}
         </button>
       </div>
     </>

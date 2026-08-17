@@ -51,24 +51,25 @@ const REACTION_LABEL_EN: Record<string, string> = {
 
 function notificationLabel(kind: string, payload: Notification["payload"], locale: UserLocale): string {
   const en = locale !== "ka";
+  const am = locale === "am";
   if (kind === "post_reaction" && payload?.reaction) {
-    return (en ? REACTION_LABEL_EN : REACTION_LABEL_KA)[payload.reaction] ?? (en ? "reacted to your post" : "გამოეხმაურა შენს პოსტს");
+    return (en ? REACTION_LABEL_EN : REACTION_LABEL_KA)[payload.reaction] ?? (am ? "արձագանքել է ձեր գրառմանը" : am ? "արձագանքել է ձեր գրառմանը" : en ? "reacted to your post" : "გამოეხმაურა შენს პოსტს");
   }
   switch (kind) {
     case "friend_request":
-      return en ? "sent you a friend request" : "გამოგიგზავნა მეგობრობის თხოვნა";
+      return am ? "ձեզ ընկերության հարցում է ուղարկել" : en ? "sent you a friend request" : "გამოგიგზავნა მეგობრობის თხოვნა";
     case "friend_accepted":
-      return en ? "accepted your request" : "მიიღო შენი მოთხოვნა";
+      return am ? "ընդունել է ձեր հարցումը" : en ? "accepted your request" : "მიიღო შენი მოთხოვნა";
     case "post_comment":
-      return en ? "commented on your post" : "დააკომენტარა შენი პოსტი";
+      return am ? "մեկնաբանել է ձեր գրառումը" : en ? "commented on your post" : "დააკომენტარა შენი პოსტი";
     case "post_reaction":
       return en ? "reacted to your post" : "გამოეხმაურა შენს პოსტს";
     case "mention":
       return payload?.mentionContext === "comment"
-        ? en ? "mentioned you in a comment" : "მოგიხსენიეს კომენტარში"
-        : en ? "mentioned you in a post" : "მოგიხსენიეს პოსტში";
+        ? am ? "ձեզ նշել է մեկնաբանության մեջ" : en ? "mentioned you in a comment" : "მოგიხსენიეს კომენტარში"
+        : am ? "ձեզ նշել է գրառման մեջ" : en ? "mentioned you in a post" : "მოგიხსენიეს პოსტში";
     case "new_match":
-      return en ? "matched with you" : "დაგემთხვათ";
+      return am ? "համընկել է ձեզ հետ" : en ? "matched with you" : "დაგემთხვათ";
     default:
       return "";
   }
@@ -98,8 +99,9 @@ type MessageNotif = {
 
 function timeAgo(date: Date, locale: UserLocale): string {
   const en = locale !== "ka";
+  const am = locale === "am";
   const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (seconds < 60) return en ? "just now" : "ახლახან";
+  if (seconds < 60) return am ? "հենց հիմա" : en ? "just now" : "ახლახან";
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return en ? `${minutes}m ago` : `${minutes} წუთის წინ`;
   const hours = Math.floor(minutes / 60);
@@ -123,6 +125,7 @@ export function NotificationsDropdown({
 }) {
   const router = useRouter();
   const en = locale !== "ka";
+  const am = locale === "am";
   const [items, setItems] = useState(initial);
   const [unread, setUnread] = useState(initialUnread);
   const [msgNotifs, setMsgNotifs] = useState<MessageNotif[]>([]);
@@ -214,7 +217,7 @@ export function NotificationsDropdown({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={en ? "Notifications" : "შეტყობინებები"}
+          aria-label={am ? "Ծանուցումներ" : am ? "Ծանուցումներ" : en ? "Notifications" : "შეტყობინებები"}
           className="relative grid size-12 place-items-center rounded-full border border-border bg-card/50 text-foreground/80 transition-all hover:border-foreground/20 hover:bg-card/80 hover:text-foreground"
         >
           <Bell className="size-5" />
@@ -238,7 +241,7 @@ export function NotificationsDropdown({
           <div className="px-6 py-10 text-center">
             <Bell className="mx-auto mb-2 size-6 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">
-              {en ? "You have no notifications yet" : "ჯერ შეტყობინებები არ გაქვს"}
+              {am ? "Դուք դեռ ծանուցումներ չունեք" : en ? "You have no notifications yet" : "ჯერ შეტყობინებები არ გაქვს"}
             </p>
           </div>
         ) : (
@@ -269,7 +272,7 @@ export function NotificationsDropdown({
               onClick={() => setOpen(false)}
               className="text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
-              {en ? "View all · Manage friends" : "ყველას ნახვა · მეგობრების მართვა"}
+              {am ? "Դիտել բոլորը · Կառավարել ընկերներին" : en ? "View all · Manage friends" : "ყველას ნახვა · მეგობრების მართვა"}
             </Link>
           </footer>
         )}
@@ -288,6 +291,7 @@ function CreditNotificationRow({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const amount = n.payload?.creditAmount ?? 0;
   const earned = amount >= 0;
   const reason = n.payload?.creditReason as CreditReason | undefined;
@@ -324,7 +328,7 @@ function CreditNotificationRow({
               )}
             >
               {earned ? "+" : "−"}
-              {Math.abs(amount)} {en ? "credits" : "კრედიტი"}
+              {Math.abs(amount)} {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}
             </span>{" "}
             {reasonLabel && (
               <span className="text-muted-foreground">· {reasonLabel}</span>
@@ -332,7 +336,7 @@ function CreditNotificationRow({
           </div>
           {typeof n.payload?.creditBalance === "number" && (
             <div className="mt-0.5 text-xs text-muted-foreground/80">
-              {en ? "Balance" : "ბალანსი"}: {n.payload.creditBalance}
+              {am ? "Մնացորդ" : en ? "Balance" : "ბალანსი"}: {n.payload.creditBalance}
             </div>
           )}
           <div className="mt-0.5 text-xs text-muted-foreground/80">

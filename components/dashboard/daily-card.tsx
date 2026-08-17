@@ -60,6 +60,7 @@ export function DailyCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const readSentinelRef = useRef<HTMLParagraphElement>(null);
   const readTrackedRef = useRef(false);
 
@@ -111,7 +112,7 @@ export function DailyCard({
       <header className="relative flex items-center justify-between gap-4">
         <div>
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Today" : "დღევანდელი დღე"} · {date}
+            {am ? "Այսօր" : en ? "Today" : "დღევანდელი დღე"} · {date}
           </div>
           <h2 className="mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
@@ -135,9 +136,9 @@ export function DailyCard({
           <span aria-hidden className="text-base leading-none">
             🔮
           </span>
-          {en ? "Tarot—ask the cards a question" : "ტარო — დაუსვი კითხვა კარტებს"}
+          {am ? "Տարո՝ հարց ուղղեք քարտերին" : en ? "Tarot—ask the cards a question" : "ტარო — დაუსვი კითხვა კარტებს"}
           <span className="rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/15 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-violet)]">
-            {en ? "First free" : "პირველი უფასოდ"}
+            {am ? "Առաջինն անվճար" : en ? "First free" : "პირველი უფასოდ"}
           </span>
         </span>
         <span
@@ -184,7 +185,7 @@ export function DailyCard({
       {transits.length > 0 && (
         <section className="relative mt-6 border-t border-border/40 pt-5">
           <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Today's transits" : "დღის ტრანზიტები"}
+            {am ? "Այսօրվա տրանզիտները" : en ? "Today's transits" : "დღის ტრანზიტები"}
           </h3>
           <ul className="mt-3 space-y-3">
             {transits.map((t, i) => {
@@ -230,7 +231,7 @@ export function DailyCard({
         ref={readSentinelRef}
         className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground"
       >
-        {en ? "A new reading will be waiting tomorrow." : "ხვალ ახალი წინასწარმეტყველება გელოდება."}
+        {am ? "Վաղը նոր ընթերցում կսպասի։" : en ? "A new reading will be waiting tomorrow." : "ხვალ ახალი წინასწარმეტყველება გელოდება."}
       </p>
     </article>
   );

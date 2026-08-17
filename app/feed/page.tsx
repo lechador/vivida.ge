@@ -53,6 +53,7 @@ export default async function FeedPage() {
     getUserLocale(user.id),
   ]);
   const en = locale !== "ka";
+  const am = locale === "am";
   const viewerIsAdmin = isAdminEmail(user.email);
   const viewerSunSign = sunSignFromDob(viewerProfile?.dateOfBirth ?? null);
   const viewerAvatar = headerData.avatarUrl ?? user.image ?? null;
@@ -69,13 +70,13 @@ export default async function FeedPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Community" : "საზოგადოება"}
+          {am ? "Համայնք" : en ? "Community" : "საზოგადოება"}
         </div>
         <div className="mb-6 sm:mb-8">
           <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            {en ? "Vivida " : "ვივიდას "}
+            {am ? "Vivida" : en ? "Vivida " : "ვივიდას "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "feed" : "ფიდი"}
+              {am ? "լրահոս" : en ? "feed" : "ფიდი"}
             </span>
           </h1>
         </div>

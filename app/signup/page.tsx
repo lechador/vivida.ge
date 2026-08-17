@@ -33,6 +33,7 @@ export default async function SignupPage({
   const dest = safeNext(next);
   const locale = await getRequestLocale();
   const en = locale !== "ka";
+  const am = locale === "am";
   const session = await auth();
   if (session?.user?.id) redirect(dest ?? "/dashboard");
 
@@ -41,23 +42,23 @@ export default async function SignupPage({
   return (
     <AuthLayout
       locale={locale}
-      title={en ? "Create your account" : "შექმენი შენი ანგარიში"}
-      subtitle={en ? "It takes a minute—your cosmos is waiting." : "ერთ წუთში — შენი კოსმოსი გელოდება."}
+      title={am ? "Ստեղծել Ձեր հաշիվը" : en ? "Create your account" : "შექმენი შენი ანგარიში"}
+      subtitle={am ? "Դա կտևի մեկ րոպե. Ձեր տիեզերքը սպասում է։" : en ? "It takes a minute—your cosmos is waiting." : "ერთ წუთში — შენი კოსმოსი გელოდება."}
       footer={
         <>
-          {en ? "Already have an account?" : "უკვე გაქვს ანგარიში?"}{" "}
+          {am ? "Արդեն ունե՞ք հաշիվ։" : en ? "Already have an account?" : "უკვე გაქვს ანგარიში?"}{" "}
           <Link
             href={loginHref}
             className="text-foreground underline-offset-2 hover:underline"
           >
-            {en ? "Sign in" : "შესვლა"}
+            {am ? "Մուտք գործել" : en ? "Sign in" : "შესვლა"}
           </Link>
         </>
       }
     >
       <GoogleButton
         locale={locale}
-        label={en ? "Sign up with Google" : "რეგისტრაცია Google-ით"}
+        label={am ? "Գրանցվել Google-ի միջոցով" : en ? "Sign up with Google" : "რეგისტრაცია Google-ით"}
         callbackUrl={dest ?? "/dashboard"}
       />
       <AuthDivider locale={locale} />

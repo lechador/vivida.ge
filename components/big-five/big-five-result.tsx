@@ -32,6 +32,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function BigFiveResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale !== "ka";
+  const am = locale === "am";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
 
@@ -90,9 +91,9 @@ export function BigFiveResultClient({ locale = "ka" }: { locale?: UserLocale }) 
   if (stored === "missing") {
     return (
       <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
-        <p className="text-foreground/85">{en ? "Take the test first to see your result." : "ჯერ ტესტი უნდა გაიარო."}</p>
+        <p className="text-foreground/85">{am ? "Նախ անցեք թեստը՝ Ձեր արդյունքը տեսնելու համար։" : en ? "Take the test first to see your result." : "ჯერ ტესტი უნდა გაიარო."}</p>
         <Button asChild variant="mystic" className="mt-5">
-          <Link href="/big-five">{en ? "Start the test" : "ტესტის დაწყება"}</Link>
+          <Link href="/big-five">{am ? "Սկսել թեստը" : en ? "Start the test" : "ტესტის დაწყება"}</Link>
         </Button>
       </div>
     );
@@ -137,10 +138,10 @@ export function BigFiveResultClient({ locale = "ka" }: { locale?: UserLocale }) 
                 <Lock className="size-5 text-[var(--vivida-violet)]" />
               </div>
               <p className="mx-auto mt-3 max-w-xs text-pretty text-sm text-foreground/85">
-                {en ? "Create a free account to save your result and read the detailed interpretation of every trait." : "დარეგისტრირდი უფასოდ და ნახე თითოეული თვისების დეტალური ანალიზი — და შეინახე შედეგი."}
+                {am ? "Ստեղծեք անվճար հաշիվ՝ Ձեր արդյունքը պահպանելու և յուրաքանչյուր հատկանիշի մանրամասն մեկնաբանությունը կարդալու համար։" : en ? "Create a free account to save your result and read the detailed interpretation of every trait." : "დარეგისტრირდი უფასოდ და ნახე თითოეული თვისების დეტალური ანალიზი — და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
-                <Link href="/signup?from=big-five">{en ? "Create free account" : "უფასო რეგისტრაცია"}</Link>
+                <Link href="/signup?from=big-five">{am ? "Ստեղծել անվճար հաշիվ" : en ? "Create free account" : "უფასო რეგისტრაცია"}</Link>
               </Button>
             </div>
           </div>
@@ -153,17 +154,17 @@ export function BigFiveResultClient({ locale = "ka" }: { locale?: UserLocale }) 
         <ShareButton headline={en ? big5HeadlineEn(result) : big5HeadlineKa(result)} locale={locale} />
         <Button type="button" variant="outline" onClick={retake} className="gap-1.5">
           <RotateCcw className="size-4" />
-          {en ? "Retake" : "თავიდან გავლა"}
+          {am ? "Կրկնել" : en ? "Retake" : "თავიდან გავლა"}
         </Button>
         <Button asChild variant="ghost">
-          <Link href="/tests">{en ? "Other tests" : "სხვა ტესტები"}</Link>
+          <Link href="/tests">{am ? "Այլ թեստեր" : en ? "Other tests" : "სხვა ტესტები"}</Link>
         </Button>
       </div>
 
       <NextTestWidget completed="big-five" locale={locale} />
 
       <p className="mx-auto max-w-lg text-center text-xs leading-relaxed text-muted-foreground">
-        {en ? "This is a self-report assessment reflecting how you perceive yourself. It is not a clinical diagnosis." : "ეს არის თვითშეფასების ტესტი — ის ასახავს იმას, თუ როგორ აღიქვამ საკუთარ თავს. ეს არ არის კლინიკური დიაგნოზი."}
+        {am ? "Սա ինքնազեկուցման գնահատական է, որն արտացոլում է, թե ինչպես եք դուք ընկալում ինքներդ ձեզ։ Սա կլինիկական ախտորոշում չէ։" : en ? "This is a self-report assessment reflecting how you perceive yourself. It is not a clinical diagnosis." : "ეს არის თვითშეფასების ტესტი — ის ასახავს იმას, თუ როგორ აღიქვამ საკუთარ თავს. ეს არ არის კლინიკური დიაგნოზი."}
       </p>
     </div>
   );
@@ -171,13 +172,14 @@ export function BigFiveResultClient({ locale = "ka" }: { locale?: UserLocale }) 
 
 function ShareButton({ headline, locale }: { headline: string; locale: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [copied, setCopied] = useState(false);
   async function share() {
     const url = en ? "https://www.vividaastro.com/big-five" : "https://www.vivida.ge/big-five";
     const text = en ? `${headline} — my Big Five profile on Vivida 🧬 What will you get?` : `${headline} — ჩემი Big Five პროფილი Vivida-ზე 🧬 შენ რას მიიღებ?`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: en ? "Vivida Big Five Test" : "Vivida Big Five ტესტი", text, url });
+        await navigator.share({ title: am ? "Vivida Big Five թեստ" : en ? "Vivida Big Five Test" : "Vivida Big Five ტესტი", text, url });
         return;
       } catch {
         /* cancelled */
@@ -194,7 +196,7 @@ function ShareButton({ headline, locale }: { headline: string; locale: UserLocal
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-1.5">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? (en ? "Copied" : "დაკოპირდა") : en ? "Share" : "გააზიარე"}
+      {copied ? (am ? "Պատճենված է" : en ? "Copied" : "დაკოპირდა") : am ? "Կիսվել" : en ? "Share" : "გააზიარე"}
     </Button>
   );
 }

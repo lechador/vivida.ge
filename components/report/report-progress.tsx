@@ -42,6 +42,7 @@ export function ReportProgress({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const stageMessages = en ? STAGE_MESSAGES_EN : STAGE_MESSAGES;
   const [status, setStatus] = useState<Status>(initialStatus);
   const [error, setError] = useState<string | null>(null);
@@ -114,7 +115,7 @@ export function ReportProgress({
             <CheckCircle2 className="size-7" />
           </div>
           <h2 className="text-2xl font-semibold">
-            {en ? "Your report is ready! 🌟" : "ანგარიში მზადაა! 🌟"}
+            {am ? "Ձեր զեկույցը պատրաստ է։ 🌟" : en ? "Your report is ready! 🌟" : "ანგარიში მზადაა! 🌟"}
           </h2>
           <p className="mt-2 max-w-md text-sm text-foreground/75">
             {en
@@ -124,14 +125,14 @@ export function ReportProgress({
           <Button asChild variant="mystic" size="xl" className="mt-6 min-w-56">
             <a href={`/api/reports/${reportId}/download`}>
               <Download className="size-5" />
-              {en ? "Download PDF" : "ჩამოტვირთე PDF"}
+              {am ? "Ներբեռնել PDF" : en ? "Download PDF" : "ჩამოტვირთე PDF"}
             </a>
           </Button>
         </div>
       ) : failed ? (
         <div className="flex flex-col items-center text-center">
           <h2 className="text-2xl font-semibold">
-            {en ? "Report generation was interrupted" : "გენერაცია შეფერხდა"}
+            {am ? "Զեկույցի ստեղծումն ընդհատվել է" : en ? "Report generation was interrupted" : "გენერაცია შეფერხდა"}
           </h2>
           <p className="mt-2 max-w-md text-sm text-foreground/75">
             {en
@@ -151,7 +152,7 @@ export function ReportProgress({
             ) : (
               <RefreshCw className="size-4" />
             )}
-            {en ? "Try again" : "სცადე ხელახლა"}
+            {am ? "Կրկին փորձել" : en ? "Try again" : "სცადე ხელახლა"}
           </Button>
         </div>
       ) : (
@@ -160,7 +161,7 @@ export function ReportProgress({
             <Loader2 className="size-7 animate-spin" />
           </div>
           <h2 className="text-2xl font-semibold">
-            {en ? "Creating your report" : "ვქმნით შენს ანგარიშს"}
+            {am ? "Ստեղծվում է ձեր զեկույցը" : en ? "Creating your report" : "ვქმნით შენს ანგარიშს"}
           </h2>
           <p className="mt-2 h-5 text-sm text-foreground/75 transition-opacity">
             {status === "pending" ? stageMessages[0] : stageMessages[stage]}

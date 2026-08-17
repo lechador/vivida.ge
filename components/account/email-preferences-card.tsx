@@ -12,6 +12,7 @@ type Prefs = { daily: boolean; marketing: boolean; nudges: boolean };
 
 export function EmailPreferencesCard({ initial, locale = "ka" }: { initial: Prefs; locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [prefs, setPrefs] = useState<Prefs>(initial);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -31,31 +32,31 @@ export function EmailPreferencesCard({ initial, locale = "ka" }: { initial: Pref
   return (
     <div className="rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
       <header className="mb-5">
-        <h2 className="text-lg font-semibold">{en ? "Email notifications" : "ელფოსტის შეტყობინებები"}</h2>
+        <h2 className="text-lg font-semibold">{am ? "Էլփոստի ծանուցումներ" : en ? "Email notifications" : "ელფოსტის შეტყობინებები"}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {en ? "Choose which emails you want to receive from Vivida." : "აირჩიე, რა ტიპის წერილები გინდა მიიღო vivida.ge-დან."}
+          {am ? "Ընտրեք, թե որ էլփոստերն եք ցանկանում ստանալ Vivida-ից։" : en ? "Choose which emails you want to receive from Vivida." : "აირჩიე, რა ტიპის წერილები გინდა მიიღო vivida.ge-დან."}
         </p>
       </header>
 
       <div className="space-y-3">
         <ToggleRow
           icon={<Sparkles className="size-5" />}
-          title={en ? "Daily horoscope" : "ყოველდღიური ჰოროსკოპი"}
-          subtitle={en ? "A short daily reading delivered in the morning." : "დილით — შენი დღევანდელი მცირე ანალიზი ელფოსტაზე."}
+          title={am ? "Օրական հորոսկոպ" : en ? "Daily horoscope" : "ყოველდღიური ჰოროსკოპი"}
+          subtitle={am ? "Կարճ օրական ընթերցում, որը կառաքվի առավոտյան։" : en ? "A short daily reading delivered in the morning." : "დილით — შენი დღევანდელი მცირე ანალიზი ელფოსტაზე."}
           on={prefs.daily}
           onChange={(v) => setPrefs((p) => ({ ...p, daily: v }))}
         />
         <ToggleRow
           icon={<UserPlus className="size-5" />}
-          title={en ? "Reminders" : "შეხსენებები"}
-          subtitle={en ? "Helpful reminders when your birth profile is incomplete." : "თუ შენი დაბადების მონაცემები არ შეგივსია — გეტყვი, რომ გააქტიურო."}
+          title={am ? "Հիշեցումներ" : en ? "Reminders" : "შეხსენებები"}
+          subtitle={am ? "Օգտակար հիշեցումներ, երբ ձեր ծննդյան պրոֆիլը թերի է։" : en ? "Helpful reminders when your birth profile is incomplete." : "თუ შენი დაბადების მონაცემები არ შეგივსია — გეტყვი, რომ გააქტიურო."}
           on={prefs.nudges}
           onChange={(v) => setPrefs((p) => ({ ...p, nudges: v }))}
         />
         <ToggleRow
           icon={<Mail className="size-5" />}
-          title={en ? "News and promotional emails" : "სიახლეები და სარეკლამო წერილები"}
-          subtitle={en ? "New features, offers and invitations." : "ახალი ფუნქციები, აქციები და მოსაწვევები."}
+          title={am ? "Նորություններ և գովազդային էլփոստեր" : en ? "News and promotional emails" : "სიახლეები და სარეკლამო წერილები"}
+          subtitle={am ? "Նոր հնարավորություններ, առաջարկներ և հրավերներ։" : en ? "New features, offers and invitations." : "ახალი ფუნქციები, აქციები და მოსაწვევები."}
           on={prefs.marketing}
           onChange={(v) => setPrefs((p) => ({ ...p, marketing: v }))}
         />
@@ -63,7 +64,7 @@ export function EmailPreferencesCard({ initial, locale = "ka" }: { initial: Pref
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="text-xs text-muted-foreground">
-          {savedAt && !isPending && !dirty && (en ? "Saved ✓" : "შენახულია ✓")}
+          {savedAt && !isPending && !dirty && (am ? "Պահպանված է ✓" : en ? "Saved ✓" : "შენახულია ✓")}
         </div>
         <Button
           type="button"
@@ -71,7 +72,7 @@ export function EmailPreferencesCard({ initial, locale = "ka" }: { initial: Pref
           disabled={isPending || !dirty}
           size="sm"
         >
-          {isPending ? (en ? "Saving…" : "ინახება…") : (en ? "Save" : "შენახვა")}
+          {isPending ? (am ? "Պահպանվում է…" : en ? "Saving…" : "ინახება…") : (am ? "Պահպանել" : en ? "Save" : "შენახვა")}
         </Button>
       </div>
     </div>

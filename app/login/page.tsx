@@ -35,22 +35,23 @@ export default async function LoginPage({
   const dest = safeNext(next);
   const locale = await getRequestLocale();
   const en = locale !== "ka";
+  const am = locale === "am";
   const session = await auth();
   if (session?.user?.id) redirect(dest ?? "/dashboard");
 
   return (
     <AuthLayout
       locale={locale}
-      title={en ? "Welcome back" : "კეთილი იყოს შენი დაბრუნება"}
-      subtitle={en ? "Step back into your cosmic map." : "შემოდი შენს კოსმიურ რუკაში."}
+      title={am ? "Բարի վերադարձ" : en ? "Welcome back" : "კეთილი იყოს შენი დაბრუნება"}
+      subtitle={am ? "Վերադարձեք ձեր տիեզերական քարտեզին։" : en ? "Step back into your cosmic map." : "შემოდი შენს კოსმიურ რუკაში."}
       footer={
         <>
-          {en ? "New to Vivida?" : "ჯერ არ გაქვს ანგარიში?"}{" "}
+          {am ? "Նոր եք Vivida-ում։" : en ? "New to Vivida?" : "ჯერ არ გაქვს ანგარიში?"}{" "}
           <Link
             href={dest ? `/signup?next=${encodeURIComponent(dest)}` : "/signup"}
             className="text-foreground underline-offset-2 hover:underline"
           >
-            {en ? "Create an account" : "დარეგისტრირდი"}
+            {am ? "Ստեղծել հաշիվ" : en ? "Create an account" : "დარეგისტრირდი"}
           </Link>
         </>
       }

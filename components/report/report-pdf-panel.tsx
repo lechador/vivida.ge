@@ -22,6 +22,7 @@ export async function ReportPdfPanel({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [report] = await db
     .select()
     .from(pdfReports)
@@ -44,17 +45,17 @@ export async function ReportPdfPanel({
             <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-[var(--vivida-cyan)]" />
             <div>
               <h3 className="text-lg font-semibold">
-                {en ? "Your complete report is ready" : "შენი სრული ანგარიში მზადაა"}
+                {am ? "Ձեր ամբողջական զեկույցը պատրաստ է" : en ? "Your complete report is ready" : "შენი სრული ანგარიში მზადაა"}
               </h3>
               <p className="mt-0.5 text-sm text-foreground/75">
-                {en ? "Download your PDF whenever you need it." : "ჩამოტვირთე PDF — ხელმისაწვდომია ნებისმიერ დროს."}
+                {am ? "Ներբեռնեք ձեր PDF-ը, երբ անհրաժեշտ լինի։" : en ? "Download your PDF whenever you need it." : "ჩამოტვირთე PDF — ხელმისაწვდომია ნებისმიერ დროს."}
               </p>
             </div>
           </div>
           <Button asChild variant="mystic" size="lg" className="min-w-44">
             <a href={`/api/reports/${report.id}/download`}>
               <Download className="size-4" />
-              {en ? "Download PDF" : "ჩამოტვირთე PDF"}
+              {am ? "Ներբեռնել PDF" : en ? "Download PDF" : "ჩამოტვირთე PDF"}
             </a>
           </Button>
         </div>
@@ -96,7 +97,7 @@ export async function ReportPdfPanel({
             </div>
           </div>
           <Button asChild variant="outline" size="lg">
-            <Link href={`/reports/${report.id}`}>{en ? "View status" : "ნახე სტატუსი"}</Link>
+            <Link href={`/reports/${report.id}`}>{am ? "Դիտել կարգավիճակը" : en ? "View status" : "ნახე სტატუსი"}</Link>
           </Button>
         </div>
       </div>

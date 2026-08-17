@@ -470,6 +470,13 @@
       "when": 1786821529426,
       "tag": "0066_parched_mandroid",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1786980940342,
+      "tag": "0067_serious_wiccan",
+      "breakpoints": true
     }
   ]
 }

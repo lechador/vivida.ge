@@ -72,6 +72,7 @@ export default async function AccountPage() {
   const accountAvatar = headerData.avatarUrl ?? user.image ?? null;
   const locale = await getRequestLocale(normalizeUserLocale(emailPrefs?.locale));
   const en = locale !== "ka";
+  const am = locale === "am";
   const onEnglishHost = await requestIsEnglishHost();
 
   return (
@@ -86,7 +87,7 @@ export default async function AccountPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Account" : "ანგარიში"}
+          {am ? "Հաշիվ" : en ? "Account" : "ანგარიში"}
         </div>
         <h1 className="mb-8 text-balance text-3xl font-semibold tracking-tight sm:mb-10 sm:text-5xl">
           {en
@@ -111,7 +112,7 @@ export default async function AccountPage() {
             <div className="flex items-center gap-1.5 text-base font-medium text-foreground">
               <span className="truncate">{user.name ?? "ვარსკვლავო"}</span>
               {headerData.isPremium && (
-                <VerifiedBadge label={en ? "Vivida PRO verified" : "Vivida PRO ვერიფიცირებული"} />
+                <VerifiedBadge label={am ? "Vivida PRO հաստատված է" : en ? "Vivida PRO verified" : "Vivida PRO ვერიფიცირებული"} />
               )}
               <CountryBadge
                 countryCode={emailPrefs?.countryCode}
@@ -162,7 +163,7 @@ export default async function AccountPage() {
           >
             <div className="min-w-0">
               <h2 className="text-lg font-semibold tracking-tight">
-                {headerData.isPremium ? "Vivida PRO" : en ? "Credits" : "კრედიტები"}
+                {headerData.isPremium ? "Vivida PRO" : am ? "Կրեդիտներ" : en ? "Credits" : "კრედიტები"}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {headerData.isPremium
@@ -220,29 +221,29 @@ export default async function AccountPage() {
         {/* Birth data */}
         <div className="mb-6 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">{en ? "Birth details" : "დაბადების მონაცემები"}</h2>
+            <h2 className="text-lg font-semibold">{am ? "Ծննդյան տվյալներ" : en ? "Birth details" : "დაბადების მონაცემები"}</h2>
             {profile?.dateOfBirth && (
               <Button asChild variant="ghost" size="sm">
                 <Link href="/onboarding">
                   <Pencil className="size-3.5" />
-                  {en ? "Edit" : "რედაქტირება"}
+                  {am ? "Խմբագրել" : en ? "Edit" : "რედაქტირება"}
                 </Link>
               </Button>
             )}
           </div>
           {profile?.dateOfBirth ? (
             <dl className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
-              <Field label={en ? "Date of birth" : "დაბადების თარიღი"} value={profile.dateOfBirth} />
+              <Field label={am ? "Ծննդյան ամսաթիվ" : en ? "Date of birth" : "დაბადების თარიღი"} value={profile.dateOfBirth} />
               <Field
-                label={en ? "Time of birth" : "დაბადების დრო"}
+                label={am ? "Ծննդյան ժամը" : en ? "Time of birth" : "დაბადების დრო"}
                 value={
                   profile.timeOfBirth
                     ? profile.timeOfBirth.slice(0, 5)
-                    : en ? "Unknown (12:00 used)" : "უცნობია (გამოყენებულია 12:00)"
+                    : am ? "Անհայտ է (օգտագործվում է 12:00)" : en ? "Unknown (12:00 used)" : "უცნობია (გამოყენებულია 12:00)"
                 }
               />
-              <Field label={en ? "Place of birth" : "დაბადების ადგილი"} value={profile.cityName} />
-              <Field label={en ? "Time zone" : "დროის სარტყელი"} value={profile.timezone} />
+              <Field label={am ? "Ծննդավայր" : en ? "Place of birth" : "დაბადების ადგილი"} value={profile.cityName} />
+              <Field label={am ? "Ժամային գոտի" : en ? "Time zone" : "დროის სარტყელი"} value={profile.timezone} />
               <div className="sm:col-span-2">
                 <GenderCard
                   initial={
@@ -264,7 +265,7 @@ export default async function AccountPage() {
               <Button asChild variant="mystic" className="mt-4">
                 <Link href="/onboarding">
                   <Sparkles className="size-4" />
-                  {en ? "Create astrology profile" : "ასტრო პროფილის შექმნა"}
+                  {am ? "Ստեղծել աստղագիտական պրոֆիլ" : en ? "Create astrology profile" : "ასტრო პროფილის შექმნა"}
                 </Link>
               </Button>
             </div>

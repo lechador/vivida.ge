@@ -12,6 +12,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function AstroProfileBanner({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:p-5">
       <div className="flex items-start gap-3">
@@ -19,16 +20,16 @@ export function AstroProfileBanner({ locale = "ka" }: { locale?: UserLocale }) {
           <Sparkles className="size-4 text-[var(--vivida-violet)]" />
         </span>
         <div>
-          <p className="text-sm font-semibold">{en ? "Create your astrology profile" : "შექმენი ასტრო პროფილი"}</p>
+          <p className="text-sm font-semibold">{am ? "Ստեղծեք Ձեր աստղագուշակության պրոֆիլը" : en ? "Create your astrology profile" : "შექმენი ასტრო პროფილი"}</p>
           <p className="text-xs text-muted-foreground">
-            {en ? "Add your birth details to unlock your chart, horoscope and compatibility." : "შეავსე დაბადების მონაცემები და გახსენი რუკა, ჰოროსკოპი და თავსებადობა."}
+            {am ? "Ավելացրեք Ձեր ծննդյան տվյալները՝ Ձեր քարտեզը, հորոսկոպը և համատեղելիությունը բացահայտելու համար։" : en ? "Add your birth details to unlock your chart, horoscope and compatibility." : "შეავსე დაბადების მონაცემები და გახსენი რუკა, ჰოროსკოპი და თავსებადობა."}
           </p>
         </div>
       </div>
       <Button asChild variant="mystic" size="sm" className="shrink-0">
         <Link href="/onboarding">
           <Sparkles className="size-4" />
-          {en ? "Add details" : "შევსება"}
+          {am ? "Ավելացնել մանրամասներ" : en ? "Add details" : "შევსება"}
         </Link>
       </Button>
     </div>

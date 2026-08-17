@@ -33,6 +33,7 @@ export default async function ReportStatusPage({
     getUserLocale(user.id),
   ]);
   const en = locale !== "ka";
+  const am = locale === "am";
 
   if (!report || report.userId !== user.id) notFound();
 
@@ -56,7 +57,7 @@ export default async function ReportStatusPage({
             href="/report"
             className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
-            {en ? "← Back to your chart" : "← დაბრუნდი რუკაზე"}
+            {am ? "← Վերադառնալ Ձեր քարտեզին" : en ? "← Back to your chart" : "← დაბრუნდი რუკაზე"}
           </Link>
         </div>
       </section>

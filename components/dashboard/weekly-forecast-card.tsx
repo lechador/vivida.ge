@@ -59,6 +59,7 @@ export function WeeklyForecastCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
@@ -71,10 +72,10 @@ export function WeeklyForecastCard({
       <header className="relative mb-5 flex items-baseline justify-between gap-3">
         <div>
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Next 7 days" : "შემდეგი 7 დღე"}
+            {am ? "Հաջորդ 7 օրը" : en ? "Next 7 days" : "შემდეგი 7 დღე"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight sm:text-xl">
-            {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
+            {am ? "Ձեր շաբաթը երկնքում" : en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
         <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" aria-hidden />
@@ -116,6 +117,7 @@ function DayRow({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const dayNum = parseDateNum(day.dateIso);
   const weekShort = en
     ? new Intl.DateTimeFormat("en", { weekday: "short", timeZone: "UTC" }).format(new Date(`${day.dateIso}T00:00:00Z`))
@@ -215,7 +217,7 @@ function DayRow({
                   {day.headline || "—"}
                 </p>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  {en ? "Moon" : "მთვარე"} {en ? day.moonSignEn : day.moonSignKa} · {labelForTilt(tilt, locale)}
+                  {am ? "Լուսին" : en ? "Moon" : "მთვარე"} {en ? day.moonSignEn : day.moonSignKa} · {labelForTilt(tilt, locale)}
                 </p>
               </div>
               <ChevronDown
@@ -274,13 +276,13 @@ function DayRow({
         <div className="mt-2 grid gap-3 rounded-xl border border-[var(--vivida-violet)]/30 bg-[oklch(0.20_0.04_283/0.7)] p-3 sm:p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <Block
-              label={en ? "Supportive" : "ჰარმონიული"}
+              label={am ? "Աջակցող" : en ? "Supportive" : "ჰარმონიული"}
               dotClass="bg-[var(--vivida-cyan)]"
               borderClass="border-[var(--vivida-cyan)]/45"
               text={day.harmonicReason || "—"}
             />
             <Block
-              label={en ? "Challenging" : "დაძაბული"}
+              label={am ? "Դժվարին" : en ? "Challenging" : "დაძაბული"}
               dotClass="bg-[var(--vivida-pink)]"
               borderClass="border-[var(--vivida-pink)]/45"
               text={day.challengingReason || "—"}
@@ -295,7 +297,7 @@ function DayRow({
           {day.drivers && day.drivers.length > 0 && (
             <div>
               <div className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {en ? "Active aspects" : "მოქმედი ასპექტები"}
+                {am ? "Ակտիվ ասպեկտներ" : en ? "Active aspects" : "მოქმედი ასპექტები"}
               </div>
               <ul className="flex flex-wrap gap-1.5">
                 {day.drivers.slice(0, 4).map((dr, j) => (

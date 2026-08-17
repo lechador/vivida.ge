@@ -25,6 +25,7 @@ const MESSAGES_EN = [
  */
 export function HoroscopeLoading({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const messages = en ? MESSAGES_EN : MESSAGES;
   const [progress, setProgress] = useState(8);
   const [stage, setStage] = useState(0);
@@ -50,7 +51,7 @@ export function HoroscopeLoading({ locale = "ka" }: { locale?: UserLocale }) {
       />
       <div className="relative flex items-center gap-2.5 text-sm font-medium text-[var(--vivida-violet)]">
         <Sparkles className="size-4 animate-pulse" />
-        {en ? "Creating your horoscope for today" : "ვქმნით შენს დღევანდელ ჰოროსკოპს"}
+        {am ? "Ստեղծվում է ձեր այսօրվա հորոսկոպը" : en ? "Creating your horoscope for today" : "ვქმნით შენს დღევანდელ ჰოროსკოპს"}
       </div>
 
       <p className="relative mt-6 h-5 text-base text-foreground/85 transition-opacity">
@@ -65,7 +66,7 @@ export function HoroscopeLoading({ locale = "ka" }: { locale?: UserLocale }) {
       </div>
 
       <p className="relative mt-3 text-xs text-muted-foreground">
-        {en ? "Chart calculations usually take a few seconds." : "ცის რუკის გაანგარიშებას ჩვეულებრივ რამდენიმე წამი სჭირდება."}
+        {am ? "Քարտեզի հաշվարկները սովորաբար տևում են մի քանի վայրկյան։" : en ? "Chart calculations usually take a few seconds." : "ცის რუკის გაანგარიშებას ჩვეულებრივ რამდენიმე წამი სჭირდება."}
       </p>
     </article>
   );

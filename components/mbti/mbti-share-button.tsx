@@ -24,6 +24,7 @@ export function MbtiShareButton({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [copied, setCopied] = useState(false);
 
   async function share() {
@@ -51,7 +52,7 @@ export function MbtiShareButton({
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-2">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? (en ? "Link copied" : "ბმული დაკოპირდა") : (en ? "Share" : "გააზიარე")}
+      {copied ? (am ? "Հղումը պատճենված է" : en ? "Link copied" : "ბმული დაკოპირდა") : (am ? "Կիսվել" : en ? "Share" : "გააზიარე")}
     </Button>
   );
 }

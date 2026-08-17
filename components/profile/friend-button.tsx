@@ -33,6 +33,7 @@ export function FriendButton({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [status, setStatus] = useState<FriendshipStatus>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -47,7 +48,7 @@ export function FriendButton({
       if (result.ok) {
         setStatus(nextStatus);
       } else {
-        setError(result.error ?? (en ? "Something went wrong" : "შეცდომა"));
+        setError(result.error ?? (am ? "Ինչ-որ բան սխալ է տեղի ունեցել" : en ? "Something went wrong" : "შეცდომა"));
       }
     });
   };
@@ -70,7 +71,7 @@ export function FriendButton({
           }
         >
           <UserPlus className="size-4" />
-          {isPending ? (en ? "Sending…" : "იგზავნება…") : (en ? "Add friend" : "მეგობრობის თხოვნა")}
+          {isPending ? (am ? "Ուղարկվում է…" : en ? "Sending…" : "იგზავნება…") : (am ? "Ավելացնել ընկեր" : en ? "Add friend" : "მეგობრობის თხოვნა")}
         </Button>
       )}
 
@@ -86,7 +87,7 @@ export function FriendButton({
           }
         >
           <Clock className="size-4" />
-          {isPending ? (en ? "Cancelling…" : "უქმდება…") : (en ? "Request sent" : "მოთხოვნა გაგზავნილია")}
+          {isPending ? (am ? "Չեղարկվում է…" : en ? "Cancelling…" : "უქმდება…") : (am ? "Հարցումն ուղարկված է" : en ? "Request sent" : "მოთხოვნა გაგზავნილია")}
         </Button>
       )}
 
@@ -103,7 +104,7 @@ export function FriendButton({
             }
           >
             <Check className="size-4" />
-            {en ? "Accept" : "მიიღე"}
+            {am ? "Ընդունել" : en ? "Accept" : "მიიღე"}
           </Button>
           <Button
             variant="outline"
@@ -116,7 +117,7 @@ export function FriendButton({
             }
           >
             <X className="size-4" />
-            {en ? "Decline" : "უარი"}
+            {am ? "Մերժել" : en ? "Decline" : "უარი"}
           </Button>
         </>
       )}
@@ -126,7 +127,7 @@ export function FriendButton({
           variant="outline"
           disabled={isPending}
           onClick={() => {
-            const sure = window.confirm(en ? "Are you sure?" : "დარწმუნებული ხარ?");
+            const sure = window.confirm(am ? "Վստա՞հ եք" : en ? "Are you sure?" : "დარწმუნებული ხარ?");
             if (!sure) return;
             run(
               () => removeFriend(targetUserId, targetUsername),
@@ -137,8 +138,8 @@ export function FriendButton({
         >
           <UserCheck className="size-4 group-hover:hidden" />
           <UserMinus className="hidden size-4 group-hover:inline" />
-          <span className="group-hover:hidden">{en ? "Friend" : "მეგობარი"}</span>
-          <span className="hidden group-hover:inline">{en ? "Remove" : "წაშლა"}</span>
+          <span className="group-hover:hidden">{am ? "Ընկեր" : en ? "Friend" : "მეგობარი"}</span>
+          <span className="hidden group-hover:inline">{am ? "Հեռացնել" : en ? "Remove" : "წაშლა"}</span>
         </Button>
       )}
 

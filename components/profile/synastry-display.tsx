@@ -98,6 +98,7 @@ export function SynastryDisplay({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const verdict = en
     ? overallVerdictEn(result.overall)
     : overallVerdict(result.overall);
@@ -117,7 +118,7 @@ export function SynastryDisplay({
           <OverallRing percent={result.overall} />
           <div className="text-center sm:text-left">
             <div className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-              {en ? "Overall compatibility" : "ერთობლივი თავსებადობა"}
+              {am ? "Ընդհանուր համատեղելիություն" : en ? "Overall compatibility" : "ერთობლივი თავსებადობა"}
             </div>
             <h2 className="mt-1 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
               <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
@@ -150,7 +151,7 @@ export function SynastryDisplay({
       <section>
         <header className="mb-4 flex items-baseline justify-between gap-3">
           <h3 className="text-xl font-semibold tracking-tight">
-            {en ? "Six areas" : "ექვსი სფერო"}
+            {am ? "Վեց ոլորտ" : en ? "Six areas" : "ექვსი სფერო"}
           </h3>
           <span className="text-xs text-muted-foreground">
             {en
@@ -239,7 +240,7 @@ export function SynastryDisplay({
         <section>
           <header className="mb-4">
             <h3 className="text-xl font-semibold tracking-tight">
-              {en ? "Key connections" : "მთავარი კავშირები"}
+              {am ? "Կարևոր կապեր" : en ? "Key connections" : "მთავარი კავშირები"}
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
               {en
@@ -276,7 +277,7 @@ export function SynastryDisplay({
       {(strengths.length > 0 || growth.length > 0) && (
         <section className="grid gap-6 sm:grid-cols-2">
           <ValenceColumn
-            title={en ? "Strengths" : "ძლიერი მხარეები"}
+            title={am ? "Ուժեղ կողմեր" : en ? "Strengths" : "ძლიერი მხარეები"}
             description={
               en
                 ? "Harmonious links where energy flows more freely"
@@ -294,7 +295,7 @@ export function SynastryDisplay({
             locale={locale}
           />
           <ValenceColumn
-            title={en ? "Growth points" : "ზრდის წერტილები"}
+            title={am ? "Աճի կետեր" : en ? "Growth points" : "ზრდის წერტილები"}
             description={
               en
                 ? "Tension that can create depth when handled with care"
@@ -348,6 +349,7 @@ function AspectRow({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const valence = aspectValence(aspect.kind);
   const accent =
     valence === "harmonious"
@@ -370,7 +372,7 @@ function AspectRow({
         type="button"
         onClick={onSelect}
         className="group flex w-full items-start gap-3 rounded-2xl border border-border bg-card/55 p-4 text-left ring-1 ring-foreground/5 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-card/75 hover:ring-foreground/15 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-        aria-label={`${bodyLabelFor(aspect.a, en)} ${aspectLabelFor(aspect.kind, en)} ${bodyLabelFor(aspect.b, en)} — ${en ? "details" : "დეტალები"}`}
+        aria-label={`${bodyLabelFor(aspect.a, en)} ${aspectLabelFor(aspect.kind, en)} ${bodyLabelFor(aspect.b, en)} — ${am ? "մանրամասներ" : en ? "details" : "დეტალები"}`}
       >
         <span
           className="grid size-10 shrink-0 place-items-center rounded-xl text-lg"
@@ -405,7 +407,7 @@ function AspectRow({
             className="mt-1.5 text-[11px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
             style={{ color: accent }}
           >
-            {en ? "View details →" : "სრულად ნახვა →"}
+            {am ? "Դիտել մանրամասները →" : en ? "View details →" : "სრულად ნახვა →"}
           </div>
         </div>
       </button>
@@ -433,6 +435,7 @@ function ValenceColumn({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <article
       className="relative overflow-hidden rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl"
@@ -510,11 +513,12 @@ function OverlaySection({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <section>
       <header className="mb-4">
         <h3 className="text-xl font-semibold tracking-tight">
-          {en ? "House overlays" : "სახლების გადაფარვა"}
+          {am ? "Տների համադրում" : am ? "Տների համադրում" : en ? "House overlays" : "სახლების გადაფარვა"}
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
           {en
@@ -558,7 +562,7 @@ function OverlaySection({
                       color: accent,
                     }}
                   >
-                    {mine ? (en ? "Yours" : "შენი") : en ? partnerName : `${partnerName}-ის`}
+                    {mine ? (am ? "Ձերը" : am ? "Ձերը" : en ? "Yours" : "შენი") : en ? partnerName : `${partnerName}-ის`}
                   </span>
                   <span>{bodyLabelFor(o.body, en)}</span>
                   <span className="text-muted-foreground">→</span>
@@ -605,6 +609,7 @@ function AspectDialog({
 
   const breakdown = aspectBreakdown(aspect, locale);
   const en = locale !== "ka";
+  const am = locale === "am";
   const valence = aspectValence(aspect.kind);
   const accent =
     valence === "harmonious"
@@ -638,7 +643,7 @@ function AspectDialog({
                 </span>
                 <span className="text-muted-foreground/60">·</span>
                 <span className="tabular-nums text-muted-foreground/80">
-                  {en ? "Orb" : "ორბი"} {aspect.orb.toFixed(2)}°
+                  {am ? "Օրբ" : en ? "Orb" : "ორბი"} {aspect.orb.toFixed(2)}°
                 </span>
               </DialogDescription>
             </div>
@@ -659,7 +664,7 @@ function AspectDialog({
                 className="text-[10px] font-semibold uppercase tracking-[0.18em]"
                 style={{ color: accent }}
               >
-                {en ? "What this means for the pair" : "რას ნიშნავს ეს წყვილისთვის"}
+                {am ? "Ինչ է սա նշանակում զույգի համար" : en ? "What this means for the pair" : "რას ნიშნავს ეს წყვილისთვის"}
               </div>
               <div className="mt-1.5 space-y-2.5">
                 {text
@@ -678,7 +683,7 @@ function AspectDialog({
           )}
 
           <BreakdownBlock
-            label={en ? "Aspect meaning" : "ასპექტის არსი"}
+            label={am ? "Ասպեկտի իմաստը" : en ? "Aspect meaning" : "ასპექტის არსი"}
             body={breakdown.aspectMeaning}
             accent={accent}
           />
@@ -698,13 +703,13 @@ function AspectDialog({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <BreakdownBlock
-              label={en ? "What works" : "რა მუშაობს"}
+              label={am ? "Ինչն է աշխատում" : en ? "What works" : "რა მუშაობს"}
               body={breakdown.positive}
               accent="oklch(0.78 0.16 200)"
               tone="positive"
             />
             <BreakdownBlock
-              label={en ? "What needs attention" : "რას მიხედო"}
+              label={am ? "Ինչն է ուշադրության կարիք ունի" : en ? "What needs attention" : "რას მიხედო"}
               body={breakdown.negative}
               accent="oklch(0.7 0.22 25)"
               tone="negative"
@@ -712,7 +717,7 @@ function AspectDialog({
           </div>
 
           <BreakdownBlock
-            label={en ? "How to use this" : "რა გავაკეთოთ ამით"}
+            label={am ? "Ինչպես օգտագործել սա" : en ? "How to use this" : "რა გავაკეთოთ ამით"}
             body={breakdown.takeaway}
           />
 
@@ -787,10 +792,11 @@ function ElementPairing({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-      <ElementChip a={sunA} b={sunB} label={en ? "Sun" : "მზე"} locale={locale} />
-      <ElementChip a={moonA} b={moonB} label={en ? "Moon" : "მთვარე"} locale={locale} />
+      <ElementChip a={sunA} b={sunB} label={am ? "Արև" : en ? "Sun" : "მზე"} locale={locale} />
+      <ElementChip a={moonA} b={moonB} label={am ? "Լուսին" : en ? "Moon" : "მთვარე"} locale={locale} />
     </div>
   );
 }
@@ -807,6 +813,7 @@ function ElementChip({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const same = a === b;
   const compatible =
     (a === "fire" && b === "air") ||
@@ -844,6 +851,7 @@ function ScoreBreakdown({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const total =
     Math.abs(breakdown.aspectPoints) +
     Math.abs(breakdown.housePoints) +
@@ -855,7 +863,7 @@ function ScoreBreakdown({
     note: string;
   }> = [
     {
-      label: en ? "Chart aspects" : "ცის ასპექტები",
+      label: am ? "Քարտեզի ասպեկտներ" : en ? "Chart aspects" : "ცის ასპექტები",
       value: breakdown.aspectPoints,
       accent: "oklch(0.78 0.18 305)",
       note: en
@@ -871,7 +879,7 @@ function ScoreBreakdown({
         : "ერთის პლანეტა მეორის რომელ სახლში ხვდება — სად ააქტიურებს ცხოვრების სფეროს.",
     },
     {
-      label: en ? "Element chemistry" : "ელემენტების ქიმია",
+      label: am ? "Տարրերի քիմիա" : en ? "Element chemistry" : "ელემენტების ქიმია",
       value: breakdown.elementPoints,
       accent: "oklch(0.85 0.16 85)",
       note: en
@@ -883,7 +891,7 @@ function ScoreBreakdown({
     <section className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
       <header className="mb-4">
         <h3 className="text-base font-semibold tracking-tight">
-          {en ? "What shapes this score" : "რამ შექმნა ეს რიცხვი"}
+          {am ? "Ինչն է ձևավորում այս միավորը" : en ? "What shapes this score" : "რამ შექმნა ეს რიცხვი"}
         </h3>
         <p className="mt-0.5 text-xs text-muted-foreground">
           {en

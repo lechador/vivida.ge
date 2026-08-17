@@ -36,6 +36,7 @@ export function SafetyMenu({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const router = useRouter();
   const [reportOpen, setReportOpen] = useState(false);
   const [confirmBlock, setConfirmBlock] = useState(false);
@@ -58,7 +59,7 @@ export function SafetyMenu({
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            aria-label={en ? "Safety" : "უსაფრთხოება"}
+            aria-label={am ? "Անվտանգություն" : en ? "Safety" : "უსაფრთხოება"}
             className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
           >
             <ShieldAlert className="size-4" />
@@ -73,7 +74,7 @@ export function SafetyMenu({
             className="cursor-pointer"
           >
             <Flag className="size-4" />
-            {en ? "Report" : "დაარეპორტე"}
+            {am ? "Հաղորդել" : en ? "Report" : "დაარეპორტე"}
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={(e) => {
@@ -86,7 +87,7 @@ export function SafetyMenu({
             className="cursor-pointer text-destructive focus:text-destructive"
           >
             <Ban className="size-4" />
-            {confirmBlock ? (en ? "Confirm block" : "დაადასტურე — დაბლოკე") : (en ? "Block" : "დაბლოკე")}
+            {confirmBlock ? (am ? "Հաստատել արգելափակումը" : en ? "Confirm block" : "დაადასტურე — დაბლოკე") : (am ? "Արգելափակել" : en ? "Block" : "დაბლოკე")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

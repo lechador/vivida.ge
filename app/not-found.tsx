@@ -20,6 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function NotFound() {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div
@@ -52,9 +53,9 @@ export default async function NotFound() {
             404
           </div>
           <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            {en ? "This page is " : "ეს გვერდი "}
+            {am ? "Այս էջը " : en ? "This page is " : "ეს გვერდი "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "inside a black hole" : "შავ ხვრელშია"}
+              {am ? "սև անցքի մեջ է" : en ? "inside a black hole" : "შავ ხვრელშია"}
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-pretty text-base text-muted-foreground">
@@ -64,13 +65,13 @@ export default async function NotFound() {
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic" size="lg">
-              <Link href="/">{en ? "Home" : "მთავარი"}</Link>
+              <Link href="/">{am ? "Գլխավոր" : en ? "Home" : "მთავარი"}</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
               {SOCIAL_FEATURES.swipeDeck ? (
-                <Link href="/discover">{en ? "Discover" : "აღმოაჩინე"}</Link>
+                <Link href="/discover">{am ? "Բացահայտել" : en ? "Discover" : "აღმოაჩინე"}</Link>
               ) : (
-                <Link href="/feed">{en ? "Feed" : "ფიდი"}</Link>
+                <Link href="/feed">{am ? "Լրահոս" : en ? "Feed" : "ფიდი"}</Link>
               )}
             </Button>
           </div>

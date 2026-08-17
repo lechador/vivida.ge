@@ -31,6 +31,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale !== "ka";
+  const am = locale === "am";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
 
@@ -92,10 +93,10 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
     return (
       <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
         <p className="text-foreground/85">
-          {en ? "Take the test first to see your result." : "ჯერ ტესტი უნდა გაიარო."}
+          {am ? "Նախ անցեք թեստը՝ Ձեր արդյունքը տեսնելու համար։" : en ? "Take the test first to see your result." : "ჯერ ტესტი უნდა გაიარო."}
         </p>
         <Button asChild variant="mystic" className="mt-5">
-          <Link href="/iq-testi">{en ? "Start the test" : "ტესტის დაწყება"}</Link>
+          <Link href="/iq-testi">{am ? "Սկսել թեստը" : en ? "Start the test" : "ტესტის დაწყება"}</Link>
         </Button>
       </div>
     );
@@ -123,7 +124,7 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
       {/* Score card */}
       <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
         <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Your IQ estimate" : "შენი IQ შედეგი"}
+          {am ? "Ձեր IQ-ի գնահատականը" : en ? "Your IQ estimate" : "შენი IQ შედეგი"}
         </div>
         <div className="mt-2 bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-7xl font-bold leading-none tracking-tight text-transparent sm:text-8xl">
           {result.iq}
@@ -141,9 +142,9 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
         </div>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <Stat label={en ? "Estimated range" : "სავარაუდო დიაპაზონი"} value={`${result.range[0]}–${result.range[1]}`} />
-          <Stat label={en ? "Percentile" : "ჯობნი მოსახლეობის"} value={en ? `${result.percentile}th` : `${result.percentile}%-ს`} />
-          <Stat label={en ? "Correct answers" : "სწორი პასუხი"} value={`${result.correct} / ${result.total}`} />
+          <Stat label={am ? "Ենթադրյալ միջակայք" : en ? "Estimated range" : "სავარაუდო დიაპაზონი"} value={`${result.range[0]}–${result.range[1]}`} />
+          <Stat label={am ? "Տոկոսային" : en ? "Percentile" : "ჯობნი მოსახლეობის"} value={en ? `${result.percentile}th` : `${result.percentile}%-ს`} />
+          <Stat label={am ? "Ճիշտ պատասխաններ" : en ? "Correct answers" : "სწორი პასუხი"} value={`${result.correct} / ${result.total}`} />
         </div>
       </div>
 
@@ -151,7 +152,7 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
       <div className="relative overflow-hidden rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
         <div className="mb-5 flex items-center gap-2">
           <Brain className="size-5 text-[var(--vivida-cyan)]" />
-          <h2 className="text-lg font-semibold tracking-tight">{en ? "Your reasoning profile" : "შენი აზროვნების რუკა"}</h2>
+          <h2 className="text-lg font-semibold tracking-tight">{am ? "Ձեր տրամաբանության պրոֆիլը" : en ? "Your reasoning profile" : "შენი აზროვნების რუკა"}</h2>
         </div>
 
         <div className={cn("space-y-4", authed === false && "pointer-events-none select-none blur-[6px]")}>
@@ -172,7 +173,7 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
                   : "დარეგისტრირდი უფასოდ და ნახე შენი აზროვნების სრული ანალიზი დომენების მიხედვით — და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
-                <Link href="/signup?from=iq">{en ? "Create free account" : "უფასო რეგისტრაცია"}</Link>
+                <Link href="/signup?from=iq">{am ? "Ստեղծել անվճար հաշիվ" : en ? "Create free account" : "უფასო რეგისტრაცია"}</Link>
               </Button>
             </div>
           </div>
@@ -187,10 +188,10 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
         <ShareButton iq={result.iq} locale={locale} />
         <Button type="button" variant="outline" onClick={retake} className="gap-1.5">
           <RotateCcw className="size-4" />
-          {en ? "Retake" : "თავიდან გავლა"}
+          {am ? "Կրկնել" : en ? "Retake" : "თავიდან გავლა"}
         </Button>
         <Button asChild variant="ghost">
-          <Link href="/tests">{en ? "Other tests" : "სხვა ტესტები"}</Link>
+          <Link href="/tests">{am ? "Այլ թեստեր" : en ? "Other tests" : "სხვა ტესტები"}</Link>
         </Button>
       </div>
 
@@ -207,6 +208,7 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
 
 function ShareButton({ iq, locale }: { iq: number; locale: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [copied, setCopied] = useState(false);
   async function share() {
     const url = en ? "https://www.vividaastro.com/iq-testi" : "https://www.vivida.ge/iq-testi";
@@ -215,7 +217,7 @@ function ShareButton({ iq, locale }: { iq: number; locale: UserLocale }) {
       : `ჩემი IQ Vivida-ს ტესტზე: ${iq} 🧠 შენ რას მიიღებ?`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: en ? "Vivida IQ Test" : "Vivida IQ ტესტი", text, url });
+        await navigator.share({ title: am ? "Vivida IQ թեստ" : en ? "Vivida IQ Test" : "Vivida IQ ტესტი", text, url });
         return;
       } catch {
         /* cancelled — fall through to copy */
@@ -232,7 +234,7 @@ function ShareButton({ iq, locale }: { iq: number; locale: UserLocale }) {
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-1.5">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? (en ? "Copied" : "დაკოპირდა") : en ? "Share" : "გააზიარე"}
+      {copied ? (am ? "Պատճենված է" : en ? "Copied" : "დაკოპირდა") : am ? "Կիսվել" : en ? "Share" : "გააზიარე"}
     </Button>
   );
 }

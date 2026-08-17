@@ -48,6 +48,7 @@ export function SpotlightCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const { card, synastry } = match;
   const verdict = en
     ? overallVerdictEn(synastry.overall)
@@ -112,7 +113,7 @@ export function SpotlightCard({
           <div className="flex items-center gap-2">
             <Sparkles className="size-3.5 text-[var(--vivida-pink)]" />
             <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--vivida-pink)]">
-              {en ? "Today’s top match" : "დღევანდელი მთავარი წყვილი"}
+              {am ? "Այսօրվա լավագույն զույգը" : en ? "Today’s top match" : "დღევანდელი მთავარი წყვილი"}
             </span>
           </div>
 
@@ -197,7 +198,7 @@ export function SpotlightCard({
           <div className="mt-1">
             <Button asChild variant="mystic" size="default">
               <Link href={`/u/${card.username}`}>
-                {en ? "View profile" : "ნახე პროფილი"}
+                {am ? "Դիտել պրոֆիլը" : en ? "View profile" : "ნახე პროფილი"}
                 <ArrowRight className="size-4" />
               </Link>
             </Button>

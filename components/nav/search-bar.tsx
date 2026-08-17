@@ -24,6 +24,7 @@ type Result = {
  */
 export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [open, setOpen] = useState(false);
@@ -103,7 +104,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder={en ? "Name or @" : "სახელი ან @"}
+          placeholder={am ? "Անուն կամ @" : en ? "Name or @" : "სახელი ან @"}
           className="h-12 w-full rounded-full border border-border bg-card/50 pl-11 pr-10 text-base outline-none ring-offset-background backdrop-blur transition-colors placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-ring"
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
@@ -129,7 +130,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
         ) : (
           <button
             type="button"
-            aria-label={en ? "Go" : "გადასვლა"}
+            aria-label={am ? "Գնալ" : en ? "Go" : "გადასვლა"}
             tabIndex={-1}
             onClick={() => {
               const target = results[highlight];
@@ -189,7 +190,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
 
       {open && hasQuery && !loading && results.length === 0 && (
         <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 rounded-xl border border-border bg-popover/95 p-4 text-center text-sm text-muted-foreground shadow-2xl backdrop-blur-md">
-          {en ? "No public profiles found" : "არცერთი საჯარო პროფილი არ მოიძებნა"}
+          {am ? "Հանրային պրոֆիլներ չեն գտնվել" : en ? "No public profiles found" : "არცერთი საჯარო პროფილი არ მოიძებნა"}
         </div>
       )}
     </div>

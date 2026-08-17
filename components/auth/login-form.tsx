@@ -26,6 +26,7 @@ const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
  */
 export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const params = useSearchParams();
   const router = useRouter();
   const verified = params.get("verified") === "1";
@@ -129,7 +130,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
       {verified && (
         <div className="flex items-start gap-2 rounded-lg border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-3 py-2 text-sm text-[var(--vivida-cyan)]">
           <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
-          {en ? "Your email is verified. Sign in to continue." : "ელფოსტა დადასტურებულია. შედი ანგარიშში."}
+          {am ? "Ձեր էլ. փոստը հաստատված է։ Մուտք գործեք շարունակելու համար։" : en ? "Your email is verified. Sign in to continue." : "ელფოსტა დადასტურებულია. შედი ანგარიშში."}
         </div>
       )}
       {verifyError && (
@@ -145,7 +146,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="email">{en ? "Email" : "ელფოსტა"}</Label>
+        <Label htmlFor="email">{am ? "Էլ. փոստ" : en ? "Email" : "ელფოსტა"}</Label>
         <Input
           id="email"
           name="email"
@@ -159,12 +160,12 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
       </div>
       <div className="space-y-1.5">
         <div className="flex items-baseline justify-between">
-          <Label htmlFor="password">{en ? "Password" : "პაროლი"}</Label>
+          <Label htmlFor="password">{am ? "Գաղտնաբառ" : en ? "Password" : "პაროლი"}</Label>
           <Link
             href="/forgot-password"
             className="text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            {en ? "Forgot it?" : "დაგავიწყდა?"}
+            {am ? "Մոռացե՞լ եք այն։" : en ? "Forgot it?" : "დაგავიწყდა?"}
           </Link>
         </div>
         <Input
@@ -189,7 +190,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
       {unverifiedEmail && (
         <div className="space-y-2 rounded-lg border border-border/60 bg-card/40 p-3">
           <Label htmlFor="login-code" className="text-xs text-muted-foreground">
-            {en ? "Enter the 6-digit code sent to your email" : "შეიყვანე ელფოსტაზე გამოგზავნილი 6-ნიშნა კოდი"}
+            {am ? "Մուտքագրեք Ձեր էլ. փոստին ուղարկված 6-նիշանոց կոդը" : en ? "Enter the 6-digit code sent to your email" : "შეიყვანე ელფოსტაზე გამოგზავნილი 6-ნიშნა კოდი"}
           </Label>
           <div className="flex gap-2">
             <Input
@@ -212,7 +213,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
               onClick={verifyCode}
               disabled={codePending || code.length !== 6}
             >
-              {codePending ? <Loader2 className="size-4 animate-spin" /> : en ? "Verify" : "დადასტურება"}
+              {codePending ? <Loader2 className="size-4 animate-spin" /> : am ? "Հաստատել" : en ? "Verify" : "დადასტურება"}
             </Button>
           </div>
           {codeError && <p className="text-xs text-destructive">{codeError}</p>}
@@ -235,7 +236,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
 
       {codeVerified && (
         <div className="rounded-lg border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-3 py-2 text-sm text-[var(--vivida-cyan)]">
-          {en ? "Your email is verified. You can sign in now." : "ელფოსტა დადასტურდა. ახლა დააჭირე „შესვლას“."}
+          {am ? "Ձեր էլ. փոստը հաստատված է։ Այժմ կարող եք մուտք գործել։" : en ? "Your email is verified. You can sign in now." : "ელფოსტა დადასტურდა. ახლა დააჭირე „შესვლას“."}
         </div>
       )}
       {resentMsg && (
@@ -254,7 +255,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
         disabled={submitDisabled}
       >
         {isPending && <Loader2 className="size-4 animate-spin" />}
-        {isPending ? (en ? "Signing in…" : "შესვლა…") : en ? "Sign in" : "შესვლა"}
+        {isPending ? (am ? "Մուտք է գործվում…" : en ? "Signing in…" : "შესვლა…") : am ? "Մուտք գործել" : en ? "Sign in" : "შესვლა"}
       </Button>
     </form>
   );

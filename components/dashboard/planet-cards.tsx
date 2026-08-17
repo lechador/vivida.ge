@@ -28,6 +28,7 @@ export function PlanetCards({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
       {PLANETS_TO_SHOW.map((key) => {
@@ -68,7 +69,7 @@ export function PlanetCards({
               <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
                 {formatDegree(body.signDegree)}
                 {body.retrograde ? " ℞" : ""}
-                {body.house ? ` · ${body.house} ${en ? "house" : "სახ."}` : ""}
+                {body.house ? ` · ${body.house} ${am ? "տուն" : en ? "house" : "სახ."}` : ""}
               </span>
             </div>
             {text && (

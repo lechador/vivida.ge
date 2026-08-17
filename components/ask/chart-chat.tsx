@@ -47,6 +47,7 @@ export function ChartChat({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const starters = en ? STARTERS_EN : STARTERS_KA;
   const [messages, setMessages] = useState<Msg[]>(initialMessages);
   const [input, setInput] = useState("");
@@ -80,7 +81,7 @@ export function ChartChat({
         const data = await res.json().catch(() => ({}));
         setError(
           (en ? ERRORS_EN : ERRORS_KA)[data.error] ??
-            (en ? "Something went wrong. Please try again." : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
+            (am ? "Ինչ-որ բան այն չէր։ Խնդրում ենք նորից փորձել։" : en ? "Something went wrong. Please try again." : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
         );
         setNeedsCredits(data.error === "needs_credits");
         setMessages((prev) => prev.slice(0, -1)); // drop empty assistant bubble
@@ -100,7 +101,7 @@ export function ChartChat({
         });
       }
     } catch {
-      setError(en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(am ? "Ցանցի սխալ։ Խնդրում ենք նորից փորձել։" : en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
       setMessages((prev) => prev.slice(0, -1));
     } finally {
       setSending(false);
@@ -168,7 +169,7 @@ export function ChartChat({
               className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/12 px-3 py-1.5 text-sm text-foreground/90 transition-colors hover:bg-[var(--vivida-violet)]/20"
             >
               <Users className="size-4" />
-              {en ? "Invite / top up" : "მოიწვიე / შეავსე"}
+              {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
             </Link>
           )}
         </div>
@@ -193,14 +194,14 @@ export function ChartChat({
               }
             }}
             rows={1}
-            placeholder={en ? "Write your question…" : "დაწერე შეკითხვა…"}
+            placeholder={am ? "Գրեք ձեր հարցը…" : en ? "Write your question…" : "დაწერე შეკითხვა…"}
             disabled={sending}
             className="max-h-32 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground"
           />
           <button
             type="submit"
             disabled={sending || !input.trim()}
-            aria-label={en ? "Send" : "გაგზავნა"}
+            aria-label={am ? "Ուղարկել" : en ? "Send" : "გაგზავნა"}
             className="grid size-10 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-md transition-opacity disabled:opacity-40"
           >
             <Send className="size-4" />
@@ -208,7 +209,7 @@ export function ChartChat({
         </div>
         <div className="mt-2 flex justify-center">
           <CreditHint>
-            {en ? "2 free questions per day, then −1 credit" : "დღეში 2 უფასო შეკითხვა, შემდეგ −1 კრედიტი"}
+            {am ? "Օրական 2 անվճար հարց, այնուհետև −1 կրեդիտ" : en ? "2 free questions per day, then −1 credit" : "დღეში 2 უფასო შეკითხვა, შემდეგ −1 კრედიტი"}
           </CreditHint>
         </div>
         <p className="mt-1.5 text-center text-[11px] text-muted-foreground">

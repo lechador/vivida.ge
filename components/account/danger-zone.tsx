@@ -36,6 +36,7 @@ const DELETION_LIST_EN = [
 
 export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const confirmPhrase = en
     ? DELETE_ACCOUNT_CONFIRM_PHRASE_EN
     : DELETE_ACCOUNT_CONFIRM_PHRASE;
@@ -63,7 +64,7 @@ export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
         // other error is real and worth surfacing.
         const message = (err as Error).message;
         if (!message?.includes("NEXT_REDIRECT")) {
-          setError(en ? "Something went wrong. Please try again." : "რაღაც შეცდომა მოხდა. სცადე თავიდან.");
+          setError(am ? "Ինչ-որ բան այն չէր։ Խնդրում ենք նորից փորձել։" : en ? "Something went wrong. Please try again." : "რაღაც შეცდომა მოხდა. სცადე თავიდან.");
         }
       }
     });
@@ -74,7 +75,7 @@ export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
       <div className="mb-2 flex items-center gap-2">
         <AlertTriangle className="size-4 text-destructive" />
         <h2 className="text-base font-semibold text-destructive">
-          {en ? "Danger zone" : "საშიში ზონა"}
+          {am ? "Վտանգավոր գոտի" : en ? "Danger zone" : "საშიში ზონა"}
         </h2>
       </div>
       <p className="mb-5 text-sm text-foreground/75">
@@ -87,7 +88,7 @@ export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
         <DialogTrigger asChild>
           <Button variant="destructive">
             <Trash2 className="size-4" />
-            {en ? "Delete account" : "ანგარიშის წაშლა"}
+            {am ? "Ջնջել հաշիվը" : am ? "Ջնջել հաշիվը" : en ? "Delete account" : "ანგარიშის წაშლა"}
           </Button>
         </DialogTrigger>
         <DialogContent>
@@ -103,7 +104,7 @@ export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
           <div className="space-y-4 text-sm">
             <div>
               <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {en ? "Will be deleted" : "წაიშლება"}
+                {am ? "Կջնջվի" : en ? "Will be deleted" : "წაიშლება"}
               </div>
               <ul className="space-y-1.5 text-foreground/85">
                 {(en ? DELETION_LIST_EN : DELETION_LIST).map((item) => (
@@ -117,7 +118,7 @@ export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
 
             <div className="space-y-2">
               <Label htmlFor="delete-confirm">
-                {en ? "To confirm, enter" : "დადასტურებისთვის შეიყვანე"}{" "}
+                {am ? "Հաստատելու համար մուտքագրեք" : en ? "To confirm, enter" : "დადასტურებისთვის შეიყვანე"}{" "}
                 <span className="font-mono font-semibold text-destructive">
                   {confirmPhrase}
                 </span>
@@ -149,7 +150,7 @@ export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
               }}
               disabled={isPending}
             >
-              {en ? "Cancel" : "გაუქმება"}
+              {am ? "Չեղարկել" : en ? "Cancel" : "გაუქმება"}
             </Button>
             <Button
               variant="destructive"
@@ -159,12 +160,12 @@ export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
               {isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  {en ? "Deleting…" : "იშლება…"}
+                  {am ? "Ջնջվում է…" : en ? "Deleting…" : "იშლება…"}
                 </>
               ) : (
                 <>
                   <Trash2 className="size-4" />
-                  {en ? "Yes, delete it" : "დიახ, წაშალე"}
+                  {am ? "Այո, ջնջել" : en ? "Yes, delete it" : "დიახ, წაშალე"}
                 </>
               )}
             </Button>

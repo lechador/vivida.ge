@@ -24,6 +24,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function MbtiGate({ questions, locale = "ka" }: { questions: MbtiQuestion[]; locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [result, setResult] = useState<MbtiResult | null>(null);
   const [noAnswers, setNoAnswers] = useState(false);
 
@@ -47,10 +48,10 @@ export function MbtiGate({ questions, locale = "ka" }: { questions: MbtiQuestion
     return (
       <div className="rounded-2xl border border-border bg-card/50 p-8 text-center">
         <p className="text-sm text-muted-foreground">
-          {en ? "No saved answers were found. Please take the test again." : "პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან."}
+          {am ? "Պահված պատասխաններ չեն գտնվել։ Խնդրում ենք նորից անցնել թեստը։" : en ? "No saved answers were found. Please take the test again." : "პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან."}
         </p>
         <Button asChild variant="mystic" className="mt-4">
-          <Link href="/pirovnebis-testi">{en ? "Start the test" : "ტესტის დაწყება"}</Link>
+          <Link href="/pirovnebis-testi">{am ? "Սկսել թեստը" : en ? "Start the test" : "ტესტის დაწყება"}</Link>
         </Button>
       </div>
     );
@@ -75,20 +76,20 @@ export function MbtiGate({ questions, locale = "ka" }: { questions: MbtiQuestion
           <Lock className="size-5 text-[var(--vivida-violet)]" />
         </div>
         <h2 className="mt-4 text-lg font-semibold tracking-tight sm:text-xl">
-          {en ? "Your full profile is ready" : "შენი ღრმა ანალიზი მზადაა"}
+          {am ? "Ձեր ամբողջական պրոֆիլը պատրաստ է" : en ? "Your full profile is ready" : "შენი ღრმა ანალიზი მზადაა"}
         </h2>
         <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-          {en ? "Sign in or create an account to save your result and unlock the complete personality profile." : "შედი ან დარეგისტრირდი, რომ ნახო სრული ფსიქოლოგიურ-ასტროლოგიური ანალიზი — მიიღებ ელფოსტაზეც."}
+          {am ? "Մուտք գործեք կամ ստեղծեք հաշիվ՝ ձեր արդյունքը պահպանելու և անհատականության ամբողջական պրոֆիլը բացելու համար։" : en ? "Sign in or create an account to save your result and unlock the complete personality profile." : "შედი ან დარეგისტრირდი, რომ ნახო სრული ფსიქოლოგიურ-ასტროლოგიური ანალიზი — მიიღებ ელფოსტაზეც."}
         </p>
         <div className="mt-5 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
           <Button asChild variant="mystic" size="lg">
             <Link href={`/signup?next=${next}`}>
               <Sparkles className="size-4" />
-              {en ? "Create free account" : "დარეგისტრირდი უფასოდ"}
+              {am ? "Ստեղծել անվճար հաշիվ" : en ? "Create free account" : "დარეგისტრირდი უფასოდ"}
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link href={`/login?next=${next}`}>{en ? "Sign in" : "შესვლა"}</Link>
+            <Link href={`/login?next=${next}`}>{am ? "Մուտք գործել" : en ? "Sign in" : "შესვლა"}</Link>
           </Button>
         </div>
       </div>

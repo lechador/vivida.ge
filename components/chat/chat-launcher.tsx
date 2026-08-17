@@ -116,6 +116,7 @@ export function ChatLauncher({
   locale = "ka",
 }: Props) {
   const en = locale !== "ka";
+  const am = locale === "am";
   // In "page" mode the panel is always considered open — the route is
   // the panel. In other modes it's a togglable surface.
   const [open, setOpen] = useState(mode === "page");
@@ -575,7 +576,7 @@ export function ChatLauncher({
       {/* Floating launcher button */}
       <motion.button
         type="button"
-        aria-label={en ? "Chat" : "ჩატი"}
+        aria-label={am ? "Զրույց" : am ? "Զրույց" : en ? "Chat" : "ჩატი"}
         data-chat-launcher
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.05 }}
@@ -654,6 +655,7 @@ function ConversationList({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <>
       <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
@@ -661,7 +663,7 @@ function ConversationList({
         {onClose && (
           <button
             type="button"
-            aria-label={en ? "Close" : "დახურვა"}
+            aria-label={am ? "Փակել" : en ? "Close" : "დახურვა"}
             onClick={onClose}
             className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
           >
@@ -673,7 +675,7 @@ function ConversationList({
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
           <MessageCircle className="size-8 text-muted-foreground/50" />
           <p className="text-sm text-muted-foreground">
-            {en ? "You have no friends yet. Add someone to start chatting." : "ჯერ მეგობრები არ გყავს — დაამატე და დაიწყე ჩატი"}
+            {am ? "Դուք դեռ ընկերներ չունեք։ Ավելացրեք մեկին՝ զրույց սկսելու համար։" : en ? "You have no friends yet. Add someone to start chatting." : "ჯერ მეგობრები არ გყავს — დაამატე და დაიწყე ჩატი"}
           </p>
           {/* Point at the deck when it's enabled; otherwise send users to
               their friends page (always available) so the CTA never dead-ends. */}
@@ -683,8 +685,8 @@ function ConversationList({
             className="text-xs text-[var(--vivida-cyan)] hover:underline"
           >
             {SOCIAL_FEATURES.swipeDeck
-              ? en ? "See who resonates with you →" : "ნახე ვინ რეზონირებს შენთან →"
-              : en ? "View friend requests →" : "ნახე მეგობრების მოთხოვნები →"}
+              ? am ? "Տեսեք, թե ով է ձեզ հետ համահունչ →" : en ? "See who resonates with you →" : "ნახე ვინ რეზონირებს შენთან →"
+              : am ? "Դիտել ընկերության հարցումները →" : en ? "View friend requests →" : "ნახე მეგობრების მოთხოვნები →"}
           </Link>
         </div>
       ) : (
@@ -806,6 +808,7 @@ function ChatView({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
@@ -878,7 +881,7 @@ function ChatView({
       <header className="flex items-center gap-3 border-b border-border/60 px-3 py-3">
         <button
           type="button"
-          aria-label={en ? "Back" : "უკან"}
+          aria-label={am ? "Ետ" : en ? "Back" : "უკან"}
           onClick={onBack}
           className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
         >
@@ -921,7 +924,7 @@ function ChatView({
               onClick={onRetry}
               className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-card"
             >
-              {en ? "Try again" : "სცადე ხელახლა"}
+              {am ? "Կրկին փորձել" : en ? "Try again" : "სცადე ხელახლა"}
             </button>
           </div>
         ) : messages === null || status === "loading" ? (
@@ -932,7 +935,7 @@ function ChatView({
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
             <MessageCircle className="size-6 text-muted-foreground/50" />
             <p className="text-xs text-muted-foreground">
-              {en ? "Start the conversation by sending the first message." : "დაიწყე საუბარი — გამოგზავნე პირველი წერილი"}
+              {am ? "Սկսեք զրույցը՝ ուղարկելով առաջին հաղորդագրությունը։" : en ? "Start the conversation by sending the first message." : "დაიწყე საუბარი — გამოგზავნე პირველი წერილი"}
             </p>
           </div>
         ) : (
@@ -977,7 +980,7 @@ function ChatView({
                   {showReadPip && (
                     <div className="mt-0.5 flex justify-end">
                       <span
-                        title={en ? "Read" : "წაიკითხა"}
+                        title={am ? "Կարդալ" : en ? "Read" : "წაიკითხა"}
                         className="inline-flex items-center"
                       >
                         <Image
@@ -1012,7 +1015,7 @@ function ChatView({
                 send();
               }
             }}
-            placeholder={en ? "Write a message…" : "დაწერე…"}
+            placeholder={am ? "Գրել հաղորդագրություն…" : en ? "Write a message…" : "დაწერე…"}
             rows={1}
             disabled={isSending}
             className="max-h-32 min-h-9 flex-1 resize-none rounded-xl border border-border bg-input/40 px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-ring"
@@ -1021,7 +1024,7 @@ function ChatView({
             type="button"
             onClick={send}
             disabled={isSending || draft.trim().length === 0}
-            aria-label={en ? "Send" : "გაგზავნა"}
+            aria-label={am ? "Ուղարկել" : en ? "Send" : "გაგზავნა"}
             className="grid size-9 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-[0_8px_24px_-8px_oklch(0.65_0.24_305/0.6)] transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
           >
             <Send className="size-4" />
@@ -1073,9 +1076,10 @@ function TypingBubble({ partner }: { partner: ChatPartner }) {
 
 function timeAgo(date: Date | string, locale: UserLocale): string {
   const en = locale !== "ka";
+  const am = locale === "am";
   const d = new Date(date);
   const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (seconds < 60) return en ? "now" : "ახლა";
+  if (seconds < 60) return am ? "հիմա" : en ? "now" : "ახლა";
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return en ? `${minutes}m` : `${minutes}წთ`;
   const hours = Math.floor(minutes / 60);

@@ -19,6 +19,7 @@ export function ProfileVisibilityToggle({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [on, setOn] = useState<boolean | null>(null); // null = loading/hidden
   const [saving, setSaving] = useState(false);
 
@@ -59,13 +60,13 @@ export function ProfileVisibilityToggle({
     <div className="mt-6 flex items-center justify-between gap-4 rounded-2xl border border-border bg-card/50 px-4 py-3.5 ring-1 ring-foreground/5 backdrop-blur-xl">
       <span className="flex items-center gap-2.5 text-sm text-foreground/85">
         <Eye className="size-4 shrink-0 text-[var(--vivida-cyan)]" />
-        {en ? "Show this result on my public profile" : "გამოაჩინე შედეგი ჩემ საჯარო პროფილზე"}
+        {am ? "Ցուցադրել այս արդյունքը իմ հանրային պրոֆիլում" : en ? "Show this result on my public profile" : "გამოაჩინე შედეგი ჩემ საჯარო პროფილზე"}
       </span>
       <button
         type="button"
         role="switch"
         aria-checked={on}
-        aria-label={en ? "Show on public profile" : "საჯარო პროფილზე ჩვენება"}
+        aria-label={am ? "Ցուցադրել հանրային պրոֆիլում" : en ? "Show on public profile" : "საჯარო პროფილზე ჩვენება"}
         disabled={saving}
         onClick={toggle}
         className={cn(

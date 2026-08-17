@@ -32,6 +32,7 @@ export function SwipeDeck({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const router = useRouter();
   const [deck, setDeck] = useState(cards);
   const [exhausted, setExhausted] = useState(false);
@@ -169,11 +170,12 @@ function DeckExhausted({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
       <Compass className="mx-auto mb-3 size-8 text-muted-foreground" />
       <h2 className="text-lg font-semibold">
-        {en ? "That is everyone for today" : "დღეს ეს იყო"}
+        {am ? "Այսօրվա համար բոլորն այսքանն էին" : en ? "That is everyone for today" : "დღეს ეს იყო"}
       </h2>
       <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
         {en
@@ -183,11 +185,11 @@ function DeckExhausted({
       <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
         <Button onClick={onReshuffle} variant="outline" size="sm">
           <RotateCcw className="size-4" />
-          {en ? "Refresh" : "ხელახლა"}
+          {am ? "Թարմացնել" : en ? "Refresh" : "ხელახლა"}
         </Button>
         <Button asChild variant="ghost" size="sm">
           <Link href="/friends">
-            {en ? "My friends →" : "ჩემი მეგობრები →"}
+            {am ? "Իմ ընկերները →" : en ? "My friends →" : "ჩემი მეგობრები →"}
           </Link>
         </Button>
       </div>

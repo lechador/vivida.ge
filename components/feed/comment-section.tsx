@@ -64,6 +64,7 @@ export function CommentSection({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [comments, setComments] = useState<FeedComment[] | null>(null);
   const [body, setBody] = useState("");
   const [replyParentId, setReplyParentId] = useState<string | null>(null);
@@ -198,7 +199,7 @@ export function CommentSection({
                 onClick={() => setLoadFailed(false)}
                 className="rounded-full border border-border px-3 py-1.5 text-[11px] text-foreground transition-colors hover:bg-card/80"
               >
-                {en ? "Try again" : "სცადე ხელახლა"}
+                {am ? "Կրկին փորձել" : en ? "Try again" : "სცადე ხელახლა"}
               </button>
             </div>
           )}
@@ -265,7 +266,7 @@ export function CommentSection({
 
           {comments && comments.length === 0 && !loading && (
             <p className="px-1 text-xs text-muted-foreground/80">
-              {en ? "No comments yet—start the conversation." : "ჯერ კომენტარი არ არის — დაიწყე საუბარი."}
+              {am ? "Դեռ մեկնաբանություններ չկան. սկսեք զրույցը։" : en ? "No comments yet—start the conversation." : "ჯერ კომენტარი არ არის — დაიწყე საუბარი."}
             </p>
           )}
 
@@ -279,7 +280,7 @@ export function CommentSection({
               onKeyDown={(e) => {
                 if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit();
               }}
-              placeholder={en ? "Write a comment…" : "დაწერე კომენტარი..."}
+              placeholder={am ? "Գրել մեկնաբանություն…" : en ? "Write a comment…" : "დაწერე კომენტარი..."}
               rows={2}
               maxLength={COMMENT_BODY_MAX + 20}
               className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
@@ -313,7 +314,7 @@ export function CommentSection({
                   ) : (
                     <Send className="size-3" />
                   )}
-                  {en ? "Add" : "დამატება"}
+                  {am ? "Ավելացնել" : en ? "Add" : "დამატება"}
                 </button>
               </div>
             </div>
@@ -348,6 +349,7 @@ function CommentRow({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const canDelete =
     comment.author.id === viewerId ||
     postAuthorId === viewerId ||
@@ -356,7 +358,7 @@ function CommentRow({
     comment.author.displayName ??
     comment.author.name?.split(" ")[0] ??
     comment.author.username ??
-    (en ? "Stargazer" : "ვარსკვლავო");
+    (am ? "Աստղադիտող" : en ? "Stargazer" : "ვარსკვლავო");
   const profileHref = comment.author.username
     ? `/u/${comment.author.username}`
     : null;
@@ -423,7 +425,7 @@ function CommentRow({
                 className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
               >
                 <Reply className="size-3" />
-                {en ? "Reply" : "უპასუხე"}
+                {am ? "Պատասխանել" : en ? "Reply" : "უპასუხე"}
               </button>
             )}
             {canDelete && (
@@ -431,7 +433,7 @@ function CommentRow({
                 type="button"
                 onClick={() => onDelete(comment.id)}
                 disabled={isPending}
-                aria-label={en ? "Delete" : "წაშლა"}
+                aria-label={am ? "Ջնջել" : am ? "Ջնջել" : en ? "Delete" : "წაშლა"}
                 className="inline-flex items-center gap-1 transition-colors hover:text-[var(--vivida-pink)]"
               >
                 <Trash2 className="size-3" />
@@ -471,6 +473,7 @@ function ReplyComposer({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const remaining = COMMENT_BODY_MAX - value.length;
   const overflow = remaining < 0;
   const disabled = isPending || value.trim().length === 0 || overflow;
@@ -486,7 +489,7 @@ function ReplyComposer({
           if ((e.metaKey || e.ctrlKey) && e.key === "Enter") onSubmit();
           if (e.key === "Escape") onCancel();
         }}
-        placeholder={en ? "Write a reply…" : "დაწერე პასუხი..."}
+        placeholder={am ? "Գրել պատասխան…" : en ? "Write a reply…" : "დაწერე პასუხი..."}
         rows={2}
         maxLength={COMMENT_BODY_MAX + 20}
         className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
@@ -515,7 +518,7 @@ function ReplyComposer({
             disabled={isPending}
             className="text-[11px] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
           >
-            {en ? "Cancel" : "გაუქმება"}
+            {am ? "Չեղարկել" : en ? "Cancel" : "გაუქმება"}
           </button>
           <button
             type="button"
@@ -528,7 +531,7 @@ function ReplyComposer({
             ) : (
               <Send className="size-3" />
             )}
-            {en ? "Reply" : "პასუხი"}
+            {am ? "Պատասխանել" : en ? "Reply" : "პასუხი"}
           </button>
         </div>
       </div>

@@ -26,6 +26,7 @@ export function TopUpCard({
   countryCode?: string | null;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const packs = creditPacksForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
 
@@ -57,21 +58,21 @@ export function TopUpCard({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           <CreditCard className="size-4 text-[var(--vivida-cyan)]" />
-          {en ? "Top up balance" : "ბალანსის შევსება"}
+          {am ? "Լիցքավորել հաշվեկշիռը" : en ? "Top up balance" : "ბალანსის შევსება"}
         </div>
         <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
           <Check className="size-3.5 text-[var(--vivida-cyan)]" />
-          {en ? "Secure one-time payment" : "ერთჯერადი უსაფრთხო გადახდა"}
+          {am ? "Անվտանգ միանվագ վճարում" : en ? "Secure one-time payment" : "ერთჯერადი უსაფრთხო გადახდა"}
         </span>
       </div>
       <h2 className="mt-2 text-xl font-semibold tracking-tight">
-        {en ? "How many credits do you need?" : "რამდენი კრედიტი გჭირდება?"}
+        {am ? "Քանի՞ կրեդիտ է ձեզ անհրաժեշտ։" : en ? "How many credits do you need?" : "რამდენი კრედიტი გჭირდება?"}
       </h2>
 
       <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
         {packs.map((p, i) => {
           const featured = i === 1;
-          const badge = i === 0 ? (en ? "Starter" : "საწყისი") : i === 1 ? (en ? "Most popular" : "რჩეული") : (en ? "Best value" : "საუკეთესო ფასი");
+          const badge = i === 0 ? (am ? "Սկզբնական" : en ? "Starter" : "საწყისი") : i === 1 ? (am ? "Ամենահանրաճանաչը" : en ? "Most popular" : "რჩეული") : (am ? "Լավագույն արժեք" : en ? "Best value" : "საუკეთესო ფასი");
           return (
             <button
               key={p.id}
@@ -97,12 +98,12 @@ export function TopUpCard({
                 )}
               </div>
               <div className="text-xs text-muted-foreground">
-                {en ? "credits" : "კრედიტი"}
+                {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}
               </div>
               <div className="mt-1 text-lg font-semibold">
                 {formatBillingAmount(p.amountMinor, p.currency, locale)}
               </div>
-              <div className="text-[10px] text-muted-foreground">≈ {Math.floor(p.credits / 5)} {en ? "unlocks" : "გახსნა"}</div>
+              <div className="text-[10px] text-muted-foreground">≈ {Math.floor(p.credits / 5)} {am ? "բացում է" : en ? "unlocks" : "გახსნა"}</div>
             </button>
           );
         })}

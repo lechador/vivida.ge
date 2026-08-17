@@ -30,6 +30,7 @@ export default async function OnboardingPage({
   const user = await requireUser();
   const locale = await getRequestLocale();
   const en = locale !== "ka";
+  const am = locale === "am";
   const { next, fast } = await searchParams;
 
   const [existing] = await db
@@ -63,7 +64,7 @@ export default async function OnboardingPage({
           </span>
         </Link>
         <div className="text-right text-xs text-muted-foreground">
-          {en ? "Hi" : "სალამი"}, {user.name?.split(" ")[0] ?? (en ? "stargazer" : "ვარსკვლავო")} ✨
+          {am ? "Բարև" : en ? "Hi" : "სალამი"}, {user.name?.split(" ")[0] ?? (am ? "աստղադիտող" : en ? "stargazer" : "ვარსკვლავო")} ✨
         </div>
       </header>
 

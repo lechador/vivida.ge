@@ -27,6 +27,7 @@ export function VisibilityCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [username, setUsername] = useState(
     initial.username ?? suggestUsername(defaultName)
   );
@@ -76,7 +77,7 @@ export function VisibilityCard({
   return (
     <div className="rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
       <header className="mb-5">
-        <h2 className="text-lg font-semibold">{en ? "Public profile" : "საჯარო პროფილი"}</h2>
+        <h2 className="text-lg font-semibold">{am ? "Հանրային պրոֆիլ" : en ? "Public profile" : "საჯარო პროფილი"}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           {en
             ? "Choose a username, display name and bio. Other people can see your big three and your shared compatibility."
@@ -86,7 +87,7 @@ export function VisibilityCard({
 
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="username">{en ? "Username" : "მომხმარებლის სახელი"}</Label>
+          <Label htmlFor="username">{am ? "Օգտանուն" : en ? "Username" : "მომხმარებლის სახელი"}</Label>
           <div className="flex items-stretch overflow-hidden rounded-lg border border-border bg-input/40 transition-colors focus-within:border-transparent focus-within:ring-2 focus-within:ring-ring">
             <span className="flex select-none items-center bg-card/60 px-3 text-sm text-muted-foreground">
               vivida.ge/u/
@@ -104,34 +105,34 @@ export function VisibilityCard({
           </div>
           {usernameInvalid ? (
             <p className="text-xs text-destructive">
-              {en ? "3–24 characters; use only a–z, 0–9 and _" : "3-24 სიმბოლო, მხოლოდ a-z, 0-9 და _"}
+              {am ? "3–24 նիշ; օգտագործել միայն a–z, 0–9 և _" : en ? "3–24 characters; use only a–z, 0–9 and _" : "3-24 სიმბოლო, მხოლოდ a-z, 0-9 და _"}
             </p>
           ) : (
             <p className="text-xs text-muted-foreground">
-              {en ? "Only a–z, 0–9 and _ (3–24 characters)" : "მხოლოდ a-z, 0-9 და _ (3-24 სიმბოლო)"}
+              {am ? "Միայն a–z, 0–9 և _ (3–24 նիշ)" : en ? "Only a–z, 0–9 and _ (3–24 characters)" : "მხოლოდ a-z, 0-9 და _ (3-24 სიმბოლო)"}
             </p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="display-name">{en ? "Display name" : "ნაჩვენები სახელი"}</Label>
+          <Label htmlFor="display-name">{am ? "Ցուցադրվող անուն" : en ? "Display name" : "ნაჩვენები სახელი"}</Label>
           <Input
             id="display-name"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             maxLength={60}
-            placeholder={en ? "Anna" : "ანა"}
+            placeholder={am ? "Աննա" : en ? "Anna" : "ანა"}
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="bio">{en ? "Bio" : "ბიო"}</Label>
+          <Label htmlFor="bio">{am ? "Կենսագրություն" : en ? "Bio" : "ბიო"}</Label>
           <textarea
             id="bio"
             value={bio}
             onChange={(e) => setBio(e.target.value.slice(0, 280))}
             rows={3}
-            placeholder={en ? "A short sentence about you…" : "მოკლე ერთი ფრაზა შენზე…"}
+            placeholder={am ? "Մի կարճ նախադասություն ձեր մասին…" : en ? "A short sentence about you…" : "მოკლე ერთი ფრაზა შენზე…"}
             className="w-full rounded-lg border border-border bg-input/40 px-4 py-2 text-base ring-offset-background backdrop-blur-sm transition-colors placeholder:text-muted-foreground/60 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           />
           <div className="text-right text-xs text-muted-foreground">
@@ -142,7 +143,7 @@ export function VisibilityCard({
         {/* Discovery opt-out — saves instantly, no Save button needed */}
         <div className="flex items-start justify-between gap-4 rounded-xl border border-border/70 bg-card/40 p-4">
           <div className="min-w-0">
-            <div className="text-sm font-medium">{en ? "Discoverability" : "აღმოჩენადობა"}</div>
+            <div className="text-sm font-medium">{am ? "Հայտնաբերելիություն" : am ? "Հայտնաբերելիություն" : en ? "Discoverability" : "აღმოჩენადობა"}</div>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
               {en
                 ? "Appear in People, search and suggestions. When disabled, your profile remains available only through its direct link."
@@ -180,14 +181,14 @@ export function VisibilityCard({
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="text-xs text-muted-foreground">
-          {savedAt && !isPending && (en ? "Saved ✓" : "შენახულია ✓")}
+          {savedAt && !isPending && (am ? "Պահպանված է ✓" : en ? "Saved ✓" : "შენახულია ✓")}
         </div>
         <div className="flex items-center gap-2">
           {initial.username && (
             <Button asChild variant="outline" size="sm">
               <Link href={`/u/${initial.username}`}>
                 <ExternalLink className="size-3.5" />
-                {en ? "View profile" : "ნახე პროფილი"}
+                {am ? "Դիտել պրոֆիլը" : en ? "View profile" : "ნახე პროფილი"}
               </Link>
             </Button>
           )}
@@ -197,7 +198,7 @@ export function VisibilityCard({
             disabled={isPending || !username || usernameInvalid}
             size="sm"
           >
-            {isPending ? (en ? "Saving…" : "ინახება…") : (en ? "Save" : "შენახვა")}
+            {isPending ? (am ? "Պահպանվում է…" : en ? "Saving…" : "ინახება…") : (am ? "Պահպանել" : en ? "Save" : "შენახვა")}
           </Button>
         </div>
       </div>

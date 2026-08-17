@@ -8,10 +8,12 @@ import { EqResultClient } from "@/components/eq/eq-result";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) !== "ka";
+  const locale = await getRequestLocale();
+  const en = locale !== "ka";
+  const am = locale === "am";
   return {
-    title: en ? "Your EQ Result" : "შენი EQ შედეგი",
-    description: en ? "Your emotional intelligence score and five-domain emotional profile." : "შენი ემოციური ინტელექტის ტესტის შედეგი — EQ ქულა და ემოციური რუკა ხუთ სფეროში.",
+    title: am ? "Ձեր ԶԳ Արդյունքը" : en ? "Your EQ Result" : "შენი EQ შედეგი",
+    description: am ? "Ձեր էմոցիոնալ ինտելեկտի միավորը և հինգ ոլորտների էմոցիոնալ պրոֆիլը։" : en ? "Your emotional intelligence score and five-domain emotional profile." : "შენი ემოციური ინტელექტის ტესტის შედეგი — EQ ქულა და ემოციური რუკა ხუთ სფეროში.",
     robots: { index: false, follow: false },
   };
 }

@@ -40,6 +40,7 @@ export function FeedList({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [posts, setPosts] = useState<FeedPost[]>(initial);
   const [hasMore, setHasMore] = useState(
     !disablePagination && initial.length >= PAGE_SIZE
@@ -85,13 +86,13 @@ export function FeedList({
             active={filter === "all"}
             onClick={() => setFilter("all")}
           >
-            {en ? "All" : "ყველა"}
+            {am ? "Բոլորը" : en ? "All" : "ყველა"}
           </FilterChip>
           <FilterChip
             active={filter === "sign"}
             onClick={() => setFilter("sign")}
           >
-            {en ? "My sign" : "ჩემი ნიშნით"}
+            {am ? "Իմ նշանը" : en ? "My sign" : "ჩემი ნიშნით"}
           </FilterChip>
         </div>
       )}
@@ -130,7 +131,7 @@ export function FeedList({
             ) : (
               <Sparkles className="size-4" />
             )}
-            {en ? "More posts" : "მეტი პოსტი"}
+            {am ? "Ավելի շատ գրառումներ" : en ? "More posts" : "მეტი პოსტი"}
           </Button>
         </div>
       )}
@@ -165,10 +166,11 @@ function FilterChip({
 
 function EmptyState({ locale }: { locale: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
       <Sparkles className="mx-auto mb-3 size-8 text-[var(--vivida-violet)]" />
-      <h2 className="text-lg font-semibold">{en ? "The feed is empty" : "ფიდი ჯერ ცარიელია"}</h2>
+      <h2 className="text-lg font-semibold">{am ? "Ժապավենը դատարկ է" : en ? "The feed is empty" : "ფიდი ჯერ ცარიელია"}</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
         {en
           ? "Be the first to share a thought, question, quote, or simply how you feel."
@@ -180,16 +182,17 @@ function EmptyState({ locale }: { locale: UserLocale }) {
 
 function SignEmptyState({ locale }: { locale: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-8 text-center">
       <p className="text-sm text-muted-foreground">
-        {en ? "No one with your sign has posted yet—will you be first?" : "ჯერ შენი ნიშნით არავის დაუპოსტავს — შენ თუ პირველი იქნები?"}
+        {am ? "Ձեր նշանով դեռ ոչ ոք գրառում չի արել. դուք կլինե՞ք առաջինը։" : en ? "No one with your sign has posted yet—will you be first?" : "ჯერ შენი ნიშნით არავის დაუპოსტავს — შენ თუ პირველი იქნები?"}
       </p>
       <Link
         href="/feed"
         className="mt-2 inline-block text-xs text-[var(--vivida-violet)] hover:underline"
       >
-        {en ? "View all" : "ნახე ყველა"}
+        {am ? "Դիտել բոլորը" : en ? "View all" : "ნახე ყველა"}
       </Link>
     </div>
   );

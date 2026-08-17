@@ -27,6 +27,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale !== "ka";
+  const am = locale === "am";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
 
@@ -87,9 +88,9 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   if (stored === "missing") {
     return (
       <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
-        <p className="text-foreground/85">{en ? "Take the test first to see your result." : "ჯერ ტესტი უნდა გაიარო."}</p>
+        <p className="text-foreground/85">{am ? "Նախ անցեք թեստը՝ Ձեր արդյունքը տեսնելու համար։" : en ? "Take the test first to see your result." : "ჯერ ტესტი უნდა გაიარო."}</p>
         <Button asChild variant="mystic" className="mt-5">
-          <Link href="/eq-testi">{en ? "Start the test" : "ტესტის დაწყება"}</Link>
+          <Link href="/eq-testi">{am ? "Սկսել թեստը" : en ? "Start the test" : "ტესტის დაწყება"}</Link>
         </Button>
       </div>
     );
@@ -119,7 +120,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
       {/* Score card (free) */}
       <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
         <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Your EQ score" : "შენი EQ ქულა"}
+          {am ? "Ձեր EQ միավորը" : en ? "Your EQ score" : "შენი EQ ქულა"}
         </div>
         <div className="mt-2 bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-7xl font-bold leading-none tracking-tight text-transparent sm:text-8xl">
           {result.overall}
@@ -162,7 +163,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
                   : "დარეგისტრირდი უფასოდ და ნახე შენი ემოციური რუკა ხუთივე სფეროში — და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
-                <Link href="/signup?from=eq">{en ? "Create free account" : "უფასო რეგისტრაცია"}</Link>
+                <Link href="/signup?from=eq">{am ? "Ստեղծել անվճար հաշիվ" : en ? "Create free account" : "უფასო რეგისტრაცია"}</Link>
               </Button>
             </div>
           </div>
@@ -177,10 +178,10 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
         <ShareButton overall={result.overall} locale={locale} />
         <Button type="button" variant="outline" onClick={retake} className="gap-1.5">
           <RotateCcw className="size-4" />
-          {en ? "Retake" : "თავიდან გავლა"}
+          {am ? "Կրկնել" : en ? "Retake" : "თავიდან გავლა"}
         </Button>
         <Button asChild variant="ghost">
-          <Link href="/tests">{en ? "Other tests" : "სხვა ტესტები"}</Link>
+          <Link href="/tests">{am ? "Այլ թեստեր" : en ? "Other tests" : "სხვა ტესტები"}</Link>
         </Button>
       </div>
 
@@ -197,6 +198,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
 
 function ShareButton({ overall, locale }: { overall: number; locale: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [copied, setCopied] = useState(false);
   async function share() {
     const url = en ? "https://www.vividaastro.com/eq-testi" : "https://www.vivida.ge/eq-testi";
@@ -205,7 +207,7 @@ function ShareButton({ overall, locale }: { overall: number; locale: UserLocale 
       : `ჩემი ემოციური ინტელექტი (EQ) Vivida-ზე: ${overall} 💗 შენ რას მიიღებ?`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: en ? "Vivida EQ Test" : "Vivida EQ ტესტი", text, url });
+        await navigator.share({ title: am ? "Vivida EQ թեստ" : en ? "Vivida EQ Test" : "Vivida EQ ტესტი", text, url });
         return;
       } catch {
         /* cancelled */
@@ -222,7 +224,7 @@ function ShareButton({ overall, locale }: { overall: number; locale: UserLocale 
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-1.5">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? (en ? "Copied" : "დაკოპირდა") : en ? "Share" : "გააზიარე"}
+      {copied ? (am ? "Պատճենված է" : en ? "Copied" : "დაკოპირდა") : am ? "Կիսվել" : en ? "Share" : "გააზიარე"}
     </Button>
   );
 }

@@ -26,6 +26,7 @@ export function PhotoCarousel({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [index, setIndex] = useState(0);
   const total = photos.length;
 
@@ -118,7 +119,7 @@ export function PhotoCarousel({
             <button
               type="button"
               onClick={() => go(-1)}
-              aria-label={en ? "Back" : "უკან"}
+              aria-label={am ? "Ետ" : en ? "Back" : "უკან"}
               className="absolute left-3 top-1/2 z-20 hidden -translate-y-1/2 grid size-9 place-items-center rounded-full bg-black/55 text-white opacity-0 backdrop-blur transition-opacity hover:bg-black/75 sm:grid group-hover:opacity-100"
             >
               <ChevronLeft className="size-4" />
@@ -128,7 +129,7 @@ export function PhotoCarousel({
             <button
               type="button"
               onClick={() => go(1)}
-              aria-label={en ? "Forward" : "წინ"}
+              aria-label={am ? "Առաջ" : en ? "Forward" : "წინ"}
               className="absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 grid size-9 place-items-center rounded-full bg-black/55 text-white opacity-0 backdrop-blur transition-opacity hover:bg-black/75 sm:grid group-hover:opacity-100"
             >
               <ChevronRight className="size-4" />
@@ -155,6 +156,7 @@ function SwipeZones({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   // Touch swipe state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
@@ -173,14 +175,14 @@ function SwipeZones({
     >
       <button
         type="button"
-        aria-label={en ? "Previous photo" : "წინა ფოტო"}
+        aria-label={am ? "Նախորդ լուսանկար" : en ? "Previous photo" : "წინა ფოტო"}
         onClick={onLeft}
         className="h-full w-1/3 cursor-pointer focus:outline-none"
         disabled={index === 0}
       />
       <button
         type="button"
-        aria-label={en ? "Next photo" : "შემდეგი ფოტო"}
+        aria-label={am ? "Հաջորդ լուսանկար" : en ? "Next photo" : "შემდეგი ფოტო"}
         onClick={onRight}
         className="h-full flex-1 cursor-pointer focus:outline-none"
         disabled={index === total - 1}

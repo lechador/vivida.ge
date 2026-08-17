@@ -33,6 +33,7 @@ export default async function TimingPage() {
   const user = await requireUser();
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
+  const am = locale === "am";
 
   const [[chart], [profile]] = await Promise.all([
     db.select({ data: charts.data }).from(charts).where(eq(charts.userId, user.id)).limit(1),
@@ -43,8 +44,8 @@ export default async function TimingPage() {
     return (
       <AstroLockedMain
         active="timing"
-        title={en ? "Your best days need a natal chart" : "საუკეთესო დღეები ნატალურ რუკას საჭიროებს"}
-        description={en ? "Add your birth details to see which days support your momentum and which call for care." : "შეავსე დაბადების მონაცემები, რომ ნახო, რომელი დღეები უბერავს ქარს ზურგში."}
+        title={am ? "Ձեր լավագույն օրերին անհրաժեշտ է նատալ քարտեզ" : en ? "Your best days need a natal chart" : "საუკეთესო დღეები ნატალურ რუკას საჭიროებს"}
+        description={am ? "Ավելացրեք Ձեր ծննդյան տվյալները՝ տեսնելու համար, թե որ օրերն են աջակցում Ձեր թափին և որոնք են խնամք պահանջում։" : en ? "Add your birth details to see which days support your momentum and which call for care." : "შეავსე დაბადების მონაცემები, რომ ნახო, რომელი დღეები უბერავს ქარს ზურგში."}
         next="/timing"
         locale={locale}
       />
@@ -76,9 +77,9 @@ export default async function TimingPage() {
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-6 sm:px-6 sm:pt-8">
         <header className="mb-6">
           <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            {en ? "Your best" : "საუკეთესო"}{" "}
+            {am ? "Ձեր լավագույն" : en ? "Your best" : "საუკეთესო"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "days" : "დღეები"}
+              {am ? "օրերը" : en ? "days" : "დღეები"}
             </span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -94,7 +95,7 @@ export default async function TimingPage() {
             {best.length > 0 && (
               <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
                 <div className="text-xs font-medium uppercase tracking-[0.16em]" style={{ color: TIER.great.color }}>
-                  {en ? "Supportive days" : "ხელსაყრელი დღეები"}
+                  {am ? "Աջակցող օրեր" : en ? "Supportive days" : "ხელსაყრელი დღეები"}
                 </div>
                 <ul className="mt-3 space-y-1.5 text-sm">
                   {best.map((d) => (
@@ -110,7 +111,7 @@ export default async function TimingPage() {
             {tough.length > 0 && (
               <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
                 <div className="text-xs font-medium uppercase tracking-[0.16em]" style={{ color: TIER.tough.color }}>
-                  {en ? "Take extra care" : "ფრთხილად ამ დღეებში"}
+                  {am ? "Առանձնահատուկ զգուշություն" : en ? "Take extra care" : "ფრთხილად ამ დღეებში"}
                 </div>
                 <ul className="mt-3 space-y-1.5 text-sm">
                   {tough.map((d) => (
@@ -145,7 +146,7 @@ export default async function TimingPage() {
                   <span className="text-sm font-semibold tabular-nums" style={{ color: t.color }}>
                     {d.dom}
                   </span>
-                  {i === 0 && <span className="text-[9px] text-muted-foreground">{en ? "today" : "დღეს"}</span>}
+                  {i === 0 && <span className="text-[9px] text-muted-foreground">{am ? "այսօր" : en ? "today" : "დღეს"}</span>}
                 </div>
               );
             })}
@@ -165,7 +166,7 @@ export default async function TimingPage() {
         {notable.length > 0 && (
           <section className="mt-8">
             <h2 className="mb-4 text-lg font-semibold tracking-tight">
-              {en ? "Notable moments" : "მნიშვნელოვანი მომენტები"}
+              {am ? "Ուշագրավ պահեր" : en ? "Notable moments" : "მნიშვნელოვანი მომენტები"}
             </h2>
             <ul className="space-y-3">
               {notable.map((n, i) => {

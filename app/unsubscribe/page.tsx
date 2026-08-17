@@ -45,6 +45,7 @@ export default async function UnsubscribePage({
   const { token, type: rawType } = await searchParams;
   const locale = await getRequestLocale();
   const en = locale !== "ka";
+  const am = locale === "am";
   // Anonymous horoscope-email leads use their own token space + opt-out path.
   const isLead = rawType === "lead";
   const type = isLead
@@ -80,7 +81,7 @@ export default async function UnsubscribePage({
           {status === "ok" ? (
             <>
               <h1 className="mb-3 text-2xl font-semibold tracking-tight">
-                {en ? "You’re unsubscribed" : "გამოწერა გაუქმდა"}
+                {am ? "Դուք դուրս եք եկել բաժանորդագրությունից" : en ? "You’re unsubscribed" : "გამოწერა გაუქმდა"}
               </h1>
               <p className="text-sm text-muted-foreground">
                 {email ? <>{email} — </> : null}
@@ -98,17 +99,17 @@ export default async function UnsubscribePage({
               </p>
               <div className="mt-6 flex justify-center gap-3">
                 <Button asChild>
-                  <Link href="/account">{en ? "Account" : "ანგარიში"}</Link>
+                  <Link href="/account">{am ? "Հաշիվ" : en ? "Account" : "ანგარიში"}</Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link href="/">{en ? "Home" : "მთავარი"}</Link>
+                  <Link href="/">{am ? "Գլխավոր" : en ? "Home" : "მთავარი"}</Link>
                 </Button>
               </div>
             </>
           ) : status === "not_found" ? (
             <>
               <h1 className="mb-3 text-2xl font-semibold tracking-tight">
-                {en ? "This link is no longer valid" : "ბმული აღარ მოქმედებს"}
+                {am ? "Այս հղումն այլևս վավեր չէ" : en ? "This link is no longer valid" : "ბმული აღარ მოქმედებს"}
               </h1>
               <p className="text-sm text-muted-foreground">
                 {en
@@ -118,7 +119,7 @@ export default async function UnsubscribePage({
               <div className="mt-6 flex justify-center">
                 <Button asChild>
                   <Link href="/account">
-                    {en ? "Go to account" : "ანგარიშში გადასვლა"}
+                    {am ? "Անցնել հաշվին" : am ? "Անցնել հաշվին" : en ? "Go to account" : "ანგარიშში გადასვლა"}
                   </Link>
                 </Button>
               </div>
@@ -126,7 +127,7 @@ export default async function UnsubscribePage({
           ) : (
             <>
               <h1 className="mb-3 text-2xl font-semibold tracking-tight">
-                {en ? "Invalid unsubscribe link" : "გამოწერის ბმული არასწორია"}
+                {am ? "Անվավեր բաժանորդագրությունից հրաժարվելու հղում" : en ? "Invalid unsubscribe link" : "გამოწერის ბმული არასწორია"}
               </h1>
               <p className="text-sm text-muted-foreground">
                 {en

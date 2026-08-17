@@ -36,14 +36,15 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userPrefs?.locale));
   const en = locale !== "ka";
+  const am = locale === "am";
   const showUkOffer = offer === "uk" && !(await isPremiumUser(user.id));
 
   if (!profile?.dateOfBirth) {
     return (
       <AstroLockedMain
         active="report"
-        title={en ? "A natal chart needs your birth details" : "ნატალური რუკა დაბადების მონაცემებს საჭიროებს"}
-        description={en ? "Add your birth date, time and place to calculate your personal cosmic map." : "შეავსე დაბადების თარიღი, დრო და ადგილი, რომ შედგეს შენი პერსონალური კოსმიური რუკა."}
+        title={am ? "Նատալ քարտեզի համար անհրաժեշտ են ձեր ծննդյան մանրամասները" : en ? "A natal chart needs your birth details" : "ნატალური რუკა დაბადების მონაცემებს საჭიროებს"}
+        description={am ? "Ավելացրեք ձեր ծննդյան ամսաթիվը, ժամը և վայրը՝ ձեր անձնական տիեզերական քարտեզը հաշվարկելու համար։" : en ? "Add your birth date, time and place to calculate your personal cosmic map." : "შეავსე დაბადების თარიღი, დრო და ადგილი, რომ შედგეს შენი პერსონალური კოსმიური რუკა."}
         next="/report"
         locale={locale}
       />
@@ -78,11 +79,11 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
               : "Your "
             : `${firstName ?? "ვარსკვლავო"}-ის `}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {en ? "cosmic chart" : "კოსმიური რუკა"}
+            {am ? "տիեզերական քարտեզ" : en ? "cosmic chart" : "კოსმიური რუკა"}
           </span>
         </h1>
         <p className="mb-6 max-w-xl text-sm text-foreground/75 sm:text-base">
-          {en ? "The sky at your birth moment, explored one layer at a time." : "ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე."}
+          {am ? "Երկինքը ձեր ծննդյան պահին, ուսումնասիրված մեկ շերտով։" : en ? "The sky at your birth moment, explored one layer at a time." : "ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე."}
         </p>
 
         {showUkOffer && (
@@ -112,38 +113,38 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
 
         <div className="mt-12 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">{en ? "Your birth details" : "შენი დაბადების მონაცემები"}</h2>
+            <h2 className="text-lg font-semibold">{am ? "Ձեր ծննդյան մանրամասները" : en ? "Your birth details" : "შენი დაბადების მონაცემები"}</h2>
             <Button asChild variant="ghost" size="sm">
               <Link href="/onboarding">
                 <Pencil className="size-3.5" />
-                {en ? "Edit" : "რედაქტირება"}
+                {am ? "Խմբագրել" : en ? "Edit" : "რედაქტირება"}
               </Link>
             </Button>
           </div>
           <dl className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
-            <Field label={en ? "Date of birth" : "დაბადების თარიღი"} value={profile.dateOfBirth} />
+            <Field label={am ? "Ծննդյան ամսաթիվ" : en ? "Date of birth" : "დაბადების თარიღი"} value={profile.dateOfBirth} />
             <Field
-              label={en ? "Time of birth" : "დაბადების დრო"}
+              label={am ? "Ծննդյան ժամը" : en ? "Time of birth" : "დაბადების დრო"}
               value={
                 profile.timeOfBirth
                   ? profile.timeOfBirth.slice(0, 5)
-                  : en ? "Unknown (12:00 used)" : "უცნობია (გამოყენებულია 12:00)"
+                  : am ? "Անհայտ է (օգտագործվում է 12:00)" : en ? "Unknown (12:00 used)" : "უცნობია (გამოყენებულია 12:00)"
               }
             />
-            <Field label={en ? "Place of birth" : "დაბადების ადგილი"} value={profile.cityName} />
-            <Field label={en ? "Time zone" : "დროის სარტყელი"} value={profile.timezone} />
+            <Field label={am ? "Ծննդավայր" : en ? "Place of birth" : "დაბადების ადგილი"} value={profile.cityName} />
+            <Field label={am ? "Ժամային գոտի" : en ? "Time zone" : "დროის სარტყელი"} value={profile.timezone} />
           </dl>
           {(profile.latitude != null || profile.longitude != null) && (
             <details className="group mt-4 text-xs text-muted-foreground">
               <summary className="cursor-pointer select-none transition-colors hover:text-foreground">
-                {en ? "Technical details" : "ტექნიკური დეტალები"}
+                {am ? "Տեխնիկական մանրամասներ" : en ? "Technical details" : "ტექნიკური დეტალები"}
               </summary>
               <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 tabular-nums">
                 {profile.latitude != null && (
-                  <span>{en ? "Latitude" : "განედი"}: {profile.latitude.toFixed(4)}</span>
+                  <span>{am ? "Լայնություն" : en ? "Latitude" : "განედი"}: {profile.latitude.toFixed(4)}</span>
                 )}
                 {profile.longitude != null && (
-                  <span>{en ? "Longitude" : "გრძედი"}: {profile.longitude.toFixed(4)}</span>
+                  <span>{am ? "Երկայնություն" : en ? "Longitude" : "გრძედი"}: {profile.longitude.toFixed(4)}</span>
                 )}
               </div>
             </details>

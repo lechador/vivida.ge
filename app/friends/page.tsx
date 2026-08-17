@@ -68,6 +68,7 @@ export default async function FriendsPage({
     getUserLocale(user.id),
   ]);
   const en = locale !== "ka";
+  const am = locale === "am";
 
   const { viewerHasChart, friends: enrichedFriends } =
     await enrichFriendsWithSynastry(user.id, friends);
@@ -91,12 +92,12 @@ export default async function FriendsPage({
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "People" : "ხალხი"}
+          {am ? "Մարդիկ" : en ? "People" : "ხალხი"}
         </div>
         <h1 className="mb-6 text-balance text-3xl font-semibold tracking-tight sm:mb-8 sm:text-5xl">
-          {en ? "Your " : "შენი "}
+          {am ? "Ձեր " : en ? "Your " : "შენი "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {en ? "circle" : "წრე"}
+            {am ? "շրջապատը" : en ? "circle" : "წრე"}
           </span>
         </h1>
 
@@ -218,6 +219,7 @@ function CompatibilityTab({
  *  mode replaces it (used on the compatibility tab). */
 function NoChartBanner({ full = false, locale }: { full?: boolean; locale: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <div
       className={cn(
@@ -236,14 +238,14 @@ function NoChartBanner({ full = false, locale }: { full?: boolean; locale: UserL
         </span>
         <div className={cn("flex-1", full && "text-center")}>
           <h2 className="text-base font-semibold tracking-tight sm:text-lg">
-            {en ? "Your natal chart is not ready" : "შენი ცის რუკა ჯერ არ არის"}
+            {am ? "Ձեր նատալ քարտեզը պատրաստ չէ" : en ? "Your natal chart is not ready" : "შენი ცის რუკა ჯერ არ არის"}
           </h2>
           <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
-            {en ? "Add your birth details to calculate compatibility with your friends." : "შეავსე დაბადების მონაცემები — გამოვთვლი თავსებადობას ყველა შენ მეგობართან."}
+            {am ? "Ավելացրեք ծննդյան մանրամասները՝ ընկերների հետ համատեղելիությունը հաշվարկելու համար։" : en ? "Add your birth details to calculate compatibility with your friends." : "შეავსე დაბადების მონაცემები — გამოვთვლი თავსებადობას ყველა შენ მეგობართან."}
           </p>
         </div>
         <Button asChild variant="mystic" className={cn(full && "mt-2")}>
-          <Link href="/onboarding">{en ? "Add details" : "შევსება"}</Link>
+          <Link href="/onboarding">{am ? "Ավելացնել մանրամասներ" : en ? "Add details" : "შევსება"}</Link>
         </Button>
       </div>
     </div>

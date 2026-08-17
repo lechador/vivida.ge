@@ -27,6 +27,7 @@ export function PeopleList({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [people, setPeople] = useState<PersonRow[]>(initial);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [query, setQuery] = useState("");
@@ -67,14 +68,14 @@ export function PeopleList({
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={en ? "Search by name or @username" : "მოძებნე სახელით ან @username-ით"}
+          placeholder={am ? "Որոնել ըստ անվան կամ @օգտանունի" : en ? "Search by name or @username" : "მოძებნე სახელით ან @username-ით"}
           className="block w-full rounded-full border border-foreground/12 bg-[oklch(0.21_0.04_285/0.85)] py-2.5 pl-10 pr-9 text-sm text-foreground placeholder:text-muted-foreground/70 backdrop-blur-xl focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--vivida-violet)]/30"
         />
         {query && (
           <button
             type="button"
             onClick={() => setQuery("")}
-            aria-label={en ? "Clear" : "გასუფთავება"}
+            aria-label={am ? "Մաքրել" : en ? "Clear" : "გასუფთავება"}
             className="absolute right-2 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:bg-card/80 hover:text-foreground"
           >
             <X className="size-3.5" />
@@ -86,8 +87,8 @@ export function PeopleList({
         <div className="rounded-2xl border border-dashed border-border/80 bg-card/30 p-10 text-center">
           <p className="text-sm text-muted-foreground">
             {query.trim().length >= 2
-              ? en ? "No one found. Try another search." : "ვერავინ ვერ მოიძებნა — სცადე სხვა სიტყვით."
-              : en ? "No profiles yet." : "ჯერ არავინ შემოსულა."}
+              ? am ? "Ոչ ոք չգտնվեց: Փորձեք այլ որոնում:" : en ? "No one found. Try another search." : "ვერავინ ვერ მოიძებნა — სცადე სხვა სიტყვით."
+              : am ? "Դեռևս պրոֆիլներ չկան:" : en ? "No profiles yet." : "ჯერ არავინ შემოსულა."}
           </p>
         </div>
       ) : (
@@ -107,7 +108,7 @@ export function PeopleList({
             disabled={isPending}
           >
             {isPending && <Loader2 className="size-4 animate-spin" />}
-            {en ? "More people" : "მეტი ხალხი"}
+            {am ? "Ավելի շատ մարդիկ" : en ? "More people" : "მეტი ხალხი"}
           </Button>
         </div>
       )}

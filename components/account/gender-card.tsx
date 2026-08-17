@@ -12,6 +12,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function GenderCard({ initial, locale = "ka" }: { initial: "male" | "female" | null; locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [value, setValue] = useState(initial);
   const [pending, startTransition] = useTransition();
 
@@ -24,16 +25,16 @@ export function GenderCard({ initial, locale = "ka" }: { initial: "male" | "fema
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="min-w-0">
-        <div className="text-sm font-medium">{en ? "Sex" : "სქესი"}</div>
+        <div className="text-sm font-medium">{am ? "Սեռ" : en ? "Sex" : "სქესი"}</div>
         <div className="text-xs text-muted-foreground">
-          {en ? "Used only for anonymous aggregate statistics." : "გამოიყენება მხოლოდ ანონიმური, ჯამური სტატისტიკისთვის."}
+          {am ? "Օգտագործվում է միայն անանուն համախմբված վիճակագրության համար։" : en ? "Used only for anonymous aggregate statistics." : "გამოიყენება მხოლოდ ანონიმური, ჯამური სტატისტიკისთვის."}
         </div>
       </div>
       <div className={cn("flex gap-2", pending && "opacity-60")}>
         {(
           [
-            { key: "female", label: en ? "Female" : "მდედრობითი", glyph: "♀" },
-            { key: "male", label: en ? "Male" : "მამრობითი", glyph: "♂" },
+            { key: "female", label: am ? "Իգական" : en ? "Female" : "მდედრობითი", glyph: "♀" },
+            { key: "male", label: am ? "Արական" : en ? "Male" : "მამრობითი", glyph: "♂" },
           ] as const
         ).map((opt) => (
           <button

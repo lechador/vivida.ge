@@ -97,6 +97,7 @@ export function OnboardingWizard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   // Birth date is locked after first registration (the server enforces this
   // — see actions/profile.ts). When the user comes back to edit, hide the
   // date step entirely so they don't waste time on a read-only field, and
@@ -226,7 +227,7 @@ export function OnboardingWizard({
     const date = validateDate(data.date);
     const timeRes = validateTime(data.time);
     if (!date || !timeRes.ok || !data.place) {
-      setError(en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.");
+      setError(am ? "Խնդրում ենք լրացնել բոլոր դաշտերը:" : en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.");
       return;
     }
     trackEvent(ANALYTICS_EVENT.onboardingSubmitted, {
@@ -330,7 +331,7 @@ export function OnboardingWizard({
             className={step === 0 ? "invisible" : ""}
           >
             <ArrowLeft />
-            {en ? "Back" : "უკან"}
+            {am ? "Ետ" : en ? "Back" : "უკან"}
           </Button>
 
           <Button
@@ -353,7 +354,7 @@ export function OnboardingWizard({
               </>
             ) : (
               <>
-                {en ? "Continue" : "გაგრძელება"}
+                {am ? "Շարունակել" : en ? "Continue" : "გაგრძელება"}
                 <ArrowRight />
               </>
             )}

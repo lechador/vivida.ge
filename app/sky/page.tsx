@@ -45,14 +45,15 @@ export default async function SkyPage() {
   const user = await requireUser();
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
+  const am = locale === "am";
   // Positions only — never wait on (or trigger) chart AI here.
   const chart = await ensureChartFor(user.id, { aiUpgrade: "skip" });
   if (!chart)
     return (
       <AstroLockedMain
         active="sky"
-        title={en ? "The live sky needs your natal chart" : "ცოცხალი ცა ნატალურ რუკას საჭიროებს"}
-        description={en ? "Add your birth details to see where today's planets fall in your chart." : "შეავსე დაბადების მონაცემები, რომ ნახო, სად არიან პლანეტები ახლა შენს რუკაზე."}
+        title={am ? "Ուղիղ եթերի երկնքին անհրաժեշտ է Ձեր նատալ քարտեզը" : en ? "The live sky needs your natal chart" : "ცოცხალი ცა ნატალურ რუკას საჭიროებს"}
+        description={am ? "Ավելացրեք Ձեր ծննդյան տվյալները՝ տեսնելու համար, թե որտեղ են ընկնում այսօրվա մոլորակները Ձեր քարտեզում։" : en ? "Add your birth details to see where today's planets fall in your chart." : "შეავსე დაბადების მონაცემები, რომ ნახო, სად არიან პლანეტები ახლა შენს რუკაზე."}
         next="/sky"
         locale={locale}
       />
@@ -74,10 +75,10 @@ export default async function SkyPage() {
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <header className="mb-8">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Live sky · now" : "ცოცხალი ცა · ახლა"}
+            {am ? "Ուղիղ եթերի երկինք · հիմա" : en ? "Live sky · now" : "ცოცხალი ცა · ახლა"}
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            {en ? "The Moon is now" : "მთვარე ახლა"}{" "}
+            {am ? "Լուսինը հիմա" : en ? "The Moon is now" : "მთვარე ახლა"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
               {en ? `in ${moonSign.labelEn}` : `${moonSign.labelKa}შია`}
               {sky.moon.house
@@ -102,7 +103,7 @@ export default async function SkyPage() {
         {sky.aspects.length > 0 && (
           <section className="mt-12">
             <h2 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {en ? "Active aspects now" : "აქტიური ასპექტები ახლა"}
+              {am ? "Ակտիվ ասպեկտներ հիմա" : en ? "Active aspects now" : "აქტიური ასპექტები ახლა"}
             </h2>
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
               {sky.aspects.map((a, i) => {
@@ -128,7 +129,7 @@ export default async function SkyPage() {
                         {n?.symbol} {en ? n?.labelEn ?? a.natal : n?.labelKa ?? a.natal}
                       </span>
                       <span className="text-muted-foreground">
-                        {en ? "orb" : "ორბისი"} {a.orb.toFixed(1)}°
+                        {am ? "օրբ" : en ? "orb" : "ორბისი"} {a.orb.toFixed(1)}°
                       </span>
                     </div>
                     <p className="mt-2 text-sm font-medium text-foreground/95">

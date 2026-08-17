@@ -9,6 +9,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function BigFiveChart({ result, locale = "ka" }: { result: BigFiveResult; locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const points: RadarPoint[] = result.traits.map((t) => ({
     key: t.key,
     label: en ? t.nameEn : t.nameKa,
@@ -19,7 +20,7 @@ export function BigFiveChart({ result, locale = "ka" }: { result: BigFiveResult;
   return (
     <div className="rounded-3xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
       <h2 className="mb-2 text-center text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        {en ? "Your personality profile" : "შენი პიროვნების პროფილი"}
+        {am ? "Ձեր անձնական պրոֆիլը" : en ? "Your personality profile" : "შენი პიროვნების პროფილი"}
       </h2>
       <TraitRadar points={points} locale={locale} />
 

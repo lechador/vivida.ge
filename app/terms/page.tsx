@@ -9,8 +9,9 @@ import { LEGAL_ENTITY } from "@/lib/legal-entity";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
+  const am = locale === "am";
   return {
-    title: en ? "Terms and Conditions" : "წესები და პირობები",
+    title: am ? "Պայմաններ և դրույթներ" : en ? "Terms and Conditions" : "წესები და პირობები",
     description: en
       ? "Terms and Conditions governing your use of Vivida."
       : "Vivida-ს გამოყენების წესები და პირობები — სამომხმარებლო ხელშეკრულება.",

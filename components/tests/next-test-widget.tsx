@@ -114,12 +114,13 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 /** A compact result-page engagement surface that leads into a complementary test. */
 export function NextTestWidget({ completed, locale = "ka" }: { completed: CompletedKind; locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const recommendation = (en ? RECOMMENDATIONS_EN : RECOMMENDATIONS)[completed];
   return <section className="mt-8 rounded-3xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
     <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">{recommendation.eyebrow}</div>
     <h2 className="mt-1 text-lg font-semibold tracking-tight">{recommendation.title}</h2>
     <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted-foreground">{recommendation.description}</p>
     <div className="mt-4 grid gap-3 sm:grid-cols-2">{recommendation.items.map(({ href, title, description, Icon, accent }) => <Link key={href} href={href} className="group rounded-2xl border border-border bg-background/35 p-4 transition-colors hover:border-foreground/25"><div className="flex items-center gap-2"><span className="grid size-8 place-items-center rounded-xl" style={{ background: `color-mix(in oklch, ${accent} 15%, transparent)`, color: accent }}><Icon className="size-4" /></span><span className="font-medium">{title}</span><ArrowRight className="ml-auto size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" /></div><p className="mt-2 text-xs text-muted-foreground">{description}</p></Link>)}</div>
-    <Button asChild variant="ghost" className="mt-3 px-0 text-[var(--vivida-cyan)] hover:bg-transparent hover:text-[var(--vivida-cyan)]"><Link href="/tests">{en ? "All tests and quizzes" : "ყველა ტესტი და ქვიზი"} <ArrowRight className="size-4" /></Link></Button>
+    <Button asChild variant="ghost" className="mt-3 px-0 text-[var(--vivida-cyan)] hover:bg-transparent hover:text-[var(--vivida-cyan)]"><Link href="/tests">{am ? "Բոլոր թեստերն ու վիկտորինաները" : en ? "All tests and quizzes" : "ყველა ტესტი და ქვიზი"} <ArrowRight className="size-4" /></Link></Button>
   </section>;
 }

@@ -35,6 +35,7 @@ export default async function PostThreadPage({
     getUserLocale(user.id),
   ]);
   const en = locale !== "ka";
+  const am = locale === "am";
 
   if (!post) notFound();
 
@@ -54,7 +55,7 @@ export default async function PostThreadPage({
           className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          {en ? "Back to feed" : "ფიდზე დაბრუნება"}
+          {am ? "Վերադառնալ լրահոս" : en ? "Back to feed" : "ფიდზე დაბრუნება"}
         </Link>
 
         <PostCard

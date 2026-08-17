@@ -33,6 +33,7 @@ export function PremiumPlanCard({
   active?: boolean;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
 
@@ -66,7 +67,7 @@ export function PremiumPlanCard({
             <Crown className="size-4" /> Vivida PRO
           </div>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-            {en ? "Everything, without credit limits" : "ყველაფერი, კრედიტების ლიმიტის გარეშე"}
+            {am ? "Ամեն ինչ՝ առանց վարկային սահմանափակումների" : en ? "Everything, without credit limits" : "ყველაფერი, კრედიტების ლიმიტის გარეშე"}
           </h2>
           <ul className="mt-4 space-y-2 text-sm text-foreground/80">
             {(en ? FEATURES_EN : FEATURES_KA).map((feature) => (
@@ -81,25 +82,25 @@ export function PremiumPlanCard({
           <div className="text-3xl font-bold tracking-tight">
             {formatBillingAmount(plan.amountMinor, plan.currency, locale)}
           </div>
-          <div className="text-xs text-muted-foreground">/{en ? "month" : "თვე"}</div>
+          <div className="text-xs text-muted-foreground">/{am ? "ամիս" : en ? "month" : "თვე"}</div>
           {active ? (
             <Button asChild variant="outline" className="mt-3 w-full">
-              <Link href="/subscription">{en ? "Manage PRO" : "PRO-ს მართვა"}</Link>
+              <Link href="/subscription">{am ? "Կառավարել PRO-ն" : en ? "Manage PRO" : "PRO-ს მართვა"}</Link>
             </Button>
           ) : (
             <Button type="button" variant="mystic" className="mt-3 w-full" onClick={subscribe} disabled={pending}>
               {pending && <Loader2 className="size-4 animate-spin" />}
-              {en ? "Get PRO" : "გახდი PRO"}
+              {am ? "Ստանալ PRO" : en ? "Get PRO" : "გახდი PRO"}
             </Button>
           )}
           {error && (
             <p className="mt-2 text-xs text-destructive">
-              {en ? "Checkout could not start." : "გადახდა ვერ დაიწყო."}
+              {am ? "Վճարումը չհաջողվեց սկսել։" : en ? "Checkout could not start." : "გადახდა ვერ დაიწყო."}
             </p>
           )}
           {!active && (
             <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
-              {en ? "Renews automatically each month. Cancel anytime." : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
+              {am ? "Ավտոմատ կերպով թարմացվում է ամեն ամիս։ Կարող եք չեղարկել ցանկացած պահի։" : en ? "Renews automatically each month. Cancel anytime." : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
             </p>
           )}
         </div>

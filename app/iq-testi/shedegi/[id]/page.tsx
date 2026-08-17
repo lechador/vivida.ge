@@ -19,8 +19,10 @@ import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata() {
-  const en = (await getRequestLocale()) !== "ka";
-  return { title: en ? "Your IQ Result" : "შენი IQ შედეგი", robots: { index: false } };
+  const locale = await getRequestLocale();
+  const en = locale !== "ka";
+  const am = locale === "am";
+  return { title: am ? "Ձեր Ինտելեկտի Գործակցի Արդյունքը" : en ? "Your IQ Result" : "შენი IQ შედეგი", robots: { index: false } };
 }
 export const dynamic = "force-dynamic";
 
@@ -40,6 +42,7 @@ export default async function SavedIqResultPage({
   const user = await requireUser();
   const locale = await getRequestLocale();
   const en = locale !== "ka";
+  const am = locale === "am";
 
   const [row] = await db
     .select()
@@ -88,11 +91,11 @@ export default async function SavedIqResultPage({
 
           <div className="mt-4 flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <span>
-              {en ? "Percentile " : "ჯობნი მოსახლეობის "}
-              <span className="font-semibold text-foreground">{row.percentile}{en ? "th" : "%"}</span>{!en && "-ს"}
+              {am ? "Տոկոսային դասակարգում " : en ? "Percentile " : "ჯობნი მოსახლეობის "}
+              <span className="font-semibold text-foreground">{row.percentile}{am ? "րդ" : en ? "th" : "%"}</span>{!en && "-ს"}
             </span>
             <span>
-              {en ? "Correct answers " : "სწორი პასუხი "}
+              {am ? "Ճիշտ պատասխաններ " : en ? "Correct answers " : "სწორი პასუხი "}
               <span className="font-semibold text-foreground">
                 {row.correct} / {row.total}
               </span>
@@ -105,7 +108,7 @@ export default async function SavedIqResultPage({
           <div className="mt-4 rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
             <h2 className="mb-4 flex items-center gap-2 text-base font-semibold tracking-tight">
               <Brain className="size-4 text-[var(--vivida-violet)]" />
-              {en ? "Reasoning profile" : "აზროვნების პროფილი"}
+              {am ? "Դատողության պրոֆիլ" : en ? "Reasoning profile" : "აზროვნების პროფილი"}
             </h2>
             <div className="space-y-4">
               {DOMAINS.map((d) => (
@@ -120,8 +123,8 @@ export default async function SavedIqResultPage({
               resultId={row.id}
               cost={CREDIT_COST.iqTest}
               balance={balance}
-              title={en ? "Unlock your reasoning profile" : "აზროვნების პროფილის გახსნა"}
-              blurb={en ? "See your strengths across logic, numbers, spatial reasoning and patterns. Pay once and keep the result." : "ნახე შენი ძლიერი მხარეები ოთხ დომენში — ლოგიკა, რიცხვები, სივრცე და პატერნები. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."}
+              title={am ? "Բացահայտեք Ձեր դատողության պրոֆիլը" : en ? "Unlock your reasoning profile" : "აზროვნების პროფილის გახსნა"}
+              blurb={am ? "Տեսեք Ձեր ուժեղ կողմերը տրամաբանության, թվերի, տարածական դատողության և օրինաչափությունների մեջ։ Վճարեք մեկ անգամ և պահպանեք արդյունքը։" : en ? "See your strengths across logic, numbers, spatial reasoning and patterns. Pay once and keep the result." : "ნახე შენი ძლიერი მხარეები ოთხ დომენში — ლოგიკა, რიცხვები, სივრცე და პატერნები. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."}
               locale={locale}
             />
           </div>
@@ -135,7 +138,7 @@ export default async function SavedIqResultPage({
           <Button asChild variant="outline">
             <Link href="/iq-testi">
               <RotateCcw className="size-4" />
-              {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
+              {am ? "Կրկնել թեստը" : en ? "Retake the test" : "ტესტის თავიდან გავლა"}
             </Link>
           </Button>
         </div>

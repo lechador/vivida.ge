@@ -8,13 +8,14 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function RestrictedNotice({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <div className="mb-6 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 sm:p-5">
       <div className="flex items-start gap-3">
         <Info className="mt-0.5 size-5 shrink-0 text-amber-300" />
         <div className="space-y-1">
           <p className="text-sm font-semibold text-amber-100">
-            {en ? "Your account is temporarily restricted" : "შენი ანგარიში დროებით შეზღუდულია"}
+            {am ? "Ձեր հաշիվը ժամանակավորապես սահմանափակված է" : en ? "Your account is temporarily restricted" : "შენი ანგარიში დროებით შეზღუდულია"}
           </p>
           <p className="text-pretty text-sm leading-relaxed text-amber-100/85">
             {en

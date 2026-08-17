@@ -11,11 +11,13 @@ import { MbtiGate } from "@/components/mbti/mbti-gate";
 import { MbtiClaimRunner } from "@/components/mbti/mbti-claim-runner";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) !== "ka";
+  const locale = await getRequestLocale();
+  const en = locale !== "ka";
+  const am = locale === "am";
   // Transient per-user result state, like the /shedegi pages — keep it out of
   // the index rather than letting it self-canonicalize as content.
   return {
-    title: en ? "Your Astro-MBTI result" : "შენი შედეგი",
+    title: am ? "Ձեր Աստրո-ՄԲՏԻ արդյունքը" : en ? "Your Astro-MBTI result" : "შენი შედეგი",
     robots: { index: false },
   };
 }
@@ -33,6 +35,7 @@ export const maxDuration = 60;
 export default async function TestClaimPage() {
   const [session, locale] = await Promise.all([auth(), getRequestLocale()]);
   const en = locale !== "ka";
+  const am = locale === "am";
   const authed = !!session?.user?.id;
   // The anonymous teaser recomputes the type client-side from the stored
   // answers, so it needs the question structure. Only loaded when anon.

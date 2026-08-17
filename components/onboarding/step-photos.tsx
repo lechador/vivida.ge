@@ -13,11 +13,12 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function StepPhotos({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   return (
     <div className="space-y-5">
       <header className="space-y-1.5 text-center">
         <h2 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-          {en ? "Add photos" : "დაამატე ფოტოები"}
+          {am ? "Ավելացնել լուսանկարներ" : en ? "Add photos" : "დაამატე ფოტოები"}
         </h2>
         <p className="mx-auto max-w-md text-pretty text-sm text-muted-foreground">
           {en

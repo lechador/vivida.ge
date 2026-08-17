@@ -29,9 +29,11 @@ import { SynastryDisplayEn } from "@/components/synastry/synastry-display-en";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) !== "ka";
+  const locale = await getRequestLocale();
+  const en = locale !== "ka";
+  const am = locale === "am";
   return {
-    title: en ? "Compatibility" : "თავსებადობა",
+    title: am ? "Համատեղելիություն" : en ? "Compatibility" : "თავსებადობა",
     robots: { index: false },
   };
 }
@@ -43,6 +45,7 @@ export default async function SynastryDetailPage({
 }) {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
+  const am = locale === "am";
   const { id } = await params;
   const user = await requireUser();
   const partner = await getPartnerForViewer(id, user.id);
@@ -62,7 +65,7 @@ export default async function SynastryDetailPage({
             ? "Your chart hasn't been created yet. "
             : "შენი რუკა ჯერ შედგენილი არ არის. ჯერ "}
           <Link href="/onboarding" className="underline">
-            {en ? "Add your birth details" : "შეავსე დაბადების მონაცემები"}
+            {am ? "Ավելացրեք Ձեր ծննդյան տվյալները" : en ? "Add your birth details" : "შეავსე დაბადების მონაცემები"}
           </Link>
           .
         </section>
@@ -103,11 +106,11 @@ export default async function SynastryDetailPage({
             className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="size-3.5" />
-            {en ? "All partners" : "ყველა პარტნიორი"}
+            {am ? "Բոլոր գործընկերները" : am ? "Բոլոր գործընկերները" : en ? "All partners" : "ყველა პარტნიორი"}
           </Link>
           <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            {viewerName ?? (en ? "You" : "შენ")}{" "}
-            <span className="text-muted-foreground">{en ? "and" : "და"}</span>{" "}
+            {viewerName ?? (am ? "Դուք" : am ? "Դուք" : en ? "You" : "შენ")}{" "}
+            <span className="text-muted-foreground">{am ? "և" : am ? "և" : en ? "and" : "და"}</span>{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
               {partner.name}
             </span>
@@ -193,7 +196,7 @@ export default async function SynastryDetailPage({
             <div className="mb-3 flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)]">
               <Sparkles className="size-4" aria-hidden />
               <span>
-                {en ? "Personalized chart narrative" : "AI-ს მცირე ნარატივი"}
+                {am ? "Անհատականացված քարտեզի պատմություն" : en ? "Personalized chart narrative" : "AI-ს მცირე ნარატივი"}
               </span>
             </div>
             <p className="text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
@@ -206,7 +209,7 @@ export default async function SynastryDetailPage({
                     <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-[var(--vivida-cyan)]">
                       <span aria-hidden>✨</span>
                       <span>
-                        {en ? "What brings you together" : "რას გაერთიანებთ"}
+                        {am ? "Ինչն է Ձեզ միավորում" : en ? "What brings you together" : "რას გაერთიანებთ"}
                       </span>
                     </div>
                     <ul className="space-y-1.5 text-sm leading-relaxed text-foreground/90">
@@ -229,7 +232,7 @@ export default async function SynastryDetailPage({
                     <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-[var(--vivida-pink)]">
                       <span aria-hidden>⚡</span>
                       <span>
-                        {en ? "Where friction appears" : "სად არის ხახუნი"}
+                        {am ? "Որտեղ է առաջանում տարաձայնություն" : en ? "Where friction appears" : "სად არის ხახუნი"}
                       </span>
                     </div>
                     <ul className="space-y-1.5 text-sm leading-relaxed text-foreground/90">

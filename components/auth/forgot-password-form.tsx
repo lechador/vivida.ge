@@ -15,6 +15,7 @@ const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [email, setEmail] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +46,7 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
         </div>
         <div>
           <h3 className="text-lg font-semibold tracking-tight">
-            {en ? "Check your inbox" : "შეამოწმე საფოსტო ყუთი"}
+            {am ? "Ստուգեք Ձեր մուտքի արկղը" : en ? "Check your inbox" : "შეამოწმე საფოსტო ყუთი"}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
             {en
@@ -57,7 +58,7 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
           href="/login"
           className="inline-block text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
         >
-          {en ? "← Back to sign in" : "← ანგარიშის შესვლა"}
+          {am ? "← Վերադառնալ մուտքի էջ" : en ? "← Back to sign in" : "← ანგარიშის შესვლა"}
         </Link>
       </div>
     );
@@ -72,7 +73,7 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
       </p>
 
       <div className="space-y-1.5">
-        <Label htmlFor="email">{en ? "Email" : "ელფოსტა"}</Label>
+        <Label htmlFor="email">{am ? "Էլ. փոստ" : en ? "Email" : "ელფოსტა"}</Label>
         <Input
           id="email"
           name="email"
@@ -101,7 +102,7 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
         disabled={submitDisabled}
       >
         {isPending && <Loader2 className="size-4 animate-spin" />}
-        {isPending ? (en ? "Sending…" : "ვაგზავნი…") : en ? "Send reset link" : "ლინკის გამოგზავნა"}
+        {isPending ? (am ? "Ուղարկվում է…" : en ? "Sending…" : "ვაგზავნი…") : am ? "Ուղարկել վերականգնման հղում" : en ? "Send reset link" : "ლინკის გამოგზავნა"}
       </Button>
     </form>
   );

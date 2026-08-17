@@ -96,6 +96,7 @@ export function LiveSky({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   // One shared 1s clock drives every readout + the wheel positions. The
   // planets move sub-pixel per tick (CSS transition smooths it), but the
   // Moon's arcsecond readout visibly counts up — that's the "it's alive"
@@ -145,7 +146,7 @@ export function LiveSky({
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           className="h-auto w-full drop-shadow-[0_0_60px_oklch(0.4_0.18_300/0.35)]"
           role="img"
-          aria-label={en ? "Live sky chart—current planetary positions in your natal houses" : "ცოცხალი ცის რუკა — პლანეტების ამჟამინდელი პოზიციები შენს ნატალურ სახლებში"}
+          aria-label={am ? "Կենդանի երկնքի քարտեզ—մոլորակների ընթացիկ դիրքերը ձեր նատալ տներում" : en ? "Live sky chart—current planetary positions in your natal houses" : "ცოცხალი ცის რუკა — პლანეტების ამჟამინდელი პოზიციები შენს ნატალურ სახლებში"}
         >
           <defs>
             <radialGradient id="sky-center" cx="50%" cy="50%" r="50%">
@@ -347,7 +348,7 @@ export function LiveSky({
                     </span>
                     {p.retrograde && (
                       <span className="rounded-full border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/10 px-1.5 text-[10px] font-medium text-[var(--vivida-pink)]">
-                        ℞ {en ? "retrograde" : "რეტროგრადული"}
+                        ℞ {am ? "հետընթաց" : en ? "retrograde" : "რეტროგრადული"}
                       </span>
                     )}
                   </span>
@@ -361,7 +362,7 @@ export function LiveSky({
                         : "სახლის გარეშე (დაბადების დრო უცნობია)"}
                     {" · "}
                     {degPerDay >= 0.1
-                      ? `${degPerDay.toFixed(1)}°/${en ? "day" : "დღეში"}`
+                      ? `${degPerDay.toFixed(1)}°/${am ? "օր" : am ? "օր" : en ? "day" : "დღეში"}`
                       : `${(degPerDay * 60).toFixed(1)}′/${en ? "day" : "დღეში"}`}
                   </span>
                 </span>

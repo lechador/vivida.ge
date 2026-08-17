@@ -37,6 +37,7 @@ export async function ChartSection({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const chart = await ensureChartFor(userId);
 
   if (!chart) {
@@ -74,9 +75,9 @@ export async function ChartSection({
             <div className="relative grid gap-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
               <div className="order-2 sm:order-1">
                 <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                  {en ? "Your sky" : "შენი ცის"}{" "}
+                  {am ? "Ձեր երկինքը" : en ? "Your sky" : "შენი ცის"}{" "}
                   <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-                    {en ? "at birth" : "მომენტი"}
+                    {am ? "ծննդյան պահին" : en ? "at birth" : "მომენტი"}
                   </span>
                 </h2>
                 <p className="mt-3 max-w-md text-sm text-foreground/80">
@@ -98,13 +99,13 @@ export async function ChartSection({
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start">
             <div>
               <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {en ? "Positions" : "პოზიციები"}
+                {am ? "Դիրքեր" : en ? "Positions" : "პოზიციები"}
               </h2>
               <PositionsTable chart={data} locale={locale} />
             </div>
             <div>
               <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {en ? "Houses" : "სახლები"}
+                {am ? "Տներ" : en ? "Houses" : "სახლები"}
               </h2>
               <div className="rounded-2xl border border-border bg-card/50 px-4 py-1 ring-1 ring-foreground/5 backdrop-blur-xl sm:px-5">
                 <HousesTable chart={data} locale={locale} />
@@ -121,7 +122,7 @@ export async function ChartSection({
           >
             <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-[var(--vivida-violet)]">
               <Sparkles className="size-3.5" aria-hidden />
-              {en ? "About your chart" : "შენი რუკის შესახებ"}
+              {am ? "Ձեր քարտեզի մասին" : en ? "About your chart" : "შენი რუკის შესახებ"}
             </div>
             <p className="text-sm leading-relaxed text-foreground/85">
               {interp.summary}
@@ -133,8 +134,8 @@ export async function ChartSection({
         <CollapsibleSection
           id="big-three"
           icon={<Sparkles className="size-5" />}
-          title={en ? "The big three" : "დიდი სამეული"}
-          subtitle={en ? "Sun, Moon and Ascendant—your core pattern" : "მზე, მთვარე და ამომავალი — შენი ბირთვი"}
+          title={am ? "Երեք գլխավորները" : en ? "The big three" : "დიდი სამეული"}
+          subtitle={am ? "Արև, Լուսին և Ասցենդենտ՝ ձեր հիմնական կաղապարը" : en ? "Sun, Moon and Ascendant—your core pattern" : "მზე, მთვარე და ამომავალი — შენი ბირთვი"}
           defaultOpen
         >
           <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
@@ -167,8 +168,8 @@ export async function ChartSection({
         <CollapsibleSection
           id="elements"
           icon={<Flame className="size-5" />}
-          title={en ? "Elements" : "ელემენტები"}
-          subtitle={en ? "The energies that carry the most weight in your chart" : "რომელი ენერგიები დომინირებენ შენს ცაში"}
+          title={am ? "Տարրեր" : en ? "Elements" : "ელემენტები"}
+          subtitle={am ? "Էներգիաները, որոնք ամենամեծ կշիռն ունեն ձեր քարտեզում" : en ? "The energies that carry the most weight in your chart" : "რომელი ენერგიები დომინირებენ შენს ცაში"}
           defaultOpen
         >
           <ElementsCard chart={data} locale={locale} />
@@ -179,8 +180,8 @@ export async function ChartSection({
           <CollapsibleSection
             id="highlights"
             icon={<Lightbulb className="size-5" />}
-            title={en ? "What stands out" : "რა ვამჩნევთ შენს რუკაში"}
-            subtitle={en ? "The patterns that carry special emphasis" : "ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"}
+            title={am ? "Ինչն է առանձնանում" : en ? "What stands out" : "რა ვამჩნევთ შენს რუკაში"}
+            subtitle={am ? "Այն կաղապարները, որոնք հատուկ շեշտադրում ունեն" : en ? "The patterns that carry special emphasis" : "ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"}
             defaultOpen
           >
             <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
@@ -205,8 +206,8 @@ export async function ChartSection({
         <CollapsibleSection
           id="planets"
           icon={<Globe2 className="size-5" />}
-          title={en ? "Planets" : "პლანეტები"}
-          subtitle={en ? "Eight distinct functions working as one system" : "რვა პლანეტა, რვა ხასიათი — ერთად შენ ხარ"}
+          title={am ? "Մոլորակներ" : en ? "Planets" : "პლანეტები"}
+          subtitle={am ? "Ութ տարբեր ֆունկցիաներ, որոնք աշխատում են որպես մեկ համակարգ" : en ? "Eight distinct functions working as one system" : "რვა პლანეტა, რვა ხასიათი — ერთად შენ ხარ"}
           defaultOpen
         >
           <PlanetCards chart={data} interpretations={interp?.planets} locale={locale} />
@@ -216,8 +217,8 @@ export async function ChartSection({
         <CollapsibleSection
           id="houses"
           icon={<Home className="size-5" />}
-          title={en ? "The 12 areas of life" : "ცხოვრების 12 სფერო"}
-          subtitle={en ? "Where each part of your chart tends to show up" : "სად რა ენერგია ვლინდება შენს ცხოვრებაში"}
+          title={am ? "Կյանքի 12 ոլորտները" : en ? "The 12 areas of life" : "ცხოვრების 12 სფერო"}
+          subtitle={am ? "Որտեղ է հայտնվում ձեր քարտեզի յուրաքանչյուր մասը" : en ? "Where each part of your chart tends to show up" : "სად რა ენერგია ვლინდება შენს ცხოვრებაში"}
           defaultOpen
         >
           <HouseCards chart={data} interpretations={interp?.houses} locale={locale} />
@@ -227,8 +228,8 @@ export async function ChartSection({
         <CollapsibleSection
           id="aspects"
           icon={<Triangle className="size-5" />}
-          title={en ? "Aspects" : "ასპექტები"}
-          subtitle={en ? "How the planets in your chart interact" : "როგორ ელაპარაკებიან პლანეტები ერთმანეთს"}
+          title={am ? "Ասպեկտներ" : en ? "Aspects" : "ასპექტები"}
+          subtitle={am ? "Ինչպես են փոխազդում ձեր քարտեզի մոլորակները" : en ? "How the planets in your chart interact" : "როგორ ელაპარაკებიან პლანეტები ერთმანეთს"}
           defaultOpen
         >
           <AspectCards chart={data} interpretations={interp?.aspects} locale={locale} />

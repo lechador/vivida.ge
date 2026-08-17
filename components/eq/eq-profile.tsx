@@ -18,6 +18,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const top = result.domains.find((d) => d.key === result.topKey)!;
   const low = result.domains.find((d) => d.key === result.lowKey)!;
 
@@ -26,7 +27,7 @@ export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?
       {/* Radar */}
       <div className="rounded-3xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
         <h2 className="mb-2 text-center text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Your emotional profile" : "შენი ემოციური რუკა"}
+          {am ? "Ձեր էմոցիոնալ պրոֆիլը" : en ? "Your emotional profile" : "შენი ემოციური რუკა"}
         </h2>
         <EqRadar domains={result.domains} locale={locale} />
       </div>
@@ -36,7 +37,7 @@ export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?
         <div className="rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 p-4 ring-1 ring-foreground/5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--vivida-cyan)]">
             <ArrowUpRight className="size-4" />
-            {en ? "Your strength" : "შენი ძალა"}
+            {am ? "Ձեր ուժը" : en ? "Your strength" : "შენი ძალა"}
           </div>
           <div className="mt-1.5 flex items-center gap-2 text-lg font-semibold">
             <span>{top.glyph}</span>
@@ -49,7 +50,7 @@ export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?
         <div className="rounded-2xl border border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/8 p-4 ring-1 ring-foreground/5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--vivida-pink)]">
             <Sprout className="size-4" />
-            {en ? "Growth opportunity" : "ზრდის სივრცე"}
+            {am ? "Աճի հնարավորություն" : en ? "Growth opportunity" : "ზრდის სივრცე"}
           </div>
           <div className="mt-1.5 flex items-center gap-2 text-lg font-semibold">
             <span>{low.glyph}</span>

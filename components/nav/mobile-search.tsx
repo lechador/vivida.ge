@@ -78,6 +78,7 @@ export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
 
 function SearchPanel({ onClose, locale }: { onClose: () => void; locale: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
@@ -142,7 +143,7 @@ function SearchPanel({ onClose, locale }: { onClose: () => void; locale: UserLoc
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={en ? "Name or @" : "სახელი ან @"}
+          placeholder={am ? "Անուն կամ @" : en ? "Name or @" : "სახელი ან @"}
           className="h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/60"
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
@@ -165,7 +166,7 @@ function SearchPanel({ onClose, locale }: { onClose: () => void; locale: UserLoc
         ) : hasQuery && results[highlight] ? (
           <button
             type="button"
-            aria-label={en ? "Go" : "გადასვლა"}
+            aria-label={am ? "Գնալ" : en ? "Go" : "გადასვლა"}
             onClick={() => navigate(results[highlight].username)}
             className="grid size-9 shrink-0 place-items-center rounded-full bg-card/60 text-foreground/80 ring-1 ring-foreground/10 transition-colors hover:bg-card hover:text-foreground"
           >
@@ -173,7 +174,7 @@ function SearchPanel({ onClose, locale }: { onClose: () => void; locale: UserLoc
           </button>
         ) : (
           <DialogPrimitive.Close
-            aria-label={en ? "Close" : "დახურვა"}
+            aria-label={am ? "Փակել" : en ? "Close" : "დახურვა"}
             className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/60 hover:text-foreground"
           >
             <X className="size-5" />
@@ -219,11 +220,11 @@ function SearchPanel({ onClose, locale }: { onClose: () => void; locale: UserLoc
           </ul>
         ) : hasQuery && !loading ? (
           <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-            {en ? "No public profiles found" : "არცერთი საჯარო პროფილი არ მოიძებნა"}
+            {am ? "Հանրային պրոֆիլներ չեն գտնվել" : en ? "No public profiles found" : "არცერთი საჯარო პროფილი არ მოიძებნა"}
           </div>
         ) : (
           <div className="px-4 py-8 text-center text-xs text-muted-foreground/70">
-            {en ? "Search by name or @username" : "მოძებნე სახელით ან @username-ით"}
+            {am ? "Որոնել ըստ անվան կամ @օգտանունի" : en ? "Search by name or @username" : "მოძებნე სახელით ან @username-ით"}
           </div>
         )}
       </div>

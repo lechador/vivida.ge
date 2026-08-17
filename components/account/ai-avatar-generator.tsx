@@ -35,6 +35,7 @@ export function AiAvatarGenerator({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -54,14 +55,14 @@ export function AiAvatarGenerator({
         error?: string;
       };
       if (!res.ok || !data.url) {
-        setError((en ? ERRORS_EN : ERRORS)[data.error ?? ""] ?? (en ? "Something went wrong. Please try again." : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."));
+        setError((en ? ERRORS_EN : ERRORS)[data.error ?? ""] ?? (am ? "Ինչ-որ բան այն չէր։ Խնդրում ենք նորից փորձել։" : en ? "Something went wrong. Please try again." : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."));
         return;
       }
       setPreview(data.url);
       // Refresh so the navbar + account avatar pick up the new main photo.
       router.refresh();
     } catch {
-      setError(en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(am ? "Ցանցի սխալ։ Խնդրում ենք նորից փորձել։" : en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
     } finally {
       setBusy(false);
     }
@@ -75,7 +76,7 @@ export function AiAvatarGenerator({
           {shown ? (
             <Image
               src={shown}
-              alt={en ? "Avatar" : "ავატარი"}
+              alt={am ? "Ավատար" : en ? "Avatar" : "ავატარი"}
               width={96}
               height={96}
               className="size-full object-cover"
@@ -96,14 +97,14 @@ export function AiAvatarGenerator({
         <div className="min-w-0 flex-1">
           <h2 className="flex items-center gap-1.5 text-lg font-semibold tracking-tight">
             <Sparkles className="size-4 text-[var(--vivida-violet)]" />
-            {en ? "AI avatar" : "AI ავატარი"}
+            {am ? "AI ավատար" : en ? "AI avatar" : "AI ავატარი"}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {busy
-              ? en ? "Creating your cosmic avatar… (~10 seconds)" : "ვქმნით შენს კოსმიურ ავატარს… (~10 წამი)"
+              ? am ? "Ստեղծվում է ձեր տիեզերական ավատարը… (~10 վայրկյան)" : en ? "Creating your cosmic avatar… (~10 seconds)" : "ვქმნით შენს კოსმიურ ავატარს… (~10 წამი)"
               : hasGenerated
-                ? en ? "Ready — it is now your profile image. How does it look?" : "მზადაა — დაყენდა შენს პროფილზე. მოგწონს თუ არა?"
-                : en ? "Create a personal avatar for your zodiac sign in Vivida's style." : "შექმენი შენი ზოდიაქოს ნიშნის პერსონალური ავატარი Vivida-ს სტილში."}
+                ? am ? "Պատրաստ է. այն այժմ ձեր պրոֆիլի նկարն է։ Ինչպե՞ս է թվում։" : en ? "Ready — it is now your profile image. How does it look?" : "მზადაა — დაყენდა შენს პროფილზე. მოგწონს თუ არა?"
+                : am ? "Ստեղծեք անձնական ավատար ձեր կենդանակերպի նշանի համար Vivida-ի ոճով։" : en ? "Create a personal avatar for your zodiac sign in Vivida's style." : "შექმენი შენი ზოდიაქოს ნიშნის პერსონალური ავატარი Vivida-ს სტილში."}
           </p>
         </div>
       </div>
@@ -123,13 +124,13 @@ export function AiAvatarGenerator({
             <Sparkles className="size-4" />
           )}
           {busy
-            ? en ? "Generating…" : "იქმნება…"
+            ? am ? "Ստեղծվում է…" : en ? "Generating…" : "იქმნება…"
             : hasGenerated
-              ? en ? "Regenerate" : "თავიდან შექმნა"
-              : en ? "Generate avatar" : "ავატარის გენერაცია"}
+              ? am ? "Վերստեղծել" : en ? "Regenerate" : "თავიდან შექმნა"
+              : am ? "Ստեղծել ավատար" : en ? "Generate avatar" : "ავატარის გენერაცია"}
         </Button>
         <span className="text-xs text-muted-foreground">
-          {en ? "Based on your sun sign" : "ეფუძნება შენი მზის ნიშანს"}
+          {am ? "Հիմնված ձեր արևի նշանի վրա" : en ? "Based on your sun sign" : "ეფუძნება შენი მზის ნიშანს"}
         </span>
       </div>
 

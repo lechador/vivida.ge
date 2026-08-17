@@ -21,6 +21,7 @@ export default async function AskPage() {
   const user = await requireUser();
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
+  const am = locale === "am";
 
   const [[chart], history] = await Promise.all([
     db
@@ -40,8 +41,8 @@ export default async function AskPage() {
     return (
       <AstroLockedMain
         active="ask"
-        title={en ? "Your AI astrologer needs a natal chart" : "AI ასტროლოგი ნატალურ რუკას საჭიროებს"}
-        description={en ? "Add your birth details to talk to an AI astrologer who knows your chart." : "შეავსე დაბადების მონაცემები, რომ ესაუბრო AI ასტროლოგს, რომელიც შენს რუკას იცნობს."}
+        title={am ? "Ձեր AI աստղագուշակին անհրաժեշտ է նատալ քարտեզ" : en ? "Your AI astrologer needs a natal chart" : "AI ასტროლოგი ნატალურ რუკას საჭიროებს"}
+        description={am ? "Ավելացրեք ձեր ծննդյան տվյալները՝ AI աստղագուշակի հետ խոսելու համար, ով ճանաչում է ձեր քարտեզը։" : en ? "Add your birth details to talk to an AI astrologer who knows your chart." : "შეავსე დაბადების მონაცემები, რომ ესაუბრო AI ასტროლოგს, რომელიც შენს რუკას იცნობს."}
         next="/ask"
         locale={locale}
       />
@@ -66,9 +67,9 @@ export default async function AskPage() {
       <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col px-4 pb-[calc(4.75rem_+_env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8 lg:pb-6">
         <header className="mb-5 shrink-0">
           <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            {en ? "Ask your" : "ჰკითხე"}{" "}
+            {am ? "Հարցրեք ձեր" : en ? "Ask your" : "ჰკითხე"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "chart" : "ვარსკვლავებს"}
+              {am ? "քարտեզին" : en ? "chart" : "ვარსკვლავებს"}
             </span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">

@@ -24,6 +24,7 @@ export function WeeklyForecastLocked({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);
 
@@ -58,10 +59,10 @@ export function WeeklyForecastLocked({
       <header className="relative mb-5 flex items-baseline justify-between gap-3">
         <div>
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Next 7 days" : "შემდეგი 7 დღე"}
+            {am ? "Հաջորդ 7 օրը" : en ? "Next 7 days" : "შემდეგი 7 დღე"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight sm:text-xl">
-            {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
+            {am ? "Ձեր շաբաթը երկնքում" : en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
         <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" aria-hidden />
@@ -105,8 +106,8 @@ export function WeeklyForecastLocked({
           </p>
           <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-3 py-1 text-sm">
             <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-            <span className="font-semibold">{cost} {en ? "credits" : "კრედიტი"}</span>
-            <span className="text-muted-foreground">· {en ? "one time · balance" : "ერთჯერადად · ბალანსი"} {balance}</span>
+            <span className="font-semibold">{cost} {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}</span>
+            <span className="text-muted-foreground">· {am ? "մեկ անգամ · հավասարակշռություն" : en ? "one time · balance" : "ერთჯერადად · ბალანსი"} {balance}</span>
           </div>
 
           {!short ? (
@@ -128,12 +129,12 @@ export function WeeklyForecastLocked({
           ) : (
             <div className="space-y-2">
               <p className="text-sm text-[var(--vivida-pink)]">
-                {en ? "Your balance is too low." : "ბალანსი არ არის საკმარისი."}
+                {am ? "Ձեր հաշվեկշիռը շատ ցածր է։" : en ? "Your balance is too low." : "ბალანსი არ არის საკმარისი."}
               </p>
               <Button asChild variant="mystic">
                 <Link href="/credits">
                   <Users className="size-4" />
-                  {en ? "Invite / top up" : "მოიწვიე / შეავსე"}
+                  {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
                 </Link>
               </Button>
             </div>

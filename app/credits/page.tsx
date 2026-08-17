@@ -22,8 +22,10 @@ import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) !== "ka";
-  return { title: en ? "Credits" : "კრედიტები", robots: { index: false } };
+  const locale = await getRequestLocale();
+  const en = locale !== "ka";
+  const am = locale === "am";
+  return { title: am ? "Կրեդիտներ" : en ? "Credits" : "კრედიტები", robots: { index: false } };
 }
 export const dynamic = "force-dynamic";
 
@@ -43,6 +45,7 @@ export default async function CreditsPage() {
   // once signed in.
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
+  const am = locale === "am";
   const [balance, ref, storedIdentity, premium] = await Promise.all([
     getBalance(user.id),
     getReferralStats(user.id),
@@ -78,7 +81,7 @@ export default async function CreditsPage() {
         {/* Balance */}
         <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Your balance" : "შენი ბალანსი"}
+            {am ? "Ձեր հաշվեկշիռը" : en ? "Your balance" : "შენი ბალანსი"}
           </div>
           <div className="mt-2 flex items-center justify-center gap-2">
             <Sparkles className="size-7 text-[var(--vivida-cyan)]" />
@@ -87,7 +90,7 @@ export default async function CreditsPage() {
             </span>
           </div>
           <div className="mt-1 text-sm text-muted-foreground">
-            {en ? "credits" : "კრედიტი"}
+            {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}
           </div>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/75">
             {en
@@ -103,7 +106,7 @@ export default async function CreditsPage() {
           >
             <span className="flex items-center gap-3 font-semibold">
               <Crown className="size-5 text-[var(--vivida-gold)]" />
-              {en ? "Manage your Vivida PRO subscription" : "Vivida PRO გამოწერის მართვა"}
+              {am ? "Կառավարեք Ձեր Vivida PRO բաժանորդագրությունը" : en ? "Manage your Vivida PRO subscription" : "Vivida PRO გამოწერის მართვა"}
             </span>
             <span aria-hidden>→</span>
           </Link>

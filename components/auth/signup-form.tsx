@@ -17,6 +17,7 @@ const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const router = useRouter();
   const params = useSearchParams();
   // Where to land after signup — same-origin relative paths only.
@@ -102,10 +103,10 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         </div>
         <div>
           <h3 className="text-lg font-semibold tracking-tight">
-            {en ? "Check your inbox" : "შემოწმე საფოსტო ყუთი"}
+            {am ? "Ստուգեք Ձեր մուտքի արկղը" : en ? "Check your inbox" : "შემოწმე საფოსტო ყუთი"}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            {en ? "We sent an email to " : "გამოგიგზავნეთ წერილი "}
+            {am ? "Մենք էլ. նամակ ուղարկեցինք " : en ? "We sent an email to " : "გამოგიგზავნეთ წერილი "}
             <span className="text-foreground">{email}</span>
             {en
               ? ". Enter the 6-digit code from the email, or simply open the link."
@@ -116,7 +117,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         {/* OTP code entry — the easy path for users who struggle with links */}
         <form onSubmit={verifyCode} className="space-y-3 text-left">
           <div className="space-y-1.5">
-            <Label htmlFor="code">{en ? "Verification code" : "დადასტურების კოდი"}</Label>
+            <Label htmlFor="code">{am ? "Հաստատման կոդ" : en ? "Verification code" : "დადასტურების კოდი"}</Label>
             <Input
               id="code"
               name="code"
@@ -146,17 +147,17 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
             disabled={verifying || code.length !== 6}
           >
             {verifying && <Loader2 className="size-4 animate-spin" />}
-            {verifying ? (en ? "Verifying…" : "მოწმდება…") : en ? "Verify" : "დადასტურება"}
+            {verifying ? (am ? "Հաստատվում է…" : en ? "Verifying…" : "მოწმდება…") : am ? "Հաստատել" : en ? "Verify" : "დადასტურება"}
           </Button>
         </form>
 
         <div className="flex items-start gap-2 rounded-lg border border-border/60 bg-card/40 px-3 py-2 text-left text-xs text-muted-foreground">
           <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-muted-foreground/70" />
-          {en ? "Can't find the email? Check spam or request it again from the " : "ვერ ნახავ წერილს? ნახე spam-ში ან "}
+          {am ? "Չե՞ք գտնում էլ. նամակը։ Ստուգեք սպամը կամ նորից հայցեք այն " : en ? "Can't find the email? Check spam or request it again from the " : "ვერ ნახავ წერილს? ნახე spam-ში ან "}
           <Link href="/login" className="underline-offset-2 hover:underline">
-            {en ? "sign-in page" : "შესვლის გვერდიდან"}
+            {am ? "մուտքի էջից" : en ? "sign-in page" : "შესვლის გვერდიდან"}
           </Link>{" "}
-          {en ? "." : " მოითხოვე ხელახლა."}
+          {am ? "։" : en ? "." : " მოითხოვე ხელახლა."}
         </div>
       </div>
     );
@@ -165,7 +166,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
   return (
     <form onSubmit={submit} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="name">{en ? "Name" : "სახელი"}</Label>
+        <Label htmlFor="name">{am ? "Անուն" : en ? "Name" : "სახელი"}</Label>
         <Input
           id="name"
           name="name"
@@ -175,11 +176,11 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={isPending}
-          placeholder={en ? "e.g. Alex" : "მაგ. გიორგი"}
+          placeholder={am ? "օրինակ՝ Ալեքս" : en ? "e.g. Alex" : "მაგ. გიორგი"}
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="email">{en ? "Email" : "ელფოსტა"}</Label>
+        <Label htmlFor="email">{am ? "Էլ. փոստ" : en ? "Email" : "ელფოსტა"}</Label>
         <Input
           id="email"
           name="email"
@@ -192,7 +193,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="password">{en ? "Password" : "პაროლი"}</Label>
+        <Label htmlFor="password">{am ? "Գաղտնաբառ" : en ? "Password" : "პაროლი"}</Label>
         <Input
           id="password"
           name="password"
@@ -205,7 +206,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           disabled={isPending}
         />
         <p className="text-xs text-muted-foreground">
-          {en ? "At least 8 characters." : "მინიმუმ 8 სიმბოლო."}
+          {am ? "Առնվազն 8 նիշ։" : en ? "At least 8 characters." : "მინიმუმ 8 სიმბოლო."}
         </p>
       </div>
 
@@ -235,13 +236,13 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
       </Button>
 
       <p className="text-center text-xs text-muted-foreground">
-        {en ? "By creating an account, you agree to the " : "რეგისტრაციით ეთანხმები "}
+        {am ? "Հաշիվ ստեղծելով՝ Դուք համաձայնում եք " : en ? "By creating an account, you agree to the " : "რეგისტრაციით ეთანხმები "}
         <Link href="/terms" className="underline-offset-2 hover:underline">
-          {en ? "Terms" : "წესებსა და პირობებს"}
+          {am ? "Պայմաններին" : en ? "Terms" : "წესებსა და პირობებს"}
         </Link>{" "}
-        {en ? " and " : " და "}
+        {am ? " և " : en ? " and " : " და "}
         <Link href="/privacy" className="underline-offset-2 hover:underline">
-          {en ? "Privacy Policy" : "კონფიდენციალურობის პოლიტიკას"}
+          {am ? "Գաղտնիության քաղաքականություն" : en ? "Privacy Policy" : "კონფიდენციალურობის პოლიტიკას"}
         </Link>
         .
       </p>

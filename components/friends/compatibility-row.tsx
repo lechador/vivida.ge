@@ -30,6 +30,7 @@ export function CompatibilityRow({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const displayName =
     u.displayName ?? u.name?.split(" ")[0] ?? u.username ?? "user";
   const profileHref = u.username ? `/u/${u.username}` : null;
@@ -123,7 +124,7 @@ export function CompatibilityRow({
         {profileHref && (
           <Link
             href={profileHref}
-            aria-label={en ? "Detailed compatibility" : "დეტალური თავსებადობა"}
+            aria-label={am ? "Մանրամասն համատեղելիություն" : en ? "Detailed compatibility" : "დეტალური თავსებადობა"}
             className="hidden shrink-0 text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
           >
             <ArrowRight className="size-4" />

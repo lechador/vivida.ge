@@ -32,6 +32,7 @@ export function UnlockCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);
@@ -67,7 +68,7 @@ export function UnlockCard({
         <Lock className="size-7 text-[var(--vivida-violet)]" />
       </div>
       <h3 className="mt-4 text-xl font-semibold tracking-tight">
-        {title ?? (en ? "Unlock the full result" : "სრული შედეგის გახსნა")}
+        {title ?? (am ? "Բացել ամբողջական արդյունքը" : en ? "Unlock the full result" : "სრული შედეგის გახსნა")}
       </h3>
       <p className="mx-auto mt-1.5 max-w-md text-sm text-foreground/80">
         {blurb ??
@@ -78,8 +79,8 @@ export function UnlockCard({
 
       <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1 text-sm">
         <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-        <span className="font-semibold">{cost} {en ? "credits" : "კრედიტი"}</span>
-        <span className="text-muted-foreground">· {en ? "balance" : "ბალანსი"} {balance}</span>
+        <span className="font-semibold">{cost} {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}</span>
+        <span className="text-muted-foreground">· {am ? "մնացորդ" : en ? "balance" : "ბალანსი"} {balance}</span>
       </div>
 
       {!short ? (
@@ -114,7 +115,7 @@ export function UnlockCard({
             <Button asChild variant="mystic">
               <Link href="/credits">
                 <Users className="size-4" />
-                {en ? "Invite / top up" : "მოიწვიე / შეავსე"}
+                {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
               </Link>
             </Button>
           </div>

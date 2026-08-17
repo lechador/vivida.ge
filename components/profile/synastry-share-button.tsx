@@ -61,6 +61,7 @@ export function SynastryShareButton({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [open, setOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -202,7 +203,7 @@ export function SynastryShareButton({
     if (!blob) return "unsupported";
     const file = new File([blob], fileName, { type: "image/png" });
     const shareData: ShareData = {
-      title: en ? "Vivida — our compatibility" : "Vivida — ჩვენი თავსებადობა",
+      title: am ? "Vivida — մեր համատեղելիությունը" : en ? "Vivida — our compatibility" : "Vivida — ჩვენი თავსებადობა",
       text: en
         ? `My compatibility with ${cardProps.partnerName} — ${Math.round(
             cardProps.result.overall
@@ -276,7 +277,7 @@ export function SynastryShareButton({
       return;
     }
     setErrorMessage(
-      en ? "Something went wrong. Please try again." : "ვერ მოხერხდა. სცადე თავიდან."
+      am ? "Ինչ-որ բան այն չէր։ Խնդրում ենք նորից փորձել։" : am ? "Ինչ-որ բան այն չէր։ Խնդրում ենք նորից փորձել։" : en ? "Something went wrong. Please try again." : "ვერ მოხერხდა. სცადე თავიდან."
     );
     setActionState("idle");
   };
@@ -304,7 +305,7 @@ export function SynastryShareButton({
         }}
       >
         <InstagramIcon className="size-4" />
-        {en ? "Share compatibility" : "გააზიარე თავსებადობა"}
+        {am ? "Կիսվել համատեղելիությամբ" : en ? "Share compatibility" : "გააზიარე თავსებადობა"}
       </Button>
 
       {/* Off-screen card mounted only while the dialog is open. The
@@ -344,7 +345,7 @@ export function SynastryShareButton({
         <DialogContent className="max-w-sm gap-4 p-5 sm:p-6">
           <DialogHeader className="text-left">
             <DialogTitle className="text-lg">
-              {en ? "Compatibility card" : "თავსებადობის ბარათი"}
+              {am ? "Համատեղելիության քարտ" : en ? "Compatibility card" : "თავსებადობის ბარათი"}
             </DialogTitle>
             <DialogDescription>
               {en
@@ -367,14 +368,14 @@ export function SynastryShareButton({
             )}
             {loadState === "error" && (
               <div className="absolute inset-0 grid place-items-center px-3 text-center text-xs text-muted-foreground">
-                {errorMessage ?? (en ? "Could not create the card" : "ვერ მოხერხდა")}
+                {errorMessage ?? (am ? "Հնարավոր չէր ստեղծել քարտը" : en ? "Could not create the card" : "ვერ მოხერხდა")}
               </div>
             )}
             {previewUrl && loadState === "ready" && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={previewUrl}
-                alt={en ? "Our compatibility card" : "ჩვენი თავსებადობის ბარათი"}
+                alt={am ? "Մեր համատեղելիության քարտը" : en ? "Our compatibility card" : "ჩვენი თავსებადობის ბარათი"}
                 className="absolute inset-0 size-full object-cover"
               />
             )}
@@ -418,7 +419,7 @@ export function SynastryShareButton({
               disabled={loadState !== "ready"}
             >
               <Download className="size-4" />
-              {en ? "Download" : "ჩამოტვირთვა"}
+              {am ? "Ներբեռնել" : en ? "Download" : "ჩამოტვირთვა"}
             </Button>
           </div>
 

@@ -63,13 +63,14 @@ export function AspectCards({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const [openKey, setOpenKey] = useState<string | null>(null);
   const aspects = chart.aspects ?? [];
 
   if (aspects.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        {en ? "No major aspects were found." : "მნიშვნელოვანი ასპექტები ვერ მოიძებნა."}
+        {am ? "Հիմնական ասպեկտներ չեն հայտնաբերվել։" : en ? "No major aspects were found." : "მნიშვნელოვანი ასპექტები ვერ მოიძებნა."}
       </p>
     );
   }

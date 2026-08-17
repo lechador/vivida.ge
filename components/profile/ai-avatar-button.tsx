@@ -21,6 +21,7 @@ const ERRORS: Record<string, string> = {
  */
 export function AiAvatarButton({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +39,7 @@ export function AiAvatarButton({ locale = "ka" }: { locale?: UserLocale }) {
       }
       router.refresh();
     } catch {
-      setError(en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(am ? "Ցանցի սխալ։ Խնդրում ենք նորից փորձել։" : en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
     } finally {
       setBusy(false);
     }
@@ -59,7 +60,7 @@ export function AiAvatarButton({ locale = "ka" }: { locale?: UserLocale }) {
         ) : (
           <Sparkles className="size-4" />
         )}
-        {busy ? (en ? "Creating…" : "იქმნება…") : (en ? "AI avatar" : "AI ავატარი")}
+        {busy ? (am ? "Ստեղծվում է…" : en ? "Creating…" : "იქმნება…") : (am ? "AI ավատար" : en ? "AI avatar" : "AI ავატარი")}
       </Button>
       {error && (
         <p className="mt-2 text-center text-xs text-[var(--vivida-pink)]">

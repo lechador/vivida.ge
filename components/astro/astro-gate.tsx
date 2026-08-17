@@ -22,6 +22,7 @@ export function AstroGate({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const href = next ? `/onboarding?next=${encodeURIComponent(next)}` : "/onboarding";
   return (
     <div className="mx-auto max-w-lg overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
@@ -35,7 +36,7 @@ export function AstroGate({
       <Button asChild variant="mystic" size="lg" className="mt-6">
         <Link href={href}>
           <Sparkles className="size-4" />
-          {en ? "Create astro profile" : "ასტრო პროფილის შექმნა"}
+          {am ? "Ստեղծել աստղային պրոֆիլ" : en ? "Create astro profile" : "ასტრო პროფილის შექმნა"}
         </Link>
       </Button>
     </div>

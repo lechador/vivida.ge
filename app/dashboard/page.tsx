@@ -38,13 +38,14 @@ export default async function DashboardPage() {
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
   const en = locale !== "ka";
+  const am = locale === "am";
 
   if (!profile?.dateOfBirth) {
     return (
       <AstroLockedMain
         active="today"
-        title={en ? "Your daily horoscope needs a natal chart" : "დღიური ჰოროსკოპი ნატალურ რუკას საჭიროებს"}
-        description={en ? "Add your birth details to receive a personalized horoscope and sky overview every day." : "შეავსე დაბადების მონაცემები და ყოველ დღე მიიღებ პერსონალურ ჰოროსკოპსა და ცის მიმოხილვას."}
+        title={am ? "Ձեր ամենօրյա հորոսկոպին անհրաժեշտ է նատալ քարտեզ" : en ? "Your daily horoscope needs a natal chart" : "დღიური ჰოროსკოპი ნატალურ რუკას საჭიროებს"}
+        description={am ? "Ավելացրեք ձեր ծննդյան տվյալները՝ ամեն օր անհատականացված հորոսկոպ և երկնքի ակնարկ ստանալու համար։" : en ? "Add your birth details to receive a personalized horoscope and sky overview every day." : "შეავსე დაბადების მონაცემები და ყოველ დღე მიიღებ პერსონალურ ჰოროსკოპსა და ცის მიმოხილვას."}
         next="/dashboard"
         locale={locale}
       />
@@ -52,7 +53,7 @@ export default async function DashboardPage() {
   }
 
   const restricted = await isAccountRestricted(user.id);
-  const firstName = user.name?.split(" ")[0] ?? (en ? "stargazer" : "ვარსკვლავო");
+  const firstName = user.name?.split(" ")[0] ?? (am ? "աստղադիտող" : en ? "stargazer" : "ვარსკვლავო");
   const completed = new Set([
     ...(mbtiResult ? ["astro-mbti"] : []),
     ...(iqResult ? ["iq"] : []),
@@ -85,7 +86,7 @@ export default async function DashboardPage() {
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         {restricted && <RestrictedNotice locale={locale} />}
         <h1 className="mb-6 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-          {en ? "Hello," : "სალამი,"}{" "}
+          {am ? "Բարև," : en ? "Hello," : "სალამი,"}{" "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
             {firstName}
           </span>

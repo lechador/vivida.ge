@@ -33,13 +33,14 @@ export function CreditBalanceMenu({
   const [pending, setPending] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const en = locale !== "ka";
+  const am = locale === "am";
   const packs = creditPacksForCountry(countryCode);
 
   if (isPremium) {
     return (
       <Link
         href="/subscription"
-        aria-label={en ? "Open PRO subscription" : "PRO გამოწერის გახსნა"}
+        aria-label={am ? "Բացել PRO բաժանորդագրությունը" : en ? "Open PRO subscription" : "PRO გამოწერის გახსნა"}
         className="inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-gold)]/45 bg-[var(--vivida-gold)]/12 px-3 py-1 text-sm font-bold tracking-wide text-[var(--vivida-gold)] transition-colors hover:bg-[var(--vivida-gold)]/20"
       >
         <Crown className="size-3.5" />
@@ -74,7 +75,7 @@ export function CreditBalanceMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={`${en ? "Credits" : "კრედიტები"}: ${balance}. ${en ? "Top up" : "ბალანსის შევსება"}`}
+          aria-label={`${am ? "Կրեդիտներ" : en ? "Credits" : "კრედიტები"}: ${balance}. ${am ? "Լիցքավորել" : en ? "Top up" : "ბალანსის შევსება"}`}
           className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-2.5 py-1 text-sm font-semibold tabular-nums text-foreground transition-all hover:border-[var(--vivida-cyan)]/65 hover:bg-[var(--vivida-cyan)]/20"
         >
           <Sparkles className="size-3.5 text-[var(--vivida-cyan)]" />
@@ -90,14 +91,14 @@ export function CreditBalanceMenu({
           <div>
             <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
               <CreditCard className="size-3.5 text-[var(--vivida-cyan)]" />
-              {en ? "Quick top-up" : "სწრაფი შევსება"}
+              {am ? "Արագ լիցքավորում" : en ? "Quick top-up" : "სწრაფი შევსება"}
             </div>
             <p className="mt-1 text-sm text-foreground/80">
-              {en ? "Choose a credit pack" : "აირჩიე კრედიტების პაკეტი"}
+              {am ? "Ընտրեք կրեդիտների փաթեթ" : en ? "Choose a credit pack" : "აირჩიე კრედიტების პაკეტი"}
             </p>
           </div>
           <div className="rounded-xl bg-[var(--vivida-cyan)]/10 px-2.5 py-1.5 text-right">
-            <div className="text-[10px] text-muted-foreground">{en ? "Balance" : "ბალანსი"}</div>
+            <div className="text-[10px] text-muted-foreground">{am ? "Մնացորդ" : en ? "Balance" : "ბალანსი"}</div>
             <div className="font-bold tabular-nums text-[var(--vivida-cyan)]">{balance}</div>
           </div>
         </div>
@@ -113,7 +114,7 @@ export function CreditBalanceMenu({
             >
               {index === 0 && (
                 <span className="absolute -top-1.5 rounded-full bg-[var(--vivida-cyan)] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[oklch(0.14_0.02_260)]">
-                  {en ? "Popular" : "რჩეული"}
+                  {am ? "Հանրաճանաչ" : en ? "Popular" : "რჩეული"}
                 </span>
               )}
               {pending === pack.id ? (
@@ -122,7 +123,7 @@ export function CreditBalanceMenu({
                 <span className="text-lg font-bold tabular-nums">{pack.credits}</span>
               )}
               <span className="text-[10px] text-muted-foreground">
-                {en ? "credits" : "კრედიტი"}
+                {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}
               </span>
               <span className="mt-1 text-sm font-semibold tabular-nums">
                 {formatBillingAmount(pack.amountMinor, pack.currency, locale)}
@@ -133,7 +134,7 @@ export function CreditBalanceMenu({
 
         {failed && (
           <p role="alert" className="mt-2 text-center text-xs text-destructive">
-            {en ? "Could not start payment. Please try again." : "გადახდა ვერ დაიწყო. სცადე თავიდან."}
+            {am ? "Վճարումը չհաջողվեց սկսել։ Խնդրում ենք նորից փորձել։" : en ? "Could not start payment. Please try again." : "გადახდა ვერ დაიწყო. სცადე თავიდან."}
           </p>
         )}
 
@@ -141,7 +142,7 @@ export function CreditBalanceMenu({
           href="/credits"
           className="mt-2 flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent/15 hover:text-foreground"
         >
-          {en ? "Credits and rewards" : "კრედიტები და ბონუსები"}
+          {am ? "Կրեդիտներ և պարգևներ" : en ? "Credits and rewards" : "კრედიტები და ბონუსები"}
           <ArrowRight className="size-3.5" />
         </Link>
       </DropdownMenuContent>

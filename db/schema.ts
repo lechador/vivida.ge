@@ -1194,33 +1194,52 @@ export type HouseInterpretationLibraryRow =
  * (strongest transit wins) and as the label in the transit-breakdown UI.
  * `edited=true` marks a human-curated row so regeneration leaves it alone.
  */
-export const transitInterpretationLibrary = pgTable("transit_interpretation_library", {
-  /** e.g. "aspect:moon:square:venus", "house:mars:7", "sign:moon:leo". */
-  key: text("key").primaryKey(),
-  /** 'aspect' | 'house' | 'sign' */
-  kind: text("kind").notNull(),
-  /** Transiting body key (sun…pluto). */
-  transit: text("transit").notNull(),
-  /** Aspect kind for kind='aspect', else null. */
-  aspectKind: text("aspect_kind"),
-  /** Natal point key (aspect), house number as text (house), or sign key (sign). */
-  subject: text("subject").notNull(),
-  /** Short Georgian headline (3-7 words). */
-  title: text("title").notNull(),
-  /** Georgian interpretation text (2-4 sentences). */
-  body: text("body").notNull(),
-  /** Model id that produced it, "curated", or "manual" after an admin edit. */
-  model: text("model").notNull(),
-  /** True once a human edits it — regeneration skips edited rows. */
-  edited: boolean("edited").notNull().default(false),
-  language: text("language").notNull().default("ka"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const transitInterpretationLibrary = pgTable(
+  "transit_interpretation_library",
+  {
+    /** e.g. "aspect:moon:square:venus", "house:mars:7", "sign:moon:leo". */
+    key: text("key").notNull(),
+    /** 'aspect' | 'house' | 'sign' */
+    kind: text("kind").notNull(),
+    /** Transiting body key (sun…pluto). */
+    transit: text("transit").notNull(),
+    /** Aspect kind for kind='aspect', else null. */
+    aspectKind: text("aspect_kind"),
+    /** Natal point key (aspect), house number as text (house), or sign key (sign). */
+    subject: text("subject").notNull(),
+    /** Short headline (3-7 words), in `language`. */
+    title: text("title").notNull(),
+    /** Interpretation text (2-4 sentences), in `language`. */
+    body: text("body").notNull(),
+    /** Model id that produced it, "curated", or "manual" after an admin edit. */
+    model: text("model").notNull(),
+    /** True once a human edits it — regeneration skips edited rows. */
+    edited: boolean("edited").notNull().default(false),
+    language: text("language").notNull().default("ka"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    /**
+     * (key, language) — NOT key alone.
+     *
+     * `language` has existed since the table was created, but `key` was the
+     * primary key, so the table could physically hold only ONE row per combo
+     * and every row was Georgian. That is why the Armenian daily horoscope
+     * came back in Georgian script: the reader's locale selected this table
+     * and the table had nothing else to give. Widening the key is what lets
+     * a translated row sit alongside its Georgian original.
+     */
+    primaryKey({
+      columns: [table.key, table.language],
+      name: "transit_interpretation_library_pkey",
+    }),
+  ],
+);
 
 export type TransitInterpretationLibraryRow =
   typeof transitInterpretationLibrary.$inferSelect;

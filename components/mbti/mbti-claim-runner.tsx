@@ -18,6 +18,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function MbtiClaimRunner({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const router = useRouter();
   const started = useRef(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,10 +61,10 @@ export function MbtiClaimRunner({ locale = "ka" }: { locale?: UserLocale }) {
     return (
       <div className="rounded-2xl border border-border bg-card/50 p-8 text-center">
         <p className="text-sm text-muted-foreground">
-          {en ? "No saved answers were found. Please take the test again." : "პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან."}
+          {am ? "Պահված պատասխաններ չեն գտնվել։ Խնդրում ենք նորից անցնել թեստը։" : en ? "No saved answers were found. Please take the test again." : "პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან."}
         </p>
         <Button asChild variant="mystic" className="mt-4">
-          <Link href="/pirovnebis-testi">{en ? "Start the test" : "ტესტის დაწყება"}</Link>
+          <Link href="/pirovnebis-testi">{am ? "Սկսել թեստը" : en ? "Start the test" : "ტესტის დაწყება"}</Link>
         </Button>
       </div>
     );
@@ -74,7 +75,7 @@ export function MbtiClaimRunner({ locale = "ka" }: { locale?: UserLocale }) {
       <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-8 text-center">
         <p className="text-sm text-destructive">{error}</p>
         <Button asChild variant="outline" className="mt-4">
-          <Link href="/pirovnebis-testi">{en ? "Try again" : "თავიდან ცდა"}</Link>
+          <Link href="/pirovnebis-testi">{am ? "Կրկին փորձել" : en ? "Try again" : "თავიდან ცდა"}</Link>
         </Button>
       </div>
     );
@@ -86,7 +87,7 @@ export function MbtiClaimRunner({ locale = "ka" }: { locale?: UserLocale }) {
         <Sparkles className="size-7 animate-pulse text-[var(--vivida-violet)]" />
       </div>
       <h2 className="mt-5 text-xl font-semibold tracking-tight">
-        {en ? "Creating your personality profile…" : "ვქმნი შენს პიროვნულ ანალიზს…"}
+        {am ? "Ստեղծվում է ձեր անհատականության պրոֆիլը…" : en ? "Creating your personality profile…" : "ვქმნი შენს პიროვნულ ანალიზს…"}
       </h2>
       <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
         {en

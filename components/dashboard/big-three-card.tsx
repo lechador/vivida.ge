@@ -36,6 +36,7 @@ export function BigThreeCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const sign = signByIndex(point.signIndex);
   const color = signColor(sign);
 
@@ -67,7 +68,7 @@ export function BigThreeCard({
         </span>
         <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
           {formatDegree(point.signDegree)}
-          {point.house ? ` · ${point.house} ${en ? "house" : "სახ."}` : ""}
+          {point.house ? ` · ${point.house} ${am ? "տուն" : en ? "house" : "სახ."}` : ""}
         </span>
       </div>
       {interpretation && (

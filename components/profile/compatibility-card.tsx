@@ -55,6 +55,7 @@ export function CompatibilityCard({
   locale = "ka",
 }: CompatibilityCardProps) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const overall = Math.round(result.overall);
 
   return (
@@ -202,7 +203,7 @@ export function CompatibilityCard({
             marginBottom: 12,
           }}
         >
-          {en ? "COMPATIBILITY" : "თავსებადობა"}
+          {am ? "ՀԱՄԱՏԵՂԵԼԻՈՒԹՅՈՒՆ" : en ? "COMPATIBILITY" : "თავსებადობა"}
         </div>
         <div
           style={{
@@ -274,7 +275,7 @@ export function CompatibilityCard({
             color: "rgba(255,255,255,0.6)",
           }}
         >
-          {en ? "Discover your compatibility" : "გაიგე შენი თავსებადობა"}
+          {am ? "Բացահայտեք ձեր համատեղելիությունը" : en ? "Discover your compatibility" : "გაიგე შენი თავსებადობა"}
         </div>
         <div
           style={{

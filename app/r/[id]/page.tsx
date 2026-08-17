@@ -48,6 +48,7 @@ export async function generateMetadata({
   const { id } = await params;
   const [r, locale] = await Promise.all([getResult(id), getRequestLocale()]);
   const en = locale !== "ka";
+  const am = locale === "am";
   if (!r) return { title: "Astro-MBTI" };
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const archetype = en ? mbtiArchetypeEn(r.mbtiType) : r.archetypeNameGe;
@@ -76,6 +77,7 @@ export default async function MbtiSharePage({
   const [r, session, locale] = await Promise.all([getResult(id), auth(), getRequestLocale()]);
   if (!r) notFound();
   const en = locale !== "ka";
+  const am = locale === "am";
   const authed = !!session?.user?.id;
   const archetype = en ? mbtiArchetypeEn(r.mbtiType) : r.archetypeNameGe;
 
@@ -110,10 +112,10 @@ export default async function MbtiSharePage({
             {en ? `Are you a ${mbtiArchetypeEn(r.mbtiType)} too?` : `${mbtiArchetypeKa(r.mbtiType)} ხარ შენც?`}
           </h2>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-            {en ? "Take the free test and discover your personality type." : "გაიარე უფასო ტესტი და აღმოაჩინე შენი ფსიქოლოგიური ტიპი."}
+            {am ? "Անցեք անվճար թեստը և բացահայտեք ձեր անհատականության տեսակը։" : en ? "Take the free test and discover your personality type." : "გაიარე უფასო ტესტი და აღმოაჩინე შენი ფსიქოლოგიური ტიპი."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
-            <Link href="/pirovnebis-testi">{en ? "Start the test" : "დაიწყე ტესტი"}</Link>
+            <Link href="/pirovnebis-testi">{am ? "Սկսել թեստը" : en ? "Start the test" : "დაიწყე ტესტი"}</Link>
           </Button>
         </div>
       </section>

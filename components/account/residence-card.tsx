@@ -20,6 +20,7 @@ export function ResidenceCard({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const am = locale === "am";
   const options = useMemo(() => countryOptions(locale), [locale]);
   const [countryCode, setCountryCode] = useState(initialCountryCode ?? "");
   const [city, setCity] = useState(initialCity ?? "");
@@ -55,7 +56,7 @@ export function ResidenceCard({
           <MapPin className="size-5" />
         </span>
         <div>
-          <h2 className="text-lg font-semibold">{en ? "Residence" : "საცხოვრებელი ადგილი"}</h2>
+          <h2 className="text-lg font-semibold">{am ? "Բնակության վայր" : en ? "Residence" : "საცხოვრებელი ადგილი"}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {en
               ? "Your country was detected at registration. You can update it and your current city here."
@@ -66,7 +67,7 @@ export function ResidenceCard({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="residence-country">{en ? "Country" : "ქვეყანა"}</Label>
+          <Label htmlFor="residence-country">{am ? "Երկիր" : en ? "Country" : "ქვეყანა"}</Label>
           <select
             id="residence-country"
             value={countryCode}
@@ -74,7 +75,7 @@ export function ResidenceCard({
             className="h-10 w-full rounded-lg border border-border bg-background/35 px-3 text-sm text-foreground outline-none transition-colors focus:border-[var(--vivida-violet)] focus:ring-2 focus:ring-[var(--vivida-violet)]/20"
           >
             <option value="" disabled>
-              {en ? "Choose country" : "აირჩიე ქვეყანა"}
+              {am ? "Ընտրել երկիր" : en ? "Choose country" : "აირჩიე ქვეყანა"}
             </option>
             {options.map((option) => (
               <option key={option.code} value={option.code}>
@@ -84,23 +85,23 @@ export function ResidenceCard({
           </select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="residence-city">{en ? "City" : "ქალაქი"}</Label>
+          <Label htmlFor="residence-city">{am ? "Քաղաք" : en ? "City" : "ქალაქი"}</Label>
           <Input
             id="residence-city"
             value={city}
             onChange={(event) => setCity(event.target.value)}
             maxLength={100}
-            placeholder={en ? "e.g. London" : "მაგ. თბილისი"}
+            placeholder={am ? "օրինակ՝ Լոնդոն" : en ? "e.g. London" : "მაგ. თბილისი"}
           />
         </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">
-          {error ?? (saved ? (en ? "Saved ✓" : "შენახულია ✓") : "")}
+          {error ?? (saved ? (am ? "Պահպանված է ✓" : en ? "Saved ✓" : "შენახულია ✓") : "")}
         </p>
         <Button type="button" size="sm" onClick={save} disabled={pending}>
-          {pending ? (en ? "Saving…" : "ინახება…") : (en ? "Save residence" : "საცხოვრებელი ადგილის შენახვა")}
+          {pending ? (am ? "Պահպանվում է…" : en ? "Saving…" : "ინახება…") : (am ? "Պահպանել բնակության վայրը" : en ? "Save residence" : "საცხოვრებელი ადგილის შენახვა")}
         </Button>
       </div>
     </section>

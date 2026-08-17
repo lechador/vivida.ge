@@ -9,8 +9,9 @@ import { LEGAL_ENTITY } from "@/lib/legal-entity";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
+  const am = locale === "am";
   return {
-    title: en ? "Privacy Policy" : "კონფიდენციალურობა",
+    title: am ? "Գաղտնիության քաղաքականություն" : en ? "Privacy Policy" : "კონფიდენციალურობა",
     description: en
       ? "Vivida's Privacy Policy explains how we collect, use, protect, and retain personal data."
       : "Vivida-ს კონფიდენციალურობის პოლიტიკა — როგორ ვაგროვებთ და ვინახავთ თქვენს მონაცემებს.",

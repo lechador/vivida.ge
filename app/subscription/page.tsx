@@ -18,7 +18,8 @@ import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tr
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) !== "ka";
+  const locale = await getRequestLocale();
+  const en = locale !== "ka";
   return { title: en ? "PRO subscription" : "PRO გამოწერა", robots: { index: false } };
 }
 

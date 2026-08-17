@@ -24,8 +24,10 @@ import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) !== "ka";
-  return { title: en ? "Your Astro-MBTI result" : "Astro-MBTI შედეგი" };
+  const locale = await getRequestLocale();
+  const en = locale !== "ka";
+  const am = locale === "am";
+  return { title: am ? "Ձեր Աստրո-ՄԲՏԻ արդյունքը" : en ? "Your Astro-MBTI result" : "Astro-MBTI შედეგი" };
 }
 export const dynamic = "force-dynamic";
 
@@ -41,6 +43,7 @@ export default async function TestResultPage({
   const { id } = await params;
   const [user, locale] = await Promise.all([requireUser(), getRequestLocale()]);
   const en = locale !== "ka";
+  const am = locale === "am";
 
   const [result] = await db
     .select()
@@ -79,7 +82,7 @@ export default async function TestResultPage({
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Astro-MBTI · Your result" : "Astro-MBTI · შენი შედეგი"}
+          {am ? "Աստրո-MBTI · Ձեր արդյունքը" : en ? "Astro-MBTI · Your result" : "Astro-MBTI · შენი შედეგი"}
         </div>
 
         {unlocked ? (
@@ -121,8 +124,8 @@ export default async function TestResultPage({
                 resultId={result.id}
                 cost={CREDIT_COST.mbtiTest}
                 balance={balance}
-                title={en ? "Unlock your full portrait" : "სრული პორტრეტის გახსნა"}
-                blurb={en ? "Explore your core preferences, strengths, relationships and working style. Unlock once and keep it in your account." : "ღრმა ანალიზი, ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ცნობილი ადამიანები შენი ტიპით — გადაიხდი ერთხელ, სამუდამოდ შენია."}
+                title={am ? "Բացահայտեք Ձեր ամբողջական դիմանկարը" : en ? "Unlock your full portrait" : "სრული პორტრეტის გახსნა"}
+                blurb={am ? "Բացահայտեք Ձեր հիմնական նախասիրությունները, ուժեղ կողմերը, հարաբերությունները և աշխատանքային ոճը։ Մեկ անգամ բացելուց հետո այն կմնա Ձեր հաշվում։" : en ? "Explore your core preferences, strengths, relationships and working style. Unlock once and keep it in your account." : "ღრმა ანალიზი, ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ცნობილი ადამიანები შენი ტიპით — გადაიხდი ერთხელ, სამუდამოდ შენია."}
                 locale={locale}
               />
             </div>
@@ -133,7 +136,7 @@ export default async function TestResultPage({
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-6">
           <p className="text-xs text-muted-foreground">
-            {en ? "Your result is saved to your account." : "შედეგი გამოგზავნილია შენს ელფოსტაზეც."}
+            {am ? "Ձեր արդյունքը պահպանված է Ձեր հաշվում։" : en ? "Your result is saved to your account." : "შედეგი გამოგზავნილია შენს ელფოსტაზეც."}
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <MbtiShareButton
@@ -143,7 +146,7 @@ export default async function TestResultPage({
               locale={locale}
             />
             <Button asChild variant="outline">
-              <Link href="/pirovnebis-testi">{en ? "Retake test" : "თავიდან გავიარო"}</Link>
+              <Link href="/pirovnebis-testi">{am ? "Կրկնել թեստը" : en ? "Retake test" : "თავიდან გავიარო"}</Link>
             </Button>
           </div>
         </div>

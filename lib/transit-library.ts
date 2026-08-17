@@ -19,7 +19,7 @@
  * seeding uses scripts/seed-transit-library.mjs (Vertex AI).
  */
 
-import { inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import { db } from "@/db";
 import { transitInterpretationLibrary } from "@/db/schema";
@@ -242,20 +242,17 @@ export async function getTransitLibraryEntries(
   locale: UserLocale = "ka",
 ): Promise<Map<string, TransitEntry>> {
   if (keys.length === 0) return new Map();
-  // The DB rows below are Georgian: `key` is the primary key, so the table
-  // physically cannot hold a second row per key, and its `language` column is
-  // "ka" for every row. Testing `locale === "en"` therefore sent Armenian
-  // readers down the Georgian path — their daily horoscope body and headline
-  // came back in Georgian script, on a site that was otherwise Armenian. This
-  // is the same `usesEnglishCopy` policy the ~175 UI files already follow:
-  // English is a legible fallback for an untranslated surface, Georgian is not.
-  if (usesEnglishCopy(locale)) {
+  // English is composed programmatically from label tables, so it never needs
+  // a row and can't have gaps.
+  if (locale === "en") {
     return new Map(
       keys
         .map((key) => [key, englishTransitEntry(key)] as const)
         .filter((entry): entry is readonly [string, TransitEntry] => Boolean(entry[1])),
     );
   }
+
+  // Georgian and Armenian both live in the table, one row per (key, language).
   const rows = await db
     .select({
       key: transitInterpretationLibrary.key,
@@ -263,8 +260,28 @@ export async function getTransitLibraryEntries(
       body: transitInterpretationLibrary.body,
     })
     .from(transitInterpretationLibrary)
-    .where(inArray(transitInterpretationLibrary.key, keys));
-  return new Map(rows.map((r) => [r.key, { title: r.title, body: r.body }]));
+    .where(
+      and(
+        inArray(transitInterpretationLibrary.key, keys),
+        eq(transitInterpretationLibrary.language, locale),
+      ),
+    );
+  const found = new Map(rows.map((r) => [r.key, { title: r.title, body: r.body }]));
+
+  // A missing Armenian row must fall back to ENGLISH, never to the Georgian
+  // row that shares its key — Georgian script on an Armenian page is the
+  // worse of the two failures, and it is the exact bug this table caused
+  // before it could hold a second language. `composeDailyFromLibrary` aborts
+  // the whole composition on any gap, so without this a single untranslated
+  // combo would drop the reader onto the full-AI path for the entire day.
+  if (locale !== "ka") {
+    for (const key of keys) {
+      if (found.has(key)) continue;
+      const fallback = englishTransitEntry(key);
+      if (fallback) found.set(key, fallback);
+    }
+  }
+  return found;
 }
 
 // ---------------------------------------------------------------------------
@@ -393,7 +410,14 @@ export async function generateTransitEntry(
 export async function ensureTransitLibraryFor(
   combos: TransitCombo[]
 ): Promise<void> {
-  const have = await getTransitLibraryEntries(combos.map((c) => c.key));
+  // Georgian only. `generateTransitEntry`'s prompt is Georgian, so this can
+  // only ever produce a `ka` row — now that (key, language) is the primary
+  // key, the language has to be stated rather than left to the column
+  // default, or a future generator would silently overwrite Georgian.
+  // Armenian is backfilled by scripts/translate-transit-library.mjs; a gap
+  // there falls back to English at read time rather than being generated
+  // live, so an Armenian reader never waits on a model call.
+  const have = await getTransitLibraryEntries(combos.map((c) => c.key), "ka");
   const missing = combos.filter((c) => !have.has(c.key));
   for (const c of missing) {
     try {
@@ -409,6 +433,7 @@ export async function ensureTransitLibraryFor(
           title: entry.title,
           body: entry.body,
           model: TRANSIT_LIBRARY_MODEL,
+          language: "ka",
         })
         .onConflictDoNothing();
     } catch (err) {
