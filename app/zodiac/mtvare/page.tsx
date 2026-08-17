@@ -12,20 +12,46 @@ import {
   MOONS_CONTENT,
   paragraphs,
 } from "@/lib/seo/zodiac-content";
-import {
-  ALL_SLUGS,
-  signMetaBySlug,
-} from "@/lib/seo/zodiac-dates";
+import { ALL_SLUGS, signMetaBySlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacPlacementHubEn } from "@/components/seo/zodiac-placement-hub-en";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ZodiacPlacementHubAm } from "@/components/seo/zodiac-placement-pages-am";
+import { ZODIAC_PLACEMENTS_AM } from "@/lib/zodiac-placements-am";
+import {
+  ARMENIAN_SITE_URL,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/mtvare";
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) === "en") {
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const content = ZODIAC_PLACEMENTS_AM.moonHub;
+    return {
+      title: { absolute: content.pageTitle },
+      description: content.metaDescription,
+      alternates: localizedAlternates(`/am${PATH}`, PATH, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}${PATH}`,
+        title: content.pageTitle,
+        description: content.metaDescription,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: content.pageTitle,
+        description: content.metaDescription,
+      },
+    };
+  }
+  if (locale === "en") {
     const title = "Moon Signs: Meaning, Emotional Traits and Love";
     const description =
       "Discover what your Moon sign reveals about emotional needs, instinctive reactions, love, compatibility, and your private inner world.";
@@ -47,30 +73,31 @@ export async function generateMetadata(): Promise<Metadata> {
   }
   return MOON_HUB_CONTENT
     ? {
-      title: { absolute: MOON_HUB_CONTENT.pageTitle },
-      description: MOON_HUB_CONTENT.metaDescription,
-      alternates: localizedAlternates(PATH, PATH, "ka"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: `${SITE_URL}${PATH}`,
-        title: MOON_HUB_CONTENT.pageTitle,
+        title: { absolute: MOON_HUB_CONTENT.pageTitle },
         description: MOON_HUB_CONTENT.metaDescription,
-        siteName: "Vivida",
-        locale: "ka_GE",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: MOON_HUB_CONTENT.pageTitle,
-        description: MOON_HUB_CONTENT.metaDescription,
-      },
+        alternates: localizedAlternates(PATH, PATH, "ka"),
+        openGraph: {
+          images: [DEFAULT_OG_IMAGE],
+          type: "website",
+          url: `${SITE_URL}${PATH}`,
+          title: MOON_HUB_CONTENT.pageTitle,
+          description: MOON_HUB_CONTENT.metaDescription,
+          siteName: "Vivida",
+          locale: "ka_GE",
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: MOON_HUB_CONTENT.pageTitle,
+          description: MOON_HUB_CONTENT.metaDescription,
+        },
       }
     : {};
 }
 
 export default async function MoonHubPage() {
-  if ((await getRequestLocale()) === "en")
-    return <ZodiacPlacementHubEn kind="moon" />;
+  const locale = await getRequestLocale();
+  if (locale === "am") return <ZodiacPlacementHubAm kind="moon" />;
+  if (locale === "en") return <ZodiacPlacementHubEn kind="moon" />;
   if (!MOON_HUB_CONTENT || !MOONS_CONTENT) notFound();
   const c = MOON_HUB_CONTENT;
   const moons = MOONS_CONTENT;
@@ -107,8 +134,18 @@ export default async function MoonHubPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ცის ნიშნები", item: `${SITE_URL}/zodiac` },
-      { "@type": "ListItem", position: 2, name: "მთვარის ნიშანი", item: `${SITE_URL}${PATH}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ცის ნიშნები",
+        item: `${SITE_URL}/zodiac`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "მთვარის ნიშანი",
+        item: `${SITE_URL}${PATH}`,
+      },
     ],
   };
 
@@ -136,7 +173,9 @@ export default async function MoonHubPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/zodiac" className="hover:text-foreground">ცის ნიშნები</Link>
+          <Link href="/zodiac" className="hover:text-foreground">
+            ცის ნიშნები
+          </Link>
           <span>/</span>
           <span className="text-foreground/80">მთვარის ნიშანი</span>
         </nav>
@@ -236,9 +275,16 @@ export default async function MoonHubPage() {
               >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
                   <span>{item.q}</span>
-                  <span aria-hidden className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45">✦</span>
+                  <span
+                    aria-hidden
+                    className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45"
+                  >
+                    ✦
+                  </span>
                 </summary>
-                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p>
+                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>
@@ -250,8 +296,8 @@ export default async function MoonHubPage() {
             გაიგე შენი ზუსტი მთვარის ნიშანი
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            შენი დაბადების დროიდან Vivida ერთ წუთში დაგიფიქსირებს მთვარის
-            ნიშანს — და ცის 12 სახლის სრულ რუკას.
+            შენი დაბადების დროიდან Vivida ერთ წუთში დაგიფიქსირებს მთვარის ნიშანს
+            — და ცის 12 სახლის სრულ რუკას.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/signup">დაიწყე უფასოდ</Link>

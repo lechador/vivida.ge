@@ -172,6 +172,45 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     }),
   );
 
+  const zodiacGuideHubEntries = [
+    "/zodiac/mtvare",
+    "/zodiac/amomavali",
+    "/zodiac/elementebi",
+    "/zodiac/datit",
+    "/zodiac/gzamkvlevi",
+  ].map((path) => ({
+    url: `${ENGLISH_SITE_URL}/am${path}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: path === "/zodiac/gzamkvlevi" ? 0.82 : 0.78,
+    alternates: alternatesFor(path, path),
+  }));
+
+  const placementEntries = (["mtvare", "amomavali"] as const).flatMap(
+    (placement) =>
+      ALL_SLUGS.map((sign) => {
+        const path = `/zodiac/${placement}/${sign}`;
+        return {
+          url: `${ENGLISH_SITE_URL}/am${path}`,
+          lastModified: ARMENIAN_PUBLISHED,
+          changeFrequency: "monthly" as const,
+          priority: 0.7,
+          alternates: alternatesFor(path, path),
+        };
+      }),
+  );
+
+  const elementEntries = ALL_ELEMENT_SLUGS.map((element) => {
+    const path = `/zodiac/elementebi/${element}`;
+    return {
+      url: `${ENGLISH_SITE_URL}/am${path}`,
+      lastModified: ARMENIAN_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+      alternates: alternatesFor(path, path),
+    };
+  });
+
   const thematicHubEntries = ALL_HOROSCOPE_THEMES.map((theme) => ({
     url: `${ENGLISH_SITE_URL}/am${themeUrl(theme)}`,
     lastModified: ARMENIAN_PUBLISHED,
@@ -507,6 +546,9 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...periodEntries,
     ...signPeriodEntries,
     ...yearlyEntries,
+    ...zodiacGuideHubEntries,
+    ...placementEntries,
+    ...elementEntries,
     ...thematicHubEntries,
     ...thematicSignEntries,
     ...pairEntries,

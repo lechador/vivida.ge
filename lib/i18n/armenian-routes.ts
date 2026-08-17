@@ -182,6 +182,11 @@ const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([
   "/astrologiuri-saxlebi",
   "/planetebi",
   "/horoskopi",
+  "/zodiac/mtvare",
+  "/zodiac/amomavali",
+  "/zodiac/elementebi",
+  "/zodiac/datit",
+  "/zodiac/gzamkvlevi",
   ...ARMENIAN_HOROSCOPE_SIGN_SLUGS.flatMap((sign) =>
     ARMENIAN_HOROSCOPE_VIEW_PATHS.map(
       (viewPath) => `/zodiac/${sign}/${viewPath}`,
@@ -209,6 +214,9 @@ const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [
   "/emociuri-inteleqti/",
   "/astrologiuri-saxlebi/",
   "/planetebi/",
+  "/zodiac/mtvare/",
+  "/zodiac/amomavali/",
+  "/zodiac/elementebi/",
 ];
 
 /**

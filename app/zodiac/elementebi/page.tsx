@@ -24,7 +24,13 @@ import { ELEMENTS_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacElementsHubEn } from "@/components/seo/zodiac-elements-en";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ZodiacElementsHubAm } from "@/components/seo/zodiac-element-pages-am";
+import { ZODIAC_PLACEMENTS_AM } from "@/lib/zodiac-placements-am";
+import {
+  ARMENIAN_SITE_URL,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/elementebi";
@@ -43,7 +49,10 @@ const ELEMENT_GLYPH: Record<ElementSlug, string> = {
   water: "▽",
 };
 
-const BLURB_KEY: Record<ElementSlug, "fireBlurb" | "earthBlurb" | "airBlurb" | "waterBlurb"> = {
+const BLURB_KEY: Record<
+  ElementSlug,
+  "fireBlurb" | "earthBlurb" | "airBlurb" | "waterBlurb"
+> = {
   fire: "fireBlurb",
   earth: "earthBlurb",
   air: "airBlurb",
@@ -51,34 +60,76 @@ const BLURB_KEY: Record<ElementSlug, "fireBlurb" | "earthBlurb" | "airBlurb" | "
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) === "en") {
-    const title = "The Four Zodiac Elements: Fire, Earth, Air and Water";
-    const description = "Understand the four zodiac elements and their signs, personality traits, strengths, challenges, love style, career patterns, and compatibility.";
-    return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: "https://www.vividaastro.com/zodiac/elementebi", title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
-  }
-  return ELEMENTS_HUB_CONTENT ? {
-      title: { absolute: ELEMENTS_HUB_CONTENT.pageTitle },
-      description: ELEMENTS_HUB_CONTENT.metaDescription,
-      alternates: localizedAlternates(PATH, PATH, "ka"),
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const content = ZODIAC_PLACEMENTS_AM.elementsHub;
+    return {
+      title: { absolute: content.pageTitle },
+      description: content.metaDescription,
+      alternates: localizedAlternates(`/am${PATH}`, PATH, "am"),
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${SITE_URL}${PATH}`,
-        title: ELEMENTS_HUB_CONTENT.pageTitle,
-        description: ELEMENTS_HUB_CONTENT.metaDescription,
+        url: `${ARMENIAN_SITE_URL}${PATH}`,
+        title: content.pageTitle,
+        description: content.metaDescription,
         siteName: "Vivida",
-        locale: "ka_GE",
+        locale: "hy_AM",
       },
       twitter: {
         card: "summary_large_image",
-        title: ELEMENTS_HUB_CONTENT.pageTitle,
-        description: ELEMENTS_HUB_CONTENT.metaDescription,
+        title: content.pageTitle,
+        description: content.metaDescription,
       },
-    } : {};
+    };
+  }
+  if (locale === "en") {
+    const title = "The Four Zodiac Elements: Fire, Earth, Air and Water";
+    const description =
+      "Understand the four zodiac elements and their signs, personality traits, strengths, challenges, love style, career patterns, and compatibility.";
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(PATH, PATH, "en"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: "https://www.vividaastro.com/zodiac/elementebi",
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
+  return ELEMENTS_HUB_CONTENT
+    ? {
+        title: { absolute: ELEMENTS_HUB_CONTENT.pageTitle },
+        description: ELEMENTS_HUB_CONTENT.metaDescription,
+        alternates: localizedAlternates(PATH, PATH, "ka"),
+        openGraph: {
+          images: [DEFAULT_OG_IMAGE],
+          type: "website",
+          url: `${SITE_URL}${PATH}`,
+          title: ELEMENTS_HUB_CONTENT.pageTitle,
+          description: ELEMENTS_HUB_CONTENT.metaDescription,
+          siteName: "Vivida",
+          locale: "ka_GE",
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: ELEMENTS_HUB_CONTENT.pageTitle,
+          description: ELEMENTS_HUB_CONTENT.metaDescription,
+        },
+      }
+    : {};
 }
 
 export default async function ElementsHubPage() {
-  if ((await getRequestLocale()) === "en") return <ZodiacElementsHubEn />;
+  const locale = await getRequestLocale();
+  if (locale === "am") return <ZodiacElementsHubAm />;
+  if (locale === "en") return <ZodiacElementsHubEn />;
   if (!ELEMENTS_HUB_CONTENT) notFound();
   const c = ELEMENTS_HUB_CONTENT;
 
@@ -114,8 +165,18 @@ export default async function ElementsHubPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ცის ნიშნები", item: `${SITE_URL}/zodiac` },
-      { "@type": "ListItem", position: 2, name: "ელემენტები", item: `${SITE_URL}${PATH}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ცის ნიშნები",
+        item: `${SITE_URL}/zodiac`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "ელემენტები",
+        item: `${SITE_URL}${PATH}`,
+      },
     ],
   };
 
@@ -143,7 +204,9 @@ export default async function ElementsHubPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/zodiac" className="hover:text-foreground">ცის ნიშნები</Link>
+          <Link href="/zodiac" className="hover:text-foreground">
+            ცის ნიშნები
+          </Link>
           <span>/</span>
           <span className="text-foreground/80">ელემენტები</span>
         </nav>
@@ -235,9 +298,16 @@ export default async function ElementsHubPage() {
               >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
                   <span>{item.q}</span>
-                  <span aria-hidden className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45">✦</span>
+                  <span
+                    aria-hidden
+                    className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45"
+                  >
+                    ✦
+                  </span>
                 </summary>
-                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p>
+                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>

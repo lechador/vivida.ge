@@ -23,8 +23,14 @@ import { elementPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacElementPageEn } from "@/components/seo/zodiac-elements-en";
+import { ZodiacElementPageAm } from "@/components/seo/zodiac-element-pages-am";
 import { ELEMENT_ENGLISH } from "@/lib/zodiac-element-en";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { elementArmenian } from "@/lib/zodiac-placements-am";
+import {
+  ARMENIAN_SITE_URL,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -59,19 +65,65 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { element } = await params;
   if (!isElement(element) || !ELEMENTS_CONTENT) return {};
-  if ((await getRequestLocale()) === "en") {
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const c = elementArmenian(element);
+    const path = `/zodiac/elementebi/${element}`;
+    return {
+      title: { absolute: c.title },
+      description: c.description,
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title: c.title,
+        description: c.description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: c.title,
+        description: c.description,
+      },
+    };
+  }
+  if (locale === "en") {
     const c = ELEMENT_ENGLISH[element];
     const title = `${c.name}: Traits, Love and Compatibility`;
     const description = `${c.tagline} Explore personality, strengths, challenges, relationships, career, and compatibility with the other elements.`;
     const url = `https://www.vividaastro.com/zodiac/elementebi/${element}`;
-    return { title: { absolute: title }, description, alternates: localizedAlternates(`/zodiac/elementebi/${element}`, `/zodiac/elementebi/${element}`, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(
+        `/zodiac/elementebi/${element}`,
+        `/zodiac/elementebi/${element}`,
+        "en",
+      ),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
   }
   const c = ELEMENTS_CONTENT[element];
   if (!c) return {};
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
-    alternates: localizedAlternates(`/zodiac/elementebi/${element}`, `/zodiac/elementebi/${element}`, "ka"),
+    alternates: localizedAlternates(
+      `/zodiac/elementebi/${element}`,
+      `/zodiac/elementebi/${element}`,
+      "ka",
+    ),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "article",
@@ -96,7 +148,9 @@ export default async function ElementDetailPage({
 }) {
   const { element } = await params;
   if (!isElement(element) || !ELEMENTS_CONTENT) notFound();
-  if ((await getRequestLocale()) === "en") return <ZodiacElementPageEn element={element} />;
+  const locale = await getRequestLocale();
+  if (locale === "am") return <ZodiacElementPageAm element={element} />;
+  if (locale === "en") return <ZodiacElementPageEn element={element} />;
   const c = ELEMENTS_CONTENT[element];
   if (!c) notFound();
 
@@ -133,9 +187,24 @@ export default async function ElementDetailPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ცის ნიშნები", item: `${SITE_URL}/zodiac` },
-      { "@type": "ListItem", position: 2, name: "ელემენტები", item: `${SITE_URL}/zodiac/elementebi` },
-      { "@type": "ListItem", position: 3, name: labelKa, item: `${SITE_URL}/zodiac/elementebi/${element}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ცის ნიშნები",
+        item: `${SITE_URL}/zodiac`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "ელემენტები",
+        item: `${SITE_URL}/zodiac/elementebi`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: labelKa,
+        item: `${SITE_URL}/zodiac/elementebi/${element}`,
+      },
     ],
   };
 
@@ -148,15 +217,28 @@ export default async function ElementDetailPage({
       <Starfield count={130} shooting={3} />
       <SmartHeader />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/zodiac" className="hover:text-foreground">ცის ნიშნები</Link>
+          <Link href="/zodiac" className="hover:text-foreground">
+            ცის ნიშნები
+          </Link>
           <span>/</span>
-          <Link href="/zodiac/elementebi" className="hover:text-foreground">ელემენტები</Link>
+          <Link href="/zodiac/elementebi" className="hover:text-foreground">
+            ელემენტები
+          </Link>
           <span>/</span>
           <span className="text-foreground/80">{labelKa}</span>
         </nav>
@@ -166,7 +248,9 @@ export default async function ElementDetailPage({
           <div
             aria-hidden
             className="absolute -right-20 -top-20 size-72 rounded-full opacity-30 blur-3xl"
-            style={{ background: `radial-gradient(circle, ${accent} 0%, transparent 70%)` }}
+            style={{
+              background: `radial-gradient(circle, ${accent} 0%, transparent 70%)`,
+            }}
           />
           <div className="relative flex items-center gap-5">
             <div
@@ -229,7 +313,9 @@ export default async function ElementDetailPage({
         {/* Strengths × weaknesses */}
         <section className="mt-12 grid gap-6 sm:grid-cols-2">
           <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
-            <h2 className="mb-3 text-lg font-semibold tracking-tight">ძლიერი მხარეები</h2>
+            <h2 className="mb-3 text-lg font-semibold tracking-tight">
+              ძლიერი მხარეები
+            </h2>
             <ul className="space-y-2 text-sm leading-relaxed">
               {c.strengths.map((s, i) => (
                 <li key={i} className="flex gap-2">
@@ -240,7 +326,9 @@ export default async function ElementDetailPage({
             </ul>
           </article>
           <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
-            <h2 className="mb-3 text-lg font-semibold tracking-tight">გამოწვევები</h2>
+            <h2 className="mb-3 text-lg font-semibold tracking-tight">
+              გამოწვევები
+            </h2>
             <ul className="space-y-2 text-sm leading-relaxed">
               {c.weaknesses.map((w, i) => (
                 <li key={i} className="flex gap-2">
@@ -253,13 +341,19 @@ export default async function ElementDetailPage({
         </section>
 
         <Section title="სიყვარულში">
-          {paragraphs(c.love).map((p, i) => <p key={i}>{p}</p>)}
+          {paragraphs(c.love).map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
         </Section>
         <Section title="კარიერაში">
-          {paragraphs(c.career).map((p, i) => <p key={i}>{p}</p>)}
+          {paragraphs(c.career).map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
         </Section>
         <Section title="თავსებადობა სხვა ელემენტებთან">
-          {paragraphs(c.compatibility).map((p, i) => <p key={i}>{p}</p>)}
+          {paragraphs(c.compatibility).map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
         </Section>
 
         {/* FAQ */}
@@ -269,12 +363,22 @@ export default async function ElementDetailPage({
           </h2>
           <div className="space-y-3">
             {c.faq.map((item, i) => (
-              <details key={i} className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors open:bg-card/80 sm:p-5">
+              <details
+                key={i}
+                className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors open:bg-card/80 sm:p-5"
+              >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
                   <span>{item.q}</span>
-                  <span aria-hidden className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45">✦</span>
+                  <span
+                    aria-hidden
+                    className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45"
+                  >
+                    ✦
+                  </span>
                 </summary>
-                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p>
+                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>
@@ -282,7 +386,9 @@ export default async function ElementDetailPage({
 
         {/* Other elements */}
         <section className="mt-14">
-          <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">სხვა ელემენტები</h2>
+          <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            სხვა ელემენტები
+          </h2>
           <div className="flex flex-wrap gap-2">
             {ALL_ELEMENT_SLUGS.filter((e) => e !== element).map((e) => (
               <Link
@@ -290,7 +396,9 @@ export default async function ElementDetailPage({
                 href={`/zodiac/elementebi/${e}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
               >
-                <span style={{ color: ELEMENT_ACCENT[e] }}>{ELEMENT_GLYPH[e]}</span>
+                <span style={{ color: ELEMENT_ACCENT[e] }}>
+                  {ELEMENT_GLYPH[e]}
+                </span>
                 {ELEMENT_LABEL_KA[e]}
               </Link>
             ))}
@@ -304,8 +412,8 @@ export default async function ElementDetailPage({
             შენი {labelKa}-ის ბალანსი
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ნატალური რუკა გიჩვენებს, რამდენი ცეცხლი, მიწა, ჰაერი და წყალი
-            გაქვს — ეს უკეთ გაგარკვევს, რა გიხერხდება ბუნებრივად.
+            ნატალური რუკა გიჩვენებს, რამდენი ცეცხლი, მიწა, ჰაერი და წყალი გაქვს
+            — ეს უკეთ გაგარკვევს, რა გიხერხდება ბუნებრივად.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/signup">ჩემი სრული რუკა</Link>
@@ -329,7 +437,9 @@ function Section({
 }) {
   return (
     <section className="mt-12 max-w-3xl">
-      <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
+      <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+        {title}
+      </h2>
       <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
         {children}
       </div>

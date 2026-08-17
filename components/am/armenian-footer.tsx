@@ -1,7 +1,11 @@
 import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { GEORGIAN_SITE_URL, ENGLISH_SITE_URL, armenianSiteHref } from "@/lib/seo/locales";
+import {
+  GEORGIAN_SITE_URL,
+  ENGLISH_SITE_URL,
+  armenianSiteHref,
+} from "@/lib/seo/locales";
 import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
 
 const EXPLORE = [
@@ -11,6 +15,11 @@ const EXPLORE = [
   { href: "/horoscope", label: "Հորոսկոպ" },
   { href: "/compatibility", label: "Համատեղելիություն" },
   { href: "/zodiac", label: "Կենդանակերպ" },
+  { href: "/zodiac/datit", label: "Նշանն ըստ ամսաթվի" },
+  { href: "/zodiac/mtvare", label: "Լուսնի նշաններ" },
+  { href: "/zodiac/amomavali", label: "Ասցենդենտներ" },
+  { href: "/zodiac/elementebi", label: "Կենդանակերպի տարրեր" },
+  { href: "/zodiac/gzamkvlevi", label: "Ամբողջական ուղեցույց" },
   { href: "/tests", label: "Թեստեր" },
 ];
 
@@ -37,7 +46,8 @@ export async function ArmenianFooter() {
             <span className="text-xl font-semibold">vivida</span>
           </Link>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Անձնական աստղաբանություն, ծննդյան քարտեզներ և ինքնաճանաչման գործիքներ՝ ամբողջությամբ հայերենով:
+            Անձնական աստղաբանություն, ծննդյան քարտեզներ և ինքնաճանաչման
+            գործիքներ՝ ամբողջությամբ հայերենով:
           </p>
           <a
             href="mailto:hello@vivida.ge"

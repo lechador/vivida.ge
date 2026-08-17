@@ -12,20 +12,43 @@ import {
   RISINGS_CONTENT,
   paragraphs,
 } from "@/lib/seo/zodiac-content";
-import {
-  ALL_SLUGS,
-  signMetaBySlug,
-} from "@/lib/seo/zodiac-dates";
+import { ALL_SLUGS, signMetaBySlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacPlacementHubEn } from "@/components/seo/zodiac-placement-hub-en";
+import { ZodiacPlacementHubAm } from "@/components/seo/zodiac-placement-pages-am";
+import { ZODIAC_PLACEMENTS_AM } from "@/lib/zodiac-placements-am";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/amomavali";
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) === "en") {
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const content = ZODIAC_PLACEMENTS_AM.risingHub;
+    return {
+      title: { absolute: content.pageTitle },
+      description: content.metaDescription,
+      alternates: localizedAlternates(`/am${PATH}`, PATH, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}${PATH}`,
+        title: content.pageTitle,
+        description: content.metaDescription,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: content.pageTitle,
+        description: content.metaDescription,
+      },
+    };
+  }
+  if (locale === "en") {
     const title = "Rising Signs: Ascendant Meaning and First Impressions";
     const description =
       "Explore what your rising sign reveals about first impressions, outward style, life approach, relationships, and the structure of your birth chart.";
@@ -47,30 +70,31 @@ export async function generateMetadata(): Promise<Metadata> {
   }
   return RISING_HUB_CONTENT
     ? {
-      title: { absolute: RISING_HUB_CONTENT.pageTitle },
-      description: RISING_HUB_CONTENT.metaDescription,
-      alternates: localizedAlternates(PATH, PATH, "ka"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: `${SITE_URL}${PATH}`,
-        title: RISING_HUB_CONTENT.pageTitle,
+        title: { absolute: RISING_HUB_CONTENT.pageTitle },
         description: RISING_HUB_CONTENT.metaDescription,
-        siteName: "Vivida",
-        locale: "ka_GE",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: RISING_HUB_CONTENT.pageTitle,
-        description: RISING_HUB_CONTENT.metaDescription,
-      },
+        alternates: localizedAlternates(PATH, PATH, "ka"),
+        openGraph: {
+          images: [DEFAULT_OG_IMAGE],
+          type: "website",
+          url: `${SITE_URL}${PATH}`,
+          title: RISING_HUB_CONTENT.pageTitle,
+          description: RISING_HUB_CONTENT.metaDescription,
+          siteName: "Vivida",
+          locale: "ka_GE",
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: RISING_HUB_CONTENT.pageTitle,
+          description: RISING_HUB_CONTENT.metaDescription,
+        },
       }
     : {};
 }
 
 export default async function RisingHubPage() {
-  if ((await getRequestLocale()) === "en")
-    return <ZodiacPlacementHubEn kind="rising" />;
+  const locale = await getRequestLocale();
+  if (locale === "am") return <ZodiacPlacementHubAm kind="rising" />;
+  if (locale === "en") return <ZodiacPlacementHubEn kind="rising" />;
   if (!RISING_HUB_CONTENT || !RISINGS_CONTENT) notFound();
   const c = RISING_HUB_CONTENT;
   const risings = RISINGS_CONTENT;
@@ -107,8 +131,18 @@ export default async function RisingHubPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ცის ნიშნები", item: `${SITE_URL}/zodiac` },
-      { "@type": "ListItem", position: 2, name: "ამომავალი ნიშანი", item: `${SITE_URL}${PATH}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ცის ნიშნები",
+        item: `${SITE_URL}/zodiac`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "ამომავალი ნიშანი",
+        item: `${SITE_URL}${PATH}`,
+      },
     ],
   };
 
@@ -136,7 +170,9 @@ export default async function RisingHubPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/zodiac" className="hover:text-foreground">ცის ნიშნები</Link>
+          <Link href="/zodiac" className="hover:text-foreground">
+            ცის ნიშნები
+          </Link>
           <span>/</span>
           <span className="text-foreground/80">ამომავალი ნიშანი</span>
         </nav>
@@ -233,9 +269,16 @@ export default async function RisingHubPage() {
               >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
                   <span>{item.q}</span>
-                  <span aria-hidden className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45">✦</span>
+                  <span
+                    aria-hidden
+                    className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45"
+                  >
+                    ✦
+                  </span>
                 </summary>
-                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p>
+                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>

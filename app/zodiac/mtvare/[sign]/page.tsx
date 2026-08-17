@@ -9,10 +9,7 @@ import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import {
-  MOONS_CONTENT,
-  paragraphs,
-} from "@/lib/seo/zodiac-content";
+import { MOONS_CONTENT, paragraphs } from "@/lib/seo/zodiac-content";
 import {
   ALL_SLUGS,
   signMetaBySlug,
@@ -22,8 +19,14 @@ import { moonPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacPlacementPageEn } from "@/components/seo/zodiac-placement-page-en";
+import { ZodiacPlacementPageAm } from "@/components/seo/zodiac-placement-pages-am";
 import { placementEnglish } from "@/lib/zodiac-placement-en";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { placementArmenian } from "@/lib/zodiac-placements-am";
+import {
+  ARMENIAN_SITE_URL,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const HUB_PATH = "/zodiac/mtvare";
@@ -45,13 +48,41 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { sign } = await params;
   if (!isSlug(sign) || !MOONS_CONTENT) return {};
-  if ((await getRequestLocale()) === "en") {
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const c = placementArmenian("moon", sign);
+    const path = `${HUB_PATH}/${sign}`;
+    return {
+      title: { absolute: c.title },
+      description: c.description,
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title: c.title,
+        description: c.description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: c.title,
+        description: c.description,
+      },
+    };
+  }
+  if (locale === "en") {
     const c = placementEnglish("moon", sign);
     const url = `https://www.vividaastro.com${HUB_PATH}/${sign}`;
     return {
       title: { absolute: c.title },
       description: c.description,
-      alternates: localizedAlternates(`${HUB_PATH}/${sign}`, `${HUB_PATH}/${sign}`, "en"),
+      alternates: localizedAlternates(
+        `${HUB_PATH}/${sign}`,
+        `${HUB_PATH}/${sign}`,
+        "en",
+      ),
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
@@ -72,7 +103,11 @@ export async function generateMetadata({
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
-    alternates: localizedAlternates(`${HUB_PATH}/${sign}`, `${HUB_PATH}/${sign}`, "ka"),
+    alternates: localizedAlternates(
+      `${HUB_PATH}/${sign}`,
+      `${HUB_PATH}/${sign}`,
+      "ka",
+    ),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "article",
@@ -97,8 +132,9 @@ export default async function MoonSignPage({
 }) {
   const { sign } = await params;
   if (!isSlug(sign)) notFound();
-  if ((await getRequestLocale()) === "en")
-    return <ZodiacPlacementPageEn kind="moon" sign={sign} />;
+  const locale = await getRequestLocale();
+  if (locale === "am") return <ZodiacPlacementPageAm kind="moon" sign={sign} />;
+  if (locale === "en") return <ZodiacPlacementPageEn kind="moon" sign={sign} />;
   if (!MOONS_CONTENT) notFound();
   const moons = MOONS_CONTENT;
   const c = moons[sign];
@@ -112,7 +148,10 @@ export default async function MoonSignPage({
     headline: c.pageTitle,
     description: c.metaDescription,
     inLanguage: "ka-GE",
-    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}${HUB_PATH}/${sign}` },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}${HUB_PATH}/${sign}`,
+    },
     author: { "@type": "Organization", name: "Vivida", url: SITE_URL },
     publisher: { "@type": "Organization", name: "Vivida", url: SITE_URL },
     alternateName: latinQueries,
@@ -132,9 +171,24 @@ export default async function MoonSignPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ცის ნიშნები", item: `${SITE_URL}/zodiac` },
-      { "@type": "ListItem", position: 2, name: "მთვარის ნიშანი", item: `${SITE_URL}${HUB_PATH}` },
-      { "@type": "ListItem", position: 3, name: `მთვარე ${c.labelKa}-ში`, item: `${SITE_URL}${HUB_PATH}/${sign}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ცის ნიშნები",
+        item: `${SITE_URL}/zodiac`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "მთვარის ნიშანი",
+        item: `${SITE_URL}${HUB_PATH}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `მთვარე ${c.labelKa}-ში`,
+        item: `${SITE_URL}${HUB_PATH}/${sign}`,
+      },
     ],
   };
 
@@ -162,9 +216,13 @@ export default async function MoonSignPage({
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/zodiac" className="hover:text-foreground">ცის ნიშნები</Link>
+          <Link href="/zodiac" className="hover:text-foreground">
+            ცის ნიშნები
+          </Link>
           <span>/</span>
-          <Link href={HUB_PATH} className="hover:text-foreground">მთვარის ნიშანი</Link>
+          <Link href={HUB_PATH} className="hover:text-foreground">
+            მთვარის ნიშანი
+          </Link>
           <span>/</span>
           <span className="text-foreground/80">{c.labelKa}</span>
         </nav>
@@ -272,9 +330,16 @@ export default async function MoonSignPage({
               >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
                   <span>{item.q}</span>
-                  <span aria-hidden className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45">✦</span>
+                  <span
+                    aria-hidden
+                    className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45"
+                  >
+                    ✦
+                  </span>
                 </summary>
-                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p>
+                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>
