@@ -21,6 +21,8 @@ const EXPLORE = [
   { href: "/zodiac/elementebi", label: "Կենդանակերպի տարրեր" },
   { href: "/zodiac/gzamkvlevi", label: "Ամբողջական ուղեցույց" },
   { href: "/tests", label: "Թեստեր" },
+  { href: "/features", label: "Հնարավորություններ" },
+  { href: "/how-it-works", label: "Ինչպես է աշխատում" },
 ];
 
 const TOOLS = [

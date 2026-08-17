@@ -59,6 +59,8 @@ describe("Armenian hreflang gating", () => {
     expect(hasArmenianVersion("/zodiac/amomavali/virgo")).toBe(true);
     expect(hasArmenianVersion("/zodiac/elementebi/fire")).toBe(true);
     expect(hasArmenianVersion("/zodiac/gzamkvlevi")).toBe(true);
+    expect(hasArmenianVersion("/features")).toBe(true);
+    expect(hasArmenianVersion("/how-it-works")).toBe(true);
     expect(hasArmenianVersion("/amomavali/verdzi")).toBe(false);
   });
 
