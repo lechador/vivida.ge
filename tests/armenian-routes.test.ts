@@ -52,7 +52,8 @@ describe("Armenian hreflang gating", () => {
   it("claims an Armenian alternate only where the page exists", () => {
     expect(hasArmenianVersion("/natal-chart")).toBe(true);
     expect(hasArmenianVersion("/zodiac/virgo/dghes")).toBe(true);
-    expect(hasArmenianVersion("/zodiac/virgo/2026")).toBe(false);
+    expect(hasArmenianVersion("/zodiac/virgo/2026")).toBe(true);
+    expect(hasArmenianVersion("/zodiac/virgo/2027")).toBe(false);
     expect(hasArmenianVersion("/amomavali/verdzi")).toBe(false);
   });
 

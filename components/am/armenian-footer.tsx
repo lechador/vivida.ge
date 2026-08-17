@@ -16,6 +16,7 @@ const EXPLORE = [
 
 const TOOLS = [
   { href: "/horoskopi", label: "Օրական հորոսկոպ" },
+  { href: "/zodiac/aries/2026", label: "Խոյ՝ 2026 թվականի հորոսկոպ" },
   { href: "/taro", label: "Տարո ընթերցում" },
   { href: "/pirovnebis-testi", label: "Անհատականության թեստ" },
   { href: "/mbti", label: "MBTI տիպեր" },

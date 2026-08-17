@@ -187,6 +187,7 @@ const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([
       (viewPath) => `/zodiac/${sign}/${viewPath}`,
     ),
   ),
+  ...ARMENIAN_HOROSCOPE_SIGN_SLUGS.map((sign) => `/zodiac/${sign}/2026`),
 ]);
 
 const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [

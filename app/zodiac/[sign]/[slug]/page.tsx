@@ -37,11 +37,13 @@ import {
   VIEW_LABEL_EN,
 } from "@/components/seo/sign-horoscope-page-en";
 import { YearlyHoroscopePageEn } from "@/components/seo/yearly-horoscope-page-en";
+import { YearlyHoroscopePageAm } from "@/components/seo/yearly-horoscope-page-am";
 import {
   SignHoroscopePageAm,
   VIEW_LABEL_AM,
 } from "@/components/seo/sign-horoscope-page-am";
 import { yearlyHoroscopeEnglish } from "@/lib/yearly-horoscope-en";
+import { yearlyHoroscopeArmenian } from "@/lib/yearly-horoscope-am";
 import {
   ARMENIAN_SITE_URL,
   DEFAULT_OG_IMAGE,
@@ -190,6 +192,30 @@ export async function generateMetadata({
   if (yearNum == null) return {};
   const c = yearlyContentFor(sign, yearNum);
   if (!c) return {};
+  if (am) {
+    const armenian = yearlyHoroscopeArmenian(sign, yearNum);
+    if (!armenian) return {};
+    const path = `/zodiac/${sign}/${slug}`;
+    return {
+      title: { absolute: armenian.title },
+      description: armenian.description,
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title: armenian.title,
+        description: armenian.description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: armenian.title,
+        description: armenian.description,
+      },
+    };
+  }
   if (en) {
     const english = yearlyHoroscopeEnglish(sign, yearNum);
     const url = `https://www.vividaastro.com/zodiac/${sign}/${slug}`;
@@ -264,7 +290,12 @@ export default async function ZodiacSignSlugPage({
   if (yearNum == null) notFound();
   const c = yearlyContentFor(sign, yearNum);
   if (!c) notFound();
-  if ((await getRequestLocale()) === "en")
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    if (!yearlyHoroscopeArmenian(sign, yearNum)) notFound();
+    return <YearlyHoroscopePageAm sign={sign} year={yearNum} />;
+  }
+  if (locale === "en")
     return <YearlyHoroscopePageEn sign={sign} year={yearNum} />;
   const year = slug;
 
