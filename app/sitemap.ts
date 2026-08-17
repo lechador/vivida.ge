@@ -394,6 +394,22 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/zodiac/reitingebi/${slug}`, `/zodiac/reitingebi/${slug}`),
   }));
 
+  const eqHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/emociuri-inteleqti`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.76,
+    alternates: alternatesFor("/emociuri-inteleqti", "/emociuri-inteleqti"),
+  };
+
+  const eqArticleEntries = EQ_ARTICLE_SLUGS.map((slug) => ({
+    url: `${ENGLISH_SITE_URL}/am/emociuri-inteleqti/${slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.68,
+    alternates: alternatesFor(`/emociuri-inteleqti/${slug}`, `/emociuri-inteleqti/${slug}`),
+  }));
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -428,6 +444,8 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     retrogradeHubEntry,
     rankingsHubEntry,
     ...rankingEntries,
+    eqHubEntry,
+    ...eqArticleEntries,
   ];
 }
 

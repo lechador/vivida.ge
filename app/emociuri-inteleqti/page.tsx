@@ -7,10 +7,12 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { auth } from "@/auth";
 import { EQ_HUB_EN, EqArticlesHubEn } from "@/components/seo/eq-articles-en";
+import { EqArticlesHubAm } from "@/components/seo/eq-articles-am";
+import { EQ_HUB_AM } from "@/lib/seo/eq-articles-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { EQ_ARTICLES } from "@/lib/seo/eq-articles";
 import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const URL = "https://www.vivida.ge/emociuri-inteleqti";
 
@@ -25,6 +27,25 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
+  if (locale === "am") {
+    const path = "/emociuri-inteleqti";
+    return {
+      title: { absolute: `${EQ_HUB_AM.title} — Vivida` },
+      description: EQ_HUB_AM.description,
+      keywords: ["էմոցիոնալ ինտելեկտ", "EQ", "էմպաթիա", "ինքնաճանաչում", "սոցիալական հմտություններ"],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title: EQ_HUB_AM.title,
+        description: EQ_HUB_AM.description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title: EQ_HUB_AM.title, description: EQ_HUB_AM.description },
+    };
+  }
   if (locale === "en") {
     const path = "/emociuri-inteleqti";
     return {
@@ -40,6 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function EqArticlesPage() {
   const locale = await getRequestLocale();
+  if (locale === "am") return <EqArticlesHubAm />;
   if (locale === "en") return <EqArticlesHubEn />;
   const session = await auth();
   const authed = !!session?.user?.id;

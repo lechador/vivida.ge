@@ -6,11 +6,13 @@ import { ArrowLeft, ArrowRight, BookOpen, Check, ExternalLink } from "lucide-rea
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { EqArticlePageEn } from "@/components/seo/eq-articles-en";
+import { EqArticlePageAm } from "@/components/seo/eq-articles-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { EQ_ARTICLES, eqArticleBySlug } from "@/lib/seo/eq-articles";
 import { eqArticleEnBySlug } from "@/lib/seo/eq-articles-en";
+import { eqArticleAmBySlug } from "@/lib/seo/eq-articles-am";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const BASE = "https://www.vivida.ge/emociuri-inteleqti";
 
@@ -20,7 +22,30 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  if ((await getRequestLocale()) === "en") {
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const item = eqArticleAmBySlug(slug);
+    if (!item) return { title: "Հոդվածը չի գտնվել" };
+    const path = `/emociuri-inteleqti/${slug}`;
+    return {
+      title: { absolute: `${item.title} — Vivida` },
+      description: item.description,
+      keywords: [item.category, "էմոցիոնալ ինտելեկտ", "EQ", ...item.domains],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        title: item.title,
+        description: item.description,
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        type: "article",
+        locale: "hy_AM",
+        publishedTime: "2026-07-20T00:00:00.000Z",
+        modifiedTime: "2026-08-14T00:00:00.000Z",
+      },
+      twitter: { card: "summary_large_image", title: item.title, description: item.description },
+    };
+  }
+  if (locale === "en") {
     const item = eqArticleEnBySlug(slug);
     if (!item) return { title: "Article not found" };
     const path = `/emociuri-inteleqti/${slug}`;
@@ -46,7 +71,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function EqArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if ((await getRequestLocale()) === "en") {
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const armenianItem = eqArticleAmBySlug(slug);
+    if (!armenianItem) notFound();
+    return <EqArticlePageAm item={armenianItem} />;
+  }
+  if (locale === "en") {
     const englishItem = eqArticleEnBySlug(slug);
     if (!englishItem) notFound();
     return <EqArticlePageEn item={englishItem} />;
