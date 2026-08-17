@@ -378,6 +378,22 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor("/merkuri-retrogradi", "/merkuri-retrogradi"),
   };
 
+  const rankingsHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/zodiac/reitingebi`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/zodiac/reitingebi", "/zodiac/reitingebi"),
+  };
+
+  const rankingEntries = ALL_RANKING_SLUGS.map((slug) => ({
+    url: `${ENGLISH_SITE_URL}/am/zodiac/reitingebi/${slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.72,
+    alternates: alternatesFor(`/zodiac/reitingebi/${slug}`, `/zodiac/reitingebi/${slug}`),
+  }));
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -410,6 +426,8 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     eclipseHubEntry,
     ...eclipseEntries,
     retrogradeHubEntry,
+    rankingsHubEntry,
+    ...rankingEntries,
   ];
 }
 

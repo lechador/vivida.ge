@@ -7,8 +7,9 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { RANKINGS_HUB_EN, RankingsHubEn } from "@/components/seo/rankings-en";
+import { RANKINGS_HUB_AM, RankingsHubAm } from "@/components/seo/rankings-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import {
   RANKING_CATEGORIES,
   RANKING_CATEGORY_ORDER,
@@ -37,6 +38,31 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
+  if (locale === "am") {
+    const path = "/zodiac/reitingebi";
+    const { title, description } = RANKINGS_HUB_AM;
+    return {
+      title: { absolute: `${title} — Vivida` },
+      description,
+      keywords: [
+        "կենդանակերպի վարկանիշներ",
+        "ամենախելացի նշանները",
+        "ամենառոմանտիկ նշանները",
+        "կենդանակերպի նշաններ",
+      ],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   if (locale === "en") {
     const path = "/zodiac/reitingebi"; const { title, description } = RANKINGS_HUB_EN;
     return { title: { absolute: title }, description, keywords: ["zodiac sign rankings", "best zodiac signs", "smartest zodiac signs", "most romantic zodiac signs"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
@@ -55,6 +81,7 @@ const HUB_QUERIES = [
 
 export default async function RankingsHubPage() {
   const locale = await getRequestLocale();
+  if (locale === "am") return <RankingsHubAm />;
   if (locale === "en") return <RankingsHubEn />;
   const breadcrumbLd = {
     "@context": "https://schema.org",

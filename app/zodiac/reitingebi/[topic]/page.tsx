@@ -18,9 +18,11 @@ import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { ALL_SLUGS, signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { RankingTopicPageEn } from "@/components/seo/rankings-en";
+import { RankingTopicPageAm } from "@/components/seo/rankings-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { rankingTopicEnBySlug } from "@/lib/seo/rankings-en";
-import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { rankingTopicAmBySlug } from "@/lib/seo/rankings-am";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -39,6 +41,27 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { topic: slug } = await params;
   const locale = await getRequestLocale();
+  if (locale === "am") {
+    const topic = rankingTopicAmBySlug(slug);
+    if (!topic) return {};
+    const description = `${topic.title}. Կենդանակերպի բոլոր 12 նշանները՝ ըստ «${topic.trait}» հատկանիշի:`;
+    const path = `/zodiac/reitingebi/${slug}`;
+    return {
+      title: { absolute: `${topic.title} — Vivida` },
+      description,
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        type: "article",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title: topic.title,
+        description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+        images: [DEFAULT_OG_IMAGE],
+      },
+      twitter: { card: "summary_large_image", title: topic.title, description },
+    };
+  }
   if (locale === "en") {
     const topic = rankingTopicEnBySlug(slug); if (!topic) return {};
     const description = `${topic.title}: all 12 Sun signs compared through ${topic.trait}, with an explanation for every placement.`;
@@ -75,7 +98,13 @@ export default async function RankingTopicPage({
   params: Promise<{ topic: string }>;
 }) {
   const { topic: slug } = await params;
-  if ((await getRequestLocale()) === "en") { const topic = rankingTopicEnBySlug(slug); if (!topic) notFound(); return <RankingTopicPageEn topic={topic} />; }
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const topic = rankingTopicAmBySlug(slug);
+    if (!topic) notFound();
+    return <RankingTopicPageAm topic={topic} />;
+  }
+  if (locale === "en") { const topic = rankingTopicEnBySlug(slug); if (!topic) notFound(); return <RankingTopicPageEn topic={topic} />; }
   const topic = rankingTopicBySlug(slug);
   if (!topic) notFound();
 
