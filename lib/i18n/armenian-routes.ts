@@ -133,9 +133,18 @@ const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([
   "/zodiac/capricorn",
   "/zodiac/aquarius",
   "/zodiac/pisces",
+  "/horoskopi/kvireuli",
+  "/horoskopi/tviuri",
+  "/siyvarulis-horoskopi",
+  "/finansuri-horoskopi",
+  "/karieris-horoskopi",
 ]);
 
-const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [];
+const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [
+  "/siyvarulis-horoskopi/",
+  "/finansuri-horoskopi/",
+  "/karieris-horoskopi/",
+];
 
 /**
  * Should this path advertise an Armenian hreflang alternate?

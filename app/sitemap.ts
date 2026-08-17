@@ -141,7 +141,39 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/zodiac/${slug}`, `/zodiac/${slug}`),
   }));
 
-  return [...coreEntries, ...signEntries];
+  const periodEntries = (["/horoskopi/kvireuli", "/horoskopi/tviuri"] as const).map((path) => ({
+    url: `${ENGLISH_SITE_URL}/am${path}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "weekly" as const,
+    priority: 0.75,
+    alternates: alternatesFor(path, path),
+  }));
+
+  const thematicHubEntries = ALL_HOROSCOPE_THEMES.map((theme) => ({
+    url: `${ENGLISH_SITE_URL}/am${themeUrl(theme)}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.78,
+    alternates: alternatesFor(themeUrl(theme), themeUrl(theme)),
+  }));
+
+  const thematicSignEntries = ALL_HOROSCOPE_THEMES.flatMap((theme) =>
+    ALL_SLUGS.map((sign) => ({
+      url: `${ENGLISH_SITE_URL}/am${themeUrl(theme, sign)}`,
+      lastModified: ARMENIAN_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.68,
+      alternates: alternatesFor(themeUrl(theme, sign), themeUrl(theme, sign)),
+    })),
+  );
+
+  return [
+    ...coreEntries,
+    ...signEntries,
+    ...periodEntries,
+    ...thematicHubEntries,
+    ...thematicSignEntries,
+  ];
 }
 
 function englishSitemap(): MetadataRoute.Sitemap {
