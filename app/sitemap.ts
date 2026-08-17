@@ -410,6 +410,38 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/emociuri-inteleqti/${slug}`, `/emociuri-inteleqti/${slug}`),
   }));
 
+  const armenianHousesHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/astrologiuri-saxlebi`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.82,
+    alternates: alternatesFor("/astrologiuri-saxlebi", "/astrologiuri-saxlebi"),
+  };
+
+  const armenianHouseEntries = HOUSE_NUMBERS.map((number) => ({
+    url: `${ENGLISH_SITE_URL}/am/astrologiuri-saxlebi/${number}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.72,
+    alternates: alternatesFor(`/astrologiuri-saxlebi/${number}`, `/astrologiuri-saxlebi/${number}`),
+  }));
+
+  const armenianPlanetsHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/planetebi`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.82,
+    alternates: alternatesFor("/planetebi", "/planetebi"),
+  };
+
+  const armenianPlanetEntries = PLANET_SLUGS.map((slug) => ({
+    url: `${ENGLISH_SITE_URL}/am/planetebi/${slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.72,
+    alternates: alternatesFor(`/planetebi/${slug}`, `/planetebi/${slug}`),
+  }));
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -446,6 +478,10 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...rankingEntries,
     eqHubEntry,
     ...eqArticleEntries,
+    armenianHousesHubEntry,
+    ...armenianHouseEntries,
+    armenianPlanetsHubEntry,
+    ...armenianPlanetEntries,
   ];
 }
 

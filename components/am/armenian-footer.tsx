@@ -6,6 +6,8 @@ import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
 
 const EXPLORE = [
   { href: "/natal-chart", label: "Նատալ քարտեզ" },
+  { href: "/astrologiuri-saxlebi", label: "Աստղաբանական տներ" },
+  { href: "/planetebi", label: "Մոլորակներ" },
   { href: "/horoscope", label: "Հորոսկոպ" },
   { href: "/compatibility", label: "Համատեղելիություն" },
   { href: "/zodiac", label: "Կենդանակերպ" },
