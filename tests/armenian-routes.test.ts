@@ -25,8 +25,8 @@ describe("Armenian path prefix", () => {
 
   it("returns null for paths that only look Armenian", () => {
     // The Georgian tree really does contain paths starting with "am" —
-    // /zodiac/amomavali is the rising-sign cluster. A naive startsWith("/am")
-    // would rewrite them into nonexistent routes.
+    // /zodiac/amomavali is the rising-sign cluster. A naive raw prefix check
+    // would rewrite it into a nonexistent route.
     expect(stripArmenianPrefix("/zodiac/amomavali")).toBeNull();
     expect(stripArmenianPrefix("/amomavali")).toBeNull();
     expect(stripArmenianPrefix("/ambebi")).toBeNull();
@@ -61,6 +61,8 @@ describe("Armenian hreflang gating", () => {
     expect(hasArmenianVersion("/zodiac/gzamkvlevi")).toBe(true);
     expect(hasArmenianVersion("/features")).toBe(true);
     expect(hasArmenianVersion("/how-it-works")).toBe(true);
+    expect(hasArmenianVersion("/quiz/namdvili-nishani")).toBe(true);
+    expect(hasArmenianVersion("/quiz/varskvlavebis-zodiaqo")).toBe(true);
     expect(hasArmenianVersion("/amomavali/verdzi")).toBe(false);
   });
 

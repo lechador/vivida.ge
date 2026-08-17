@@ -167,6 +167,7 @@ export default async function RootLayout({
         >
           <span className="locale-ka-only">მთავარ კონტენტზე გადასვლა</span>
           <span className="locale-en-only">Skip to main content</span>
+          <span className="locale-am-only">Անցնել հիմնական բովանդակությանը</span>
         </a>
         <NextTopLoader
           color="oklch(0.78 0.18 305)"
@@ -182,6 +183,7 @@ export default async function RootLayout({
           gaId={GA_ID}
           fbPixelId={FB_PIXEL_ID}
           trackingEnabled={TRACKING_ENABLED}
+          locale={locale}
         />
         <div
           id="main-content"

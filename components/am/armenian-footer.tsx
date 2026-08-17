@@ -29,6 +29,8 @@ const TOOLS = [
   { href: "/horoskopi", label: "Օրական հորոսկոպ" },
   { href: "/zodiac/aries/2026", label: "Խոյ՝ 2026 թվականի հորոսկոպ" },
   { href: "/taro", label: "Տարո ընթերցում" },
+  { href: "/quiz/namdvili-nishani", label: "Իմ իրական կենդանակերպի նշանը" },
+  { href: "/quiz/varskvlavebis-zodiaqo", label: "Հայտնիների կենդանակերպը" },
   { href: "/pirovnebis-testi", label: "Անհատականության թեստ" },
   { href: "/mbti", label: "MBTI տիպեր" },
   { href: "/iq-testi", label: "IQ թեստ" },

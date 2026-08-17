@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-.locale-en-only {
+.locale-en-only,
+.locale-am-only {
   display: none;
 }
 
@@ -9,6 +10,14 @@ html[lang="en"] .locale-en-only {
 }
 
 html[lang="en"] .locale-ka-only {
+  display: none;
+}
+
+html[lang="hy"] .locale-am-only {
+  display: inline;
+}
+
+html[lang="hy"] .locale-ka-only {
   display: none;
 }
 @import "tw-animate-css";

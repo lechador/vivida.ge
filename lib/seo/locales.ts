@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import {
   hasArmenianVersion,
   stripArmenianPrefix,
+  withArmenianPrefix,
 } from "../i18n/armenian-routes";
 
 export const GEORGIAN_SITE_URL = "https://www.vivida.ge";
@@ -116,7 +117,7 @@ export function localizedAlternates(
       ? publicEnglishPath(canonicalPath)
       : resolveEnglishPath(
           locale === "am"
-            ? (canonicalPath.replace(/^\/am/, "") || "/")
+            ? (stripArmenianPrefix(canonicalPath) ?? canonicalPath)
             : pairedPath,
         );
 
@@ -124,7 +125,7 @@ export function localizedAlternates(
     locale === "am"
       ? canonicalPath
       : (armenianPath ?? (enPath === "/" ? "/am" : `/am${enPath}`));
-  const amPath = rawAm.startsWith("/am") ? rawAm : `/am${rawAm === "/" ? "" : rawAm}`;
+  const amPath = withArmenianPrefix(rawAm);
 
   const canonical =
     locale === "am"
@@ -182,8 +183,7 @@ export function englishSiteHref(path: string, onEnglishHost: boolean): string {
  * Resolve an Armenian-site content link for whichever host is serving.
  */
 export function armenianSiteHref(path: string, onEnglishHost: boolean): string {
-  const amPath = path.startsWith("/am") ? path : `/am${path === "/" ? "" : path}`;
+  const amPath = withArmenianPrefix(path);
   if (onEnglishHost) return amPath;
   return `${ENGLISH_SITE_URL}${amPath}`;
 }
-

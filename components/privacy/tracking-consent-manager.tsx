@@ -14,6 +14,7 @@ import {
   browserTrackingConsent,
   type TrackingConsent,
 } from "@/lib/tracking-consent";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 function clearMarketingCookies() {
   const names = document.cookie
@@ -43,10 +44,12 @@ export function TrackingConsentManager({
   gaId,
   fbPixelId,
   trackingEnabled,
+  locale = "ka",
 }: {
   gaId?: string;
   fbPixelId?: string;
   trackingEnabled: boolean;
+  locale?: UserLocale;
 }) {
   const [consent, setConsent] = useState<TrackingConsent>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -70,7 +73,8 @@ export function TrackingConsentManager({
     window.dispatchEvent(new CustomEvent(`vivida:tracking-${next}`));
   }
 
-  const en = typeof document !== "undefined" && document.documentElement.lang === "en";
+  const en = locale === "en";
+  const am = locale === "am";
   const showPanel = ready && (consent === null || settingsOpen);
   const trackingAllowed = trackingEnabled && consent === "granted";
 
@@ -120,7 +124,7 @@ export function TrackingConsentManager({
           {/* Kept in the DOM at every size so the button always has an
               accessible name, visible only where there is room for it. */}
           <span className="sr-only lg:not-sr-only">
-            {en ? "Privacy choices" : "კონფიდენციალურობა"}
+            {am ? "Գաղտնիության ընտրություններ" : en ? "Privacy choices" : "კონფიდენციალურობა"}
           </span>
         </button>
       )}
@@ -141,10 +145,12 @@ export function TrackingConsentManager({
             </div>
             <div>
               <h2 className="text-sm font-semibold sm:text-base">
-                {en ? "Your privacy choices" : "შენი კონფიდენციალურობის არჩევანი"}
+                {am ? "Գաղտնիության ձեր ընտրությունները" : en ? "Your privacy choices" : "შენი კონფიდენციალურობის არჩევანი"}
               </h2>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                {en
+                {am
+                  ? "Անհրաժեշտ cookie-ներն ապահովում են Vivida-ի աշխատանքը։ Ձեր թույլտվությամբ վերլուծական և Meta cookie-ներն օգնում են չափել, թե որ արշավներն են հանգեցնում օգտակար այցելությունների և գնումների։"
+                  : en
                   ? "Essential cookies keep Vivida working. With your permission, analytics and Meta cookies help us measure which campaigns lead to useful visits and purchases."
                   : "აუცილებელი cookie-ები Vivida-ს მუშაობას უზრუნველყოფს. შენი თანხმობით, ანალიტიკა და Meta cookie-ები გვეხმარება გავიგოთ რომელი კამპანია იწვევს სასარგებლო ვიზიტებსა და ყიდვებს."}
               </p>
@@ -160,7 +166,7 @@ export function TrackingConsentManager({
               size="sm"
               onClick={() => choose("denied")}
             >
-              {en ? "Essential only" : "მხოლოდ აუცილებელი"}
+              {am ? "Միայն անհրաժեշտները" : en ? "Essential only" : "მხოლოდ აუცილებელი"}
             </Button>
             <Button
               type="button"
@@ -168,7 +174,7 @@ export function TrackingConsentManager({
               size="sm"
               onClick={() => choose("granted")}
             >
-              {en ? "Allow analytics & Meta" : "ანალიტიკისა და Meta-ს დაშვება"}
+              {am ? "Թույլատրել վերլուծությունն ու Meta-ն" : en ? "Allow analytics & Meta" : "ანალიტიკისა და Meta-ს დაშვება"}
             </Button>
           </div>
         </div>
