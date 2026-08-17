@@ -250,6 +250,22 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/numerologia/${number}`, `/numerologia/${number}`),
   }));
 
+  const angelHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/angeluri-ricxvebi`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/angeluri-ricxvebi", "/angeluri-ricxvebi"),
+  };
+
+  const angelEntries = ALL_ANGEL_SLUGS.map((slug) => ({
+    url: `${ENGLISH_SITE_URL}/am/angeluri-ricxvebi/${slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.72,
+    alternates: alternatesFor(`/angeluri-ricxvebi/${slug}`, `/angeluri-ricxvebi/${slug}`),
+  }));
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -266,6 +282,8 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...dreamEntries,
     numerologyHubEntry,
     ...numerologyEntries,
+    angelHubEntry,
+    ...angelEntries,
   ];
 }
 

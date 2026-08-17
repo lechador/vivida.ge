@@ -7,6 +7,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { ANGEL_HUB_EN, AngelNumbersHubEn } from "@/components/seo/angel-numbers-en";
+import { ANGEL_HUB_AM, AngelNumbersHubAm } from "@/components/seo/angel-numbers-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   ANGEL_FAQ,
@@ -14,7 +15,7 @@ import {
   ANGEL_NUMBERS,
 } from "@/lib/seo/angel-numbers";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -55,6 +56,25 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
+  if (locale === "am") {
+    const path = "/angeluri-ricxvebi";
+    return {
+      title: { absolute: `${ANGEL_HUB_AM.title} — Vivida` },
+      description: ANGEL_HUB_AM.description,
+      keywords: ["հրեշտակային թվեր", "111 նշանակություն", "222 նշանակություն", "11:11 նշանակություն", "կրկնվող թվեր"],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title: ANGEL_HUB_AM.title,
+        description: ANGEL_HUB_AM.description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title: ANGEL_HUB_AM.title, description: ANGEL_HUB_AM.description },
+    };
+  }
   if (locale === "en") {
     const path = "/angeluri-ricxvebi";
     return {
@@ -71,6 +91,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AngelNumbersHubPage() {
   const locale = await getRequestLocale();
+  if (locale === "am") return <AngelNumbersHubAm />;
   if (locale === "en") return <AngelNumbersHubEn />;
   const ld = [
     articleLd({

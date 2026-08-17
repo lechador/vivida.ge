@@ -51,13 +51,13 @@ describe("Armenian path prefix", () => {
 describe("Armenian hreflang gating", () => {
   it("claims an Armenian alternate only where the page exists", () => {
     expect(hasArmenianVersion("/natal-chart")).toBe(true);
-    expect(hasArmenianVersion("/angeluri-ricxvebi")).toBe(false);
+    expect(hasArmenianVersion("/chinuri-horoskopi")).toBe(false);
   });
 
   it("omits hy entirely on pages with no Armenian twin", () => {
     const alternates = localizedAlternates(
-      "/angeluri-ricxvebi",
-      "/angeluri-ricxvebi",
+      "/chinuri-horoskopi",
+      "/chinuri-horoskopi",
       "ka",
     );
     expect(alternates.languages).not.toHaveProperty("hy");
