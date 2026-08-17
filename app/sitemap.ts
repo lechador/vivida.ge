@@ -186,6 +186,22 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor("/tavsebadoba", "/tavsebadoba"),
   };
 
+  const taroHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/taro`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/taro", "/taro"),
+  };
+
+  const tarotCardEntries = TAROT_CARDS.map((card) => ({
+    url: `${ENGLISH_SITE_URL}/am/taro/${card.slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+    alternates: alternatesFor(`/taro/${card.slug}`, `/taro/${card.slug}`),
+  }));
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -194,6 +210,8 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...thematicSignEntries,
     ...pairEntries,
     tavsebadobaEntry,
+    taroHubEntry,
+    ...tarotCardEntries,
   ];
 }
 

@@ -36,7 +36,7 @@ export function CardImage({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={`/tarot/${slug}.webp`}
-            alt={locale === "en" ? `${name} tarot card` : `ტაროს კარტი — ${name}`}
+            alt={locale === "am" ? `Տարո քարտ — ${name}` : locale === "en" ? `${name} tarot card` : `ტაროს კარტი — ${name}`}
             loading={priority ? "eager" : "lazy"}
             onError={() => setOk(false)}
             className="size-full object-cover"

@@ -12,8 +12,9 @@ import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { TAROT_CARDS } from "@/lib/tarot/deck";
 import { TAROT_CARDS_EN } from "@/lib/tarot/deck-en";
+import { TAROT_CARDS_AM } from "@/lib/tarot/deck-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 import { TAROT_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
@@ -25,6 +26,9 @@ const DESCRIPTION_KA =
 const TITLE_EN = "Free Online Tarot Reading — Three-Card Spread";
 const DESCRIPTION_EN =
   "Ask a question and receive a personal three-card tarot reading. Explore clear upright and reversed meanings for all 22 Major Arcana cards.";
+const TITLE_AM = "Տարո առցանց ընթերցում — Տարոյի 22 Մեծ Արկաններ";
+const DESCRIPTION_AM =
+  "Տարո առցանց ընթերցում հայերենով. տվեք հարց և ստացեք անձնական պատասխան 3 քարտերի միջոցով: Տարոյի 22 Մեծ Արկաններ — առաջին հարցն անվճար:";
 
 const FAQ_KA = [
   {
@@ -64,8 +68,47 @@ const FAQ_EN = [
   },
 ];
 
+const FAQ_AM = [
+  {
+    q: "Ինչպե՞ս է աշխատում առցանց տարո ընթերցումը Vivida-ում:",
+    a: "Գրեք ձեր հարցը, և մենք պատահականորեն բացում ենք 3 քարտ (արմատ, ներկա, ուղի): AI տարոլոգը կազմում է անհատական պատասխան հայերենով՝ կապելով 3 քարտերը ձեր հարցի հետ:",
+  },
+  {
+    q: "Որքա՞ն արժե տարո ընթերցումը:",
+    a: `Առաջին հարցը լիովին անվճար է: Յուրաքանչյուր հաջորդ հարցն արժե ${CREDIT_COST.tarot} կրեդիտ:`,
+  },
+  {
+    q: "Արդյո՞ք տարոն կանխատեսում է ապագան:",
+    a: "Տարոն ինքնաճանաչման և իրավիճակը տարբեր տեսանկյուններից տեսնելու գործիք է, ոչ թե ճակատագրի անխուսափելի կանխատեսում:",
+  },
+  {
+    q: "Ո՞ր քարտերն են օգտագործվում:",
+    a: "22 Մեծ Արկանները՝ Հիմարից մինչև Աշխարհ: Յուրաքանչյուր քարտ ունի ուղիղ և շրջված իմաստներ:",
+  },
+];
+
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    return {
+      title: { absolute: TITLE_AM },
+      description: DESCRIPTION_AM,
+      keywords: ["տարո", "տարո առցանց", "տարոյի քարտեր", "տարո ընթերցում", "մեծ արկաններ"],
+      alternates: localizedAlternates("/am/taro", "/taro", "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}/taro`,
+        title: TITLE_AM,
+        description: DESCRIPTION_AM,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title: TITLE_AM, description: DESCRIPTION_AM },
+    };
+  }
+
+  const en = locale === "en";
   const title = en ? TITLE_EN : TITLE_KA;
   const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
@@ -75,14 +118,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: en
       ? ["online tarot reading", "free tarot reading", "three card tarot", "Major Arcana meanings", "tarot card meanings"]
       : ["ტარო", "ტარო ქართულად", "ტაროზე მკითხაობა", "ონლაინ ტარო", "ტარო კითხვა", "ტაროს გაშლა", "ტარო კარტები", "უფასო ტარო"],
-    alternates: {
-      canonical: `${siteUrl}/taro`,
-      languages: {
-        en: `${ENGLISH_SITE_URL}/taro`,
-        "ka-GE": `${GEORGIAN_SITE_URL}/taro`,
-        "x-default": `${ENGLISH_SITE_URL}/taro`,
-      },
-    },
+    alternates: localizedAlternates("/taro", "/taro", en ? "en" : "ka"),
     openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/taro`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -93,11 +129,12 @@ export default async function TaroHubPage() {
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const title = en ? TITLE_EN : TITLE_KA;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
-  const faq = en ? FAQ_EN : FAQ_KA;
-  const cards = en ? TAROT_CARDS_EN : TAROT_CARDS;
+  const am = locale === "am";
+  const siteUrl = am ? ARMENIAN_SITE_URL : en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = am ? TITLE_AM : en ? TITLE_EN : TITLE_KA;
+  const description = am ? DESCRIPTION_AM : en ? DESCRIPTION_EN : DESCRIPTION_KA;
+  const faq = am ? FAQ_AM : en ? FAQ_EN : FAQ_KA;
+  const cards = am ? TAROT_CARDS_AM : en ? TAROT_CARDS_EN : TAROT_CARDS;
 
   const ld = [
     articleLd({

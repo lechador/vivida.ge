@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
 import { CardImage } from "@/components/tarot/card-image";
 import { TAROT_CARDS, TAROT_BY_SLUG } from "@/lib/tarot/deck";
 import { TAROT_CARDS_EN, TAROT_EN_BY_SLUG } from "@/lib/tarot/deck-en";
+import { TAROT_CARDS_AM, tarotCardBySlugAm } from "@/lib/tarot/deck-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 export const revalidate = 604800;
 
@@ -28,8 +29,35 @@ export async function generateMetadata({
   const { card: slug } = await params;
   const kaCard = TAROT_BY_SLUG[slug];
   const enCard = TAROT_EN_BY_SLUG[slug];
+  const amCard = tarotCardBySlugAm(slug);
   if (!kaCard || !enCard) return {};
-  const en = (await getRequestLocale()) === "en";
+
+  const locale = await getRequestLocale();
+  if (locale === "am" && amCard) {
+    const name = amCard.name;
+    const keywords = amCard.keywords;
+    const title = `${name} — Տարո քարտի նշանակությունը`;
+    const description = `Տարո քարտ „${name}“. Ուղիղ և շրջված նշանակություն, սեր և կարիերա՝ հայերենով: ${keywords.slice(0, 3).join(", ")}:`;
+    const url = `${ARMENIAN_SITE_URL}/taro/${slug}`;
+    return {
+      title: { absolute: `${title} — Vivida` },
+      description,
+      keywords: ["տարո", name, `տարո ${name}`, `${name} նշանակություն`, `${name} տարո քարտ`],
+      alternates: localizedAlternates(`/am/taro/${slug}`, `/taro/${slug}`, "am"),
+      openGraph: {
+        type: "article",
+        url,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+        images: [DEFAULT_OG_IMAGE],
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
+
+  const en = locale === "en";
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const name = en ? enCard.name : kaCard.nameKa;
   const keywords = en ? enCard.keywords : kaCard.keywordsKa;
@@ -49,14 +77,7 @@ export async function generateMetadata({
         ? [name, `${name} tarot meaning`, `${name} reversed`, "tarot card meanings", "Major Arcana"]
         : ["ტარო", name, `ტარო ${name}`, `${name} მნიშვნელობა`, `${name} ტაროს კარტი`, "ტაროს კარტები", kaCard.nameEn]),
     ],
-    alternates: {
-      canonical: url,
-      languages: {
-        en: `${ENGLISH_SITE_URL}/taro/${slug}`,
-        "ka-GE": `${GEORGIAN_SITE_URL}/taro/${slug}`,
-        "x-default": `${ENGLISH_SITE_URL}/taro/${slug}`,
-      },
-    },
+    alternates: localizedAlternates(`/taro/${slug}`, `/taro/${slug}`, en ? "en" : "ka"),
     openGraph: {
       type: "article",
       url,
@@ -78,12 +99,16 @@ export default async function TarotCardPage({
   const { card: slug } = await params;
   const kaCard = TAROT_BY_SLUG[slug];
   const enCard = TAROT_EN_BY_SLUG[slug];
+  const amCard = tarotCardBySlugAm(slug);
   if (!kaCard || !enCard) notFound();
 
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const card = en
+  const am = locale === "am";
+  const siteUrl = am ? ARMENIAN_SITE_URL : en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const card = am && amCard
+    ? amCard
+    : en
     ? enCard
     : {
         slug: kaCard.slug,
@@ -98,25 +123,41 @@ export default async function TarotCardPage({
         career: kaCard.careerKa,
       };
 
-  const deck = en ? TAROT_CARDS_EN : TAROT_CARDS;
+  const deck = am ? TAROT_CARDS_AM : en ? TAROT_CARDS_EN : TAROT_CARDS;
   const idx = deck.findIndex((c) => c.slug === slug);
   const prev = idx > 0 ? deck[idx - 1] : null;
   const next = idx < deck.length - 1 ? deck[idx + 1] : null;
   const cardName = (item: (typeof deck)[number]) =>
-    en ? (item as (typeof TAROT_CARDS_EN)[number]).name : (item as (typeof TAROT_CARDS)[number]).nameKa;
+    am
+      ? (item as (typeof TAROT_CARDS_AM)[number]).name
+      : en
+      ? (item as (typeof TAROT_CARDS_EN)[number]).name
+      : (item as (typeof TAROT_CARDS)[number]).nameKa;
   const url = `${siteUrl}/taro/${slug}`;
 
   const faq = [
     {
-      q: en ? `What does ${card.name} mean in tarot?` : `რას ნიშნავს ტაროს კარტი „${card.name}"?`,
+      q: am
+        ? `Ի՞նչ է նշանակում „${card.name}" տարո քարտը:`
+        : en
+        ? `What does ${card.name} mean in tarot?`
+        : `რას ნიშნავს ტაროს კარტი „${card.name}"?`,
       a: card.upright,
     },
     {
-      q: en ? `What does ${card.name} reversed mean?` : `რას ნიშნავს შებრუნებული „${card.name}"?`,
+      q: am
+        ? `Ի՞նչ է նշանակում շրջված „${card.name}" քարտը:`
+        : en
+        ? `What does ${card.name} reversed mean?`
+        : `რას ნიშნავს შებრუნებული „${card.name}"?`,
       a: card.reversed,
     },
     {
-      q: en ? `What does ${card.name} mean in love?` : `„${card.name}" სიყვარულში რას ნიშნავს?`,
+      q: am
+        ? `Ի՞նչ է նշանակում „${card.name}" քարտը սիրո մեջ:`
+        : en
+        ? `What does ${card.name} mean in love?`
+        : `„${card.name}" სიყვარულში რას ნიშნავს?`,
       a: card.love,
     },
   ];
@@ -180,8 +221,8 @@ export default async function TarotCardPage({
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/taro" className="hover:text-foreground">
-            {en ? "Tarot" : "ტარო"}
+          <Link href={am ? "/am/taro" : "/taro"} className="hover:text-foreground">
+            {am ? "Տարո" : en ? "Tarot" : "ტარო"}
           </Link>
           <span>/</span>
           <span className="text-foreground/80">{card.name}</span>
@@ -199,8 +240,8 @@ export default async function TarotCardPage({
           />
           <div className="min-w-0 flex-1">
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {en ? "Major Arcana" : "დიდი არკანა"} · {card.number}
-              {!en && ` · ${kaCard.nameEn}`}
+              {am ? "Մեծ Արկան" : en ? "Major Arcana" : "დიდი არკანა"} · {card.number}
+              {!en && !am && ` · ${kaCard.nameEn}`}
             </div>
             <h1 className="mt-1 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               {card.name}
@@ -225,7 +266,7 @@ export default async function TarotCardPage({
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           <article className="rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
             <h2 className="text-lg font-semibold tracking-tight">
-              {en ? "Upright meaning" : "პირდაპირი მნიშვნელობა"}
+              {am ? "Ուղիղ նշանակություն" : en ? "Upright meaning" : "პირდაპირი მნიშვნელობა"}
             </h2>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {card.keywords.map((k) => (
@@ -243,7 +284,7 @@ export default async function TarotCardPage({
           </article>
           <article className="rounded-2xl border border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/8 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
             <h2 className="text-lg font-semibold tracking-tight">
-              {en ? "Reversed meaning" : "შებრუნებული მნიშვნელობა"}
+              {am ? "Շրջված նշանակություն" : en ? "Reversed meaning" : "შებრუნებული მნიშვნელობა"}
             </h2>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {card.reversedKeywords.map((k) => (
@@ -266,7 +307,7 @@ export default async function TarotCardPage({
           <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
             <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
               <Heart className="size-4 text-[var(--vivida-pink)]" />
-              {en ? "Love" : "სიყვარული"}
+              {am ? "Սեր" : en ? "Love" : "სიყვარული"}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-foreground/90">
               {card.love}
@@ -275,7 +316,7 @@ export default async function TarotCardPage({
           <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
             <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
               <Briefcase className="size-4 text-[var(--vivida-cyan)]" />
-              {en ? "Career" : "კარიერა"}
+              {am ? "Կարիերա" : en ? "Career" : "კარიერა"}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-foreground/90">
               {card.career}
@@ -287,16 +328,18 @@ export default async function TarotCardPage({
         <div className="mt-12 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Wand2 className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            {en ? "Ask the tarot" : "დაუსვი კითხვა ტაროს"}
+            {am ? "Հարցրու տարոյին" : en ? "Ask the tarot" : "დაუსვი კითხვა ტაროს"}
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            {en
+            {am
+              ? "Բացեք 3 քարտ և ստացեք անձնական պատասխան: Առաջին հարցն անվճար է:"
+              : en
               ? "Draw a three-card spread and receive a thoughtful, personal reading. Your first question is free."
               : "გაშალე 3-კარტიანი განლაგება და მიიღე ცოცხალი, პერსონალური პასუხი ქართულად. პირველი კითხვა უფასოა."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/taro">
-              {en ? "Draw the cards" : "გაშალე კარტები"}
+            <Link href={am ? "/am/taro" : "/taro"}>
+              {am ? "Բացել քարտերը" : en ? "Draw the cards" : "გაშალე კარტები"}
               <ArrowRight className="size-4" />
             </Link>
           </Button>
@@ -305,7 +348,7 @@ export default async function TarotCardPage({
         {/* FAQ */}
         <section className="mt-12">
           <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
-            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
+            {am ? "Հաճախ տրվող հարցեր" : en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="space-y-3">
             {faq.map((item, i) => (
@@ -334,13 +377,13 @@ export default async function TarotCardPage({
         <div className="mt-12 flex items-stretch justify-between gap-3">
           {prev ? (
             <Link
-              href={`/taro/${prev.slug}`}
+              href={am ? `/am/taro/${prev.slug}` : `/taro/${prev.slug}`}
               className="group flex flex-1 items-center gap-3 rounded-2xl border border-border bg-card/55 p-4 transition-colors hover:bg-card/80"
             >
               <span className="text-2xl">{prev.glyph}</span>
               <span className="min-w-0">
                 <span className="block text-[11px] text-muted-foreground">
-                  {en ? "Previous" : "წინა"}
+                  {am ? "Նախորդ" : en ? "Previous" : "წინა"}
                 </span>
                 <span className="block truncate font-medium">
                   {cardName(prev)}
@@ -352,12 +395,12 @@ export default async function TarotCardPage({
           )}
           {next ? (
             <Link
-              href={`/taro/${next.slug}`}
+              href={am ? `/am/taro/${next.slug}` : `/taro/${next.slug}`}
               className="group flex flex-1 items-center justify-end gap-3 rounded-2xl border border-border bg-card/55 p-4 text-right transition-colors hover:bg-card/80"
             >
               <span className="min-w-0">
                 <span className="block text-[11px] text-muted-foreground">
-                  {en ? "Next" : "შემდეგი"}
+                  {am ? "Հաջորդ" : en ? "Next" : "შემდეგი"}
                 </span>
                 <span className="block truncate font-medium">
                   {cardName(next)}
@@ -373,13 +416,13 @@ export default async function TarotCardPage({
         {/* All cards */}
         <section className="mt-14">
           <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "All tarot cards" : "ტაროს ყველა კარტი"}
+            {am ? "Տարոյի բոլոր քարտերը" : en ? "All tarot cards" : "ტაროს ყველა კარტი"}
           </h2>
           <div className="flex flex-wrap gap-2">
             {deck.filter((c) => c.slug !== slug).map((c) => (
               <Link
                 key={c.slug}
-                href={`/taro/${c.slug}`}
+                href={am ? `/am/taro/${c.slug}` : `/taro/${c.slug}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
               >
                 <span aria-hidden>{c.glyph}</span>
@@ -392,7 +435,9 @@ export default async function TarotCardPage({
         <PopularSearches
           locale={locale}
           queries={
-            en
+            am
+              ? [`տարո ${card.name}`, `${card.name} նշանակություն`, `${card.name} շրջված`, "տարո առցանց", "տարոյի քարտեր"]
+              : en
               ? [`${card.name} tarot meaning`, `${card.name} reversed`, `${card.name} love meaning`, "Major Arcana meanings"]
               : [`ტარო ${card.name}`, `${card.name} მნიშვნელობა`, `${card.name} შებრუნებული`, "ტარო ქართულად", "ტაროს კარტების მნიშვნელობა"]
           }
