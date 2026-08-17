@@ -167,12 +167,33 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     })),
   );
 
+  const pairEntries = ALL_PAIR_SLUGS.map((pair) => ({
+    url: `${ENGLISH_SITE_URL}/am/zodiac/tavsebadoba/${pair}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.72,
+    alternates: alternatesFor(
+      `/zodiac/tavsebadoba/${pair}`,
+      `/zodiac/tavsebadoba/${pair}`,
+    ),
+  }));
+
+  const tavsebadobaEntry = {
+    url: `${ENGLISH_SITE_URL}/am/tavsebadoba`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/tavsebadoba", "/tavsebadoba"),
+  };
+
   return [
     ...coreEntries,
     ...signEntries,
     ...periodEntries,
     ...thematicHubEntries,
     ...thematicSignEntries,
+    ...pairEntries,
+    tavsebadobaEntry,
   ];
 }
 

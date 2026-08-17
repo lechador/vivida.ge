@@ -22,9 +22,11 @@ import {
 import { pairPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ARMENIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
+import { zodiacPairArmenian } from "@/lib/zodiac-pair-am";
 import { ZodiacPairPageEn } from "@/components/seo/zodiac-pair-page-en";
+import { ZodiacPairPageAm } from "@/components/seo/zodiac-pair-page-am";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -46,13 +48,32 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { pair } = await params;
-  if (!PAIRS_CONTENT) return {};
-  const c = PAIRS_CONTENT[pair];
-  if (!c) return {};
   const parsed = parsePairSlug(pair);
   if (!parsed) return {};
+  const locale = await getRequestLocale();
   const path = `/zodiac/tavsebadoba/${pair}`;
-  if ((await getRequestLocale()) === "en") {
+
+  if (locale === "am") {
+    const armenian = zodiacPairArmenian(...parsed);
+    const url = `${ARMENIAN_SITE_URL}${path}`;
+    return {
+      title: { absolute: `${armenian.title} — Vivida` },
+      description: armenian.description,
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url,
+        title: armenian.title,
+        description: armenian.description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title: armenian.title, description: armenian.description },
+    };
+  }
+
+  if (locale === "en") {
     const english = zodiacPairEnglish(...parsed);
     const url = `https://www.vividaastro.com${path}`;
     return {
@@ -63,6 +84,11 @@ export async function generateMetadata({
       twitter: { card: "summary_large_image", title: english.title, description: english.description },
     };
   }
+
+  if (!PAIRS_CONTENT) return {};
+  const c = PAIRS_CONTENT[pair];
+  if (!c) return {};
+
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
@@ -90,15 +116,16 @@ export default async function PairPage({
   params: Promise<Params>;
 }) {
   const { pair } = await params;
-  if (!PAIRS_CONTENT) notFound();
   const parsed = parsePairSlug(pair);
   if (!parsed) notFound();
-  const c = PAIRS_CONTENT[pair];
-  if (!c) notFound();
 
   const [a, b] = parsed;
-  if ((await getRequestLocale()) === "en")
-    return <ZodiacPairPageEn a={a} b={b} />;
+  const locale = await getRequestLocale();
+  if (locale === "am") return <ZodiacPairPageAm a={a} b={b} />;
+  if (locale === "en") return <ZodiacPairPageEn a={a} b={b} />;
+  if (!PAIRS_CONTENT) notFound();
+  const c = PAIRS_CONTENT[pair];
+  if (!c) notFound();
   const aSign = SIGNS_CONTENT[a];
   const bSign = SIGNS_CONTENT[b];
   const aMeta = signMetaBySlug(a);

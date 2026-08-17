@@ -138,12 +138,14 @@ const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([
   "/siyvarulis-horoskopi",
   "/finansuri-horoskopi",
   "/karieris-horoskopi",
+  "/tavsebadoba",
 ]);
 
 const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [
   "/siyvarulis-horoskopi/",
   "/finansuri-horoskopi/",
   "/karieris-horoskopi/",
+  "/zodiac/tavsebadoba/",
 ];
 
 /**
