@@ -13,9 +13,16 @@ import {
 } from "@/lib/retrograde";
 import { RETROGRADE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { MERCURY_RETROGRADE_EN, MercuryRetrogradePageEn } from "@/components/seo/mercury-retrograde-en";
+import {
+  MERCURY_RETROGRADE_EN,
+  MercuryRetrogradePageEn,
+} from "@/components/seo/mercury-retrograde-en";
+import {
+  MERCURY_RETROGRADE_AM,
+  MercuryRetrogradePageAm,
+} from "@/components/seo/mercury-retrograde-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -56,9 +63,55 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
+  if (locale === "am") {
+    const path = "/merkuri-retrogradi";
+    const { title, description } = MERCURY_RETROGRADE_AM;
+    return {
+      title: { absolute: `${title} — Vivida` },
+      description,
+      keywords: [
+        "Մերկուրիի ռետրոգրադ",
+        "Մերկուրի ռետրոգրադ",
+        "ռետրոգրադ Մերկուրի 2026",
+        "հետընթաց Մերկուրի",
+      ],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   if (locale === "en") {
-    const path = "/merkuri-retrogradi"; const { title, description } = MERCURY_RETROGRADE_EN;
-    return { title: { absolute: title }, description, keywords: ["Mercury retrograde", "Mercury retrograde dates", "is Mercury retrograde", "Mercury retrograde meaning"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+    const path = "/merkuri-retrogradi";
+    const { title, description } = MERCURY_RETROGRADE_EN;
+    return {
+      title: { absolute: title },
+      description,
+      keywords: [
+        "Mercury retrograde",
+        "Mercury retrograde dates",
+        "is Mercury retrograde",
+        "Mercury retrograde meaning",
+      ],
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `https://www.vividaastro.com${path}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
   }
   return KA_METADATA;
 }
@@ -93,6 +146,7 @@ function formatKa(isoDate: string): string {
 
 export default async function MercuryRetrogradePage() {
   const locale = await getRequestLocale();
+  if (locale === "am") return <MercuryRetrogradePageAm />;
   if (locale === "en") return <MercuryRetrogradePageEn />;
   const now = new Date();
   const year = now.getUTCFullYear();

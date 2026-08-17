@@ -79,3 +79,14 @@ export function amLongDate(ymd: string): string {
 export function amShortDate(date: Date): string {
   return `${date.getDate()} ${AM_MONTHS_SHORT[date.getMonth()]}`;
 }
+
+/** "9 օգոստոսի 2026" from a Date object or ISO string. */
+export function formatAmDate(dateInput: Date | string, short = false): string {
+  const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
+  if (Number.isNaN(date.getTime())) return String(dateInput);
+  const day = date.getDate();
+  const month = short ? AM_MONTHS_SHORT[date.getMonth()] : AM_MONTHS_GENITIVE[date.getMonth()];
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+

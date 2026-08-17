@@ -48,6 +48,17 @@ export const PHASE_LABEL_EN: Record<PhaseKey, string> = {
   waning_crescent: "Waning Crescent",
 };
 
+export const PHASE_LABEL_AM: Record<PhaseKey, string> = {
+  new_moon: "Նորալուսին",
+  waxing_crescent: "Աճող մահիկ",
+  first_quarter: "Առաջին քառորդ",
+  waxing_gibbous: "Աճող լուսին",
+  full_moon: "Լիալուսին",
+  waning_gibbous: "Նվազող լուսին",
+  last_quarter: "Վերջին քառորդ",
+  waning_crescent: "Նվազող մահիկ",
+};
+
 export type MoonPhaseSnapshot = {
   /** 0..360, sun→moon angular separation. */
   phaseAngle: number;

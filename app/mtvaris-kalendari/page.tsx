@@ -17,8 +17,9 @@ import {
 } from "@/lib/seo/moon-reference";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { MOON_CALENDAR_EN, MoonCalendarPageEn } from "@/components/seo/moon-calendar-en";
+import { MOON_CALENDAR_AM, MoonCalendarPageAm } from "@/components/seo/moon-calendar-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PAGE_URL = `${SITE_URL}/mtvaris-kalendari`;
@@ -72,6 +73,32 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
+  if (locale === "am") {
+    const path = "/mtvaris-kalendari";
+    const { title, description } = MOON_CALENDAR_AM;
+    return {
+      title: { absolute: `${title} — Vivida` },
+      description,
+      keywords: [
+        "լուսնային օրացույց",
+        `լուսնային օրացույց ${CURRENT_YEAR}`,
+        "լուսնի փուլն այսօր",
+        "լիալուսին",
+        "նորալուսին",
+      ],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   if (locale === "en") {
     const path = "/mtvaris-kalendari"; const { title, description } = MOON_CALENDAR_EN;
     return { title: { absolute: title }, description, keywords: ["moon calendar", `moon calendar ${CURRENT_YEAR}`, "moon phase today", "next full moon", "next new moon"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
@@ -164,7 +191,9 @@ function EventList({ events, label }: { events: MajorEvent[]; label: string }) {
 }
 
 export default async function MoonCalendarPage() {
-  if ((await getRequestLocale()) === "en") return <MoonCalendarPageEn />;
+  const locale = await getRequestLocale();
+  if (locale === "am") return <MoonCalendarPageAm />;
+  if (locale === "en") return <MoonCalendarPageEn />;
   const now = new Date();
   const localToday = tbilisiParts(now);
   const todayNoonUtc = new Date(Date.UTC(localToday.year, localToday.month, localToday.day, 8));

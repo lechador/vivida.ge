@@ -145,6 +145,14 @@ const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([
   "/numerologia",
   "/angeluri-ricxvebi",
   "/chinuri-horoskopi",
+  "/mtvaris-kalendari",
+  "/savse-mtvare",
+  "/akhali-mtvare",
+  "/astrologiuri-kalendari",
+  "/ighbliani-dgheebi",
+  "/frtxili-dgheebi",
+  "/dabnelebebi",
+  "/merkuri-retrogradi",
 ]);
 
 const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [
@@ -158,6 +166,10 @@ const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [
   "/numerologia/",
   "/angeluri-ricxvebi/",
   "/chinuri-horoskopi/",
+  "/savse-mtvare/",
+  "/akhali-mtvare/",
+  "/astrologiuri-kalendari/",
+  "/dabnelebebi/",
 ];
 
 /**

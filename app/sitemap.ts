@@ -282,6 +282,102 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/chinuri-horoskopi/${slug}`, `/chinuri-horoskopi/${slug}`),
   }));
 
+  const moonCalendarHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/mtvaris-kalendari`,
+    lastModified: NOW,
+    changeFrequency: "daily" as const,
+    priority: 0.85,
+    alternates: alternatesFor("/mtvaris-kalendari", "/mtvaris-kalendari"),
+  };
+
+  const savseMtvareHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/savse-mtvare`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/savse-mtvare", "/savse-mtvare"),
+  };
+
+  const savseMtvareEntries = moonEvents("full").map((event) => ({
+    url: `${ENGLISH_SITE_URL}/am/savse-mtvare/${event.iso}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+    alternates: alternatesFor(`/savse-mtvare/${event.iso}`, `/savse-mtvare/${event.iso}`),
+  }));
+
+  const akhaliMtvareHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/akhali-mtvare`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/akhali-mtvare", "/akhali-mtvare"),
+  };
+
+  const akhaliMtvareEntries = moonEvents("new").map((event) => ({
+    url: `${ENGLISH_SITE_URL}/am/akhali-mtvare/${event.iso}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+    alternates: alternatesFor(`/akhali-mtvare/${event.iso}`, `/akhali-mtvare/${event.iso}`),
+  }));
+
+  const astrologyCalendarHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/astrologiuri-kalendari`,
+    lastModified: NOW,
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/astrologiuri-kalendari", "/astrologiuri-kalendari"),
+  };
+
+  const astrologyCalendarEntries = calendarWindow().map((day) => ({
+    url: `${ENGLISH_SITE_URL}/am/astrologiuri-kalendari/${day.iso}`,
+    lastModified: NOW,
+    changeFrequency: "daily" as const,
+    priority: 0.65,
+    alternates: alternatesFor(`/astrologiuri-kalendari/${day.iso}`, `/astrologiuri-kalendari/${day.iso}`),
+  }));
+
+  const luckyDaysEntry = {
+    url: `${ENGLISH_SITE_URL}/am/ighbliani-dgheebi`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "weekly" as const,
+    priority: 0.75,
+    alternates: alternatesFor("/ighbliani-dgheebi", "/ighbliani-dgheebi"),
+  };
+
+  const cautionDaysEntry = {
+    url: `${ENGLISH_SITE_URL}/am/frtxili-dgheebi`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "weekly" as const,
+    priority: 0.75,
+    alternates: alternatesFor("/frtxili-dgheebi", "/frtxili-dgheebi"),
+  };
+
+  const eclipseHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/dabnelebebi`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/dabnelebebi", "/dabnelebebi"),
+  };
+
+  const eclipseEntries = ECLIPSES.map((eclipse) => ({
+    url: `${ENGLISH_SITE_URL}/am/dabnelebebi/${eclipse.slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+    alternates: alternatesFor(`/dabnelebebi/${eclipse.slug}`, `/dabnelebebi/${eclipse.slug}`),
+  }));
+
+  const retrogradeHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/merkuri-retrogradi`,
+    lastModified: NOW,
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/merkuri-retrogradi", "/merkuri-retrogradi"),
+  };
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -302,6 +398,18 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...angelEntries,
     chineseHubEntry,
     ...chineseEntries,
+    moonCalendarHubEntry,
+    savseMtvareHubEntry,
+    ...savseMtvareEntries,
+    akhaliMtvareHubEntry,
+    ...akhaliMtvareEntries,
+    astrologyCalendarHubEntry,
+    ...astrologyCalendarEntries,
+    luckyDaysEntry,
+    cautionDaysEntry,
+    eclipseHubEntry,
+    ...eclipseEntries,
+    retrogradeHubEntry,
   ];
 }
 

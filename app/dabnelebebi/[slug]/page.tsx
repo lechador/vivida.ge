@@ -1,5 +1,94 @@
-import type { Metadata } from "next"; import { notFound } from "next/navigation"; import { EclipseDetail } from "@/components/seo/moon-event-pages"; import { ECLIPSES } from "@/lib/seo/moon-events";
-import { EclipseDetailEn } from "@/components/seo/moon-event-pages-en"; import { eclipseEnBySlug } from "@/lib/seo/eclipse-en"; import { getRequestLocale } from "@/lib/i18n/request-locale"; import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
-type Props = { params: Promise<{ slug: string }> }; export function generateStaticParams() { return ECLIPSES.map((e) => ({ slug: e.slug })); }
-export async function generateMetadata({ params }: Props): Promise<Metadata> { const { slug } = await params; const path = `/dabnelebebi/${slug}`; if ((await getRequestLocale()) === "en") { const e = eclipseEnBySlug(slug); if (!e) return {}; const description = `${e.description} Visibility, eclipse type, safe viewing, and astrological context.`; return { title: { absolute: e.title }, description, alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], title: e.title, description, url: `https://www.vividaastro.com${path}`, type: "article", locale: "en_US", siteName: "Vivida" }, twitter: { card: "summary_large_image", title: e.title, description } }; } const e = ECLIPSES.find((x) => x.slug === slug); if (!e) return {}; return { title: { absolute: e.title }, description: `${e.description} ხილვადობა, ტიპი, უსაფრთხო დაკვირვება და ასტროლოგიური კონტექსტი.`, alternates: localizedAlternates(path, path, "ka") }; }
-export default async function Page({ params }: Props) { const { slug } = await params; if ((await getRequestLocale()) === "en") { const e = eclipseEnBySlug(slug); if (!e) notFound(); return <EclipseDetailEn eclipse={e} />; } const e = ECLIPSES.find((x) => x.slug === slug); if (!e) notFound(); return <EclipseDetail eclipse={e} />; }
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+import { EclipseDetail } from "@/components/seo/moon-event-pages";
+import { ECLIPSES } from "@/lib/seo/moon-events";
+import { EclipseDetailEn } from "@/components/seo/moon-event-pages-en";
+import { EclipseDetailAm } from "@/components/seo/moon-event-pages-am";
+import { eclipseEnBySlug } from "@/lib/seo/eclipse-en";
+import { eclipseAmBySlug } from "@/lib/seo/eclipse-am";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+
+type Props = { params: Promise<{ slug: string }> };
+
+export function generateStaticParams() {
+  return ECLIPSES.map((e) => ({ slug: e.slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const path = `/dabnelebebi/${slug}`;
+  const locale = await getRequestLocale();
+
+  if (locale === "am") {
+    const e = eclipseAmBySlug(slug);
+    if (!e) return {};
+    const description = `${e.description} Տեսանելիություն, խավարման տեսակ, անվտանգ դիտում և աստղաբանական համատեքստ:`;
+    return {
+      title: { absolute: `${e.title} — Vivida` },
+      description,
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        title: e.title,
+        description,
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        type: "article",
+        locale: "hy_AM",
+        siteName: "Vivida",
+      },
+      twitter: { card: "summary_large_image", title: e.title, description },
+    };
+  }
+
+  if (locale === "en") {
+    const e = eclipseEnBySlug(slug);
+    if (!e) return {};
+    const description = `${e.description} Visibility, eclipse type, safe viewing, and astrological context.`;
+    return {
+      title: { absolute: e.title },
+      description,
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        title: e.title,
+        description,
+        url: `https://www.vividaastro.com${path}`,
+        type: "article",
+        locale: "en_US",
+        siteName: "Vivida",
+      },
+      twitter: { card: "summary_large_image", title: e.title, description },
+    };
+  }
+
+  const e = ECLIPSES.find((x) => x.slug === slug);
+  if (!e) return {};
+  return {
+    title: { absolute: e.title },
+    description: `${e.description} ხილვადობა, ტიპი, უსაფრთხო დაკვირვება და ასტროლოგიური კონტექსტი.`,
+    alternates: localizedAlternates(path, path, "ka"),
+  };
+}
+
+export default async function Page({ params }: Props) {
+  const { slug } = await params;
+  const locale = await getRequestLocale();
+
+  if (locale === "am") {
+    const e = eclipseAmBySlug(slug);
+    if (!e) notFound();
+    return <EclipseDetailAm eclipse={e} />;
+  }
+
+  if (locale === "en") {
+    const e = eclipseEnBySlug(slug);
+    if (!e) notFound();
+    return <EclipseDetailEn eclipse={e} />;
+  }
+
+  const e = ECLIPSES.find((x) => x.slug === slug);
+  if (!e) notFound();
+  return <EclipseDetail eclipse={e} />;
+}

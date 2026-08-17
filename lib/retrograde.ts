@@ -18,6 +18,8 @@ export type RetrogradePeriod = {
   endSignKa: string;
   startSignEn: string;
   endSignEn: string;
+  startSignAm: string;
+  endSignAm: string;
 };
 
 function iso(d: Date): string {
@@ -63,6 +65,8 @@ export function mercuryRetrogradePeriods(year: number): RetrogradePeriod[] {
           endSignKa: signOf(prevLon).labelKa,
           startSignEn: signOf(current.startLon).labelEn,
           endSignEn: signOf(prevLon).labelEn,
+          startSignAm: signOf(current.startLon).labelAm,
+          endSignAm: signOf(prevLon).labelAm,
         });
         current = null;
       }
