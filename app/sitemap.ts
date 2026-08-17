@@ -202,6 +202,22 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/taro/${card.slug}`, `/taro/${card.slug}`),
   }));
 
+  const mbtiHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/mbti`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/mbti", "/mbti"),
+  };
+
+  const mbtiEntries = ALL_MBTI_SLUGS.map((slug) => ({
+    url: `${ENGLISH_SITE_URL}/am/mbti/${slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.72,
+    alternates: alternatesFor(`/mbti/${slug}`, `/mbti/${slug}`),
+  }));
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -212,6 +228,8 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     tavsebadobaEntry,
     taroHubEntry,
     ...tarotCardEntries,
+    mbtiHubEntry,
+    ...mbtiEntries,
   ];
 }
 
