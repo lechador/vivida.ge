@@ -51,13 +51,13 @@ describe("Armenian path prefix", () => {
 describe("Armenian hreflang gating", () => {
   it("claims an Armenian alternate only where the page exists", () => {
     expect(hasArmenianVersion("/natal-chart")).toBe(true);
-    expect(hasArmenianVersion("/sizmris-akhsna")).toBe(false);
+    expect(hasArmenianVersion("/numerologia")).toBe(false);
   });
 
   it("omits hy entirely on pages with no Armenian twin", () => {
     const alternates = localizedAlternates(
-      "/sizmris-akhsna",
-      "/sizmris-akhsna",
+      "/numerologia",
+      "/numerologia",
       "ka",
     );
     expect(alternates.languages).not.toHaveProperty("hy");

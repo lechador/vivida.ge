@@ -218,6 +218,22 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/mbti/${slug}`, `/mbti/${slug}`),
   }));
 
+  const dreamsHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/sizmris-akhsna`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/sizmris-akhsna", "/sizmris-akhsna"),
+  };
+
+  const dreamEntries = ALL_DREAM_SLUGS.map((slug) => ({
+    url: `${ENGLISH_SITE_URL}/am/sizmris-akhsna/${slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.72,
+    alternates: alternatesFor(`/sizmris-akhsna/${slug}`, `/sizmris-akhsna/${slug}`),
+  }));
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -230,6 +246,8 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...tarotCardEntries,
     mbtiHubEntry,
     ...mbtiEntries,
+    dreamsHubEntry,
+    ...dreamEntries,
   ];
 }
 

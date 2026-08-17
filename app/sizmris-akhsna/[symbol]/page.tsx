@@ -8,6 +8,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { DreamSymbolPageEn } from "@/components/seo/dreams-en";
+import { DreamSymbolPageAm } from "@/components/seo/dreams-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   ALL_DREAM_SLUGS,
@@ -16,8 +17,9 @@ import {
   isDreamSlug,
 } from "@/lib/seo/dreams";
 import { DREAM_EN_BY_SLUG } from "@/lib/seo/dreams-en";
+import { DREAM_AM_BY_SLUG } from "@/lib/seo/dreams-am";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -36,6 +38,31 @@ export async function generateMetadata({
   if (!isDreamSlug(symbol)) return {};
   const s = DREAM_BY_SLUG[symbol];
   const locale = await getRequestLocale();
+
+  if (locale === "am") {
+    const content = DREAM_AM_BY_SLUG[symbol];
+    if (!content) return {};
+    const path = `/sizmris-akhsna/${symbol}`;
+    const title = `Երազում ${content.title} տեսնելու իմաստը — Երազահան`;
+    const description = `${content.summary} Իմացեք տարածված սցենարների, դրական նշանակության և զգուշացումների մասին:`;
+    return {
+      title: { absolute: `${title} — Vivida` },
+      description,
+      keywords: [`${content.title} երազում`, `${content.title} երազահան`, "երազների մեկնաբանություն"],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
+
   if (locale === "en") {
     const content = DREAM_EN_BY_SLUG[symbol];
     if (!content) return {};
@@ -84,11 +111,6 @@ export async function generateMetadata({
   };
 }
 
-/**
- * One page per dream symbol. The `variantsKa` list is the point: it carries
- * the actual long-tail phrasings ("შავი გველი", "კბილი სისხლით ვარდება")
- * that people type verbatim, each as its own scannable answer block.
- */
 export default async function DreamSymbolPage({
   params,
 }: {
@@ -97,7 +119,13 @@ export default async function DreamSymbolPage({
   const { symbol } = await params;
   if (!isDreamSlug(symbol)) notFound();
   const s = DREAM_BY_SLUG[symbol];
-  if ((await getRequestLocale()) === "en") {
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const content = DREAM_AM_BY_SLUG[symbol];
+    if (!content) notFound();
+    return <DreamSymbolPageAm base={s} content={content} />;
+  }
+  if (locale === "en") {
     const content = DREAM_EN_BY_SLUG[symbol];
     if (!content) notFound();
     return <DreamSymbolPageEn base={s} content={content} />;

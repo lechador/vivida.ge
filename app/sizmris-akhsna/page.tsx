@@ -7,6 +7,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { DREAMS_HUB_EN, DreamsHubEn } from "@/components/seo/dreams-en";
+import { DREAMS_HUB_AM, DreamsHubAm } from "@/components/seo/dreams-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   DREAMS_FAQ,
@@ -15,7 +16,7 @@ import {
   dreamsByLetter,
 } from "@/lib/seo/dreams";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -55,6 +56,25 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
+  if (locale === "am") {
+    const path = "/sizmris-akhsna";
+    return {
+      title: { absolute: `${DREAMS_HUB_AM.title} — Vivida` },
+      description: DREAMS_HUB_AM.description,
+      keywords: ["երազահան", "երազների մեկնաբանություն", "երազի նշանակություն", "տարածված երազներ"],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title: DREAMS_HUB_AM.title,
+        description: DREAMS_HUB_AM.description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title: DREAMS_HUB_AM.title, description: DREAMS_HUB_AM.description },
+    };
+  }
   if (locale === "en") {
     const path = "/sizmris-akhsna";
     return {
@@ -69,14 +89,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return KA_METADATA;
 }
 
-/**
- * Dream-dictionary hub. Structured as an A–Z index on purpose: "ანბანის
- * მიხედვით" is the dominant modifier on this query family, and it's also
- * genuinely the fastest way for someone to find the symbol they woke up
- * thinking about.
- */
 export default async function DreamsHubPage() {
   const locale = await getRequestLocale();
+  if (locale === "am") return <DreamsHubAm />;
   if (locale === "en") return <DreamsHubEn />;
   const groups = dreamsByLetter();
 
