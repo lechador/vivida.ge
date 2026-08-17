@@ -31,8 +31,16 @@ import { ELEMENT_COLOR } from "@/lib/pdf/theme";
 import { cn } from "@/lib/utils";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacSignPageEn } from "@/components/seo/zodiac-sign-page-en";
+import { ZodiacSignPageAm } from "@/components/seo/zodiac-sign-page-am";
 import { ZODIAC_SIGN_EN } from "@/lib/zodiac-sign-en";
-import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { ZODIAC_SIGN_AM } from "@/lib/zodiac-sign-am";
+import { SIGNS } from "@/lib/zodiac";
+import {
+  ARMENIAN_SITE_URL,
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -55,9 +63,34 @@ export async function generateMetadata({
   if (!isSlug(sign)) return {};
   const c = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign);
-  const en = (await getRequestLocale()) === "en";
+  const locale = await getRequestLocale();
   const accent = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
-  if (en && meta) {
+
+  if (locale === "am") {
+    const signInfo = signMetaBySlug(sign);
+    const name = signInfo?.labelAm || meta?.labelKa || sign;
+    const amContent = ZODIAC_SIGN_AM[sign];
+    const title = `${name} կենդանակերպի նշան. Ամսաթվեր, բնավորություն, սեր և համատեղելիություն`;
+    const description = `${name} կենդանակերպի նշանի ուղեցույց. ${amContent.tagline} Բացահայտիր ամսաթվերը, բնավորության գծերը, ուժեղ կողմերը, մարտահրավերները, սերը, կարիերան և համատեղելիությունը:`;
+    const path = `/am/zodiac/${sign}`;
+    return {
+      title: { absolute: `${title} — Vivida` },
+      description,
+      alternates: localizedAlternates(path, `/zodiac/${sign}`, "am"),
+      openGraph: {
+        type: "article",
+        url: `${ARMENIAN_SITE_URL}/zodiac/${sign}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+        images: [DEFAULT_OG_IMAGE],
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
+
+  if (locale === "en" && meta) {
     const name = meta.labelEn;
     const title = `${name} Zodiac Sign: Dates, Traits, Love and Compatibility`;
     const description = `${name} zodiac sign guide: ${ZODIAC_SIGN_EN[sign].tagline} Explore dates, personality traits, strengths, challenges, love, career, and compatibility.`;
@@ -114,8 +147,9 @@ export default async function ZodiacSignPage({
 }) {
   const { sign } = await params;
   if (!isSlug(sign)) notFound();
-  if ((await getRequestLocale()) === "en")
-    return <ZodiacSignPageEn sign={sign} />;
+  const locale = await getRequestLocale();
+  if (locale === "am") return <ZodiacSignPageAm sign={sign} />;
+  if (locale === "en") return <ZodiacSignPageEn sign={sign} />;
   const c = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign);
   const accent = meta ? signColor(meta) : "var(--vivida-violet)";

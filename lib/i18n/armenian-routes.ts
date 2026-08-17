@@ -120,7 +120,20 @@ export function isArmenianCoreRoute(strippedPath: string): boolean {
  * translated. Grows as translated clusters land; nothing may be added here
  * before the Armenian branch of that route actually renders.
  */
-const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([]);
+const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([
+  "/zodiac/aries",
+  "/zodiac/taurus",
+  "/zodiac/gemini",
+  "/zodiac/cancer",
+  "/zodiac/leo",
+  "/zodiac/virgo",
+  "/zodiac/libra",
+  "/zodiac/scorpio",
+  "/zodiac/sagittarius",
+  "/zodiac/capricorn",
+  "/zodiac/aquarius",
+  "/zodiac/pisces",
+]);
 
 const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [];
 

@@ -227,3 +227,51 @@ export const ZODIAC_SIGN_AM: Record<ZodiacSlug, ZodiacSignArmenian> = {
     career: "Արվեստ, երաժշտություն, հոգեբանություն, կինեմատոգրաֆիա, բժշկություն, բարեգործություն և հոգևոր պրակտիկաներ:",
   },
 };
+
+export const ELEMENT_AM: Record<string, string> = {
+  fire: "Կրակ",
+  earth: "Հող",
+  air: "Օդ",
+  water: "Ջուր",
+  ცეცხლი: "Կրակ",
+  მიწა: "Հող",
+  ჰაერი: "Օդ",
+  წყალი: "Ջուր",
+};
+
+export const MODALITY_AM: Record<string, string> = {
+  კარდინალური: "Կարդինալ",
+  ფიქსირებული: "Ֆիքսված",
+  მუტაბელური: "Մուտաբել",
+};
+
+export const RULER_AM: Record<ZodiacSlug, string> = {
+  aries: "Մարս",
+  taurus: "Վեներա",
+  gemini: "Մերկուրի",
+  cancer: "Լուսին",
+  leo: "Արև",
+  virgo: "Մերկուրի",
+  libra: "Վեներա",
+  scorpio: "Պլուտոն",
+  sagittarius: "Յուպիտեր",
+  capricorn: "Սատուրն",
+  aquarius: "Ուրան",
+  pisces: "Նեպտուն",
+};
+
+export const COMPATIBILITY_AM: Record<ZodiacSlug, ZodiacSlug[]> = {
+  aries: ["leo", "sagittarius", "gemini", "libra"],
+  taurus: ["virgo", "capricorn", "cancer", "scorpio"],
+  gemini: ["libra", "aquarius", "aries", "sagittarius"],
+  cancer: ["scorpio", "pisces", "taurus", "capricorn"],
+  leo: ["aries", "sagittarius", "gemini", "aquarius"],
+  virgo: ["taurus", "capricorn", "cancer", "pisces"],
+  libra: ["gemini", "aquarius", "leo", "aries"],
+  scorpio: ["cancer", "pisces", "virgo", "taurus"],
+  sagittarius: ["aries", "leo", "aquarius", "gemini"],
+  capricorn: ["taurus", "virgo", "scorpio", "cancer"],
+  aquarius: ["gemini", "libra", "sagittarius", "leo"],
+  pisces: ["cancer", "scorpio", "taurus", "virgo"],
+};
+

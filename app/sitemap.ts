@@ -120,7 +120,7 @@ function alternatesFor(
  * English at the root and Armenian under /am.
  */
 function armenianSitemap(): MetadataRoute.Sitemap {
-  return ARMENIAN_CORE_ROUTES.map((path) => ({
+  const coreEntries = ARMENIAN_CORE_ROUTES.map((path) => ({
     url: `${ENGLISH_SITE_URL}${withArmenianPrefix(path)}`,
     lastModified: ARMENIAN_PUBLISHED,
     changeFrequency: (path === "/about" ? "yearly" : "monthly") as
@@ -132,6 +132,16 @@ function armenianSitemap(): MetadataRoute.Sitemap {
       path,
     ),
   }));
+
+  const signEntries = ALL_SLUGS.map((slug) => ({
+    url: `${ENGLISH_SITE_URL}/am/zodiac/${slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.78,
+    alternates: alternatesFor(`/zodiac/${slug}`, `/zodiac/${slug}`),
+  }));
+
+  return [...coreEntries, ...signEntries];
 }
 
 function englishSitemap(): MetadataRoute.Sitemap {
