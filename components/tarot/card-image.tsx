@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * A single tarot illustration with a styled fallback. The 22 artworks live at
@@ -21,7 +22,7 @@ export function CardImage({
   glyph: string;
   className?: string;
   priority?: boolean;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const [ok, setOk] = useState(true);
   return (

@@ -11,6 +11,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 const OPTIONS: Array<{ value: UserLocale; label: string; nativeLabel: string }> = [
   { value: "ka", label: "Georgian", nativeLabel: "ქართული" },
   { value: "en", label: "English", nativeLabel: "English" },
+  { value: "am", label: "Armenian", nativeLabel: "Հայերեն" },
 ];
 
 export function LanguageCard({ initial }: { initial: UserLocale }) {
@@ -18,6 +19,7 @@ export function LanguageCard({ initial }: { initial: UserLocale }) {
   const [locale, setLocale] = useState(initial);
   const [isPending, startTransition] = useTransition();
   const en = locale === "en";
+  const am = locale === "am";
 
   function select(next: UserLocale) {
     if (next === locale || isPending) return;
@@ -32,6 +34,14 @@ export function LanguageCard({ initial }: { initial: UserLocale }) {
     });
   }
 
+  const title = am ? "Լեզու" : en ? "Language" : "ენა";
+  const description = am
+    ? "Ընտրեք ձեր հաշվի և նավիգացիայի լեզուն:"
+    : en
+    ? "Choose the language used across your account and authenticated navigation."
+    : "აირჩიე ანგარიშისა და ავტორიზებული ნავიგაციის ენა.";
+  const updatingText = am ? "Թարմացվում է…" : en ? "Updating…" : "ახლდება…";
+
   return (
     <section lang={locale} className="rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
       <header className="mb-5 flex items-start gap-3">
@@ -39,16 +49,12 @@ export function LanguageCard({ initial }: { initial: UserLocale }) {
           <Languages className="size-5" />
         </span>
         <div>
-          <h2 className="text-lg font-semibold">{en ? "Language" : "ენა"}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {en
-              ? "Choose the language used across your account and authenticated navigation."
-              : "აირჩიე ანგარიშისა და ავტორიზებული ნავიგაციის ენა."}
-          </p>
+          <h2 className="text-lg font-semibold">{title}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         </div>
       </header>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {OPTIONS.map((option) => {
           const selected = locale === option.value;
           return (
@@ -72,7 +78,8 @@ export function LanguageCard({ initial }: { initial: UserLocale }) {
           );
         })}
       </div>
-      {isPending && <p className="mt-3 text-xs text-muted-foreground">{en ? "Updating…" : "ახლდება…"}</p>}
+      {isPending && <p className="mt-3 text-xs text-muted-foreground">{updatingText}</p>}
     </section>
   );
 }
+

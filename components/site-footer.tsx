@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { EnglishFooter } from "@/components/en/english-footer";
+import { ArmenianFooter } from "@/components/am/armenian-footer";
 import type { UserLocale } from "@/lib/i18n/locale";
 
 const PRODUCT_LINKS = [
@@ -41,6 +42,7 @@ const LEGAL_LINKS = [
   { href: "/terms", label: "წესები და პირობები" },
   { href: "/privacy", label: "კონფიდენციალურობა" },
   { href: "/en", label: "English" },
+  { href: "/am", label: "Հայերեն" },
 ];
 
 /**
@@ -48,7 +50,9 @@ const LEGAL_LINKS = [
  * — they have their own bottom UI density and the chat launcher.
  */
 export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
+  if (locale === "am") return <ArmenianFooter />;
   if (locale === "en") return <EnglishFooter />;
+
   const year = new Date().getFullYear();
   return (
     <footer className="relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-md">

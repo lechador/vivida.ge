@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { fbTrack } from "@/lib/fb-pixel";
 import { readPendingNatalProfile } from "@/lib/pending-natal-profile";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
-export function FastOnboarding({ next, locale }: { next?: string; locale: "ka" | "en" }) {
+export function FastOnboarding({ next, locale }: { next?: string; locale: UserLocale }) {
   const en = locale === "en";
   const [missing, setMissing] = useState(false);
   const [error, setError] = useState<string | null>(null);

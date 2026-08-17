@@ -18,7 +18,13 @@ describe("country catalogue", () => {
   it("creates country labels and flags", () => {
     expect(countryFlagEmoji("GE")).toBe("🇬🇪");
     expect(countryFlagEmoji("GB")).toBe("🇬🇧");
+    expect(countryFlagEmoji("AM")).toBe("🇦🇲");
     expect(countryOptions("en").find((country) => country.code === "GB")?.name)
       .toBe("United Kingdom");
+    expect(countryOptions("am").find((country) => country.code === "AM")?.name)
+      .toBe("Հայաստան");
+    expect(countryOptions("am").find((country) => country.code === "GE")?.name)
+      .toBe("Վրաստան");
+    expect(isCountryCode("AM")).toBe(true);
   });
 });

@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
-type GuideLocale = "ka" | "en";
+type GuideLocale = UserLocale;
 
 export function GuideShell({ children, locale = "ka", georgianPath }: { children: React.ReactNode; locale?: GuideLocale; georgianPath?: string }) {
   return (

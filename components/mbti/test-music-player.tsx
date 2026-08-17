@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Music4, Pause } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const PREF_KEY = "vivida_test_music";
 const SRC = "/audio/test-ambient.mp3";
@@ -17,7 +18,7 @@ const VOLUME = 0.32;
  * resume (works when arriving via an in-app navigation, which counts as a
  * gesture).
  */
-export function TestMusicPlayer({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function TestMusicPlayer({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale === "en";
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);

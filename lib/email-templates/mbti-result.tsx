@@ -2,6 +2,7 @@ import { Button, Heading, Text } from "@react-email/components";
 import * as React from "react";
 
 import { EmailLayout, buttonStyle, mutedStyle, paragraphStyle } from "./_layout";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Sent when a user's Astro-MBTI result is generated. Shows the type +
@@ -21,7 +22,7 @@ export function MbtiResultEmail({
   resultUrl: string;
   /** First ~2 sentences of the analysis, for a teaser in the inbox. */
   excerpt: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const greeting = en

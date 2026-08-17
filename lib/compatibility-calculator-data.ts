@@ -34,6 +34,12 @@ const SCORE_EN: Record<CompatibilityScore, string> = {
   გამომწვევი: "Dynamic",
 };
 
+const SCORE_AM: Record<CompatibilityScore, string> = {
+  ძლიერი: "Ուժեղ",
+  ჰარმონიული: "Ներդաշնակ",
+  გამომწვევი: "Դինամիկ",
+};
+
 export type CalcSign = {
   slug: ZodiacSlug;
   label: string;
@@ -57,15 +63,20 @@ export type CalculatorData = {
 };
 
 export function buildCalculatorData(
-  locale: "ka" | "en" = "ka",
+  locale: "ka" | "en" | "am" = "ka",
 ): CalculatorData {
   const en = locale === "en";
+  const am = locale === "am";
   const signs: CalcSign[] = ALL_SLUGS.map((slug) => {
     const meta = signMetaBySlug(slug);
     const c = SIGNS_CONTENT[slug];
     return {
       slug,
-      label: en ? (meta?.labelEn ?? slug) : c.labelKa,
+      label: am
+        ? (meta?.labelAm ?? slug)
+        : en
+        ? (meta?.labelEn ?? slug)
+        : c.labelKa,
       symbol: c.symbol,
       color: meta ? signColor(meta) : "var(--vivida-violet)",
     };
@@ -76,24 +87,29 @@ export function buildCalculatorData(
     for (const [slug, c] of Object.entries(PAIRS_CONTENT)) {
       const percent = pairPercent(slug, c.overallScore);
       const [aSlug, bSlug] = slug.split("-") as [ZodiacSlug, ZodiacSlug];
-      // Every pair previously shared one of three canned taglines and an
-      // identical strengths list, so all 78 English results read the same.
-      // This is the per-pair copy already used by /zodiac/tavsebadoba/[pair],
-      // which is also where the "View full analysis" link goes — so the
-      // teaser and the page it opens now agree.
       const enContent = en ? zodiacPairEnglish(aSlug, bSlug) : null;
+      const score = am
+        ? SCORE_AM[c.overallScore]
+        : en
+        ? SCORE_EN[c.overallScore]
+        : c.overallScore;
+
       pairs[slug] = {
         slug,
         percent,
-        score: en ? SCORE_EN[c.overallScore] : c.overallScore,
+        score,
         tagline: enContent ? enContent.tagline : c.tagline,
         strengths: enContent
           ? enContent.strengths.slice(0, 3)
           : c.strengths.slice(0, 3),
-        labelA: en
+        labelA: am
+          ? (signMetaBySlug(aSlug)?.labelAm ?? c.labelA)
+          : en
           ? (signMetaBySlug(aSlug)?.labelEn ?? c.labelA)
           : c.labelA,
-        labelB: en
+        labelB: am
+          ? (signMetaBySlug(bSlug)?.labelAm ?? c.labelB)
+          : en
           ? (signMetaBySlug(bSlug)?.labelEn ?? c.labelB)
           : c.labelB,
       };
@@ -102,3 +118,4 @@ export function buildCalculatorData(
 
   return { signs, pairs };
 }
+

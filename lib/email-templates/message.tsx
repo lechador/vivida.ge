@@ -7,6 +7,7 @@ import {
   mutedStyle,
   paragraphStyle,
 } from "./_layout";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Notification email — fired only when the recipient has been absent
@@ -30,7 +31,7 @@ export function MessageEmail({
   snippet: string;
   conversationUrl: string;
   unsubscribeUrl: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const greeting = recipientName

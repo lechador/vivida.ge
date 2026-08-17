@@ -109,8 +109,10 @@ const RECOMMENDATIONS_EN: typeof RECOMMENDATIONS = {
   },
 };
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 /** A compact result-page engagement surface that leads into a complementary test. */
-export function NextTestWidget({ completed, locale = "ka" }: { completed: CompletedKind; locale?: "ka" | "en" }) {
+export function NextTestWidget({ completed, locale = "ka" }: { completed: CompletedKind; locale?: UserLocale }) {
   const en = locale === "en";
   const recommendation = (en ? RECOMMENDATIONS_EN : RECOMMENDATIONS)[completed];
   return <section className="mt-8 rounded-3xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">

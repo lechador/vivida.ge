@@ -57,7 +57,9 @@ const ROWS_EN: EarnRow[] = [
   },
 ];
 
-export function CreditEarnInfo({ locale }: { locale: "ka" | "en" }) {
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
+export function CreditEarnInfo({ locale }: { locale: UserLocale }) {
   const en = locale === "en";
   const rows = en ? ROWS_EN : ROWS_KA;
   return (

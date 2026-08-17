@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { MbtiQuiz } from "@/components/mbti-quiz";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { MBTI_ANSWERS_STORAGE_KEY, type MbtiQuestion } from "@/lib/mbti-questions";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Public test host. The quiz runs for everyone (no login needed); on finish
@@ -12,7 +13,7 @@ import { MBTI_ANSWERS_STORAGE_KEY, type MbtiQuestion } from "@/lib/mbti-question
  * authed → generate the result, anonymous → show the teaser gate. No AI runs
  * here, so anonymous takers can't trigger the expensive synthesis.
  */
-export function MbtiTestClient({ questions, locale = "ka" }: { questions: MbtiQuestion[]; locale?: "ka" | "en" }) {
+export function MbtiTestClient({ questions, locale = "ka" }: { questions: MbtiQuestion[]; locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
   return (

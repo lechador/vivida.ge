@@ -8,7 +8,7 @@ import { sendVerificationEmail } from "@/lib/email";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { acquireResendSlot } from "@/lib/resend-throttle";
-import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
 /**
@@ -47,8 +47,8 @@ function resolveFrom(v: string | undefined, fb: string): string {
 }
 const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <hello@vivida.ge>");
 const ORIGIN = process.env.EMAIL_ORIGIN ?? "https://vivida.ge";
-function absUrlForLocale(p: string, locale: "ka" | "en"): string {
-  const origin = locale === "en" ? ENGLISH_SITE_URL : ORIGIN;
+function absUrlForLocale(p: string, locale: UserLocale): string {
+  const origin = locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
   return `${origin.replace(/\/$/, "")}${p.startsWith("/") ? p : `/${p}`}`;
 }
 

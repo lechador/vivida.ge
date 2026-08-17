@@ -63,11 +63,13 @@ export function aspectDetailKey(
 const CONTENT = rawContent as Record<string, AspectDetailContent>;
 const CONTENT_EN = rawContentEn as Record<string, AspectDetailContent>;
 
+import type { UserLocale } from "./i18n/user-locale";
+
 export function aspectDetailContent(
   kind: AspectKind,
   a: string,
   b: string,
-  locale: "ka" | "en" = "ka"
+  locale: UserLocale = "ka"
 ): AspectDetailContent | null {
   const table = locale === "en" ? CONTENT_EN : CONTENT;
   return table[aspectDetailKey(kind, a, b)] ?? null;

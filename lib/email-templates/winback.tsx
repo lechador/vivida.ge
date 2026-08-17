@@ -2,6 +2,7 @@ import { Button, Heading, Section, Text } from "@react-email/components";
 import * as React from "react";
 
 import { EmailLayout, buttonStyle, paragraphStyle } from "./_layout";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Winback email — sent once when a previously-active user has been quiet for
@@ -26,7 +27,7 @@ export function WinbackEmail({
   balance: number;
   dashboardUrl: string;
   unsubscribeUrl: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   return (

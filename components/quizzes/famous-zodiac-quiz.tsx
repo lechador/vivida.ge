@@ -29,7 +29,9 @@ function optionsFor(question: FamousZodiacQuestion) {
   return shuffle([signFor(question.sign), ...distractors]);
 }
 
-function resultCopy(score: number, total: number, locale: "ka" | "en") {
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
+function resultCopy(score: number, total: number, locale: UserLocale) {
   const pct = total > 0 ? score / total : 0;
   if (locale === "en") {
     if (score === total) return ["A true zodiac encyclopedia!", "You identified every celebrity’s sign correctly."];
@@ -45,7 +47,7 @@ function resultCopy(score: number, total: number, locale: "ka" | "en") {
 
 const subscribeToClient = () => () => {};
 
-export function FamousZodiacQuiz({ images, locale = "ka" }: { images: Record<string, string>; locale?: "ka" | "en" }) {
+export function FamousZodiacQuiz({ images, locale = "ka" }: { images: Record<string, string>; locale?: UserLocale }) {
   const mounted = useSyncExternalStore(
     subscribeToClient,
     () => true,
@@ -56,7 +58,7 @@ export function FamousZodiacQuiz({ images, locale = "ka" }: { images: Record<str
   return <FamousZodiacQuizGame images={images} locale={locale} />;
 }
 
-function FamousZodiacQuizGame({ images, locale }: { images: Record<string, string>; locale: "ka" | "en" }) {
+function FamousZodiacQuizGame({ images, locale }: { images: Record<string, string>; locale: UserLocale }) {
   const en = locale === "en";
   const [questions, setQuestions] = useState(() =>
     shuffle(FAMOUS_ZODIAC_QUESTIONS).slice(0, FAMOUS_ZODIAC_ROUND)

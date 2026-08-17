@@ -6,6 +6,7 @@ import {
   buttonStyle,
   paragraphStyle,
 } from "./_layout";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Generic marketing template — admin types subject + body in the panel,
@@ -28,7 +29,7 @@ export function MarketingEmail({
   ctaLabel?: string | null;
   ctaUrl?: string | null;
   unsubscribeUrl: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const greeting = name

@@ -106,12 +106,17 @@ export default async function SubscriptionPage() {
   );
 }
 
-function formatDate(date: Date, locale: "ka" | "en") {
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "ka-GE", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
+function formatDate(date: Date, locale: UserLocale) {
+  return new Intl.DateTimeFormat(
+    locale === "am" ? "hy-AM" : locale === "en" ? "en-GB" : "ka-GE",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }
+  ).format(date);
 }
 
 function Detail({ icon: Icon, label, value }: { icon: typeof CalendarDays; label: string; value: string }) {

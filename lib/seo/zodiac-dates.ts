@@ -36,6 +36,8 @@ export type ZodiacDateMeta = {
   rangeKa: string;
   /** Display string in English. */
   rangeEn: string;
+  /** Display string in Armenian. */
+  rangeAm: string;
 };
 
 export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
@@ -45,6 +47,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 4, day: 19 },
     rangeKa: "21 მარტი – 19 აპრილი",
     rangeEn: "March 21 – April 19",
+    rangeAm: "21 մարտի – 19 ապրիլի",
   },
   taurus: {
     slug: "taurus",
@@ -52,6 +55,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 5, day: 20 },
     rangeKa: "20 აპრილი – 20 მაისი",
     rangeEn: "April 20 – May 20",
+    rangeAm: "20 ապրիլի – 20 մայիսի",
   },
   gemini: {
     slug: "gemini",
@@ -59,6 +63,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 6, day: 20 },
     rangeKa: "21 მაისი – 20 ივნისი",
     rangeEn: "May 21 – June 20",
+    rangeAm: "21 մայիսի – 20 հունիսի",
   },
   cancer: {
     slug: "cancer",
@@ -66,6 +71,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 7, day: 22 },
     rangeKa: "21 ივნისი – 22 ივლისი",
     rangeEn: "June 21 – July 22",
+    rangeAm: "21 հունիսի – 22 հուլիսի",
   },
   leo: {
     slug: "leo",
@@ -73,6 +79,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 8, day: 22 },
     rangeKa: "23 ივლისი – 22 აგვისტო",
     rangeEn: "July 23 – August 22",
+    rangeAm: "23 հուլիսի – 22 օգոստոսի",
   },
   virgo: {
     slug: "virgo",
@@ -80,6 +87,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 9, day: 22 },
     rangeKa: "23 აგვისტო – 22 სექტემბერი",
     rangeEn: "August 23 – September 22",
+    rangeAm: "23 օգոստոսի – 22 սեպտեմբերի",
   },
   libra: {
     slug: "libra",
@@ -87,6 +95,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 10, day: 22 },
     rangeKa: "23 სექტემბერი – 22 ოქტომბერი",
     rangeEn: "September 23 – October 22",
+    rangeAm: "23 սեպտեմբերի – 22 հոկտեմբերի",
   },
   scorpio: {
     slug: "scorpio",
@@ -94,6 +103,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 11, day: 21 },
     rangeKa: "23 ოქტომბერი – 21 ნოემბერი",
     rangeEn: "October 23 – November 21",
+    rangeAm: "23 հոկտեմբերի – 21 նոյեմբերի",
   },
   sagittarius: {
     slug: "sagittarius",
@@ -101,6 +111,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 12, day: 21 },
     rangeKa: "22 ნოემბერი – 21 დეკემბერი",
     rangeEn: "November 22 – December 21",
+    rangeAm: "22 նոյեմբերի – 21 դեկտեմբերի",
   },
   capricorn: {
     slug: "capricorn",
@@ -108,6 +119,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 1, day: 19 },
     rangeKa: "22 დეკემბერი – 19 იანვარი",
     rangeEn: "December 22 – January 19",
+    rangeAm: "22 դեկտեմբերի – 19 հունվարի",
   },
   aquarius: {
     slug: "aquarius",
@@ -115,6 +127,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 2, day: 18 },
     rangeKa: "20 იანვარი – 18 თებერვალი",
     rangeEn: "January 20 – February 18",
+    rangeAm: "20 հունվարի – 18 փետրվարի",
   },
   pisces: {
     slug: "pisces",
@@ -122,6 +135,7 @@ export const ZODIAC_DATES: Record<ZodiacSlug, ZodiacDateMeta> = {
     end: { month: 3, day: 20 },
     rangeKa: "19 თებერვალი – 20 მარტი",
     rangeEn: "February 19 – March 20",
+    rangeAm: "19 փետրվարի – 20 մարտի",
   },
 };
 
@@ -144,7 +158,7 @@ export function signMetaBySlug(slug: ZodiacSlug): ZodiacSign | undefined {
   return SIGNS.find((s) => s.key === slug);
 }
 
-// ─── Element helpers (latin slug ↔ Georgian label ↔ signs in element) ─
+// ─── Element helpers ───────────────────────────────────────────────────
 
 export type ElementSlug = "fire" | "earth" | "air" | "water";
 
@@ -154,6 +168,14 @@ export const ELEMENT_LABEL_KA: Record<ElementSlug, string> = {
   air: "ჰაერი",
   water: "წყალი",
 };
+
+export const ELEMENT_LABEL_AM: Record<ElementSlug, string> = {
+  fire: "Կրակ",
+  earth: "Հող",
+  air: "Օդ",
+  water: "Ջուր",
+};
+
 
 export const ALL_ELEMENT_SLUGS: ElementSlug[] = [
   "fire",

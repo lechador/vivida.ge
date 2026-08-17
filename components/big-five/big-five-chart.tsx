@@ -1,12 +1,13 @@
 import { BIG5_LEVEL_LABEL, BIG5_LEVEL_LABEL_EN, type BigFiveResult } from "@/lib/big-five/scoring";
 import { TraitRadar, type RadarPoint } from "@/components/tests/trait-radar";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * The summary section of the Big Five result — the radar + a labelled score bar per
  * trait. This is the "profile shape"; the written per-trait analysis lives in
  * BigFiveDetail (gated).
  */
-export function BigFiveChart({ result, locale = "ka" }: { result: BigFiveResult; locale?: "ka" | "en" }) {
+export function BigFiveChart({ result, locale = "ka" }: { result: BigFiveResult; locale?: UserLocale }) {
   const en = locale === "en";
   const points: RadarPoint[] = result.traits.map((t) => ({
     key: t.key,

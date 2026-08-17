@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
  * server); if the balance is short it flips to an invite-or-buy prompt. Shown
  * in place of the gated content on the test-result pages.
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function UnlockCard({
   kind,
   resultId,
@@ -27,7 +29,7 @@ export function UnlockCard({
   balance: number;
   title?: string;
   blurb?: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const router = useRouter();

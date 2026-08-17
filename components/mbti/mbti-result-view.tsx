@@ -13,6 +13,8 @@ const AXES: MbtiAxis[] = ["EI", "SN", "TF", "JP", "AT"];
  * `analysis={null}` to keep the deep text locked). Rows written before the
  * Identity axis existed lack `AT`; that bar is simply skipped for them.
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function MbtiResultView({
   type,
   archetypeNameGe,
@@ -25,7 +27,7 @@ export function MbtiResultView({
   scores: MbtiScoresJson;
   /** Full synthesis text, or null to lock it (anonymous teaser). */
   analysis: string | null;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   return (
     <div className="space-y-8">

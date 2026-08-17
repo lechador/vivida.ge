@@ -11,6 +11,7 @@
  */
 import Stripe from "stripe";
 import { formatBillingAmount, type PremiumPlan } from "@/lib/billing-config";
+import type { UserLocale } from "./i18n/user-locale";
 
 let _stripe: Stripe | null = null;
 
@@ -91,7 +92,7 @@ export async function createCreditCheckoutSession(opts: {
   credits: number;
   amountMinor: number;
   currency: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
   trackingMetadata?: Record<string, string>;
 }): Promise<Stripe.Checkout.Session> {
   const {
@@ -104,10 +105,12 @@ export async function createCreditCheckoutSession(opts: {
     locale = "ka",
     trackingMetadata = {},
   } = opts;
-  const en = locale === "en";
   // Same formatter the top-up card uses, so the price on the button and the
   // price on the Stripe page are written identically.
   const formatted = formatBillingAmount(amountMinor, currency, locale);
+  const creditWord = { ka: "კრედიტი", en: "credits", am: "կրեդիտ" }[locale];
+  const productName =
+    locale === "en" ? `${credits} Vivida credits` : `${credits} ${creditWord}`;
   return stripe().checkout.sessions.create({
     mode: "payment",
     customer_email: email ?? undefined,
@@ -122,10 +125,8 @@ export async function createCreditCheckoutSession(opts: {
           currency,
           unit_amount: amountMinor,
           product_data: {
-            name: en ? `${credits} Vivida credits` : `${credits} კრედიტი`,
-            description: en
-              ? `Vivida · ${formatted} — ${credits} credits`
-              : `Vivida · ${formatted} — ${credits} კრედიტი`,
+            name: productName,
+            description: `Vivida · ${formatted} — ${credits} ${creditWord}`,
           },
         },
       },

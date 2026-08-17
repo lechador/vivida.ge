@@ -8,6 +8,8 @@ import {
   paragraphStyle,
 } from "./_layout";
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function PasswordResetEmail({
   name,
   resetUrl,
@@ -15,7 +17,7 @@ export function PasswordResetEmail({
 }: {
   name: string | null;
   resetUrl: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const greeting = name

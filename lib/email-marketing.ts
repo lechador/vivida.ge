@@ -16,7 +16,7 @@ import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete
 import { MarketingEmail } from "@/lib/email-templates/marketing";
 import { ensureDailyFor } from "@/actions/daily";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
-import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
 let _client: Resend | null = null;
@@ -40,8 +40,8 @@ const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <hello@vivida.ge>");
 // localhost in local admin/dev sessions and must never leak into a real send.
 const ORIGIN = process.env.EMAIL_ORIGIN ?? "https://vivida.ge";
 
-function localizedAbsUrl(path: string, locale: "ka" | "en"): string {
-  const origin = locale === "en" ? ENGLISH_SITE_URL : ORIGIN;
+function localizedAbsUrl(path: string, locale: UserLocale): string {
+  const origin = locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
   return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 

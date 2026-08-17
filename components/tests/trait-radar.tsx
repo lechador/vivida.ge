@@ -1,3 +1,5 @@
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export type RadarPoint = { key: string; label: string; score: number; hue: string };
 
 /**
@@ -12,7 +14,7 @@ export function TraitRadar({
 }: {
   points: RadarPoint[];
   size?: number;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const cx = size / 2;
   const cy = size / 2;

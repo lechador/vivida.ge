@@ -20,6 +20,7 @@ import {
   firstAdaptiveItem,
   nextAdaptiveItem,
 } from "@/lib/iq/adaptive";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * The timed, *adaptive* IQ test (computerised adaptive testing). One item per
@@ -30,7 +31,7 @@ import {
  * A global countdown auto-submits at zero. Answers are stashed in localStorage
  * and scored on /iq-testi/shedegi — no server round-trip needed.
  */
-export function IqTestClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
 
@@ -244,7 +245,7 @@ function Cell({
   );
 }
 
-function IqStem({ item, locale }: { item: IqItem; locale: "ka" | "en" }) {
+function IqStem({ item, locale }: { item: IqItem; locale: UserLocale }) {
   const s = item.stem;
 
   if (s.type === "logic") {
@@ -320,7 +321,7 @@ function IqOptions({
   item: IqItem;
   selected: number | undefined;
   onPick: (i: number) => void;
-  locale: "ka" | "en";
+  locale: UserLocale;
 }) {
   const isFigure = item.options[0]?.kind === "figure";
 

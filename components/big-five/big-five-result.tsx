@@ -20,14 +20,16 @@ import { NextTestWidget } from "@/components/tests/next-test-widget";
 
 type Stored = { answers: Record<number, number>; attemptId?: string };
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 /**
- * Fresh Big Five result — computed client-side from the stashed answers so an
+ * The anonymous Big Five result page. Reads answers from localStorage so an
  * anonymous visitor sees the profile instantly. The radar + trait scores are
  * free; the per-trait written analysis is gated behind login here. A signed-in
  * taker is routed to the persistent /big-five/shedegi/[id] view (analysis behind
  * a one-time credit unlock).
  */
-export function BigFiveResultClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function BigFiveResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
@@ -167,7 +169,7 @@ export function BigFiveResultClient({ locale = "ka" }: { locale?: "ka" | "en" })
   );
 }
 
-function ShareButton({ headline, locale }: { headline: string; locale: "ka" | "en" }) {
+function ShareButton({ headline, locale }: { headline: string; locale: UserLocale }) {
   const en = locale === "en";
   const [copied, setCopied] = useState(false);
   async function share() {

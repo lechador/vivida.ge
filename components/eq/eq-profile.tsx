@@ -9,13 +9,14 @@ import {
   type EqResult,
 } from "@/lib/eq/scoring";
 import { EqRadar } from "@/components/eq/eq-radar";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * The deep EQ profile — the radar, a strength/growth pair, and a card per
  * domain (score, band, interpretation, a concrete practice). Pure/server-safe
  * so it renders on the saved page and (blurred) on the anonymous teaser.
  */
-export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?: "ka" | "en" }) {
+export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?: UserLocale }) {
   const en = locale === "en";
   const top = result.domains.find((d) => d.key === result.topKey)!;
   const low = result.domains.find((d) => d.key === result.lowKey)!;

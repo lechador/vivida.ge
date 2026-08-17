@@ -10,7 +10,7 @@ import { FriendRequestEmail } from "@/lib/email-templates/friend-request";
 import { MessageEmail } from "@/lib/email-templates/message";
 import { MbtiResultEmail } from "@/lib/email-templates/mbti-result";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
-import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { ENGLISH_SITE_URL, isEnglishHost } from "@/lib/seo/locales";
 
 /**
@@ -53,11 +53,11 @@ function absUrl(path: string, origin: string = ORIGIN): string {
   return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
-function originForLocale(locale: "ka" | "en"): string {
-  return locale === "en" ? ENGLISH_SITE_URL : ORIGIN;
+function originForLocale(locale: UserLocale): string {
+  return locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
 }
 
-function localeForOrigin(origin: string | undefined): "ka" | "en" {
+function localeForOrigin(origin: string | undefined): UserLocale {
   if (!origin) return "ka";
   try {
     return isEnglishHost(new URL(origin).hostname) ? "en" : "ka";
@@ -273,7 +273,7 @@ export async function sendWelcomeEmail({
   userId: string;
   to: string;
   name: string | null;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }): Promise<void> {
   const c = client();
   if (!c) {
@@ -337,7 +337,7 @@ export async function sendMbtiResultEmail({
   mbtiType: string;
   archetypeNameGe: string;
   excerpt?: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
   origin?: string;
 }): Promise<void> {
   const c = client();

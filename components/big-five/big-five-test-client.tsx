@@ -14,12 +14,14 @@ import {
   BIG5_QUESTIONS_EN,
 } from "@/lib/big-five/questions";
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 /**
  * Hosts the Big Five quiz. On finish it stashes the answers + a fresh attemptId
  * to localStorage and routes to the result page — no scoring runs here, so an
  * anonymous taker can complete the test without an account.
  */
-export function BigFiveTestClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function BigFiveTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
   const questions = en ? BIG5_QUESTIONS_EN : BIG5_QUESTIONS;

@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 
+// Relative, not "@/": this module is imported by next.config.ts, which is
+// loaded outside the app's tsconfig path aliases.
+import {
+  hasArmenianVersion,
+  stripArmenianPrefix,
+} from "../i18n/armenian-routes";
+
 export const GEORGIAN_SITE_URL = "https://www.vivida.ge";
 export const ENGLISH_SITE_URL = "https://www.vividaastro.com";
+export const ARMENIAN_SITE_URL = "https://www.vividaastro.com/am";
 
 export const GEORGIAN_HOSTS = ["vivida.ge", "www.vivida.ge"] as const;
 export const ENGLISH_HOSTS = [
@@ -78,27 +86,69 @@ export function siteOriginForHost(host: string | null | undefined): string {
   return isEnglishHost(host) ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
 }
 
+export function resolveEnglishPath(path: string): string {
+  const normalized = publicEnglishPath(path);
+  const found = CORE_LANGUAGE_PAIRS.find(
+    (p) => p.ka === path || p.en === normalized || p.internalEn === path || p.en === path,
+  );
+  if (found) return found.en;
+  return normalized;
+}
+
 export function localizedAlternates(
   canonicalPath: string,
   pairedPath: string,
-  locale: "ka" | "en",
+  locale: "ka" | "en" | "am" | string,
+  armenianPath?: string,
 ): NonNullable<Metadata["alternates"]> {
-  const kaPath = locale === "ka" ? canonicalPath || "/" : pairedPath;
-  const enPath = publicEnglishPath(
-    locale === "en" ? canonicalPath : pairedPath,
-  );
-  const canonical =
+  const kaPath =
+    locale === "ka"
+      ? canonicalPath || "/"
+      : CORE_LANGUAGE_PAIRS.find(
+          (p) =>
+            p.en === publicEnglishPath(canonicalPath) ||
+            p.internalEn === canonicalPath ||
+            p.en === publicEnglishPath(pairedPath),
+        )?.ka ?? pairedPath;
+
+  const enPath =
     locale === "en"
+      ? publicEnglishPath(canonicalPath)
+      : resolveEnglishPath(
+          locale === "am"
+            ? (canonicalPath.replace(/^\/am/, "") || "/")
+            : pairedPath,
+        );
+
+  const rawAm =
+    locale === "am"
+      ? canonicalPath
+      : (armenianPath ?? (enPath === "/" ? "/am" : `/am${enPath}`));
+  const amPath = rawAm.startsWith("/am") ? rawAm : `/am${rawAm === "/" ? "" : rawAm}`;
+
+  const canonical =
+    locale === "am"
+      ? `${ENGLISH_SITE_URL}${amPath}`
+      : locale === "en"
       ? `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`
       : `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
   const englishUrl = `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
   const georgianUrl = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
+  const armenianUrl = `${ENGLISH_SITE_URL}${amPath}`;
+
+  // An Armenian alternate is a promise that the URL resolves. Most of the
+  // ~1,200 Georgian and English pages have no Armenian twin yet, and pointing
+  // hreflang at a 404 makes Google discard the entire annotation cluster for
+  // the page — including the ka↔en pair that does work.
+  const includeArmenian =
+    locale === "am" || hasArmenianVersion(stripArmenianPrefix(amPath) ?? "/");
 
   return {
     canonical,
     languages: {
       "ka-GE": georgianUrl,
       en: englishUrl,
+      ...(includeArmenian ? { "hy-AM": armenianUrl, hy: armenianUrl } : {}),
       "x-default": englishUrl,
     },
   };
@@ -122,19 +172,18 @@ export const DEFAULT_OG_IMAGE = "/opengraph-image";
 
 /**
  * Resolve an English-site content link for whichever host is serving.
- *
- * The English chrome also renders on the Georgian host — a signed-in user
- * whose `interfaceLanguage` is English — and there a bare path is wrong twice
- * over. `/natal-chart`, `/horoscope`, `/compatibility` and `/about` are not
- * route files at all (they are `beforeFiles` rewrites in next.config gated on
- * `has: host in ENGLISH_HOSTS`), so they 404 outright on vivida.ge; and every
- * other path resolves but renders Georgian, since locale now follows the host.
- * Sending English chrome's content links to the English domain fixes both.
- *
- * Auth-bound links (/login, /dashboard, /account) must NOT go through this —
- * the session cookie is per-domain, so crossing over would sign the user out.
  */
 export function englishSiteHref(path: string, onEnglishHost: boolean): string {
   if (onEnglishHost) return path;
   return `${ENGLISH_SITE_URL}${path === "/" ? "" : path}`;
 }
+
+/**
+ * Resolve an Armenian-site content link for whichever host is serving.
+ */
+export function armenianSiteHref(path: string, onEnglishHost: boolean): string {
+  const amPath = path.startsWith("/am") ? path : `/am${path === "/" ? "" : path}`;
+  if (onEnglishHost) return amPath;
+  return `${ENGLISH_SITE_URL}${amPath}`;
+}
+

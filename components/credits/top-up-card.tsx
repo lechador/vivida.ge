@@ -11,6 +11,8 @@ import {
 import { fbTrack } from "@/lib/fb-pixel";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 /**
  * Stripe credit top-up — pick a pack, redirect to Checkout. The webhook awards
  * the credits on completion, so on return the /credits balance is already
@@ -20,7 +22,7 @@ export function TopUpCard({
   locale,
   countryCode,
 }: {
-  locale: "ka" | "en";
+  locale: UserLocale;
   countryCode?: string | null;
 }) {
   const en = locale === "en";

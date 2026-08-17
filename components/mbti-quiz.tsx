@@ -18,6 +18,8 @@ const FOCUS_KEY = "vivida_test_focus"; // localStorage: "on" | "off"
  * owns what happens next (save + navigate). The quiz shows a "working" state
  * while that runs, and surfaces an error if it comes back not-ok.
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function MbtiQuiz({
   questions,
   onSubmit,
@@ -29,7 +31,7 @@ export function MbtiQuiz({
   onSubmit: (answers: Record<number, number>) => Promise<MbtiSubmitResult>;
   submitLabel?: string;
   workingLabel?: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const [answers, setAnswers] = useState<Record<number, number>>({});

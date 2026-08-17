@@ -6,6 +6,7 @@ import {
   buttonStyle,
   paragraphStyle,
 } from "./_layout";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Daily horoscope teaser. Intentionally short — date, evocative AI
@@ -34,7 +35,7 @@ export function DailyHoroscopeEmail({
   unsubscribeUrl: string;
   /** Localised date string the dashboard would show, e.g. "ორშაბათი, 6 მაისი". */
   localizedDate: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const greeting = name

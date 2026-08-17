@@ -28,13 +28,15 @@ export type MbtiSynthesis = {
   analysisText: string;
 };
 
+import type { UserLocale } from "./i18n/user-locale";
+
 export type MbtiSynthesisInput = {
   firstName: string | null;
   type: string;
   scores: MbtiScores;
   /** Null when the user hasn't entered birth data yet. */
   chart: NatalChartJson | null;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 };
 
 const SYSTEM_PROMPT =
@@ -160,7 +162,7 @@ function parseSynthesis(raw: string): MbtiSynthesis {
   };
 }
 
-async function viaOpenRouter(prompt: string, locale: "ka" | "en"): Promise<MbtiSynthesis> {
+async function viaOpenRouter(prompt: string, locale: UserLocale): Promise<MbtiSynthesis> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
   const res = await fetch(OPENROUTER_URL, {
@@ -198,7 +200,7 @@ async function viaOpenRouter(prompt: string, locale: "ka" | "en"): Promise<MbtiS
   return parseSynthesis(raw);
 }
 
-async function viaGoogle(prompt: string, locale: "ka" | "en"): Promise<MbtiSynthesis> {
+async function viaGoogle(prompt: string, locale: UserLocale): Promise<MbtiSynthesis> {
   const { GoogleGenAI } = await import("@google/genai");
   const apiKey = process.env.GEMINI_API_KEY;
   const ai = apiKey

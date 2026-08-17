@@ -73,7 +73,7 @@ function localized(locale: UserLocale, ka: string, en: string): string {
 
 // ─── Localized copy for core error codes ─────────────────────────────────
 
-function registerError(error: RegisterError, locale: UserLocale): string {
+function registerError(error: string, locale: UserLocale): string {
   switch (error) {
     case "invalid_name":
       return localized(locale, "შეიყვანე შენი სახელი", "Enter your name");
@@ -86,12 +86,14 @@ function registerError(error: RegisterError, locale: UserLocale): string {
         `Password must be at least ${MIN_PASSWORD_LEN} characters`,
       );
     case "email_taken":
+    case "oauth_only":
       return localized(
         locale,
         "ეს ელფოსტა უკვე დარეგისტრირებულია. სცადე შესვლა ან პაროლის აღდგენა.",
         "This email is already registered. Try signing in or resetting your password.",
       );
     case "failed":
+    default:
       return localized(
         locale,
         "ანგარიშის შექმნა ვერ მოხერხდა. სცადე თავიდან.",

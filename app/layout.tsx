@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { requestIsEnglish } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { ARMENIAN_SITE_URL, ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { Noto_Sans_Georgian } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { ChatShell } from "@/components/chat/chat-shell";
@@ -34,6 +34,15 @@ const TITLE_EN = "Vivida — Natal Charts, Horoscopes and Zodiac Guides";
 const DESCRIPTION_EN =
   "Personal astrology, daily horoscopes and a free natal chart built from your exact birth moment. Understand what your chart actually says about you.";
 
+const TITLE_AM = "Vivida — Նատալ քարտեզներ, հորոսկոպներ և կենդանակերպի ուղեցույցներ";
+const DESCRIPTION_AM =
+  "Անհատական աստղագուշակություն, ամենօրյա հորոսկոպներ և անվճար նատալ քարտեզ՝ կազմված ձեր ծննդյան ճշգրիտ պահից: Իմացեք, թե իրականում ինչ է ասում ձեր քարտեզը ձեր մասին:";
+
+/** `lang` attribute per locale — Armenian is `hy`, the ISO 639-1 code. */
+const HTML_LANG = { ka: "ka", en: "en", am: "hy" } as const;
+
+const OG_LOCALE = { ka: "ka_GE", en: "en_US", am: "hy_AM" } as const;
+
 /**
  * Site-wide metadata defaults. Per-page `metadata` exports override these
  * surgically — e.g. /report sets its own `title` while inheriting OG/Twitter.
@@ -44,10 +53,15 @@ const DESCRIPTION_EN =
  * brand reads as the primary name in Google's results.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const en = await requestIsEnglish();
-  const origin = en ? ENGLISH_SITE_URL : SITE_URL;
-  const title = en ? TITLE_EN : TITLE;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION;
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const am = locale === "am";
+  // Armenian is a path prefix on the international domain, so its origin is
+  // that domain plus /am — a bare ENGLISH_SITE_URL here would resolve every
+  // relative canonical on an Armenian page onto its English twin.
+  const origin = am ? ARMENIAN_SITE_URL : en ? ENGLISH_SITE_URL : SITE_URL;
+  const title = am ? TITLE_AM : en ? TITLE_EN : TITLE;
+  const description = am ? DESCRIPTION_AM : en ? DESCRIPTION_EN : DESCRIPTION;
 
   return {
     // Host-aware so relative canonicals and OG/image URLs in child pages
@@ -76,8 +90,10 @@ export async function generateMetadata(): Promise<Metadata> {
       url: origin,
       siteName: "Vivida",
       type: "website",
-      locale: en ? "en_US" : "ka_GE",
-      alternateLocale: en ? ["ka_GE"] : ["en_US"],
+      locale: OG_LOCALE[locale],
+      alternateLocale: Object.values(OG_LOCALE).filter(
+        (value) => value !== OG_LOCALE[locale],
+      ),
     },
     twitter: {
       card: "summary_large_image",
@@ -125,15 +141,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // The same deployment serves two language domains. Resolving the locale on
-  // the server puts the correct `lang` in the delivered HTML — the previous
-  // inline script only patched it after parse, so crawlers that don't run JS
-  // (and every social/AI scraper) saw the English domain declared Georgian.
-  const en = await requestIsEnglish();
+  // The same deployment serves two language domains, and Armenian off a path
+  // prefix on one of them. Resolving the locale on the server puts the correct
+  // `lang` in the delivered HTML — an inline script only patches it after
+  // parse, so crawlers that don't run JS (and every social/AI scraper) saw the
+  // English domain declared Georgian.
+  const locale = await getRequestLocale();
 
   return (
     <html
-      lang={en ? "en" : "ka"}
+      lang={HTML_LANG[locale]}
       data-scroll-behavior="smooth"
       className={`dark scroll-smooth ${notoGeorgian.variable} h-full antialiased`}
       suppressHydrationWarning

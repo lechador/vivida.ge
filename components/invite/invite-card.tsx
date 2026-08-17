@@ -6,6 +6,8 @@ import { Check, Copy, Share2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { REFERRAL_REWARD } from "@/lib/credits-config";
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 /**
  * Invite panel — the credit-earning growth loop's UI. Shows the user's personal
  * link, a copy/share affordance, and their referral progress.
@@ -19,7 +21,7 @@ export function InviteCard({
   link: string;
   invited: number;
   qualified: number;
-  locale: "ka" | "en";
+  locale: UserLocale;
 }) {
   const en = locale === "en";
   const [copied, setCopied] = useState(false);

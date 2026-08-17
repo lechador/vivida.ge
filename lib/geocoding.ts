@@ -44,13 +44,22 @@ interface OpenMeteoRaw {
   }>;
 }
 
-// ─── Georgian-script support ────────────────────────────────────────────
+// ─── Georgian & Armenian script support ─────────────────────────────────
 
-/**
- * Top Georgian cities + international destinations Georgians commonly type
- * in Georgian. Keys are lowercase Georgian; values are the Latin form
- * Open-Meteo's index recognizes. Sorted by likelihood of being used.
- */
+/** Range covers Mkhedruli (U+10A0–U+10FF) and extensions. */
+const GEORGIAN_RE = /[Ⴀ-ჿⴀ-⴯Ა-Ჿ]/;
+
+/** Range covers Armenian (U+0530–U+058F, U+FB13–U+FB17). */
+const ARMENIAN_RE = /[\u0530-\u058F\uFB13-\uFB17]/;
+
+export function hasGeorgianScript(s: string): boolean {
+  return GEORGIAN_RE.test(s);
+}
+
+export function hasArmenianScript(s: string): boolean {
+  return ARMENIAN_RE.test(s);
+}
+
 const KA_TO_EN_CITY: Record<string, string> = {
   // Georgia — major
   "თბილისი": "Tbilisi",
@@ -156,12 +165,85 @@ const KA_TO_EN_CITY: Record<string, string> = {
   "მელბურნი": "Melbourne",
 };
 
-/** Reverse map for displaying Georgian back to the user. */
+/** Armenian city mapping */
+const AM_TO_EN_CITY: Record<string, string> = {
+  // Armenia — major
+  "երևան": "Yerevan",
+  "գյումրի": "Gyumri",
+  "վանաձոր": "Vanadzor",
+  "վաղարշապատ": "Vagharshapat",
+  "էջմիածին": "Echmiadzin",
+  "աբովյան": "Abovyan",
+  "հրազդան": "Hrazdan",
+  "կապան": "Kapan",
+  "արմավիր": "Armavir",
+  "գավառ": "Gavar",
+  "արտաշատ": "Artashat",
+  "իջևան": "Ijevan",
+  "դիլիջան": "Dilijan",
+  "գորիս": "Goris",
+  "սևան": "Sevan",
+  "չարենցավան": "Charentsavan",
+  "սիսիան": "Sisian",
+  "աշտարակ": "Ashtarak",
+  "արարատ": "Ararat",
+  "մասիս": "Masis",
+  "սպիտակ": "Spitak",
+  "ստեփանավան": "Stepanavan",
+  "ալավերդի": "Alaverdi",
+  "ջերմուկ": "Jermuk",
+  "քաջարան": "Kajaran",
+  "մարտունի": "Martuni",
+  "վարդենիս": "Vardenis",
+  "եղեգնաձոր": "Yeghegnadzor",
+  "բերդ": "Berd",
+  "նոյեմբերյան": "Noyemberyan",
+  "մեղրի": "Meghri",
+  "ծաղկաձոր": "Tsaghkadzor",
+  // International & Diaspora
+  "թբիլիսի": "Tbilisi",
+  "բաթումի": "Batumi",
+  "քութայիսի": "Kutaisi",
+  "ახալქალაქի": "Akhalkalaki",
+  "ախալքալաք": "Akhalkalaki",
+  "նինոծմինդա": "Ninotsminda",
+  "մոսկվա": "Moscow",
+  "սանկտ պետերբուրգ": "Saint Petersburg",
+  "կրասնոդար": "Krasnodar",
+  "սոչի": "Sochi",
+  "դոնի ռոստով": "Rostov-on-Don",
+  "լոս անջելես": "Los Angeles",
+  "գլենդել": "Glendale",
+  "բըրբանք": "Burbank",
+  "փարիզ": "Paris",
+  "մարսել": "Marseille",
+  "լիոն": "Lyon",
+  "լոնդոն": "London",
+  "բեյրութ": "Beirut",
+  "թեհրան": "Tehran",
+  "ստամբուլ": "Istanbul",
+  "դուբայ": "Dubai",
+  "նյու յորք": "New York",
+  "բոստոն": "Boston",
+  "տորոնտո": "Toronto",
+  "մոնրեալ": "Montreal",
+  "բուենոս այրես": "Buenos Aires",
+  "սիդնեյ": "Sydney",
+  "բեռլին": "Berlin",
+  "վիեննա": "Vienna",
+  "հռոմ": "Rome",
+  "աթենք": "Athens",
+  "կիև": "Kyiv",
+};
+
 const EN_TO_KA_CITY: Record<string, string> = Object.fromEntries(
   Object.entries(KA_TO_EN_CITY).map(([ka, en]) => [en.toLowerCase(), ka])
 );
 
-/** Country names — keep concise; users rarely search by country alone. */
+const EN_TO_AM_CITY: Record<string, string> = Object.fromEntries(
+  Object.entries(AM_TO_EN_CITY).map(([am, en]) => [en.toLowerCase(), am])
+);
+
 const EN_TO_KA_COUNTRY: Record<string, string> = {
   georgia: "საქართველო",
   russia: "რუსეთი",
@@ -181,11 +263,30 @@ const EN_TO_KA_COUNTRY: Record<string, string> = {
   china: "ჩინეთი",
 };
 
-/**
- * Single-letter Georgian → Latin transliteration. Used when the input isn't
- * in our city dictionary. Drops apostrophes from ejective consonants
- * (კ′, პ′, ტ′, წ′, ჭ′, ყ′) since Open-Meteo uses unmarked Latin.
- */
+const EN_TO_AM_COUNTRY: Record<string, string> = {
+  armenia: "Հայաստան",
+  georgia: "Վրաստան",
+  russia: "Ռուսաստան",
+  "united states": "ԱՄՆ",
+  "united kingdom": "Միացյալ Թագավորություն",
+  france: "Ֆրանսիա",
+  germany: "Գերմանիա",
+  italy: "Իտալիա",
+  spain: "Իսպանիա",
+  greece: "Հունաստան",
+  iran: "Իրան",
+  lebanon: "Լիբանան",
+  turkey: "Թուրքիա",
+  ukraine: "Ուկրաինա",
+  israel: "Իսրայել",
+  canada: "Կանադա",
+  australia: "Ավստրալիա",
+  argentina: "Արգենտինա",
+  cyprus: "Կիպրոս",
+  uae: "ԱՄԷ",
+  "united arab emirates": "Արաբական Միացյալ Էմիրություններ",
+};
+
 const KA_LETTER_TO_LATIN: Record<string, string> = {
   "ა": "a",  "ბ": "b",  "გ": "g",  "დ": "d",  "ე": "e",
   "ვ": "v",  "ზ": "z",  "თ": "t",  "ი": "i",  "კ": "k",
@@ -194,52 +295,66 @@ const KA_LETTER_TO_LATIN: Record<string, string> = {
   "ფ": "p",  "ქ": "k",  "ღ": "gh", "ყ": "q",  "შ": "sh",
   "ჩ": "ch", "ც": "ts", "ძ": "dz", "წ": "ts", "ჭ": "ch",
   "ხ": "kh", "ჯ": "j",  "ჰ": "h",
-  // Archaic letters still in occasional use
   "ჱ": "e",  "ჲ": "y",  "ჳ": "w",  "ჴ": "kh", "ჵ": "h",  "ჶ": "f",
 };
 
-/** Range covers Mkhedruli (U+10A0–U+10FF) and a couple of extensions. */
-const GEORGIAN_RE = /[Ⴀ-ჿⴀ-⴯Ა-Ჿ]/;
+const AM_LETTER_TO_LATIN: Record<string, string> = {
+  "ա": "a",  "բ": "b",  "գ": "g",  "դ": "d",  "ե": "e",
+  "զ": "z",  "է": "e",  "ը": "y",  "թ": "t",  "ժ": "zh",
+  "ի": "i",  "լ": "l",  "խ": "kh", "ծ": "ts", "կ": "k",
+  "հ": "h",  "ձ": "dz", "ղ": "gh", "ճ": "ch", "մ": "m",
+  "յ": "y",  "ն": "n",  "շ": "sh", "ո": "o",  "չ": "ch",
+  "պ": "p",  "ջ": "j",  "ռ": "r",  "ս": "s",  "վ": "v",
+  "տ": "t",  "ր": "r",  "ց": "ts", "ու": "u", "փ": "p",
+  "ք": "k",  "և": "ev", "օ": "o",  "ֆ": "f",
+};
 
-export function hasGeorgianScript(s: string): boolean {
-  return GEORGIAN_RE.test(s);
-}
-
-/** Letter-by-letter Georgian → Latin (no diacritics). */
+/** Letter-by-letter Georgian → Latin */
 function transliterateKa(s: string): string {
   return s.replace(/./gu, (c) => KA_LETTER_TO_LATIN[c.toLowerCase()] ?? c);
 }
 
-/**
- * Resolve a user-typed query (possibly Georgian) into a Latin string the
- * Open-Meteo index will recognize. Tries the city dictionary first (exact
- * + first-token), falls back to letter transliteration.
- */
-function toSearchQuery(input: string): string {
-  const trimmed = input.trim();
-  if (!hasGeorgianScript(trimmed)) return trimmed;
-
-  const lower = trimmed.toLowerCase();
-  if (KA_TO_EN_CITY[lower]) return KA_TO_EN_CITY[lower];
-
-  // Strip trailing ", country" or similar — match on the leading city token.
-  const head = lower.split(/[,،]/)[0]?.trim();
-  if (head && KA_TO_EN_CITY[head]) return KA_TO_EN_CITY[head];
-
-  return transliterateKa(trimmed);
+/** Letter-by-letter Armenian → Latin */
+function transliterateAm(s: string): string {
+  return s.replace(/./gu, (c) => AM_LETTER_TO_LATIN[c.toLowerCase()] ?? c);
 }
 
-/**
- * If we know a city's Georgian name (from the dictionary), use it for
- * display. Country gets the same treatment. Falls back to the API's
- * English value otherwise.
- */
+function toSearchQuery(input: string): string {
+  const trimmed = input.trim();
+  if (hasArmenianScript(trimmed)) {
+    const lower = trimmed.toLowerCase();
+    if (AM_TO_EN_CITY[lower]) return AM_TO_EN_CITY[lower];
+    const head = lower.split(/[,،]/)[0]?.trim();
+    if (head && AM_TO_EN_CITY[head]) return AM_TO_EN_CITY[head];
+    return transliterateAm(trimmed);
+  }
+
+  if (hasGeorgianScript(trimmed)) {
+    const lower = trimmed.toLowerCase();
+    if (KA_TO_EN_CITY[lower]) return KA_TO_EN_CITY[lower];
+    const head = lower.split(/[,،]/)[0]?.trim();
+    if (head && KA_TO_EN_CITY[head]) return KA_TO_EN_CITY[head];
+    return transliterateKa(trimmed);
+  }
+
+  return trimmed;
+}
+
 function localizeForKa(name: string, country: string): { name: string; country: string } {
   const ka = EN_TO_KA_CITY[name.toLowerCase()];
   const kaCountry = EN_TO_KA_COUNTRY[country.toLowerCase()];
   return {
     name: ka ?? name,
     country: kaCountry ?? country,
+  };
+}
+
+function localizeForAm(name: string, country: string): { name: string; country: string } {
+  const am = EN_TO_AM_CITY[name.toLowerCase()];
+  const amCountry = EN_TO_AM_COUNTRY[country.toLowerCase()];
+  return {
+    name: am ? am.charAt(0).toUpperCase() + am.slice(1) : name,
+    country: amCountry ?? country,
   };
 }
 
@@ -253,6 +368,7 @@ export async function searchPlaces(
   if (original.length < 2) return [];
 
   const wasGeorgian = hasGeorgianScript(original);
+  const wasArmenian = hasArmenianScript(original);
   const searchQuery = toSearchQuery(original);
 
   const url = new URL(ENDPOINT);
@@ -263,7 +379,7 @@ export async function searchPlaces(
 
   const res = await fetch(url, {
     headers: { "User-Agent": "vivida.ge/0.1" },
-    next: { revalidate: 60 * 60 * 24 }, // cache identical queries for a day
+    next: { revalidate: 60 * 60 * 24 },
   });
 
   if (!res.ok) {
@@ -274,12 +390,14 @@ export async function searchPlaces(
   if (!data.results) return [];
 
   return data.results.map((r) => {
-    // When the user typed Georgian, prefer Georgian for the display name
-    // if we have a mapping. Otherwise leave the API's English values intact
-    // (admin1 stays English regardless — we don't have region translations).
-    const localized = wasGeorgian
-      ? localizeForKa(r.name, r.country)
-      : { name: r.name, country: r.country };
+    let localized: { name: string; country: string };
+    if (wasArmenian) {
+      localized = localizeForAm(r.name, r.country);
+    } else if (wasGeorgian) {
+      localized = localizeForKa(r.name, r.country);
+    } else {
+      localized = { name: r.name, country: r.country };
+    }
 
     return {
       id: r.id,
@@ -297,3 +415,4 @@ export async function searchPlaces(
     };
   });
 }
+

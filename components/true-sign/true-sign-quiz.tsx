@@ -15,6 +15,7 @@ import {
   type TsResult,
 } from "@/lib/true-sign/quiz";
 import { signColor } from "@/lib/zodiac";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * "რომელი ზოდიაქოს ნიშანი ხარ სინამდვილეში?" — a free, fully client-side
@@ -22,7 +23,7 @@ import { signColor } from "@/lib/zodiac";
  * the sign you embody (element × modality), with a share button and a natal-
  * chart cross-sell (your BIRTH sign may differ — go find out for real).
  */
-export function TrueSignQuiz({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale === "en";
   const questions = en ? TS_QUESTIONS_EN : TS_QUESTIONS;
   const [answers, setAnswers] = useState<Record<number, number>>({});

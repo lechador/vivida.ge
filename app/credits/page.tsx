@@ -12,6 +12,7 @@ import { InviteCard } from "@/components/invite/invite-card";
 import { TopUpCard } from "@/components/credits/top-up-card";
 import { CreditEarnInfo } from "@/components/credits/earn-info";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 import { premiumPlanForCountry } from "@/lib/billing-config";
 import { countryCodeFromHeaders, setResidenceCountryIfMissing } from "@/lib/residence";
@@ -25,10 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = "force-dynamic";
 
-const SITE_URL = {
+const SITE_URL: Record<UserLocale, string> = {
   ka: "https://www.vivida.ge",
   en: "https://www.vividaastro.com",
-} as const;
+  am: "https://www.vividaastro.com/am",
+};
 
 /**
  * Credits hub — balance, the invite/earn loop, and (Phase 3) Stripe top-up.

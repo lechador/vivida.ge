@@ -1,5 +1,6 @@
 import { MarketingHeader } from "@/components/marketing-header";
 import { EnglishHeader } from "@/components/en/english-header";
+import { ArmenianHeader } from "@/components/am/armenian-header";
 import type { UserLocale } from "@/lib/i18n/locale";
 
 type MarketingActive =
@@ -30,8 +31,12 @@ export function SmartHeader({
   locale?: UserLocale;
   georgianPath?: string;
 } = {}) {
+  if (locale === "am") {
+    return <ArmenianHeader georgianPath={georgianPath} />;
+  }
   if (locale === "en") {
     return <EnglishHeader georgianPath={georgianPath} />;
   }
   return <MarketingHeader active={active} />;
 }
+

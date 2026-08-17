@@ -85,6 +85,8 @@ function paras(s: string): string[] {
     .filter(Boolean);
 }
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function SynastryDeepReport({
   partnerId,
   partnerName,
@@ -94,7 +96,7 @@ export function SynastryDeepReport({
   partnerId: string;
   partnerName: string;
   initial: SynastryDeepReportJson | null;
-  locale: "ka" | "en";
+  locale: UserLocale;
 }) {
   const en = locale === "en";
   const messages = en ? GEN_MESSAGES_EN : GEN_MESSAGES;

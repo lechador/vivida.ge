@@ -30,6 +30,11 @@ import {
   GEORGIAN_SITE_URL,
   isEnglishHost,
 } from "@/lib/seo/locales";
+import {
+  ARMENIAN_CORE_ROUTES,
+  hasArmenianVersion,
+  withArmenianPrefix,
+} from "@/lib/i18n/armenian-routes";
 import { HOUSE_NUMBERS, PLANET_SLUGS } from "@/lib/seo/astrology-guides";
 import { ALL_DREAM_SLUGS } from "@/lib/seo/dreams";
 import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
@@ -57,6 +62,8 @@ const CONTENT_PUBLISHED = new Date("2026-07-20");
 const ENGLISH_PUBLISHED = new Date("2026-07-27");
 const ENGLISH_ASTROLOGY_PUBLISHED = new Date("2026-08-13");
 const ASTROLOGY_GUIDES_PUBLISHED = new Date("2026-07-27");
+/** Armenian launch — bump as translated clusters land. */
+const ARMENIAN_PUBLISHED = new Date("2026-08-17");
 /** მკითხაობა / სიზმრის ახსნა / ანგელოზური რიცხვები clusters. */
 const NEW_CLUSTERS_PUBLISHED = new Date("2026-07-29");
 
@@ -81,6 +88,52 @@ const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
   nextMonth: 0.75,
 };
 
+/**
+ * Language alternates for one page, with Armenian included only where it
+ * exists. Shared by the English and Armenian sections so the two can never
+ * disagree about whether a page has an Armenian twin — a one-way annotation
+ * is discarded by Google, which is the failure mode /features hit in Aug 2026.
+ */
+function alternatesFor(
+  kaPath: string | null,
+  enPath: string,
+): NonNullable<MetadataRoute.Sitemap[number]["alternates"]> {
+  const englishUrl = `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
+  const languages: Record<string, string> = {};
+  if (kaPath) {
+    languages["ka-GE"] = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
+  }
+  languages.en = englishUrl;
+  if (hasArmenianVersion(enPath)) {
+    languages["hy-AM"] =
+      `${ENGLISH_SITE_URL}${withArmenianPrefix(enPath)}`;
+  }
+  languages["x-default"] = englishUrl;
+  return { languages };
+}
+
+/**
+ * The Armenian URLs themselves.
+ *
+ * They live on the international host, so they belong in *that* host's
+ * sitemap — there is one sitemap.xml per domain, and vividaastro.com serves
+ * English at the root and Armenian under /am.
+ */
+function armenianSitemap(): MetadataRoute.Sitemap {
+  return ARMENIAN_CORE_ROUTES.map((path) => ({
+    url: `${ENGLISH_SITE_URL}${withArmenianPrefix(path)}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: (path === "/about" ? "yearly" : "monthly") as
+      | "yearly"
+      | "monthly",
+    priority: path === "/" ? 0.9 : path === "/about" ? 0.5 : 0.7,
+    alternates: alternatesFor(
+      CORE_LANGUAGE_PAIRS.find((pair) => pair.en === path)?.ka ?? null,
+      path,
+    ),
+  }));
+}
+
 function englishSitemap(): MetadataRoute.Sitemap {
   const samePathEntry = (
     path: string,
@@ -92,13 +145,7 @@ function englishSitemap(): MetadataRoute.Sitemap {
     lastModified,
     changeFrequency,
     priority,
-    alternates: {
-      languages: {
-        "ka-GE": `${GEORGIAN_SITE_URL}${path}`,
-        en: `${ENGLISH_SITE_URL}${path}`,
-        "x-default": `${ENGLISH_SITE_URL}${path}`,
-      },
-    },
+    alternates: alternatesFor(path, path),
   });
 
   const signPages = ALL_SLUGS.map((slug) =>
@@ -180,38 +227,26 @@ function englishSitemap(): MetadataRoute.Sitemap {
   );
 
   return [
-    ...CORE_LANGUAGE_PAIRS.map((pair) => {
-      const englishUrl = `${ENGLISH_SITE_URL}${pair.en === "/" ? "" : pair.en}`;
-      const georgianUrl = `${GEORGIAN_SITE_URL}${pair.ka === "/" ? "" : pair.ka}`;
-      return {
-        url: englishUrl,
-        lastModified: ENGLISH_PUBLISHED,
-        changeFrequency: "monthly" as const,
-        priority: pair.en === "/" ? 0.9 : 0.7,
-        alternates: {
-          languages: {
-            "ka-GE": georgianUrl,
-            en: englishUrl,
-            "x-default": englishUrl,
-          },
-        },
-      };
-    }),
+    ...CORE_LANGUAGE_PAIRS.map((pair) => ({
+      url: `${ENGLISH_SITE_URL}${pair.en === "/" ? "" : pair.en}`,
+      lastModified: ENGLISH_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: pair.en === "/" ? 0.9 : 0.7,
+      alternates: alternatesFor(pair.ka, pair.en),
+    })),
     // English-only pages (no Georgian equivalent, so no ka-GE alternate).
     // Driven off the shared table rather than hardcoded, so moving a route
     // into ENGLISH_ONLY_ROUTES can't silently drop it from this sitemap.
-    ...ENGLISH_ONLY_ROUTES.map((route) => {
-      const url = `${ENGLISH_SITE_URL}${route.en}`;
-      return {
-        url,
-        lastModified: ENGLISH_PUBLISHED,
-        changeFrequency: (route.en === "/about" ? "yearly" : "monthly") as
-          | "yearly"
-          | "monthly",
-        priority: route.en === "/about" ? 0.5 : 0.7,
-        alternates: { languages: { en: url, "x-default": url } },
-      };
-    }),
+    ...ENGLISH_ONLY_ROUTES.map((route) => ({
+      url: `${ENGLISH_SITE_URL}${route.en}`,
+      lastModified: ENGLISH_PUBLISHED,
+      changeFrequency: (route.en === "/about" ? "yearly" : "monthly") as
+        | "yearly"
+        | "monthly",
+      priority: route.en === "/about" ? 0.5 : 0.7,
+      // No Georgian twin, but /about and /horoscope do have Armenian ones.
+      alternates: alternatesFor(null, route.en),
+    })),
     // Tests and quizzes. These render fully in English at their Georgian
     // slugs and are linked from the English /tests hub, but were missing
     // from this sitemap — the strongest English commercial queries we have
@@ -282,6 +317,9 @@ function englishSitemap(): MetadataRoute.Sitemap {
     ...numerologyPages,
     ...angelNumberPages,
     ...eqArticlePages,
+    // Armenian shares this domain, so its URLs are declared here rather than
+    // in a sitemap of their own.
+    ...armenianSitemap(),
   ];
 }
 
@@ -792,16 +830,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const path = new URL(entry.url).pathname;
     const pair = pairByKaPath.get(path);
     if (!pair) return entry;
-    return {
-      ...entry,
-      alternates: {
-        languages: {
-          "ka-GE": `${BASE}${pair.ka}`,
-          en: `${ENGLISH_SITE_URL}${pair.en === "/" ? "" : pair.en}`,
-          "x-default": `${ENGLISH_SITE_URL}${pair.en === "/" ? "" : pair.en}`,
-        },
-      },
-    };
+    // Same builder the English and Armenian sections use, so all three sides
+    // of a pair agree on whether an Armenian alternate exists.
+    return { ...entry, alternates: alternatesFor(pair.ka, pair.en) };
   });
 
   return georgianWithAlternates;

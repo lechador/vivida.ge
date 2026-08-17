@@ -21,23 +21,18 @@ export function StepPlace({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const am = locale === "am";
   const [query, setQuery] = useState(value?.displayName ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  // "empty" / "error" drive the visible panels below — without them a
-  // village the geocoder doesn't know renders nothing at all and the
-  // wizard's Continue button stays disabled with no explanation.
+  // "empty" / "error" drive the visible panels below
   const [status, setStatus] = useState<"idle" | "ok" | "empty" | "error">(
     "idle"
   );
   const [retryKey, setRetryKey] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Debounced fetch — only when the trimmed query is long enough and the
-  // user hasn't already selected this exact place. Stale results stay in
-  // state but the dropdown is gated below by these same flags so they
-  // never render after a selection.
   const trimmed = query.trim();
   const hasQuery = trimmed.length >= 2;
   const isSelected = !!value && query === value.displayName;
@@ -46,8 +41,6 @@ export function StepPlace({
     if (!shouldFetch) return;
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
-      // Spinner only after debounce fires — avoids per-keystroke flicker
-      // and satisfies the "no synchronous setState in effect" rule.
       setLoading(true);
       try {
         const res = await fetch(
@@ -90,26 +83,60 @@ export function StepPlace({
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
+  const headingText = am
+    ? "Որտե՞ղ եք ծնվել:"
+    : en
+    ? "Where were you born?"
+    : "სად დაიბადე?";
+  const descText = am
+    ? "Ձեր ծննդավայրը կապում է ձեր քարտեզը տվյալ պահի երկնքի հետ:"
+    : en
+    ? "Your birthplace connects your chart to the sky at that exact moment."
+    : "დაბადების ადგილი შენს რუკას იმ მომენტის ცასთან აკავშირებს.";
+  const labelText = am
+    ? "Ծննդավայր քաղաք"
+    : en
+    ? "Birth city"
+    : "დაბადების ქალაქი";
+  const placeholderText = am
+    ? "Երևան, Գյումրի, Վանաձոր…"
+    : en
+    ? "London, New York, Tokyo…"
+    : "თბილისი, ნიუ-იორკი, ტოკიო…";
+  const clearAriaLabel = am ? "Մաքրել" : en ? "Clear" : "წაშლა";
+  const notFoundText = am
+    ? "Քաղաքը չգտնվեց"
+    : en
+    ? "No place found"
+    : "ვერაფერი მოიძებნა";
+  const notFoundHint = am
+    ? "Փորձեք այլ տարբերակ կամ ընտրեք մոտակա խոշոր քաղաքը:"
+    : en
+    ? "Try a different spelling, or pick the nearest larger city — it does not change your chart."
+    : "სცადე სხვა დაწერილობა ან აირჩიე უახლოესი დიდი ქალაქი — რუკას ეს არ ცვლის.";
+  const errorText = am
+    ? "Չհաջողվեց կապվել որոնման ծառայության հետ:"
+    : en
+    ? "Could not reach the search service."
+    : "საძიებო სერვისს ვერ დავუკავშირდით.";
+  const retryText = am ? "Փորձել կրկին" : en ? "Try again" : "სცადე ხელახლა";
+
   return (
     <div className="space-y-6">
       <header className="space-y-2 text-center">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          {en ? "Where were you born?" : "სად დაიბადე?"}
+          {headingText}
         </h2>
-        <p className="text-muted-foreground">
-          {en
-            ? "Your birthplace connects your chart to the sky at that exact moment."
-            : "დაბადების ადგილი შენს რუკას იმ მომენტის ცასთან აკავშირებს."}
-        </p>
+        <p className="text-muted-foreground">{descText}</p>
       </header>
 
       <div className="mx-auto max-w-md space-y-2" ref={wrapperRef}>
-        <Label htmlFor="place">{en ? "Birth city" : "დაბადების ქალაქი"}</Label>
+        <Label htmlFor="place">{labelText}</Label>
         <div className="relative">
           <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="place"
-            placeholder={en ? "London, New York, Tokyo…" : "თბილისი, ნიუ-იორკი, ტოკიო…"}
+            placeholder={placeholderText}
             className="pl-9 pr-10 text-base"
             value={query}
             onChange={(e) => {
@@ -129,7 +156,7 @@ export function StepPlace({
           ) : value ? (
             <button
               type="button"
-              aria-label={en ? "Clear" : "წაშლა"}
+              aria-label={clearAriaLabel}
               onClick={() => {
                 onChange(null);
                 setQuery("");
@@ -191,13 +218,9 @@ export function StepPlace({
                 transition={{ duration: 0.15 }}
                 className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 rounded-lg border border-border bg-popover/95 px-3 py-2.5 text-sm shadow-2xl backdrop-blur-md"
               >
-                <p className="text-foreground">
-                  {en ? "No place found" : "ვერაფერი მოიძებნა"}
-                </p>
+                <p className="text-foreground">{notFoundText}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {en
-                    ? "Try a different spelling, or pick the nearest larger city — it does not change your chart."
-                    : "სცადე სხვა დაწერილობა ან აირჩიე უახლოესი დიდი ქალაქი — რუკას ეს არ ცვლის."}
+                  {notFoundHint}
                 </p>
               </motion.div>
             )}
@@ -211,11 +234,7 @@ export function StepPlace({
                 transition={{ duration: 0.15 }}
                 className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 rounded-lg border border-border bg-popover/95 px-3 py-2.5 text-sm shadow-2xl backdrop-blur-md"
               >
-                <p className="text-foreground">
-                  {en
-                    ? "Could not reach the search service."
-                    : "საძიებო სერვისს ვერ დავუკავშირდით."}
-                </p>
+                <p className="text-foreground">{errorText}</p>
                 <button
                   type="button"
                   onClick={() => {
@@ -224,7 +243,7 @@ export function StepPlace({
                   }}
                   className="mt-2 rounded-full border border-border px-3 py-1 text-xs text-foreground transition-colors hover:bg-accent/15"
                 >
-                  {en ? "Try again" : "სცადე ხელახლა"}
+                  {retryText}
                 </button>
               </motion.div>
             )}

@@ -15,14 +15,16 @@ import { EqArticleRecommendations } from "@/components/eq/eq-article-recommendat
 
 type Stored = { answers: Record<number, number>; attemptId?: string };
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 /**
- * Fresh EQ result — computed client-side from the stashed answers so an
+ * The anonymous EQ result page. Reads answers from localStorage so an
  * anonymous visitor sees their score instantly. The overall score + band are
  * free; the 5-domain profile is gated behind login here. A signed-in taker is
  * routed to the persistent /eq-testi/shedegi/[id] view (deep profile behind a
  * one-time credit unlock).
  */
-export function EqResultClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
@@ -193,7 +195,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
   );
 }
 
-function ShareButton({ overall, locale }: { overall: number; locale: "ka" | "en" }) {
+function ShareButton({ overall, locale }: { overall: number; locale: UserLocale }) {
   const en = locale === "en";
   const [copied, setCopied] = useState(false);
   async function share() {

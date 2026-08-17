@@ -20,13 +20,15 @@ type Stored = {
 };
 
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 /**
  * IQ result. The score, band, percentile and bell curve are free; the
  * per-domain breakdown is gated behind login (mirrors the personality test).
  * Everything is computed client-side from the stashed answers, so an anonymous
  * visitor still sees their number instantly.
  */
-export function IqResultClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
@@ -203,7 +205,7 @@ export function IqResultClient({ locale = "ka" }: { locale?: "ka" | "en" }) {
   );
 }
 
-function ShareButton({ iq, locale }: { iq: number; locale: "ka" | "en" }) {
+function ShareButton({ iq, locale }: { iq: number; locale: UserLocale }) {
   const en = locale === "en";
   const [copied, setCopied] = useState(false);
   async function share() {

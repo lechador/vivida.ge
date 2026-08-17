@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * "Show my result on my public profile" opt-in, shown on a test's result page.
@@ -15,7 +16,7 @@ export function ProfileVisibilityToggle({
   locale = "ka",
 }: {
   kind: "mbti" | "iq" | "eq" | "big-five";
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const [on, setOn] = useState<boolean | null>(null); // null = loading/hidden

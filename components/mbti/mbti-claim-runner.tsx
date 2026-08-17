@@ -8,6 +8,7 @@ import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { submitMbti } from "@/actions/submit-mbti";
 import { MBTI_ANSWERS_STORAGE_KEY } from "@/lib/mbti-questions";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Runs once the user is authed and lands on /pirovnebis-testi/claim: reads the stored
@@ -15,7 +16,7 @@ import { MBTI_ANSWERS_STORAGE_KEY } from "@/lib/mbti-questions";
  * result. This is the only place the expensive generation runs. Guards
  * against double-submit (React strict-mode / re-renders) with a ref.
  */
-export function MbtiClaimRunner({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function MbtiClaimRunner({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale === "en";
   const router = useRouter();
   const started = useRef(false);

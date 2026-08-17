@@ -31,6 +31,7 @@ export function DesktopSidebar({
       href: "/messages",
       label: "ჩატი",
       labelEn: "Chat",
+      labelAm: "Չատ",
       Icon: MessageCircle,
       hue: "oklch(0.78 0.18 200)",
     },

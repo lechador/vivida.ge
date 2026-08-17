@@ -26,6 +26,7 @@ import {
   listMutualFriendsPreview,
 } from "@/lib/friendship";
 import { ageFromDob } from "@/lib/profile-utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import {
   getLatestEqResult,
   getLatestIqResult,
@@ -587,21 +588,41 @@ function ProfileStats({
 }: {
   friends: number;
   posts: number;
-  locale: "ka" | "en";
+  locale: UserLocale;
 }) {
+  const am = locale === "am";
+  const en = locale === "en";
   return (
     <dl className="mt-5 inline-flex items-stretch divide-x divide-border/60 rounded-2xl border border-border/60 bg-card/35 px-1 backdrop-blur-xl">
-      <Stat label={locale === "en" ? "Friends" : "მეგობრები"} value={friends} locale={locale} />
-      <Stat label={locale === "en" ? "Posts" : "პოსტი"} value={posts} locale={locale} />
+      <Stat
+        label={am ? "Ընկերներ" : en ? "Friends" : "მეგობრები"}
+        value={friends}
+        locale={locale}
+      />
+      <Stat
+        label={am ? "Հրապարակումներ" : en ? "Posts" : "პოსტი"}
+        value={posts}
+        locale={locale}
+      />
     </dl>
   );
 }
 
-function Stat({ label, value, locale }: { label: string; value: number; locale: "ka" | "en" }) {
+function Stat({
+  label,
+  value,
+  locale,
+}: {
+  label: string;
+  value: number;
+  locale: UserLocale;
+}) {
   return (
     <div className="flex min-w-[68px] flex-col items-center gap-0.5 px-3 py-2 sm:min-w-[88px] sm:px-4">
       <dd className="text-base font-semibold tabular-nums leading-none text-foreground sm:text-lg">
-        {Intl.NumberFormat(locale === "en" ? "en" : "ka-GE").format(value)}
+        {Intl.NumberFormat(
+          locale === "am" ? "hy-AM" : locale === "en" ? "en" : "ka-GE"
+        ).format(value)}
       </dd>
       <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">
         {label}
@@ -627,7 +648,7 @@ function MutualFriendsPill({
     image: string | null;
     username: string | null;
   }>;
-  locale: "ka" | "en";
+  locale: UserLocale;
 }) {
   return (
     <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/60 px-2.5 py-1 text-xs text-muted-foreground">

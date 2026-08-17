@@ -8,6 +8,8 @@ import {
   paragraphStyle,
 } from "./_layout";
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function VerificationEmail({
   name,
   verifyUrl,
@@ -18,7 +20,7 @@ export function VerificationEmail({
   verifyUrl: string;
   /** 6-digit OTP alternative to the link; omitted (null) → link-only email. */
   code?: string | null;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const greeting = name

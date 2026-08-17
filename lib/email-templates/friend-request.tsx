@@ -13,6 +13,8 @@ import {
  * from the site for >1h, throttled to one per hour. The "from" name is
  * the requester; we send to the *recipient* of the friend request.
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function FriendRequestEmail({
   recipientName,
   fromName,
@@ -26,7 +28,7 @@ export function FriendRequestEmail({
   fromUsername: string | null;
   friendsUrl: string;
   unsubscribeUrl: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const greeting = recipientName

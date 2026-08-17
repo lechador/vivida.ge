@@ -14,6 +14,7 @@ import {
   type MbtiResult,
   type MbtiQuestion,
 } from "@/lib/mbti-questions";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Anonymous teaser gate. Computes the type client-side (free — no AI, no
@@ -21,7 +22,7 @@ import {
  * the deep synthesis locked behind login/registration. The CTAs carry
  * `next=/pirovnebis-testi/claim` so the user returns here and auto-generates after auth.
  */
-export function MbtiGate({ questions, locale = "ka" }: { questions: MbtiQuestion[]; locale?: "ka" | "en" }) {
+export function MbtiGate({ questions, locale = "ka" }: { questions: MbtiQuestion[]; locale?: UserLocale }) {
   const en = locale === "en";
   const [result, setResult] = useState<MbtiResult | null>(null);
   const [noAnswers, setNoAnswers] = useState(false);

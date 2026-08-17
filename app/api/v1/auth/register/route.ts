@@ -29,6 +29,7 @@ const MESSAGES: Record<RegisterError, string> = {
   invalid_email: "Invalid email address",
   weak_password: "Password is too short",
   email_taken: "This email is already registered",
+  oauth_only: "This email is already registered with Google",
   failed: "Could not create the account",
 };
 

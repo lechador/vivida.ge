@@ -11,6 +11,7 @@ import { listPartners, partnerCreationsThisMonth } from "@/lib/partners-core";
 import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
 import { PartnerCard } from "@/components/synastry/partner-card";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const en = (await getRequestLocale()) === "en";
@@ -108,7 +109,7 @@ function EmptyState({
   locale,
 }: {
   canAdd: boolean;
-  locale: "ka" | "en";
+  locale: UserLocale;
 }) {
   const en = locale === "en";
   return (

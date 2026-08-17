@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 
 import { isEnglishHost } from "@/lib/seo/locales";
 
+import { LOCALE_HEADER } from "./armenian-routes";
 import {
   normalizeUserLocale,
   type UserLocale,
@@ -25,25 +26,17 @@ export function localeForHost(
 
 /**
  * Request-aware locale for Server Components and Server Actions.
- *
- * The host decides, and a `preferred` value (the signed-in user's
- * `interfaceLanguage`) is honoured only on the Georgian host. There is
- * deliberately NO cookie fallback: public pages call this with no argument, so
- * dropping it makes every indexable URL render exactly one language.
- *
- * The cookie used to be consulted here, which meant the SAME Georgian URL
- * rendered English for some visitors — and, worse, emitted their metadata to
- * match: www.vivida.ge/horoskopi advertised `canonical:
- * https://www.vividaastro.com/horoskopi`, pointing a Georgian money page at the
- * other domain. Canonical, hreflang and <html lang> must be a function of the
- * URL alone. Signed-in surfaces (/dashboard, /account, /report) still pass
- * `preferred` and still switch language; they are robots-disallowed, so no
- * indexable page varies by user.
  */
 export async function getRequestLocale(
   preferred?: string | null,
 ): Promise<UserLocale> {
   const requestHeaders = await headers();
+
+  // Set by proxy.ts from the `/am` path prefix. It outranks the host because
+  // Armenian shares the international domain with English — the URL is the
+  // only thing that separates them.
+  if (requestHeaders.get(LOCALE_HEADER) === "am") return "am";
+
   const host =
     requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
 
@@ -51,11 +44,24 @@ export async function getRequestLocale(
   return normalizeUserLocale(preferred);
 }
 
+/** Is this request being served from the Armenian `/am` URL space? */
+export async function requestIsArmenianPath(): Promise<boolean> {
+  const requestHeaders = await headers();
+  return requestHeaders.get(LOCALE_HEADER) === "am";
+}
+
 export async function requestIsEnglish(
   preferred?: string | null,
 ): Promise<boolean> {
   return (await getRequestLocale(preferred)) === "en";
 }
+
+export async function requestIsArmenian(
+  preferred?: string | null,
+): Promise<boolean> {
+  return (await getRequestLocale(preferred)) === "am";
+}
+
 
 /**
  * Is this request being served from the English domain?

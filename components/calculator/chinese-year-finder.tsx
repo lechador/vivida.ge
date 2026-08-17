@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { animalForYear } from "@/lib/seo/chinese-zodiac";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * "ზოდიაქოს ნიშანი წლების მიხედვით" — type a birth year, get the Chinese
  * animal. Pure client, no API (the mapping is deterministic).
  */
-export function ChineseYearFinder({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function ChineseYearFinder({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale === "en";
   const [year, setYear] = useState("");
   const [result, setResult] = useState<ReturnType<typeof animalForYear> | null>(

@@ -17,6 +17,7 @@ import type {
 } from "@/components/onboarding/types";
 import type { GeocodeResult } from "@/lib/geocoding";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Single-page form for adding a synastry partner. Same input shape as the
@@ -24,7 +25,7 @@ import { cn } from "@/lib/utils";
  * something the user types in once and forgets, so the slow-paced
  * multi-step ceremony isn't appropriate here.
  */
-export function PartnerForm({ locale }: { locale: "ka" | "en" }) {
+export function PartnerForm({ locale }: { locale: UserLocale }) {
   const en = locale === "en";
   const router = useRouter();
   const [name, setName] = useState("");
@@ -263,7 +264,7 @@ function PlaceField({
 }: {
   value: PlaceValue;
   onChange: (next: PlaceValue) => void;
-  locale: "ka" | "en";
+  locale: UserLocale;
 }) {
   const en = locale === "en";
   const [query, setQuery] = useState(value?.displayName ?? "");

@@ -41,15 +41,21 @@ export function PositionsTable({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const am = locale === "am";
+  const planetHeader = am ? "Մոլորակ" : en ? "Planet" : "პლანეტა";
+  const signHeader = am ? "Նշան" : en ? "Sign" : "ნიშანი";
+  const degreeHeader = am ? "Աստիճան" : en ? "Degree" : "გრადუსი";
+  const houseHeader = am ? "Տուն" : en ? "House" : "სახლი";
+
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
       <div
         className={`${GRID} px-4 py-2.5 text-[11px] uppercase tracking-wider text-muted-foreground sm:px-5`}
       >
-        <span>{en ? "Planet" : "პლანეტა"}</span>
-        <span>{en ? "Sign" : "ნიშანი"}</span>
-        <span className="text-right">{en ? "Degree" : "გრადუსი"}</span>
-        <span className="text-right">{en ? "House" : "სახლი"}</span>
+        <span>{planetHeader}</span>
+        <span>{signHeader}</span>
+        <span className="text-right">{degreeHeader}</span>
+        <span className="text-right">{houseHeader}</span>
       </div>
       <ul>
         {ROW_KEYS.map((key) => {
@@ -59,6 +65,16 @@ export function PositionsTable({
           const sign = signByIndex(point.signIndex);
           const color = signColor(sign);
           const house = key === "ascendant" ? 1 : point.house;
+          const planetLabel = am
+            ? meta?.labelAm ?? key
+            : en
+            ? meta?.labelEn ?? key
+            : meta?.labelKa ?? key;
+          const signLabel = am
+            ? sign.labelAm
+            : en
+            ? sign.labelEn
+            : sign.labelKa;
 
           return (
             <li key={key} className="border-t border-border/50">
@@ -70,14 +86,14 @@ export function PositionsTable({
                   <span aria-hidden style={{ color }} className={GLYPH}>
                     {meta?.symbol ?? "?"}
                   </span>
-                  <span className="truncate">{en ? meta?.labelEn ?? key : meta?.labelKa ?? key}</span>
+                  <span className="truncate">{planetLabel}</span>
                 </span>
 
                 <span className="flex min-w-0 items-center gap-2 text-foreground/85">
                   <span aria-hidden style={{ color }} className={GLYPH}>
                     {`${sign.symbol}︎`}
                   </span>
-                  <span className="truncate">{en ? sign.labelEn : sign.labelKa}</span>
+                  <span className="truncate">{signLabel}</span>
                 </span>
 
                 <span className="whitespace-nowrap text-right tabular-nums text-foreground/80">
@@ -125,6 +141,12 @@ export function HousesTable({
       {houses.map((h) => {
         const sign = signByIndex(h.signIndex);
         const color = signColor(sign);
+        const signLabel =
+          locale === "am"
+            ? sign.labelAm
+            : locale === "en"
+            ? sign.labelEn
+            : sign.labelKa;
         return (
           <a
             key={h.number}
@@ -137,7 +159,7 @@ export function HousesTable({
             <span aria-hidden style={{ color }} className={GLYPH}>
               {`${sign.symbol}︎`}
             </span>
-            <span className="truncate">{locale === "en" ? sign.labelEn : sign.labelKa}</span>
+            <span className="truncate">{signLabel}</span>
           </a>
         );
       })}

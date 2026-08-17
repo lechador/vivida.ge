@@ -129,12 +129,14 @@ export async function getSynastryLibraryEntries(
  * looks them up. Returns a plain object so it can cross the server→client
  * boundary as a prop.
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export async function getSynastryInterpretationsFor(
   result: {
     topAspects: { a: string; b: string; kind: AspectKind }[];
     breakdown: { topOverlays: { body: string; house: number }[] };
   },
-  locale: "ka" | "en" = "ka"
+  locale: UserLocale = "ka"
 ): Promise<Record<string, string>> {
   const keys = [
     ...result.topAspects.map((x) => synastryAspectKey(x.a, x.b, x.kind)),

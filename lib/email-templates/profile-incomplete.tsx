@@ -7,6 +7,7 @@ import {
   mutedStyle,
   paragraphStyle,
 } from "./_layout";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function ProfileIncompleteEmail({
   name,
@@ -17,7 +18,7 @@ export function ProfileIncompleteEmail({
   name: string | null;
   onboardingUrl: string;
   unsubscribeUrl: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const greeting = name

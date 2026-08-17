@@ -15,6 +15,8 @@ import {
  * The site is currently 100% free; copy reflects that. When paid plans
  * return, swap the body for the upsell version.
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function WelcomeEmail({
   name,
   dashboardUrl,
@@ -22,7 +24,7 @@ export function WelcomeEmail({
 }: {
   name: string | null;
   dashboardUrl: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const greeting = name

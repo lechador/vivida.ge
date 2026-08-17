@@ -35,7 +35,12 @@ export function PopularSearches({
         id="popular-searches-heading"
         className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground"
       >
-        {title ?? (locale === "en" ? "Popular searches" : "ხშირი ძიებები")}
+        {title ??
+          (locale === "am"
+            ? "Հաճախակի որոնումներ"
+            : locale === "en"
+            ? "Popular searches"
+            : "ხშირი ძიებები")}
       </h2>
       <ul className="flex flex-wrap gap-2">
         {queries.map((q, i) => (

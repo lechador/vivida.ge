@@ -22,25 +22,39 @@ export function StepDate({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const am = locale === "am";
   const monthRef = useRef<HTMLInputElement>(null);
   const yearRef = useRef<HTMLInputElement>(null);
+
+  const headingText = am
+    ? "Ե՞րբ է սկսվել ձեր պատմությունը:"
+    : en
+    ? "When did your story begin?"
+    : "როდის დაიწყო შენი ისტორია?";
+  const descText = am
+    ? "Ծննդյան օրը որոշում է ձեր Արևը, Լուսինը և հիմնական արխետիպերը:"
+    : en
+    ? "Your birth date determines your Sun, Moon and core archetypes."
+    : "დაბადების დღე განსაზღვრავს შენს მზეს, მთვარეს და ძირითად არქეტიპებს.";
+  const dayLabel = am ? "Օր" : en ? "Day" : "რიცხვი";
+  const monthLabel = am ? "Ամիս" : en ? "Month" : "თვე";
+  const yearLabel = am ? "Տարի" : en ? "Year" : "წელი";
+  const genderLabel = am ? "Սեռ" : en ? "Gender" : "სქესი";
+  const femaleLabel = am ? "Իգական" : en ? "Female" : "მდედრობითი";
+  const maleLabel = am ? "Արական" : en ? "Male" : "მამრობითი";
 
   return (
     <div className="space-y-6">
       <header className="space-y-2 text-center">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          {en ? "When did your story begin?" : "როდის დაიწყო შენი ისტორია?"}
+          {headingText}
         </h2>
-        <p className="text-muted-foreground">
-          {en
-            ? "Your birth date determines your Sun, Moon and core archetypes."
-            : "დაბადების დღე განსაზღვრავს შენს მზეს, მთვარეს და ძირითად არქეტიპებს."}
-        </p>
+        <p className="text-muted-foreground">{descText}</p>
       </header>
 
       <div className="mx-auto grid max-w-md grid-cols-[1fr_1fr_1.4fr] gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="day">{en ? "Day" : "რიცხვი"}</Label>
+          <Label htmlFor="day">{dayLabel}</Label>
           <Input
             id="day"
             inputMode="numeric"
@@ -57,7 +71,7 @@ export function StepDate({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="month">{en ? "Month" : "თვე"}</Label>
+          <Label htmlFor="month">{monthLabel}</Label>
           <Input
             id="month"
             ref={monthRef}
@@ -74,7 +88,7 @@ export function StepDate({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="year">{en ? "Year" : "წელი"}</Label>
+          <Label htmlFor="year">{yearLabel}</Label>
           <Input
             id="year"
             ref={yearRef}
@@ -94,12 +108,12 @@ export function StepDate({
       </div>
 
       <div className="mx-auto max-w-md space-y-1.5">
-        <Label>{en ? "Gender" : "სქესი"}</Label>
+        <Label>{genderLabel}</Label>
         <div className="grid grid-cols-2 gap-3">
           {(
             [
-              { key: "female", label: en ? "Female" : "მდედრობითი", glyph: "♀" },
-              { key: "male", label: en ? "Male" : "მამრობითი", glyph: "♂" },
+              { key: "female", label: femaleLabel, glyph: "♀" },
+              { key: "male", label: maleLabel, glyph: "♂" },
             ] as const
           ).map((opt) => (
             <button
@@ -114,7 +128,9 @@ export function StepDate({
                   : "border-border bg-background/40 text-foreground/80 hover:border-[var(--vivida-violet)]/50 hover:bg-[var(--vivida-violet)]/5"
               )}
             >
-              <span className="text-lg text-[var(--vivida-violet)]">{opt.glyph}</span>
+              <span className="text-lg text-[var(--vivida-violet)]">
+                {opt.glyph}
+              </span>
               {opt.label}
             </button>
           ))}

@@ -19,19 +19,39 @@ export function StepTime({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const am = locale === "am";
   const minuteRef = useRef<HTMLInputElement>(null);
+
+  const headingText = am
+    ? "Ճշգրիտ ժամը նույնպես կարևոր է:"
+    : en
+    ? "The exact time matters too."
+    : "ზუსტი დროც მნიშვნელოვანია.";
+  const descText = am
+    ? "Ծննդյան ժամը բացահայտում է ձեր Ասցենդենտը և տները՝ քարտեզի ամենախորքային շերտը:"
+    : en
+    ? "Your birth time reveals your rising sign and houses—the chart's deepest layer."
+    : "დაბადების დრო ხსნის შენს ამომავალ ნიშანსა და სახლებს — რუკის ყველაზე ღრმა შრეს.";
+  const hourLabel = am ? "Ժամ" : en ? "Hour" : "საათი";
+  const minuteLabel = am ? "Րոպե" : en ? "Minute" : "წუთი";
+  const unknownLabel = am
+    ? "Չգիտեմ ճշգրիտ ժամը"
+    : en
+    ? "I don't know the exact time"
+    : "არ ვიცი ზუსტი დრო";
+  const unknownHint = am
+    ? "Այս դեպքում կօգտագործենք 12:00: Ձեր Արևը և մոլորակների մեծ մասը կլինեն ճշգրիտ, բայց Ասցենդենտը և տները կարող են լինել մոտավոր:"
+    : en
+    ? "We'll use 12:00 in this case. Your Sun and most planets will remain accurate, but your rising sign and houses may not be."
+    : "ამ შემთხვევაში, დროს 12:00-ად ჩავთვლით. შენი მზე და პლანეტების უმეტესობა ზუსტი იქნება, თუმცა ამომავალი ნიშანი და სახლები, შესაძლოა, არ იყოს ზუსტი.";
 
   return (
     <div className="space-y-6">
       <header className="space-y-2 text-center">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          {en ? "The exact time matters too." : "ზუსტი დროც მნიშვნელოვანია."}
+          {headingText}
         </h2>
-        <p className="text-muted-foreground">
-          {en
-            ? "Your birth time reveals your rising sign and houses—the chart's deepest layer."
-            : "დაბადების დრო ხსნის შენს ამომავალ ნიშანსა და სახლებს — რუკის ყველაზე ღრმა შრეს."}
-        </p>
+        <p className="text-muted-foreground">{descText}</p>
       </header>
 
       <div
@@ -41,7 +61,7 @@ export function StepTime({
         )}
       >
         <div className="space-y-1.5">
-          <Label htmlFor="hour">{en ? "Hour" : "საათი"}</Label>
+          <Label htmlFor="hour">{hourLabel}</Label>
           <Input
             id="hour"
             inputMode="numeric"
@@ -59,7 +79,7 @@ export function StepTime({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="minute">{en ? "Minute" : "წუთი"}</Label>
+          <Label htmlFor="minute">{minuteLabel}</Label>
           <Input
             id="minute"
             ref={minuteRef}
@@ -98,14 +118,12 @@ export function StepTime({
               : "border-muted-foreground"
           )}
         />
-        {en ? "I don't know the exact time" : "არ ვიცი ზუსტი დრო"}
+        {unknownLabel}
       </motion.button>
 
       {value.unknown && (
         <p className="mx-auto max-w-sm text-center text-xs text-muted-foreground/80">
-          {en
-            ? "We'll use 12:00 in this case. Your Sun and most planets will remain accurate, but your rising sign and houses may not be."
-            : "ამ შემთხვევაში, დროს 12:00-ად ჩავთვლით. შენი მზე და პლანეტების უმეტესობა ზუსტი იქნება, თუმცა ამომავალი ნიშანი და სახლები, შესაძლოა, არ იყოს ზუსტი."}
+          {unknownHint}
         </p>
       )}
     </div>

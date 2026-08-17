@@ -18,6 +18,8 @@ const FOCUS_KEY = "vivida_test_focus"; // shared across the tests
  * Reused by the Big Five test; the mid value of the scale is treated as
  * neutral for the graduated agree(cyan)/disagree(pink) styling.
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function LikertQuiz({
   questions,
   scale,
@@ -31,7 +33,7 @@ export function LikertQuiz({
   onSubmit: (answers: Record<number, number>) => Promise<LikertSubmitResult>;
   submitLabel?: string;
   workingLabel?: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const [answers, setAnswers] = useState<Record<number, number>>({});

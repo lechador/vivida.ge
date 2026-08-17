@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
  * otherwise copies the public share link to the clipboard. The link points at
  * the public /r/[id] page, which unfurls with a generated social card.
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function MbtiShareButton({
   path,
   type,
@@ -19,7 +21,7 @@ export function MbtiShareButton({
   path: string; // e.g. "/r/<id>"
   type: string;
   archetype: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const [copied, setCopied] = useState(false);

@@ -38,12 +38,14 @@ export type NavItem = {
   href: string;
   label: string;
   labelEn: string;
+  labelAm: string;
   Icon: LucideIcon;
   /** Hue used for the active glow + hover icon tint. Roughly the brand axis. */
   hue: string;
   /** Small pill next to the label ("ახალი") — drop it once the feature ages. */
   badgeKa?: string;
   badgeEn?: string;
+  badgeAm?: string;
 };
 
 /**
@@ -65,7 +67,9 @@ function navVisible(item: NavItem): boolean {
  * Resolve the visible label for the current interface language.
  */
 export function navLabel(item: NavItem, locale: UserLocale = "ka"): string {
-  return locale === "en" ? item.labelEn : item.label;
+  if (locale === "am") return item.labelAm;
+  if (locale === "en") return item.labelEn;
+  return item.label;
 }
 
 const ALL_NAV_ITEMS: NavItem[] = [
@@ -74,6 +78,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/dashboard",
     label: "დღეს",
     labelEn: "Today",
+    labelAm: "Այսօր",
     Icon: Sun,
     hue: "oklch(0.82 0.16 80)",
   },
@@ -82,6 +87,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/sky",
     label: "ცა ახლა",
     labelEn: "Sky now",
+    labelAm: "Երկինքն այժմ",
     Icon: Orbit,
     hue: "oklch(0.80 0.15 200)",
   },
@@ -90,6 +96,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/report",
     label: "ჩემი რუკა",
     labelEn: "My chart",
+    labelAm: "Իմ քարտեզը",
     Icon: Compass,
     hue: "oklch(0.78 0.18 305)",
   },
@@ -98,6 +105,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/ask",
     label: "ჰკითხე",
     labelEn: "Ask",
+    labelAm: "Հարցնել",
     Icon: Stars,
     hue: "oklch(0.80 0.16 230)",
   },
@@ -106,16 +114,19 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/taro",
     label: "ტარო",
     labelEn: "Tarot",
+    labelAm: "Տարո",
     Icon: Wand2,
     hue: "oklch(0.78 0.18 305)",
     badgeKa: "ახალი",
     badgeEn: "New",
+    badgeAm: "Նոր",
   },
   {
     key: "timing",
     href: "/timing",
     label: "როდის",
     labelEn: "Timing",
+    labelAm: "Երբ",
     Icon: CalendarClock,
     hue: "oklch(0.82 0.14 90)",
   },
@@ -124,6 +135,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/feed",
     label: "ფიდი",
     labelEn: "Feed",
+    labelAm: "Լրահոս",
     Icon: Sparkles,
     hue: "oklch(0.78 0.18 320)",
   },
@@ -132,6 +144,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/tests",
     label: "ტესტები",
     labelEn: "Tests",
+    labelAm: "Թեստեր",
     Icon: Brain,
     hue: "oklch(0.78 0.16 300)",
   },
@@ -140,6 +153,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/discover",
     label: "აღმოაჩინე",
     labelEn: "Discover",
+    labelAm: "Բացահայտել",
     Icon: Telescope,
     hue: "oklch(0.78 0.15 195)",
   },
@@ -148,6 +162,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/synastry",
     label: "თავსებადობა",
     labelEn: "Compatibility",
+    labelAm: "Համատեղելիություն",
     Icon: Heart,
     hue: "oklch(0.72 0.22 350)",
   },
@@ -156,6 +171,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/people",
     label: "ხალხი",
     labelEn: "People",
+    labelAm: "Մարդիկ",
     Icon: UserPlus,
     hue: "oklch(0.75 0.16 160)",
   },
@@ -164,6 +180,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/friends",
     label: "მეგობრები",
     labelEn: "Friends",
+    labelAm: "Ընկերներ",
     Icon: Users,
     hue: "oklch(0.72 0.22 0)",
   },
@@ -171,13 +188,8 @@ const ALL_NAV_ITEMS: NavItem[] = [
 
 /**
  * The mobile bottom tab bar shows a curated 5-item subset of the nav:
- * today / chart / tarot / tests / chat. The content funnels (tarot, tests)
- * that the data shows drive consumption get a slot; the near-dead social
- * feed and synastry drop to the mobile drawer (still reachable). Messages
- * keeps a slot — it's the messenger's only mobile entry point, with a live
- * unread badge.
+ * today / chart / tarot / tests / chat.
  */
-/** Visible desktop nav — gated entries (e.g. discover) filtered out when off. */
 export const NAV_ITEMS: NavItem[] = ALL_NAV_ITEMS.filter(navVisible);
 
 const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
@@ -186,6 +198,7 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     href: "/dashboard",
     label: "დღეს",
     labelEn: "Today",
+    labelAm: "Այսօր",
     Icon: Sun,
     hue: "oklch(0.82 0.16 80)",
   },
@@ -194,6 +207,7 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     href: "/report",
     label: "ჩემი რუკა",
     labelEn: "My chart",
+    labelAm: "Իմ քարտեզը",
     Icon: Compass,
     hue: "oklch(0.78 0.18 305)",
   },
@@ -202,6 +216,7 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     href: "/taro",
     label: "ტარო",
     labelEn: "Tarot",
+    labelAm: "Տարո",
     Icon: Wand2,
     hue: "oklch(0.78 0.18 305)",
   },
@@ -210,6 +225,7 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     href: "/tests",
     label: "ტესტები",
     labelEn: "Tests",
+    labelAm: "Թեստեր",
     Icon: Brain,
     hue: "oklch(0.78 0.16 300)",
   },
@@ -218,10 +234,12 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     href: "/messages",
     label: "ჩატი",
     labelEn: "Chat",
+    labelAm: "Չաթ",
     Icon: MessageCircle,
     hue: "oklch(0.78 0.18 200)",
   },
 ];
+
 
 /** Visible mobile tab bar — same flag filtering as the desktop nav. */
 export const MOBILE_TAB_ITEMS: NavItem[] =

@@ -2,13 +2,14 @@ import Image from "next/image";
 
 import { mbtiBaseType } from "@/lib/mbti-questions";
 import { mbtiCharacterSrc, mbtiFamousFor } from "@/lib/mbti-characters";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * "Famous people commonly typed as X" — names shown with the type's own
  * character avatar (we don't render real faces). Framed as popular, unofficial
  * associations rather than fact.
  */
-export function MbtiFamousPeople({ type, locale = "ka" }: { type: string; locale?: "ka" | "en" }) {
+export function MbtiFamousPeople({ type, locale = "ka" }: { type: string; locale?: UserLocale }) {
   const en = locale === "en";
   const people = mbtiFamousFor(type);
   if (people.length === 0) return null;

@@ -9,6 +9,7 @@ import {
   big5HeadlineKa,
   type BigFiveResult,
 } from "@/lib/big-five/scoring";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * The deep tier of the Big Five result — a written interpretation per trait
@@ -16,7 +17,7 @@ import {
  * personality. Pure/server-safe so it renders on the saved page and (blurred)
  * on the anonymous teaser.
  */
-export function BigFiveDetail({ result, locale = "ka" }: { result: BigFiveResult; locale?: "ka" | "en" }) {
+export function BigFiveDetail({ result, locale = "ka" }: { result: BigFiveResult; locale?: UserLocale }) {
   const en = locale === "en";
   return (
     <div className="space-y-3">

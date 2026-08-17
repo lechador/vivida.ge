@@ -15,6 +15,8 @@ import * as React from "react";
  * email clients (Gmail / iOS Mail / Outlook) ignore most CSS files,
  * so React Email guidance is to keep things explicit.
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function EmailLayout({
   preview,
   children,
@@ -26,7 +28,7 @@ export function EmailLayout({
   /** Marketing/digest emails pass this. Renders a one-click unsubscribe
    *  link in the footer. Omit for transactional mail (verification etc). */
   unsubscribeUrl?: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   return (

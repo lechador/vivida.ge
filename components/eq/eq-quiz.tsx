@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { EQ_LIKERT, type EqQuestion } from "@/lib/eq/questions";
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export type EqSubmitResult = { ok: true } | { ok: false; error: string };
 
 const FOCUS_KEY = "vivida_test_focus"; // shared with the other tests
@@ -30,7 +32,7 @@ export function EqQuiz({
   onSubmit: (answers: Record<number, number>) => Promise<EqSubmitResult>;
   submitLabel?: string;
   workingLabel?: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const [answers, setAnswers] = useState<Record<number, number>>({});

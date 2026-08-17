@@ -1,11 +1,12 @@
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * The IQ bell curve with the taker's score marked — a normal distribution
  * (mean 100, SD 15) drawn over the 55–145 range, shaded up to the score so the
  * "where you land" reads instantly.
  */
-export function IqBellCurve({ iq, locale = "ka" }: { iq: number; locale?: "ka" | "en" }) {
+export function IqBellCurve({ iq, locale = "ka" }: { iq: number; locale?: UserLocale }) {
   const W = 560;
   const H = 180;
   const padX = 24;

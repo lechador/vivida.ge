@@ -6,6 +6,7 @@ import { Trash2 } from "lucide-react";
 
 import { softDeletePartner } from "@/actions/partners";
 import { cn } from "@/lib/utils";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Saved-partner row on /synastry. Click → /synastry/[id]; trash → soft delete.
@@ -23,7 +24,7 @@ export function PartnerCard({
   name: string;
   cityName: string;
   dateOfBirth: string;
-  locale: "ka" | "en";
+  locale: UserLocale;
 }) {
   const [isPending, startTransition] = useTransition();
 

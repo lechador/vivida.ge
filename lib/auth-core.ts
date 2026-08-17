@@ -7,6 +7,7 @@ import { authTokens, users, type AuthTokenPurpose } from "@/db/schema";
 import { awardJoinedReputation } from "@/lib/reputation";
 import { onUserSignedUp, qualifyReferral } from "@/lib/referral";
 import { ensureUsername } from "@/lib/username";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Framework-agnostic email/password auth logic, shared by the website
@@ -61,12 +62,13 @@ export async function issueAuthToken(
     .delete(authTokens)
     .where(and(eq(authTokens.userId, userId), eq(authTokens.purpose, purpose)));
   const token = randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + ttlMs);
   await db.insert(authTokens).values({
     token,
     userId,
     purpose,
     code,
-    expiresAt: new Date(Date.now() + ttlMs),
+    expiresAt,
   });
   return token;
 }
@@ -78,6 +80,7 @@ export type RegisterError =
   | "invalid_email"
   | "weak_password"
   | "email_taken"
+  | "oauth_only"
   | "failed";
 
 export type RegisterResult =
@@ -91,7 +94,10 @@ export type RegisterResult =
       /** 6-digit OTP shown in the same email; caller passes it to the sender. */
       verifyCode: string;
     }
-  | { ok: false; error: RegisterError };
+  | {
+      ok: false;
+      error: RegisterError;
+    };
 
 /**
  * Create an email/password account (unverified) and provision its trial.
@@ -102,7 +108,7 @@ export async function registerUser(input: {
   name: string;
   email: string;
   password: string;
-  interfaceLanguage?: "ka" | "en";
+  interfaceLanguage?: UserLocale;
   residenceCountryCode?: string | null;
 }): Promise<RegisterResult> {
   const name = input.name.trim();

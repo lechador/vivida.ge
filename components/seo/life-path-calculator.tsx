@@ -16,13 +16,15 @@ import {
  * the natal-chart CTA is the acquisition hook (same funnel pattern as the
  * compatibility calculator).
  */
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 export function LifePathCalculator({
   archetypes,
   locale = "ka",
 }: {
   /** number → archetype label, passed from the server page (content lives there). */
   archetypes: Record<string, string>;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const en = locale === "en";
   const [date, setDate] = useState("");

@@ -1,4 +1,5 @@
 import type { EqDomainScore } from "@/lib/eq/scoring";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Five-spoke radar of the EQ domains — the signature result visual. Pure SVG,
@@ -13,7 +14,7 @@ export function EqRadar({
 }: {
   domains: EqDomainScore[];
   size?: number;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }) {
   const cx = size / 2;
   const cy = size / 2;
