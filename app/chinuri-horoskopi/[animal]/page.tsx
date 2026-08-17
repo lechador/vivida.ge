@@ -8,6 +8,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { ChineseAnimalPageEn } from "@/components/seo/chinese-zodiac-en";
+import { ChineseAnimalPageAm } from "@/components/seo/chinese-zodiac-am";
 import { ensureChineseZodiac } from "@/actions/chinese-zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -17,7 +18,11 @@ import {
   yearsForAnimal,
 } from "@/lib/seo/chinese-zodiac";
 import { chineseZodiacContentEnBySlug } from "@/lib/seo/chinese-zodiac-en";
-import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import {
+  CHINESE_ANIMALS_AM,
+  CHINESE_ZODIAC_AM_BY_SLUG,
+} from "@/lib/seo/chinese-zodiac-am";
+import { ARMENIAN_SITE_URL, ENGLISH_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -42,6 +47,37 @@ export async function generateMetadata({
   const animal = chineseAnimalBySlug(slug);
   if (!animal) return {};
   const locale = await getRequestLocale();
+
+  if (locale === "am") {
+    const content = CHINESE_ZODIAC_AM_BY_SLUG[slug];
+    if (!content) return {};
+    const amName = content.name || CHINESE_ANIMALS_AM[slug]?.name || animal.nameEn;
+    const path = `/chinuri-horoskopi/${slug}`;
+    const title = `${amName} — Չինական կենդանակերպի տարիները, բնավորությունը և համատեղելիությունը`;
+    const description = `${content.headline}. Բացահայտեք ${amName}ի ծննդյան տարեթվերը, բնավորությունը, ուժեղ կողմերը, սիրային համատեղելիությունը և կարիերան:`;
+    return {
+      title: { absolute: `${title} — Vivida` },
+      description,
+      keywords: [
+        `չինական հորոսկոպ ${amName}`,
+        `${amName}ի տարի`,
+        "չինական կենդանակերպ",
+        "չինական նշաններ",
+      ],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
+
   if (locale === "en") {
     const content = chineseZodiacContentEnBySlug(slug);
     if (!content) return {};
@@ -104,6 +140,11 @@ export default async function ChineseAnimalPage({
   if (!animal) notFound();
 
   const locale = await getRequestLocale();
+  if (locale === "am") {
+    const content = CHINESE_ZODIAC_AM_BY_SLUG[slug];
+    if (!content) notFound();
+    return <ChineseAnimalPageAm animal={animal} content={content} />;
+  }
   if (locale === "en") {
     const content = chineseZodiacContentEnBySlug(slug);
     if (!content) notFound();

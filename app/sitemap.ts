@@ -266,6 +266,22 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/angeluri-ricxvebi/${slug}`, `/angeluri-ricxvebi/${slug}`),
   }));
 
+  const chineseHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/chinuri-horoskopi`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/chinuri-horoskopi", "/chinuri-horoskopi"),
+  };
+
+  const chineseEntries = ALL_CHINESE_SLUGS.map((slug) => ({
+    url: `${ENGLISH_SITE_URL}/am/chinuri-horoskopi/${slug}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.72,
+    alternates: alternatesFor(`/chinuri-horoskopi/${slug}`, `/chinuri-horoskopi/${slug}`),
+  }));
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -284,6 +300,8 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...numerologyEntries,
     angelHubEntry,
     ...angelEntries,
+    chineseHubEntry,
+    ...chineseEntries,
   ];
 }
 

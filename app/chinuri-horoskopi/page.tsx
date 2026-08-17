@@ -10,10 +10,14 @@ import {
   CHINESE_HUB_EN,
   ChineseZodiacHubEn,
 } from "@/components/seo/chinese-zodiac-en";
+import {
+  CHINESE_HUB_AM,
+  ChineseZodiacHubAm,
+} from "@/components/seo/chinese-zodiac-am";
 import { ensureChineseZodiacHub } from "@/actions/chinese-zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { CHINESE_ANIMALS, yearsForAnimal } from "@/lib/seo/chinese-zodiac";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -28,6 +32,34 @@ export const revalidate = 604800;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
+  if (locale === "am") {
+    const path = "/chinuri-horoskopi";
+    return {
+      title: { absolute: `${CHINESE_HUB_AM.title} — Vivida` },
+      description: CHINESE_HUB_AM.description,
+      keywords: [
+        "չինական կենդանակերպ",
+        "չինական հորոսկոպ",
+        "կենդանակերպի նշաններ ըստ տարիների",
+        "արևելյան հորոսկոպ",
+      ],
+      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ARMENIAN_SITE_URL}${path}`,
+        title: CHINESE_HUB_AM.title,
+        description: CHINESE_HUB_AM.description,
+        siteName: "Vivida",
+        locale: "hy_AM",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: CHINESE_HUB_AM.title,
+        description: CHINESE_HUB_AM.description,
+      },
+    };
+  }
   if (locale === "en") {
     const path = "/chinuri-horoskopi";
     return {
@@ -90,6 +122,7 @@ const HUB_QUERIES = [
 
 export default async function ChineseZodiacHubPage() {
   const locale = await getRequestLocale();
+  if (locale === "am") return <ChineseZodiacHubAm />;
   if (locale === "en") return <ChineseZodiacHubEn />;
 
   const hub = await ensureChineseZodiacHub();
