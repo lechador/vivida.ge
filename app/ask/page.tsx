@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 export default async function AskPage() {
   const user = await requireUser();
   const locale = await getUserLocale(user.id);
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   const [[chart], history] = await Promise.all([
     db

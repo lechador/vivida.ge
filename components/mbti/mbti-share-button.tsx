@@ -23,7 +23,7 @@ export function MbtiShareButton({
   archetype: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [copied, setCopied] = useState(false);
 
   async function share() {

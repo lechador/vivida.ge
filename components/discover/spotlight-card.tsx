@@ -47,7 +47,7 @@ export function SpotlightCard({
   match: SpotlightMatch;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const { card, synastry } = match;
   const verdict = en
     ? overallVerdictEn(synastry.overall)

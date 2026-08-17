@@ -49,7 +49,7 @@ export function SwipeCard({
   onLike: () => void;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [photoIdx, setPhotoIdx] = useState(0);
   const photos = card.photos.length > 0 ? card.photos : card.photoUrl ? [card.photoUrl] : [];
   const heroSrc = photos[photoIdx] ?? card.image ?? null;

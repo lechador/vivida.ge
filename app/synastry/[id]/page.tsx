@@ -29,7 +29,7 @@ import { SynastryDisplayEn } from "@/components/synastry/synastry-display-en";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return {
     title: en ? "Compatibility" : "თავსებადობა",
     robots: { index: false },
@@ -42,7 +42,7 @@ export default async function SynastryDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   const { id } = await params;
   const user = await requireUser();
   const partner = await getPartnerForViewer(id, user.id);

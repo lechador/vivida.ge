@@ -266,7 +266,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
   registerReportFonts();
   const { chart, salience, content } = data;
   const locale = data.locale ?? "ka";
-  const en = locale === "en";
+  const en = locale !== "ka";
   const narrative = content.narrative;
 
   const sunMeta = signByIndex(chart.bodies.sun.signIndex);

@@ -39,7 +39,7 @@ export function FeedList({
   disablePagination?: boolean;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [posts, setPosts] = useState<FeedPost[]>(initial);
   const [hasMore, setHasMore] = useState(
     !disablePagination && initial.length >= PAGE_SIZE
@@ -164,7 +164,7 @@ function FilterChip({
 }
 
 function EmptyState({ locale }: { locale: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
       <Sparkles className="mx-auto mb-3 size-8 text-[var(--vivida-violet)]" />
@@ -179,7 +179,7 @@ function EmptyState({ locale }: { locale: UserLocale }) {
 }
 
 function SignEmptyState({ locale }: { locale: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-8 text-center">
       <p className="text-sm text-muted-foreground">

@@ -46,7 +46,7 @@ export function ChartChat({
   firstName: string | null;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const starters = en ? STARTERS_EN : STARTERS_KA;
   const [messages, setMessages] = useState<Msg[]>(initialMessages);
   const [input, setInput] = useState("");

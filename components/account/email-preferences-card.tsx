@@ -11,7 +11,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 type Prefs = { daily: boolean; marketing: boolean; nudges: boolean };
 
 export function EmailPreferencesCard({ initial, locale = "ka" }: { initial: Prefs; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [prefs, setPrefs] = useState<Prefs>(initial);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();

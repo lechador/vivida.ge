@@ -8,7 +8,7 @@ import { BigFiveResultClient } from "@/components/big-five/big-five-result";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return { title: en ? "Your Big Five Result" : "შენი Big Five შედეგი", description: en ? "Your five-trait Big Five personality profile." : "შენი Big Five (დიდი ხუთეული) ტესტის შედეგი — ხუთ თვისებაზე დაფუძნებული პიროვნების პროფილი.", robots: { index: false, follow: false } };
 }
 

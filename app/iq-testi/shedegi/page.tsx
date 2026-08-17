@@ -8,7 +8,7 @@ import { IqResultClient } from "@/components/iq/iq-result";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return {
     title: en ? "Your IQ Result" : "შენი IQ შედეგი",
     description: en

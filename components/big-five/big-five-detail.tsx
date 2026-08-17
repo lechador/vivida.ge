@@ -18,7 +18,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * on the anonymous teaser.
  */
 export function BigFiveDetail({ result, locale = "ka" }: { result: BigFiveResult; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="space-y-3">
       <div className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/8 p-4 text-center ring-1 ring-foreground/5">

@@ -35,7 +35,7 @@ const DELETION_LIST_EN = [
 ];
 
 export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const confirmPhrase = en
     ? DELETE_ACCOUNT_CONFIRM_PHRASE_EN
     : DELETE_ACCOUNT_CONFIRM_PHRASE;

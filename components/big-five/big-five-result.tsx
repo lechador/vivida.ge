@@ -31,7 +31,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function BigFiveResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
 
@@ -170,7 +170,7 @@ export function BigFiveResultClient({ locale = "ka" }: { locale?: UserLocale }) 
 }
 
 function ShareButton({ headline, locale }: { headline: string; locale: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [copied, setCopied] = useState(false);
   async function share() {
     const url = en ? "https://www.vividaastro.com/big-five" : "https://www.vivida.ge/big-five";

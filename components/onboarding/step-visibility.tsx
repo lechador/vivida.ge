@@ -15,7 +15,7 @@ export function StepVisibility({
   defaultName: string | null;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="space-y-6">
       <header className="space-y-2 text-center">

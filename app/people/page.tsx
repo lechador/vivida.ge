@@ -32,7 +32,7 @@ export default async function PeoplePage() {
     listPeople(user.id, { limit: 30 }),
     getUserLocale(user.id),
   ]);
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   return (
     <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">

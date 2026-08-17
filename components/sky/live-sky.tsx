@@ -95,7 +95,7 @@ export function LiveSky({
   data: SkyData;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   // One shared 1s clock drives every readout + the wheel positions. The
   // planets move sub-pixel per tick (CSS transition smooths it), but the
   // Moon's arcsecond readout visibly counts up — that's the "it's alive"

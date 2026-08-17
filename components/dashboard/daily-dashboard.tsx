@@ -39,7 +39,7 @@ export function DailyDashboard({
   userId: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const router = useRouter();
   const [core, setCore] = useState<DashboardCore | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -160,7 +160,7 @@ function DashboardExtrasSection({
   balance: number;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [extras, setExtras] = useState<DashboardExtras | null>(null);
 
   useEffect(() => {

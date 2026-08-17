@@ -1,8 +1,8 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { isEnglishHost } from "@/lib/seo/locales";
 
-import { LOCALE_HEADER } from "./armenian-routes";
+import { LOCALE_CHOICE_COOKIE, LOCALE_HEADER } from "./armenian-routes";
 import {
   normalizeUserLocale,
   type UserLocale,
@@ -60,6 +60,35 @@ export async function getRequestLocale(
     return normalizeUserLocale(preferred) === "am" ? "am" : "en";
   }
   return normalizeUserLocale(preferred);
+}
+
+/**
+ * The locale to persist on a newly created account.
+ *
+ * Distinct from `getRequestLocale()` because sign-up happens *outside* the
+ * Armenian URL space: `/login` and `/signup` are shared, unprefixed routes, so
+ * by the time the form posts there is no `/am` left to read and the host says
+ * "English". Every Armenian sign-up was therefore stamped `en` (or `ka` via
+ * Google), which no later request could undo — the account was simply wrong
+ * from birth.
+ *
+ * The `vivida_lang` cookie is the surviving evidence: proxy.ts sets it both
+ * when the geo redirect fires and whenever an Armenian page is served, so
+ * anyone who reached sign-up *through* the Armenian site carries it.
+ *
+ * Only consulted at account creation. Deliberately NOT part of the general
+ * locale resolution, where a cookie deciding language would make the same URL
+ * render differently for different visitors — which is exactly the trap the
+ * earlier locale cookie was removed to escape.
+ */
+export async function getSignupLocale(): Promise<UserLocale> {
+  const requestHeaders = await headers();
+  if (requestHeaders.get(LOCALE_HEADER) === "am") return "am";
+
+  const cookieStore = await cookies();
+  if (cookieStore.get(LOCALE_CHOICE_COOKIE)?.value === "am") return "am";
+
+  return getRequestLocale();
 }
 
 /** Is this request being served from the Armenian `/am` URL space? */

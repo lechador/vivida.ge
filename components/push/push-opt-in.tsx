@@ -44,7 +44,7 @@ export function PushOptIn({
   variant?: "card" | "banner";
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [state, setState] = useState<State>("loading");
   const [error, setError] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);

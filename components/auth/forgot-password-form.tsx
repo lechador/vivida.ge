@@ -14,7 +14,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [email, setEmail] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

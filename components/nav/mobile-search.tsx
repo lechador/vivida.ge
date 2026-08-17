@@ -77,7 +77,7 @@ export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
 }
 
 function SearchPanel({ onClose, locale }: { onClose: () => void; locale: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);

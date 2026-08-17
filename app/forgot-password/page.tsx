@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ForgotPasswordPage() {
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <AuthLayout
       locale={locale}

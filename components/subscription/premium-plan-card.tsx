@@ -32,7 +32,7 @@ export function PremiumPlanCard({
   locale: UserLocale;
   active?: boolean;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
 

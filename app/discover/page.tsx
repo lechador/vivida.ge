@@ -75,7 +75,7 @@ function EmptyState({
   hasElement: boolean;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="mx-auto mt-12 max-w-md rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
       <Compass className="mx-auto mb-3 size-8 text-muted-foreground" />

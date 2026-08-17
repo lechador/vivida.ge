@@ -32,7 +32,7 @@ export function FriendButton({
   initialStatus: FriendshipStatus;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [status, setStatus] = useState<FriendshipStatus>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();

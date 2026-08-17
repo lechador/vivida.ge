@@ -47,7 +47,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const [r, locale] = await Promise.all([getResult(id), getRequestLocale()]);
-  const en = locale === "en";
+  const en = locale !== "ka";
   if (!r) return { title: "Astro-MBTI" };
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const archetype = en ? mbtiArchetypeEn(r.mbtiType) : r.archetypeNameGe;
@@ -75,7 +75,7 @@ export default async function MbtiSharePage({
   const { id } = await params;
   const [r, session, locale] = await Promise.all([getResult(id), auth(), getRequestLocale()]);
   if (!r) notFound();
-  const en = locale === "en";
+  const en = locale !== "ka";
   const authed = !!session?.user?.id;
   const archetype = en ? mbtiArchetypeEn(r.mbtiType) : r.archetypeNameGe;
 

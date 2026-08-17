@@ -63,7 +63,7 @@ export function CommentSection({
   open: boolean;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [comments, setComments] = useState<FeedComment[] | null>(null);
   const [body, setBody] = useState("");
   const [replyParentId, setReplyParentId] = useState<string | null>(null);
@@ -347,7 +347,7 @@ function CommentRow({
   onReply?: () => void;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const canDelete =
     comment.author.id === viewerId ||
     postAuthorId === viewerId ||
@@ -470,7 +470,7 @@ function ReplyComposer({
   ref: React.RefObject<HTMLTextAreaElement | null>;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const remaining = COMMENT_BODY_MAX - value.length;
   const overflow = remaining < 0;
   const disabled = isPending || value.trim().length === 0 || overflow;

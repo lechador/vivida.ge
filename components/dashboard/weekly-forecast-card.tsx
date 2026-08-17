@@ -58,7 +58,7 @@ export function WeeklyForecastCard({
   days: WeeklyForecastDay[];
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
@@ -115,7 +115,7 @@ function DayRow({
   onToggle: () => void;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const dayNum = parseDateNum(day.dateIso);
   const weekShort = en
     ? new Intl.DateTimeFormat("en", { weekday: "short", timeZone: "UTC" }).format(new Date(`${day.dateIso}T00:00:00Z`))

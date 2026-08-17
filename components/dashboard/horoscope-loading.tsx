@@ -24,7 +24,7 @@ const MESSAGES_EN = [
  * eases toward ~92% and the parent swaps in the real card when ready.
  */
 export function HoroscopeLoading({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const messages = en ? MESSAGES_EN : MESSAGES;
   const [progress, setProgress] = useState(8);
   const [stage, setStage] = useState(0);

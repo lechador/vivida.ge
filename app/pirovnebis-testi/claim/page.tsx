@@ -11,7 +11,7 @@ import { MbtiGate } from "@/components/mbti/mbti-gate";
 import { MbtiClaimRunner } from "@/components/mbti/mbti-claim-runner";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   // Transient per-user result state, like the /shedegi pages — keep it out of
   // the index rather than letting it self-canonicalize as content.
   return {
@@ -32,7 +32,7 @@ export const maxDuration = 60;
  */
 export default async function TestClaimPage() {
   const [session, locale] = await Promise.all([auth(), getRequestLocale()]);
-  const en = locale === "en";
+  const en = locale !== "ka";
   const authed = !!session?.user?.id;
   // The anonymous teaser recomputes the type client-side from the stored
   // answers, so it needs the question structure. Only loaded when anon.

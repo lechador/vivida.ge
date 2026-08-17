@@ -32,7 +32,7 @@ export default async function SignupPage({
   const { next } = await searchParams;
   const dest = safeNext(next);
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   const session = await auth();
   if (session?.user?.id) redirect(dest ?? "/dashboard");
 

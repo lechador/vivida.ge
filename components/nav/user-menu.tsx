@@ -34,7 +34,7 @@ export function UserMenu({
   locale?: UserLocale;
 }) {
   const [isPending, startTransition] = useTransition();
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   return (
     <DropdownMenu>

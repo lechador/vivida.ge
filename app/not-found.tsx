@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NotFound() {
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div

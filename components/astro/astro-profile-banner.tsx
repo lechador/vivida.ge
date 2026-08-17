@@ -11,7 +11,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * natal chart) by default, so no `next` is threaded here.
  */
 export function AstroProfileBanner({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:p-5">
       <div className="flex items-start gap-3">

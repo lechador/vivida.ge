@@ -113,7 +113,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /** A compact result-page engagement surface that leads into a complementary test. */
 export function NextTestWidget({ completed, locale = "ka" }: { completed: CompletedKind; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const recommendation = (en ? RECOMMENDATIONS_EN : RECOMMENDATIONS)[completed];
   return <section className="mt-8 rounded-3xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
     <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">{recommendation.eyebrow}</div>

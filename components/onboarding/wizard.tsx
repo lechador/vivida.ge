@@ -96,7 +96,7 @@ export function OnboardingWizard({
   next?: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   // Birth date is locked after first registration (the server enforces this
   // — see actions/profile.ts). When the user comes back to edit, hide the
   // date step entirely so they don't waste time on a read-only field, and

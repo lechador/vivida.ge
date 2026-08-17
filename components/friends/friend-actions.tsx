@@ -28,7 +28,7 @@ export function FriendActions({
   otherUsername: string | null;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [isPending, startTransition] = useTransition();
   const [removed, setRemoved] = useState(false);
 

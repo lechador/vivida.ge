@@ -23,7 +23,7 @@ const ITEMS: Array<{
  * full /report.
  */
 export function MiniBigThree({ chart, locale = "ka" }: { chart: NatalChartJson; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="grid grid-cols-3 gap-3">
       {ITEMS.map((item) => {

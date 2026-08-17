@@ -28,7 +28,7 @@ const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   const title = en
     ? "The 12 Zodiac Signs — Dates, Traits and Meanings"
     : HUB_CONTENT.pageTitle;

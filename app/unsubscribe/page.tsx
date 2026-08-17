@@ -44,7 +44,7 @@ export default async function UnsubscribePage({
 }) {
   const { token, type: rawType } = await searchParams;
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   // Anonymous horoscope-email leads use their own token space + opt-out path.
   const isLead = rawType === "lead";
   const type = isLead

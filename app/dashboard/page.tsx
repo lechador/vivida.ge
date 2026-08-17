@@ -37,7 +37,7 @@ export default async function DashboardPage() {
     db.select({ id: bigFiveResults.id }).from(bigFiveResults).where(eq(bigFiveResults.userId, user.id)).limit(1),
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   if (!profile?.dateOfBirth) {
     return (

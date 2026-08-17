@@ -67,7 +67,7 @@ export default async function FriendsPage({
     listOutgoingRequests(user.id),
     getUserLocale(user.id),
   ]);
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   const { viewerHasChart, friends: enrichedFriends } =
     await enrichFriendsWithSynastry(user.id, friends);
@@ -217,7 +217,7 @@ function CompatibilityTab({
  *  synastry can compute. Inline mode sits above the friends list; full
  *  mode replaces it (used on the compatibility tab). */
 function NoChartBanner({ full = false, locale }: { full?: boolean; locale: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div
       className={cn(

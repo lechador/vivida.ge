@@ -24,7 +24,7 @@ export function HouseCards({
   interpretations?: Record<string, string>;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const occupants: Record<
     number,
     Array<{ key: string; label: string; symbol: string }>

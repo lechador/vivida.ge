@@ -23,7 +23,7 @@ export function WeeklyForecastLocked({
   balance: number;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);
 

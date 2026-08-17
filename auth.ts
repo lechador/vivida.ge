@@ -14,7 +14,7 @@ import {
   countryCodeFromHeaders,
   setResidenceCountryIfMissing,
 } from "@/lib/residence";
-import { isEnglishHost } from "@/lib/seo/locales";
+import { getSignupLocale } from "@/lib/i18n/request-locale";
 
 /**
  * Credentials provider for the email/password login flow. Lives in
@@ -131,13 +131,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // every email/push reads that column, not the host. Guarded on the default
       // so a later /account choice is never overwritten.
       try {
-        const requestHeaders = await headers();
-        const host =
-          requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
-        if (isEnglishHost(host)) {
+        // getSignupLocale, not the host: Armenian is a path prefix and OAuth
+        // returns to a shared callback, so the host reports "English" for an
+        // Armenian sign-up. The vivida_lang cookie is what survives the round
+        // trip through Google.
+        const signupLocale = await getSignupLocale();
+        if (signupLocale !== "ka") {
           await db
             .update(users)
-            .set({ interfaceLanguage: "en" })
+            .set({ interfaceLanguage: signupLocale })
             .where(
               and(eq(users.id, user.id), eq(users.interfaceLanguage, "ka")),
             );

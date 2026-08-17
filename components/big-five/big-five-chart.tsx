@@ -8,7 +8,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * BigFiveDetail (gated).
  */
 export function BigFiveChart({ result, locale = "ka" }: { result: BigFiveResult; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const points: RadarPoint[] = result.traits.map((t) => ({
     key: t.key,
     label: en ? t.nameEn : t.nameKa,

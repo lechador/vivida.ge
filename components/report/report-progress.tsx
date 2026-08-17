@@ -41,7 +41,7 @@ export function ReportProgress({
   initialStatus: Status;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const stageMessages = en ? STAGE_MESSAGES_EN : STAGE_MESSAGES;
   const [status, setStatus] = useState<Status>(initialStatus);
   const [error, setError] = useState<string | null>(null);

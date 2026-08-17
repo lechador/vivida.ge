@@ -35,7 +35,7 @@ export function BigThreeCard({
   interpretation?: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const sign = signByIndex(point.signIndex);
   const color = signColor(sign);
 

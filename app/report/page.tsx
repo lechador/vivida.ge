@@ -35,7 +35,7 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
     db.select({ locale: users.interfaceLanguage }).from(users).where(eq(users.id, user.id)).limit(1),
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userPrefs?.locale));
-  const en = locale === "en";
+  const en = locale !== "ka";
   const showUkOffer = offer === "uk" && !(await isPremiumUser(user.id));
 
   if (!profile?.dateOfBirth) {

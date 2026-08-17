@@ -19,7 +19,7 @@ export function ResidenceCard({
   initialCity: string | null;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const options = useMemo(() => countryOptions(locale), [locale]);
   const [countryCode, setCountryCode] = useState(initialCountryCode ?? "");
   const [city, setCity] = useState(initialCity ?? "");

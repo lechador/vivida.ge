@@ -17,7 +17,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * against double-submit (React strict-mode / re-renders) with a ref.
  */
 export function MbtiClaimRunner({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const router = useRouter();
   const started = useRef(false);
   const [error, setError] = useState<string | null>(null);

@@ -45,7 +45,7 @@ export function PostActions({
   onToggleComments: () => void;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [counts, setCounts] = useState<FeedReactionCounts>(initialCounts);
   const [mine, setMine] = useState<PostReactionKind | null>(initialMine);
   const [pickerOpen, setPickerOpen] = useState(false);

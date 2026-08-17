@@ -15,7 +15,7 @@ export default async function ResetPasswordPage({
 }) {
   const { token } = await searchParams;
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <AuthLayout
       locale={locale}

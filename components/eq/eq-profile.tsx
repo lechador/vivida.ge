@@ -17,7 +17,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * so it renders on the saved page and (blurred) on the anonymous teaser.
  */
 export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const top = result.domains.find((d) => d.key === result.topKey)!;
   const low = result.domains.find((d) => d.key === result.lowKey)!;
 

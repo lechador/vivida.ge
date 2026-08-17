@@ -96,7 +96,7 @@ export async function generateMetadata({
 }: {
   searchParams: Promise<{ big?: string }>;
 }): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   const sp = await searchParams;
   const big = typeof sp.big === "string" ? sp.big : "";
   const idxs = big.split(".").map((s) => parseInt(s, 10));

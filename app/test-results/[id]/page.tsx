@@ -24,7 +24,7 @@ import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return { title: en ? "Your Astro-MBTI result" : "Astro-MBTI შედეგი" };
 }
 export const dynamic = "force-dynamic";
@@ -40,7 +40,7 @@ export default async function TestResultPage({
 }) {
   const { id } = await params;
   const [user, locale] = await Promise.all([requireUser(), getRequestLocale()]);
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   const [result] = await db
     .select()

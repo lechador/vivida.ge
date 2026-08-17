@@ -26,7 +26,7 @@ export function PeopleList({
   initialCursor: string | null;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [people, setPeople] = useState<PersonRow[]>(initial);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [query, setQuery] = useState("");

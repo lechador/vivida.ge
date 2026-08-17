@@ -50,7 +50,7 @@ const REACTION_LABEL_EN: Record<string, string> = {
 };
 
 function notificationLabel(kind: string, payload: Notification["payload"], locale: UserLocale): string {
-  const en = locale === "en";
+  const en = locale !== "ka";
   if (kind === "post_reaction" && payload?.reaction) {
     return (en ? REACTION_LABEL_EN : REACTION_LABEL_KA)[payload.reaction] ?? (en ? "reacted to your post" : "გამოეხმაურა შენს პოსტს");
   }
@@ -97,7 +97,7 @@ type MessageNotif = {
 };
 
 function timeAgo(date: Date, locale: UserLocale): string {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
   if (seconds < 60) return en ? "just now" : "ახლახან";
   const minutes = Math.floor(seconds / 60);
@@ -122,7 +122,7 @@ export function NotificationsDropdown({
   locale?: UserLocale;
 }) {
   const router = useRouter();
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [items, setItems] = useState(initial);
   const [unread, setUnread] = useState(initialUnread);
   const [msgNotifs, setMsgNotifs] = useState<MessageNotif[]>([]);
@@ -287,7 +287,7 @@ function CreditNotificationRow({
   onClose: () => void;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const amount = n.payload?.creditAmount ?? 0;
   const earned = amount >= 0;
   const reason = n.payload?.creditReason as CreditReason | undefined;

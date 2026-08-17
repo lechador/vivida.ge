@@ -8,7 +8,7 @@ import { EqResultClient } from "@/components/eq/eq-result";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return {
     title: en ? "Your EQ Result" : "შენი EQ შედეგი",
     description: en ? "Your emotional intelligence score and five-domain emotional profile." : "შენი ემოციური ინტელექტის ტესტის შედეგი — EQ ქულა და ემოციური რუკა ხუთ სფეროში.",

@@ -32,7 +32,7 @@ export function ReportDialog({
   targetId: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [reason, setReason] = useState("");
   const [done, setDone] = useState(false);
   const [pending, start] = useTransition();

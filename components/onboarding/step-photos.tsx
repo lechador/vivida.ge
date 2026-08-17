@@ -12,7 +12,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * back out / skip without leaving orphans.
  */
 export function StepPhotos({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="space-y-5">
       <header className="space-y-1.5 text-center">

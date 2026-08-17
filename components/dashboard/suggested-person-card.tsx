@@ -12,7 +12,7 @@ import type { DiscoverCard } from "@/lib/discover";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function SuggestedPersonCard({ person, locale = "ka" }: { person: DiscoverCard; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();

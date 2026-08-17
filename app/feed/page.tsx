@@ -52,7 +52,7 @@ export default async function FeedPage() {
       : Promise.resolve([] as Awaited<ReturnType<typeof getDashboardSuggestions>>),
     getUserLocale(user.id),
   ]);
-  const en = locale === "en";
+  const en = locale !== "ka";
   const viewerIsAdmin = isAdminEmail(user.email);
   const viewerSunSign = sunSignFromDob(viewerProfile?.dateOfBirth ?? null);
   const viewerAvatar = headerData.avatarUrl ?? user.image ?? null;

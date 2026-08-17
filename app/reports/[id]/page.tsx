@@ -32,7 +32,7 @@ export default async function ReportStatusPage({
     db.select().from(pdfReports).where(eq(pdfReports.id, id)).limit(1),
     getUserLocale(user.id),
   ]);
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   if (!report || report.userId !== user.id) notFound();
 

@@ -97,7 +97,7 @@ export function SynastryDisplay({
   interpretations?: Record<string, string>;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const verdict = en
     ? overallVerdictEn(result.overall)
     : overallVerdict(result.overall);
@@ -347,7 +347,7 @@ function AspectRow({
   onSelect: () => void;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const valence = aspectValence(aspect.kind);
   const accent =
     valence === "harmonious"
@@ -432,7 +432,7 @@ function ValenceColumn({
   onSelect: (a: SynastryAspect) => void;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <article
       className="relative overflow-hidden rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl"
@@ -509,7 +509,7 @@ function OverlaySection({
   interpretations: Record<string, string>;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <section>
       <header className="mb-4">
@@ -604,7 +604,7 @@ function AspectDialog({
   }
 
   const breakdown = aspectBreakdown(aspect, locale);
-  const en = locale === "en";
+  const en = locale !== "ka";
   const valence = aspectValence(aspect.kind);
   const accent =
     valence === "harmonious"
@@ -786,7 +786,7 @@ function ElementPairing({
   moonB: ChartElement;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
       <ElementChip a={sunA} b={sunB} label={en ? "Sun" : "მზე"} locale={locale} />
@@ -806,7 +806,7 @@ function ElementChip({
   label: string;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const same = a === b;
   const compatible =
     (a === "fire" && b === "air") ||
@@ -843,7 +843,7 @@ function ScoreBreakdown({
   breakdown: SynastryResult["breakdown"];
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const total =
     Math.abs(breakdown.aspectPoints) +
     Math.abs(breakdown.housePoints) +

@@ -21,7 +21,7 @@ export async function ReportPdfPanel({
   userId: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [report] = await db
     .select()
     .from(pdfReports)

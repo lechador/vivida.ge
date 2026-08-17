@@ -59,7 +59,7 @@ export function DailyCard({
   onRead?: () => void;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const readSentinelRef = useRef<HTMLParagraphElement>(null);
   const readTrackedRef = useRef(false);
 

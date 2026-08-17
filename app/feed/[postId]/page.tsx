@@ -34,7 +34,7 @@ export default async function PostThreadPage({
     getPostForViewer(user.id, postId),
     getUserLocale(user.id),
   ]);
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   if (!post) notFound();
 

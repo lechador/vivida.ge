@@ -29,7 +29,7 @@ export function CompatibilityRow({
   rank: number;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const displayName =
     u.displayName ?? u.name?.split(" ")[0] ?? u.username ?? "user";
   const profileHref = u.username ? `/u/${u.username}` : null;

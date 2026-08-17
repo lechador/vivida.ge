@@ -68,7 +68,7 @@ export default async function AccountPage() {
   // Same avatar resolution as the navbar so they never disagree.
   const accountAvatar = headerData.avatarUrl ?? user.image ?? null;
   const locale = await getRequestLocale(normalizeUserLocale(emailPrefs?.locale));
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   return (
     <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">

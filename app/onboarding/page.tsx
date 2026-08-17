@@ -29,7 +29,7 @@ export default async function OnboardingPage({
 }) {
   const user = await requireUser();
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   const { next, fast } = await searchParams;
 
   const [existing] = await db

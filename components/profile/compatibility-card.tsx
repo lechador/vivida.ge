@@ -54,7 +54,7 @@ export function CompatibilityCard({
   verdict,
   locale = "ka",
 }: CompatibilityCardProps) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const overall = Math.round(result.overall);
 
   return (

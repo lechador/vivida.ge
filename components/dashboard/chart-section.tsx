@@ -36,7 +36,7 @@ export async function ChartSection({
   userId: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const chart = await ensureChartFor(userId);
 
   if (!chart) {

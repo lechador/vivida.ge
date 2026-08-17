@@ -12,6 +12,7 @@ import {
 } from "@/lib/i18n/armenian-routes";
 import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 import { localeForHost } from "@/lib/i18n/request-locale";
+import { usesEnglishCopy } from "@/lib/i18n/locale";
 import { articleLd } from "@/lib/seo/jsonld";
 import {
   creditPacksForCountry,
@@ -247,5 +248,14 @@ describe("locale precedence on the international host", () => {
     expect(localeForHost(KA_HOST, "en")).toBe("en");
     expect(localeForHost(KA_HOST, "am")).toBe("am");
     expect(localeForHost(KA_HOST, null)).toBe("ka");
+  });
+});
+
+describe("Armenian falls back to English, never Georgian", () => {
+  it("treats Armenian as an English-copy locale on untranslated surfaces", () => {
+    // The `const en = locale !== "ka"` idiom applied across 121 files.
+    expect(usesEnglishCopy("en")).toBe(true);
+    expect(usesEnglishCopy("am")).toBe(true);
+    expect(usesEnglishCopy("ka")).toBe(false);
   });
 });

@@ -25,7 +25,7 @@ export function PhotoCarousel({
   photos: Photo[];
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [index, setIndex] = useState(0);
   const total = photos.length;
 
@@ -154,7 +154,7 @@ function SwipeZones({
   total: number;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   // Touch swipe state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 

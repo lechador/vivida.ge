@@ -23,7 +23,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * `next=/pirovnebis-testi/claim` so the user returns here and auto-generates after auth.
  */
 export function MbtiGate({ questions, locale = "ka" }: { questions: MbtiQuestion[]; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [result, setResult] = useState<MbtiResult | null>(null);
   const [noAnswers, setNoAnswers] = useState(false);
 

@@ -14,13 +14,13 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return { title: en ? "Compatibility" : "თავსებადობა" };
 }
 
 export default async function SynastryPage() {
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   const user = await requireUser();
   const [partners, used] = await Promise.all([
     listPartners(user.id),
@@ -111,7 +111,7 @@ function EmptyState({
   canAdd: boolean;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="rounded-2xl border border-border/60 bg-card/50 p-10 text-center backdrop-blur-xl">
       <Heart

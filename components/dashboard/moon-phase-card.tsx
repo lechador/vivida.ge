@@ -20,7 +20,7 @@ export function MoonPhaseCard({
   onRead?: () => void;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const { snapshot } = data;
   const sign = signByIndex(snapshot.signIndex);
   const illumPct = Math.round(snapshot.illumination * 100);

@@ -60,7 +60,7 @@ const ROWS_EN: EarnRow[] = [
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function CreditEarnInfo({ locale }: { locale: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const rows = en ? ROWS_EN : ROWS_KA;
   return (
     <div className="rounded-3xl border border-[var(--vivida-cyan)]/30 bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">

@@ -26,7 +26,7 @@ export function VisibilityCard({
   defaultName: string | null;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [username, setUsername] = useState(
     initial.username ?? suggestUsername(defaultName)
   );

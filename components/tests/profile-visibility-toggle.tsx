@@ -18,7 +18,7 @@ export function ProfileVisibilityToggle({
   kind: "mbti" | "iq" | "eq" | "big-five";
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [on, setOn] = useState<boolean | null>(null); // null = loading/hidden
   const [saving, setSaving] = useState(false);
 

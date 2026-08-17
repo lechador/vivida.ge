@@ -21,7 +21,7 @@ import { enforceAuthRateLimit } from "@/lib/rate-limit";
 import { ApiError } from "@/lib/api/errors";
 import { TURNSTILE_ERROR_KA, verifyTurnstile } from "@/lib/turnstile";
 import { siteOriginForHost } from "@/lib/seo/locales";
-import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { getRequestLocale, getSignupLocale } from "@/lib/i18n/request-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { countryCodeFromHeaders } from "@/lib/residence";
 
@@ -68,7 +68,9 @@ export async function signOutAction() {
 const TURNSTILE_ERROR_EN = "We could not verify that you are human. Please try again.";
 
 function localized(locale: UserLocale, ka: string, en: string): string {
-  return locale === "en" ? en : ka;
+  // Georgian for Georgian, English for everyone else. Testing `=== "en"` sent
+  // Armenian users Georgian error text, which is the least useful of the two.
+  return locale === "ka" ? ka : en;
 }
 
 // ─── Localized copy for core error codes ─────────────────────────────────
@@ -117,13 +119,15 @@ export type SignUpResult = { ok: true } | { ok: false; error: string };
 export async function signUpWithEmail(
   input: SignUpInput
 ): Promise<SignUpResult> {
-  const locale = await getRequestLocale();
+  // Sign-up runs on the shared, unprefixed /signup route, so the host cannot
+  // tell an Armenian visitor from an English one — see getSignupLocale.
+  const locale = await getSignupLocale();
   // Bot gate first — fast path before we touch the DB or hash anything.
   const human = await verifyTurnstile(input.turnstileToken);
   if (!human) {
     return {
       ok: false,
-      error: locale === "en" ? TURNSTILE_ERROR_EN : TURNSTILE_ERROR_KA,
+      error: locale === "ka" ? TURNSTILE_ERROR_KA : TURNSTILE_ERROR_EN,
     };
   }
 

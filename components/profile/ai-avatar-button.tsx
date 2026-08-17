@@ -20,7 +20,7 @@ const ERRORS: Record<string, string> = {
  * the main avatar) and refreshes so the carousel/header update in place.
  */
 export function AiAvatarButton({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

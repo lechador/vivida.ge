@@ -98,7 +98,7 @@ export function SynastryDeepReport({
   initial: SynastryDeepReportJson | null;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const messages = en ? GEN_MESSAGES_EN : GEN_MESSAGES;
   const sections = en ? SECTIONS_EN : SECTIONS;
   const [report, setReport] = useState<SynastryDeepReportJson | null>(initial);

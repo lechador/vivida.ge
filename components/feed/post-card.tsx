@@ -66,7 +66,7 @@ export function PostCard({
   mode?: "feed" | "detail";
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editing, setEditing] = useState(false);

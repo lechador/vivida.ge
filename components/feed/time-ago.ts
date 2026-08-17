@@ -10,7 +10,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * snapshot is taken at module load.
  */
 export function feedTimeAgo(date: Date | string, locale: UserLocale = "ka"): string {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const ts = typeof date === "string" ? new Date(date) : date;
   const seconds = Math.floor((Date.now() - ts.getTime()) / 1000);
   if (seconds < 45) return en ? "just now" : "ახლახან";

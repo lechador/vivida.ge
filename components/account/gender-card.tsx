@@ -11,7 +11,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * the discoverability toggle. Only used for aggregate audience analytics.
  */
 export function GenderCard({ initial, locale = "ka" }: { initial: "male" | "female" | null; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [value, setValue] = useState(initial);
   const [pending, startTransition] = useTransition();
 

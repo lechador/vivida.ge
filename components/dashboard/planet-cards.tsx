@@ -27,7 +27,7 @@ export function PlanetCards({
   interpretations?: Record<string, string>;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
       {PLANETS_TO_SHOW.map((key) => {

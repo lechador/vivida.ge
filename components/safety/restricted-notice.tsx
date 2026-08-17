@@ -7,7 +7,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * limited, what still works, and that access opens automatically at 18.
  */
 export function RestrictedNotice({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="mb-6 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 sm:p-5">
       <div className="flex items-start gap-3">

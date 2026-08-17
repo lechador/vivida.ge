@@ -21,7 +21,7 @@ export function AstroGate({
   next?: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const href = next ? `/onboarding?next=${encodeURIComponent(next)}` : "/onboarding";
   return (
     <div className="mx-auto max-w-lg overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">

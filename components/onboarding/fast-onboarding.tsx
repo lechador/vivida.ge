@@ -12,7 +12,7 @@ import { readPendingNatalProfile } from "@/lib/pending-natal-profile";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function FastOnboarding({ next, locale }: { next?: string; locale: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [missing, setMissing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();

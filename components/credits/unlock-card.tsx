@@ -31,7 +31,7 @@ export function UnlockCard({
   blurb?: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);

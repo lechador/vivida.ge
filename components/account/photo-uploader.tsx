@@ -32,7 +32,7 @@ export function PhotoUploader({
   initial: ServerPhoto[];
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [photos, setPhotos] = useState<ServerPhoto[]>(initial);
   const [pending, setPending] = useState<PendingUpload[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -399,7 +399,7 @@ function PhotoTile({
   onPromote: (() => void) | null;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-border ring-1 ring-foreground/5">
       <Image
@@ -529,7 +529,7 @@ async function decodeViaImg(file: File): Promise<ImageBitmap> {
 }
 
 function errorToMessage(code: string | undefined, locale: UserLocale): string {
-  const en = locale === "en";
+  const en = locale !== "ka";
   switch (code) {
     case "limit_reached":
       return en ? "You already have the maximum of 6 photos" : "მაქსიმალური 6 ფოტო უკვე გყავს";

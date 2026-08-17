@@ -32,7 +32,7 @@ export function CreditBalanceMenu({
 }) {
   const [pending, setPending] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
-  const en = locale === "en";
+  const en = locale !== "ka";
   const packs = creditPacksForCountry(countryCode);
 
   if (isPremium) {

@@ -24,7 +24,7 @@ const ACCENTS: Record<string, string> = {
 
 /** Compact dashboard cross-sell: one relevant unfinished test, never a grid. */
 export function DashboardTestPromo({ test, allCompleted, locale = "ka" }: { test: TestCatalogEntry; allCompleted: boolean; locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const Icon = ICONS[test.slug] ?? Sparkles;
   const accent = ACCENTS[test.slug] ?? "var(--vivida-violet)";
 

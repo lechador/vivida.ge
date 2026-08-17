@@ -25,7 +25,7 @@ const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
  * inline if their account is unverified.
  */
 export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const params = useSearchParams();
   const router = useRouter();
   const verified = params.get("verified") === "1";

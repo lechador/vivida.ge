@@ -19,7 +19,7 @@ import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata() {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return { title: en ? "Your IQ Result" : "შენი IQ შედეგი", robots: { index: false } };
 }
 export const dynamic = "force-dynamic";
@@ -39,7 +39,7 @@ export default async function SavedIqResultPage({
   const { id } = await params;
   const user = await requireUser();
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   const [row] = await db
     .select()

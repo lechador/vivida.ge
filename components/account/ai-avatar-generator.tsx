@@ -34,7 +34,7 @@ export function AiAvatarGenerator({
   initialAvatar: string | null;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

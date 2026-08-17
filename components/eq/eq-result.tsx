@@ -26,7 +26,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
 
@@ -196,7 +196,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
 }
 
 function ShareButton({ overall, locale }: { overall: number; locale: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [copied, setCopied] = useState(false);
   async function share() {
     const url = en ? "https://www.vividaastro.com/eq-testi" : "https://www.vivida.ge/eq-testi";

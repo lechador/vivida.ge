@@ -23,7 +23,7 @@ type Result = {
  * with arrow keys + Enter to navigate to the highlighted result.
  */
 export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [open, setOpen] = useState(false);

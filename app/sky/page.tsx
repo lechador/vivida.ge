@@ -44,7 +44,7 @@ const ASPECT_TONE: Record<string, string> = {
 export default async function SkyPage() {
   const user = await requireUser();
   const locale = await getUserLocale(user.id);
-  const en = locale === "en";
+  const en = locale !== "ka";
   // Positions only — never wait on (or trigger) chart AI here.
   const chart = await ensureChartFor(user.id, { aiUpgrade: "skip" });
   if (!chart)

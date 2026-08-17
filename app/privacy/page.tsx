@@ -8,7 +8,7 @@ import { LEGAL_ENTITY } from "@/lib/legal-entity";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   return {
     title: en ? "Privacy Policy" : "კონფიდენციალურობა",
     description: en

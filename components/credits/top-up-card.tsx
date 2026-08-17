@@ -25,7 +25,7 @@ export function TopUpCard({
   locale: UserLocale;
   countryCode?: string | null;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const packs = creditPacksForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
 

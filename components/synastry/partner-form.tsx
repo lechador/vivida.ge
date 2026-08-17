@@ -26,7 +26,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * multi-step ceremony isn't appropriate here.
  */
 export function PartnerForm({ locale }: { locale: UserLocale }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const router = useRouter();
   const [name, setName] = useState("");
   const [date, setDate] = useState<DateValue>({ day: "", month: "", year: "" });
@@ -266,7 +266,7 @@ function PlaceField({
   onChange: (next: PlaceValue) => void;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [query, setQuery] = useState(value?.displayName ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);

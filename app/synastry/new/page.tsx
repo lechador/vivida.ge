@@ -12,13 +12,13 @@ import { PartnerForm } from "@/components/synastry/partner-form";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return { title: en ? "Add a partner" : "ახალი პარტნიორი" };
 }
 
 export default async function NewPartnerPage() {
   const locale = await getRequestLocale();
-  const en = locale === "en";
+  const en = locale !== "ka";
   const user = await requireUser();
   // Server-side cap check — keeps unauthorised users from bypassing the
   // client-side disabled CTA.

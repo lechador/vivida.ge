@@ -35,7 +35,7 @@ export function SafetyMenu({
   align?: "end" | "start";
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const router = useRouter();
   const [reportOpen, setReportOpen] = useState(false);
   const [confirmBlock, setConfirmBlock] = useState(false);

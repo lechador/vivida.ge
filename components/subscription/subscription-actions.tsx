@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function SubscriptionActions({ locale, active, cancelAtPeriodEnd, hasCustomer }: { locale: UserLocale; active: boolean; cancelAtPeriodEnd: boolean; hasCustomer: boolean }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const router = useRouter();
   const [pending, setPending] = useState<"cancel" | "resume" | "portal" | null>(null);
   const [error, setError] = useState(false);

@@ -22,7 +22,7 @@ import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return { title: en ? "Credits" : "კრედიტები", robots: { index: false } };
 }
 export const dynamic = "force-dynamic";
@@ -42,7 +42,7 @@ export default async function CreditsPage() {
   // the stored preference is the only way an Armenian user stays in Armenian
   // once signed in.
   const locale = await getUserLocale(user.id);
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [balance, ref, storedIdentity, premium] = await Promise.all([
     getBalance(user.id),
     getReferralStats(user.id),

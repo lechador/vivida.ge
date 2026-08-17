@@ -62,7 +62,7 @@ export function AspectCards({
   interpretations?: Record<string, string>;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [openKey, setOpenKey] = useState<string | null>(null);
   const aspects = chart.aspects ?? [];
 

@@ -115,7 +115,7 @@ export function ChatLauncher({
   initialPartnerId = null,
   locale = "ka",
 }: Props) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   // In "page" mode the panel is always considered open — the route is
   // the panel. In other modes it's a togglable surface.
   const [open, setOpen] = useState(mode === "page");
@@ -653,7 +653,7 @@ function ConversationList({
   onClose: (() => void) | null;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   return (
     <>
       <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
@@ -805,7 +805,7 @@ function ChatView({
   onTyping: () => void;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
@@ -1072,7 +1072,7 @@ function TypingBubble({ partner }: { partner: ChatPartner }) {
 }
 
 function timeAgo(date: Date | string, locale: UserLocale): string {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const d = new Date(date);
   const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
   if (seconds < 60) return en ? "now" : "ახლა";

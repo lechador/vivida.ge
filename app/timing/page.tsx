@@ -32,7 +32,7 @@ const FAMILY_COLOR: Record<string, string> = {
 export default async function TimingPage() {
   const user = await requireUser();
   const locale = await getUserLocale(user.id);
-  const en = locale === "en";
+  const en = locale !== "ka";
 
   const [[chart], [profile]] = await Promise.all([
     db.select({ data: charts.data }).from(charts).where(eq(charts.userId, user.id)).limit(1),

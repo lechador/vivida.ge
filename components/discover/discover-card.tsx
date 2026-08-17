@@ -27,7 +27,7 @@ export function DiscoverCard({
   card: Card;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const accent = ELEMENT_HEX[card.sunElement];
   const heroSrc = card.photoUrl ?? card.image;
 
