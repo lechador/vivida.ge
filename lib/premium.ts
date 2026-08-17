@@ -42,6 +42,10 @@ export async function getBillingIdentity(userId: string) {
       stripeCustomerId: users.stripeCustomerId,
       isPremium: users.isPremium,
       premiumUntil: users.premiumUntil,
+      // Checkout reads this to write the Stripe line item in the buyer's
+      // language. Carried on the row the billing routes already fetch, so
+      // they don't have to import the db-backed getUserLocale.
+      interfaceLanguage: users.interfaceLanguage,
     })
     .from(users)
     .where(eq(users.id, userId))

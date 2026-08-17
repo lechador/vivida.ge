@@ -29,8 +29,13 @@ export async function POST(req: Request) {
   if (!pack) return NextResponse.json({ error: "bad_pack" }, { status: 400 });
 
   const origin = new URL(req.url).origin;
+  // Host alone cannot see Armenian — it is a path prefix, and this route is
+  // POSTed from an authed surface that has none. The stored preference rides
+  // on the billing row already fetched above, so Armenian reaches the Stripe
+  // Checkout page without a second query.
   const locale = localeForHost(
     req.headers.get("x-forwarded-host") ?? new URL(req.url).host,
+    billingUser?.interfaceLanguage,
   );
   try {
     const tracking = checkoutTrackingFromRequest(req);

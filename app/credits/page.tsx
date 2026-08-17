@@ -12,6 +12,7 @@ import { InviteCard } from "@/components/invite/invite-card";
 import { TopUpCard } from "@/components/credits/top-up-card";
 import { CreditEarnInfo } from "@/components/credits/earn-info";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 import { premiumPlanForCountry } from "@/lib/billing-config";
@@ -36,9 +37,12 @@ const SITE_URL: Record<UserLocale, string> = {
  * Credits hub — balance, the invite/earn loop, and (Phase 3) Stripe top-up.
  */
 export default async function CreditsPage() {
-  const locale = await getRequestLocale();
-  const en = locale === "en";
   const user = await requireUser();
+  // getUserLocale, not getRequestLocale: this surface has no `/am` prefix, so
+  // the stored preference is the only way an Armenian user stays in Armenian
+  // once signed in.
+  const locale = await getUserLocale(user.id);
+  const en = locale === "en";
   const [balance, ref, storedIdentity, premium] = await Promise.all([
     getBalance(user.id),
     getReferralStats(user.id),

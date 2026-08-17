@@ -15,6 +15,40 @@ export const ARMENIAN_PREFIX = "/am";
 export const LOCALE_HEADER = "x-vivida-locale";
 
 /**
+ * Marks that this browser has already been placed in a language space.
+ *
+ * Set both when the geo redirect fires and when an Armenian page is served, so
+ * the redirect happens at most once. Without the second case, an Armenian
+ * visitor arriving on `/am` straight from a search result would be bounced
+ * back to `/am` the moment they used the language switcher to reach English.
+ */
+export const LOCALE_CHOICE_COOKIE = "vivida_lang";
+
+/**
+ * Crawlers must never be geo-redirected — an index built from redirects is an
+ * index of the wrong URLs, and Google does crawl from outside the US.
+ */
+const CRAWLER_UA =
+  /bot|crawler|spider|crawling|slurp|mediapartners|facebookexternalhit|embedly|quora link preview|showyoubot|outbrain|pinterest|vkshare|w3c_validator|gptbot|claudebot|perplexity|ccbot|applebot/i;
+
+export function isCrawler(userAgent: string | null | undefined): boolean {
+  return !!userAgent && CRAWLER_UA.test(userAgent);
+}
+
+/**
+ * Viewer country from the edge geo headers, uppercased ISO alpha-2.
+ *
+ * Deliberately not reusing `lib/residence.ts` — that module imports the db and
+ * cannot run in the proxy's edge runtime.
+ */
+export function countryFromGeoHeaders(headers: Headers): string | null {
+  const raw =
+    headers.get("x-vercel-ip-country") ?? headers.get("cf-ipcountry");
+  const code = raw?.trim().toUpperCase();
+  return code && /^[A-Z]{2}$/.test(code) ? code : null;
+}
+
+/**
  * The routes served by real files under `app/am/**`, mirroring `app/en/**`.
  *
  * These keep English slugs (`/natal-chart`, not `/nataluri-ruka`) exactly as

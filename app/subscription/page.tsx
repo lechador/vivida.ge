@@ -11,6 +11,7 @@ import { formatBillingAmount, premiumPlanForCountry } from "@/lib/billing-config
 import { getBillingIdentity, getPremiumSubscription, isPremiumUser } from "@/lib/premium";
 import { countryCodeFromHeaders, countryDisplayName, setResidenceCountryIfMissing } from "@/lib/residence";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
 
@@ -23,7 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SubscriptionPage() {
   const user = await requireUser();
-  const locale = await getRequestLocale();
+  // See app/credits/page.tsx — authed surfaces carry no `/am` prefix, so the
+  // stored preference is what keeps an Armenian user in Armenian.
+  const locale = await getUserLocale(user.id);
   const en = locale === "en";
   let identity = await getBillingIdentity(user.id);
   if (!identity) throw new Error("Billing identity not found");

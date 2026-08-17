@@ -2,13 +2,16 @@ import { describe, expect, it } from "vitest";
 
 import {
   ARMENIAN_PREFIX,
+  countryFromGeoHeaders,
   hasArmenianVersion,
+  isCrawler,
   isArmenianCoreRoute,
   localeHref,
   stripArmenianPrefix,
   withArmenianPrefix,
 } from "@/lib/i18n/armenian-routes";
 import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { localeForHost } from "@/lib/i18n/request-locale";
 import { articleLd } from "@/lib/seo/jsonld";
 import {
   creditPacksForCountry,
@@ -172,5 +175,77 @@ describe("JSON-LD inLanguage for Armenian URLs", () => {
         description: "Desc",
       }).inLanguage,
     ).toBe("ka-GE");
+  });
+});
+
+describe("geo-redirect guards", () => {
+  it("reads the viewer country from either edge geo header", () => {
+    expect(
+      countryFromGeoHeaders(new Headers({ "x-vercel-ip-country": "am" })),
+    ).toBe("AM");
+    expect(countryFromGeoHeaders(new Headers({ "cf-ipcountry": "AM" }))).toBe(
+      "AM",
+    );
+    expect(countryFromGeoHeaders(new Headers())).toBeNull();
+    // Vercel sends XX when it cannot resolve the IP.
+    expect(
+      countryFromGeoHeaders(new Headers({ "x-vercel-ip-country": "" })),
+    ).toBeNull();
+  });
+
+  it("never redirects a crawler, so the index is built from real URLs", () => {
+    for (const ua of [
+      "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+      "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)",
+      "Mozilla/5.0 (compatible; YandexBot/3.0)",
+      "facebookexternalhit/1.1",
+      "GPTBot/1.0",
+    ]) {
+      expect(isCrawler(ua)).toBe(true);
+    }
+    expect(
+      isCrawler(
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+          "(KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+      ),
+    ).toBe(false);
+    expect(isCrawler(null)).toBe(false);
+  });
+
+  it("only targets paths that have an Armenian page, never the authed app", () => {
+    // The redirect is gated on hasArmenianVersion, so these can never be hit.
+    expect(hasArmenianVersion("/dashboard")).toBe(false);
+    expect(hasArmenianVersion("/credits")).toBe(false);
+    expect(hasArmenianVersion("/account")).toBe(false);
+    expect(hasArmenianVersion("/api/credits/checkout")).toBe(false);
+    // …while the public entry points are eligible.
+    expect(hasArmenianVersion("/")).toBe(true);
+    expect(hasArmenianVersion("/zodiac/virgo")).toBe(true);
+  });
+});
+
+describe("locale precedence on the international host", () => {
+  const EN_HOST = "www.vividaastro.com";
+  const KA_HOST = "www.vivida.ge";
+
+  it("lets a stored Armenian preference through, since /am owns no host", () => {
+    expect(localeForHost(EN_HOST, "am")).toBe("am");
+    expect(localeForHost(EN_HOST, "hy")).toBe("am");
+  });
+
+  it("never lets a stored Georgian preference hijack the English domain", () => {
+    // Every user defaults to "ka", so honouring it here would serve Georgian
+    // to the entire international audience.
+    expect(localeForHost(EN_HOST, "ka")).toBe("en");
+    expect(localeForHost(EN_HOST, null)).toBe("en");
+    expect(localeForHost(EN_HOST, undefined)).toBe("en");
+    expect(localeForHost(EN_HOST, "nonsense")).toBe("en");
+  });
+
+  it("leaves the Georgian host resolving exactly as before", () => {
+    expect(localeForHost(KA_HOST, "ka")).toBe("ka");
+    expect(localeForHost(KA_HOST, "en")).toBe("en");
+    expect(localeForHost(KA_HOST, "am")).toBe("am");
+    expect(localeForHost(KA_HOST, null)).toBe("ka");
   });
 });
