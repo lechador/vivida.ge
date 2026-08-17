@@ -161,7 +161,7 @@ export async function AppHeader({
           </>
         ) : (
           <Button asChild variant="ghost">
-            <Link href="/login">{locale === "en" ? "Sign in" : "შესვლა"}</Link>
+            <Link href="/login">{locale !== "ka" ? "Sign in" : "შესვლა"}</Link>
           </Button>
         )}
       </div>

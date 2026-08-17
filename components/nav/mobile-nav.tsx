@@ -29,7 +29,7 @@ export function MobileNav({
       <DialogPrimitive.Trigger asChild>
         <button
           type="button"
-          aria-label={locale === "en" ? "Menu" : "მენიუ"}
+          aria-label={locale !== "ka" ? "Menu" : "მენიუ"}
           className="grid size-11 shrink-0 place-items-center rounded-full text-foreground/85 transition-colors hover:bg-card/60 hover:text-foreground lg:hidden"
         >
           <Menu className="size-5" />
@@ -80,7 +80,7 @@ export function MobileNav({
                     </span>
                   </Link>
                   <DialogPrimitive.Close
-                    aria-label={locale === "en" ? "Close" : "დახურვა"}
+                    aria-label={locale !== "ka" ? "Close" : "დახურვა"}
                     className="grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/60 hover:text-foreground"
                   >
                     <X className="size-5" />
@@ -89,7 +89,7 @@ export function MobileNav({
 
                 {/* For accessibility — Radix requires DialogTitle inside content. */}
                 <DialogPrimitive.Title className="sr-only">
-                  {locale === "en" ? "Navigation" : "ნავიგაცია"}
+                  {locale !== "ka" ? "Navigation" : "ნავიგაცია"}
                 </DialogPrimitive.Title>
 
                 {/* Nav items */}
@@ -147,7 +147,7 @@ export function MobileNav({
                         <span className="relative z-10">{navLabel(item, locale)}</span>
                         {item.badgeKa && (
                           <span className="relative z-10 ml-auto rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]">
-                            {locale === "en" ? item.badgeEn : item.badgeKa}
+                            {locale !== "ka" ? item.badgeEn : item.badgeKa}
                           </span>
                         )}
                       </Link>

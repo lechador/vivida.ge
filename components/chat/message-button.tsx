@@ -34,7 +34,7 @@ export function MessageButton({
         size="icon"
         className={cn("shrink-0", className)}
       >
-        <Link href={href} aria-label={locale === "en" ? "Message" : "წერილი"}>
+        <Link href={href} aria-label={locale !== "ka" ? "Message" : "წერილი"}>
           <MessageCircle className="size-4" />
         </Link>
       </Button>
@@ -45,7 +45,7 @@ export function MessageButton({
     <Button asChild variant="outline" className={cn("shrink-0", className)}>
       <Link href={href}>
         <MessageCircle className="size-4" />
-        {locale === "en" ? "Message" : "წერილი"}
+        {locale !== "ka" ? "Message" : "წერილი"}
       </Link>
     </Button>
   );

@@ -32,7 +32,7 @@ export function PartnerCard({
     e.preventDefault();
     e.stopPropagation();
     if (
-      !window.confirm(locale === "en" ? `Remove ${name}?` : `წავშალოთ ${name}?`)
+      !window.confirm(locale !== "ka" ? `Remove ${name}?` : `წავშალოთ ${name}?`)
     )
       return;
     startTransition(async () => {
@@ -68,8 +68,8 @@ export function PartnerCard({
         onClick={onDelete}
         disabled={isPending}
         className="relative grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
-        aria-label={locale === "en" ? `Remove ${name}` : `წაშლა — ${name}`}
-        title={locale === "en" ? "Remove" : "წაშლა"}
+        aria-label={locale !== "ka" ? `Remove ${name}` : `წაშლა — ${name}`}
+        title={locale !== "ka" ? "Remove" : "წაშლა"}
       >
         <Trash2 className="size-4" />
       </button>

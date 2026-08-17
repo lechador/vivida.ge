@@ -29,7 +29,7 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale === "en" ? "Account" : "ანგარიში" };
+  return { title: locale !== "ka" ? "Account" : "ანგარიში" };
 }
 export const dynamic = "force-dynamic";
 

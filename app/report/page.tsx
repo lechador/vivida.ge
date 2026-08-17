@@ -23,7 +23,7 @@ import { isPremiumUser } from "@/lib/premium";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale === "en" ? "My natal chart" : "ჩემი რუკა" };
+  return { title: locale !== "ka" ? "My natal chart" : "ჩემი რუკა" };
 }
 
 export default async function ReportPage({ searchParams }: { searchParams: Promise<{ offer?: string }> }) {

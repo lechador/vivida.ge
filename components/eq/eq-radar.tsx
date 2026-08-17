@@ -41,7 +41,7 @@ export function EqRadar({
       viewBox={`0 0 ${size} ${size}`}
       className="mx-auto h-auto w-full max-w-[340px]"
       role="img"
-      aria-label={locale === "en" ? "Emotional intelligence domain radar" : "ემოციური ინტელექტის დომენების რადარი"}
+      aria-label={locale !== "ka" ? "Emotional intelligence domain radar" : "ემოციური ინტელექტის დომენების რადარი"}
     >
       <defs>
         <linearGradient id="eq-radar-fill" x1="0" y1="0" x2="1" y2="1">
@@ -107,7 +107,7 @@ export function EqRadar({
               fontWeight={600}
               fill="oklch(0.92 0.02 290)"
             >
-              {locale === "en" ? d.nameEn : d.nameKa}
+              {locale !== "ka" ? d.nameEn : d.nameKa}
             </text>
             <text
               x={x}

@@ -32,7 +32,7 @@ export function IqBellCurve({ iq, locale = "ka" }: { iq: number; locale?: UserLo
   const ticks = [55, 70, 85, 100, 115, 130, 145];
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={locale === "en" ? `IQ ${iq} on a bell curve` : `IQ ${iq} ბელ-მრუდზე`}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={locale !== "ka" ? `IQ ${iq} on a bell curve` : `IQ ${iq} ბელ-მრუდზე`}>
       <defs>
         <linearGradient id="iq-fill" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="var(--vivida-violet)" stopOpacity="0.15" />

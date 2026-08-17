@@ -15,7 +15,7 @@ import type { Metadata } from "next";
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title:
-      (await getRequestLocale()) === "en" ? "Your report" : "შენი ანგარიში",
+      (await getRequestLocale()) !== "ka" ? "Your report" : "შენი ანგარიში",
   };
 }
 export const dynamic = "force-dynamic";

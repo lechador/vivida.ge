@@ -159,7 +159,7 @@ export function SuggestedPeopleRail({
           href="/people"
           className="text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
-          {locale === "en" ? "View all →" : "ყველა →"}
+          {locale !== "ka" ? "View all →" : "ყველა →"}
         </Link>
       </div>
 
@@ -167,7 +167,7 @@ export function SuggestedPeopleRail({
         <button
           type="button"
           onClick={() => scrollByAmount(-1)}
-          aria-label={locale === "en" ? "Previous" : "უკან"}
+          aria-label={locale !== "ka" ? "Previous" : "უკან"}
           className={cn(
             "absolute left-0 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background/90 p-2 text-foreground shadow-lg backdrop-blur transition-opacity hover:bg-background sm:flex",
             canLeft ? "opacity-100" : "pointer-events-none opacity-0"
@@ -178,7 +178,7 @@ export function SuggestedPeopleRail({
         <button
           type="button"
           onClick={() => scrollByAmount(1)}
-          aria-label={locale === "en" ? "Next" : "წინ"}
+          aria-label={locale !== "ka" ? "Next" : "წინ"}
           className={cn(
             "absolute right-0 top-1/2 z-10 hidden translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background/90 p-2 text-foreground shadow-lg backdrop-blur transition-opacity hover:bg-background sm:flex",
             canRight ? "opacity-100" : "pointer-events-none opacity-0"

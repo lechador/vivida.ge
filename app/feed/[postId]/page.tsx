@@ -13,7 +13,7 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await getRequestLocale()) === "en" ? "Post" : "პოსტი" };
+  return { title: (await getRequestLocale()) !== "ka" ? "Post" : "პოსტი" };
 }
 export const dynamic = "force-dynamic";
 

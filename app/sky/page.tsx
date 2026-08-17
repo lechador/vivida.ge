@@ -15,7 +15,7 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale === "en" ? "Live sky" : "ცოცხალი ცა" };
+  return { title: locale !== "ka" ? "Live sky" : "ცოცხალი ცა" };
 }
 
 const ASPECT_GLYPH: Record<string, string> = {

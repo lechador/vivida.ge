@@ -14,7 +14,7 @@ import { FastOnboarding } from "@/components/onboarding/fast-onboarding";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale === "en" ? "Set up your chart" : "გაცნობა" };
+  return { title: locale !== "ka" ? "Set up your chart" : "გაცნობა" };
 }
 
 /** Same-origin relative path only (no open redirect). */

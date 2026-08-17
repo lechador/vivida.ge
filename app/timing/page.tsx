@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale === "en" ? "Your best days" : "საუკეთესო დღეები" };
+  return { title: locale !== "ka" ? "Your best days" : "საუკეთესო დღეები" };
 }
 export const dynamic = "force-dynamic";
 

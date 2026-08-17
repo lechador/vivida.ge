@@ -18,7 +18,7 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale === "en" ? "Today" : "დღეს" };
+  return { title: locale !== "ka" ? "Today" : "დღეს" };
 }
 
 export default async function DashboardPage() {

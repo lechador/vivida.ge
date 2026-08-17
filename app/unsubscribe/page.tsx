@@ -14,7 +14,7 @@ import type { Metadata } from "next";
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title:
-      (await getRequestLocale()) === "en"
+      (await getRequestLocale()) !== "ka"
         ? "Unsubscribe"
         : "გამოწერის გაუქმება",
   };

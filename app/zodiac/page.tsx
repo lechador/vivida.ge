@@ -86,7 +86,7 @@ const FAQ_LD = {
 };
 
 export default async function ZodiacHubPage() {
-  if ((await getRequestLocale()) === "en") return <ZodiacHubEn />;
+  if ((await getRequestLocale()) !== "ka") return <ZodiacHubEn />;
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
       <div

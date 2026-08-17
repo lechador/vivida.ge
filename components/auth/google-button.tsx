@@ -38,10 +38,10 @@ export function GoogleButton({
     >
       <GoogleGlyph />
       {isPending
-        ? locale === "en"
+        ? locale !== "ka"
           ? "Connecting…"
           : "ვაკავშირდებით…"
-        : label ?? (locale === "en" ? "Continue with Google" : "შემოდი Google-ით")}
+        : label ?? (locale !== "ka" ? "Continue with Google" : "შემოდი Google-ით")}
     </Button>
   );
 }

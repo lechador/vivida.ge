@@ -133,7 +133,7 @@ export async function POST(req: Request) {
         if (!full) {
           controller.enqueue(
             encoder.encode(
-              locale === "en"
+              locale !== "ka"
                 ? "Sorry, I couldn't generate a response. Please try again."
                 : "ბოდიში, პასუხის გენერაცია ვერ მოხერხდა. სცადე ხელახლა.",
             )

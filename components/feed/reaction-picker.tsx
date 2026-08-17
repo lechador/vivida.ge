@@ -65,7 +65,7 @@ export function ReactionPicker({
               e.stopPropagation();
               onPick(r.kind);
             }}
-            aria-label={locale === "en" ? r.labelEn : r.labelKa}
+            aria-label={locale !== "ka" ? r.labelEn : r.labelKa}
             className="group/btn relative grid size-9 place-items-center rounded-full transition-transform hover:scale-125"
             style={
               {

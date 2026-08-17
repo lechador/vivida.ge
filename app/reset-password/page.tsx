@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale === "en" ? "New password" : "ახალი პაროლი" };
+  return { title: locale !== "ka" ? "New password" : "ახალი პაროლი" };
 }
 
 export default async function ResetPasswordPage({

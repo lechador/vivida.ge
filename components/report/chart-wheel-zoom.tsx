@@ -30,7 +30,7 @@ export function ChartWheelZoom({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label={locale === "en" ? "Enlarge chart" : "გაადიდე რუკა"}
+        aria-label={locale !== "ka" ? "Enlarge chart" : "გაადიდე რუკა"}
         className="group relative block w-full cursor-zoom-in rounded-full transition-transform hover:scale-[1.01] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--vivida-violet)]/60"
       >
         <ChartWheel chart={chart} locale={locale} />
@@ -42,7 +42,7 @@ export function ChartWheelZoom({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-[min(92vw,640px)] border-border bg-card/95 p-4 backdrop-blur-xl sm:p-6">
           <DialogTitle className="sr-only">
-            {locale === "en" ? "Natal chart" : "ნატალური რუკა"}
+            {locale !== "ka" ? "Natal chart" : "ნატალური რუკა"}
           </DialogTitle>
           <ChartWheel chart={chart} locale={locale} />
         </DialogContent>

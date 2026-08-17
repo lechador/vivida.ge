@@ -66,7 +66,7 @@ export function MessagesTabBadge({
   return (
     <span
       aria-label={
-        locale === "en"
+        locale !== "ka"
           ? `${count} new ${count === 1 ? "message" : "messages"}`
           : `${count} ახალი წერილი`
       }

@@ -13,11 +13,11 @@ import type { Metadata } from "next";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
-    title: locale === "en" ? "Sign in" : "შესვლა",
+    title: locale !== "ka" ? "Sign in" : "შესვლა",
     // Both hosts serve this path in their own language, and both were
     // indexable while self-canonicalizing — without hreflang that reads as
     // two duplicates rather than one page in two languages.
-    alternates: localizedAlternates("/login", "/login", locale === "en" ? "en" : "ka"),
+    alternates: localizedAlternates("/login", "/login", locale !== "ka" ? "en" : "ka"),
   };
 }
 

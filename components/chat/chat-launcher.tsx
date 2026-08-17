@@ -721,8 +721,8 @@ function ConversationRow({
     conv.partner.username ??
     "user";
   const preview = conv.lastMessage
-    ? `${conv.lastMessage.senderId === viewerId ? (locale === "en" ? "You: " : "შენ: ") : ""}${conv.lastMessage.body}`
-    : locale === "en" ? "No messages yet" : "ჩატი ჯერ არ დაგიწყიათ";
+    ? `${conv.lastMessage.senderId === viewerId ? (locale !== "ka" ? "You: " : "შენ: ") : ""}${conv.lastMessage.body}`
+    : locale !== "ka" ? "No messages yet" : "ჩატი ჯერ არ დაგიწყიათ";
   const isUnread = conv.unreadCount > 0;
 
   return (

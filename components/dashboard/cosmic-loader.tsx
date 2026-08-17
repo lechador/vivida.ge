@@ -66,7 +66,7 @@ function SimpleStatus({ locale }: { locale: UserLocale }) {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="mt-8 text-base text-foreground/85 sm:text-lg"
     >
-      {locale === "en" ? "Calculating the stars…" : "ვარსკვლავებს ვითვლით…"}
+      {locale !== "ka" ? "Calculating the stars…" : "ვარსკვლავებს ვითვლით…"}
     </motion.p>
   );
 }
@@ -115,7 +115,7 @@ function ProgressiveStatus({ locale }: { locale: UserLocale }) {
   }, []);
 
   // Pick the highest stage whose threshold the bar has crossed.
-  const stages = locale === "en" ? STAGES_EN : STAGES;
+  const stages = locale !== "ka" ? STAGES_EN : STAGES;
   const stage = stages.reduce(
     (best, s) => (progress / 100 >= s.at ? s : best),
     stages[0]

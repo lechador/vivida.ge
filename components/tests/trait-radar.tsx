@@ -39,7 +39,7 @@ export function TraitRadar({
       className="mx-auto h-auto w-full max-w-[360px]"
       role="img"
       aria-label={
-        locale === "en"
+        locale !== "ka"
           ? "Personality trait radar chart"
           : "პიროვნების თვისებების რადარი"
       }

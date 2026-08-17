@@ -361,7 +361,7 @@ function Block({
 }
 
 function labelForTilt(tilt: "harmonic" | "challenging" | "balanced", locale: UserLocale): string {
-  if (locale === "en") {
+  if (locale !== "ka") {
     if (tilt === "harmonic") return "supportive day";
     if (tilt === "challenging") return "challenging day";
     return "mixed day";
@@ -373,7 +373,7 @@ function labelForTilt(tilt: "harmonic" | "challenging" | "balanced", locale: Use
 
 function bodyLabel(key: string, locale: UserLocale): string {
   const body = BODIES[key];
-  return (locale === "en" ? body?.labelEn : body?.labelKa) ?? key;
+  return (locale !== "ka" ? body?.labelEn : body?.labelKa) ?? key;
 }
 
 function parseDateNum(iso: string): string {

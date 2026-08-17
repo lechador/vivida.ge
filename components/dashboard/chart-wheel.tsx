@@ -144,7 +144,7 @@ export function ChartWheel({
       width="100%"
       height="100%"
       role="img"
-      aria-label={locale === "en" ? "Natal chart wheel" : "ნატალური რუკის ბორბალი"}
+      aria-label={locale !== "ka" ? "Natal chart wheel" : "ნატალური რუკის ბორბალი"}
       className="select-none"
     >
       <defs>

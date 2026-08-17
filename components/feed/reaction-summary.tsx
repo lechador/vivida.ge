@@ -38,7 +38,7 @@ export function ReactionSummary({
             style={{
               backgroundColor: `color-mix(in oklch, ${r.hue} 45%, var(--background))`,
             }}
-            aria-label={locale === "en" ? r.labelEn : r.labelKa}
+            aria-label={locale !== "ka" ? r.labelEn : r.labelKa}
           >
             <ReactionIcon kind={r.kind} size={11} active />
           </span>

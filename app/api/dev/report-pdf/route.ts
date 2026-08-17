@@ -87,7 +87,7 @@ async function handle(req: Request) {
   // deterministically from the exact chart so no Georgian cache can leak.
   const t0 = Date.now();
   const content =
-    locale === "en"
+    locale !== "ka"
       ? buildEnglishNatalReportContent(chart, salience, firstName)
       : await generateNatalReport({ firstName, chart, salience });
   const genMs = Date.now() - t0;

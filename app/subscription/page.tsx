@@ -18,7 +18,7 @@ import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tr
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const en = (await getRequestLocale()) !== "ka";
   return { title: en ? "PRO subscription" : "PRO გამოწერა", robots: { index: false } };
 }
 
@@ -27,7 +27,7 @@ export default async function SubscriptionPage() {
   // See app/credits/page.tsx — authed surfaces carry no `/am` prefix, so the
   // stored preference is what keeps an Armenian user in Armenian.
   const locale = await getUserLocale(user.id);
-  const en = locale === "en";
+  const en = locale !== "ka";
   let identity = await getBillingIdentity(user.id);
   if (!identity) throw new Error("Billing identity not found");
   if (!identity?.countryCode) {

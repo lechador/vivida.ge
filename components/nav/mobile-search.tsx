@@ -33,7 +33,7 @@ export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
       <DialogPrimitive.Trigger asChild>
         <button
           type="button"
-          aria-label={locale === "en" ? "Search" : "ძებნა"}
+          aria-label={locale !== "ka" ? "Search" : "ძებნა"}
           className="grid size-11 shrink-0 place-items-center rounded-full text-foreground/85 transition-colors hover:bg-card/60 hover:text-foreground md:hidden"
         >
           <Search className="size-5" />
@@ -64,7 +64,7 @@ export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
                 className="fixed inset-x-2 top-2 z-50 flex max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card/95 shadow-2xl ring-1 ring-foreground/10 backdrop-blur-xl"
               >
                 <DialogPrimitive.Title className="sr-only">
-                  {locale === "en" ? "Search" : "ძებნა"}
+                  {locale !== "ka" ? "Search" : "ძებნა"}
                 </DialogPrimitive.Title>
                 <SearchPanel onClose={() => setOpen(false)} locale={locale} />
               </motion.div>

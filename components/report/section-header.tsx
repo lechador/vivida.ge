@@ -27,7 +27,7 @@ export function SectionHeader({
       </div>
       <div className="min-w-0">
         <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-          {locale === "en" ? "Section" : "სექცია"} {number}
+          {locale !== "ka" ? "Section" : "სექცია"} {number}
         </div>
         <h2 className="mt-0.5 text-2xl font-semibold tracking-tight">
           {title}

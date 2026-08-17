@@ -475,7 +475,7 @@ function MessageNotificationRow({
         <div className="min-w-0 flex-1">
           <div className="text-sm leading-snug">
             <span className="font-medium text-foreground">{display}</span>{" "}
-            <span className="text-muted-foreground">{locale === "en" ? "messaged you" : "მოგწერა"}</span>
+            <span className="text-muted-foreground">{locale !== "ka" ? "messaged you" : "მოგწერა"}</span>
           </div>
           <div className="mt-0.5 line-clamp-2 text-xs text-foreground/80">
             {n.body}

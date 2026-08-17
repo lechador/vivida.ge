@@ -211,8 +211,8 @@ function Footer({ locale }: { locale: UserLocale }) {
   return e(
     View,
     { style: s.footer, fixed: true },
-    e(Text, null, locale === "en" ? "VIVIDA · NATAL REPORT" : "VIVIDA · ნატალური ანგარიში"),
-    e(Text, null, locale === "en" ? "vividaastro.com" : "vivida.ge")
+    e(Text, null, locale !== "ka" ? "VIVIDA · NATAL REPORT" : "VIVIDA · ნატალური ანგარიში"),
+    e(Text, null, locale !== "ka" ? "vividaastro.com" : "vivida.ge")
   );
 }
 

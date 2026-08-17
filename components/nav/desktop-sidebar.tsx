@@ -43,7 +43,7 @@ export function DesktopSidebar({
   return (
     <aside
       data-desktop-sidebar
-      aria-label={locale === "en" ? "Main navigation" : "ძირითადი ნავიგაცია"}
+      aria-label={locale !== "ka" ? "Main navigation" : "ძირითადი ნავიგაცია"}
       className={cn(
         "group hidden lg:flex",
         "fixed left-0 top-0 z-40 h-[100dvh] w-[4.5rem] hover:w-60",
@@ -115,7 +115,7 @@ export function DesktopSidebar({
                       reveal
                     )}
                   >
-                    {locale === "en" ? item.badgeEn : item.badgeKa}
+                    {locale !== "ka" ? item.badgeEn : item.badgeKa}
                   </span>
                 )}
                 {isActive && (
@@ -143,7 +143,7 @@ export function DesktopSidebar({
             reveal
           )}
         >
-          {locale === "en" ? "Account & settings →" : "ანგარიში & პარამეტრები →"}
+          {locale !== "ka" ? "Account & settings →" : "ანგარიში & პარამეტრები →"}
         </Link>
       </div>
     </aside>

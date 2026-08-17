@@ -14,7 +14,7 @@ import { VerifiedBadge } from "@/components/profile/verified-badge";
  */
 export function PersonRowCard({ person, locale = "ka" }: { person: PersonRow; locale?: UserLocale }) {
   const display =
-    person.displayName ?? person.username ?? (locale === "en" ? "Stargazer" : "ვარსკვლავო");
+    person.displayName ?? person.username ?? (locale !== "ka" ? "Stargazer" : "ვარსკვლავო");
   const profileHref = person.username ? `/u/${person.username}` : "#";
 
   return (
@@ -23,7 +23,7 @@ export function PersonRowCard({ person, locale = "ka" }: { person: PersonRow; lo
         <Link
           href={profileHref}
           className="shrink-0"
-          aria-label={locale === "en" ? `${display}'s profile` : `${display}-ის პროფილი`}
+          aria-label={locale !== "ka" ? `${display}'s profile` : `${display}-ის პროფილი`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

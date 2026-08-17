@@ -27,7 +27,7 @@ export function MobileTabBar({
   return (
     <nav
       data-mobile-tab-bar
-      aria-label={locale === "en" ? "Main navigation" : "ძირითადი ნავიგაცია"}
+      aria-label={locale !== "ka" ? "Main navigation" : "ძირითადი ნავიგაცია"}
       className={cn(
         "fixed inset-x-0 bottom-0 z-40 lg:hidden",
         // Lifted card surface that reads as its own UI layer instead of

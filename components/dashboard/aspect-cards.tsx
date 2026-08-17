@@ -42,10 +42,10 @@ const FAMILY_META: Record<Family, { color: string; labelKa: string; labelEn: str
 };
 
 function bodyLabel(key: string, locale: UserLocale): string {
-  if (key === "ascendant") return locale === "en" ? "Ascendant" : "ამომავალი";
-  if (key === "midheaven") return locale === "en" ? "Midheaven" : "ზენიტი";
+  if (key === "ascendant") return locale !== "ka" ? "Ascendant" : "ამომავალი";
+  if (key === "midheaven") return locale !== "ka" ? "Midheaven" : "ზენიტი";
   const meta = bodyMeta(key);
-  return locale === "en" ? meta?.labelEn ?? key : meta?.labelKa ?? key;
+  return locale !== "ka" ? meta?.labelEn ?? key : meta?.labelKa ?? key;
 }
 
 /**

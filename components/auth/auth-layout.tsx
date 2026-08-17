@@ -80,7 +80,7 @@ export function AuthDivider({ locale = "ka" }: { locale?: UserLocale }) {
   return (
     <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-muted-foreground/70">
       <span className="h-px flex-1 bg-border/60" />
-      {locale === "en" ? "or" : "ან"}
+      {locale !== "ka" ? "or" : "ან"}
       <span className="h-px flex-1 bg-border/60" />
     </div>
   );

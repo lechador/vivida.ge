@@ -13,9 +13,9 @@ import type { Metadata } from "next";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
-    title: locale === "en" ? "Create an account" : "რეგისტრაცია",
+    title: locale !== "ka" ? "Create an account" : "რეგისტრაცია",
     // Same-path language pair — see the note in app/login/page.tsx.
-    alternates: localizedAlternates("/signup", "/signup", locale === "en" ? "en" : "ka"),
+    alternates: localizedAlternates("/signup", "/signup", locale !== "ka" ? "en" : "ka"),
   };
 }
 

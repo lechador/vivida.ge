@@ -257,7 +257,7 @@ export function MentionInput({
       )}
       {showHint && (
         <div className="pointer-events-none absolute left-0 right-0 top-full z-20 mt-1 rounded-lg border border-border/60 bg-card/80 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur-xl">
-          {locale === "en"
+          {locale !== "ka"
             ? "Enter at least 2 characters to find someone…"
             : "ჩაწერე მინიმუმ 2 სიმბოლო მეგობრის მოსაძებნად…"}
         </div>

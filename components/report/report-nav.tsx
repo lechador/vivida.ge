@@ -131,7 +131,7 @@ export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
 
   return (
     <nav
-      aria-label={locale === "en" ? "Chart navigation" : "რუკის ნავიგაცია"}
+      aria-label={locale !== "ka" ? "Chart navigation" : "რუკის ნავიგაცია"}
       className="sticky top-0 z-30 -mx-4 border-b border-border/40 bg-background/80 px-4 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 sm:-mx-6 sm:px-6 sm:py-3"
     >
       <div className="relative mx-auto max-w-6xl">
@@ -228,7 +228,7 @@ function NavPill({
         }
       />
       <span className="relative z-10">
-        {locale === "en" ? section.labelEn : section.label}
+        {locale !== "ka" ? section.labelEn : section.label}
       </span>
     </a>
   );

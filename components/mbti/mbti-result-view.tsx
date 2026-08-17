@@ -56,7 +56,7 @@ export function MbtiResultView({
         {AXES.map((axis) => {
           const s = scores[axis];
           if (!s) return null; // pre-Identity rows have no AT bar
-          const [firstKa, secondKa] = (locale === "en" ? AXIS_LABEL_EN : AXIS_LABEL_KA)[axis];
+          const [firstKa, secondKa] = (locale !== "ka" ? AXIS_LABEL_EN : AXIS_LABEL_KA)[axis];
           const firstLetter = axis[0];
           const winnerIsFirst = s.letter === firstLetter;
           // pct is the winner's strength; render as the first-pole share.

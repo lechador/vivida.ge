@@ -28,7 +28,7 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: (await getRequestLocale()) === "en" ? "Friends" : "მეგობრები",
+    title: (await getRequestLocale()) !== "ka" ? "Friends" : "მეგობრები",
   };
 }
 
@@ -195,7 +195,7 @@ function CompatibilityTab({
   return (
     <>
       <p className="mb-4 text-xs text-muted-foreground sm:text-sm">
-        {locale === "en"
+        {locale !== "ka"
           ? "Friends are ranked by combined chart compatibility. Select someone to view the complete English interpretation."
           : "შენი მეგობრები დალაგებულია ცის რუკების ერთობლივი თავსებადობით. დააჭირე ვინმეს — ნახავ სრულ აღწერას."}
       </p>
@@ -280,7 +280,7 @@ function FriendRow({
       {profileHref ? (
         <Link
           href={profileHref}
-          aria-label={locale === "en" ? `${displayName}'s profile` : `${displayName}-ის პროფილი`}
+          aria-label={locale !== "ka" ? `${displayName}'s profile` : `${displayName}-ის პროფილი`}
           className="shrink-0 rounded-full transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {avatar}
@@ -338,7 +338,7 @@ function FriendRow({
       {u.username && (
         <Link
           href={`/u/${u.username}`}
-          aria-label={locale === "en" ? `${displayName}'s profile` : `${displayName}-ის პროფილი`}
+          aria-label={locale !== "ka" ? `${displayName}'s profile` : `${displayName}-ის პროფილი`}
           className="hidden shrink-0 text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
         >
           <ArrowRight className="size-4" />
@@ -377,7 +377,7 @@ function EmptyState({ tab, locale }: { tab: Tab; locale: UserLocale }) {
     incoming: { Icon: UserPlus, title: "No incoming requests", body: "New friend requests will appear here." },
     outgoing: { Icon: UserPlus, title: "No sent requests", body: "Requests you send remain here until the other person responds." },
   }[tab];
-  const copy = locale === "en" ? copyEn : copyKa;
+  const copy = locale !== "ka" ? copyEn : copyKa;
 
   return (
     <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">

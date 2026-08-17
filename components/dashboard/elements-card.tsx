@@ -57,7 +57,7 @@ export function ElementsCard({
                 el === balance.dominant ? "font-medium" : "text-foreground/80"
               }
             >
-              {locale === "en" ? ELEMENT_EN[el] : el}
+              {locale !== "ka" ? ELEMENT_EN[el] : el}
             </span>
             <span className="tabular-nums text-muted-foreground">
               {Math.round(balance.percentages[el])}%

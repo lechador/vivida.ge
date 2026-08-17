@@ -151,7 +151,7 @@ const FAQ = [
 ];
 
 export default async function NataluriRukaPage() {
-  if ((await getRequestLocale()) === "en") return <NatalChartPageEn />;
+  if ((await getRequestLocale()) !== "ka") return <NatalChartPageEn />;
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
