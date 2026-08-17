@@ -23,7 +23,10 @@ import { ResidenceCard } from "@/components/account/residence-card";
 import { VerifiedBadge } from "@/components/profile/verified-badge";
 import { CountryBadge } from "@/components/profile/country-badge";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
-import { getRequestLocale } from "@/lib/i18n/request-locale";
+import {
+  getRequestLocale,
+  requestIsEnglishHost,
+} from "@/lib/i18n/request-locale";
 import { countryDisplayName } from "@/lib/residence";
 import type { Metadata } from "next";
 
@@ -69,6 +72,7 @@ export default async function AccountPage() {
   const accountAvatar = headerData.avatarUrl ?? user.image ?? null;
   const locale = await getRequestLocale(normalizeUserLocale(emailPrefs?.locale));
   const en = locale !== "ka";
+  const onEnglishHost = await requestIsEnglishHost();
 
   return (
     <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -123,9 +127,15 @@ export default async function AccountPage() {
           </span>
         </div>
 
-        <div className="mb-6">
-          <LanguageCard initial={locale} />
-        </div>
+        {/* Language is a property of the domain, not of the account: vivida.ge
+            renders Georgian for everyone. Offering a picker here would be a
+            control that writes a preference this site then ignores. The
+            international domain, where the choice is real, still shows it. */}
+        {onEnglishHost && (
+          <div className="mb-6">
+            <LanguageCard initial={locale} />
+          </div>
+        )}
 
         {/* Profile photos — surfaced near the top so it's easy to find */}
         <div className="mb-6">

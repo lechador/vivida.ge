@@ -11,22 +11,18 @@ import {
 /**
  * Resolve the interface language without querying the database.
  *
- * The international domain is authoritative: every request served from
- * vividaastro.com is English, including signed-out and newly-created users.
- * The Georgian domain is equally authoritative in the other direction for
- * anything a crawler can reach — see getRequestLocale.
+ * The domain decides, and nothing overrides it. vivida.ge is the Georgian
+ * site: every request it serves renders Georgian, signed in or out, whatever
+ * `users.interfaceLanguage` happens to say. vividaastro.com is the
+ * international site, where English is the default and Armenian is the one
+ * language a stored preference may still select — see getRequestLocale.
  */
 export function localeForHost(
   host: string | null | undefined,
   preferred?: string | null,
 ): UserLocale {
-  // Same narrow rule as getRequestLocale: on the international host a stored
-  // preference may select Armenian (which owns no domain of its own) but never
-  // Georgian (which does, and is the default value for every user).
-  if (isEnglishHost(host)) {
-    return normalizeUserLocale(preferred) === "am" ? "am" : "en";
-  }
-  return normalizeUserLocale(preferred);
+  if (!isEnglishHost(host)) return "ka";
+  return normalizeUserLocale(preferred) === "am" ? "am" : "en";
 }
 
 /**
@@ -36,30 +32,37 @@ export async function getRequestLocale(
   preferred?: string | null,
 ): Promise<UserLocale> {
   const requestHeaders = await headers();
-
-  // Set by proxy.ts from the `/am` path prefix. It outranks the host because
-  // Armenian shares the international domain with English — the URL is the
-  // only thing that separates them.
-  if (requestHeaders.get(LOCALE_HEADER) === "am") return "am";
-
   const host =
     requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
 
-  if (isEnglishHost(host)) {
-    // Armenian is the only locale with no domain of its own: Georgian owns
-    // vivida.ge, English owns vividaastro.com, and Armenian is a path prefix
-    // on the latter. Authenticated surfaces carry no `/am` prefix, so without
-    // this a user who explicitly picked Հայերեն in account settings could
-    // never be served it once signed in — the setting was unreachable here.
-    //
-    // Deliberately narrow: a stored preference may select Armenian, never
-    // Georgian. `users.interfaceLanguage` defaults to "ka" for everyone, so
-    // honouring a Georgian preference here would hand Georgian to every user
-    // still sitting on that default. Georgian has its own domain to be
-    // reached on; Armenian does not.
-    return normalizeUserLocale(preferred) === "am" ? "am" : "en";
-  }
-  return normalizeUserLocale(preferred);
+  // vivida.ge is Georgian, full stop.
+  //
+  // It used to honour `users.interfaceLanguage` here, on the reasoning that
+  // the authed surfaces are robots-disallowed so no indexable URL could vary.
+  // What that missed is that only *some* surfaces pass the preference through:
+  // the layout, the nav and every public page call this with no argument, so a
+  // single account sitting on "am" or "en" saw one page in three languages at
+  // once. A domain that is the Georgian site cannot render a language its
+  // reader did not ask this domain for. Anyone who wants English or Armenian
+  // has vividaastro.com to read it on.
+  if (!isEnglishHost(host)) return "ka";
+
+  // Set by proxy.ts from the `/am` path prefix. It outranks the preference
+  // because Armenian shares the international domain with English — the URL is
+  // the only thing that separates them.
+  if (requestHeaders.get(LOCALE_HEADER) === "am") return "am";
+
+  // Armenian is the only locale with no domain of its own: Georgian owns
+  // vivida.ge, English owns vividaastro.com, and Armenian is a path prefix on
+  // the latter. Authenticated surfaces carry no `/am` prefix, so without this
+  // a user who explicitly picked Հայերեն in account settings could never be
+  // served it once signed in — the setting was unreachable here.
+  //
+  // Deliberately narrow: a stored preference may select Armenian, never
+  // Georgian. `users.interfaceLanguage` defaults to "ka" for everyone, so
+  // honouring a Georgian preference here would hand Georgian to every visitor
+  // still sitting on that default.
+  return normalizeUserLocale(preferred) === "am" ? "am" : "en";
 }
 
 /**
@@ -82,13 +85,18 @@ export async function getRequestLocale(
  * earlier locale cookie was removed to escape.
  */
 export async function getSignupLocale(): Promise<UserLocale> {
-  const requestHeaders = await headers();
-  if (requestHeaders.get(LOCALE_HEADER) === "am") return "am";
+  // Resolve the host first: the cookie below may only ever promote English to
+  // Armenian, never reach across to the Georgian domain. `vivida_lang` is
+  // scoped to vividaastro.com so it cannot be sent to vivida.ge anyway, but a
+  // sign-up that stamps the wrong language is invisible until the user's whole
+  // account is in it — worth being explicit rather than merely lucky.
+  const locale = await getRequestLocale();
+  if (locale !== "en") return locale;
 
   const cookieStore = await cookies();
   if (cookieStore.get(LOCALE_CHOICE_COOKIE)?.value === "am") return "am";
 
-  return getRequestLocale();
+  return locale;
 }
 
 /** Is this request being served from the Armenian `/am` URL space? */

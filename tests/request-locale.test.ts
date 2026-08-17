@@ -31,8 +31,13 @@ describe("localeForHost", () => {
     expect(localeForHost("www.vividaastro.com:443", "ka")).toBe("en");
   });
 
-  it("retains an explicit preference on non-English hosts", () => {
-    expect(localeForHost("www.vivida.ge", "en")).toBe("en");
+  it("always serves Georgian on the Georgian domain", () => {
+    // vivida.ge is the Georgian site, not a site that renders whatever the
+    // reader's account says. A stored "en"/"am" reaching through here showed
+    // the layout and public pages in Georgian (they pass no preference) and
+    // the authed surfaces in another language, on the same screen.
+    expect(localeForHost("www.vivida.ge", "en")).toBe("ka");
+    expect(localeForHost("www.vivida.ge", "am")).toBe("ka");
     expect(localeForHost("www.vivida.ge", "ka")).toBe("ka");
   });
 
@@ -55,10 +60,13 @@ describe("getRequestLocale", () => {
     await expect(getRequestLocale("ka")).resolves.toBe("en");
   });
 
-  it("honours a signed-in user's preference on the Georgian host", async () => {
-    // /dashboard, /account and /report pass users.interfaceLanguage through.
-    // These routes are robots-disallowed, so no indexable URL varies by user.
-    await expect(getRequestLocale("en")).resolves.toBe("en");
+  it("ignores a signed-in user's preference on the Georgian host", async () => {
+    // /dashboard, /account, /report and the nav pass users.interfaceLanguage
+    // through; the layout and every public page do not. Honouring it here
+    // therefore split a single page across two languages for anyone whose
+    // account was not on "ka".
+    await expect(getRequestLocale("en")).resolves.toBe("ka");
+    await expect(getRequestLocale("am")).resolves.toBe("ka");
     await expect(getRequestLocale("ka")).resolves.toBe("ka");
   });
 });

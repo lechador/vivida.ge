@@ -243,10 +243,10 @@ describe("locale precedence on the international host", () => {
     expect(localeForHost(EN_HOST, "nonsense")).toBe("en");
   });
 
-  it("leaves the Georgian host resolving exactly as before", () => {
+  it("keeps the Georgian host Georgian, whatever the preference says", () => {
     expect(localeForHost(KA_HOST, "ka")).toBe("ka");
-    expect(localeForHost(KA_HOST, "en")).toBe("en");
-    expect(localeForHost(KA_HOST, "am")).toBe("am");
+    expect(localeForHost(KA_HOST, "en")).toBe("ka");
+    expect(localeForHost(KA_HOST, "am")).toBe("ka");
     expect(localeForHost(KA_HOST, null)).toBe("ka");
   });
 });
