@@ -37,8 +37,16 @@ import {
   VIEW_LABEL_EN,
 } from "@/components/seo/sign-horoscope-page-en";
 import { YearlyHoroscopePageEn } from "@/components/seo/yearly-horoscope-page-en";
+import {
+  SignHoroscopePageAm,
+  VIEW_LABEL_AM,
+} from "@/components/seo/sign-horoscope-page-am";
 import { yearlyHoroscopeEnglish } from "@/lib/yearly-horoscope-en";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  ARMENIAN_SITE_URL,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -99,10 +107,35 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { sign, slug } = await params;
   if (!isSlug(sign)) return {};
-  const en = (await getRequestLocale()) === "en";
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const am = locale === "am";
 
   const view = viewFromPath(slug);
   if (view) {
+    if (am) {
+      const meta = signMetaBySlug(sign);
+      const name = meta?.labelAm || meta?.labelKa || sign;
+      const title = `${name} — ${VIEW_LABEL_AM[view]}`;
+      const description = `${name} նշանի ${VIEW_LABEL_AM[view].toLowerCase()}՝ գործնական խորհուրդներ հարաբերությունների, առաջնահերթությունների, աշխատանքի և անձնական աճի համար։`;
+      const path = `/zodiac/${sign}/${slug}`;
+      return {
+        title: { absolute: title },
+        description,
+        keywords: [`${name} հորոսկոպ`, `${name} այսօրվա հորոսկոպ`, VIEW_LABEL_AM[view], "օրական հորոսկոպ"],
+        alternates: localizedAlternates(`/am${path}`, path, "am"),
+        openGraph: {
+          images: [DEFAULT_OG_IMAGE],
+          type: "article",
+          url: `${ARMENIAN_SITE_URL}${path}`,
+          title,
+          description,
+          siteName: "Vivida",
+          locale: "hy_AM",
+        },
+        twitter: { card: "summary_large_image", title, description },
+      };
+    }
     const sc = SIGNS_CONTENT[sign];
     const url = `${SITE_URL}/zodiac/${sign}/${slug}`;
     const anchor = anchorForView(view);
@@ -219,7 +252,10 @@ export default async function ZodiacSignSlugPage({
 
   const view = viewFromPath(slug);
   if (view) {
-    if ((await getRequestLocale()) === "en")
+    const locale = await getRequestLocale();
+    if (locale === "am")
+      return <SignHoroscopePageAm sign={sign} view={view} />;
+    if (locale === "en")
       return <SignHoroscopePageEn sign={sign} view={view} />;
     return <HoroscopeView sign={sign} view={view} />;
   }

@@ -113,6 +113,30 @@ export function isArmenianCoreRoute(strippedPath: string): boolean {
   return CORE_ROUTE_SET.has(strippedPath);
 }
 
+const ARMENIAN_HOROSCOPE_SIGN_SLUGS = [
+  "aries",
+  "taurus",
+  "gemini",
+  "cancer",
+  "leo",
+  "virgo",
+  "libra",
+  "scorpio",
+  "sagittarius",
+  "capricorn",
+  "aquarius",
+  "pisces",
+] as const;
+
+const ARMENIAN_HOROSCOPE_VIEW_PATHS = [
+  "dghes",
+  "khval",
+  "kviris-horoskopi",
+  "tvis-horoskopi",
+  "momavali-kviris-horoskopi",
+  "momavali-tvis-horoskopi",
+] as const;
+
 /**
  * Long-tail paths in the shared route tree that render Armenian.
  *
@@ -157,6 +181,12 @@ const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([
   "/emociuri-inteleqti",
   "/astrologiuri-saxlebi",
   "/planetebi",
+  "/horoskopi",
+  ...ARMENIAN_HOROSCOPE_SIGN_SLUGS.flatMap((sign) =>
+    ARMENIAN_HOROSCOPE_VIEW_PATHS.map(
+      (viewPath) => `/zodiac/${sign}/${viewPath}`,
+    ),
+  ),
 ]);
 
 const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [

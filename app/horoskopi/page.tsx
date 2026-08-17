@@ -23,6 +23,10 @@ import { signColor } from "@/lib/zodiac";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { HoroscopeHubEn } from "@/components/seo/horoscope-hub-en";
+import {
+  PeriodHoroscopeHubAm,
+  periodHubMetadataAm,
+} from "@/components/seo/period-horoscope-hub-am";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -39,7 +43,9 @@ const DESCRIPTION =
   "დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის — ვერძი, კურო, ტყუპები, კირჩხიბი, ლომი, ქალწული, სასწორი, მორიელი, მშვილდოსანი, თხის რქა, მერწყული, თევზები. დღევანდელი, ხვალინდელი, კვირისა და თვის ჰოროსკოპი რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const locale = await getRequestLocale();
+  if (locale === "am") return periodHubMetadataAm("day");
+  const en = locale === "en";
   const title = en ? "Daily Horoscope Today — All Zodiac Signs" : TITLE;
   const description = en
     ? "Read today's horoscope for every zodiac sign, with practical guidance based on the current sky. Explore daily, weekly, and monthly astrology forecasts."
@@ -117,7 +123,9 @@ const FAQ = [
 ];
 
 export default async function HoroskopiHubPage() {
-  if ((await getRequestLocale()) === "en") return <HoroscopeHubEn />;
+  const locale = await getRequestLocale();
+  if (locale === "am") return <PeriodHoroscopeHubAm period="day" />;
+  if (locale === "en") return <HoroscopeHubEn />;
   const now = new Date();
   const todayLabel = signHoroscopePeriodLabel(now, "day");
 

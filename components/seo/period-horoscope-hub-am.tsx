@@ -13,9 +13,24 @@ import { ZODIAC_SIGN_AM } from "@/lib/zodiac-sign-am";
 import { AM_MONTHS, AM_MONTHS_GENITIVE } from "@/lib/i18n/am-date";
 import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
-export type ArmenianPeriod = "week" | "month";
+export type ArmenianPeriod = "day" | "week" | "month";
 
 export const PERIOD_AM = {
+  day: {
+    path: "/horoskopi",
+    viewPath: VIEW_PATH.today,
+    title: "Այսօրվա հորոսկոպը․ Կենդանակերպի բոլոր 12 նշանները",
+    description: "Կարդացեք այսօրվա հորոսկոպը կենդանակերպի բոլոր 12 նշանների համար՝ գործնական խորհուրդներ հարաբերությունների, աշխատանքի և անձնական աճի համար։",
+    heading: "Այսօրվա հորոսկոպը",
+    intro: "Ընտրեք ձեր կենդանակերպի նշանը և կարդացեք այսօրվա հորոսկոպը։ Օգտագործեք այն առաջնահերթությունները հստակեցնելու և օրը գիտակցված պլանավորելու համար։",
+    cadence: "Օրական ուղեցույց",
+    cta: "Կարդալ այսօրվա ամբողջական հորոսկոպը →",
+    faq: [
+      { q: "Ե՞րբ է թարմացվում օրական հորոսկոպը։", a: "Օրական հորոսկոպը թարմացվում է ամեն օր և ներկայացնում տվյալ օրվա հիմնական աստղաբանական թեմաները։" },
+      { q: "Արևի՞, թե՞ ասցենդենտի նշանով պետք է կարդալ։", a: "Սկսեք ձեր Արեգակի նշանից, ապա կարդացեք նաև ասցենդենտը։ Ամբողջական պատկերի համար հաշվարկեք ձեր նատալ քարտեզը։" },
+      { q: "Արդյո՞ք օրական հորոսկոպը կանխատեսում է ճշգրիտ իրադարձություններ։", a: "Ոչ։ Այն առաջարկում է աստղաբանական միտումներ և ինքնաճանաչման թեմաներ, ոչ թե անխուսափելի իրադարձություններ։" },
+    ],
+  },
   week: {
     path: "/horoskopi/kvireuli",
     viewPath: VIEW_PATH.week,
@@ -80,9 +95,11 @@ export function PeriodHoroscopeHubAm({ period }: { period: ArmenianPeriod }) {
   const config = PERIOD_AM[period];
   const now = new Date();
   const weekStart = startOfWeek(now);
-  const dateLabel = period === "week"
-    ? `${weekStart.getDate()} ${AM_MONTHS_GENITIVE[weekStart.getMonth()]}-ի շաբաթը`
-    : `${AM_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+  const dateLabel = period === "day"
+    ? `${now.getDate()} ${AM_MONTHS_GENITIVE[now.getMonth()]} ${now.getFullYear()}`
+    : period === "week"
+      ? `${weekStart.getDate()} ${AM_MONTHS_GENITIVE[weekStart.getMonth()]}-ի շաբաթը`
+      : `${AM_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
   const url = `${ARMENIAN_SITE_URL}${config.path}`;
   const ld = [
     {
@@ -169,7 +186,9 @@ export function PeriodHoroscopeHubAm({ period }: { period: ArmenianPeriod }) {
             const accent = signColor(meta);
             const name = meta.labelAm || meta.labelKa;
             const summary =
-              period === "week"
+              period === "day"
+                ? `Այսօր օգտագործիր ${profile.strengths[0].toLowerCase()} հատկանիշը և կենտրոնացիր մեկ հստակ առաջնահերթության վրա։`
+                : period === "week"
                 ? `Այս շաբաթ օգտագործիր ${profile.strengths[0].toLowerCase()} հատկանիշը և զգուշացիր ${profile.challenges[0].toLowerCase()}-ից:`
                 : `Այս ամիսը նպաստում է կայուն աճին ${profile.strengths.slice(0, 2).join(" և ").toLowerCase()} միջոցով:`;
             return (
@@ -211,7 +230,7 @@ export function PeriodHoroscopeHubAm({ period }: { period: ArmenianPeriod }) {
                   href={`/am/zodiac/${sign}/${config.viewPath}`}
                   className="rounded-xl border border-border/60 bg-card/40 px-3.5 py-2.5 text-sm font-medium"
                 >
-                  {name} {period === "week" ? "շաբաթական" : "ամսական"} հորոսկոպ
+                  {name} {period === "day" ? "օրական" : period === "week" ? "շաբաթական" : "ամսական"} հորոսկոպ
                 </Link>
               );
             })}

@@ -141,13 +141,26 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/zodiac/${slug}`, `/zodiac/${slug}`),
   }));
 
-  const periodEntries = (["/horoskopi/kvireuli", "/horoskopi/tviuri"] as const).map((path) => ({
+  const periodEntries = (["/horoskopi", "/horoskopi/kvireuli", "/horoskopi/tviuri"] as const).map((path) => ({
     url: `${ENGLISH_SITE_URL}/am${path}`,
     lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "weekly" as const,
+    changeFrequency: (path === "/horoskopi" ? "daily" : "weekly") as "daily" | "weekly",
     priority: 0.75,
     alternates: alternatesFor(path, path),
   }));
+
+  const signPeriodEntries = ALL_SLUGS.flatMap((sign) =>
+    ALL_HOROSCOPE_VIEWS.map((view) => {
+      const path = `/zodiac/${sign}/${VIEW_PATH[view]}`;
+      return {
+        url: `${ENGLISH_SITE_URL}/am${path}`,
+        lastModified: NOW,
+        changeFrequency: VIEW_CHANGE_FREQ[view],
+        priority: VIEW_PRIORITY[view],
+        alternates: alternatesFor(path, path),
+      };
+    }),
+  );
 
   const thematicHubEntries = ALL_HOROSCOPE_THEMES.map((theme) => ({
     url: `${ENGLISH_SITE_URL}/am${themeUrl(theme)}`,
@@ -446,6 +459,7 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...coreEntries,
     ...signEntries,
     ...periodEntries,
+    ...signPeriodEntries,
     ...thematicHubEntries,
     ...thematicSignEntries,
     ...pairEntries,
