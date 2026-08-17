@@ -234,6 +234,22 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(`/sizmris-akhsna/${slug}`, `/sizmris-akhsna/${slug}`),
   }));
 
+  const numerologyHubEntry = {
+    url: `${ENGLISH_SITE_URL}/am/numerologia`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+    alternates: alternatesFor("/numerologia", "/numerologia"),
+  };
+
+  const numerologyEntries = LIFE_PATH_NUMBERS.map((number) => ({
+    url: `${ENGLISH_SITE_URL}/am/numerologia/${number}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.72,
+    alternates: alternatesFor(`/numerologia/${number}`, `/numerologia/${number}`),
+  }));
+
   return [
     ...coreEntries,
     ...signEntries,
@@ -248,6 +264,8 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...mbtiEntries,
     dreamsHubEntry,
     ...dreamEntries,
+    numerologyHubEntry,
+    ...numerologyEntries,
   ];
 }
 

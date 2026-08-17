@@ -142,6 +142,7 @@ const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([
   "/taro",
   "/mbti",
   "/sizmris-akhsna",
+  "/numerologia",
 ]);
 
 const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [
@@ -152,6 +153,7 @@ const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [
   "/taro/",
   "/mbti/",
   "/sizmris-akhsna/",
+  "/numerologia/",
 ];
 
 /**

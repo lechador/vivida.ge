@@ -27,6 +27,7 @@ export function LifePathCalculator({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const am = locale === "am";
   const [date, setDate] = useState("");
   const [result, setResult] = useState<LifePathNumber | null>(null);
 
@@ -40,10 +41,12 @@ export function LifePathCalculator({
   return (
     <div className="rounded-3xl border border-[var(--vivida-violet)]/35 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/10 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
       <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-        {en ? "Life path number calculator" : "ბედის რიცხვის კალკულატორი"}
+        {am ? "Կյանքի ուղու թվի հաշվիչ" : en ? "Life path number calculator" : "ბედის რიცხვის კალკულატორი"}
       </h2>
       <p className="mt-1.5 text-sm text-muted-foreground">
-        {en
+        {am
+          ? "Մուտքագրեք ձեր ծննդյան ամսաթիվը: Գրանցում չի պահանջվում:"
+          : en
           ? "Enter your birth date. No signup required."
           : "შეიყვანე დაბადების თარიღი — რეგისტრაცია არ სჭირდება."}
       </p>
@@ -57,10 +60,10 @@ export function LifePathCalculator({
             setResult(null);
           }}
           className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none focus:border-[var(--vivida-violet)]/60 sm:max-w-56"
-          aria-label={en ? "Birth date" : "დაბადების თარიღი"}
+          aria-label={am ? "Ծննդյան ամսաթիվ" : en ? "Birth date" : "დაბადების თარიღი"}
         />
         <Button type="button" variant="mystic" onClick={calc} disabled={!date}>
-          {en ? "Calculate" : "გამოთვლა"}
+          {am ? "Հաշվել" : en ? "Calculate" : "გამოთვლა"}
           <Sparkles className="size-4" />
         </Button>
       </div>
@@ -68,7 +71,7 @@ export function LifePathCalculator({
       {result && (
         <div className="mt-6 rounded-2xl border border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/8 p-5 text-center">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Your life path number" : "შენი ბედის რიცხვი"}
+            {am ? "Ձեր կյանքի ուղու թիվը" : en ? "Your life path number" : "შენი ბედის რიცხვი"}
           </div>
           <div className="mt-1 bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-6xl font-bold tracking-tight text-transparent">
             {result}
@@ -79,10 +82,14 @@ export function LifePathCalculator({
             </div>
           )}
           <Link
-            href={`/numerologia/${result}`}
+            href={am ? `/am/numerologia/${result}` : `/numerologia/${result}`}
             className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--vivida-cyan)] hover:underline"
           >
-            {en ? `Read the full meaning of ${result}` : `სრული აღწერა — რას ნიშნავს ${result}`}
+            {am
+              ? `Կարդալ ${result}-ի ամբողջական նշանակությունը`
+              : en
+              ? `Read the full meaning of ${result}`
+              : `სრული აღწერა — რას ნიშნავს ${result}`}
             <ArrowRight className="size-4" />
           </Link>
         </div>
