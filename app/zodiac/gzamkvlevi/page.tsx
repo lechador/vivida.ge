@@ -58,10 +58,14 @@ const KA_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) !== "en") return KA_METADATA;
-  const title = "Complete Zodiac Guide: Signs, Moon, Rising and Compatibility";
-  const description = "Explore all zodiac signs, Moon signs, rising signs, four elements, horoscope periods, calculators, and all 78 compatibility pairings.";
-  return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${PATH}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  const locale = await getRequestLocale();
+  if (locale === "ka") return KA_METADATA;
+  if (locale === "en") {
+    const title = "Complete Zodiac Guide: Signs, Moon, Rising and Compatibility";
+    const description = "Explore all zodiac signs, Moon signs, rising signs, four elements, horoscope periods, calculators, and all 78 compatibility pairings.";
+    return { title: { absolute: title }, description, alternates: localizedAlternates(PATH, PATH, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${PATH}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  return KA_METADATA;
 }
 
 const ELEMENT_ACCENT: Record<string, string> = {
@@ -72,7 +76,8 @@ const ELEMENT_ACCENT: Record<string, string> = {
 };
 
 export default async function GuideIndexPage() {
-  if ((await getRequestLocale()) === "en") return <ZodiacGuideIndexEn />;
+  const locale = await getRequestLocale();
+  if (locale === "en") return <ZodiacGuideIndexEn />;
   // Build a flat list of all canonical pages for the JSON-LD ItemList.
   const allUrls: Array<{ url: string; name: string }> = [
     { url: `${SITE_URL}/zodiac`, name: "ცის ნიშნები — ჰაბი" },

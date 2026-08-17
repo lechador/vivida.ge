@@ -54,20 +54,25 @@ const KA_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) !== "en") return KA_METADATA;
-  const path = "/numerologia";
-  return {
-    title: { absolute: NUMEROLOGY_HUB_EN.title },
-    description: NUMEROLOGY_HUB_EN.description,
-    keywords: ["life path number", "life path calculator", "numerology meanings", "master numbers"],
-    alternates: localizedAlternates(path, path, "en"),
-    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
-    twitter: { card: "summary_large_image", title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description },
-  };
+  const locale = await getRequestLocale();
+  if (locale === "ka") return KA_METADATA;
+  if (locale === "en") {
+    const path = "/numerologia";
+    return {
+      title: { absolute: NUMEROLOGY_HUB_EN.title },
+      description: NUMEROLOGY_HUB_EN.description,
+      keywords: ["life path number", "life path calculator", "numerology meanings", "master numbers"],
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+      twitter: { card: "summary_large_image", title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description },
+    };
+  }
+  return KA_METADATA;
 }
 
 export default async function NumerologiaHubPage() {
-  if ((await getRequestLocale()) === "en") return <NumerologyHubEn />;
+  const locale = await getRequestLocale();
+  if (locale === "en") return <NumerologyHubEn />;
   const archetypes = Object.fromEntries(
     LIFE_PATH_NUMBERS.map((n) => [n, LIFE_PATH_CONTENT[n].archetypeKa])
   );

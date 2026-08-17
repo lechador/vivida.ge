@@ -12,11 +12,17 @@ import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) !== "en") return periodHubMetadata("week");
-  const config = PERIOD_EN.week;
-  return { title: { absolute: config.title }, description: config.description, alternates: localizedAlternates(config.path, config.path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${config.path}`, title: config.title, description: config.description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: config.title, description: config.description } };
+  const locale = await getRequestLocale();
+  if (locale === "ka") return periodHubMetadata("week");
+  if (locale === "en") {
+    const config = PERIOD_EN.week;
+    return { title: { absolute: config.title }, description: config.description, alternates: localizedAlternates(config.path, config.path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${config.path}`, title: config.title, description: config.description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: config.title, description: config.description } };
+  }
+  return periodHubMetadata("week");
 }
 
 export default async function WeeklyHoroscopeHubPage() {
-  return (await getRequestLocale()) === "en" ? <PeriodHoroscopeHubEn period="week" /> : <PeriodHoroscopeHub period="week" />;
+  const locale = await getRequestLocale();
+  if (locale === "en") return <PeriodHoroscopeHubEn period="week" />;
+  return <PeriodHoroscopeHub period="week" />;
 }

@@ -53,16 +53,20 @@ const KA_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) !== "en") return KA_METADATA;
-  const path = "/sizmris-akhsna";
-  return {
-    title: { absolute: DREAMS_HUB_EN.title },
-    description: DREAMS_HUB_EN.description,
-    keywords: ["dream dictionary", "dream meanings", "dream interpretation", "common dream symbols"],
-    alternates: localizedAlternates(path, path, "en"),
-    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
-    twitter: { card: "summary_large_image", title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description },
-  };
+  const locale = await getRequestLocale();
+  if (locale === "ka") return KA_METADATA;
+  if (locale === "en") {
+    const path = "/sizmris-akhsna";
+    return {
+      title: { absolute: DREAMS_HUB_EN.title },
+      description: DREAMS_HUB_EN.description,
+      keywords: ["dream dictionary", "dream meanings", "dream interpretation", "common dream symbols"],
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+      twitter: { card: "summary_large_image", title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description },
+    };
+  }
+  return KA_METADATA;
 }
 
 /**
@@ -72,7 +76,8 @@ export async function generateMetadata(): Promise<Metadata> {
  * thinking about.
  */
 export default async function DreamsHubPage() {
-  if ((await getRequestLocale()) === "en") return <DreamsHubEn />;
+  const locale = await getRequestLocale();
+  if (locale === "en") return <DreamsHubEn />;
   const groups = dreamsByLetter();
 
   const ld = [

@@ -54,9 +54,13 @@ const KA_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) !== "en") return KA_METADATA;
-  const path = "/merkuri-retrogradi"; const { title, description } = MERCURY_RETROGRADE_EN;
-  return { title: { absolute: title }, description, keywords: ["Mercury retrograde", "Mercury retrograde dates", "is Mercury retrograde", "Mercury retrograde meaning"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  const locale = await getRequestLocale();
+  if (locale === "ka") return KA_METADATA;
+  if (locale === "en") {
+    const path = "/merkuri-retrogradi"; const { title, description } = MERCURY_RETROGRADE_EN;
+    return { title: { absolute: title }, description, keywords: ["Mercury retrograde", "Mercury retrograde dates", "is Mercury retrograde", "Mercury retrograde meaning"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  return KA_METADATA;
 }
 
 const FAQ = [
@@ -88,7 +92,8 @@ function formatKa(isoDate: string): string {
 }
 
 export default async function MercuryRetrogradePage() {
-  if ((await getRequestLocale()) === "en") return <MercuryRetrogradePageEn />;
+  const locale = await getRequestLocale();
+  if (locale === "en") return <MercuryRetrogradePageEn />;
   const now = new Date();
   const year = now.getUTCFullYear();
   const retroNow = isMercuryRetrogradeNow(now);

@@ -35,9 +35,13 @@ const KA_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) !== "en") return KA_METADATA;
-  const path = "/zodiac/reitingebi"; const { title, description } = RANKINGS_HUB_EN;
-  return { title: { absolute: title }, description, keywords: ["zodiac sign rankings", "best zodiac signs", "smartest zodiac signs", "most romantic zodiac signs"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  const locale = await getRequestLocale();
+  if (locale === "ka") return KA_METADATA;
+  if (locale === "en") {
+    const path = "/zodiac/reitingebi"; const { title, description } = RANKINGS_HUB_EN;
+    return { title: { absolute: title }, description, keywords: ["zodiac sign rankings", "best zodiac signs", "smartest zodiac signs", "most romantic zodiac signs"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  return KA_METADATA;
 }
 
 const HUB_QUERIES = [
@@ -50,7 +54,8 @@ const HUB_QUERIES = [
 ];
 
 export default async function RankingsHubPage() {
-  if ((await getRequestLocale()) === "en") return <RankingsHubEn />;
+  const locale = await getRequestLocale();
+  if (locale === "en") return <RankingsHubEn />;
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

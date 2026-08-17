@@ -53,6 +53,8 @@ export function stripArmenianPrefix(pathname: string): string | null {
   return null;
 }
 
+import type { UserLocale } from "@/lib/i18n/user-locale";
+
 /** `/zodiac/vergo` → `/am/zodiac/vergo`, `/` → `/am`. Idempotent. */
 export function withArmenianPrefix(path: string): string {
   if (path === ARMENIAN_PREFIX || path.startsWith(`${ARMENIAN_PREFIX}/`)) {
@@ -60,6 +62,44 @@ export function withArmenianPrefix(path: string): string {
   }
   if (path === "/" || path === "") return ARMENIAN_PREFIX;
   return `${ARMENIAN_PREFIX}${path}`;
+}
+
+/**
+ * Prefix an internal content href for the locale being rendered.
+ * Leaves absolute URLs, API routes, auth routes, and authenticated surfaces untouched.
+ */
+export function localeHref(path: string, locale?: UserLocale): string {
+  if (locale !== "am") return path;
+  if (
+    !path ||
+    path.startsWith("http://") ||
+    path.startsWith("https://") ||
+    path.startsWith("mailto:") ||
+    path.startsWith("tel:") ||
+    path.startsWith("#")
+  ) {
+    return path;
+  }
+  if (
+    path.startsWith("/api/") ||
+    path.startsWith("/login") ||
+    path.startsWith("/signup") ||
+    path.startsWith("/forgot-password") ||
+    path.startsWith("/reset-password") ||
+    path.startsWith("/dashboard") ||
+    path.startsWith("/account") ||
+    path.startsWith("/feed") ||
+    path.startsWith("/messages") ||
+    path.startsWith("/friends") ||
+    path.startsWith("/people") ||
+    path.startsWith("/subscription") ||
+    path.startsWith("/credits") ||
+    path.startsWith("/admin") ||
+    path.startsWith("/u/")
+  ) {
+    return path;
+  }
+  return withArmenianPrefix(path);
 }
 
 /**

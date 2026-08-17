@@ -4,10 +4,12 @@ import {
   ARMENIAN_PREFIX,
   hasArmenianVersion,
   isArmenianCoreRoute,
+  localeHref,
   stripArmenianPrefix,
   withArmenianPrefix,
 } from "@/lib/i18n/armenian-routes";
 import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { articleLd } from "@/lib/seo/jsonld";
 import {
   creditPacksForCountry,
   formatBillingAmount,
@@ -106,5 +108,53 @@ describe("Armenian billing", () => {
   it("does not disturb Georgian or English formatting", () => {
     expect(formatBillingAmount(1990, "gel", "ka")).toBe("₾19.90");
     expect(formatBillingAmount(999, "gbp", "en")).toBe("£9.99");
+  });
+});
+
+describe("localeHref internal linking", () => {
+  it("prefixes content paths for Armenian locale only", () => {
+    expect(localeHref("/zodiac", "am")).toBe("/am/zodiac");
+    expect(localeHref("/zodiac/vergo", "am")).toBe("/am/zodiac/vergo");
+    expect(localeHref("/natal-chart", "am")).toBe("/am/natal-chart");
+    expect(localeHref("/", "am")).toBe("/am");
+    expect(localeHref("/zodiac", "ka")).toBe("/zodiac");
+    expect(localeHref("/zodiac", "en")).toBe("/zodiac");
+  });
+
+  it("does not prefix auth, API, or authed app surfaces", () => {
+    expect(localeHref("/dashboard", "am")).toBe("/dashboard");
+    expect(localeHref("/account", "am")).toBe("/account");
+    expect(localeHref("/login", "am")).toBe("/login");
+    expect(localeHref("/signup", "am")).toBe("/signup");
+    expect(localeHref("/api/tarot/reading", "am")).toBe("/api/tarot/reading");
+    expect(localeHref("https://vivida.ge", "am")).toBe("https://vivida.ge");
+  });
+});
+
+describe("JSON-LD inLanguage for Armenian URLs", () => {
+  it("emits hy-AM for /am URLs and preserves en and ka-GE for others", () => {
+    expect(
+      articleLd({
+        url: "https://www.vividaastro.com/am/zodiac/virgo",
+        headline: "Virgo",
+        description: "Desc",
+      }).inLanguage,
+    ).toBe("hy-AM");
+
+    expect(
+      articleLd({
+        url: "https://www.vividaastro.com/zodiac/virgo",
+        headline: "Virgo",
+        description: "Desc",
+      }).inLanguage,
+    ).toBe("en");
+
+    expect(
+      articleLd({
+        url: "https://www.vivida.ge/zodiac/kalwuli",
+        headline: "ქალწული",
+        description: "Desc",
+      }).inLanguage,
+    ).toBe("ka-GE");
   });
 });

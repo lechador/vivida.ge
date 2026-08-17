@@ -53,20 +53,25 @@ const KA_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) !== "en") return KA_METADATA;
-  const path = "/angeluri-ricxvebi";
-  return {
-    title: { absolute: ANGEL_HUB_EN.title },
-    description: ANGEL_HUB_EN.description,
-    keywords: ["angel numbers", "111 meaning", "222 meaning", "11:11 meaning", "repeating numbers"],
-    alternates: localizedAlternates(path, path, "en"),
-    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
-    twitter: { card: "summary_large_image", title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description },
-  };
+  const locale = await getRequestLocale();
+  if (locale === "ka") return KA_METADATA;
+  if (locale === "en") {
+    const path = "/angeluri-ricxvebi";
+    return {
+      title: { absolute: ANGEL_HUB_EN.title },
+      description: ANGEL_HUB_EN.description,
+      keywords: ["angel numbers", "111 meaning", "222 meaning", "11:11 meaning", "repeating numbers"],
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+      twitter: { card: "summary_large_image", title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description },
+    };
+  }
+  return KA_METADATA;
 }
 
 export default async function AngelNumbersHubPage() {
-  if ((await getRequestLocale()) === "en") return <AngelNumbersHubEn />;
+  const locale = await getRequestLocale();
+  if (locale === "en") return <AngelNumbersHubEn />;
   const ld = [
     articleLd({
       url: `${SITE_URL}/angeluri-ricxvebi`,

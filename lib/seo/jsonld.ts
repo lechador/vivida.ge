@@ -11,18 +11,23 @@
  */
 
 import { isEnglishHost } from "./locales";
+import { stripArmenianPrefix } from "@/lib/i18n/armenian-routes";
 
 const SITE_URL = "https://www.vivida.ge";
 
 /**
- * The same builders serve both language domains, so the page URL is the
+ * The same builders serve all language domains, so the page URL is the
  * only reliable locale signal available to a synchronous helper. Deriving
  * it here keeps `inLanguage` correct without every call site threading a
- * locale through — English pages already pass their vividaastro.com URL.
+ * locale through — English pages pass vividaastro.com, Armenian pass /am.
  */
-function inLanguageFor(url: string): "en" | "ka-GE" {
+function inLanguageFor(url: string): "en" | "ka-GE" | "hy-AM" {
   try {
-    return isEnglishHost(new URL(url).host) ? "en" : "ka-GE";
+    const parsed = new URL(url);
+    if (stripArmenianPrefix(parsed.pathname) !== null) {
+      return "hy-AM";
+    }
+    return isEnglishHost(parsed.host) ? "en" : "ka-GE";
   } catch {
     return "ka-GE";
   }

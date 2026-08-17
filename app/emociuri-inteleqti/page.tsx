@@ -23,19 +23,24 @@ const KA_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) !== "en") return KA_METADATA;
-  const path = "/emociuri-inteleqti";
-  return {
-    title: { absolute: EQ_HUB_EN.title }, description: EQ_HUB_EN.description,
-    keywords: ["emotional intelligence", "EQ skills", "empathy", "emotion regulation", "self-awareness"],
-    alternates: localizedAlternates(path, path, "en"),
-    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: EQ_HUB_EN.title, description: EQ_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
-    twitter: { card: "summary_large_image", title: EQ_HUB_EN.title, description: EQ_HUB_EN.description },
-  };
+  const locale = await getRequestLocale();
+  if (locale === "ka") return KA_METADATA;
+  if (locale === "en") {
+    const path = "/emociuri-inteleqti";
+    return {
+      title: { absolute: EQ_HUB_EN.title }, description: EQ_HUB_EN.description,
+      keywords: ["emotional intelligence", "EQ skills", "empathy", "emotion regulation", "self-awareness"],
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: EQ_HUB_EN.title, description: EQ_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+      twitter: { card: "summary_large_image", title: EQ_HUB_EN.title, description: EQ_HUB_EN.description },
+    };
+  }
+  return KA_METADATA;
 }
 
 export default async function EqArticlesPage() {
-  if ((await getRequestLocale()) === "en") return <EqArticlesHubEn />;
+  const locale = await getRequestLocale();
+  if (locale === "en") return <EqArticlesHubEn />;
   const session = await auth();
   const authed = !!session?.user?.id;
   const categories = [...new Set(EQ_ARTICLES.map((item) => item.category))];

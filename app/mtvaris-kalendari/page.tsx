@@ -70,9 +70,13 @@ const KA_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if ((await getRequestLocale()) !== "en") return KA_METADATA;
-  const path = "/mtvaris-kalendari"; const { title, description } = MOON_CALENDAR_EN;
-  return { title: { absolute: title }, description, keywords: ["moon calendar", `moon calendar ${CURRENT_YEAR}`, "moon phase today", "next full moon", "next new moon"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  const locale = await getRequestLocale();
+  if (locale === "ka") return KA_METADATA;
+  if (locale === "en") {
+    const path = "/mtvaris-kalendari"; const { title, description } = MOON_CALENDAR_EN;
+    return { title: { absolute: title }, description, keywords: ["moon calendar", `moon calendar ${CURRENT_YEAR}`, "moon phase today", "next full moon", "next new moon"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  return KA_METADATA;
 }
 
 const MONTHS_KA = [
