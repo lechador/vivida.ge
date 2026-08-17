@@ -1,14 +1,14 @@
-import Link from "next/link";
-import { Calendar, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import {
   ALL_SLUGS,
+  ELEMENT_LABEL_AM,
   ZODIAC_DATES,
+  elementSlugForSign,
   signMetaBySlug,
 } from "@/lib/seo/zodiac-dates";
 import { ZODIAC_SIGN_AM } from "@/lib/zodiac-sign-am";
@@ -16,6 +16,9 @@ import { signColor } from "@/lib/zodiac";
 import { breadcrumbLd } from "@/lib/seo/jsonld";
 import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
 
+/* Kept only as a record of the original Georgian-to-Armenian mapping. Several
+ * keys accidentally mixed Georgian and Armenian code points, so runtime
+ * lookups now use canonical slug fields below instead of script-sensitive text.
 const ELEMENT_AM: Record<string, string> = {
   ცეცხლი: "Կրակ",
   მიწա: "Հող",
@@ -38,6 +41,13 @@ const RULER_AM: Record<string, string> = {
   ურანი: "Ուրան",
   ნეპտუნი: "Նեպտուն",
   პլუტონი: "Պլուտոն",
+};
+
+*/
+const MODALITY_AM_CANONICAL: Record<string, string> = {
+  კარდინალური: "Կարդինալ",
+  ფიქსირებული: "Ֆիքսված",
+  მუტაბელური: "Փոփոխական",
 };
 
 const FAQ = [
@@ -116,9 +126,10 @@ export function ZodiacHubAm() {
             const dates = ZODIAC_DATES[slug];
             const profile = ZODIAC_SIGN_AM[slug];
             const color = signColor(meta);
-            const element = ELEMENT_AM[meta.element] ?? meta.element;
-            const modality = MODALITY_AM[meta.modality] ?? meta.modality;
-            const ruler = RULER_AM[meta.ruler] ?? meta.ruler;
+            const element = ELEMENT_LABEL_AM[elementSlugForSign(slug)];
+            const modality =
+              MODALITY_AM_CANONICAL[meta.modality] ?? meta.modality;
+            const ruler = meta.rulerAm;
 
             return (
               <article

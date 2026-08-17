@@ -1,25 +1,29 @@
-import type { AstrologyCalendarDay, CalendarTone } from "@/lib/seo/astrology-calendar";
+import type {
+  AstrologyCalendarDay,
+  CalendarTone,
+} from "@/lib/seo/astrology-calendar";
 import { formatAmDate } from "@/lib/i18n/am-date";
+import { BODIES } from "@/lib/zodiac";
 
 const PLANET_AM: Record<string, string> = {
-  "მზე": "Արև",
-  "მთვარე": "Լուսին",
-  "მერკური": "Մերկուրի",
-  "ვენერა": "Վեներա",
-  "მარსი": "Մարս",
-  "იუპიტერი": "Յուպիտեր",
-  "სატურნი": "Սատուրն",
-  "ურანი": "Ուրան",
-  "ნეპտუნი": "Նեպտուն",
-  "პლუტონი": "Պլուտոն",
+  მზე: "Արև",
+  მთვარე: "Լուսին",
+  მერკური: "Մերկուրի",
+  ვენერა: "Վեներա",
+  მარსი: "Մարս",
+  იუპიტერი: "Յուպիտեր",
+  სატურნი: "Սատուրն",
+  ურანი: "Ուրան",
+  ნეპտუნი: "Նեպտուն",
+  პლუტონი: "Պլուտոն",
 };
 
 const ASPECT_AM: Record<string, string> = {
-  "შეერთება": "միացում",
-  "სექსტილი": "սեքստիլ",
-  "კვადრატი": "քառակուսի",
-  "ტრიგონი": "տրին",
-  "ოპოზიცია": "օպոզիցիա",
+  შეერთება: "միացում",
+  სექსტილი: "սեքստիլ",
+  კვადრატი: "քառակուսի",
+  ტრიგონი: "տրին",
+  ოპოზიცია: "օպոզիցիա",
 };
 
 const WEEKDAYS_AM = [
@@ -32,13 +36,20 @@ const WEEKDAYS_AM = [
   "Շաբաթ",
 ];
 
-export const TONE_AM: Record<CalendarTone, { label: string; color: string; icon: string }> = {
+export const TONE_AM: Record<
+  CalendarTone,
+  { label: string; color: string; icon: string }
+> = {
   lucky: { label: "Բարենպաստ", color: "var(--vivida-cyan)", icon: "✦" },
-  balanced: { label: "Հավասարակշռված", color: "var(--vivida-violet)", icon: "◐" },
+  balanced: {
+    label: "Հավասարակշռված",
+    color: "var(--vivida-violet)",
+    icon: "◐",
+  },
   careful: { label: "Զգուշության օր", color: "var(--vivida-pink)", icon: "△" },
 };
 
-export function calendarDateLabelAm(date: Date, short = false) {
+export function calendarDateLabelAm(date: Date) {
   return formatAmDate(date);
 }
 
@@ -47,7 +58,11 @@ export function weekdayAm(date: Date) {
 }
 
 export function planetAm(labelKa: string) {
-  return PLANET_AM[labelKa] ?? labelKa;
+  return (
+    Object.values(BODIES).find((body) => body.labelKa === labelKa)?.labelAm ??
+    PLANET_AM[labelKa] ??
+    labelKa
+  );
 }
 
 export function aspectAm(kindKa: string) {
@@ -58,7 +73,7 @@ export function dayLeadAm(day: AstrologyCalendarDay) {
   const strongest = day.sky.aspects[0];
   return strongest
     ? `${planetAm(strongest.aKa)}–${planetAm(strongest.bKa)} ${aspectAm(
-        strongest.kindKa
+        strongest.kindKa,
       )} ասպեկտը սահմանում է օրվա գլխավոր աստղաբանական տոնայնությունը:`
     : "Քանի որ ուժեղ լարված ասպեկտներ չկան, օրվա ընդհանուր ռիթմը համեմատաբար հանգիստ և ճկուն է:";
 }

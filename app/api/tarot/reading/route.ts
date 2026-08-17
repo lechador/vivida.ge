@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { normalizeUserLocale } from "@/lib/i18n/locale";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { performReading } from "@/lib/tarot/reading";
 
@@ -22,7 +23,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const body = (await req.json().catch(() => ({}))) as { question?: unknown };
+  const body = (await req.json().catch(() => ({}))) as {
+    question?: unknown;
+    locale?: unknown;
+  };
   const question = typeof body.question === "string" ? body.question : "";
 
   // Daily cap on the AI call, matching the other LLM routes. Credits alone are
@@ -38,13 +42,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  const locale = await getRequestLocale();
+  const locale =
+    body.locale === "am" || body.locale === "en" || body.locale === "ka"
+      ? normalizeUserLocale(body.locale)
+      : await getRequestLocale();
   const result = await performReading(userId, question, locale);
   if (!result.ok) {
     if (result.error === "insufficient") {
       return NextResponse.json(
         { error: "needs_credits", cost: result.cost, balance: result.balance },
-        { status: 402 }
+        { status: 402 },
       );
     }
     return NextResponse.json({ error: result.error }, { status: 400 });

@@ -6,22 +6,30 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { BigFiveTestClient } from "@/components/big-five/big-five-test-client";
 import { PopularSearches } from "@/components/seo/popular-searches";
+import { ArmenianBigFiveAssessmentPage } from "@/components/tests/armenian-assessment-pages";
 import { BIG5_QUESTION_COUNT, BIG5_TRAITS } from "@/lib/big-five/questions";
 import { BIG5_META_DESCRIPTION, BIG5_META_DESCRIPTION_EN, BIG5_INTRO, BIG5_INTRO_EN, BIG5_FAQ, BIG5_FAQ_EN } from "@/lib/big-five/content";
 import { BIGFIVE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const TITLE_KA = "Big Five ტესტი — დიდი ხუთეული, პიროვნების ტესტი ქართულად";
 const TITLE_EN = "Free Big Five Personality Test — OCEAN Profile";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const title = "Անվճար Big Five անհատականության թեստ — OCEAN պրոֆիլ";
+    const description = "Պատասխանեք 40 հարցի և բացահայտեք ձեր պրոֆիլը անհատականության հինգ լայն գծերով։";
+    const url = `${ARMENIAN_SITE_URL}/big-five`;
+    return { title: { absolute: title }, description, keywords: ["անվճար Big Five թեստ", "OCEAN անհատականության թեստ", "անհատականության հինգ գծերը"], alternates: localizedAlternates("/am/big-five", "/big-five", "am"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "hy_AM" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  const en = locale === "en";
   const title = en ? TITLE_EN : TITLE_KA;
   const description = en ? BIG5_META_DESCRIPTION_EN : BIG5_META_DESCRIPTION;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  return { title: { absolute: title }, description, keywords: en ? ["free Big Five test", "Big Five personality test", "OCEAN personality test", "personality traits test"] : ["big five ტესტი", "დიდი ხუთეული", "პიროვნების ტესტი", "ocean ტესტი"], alternates: { canonical: `${siteUrl}/big-five`, languages: { en: `${ENGLISH_SITE_URL}/big-five`, "ka-GE": `${GEORGIAN_SITE_URL}/big-five`, "x-default": `${ENGLISH_SITE_URL}/big-five` } }, openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/big-five`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" }, twitter: { card: "summary_large_image", title, description } };
+  return { title: { absolute: title }, description, keywords: en ? ["free Big Five test", "Big Five personality test", "OCEAN personality test", "personality traits test"] : ["big five ტესტი", "დიდი ხუთეული", "პიროვნების ტესტი", "ocean ტესტი"], alternates: localizedAlternates("/big-five", "/big-five", en ? "en" : "ka"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/big-five`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" }, twitter: { card: "summary_large_image", title, description } };
 }
 
 /**
@@ -34,6 +42,7 @@ export default async function BigFiveTestPage() {
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
   const en = locale === "en";
+  if (locale === "am") return <ArmenianBigFiveAssessmentPage authed={authed} />;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const description = en ? BIG5_META_DESCRIPTION_EN : BIG5_META_DESCRIPTION;
   const faq = en ? BIG5_FAQ_EN : BIG5_FAQ;

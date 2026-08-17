@@ -6,6 +6,7 @@ import { MbtiQuiz } from "@/components/mbti-quiz";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { MBTI_ANSWERS_STORAGE_KEY, type MbtiQuestion } from "@/lib/mbti-questions";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { localeHref } from "@/lib/i18n/armenian-routes";
 
 /**
  * Public test host. The quiz runs for everyone (no login needed); on finish
@@ -16,12 +17,13 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function MbtiTestClient({ questions, locale = "ka" }: { questions: MbtiQuestion[]; locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
+  const am = locale === "am";
   return (
     <MbtiQuiz
       questions={questions}
       locale={locale}
-      submitLabel={en ? "See my result" : "დასრულება"}
-      workingLabel={en ? "Preparing your result…" : "ვამზადებ შენს შედეგს…"}
+      submitLabel={am ? "Տեսնել արդյունքը" : en ? "See my result" : "დასრულება"}
+      workingLabel={am ? "Պատրաստում ենք ձեր արդյունքը…" : en ? "Preparing your result…" : "ვამზადებ შენს შედეგს…"}
       onSubmit={async (answers) => {
         try {
           window.localStorage.setItem(
@@ -36,7 +38,7 @@ export function MbtiTestClient({ questions, locale = "ka" }: { questions: MbtiQu
           test: "mbti",
           items: questions.length,
         });
-        router.push("/pirovnebis-testi/claim");
+        router.push(localeHref("/pirovnebis-testi/claim", locale));
         return { ok: true };
       }}
     />

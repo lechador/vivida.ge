@@ -15,6 +15,8 @@ import {
 } from "@/lib/big-five/questions";
 
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { localeHref } from "@/lib/i18n/armenian-routes";
+import { BIG5_QUESTIONS_AM, FIVE_POINT_LIKERT_AM } from "@/lib/tests-content-am";
 
 /**
  * Hosts the Big Five quiz. On finish it stashes the answers + a fresh attemptId
@@ -24,7 +26,9 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function BigFiveTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
-  const questions = en ? BIG5_QUESTIONS_EN : BIG5_QUESTIONS;
+  const am = locale === "am";
+  const questions = am ? BIG5_QUESTIONS_AM : en ? BIG5_QUESTIONS_EN : BIG5_QUESTIONS;
+  const scale = am ? FIVE_POINT_LIKERT_AM : BIG5_LIKERT;
 
   async function onSubmit(
     answers: Record<number, number>
@@ -45,11 +49,11 @@ export function BigFiveTestClient({ locale = "ka" }: { locale?: UserLocale }) {
       test: "big_five",
       items: questions.length,
     });
-    router.push("/big-five/shedegi");
+    router.push(localeHref("/big-five/shedegi", locale));
     return { ok: true };
   }
 
   return (
-    <LikertQuiz questions={questions} scale={BIG5_LIKERT} onSubmit={onSubmit} locale={locale} submitLabel={en ? "See my result" : "ნახე შედეგი"} workingLabel={en ? "Calculating your profile…" : "ვთვლი შენს პროფილს…"} />
+    <LikertQuiz questions={questions} scale={scale} onSubmit={onSubmit} locale={locale} submitLabel={am ? "Տեսնել արդյունքը" : en ? "See my result" : "ნახე შედეგი"} workingLabel={am ? "Հաշվում ենք ձեր պրոֆիլը…" : en ? "Calculating your profile…" : "ვთვლი შენს პროფილს…"} />
   );
 }

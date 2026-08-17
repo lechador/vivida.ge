@@ -206,6 +206,19 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor(path, path),
   }));
 
+  const armenianAssessmentEntries = [
+    "/pirovnebis-testi",
+    "/iq-testi",
+    "/eq-testi",
+    "/big-five",
+  ].map((path) => ({
+    url: `${ENGLISH_SITE_URL}/am${path}`,
+    lastModified: ARMENIAN_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.9,
+    alternates: alternatesFor(path, path),
+  }));
+
   const placementEntries = (["mtvare", "amomavali"] as const).flatMap(
     (placement) =>
       ALL_SLUGS.map((sign) => {
@@ -569,6 +582,7 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...zodiacGuideHubEntries,
     ...productGuideEntries,
     ...armenianQuizEntries,
+    ...armenianAssessmentEntries,
     ...placementEntries,
     ...elementEntries,
     ...thematicHubEntries,

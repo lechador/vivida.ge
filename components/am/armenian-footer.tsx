@@ -34,6 +34,8 @@ const TOOLS = [
   { href: "/pirovnebis-testi", label: "Անհատականության թեստ" },
   { href: "/mbti", label: "MBTI տիպեր" },
   { href: "/iq-testi", label: "IQ թեստ" },
+  { href: "/eq-testi", label: "EQ թեստ" },
+  { href: "/big-five", label: "Big Five թեստ" },
   { href: "/emociuri-inteleqti", label: "Էմոցիոնալ ինտելեկտ" },
 ];
 

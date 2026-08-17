@@ -63,6 +63,10 @@ describe("Armenian hreflang gating", () => {
     expect(hasArmenianVersion("/how-it-works")).toBe(true);
     expect(hasArmenianVersion("/quiz/namdvili-nishani")).toBe(true);
     expect(hasArmenianVersion("/quiz/varskvlavebis-zodiaqo")).toBe(true);
+    expect(hasArmenianVersion("/pirovnebis-testi")).toBe(true);
+    expect(hasArmenianVersion("/iq-testi")).toBe(true);
+    expect(hasArmenianVersion("/eq-testi")).toBe(true);
+    expect(hasArmenianVersion("/big-five")).toBe(true);
     expect(hasArmenianVersion("/amomavali/verdzi")).toBe(false);
   });
 

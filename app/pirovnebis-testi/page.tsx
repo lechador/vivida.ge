@@ -10,11 +10,13 @@ import { MbtiTestClient } from "@/components/mbti/mbti-test-client";
 import { TestMusicPlayer } from "@/components/mbti/test-music-player";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
+import { ArmenianMbtiAssessmentPage } from "@/components/tests/armenian-assessment-pages";
 import { PERSONALITY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { MBTI_QUESTIONS_EN } from "@/lib/mbti-questions";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { MBTI_QUESTIONS_AM } from "@/lib/tests-content-am";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -26,8 +28,15 @@ const TITLE_EN = "Free Personality Test — Discover Your 16-Type Profile";
 const DESCRIPTION_EN = "Take a free 60-question personality test and explore your preferences across energy, information, decisions, structure and identity.";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
-  if (en) return { title: { absolute: TITLE_EN }, description: DESCRIPTION_EN, keywords: ["free personality test", "16 personalities test", "MBTI style test", "personality type test"], alternates: { canonical: `${ENGLISH_SITE_URL}/pirovnebis-testi`, languages: { en: `${ENGLISH_SITE_URL}/pirovnebis-testi`, "ka-GE": `${GEORGIAN_SITE_URL}/pirovnebis-testi`, "x-default": `${ENGLISH_SITE_URL}/pirovnebis-testi` } }, openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${ENGLISH_SITE_URL}/pirovnebis-testi`, title: TITLE_EN, description: DESCRIPTION_EN, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: TITLE_EN, description: DESCRIPTION_EN } };
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const title = "Անվճար անհատականության թեստ — բացահայտեք ձեր 16 տիպերից մեկը";
+    const description = "Պատասխանեք 60 հարցի և բացահայտեք ձեր նախընտրությունները էներգիայի, տեղեկատվության, որոշումների, կառուցվածքի և ինքնության ոլորտներում։";
+    const url = `${ARMENIAN_SITE_URL}/pirovnebis-testi`;
+    return { title: { absolute: title }, description, keywords: ["անվճար անհատականության թեստ", "MBTI թեստ հայերեն", "16 տիպերի թեստ", "հոգեբանական թեստ"], alternates: localizedAlternates("/am/pirovnebis-testi", "/pirovnebis-testi", "am"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "hy_AM" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  const en = locale === "en";
+  if (en) return { title: { absolute: TITLE_EN }, description: DESCRIPTION_EN, keywords: ["free personality test", "16 personalities test", "MBTI style test", "personality type test"], alternates: localizedAlternates("/pirovnebis-testi", "/pirovnebis-testi", "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${ENGLISH_SITE_URL}/pirovnebis-testi`, title: TITLE_EN, description: DESCRIPTION_EN, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: TITLE_EN, description: DESCRIPTION_EN } };
   return {
   title: { absolute: TITLE },
   description: DESCRIPTION,
@@ -48,14 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
   ],
   // Reciprocal — the English side already points here, and hreflang pairs
   // are discarded unless both directions agree.
-  alternates: {
-    canonical: `${SITE_URL}/pirovnebis-testi`,
-    languages: {
-      en: `${ENGLISH_SITE_URL}/pirovnebis-testi`,
-      "ka-GE": `${SITE_URL}/pirovnebis-testi`,
-      "x-default": `${ENGLISH_SITE_URL}/pirovnebis-testi`,
-    },
-  },
+  alternates: localizedAlternates("/pirovnebis-testi", "/pirovnebis-testi", "ka"),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     type: "website",
@@ -93,7 +95,9 @@ export default async function TestPage() {
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const questions = en ? MBTI_QUESTIONS_EN : await getMbtiQuestions();
+  const am = locale === "am";
+  const questions = am ? MBTI_QUESTIONS_AM : en ? MBTI_QUESTIONS_EN : await getMbtiQuestions();
+  if (am) return <ArmenianMbtiAssessmentPage authed={authed} questions={questions} />;
   const siteUrl = en ? ENGLISH_SITE_URL : SITE_URL;
   const description = en ? DESCRIPTION_EN : DESCRIPTION;
 

@@ -6,6 +6,7 @@ import { ChevronLeft, Focus, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { EQ_LIKERT, type EqQuestion } from "@/lib/eq/questions";
+import { FIVE_POINT_LIKERT_AM } from "@/lib/tests-content-am";
 
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -35,6 +36,8 @@ export function EqQuiz({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const am = locale === "am";
+  const scale = am ? [...FIVE_POINT_LIKERT_AM].sort((a, b) => b.value - a.value) : SCALE;
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [index, setIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +86,7 @@ export function EqQuiz({
     if (!allAnswered) {
       const missing = questions.findIndex((qq) => answers[qq.id] === undefined);
       if (missing >= 0) setIndex(missing);
-      setError(en ? "Please answer every question." : "გთხოვ, უპასუხე ყველა კითხვას.");
+      setError(am ? "Խնդրում ենք պատասխանել բոլոր հարցերին։" : en ? "Please answer every question." : "გთხოვ, უპასუხე ყველა კითხვას.");
       return;
     }
     setError(null);
@@ -127,8 +130,8 @@ export function EqQuiz({
           type="button"
           onClick={toggleFocus}
           aria-pressed={focus}
-          aria-label={focus ? (en ? "Exit focus mode" : "ფოკუს-რეჟიმის გამორთვა") : (en ? "Enter focus mode" : "ფოკუს-რეჟიმის ჩართვა")}
-          title={focus ? (en ? "Exit focus mode" : "ფოკუს-რეჟიმის გამორთვა") : (en ? "Focus mode" : "ფოკუს-რეჟიმი")}
+          aria-label={focus ? (am ? "Անջատել կենտրոնացման ռեժիմը" : en ? "Exit focus mode" : "ფოკუს-რეჟიმის გამორთვა") : (am ? "Միացնել կենտրոնացման ռեժիմը" : en ? "Enter focus mode" : "ფოკუს-რეჟიმის ჩართვა")}
+          title={focus ? (am ? "Անջատել կենտրոնացման ռեժիմը" : en ? "Exit focus mode" : "ფოკუს-რეჟიმის გამორთვა") : (am ? "Կենտրոնացման ռեժիմ" : en ? "Focus mode" : "ფოკუს-რეჟიმი")}
           className={cn(
             "absolute -right-2.5 -top-2.5 grid size-8 place-items-center rounded-full border backdrop-blur-xl transition-all hover:scale-105 sm:-right-3 sm:-top-3",
             focus
@@ -143,7 +146,7 @@ export function EqQuiz({
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
             <span>
-              {en ? "Question" : "კითხვა"} {index + 1} / {total}
+              {am ? "Հարց" : en ? "Question" : "კითხვა"} {index + 1} / {total}
             </span>
             <span className="tabular-nums">{progressPct}%</span>
           </div>
@@ -158,15 +161,15 @@ export function EqQuiz({
         {/* Question */}
         <div key={q.id} className="animate-in fade-in duration-300">
           <p className="min-h-[3.5rem] text-balance text-lg font-medium leading-snug sm:text-xl">
-            {en ? q.textEn ?? q.textKa : q.textKa}
+            {am || en ? q.textEn ?? q.textKa : q.textKa}
           </p>
 
           <div
             role="radiogroup"
-            aria-label={en ? "Your answer" : "შენი პასუხი"}
+            aria-label={am ? "Ձեր պատասխանը" : en ? "Your answer" : "შენი პასუხი"}
             className="mt-7 flex items-center justify-center gap-2 sm:gap-3"
           >
-            {SCALE.map((opt) => {
+            {scale.map((opt) => {
               const selected = current === opt.value;
               const magnitude = Math.abs(opt.value - 3); // 0,1,2
               const size =
@@ -187,8 +190,8 @@ export function EqQuiz({
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  aria-label={en ? opt.labelEn : opt.labelKa}
-                  title={en ? opt.labelEn : opt.labelKa}
+                  aria-label={am || en ? opt.labelEn : opt.labelKa}
+                  title={am || en ? opt.labelEn : opt.labelKa}
                   onClick={() => pick(opt.value)}
                   className={cn(
                     "grid shrink-0 place-items-center rounded-full border-2 transition-all duration-150 hover:scale-110",
@@ -213,8 +216,8 @@ export function EqQuiz({
             })}
           </div>
           <div className="mt-3 flex items-center justify-between px-1 text-xs text-muted-foreground">
-            <span>{en ? "Agree" : "ვეთანხმები"}</span>
-            <span>{en ? "Disagree" : "არ ვეთანხმები"}</span>
+            <span>{am ? "Համաձայն եմ" : en ? "Agree" : "ვეთანხმები"}</span>
+            <span>{am ? "Համաձայն չեմ" : en ? "Disagree" : "არ ვეთანხმები"}</span>
           </div>
         </div>
 
@@ -234,7 +237,7 @@ export function EqQuiz({
             className="gap-1"
           >
             <ChevronLeft className="size-4" />
-            {en ? "Previous" : "წინა"}
+            {am ? "Նախորդը" : en ? "Previous" : "წინა"}
           </Button>
 
           {isLast ? (
@@ -255,7 +258,7 @@ export function EqQuiz({
               onClick={() => setIndex((i) => Math.min(total - 1, i + 1))}
               disabled={current === undefined}
             >
-              {en ? "Next" : "შემდეგი"}
+              {am ? "Հաջորդը" : en ? "Next" : "შემდეგი"}
             </Button>
           )}
         </div>

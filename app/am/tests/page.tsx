@@ -15,6 +15,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { SmartHeader } from "@/components/smart-header";
 import { SiteFooter } from "@/components/site-footer";
 import { TESTS, type TestCatalogEntry } from "@/lib/tests-catalog";
+import { localeHref } from "@/lib/i18n/armenian-routes";
 import {
   DEFAULT_OG_IMAGE,
   ARMENIAN_SITE_URL,
@@ -234,7 +235,7 @@ function TestSection({
                 {test.metaAm}
               </div>
               <Link
-                href={test.href}
+                href={localeHref(test.href, "am")}
                 className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm font-semibold text-white"
               >
                 {test.kind === "quiz" ? "Սկսել քվիզը" : "Սկսել թեստը"}

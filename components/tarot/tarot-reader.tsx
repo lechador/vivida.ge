@@ -43,11 +43,12 @@ export function TarotReader({
   locale: UserLocale;
 }) {
   const en = locale === "en";
+  const am = locale === "am";
   const router = useRouter();
   const [question, setQuestion] = useState("");
   const [reading, setReading] = useState<Reading | null>(null);
   const [status, setStatus] = useState<"idle" | "drawing" | "short" | "error">(
-    "idle"
+    "idle",
   );
 
   async function ask() {
@@ -63,7 +64,9 @@ export function TarotReader({
       trackEvent(ANALYTICS_EVENT.tarotLoginRequired, {
         widget: "tarot_reader",
       });
-      router.push(`/login?next=${encodeURIComponent("/taro")}`);
+      router.push(
+        `/login?next=${encodeURIComponent(am ? "/am/taro" : "/taro")}`,
+      );
       return;
     }
     setStatus("drawing");
@@ -72,7 +75,7 @@ export function TarotReader({
       const res = await fetch("/api/tarot/reading", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q }),
+        body: JSON.stringify({ question: q, locale }),
       });
       if (res.status === 402) {
         trackEvent(ANALYTICS_EVENT.tarotCreditsShort, {
@@ -109,7 +112,11 @@ export function TarotReader({
         htmlFor="tarot-question"
         className="block text-sm font-medium text-foreground/90"
       >
-        {en ? "Ask the cards a question" : "დაუსვი კითხვა კარტებს"}
+        {am
+          ? "Հարց տվեք քարտերին"
+          : en
+            ? "Ask the cards a question"
+            : "დაუსვი კითხვა კარტებს"}
       </label>
       <div className="mt-2 flex flex-col gap-3 sm:flex-row">
         <input
@@ -123,9 +130,11 @@ export function TarotReader({
           disabled={status === "drawing"}
           maxLength={300}
           placeholder={
-            en
-              ? "For example: What should I understand about this relationship?"
-              : "მაგ: რას მიპირებს ეს ურთიერთობა?"
+            am
+              ? "Օրինակ՝ ի՞նչ պետք է հասկանամ այս հարաբերությունների մասին:"
+              : en
+                ? "For example: What should I understand about this relationship?"
+                : "მაგ: რას მიპირებს ეს ურთიერთობა?"
           }
           className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
         />
@@ -141,14 +150,16 @@ export function TarotReader({
           ) : (
             <Wand2 className="size-4" />
           )}
-          {en ? "Draw the cards" : "გაშალე კარტები"}
+          {am ? "Բացել քարտերը" : en ? "Draw the cards" : "გაშალე კარტები"}
         </Button>
       </div>
       <div className="mt-2">
         <CreditHint>
-          {en
-            ? `Your first question is free, then ${cost} credits`
-            : `პირველი კითხვა უფასოა, შემდეგ −${cost} კრედიტი`}
+          {am
+            ? `Առաջին հարցն անվճար է, այնուհետև՝ ${cost} կրեդիտ`
+            : en
+              ? `Your first question is free, then ${cost} credits`
+              : `პირველი კითხვა უფასოა, შემდეგ −${cost} კრედიტი`}
         </CreditHint>
       </div>
 
@@ -156,23 +167,31 @@ export function TarotReader({
       {status === "short" && (
         <div className="mt-5 rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
           <p className="text-[var(--vivida-pink)]">
-            {en
-              ? "You do not have enough credits. Invite a friend or top up your balance."
-              : "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი."}
+            {am
+              ? "Կրեդիտները բավարար չեն: Հրավիրեք ընկերոջը կամ համալրեք հաշվեկշիռը:"
+              : en
+                ? "You do not have enough credits. Invite a friend or top up your balance."
+                : "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი."}
           </p>
           <Button asChild variant="mystic" className="mt-3">
             <Link href="/credits">
               <Users className="size-4" />
-              {en ? "Invite / top up" : "მოიწვიე / შეავსე"}
+              {am
+                ? "Հրավիրել / համալրել"
+                : en
+                  ? "Invite / top up"
+                  : "მოიწვიე / შეავსე"}
             </Link>
           </Button>
         </div>
       )}
       {status === "error" && (
         <p className="mt-4 text-sm text-[var(--vivida-pink)]">
-          {en
-            ? "Something went wrong. Please try again."
-            : "რაღაც ვერ მოხერხდა — სცადე ხელახლა."}
+          {am
+            ? "Ինչ-որ բան սխալ ստացվեց: Խնդրում ենք կրկին փորձել:"
+            : en
+              ? "Something went wrong. Please try again."
+              : "რაღაც ვერ მოხერხდა — სცადე ხელახლა."}
         </p>
       )}
 
@@ -199,7 +218,7 @@ export function TarotReader({
 
           <div className="text-center">
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {en ? "Your reading" : "შენი კითხვა"}
+              {am ? "Ձեր ընթերցումը" : en ? "Your reading" : "შენი კითხვა"}
             </div>
             <h3 className="mt-1 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
               {reading.headline}
@@ -214,7 +233,8 @@ export function TarotReader({
               >
                 <div className="text-xs font-medium text-[var(--vivida-violet)]">
                   {c.position} · {c.name}
-                  {c.reversed && (en ? " (reversed)" : " (შებრუნებული)")}
+                  {c.reversed &&
+                    (am ? " (շրջված)" : en ? " (reversed)" : " (შებრუნებული)")}
                 </div>
                 <p className="mt-1 text-sm leading-relaxed text-foreground/90">
                   {c.interpretation}
@@ -238,16 +258,25 @@ export function TarotReader({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-xs text-muted-foreground">
               {reading.free
-                ? en
-                  ? "First reading — free ✦"
-                  : "პირველი კითხვა — უფასო ✦"
-                : en
-                  ? `−${reading.charged} credits · ${reading.balance} remaining`
-                  : `−${reading.charged} კრედიტი · ბალანსი ${reading.balance}`}
+                ? am
+                  ? "Առաջին ընթերցումը՝ անվճար ✦"
+                  : en
+                    ? "First reading — free ✦"
+                    : "პირველი კითხვა — უფასო ✦"
+                : am
+                  ? `−${reading.charged} կրեդիտ · մնացել է ${reading.balance}`
+                  : en
+                    ? `−${reading.charged} credits · ${reading.balance} remaining`
+                    : `−${reading.charged} კრედიტი · ბალანსი ${reading.balance}`}
             </span>
-            <Button type="button" variant="outline" onClick={reset} className="gap-1.5">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={reset}
+              className="gap-1.5"
+            >
               <RotateCcw className="size-4" />
-              {en ? "New question" : "ახალი კითხვა"}
+              {am ? "Նոր հարց" : en ? "New question" : "ახალი კითხვა"}
             </Button>
           </div>
 
@@ -255,26 +284,38 @@ export function TarotReader({
               moment, instead of dead-ending at the credit-gated new question. */}
           <div className="border-t border-border/40 pt-5 text-center">
             <p className="text-xs text-muted-foreground">
-              {en ? "Or keep exploring" : "ან განაგრძე"}
+              {am
+                ? "Կամ շարունակեք ուսումնասիրել"
+                : en
+                  ? "Or keep exploring"
+                  : "ან განაგრძე"}
             </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               <Link
                 href="/dashboard"
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
               >
-                {en ? "Daily horoscope" : "დღის ჰოროსკოპი"}
+                {am
+                  ? "Օրվա հորոսկոպ"
+                  : en
+                    ? "Daily horoscope"
+                    : "დღის ჰოროსკოპი"}
               </Link>
               <Link
                 href="/report"
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
               >
-                {en ? "My natal chart" : "ჩემი ნატალური რუკა"}
+                {am
+                  ? "Իմ ծննդյան քարտեզը"
+                  : en
+                    ? "My natal chart"
+                    : "ჩემი ნატალური რუკა"}
               </Link>
               <Link
-                href="/tests"
+                href={am ? "/am/tests" : "/tests"}
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
               >
-                {en ? "Tests" : "ტესტები"}
+                {am ? "Թեստեր" : en ? "Tests" : "ტესტები"}
               </Link>
             </div>
           </div>
@@ -285,7 +326,13 @@ export function TarotReader({
 }
 
 /** A single revealed card — illustration with a styled fallback back. */
-function TarotCardFace({ card, delayMs }: { card: SpreadCard; delayMs: number }) {
+function TarotCardFace({
+  card,
+  delayMs,
+}: {
+  card: SpreadCard;
+  delayMs: number;
+}) {
   const [imgOk, setImgOk] = useState(true);
   return (
     <figure

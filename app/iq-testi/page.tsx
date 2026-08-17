@@ -9,10 +9,11 @@ import { IqTestClient } from "@/components/iq/iq-test";
 import { IQ_ADAPTIVE_LENGTH } from "@/lib/iq/adaptive";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
+import { ArmenianIqAssessmentPage } from "@/components/tests/armenian-assessment-pages";
 import { IQ_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const TITLE_KA = "IQ ტესტი — უფასო ინტელექტის ტესტი ქართულად";
 const DESCRIPTION_KA =
@@ -22,7 +23,14 @@ const DESCRIPTION_EN =
   "Take a free, adaptive 25-task IQ test covering numerical, logical, spatial and pattern reasoning. Receive an estimated IQ score and percentile in about 25 minutes.";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const title = "Անվճար IQ թեստ — հարմարվող տրամաբանական գնահատում";
+    const description = "Անցեք թվային, տրամաբանական, տարածական և պատկերային մտածողության 25 հարմարվող առաջադրանք և ստացեք IQ-ի մոտավոր միավոր։";
+    const url = `${ARMENIAN_SITE_URL}/iq-testi`;
+    return { title: { absolute: title }, description, keywords: ["անվճար IQ թեստ", "IQ թեստ հայերեն", "տրամաբանական թեստ", "ինտելեկտի թեստ"], alternates: localizedAlternates("/am/iq-testi", "/iq-testi", "am"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "hy_AM" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  const en = locale === "en";
   const title = en ? TITLE_EN : TITLE_KA;
   const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
@@ -32,14 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: en
       ? ["free IQ test", "online IQ test", "adaptive IQ test", "logic test", "reasoning test", "intelligence test"]
       : ["iq ტესტი", "iq ტესტი ქართულად", "ინტელექტის ტესტი", "უფასო iq ტესტი", "iq ტესტი ონლაინ", "ლოგიკური ტესტი"],
-    alternates: {
-      canonical: `${siteUrl}/iq-testi`,
-      languages: {
-        en: `${ENGLISH_SITE_URL}/iq-testi`,
-        "ka-GE": `${GEORGIAN_SITE_URL}/iq-testi`,
-        "x-default": `${ENGLISH_SITE_URL}/iq-testi`,
-      },
-    },
+    alternates: localizedAlternates("/iq-testi", "/iq-testi", en ? "en" : "ka"),
     openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/iq-testi`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -85,6 +86,7 @@ export default async function IqTestPage() {
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
   const en = locale === "en";
+  if (locale === "am") return <ArmenianIqAssessmentPage authed={authed} />;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
   const faq = en ? IQ_FAQ_EN : IQ_FAQ;

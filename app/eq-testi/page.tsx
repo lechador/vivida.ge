@@ -6,11 +6,12 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { EqTestClient } from "@/components/eq/eq-test-client";
 import { PopularSearches } from "@/components/seo/popular-searches";
+import { ArmenianEqAssessmentPage } from "@/components/tests/armenian-assessment-pages";
 import { EQ_QUESTION_COUNT, EQ_DOMAINS } from "@/lib/eq/questions";
 import { EQ_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const TITLE_KA = "EQ ტესტი — ემოციური ინტელექტის ტესტი ქართულად";
 const DESCRIPTION_KA =
@@ -20,14 +21,21 @@ const DESCRIPTION_EN =
   "Take a free 40-question emotional intelligence self-assessment across self-awareness, self-regulation, motivation, empathy and social skills.";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const en = (await getRequestLocale()) === "en";
+  const locale = await getRequestLocale();
+  if (locale === "am") {
+    const title = "Անվճար EQ թեստ — էմոցիոնալ ինտելեկտի գնահատում";
+    const description = "Պատասխանեք 40 հարցի և ուսումնասիրեք ինքնագիտակցությունը, ինքնակարգավորումը, մոտիվացիան, ապրումակցումը և սոցիալական հմտությունները։";
+    const url = `${ARMENIAN_SITE_URL}/eq-testi`;
+    return { title: { absolute: title }, description, keywords: ["անվճար EQ թեստ", "էմոցիոնալ ինտելեկտի թեստ", "ապրումակցման թեստ", "ինքնագիտակցության թեստ"], alternates: localizedAlternates("/am/eq-testi", "/eq-testi", "am"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "hy_AM" }, twitter: { card: "summary_large_image", title, description } };
+  }
+  const en = locale === "en";
   const title = en ? TITLE_EN : TITLE_KA;
   const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   return {
     title: { absolute: title }, description,
     keywords: en ? ["free EQ test", "emotional intelligence test", "empathy test", "self awareness test", "emotional intelligence assessment"] : ["eq ტესტი", "ემოციური ინტელექტი", "ემოციური ინტელექტის ტესტი", "უფასო eq ტესტი", "ემპათიის ტესტი"],
-    alternates: { canonical: `${siteUrl}/eq-testi`, languages: { en: `${ENGLISH_SITE_URL}/eq-testi`, "ka-GE": `${GEORGIAN_SITE_URL}/eq-testi`, "x-default": `${ENGLISH_SITE_URL}/eq-testi` } },
+    alternates: localizedAlternates("/eq-testi", "/eq-testi", en ? "en" : "ka"),
     openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/eq-testi`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -69,6 +77,7 @@ export default async function EqTestPage() {
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
   const en = locale === "en";
+  if (locale === "am") return <ArmenianEqAssessmentPage authed={authed} />;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
   const faq = en ? EQ_FAQ_EN : EQ_FAQ;

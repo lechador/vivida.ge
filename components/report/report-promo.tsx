@@ -14,7 +14,9 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
  * violet "start free" CTAs on the same pages.
  */
 export async function ReportPromo({ className }: { className?: string }) {
-  const en = (await getRequestLocale()) === "en";
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const am = locale === "am";
   const session = await auth();
   const authed = Boolean(session?.user?.id);
 
@@ -30,17 +32,25 @@ export async function ReportPromo({ className }: { className?: string }) {
         <div className="max-w-xl">
           <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-gold)]/30 bg-[var(--vivida-gold)]/10 px-2.5 py-0.5 text-xs font-medium text-[var(--vivida-gold)]">
             <Sparkles className="size-3" />
-            {en ? "Complete report · PDF" : "სრული ანგარიში · PDF"}
+            {am
+              ? "Ամբողջական զեկույց · PDF"
+              : en
+                ? "Complete report · PDF"
+                : "სრული ანგარიში · PDF"}
           </div>
           <h2 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-            {en
-              ? "An in-depth reading of your birth chart—a downloadable PDF"
-              : "შენი ნატალური რუკის ღრმა ანალიზი — ჩამოსატვირთი PDF"}
+            {am
+              ? "Ձեր ծննդյան քարտեզի խորքային վերլուծությունը՝ ներբեռնվող PDF-ով"
+              : en
+                ? "An in-depth reading of your birth chart—a downloadable PDF"
+                : "შენი ნატალური რუკის ღრმა ანალიზი — ჩამოსატვირთი PDF"}
           </h2>
           <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-            {en
-              ? "A beautifully designed 10+ page personal report covering the standout patterns in your chart, planets, houses, aspects, strengths, and growth areas."
-              : "10+ გვერდიანი პერსონალური ანგარიში: რა გამოირჩევა შენს რუკაში, პლანეტების, სახლებისა და ასპექტების დეტალური ახსნა, ძლიერი მხარეები და ზრდის ზონები — ლამაზად გაფორმებული."}
+            {am
+              ? "Գեղեցիկ ձևավորված 10+ էջանոց անհատական զեկույց՝ ձեր քարտեզի առանցքային օրինաչափությունների, մոլորակների, տների, ասպեկտների, ուժեղ կողմերի և աճի ոլորտների մասին:"
+              : en
+                ? "A beautifully designed 10+ page personal report covering the standout patterns in your chart, planets, houses, aspects, strengths, and growth areas."
+                : "10+ გვერდიანი პერსონალური ანგარიში: რა გამოირჩევა შენს რუკაში, პლანეტების, სახლებისა და ასპექტების დეტალური ახსნა, ძლიერი მხარეები და ზრდის ზონები — ლამაზად გაფორმებული."}
           </p>
         </div>
         <div className="flex flex-col items-stretch gap-2 sm:items-end">
@@ -48,19 +58,25 @@ export async function ReportPromo({ className }: { className?: string }) {
             <Link href={authed ? "/report" : "/signup"}>
               <FileText className="size-4" />
               {authed
-                ? en
-                  ? "Get my report"
-                  : "მიიღე ანგარიში"
-                : en
-                  ? "Get started"
-                  : "დაიწყე"}
+                ? am
+                  ? "Ստանալ իմ զեկույցը"
+                  : en
+                    ? "Get my report"
+                    : "მიიღე ანგარიში"
+                : am
+                  ? "Սկսել"
+                  : en
+                    ? "Get started"
+                    : "დაიწყე"}
             </Link>
           </Button>
           <span className="text-center text-xs text-muted-foreground sm:text-right">
             {CREDIT_COST.pdfReport}{" "}
-            {en
-              ? "credits · no subscription"
-              : "კრედიტი · ყოველთვიური გამოწერის გარეშე"}
+            {am
+              ? "կրեդիտ · առանց ամսական բաժանորդագրության"
+              : en
+                ? "credits · no subscription"
+                : "კრედიტი · ყოველთვიური გამოწერის გარეშე"}
           </span>
         </div>
       </div>

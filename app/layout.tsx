@@ -165,9 +165,11 @@ export default async function RootLayout({
           href="#main-content"
           className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-xl border border-[var(--vivida-violet)]/60 bg-background px-4 py-2.5 text-sm font-semibold text-foreground shadow-xl transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[var(--vivida-violet)] focus:ring-offset-2 focus:ring-offset-background"
         >
-          <span className="locale-ka-only">მთავარ კონტენტზე გადასვლა</span>
-          <span className="locale-en-only">Skip to main content</span>
-          <span className="locale-am-only">Անցնել հիմնական բովանդակությանը</span>
+          {locale === "am"
+            ? "Անցնել հիմնական բովանդակությանը"
+            : locale === "en"
+              ? "Skip to main content"
+              : "მთავარ კონტენტზე გადასვლა"}
         </a>
         <NextTopLoader
           color="oklch(0.78 0.18 305)"

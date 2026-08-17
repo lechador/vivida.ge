@@ -21,6 +21,8 @@ import {
   nextAdaptiveItem,
 } from "@/lib/iq/adaptive";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { localeHref } from "@/lib/i18n/armenian-routes";
+import { IQ_STEM_PROMPT_AM, IQ_TEXT_AM } from "@/lib/tests-content-am";
 
 /**
  * The timed, *adaptive* IQ test (computerised adaptive testing). One item per
@@ -34,6 +36,8 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
+  const am = locale === "am";
+  const prompt = am ? IQ_STEM_PROMPT_AM : en ? STEM_PROMPT_EN : STEM_PROMPT_KA;
 
   const [administered, setAdministered] = useState<IqItem[]>(() => [
     firstAdaptiveItem(),
@@ -91,7 +95,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
       items: administeredRef.current.length,
       time_used_sec: IQ_TIME_LIMIT_SEC - timeLeftRef.current,
     });
-    router.push("/iq-testi/shedegi");
+    router.push(localeHref("/iq-testi/shedegi", locale));
   }
 
   // One stable countdown — never re-armed, so answering never resets it.
@@ -144,7 +148,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
           <Sparkles className="size-7 animate-pulse text-[var(--vivida-violet)]" />
         </div>
         <h2 className="mt-5 text-xl font-semibold tracking-tight">
-          {en ? "Calculating your result…" : "ვთვლი შენს შედეგს…"}
+          {am ? "Հաշվում ենք ձեր արդյունքը…" : en ? "Calculating your result…" : "ვთვლი შენს შედეგს…"}
         </h2>
         <Loader2 className="mx-auto mt-6 size-5 animate-spin text-muted-foreground" />
       </div>
@@ -157,7 +161,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>
-            {en ? "Task" : "დავალება"} {step} / {IQ_ADAPTIVE_LENGTH}
+            {am ? "Առաջադրանք" : en ? "Task" : "დავალება"} {step} / {IQ_ADAPTIVE_LENGTH}
           </span>
           <span
             className={cn(
@@ -181,9 +185,9 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
       <div key={q.id} className="animate-in fade-in duration-300">
         <IqStem item={q} locale={locale} />
 
-        {(en ? STEM_PROMPT_EN : STEM_PROMPT_KA)[q.stem.type] && (
+        {prompt[q.stem.type] && (
           <p className="mb-4 mt-6 text-center text-sm text-foreground/80">
-            {(en ? STEM_PROMPT_EN : STEM_PROMPT_KA)[q.stem.type]}
+            {prompt[q.stem.type]}
           </p>
         )}
 
@@ -201,7 +205,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
         {isLast ? (
           <Button type="button" variant="mystic" size="lg" onClick={advance}>
             <Sparkles className="size-4" />
-            {en ? "Finish" : "დასრულება"}
+            {am ? "Ավարտել" : en ? "Finish" : "დასრულება"}
           </Button>
         ) : (
           <Button
@@ -210,10 +214,14 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
             onClick={advance}
           >
             {answered
-              ? en
+              ? am
+                ? "Հաջորդը"
+                : en
                 ? "Next"
                 : "შემდეგი"
-              : en
+              : am
+                ? "Բաց թողնել"
+                : en
                 ? "Skip"
                 : "გამოტოვება"}
           </Button>
@@ -251,7 +259,7 @@ function IqStem({ item, locale }: { item: IqItem; locale: UserLocale }) {
   if (s.type === "logic") {
     return (
       <p className="min-h-[3.5rem] text-balance text-center text-lg font-medium leading-snug sm:text-xl">
-        {locale === "en" ? s.textEn : s.textKa}
+        {locale === "am" ? (IQ_TEXT_AM.get(item.id)?.text ?? s.textEn) : locale === "en" ? s.textEn : s.textKa}
       </p>
     );
   }
@@ -345,7 +353,9 @@ function IqOptions({
             // letter is the same identity the text options show in their badge.
             aria-label={
               opt.kind === "figure"
-                ? locale === "en"
+                ? locale === "am"
+                  ? `Տարբերակ ${String.fromCharCode(65 + i)}`
+                  : locale === "en"
                   ? `Option ${String.fromCharCode(65 + i)}`
                   : `ვარიანტი ${String.fromCharCode(65 + i)}`
                 : undefined
@@ -374,7 +384,7 @@ function IqOptions({
                 >
                   {String.fromCharCode(65 + i)}
                 </span>
-                {locale === "en" ? opt.textEn ?? opt.text : opt.text}
+                {locale === "am" ? (IQ_TEXT_AM.get(item.id)?.options[i] ?? opt.textEn ?? opt.text) : locale === "en" ? opt.textEn ?? opt.text : opt.text}
               </span>
             )}
           </button>

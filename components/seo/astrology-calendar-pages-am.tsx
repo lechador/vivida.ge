@@ -34,7 +34,7 @@ function DayCard({ day }: { day: AstrologyCalendarDay }) {
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs text-muted-foreground">{weekdayAm(day.date)}</p>
-          <h3 className="font-semibold">{calendarDateLabelAm(day.date, true)}</h3>
+          <h3 className="font-semibold">{calendarDateLabelAm(day.date)}</h3>
         </div>
         <span className="text-xl" style={{ color: tone.color }}>
           {tone.icon}

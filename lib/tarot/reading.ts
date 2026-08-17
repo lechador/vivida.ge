@@ -14,10 +14,8 @@ import {
   TAROT_CARDS,
   type DrawnCard,
 } from "@/lib/tarot/deck";
-import {
-  SPREAD_POSITIONS_EN,
-  TAROT_EN_BY_SLUG,
-} from "@/lib/tarot/deck-en";
+import { SPREAD_POSITIONS_EN, TAROT_EN_BY_SLUG } from "@/lib/tarot/deck-en";
+import { tarotCardBySlugAm } from "@/lib/tarot/deck-am";
 import type { UserLocale } from "@/lib/i18n/locale";
 
 /**
@@ -66,6 +64,13 @@ function drawSpread(): DrawnCard[] {
 
 /** Compose a readable fallback answer purely from the static card meanings. */
 function cardCopy(drawn: DrawnCard, locale: UserLocale) {
+  if (locale === "am") {
+    const card = tarotCardBySlugAm(drawn.card.slug)!;
+    return {
+      name: card.name,
+      meaning: drawn.reversed ? card.reversed : card.upright,
+    };
+  }
   if (locale === "en") {
     const card = TAROT_EN_BY_SLUG[drawn.card.slug];
     return {
@@ -79,7 +84,10 @@ function cardCopy(drawn: DrawnCard, locale: UserLocale) {
   };
 }
 
-function fallbackReading(drawn: DrawnCard[], locale: UserLocale): {
+function fallbackReading(
+  drawn: DrawnCard[],
+  locale: UserLocale,
+): {
   headline: string;
   cards: string[];
   reading: string;
@@ -88,6 +96,16 @@ function fallbackReading(drawn: DrawnCard[], locale: UserLocale): {
   const copy = drawn.map((card) => cardCopy(card, locale));
   const perCard = copy.map((card) => card.meaning);
   const [past, present, future] = copy.map((card) => card.name);
+  if (locale === "am") {
+    return {
+      headline: `${present}-ի լույսի ներքո`,
+      cards: perCard,
+      reading:
+        `Երեք քարտ պատասխանում են ձեր հարցին: Արմատում ${past}-ն է, ներկան սահմանում է ${present}-ը, իսկ առաջիկա ուղին բացում է ${future}-ը: ` +
+        perCard.join(" "),
+      advice: perCard[1],
+    };
+  }
   if (locale === "en") {
     return {
       headline: `In the light of ${present}`,
@@ -104,7 +122,9 @@ function fallbackReading(drawn: DrawnCard[], locale: UserLocale): {
     reading:
       `შენს კითხვას სამი კარტი პასუხობს. ფესვში ${past} დგას, აწმყოს ${present} განსაზღვრავს, გზას კი ${future} ხსნის. ` +
       perCard.join(" "),
-    advice: drawn[1].reversed ? drawn[1].card.reversedKa : drawn[1].card.uprightKa,
+    advice: drawn[1].reversed
+      ? drawn[1].card.reversedKa
+      : drawn[1].card.uprightKa,
   };
 }
 
@@ -132,27 +152,41 @@ export async function performReading(
     const paid = await spendCredits(userId, CREDIT_COST.tarot, "spend_tarot");
     if (!paid) {
       const balance = await getBalance(userId);
-      return { ok: false, error: "insufficient", cost: CREDIT_COST.tarot, balance };
+      return {
+        ok: false,
+        error: "insufficient",
+        cost: CREDIT_COST.tarot,
+        balance,
+      };
     }
     charged = CREDIT_COST.tarot;
   }
 
   // ── Draw + interpret ─────────────────────────────────────────────────────
   const drawn = drawSpread();
-  const positions = locale === "en" ? SPREAD_POSITIONS_EN : SPREAD_POSITIONS_KA;
+  const positions =
+    locale === "am"
+      ? (["անցյալ / արմատ", "ներկա / առանցք", "ապագա / ուղի"] as const)
+      : locale === "en"
+        ? SPREAD_POSITIONS_EN
+        : SPREAD_POSITIONS_KA;
   const aiInput = {
     question: q,
     cards: drawn.map((d, i) => ({
       position: positions[i],
       name: cardCopy(d, locale).name,
       orientation:
-        locale === "en"
+        locale === "am"
           ? d.reversed
-            ? "reversed"
-            : "upright"
-          : d.reversed
-            ? "შებრუნებული"
-            : "პირდაპირი",
+            ? "շրջված"
+            : "ուղիղ"
+          : locale === "en"
+            ? d.reversed
+              ? "reversed"
+              : "upright"
+            : d.reversed
+              ? "შებრუნებული"
+              : "პირდაპირი",
       meaning: cardCopy(d, locale).meaning,
     })),
     locale,
@@ -162,7 +196,10 @@ export async function performReading(
   try {
     ai = await generateTarotReading(aiInput);
   } catch (err) {
-    console.warn("[tarot] AI reading failed, using fallback:", (err as Error).message);
+    console.warn(
+      "[tarot] AI reading failed, using fallback:",
+      (err as Error).message,
+    );
   }
   const composed = ai ?? fallbackReading(drawn, locale);
 

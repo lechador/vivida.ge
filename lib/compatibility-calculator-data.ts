@@ -20,6 +20,7 @@ import {
 import { signColor } from "@/lib/zodiac";
 import { pairPercent } from "@/lib/compatibility-score";
 import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
+import { zodiacPairArmenian } from "@/lib/zodiac-pair-am";
 
 /**
  * The editorial category is what drives `percent` (see compatibility-score),
@@ -75,8 +76,8 @@ export function buildCalculatorData(
       label: am
         ? (meta?.labelAm ?? slug)
         : en
-        ? (meta?.labelEn ?? slug)
-        : c.labelKa,
+          ? (meta?.labelEn ?? slug)
+          : c.labelKa,
       symbol: c.symbol,
       color: meta ? signColor(meta) : "var(--vivida-violet)",
     };
@@ -88,34 +89,40 @@ export function buildCalculatorData(
       const percent = pairPercent(slug, c.overallScore);
       const [aSlug, bSlug] = slug.split("-") as [ZodiacSlug, ZodiacSlug];
       const enContent = en ? zodiacPairEnglish(aSlug, bSlug) : null;
+      const amContent = am ? zodiacPairArmenian(aSlug, bSlug) : null;
       const score = am
         ? SCORE_AM[c.overallScore]
         : en
-        ? SCORE_EN[c.overallScore]
-        : c.overallScore;
+          ? SCORE_EN[c.overallScore]
+          : c.overallScore;
 
       pairs[slug] = {
         slug,
         percent,
         score,
-        tagline: enContent ? enContent.tagline : c.tagline,
-        strengths: enContent
-          ? enContent.strengths.slice(0, 3)
-          : c.strengths.slice(0, 3),
+        tagline: amContent
+          ? amContent.tagline
+          : enContent
+            ? enContent.tagline
+            : c.tagline,
+        strengths: amContent
+          ? amContent.strengths.slice(0, 3)
+          : enContent
+            ? enContent.strengths.slice(0, 3)
+            : c.strengths.slice(0, 3),
         labelA: am
           ? (signMetaBySlug(aSlug)?.labelAm ?? c.labelA)
           : en
-          ? (signMetaBySlug(aSlug)?.labelEn ?? c.labelA)
-          : c.labelA,
+            ? (signMetaBySlug(aSlug)?.labelEn ?? c.labelA)
+            : c.labelA,
         labelB: am
           ? (signMetaBySlug(bSlug)?.labelAm ?? c.labelB)
           : en
-          ? (signMetaBySlug(bSlug)?.labelEn ?? c.labelB)
-          : c.labelB,
+            ? (signMetaBySlug(bSlug)?.labelEn ?? c.labelB)
+            : c.labelB,
       };
     }
   }
 
   return { signs, pairs };
 }
-

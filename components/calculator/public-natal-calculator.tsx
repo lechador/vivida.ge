@@ -31,6 +31,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 import type { GeocodeResult } from "@/lib/geocoding";
 import type { NatalChartJson, PointJson } from "@/db/schema";
 import { savePendingNatalProfile } from "@/lib/pending-natal-profile";
+import { localeHref } from "@/lib/i18n/armenian-routes";
 
 const ERRORS: Record<string, string> = {
   invalid_date: "შეამოწმე დაბადების თარიღი.",
@@ -94,11 +95,15 @@ export function PublicNatalCalculator({
     const moon = chart.bodies.moon?.signIndex;
     const asc = chart.ascendant?.signIndex;
     if (sun == null || moon == null || asc == null) return;
-    const url = `${window.location.origin}/nataluri-ruka?big=${sun}.${moon}.${asc}`;
+    const url = `${window.location.origin}${am ? "/am" : ""}/nataluri-ruka?big=${sun}.${moon}.${asc}`;
     try {
       if (navigator.share) {
         await navigator.share({
-          title: en ? "My birth chart" : "ჩემი ნატალური რუკა",
+          title: am
+            ? "Իմ ծննդյան քարտեզը"
+            : en
+              ? "My birth chart"
+              : "ჩემი ნატალური რუკა",
           url,
         });
         trackEvent(ANALYTICS_EVENT.natalChartShared, { method: "native" });
@@ -149,9 +154,11 @@ export function PublicNatalCalculator({
       if (!res.ok || !data.chart) {
         setError(
           errors[data.error] ??
-            (en
-              ? "Something went wrong. Please try again."
-              : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
+            (am
+              ? "Ինչ-որ բան սխալ ստացվեց: Խնդրում ենք կրկին փորձել:"
+              : en
+                ? "Something went wrong. Please try again."
+                : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
         );
         return;
       }
@@ -175,9 +182,11 @@ export function PublicNatalCalculator({
       );
     } catch {
       setError(
-        en
-          ? "Network error. Please try again."
-          : "ქსელის შეცდომა. სცადე ხელახლა.",
+        am
+          ? "Ցանցային սխալ: Խնդրում ենք կրկին փորձել:"
+          : en
+            ? "Network error. Please try again."
+            : "ქსელის შეცდომა. სცადე ხელახლა.",
       );
     } finally {
       setLoading(false);
@@ -208,28 +217,30 @@ export function PublicNatalCalculator({
         >
           {/* Date */}
           <div className="space-y-2">
-            <Label>{en ? "Birth date" : "დაბადების თარიღი"}</Label>
+            <Label>
+              {am ? "Ծննդյան ամսաթիվ" : en ? "Birth date" : "დაბადების თარიღი"}
+            </Label>
             <div className="grid grid-cols-3 gap-3">
               <NumField
                 value={day}
                 onChange={setDay}
                 max={2}
-                placeholder={en ? "Day" : "დღე"}
-                aria={en ? "Day" : "დღე"}
+                placeholder={am ? "Օր" : en ? "Day" : "დღე"}
+                aria={am ? "Օր" : en ? "Day" : "დღე"}
               />
               <NumField
                 value={month}
                 onChange={setMonth}
                 max={2}
-                placeholder={en ? "Month" : "თვე"}
-                aria={en ? "Month" : "თვე"}
+                placeholder={am ? "Ամիս" : en ? "Month" : "თვე"}
+                aria={am ? "Ամիս" : en ? "Month" : "თვე"}
               />
               <NumField
                 value={year}
                 onChange={setYear}
                 max={4}
-                placeholder={en ? "Year" : "წელი"}
-                aria={en ? "Year" : "წელი"}
+                placeholder={am ? "Տարի" : en ? "Year" : "წელი"}
+                aria={am ? "Տարի" : en ? "Year" : "წელი"}
               />
             </div>
           </div>
@@ -237,7 +248,9 @@ export function PublicNatalCalculator({
           {/* Time */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>{en ? "Birth time" : "დაბადების დრო"}</Label>
+              <Label>
+                {am ? "Ծննդյան ժամ" : en ? "Birth time" : "დაბადების დრო"}
+              </Label>
               <button
                 type="button"
                 onClick={() => setUnknownTime((v) => !v)}
@@ -248,7 +261,11 @@ export function PublicNatalCalculator({
                 }`}
               >
                 {unknownTime ? "✓ " : ""}
-                {en ? "I don't know the exact time" : "არ ვიცი ზუსტი დრო"}
+                {am
+                  ? "Չգիտեմ ճշգրիտ ժամը"
+                  : en
+                    ? "I don't know the exact time"
+                    : "არ ვიცი ზუსტი დრო"}
               </button>
             </div>
             <div
@@ -258,24 +275,26 @@ export function PublicNatalCalculator({
                 value={hour}
                 onChange={setHour}
                 max={2}
-                placeholder={en ? "Hour" : "საათი"}
-                aria={en ? "Hour" : "საათი"}
+                placeholder={am ? "Ժամ" : en ? "Hour" : "საათი"}
+                aria={am ? "Ժամ" : en ? "Hour" : "საათი"}
                 disabled={unknownTime}
               />
               <NumField
                 value={minute}
                 onChange={setMinute}
                 max={2}
-                placeholder={en ? "Minute" : "წუთი"}
-                aria={en ? "Minute" : "წუთი"}
+                placeholder={am ? "Րոպե" : en ? "Minute" : "წუთი"}
+                aria={am ? "Րոպե" : en ? "Minute" : "წუთი"}
                 disabled={unknownTime}
               />
             </div>
             {unknownTime && (
               <p className="text-xs text-muted-foreground">
-                {en
-                  ? "We'll use 12:00 noon. Most planetary signs will remain accurate, but the rising sign and houses may not be."
-                  : "დროს 12:00-ად ჩავთვლით — მზე და პლანეტები ზუსტი იქნება, ამომავალი და სახლები შესაძლოა არა."}
+                {am
+                  ? "Կօգտագործենք կեսօրվա 12:00-ը: Մոլորակների նշանների մեծ մասը ճշգրիտ կմնա, սակայն Ասցենդենտն ու տները կարող են տարբերվել:"
+                  : en
+                    ? "We'll use 12:00 noon. Most planetary signs will remain accurate, but the rising sign and houses may not be."
+                    : "დროს 12:00-ად ჩავთვლით — მზე და პლანეტები ზუსტი იქნება, ამომავალი და სახლები შესაძლოა არა."}
               </p>
             )}
           </div>
@@ -300,12 +319,16 @@ export function PublicNatalCalculator({
               <Sparkles className="size-4" />
             )}
             {chart
-              ? en
-                ? "Calculate again"
-                : "ხელახლა გამოთვლა"
-              : en
-                ? "Calculate my chart"
-                : "გამოთვალე ჩემი რუკა"}
+              ? am
+                ? "Կրկին հաշվարկել"
+                : en
+                  ? "Calculate again"
+                  : "ხელახლა გამოთვლა"
+              : am
+                ? "Հաշվել իմ քարտեզը"
+                : en
+                  ? "Calculate my chart"
+                  : "გამოთვალე ჩემი რუკა"}
           </Button>
         </form>
       </div>
@@ -323,12 +346,16 @@ export function PublicNatalCalculator({
                 <Share2 className="size-4" />
               )}
               {copied
-                ? en
-                  ? "Link copied"
-                  : "ბმული დაკოპირდა"
-                : en
-                  ? "Share my chart"
-                  : "გააზიარე ჩემი რუკა"}
+                ? am
+                  ? "Հղումը պատճենված է"
+                  : en
+                    ? "Link copied"
+                    : "ბმული დაკოპირდა"
+                : am
+                  ? "Կիսվել իմ քարտեզով"
+                  : en
+                    ? "Share my chart"
+                    : "გააზიარე ჩემი რუკა"}
             </Button>
           </div>
 
@@ -338,27 +365,53 @@ export function PublicNatalCalculator({
 
           {acquisitionMode && (
             <div className="relative overflow-hidden rounded-3xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-violet)]/16 via-card/70 to-[var(--vivida-gold)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-9">
-              <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]"><Lock className="size-5" /></div>
-              <h3 className="text-balance text-2xl font-semibold sm:text-3xl">Save your chart & unlock personal readings</h3>
-              <p className="mx-auto mt-3 max-w-lg text-muted-foreground">Create a free account to reveal what every placement means for you, then choose PRO unlimited or pay-as-you-go credits.</p>
-              <div className="mt-5 flex flex-wrap justify-center gap-3">
-                <Button asChild variant="mystic" size="lg"><Link href={signupHref} onClick={() => trackEvent(ANALYTICS_EVENT.registerClick, { widget: "uk_landing_chart" })}>Save my chart free</Link></Button>
-                <Button asChild variant="outline" size="lg"><Link href={loginHref}>Log in</Link></Button>
+              <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
+                <Lock className="size-5" />
               </div>
-              <p className="mt-3 text-xs text-muted-foreground">Free account · No card required</p>
+              <h3 className="text-balance text-2xl font-semibold sm:text-3xl">
+                Save your chart & unlock personal readings
+              </h3>
+              <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
+                Create a free account to reveal what every placement means for
+                you, then choose PRO unlimited or pay-as-you-go credits.
+              </p>
+              <div className="mt-5 flex flex-wrap justify-center gap-3">
+                <Button asChild variant="mystic" size="lg">
+                  <Link
+                    href={signupHref}
+                    onClick={() =>
+                      trackEvent(ANALYTICS_EVENT.registerClick, {
+                        widget: "uk_landing_chart",
+                      })
+                    }
+                  >
+                    Save my chart free
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link href={loginHref}>Log in</Link>
+                </Button>
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Free account · No card required
+              </p>
             </div>
           )}
 
           <section>
             <h3 className="mb-3 text-lg font-semibold tracking-tight">
-              {en ? "Planet positions" : "პლანეტების პოზიციები"}
+              {am
+                ? "Մոլորակների դիրքերը"
+                : en
+                  ? "Planet positions"
+                  : "პლანეტების პოზიციები"}
             </h3>
             <PositionsTable chart={chart} locale={locale} />
           </section>
 
           <section>
             <h3 className="mb-3 text-lg font-semibold tracking-tight">
-              {en ? "12 houses" : "12 სახლი"}
+              {am ? "12 տները" : en ? "12 houses" : "12 სახლი"}
             </h3>
             <div className="rounded-2xl border border-border bg-card/50 px-4 py-3 ring-1 ring-foreground/5 backdrop-blur-xl sm:px-5">
               <HousesTable chart={chart} locale={locale} />
@@ -367,45 +420,55 @@ export function PublicNatalCalculator({
 
           <section>
             <h3 className="mb-3 text-lg font-semibold tracking-tight">
-              {en ? "Aspects" : "ასპექტები"}
+              {am ? "Ասպեկտներ" : en ? "Aspects" : "ასპექტები"}
             </h3>
             <AspectCards chart={chart} locale={locale} />
           </section>
 
           {/* Unlock CTA */}
           {!acquisitionMode && (
-          <div className="relative overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/14 via-card/65 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
-            <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
-              <Lock className="size-5" />
+            <div className="relative overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/14 via-card/65 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
+              <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
+                <Lock className="size-5" />
+              </div>
+              <h3 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+                {am
+                  ? "Ի՞նչ է սա նշանակում ձեզ համար:"
+                  : en
+                    ? "What does this mean for you?"
+                    : "რას ნიშნავს ეს შენთვის?"}
+              </h3>
+              <p className="mx-auto mt-3 max-w-lg text-pretty text-base text-muted-foreground">
+                {am
+                  ? "Սրանք ձեր քարտեզի ճշգրիտ դիրքերն են: Ստեղծեք անվճար հաշիվ՝ յուրաքանչյուր մոլորակի, տան և ասպեկտի անհատական մեկնաբանությունները, AI վերլուծությունն ու ամբողջական PDF զեկույցը բացելու համար:"
+                  : en
+                    ? "These are the precise placements in your chart. Create a free account to unlock personal interpretations for every planet, house, and aspect, plus AI insights and a complete PDF report."
+                    : "ეს არის შენი რუკის სუფთა მონაცემები. დარეგისტრირდი უფასოდ და ნახე თითოეული პლანეტის, სახლისა და ასპექტის პერსონალური ინტერპრეტაცია, AI ანალიზი და სრული PDF ანგარიში."}
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                <Button asChild variant="mystic" size="lg">
+                  <Link
+                    href={signupHref}
+                    onClick={() =>
+                      trackEvent(ANALYTICS_EVENT.registerClick, {
+                        widget: "natal_calculator",
+                      })
+                    }
+                  >
+                    {am
+                      ? "Ստեղծել անվճար հաշիվ"
+                      : en
+                        ? "Create free account"
+                        : "უფასო რეგისტრაცია"}
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link href={loginHref}>
+                    {am ? "Մուտք գործել" : en ? "Log in" : "შესვლა"}
+                  </Link>
+                </Button>
+              </div>
             </div>
-            <h3 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              {en ? "What does this mean for you?" : "რას ნიშნავს ეს შენთვის?"}
-            </h3>
-            <p className="mx-auto mt-3 max-w-lg text-pretty text-base text-muted-foreground">
-              {en
-                ? "These are the precise placements in your chart. Create a free account to unlock personal interpretations for every planet, house, and aspect, plus AI insights and a complete PDF report."
-                : "ეს არის შენი რუკის სუფთა მონაცემები. დარეგისტრირდი უფასოდ და ნახე თითოეული პლანეტის, სახლისა და ასპექტის პერსონალური ინტერპრეტაცია, AI ანალიზი და სრული PDF ანგარიში."}
-            </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button asChild variant="mystic" size="lg">
-                <Link
-                  href={signupHref}
-                  onClick={() =>
-                    trackEvent(ANALYTICS_EVENT.registerClick, {
-                      widget: "natal_calculator",
-                    })
-                  }
-                >
-                  {en ? "Create free account" : "უფასო რეგისტრაცია"}
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href={loginHref}>
-                  {en ? "Log in" : "შესვლა"}
-                </Link>
-              </Button>
-            </div>
-          </div>
           )}
 
           {/* Lower-friction return hook — get the daily horoscope by email
@@ -422,30 +485,46 @@ export function PublicNatalCalculator({
               to their sun sign for relevance. */}
           <div className="text-center">
             <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-              {en ? "Or keep exploring for free" : "ან განაგრძე უფასოდ"}
+              {am
+                ? "Կամ շարունակեք անվճար ուսումնասիրել"
+                : en
+                  ? "Or keep exploring for free"
+                  : "ან განაგრძე უფასოდ"}
             </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               {sunSlug && sunSign && (
                 <Link
-                  href={`/zodiac/${sunSlug}`}
+                  href={localeHref(`/zodiac/${sunSlug}`, locale)}
                   className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
                 >
                   <span aria-hidden>{sunSign.symbol}</span>
-                  {en ? sunSign.labelEn : sunSign.labelKa} —{" "}
-                  {en ? "your sign" : "შენი ნიშანი"}
+                  {am
+                    ? sunSign.labelAm
+                    : en
+                      ? sunSign.labelEn
+                      : sunSign.labelKa}{" "}
+                  — {am ? "ձեր նշանը" : en ? "your sign" : "შენი ნიშანი"}
                 </Link>
               )}
               <Link
-                href="/horoskopi"
+                href={localeHref("/horoskopi", locale)}
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
               >
-                {en ? "Daily horoscope" : "დღის ჰოროსკოპი"}
+                {am
+                  ? "Օրվա հորոսկոպ"
+                  : en
+                    ? "Daily horoscope"
+                    : "დღის ჰოროსკოპი"}
               </Link>
               <Link
-                href="/zodiac/tavsebadoba"
+                href={localeHref("/zodiac/tavsebadoba", locale)}
                 className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
               >
-                {en ? "Compatibility" : "თავსებადობა"}
+                {am
+                  ? "Համատեղելիություն"
+                  : en
+                    ? "Compatibility"
+                    : "თავსებადობა"}
               </Link>
             </div>
           </div>
@@ -493,14 +572,14 @@ function HoroscopeEmailCapture({
             ? am
               ? "Չափազանց շատ հարցումներ: Փորձեք մի փոքր ուշ:"
               : en
-              ? "Too many requests. Please try again soon."
-              : "ბევრი მოთხოვნა. სცადე ცოტა ხანში."
+                ? "Too many requests. Please try again soon."
+                : "ბევრი მოთხოვნა. სცადე ცოტა ხანში."
             : (typeof data.error === "string" && data.error) ||
                 (am
                   ? "Չհաջողվեց: Փորձեք կրկին:"
                   : en
-                  ? "It didn't work. Please try again."
-                  : "ვერ მოხერხდა. სცადე ხელახლა."),
+                    ? "It didn't work. Please try again."
+                    : "ვერ მოხერხდა. სცადე ხელახლა."),
         );
         return;
       }
@@ -514,8 +593,8 @@ function HoroscopeEmailCapture({
         am
           ? "Ցանցային սխալ: Փորձեք կրկին:"
           : en
-          ? "Network error. Please try again."
-          : "ქსელის შეცდომა. სცადე ხელახლა.",
+            ? "Network error. Please try again."
+            : "ქსელის შეცდომა. სცადე ხელახლა.",
       );
     }
   }
@@ -527,8 +606,8 @@ function HoroscopeEmailCapture({
         {am
           ? "Բաժանորդագրված եք: Առաջին հորոսկոպն ուղարկվում է ձեր էլ. հասցեին:"
           : en
-          ? "Subscribed! Your first horoscope is on its way."
-          : "გამოწერილია! პირველი ჰოროსკოპი უკვე იგზავნება ელფოსტაზე."}
+            ? "Subscribed! Your first horoscope is on its way."
+            : "გამოწერილია! პირველი ჰოროსკოპი უკვე იგზავნება ელფოსტაზე."}
       </div>
     );
   }
@@ -547,23 +626,25 @@ function HoroscopeEmailCapture({
           {am
             ? "Ստացեք օրական հորոսկոպը ձեր էլ. փոստին"
             : en
-            ? "Get your daily horoscope in your inbox"
-            : "მიიღე ყოველდღიური ჰოროსკოპი მეილზე"}
+              ? "Get your daily horoscope in your inbox"
+              : "მიიღე ყოველდღიური ჰოროსკოპი მეილზე"}
         </span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
         {am
           ? "Անվճար: Առանց սպամի: Կարող եք դադարեցնել ցանկացած պահի:"
           : en
-          ? "Free forever · No spam · One-click unsubscribe."
-          : "უფასოა · სპამის გარეშე · გაუქმება ნებისმიერ დროს."}
+            ? "Free forever · No spam · One-click unsubscribe."
+            : "უფასოა · სპამის გარეშე · გაუქმება ნებისმიერ დროს."}
       </p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <Input
           type="email"
           required
           autoComplete="email"
-          placeholder={am ? "Ձեր էլ. հասցեն" : en ? "Your email address" : "შენი ელფოსტა"}
+          placeholder={
+            am ? "Ձեր էլ. հասցեն" : en ? "Your email address" : "შენი ელფოსტა"
+          }
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={status === "loading"}
@@ -643,9 +724,21 @@ function BigThree({
     glyph: string;
     point: PointJson | undefined;
   }[] = [
-    { label: am ? "Արև" : en ? "Sun" : "მზე", glyph: "☉", point: chart.bodies.sun },
-    { label: am ? "Լուսին" : en ? "Moon" : "მთვარე", glyph: "☽", point: chart.bodies.moon },
-    { label: am ? "Ասցենդենտ" : en ? "Rising" : "ამომავალი", glyph: "AC", point: chart.ascendant },
+    {
+      label: am ? "Արև" : en ? "Sun" : "მზე",
+      glyph: "☉",
+      point: chart.bodies.sun,
+    },
+    {
+      label: am ? "Լուսին" : en ? "Moon" : "მთვარე",
+      glyph: "☽",
+      point: chart.bodies.moon,
+    },
+    {
+      label: am ? "Ասցենդենտ" : en ? "Rising" : "ამომავალი",
+      glyph: "AC",
+      point: chart.ascendant,
+    },
   ];
   return (
     <div className="grid gap-3 sm:grid-cols-3">
@@ -750,8 +843,8 @@ function PlacePicker({
             am
               ? "Երևան, Գյումրի, Վանաձոր…"
               : en
-              ? "London, Paris, New York…"
-              : "თბილისი, ბათუმი, ქუთაისი…"
+                ? "London, Paris, New York…"
+                : "თბილისი, ბათუმი, ქუთაისი…"
           }
           className="pl-9 pr-10 text-base"
           value={query}
