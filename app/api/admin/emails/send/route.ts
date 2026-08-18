@@ -3,8 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   audienceCount,
   ensureBirthDetailsCampaign,
+  ensureLowCreditOfferCampaign,
   sendBirthDetailsCampaignTest,
   sendBulk,
+  sendLowCreditOfferTest,
   sendMarketingTestEmail,
   type EmailTemplateKind,
 } from "@/lib/email-marketing";
@@ -17,7 +19,8 @@ import {
  *
  * Body:
  *   {
- *     template: "daily_horoscope" | "profile_incomplete" | "marketing",
+ *     template: "daily_horoscope" | "profile_incomplete" | "marketing"
+ *               | "low_credit_offer",
  *     subject?: string,         // marketing only
  *     body?: string,            // marketing only (paragraphs split on \n\n)
  *     ctaLabel?: string,
@@ -34,6 +37,7 @@ const VALID_TEMPLATES: ReadonlySet<EmailTemplateKind> = new Set([
   "daily_horoscope",
   "profile_incomplete",
   "marketing",
+  "low_credit_offer",
 ]);
 
 function authed(req: NextRequest): boolean {
@@ -104,10 +108,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ testEmail: body.testEmail, sent });
   }
 
+  if (template === "low_credit_offer" && body.testEmail?.trim()) {
+    const sent = await sendLowCreditOfferTest(body.testEmail);
+    return NextResponse.json({ testEmail: body.testEmail, sent });
+  }
+
+  // The offer template always runs under its campaign — the recipient rows are
+  // what entitle a buyer to the ₾29 price, so a campaign-less send would mail
+  // an offer nobody could actually redeem.
   const campaign =
-    template === "profile_incomplete" && body.campaign === true
-      ? await ensureBirthDetailsCampaign()
-      : null;
+    template === "low_credit_offer"
+      ? await ensureLowCreditOfferCampaign()
+      : template === "profile_incomplete" && body.campaign === true
+        ? await ensureBirthDetailsCampaign()
+        : null;
 
   const result = await sendBulk({
     template,

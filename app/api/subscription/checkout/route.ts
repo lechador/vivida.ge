@@ -8,6 +8,7 @@ import {
   isStripeConfigured,
 } from "@/lib/stripe";
 import { checkoutTrackingFromRequest, checkoutTrackingMetadata, trackCheckoutStarted } from "@/lib/checkout-tracking";
+import { getLowCreditOffer } from "@/lib/promo-offer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,8 +24,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: "/subscription", alreadyPremium: true });
   }
 
+  // The promo is requested by name, never priced by the client. Eligibility is
+  // resolved from the campaign here, so a user who was never addressed — or
+  // whose offer has expired — cannot reach the ₾29 price by posting the flag.
+  const body = (await req.json().catch(() => null)) as { offer?: unknown } | null;
+  const wantsOffer = body?.offer === "low_credits";
+
   const identity = await getBillingIdentity(userId);
-  const plan = premiumPlanForCountry(identity?.countryCode);
+  const offer = wantsOffer ? await getLowCreditOffer(userId) : null;
+  if (wantsOffer && !offer) {
+    return NextResponse.json({ error: "offer_unavailable" }, { status: 403 });
+  }
+
+  const plan = offer?.plan ?? premiumPlanForCountry(identity?.countryCode);
   if (!plan) {
     return NextResponse.json({ error: "country_unavailable" }, { status: 403 });
   }

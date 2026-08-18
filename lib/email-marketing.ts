@@ -3,6 +3,7 @@ import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
+  creditAccounts,
   dailyEmailLog,
   emailCampaignRecipients,
   emailCampaigns,
@@ -14,10 +15,22 @@ import { acquireResendSlot } from "@/lib/resend-throttle";
 import { DailyHoroscopeEmail } from "@/lib/email-templates/daily-horoscope";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { MarketingEmail } from "@/lib/email-templates/marketing";
+import { LowCreditOfferEmail } from "@/lib/email-templates/low-credit-offer";
 import { ensureDailyFor } from "@/actions/daily";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import {
+  LOW_CREDIT_OFFER_CAMPAIGN_SLUG,
+  LOW_CREDIT_OFFER_ENDS_AT,
+  LOW_CREDIT_OFFER_THRESHOLD,
+} from "@/lib/promo-offer";
+import {
+  formatBillingAmount,
+  LOW_CREDIT_PROMO_MONTHS,
+  LOW_CREDIT_PROMO_PLAN,
+} from "@/lib/billing-config";
+import { kaDayMonthGenitive } from "@/lib/i18n/ka-date";
 
 let _client: Resend | null = null;
 function client(): Resend | null {
@@ -49,7 +62,8 @@ function localizedAbsUrl(path: string, locale: UserLocale): string {
 export type EmailTemplateKind =
   | "daily_horoscope"
   | "profile_incomplete"
-  | "marketing";
+  | "marketing"
+  | "low_credit_offer";
 
 export type SendOptions = {
   template: EmailTemplateKind;
@@ -80,6 +94,9 @@ type Recipient = {
   email: string;
   name: string | null;
   locale: string;
+  /** Credit balance at audience-resolution time. Only the offer template
+   *  reads it — it is the reason that email is being sent. */
+  balance?: number;
 };
 
 /**
@@ -136,6 +153,45 @@ async function resolveAudience(
           }))
       );
   }
+  if (template === "low_credit_offer") {
+    // Georgian users who are nearly out of credits and are not already paying.
+    // leftJoin, not innerJoin: a user with no wallet row has no credits at all,
+    // which is the most qualified state this campaign has — an innerJoin would
+    // silently drop exactly those people.
+    const rows = await db
+      .select({
+        userId: users.id,
+        email: users.email,
+        name: users.name,
+        locale: users.interfaceLanguage,
+        balance: sql<number>`coalesce(${creditAccounts.balance}, 0)`,
+        isPremium: users.isPremium,
+        premiumUntil: users.premiumUntil,
+      })
+      .from(users)
+      .leftJoin(creditAccounts, eq(creditAccounts.userId, users.id))
+      .where(
+        and(
+          eq(users.emailMarketing, true),
+          eq(users.residenceCountryCode, LOW_CREDIT_PROMO_PLAN.countryCode),
+          sql`coalesce(${creditAccounts.balance}, 0) <= ${LOW_CREDIT_OFFER_THRESHOLD}`,
+        ),
+      );
+    const now = Date.now();
+    return rows
+      .filter((r) => !!r.email)
+      .filter(
+        (r) => !(r.isPremium && r.premiumUntil && r.premiumUntil.getTime() > now),
+      )
+      .map((r) => ({
+        userId: r.userId,
+        email: r.email!,
+        name: r.name,
+        locale: r.locale,
+        balance: Number(r.balance),
+      }));
+  }
+
   // marketing
   return await db
     .select({
@@ -173,6 +229,44 @@ export async function ensureBirthDetailsCampaign(): Promise<{ id: string }> {
     .returning({ id: emailCampaigns.id });
   return campaign;
 }
+
+const OFFER_SUBJECT = {
+  ka: `${LOW_CREDIT_PROMO_MONTHS} თვე ულიმიტო Vivida — მხოლოდ ${formatBillingAmount(
+    LOW_CREDIT_PROMO_PLAN.amountMinor,
+    LOW_CREDIT_PROMO_PLAN.currency,
+    "ka",
+  )}`,
+  en: `${LOW_CREDIT_PROMO_MONTHS} months of unlimited Vivida — just ${formatBillingAmount(
+    LOW_CREDIT_PROMO_PLAN.amountMinor,
+    LOW_CREDIT_PROMO_PLAN.currency,
+    "en",
+  )}`,
+};
+
+export async function ensureLowCreditOfferCampaign(): Promise<{ id: string }> {
+  const [campaign] = await db
+    .insert(emailCampaigns)
+    .values({
+      slug: LOW_CREDIT_OFFER_CAMPAIGN_SLUG,
+      name: "Low credits · 3 months PRO for ₾29",
+      template: "low_credit_offer",
+      subject: OFFER_SUBJECT.ka,
+      // No credit reward: the campaign's conversion is the subscription, and a
+      // reward here would hand free credits to the very people it is trying to
+      // move onto PRO.
+      rewardCredits: 0,
+      status: "draft",
+      ctaLabel: "გაააქტიურე შეთავაზება",
+      ctaUrl: "/credits",
+    })
+    .onConflictDoUpdate({
+      target: emailCampaigns.slug,
+      set: { subject: OFFER_SUBJECT.ka },
+    })
+    .returning({ id: emailCampaigns.id });
+  return campaign;
+}
+
 
 /**
  * Send-with-concurrency-cap. Resend's free tier rate-limits at 2 req/s,
@@ -216,6 +310,22 @@ export async function sendBulk(opts: SendOptions): Promise<SendResult> {
       );
     const attemptedIds = new Set(attempted.map((row) => row.userId));
     audience = audience.filter((recipient) => !attemptedIds.has(recipient.userId));
+  }
+  // Same resumability for the offer blast, keyed off the campaign rather than
+  // the subject line: whoever already has a sent row must not be mailed twice
+  // if the route times out and the admin retries.
+  if (opts.template === "low_credit_offer" && opts.campaignId) {
+    const alreadySent = await db
+      .select({ userId: emailCampaignRecipients.userId })
+      .from(emailCampaignRecipients)
+      .where(
+        and(
+          eq(emailCampaignRecipients.campaignId, opts.campaignId),
+          isNotNull(emailCampaignRecipients.sentAt),
+        ),
+      );
+    const sentIds = new Set(alreadySent.map((row) => row.userId));
+    audience = audience.filter((recipient) => !sentIds.has(recipient.userId));
   }
   if (opts.dryRun || !c) {
     return {
@@ -277,6 +387,49 @@ export async function sendBirthDetailsCampaignTest(to: string): Promise<boolean>
     { template: "profile_incomplete", campaignId: campaign.id, allowCompletedProfile: true },
     testRecipient,
     `campaign:${campaign.id}:${recipient.userId}`
+  );
+}
+
+/**
+ * Send the low-credit offer to one named account, bypassing the audience
+ * filters. The recipient row is written as a test so it stays out of the
+ * campaign's conversion figures — but it is a real row with a real sent_at, so
+ * the tester genuinely sees the offer card and can walk the whole purchase.
+ */
+export async function sendLowCreditOfferTest(to: string): Promise<boolean> {
+  const [recipient] = await db
+    .select({
+      userId: users.id,
+      email: users.email,
+      name: users.name,
+      locale: users.interfaceLanguage,
+    })
+    .from(users)
+    .where(eq(users.email, to.trim().toLowerCase()))
+    .limit(1);
+  if (!recipient?.email) throw new Error("test recipient is not a registered user");
+  const campaign = await ensureLowCreditOfferCampaign();
+  await db
+    .insert(emailCampaignRecipients)
+    .values({
+      campaignId: campaign.id,
+      userId: recipient.userId,
+      email: recipient.email,
+      isTest: true,
+    })
+    .onConflictDoUpdate({
+      target: [emailCampaignRecipients.campaignId, emailCampaignRecipients.userId],
+      set: { email: recipient.email },
+    });
+  return dispatch(
+    {
+      template: "low_credit_offer",
+      campaignId: campaign.id,
+      // The tester is usually not low on credits; send anyway.
+      allowCompletedProfile: true,
+    },
+    { ...recipient, email: recipient.email },
+    `campaign:${campaign.id}:${recipient.userId}`,
   );
 }
 
@@ -411,6 +564,95 @@ async function dispatch(
       recipient.email,
       subject,
       result.error?.message
+    );
+    if (result.error) throw new Error(result.error.message ?? "send failed");
+    return true;
+  }
+
+  if (opts.template === "low_credit_offer") {
+    // Re-check at dispatch, not just at audience resolution: a long blast can
+    // outlive someone topping up or subscribing mid-run, and nobody should get
+    // a "you are nearly out of credits" email once they no longer are.
+    const [current] = await db
+      .select({
+        balance: sql<number>`coalesce(${creditAccounts.balance}, 0)`,
+        isPremium: users.isPremium,
+        premiumUntil: users.premiumUntil,
+      })
+      .from(users)
+      .leftJoin(creditAccounts, eq(creditAccounts.userId, users.id))
+      .where(eq(users.id, recipient.userId))
+      .limit(1);
+    const balance = Number(current?.balance ?? recipient.balance ?? 0);
+    const stillPremium = Boolean(
+      current?.isPremium &&
+        current.premiumUntil &&
+        current.premiumUntil.getTime() > Date.now(),
+    );
+    if (stillPremium) return false;
+    if (balance > LOW_CREDIT_OFFER_THRESHOLD && !opts.allowCompletedProfile) {
+      return false;
+    }
+
+    const unsubUrl = localizedAbsUrl(
+      `/unsubscribe?token=${token}&type=marketing`,
+      locale,
+    );
+    const subject = locale === "ka" ? OFFER_SUBJECT.ka : OFFER_SUBJECT.en;
+    await acquireResendSlot();
+    const result = await c.emails.send(
+      {
+        from: FROM,
+        to: recipient.email,
+        subject,
+        react: LowCreditOfferEmail({
+          name: recipient.name?.split(" ")[0] ?? null,
+          balance,
+          priceLabel: formatBillingAmount(
+            LOW_CREDIT_PROMO_PLAN.amountMinor,
+            LOW_CREDIT_PROMO_PLAN.currency,
+            locale,
+          ),
+          months: LOW_CREDIT_PROMO_MONTHS,
+          deadlineLabel:
+            locale === "ka"
+              ? kaDayMonthGenitive(LOW_CREDIT_OFFER_ENDS_AT)
+              : new Intl.DateTimeFormat("en-GB", {
+                  day: "numeric",
+                  month: "long",
+                }).format(LOW_CREDIT_OFFER_ENDS_AT),
+          creditsUrl: localizedAbsUrl("/credits", locale),
+          unsubscribeUrl: unsubUrl,
+          locale,
+        }),
+        headers: {
+          "List-Unsubscribe": `<${unsubUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      },
+      idempotencyKey ? { idempotencyKey } : undefined,
+    );
+    if (opts.campaignId) {
+      await db
+        .update(emailCampaignRecipients)
+        .set({
+          status: result.error ? "failed" : "sent",
+          error: result.error?.message ?? null,
+          sentAt: result.error ? null : new Date(),
+        })
+        .where(
+          and(
+            eq(emailCampaignRecipients.campaignId, opts.campaignId),
+            eq(emailCampaignRecipients.userId, recipient.userId),
+          ),
+        );
+    }
+    await logToUnifiedSendLog(
+      recipient.userId,
+      "low_credit_offer",
+      recipient.email,
+      subject,
+      result.error?.message,
     );
     if (result.error) throw new Error(result.error.message ?? "send failed");
     return true;

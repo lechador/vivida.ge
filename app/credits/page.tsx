@@ -18,6 +18,9 @@ import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 import { premiumPlanForCountry } from "@/lib/billing-config";
 import { countryCodeFromHeaders, setResidenceCountryIfMissing } from "@/lib/residence";
 import { PremiumPlanCard } from "@/components/subscription/premium-plan-card";
+import { LowCreditOfferCard } from "@/components/subscription/low-credit-offer-card";
+import { getLowCreditOffer } from "@/lib/promo-offer";
+import { kaDayMonthGenitive } from "@/lib/i18n/ka-date";
 import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
 
@@ -46,11 +49,14 @@ export default async function CreditsPage() {
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
   const am = locale === "am";
-  const [balance, ref, storedIdentity, premium] = await Promise.all([
+  const [balance, ref, storedIdentity, premium, offer] = await Promise.all([
     getBalance(user.id),
     getReferralStats(user.id),
     getBillingIdentity(user.id),
     isPremiumUser(user.id),
+    // Null for everyone the low-credit campaign did not email, which is the
+    // whole point — the promo price must not leak to the rest of Georgia.
+    getLowCreditOffer(user.id),
   ]);
   // Accounts created before residence tracking have no country, which would
   // hide PRO and fall the packs back to GEL by luck rather than by geo. Same
@@ -110,6 +116,25 @@ export default async function CreditsPage() {
             </span>
             <span aria-hidden>→</span>
           </Link>
+        ) : offer ? (
+          // The offer replaces the standard PRO card rather than sitting beside
+          // it: two prices for the same thing is a reason to hesitate.
+          <div className="mt-4">
+            <LowCreditOfferCard
+              plan={offer.plan}
+              months={offer.months}
+              deadlineLabel={
+                locale === "ka"
+                  ? kaDayMonthGenitive(offer.endsAt)
+                  : new Intl.DateTimeFormat("en-GB", {
+                      day: "numeric",
+                      month: "long",
+                    }).format(offer.endsAt)
+              }
+              standardPlan={premiumPlan}
+              locale={locale}
+            />
+          </div>
         ) : premiumPlan ? (
           <div className="mt-4">
             <PremiumPlanCard plan={premiumPlan} locale={locale} />

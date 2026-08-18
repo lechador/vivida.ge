@@ -3,7 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   creditPackForCountry,
   creditPacksForCountry,
+  billingPeriodMonths,
   formatBillingAmount,
+  LOW_CREDIT_PROMO_MONTHS,
+  LOW_CREDIT_PROMO_PLAN,
+  PREMIUM_PLANS_BY_COUNTRY,
   premiumPlanForCountry,
 } from "@/lib/billing-config";
 
@@ -86,6 +90,69 @@ describe("country billing catalogue", () => {
       expect(plan.amountMinor).toBeLessThan(largest.amountMinor);
     },
   );
+});
+
+describe("low-credit win-back promo", () => {
+  it("bills ₾29 once per three months, not once per month", () => {
+    expect(LOW_CREDIT_PROMO_PLAN.amountMinor).toBe(2900);
+    expect(LOW_CREDIT_PROMO_PLAN.currency).toBe("gel");
+    expect(LOW_CREDIT_PROMO_PLAN.interval).toBe("month");
+    expect(LOW_CREDIT_PROMO_PLAN.intervalCount).toBe(LOW_CREDIT_PROMO_MONTHS);
+    expect(LOW_CREDIT_PROMO_MONTHS).toBe(3);
+  });
+
+  /**
+   * The offer is targeted. If country lookup could ever return it, every
+   * Georgian visiting /credits would be shown ₾29 instead of ₾19.90.
+   */
+  it("is unreachable from country lookup alone", () => {
+    expect(premiumPlanForCountry("GE")!.key).toBe("premium_ge_monthly");
+    expect(Object.values(PREMIUM_PLANS_BY_COUNTRY)).not.toContain(
+      LOW_CREDIT_PROMO_PLAN,
+    );
+  });
+
+  it("undercuts paying the standard Georgian rate for the same span", () => {
+    const standard = premiumPlanForCountry("GE")!;
+    expect(LOW_CREDIT_PROMO_PLAN.currency).toBe(standard.currency);
+    expect(LOW_CREDIT_PROMO_PLAN.amountMinor).toBeLessThan(
+      standard.amountMinor * LOW_CREDIT_PROMO_MONTHS,
+    );
+  });
+
+  it("carries its own Stripe lookup key", () => {
+    expect(LOW_CREDIT_PROMO_PLAN.stripeLookupKey).toBe(
+      "vivida_promo_ge_quarterly_2900_v1",
+    );
+    expect(LOW_CREDIT_PROMO_PLAN.stripeLookupKey).not.toBe(
+      premiumPlanForCountry("GE")!.stripeLookupKey,
+    );
+  });
+});
+
+describe("billingPeriodMonths", () => {
+  const at = (y: number, m: number, d = 1) => new Date(Date.UTC(y, m - 1, d));
+
+  it("reads a monthly cycle as one month", () => {
+    expect(billingPeriodMonths(at(2026, 1), at(2026, 2))).toBe(1);
+    // February is the shortest cycle of the year and must not round to zero.
+    expect(billingPeriodMonths(at(2026, 2), at(2026, 3))).toBe(1);
+  });
+
+  /** A quarter is 89–92 days depending on where it starts; all are 3 months. */
+  it("reads every quarter in the year as three months", () => {
+    for (let month = 1; month <= 12; month++) {
+      const start = at(2026, month);
+      const end = new Date(
+        Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 3, 1),
+      );
+      expect(billingPeriodMonths(start, end)).toBe(3);
+    }
+  });
+
+  it("never reports a cycle shorter than a month", () => {
+    expect(billingPeriodMonths(at(2026, 1, 1), at(2026, 1, 2))).toBe(1);
+  });
 });
 
 describe("formatBillingAmount", () => {

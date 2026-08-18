@@ -7,7 +7,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PremiumPlanCard } from "@/components/subscription/premium-plan-card";
 import { SubscriptionActions } from "@/components/subscription/subscription-actions";
-import { formatBillingAmount, premiumPlanForCountry } from "@/lib/billing-config";
+import { billingPeriodMonths, formatBillingAmount, premiumPlanForCountry } from "@/lib/billing-config";
 import { getBillingIdentity, getPremiumSubscription, isPremiumUser } from "@/lib/premium";
 import { countryCodeFromHeaders, countryDisplayName, setResidenceCountryIfMissing } from "@/lib/residence";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -71,7 +71,18 @@ export default async function SubscriptionPage() {
                 <div className="text-sm text-muted-foreground">Vivida PRO · {country}</div>
                 <div className="mt-1 text-2xl font-semibold">
                   {formatBillingAmount(subscription.amountMinor, subscription.currency, locale)}
-                  <span className="text-sm font-normal text-muted-foreground">/{en ? "month" : "თვე"}</span>
+                  {/* Read from the subscription, not assumed monthly — the
+                      ₾29 promo bills quarterly, and telling its buyers they
+                      pay that every month would be a false billing claim. */}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    /{billingCadenceLabel(
+                      billingPeriodMonths(
+                        subscription.currentPeriodStart,
+                        subscription.currentPeriodEnd,
+                      ),
+                      en,
+                    )}
+                  </span>
                 </div>
               </div>
               <span className={`rounded-full px-3 py-1 text-xs font-semibold ${active ? "bg-emerald-400/12 text-emerald-300" : "bg-foreground/10 text-muted-foreground"}`}>
@@ -121,6 +132,12 @@ function formatDate(date: Date, locale: UserLocale) {
       year: "numeric",
     }
   ).format(date);
+}
+
+/** "month" / "3 months" — the denominator under a subscription's price. */
+function billingCadenceLabel(months: number, en: boolean): string {
+  if (months === 1) return en ? "month" : "თვე";
+  return en ? `${months} months` : `${months} თვე`;
 }
 
 function Detail({ icon: Icon, label, value }: { icon: typeof CalendarDays; label: string; value: string }) {

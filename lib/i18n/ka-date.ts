@@ -77,3 +77,37 @@ export function kaLongDate(ymd: string): string {
 export function kaShortDate(date: Date): string {
   return `${date.getDate()} ${KA_MONTHS_SHORT[date.getMonth()]}`;
 }
+
+/** "1 სექტემბერი" for an instant, read in the runtime's own timezone. */
+export function kaDayMonth(date: Date): string {
+  return `${date.getDate()} ${KA_MONTHS[date.getMonth()]}`;
+}
+
+/**
+ * Genitive month names — the form a date takes before a postposition, as in
+ * "1 სექტემბრის ჩათვლით" (up to and including 1 September).
+ *
+ * Georgian does not build this by suffixing the nominative: "სექტემბერი" +
+ * "-ის" gives "სექტემბერიის", which is simply wrong. Most months syncopate
+ * the final vowel of the stem (სექტემბერი → სექტემბრის) and აგვისტო takes a
+ * bare -ს, so the forms are listed rather than derived.
+ */
+const KA_MONTHS_GENITIVE = [
+  "იანვრის",
+  "თებერვლის",
+  "მარტის",
+  "აპრილის",
+  "მაისის",
+  "ივნისის",
+  "ივლისის",
+  "აგვისტოს",
+  "სექტემბრის",
+  "ოქტომბრის",
+  "ნოემბრის",
+  "დეკემბრის",
+];
+
+/** "1 სექტემბრის" — pair with a postposition, e.g. `${…} ჩათვლით`. */
+export function kaDayMonthGenitive(date: Date): string {
+  return `${date.getDate()} ${KA_MONTHS_GENITIVE[date.getMonth()]}`;
+}

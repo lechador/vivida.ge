@@ -15,6 +15,8 @@ export type PremiumPlan = {
   amountMinor: number;
   currency: BillingCurrency;
   interval: "month";
+  /** Months per billing cycle. Absent means 1 — the standard monthly plans. */
+  intervalCount?: number;
   stripeLookupKey: string;
 };
 
@@ -92,6 +94,47 @@ export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
     stripeLookupKey: "vivida_premium_ge_monthly_1990_v1",
   },
 };
+
+/**
+ * Targeted win-back offer: three months of PRO for ₾29, shown only to the
+ * users the low-credit campaign addressed (see lib/promo-offer.ts).
+ *
+ * A real quarterly Stripe subscription rather than a one-off grant, so every
+ * existing entitlement path works untouched — syncPremiumSubscription writes
+ * `premiumUntil` from the subscription's period end, which a 3-month interval
+ * puts three months out, and the buyer can cancel from the billing portal like
+ * any other subscriber. It renews at ₾29 per quarter, NOT at the ₾19.90
+ * monthly rate, so this is a standing discount for as long as they stay.
+ *
+ * The offer is deliberately absent from PREMIUM_PLANS_BY_COUNTRY: country
+ * alone must never resolve to it, or every Georgian would see the promo price.
+ */
+export const LOW_CREDIT_PROMO_PLAN: PremiumPlan = {
+  key: "promo_ge_quarterly",
+  countryCode: "GE",
+  amountMinor: 2900,
+  currency: "gel",
+  interval: "month",
+  intervalCount: 3,
+  stripeLookupKey: "vivida_promo_ge_quarterly_2900_v1",
+};
+
+/** Months of PRO one purchase of the promo buys — used in the offer copy. */
+export const LOW_CREDIT_PROMO_MONTHS = 3;
+
+/**
+ * Months in one billing cycle, read back from a subscription's own period.
+ *
+ * Derived rather than stored: `premium_subscription` never recorded an
+ * interval count (every plan was monthly when it was written), and the period
+ * bounds Stripe already gives us are the authoritative answer for any cadence
+ * without a migration. Rounded because months are not equal lengths — a
+ * quarter spans 89 to 92 days depending on where in the year it starts.
+ */
+export function billingPeriodMonths(start: Date, end: Date): number {
+  const days = (end.getTime() - start.getTime()) / 86_400_000;
+  return Math.max(1, Math.round(days / 30.44));
+}
 
 export function normalizeCountryCode(value: string | null | undefined): string | null {
   const code = value?.trim().toUpperCase();

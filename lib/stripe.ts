@@ -146,10 +146,13 @@ async function priceForPlan(plan: PremiumPlan): Promise<Stripe.Price> {
   if (!price) {
     throw new Error(`Stripe price is missing for ${plan.stripeLookupKey}`);
   }
+  // interval_count is checked too: without it the quarterly promo would accept
+  // a monthly price under its lookup key and bill ₾29 every month.
   if (
     price.currency !== plan.currency ||
     price.unit_amount !== plan.amountMinor ||
-    price.recurring?.interval !== plan.interval
+    price.recurring?.interval !== plan.interval ||
+    (price.recurring?.interval_count ?? 1) !== (plan.intervalCount ?? 1)
   ) {
     throw new Error(`Stripe price does not match catalogue for ${plan.key}`);
   }
