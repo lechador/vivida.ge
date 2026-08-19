@@ -363,56 +363,60 @@ export default async function TaroHubPage() {
           </div>
         </section>
 
-        {/* CTA → natal chart */}
-        <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
-          <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            {am
-              ? "Քարտերն ու աստղերը՝ միասին"
-              : en
-                ? "Cards and stars, together"
-                : "ტაროც და ვარსკვლავებიც"}
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            {am
-              ? "Ծննդյան քարտեզը լրացնում է պատկերը՝ Լուսին, Վեներա, մոլորակներ և բոլոր տասներկու տները: Ստեղծեք այն անվճար:"
-              : en
-                ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
-                : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს — მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
-          </p>
-          <Link
-            href={localeHref(en ? "/natal-chart" : "/nataluri-ruka", locale)}
-            className="mt-6 inline-flex items-center gap-1.5 rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2.5 text-sm font-semibold text-white"
-          >
-            {am
-              ? "Ստեղծել ծննդյան քարտեզը"
-              : en
-                ? "Create my natal chart"
-                : "ჩემი ნატალური რუკა"}
-            <ArrowRight className="size-4" />
-          </Link>
-        </div>
+        {/* CTA → natal chart (logged-out visitors only) */}
+        {!authed && (
+          <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
+            <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
+            <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+              {am
+                ? "Քարտերն ու աստղերը՝ միասին"
+                : en
+                  ? "Cards and stars, together"
+                  : "ტაროც და ვარსკვლავებიც"}
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
+              {am
+                ? "Ծննդյան քարտեզը լրացնում է պատկերը՝ Լուսին, Վեներա, մոլորակներ և բոլոր տասներկու տները: Ստեղծեք այն անվճար:"
+                : en
+                  ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
+                  : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს — მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
+            </p>
+            <Link
+              href={localeHref(en ? "/natal-chart" : "/nataluri-ruka", locale)}
+              className="mt-6 inline-flex items-center gap-1.5 rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2.5 text-sm font-semibold text-white"
+            >
+              {am
+                ? "Ստեղծել ծննդյան քարտեզը"
+                : en
+                  ? "Create my natal chart"
+                  : "ჩემი ნატალური რუკა"}
+              <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        )}
 
-        <PopularSearches
-          locale={locale}
-          queries={
-            am
-              ? [
-                  "տարո առցանց հայերեն",
-                  "երեք քարտի տարո բացում",
-                  "Մեծ Արկանների իմաստները",
-                  "ուղիղ և շրջված տարո քարտեր",
-                ]
-              : en
+        {!authed && (
+          <PopularSearches
+            locale={locale}
+            queries={
+              am
                 ? [
-                    "free online tarot reading",
-                    "three card tarot spread",
-                    "Major Arcana meanings",
-                    "upright and reversed tarot cards",
+                    "տարո առցանց հայերեն",
+                    "երեք քարտի տարո բացում",
+                    "Մեծ Արկանների իմաստները",
+                    "ուղիղ և շրջված տարո քարտեր",
                   ]
-                : TAROT_LATIN_QUERIES
-          }
-        />
+                : en
+                  ? [
+                      "free online tarot reading",
+                      "three card tarot spread",
+                      "Major Arcana meanings",
+                      "upright and reversed tarot cards",
+                    ]
+                  : TAROT_LATIN_QUERIES
+            }
+          />
+        )}
       </section>
 
       <SiteFooter locale={locale} />
