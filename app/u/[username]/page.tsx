@@ -531,19 +531,38 @@ export default async function PublicProfilePage({
           </section>
         )}
 
-        {/* Logged-in visitor without a chart (no profile yet) */}
+        {/* No synastry for a logged-in visitor — two very different reasons.
+            `synastry` is null when *either* chart is missing, so branch on
+            whose data is actually absent: nudging the viewer to onboarding
+            when it's the profile owner who never filled in birth details
+            just confuses them (there's nothing for them to fix). */}
         {viewerId && !synastry && !isOwner && (
-          <section className="mt-10 rounded-2xl border border-border bg-card/65 p-6 text-center backdrop-blur-xl ring-1 ring-foreground/5">
-            <h2 className="text-xl font-semibold tracking-tight">
-              {en ? "To see your compatibility" : "თქვენი თავსებადობის სანახავად"}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {en ? "Add your birth details first." : "ჯერ შეავსე დაბადების მონაცემები."}
-            </p>
-            <Button asChild variant="mystic" className="mt-4">
-              <Link href="/onboarding">{en ? "Add details now" : "შეავსე ახლავე"}</Link>
-            </Button>
-          </section>
+          ownerChart ? (
+            <section className="mt-10 rounded-2xl border border-border bg-card/65 p-6 text-center backdrop-blur-xl ring-1 ring-foreground/5">
+              <h2 className="text-xl font-semibold tracking-tight">
+                {en ? "To see your compatibility" : "თქვენი თავსებადობის სანახავად"}
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {en ? "Add your birth details first." : "ჯერ შეავსე დაბადების მონაცემები."}
+              </p>
+              <Button asChild variant="mystic" className="mt-4">
+                <Link href="/onboarding">{en ? "Add details now" : "შეავსე ახლავე"}</Link>
+              </Button>
+            </section>
+          ) : (
+            <section className="mt-10 rounded-2xl border border-border bg-card/65 p-6 text-center backdrop-blur-xl ring-1 ring-foreground/5">
+              <h2 className="text-xl font-semibold tracking-tight">
+                {en
+                  ? `${displayName} hasn't added birth details yet`
+                  : `${displayName}-ს ჯერ არ შეუვსებია დაბადების მონაცემები`}
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {en
+                  ? "As soon as they do, your compatibility will show up here."
+                  : "როგორც შეავსებს, თქვენი თავსებადობა აქ გამოჩნდება."}
+              </p>
+            </section>
+          )
         )}
       </section>
     </main>

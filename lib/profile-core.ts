@@ -156,8 +156,14 @@ export async function saveBirthDataCore(
       })
       .onConflictDoUpdate({
         target: profiles.userId,
-        // dateOfBirth is intentionally absent — it's locked after first save.
         set: {
+          // `lockedDate` is the stored date when there is one and the client's
+          // only when the column is still empty, so writing it here preserves
+          // the "birth date is fixed at first registration" rule. It has to be
+          // in the update branch: every user now gets a profile row at signup
+          // (ensureUsername), so onboarding always lands on the conflict path
+          // and omitting it here meant birth dates were never persisted at all.
+          dateOfBirth: lockedDate,
           timeOfBirth: timeForDb,
           latitude: input.latitude,
           longitude: input.longitude,
