@@ -57,7 +57,10 @@ function initialState(
     time: {
       hour: hh ?? "",
       minute: mm ?? "",
-      unknown: !profile.timeOfBirth,
+      // A profile row exists from signup with every birth field null, so a
+      // missing time only means "unknown" once they've actually filled the
+      // wizard in. Brand-new users must start with the toggle OFF.
+      unknown: !!profile.dateOfBirth && !profile.timeOfBirth,
     },
     place:
       profile.latitude !== null &&
