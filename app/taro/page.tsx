@@ -8,6 +8,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { TarotReader } from "@/components/tarot/tarot-reader";
+import { TarotConversionLanding } from "@/components/tarot/tarot-conversion-landing";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { TAROT_CARDS } from "@/lib/tarot/deck";
@@ -211,6 +212,18 @@ export default async function TaroHubPage() {
       })),
     },
   ];
+
+  if (locale === "ka") {
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
+        />
+        <TarotConversionLanding authed={authed} />
+      </>
+    );
+  }
 
   return (
     <main

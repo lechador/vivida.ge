@@ -8,6 +8,7 @@ import { Loader2, RotateCcw, Sparkles, Users, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import { fbTrack, fbTrackCustom } from "@/lib/fb-pixel";
 import type { UserLocale } from "@/lib/i18n/locale";
 
 type SpreadCard = {
@@ -92,6 +93,16 @@ export function TarotReader({
       trackEvent(ANALYTICS_EVENT.tarotReadingCompleted, {
         free: next.free ? 1 : 0,
       });
+      fbTrackCustom("TarotReadingCompleted", {
+        free: next.free ? 1 : 0,
+        content_name: "three_card_tarot_reading",
+      });
+      if (next.free) {
+        fbTrack("Lead", {
+          content_name: "first_tarot_reading",
+          content_category: "tarot",
+        });
+      }
       setReading(next);
       setStatus("idle");
     } catch {
