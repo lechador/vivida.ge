@@ -9,6 +9,7 @@ import { WelcomeEmail } from "@/lib/email-templates/welcome";
 import { FriendRequestEmail } from "@/lib/email-templates/friend-request";
 import { MessageEmail } from "@/lib/email-templates/message";
 import { MbtiResultEmail } from "@/lib/email-templates/mbti-result";
+import { ReportReadyEmail } from "@/lib/email-templates/report-ready";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { ENGLISH_SITE_URL, isEnglishHost } from "@/lib/seo/locales";
@@ -377,6 +378,115 @@ export async function sendMbtiResultEmail({
     await recordSent(userId, "mbti_result", { email: to, subject });
   } catch (err) {
     console.error("[email] mbti result threw:", (err as Error).message);
+  }
+}
+
+/**
+ * Resend rejects oversized payloads outright, so a report that somehow renders
+ * huge should still arrive as a link rather than as a failed send. Our natal
+ * PDFs are tens of kilobytes; this is a floor under a pathological case, well
+ * below Resend's own 40 MB ceiling.
+ */
+const MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024;
+
+/**
+ * Email a finished natal report PDF to its owner, on demand from the button on
+ * /report and /reports/[id]. Transactional and deliberately re-sendable — the
+ * whole point of the button is "it didn't arrive, send it again", so there is
+ * no idempotency key here; the route rate-limits instead.
+ *
+ * Unlike the fire-and-forget notification senders above, this one reports back:
+ * a person is watching a spinner, and "sent" has to mean sent.
+ */
+export async function sendReportPdfEmail({
+  userId,
+  to,
+  name,
+  reportId,
+  pdfKey,
+  locale = "ka",
+}: {
+  userId: string;
+  to: string;
+  name: string | null;
+  reportId: string;
+  /** R2 key of the generated PDF. */
+  pdfKey: string;
+  locale?: UserLocale;
+}): Promise<{ ok: boolean; error?: string }> {
+  const c = client();
+  if (!c) {
+    console.warn("[email] RESEND_API_KEY missing — skipping report PDF to", to);
+    return { ok: false, error: "email_not_configured" };
+  }
+
+  const reportUrl = absUrl(`/reports/${reportId}`, originForLocale(locale));
+  const subject =
+    locale === "am"
+      ? "Ձեր նատալ զեկույցը · Vivida"
+      : locale === "en"
+        ? "Your natal report · Vivida"
+        : "შენი ნატალური ანგარიში · Vivida";
+
+  try {
+    // Dynamic import so the AWS SDK stays out of every module that merely
+    // imports this file for a notification send.
+    const { getObjectBytes } = await import("@/lib/r2");
+    let pdf: Uint8Array | null = null;
+    try {
+      const bytes = await getObjectBytes(pdfKey);
+      pdf = bytes.byteLength <= MAX_ATTACHMENT_BYTES ? bytes : null;
+      if (!pdf) {
+        console.warn(
+          `[email] report ${reportId} PDF too large to attach (${bytes.byteLength} bytes) — sending link only`
+        );
+      }
+    } catch (err) {
+      // The report exists but its bytes are unreachable. The link still works,
+      // so send that rather than nothing.
+      console.error(
+        "[email] report PDF fetch failed, sending link only:",
+        (err as Error).message
+      );
+    }
+
+    const result = await c.emails.send({
+      from: FROM,
+      to,
+      subject,
+      react: ReportReadyEmail({
+        name: name?.split(" ")[0] ?? null,
+        reportUrl,
+        attached: pdf !== null,
+        locale,
+      }),
+      attachments: pdf
+        ? [
+            {
+              filename: "vivida-natal-report.pdf",
+              content: Buffer.from(pdf),
+              contentType: "application/pdf",
+            },
+          ]
+        : undefined,
+    });
+
+    if (result.error) {
+      console.error("[email] report PDF send failed:", result.error);
+      await recordSent(userId, "report_pdf", {
+        email: to,
+        subject,
+        status: "failed",
+        error: result.error.message,
+      });
+      return { ok: false, error: "send_failed" };
+    }
+
+    await recordSent(userId, "report_pdf", { email: to, subject });
+    return { ok: true };
+  } catch (err) {
+    console.error("[email] report PDF threw:", (err as Error).message);
+    return { ok: false, error: "send_failed" };
   }
 }
 

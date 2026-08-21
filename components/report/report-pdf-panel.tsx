@@ -7,6 +7,7 @@ import { pdfReports } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import { CREDIT_COST, getBalance } from "@/lib/credits";
 import { BuyReportCta } from "./buy-report-cta";
+import { SendReportEmailButton } from "./send-report-email-button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -52,12 +53,15 @@ export async function ReportPdfPanel({
               </p>
             </div>
           </div>
-          <Button asChild variant="mystic" size="lg" className="min-w-44">
-            <a href={`/api/reports/${report.id}/download`}>
-              <Download className="size-4" />
-              {am ? "Ներբեռնել PDF" : en ? "Download PDF" : "ჩამოტვირთე PDF"}
-            </a>
-          </Button>
+          <div className="flex shrink-0 flex-col items-stretch gap-2 sm:min-w-52">
+            <Button asChild variant="mystic" size="lg">
+              <a href={`/api/reports/${report.id}/download`}>
+                <Download className="size-4" />
+                {am ? "Ներբեռնել PDF" : en ? "Download PDF" : "ჩამოტვირთე PDF"}
+              </a>
+            </Button>
+            <SendReportEmailButton reportId={report.id} locale={locale} />
+          </div>
         </div>
       </div>
     );

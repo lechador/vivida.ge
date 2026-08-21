@@ -116,6 +116,22 @@ export async function presignedDownloadUrl({
   return getSignedUrl(client(), cmd, { expiresIn });
 }
 
+/**
+ * Read a private object back out of R2 as bytes. Most consumers get a
+ * presigned URL instead, but some need the file itself server-side — e.g.
+ * attaching a generated report PDF to an email.
+ */
+export async function getObjectBytes(key: string): Promise<Uint8Array> {
+  const res = await client().send(
+    new GetObjectCommand({
+      Bucket: requireEnv("R2_BUCKET_NAME"),
+      Key: key,
+    })
+  );
+  if (!res.Body) throw new Error(`R2 object "${key}" returned no body`);
+  return res.Body.transformToByteArray();
+}
+
 export async function deleteObject(key: string): Promise<void> {
   await client().send(
     new DeleteObjectCommand({

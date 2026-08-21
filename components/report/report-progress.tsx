@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, Download, Loader2, RefreshCw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { SendReportEmailButton } from "./send-report-email-button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 type Status = "pending" | "paid" | "generating" | "ready" | "failed";
@@ -128,6 +129,11 @@ export function ReportProgress({
               {am ? "Ներբեռնել PDF" : en ? "Download PDF" : "ჩამოტვირთე PDF"}
             </a>
           </Button>
+          <SendReportEmailButton
+            reportId={reportId}
+            locale={locale}
+            className="mt-3 items-center"
+          />
         </div>
       ) : failed ? (
         <div className="flex flex-col items-center text-center">
