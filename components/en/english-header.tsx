@@ -8,6 +8,7 @@ import {
 } from "@/lib/seo/locales";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
+import { LanguageSelector } from "@/components/i18n/language-selector";
 
 const NAV = [
   { href: "/natal-chart", label: "Natal chart" },
@@ -46,6 +47,7 @@ export async function EnglishHeader({
   // instead of the explainer /am/horoscope actually mirrors.
   const resolvedArmenianPath = armenianPath ?? resolveEnglishPath(georgianPath);
   const armenianHref = armenianSiteHref(resolvedArmenianPath, onEnglishHost);
+  const georgianHref = `${GEORGIAN_SITE_URL}${georgianPath === "/" ? "" : georgianPath}`;
   return (
     <header className="relative z-20 border-b border-border/30 bg-background/45 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
@@ -71,22 +73,12 @@ export async function EnglishHeader({
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <Link
-            href={armenianHref}
-            hrefLang="hy-AM"
-            className="rounded-full border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-            aria-label="Switch to Armenian"
-          >
-            Հայերեն
-          </Link>
-          <Link
-            href={`${GEORGIAN_SITE_URL}${georgianPath === "/" ? "" : georgianPath}`}
-            hrefLang="ka-GE"
-            className="rounded-full border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-            aria-label="Switch to Georgian"
-          >
-            ქართული
-          </Link>
+          <LanguageSelector
+            currentLocale="en"
+            englishHref={href(resolveEnglishPath(georgianPath))}
+            armenianHref={armenianHref}
+            georgianHref={georgianHref}
+          />
           <Link
             href="/login"
             className="rounded-full border border-[var(--vivida-cyan)]/45 bg-[var(--vivida-cyan)]/8 px-3.5 py-1.5 text-sm font-medium text-[var(--vivida-cyan)] transition-colors hover:bg-[var(--vivida-cyan)]/14 hover:text-foreground"
