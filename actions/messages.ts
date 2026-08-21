@@ -71,7 +71,7 @@ export async function sendMessage(
 
 /**
  * Sender pings while they're typing. Friendship-checked. Idempotent — each
- * ping refreshes the TTL; the recipient's SSE poll picks up the row.
+ * ping refreshes the TTL; the recipient's active-chat poll picks up the row.
  */
 export async function pingTyping(
   recipientId: string

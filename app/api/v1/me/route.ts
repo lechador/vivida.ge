@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { profiles, users } from "@/db/schema";
+import { premiumSubscriptions, profiles, users } from "@/db/schema";
 import { requireMobileUser } from "@/lib/api/auth";
 import { handle } from "@/lib/api/errors";
 import { ok, fail } from "@/lib/api/respond";
@@ -54,8 +54,18 @@ export async function GET(req: Request) {
           residenceCity: users.residenceCity,
           verified: users.isPremium,
           premiumUntil: users.premiumUntil,
+          // Which processor bills this user's PRO. The app needs it to decide
+          // where to send someone who wants to cancel: a store subscription can
+          // only be managed in the store, and a Stripe one only on the website.
+          // It also gates the paywall — offering PRO to a live Stripe
+          // subscriber would charge them for it twice.
+          premiumSource: premiumSubscriptions.source,
         })
         .from(users)
+        .leftJoin(
+          premiumSubscriptions,
+          eq(premiumSubscriptions.userId, users.id),
+        )
         .where(eq(users.id, user.id))
         .limit(1),
     ]);
@@ -72,6 +82,7 @@ export async function GET(req: Request) {
         residenceCountryCode: account?.residenceCountryCode ?? null,
         residenceCity: account?.residenceCity ?? null,
         verified,
+        premiumSource: verified ? account?.premiumSource ?? null : null,
       },
       profile: profile ?? null,
     });

@@ -35,6 +35,10 @@ export async function GET(req: Request) {
 
   return NextResponse.json(
     { pages, users: usersHits },
-    { headers: { "cache-control": "no-store" } }
+    {
+      headers: {
+        "cache-control": "public, s-maxage=60, stale-while-revalidate=300",
+      },
+    }
   );
 }

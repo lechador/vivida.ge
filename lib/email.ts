@@ -1,17 +1,19 @@
 import { Resend } from "resend";
-import { and, desc, eq, gt } from "drizzle-orm";
+import { and, desc, eq, gt, gte, inArray, isNull, lt } from "drizzle-orm";
 
 import { db } from "@/db";
-import { emailSendLog, profiles, users } from "@/db/schema";
+import { emailSendLog, notifications, profiles, users } from "@/db/schema";
 import { VerificationEmail } from "@/lib/email-templates/verification";
 import { PasswordResetEmail } from "@/lib/email-templates/password-reset";
 import { WelcomeEmail } from "@/lib/email-templates/welcome";
 import { FriendRequestEmail } from "@/lib/email-templates/friend-request";
 import { MessageEmail } from "@/lib/email-templates/message";
+import { FeedActivityEmail } from "@/lib/email-templates/feed-activity";
 import { MbtiResultEmail } from "@/lib/email-templates/mbti-result";
 import { ReportReadyEmail } from "@/lib/email-templates/report-ready";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
+import { usesEnglishCopy } from "@/lib/i18n/locale";
 import { ENGLISH_SITE_URL, isEnglishHost } from "@/lib/seo/locales";
 
 /**
@@ -153,9 +155,9 @@ export async function sendPasswordResetEmail({
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Lifecycle / notification emails — welcome, friend-request, message.
-// All three are fire-and-forget from the call site (typically wrapped in
-// `after()`) and never throw. They guard against:
+// Lifecycle / notification emails — welcome, friend-request, message,
+// feed activity (comment / reaction). Fire-and-forget from the call site
+// (typically wrapped in `after()`) and never throw. They guard against:
 //   - missing RESEND_API_KEY (early-return with warn)
 //   - duplicate welcome (one-shot per user via email_send_log)
 //   - notification spam (1h throttle per user per kind)
@@ -718,5 +720,217 @@ export async function sendMessageEmail({
     });
   } catch (err) {
     console.error("[email] message threw:", (err as Error).message);
+  }
+}
+
+const REACTION_SUBJECT_KA: Record<string, string> = {
+  like: "მოეწონა შენი პოსტი",
+  funny: "გაეცინა შენი პოსტი",
+  sad: "დაამწუხრა შენი პოსტი",
+  dislike: "არ მოეწონა შენი პოსტი",
+};
+
+const REACTION_SUBJECT_EN: Record<string, string> = {
+  like: "liked your post",
+  funny: "found your post funny",
+  sad: "reacted sadly to your post",
+  dislike: "disliked your post",
+};
+
+/**
+ * Comment / reaction email — same gating as friend-request and message:
+ * recipient absent ≥1h, emailNudges on, one send per kind per hour.
+ * Never throws.
+ */
+export async function sendFeedActivityEmail({
+  recipientUserId,
+  kind,
+  fromName,
+  fromUsername,
+  postId,
+  preview,
+  reaction,
+}: {
+  recipientUserId: string;
+  kind: "post_comment" | "post_reaction";
+  fromName: string;
+  fromUsername: string | null;
+  postId: string;
+  preview?: string | null;
+  reaction?: string | null;
+}): Promise<boolean> {
+  const c = client();
+  if (!c) return false;
+
+  const [recipient] = await db
+    .select({
+      email: users.email,
+      name: users.name,
+      emailNudges: users.emailNudges,
+      locale: users.interfaceLanguage,
+    })
+    .from(users)
+    .where(eq(users.id, recipientUserId))
+    .limit(1);
+  if (!recipient?.email) return false;
+  if (recipient.emailNudges === false) return false;
+  if (!(await userAbsentFor(recipientUserId, ABSENCE_THRESHOLD_MIN))) return false;
+  if (await sentRecently(recipientUserId, kind, NOTIFICATION_THROTTLE_MIN)) {
+    return false;
+  }
+
+  const token = await getOrCreateUnsubscribeToken(recipientUserId);
+  const locale = normalizeUserLocale(recipient.locale);
+  const origin = originForLocale(locale);
+  const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`, origin);
+  const postUrl = absUrl(`/feed/${postId}`, origin);
+  const en = usesEnglishCopy(locale);
+  const snippet =
+    preview && preview.length > 140
+      ? `${preview.slice(0, 140).trimEnd()}…`
+      : (preview ?? "");
+
+  const subject =
+    kind === "post_comment"
+      ? en
+        ? `${fromName} commented on your post · Vivida`
+        : `${fromName}-მ შენს პოსტს დააკომენტარა · Vivida`
+      : en
+        ? `${fromName} ${REACTION_SUBJECT_EN[reaction ?? ""] ?? "reacted to your post"} · Vivida`
+        : `${fromName} — ${REACTION_SUBJECT_KA[reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"} · Vivida`;
+
+  try {
+    const result = await c.emails.send(
+      {
+        from: FROM,
+        to: recipient.email,
+        subject,
+        react: FeedActivityEmail({
+          recipientName: recipient.name?.split(" ")[0] ?? null,
+          fromName,
+          fromUsername,
+          kind,
+          preview: snippet || null,
+          reaction,
+          postUrl,
+          unsubscribeUrl: unsubUrl,
+          locale,
+        }),
+        headers: {
+          "List-Unsubscribe": `<${unsubUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      },
+      {
+        idempotencyKey: `${kind}:${recipientUserId}:${Math.floor(
+          Date.now() / 3600_000
+        )}`,
+      }
+    );
+    if (result.error) {
+      console.error("[email] feed-activity send failed:", result.error);
+      return false;
+    }
+    await recordSent(recipientUserId, kind, {
+      email: recipient.email,
+      subject,
+    });
+    return true;
+  } catch (err) {
+    console.error("[email] feed-activity threw:", (err as Error).message);
+    return false;
+  }
+}
+
+/** Has this kind been emailed to this user at or after `since`? */
+async function sentSince(
+  userId: string,
+  kind: string,
+  since: Date
+): Promise<boolean> {
+  const [row] = await db
+    .select({ id: emailSendLog.id })
+    .from(emailSendLog)
+    .where(
+      and(
+        eq(emailSendLog.userId, userId),
+        eq(emailSendLog.kind, kind),
+        gte(emailSendLog.sentAt, since)
+      )
+    )
+    .limit(1);
+  return !!row;
+}
+
+/**
+ * Delayed feed-activity emails: unread comment/reaction notifications that
+ * are ≥1h old, whose owner is still away. Covers the case where the user
+ * was on the site when the event happened (so the immediate send was
+ * skipped) and then didn't come back. Hourly cron. Never throws.
+ */
+export async function flushUnreadFeedActivityEmails(): Promise<{
+  candidates: number;
+  sent: number;
+}> {
+  const c = client();
+  if (!c) return { candidates: 0, sent: 0 };
+
+  try {
+    const now = Date.now();
+    const oldest = new Date(now - 24 * 60 * 60_000);
+    const due = new Date(now - ABSENCE_THRESHOLD_MIN * 60_000);
+
+    const rows = await db
+      .select({
+        userId: notifications.userId,
+        kind: notifications.kind,
+        payload: notifications.payload,
+        createdAt: notifications.createdAt,
+      })
+      .from(notifications)
+      .innerJoin(users, eq(users.id, notifications.userId))
+      .where(
+        and(
+          inArray(notifications.kind, ["post_comment", "post_reaction"]),
+          isNull(notifications.readAt),
+          gt(notifications.createdAt, oldest),
+          lt(notifications.createdAt, due),
+          eq(users.emailNudges, true)
+        )
+      )
+      .orderBy(desc(notifications.createdAt));
+
+    const latest = new Map<string, (typeof rows)[number]>();
+    for (const row of rows) {
+      const key = `${row.userId}:${row.kind}`;
+      if (!latest.has(key)) latest.set(key, row);
+    }
+
+    let sent = 0;
+    for (const row of latest.values()) {
+      if (row.kind !== "post_comment" && row.kind !== "post_reaction") continue;
+      const postId = row.payload?.postId;
+      if (!postId) continue;
+      if (await sentSince(row.userId, row.kind, row.createdAt)) continue;
+
+      const didSend = await sendFeedActivityEmail({
+        recipientUserId: row.userId,
+        kind: row.kind,
+        fromName: row.payload?.fromName ?? "Vivida-ის წევრი",
+        fromUsername: row.payload?.fromUsername ?? null,
+        postId,
+        preview: row.payload?.preview,
+        reaction: row.payload?.reaction,
+      });
+      if (didSend) sent++;
+    }
+
+    return { candidates: latest.size, sent };
+  } catch (err) {
+    console.error(
+      "[email] feed-activity flush threw:",
+      (err as Error).message
+    );
+    return { candidates: 0, sent: 0 };
   }
 }

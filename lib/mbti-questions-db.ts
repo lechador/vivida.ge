@@ -2,6 +2,7 @@ import "server-only";
 
 import { asc, eq } from "drizzle-orm";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import { db } from "@/db";
 import { mbtiQuestions } from "@/db/schema";
@@ -23,7 +24,7 @@ import {
  * structure so a stray value can never corrupt scoring — an unknown axis falls
  * back to the static question with that id.
  */
-export const getMbtiQuestions = cache(async (): Promise<MbtiQuestion[]> => {
+const getMbtiQuestionsCached = unstable_cache(async (): Promise<MbtiQuestion[]> => {
   try {
     const rows = await db
       .select()
@@ -47,4 +48,6 @@ export const getMbtiQuestions = cache(async (): Promise<MbtiQuestion[]> => {
     console.warn("[mbti-questions-db] read failed, using static:", (err as Error).message);
     return MBTI_QUESTIONS;
   }
-});
+}, ["mbti-questions"], { revalidate: 5 * 60 });
+
+export const getMbtiQuestions = cache(getMbtiQuestionsCached);

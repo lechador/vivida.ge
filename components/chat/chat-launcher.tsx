@@ -50,6 +50,13 @@ type StreamPayload = {
   };
 };
 
+type PollPayload = {
+  messages: StreamPayload[];
+  typing: Array<{ senderId: string; expiresAt: string }>;
+  receipts: ReadEventPayload[];
+  now: string;
+};
+
 /**
  * Window CustomEvent contracts used to talk to the bell-icon dropdown
  * without coupling the components.
@@ -94,8 +101,8 @@ type Props = {
   /**
    * "modal"      — legacy floating chat button + animated panel (desktop)
    * "page"       — render inline as a full-page chat experience (/messages)
-   * "background" — no UI; only run the SSE pump and dispatch badge events
-   *                so the bottom-bar messages tab + bell stay live.
+   * "background" — retained as an inert compatibility mode; it performs no
+   *                network or database work.
    */
   mode?: "modal" | "page" | "background";
   /** When mounted in "page" mode, optionally auto-open this partner's chat. */
@@ -138,12 +145,13 @@ export function ChatLauncher({
     Record<string, ThreadStatus>
   >({});
 
-  // Refs read by the SSE callback so they always see fresh values.
+  // Refs read by polling callbacks so they always see fresh values.
   const openRef = useRef(open);
   const activePartnerRef = useRef<string | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
   const loadedRef = useRef<Set<string>>(new Set());
   const conversationsRef = useRef(conversations);
+  const pollCursorRef = useRef(new Date().toISOString());
   const typingTimersRef = useRef<
     Record<string, ReturnType<typeof setTimeout>>
   >({});
@@ -228,9 +236,6 @@ export function ChatLauncher({
         );
       }
 
-      if (isActivelyViewing) {
-        markConversationRead(msg.senderId).catch(() => {});
-      }
     },
     [viewerId]
   );
@@ -278,67 +283,91 @@ export function ChatLauncher({
     });
   }, [viewerId]);
 
-  // Long-lived SSE — server auto-recycles every ~23s, EventSource auto-reconnects.
-  // Visibility gating: when the tab is hidden we close the connection and the
-  // server-side polling stops. New messages still arrive as soon as the user
-  // returns (we reconnect with a 30s lookback). For users with many tabs this
-  // collapses constant Neon traffic to "only when actively looking."
+  // Chat is intentionally pull-based and scoped to /messages. The conversation
+  // list checks once per minute with one DB query; an open conversation checks
+  // every 10s and also asks for typing/read state. Hidden tabs do no work.
+  // This replaces the old site-wide, reconnecting SSE function which held
+  // Vercel memory and queried Neon three times every two seconds.
   useEffect(() => {
-    let es: EventSource | null = null;
+    if (mode === "background") return;
+
     let cancelled = false;
+    let inFlight = false;
+    const intervalMs = activePartnerId ? 10_000 : 60_000;
 
-    const onMessage = (ev: MessageEvent) => {
+    const poll = async () => {
+      if (
+        cancelled ||
+        inFlight ||
+        document.visibilityState === "hidden"
+      ) {
+        return;
+      }
+      inFlight = true;
       try {
-        const payload = JSON.parse(ev.data) as StreamPayload;
-        if (payload && typeof payload.id === "string") applyIncoming(payload);
-      } catch {}
-    };
-    const onTyping = (ev: MessageEvent) => {
-      try {
-        applyTyping(JSON.parse(ev.data) as TypingEventPayload);
-      } catch {}
-    };
-    const onRead = (ev: MessageEvent) => {
-      try {
-        applyRead(JSON.parse(ev.data) as ReadEventPayload);
-      } catch {}
-    };
+        const params = new URLSearchParams({ since: pollCursorRef.current });
+        if (activePartnerId) params.set("with", activePartnerId);
+        const res = await fetch(`/api/messages/poll?${params.toString()}`, {
+          headers: { accept: "application/json" },
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const payload = (await res.json()) as PollPayload;
+        if (cancelled || !payload?.now) return;
 
-    const connect = () => {
-      if (cancelled || es) return;
-      es = new EventSource("/api/messages/stream");
-      es.addEventListener("message", onMessage);
-      es.addEventListener("typing", onTyping);
-      es.addEventListener("read", onRead);
-      // Native EventSource handles the 23s server-recycle reconnect for us.
-      // We only intervene on tab visibility changes below.
-    };
+        let readActiveThread = false;
+        for (const message of payload.messages ?? []) {
+          if (!message?.id) continue;
+          applyIncoming(message);
+          if (
+            activePartnerId &&
+            message.senderId === activePartnerId &&
+            message.recipientId === viewerId
+          ) {
+            readActiveThread = true;
+          }
+        }
+        applyTyping({ senders: payload.typing ?? [] });
+        for (const receipt of payload.receipts ?? []) applyRead(receipt);
+        pollCursorRef.current = payload.now;
 
-    const disconnect = () => {
-      es?.close();
-      es = null;
-    };
-
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden") {
-        disconnect();
-      } else {
-        connect();
+        // One batched UPDATE after a poll, regardless of how many messages
+        // arrived, instead of one server action per streamed message.
+        if (readActiveThread && activePartnerId) {
+          void markConversationRead(activePartnerId).catch(() => {});
+        }
+      } catch {
+        // Keep the cursor unchanged so the next successful poll catches up.
+      } finally {
+        inFlight = false;
       }
     };
 
-    if (document.visibilityState !== "hidden") connect();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") void poll();
+    };
+
+    // An opened thread should catch up immediately. The low-value conversation
+    // list waits for its first minute tick instead of spending on page mount.
+    if (activePartnerId) void poll();
+    const timer = window.setInterval(() => void poll(), intervalMs);
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       cancelled = true;
+      window.clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisibility);
-      disconnect();
-      // Clear pending typing timers so they don't fire after unmount
-      for (const t of Object.values(typingTimersRef.current)) clearTimeout(t);
+    };
+  }, [activePartnerId, applyIncoming, applyTyping, applyRead, mode, viewerId]);
+
+  useEffect(() => {
+    return () => {
+      for (const timer of Object.values(typingTimersRef.current)) {
+        clearTimeout(timer);
+      }
       typingTimersRef.current = {};
     };
-  }, [applyIncoming, applyTyping, applyRead]);
+  }, []);
 
   // Close on Escape
   useEffect(() => {
@@ -526,9 +555,7 @@ export function ChatLauncher({
     [viewerId]
   );
 
-  // Background mode: SSE pump + event dispatch only, no UI. Used on every
-  // authed page so the bottom-bar messages badge stays live without
-  // mounting the full chat surface twice.
+  // Compatibility-only: background chat deliberately performs no work.
   if (mode === "background") return null;
 
   // Page mode: full-bleed on mobile (no card frame, no rounded edges,
@@ -840,10 +867,10 @@ function ChatView({
 
   const handleDraftChange = (val: string) => {
     setDraft(val);
-    // Debounce typing pings — at most once every 3s to keep the TTL fresh
-    // without hammering the DB on every keystroke.
+    // A 15s TTL plus an 8s write debounce stays observable through the
+    // low-frequency poll without writing on every keystroke.
     const now = Date.now();
-    if (val.trim().length > 0 && now - lastTypingPingRef.current > 3000) {
+    if (val.trim().length > 0 && now - lastTypingPingRef.current > 8000) {
       lastTypingPingRef.current = now;
       onTyping();
     }

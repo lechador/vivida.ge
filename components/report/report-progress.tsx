@@ -55,15 +55,17 @@ export function ReportProgress({
   const failed = status === "failed";
   const terminal = done || failed;
 
-  const poll = useCallback(async () => {
+  const poll = useCallback(async (): Promise<boolean> => {
     try {
       const res = await fetch(`/api/reports/${reportId}`, { cache: "no-store" });
-      if (!res.ok) return;
+      if (!res.ok) return false;
       const data = await res.json();
       setStatus(data.status as Status);
       if (data.status === "failed") setError(data.error ?? null);
+      return data.status === "ready" || data.status === "failed";
     } catch {
       /* transient — keep polling */
+      return false;
     }
   }, [reportId]);
 
@@ -72,12 +74,30 @@ export function ReportProgress({
   // external-system subscription, hence the setState-in-callback.
   useEffect(() => {
     if (terminal) return;
-    // Immediate kick before the first interval tick; poll() only setStates
-    // after an async fetch resolves, so this isn't a synchronous cascade.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void poll();
-    const id = setInterval(() => void poll(), 2500);
-    return () => clearInterval(id);
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let delayMs = 5_000;
+    const run = async () => {
+      if (cancelled || document.visibilityState === "hidden") return;
+      const finished = await poll();
+      if (cancelled || finished) return;
+      timer = setTimeout(run, delayMs);
+      delayMs = Math.min(delayMs * 2, 15_000);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        if (timer) clearTimeout(timer);
+        delayMs = 5_000;
+        void run();
+      }
+    };
+    void run();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [terminal, poll]);
 
   // Eased progress crawl + rotating stage messages while generating.

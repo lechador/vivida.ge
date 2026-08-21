@@ -3,7 +3,7 @@ import { after } from "next/server";
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { recordVisit } from "@/lib/activity";
+import { recordVisit, shouldRecordVisit } from "@/lib/activity";
 
 import { ApiError } from "./errors";
 import { verifyAccessToken } from "./jwt";
@@ -20,18 +20,7 @@ import { toPublicUser, type PublicUser } from "./serialize";
  *   const user = await requireMobileUser(req);
  */
 export async function requireMobileUser(req: Request): Promise<PublicUser> {
-  const header = req.headers.get("authorization") ?? "";
-  const match = header.match(/^Bearer\s+(.+)$/i);
-  if (!match) {
-    throw new ApiError(401, "unauthorized", "Missing bearer token");
-  }
-
-  let userId: string;
-  try {
-    userId = await verifyAccessToken(match[1]);
-  } catch {
-    throw new ApiError(401, "invalid_token", "Invalid or expired access token");
-  }
+  const userId = await requireMobileUserId(req);
 
   const [user] = await db
     .select({
@@ -48,8 +37,29 @@ export async function requireMobileUser(req: Request): Promise<PublicUser> {
     throw new ApiError(401, "unauthorized", "Account no longer exists");
   }
 
-  // Best-effort admin activity record, mirroring the website's requireUser().
-  after(() => recordVisit(userId));
+  if (shouldRecordVisit(userId)) after(() => recordVisit(userId));
 
   return toPublicUser(user);
+}
+
+/**
+ * Lightweight authentication for high-frequency read-only endpoints. Access
+ * tokens expire after 15 minutes, so polling does not need another Neon query
+ * merely to prove that the already-signed token's user row still exists.
+ */
+export async function requireMobileUserId(req: Request): Promise<string> {
+  const header = req.headers.get("authorization") ?? "";
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  if (!match) {
+    throw new ApiError(401, "unauthorized", "Missing bearer token");
+  }
+
+  let userId: string;
+  try {
+    userId = await verifyAccessToken(match[1]);
+  } catch {
+    throw new ApiError(401, "invalid_token", "Invalid or expired access token");
+  }
+
+  return userId;
 }

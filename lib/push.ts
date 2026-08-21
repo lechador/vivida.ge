@@ -110,35 +110,74 @@ export async function sendDailyPushBlast(opts: {
 }): Promise<{ recipients: number; sent: number }> {
   if (!ensureConfigured()) return { recipients: 0, sent: 0 };
 
-  const recipients = await db
-    .selectDistinct({
+  const rows = await db
+    .select({
       userId: pushSubscriptions.userId,
       locale: users.interfaceLanguage,
+      id: pushSubscriptions.id,
+      endpoint: pushSubscriptions.endpoint,
+      p256dh: pushSubscriptions.p256dh,
+      auth: pushSubscriptions.auth,
+      headline: dailyHoroscopes.headline,
+      language: dailyHoroscopes.language,
     })
     .from(pushSubscriptions)
-    .innerJoin(users, eq(users.id, pushSubscriptions.userId));
+    .innerJoin(users, eq(users.id, pushSubscriptions.userId))
+    .leftJoin(
+      dailyHoroscopes,
+      and(
+        eq(dailyHoroscopes.userId, pushSubscriptions.userId),
+        eq(dailyHoroscopes.date, opts.sendDate),
+      ),
+    );
+
+  const recipients = new Map<
+    string,
+    {
+      locale: string;
+      headline: string | null;
+      language: string | null;
+      subs: SubRow[];
+    }
+  >();
+  for (const row of rows) {
+    const current = recipients.get(row.userId) ?? {
+      locale: row.locale,
+      headline: row.headline,
+      language: row.language,
+      subs: [],
+    };
+    current.subs.push({
+      id: row.id,
+      endpoint: row.endpoint,
+      p256dh: row.p256dh,
+      auth: row.auth,
+    });
+    recipients.set(row.userId, current);
+  }
 
   let sent = 0;
-  for (const { userId, locale: rawLocale } of recipients) {
-    const locale = normalizeUserLocale(rawLocale);
-    const [h] = await db
-      .select({ headline: dailyHoroscopes.headline, language: dailyHoroscopes.language })
-      .from(dailyHoroscopes)
-      .where(
-        and(
-          eq(dailyHoroscopes.userId, userId),
-          eq(dailyHoroscopes.date, opts.sendDate)
-        )
-      )
-      .limit(1);
-    sent += await sendPushToUser(userId, {
-      title: "Vivida ✨",
-      body: h?.language === locale
-        ? h.headline
-        : locale === "en" ? GENERIC_BODY_EN : GENERIC_BODY,
-      url: "/dashboard",
-      tag: `daily-${opts.sendDate}`,
-    });
+  const entries = Array.from(recipients.values());
+  let next = 0;
+  async function worker() {
+    while (next < entries.length) {
+      const recipient = entries[next++];
+      const locale = normalizeUserLocale(recipient.locale);
+      sent += await sendToSubs(recipient.subs, {
+        title: "Vivida ✨",
+        body:
+          recipient.language === locale && recipient.headline
+            ? recipient.headline
+            : locale === "en"
+              ? GENERIC_BODY_EN
+              : GENERIC_BODY,
+        url: "/dashboard",
+        tag: `daily-${opts.sendDate}`,
+      });
+    }
   }
-  return { recipients: recipients.length, sent };
+  await Promise.all(
+    Array.from({ length: Math.min(20, entries.length) }, () => worker()),
+  );
+  return { recipients: recipients.size, sent };
 }

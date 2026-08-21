@@ -8,6 +8,13 @@ import {
   type UserLocale,
 } from "./locale";
 
+const DEPLOYMENT_LOCALE =
+  process.env.VIVIDA_DEPLOYMENT_LOCALE === "ka" ||
+  process.env.VIVIDA_DEPLOYMENT_LOCALE === "en" ||
+  process.env.VIVIDA_DEPLOYMENT_LOCALE === "am"
+    ? process.env.VIVIDA_DEPLOYMENT_LOCALE
+    : null;
+
 /**
  * Resolve the interface language without querying the database.
  *
@@ -31,6 +38,20 @@ export function localeForHost(
 export async function getRequestLocale(
   preferred?: string | null,
 ): Promise<UserLocale> {
+  // Cost-optimized split deployments set a build-time locale, making public
+  // pages truly static/ISR because no request-time API is touched. On the
+  // English app an authenticated user's explicit Armenian preference remains
+  // valid; Georgian deployments stay Georgian unconditionally.
+  if (DEPLOYMENT_LOCALE) {
+    if (
+      DEPLOYMENT_LOCALE === "en" &&
+      normalizeUserLocale(preferred) === "am"
+    ) {
+      return "am";
+    }
+    return DEPLOYMENT_LOCALE;
+  }
+
   const requestHeaders = await headers();
   const host =
     requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
@@ -101,6 +122,7 @@ export async function getSignupLocale(): Promise<UserLocale> {
 
 /** Is this request being served from the Armenian `/am` URL space? */
 export async function requestIsArmenianPath(): Promise<boolean> {
+  if (DEPLOYMENT_LOCALE) return DEPLOYMENT_LOCALE === "am";
   const requestHeaders = await headers();
   return requestHeaders.get(LOCALE_HEADER) === "am";
 }
@@ -126,6 +148,7 @@ export async function requestIsArmenian(
  * the URL belongs to — which is what decides whether an internal link resolves.
  */
 export async function requestIsEnglishHost(): Promise<boolean> {
+  if (DEPLOYMENT_LOCALE) return DEPLOYMENT_LOCALE !== "ka";
   const requestHeaders = await headers();
   return isEnglishHost(
     requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host"),

@@ -32,6 +32,7 @@ import {
 } from "@/lib/transit-library";
 import { signByIndex } from "@/lib/zodiac";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
+import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 
 /**
  * Returns today's horoscope for the user, generating + caching it on first
@@ -77,6 +78,13 @@ export async function ensureDailyFor(
     if (versionMatches && chartMatches && languageMatches) return existing;
     // Otherwise fall through and regenerate (upsert below)
   }
+
+  const lockKey = `daily:${userId}:${today}:${locale}:v${DAILY_PROMPT_VERSION}`;
+  if (!(await claimGeneration(lockKey, 3 * 60 * 1000))) {
+    return existing ?? null;
+  }
+
+  try {
 
   const now = new Date();
   const transits = computeTransits(
@@ -267,4 +275,7 @@ export async function ensureDailyFor(
     .returning();
 
   return inserted ?? null;
+  } finally {
+    await releaseGeneration(lockKey).catch(() => {});
+  }
 }

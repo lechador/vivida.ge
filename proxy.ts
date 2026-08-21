@@ -1,5 +1,10 @@
 import NextAuth from "next-auth";
-import { NextResponse, type NextRequest } from "next/server";
+import {
+  NextResponse,
+  type NextFetchEvent,
+  type NextMiddleware,
+  type NextRequest,
+} from "next/server";
 
 import { authConfig } from "@/auth.config";
 import {
@@ -116,10 +121,26 @@ function rememberLanguageChoice(response: NextResponse, value: string): void {
   });
 }
 
-export default auth((request) => {
+const protectedProxy = auth((request) => {
   const req = request as NextRequest;
   return armenianRouting(req) ?? armenianGeoRedirect(req);
-});
+}) as unknown as NextMiddleware;
+
+/**
+ * JWT decoding used to run for every SEO page and API request even though the
+ * Auth.js authorization callback protects only these two route families.
+ * Public traffic now pays only the inexpensive locale routing checks.
+ */
+export default function proxy(request: NextRequest, event: NextFetchEvent) {
+  const { pathname } = request.nextUrl;
+  if (
+    pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/dashboard")
+  ) {
+    return protectedProxy(request, event);
+  }
+  return armenianRouting(request) ?? armenianGeoRedirect(request);
+}
 
 export const config = {
   matcher: [

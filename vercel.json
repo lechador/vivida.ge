@@ -7,12 +7,16 @@
       "schedule": "0 5 * * *"
     },
     {
-      "path": "/api/cron/daily-horoscope",
+      "path": "/api/cron/daily-horoscope-retry",
       "schedule": "30 5 * * *"
     },
     {
       "path": "/api/cron/monthly-credits",
       "schedule": "0 6 1 * *"
+    },
+    {
+      "path": "/api/cron/feed-notification-emails",
+      "schedule": "15 * * * *"
     }
   ]
 }

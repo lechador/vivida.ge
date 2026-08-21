@@ -3,7 +3,6 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ARMENIAN_SITE_URL, ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { Noto_Sans_Georgian } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
-import { ChatShell } from "@/components/chat/chat-shell";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
 import { RefCapture } from "@/components/ref-capture";
 import { TrackingConsentManager } from "@/components/privacy/tracking-consent-manager";
@@ -194,7 +193,6 @@ export default async function RootLayout({
         >
           {children}
         </div>
-        <ChatShell />
       </body>
     </html>
   );

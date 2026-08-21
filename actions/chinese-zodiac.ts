@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 
 import { db } from "@/db";
 import { chineseZodiac, type ChineseZodiac } from "@/db/schema";
@@ -16,6 +17,7 @@ import {
   chineseAnimalBySlug,
   yearsForAnimal,
 } from "@/lib/seo/chinese-zodiac";
+import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 
 const ANIMALS_FOR_PROMPT = CHINESE_ANIMALS.map((a) => ({
   slug: a.slug,
@@ -32,7 +34,7 @@ async function cached(animal: string): Promise<ChineseZodiac | undefined> {
 }
 
 /** Per-animal Chinese-zodiac content, generated on miss + cached. */
-export async function ensureChineseZodiac(
+async function ensureChineseZodiacUncached(
   slug: string
 ): Promise<ChineseZodiac | null> {
   const animal = chineseAnimalBySlug(slug);
@@ -44,6 +46,10 @@ export async function ensureChineseZodiac(
   }
   if (!isOpenRouterConfigured()) return existing ?? null;
 
+  const lockKey = `chinese-zodiac:${slug}:v${CHINESE_ZODIAC_PROMPT_VERSION}`;
+  if (!(await claimGeneration(lockKey))) return existing ?? null;
+
+  try {
   const result = await generateChineseZodiac({
     nameKa: animal.nameKa,
     slug: animal.slug,
@@ -95,16 +101,35 @@ export async function ensureChineseZodiac(
     });
 
   return (await cached(slug)) ?? null;
+  } finally {
+    await releaseGeneration(lockKey).catch(() => {});
+  }
+}
+
+const cachedChineseZodiac = unstable_cache(
+  ensureChineseZodiacUncached,
+  ["chinese-zodiac", String(CHINESE_ZODIAC_PROMPT_VERSION)],
+  { revalidate: 24 * 60 * 60 },
+);
+
+export async function ensureChineseZodiac(
+  slug: string,
+): Promise<ChineseZodiac | null> {
+  return cachedChineseZodiac(slug);
 }
 
 /** Hub intro/FAQ, stored in the reserved "_hub" row. */
-export async function ensureChineseZodiacHub(): Promise<ChineseZodiac | null> {
+async function ensureChineseZodiacHubUncached(): Promise<ChineseZodiac | null> {
   const existing = await cached("_hub");
   if (existing && existing.promptVersion === CHINESE_ZODIAC_PROMPT_VERSION) {
     return existing;
   }
   if (!isOpenRouterConfigured()) return existing ?? null;
 
+  const lockKey = `chinese-zodiac:_hub:v${CHINESE_ZODIAC_PROMPT_VERSION}`;
+  if (!(await claimGeneration(lockKey))) return existing ?? null;
+
+  try {
   const result = await generateChineseZodiacHub({
     animals: ANIMALS_FOR_PROMPT,
   }).catch((err) => {
@@ -137,4 +162,17 @@ export async function ensureChineseZodiacHub(): Promise<ChineseZodiac | null> {
     });
 
   return (await cached("_hub")) ?? null;
+  } finally {
+    await releaseGeneration(lockKey).catch(() => {});
+  }
+}
+
+const cachedChineseZodiacHub = unstable_cache(
+  ensureChineseZodiacHubUncached,
+  ["chinese-zodiac-hub", String(CHINESE_ZODIAC_PROMPT_VERSION)],
+  { revalidate: 24 * 60 * 60 },
+);
+
+export async function ensureChineseZodiacHub(): Promise<ChineseZodiac | null> {
+  return cachedChineseZodiacHub();
 }

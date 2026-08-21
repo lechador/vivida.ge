@@ -1,6 +1,7 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 
 import { db } from "@/db";
 import {
@@ -24,6 +25,7 @@ import {
 } from "@/lib/sign-horoscope";
 import { ALL_SLUGS, signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { signFromLongitude } from "@/lib/zodiac";
+import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 
 /**
  * SEO daily/weekly/monthly horoscope per sun sign.
@@ -92,10 +94,10 @@ function aspectToSignCenter(
  * Returns null when OpenRouter isn't configured (callers render a
  * placeholder instead of erroring the page).
  */
-export async function ensureSignHoroscope(
+async function ensureSignHoroscopeUncached(
   slug: ZodiacSlug,
   period: SignHoroscopePeriod,
-  now: Date = new Date()
+  now: Date,
 ): Promise<SignHoroscope | null> {
   if (!(ALL_SLUGS as string[]).includes(slug)) return null;
   const periodKey = signHoroscopePeriodKey(now, period);
@@ -117,8 +119,14 @@ export async function ensureSignHoroscope(
 
   if (!isOpenRouterConfigured()) return existing ?? null;
 
-  const meta = signMetaBySlug(slug);
-  if (!meta) return null;
+  const lockKey = `sign-horoscope:${slug}:${period}:${periodKey}:v${SIGN_HOROSCOPE_PROMPT_VERSION}`;
+  if (!(await claimGeneration(lockKey, 3 * 60 * 1000))) {
+    return existing ?? null;
+  }
+
+  try {
+    const meta = signMetaBySlug(slug);
+    if (!meta) return null;
 
   const anchor = periodAnchorDate(now, period);
   const transits = computeTransits(anchor);
@@ -193,5 +201,29 @@ export async function ensureSignHoroscope(
       )
     )
     .limit(1);
-  return refreshed ?? null;
+    return refreshed ?? null;
+  } finally {
+    await releaseGeneration(lockKey).catch(() => {});
+  }
+}
+
+const cachedSignHoroscope = unstable_cache(
+  async (slug: ZodiacSlug, period: SignHoroscopePeriod, anchorIso: string) =>
+    ensureSignHoroscopeUncached(slug, period, new Date(anchorIso)),
+  ["sign-horoscope", String(SIGN_HOROSCOPE_PROMPT_VERSION)],
+  { revalidate: 60 * 60 },
+);
+
+/**
+ * Shared cross-request cache. Using the period anchor (rather than the current
+ * timestamp) gives every request in the same day/week/month one cache key and
+ * prevents crawler bursts from repeating the same DB/AI work.
+ */
+export async function ensureSignHoroscope(
+  slug: ZodiacSlug,
+  period: SignHoroscopePeriod,
+  now: Date = new Date(),
+): Promise<SignHoroscope | null> {
+  const anchor = periodAnchorDate(now, period);
+  return cachedSignHoroscope(slug, period, anchor.toISOString());
 }

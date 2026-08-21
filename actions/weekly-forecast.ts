@@ -21,6 +21,7 @@ import {
 } from "@/lib/openrouter";
 import { composeWeeklyFromLibrary } from "@/lib/transit-library";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
+import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 
 /**
  * Returns the user's 7-day forecast, regenerating + caching it whenever the
@@ -62,6 +63,13 @@ export async function ensureWeeklyForecast(
   ) {
     return existing;
   }
+
+  const lockKey = `weekly:${userId}:${weekStart}:${locale}:v${WEEKLY_PROMPT_VERSION}`;
+  if (!(await claimGeneration(lockKey, 5 * 60 * 1000))) {
+    return existing ?? null;
+  }
+
+  try {
 
   // Compute deterministic scores + drivers for each of the next 7 days,
   // starting TOMORROW — today is already covered by the daily horoscope
@@ -178,4 +186,7 @@ export async function ensureWeeklyForecast(
     .returning();
 
   return inserted ?? null;
+  } finally {
+    await releaseGeneration(lockKey).catch(() => {});
+  }
 }

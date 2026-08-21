@@ -14,6 +14,7 @@ import { buildEnglishNatalReportContent } from "@/lib/report-content-pdf-en";
 import { NatalReport } from "@/components/pdf/natal-report";
 import { putObject } from "@/lib/r2";
 import { normalizeUserLocale } from "@/lib/i18n/locale";
+import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 
 export function reportPdfKey(userId: string, reportId: string): string {
   return `reports/${userId}/${reportId}.pdf`;
@@ -25,6 +26,13 @@ export function reportPdfKey(userId: string, reportId: string): string {
  * → failed with an error message. Returns true on success.
  */
 export async function generateAndStoreReport(reportId: string): Promise<boolean> {
+  const lockKey = `pdf-report:${reportId}`;
+  if (!(await claimGeneration(lockKey, 10 * 60 * 1000))) {
+    console.info(`[report-gen] ${reportId}: generation already claimed`);
+    return false;
+  }
+
+  try {
   const [report] = await db
     .select()
     .from(pdfReports)
@@ -125,5 +133,8 @@ export async function generateAndStoreReport(reportId: string): Promise<boolean>
       .set({ status: "failed", error: msg.slice(0, 500) })
       .where(eq(pdfReports.id, reportId));
     return false;
+  }
+  } finally {
+    await releaseGeneration(lockKey).catch(() => {});
   }
 }

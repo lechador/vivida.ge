@@ -477,6 +477,20 @@
       "when": 1786980940342,
       "tag": "0067_serious_wiccan",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1787049391894,
+      "tag": "0068_uneven_zemo",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1787343233187,
+      "tag": "0069_ambiguous_darkstar",
+      "breakpoints": true
     }
   ]
 }

@@ -11,6 +11,11 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    // Generated/runtime copies are not source. Scanning them made a normal
+    // lint consume 4+ GB and report third-party bundle errors.
+    ".output/**",
+    ".eve/**",
+    ".claude/**",
     "next-env.d.ts",
   ]),
 ]);

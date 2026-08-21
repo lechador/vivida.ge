@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { requireMobileUser } from "@/lib/api/auth";
+import { requireMobileUserId } from "@/lib/api/auth";
 import { handle } from "@/lib/api/errors";
 import { ok } from "@/lib/api/respond";
 import {
@@ -13,11 +13,12 @@ export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
 
 const Query = z.object({
-  since: z.string().optional(),
+  since: z.string().datetime({ offset: true }).optional(),
+  with: z.string().min(1),
 });
 
 /**
- * GET /api/v1/messages/poll?since=<ISO>
+ * GET /api/v1/messages/poll?with=<partnerId>&since=<ISO>
  *
  * The mobile equivalent of the website's SSE message stream. Returns
  * everything that happened since the client's last poll:
@@ -29,18 +30,21 @@ const Query = z.object({
  */
 export async function GET(req: Request) {
   return handle(async () => {
-    const user = await requireMobileUser(req);
+    const userId = await requireMobileUserId(req);
 
     const { searchParams } = new URL(req.url);
-    const { since } = Query.parse({ since: searchParams.get("since") ?? undefined });
+    const { since, with: partnerId } = Query.parse({
+      since: searchParams.get("since") ?? undefined,
+      with: searchParams.get("with") ?? undefined,
+    });
 
     const now = new Date();
     const sinceDate = since ? new Date(since) : now;
 
     const [messages, typing, receipts] = await Promise.all([
-      pollInboundMessages(user.id, sinceDate),
-      pollTypingIndicators(user.id),
-      pollReadReceipts(user.id, sinceDate),
+      pollInboundMessages(userId, sinceDate, partnerId),
+      pollTypingIndicators(userId, partnerId),
+      pollReadReceipts(userId, sinceDate, partnerId),
     ]);
 
     return ok({ messages, typing, receipts, now: now.toISOString() });

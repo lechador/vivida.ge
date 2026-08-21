@@ -1,7 +1,29 @@
-import { and, eq, isNull, lt, or, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { profiles, userActivityDays, users } from "@/db/schema";
+
+const VISIT_THROTTLE_MS = 5 * 60 * 1000;
+const recentlyRecorded = new Map<string, number>();
+
+/**
+ * Avoid scheduling the same best-effort analytics write on every navigation
+ * handled by a warm function instance. The SQL below remains authoritative;
+ * this is only a zero-I/O fast path for hot users.
+ */
+export function shouldRecordVisit(userId: string, now = Date.now()): boolean {
+  const previous = recentlyRecorded.get(userId) ?? 0;
+  if (now - previous < VISIT_THROTTLE_MS) return false;
+  recentlyRecorded.set(userId, now);
+
+  // Keep the opportunistic cache bounded on long-lived workers.
+  if (recentlyRecorded.size > 5_000) {
+    const cutoff = now - VISIT_THROTTLE_MS;
+    for (const [id, at] of recentlyRecorded) {
+      if (at < cutoff) recentlyRecorded.delete(id);
+    }
+  }
+  return true;
+}
 
 /**
  * Best-effort "user was active today" record.
@@ -19,37 +41,32 @@ import { profiles, userActivityDays, users } from "@/db/schema";
  */
 export async function recordVisit(userId: string): Promise<void> {
   try {
-    const [profile] = await db
-      .select({ timezone: profiles.timezone })
-      .from(profiles)
-      .where(eq(profiles.userId, userId))
-      .limit(1);
-
-    const tz = profile?.timezone ?? "UTC";
-    const dateLocal = formatLocalDate(new Date(), tz);
-
-    await db
-      .insert(userActivityDays)
-      .values({ userId, dateLocal })
-      .onConflictDoNothing();
-
-    // Also bump users.lastLoginAt so the admin "last seen" column reflects
-    // continued activity even when the user never explicitly signs in (JWT
-    // sessions can stay valid for weeks). Conditional WHERE throttles to
-    // ~1 write per minute per user so heavy navigation doesn't pummel Neon.
-    await db
-      .update(users)
-      .set({ lastLoginAt: new Date() })
-      .where(
-        and(
-          eq(users.id, userId),
-          or(
-            isNull(users.lastLoginAt),
-            lt(users.lastLoginAt, sql`now() - interval '60 seconds'`)
-          )
+    // One Neon round-trip replaces the former profile SELECT + activity INSERT
+    // + last-login UPDATE. PostgreSQL resolves the user's local date itself.
+    await db.execute(sql`
+      WITH user_context AS (
+        SELECT
+          ${userId}::text AS user_id,
+          to_char(
+            now() AT TIME ZONE COALESCE(p.timezone, 'UTC'),
+            'YYYY-MM-DD'
+          ) AS date_local
+        FROM "user" u
+        LEFT JOIN profile p ON p.user_id = u.id
+        WHERE u.id = ${userId}
+      ), activity AS (
+        INSERT INTO user_activity_day (user_id, date_local)
+        SELECT user_id, date_local FROM user_context
+        ON CONFLICT DO NOTHING
+      )
+      UPDATE "user"
+      SET last_login_at = now()
+      WHERE id = ${userId}
+        AND (
+          last_login_at IS NULL
+          OR last_login_at < now() - interval '5 minutes'
         )
-      );
-
+    `);
   } catch (err) {
     // Activity logging is opportunistic — drop the error rather than
     // letting it bubble up into the page response.

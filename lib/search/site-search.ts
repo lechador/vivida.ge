@@ -1,4 +1,5 @@
 import { and, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 
 import { db } from "@/db";
 import { profiles, users } from "@/db/schema";
@@ -54,7 +55,7 @@ export function searchPages(q: string, limit = 8): PageHit[] {
  * into discovery (`discoverable`). No viewer needed; safe for the signed-out
  * homepage since these profiles are public by the user's own choice.
  */
-export async function searchPublicUsers(
+async function searchPublicUsersUncached(
   q: string,
   limit = 5
 ): Promise<UserHit[]> {
@@ -102,4 +103,17 @@ export async function searchPublicUsers(
     name: r.name,
     image: resolveAvatar(r.id, r.image, photos),
   }));
+}
+
+const cachedPublicUserSearch = unstable_cache(
+  searchPublicUsersUncached,
+  ["public-user-search-v1"],
+  { revalidate: 60 },
+);
+
+export async function searchPublicUsers(
+  q: string,
+  limit = 5,
+): Promise<UserHit[]> {
+  return cachedPublicUserSearch(q.trim().toLowerCase(), limit);
 }

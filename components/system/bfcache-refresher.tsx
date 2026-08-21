@@ -26,6 +26,15 @@ export function BfcacheRefresher() {
   const router = useRouter();
 
   useEffect(() => {
+    const appPrefixes = [
+      "/account", "/ask", "/credits", "/dashboard", "/discover",
+      "/feed", "/friends", "/messages", "/onboarding", "/people",
+      "/report", "/reports", "/sky", "/subscription", "/synastry",
+      "/timing",
+    ];
+    if (!appPrefixes.some((prefix) => window.location.pathname.startsWith(prefix))) {
+      return;
+    }
     let lastHiddenAt: number | null = null;
     const STALE_AFTER_MS = 5 * 60 * 1000; // 5 minutes
 

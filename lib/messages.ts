@@ -128,12 +128,13 @@ export type InboundStreamMessage = Message & {
 
 /**
  * Inbound messages for the viewer with createdAt > since, oldest-first.
- * Joined with sender profile info so the SSE stream can deliver everything
- * the bell + chat panel need without a follow-up fetch.
+ * Joined with sender profile info so the website/mobile poll can deliver
+ * everything the bell + chat panel need without a follow-up fetch.
  */
 export async function pollInboundMessages(
   viewerId: string,
-  since: Date
+  since: Date,
+  senderId?: string,
 ): Promise<InboundStreamMessage[]> {
   const rows = await db
     .select({
@@ -154,7 +155,8 @@ export async function pollInboundMessages(
     .where(
       and(
         eq(messages.recipientId, viewerId),
-        gt(messages.createdAt, since)
+        gt(messages.createdAt, since),
+        senderId ? eq(messages.senderId, senderId) : undefined,
       )
     )
     .orderBy(asc(messages.createdAt))
@@ -169,10 +171,12 @@ export async function pollInboundMessages(
 
 /**
  * Active typing indicators targeting the viewer (recipientId = viewer,
- * expiresAt > now). Used by the SSE poll to push 'typing' events.
+ * expiresAt > now). A website poll can scope this to the open conversation;
+ * mobile callers can omit senderId to retain their all-conversations feed.
  */
 export async function pollTypingIndicators(
-  viewerId: string
+  viewerId: string,
+  senderId?: string,
 ): Promise<{ senderId: string; expiresAt: Date }[]> {
   return db
     .select({
@@ -183,7 +187,8 @@ export async function pollTypingIndicators(
     .where(
       and(
         eq(typingIndicators.recipientId, viewerId),
-        gt(typingIndicators.expiresAt, new Date())
+        gt(typingIndicators.expiresAt, new Date()),
+        senderId ? eq(typingIndicators.senderId, senderId) : undefined,
       )
     );
 }
@@ -191,12 +196,13 @@ export async function pollTypingIndicators(
 /**
  * For each partner the viewer has sent messages to, the latest readAt
  * timestamp among the viewer's sent messages, restricted to read events
- * that happened after `since`. Used to push 'read' SSE events so the
- * sender's UI can mark their bubbles as read.
+ * that happened after `since`. Website polling scopes this to the open
+ * conversation; mobile polling can continue requesting every partner.
  */
 export async function pollReadReceipts(
   viewerId: string,
-  since: Date
+  since: Date,
+  partnerId?: string,
 ): Promise<{ partnerId: string; readAt: Date }[]> {
   const rows = await db
     .select({
@@ -207,7 +213,8 @@ export async function pollReadReceipts(
     .where(
       and(
         eq(messages.senderId, viewerId),
-        gt(messages.readAt, since)
+        gt(messages.readAt, since),
+        partnerId ? eq(messages.recipientId, partnerId) : undefined,
       )
     )
     .groupBy(messages.recipientId);
@@ -223,7 +230,7 @@ export async function pollReadReceipts(
 export async function recordTyping(
   senderId: string,
   recipientId: string,
-  ttlMs = 5000
+  ttlMs = 15000
 ): Promise<void> {
   if (senderId === recipientId) return;
   const expiresAt = new Date(Date.now() + ttlMs);

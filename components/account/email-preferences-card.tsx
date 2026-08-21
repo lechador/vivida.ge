@@ -49,7 +49,7 @@ export function EmailPreferencesCard({ initial, locale = "ka" }: { initial: Pref
         <ToggleRow
           icon={<UserPlus className="size-5" />}
           title={am ? "Հիշեցումներ" : en ? "Reminders" : "შეხსენებები"}
-          subtitle={am ? "Օգտակար հիշեցումներ, երբ ձեր ծննդյան պրոֆիլը թերի է։" : en ? "Helpful reminders when your birth profile is incomplete." : "თუ შენი დაბადების მონაცემები არ შეგივსია — გეტყვი, რომ გააქტიურო."}
+          subtitle={am ? "Ընկերության հարցումներ, նամակներ և ֆիդի ակտիվություն, եթե 1 ժամ չեք մտել։" : en ? "Friend requests, messages, and feed activity if you have not visited in an hour." : "მეგობრობის მოთხოვნები, წერილები და ფიდის აქტივობა — თუ საიტზე 1 საათი არ შემოხვალ."}
           on={prefs.nudges}
           onChange={(v) => setPrefs((p) => ({ ...p, nudges: v }))}
         />

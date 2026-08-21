@@ -5,7 +5,7 @@ import { after } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { recordVisit } from "@/lib/activity";
+import { recordVisit, shouldRecordVisit } from "@/lib/activity";
 
 /**
  * Server-side helper for protected pages.
@@ -40,6 +40,6 @@ export async function requireUser() {
     redirect("/api/auth/signout?callbackUrl=/");
   }
 
-  after(() => recordVisit(userId));
+  if (shouldRecordVisit(userId)) after(() => recordVisit(userId));
   return session.user;
 }

@@ -82,7 +82,9 @@ export const users = pgTable("user", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-});
+}, (t) => [
+  index("user_name_trgm_idx").using("gin", t.name.asc().op("gin_trgm_ops")),
+]);
 
 /**
  * Credit wallet — one row per user, atomically updated. Balance is authoritative
@@ -168,6 +170,15 @@ export type Referral = typeof referrals.$inferSelect;
  * Stripe-backed Premium entitlement. One current subscription per user keeps
  * the app-side access check cheap while Stripe remains the billing authority.
  */
+/**
+ * Who is billing this subscription. Stripe is the website's processor; the
+ * store builds cannot use it (Apple 3.1.1 / Play Billing), so an app purchase
+ * arrives through RevenueCat instead. One user still has at most one PRO row —
+ * `source` says which processor owns it, and a webhook may only deactivate a
+ * row whose source matches, so neither can cancel the other's subscription.
+ */
+export type PremiumSource = "stripe" | "revenuecat";
+
 export const premiumSubscriptions = pgTable(
   "premium_subscription",
   {
@@ -176,8 +187,22 @@ export const premiumSubscriptions = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     planKey: text("plan_key").notNull(),
     countryCode: text("country_code").notNull(),
-    stripeSubscriptionId: text("stripe_subscription_id").notNull().unique(),
-    stripePriceId: text("stripe_price_id").notNull(),
+    source: text("source").$type<PremiumSource>().notNull().default("stripe"),
+    /** Stripe-only. Null on a store purchase. */
+    stripeSubscriptionId: text("stripe_subscription_id").unique(),
+    /** Stripe-only. Null on a store purchase. */
+    stripePriceId: text("stripe_price_id"),
+    /**
+     * RevenueCat-only. The *original* transaction id, which is stable across
+     * renewals — the per-renewal id is not, and keying on it would create a
+     * new row every month.
+     */
+    rcOriginalTransactionId: text("rc_original_transaction_id").unique(),
+    /** RevenueCat-only: the store product id, e.g. `ge.vivida.pro.monthly`. */
+    rcProductId: text("rc_product_id"),
+    /** RevenueCat-only: "APP_STORE" | "PLAY_STORE" — decides where we send the
+     *  user to cancel, since we cannot cancel a store subscription ourselves. */
+    rcStore: text("rc_store"),
     status: text("status").notNull(),
     currency: text("currency").notNull(),
     amountMinor: integer("amount_minor").notNull(),
@@ -338,6 +363,20 @@ export const rateLimitHits = pgTable(
 );
 
 /**
+ * Short-lived distributed claims for expensive AI/PDF work. Unlike an
+ * in-memory mutex this coordinates every Vercel instance; expiry lets another
+ * invocation recover a job if the original worker is terminated.
+ */
+export const generationLocks = pgTable(
+  "generation_lock",
+  {
+    key: text("key").primaryKey(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  },
+  (t) => [index("generation_lock_expires_idx").on(t.expiresAt)],
+);
+
+/**
  * Vivida-specific: birth profile, 1:1 with users.
  * Time stored separately so we can render exact birth time independent of TZ.
  */
@@ -385,7 +424,16 @@ export const profiles = pgTable("profile", {
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-});
+}, (t) => [
+  index("profile_username_trgm_idx").using(
+    "gin",
+    t.username.asc().op("gin_trgm_ops"),
+  ),
+  index("profile_display_name_trgm_idx").using(
+    "gin",
+    t.displayName.asc().op("gin_trgm_ops"),
+  ),
+]);
 
 /**
  * Cached natal chart per user. Recomputed only when birth data changes
@@ -527,6 +575,8 @@ export const messages = pgTable(
       t.createdAt
     ),
     index("message_recipient_read_idx").on(t.recipientId, t.readAt),
+    index("message_recipient_created_idx").on(t.recipientId, t.createdAt),
+    index("message_sender_read_idx").on(t.senderId, t.readAt),
   ]
 );
 
@@ -820,8 +870,9 @@ export const dailyEmailLog = pgTable(
  *   1. Idempotency for one-shot emails (e.g. welcome) — we check for an
  *      existing row before sending.
  *   2. Per-kind throttling for notification emails (friend-request,
- *      message) — we suppress a second send within a sliding 1h window
- *      so a chatty conversation doesn't spam the inbox.
+ *      message, post_comment, post_reaction) — we suppress a second send
+ *      within a sliding 1h window so a chatty conversation doesn't spam
+ *      the inbox.
  *
  * Resend's Idempotency-Key is the second line of defence; this table is
  * the application-level guard.
@@ -833,8 +884,9 @@ export const emailSendLog = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    /** 'welcome' | 'friend_request' | 'message' | 'birthday' | 'marketing'
-     *  | 'verification' | 'password_reset' | 'profile_incomplete' … */
+    /** 'welcome' | 'friend_request' | 'message' | 'post_comment' |
+     *  'post_reaction' | 'birthday' | 'marketing' | 'verification' |
+     *  'password_reset' | 'profile_incomplete' … */
     kind: text("kind").notNull(),
     /** Recipient address at send time (users can change email later). */
     email: text("email"),

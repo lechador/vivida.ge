@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-
-import { auth } from "@/auth";
 import { buildCalculatorData } from "@/lib/compatibility-calculator-data";
 import { CompatibilityCalculator } from "@/components/landing/compatibility-calculator";
 import { FaqSection } from "@/components/landing/faq-section";
@@ -89,14 +86,6 @@ const WEBSITE_LD = {
 };
 
 export default async function Home() {
-  // If you're already signed in there's nothing for you on the marketing
-  // page — straight to the app. The personalized dashboard (daily horoscope +
-  // chart) is the in-app home; users without birth data get a soft prompt to
-  // complete onboarding there.
-  const session = await auth();
-  if (session?.user?.id) {
-    redirect("/dashboard");
-  }
   const { signs, pairs } = buildCalculatorData();
   return (
     <>

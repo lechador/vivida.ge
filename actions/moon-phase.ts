@@ -22,6 +22,7 @@ import {
 import { signByIndex } from "@/lib/zodiac";
 import { englishMoonPhaseReading } from "@/lib/moon-phase-en";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 
 export type MoonPhaseRow = MoonPhase & { snapshot: MoonPhaseSnapshot };
 
@@ -76,6 +77,13 @@ export async function ensureMoonPhase(
   if (existing && existing.promptVersion === MOON_PHASE_PROMPT_VERSION) {
     return { ...existing, snapshot };
   }
+
+  const lockKey = `moon-phase:${today}:v${MOON_PHASE_PROMPT_VERSION}`;
+  if (!(await claimGeneration(lockKey, 3 * 60 * 1000))) {
+    return existing ? { ...existing, snapshot } : null;
+  }
+
+  try {
 
   // Fast path: the reading is fully determined by (phase, sign), so copy
   // today's combo from the pre-generated library — no AI call.
@@ -155,4 +163,7 @@ export async function ensureMoonPhase(
     .returning();
 
   return inserted ? { ...inserted, snapshot } : null;
+  } finally {
+    await releaseGeneration(lockKey).catch(() => {});
+  }
 }

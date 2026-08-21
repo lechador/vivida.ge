@@ -1,18 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest } from "next/server";
 
-import {
-  sendDailyHoroscopeBlast,
-  utcDateKey,
-} from "@/lib/email-marketing";
-import { sendDailyPushBlast } from "@/lib/push";
-import { sendBirthdayGifts } from "@/lib/birthday";
-import { sendWinbackNudges } from "@/lib/winback";
-import { sendDailyHoroscopeToLeads } from "@/lib/horoscope-leads";
-import {
-  sendVerificationRenudges,
-  sendProfileIncompleteRenudges,
-} from "@/lib/renudge";
-import { pruneRateLimits } from "@/lib/rate-limit";
+import { runDailyHoroscopeCron } from "@/lib/cron/daily-horoscope";
 
 /**
  * Daily-horoscope email blast — cron-triggered.
@@ -44,93 +32,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-function authed(req: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-  const adminToken = process.env.ADMIN_API_TOKEN;
-
-  const authHeader = req.headers.get("authorization");
-  if (cronSecret && authHeader === `Bearer ${cronSecret}`) return true;
-
-  const adminHeader = req.headers.get("x-admin-token");
-  if (adminToken && adminHeader === adminToken) return true;
-
-  return false;
-}
-
-async function run(req: NextRequest) {
-  if (!authed(req)) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  const url = new URL(req.url);
-  const concurrencyParam = url.searchParams.get("concurrency");
-  const concurrency = concurrencyParam
-    ? Math.max(1, Math.min(20, Number(concurrencyParam) || 8))
-    : 8;
-
-  const sendDate = utcDateKey();
-  const result = await sendDailyHoroscopeBlast({ sendDate, concurrency });
-
-  // Daily web-push blast — runs after the email so today's headlines are
-  // already generated/cached and the push can carry the personalized line.
-  // Best-effort: a push failure never fails the email job.
-  let push = { recipients: 0, sent: 0 };
-  try {
-    push = await sendDailyPushBlast({ sendDate });
-  } catch (err) {
-    console.warn("[cron] daily push blast failed:", (err as Error).message);
-  }
-
-  // Birthday gifts + emails — once-a-year per user (guarded inside), so the
-  // 05:30 retry tick is safe. Best-effort: never fails the blast.
-  let birthdays = { birthdays: 0, gifted: 0, emailed: 0, failed: 0 };
-  try {
-    birthdays = await sendBirthdayGifts();
-  } catch (err) {
-    console.warn("[cron] birthday gifts failed:", (err as Error).message);
-  }
-
-  // Winback nudges — users active before, quiet 7-14 days. Once per dormancy
-  // spell (claim-row guard inside), so the retry tick is safe here too.
-  let winback = { dormant: 0, emailed: 0, pushed: 0, skipped: 0, failed: 0 };
-  try {
-    winback = await sendWinbackNudges();
-  } catch (err) {
-    console.warn("[cron] winback nudges failed:", (err as Error).message);
-  }
-
-  // Anonymous "daily horoscope by email" leads (captured on the free natal
-  // calculator) — send today's per-sign horoscope. Best-effort; never fails
-  // the user blast.
-  let leads = { audience: 0, sent: 0, skipped: 0, failed: 0 };
-  try {
-    leads = await sendDailyHoroscopeToLeads({ sendDate });
-  } catch (err) {
-    console.warn("[cron] lead horoscope send failed:", (err as Error).message);
-  }
-
-  // Lifecycle re-nudges — recover abandoned email verifications and prompt
-  // birthdata-less accounts into the personalized daily audience. Low-volume,
-  // capped (max 2 each), idempotent via email_send_log. Best-effort; never
-  // fails the blast.
-  const renudge = {
-    verify: { candidates: 0, sent: 0 },
-    profile: { candidates: 0, sent: 0 },
-  };
-  try {
-    renudge.verify = await sendVerificationRenudges();
-    renudge.profile = await sendProfileIncompleteRenudges();
-  } catch (err) {
-    console.warn("[cron] re-nudge failed:", (err as Error).message);
-  }
-
-  // Housekeeping: drop expired rate-limit counters. Best-effort, never
-  // blocks or fails the blast (pruneRateLimits swallows its own errors).
-  await pruneRateLimits();
-
-  return NextResponse.json({ sendDate, concurrency, ...result, push, birthdays, winback, leads, renudge });
-}
-
 // Vercel Cron fires GET; manual reruns from admin can use POST.
-export const GET = run;
-export const POST = run;
+export function GET(req: NextRequest) {
+  return runDailyHoroscopeCron(req, false);
+}
+
+export const POST = GET;

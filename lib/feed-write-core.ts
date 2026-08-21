@@ -15,6 +15,7 @@ import {
 } from "@/db/schema";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { isAdminEmail } from "@/lib/admin-auth";
+import { sendFeedActivityEmail } from "@/lib/email";
 import { queueNotificationPush } from "@/lib/notification-push";
 import { resolveMentions } from "@/lib/mentions";
 import {
@@ -111,6 +112,80 @@ async function notifyMentions(opts: {
   } catch (err) {
     console.warn("[feed.notifyMentions] failed:", (err as Error).message);
   }
+}
+
+/**
+ * In-app bell + web-push + (if the recipient has been away ≥1h) email for a
+ * feed comment or reaction. Dedupes recipients and never notifies the actor.
+ */
+async function notifyFeedActivity(opts: {
+  recipientIds: string[];
+  actorId: string;
+  kind: "post_comment" | "post_reaction";
+  postId: string;
+  preview?: string;
+  reaction?: PostReactionKind;
+}): Promise<void> {
+  const recipients = [...new Set(opts.recipientIds)].filter(
+    (id) => id !== opts.actorId
+  );
+  if (recipients.length === 0) return;
+
+  const [actor] = await db
+    .select({
+      name: users.name,
+      image: users.image,
+      displayName: profiles.displayName,
+      username: profiles.username,
+    })
+    .from(users)
+    .leftJoin(profiles, eq(profiles.userId, users.id))
+    .where(eq(users.id, opts.actorId))
+    .limit(1);
+
+  const fromName = actor?.displayName ?? actor?.name ?? "Vivida-ის წევრი";
+  const payload: NotificationPayload = {
+    fromUserId: opts.actorId,
+    fromUsername: actor?.username ?? null,
+    fromName: actor?.displayName ?? actor?.name ?? null,
+    fromImage: actor?.image ?? null,
+    postId: opts.postId,
+    preview: opts.preview,
+    reaction: opts.reaction,
+  };
+
+  await db.insert(notifications).values(
+    recipients.map((userId) => ({
+      userId,
+      kind: opts.kind,
+      payload,
+    }))
+  );
+  for (const id of recipients) {
+    invalidateHeaderForUser(id);
+    queueNotificationPush(id, opts.kind, payload);
+  }
+
+  after(async () => {
+    for (const id of recipients) {
+      try {
+        await sendFeedActivityEmail({
+          recipientUserId: id,
+          kind: opts.kind,
+          fromName,
+          fromUsername: actor?.username ?? null,
+          postId: opts.postId,
+          preview: opts.preview,
+          reaction: opts.reaction,
+        });
+      } catch (err) {
+        console.warn(
+          "[feed.notifyFeedActivity] email failed:",
+          (err as Error).message
+        );
+      }
+    }
+  });
 }
 
 /** Create a post. Caps at POST_BODY_MAX and throttles per user. */
@@ -252,39 +327,22 @@ export async function addCommentCore(
     .values({ postId, userId, body, parentId: parent?.id ?? null })
     .returning({ id: postComments.id });
 
-  const recipientId = parent ? parent.userId : post.userId;
-  if (recipientId !== userId) {
-    const [actor] = await db
-      .select({
-        name: users.name,
-        image: users.image,
-        displayName: profiles.displayName,
-        username: profiles.username,
-      })
-      .from(users)
-      .leftJoin(profiles, eq(profiles.userId, users.id))
-      .where(eq(users.id, userId))
-      .limit(1);
-    const payload: NotificationPayload = {
-      fromUserId: userId,
-      fromUsername: actor?.username ?? null,
-      fromName: actor?.displayName ?? actor?.name ?? null,
-      fromImage: actor?.image ?? null,
-      postId,
-      preview: body.slice(0, 120),
-    };
-    await db.insert(notifications).values({
-      userId: recipientId,
-      kind: "post_comment",
-      payload,
-    });
-    invalidateHeaderForUser(recipientId);
-    queueNotificationPush(recipientId, "post_comment", payload);
-  }
+  const recipientIds = [post.userId];
+  if (parent) recipientIds.push(parent.userId);
+  await notifyFeedActivity({
+    recipientIds,
+    actorId: userId,
+    kind: "post_comment",
+    postId,
+    preview: body.slice(0, 120),
+  });
 
   if (inserted) {
     const commentId = inserted.id;
-    const repRecipientId = recipientId;
+    const repRecipientId = parent ? parent.userId : post.userId;
+    const mentionExclude = [...new Set(recipientIds)].filter(
+      (id) => id !== userId
+    );
     after(async () => {
       await awardReputation({
         userId,
@@ -303,7 +361,7 @@ export async function addCommentCore(
         actorId: userId,
         postId,
         context: "comment",
-        excludeUserIds: repRecipientId !== userId ? [repRecipientId] : [],
+        excludeUserIds: mentionExclude,
       });
     });
   }
@@ -355,32 +413,13 @@ export async function reactToPostCore(
       .where(eq(posts.id, postId))
       .limit(1);
     if (post && post.userId !== userId) {
-      const [actor] = await db
-        .select({
-          name: users.name,
-          image: users.image,
-          displayName: profiles.displayName,
-          username: profiles.username,
-        })
-        .from(users)
-        .leftJoin(profiles, eq(profiles.userId, users.id))
-        .where(eq(users.id, userId))
-        .limit(1);
-      const payload: NotificationPayload = {
-        fromUserId: userId,
-        fromUsername: actor?.username ?? null,
-        fromName: actor?.displayName ?? actor?.name ?? null,
-        fromImage: actor?.image ?? null,
+      await notifyFeedActivity({
+        recipientIds: [post.userId],
+        actorId: userId,
+        kind: "post_reaction",
         postId,
         reaction: kind,
-      };
-      await db.insert(notifications).values({
-        userId: post.userId,
-        kind: "post_reaction",
-        payload,
       });
-      invalidateHeaderForUser(post.userId);
-      queueNotificationPush(post.userId, "post_reaction", payload);
 
       const postAuthorId = post.userId;
       after(async () => {

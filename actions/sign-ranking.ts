@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 
 import { db } from "@/db";
 import { signRankings, type SignRanking } from "@/db/schema";
@@ -12,6 +13,7 @@ import {
 } from "@/lib/openrouter";
 import { ALL_SLUGS, signMetaBySlug } from "@/lib/seo/zodiac-dates";
 import { rankingTopicBySlug } from "@/lib/seo/rankings";
+import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 
 /**
  * Resolve a cached sign-ranking listicle, generating + upserting on miss.
@@ -19,7 +21,7 @@ import { rankingTopicBySlug } from "@/lib/seo/rankings";
  * Returns null when the topic is unknown or OpenRouter isn't configured
  * (callers render a graceful fallback instead of erroring the page).
  */
-export async function ensureSignRanking(
+async function ensureSignRankingUncached(
   topicSlug: string
 ): Promise<SignRanking | null> {
   const topic = rankingTopicBySlug(topicSlug);
@@ -36,6 +38,10 @@ export async function ensureSignRanking(
 
   if (!isOpenRouterConfigured()) return existing ?? null;
 
+  const lockKey = `sign-ranking:${topicSlug}:v${RANKING_PROMPT_VERSION}`;
+  if (!(await claimGeneration(lockKey))) return existing ?? null;
+
+  try {
   const signs = ALL_SLUGS.map((slug) => ({
     slug,
     labelKa: signMetaBySlug(slug)?.labelKa ?? slug,
@@ -81,4 +87,19 @@ export async function ensureSignRanking(
     .where(eq(signRankings.topic, topicSlug))
     .limit(1);
   return refreshed ?? null;
+  } finally {
+    await releaseGeneration(lockKey).catch(() => {});
+  }
+}
+
+const cachedSignRanking = unstable_cache(
+  ensureSignRankingUncached,
+  ["sign-ranking", String(RANKING_PROMPT_VERSION)],
+  { revalidate: 7 * 24 * 60 * 60 },
+);
+
+export async function ensureSignRanking(
+  topicSlug: string,
+): Promise<SignRanking | null> {
+  return cachedSignRanking(topicSlug);
 }

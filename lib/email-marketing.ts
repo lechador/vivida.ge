@@ -775,6 +775,8 @@ export async function sendDailyHoroscopeBlast(opts: {
    *  dispatch from their profile timezone. */
   sendDate: string;
   concurrency?: number;
+  /** Retry ticks drain existing rows without rewriting the whole audience. */
+  enqueue?: boolean;
 }): Promise<DailyBlastResult> {
   const start = Date.now();
   const audience = await resolveAudience("daily_horoscope");
@@ -794,16 +796,18 @@ export async function sendDailyHoroscopeBlast(opts: {
   }
 
   // 1) Enqueue: idempotent insert.
-  const inserted = await db
-    .insert(dailyEmailLog)
-    .values(
-      audience.map((r) => ({
-        userId: r.userId,
-        sendDate: opts.sendDate,
-      }))
-    )
-    .onConflictDoNothing()
-    .returning({ userId: dailyEmailLog.userId });
+  const inserted = opts.enqueue === false
+    ? []
+    : await db
+        .insert(dailyEmailLog)
+        .values(
+          audience.map((r) => ({
+            userId: r.userId,
+            sendDate: opts.sendDate,
+          }))
+        )
+        .onConflictDoNothing()
+        .returning({ userId: dailyEmailLog.userId });
   const enqueued = inserted.length;
   const alreadyEnqueued = audience.length - enqueued;
 

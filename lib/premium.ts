@@ -99,8 +99,19 @@ export async function syncPremiumSubscription(
   const record = {
     planKey,
     countryCode,
+    // Stamp the owner explicitly. A Stripe write that left `source` at its
+    // default would be indistinguishable from a store purchase the moment the
+    // default ever changes — and the RevenueCat path refuses to deactivate a
+    // row it does not own, so this field decides who can cancel what.
+    source: "stripe" as const,
     stripeSubscriptionId: subscription.id,
     stripePriceId: price.id,
+    // Clear any store identity: if Stripe is taking the subscription over, a
+    // stale RevenueCat transaction id would collide on its unique index the
+    // next time that user bought in the app.
+    rcOriginalTransactionId: null,
+    rcProductId: null,
+    rcStore: null,
     status: subscription.status,
     currency: price.currency,
     amountMinor,
@@ -155,12 +166,22 @@ export async function activatePremiumFromCheckout(
   await syncPremiumSubscription(subscription, userId);
 }
 
+/**
+ * Turn auto-renew off (or back on) for a Stripe subscription.
+ *
+ * Returns null when there is nothing we can cancel — no subscription, or one
+ * bought through the App Store / Play Store. A store subscription can only be
+ * cancelled by its owner in the store's own account settings; there is no API
+ * for us to do it, and the UI must send them there instead of showing a button
+ * that cannot work.
+ */
 export async function updateSubscriptionCancellation(
   userId: string,
   cancelAtPeriodEnd: boolean,
 ) {
   const current = await getPremiumSubscription(userId);
   if (!current) return null;
+  if (current.source !== "stripe" || !current.stripeSubscriptionId) return null;
   const updated = await stripe().subscriptions.update(
     current.stripeSubscriptionId,
     { cancel_at_period_end: cancelAtPeriodEnd },

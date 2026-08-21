@@ -116,6 +116,12 @@ const nextConfig: NextConfig = {
     ]);
   },
   images: {
+    // User photos are immutable R2 keys. Keep optimized derivatives for a
+    // month and expose only the widths/qualities the UI actually uses.
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1600],
+    imageSizes: [16, 24, 32, 40, 48, 56, 64, 96, 128, 160, 256, 384],
+    qualities: [60, 75],
     remotePatterns: [
       // Google avatar images
       { protocol: "https", hostname: "lh3.googleusercontent.com" },

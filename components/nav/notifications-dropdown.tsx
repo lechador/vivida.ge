@@ -369,7 +369,9 @@ function DbNotificationRow({
   const Icon = KIND_ICON[n.kind] ?? Bell;
   const username = n.payload?.fromUsername;
   const href =
-    (n.kind === "post_comment" || n.kind === "post_reaction") &&
+    (n.kind === "post_comment" ||
+      n.kind === "post_reaction" ||
+      n.kind === "mention") &&
     n.payload?.postId
       ? // Single-post route, not /feed#post-<id>: the anchor only exists
         // while the post is inside the feed's first page.

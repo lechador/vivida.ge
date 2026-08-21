@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Check, Heart, Lock, Sparkles } from "lucide-react";
 
-import { auth } from "@/auth";
 import { Starfield } from "@/components/landing/starfield";
 import { CompatibilityCalculator } from "@/components/landing/compatibility-calculator";
 import { SiteFooter } from "@/components/site-footer";
@@ -107,9 +105,6 @@ export default async function TavsebadobaPage() {
   const locale = await getRequestLocale();
   const en = locale === "en";
   const am = locale === "am";
-  const session = await auth();
-  if (session?.user?.id) redirect("/dashboard");
-
   const { signs, pairs } = buildCalculatorData(locale);
   const trustList = am ? TRUST_AM : en ? TRUST_EN : TRUST_KA;
 
