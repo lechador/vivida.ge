@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
-import { withEve } from "eve/next";
 
 import {
   ENGLISH_HOSTS,
@@ -165,4 +164,4 @@ const nextConfigWithSentry = withSentryConfig(nextConfig, {
   },
 });
 
-export default withEve(nextConfigWithSentry);
+export default nextConfigWithSentry;
