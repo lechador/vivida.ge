@@ -69,6 +69,12 @@ describe("country billing catalogue", () => {
       amountMinor: 690,
       currency: "gel",
     });
+    expect(premiumPlanForCountry("US")).toEqual(
+      PREMIUM_PLANS_BY_COUNTRY.GE,
+    );
+    expect(premiumPlanForCountry(null)).toEqual(
+      PREMIUM_PLANS_BY_COUNTRY.GE,
+    );
   });
 
   it.each(["GE", "GB"])(

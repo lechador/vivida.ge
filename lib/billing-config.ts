@@ -156,11 +156,12 @@ export function creditPackForCountry(
   return creditPacksForCountry(countryCode).find((pack) => pack.id === packId) ?? null;
 }
 
+/** Use Georgian PRO pricing until a country-specific market is launched. */
 export function premiumPlanForCountry(
   countryCode: string | null | undefined,
-): PremiumPlan | null {
+): PremiumPlan {
   const code = normalizeCountryCode(countryCode);
-  return (code && PREMIUM_PLANS_BY_COUNTRY[code]) || null;
+  return (code && PREMIUM_PLANS_BY_COUNTRY[code]) || PREMIUM_PLANS_BY_COUNTRY.GE;
 }
 
 const CURRENCY_SYMBOL: Record<string, string> = {

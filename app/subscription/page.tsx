@@ -97,24 +97,14 @@ export default async function SubscriptionPage() {
 
               <SubscriptionActions locale={locale} active={active} cancelAtPeriodEnd={subscription.cancelAtPeriodEnd} hasCustomer={Boolean(identity?.stripeCustomerId)} />
             </section>
-            {!active && plan && (
+            {!active && (
               <div className="mt-4">
                 <PremiumPlanCard plan={plan} locale={locale} />
               </div>
             )}
           </>
-        ) : plan ? (
-          <PremiumPlanCard plan={plan} locale={locale} />
         ) : (
-          <section className="rounded-3xl border border-border bg-card/60 p-8 text-center ring-1 ring-foreground/5">
-            <Crown className="mx-auto size-9 text-muted-foreground" />
-            <h2 className="mt-3 text-xl font-semibold">
-              {en ? "PRO is not available in your country yet" : "PRO შენს ქვეყანაში ჯერ არ არის ხელმისაწვდომი"}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {en ? `Detected country: ${country}. Country-specific plans are being added gradually.` : `განსაზღვრული ქვეყანა: ${country}. გეგმები ეტაპობრივად ემატება.`}
-            </p>
-          </section>
+          <PremiumPlanCard plan={plan} locale={locale} />
         )}
       </section>
     </main>

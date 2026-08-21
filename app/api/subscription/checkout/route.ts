@@ -37,9 +37,6 @@ export async function POST(req: Request) {
   }
 
   const plan = offer?.plan ?? premiumPlanForCountry(identity?.countryCode);
-  if (!plan) {
-    return NextResponse.json({ error: "country_unavailable" }, { status: 403 });
-  }
 
   try {
     const tracking = checkoutTrackingFromRequest(req);
