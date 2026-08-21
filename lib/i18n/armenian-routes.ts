@@ -9,6 +9,11 @@
  * components downstream. Everything here is edge-safe: no db, no node built-ins.
  */
 
+import {
+  internationalInternalPath,
+  internationalPublicPath,
+} from "../seo/public-paths";
+
 export const ARMENIAN_PREFIX = "/am";
 
 /** Request header `proxy.ts` writes so `getRequestLocale()` can read the prefix. */
@@ -91,11 +96,10 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /** `/zodiac/vergo` → `/am/zodiac/vergo`, `/` → `/am`. Idempotent. */
 export function withArmenianPrefix(path: string): string {
-  if (path === ARMENIAN_PREFIX || path.startsWith(`${ARMENIAN_PREFIX}/`)) {
-    return path;
-  }
-  if (path === "/" || path === "") return ARMENIAN_PREFIX;
-  return `${ARMENIAN_PREFIX}${path}`;
+  const raw = stripArmenianPrefix(path) ?? path;
+  const clean = internationalPublicPath(raw);
+  if (clean === "/" || clean === "") return ARMENIAN_PREFIX;
+  return `${ARMENIAN_PREFIX}${clean}`;
 }
 
 /**
@@ -103,7 +107,6 @@ export function withArmenianPrefix(path: string): string {
  * Leaves absolute URLs, API routes, auth routes, and authenticated surfaces untouched.
  */
 export function localeHref(path: string, locale?: UserLocale): string {
-  if (locale !== "am") return path;
   if (
     !path ||
     path.startsWith("http://") ||
@@ -133,6 +136,8 @@ export function localeHref(path: string, locale?: UserLocale): string {
   ) {
     return path;
   }
+  if (locale === "en") return internationalPublicPath(path);
+  if (locale !== "am") return path;
   return withArmenianPrefix(path);
 }
 
@@ -270,7 +275,8 @@ const ARMENIAN_CONTENT_PREFIXES: readonly string[] = [
  * default is no Armenian alternate, and a route opts in only once translated.
  */
 export function hasArmenianVersion(path: string): boolean {
-  const normalized = path === "" ? "/" : path;
+  const raw = stripArmenianPrefix(path) ?? path;
+  const normalized = internationalInternalPath(raw === "" ? "/" : raw);
   if (CORE_ROUTE_SET.has(normalized)) return true;
   if (ARMENIAN_CONTENT_PATHS.has(normalized)) return true;
   return ARMENIAN_CONTENT_PREFIXES.some((prefix) =>

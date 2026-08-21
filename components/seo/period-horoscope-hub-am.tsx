@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { signColor } from "@/lib/zodiac";
 import { ZODIAC_SIGN_AM } from "@/lib/zodiac-sign-am";
 import { AM_MONTHS, AM_MONTHS_GENITIVE } from "@/lib/i18n/am-date";
 import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
+import { withArmenianPrefix } from "@/lib/i18n/armenian-routes";
 
 export type ArmenianPeriod = "day" | "week" | "month";
 
@@ -66,7 +68,7 @@ export const PERIOD_AM = {
 export function periodHubMetadataAm(period: ArmenianPeriod) {
   const config = PERIOD_AM[period];
   const path = `/am${config.path}`;
-  const url = `${ARMENIAN_SITE_URL}${config.path}`;
+  const url = `${ARMENIAN_SITE_URL}${internationalPublicPath(config.path)}`;
   return {
     title: { absolute: `${config.title} — Vivida` },
     description: config.description,
@@ -100,7 +102,7 @@ export function PeriodHoroscopeHubAm({ period }: { period: ArmenianPeriod }) {
     : period === "week"
       ? `${weekStart.getDate()} ${AM_MONTHS_GENITIVE[weekStart.getMonth()]}-ի շաբաթը`
       : `${AM_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
-  const url = `${ARMENIAN_SITE_URL}${config.path}`;
+  const url = `${ARMENIAN_SITE_URL}${internationalPublicPath(config.path)}`;
   const ld = [
     {
       "@context": "https://schema.org",
@@ -115,7 +117,7 @@ export function PeriodHoroscopeHubAm({ period }: { period: ArmenianPeriod }) {
           "@type": "ListItem",
           position: index + 1,
           name: `${signMetaBySlug(sign)!.labelAm || sign} ${config.cadence.toLowerCase()}`,
-          url: `${ARMENIAN_SITE_URL}/zodiac/${sign}/${config.viewPath}`,
+          url: `${ARMENIAN_SITE_URL}${internationalPublicPath(`/zodiac/${sign}/${config.viewPath}`)}`,
         })),
       },
     },
@@ -155,11 +157,11 @@ export function PeriodHoroscopeHubAm({ period }: { period: ArmenianPeriod }) {
           <p className="mt-4 text-pretty text-base text-foreground/85 sm:text-lg">{config.intro}</p>
         </header>
         <div className="mb-10 flex flex-wrap gap-2">
-          <Link href="/am/horoscope" className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm">
+          <Link href="/am/daily-horoscope" className="rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm">
             Օրական հորոսկոպ
           </Link>
           <Link
-            href={`/am${PERIOD_AM.week.path}`}
+            href={withArmenianPrefix(PERIOD_AM.week.path)}
             className={`rounded-full border px-4 py-1.5 text-sm ${
               period === "week"
                 ? "border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/15"
@@ -169,7 +171,7 @@ export function PeriodHoroscopeHubAm({ period }: { period: ArmenianPeriod }) {
             Շաբաթական հորոսկոպ
           </Link>
           <Link
-            href={`/am${PERIOD_AM.month.path}`}
+            href={withArmenianPrefix(PERIOD_AM.month.path)}
             className={`rounded-full border px-4 py-1.5 text-sm ${
               period === "month"
                 ? "border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/15"
@@ -194,7 +196,7 @@ export function PeriodHoroscopeHubAm({ period }: { period: ArmenianPeriod }) {
             return (
               <Link
                 key={sign}
-                href={`/am/zodiac/${sign}/${config.viewPath}`}
+                href={withArmenianPrefix(`/zodiac/${sign}/${config.viewPath}`)}
                 className="group rounded-2xl border border-border bg-card/55 p-5 transition hover:bg-card/80"
               >
                 <div className="flex items-start gap-3">
@@ -227,7 +229,7 @@ export function PeriodHoroscopeHubAm({ period }: { period: ArmenianPeriod }) {
               return (
                 <Link
                   key={sign}
-                  href={`/am/zodiac/${sign}/${config.viewPath}`}
+                  href={withArmenianPrefix(`/zodiac/${sign}/${config.viewPath}`)}
                   className="rounded-xl border border-border/60 bg-card/40 px-3.5 py-2.5 text-sm font-medium"
                 >
                   {name} {period === "day" ? "օրական" : period === "week" ? "շաբաթական" : "ամսական"} հորոսկոպ

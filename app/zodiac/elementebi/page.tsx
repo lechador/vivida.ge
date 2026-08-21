@@ -27,8 +27,9 @@ import { ZodiacElementsHubEn } from "@/components/seo/zodiac-elements-en";
 import { ZodiacElementsHubAm } from "@/components/seo/zodiac-element-pages-am";
 import { ZODIAC_PLACEMENTS_AM } from "@/lib/zodiac-placements-am";
 import {
-  ARMENIAN_SITE_URL,
   DEFAULT_OG_IMAGE,
+  armenianSiteHref,
+  englishSiteHref,
   localizedAlternates,
 } from "@/lib/seo/locales";
 
@@ -70,7 +71,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ARMENIAN_SITE_URL}${PATH}`,
+        url: armenianSiteHref(PATH, false),
         title: content.pageTitle,
         description: content.metaDescription,
         siteName: "Vivida",
@@ -94,7 +95,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: "https://www.vividaastro.com/zodiac/elementebi",
+        url: englishSiteHref(PATH, false),
         title,
         description,
         siteName: "Vivida",

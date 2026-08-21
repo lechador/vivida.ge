@@ -12,7 +12,7 @@ import { EQ_ARTICLES, eqArticleBySlug } from "@/lib/seo/eq-articles";
 import { eqArticleEnBySlug } from "@/lib/seo/eq-articles-en";
 import { eqArticleAmBySlug } from "@/lib/seo/eq-articles-am";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const BASE = "https://www.vivida.ge/emociuri-inteleqti";
 
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         images: [DEFAULT_OG_IMAGE],
         title: item.title,
         description: item.description,
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         type: "article",
         locale: "hy_AM",
         publishedTime: "2026-07-20T00:00:00.000Z",
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: { absolute: item.title }, description: item.description,
       keywords: [item.category, "emotional intelligence", "EQ", ...item.domains],
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], title: item.title, description: item.description, url: `https://www.vividaastro.com${path}`, type: "article", locale: "en_US", publishedTime: "2026-07-20T00:00:00.000Z", modifiedTime: "2026-08-14T00:00:00.000Z" },
+      openGraph: { images: [DEFAULT_OG_IMAGE], title: item.title, description: item.description, url: englishSiteHref(path, false), type: "article", locale: "en_US", publishedTime: "2026-07-20T00:00:00.000Z", modifiedTime: "2026-08-14T00:00:00.000Z" },
       twitter: { card: "summary_large_image", title: item.title, description: item.description },
     };
   }

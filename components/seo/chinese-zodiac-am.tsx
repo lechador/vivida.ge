@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import { ChineseYearFinder } from "@/components/calculator/chinese-year-finder";

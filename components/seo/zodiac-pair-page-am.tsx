@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { zodiacPairArmenian } from "@/lib/zodiac-pair-am";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
 
 const RATING_COLOR: Record<string, string> = {
   Ուժեղ: "oklch(0.78 0.18 305)",

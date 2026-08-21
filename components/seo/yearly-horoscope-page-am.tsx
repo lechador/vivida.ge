@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 import { Calendar, Sparkles } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
@@ -12,7 +12,7 @@ import {
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
-import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
+import { armenianSiteHref } from "@/lib/seo/locales";
 import { signColor } from "@/lib/zodiac";
 import { yearlyHoroscopeArmenian } from "@/lib/yearly-horoscope-am";
 
@@ -29,7 +29,7 @@ export function YearlyHoroscopePageAm({
   const name = meta.labelAm || meta.labelKa;
   const accent = signColor(meta);
   const path = `/zodiac/${sign}/${year}`;
-  const url = `${ARMENIAN_SITE_URL}${path}`;
+  const url = armenianSiteHref(path, false);
   const structuredData = [
     {
       "@context": "https://schema.org",

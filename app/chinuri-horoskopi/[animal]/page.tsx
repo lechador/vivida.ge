@@ -22,7 +22,7 @@ import {
   CHINESE_ANIMALS_AM,
   CHINESE_ZODIAC_AM_BY_SLUG,
 } from "@/lib/seo/chinese-zodiac-am";
-import { ARMENIAN_SITE_URL, ENGLISH_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, ENGLISH_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -68,7 +68,7 @@ export async function generateMetadata({
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title,
         description,
         siteName: "Vivida",
@@ -91,7 +91,7 @@ export async function generateMetadata({
       alternates: localizedAlternates(path, path, "en"),
       openGraph: {
         type: "article",
-        url: `${ENGLISH_SITE_URL}${path}`,
+        url: englishSiteHref(path, false),
         title,
         description,
         siteName: "Vivida",

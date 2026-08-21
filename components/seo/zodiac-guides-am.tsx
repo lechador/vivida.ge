@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 import { Compass, Moon, Sparkles, Sunrise, Sun } from "lucide-react";
 
 import { SignByDatePicker } from "@/app/zodiac/datit/sign-by-date-picker";
@@ -17,7 +17,8 @@ import {
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
-import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, armenianSiteHref } from "@/lib/seo/locales";
+import { serializeLd } from "@/lib/seo/jsonld";
 import { signColor } from "@/lib/zodiac";
 import {
   ELEMENT_NAME_AM,
@@ -158,7 +159,7 @@ export function ZodiacByDatePageAm() {
 
 export function ZodiacGuideIndexAm() {
   const path = "/zodiac/gzamkvlevi";
-  const url = `${ARMENIAN_SITE_URL}${path}`;
+  const url = armenianSiteHref(path, false);
   const links = [
     "/zodiac",
     "/zodiac/datit",
@@ -198,7 +199,7 @@ export function ZodiacGuideIndexAm() {
       <SmartHeader locale="am" georgianPath={path} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex gap-2 text-xs text-muted-foreground">

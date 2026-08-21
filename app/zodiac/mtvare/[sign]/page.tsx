@@ -23,8 +23,9 @@ import { ZodiacPlacementPageAm } from "@/components/seo/zodiac-placement-pages-a
 import { placementEnglish } from "@/lib/zodiac-placement-en";
 import { placementArmenian } from "@/lib/zodiac-placements-am";
 import {
-  ARMENIAN_SITE_URL,
   DEFAULT_OG_IMAGE,
+  armenianSiteHref,
+  englishSiteHref,
   localizedAlternates,
 } from "@/lib/seo/locales";
 
@@ -59,7 +60,7 @@ export async function generateMetadata({
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title: c.title,
         description: c.description,
         siteName: "Vivida",
@@ -74,7 +75,7 @@ export async function generateMetadata({
   }
   if (locale === "en") {
     const c = placementEnglish("moon", sign);
-    const url = `https://www.vividaastro.com${HUB_PATH}/${sign}`;
+    const url = englishSiteHref(`${HUB_PATH}/${sign}`, false);
     return {
       title: { absolute: c.title },
       description: c.description,

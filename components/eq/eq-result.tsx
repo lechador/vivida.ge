@@ -201,7 +201,7 @@ function ShareButton({ overall, locale }: { overall: number; locale: UserLocale 
   const am = locale === "am";
   const [copied, setCopied] = useState(false);
   async function share() {
-    const url = en ? "https://www.vividaastro.com/eq-testi" : "https://www.vivida.ge/eq-testi";
+    const url = en ? "https://www.vividaastro.com/eq-test" : "https://www.vivida.ge/eq-testi";
     const text = en
       ? `My emotional intelligence score on Vivida: ${overall} 💗 What will you get?`
       : `ჩემი ემოციური ინტელექტი (EQ) Vivida-ზე: ${overall} 💗 შენ რას მიიღებ?`;

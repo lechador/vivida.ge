@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { ExternalLink, Moon, Sun } from "lucide-react";
 
 import { SiteFooter } from "@/components/site-footer";

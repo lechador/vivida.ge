@@ -22,7 +22,7 @@ import { RankingTopicPageAm } from "@/components/seo/rankings-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { rankingTopicEnBySlug } from "@/lib/seo/rankings-en";
 import { rankingTopicAmBySlug } from "@/lib/seo/rankings-am";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -52,7 +52,7 @@ export async function generateMetadata({
       alternates: localizedAlternates(`/am${path}`, path, "am"),
       openGraph: {
         type: "article",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title: topic.title,
         description,
         siteName: "Vivida",
@@ -67,7 +67,7 @@ export async function generateMetadata({
     const description = `${topic.title}: all 12 Sun signs compared through ${topic.trait}, with an explanation for every placement.`;
     const path = `/zodiac/reitingebi/${slug}`;
     const ogEn = `${ENGLISH_SITE_URL}/api/og/page?t=${encodeURIComponent(topic.title)}&k=${encodeURIComponent("Ranking")}&a=${encodeURIComponent("#eac358")}`;
-    return { title: { absolute: topic.title }, description, alternates: localizedAlternates(path, path, "en"), openGraph: { type: "article", url: `${ENGLISH_SITE_URL}${path}`, title: topic.title, description, siteName: "Vivida", locale: "en_US", images: [{ url: ogEn, width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", title: topic.title, description, images: [ogEn] } };
+    return { title: { absolute: topic.title }, description, alternates: localizedAlternates(path, path, "en"), openGraph: { type: "article", url: englishSiteHref(path, false), title: topic.title, description, siteName: "Vivida", locale: "en_US", images: [{ url: ogEn, width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", title: topic.title, description, images: [ogEn] } };
   }
   const topic = rankingTopicBySlug(slug);
   if (!topic) return {};

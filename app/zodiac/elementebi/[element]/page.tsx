@@ -27,8 +27,9 @@ import { ZodiacElementPageAm } from "@/components/seo/zodiac-element-pages-am";
 import { ELEMENT_ENGLISH } from "@/lib/zodiac-element-en";
 import { elementArmenian } from "@/lib/zodiac-placements-am";
 import {
-  ARMENIAN_SITE_URL,
   DEFAULT_OG_IMAGE,
+  armenianSiteHref,
+  englishSiteHref,
   localizedAlternates,
 } from "@/lib/seo/locales";
 
@@ -76,7 +77,7 @@ export async function generateMetadata({
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title: c.title,
         description: c.description,
         siteName: "Vivida",
@@ -93,7 +94,7 @@ export async function generateMetadata({
     const c = ELEMENT_ENGLISH[element];
     const title = `${c.name}: Traits, Love and Compatibility`;
     const description = `${c.tagline} Explore personality, strengths, challenges, relationships, career, and compatibility with the other elements.`;
-    const url = `https://www.vividaastro.com/zodiac/elementebi/${element}`;
+    const url = englishSiteHref(`/zodiac/elementebi/${element}`, false);
     return {
       title: { absolute: title },
       description,

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
-import { zodiacPairEnglish, type PairRating } from "@/lib/zodiac-pair-en";
+import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
 
 const RATING_COLOR: Record<string, string> = {
   Strong: "oklch(0.78 0.18 305)",

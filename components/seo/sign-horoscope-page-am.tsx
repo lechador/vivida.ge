@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 import { Calendar, Sparkles } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
@@ -20,6 +20,9 @@ import {
 import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
 import { signColor } from "@/lib/zodiac";
 import { ZODIAC_SIGN_AM } from "@/lib/zodiac-sign-am";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
+import { withArmenianPrefix } from "@/lib/i18n/armenian-routes";
+import { serializeLd } from "@/lib/seo/jsonld";
 
 export const VIEW_LABEL_AM: Record<HoroscopeView, string> = {
   today: "Այսօրվա հորոսկոպ",
@@ -93,7 +96,7 @@ export function SignHoroscopePageAm({
   const label = VIEW_LABEL_AM[view];
   const period = dateLabel(view);
   const path = `/zodiac/${sign}/${VIEW_PATH[view]}`;
-  const url = `${ARMENIAN_SITE_URL}${path}`;
+  const url = `${ARMENIAN_SITE_URL}${internationalPublicPath(path)}`;
   const ld = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -115,7 +118,7 @@ export function SignHoroscopePageAm({
       <SmartHeader locale="am" georgianPath={path} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
@@ -202,7 +205,7 @@ export function SignHoroscopePageAm({
             {ALL_HOROSCOPE_VIEWS.filter((item) => item !== view).map((item) => (
               <Link
                 key={item}
-                href={`/am/zodiac/${sign}/${VIEW_PATH[item]}`}
+                href={withArmenianPrefix(`/zodiac/${sign}/${VIEW_PATH[item]}`)}
                 className="rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm hover:bg-card/80"
               >
                 {VIEW_LABEL_AM[item]}
@@ -227,7 +230,7 @@ export function SignHoroscopePageAm({
               return (
                 <Link
                   key={slug}
-                  href={`/am/zodiac/${slug}/${VIEW_PATH[view]}`}
+                  href={withArmenianPrefix(`/zodiac/${slug}/${VIEW_PATH[view]}`)}
                   className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm hover:bg-card/80"
                 >
                   <span>{SIGNS_CONTENT[slug].symbol}</span>

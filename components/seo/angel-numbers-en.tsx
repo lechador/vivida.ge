@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";

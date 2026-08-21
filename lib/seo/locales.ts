@@ -7,6 +7,7 @@ import {
   stripArmenianPrefix,
   withArmenianPrefix,
 } from "../i18n/armenian-routes";
+import { internationalPublicPath } from "./public-paths";
 
 export const GEORGIAN_SITE_URL = "https://www.vivida.ge";
 export const ENGLISH_SITE_URL = "https://www.vividaastro.com";
@@ -59,7 +60,8 @@ export const ENGLISH_ONLY_ROUTES: ReadonlyArray<{
   // "How daily horoscopes work" — an explainer with no Georgian equivalent.
   // It previously held the hreflang pair with the Georgian /horoskopi, but
   // that is the Georgian *daily hub*, whose real English counterpart is the
-  // English /horoskopi (same-path, like its /kvireuli and /tviuri siblings).
+  // English daily-horoscope content from the shared /horoskopi route (publicly
+  // exposed as /daily-horoscope, alongside /weekly- and /monthly-horoscope).
   // Pairing an explainer with a daily hub mismatched the content on both
   // sides and left the English daily hub with no counterpart at all.
   { en: "/horoscope", internalEn: "/en/horoscope" },
@@ -93,7 +95,7 @@ export function resolveEnglishPath(path: string): string {
     (p) => p.ka === path || p.en === normalized || p.internalEn === path || p.en === path,
   );
   if (found) return found.en;
-  return normalized;
+  return internationalPublicPath(normalized);
 }
 
 export function localizedAlternates(
@@ -112,7 +114,7 @@ export function localizedAlternates(
             p.en === publicEnglishPath(pairedPath),
         )?.ka ?? pairedPath;
 
-  const enPath =
+  const rawEnPath =
     locale === "en"
       ? publicEnglishPath(canonicalPath)
       : resolveEnglishPath(
@@ -120,6 +122,7 @@ export function localizedAlternates(
             ? (stripArmenianPrefix(canonicalPath) ?? canonicalPath)
             : pairedPath,
         );
+  const enPath = internationalPublicPath(rawEnPath);
 
   const rawAm =
     locale === "am"
@@ -175,8 +178,9 @@ export const DEFAULT_OG_IMAGE = "/opengraph-image";
  * Resolve an English-site content link for whichever host is serving.
  */
 export function englishSiteHref(path: string, onEnglishHost: boolean): string {
-  if (onEnglishHost) return path;
-  return `${ENGLISH_SITE_URL}${path === "/" ? "" : path}`;
+  const publicPath = internationalPublicPath(path);
+  if (onEnglishHost) return publicPath;
+  return `${ENGLISH_SITE_URL}${publicPath === "/" ? "" : publicPath}`;
 }
 
 /**

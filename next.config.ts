@@ -28,7 +28,7 @@ const ENGLISH_LEGACY_CONTENT_REDIRECTS = [
     destination: "/natal-chart",
   },
   { source: "/piradi-horoskopi", destination: "/horoscope" },
-  { source: "/mkitxaoba", destination: "/taro" },
+  { source: "/mkitxaoba", destination: "/tarot" },
   { source: "/zodiac/tavsebadoba", destination: "/compatibility" },
 ] as const;
 

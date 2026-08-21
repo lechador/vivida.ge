@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 
 import { ReportPromo } from "@/components/report/report-promo";
 import { SiteFooter } from "@/components/site-footer";
@@ -16,6 +16,7 @@ import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signMetaBySlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
+import { serializeLd } from "@/lib/seo/jsonld";
 
 export { RANKINGS_HUB_AM };
 
@@ -55,7 +56,7 @@ export function RankingsHubAm() {
       <SmartHeader locale="am" georgianPath="/zodiac/reitingebi" />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
@@ -180,7 +181,7 @@ export function RankingTopicPageAm({ topic }: { topic: RankingTopicAm }) {
       <SmartHeader locale="am" georgianPath={`/zodiac/reitingebi/${topic.slug}`} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">

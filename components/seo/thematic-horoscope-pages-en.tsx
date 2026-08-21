@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,12 @@ import { ALL_SLUGS, ZODIAC_DATES, signMetaBySlug, type ZodiacSlug } from "@/lib/
 import { ALL_HOROSCOPE_THEMES, themeUrl, type HoroscopeTheme } from "@/lib/seo/thematic-horoscope";
 import { THEME_CONFIG_EN, thematicHoroscopeEnglish } from "@/lib/thematic-horoscope-en";
 import { signColor } from "@/lib/zodiac";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, englishSiteHref, localizedAlternates } from "@/lib/seo/locales";
 
 export function thematicHubMetadataEn(theme: HoroscopeTheme) {
   const config = THEME_CONFIG_EN[theme];
   const path = themeUrl(theme);
-  const url = `https://www.vividaastro.com${path}`;
+  const url = englishSiteHref(path, false);
   return {
     title: { absolute: config.title },
     description: config.description,
@@ -31,7 +31,7 @@ export function thematicDetailMetadataEn(theme: HoroscopeTheme, sign: ZodiacSlug
   const content = thematicHoroscopeEnglish(theme, sign);
   const name = signMetaBySlug(sign)!.labelEn;
   const path = themeUrl(theme, sign);
-  const url = `https://www.vividaastro.com${path}`;
+  const url = englishSiteHref(path, false);
   const title = `${name} ${config.label}: Traits and Practical Guidance`;
   const description = `${name} ${config.label.toLowerCase()}: explore natural strengths, growth areas, patterns, and practical guidance for ${config.shortLabel.toLowerCase()}.`;
   return {
@@ -56,7 +56,7 @@ function themeFaq(theme: HoroscopeTheme) {
 export function ThematicHoroscopeHubEn({ theme }: { theme: HoroscopeTheme }) {
   const config = THEME_CONFIG_EN[theme];
   const faq = themeFaq(theme);
-  const url = `https://www.vividaastro.com${themeUrl(theme)}`;
+  const url = englishSiteHref(themeUrl(theme), false);
   const ld = [
     { "@context": "https://schema.org", "@type": "CollectionPage", name: config.title, description: config.description, url, inLanguage: "en", mainEntity: { "@type": "ItemList", itemListElement: ALL_SLUGS.map((sign, index) => ({ "@type": "ListItem", position: index + 1, name: `${signMetaBySlug(sign)!.labelEn} ${config.label}`, url: `https://www.vividaastro.com${themeUrl(theme, sign)}` })) } },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },
@@ -84,7 +84,7 @@ export function ThematicHoroscopeDetailEn({ theme, sign }: { theme: HoroscopeThe
     { q: `What is ${name}'s main strength?`, a: content.focus },
     { q: `What should ${name} watch for?`, a: content.watch },
   ];
-  const url = `https://www.vividaastro.com${themeUrl(theme, sign)}`;
+  const url = englishSiteHref(themeUrl(theme, sign), false);
   const ld = [
     { "@context": "https://schema.org", "@type": "Article", headline: `${name} ${config.label}: Traits and Guidance`, description: content.focus, inLanguage: "en", mainEntityOfPage: { "@type": "WebPage", "@id": url }, author: { "@type": "Organization", name: "Vivida" } },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) },

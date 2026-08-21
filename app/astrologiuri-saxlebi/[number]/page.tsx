@@ -10,7 +10,7 @@ import { HOUSE_GUIDES, HOUSE_NUMBERS, houseByNumber } from "@/lib/seo/astrology-
 import { houseByNumberEn } from "@/lib/seo/astrology-guides-en";
 import { houseByNumberAm } from "@/lib/seo/astrology-guides-am";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const BASE = "https://www.vivida.ge";
 type Props = { params: Promise<{ number: string }> };
@@ -23,14 +23,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const title = `${house.number}-րդ տունն աստղագուշակության մեջ․ ${house.name}`;
     const description = `Բացահայտեք ${house.number}-րդ տան իմաստը նատալ քարտեզում՝ ${house.area.toLowerCase()}, բնական նշանը, կառավարող մոլորակը և մեկնաբանման եղանակը։`;
     const path = `/astrologiuri-saxlebi/${house.number}`;
-    return { title: { absolute: title }, description, keywords: [`աստղագուշակության ${house.number}-րդ տուն`, `${house.number}-րդ տուն նատալ քարտեզում`, house.name, ...house.keywords], alternates: localizedAlternates(`/am${path}`, path, "am"), openGraph: { images: [DEFAULT_OG_IMAGE], title, description, url: `${ARMENIAN_SITE_URL}${path}`, type: "article", locale: "hy_AM", siteName: "Vivida" }, twitter: { card: "summary_large_image", title, description } };
+    return { title: { absolute: title }, description, keywords: [`աստղագուշակության ${house.number}-րդ տուն`, `${house.number}-րդ տուն նատալ քարտեզում`, house.name, ...house.keywords], alternates: localizedAlternates(`/am${path}`, path, "am"), openGraph: { images: [DEFAULT_OG_IMAGE], title, description, url: armenianSiteHref(path, false), type: "article", locale: "hy_AM", siteName: "Vivida" }, twitter: { card: "summary_large_image", title, description } };
   }
   if (locale === "en") {
     const house = houseByNumberEn(number); if (!house) return {};
     const title = `${house.number}${house.number === 1 ? "st" : house.number === 2 ? "nd" : house.number === 3 ? "rd" : "th"} House in Astrology: Meaning in Your Birth Chart`;
     const description = `Learn what the ${house.number}${house.number === 1 ? "st" : house.number === 2 ? "nd" : house.number === 3 ? "rd" : "th"} house means in astrology: ${house.area.toLowerCase()}, its natural sign and ruler, and how to interpret it.`;
     const path = `/astrologiuri-saxlebi/${house.number}`;
-    return { title: { absolute: title }, description, keywords: [`${house.number} house astrology`, `${house.name} birth chart`, ...house.keywords], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], title, description, url: `https://www.vividaastro.com${path}`, type: "article", locale: "en_US", siteName: "Vivida" }, twitter: { card: "summary_large_image", title, description } };
+    return { title: { absolute: title }, description, keywords: [`${house.number} house astrology`, `${house.name} birth chart`, ...house.keywords], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], title, description, url: englishSiteHref(path, false), type: "article", locale: "en_US", siteName: "Vivida" }, twitter: { card: "summary_large_image", title, description } };
   }
   const house = houseByNumber(number); if (!house) return {};
   const title = `${house.number}-ე სახლი ასტროლოგიაში — ${house.name}`;

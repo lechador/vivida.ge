@@ -3,7 +3,7 @@ import { MoonPhaseHub } from "@/components/seo/moon-event-pages";
 import { MOON_PHASE_META_EN, MoonPhaseHubEn } from "@/components/seo/moon-event-pages-en";
 import { MOON_PHASE_META_AM, MoonPhaseHubAm } from "@/components/seo/moon-event-pages-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 export const revalidate = 86400;
 
@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title: meta.title,
         description: meta.description,
         locale: "hy_AM",
@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `https://www.vividaastro.com${path}`,
+        url: englishSiteHref(path, false),
         title: meta.title,
         description: meta.description,
         locale: "en_US",

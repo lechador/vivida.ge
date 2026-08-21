@@ -211,7 +211,7 @@ function ShareButton({ iq, locale }: { iq: number; locale: UserLocale }) {
   const am = locale === "am";
   const [copied, setCopied] = useState(false);
   async function share() {
-    const url = en ? "https://www.vividaastro.com/iq-testi" : "https://www.vivida.ge/iq-testi";
+    const url = en ? "https://www.vividaastro.com/iq-test" : "https://www.vivida.ge/iq-testi";
     const text = en
       ? `My estimated IQ on Vivida: ${iq} 🧠 What will you get?`
       : `ჩემი IQ Vivida-ს ტესტზე: ${iq} 🧠 შენ რას მიიღებ?`;

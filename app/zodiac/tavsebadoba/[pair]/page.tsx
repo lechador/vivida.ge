@@ -22,7 +22,7 @@ import {
 import { pairPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE, ARMENIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, armenianSiteHref, englishSiteHref, localizedAlternates } from "@/lib/seo/locales";
 import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
 import { zodiacPairArmenian } from "@/lib/zodiac-pair-am";
 import { ZodiacPairPageEn } from "@/components/seo/zodiac-pair-page-en";
@@ -55,7 +55,7 @@ export async function generateMetadata({
 
   if (locale === "am") {
     const armenian = zodiacPairArmenian(...parsed);
-    const url = `${ARMENIAN_SITE_URL}${path}`;
+    const url = armenianSiteHref(path, false);
     return {
       title: { absolute: `${armenian.title} — Vivida` },
       description: armenian.description,
@@ -75,7 +75,7 @@ export async function generateMetadata({
 
   if (locale === "en") {
     const english = zodiacPairEnglish(...parsed);
-    const url = `https://www.vividaastro.com${path}`;
+    const url = englishSiteHref(path, false);
     return {
       title: { absolute: english.title },
       description: english.description,

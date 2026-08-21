@@ -17,7 +17,7 @@ import {
 import { ensureChineseZodiacHub } from "@/actions/chinese-zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { CHINESE_ANIMALS, yearsForAnimal } from "@/lib/seo/chinese-zodiac";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title: CHINESE_HUB_AM.title,
         description: CHINESE_HUB_AM.description,
         siteName: "Vivida",
@@ -75,7 +75,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `https://www.vividaastro.com${path}`,
+        url: englishSiteHref(path, false),
         title: CHINESE_HUB_EN.title,
         description: CHINESE_HUB_EN.description,
         siteName: "Vivida",

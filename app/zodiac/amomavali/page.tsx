@@ -18,8 +18,7 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacPlacementHubEn } from "@/components/seo/zodiac-placement-hub-en";
 import { ZodiacPlacementHubAm } from "@/components/seo/zodiac-placement-pages-am";
 import { ZODIAC_PLACEMENTS_AM } from "@/lib/zodiac-placements-am";
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
-import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, armenianSiteHref, englishSiteHref, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/amomavali";
@@ -35,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ARMENIAN_SITE_URL}${PATH}`,
+        url: armenianSiteHref(PATH, false),
         title: content.pageTitle,
         description: content.metaDescription,
         siteName: "Vivida",
@@ -59,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: "https://www.vividaastro.com/zodiac/amomavali",
+        url: englishSiteHref(PATH, false),
         title,
         description,
         siteName: "Vivida",

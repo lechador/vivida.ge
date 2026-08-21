@@ -18,6 +18,10 @@ import {
   withArmenianPrefix,
 } from "@/lib/i18n/armenian-routes";
 import { ENGLISH_SITE_URL, isEnglishHost } from "@/lib/seo/locales";
+import {
+  internationalInternalPath,
+  internationalPublicPath,
+} from "@/lib/seo/public-paths";
 
 const { auth } = NextAuth(authConfig);
 
@@ -36,8 +40,8 @@ const { auth } = NextAuth(authConfig);
  */
 function armenianRouting(request: NextRequest): NextResponse | undefined {
   const { pathname } = request.nextUrl;
-  const stripped = stripArmenianPrefix(pathname);
-  if (stripped === null) return undefined;
+  const strippedPublic = stripArmenianPrefix(pathname);
+  if (strippedPublic === null) return undefined;
 
   // The Armenian site belongs to the international domain. Serving it from
   // vivida.ge too would publish every Armenian page at a second URL competing
@@ -52,6 +56,17 @@ function armenianRouting(request: NextRequest): NextResponse | undefined {
     );
     return NextResponse.redirect(target, 308);
   }
+
+  const cleanPath = internationalPublicPath(strippedPublic);
+  if (cleanPath !== strippedPublic) {
+    const target = request.nextUrl.clone();
+    target.pathname = withArmenianPrefix(cleanPath);
+    const response = NextResponse.redirect(target, 308);
+    rememberLanguageChoice(response, "am");
+    return response;
+  }
+
+  const stripped = internationalInternalPath(strippedPublic);
 
   const headers = new Headers(request.headers);
   headers.set(LOCALE_HEADER, "am");
@@ -72,6 +87,35 @@ function armenianRouting(request: NextRequest): NextResponse | undefined {
   // switcher escape to English and stay there.
   rememberLanguageChoice(response, "am");
   return response;
+}
+
+/**
+ * Expose English-readable URLs on vividaastro.com while preserving the shared
+ * Georgian App Router tree. Legacy public URLs permanently redirect to their
+ * clean equivalents; clean URLs are internally rewritten with no extra hop.
+ */
+function internationalEnglishRouting(
+  request: NextRequest,
+): NextResponse | undefined {
+  const host =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (!isEnglishHost(host)) return undefined;
+
+  const { pathname } = request.nextUrl;
+  if (stripArmenianPrefix(pathname) !== null) return undefined;
+
+  const cleanPath = internationalPublicPath(pathname);
+  if (cleanPath !== pathname) {
+    const target = request.nextUrl.clone();
+    target.pathname = cleanPath;
+    return NextResponse.redirect(target, 308);
+  }
+
+  const internalPath = internationalInternalPath(pathname);
+  if (internalPath === pathname) return undefined;
+  const destination = request.nextUrl.clone();
+  destination.pathname = internalPath;
+  return NextResponse.rewrite(destination);
 }
 
 /**
@@ -139,7 +183,11 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
   ) {
     return protectedProxy(request, event);
   }
-  return armenianRouting(request) ?? armenianGeoRedirect(request);
+  return (
+    armenianRouting(request) ??
+    internationalEnglishRouting(request) ??
+    armenianGeoRedirect(request)
+  );
 }
 
 export const config = {

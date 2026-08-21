@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 
 import { PublicNatalCalculator } from "@/components/calculator/public-natal-calculator";
 import { PopularSearches } from "@/components/seo/popular-searches";

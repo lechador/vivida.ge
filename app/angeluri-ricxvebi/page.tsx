@@ -15,7 +15,7 @@ import {
   ANGEL_NUMBERS,
 } from "@/lib/seo/angel-numbers";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -66,7 +66,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title: ANGEL_HUB_AM.title,
         description: ANGEL_HUB_AM.description,
         siteName: "Vivida",
@@ -82,7 +82,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: ANGEL_HUB_EN.description,
       keywords: ["angel numbers", "111 meaning", "222 meaning", "11:11 meaning", "repeating numbers"],
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: englishSiteHref(path, false), title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
       twitter: { card: "summary_large_image", title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description },
     };
   }

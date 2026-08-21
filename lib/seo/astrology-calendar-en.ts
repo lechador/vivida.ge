@@ -24,6 +24,21 @@ export function calendarDateLabelEn(date: Date, short = false) {
   }).format(date);
 }
 
+/**
+ * Keep the search snippet and the visible English calendar page aligned.
+ * Search Console shows that date-led queries use both "astrology" and
+ * "ephemeris / planetary positions", so each day should answer that intent
+ * explicitly instead of presenting itself as only a generic forecast.
+ */
+export function calendarDaySeoEn(date: Date) {
+  const label = calendarDateLabelEn(date);
+  return {
+    label,
+    title: `${label} Astrology: Planetary Positions & Aspects`,
+    description: `${label} astrology and ephemeris: see planetary positions by zodiac sign, major aspects, the daily energy index, and practical guidance.`,
+  };
+}
+
 export function weekdayEn(date: Date) {
   return new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: "UTC" }).format(date);
 }

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { ArrowLeft, ArrowRight, BookOpen, Check, ExternalLink, Heart } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";

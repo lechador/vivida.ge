@@ -8,7 +8,7 @@ import { MoonPhaseDetailAm } from "@/components/seo/moon-event-pages-am";
 import { formatAmDate } from "@/lib/i18n/am-date";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { signByIndex } from "@/lib/zodiac";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 type Props = { params: Promise<{ date: string }> };
 export const revalidate = 86400;
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [DEFAULT_OG_IMAGE],
         title,
         description,
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         type: "article",
         locale: "hy_AM",
         siteName: "Vivida",
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [DEFAULT_OG_IMAGE],
         title,
         description,
-        url: `https://www.vividaastro.com${path}`,
+        url: englishSiteHref(path, false),
         type: "article",
         locale: "en_US",
         siteName: "Vivida",

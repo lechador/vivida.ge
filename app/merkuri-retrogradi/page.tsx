@@ -22,7 +22,7 @@ import {
   MercuryRetrogradePageAm,
 } from "@/components/seo/mercury-retrograde-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -79,7 +79,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title,
         description,
         siteName: "Vivida",
@@ -104,7 +104,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `https://www.vividaastro.com${path}`,
+        url: englishSiteHref(path, false),
         title,
         description,
         siteName: "Vivida",

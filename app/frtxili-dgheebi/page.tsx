@@ -10,6 +10,7 @@ import {
 } from "@/components/seo/astrology-calendar-pages-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 const title = "ფრთხილი დღეები — როდის გვჭირდება მეტი ყურადღება";
 const description =
@@ -30,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: `${ARMENIAN_SITE_URL}${internationalPublicPath(path)}`,
         title: am.title,
         description: am.description,
         locale: "hy_AM",
@@ -49,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `https://www.vividaastro.com${path}`,
+        url: `https://www.vividaastro.com${internationalPublicPath(path)}`,
         title: en.title,
         description: en.description,
         locale: "en_US",

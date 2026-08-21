@@ -34,6 +34,7 @@ import { HoroscopeView } from "./horoscope-view";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   SignHoroscopePageEn,
+  signHoroscopeSeoEn,
   VIEW_LABEL_EN,
 } from "@/components/seo/sign-horoscope-page-en";
 import { YearlyHoroscopePageEn } from "@/components/seo/yearly-horoscope-page-en";
@@ -45,10 +46,11 @@ import {
 import { yearlyHoroscopeEnglish } from "@/lib/yearly-horoscope-en";
 import { yearlyHoroscopeArmenian } from "@/lib/yearly-horoscope-am";
 import {
-  ARMENIAN_SITE_URL,
   DEFAULT_OG_IMAGE,
+  armenianSiteHref,
   localizedAlternates,
 } from "@/lib/seo/locales";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -129,7 +131,7 @@ export async function generateMetadata({
         openGraph: {
           images: [DEFAULT_OG_IMAGE],
           type: "article",
-          url: `${ARMENIAN_SITE_URL}${path}`,
+          url: armenianSiteHref(path, false),
           title,
           description,
           siteName: "Vivida",
@@ -145,11 +147,12 @@ export async function generateMetadata({
     // Lead with "<sign> ჰოროსკოპი" — the exact shape of the query ("ვერძი
     // ჰოროსკოპი", "verdzi horoskopi") — then the view + live period label.
     const name = en ? (signMetaBySlug(sign)?.labelEn ?? sign) : sc.labelKa;
+    const englishSeo = en ? signHoroscopeSeoEn(name, view) : null;
     const title = en
-      ? `${name} Horoscope — ${VIEW_LABEL_EN[view]}`
+      ? englishSeo!.title
       : `${sc.labelKa} ჰოროსკოპი — ${VIEW_TITLE_KA[view]} (${periodLabel})`;
     const description = en
-      ? `${name} ${VIEW_LABEL_EN[view].toLowerCase()}: practical guidance for relationships, priorities, work, and personal growth.`
+      ? englishSeo!.description
       : `${sc.labelKa}-ის ${VIEW_TITLE_KA[view]} (${periodLabel}). ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები — რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.`;
     return {
       title: { absolute: title },
@@ -178,7 +181,9 @@ export async function generateMetadata({
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
-        url: en ? `https://www.vividaastro.com/zodiac/${sign}/${slug}` : url,
+        url: en
+          ? `https://www.vividaastro.com${internationalPublicPath(`/zodiac/${sign}/${slug}`)}`
+          : url,
         title,
         description,
         siteName: "Vivida",
@@ -203,7 +208,7 @@ export async function generateMetadata({
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title: armenian.title,
         description: armenian.description,
         siteName: "Vivida",

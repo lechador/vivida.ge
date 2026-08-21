@@ -27,11 +27,13 @@ import {
 import {
   ARMENIAN_CORE_ROUTES,
   hasArmenianVersion,
+  stripArmenianPrefix,
   withArmenianPrefix,
 } from "@/lib/i18n/armenian-routes";
 import { HOUSE_NUMBERS, PLANET_SLUGS } from "@/lib/seo/astrology-guides";
 import { ALL_DREAM_SLUGS } from "@/lib/seo/dreams";
 import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -92,7 +94,8 @@ function alternatesFor(
   kaPath: string | null,
   enPath: string,
 ): NonNullable<MetadataRoute.Sitemap[number]["alternates"]> {
-  const englishUrl = `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
+  const publicEnPath = internationalPublicPath(enPath);
+  const englishUrl = `${ENGLISH_SITE_URL}${publicEnPath === "/" ? "" : publicEnPath}`;
   const languages: Record<string, string> = {};
   if (kaPath) {
     languages["ka-GE"] = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
@@ -720,7 +723,7 @@ function englishSitemap(): MetadataRoute.Sitemap {
     samePathEntry(`/emociuri-inteleqti/${slug}`, "monthly", 0.68),
   );
 
-  return [
+  const entries: MetadataRoute.Sitemap = [
     ...CORE_LANGUAGE_PAIRS.map((pair) => ({
       url: `${ENGLISH_SITE_URL}${pair.en === "/" ? "" : pair.en}`,
       lastModified: ENGLISH_PUBLISHED,
@@ -756,8 +759,8 @@ function englishSitemap(): MetadataRoute.Sitemap {
       0.75,
       ENGLISH_PUBLISHED,
     ),
-    // The English daily-horoscope hub — same-path pair with the Georgian
-    // daily hub, matching its /kvireuli and /tviuri siblings below.
+    // The English daily-horoscope hub shares the Georgian App Router page but
+    // is published at /daily-horoscope on the international domain.
     samePathEntry("/horoskopi", "daily", 0.95, NOW),
     // NOTE: /tavsebadoba is deliberately absent here. It is a paid-ad landing
     // page with no internal link from any English surface, so submitting the
@@ -815,6 +818,16 @@ function englishSitemap(): MetadataRoute.Sitemap {
     // in a sitemap of their own.
     ...armenianSitemap(),
   ];
+
+  return entries.map((entry) => {
+    const parsed = new URL(entry.url);
+    const armenianPath = stripArmenianPrefix(parsed.pathname);
+    parsed.pathname =
+      armenianPath === null
+        ? internationalPublicPath(parsed.pathname)
+        : withArmenianPrefix(armenianPath);
+    return { ...entry, url: parsed.toString().replace(/\/$/, "") };
+  });
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -1299,10 +1312,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   /**
-   * Georgian pages whose English version lives at the same path rather than
-   * on a translated slug. /horoskopi belongs here (not in CORE_LANGUAGE_PAIRS)
-   * because the English daily hub is /horoskopi too — the translated-slug
-   * /horoscope is a separate English-only explainer.
+   * Georgian pages whose English version is served from the same route tree.
+   * /horoskopi belongs here (not in CORE_LANGUAGE_PAIRS): its international
+   * public URL is /daily-horoscope, while /horoscope remains a separate
+   * English-only explainer.
    */
   const SAME_PATH_PAIRS = [
     "/horoskopi",

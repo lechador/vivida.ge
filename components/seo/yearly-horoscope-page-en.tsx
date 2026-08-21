@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

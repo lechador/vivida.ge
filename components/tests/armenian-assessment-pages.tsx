@@ -11,7 +11,7 @@ import { MbtiTestClient } from "@/components/mbti/mbti-test-client";
 import { IqTestClient } from "@/components/iq/iq-test";
 import { EqTestClient } from "@/components/eq/eq-test-client";
 import { BigFiveTestClient } from "@/components/big-five/big-five-test-client";
-import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, armenianSiteHref } from "@/lib/seo/locales";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { localeHref } from "@/lib/i18n/armenian-routes";
 import type { MbtiQuestion } from "@/lib/mbti-questions";
@@ -62,7 +62,7 @@ function ArmenianAssessmentShell({
   music?: boolean;
   links?: { href: string; label: string; sub: string }[];
 }) {
-  const url = `${ARMENIAN_SITE_URL}${path}`;
+  const url = armenianSiteHref(path, false);
   const ld = [
     { "@context": "https://schema.org", "@type": "Quiz", name: title, description, inLanguage: "hy-AM", url, educationalLevel: "beginner", numberOfQuestions: questionCount, about: { "@type": "Thing", name: about } },
     faqLd(faq),

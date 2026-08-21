@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { ArrowRight } from "lucide-react";
 
 import { FaqList, GuideBreadcrumbs, GuideShell, NatalCta } from "@/components/seo/astrology-guide-shell";

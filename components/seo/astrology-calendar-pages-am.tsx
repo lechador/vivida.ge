@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 import { ArrowRight, CalendarDays, ShieldAlert, Sparkles } from "lucide-react";
 
 import { SiteFooter } from "@/components/site-footer";
@@ -21,6 +21,8 @@ import {
 } from "@/lib/seo/astrology-calendar-am";
 import { signByIndex } from "@/lib/zodiac";
 import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
+import { withArmenianPrefix } from "@/lib/i18n/armenian-routes";
 
 const SITE = ARMENIAN_SITE_URL;
 
@@ -28,7 +30,7 @@ function DayCard({ day }: { day: AstrologyCalendarDay }) {
   const tone = TONE_AM[day.tone];
   return (
     <Link
-      href={`/am/astrologiuri-kalendari/${day.iso}`}
+      href={withArmenianPrefix(`/astrologiuri-kalendari/${day.iso}`)}
       className="group rounded-2xl border border-border bg-card/55 p-4 transition hover:-translate-y-0.5 hover:border-foreground/20"
     >
       <div className="flex items-center justify-between gap-3">
@@ -128,7 +130,8 @@ export function AstrologyCalendarHubAm({
     },
   ];
 
-  const url = `${SITE}${config.path}`;
+  const publicPath = internationalPublicPath(config.path);
+  const url = `${SITE}${publicPath}`;
   const Icon = config.icon;
   const ld = [
     articleLd({
@@ -150,7 +153,7 @@ export function AstrologyCalendarHubAm({
         "@type": "ListItem",
         position: index + 1,
         name: `${calendarDateLabelAm(day.date)} — ${TONE_AM[day.tone].label}`,
-        url: `${SITE}/astrologiuri-kalendari/${day.iso}`,
+        url: `${SITE}${internationalPublicPath(`/astrologiuri-kalendari/${day.iso}`)}`,
       })),
     },
   ];
@@ -174,16 +177,16 @@ export function AstrologyCalendarHubAm({
 
         <nav className="mt-7 flex flex-wrap gap-2">
           {[
-            ["/am/astrologiuri-kalendari", "Ամբողջ օրացույցը"],
-            ["/am/ighbliani-dgheebi", "Բարենպաստ օրեր"],
-            ["/am/frtxili-dgheebi", "Զգուշության օրեր"],
-            ["/am/mtvaris-kalendari", "Լուսնային օրացույց"],
+            ["/am/astrology-calendar", "Ամբողջ օրացույցը"],
+            ["/am/lucky-days", "Բարենպաստ օրեր"],
+            ["/am/challenging-days", "Զգուշության օրեր"],
+            ["/am/moon-calendar", "Լուսնային օրացույց"],
           ].map(([href, label]) => (
             <Link
               key={href}
               href={href}
               className={`rounded-full border px-4 py-2 text-sm ${
-                href === `/am${config.path}`
+                href === withArmenianPrefix(config.path)
                   ? "border-[var(--vivida-cyan)]/50 bg-[var(--vivida-cyan)]/10"
                   : "border-border bg-card/55 text-muted-foreground hover:text-foreground"
               }`}
@@ -249,7 +252,7 @@ export function AstrologyCalendarDetailAm({ date }: { date: Date }) {
   const advice = dayAdviceAm(day);
   const tone = TONE_AM[day.tone];
   const label = calendarDateLabelAm(day.date);
-  const url = `${SITE}/astrologiuri-kalendari/${day.iso}`;
+  const url = `${SITE}${internationalPublicPath(`/astrologiuri-kalendari/${day.iso}`)}`;
 
   const faq = [
     {
@@ -273,7 +276,7 @@ export function AstrologyCalendarDetailAm({ date }: { date: Date }) {
     }),
     breadcrumbLd([
       { name: "Գլխավոր", url: SITE },
-      { name: "Աստղաբանական օրացույց", url: `${SITE}/astrologiuri-kalendari` },
+      { name: "Աստղաբանական օրացույց", url: `${SITE}/astrology-calendar` },
       { name: label, url },
     ]),
     faqLd(faq),
@@ -289,7 +292,7 @@ export function AstrologyCalendarDetailAm({ date }: { date: Date }) {
       />
       <article className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
         <nav className="text-xs text-muted-foreground">
-          <Link href="/am/astrologiuri-kalendari" className="hover:text-foreground">
+          <Link href="/am/astrology-calendar" className="hover:text-foreground">
             Աստղաբանական օրացույց
           </Link>{" "}
           / {label}
@@ -390,13 +393,13 @@ export function AstrologyCalendarDetailAm({ date }: { date: Date }) {
 
         <div className="mt-12 flex flex-wrap gap-3">
           <Link
-            href="/am/ighbliani-dgheebi"
+            href="/am/lucky-days"
             className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-sm"
           >
             Բարենպաստ օրեր <ArrowRight className="size-4" />
           </Link>
           <Link
-            href="/am/frtxili-dgheebi"
+            href="/am/challenging-days"
             className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-sm"
           >
             Զգուշության օրեր <ArrowRight className="size-4" />

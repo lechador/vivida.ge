@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import {
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signColor } from "@/lib/zodiac";
 import { VIEW_PATH } from "@/lib/sign-horoscope";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
+import { serializeLd } from "@/lib/seo/jsonld";
 
 const SIGN_SUMMARY: Record<string, string> = {
   aries:
@@ -71,7 +73,7 @@ export function HoroscopeHubEn() {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Daily Horoscope for Every Zodiac Sign",
-    url: "https://www.vividaastro.com/horoskopi",
+    url: "https://www.vividaastro.com/daily-horoscope",
     inLanguage: "en",
     mainEntity: {
       "@type": "ItemList",
@@ -79,7 +81,7 @@ export function HoroscopeHubEn() {
         "@type": "ListItem",
         position: index + 1,
         name: signMetaBySlug(slug)?.labelEn ?? slug,
-        url: `https://www.vividaastro.com/zodiac/${slug}/${VIEW_PATH.today}`,
+        url: `https://www.vividaastro.com${internationalPublicPath(`/zodiac/${slug}/${VIEW_PATH.today}`)}`,
       })),
     },
   };
@@ -97,7 +99,7 @@ export function HoroscopeHubEn() {
       <SmartHeader locale="en" georgianPath="/horoskopi" />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
@@ -125,13 +127,13 @@ export function HoroscopeHubEn() {
 
         <div className="mb-10 flex flex-wrap gap-2">
           {[
-            { href: "/horoskopi", label: "Daily horoscope", active: true },
-            { href: "/horoskopi/kvireuli", label: "Weekly horoscope" },
-            { href: "/horoskopi/tviuri", label: "Monthly horoscope" },
-            { href: "/siyvarulis-horoskopi", label: "Love horoscope" },
-            { href: "/finansuri-horoskopi", label: "Money horoscope" },
-            { href: "/mtvaris-kalendari", label: "Moon calendar" },
-            { href: "/merkuri-retrogradi", label: "Mercury retrograde" },
+            { href: "/daily-horoscope", label: "Daily horoscope", active: true },
+            { href: "/weekly-horoscope", label: "Weekly horoscope" },
+            { href: "/monthly-horoscope", label: "Monthly horoscope" },
+            { href: "/love-horoscope", label: "Love horoscope" },
+            { href: "/money-horoscope", label: "Money horoscope" },
+            { href: "/moon-calendar", label: "Moon calendar" },
+            { href: "/mercury-retrograde", label: "Mercury retrograde" },
           ].map((item) => (
             <Link
               key={item.href}
@@ -155,7 +157,7 @@ export function HoroscopeHubEn() {
             return (
               <Link
                 key={slug}
-                href={`/zodiac/${slug}/${VIEW_PATH.today}`}
+                href={internationalPublicPath(`/zodiac/${slug}/${VIEW_PATH.today}`)}
                 className="group relative overflow-hidden rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-card/80"
               >
                 <div

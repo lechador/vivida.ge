@@ -8,7 +8,7 @@ import { EclipseDetailAm } from "@/components/seo/moon-event-pages-am";
 import { eclipseEnBySlug } from "@/lib/seo/eclipse-en";
 import { eclipseAmBySlug } from "@/lib/seo/eclipse-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [DEFAULT_OG_IMAGE],
         title: e.title,
         description,
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         type: "article",
         locale: "hy_AM",
         siteName: "Vivida",
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [DEFAULT_OG_IMAGE],
         title: e.title,
         description,
-        url: `https://www.vividaastro.com${path}`,
+        url: englishSiteHref(path, false),
         type: "article",
         locale: "en_US",
         siteName: "Vivida",

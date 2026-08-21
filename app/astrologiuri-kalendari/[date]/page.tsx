@@ -10,9 +10,10 @@ import {
   calendarWindow,
   parseCalendarDate,
 } from "@/lib/seo/astrology-calendar";
-import { calendarDateLabelEn } from "@/lib/seo/astrology-calendar-en";
+import { calendarDaySeoEn } from "@/lib/seo/astrology-calendar-en";
 import { calendarDateLabelAm } from "@/lib/seo/astrology-calendar-am";
 import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 type Props = { params: Promise<{ date: string }> };
 export const revalidate = 86400;
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: `${ARMENIAN_SITE_URL}${internationalPublicPath(path)}`,
         title,
         description,
         locale: "hy_AM",
@@ -50,9 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   if (locale === "en") {
-    const label = calendarDateLabelEn(date);
-    const title = `${label} Astrology Forecast: Planetary Aspects`;
-    const description = `${label} astrology forecast with planetary aspects, a daily energy index, supportive themes, cautions, and practical guidance.`;
+    const { title, description } = calendarDaySeoEn(date);
     return {
       title: { absolute: title },
       description,
@@ -60,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
-        url: `https://www.vividaastro.com${path}`,
+        url: `https://www.vividaastro.com${internationalPublicPath(path)}`,
         title,
         description,
         locale: "en_US",

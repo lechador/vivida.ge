@@ -18,7 +18,7 @@ import {
 } from "@/lib/seo/numerology-content";
 import { NUMEROLOGY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -67,7 +67,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title: NUMEROLOGY_HUB_AM.title,
         description: NUMEROLOGY_HUB_AM.description,
         siteName: "Vivida",
@@ -83,7 +83,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: NUMEROLOGY_HUB_EN.description,
       keywords: ["life path number", "life path calculator", "numerology meanings", "master numbers"],
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: englishSiteHref(path, false), title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
       twitter: { card: "summary_large_image", title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description },
     };
   }

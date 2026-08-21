@@ -27,6 +27,7 @@ import {
   PeriodHoroscopeHubAm,
   periodHubMetadataAm,
 } from "@/components/seo/period-horoscope-hub-am";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -89,7 +90,9 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "website",
-      url: `${en ? "https://www.vividaastro.com" : SITE_URL}/horoskopi`,
+      url: en
+        ? `https://www.vividaastro.com${internationalPublicPath("/horoskopi")}`
+        : `${SITE_URL}/horoskopi`,
       title,
       description,
       siteName: "Vivida",

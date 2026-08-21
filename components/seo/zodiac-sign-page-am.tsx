@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
   signMetaBySlug,
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
-import { SIGNS, signColor } from "@/lib/zodiac";
+import { signColor } from "@/lib/zodiac";
 import {
   COMPATIBILITY_AM,
   ELEMENT_AM,

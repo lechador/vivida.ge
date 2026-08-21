@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArmenianLink as Link } from "@/components/i18n/international-link";
 import { Moon, Sparkles, Sunrise } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
@@ -11,7 +11,7 @@ import {
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
-import { ARMENIAN_SITE_URL } from "@/lib/seo/locales";
+import { ARMENIAN_SITE_URL, armenianSiteHref } from "@/lib/seo/locales";
 import { signColor } from "@/lib/zodiac";
 import type { PlacementKind } from "@/lib/zodiac-placement-en";
 import {
@@ -223,7 +223,7 @@ export function ZodiacPlacementPageAm({
   const Icon = kind === "moon" ? Moon : Sunrise;
   const pageName = config.cardName(name);
   const path = `${config.path}/${sign}`;
-  const url = `${ARMENIAN_SITE_URL}${path}`;
+  const url = armenianSiteHref(path, false);
   const structuredData = [
     {
       "@context": "https://schema.org",

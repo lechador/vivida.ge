@@ -3,7 +3,7 @@ import { EclipseHub } from "@/components/seo/moon-event-pages";
 import { ECLIPSE_META_EN, EclipseHubEn } from "@/components/seo/moon-event-pages-en";
 import { ECLIPSE_META_AM, EclipseHubAm } from "@/components/seo/moon-event-pages-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const path = "/dabnelebebi";
@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
         images: [DEFAULT_OG_IMAGE],
         title,
         description,
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         type: "website",
         locale: "hy_AM",
         siteName: "Vivida",
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
         images: [DEFAULT_OG_IMAGE],
         title,
         description,
-        url: `https://www.vividaastro.com${path}`,
+        url: englishSiteHref(path, false),
         type: "website",
         locale: "en_US",
         siteName: "Vivida",

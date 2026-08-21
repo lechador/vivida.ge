@@ -19,7 +19,7 @@ import {
 import { ANGEL_EN_BY_SLUG } from "@/lib/seo/angel-numbers-en";
 import { ANGEL_AM_BY_SLUG } from "@/lib/seo/angel-numbers-am";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -53,7 +53,7 @@ export async function generateMetadata({
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title,
         description,
         siteName: "Vivida",
@@ -72,7 +72,7 @@ export async function generateMetadata({
     return {
       title: { absolute: title }, description,
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" },
+      openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url: englishSiteHref(path, false), title, description, siteName: "Vivida", locale: "en_US" },
       twitter: { card: "summary_large_image", title, description },
     };
   }

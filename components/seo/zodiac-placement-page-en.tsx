@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { Moon, Sparkles, Sunrise } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { ALL_SLUGS, signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dat
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signColor } from "@/lib/zodiac";
 import { placementEnglish, type PlacementKind } from "@/lib/zodiac-placement-en";
+import { serializeLd } from "@/lib/seo/jsonld";
+import { englishSiteHref } from "@/lib/seo/locales";
 
 export function ZodiacPlacementPageEn({ kind, sign }: { kind: PlacementKind; sign: ZodiacSlug }) {
   const path = kind === "moon" ? "/zodiac/mtvare" : "/zodiac/amomavali";
@@ -32,7 +34,7 @@ export function ZodiacPlacementPageEn({ kind, sign }: { kind: PlacementKind; sig
       headline: copy.title,
       description: copy.description,
       inLanguage: "en",
-      mainEntityOfPage: { "@type": "WebPage", "@id": `https://www.vividaastro.com${path}/${sign}` },
+      mainEntityOfPage: { "@type": "WebPage", "@id": englishSiteHref(`${path}/${sign}`, false) },
       author: { "@type": "Organization", name: "Vivida" },
       publisher: { "@type": "Organization", name: "Vivida" },
     },
@@ -48,7 +50,7 @@ export function ZodiacPlacementPageEn({ kind, sign }: { kind: PlacementKind; sig
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]" />
       <Starfield count={130} shooting={3} />
       <SmartHeader locale="en" georgianPath={`${path}/${sign}`} />
-      {ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
+      {ld.map((item, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeLd(item) }} />)}
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
           <Link href="/zodiac" className="hover:text-foreground">Zodiac signs</Link><span>/</span>

@@ -19,7 +19,7 @@ import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { MOON_CALENDAR_EN, MoonCalendarPageEn } from "@/components/seo/moon-calendar-en";
 import { MOON_CALENDAR_AM, MoonCalendarPageAm } from "@/components/seo/moon-calendar-am";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PAGE_URL = `${SITE_URL}/mtvaris-kalendari`;
@@ -90,7 +90,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ARMENIAN_SITE_URL}${path}`,
+        url: armenianSiteHref(path, false),
         title,
         description,
         siteName: "Vivida",
@@ -101,7 +101,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
   if (locale === "en") {
     const path = "/mtvaris-kalendari"; const { title, description } = MOON_CALENDAR_EN;
-    return { title: { absolute: title }, description, keywords: ["moon calendar", `moon calendar ${CURRENT_YEAR}`, "moon phase today", "next full moon", "next new moon"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `https://www.vividaastro.com${path}`, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+    return { title: { absolute: title }, description, keywords: ["moon calendar", `moon calendar ${CURRENT_YEAR}`, "moon phase today", "next full moon", "next new moon"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: englishSiteHref(path, false), title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
   }
   return KA_METADATA;
 }

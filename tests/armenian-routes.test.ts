@@ -277,18 +277,19 @@ describe("language-switch targets are page-accurate", () => {
   const armenianTargetFor = (georgianPath: string) =>
     armenianSiteHref(resolveEnglishPath(georgianPath), true);
 
-  it("keeps the long tail on the same page across all three locales", () => {
-    // These slugs are shared verbatim by ka, en and am, so the derivation is
-    // an identity and the switch must land on the same article.
-    for (const path of [
-      "/mtvaris-kalendari",
-      "/sizmris-akhsna/gveli",
-      "/zodiac/tavsebadoba/aries-leo",
-      "/big-five",
-      "/taro/the-fool",
+  it("keeps the long tail on the same page using international public slugs", () => {
+    for (const [georgianPath, publicPath] of [
+      ["/mtvaris-kalendari", "/moon-calendar"],
+      ["/sizmris-akhsna/gveli", "/dream-meanings/gveli"],
+      [
+        "/zodiac/tavsebadoba/aries-leo",
+        "/zodiac/compatibility/aries-leo",
+      ],
+      ["/big-five", "/big-five"],
+      ["/taro/the-fool", "/tarot/the-fool"],
     ]) {
-      expect(resolveEnglishPath(path)).toBe(path);
-      expect(armenianTargetFor(path)).toBe(`/am${path}`);
+      expect(resolveEnglishPath(georgianPath)).toBe(publicPath);
+      expect(armenianTargetFor(georgianPath)).toBe(`/am${publicPath}`);
     }
   });
 
@@ -307,7 +308,7 @@ describe("language-switch targets are page-accurate", () => {
 
   it("crosses to the international domain when rendered on the Georgian host", () => {
     expect(armenianSiteHref("/mtvaris-kalendari", false)).toBe(
-      `${ENGLISH_SITE_URL}/am/mtvaris-kalendari`,
+      `${ENGLISH_SITE_URL}/am/moon-calendar`,
     );
   });
 

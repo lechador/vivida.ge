@@ -11,7 +11,11 @@
  */
 
 import { isEnglishHost } from "./locales";
-import { stripArmenianPrefix } from "@/lib/i18n/armenian-routes";
+import {
+  stripArmenianPrefix,
+  withArmenianPrefix,
+} from "@/lib/i18n/armenian-routes";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -146,5 +150,21 @@ export function websiteLd(): JsonLd {
  * each independently.
  */
 export function serializeLd(ld: JsonLd | JsonLd[]): string {
-  return JSON.stringify(ld);
+  return JSON.stringify(ld, (_key, value: unknown) => {
+    if (typeof value !== "string" || !value.startsWith("http")) return value;
+
+    try {
+      const url = new URL(value);
+      if (!isEnglishHost(url.host)) return value;
+
+      const armenianPath = stripArmenianPrefix(url.pathname);
+      url.pathname =
+        armenianPath === null
+          ? internationalPublicPath(url.pathname)
+          : withArmenianPrefix(armenianPath);
+      return url.toString();
+    } catch {
+      return value;
+    }
+  });
 }
