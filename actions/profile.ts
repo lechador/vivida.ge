@@ -32,7 +32,8 @@ function safeNext(v: string | undefined): string | null {
 
 export async function saveProfile(
   input: SaveProfileInput,
-  next?: string
+  next?: string,
+  showResult = false
 ): Promise<SaveProfileResult> {
   const user = await requireUser();
 
@@ -72,10 +73,13 @@ export async function saveProfile(
     await sendWelcomeIfEligible(userId);
   });
 
-  // Land on the natal chart by default — seeing your freshly-built chart is
-  // the payoff of entering birth data. A feature-specific `next` (e.g. /sky)
-  // still wins when the user unlocked from that feature.
-  const dest = safeNext(next) ?? "/report";
+  // First-time onboarding gets a compact, immediate value reveal before the
+  // full report. Keep feature-specific destinations (e.g. /sky) attached so
+  // the reveal can continue users into the flow they originally unlocked.
+  const requestedDest = safeNext(next);
+  const dest = showResult
+    ? `/onboarding/result${requestedDest ? `?next=${encodeURIComponent(requestedDest)}` : ""}`
+    : requestedDest ?? "/report";
   revalidatePath("/dashboard");
   revalidatePath("/report");
   revalidatePath("/onboarding");

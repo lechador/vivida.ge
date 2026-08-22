@@ -9,6 +9,7 @@ import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartChat } from "@/components/ask/chart-chat";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { normalizeChartStarter } from "@/lib/chart-chat-starters";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,8 +18,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = "force-dynamic";
 
-export default async function AskPage() {
+export default async function AskPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ starter?: string }>;
+}) {
   const user = await requireUser();
+  const { starter } = await searchParams;
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
   const am = locale === "am";
@@ -79,7 +85,12 @@ export default async function AskPage() {
           </p>
         </header>
 
-        <ChartChat initialMessages={initialMessages} firstName={firstName} locale={locale} />
+        <ChartChat
+          initialMessages={initialMessages}
+          initialStarter={normalizeChartStarter(starter)}
+          firstName={firstName}
+          locale={locale}
+        />
       </section>
     </main>
   );

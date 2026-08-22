@@ -250,7 +250,8 @@ export function OnboardingWizard({
           gender: data.gender,
           username: data.visibility.username,
         },
-        next
+        next,
+        !dateLocked
       );
       if (result && !result.ok) {
         setError(result.error);

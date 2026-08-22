@@ -41,7 +41,7 @@ export function FastOnboarding({ next, locale }: { next?: string; locale: UserLo
           longitude: pending.place.longitude,
           timezone: pending.place.timezone,
           gender: null,
-        }, next);
+        }, next, true);
         if (result && !result.ok) setError(result.error);
       });
     });

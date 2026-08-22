@@ -7,6 +7,11 @@ import { Send, Sparkles, Users } from "lucide-react";
 import { CreditHint } from "@/components/credits/credit-hint";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import {
+  chartStarterOptions,
+  chartStarterText,
+  type ChartStarterId,
+} from "@/lib/chart-chat-starters";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -18,18 +23,6 @@ const ERRORS_KA: Record<string, string> = {
   needs_credits: "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი.",
 };
 
-const STARTERS_KA = [
-  "რა არის ჩემი ძლიერი მხარეები?",
-  "რას ამბობს ჩემი მთვარე ემოციებზე?",
-  "როგორი ვარ ურთიერთობებში?",
-  "რა მირჩევნია კარიერაში?",
-];
-const STARTERS_EN = [
-  "What are my greatest strengths?",
-  "What does my Moon say about my emotions?",
-  "What am I like in relationships?",
-  "What kind of career suits me?",
-];
 const ERRORS_EN: Record<string, string> = {
   rate_limited: "You've reached today's limit. Try again tomorrow.",
   no_chart: "Create your natal chart first.",
@@ -40,18 +33,22 @@ const ERRORS_EN: Record<string, string> = {
 
 export function ChartChat({
   initialMessages,
+  initialStarter,
   firstName,
   locale = "ka",
 }: {
   initialMessages: Msg[];
+  initialStarter?: ChartStarterId;
   firstName: string | null;
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
   const am = locale === "am";
-  const starters = en ? STARTERS_EN : STARTERS_KA;
+  const starters = chartStarterOptions(locale);
   const [messages, setMessages] = useState<Msg[]>(initialMessages);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(() =>
+    initialStarter ? chartStarterText(initialStarter, locale) : ""
+  );
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Tracked separately from the message so the 402 branch can also offer
@@ -139,21 +136,22 @@ export function ChartChat({
                 : "დამისვი შეკითხვა შენი რუკის შესახებ — ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო."}
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {starters.map((q) => (
+              {starters.map((starter) => (
                 <button
-                  key={q}
+                  key={starter.id}
                   type="button"
                   onClick={() => {
                     trackEvent(ANALYTICS_EVENT.recommendationClicked, {
                       placement: "chart_chat_starter",
                       destination: "ai_chart_chat",
                       product: "ai_chart_chat",
+                      recommendation: starter.id,
                     });
-                    void send(q);
+                    void send(starter.text);
                   }}
                   className="rounded-full border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-3 py-1.5 text-sm text-foreground/85 transition-colors hover:bg-[var(--vivida-violet)]/20"
                 >
-                  {q}
+                  {starter.text}
                 </button>
               ))}
             </div>
