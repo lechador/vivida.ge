@@ -21,6 +21,12 @@ export function CheckoutSuccessTracker() {
         if (!data) return;
         const params = { value: data.value, currency: data.currency, content_ids: [data.contentId], content_type: "product" };
         fbTrack("Purchase", params, data.purchaseEventId);
+        trackEvent(ANALYTICS_EVENT.checkoutSuccess, {
+          product: data.contentId,
+          kind: data.kind,
+          value: data.value,
+          currency: data.currency,
+        });
         trackEvent(ANALYTICS_EVENT.purchaseCompleted, { product: data.contentId, value: data.value, currency: data.currency });
         if (data.kind === "premium") {
           fbTrack("Subscribe", params, data.subscribeEventId);

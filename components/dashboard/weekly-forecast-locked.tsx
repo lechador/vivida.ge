@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2, Lock, Sparkles, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  ANALYTICS_EVENT,
+  creditBalanceBucket,
+  trackEvent,
+} from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -28,7 +33,32 @@ export function WeeklyForecastLocked({
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);
 
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENT.paywallViewed, {
+      product: "weekly_forecast",
+      surface: "dashboard",
+      cost,
+      balance_bucket: creditBalanceBucket(balance),
+    });
+  }, [balance, cost]);
+
+  useEffect(() => {
+    if (!short) return;
+    trackEvent(ANALYTICS_EVENT.insufficientCredits, {
+      product: "weekly_forecast",
+      surface: "dashboard",
+      cost,
+      balance_bucket: creditBalanceBucket(balance),
+    });
+  }, [balance, cost, short]);
+
   async function unlock() {
+    trackEvent(ANALYTICS_EVENT.productSelected, {
+      product: "weekly_forecast",
+      surface: "dashboard",
+      payment_model: "credits",
+      cost,
+    });
     setPending(true);
     try {
       const r = await fetch("/api/credits/unlock", {
@@ -37,6 +67,17 @@ export function WeeklyForecastLocked({
         body: JSON.stringify({ kind: "weekly" }),
       });
       if (r.ok) {
+        const data = (await r.json().catch(() => ({}))) as {
+          status?: string;
+        };
+        if (data.status === "unlocked") {
+          trackEvent(ANALYTICS_EVENT.creditUnlock, {
+            product: "weekly_forecast",
+            surface: "dashboard",
+            cost,
+            outcome: "unlocked",
+          });
+        }
         // Reload so the dashboard re-fetches with the forecast unlocked.
         window.location.reload();
         return;
@@ -132,7 +173,16 @@ export function WeeklyForecastLocked({
                 {am ? "Ձեր հաշվեկշիռը շատ ցածր է։" : en ? "Your balance is too low." : "ბალანსი არ არის საკმარისი."}
               </p>
               <Button asChild variant="mystic">
-                <Link href="/credits">
+                <Link
+                  href="/credits"
+                  onClick={() =>
+                    trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+                      placement: "weekly_forecast_shortfall",
+                      destination: "credits",
+                      product: "weekly_forecast",
+                    })
+                  }
+                >
                   <Users className="size-4" />
                   {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
                 </Link>

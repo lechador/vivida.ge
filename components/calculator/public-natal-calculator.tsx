@@ -26,7 +26,11 @@ import {
 } from "@/components/report/positions-table";
 import { signByIndex, signColor, formatDegree } from "@/lib/zodiac";
 import { slugByLabelKa } from "@/lib/seo/zodiac-content";
-import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import {
+  ANALYTICS_EVENT,
+  trackEvent,
+  trackFirstResultViewed,
+} from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import type { GeocodeResult } from "@/lib/geocoding";
 import type { NatalChartJson, PointJson } from "@/db/schema";
@@ -171,6 +175,10 @@ export function PublicNatalCalculator({
       trackEvent(ANALYTICS_EVENT.natalChartComputed, {
         widget: "natal_calculator",
         exact_time: t.time ? 1 : 0,
+      });
+      trackFirstResultViewed({
+        product: "natal_chart",
+        surface: "natal_calculator",
       });
       setTimeout(
         () =>

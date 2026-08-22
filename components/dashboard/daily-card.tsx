@@ -8,7 +8,11 @@ import type { DailyHoroscope } from "@/db/schema";
 import type { TransitBreakdownItem } from "@/lib/transit-library";
 import { kaLongDate } from "@/lib/i18n/ka-date";
 import { BODIES } from "@/lib/zodiac";
-import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import {
+  ANALYTICS_EVENT,
+  trackEvent,
+  trackFirstResultViewed,
+} from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ASPECT_GLYPH: Record<string, string> = {
@@ -70,6 +74,10 @@ export function DailyCard({
       date: horoscope.date,
       has_transits: transits.length > 0 ? 1 : 0,
     });
+    trackFirstResultViewed({
+      product: "daily_horoscope",
+      surface: "dashboard",
+    });
 
     const sentinel = readSentinelRef.current;
     if (!sentinel || typeof IntersectionObserver === "undefined") return;
@@ -130,6 +138,13 @@ export function DailyCard({
           horoscope can't answer. First reading is free, so lead with that. */}
       <Link
         href="/taro"
+        onClick={() =>
+          trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+            placement: "daily_horoscope",
+            destination: "tarot",
+            product: "tarot",
+          })
+        }
         className="group relative mt-5 flex items-center justify-between gap-3 rounded-xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/8 px-4 py-3 transition-colors hover:border-[var(--vivida-violet)]/60 hover:bg-[var(--vivida-violet)]/15"
       >
         <span className="flex flex-wrap items-center gap-2.5 text-sm font-medium">

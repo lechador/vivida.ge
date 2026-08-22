@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, Crown, Loader2 } from "lucide-react";
 
@@ -27,17 +27,41 @@ export function PremiumPlanCard({
   plan,
   locale,
   active = false,
+  placement = "premium_plan_card",
 }: {
   plan: PremiumPlan;
   locale: UserLocale;
   active?: boolean;
+  placement?: string;
 }) {
   const en = locale !== "ka";
   const am = locale === "am";
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
 
+  useEffect(() => {
+    if (active) return;
+    const params = {
+      product: plan.key,
+      placement,
+      value: plan.amountMinor / 100,
+      currency: plan.currency,
+    };
+    trackEvent(ANALYTICS_EVENT.proExposure, params);
+    trackEvent(ANALYTICS_EVENT.paywallViewed, {
+      ...params,
+      surface: placement,
+    });
+  }, [active, placement, plan.amountMinor, plan.currency, plan.key]);
+
   async function subscribe() {
+    trackEvent(ANALYTICS_EVENT.productSelected, {
+      product: plan.key,
+      surface: placement,
+      payment_model: "subscription",
+      value: plan.amountMinor / 100,
+      currency: plan.currency,
+    });
     setPending(true);
     setError(false);
     try {

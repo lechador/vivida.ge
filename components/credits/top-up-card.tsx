@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, CreditCard, Loader2, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -30,7 +30,24 @@ export function TopUpCard({
   const packs = creditPacksForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
 
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENT.paywallViewed, {
+      product: "credit_pack",
+      surface: "credits_hub",
+      country: countryCode ?? "unknown",
+    });
+  }, [countryCode]);
+
   async function buy(packId: string) {
+    const selected = packs.find((pack) => pack.id === packId);
+    trackEvent(ANALYTICS_EVENT.productSelected, {
+      product: packId,
+      surface: "credits_hub",
+      payment_model: "one_time",
+      credits: selected?.credits,
+      value: selected ? selected.amountMinor / 100 : undefined,
+      currency: selected?.currency,
+    });
     setPending(packId);
     try {
       const r = await fetch("/api/credits/checkout", {

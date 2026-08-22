@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ANALYTICS_EVENT, trackEvent } from "../lib/analytics";
+import {
+  ANALYTICS_EVENT,
+  creditBalanceBucket,
+  trackEvent,
+  trackExperimentAssignment,
+  trackFirstResultViewed,
+} from "../lib/analytics";
 
 type Hit = { name: string; params?: Record<string, unknown> };
 
@@ -23,6 +29,7 @@ describe("trackEvent", () => {
 
   afterEach(() => {
     delete (globalThis as { gtag?: unknown }).gtag;
+    delete (globalThis as { localStorage?: unknown }).localStorage;
     delete (globalThis as { window?: unknown }).window;
   });
 
@@ -76,8 +83,58 @@ describe("trackEvent", () => {
   });
 
   it("is a no-op when gtag is not loaded", () => {
-    expect(() =>
-      trackEvent(ANALYTICS_EVENT.registerClick, { widget: "x" })
-    ).not.toThrow();
+    expect(trackEvent(ANALYTICS_EVENT.registerClick, { widget: "x" })).toBe(
+      false
+    );
+  });
+
+  it("tracks experiment assignments with stable experiment and variant fields", () => {
+    const hits = installGtag();
+    trackExperimentAssignment("signup_credits_v1", "staged", {
+      eligibility: "new_user",
+    });
+    expect(hits).toEqual([
+      {
+        name: "experiment_assigned",
+        params: {
+          experiment: "signup_credits_v1",
+          variant: "staged",
+          eligibility: "new_user",
+        },
+      },
+    ]);
+  });
+
+  it("uses low-cardinality credit balance buckets", () => {
+    expect([-1, 0, 1, 5, 6, 20, 21, 200].map(creditBalanceBucket)).toEqual([
+      "zero",
+      "zero",
+      "1_5",
+      "1_5",
+      "6_20",
+      "6_20",
+      "21_plus",
+      "21_plus",
+    ]);
+  });
+
+  it("records the first result once and persists the browser marker", () => {
+    const hits = installGtag();
+    const values = new Map<string, string>();
+    (globalThis as { localStorage?: unknown }).localStorage = {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+    };
+
+    trackFirstResultViewed({ product: "natal_chart", surface: "calculator" });
+    trackFirstResultViewed({ product: "tarot", surface: "tarot_reader" });
+
+    expect(hits).toEqual([
+      {
+        name: "first_result_viewed",
+        params: { product: "natal_chart", surface: "calculator" },
+      },
+    ]);
+    expect([...values.values()]).toEqual(["1"]);
   });
 });

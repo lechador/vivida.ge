@@ -67,7 +67,11 @@ export async function POST(req: Request) {
   // Already paid (incl. failed → retryable on the status page) or done:
   // route back to it, never charge twice.
   if (existing && ["paid", "generating", "ready", "failed"].includes(existing.status)) {
-    return Response.json({ reportId: existing.id, url: `/reports/${existing.id}` });
+    return Response.json({
+      reportId: existing.id,
+      url: `/reports/${existing.id}`,
+      unlockStatus: "already",
+    });
   }
 
   // ── Pay with credits ─────────────────────────────────────────────────
@@ -100,5 +104,9 @@ export async function POST(req: Request) {
     .returning({ id: pdfReports.id });
 
   after(() => generateAndStoreReport(row.id));
-  return Response.json({ reportId: row.id, url: `/reports/${row.id}` });
+  return Response.json({
+    reportId: row.id,
+    url: `/reports/${row.id}`,
+    unlockStatus: "unlocked",
+  });
 }

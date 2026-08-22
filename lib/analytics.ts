@@ -48,7 +48,16 @@ export const ANALYTICS_EVENT = {
   tarotCreditsShort: "tarot_credits_short",
   tarotReadingCompleted: "tarot_reading_completed",
   testCompleted: "test_completed",
+  firstResultViewed: "first_result_viewed",
+  recommendationClicked: "recommendation_clicked",
+  paywallViewed: "paywall_viewed",
+  productSelected: "product_selected",
+  insufficientCredits: "insufficient_credits",
+  creditUnlock: "credit_unlock",
+  proExposure: "pro_exposure",
+  experimentAssigned: "experiment_assigned",
   checkoutStarted: "checkout_started",
+  checkoutSuccess: "checkout_success",
   purchaseCompleted: "purchase_completed",
   subscriptionStarted: "subscription_started",
 } as const;
@@ -108,14 +117,14 @@ function stripCampaignParams(params: GtagParams): GtagParams {
 export function trackEvent(
   name: AnalyticsEventName,
   params?: GtagParams
-): void {
-  if (typeof window === "undefined") return;
+): boolean {
+  if (typeof window === "undefined") return false;
   const gtag = (
     window as unknown as {
       gtag?: (command: string, eventName: string, params?: GtagParams) => void;
     }
   ).gtag;
-  if (typeof gtag !== "function") return;
+  if (typeof gtag !== "function") return false;
   try {
     const safeParams = params && stripCampaignParams(params);
     gtag("event", name, safeParams);
@@ -125,7 +134,63 @@ export function trackEvent(
         action: name,
       });
     }
+    return true;
   } catch {
     /* analytics must never break the app */
+    return false;
   }
+}
+
+const FIRST_RESULT_STORAGE_KEY = "vivida_analytics:first_result_viewed:v1";
+
+/**
+ * Records the first completed result seen in this browser. The marker is only
+ * written after GA4 accepted the event, so users who grant analytics consent
+ * later are not silently excluded. Storage failures fall back to once per page
+ * load without ever blocking the product experience.
+ */
+let firstResultTrackedInMemory = false;
+export function trackFirstResultViewed(params: GtagParams): void {
+  if (typeof window === "undefined" || firstResultTrackedInMemory) return;
+  try {
+    if (window.localStorage.getItem(FIRST_RESULT_STORAGE_KEY)) {
+      firstResultTrackedInMemory = true;
+      return;
+    }
+  } catch {
+    /* private browsing / disabled storage — use the in-memory guard */
+  }
+
+  if (!trackEvent(ANALYTICS_EVENT.firstResultViewed, params)) return;
+  firstResultTrackedInMemory = true;
+  try {
+    window.localStorage.setItem(FIRST_RESULT_STORAGE_KEY, "1");
+  } catch {
+    /* the event was delivered; persistence is best-effort */
+  }
+}
+
+/** Stable, low-cardinality wallet segments for paywall analysis. */
+export function creditBalanceBucket(balance: number): string {
+  if (balance <= 0) return "zero";
+  if (balance <= 5) return "1_5";
+  if (balance <= 20) return "6_20";
+  return "21_plus";
+}
+
+/**
+ * Experiment owners call this exactly when a visitor is assigned. Assignment
+ * and exposure are deliberately separate: a variant can be assigned before
+ * its UI is actually rendered.
+ */
+export function trackExperimentAssignment(
+  experiment: string,
+  variant: string,
+  params?: GtagParams
+): void {
+  trackEvent(ANALYTICS_EVENT.experimentAssigned, {
+    ...params,
+    experiment,
+    variant,
+  });
 }

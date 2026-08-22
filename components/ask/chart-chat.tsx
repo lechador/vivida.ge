@@ -6,6 +6,7 @@ import { Send, Sparkles, Users } from "lucide-react";
 
 import { CreditHint } from "@/components/credits/credit-hint";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -83,7 +84,20 @@ export function ChartChat({
           (en ? ERRORS_EN : ERRORS_KA)[data.error] ??
             (am ? "Ինչ-որ բան այն չէր։ Խնդրում ենք նորից փորձել։" : en ? "Something went wrong. Please try again." : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
         );
-        setNeedsCredits(data.error === "needs_credits");
+        const short = data.error === "needs_credits";
+        setNeedsCredits(short);
+        if (short) {
+          trackEvent(ANALYTICS_EVENT.insufficientCredits, {
+            product: "ai_chart_chat",
+            surface: "chart_chat",
+            cost: typeof data.cost === "number" ? data.cost : undefined,
+          });
+          trackEvent(ANALYTICS_EVENT.paywallViewed, {
+            product: "ai_chart_chat",
+            surface: "chart_chat_shortfall",
+            cost: typeof data.cost === "number" ? data.cost : undefined,
+          });
+        }
         setMessages((prev) => prev.slice(0, -1)); // drop empty assistant bubble
         return;
       }
@@ -129,7 +143,14 @@ export function ChartChat({
                 <button
                   key={q}
                   type="button"
-                  onClick={() => send(q)}
+                  onClick={() => {
+                    trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+                      placement: "chart_chat_starter",
+                      destination: "ai_chart_chat",
+                      product: "ai_chart_chat",
+                    });
+                    void send(q);
+                  }}
                   className="rounded-full border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-3 py-1.5 text-sm text-foreground/85 transition-colors hover:bg-[var(--vivida-violet)]/20"
                 >
                   {q}
@@ -166,6 +187,13 @@ export function ChartChat({
           {needsCredits && (
             <Link
               href="/credits"
+              onClick={() =>
+                trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+                  placement: "chart_chat_shortfall",
+                  destination: "credits",
+                  product: "ai_chart_chat",
+                })
+              }
               className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/12 px-3 py-1.5 text-sm text-foreground/90 transition-colors hover:bg-[var(--vivida-violet)]/20"
             >
               <Users className="size-4" />

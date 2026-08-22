@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Clock, Crown, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -60,7 +60,30 @@ export function LowCreditOfferCard({
     ? formatBillingAmount(standardPlan.amountMinor * months, standardPlan.currency, locale)
     : null;
 
+  useEffect(() => {
+    const params = {
+      product: plan.key,
+      placement: "low_credit_offer",
+      offer: "low_credits",
+      value: plan.amountMinor / 100,
+      currency: plan.currency,
+    };
+    trackEvent(ANALYTICS_EVENT.proExposure, params);
+    trackEvent(ANALYTICS_EVENT.paywallViewed, {
+      ...params,
+      surface: "credits_hub",
+    });
+  }, [plan.amountMinor, plan.currency, plan.key]);
+
   async function subscribe() {
+    trackEvent(ANALYTICS_EVENT.productSelected, {
+      product: plan.key,
+      surface: "low_credit_offer",
+      offer: "low_credits",
+      payment_model: "subscription",
+      value: plan.amountMinor / 100,
+      currency: plan.currency,
+    });
     setPending(true);
     setError(false);
     try {

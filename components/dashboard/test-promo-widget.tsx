@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Brain, Clock3, Fingerprint, Heart, Radar, Sparkles } from "lucide-react";
 
 import type { TestCatalogEntry } from "@/lib/tests-catalog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
 const ICONS: Record<string, typeof Brain> = {
   iq: Brain,
@@ -31,7 +34,17 @@ export function DashboardTestPromo({ test, allCompleted, locale = "ka" }: { test
 
   return (
     <aside className="mt-7 overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
-      <Link href={test.href} className="group flex items-center gap-4 p-4 transition-colors hover:bg-card/75 sm:p-5">
+      <Link
+        href={test.href}
+        onClick={() =>
+          trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+            placement: "dashboard_test_promo",
+            destination: test.slug,
+            product: "test",
+          })
+        }
+        className="group flex items-center gap-4 p-4 transition-colors hover:bg-card/75 sm:p-5"
+      >
         <span
           className="grid size-11 shrink-0 place-items-center rounded-2xl"
           style={{ color: accent, background: `color-mix(in oklch, ${accent} 15%, transparent)` }}

@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Lock, Loader2, Sparkles, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  ANALYTICS_EVENT,
+  creditBalanceBucket,
+  trackEvent,
+} from "@/lib/analytics";
 
 /**
  * "Unlock the deep result" gate. Spends `cost` credits once (idempotent on the
@@ -38,7 +43,32 @@ export function UnlockCard({
   const [short, setShort] = useState(balance < cost);
   const [failed, setFailed] = useState(false);
 
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENT.paywallViewed, {
+      product: kind,
+      surface: "result_unlock",
+      cost,
+      balance_bucket: creditBalanceBucket(balance),
+    });
+  }, [balance, cost, kind]);
+
+  useEffect(() => {
+    if (!short) return;
+    trackEvent(ANALYTICS_EVENT.insufficientCredits, {
+      product: kind,
+      surface: "result_unlock",
+      cost,
+      balance_bucket: creditBalanceBucket(balance),
+    });
+  }, [balance, cost, kind, short]);
+
   async function unlock() {
+    trackEvent(ANALYTICS_EVENT.productSelected, {
+      product: kind,
+      surface: "result_unlock",
+      payment_model: "credits",
+      cost,
+    });
     setPending(true);
     setFailed(false);
     try {
@@ -48,6 +78,17 @@ export function UnlockCard({
         body: JSON.stringify({ kind, resultId }),
       });
       if (r.ok) {
+        const data = (await r.json().catch(() => ({}))) as {
+          status?: string;
+        };
+        if (data.status === "unlocked") {
+          trackEvent(ANALYTICS_EVENT.creditUnlock, {
+            product: kind,
+            surface: "result_unlock",
+            cost,
+            outcome: "unlocked",
+          });
+        }
         router.refresh(); // server re-renders with the content revealed
         return;
       }
@@ -113,7 +154,16 @@ export function UnlockCard({
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic">
-              <Link href="/credits">
+              <Link
+                href="/credits"
+                onClick={() =>
+                  trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+                    placement: "result_unlock_shortfall",
+                    destination: "credits",
+                    product: kind,
+                  })
+                }
+              >
                 <Users className="size-4" />
                 {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
               </Link>

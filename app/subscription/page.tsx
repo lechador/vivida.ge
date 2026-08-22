@@ -99,12 +99,20 @@ export default async function SubscriptionPage() {
             </section>
             {!active && (
               <div className="mt-4">
-                <PremiumPlanCard plan={plan} locale={locale} />
+                <PremiumPlanCard
+                  plan={plan}
+                  locale={locale}
+                  placement="subscription_page_reactivation"
+                />
               </div>
             )}
           </>
         ) : (
-          <PremiumPlanCard plan={plan} locale={locale} />
+          <PremiumPlanCard
+            plan={plan}
+            locale={locale}
+            placement="subscription_page"
+          />
         )}
       </section>
     </main>

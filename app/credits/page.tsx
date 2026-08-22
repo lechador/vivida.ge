@@ -137,7 +137,11 @@ export default async function CreditsPage() {
           </div>
         ) : premiumPlan ? (
           <div className="mt-4">
-            <PremiumPlanCard plan={premiumPlan} locale={locale} />
+            <PremiumPlanCard
+              plan={premiumPlan}
+              locale={locale}
+              placement="credits_hub"
+            />
           </div>
         ) : null}
 

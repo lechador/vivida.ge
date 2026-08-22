@@ -7,7 +7,11 @@ import { Loader2, RotateCcw, Sparkles, Users, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
-import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import {
+  ANALYTICS_EVENT,
+  trackEvent,
+  trackFirstResultViewed,
+} from "@/lib/analytics";
 import { fbTrack, fbTrackCustom } from "@/lib/fb-pixel";
 import type { UserLocale } from "@/lib/i18n/locale";
 
@@ -82,6 +86,16 @@ export function TarotReader({
         trackEvent(ANALYTICS_EVENT.tarotCreditsShort, {
           widget: "tarot_reader",
         });
+        trackEvent(ANALYTICS_EVENT.insufficientCredits, {
+          product: "tarot",
+          surface: "tarot_reader",
+          cost,
+        });
+        trackEvent(ANALYTICS_EVENT.paywallViewed, {
+          product: "tarot",
+          surface: "tarot_shortfall",
+          cost,
+        });
         setStatus("short");
         return;
       }
@@ -91,6 +105,19 @@ export function TarotReader({
       }
       const next = (await res.json()) as Reading;
       trackEvent(ANALYTICS_EVENT.tarotReadingCompleted, {
+        free: next.free ? 1 : 0,
+      });
+      if (next.charged > 0) {
+        trackEvent(ANALYTICS_EVENT.creditUnlock, {
+          product: "tarot",
+          surface: "tarot_reader",
+          cost: next.charged,
+          outcome: "unlocked",
+        });
+      }
+      trackFirstResultViewed({
+        product: "tarot",
+        surface: "tarot_reader",
         free: next.free ? 1 : 0,
       });
       fbTrackCustom("TarotReadingCompleted", {
@@ -185,7 +212,16 @@ export function TarotReader({
                 : "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი."}
           </p>
           <Button asChild variant="mystic" className="mt-3">
-            <Link href="/credits">
+            <Link
+              href="/credits"
+              onClick={() =>
+                trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+                  placement: "tarot_shortfall",
+                  destination: "credits",
+                  product: "tarot",
+                })
+              }
+            >
               <Users className="size-4" />
               {am
                 ? "Հրավիրել / համալրել"

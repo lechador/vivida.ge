@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FileText, Loader2, Sparkles, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import {
+  ANALYTICS_EVENT,
+  creditBalanceBucket,
+  trackEvent,
+} from "@/lib/analytics";
 
 const ERRORS: Record<string, string> = {
   no_chart: "ჯერ შენი რუკა უნდა შეიქმნას. დაასრულე ონბორდინგი.",
@@ -34,7 +39,32 @@ export function BuyReportCta({
   const [error, setError] = useState<string | null>(null);
   const [short, setShort] = useState(balance < cost);
 
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENT.paywallViewed, {
+      product: "natal_pdf",
+      surface: "natal_report_cta",
+      cost,
+      balance_bucket: creditBalanceBucket(balance),
+    });
+  }, [balance, cost]);
+
+  useEffect(() => {
+    if (!short) return;
+    trackEvent(ANALYTICS_EVENT.insufficientCredits, {
+      product: "natal_pdf",
+      surface: "natal_report_cta",
+      cost,
+      balance_bucket: creditBalanceBucket(balance),
+    });
+  }, [balance, cost, short]);
+
   async function start() {
+    trackEvent(ANALYTICS_EVENT.productSelected, {
+      product: "natal_pdf",
+      surface: "natal_report_cta",
+      payment_model: "credits",
+      cost,
+    });
     setLoading(true);
     setError(null);
     try {
@@ -61,6 +91,14 @@ export function BuyReportCta({
         );
         setLoading(false);
         return;
+      }
+      if (data.unlockStatus === "unlocked") {
+        trackEvent(ANALYTICS_EVENT.creditUnlock, {
+          product: "natal_pdf",
+          surface: "natal_report_cta",
+          cost,
+          outcome: "unlocked",
+        });
       }
       router.push(data.url);
     } catch {
@@ -122,7 +160,16 @@ export function BuyReportCta({
                 {am ? "Ձեր հաշվեկշիռը շատ ցածր է։" : en ? "Your balance is too low." : "ბალანსი არ არის საკმარისი."}
               </p>
               <Button asChild variant="mystic" size="lg">
-                <Link href="/credits">
+                <Link
+                  href="/credits"
+                  onClick={() =>
+                    trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+                      placement: "natal_report_shortfall",
+                      destination: "credits",
+                      product: "natal_pdf",
+                    })
+                  }
+                >
                   <Users className="size-4" />
                   {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
                 </Link>
