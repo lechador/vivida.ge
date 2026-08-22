@@ -31,6 +31,7 @@ inventory only after those foundations are measurable.
 | P0 — shipped 2026-08-22 | Full value and paywall measurement | We can see some value actions, but not the complete exposure → selection → shortfall → checkout → unlock journey. | Reliable value, paywall, D1/D7/D30, and payer-conversion baselines. |
 | P0 — shipped | Preserve calculator data through signup/onboarding | The public calculator already collects the exact birth inputs onboarding asks for again. | Higher calculator-to-profile completion and shorter onboarding time. |
 | P0 — shipped 2026-08-22 | First onboarding “aha” result | New users now see their personalized Big Three immediately, then receive tracked, prefilled AI question recommendations. | Higher first-value completion, recommendation click-through, and D1 return. |
+| P0 — shipped 2026-08-22 | Credits vs PRO comparison | Public natal promos, natal and first-free-tarot result states, and the Credits hub now explain one-time credits versus monthly unlimited PRO before a balance shortfall. | Higher monetization-choice click-through and payer conversion before users reach zero credits. |
 | P1 | Daily “Today” ritual | Existing daily content does not yet create a compact progress loop with a clear reason to return tomorrow. | Higher DAU/MAU, active days per MAU, and D7 retention. |
 | P1 | Contextual paywalls and credit-economy experiments | Free supply materially exceeds spend and most active wallets are far from a purchase decision. | Higher paywall-to-checkout and 30-day payer conversion without lower retention. |
 | P1 | Reading history and journal | Tarot, forecasts, and AI insight do not accumulate into durable personal value. | Higher weekly repeat use and history reopen rate. |
@@ -54,8 +55,10 @@ inventory only after those foundations are measurable.
    details, show a concise personal result plus suggested AI questions. The
    result now reveals Sun, Moon, and Rising, preserves feature-specific return
    paths, and prefills questions without sending or spending automatically.
-3. Surface monetization before a short wallet. Add a clear Credits vs PRO
-   comparison to public product messaging and contextual result pages.
+3. **Shipped 2026-08-22:** Surface monetization before a short wallet. Public
+   natal promos, natal and first-free-tarot result states, and the Credits hub
+   now compare one-time credits with monthly unlimited PRO using market-specific
+   prices and tracked selection links.
 4. Test future signup-credit issuance on new cohorts. Compare the current 20
    credits with a staged grant such as 10 immediately plus 5 after the first
    return. Preserve every existing balance.

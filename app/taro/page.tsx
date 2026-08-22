@@ -25,6 +25,7 @@ import {
 } from "@/lib/seo/locales";
 import { TAROT_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 
 export const dynamic = "force-dynamic";
 
@@ -167,8 +168,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function TaroHubPage() {
   const session = await auth();
-  const authed = !!session?.user?.id;
-  const locale = await getRequestLocale();
+  const userId = session?.user?.id;
+  const authed = !!userId;
+  const [locale, billingIdentity, premium] = await Promise.all([
+    getRequestLocale(),
+    userId ? getBillingIdentity(userId) : null,
+    userId ? isPremiumUser(userId) : false,
+  ]);
   const en = locale === "en";
   const am = locale === "am";
   const siteUrl = am
@@ -220,7 +226,11 @@ export default async function TaroHubPage() {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
         />
-        <TarotConversionLanding authed={authed} />
+        <TarotConversionLanding
+          authed={authed}
+          countryCode={billingIdentity?.countryCode ?? "GE"}
+          premium={premium}
+        />
       </>
     );
   }
@@ -283,7 +293,15 @@ export default async function TaroHubPage() {
           </p>
         </header>
 
-        <TarotReader authed={authed} cost={CREDIT_COST.tarot} locale={locale} />
+        <TarotReader
+          authed={authed}
+          cost={CREDIT_COST.tarot}
+          locale={locale}
+          countryCode={
+            billingIdentity?.countryCode ?? (locale === "am" ? "AM" : "GB")
+          }
+          premium={premium}
+        />
 
         {/* All cards — internal linking + SEO cluster */}
         <section className="mt-12">

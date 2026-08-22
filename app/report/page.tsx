@@ -30,14 +30,15 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
   const user = await requireUser();
   const { offer } = await searchParams;
 
-  const [[profile], [userPrefs]] = await Promise.all([
+  const [[profile], [userPrefs], premium] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
-    db.select({ locale: users.interfaceLanguage }).from(users).where(eq(users.id, user.id)).limit(1),
+    db.select({ locale: users.interfaceLanguage, countryCode: users.residenceCountryCode }).from(users).where(eq(users.id, user.id)).limit(1),
+    isPremiumUser(user.id),
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userPrefs?.locale));
   const en = locale !== "ka";
   const am = locale === "am";
-  const showUkOffer = offer === "uk" && !(await isPremiumUser(user.id));
+  const showUkOffer = offer === "uk" && !premium;
 
   if (!profile?.dateOfBirth) {
     return (
@@ -97,7 +98,12 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
 
         <div className="mb-10">
           <Suspense fallback={null}>
-            <ReportPdfPanel userId={user.id} locale={locale} />
+            <ReportPdfPanel
+              userId={user.id}
+              locale={locale}
+              countryCode={userPrefs?.countryCode}
+              premium={premium}
+            />
           </Suspense>
         </div>
 

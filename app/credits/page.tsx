@@ -23,6 +23,7 @@ import { getLowCreditOffer } from "@/lib/promo-offer";
 import { kaDayMonthGenitive } from "@/lib/i18n/ka-date";
 import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
+import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -105,6 +106,18 @@ export default async function CreditsPage() {
           </p>
         </div>
 
+        {!premium && !offer && (
+          <div className="mt-4">
+            <CreditsVsPro
+              locale={locale}
+              countryCode={identity?.countryCode}
+              placement="credits_hub_comparison"
+              creditHref="#credit-packs"
+              proHref="#pro-plan"
+            />
+          </div>
+        )}
+
         {premium ? (
           <Link
             href="/subscription"
@@ -136,7 +149,7 @@ export default async function CreditsPage() {
             />
           </div>
         ) : premiumPlan ? (
-          <div className="mt-4">
+          <div id="pro-plan" className="mt-4 scroll-mt-20">
             <PremiumPlanCard
               plan={premiumPlan}
               locale={locale}
@@ -146,7 +159,7 @@ export default async function CreditsPage() {
         ) : null}
 
         {/* Top-up is kept directly below the balance so there is no hunt or scroll. */}
-        <div className="mt-4">
+        <div id="credit-packs" className="mt-4 scroll-mt-20">
           <TopUpCard locale={locale} countryCode={identity?.countryCode} />
         </div>
 

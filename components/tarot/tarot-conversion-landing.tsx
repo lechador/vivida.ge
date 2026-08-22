@@ -70,7 +70,15 @@ const READING_STEPS = [
   },
 ];
 
-export function TarotConversionLanding({ authed }: { authed: boolean }) {
+export function TarotConversionLanding({
+  authed,
+  countryCode,
+  premium = false,
+}: {
+  authed: boolean;
+  countryCode?: string | null;
+  premium?: boolean;
+}) {
   const packs = creditPacksForCountry("GE");
   const pro = premiumPlanForCountry("GE");
   const creditsHref = authed ? "/credits" : "/login?next=%2Fcredits";
@@ -201,7 +209,13 @@ export function TarotConversionLanding({ authed }: { authed: boolean }) {
               ამ ურთიერთობაში?“
             </p>
           </div>
-          <TarotReader authed={authed} cost={CREDIT_COST.tarot} locale="ka" />
+          <TarotReader
+            authed={authed}
+            cost={CREDIT_COST.tarot}
+            locale="ka"
+            countryCode={countryCode}
+            premium={premium}
+          />
           {!authed && (
             <p className="mt-4 text-center text-xs leading-5 text-white/45">
               პასუხის მისაღებად გაივლი სწრაფ რეგისტრაციას — შენი პირველი

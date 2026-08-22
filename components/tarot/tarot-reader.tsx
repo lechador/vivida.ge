@@ -7,6 +7,7 @@ import { Loader2, RotateCcw, Sparkles, Users, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
+import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
 import {
   ANALYTICS_EVENT,
   trackEvent,
@@ -42,10 +43,14 @@ export function TarotReader({
   authed,
   cost,
   locale,
+  countryCode,
+  premium = false,
 }: {
   authed: boolean;
   cost: number;
   locale: UserLocale;
+  countryCode?: string | null;
+  premium?: boolean;
 }) {
   const en = locale === "en";
   const am = locale === "am";
@@ -326,6 +331,17 @@ export function TarotReader({
               {am ? "Նոր հարց" : en ? "New question" : "ახალი კითხვა"}
             </Button>
           </div>
+
+          {authed && reading.free && !premium && (
+            <CreditsVsPro
+              locale={locale}
+              countryCode={countryCode}
+              placement="tarot_first_result_comparison"
+              creditHref="/credits"
+              proHref="/subscription"
+              compact
+            />
+          )}
 
           {/* Free second-action rail — a next step at the peak-engagement
               moment, instead of dead-ending at the credit-gated new question. */}

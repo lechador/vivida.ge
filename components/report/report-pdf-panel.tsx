@@ -9,6 +9,7 @@ import { CREDIT_COST, getBalance } from "@/lib/credits";
 import { BuyReportCta } from "./buy-report-cta";
 import { SendReportEmailButton } from "./send-report-email-button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
 
 /**
  * Report purchase/download surface on /report. Adapts to the user's latest
@@ -18,9 +19,13 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export async function ReportPdfPanel({
   userId,
   locale = "ka",
+  countryCode,
+  premium = false,
 }: {
   userId: string;
   locale?: UserLocale;
+  countryCode?: string | null;
+  premium?: boolean;
 }) {
   const en = locale !== "ka";
   const am = locale === "am";
@@ -110,5 +115,20 @@ export async function ReportPdfPanel({
 
   // None / pending → pay with credits to generate.
   const balance = await getBalance(userId);
-  return <BuyReportCta cost={CREDIT_COST.pdfReport} balance={balance} locale={locale} />;
+  return (
+    <div className="space-y-4">
+      <BuyReportCta cost={CREDIT_COST.pdfReport} balance={balance} locale={locale} />
+      {!premium && (
+        <CreditsVsPro
+          locale={locale}
+          countryCode={countryCode}
+          placement="natal_report_comparison"
+          creditHref="/credits"
+          proHref="/subscription"
+          context="natal_report"
+          compact
+        />
+      )}
+    </div>
+  );
 }

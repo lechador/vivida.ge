@@ -2,8 +2,8 @@ import Link from "next/link";
 import { FileText, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { CREDIT_COST } from "@/lib/credits-config";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
 
 /**
  * Marketing promo for the paid natal PDF report, for public/SEO pages.
@@ -51,18 +51,24 @@ export async function ReportPromo({ className }: { className?: string }) {
           <Button asChild variant="mystic" size="lg" className="min-w-44">
             <Link href="/signup?next=%2Freport">
               <FileText className="size-4" />
-              {am ? "Սկսել" : en ? "Get started" : "დაიწყე"}
+              {am ? "Ստեղծել անվճար քարտեզ" : en ? "Create my free chart" : "შექმენი უფასო რუკა"}
             </Link>
           </Button>
           <span className="text-center text-xs text-muted-foreground sm:text-right">
-            {CREDIT_COST.pdfReport}{" "}
-            {am
-              ? "կրեդիտ · առանց ամսական բաժանորդագրության"
-              : en
-                ? "credits · no subscription"
-                : "კრედიტი · ყოველთვიური გამოწერის გარეშე"}
+            {am ? "Անվճար քարտեզ՝ նախքան վճարովի զեկույցը" : en ? "Free chart before any paid report" : "უფასო რუკა ფასიან ანგარიშამდე"}
           </span>
         </div>
+      </div>
+      <div className="relative mt-6">
+        <CreditsVsPro
+          locale={locale}
+          countryCode={locale === "am" ? "AM" : locale === "en" ? "GB" : "GE"}
+          placement="public_natal_report_comparison"
+          creditHref="/signup?next=%2Fcredits"
+          proHref="/signup?next=%2Fsubscription"
+          context="natal_report"
+          compact
+        />
       </div>
     </div>
   );
