@@ -32,6 +32,7 @@ inventory only after those foundations are measurable.
 | P0 — shipped | Preserve calculator data through signup/onboarding | The public calculator already collects the exact birth inputs onboarding asks for again. | Higher calculator-to-profile completion and shorter onboarding time. |
 | P0 — shipped 2026-08-22 | First onboarding “aha” result | New users now see their personalized Big Three immediately, then receive tracked, prefilled AI question recommendations. | Higher first-value completion, recommendation click-through, and D1 return. |
 | P0 — shipped 2026-08-22 | Credits vs PRO comparison | Public natal promos, natal and first-free-tarot result states, and the Credits hub now explain one-time credits versus monthly unlimited PRO before a balance shortfall. | Higher monetization-choice click-through and payer conversion before users reach zero credits. |
+| P0 — implemented 2026-08-22 | Signup-credit cohort test | Future signups are assigned 50/50 to 20 credits immediately or 10 immediately plus 5 after a 24-hour return; legacy balances remain untouched. | Variant-level D1/D7 retention, seven-day credit use, and 30-day payer conversion. |
 | P1 | Daily “Today” ritual | Existing daily content does not yet create a compact progress loop with a clear reason to return tomorrow. | Higher DAU/MAU, active days per MAU, and D7 retention. |
 | P1 | Contextual paywalls and credit-economy experiments | Free supply materially exceeds spend and most active wallets are far from a purchase decision. | Higher paywall-to-checkout and 30-day payer conversion without lower retention. |
 | P1 | Reading history and journal | Tarot, forecasts, and AI insight do not accumulate into durable personal value. | Higher weekly repeat use and history reopen rate. |
@@ -59,9 +60,12 @@ inventory only after those foundations are measurable.
    natal promos, natal and first-free-tarot result states, and the Credits hub
    now compare one-time credits with monthly unlimited PRO using market-specific
    prices and tracked selection links.
-4. Test future signup-credit issuance on new cohorts. Compare the current 20
-   credits with a staged grant such as 10 immediately plus 5 after the first
-   return. Preserve every existing balance.
+4. **Implemented 2026-08-22:** Test future signup-credit issuance on new
+   cohorts. New accounts receive a durable 50/50 assignment: 20 credits
+   immediately, or 10 immediately plus 5 on the first authenticated return at
+   least 24 hours later. Every existing balance is preserved. The admin Growth
+   view compares exposure, D1/D7 return, seven-day credit use, return-bonus
+   completion, and 30-day payer conversion by variant.
 
 ### P1 — repeat-use loop and conversion (weeks 2–6)
 
@@ -109,7 +113,9 @@ Implementation status: the canonical events live in `lib/analytics.ts`; the
 current natal, daily, recommendation, credit-gate, report, tarot, credit-pack,
 PRO, and verified checkout-return surfaces emit them. The admin app exposes
 database-backed weekly cohorts at `/growth`. Future experiments must call the
-shared assignment helper when eligibility selects a stable variant.
+shared assignment helper when eligibility selects a stable variant. The
+`signup_credits_v1` assignment is persisted in `experiment_assignment` and
+reported to analytics once from onboarding.
 
 ## Cohort and conversion definitions
 

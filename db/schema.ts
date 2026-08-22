@@ -167,6 +167,40 @@ export type CreditTransaction = typeof creditTransactions.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
 
 /**
+ * Durable per-user experiment assignments. Assignment happens once and never
+ * changes on later requests, so product outcomes can be joined back to the
+ * exact cohort without relying on browser cookies or analytics identifiers.
+ */
+export const experimentAssignments = pgTable(
+  "experiment_assignment",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    experiment: text("experiment").notNull(),
+    variant: text("variant").notNull(),
+    eligibility: text("eligibility").notNull(),
+    assignedAt: timestamp("assigned_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    /** First product surface that reported the assignment to analytics. */
+    exposedAt: timestamp("exposed_at", { withTimezone: true }),
+    /** Experiment-specific completion, e.g. the staged return grant landing. */
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.experiment] }),
+    index("experiment_assignment_cohort_idx").on(
+      t.experiment,
+      t.variant,
+      t.assignedAt,
+    ),
+  ],
+);
+
+export type ExperimentAssignment = typeof experimentAssignments.$inferSelect;
+
+/**
  * Stripe-backed Premium entitlement. One current subscription per user keeps
  * the app-side access check cheap while Stripe remains the billing authority.
  */

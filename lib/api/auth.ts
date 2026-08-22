@@ -1,9 +1,13 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { after } from "next/server";
 
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { experimentAssignments, users } from "@/db/schema";
 import { recordVisit, shouldRecordVisit } from "@/lib/activity";
+import {
+  isSignupCreditVariant,
+  SIGNUP_CREDITS_EXPERIMENT,
+} from "@/lib/signup-credit-experiment-config";
 
 import { ApiError } from "./errors";
 import { verifyAccessToken } from "./jwt";
@@ -28,8 +32,18 @@ export async function requireMobileUser(req: Request): Promise<PublicUser> {
       name: users.name,
       email: users.email,
       image: users.image,
+      experimentVariant: experimentAssignments.variant,
+      experimentAssignedAt: experimentAssignments.assignedAt,
+      experimentCompletedAt: experimentAssignments.completedAt,
     })
     .from(users)
+    .leftJoin(
+      experimentAssignments,
+      and(
+        eq(experimentAssignments.userId, users.id),
+        eq(experimentAssignments.experiment, SIGNUP_CREDITS_EXPERIMENT),
+      ),
+    )
     .where(eq(users.id, userId))
     .limit(1);
 
@@ -37,7 +51,19 @@ export async function requireMobileUser(req: Request): Promise<PublicUser> {
     throw new ApiError(401, "unauthorized", "Account no longer exists");
   }
 
-  if (shouldRecordVisit(userId)) after(() => recordVisit(userId));
+  const pendingSignupCredits =
+    !user.experimentCompletedAt &&
+    user.experimentAssignedAt &&
+    user.experimentVariant &&
+    isSignupCreditVariant(user.experimentVariant)
+      ? {
+          variant: user.experimentVariant,
+          assignedAt: user.experimentAssignedAt,
+        }
+      : undefined;
+  if (shouldRecordVisit(userId)) {
+    after(() => recordVisit(userId, pendingSignupCredits));
+  }
 
   return toPublicUser(user);
 }

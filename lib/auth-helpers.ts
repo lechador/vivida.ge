@@ -1,11 +1,15 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { experimentAssignments, users } from "@/db/schema";
 import { recordVisit, shouldRecordVisit } from "@/lib/activity";
+import {
+  isSignupCreditVariant,
+  SIGNUP_CREDITS_EXPERIMENT,
+} from "@/lib/signup-credit-experiment-config";
 
 /**
  * Server-side helper for protected pages.
@@ -28,8 +32,20 @@ export async function requireUser() {
   const userId = session.user.id;
 
   const [row] = await db
-    .select({ id: users.id })
+    .select({
+      id: users.id,
+      experimentVariant: experimentAssignments.variant,
+      experimentAssignedAt: experimentAssignments.assignedAt,
+      experimentCompletedAt: experimentAssignments.completedAt,
+    })
     .from(users)
+    .leftJoin(
+      experimentAssignments,
+      and(
+        eq(experimentAssignments.userId, users.id),
+        eq(experimentAssignments.experiment, SIGNUP_CREDITS_EXPERIMENT),
+      ),
+    )
     .where(eq(users.id, userId))
     .limit(1);
   if (!row) {
@@ -40,6 +56,18 @@ export async function requireUser() {
     redirect("/api/auth/signout?callbackUrl=/");
   }
 
-  if (shouldRecordVisit(userId)) after(() => recordVisit(userId));
+  const pendingSignupCredits =
+    !row.experimentCompletedAt &&
+    row.experimentAssignedAt &&
+    row.experimentVariant &&
+    isSignupCreditVariant(row.experimentVariant)
+      ? {
+          variant: row.experimentVariant,
+          assignedAt: row.experimentAssignedAt,
+        }
+      : undefined;
+  if (shouldRecordVisit(userId)) {
+    after(() => recordVisit(userId, pendingSignupCredits));
+  }
   return session.user;
 }

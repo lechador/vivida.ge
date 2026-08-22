@@ -11,6 +11,13 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { FastOnboarding } from "@/components/onboarding/fast-onboarding";
+import { ExperimentAssignmentTracker } from "@/components/analytics/experiment-assignment-tracker";
+import {
+  getSignupCreditAssignment,
+  markSignupCreditExperimentExposed,
+  SIGNUP_CREDITS_EXPERIMENT,
+} from "@/lib/signup-credit-experiment";
+import { after } from "next/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -33,17 +40,30 @@ export default async function OnboardingPage({
   const am = locale === "am";
   const { next, fast } = await searchParams;
 
-  const [existing] = await db
-    .select()
-    .from(profiles)
-    .where(eq(profiles.userId, user.id))
-    .limit(1);
+  const [[existing], assignment] = await Promise.all([
+    db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.userId, user.id))
+      .limit(1),
+    getSignupCreditAssignment(user.id),
+  ]);
+  if (assignment && !assignment.exposedAt) {
+    after(() => markSignupCreditExperimentExposed(user.id));
+  }
 
   const destination = safeNext(next);
   if (fast === "1" && existing) redirect(destination ?? "/report");
 
   return (
     <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
+      {assignment && (
+        <ExperimentAssignmentTracker
+          experiment={SIGNUP_CREDITS_EXPERIMENT}
+          variant={assignment.variant}
+          eligibility={assignment.eligibility}
+        />
+      )}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(50%_40%_at_50%_0%,oklch(0.28_0.12_300/0.45),transparent_70%),radial-gradient(35%_30%_at_85%_75%,oklch(0.32_0.13_200/0.35),transparent_70%)]"

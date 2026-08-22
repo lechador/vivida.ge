@@ -5,12 +5,11 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { users, profiles, referrals } from "@/db/schema";
 import {
-  earnOnce,
   ensureCreditAccount,
   grantCredits,
   REFERRAL_REWARD,
-  SIGNUP_BONUS,
 } from "@/lib/credits";
+import { provisionSignupCredits } from "@/lib/signup-credit-experiment";
 
 /**
  * Referral engine — the credit-earning growth loop.
@@ -114,10 +113,9 @@ export async function qualifyReferral(invitedUserId: string): Promise<void> {
 export async function onUserSignedUp(userId: string): Promise<void> {
   try {
     await ensureCreditAccount(userId);
-    // `earnOnce` guards on an existing signup_bonus row, so no matter how many
-    // create paths fire for one user (email registerUser + the Auth.js
-    // createUser event, etc.), the bonus lands exactly once.
-    await earnOnce(userId, SIGNUP_BONUS, "signup_bonus");
+    // Assignment and both possible grants are durable + idempotent, so duplicate
+    // create hooks or a later recovery visit cannot double-credit the account.
+    await provisionSignupCredits(userId);
   } catch (err) {
     console.warn("[referral.onUserSignedUp] bonus failed:", (err as Error).message);
   }

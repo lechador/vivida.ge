@@ -90,9 +90,9 @@ describe("trackEvent", () => {
 
   it("tracks experiment assignments with stable experiment and variant fields", () => {
     const hits = installGtag();
-    trackExperimentAssignment("signup_credits_v1", "staged", {
+    expect(trackExperimentAssignment("signup_credits_v1", "staged", {
       eligibility: "new_user",
-    });
+    })).toBe(true);
     expect(hits).toEqual([
       {
         name: "experiment_assigned",

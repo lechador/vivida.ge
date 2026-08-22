@@ -10,6 +10,10 @@
  */
 
 export const SIGNUP_BONUS = 20;
+/** signup_credits_v1: staged cohort receives this immediately. */
+export const STAGED_SIGNUP_BONUS = 10;
+/** signup_credits_v1: staged cohort receives this on its first 24h+ return. */
+export const STAGED_RETURN_BONUS = 5;
 export const REFERRAL_REWARD = 10;
 /** Free credits granted to every user on the first day of each month. */
 export const MONTHLY_BONUS = 5;
@@ -62,6 +66,7 @@ export const FREE_ALLOWANCE = {
 
 export type CreditReason =
   | "signup_bonus"
+  | "first_return_bonus"
   | "referral"
   | "purchase"
   | "monthly_bonus"
@@ -90,6 +95,7 @@ export type CreditReason =
  */
 export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   signup_bonus: "მისალმების ბონუსი",
+  first_return_bonus: "დაბრუნების ბონუსი",
   referral: "მეგობრის მოწვევა",
   purchase: "ბალანსის შევსება",
   monthly_bonus: "თვის ბონუსი",
@@ -114,6 +120,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
 
 export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
   signup_bonus: "Welcome bonus",
+  first_return_bonus: "First return bonus",
   referral: "Friend referral",
   purchase: "Balance top-up",
   monthly_bonus: "Monthly bonus",

@@ -187,8 +187,8 @@ export function trackExperimentAssignment(
   experiment: string,
   variant: string,
   params?: GtagParams
-): void {
-  trackEvent(ANALYTICS_EVENT.experimentAssigned, {
+): boolean {
+  return trackEvent(ANALYTICS_EVENT.experimentAssigned, {
     ...params,
     experiment,
     variant,

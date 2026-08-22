@@ -1,6 +1,10 @@
 import { sql } from "drizzle-orm";
 
 import { db } from "@/db";
+import {
+  processPendingSignupCredits,
+} from "@/lib/signup-credit-experiment";
+import type { PendingSignupCreditAssignment } from "@/lib/signup-credit-experiment-config";
 
 const VISIT_THROTTLE_MS = 5 * 60 * 1000;
 const recentlyRecorded = new Map<string, number>();
@@ -39,7 +43,10 @@ export function shouldRecordVisit(userId: string, now = Date.now()): boolean {
  * back to UTC when the profile or timezone is missing (e.g. a fresh
  * signup that hasn't completed onboarding yet).
  */
-export async function recordVisit(userId: string): Promise<void> {
+export async function recordVisit(
+  userId: string,
+  pendingSignupCredits?: PendingSignupCreditAssignment,
+): Promise<void> {
   try {
     // One Neon round-trip replaces the former profile SELECT + activity INSERT
     // + last-login UPDATE. PostgreSQL resolves the user's local date itself.
@@ -76,6 +83,19 @@ export async function recordVisit(userId: string): Promise<void> {
       ":",
       (err as Error).message
     );
+  }
+
+  if (pendingSignupCredits) {
+    try {
+      await processPendingSignupCredits(userId, pendingSignupCredits);
+    } catch (err) {
+      console.warn(
+        "[activity.signupCredits] failed for",
+        userId,
+        ":",
+        (err as Error).message,
+      );
+    }
   }
 }
 
