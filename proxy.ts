@@ -17,6 +17,7 @@ import {
   stripArmenianPrefix,
   withArmenianPrefix,
 } from "@/lib/i18n/armenian-routes";
+import { signedInLandingTarget } from "@/lib/landing-redirect";
 import { ENGLISH_SITE_URL, isEnglishHost } from "@/lib/seo/locales";
 import {
   internationalInternalPath,
@@ -156,6 +157,36 @@ function armenianGeoRedirect(request: NextRequest): NextResponse | undefined {
   return response;
 }
 
+/**
+ * Send a signed-in visitor from the marketing landing into the app.
+ *
+ * Runs ahead of the locale rules because language routing is irrelevant once
+ * someone is signed in — the interface language of /dashboard is decided by
+ * host, which a same-host redirect preserves. The query string is carried
+ * over so ref/utm capture in the root layout still sees it.
+ */
+function signedInLandingRedirect(
+  request: NextRequest,
+): NextResponse | undefined {
+  const host =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  const target = signedInLandingTarget({
+    method: request.method,
+    pathname: request.nextUrl.pathname,
+    searchParams: request.nextUrl.searchParams,
+    cookieNames: request.cookies.getAll().map((cookie) => cookie.name),
+    englishHost: isEnglishHost(host),
+  });
+  if (!target) return undefined;
+
+  const destination = request.nextUrl.clone();
+  destination.pathname = target;
+  // 307, never 308: whether this visitor is signed in is a property of the
+  // request, not of the URL, and a cached permanent redirect would follow the
+  // browser into signed-out sessions.
+  return NextResponse.redirect(destination, 307);
+}
+
 function rememberLanguageChoice(response: NextResponse, value: string): void {
   response.cookies.set(LOCALE_CHOICE_COOKIE, value, {
     path: "/",
@@ -184,6 +215,7 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     return protectedProxy(request, event);
   }
   return (
+    signedInLandingRedirect(request) ??
     armenianRouting(request) ??
     internationalEnglishRouting(request) ??
     armenianGeoRedirect(request)
