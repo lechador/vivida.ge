@@ -10,7 +10,8 @@ type MarketingActive =
   | "zodiac"
   | "horoskopi"
   | "taro"
-  | "tests";
+  | "tests"
+  | "articles";
 
 /**
  * Header for public marketing + SEO pages. Fully STATIC on purpose: it does
@@ -26,17 +27,20 @@ export function SmartHeader({
   active,
   locale = "ka",
   georgianPath = "/",
+  englishPath,
+  armenianPath,
 }: {
   active?: MarketingActive;
   locale?: UserLocale;
   georgianPath?: string;
+  englishPath?: string;
+  armenianPath?: string;
 } = {}) {
   if (locale === "am") {
-    return <ArmenianHeader georgianPath={georgianPath} />;
+    return <ArmenianHeader georgianPath={georgianPath} englishPath={englishPath} />;
   }
   if (locale === "en") {
-    return <EnglishHeader georgianPath={georgianPath} />;
+    return <EnglishHeader georgianPath={georgianPath} armenianPath={armenianPath} />;
   }
-  return <MarketingHeader active={active} />;
+  return <MarketingHeader active={active} englishPath={englishPath} />;
 }
-

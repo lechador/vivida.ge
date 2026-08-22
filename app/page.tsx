@@ -12,6 +12,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteSearch } from "@/components/search/site-search";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { LatestArticlesSection } from "@/components/articles/latest-articles-section";
 import { localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -228,6 +229,7 @@ export default async function Home() {
           </div>
         </section>
 
+        <LatestArticlesSection locale="ka" />
         <PillarsSection />
         <FeaturesSection />
         <HowItWorksSection />

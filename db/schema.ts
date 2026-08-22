@@ -2392,3 +2392,56 @@ export const surveyResponses = pgTable(
 );
 
 export type SurveyResponseRow = typeof surveyResponses.$inferSelect;
+
+/**
+ * Editorial articles. Every row is one language edition; `translationKey`
+ * groups editions of the same story without requiring all three languages to
+ * exist. This keeps publishing flexible and lets hreflang advertise only real,
+ * published counterparts.
+ */
+export const articles = pgTable(
+  "article",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    translationKey: text("translation_key").notNull(),
+    language: text("language").notNull().default("ka"),
+    slug: text("slug").notNull(),
+    status: text("status").notNull().default("draft"),
+    category: text("category").notNull(),
+    title: text("title").notNull(),
+    excerpt: text("excerpt").notNull(),
+    /** Trusted-editor Markdown; rendered by a deliberately small safe subset. */
+    content: text("content").notNull(),
+    imageUrl: text("image_url").notNull(),
+    imageAlt: text("image_alt").notNull(),
+    seoTitle: text("seo_title"),
+    seoDescription: text("seo_description"),
+    authorName: text("author_name").notNull().default("Vivida Editorial"),
+    featured: boolean("featured").notNull().default(false),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    uniqueIndex("article_language_slug_uq").on(t.language, t.slug),
+    uniqueIndex("article_translation_language_uq").on(
+      t.translationKey,
+      t.language,
+    ),
+    index("article_published_language_idx").on(
+      t.status,
+      t.language,
+      t.publishedAt,
+    ),
+    index("article_category_language_idx").on(t.category, t.language),
+  ],
+);
+
+export type ArticleRow = typeof articles.$inferSelect;
+export type NewArticleRow = typeof articles.$inferInsert;

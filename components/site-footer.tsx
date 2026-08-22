@@ -13,6 +13,7 @@ const PRODUCT_LINKS = [
 ];
 
 const LEARN_LINKS = [
+  { href: "/articles", label: "სტატიები" },
   { href: "/zodiac", label: "ცის ნიშნები" },
   { href: "/zodiac/datit", label: "ნიშანი თარიღით" },
   { href: "/zodiac/mtvare", label: "მთვარის ნიშანი" },

@@ -15,6 +15,7 @@ const NAV = [
   { href: "/horoscope", label: "Horoscope" },
   { href: "/zodiac", label: "Zodiac" },
   { href: "/tests", label: "Tests" },
+  { href: "/articles", label: "Articles" },
 ];
 
 export async function EnglishHeader({

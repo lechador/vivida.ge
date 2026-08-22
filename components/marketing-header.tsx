@@ -19,7 +19,10 @@ const EN_PATH_BY_KA = new Map(
  * mirroring EnglishHeader's ქართული switch: the /en/* internal paths only
  * 301-redirect to this domain anyway.
  */
-function englishHrefFor(pathname: string): string {
+function englishHrefFor(pathname: string, override?: string): string {
+  if (override) {
+    return `${ENGLISH_SITE_URL}${override === "/" ? "" : override}`;
+  }
   const kaPath = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
   const enPath = EN_PATH_BY_KA.get(kaPath) ?? kaPath;
   return `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
@@ -35,6 +38,7 @@ function englishHrefFor(pathname: string): string {
  */
 export function MarketingHeader({
   active,
+  englishPath,
 }: {
   active?:
     | "features"
@@ -43,9 +47,11 @@ export function MarketingHeader({
     | "zodiac"
     | "horoskopi"
     | "taro"
-    | "tests";
+    | "tests"
+    | "articles";
+  englishPath?: string;
 }) {
-  const englishHref = englishHrefFor(usePathname() || "/");
+  const englishHref = englishHrefFor(usePathname() || "/", englishPath);
 
   const link = (href: string, label: string, key: typeof active) => (
     <Link
@@ -89,6 +95,7 @@ export function MarketingHeader({
           {link("/horoskopi", "ჰოროსკოპი", "horoskopi")}
           {link("/taro", "ტარო", "taro")}
           {link("/tests", "ტესტები", "tests")}
+          {link("/articles", "სტატიები", "articles")}
           {link("/zodiac", "ზოდიაქო", "zodiac")}
         </nav>
 

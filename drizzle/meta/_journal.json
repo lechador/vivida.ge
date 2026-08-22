@@ -498,6 +498,13 @@
       "when": 1787397188629,
       "tag": "0070_safe_wrecker",
       "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1787431903047,
+      "tag": "0071_tan_falcon",
+      "breakpoints": true
     }
   ]
 }

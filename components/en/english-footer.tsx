@@ -28,6 +28,7 @@ const EXPLORE = [
 ];
 
 const LEARN = [
+  { href: "/articles", label: "Articles" },
   { href: "/zodiac", label: "Zodiac signs" },
   { href: "/zodiac/datit", label: "Sign by birth date" },
   { href: "/zodiac/mtvare", label: "Moon sign" },

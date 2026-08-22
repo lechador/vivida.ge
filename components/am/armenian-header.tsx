@@ -16,6 +16,7 @@ const NAV = [
   { href: "/zodiac", label: "Կենդանակերպ" },
   { href: "/compatibility", label: "Համատեղելիություն" },
   { href: "/tests", label: "Թեստեր" },
+  { href: "/articles", label: "Հոդվածներ" },
 ];
 
 export async function ArmenianHeader({

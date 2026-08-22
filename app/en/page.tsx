@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Compass, Heart, Languages, Orbit, Sparkles } from "lucide-react";
 
 import { EnglishShell } from "@/components/en/english-shell";
+import { LatestArticlesSection } from "@/components/articles/latest-articles-section";
 import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const URL = ENGLISH_SITE_URL;
@@ -87,6 +88,8 @@ export default function EnglishHomePage() {
           ))}
         </div>
       </section>
+
+      <LatestArticlesSection locale="en" />
 
       <section className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 sm:py-20">
         <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">How Vivida works</h2>

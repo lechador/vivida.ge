@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { ArmenianShell } from "@/components/am/armenian-shell";
+import { LatestArticlesSection } from "@/components/articles/latest-articles-section";
 import {
   DEFAULT_OG_IMAGE,
   ARMENIAN_SITE_URL,
@@ -187,6 +188,8 @@ export default function ArmenianHomePage() {
           ))}
         </div>
       </section>
+
+      <LatestArticlesSection locale="am" />
 
       <section className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 sm:py-20">
         <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">

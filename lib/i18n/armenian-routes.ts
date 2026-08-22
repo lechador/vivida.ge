@@ -234,6 +234,7 @@ const ARMENIAN_CONTENT_PATHS: ReadonlySet<string> = new Set<string>([
   "/iq-testi",
   "/eq-testi",
   "/big-five",
+  "/articles",
   ...ARMENIAN_HOROSCOPE_SIGN_SLUGS.flatMap((sign) =>
     ARMENIAN_HOROSCOPE_VIEW_PATHS.map(
       (viewPath) => `/zodiac/${sign}/${viewPath}`,

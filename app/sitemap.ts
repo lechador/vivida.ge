@@ -34,6 +34,10 @@ import { HOUSE_NUMBERS, PLANET_SLUGS } from "@/lib/seo/astrology-guides";
 import { ALL_DREAM_SLUGS } from "@/lib/seo/dreams";
 import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
+import {
+  articleUrl,
+  listPublishedArticleSitemapItems,
+} from "@/lib/articles";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -627,7 +631,60 @@ function armenianSitemap(): MetadataRoute.Sitemap {
   ];
 }
 
-function englishSitemap(): MetadataRoute.Sitemap {
+type SitemapArticle = Awaited<ReturnType<typeof listPublishedArticleSitemapItems>>[number];
+
+function articleAlternates(
+  current: SitemapArticle,
+  all: SitemapArticle[],
+): NonNullable<MetadataRoute.Sitemap[number]["alternates"]> {
+  const siblings = all.filter((item) => item.translationKey === current.translationKey);
+  const languages: Record<string, string> = {};
+  for (const sibling of siblings) {
+    if (sibling.language === "ka") languages["ka-GE"] = articleUrl("ka", sibling.slug);
+    if (sibling.language === "en") languages.en = articleUrl("en", sibling.slug);
+    if (sibling.language === "am") {
+      languages["hy-AM"] = articleUrl("am", sibling.slug);
+      languages.hy = articleUrl("am", sibling.slug);
+    }
+  }
+  languages["x-default"] = languages.en ?? articleUrl(current.language as "ka" | "en" | "am", current.slug);
+  return { languages };
+}
+
+function articleSitemapEntries(
+  all: SitemapArticle[],
+  languages: ReadonlySet<string>,
+): MetadataRoute.Sitemap {
+  return all
+    .filter((item) => languages.has(item.language))
+    .map((item) => ({
+      url: articleUrl(item.language as "ka" | "en" | "am", item.slug),
+      lastModified: item.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.72,
+      alternates: articleAlternates(item, all),
+    }));
+}
+
+function articleHubEntry(locale: "ka" | "en" | "am"): MetadataRoute.Sitemap[number] {
+  return {
+    url: articleUrl(locale),
+    lastModified: NOW,
+    changeFrequency: "weekly",
+    priority: 0.86,
+    alternates: {
+      languages: {
+        "ka-GE": articleUrl("ka"),
+        en: articleUrl("en"),
+        "hy-AM": articleUrl("am"),
+        hy: articleUrl("am"),
+        "x-default": articleUrl("en"),
+      },
+    },
+  };
+}
+
+function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
   const samePathEntry = (
     path: string,
     changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"],
@@ -814,9 +871,13 @@ function englishSitemap(): MetadataRoute.Sitemap {
     ...numerologyPages,
     ...angelNumberPages,
     ...eqArticlePages,
+    articleHubEntry("en"),
+    ...articleSitemapEntries(articleItems, new Set(["en"])),
     // Armenian shares this domain, so its URLs are declared here rather than
     // in a sitemap of their own.
     ...armenianSitemap(),
+    articleHubEntry("am"),
+    ...articleSitemapEntries(articleItems, new Set(["am"])),
   ];
 
   return entries.map((entry) => {
@@ -831,10 +892,13 @@ function englishSitemap(): MetadataRoute.Sitemap {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const requestHeaders = await headers();
+  const [requestHeaders, articleItems] = await Promise.all([
+    headers(),
+    listPublishedArticleSitemapItems(),
+  ]);
   const host =
     requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
-  if (isEnglishHost(host)) return englishSitemap();
+  if (isEnglishHost(host)) return englishSitemap(articleItems);
 
   const zodiacSignPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
     url: `${BASE}/zodiac/${slug}`,
@@ -965,6 +1029,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const georgianPages: MetadataRoute.Sitemap = [
+    articleHubEntry("ka"),
+    ...articleSitemapEntries(articleItems, new Set(["ka"])),
     {
       url: `${BASE}`,
       lastModified: EVERGREEN,
