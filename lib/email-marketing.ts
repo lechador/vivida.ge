@@ -621,7 +621,9 @@ async function dispatch(
                   day: "numeric",
                   month: "long",
                 }).format(LOW_CREDIT_OFFER_ENDS_AT),
-          creditsUrl: localizedAbsUrl("/credits", locale),
+          // Preserve the destination even when the email is opened in a
+          // browser where the recipient is not currently signed in.
+          creditsUrl: localizedAbsUrl("/login?next=%2Fcredits", locale),
           unsubscribeUrl: unsubUrl,
           locale,
         }),

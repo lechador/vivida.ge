@@ -23,7 +23,7 @@ import {
 export const LOW_CREDIT_OFFER_CAMPAIGN_SLUG = "low-credits-3mo-29-2026";
 
 /** Balance at or below which the campaign addressed a user. */
-export const LOW_CREDIT_OFFER_THRESHOLD = 5;
+export const LOW_CREDIT_OFFER_THRESHOLD = 4;
 
 /**
  * Offer closes at midnight Tbilisi on 1 September 2026 (UTC+4). The deadline

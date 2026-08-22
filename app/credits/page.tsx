@@ -43,7 +43,9 @@ const SITE_URL: Record<UserLocale, string> = {
  * Credits hub — balance, the invite/earn loop, and (Phase 3) Stripe top-up.
  */
 export default async function CreditsPage() {
-  const user = await requireUser();
+  // Campaign emails link here directly. Preserve the destination for readers
+  // whose browser session expired so signing in still lands on their offer.
+  const user = await requireUser("/credits");
   // getUserLocale, not getRequestLocale: this surface has no `/am` prefix, so
   // the stored preference is the only way an Armenian user stays in Armenian
   // once signed in.

@@ -24,10 +24,14 @@ import {
  * Side effect: schedules a deferred `recordVisit()` write for admin activity
  * reporting.
  */
-export async function requireUser() {
+export async function requireUser(loginDestination?: string) {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/");
+    redirect(
+      loginDestination
+        ? `/login?next=${encodeURIComponent(loginDestination)}`
+        : "/",
+    );
   }
   const userId = session.user.id;
 
