@@ -512,6 +512,13 @@
       "when": 1787434232359,
       "tag": "0072_silly_smiling_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1787435071208,
+      "tag": "0073_add_georgian_editorial_articles",
+      "breakpoints": true
     }
   ]
 }
