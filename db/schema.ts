@@ -2445,3 +2445,56 @@ export const articles = pgTable(
 
 export type ArticleRow = typeof articles.$inferSelect;
 export type NewArticleRow = typeof articles.$inferInsert;
+
+/**
+ * Public discussion attached to an editorial article. Reading is public, while
+ * writes always require an authenticated, unrestricted Vivida account.
+ */
+export const articleComments = pgTable(
+  "article_comment",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    articleId: text("article_id")
+      .notNull()
+      .references(() => articles.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("article_comment_article_created_idx").on(
+      t.articleId,
+      t.createdAt,
+    ),
+    index("article_comment_user_created_idx").on(t.userId, t.createdAt),
+  ],
+);
+
+/** One toggleable like per user and article. */
+export const articleLikes = pgTable(
+  "article_like",
+  {
+    articleId: text("article_id")
+      .notNull()
+      .references(() => articles.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.articleId, t.userId] }),
+    index("article_like_article_idx").on(t.articleId),
+  ],
+);
+
+export type ArticleCommentRow = typeof articleComments.$inferSelect;
+export type ArticleLikeRow = typeof articleLikes.$inferSelect;

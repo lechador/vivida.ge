@@ -4,7 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock3, Compass } from "lucide-react";
 
+import { auth } from "@/auth";
 import { ArticleCard } from "@/components/articles/article-card";
+import { ArticleEngagement } from "@/components/articles/article-engagement";
 import { ArticleMarkdown, articleHeadings } from "@/components/articles/article-markdown";
 import { ReadingProgress } from "@/components/articles/reading-progress";
 import { Starfield } from "@/components/landing/starfield";
@@ -20,6 +22,7 @@ import {
   listRelatedArticles,
   readingMinutes,
 } from "@/lib/articles";
+import { getArticleEngagement } from "@/lib/article-engagement";
 import type { UserLocale } from "@/lib/i18n/locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
@@ -74,13 +77,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ArticlePage({ params }: Props) {
-  const [{ slug }, locale] = await Promise.all([params, getRequestLocale()]);
+  const [{ slug }, locale, session] = await Promise.all([
+    params,
+    getRequestLocale(),
+    auth(),
+  ]);
   const article = await getPublishedArticle(locale, slug);
   if (!article) notFound();
 
-  const [translations, related] = await Promise.all([
+  const [translations, related, engagement] = await Promise.all([
     getPublishedArticleTranslations(article.translationKey),
     listRelatedArticles(article),
+    getArticleEngagement(article.id, session?.user?.id),
   ]);
   const paths = new Map(translations.map((item) => [item.language, `/articles/${item.slug}`]));
   const headings = articleHeadings(article.content);
@@ -156,6 +164,14 @@ export default async function ArticlePage({ params }: Props) {
             )}
           </div>
         </article>
+
+        <ArticleEngagement
+          articleId={article.id}
+          locale={locale}
+          initial={engagement}
+          isAuthenticated={Boolean(session?.user?.id)}
+          loginHref={`/login?next=${encodeURIComponent(`${articlePath(locale, article.slug)}#discussion`)}`}
+        />
 
         <section className="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6 sm:pb-20">
           <div className="overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/30 bg-[radial-gradient(circle_at_15%_10%,oklch(0.65_0.24_305/0.22),transparent_45%),color-mix(in_oklch,var(--card)_70%,transparent)] p-7 sm:p-10">
