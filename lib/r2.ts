@@ -81,10 +81,12 @@ export async function putObject({
   key,
   body,
   contentType,
+  cacheControl,
 }: {
   key: string;
   body: Uint8Array | Buffer;
   contentType: string;
+  cacheControl?: string;
 }): Promise<void> {
   await client().send(
     new PutObjectCommand({
@@ -92,6 +94,7 @@ export async function putObject({
       Key: key,
       Body: body,
       ContentType: contentType,
+      CacheControl: cacheControl,
     })
   );
 }

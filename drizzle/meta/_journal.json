@@ -519,6 +519,13 @@
       "when": 1787435071208,
       "tag": "0073_add_georgian_editorial_articles",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1787468961021,
+      "tag": "0074_move_article_images_to_r2",
+      "breakpoints": true
     }
   ]
 }
