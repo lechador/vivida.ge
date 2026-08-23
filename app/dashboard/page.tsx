@@ -11,7 +11,9 @@ import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
+import { DashboardArticleRecommendations } from "@/components/dashboard/article-recommendations";
 import { TESTS } from "@/lib/tests-catalog";
+import { listPublishedArticlePreviews, type ArticlePreview } from "@/lib/articles";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { Metadata } from "next";
@@ -19,6 +21,23 @@ import type { Metadata } from "next";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return { title: locale !== "ka" ? "Today" : "დღეს" };
+}
+
+function pickDailyArticles(
+  articles: ArticlePreview[],
+  seed: number,
+  limit = 3,
+): ArticlePreview[] {
+  const shuffled = [...articles];
+  let state = seed || 1;
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;
+    const swapIndex = state % (index + 1);
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+
+  return shuffled.slice(0, limit);
 }
 
 export default async function DashboardPage() {
@@ -52,7 +71,10 @@ export default async function DashboardPage() {
     );
   }
 
-  const restricted = await isAccountRestricted(user.id);
+  const [restricted, publishedArticles] = await Promise.all([
+    isAccountRestricted(user.id),
+    listPublishedArticlePreviews(locale),
+  ]);
   const firstName = user.name?.split(" ")[0] ?? (am ? "աստղադիտող" : en ? "stargazer" : "ვარსკვლავო");
   const completed = new Set([
     ...(mbtiResult ? ["astro-mbti"] : []),
@@ -68,6 +90,7 @@ export default async function DashboardPage() {
   const dailySeed = `${user.id}:${new Date().toISOString().slice(0, 10)}`;
   const seedValue = [...dailySeed].reduce((sum, char) => (sum * 31 + char.charCodeAt(0)) >>> 0, 0);
   const suggestedTest = pool[seedValue % pool.length];
+  const suggestedArticles = pickDailyArticles(publishedArticles, seedValue);
 
   return (
     <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
@@ -101,6 +124,8 @@ export default async function DashboardPage() {
             stream closes immediately and the browser tab spinner stops.
             Our internal CosmicLoader covers the AI generation window. */}
         <DailyDashboard userId={user.id} locale={locale} />
+
+        <DashboardArticleRecommendations articles={suggestedArticles} locale={locale} />
 
         {suggestedTest && (
           <DashboardTestPromo test={suggestedTest} allCompleted={unfinished.length === 0} locale={locale} />

@@ -20,6 +20,10 @@ export const ARTICLE_CATEGORIES = [
 
 export type ArticleCategory = (typeof ARTICLE_CATEGORIES)[number];
 export type PublishedArticle = ArticleRow;
+export type ArticlePreview = Pick<
+  ArticleRow,
+  "id" | "language" | "slug" | "title" | "category" | "imageUrl" | "imageAlt"
+>;
 
 export const ARTICLE_CATEGORY_LABELS: Record<
   UserLocale,
@@ -84,6 +88,38 @@ export const listPublishedArticles = cache(
           .from(articles)
           .where(and(...conditions))
           .orderBy(desc(articles.featured), desc(articles.publishedAt))
+          .limit(limit),
+      [],
+    );
+  },
+);
+
+/** Minimal article payload for compact recommendation surfaces. */
+export const listPublishedArticlePreviews = cache(
+  async (locale: UserLocale, requestedLimit = 60): Promise<ArticlePreview[]> => {
+    const limit = Math.min(Math.max(requestedLimit, 1), 60);
+
+    return safely(
+      () =>
+        db
+          .select({
+            id: articles.id,
+            language: articles.language,
+            slug: articles.slug,
+            title: articles.title,
+            category: articles.category,
+            imageUrl: articles.imageUrl,
+            imageAlt: articles.imageAlt,
+          })
+          .from(articles)
+          .where(
+            and(
+              eq(articles.language, locale),
+              eq(articles.status, "published"),
+              lte(articles.publishedAt, new Date()),
+            ),
+          )
+          .orderBy(desc(articles.publishedAt))
           .limit(limit),
       [],
     );
