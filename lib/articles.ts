@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { and, desc, eq, lte, ne } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 
 import { db } from "@/db";
 import { articles, type ArticleRow } from "@/db/schema";
@@ -68,17 +69,32 @@ async function safely<T>(query: () => Promise<T>, fallback: T): Promise<T> {
   }
 }
 
-export const listPublishedArticles = cache(
+const ARTICLE_REVALIDATE_SECONDS = 300;
+
+function restoreDate(value: Date | string): Date {
+  return value instanceof Date ? value : new Date(value);
+}
+
+function restoreArticleDates(article: PublishedArticle): PublishedArticle {
+  return {
+    ...article,
+    publishedAt: article.publishedAt ? restoreDate(article.publishedAt) : null,
+    createdAt: restoreDate(article.createdAt),
+    updatedAt: restoreDate(article.updatedAt),
+  };
+}
+
+const listPublishedArticlesAcrossRequests = unstable_cache(
   async (
     locale: UserLocale,
-    options: { limit?: number; category?: ArticleCategory } = {},
+    limit: number,
+    category: ArticleCategory | null,
   ): Promise<PublishedArticle[]> => {
-    const limit = Math.min(Math.max(options.limit ?? 24, 1), 60);
     const conditions = [
       eq(articles.language, locale),
       eq(articles.status, "published"),
       lte(articles.publishedAt, new Date()),
-      options.category ? eq(articles.category, options.category) : undefined,
+      category ? eq(articles.category, category) : undefined,
     ].filter((value): value is NonNullable<typeof value> => Boolean(value));
 
     return safely(
@@ -92,13 +108,28 @@ export const listPublishedArticles = cache(
       [],
     );
   },
+  ["published-articles"],
+  { revalidate: ARTICLE_REVALIDATE_SECONDS, tags: ["articles"] },
+);
+
+export const listPublishedArticles = cache(
+  async (
+    locale: UserLocale,
+    options: { limit?: number; category?: ArticleCategory } = {},
+  ): Promise<PublishedArticle[]> => {
+    const limit = Math.min(Math.max(options.limit ?? 24, 1), 60);
+    const items = await listPublishedArticlesAcrossRequests(
+      locale,
+      limit,
+      options.category ?? null,
+    );
+    return items.map(restoreArticleDates);
+  },
 );
 
 /** Minimal article payload for compact recommendation surfaces. */
-export const listPublishedArticlePreviews = cache(
-  async (locale: UserLocale, requestedLimit = 60): Promise<ArticlePreview[]> => {
-    const limit = Math.min(Math.max(requestedLimit, 1), 60);
-
+const listPublishedArticlePreviewsAcrossRequests = unstable_cache(
+  async (locale: UserLocale, limit: number): Promise<ArticlePreview[]> => {
     return safely(
       () =>
         db
@@ -124,9 +155,18 @@ export const listPublishedArticlePreviews = cache(
       [],
     );
   },
+  ["published-article-previews"],
+  { revalidate: ARTICLE_REVALIDATE_SECONDS, tags: ["articles"] },
 );
 
-export const getPublishedArticle = cache(
+export const listPublishedArticlePreviews = cache(
+  async (locale: UserLocale, requestedLimit = 60): Promise<ArticlePreview[]> => {
+    const limit = Math.min(Math.max(requestedLimit, 1), 60);
+    return listPublishedArticlePreviewsAcrossRequests(locale, limit);
+  },
+);
+
+const getPublishedArticleAcrossRequests = unstable_cache(
   async (locale: UserLocale, slug: string): Promise<PublishedArticle | null> => {
     const rows = await safely(
       () =>
@@ -146,9 +186,18 @@ export const getPublishedArticle = cache(
     );
     return rows[0] ?? null;
   },
+  ["published-article"],
+  { revalidate: ARTICLE_REVALIDATE_SECONDS, tags: ["articles"] },
 );
 
-export const getPublishedArticleTranslations = cache(
+export const getPublishedArticle = cache(
+  async (locale: UserLocale, slug: string): Promise<PublishedArticle | null> => {
+    const article = await getPublishedArticleAcrossRequests(locale, slug);
+    return article ? restoreArticleDates(article) : null;
+  },
+);
+
+const getPublishedArticleTranslationsAcrossRequests = unstable_cache(
   async (translationKey: string): Promise<PublishedArticle[]> =>
     safely(
       () =>
@@ -164,43 +213,71 @@ export const getPublishedArticleTranslations = cache(
           ),
       [],
     ),
+  ["published-article-translations"],
+  { revalidate: ARTICLE_REVALIDATE_SECONDS, tags: ["articles"] },
 );
 
-export const listRelatedArticles = cache(
-  async (article: PublishedArticle, limit = 3): Promise<PublishedArticle[]> => {
-    const sameCategory = await safely(
+export const getPublishedArticleTranslations = cache(
+  async (translationKey: string): Promise<PublishedArticle[]> => {
+    const items = await getPublishedArticleTranslationsAcrossRequests(translationKey);
+    return items.map(restoreArticleDates);
+  },
+);
+
+const listSameCategoryArticlesAcrossRequests = unstable_cache(
+  async (
+    language: UserLocale,
+    category: string,
+    articleId: string,
+    limit: number,
+  ): Promise<PublishedArticle[]> =>
+    safely(
       () =>
         db
           .select()
           .from(articles)
           .where(
             and(
-              eq(articles.language, article.language),
+              eq(articles.language, language),
               eq(articles.status, "published"),
-              eq(articles.category, article.category),
-              ne(articles.id, article.id),
+              eq(articles.category, category),
+              ne(articles.id, articleId),
               lte(articles.publishedAt, new Date()),
             ),
           )
           .orderBy(desc(articles.publishedAt))
           .limit(limit),
       [],
+    ),
+  ["related-published-articles"],
+  { revalidate: ARTICLE_REVALIDATE_SECONDS, tags: ["articles"] },
+);
+
+export const listRelatedArticles = cache(
+  async (article: PublishedArticle, limit = 3): Promise<PublishedArticle[]> => {
+    const safeLimit = Math.min(Math.max(limit, 1), 12);
+    const cachedSameCategory = await listSameCategoryArticlesAcrossRequests(
+      article.language as UserLocale,
+      article.category,
+      article.id,
+      safeLimit,
     );
-    if (sameCategory.length >= limit) return sameCategory;
+    const sameCategory = cachedSameCategory.map(restoreArticleDates);
+    if (sameCategory.length >= safeLimit) return sameCategory;
 
     const excludedIds = new Set([article.id, ...sameCategory.map((item) => item.id)]);
     const recent = await listPublishedArticles(article.language as UserLocale, {
-      limit: limit + excludedIds.size,
+      limit: safeLimit + excludedIds.size,
     });
     return [
       ...sameCategory,
       ...recent.filter((item) => !excludedIds.has(item.id)),
-    ].slice(0, limit);
+    ].slice(0, safeLimit);
   },
 );
 
-export const listPublishedArticleSitemapItems = cache(async () =>
-  safely(
+const listPublishedArticleSitemapItemsAcrossRequests = unstable_cache(
+  async () => safely(
     () =>
       db
         .select({
@@ -219,6 +296,18 @@ export const listPublishedArticleSitemapItems = cache(async () =>
         .orderBy(desc(articles.publishedAt)),
     [],
   ),
+  ["published-article-sitemap-items"],
+  { revalidate: ARTICLE_REVALIDATE_SECONDS, tags: ["articles"] },
+);
+
+export const listPublishedArticleSitemapItems = cache(
+  async () => {
+    const items = await listPublishedArticleSitemapItemsAcrossRequests();
+    return items.map((item) => ({
+      ...item,
+      updatedAt: restoreDate(item.updatedAt),
+    }));
+  },
 );
 
 export function articlePath(locale: UserLocale, slug?: string): string {

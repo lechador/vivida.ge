@@ -666,10 +666,20 @@ function articleSitemapEntries(
     }));
 }
 
-function articleHubEntry(locale: "ka" | "en" | "am"): MetadataRoute.Sitemap[number] {
+function articleHubEntry(
+  locale: "ka" | "en" | "am",
+  all: SitemapArticle[],
+): MetadataRoute.Sitemap[number] {
+  const localeUpdates = all
+    .filter((item) => item.language === locale)
+    .map((item) => item.updatedAt.getTime());
+  const latestUpdate = localeUpdates.length
+    ? new Date(Math.max(...localeUpdates))
+    : CONTENT_PUBLISHED;
+
   return {
     url: articleUrl(locale),
-    lastModified: NOW,
+    lastModified: latestUpdate,
     changeFrequency: "weekly",
     priority: 0.86,
     alternates: {
@@ -871,12 +881,12 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
     ...numerologyPages,
     ...angelNumberPages,
     ...eqArticlePages,
-    articleHubEntry("en"),
+    articleHubEntry("en", articleItems),
     ...articleSitemapEntries(articleItems, new Set(["en"])),
     // Armenian shares this domain, so its URLs are declared here rather than
     // in a sitemap of their own.
     ...armenianSitemap(),
-    articleHubEntry("am"),
+    articleHubEntry("am", articleItems),
     ...articleSitemapEntries(articleItems, new Set(["am"])),
   ];
 
@@ -1029,7 +1039,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const georgianPages: MetadataRoute.Sitemap = [
-    articleHubEntry("ka"),
+    articleHubEntry("ka", articleItems),
     ...articleSitemapEntries(articleItems, new Set(["ka"])),
     {
       url: `${BASE}`,

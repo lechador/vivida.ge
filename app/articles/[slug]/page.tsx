@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock3, Compass } from "lucide-react";
+import { ChevronRight, Clock3, Compass } from "lucide-react";
 
-import { auth } from "@/auth";
 import { ArticleCard } from "@/components/articles/article-card";
 import { ArticleEngagement } from "@/components/articles/article-engagement";
 import { ArticleMarkdown, articleHeadings } from "@/components/articles/article-markdown";
@@ -22,7 +21,6 @@ import {
   listRelatedArticles,
   readingMinutes,
 } from "@/lib/articles";
-import { getArticleEngagement } from "@/lib/article-engagement";
 import type { UserLocale } from "@/lib/i18n/locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
@@ -67,9 +65,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       url: articleUrl(locale, article.slug),
+      section: ARTICLE_CATEGORY_LABELS[locale][article.category as keyof (typeof ARTICLE_CATEGORY_LABELS)[typeof locale]],
       publishedTime: article.publishedAt?.toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
       authors: [article.authorName],
+      tags: [ARTICLE_CATEGORY_LABELS[locale][article.category as keyof (typeof ARTICLE_CATEGORY_LABELS)[typeof locale]]],
       images: [{ url: article.imageUrl, alt: article.imageAlt, width: 1440, height: 810 }],
     },
     twitter: { card: "summary_large_image", title, description, images: [article.imageUrl] },
@@ -77,22 +77,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ArticlePage({ params }: Props) {
-  const [{ slug }, locale, session] = await Promise.all([
-    params,
-    getRequestLocale(),
-    auth(),
-  ]);
+  const [{ slug }, locale] = await Promise.all([params, getRequestLocale()]);
   const article = await getPublishedArticle(locale, slug);
   if (!article) notFound();
 
-  const [translations, related, engagement] = await Promise.all([
+  const [translations, related] = await Promise.all([
     getPublishedArticleTranslations(article.translationKey),
     listRelatedArticles(article),
-    getArticleEngagement(article.id, session?.user?.id),
   ]);
   const paths = new Map(translations.map((item) => [item.language, `/articles/${item.slug}`]));
   const headings = articleHeadings(article.content);
   const copy = COPY[locale];
+  const canonical = articleUrl(locale, article.slug);
+  const siteRoot = articleUrl(locale).replace(/\/articles$/, "");
+  const categoryLabel = ARTICLE_CATEGORY_LABELS[locale][article.category as keyof (typeof ARTICLE_CATEGORY_LABELS)[typeof locale]];
   const ld = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -102,11 +100,47 @@ export default async function ArticlePage({ params }: Props) {
     datePublished: article.publishedAt?.toISOString(),
     dateModified: article.updatedAt.toISOString(),
     inLanguage: locale === "am" ? "hy-AM" : locale === "ka" ? "ka-GE" : "en",
-    author: { "@type": "Organization", name: article.authorName },
-    publisher: { "@type": "Organization", name: "Vivida", url: articleUrl(locale).replace(/\/articles$/, "") },
-    mainEntityOfPage: articleUrl(locale, article.slug),
-    articleSection: ARTICLE_CATEGORY_LABELS[locale][article.category as keyof (typeof ARTICLE_CATEGORY_LABELS)[typeof locale]],
+    author: {
+      "@type": "Organization",
+      name: article.authorName,
+      url: siteRoot,
+    },
+    publisher: {
+      "@type": "Organization",
+      "@id": `${siteRoot}/#organization`,
+      name: "Vivida",
+      url: siteRoot,
+      logo: { "@type": "ImageObject", url: `${siteRoot}/apple-icon.png` },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
+    articleSection: categoryLabel,
+    isAccessibleForFree: true,
   };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Vivida",
+        item: siteRoot,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: copy.back,
+        item: articleUrl(locale),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: article.title,
+        item: canonical,
+      },
+    ],
+  };
+  const homePath = locale === "am" ? "/am" : "/";
 
   return (
     <div className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -122,12 +156,18 @@ export default async function ArticlePage({ params }: Props) {
       />
       <main className="relative z-10 flex-1">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
         <article>
           <header className="mx-auto w-full max-w-5xl px-4 pb-8 pt-10 sm:px-6 sm:pb-12 sm:pt-16">
-            <Link href={articlePath(locale)} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-              <ArrowLeft className="size-4" aria-hidden /> {copy.back}
-            </Link>
+            <nav
+              aria-label={locale === "ka" ? "სანავიგაციო გზა" : locale === "am" ? "Նավիգացիոն ուղի" : "Breadcrumb"}
+              className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground"
+            >
+              <Link href={homePath} className="transition-colors hover:text-foreground">Vivida</Link>
+              <ChevronRight className="size-3.5" aria-hidden />
+              <Link href={articlePath(locale)} className="transition-colors hover:text-foreground">{copy.back}</Link>
+            </nav>
             <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-muted-foreground sm:text-sm">
               <Link href={`${articlePath(locale)}?category=${article.category}`} className="rounded-full border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/10 px-3 py-1.5 font-semibold text-[var(--vivida-violet)]">
                 {ARTICLE_CATEGORY_LABELS[locale][article.category as keyof (typeof ARTICLE_CATEGORY_LABELS)[typeof locale]]}
@@ -168,8 +208,6 @@ export default async function ArticlePage({ params }: Props) {
         <ArticleEngagement
           articleId={article.id}
           locale={locale}
-          initial={engagement}
-          isAuthenticated={Boolean(session?.user?.id)}
           loginHref={`/login?next=${encodeURIComponent(`${articlePath(locale, article.slug)}#discussion`)}`}
         />
 

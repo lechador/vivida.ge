@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import {
   addArticleComment,
   ARTICLE_COMMENT_MAX,
+  getArticleEngagement,
 } from "@/lib/article-engagement";
 
 export const runtime = "nodejs";
@@ -11,6 +12,26 @@ export const runtime = "nodejs";
 const Body = z.object({
   body: z.string().min(1).max(ARTICLE_COMMENT_MAX),
 });
+
+export async function GET(
+  _request: Request,
+  context: { params: Promise<{ id: string }> },
+) {
+  try {
+    const [session, { id }] = await Promise.all([auth(), context.params]);
+    const engagement = await getArticleEngagement(id, session?.user?.id);
+    return Response.json(
+      {
+        ...engagement,
+        isAuthenticated: Boolean(session?.user?.id),
+      },
+      { headers: { "Cache-Control": "private, no-store" } },
+    );
+  } catch (error) {
+    console.error("[articles.comments.read] failed", error);
+    return Response.json({ error: "comments_failed" }, { status: 500 });
+  }
+}
 
 export async function POST(
   request: Request,

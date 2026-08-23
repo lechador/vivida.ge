@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Heart, Loader2, MessageCircle, Send } from "lucide-react";
@@ -70,9 +70,16 @@ type ClientComment = Omit<ArticleComment, "createdAt"> & {
 type Props = {
   articleId: string;
   locale: UserLocale;
-  initial: ArticleEngagement;
-  isAuthenticated: boolean;
   loginHref: string;
+};
+
+type EngagementPayload = ArticleEngagement & { isAuthenticated: boolean };
+
+const EMPTY_ENGAGEMENT: ArticleEngagement = {
+  likeCount: 0,
+  commentCount: 0,
+  viewerLiked: false,
+  comments: [],
 };
 
 function commentDate(value: Date | string, locale: UserLocale): string {
@@ -97,22 +104,56 @@ async function responseError(response: Response, fallback: string) {
 export function ArticleEngagement({
   articleId,
   locale,
-  initial,
-  isAuthenticated,
   loginHref,
 }: Props) {
   const copy = COPY[locale];
   const router = useRouter();
-  const [liked, setLiked] = useState(initial.viewerLiked);
-  const [likeCount, setLikeCount] = useState(initial.likeCount);
-  const [commentCount, setCommentCount] = useState(initial.commentCount);
-  const [comments, setComments] = useState<ClientComment[]>(initial.comments);
+  const [liked, setLiked] = useState(EMPTY_ENGAGEMENT.viewerLiked);
+  const [likeCount, setLikeCount] = useState(EMPTY_ENGAGEMENT.likeCount);
+  const [commentCount, setCommentCount] = useState(EMPTY_ENGAGEMENT.commentCount);
+  const [comments, setComments] = useState<ClientComment[]>(EMPTY_ENGAGEMENT.comments);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [engagementReady, setEngagementReady] = useState(false);
   const [body, setBody] = useState("");
   const [likePending, setLikePending] = useState(false);
   const [commentPending, setCommentPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+
+    fetch(`/api/articles/${articleId}/comments`, {
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("engagement_failed");
+        return response.json() as Promise<EngagementPayload>;
+      })
+      .then((payload) => {
+        if (!active) return;
+        setLiked(payload.viewerLiked);
+        setLikeCount(payload.likeCount);
+        setCommentCount(payload.commentCount);
+        setComments(payload.comments);
+        setIsAuthenticated(payload.isAuthenticated);
+      })
+      .catch(() => {
+        // The article remains fully readable if engagement is unavailable.
+      })
+      .finally(() => {
+        if (active) setEngagementReady(true);
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [articleId]);
+
   async function toggleLike() {
+    if (!engagementReady) return;
     if (!isAuthenticated) {
       router.push(loginHref);
       return;
@@ -203,7 +244,7 @@ export function ArticleEngagement({
           <button
             type="button"
             onClick={toggleLike}
-            disabled={likePending}
+            disabled={!engagementReady || likePending}
             aria-pressed={liked}
             aria-label={liked ? copy.unlike : copy.like}
             className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all disabled:cursor-wait disabled:opacity-70 ${
@@ -221,7 +262,12 @@ export function ArticleEngagement({
           </button>
         </div>
 
-        {isAuthenticated ? (
+        {!engagementReady ? (
+          <div
+            className="vivida-pulse-soft mt-6 h-24 rounded-2xl border border-border/60 bg-background/25"
+            aria-hidden
+          />
+        ) : isAuthenticated ? (
           <form onSubmit={publishComment} className="mt-6">
             <label htmlFor="article-comment" className="sr-only">
               {copy.placeholder}
@@ -275,7 +321,12 @@ export function ArticleEngagement({
         )}
 
         <div className="mt-7 space-y-5" aria-live="polite">
-          {comments.length === 0 ? (
+          {!engagementReady ? (
+            <div
+              className="vivida-pulse-soft h-20 rounded-2xl border border-border/60 bg-background/25"
+              aria-hidden
+            />
+          ) : comments.length === 0 ? (
             <div className="flex items-center gap-3 rounded-2xl border border-dashed border-border/70 p-5 text-sm text-muted-foreground">
               <MessageCircle className="size-5 shrink-0" aria-hidden />
               {copy.empty}
