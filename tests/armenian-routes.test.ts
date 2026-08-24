@@ -95,6 +95,25 @@ describe("Armenian hreflang gating", () => {
       `${ENGLISH_SITE_URL}/am/zodiac`,
     );
   });
+
+  it("self-canonicalizes translated aliases at their public URL", () => {
+    expect(
+      localizedAlternates(
+        "/am/zodiac/amomavali",
+        "/zodiac/amomavali",
+        "am",
+      ).canonical,
+    ).toBe(`${ENGLISH_SITE_URL}/am/zodiac/rising-sign`);
+    expect(
+      localizedAlternates(
+        "/am/zodiac/tavsebadoba/aries-scorpio",
+        "/zodiac/tavsebadoba/aries-scorpio",
+        "am",
+      ).canonical,
+    ).toBe(
+      `${ENGLISH_SITE_URL}/am/zodiac/compatibility/aries-scorpio`,
+    );
+  });
 });
 
 describe("Armenian billing", () => {

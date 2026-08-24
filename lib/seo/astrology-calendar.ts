@@ -1,6 +1,15 @@
 import { computeMundaneSky, type MundaneAspect, type MundaneSky } from "@/lib/mundane-sky";
 
-export const CALENDAR_DAYS = 90;
+/**
+ * Keep the browsable calendar useful without publishing a large block of
+ * low-demand future-date URLs. Individual days are deterministic, so a
+ * rolling month gives readers enough planning range while keeping crawl
+ * signals focused on dates that can earn impressions soon.
+ */
+export const CALENDAR_DAYS = 30;
+
+/** Only the nearest dates get the stronger sitemap discovery signal. */
+export const SITEMAP_CALENDAR_DAYS = 14;
 export const MONTHS_KA = [
   "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
   "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი",

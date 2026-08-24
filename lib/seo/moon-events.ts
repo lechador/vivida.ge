@@ -5,6 +5,16 @@ export type MoonEventKind = "full" | "new";
 export type MoonEvent = { kind: MoonEventKind; date: Date; iso: string; label: string; snapshot: MoonPhaseSnapshot; exactTimeKa: string };
 const eventCache = new Map<string, MoonEvent[]>();
 
+/**
+ * Publish detail pages only when an event is close enough to be useful. The
+ * previous 550-day window created many orphan-like future URLs that Google
+ * discovered but did not crawl.
+ */
+export const MOON_EVENT_DAYS = 210;
+
+/** The sitemap prioritises roughly the next four lunations of each kind. */
+export const SITEMAP_MOON_EVENT_DAYS = 120;
+
 function tbilisiStart() {
   const iso = new Date(Date.now() + 4 * 3600000).toISOString().slice(0, 10);
   return new Date(`${iso}T00:00:00Z`);
@@ -26,7 +36,7 @@ function refine(day: Date, kind: MoonEventKind) {
   return best;
 }
 
-export function moonEvents(kind: MoonEventKind, days = 550) {
+export function moonEvents(kind: MoonEventKind, days = MOON_EVENT_DAYS) {
   const cacheKey = `${kind}-${days}`;
   const cached = eventCache.get(cacheKey);
   if (cached) return cached;

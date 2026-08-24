@@ -249,8 +249,8 @@ export function MoonPhaseDetailAm({ event }: { event: MoonEvent }) {
       url,
       headline: `${cfg.title} — ${date}`,
       description: meaning,
-      datePublished: `${event.iso}T00:00:00Z`,
-      dateModified: `${event.iso}T00:00:00Z`,
+      datePublished: "2026-08-17T00:00:00Z",
+      dateModified: "2026-08-24T00:00:00Z",
     }),
     breadcrumbLd([
       { name: "Գլխավոր", url: SITE },

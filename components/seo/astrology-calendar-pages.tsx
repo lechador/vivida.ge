@@ -30,9 +30,9 @@ export function AstrologyCalendarHub({ filter = "all" }: { filter?: "all" | "luc
   const lucky = all.filter((day) => day.tone === "lucky").slice(0, 5);
   const careful = all.filter((day) => day.tone === "careful").slice(0, 5);
   const config = filter === "lucky"
-    ? { title: "იღბლიანი დღეები", intro: "მომდევნო 90 დღეში ჰარმონიული ასპექტებით გამორჩეული თარიღები — დაგეგმვისთვის, ახალი ნაბიჯებისა და მნიშვნელოვანი საუბრებისთვის.", icon: Sparkles, url: "/ighbliani-dgheebi" }
+    ? { title: "იღბლიანი დღეები", intro: "მომდევნო 30 დღეში ჰარმონიული ასპექტებით გამორჩეული თარიღები — დაგეგმვისთვის, ახალი ნაბიჯებისა და მნიშვნელოვანი საუბრებისთვის.", icon: Sparkles, url: "/ighbliani-dgheebi" }
     : filter === "careful"
-      ? { title: "ფრთხილი დღეები", intro: "მომდევნო 90 დღეში დაძაბული ასპექტებით გამორჩეული თარიღები — მეტი დაკვირვების, გადამოწმებისა და მშვიდი რეაგირებისთვის.", icon: ShieldAlert, url: "/frtxili-dgheebi" }
+      ? { title: "ფრთხილი დღეები", intro: "მომდევნო 30 დღეში დაძაბული ასპექტებით გამორჩეული თარიღები — მეტი დაკვირვების, გადამოწმებისა და მშვიდი რეაგირებისთვის.", icon: ShieldAlert, url: "/frtxili-dgheebi" }
       : { title: "ასტროლოგიური კალენდარი", intro: "ყოველი დღის პლანეტარული ასპექტები, ხელსაყრელი და ფრთხილი თარიღები. დაგეგმე მომდევნო 30 დღე რეალურ ტრანზიტებზე დაფუძნებული საერთო ცის სურათით.", icon: CalendarDays, url: "/astrologiuri-kalendari" };
   const faq = [
     { q: "როგორ ითვლება დღის ასტროლოგიური ინდექსი?", a: "ინდექსი ითვალისწინებს იმ დღის პლანეტათაშორის ჰარმონიულ და დაძაბულ ასპექტებს, მათ სიზუსტესა და მონაწილე პლანეტებს. ეს საერთო ცის შეფასებაა და არა პირადი პროგნოზი." },
@@ -57,7 +57,7 @@ export function AstrologyCalendarDetail({ date }: { date: Date }) {
   const day = astrologyDay(date); const advice = dayAdvice(day); const tone = TONE[day.tone];
   const url = `${SITE}/astrologiuri-kalendari/${day.iso}`;
   const faq = [{ q: `${day.shortLabel} იღბლიანი დღეა?`, a: `${advice.title}: ${advice.summary}` }, { q: "ეს პროგნოზი ყველა ადამიანისთვის ერთნაირია?", a: "გვერდი საერთო ცის ასპექტებს აღწერს. პირადი გამოცდილება ნატალური რუკის, მდებარეობისა და ინდივიდუალური გარემოებების მიხედვით განსხვავდება." }];
-  const ld = [articleLd({ url, headline: `${day.label} — დღის ასტროლოგიური პროგნოზი`, description: advice.summary, datePublished: `${day.iso}T00:00:00+04:00`, dateModified: `${day.iso}T00:00:00+04:00` }), breadcrumbLd([{ name: "მთავარი", url: SITE }, { name: "ასტროლოგიური კალენდარი", url: `${SITE}/astrologiuri-kalendari` }, { name: day.label, url }]), faqLd(faq)];
+  const ld = [articleLd({ url, headline: `${day.label} — დღის ასტროლოგიური პროგნოზი`, description: advice.summary, datePublished: "2026-07-21T00:00:00+04:00", dateModified: "2026-08-24T00:00:00+04:00" }), breadcrumbLd([{ name: "მთავარი", url: SITE }, { name: "ასტროლოგიური კალენდარი", url: `${SITE}/astrologiuri-kalendari` }, { name: day.label, url }]), faqLd(faq)];
   return <main className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={90} shooting={1} /><SmartHeader /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeLd(ld) }} />
     <article className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12"><nav className="text-xs text-muted-foreground"><Link href="/astrologiuri-kalendari" className="hover:text-foreground">ასტროლოგიური კალენდარი</Link> / {day.label}</nav>
       <header className="mt-6 rounded-3xl border border-border bg-card/60 p-6 sm:p-9"><p className="text-sm" style={{ color: tone.color }}>{tone.icon} {advice.title} · ინდექსი {day.score}/100</p><h1 className="mt-3 text-balance text-3xl font-semibold sm:text-4xl">{day.label} — დღის ასტროლოგიური პროგნოზი</h1><p className="mt-4 text-lg leading-8 text-foreground/80">{day.lead}</p><p className="mt-3 leading-7 text-foreground/75">{advice.summary}</p></header>

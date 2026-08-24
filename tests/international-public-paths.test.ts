@@ -23,6 +23,8 @@ describe("international public URL vocabulary", () => {
       "/zodiac/aquarius/next-month-horoscope",
     ],
     ["/astrologiuri-saxlebi/6", "/astrology-houses/6"],
+    ["/zodiac/amomavali", "/zodiac/rising-sign"],
+    ["/zodiac/amomavali/cancer", "/zodiac/rising-sign/cancer"],
     [
       "/zodiac/tavsebadoba/aries-leo",
       "/zodiac/compatibility/aries-leo",
@@ -88,5 +90,14 @@ describe("international public URL vocabulary", () => {
       armenian: "https://www.vividaastro.com/am/moon-calendar",
       georgian: "https://www.vivida.ge/astrologiuri-kalendari",
     });
+  });
+
+  it("keeps the Search Console canonical examples on clean Armenian URLs", () => {
+    expect(withArmenianPrefix("/zodiac/amomavali")).toBe(
+      "/am/zodiac/rising-sign",
+    );
+    expect(withArmenianPrefix("/zodiac/tavsebadoba/aries-scorpio")).toBe(
+      "/am/zodiac/compatibility/aries-scorpio",
+    );
   });
 });
