@@ -396,7 +396,7 @@ function DbNotificationRow({
   const isRelationship = n.kind === "relationship_connected" || n.kind === "relationship_weekly" || n.kind === "relationship_transit";
   const isReminder = n.kind === "timing_reminder" || n.kind === "forecast_reminder";
   const href =
-    isReminder && n.payload?.reminderUrl
+    (isReminder || isRelationship) && n.payload?.reminderUrl
       ? n.payload.reminderUrl
       : isRelationship && n.payload?.partnerId
       ? `/synastry/${n.payload.partnerId}`

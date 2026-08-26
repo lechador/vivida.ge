@@ -7,6 +7,8 @@ import { createCreditCheckoutSession, isStripeConfigured } from "@/lib/stripe";
 import { localeForHost } from "@/lib/i18n/request-locale";
 import { checkoutTrackingFromRequest, checkoutTrackingMetadata, trackCheckoutStarted } from "@/lib/checkout-tracking";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
+import { EXPERIMENTS } from "@/lib/experiment-catalog";
+import { recordExperimentOutcomesBestEffort } from "@/lib/experiment-outcomes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,6 +56,13 @@ export async function POST(req: Request) {
       trackingMetadata: checkoutTrackingMetadata(tracking),
       returnTo,
     });
+    await recordExperimentOutcomesBestEffort(
+      userId,
+      [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
+      "checkout_started",
+      "credits_checkout",
+      checkout.id,
+    );
     if (tracking.allowed) after(() => trackCheckoutStarted({
       session: checkout,
       tracking,

@@ -22,6 +22,12 @@ import { localDateString } from "@/lib/transits";
 import { localScheduleParts } from "@/lib/reminder-config";
 import { sendPersonalReminderEmail } from "@/lib/email";
 import { isBlockedEitherWay } from "@/lib/block";
+import { sendPushToUser } from "@/lib/push";
+import {
+  claimReminderDelivery,
+  finishReminderDelivery,
+  trackedReminderPath,
+} from "@/lib/reminder-delivery";
 
 async function claimDelivery(partnerId: string, userId: string, deliveryKey: string): Promise<boolean> {
   const [claimed] = await db.insert(relationshipNotificationDeliveries).values({
@@ -30,6 +36,84 @@ async function claimDelivery(partnerId: string, userId: string, deliveryKey: str
     deliveryKey,
   }).onConflictDoNothing().returning({ id: relationshipNotificationDeliveries.id });
   return Boolean(claimed);
+}
+
+async function deliverRelationshipChannels(input: {
+  userId: string;
+  email: string | null;
+  name: string | null;
+  locale: ReturnType<typeof normalizeUserLocale>;
+  kind: "relationship_weekly" | "relationship_transit";
+  deliveryKey: string;
+  path: string;
+  title: string;
+  body: string;
+  payload: { partnerId: string; partnerName: string; relationshipHeadline?: string; transitTitle?: string };
+  pushEnabled: boolean;
+  emailEnabled: boolean;
+}): Promise<void> {
+  const topic = "relationship";
+  const inAppId = await claimReminderDelivery({
+    userId: input.userId,
+    topic,
+    channel: "in_app",
+    deliveryKey: input.deliveryKey,
+    destination: input.path,
+  });
+  if (inAppId) {
+    try {
+      await emitRelationshipNotification(input.userId, input.kind, {
+        ...input.payload,
+        reminderUrl: trackedReminderPath(inAppId),
+      }, { push: false });
+      await finishReminderDelivery(inAppId, true);
+    } catch (error) {
+      await finishReminderDelivery(inAppId, false);
+      console.warn("[relationship-reminders] in-app delivery failed:", error);
+    }
+  }
+
+  if (input.pushEnabled) {
+    const pushId = await claimReminderDelivery({
+      userId: input.userId,
+      topic,
+      channel: "push",
+      deliveryKey: input.deliveryKey,
+      destination: input.path,
+    });
+    if (pushId) {
+      const sent = await sendPushToUser(input.userId, {
+        title: input.title,
+        body: input.body,
+        url: trackedReminderPath(pushId),
+        tag: `${input.kind}-${input.payload.partnerId}`,
+      });
+      await finishReminderDelivery(pushId, sent > 0);
+    }
+  }
+
+  if (input.emailEnabled && input.email) {
+    const emailId = await claimReminderDelivery({
+      userId: input.userId,
+      topic,
+      channel: "email",
+      deliveryKey: input.deliveryKey,
+      destination: input.path,
+    });
+    if (emailId) {
+      const sent = await sendPersonalReminderEmail({
+        userId: input.userId,
+        to: input.email,
+        name: input.name,
+        title: input.title,
+        body: input.body,
+        path: trackedReminderPath(emailId),
+        locale: input.locale,
+        idempotencyKey: `relationship:${input.kind}:${input.userId}:${input.deliveryKey}`,
+      });
+      await finishReminderDelivery(emailId, sent);
+    }
+  }
 }
 
 /** Daily, idempotent dispatcher for opt-in recurring relationship events. */
@@ -110,19 +194,20 @@ export async function deliverRelationshipUpdates(
           ...payloadBase,
           relationshipHeadline: weekly.headline,
         };
-        await emitRelationshipNotification(subscription.userId, "relationship_weekly", payload, { push: pushEnabled });
-        if (emailEnabled && row.email) {
-          await sendPersonalReminderEmail({
-            userId: subscription.userId,
-            to: row.email,
-            name: row.name,
-            title: locale === "ka" ? "ურთიერთობის ახალი კვირა" : "Your weekly relationship update",
-            body: weekly.headline,
-            path: `/synastry/${partner.id}`,
-            locale,
-            idempotencyKey: `relationship:weekly:${subscription.userId}:${partner.id}:${weekly.weekStart}:${locale}`,
-          });
-        }
+        await deliverRelationshipChannels({
+          userId: subscription.userId,
+          email: row.email,
+          name: row.name,
+          locale,
+          kind: "relationship_weekly",
+          deliveryKey: `${partner.id}:${key}`,
+          path: `/synastry/${partner.id}`,
+          title: locale === "ka" ? "ურთიერთობის ახალი კვირა" : "Your weekly relationship update",
+          body: weekly.headline,
+          payload,
+          pushEnabled,
+          emailEnabled,
+        });
         weeklySent += 1;
       }
     }
@@ -136,19 +221,20 @@ export async function deliverRelationshipUpdates(
           ...payloadBase,
           transitTitle: notable.title,
         };
-        await emitRelationshipNotification(subscription.userId, "relationship_transit", payload, { push: pushEnabled });
-        if (emailEnabled && row.email) {
-          await sendPersonalReminderEmail({
-            userId: subscription.userId,
-            to: row.email,
-            name: row.name,
-            title: locale === "ka" ? "ურთიერთობის მნიშვნელოვანი ტრანზიტი" : "Important relationship transit",
-            body: `${notable.title}. ${notable.meaning}`,
-            path: `/synastry/${partner.id}`,
-            locale,
-            idempotencyKey: `relationship:transit:${subscription.userId}:${partner.id}:${notable.key}:${locale}`,
-          });
-        }
+        await deliverRelationshipChannels({
+          userId: subscription.userId,
+          email: row.email,
+          name: row.name,
+          locale,
+          kind: "relationship_transit",
+          deliveryKey: `${partner.id}:${key}`,
+          path: `/synastry/${partner.id}`,
+          title: locale === "ka" ? "ურთიერთობის მნიშვნელოვანი ტრანზიტი" : "Important relationship transit",
+          body: `${notable.title}. ${notable.meaning}`,
+          payload,
+          pushEnabled,
+          emailEnabled,
+        });
         transitsSent += 1;
       }
     }

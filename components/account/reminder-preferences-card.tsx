@@ -10,6 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import type { ReminderPreferences } from "@/lib/reminder-config";
+import { EXPERIMENTS } from "@/lib/experiment-catalog";
+import { useExperiment } from "@/lib/use-experiment";
 import { cn } from "@/lib/utils";
 
 const WEEKDAYS = {
@@ -37,6 +39,7 @@ export function ReminderPreferencesCard({
   const [isPending, startTransition] = useTransition();
   const dirty = JSON.stringify(prefs) !== JSON.stringify(baseline);
   const calendarPath = calendarToken ? `/api/calendar/${calendarToken}` : null;
+  const promptVariant = useExperiment(EXPERIMENTS.reminderPrompt, "account_reminder_settings");
 
   const topics = useMemo(() => [
     {
@@ -92,7 +95,7 @@ export function ReminderPreferencesCard({
     <section className="rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
       <header className="mb-5 flex items-start gap-3">
         <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--vivida-violet)]/12 text-[var(--vivida-violet)]"><BellRing className="size-5" /></div>
-        <div><h2 className="text-lg font-semibold">{am ? "Անձնական հիշեցումներ" : en ? "Personal reminders" : "პერსონალური შეხსენებები"}</h2><p className="mt-1 text-sm text-muted-foreground">{am ? "Ընտրեք թեման, ալիքը և ձեր տեղական ժամը։" : en ? "Choose the topic, channel and your local delivery time." : "აირჩიე თემა, არხი და შენს ადგილობრივ დროზე მიწოდების საათი."}</p></div>
+        <div><h2 className="text-lg font-semibold">{am ? "Անձնական հիշեցումներ" : en ? "Personal reminders" : "პერსონალური შეხსენებები"}</h2><p className="mt-1 text-sm text-muted-foreground">{promptVariant === "benefit_first" ? (am ? "Ստացեք Ձեր քարտեզի կարևոր պահերը ճիշտ ժամանակին՝ Ձեր ընտրած ալիքով։" : en ? "Receive the moments that matter in your chart, at the time and channel you choose." : "მიიღე შენი რუკის მნიშვნელოვანი მომენტები სწორ დროს, შენს არჩეულ არხში.") : (am ? "Ընտրեք թեման, ալիքը և ձեր տեղական ժամը։" : en ? "Choose the topic, channel and your local delivery time." : "აირჩიე თემა, არხი და შენს ადგილობრივ დროზე მიწოდების საათი.")}</p></div>
       </header>
 
       <div className="space-y-3">

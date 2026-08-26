@@ -10,6 +10,8 @@ import {
 import { checkoutTrackingFromRequest, checkoutTrackingMetadata, trackCheckoutStarted } from "@/lib/checkout-tracking";
 import { getLowCreditOffer } from "@/lib/promo-offer";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
+import { EXPERIMENTS } from "@/lib/experiment-catalog";
+import { recordExperimentOutcomesBestEffort } from "@/lib/experiment-outcomes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -51,6 +53,13 @@ export async function POST(req: Request) {
       trackingMetadata: checkoutTrackingMetadata(tracking),
       returnTo,
     });
+    await recordExperimentOutcomesBestEffort(
+      userId,
+      [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
+      "checkout_started",
+      "subscription_checkout",
+      checkout.id,
+    );
     if (tracking.allowed) after(() => trackCheckoutStarted({
       session: checkout,
       tracking,

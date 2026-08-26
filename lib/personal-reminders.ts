@@ -17,15 +17,14 @@ import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { sendPushToUser } from "@/lib/push";
 import { deliverRelationshipUpdates } from "@/lib/relationship-notifications";
 import { localScheduleParts } from "@/lib/reminder-config";
+import {
+  claimReminderDelivery,
+  finishReminderDelivery,
+  trackedReminderPath,
+} from "@/lib/reminder-delivery";
 import { computeTiming } from "@/lib/timing";
 
 type ReminderCopy = { title: string; body: string; path: string };
-
-async function claim(userId: string, topic: string, channel: string, deliveryKey: string): Promise<boolean> {
-  const [row] = await db.insert(reminderDeliveries).values({ userId, topic, channel, deliveryKey })
-    .onConflictDoNothing().returning({ id: reminderDeliveries.id });
-  return Boolean(row);
-}
 
 async function insertBell(userId: string, kind: "timing_reminder" | "forecast_reminder", copy: ReminderCopy): Promise<void> {
   await db.insert(notifications).values({
@@ -49,30 +48,45 @@ async function deliverChannels(input: {
   copy: ReminderCopy;
 }): Promise<{ push: number; email: number }> {
   const kind = input.topic === "timing" ? "timing_reminder" : "forecast_reminder";
-  if (await claim(input.userId, input.topic, "in_app", input.deliveryKey)) {
-    await insertBell(input.userId, kind, input.copy);
+  const inAppId = await claimReminderDelivery({ userId: input.userId, topic: input.topic, channel: "in_app", deliveryKey: input.deliveryKey, destination: input.copy.path });
+  if (inAppId) {
+    try {
+      await insertBell(input.userId, kind, { ...input.copy, path: trackedReminderPath(inAppId) });
+      await finishReminderDelivery(inAppId, true);
+    } catch (error) {
+      await finishReminderDelivery(inAppId, false);
+      console.warn("[reminders] in-app delivery failed:", error);
+    }
   }
   let push = 0;
   let email = 0;
-  if (input.push && await claim(input.userId, input.topic, "push", input.deliveryKey)) {
+  const pushId = input.push
+    ? await claimReminderDelivery({ userId: input.userId, topic: input.topic, channel: "push", deliveryKey: input.deliveryKey, destination: input.copy.path })
+    : null;
+  if (pushId) {
     push = await sendPushToUser(input.userId, {
       title: input.copy.title,
       body: input.copy.body,
-      url: input.copy.path,
+      url: trackedReminderPath(pushId),
       tag: `personal-${input.topic}`,
     });
+    await finishReminderDelivery(pushId, push > 0);
   }
-  if (input.emailEnabled && input.emailAllowed && input.email && await claim(input.userId, input.topic, "email", input.deliveryKey)) {
+  const emailId = input.emailEnabled && input.emailAllowed && input.email
+    ? await claimReminderDelivery({ userId: input.userId, topic: input.topic, channel: "email", deliveryKey: input.deliveryKey, destination: input.copy.path })
+    : null;
+  if (emailId && input.email) {
     email = await sendPersonalReminderEmail({
       userId: input.userId,
       to: input.email,
       name: input.name,
       title: input.copy.title,
       body: input.copy.body,
-      path: input.copy.path,
+      path: trackedReminderPath(emailId),
       locale: input.locale,
       idempotencyKey: `personal:${input.topic}:${input.userId}:${input.deliveryKey}`,
     }) ? 1 : 0;
+    await finishReminderDelivery(emailId, email > 0);
   }
   return { push, email };
 }

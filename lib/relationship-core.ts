@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createHash, randomBytes } from "node:crypto";
-import { and, desc, eq, gte, inArray, isNull, or } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull, ne, or } from "drizzle-orm";
 
 import { ensureChartFor } from "@/actions/chart";
 import { db } from "@/db";
@@ -9,6 +9,7 @@ import {
   notifications,
   partners,
   relationshipCheckinAnswers,
+  reminderPreferenceEvents,
   relationshipSubscriptions,
   relationshipWeeklyUpdates,
   users,
@@ -327,6 +328,30 @@ export async function setRelationshipSubscriptionCore(
   const partner = await getRelationshipPartnerForViewer(partnerId, userId);
   if (!partner) return { ok: false, error: "ურთიერთობა ვერ მოიძებნა" };
   if (!(await isRelationshipUnlocked(partner))) return { ok: false, error: "თავსებადობა ჯერ არ არის გახსნილი" };
+  const [existing, otherEnabled] = await Promise.all([
+    db.select({
+      weeklyEnabled: relationshipSubscriptions.weeklyEnabled,
+      transitEnabled: relationshipSubscriptions.transitEnabled,
+    }).from(relationshipSubscriptions).where(and(
+      eq(relationshipSubscriptions.partnerId, partnerId),
+      eq(relationshipSubscriptions.userId, userId),
+    )).limit(1),
+    db.select({ partnerId: relationshipSubscriptions.partnerId })
+      .from(relationshipSubscriptions)
+      .where(and(
+        eq(relationshipSubscriptions.userId, userId),
+        ne(relationshipSubscriptions.partnerId, partnerId),
+        or(
+          eq(relationshipSubscriptions.weeklyEnabled, true),
+          eq(relationshipSubscriptions.transitEnabled, true),
+        ),
+      ))
+      .limit(1),
+  ]);
+  const wasOptedIn = Boolean(
+    otherEnabled[0] || existing[0]?.weeklyEnabled || existing[0]?.transitEnabled,
+  );
+  const isOptedIn = Boolean(otherEnabled[0] || values.weeklyEnabled || values.transitEnabled);
   await db.insert(relationshipSubscriptions).values({
     partnerId,
     userId,
@@ -336,6 +361,14 @@ export async function setRelationshipSubscriptionCore(
     target: [relationshipSubscriptions.partnerId, relationshipSubscriptions.userId],
     set: { ...values, updatedAt: new Date() },
   });
+  if (wasOptedIn !== isOptedIn) {
+    await db.insert(reminderPreferenceEvents).values({
+      userId,
+      topic: "relationship",
+      channel: "subscription",
+      eventType: isOptedIn ? "opt_in" : "opt_out",
+    });
+  }
   return { ok: true };
 }
 

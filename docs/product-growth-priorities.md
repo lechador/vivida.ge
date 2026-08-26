@@ -86,8 +86,11 @@ inventory only after those foundations are measurable.
     updates, shared prompts, relevant alerts, and mutual invite links.
 11. Test annual PRO at an effective 8–10 monthly payments, gift credits/reports,
     and relationship bundles.
-12. Persist experiment eligibility, assignment, exposure, and outcome for every
-    onboarding, paywall, notification, and pricing test.
+12. **Implemented 2026-08-26:** Persist experiment eligibility, assignment,
+    exposure, and outcome for onboarding, paywall, notification, and pricing
+    tests. Pricing presentation, contextual paywall copy, and reminder prompts
+    now use durable user-level cohorts; checkout and purchase outcomes come
+    from server-side sources.
 
 ## Event contract for the value and paywall funnel
 
@@ -113,10 +116,11 @@ campaign parameter names such as `source`, `medium`, and `campaign`.
 Implementation status: the canonical events live in `lib/analytics.ts`; the
 current natal, daily, recommendation, credit-gate, report, tarot, credit-pack,
 PRO, and verified checkout-return surfaces emit them. The admin app exposes
-database-backed weekly cohorts at `/growth`. Future experiments must call the
-shared assignment helper when eligibility selects a stable variant. The
-`signup_credits_v1` assignment is persisted in `experiment_assignment` and
-reported to analytics once from onboarding.
+database-backed experiment, reminder, and credit-economy views at
+`/admin/growth`. Stable assignment remains in `experiment_assignment`; each
+exposure and outcome is append-only and idempotent in `experiment_event`.
+Browser analytics remains a directional cross-check, not the experiment source
+of truth.
 
 ## Cohort and conversion definitions
 
@@ -136,13 +140,10 @@ reported to analytics once from onboarding.
 ## Missing or underdeveloped functionality
 
 - Personal reading history, saved insights, bookmarks, and user notes.
-- Measure reminder opt-in, delivery-to-value completion, and opt-out rates after
-  the configurable transit, relationship, forecast, and calendar channels ship.
 - A recurring relationship experience rather than static synastry alone.
 - A broader paid report store and bundles.
 - Gift credits, gift reports, and partner/seasonal packages.
 - A standard annual PRO plan.
-- Persistent experiment assignment/exposure data and complete paywall analytics.
 - Offline PWA content caching; the current service worker is push-focused.
 
 ## Credit-economy guardrails (shipped 2026-08-26)
@@ -157,6 +158,10 @@ reported to analytics once from onboarding.
 - The baseline free-issuance/spend ratio is 4.52×. Do not expand free issuance
   while the four-week matured ratio is above 2.5×; the operating target is
   below 2.0× without reducing D7 activated retention or payer conversion.
+- `/admin/growth` now calculates an exact rolling 28-day guardrail plus the
+  current and preceding three Tbilisi calendar weeks directly from the
+  append-only credit ledger. It separates purchased issuance from free issuance
+  and marks ≤2.0× healthy, 2.0–2.5× watch, and >2.5× stop.
 - Review median active-wallet balance, paywall-to-checkout conversion, 30-day
   payer conversion, D7 activated retention, refunds, and support complaints
   together. A retention lift is not a win if payer conversion falls.

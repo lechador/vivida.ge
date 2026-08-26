@@ -211,6 +211,50 @@ export const experimentAssignments = pgTable(
 export type ExperimentAssignment = typeof experimentAssignments.$inferSelect;
 
 /**
+ * Append-only experiment observations. Assignments answer “which cohort?”,
+ * while these rows answer “where was it seen?” and “what happened next?”.
+ * `eventKey` makes retries idempotent without collapsing distinct sessions.
+ */
+export const experimentEvents = pgTable(
+  "experiment_event",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    experiment: text("experiment").notNull(),
+    variant: text("variant").notNull(),
+    /** exposure | outcome */
+    eventType: text("event_type").notNull(),
+    eventName: text("event_name").notNull(),
+    surface: text("surface").notNull(),
+    eventKey: text("event_key").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    uniqueIndex("experiment_event_dedupe_idx").on(
+      t.userId,
+      t.experiment,
+      t.eventType,
+      t.eventName,
+      t.eventKey,
+    ),
+    index("experiment_event_analysis_idx").on(
+      t.experiment,
+      t.variant,
+      t.eventType,
+      t.createdAt,
+    ),
+  ],
+);
+
+export type ExperimentEvent = typeof experimentEvents.$inferSelect;
+
+/**
  * Stripe-backed Premium entitlement. One current subscription per user keeps
  * the app-side access check cheap while Stripe remains the billing authority.
  */
@@ -1478,6 +1522,31 @@ export const reminderSettings = pgTable("reminder_setting", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+/** Append-only consent history used for reminder opt-in/opt-out funnels. */
+export const reminderPreferenceEvents = pgTable(
+  "reminder_preference_event",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    topic: text("topic").notNull(),
+    channel: text("channel").notNull(),
+    /** opt_in | opt_out */
+    eventType: text("event_type").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    index("reminder_preference_event_funnel_idx").on(
+      t.eventType,
+      t.topic,
+      t.channel,
+      t.createdAt,
+    ),
+    index("reminder_preference_event_user_idx").on(t.userId, t.createdAt),
+  ],
+);
+
 export const reminderDeliveries = pgTable(
   "reminder_delivery",
   {
@@ -1488,6 +1557,13 @@ export const reminderDeliveries = pgTable(
     topic: text("topic").notNull(),
     channel: text("channel").notNull(),
     deliveryKey: text("delivery_key").notNull(),
+    destination: text("destination").notNull().default("/dashboard"),
+    /** claimed | sent | failed */
+    status: text("status").notNull().default("claimed"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    failedAt: timestamp("failed_at", { withTimezone: true }),
+    /** Set when the authenticated recipient opens the reminder destination. */
+    valueCompletedAt: timestamp("value_completed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (t) => [
@@ -1498,10 +1574,12 @@ export const reminderDeliveries = pgTable(
       t.deliveryKey,
     ),
     index("reminder_delivery_created_idx").on(t.createdAt),
+    index("reminder_delivery_funnel_idx").on(t.status, t.topic, t.channel, t.createdAt),
   ],
 );
 
 export type ReminderSettings = typeof reminderSettings.$inferSelect;
+export type ReminderDelivery = typeof reminderDeliveries.$inferSelect;
 
 /**
  * Chinese-zodiac page content (ჩინური ჰოროსკოპი). One row per animal slug

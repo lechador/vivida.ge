@@ -13,6 +13,8 @@ import {
   syncPremiumSubscription,
 } from "@/lib/premium";
 import { trackCheckoutCompleted } from "@/lib/checkout-tracking";
+import { EXPERIMENTS } from "@/lib/experiment-catalog";
+import { recordExperimentOutcomesBestEffort } from "@/lib/experiment-outcomes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -42,8 +44,18 @@ export async function POST(req: Request) {
     const sessionObj = event.data.object as Stripe.Checkout.Session;
 
     if (sessionObj.metadata?.kind === "premium") {
+      const uid = sessionObj.metadata?.userId ?? "";
       try {
         await activatePremiumFromCheckout(sessionObj);
+        if (uid) {
+          await recordExperimentOutcomesBestEffort(
+            uid,
+            [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
+            "purchase_completed",
+            "stripe_webhook",
+            sessionObj.id,
+          );
+        }
       } catch (err) {
         console.error("[stripe/webhook] premium activation failed:", err);
         return new Response("premium sync failed", { status: 500 });
@@ -66,6 +78,13 @@ export async function POST(req: Request) {
       if (uid && Number.isFinite(credits) && credits > 0) {
         try {
           await grantPurchaseCredits(uid, credits, sessionObj.id);
+          await recordExperimentOutcomesBestEffort(
+            uid,
+            [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
+            "purchase_completed",
+            "stripe_webhook",
+            sessionObj.id,
+          );
         } catch (err) {
           console.error("[stripe/webhook] credit grant failed:", err);
           // 500 so Stripe redelivers — the grant is idempotent on the session

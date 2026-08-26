@@ -11,7 +11,9 @@ import {
   premiumPlanForCountry,
 } from "@/lib/billing-config";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import { EXPERIMENTS } from "@/lib/experiment-catalog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { trackExperimentOutcome, useExperiment } from "@/lib/use-experiment";
 import { cn } from "@/lib/utils";
 
 type BillingContext = "general" | "natal_report";
@@ -37,6 +39,7 @@ export function CreditsVsPro({
   const am = locale === "am";
   const starterPack = creditPacksForCountry(countryCode)[0];
   const pro = premiumPlanForCountry(countryCode);
+  const variant = useExperiment(EXPERIMENTS.pricingPresentation, placement);
 
   useEffect(() => {
     trackEvent(ANALYTICS_EVENT.proExposure, {
@@ -54,6 +57,11 @@ export function CreditsVsPro({
       product: "billing_choice",
       payment_model: destination === "credits" ? "one_time" : "subscription",
     });
+    trackExperimentOutcome(
+      EXPERIMENTS.pricingPresentation,
+      placement,
+      destination === "credits" ? "choice_credits" : "choice_pro",
+    );
   }
 
   const heading =
@@ -99,7 +107,7 @@ export function CreditsVsPro({
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <article className="flex flex-col rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/7 p-5">
+        <article className={cn("flex flex-col rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/7 p-5", variant === "pro_first" && "sm:order-2")}>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--vivida-cyan)]">
             <Coins className="size-4" />
             {am ? "Վճարել ըստ օգտագործման" : en ? "Pay as you go" : "გადაიხადე საჭიროებისას"}
@@ -135,7 +143,7 @@ export function CreditsVsPro({
           </Button>
         </article>
 
-        <article className="relative flex flex-col overflow-hidden rounded-2xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-gold)]/12 to-[var(--vivida-violet)]/10 p-5">
+        <article className={cn("relative flex flex-col overflow-hidden rounded-2xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-gold)]/12 to-[var(--vivida-violet)]/10 p-5", variant === "pro_first" && "sm:order-1")}>
           <div aria-hidden className="absolute -right-10 -top-12 size-36 rounded-full bg-[var(--vivida-gold)]/12 blur-3xl" />
           <div className="relative flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--vivida-gold)]">
             <Crown className="size-4" /> Vivida PRO

@@ -107,14 +107,14 @@ function copyFor(
       return {
         title: en ? "Partner connected 💞" : "პარტნიორი დაკავშირებულია 💞",
         body: en ? `${name} accepted your relationship invitation` : `${name}-მ მიიღო შენი ურთიერთობის მოწვევა`,
-        url: payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry",
+        url: payload.reminderUrl ?? (payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry"),
         tag: `relationship-connected-${payload.partnerId ?? "x"}`,
       };
     case "relationship_weekly":
       return {
         title: en ? "Your weekly relationship update" : "ურთიერთობის ახალი კვირა",
         body: payload.relationshipHeadline ?? (en ? "See what this week brings for both of you" : "ნახე, რას გთავაზობთ ეს კვირა ორივეს"),
-        url: payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry",
+        url: payload.reminderUrl ?? (payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry"),
         tag: `relationship-weekly-${payload.partnerId ?? "x"}`,
       };
     case "relationship_transit":
