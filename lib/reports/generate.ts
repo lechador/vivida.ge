@@ -7,7 +7,7 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { charts, pdfReports, profiles, users } from "@/db/schema";
+import { charts, partners, pdfReports, profiles, users } from "@/db/schema";
 import { computeChartSalience } from "@/lib/report-salience";
 import { generateNatalReport } from "@/lib/report-content";
 import { buildEnglishNatalReportContent } from "@/lib/report-content-pdf-en";
@@ -15,6 +15,9 @@ import { NatalReport } from "@/components/pdf/natal-report";
 import { putObject } from "@/lib/r2";
 import { normalizeUserLocale } from "@/lib/i18n/locale";
 import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
+import { isReportProductKey } from "@/lib/report-catalog";
+import { buildPremiumReportContent } from "@/lib/reports/premium-content";
+import { PremiumReport } from "@/components/pdf/premium-report";
 
 export function reportPdfKey(userId: string, reportId: string): string {
   return `reports/${userId}/${reportId}.pdf`;
@@ -60,12 +63,23 @@ export async function generateAndStoreReport(reportId: string): Promise<boolean>
   try {
     const { renderToBuffer } = await import("@react-pdf/renderer");
 
-    const [chartRow] = await db
+    let [chartRow] = await db
       .select()
       .from(charts)
       .where(eq(charts.userId, report.userId))
       .limit(1);
     if (!chartRow) throw new Error("no chart on file for user");
+
+    let relationshipPartner: { name: string; chart: typeof chartRow.data } | undefined;
+    if (report.type === "relationship") {
+      if (!report.partnerId) throw new Error("relationship report has no partner");
+      const [partner] = await db.select().from(partners).where(eq(partners.id, report.partnerId)).limit(1);
+      if (!partner) throw new Error("relationship partner no longer exists");
+      const [ownerChart] = await db.select().from(charts).where(eq(charts.userId, partner.userId)).limit(1);
+      if (!ownerChart) throw new Error("relationship owner has no chart");
+      chartRow = ownerChart;
+      relationshipPartner = { name: partner.name, chart: partner.chart };
+    }
 
     const [profile] = await db
       .select()
@@ -83,26 +97,37 @@ export async function generateAndStoreReport(reportId: string): Promise<boolean>
     const firstName = user?.name?.split(" ")[0] ?? null;
     const locale = normalizeUserLocale(report.language);
 
-    const content =
-      locale === "en"
-        ? buildEnglishNatalReportContent(chart, salience, firstName)
-        : await generateNatalReport({ firstName, chart, salience });
-
+    let storedContent = report.content;
     const buffer = await renderToBuffer(
-      NatalReport({
-        data: {
-          name: firstName,
-          birth: {
-            date: profile?.dateOfBirth ?? "",
-            time: profile?.timeOfBirth ? profile.timeOfBirth.slice(0, 5) : null,
-            place: profile?.cityName ?? "",
-          },
-          chart,
-          salience,
-          content,
-          locale,
-        },
-      })
+      isReportProductKey(report.type)
+        ? PremiumReport({
+            content: storedContent ?? (storedContent = buildPremiumReportContent({
+              type: report.type,
+              chart,
+              locale,
+              firstName,
+              timezone: profile?.timezone ?? "Asia/Tbilisi",
+              partner: relationshipPartner,
+            })),
+            locale,
+          })
+        : NatalReport({
+            data: {
+              name: firstName,
+              birth: {
+                date: profile?.dateOfBirth ?? "",
+                time: profile?.timeOfBirth ? profile.timeOfBirth.slice(0, 5) : null,
+                place: profile?.cityName ?? "",
+              },
+              chart,
+              salience,
+              content:
+                locale === "en"
+                  ? buildEnglishNatalReportContent(chart, salience, firstName)
+                  : await generateNatalReport({ firstName, chart, salience }),
+              locale,
+            },
+          })
     );
 
     const key = reportPdfKey(report.userId, report.id);
@@ -118,6 +143,7 @@ export async function generateAndStoreReport(reportId: string): Promise<boolean>
         status: "ready",
         pdfKey: key,
         inputHash: chartRow.inputHash,
+        content: storedContent,
         readyAt: new Date(),
         error: null,
       })

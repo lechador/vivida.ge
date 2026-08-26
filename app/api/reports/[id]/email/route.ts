@@ -7,6 +7,7 @@ import { sendReportPdfEmail } from "@/lib/email";
 import { normalizeUserLocale } from "@/lib/i18n/locale";
 import { ApiError } from "@/lib/api/errors";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { isReportProductKey, localized, REPORT_PRODUCTS } from "@/lib/report-catalog";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -74,13 +75,16 @@ export async function POST(req: Request, ctx: Params) {
 
   // The PDF's own language was fixed at purchase; write the covering email in
   // the same one so the two don't disagree.
+  const reportLocale = normalizeUserLocale(report.language ?? user.locale);
   const result = await sendReportPdfEmail({
     userId,
     to: user.email,
     name: user.name,
     reportId: report.id,
     pdfKey: report.pdfKey,
-    locale: normalizeUserLocale(report.language ?? user.locale),
+    locale: reportLocale,
+    reportType: report.type,
+    reportTitle: isReportProductKey(report.type) ? localized(REPORT_PRODUCTS[report.type].shortTitle, reportLocale) : undefined,
   });
 
   if (!result.ok) {

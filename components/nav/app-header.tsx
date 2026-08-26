@@ -32,6 +32,7 @@ export async function AppHeader({
     | "today"
     | "sky"
     | "report"
+    | "reports"
     | "ask"
     | "library"
     | "tarot"

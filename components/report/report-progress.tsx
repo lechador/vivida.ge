@@ -37,10 +37,12 @@ export function ReportProgress({
   reportId,
   initialStatus,
   locale = "ka",
+  title,
 }: {
   reportId: string;
   initialStatus: Status;
   locale?: UserLocale;
+  title?: string;
 }) {
   const en = locale !== "ka";
   const am = locale === "am";
@@ -136,12 +138,12 @@ export function ReportProgress({
             <CheckCircle2 className="size-7" />
           </div>
           <h2 className="text-2xl font-semibold">
-            {am ? "Ձեր զեկույցը պատրաստ է։ 🌟" : en ? "Your report is ready! 🌟" : "ანგარიში მზადაა! 🌟"}
+            {title ? `${title} — ${am ? "պատրաստ է 🌟" : en ? "ready 🌟" : "მზადაა 🌟"}` : am ? "Ձեր զեկույցը պատրաստ է։ 🌟" : en ? "Your report is ready! 🌟" : "ანგარიში მზადაა! 🌟"}
           </h2>
           <p className="mt-2 max-w-md text-sm text-foreground/75">
             {en
-              ? "Your personal natal report is complete. Download it and keep it forever."
-              : "შენი პერსონალური ნატალური ანგარიში დასრულდა. ჩამოტვირთე — ის სამუდამოდ შენთან რჩება."}
+              ? "Your personal report is complete. Download it and keep it forever."
+              : "შენი პერსონალური რეპორტი დასრულდა. ჩამოტვირთე — ის სამუდამოდ შენთან რჩება."}
           </p>
           <Button asChild variant="mystic" size="xl" className="mt-6 min-w-56">
             <a href={`/api/reports/${reportId}/download`}>

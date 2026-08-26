@@ -11,6 +11,7 @@ import { ReportProgress } from "@/components/report/report-progress";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { Metadata } from "next";
+import { isReportProductKey, localized, REPORT_PRODUCTS } from "@/lib/report-catalog";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -44,20 +45,21 @@ export default async function ReportStatusPage({
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
       />
       <Starfield count={140} shooting={3} />
-      <AppHeader authed active="report" />
+      <AppHeader authed active="reports" />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 pt-12 sm:px-6">
         <ReportProgress
           reportId={report.id}
           initialStatus={report.status}
           locale={locale}
+          title={isReportProductKey(report.type) ? localized(REPORT_PRODUCTS[report.type].shortTitle, locale) : undefined}
         />
         <div className="mt-6 text-center">
           <Link
-            href="/report"
+            href="/reports"
             className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
-            {am ? "← Վերադառնալ Ձեր քարտեզին" : en ? "← Back to your chart" : "← დაბრუნდი რუკაზე"}
+            {am ? "← Վերադառնալ զեկույցներին" : en ? "← Back to reports" : "← დაბრუნდი რეპორტებში"}
           </Link>
         </div>
       </section>

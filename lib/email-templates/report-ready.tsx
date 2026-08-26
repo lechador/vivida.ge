@@ -18,21 +18,19 @@ export function ReportReadyEmail({
   reportUrl,
   attached,
   locale = "ka",
+  reportTitle,
 }: {
   name: string | null;
   /** Link back to the in-app report page (download works there while signed in). */
   reportUrl: string;
   attached: boolean;
   locale?: UserLocale;
+  reportTitle?: string;
 }) {
   const en = locale !== "ka";
   const am = locale === "am";
 
-  const preview = am
-    ? "Ձեր նատալ քարտեզի ամբողջական զեկույցը"
-    : en
-      ? "Your complete natal chart report"
-      : "შენი ნატალური რუკის სრული ანგარიში";
+  const preview = reportTitle ?? (am ? "Ձեր ամբողջական զեկույցը" : en ? "Your complete personal report" : "შენი სრული პერსონალური რეპორტი");
 
   const greeting = name
     ? am
@@ -59,11 +57,7 @@ export function ReportReadyEmail({
           margin: "0 0 16px",
         }}
       >
-        {am
-          ? "Ձեր նատալ զեկույցը"
-          : en
-            ? "Your natal report"
-            : "შენი ნატალური ანგარიში"}
+        {reportTitle ?? (am ? "Ձեր զեկույցը" : en ? "Your report" : "შენი რეპორტი")}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
@@ -71,15 +65,15 @@ export function ReportReadyEmail({
       <Text style={paragraphStyle}>
         {attached
           ? am
-            ? "Ձեր անձնական նատալ զեկույցը կցված է այս նամակին PDF ֆայլով։ Պահեք այն ձեզ մոտ՝ ցանկացած պահի կարդալու համար։"
+            ? "Ձեր անձնական զեկույցը կցված է այս նամակին PDF ֆայլով։ Պահեք այն ձեզ մոտ՝ ցանկացած պահի կարդալու համար։"
             : en
-              ? "Your personal natal report is attached to this email as a PDF. Save it — it's yours to keep and read whenever you like."
-              : "შენი პერსონალური ნატალური ანგარიში ამ წერილს PDF-ად ახლავს. შეინახე — ის სამუდამოდ შენთან რჩება."
+              ? "Your personal report is attached to this email as a PDF. Save it — it's yours to keep and read whenever you like."
+              : "შენი პერსონალური რეპორტი ამ წერილს PDF-ად ახლავს. შეინახე — ის სამუდამოდ შენთან რჩება."
           : am
-            ? "Ձեր անձնական նատալ զեկույցը պատրաստ է։ Ներբեռնեք այն ստորև նշված հղումով։"
+            ? "Ձեր անձնական զեկույցը պատրաստ է։ Ներբեռնեք այն ստորև նշված հղումով։"
             : en
-              ? "Your personal natal report is ready. Download it from the link below."
-              : "შენი პერსონალური ნატალური ანგარიში მზადაა. ჩამოტვირთე ქვემოთ მოცემული ბმულით."}
+              ? "Your personal report is ready. Download it from the link below."
+              : "შენი პერსონალური რეპორტი მზადაა. ჩამოტვირთე ქვემოთ მოცემული ბმულით."}
       </Text>
 
       <Button href={reportUrl} style={buttonStyle}>

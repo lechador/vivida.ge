@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { pdfReports } from "@/db/schema";
 import { presignedDownloadUrl } from "@/lib/r2";
+import { isReportProductKey } from "@/lib/report-catalog";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,7 +34,7 @@ export async function GET(req: Request, ctx: Params) {
   const url = await presignedDownloadUrl({
     key: report.pdfKey,
     expiresIn: 5 * 60,
-    downloadFilename: "vivida-natal-report.pdf",
+    downloadFilename: isReportProductKey(report.type) ? `vivida-${report.type}-report.pdf` : "vivida-natal-report.pdf",
   });
   return Response.redirect(url, 302);
 }

@@ -535,6 +535,16 @@ export const pdfReportStatusEnum = pgEnum("pdf_report_status", [
   "failed", // generation errored — retryable
 ]);
 
+export type PremiumReportContentJson = {
+  title: string;
+  subtitle: string;
+  overview: string;
+  sections: Array<{ title: string; body: string; highlights?: string[] }>;
+  keyDates?: Array<{ date: string; title: string; note: string; tone: "supportive" | "caution" | "neutral" }>;
+  actionPlan: string[];
+  closing: string;
+};
+
 export const pdfReports = pgTable(
   "pdf_report",
   {
@@ -544,7 +554,7 @@ export const pdfReports = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    /** 'natal' | 'synastry' | 'forecast' — natal is the only one shipped today. */
+    /** Stable product key: natal / annual / relationship / career / timing. */
     type: text("type").notNull().default("natal"),
     /** Language captured at purchase so retries always reproduce the same PDF. */
     language: text("language").notNull().default("ka"),
@@ -552,6 +562,16 @@ export const pdfReports = pgTable(
     /** chart input hash captured at purchase, so we can flag a stale report
      *  if the user later changes their birth data. */
     inputHash: text("input_hash"),
+    /** Product edition prevents repeat charges for the same dated/sourced report. */
+    editionKey: text("edition_key").notNull().default("evergreen"),
+    /** Empty for solo reports; partner id for relationship reports. */
+    subjectKey: text("subject_key").notNull().default(""),
+    partnerId: text("partner_id").references(() => partners.id, { onDelete: "set null" }),
+    /** Rows purchased together share a bundle id/key for customer support. */
+    bundleId: text("bundle_id"),
+    bundleKey: text("bundle_key"),
+    /** Snapshot used to render the PDF and support deterministic retries. */
+    content: jsonb("content").$type<PremiumReportContentJson | null>(),
     amountCents: integer("amount_cents").notNull().default(0),
     currency: text("currency").notNull().default("GEL"),
     /** Legacy compatibility field; new credit-funded reports are always false. */
@@ -571,6 +591,14 @@ export const pdfReports = pgTable(
   (t) => [
     index("pdf_report_user_created_idx").on(t.userId, t.createdAt),
     index("pdf_report_status_idx").on(t.status),
+    uniqueIndex("pdf_report_user_product_edition_idx").on(
+      t.userId,
+      t.type,
+      t.language,
+      t.editionKey,
+      t.subjectKey,
+    ),
+    index("pdf_report_bundle_idx").on(t.userId, t.bundleId),
   ]
 );
 

@@ -1,159 +1,122 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { after } from "next/server";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { charts, pdfReports } from "@/db/schema";
-import { CREDIT_COST, spendCredits } from "@/lib/credits";
+import { CREDIT_COST, spendOnce } from "@/lib/credits";
 import { generateAndStoreReport } from "@/lib/reports/generate";
 import { reportCurrency } from "@/lib/stripe";
-import { getUserLocale } from "@/lib/i18n/user-locale";
+import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { archiveLibraryEntry } from "@/lib/library";
+import { getRelationshipPartnerForViewer } from "@/lib/relationship-core";
+import {
+  REPORT_BUNDLES,
+  REPORT_PRODUCTS,
+  bundleRemainingPrice,
+  isReportBundleKey,
+  isReportProductKey,
+  localized,
+  reportEditionKey,
+  type ReportProductKey,
+} from "@/lib/report-catalog";
 
-async function archiveReport(input: {
-  id: string;
-  userId: string;
-  type: string;
-  language: string;
-  status: string;
-  createdAt: Date;
-}) {
-  const { language } = input;
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const maxDuration = 300;
+
+const ACTIVE_STATUSES = new Set(["paid", "generating", "ready", "failed"]);
+
+async function archiveReport(input: { id: string; userId: string; type: string; language: string; status: string; createdAt: Date }) {
+  const locale: UserLocale = input.language === "en" || input.language === "am" ? input.language : "ka";
+  const product = isReportProductKey(input.type) ? REPORT_PRODUCTS[input.type] : null;
   await archiveLibraryEntry({
     userId: input.userId,
     kind: "report",
     sourceId: input.id,
-    title:
-      language === "en"
-        ? "Complete natal report"
-        : language === "am"
-          ? "Ամբողջական նատալ զեկույց"
-          : "სრული ნატალური რეპორტი",
-    summary:
-      language === "en"
-        ? "Your downloadable personal PDF report"
-        : language === "am"
-          ? "Ձեր ներբեռնվող անձնական PDF զեկույցը"
-          : "შენი ჩამოსატვირთი პერსონალური PDF რეპორტი",
+    title: product ? localized(product.shortTitle, locale) : locale === "ka" ? "სრული ნატალური რეპორტი" : "Complete natal report",
+    summary: product ? localized(product.description, locale) : locale === "ka" ? "შენი ჩამოსატვირთი პერსონალური PDF რეპორტი" : "Your downloadable personal PDF report",
     content: { type: "report", reportType: input.type, status: input.status },
     href: `/reports/${input.id}`,
-    language,
+    language: locale,
     occurredAt: input.createdAt,
   });
 }
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-// Generation is kicked off via after() — keep the function alive.
-export const maxDuration = 300;
-
-const SUPPORTED_TYPES = new Set(["natal"]);
-
-/**
- * Generate a natal PDF report, paid with credits. Spends CREDIT_COST.pdfReport
- * once, creates the report row as 'paid', and kicks off generation, returning
- * the in-app status page URL. Re-clicking when a paid/generating/ready report
- * already exists returns it instead of charging again. 402 when short.
- */
 export async function POST(req: Request) {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) {
-    return Response.json({ error: "unauthorized" }, { status: 401 });
-  }
+  if (!userId) return Response.json({ error: "unauthorized" }, { status: 401 });
+
+  const body = await req.json().catch(() => ({})) as { type?: unknown; bundleKey?: unknown; partnerId?: unknown };
+  const bundleKey = isReportBundleKey(body.bundleKey) ? body.bundleKey : null;
+  const singleType = isReportProductKey(body.type) ? body.type : body.type === "natal" ? "natal" : null;
+  if (!bundleKey && !singleType) return Response.json({ error: "unsupported_product" }, { status: 400 });
+  if (bundleKey && singleType) return Response.json({ error: "choose_product_or_bundle" }, { status: 400 });
+
   const locale = await getUserLocale(userId);
+  const [viewerChart] = await db.select().from(charts).where(eq(charts.userId, userId)).limit(1);
+  if (!viewerChart) return Response.json({ error: "no_chart" }, { status: 400 });
 
-  let type = "natal";
-  try {
-    const body = await req.json().catch(() => ({}));
-    if (body && typeof body.type === "string") type = body.type;
-  } catch {
-    /* empty body is fine */
-  }
-  if (!SUPPORTED_TYPES.has(type)) {
-    return Response.json({ error: "unsupported_type" }, { status: 400 });
-  }
+  const products: Array<ReportProductKey | "natal"> = bundleKey ? [...REPORT_BUNDLES[bundleKey].products] : [singleType!];
+  const needsRelationship = products.includes("relationship");
+  const partnerId = typeof body.partnerId === "string" ? body.partnerId : "";
+  const partner = needsRelationship && partnerId ? await getRelationshipPartnerForViewer(partnerId, userId) : null;
+  if (needsRelationship && !partner) return Response.json({ error: "relationship_required" }, { status: 400 });
 
-  // Must have a generated chart to report on.
-  const [chartRow] = await db
-    .select({ userId: charts.userId })
-    .from(charts)
-    .where(eq(charts.userId, userId))
-    .limit(1);
-  if (!chartRow) {
-    return Response.json({ error: "no_chart" }, { status: 400 });
+  let ownerChartHash = viewerChart.inputHash;
+  if (partner && partner.userId !== userId) {
+    const [ownerChart] = await db.select({ inputHash: charts.inputHash }).from(charts).where(eq(charts.userId, partner.userId)).limit(1);
+    if (!ownerChart) return Response.json({ error: "relationship_chart_missing" }, { status: 400 });
+    ownerChartHash = ownerChart.inputHash;
   }
 
-  // Don't double-charge / double-create: reuse an in-flight or finished one.
-  const [existing] = await db
-    .select()
-    .from(pdfReports)
-    .where(
-      and(
-        eq(pdfReports.userId, userId),
-        eq(pdfReports.type, type),
-        eq(pdfReports.language, locale),
-      ),
-    )
-    .orderBy(desc(pdfReports.createdAt))
-    .limit(1);
-  // Already paid (incl. failed → retryable on the status page) or done:
-  // route back to it, never charge twice.
-  if (existing && ["paid", "generating", "ready", "failed"].includes(existing.status)) {
-    await archiveReport(existing).catch((error) =>
-      console.warn("[library] report archive failed:", error),
-    );
-    return Response.json({
-      reportId: existing.id,
-      url: `/reports/${existing.id}`,
-      unlockStatus: "already",
-    });
-  }
-
-  // ── Pay with credits ─────────────────────────────────────────────────
-  // Charge before creating the row; the atomic spend guards the balance so a
-  // short wallet never gets a comped report.
-  const paid = await spendCredits(
-    userId,
-    CREDIT_COST.pdfReport,
-    "spend_report"
-  );
-  if (!paid) {
-    return Response.json(
-      { error: "insufficient_credits", cost: CREDIT_COST.pdfReport },
-      { status: 402 }
-    );
-  }
-
-  const [row] = await db
-    .insert(pdfReports)
-    .values({
-      userId,
-      type,
-      language: locale,
-      status: "paid",
-      comped: false,
-      amountCents: 0,
-      currency: reportCurrency().toUpperCase(),
-      paidAt: new Date(),
-    })
-    .returning({
-      id: pdfReports.id,
-      userId: pdfReports.userId,
-      type: pdfReports.type,
-      language: pdfReports.language,
-      status: pdfReports.status,
-      createdAt: pdfReports.createdAt,
-    });
-
-  await archiveReport(row).catch((error) =>
-    console.warn("[library] report archive failed:", error),
-  );
-
-  after(() => generateAndStoreReport(row.id));
-  return Response.json({
-    reportId: row.id,
-    url: `/reports/${row.id}`,
-    unlockStatus: "unlocked",
+  const now = new Date();
+  const specs = products.map((type) => {
+    const subjectKey = type === "relationship" ? partner!.id : "";
+    const sourceHash = type === "relationship" ? `${ownerChartHash}:${partner!.inputHash}` : viewerChart.inputHash;
+    return { type, subjectKey, partnerId: type === "relationship" ? partner!.id : null, editionKey: type === "natal" ? "evergreen" : reportEditionKey(type, now, sourceHash, subjectKey) };
   });
+
+  const existingRows = await db.select().from(pdfReports).where(and(
+    eq(pdfReports.userId, userId),
+    eq(pdfReports.language, locale),
+    inArray(pdfReports.type, specs.map((spec) => spec.type)),
+  ));
+  const existingBySpec = new Map<string, (typeof existingRows)[number]>();
+  for (const row of existingRows) {
+    if (ACTIVE_STATUSES.has(row.status)) existingBySpec.set(`${row.type}:${row.editionKey}:${row.subjectKey}`, row);
+  }
+  const missing = specs.filter((spec) => !existingBySpec.has(`${spec.type}:${spec.editionKey}:${spec.subjectKey}`));
+  if (missing.length === 0) {
+    const rows = specs.map((spec) => existingBySpec.get(`${spec.type}:${spec.editionKey}:${spec.subjectKey}`)!);
+    await Promise.all(rows.map((row) => archiveReport(row).catch(() => {})));
+    return Response.json({ reportId: rows[0].id, reportIds: rows.map((row) => row.id), url: rows.length === 1 ? `/reports/${rows[0].id}` : "/reports", unlockStatus: "already", cost: 0 });
+  }
+
+  const fullMissing = missing.reduce((sum, spec) => sum + (spec.type === "natal" ? CREDIT_COST.pdfReport : REPORT_PRODUCTS[spec.type].credits), 0);
+  const cost = bundleKey ? bundleRemainingPrice(bundleKey, missing.map((spec) => spec.type as ReportProductKey)) : fullMissing;
+  const purchaseRef = `report-store:${bundleKey ?? singleType}:${missing.map((spec) => `${spec.type}:${spec.editionKey}:${spec.subjectKey}`).sort().join("|")}`;
+  const unlockStatus = await spendOnce(userId, cost, "spend_report", purchaseRef);
+  if (unlockStatus === "insufficient") return Response.json({ error: "insufficient_credits", cost }, { status: 402 });
+
+  const bundleId = bundleKey ? crypto.randomUUID() : null;
+  await db.insert(pdfReports).values(missing.map((spec) => ({
+    userId, type: spec.type, language: locale, status: "paid" as const,
+    inputHash: spec.type === "relationship" ? ownerChartHash : viewerChart.inputHash,
+    editionKey: spec.editionKey, subjectKey: spec.subjectKey, partnerId: spec.partnerId,
+    bundleId, bundleKey, comped: false, amountCents: 0,
+    currency: reportCurrency().toUpperCase(), paidAt: now,
+  }))).onConflictDoNothing();
+
+  const allRows = await db.select().from(pdfReports).where(and(
+    eq(pdfReports.userId, userId), eq(pdfReports.language, locale), inArray(pdfReports.type, specs.map((spec) => spec.type)),
+  ));
+  const rows = specs.map((spec) => allRows.find((row) => row.type === spec.type && row.editionKey === spec.editionKey && row.subjectKey === spec.subjectKey)).filter(Boolean) as typeof allRows;
+  if (rows.length !== specs.length) throw new Error("report purchase completed but report rows are missing");
+
+  await Promise.all(rows.map((row) => archiveReport(row).catch((error) => console.warn("[library] report archive failed:", error))));
+  const generated = rows.filter((row) => missing.some((spec) => spec.type === row.type && spec.editionKey === row.editionKey && spec.subjectKey === row.subjectKey));
+  after(() => Promise.all(generated.map((row) => generateAndStoreReport(row.id))).then(() => undefined));
+  return Response.json({ reportId: rows[0].id, reportIds: rows.map((row) => row.id), url: rows.length === 1 ? `/reports/${rows[0].id}` : "/reports", unlockStatus, cost, bundleId });
 }

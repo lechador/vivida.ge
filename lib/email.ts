@@ -407,6 +407,8 @@ export async function sendReportPdfEmail({
   reportId,
   pdfKey,
   locale = "ka",
+  reportTitle,
+  reportType = "natal",
 }: {
   userId: string;
   to: string;
@@ -415,6 +417,8 @@ export async function sendReportPdfEmail({
   /** R2 key of the generated PDF. */
   pdfKey: string;
   locale?: UserLocale;
+  reportTitle?: string;
+  reportType?: string;
 }): Promise<{ ok: boolean; error?: string }> {
   const c = client();
   if (!c) {
@@ -423,12 +427,7 @@ export async function sendReportPdfEmail({
   }
 
   const reportUrl = absUrl(`/reports/${reportId}`, originForLocale(locale));
-  const subject =
-    locale === "am"
-      ? "Ձեր նատալ զեկույցը · Vivida"
-      : locale === "en"
-        ? "Your natal report · Vivida"
-        : "შენი ნატალური ანგარიში · Vivida";
+  const subject = `${reportTitle ?? (locale === "am" ? "Ձեր նատալ զեկույցը" : locale === "en" ? "Your natal report" : "შენი ნატალური ანგარიში")} · Vivida`;
 
   try {
     // Dynamic import so the AWS SDK stays out of every module that merely
@@ -461,11 +460,12 @@ export async function sendReportPdfEmail({
         reportUrl,
         attached: pdf !== null,
         locale,
+        reportTitle,
       }),
       attachments: pdf
         ? [
             {
-              filename: "vivida-natal-report.pdf",
+              filename: `vivida-${reportType}-report.pdf`,
               content: Buffer.from(pdf),
               contentType: "application/pdf",
             },

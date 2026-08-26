@@ -5,6 +5,7 @@ import {
   Compass,
   Heart,
   MessageCircle,
+  ScrollText,
   Orbit,
   Sparkles,
   Stars,
@@ -23,6 +24,7 @@ export type NavActiveKey =
   | "today"
   | "sky"
   | "report"
+  | "reports"
   | "ask"
   | "library"
   | "tarot"
@@ -101,6 +103,18 @@ const ALL_NAV_ITEMS: NavItem[] = [
     labelAm: "Իմ քարտեզը",
     Icon: Compass,
     hue: "oklch(0.78 0.18 305)",
+  },
+  {
+    key: "reports",
+    href: "/reports",
+    label: "რეპორტები",
+    labelEn: "Reports",
+    labelAm: "Զեկույցներ",
+    Icon: ScrollText,
+    hue: "oklch(0.80 0.16 55)",
+    badgeKa: "ახალი",
+    badgeEn: "New",
+    badgeAm: "Նոր",
   },
   {
     key: "ask",
