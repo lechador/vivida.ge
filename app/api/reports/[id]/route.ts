@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 const STUCK_MS = 5 * 60 * 1000;
+const PAID_RETRY_MS = 60 * 1000;
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -32,6 +33,8 @@ export async function GET(req: Request, ctx: Params) {
     return Response.json({ error: "not_found" }, { status: 404 });
   }
 
+  let generationQueued = false;
+
   // Fallback: if the webhook is late, confirm the Stripe session ourselves.
   if (report.status === "pending" && report.stripeSessionId && isStripeConfigured()) {
     try {
@@ -46,12 +49,39 @@ export async function GET(req: Request, ctx: Params) {
           .set({ status: "paid", paidAt: new Date(), stripePaymentIntentId: pi })
           .where(eq(pdfReports.id, id));
         after(() => generateAndStoreReport(id));
+        generationQueued = true;
         report = { ...report, status: "paid" };
       }
     } catch (err) {
       console.error("[reports/:id] session reconcile failed:", err);
     }
   }
+
+  const stuckGenerating =
+    report.status === "generating" &&
+    (report.generationStartedAt ?? report.paidAt) != null &&
+    Date.now() - (report.generationStartedAt ?? report.paidAt)!.getTime() > STUCK_MS;
+
+  // Credit-funded purchases do not have a Stripe webhook to reconcile. If a
+  // deployment ends before its original `after()` callback starts, the row can
+  // remain `paid`; similarly, a crashed renderer can leave it `generating`.
+  // Polling the status page now repairs both states without charging again.
+  if (stuckGenerating) {
+    await db
+      .update(pdfReports)
+      .set({ status: "paid", generationStartedAt: null, error: null })
+      .where(eq(pdfReports.id, id));
+    report = { ...report, status: "paid", generationStartedAt: null, error: null };
+  }
+  if (report.status === "paid" && !generationQueued) {
+    after(() => generateAndStoreReport(id));
+    generationQueued = true;
+  }
+
+  const paidLongEnoughToRetry =
+    report.status === "paid" &&
+    report.paidAt != null &&
+    Date.now() - report.paidAt.getTime() > PAID_RETRY_MS;
 
   return Response.json({
     id: report.id,
@@ -60,6 +90,8 @@ export async function GET(req: Request, ctx: Params) {
     ready: report.status === "ready",
     comped: report.comped,
     error: report.status === "failed" ? report.error : null,
+    retryable: report.status === "failed" || paidLongEnoughToRetry || stuckGenerating,
+    recovering: generationQueued,
     createdAt: report.createdAt,
   });
 }
@@ -92,7 +124,7 @@ export async function POST(req: Request, ctx: Params) {
 
   await db
     .update(pdfReports)
-    .set({ status: "paid", error: null })
+    .set({ status: "paid", generationStartedAt: null, error: null })
     .where(eq(pdfReports.id, id));
   after(() => generateAndStoreReport(id));
   return Response.json({ ok: true, status: "paid" });

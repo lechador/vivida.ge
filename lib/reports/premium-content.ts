@@ -56,6 +56,20 @@ function annual(input: Input): PremiumReportContentJson {
     actionPlan: ["ჩამოწერე წლის ერთი მთავარი მიზანი და სამი საზომი შედეგი.", "თვეში ერთხელ გადაამოწმე ენერგია, პროგრესი და საზღვრები.", "მნიშვნელოვანი ნაბიჯები მხარდამჭერ ფანჯრებში დაგეგმე.", "რთულ კვირებში შეამცირე მოცულობა, მაგრამ შეინარჩუნე რიტმი."],
     closing: "ასტროლოგიური დრო მიმართულებას გაძლევს; არჩევანი და მოქმედება შენთან რჩება.",
   };
+  if (input.locale === "am") return {
+    title: `${year} - Ձեր անձնական տարին`,
+    subtitle: `${baseName(input.firstName, input.locale)} · Արևը ${sun}-ում · Լուսինը ${moon}-ում · Ասցենդենտը ${asc}-ում`,
+    overview: `Այս կանխատեսումը միավորում է ձեր նատալ քարտեզը և առաջիկա 12 ամիսների տրանզիտները։ Գլխավոր խնդիրը ${sun}-ի նպատակը, ${moon}-ի հուզական կարիքները և ${asc}-ի գործելու ոճը մեկ ուղղության մեջ համադրելն է։`,
+    sections: [
+      { title: "Տարվա գլխավոր թեման", body: `${sun}-ում գտնվող Արևը հուշում է՝ ուժ ներդնել այն նպատակներում, որոնք անձնական իմաստ ունեն։ ${asc} ասցենդենտը նկարագրում է, թե ինչպես եք սկսում, իսկ ${moon}-ում գտնվող Լուսինը՝ երբ է պետք դանդաղել և վերականգնել ներքին պաշարները։`, highlights: ["Ընտրեք տարվա մեկ հիմնական ուղղություն", "Ամեն ամիս վերանայեք առաջընթացը", "Մի շփոթեք արագությունը իրական առաջընթացի հետ"] },
+      { title: "Աճ և հնարավորություններ", body: "Յուպիտերի և աջակցող անձնական տրանզիտների օրերը հնարավորություններ են ստեղծում դիմումների, ուսման, կարևոր զրույցների և ավելի մեծ տեսանելիության համար։" },
+      { title: "Սահմաններ և վերափոխում", body: "Լարված շրջանները արգելք չեն, այլ ախտորոշիչ ազդակ։ Պատասխանեք կառուցվածքով, վերջնաժամկետներով և փոքր, կրկնվող քայլերով։" },
+      { title: "Տարվա ռիթմը", body: "Բարձր էներգիայի պատուհաններում գործեք, իսկ ավելի հանգիստ շրջաններում վերանայեք, ավարտեք և վերականգնվեք։ Այս հերթագայությունը պահպանում է ձեր ընթացքը։" },
+    ],
+    keyDates: [...top.map((d) => ({ date: d.dateIso, title: "Աջակցող պատուհան", note: "Ուժեղ օր է նախաձեռնության, համաձայնության կամ տեսանելիության համար։", tone: "supportive" as const })), ...cautious.map((d) => ({ date: d.dateIso, title: "Դանդաղեցման պատուհան", note: "Ստուգեք մանրամասները և տեղ թողեք պլանը փոխելու համար։", tone: "caution" as const }))].sort((a, b) => a.date.localeCompare(b.date)),
+    actionPlan: ["Սահմանեք տարվա մեկ գլխավոր նպատակ և երեք չափելի արդյունք։", "Ամեն ամիս վերանայեք էներգիան, առաջընթացն ու սահմանները։", "Կարևոր քայլերը պլանավորեք աջակցող պատուհաններում։", "Դժվար շաբաթներին նվազեցրեք ծավալը, բայց պահպանեք ռիթմը։"],
+    closing: "Աստղագիտական ժամանակացույցը ուղղություն է տալիս, բայց ընտրությունն ու գործողությունը մնում են ձեզ։",
+  };
   return {
     title: `${year} — Your personal year`,
     subtitle: `${baseName(input.firstName, input.locale)} · Sun in ${sun} · Moon in ${moon} · ${asc} rising`,
@@ -76,7 +90,21 @@ function timingReport(input: Input): PremiumReportContentJson {
   const timing = computeTiming(input.chart, input.now ?? new Date(), input.timezone, 90, input.locale);
   const best = [...timing.days].sort((a, b) => b.score - a.score).slice(0, 8);
   const caution = [...timing.days].sort((a, b) => a.score - b.score).slice(0, 6);
-  const en = input.locale !== "ka";
+  if (input.locale === "am") return {
+    title: "Ձեր առաջիկա 90 օրը",
+    subtitle: "Գործողության, վերանայման և վերականգնման անձնական ժամանակային քարտեզ",
+    overview: "Այս զեկույցը յուրաքանչյուր օրը գնահատում է ձեր նատալ քարտեզի համեմատ։ Այն պլանավորման կողմնացույց է, ոչ թե երաշխիք, և լավագույնս աշխատում է ձեր իրական առաջնահերթությունների ու սահմանափակումների հետ միասին։",
+    sections: [
+      { title: "Ինչպես օգտագործել օրացույցը", body: "Աջակցող օրերն օգտագործեք մեկնարկների, խնդրանքների և վճռորոշ զրույցների համար։ Չեզոք օրերին աշխատեք հետևողականորեն։ Զգուշության օրերին նվազեցրեք խուսափելի ռիսկը և լրացուցիչ ժամանակ թողեք ստուգման համար։" },
+      { title: "Ձեր ամենաուժեղ պատուհանները", body: best.map((d) => d.dateIso).join(" · "), highlights: best.slice(0, 4).map((d) => `${d.dateIso}․ գործեք հստակ առաջնահերթության ուղղությամբ`) },
+      { title: "Լրացուցիչ զգուշության պատուհանները", body: caution.map((d) => d.dateIso).join(" · "), highlights: caution.slice(0, 4).map((d) => `${d.dateIso}․ պարտավորվելուց առաջ ստուգեք մանրամասները`) },
+      { title: "Կարևոր անձնական տրանզիտներ", body: timing.notable.length ? timing.notable.map((n) => `${n.dateLabelKa} - ${n.title}: ${n.meaning}`).join("\n\n") : "Այս ժամանակահատվածում որևէ արտասովոր ճշգրիտ գլխավոր տրանզիտ չի գերակշռում․ հետևողականությունն ավելի կարևոր է, քան մեկ առանձին ամսաթիվը։" },
+    ],
+    keyDates: [...best.map((d) => ({ date: d.dateIso, title: "Գործելու պատուհան", note: "Առաջնահերթություն տվեք կարևոր արտաքին քայլին։", tone: "supportive" as const })), ...caution.map((d) => ({ date: d.dateIso, title: "Վերանայման պատուհան", note: "Դանդաղեք և ստուգեք ենթադրությունները։", tone: "caution" as const }))].sort((a, b) => a.date.localeCompare(b.date)),
+    actionPlan: ["Ընտրեք երեք արդյունք առաջիկա 90 օրվա համար։", "Ամենադժվար արտաքին քայլը տեղադրեք աջակցող պատուհանում։", "Զգուշության օրերը պահեք վերանայման և պահպանման աշխատանքների համար։", "Ամեն կիրակի վերանայեք առաջիկա յոթ օրը։"],
+    closing: "Լավ ժամանակը աջակցում է լավ որոշմանը, բայց երբեք չի փոխարինում այն։",
+  };
+  const en = input.locale === "en";
   return {
     title: en ? "Your next 90 days" : "შენი მომდევნო 90 დღე",
     subtitle: en ? "A personal timing map for action, review and recovery" : "პერსონალური დროის რუკა მოქმედებისთვის, გადახედვისა და აღდგენისთვის",
@@ -94,11 +122,24 @@ function timingReport(input: Input): PremiumReportContentJson {
 }
 
 function career(input: Input): PremiumReportContentJson {
-  const en = input.locale !== "ka";
   const mc = signName(input.chart.midheaven.signIndex, input.locale);
   const sun = signName(input.chart.bodies.sun.signIndex, input.locale);
   const mercury = signName(input.chart.bodies.mercury.signIndex, input.locale);
   const saturn = signName(input.chart.bodies.saturn.signIndex, input.locale);
+  if (input.locale === "am") return {
+    title: "Կարիերա և կոչում",
+    subtitle: `MC-ն ${mc}-ում · Արևը ${sun}-ում`,
+    overview: `${mc}-ում գտնվող MC-ն նկարագրում է ժամանակի ընթացքում կառուցվող հեղինակությունը, իսկ ${sun}-ում գտնվող Արևը՝ այն աշխատանքը, որը պահպանում է ձեր ներքին ներգրավվածությունը։ Այս զեկույցը այդ ազդակները վերածում է դերի, միջավայրի և աճի ընտրությունների։`,
+    sections: [
+      { title: "Հանրային ուղղություն", body: `Քարտեզի գագաթին գտնվող ${mc}-ը նպաստում է այնպիսի ուղու, որտեղ այդ նշանի հատկությունները դառնում են տեսանելի և օգտակար։ Կառուցեք կատարված աշխատանքի ապացույց, ոչ միայն ներուժ, և թույլ տվեք, որ հեղինակությունը ժամանակի ընթացքում կուտակվի։`, highlights: ["Ընտրեք տեսանելի արդյունք ունեցող աշխատանք", "Կառուցեք կրկնվող աշխատանքի պորտֆոլիո", "Հեղինակությանը վերաբերվեք որպես երկարաժամկետ ակտիվի"] },
+      { title: "Մտածողություն և հաղորդակցություն", body: `${mercury}-ում գտնվող Մերկուրին նկարագրում է, թե ինչպես եք սովորում, բացատրում և լուծումներ գտնում։ Աշխատանքային ընթացքը կառուցեք այդ ոճի շուրջ, բայց անհրաժեշտության դեպքում գիտակցաբար մարզեք նաև հակառակ մոտեցումը։` },
+      { title: "Կարգապահություն և վարպետություն", body: `${saturn}-ում գտնվող Սատուրնը ցույց է տալիս այն ոլորտը, որտեղ համբերությունը վերածվում է հեղինակության։ Առաջընթացը կարող է ավելի դանդաղ թվալ, բայց հետևողականությունը ստեղծում է ամուր վստահություն։` },
+      { title: "Լավագույն աշխատանքային միջավայրը", body: `${sun}-ում գտնվող ձեր Արևին անհրաժեշտ է բավարար ինքնուրույնություն՝ արդյունքով հետաքրքրվելու համար, և բավարար կառուցվածք՝ գործը ավարտելու համար։ Նախընտրեք թիմեր, որտեղ պատասխանատվությունը հստակ է, արձագանքը՝ օգտակար, իսկ խորությունը գնահատվում է աղմուկից առավել։` },
+    ],
+    actionPlan: ["Սահմանեք մեկ մասնագիտական թեմա, որով ցանկանում եք ճանաչված լինել։", "30 օրվա ընթացքում ստեղծեք մեկ հանրային աշխատանքի օրինակ։", "Երեք վստահելի մարդու հարցրեք, թե որտեղ են տեսնում ձեր ամենաուժեղ առավելությունը։", "Մշտական թռիչքից առաջ անցկացրեք 90-օրյա փորձարկում։"],
+    closing: "Կոչումը կարիերա է դառնում կրկնվող արդյունքի, սահմանների և ժամանակի շնորհիվ։",
+  };
+  const en = input.locale === "en";
   return {
     title: en ? "Career and calling" : "კარიერა და მოწოდება",
     subtitle: en ? `Midheaven in ${mc} · Sun in ${sun}` : `MC ${mc}-ში · მზე ${sun}-ში`,
@@ -117,10 +158,26 @@ function career(input: Input): PremiumReportContentJson {
 function relationship(input: Input): PremiumReportContentJson {
   if (!input.partner) throw new Error("relationship report requires a partner");
   const result = computeSynastry(input.chart, input.partner.chart);
-  const en = input.locale !== "ka";
+  const en = input.locale === "en";
+  const am = input.locale === "am";
   const sorted = CATEGORIES.map((key) => ({ key, score: result.scores[key] })).sort((a, b) => b.score - a.score);
   const labelsEn: Record<string, string> = { love: "Love", friendship: "Friendship", communication: "Communication", growth: "Growth", chemistry: "Chemistry", business: "Shared work" };
-  const label = (key: string) => en ? labelsEn[key] : CATEGORY_LABEL_KA[key as keyof typeof CATEGORY_LABEL_KA];
+  const labelsAm: Record<string, string> = { love: "Սեր", friendship: "Ընկերություն", communication: "Հաղորդակցություն", growth: "Աճ", chemistry: "Քիմիա", business: "Համատեղ աշխատանք" };
+  const aspectsAm: Record<string, string> = { conjunction: "միացում", sextile: "սեքստիլ", square: "քառակուսի", trine: "տրին", opposition: "ընդդիմություն" };
+  const label = (key: string) => am ? labelsAm[key] : en ? labelsEn[key] : CATEGORY_LABEL_KA[key as keyof typeof CATEGORY_LABEL_KA];
+  if (am) return {
+    title: `Հարաբերությունների զեկույց․ ${input.partner.name}`,
+    subtitle: `Ընդհանուր համատեղելիություն՝ ${result.overall}%`,
+    overview: `Ձեր ${result.overall}% ցուցանիշը միտումների քարտեզ է, ոչ թե դատավճիռ։ Ամենաուժեղ ոլորտը ${label(sorted[0].key)}-ն է (${sorted[0].score}%), իսկ առավել գիտակցված աշխատանք պահանջող ոլորտը՝ ${label(sorted.at(-1)!.key)}-ն (${sorted.at(-1)!.score}%)։`,
+    sections: [
+      { title: "Համատեղելիությունն ըստ ոլորտների", body: sorted.map((x) => `${label(x.key)} - ${x.score}%`).join("\n"), highlights: sorted.slice(0, 3).map((x) => `${label(x.key)}-ը հարաբերության բնական ռեսուրս է։`) },
+      { title: "Ձեր ամենաուժեղ կապերը", body: result.topAspects.slice(0, 4).map((a) => `${bodyName(a.a, input.locale)} ${aspectsAm[a.kind] ?? a.kind} ${bodyName(a.b, input.locale)} · ${a.orb.toFixed(1)}°`).join("\n") || "Հարաբերությունը ձևավորվում է ամբողջական պատկերով, ոչ թե մեկ գերիշխող ասպեկտով։" },
+      { title: "Որտեղ լարվածությունը կարող է աճ դառնալ", body: `${label(sorted.at(-1)!.key)}-ի համեմատաբար ցածր ցուցանիշը հստակ պայմանավորվածությունների հրավեր է։ Մոտիվները ենթադրելուց առաջ անվանեք կարիքները և դժվար զրույցին վերադարձեք, երբ երկուսդ էլ հանգստանաք։` },
+      { title: "Համատեղ ուսումնասիրության հարցեր", body: "Ի՞նչն է օգնում մեզանից յուրաքանչյուրին իրեն լսված զգալ։\nԻնչպիսի՞ն է աջակցությունը սթրեսի ժամանակ։\nՈ՞ր որոշումն է ավելի հստակ ընդհանուր համաձայնություն պահանջում։\nԻնչպե՞ս պաշտպանենք և՛ մտերմությունը, և՛ ինքնուրույնությունը։" },
+    ],
+    actionPlan: ["Անցկացրեք մեկ 30-րոպեանոց զրույց և առաջին 10 րոպեն միայն լսեք։", "Համաձայնեցրեք մեկ արտահայտություն լարված պահերը մեղմելու համար։", "Պլանավորեք մեկ զբաղմունք ձեր ամենաուժեղ համատեղելիության ոլորտի շուրջ։", "Կրկնվող վեճը դիտարկեք որպես ընդհանուր համակարգ, ոչ թե անձնական թերություն։"],
+    closing: "Համատեղելիությունը ներուժ է, իսկ հարաբերության որակը՝ այն պրակտիկան, որը կառուցում եք միասին։",
+  };
   return {
     title: en ? `Relationship report: ${input.partner.name}` : `ურთიერთობის რეპორტი: ${input.partner.name}`,
     subtitle: en ? `Overall compatibility ${result.overall}%` : `საერთო თავსებადობა ${result.overall}%`,

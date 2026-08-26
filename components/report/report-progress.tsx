@@ -26,6 +26,14 @@ const STAGE_MESSAGES_EN = [
   "Analyzing houses and aspects…",
   "Designing your PDF…",
 ];
+const STAGE_MESSAGES_AM = [
+  "Հաստատում ենք գնումը…",
+  "Վերլուծում ենք ձեր նատալ քարտեզը…",
+  "Կարդում ենք մոլորակների լեզուն…",
+  "Գրում ենք ձեր անձնական մեկնաբանությունը…",
+  "Վերլուծում ենք տներն ու ասպեկտները…",
+  "Ձևավորում ենք ձեր PDF-ը…",
+];
 
 /**
  * Live status for a report. Generation is opaque (parallel LLM calls + PDF
@@ -46,12 +54,13 @@ export function ReportProgress({
 }) {
   const en = locale !== "ka";
   const am = locale === "am";
-  const stageMessages = en ? STAGE_MESSAGES_EN : STAGE_MESSAGES;
+  const stageMessages = am ? STAGE_MESSAGES_AM : en ? STAGE_MESSAGES_EN : STAGE_MESSAGES;
   const [status, setStatus] = useState<Status>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(initialStatus === "ready" ? 100 : 6);
   const [stage, setStage] = useState(0);
   const [retrying, setRetrying] = useState(false);
+  const [retryable, setRetryable] = useState(initialStatus === "failed");
 
   const done = status === "ready";
   const failed = status === "failed";
@@ -63,6 +72,7 @@ export function ReportProgress({
       if (!res.ok) return false;
       const data = await res.json();
       setStatus(data.status as Status);
+      setRetryable(Boolean(data.retryable));
       if (data.status === "failed") setError(data.error ?? null);
       return data.status === "ready" || data.status === "failed";
     } catch {
@@ -121,10 +131,15 @@ export function ReportProgress({
     setRetrying(true);
     setError(null);
     try {
-      await fetch(`/api/reports/${reportId}`, { method: "POST" });
+      const response = await fetch(`/api/reports/${reportId}`, { method: "POST" });
+      if (!response.ok) {
+        setError(am ? "Կրկին ստեղծումը չհաջողվեց սկսել։ Խնդրում ենք քիչ անց նորից փորձել։" : en ? "The retry could not be started. Please try again shortly." : "ხელახალი გენერაცია ვერ გაეშვა. ცოტა ხანში ისევ სცადე.");
+        return;
+      }
       setStatus("paid");
+      setRetryable(false);
       setProgress(8);
-      poll();
+      void poll();
     } finally {
       setRetrying(false);
     }
@@ -141,9 +156,11 @@ export function ReportProgress({
             {title ? `${title} — ${am ? "պատրաստ է 🌟" : en ? "ready 🌟" : "მზადაა 🌟"}` : am ? "Ձեր զեկույցը պատրաստ է։ 🌟" : en ? "Your report is ready! 🌟" : "ანგარიში მზადაა! 🌟"}
           </h2>
           <p className="mt-2 max-w-md text-sm text-foreground/75">
-            {en
-              ? "Your personal report is complete. Download it and keep it forever."
-              : "შენი პერსონალური რეპორტი დასრულდა. ჩამოტვირთე — ის სამუდამოდ შენთან რჩება."}
+            {am
+              ? "Ձեր անձնական զեկույցը պատրաստ է։ Ներբեռնեք և պահեք այն ընդմիշտ։"
+              : en
+                ? "Your personal report is complete. Download it and keep it forever."
+                : "შენი პერსონალური რეპორტი დასრულდა. ჩამოტვირთე — ის სამუდამოდ შენთან რჩება."}
           </p>
           <Button asChild variant="mystic" size="xl" className="mt-6 min-w-56">
             <a href={`/api/reports/${reportId}/download`}>
@@ -163,9 +180,11 @@ export function ReportProgress({
             {am ? "Զեկույցի ստեղծումն ընդհատվել է" : en ? "Report generation was interrupted" : "გენერაცია შეფერხდა"}
           </h2>
           <p className="mt-2 max-w-md text-sm text-foreground/75">
-            {en
-              ? "Something went wrong while creating the PDF. Your payment is saved, so you can retry at no extra cost."
-              : "რაღაც ვერ მოხერხდა PDF-ის შექმნისას. გადახდა შენახულია — სცადე ხელახლა დამატებითი საფასურის გარეშე."}
+            {am
+              ? "PDF-ը ստեղծելիս սխալ առաջացավ։ Գնումը պահպանված է, և կարող եք անվճար կրկին փորձել։"
+              : en
+                ? "Something went wrong while creating the PDF. Your payment is saved, so you can retry at no extra cost."
+                : "რაღაც ვერ მოხერხდა PDF-ის შექმნისას. გადახდა შენახულია — სცადე ხელახლა დამატებითი საფასურის გარეშე."}
           </p>
           {error && <p className="mt-2 text-xs text-muted-foreground">{error}</p>}
           <Button
@@ -201,10 +220,25 @@ export function ReportProgress({
             />
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            {en
-              ? "Please keep this page open. It usually takes less than a minute."
-              : "გთხოვ, არ დახურო ეს გვერდი — ჩვეულებრივ ერთ წუთზე ნაკლები სჭირდება."}
+            {am
+              ? "Խնդրում ենք բաց պահել այս էջը․ սովորաբար մեկ րոպեից պակաս է տևում։"
+              : en
+                ? "Please keep this page open. It usually takes less than a minute."
+                : "გთხოვ, არ დახურო ეს გვერდი — ჩვეულებრივ ერთ წუთზე ნაკლები სჭირდება."}
           </p>
+          {retryable && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-5"
+              onClick={retry}
+              disabled={retrying}
+            >
+              {retrying ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+              {am ? "Կրկին սկսել ստեղծումը" : en ? "Restart generation" : "გენერაციის ხელახლა გაშვება"}
+            </Button>
+          )}
+          {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
         </div>
       )}
     </div>

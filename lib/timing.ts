@@ -46,6 +46,7 @@ const TRANSIT_WEIGHT: Record<string, number> = {
 
 const WEEKDAYS_KA = ["კვ", "ორ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ"];
 const WEEKDAYS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAYS_AM = ["Կիր", "Երկ", "Երք", "Չոր", "Հնգ", "Ուրբ", "Շաբ"];
 const MONTHS_KA = [
   "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
   "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი",
@@ -53,6 +54,10 @@ const MONTHS_KA = [
 const MONTHS_EN = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
+];
+const MONTHS_AM = [
+  "հունվար", "փետրվար", "մարտ", "ապրիլ", "մայիս", "հունիս",
+  "հուլիս", "օգոստոս", "սեպտեմբեր", "հոկտեմբեր", "նոյեմբեր", "դեկտեմբեր",
 ];
 
 export type DayTier = "great" | "good" | "calm" | "tough";
@@ -98,6 +103,28 @@ const KIND_KA: Record<string, string> = {
   trine: "ტრინი",
   opposition: "ოპოზიცია",
 };
+const TRANSIT_AM: Record<string, string> = {
+  venus: "Վեներա",
+  mars: "Մարս",
+  jupiter: "Յուպիտեր",
+  saturn: "Սատուրն",
+};
+const NATAL_AM_GENITIVE: Record<string, string> = {
+  sun: "Արևի",
+  moon: "Լուսնի",
+  mercury: "Մերկուրիի",
+  venus: "Վեներայի",
+  mars: "Մարսի",
+  ascendant: "Ասցենդենտի",
+  midheaven: "MC-ի",
+};
+const KIND_AM: Record<string, string> = {
+  conjunction: "միացում",
+  sextile: "սեքստիլ",
+  square: "քառակուսի",
+  trine: "տրին",
+  opposition: "ընդդիմություն",
+};
 const PLANET_MEANING: Record<string, string> = {
   venus: "სიყვარულის, ჰარმონიისა და სიამოვნების ენერგია",
   mars: "ენერგიის, ინიციატივისა და მოქმედების ბიძგი",
@@ -138,6 +165,26 @@ const FAMILY_TONE_EN: Record<AspectFamily, string> = {
   tense: "This can bring friction; stay flexible and patient.",
   neutral: "This is a meaningful emphasis worth noticing.",
 };
+const PLANET_MEANING_AM: Record<string, string> = {
+  venus: "Սիրո, ներդաշնակության և հաճույքի էներգիան",
+  mars: "Գործողության, նախաձեռնության և էներգիայի ուժը",
+  jupiter: "Աճի, հնարավորության և վստահության ալիքը",
+  saturn: "Պատասխանատվության, կառուցվածքի և հետևողական ջանքի պահանջը",
+};
+const NATAL_AREA_AM: Record<string, string> = {
+  sun: "ձեր ինքնությանն ու կենսունակությանը",
+  moon: "ձեր զգացմունքներին ու ներաշխարհին",
+  mercury: "ձեր մտածողությանն ու հաղորդակցությանը",
+  venus: "ձեր հարաբերություններին ու արժեքներին",
+  mars: "ձեր շարժիչ ուժին ու գործողություններին",
+  ascendant: "ձեր ինքնարտահայտմանն ու արտաքին ոճին",
+  midheaven: "ձեր կարիերային ու հանրային ուղղությանը",
+};
+const FAMILY_TONE_AM: Record<AspectFamily, string> = {
+  harmonic: "Սա աջակցող հնարավորություն է․ օգտագործեք այն գիտակցաբար։",
+  tense: "Սա կարող է լարվածություն բերել․ պահպանեք ճկունությունն ու համբերությունը։",
+  neutral: "Սա կարևոր շեշտադրում է, որն արժե նկատել։",
+};
 
 const NOTABLE_TRANSITS = new Set(["venus", "mars", "jupiter", "saturn"]);
 const NOTABLE_NATALS = new Set([
@@ -168,6 +215,7 @@ export function computeTiming(
   locale: UserLocale = "ka",
 ): { days: TimingDay[]; notable: NotableTransit[] } {
   const en = locale === "en";
+  const am = locale === "am";
   const natalPoints: Record<string, { longitude: number }> = {};
   for (const [k, v] of Object.entries(natal.bodies)) {
     natalPoints[k] = { longitude: v.longitude };
@@ -208,7 +256,7 @@ export function computeTiming(
     out.push({
       dateIso,
       dom: local.getUTCDate(),
-      weekdayKa: (en ? WEEKDAYS_EN : WEEKDAYS_KA)[local.getUTCDay()],
+      weekdayKa: (am ? WEEKDAYS_AM : en ? WEEKDAYS_EN : WEEKDAYS_KA)[local.getUTCDay()],
       score,
       tier: tierFor(score),
     });
@@ -225,17 +273,21 @@ export function computeTiming(
         orb: a.orb,
         item: {
           dateIso,
-          dateLabelKa: `${local.getUTCDate()} ${(en ? MONTHS_EN : MONTHS_KA)[local.getUTCMonth()]}`,
+          dateLabelKa: `${local.getUTCDate()} ${(am ? MONTHS_AM : en ? MONTHS_EN : MONTHS_KA)[local.getUTCMonth()]}`,
           transit: a.transit,
           natal: a.natal,
           kind: a.kind,
           family: fam,
-          title: en
-            ? `${a.transit[0].toUpperCase() + a.transit.slice(1)} ${a.kind} natal ${a.natal[0].toUpperCase() + a.natal.slice(1)}`
-            : `${TRANSIT_KA[a.transit]} ${KIND_KA[a.kind]} ${NATAL_KA[a.natal]}-თან`,
-          meaning: en
-            ? `${PLANET_MEANING_EN[a.transit]} meets ${NATAL_AREA_EN[a.natal]}. ${FAMILY_TONE_EN[fam]}`
-            : `${PLANET_MEANING[a.transit]} ხვდება ${NATAL_AREA[a.natal]}. ${FAMILY_TONE[fam]}`,
+          title: am
+            ? `${TRANSIT_AM[a.transit]}՝ ${KIND_AM[a.kind]} նատալ ${NATAL_AM_GENITIVE[a.natal]} հետ`
+            : en
+              ? `${a.transit[0].toUpperCase() + a.transit.slice(1)} ${a.kind} natal ${a.natal[0].toUpperCase() + a.natal.slice(1)}`
+              : `${TRANSIT_KA[a.transit]} ${KIND_KA[a.kind]} ${NATAL_KA[a.natal]}-თან`,
+          meaning: am
+            ? `${PLANET_MEANING_AM[a.transit]} հանդիպում է ${NATAL_AREA_AM[a.natal]}։ ${FAMILY_TONE_AM[fam]}`
+            : en
+              ? `${PLANET_MEANING_EN[a.transit]} meets ${NATAL_AREA_EN[a.natal]}. ${FAMILY_TONE_EN[fam]}`
+              : `${PLANET_MEANING[a.transit]} ხვდება ${NATAL_AREA[a.natal]}. ${FAMILY_TONE[fam]}`,
         },
       });
     }

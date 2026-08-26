@@ -18,6 +18,7 @@ import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 import { isReportProductKey } from "@/lib/report-catalog";
 import { buildPremiumReportContent } from "@/lib/reports/premium-content";
 import { PremiumReport } from "@/components/pdf/premium-report";
+import { resolveRelationshipReportView } from "@/lib/reports/relationship-view";
 
 export function reportPdfKey(userId: string, reportId: string): string {
   return `reports/${userId}/${reportId}.pdf`;
@@ -57,7 +58,7 @@ export async function generateAndStoreReport(reportId: string): Promise<boolean>
   // Claim the job.
   await db
     .update(pdfReports)
-    .set({ status: "generating", error: null })
+    .set({ status: "generating", generationStartedAt: new Date(), error: null })
     .where(eq(pdfReports.id, reportId));
 
   try {
@@ -75,10 +76,25 @@ export async function generateAndStoreReport(reportId: string): Promise<boolean>
       if (!report.partnerId) throw new Error("relationship report has no partner");
       const [partner] = await db.select().from(partners).where(eq(partners.id, report.partnerId)).limit(1);
       if (!partner) throw new Error("relationship partner no longer exists");
-      const [ownerChart] = await db.select().from(charts).where(eq(charts.userId, partner.userId)).limit(1);
-      if (!ownerChart) throw new Error("relationship owner has no chart");
-      chartRow = ownerChart;
-      relationshipPartner = { name: partner.name, chart: partner.chart };
+      let ownerChart: typeof chartRow | null = null;
+      let ownerName: string | null = null;
+      if (report.userId === partner.linkedUserId) {
+        const [[ownerChartRow], [owner]] = await Promise.all([
+          db.select().from(charts).where(eq(charts.userId, partner.userId)).limit(1),
+          db.select({ name: users.name }).from(users).where(eq(users.id, partner.userId)).limit(1),
+        ]);
+        ownerChart = ownerChartRow ?? null;
+        ownerName = owner?.name ?? null;
+      }
+      const view = resolveRelationshipReportView({
+        reportUserId: report.userId,
+        purchaserChart: chartRow,
+        relationship: partner,
+        ownerChart,
+        ownerName,
+      });
+      chartRow = view.chart;
+      relationshipPartner = view.partner;
     }
 
     const [profile] = await db

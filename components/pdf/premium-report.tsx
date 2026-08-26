@@ -4,7 +4,7 @@ import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import type { PremiumReportContentJson } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { C } from "@/lib/pdf/theme";
-import { registerReportFonts } from "@/components/pdf/natal-report";
+import { registerArmenianReportFonts, registerReportFonts } from "@/components/pdf/natal-report";
 
 const styles = StyleSheet.create({
   page: { backgroundColor: C.bg, color: C.text, fontFamily: "Noto", fontSize: 10.5, lineHeight: 1.65, paddingTop: 52, paddingBottom: 54, paddingHorizontal: 48 },
@@ -35,55 +35,84 @@ const styles = StyleSheet.create({
   footer: { position: "absolute", bottom: 25, left: 48, right: 48, flexDirection: "row", justifyContent: "space-between", color: C.textDim, fontSize: 8 },
 });
 
+function chunks<T>(items: readonly T[], size: number): T[][] {
+  return Array.from({ length: Math.ceil(items.length / size) }, (_, index) => items.slice(index * size, (index + 1) * size));
+}
+
+function paginateBody(body: string, maxChars = 1_050): string[] {
+  const paragraphs = body.split("\n\n");
+  if (paragraphs.length === 1 || body.length <= maxChars) return [body];
+  const pages: string[] = [];
+  let current = "";
+  for (const paragraph of paragraphs) {
+    const candidate = current ? `${current}\n\n${paragraph}` : paragraph;
+    if (current && candidate.length > maxChars) {
+      pages.push(current);
+      current = paragraph;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) pages.push(current);
+  return pages;
+}
+
 function Footer({ locale }: { locale: UserLocale }) {
   return (
     <View style={styles.footer} fixed>
       <Text>VIVIDA</Text>
-      <Text>{locale === "ka" ? "პერსონალური ასტროლოგიური რეპორტი" : "Personal astrology report"}</Text>
+      <Text>{locale === "ka" ? "პერსონალური ასტროლოგიური რეპორტი" : locale === "am" ? "Անձնական աստղագիտական զեկույց" : "Personal astrology report"}</Text>
     </View>
   );
 }
 
 export function PremiumReport({ content, locale }: { content: PremiumReportContentJson; locale: UserLocale }) {
   registerReportFonts();
-  const contents = locale === "ka" ? "შენი რეპორტი" : "Your report";
+  if (locale === "am") registerArmenianReportFonts();
+  const am = locale === "am";
+  const localizedFont = { fontFamily: am ? "NotoArmenian" : "Noto" };
+  const contents = locale === "ka" ? "შენი რეპორტი" : am ? "Ձեր զեկույցը" : "Your report";
+  const datePages = chunks(content.keyDates ?? [], 10);
   return (
     <Document title={content.title} author="Vivida">
-      <Page size="A4" style={styles.cover}>
+      <Page size="A4" style={[styles.cover, localizedFont]}>
         <Text style={styles.kicker}>VIVIDA · {contents}</Text>
         <Text style={styles.coverTitle}>{content.title}</Text>
         <Text style={styles.subtitle}>{content.subtitle}</Text>
         <View style={styles.coverRule} />
-        <Text style={styles.brand}>VIVIDA.GE · PERSONAL ASTROLOGY</Text>
+        <Text style={styles.brand}>VIVIDA · {am ? "ԱՆՁՆԱԿԱՆ ԱՍՏՂԱԳԻՏՈՒԹՅՈՒՆ" : "PERSONAL ASTROLOGY"}</Text>
       </Page>
 
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.pageTitle}>{locale === "ka" ? "მთავარი ხედვა" : "The big picture"}</Text>
+      <Page size="A4" style={[styles.page, localizedFont]}>
+        <Text style={styles.pageTitle}>{locale === "ka" ? "მთავარი ხედვა" : am ? "Գլխավոր պատկերը" : "The big picture"}</Text>
         <Text style={styles.prose}>{content.overview}</Text>
         <Footer locale={locale} />
       </Page>
 
-      {content.sections.map((section, index) => (
-        <Page size="A4" style={styles.page} key={`${section.title}-${index}`}>
-          <View style={styles.section}>
-            <Text style={styles.sectionNo}>{String(index + 1).padStart(2, "0")} · {locale === "ka" ? "თავი" : "SECTION"}</Text>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <Text style={styles.prose}>{section.body}</Text>
-            {section.highlights?.map((highlight) => (
-              <View style={styles.highlight} key={highlight} wrap={false}>
-                <Text style={styles.highlightText}>• {highlight}</Text>
-              </View>
-            ))}
-          </View>
-          <Footer locale={locale} />
-        </Page>
-      ))}
+      {content.sections.flatMap((section, index) => {
+        const bodyPages = paginateBody(section.body);
+        return bodyPages.map((body, pageIndex) => (
+          <Page size="A4" style={[styles.page, localizedFont]} key={`${section.title}-${index}-${pageIndex}`}>
+            <View style={styles.section}>
+              <Text style={styles.sectionNo}>{String(index + 1).padStart(2, "0")} · {locale === "ka" ? "თავი" : am ? "ԲԱԺԻՆ" : "SECTION"}</Text>
+              <Text style={styles.sectionTitle}>{section.title}{pageIndex > 0 ? ` · ${pageIndex + 1}` : ""}</Text>
+              <Text style={styles.prose}>{body}</Text>
+              {pageIndex === bodyPages.length - 1 && section.highlights?.map((highlight) => (
+                <View style={styles.highlight} key={highlight} wrap={false}>
+                  <Text style={styles.highlightText}>• {highlight}</Text>
+                </View>
+              ))}
+            </View>
+            <Footer locale={locale} />
+          </Page>
+        ));
+      })}
 
-      {!!content.keyDates?.length && (
-        <Page size="A4" style={styles.page}>
-          <Text style={styles.pageTitle}>{locale === "ka" ? "მნიშვნელოვანი თარიღები" : "Key dates"}</Text>
+      {datePages.map((dates, pageIndex) => (
+        <Page size="A4" style={[styles.page, localizedFont]} key={`dates-${pageIndex}`}>
+          <Text style={styles.pageTitle}>{locale === "ka" ? "მნიშვნელოვანი თარიღები" : am ? "Կարևոր ամսաթվեր" : "Key dates"}{pageIndex > 0 ? ` · ${pageIndex + 1}` : ""}</Text>
           <View style={styles.dates}>
-            {content.keyDates.map((item, index) => (
+            {dates.map((item, index) => (
               <View style={styles.dateRow} key={`${item.date}-${index}`} wrap={false}>
                 <Text style={styles.date}>{item.date}</Text>
                 <View style={styles.dateBody}>
@@ -95,10 +124,10 @@ export function PremiumReport({ content, locale }: { content: PremiumReportConte
           </View>
           <Footer locale={locale} />
         </Page>
-      )}
+      ))}
 
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.pageTitle}>{locale === "ka" ? "სამოქმედო გეგმა" : "Your action plan"}</Text>
+      <Page size="A4" style={[styles.page, localizedFont]}>
+        <Text style={styles.pageTitle}>{locale === "ka" ? "სამოქმედო გეგმა" : am ? "Գործողությունների պլան" : "Your action plan"}</Text>
         <View style={styles.plan}>
           {content.actionPlan.map((item, index) => (
             <View style={styles.planRow} key={item} wrap={false}>

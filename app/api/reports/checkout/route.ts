@@ -74,7 +74,11 @@ export async function POST(req: Request) {
   const now = new Date();
   const specs = products.map((type) => {
     const subjectKey = type === "relationship" ? partner!.id : "";
-    const sourceHash = type === "relationship" ? `${ownerChartHash}:${partner!.inputHash}` : viewerChart.inputHash;
+    const sourceHash = type === "relationship"
+      ? partner!.userId === userId
+        ? `${viewerChart.inputHash}:${partner!.inputHash}`
+        : `${ownerChartHash}:${viewerChart.inputHash}`
+      : viewerChart.inputHash;
     return { type, subjectKey, partnerId: type === "relationship" ? partner!.id : null, editionKey: type === "natal" ? "evergreen" : reportEditionKey(type, now, sourceHash, subjectKey) };
   });
 
@@ -103,7 +107,7 @@ export async function POST(req: Request) {
   const bundleId = bundleKey ? crypto.randomUUID() : null;
   await db.insert(pdfReports).values(missing.map((spec) => ({
     userId, type: spec.type, language: locale, status: "paid" as const,
-    inputHash: spec.type === "relationship" ? ownerChartHash : viewerChart.inputHash,
+    inputHash: viewerChart.inputHash,
     editionKey: spec.editionKey, subjectKey: spec.subjectKey, partnerId: spec.partnerId,
     bundleId, bundleKey, comped: false, amountCents: 0,
     currency: reportCurrency().toUpperCase(), paidAt: now,

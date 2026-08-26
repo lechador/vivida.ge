@@ -586,6 +586,8 @@ export const pdfReports = pgTable(
       .defaultNow()
       .notNull(),
     paidAt: timestamp("paid_at", { withTimezone: true }),
+    /** Timestamp of the latest renderer claim; used to recover crashed jobs. */
+    generationStartedAt: timestamp("generation_started_at", { withTimezone: true }),
     readyAt: timestamp("ready_at", { withTimezone: true }),
   },
   (t) => [

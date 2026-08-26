@@ -20,6 +20,7 @@ import type { UserLocale } from "@/lib/i18n/locale";
 
 const FONT_DIR = path.join(process.cwd(), "app", "_fonts");
 let fontsReady = false;
+let armenianFontsReady = false;
 export function registerReportFonts() {
   if (fontsReady) return;
   Font.register({
@@ -32,6 +33,19 @@ export function registerReportFonts() {
   // Long Georgian words shouldn't be hyphenated.
   Font.registerHyphenationCallback((w) => [w]);
   fontsReady = true;
+}
+
+export function registerArmenianReportFonts() {
+  if (armenianFontsReady) return;
+  const src = path.join(FONT_DIR, "NotoSansArmenian-Variable.ttf");
+  Font.register({
+    family: "NotoArmenian",
+    fonts: [
+      { src, fontWeight: "normal" },
+      { src, fontWeight: "bold" },
+    ],
+  });
+  armenianFontsReady = true;
 }
 
 export type NatalReportData = {
