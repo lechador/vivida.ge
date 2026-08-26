@@ -2326,10 +2326,10 @@ export const reportStatusEnum = pgEnum("report_status", [
 ]);
 
 /**
- * User-submitted abuse reports. Deliberately schema-light — capture enough
- * to review by hand (who reported what, plus an optional free-text reason)
- * without a dedicated admin UI yet. `targetId` is the reported user / post /
+ * User-submitted abuse reports. `targetId` is the reported user / post /
  * comment id, or the other participant's user id for a message_thread report.
+ * Resolution fields keep the latest queue state easy to query; the append-only
+ * report_moderation_action table below preserves the full admin audit trail.
  */
 export const reports = pgTable(
   "report",
@@ -2344,6 +2344,12 @@ export const reports = pgTable(
     targetId: text("target_id").notNull(),
     reason: text("reason"),
     status: reportStatusEnum("status").notNull().default("open"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedBy: text("reviewed_by"),
+    resolutionNote: text("resolution_note"),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -2358,10 +2364,41 @@ export const reports = pgTable(
   ]
 );
 
+/**
+ * Append-only trust & safety audit trail. A report may be reviewed, reopened,
+ * dismissed, restricted, and later unrestricted; keeping each event avoids
+ * losing the decision history when the report's current status changes.
+ */
+export const reportModerationActions = pgTable(
+  "report_moderation_action",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    reportId: text("report_id")
+      .notNull()
+      .references(() => reports.id, { onDelete: "cascade" }),
+    actorEmail: text("actor_email").notNull(),
+    action: text("action").notNull(),
+    targetUserId: text("target_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("report_moderation_action_report_idx").on(t.reportId, t.createdAt),
+    index("report_moderation_action_target_idx").on(t.targetUserId, t.createdAt),
+  ],
+);
+
 export type Block = typeof blocks.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type NewReport = typeof reports.$inferInsert;
 export type ReportTargetType = (typeof reportTargetTypeEnum.enumValues)[number];
+export type ReportModerationAction = typeof reportModerationActions.$inferSelect;
 
 /**
  * Per-axis MBTI score. `letter` is the winning pole of the axis; `pct` is how

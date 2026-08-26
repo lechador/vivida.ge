@@ -16,10 +16,12 @@ import { MINIMUM_AGE_YEARS } from "@/lib/profile-core";
  *     the day they turn 18** (nothing to remember to clear); or
  *   - `users.restricted = true` → a manual override for non-age cases.
  *
- * Shared Georgian copy so web + mobile surface the same message.
+ * Shared Georgian copy so web + mobile surface the same message. The wording
+ * intentionally covers both age-based and manual safety restrictions without
+ * disclosing an internal moderation decision.
  */
 export const RESTRICTED_MESSAGE =
-  "შენი ანგარიში შეზღუდულია 18 წლის ასაკამდე — ამ ფუნქციით ვერ ისარგებლებ.";
+  "შენი ანგარიში უსაფრთხოების წესების გამო შეზღუდულია — ამ ფუნქციით ვერ ისარგებლებ.";
 
 export async function isAccountRestricted(userId: string): Promise<boolean> {
   const [row] = await db

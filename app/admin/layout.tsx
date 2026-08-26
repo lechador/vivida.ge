@@ -43,6 +43,13 @@ export default async function AdminLayout({
               ფიდი
             </Link>
             <span className="text-muted-foreground/40">·</span>
+            <Link
+              href="/admin/safety"
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              უსაფრთხოება
+            </Link>
+            <span className="text-muted-foreground/40">·</span>
             <span className="text-muted-foreground/80">
               {admin.email}
             </span>

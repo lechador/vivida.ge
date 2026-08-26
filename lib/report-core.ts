@@ -4,9 +4,9 @@ import { db } from "@/db";
 import { reports, type ReportTargetType } from "@/db/schema";
 
 /**
- * Report *write* logic. Deliberately minimal — we just capture the report
- * for manual review (no admin UI yet). Read it with a SQL client or db:studio
- * (`select * from report where status='open' order by created_at desc`).
+ * Report *write* logic. Deliberately minimal — capture the report for the
+ * `/admin/safety` review queue. Moderation decisions and restrictions are
+ * handled separately in lib/admin-safety.ts.
  */
 
 const MAX_REASON = 1000;
