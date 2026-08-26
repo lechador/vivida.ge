@@ -77,7 +77,15 @@ export async function partnerCreationsThisMonth(
  * the paid `aiInterpretation`/`deepReport` for free. The per-partner routes
  * gate those two fields; the list must not carry them at all.
  */
-export type PartnerListItem = Omit<Partner, "aiInterpretation" | "deepReport">;
+export type PartnerListItem = Omit<
+  Partner,
+  | "aiInterpretation"
+  | "deepReport"
+  | "linkedUserId"
+  | "inviteTokenHash"
+  | "inviteExpiresAt"
+  | "inviteAcceptedAt"
+>;
 
 export async function listPartners(
   userId: string,

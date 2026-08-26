@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import {
   AtSign,
   Bell,
+  CalendarDays,
+  HeartHandshake,
   MessageCircle,
   MessageSquare,
   Sparkles,
@@ -34,6 +36,9 @@ const KIND_ICON: Record<string, LucideIcon> = {
   mention: AtSign,
   new_match: Sparkles,
   credit: Sparkles,
+  relationship_connected: HeartHandshake,
+  relationship_weekly: CalendarDays,
+  relationship_transit: Sparkles,
 };
 
 const REACTION_LABEL_KA: Record<string, string> = {
@@ -70,6 +75,16 @@ function notificationLabel(kind: string, payload: Notification["payload"], local
         : am ? "ձեզ նշել է գրառման մեջ" : en ? "mentioned you in a post" : "მოგიხსენიეს პოსტში";
     case "new_match":
       return am ? "համընկել է ձեզ հետ" : en ? "matched with you" : "დაგემთხვათ";
+    case "relationship_connected":
+      return en ? "accepted your relationship invitation" : "მიიღო შენი ურთიერთობის მოწვევა";
+    case "relationship_weekly":
+      return payload?.relationshipHeadline
+        ? `— ${payload.relationshipHeadline}`
+        : en ? "has a new weekly update" : "— ახალი ყოველკვირეული განახლება";
+    case "relationship_transit":
+      return payload?.transitTitle
+        ? `— ${payload.transitTitle}`
+        : en ? "has an important upcoming transit" : "— მნიშვნელოვანი ტრანზიტი ახლოვდება";
     default:
       return "";
   }
@@ -373,8 +388,11 @@ function DbNotificationRow({
   }
   const Icon = KIND_ICON[n.kind] ?? Bell;
   const username = n.payload?.fromUsername;
+  const isRelationship = n.kind === "relationship_connected" || n.kind === "relationship_weekly" || n.kind === "relationship_transit";
   const href =
-    (n.kind === "post_comment" ||
+    isRelationship && n.payload?.partnerId
+      ? `/synastry/${n.payload.partnerId}`
+      : (n.kind === "post_comment" ||
       n.kind === "post_reaction" ||
       n.kind === "mention") &&
     n.payload?.postId
@@ -418,7 +436,7 @@ function DbNotificationRow({
         <div className="min-w-0 flex-1">
           <div className="text-sm leading-snug">
             <span className="font-medium text-foreground">
-              {n.payload?.fromName ?? username ?? "vivida user"}
+              {n.payload?.fromName ?? (isRelationship ? n.payload?.partnerName : null) ?? username ?? "vivida user"}
             </span>{" "}
             <span className="text-muted-foreground">
               {notificationLabel(n.kind, n.payload, locale)}

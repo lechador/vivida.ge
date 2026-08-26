@@ -651,6 +651,9 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "new_match",
   // Credit balance moved (earned or spent) — deep-links to /credits.
   "credit",
+  "relationship_connected",
+  "relationship_weekly",
+  "relationship_transit",
 ]);
 
 /**
@@ -680,6 +683,11 @@ export type NotificationPayload = {
   creditReason?: string;
   /** Resulting balance after the change, for `credit` kind. */
   creditBalance?: number;
+  /** Shared relationship/synastry destination and recurring-update copy. */
+  partnerId?: string;
+  partnerName?: string;
+  relationshipHeadline?: string;
+  transitTitle?: string;
 };
 
 export const notifications = pgTable("notification", {
@@ -1654,6 +1662,14 @@ export const partners = pgTable(
     deepViewerHash: text("deep_viewer_hash"),
     deepModel: text("deep_model"),
     deepGeneratedAt: timestamp("deep_generated_at", { withTimezone: true }),
+    /** Registered partner who accepted the private invite. */
+    linkedUserId: text("linked_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    /** SHA-256 only; the raw invite token exists solely in the shared URL. */
+    inviteTokenHash: text("invite_token_hash").unique(),
+    inviteExpiresAt: timestamp("invite_expires_at", { withTimezone: true }),
+    inviteAcceptedAt: timestamp("invite_accepted_at", { withTimezone: true }),
     /** Soft delete. NULL = active, set = hidden from UI but still counts
      *  toward the monthly creation cap. */
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
@@ -1664,7 +1680,121 @@ export const partners = pgTable(
   (t) => [
     index("partner_user_created_idx").on(t.userId, t.createdAt),
     index("partner_user_deleted_idx").on(t.userId, t.deletedAt),
+    index("partner_linked_user_idx").on(t.linkedUserId, t.deletedAt),
   ]
+);
+
+export type RelationshipWeeklyJson = {
+  weekStart: string;
+  headline: string;
+  summary: string;
+  theme: "communication" | "closeness" | "emotions" | "boundaries" | "growth";
+  harmonyScore: number;
+  challengeScore: number;
+  days: Array<{ dateIso: string; score: number; tier: "great" | "good" | "calm" | "tough" }>;
+  questions: Array<{ key: string; text: string }>;
+  notable: Array<{
+    key: string;
+    dateIso: string;
+    title: string;
+    meaning: string;
+    family: "harmonic" | "tense" | "neutral";
+  }>;
+};
+
+/** One deterministic shared update per relationship, week and language. */
+export const relationshipWeeklyUpdates = pgTable(
+  "relationship_weekly_update",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    partnerId: text("partner_id")
+      .notNull()
+      .references(() => partners.id, { onDelete: "cascade" }),
+    weekStart: text("week_start").notNull(),
+    language: text("language").notNull().default("ka"),
+    ownerChartHash: text("owner_chart_hash").notNull(),
+    partnerChartHash: text("partner_chart_hash").notNull(),
+    content: jsonb("content").$type<RelationshipWeeklyJson>().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("relationship_weekly_partner_week_language_idx").on(
+      t.partnerId,
+      t.weekStart,
+      t.language,
+    ),
+  ],
+);
+
+/** Per-participant opt-ins; accepting an invite never silently enables push. */
+export const relationshipSubscriptions = pgTable(
+  "relationship_subscription",
+  {
+    partnerId: text("partner_id")
+      .notNull()
+      .references(() => partners.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    weeklyEnabled: boolean("weekly_enabled").notNull().default(false),
+    transitEnabled: boolean("transit_enabled").notNull().default(false),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.partnerId, t.userId] }),
+    index("relationship_subscription_user_idx").on(t.userId),
+  ],
+);
+
+/** Participant-only shared answers; each participant owns one answer. */
+export const relationshipCheckinAnswers = pgTable(
+  "relationship_checkin_answer",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    partnerId: text("partner_id")
+      .notNull()
+      .references(() => partners.id, { onDelete: "cascade" }),
+    weekStart: text("week_start").notNull(),
+    questionKey: text("question_key").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    answer: text("answer").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("relationship_answer_partner_week_question_user_idx").on(
+      t.partnerId,
+      t.weekStart,
+      t.questionKey,
+      t.userId,
+    ),
+    index("relationship_answer_partner_week_idx").on(t.partnerId, t.weekStart),
+  ],
+);
+
+/** Idempotency ledger for weekly and transit notifications. */
+export const relationshipNotificationDeliveries = pgTable(
+  "relationship_notification_delivery",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    partnerId: text("partner_id")
+      .notNull()
+      .references(() => partners.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    deliveryKey: text("delivery_key").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("relationship_delivery_partner_user_key_idx").on(
+      t.partnerId,
+      t.userId,
+      t.deliveryKey,
+    ),
+  ],
 );
 
 export type SynastryInterpretationJson = {

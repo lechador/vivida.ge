@@ -7,8 +7,14 @@ import { requireUser } from "@/lib/auth-helpers";
 import { ensureChartFor } from "@/actions/chart";
 import {
   ensureSynastryInterpretation,
-  getPartnerForViewer,
 } from "@/lib/partners-core";
+import {
+  ensureRelationshipWeeklyUpdate,
+  getRelationshipParticipantNames,
+  getRelationshipPartnerForViewer,
+  getRelationshipSubscription,
+  listRelationshipAnswers,
+} from "@/lib/relationship-core";
 import { computeSynastry } from "@/lib/synastry";
 import { getSynastryInterpretationsFor } from "@/lib/synastry-library";
 import {
@@ -26,6 +32,8 @@ import { UnlockCard } from "@/components/credits/unlock-card";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { SynastryDeepReport } from "@/components/synastry/synastry-deep-report";
 import { SynastryDisplayEn } from "@/components/synastry/synastry-display-en";
+import { RelationshipControls } from "@/components/synastry/relationship-controls";
+import { RelationshipWeeklyCard } from "@/components/synastry/relationship-weekly-card";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -48,11 +56,13 @@ export default async function SynastryDetailPage({
   const am = locale === "am";
   const { id } = await params;
   const user = await requireUser();
-  const partner = await getPartnerForViewer(id, user.id);
+  const partner = await getRelationshipPartnerForViewer(id, user.id);
   if (!partner) notFound();
 
-  const viewerName = user.name?.split(" ")[0] ?? null;
-  const viewerChart = await ensureChartFor(user.id);
+  const isOwner = partner.userId === user.id;
+  const participantNames = await getRelationshipParticipantNames(partner);
+  const viewerName = participantNames.ownerName;
+  const viewerChart = await ensureChartFor(partner.userId);
   if (!viewerChart) {
     return (
       <main
@@ -78,17 +88,17 @@ export default async function SynastryDetailPage({
   // once and then permanently unlocked for that partner. Free unlocks are
   // recorded as zero-cost ledger rows so the allowance is stable across
   // partners and can't be re-farmed by re-opening the same one.
-  let unlocked = await isUnlocked(user.id, partner.id, "spend_synastry");
-  if (!unlocked) {
-    const used = await countUnlocks(user.id, "spend_synastry");
+  let unlocked = await isUnlocked(partner.userId, partner.id, "spend_synastry");
+  if (!unlocked && isOwner) {
+    const used = await countUnlocks(partner.userId, "spend_synastry");
     if (used < FREE_ALLOWANCE.synastry) {
-      await spendOnce(user.id, 0, "spend_synastry", partner.id);
+      await spendOnce(partner.userId, 0, "spend_synastry", partner.id);
       unlocked = true;
     }
   }
 
   if (!unlocked) {
-    const balance = await getBalance(user.id);
+    const balance = isOwner ? await getBalance(partner.userId) : 0;
     return (
       <main
         lang={locale}
@@ -118,23 +128,29 @@ export default async function SynastryDetailPage({
           <p className="mb-6 text-sm text-muted-foreground">
             {partner.dateOfBirth} · {partner.cityName}
           </p>
-          <UnlockCard
-            kind="synastry"
-            resultId={partner.id}
-            cost={CREDIT_COST.synastry}
-            balance={balance}
-            title={
-              en
-                ? "Unlock your compatibility reading"
-                : "თქვენი თავსებადობის გახსნა"
-            }
-            blurb={
-              en
-                ? "See the complete synastry reading—key aspects, strengths, and points of friction. Pay once and this partner remains unlocked."
-                : "ნახე სრული სინასტრია — ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
-            }
-            locale={locale}
-          />
+          {isOwner ? (
+            <UnlockCard
+              kind="synastry"
+              resultId={partner.id}
+              cost={CREDIT_COST.synastry}
+              balance={balance}
+              title={
+                en
+                  ? "Unlock your compatibility reading"
+                  : "თქვენი თავსებადობის გახსნა"
+              }
+              blurb={
+                en
+                  ? "See the complete synastry reading—key aspects, strengths, and points of friction. Pay once and this partner remains unlocked."
+                  : "ნახე სრული სინასტრია — ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
+              }
+              locale={locale}
+            />
+          ) : (
+            <div className="rounded-2xl border border-border bg-card/70 p-6 text-sm text-muted-foreground">
+              {en ? "The relationship owner needs to unlock this reading first." : "ამ თავსებადობის შედეგი ჯერ ურთიერთობის მფლობელმა უნდა გახსნას."}
+            </div>
+          )}
         </section>
       </main>
     );
@@ -149,6 +165,14 @@ export default async function SynastryDetailPage({
   // the Gemini call, subsequent visits read the cached row).
   const partnerWithAi = await ensureSynastryInterpretation(partner, locale);
   const ai = partnerWithAi.aiInterpretation;
+
+  const [weekly, subscription] = await Promise.all([
+    ensureRelationshipWeeklyUpdate(partnerWithAi, locale),
+    getRelationshipSubscription(partner.id, user.id),
+  ]);
+  const answers = weekly
+    ? await listRelationshipAnswers(partner.id, user.id, weekly.weekStart)
+    : [];
 
   // Deep report is cached on the partner row; show it if it's fresh for this
   // viewer + prompt version, otherwise the component offers to generate it.
@@ -190,6 +214,26 @@ export default async function SynastryDetailPage({
         <p className="mb-8 text-sm text-muted-foreground">
           {partner.dateOfBirth} · {partner.cityName}
         </p>
+
+        <RelationshipControls
+          partnerId={partner.id}
+          partnerName={partner.name}
+          isOwner={isOwner}
+          connected={Boolean(partner.linkedUserId)}
+          initialSubscription={subscription}
+          locale={locale}
+        />
+
+        {weekly && (
+          <RelationshipWeeklyCard
+            partnerId={partner.id}
+            weekly={weekly}
+            answers={answers}
+            currentUserId={user.id}
+            connected={Boolean(partner.linkedUserId)}
+            locale={locale}
+          />
+        )}
 
         {ai && (
           <article className="mb-8 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-pink)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">

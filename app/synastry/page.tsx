@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { CreditHint } from "@/components/credits/credit-hint";
-import { listPartners, partnerCreationsThisMonth } from "@/lib/partners-core";
+import { partnerCreationsThisMonth } from "@/lib/partners-core";
+import { listRelationshipsForViewer } from "@/lib/relationship-core";
 import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
 import { PartnerCard } from "@/components/synastry/partner-card";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -26,7 +27,7 @@ export default async function SynastryPage() {
   const am = locale === "am";
   const user = await requireUser();
   const [partners, used] = await Promise.all([
-    listPartners(user.id),
+    listRelationshipsForViewer(user.id),
     partnerCreationsThisMonth(user.id),
   ]);
   const cap = PARTNER_CAP_PER_MONTH;
@@ -93,9 +94,11 @@ export default async function SynastryPage() {
               <li key={p.id}>
                 <PartnerCard
                   id={p.id}
-                  name={p.name}
+                  name={p.displayName}
                   cityName={p.cityName}
                   dateOfBirth={p.dateOfBirth}
+                  canDelete={p.viewerRole === "owner"}
+                  connected={p.connected}
                   locale={locale}
                 />
               </li>

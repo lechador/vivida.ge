@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { Link2, Trash2 } from "lucide-react";
 
 import { softDeletePartner } from "@/actions/partners";
 import { cn } from "@/lib/utils";
@@ -18,12 +18,16 @@ export function PartnerCard({
   name,
   cityName,
   dateOfBirth,
+  canDelete = true,
+  connected = false,
   locale,
 }: {
   id: string;
   name: string;
   cityName: string;
   dateOfBirth: string;
+  canDelete?: boolean;
+  connected?: boolean;
   locale: UserLocale;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -56,23 +60,31 @@ export function PartnerCard({
         {name.slice(0, 1).toUpperCase()}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-base font-semibold tracking-tight">
-          {name}
+        <div className="flex items-center gap-2">
+          <div className="truncate text-base font-semibold tracking-tight">{name}</div>
+          {connected && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--vivida-cyan)]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--vivida-cyan)]">
+              <Link2 className="size-2.5" aria-hidden />
+              {locale !== "ka" ? "Connected" : "ერთად"}
+            </span>
+          )}
         </div>
         <div className="mt-0.5 truncate text-xs text-muted-foreground">
           {dateOfBirth} · {cityName}
         </div>
       </div>
-      <button
-        type="button"
-        onClick={onDelete}
-        disabled={isPending}
-        className="relative grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
-        aria-label={locale !== "ka" ? `Remove ${name}` : `წაშლა — ${name}`}
-        title={locale !== "ka" ? "Remove" : "წაშლა"}
-      >
-        <Trash2 className="size-4" />
-      </button>
+      {canDelete && (
+        <button
+          type="button"
+          onClick={onDelete}
+          disabled={isPending}
+          className="relative grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
+          aria-label={locale !== "ka" ? `Remove ${name}` : `წაშლა — ${name}`}
+          title={locale !== "ka" ? "Remove" : "წაშლა"}
+        >
+          <Trash2 className="size-4" />
+        </button>
+      )}
     </Link>
   );
 }

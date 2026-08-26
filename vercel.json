@@ -17,6 +17,10 @@
     {
       "path": "/api/cron/feed-notification-emails",
       "schedule": "15 * * * *"
+    },
+    {
+      "path": "/api/cron/relationship-updates",
+      "schedule": "30 6 * * *"
     }
   ]
 }
