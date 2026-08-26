@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { markAllNotificationsRead } from "@/actions/notifications";
 import type { Notification } from "@/db/schema";
-import { CREDIT_REASON_LABEL_EN, CREDIT_REASON_LABEL_KA, type CreditReason } from "@/lib/credits-config";
+import { CREDIT_REASON_LABEL_AM, CREDIT_REASON_LABEL_EN, CREDIT_REASON_LABEL_KA, type CreditReason } from "@/lib/credits-config";
 import { cn } from "@/lib/utils";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { kaShortDate } from "@/lib/i18n/ka-date";
@@ -295,7 +295,12 @@ function CreditNotificationRow({
   const amount = n.payload?.creditAmount ?? 0;
   const earned = amount >= 0;
   const reason = n.payload?.creditReason as CreditReason | undefined;
-  const reasonLabel = reason ? (en ? CREDIT_REASON_LABEL_EN : CREDIT_REASON_LABEL_KA)[reason] : "";
+  const reasonLabels = am
+    ? CREDIT_REASON_LABEL_AM
+    : en
+      ? CREDIT_REASON_LABEL_EN
+      : CREDIT_REASON_LABEL_KA;
+  const reasonLabel = reason ? reasonLabels[reason] : "";
   const isUnread = !n.readAt;
   return (
     <li>

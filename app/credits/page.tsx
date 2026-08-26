@@ -4,7 +4,11 @@ import { headers } from "next/headers";
 import { Crown, Sparkles } from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
-import { getBalance } from "@/lib/credits";
+import {
+  getBalance,
+  getCreditHistoryPage,
+  type CreditHistoryFilter,
+} from "@/lib/credits";
 import { getReferralStats } from "@/lib/referral";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -24,6 +28,7 @@ import { kaDayMonthGenitive } from "@/lib/i18n/ka-date";
 import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
 import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
+import { CreditHistory } from "@/components/credits/credit-history";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -42,7 +47,14 @@ const SITE_URL: Record<UserLocale, string> = {
 /**
  * Credits hub — balance, the invite/earn loop, and (Phase 3) Stripe top-up.
  */
-export default async function CreditsPage() {
+export default async function CreditsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    history?: string | string[];
+    page?: string | string[];
+  }>;
+}) {
   // Campaign emails link here directly. Preserve the destination for readers
   // whose browser session expired so signing in still lands on their offer.
   const user = await requireUser("/credits");
@@ -52,7 +64,14 @@ export default async function CreditsPage() {
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
   const am = locale === "am";
-  const [balance, ref, storedIdentity, premium, offer] = await Promise.all([
+  const query = await searchParams;
+  const historyParam = Array.isArray(query.history) ? query.history[0] : query.history;
+  const historyFilter: CreditHistoryFilter =
+    historyParam === "earned" || historyParam === "spent" ? historyParam : "all";
+  const pageParam = Array.isArray(query.page) ? query.page[0] : query.page;
+  const parsedPage = Number.parseInt(pageParam ?? "1", 10);
+  const historyPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const [balance, ref, storedIdentity, premium, offer, history] = await Promise.all([
     getBalance(user.id),
     getReferralStats(user.id),
     getBillingIdentity(user.id),
@@ -60,6 +79,10 @@ export default async function CreditsPage() {
     // Null for everyone the low-credit campaign did not email, which is the
     // whole point — the promo price must not leak to the rest of Georgia.
     getLowCreditOffer(user.id),
+    getCreditHistoryPage(user.id, {
+      filter: historyFilter,
+      page: historyPage,
+    }),
   ]);
   // Accounts created before residence tracking have no country, which would
   // hide PRO and fall the packs back to GEL by luck rather than by geo. Same
@@ -163,6 +186,14 @@ export default async function CreditsPage() {
         {/* Top-up is kept directly below the balance so there is no hunt or scroll. */}
         <div id="credit-packs" className="mt-4 scroll-mt-20">
           <TopUpCard locale={locale} countryCode={identity?.countryCode} />
+        </div>
+
+        <div className="mt-4">
+          <CreditHistory
+            history={history}
+            filter={historyFilter}
+            locale={locale}
+          />
         </div>
 
         {/* How to earn for free. */}

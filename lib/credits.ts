@@ -339,3 +339,104 @@ export async function getCreditHistory(userId: string, limit = 30) {
     .orderBy(desc(creditTransactions.createdAt))
     .limit(limit);
 }
+
+export type CreditHistoryFilter = "all" | "earned" | "spent";
+
+export type CreditHistoryItem = {
+  id: string;
+  amount: number;
+  reason: string;
+  createdAt: Date | string;
+  balanceAfter: number;
+};
+
+export type CreditHistoryPage = {
+  items: CreditHistoryItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  summary: {
+    earned: number;
+    spent: number;
+  };
+};
+
+/**
+ * Paginated account ledger for the Credits hub. The running balance is computed
+ * before the earned/spent filter is applied, so filtered views still show the
+ * real balance that followed each transaction.
+ */
+export async function getCreditHistoryPage(
+  userId: string,
+  options: {
+    filter?: CreditHistoryFilter;
+    page?: number;
+    pageSize?: number;
+  } = {}
+): Promise<CreditHistoryPage> {
+  const filter = options.filter ?? "all";
+  const pageSize = Math.min(Math.max(Math.trunc(options.pageSize ?? 20), 1), 50);
+  const requestedPage = Math.max(Math.trunc(options.page ?? 1), 1);
+  const amountFilter =
+    filter === "earned"
+      ? sql`amount > 0`
+      : filter === "spent"
+        ? sql`amount < 0`
+        : sql`true`;
+
+  const [aggregateResult, filteredCountResult] = await Promise.all([
+    db.execute<{ earned: number; spent: number }>(sql`
+      SELECT
+        COALESCE(SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END), 0)::int AS earned,
+        ABS(COALESCE(SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END), 0))::int AS spent
+      FROM credit_transaction
+      WHERE user_id = ${userId}
+    `),
+    db.execute<{ total: number }>(sql`
+      SELECT COUNT(*)::int AS total
+      FROM credit_transaction
+      WHERE user_id = ${userId} AND ${amountFilter}
+    `),
+  ]);
+
+  const total = Number(filteredCountResult.rows[0]?.total ?? 0);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(requestedPage, totalPages);
+  const offset = (page - 1) * pageSize;
+
+  const historyResult = await db.execute<CreditHistoryItem>(sql`
+    WITH ledger AS (
+      SELECT
+        id,
+        amount,
+        reason,
+        created_at AS "createdAt",
+        SUM(amount) OVER (
+          ORDER BY created_at ASC, id ASC
+          ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        )::int AS "balanceAfter"
+      FROM credit_transaction
+      WHERE user_id = ${userId}
+    )
+    SELECT id, amount, reason, "createdAt", "balanceAfter"
+    FROM ledger
+    WHERE ${amountFilter}
+    ORDER BY "createdAt" DESC, id DESC
+    LIMIT ${pageSize}
+    OFFSET ${offset}
+  `);
+  const summaryRow = aggregateResult.rows[0];
+
+  return {
+    items: historyResult.rows,
+    page,
+    pageSize,
+    total,
+    totalPages,
+    summary: {
+      earned: Number(summaryRow?.earned ?? 0),
+      spent: Number(summaryRow?.spent ?? 0),
+    },
+  };
+}

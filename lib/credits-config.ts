@@ -142,3 +142,28 @@ export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
   grandfather: "Gift",
   admin_grant: "Gift",
 };
+
+export const CREDIT_REASON_LABEL_AM: Record<CreditReason, string> = {
+  signup_bonus: "Ողջույնի բոնուս",
+  first_return_bonus: "Վերադարձի բոնուս",
+  referral: "Ընկերոջ հրավեր",
+  purchase: "Հաշվեկշռի համալրում",
+  monthly_bonus: "Ամսական բոնուս",
+  streak_bonus: "Նախկին բոնուս",
+  birthday_gift: "Ծննդյան նվեր",
+  campaign_reward: "Ծննդյան տվյալների լրացման բոնուս",
+  earn_feed_post: "Գրառում հոսքում",
+  earn_profile_photo: "Պրոֆիլի լուսանկար",
+  spend_synastry: "Համատեղելիություն",
+  spend_chat: "AI զրույց",
+  spend_mbti: "Անհատականության թեստ",
+  spend_iq: "IQ թեստ",
+  spend_eq: "EQ թեստ",
+  spend_bigfive: "Big Five թեստ",
+  spend_audio: "Աուդիո հորոսկոպ",
+  spend_report: "PDF քարտեզ",
+  spend_weekly: "7-օրյա կանխատեսում",
+  spend_tarot: "Տարոյի ընթերցում",
+  grandfather: "Նվեր",
+  admin_grant: "Նվեր",
+};
