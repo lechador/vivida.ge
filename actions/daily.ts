@@ -33,6 +33,25 @@ import {
 import { signByIndex } from "@/lib/zodiac";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
+import { archiveLibraryEntry } from "@/lib/library";
+
+async function archiveDailyReading(userId: string, reading: DailyHoroscope) {
+  await archiveLibraryEntry({
+    userId,
+    kind: "daily",
+    sourceId: reading.date,
+    title: reading.headline,
+    summary: reading.summary,
+    content: {
+      type: "daily",
+      summary: reading.summary,
+      body: reading.body,
+      themes: reading.themes,
+    },
+    language: reading.language,
+    occurredAt: reading.createdAt,
+  });
+}
 
 /**
  * Returns today's horoscope for the user, generating + caching it on first
@@ -75,7 +94,12 @@ export async function ensureDailyFor(
     const versionMatches = meta?.promptVersion === DAILY_PROMPT_VERSION;
     const chartMatches = meta?.natalInputHash === chart.inputHash;
     const languageMatches = existing.language === locale;
-    if (versionMatches && chartMatches && languageMatches) return existing;
+    if (versionMatches && chartMatches && languageMatches) {
+      await archiveDailyReading(userId, existing).catch((error) =>
+        console.warn("[library] daily archive failed:", error),
+      );
+      return existing;
+    }
     // Otherwise fall through and regenerate (upsert below)
   }
 
@@ -288,6 +312,11 @@ export async function ensureDailyFor(
     })
     .returning();
 
+  if (inserted) {
+    await archiveDailyReading(userId, inserted).catch((error) =>
+      console.warn("[library] daily archive failed:", error),
+    );
+  }
   return inserted ?? null;
   } finally {
     await releaseGeneration(lockKey).catch(() => {});

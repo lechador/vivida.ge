@@ -8,6 +8,39 @@ import { CREDIT_COST, spendCredits } from "@/lib/credits";
 import { generateAndStoreReport } from "@/lib/reports/generate";
 import { reportCurrency } from "@/lib/stripe";
 import { getUserLocale } from "@/lib/i18n/user-locale";
+import { archiveLibraryEntry } from "@/lib/library";
+
+async function archiveReport(input: {
+  id: string;
+  userId: string;
+  type: string;
+  language: string;
+  status: string;
+  createdAt: Date;
+}) {
+  const { language } = input;
+  await archiveLibraryEntry({
+    userId: input.userId,
+    kind: "report",
+    sourceId: input.id,
+    title:
+      language === "en"
+        ? "Complete natal report"
+        : language === "am"
+          ? "Ամբողջական նատալ զեկույց"
+          : "სრული ნატალური რეპორტი",
+    summary:
+      language === "en"
+        ? "Your downloadable personal PDF report"
+        : language === "am"
+          ? "Ձեր ներբեռնվող անձնական PDF զեկույցը"
+          : "შენი ჩამოსატვირთი პერსონალური PDF რეპორტი",
+    content: { type: "report", reportType: input.type, status: input.status },
+    href: `/reports/${input.id}`,
+    language,
+    occurredAt: input.createdAt,
+  });
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -67,6 +100,9 @@ export async function POST(req: Request) {
   // Already paid (incl. failed → retryable on the status page) or done:
   // route back to it, never charge twice.
   if (existing && ["paid", "generating", "ready", "failed"].includes(existing.status)) {
+    await archiveReport(existing).catch((error) =>
+      console.warn("[library] report archive failed:", error),
+    );
     return Response.json({
       reportId: existing.id,
       url: `/reports/${existing.id}`,
@@ -101,7 +137,18 @@ export async function POST(req: Request) {
       currency: reportCurrency().toUpperCase(),
       paidAt: new Date(),
     })
-    .returning({ id: pdfReports.id });
+    .returning({
+      id: pdfReports.id,
+      userId: pdfReports.userId,
+      type: pdfReports.type,
+      language: pdfReports.language,
+      status: pdfReports.status,
+      createdAt: pdfReports.createdAt,
+    });
+
+  await archiveReport(row).catch((error) =>
+    console.warn("[library] report archive failed:", error),
+  );
 
   after(() => generateAndStoreReport(row.id));
   return Response.json({

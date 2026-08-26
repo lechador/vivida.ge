@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, RotateCcw, Sparkles, Users, Wand2 } from "lucide-react";
+import { BookOpen, Loader2, RotateCcw, Sparkles, Users, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
@@ -32,6 +32,7 @@ type Reading = {
   charged: number;
   free: boolean;
   balance: number;
+  libraryId?: string;
 };
 
 /**
@@ -321,15 +322,25 @@ export function TarotReader({
                     ? `−${reading.charged} credits · ${reading.balance} remaining`
                     : `−${reading.charged} კრედიტი · ბალანსი ${reading.balance}`}
             </span>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={reset}
-              className="gap-1.5"
-            >
-              <RotateCcw className="size-4" />
-              {am ? "Նոր հարց" : en ? "New question" : "ახალი კითხვა"}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              {reading.libraryId && (
+                <Button asChild variant="outline" className="gap-1.5">
+                  <Link href={`/library/${reading.libraryId}`}>
+                    <BookOpen className="size-4" />
+                    {am ? "Պահված է" : en ? "Saved" : "შენახულია"}
+                  </Link>
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={reset}
+                className="gap-1.5"
+              >
+                <RotateCcw className="size-4" />
+                {am ? "Նոր հարց" : en ? "New question" : "ახალი კითხვა"}
+              </Button>
+            </div>
           </div>
 
           {authed && reading.free && !premium && (

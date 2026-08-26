@@ -533,6 +533,13 @@
       "when": 1787482265000,
       "tag": "0075_add_more_georgian_editorial_articles",
       "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1787705221134,
+      "tag": "0076_fantastic_havok",
+      "breakpoints": true
     }
   ]
 }

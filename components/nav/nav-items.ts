@@ -1,5 +1,6 @@
 import {
   Brain,
+  BookOpen,
   CalendarClock,
   Compass,
   Heart,
@@ -23,6 +24,7 @@ export type NavActiveKey =
   | "sky"
   | "report"
   | "ask"
+  | "library"
   | "tarot"
   | "timing"
   | "feed"
@@ -108,6 +110,18 @@ const ALL_NAV_ITEMS: NavItem[] = [
     labelAm: "Հարցնել",
     Icon: Stars,
     hue: "oklch(0.80 0.16 230)",
+  },
+  {
+    key: "library",
+    href: "/library",
+    label: "ბიბლიოთეკა",
+    labelEn: "Library",
+    labelAm: "Գրադարան",
+    Icon: BookOpen,
+    hue: "oklch(0.80 0.15 190)",
+    badgeKa: "ახალი",
+    badgeEn: "New",
+    badgeAm: "Նոր",
   },
   {
     key: "tarot",

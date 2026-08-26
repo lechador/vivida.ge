@@ -17,6 +17,7 @@ import {
 } from "@/lib/openrouter";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { getUserLocale } from "@/lib/i18n/user-locale";
+import { archiveLibraryEntry } from "@/lib/library";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -141,10 +142,33 @@ export async function POST(req: Request) {
         }
       } finally {
         if (full.trim()) {
-          await db
+          const assistantMessages = await db
             .insert(chartChatMessages)
             .values({ userId, role: "assistant", content: full })
-            .catch((e) => console.error("[ask] persist failed:", e));
+            .returning({
+              id: chartChatMessages.id,
+              createdAt: chartChatMessages.createdAt,
+            })
+            .catch((e) => {
+              console.error("[ask] persist failed:", e);
+              return [];
+            });
+          const assistantMessage = assistantMessages[0];
+          if (assistantMessage) {
+            await archiveLibraryEntry({
+              userId,
+              kind: "ai",
+              sourceId: assistantMessage.id,
+              title: message.slice(0, 160),
+              summary: full.slice(0, 240),
+              content: { type: "ai", question: message, answer: full },
+              href: "/ask",
+              language: locale,
+              occurredAt: assistantMessage.createdAt,
+            }).catch((error) =>
+              console.warn("[library] AI archive failed:", error),
+            );
+          }
         }
         controller.close();
       }

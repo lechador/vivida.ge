@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { LogOut, Settings, Sparkles, User } from "lucide-react";
+import { BookOpen, LogOut, Settings, Sparkles, User } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -92,6 +92,12 @@ export function UserMenu({
                 {balance}
               </span>
             )}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/library" className="cursor-pointer">
+            <BookOpen className="size-4 text-[var(--vivida-violet)]" />
+            {am ? "Իմ գրադարանը" : en ? "My library" : "ჩემი ბიბლიოთეკა"}
           </Link>
         </DropdownMenuItem>
         {isPremium && (

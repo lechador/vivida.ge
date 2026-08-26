@@ -1515,6 +1515,102 @@ export type WeeklyForecastDay = {
   }>;
 };
 
+export const libraryEntryKindEnum = pgEnum("library_entry_kind", [
+  "daily",
+  "weekly",
+  "tarot",
+  "ai",
+  "report",
+]);
+
+export type LibraryEntryKind =
+  (typeof libraryEntryKindEnum.enumValues)[number];
+
+export type LibraryEntryContent =
+  | {
+      type: "daily";
+      summary: string;
+      body: string;
+      themes: string[];
+    }
+  | {
+      type: "weekly";
+      weekStart: string;
+      days: WeeklyForecastDay[];
+    }
+  | {
+      type: "tarot";
+      question: string;
+      cards: Array<{
+        slug: string;
+        name: string;
+        glyph: string;
+        reversed: boolean;
+        position: string;
+        interpretation: string;
+      }>;
+      reading: string;
+      advice: string;
+    }
+  | {
+      type: "ai";
+      question: string;
+      answer: string;
+    }
+  | {
+      type: "report";
+      reportType: string;
+      status: string;
+    };
+
+/**
+ * Durable personal archive of generated readings. Source rows may be cached,
+ * overwritten, or live in separate product tables; this snapshot keeps the
+ * exact value the user received and layers favorites + private notes on top.
+ */
+export const libraryEntries = pgTable(
+  "library_entry",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: libraryEntryKindEnum("kind").notNull(),
+    /** Stable id in the source product (date, message id, report id, etc.). */
+    sourceId: text("source_id").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary"),
+    content: jsonb("content").$type<LibraryEntryContent>().notNull(),
+    href: text("href"),
+    language: text("language").notNull().default("ka"),
+    favorite: boolean("favorite").notNull().default(false),
+    note: text("note"),
+    occurredAt: timestamp("occurred_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    uniqueIndex("library_entry_user_kind_source_idx").on(
+      t.userId,
+      t.kind,
+      t.sourceId,
+    ),
+    index("library_entry_user_occurred_idx").on(t.userId, t.occurredAt),
+    index("library_entry_user_favorite_idx").on(t.userId, t.favorite),
+  ],
+);
+
+export type LibraryEntry = typeof libraryEntries.$inferSelect;
+export type NewLibraryEntry = typeof libraryEntries.$inferInsert;
+
 /**
  * Partners — people the user has computed synastry against. One row per
  * partner saved, soft-deleted via `deletedAt` (we keep deleted rows so
@@ -1840,6 +1936,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   sessions: many(sessions),
   payments: many(payments),
   dailyHoroscopes: many(dailyHoroscopes),
+  libraryEntries: many(libraryEntries),
 }));
 
 export const profilesRelations = relations(profiles, ({ one }) => ({

@@ -17,6 +17,7 @@ import {
 import { SPREAD_POSITIONS_EN, TAROT_EN_BY_SLUG } from "@/lib/tarot/deck-en";
 import { tarotCardBySlugAm } from "@/lib/tarot/deck-am";
 import type { UserLocale } from "@/lib/i18n/locale";
+import { archiveLibraryEntry } from "@/lib/library";
 
 /**
  * The tarot Q&A engine. Draws a 3-card spread, charges credits (first reading
@@ -43,6 +44,7 @@ export type TarotReading = {
   charged: number;
   free: boolean;
   balance: number;
+  libraryId?: string;
 };
 
 export type TarotResult =
@@ -213,6 +215,24 @@ export async function performReading(
   }));
 
   const balance = await getBalance(userId);
+  const libraryEntry = await archiveLibraryEntry({
+    userId,
+    kind: "tarot",
+    sourceId: crypto.randomUUID(),
+    title: composed.headline,
+    summary: q,
+    content: {
+      type: "tarot",
+      question: q,
+      cards,
+      reading: composed.reading,
+      advice: composed.advice,
+    },
+    language: locale,
+  }).catch((error) => {
+    console.warn("[library] tarot archive failed:", error);
+    return null;
+  });
   return {
     ok: true,
     reading: {
@@ -223,6 +243,7 @@ export async function performReading(
       charged,
       free,
       balance,
+      libraryId: libraryEntry?.id,
     },
   };
 }

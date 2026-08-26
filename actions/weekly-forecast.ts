@@ -22,6 +22,38 @@ import {
 import { composeWeeklyFromLibrary } from "@/lib/transit-library";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
+import { archiveLibraryEntry } from "@/lib/library";
+
+async function archiveWeeklyForecast(
+  userId: string,
+  forecast: WeeklyForecast,
+) {
+  const language = forecast.language;
+  await archiveLibraryEntry({
+    userId,
+    kind: "weekly",
+    sourceId: forecast.weekStart,
+    title:
+      language === "en"
+        ? "Your 7-day forecast"
+        : language === "am"
+          ? "Ձեր 7-օրյա կանխատեսումը"
+          : "შენი 7-დღიანი პროგნოზი",
+    summary:
+      language === "en"
+        ? "Personal forecast for the next seven days"
+        : language === "am"
+          ? "Անձնական կանխատեսում առաջիկա յոթ օրերի համար"
+          : "პერსონალური პროგნოზი მომდევნო შვიდი დღისთვის",
+    content: {
+      type: "weekly",
+      weekStart: forecast.weekStart,
+      days: forecast.days,
+    },
+    language,
+    occurredAt: forecast.createdAt,
+  });
+}
 
 /**
  * Returns the user's 7-day forecast, regenerating + caching it whenever the
@@ -61,6 +93,9 @@ export async function ensureWeeklyForecast(
     existing.natalInputHash === chart.inputHash &&
     existing.language === locale
   ) {
+    await archiveWeeklyForecast(userId, existing).catch((error) =>
+      console.warn("[library] weekly archive failed:", error),
+    );
     return existing;
   }
 
@@ -185,6 +220,11 @@ export async function ensureWeeklyForecast(
     })
     .returning();
 
+  if (inserted) {
+    await archiveWeeklyForecast(userId, inserted).catch((error) =>
+      console.warn("[library] weekly archive failed:", error),
+    );
+  }
   return inserted ?? null;
   } finally {
     await releaseGeneration(lockKey).catch(() => {});
