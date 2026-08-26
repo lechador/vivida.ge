@@ -277,6 +277,20 @@ export async function earnDailyCapped(
   return true;
 }
 
+/** Atomic one-per-week feed reward; concurrent post requests cannot double-pay. */
+export async function earnWeeklyFeedReward(
+  userId: string,
+  amount: number,
+  weekKey: string,
+): Promise<boolean> {
+  return grantCreditsOnce(
+    userId,
+    amount,
+    "earn_feed_post",
+    `feed-week:${weekKey}`,
+  );
+}
+
 /** Grant a one-time reward (profile photo). No-op if already granted. */
 export async function earnOnce(
   userId: string,

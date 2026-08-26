@@ -30,16 +30,24 @@ export {
 /** Credits EARNED by activity (beyond signup/referral/purchase). Capped to
  *  prevent farming — see the caps below. */
 export const CREDIT_REWARD = {
-  feedPost: 5,
+  /** One small weekly reward keeps the feed loop alive without replacing purchases. */
+  feedPost: 1,
   profilePhoto: 3,
 } as const;
 
 /** Anti-farming caps for earned credits. */
 export const REWARD_CAP = {
-  /** Only the first N feed posts each day earn credits. */
-  feedPostPerDay: 1,
+  /** Only the first eligible feed post in a UTC week earns credits. */
+  feedPostPerWeek: 1,
   /** Profile-photo reward is one-time (guarded by ledger presence). */
 } as const;
+
+/** Lifetime-only ritual milestones. Total possible reward: 8 credits. */
+export const RITUAL_STREAK_MILESTONES = [
+  { days: 7, credits: 1 },
+  { days: 30, credits: 2 },
+  { days: 100, credits: 5 },
+] as const;
 
 /** What each gated action costs (beyond its free allowance). */
 export const CREDIT_COST = {
@@ -99,7 +107,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   referral: "მეგობრის მოწვევა",
   purchase: "ბალანსის შევსება",
   monthly_bonus: "თვის ბონუსი",
-  streak_bonus: "წარსული ბონუსი",
+  streak_bonus: "დღიური სერიის ბონუსი",
   birthday_gift: "დაბადების დღის საჩუქარი",
   campaign_reward: "დაბადების დეტალების შევსების ბონუსი",
   earn_feed_post: "პოსტი ფიდში",
@@ -124,7 +132,7 @@ export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
   referral: "Friend referral",
   purchase: "Balance top-up",
   monthly_bonus: "Monthly bonus",
-  streak_bonus: "Past bonus",
+  streak_bonus: "Daily streak bonus",
   birthday_gift: "Birthday gift",
   campaign_reward: "Birth details completion bonus",
   earn_feed_post: "Feed post",
@@ -149,7 +157,7 @@ export const CREDIT_REASON_LABEL_AM: Record<CreditReason, string> = {
   referral: "Ընկերոջ հրավեր",
   purchase: "Հաշվեկշռի համալրում",
   monthly_bonus: "Ամսական բոնուս",
-  streak_bonus: "Նախկին բոնուս",
+  streak_bonus: "Ամենօրյա շարքի բոնուս",
   birthday_gift: "Ծննդյան նվեր",
   campaign_reward: "Ծննդյան տվյալների լրացման բոնուս",
   earn_feed_post: "Գրառում հոսքում",

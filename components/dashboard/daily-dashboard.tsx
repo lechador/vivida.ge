@@ -23,7 +23,7 @@ import { CREDIT_COST } from "@/lib/credits-config";
 import { WeeklyForecastCard } from "./weekly-forecast-card";
 import { WeeklyForecastLocked } from "./weekly-forecast-locked";
 import type { UserLocale } from "@/lib/i18n/user-locale";
-import { DailyCard } from "./daily-card";
+import { DailyRitual } from "./daily-ritual";
 
 /**
  * Dashboard content loaded after first paint via server actions. The page
@@ -81,7 +81,7 @@ export function DailyDashboard({
     );
   }
 
-  const { chart, canDaily, weeklyUnlocked, balance, suggestions } = core;
+  const { chart, canDaily, weeklyUnlocked, balance, suggestions, ritualProgress } = core;
 
   return (
     <div className="space-y-8">
@@ -102,6 +102,7 @@ export function DailyDashboard({
         weeklyUnlocked={weeklyUnlocked}
         balance={balance}
         locale={locale}
+        ritualProgress={ritualProgress}
       />
 
       <section>
@@ -154,12 +155,14 @@ function DashboardExtrasSection({
   weeklyUnlocked,
   balance,
   locale,
+  ritualProgress,
 }: {
   userId: string;
   canDaily: boolean;
   weeklyUnlocked: boolean;
   balance: number;
   locale: UserLocale;
+  ritualProgress: import("@/lib/streak-credits").StreakProgress;
 }) {
   const en = locale !== "ka";
   const am = locale === "am";
@@ -209,9 +212,11 @@ function DashboardExtrasSection({
         <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
           {(!loading && extras.daily) ? (
             <div className="min-w-0 xl:col-span-7">
-              <DailyCard
+              <DailyRitual
+                userId={userId}
                 horoscope={extras.daily}
                 transits={extras.transitBreakdown}
+                initialProgress={ritualProgress}
                 locale={locale}
               />
             </div>

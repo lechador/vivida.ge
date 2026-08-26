@@ -28,11 +28,13 @@ export function PremiumPlanCard({
   locale,
   active = false,
   placement = "premium_plan_card",
+  returnTo,
 }: {
   plan: PremiumPlan;
   locale: UserLocale;
   active?: boolean;
   placement?: string;
+  returnTo?: string | null;
 }) {
   const en = locale !== "ka";
   const am = locale === "am";
@@ -65,7 +67,11 @@ export function PremiumPlanCard({
     setPending(true);
     setError(false);
     try {
-      const response = await fetch("/api/subscription/checkout", { method: "POST" });
+      const response = await fetch("/api/subscription/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ returnTo }),
+      });
       const data = (await response.json().catch(() => ({}))) as {
         url?: string; eventId?: string; value?: number; currency?: string; contentId?: string;
       };

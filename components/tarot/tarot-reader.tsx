@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Loader2, RotateCcw, Sparkles, Users, Wand2 } from "lucide-react";
+import { BookOpen, Loader2, RotateCcw, Sparkles, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
@@ -15,6 +15,7 @@ import {
 } from "@/lib/analytics";
 import { fbTrack, fbTrackCustom } from "@/lib/fb-pixel";
 import type { UserLocale } from "@/lib/i18n/locale";
+import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 
 type SpreadCard = {
   slug: string;
@@ -61,6 +62,7 @@ export function TarotReader({
   const [status, setStatus] = useState<"idle" | "drawing" | "short" | "error">(
     "idle",
   );
+  const [shortBalance, setShortBalance] = useState(0);
 
   async function ask() {
     // A second Enter while the first request is in flight would spend the
@@ -89,6 +91,8 @@ export function TarotReader({
         body: JSON.stringify({ question: q, locale }),
       });
       if (res.status === 402) {
+        const data = (await res.json().catch(() => ({}))) as { balance?: number };
+        setShortBalance(typeof data.balance === "number" ? data.balance : 0);
         trackEvent(ANALYTICS_EVENT.tarotCreditsShort, {
           widget: "tarot_reader",
         });
@@ -210,32 +214,7 @@ export function TarotReader({
       {/* Short-balance prompt */}
       {status === "short" && (
         <div className="mt-5 rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
-          <p className="text-[var(--vivida-pink)]">
-            {am
-              ? "Կրեդիտները բավարար չեն: Հրավիրեք ընկերոջը կամ համալրեք հաշվեկշիռը:"
-              : en
-                ? "You do not have enough credits. Invite a friend or top up your balance."
-                : "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი."}
-          </p>
-          <Button asChild variant="mystic" className="mt-3">
-            <Link
-              href="/credits"
-              onClick={() =>
-                trackEvent(ANALYTICS_EVENT.recommendationClicked, {
-                  placement: "tarot_shortfall",
-                  destination: "credits",
-                  product: "tarot",
-                })
-              }
-            >
-              <Users className="size-4" />
-              {am
-                ? "Հրավիրել / համալրել"
-                : en
-                  ? "Invite / top up"
-                  : "მოიწვიე / შეავსე"}
-            </Link>
-          </Button>
+          <ContextualPaywallActions locale={locale} balance={shortBalance} cost={cost} product="tarot" returnTo={am ? "/am/taro" : "/taro"} placement="tarot_shortfall" />
         </div>
       )}
       {status === "error" && (

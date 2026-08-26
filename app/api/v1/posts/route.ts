@@ -5,7 +5,8 @@ import { requireMobileUser } from "@/lib/api/auth";
 import { handle } from "@/lib/api/errors";
 import { ok, fail } from "@/lib/api/respond";
 import { parseBody } from "@/lib/api/validate";
-import { CREDIT_REWARD, REWARD_CAP, earnDailyCapped } from "@/lib/credits";
+import { CREDIT_REWARD, earnWeeklyFeedReward } from "@/lib/credits";
+import { rewardWeekKey } from "@/lib/credit-economy";
 import { createPostCore } from "@/lib/feed-write-core";
 
 export const runtime = "nodejs";
@@ -36,15 +37,9 @@ export async function POST(req: Request) {
 
     const userId = user.id;
     after(async () => {
-      // Reward the first post of the day (capped, so posting can't be
-      // farmed) — mirrors actions/feed.ts so mobile and web pay the same.
+      // Mirrors the web's one-per-week atomic reward.
       try {
-        await earnDailyCapped(
-          userId,
-          CREDIT_REWARD.feedPost,
-          "earn_feed_post",
-          REWARD_CAP.feedPostPerDay
-        );
+        await earnWeeklyFeedReward(userId, CREDIT_REWARD.feedPost, rewardWeekKey());
       } catch (err) {
         console.warn(
           "[api/v1/posts] feed-post reward failed:",

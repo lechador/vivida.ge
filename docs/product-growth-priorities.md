@@ -1,6 +1,6 @@
 # Vivida retention and monetization plan
 
-Last updated: 22 August 2026
+Last updated: 26 August 2026
 
 This is the implementation order for improving activation, retention, and
 customer spend. It combines the repository and live-product audit with
@@ -15,8 +15,9 @@ inventory only after those foundations are measurable.
 - 73.7% of the measured signup cohort completed a birth profile, while 31.8%
   returned during days 1–7.
 - 48.2% of MAU were active on one day only; 8.2% were active on 8+ days.
-- 15,273 free credits were issued in the trailing 30 days versus 3,075 spent,
-  a 4.97× supply-to-spend ratio.
+- 15,044 free credits were issued in the trailing 30 days versus 3,331 spent,
+  a 4.52× supply-to-spend ratio. Purchased issuance was 140 credits across
+  four users; the active-wallet median was 20 credits.
 - Tarot and natal PDF reports generated 79.5% of credit consumption.
 - Two users have made lifetime credit purchases and one PRO subscription was
   active at extraction. Those counts can overlap and are not summed as unique
@@ -33,8 +34,8 @@ inventory only after those foundations are measurable.
 | P0 — shipped 2026-08-22 | First onboarding “aha” result | New users now see their personalized Big Three immediately, then receive tracked, prefilled AI question recommendations. | Higher first-value completion, recommendation click-through, and D1 return. |
 | P0 — shipped 2026-08-22 | Credits vs PRO comparison | Public natal promos, natal and first-free-tarot result states, and the Credits hub now explain one-time credits versus monthly unlimited PRO before a balance shortfall. | Higher monetization-choice click-through and payer conversion before users reach zero credits. |
 | P0 — implemented 2026-08-22 | Signup-credit cohort test | Future signups are assigned 50/50 to 20 credits immediately or 10 immediately plus 5 after a 24-hour return; legacy balances remain untouched. | Variant-level D1/D7 retention, seven-day credit use, and 30-day payer conversion. |
-| P1 | Daily “Today” ritual | Existing daily content does not yet create a compact progress loop with a clear reason to return tomorrow. | Higher DAU/MAU, active days per MAU, and D7 retention. |
-| P1 | Contextual paywalls and credit-economy experiments | Free supply materially exceeds spend and most active wallets are far from a purchase decision. | Higher paywall-to-checkout and 30-day payer conversion without lower retention. |
+| P1 — shipped 2026-08-26 | Daily “Today” ritual | Daily reading, chosen focus, server-truth streak, and lifetime milestones now create a compact reason to return. | Higher DAU/MAU, active days per MAU, and D7 retention. |
+| P1 — shipped 2026-08-26 | Contextual paywalls and credit-economy experiments | Shortfalls now name the deficit, compare credits with PRO, recommend the smallest sufficient pack, and return to content after verified checkout. Repeatable free earning is capped. | Higher paywall-to-checkout and 30-day payer conversion without lower retention. |
 | P1 | Reading history and journal | Tarot, forecasts, and AI insight do not accumulate into durable personal value. | Higher weekly repeat use and history reopen rate. |
 | P2 | Paid report store and bundles | Demand is concentrated in tarot and natal PDFs, but the paid catalog is narrow. | Higher ARPPU and report attach rate. |
 | P2 | Recurring relationship experience | Synastry is mainly a static, one-time unlock. | Higher partner invites and weekly relationship-feature retention. |
@@ -69,12 +70,12 @@ inventory only after those foundations are measurable.
 
 ### P1 — repeat-use loop and conversion (weeks 2–6)
 
-5. Build a “Today” home module with one insight, one recommended action,
+5. **Shipped 2026-08-26:** Build a “Today” home module with one insight, one recommended action,
    progress/streak state, next refresh time, and a deep link into paid depth.
 6. Add durable tarot, AI insight, and forecast history with a personal journal.
-7. Make paywalls contextual: preview the locked value, explain the unlock,
+7. **Shipped 2026-08-26:** Make paywalls contextual: preview the locked value, explain the unlock,
    recommend a pack, compare PRO, and return to the content after checkout.
-8. Make the credit system legible with a detailed ledger, next-unlock progress,
+8. **Shipped 2026-08-26:** Make the credit system legible with a detailed ledger, next-unlock progress,
    and earned rewards tied to meaningful behavior rather than passive issuance.
 
 ### P2 — expand high-intent paid inventory (weeks 6–12)
@@ -142,8 +143,23 @@ reported to analytics once from onboarding.
 - Gift credits, gift reports, and partner/seasonal packages.
 - A standard annual PRO plan.
 - Persistent experiment assignment/exposure data and complete paywall analytics.
-- A coherent visible streak, challenge, or collection loop.
 - Offline PWA content caching; the current service worker is push-focused.
+
+## Credit-economy guardrails (shipped 2026-08-26)
+
+- The feed reward is **+1 on the first eligible post per UTC week**, enforced
+  atomically by a week-keyed ledger reference. Its repeatable maximum is about
+  four credits per month, down from the former theoretical 150 per month.
+- Daily-ritual rewards are lifetime milestones only: day 7 gives +1, day 30
+  gives +2, and day 100 gives +5. They never repeat; lifetime maximum is +8.
+- The existing monthly drop remains +5 and was not increased. No passive daily
+  reward was added.
+- The baseline free-issuance/spend ratio is 4.52×. Do not expand free issuance
+  while the four-week matured ratio is above 2.5×; the operating target is
+  below 2.0× without reducing D7 activated retention or payer conversion.
+- Review median active-wallet balance, paywall-to-checkout conversion, 30-day
+  payer conversion, D7 activated retention, refunds, and support complaints
+  together. A retention lift is not a win if payer conversion falls.
 
 ## Provisional 90-day targets
 

@@ -1712,9 +1712,9 @@ export const userActivityDays = pgTable(
     firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
-    /** Retired ritual-completion field retained for historical data. */
+    /** Server-truth completion time for the current daily ritual version. */
     ritualCompletedAt: timestamp("ritual_completed_at", { withTimezone: true }),
-    /** Retired ritual product version retained for historical data. */
+    /** Version isolates current streaks from historical/backfilled activity. */
     ritualVersion: integer("ritual_version"),
   },
   (t) => [

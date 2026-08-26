@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { FileText, Loader2, Sparkles, Users } from "lucide-react";
+import { FileText, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -12,6 +11,7 @@ import {
   creditBalanceBucket,
   trackEvent,
 } from "@/lib/analytics";
+import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 
 const ERRORS: Record<string, string> = {
   no_chart: "ჯერ შენი რუკა უნდა შეიქმნას. დაასრულე ონბორდინგი.",
@@ -155,26 +155,7 @@ export function BuyReportCta({
               </span>
             </>
           ) : (
-            <div className="space-y-2 text-center sm:text-right">
-              <p className="text-sm text-[var(--vivida-pink)]">
-                {am ? "Ձեր հաշվեկշիռը շատ ցածր է։" : en ? "Your balance is too low." : "ბალანსი არ არის საკმარისი."}
-              </p>
-              <Button asChild variant="mystic" size="lg">
-                <Link
-                  href="/credits"
-                  onClick={() =>
-                    trackEvent(ANALYTICS_EVENT.recommendationClicked, {
-                      placement: "natal_report_shortfall",
-                      destination: "credits",
-                      product: "natal_pdf",
-                    })
-                  }
-                >
-                  <Users className="size-4" />
-                  {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
-                </Link>
-              </Button>
-            </div>
+            <ContextualPaywallActions locale={locale} balance={balance} cost={cost} product="natal_pdf" returnTo="/report" placement="natal_report_shortfall" />
           )}
         </div>
       </div>

@@ -1,20 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { fbTrack } from "@/lib/fb-pixel";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export function CheckoutSuccessTracker() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     if (searchParams.get("status") !== "success") return;
     const sessionId = searchParams.get("session_id");
     if (!sessionId) return;
+    const rawNext = searchParams.get("next");
+    const returnTo = rawNext ? normalizeReturnPath(rawNext) : null;
     const key = `vivida_checkout_tracked:${sessionId}`;
-    if (sessionStorage.getItem(key)) return;
+    if (sessionStorage.getItem(key)) {
+      if (returnTo) router.replace(returnTo);
+      return;
+    }
     void fetch(`/api/billing/session?session_id=${encodeURIComponent(sessionId)}`)
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
@@ -33,9 +40,10 @@ export function CheckoutSuccessTracker() {
           trackEvent(ANALYTICS_EVENT.subscriptionStarted, { product: data.contentId, value: data.value, currency: data.currency });
         }
         sessionStorage.setItem(key, "1");
+        if (returnTo) router.replace(returnTo);
       })
       .catch(() => undefined);
-  }, [searchParams]);
+  }, [router, searchParams]);
 
   return null;
 }

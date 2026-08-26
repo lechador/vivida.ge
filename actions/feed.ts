@@ -6,7 +6,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { posts, type PostReactionKind } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { CREDIT_REWARD, REWARD_CAP, earnDailyCapped } from "@/lib/credits";
+import { CREDIT_REWARD, earnWeeklyFeedReward } from "@/lib/credits";
+import { rewardWeekKey } from "@/lib/credit-economy";
 import {
   listFeedPage,
   listRecentPostsByUserPage,
@@ -86,14 +87,9 @@ export async function createPost(rawBody: string): Promise<FeedActionResult> {
   const result = await createPostCore(user.id, rawBody);
   if (result.ok) {
     revalidatePath("/feed");
-    // Reward the first post of the day (capped, so posting can't be farmed).
+    // One small reward per week; atomic ref prevents concurrent farming.
     try {
-      await earnDailyCapped(
-        user.id,
-        CREDIT_REWARD.feedPost,
-        "earn_feed_post",
-        REWARD_CAP.feedPostPerDay
-      );
+      await earnWeeklyFeedReward(user.id, CREDIT_REWARD.feedPost, rewardWeekKey());
     } catch {
       /* reward is best-effort */
     }

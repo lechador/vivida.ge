@@ -9,6 +9,7 @@ import {
 } from "@/lib/stripe";
 import { checkoutTrackingFromRequest, checkoutTrackingMetadata, trackCheckoutStarted } from "@/lib/checkout-tracking";
 import { getLowCreditOffer } from "@/lib/promo-offer";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,8 +28,9 @@ export async function POST(req: Request) {
   // The promo is requested by name, never priced by the client. Eligibility is
   // resolved from the campaign here, so a user who was never addressed — or
   // whose offer has expired — cannot reach the ₾29 price by posting the flag.
-  const body = (await req.json().catch(() => null)) as { offer?: unknown } | null;
+  const body = (await req.json().catch(() => null)) as { offer?: unknown; returnTo?: unknown } | null;
   const wantsOffer = body?.offer === "low_credits";
+  const returnTo = typeof body?.returnTo === "string" ? normalizeReturnPath(body.returnTo) : null;
 
   const identity = await getBillingIdentity(userId);
   const offer = wantsOffer ? await getLowCreditOffer(userId) : null;
@@ -47,6 +49,7 @@ export async function POST(req: Request) {
       origin: new URL(req.url).origin,
       plan,
       trackingMetadata: checkoutTrackingMetadata(tracking),
+      returnTo,
     });
     if (tracking.allowed) after(() => trackCheckoutStarted({
       session: checkout,

@@ -25,7 +25,7 @@ const ROWS_KA: EarnRow[] = [
   {
     Icon: PenLine,
     title: "დაწერე პოსტი ფიდში",
-    detail: "დღეში პირველ პოსტზე",
+    detail: "კვირაში პირველ პოსტზე",
     amount: CREDIT_REWARD.feedPost,
   },
   {
@@ -46,7 +46,7 @@ const ROWS_EN: EarnRow[] = [
   {
     Icon: PenLine,
     title: "Write a feed post",
-    detail: "For your first post each day",
+    detail: "For your first post each week",
     amount: CREDIT_REWARD.feedPost,
   },
   {
@@ -57,12 +57,33 @@ const ROWS_EN: EarnRow[] = [
   },
 ];
 
+const ROWS_AM: EarnRow[] = [
+  {
+    Icon: UserPlus,
+    title: "Հրավիրեք ընկերոջը",
+    detail: "Երբ նա գրանցվի և լրացնի պրոֆիլը",
+    amount: REFERRAL_REWARD,
+  },
+  {
+    Icon: PenLine,
+    title: "Գրառում կատարեք հոսքում",
+    detail: "Շաբաթվա առաջին գրառման համար",
+    amount: CREDIT_REWARD.feedPost,
+  },
+  {
+    Icon: Camera,
+    title: "Ավելացրեք պրոֆիլի լուսանկար",
+    detail: "Մեկ անգամ՝ որակյալ լուսանկար վերբեռնելիս",
+    amount: CREDIT_REWARD.profilePhoto,
+  },
+];
+
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function CreditEarnInfo({ locale }: { locale: UserLocale }) {
   const en = locale !== "ka";
   const am = locale === "am";
-  const rows = en ? ROWS_EN : ROWS_KA;
+  const rows = am ? ROWS_AM : en ? ROWS_EN : ROWS_KA;
   return (
     <div className="rounded-3xl border border-[var(--vivida-cyan)]/30 bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
       <div className="mb-1 flex items-center gap-2">

@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Lock, Loader2, Sparkles, Users } from "lucide-react";
+import { Lock, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +17,15 @@ import {
  * in place of the gated content on the test-result pages.
  */
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
+
+function resultPath(kind: "iq" | "eq" | "big-five" | "mbti" | "synastry", resultId: string): string {
+  if (kind === "iq") return `/iq-testi/shedegi/${resultId}`;
+  if (kind === "eq") return `/eq-testi/shedegi/${resultId}`;
+  if (kind === "big-five") return `/big-five/shedegi/${resultId}`;
+  if (kind === "synastry") return `/synastry/${resultId}`;
+  return `/test-results/${resultId}`;
+}
 
 export function UnlockCard({
   kind,
@@ -147,28 +155,7 @@ export function UnlockCard({
         </div>
       ) : (
         <div className="mt-5 space-y-3">
-          <p className="text-sm text-[var(--vivida-pink)]">
-            {en
-              ? "You do not have enough credits. Invite a friend or top up your balance."
-              : "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი."}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild variant="mystic">
-              <Link
-                href="/credits"
-                onClick={() =>
-                  trackEvent(ANALYTICS_EVENT.recommendationClicked, {
-                    placement: "result_unlock_shortfall",
-                    destination: "credits",
-                    product: kind,
-                  })
-                }
-              >
-                <Users className="size-4" />
-                {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
-              </Link>
-            </Button>
-          </div>
+          <ContextualPaywallActions locale={locale} balance={balance} cost={cost} product={kind} returnTo={resultPath(kind, resultId)} placement="result_unlock_shortfall" />
         </div>
       )}
     </div>

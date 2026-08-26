@@ -14,6 +14,7 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +24,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: en ? "PRO subscription" : "PRO გამოწერა", robots: { index: false } };
 }
 
-export default async function SubscriptionPage() {
+export default async function SubscriptionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
   const user = await requireUser();
+  const query = await searchParams;
+  const rawNext = Array.isArray(query.next) ? query.next[0] : query.next;
+  const returnTo = rawNext ? normalizeReturnPath(rawNext) : null;
   // See app/credits/page.tsx — authed surfaces carry no `/am` prefix, so the
   // stored preference is what keeps an Armenian user in Armenian.
   const locale = await getUserLocale(user.id);
@@ -103,6 +111,7 @@ export default async function SubscriptionPage() {
                   plan={plan}
                   locale={locale}
                   placement="subscription_page_reactivation"
+                  returnTo={returnTo}
                 />
               </div>
             )}
@@ -112,6 +121,7 @@ export default async function SubscriptionPage() {
             plan={plan}
             locale={locale}
             placement="subscription_page"
+            returnTo={returnTo}
           />
         )}
       </section>

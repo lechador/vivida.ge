@@ -21,14 +21,26 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function TopUpCard({
   locale,
   countryCode,
+  balance,
+  neededCredits,
+  returnTo,
 }: {
   locale: UserLocale;
   countryCode?: string | null;
+  balance: number;
+  neededCredits?: number | null;
+  returnTo?: string | null;
 }) {
   const en = locale !== "ka";
   const am = locale === "am";
   const packs = creditPacksForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
+  const deficit = neededCredits && neededCredits > balance
+    ? neededCredits - balance
+    : null;
+  const recommendedId = deficit
+    ? (packs.find((pack) => pack.credits >= deficit) ?? packs[packs.length - 1]).id
+    : packs[1]?.id ?? packs[0].id;
 
   useEffect(() => {
     trackEvent(ANALYTICS_EVENT.paywallViewed, {
@@ -53,7 +65,7 @@ export function TopUpCard({
       const r = await fetch("/api/credits/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ packId }),
+        body: JSON.stringify({ packId, returnTo }),
       });
       const data = (await r.json().catch(() => ({}))) as {
         url?: string; eventId?: string; value?: number; currency?: string; contentId?: string;
@@ -85,11 +97,16 @@ export function TopUpCard({
       <h2 className="mt-2 text-xl font-semibold tracking-tight">
         {am ? "Քանի՞ կրեդիտ է ձեզ անհրաժեշտ։" : en ? "How many credits do you need?" : "რამდენი კრედიტი გჭირდება?"}
       </h2>
+      {deficit && (
+        <p className="mt-2 rounded-xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 px-3 py-2 text-sm text-foreground/80">
+          {am ? `Այս բացման համար պակասում է ${deficit} կրեդիտ։` : en ? `You need ${deficit} more credit${deficit === 1 ? "" : "s"} for this unlock.` : `ამ გახსნისთვის გაკლია ${deficit} კრედიტი.`}
+        </p>
+      )}
 
       <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
         {packs.map((p, i) => {
-          const featured = i === 1;
-          const badge = i === 0 ? (am ? "Սկզբնական" : en ? "Starter" : "საწყისი") : i === 1 ? (am ? "Ամենահանրաճանաչը" : en ? "Most popular" : "რჩეული") : (am ? "Լավագույն արժեք" : en ? "Best value" : "საუკეთესო ფასი");
+          const featured = p.id === recommendedId;
+          const badge = featured && deficit ? (am ? "Առաջարկվող" : en ? "Recommended" : "რეკომენდებული") : i === 0 ? (am ? "Սկզբնական" : en ? "Starter" : "საწყისი") : i === 1 ? (am ? "Ամենահանրաճանաչը" : en ? "Most popular" : "რჩეული") : (am ? "Լավագույն արժեք" : en ? "Best value" : "საუკეთესო ფასი");
           return (
             <button
               key={p.id}

@@ -22,6 +22,8 @@ import type {
 } from "@/db/schema";
 import type { DiscoverCard } from "@/lib/discover";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { getDailyRitualProgress } from "@/lib/daily-ritual-core";
+import type { StreakProgress } from "@/lib/streak-credits";
 
 /**
  * The dashboard loads in two waves so the page never blocks on AI latency:
@@ -49,6 +51,7 @@ export type DashboardCore =
       weeklyUnlocked: boolean;
       /** Credit balance — used by the locked-forecast unlock CTA. */
       balance: number;
+      ritualProgress: StreakProgress;
       suggestions: DiscoverCard[];
     };
 
@@ -60,7 +63,7 @@ export async function loadDashboardCore(userId: string): Promise<DashboardCore> 
 
   // Skip the "suggested people" query entirely when the rail is flagged off
   // — no point ranking strangers we won't show. Render is also guarded.
-  const [profileRow, suggestions, weeklyUnlocked, balance] = await Promise.all([
+  const [profileRow, suggestions, weeklyUnlocked, balance, ritualProgress] = await Promise.all([
     db
       .select({ timezone: profiles.timezone })
       .from(profiles)
@@ -71,6 +74,7 @@ export async function loadDashboardCore(userId: string): Promise<DashboardCore> 
       : Promise.resolve([] as DiscoverCard[]),
     isUnlocked(userId, "weekly", "spend_weekly"),
     getBalance(userId),
+    getDailyRitualProgress(userId),
   ]);
 
   return {
@@ -80,6 +84,7 @@ export async function loadDashboardCore(userId: string): Promise<DashboardCore> 
     canDaily: true,
     weeklyUnlocked,
     balance,
+    ritualProgress,
     suggestions,
   };
 }

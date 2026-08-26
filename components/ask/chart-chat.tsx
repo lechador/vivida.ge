@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { Send, Sparkles, Users } from "lucide-react";
+import { Send, Sparkles } from "lucide-react";
 
 import { CreditHint } from "@/components/credits/credit-hint";
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -12,6 +11,7 @@ import {
   chartStarterText,
   type ChartStarterId,
 } from "@/lib/chart-chat-starters";
+import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -54,6 +54,7 @@ export function ChartChat({
   // Tracked separately from the message so the 402 branch can also offer
   // the standard invite/top-up CTA, like every other credit gate.
   const [needsCredits, setNeedsCredits] = useState(false);
+  const [creditShortfall, setCreditShortfall] = useState({ balance: 0, cost: 1 });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -84,6 +85,10 @@ export function ChartChat({
         const short = data.error === "needs_credits";
         setNeedsCredits(short);
         if (short) {
+          setCreditShortfall({
+            balance: typeof data.balance === "number" ? data.balance : 0,
+            cost: typeof data.cost === "number" ? data.cost : 1,
+          });
           trackEvent(ANALYTICS_EVENT.insufficientCredits, {
             product: "ai_chart_chat",
             surface: "chart_chat",
@@ -182,22 +187,7 @@ export function ChartChat({
       {error && (
         <div className="mt-3 shrink-0">
           <p className="text-sm text-[var(--vivida-pink)]">{error}</p>
-          {needsCredits && (
-            <Link
-              href="/credits"
-              onClick={() =>
-                trackEvent(ANALYTICS_EVENT.recommendationClicked, {
-                  placement: "chart_chat_shortfall",
-                  destination: "credits",
-                  product: "ai_chart_chat",
-                })
-              }
-              className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/12 px-3 py-1.5 text-sm text-foreground/90 transition-colors hover:bg-[var(--vivida-violet)]/20"
-            >
-              <Users className="size-4" />
-              {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
-            </Link>
-          )}
+          {needsCredits && <div className="mt-2"><ContextualPaywallActions locale={locale} balance={creditShortfall.balance} cost={creditShortfall.cost} product="ai_chart_chat" returnTo="/ask" placement="chart_chat_shortfall" /></div>}
         </div>
       )}
 

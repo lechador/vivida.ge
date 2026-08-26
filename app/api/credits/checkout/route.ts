@@ -6,6 +6,7 @@ import { getBillingIdentity } from "@/lib/premium";
 import { createCreditCheckoutSession, isStripeConfigured } from "@/lib/stripe";
 import { localeForHost } from "@/lib/i18n/request-locale";
 import { checkoutTrackingFromRequest, checkoutTrackingMetadata, trackCheckoutStarted } from "@/lib/checkout-tracking";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,7 +24,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "unavailable" }, { status: 503 });
   }
 
-  const body = (await req.json().catch(() => ({}))) as { packId?: unknown };
+  const body = (await req.json().catch(() => ({}))) as { packId?: unknown; returnTo?: unknown };
+  const returnTo = typeof body.returnTo === "string"
+    ? normalizeReturnPath(body.returnTo)
+    : null;
   const billingUser = await getBillingIdentity(userId);
   const pack = creditPackForCountry(billingUser?.countryCode, body.packId);
   if (!pack) return NextResponse.json({ error: "bad_pack" }, { status: 400 });
@@ -48,6 +52,7 @@ export async function POST(req: Request) {
       currency: pack.currency,
       locale,
       trackingMetadata: checkoutTrackingMetadata(tracking),
+      returnTo,
     });
     if (tracking.allowed) after(() => trackCheckoutStarted({
       session: checkout,

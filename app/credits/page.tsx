@@ -29,6 +29,9 @@ import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
 import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
 import { CreditHistory } from "@/components/credits/credit-history";
+import { CreditProgressCard } from "@/components/credits/credit-progress-card";
+import { nextMonthlyBonusDate } from "@/lib/credit-progress";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -53,18 +56,34 @@ export default async function CreditsPage({
   searchParams: Promise<{
     history?: string | string[];
     page?: string | string[];
+    next?: string | string[];
+    need?: string | string[];
+    product?: string | string[];
   }>;
 }) {
+  const query = await searchParams;
+  const rawNext = Array.isArray(query.next) ? query.next[0] : query.next;
+  const returnTo = rawNext ? normalizeReturnPath(rawNext) : null;
+  const rawNeed = Array.isArray(query.need) ? query.need[0] : query.need;
+  const parsedNeed = Number.parseInt(rawNeed ?? "", 10);
+  const neededCredits = Number.isFinite(parsedNeed) && parsedNeed > 0 && parsedNeed <= 100 ? parsedNeed : null;
+  const loginQuery = new URLSearchParams();
+  if (returnTo) loginQuery.set("next", returnTo);
+  if (neededCredits) loginQuery.set("need", String(neededCredits));
+  const rawProduct = Array.isArray(query.product) ? query.product[0] : query.product;
+  if (typeof rawProduct === "string" && /^[a-z0-9_-]{1,60}$/i.test(rawProduct)) {
+    loginQuery.set("product", rawProduct);
+  }
+  const loginReturn = loginQuery.size > 0 ? `/credits?${loginQuery.toString()}` : "/credits";
   // Campaign emails link here directly. Preserve the destination for readers
   // whose browser session expired so signing in still lands on their offer.
-  const user = await requireUser("/credits");
+  const user = await requireUser(loginReturn);
   // getUserLocale, not getRequestLocale: this surface has no `/am` prefix, so
   // the stored preference is the only way an Armenian user stays in Armenian
   // once signed in.
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
   const am = locale === "am";
-  const query = await searchParams;
   const historyParam = Array.isArray(query.history) ? query.history[0] : query.history;
   const historyFilter: CreditHistoryFilter =
     historyParam === "earned" || historyParam === "spent" ? historyParam : "all";
@@ -131,6 +150,10 @@ export default async function CreditsPage({
           </p>
         </div>
 
+        <div className="mt-4">
+          <CreditProgressCard balance={balance} nextMonthlyDate={nextMonthlyBonusDate()} locale={locale} />
+        </div>
+
         {!premium && !offer && (
           <div className="mt-4">
             <CreditsVsPro
@@ -185,7 +208,7 @@ export default async function CreditsPage({
 
         {/* Top-up is kept directly below the balance so there is no hunt or scroll. */}
         <div id="credit-packs" className="mt-4 scroll-mt-20">
-          <TopUpCard locale={locale} countryCode={identity?.countryCode} />
+          <TopUpCard locale={locale} countryCode={identity?.countryCode} balance={balance} neededCredits={neededCredits} returnTo={returnTo} />
         </div>
 
         <div className="mt-4">

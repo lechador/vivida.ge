@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Loader2, Lock, Sparkles, Users } from "lucide-react";
+import { Loader2, Lock, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +10,7 @@ import {
   trackEvent,
 } from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 
 /**
  * Locked state for the 7-day forecast. The forecast is a one-time credit
@@ -168,26 +168,7 @@ export function WeeklyForecastLocked({
               {en ? `Unlock for ${cost} credits` : `გახსნა ${cost} კრედიტით`}
             </Button>
           ) : (
-            <div className="space-y-2">
-              <p className="text-sm text-[var(--vivida-pink)]">
-                {am ? "Ձեր հաշվեկշիռը շատ ցածր է։" : en ? "Your balance is too low." : "ბალანსი არ არის საკმარისი."}
-              </p>
-              <Button asChild variant="mystic">
-                <Link
-                  href="/credits"
-                  onClick={() =>
-                    trackEvent(ANALYTICS_EVENT.recommendationClicked, {
-                      placement: "weekly_forecast_shortfall",
-                      destination: "credits",
-                      product: "weekly_forecast",
-                    })
-                  }
-                >
-                  <Users className="size-4" />
-                  {am ? "Հրավիրել / լիցքավորել" : en ? "Invite / top up" : "მოიწვიე / შეავსე"}
-                </Link>
-              </Button>
-            </div>
+            <ContextualPaywallActions locale={locale} balance={balance} cost={cost} product="weekly_forecast" returnTo="/dashboard" placement="weekly_forecast_shortfall" />
           )}
         </div>
       </div>

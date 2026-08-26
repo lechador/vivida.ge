@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { stripe } from "@/lib/stripe";
+import { grantPurchaseCredits } from "@/lib/credits";
+import { activatePremiumFromCheckout } from "@/lib/premium";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,6 +21,13 @@ export async function GET(req: Request) {
     }
     const kind = checkout.metadata.kind;
     if (kind !== "credits" && kind !== "premium") return NextResponse.json({ error: "bad_kind" }, { status: 400 });
+    // Webhook delivery may lag behind Stripe's redirect. Reconcile credit
+    // purchases here too; the session-keyed database function is idempotent.
+    if (kind === "credits") {
+      await grantPurchaseCredits(userId, Number(checkout.metadata.credits ?? 0), checkout.id);
+    } else {
+      await activatePremiumFromCheckout(checkout);
+    }
     const contentId = kind === "premium" ? checkout.metadata.planKey ?? "vivida_pro" : `credits_${checkout.metadata.credits ?? "pack"}`;
     return NextResponse.json({
       kind,

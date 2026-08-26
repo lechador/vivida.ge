@@ -94,6 +94,7 @@ export async function createCreditCheckoutSession(opts: {
   currency: string;
   locale?: UserLocale;
   trackingMetadata?: Record<string, string>;
+  returnTo?: string | null;
 }): Promise<Stripe.Checkout.Session> {
   const {
     userId,
@@ -104,6 +105,7 @@ export async function createCreditCheckoutSession(opts: {
     currency,
     locale = "ka",
     trackingMetadata = {},
+    returnTo,
   } = opts;
   // Same formatter the top-up card uses, so the price on the button and the
   // price on the Stripe page are written identically.
@@ -131,8 +133,8 @@ export async function createCreditCheckoutSession(opts: {
         },
       },
     ],
-    success_url: `${origin}/credits?status=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/credits?status=canceled`,
+    success_url: `${origin}/credits?status=success&session_id={CHECKOUT_SESSION_ID}${returnTo ? `&next=${encodeURIComponent(returnTo)}` : ""}`,
+    cancel_url: `${origin}/credits?status=canceled${returnTo ? `&next=${encodeURIComponent(returnTo)}` : ""}`,
   });
 }
 
@@ -166,8 +168,9 @@ export async function createPremiumCheckoutSession(opts: {
   origin: string;
   plan: PremiumPlan;
   trackingMetadata?: Record<string, string>;
+  returnTo?: string | null;
 }): Promise<Stripe.Checkout.Session> {
-  const { userId, email, stripeCustomerId, origin, plan, trackingMetadata = {} } = opts;
+  const { userId, email, stripeCustomerId, origin, plan, trackingMetadata = {}, returnTo } = opts;
   const price = await priceForPlan(plan);
   const metadata = {
     kind: "premium",
@@ -191,8 +194,8 @@ export async function createPremiumCheckoutSession(opts: {
     line_items: [{ price: price.id, quantity: 1 }],
     allow_promotion_codes: true,
     billing_address_collection: "auto",
-    success_url: `${origin}/subscription?status=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/subscription?status=canceled`,
+    success_url: `${origin}/subscription?status=success&session_id={CHECKOUT_SESSION_ID}${returnTo ? `&next=${encodeURIComponent(returnTo)}` : ""}`,
+    cancel_url: `${origin}/subscription?status=canceled${returnTo ? `&next=${encodeURIComponent(returnTo)}` : ""}`,
   });
 }
 

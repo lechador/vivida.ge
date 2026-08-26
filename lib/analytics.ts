@@ -40,6 +40,8 @@ export const ANALYTICS_EVENT = {
   publicHoroscopeRead: "public_horoscope_read",
   dailyHoroscopeViewed: "daily_horoscope_viewed",
   dailyHoroscopeRead: "daily_horoscope_read",
+  dailyFocusSelected: "daily_focus_selected",
+  dailyRitualCompleted: "daily_ritual_completed",
   pushPromptViewed: "push_prompt_viewed",
   pushEnabled: "push_enabled",
   pushDismissed: "push_dismissed",
