@@ -30,6 +30,13 @@ export default async function AdminLayout({
           </div>
           <nav className="flex items-center gap-4 text-xs">
             <Link
+              href="/admin/users"
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              მომხმარებლები
+            </Link>
+            <span className="text-muted-foreground/40">·</span>
+            <Link
               href="/admin/feed"
               className="text-muted-foreground transition-colors hover:text-foreground"
             >

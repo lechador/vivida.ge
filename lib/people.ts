@@ -17,6 +17,7 @@ import { firstReadyPhotoByUser, resolveAvatar } from "./avatars";
 import { getBlockedUserIds } from "./block";
 import { getResidenceCountryCode, sameCountryFirst } from "./residence";
 import type { FriendshipStatus } from "./friendship";
+import { hasVerifiedBadge } from "./verified-badge";
 
 /**
  * One row in the /people directory list. Shape kept lean — avatar,
@@ -133,6 +134,7 @@ export async function listPeople(
       bio: profiles.bio,
       isPremium: users.isPremium,
       premiumUntil: users.premiumUntil,
+      verifiedBadgeGrantedAt: users.verifiedBadgeGrantedAt,
       sameCountry,
     })
     .from(profiles)
@@ -192,9 +194,7 @@ export async function listPeople(
       bio: r.bio,
       image: resolveAvatar(r.id, r.image, photos),
       createdAt: r.createdAt,
-      verified: Boolean(
-        r.isPremium && r.premiumUntil && r.premiumUntil.getTime() > Date.now(),
-      ),
+      verified: hasVerifiedBadge(r),
       friendship: statusByPartner.get(r.id) ?? "none",
     })),
     nextCursor: hasMore ? encodeCursor(page[page.length - 1]) : null,

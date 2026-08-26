@@ -12,6 +12,7 @@ import { FeedActivityEmail } from "@/lib/email-templates/feed-activity";
 import { MbtiResultEmail } from "@/lib/email-templates/mbti-result";
 import { ReportReadyEmail } from "@/lib/email-templates/report-ready";
 import { PersonalReminderEmail } from "@/lib/email-templates/personal-reminder";
+import { VerifiedBadgeGiftEmail } from "@/lib/email-templates/verified-badge-gift";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { usesEnglishCopy } from "@/lib/i18n/locale";
@@ -315,6 +316,78 @@ export async function sendWelcomeEmail({
     });
   } catch (err) {
     console.error("[email] welcome threw:", (err as Error).message);
+  }
+}
+
+/**
+ * Transactional notice sent when an admin gifts the identity badge. The
+ * caller supplies a grant-specific idempotency key, so retrying a failed admin
+ * action cannot put duplicate gift messages in the user's inbox.
+ */
+export async function sendVerifiedBadgeGiftEmail({
+  userId,
+  to,
+  name,
+  username,
+  locale = "ka",
+  idempotencyKey,
+}: {
+  userId: string;
+  to: string;
+  name: string | null;
+  username: string | null;
+  locale?: UserLocale;
+  idempotencyKey: string;
+}): Promise<{ ok: boolean; error?: "email_not_configured" | "send_failed" }> {
+  const c = client();
+  if (!c) {
+    console.warn("[email] RESEND_API_KEY missing — skipping badge gift to", to);
+    return { ok: false, error: "email_not_configured" };
+  }
+
+  const profileUrl = absUrl(
+    username ? `/u/${encodeURIComponent(username)}` : "/dashboard",
+    originForLocale(locale),
+  );
+  const subject = locale === "am"
+    ? "Դուք նվեր եք ստացել Verified Badge · Vivida"
+    : locale === "en"
+      ? "You received a Verified Badge as a gift · Vivida"
+      : "Verified Badge საჩუქრად მიიღე · Vivida";
+
+  try {
+    const result = await c.emails.send(
+      {
+        from: FROM,
+        to,
+        subject,
+        react: VerifiedBadgeGiftEmail({
+          name: name?.split(" ")[0] ?? null,
+          profileUrl,
+          locale,
+        }),
+      },
+      { idempotencyKey },
+    );
+    if (result.error) {
+      await recordSent(userId, "verified_badge_gift", {
+        email: to,
+        subject,
+        status: "failed",
+        error: result.error.message,
+      });
+      return { ok: false, error: "send_failed" };
+    }
+    await recordSent(userId, "verified_badge_gift", { email: to, subject });
+    return { ok: true };
+  } catch (error) {
+    await recordSent(userId, "verified_badge_gift", {
+      email: to,
+      subject,
+      status: "failed",
+      error: (error as Error).message.slice(0, 500),
+    }).catch(() => undefined);
+    return { ok: false, error: "send_failed" };
   }
 }
 

@@ -29,6 +29,7 @@ import {
   POST_EDIT_WINDOW_MS,
 } from "@/lib/feed-config";
 import { loadProfilePhotos, type FeedAuthor } from "@/lib/feed-core";
+import { hasVerifiedBadge } from "@/lib/verified-badge";
 
 /** Identity an edit/delete acts on — id for ownership, email for admin. */
 export type FeedActor = { id: string; email: string | null | undefined };
@@ -454,6 +455,7 @@ export async function listCommentsCore(postId: string): Promise<FeedComment[]> {
       authorDisplayName: profiles.displayName,
       authorIsPremium: users.isPremium,
       authorPremiumUntil: users.premiumUntil,
+      authorVerifiedBadgeGrantedAt: users.verifiedBadgeGrantedAt,
     })
     .from(postComments)
     .innerJoin(users, eq(users.id, postComments.userId))
@@ -476,11 +478,11 @@ export async function listCommentsCore(postId: string): Promise<FeedComment[]> {
       image: photos.get(r.authorId) ?? r.authorImage,
       username: r.authorUsername,
       displayName: r.authorDisplayName,
-      verified: Boolean(
-        r.authorIsPremium &&
-          r.authorPremiumUntil &&
-          r.authorPremiumUntil.getTime() > Date.now(),
-      ),
+      verified: hasVerifiedBadge({
+        isPremium: r.authorIsPremium,
+        premiumUntil: r.authorPremiumUntil,
+        verifiedBadgeGrantedAt: r.authorVerifiedBadgeGrantedAt,
+      }),
     },
   });
 

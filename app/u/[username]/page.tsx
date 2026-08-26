@@ -36,7 +36,7 @@ import { EQ_BAND_META, type EqBand } from "@/lib/eq/scoring";
 import { Button } from "@/components/ui/button";
 import { VerifiedBadge } from "@/components/profile/verified-badge";
 import { CountryBadge } from "@/components/profile/country-badge";
-import { isPremiumUser } from "@/lib/premium";
+import { hasVerifiedBadge } from "@/lib/verified-badge";
 import { countryDisplayName } from "@/lib/residence";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -243,7 +243,7 @@ export default async function PublicProfilePage({
 
   const displayName =
     profile.displayName ?? owner.name?.split(" ")[0] ?? username;
-  const ownerVerified = await isPremiumUser(owner.id);
+  const ownerVerified = hasVerifiedBadge(owner);
   const age = ageFromDob(profile.dateOfBirth);
 
   return (

@@ -2,6 +2,7 @@ import { and, asc, desc, eq, inArray, lt, notInArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { getBlockedUserIds } from "@/lib/block";
+import { hasVerifiedBadge } from "@/lib/verified-badge";
 import {
   postComments,
   postReactions,
@@ -64,6 +65,7 @@ const POST_SELECT = {
   authorDisplayName: profiles.displayName,
   authorIsPremium: users.isPremium,
   authorPremiumUntil: users.premiumUntil,
+  authorVerifiedBadgeGrantedAt: users.verifiedBadgeGrantedAt,
   authorDob: profiles.dateOfBirth,
 };
 
@@ -79,6 +81,7 @@ type PostRow = {
   authorDisplayName: string | null;
   authorIsPremium: boolean;
   authorPremiumUntil: Date | null;
+  authorVerifiedBadgeGrantedAt: Date | null;
   authorDob: string | null;
 };
 
@@ -175,11 +178,11 @@ async function enrichPostRows(
       image: photos.get(r.authorId) ?? r.authorImage,
       username: r.authorUsername,
       displayName: r.authorDisplayName,
-      verified: Boolean(
-        r.authorIsPremium &&
-          r.authorPremiumUntil &&
-          r.authorPremiumUntil.getTime() > Date.now(),
-      ),
+      verified: hasVerifiedBadge({
+        isPremium: r.authorIsPremium,
+        premiumUntil: r.authorPremiumUntil,
+        verifiedBadgeGrantedAt: r.authorVerifiedBadgeGrantedAt,
+      }),
     },
     authorSunSign: sunSignFromDob(r.authorDob),
     authorReputation: reputations.get(r.authorId) ?? 0,

@@ -33,6 +33,7 @@ import { getResidenceCountryCode, sameCountryFirst } from "./residence";
 import { signByIndex, type ZodiacSign } from "./zodiac";
 import { ageFromDob } from "./profile-utils";
 import { computeSynastry, type SynastryResult } from "./synastry";
+import { hasVerifiedBadge } from "./verified-badge";
 
 export type Element = ZodiacSign["element"];
 
@@ -229,11 +230,7 @@ export async function getDiscoveryFeed(
       sunSign: sign,
       sunElement: sign.element,
       compatibility: synastry?.overall ?? null,
-      verified: Boolean(
-        c.user.isPremium &&
-          c.user.premiumUntil &&
-          c.user.premiumUntil.getTime() > Date.now(),
-      ),
+      verified: hasVerifiedBadge(c.user),
     };
 
     const entry: Scored = { card, synastry };

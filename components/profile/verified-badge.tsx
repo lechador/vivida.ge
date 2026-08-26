@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 /** Premium identity marker shown next to a user's name across social surfaces. */
 export function VerifiedBadge({
   className,
-  label = "Vivida PRO verified",
+  label = "Vivida verified",
 }: {
   className?: string;
   label?: string;

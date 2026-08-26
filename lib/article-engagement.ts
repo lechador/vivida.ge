@@ -10,6 +10,7 @@ import {
 } from "@/db/schema";
 import { loadProfilePhotos } from "@/lib/feed-core";
 import { isAccountRestricted, RESTRICTED_MESSAGE } from "@/lib/restriction";
+import { hasVerifiedBadge } from "@/lib/verified-badge";
 
 export const ARTICLE_COMMENT_MAX = 1_000;
 const COMMENT_THROTTLE_MS = 5_000;
@@ -50,6 +51,7 @@ const COMMENT_SELECT = {
   authorDisplayName: profiles.displayName,
   authorIsPremium: users.isPremium,
   authorPremiumUntil: users.premiumUntil,
+  authorVerifiedBadgeGrantedAt: users.verifiedBadgeGrantedAt,
 };
 
 type CommentRow = {
@@ -63,6 +65,7 @@ type CommentRow = {
   authorDisplayName: string | null;
   authorIsPremium: boolean;
   authorPremiumUntil: Date | null;
+  authorVerifiedBadgeGrantedAt: Date | null;
 };
 
 async function toComments(rows: CommentRow[]): Promise<ArticleComment[]> {
@@ -83,10 +86,13 @@ async function toComments(rows: CommentRow[]): Promise<ArticleComment[]> {
         null,
       image: photos.get(row.authorId) ?? row.authorImage,
       username: row.authorUsername,
-      verified: Boolean(
-        row.authorIsPremium &&
-          row.authorPremiumUntil &&
-          row.authorPremiumUntil.getTime() > now,
+      verified: hasVerifiedBadge(
+        {
+          isPremium: row.authorIsPremium,
+          premiumUntil: row.authorPremiumUntil,
+          verifiedBadgeGrantedAt: row.authorVerifiedBadgeGrantedAt,
+        },
+        now,
       ),
     },
   }));

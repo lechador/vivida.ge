@@ -60,6 +60,16 @@ export const users = pgTable("user", {
   isPremium: boolean("is_premium").notNull().default(false),
   /** Last paid entitlement boundary, shown in account/subscription UI. */
   premiumUntil: timestamp("premium_until", { withTimezone: true }),
+  /** Manual identity badge gift, independent from paid Premium access. */
+  verifiedBadgeGrantedAt: timestamp("verified_badge_granted_at", {
+    withTimezone: true,
+  }),
+  /** Admin email captured for the audit trail at grant time. */
+  verifiedBadgeGrantedBy: text("verified_badge_granted_by"),
+  /** Set only after the transactional gift email is accepted by Resend. */
+  verifiedBadgeEmailSentAt: timestamp("verified_badge_email_sent_at", {
+    withTimezone: true,
+  }),
   /** Random opaque token used in unsubscribe links. Lazily populated on
    *  first send — see lib/unsubscribe.ts. Unique so a token resolves to
    *  at most one user. */
@@ -969,7 +979,7 @@ export const emailSendLog = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     /** 'welcome' | 'friend_request' | 'message' | 'post_comment' |
      *  'post_reaction' | 'birthday' | 'marketing' | 'verification' |
-     *  'password_reset' | 'profile_incomplete' … */
+     *  'password_reset' | 'profile_incomplete' | 'verified_badge_gift' … */
     kind: text("kind").notNull(),
     /** Recipient address at send time (users can change email later). */
     email: text("email"),
