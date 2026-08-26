@@ -861,6 +861,7 @@ const REACTION_SUBJECT_EN: Record<string, string> = {
  */
 export async function sendFeedActivityEmail({
   recipientUserId,
+  fromUserId,
   kind,
   fromName,
   fromUsername,
@@ -869,6 +870,7 @@ export async function sendFeedActivityEmail({
   reaction,
 }: {
   recipientUserId: string;
+  fromUserId: string;
   kind: "post_comment" | "post_reaction";
   fromName: string;
   fromUsername: string | null;
@@ -878,6 +880,8 @@ export async function sendFeedActivityEmail({
 }): Promise<boolean> {
   const c = client();
   if (!c) return false;
+  const { isBlockedEitherWay } = await import("@/lib/block");
+  if (await isBlockedEitherWay(recipientUserId, fromUserId)) return false;
 
   const [recipient] = await db
     .select({
@@ -1032,6 +1036,7 @@ export async function flushUnreadFeedActivityEmails(): Promise<{
 
       const didSend = await sendFeedActivityEmail({
         recipientUserId: row.userId,
+        fromUserId: row.payload?.fromUserId ?? "",
         kind: row.kind,
         fromName: row.payload?.fromName ?? "Vivida-ის წევრი",
         fromUsername: row.payload?.fromUsername ?? null,

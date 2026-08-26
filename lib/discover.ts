@@ -34,6 +34,7 @@ import { signByIndex, type ZodiacSign } from "./zodiac";
 import { ageFromDob } from "./profile-utils";
 import { computeSynastry, type SynastryResult } from "./synastry";
 import { hasVerifiedBadge } from "./verified-badge";
+import { getBlockedUserIds } from "./block";
 
 export type Element = ZodiacSign["element"];
 
@@ -106,23 +107,27 @@ export async function getDiscoveryFeed(
 
   // 2. Build the exclusion set — self + anyone we already have a row with
   //    (friends, pending, blocked).
-  const friendRows = await db
-    .select({
-      a: friendships.requesterId,
-      b: friendships.recipientId,
-    })
-    .from(friendships)
-    .where(
-      or(
-        eq(friendships.requesterId, viewerId),
-        eq(friendships.recipientId, viewerId)
-      )
-    );
+  const [friendRows, blockedIds] = await Promise.all([
+    db
+      .select({
+        a: friendships.requesterId,
+        b: friendships.recipientId,
+      })
+      .from(friendships)
+      .where(
+        or(
+          eq(friendships.requesterId, viewerId),
+          eq(friendships.recipientId, viewerId),
+        ),
+      ),
+    getBlockedUserIds(viewerId),
+  ]);
 
   const excluded = new Set<string>([viewerId]);
   for (const r of friendRows) {
     excluded.add(r.a === viewerId ? r.b : r.a);
   }
+  for (const id of blockedIds) excluded.add(id);
   const excludedList = [...excluded];
 
   // 3. Pull profile candidates with their charts

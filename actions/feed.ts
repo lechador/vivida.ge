@@ -76,8 +76,8 @@ export async function listRecentPostsByUser(
 export async function listComments(
   postId: string
 ): Promise<import("@/lib/feed-write-core").FeedComment[]> {
-  await requireUser();
-  return listCommentsCore(postId);
+  const viewer = await requireUser();
+  return listCommentsCore(postId, viewer.id);
 }
 
 /** Create a post. Shared core does the cap/throttle/insert + deferred

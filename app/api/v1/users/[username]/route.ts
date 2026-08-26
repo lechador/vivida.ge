@@ -60,7 +60,7 @@ export async function GET(
       birthRows,
     ] = await Promise.all([
       getReputation(row.id),
-      countFriends(row.id),
+      countFriends(row.id, viewer.id),
       isSelf
         ? Promise.resolve("none" as const)
         : getFriendshipStatus(viewer.id, row.id),

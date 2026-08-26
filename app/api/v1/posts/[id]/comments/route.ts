@@ -21,9 +21,9 @@ export async function GET(
   ctx: { params: Promise<{ id: string }> }
 ) {
   return handle(async () => {
-    await requireMobileUser(req);
+    const viewer = await requireMobileUser(req);
     const { id } = await ctx.params;
-    const comments = await listCommentsCore(id);
+    const comments = await listCommentsCore(id, viewer.id);
     return ok({ comments });
   });
 }

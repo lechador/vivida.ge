@@ -30,6 +30,8 @@ import {
 } from "@/lib/feed-config";
 import { loadProfilePhotos, type FeedAuthor } from "@/lib/feed-core";
 import { hasVerifiedBadge } from "@/lib/verified-badge";
+import { getBlockedUserIds, isBlockedEitherWay } from "@/lib/block";
+import { filterBlockedCommentThreads } from "@/lib/block-visibility";
 
 /** Identity an edit/delete acts on — id for ownership, email for admin. */
 export type FeedActor = { id: string; email: string | null | undefined };
@@ -76,8 +78,9 @@ async function notifyMentions(opts: {
   excludeUserIds: string[];
 }): Promise<void> {
   try {
+    const blockedIds = await getBlockedUserIds(opts.actorId);
     const targets = await resolveMentions(opts.body, {
-      excludeUserIds: [opts.actorId, ...opts.excludeUserIds],
+      excludeUserIds: [opts.actorId, ...opts.excludeUserIds, ...blockedIds],
     });
     if (targets.length === 0) return;
 
@@ -127,8 +130,9 @@ async function notifyFeedActivity(opts: {
   preview?: string;
   reaction?: PostReactionKind;
 }): Promise<void> {
+  const blockedIds = new Set(await getBlockedUserIds(opts.actorId));
   const recipients = [...new Set(opts.recipientIds)].filter(
-    (id) => id !== opts.actorId
+    (id) => id !== opts.actorId && !blockedIds.has(id)
   );
   if (recipients.length === 0) return;
 
@@ -172,6 +176,7 @@ async function notifyFeedActivity(opts: {
       try {
         await sendFeedActivityEmail({
           recipientUserId: id,
+          fromUserId: opts.actorId,
           kind: opts.kind,
           fromName,
           fromUsername: actor?.username ?? null,
@@ -284,6 +289,9 @@ export async function addCommentCore(
     .where(eq(posts.id, postId))
     .limit(1);
   if (!post) return { ok: false, error: "პოსტი ვერ მოიძებნა" };
+  if (post.userId !== userId && await isBlockedEitherWay(userId, post.userId)) {
+    return { ok: false, error: "პოსტთან მოქმედება შეუძლებელია" };
+  }
 
   let parent: { id: string; userId: string; parentId: string | null } | null =
     null;
@@ -306,6 +314,9 @@ export async function addCommentCore(
         ok: false,
         error: "პასუხების პასუხი ჯერ არ შეიძლება — უპასუხე ძირითად კომენტარს.",
       };
+    }
+    if (row.userId !== userId && await isBlockedEitherWay(userId, row.userId)) {
+      return { ok: false, error: "კომენტართან მოქმედება შეუძლებელია" };
     }
     parent = { id: row.id, userId: row.userId, parentId: row.parentId };
   }
@@ -382,6 +393,16 @@ export async function reactToPostCore(
   postId: string,
   kind: PostReactionKind
 ): Promise<FeedActionResult<{ active: PostReactionKind | null }>> {
+  const [post] = await db
+    .select({ userId: posts.userId })
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
+  if (!post) return { ok: false, error: "პოსტი ვერ მოიძებნა" };
+  if (post.userId !== userId && await isBlockedEitherWay(userId, post.userId)) {
+    return { ok: false, error: "პოსტთან მოქმედება შეუძლებელია" };
+  }
+
   const [existing] = await db
     .select({ kind: postReactions.kind })
     .from(postReactions)
@@ -408,12 +429,7 @@ export async function reactToPostCore(
     });
 
   if (!existing) {
-    const [post] = await db
-      .select({ userId: posts.userId })
-      .from(posts)
-      .where(eq(posts.id, postId))
-      .limit(1);
-    if (post && post.userId !== userId) {
+    if (post.userId !== userId) {
       await notifyFeedActivity({
         recipientIds: [post.userId],
         actorId: userId,
@@ -440,8 +456,12 @@ export async function reactToPostCore(
  * Comments for one post in tree-render order (top-level oldest-first, each
  * followed by its replies). One-level nesting, so no recursive CTE needed.
  */
-export async function listCommentsCore(postId: string): Promise<FeedComment[]> {
-  const rows = await db
+export async function listCommentsCore(
+  postId: string,
+  viewerId: string,
+): Promise<FeedComment[]> {
+  const blockedIds = await getBlockedUserIds(viewerId);
+  const rawRows = await db
     .select({
       id: postComments.id,
       postId: postComments.postId,
@@ -462,6 +482,7 @@ export async function listCommentsCore(postId: string): Promise<FeedComment[]> {
     .leftJoin(profiles, eq(profiles.userId, postComments.userId))
     .where(eq(postComments.postId, postId))
     .orderBy(postComments.createdAt);
+  const rows = filterBlockedCommentThreads(rawRows, blockedIds);
 
   const authorIds = Array.from(new Set(rows.map((r) => r.authorId)));
   const photos = await loadProfilePhotos(authorIds);
@@ -505,11 +526,8 @@ export async function listCommentsCore(postId: string): Promise<FeedComment[]> {
     const children = childrenByParent.get(parent.id);
     if (children) ordered.push(...children);
   }
-  for (const [parentId, children] of childrenByParent) {
-    if (!topLevel.some((t) => t.id === parentId)) {
-      ordered.push(...children);
-    }
-  }
+  // A reply whose parent is hidden by a block stays hidden too; otherwise it
+  // would leak context from the blocked thread as an unexplained orphan.
   return ordered;
 }
 

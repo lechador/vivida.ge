@@ -1,9 +1,10 @@
 import { z } from "zod";
 
 import { requireMobileUser } from "@/lib/api/auth";
-import { handle } from "@/lib/api/errors";
+import { ApiError, handle } from "@/lib/api/errors";
 import { ok } from "@/lib/api/respond";
 import { listPeople } from "@/lib/people";
+import { SOCIAL_FEATURES } from "@/lib/social-flags";
 
 export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
@@ -29,6 +30,9 @@ const Query = z.object({
 export async function GET(req: Request) {
   return handle(async () => {
     const user = await requireMobileUser(req);
+    if (!SOCIAL_FEATURES.peopleDirectory) {
+      throw new ApiError(404, "feature_disabled", "People directory is not available");
+    }
 
     const { searchParams } = new URL(req.url);
     const { cursor, q, limit } = Query.parse({

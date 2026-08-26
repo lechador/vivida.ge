@@ -20,6 +20,7 @@ import { isUnlocked } from "@/lib/credits";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { queueNotificationPush } from "@/lib/notification-push";
+import { isBlockedEitherWay } from "@/lib/block";
 import type { PartnerListItem } from "@/lib/partners-core";
 import {
   computeRelationshipWeekly,
@@ -50,7 +51,14 @@ export async function getRelationshipPartnerForViewer(
       isNull(partners.deletedAt),
     ))
     .limit(1);
-  return row ?? null;
+  if (!row) return null;
+  if (
+    row.linkedUserId &&
+    await isBlockedEitherWay(row.userId, row.linkedUserId)
+  ) {
+    return null;
+  }
+  return row;
 }
 
 export type RelationshipListItem = PartnerListItem & Pick<Partner, "linkedUserId" | "inviteAcceptedAt"> & {
@@ -264,6 +272,9 @@ export async function acceptRelationshipInviteCore(
   )).limit(1);
   if (!candidate) return { ok: false, error: "მოწვევა ვადაგასულია ან უკვე გამოყენებულია" };
   if (candidate.userId === userId) return { ok: false, error: "საკუთარ მოწვევას ვერ მიიღებ" };
+  if (await isBlockedEitherWay(candidate.userId, userId)) {
+    return { ok: false, error: "მოწვევის მიღება შეუძლებელია" };
+  }
   if (!(await isRelationshipUnlocked(candidate))) {
     return { ok: false, error: "ურთიერთობის შედეგი ჯერ არ არის გახსნილი" };
   }

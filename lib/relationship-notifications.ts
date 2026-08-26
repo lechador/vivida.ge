@@ -21,6 +21,7 @@ import {
 import { localDateString } from "@/lib/transits";
 import { localScheduleParts } from "@/lib/reminder-config";
 import { sendPersonalReminderEmail } from "@/lib/email";
+import { isBlockedEitherWay } from "@/lib/block";
 
 async function claimDelivery(partnerId: string, userId: string, deliveryKey: string): Promise<boolean> {
   const [claimed] = await db.insert(relationshipNotificationDeliveries).values({
@@ -69,6 +70,13 @@ export async function deliverRelationshipUpdates(
   for (const row of rows) {
     const { partner, subscription } = row;
     if (subscription.userId !== partner.userId && subscription.userId !== partner.linkedUserId) {
+      skipped += 1;
+      continue;
+    }
+    if (
+      partner.linkedUserId &&
+      await isBlockedEitherWay(partner.userId, partner.linkedUserId)
+    ) {
       skipped += 1;
       continue;
     }

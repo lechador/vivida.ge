@@ -18,6 +18,7 @@ export async function blockUser(targetUserId: string) {
   // Block drops friendship/match + filters feed; refresh the surfaces that
   // render the now-hidden user.
   invalidateHeaderForUser(user.id);
+  invalidateHeaderForUser(targetUserId);
   revalidatePath("/feed");
   revalidatePath("/friends");
   revalidatePath("/messages");
@@ -27,6 +28,8 @@ export async function blockUser(targetUserId: string) {
 export async function unblockUser(targetUserId: string) {
   const user = await requireUser();
   const res = await unblockUserCore(user.id, targetUserId);
+  invalidateHeaderForUser(user.id);
+  invalidateHeaderForUser(targetUserId);
   revalidatePath("/feed");
   return res;
 }

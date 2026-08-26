@@ -60,6 +60,7 @@ export async function POST(req: Request) {
     const res = await blockUserCore(user.id, targetUserId);
     if (!res.ok) return fail(422, "block_rejected", res.error);
     invalidateHeaderForUser(user.id);
+    invalidateHeaderForUser(targetUserId);
     return ok({ ok: true });
   });
 }
@@ -71,6 +72,7 @@ export async function DELETE(req: Request) {
     const res = await unblockUserCore(user.id, targetUserId);
     if (!res.ok) return fail(422, "unblock_rejected", res.error);
     invalidateHeaderForUser(user.id);
+    invalidateHeaderForUser(targetUserId);
     return ok({ ok: true });
   });
 }

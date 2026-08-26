@@ -1,8 +1,19 @@
-import { and, count, desc, eq, inArray, or, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  inArray,
+  notExists,
+  notInArray,
+  or,
+  sql,
+} from "drizzle-orm";
 
 import { db } from "@/db";
-import { friendships, profiles, users } from "@/db/schema";
+import { blocks, friendships, profiles, users } from "@/db/schema";
 import { firstReadyPhotoByUser, resolveAvatar } from "./avatars";
+import { getBlockedUserIds, isBlockedEitherWay } from "./block";
 
 export type FriendshipStatus =
   | "none"
@@ -21,6 +32,7 @@ export async function getFriendshipStatus(
   otherId: string
 ): Promise<FriendshipStatus> {
   if (viewerId === otherId) return "none";
+  if (await isBlockedEitherWay(viewerId, otherId)) return "blocked";
   const [row] = await db
     .select()
     .from(friendships)
@@ -62,6 +74,7 @@ export type FriendshipUser = {
  * recipient, and vice versa. We run two queries and merge.
  */
 export async function listFriends(userId: string): Promise<FriendshipUser[]> {
+  const blockedIds = await getBlockedUserIds(userId);
   const asRequester = await db
     .select({
       friendship: friendships,
@@ -74,7 +87,10 @@ export async function listFriends(userId: string): Promise<FriendshipUser[]> {
     .where(
       and(
         eq(friendships.requesterId, userId),
-        eq(friendships.status, "accepted")
+        eq(friendships.status, "accepted"),
+        blockedIds.length
+          ? notInArray(friendships.recipientId, blockedIds)
+          : undefined,
       )
     );
 
@@ -90,7 +106,10 @@ export async function listFriends(userId: string): Promise<FriendshipUser[]> {
     .where(
       and(
         eq(friendships.recipientId, userId),
-        eq(friendships.status, "accepted")
+        eq(friendships.status, "accepted"),
+        blockedIds.length
+          ? notInArray(friendships.requesterId, blockedIds)
+          : undefined,
       )
     );
 
@@ -114,6 +133,7 @@ export async function listFriends(userId: string): Promise<FriendshipUser[]> {
 export async function listIncomingRequests(
   userId: string
 ): Promise<FriendshipUser[]> {
+  const blockedIds = await getBlockedUserIds(userId);
   const rows = await db
     .select({
       friendship: friendships,
@@ -126,7 +146,10 @@ export async function listIncomingRequests(
     .where(
       and(
         eq(friendships.recipientId, userId),
-        eq(friendships.status, "pending")
+        eq(friendships.status, "pending"),
+        blockedIds.length
+          ? notInArray(friendships.requesterId, blockedIds)
+          : undefined,
       )
     )
     .orderBy(desc(friendships.createdAt));
@@ -148,6 +171,7 @@ export async function listIncomingRequests(
 export async function listOutgoingRequests(
   userId: string
 ): Promise<FriendshipUser[]> {
+  const blockedIds = await getBlockedUserIds(userId);
   const rows = await db
     .select({
       friendship: friendships,
@@ -160,7 +184,10 @@ export async function listOutgoingRequests(
     .where(
       and(
         eq(friendships.requesterId, userId),
-        eq(friendships.status, "pending")
+        eq(friendships.status, "pending"),
+        blockedIds.length
+          ? notInArray(friendships.recipientId, blockedIds)
+          : undefined,
       )
     )
     .orderBy(desc(friendships.createdAt));
@@ -183,7 +210,15 @@ export async function listOutgoingRequests(
  * `friendships` row (requester / recipient) count, so a single COUNT
  * over the OR query gives the answer.
  */
-export async function countFriends(userId: string): Promise<number> {
+export async function countFriends(
+  userId: string,
+  viewerId: string = userId,
+): Promise<number> {
+  const blockLists = await Promise.all([
+    getBlockedUserIds(userId),
+    viewerId === userId ? Promise.resolve([]) : getBlockedUserIds(viewerId),
+  ]);
+  const excludedIds = [...new Set(blockLists.flat())];
   const [row] = await db
     .select({ value: count() })
     .from(friendships)
@@ -191,9 +226,19 @@ export async function countFriends(userId: string): Promise<number> {
       and(
         eq(friendships.status, "accepted"),
         or(
-          eq(friendships.requesterId, userId),
-          eq(friendships.recipientId, userId)
-        )
+          and(
+            eq(friendships.requesterId, userId),
+            excludedIds.length
+              ? notInArray(friendships.recipientId, excludedIds)
+              : undefined,
+          ),
+          and(
+            eq(friendships.recipientId, userId),
+            excludedIds.length
+              ? notInArray(friendships.requesterId, excludedIds)
+              : undefined,
+          ),
+        ),
       )
     );
   return Number(row?.value ?? 0);
@@ -213,6 +258,23 @@ export async function countFriendsBatch(
 ): Promise<Map<string, number>> {
   const out = new Map<string, number>();
   if (userIds.length === 0) return out;
+  const pairIsNotBlocked = () => notExists(
+    db
+      .select({ value: sql`1` })
+      .from(blocks)
+      .where(
+        or(
+          and(
+            eq(blocks.blockerId, friendships.requesterId),
+            eq(blocks.blockedId, friendships.recipientId),
+          ),
+          and(
+            eq(blocks.blockerId, friendships.recipientId),
+            eq(blocks.blockedId, friendships.requesterId),
+          ),
+        ),
+      ),
+  );
   const [asReq, asRec] = await Promise.all([
     db
       .select({
@@ -223,7 +285,8 @@ export async function countFriendsBatch(
       .where(
         and(
           eq(friendships.status, "accepted"),
-          inArray(friendships.requesterId, userIds)
+          inArray(friendships.requesterId, userIds),
+          pairIsNotBlocked(),
         )
       )
       .groupBy(friendships.requesterId),
@@ -236,7 +299,8 @@ export async function countFriendsBatch(
       .where(
         and(
           eq(friendships.status, "accepted"),
-          inArray(friendships.recipientId, userIds)
+          inArray(friendships.recipientId, userIds),
+          pairIsNotBlocked(),
         )
       )
       .groupBy(friendships.recipientId),
@@ -277,6 +341,14 @@ export async function countMutualFriends(
     SELECT COUNT(*)::int AS cnt
     FROM viewer_friends v
     JOIN other_friends o ON o.friend_id = v.friend_id
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM "block" b
+      WHERE
+        (b.blocker_id IN (${viewerId}, ${otherId}) AND b.blocked_id = v.friend_id)
+        OR
+        (b.blocked_id IN (${viewerId}, ${otherId}) AND b.blocker_id = v.friend_id)
+    )
   `);
   const first = (rows.rows as Array<{ cnt: number }>)[0];
   return Number(first?.cnt ?? 0);
@@ -315,6 +387,14 @@ export async function listMutualFriendsPreview(
     JOIN other_friends o ON o.friend_id = v.friend_id
     JOIN "user" u ON u.id = v.friend_id
     LEFT JOIN profile p ON p.user_id = u.id
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM "block" b
+      WHERE
+        (b.blocker_id IN (${viewerId}, ${otherId}) AND b.blocked_id = v.friend_id)
+        OR
+        (b.blocked_id IN (${viewerId}, ${otherId}) AND b.blocker_id = v.friend_id)
+    )
     LIMIT ${limit}
   `);
   const list = (rows.rows ?? []) as Array<{
@@ -335,13 +415,17 @@ export async function listMutualFriendsPreview(
 
 /** Just the count — used for the AppHeader notification dot. */
 export async function countPendingRequests(userId: string): Promise<number> {
+  const blockedIds = await getBlockedUserIds(userId);
   const [row] = await db
     .select({ value: count() })
     .from(friendships)
     .where(
       and(
         eq(friendships.recipientId, userId),
-        eq(friendships.status, "pending")
+        eq(friendships.status, "pending"),
+        blockedIds.length
+          ? notInArray(friendships.requesterId, blockedIds)
+          : undefined,
       )
     );
   return Number(row?.value ?? 0);

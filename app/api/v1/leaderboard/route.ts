@@ -28,7 +28,7 @@ export async function GET(req: Request) {
     const { limit } = Query.parse({ limit: searchParams.get("limit") ?? undefined });
 
     const [top, myTotal] = await Promise.all([
-      getLeaderboard(limit ?? 50),
+      getLeaderboard(user.id, limit ?? 50),
       getUserReputationTotal(user.id),
     ]);
 

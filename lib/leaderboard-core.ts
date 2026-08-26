@@ -1,8 +1,9 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, notInArray } from "drizzle-orm";
 
 import { db } from "@/db";
 import { profiles, userReputation, users } from "@/db/schema";
 import { loadProfilePhotos } from "@/lib/feed-core";
+import { getBlockedUserIds } from "@/lib/block";
 
 /**
  * Framework-agnostic leaderboard data, shared by the website's
@@ -21,7 +22,11 @@ export type LeaderboardRow = {
 };
 
 /** Top users by reputation, highest first. Single join + one photo query. */
-export async function getLeaderboard(limit = 50): Promise<LeaderboardRow[]> {
+export async function getLeaderboard(
+  viewerId: string,
+  limit = 50,
+): Promise<LeaderboardRow[]> {
+  const blockedIds = await getBlockedUserIds(viewerId);
   const top = await db
     .select({
       userId: userReputation.userId,
@@ -34,6 +39,11 @@ export async function getLeaderboard(limit = 50): Promise<LeaderboardRow[]> {
     .from(userReputation)
     .innerJoin(users, eq(users.id, userReputation.userId))
     .leftJoin(profiles, eq(profiles.userId, userReputation.userId))
+    .where(
+      blockedIds.length
+        ? notInArray(userReputation.userId, blockedIds)
+        : undefined,
+    )
     .orderBy(desc(userReputation.total))
     .limit(limit);
 

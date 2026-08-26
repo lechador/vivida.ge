@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { and, asc, eq, ilike, isNotNull, ne, or, sql } from "drizzle-orm";
+import { and, asc, eq, ilike, isNotNull, ne, notInArray, or, sql } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { profiles, users } from "@/db/schema";
 import { firstReadyPhotoByUser, resolveAvatar } from "@/lib/avatars";
+import { getBlockedUserIds } from "@/lib/block";
 
 const MIN_QUERY = 2;
 const MAX_RESULTS = 8;
@@ -29,6 +30,7 @@ export async function GET(req: Request) {
 
   // ILIKE prefix-or-contains match on username, display_name, or user.name
   const pattern = `%${q.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+  const blockedIds = await getBlockedUserIds(session.user.id);
 
   const rows = await db
     .select({
@@ -44,6 +46,7 @@ export async function GET(req: Request) {
     .where(
       and(
         ne(users.id, session.user.id),
+        blockedIds.length ? notInArray(users.id, blockedIds) : undefined,
         // Hide users who haven't picked a username yet — their card would
         // link to a broken /u/ URL.
         isNotNull(profiles.username),

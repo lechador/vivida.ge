@@ -6,6 +6,7 @@ import { users, type NotificationKind, type NotificationPayload } from "@/db/sch
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { isPushConfigured, sendPushToUser } from "@/lib/push";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { isBlockedEitherWay } from "@/lib/block";
 
 /**
  * Web-push mirrors for social notifications. Until now push fired exactly
@@ -151,6 +152,12 @@ export function queueNotificationPush(
   if (!isPushConfigured()) return;
   const task = async () => {
     try {
+      if (
+        payload.fromUserId &&
+        await isBlockedEitherWay(recipientId, payload.fromUserId)
+      ) {
+        return;
+      }
       const [recipient] = await db
         .select({ locale: users.interfaceLanguage })
         .from(users)

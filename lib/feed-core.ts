@@ -3,6 +3,7 @@ import { and, asc, desc, eq, inArray, lt, notInArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { getBlockedUserIds } from "@/lib/block";
 import { hasVerifiedBadge } from "@/lib/verified-badge";
+import { filterBlockedCommentThreads } from "@/lib/block-visibility";
 import {
   postComments,
   postReactions,
@@ -114,12 +115,14 @@ export async function loadProfilePhotos(
  */
 async function enrichPostRows(
   viewerId: string,
-  rows: PostRow[]
+  rows: PostRow[],
+  knownBlockedIds?: string[],
 ): Promise<FeedPost[]> {
   if (rows.length === 0) return [];
 
   const postIds = rows.map((r) => r.id);
   const authorIds = Array.from(new Set(rows.map((r) => r.authorId)));
+  const blockedIds = knownBlockedIds ?? await getBlockedUserIds(viewerId);
 
   const { getReputationFor } = await import("@/lib/reputation");
   const [counts, mine, comments, reputations, photos] = await Promise.all([
@@ -130,7 +133,14 @@ async function enrichPostRows(
         count: sql<number>`count(*)::int`,
       })
       .from(postReactions)
-      .where(inArray(postReactions.postId, postIds))
+      .where(
+        and(
+          inArray(postReactions.postId, postIds),
+          blockedIds.length
+            ? notInArray(postReactions.userId, blockedIds)
+            : undefined,
+        ),
+      )
       .groupBy(postReactions.postId, postReactions.kind),
     db
       .select({ postId: postReactions.postId, kind: postReactions.kind })
@@ -144,11 +154,12 @@ async function enrichPostRows(
     db
       .select({
         postId: postComments.postId,
-        count: sql<number>`count(*)::int`,
+        id: postComments.id,
+        parentId: postComments.parentId,
+        authorId: postComments.userId,
       })
       .from(postComments)
-      .where(inArray(postComments.postId, postIds))
-      .groupBy(postComments.postId),
+      .where(inArray(postComments.postId, postIds)),
     getReputationFor(authorIds),
     loadProfilePhotos(authorIds),
   ]);
@@ -164,7 +175,9 @@ async function enrichPostRows(
   for (const row of mine) mineMap.set(row.postId, row.kind);
 
   const commentMap = new Map<string, number>();
-  for (const row of comments) commentMap.set(row.postId, Number(row.count));
+  for (const row of filterBlockedCommentThreads(comments, blockedIds)) {
+    commentMap.set(row.postId, (commentMap.get(row.postId) ?? 0) + 1);
+  }
 
   return rows.map((r) => ({
     id: r.id,
@@ -223,7 +236,7 @@ export async function listFeedPage(opts: {
     .orderBy(desc(posts.createdAt))
     .limit(limit);
 
-  return enrichPostRows(opts.viewerId, rows);
+  return enrichPostRows(opts.viewerId, rows, blockedIds);
 }
 
 /** A single post in the same enriched shape as the feed, or null if gone. */
@@ -231,15 +244,21 @@ export async function getPostForViewer(
   viewerId: string,
   postId: string
 ): Promise<FeedPost | null> {
+  const blockedIds = await getBlockedUserIds(viewerId);
   const rows = await db
     .select(POST_SELECT)
     .from(posts)
     .innerJoin(users, eq(users.id, posts.userId))
     .leftJoin(profiles, eq(profiles.userId, posts.userId))
-    .where(eq(posts.id, postId))
+    .where(
+      and(
+        eq(posts.id, postId),
+        blockedIds.length ? notInArray(posts.userId, blockedIds) : undefined,
+      ),
+    )
     .limit(1);
 
-  const [post] = await enrichPostRows(viewerId, rows);
+  const [post] = await enrichPostRows(viewerId, rows, blockedIds);
   return post ?? null;
 }
 
@@ -250,6 +269,8 @@ export async function listRecentPostsByUserPage(opts: {
   limit?: number;
 }): Promise<FeedPost[]> {
   const limit = Math.min(Math.max(opts.limit ?? 5, 1), 20);
+  const blockedIds = await getBlockedUserIds(opts.viewerId);
+  if (blockedIds.includes(opts.userId)) return [];
 
   const rows = await db
     .select(POST_SELECT)
@@ -260,7 +281,7 @@ export async function listRecentPostsByUserPage(opts: {
     .orderBy(desc(posts.createdAt))
     .limit(limit);
 
-  return enrichPostRows(opts.viewerId, rows);
+  return enrichPostRows(opts.viewerId, rows, blockedIds);
 }
 
 /**

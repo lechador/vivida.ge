@@ -1,4 +1,4 @@
-# Safety follow-ups (deferred, not yet built)
+# Safety follow-ups
 
 > ## 🚨 HARD GATE — photo moderation (#1) before ANY ads or growth push
 > Unmoderated public profile photos become an **acute** risk the moment we
@@ -8,25 +8,23 @@
 > closed group.
 
 Captured during the low-density safety cleanup (Steps 1–3) so they aren't
-forgotten. None of these are built yet — this is a backlog, not a spec.
+forgotten. Photo moderation and the admin reports queue remain backlog items;
+completed work is recorded below to prevent regressions.
 
-## Block-enforcement gaps
+## Block enforcement — RESOLVED (2026-08-26)
 
-Blocks are enforced server-side in the high-traffic vectors (DMs via
-`canMessage`, friend requests via `sendFriendRequestCore`, feed posts via
-`listFeedPage`, and the `/u/[username]` profile guard). Still leaking the
-blocked user in lower-traffic surfaces:
+Block relationships are now enforced server-side across the web and mobile
+API surfaces:
 
-- **Comments** — a blocked user's comments still render under a visible post
-  (`listComments` in `lib/feed-core.ts` is not block-filtered).
-- **Friend lists & mutual-friend counts** — `countFriends`,
-  `countMutualFriends`, `listMutualFriendsPreview` don't exclude blocks.
-- **Leaderboard** (`/leaderboard`) — blocked users still appear in rankings.
-- **Notifications** — actions a blocked user can still take on shared content
-  (e.g. reacting to / commenting on your post) can still emit notifications.
-- **Discovery / people directory** — currently flagged OFF, but if
-  `SOCIAL_FEATURES.swipeDeck` / `peopleDirectory` are re-enabled, their queries
-  (`getDiscoveryFeed`, `listPeople`) need block filtering added.
+- Feed posts and direct permalinks, comments/replies, reactions, and their
+  visible aggregate counts.
+- Friend lists and requests, friend/mutual-friend counts, leaderboard, search,
+  discovery, people directory, matches, and direct profile access.
+- In-app, push, and email actor notifications; existing actor-backed
+  notifications are removed when a block is created.
+- Active friendship/match and linked relationship-partner connections are
+  disconnected when blocking, while private chart data remains owned by its
+  creator.
 
 ## Underage accounts — RESOLVED (Step 3.1)
 
@@ -44,12 +42,10 @@ blocked user in lower-traffic surfaces:
 - Remaining: no automated re-scan/alerting for future edge cases (not needed
   while onboarding blocks under-18).
 
-## Mobile API parity
+## Mobile API parity — RESOLVED (2026-08-26)
 
-- The web swipe deck / people directory are flag-gated off, but the mobile
-  API endpoints `/api/v1/discover` and `/api/v1/people` still serve that data
-  to the (unlaunched) Flutter app. Gate them behind the same flags before the
-  app ships, or if they become reachable.
+- `/api/v1/discover` and `/api/v1/people` now use the same feature flags as
+  their web surfaces and return `404 feature_disabled` while disabled.
 
 ## Reports
 

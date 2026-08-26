@@ -25,7 +25,7 @@ import {
   profiles,
   users,
 } from "@/db/schema";
-import { getBlockedUserIds } from "./block";
+import { getBlockedUserIds, isBlockedEitherWay } from "./block";
 import { getResidenceCountryCode, sameCountryFirst } from "./residence";
 import { signByIndex, type ZodiacSign } from "./zodiac";
 import { ageFromDob } from "./profile-utils";
@@ -205,16 +205,23 @@ export async function getMatchDeck(viewerId: string): Promise<DeckCard[]> {
 
 /** A viewer's active matches, newest first, with the other person's card. */
 export async function listMatches(viewerId: string): Promise<MatchView[]> {
-  const rows = await db
-    .select({ a: matches.userAId, b: matches.userBId, createdAt: matches.createdAt })
-    .from(matches)
-    .where(
-      and(
-        isNull(matches.unmatchedAt),
-        or(eq(matches.userAId, viewerId), eq(matches.userBId, viewerId))
+  const [rawRows, blockedIds] = await Promise.all([
+    db
+      .select({ a: matches.userAId, b: matches.userBId, createdAt: matches.createdAt })
+      .from(matches)
+      .where(
+        and(
+          isNull(matches.unmatchedAt),
+          or(eq(matches.userAId, viewerId), eq(matches.userBId, viewerId)),
+        ),
       )
-    )
-    .orderBy(desc(matches.createdAt));
+      .orderBy(desc(matches.createdAt)),
+    getBlockedUserIds(viewerId),
+  ]);
+  const blocked = new Set(blockedIds);
+  const rows = rawRows.filter((row) =>
+    !blocked.has(row.a === viewerId ? row.b : row.a),
+  );
 
   if (rows.length === 0) return [];
 
@@ -358,6 +365,7 @@ export async function listIncomingLikes(viewerId: string): Promise<IncomingLikes
 
 /** Whether two users have an active (non-unmatched) match. */
 export async function areMatched(a: string, b: string): Promise<boolean> {
+  if (await isBlockedEitherWay(a, b)) return false;
   const [x, y] = a < b ? [a, b] : [b, a];
   const [row] = await db
     .select({ userAId: matches.userAId })

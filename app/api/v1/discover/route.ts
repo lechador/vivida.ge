@@ -1,7 +1,8 @@
 import { requireMobileUser } from "@/lib/api/auth";
-import { handle } from "@/lib/api/errors";
+import { ApiError, handle } from "@/lib/api/errors";
 import { ok } from "@/lib/api/respond";
 import { getDiscoveryFeed } from "@/lib/discover";
+import { SOCIAL_FEATURES } from "@/lib/social-flags";
 
 export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
@@ -17,6 +18,9 @@ export { OPTIONS } from "@/lib/api/cors";
 export async function GET(req: Request) {
   return handle(async () => {
     const user = await requireMobileUser(req);
+    if (!SOCIAL_FEATURES.swipeDeck) {
+      throw new ApiError(404, "feature_disabled", "Discover is not available");
+    }
     const feed = await getDiscoveryFeed(user.id);
     return ok(feed);
   });

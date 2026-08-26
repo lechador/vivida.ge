@@ -1,13 +1,25 @@
-import { and, count, desc, eq, isNull } from "drizzle-orm";
+import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
+  blocks,
   notifications,
   type Notification,
 } from "@/db/schema";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 
 export type NotificationView = Notification;
+
+/** Hide actor-backed notifications when either side has blocked the other. */
+function visibleActorNotification(userId: string) {
+  return sql<boolean>`NOT EXISTS (
+    SELECT 1 FROM ${blocks}
+    WHERE
+      (${blocks.blockerId} = ${userId} AND ${blocks.blockedId} = ${notifications.payload}->>'fromUserId')
+      OR
+      (${blocks.blockedId} = ${userId} AND ${blocks.blockerId} = ${notifications.payload}->>'fromUserId')
+  )`;
+}
 
 /** Most recent notifications for a user. Capped to keep the dropdown lean. */
 export async function listRecentNotifications(
@@ -17,7 +29,12 @@ export async function listRecentNotifications(
   return db
     .select()
     .from(notifications)
-    .where(eq(notifications.userId, userId))
+    .where(
+      and(
+        eq(notifications.userId, userId),
+        visibleActorNotification(userId),
+      ),
+    )
     .orderBy(desc(notifications.createdAt))
     .limit(limit);
 }
@@ -32,7 +49,8 @@ export async function countUnreadNotifications(
     .where(
       and(
         eq(notifications.userId, userId),
-        isNull(notifications.readAt)
+        isNull(notifications.readAt),
+        visibleActorNotification(userId),
       )
     );
   return Number(row?.value ?? 0);

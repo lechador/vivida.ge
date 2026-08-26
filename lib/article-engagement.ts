@@ -1,4 +1,4 @@
-import { and, desc, eq, lte, sql } from "drizzle-orm";
+import { and, desc, eq, lte, notInArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -11,6 +11,7 @@ import {
 import { loadProfilePhotos } from "@/lib/feed-core";
 import { isAccountRestricted, RESTRICTED_MESSAGE } from "@/lib/restriction";
 import { hasVerifiedBadge } from "@/lib/verified-badge";
+import { getBlockedUserIds } from "@/lib/block";
 
 export const ARTICLE_COMMENT_MAX = 1_000;
 const COMMENT_THROTTLE_MS = 5_000;
@@ -104,15 +105,30 @@ export async function getArticleEngagement(
   viewerId?: string,
 ): Promise<ArticleEngagement> {
   try {
+    const blockedIds = viewerId ? await getBlockedUserIds(viewerId) : [];
     const [likes, commentTotal, mine, rows] = await Promise.all([
       db
         .select({ value: sql<number>`count(*)::int` })
         .from(articleLikes)
-        .where(eq(articleLikes.articleId, articleId)),
+        .where(
+          and(
+            eq(articleLikes.articleId, articleId),
+            blockedIds.length
+              ? notInArray(articleLikes.userId, blockedIds)
+              : undefined,
+          ),
+        ),
       db
         .select({ value: sql<number>`count(*)::int` })
         .from(articleComments)
-        .where(eq(articleComments.articleId, articleId)),
+        .where(
+          and(
+            eq(articleComments.articleId, articleId),
+            blockedIds.length
+              ? notInArray(articleComments.userId, blockedIds)
+              : undefined,
+          ),
+        ),
       viewerId
         ? db
             .select({ articleId: articleLikes.articleId })
@@ -130,7 +146,14 @@ export async function getArticleEngagement(
         .from(articleComments)
         .innerJoin(users, eq(users.id, articleComments.userId))
         .leftJoin(profiles, eq(profiles.userId, articleComments.userId))
-        .where(eq(articleComments.articleId, articleId))
+        .where(
+          and(
+            eq(articleComments.articleId, articleId),
+            blockedIds.length
+              ? notInArray(articleComments.userId, blockedIds)
+              : undefined,
+          ),
+        )
         .orderBy(desc(articleComments.createdAt))
         .limit(COMMENT_LIMIT),
     ]);

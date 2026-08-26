@@ -180,7 +180,7 @@ export default async function PublicProfilePage({
 
   // Profile stats — friends + posts, both public.
   const [ownerFriendsCount, ownerPostsCount] = await Promise.all([
-    countFriends(owner.id),
+    countFriends(owner.id, viewerId ?? owner.id),
     countPostsByUser(owner.id),
   ]);
 

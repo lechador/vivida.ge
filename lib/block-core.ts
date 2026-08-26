@@ -1,7 +1,13 @@
-import { and, eq, isNull, or } from "drizzle-orm";
+import { and, eq, isNull, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { blocks, friendships, matches } from "@/db/schema";
+import {
+  blocks,
+  friendships,
+  matches,
+  notifications,
+  partners,
+} from "@/db/schema";
 
 /**
  * Block *write* logic, framework-agnostic (shared by web Server Actions and,
@@ -52,6 +58,24 @@ export async function blockUserCore(
       )
     );
 
+  // Actor details are denormalized into notification JSON. Remove historical
+  // rows in both directions so a block takes effect immediately in the bell,
+  // even before its cached header data refreshes.
+  await db
+    .delete(notifications)
+    .where(
+      or(
+        and(
+          eq(notifications.userId, blockerId),
+          sql`${notifications.payload}->>'fromUserId' = ${blockedId}`,
+        ),
+        and(
+          eq(notifications.userId, blockedId),
+          sql`${notifications.payload}->>'fromUserId' = ${blockerId}`,
+        ),
+      ),
+    );
+
   const [a, b] = orderedPair(blockerId, blockedId);
   await db
     .update(matches)
@@ -62,6 +86,25 @@ export async function blockUserCore(
         eq(matches.userBId, b),
         isNull(matches.unmatchedAt)
       )
+    );
+
+  // A linked relationship invite is another mutual social connection. Sever
+  // it in either ownership direction so shared prompts/updates cannot bypass
+  // the block. The owner's saved partner chart remains their private data.
+  await db
+    .update(partners)
+    .set({ linkedUserId: null, inviteAcceptedAt: null })
+    .where(
+      or(
+        and(
+          eq(partners.userId, blockerId),
+          eq(partners.linkedUserId, blockedId),
+        ),
+        and(
+          eq(partners.userId, blockedId),
+          eq(partners.linkedUserId, blockerId),
+        ),
+      ),
     );
 
   return { ok: true };
