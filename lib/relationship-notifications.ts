@@ -5,6 +5,8 @@ import { and, eq, isNull, or } from "drizzle-orm";
 import { db } from "@/db";
 import {
   partners,
+  profiles,
+  reminderSettings,
   relationshipNotificationDeliveries,
   relationshipSubscriptions,
   users,
@@ -17,6 +19,8 @@ import {
   isRelationshipUnlocked,
 } from "@/lib/relationship-core";
 import { localDateString } from "@/lib/transits";
+import { localScheduleParts } from "@/lib/reminder-config";
+import { sendPersonalReminderEmail } from "@/lib/email";
 
 async function claimDelivery(partnerId: string, userId: string, deliveryKey: string): Promise<boolean> {
   const [claimed] = await db.insert(relationshipNotificationDeliveries).values({
@@ -28,7 +32,10 @@ async function claimDelivery(partnerId: string, userId: string, deliveryKey: str
 }
 
 /** Daily, idempotent dispatcher for opt-in recurring relationship events. */
-export async function deliverRelationshipUpdates(now = new Date()): Promise<{
+export async function deliverRelationshipUpdates(
+  now = new Date(),
+  options: { respectLocalHour?: boolean } = {},
+): Promise<{
   subscriptions: number;
   weeklySent: number;
   transitsSent: number;
@@ -38,9 +45,16 @@ export async function deliverRelationshipUpdates(now = new Date()): Promise<{
     subscription: relationshipSubscriptions,
     partner: partners,
     locale: users.interfaceLanguage,
+    email: users.email,
+    name: users.name,
+    emailAllowed: users.emailNudges,
+    reminder: reminderSettings,
+    profileTimezone: profiles.timezone,
   }).from(relationshipSubscriptions)
     .innerJoin(partners, eq(partners.id, relationshipSubscriptions.partnerId))
     .innerJoin(users, eq(users.id, relationshipSubscriptions.userId))
+    .leftJoin(reminderSettings, eq(reminderSettings.userId, relationshipSubscriptions.userId))
+    .leftJoin(profiles, eq(profiles.userId, relationshipSubscriptions.userId))
     .where(and(
       or(
         eq(relationshipSubscriptions.weeklyEnabled, true),
@@ -62,6 +76,17 @@ export async function deliverRelationshipUpdates(now = new Date()): Promise<{
       skipped += 1;
       continue;
     }
+    const pushEnabled = row.reminder?.relationshipPush ?? true;
+    const emailEnabled = Boolean(row.reminder?.relationshipEmail && row.emailAllowed && row.email);
+    if (!pushEnabled && !emailEnabled) {
+      skipped += 1;
+      continue;
+    }
+    if (options.respectLocalHour) {
+      const timezone = row.profileTimezone ?? partner.timezone;
+      const local = localScheduleParts(now, timezone);
+      if (local.hour !== (row.reminder?.localHour ?? 9)) continue;
+    }
     const locale = normalizeUserLocale(row.locale);
     const weekly = await ensureRelationshipWeeklyUpdate(partner as Partner, locale, now);
     if (!weekly) {
@@ -73,10 +98,23 @@ export async function deliverRelationshipUpdates(now = new Date()): Promise<{
     if (subscription.weeklyEnabled) {
       const key = `weekly:${weekly.weekStart}:${locale}`;
       if (await claimDelivery(partner.id, subscription.userId, key)) {
-        await emitRelationshipNotification(subscription.userId, "relationship_weekly", {
+        const payload = {
           ...payloadBase,
           relationshipHeadline: weekly.headline,
-        });
+        };
+        await emitRelationshipNotification(subscription.userId, "relationship_weekly", payload, { push: pushEnabled });
+        if (emailEnabled && row.email) {
+          await sendPersonalReminderEmail({
+            userId: subscription.userId,
+            to: row.email,
+            name: row.name,
+            title: locale === "ka" ? "ურთიერთობის ახალი კვირა" : "Your weekly relationship update",
+            body: weekly.headline,
+            path: `/synastry/${partner.id}`,
+            locale,
+            idempotencyKey: `relationship:weekly:${subscription.userId}:${partner.id}:${weekly.weekStart}:${locale}`,
+          });
+        }
         weeklySent += 1;
       }
     }
@@ -86,10 +124,23 @@ export async function deliverRelationshipUpdates(now = new Date()): Promise<{
       for (const notable of weekly.notable.filter((item) => item.dateIso === today)) {
         const key = `transit:${notable.key}:${locale}`;
         if (!(await claimDelivery(partner.id, subscription.userId, key))) continue;
-        await emitRelationshipNotification(subscription.userId, "relationship_transit", {
+        const payload = {
           ...payloadBase,
           transitTitle: notable.title,
-        });
+        };
+        await emitRelationshipNotification(subscription.userId, "relationship_transit", payload, { push: pushEnabled });
+        if (emailEnabled && row.email) {
+          await sendPersonalReminderEmail({
+            userId: subscription.userId,
+            to: row.email,
+            name: row.name,
+            title: locale === "ka" ? "ურთიერთობის მნიშვნელოვანი ტრანზიტი" : "Important relationship transit",
+            body: `${notable.title}. ${notable.meaning}`,
+            path: `/synastry/${partner.id}`,
+            locale,
+            idempotencyKey: `relationship:transit:${subscription.userId}:${partner.id}:${notable.key}:${locale}`,
+          });
+        }
         transitsSent += 1;
       }
     }

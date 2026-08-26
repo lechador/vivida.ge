@@ -243,10 +243,11 @@ async function emitRelationshipNotification(
   userId: string,
   kind: "relationship_connected" | "relationship_weekly" | "relationship_transit",
   payload: NotificationPayload,
+  options: { push?: boolean } = {},
 ): Promise<void> {
   await db.insert(notifications).values({ userId, kind, payload });
   invalidateHeaderForUser(userId);
-  queueNotificationPush(userId, kind, payload);
+  if (options.push !== false) queueNotificationPush(userId, kind, payload);
 }
 
 export async function acceptRelationshipInviteCore(

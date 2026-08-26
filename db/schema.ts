@@ -682,6 +682,8 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "relationship_connected",
   "relationship_weekly",
   "relationship_transit",
+  "timing_reminder",
+  "forecast_reminder",
 ]);
 
 /**
@@ -716,6 +718,9 @@ export type NotificationPayload = {
   partnerName?: string;
   relationshipHeadline?: string;
   transitTitle?: string;
+  reminderTitle?: string;
+  reminderBody?: string;
+  reminderUrl?: string;
 };
 
 export const notifications = pgTable("notification", {
@@ -1436,6 +1441,55 @@ export const pushSubscriptions = pgTable("push_subscription", {
 });
 
 export type PushSubscriptionRow = typeof pushSubscriptions.$inferSelect;
+
+/** User-owned delivery choices for personal astrology reminders. */
+export const reminderSettings = pgTable("reminder_setting", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  transitPush: boolean("transit_push").notNull().default(false),
+  transitEmail: boolean("transit_email").notNull().default(false),
+  /** daily | weekly */
+  transitCadence: text("transit_cadence").notNull().default("weekly"),
+  forecastPush: boolean("forecast_push").notNull().default(false),
+  forecastEmail: boolean("forecast_email").notNull().default(false),
+  /** Global channels for relationships that are enabled per partner. */
+  relationshipPush: boolean("relationship_push").notNull().default(true),
+  relationshipEmail: boolean("relationship_email").notNull().default(false),
+  /** 0–23 in the user's profile timezone. */
+  localHour: integer("local_hour").notNull().default(9),
+  /** 0=Sunday ... 6=Saturday. */
+  weeklyDay: integer("weekly_day").notNull().default(1),
+  calendarEnabled: boolean("calendar_enabled").notNull().default(false),
+  /** Opaque secret URL token for calendar subscriptions. */
+  calendarToken: text("calendar_token").unique(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const reminderDeliveries = pgTable(
+  "reminder_delivery",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    topic: text("topic").notNull(),
+    channel: text("channel").notNull(),
+    deliveryKey: text("delivery_key").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("reminder_delivery_user_topic_channel_key_idx").on(
+      t.userId,
+      t.topic,
+      t.channel,
+      t.deliveryKey,
+    ),
+    index("reminder_delivery_created_idx").on(t.createdAt),
+  ],
+);
+
+export type ReminderSettings = typeof reminderSettings.$inferSelect;
 
 /**
  * Chinese-zodiac page content (ჩინური ჰოროსკოპი). One row per animal slug

@@ -11,6 +11,7 @@ import { MessageEmail } from "@/lib/email-templates/message";
 import { FeedActivityEmail } from "@/lib/email-templates/feed-activity";
 import { MbtiResultEmail } from "@/lib/email-templates/mbti-result";
 import { ReportReadyEmail } from "@/lib/email-templates/report-ready";
+import { PersonalReminderEmail } from "@/lib/email-templates/personal-reminder";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { usesEnglishCopy } from "@/lib/i18n/locale";
@@ -489,6 +490,49 @@ export async function sendReportPdfEmail({
   } catch (err) {
     console.error("[email] report PDF threw:", (err as Error).message);
     return { ok: false, error: "send_failed" };
+  }
+}
+
+/** Explicitly opted-in personal astrology reminder. */
+export async function sendPersonalReminderEmail({
+  userId,
+  to,
+  name,
+  title,
+  body,
+  path,
+  locale = "ka",
+  idempotencyKey,
+}: {
+  userId: string;
+  to: string;
+  name: string | null;
+  title: string;
+  body: string;
+  path: string;
+  locale?: UserLocale;
+  idempotencyKey: string;
+}): Promise<boolean> {
+  const c = client();
+  if (!c) return false;
+  const actionUrl = absUrl(path, originForLocale(locale));
+  const subject = `${title} · Vivida`;
+  try {
+    const result = await c.emails.send({
+      from: FROM,
+      to,
+      subject,
+      react: PersonalReminderEmail({ name: name?.split(" ")[0] ?? null, title, body, actionUrl, locale }),
+    }, { idempotencyKey });
+    if (result.error) {
+      await recordSent(userId, "personal_reminder", { email: to, subject, status: "failed", error: result.error.message });
+      return false;
+    }
+    await recordSent(userId, "personal_reminder", { email: to, subject });
+    return true;
+  } catch (error) {
+    await recordSent(userId, "personal_reminder", { email: to, subject, status: "failed", error: (error as Error).message.slice(0, 500) }).catch(() => undefined);
+    return false;
   }
 }
 

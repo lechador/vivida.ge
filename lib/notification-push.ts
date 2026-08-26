@@ -123,6 +123,16 @@ function copyFor(
         url: payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry",
         tag: `relationship-transit-${payload.partnerId ?? "x"}`,
       };
+    case "timing_reminder":
+    case "forecast_reminder":
+      return payload.reminderTitle && payload.reminderBody
+        ? {
+            title: payload.reminderTitle,
+            body: payload.reminderBody,
+            url: payload.reminderUrl ?? "/dashboard",
+            tag: kind,
+          }
+        : null;
     default:
       return null; // e.g. "credit" — bell-only by design
   }

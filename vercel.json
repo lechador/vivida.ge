@@ -19,8 +19,8 @@
       "schedule": "15 * * * *"
     },
     {
-      "path": "/api/cron/relationship-updates",
-      "schedule": "30 6 * * *"
+      "path": "/api/cron/personal-reminders",
+      "schedule": "0 * * * *"
     }
   ]
 }

@@ -40,7 +40,7 @@ inventory only after those foundations are measurable.
 | P2 | Paid report store and bundles | Demand is concentrated in tarot and natal PDFs, but the paid catalog is narrow. | Higher ARPPU and report attach rate. |
 | P2 | Recurring relationship experience | Synastry is mainly a static, one-time unlock. | Higher partner invites and weekly relationship-feature retention. |
 | P2 | Annual PRO, gifting, and bundles | Monetization is limited to monthly PRO, credits, and one targeted quarterly offer. | Higher subscription conversion, prepaid revenue, and gift purchases. |
-| P2 | Personalized return channels | Push/email exist, but timing, channel, and destination are not user-controlled. | Higher notification-to-value completion with stable opt-out rates. |
+| P2 — implemented 2026-08-26 | Personalized return channels | Users now control transit, forecast, and relationship reminders by channel, cadence, local time, and private calendar sync. | Higher notification-to-value completion with stable opt-out rates. |
 | P2 | Next-best-action content graph | Long pages offer many equal choices instead of one relevant continuation. | More meaningful actions per valuable session. |
 | P3 | Utility-led social loops | Sharing a chart or compatibility result has value even at low community density. | More qualified invites and shared-result landings. |
 
@@ -136,8 +136,8 @@ reported to analytics once from onboarding.
 ## Missing or underdeveloped functionality
 
 - Personal reading history, saved insights, bookmarks, and user notes.
-- Configurable reminders for transits, relationships, forecasts, and calendar
-  export/sync.
+- Measure reminder opt-in, delivery-to-value completion, and opt-out rates after
+  the configurable transit, relationship, forecast, and calendar channels ship.
 - A recurring relationship experience rather than static synastry alone.
 - A broader paid report store and bundles.
 - Gift credits, gift reports, and partner/seasonal packages.

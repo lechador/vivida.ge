@@ -39,6 +39,8 @@ const KIND_ICON: Record<string, LucideIcon> = {
   relationship_connected: HeartHandshake,
   relationship_weekly: CalendarDays,
   relationship_transit: Sparkles,
+  timing_reminder: Sparkles,
+  forecast_reminder: CalendarDays,
 };
 
 const REACTION_LABEL_KA: Record<string, string> = {
@@ -85,6 +87,9 @@ function notificationLabel(kind: string, payload: Notification["payload"], local
       return payload?.transitTitle
         ? `— ${payload.transitTitle}`
         : en ? "has an important upcoming transit" : "— მნიშვნელოვანი ტრანზიტი ახლოვდება";
+    case "timing_reminder":
+    case "forecast_reminder":
+      return payload?.reminderBody ?? "";
     default:
       return "";
   }
@@ -389,8 +394,11 @@ function DbNotificationRow({
   const Icon = KIND_ICON[n.kind] ?? Bell;
   const username = n.payload?.fromUsername;
   const isRelationship = n.kind === "relationship_connected" || n.kind === "relationship_weekly" || n.kind === "relationship_transit";
+  const isReminder = n.kind === "timing_reminder" || n.kind === "forecast_reminder";
   const href =
-    isRelationship && n.payload?.partnerId
+    isReminder && n.payload?.reminderUrl
+      ? n.payload.reminderUrl
+      : isRelationship && n.payload?.partnerId
       ? `/synastry/${n.payload.partnerId}`
       : (n.kind === "post_comment" ||
       n.kind === "post_reaction" ||
@@ -436,7 +444,7 @@ function DbNotificationRow({
         <div className="min-w-0 flex-1">
           <div className="text-sm leading-snug">
             <span className="font-medium text-foreground">
-              {n.payload?.fromName ?? (isRelationship ? n.payload?.partnerName : null) ?? username ?? "vivida user"}
+              {n.payload?.fromName ?? (isReminder ? n.payload?.reminderTitle : null) ?? (isRelationship ? n.payload?.partnerName : null) ?? username ?? "vivida user"}
             </span>{" "}
             <span className="text-muted-foreground">
               {notificationLabel(n.kind, n.payload, locale)}

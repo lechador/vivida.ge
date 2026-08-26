@@ -20,6 +20,7 @@ import { PushOptIn } from "@/components/push/push-opt-in";
 import { EmailPreferencesCard } from "@/components/account/email-preferences-card";
 import { LanguageCard } from "@/components/account/language-card";
 import { ResidenceCard } from "@/components/account/residence-card";
+import { ReminderPreferencesCard } from "@/components/account/reminder-preferences-card";
 import { VerifiedBadge } from "@/components/profile/verified-badge";
 import { CountryBadge } from "@/components/profile/country-badge";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
@@ -29,6 +30,7 @@ import {
 } from "@/lib/i18n/request-locale";
 import { countryDisplayName } from "@/lib/residence";
 import type { Metadata } from "next";
+import { getReminderPreferences } from "@/lib/reminder-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -39,7 +41,7 @@ export const dynamic = "force-dynamic";
 export default async function AccountPage() {
   const user = await requireUser();
 
-  const [[profile], photos, [emailPrefs], headerData] = await Promise.all([
+  const [[profile], photos, [emailPrefs], headerData, reminderData] = await Promise.all([
     db
       .select()
       .from(profiles)
@@ -67,6 +69,7 @@ export default async function AccountPage() {
       .where(eq(users.id, user.id))
       .limit(1),
     getHeaderData(user.id),
+    getReminderPreferences(user.id),
   ]);
   // Same avatar resolution as the navbar so they never disagree.
   const accountAvatar = headerData.avatarUrl ?? user.image ?? null;
@@ -184,6 +187,14 @@ export default async function AccountPage() {
         {/* Push notifications */}
         <div className="mb-6">
           <PushOptIn locale={locale} />
+        </div>
+
+        <div className="mb-6">
+          <ReminderPreferencesCard
+            initial={reminderData.preferences}
+            initialCalendarToken={reminderData.calendarToken}
+            locale={locale}
+          />
         </div>
 
         {/* Email preferences */}
