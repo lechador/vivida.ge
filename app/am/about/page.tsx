@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Mail, MapPin, ShieldCheck } from "lucide-react";
 
 import { ArmenianGuide } from "@/components/am/armenian-guide";
-import { DEFAULT_OG_IMAGE, ARMENIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ARMENIAN_SITE_URL, ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { breadcrumbLd } from "@/lib/seo/jsonld";
 
 const TITLE = "Vivida-ի մասին";
@@ -16,8 +16,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: `${ARMENIAN_SITE_URL}/about`,
     languages: {
+      en: `${ENGLISH_SITE_URL}/about`,
+      "hy-AM": `${ARMENIAN_SITE_URL}/about`,
       hy: `${ARMENIAN_SITE_URL}/about`,
-      "x-default": `${ARMENIAN_SITE_URL}/about`,
+      "x-default": `${ENGLISH_SITE_URL}/about`,
     },
   },
   openGraph: {

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { ArmenianGuide } from "@/components/am/armenian-guide";
 import { SIGNS } from "@/lib/zodiac";
-import { DEFAULT_OG_IMAGE, ARMENIAN_SITE_URL } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, ARMENIAN_SITE_URL, ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { articleLd, breadcrumbLd, faqLd } from "@/lib/seo/jsonld";
 
 const TITLE = "Ինչպե՞ս են աշխատում օրական հորոսկոպները — Vivida";
@@ -16,8 +16,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: `${ARMENIAN_SITE_URL}/horoscope`,
     languages: {
+      en: `${ENGLISH_SITE_URL}/horoscope`,
+      "hy-AM": `${ARMENIAN_SITE_URL}/horoscope`,
       hy: `${ARMENIAN_SITE_URL}/horoscope`,
-      "x-default": `${ARMENIAN_SITE_URL}/horoscope`,
+      "x-default": `${ENGLISH_SITE_URL}/horoscope`,
     },
   },
   openGraph: {

@@ -112,6 +112,38 @@ describe("POST /api/credits/checkout", () => {
     );
   });
 
+  it("creates an Armenian AMD Checkout session for Armenian residents", async () => {
+    mocks.getBillingIdentity.mockResolvedValue({
+      countryCode: "AM",
+      interfaceLanguage: "am",
+    });
+
+    const response = await POST(
+      new Request("https://vividaastro.com/api/credits/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ packId: "s" }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      url: "https://checkout.stripe.test/1",
+      eventId: "cs_test_1:initiate_checkout",
+      value: 990,
+      currency: "AMD",
+      contentId: "credits_30",
+    });
+    expect(mocks.createCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        credits: 30,
+        amountMinor: 99_000,
+        currency: "amd",
+        locale: "am",
+      }),
+    );
+  });
+
   it("reports unavailable payments before creating a session", async () => {
     mocks.isStripeConfigured.mockReturnValue(false);
 

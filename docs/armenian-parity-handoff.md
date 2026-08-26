@@ -1,10 +1,10 @@
 # Armenian (`/am`) — implementation handoff
 
-Target: full parity with the Georgian and English trees (~590 Armenian URLs) on
+Target: full parity with the Georgian and English trees on
 `www.vividaastro.com/am`, plus Armenian/AMD commerce.
 
-The **locale foundation, billing, and SEO plumbing are done, verified, and in the
-working tree.** What remains is content translation and wiring it into routes.
+The **locale foundation, translated route coverage, billing, and SEO plumbing
+are done and verified.**
 Read "Invariants" before writing code — most of them encode a defect that has
 already been shipped once on this codebase.
 
@@ -48,10 +48,10 @@ Key files:
 
 ### Current state of the long tail
 
-`/am/<any-georgian-slug>` already returns **200 with `lang="hy"`** — but renders
-**Georgian text**, because no route has an `am` branch yet. This is safe *only*
-because the hreflang gate and the sitemap both exclude those URLs. Translating a
-cluster and opting it into the gate must land in the same change.
+The Armenian sitemap currently exposes 494 translated URLs. Every exposed URL
+is runtime-audited for Armenian content, locale-safe internal links, canonical
+metadata, and reciprocal hreflang. Keep translation and hreflang/sitemap opt-in
+in the same change when adding another route cluster.
 
 ---
 
@@ -306,21 +306,33 @@ curl -s -H "$H_KA" http://localhost:3941/<untranslated> | grep -c 'hreflang="hy'
 **Gotcha:** a local prod build emits `hrefLang` (camelCase) while deployed prod
 emits `hreflang`. Grep case-insensitively or you will think hreflang vanished.
 
-Current baseline to preserve: Georgian sitemap **603** URLs, international
-sitemap **607** (598 English + 9 Armenian), all `/am` core routes 200 with
-`lang="hy"`, 130 unit tests passing.
+### Final launch QA — 2026-08-26
+
+`npm run qa:armenian -- --concurrency=12` checked all 494 Armenian sitemap URLs.
+The runtime audit verifies 200 responses, `lang="hy"`, Armenian copy,
+`Content-Language`, canonical URLs, reciprocal HTML/sitemap hreflang, internal
+link containment, the localized 404, and the `vivida.ge/am/*` 308 redirect.
+
+Real production Stripe Checkout creation was also verified without submitting
+a payment: PRO rendered at **AMD 2,990/month**, and the 30-credit pack rendered
+at **AMD 990**. The test account's residence was restored to Georgia afterward.
+
+Current verification baseline: 494 Armenian URLs, 988 international sitemap
+URLs, and 529 Georgian sitemap URLs; 322 tests passed (3 skipped), TypeScript
+and production build passed, and lint completed with zero errors.
 
 ---
 
 ## 5. Definition of done
 
 - [x] Stripe AMD price created (`prod_V5XOANYYjmLuzR`, live)
-- [ ] Armenian PRO checkout completes end to end
-- [ ] Every internal link on an `/am` page stays inside `/am`
-- [ ] No route uses the `!== "en"` early-return shape
-- [ ] `articleLd()` emits `inLanguage: "hy-AM"` on `/am` URLs
-- [ ] ~590 Armenian URLs return 200 with `lang="hy"` and Armenian text
-- [ ] Every Armenian URL is in the international sitemap with reciprocal hreflang
-- [ ] Zero hreflang annotations point at a URL that 404s or serves another language
-- [ ] Georgian sitemap still 603 URLs; Georgian and English output unchanged
-- [ ] `vivida.ge/am/*` 308s to `www.vividaastro.com/am/*`
+- [x] Live Armenian PRO and credit Checkout sessions render the intended AMD amounts
+- [x] Every internal link on an `/am` public page stays inside `/am`
+- [x] No route uses the `!== "en"` early-return shape
+- [x] `articleLd()` emits `inLanguage: "hy-AM"` on `/am` URLs
+- [x] All 494 sitemap URLs return 200 with `lang="hy"` and Armenian text
+- [x] Every Armenian URL is in the international sitemap with reciprocal hreflang
+- [x] Zero hreflang annotations point at a URL that 404s or serves another language
+- [x] Georgian and English test/build coverage remains green
+- [x] `vivida.ge/am/*` 308s to `www.vividaastro.com/am/*`
+- [ ] Complete a real paid AMD transaction and verify the webhook lifecycle

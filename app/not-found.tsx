@@ -6,12 +6,15 @@ import { Starfield } from "@/components/landing/starfield";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localeHref } from "@/lib/i18n/armenian-routes";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
   return {
-    title:
-      (await getRequestLocale()) !== "ka"
+    title: locale === "am"
+      ? "Էջը չի գտնվել"
+      : locale === "en"
         ? "Page not found"
         : "გვერდი ვერ მოიძებნა",
   };
@@ -19,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NotFound() {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const en = locale === "en";
   const am = locale === "am";
   return (
     <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -30,7 +33,7 @@ export default async function NotFound() {
       <Starfield count={100} shooting={2} />
 
       <header className="relative z-10 mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
-        <Link href="/" className="inline-flex items-center gap-2.5">
+        <Link href={localeHref("/", locale)} className="inline-flex items-center gap-2.5">
           <VividaMark size={36} id="not-found" />
           <span
             className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
@@ -59,13 +62,15 @@ export default async function NotFound() {
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-pretty text-base text-muted-foreground">
-            {en
-              ? "The link may be incorrect or the page may have moved. Let’s get you back on course."
-              : "ან არასწორი ლინკი, ან გვერდი წაშლილია. დავაბრუნოთ შენი კოსმოსის გზაზე."}
+            {am
+              ? "Հղումը կարող է սխալ լինել կամ էջը տեղափոխված է։ Եկեք վերադառնանք ճիշտ ուղուն։"
+              : en
+                ? "The link may be incorrect or the page may have moved. Let’s get you back on course."
+                : "ან არასწორი ლინკი, ან გვერდი წაშლილია. დავაბრუნოთ შენი კოსმოსის გზაზე."}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic" size="lg">
-              <Link href="/">{am ? "Գլխավոր" : en ? "Home" : "მთავარი"}</Link>
+              <Link href={localeHref("/", locale)}>{am ? "Գլխավոր" : en ? "Home" : "მთავარი"}</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
               {SOCIAL_FEATURES.swipeDeck ? (

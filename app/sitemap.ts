@@ -287,14 +287,6 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ),
   }));
 
-  const tavsebadobaEntry = {
-    url: `${ENGLISH_SITE_URL}/am/tavsebadoba`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/tavsebadoba", "/tavsebadoba"),
-  };
-
   const taroHubEntry = {
     url: `${ENGLISH_SITE_URL}/am/taro`,
     lastModified: ARMENIAN_PUBLISHED,
@@ -610,7 +602,6 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ...thematicHubEntries,
     ...thematicSignEntries,
     ...pairEntries,
-    tavsebadobaEntry,
     taroHubEntry,
     ...tarotCardEntries,
     mbtiHubEntry,
@@ -1436,10 +1427,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const georgianWithAlternates = georgianPages.map((entry) => {
     const path = new URL(entry.url).pathname;
     const pair = pairByKaPath.get(path);
-    if (!pair) return entry;
+    // Every translated Armenian page must be reciprocal from the Georgian
+    // sitemap too. Previously only the small core pair table received
+    // alternates, leaving hundreds of valid Armenian long-tail URLs one-way.
+    if (!pair && !hasArmenianVersion(path)) return entry;
     // Same builder the English and Armenian sections use, so all three sides
     // of a pair agree on whether an Armenian alternate exists.
-    return { ...entry, alternates: alternatesFor(pair.ka, pair.en) };
+    return {
+      ...entry,
+      alternates: alternatesFor(pair?.ka ?? path, pair?.en ?? path),
+    };
   });
 
   return georgianWithAlternates;

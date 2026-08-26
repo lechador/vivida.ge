@@ -50,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const url = `${ARMENIAN_SITE_URL}/quiz/namdvili-nishani`;
     return { title: { absolute: title }, description, keywords: ["կենդանակերպի թեստ", "կենդանակերպի որ նշանն եմ", "անհատականության թեստ", "աստղաբանական թեստ"], alternates: localizedAlternates("/am/quiz/namdvili-nishani", "/quiz/namdvili-nishani", "am"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "hy_AM" }, twitter: { card: "summary_large_image", title, description } };
   }
-  if (locale !== "en") return METADATA_KA;
+  if (locale === "ka") return METADATA_KA;
   const title = "Which Zodiac Sign Matches Your Personality? — Quiz";
   const description = "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality. Free and instant.";
   const url = `${ENGLISH_SITE_URL}/quiz/namdvili-nishani`;

@@ -11,6 +11,8 @@
  * Usage:
  *   node scripts/create-am-stripe-price.mjs            # dry run, prints the plan
  *   node scripts/create-am-stripe-price.mjs --apply    # actually creates it
+ *   node scripts/create-am-stripe-price.mjs --checkout-smoke
+ *     # creates live PRO + credit Checkout Sessions, validates AMD, then expires them
  */
 
 import { config } from "dotenv";
@@ -44,6 +46,7 @@ const PLAN = {
 };
 
 const apply = process.argv.includes("--apply");
+const checkoutSmoke = process.argv.includes("--checkout-smoke");
 const key = process.env.STRIPE_SECRET_KEY;
 if (!key) {
   console.error("STRIPE_SECRET_KEY is not set in .env.local — aborting.");
@@ -52,6 +55,78 @@ if (!key) {
 
 const stripe = new Stripe(key);
 const display = `֏${(PLAN.amountMinor / 100).toLocaleString("en-GB")}/month`;
+
+async function expireCheckedSession(session, label, expectedAmount) {
+  try {
+    if (
+      session.mode !== (label === "PRO" ? "subscription" : "payment") ||
+      session.currency !== PLAN.currency ||
+      session.amount_total !== expectedAmount ||
+      session.status !== "open" ||
+      !session.url?.startsWith("https://checkout.stripe.com/")
+    ) {
+      throw new Error(
+        `${label} Checkout mismatch: mode=${session.mode}, currency=${session.currency}, ` +
+        `amount=${session.amount_total}, status=${session.status}`,
+      );
+    }
+    console.log(`${label} Checkout verified: ${session.id}`);
+  } finally {
+    if (session.status === "open") {
+      const expired = await stripe.checkout.sessions.expire(session.id);
+      if (expired.status !== "expired") {
+        throw new Error(`${label} Checkout session did not expire cleanly`);
+      }
+      console.log(`${label} Checkout expired after QA.`);
+    }
+  }
+}
+
+async function runCheckoutSmoke(price) {
+  const marker = `armenian_launch_qa_${Date.now()}`;
+  const successUrl =
+    "https://www.vividaastro.com/subscription?status=success&session_id={CHECKOUT_SESSION_ID}";
+
+  const premium = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    client_reference_id: marker,
+    metadata: { kind: "premium", userId: marker, planKey: PLAN.key, countryCode: "AM", qa: "true" },
+    subscription_data: {
+      metadata: { kind: "premium", userId: marker, planKey: PLAN.key, countryCode: "AM", qa: "true" },
+      description: "Vivida PRO · Armenian launch QA",
+    },
+    line_items: [{ price: price.id, quantity: 1 }],
+    allow_promotion_codes: true,
+    billing_address_collection: "auto",
+    success_url: successUrl,
+    cancel_url: "https://www.vividaastro.com/subscription?status=canceled",
+  });
+  await expireCheckedSession(premium, "PRO", PLAN.amountMinor);
+
+  const creditAmount = 99_000;
+  const credits = await stripe.checkout.sessions.create({
+    mode: "payment",
+    metadata: { userId: marker, kind: "credits", credits: "30", qa: "true" },
+    payment_intent_data: {
+      metadata: { userId: marker, kind: "credits", credits: "30", qa: "true" },
+    },
+    line_items: [{
+      quantity: 1,
+      price_data: {
+        currency: PLAN.currency,
+        unit_amount: creditAmount,
+        product_data: {
+          name: "30 Vivida կրեդիտ",
+          description: "Vivida · 990 ֏ — 30 կրեդիտ",
+        },
+      },
+    }],
+    success_url:
+      "https://www.vividaastro.com/credits?status=success&session_id={CHECKOUT_SESSION_ID}",
+    cancel_url: "https://www.vividaastro.com/credits?status=canceled",
+  });
+  await expireCheckedSession(credits, "Credits", creditAmount);
+}
 
 console.log(`Plan     ${PLAN.key}`);
 console.log(`Price    ${display}  (${PLAN.amountMinor} ${PLAN.currency} minor units)`);
@@ -79,6 +154,7 @@ if (existing.data[0]) {
     process.exit(1);
   }
   console.log("It matches the catalogue. Nothing to do.");
+  if (checkoutSmoke) await runCheckoutSmoke(price);
   process.exit(0);
 }
 
@@ -113,3 +189,4 @@ const price = await stripe.prices.create({
 
 console.log(`\nCreated price ${price.id} on product ${product.id}.`);
 console.log("Armenian PRO checkout is now live.");
+if (checkoutSmoke) await runCheckoutSmoke(price);
