@@ -31,6 +31,7 @@ import {
   LOW_CREDIT_PROMO_PLAN,
 } from "@/lib/billing-config";
 import { kaDayMonthGenitive } from "@/lib/i18n/ka-date";
+import { dailyEmailSubject } from "@/lib/daily-headline";
 
 let _client: Resend | null = null;
 function client(): Resend | null {
@@ -486,16 +487,26 @@ async function dispatch(
 
     const unsubUrl = localizedAbsUrl(`/unsubscribe?token=${token}&type=daily`, locale);
     const dashboardUrl = localizedAbsUrl("/dashboard", locale);
+    const firstName = recipient.name?.split(" ")[0] ?? null;
+    const subject = dailyEmailSubject({
+      firstName,
+      headline: daily.headline?.trim() || (locale === "en" ? "Your daily horoscope" : "შენი დღევანდელი ჰოროსკოპი"),
+      dateKey: daily.date,
+      locale,
+      topAspects: daily.transits?.headlineAspect
+        ? [daily.transits.headlineAspect]
+        : daily.transits?.topAspects,
+      moonHouse: daily.transits?.moonHouse,
+    });
     await acquireResendSlot();
     const result = await c.emails.send(
       {
         from: FROM,
         to: recipient.email,
-        // Use today's actual headline as the subject — a concrete, personal
-        // line opens far better than a static "your daily horoscope".
-        subject: daily.headline?.trim() || (locale === "en" ? "Your daily horoscope" : "შენი დღევანდელი ჰოროსკოპი"),
+        // Inbox copy has its own hook instead of repeating the dashboard H1.
+        subject,
         react: DailyHoroscopeEmail({
-          name: recipient.name?.split(" ")[0] ?? null,
+          name: firstName,
           headline: daily.headline,
           summary: daily.summary,
           dashboardUrl,

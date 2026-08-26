@@ -857,6 +857,12 @@ export type DailyTransitsJson = {
   /** Today's transiting moon — kept for quick UI access. */
   moonHouse?: number | null;
   moonSignEn?: string;
+  /** The exact Moon aspect that drove the product headline, if any. */
+  headlineAspect?: {
+    transit: string;
+    natal: string;
+    kind: string;
+  } | null;
   /** "library" = composed from transit_interpretation_library (no AI call),
    *  "ai" (or absent, for older rows) = full per-user model generation. */
   source?: "library" | "ai";

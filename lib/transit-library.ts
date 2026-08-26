@@ -30,6 +30,7 @@ import type { AspectKind } from "./aspects";
 import { ASPECT_BODIES, ASPECT_KINDS, libraryKindKa } from "./aspect-library";
 import type { CrossAspect } from "./transits";
 import { usesEnglishCopy, type UserLocale } from "./i18n/locale";
+import { dailyHeadlineKa } from "./daily-headline";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
@@ -294,7 +295,10 @@ const SYSTEM_PROMPT =
   "თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები " +
   '("ვარსკვლავები გელიან", "მიენდე სამყაროს"). ' +
   'დააბრუნე მხოლოდ JSON: {"title": "...", "body": "..."} — title არის ' +
-  "მოკლე სათაური (3-6 სიტყვა, წერტილის გარეშე), body — ტექსტი.";
+  "მოკლე სათაური (3-6 სიტყვა, წერტილის გარეშე), body — ტექსტი. " +
+  "title-ში დაასახელე კონკრეტული თემა ან მოქმედება; არ გამოიყენო ორი " +
+  "აბსტრაქტული არსებითი სახელის ფორმულა, ზედიზედ 'X და Y', ან ხშირად " +
+  "გამეორებული სიტყვები: სული, გული, შინაგანი, ჰარმონია, დღე.";
 
 /** Build the user prompt for one combo. Short daily copy, not natal essays. */
 export function buildTransitPrompt(combo: TransitCombo): string {
@@ -316,7 +320,8 @@ export function buildTransitPrompt(combo: TransitCombo): string {
       `დროის მასშტაბი: ${timescale}.\n\n` +
       `2-4 წინადადება (დაახ. 40-70 სიტყვა), "შენ"-ის ფორმა. ახსენი რა იგრძნობა ` +
       `დღეს ამ ტრანზიტით და ერთი კონკრეტული, პრაქტიკული რჩევა. ` +
-      `title იყოს ამ დღის განწყობის მოკლე, ცოცხალი ფორმულირება.`
+      `title იყოს მოკლე, კონკრეტული და ქმედებაზე ან ცხოვრების სფეროზე მიბმული; ` +
+      `არა აბსტრაქტული "სული/გული/შინაგანი" ფორმულირება.`
     );
   }
 
@@ -329,7 +334,7 @@ export function buildTransitPrompt(combo: TransitCombo): string {
       `დროის მასშტაბი: ${timescale}.\n\n` +
       `2-3 წინადადება (დაახ. 35-60 სიტყვა), "შენ"-ის ფორმა. რომელი ცხოვრების ` +
       `სფერო აქტიურდება და როგორ გამოიყენო ეს დღეს. ` +
-      `title იყოს მოკლე და კონკრეტული.`
+      `title იყოს მოკლე, კონკრეტული და დასახელებული ცხოვრების სფეროზე მიბმული.`
     );
   }
 
@@ -343,7 +348,7 @@ export function buildTransitPrompt(combo: TransitCombo): string {
     `დროის მასშტაბი: ${timescale}.\n\n` +
     `2-3 წინადადება (დაახ. 35-60 სიტყვა), "შენ"-ის ფორმა. როგორი ემოციური/` +
     `ენერგეტიკული ფონია დღეს ამ განლაგებით და რას უწყობს ხელს. ` +
-    `title იყოს დღის განწყობის მოკლე ფორმულირება.`
+    `title იყოს მოკლე, კონკრეტული და ქმედებაზე მიბმული; არა ზოგადი მისტიკური ფორმულირება.`
   );
 }
 
@@ -557,6 +562,7 @@ export function composeDailyFromLibrary(
   facts: TransitDayFacts,
   entries: Map<string, TransitEntry>,
   locale: UserLocale = "ka",
+  dateKey = "",
 ): ComposedDaily | null {
   const need = (key: string): TransitEntry | null => entries.get(key) ?? null;
 
@@ -588,10 +594,27 @@ export function composeDailyFromLibrary(
   const outerAspects = collect(facts.outerAspects, COMPOSE_LIMITS.outer);
   if (!moonAspects || !innerAspects || !outerAspects) return null;
 
-  // Headline: the tightest Moon aspect leads the day; quiet days fall back
-  // to the Moon's house, then its sign.
-  const headline =
+  // The library still supplies the astrological meaning, but its one fixed
+  // title is no longer shown to every user on every recurrence. Georgian
+  // product headlines rotate through concrete editorial structures based on
+  // the same lead aspect / house / sign. Other locales keep their translated
+  // library title until they receive a reviewed headline system of their own.
+  const libraryHeadline =
     moonAspects[0]?.entry.title ?? moonHouse?.title ?? moonSign.title;
+  const headline =
+    locale === "ka"
+      ? dailyHeadlineKa(
+          {
+            moon: {
+              sign: facts.moon.sign,
+              house: facts.moon.house,
+              aspects: facts.moon.aspects,
+            },
+          },
+          dateKey,
+          libraryHeadline,
+        )
+      : libraryHeadline;
 
   const paragraphs: string[] = [];
   if (moonHouse) paragraphs.push(moonHouse.body);

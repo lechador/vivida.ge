@@ -204,7 +204,7 @@ export async function ensureDailyFor(
       combos.map((c) => c.key),
       locale,
     );
-    const composed = composeDailyFromLibrary(facts, entries, locale);
+    const composed = composeDailyFromLibrary(facts, entries, locale, today);
     if (composed) {
       reading = composed;
       model = "library";
@@ -248,6 +248,13 @@ export async function ensureDailyFor(
         natalInputHash: chart.inputHash,
         moonHouse,
         moonSignEn: context.moon.signEn,
+        headlineAspect: moonAspects[0]
+          ? {
+              transit: moonAspects[0].transit,
+              natal: moonAspects[0].natal,
+              kind: moonAspects[0].kind,
+            }
+          : null,
         source,
       },
       model,
@@ -266,6 +273,13 @@ export async function ensureDailyFor(
           natalInputHash: chart.inputHash,
           moonHouse,
           moonSignEn: context.moon.signEn,
+          headlineAspect: moonAspects[0]
+            ? {
+                transit: moonAspects[0].transit,
+                natal: moonAspects[0].natal,
+                kind: moonAspects[0].kind,
+              }
+            : null,
           source,
         },
         model,
