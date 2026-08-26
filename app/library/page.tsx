@@ -19,6 +19,7 @@ import type { LibraryEntryKind } from "@/db/schema";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import {
+  DailyLibraryCard,
   LibraryCard,
   libraryKindLabel,
 } from "@/components/library/library-card";
@@ -96,6 +97,8 @@ export default async function LibraryPage({
   });
   const en = locale === "en";
   const am = locale === "am";
+  const dailyItems = library.items.filter((entry) => entry.kind === "daily");
+  const otherItems = library.items.filter((entry) => entry.kind !== "daily");
 
   return (
     <main lang={locale} className="relative isolate min-h-screen overflow-hidden">
@@ -198,10 +201,21 @@ export default async function LibraryPage({
         </div>
 
         {library.items.length > 0 ? (
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {library.items.map((entry) => (
-              <LibraryCard key={entry.id} entry={entry} locale={locale} />
-            ))}
+          <div className="mt-6 space-y-6">
+            {dailyItems.length > 0 && (
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {dailyItems.map((entry) => (
+                  <DailyLibraryCard key={entry.id} entry={entry} locale={locale} />
+                ))}
+              </div>
+            )}
+            {otherItems.length > 0 && (
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {otherItems.map((entry) => (
+                  <LibraryCard key={entry.id} entry={entry} locale={locale} />
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="mt-6 rounded-3xl border border-dashed border-border bg-card/35 px-6 py-16 text-center">

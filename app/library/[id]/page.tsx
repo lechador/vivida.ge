@@ -12,7 +12,10 @@ import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { LibraryFavoriteButton } from "@/components/library/favorite-button";
 import { LibraryNoteEditor } from "@/components/library/note-editor";
-import { libraryKindLabel } from "@/components/library/library-card";
+import {
+  dailyLibraryDate,
+  libraryKindLabel,
+} from "@/components/library/library-card";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -51,6 +54,8 @@ export default async function LibraryEntryPage({
     hour: "2-digit",
     minute: "2-digit",
   }).format(entry.occurredAt);
+  const displayTitle =
+    entry.kind === "daily" ? dailyLibraryDate(entry, locale) : entry.title;
 
   return (
     <main lang={locale} className="relative isolate min-h-screen overflow-hidden">
@@ -74,11 +79,15 @@ export default async function LibraryEntryPage({
                 {libraryKindLabel(entry.kind, locale)}
               </div>
               <h1 className="mt-2 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-4xl">
-                {entry.title}
+                {displayTitle}
               </h1>
-              <time className="mt-3 block text-sm text-muted-foreground" dateTime={entry.occurredAt.toISOString()}>
-                {date}
-              </time>
+              {entry.kind === "daily" ? (
+                <p className="mt-3 text-sm text-foreground/65">{entry.title}</p>
+              ) : (
+                <time className="mt-3 block text-sm text-muted-foreground" dateTime={entry.occurredAt.toISOString()}>
+                  {date}
+                </time>
+              )}
             </div>
             <LibraryFavoriteButton entryId={entry.id} initialFavorite={entry.favorite} locale={locale} />
           </div>

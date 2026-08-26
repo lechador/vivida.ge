@@ -19,6 +19,19 @@ const DATE_LOCALE: Record<UserLocale, string> = {
   am: "hy-AM",
 };
 
+export function dailyLibraryDate(entry: LibraryEntry, locale: UserLocale) {
+  const sourceDate = /^\d{4}-\d{2}-\d{2}$/.test(entry.sourceId)
+    ? new Date(`${entry.sourceId}T12:00:00Z`)
+    : entry.occurredAt;
+  return new Intl.DateTimeFormat(DATE_LOCALE[locale], {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(sourceDate);
+}
+
 const KIND: Record<
   LibraryEntryKind,
   { Icon: LucideIcon; ka: string; en: string; am: string; color: string }
@@ -117,6 +130,54 @@ export function LibraryCard({
           )}
         </div>
       </Link>
+    </article>
+  );
+}
+
+/** Compact landscape treatment for the high-volume daily archive. */
+export function DailyLibraryCard({
+  entry,
+  locale,
+}: {
+  entry: LibraryEntry;
+  locale: UserLocale;
+}) {
+  const date = dailyLibraryDate(entry, locale);
+
+  return (
+    <article className="group flex min-h-28 items-center gap-3 rounded-2xl border border-border bg-card/55 p-3.5 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-[var(--vivida-cyan)]/30 hover:bg-card/70 sm:p-4">
+      <Link
+        href={`/library/${entry.id}`}
+        className="flex min-w-0 flex-1 items-center gap-3 focus:outline-none"
+      >
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 text-[var(--vivida-cyan)]">
+          <Sparkles className="size-4" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            {libraryKindLabel("daily", locale)}
+          </span>
+          <span className="mt-1 block truncate text-sm font-semibold capitalize tracking-tight sm:text-base">
+            {date}
+          </span>
+          {entry.summary && (
+            <span className="mt-1 block truncate text-xs text-foreground/60">
+              {entry.summary}
+            </span>
+          )}
+          {entry.note && (
+            <span className="mt-1 inline-flex items-center gap-1 text-[10px] text-[var(--vivida-cyan)]">
+              <NotebookPen className="size-3" />
+              {locale === "am" ? "Նշում" : locale === "en" ? "Note" : "ჩანაწერი"}
+            </span>
+          )}
+        </span>
+      </Link>
+      <LibraryFavoriteButton
+        entryId={entry.id}
+        initialFavorite={entry.favorite}
+        locale={locale}
+      />
     </article>
   );
 }

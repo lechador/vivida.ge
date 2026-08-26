@@ -230,6 +230,17 @@ html[lang="hy"] .locale-ka-only {
   }
 }
 
+/* Keep the privacy control outside the desktop navigation rail. In its old
+ * bottom-left position it sat directly over the sidebar's account/settings
+ * link. The lower z-index also lets the expanded rail cover the pill while it
+ * is being used, instead of the pill floating above the menu. */
+@media (min-width: 1024px) {
+  body:has([data-desktop-sidebar]) [data-privacy-reopen] {
+    left: calc(4.5rem + 0.75rem);
+    z-index: 30;
+  }
+}
+
 /* Slow drifting starfield used on the landing page.
  * `contain: paint` isolates this layer so star repaints don't affect siblings;
  * `will-change: transform` promotes it to its own composite layer (the drift
