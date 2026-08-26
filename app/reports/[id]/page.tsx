@@ -56,10 +56,10 @@ export default async function ReportStatusPage({
         />
         <div className="mt-6 text-center">
           <Link
-            href="/reports"
+            href="/library"
             className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
-            {am ? "← Վերադառնալ զեկույցներին" : en ? "← Back to reports" : "← დაბრუნდი რეპორტებში"}
+            {am ? "← Վերադառնալ գրադարան" : en ? "← Back to library" : "← დაბრუნდი ბიბლიოთეკაში"}
           </Link>
         </div>
       </section>

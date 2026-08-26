@@ -19,6 +19,7 @@ import type { LucideIcon } from "lucide-react";
 
 import { SOCIAL_FEATURES, type SocialFeature } from "@/lib/social-flags";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { REPORT_STORE_VISIBLE } from "@/lib/report-store-availability";
 
 export type NavActiveKey =
   | "today"
@@ -63,6 +64,7 @@ const NAV_FEATURE_GATE: Partial<Record<NavActiveKey, SocialFeature>> = {
 };
 
 function navVisible(item: NavItem): boolean {
+  if (item.key === "reports" && !REPORT_STORE_VISIBLE) return false;
   const gate = NAV_FEATURE_GATE[item.key];
   return !gate || SOCIAL_FEATURES[gate];
 }

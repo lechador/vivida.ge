@@ -20,6 +20,7 @@ import {
   reportEditionKey,
   type ReportProductKey,
 } from "@/lib/report-catalog";
+import { canStartReportCheckout } from "@/lib/report-store-availability";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -53,6 +54,9 @@ export async function POST(req: Request) {
   const singleType = isReportProductKey(body.type) ? body.type : body.type === "natal" ? "natal" : null;
   if (!bundleKey && !singleType) return Response.json({ error: "unsupported_product" }, { status: 400 });
   if (bundleKey && singleType) return Response.json({ error: "choose_product_or_bundle" }, { status: 400 });
+  if (!canStartReportCheckout({ type: singleType, bundleKey })) {
+    return Response.json({ error: "report_store_unavailable" }, { status: 404 });
+  }
 
   const locale = await getUserLocale(userId);
   const [viewerChart] = await db.select().from(charts).where(eq(charts.userId, userId)).limit(1);

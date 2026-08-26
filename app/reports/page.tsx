@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
 
 import { requireUser } from "@/lib/auth-helpers";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -12,6 +13,7 @@ import { pdfReports } from "@/db/schema";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { ReportStore } from "@/components/report/report-store";
+import { REPORT_STORE_VISIBLE } from "@/lib/report-store-availability";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -21,6 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-dynamic";
 
 export default async function ReportsStorePage() {
+  if (!REPORT_STORE_VISIBLE) notFound();
   const user = await requireUser("/reports");
   const [locale, balance, premium, relationships, reports] = await Promise.all([
     getUserLocale(user.id),
