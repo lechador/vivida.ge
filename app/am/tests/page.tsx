@@ -91,7 +91,10 @@ export default function ArmenianTestsPage() {
       "@context": "https://schema.org",
       "@type": "ItemList",
       name: "Vivida թեստեր և քվիզներ",
-      itemListElement: TESTS.filter((test) => test.available).map(
+      itemListElement: TESTS.filter(
+        (test) =>
+          test.available && (!test.locales || test.locales.includes("am")),
+      ).map(
         (test, index) => ({
           "@type": "ListItem",
           position: index + 1,
@@ -139,14 +142,22 @@ export default function ArmenianTestsPage() {
         <TestSection
           eyebrow="Սկսեք այստեղից"
           title="Հիմնական թեստեր"
-          tests={TESTS.filter((test) => test.kind === "featured")}
+          tests={TESTS.filter(
+            (test) =>
+              test.kind === "featured" &&
+              (!test.locales || test.locales.includes("am")),
+          )}
         />
 
         <div className="mt-10">
           <TestSection
             eyebrow="Արագ և զվարճալի"
             title="Կենդանակերպի քվիզներ"
-            tests={TESTS.filter((test) => test.kind === "quiz")}
+            tests={TESTS.filter(
+              (test) =>
+                test.kind === "quiz" &&
+                (!test.locales || test.locales.includes("am")),
+            )}
           />
         </div>
 

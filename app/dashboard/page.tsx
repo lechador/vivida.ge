@@ -82,9 +82,22 @@ export default async function DashboardPage() {
     ...(eqResult ? ["eq"] : []),
     ...(bigFiveResult ? ["big-five"] : []),
   ]);
-  const primaryTests = TESTS.filter((test) => test.available && test.kind === "featured");
+  const primaryTests = TESTS.filter(
+    (test) =>
+      test.available &&
+      test.kind === "featured" &&
+      (!test.locales || test.locales.includes(locale)),
+  );
   const unfinished = primaryTests.filter((test) => !completed.has(test.slug));
-  const pool = unfinished.length > 0 ? unfinished : TESTS.filter((test) => test.available && test.kind === "quiz");
+  const pool =
+    unfinished.length > 0
+      ? unfinished
+      : TESTS.filter(
+          (test) =>
+            test.available &&
+            test.kind === "quiz" &&
+            (!test.locales || test.locales.includes(locale)),
+        );
   // Stable for one civil day, but rotates across users/days instead of always
   // favoring the first catalog entry.
   const dailySeed = `${user.id}:${new Date().toISOString().slice(0, 10)}`;

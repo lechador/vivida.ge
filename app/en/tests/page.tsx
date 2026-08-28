@@ -86,7 +86,10 @@ export default function EnglishTestsPage() {
       "@context": "https://schema.org",
       "@type": "ItemList",
       name: "Vivida tests and quizzes",
-      itemListElement: TESTS.filter((test) => test.available).map(
+      itemListElement: TESTS.filter(
+        (test) =>
+          test.available && (!test.locales || test.locales.includes("en")),
+      ).map(
         (test, index) => ({
           "@type": "ListItem",
           position: index + 1,
@@ -130,14 +133,22 @@ export default function EnglishTestsPage() {
         <TestSection
           eyebrow="Start here"
           title="Core assessments"
-          tests={TESTS.filter((test) => test.kind === "featured")}
+          tests={TESTS.filter(
+            (test) =>
+              test.kind === "featured" &&
+              (!test.locales || test.locales.includes("en")),
+          )}
         />
 
         <div className="mt-10">
           <TestSection
             eyebrow="Quick and playful"
             title="Zodiac quizzes"
-            tests={TESTS.filter((test) => test.kind === "quiz")}
+            tests={TESTS.filter(
+              (test) =>
+                test.kind === "quiz" &&
+                (!test.locales || test.locales.includes("en")),
+            )}
           />
         </div>
 

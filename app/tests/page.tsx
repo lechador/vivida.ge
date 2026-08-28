@@ -7,6 +7,7 @@ import {
   Clock,
   ArrowRight,
   HeartHandshake,
+  Heart,
   Layers,
   RotateCcw,
   Sparkles,
@@ -42,6 +43,7 @@ const SITE_URL = "https://www.vivida.ge";
 const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
   iq: { Icon: Brain, accent: "var(--vivida-cyan)" },
   eq: { Icon: HeartHandshake, accent: "var(--vivida-pink)" },
+  "self-esteem": { Icon: Heart, accent: "var(--vivida-pink)" },
   "big-five": { Icon: Layers, accent: "var(--vivida-violet)" },
   "astro-mbti": { Icon: Fingerprint, accent: "var(--vivida-violet)" },
   "true-sign": { Icon: Sparkles, accent: "var(--vivida-cyan)" },

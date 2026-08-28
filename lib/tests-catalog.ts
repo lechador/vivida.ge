@@ -22,6 +22,8 @@ export type TestCatalogEntry = {
   metaAm: string;
   /** True while the test is live; false renders a "მალე" (soon) card. */
   available: boolean;
+  /** Omit for all locales; use this while an assessment has one translation. */
+  locales?: ("ka" | "en" | "am")[];
 };
 
 export const TESTS: TestCatalogEntry[] = [
@@ -66,6 +68,28 @@ export const TESTS: TestCatalogEntry[] = [
     metaEn: "40 questions · about 7 minutes · free",
     metaAm: "40 հարց · ~7 րոպե · անվճար",
     available: true,
+  },
+  {
+    slug: "self-esteem",
+    kind: "featured",
+    href: "/tvit-shepasebis-testi",
+    titleKa: "თვითშეფასების ტესტი",
+    titleEn: "Self-Esteem Test",
+    titleAm: "Ինքնագնահատականի թեստ",
+    taglineKa: "როგორ უყურებ საკუთარ თავს?",
+    taglineEn: "How do you see yourself?",
+    taglineAm: "Ինչպե՞ս եք տեսնում ինքներդ ձեզ",
+    descKa:
+      "Rosenberg-ის 10-კითხვიანი სკალა ზომავს საკუთარი ღირებულების, შესაძლებლობებისა და თავის პატივისცემის საერთო განცდას. შედეგი და რეფლექსიის პერსონალური თემები მყისიერად.",
+    descEn:
+      "The ten-item Rosenberg scale explores your overall sense of self-worth and self-respect.",
+    descAm:
+      "Ռոզենբերգի տասը հարցից բաղկացած սանդղակը գնահատում է ինքնարժեքի և ինքնահարգանքի ընդհանուր զգացումը։",
+    metaKa: "10 კითხვა · ~2 წუთი · უფასო",
+    metaEn: "10 questions · about 2 minutes · free",
+    metaAm: "10 հարց · ~2 րոպե · անվճար",
+    available: true,
+    locales: ["ka"],
   },
   {
     slug: "big-five",
@@ -152,4 +176,3 @@ export const TESTS: TestCatalogEntry[] = [
     available: true,
   },
 ];
-
