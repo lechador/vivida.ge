@@ -47,6 +47,15 @@ export const users = pgTable("user", {
     .default(true),
   emailMarketing: boolean("email_marketing").notNull().default(true),
   emailNudges: boolean("email_nudges").notNull().default(true),
+  // ── Native mobile push preferences ───────────────────────────────────
+  // The master switch starts OFF until the user grants the OS notification
+  // permission. Category choices default ON so the first opt-in enables the
+  // useful product notifications without additional setup.
+  pushEnabled: boolean("push_enabled").notNull().default(false),
+  pushMessages: boolean("push_messages").notNull().default(true),
+  pushHoroscope: boolean("push_horoscope").notNull().default(true),
+  pushComments: boolean("push_comments").notNull().default(true),
+  pushReactions: boolean("push_reactions").notNull().default(true),
   /** Preferred interface language for authenticated pages. Public SEO routes
    * keep their explicit URL language; this setting controls the signed-in UI. */
   interfaceLanguage: text("interface_language").notNull().default("ka"),

@@ -589,6 +589,13 @@
       "when": 1787760439355,
       "tag": "0083_moaning_kulan_gath",
       "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1788105534504,
+      "tag": "0084_add_mobile_push_preferences",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { users, type NotificationKind, type NotificationPayload } from "@/db/schema";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { isPushConfigured, sendPushToUser } from "@/lib/push";
+import type { NativePushCategory } from "@/lib/native-push";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { isBlockedEitherWay } from "@/lib/block";
 
@@ -139,6 +140,12 @@ function copyFor(
   }
 }
 
+function categoryFor(kind: NotificationKind): NativePushCategory | undefined {
+  if (kind === "post_comment") return "comments";
+  if (kind === "post_reaction") return "reactions";
+  return undefined;
+}
+
 /**
  * Queue a push mirroring a just-inserted notification row. Never throws and
  * never blocks: the send runs after the response via after(), falling back to
@@ -165,7 +172,7 @@ export function queueNotificationPush(
         .limit(1);
       const copy = copyFor(kind, payload, normalizeUserLocale(recipient?.locale));
       if (!copy) return;
-      await sendPushToUser(recipientId, copy);
+      await sendPushToUser(recipientId, copy, categoryFor(kind));
     } catch (err) {
       console.warn(
         "[notification-push] send failed:",
@@ -221,5 +228,5 @@ export async function sendMessagePush(opts: {
     body: opts.body.slice(0, 120),
     url: `/messages?with=${encodeURIComponent(opts.fromUserId)}`,
     tag: `msg-${opts.fromUserId}`,
-  });
+  }, "messages");
 }

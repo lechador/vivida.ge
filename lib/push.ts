@@ -10,6 +10,11 @@ import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { pushSubscriptions, dailyHoroscopes, users } from "@/db/schema";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+import {
+  isNativePushConfigured,
+  sendNativePushToUser,
+  type NativePushCategory,
+} from "@/lib/native-push";
 
 let configured = false;
 
@@ -26,7 +31,8 @@ function ensureConfigured(): boolean {
 
 export function isPushConfigured(): boolean {
   return Boolean(
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY
+    (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) ||
+      isNativePushConfigured(),
   );
 }
 
@@ -80,20 +86,29 @@ async function sendToSubs(
 /** Send a push to every device a user has subscribed. Returns # delivered. */
 export async function sendPushToUser(
   userId: string,
-  payload: PushPayload
+  payload: PushPayload,
+  category?: NativePushCategory,
 ): Promise<number> {
-  if (!ensureConfigured()) return 0;
-  const subs = await db
-    .select({
-      id: pushSubscriptions.id,
-      endpoint: pushSubscriptions.endpoint,
-      p256dh: pushSubscriptions.p256dh,
-      auth: pushSubscriptions.auth,
-    })
-    .from(pushSubscriptions)
-    .where(eq(pushSubscriptions.userId, userId));
-  if (subs.length === 0) return 0;
-  return sendToSubs(subs, payload);
+  const webTask = ensureConfigured()
+    ? db
+        .select({
+          id: pushSubscriptions.id,
+          endpoint: pushSubscriptions.endpoint,
+          p256dh: pushSubscriptions.p256dh,
+          auth: pushSubscriptions.auth,
+        })
+        .from(pushSubscriptions)
+        .where(eq(pushSubscriptions.userId, userId))
+        .then((subs) => (subs.length ? sendToSubs(subs, payload) : 0))
+    : Promise.resolve(0);
+  const nativeTask = sendNativePushToUser(userId, payload, category).catch(
+    (error) => {
+      console.warn("[push] native delivery failed:", (error as Error).message);
+      return 0;
+    },
+  );
+  const [web, native] = await Promise.all([webTask, nativeTask]);
+  return web + native;
 }
 
 const GENERIC_BODY = "შენი დღევანდელი ჰოროსკოპი მზადაა — გახსენი და ნახე ✨";
@@ -108,44 +123,74 @@ const GENERIC_BODY_EN = "Your daily horoscope is ready — open it to read more 
 export async function sendDailyPushBlast(opts: {
   sendDate: string;
 }): Promise<{ recipients: number; sent: number }> {
-  if (!ensureConfigured()) return { recipients: 0, sent: 0 };
+  const webConfigured = ensureConfigured();
+  const nativeConfigured = isNativePushConfigured();
+  if (!webConfigured && !nativeConfigured) return { recipients: 0, sent: 0 };
 
-  const rows = await db
-    .select({
-      userId: pushSubscriptions.userId,
-      locale: users.interfaceLanguage,
-      id: pushSubscriptions.id,
-      endpoint: pushSubscriptions.endpoint,
-      p256dh: pushSubscriptions.p256dh,
-      auth: pushSubscriptions.auth,
-      headline: dailyHoroscopes.headline,
-      language: dailyHoroscopes.language,
-    })
-    .from(pushSubscriptions)
-    .innerJoin(users, eq(users.id, pushSubscriptions.userId))
-    .leftJoin(
-      dailyHoroscopes,
-      and(
-        eq(dailyHoroscopes.userId, pushSubscriptions.userId),
-        eq(dailyHoroscopes.date, opts.sendDate),
-      ),
-    );
+  const [rows, nativeRows] = await Promise.all([
+    webConfigured
+      ? db
+          .select({
+            userId: pushSubscriptions.userId,
+            locale: users.interfaceLanguage,
+            id: pushSubscriptions.id,
+            endpoint: pushSubscriptions.endpoint,
+            p256dh: pushSubscriptions.p256dh,
+            auth: pushSubscriptions.auth,
+            headline: dailyHoroscopes.headline,
+            language: dailyHoroscopes.language,
+          })
+          .from(pushSubscriptions)
+          .innerJoin(users, eq(users.id, pushSubscriptions.userId))
+          .leftJoin(
+            dailyHoroscopes,
+            and(
+              eq(dailyHoroscopes.userId, pushSubscriptions.userId),
+              eq(dailyHoroscopes.date, opts.sendDate),
+            ),
+          )
+      : Promise.resolve([]),
+    nativeConfigured
+      ? db
+          .select({
+            userId: users.id,
+            locale: users.interfaceLanguage,
+            headline: dailyHoroscopes.headline,
+            language: dailyHoroscopes.language,
+          })
+          .from(users)
+          .leftJoin(
+            dailyHoroscopes,
+            and(
+              eq(dailyHoroscopes.userId, users.id),
+              eq(dailyHoroscopes.date, opts.sendDate),
+            ),
+          )
+          .where(
+            and(eq(users.pushEnabled, true), eq(users.pushHoroscope, true)),
+          )
+      : Promise.resolve([]),
+  ]);
 
   const recipients = new Map<
     string,
     {
+      userId: string;
       locale: string;
       headline: string | null;
       language: string | null;
       subs: SubRow[];
+      native: boolean;
     }
   >();
   for (const row of rows) {
     const current = recipients.get(row.userId) ?? {
+      userId: row.userId,
       locale: row.locale,
       headline: row.headline,
       language: row.language,
       subs: [],
+      native: false,
     };
     current.subs.push({
       id: row.id,
@@ -153,6 +198,22 @@ export async function sendDailyPushBlast(opts: {
       p256dh: row.p256dh,
       auth: row.auth,
     });
+    recipients.set(row.userId, current);
+  }
+  for (const row of nativeRows) {
+    const current = recipients.get(row.userId) ?? {
+      userId: row.userId,
+      locale: row.locale,
+      headline: row.headline,
+      language: row.language,
+      subs: [],
+      native: true,
+    };
+    current.native = true;
+    // Prefer a generated horoscope over the empty value from the other
+    // channel when the same user has both web and native subscriptions.
+    current.headline = row.headline ?? current.headline;
+    current.language = row.language ?? current.language;
     recipients.set(row.userId, current);
   }
 
@@ -163,7 +224,7 @@ export async function sendDailyPushBlast(opts: {
     while (next < entries.length) {
       const recipient = entries[next++];
       const locale = normalizeUserLocale(recipient.locale);
-      sent += await sendToSubs(recipient.subs, {
+      const payload = {
         title: "Vivida ✨",
         body:
           recipient.language === locale && recipient.headline
@@ -173,7 +234,22 @@ export async function sendDailyPushBlast(opts: {
               : GENERIC_BODY,
         url: "/dashboard",
         tag: `daily-${opts.sendDate}`,
-      });
+      };
+      const [webSent, nativeSent] = await Promise.all([
+        recipient.subs.length ? sendToSubs(recipient.subs, payload) : 0,
+        recipient.native
+          ? sendNativePushToUser(recipient.userId, payload, "horoscope").catch(
+              (error) => {
+                console.warn(
+                  "[push] native daily delivery failed:",
+                  (error as Error).message,
+                );
+                return 0;
+              },
+            )
+          : 0,
+      ]);
+      sent += webSent + nativeSent;
     }
   }
   await Promise.all(
