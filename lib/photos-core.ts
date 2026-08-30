@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { profilePhotos, type ProfilePhoto } from "@/db/schema";
@@ -77,11 +77,23 @@ export async function createPhotoUpload(
     return { ok: false, code: "empty" };
   }
 
-  // Limit check
+  // Limit check. Count completed photos plus only recent reservations. A
+  // presigned PUT expires after five minutes, so an older pending row can no
+  // longer complete and must not permanently consume one of the six slots.
+  // We keep the row for audit/debugging instead of deleting user data here.
+  const activeReservationCutoff = new Date(Date.now() - 10 * 60 * 1000);
   const [{ value: existingCount }] = await db
     .select({ value: count() })
     .from(profilePhotos)
-    .where(eq(profilePhotos.userId, userId));
+    .where(
+      and(
+        eq(profilePhotos.userId, userId),
+        or(
+          eq(profilePhotos.ready, true),
+          gte(profilePhotos.createdAt, activeReservationCutoff),
+        ),
+      ),
+    );
   if (Number(existingCount) >= PHOTO_LIMITS.MAX_PER_USER) {
     return { ok: false, code: "limit_reached" };
   }
