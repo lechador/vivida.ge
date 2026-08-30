@@ -1,20 +1,13 @@
 "use server";
 
-import { after } from "next/server";
 import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { mbtiTestResults, users, profiles } from "@/db/schema";
+import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
-import { ensureChartFor } from "@/actions/chart";
-import { calculateMbti, mbtiArchetypeEn, mbtiArchetypeKa } from "@/lib/mbti-questions";
-import { getMbtiQuestions } from "@/lib/mbti-questions-db";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
-import { generateMbtiSynthesis } from "@/lib/mbti-synthesis";
-import { sendMbtiResultEmail } from "@/lib/email";
-import { enforceAuthRateLimit } from "@/lib/rate-limit";
+import { submitMbtiFor } from "@/lib/mbti-submit-core";
 import { ApiError } from "@/lib/api/errors";
 
 export type SubmitMbtiResult =
@@ -38,9 +31,9 @@ async function clientIp(): Promise<string> {
  * but the expensive Gemini synthesis only runs for a signed-in user (so an
  * anonymous visitor can't burn AI budget), and it's rate-limited on top.
  *
- * Steps: recompute the type server-side (authoritative) → fetch the natal
- * chart (may be null pre-onboarding) → synthesize (Google in dev, OpenRouter
- * in prod) → persist → email the result in the background → return the id.
+ * The work itself lives in `lib/mbti-submit-core.ts` so the mobile API runs
+ * the identical flow; this action only supplies the web's notion of "who is
+ * asking" and turns thrown errors back into the form's result shape.
  */
 export async function submitMbti(
   answers: Record<number, number>
@@ -50,98 +43,32 @@ export async function submitMbti(
   const en = locale === "en";
 
   try {
-    await enforceAuthRateLimit({
-      action: "mbti_submit",
+    const { id } = await submitMbtiFor({
+      userId: user.id,
+      answers,
+      locale,
       ip: await clientIp(),
-      email: user.id, // per-user cap keyed on the stable id
-      ipLimit: 20,
-      emailLimit: 6, // ≤6 generations/hour per account
-      windowMs: 60 * 60 * 1000,
     });
+    return { ok: true, id };
   } catch (err) {
     if (err instanceof ApiError && err.status === 429) {
-      return { ok: false, error: "ბევრი მცდელობა იყო. სცადე ცოტა ხანში." };
+      return {
+        ok: false,
+        error: en
+          ? "Too many attempts. Please try again shortly."
+          : "ბევრი მცდელობა იყო. სცადე ცოტა ხანში.",
+      };
+    }
+    if (err instanceof ApiError && err.code === "save_failed") {
+      return {
+        ok: false,
+        error: en
+          ? "We could not save your result. Please try again."
+          : "შენახვა ვერ მოხერხდა. სცადე თავიდან.",
+      };
     }
     throw err;
   }
-
-  // Server-side scoring is authoritative — never trust a client-sent type.
-  // Score against the live question set (axis/pole come from the invariant
-  // static structure inside getMbtiQuestions, so wording edits can't skew it).
-  const { type, scores } = calculateMbti(answers, await getMbtiQuestions());
-
-  // Positions only; never wait on / trigger chart AI here.
-  const chart = await ensureChartFor(user.id, { aiUpgrade: "skip" }).catch(
-    () => null
-  );
-
-  const [u] = await db
-    .select({ name: users.name })
-    .from(users)
-    .where(eq(users.id, user.id))
-    .limit(1);
-  const firstName = u?.name?.split(" ")[0] ?? null;
-
-  const synthesis = await generateMbtiSynthesis({
-    firstName,
-    type,
-      scores,
-      chart: chart?.data ?? null,
-      locale,
-  });
-
-  // Graceful floor: if every AI path fails, still save a result using the
-  // static archetype + a short deterministic note, so the user isn't blocked.
-  const archetypeNameGe =
-    synthesis?.archetypeNameGe?.trim() || (en ? mbtiArchetypeEn(type) : mbtiArchetypeKa(type));
-  const aiSynthesisText =
-    synthesis?.analysisText ??
-    (en
-      ? `Your personality type is ${type} — ${mbtiArchetypeEn(type)}. A detailed analysis will be added soon.`
-      : `შენი ფსიქოლოგიური ტიპია ${type} — ${mbtiArchetypeKa(type)}. დეტალური ანალიზი მალე დაემატება.`);
-  const model = `${locale}:${synthesis?.model ?? "fallback"}`;
-
-  const [inserted] = await db
-    .insert(mbtiTestResults)
-    .values({
-      userId: user.id,
-      mbtiType: type,
-      archetypeNameGe,
-      scores,
-      aiSynthesisText,
-      model,
-    })
-    .returning({ id: mbtiTestResults.id });
-
-  if (!inserted) return { ok: false, error: en ? "We could not save your result. Please try again." : "შენახვა ვერ მოხერხდა. სცადე თავიდან." };
-
-  // Email the result in the background — the "sent to email" requirement.
-  const resultId = inserted.id;
-  after(async () => {
-    try {
-      const [target] = await db
-        .select({ email: users.email })
-        .from(users)
-        .where(eq(users.id, user.id))
-        .limit(1);
-      if (target?.email) {
-        await sendMbtiResultEmail({
-          userId: user.id,
-          to: target.email,
-          name: firstName,
-          resultId,
-          mbtiType: type,
-          archetypeNameGe: en ? mbtiArchetypeEn(type) : archetypeNameGe,
-          locale,
-          origin: en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL,
-        });
-      }
-    } catch (err) {
-      console.warn("[submitMbti] result email failed:", (err as Error).message);
-    }
-  });
-
-  return { ok: true, id: resultId };
 }
 
 /** Whether the current user has completed onboarding (needed for the astro
