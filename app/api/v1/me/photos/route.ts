@@ -9,14 +9,15 @@ export { OPTIONS } from "@/lib/api/cors";
 /**
  * GET /api/v1/me/photos
  *
- * The authenticated user's own profile photos in display order, including
- * not-yet-ready uploads (so the client can show in-flight slots). Shares
- * listOwnPhotos() with the photo core.
+ * The authenticated user's completed profile photos in display order.
+ * Pending rows are upload reservations and may not exist in R2 yet; the
+ * native gallery has its own local upload progress and must never try to
+ * render those public URLs.
  */
 export async function GET(req: Request) {
   return handle(async () => {
     const user = await requireMobileUser(req);
-    const photos = await listOwnPhotos(user.id);
+    const photos = (await listOwnPhotos(user.id)).filter((photo) => photo.ready);
     return ok({ photos });
   });
 }
