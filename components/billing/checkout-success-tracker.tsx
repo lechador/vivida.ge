@@ -26,6 +26,10 @@ export function CheckoutSuccessTracker() {
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
         if (!data) return;
+        // The server may have granted credits only in this reconciliation
+        // request, after the page rendered its balance. Refresh before any
+        // analytics/storage code can fail and leave that balance stale.
+        router.refresh();
         const params = { value: data.value, currency: data.currency, content_ids: [data.contentId], content_type: "product" };
         fbTrack("Purchase", params, data.purchaseEventId);
         trackEvent(ANALYTICS_EVENT.checkoutSuccess, {
