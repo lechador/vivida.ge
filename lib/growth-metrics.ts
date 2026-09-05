@@ -35,6 +35,16 @@ export type CreditWeekRow = {
   guardrail: CreditGuardrail;
 };
 
+export type RelationshipMetrics = {
+  invitesCreated: number;
+  invitesAccepted: number;
+  weeklySubscribers: number;
+  transitSubscribers: number;
+  answers: number;
+  answerUsers: number;
+  weeklyUpdates: number;
+};
+
 function numberValue(value: unknown): number {
   const number = Number(value ?? 0);
   return Number.isFinite(number) ? number : 0;
@@ -45,9 +55,10 @@ export async function getGrowthMetrics(days: 28 | 84): Promise<{
   reminders: ReminderFunnelRow[];
   creditWeeks: CreditWeekRow[];
   creditSummary: { freeIssued: number; purchased: number; spent: number };
+  relationships: RelationshipMetrics;
 }> {
   const interval = `${days} days`;
-  const [experimentResult, preferenceResult, deliveryResult, creditResult, creditSummaryResult] = await Promise.all([
+  const [experimentResult, preferenceResult, deliveryResult, creditResult, creditSummaryResult, relationshipResult] = await Promise.all([
     db.execute(sql`
       SELECT
         a.experiment,
@@ -125,6 +136,38 @@ export async function getGrowthMetrics(days: 28 | 84): Promise<{
       FROM credit_transaction
       WHERE created_at >= now() - interval '28 days'
     `),
+    db.execute(sql`
+      WITH invites AS (
+        SELECT
+          count(*) FILTER (
+            WHERE p.invite_accepted_at >= now() - ${interval}::interval
+               OR p.invite_expires_at >= now() - ${interval}::interval
+          )::int AS created,
+          count(*) FILTER (
+            WHERE p.invite_accepted_at >= now() - ${interval}::interval
+          )::int AS accepted
+        FROM partner p
+        WHERE p.deleted_at IS NULL
+      ),
+      subscribers AS (
+        SELECT
+          count(*) FILTER (WHERE s.weekly_enabled)::int AS weekly,
+          count(*) FILTER (WHERE s.transit_enabled)::int AS transit
+        FROM relationship_subscription s
+        JOIN partner p ON p.id = s.partner_id AND p.deleted_at IS NULL
+      )
+      SELECT
+        (SELECT created FROM invites) AS invites_created,
+        (SELECT accepted FROM invites) AS invites_accepted,
+        (SELECT weekly FROM subscribers) AS weekly_subscribers,
+        (SELECT transit FROM subscribers) AS transit_subscribers,
+        (SELECT count(*)::int FROM relationship_checkin_answer
+          WHERE updated_at >= now() - ${interval}::interval) AS answers,
+        (SELECT count(DISTINCT user_id)::int FROM relationship_checkin_answer
+          WHERE updated_at >= now() - ${interval}::interval) AS answer_users,
+        (SELECT count(*)::int FROM relationship_weekly_update
+          WHERE created_at >= now() - ${interval}::interval) AS weekly_updates
+    `),
   ]);
 
   const experiments = experimentResult.rows.map((row) => ({
@@ -176,6 +219,17 @@ export async function getGrowthMetrics(days: 28 | 84): Promise<{
     };
   });
 
+  const relationshipRow = relationshipResult.rows[0] ?? {};
+  const relationships: RelationshipMetrics = {
+    invitesCreated: numberValue(relationshipRow.invites_created),
+    invitesAccepted: numberValue(relationshipRow.invites_accepted),
+    weeklySubscribers: numberValue(relationshipRow.weekly_subscribers),
+    transitSubscribers: numberValue(relationshipRow.transit_subscribers),
+    answers: numberValue(relationshipRow.answers),
+    answerUsers: numberValue(relationshipRow.answer_users),
+    weeklyUpdates: numberValue(relationshipRow.weekly_updates),
+  };
+
   return {
     experiments,
     reminders: [...reminderMap.values()].sort((a, b) => a.topic.localeCompare(b.topic)),
@@ -185,5 +239,6 @@ export async function getGrowthMetrics(days: 28 | 84): Promise<{
       purchased: numberValue(creditSummaryResult.rows[0]?.purchased),
       spent: numberValue(creditSummaryResult.rows[0]?.spent),
     },
+    relationships,
   };
 }

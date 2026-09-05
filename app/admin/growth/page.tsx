@@ -1,4 +1,4 @@
-import { Activity, BellRing, FlaskConical, Gauge, WalletCards } from "lucide-react";
+import { Activity, BellRing, FlaskConical, Gauge, Users, WalletCards } from "lucide-react";
 import Link from "next/link";
 
 import { requireAdmin } from "@/lib/admin-auth";
@@ -103,6 +103,18 @@ export default async function AdminGrowthPage({
       </section>
 
       <section className="mt-6 rounded-2xl border border-border bg-card/45 p-5 sm:p-6">
+        <div className="flex items-center gap-2"><Users className="size-5 text-[var(--vivida-cyan)]" /><h2 className="text-lg font-semibold">ურთიერთობები · recurring synastry</h2></div>
+        <p className="mt-1 text-xs text-muted-foreground">მოწვევები, მიღების წილი, მიმდინარე გამომწერები (snapshot, არა პერიოდი), გაზიარებული პასუხები და გენერირებული ყოველკვირეული განახლებები არჩეულ პერიოდში.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Metric label={`მოწვევები · მიღებული ${percent(metrics.relationships.invitesAccepted, metrics.relationships.invitesCreated)}`} value={`${metrics.relationships.invitesAccepted} / ${metrics.relationships.invitesCreated}`} wide />
+          <Metric label="ყოველკვირეული გამომწერები" value={metrics.relationships.weeklySubscribers} />
+          <Metric label="ტრანზიტ-ალერტ გამომწერები" value={metrics.relationships.transitSubscribers} />
+          <Metric label={`საერთო პასუხები · ${metrics.relationships.answerUsers} მომხმარებელი`} value={metrics.relationships.answers} />
+          <Metric label="გენერირებული weekly განახლებები" value={metrics.relationships.weeklyUpdates} />
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-border bg-card/45 p-5 sm:p-6">
         <div className="flex items-center gap-2"><Gauge className="size-5 text-[var(--vivida-gold)]" /><h2 className="text-lg font-semibold">კრედიტების ოთხკვირიანი კონტროლი</h2></div>
         <p className="mt-1 text-xs text-muted-foreground">ზედა guardrail ზუსტად ბოლო 28 დღეს ითვლის; ქვემოთ მიმდინარე და წინა სამი კალენდარული კვირაა. უფასო = ყველა დადებითი ledger ჩანაწერი `purchase`-ის გარდა; ხარჯვა = ყველა უარყოფითი ჩანაწერის აბსოლუტური ჯამი. მიზანი ≤2.0×, დაკვირვება 2.0–2.5×, უფასო გაცემის ზრდის გაჩერება &gt;2.5×.</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -119,6 +131,6 @@ function SummaryCard({ label, value, icon: Icon }: { label: string; value: numbe
   return <div className="rounded-2xl border border-border bg-card/55 p-5"><div className="flex items-center gap-2 text-xs text-muted-foreground"><Icon className="size-4" />{label}</div><div className="mt-2 text-3xl font-semibold tabular-nums">{value}</div></div>;
 }
 
-function Metric({ label, value }: { label: string; value: number }) {
-  return <div><div className="text-lg font-semibold tabular-nums">{value}</div><div className="text-[10px] opacity-70">{label}</div></div>;
+function Metric({ label, value, wide }: { label: string; value: string | number; wide?: boolean }) {
+  return <div className={wide ? "rounded-xl border border-border/60 p-4 sm:col-span-2 lg:col-span-2" : undefined}><div className="text-lg font-semibold tabular-nums">{value}</div><div className="text-[10px] opacity-70">{label}</div></div>;
 }

@@ -36,9 +36,9 @@ inventory only after those foundations are measurable.
 | P0 — implemented 2026-08-22 | Signup-credit cohort test | Future signups are assigned 50/50 to 20 credits immediately or 10 immediately plus 5 after a 24-hour return; legacy balances remain untouched. | Variant-level D1/D7 retention, seven-day credit use, and 30-day payer conversion. |
 | P1 — shipped 2026-08-26 | Daily “Today” ritual | Daily reading, chosen focus, server-truth streak, and lifetime milestones now create a compact reason to return. | Higher DAU/MAU, active days per MAU, and D7 retention. |
 | P1 — shipped 2026-08-26 | Contextual paywalls and credit-economy experiments | Shortfalls now name the deficit, compare credits with PRO, recommend the smallest sufficient pack, and return to content after verified checkout. Repeatable free earning is capped. | Higher paywall-to-checkout and 30-day payer conversion without lower retention. |
-| P1 | Reading history and journal | Tarot, forecasts, and AI insight do not accumulate into durable personal value. | Higher weekly repeat use and history reopen rate. |
-| P2 | Paid report store and bundles | Demand is concentrated in tarot and natal PDFs, but the paid catalog is narrow. | Higher ARPPU and report attach rate. |
-| P2 | Recurring relationship experience | Synastry is mainly a static, one-time unlock. | Higher partner invites and weekly relationship-feature retention. |
+| P1 — shipped 2026-09-05 | Reading history and journal | Tarot, forecasts, and AI insight do not accumulate into durable personal value. | Higher weekly repeat use and history reopen rate. |
+| P2 — shipped 2026-09-05 | Paid report store and bundles | Demand is concentrated in tarot and natal PDFs, but the paid catalog is narrow. | Higher ARPPU and report attach rate. |
+| P2 — shipped 2026-09-05 | Recurring relationship experience | Synastry is mainly a static, one-time unlock. | Higher partner invites and weekly relationship-feature retention. |
 | P2 | Annual PRO, gifting, and bundles | Monetization is limited to monthly PRO, credits, and one targeted quarterly offer. | Higher subscription conversion, prepaid revenue, and gift purchases. |
 | P2 — implemented 2026-08-26 | Personalized return channels | Users now control transit, forecast, and relationship reminders by channel, cadence, local time, and private calendar sync. | Higher notification-to-value completion with stable opt-out rates. |
 | P2 | Next-best-action content graph | Long pages offer many equal choices instead of one relevant continuation. | More meaningful actions per valuable session. |
@@ -72,7 +72,11 @@ inventory only after those foundations are measurable.
 
 5. **Shipped 2026-08-26:** Build a “Today” home module with one insight, one recommended action,
    progress/streak state, next refresh time, and a deep link into paid depth.
-6. Add durable tarot, AI insight, and forecast history with a personal journal.
+6. **Shipped 2026-09-05:** Add durable tarot, AI insight, and forecast history with a personal journal.
+   The `/library` archive (daily, weekly, tarot, AI, reports) with filters,
+   search, favorites, private notes, and a per-entry detail page was already
+   built with migration `0076`; this step added ownership- and validation-
+   level test coverage for the favorite/note actions (`tests/library-actions.test.ts`).
 7. **Shipped 2026-08-26:** Make paywalls contextual: preview the locked value, explain the unlock,
    recommend a pack, compare PRO, and return to the content after checkout.
 8. **Shipped 2026-08-26:** Make the credit system legible with a detailed ledger, next-unlock progress,
@@ -80,10 +84,23 @@ inventory only after those foundations are measurable.
 
 ### P2 — expand high-intent paid inventory (weeks 6–12)
 
-9. Launch annual forecast, relationship, career, and timing reports plus two-
-   and three-report bundles.
-10. Turn synastry into a recurring experience with weekly partner/friend
+9. **Shipped 2026-09-05:** Launch annual forecast, relationship, career, and timing reports plus two-
+   and three-report bundles. The store, catalog, credit checkout with
+   prorated bundle pricing, PDF generation in ka/en/am, and library
+   archiving were already built and gated behind `REPORT_STORE_VISIBLE`;
+   the launch flips the gate so `/reports` appears in navigation and all
+   four products plus all four bundles are purchasable.
+10. **Shipped 2026-09-05:** Turn synastry into a recurring experience with weekly partner/friend
     updates, shared prompts, relevant alerts, and mutual invite links.
+    The experience (deterministic weekly updates, themed shared check-in
+    questions with per-participant answers, transit alerts, race-safe mutual
+    invite links, opt-in subscriptions with local-hour hourly delivery via
+    the personal-reminders cron) was already built; this step closed the
+    measurement gap with a Relationships section on `/admin/growth`
+    (invites created/accepted, acceptance rate, weekly/transit subscribers,
+    shared answers, generated weekly updates) backed by
+    `tests/growth-relationships.test.ts`. Delivery-level funnel for the
+    `relationship` topic was already covered by the reminder-funnel view.
 11. Test annual PRO at an effective 8–10 monthly payments, gift credits/reports,
     and relationship bundles.
 12. **Implemented 2026-08-26:** Persist experiment eligibility, assignment,
@@ -139,9 +156,6 @@ of truth.
 
 ## Missing or underdeveloped functionality
 
-- Personal reading history, saved insights, bookmarks, and user notes.
-- A recurring relationship experience rather than static synastry alone.
-- A broader paid report store and bundles.
 - Gift credits, gift reports, and partner/seasonal packages.
 - A standard annual PRO plan.
 - Offline PWA content caching; the current service worker is push-focused.

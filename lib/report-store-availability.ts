@@ -1,9 +1,9 @@
 /**
- * Temporary product gate for the expanded paid-report store. Keep the store,
- * catalogue and generated report detail routes intact while the report content
- * is being expanded. The legacy natal PDF on /report remains available.
+ * Product gate for the paid-report store. Launched 2026-09-05 (growth plan
+ * P2 item 9): annual, relationship, career, and timing reports plus bundles
+ * are live alongside the legacy natal PDF on /report.
  */
-export const REPORT_STORE_VISIBLE = false;
+export const REPORT_STORE_VISIBLE = true;
 
 export function canStartReportCheckout(input: {
   type: string | null;
