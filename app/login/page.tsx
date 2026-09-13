@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { AppleButton } from "@/components/auth/apple-button";
 import { AuthDivider, AuthLayout } from "@/components/auth/auth-layout";
 import { GoogleButton } from "@/components/auth/google-button";
 import { LoginForm } from "@/components/auth/login-form";
@@ -56,7 +57,10 @@ export default async function LoginPage({
         </>
       }
     >
-      <GoogleButton locale={locale} callbackUrl={dest ?? "/dashboard"} />
+      <div className="space-y-3">
+        <GoogleButton locale={locale} callbackUrl={dest ?? "/dashboard"} />
+        <AppleButton locale={locale} callbackUrl={dest ?? "/dashboard"} />
+      </div>
       <AuthDivider locale={locale} />
       {/* useSearchParams in LoginForm requires a Suspense boundary. */}
       <Suspense fallback={null}>

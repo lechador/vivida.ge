@@ -30,6 +30,7 @@ export const ANALYTICS_EVENT = {
   horoscopeEmailSubscribed: "horoscope_email_subscribed",
   registerClick: "register_click",
   signUpGoogleClick: "sign_up_google_click",
+  signUpAppleClick: "sign_up_apple_click",
   signUpSubmitted: "sign_up_submitted",
   signUpVerified: "sign_up_verified",
   onboardingStarted: "onboarding_started",

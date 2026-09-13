@@ -61,6 +61,10 @@ export async function signInWithGoogle(callbackUrl: string = "/dashboard") {
   await signIn("google", { redirectTo: callbackUrl });
 }
 
+export async function signInWithApple(callbackUrl: string = "/dashboard") {
+  await signIn("apple", { redirectTo: callbackUrl });
+}
+
 export async function signOutAction() {
   await signOut({ redirectTo: "/" });
 }

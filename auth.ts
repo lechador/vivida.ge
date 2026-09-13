@@ -91,14 +91,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         );
       }
     },
-    // Web Google sign-ups are created by the DrizzleAdapter (not our
+    // Web Google/Apple sign-ups are created by the DrizzleAdapter (not our
     // registerUser/findOrCreateOAuthUser paths), so this is the ONLY hook that
     // fires for them. Without it, adapter-created users never received the
     // signup bonus or referral attribution. onUserSignedUp is idempotent
     // (earnOnce) + best-effort, so it can't double-grant or break the callback.
     async createUser({ user }) {
       if (!user?.id) return;
-      // Adapter-created users are Google OAuth sign-ups (our credentials flow
+      // Adapter-created users are OAuth sign-ups (our credentials flow
       // creates users itself, gated on email verification). Google asserts
       // email_verified, but NextAuth's default profile mapping doesn't stamp
       // emailVerified — do it here so these accounts count as verified and any

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { AppleButton } from "@/components/auth/apple-button";
 import { AuthDivider, AuthLayout } from "@/components/auth/auth-layout";
 import { GoogleButton } from "@/components/auth/google-button";
 import { SignupForm } from "@/components/auth/signup-form";
@@ -56,11 +57,18 @@ export default async function SignupPage({
         </>
       }
     >
-      <GoogleButton
-        locale={locale}
-        label={am ? "Գրանցվել Google-ի միջոցով" : en ? "Sign up with Google" : "რეგისტრაცია Google-ით"}
-        callbackUrl={dest ?? "/dashboard"}
-      />
+      <div className="space-y-3">
+        <GoogleButton
+          locale={locale}
+          label={am ? "Գրանցվել Google-ի միջոցով" : en ? "Sign up with Google" : "რეგისტრაცია Google-ით"}
+          callbackUrl={dest ?? "/dashboard"}
+        />
+        <AppleButton
+          locale={locale}
+          label={am ? "Գրանցվել Apple-ի միջոցով" : en ? "Sign up with Apple" : "რეგისტრაცია Apple-ით"}
+          callbackUrl={dest ?? "/dashboard"}
+        />
+      </div>
       <AuthDivider locale={locale} />
       {/* useSearchParams in SignupForm requires a Suspense boundary. */}
       <Suspense fallback={null}>
