@@ -48,6 +48,9 @@ jobs:
       - name: Audit production dependencies
         run: npm run audit:prod
 
+      - name: Check env coverage
+        run: npm run check:env
+
       - name: Lint
         run: npm run lint
 

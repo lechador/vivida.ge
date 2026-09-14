@@ -17,6 +17,7 @@
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "check:env": "node scripts/check-env.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
