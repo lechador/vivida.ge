@@ -1,4 +1,5 @@
 import type { NatalChartJson, PremiumReportContentJson } from "@/db/schema";
+import type { AspectKind } from "@/lib/aspects";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { computeSynastry, CATEGORIES, CATEGORY_LABEL_KA } from "@/lib/synastry";
 import { computeTiming } from "@/lib/timing";
@@ -30,6 +31,69 @@ function baseName(name: string | null, locale: UserLocale): string {
   return name || (locale === "ka" ? "შენი" : locale === "am" ? "Ձեր" : "Your");
 }
 
+/**
+ * Georgian sign-name declension. Never glue cases on with a hyphen
+ * ("ვერძი-ის" is wrong); -ი/-ა stems drop the vowel, everything else
+ * appends the ending: ვერძის/ვერძში, კუროს/კუროში, ტყუპების/ტყუპებში.
+ */
+export function kaSignGenitive(name: string): string {
+  if (name.endsWith("ი") || name.endsWith("ა")) return `${name.slice(0, -1)}ის`;
+  return `${name}ს`;
+}
+
+export function kaSignLocative(name: string): string {
+  // -ი stems drop the vowel (ვერძში); -ა stems keep it (თხის რქაში).
+  if (name.endsWith("ი")) return `${name.slice(0, -1)}ში`;
+  return `${name}ში`;
+}
+
+/**
+ * Armenian sign-name declension. Native inflection takes no hyphen
+ * ("Խոյ-ում" is wrong); the only irregular sign is Խեցգետին, which drops
+ * its ի before vowel suffixes: Խեցգետնում, Խեցգետնի.
+ */
+export function amSignLocative(name: string): string {
+  if (name === "Խեցգետին") return "Խեցգետնում";
+  return `${name}ում`;
+}
+
+export function amSignGenitive(name: string): string {
+  if (name === "Խեցգետին") return "Խեցգետնի";
+  return `${name}ի`;
+}
+
+export function amSignDefinite(name: string): string {
+  return `${name}ը`;
+}
+
+/**
+ * Definite article for any Armenian word: -ն after vowels, -ը after
+ * consonants ("Քիմիան" but "Աճը"). Sign names are always consonant-final,
+ * so amSignDefinite stays simple; use this for category labels.
+ */
+export function amDefiniteWord(word: string): string {
+  return /(ու|[աեէըիոօ])$/.test(word) ? `${word}ն` : `${word}ը`;
+}
+
+const ASPECT_KA: Record<AspectKind, string> = {
+  conjunction: "შეერთება",
+  sextile: "სექსტილი",
+  square: "კვადრატი",
+  trine: "ტრინი",
+  opposition: "ოპოზიცია",
+};
+
+export function aspectKindKa(kind: AspectKind): string {
+  return ASPECT_KA[kind];
+}
+
+/** One-word verdict per compatibility area; adjectives need no declension. */
+export function areaTier(score: number, locale: UserLocale): string {
+  if (locale === "ka") return score >= 75 ? "ძლიერი" : score >= 60 ? "სტაბილური" : "განვითარებადი";
+  if (locale === "am") return score >= 75 ? "ուժեղ" : score >= 60 ? "կայուն" : "զարգացող";
+  return score >= 75 ? "strong" : score >= 60 ? "steady" : "developing";
+}
+
 function annual(input: Input): PremiumReportContentJson {
   const now = input.now ?? new Date();
   const year = now.getUTCFullYear();
@@ -42,7 +106,7 @@ function annual(input: Input): PremiumReportContentJson {
   if (input.locale === "ka") return {
     title: `${year} — შენი პერსონალური წელი`,
     subtitle: `${baseName(input.firstName, input.locale)} · მზე ${sun} · მთვარე ${moon} · ასცენდენტი ${asc}`,
-    overview: `ეს წელი იკითხება შენი ნატალური რუკისა და მომდევნო 12 თვის ტრანზიტების გადაკვეთით. მთავარი ამოცანაა ${sun}-ის მიზანმიმართულობა, ${moon}-ის ემოციური საჭიროებები და ${asc}-ის მოქმედების სტილი ერთ მიმართულებად შეკრა.`,
+    overview: `ეს წელი იკითხება შენი ნატალური რუკისა და მომდევნო 12 თვის ტრანზიტების გადაკვეთით. მთავარი ამოცანაა ${kaSignGenitive(sun)} მიზანმიმართულობა, ${kaSignGenitive(moon)} ემოციური საჭიროებები და ${kaSignGenitive(asc)} მოქმედების სტილი ერთ მიმართულებად შეკრა.`,
     sections: [
       { title: "წლის მთავარი თემა", body: `შენი მზის ნიშანი — ${sun} — გთხოვს, ენერგია იმ მიზნებში ჩადო, რომლებიც პირად მნიშვნელობას ატარებს. ასცენდენტი ${asc} გაჩვენებს, როგორ დაიწყო; მთვარე ${moon} კი როდის გჭირდება ტემპის შენელება და შინაგანი რესურსის აღდგენა.`, highlights: ["აირჩიე ერთი მთავარი წლიური მიმართულება", "შეაფასე პროგრესი ყოველ თვეში", "არ აურიო სიჩქარე და რეალური წინსვლა"] },
       { title: "ზრდა და შესაძლებლობები", body: `იუპიტერისა და მხარდამჭერი ტრანზიტების დღეები გაფართოების ფანჯრებს ქმნის. გამოიყენე ისინი მნიშვნელოვანი შეხვედრებისთვის, განაცხადებისთვის, სწავლისთვის და ხილვადობის გასაზრდელად.` },
@@ -58,10 +122,10 @@ function annual(input: Input): PremiumReportContentJson {
   };
   if (input.locale === "am") return {
     title: `${year} - Ձեր անձնական տարին`,
-    subtitle: `${baseName(input.firstName, input.locale)} · Արևը ${sun}-ում · Լուսինը ${moon}-ում · Ասցենդենտը ${asc}-ում`,
-    overview: `Այս կանխատեսումը միավորում է ձեր նատալ քարտեզը և առաջիկա 12 ամիսների տրանզիտները։ Գլխավոր խնդիրը ${sun}-ի նպատակը, ${moon}-ի հուզական կարիքները և ${asc}-ի գործելու ոճը մեկ ուղղության մեջ համադրելն է։`,
+    subtitle: `${baseName(input.firstName, input.locale)} · Արևը ${amSignLocative(sun)} · Լուսինը ${amSignLocative(moon)} · Ասցենդենտը ${amSignLocative(asc)}`,
+    overview: `Այս կանխատեսումը միավորում է ձեր նատալ քարտեզը և առաջիկա 12 ամիսների տրանզիտները։ Գլխավոր խնդիրը ${amSignGenitive(sun)} նպատակը, ${amSignGenitive(moon)} հուզական կարիքները և ${amSignGenitive(asc)} գործելու ոճը մեկ ուղղության մեջ համադրելն է։`,
     sections: [
-      { title: "Տարվա գլխավոր թեման", body: `${sun}-ում գտնվող Արևը հուշում է՝ ուժ ներդնել այն նպատակներում, որոնք անձնական իմաստ ունեն։ ${asc} ասցենդենտը նկարագրում է, թե ինչպես եք սկսում, իսկ ${moon}-ում գտնվող Լուսինը՝ երբ է պետք դանդաղել և վերականգնել ներքին պաշարները։`, highlights: ["Ընտրեք տարվա մեկ հիմնական ուղղություն", "Ամեն ամիս վերանայեք առաջընթացը", "Մի շփոթեք արագությունը իրական առաջընթացի հետ"] },
+      { title: "Տարվա գլխավոր թեման", body: `${amSignLocative(sun)} գտնվող Արևը հուշում է՝ ուժ ներդնել այն նպատակներում, որոնք անձնական իմաստ ունեն։ ${asc} ասցենդենտը նկարագրում է, թե ինչպես եք սկսում, իսկ ${amSignLocative(moon)} գտնվող Լուսինը՝ երբ է պետք դանդաղել և վերականգնել ներքին պաշարները։`, highlights: ["Ընտրեք տարվա մեկ հիմնական ուղղություն", "Ամեն ամիս վերանայեք առաջընթացը", "Մի շփոթեք արագությունը իրական առաջընթացի հետ"] },
       { title: "Աճ և հնարավորություններ", body: "Յուպիտերի և աջակցող անձնական տրանզիտների օրերը հնարավորություններ են ստեղծում դիմումների, ուսման, կարևոր զրույցների և ավելի մեծ տեսանելիության համար։" },
       { title: "Սահմաններ և վերափոխում", body: "Լարված շրջանները արգելք չեն, այլ ախտորոշիչ ազդակ։ Պատասխանեք կառուցվածքով, վերջնաժամկետներով և փոքր, կրկնվող քայլերով։" },
       { title: "Տարվա ռիթմը", body: "Բարձր էներգիայի պատուհաններում գործեք, իսկ ավելի հանգիստ շրջաններում վերանայեք, ավարտեք և վերականգնվեք։ Այս հերթագայությունը պահպանում է ձեր ընթացքը։" },
@@ -128,13 +192,13 @@ function career(input: Input): PremiumReportContentJson {
   const saturn = signName(input.chart.bodies.saturn.signIndex, input.locale);
   if (input.locale === "am") return {
     title: "Կարիերա և կոչում",
-    subtitle: `MC-ն ${mc}-ում · Արևը ${sun}-ում`,
-    overview: `${mc}-ում գտնվող MC-ն նկարագրում է ժամանակի ընթացքում կառուցվող հեղինակությունը, իսկ ${sun}-ում գտնվող Արևը՝ այն աշխատանքը, որը պահպանում է ձեր ներքին ներգրավվածությունը։ Այս զեկույցը այդ ազդակները վերածում է դերի, միջավայրի և աճի ընտրությունների։`,
+    subtitle: `MC-ն ${amSignLocative(mc)} · Արևը ${amSignLocative(sun)}`,
+    overview: `${amSignLocative(mc)} գտնվող MC-ն նկարագրում է ժամանակի ընթացքում կառուցվող հեղինակությունը, իսկ ${amSignLocative(sun)} գտնվող Արևը՝ այն աշխատանքը, որը պահպանում է ձեր ներքին ներգրավվածությունը։ Այս զեկույցը այդ ազդակները վերածում է դերի, միջավայրի և աճի ընտրությունների։`,
     sections: [
-      { title: "Հանրային ուղղություն", body: `Քարտեզի գագաթին գտնվող ${mc}-ը նպաստում է այնպիսի ուղու, որտեղ այդ նշանի հատկությունները դառնում են տեսանելի և օգտակար։ Կառուցեք կատարված աշխատանքի ապացույց, ոչ միայն ներուժ, և թույլ տվեք, որ հեղինակությունը ժամանակի ընթացքում կուտակվի։`, highlights: ["Ընտրեք տեսանելի արդյունք ունեցող աշխատանք", "Կառուցեք կրկնվող աշխատանքի պորտֆոլիո", "Հեղինակությանը վերաբերվեք որպես երկարաժամկետ ակտիվի"] },
-      { title: "Մտածողություն և հաղորդակցություն", body: `${mercury}-ում գտնվող Մերկուրին նկարագրում է, թե ինչպես եք սովորում, բացատրում և լուծումներ գտնում։ Աշխատանքային ընթացքը կառուցեք այդ ոճի շուրջ, բայց անհրաժեշտության դեպքում գիտակցաբար մարզեք նաև հակառակ մոտեցումը։` },
-      { title: "Կարգապահություն և վարպետություն", body: `${saturn}-ում գտնվող Սատուրնը ցույց է տալիս այն ոլորտը, որտեղ համբերությունը վերածվում է հեղինակության։ Առաջընթացը կարող է ավելի դանդաղ թվալ, բայց հետևողականությունը ստեղծում է ամուր վստահություն։` },
-      { title: "Լավագույն աշխատանքային միջավայրը", body: `${sun}-ում գտնվող ձեր Արևին անհրաժեշտ է բավարար ինքնուրույնություն՝ արդյունքով հետաքրքրվելու համար, և բավարար կառուցվածք՝ գործը ավարտելու համար։ Նախընտրեք թիմեր, որտեղ պատասխանատվությունը հստակ է, արձագանքը՝ օգտակար, իսկ խորությունը գնահատվում է աղմուկից առավել։` },
+      { title: "Հանրային ուղղություն", body: `Քարտեզի գագաթին գտնվող ${amSignDefinite(mc)} նպաստում է այնպիսի ուղու, որտեղ այդ նշանի հատկությունները դառնում են տեսանելի և օգտակար։ Կառուցեք կատարված աշխատանքի ապացույց, ոչ միայն ներուժ, և թույլ տվեք, որ հեղինակությունը ժամանակի ընթացքում կուտակվի։`, highlights: ["Ընտրեք տեսանելի արդյունք ունեցող աշխատանք", "Կառուցեք կրկնվող աշխատանքի պորտֆոլիո", "Հեղինակությանը վերաբերվեք որպես երկարաժամկետ ակտիվի"] },
+      { title: "Մտածողություն և հաղորդակցություն", body: `${amSignLocative(mercury)} գտնվող Մերկուրին նկարագրում է, թե ինչպես եք սովորում, բացատրում և լուծումներ գտնում։ Աշխատանքային ընթացքը կառուցեք այդ ոճի շուրջ, բայց անհրաժեշտության դեպքում գիտակցաբար մարզեք նաև հակառակ մոտեցումը։` },
+      { title: "Կարգապահություն և վարպետություն", body: `${amSignLocative(saturn)} գտնվող Սատուրնը ցույց է տալիս այն ոլորտը, որտեղ համբերությունը վերածվում է հեղինակության։ Առաջընթացը կարող է ավելի դանդաղ թվալ, բայց հետևողականությունը ստեղծում է ամուր վստահություն։` },
+      { title: "Լավագույն աշխատանքային միջավայրը", body: `${amSignLocative(sun)} գտնվող ձեր Արևին անհրաժեշտ է բավարար ինքնուրույնություն՝ արդյունքով հետաքրքրվելու համար, և բավարար կառուցվածք՝ գործը ավարտելու համար։ Նախընտրեք թիմեր, որտեղ պատասխանատվությունը հստակ է, արձագանքը՝ օգտակար, իսկ խորությունը գնահատվում է աղմուկից առավել։` },
     ],
     actionPlan: ["Սահմանեք մեկ մասնագիտական թեմա, որով ցանկանում եք ճանաչված լինել։", "30 օրվա ընթացքում ստեղծեք մեկ հանրային աշխատանքի օրինակ։", "Երեք վստահելի մարդու հարցրեք, թե որտեղ են տեսնում ձեր ամենաուժեղ առավելությունը։", "Մշտական թռիչքից առաջ անցկացրեք 90-օրյա փորձարկում։"],
     closing: "Կոչումը կարիերա է դառնում կրկնվող արդյունքի, սահմանների և ժամանակի շնորհիվ։",
@@ -142,13 +206,13 @@ function career(input: Input): PremiumReportContentJson {
   const en = input.locale === "en";
   return {
     title: en ? "Career and calling" : "კარიერა და მოწოდება",
-    subtitle: en ? `Midheaven in ${mc} · Sun in ${sun}` : `MC ${mc}-ში · მზე ${sun}-ში`,
-    overview: en ? `Your Midheaven in ${mc} describes the reputation you build over time, while your ${sun} Sun shows the work that keeps your identity engaged. This report turns those signals into choices about role, environment and growth.` : `MC ${mc}-ში აღწერს რეპუტაციას, რომელსაც დროთა განმავლობაში აშენებ; მზე ${sun}-ში კი აჩვენებს, როგორი საქმე ინარჩუნებს შენს შინაგან ჩართულობას. ეს რეპორტი ამ სიგნალებს როლის, გარემოსა და ზრდის არჩევანებად გარდაქმნის.`,
+    subtitle: en ? `Midheaven in ${mc} · Sun in ${sun}` : `MC ${kaSignLocative(mc)} · მზე ${kaSignLocative(sun)}`,
+    overview: en ? `Your Midheaven in ${mc} describes the reputation you build over time, while your ${sun} Sun shows the work that keeps your identity engaged. This report turns those signals into choices about role, environment and growth.` : `MC ${kaSignLocative(mc)} აღწერს რეპუტაციას, რომელსაც დროთა განმავლობაში აშენებ; მზე ${kaSignLocative(sun)} კი აჩვენებს, როგორი საქმე ინარჩუნებს შენს შინაგან ჩართულობას. ეს რეპორტი ამ სიგნალებს როლის, გარემოსა და ზრდის არჩევანებად გარდაქმნის.`,
     sections: [
       { title: en ? "Public direction" : "საზოგადოებრივი მიმართულება", body: en ? `${mc} at the top of your chart favors a career path where its qualities become visible and useful. Build proof of work—not only potential—and let your reputation compound.` : `${mc} რუკის მწვერვალზე გიბიძგებს კარიერისკენ, სადაც ამ ნიშნის თვისებები ხილული და სასარგებლო ხდება. ააშენე შესრულებული საქმის მტკიცებულება და არა მხოლოდ პოტენციალი.`, highlights: en ? ["Choose work with visible outcomes", "Build a repeatable body of proof", "Treat reputation as a long-term asset"] : ["აირჩიე საქმე ხილული შედეგით", "შექმენი განმეორებადი პორტფოლიო", "რეპუტაციას გრძელვადიან აქტივად შეხედე"] },
-      { title: en ? "Thinking and communication" : "აზროვნება და კომუნიკაცია", body: en ? `Mercury in ${mercury} describes how you learn, explain and solve. Design your workflow around that style, while deliberately practicing the opposite mode when the task requires it.` : `მერკური ${mercury}-ში აღწერს, როგორ სწავლობ, ხსნი და წყვეტ პრობლემებს. სამუშაო პროცესი ამ სტილზე ააწყვე, მაგრამ საჭიროებისას საპირისპირო რეჟიმიც შეგნებულად ავარჯიშე.` },
-      { title: en ? "Discipline and mastery" : "დისციპლინა და ოსტატობა", body: en ? `Saturn in ${saturn} marks the field where patience becomes authority. Progress may feel slower here, but consistency produces durable credibility.` : `სატურნი ${saturn}-ში მიუთითებს სფეროზე, სადაც მოთმინება ავტორიტეტად გარდაიქმნება. პროგრესი შეიძლება ნელი ჩანდეს, მაგრამ თანმიმდევრულობა მყარ სანდოობას ქმნის.` },
-      { title: en ? "Best work environment" : "შესაფერისი სამუშაო გარემო", body: en ? `Your ${sun} Sun needs enough autonomy to care about the result and enough structure to finish. Favor teams that make ownership clear, give useful feedback and reward depth over noise.` : `შენს ${sun}-ის მზეს სჭირდება საკმარისი ავტონომია შედეგით დასაინტერესებლად და საკმარისი სტრუქტურა საქმის დასასრულებლად. ეძებე გუნდი, სადაც პასუხისმგებლობა ნათელია და ხარისხიანი უკუკავშირი არსებობს.` },
+      { title: en ? "Thinking and communication" : "აზროვნება და კომუნიკაცია", body: en ? `Mercury in ${mercury} describes how you learn, explain and solve. Design your workflow around that style, while deliberately practicing the opposite mode when the task requires it.` : `მერკური ${kaSignLocative(mercury)} აღწერს, როგორ სწავლობ, ხსნი და წყვეტ პრობლემებს. სამუშაო პროცესი ამ სტილზე ააწყვე, მაგრამ საჭიროებისას საპირისპირო რეჟიმიც შეგნებულად ავარჯიშე.` },
+      { title: en ? "Discipline and mastery" : "დისციპლინა და ოსტატობა", body: en ? `Saturn in ${saturn} marks the field where patience becomes authority. Progress may feel slower here, but consistency produces durable credibility.` : `სატურნი ${kaSignLocative(saturn)} მიუთითებს სფეროზე, სადაც მოთმინება ავტორიტეტად გარდაიქმნება. პროგრესი შეიძლება ნელი ჩანდეს, მაგრამ თანმიმდევრულობა მყარ სანდოობას ქმნის.` },
+      { title: en ? "Best work environment" : "შესაფერისი სამუშაო გარემო", body: en ? `Your ${sun} Sun needs enough autonomy to care about the result and enough structure to finish. Favor teams that make ownership clear, give useful feedback and reward depth over noise.` : `შენს ${kaSignGenitive(sun)} მზეს სჭირდება საკმარისი ავტონომია შედეგით დასაინტერესებლად და საკმარისი სტრუქტურა საქმის დასასრულებლად. ეძებე გუნდი, სადაც პასუხისმგებლობა ნათელია და ხარისხიანი უკუკავშირი არსებობს.` },
     ],
     actionPlan: en ? ["Define one professional thesis you want to be known for.", "Create one public proof-of-work artifact in 30 days.", "Ask three trusted people where they see your strongest leverage.", "Run a 90-day experiment before making a permanent leap."] : ["განსაზღვრე ერთი პროფესიული თემა, რომლითაც გინდა გიცნობდნენ.", "30 დღეში შექმენი ერთი საჯარო ნამუშევარი.", "სამ სანდო ადამიანს ჰკითხე, სად ხედავენ შენს ყველაზე ძლიერ მხარეს.", "საბოლოო ნახტომამდე ჩაატარე 90-დღიანი ექსპერიმენტი."],
     closing: en ? "A calling becomes a career through repeated evidence, boundaries and time." : "მოწოდება კარიერად განმეორებადი შედეგით, საზღვრებითა და დროით იქცევა.",
@@ -170,9 +234,9 @@ function relationship(input: Input): PremiumReportContentJson {
     subtitle: `Ընդհանուր համատեղելիություն՝ ${result.overall}%`,
     overview: `Ձեր ${result.overall}% ցուցանիշը միտումների քարտեզ է, ոչ թե դատավճիռ։ Ամենաուժեղ ոլորտը ${label(sorted[0].key)}-ն է (${sorted[0].score}%), իսկ առավել գիտակցված աշխատանք պահանջող ոլորտը՝ ${label(sorted.at(-1)!.key)}-ն (${sorted.at(-1)!.score}%)։`,
     sections: [
-      { title: "Համատեղելիությունն ըստ ոլորտների", body: sorted.map((x) => `${label(x.key)} - ${x.score}%`).join("\n"), highlights: sorted.slice(0, 3).map((x) => `${label(x.key)}-ը հարաբերության բնական ռեսուրս է։`) },
+      { title: "Համատեղելիությունն ըստ ոլորտների", body: sorted.map((x) => `${label(x.key)} - ${x.score}% · ${areaTier(x.score, "am")}`).join("\n"), highlights: sorted.slice(0, 3).map((x) => `${amDefiniteWord(label(x.key))} հարաբերության բնական ռեսուրս է։`) },
       { title: "Ձեր ամենաուժեղ կապերը", body: result.topAspects.slice(0, 4).map((a) => `${bodyName(a.a, input.locale)} ${aspectsAm[a.kind] ?? a.kind} ${bodyName(a.b, input.locale)} · ${a.orb.toFixed(1)}°`).join("\n") || "Հարաբերությունը ձևավորվում է ամբողջական պատկերով, ոչ թե մեկ գերիշխող ասպեկտով։" },
-      { title: "Որտեղ լարվածությունը կարող է աճ դառնալ", body: `${label(sorted.at(-1)!.key)}-ի համեմատաբար ցածր ցուցանիշը հստակ պայմանավորվածությունների հրավեր է։ Մոտիվները ենթադրելուց առաջ անվանեք կարիքները և դժվար զրույցին վերադարձեք, երբ երկուսդ էլ հանգստանաք։` },
+      { title: "Որտեղ լարվածությունը կարող է աճ դառնալ", body: `«${label(sorted.at(-1)!.key)}» ոլորտի համեմատաբար ցածր ցուցանիշը հստակ պայմանավորվածությունների հրավեր է։ Մոտիվները ենթադրելուց առաջ անվանեք կարիքները և դժվար զրույցին վերադարձեք, երբ երկուսդ էլ հանգստանաք։` },
       { title: "Համատեղ ուսումնասիրության հարցեր", body: "Ի՞նչն է օգնում մեզանից յուրաքանչյուրին իրեն լսված զգալ։\nԻնչպիսի՞ն է աջակցությունը սթրեսի ժամանակ։\nՈ՞ր որոշումն է ավելի հստակ ընդհանուր համաձայնություն պահանջում։\nԻնչպե՞ս պաշտպանենք և՛ մտերմությունը, և՛ ինքնուրույնությունը։" },
     ],
     actionPlan: ["Անցկացրեք մեկ 30-րոպեանոց զրույց և առաջին 10 րոպեն միայն լսեք։", "Համաձայնեցրեք մեկ արտահայտություն լարված պահերը մեղմելու համար։", "Պլանավորեք մեկ զբաղմունք ձեր ամենաուժեղ համատեղելիության ոլորտի շուրջ։", "Կրկնվող վեճը դիտարկեք որպես ընդհանուր համակարգ, ոչ թե անձնական թերություն։"],
@@ -183,9 +247,9 @@ function relationship(input: Input): PremiumReportContentJson {
     subtitle: en ? `Overall compatibility ${result.overall}%` : `საერთო თავსებადობა ${result.overall}%`,
     overview: en ? `Your ${result.overall}% score is a map of tendencies, not a verdict. The strongest area is ${label(sorted[0].key)} (${sorted[0].score}%); the area asking for the most conscious work is ${label(sorted.at(-1)!.key)} (${sorted.at(-1)!.score}%).` : `თქვენი ${result.overall}% ქულა ტენდენციების რუკაა და არა განაჩენი. ყველაზე ძლიერი სფეროა ${label(sorted[0].key)} (${sorted[0].score}%), ხოლო ყველაზე შეგნებულ მუშაობას ითხოვს ${label(sorted.at(-1)!.key)} (${sorted.at(-1)!.score}%).`,
     sections: [
-      { title: en ? "Compatibility by area" : "თავსებადობა სფეროების მიხედვით", body: sorted.map((x) => `${label(x.key)} — ${x.score}%`).join("\n"), highlights: sorted.slice(0, 3).map((x) => en ? `${label(x.key)} is a natural resource for the relationship.` : `${label(x.key)} ურთიერთობის ბუნებრივი რესურსია.`) },
-      { title: en ? "Your strongest contacts" : "თქვენი ძლიერი კონტაქტები", body: result.topAspects.slice(0, 4).map((a) => `${bodyName(a.a, input.locale)} ${a.kind} ${bodyName(a.b, input.locale)} · ${a.orb.toFixed(1)}°`).join("\n") || (en ? "The relationship is shaped more by the full pattern than one dominant aspect." : "ურთიერთობას ერთი დომინანტური ასპექტის ნაცვლად მთლიანი სურათი აყალიბებს.") },
-      { title: en ? "Where friction can become growth" : "სად შეიძლება დაძაბულობა ზრდად იქცეს", body: en ? `Treat a lower ${label(sorted.at(-1)!.key)} score as a prompt for explicit agreements. Name needs before interpreting motives, and return to the conversation after nervous systems have settled.` : `${label(sorted.at(-1)!.key)}-ის შედარებით დაბალი ქულა მკაფიო შეთანხმებებისკენ გიბიძგებთ. განზრახვების გამოცნობის ნაცვლად დაასახელეთ საჭიროებები და რთულ საუბარს დამშვიდების შემდეგ დაუბრუნდით.` },
+      { title: en ? "Compatibility by area" : "თავსებადობა სფეროების მიხედვით", body: sorted.map((x) => `${label(x.key)} — ${x.score}% · ${areaTier(x.score, input.locale)}`).join("\n"), highlights: sorted.slice(0, 3).map((x) => en ? `${label(x.key)} is a natural resource for the relationship.` : `${label(x.key)} ურთიერთობის ბუნებრივი რესურსია.`) },
+      { title: en ? "Your strongest contacts" : "თქვენი ძლიერი კონტაქტები", body: result.topAspects.slice(0, 4).map((a) => `${bodyName(a.a, input.locale)} ${en ? a.kind : aspectKindKa(a.kind)} ${bodyName(a.b, input.locale)} · ${a.orb.toFixed(1)}°`).join("\n") || (en ? "The relationship is shaped more by the full pattern than one dominant aspect." : "ურთიერთობას ერთი დომინანტური ასპექტის ნაცვლად მთლიანი სურათი აყალიბებს.") },
+      { title: en ? "Where friction can become growth" : "სად შეიძლება დაძაბულობა ზრდად იქცეს", body: en ? `Treat a lower ${label(sorted.at(-1)!.key)} score as a prompt for explicit agreements. Name needs before interpreting motives, and return to the conversation after nervous systems have settled.` : `შედარებით დაბალი მაჩვენებელი სფეროში „${label(sorted.at(-1)!.key)}“ მკაფიო შეთანხმებებისკენ გიბიძგებთ. განზრახვების გამოცნობის ნაცვლად დაასახელეთ საჭიროებები და რთულ საუბარს დამშვიდების შემდეგ დაუბრუნდით.` },
       { title: en ? "Questions to explore together" : "საერთო კითხვები", body: en ? "What helps each of us feel heard?\nWhat does support look like during stress?\nWhich decision needs a clearer shared agreement?\nHow do we protect both closeness and autonomy?" : "რა ეხმარება თითოეულ ჩვენგანს, რომ მოსმენილად იგრძნოს თავი?\nროგორ გამოიყურება მხარდაჭერა სტრესის დროს?\nრომელ გადაწყვეტილებას სჭირდება უფრო მკაფიო შეთანხმება?\nროგორ დავიცვათ სიახლოვეც და ავტონომიაც?" },
     ],
     actionPlan: en ? ["Hold one 30-minute check-in without problem-solving for the first 10 minutes.", "Agree on one repair phrase for tense moments.", "Plan one activity around your strongest compatibility area.", "Review one recurring conflict as a shared system, not a personal defect."] : ["ჩაატარეთ 30-წუთიანი check-in და პირველი 10 წუთი მხოლოდ მოუსმინეთ.", "შეთანხმდით ერთ ფრაზაზე დაძაბული მომენტის შესარბილებლად.", "დაგეგმეთ აქტივობა ყველაზე ძლიერი სფეროს გარშემო.", "განმეორებადი კონფლიქტი საერთო სისტემად განიხილეთ და არა პირად ნაკლად."],

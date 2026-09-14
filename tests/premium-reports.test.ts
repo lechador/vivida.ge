@@ -3,9 +3,21 @@ import { describe, expect, it } from "vitest";
 
 import { PremiumReport } from "@/components/pdf/premium-report";
 import type { NatalChartJson } from "@/db/schema";
-import { buildPremiumReportContent } from "@/lib/reports/premium-content";
+import type { UserLocale } from "@/lib/i18n/user-locale";
+import {
+  amDefiniteWord,
+  amSignDefinite,
+  amSignGenitive,
+  amSignLocative,
+  areaTier,
+  aspectKindKa,
+  buildPremiumReportContent,
+  kaSignGenitive,
+  kaSignLocative,
+} from "@/lib/reports/premium-content";
 import { resolveRelationshipReportView } from "@/lib/reports/relationship-view";
 import type { ReportProductKey } from "@/lib/report-catalog";
+import { signByIndex } from "@/lib/zodiac";
 
 const BODY_KEYS = ["sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto"] as const;
 
@@ -61,6 +73,136 @@ describe("premium report content", () => {
       expect(pdf.length).toBeGreaterThan(10_000);
     }
   });
+});
+
+describe("sign-name declension", () => {
+  const ka = Array.from({ length: 12 }, (_, index) => signByIndex(index).labelKa);
+  const am = Array.from({ length: 12 }, (_, index) => signByIndex(index).labelAm);
+
+  it("declines every Georgian sign without a hyphen", () => {
+    expect(ka.map(kaSignGenitive)).toEqual([
+      "ვერძის", "კუროს", "ტყუპების", "კირჩხიბის", "ლომის", "ქალწულის",
+      "სასწორის", "მორიელის", "მშვილდოსანის", "თხის რქის", "მერწყულის", "თევზების",
+    ]);
+    expect(ka.map(kaSignLocative)).toEqual([
+      "ვერძში", "კუროში", "ტყუპებში", "კირჩხიბში", "ლომში", "ქალწულში",
+      "სასწორში", "მორიელში", "მშვილდოსანში", "თხის რქაში", "მერწყულში", "თევზებში",
+    ]);
+  });
+
+  it("declines every Armenian sign without a hyphen", () => {
+    expect(am.map(amSignLocative)).toEqual([
+      "Խոյում", "Ցուլում", "Երկվորյակներում", "Խեցգետնում", "Առյուծում", "Կույսում",
+      "Կշեռքում", "Կարիճում", "Աղեղնավորում", "Այծեղջյուրում", "Ջրհոսում", "Ձկներում",
+    ]);
+    expect(am.map(amSignGenitive)).toEqual([
+      "Խոյի", "Ցուլի", "Երկվորյակների", "Խեցգետնի", "Առյուծի", "Կույսի",
+      "Կշեռքի", "Կարիճի", "Աղեղնավորի", "Այծեղջյուրի", "Ջրհոսի", "Ձկների",
+    ]);
+    expect(am.map(amSignDefinite)).toEqual([
+      "Խոյը", "Ցուլը", "Երկվորյակները", "Խեցգետինը", "Առյուծը", "Կույսը",
+      "Կշեռքը", "Կարիճը", "Աղեղնավորը", "Այծեղջյուրը", "Ջրհոսը", "Ձկները",
+    ]);
+  });
+
+  it("names every aspect in Georgian and tiers every score band", () => {
+    expect([
+      aspectKindKa("conjunction"),
+      aspectKindKa("sextile"),
+      aspectKindKa("square"),
+      aspectKindKa("trine"),
+      aspectKindKa("opposition"),
+    ]).toEqual(["შეერთება", "სექსტილი", "კვადრატი", "ტრინი", "ოპოზიცია"]);
+    expect([areaTier(90, "ka"), areaTier(70, "ka"), areaTier(40, "ka")]).toEqual([
+      "ძლიერი", "სტაბილური", "განვითარებადი",
+    ]);
+    expect([areaTier(90, "am"), areaTier(70, "am"), areaTier(40, "am")]).toEqual([
+      "ուժեղ", "կայուն", "զարգացող",
+    ]);
+    expect([areaTier(90, "en"), areaTier(70, "en"), areaTier(40, "en")]).toEqual([
+      "strong", "steady", "developing",
+    ]);
+    expect([
+      amDefiniteWord("Քիմիա"),
+      amDefiniteWord("Աճ"),
+      amDefiniteWord("Սեր"),
+      amDefiniteWord("Ընկերություն"),
+    ]).toEqual(["Քիմիան", "Աճը", "Սերը", "Ընկերությունը"]);
+  });
+});
+
+describe("report depth and language purity", () => {
+  const MIN_PROSE: Record<ReportProductKey, number> = {
+    annual: 1500,
+    relationship: 1100,
+    career: 1100,
+    timing: 2500,
+  };
+
+  for (const type of ["annual", "relationship", "career", "timing"] satisfies ReportProductKey[]) {
+    for (const locale of ["ka", "en", "am"] satisfies UserLocale[]) {
+      it(`fills the ${type} report with substantial copy in ${locale}`, () => {
+        const firstName = locale === "ka" ? "ნინო" : locale === "am" ? "Անի" : "Anna";
+        const content = buildPremiumReportContent({
+          type,
+          chart: chart(),
+          locale,
+          firstName,
+          timezone: "Asia/Tbilisi",
+          partner: type === "relationship" ? { name: "Partner", chart: chart(7) } : undefined,
+          now: new Date("2026-08-26T12:00:00Z"),
+        });
+        const prose = [
+          content.title, content.subtitle, content.overview, content.closing,
+          ...content.sections.flatMap((section) => [section.title, section.body, ...(section.highlights ?? [])]),
+          ...(content.keyDates ?? []).flatMap((date) => [date.title, date.note]),
+          ...content.actionPlan,
+        ].join("");
+        expect(content.sections.length).toBeGreaterThanOrEqual(4);
+        for (const section of content.sections) {
+          expect(section.title.length).toBeGreaterThan(0);
+          expect(section.body.length).toBeGreaterThanOrEqual(50);
+        }
+        expect(content.actionPlan.length).toBeGreaterThanOrEqual(4);
+        if (type === "annual") expect(content.keyDates?.length).toBeGreaterThanOrEqual(6);
+        if (type === "timing") expect(content.keyDates?.length).toBeGreaterThanOrEqual(10);
+        expect(prose.length).toBeGreaterThan(MIN_PROSE[type]);
+        expect(prose).not.toMatch(/undefined|null|NaN|TODO|Lorem|FIXME/);
+      });
+
+      it(`keeps the ${type}/${locale} copy in its own script`, () => {
+        const content = buildPremiumReportContent({
+          type,
+          chart: chart(),
+          locale,
+          firstName: "Test",
+          timezone: "Asia/Tbilisi",
+          partner: type === "relationship" ? { name: "Partner", chart: chart(7) } : undefined,
+          now: new Date("2026-08-26T12:00:00Z"),
+        });
+        const serialized = JSON.stringify(content);
+        // Hyphen-glued case endings are never grammatical in ka/am.
+        expect(serialized).not.toMatch(/[ა-ჰ]-ში/);
+        expect(serialized).not.toMatch(/[ა-ჰ]-ის/);
+        expect(serialized).not.toMatch(/[Ա-ֆ]-ում/);
+        if (locale === "ka") {
+          expect(serialized).toMatch(/[ა-ჰ]/);
+          expect(serialized).not.toMatch(/[Ա-ֆ]/);
+          if (type === "relationship") {
+            expect(serialized).not.toMatch(/conjunction|sextile|square|trine|opposition/);
+          }
+        }
+        if (locale === "en") {
+          expect(serialized).not.toMatch(/[ა-ჰ]/);
+          expect(serialized).not.toMatch(/[Ա-ֆ]/);
+        }
+        if (locale === "am") {
+          expect(serialized).toMatch(/[Ա-ֆ]/);
+          expect(serialized).not.toMatch(/[ა-ჰ]/);
+        }
+      });
+    }
+  }
 });
 
 describe("relationship report perspective", () => {

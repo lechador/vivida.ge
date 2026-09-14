@@ -1,5 +1,4 @@
 import { Button, Heading, Text } from "@react-email/components";
-import * as React from "react";
 
 import {
   EmailLayout,
@@ -32,9 +31,10 @@ export function MarketingEmail({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const am = locale === "am";
   const greeting = name
-    ? en ? `Hello, ${name}!` : `სალამი, ${name}!`
-    : en ? "Hello!" : "სალამი!";
+    ? am ? `Բարև, ${name}!` : en ? `Hello, ${name}!` : `სალამი, ${name}!`
+    : am ? "Բարև!" : en ? "Hello!" : "სალამი!";
   const paragraphs = body.split(/\n\n+/).filter(Boolean);
   return (
     <EmailLayout preview={heading} unsubscribeUrl={unsubscribeUrl} locale={locale}>
