@@ -11,7 +11,7 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     services:
       postgres:
         image: postgres:17-alpine
@@ -71,3 +71,13 @@ jobs:
 
       - name: End-to-end smoke tests
         run: npm run test:e2e
+
+      - name: Lighthouse performance budgets
+        run: npm run perf:ci
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouserc/

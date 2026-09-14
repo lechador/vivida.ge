@@ -39,6 +39,7 @@ npm run check:env   # fails when code reads a key missing from .env.example
 | `npm run check:env` | env-coverage check (also runs in CI) |
 | `npm test` | vitest unit suite |
 | `npm run test:e2e` | Playwright smoke + accessibility sweep |
+| `npm run perf:ci` | Lighthouse budgets (/, /horoskopi, /nataluri-ruka, /en) — CLS ≤ 0.1 hard gate, LCP/perf warnings |
 | `npm run qa:armenian` | Armenian launch audit (`scripts/audit-armenian-launch.mjs`) |
 | `npm run audit:prod` | `npm audit` for prod deps, high+ |
 | `npm run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle schema workflow |
