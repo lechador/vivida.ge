@@ -31,18 +31,20 @@ npm run check:env   # fails when code reads a key missing from .env.example
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` / `build` / `start` | run / build / serve production |
-| `npm run lint` | eslint (must be warning-free) |
-| `npm run typecheck` | `tsc --noEmit` (has `noUnusedLocals`) |
-| `npm run check:env` | env-coverage check (also runs in CI) |
-| `npm test` | vitest unit suite |
-| `npm run test:e2e` | Playwright smoke + accessibility sweep |
-| `npm run perf:ci` | Lighthouse budgets (/, /horoskopi, /nataluri-ruka, /en) — CLS ≤ 0.1 hard gate, LCP/perf warnings |
-| `npm run qa:armenian` | Armenian launch audit (`scripts/audit-armenian-launch.mjs`) |
-| `npm run audit:prod` | `npm audit` for prod deps, high+ |
-| `npm run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle schema workflow |
+| Command                                                        | What it does                                                                                     |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `npm run dev` / `build` / `start`                              | run / build / serve production                                                                   |
+| `npm run lint`                                                 | eslint (must be warning-free)                                                                    |
+| `npm run typecheck`                                            | `tsc --noEmit` (has `noUnusedLocals`)                                                            |
+| `npm run check`                                                | `check:env` + `lint` + `typecheck` in one go                                                     |
+| `npm run format` / `format:check`                              | prettier write / check (pre-commit hook formats staged files)                                    |
+| `npm run check:env`                                            | env-coverage check (also runs in CI)                                                             |
+| `npm test`                                                     | vitest unit suite                                                                                |
+| `npm run test:e2e`                                             | Playwright smoke + accessibility sweep                                                           |
+| `npm run perf:ci`                                              | Lighthouse budgets (/, /horoskopi, /nataluri-ruka, /en) — CLS ≤ 0.1 hard gate, LCP/perf warnings |
+| `npm run qa:armenian`                                          | Armenian launch audit (`scripts/audit-armenian-launch.mjs`)                                      |
+| `npm run audit:prod`                                           | `npm audit` for prod deps, high+                                                                 |
+| `npm run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle schema workflow                                                                          |
 
 ## Database
 

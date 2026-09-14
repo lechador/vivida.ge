@@ -3,33 +3,19 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 import {
   ENGLISH_HOSTS,
+  ENGLISH_LEGACY_CONTENT_REDIRECTS,
   ENGLISH_PUBLIC_ROUTES,
   ENGLISH_SITE_URL,
   GEORGIAN_HOSTS,
 } from "./lib/seo/locales";
 
-/**
- * Georgian keyword landing pages that overlap an established English page.
- *
- * Serving the Georgian page on the international host would create a
- * language-mismatched, competing URL. A host-scoped permanent redirect keeps
- * the Georgian URLs intact on vivida.ge while consolidating English signals
- * on the existing canonical page.
- */
-const ENGLISH_LEGACY_CONTENT_REDIRECTS = [
-  // Renders the identical <NatalChartPageEn /> as /natal-chart, so on the
-  // international host it was a straight duplicate of the canonical English
-  // URL — two self-canonicalling copies competing for the same query. The
-  // Georgian /nataluri-ruka is untouched: this is host-scoped.
-  { source: "/nataluri-ruka", destination: "/natal-chart" },
-  { source: "/piradi-ruka", destination: "/natal-chart" },
-  {
-    source: "/piradi-ruka/rogor-shevadginot",
-    destination: "/natal-chart",
-  },
-  { source: "/piradi-horoskopi", destination: "/horoscope" },
-  { source: "/mkitxaoba", destination: "/tarot" },
-  { source: "/zodiac/tavsebadoba", destination: "/compatibility" },
+// Every route that may render a report PDF reads the Georgian TTFs via fs;
+// Vercel's tracer won't follow the dynamic path, so bundle them explicitly.
+const REPORT_PDF_ROUTES = [
+  "/api/dev/report-pdf",
+  "/api/stripe/webhook",
+  "/api/reports/checkout",
+  "/api/reports/[id]",
 ] as const;
 
 const nextConfig: NextConfig = {
@@ -37,14 +23,9 @@ const nextConfig: NextConfig = {
   // tracer won't pick up a dynamic path on its own, so include them explicitly
   // in that function's bundle (otherwise the font is missing on the deploy and
   // Georgian renders as tofu).
-  outputFileTracingIncludes: {
-    // Every route that may render a report PDF reads the Georgian TTFs via fs;
-    // Vercel's tracer won't follow the dynamic path, so bundle them explicitly.
-    "/api/dev/report-pdf": ["./app/_fonts/*.ttf"],
-    "/api/stripe/webhook": ["./app/_fonts/*.ttf"],
-    "/api/reports/checkout": ["./app/_fonts/*.ttf"],
-    "/api/reports/[id]": ["./app/_fonts/*.ttf"],
-  },
+  outputFileTracingIncludes: Object.fromEntries(
+    REPORT_PDF_ROUTES.map((route) => [route, ["./app/_fonts/*.ttf"]]),
+  ),
   async redirects() {
     // The personality test moved from /test to the keyword-rich Georgian slug
     // /pirovnebis-testi ("პიროვნების ტესტი"). 301 the old paths so any early
@@ -75,7 +56,11 @@ const nextConfig: NextConfig = {
       ...legacyEnglishRedirects,
       ...legacyContentRedirects,
       { source: "/test", destination: "/pirovnebis-testi", permanent: true },
-      { source: "/test/claim", destination: "/pirovnebis-testi/claim", permanent: true },
+      {
+        source: "/test/claim",
+        destination: "/pirovnebis-testi/claim",
+        permanent: true,
+      },
     ];
   },
   async rewrites() {
@@ -142,8 +127,8 @@ const nextConfig: NextConfig = {
 
 const canUploadSentrySourceMaps = Boolean(
   process.env.SENTRY_AUTH_TOKEN &&
-    process.env.SENTRY_ORG &&
-    process.env.SENTRY_PROJECT,
+  process.env.SENTRY_ORG &&
+  process.env.SENTRY_PROJECT,
 );
 
 const nextConfigWithSentry = withSentryConfig(nextConfig, {

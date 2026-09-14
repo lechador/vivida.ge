@@ -75,9 +75,7 @@ test.describe("calculator to signup continuity", () => {
     await page.getByPlaceholder("წუთი").fill("30");
     await page.locator("#calc-place").fill("თბ");
     await page.getByRole("button", { name: "Tbilisi" }).click();
-    await page
-      .getByRole("button", { name: "გამოთვალე ჩემი რუკა" })
-      .click();
+    await page.getByRole("button", { name: "გამოთვალე ჩემი რუკა" }).click();
 
     await expect(
       page.getByRole("heading", { name: "პლანეტების პოზიციები" }),
@@ -95,9 +93,6 @@ test.describe("calculator to signup continuity", () => {
 
     await expect(
       page.getByRole("link", { name: "უფასო რეგისტრაცია" }),
-    ).toHaveAttribute(
-      "href",
-      "/signup?next=%2Fonboarding%3Fnext%3D%2Freport",
-    );
+    ).toHaveAttribute("href", "/signup?next=%2Fonboarding%3Fnext%3D%2Freport");
   });
 });

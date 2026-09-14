@@ -31,8 +31,7 @@ export type CoreEnglishPath =
   | "/terms";
 
 export type CoreEnglishInternalPath =
-  | "/en"
-  | `/en${Exclude<CoreEnglishPath, "/">}`;
+  "/en" | `/en${Exclude<CoreEnglishPath, "/">}`;
 
 /**
  * Explicit pairs keep hreflang honest: only pages with a real English version
@@ -46,7 +45,11 @@ export const CORE_LANGUAGE_PAIRS: ReadonlyArray<{
   { ka: "/", en: "/", internalEn: "/en" },
   { ka: "/nataluri-ruka", en: "/natal-chart", internalEn: "/en/natal-chart" },
   { ka: "/zodiac", en: "/zodiac", internalEn: "/en/zodiac" },
-  { ka: "/zodiac/tavsebadoba", en: "/compatibility", internalEn: "/en/compatibility" },
+  {
+    ka: "/zodiac/tavsebadoba",
+    en: "/compatibility",
+    internalEn: "/en/compatibility",
+  },
   { ka: "/tests", en: "/tests", internalEn: "/en/tests" },
   { ka: "/privacy", en: "/privacy", internalEn: "/en/privacy" },
   { ka: "/terms", en: "/terms", internalEn: "/en/terms" },
@@ -92,7 +95,11 @@ export function siteOriginForHost(host: string | null | undefined): string {
 export function resolveEnglishPath(path: string): string {
   const normalized = publicEnglishPath(path);
   const found = CORE_LANGUAGE_PAIRS.find(
-    (p) => p.ka === path || p.en === normalized || p.internalEn === path || p.en === path,
+    (p) =>
+      p.ka === path ||
+      p.en === normalized ||
+      p.internalEn === path ||
+      p.en === path,
   );
   if (found) return found.en;
   return internationalPublicPath(normalized);
@@ -107,12 +114,12 @@ export function localizedAlternates(
   const kaPath =
     locale === "ka"
       ? canonicalPath || "/"
-      : CORE_LANGUAGE_PAIRS.find(
+      : (CORE_LANGUAGE_PAIRS.find(
           (p) =>
             p.en === publicEnglishPath(canonicalPath) ||
             p.internalEn === canonicalPath ||
             p.en === publicEnglishPath(pairedPath),
-        )?.ka ?? pairedPath;
+        )?.ka ?? pairedPath);
 
   const rawEnPath =
     locale === "en"
@@ -134,8 +141,8 @@ export function localizedAlternates(
     locale === "am"
       ? `${ENGLISH_SITE_URL}${amPath}`
       : locale === "en"
-      ? `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`
-      : `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
+        ? `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`
+        : `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
   const englishUrl = `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
   const georgianUrl = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
   const armenianUrl = `${ENGLISH_SITE_URL}${amPath}`;
@@ -191,3 +198,31 @@ export function armenianSiteHref(path: string, onEnglishHost: boolean): string {
   if (onEnglishHost) return amPath;
   return `${ENGLISH_SITE_URL}${amPath}`;
 }
+
+/**
+ * Georgian keyword landing pages that overlap an established English page.
+ *
+ * Serving the Georgian page on the international host would create a
+ * language-mismatched, competing URL. A host-scoped permanent redirect keeps
+ * the Georgian URLs intact on vivida.ge while consolidating English signals
+ * on the existing canonical page.
+ *
+ * Lives here (not in next.config.ts) so the SEO suite can assert the
+ * contract: every source must stay a 200 with Georgian copy on the Georgian
+ * hosts and a 308 to its destination on the English hosts.
+ */
+export const ENGLISH_LEGACY_CONTENT_REDIRECTS = [
+  // Renders the identical <NatalChartPageEn /> as /natal-chart, so on the
+  // international host it was a straight duplicate of the canonical English
+  // URL — two self-canonicalling copies competing for the same query. The
+  // Georgian /nataluri-ruka is untouched: this is host-scoped.
+  { source: "/nataluri-ruka", destination: "/natal-chart" },
+  { source: "/piradi-ruka", destination: "/natal-chart" },
+  {
+    source: "/piradi-ruka/rogor-shevadginot",
+    destination: "/natal-chart",
+  },
+  { source: "/piradi-horoskopi", destination: "/horoscope" },
+  { source: "/mkitxaoba", destination: "/tarot" },
+  { source: "/zodiac/tavsebadoba", destination: "/compatibility" },
+] as const;

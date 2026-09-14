@@ -79,19 +79,53 @@ test.describe("locale routing", () => {
     );
   });
 
-  test("Georgian slug on the English host consolidates onto English", async ({
-    request,
-  }) => {
-    const res = await request.get("/nataluri-ruka", {
-      headers: { host: EN_HOST },
-      maxRedirects: 0,
-    });
+  // Full duplicate-content matrix: every Georgian keyword URL that overlaps
+  // an English page must 308 to its canonical on the English host while
+  // staying a Georgian 200 on vivida.ge. Unit-level list consistency lives in
+  // tests/seo-legacy-redirects.test.ts; this asserts live behavior per entry.
+  const legacyMatrix = [
+    {
+      source: "/nataluri-ruka",
+      destination: "https://www.vividaastro.com/natal-chart",
+    },
+    {
+      source: "/piradi-ruka",
+      destination: "https://www.vividaastro.com/natal-chart",
+    },
+    {
+      source: "/piradi-ruka/rogor-shevadginot",
+      destination: "https://www.vividaastro.com/natal-chart",
+    },
+    {
+      source: "/piradi-horoskopi",
+      destination: "https://www.vividaastro.com/horoscope",
+    },
+    { source: "/mkitxaoba", destination: "https://www.vividaastro.com/tarot" },
+    {
+      source: "/zodiac/tavsebadoba",
+      destination: "https://www.vividaastro.com/compatibility",
+    },
+  ] as const;
 
-    expect(res.status()).toBe(308);
-    expect(res.headers()["location"]).toBe(
-      "https://www.vividaastro.com/natal-chart",
-    );
-  });
+  for (const { source, destination } of legacyMatrix) {
+    test(`${source} consolidates on the English host, stays Georgian on .ge`, async ({
+      request,
+    }) => {
+      const en = await request.get(source, {
+        headers: { host: EN_HOST },
+        maxRedirects: 0,
+      });
+      expect(en.status()).toBe(308);
+      expect(en.headers()["location"]).toBe(destination);
+
+      const ge = await request.get(source, {
+        headers: { host: GE_HOST },
+      });
+      expect(ge.status()).toBe(200);
+      // Georgian URL, Georgian copy — never an English duplicate.
+      expect(await ge.text()).toMatch(/[ა-ჰ]/);
+    });
+  }
 
   test("Armenian URL on the Georgian host moves to the .com host", async ({
     request,
