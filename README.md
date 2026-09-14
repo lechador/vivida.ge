@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# vivida.ge — Vivida web app
 
-## Getting Started
+Trilingual astrology platform (Next.js 16 App Router, React 19):
 
-First, run the development server:
+- `ka` — Georgian, served on the vivida.ge host
+- `en` — English, served on the vividaastro.com host (clean URLs rewritten to the internal `/en` tree)
+- `am` — Armenian, served under `/am` on the international host
+
+See `docs/armenian-parity-handoff.md` for the locale-routing invariants before touching `proxy.ts`, rewrites, or hreflang.
+
+## Stack
+
+Next.js 16 · React 19 · Auth.js v5 (Google + Apple + credentials) · Drizzle ORM + Neon Postgres · Stripe + RevenueCat · Resend email · Cloudflare R2 + Turnstile · Sentry · Vercel (region `fra1`)
+
+## Getting started
+
+Requires Node `>=22`.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+cp .env.example .env.local   # fill in values; every key is documented
+npm run db:push               # create schema in your dev database
+npm run dev                   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Validate the environment at any time:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run check:env   # fails when code reads a key missing from .env.example
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Command | What it does |
+|---|---|
+| `npm run dev` / `build` / `start` | run / build / serve production |
+| `npm run lint` | eslint (must be warning-free) |
+| `npm run typecheck` | `tsc --noEmit` (has `noUnusedLocals`) |
+| `npm run check:env` | env-coverage check (also runs in CI) |
+| `npm test` | vitest unit suite |
+| `npm run test:e2e` | Playwright smoke + accessibility sweep |
+| `npm run qa:armenian` | Armenian launch audit (`scripts/audit-armenian-launch.mjs`) |
+| `npm run audit:prod` | `npm audit` for prod deps, high+ |
+| `npm run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle schema workflow |
 
-To learn more about Next.js, take a look at the following resources:
+## Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Schema lives in `db/` (`schema.ts`), migrations in `drizzle/` (80+ and counting). CI applies `db:migrate` against a `postgres:17` service; locally `db:push` is fastest for iteration.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Integration tests (`tests/*.integration.test.ts`) need a scratch Postgres via `TEST_DATABASE_URL` and skip automatically when it is unset. Never point it at production.
 
-## Deploy on Vercel
+## Tests
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `tests/` — ~95 vitest files: billing/credits, SEO content matrices (`-am`/`-en`), webhooks, growth metrics, auth.
+- `e2e/` — Playwright smoke, accessibility (`@axe-core`), audit sweep. Thin by design; add coverage when touching `proxy.ts`, checkout return, or onboarding prefill.
+- `scripts/check-env.mjs` — keeps `.env.example` in sync with `process.env.*` usage.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Crons (vercel.json)
+
+`daily-horoscope` 05:00, `daily-horoscope-retry` 05:30, `monthly-credits` (1st, 06:00), `feed-notification-emails` hourly :15, `personal-reminders` hourly. All ingeniously guarded by `CRON_SECRET` / `ADMIN_API_TOKEN` — see `lib/cron/`.
+
+## Docs
+
+- `docs/product-growth-priorities.md` — retention/monetization roadmap, funnel event contract, credit-economy guardrails
+- `docs/production-monitoring.md` — Sentry setup and alerting
+- `docs/armenian-parity-handoff.md` — locale routing, currency, and translation invariants
+- `scripts/README.md` — ops/content script catalog
