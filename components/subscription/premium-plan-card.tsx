@@ -2,10 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, Crown, Loader2 } from "lucide-react";
+import { Check, Crown, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { formatBillingAmount, type PremiumPlan } from "@/lib/billing-config";
+import {
+  discountedPremiumPlanForCountry,
+  formatBillingAmount,
+  premiumPlanSavingsPercent,
+  type PremiumPlan,
+} from "@/lib/billing-config";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { fbTrack } from "@/lib/fb-pixel";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
@@ -40,29 +45,39 @@ export function PremiumPlanCard({
   const am = locale === "am";
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
+  const discountedPlan = discountedPremiumPlanForCountry(plan.countryCode);
+  const [selectedKey, setSelectedKey] = useState(
+    () => discountedPlan?.key ?? plan.key,
+  );
+  const selectedPlan = discountedPlan?.key === selectedKey ? discountedPlan : plan;
+  const months = selectedPlan.intervalCount ?? 1;
+  const isDiscounted = Boolean(discountedPlan && selectedPlan.key === discountedPlan.key);
+  const savings = discountedPlan
+    ? premiumPlanSavingsPercent(plan, discountedPlan)
+    : 0;
 
   useEffect(() => {
     if (active) return;
     const params = {
-      product: plan.key,
+      product: selectedPlan.key,
       placement,
-      value: plan.amountMinor / 100,
-      currency: plan.currency,
+      value: selectedPlan.amountMinor / 100,
+      currency: selectedPlan.currency,
     };
     trackEvent(ANALYTICS_EVENT.proExposure, params);
     trackEvent(ANALYTICS_EVENT.paywallViewed, {
       ...params,
       surface: placement,
     });
-  }, [active, placement, plan.amountMinor, plan.currency, plan.key]);
+  }, [active, placement, selectedPlan.amountMinor, selectedPlan.currency, selectedPlan.key]);
 
   async function subscribe() {
     trackEvent(ANALYTICS_EVENT.productSelected, {
-      product: plan.key,
+      product: selectedPlan.key,
       surface: placement,
       payment_model: "subscription",
-      value: plan.amountMinor / 100,
-      currency: plan.currency,
+      value: selectedPlan.amountMinor / 100,
+      currency: selectedPlan.currency,
     });
     setPending(true);
     setError(false);
@@ -70,7 +85,7 @@ export function PremiumPlanCard({
       const response = await fetch("/api/subscription/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ returnTo }),
+        body: JSON.stringify({ planKey: selectedPlan.key, returnTo }),
       });
       const data = (await response.json().catch(() => ({}))) as {
         url?: string; eventId?: string; value?: number; currency?: string; contentId?: string;
@@ -108,11 +123,48 @@ export function PremiumPlanCard({
             ))}
           </ul>
         </div>
-        <div className="shrink-0 rounded-2xl border border-[var(--vivida-gold)]/25 bg-background/35 p-4 text-center sm:min-w-44">
+        <div className="shrink-0 rounded-2xl border border-[var(--vivida-gold)]/25 bg-background/35 p-4 text-center sm:min-w-56">
+          {discountedPlan && !active && (
+            <div className="mb-4 grid grid-cols-2 rounded-xl border border-border/60 bg-background/45 p-1 text-xs">
+              <button
+                type="button"
+                onClick={() => setSelectedKey(discountedPlan.key)}
+                className={`rounded-lg px-2 py-2 font-semibold transition-colors ${isDiscounted ? "bg-[var(--vivida-gold)]/18 text-[var(--vivida-gold)]" : "text-muted-foreground hover:text-foreground"}`}
+                aria-pressed={isDiscounted}
+              >
+                {am ? "3 ամիս" : en ? "3 months" : "3 თვე"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedKey(plan.key)}
+                className={`rounded-lg px-2 py-2 font-semibold transition-colors ${!isDiscounted ? "bg-card text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                aria-pressed={!isDiscounted}
+              >
+                {am ? "Ամսական" : en ? "Monthly" : "თვიური"}
+              </button>
+            </div>
+          )}
+          {isDiscounted && (
+            <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-gold)]/16 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--vivida-gold)]">
+              <Sparkles className="size-3" />
+              {am ? `Խնայեք ${savings}%` : en ? `Save ${savings}%` : `დაზოგე ${savings}%`}
+            </div>
+          )}
           <div className="text-3xl font-bold tracking-tight">
-            {formatBillingAmount(plan.amountMinor, plan.currency, locale)}
+            {formatBillingAmount(selectedPlan.amountMinor, selectedPlan.currency, locale)}
           </div>
-          <div className="text-xs text-muted-foreground">/{am ? "ամիս" : en ? "month" : "თვე"}</div>
+          <div className="text-xs text-muted-foreground">
+            /{months === 1 ? (am ? "ամիս" : en ? "month" : "თვე") : (am ? `${months} ամիս` : en ? `${months} months` : `${months} თვე`)}
+          </div>
+          {isDiscounted && (
+            <div className="mt-1 text-xs text-foreground/70">
+              {am ? "Ընդամենը" : en ? "Only" : "მხოლოდ"}{" "}
+              <span className="font-semibold text-foreground">
+                {formatBillingAmount(Math.round(selectedPlan.amountMinor / months), selectedPlan.currency, locale)}
+              </span>{" "}
+              {am ? "ամսական" : en ? "per month" : "თვეში"}
+            </div>
+          )}
           {active ? (
             <Button asChild variant="outline" className="mt-3 w-full">
               <Link href="/subscription">{am ? "Կառավարել PRO-ն" : en ? "Manage PRO" : "PRO-ს მართვა"}</Link>
@@ -120,7 +172,9 @@ export function PremiumPlanCard({
           ) : (
             <Button type="button" variant="mystic" className="mt-3 w-full" onClick={subscribe} disabled={pending}>
               {pending && <Loader2 className="size-4 animate-spin" />}
-              {am ? "Ստանալ PRO" : en ? "Get PRO" : "გახდი PRO"}
+              {isDiscounted
+                ? am ? "Ստանալ 3 ամիս" : en ? "Get 3 months" : "მიიღე 3 თვე"
+                : am ? "Ստանալ PRO" : en ? "Get PRO" : "გახდი PRO"}
             </Button>
           )}
           {error && (
@@ -130,7 +184,13 @@ export function PremiumPlanCard({
           )}
           {!active && (
             <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
-              {am ? "Ավտոմատ կերպով թարմացվում է ամեն ամիս։ Կարող եք չեղարկել ցանկացած պահի։" : en ? "Renews automatically each month. Cancel anytime." : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
+              {isDiscounted
+                ? am
+                  ? "Նույն գնով թարմացվում է յուրաքանչյուր 3 ամիսը մեկ։ Կարող եք չեղարկել ցանկացած պահի։"
+                  : en
+                    ? "Renews every 3 months at the same price. Cancel anytime."
+                    : "იგივე ფასად ყოველ 3 თვეში განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."
+                : am ? "Ավտոմատ կերպով թարմացվում է ամեն ամիս։ Կարող եք չեղարկել ցանկացած պահի։" : en ? "Renews automatically each month. Cancel anytime." : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
             </p>
           )}
         </div>

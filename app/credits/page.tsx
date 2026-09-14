@@ -19,7 +19,10 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
-import { premiumPlanForCountry } from "@/lib/billing-config";
+import {
+  premiumPlanForCountry,
+  shouldShowPurchasePromotion,
+} from "@/lib/billing-config";
 import { countryCodeFromHeaders, setResidenceCountryIfMissing } from "@/lib/residence";
 import { PremiumPlanCard } from "@/components/subscription/premium-plan-card";
 import { LowCreditOfferCard } from "@/components/subscription/low-credit-offer-card";
@@ -114,6 +117,10 @@ export default async function CreditsPage({
   }
   const link = `${SITE_URL[locale]}/?ref=${ref.code}`;
   const premiumPlan = premiumPlanForCountry(identity?.countryCode);
+  const showPurchasePromotions = shouldShowPurchasePromotion({
+    isPremium: premium,
+    balance,
+  });
 
   return (
     <main
@@ -154,7 +161,7 @@ export default async function CreditsPage({
           <CreditProgressCard balance={balance} nextMonthlyDate={nextMonthlyBonusDate()} locale={locale} />
         </div>
 
-        {!premium && !offer && (
+        {showPurchasePromotions && !offer && (
           <div className="mt-4">
             <CreditsVsPro
               locale={locale}
@@ -162,6 +169,7 @@ export default async function CreditsPage({
               placement="credits_hub_comparison"
               creditHref="#credit-packs"
               proHref="#pro-plan"
+              balance={balance}
             />
           </div>
         )}
@@ -177,7 +185,7 @@ export default async function CreditsPage({
             </span>
             <span aria-hidden>→</span>
           </Link>
-        ) : offer ? (
+        ) : showPurchasePromotions && offer ? (
           // The offer replaces the standard PRO card rather than sitting beside
           // it: two prices for the same thing is a reason to hesitate.
           <div className="mt-4">
@@ -196,7 +204,7 @@ export default async function CreditsPage({
               locale={locale}
             />
           </div>
-        ) : premiumPlan ? (
+        ) : showPurchasePromotions && premiumPlan ? (
           <div id="pro-plan" className="mt-4 scroll-mt-20">
             <PremiumPlanCard
               plan={premiumPlan}

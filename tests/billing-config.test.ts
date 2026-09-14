@@ -8,7 +8,13 @@ import {
   LOW_CREDIT_PROMO_MONTHS,
   LOW_CREDIT_PROMO_PLAN,
   PREMIUM_PLANS_BY_COUNTRY,
+  discountedPremiumPlanForCountry,
+  featuredPremiumPlanForCountry,
+  premiumPlanByKeyForCountry,
+  premiumPlanSavingsPercent,
   premiumPlanForCountry,
+  PURCHASE_PROMOTION_CREDIT_THRESHOLD,
+  shouldShowPurchasePromotion,
 } from "@/lib/billing-config";
 
 describe("country billing catalogue", () => {
@@ -107,11 +113,7 @@ describe("low-credit win-back promo", () => {
     expect(LOW_CREDIT_PROMO_MONTHS).toBe(3);
   });
 
-  /**
-   * The offer is targeted. If country lookup could ever return it, every
-   * Georgian visiting /credits would be shown ₾29 instead of ₾19.90.
-   */
-  it("is unreachable from country lookup alone", () => {
+  it("keeps the standard monthly lookup stable for existing callers", () => {
     expect(premiumPlanForCountry("GE")!.key).toBe("premium_ge_monthly");
     expect(Object.values(PREMIUM_PLANS_BY_COUNTRY)).not.toContain(
       LOW_CREDIT_PROMO_PLAN,
@@ -133,6 +135,63 @@ describe("low-credit win-back promo", () => {
     expect(LOW_CREDIT_PROMO_PLAN.stripeLookupKey).not.toBe(
       premiumPlanForCountry("GE")!.stripeLookupKey,
     );
+  });
+});
+
+describe("public discounted PRO plan", () => {
+  it("features the quarterly ₾29 plan in Georgia", () => {
+    expect(discountedPremiumPlanForCountry("GE")).toEqual(LOW_CREDIT_PROMO_PLAN);
+    expect(featuredPremiumPlanForCountry("GE")).toEqual(LOW_CREDIT_PROMO_PLAN);
+  });
+
+  it("keeps monthly PRO featured in markets without a quarterly plan", () => {
+    expect(discountedPremiumPlanForCountry("GB")).toBeNull();
+    expect(featuredPremiumPlanForCountry("GB")).toEqual(
+      premiumPlanForCountry("GB"),
+    );
+  });
+
+  it("only resolves server-approved plans for the user's market", () => {
+    expect(
+      premiumPlanByKeyForCountry("GE", LOW_CREDIT_PROMO_PLAN.key),
+    ).toEqual(LOW_CREDIT_PROMO_PLAN);
+    expect(
+      premiumPlanByKeyForCountry("GB", LOW_CREDIT_PROMO_PLAN.key),
+    ).toBeNull();
+    expect(premiumPlanByKeyForCountry("GE", "made_up_price")).toBeNull();
+  });
+
+  it("calculates the displayed discount against three monthly payments", () => {
+    expect(
+      premiumPlanSavingsPercent(
+        premiumPlanForCountry("GE"),
+        LOW_CREDIT_PROMO_PLAN,
+      ),
+    ).toBe(51);
+  });
+});
+
+describe("purchase-promotion eligibility", () => {
+  it("shows acquisition prompts below 25 credits", () => {
+    expect(PURCHASE_PROMOTION_CREDIT_THRESHOLD).toBe(25);
+    expect(
+      shouldShowPurchasePromotion({ isPremium: false, balance: 24 }),
+    ).toBe(true);
+  });
+
+  it("suppresses acquisition prompts at 25 credits and above", () => {
+    expect(
+      shouldShowPurchasePromotion({ isPremium: false, balance: 25 }),
+    ).toBe(false);
+    expect(
+      shouldShowPurchasePromotion({ isPremium: false, balance: 180 }),
+    ).toBe(false);
+  });
+
+  it("always suppresses acquisition prompts for PRO subscribers", () => {
+    expect(
+      shouldShowPurchasePromotion({ isPremium: true, balance: 0 }),
+    ).toBe(false);
   });
 });
 

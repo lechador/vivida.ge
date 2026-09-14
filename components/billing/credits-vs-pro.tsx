@@ -7,8 +7,12 @@ import { ArrowRight, Check, Coins, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   creditPacksForCountry,
+  discountedPremiumPlanForCountry,
+  featuredPremiumPlanForCountry,
   formatBillingAmount,
+  premiumPlanSavingsPercent,
   premiumPlanForCountry,
+  shouldShowPurchasePromotion,
 } from "@/lib/billing-config";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { EXPERIMENTS } from "@/lib/experiment-catalog";
@@ -26,6 +30,8 @@ export function CreditsVsPro({
   proHref,
   context = "general",
   compact = false,
+  balance,
+  isPremium = false,
 }: {
   locale: UserLocale;
   countryCode?: string | null;
@@ -34,21 +40,33 @@ export function CreditsVsPro({
   proHref: string;
   context?: BillingContext;
   compact?: boolean;
+  balance?: number;
+  isPremium?: boolean;
 }) {
   const en = locale === "en";
   const am = locale === "am";
   const starterPack = creditPacksForCountry(countryCode)[0];
-  const pro = premiumPlanForCountry(countryCode);
+  const standardPro = premiumPlanForCountry(countryCode);
+  const discountedPro = discountedPremiumPlanForCountry(countryCode);
+  const pro = featuredPremiumPlanForCountry(countryCode);
+  const proMonths = pro.intervalCount ?? 1;
+  const proSavings = discountedPro
+    ? premiumPlanSavingsPercent(standardPro, discountedPro)
+    : 0;
   const variant = useExperiment(EXPERIMENTS.pricingPresentation, placement);
+  const showPromotion = balance == null
+    ? !isPremium
+    : shouldShowPurchasePromotion({ isPremium, balance });
 
   useEffect(() => {
+    if (!showPromotion) return;
     trackEvent(ANALYTICS_EVENT.proExposure, {
       product: pro.key,
       placement,
       value: pro.amountMinor / 100,
       currency: pro.currency,
     });
-  }, [placement, pro.amountMinor, pro.currency, pro.key]);
+  }, [placement, pro.amountMinor, pro.currency, pro.key, showPromotion]);
 
   function trackChoice(destination: "credits" | "subscription") {
     trackEvent(ANALYTICS_EVENT.recommendationClicked, {
@@ -77,6 +95,8 @@ export function CreditsVsPro({
           ? "Choose what fits your rhythm"
           : "აირჩიე შენთვის მოსახერხებელი გზა";
 
+  if (!showPromotion) return null;
+
   return (
     <section
       className={cn(
@@ -99,10 +119,16 @@ export function CreditsVsPro({
                 ? "Pay once with credits for this report, or choose PRO for unlimited reports, tarot, AI chat, and forecasts."
                 : "ამ ანგარიშისთვის გადაიხადე ერთხელ კრედიტებით, ან აირჩიე PRO — ულიმიტო ანგარიშებისთვის, ტაროსთვის, AI ჩატისა და პროგნოზებისთვის."
             : am
-              ? "Կրեդիտները միանվագ գնում են, իսկ PRO-ն՝ ամսական անսահմանափակ հասանելիություն։"
+              ? discountedPro
+                ? "Կրեդիտները միանվագ գնում են, իսկ PRO-ն 3 ամսով բացում է ամեն ինչ՝ զեղչված գնով։"
+                : "Կրեդիտները միանվագ գնում են, իսկ PRO-ն՝ ամսական անսահմանափակ հասանելիություն։"
               : en
-                ? "Credits are a one-time purchase. PRO is unlimited monthly access."
-                : "კრედიტები ერთჯერადი შენაძენია, PRO კი — ყოველთვიური ულიმიტო წვდომა."}
+                ? discountedPro
+                  ? "Credits are a one-time purchase. PRO unlocks everything for 3 months at a discounted price."
+                  : "Credits are a one-time purchase. PRO is unlimited monthly access."
+                : discountedPro
+                  ? "კრედიტები ერთჯერადი შენაძენია, PRO კი ყველაფერს 3 თვით, ფასდაკლებით ხსნის."
+                  : "კრედიტები ერთჯერადი შენაძენია, PRO კი — ყოველთვიური ულიმიტო წვდომა."}
         </p>
       </div>
 
@@ -147,6 +173,11 @@ export function CreditsVsPro({
           <div aria-hidden className="absolute -right-10 -top-12 size-36 rounded-full bg-[var(--vivida-gold)]/12 blur-3xl" />
           <div className="relative flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--vivida-gold)]">
             <Crown className="size-4" /> Vivida PRO
+            {discountedPro && (
+              <span className="ml-auto rounded-full bg-[var(--vivida-gold)]/16 px-2 py-0.5 text-[9px]">
+                −{proSavings}%
+              </span>
+            )}
           </div>
           <h3 className="relative mt-3 text-xl font-semibold">
             {am ? "Անսահմանափակ հասանելիություն" : en ? "Unlimited access" : "ულიმიტო წვდომა"}
@@ -155,8 +186,17 @@ export function CreditsVsPro({
             <span className="text-2xl font-bold tracking-tight">
               {formatBillingAmount(pro.amountMinor, pro.currency, locale)}
             </span>
-            <span className="text-xs text-muted-foreground">/ {am ? "ամիս" : en ? "month" : "თვე"}</span>
+            <span className="text-xs text-muted-foreground">
+              / {proMonths === 1 ? (am ? "ամիս" : en ? "month" : "თვე") : (am ? `${proMonths} ամիս` : en ? `${proMonths} months` : `${proMonths} თვე`)}
+            </span>
           </div>
+          {discountedPro && (
+            <p className="relative mt-1 text-xs font-medium text-[var(--vivida-gold)]">
+              {am ? "Ընդամենը" : en ? "Only" : "მხოლოდ"}{" "}
+              {formatBillingAmount(Math.round(pro.amountMinor / proMonths), pro.currency, locale)}
+              {am ? " ամսական" : en ? " per month" : " თვეში"}
+            </p>
+          )}
           <ul className="relative mt-4 flex-1 space-y-2 text-sm text-foreground/75">
             {[
               am ? "Բոլոր կրեդիտային գործառույթներն առանց սահմանափակումների" : en ? "Every credit-gated feature, unlimited" : "ყველა კრედიტიანი ფუნქცია ულიმიტოდ",

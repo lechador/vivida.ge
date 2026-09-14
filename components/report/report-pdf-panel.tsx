@@ -127,6 +127,7 @@ export async function ReportPdfPanel({
           proHref="/subscription"
           context="natal_report"
           compact
+          balance={balance}
         />
       )}
     </div>

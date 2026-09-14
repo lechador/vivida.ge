@@ -1,7 +1,10 @@
 import { after, NextResponse } from "next/server";
 
 import { auth } from "@/auth";
-import { premiumPlanForCountry } from "@/lib/billing-config";
+import {
+  premiumPlanByKeyForCountry,
+  premiumPlanForCountry,
+} from "@/lib/billing-config";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 import {
   createPremiumCheckoutSession,
@@ -30,7 +33,11 @@ export async function POST(req: Request) {
   // The promo is requested by name, never priced by the client. Eligibility is
   // resolved from the campaign here, so a user who was never addressed — or
   // whose offer has expired — cannot reach the ₾29 price by posting the flag.
-  const body = (await req.json().catch(() => null)) as { offer?: unknown; returnTo?: unknown } | null;
+  const body = (await req.json().catch(() => null)) as {
+    offer?: unknown;
+    planKey?: unknown;
+    returnTo?: unknown;
+  } | null;
   const wantsOffer = body?.offer === "low_credits";
   const returnTo = typeof body?.returnTo === "string" ? normalizeReturnPath(body.returnTo) : null;
 
@@ -40,7 +47,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "offer_unavailable" }, { status: 403 });
   }
 
-  const plan = offer?.plan ?? premiumPlanForCountry(identity?.countryCode);
+  const selectedPlan = body?.planKey == null
+    ? null
+    : premiumPlanByKeyForCountry(identity?.countryCode, body.planKey);
+  if (body?.planKey != null && !selectedPlan) {
+    return NextResponse.json({ error: "invalid_plan" }, { status: 400 });
+  }
+
+  const plan = offer?.plan ?? selectedPlan ?? premiumPlanForCountry(identity?.countryCode);
 
   try {
     const tracking = checkoutTrackingFromRequest(req);

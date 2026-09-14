@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, LogOut, Settings, Sparkles, User } from "lucide-react";
+import { BookOpen, Crown, LogOut, Settings, Sparkles, User } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -15,6 +15,11 @@ import {
 import { signOutAction } from "@/actions/auth";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import {
+  featuredPremiumPlanForCountry,
+  formatBillingAmount,
+  shouldShowPurchasePromotion,
+} from "@/lib/billing-config";
 
 export function UserMenu({
   name,
@@ -23,6 +28,7 @@ export function UserMenu({
   username,
   balance,
   isPremium = false,
+  countryCode,
   locale = "ka",
 }: {
   name: string | null;
@@ -31,11 +37,18 @@ export function UserMenu({
   username: string | null;
   balance?: number;
   isPremium?: boolean;
+  countryCode?: string | null;
   locale?: UserLocale;
 }) {
   const [isPending, startTransition] = useTransition();
   const en = locale !== "ka";
   const am = locale === "am";
+  const featuredPro = featuredPremiumPlanForCountry(countryCode);
+  const proMonths = featuredPro.intervalCount ?? 1;
+  const showProEntry = isPremium || shouldShowPurchasePromotion({
+    isPremium,
+    balance: balance ?? 0,
+  });
 
   return (
     <DropdownMenu>
@@ -100,11 +113,20 @@ export function UserMenu({
             {am ? "Իմ գրադարանը" : en ? "My library" : "ჩემი ბიბლიოთეკა"}
           </Link>
         </DropdownMenuItem>
-        {isPremium && (
+        {showProEntry && (
           <DropdownMenuItem asChild>
             <Link href="/subscription" className="cursor-pointer">
-              <Sparkles className="size-4 text-[var(--vivida-gold)]" />
-              PRO
+              <Crown className="size-4 text-[var(--vivida-gold)]" />
+              {isPremium
+                ? (am ? "Կառավարել PRO-ն" : en ? "Manage PRO" : "PRO-ს მართვა")
+                : proMonths > 1
+                  ? (am ? `${proMonths} ամիս PRO` : en ? `${proMonths} months of PRO` : `${proMonths} თვე PRO`)
+                  : (am ? "Ստանալ PRO" : en ? "Get PRO" : "გახდი PRO")}
+              {!isPremium && (
+                <span className="ml-auto text-xs font-semibold text-[var(--vivida-gold)]">
+                  {formatBillingAmount(featuredPro.amountMinor, featuredPro.currency, locale)}
+                </span>
+              )}
             </Link>
           </DropdownMenuItem>
         )}

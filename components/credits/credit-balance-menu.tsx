@@ -6,7 +6,9 @@ import { ArrowRight, CreditCard, Crown, Loader2, Plus, Sparkles } from "lucide-r
 
 import {
   creditPacksForCountry,
+  featuredPremiumPlanForCountry,
   formatBillingAmount,
+  shouldShowPurchasePromotion,
 } from "@/lib/credits-config";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import {
@@ -35,6 +37,8 @@ export function CreditBalanceMenu({
   const en = locale !== "ka";
   const am = locale === "am";
   const packs = creditPacksForCountry(countryCode);
+  const featuredPro = featuredPremiumPlanForCountry(countryCode);
+  const proMonths = featuredPro.intervalCount ?? 1;
 
   if (isPremium) {
     return (
@@ -131,6 +135,36 @@ export function CreditBalanceMenu({
             </button>
           ))}
         </div>
+
+        {shouldShowPurchasePromotion({ isPremium, balance }) && (
+          <Link
+            href="/subscription"
+            className="mt-3 flex items-center gap-3 rounded-2xl border border-[var(--vivida-gold)]/30 bg-[var(--vivida-gold)]/8 p-3 transition-colors hover:bg-[var(--vivida-gold)]/14"
+          >
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--vivida-gold)]/14 text-[var(--vivida-gold)]">
+              <Crown className="size-4" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs font-semibold text-foreground">
+                {proMonths > 1
+                  ? am ? `${proMonths} ամիս Vivida PRO` : en ? `${proMonths} months of Vivida PRO` : `${proMonths} თვე Vivida PRO`
+                  : am ? "Vivida PRO" : en ? "Unlimited with PRO" : "ულიმიტო წვდომა PRO-თი"}
+              </span>
+              <span className="block text-[10px] text-muted-foreground">
+                {am ? "Բոլոր գործառույթներն առանց կրեդիտային սահմանափակման" : en ? "Every feature, without credit limits" : "ყველა ფუნქცია კრედიტების ლიმიტის გარეშე"}
+              </span>
+            </span>
+            <span className="shrink-0 text-right">
+              <span className="block text-sm font-bold text-[var(--vivida-gold)]">
+                {formatBillingAmount(featuredPro.amountMinor, featuredPro.currency, locale)}
+              </span>
+              <span className="block text-[9px] text-muted-foreground">
+                /{proMonths > 1 ? (am ? `${proMonths} ամիս` : en ? `${proMonths} mo` : `${proMonths} თვე`) : (am ? "ամիս" : en ? "mo" : "თვე")}
+              </span>
+            </span>
+            <ArrowRight className="size-3.5 shrink-0 text-[var(--vivida-gold)]" />
+          </Link>
+        )}
 
         {failed && (
           <p role="alert" className="mt-2 text-center text-xs text-destructive">

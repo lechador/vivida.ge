@@ -21,8 +21,11 @@ export const MONTHLY_BONUS = 5;
 export {
   creditPackForCountry,
   creditPacksForCountry,
+  featuredPremiumPlanForCountry,
   formatBillingAmount,
   premiumPlanForCountry,
+  PURCHASE_PROMOTION_CREDIT_THRESHOLD,
+  shouldShowPurchasePromotion,
   type CreditPack,
   type PremiumPlan,
 } from "@/lib/billing-config";

@@ -4,14 +4,26 @@ import { FileText, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
+import { auth } from "@/auth";
+import { getBalance } from "@/lib/credits";
+import { isPremiumUser } from "@/lib/premium";
+import { shouldShowPurchasePromotion } from "@/lib/billing-config";
 
 /**
  * Marketing promo for the paid natal PDF report, for public/SEO pages.
- * Kept auth-independent so every SEO page using it remains static/ISR. Signup
- * already redirects an authenticated visitor to the supplied `next` path.
+ * The report itself remains visible to everyone. Its acquisition-price
+ * comparison is personalized so established credit holders and subscribers
+ * are not repeatedly marketed to while reading public content.
  */
 export async function ReportPromo({ className }: { className?: string }) {
-  const locale = await getRequestLocale();
+  const [locale, session] = await Promise.all([getRequestLocale(), auth()]);
+  const userId = session?.user?.id;
+  const [balance, premium] = userId
+    ? await Promise.all([getBalance(userId), isPremiumUser(userId)])
+    : [undefined, false];
+  const showPricingComparison = balance == null
+    ? !premium
+    : shouldShowPurchasePromotion({ isPremium: premium, balance });
   const en = locale === "en";
   const am = locale === "am";
   return (
@@ -59,17 +71,21 @@ export async function ReportPromo({ className }: { className?: string }) {
           </span>
         </div>
       </div>
-      <div className="relative mt-6">
-        <CreditsVsPro
-          locale={locale}
-          countryCode={locale === "am" ? "AM" : locale === "en" ? "GB" : "GE"}
-          placement="public_natal_report_comparison"
-          creditHref="/signup?next=%2Fcredits"
-          proHref="/signup?next=%2Fsubscription"
-          context="natal_report"
-          compact
-        />
-      </div>
+      {showPricingComparison && (
+        <div className="relative mt-6">
+          <CreditsVsPro
+            locale={locale}
+            countryCode={locale === "am" ? "AM" : locale === "en" ? "GB" : "GE"}
+            placement="public_natal_report_comparison"
+            creditHref="/signup?next=%2Fcredits"
+            proHref="/signup?next=%2Fsubscription"
+            context="natal_report"
+            compact
+            balance={balance}
+            isPremium={premium}
+          />
+        </div>
+      )}
     </div>
   );
 }

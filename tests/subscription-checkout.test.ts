@@ -74,4 +74,46 @@ describe("POST /api/subscription/checkout", () => {
       }),
     );
   });
+
+  it("accepts the public Georgian quarterly plan from the server catalogue", async () => {
+    mocks.getBillingIdentity.mockResolvedValue({
+      countryCode: "GE",
+      email: "georgian@example.com",
+      stripeCustomerId: null,
+    });
+
+    const response = await POST(
+      new Request("https://vivida.ge/api/subscription/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ planKey: "promo_ge_quarterly" }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.createCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        plan: expect.objectContaining({
+          key: "promo_ge_quarterly",
+          amountMinor: 2900,
+          currency: "gel",
+          intervalCount: 3,
+        }),
+      }),
+    );
+  });
+
+  it("rejects a plan that is not available in the user's market", async () => {
+    const response = await POST(
+      new Request("https://vividaastro.com/api/subscription/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ planKey: "promo_ge_quarterly" }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ error: "invalid_plan" });
+    expect(mocks.createCheckout).not.toHaveBeenCalled();
+  });
 });

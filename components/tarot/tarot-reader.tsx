@@ -330,6 +330,7 @@ export function TarotReader({
               creditHref="/credits"
               proHref="/subscription"
               compact
+              balance={reading.balance}
             />
           )}
 

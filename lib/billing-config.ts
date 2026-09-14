@@ -21,6 +21,23 @@ export type PremiumPlan = {
 };
 
 /**
+ * Acquisition prompts stop once a user has enough balance for a substantial
+ * paid action. Dedicated billing pages remain available when they deliberately
+ * choose to visit them.
+ */
+export const PURCHASE_PROMOTION_CREDIT_THRESHOLD = 25;
+
+export function shouldShowPurchasePromotion({
+  isPremium,
+  balance,
+}: {
+  isPremium: boolean;
+  balance: number;
+}): boolean {
+  return !isPremium && balance < PURCHASE_PROMOTION_CREDIT_THRESHOLD;
+}
+
+/**
  * Georgian one-time alternatives to the ₾19.90/month unlimited plan.
  *
  * Priced for the local market rather than converted from the UK sheet: the
@@ -96,8 +113,8 @@ export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
 };
 
 /**
- * Targeted win-back offer: three months of PRO for ₾29, shown only to the
- * users the low-credit campaign addressed (see lib/promo-offer.ts).
+ * Three months of PRO for ₾29. It started as a targeted win-back offer and is
+ * now also the public discounted Georgian plan.
  *
  * A real quarterly Stripe subscription rather than a one-off grant, so every
  * existing entitlement path works untouched — syncPremiumSubscription writes
@@ -106,8 +123,9 @@ export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
  * any other subscriber. It renews at ₾29 per quarter, NOT at the ₾19.90
  * monthly rate, so this is a standing discount for as long as they stay.
  *
- * The offer is deliberately absent from PREMIUM_PLANS_BY_COUNTRY: country
- * alone must never resolve to it, or every Georgian would see the promo price.
+ * The plan stays separate from PREMIUM_PLANS_BY_COUNTRY so legacy callers that
+ * explicitly need the standard monthly price keep receiving it. Public sales
+ * surfaces opt into the discounted plan through the helpers below.
  */
 export const LOW_CREDIT_PROMO_PLAN: PremiumPlan = {
   key: "promo_ge_quarterly",
@@ -117,6 +135,20 @@ export const LOW_CREDIT_PROMO_PLAN: PremiumPlan = {
   interval: "month",
   intervalCount: 3,
   stripeLookupKey: "vivida_promo_ge_quarterly_2900_v1",
+};
+
+/**
+ * Public discounted PRO plan for Georgia.
+ *
+ * This intentionally reuses the battle-tested quarterly Stripe price that was
+ * launched for the low-credit campaign. Keeping the key stable means existing
+ * subscribers, webhook metadata, and billing-portal records continue to line
+ * up while the offer becomes available across the product.
+ */
+export const DISCOUNTED_PREMIUM_PLANS_BY_COUNTRY: Partial<
+  Record<string, PremiumPlan>
+> = {
+  GE: LOW_CREDIT_PROMO_PLAN,
 };
 
 /** Months of PRO one purchase of the promo buys — used in the offer copy. */
@@ -162,6 +194,48 @@ export function premiumPlanForCountry(
 ): PremiumPlan {
   const code = normalizeCountryCode(countryCode);
   return (code && PREMIUM_PLANS_BY_COUNTRY[code]) || PREMIUM_PLANS_BY_COUNTRY.GE;
+}
+
+/** The public multi-month deal for this market, when one is available. */
+export function discountedPremiumPlanForCountry(
+  countryCode: string | null | undefined,
+): PremiumPlan | null {
+  const code = normalizeCountryCode(countryCode);
+  // Match the standard catalogue's Georgian fallback for markets that do not
+  // yet have their own prices. Launched GB and AM keep their local plans.
+  const market = code && PREMIUM_PLANS_BY_COUNTRY[code] ? code : "GE";
+  return DISCOUNTED_PREMIUM_PLANS_BY_COUNTRY[market] ?? null;
+}
+
+/**
+ * Resolve a user-selectable plan without trusting any client-supplied price.
+ * Only plans belonging to the user's market can be returned.
+ */
+export function premiumPlanByKeyForCountry(
+  countryCode: string | null | undefined,
+  planKey: unknown,
+): PremiumPlan | null {
+  if (typeof planKey !== "string") return null;
+  const standard = premiumPlanForCountry(countryCode);
+  const discounted = discountedPremiumPlanForCountry(countryCode);
+  return [standard, discounted].find((plan) => plan?.key === planKey) ?? null;
+}
+
+/** Prefer the discounted multi-month plan anywhere a single PRO price is shown. */
+export function featuredPremiumPlanForCountry(
+  countryCode: string | null | undefined,
+): PremiumPlan {
+  return discountedPremiumPlanForCountry(countryCode) ?? premiumPlanForCountry(countryCode);
+}
+
+export function premiumPlanSavingsPercent(
+  standard: PremiumPlan,
+  discounted: PremiumPlan,
+): number {
+  const months = discounted.intervalCount ?? 1;
+  const regularTotal = standard.amountMinor * months;
+  if (regularTotal <= 0 || standard.currency !== discounted.currency) return 0;
+  return Math.max(0, Math.round((1 - discounted.amountMinor / regularTotal) * 100));
 }
 
 const CURRENCY_SYMBOL: Record<string, string> = {

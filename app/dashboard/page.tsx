@@ -12,10 +12,13 @@ import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
 import { DashboardArticleRecommendations } from "@/components/dashboard/article-recommendations";
+import { DashboardBillingNudge } from "@/components/dashboard/billing-nudge";
 import { TESTS } from "@/lib/tests-catalog";
 import { listPublishedArticlePreviews, type ArticlePreview } from "@/lib/articles";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { getBalance } from "@/lib/credits";
+import { shouldShowPurchasePromotion } from "@/lib/billing-config";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -43,10 +46,14 @@ function pickDailyArticles(
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [[profile], [userRow], [mbtiResult], [iqResult], [eqResult], [bigFiveResult]] = await Promise.all([
+  const [[profile], [userRow], [mbtiResult], [iqResult], [eqResult], [bigFiveResult], balance] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     db
-      .select({ locale: users.interfaceLanguage })
+      .select({
+        locale: users.interfaceLanguage,
+        countryCode: users.residenceCountryCode,
+        isPremium: users.isPremium,
+      })
       .from(users)
       .where(eq(users.id, user.id))
       .limit(1),
@@ -54,6 +61,7 @@ export default async function DashboardPage() {
     db.select({ id: iqResults.id }).from(iqResults).where(eq(iqResults.userId, user.id)).limit(1),
     db.select({ id: eqResults.id }).from(eqResults).where(eq(eqResults.userId, user.id)).limit(1),
     db.select({ id: bigFiveResults.id }).from(bigFiveResults).where(eq(bigFiveResults.userId, user.id)).limit(1),
+    getBalance(user.id),
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
   const en = locale !== "ka";
@@ -137,6 +145,18 @@ export default async function DashboardPage() {
             stream closes immediately and the browser tab spinner stops.
             Our internal CosmicLoader covers the AI generation window. */}
         <DailyDashboard userId={user.id} locale={locale} />
+
+        {shouldShowPurchasePromotion({
+          isPremium: userRow?.isPremium ?? false,
+          balance,
+        }) && (
+          <div className="mt-8">
+            <DashboardBillingNudge
+              locale={locale}
+              countryCode={userRow?.countryCode}
+            />
+          </div>
+        )}
 
         <DashboardArticleRecommendations articles={suggestedArticles} locale={locale} />
 

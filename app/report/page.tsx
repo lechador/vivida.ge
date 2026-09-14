@@ -18,7 +18,11 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ClearPendingNatalProfile } from "@/components/onboarding/clear-pending-natal-profile";
 import type { Metadata } from "next";
 import { PremiumPlanCard } from "@/components/subscription/premium-plan-card";
-import { premiumPlanForCountry } from "@/lib/billing-config";
+import {
+  premiumPlanForCountry,
+  shouldShowPurchasePromotion,
+} from "@/lib/billing-config";
+import { getBalance } from "@/lib/credits";
 import { isPremiumUser } from "@/lib/premium";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -38,7 +42,14 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
   const locale = await getRequestLocale(normalizeUserLocale(userPrefs?.locale));
   const en = locale !== "ka";
   const am = locale === "am";
-  const showUkOffer = offer === "uk" && !premium;
+  // Only pay the balance-query cost on the explicit campaign landing path.
+  const offerBalance = offer === "uk" && !premium
+    ? await getBalance(user.id)
+    : null;
+  const showUkOffer = offerBalance != null && shouldShowPurchasePromotion({
+    isPremium: premium,
+    balance: offerBalance,
+  });
 
   if (!profile?.dateOfBirth) {
     return (

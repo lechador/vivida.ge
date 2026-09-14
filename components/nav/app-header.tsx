@@ -158,6 +158,7 @@ export async function AppHeader({
               username={username}
               balance={balance}
               isPremium={isPremium}
+              countryCode={residenceCountryCode}
               locale={locale}
             />
           </>
