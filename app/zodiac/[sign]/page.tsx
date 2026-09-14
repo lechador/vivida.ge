@@ -34,7 +34,6 @@ import { ZodiacSignPageEn } from "@/components/seo/zodiac-sign-page-en";
 import { ZodiacSignPageAm } from "@/components/seo/zodiac-sign-page-am";
 import { ZODIAC_SIGN_EN } from "@/lib/zodiac-sign-en";
 import { ZODIAC_SIGN_AM } from "@/lib/zodiac-sign-am";
-import { SIGNS } from "@/lib/zodiac";
 import {
   ARMENIAN_SITE_URL,
   DEFAULT_OG_IMAGE,

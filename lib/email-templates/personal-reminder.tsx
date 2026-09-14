@@ -1,5 +1,4 @@
 import { Button, Heading, Text } from "@react-email/components";
-import * as React from "react";
 
 import { EmailLayout, buttonStyle, mutedStyle, paragraphStyle } from "./_layout";
 import type { UserLocale } from "@/lib/i18n/user-locale";

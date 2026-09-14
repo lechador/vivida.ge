@@ -12,10 +12,7 @@ import {
   weekdayAm,
 } from "@/lib/seo/astrology-calendar-am";
 import { astrologyDay } from "@/lib/seo/astrology-calendar";
-import {
-  isMercuryRetrogradeNow,
-  mercuryRetrogradePeriods,
-} from "@/lib/retrograde";
+import { mercuryRetrogradePeriods } from "@/lib/retrograde";
 import { MOON_CALENDAR_AM } from "@/components/seo/moon-calendar-am";
 import {
   ECLIPSE_META_AM,

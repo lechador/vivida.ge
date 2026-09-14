@@ -35,7 +35,6 @@ export const maxDuration = 60;
 export default async function TestClaimPage() {
   const [session, locale] = await Promise.all([auth(), getRequestLocale()]);
   const en = locale !== "ka";
-  const am = locale === "am";
   const authed = !!session?.user?.id;
   // The anonymous teaser recomputes the type client-side from the stored
   // answers, so it needs the question structure. Only loaded when anon.

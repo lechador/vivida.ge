@@ -1,4 +1,4 @@
-import { pairSlug, signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
+import { signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { ZODIAC_SIGN_AM, ELEMENT_AM } from "@/lib/zodiac-sign-am";
 
 export type PairRatingAm = "Ուժեղ" | "Ներդաշնակ" | "Զարգացնող" | "Դժվար";

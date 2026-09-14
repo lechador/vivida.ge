@@ -14,7 +14,6 @@ import {
   preparePasswordReset,
   prepareVerificationResend,
   registerUser,
-  type RegisterError,
 } from "@/lib/auth-core";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/email";
 import { enforceAuthRateLimit } from "@/lib/rate-limit";

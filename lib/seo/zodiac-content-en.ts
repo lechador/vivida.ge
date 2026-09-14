@@ -6,7 +6,6 @@
 
 import rawData from "./zodiac-content-en.json";
 import type { ElementSlug, ZodiacSlug } from "./zodiac-dates";
-import { ALL_SLUGS, ALL_PAIR_SLUGS } from "./zodiac-dates";
 
 export type CompatibilityLevelEn = "Strong" | "Harmonious" | "Challenging";
 

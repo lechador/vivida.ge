@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ALL_ANGEL_SLUGS, ANGEL_NUMBERS } from "@/lib/seo/angel-numbers";
+import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
 import { ANGEL_AM_BY_SLUG, ANGEL_FAQ_AM, ANGEL_NUMBERS_AM } from "@/lib/seo/angel-numbers-am";
 
 const GEORGIAN = /[ა-ჰ]/;

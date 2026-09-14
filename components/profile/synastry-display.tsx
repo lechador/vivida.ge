@@ -435,7 +435,6 @@ function ValenceColumn({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   return (
     <article
       className="relative overflow-hidden rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl"
@@ -813,7 +812,6 @@ function ElementChip({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const same = a === b;
   const compatible =
     (a === "fire" && b === "air") ||

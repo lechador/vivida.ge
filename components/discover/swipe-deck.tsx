@@ -32,7 +32,6 @@ export function SwipeDeck({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const router = useRouter();
   const [deck, setDeck] = useState(cards);
   const [exhausted, setExhausted] = useState(false);

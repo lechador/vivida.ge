@@ -10,6 +10,16 @@ vi.mock("@/lib/header-cache", () => ({
   invalidateHeaderForUser: () => {},
 }));
 
+// "@/db" throws at import time when DATABASE_URL is unset. When
+// TEST_DATABASE_URL is also unset this suite skips anyway, so fall back to a
+// stub db and avoid failing the whole vitest run on import.
+vi.mock("@/db", async (importOriginal) => {
+  if (process.env.TEST_DATABASE_URL) {
+    return await importOriginal<typeof import("@/db")>();
+  }
+  return { db: {}, schema: {} };
+});
+
 import { promotePhoto } from "@/lib/photos-core";
 
 const databaseUrl = process.env.TEST_DATABASE_URL;

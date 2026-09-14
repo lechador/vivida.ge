@@ -8,7 +8,6 @@ import {
   Section,
   Text,
 } from "@react-email/components";
-import * as React from "react";
 
 /**
  * Shared layout for transactional emails. Plain inline styles only —

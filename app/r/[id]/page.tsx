@@ -48,7 +48,6 @@ export async function generateMetadata({
   const { id } = await params;
   const [r, locale] = await Promise.all([getResult(id), getRequestLocale()]);
   const en = locale !== "ka";
-  const am = locale === "am";
   if (!r) return { title: "Astro-MBTI" };
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const archetype = en ? mbtiArchetypeEn(r.mbtiType) : r.archetypeNameGe;

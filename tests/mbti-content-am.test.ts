@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ALL_MBTI_TYPES, buildMbtiSeoAm } from "@/lib/seo/mbti-seo";
-import { MBTI_CONTENT_AM, mbtiByCodeAm } from "@/lib/mbti-content-am";
+import { mbtiByCodeAm } from "@/lib/mbti-content-am";
 
 const GEORGIAN = /[ა-ჰ]/;
 const ARMENIAN = /[\u0530-\u058F]/;
