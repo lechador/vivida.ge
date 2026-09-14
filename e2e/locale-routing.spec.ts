@@ -1,0 +1,189 @@
+import { expect, test } from "@playwright/test";
+
+/**
+ * Host-scoped locale routing: proxy.ts + next.config.ts redirects/rewrites.
+ *
+ * The suite runs against 127.0.0.1, which is neither the Georgian nor the
+ * English host — so every case below pins the host explicitly via the Host
+ * header (verified to reach the app through the request fixture). That is
+ * what makes these assertions meaningful: without the override, the English
+ * rewrite has no route (404) and the host-scoped redirects never fire.
+ *
+ * Regression coverage for:
+ *  - the /en self-redirect loop on vividaastro.com (rewrites vs redirects),
+ *  - Georgian slugs leaking onto the English host (duplicate content),
+ *  - Armenian pages served from vivida.ge (duplicate content),
+ *  - the conservative Armenian geo redirect (crawlers, cookies, country).
+ */
+
+const GE_HOST = "www.vivida.ge";
+const EN_HOST = "www.vividaastro.com";
+const BROWSER_UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
+
+test.describe("locale routing", () => {
+  test("Georgian host serves the Georgian page in place", async ({
+    request,
+  }) => {
+    const res = await request.get("/nataluri-ruka", {
+      headers: { host: GE_HOST },
+    });
+
+    expect(res.status()).toBe(200);
+    expect(res.url()).toMatch(/\/nataluri-ruka$/);
+  });
+
+  test("English host rewrites the clean URL with no redirect hop", async ({
+    request,
+  }) => {
+    const res = await request.get("/natal-chart", {
+      headers: { host: EN_HOST },
+      maxRedirects: 0,
+    });
+
+    expect(res.status()).toBe(200);
+  });
+
+  test("clean English URL has no route off the English host", async ({
+    request,
+  }) => {
+    const res = await request.get("/natal-chart", { maxRedirects: 0 });
+
+    expect(res.status()).toBe(404);
+  });
+
+  test("internal /en path on the English host renders, not redirects", async ({
+    request,
+  }) => {
+    // The rewrite destination must never redirect back to the clean URL —
+    // that was the self-redirect loop on vividaastro.com/.
+    const res = await request.get("/en/natal-chart", {
+      headers: { host: EN_HOST },
+      maxRedirects: 0,
+    });
+
+    expect(res.status()).toBe(200);
+  });
+
+  test("internal /en path on the Georgian host redirects to the clean English URL", async ({
+    request,
+  }) => {
+    const res = await request.get("/en/natal-chart", {
+      headers: { host: GE_HOST },
+      maxRedirects: 0,
+    });
+
+    expect(res.status()).toBe(308);
+    expect(res.headers()["location"]).toBe(
+      "https://www.vividaastro.com/natal-chart",
+    );
+  });
+
+  test("Georgian slug on the English host consolidates onto English", async ({
+    request,
+  }) => {
+    const res = await request.get("/nataluri-ruka", {
+      headers: { host: EN_HOST },
+      maxRedirects: 0,
+    });
+
+    expect(res.status()).toBe(308);
+    expect(res.headers()["location"]).toBe(
+      "https://www.vividaastro.com/natal-chart",
+    );
+  });
+
+  test("Armenian URL on the Georgian host moves to the .com host", async ({
+    request,
+  }) => {
+    const res = await request.get("/am", {
+      headers: { host: GE_HOST },
+      maxRedirects: 0,
+    });
+
+    expect(res.status()).toBe(308);
+    expect(res.headers()["location"]).toBe("https://www.vividaastro.com/am");
+  });
+
+  test("Armenian core route renders with the Armenian content language", async ({
+    request,
+  }) => {
+    const res = await request.get("/am/natal-chart", {
+      headers: { host: EN_HOST },
+    });
+
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-language"]).toBe("hy");
+  });
+
+  test("English root declares the English content language", async ({
+    request,
+  }) => {
+    const res = await request.get("/", { headers: { host: EN_HOST } });
+
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-language"]).toBe("en");
+  });
+
+  test("legacy /test redirects to the Georgian slug", async ({ request }) => {
+    const res = await request.get("/test", { maxRedirects: 0 });
+
+    expect(res.status()).toBe(308);
+    expect(res.headers()["location"]).toMatch(/\/pirovnebis-testi$/);
+  });
+
+  test.describe("Armenian geo redirect", () => {
+    const geoHeaders = {
+      host: EN_HOST,
+      accept: "text/html",
+      "user-agent": BROWSER_UA,
+      "x-vercel-ip-country": "AM",
+    };
+
+    test("Armenian visitor is sent to /am once", async ({ request }) => {
+      const res = await request.get("/horoscope", {
+        headers: geoHeaders,
+        maxRedirects: 0,
+      });
+
+      expect(res.status()).toBe(307);
+      expect(res.headers()["location"]).toMatch(/\/am\/horoscope$/);
+      const setCookie = res
+        .headersArray()
+        .filter((h) => h.name.toLowerCase() === "set-cookie")
+        .map((h) => h.value)
+        .join("; ");
+      expect(setCookie).toContain("vivida_lang=am");
+    });
+
+    test("crawlers are never geo-redirected", async ({ request }) => {
+      const res = await request.get("/horoscope", {
+        headers: {
+          ...geoHeaders,
+          "user-agent": "Googlebot/2.1 (+http://www.google.com/bot.html)",
+        },
+        maxRedirects: 0,
+      });
+
+      expect(res.status()).toBe(200);
+    });
+
+    test("a stored language choice wins over geo", async ({ request }) => {
+      const res = await request.get("/horoscope", {
+        headers: { ...geoHeaders, cookie: "vivida_lang=en" },
+        maxRedirects: 0,
+      });
+
+      expect(res.status()).toBe(200);
+    });
+
+    test("visitors outside Armenia stay put", async ({ request }) => {
+      const res = await request.get("/horoscope", {
+        headers: { ...geoHeaders, "x-vercel-ip-country": "US" },
+        maxRedirects: 0,
+      });
+
+      expect(res.status()).toBe(200);
+    });
+  });
+});
