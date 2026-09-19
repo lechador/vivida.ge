@@ -33,7 +33,6 @@ export function ReportDialog({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [reason, setReason] = useState("");
   const [done, setDone] = useState(false);
   const [pending, start] = useTransition();
@@ -66,13 +65,21 @@ export function ReportDialog({
         <DialogHeader>
           <DialogTitle>
             {done
-              ? am ? "Շնորհակալություն, ձեր զեկույցն ստացվել է" : en ? "Thank you—your report was received" : "მადლობა — საჩივარი მიღებულია"
-              : am ? "Ներկայացնել զեկույց" : en ? "Submit a report" : "საჩივრის გაგზავნა"}
+              ? en
+                ? "Thank you—your report was received"
+                : "მადლობა — საჩივარი მიღებულია"
+              : en
+                ? "Submit a report"
+                : "საჩივრის გაგზავნა"}
           </DialogTitle>
           <DialogDescription>
             {done
-              ? am ? "Մեր թիմը կվերանայի այն։ Կարող եք նաև արգելափակել այս օգտատիրոջը։" : en ? "Our team will review it. You can also block this user." : "ჩვენი გუნდი გადახედავს. ასევე შეგიძლია დაბლოკო ეს მომხმარებელი."
-              : am ? "Պատմեք, թե ինչ է պատահել (ըստ ցանկության)։ Կեղծ զեկույցները կարող են ազդել ձեր հաշվի վրա։" : en ? "Tell us what happened (optional). False reports may affect your account." : "მოგვწერე, რა მოხდა (არასავალდებულო). ცრუ საჩივრები აისახება შენს ანგარიშზე."}
+              ? en
+                ? "Our team will review it. You can also block this user."
+                : "ჩვენი გუნდი გადახედავს. ასევე შეგიძლია დაბლოკო ეს მომხმარებელი."
+              : en
+                ? "Tell us what happened (optional). False reports may affect your account."
+                : "მოგვწერე, რა მოხდა (არასავალდებულო). ცრუ საჩივრები აისახება შენს ანგარიშზე."}
           </DialogDescription>
         </DialogHeader>
 
@@ -83,15 +90,21 @@ export function ReportDialog({
               onChange={(e) => setReason(e.target.value)}
               maxLength={1000}
               rows={4}
-              placeholder={am ? "Նկարագրեք խնդիրը…" : en ? "Describe the issue…" : "აღწერე პრობლემა…"}
+              placeholder={en ? "Describe the issue…" : "აღწერე პრობლემა…"}
               className="w-full resize-none rounded-lg border border-border bg-card/60 p-3 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
             />
             <div className="mt-2 flex justify-end gap-2">
               <Button variant="outline" onClick={() => close(false)}>
-                {am ? "Չեղարկել" : en ? "Cancel" : "გაუქმება"}
+                {en ? "Cancel" : "გაუქმება"}
               </Button>
               <Button onClick={submit} disabled={pending}>
-                {pending ? (am ? "Ուղարկվում է…" : en ? "Sending…" : "იგზავნება…") : (am ? "Ներկայացնել" : en ? "Submit" : "გაგზავნა")}
+                {pending
+                  ? en
+                    ? "Sending…"
+                    : "იგზავნება…"
+                  : en
+                    ? "Submit"
+                    : "გაგზავნა"}
               </Button>
             </div>
           </>
@@ -99,7 +112,9 @@ export function ReportDialog({
 
         {done && (
           <div className="flex justify-end">
-            <Button onClick={() => close(false)}>{am ? "Փակել" : en ? "Close" : "დახურვა"}</Button>
+            <Button onClick={() => close(false)}>
+              {en ? "Close" : "დახურვა"}
+            </Button>
           </div>
         )}
       </DialogContent>

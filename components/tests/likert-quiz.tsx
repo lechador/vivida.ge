@@ -36,7 +36,6 @@ export function LikertQuiz({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [index, setIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -68,11 +67,14 @@ export function LikertQuiz({
   // Agree (high) on the left → disagree (low) on the right; mid = neutral.
   const ordered = useMemo(
     () => [...scale].sort((a, b) => b.value - a.value),
-    [scale]
+    [scale],
   );
   const mid = useMemo(
-    () => (Math.max(...scale.map((s) => s.value)) + Math.min(...scale.map((s) => s.value))) / 2,
-    [scale]
+    () =>
+      (Math.max(...scale.map((s) => s.value)) +
+        Math.min(...scale.map((s) => s.value))) /
+      2,
+    [scale],
   );
 
   const total = questions.length;
@@ -95,7 +97,9 @@ export function LikertQuiz({
     if (!allAnswered) {
       const missing = questions.findIndex((qq) => answers[qq.id] === undefined);
       if (missing >= 0) setIndex(missing);
-      setError(am ? "Խնդրում ենք պատասխանել բոլոր հարցերին։" : en ? "Please answer every question." : "გთხოვ, უპასუხე ყველა კითხვას.");
+      setError(
+        en ? "Please answer every question." : "გთხოვ, უპასუხე ყველა კითხვას.",
+      );
       return;
     }
     setError(null);
@@ -111,7 +115,9 @@ export function LikertQuiz({
         <div className="mx-auto grid size-14 place-items-center rounded-full bg-[var(--vivida-violet)]/15 ring-1 ring-[var(--vivida-violet)]/40">
           <Sparkles className="size-7 animate-pulse text-[var(--vivida-violet)]" />
         </div>
-        <h2 className="mt-5 text-xl font-semibold tracking-tight">{workingLabel}</h2>
+        <h2 className="mt-5 text-xl font-semibold tracking-tight">
+          {workingLabel}
+        </h2>
         <Loader2 className="mx-auto mt-6 size-5 animate-spin text-muted-foreground" />
       </div>
     );
@@ -132,20 +138,36 @@ export function LikertQuiz({
           "rounded-3xl border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8",
           focus
             ? "relative z-40 border-[var(--vivida-violet)]/40 vivida-focus-card"
-            : "border-border"
+            : "border-border",
         )}
       >
         <button
           type="button"
           onClick={toggleFocus}
           aria-pressed={focus}
-          aria-label={focus ? (am ? "Անջատել կենտրոնացման ռեժիմը" : en ? "Exit focus mode" : "ფოკუს-რეჟიმის გამორთვა") : (am ? "Միացնել կենտրոնացման ռեժիմը" : en ? "Enter focus mode" : "ფოკუს-რეჟიმის ჩართვა")}
-          title={focus ? (am ? "Անջատել կենտրոնացման ռեժիմը" : en ? "Exit focus mode" : "ფოკუს-რეჟიმის გამორთვა") : (am ? "Կենտրոնացման ռեժիմ" : en ? "Focus mode" : "ფოკუს-რეჟიმი")}
+          aria-label={
+            focus
+              ? en
+                ? "Exit focus mode"
+                : "ფოკუს-რეჟიმის გამორთვა"
+              : en
+                ? "Enter focus mode"
+                : "ფოკუს-რეჟიმის ჩართვა"
+          }
+          title={
+            focus
+              ? en
+                ? "Exit focus mode"
+                : "ფოკუს-რეჟიმის გამორთვა"
+              : en
+                ? "Focus mode"
+                : "ფოკუს-რეჟიმი"
+          }
           className={cn(
             "absolute -right-2.5 -top-2.5 grid size-8 place-items-center rounded-full border backdrop-blur-xl transition-all hover:scale-105 sm:-right-3 sm:-top-3",
             focus
               ? "border-[var(--vivida-violet)]/60 bg-[oklch(0.18_0.07_300/0.85)] text-[var(--vivida-cyan)] shadow-[0_0_18px_-4px_oklch(0.65_0.24_305/0.8)]"
-              : "border-border bg-card/80 text-muted-foreground"
+              : "border-border bg-card/80 text-muted-foreground",
           )}
         >
           <Focus className="size-4" />
@@ -154,7 +176,7 @@ export function LikertQuiz({
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
             <span>
-              {am ? "Հարց" : en ? "Question" : "კითხვა"} {index + 1} / {total}
+              {en ? "Question" : "კითხვა"} {index + 1} / {total}
             </span>
             <span className="tabular-nums">{progressPct}%</span>
           </div>
@@ -168,12 +190,12 @@ export function LikertQuiz({
 
         <div key={q.id} className="animate-in fade-in duration-300">
           <p className="min-h-[3.5rem] text-balance text-lg font-medium leading-snug sm:text-xl">
-            {am || en ? q.textEn ?? q.textKa : q.textKa}
+            {en ? (q.textEn ?? q.textKa) : q.textKa}
           </p>
 
           <div
             role="radiogroup"
-            aria-label={am ? "Ձեր պատասխանը" : en ? "Your answer" : "შენი პასუხი"}
+            aria-label={en ? "Your answer" : "შენი პასუხი"}
             className="mt-7 flex items-center justify-center gap-2 sm:gap-3"
           >
             {ordered.map((opt) => {
@@ -197,12 +219,12 @@ export function LikertQuiz({
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  aria-label={am || en ? opt.labelEn ?? opt.labelKa : opt.labelKa}
-                  title={am || en ? opt.labelEn ?? opt.labelKa : opt.labelKa}
+                  aria-label={en ? (opt.labelEn ?? opt.labelKa) : opt.labelKa}
+                  title={en ? (opt.labelEn ?? opt.labelKa) : opt.labelKa}
                   onClick={() => pick(opt.value)}
                   className={cn(
                     "grid shrink-0 place-items-center rounded-full border-2 transition-all duration-150 hover:scale-110",
-                    sizeCls
+                    sizeCls,
                   )}
                   style={{
                     borderColor: `color-mix(in oklch, ${tone} ${selected ? "100%" : "45%"}, transparent)`,
@@ -223,8 +245,8 @@ export function LikertQuiz({
             })}
           </div>
           <div className="mt-3 flex items-center justify-between px-1 text-xs text-muted-foreground">
-            <span>{am ? "Համաձայն եմ" : en ? "Agree" : "ვეთანხმები"}</span>
-            <span>{am ? "Համաձայն չեմ" : en ? "Disagree" : "არ ვეთანხმები"}</span>
+            <span>{en ? "Agree" : "ვეთანხმები"}</span>
+            <span>{en ? "Disagree" : "არ ვეთანხმები"}</span>
           </div>
         </div>
 
@@ -243,7 +265,7 @@ export function LikertQuiz({
             className="gap-1"
           >
             <ChevronLeft className="size-4" />
-            {am ? "Նախորդը" : en ? "Previous" : "წინა"}
+            {en ? "Previous" : "წინა"}
           </Button>
 
           {isLast ? (
@@ -264,7 +286,7 @@ export function LikertQuiz({
               onClick={() => setIndex((i) => Math.min(total - 1, i + 1))}
               disabled={current === undefined}
             >
-              {am ? "Հաջորդը" : en ? "Next" : "შემდეგი"}
+              {en ? "Next" : "შემდეგი"}
             </Button>
           )}
         </div>

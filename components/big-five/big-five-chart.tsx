@@ -1,4 +1,8 @@
-import { BIG5_LEVEL_LABEL, BIG5_LEVEL_LABEL_EN, type BigFiveResult } from "@/lib/big-five/scoring";
+import {
+  BIG5_LEVEL_LABEL,
+  BIG5_LEVEL_LABEL_EN,
+  type BigFiveResult,
+} from "@/lib/big-five/scoring";
 import { TraitRadar, type RadarPoint } from "@/components/tests/trait-radar";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -7,9 +11,14 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * trait. This is the "profile shape"; the written per-trait analysis lives in
  * BigFiveDetail (gated).
  */
-export function BigFiveChart({ result, locale = "ka" }: { result: BigFiveResult; locale?: UserLocale }) {
+export function BigFiveChart({
+  result,
+  locale = "ka",
+}: {
+  result: BigFiveResult;
+  locale?: UserLocale;
+}) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const points: RadarPoint[] = result.traits.map((t) => ({
     key: t.key,
     label: en ? t.nameEn : t.nameKa,
@@ -20,7 +29,7 @@ export function BigFiveChart({ result, locale = "ka" }: { result: BigFiveResult;
   return (
     <div className="rounded-3xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
       <h2 className="mb-2 text-center text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        {am ? "Ձեր անձնական պրոֆիլը" : en ? "Your personality profile" : "შენი პიროვნების პროფილი"}
+        {en ? "Your personality profile" : "შენი პიროვნების პროფილი"}
       </h2>
       <TraitRadar points={points} locale={locale} />
 

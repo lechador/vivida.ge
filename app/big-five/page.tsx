@@ -6,30 +6,58 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { BigFiveTestClient } from "@/components/big-five/big-five-test-client";
 import { PopularSearches } from "@/components/seo/popular-searches";
-import { ArmenianBigFiveAssessmentPage } from "@/components/tests/armenian-assessment-pages";
+
 import { BIG5_QUESTION_COUNT, BIG5_TRAITS } from "@/lib/big-five/questions";
-import { BIG5_META_DESCRIPTION, BIG5_META_DESCRIPTION_EN, BIG5_INTRO, BIG5_INTRO_EN, BIG5_FAQ, BIG5_FAQ_EN } from "@/lib/big-five/content";
+import {
+  BIG5_META_DESCRIPTION,
+  BIG5_META_DESCRIPTION_EN,
+  BIG5_INTRO,
+  BIG5_INTRO_EN,
+  BIG5_FAQ,
+  BIG5_FAQ_EN,
+} from "@/lib/big-five/content";
 import { BIGFIVE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  GEORGIAN_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const TITLE_KA = "Big Five ტესტი — დიდი ხუთეული, პიროვნების ტესტი ქართულად";
 const TITLE_EN = "Free Big Five Personality Test — OCEAN Profile";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const title = "Անվճար Big Five անհատականության թեստ — OCEAN պրոֆիլ";
-    const description = "Պատասխանեք 40 հարցի և բացահայտեք ձեր պրոֆիլը անհատականության հինգ լայն գծերով։";
-    const url = `${ARMENIAN_SITE_URL}/big-five`;
-    return { title: { absolute: title }, description, keywords: ["անվճար Big Five թեստ", "OCEAN անհատականության թեստ", "անհատականության հինգ գծերը"], alternates: localizedAlternates("/am/big-five", "/big-five", "am"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "hy_AM" }, twitter: { card: "summary_large_image", title, description } };
-  }
   const en = locale === "en";
   const title = en ? TITLE_EN : TITLE_KA;
   const description = en ? BIG5_META_DESCRIPTION_EN : BIG5_META_DESCRIPTION;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  return { title: { absolute: title }, description, keywords: en ? ["free Big Five test", "Big Five personality test", "OCEAN personality test", "personality traits test"] : ["big five ტესტი", "დიდი ხუთეული", "პიროვნების ტესტი", "ocean ტესტი"], alternates: localizedAlternates("/big-five", "/big-five", en ? "en" : "ka"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/big-five`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" }, twitter: { card: "summary_large_image", title, description } };
+  return {
+    title: { absolute: title },
+    description,
+    keywords: en
+      ? [
+          "free Big Five test",
+          "Big Five personality test",
+          "OCEAN personality test",
+          "personality traits test",
+        ]
+      : ["big five ტესტი", "დიდი ხუთეული", "პიროვნების ტესტი", "ocean ტესტი"],
+    alternates: localizedAlternates("/big-five", "/big-five", en ? "en" : "ka"),
+    openGraph: {
+      images: [DEFAULT_OG_IMAGE],
+      type: "website",
+      url: `${siteUrl}/big-five`,
+      title,
+      description,
+      siteName: "Vivida",
+      locale: en ? "en_US" : "ka_GE",
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
 }
 
 /**
@@ -42,7 +70,6 @@ export default async function BigFiveTestPage() {
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
   const en = locale === "en";
-  if (locale === "am") return <ArmenianBigFiveAssessmentPage authed={authed} />;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const description = en ? BIG5_META_DESCRIPTION_EN : BIG5_META_DESCRIPTION;
   const faq = en ? BIG5_FAQ_EN : BIG5_FAQ;
@@ -60,19 +87,27 @@ export default async function BigFiveTestPage() {
       about: {
         "@type": "Thing",
         name: en ? "Big Five personality traits" : "დიდი ხუთეული (Big Five)",
-        alternateName: en ? ["Big Five", "OCEAN", "personality traits"] : ["Big Five", "OCEAN", "დიდი ხუთეული", "პიროვნების ტესტი"],
+        alternateName: en
+          ? ["Big Five", "OCEAN", "personality traits"]
+          : ["Big Five", "OCEAN", "დიდი ხუთეული", "პიროვნების ტესტი"],
       },
     },
     faqLd(faq),
     breadcrumbLd([
       { name: en ? "Home" : "მთავარი", url: siteUrl },
       { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
-      { name: en ? "Big Five Test" : "Big Five ტესტი", url: `${siteUrl}/big-five` },
+      {
+        name: en ? "Big Five Test" : "Big Five ტესტი",
+        url: `${siteUrl}/big-five`,
+      },
     ]),
   ];
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_265/0.4),transparent_70%),radial-gradient(40%_35%_at_15%_80%,oklch(0.30_0.15_200/0.35),transparent_70%)]"
@@ -83,7 +118,11 @@ export default async function BigFiveTestPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/big-five" />}
+      {authed ? (
+        <AppHeader authed active="tests" />
+      ) : (
+        <SmartHeader active="tests" locale={locale} georgianPath="/big-five" />
+      )}
 
       <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-4 pb-10 pt-4 sm:px-6 sm:pb-14 sm:pt-6">
         <header className="mb-5 text-center">
@@ -97,7 +136,9 @@ export default async function BigFiveTestPage() {
             </span>
           </h1>
           <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-            {en ? `${BIG5_QUESTION_COUNT} questions · about 7 minutes · free` : `${BIG5_QUESTION_COUNT} კითხვა · ~7 წუთი · უფასო`}
+            {en
+              ? `${BIG5_QUESTION_COUNT} questions · about 7 minutes · free`
+              : `${BIG5_QUESTION_COUNT} კითხვა · ~7 წუთი · უფასო`}
           </p>
         </header>
 
@@ -161,7 +202,19 @@ export default async function BigFiveTestPage() {
             ))}
           </div>
 
-          <PopularSearches queries={en ? ["free Big Five personality test", "OCEAN personality test", "five personality traits", "Big Five profile"] : BIGFIVE_LATIN_QUERIES} locale={locale} />
+          <PopularSearches
+            queries={
+              en
+                ? [
+                    "free Big Five personality test",
+                    "OCEAN personality test",
+                    "five personality traits",
+                    "Big Five profile",
+                  ]
+                : BIGFIVE_LATIN_QUERIES
+            }
+            locale={locale}
+          />
         </div>
       </section>
     </main>

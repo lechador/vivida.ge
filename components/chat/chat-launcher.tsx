@@ -1,20 +1,9 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  MessageCircle,
-  Send,
-  X,
-} from "lucide-react";
+import { ArrowLeft, MessageCircle, Send, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import {
@@ -123,12 +112,11 @@ export function ChatLauncher({
   locale = "ka",
 }: Props) {
   const en = locale !== "ka";
-  const am = locale === "am";
   // In "page" mode the panel is always considered open — the route is
   // the panel. In other modes it's a togglable surface.
   const [open, setOpen] = useState(mode === "page");
   const [activePartnerId, setActivePartnerId] = useState<string | null>(
-    initialPartnerId
+    initialPartnerId,
   );
   const [conversations, setConversations] = useState(initialConversations);
   const [unreadTotal, setUnreadTotal] = useState(initialUnreadTotal);
@@ -152,9 +140,9 @@ export function ChatLauncher({
   const loadedRef = useRef<Set<string>>(new Set());
   const conversationsRef = useRef(conversations);
   const pollCursorRef = useRef(new Date().toISOString());
-  const typingTimersRef = useRef<
-    Record<string, ReturnType<typeof setTimeout>>
-  >({});
+  const typingTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>(
+    {},
+  );
 
   useEffect(() => {
     conversationsRef.current = conversations;
@@ -232,12 +220,11 @@ export function ChatLauncher({
         window.dispatchEvent(
           new CustomEvent<ChatNotifyDetail>("vivida:chat-message", {
             detail,
-          })
+          }),
         );
       }
-
     },
-    [viewerId]
+    [viewerId],
   );
 
   const applyTyping = useCallback((payload: TypingEventPayload) => {
@@ -251,37 +238,43 @@ export function ChatLauncher({
       });
       const existing = typingTimersRef.current[s.senderId];
       if (existing) clearTimeout(existing);
-      typingTimersRef.current[s.senderId] = setTimeout(() => {
-        setTypingByPartner((prev) => {
-          if (!prev[s.senderId]) return prev;
-          if (prev[s.senderId] > Date.now()) return prev;
-          const next = { ...prev };
-          delete next[s.senderId];
-          return next;
-        });
-        delete typingTimersRef.current[s.senderId];
-      }, Math.max(0, expiresMs - Date.now()) + 50);
+      typingTimersRef.current[s.senderId] = setTimeout(
+        () => {
+          setTypingByPartner((prev) => {
+            if (!prev[s.senderId]) return prev;
+            if (prev[s.senderId] > Date.now()) return prev;
+            const next = { ...prev };
+            delete next[s.senderId];
+            return next;
+          });
+          delete typingTimersRef.current[s.senderId];
+        },
+        Math.max(0, expiresMs - Date.now()) + 50,
+      );
     }
   }, []);
 
-  const applyRead = useCallback((payload: ReadEventPayload) => {
-    if (!payload?.partnerId || !payload?.readAt) return;
-    const readAtDate = new Date(payload.readAt);
-    if (Number.isNaN(readAtDate.getTime())) return;
-    setMessagesByPartner((prev) => {
-      const list = prev[payload.partnerId];
-      if (!list) return prev;
-      let changed = false;
-      const updated = list.map((m) => {
-        if (m.senderId !== viewerId) return m;
-        if (m.createdAt.getTime() > readAtDate.getTime()) return m;
-        if (m.readAt && m.readAt.getTime() >= readAtDate.getTime()) return m;
-        changed = true;
-        return { ...m, readAt: readAtDate };
+  const applyRead = useCallback(
+    (payload: ReadEventPayload) => {
+      if (!payload?.partnerId || !payload?.readAt) return;
+      const readAtDate = new Date(payload.readAt);
+      if (Number.isNaN(readAtDate.getTime())) return;
+      setMessagesByPartner((prev) => {
+        const list = prev[payload.partnerId];
+        if (!list) return prev;
+        let changed = false;
+        const updated = list.map((m) => {
+          if (m.senderId !== viewerId) return m;
+          if (m.createdAt.getTime() > readAtDate.getTime()) return m;
+          if (m.readAt && m.readAt.getTime() >= readAtDate.getTime()) return m;
+          changed = true;
+          return { ...m, readAt: readAtDate };
+        });
+        return changed ? { ...prev, [payload.partnerId]: updated } : prev;
       });
-      return changed ? { ...prev, [payload.partnerId]: updated } : prev;
-    });
-  }, [viewerId]);
+    },
+    [viewerId],
+  );
 
   // Chat is intentionally pull-based and scoped to /messages. The conversation
   // list checks once per minute with one DB query; an open conversation checks
@@ -296,11 +289,7 @@ export function ChatLauncher({
     const intervalMs = activePartnerId ? 10_000 : 60_000;
 
     const poll = async () => {
-      if (
-        cancelled ||
-        inFlight ||
-        document.visibilityState === "hidden"
-      ) {
+      if (cancelled || inFlight || document.visibilityState === "hidden") {
         return;
       }
       inFlight = true;
@@ -386,79 +375,76 @@ export function ChatLauncher({
     () =>
       conversations.find((c) => c.partner.id === activePartnerId)?.partner ??
       null,
-    [conversations, activePartnerId]
+    [conversations, activePartnerId],
   );
 
-  const handleSelect = useCallback(
-    async (partnerId: string) => {
-      setActivePartnerId(partnerId);
-      activePartnerRef.current = partnerId;
+  const handleSelect = useCallback(async (partnerId: string) => {
+    setActivePartnerId(partnerId);
+    activePartnerRef.current = partnerId;
 
-      // Read-then-write so we can fire side effects (state on other islands,
-      // window events) outside the updater. The updater itself must be pure —
-      // dispatching a CustomEvent inside it triggers cross-component setState
-      // during render, which React errors on. Using the ref keeps handleSelect
-      // stable (empty deps) without going stale.
-      const target = conversationsRef.current.find(
-        (c) => c.partner.id === partnerId
+    // Read-then-write so we can fire side effects (state on other islands,
+    // window events) outside the updater. The updater itself must be pure —
+    // dispatching a CustomEvent inside it triggers cross-component setState
+    // during render, which React errors on. Using the ref keeps handleSelect
+    // stable (empty deps) without going stale.
+    const target = conversationsRef.current.find(
+      (c) => c.partner.id === partnerId,
+    );
+    const wasUnread = target?.unreadCount ?? 0;
+    setConversations((cs) =>
+      cs.map((c) =>
+        c.partner.id === partnerId ? { ...c, unreadCount: 0 } : c,
+      ),
+    );
+    if (wasUnread > 0) {
+      setUnreadTotal((t) => Math.max(0, t - wasUnread));
+      window.dispatchEvent(
+        new CustomEvent<ChatClearedDetail>("vivida:chat-cleared", {
+          detail: { partnerId, clearedCount: wasUnread },
+        }),
       );
-      const wasUnread = target?.unreadCount ?? 0;
-      setConversations((cs) =>
-        cs.map((c) =>
-          c.partner.id === partnerId ? { ...c, unreadCount: 0 } : c
-        )
+    }
+
+    try {
+      await markConversationRead(partnerId);
+    } catch {}
+
+    if (loadedRef.current.has(partnerId)) return;
+    loadedRef.current.add(partnerId);
+    setThreadStatus((prev) => ({ ...prev, [partnerId]: "loading" }));
+    try {
+      const res = await fetch(
+        `/api/messages?with=${encodeURIComponent(partnerId)}`,
       );
-      if (wasUnread > 0) {
-        setUnreadTotal((t) => Math.max(0, t - wasUnread));
-        window.dispatchEvent(
-          new CustomEvent<ChatClearedDetail>("vivida:chat-cleared", {
-            detail: { partnerId, clearedCount: wasUnread },
-          })
-        );
-      }
-
-      try {
-        await markConversationRead(partnerId);
-      } catch {}
-
-      if (loadedRef.current.has(partnerId)) return;
-      loadedRef.current.add(partnerId);
-      setThreadStatus((prev) => ({ ...prev, [partnerId]: "loading" }));
-      try {
-        const res = await fetch(
-          `/api/messages?with=${encodeURIComponent(partnerId)}`
-        );
-        if (!res.ok) {
-          loadedRef.current.delete(partnerId);
-          setThreadStatus((prev) => ({ ...prev, [partnerId]: "error" }));
-          return;
-        }
-        const data = (await res.json()) as { messages: Message[] };
-        const msgs = data.messages.map((m) => ({
-          ...m,
-          createdAt: new Date(m.createdAt),
-          readAt: m.readAt ? new Date(m.readAt) : null,
-        }));
-        for (const m of msgs) seenIdsRef.current.add(m.id);
-        setMessagesByPartner((prev) => {
-          const existing = prev[partnerId] ?? [];
-          // Merge in any optimistic / streamed messages added during fetch
-          const byId = new Map<string, Message>();
-          for (const m of msgs) byId.set(m.id, m);
-          for (const m of existing) if (!byId.has(m.id)) byId.set(m.id, m);
-          const merged = Array.from(byId.values()).sort(
-            (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-          );
-          return { ...prev, [partnerId]: merged };
-        });
-        setThreadStatus((prev) => ({ ...prev, [partnerId]: "ready" }));
-      } catch {
+      if (!res.ok) {
         loadedRef.current.delete(partnerId);
         setThreadStatus((prev) => ({ ...prev, [partnerId]: "error" }));
+        return;
       }
-    },
-    []
-  );
+      const data = (await res.json()) as { messages: Message[] };
+      const msgs = data.messages.map((m) => ({
+        ...m,
+        createdAt: new Date(m.createdAt),
+        readAt: m.readAt ? new Date(m.readAt) : null,
+      }));
+      for (const m of msgs) seenIdsRef.current.add(m.id);
+      setMessagesByPartner((prev) => {
+        const existing = prev[partnerId] ?? [];
+        // Merge in any optimistic / streamed messages added during fetch
+        const byId = new Map<string, Message>();
+        for (const m of msgs) byId.set(m.id, m);
+        for (const m of existing) if (!byId.has(m.id)) byId.set(m.id, m);
+        const merged = Array.from(byId.values()).sort(
+          (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+        );
+        return { ...prev, [partnerId]: merged };
+      });
+      setThreadStatus((prev) => ({ ...prev, [partnerId]: "ready" }));
+    } catch {
+      loadedRef.current.delete(partnerId);
+      setThreadStatus((prev) => ({ ...prev, [partnerId]: "error" }));
+    }
+  }, []);
 
   // External "open this chat" trigger (fired from the bell dropdown when a
   // message notification is clicked).
@@ -525,15 +511,13 @@ export function ChatLauncher({
       const real: Message = {
         ...result.message,
         createdAt: new Date(result.message.createdAt),
-        readAt: result.message.readAt
-          ? new Date(result.message.readAt)
-          : null,
+        readAt: result.message.readAt ? new Date(result.message.readAt) : null,
       };
       seenIdsRef.current.add(real.id);
       setMessagesByPartner((prev) => ({
         ...prev,
         [partnerId]: (prev[partnerId] ?? []).map((m) =>
-          m.id === tempId ? real : m
+          m.id === tempId ? real : m,
         ),
       }));
       setConversations((cs) =>
@@ -547,12 +531,12 @@ export function ChatLauncher({
                   senderId: real.senderId,
                 },
               }
-            : c
-        )
+            : c,
+        ),
       );
       return { ok: true };
     },
-    [viewerId]
+    [viewerId],
   );
 
   // Compatibility-only: background chat deliberately performs no work.
@@ -567,7 +551,7 @@ export function ChatLauncher({
       <div
         className={cn(
           "flex min-h-0 flex-1 flex-col overflow-hidden",
-          "sm:rounded-2xl sm:border sm:border-border sm:bg-card/65 sm:ring-1 sm:ring-foreground/5 sm:backdrop-blur-xl"
+          "sm:rounded-2xl sm:border sm:border-border sm:bg-card/65 sm:ring-1 sm:ring-foreground/5 sm:backdrop-blur-xl",
         )}
       >
         {activePartner ? (
@@ -603,7 +587,7 @@ export function ChatLauncher({
       {/* Floating launcher button */}
       <motion.button
         type="button"
-        aria-label={am ? "Զրույց" : am ? "Զրույց" : en ? "Chat" : "ჩატი"}
+        aria-label={en ? "Chat" : "ჩატი"}
         data-chat-launcher
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.05 }}
@@ -611,14 +595,10 @@ export function ChatLauncher({
         className={cn(
           "fixed bottom-4 right-4 z-40 grid size-14 place-items-center rounded-full text-white shadow-[0_12px_40px_-8px_oklch(0.65_0.24_305/0.65)] ring-1 ring-foreground/20 sm:bottom-5 sm:right-5",
           "bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))]",
-          "transition-shadow hover:shadow-[0_18px_50px_-8px_oklch(0.65_0.24_305/0.85)]"
+          "transition-shadow hover:shadow-[0_18px_50px_-8px_oklch(0.65_0.24_305/0.85)]",
         )}
       >
-        {open ? (
-          <X className="size-5" />
-        ) : (
-          <MessageCircle className="size-5" />
-        )}
+        {open ? <X className="size-5" /> : <MessageCircle className="size-5" />}
         {unreadTotal > 0 && (
           <span className="absolute -right-1 -top-1 grid size-5 min-w-5 place-items-center rounded-full bg-[var(--vivida-pink)] px-1 text-[10px] font-semibold leading-none text-white ring-2 ring-background">
             {unreadTotal > 9 ? "9+" : unreadTotal}
@@ -682,15 +662,16 @@ function ConversationList({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   return (
     <>
       <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-        <h2 className="text-base font-semibold tracking-tight">{en ? "Chat" : "ჩატი"}</h2>
+        <h2 className="text-base font-semibold tracking-tight">
+          {en ? "Chat" : "ჩატი"}
+        </h2>
         {onClose && (
           <button
             type="button"
-            aria-label={am ? "Փակել" : en ? "Close" : "დახურვა"}
+            aria-label={en ? "Close" : "დახურვა"}
             onClick={onClose}
             className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
           >
@@ -702,7 +683,9 @@ function ConversationList({
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
           <MessageCircle className="size-8 text-muted-foreground/50" />
           <p className="text-sm text-muted-foreground">
-            {am ? "Դուք դեռ ընկերներ չունեք։ Ավելացրեք մեկին՝ զրույց սկսելու համար։" : en ? "You have no friends yet. Add someone to start chatting." : "ჯერ მეგობრები არ გყავს — დაამატე და დაიწყე ჩატი"}
+            {en
+              ? "You have no friends yet. Add someone to start chatting."
+              : "ჯერ მეგობრები არ გყავს — დაამატე და დაიწყე ჩატი"}
           </p>
           {/* Point at the deck when it's enabled; otherwise send users to
               their friends page (always available) so the CTA never dead-ends. */}
@@ -712,8 +695,12 @@ function ConversationList({
             className="text-xs text-[var(--vivida-cyan)] hover:underline"
           >
             {SOCIAL_FEATURES.swipeDeck
-              ? am ? "Տեսեք, թե ով է ձեզ հետ համահունչ →" : en ? "See who resonates with you →" : "ნახე ვინ რეზონირებს შენთან →"
-              : am ? "Դիտել ընկերության հարցումները →" : en ? "View friend requests →" : "ნახე მეგობრების მოთხოვნები →"}
+              ? en
+                ? "See who resonates with you →"
+                : "ნახე ვინ რეზონირებს შენთან →"
+              : en
+                ? "View friend requests →"
+                : "ნახე მეგობრების მოთხოვნები →"}
           </Link>
         </div>
       ) : (
@@ -751,7 +738,9 @@ function ConversationRow({
     "user";
   const preview = conv.lastMessage
     ? `${conv.lastMessage.senderId === viewerId ? (locale !== "ka" ? "You: " : "შენ: ") : ""}${conv.lastMessage.body}`
-    : locale !== "ka" ? "No messages yet" : "ჩატი ჯერ არ დაგიწყიათ";
+    : locale !== "ka"
+      ? "No messages yet"
+      : "ჩატი ჯერ არ დაგიწყიათ";
   const isUnread = conv.unreadCount > 0;
 
   return (
@@ -761,7 +750,7 @@ function ConversationRow({
         onClick={onSelect}
         className={cn(
           "flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors",
-          isUnread ? "bg-[var(--vivida-violet)]/8" : "hover:bg-accent/10"
+          isUnread ? "bg-[var(--vivida-violet)]/8" : "hover:bg-accent/10",
         )}
       >
         <Image
@@ -778,7 +767,7 @@ function ConversationRow({
                 "truncate text-sm",
                 isUnread
                   ? "font-semibold text-foreground"
-                  : "font-medium text-foreground"
+                  : "font-medium text-foreground",
               )}
             >
               {display}
@@ -792,7 +781,7 @@ function ConversationRow({
           <div
             className={cn(
               "mt-0.5 truncate text-xs",
-              isUnread ? "text-foreground/85" : "text-muted-foreground"
+              isUnread ? "text-foreground/85" : "text-muted-foreground",
             )}
           >
             {preview}
@@ -835,7 +824,6 @@ function ChatView({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
@@ -908,7 +896,7 @@ function ChatView({
       <header className="flex items-center gap-3 border-b border-border/60 px-3 py-3">
         <button
           type="button"
-          aria-label={am ? "Ետ" : en ? "Back" : "უკან"}
+          aria-label={en ? "Back" : "უკან"}
           onClick={onBack}
           className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
         >
@@ -932,7 +920,11 @@ function ChatView({
             </Link>
           )}
         </div>
-        <SafetyMenu targetUserId={partner.id} targetType="message_thread" locale={locale} />
+        <SafetyMenu
+          targetUserId={partner.id}
+          targetType="message_thread"
+          locale={locale}
+        />
       </header>
 
       <div
@@ -951,7 +943,7 @@ function ChatView({
               onClick={onRetry}
               className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-card"
             >
-              {am ? "Կրկին փորձել" : en ? "Try again" : "სცადე ხელახლა"}
+              {en ? "Try again" : "სცადე ხელახლა"}
             </button>
           </div>
         ) : messages === null || status === "loading" ? (
@@ -962,7 +954,9 @@ function ChatView({
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
             <MessageCircle className="size-6 text-muted-foreground/50" />
             <p className="text-xs text-muted-foreground">
-              {am ? "Սկսեք զրույցը՝ ուղարկելով առաջին հաղորդագրությունը։" : en ? "Start the conversation by sending the first message." : "დაიწყე საუბარი — გამოგზავნე პირველი წერილი"}
+              {en
+                ? "Start the conversation by sending the first message."
+                : "დაიწყე საუბარი — გამოგზავნე პირველი წერილი"}
             </p>
           </div>
         ) : (
@@ -978,7 +972,7 @@ function ChatView({
                   <div
                     className={cn(
                       "flex items-end gap-2",
-                      mine ? "justify-end" : "justify-start"
+                      mine ? "justify-end" : "justify-start",
                     )}
                   >
                     {!mine &&
@@ -998,7 +992,7 @@ function ChatView({
                         "max-w-[78%] whitespace-pre-wrap rounded-2xl px-3 py-1.5 text-sm leading-snug",
                         mine
                           ? "bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] text-white"
-                          : "bg-card text-foreground/90 ring-1 ring-foreground/5"
+                          : "bg-card text-foreground/90 ring-1 ring-foreground/5",
                       )}
                     >
                       {m.body}
@@ -1007,7 +1001,7 @@ function ChatView({
                   {showReadPip && (
                     <div className="mt-0.5 flex justify-end">
                       <span
-                        title={am ? "Կարդալ" : en ? "Read" : "წაიკითხა"}
+                        title={en ? "Read" : "წაიკითხა"}
                         className="inline-flex items-center"
                       >
                         <Image
@@ -1029,9 +1023,7 @@ function ChatView({
       </div>
 
       <footer className="border-t border-border/60 p-2.5">
-        {error && (
-          <p className="mb-2 px-1 text-xs text-destructive">{error}</p>
-        )}
+        {error && <p className="mb-2 px-1 text-xs text-destructive">{error}</p>}
         <div className="flex items-end gap-2">
           <textarea
             value={draft}
@@ -1042,7 +1034,7 @@ function ChatView({
                 send();
               }
             }}
-            placeholder={am ? "Գրել հաղորդագրություն…" : en ? "Write a message…" : "დაწერე…"}
+            placeholder={en ? "Write a message…" : "დაწერე…"}
             rows={1}
             disabled={isSending}
             className="max-h-32 min-h-9 flex-1 resize-none rounded-xl border border-border bg-input/40 px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-ring"
@@ -1051,7 +1043,7 @@ function ChatView({
             type="button"
             onClick={send}
             disabled={isSending || draft.trim().length === 0}
-            aria-label={am ? "Ուղարկել" : en ? "Send" : "გაგზავნა"}
+            aria-label={en ? "Send" : "გაგზავნა"}
             className="grid size-9 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-[0_8px_24px_-8px_oklch(0.65_0.24_305/0.6)] transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
           >
             <Send className="size-4" />
@@ -1103,10 +1095,9 @@ function TypingBubble({ partner }: { partner: ChatPartner }) {
 
 function timeAgo(date: Date | string, locale: UserLocale): string {
   const en = locale !== "ka";
-  const am = locale === "am";
   const d = new Date(date);
   const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (seconds < 60) return am ? "հիմա" : en ? "now" : "ახლა";
+  if (seconds < 60) return en ? "now" : "ახლა";
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return en ? `${minutes}m` : `${minutes}წთ`;
   const hours = Math.floor(minutes / 60);
@@ -1114,6 +1105,8 @@ function timeAgo(date: Date | string, locale: UserLocale): string {
   const days = Math.floor(hours / 24);
   if (days < 7) return en ? `${days}d` : `${days}დ`;
   return en
-    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(d)
+    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(
+        d,
+      )
     : kaShortDate(d);
 }

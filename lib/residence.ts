@@ -28,7 +28,6 @@ function andUserCountryMissing(userId: string) {
   return and(eq(users.id, userId), isNull(users.residenceCountryCode));
 }
 
-import { AM_COUNTRY_NAMES } from "@/lib/countries";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function countryDisplayName(
@@ -37,14 +36,7 @@ export function countryDisplayName(
 ): string {
   const code = normalizeCountryCode(countryCode);
   if (!code) {
-    return locale === "am"
-      ? "Անհայտ"
-      : locale === "en"
-      ? "Not determined"
-      : "ვერ განისაზღვრა";
-  }
-  if (locale === "am") {
-    return AM_COUNTRY_NAMES[code] ?? code;
+    return locale === "en" ? "Not determined" : "ვერ განისაზღვრა";
   }
   try {
     return (

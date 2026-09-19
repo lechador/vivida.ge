@@ -3,7 +3,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { ensureChartFor } from "@/actions/chart";
-import { AhaResult, type AhaPlacement } from "@/components/onboarding/aha-result";
+import {
+  AhaResult,
+  type AhaPlacement,
+} from "@/components/onboarding/aha-result";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { Starfield } from "@/components/landing/starfield";
 import { requireUser } from "@/lib/auth-helpers";
@@ -15,12 +18,7 @@ import { BODIES, signByIndex } from "@/lib/zodiac";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
-    title:
-      locale === "am"
-        ? "Ձեր երեք գլխավորները"
-        : locale === "en"
-          ? "Your Big Three"
-          : "შენი დიდი სამეული",
+    title: locale === "en" ? "Your Big Three" : "შენი დიდი სამეული",
   };
 }
 
@@ -33,7 +31,9 @@ function safeNext(value: string | undefined): string {
 function firstSentence(value: string | undefined): string | undefined {
   if (!value) return undefined;
   const sentence = value.match(/^.*?[.!?](?:\s|$)/)?.[0]?.trim() ?? value;
-  return sentence.length > 220 ? `${sentence.slice(0, 217).trimEnd()}…` : sentence;
+  return sentence.length > 220
+    ? `${sentence.slice(0, 217).trimEnd()}…`
+    : sentence;
 }
 
 export default async function OnboardingResultPage({
@@ -59,23 +59,29 @@ export default async function OnboardingResultPage({
       : buildEnglishChartInterpretation(chart.data);
   const kinds = ["sun", "moon", "ascendant"] as const;
   const placements: AhaPlacement[] = kinds.flatMap((kind) => {
-    const point = kind === "ascendant" ? chart.data.ascendant : chart.data.bodies[kind];
+    const point =
+      kind === "ascendant" ? chart.data.ascendant : chart.data.bodies[kind];
     if (!point) return [];
     const body = BODIES[kind];
     const sign = signByIndex(point.signIndex);
-    return [{
-      kind,
-      label: locale === "am" ? body.labelAm : locale === "en" ? body.labelEn : body.labelKa,
-      glyph: body.symbol,
-      sign: locale === "am" ? sign.labelAm : locale === "en" ? sign.labelEn : sign.labelKa,
-      signSymbol: sign.symbol,
-      meaning: locale === "am" ? body.meaningAm : locale === "en" ? body.meaningEn : body.meaningKa,
-      interpretation: firstSentence(interpretation?.bigThree?.[kind]),
-    }];
+    return [
+      {
+        kind,
+        label: locale === "en" ? body.labelEn : body.labelKa,
+        glyph: body.symbol,
+        sign: locale === "en" ? sign.labelEn : sign.labelKa,
+        signSymbol: sign.symbol,
+        meaning: locale === "en" ? body.meaningEn : body.meaningKa,
+        interpretation: firstSentence(interpretation?.bigThree?.[kind]),
+      },
+    ];
   });
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-dvh flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-dvh flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.14_220/0.38),transparent_70%),radial-gradient(35%_25%_at_12%_78%,oklch(0.32_0.16_350/0.35),transparent_70%)]"

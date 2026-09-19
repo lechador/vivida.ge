@@ -16,37 +16,18 @@ import { ALL_SLUGS, signMetaBySlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacPlacementHubEn } from "@/components/seo/zodiac-placement-hub-en";
-import { ZodiacPlacementHubAm } from "@/components/seo/zodiac-placement-pages-am";
-import { ZODIAC_PLACEMENTS_AM } from "@/lib/zodiac-placements-am";
-import { DEFAULT_OG_IMAGE, armenianSiteHref, englishSiteHref, localizedAlternates } from "@/lib/seo/locales";
+
+import {
+  DEFAULT_OG_IMAGE,
+  englishSiteHref,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/amomavali";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const content = ZODIAC_PLACEMENTS_AM.risingHub;
-    return {
-      title: { absolute: content.pageTitle },
-      description: content.metaDescription,
-      alternates: localizedAlternates(`/am${PATH}`, PATH, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: armenianSiteHref(PATH, false),
-        title: content.pageTitle,
-        description: content.metaDescription,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: content.pageTitle,
-        description: content.metaDescription,
-      },
-    };
-  }
   if (locale === "en") {
     const title = "Rising Signs: Ascendant Meaning and First Impressions";
     const description =
@@ -92,7 +73,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RisingHubPage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <ZodiacPlacementHubAm kind="rising" />;
   if (locale === "en") return <ZodiacPlacementHubEn kind="rising" />;
   if (!RISING_HUB_CONTENT || !RISINGS_CONTENT) notFound();
   const c = RISING_HUB_CONTENT;

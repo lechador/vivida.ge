@@ -48,7 +48,6 @@ export function SpotlightCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const { card, synastry } = match;
   const verdict = en
     ? overallVerdictEn(synastry.overall)
@@ -113,7 +112,7 @@ export function SpotlightCard({
           <div className="flex items-center gap-2">
             <Sparkles className="size-3.5 text-[var(--vivida-pink)]" />
             <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--vivida-pink)]">
-              {am ? "Այսօրվա լավագույն զույգը" : en ? "Today’s top match" : "დღევანდელი მთავარი წყვილი"}
+              {en ? "Today’s top match" : "დღევანდელი მთავარი წყვილი"}
             </span>
           </div>
 
@@ -122,7 +121,9 @@ export function SpotlightCard({
               <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
                 {card.displayName}
               </span>
-              {card.verified && <VerifiedBadge className="ml-1.5 inline-flex align-middle" />}
+              {card.verified && (
+                <VerifiedBadge className="ml-1.5 inline-flex align-middle" />
+              )}
             </h2>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground sm:text-sm">
               <span className="text-foreground/85">
@@ -130,7 +131,9 @@ export function SpotlightCard({
               </span>
               <span className="text-muted-foreground/60">·</span>
               <span>
-                {en ? ELEMENT_EN[card.sunElement] ?? card.sunElement : card.sunElement}
+                {en
+                  ? (ELEMENT_EN[card.sunElement] ?? card.sunElement)
+                  : card.sunElement}
               </span>
               <span className="text-muted-foreground/60">·</span>
               <Link
@@ -198,7 +201,7 @@ export function SpotlightCard({
           <div className="mt-1">
             <Button asChild variant="mystic" size="default">
               <Link href={`/u/${card.username}`}>
-                {am ? "Դիտել պրոֆիլը" : en ? "View profile" : "ნახე პროფილი"}
+                {en ? "View profile" : "ნახე პროფილი"}
                 <ArrowRight className="size-4" />
               </Link>
             </Button>

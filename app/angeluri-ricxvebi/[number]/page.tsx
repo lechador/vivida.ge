@@ -8,7 +8,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { AngelNumberPageEn } from "@/components/seo/angel-numbers-en";
-import { AngelNumberPageAm } from "@/components/seo/angel-numbers-am";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   ALL_ANGEL_SLUGS,
@@ -17,9 +17,13 @@ import {
   isAngelSlug,
 } from "@/lib/seo/angel-numbers";
 import { ANGEL_EN_BY_SLUG } from "@/lib/seo/angel-numbers-en";
-import { ANGEL_AM_BY_SLUG } from "@/lib/seo/angel-numbers-am";
+
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -39,30 +43,6 @@ export async function generateMetadata({
   const a = ANGEL_BY_SLUG[number];
   const locale = await getRequestLocale();
 
-  if (locale === "am") {
-    const content = ANGEL_AM_BY_SLUG[number];
-    if (!content) return {};
-    const path = `/angeluri-ricxvebi/${number}`;
-    const title = `${content.title} — Իմաստը սիրո և կյանքի մեջ`;
-    const description = `${content.essence} Բացահայտեք ${number} հրեշտակային թվի նշանակությունը սիրո, կարիերայի մեջ և գործողությունների հուշում:`;
-    return {
-      title: { absolute: `${title} — Vivida` },
-      description,
-      keywords: [`հրեշտակային թիվ ${number}`, `թիվ ${number} նշանակություն`, "կրկնվող թվեր"],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "article",
-        url: armenianSiteHref(path, false),
-        title,
-        description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title, description },
-    };
-  }
-
   if (locale === "en") {
     const content = ANGEL_EN_BY_SLUG[number];
     if (!content) return {};
@@ -70,9 +50,18 @@ export async function generateMetadata({
     const title = `${content.title}: Meaning in Love, Career and Life`;
     const description = `${content.essence} Explore the modern symbolic meaning of ${number}, relationship and career themes, and a grounded action prompt.`;
     return {
-      title: { absolute: title }, description,
+      title: { absolute: title },
+      description,
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url: englishSiteHref(path, false), title, description, siteName: "Vivida", locale: "en_US" },
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: englishSiteHref(path, false),
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
       twitter: { card: "summary_large_image", title, description },
     };
   }
@@ -93,7 +82,11 @@ export async function generateMetadata({
       `${a.slug} mnishvneloba`,
       "angeluri ricxvebi",
     ],
-    alternates: localizedAlternates(`/angeluri-ricxvebi/${number}`, `/angeluri-ricxvebi/${number}`, "ka"),
+    alternates: localizedAlternates(
+      `/angeluri-ricxvebi/${number}`,
+      `/angeluri-ricxvebi/${number}`,
+      "ka",
+    ),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "article",
@@ -116,11 +109,6 @@ export default async function AngelNumberPage({
   if (!isAngelSlug(number)) notFound();
   const a = ANGEL_BY_SLUG[number];
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const content = ANGEL_AM_BY_SLUG[number];
-    if (!content) notFound();
-    return <AngelNumberPageAm base={a} content={content} />;
-  }
   if (locale === "en") {
     const content = ANGEL_EN_BY_SLUG[number];
     if (!content) notFound();

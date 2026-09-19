@@ -110,13 +110,18 @@ export async function createCreditCheckoutSession(opts: {
   // Same formatter the top-up card uses, so the price on the button and the
   // price on the Stripe page are written identically.
   const formatted = formatBillingAmount(amountMinor, currency, locale);
-  const creditWord = { ka: "კრედიტი", en: "credits", am: "կրեդիտ" }[locale];
+  const creditWord = { ka: "კრედიტი", en: "credits" }[locale];
   const productName =
     locale === "en" ? `${credits} Vivida credits` : `${credits} ${creditWord}`;
   return stripe().checkout.sessions.create({
     mode: "payment",
     customer_email: email ?? undefined,
-    metadata: { userId, kind: "credits", credits: String(credits), ...trackingMetadata },
+    metadata: {
+      userId,
+      kind: "credits",
+      credits: String(credits),
+      ...trackingMetadata,
+    },
     payment_intent_data: {
       metadata: { userId, kind: "credits", credits: String(credits) },
     },
@@ -170,7 +175,15 @@ export async function createPremiumCheckoutSession(opts: {
   trackingMetadata?: Record<string, string>;
   returnTo?: string | null;
 }): Promise<Stripe.Checkout.Session> {
-  const { userId, email, stripeCustomerId, origin, plan, trackingMetadata = {}, returnTo } = opts;
+  const {
+    userId,
+    email,
+    stripeCustomerId,
+    origin,
+    plan,
+    trackingMetadata = {},
+    returnTo,
+  } = opts;
   const price = await priceForPlan(plan);
   const metadata = {
     kind: "premium",

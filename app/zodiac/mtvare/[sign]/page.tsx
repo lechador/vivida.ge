@@ -19,12 +19,11 @@ import { moonPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacPlacementPageEn } from "@/components/seo/zodiac-placement-page-en";
-import { ZodiacPlacementPageAm } from "@/components/seo/zodiac-placement-pages-am";
+
 import { placementEnglish } from "@/lib/zodiac-placement-en";
-import { placementArmenian } from "@/lib/zodiac-placements-am";
+
 import {
   DEFAULT_OG_IMAGE,
-  armenianSiteHref,
   englishSiteHref,
   localizedAlternates,
 } from "@/lib/seo/locales";
@@ -50,29 +49,6 @@ export async function generateMetadata({
   const { sign } = await params;
   if (!isSlug(sign) || !MOONS_CONTENT) return {};
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const c = placementArmenian("moon", sign);
-    const path = `${HUB_PATH}/${sign}`;
-    return {
-      title: { absolute: c.title },
-      description: c.description,
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "article",
-        url: armenianSiteHref(path, false),
-        title: c.title,
-        description: c.description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: c.title,
-        description: c.description,
-      },
-    };
-  }
   if (locale === "en") {
     const c = placementEnglish("moon", sign);
     const url = englishSiteHref(`${HUB_PATH}/${sign}`, false);
@@ -134,7 +110,6 @@ export default async function MoonSignPage({
   const { sign } = await params;
   if (!isSlug(sign)) notFound();
   const locale = await getRequestLocale();
-  if (locale === "am") return <ZodiacPlacementPageAm kind="moon" sign={sign} />;
   if (locale === "en") return <ZodiacPlacementPageEn kind="moon" sign={sign} />;
   if (!MOONS_CONTENT) notFound();
   const moons = MOONS_CONTENT;

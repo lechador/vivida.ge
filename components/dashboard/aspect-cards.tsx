@@ -35,17 +35,32 @@ const ASPECT_LABEL_EN: Record<string, string> = {
 const FAMILY_ORDER = ["harmonic", "tense", "neutral"] as const;
 type Family = (typeof FAMILY_ORDER)[number];
 
-const FAMILY_META: Record<Family, { color: string; labelKa: string; labelEn: string }> = {
-  harmonic: { color: "oklch(0.78 0.18 200)", labelKa: "ჰარმონიული", labelEn: "Harmonious" },
-  tense: { color: "oklch(0.72 0.22 350)", labelKa: "დაძაბული", labelEn: "Dynamic" },
-  neutral: { color: "oklch(0.85 0.16 85)", labelKa: "შერწყმული", labelEn: "Concentrated" },
+const FAMILY_META: Record<
+  Family,
+  { color: string; labelKa: string; labelEn: string }
+> = {
+  harmonic: {
+    color: "oklch(0.78 0.18 200)",
+    labelKa: "ჰარმონიული",
+    labelEn: "Harmonious",
+  },
+  tense: {
+    color: "oklch(0.72 0.22 350)",
+    labelKa: "დაძაბული",
+    labelEn: "Dynamic",
+  },
+  neutral: {
+    color: "oklch(0.85 0.16 85)",
+    labelKa: "შერწყმული",
+    labelEn: "Concentrated",
+  },
 };
 
 function bodyLabel(key: string, locale: UserLocale): string {
   if (key === "ascendant") return locale !== "ka" ? "Ascendant" : "ამომავალი";
   if (key === "midheaven") return locale !== "ka" ? "Midheaven" : "ზენიტი";
   const meta = bodyMeta(key);
-  return locale !== "ka" ? meta?.labelEn ?? key : meta?.labelKa ?? key;
+  return locale !== "ka" ? (meta?.labelEn ?? key) : (meta?.labelKa ?? key);
 }
 
 /**
@@ -63,14 +78,15 @@ export function AspectCards({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [openKey, setOpenKey] = useState<string | null>(null);
   const aspects = chart.aspects ?? [];
 
   if (aspects.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        {am ? "Հիմնական ասպեկտներ չեն հայտնաբերվել։" : en ? "No major aspects were found." : "მნიშვნელოვანი ასპექტები ვერ მოიძებნა."}
+        {en
+          ? "No major aspects were found."
+          : "მნიშვნელოვანი ასპექტები ვერ მოიძებნა."}
       </p>
     );
   }
@@ -118,7 +134,7 @@ export function AspectCards({
                       aria-expanded={open}
                       className={cn(
                         "flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors sm:px-5",
-                        text && "cursor-pointer hover:bg-card/70"
+                        text && "cursor-pointer hover:bg-card/70",
                       )}
                     >
                       <span
@@ -128,11 +144,16 @@ export function AspectCards({
                       >
                         {ASPECT_SYMBOL[a.kind] ?? "·"}
                       </span>
-                      <span className="font-medium">{bodyLabel(a.a, locale)}</span>
-                      <span className="text-muted-foreground">
-                        {(en ? ASPECT_LABEL_EN : ASPECT_LABEL_KA)[a.kind] ?? a.kind}
+                      <span className="font-medium">
+                        {bodyLabel(a.a, locale)}
                       </span>
-                      <span className="font-medium">{bodyLabel(a.b, locale)}</span>
+                      <span className="text-muted-foreground">
+                        {(en ? ASPECT_LABEL_EN : ASPECT_LABEL_KA)[a.kind] ??
+                          a.kind}
+                      </span>
+                      <span className="font-medium">
+                        {bodyLabel(a.b, locale)}
+                      </span>
                       <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
                         {a.orb.toFixed(1)}°
                       </span>
@@ -141,7 +162,7 @@ export function AspectCards({
                           aria-hidden
                           className={cn(
                             "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
-                            open && "rotate-180"
+                            open && "rotate-180",
                           )}
                         />
                       )}

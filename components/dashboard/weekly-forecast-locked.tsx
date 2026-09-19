@@ -29,7 +29,6 @@ export function WeeklyForecastLocked({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);
 
@@ -100,21 +99,21 @@ export function WeeklyForecastLocked({
       <header className="relative mb-5 flex items-baseline justify-between gap-3">
         <div>
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {am ? "Հաջորդ 7 օրը" : en ? "Next 7 days" : "შემდეგი 7 დღე"}
+            {en ? "Next 7 days" : "შემდეგი 7 დღე"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight sm:text-xl">
-            {am ? "Ձեր շաբաթը երկնքում" : en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
+            {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
-        <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" aria-hidden />
+        <Sparkles
+          className="size-5 shrink-0 text-[var(--vivida-cyan)]"
+          aria-hidden
+        />
       </header>
 
       {/* Blurred teaser rows — a hint of the week behind the lock. */}
       <div className="relative">
-        <ol
-          aria-hidden
-          className="space-y-3.5 select-none blur-[6px]"
-        >
+        <ol aria-hidden className="space-y-3.5 select-none blur-[6px]">
           {[0, 1, 2, 3].map((i) => (
             <li
               key={i}
@@ -122,7 +121,11 @@ export function WeeklyForecastLocked({
             >
               <div className="flex flex-col items-center rounded-lg border border-border bg-[oklch(0.27_0.05_285/0.7)] px-3 py-2">
                 <span className="text-[10px] uppercase text-muted-foreground">
-                  {(en ? ["Mon", "Tue", "Wed", "Thu"] : ["ორშ", "სამ", "ოთხ", "ხუთ"])[i]}
+                  {
+                    (en
+                      ? ["Mon", "Tue", "Wed", "Thu"]
+                      : ["ორშ", "სამ", "ოთხ", "ხუთ"])[i]
+                  }
                 </span>
                 <span className="text-lg font-semibold">{12 + i}</span>
               </div>
@@ -147,8 +150,12 @@ export function WeeklyForecastLocked({
           </p>
           <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-3 py-1 text-sm">
             <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-            <span className="font-semibold">{cost} {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}</span>
-            <span className="text-muted-foreground">· {am ? "մեկ անգամ · հավասարակշռություն" : en ? "one time · balance" : "ერთჯერადად · ბალანსი"} {balance}</span>
+            <span className="font-semibold">
+              {cost} {en ? "credits" : "კრედიტი"}
+            </span>
+            <span className="text-muted-foreground">
+              · {en ? "one time · balance" : "ერთჯერადად · ბალანსი"} {balance}
+            </span>
           </div>
 
           {!short ? (
@@ -168,7 +175,14 @@ export function WeeklyForecastLocked({
               {en ? `Unlock for ${cost} credits` : `გახსნა ${cost} კრედიტით`}
             </Button>
           ) : (
-            <ContextualPaywallActions locale={locale} balance={balance} cost={cost} product="weekly_forecast" returnTo="/dashboard" placement="weekly_forecast_shortfall" />
+            <ContextualPaywallActions
+              locale={locale}
+              balance={balance}
+              cost={cost}
+              product="weekly_forecast"
+              returnTo="/dashboard"
+              placement="weekly_forecast_shortfall"
+            />
           )}
         </div>
       </div>

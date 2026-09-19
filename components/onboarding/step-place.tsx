@@ -21,14 +21,13 @@ export function StepPlace({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   const [query, setQuery] = useState(value?.displayName ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   // "empty" / "error" drive the visible panels below
   const [status, setStatus] = useState<"idle" | "ok" | "empty" | "error">(
-    "idle"
+    "idle",
   );
   const [retryKey, setRetryKey] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -45,7 +44,7 @@ export function StepPlace({
       try {
         const res = await fetch(
           `/api/geocode?q=${encodeURIComponent(trimmed)}`,
-          { signal: ctrl.signal }
+          { signal: ctrl.signal },
         );
         if (!res.ok) throw new Error("geocode failed");
         const data = (await res.json()) as { results: GeocodeResult[] };
@@ -83,43 +82,23 @@ export function StepPlace({
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const headingText = am
-    ? "Որտե՞ղ եք ծնվել:"
-    : en
-    ? "Where were you born?"
-    : "სად დაიბადე?";
-  const descText = am
-    ? "Ձեր ծննդավայրը կապում է ձեր քարտեզը տվյալ պահի երկնքի հետ:"
-    : en
+  const headingText = en ? "Where were you born?" : "სად დაიბადე?";
+  const descText = en
     ? "Your birthplace connects your chart to the sky at that exact moment."
     : "დაბადების ადგილი შენს რუკას იმ მომენტის ცასთან აკავშირებს.";
-  const labelText = am
-    ? "Ծննդավայր քաղաք"
-    : en
-    ? "Birth city"
-    : "დაბადების ქალაქი";
-  const placeholderText = am
-    ? "Երևան, Գյումրի, Վանաձոր…"
-    : en
+  const labelText = en ? "Birth city" : "დაბადების ქალაქი";
+  const placeholderText = en
     ? "London, New York, Tokyo…"
     : "თბილისი, ნიუ-იორკი, ტოკიო…";
-  const clearAriaLabel = am ? "Մաքրել" : en ? "Clear" : "წაშლა";
-  const notFoundText = am
-    ? "Քաղաքը չգտնվեց"
-    : en
-    ? "No place found"
-    : "ვერაფერი მოიძებნა";
-  const notFoundHint = am
-    ? "Փորձեք այլ տարբերակ կամ ընտրեք մոտակա խոշոր քաղաքը:"
-    : en
+  const clearAriaLabel = en ? "Clear" : "წაშლა";
+  const notFoundText = en ? "No place found" : "ვერაფერი მოიძებნა";
+  const notFoundHint = en
     ? "Try a different spelling, or pick the nearest larger city — it does not change your chart."
     : "სცადე სხვა დაწერილობა ან აირჩიე უახლოესი დიდი ქალაქი — რუკას ეს არ ცვლის.";
-  const errorText = am
-    ? "Չհաջողվեց կապվել որոնման ծառայության հետ:"
-    : en
+  const errorText = en
     ? "Could not reach the search service."
     : "საძიებო სერვისს ვერ დავუკავშირდით.";
-  const retryText = am ? "Փորձել կրկին" : en ? "Try again" : "სცადე ხელახლა";
+  const retryText = en ? "Try again" : "სცადე ხელახლა";
 
   return (
     <div className="space-y-6">
@@ -145,7 +124,9 @@ export function StepPlace({
               if (value) onChange(null);
             }}
             onFocus={() =>
-              (results.length > 0 || status === "empty" || status === "error") &&
+              (results.length > 0 ||
+                status === "empty" ||
+                status === "error") &&
               setOpen(true)
             }
             autoComplete="off"
@@ -188,7 +169,7 @@ export function StepPlace({
                       }}
                       className={cn(
                         "flex w-full items-start gap-3 rounded-md px-3 py-2 text-left text-sm transition-colors",
-                        "hover:bg-accent/15"
+                        "hover:bg-accent/15",
                       )}
                     >
                       <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />

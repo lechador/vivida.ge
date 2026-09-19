@@ -21,7 +21,6 @@ const ERRORS: Record<string, string> = {
  */
 export function AiAvatarButton({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,12 +33,20 @@ export function AiAvatarButton({ locale = "ka" }: { locale?: UserLocale }) {
       const res = await fetch("/api/avatar/generate", { method: "POST" });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setError(en ? "Avatar generation failed. Please try again." : (ERRORS[data.error ?? ""] ?? "რაღაც ვერ მოხერხდა."));
+        setError(
+          en
+            ? "Avatar generation failed. Please try again."
+            : (ERRORS[data.error ?? ""] ?? "რაღაც ვერ მოხერხდა."),
+        );
         return;
       }
       router.refresh();
     } catch {
-      setError(am ? "Ցանցի սխալ։ Խնդրում ենք նորից փորձել։" : en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(
+        en
+          ? "Network error. Please try again."
+          : "ქსელის შეცდომა. სცადე ხელახლა.",
+      );
     } finally {
       setBusy(false);
     }
@@ -60,7 +67,13 @@ export function AiAvatarButton({ locale = "ka" }: { locale?: UserLocale }) {
         ) : (
           <Sparkles className="size-4" />
         )}
-        {busy ? (am ? "Ստեղծվում է…" : en ? "Creating…" : "იქმნება…") : (am ? "AI ավատար" : en ? "AI avatar" : "AI ავატარი")}
+        {busy
+          ? en
+            ? "Creating…"
+            : "იქმნება…"
+          : en
+            ? "AI avatar"
+            : "AI ავატარი"}
       </Button>
       {error && (
         <p className="mt-2 text-center text-xs text-[var(--vivida-pink)]">

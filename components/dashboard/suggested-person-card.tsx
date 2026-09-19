@@ -11,9 +11,14 @@ import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { DiscoverCard } from "@/lib/discover";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
-export function SuggestedPersonCard({ person, locale = "ka" }: { person: DiscoverCard; locale?: UserLocale }) {
+export function SuggestedPersonCard({
+  person,
+  locale = "ka",
+}: {
+  person: DiscoverCard;
+  locale?: UserLocale;
+}) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -35,7 +40,11 @@ export function SuggestedPersonCard({ person, locale = "ka" }: { person: Discove
       <Link
         href={`/u/${person.username}`}
         className="flex w-full flex-col items-center"
-        aria-label={en ? `${person.displayName}'s profile` : `${person.displayName}-ის პროფილი`}
+        aria-label={
+          en
+            ? `${person.displayName}'s profile`
+            : `${person.displayName}-ის პროფილი`
+        }
       >
         <div className="relative">
           <div
@@ -65,7 +74,9 @@ export function SuggestedPersonCard({ person, locale = "ka" }: { person: Discove
           <span className="font-semibold tabular-nums text-foreground">
             {person.compatibility}%
           </span>
-          <span className="text-muted-foreground">{am ? "համատեղելի" : en ? "compatible" : "თავსებადი"}</span>
+          <span className="text-muted-foreground">
+            {en ? "compatible" : "თავსებადი"}
+          </span>
         </div>
       )}
 
@@ -79,12 +90,18 @@ export function SuggestedPersonCard({ person, locale = "ka" }: { person: Discove
         {sent ? (
           <>
             <Check className="size-3.5" />
-            {am ? "Ուղարկված է" : en ? "Sent" : "გაგზავნილი"}
+            {en ? "Sent" : "გაგზავნილი"}
           </>
         ) : (
           <>
             <UserPlus className="size-3.5" />
-            {isPending ? (am ? "Ուղարկվում է…" : en ? "Sending…" : "იგზავნება…") : (am ? "Ավելացնել" : en ? "Add" : "დამატება")}
+            {isPending
+              ? en
+                ? "Sending…"
+                : "იგზავნება…"
+              : en
+                ? "Add"
+                : "დამატება"}
           </>
         )}
       </Button>

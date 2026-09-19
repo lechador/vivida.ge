@@ -21,7 +21,6 @@ export function MoonPhaseCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const { snapshot } = data;
   const sign = signByIndex(snapshot.signIndex);
   const illumPct = Math.round(snapshot.illumination * 100);
@@ -30,7 +29,7 @@ export function MoonPhaseCard({
     <article
       className={cn(
         "relative overflow-hidden rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-5",
-        "bg-gradient-to-br from-card/65 via-card/55 to-[oklch(0.30_0.10_265/0.45)]"
+        "bg-gradient-to-br from-card/65 via-card/55 to-[oklch(0.30_0.10_265/0.45)]",
       )}
     >
       <div
@@ -42,7 +41,7 @@ export function MoonPhaseCard({
       <div className="relative mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {am ? "Այսօրվա Լուսինը" : en ? "Today's Moon" : "დღევანდელი მთვარე"}
+            {en ? "Today's Moon" : "დღევანდელი მთვარე"}
           </div>
           <div className="mt-1 text-sm font-medium text-foreground/85">
             {en ? PHASE_LABEL_EN[data.snapshot.phaseKey] : data.phaseLabelKa} ·{" "}
@@ -61,8 +60,12 @@ export function MoonPhaseCard({
       </h3>
 
       <div className="relative mt-2 flex flex-wrap gap-1 text-[11px] text-foreground/70">
-        <Pill>{en ? `${illumPct}% illuminated` : `${illumPct}% განათებული`}</Pill>
-        <Pill>{snapshot.ageDays.toFixed(1)} {am ? "օրերը" : en ? "days" : "დღე"}</Pill>
+        <Pill>
+          {en ? `${illumPct}% illuminated` : `${illumPct}% განათებული`}
+        </Pill>
+        <Pill>
+          {snapshot.ageDays.toFixed(1)} {en ? "days" : "დღე"}
+        </Pill>
       </div>
 
       <p className="relative mt-3 text-pretty text-sm leading-relaxed text-foreground/85">
@@ -89,8 +92,13 @@ export function MoonPhaseCard({
         }}
       >
         <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
-          <span>{am ? "Շարունակել կարդալ" : en ? "Continue reading" : "გააგრძელე კითხვა"}</span>
-          <span aria-hidden className="transition-transform group-open:rotate-90">›</span>
+          <span>{en ? "Continue reading" : "გააგრძელე კითხვა"}</span>
+          <span
+            aria-hidden
+            className="transition-transform group-open:rotate-90"
+          >
+            ›
+          </span>
         </summary>
         <div className="mt-3 space-y-2.5 text-pretty text-sm leading-relaxed text-foreground/85">
           {data.body
@@ -149,7 +157,12 @@ function MoonGlyph({
           <stop offset="100%" stopColor="oklch(0.10 0.03 270)" />
         </radialGradient>
         <filter id="moon-craters" x="-50%" y="-50%" width="200%" height="200%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" />
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.9"
+            numOctaves="2"
+            seed="3"
+          />
           <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.04 0" />
           <feComposite in2="SourceGraphic" operator="in" />
         </filter>
@@ -171,7 +184,11 @@ function MoonGlyph({
   );
 }
 
-function buildShadowPath(phase: number, r: number, xRadius: number): string | null {
+function buildShadowPath(
+  phase: number,
+  r: number,
+  xRadius: number,
+): string | null {
   if (phase >= 0.49 && phase <= 0.51) return null;
   if (phase < 0.005 || phase > 0.995) {
     return `M ${-r},0 A ${r},${r} 0 1,0 ${r},0 A ${r},${r} 0 1,0 ${-r},0 Z`;

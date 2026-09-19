@@ -7,9 +7,13 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { RANKINGS_HUB_EN, RankingsHubEn } from "@/components/seo/rankings-en";
-import { RANKINGS_HUB_AM, RankingsHubAm } from "@/components/seo/rankings-am";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 import {
   RANKING_CATEGORIES,
   RANKING_CATEGORY_ORDER,
@@ -19,10 +23,17 @@ import {
 const SITE_URL = "https://www.vivida.ge";
 
 const KA_METADATA: Metadata = {
-  title: { absolute: "ზოდიაქოს ნიშნების რეიტინგები — ყველაზე ჭკვიანი, ეჭვიანი, თავსებადი" },
+  title: {
+    absolute:
+      "ზოდიაქოს ნიშნების რეიტინგები — ყველაზე ჭკვიანი, ეჭვიანი, თავსებადი",
+  },
   description:
     "ზოდიაქოს ნიშნების რეიტინგები: ყველაზე ჭკვიანი, ეჭვიანი, რომანტიული, ერთგული, ძლიერი და სხვა. 12-ვე ნიშანი დალაგებული თვისებების მიხედვით, ქართულად.",
-  alternates: localizedAlternates("/zodiac/reitingebi", "/zodiac/reitingebi", "ka"),
+  alternates: localizedAlternates(
+    "/zodiac/reitingebi",
+    "/zodiac/reitingebi",
+    "ka",
+  ),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     type: "website",
@@ -38,34 +49,30 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
-  if (locale === "am") {
+  if (locale === "en") {
     const path = "/zodiac/reitingebi";
-    const { title, description } = RANKINGS_HUB_AM;
+    const { title, description } = RANKINGS_HUB_EN;
     return {
-      title: { absolute: `${title} — Vivida` },
+      title: { absolute: title },
       description,
       keywords: [
-        "կենդանակերպի վարկանիշներ",
-        "ամենախելացի նշանները",
-        "ամենառոմանտիկ նշանները",
-        "կենդանակերպի նշաններ",
+        "zodiac sign rankings",
+        "best zodiac signs",
+        "smartest zodiac signs",
+        "most romantic zodiac signs",
       ],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
+      alternates: localizedAlternates(path, path, "en"),
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: armenianSiteHref(path, false),
+        url: englishSiteHref(path, false),
         title,
         description,
         siteName: "Vivida",
-        locale: "hy_AM",
+        locale: "en_US",
       },
       twitter: { card: "summary_large_image", title, description },
     };
-  }
-  if (locale === "en") {
-    const path = "/zodiac/reitingebi"; const { title, description } = RANKINGS_HUB_EN;
-    return { title: { absolute: title }, description, keywords: ["zodiac sign rankings", "best zodiac signs", "smartest zodiac signs", "most romantic zodiac signs"], alternates: localizedAlternates(path, path, "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: englishSiteHref(path, false), title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
   }
   return KA_METADATA;
 }
@@ -81,13 +88,17 @@ const HUB_QUERIES = [
 
 export default async function RankingsHubPage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <RankingsHubAm />;
   if (locale === "en") return <RankingsHubEn />;
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ცის ნიშნები", item: `${SITE_URL}/zodiac` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ცის ნიშნები",
+        item: `${SITE_URL}/zodiac`,
+      },
       {
         "@type": "ListItem",
         position: 2,

@@ -5,8 +5,11 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LifePathCalculator } from "@/components/seo/life-path-calculator";
 import { PopularSearches } from "@/components/seo/popular-searches";
-import { NUMEROLOGY_HUB_EN, NumerologyHubEn } from "@/components/seo/numerology-en";
-import { NUMEROLOGY_HUB_AM, NumerologyHubAm } from "@/components/seo/numerology-am";
+import {
+  NUMEROLOGY_HUB_EN,
+  NumerologyHubEn,
+} from "@/components/seo/numerology-en";
+
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -18,7 +21,11 @@ import {
 } from "@/lib/seo/numerology-content";
 import { NUMEROLOGY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -51,40 +58,42 @@ const KA_METADATA: Metadata = {
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
-  if (locale === "am") {
-    const path = "/numerologia";
-    return {
-      title: { absolute: `${NUMEROLOGY_HUB_AM.title} — Vivida` },
-      description: NUMEROLOGY_HUB_AM.description,
-      keywords: ["նումերոլոգիա", "կյանքի ուղու թիվ", "նումերոլոգիական հաշվիչ", "թվերի նշանակություն"],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: armenianSiteHref(path, false),
-        title: NUMEROLOGY_HUB_AM.title,
-        description: NUMEROLOGY_HUB_AM.description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title: NUMEROLOGY_HUB_AM.title, description: NUMEROLOGY_HUB_AM.description },
-    };
-  }
   if (locale === "en") {
     const path = "/numerologia";
     return {
       title: { absolute: NUMEROLOGY_HUB_EN.title },
       description: NUMEROLOGY_HUB_EN.description,
-      keywords: ["life path number", "life path calculator", "numerology meanings", "master numbers"],
+      keywords: [
+        "life path number",
+        "life path calculator",
+        "numerology meanings",
+        "master numbers",
+      ],
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: englishSiteHref(path, false), title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
-      twitter: { card: "summary_large_image", title: NUMEROLOGY_HUB_EN.title, description: NUMEROLOGY_HUB_EN.description },
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: englishSiteHref(path, false),
+        title: NUMEROLOGY_HUB_EN.title,
+        description: NUMEROLOGY_HUB_EN.description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: NUMEROLOGY_HUB_EN.title,
+        description: NUMEROLOGY_HUB_EN.description,
+      },
     };
   }
   return KA_METADATA;
@@ -92,10 +101,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NumerologiaHubPage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <NumerologyHubAm />;
   if (locale === "en") return <NumerologyHubEn />;
   const archetypes = Object.fromEntries(
-    LIFE_PATH_NUMBERS.map((n) => [n, LIFE_PATH_CONTENT[n].archetypeKa])
+    LIFE_PATH_NUMBERS.map((n) => [n, LIFE_PATH_CONTENT[n].archetypeKa]),
   );
 
   const ld = [

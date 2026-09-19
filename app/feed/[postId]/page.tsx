@@ -35,12 +35,14 @@ export default async function PostThreadPage({
     getUserLocale(user.id),
   ]);
   const en = locale !== "ka";
-  const am = locale === "am";
 
   if (!post) notFound();
 
   return (
-    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex flex-1 flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%)]"
@@ -55,7 +57,7 @@ export default async function PostThreadPage({
           className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          {am ? "Վերադառնալ լրահոս" : en ? "Back to feed" : "ფიდზე დაბრუნება"}
+          {en ? "Back to feed" : "ფიდზე დაბრუნება"}
         </Link>
 
         <PostCard

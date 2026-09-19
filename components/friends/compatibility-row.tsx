@@ -2,10 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 
-import {
-  CATEGORY_EMOJI,
-  CATEGORY_LABEL_KA,
-} from "@/lib/synastry";
+import { CATEGORY_EMOJI, CATEGORY_LABEL_KA } from "@/lib/synastry";
 import { CATEGORY_LABEL_EN, overallVerdictEn } from "@/lib/synastry-en";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { FriendWithSynastry } from "@/lib/friend-synastry";
@@ -30,7 +27,6 @@ export function CompatibilityRow({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const displayName =
     u.displayName ?? u.name?.split(" ")[0] ?? u.username ?? "user";
   const profileHref = u.username ? `/u/${u.username}` : null;
@@ -65,7 +61,9 @@ export function CompatibilityRow({
         {profileHref ? (
           <Link
             href={profileHref}
-            aria-label={en ? `${displayName}'s profile` : `${displayName}-ის პროფილი`}
+            aria-label={
+              en ? `${displayName}'s profile` : `${displayName}-ის პროფილი`
+            }
             className="shrink-0 rounded-full transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {avatar}
@@ -124,7 +122,7 @@ export function CompatibilityRow({
         {profileHref && (
           <Link
             href={profileHref}
-            aria-label={am ? "Մանրամասն համատեղելիություն" : en ? "Detailed compatibility" : "დეტალური თავსებადობა"}
+            aria-label={en ? "Detailed compatibility" : "დეტალური თავსებადობა"}
             className="hidden shrink-0 text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
           >
             <ArrowRight className="size-4" />

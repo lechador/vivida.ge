@@ -20,7 +20,8 @@ const ERRORS_KA: Record<string, string> = {
   no_chart: "ჯერ შენი რუკა უნდა შეიქმნას.",
   unavailable: "სერვისი დროებით მიუწვდომელია.",
   invalid_message: "შეტყობინება ცარიელია ან ძალიან გრძელია.",
-  needs_credits: "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი.",
+  needs_credits:
+    "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი.",
 };
 
 const ERRORS_EN: Record<string, string> = {
@@ -43,18 +44,20 @@ export function ChartChat({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const starters = chartStarterOptions(locale);
   const [messages, setMessages] = useState<Msg[]>(initialMessages);
   const [input, setInput] = useState(() =>
-    initialStarter ? chartStarterText(initialStarter, locale) : ""
+    initialStarter ? chartStarterText(initialStarter, locale) : "",
   );
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Tracked separately from the message so the 402 branch can also offer
   // the standard invite/top-up CTA, like every other credit gate.
   const [needsCredits, setNeedsCredits] = useState(false);
-  const [creditShortfall, setCreditShortfall] = useState({ balance: 0, cost: 1 });
+  const [creditShortfall, setCreditShortfall] = useState({
+    balance: 0,
+    cost: 1,
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -67,7 +70,11 @@ export function ChartChat({
     setError(null);
     setNeedsCredits(false);
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: msg }, { role: "assistant", content: "" }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: msg },
+      { role: "assistant", content: "" },
+    ]);
     setSending(true);
 
     try {
@@ -80,7 +87,9 @@ export function ChartChat({
         const data = await res.json().catch(() => ({}));
         setError(
           (en ? ERRORS_EN : ERRORS_KA)[data.error] ??
-            (am ? "Ինչ-որ բան այն չէր։ Խնդրում ենք նորից փորձել։" : en ? "Something went wrong. Please try again." : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
+            (en
+              ? "Something went wrong. Please try again."
+              : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
         );
         const short = data.error === "needs_credits";
         setNeedsCredits(short);
@@ -117,7 +126,11 @@ export function ChartChat({
         });
       }
     } catch {
-      setError(am ? "Ցանցի սխալ։ Խնդրում ենք նորից փորձել։" : en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(
+        en
+          ? "Network error. Please try again."
+          : "ქსელის შეცდომა. სცადე ხელახლა.",
+      );
       setMessages((prev) => prev.slice(0, -1));
     } finally {
       setSending(false);
@@ -179,7 +192,7 @@ export function ChartChat({
                 {m.content || <TypingDots />}
               </div>
             </div>
-          )
+          ),
         )}
         <div ref={scrollRef} />
       </div>
@@ -187,7 +200,18 @@ export function ChartChat({
       {error && (
         <div className="mt-3 shrink-0">
           <p className="text-sm text-[var(--vivida-pink)]">{error}</p>
-          {needsCredits && <div className="mt-2"><ContextualPaywallActions locale={locale} balance={creditShortfall.balance} cost={creditShortfall.cost} product="ai_chart_chat" returnTo="/ask" placement="chart_chat_shortfall" /></div>}
+          {needsCredits && (
+            <div className="mt-2">
+              <ContextualPaywallActions
+                locale={locale}
+                balance={creditShortfall.balance}
+                cost={creditShortfall.cost}
+                product="ai_chart_chat"
+                returnTo="/ask"
+                placement="chart_chat_shortfall"
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -210,14 +234,14 @@ export function ChartChat({
               }
             }}
             rows={1}
-            placeholder={am ? "Գրեք ձեր հարցը…" : en ? "Write your question…" : "დაწერე შეკითხვა…"}
+            placeholder={en ? "Write your question…" : "დაწერე შეკითხვა…"}
             disabled={sending}
             className="max-h-32 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground"
           />
           <button
             type="submit"
             disabled={sending || !input.trim()}
-            aria-label={am ? "Ուղարկել" : en ? "Send" : "გაგზავნა"}
+            aria-label={en ? "Send" : "გაგზავნა"}
             className="grid size-10 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-md transition-opacity disabled:opacity-40"
           >
             <Send className="size-4" />
@@ -225,7 +249,9 @@ export function ChartChat({
         </div>
         <div className="mt-2 flex justify-center">
           <CreditHint>
-            {am ? "Օրական 2 անվճար հարց, այնուհետև −1 կրեդիտ" : en ? "2 free questions per day, then −1 credit" : "დღეში 2 უფასო შეკითხვა, შემდეგ −1 კრედიტი"}
+            {en
+              ? "2 free questions per day, then −1 credit"
+              : "დღეში 2 უფასო შეკითხვა, შემდეგ −1 კრედიტი"}
           </CreditHint>
         </div>
         <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
@@ -245,7 +271,10 @@ function TypingDots() {
         <span
           key={i}
           className="size-1.5 rounded-full bg-[var(--vivida-violet)]"
-          style={{ animation: "vivida-typing-bounce 1.2s infinite", animationDelay: `${i * 0.15}s` }}
+          style={{
+            animation: "vivida-typing-bounce 1.2s infinite",
+            animationDelay: `${i * 0.15}s`,
+          }}
         />
       ))}
     </span>

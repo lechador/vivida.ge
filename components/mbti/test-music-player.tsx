@@ -20,7 +20,6 @@ const VOLUME = 0.32;
  */
 export function TestMusicPlayer({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale === "en";
-  const am = locale === "am";
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [hinted, setHinted] = useState(false); // pulse to invite, once
@@ -59,7 +58,6 @@ export function TestMusicPlayer({ locale = "ka" }: { locale?: UserLocale }) {
     let alive = true;
     fetch(SRC, { method: "HEAD" })
       .then((r) => {
-         
         if (alive && r.ok) setAvailable(true);
       })
       .catch(() => {});
@@ -81,7 +79,6 @@ export function TestMusicPlayer({ locale = "ka" }: { locale?: UserLocale }) {
     if (on) void start();
     else setHinted(true);
     /* eslint-enable react-hooks/set-state-in-effect */
-     
   }, [available]);
 
   if (!available) return null;
@@ -92,13 +89,29 @@ export function TestMusicPlayer({ locale = "ka" }: { locale?: UserLocale }) {
       <button
         type="button"
         onClick={playing ? stop : start}
-        aria-label={playing ? (am ? "Անջատել երաժշտությունը" : en ? "Turn music off" : "მუსიკის გამორთვა") : (am ? "Միացնել մեղմ երաժշտությունը" : en ? "Turn ambient music on" : "მისტიკური მუსიკის ჩართვა")}
-        title={playing ? (am ? "Անջատել երաժշտությունը" : en ? "Turn music off" : "მუსიკის გამორთვა") : (am ? "Մեղմ երաժշտություն" : en ? "Ambient music" : "მისტიკური მუსიკა")}
+        aria-label={
+          playing
+            ? en
+              ? "Turn music off"
+              : "მუსიკის გამორთვა"
+            : en
+              ? "Turn ambient music on"
+              : "მისტიკური მუსიკის ჩართვა"
+        }
+        title={
+          playing
+            ? en
+              ? "Turn music off"
+              : "მუსიკის გამორთვა"
+            : en
+              ? "Ambient music"
+              : "მისტიკური მუსიკა"
+        }
         className={cn(
           "fixed right-4 bottom-24 z-40 grid size-12 place-items-center rounded-full sm:right-6 sm:bottom-6",
           "border border-[var(--vivida-violet)]/50 bg-[oklch(0.16_0.06_300/0.8)] text-[var(--vivida-cyan)] backdrop-blur-xl",
           "shadow-[0_0_24px_-6px_oklch(0.65_0.24_305/0.7)] transition-transform hover:scale-105",
-          hinted && !playing && "vivida-music-pulse"
+          hinted && !playing && "vivida-music-pulse",
         )}
       >
         {playing ? (

@@ -33,7 +33,6 @@ export function BuyReportCta({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +86,7 @@ export function BuyReportCta({
               : data.error === "unauthorized"
                 ? "Please sign in first."
                 : "Something went wrong. Please try again."
-            : ERRORS[data.error] ?? "რაღაც ვერ მოხერხდა. სცადე ხელახლა.",
+            : (ERRORS[data.error] ?? "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
         );
         setLoading(false);
         return;
@@ -102,7 +101,11 @@ export function BuyReportCta({
       }
       router.push(data.url);
     } catch {
-      setError(am ? "Ցանցի սխալ։ Խնդրում ենք նորից փորձել։" : en ? "Network error. Please try again." : "ქსელის შეცდომა. სცადე ხელახლა.");
+      setError(
+        en
+          ? "Network error. Please try again."
+          : "ქსელის შეცდომა. სცადე ხელახლა.",
+      );
       setLoading(false);
     }
   }
@@ -117,10 +120,12 @@ export function BuyReportCta({
         <div className="max-w-xl">
           <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-gold)]/30 bg-[var(--vivida-gold)]/10 px-2.5 py-0.5 text-xs font-medium text-[var(--vivida-gold)]">
             <Sparkles className="size-3" />
-            {am ? "Ամբողջական զեկույց" : en ? "Complete report" : "სრული ანგარიში"}
+            {en ? "Complete report" : "სრული ანგარიში"}
           </div>
           <h3 className="text-xl font-semibold tracking-tight">
-            {am ? "Ձեր նատալ քարտեզի խորը վերլուծություն—PDF" : en ? "A deep reading of your natal chart—PDF" : "შენი ნატალური რუკის ღრმა ანალიზი — PDF"}
+            {en
+              ? "A deep reading of your natal chart—PDF"
+              : "შენი ნატალური რუკის ღრმა ანალიზი — PDF"}
           </h3>
           <p className="mt-1.5 text-sm text-foreground/75">
             {en
@@ -129,8 +134,12 @@ export function BuyReportCta({
           </p>
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1 text-sm">
             <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-            <span className="font-semibold">{cost} {am ? "կրեդիտներ" : am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}</span>
-            <span className="text-muted-foreground">· {am ? "մնացորդ" : en ? "balance" : "ბალანსი"} {balance}</span>
+            <span className="font-semibold">
+              {cost} {en ? "credits" : "კრედიტი"}
+            </span>
+            <span className="text-muted-foreground">
+              · {en ? "balance" : "ბალანსი"} {balance}
+            </span>
           </div>
         </div>
         <div className="flex flex-col items-stretch gap-2 sm:items-end">
@@ -148,18 +157,29 @@ export function BuyReportCta({
                 ) : (
                   <FileText className="size-4" />
                 )}
-                {am ? "Ստեղծել" : en ? "Create" : "შექმნა"} — {cost} {en ? "credits" : "კრედიტი"}
+                {en ? "Create" : "შექმნა"} — {cost} {en ? "credits" : "კრედიტი"}
               </Button>
               <span className="text-center text-xs text-muted-foreground sm:text-right">
-                {am ? "Միանվագ վճարում · մշտական մուտք" : en ? "One-time payment · permanent access" : "ერთჯერადი გადახდა · სამუდამო წვდომა"}
+                {en
+                  ? "One-time payment · permanent access"
+                  : "ერთჯერადი გადახდა · სამუდამო წვდომა"}
               </span>
             </>
           ) : (
-            <ContextualPaywallActions locale={locale} balance={balance} cost={cost} product="natal_pdf" returnTo="/report" placement="natal_report_shortfall" />
+            <ContextualPaywallActions
+              locale={locale}
+              balance={balance}
+              cost={cost}
+              product="natal_pdf"
+              returnTo="/report"
+              placement="natal_report_shortfall"
+            />
           )}
         </div>
       </div>
-      {error && <p className="mt-3 text-sm text-[var(--vivida-pink)]">{error}</p>}
+      {error && (
+        <p className="mt-3 text-sm text-[var(--vivida-pink)]">{error}</p>
+      )}
     </div>
   );
 }

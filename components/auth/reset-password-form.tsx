@@ -19,7 +19,6 @@ export function ResetPasswordForm({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -31,7 +30,7 @@ export function ResetPasswordForm({
     e.preventDefault();
     setError(null);
     if (password !== confirm) {
-      setError(am ? "Գաղտնաբառերը չեն համընկնում" : en ? "Passwords do not match" : "პაროლები არ ემთხვევა");
+      setError(en ? "Passwords do not match" : "პაროლები არ ემთხვევა");
       return;
     }
     startTransition(async () => {
@@ -57,10 +56,12 @@ export function ResetPasswordForm({
         </div>
         <div>
           <h3 className="text-lg font-semibold tracking-tight">
-            {am ? "Գաղտնաբառը թարմացված է" : en ? "Password updated" : "პაროლი შეიცვალა"}
+            {en ? "Password updated" : "პაროლი შეიცვალა"}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            {am ? "Ձեզ տեղափոխում ենք մուտքի էջ…" : en ? "Taking you to the sign-in page…" : "ახლავე გადაგამისამართებთ შესვლის გვერდზე…"}
+            {en
+              ? "Taking you to the sign-in page…"
+              : "ახლავე გადაგამისამართებთ შესვლის გვერდზე…"}
           </p>
         </div>
       </div>
@@ -71,13 +72,15 @@ export function ResetPasswordForm({
     return (
       <div className="space-y-3 text-center">
         <p className="text-sm text-destructive">
-          {am ? "Այս հղումն անվավեր է կամ ժամկետանց։" : en ? "This link is invalid or has expired." : "ლინკი არასწორია ან ვადაგასულია."}
+          {en
+            ? "This link is invalid or has expired."
+            : "ლინკი არასწორია ან ვადაგასულია."}
         </p>
         <Link
           href="/forgot-password"
           className="inline-block text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
         >
-          {am ? "Հայցել նոր հղում" : en ? "Request a new link" : "მოითხოვე ახალი ლინკი"}
+          {en ? "Request a new link" : "მოითხოვე ახალი ლინკი"}
         </Link>
       </div>
     );
@@ -86,7 +89,7 @@ export function ResetPasswordForm({
   return (
     <form onSubmit={submit} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="password">{am ? "Նոր գաղտնաբառ" : en ? "New password" : "ახალი პაროლი"}</Label>
+        <Label htmlFor="password">{en ? "New password" : "ახალი პაროლი"}</Label>
         <Input
           id="password"
           name="password"
@@ -99,11 +102,13 @@ export function ResetPasswordForm({
           disabled={isPending}
         />
         <p className="text-xs text-muted-foreground">
-          {am ? "Առնվազն 8 նիշ։" : en ? "At least 8 characters." : "მინიმუმ 8 სიმბოლო."}
+          {en ? "At least 8 characters." : "მინიმუმ 8 სიმბოლო."}
         </p>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="confirm">{am ? "Հաստատել գաղտնաբառը" : en ? "Confirm password" : "გაიმეორე პაროლი"}</Label>
+        <Label htmlFor="confirm">
+          {en ? "Confirm password" : "გაიმეორე პაროლი"}
+        </Label>
         <Input
           id="confirm"
           name="confirm"
@@ -131,7 +136,13 @@ export function ResetPasswordForm({
         disabled={isPending}
       >
         {isPending && <Loader2 className="size-4 animate-spin" />}
-        {isPending ? (am ? "Պահպանվում է…" : en ? "Saving…" : "ინახება…") : am ? "Սահմանել գաղտնաբառ" : en ? "Set password" : "პაროლის დაყენება"}
+        {isPending
+          ? en
+            ? "Saving…"
+            : "ინახება…"
+          : en
+            ? "Set password"
+            : "პაროლის დაყენება"}
       </Button>
     </form>
   );

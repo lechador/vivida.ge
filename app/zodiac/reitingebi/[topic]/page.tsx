@@ -15,14 +15,22 @@ import {
   rankingTopicBySlug,
 } from "@/lib/seo/rankings";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
-import { ALL_SLUGS, signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
+import {
+  ALL_SLUGS,
+  signMetaBySlug,
+  type ZodiacSlug,
+} from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { RankingTopicPageEn } from "@/components/seo/rankings-en";
-import { RankingTopicPageAm } from "@/components/seo/rankings-am";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { rankingTopicEnBySlug } from "@/lib/seo/rankings-en";
-import { rankingTopicAmBySlug } from "@/lib/seo/rankings-am";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+
+import {
+  englishSiteHref,
+  ENGLISH_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -41,33 +49,32 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { topic: slug } = await params;
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const topic = rankingTopicAmBySlug(slug);
-    if (!topic) return {};
-    const description = `${topic.title}. Կենդանակերպի բոլոր 12 նշանները՝ ըստ «${topic.trait}» հատկանիշի:`;
-    const path = `/zodiac/reitingebi/${slug}`;
-    return {
-      title: { absolute: `${topic.title} — Vivida` },
-      description,
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        type: "article",
-        url: armenianSiteHref(path, false),
-        title: topic.title,
-        description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-        images: [DEFAULT_OG_IMAGE],
-      },
-      twitter: { card: "summary_large_image", title: topic.title, description },
-    };
-  }
   if (locale === "en") {
-    const topic = rankingTopicEnBySlug(slug); if (!topic) return {};
+    const topic = rankingTopicEnBySlug(slug);
+    if (!topic) return {};
     const description = `${topic.title}: all 12 Sun signs compared through ${topic.trait}, with an explanation for every placement.`;
     const path = `/zodiac/reitingebi/${slug}`;
     const ogEn = `${ENGLISH_SITE_URL}/api/og/page?t=${encodeURIComponent(topic.title)}&k=${encodeURIComponent("Ranking")}&a=${encodeURIComponent("#eac358")}`;
-    return { title: { absolute: topic.title }, description, alternates: localizedAlternates(path, path, "en"), openGraph: { type: "article", url: englishSiteHref(path, false), title: topic.title, description, siteName: "Vivida", locale: "en_US", images: [{ url: ogEn, width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", title: topic.title, description, images: [ogEn] } };
+    return {
+      title: { absolute: topic.title },
+      description,
+      alternates: localizedAlternates(path, path, "en"),
+      openGraph: {
+        type: "article",
+        url: englishSiteHref(path, false),
+        title: topic.title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+        images: [{ url: ogEn, width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: topic.title,
+        description,
+        images: [ogEn],
+      },
+    };
   }
   const topic = rankingTopicBySlug(slug);
   if (!topic) return {};
@@ -78,7 +85,11 @@ export async function generateMetadata({
   return {
     title: { absolute: title },
     description,
-    alternates: localizedAlternates(`/zodiac/reitingebi/${slug}`, `/zodiac/reitingebi/${slug}`, "ka"),
+    alternates: localizedAlternates(
+      `/zodiac/reitingebi/${slug}`,
+      `/zodiac/reitingebi/${slug}`,
+      "ka",
+    ),
     openGraph: {
       type: "article",
       url,
@@ -99,12 +110,11 @@ export default async function RankingTopicPage({
 }) {
   const { topic: slug } = await params;
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const topic = rankingTopicAmBySlug(slug);
+  if (locale === "en") {
+    const topic = rankingTopicEnBySlug(slug);
     if (!topic) notFound();
-    return <RankingTopicPageAm topic={topic} />;
+    return <RankingTopicPageEn topic={topic} />;
   }
-  if (locale === "en") { const topic = rankingTopicEnBySlug(slug); if (!topic) notFound(); return <RankingTopicPageEn topic={topic} />; }
   const topic = rankingTopicBySlug(slug);
   if (!topic) notFound();
 
@@ -156,7 +166,12 @@ export default async function RankingTopicPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ცის ნიშნები", item: `${SITE_URL}/zodiac` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ცის ნიშნები",
+        item: `${SITE_URL}/zodiac`,
+      },
       {
         "@type": "ListItem",
         position: 2,
@@ -269,7 +284,11 @@ export default async function RankingTopicPage({
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg" style={{ color: accent }} aria-hidden>
+                      <span
+                        className="text-lg"
+                        style={{ color: accent }}
+                        aria-hidden
+                      >
                         {sc?.symbol}
                       </span>
                       <h2 className="text-base font-semibold tracking-tight text-foreground sm:text-lg">

@@ -10,7 +10,6 @@ import { ZODIAC_DATES, signSlugByDate } from "@/lib/seo/zodiac-dates";
 import { signMetaBySlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { ELEMENT_EN, ZODIAC_SIGN_EN } from "@/lib/zodiac-sign-en";
-import { ELEMENT_AM, ZODIAC_SIGN_AM } from "@/lib/zodiac-sign-am";
 
 const MONTHS_KA = [
   "იანვარი",
@@ -40,20 +39,6 @@ const MONTHS_EN = [
   "November",
   "December",
 ];
-const MONTHS_AM = [
-  "Հունվար",
-  "Փետրվար",
-  "Մարտ",
-  "Ապրիլ",
-  "Մայիս",
-  "Հունիս",
-  "Հուլիս",
-  "Օգոստոս",
-  "Սեպտեմբեր",
-  "Հոկտեմբեր",
-  "Նոյեմբեր",
-  "Դեկտեմբեր",
-];
 
 const DAYS_IN_MONTH = (m: number) =>
   m === 2 ? 29 : [4, 6, 9, 11].includes(m) ? 30 : 31;
@@ -64,7 +49,6 @@ export function SignByDatePicker({
   locale?: "ka" | "en" | "am";
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   const [month, setMonth] = useState<number | null>(null);
   const [day, setDay] = useState<number | null>(null);
 
@@ -82,17 +66,13 @@ export function SignByDatePicker({
     <div className="rounded-3xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
       <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
         <Calendar className="size-3.5" />
-        {am
-          ? "Ձեր ծննդյան ամսաթիվը"
-          : en
-            ? "Your birth date"
-            : "შენი დაბადების თარიღი"}
+        {en ? "Your birth date" : "შენი დაბადების თარიღი"}
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className="block">
           <span className="mb-1.5 block text-xs text-muted-foreground">
-            {am ? "Ամիս" : en ? "Month" : "თვე"}
+            {en ? "Month" : "თვე"}
           </span>
           <select
             value={month ?? ""}
@@ -105,10 +85,8 @@ export function SignByDatePicker({
             }}
             className="w-full rounded-xl border border-border bg-card/40 px-4 py-3 text-base text-foreground outline-none transition-colors focus:border-[var(--vivida-violet)]/60 focus:ring-2 focus:ring-[var(--vivida-violet)]/30"
           >
-            <option value="">
-              {am ? "Ընտրեք ամիսը" : en ? "Choose month" : "აირჩიე თვე"}
-            </option>
-            {(am ? MONTHS_AM : en ? MONTHS_EN : MONTHS_KA).map((label, i) => (
+            <option value="">{en ? "Choose month" : "აირჩიე თვე"}</option>
+            {(en ? MONTHS_EN : MONTHS_KA).map((label, i) => (
               <option key={i} value={i + 1}>
                 {label}
               </option>
@@ -118,7 +96,7 @@ export function SignByDatePicker({
 
         <label className="block">
           <span className="mb-1.5 block text-xs text-muted-foreground">
-            {am ? "Օր" : en ? "Day" : "დღე"}
+            {en ? "Day" : "დღე"}
           </span>
           <select
             value={day ?? ""}
@@ -128,9 +106,7 @@ export function SignByDatePicker({
             disabled={month == null}
             className="w-full rounded-xl border border-border bg-card/40 px-4 py-3 text-base text-foreground outline-none transition-colors focus:border-[var(--vivida-violet)]/60 focus:ring-2 focus:ring-[var(--vivida-violet)]/30 disabled:opacity-50"
           >
-            <option value="">
-              {am ? "Ընտրեք օրը" : en ? "Choose day" : "აირჩიე დღე"}
-            </option>
+            <option value="">{en ? "Choose day" : "აირჩიე დღე"}</option>
             {month != null &&
               Array.from({ length: DAYS_IN_MONTH(month) }, (_, i) => i + 1).map(
                 (d) => (
@@ -172,31 +148,21 @@ export function SignByDatePicker({
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {am
-                  ? "Ձեր կենդանակերպի նշանն է"
-                  : en
-                    ? "Your zodiac sign is"
-                    : "შენი ცის ნიშანია"}
+                {en ? "Your zodiac sign is" : "შენი ცის ნიშანია"}
               </div>
               <div className="mt-0.5 text-2xl font-semibold tracking-tight sm:text-3xl">
-                {am ? meta?.labelAm : en ? meta?.labelEn : result.labelKa}
+                {en ? meta?.labelEn : result.labelKa}
               </div>
               <div className="mt-0.5 text-xs text-muted-foreground">
-                {am
-                  ? `${dates.rangeAm} · ${ELEMENT_AM[result.element]}`
-                  : en
-                    ? `${dates.rangeEn} · ${ELEMENT_EN[result.element]}`
-                    : `${dates.rangeKa} · ${result.element}`}
+                {en
+                  ? `${dates.rangeEn} · ${ELEMENT_EN[result.element]}`
+                  : `${dates.rangeKa} · ${result.element}`}
               </div>
             </div>
           </div>
 
           <p className="relative mt-4 text-pretty text-sm leading-relaxed text-foreground/90 sm:text-base">
-            {am
-              ? ZODIAC_SIGN_AM[result.slug].tagline
-              : en
-                ? ZODIAC_SIGN_EN[result.slug].tagline
-                : result.tagline}
+            {en ? ZODIAC_SIGN_EN[result.slug].tagline : result.tagline}
           </p>
 
           <Button
@@ -204,12 +170,10 @@ export function SignByDatePicker({
             variant="mystic"
             className="relative mt-5 w-full sm:w-auto"
           >
-            <Link href={`${am ? "/am" : ""}/zodiac/${result.slug}`}>
-              {am
-                ? `Կարդալ ${meta?.labelAm} նշանի ամբողջական ուղեցույցը`
-                : en
-                  ? `Read the full ${meta?.labelEn} guide`
-                  : `ნახე ${result.labelKa}-ის სრული აღწერა`}
+            <Link href={`${""}/zodiac/${result.slug}`}>
+              {en
+                ? `Read the full ${meta?.labelEn} guide`
+                : `ნახე ${result.labelKa}-ის სრული აღწერა`}
               <ArrowRight className="size-4" />
             </Link>
           </Button>

@@ -76,12 +76,11 @@ function EmptyState({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   return (
     <div className="mx-auto mt-12 max-w-md rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
       <Compass className="mx-auto mb-3 size-8 text-muted-foreground" />
       <h2 className="text-lg font-semibold">
-        {am ? "Դեռ ոչինչ չկա" : en ? "Nothing here yet" : "ჯერ ცარიელია"}
+        {en ? "Nothing here yet" : "ჯერ ცარიელია"}
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
         {hasElement
@@ -94,9 +93,7 @@ function EmptyState({
       </p>
       {!hasElement && (
         <Button asChild variant="mystic" className="mt-4">
-          <Link href="/onboarding">
-            {am ? "Ավելացնել մանրամասներ" : en ? "Add details" : "შეავსე ახლავე"}
-          </Link>
+          <Link href="/onboarding">{en ? "Add details" : "შეავსე ახლავე"}</Link>
         </Button>
       )}
     </div>

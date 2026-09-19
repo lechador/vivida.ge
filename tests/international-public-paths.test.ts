@@ -5,17 +5,14 @@ import {
   internationalPublicPath,
   isInternationalCleanPath,
   isInternationalLegacyPath,
+  localizedHref,
 } from "@/lib/seo/public-paths";
-import { localeHref, withArmenianPrefix } from "@/lib/i18n/armenian-routes";
 import { serializeLd } from "@/lib/seo/jsonld";
 
 describe("international public URL vocabulary", () => {
   it.each([
     ["/astrologiuri-kalendari", "/astrology-calendar"],
-    [
-      "/astrologiuri-kalendari/2026-08-18",
-      "/astrology-calendar/2026-08-18",
-    ],
+    ["/astrologiuri-kalendari/2026-08-18", "/astrology-calendar/2026-08-18"],
     ["/chinuri-horoskopi/monkey", "/chinese-zodiac/monkey"],
     ["/horoskopi/kvireuli", "/weekly-horoscope"],
     [
@@ -25,10 +22,7 @@ describe("international public URL vocabulary", () => {
     ["/astrologiuri-saxlebi/6", "/astrology-houses/6"],
     ["/zodiac/amomavali", "/zodiac/rising-sign"],
     ["/zodiac/amomavali/cancer", "/zodiac/rising-sign/cancer"],
-    [
-      "/zodiac/tavsebadoba/aries-leo",
-      "/zodiac/compatibility/aries-leo",
-    ],
+    ["/zodiac/tavsebadoba/aries-leo", "/zodiac/compatibility/aries-leo"],
   ])("maps %s to %s and back without a chain", (legacy, clean) => {
     expect(internationalPublicPath(legacy)).toBe(clean);
     expect(internationalInternalPath(clean)).toBe(legacy);
@@ -38,18 +32,15 @@ describe("international public URL vocabulary", () => {
     expect(internationalInternalPath(legacy)).toBe(legacy);
   });
 
-  it("keeps Georgian routes internal while publishing clean EN and AM links", () => {
-    expect(localeHref("/astrologiuri-kalendari", "ka")).toBe(
+  it("keeps Georgian routes internal while publishing clean EN links", () => {
+    expect(localizedHref("/astrologiuri-kalendari", "ka")).toBe(
       "/astrologiuri-kalendari",
     );
-    expect(localeHref("/astrologiuri-kalendari", "en")).toBe(
+    expect(localizedHref("/astrologiuri-kalendari", "en")).toBe(
       "/astrology-calendar",
     );
-    expect(localeHref("/astrologiuri-kalendari", "am")).toBe(
-      "/am/astrology-calendar",
-    );
-    expect(withArmenianPrefix("/am/astrologiuri-kalendari/2026-08-18")).toBe(
-      "/am/astrology-calendar/2026-08-18",
+    expect(localizedHref("/astrologiuri-kalendari/2026-08-18", "en")).toBe(
+      "/astrology-calendar/2026-08-18",
     );
   });
 
@@ -58,12 +49,7 @@ describe("international public URL vocabulary", () => {
     expect(internationalPublicPath("/zodiac/tavsebadoba")).toBe(
       "/compatibility",
     );
-    expect(internationalInternalPath("/compatibility")).toBe(
-      "/compatibility",
-    );
-    expect(localeHref("/zodiac/tavsebadoba", "am")).toBe(
-      "/am/compatibility",
-    );
+    expect(internationalInternalPath("/compatibility")).toBe("/compatibility");
   });
 
   it("preserves query strings and fragments while translating the pathname", () => {
@@ -73,31 +59,26 @@ describe("international public URL vocabulary", () => {
     expect(internationalInternalPath("/zodiac/dates?month=8#picker")).toBe(
       "/zodiac/datit?month=8#picker",
     );
-    expect(localeHref("/sizmris-akhsna?query=water", "am")).toBe(
-      "/am/dream-meanings?query=water",
-    );
   });
 
-  it("publishes clean English and Armenian URLs inside JSON-LD", () => {
+  it("publishes clean English URLs inside JSON-LD", () => {
     const json = serializeLd({
       english: "https://www.vividaastro.com/astrologiuri-kalendari/2026-08-18",
-      armenian: "https://www.vividaastro.com/am/mtvaris-kalendari",
       georgian: "https://www.vivida.ge/astrologiuri-kalendari",
     });
 
     expect(JSON.parse(json)).toEqual({
       english: "https://www.vividaastro.com/astrology-calendar/2026-08-18",
-      armenian: "https://www.vividaastro.com/am/moon-calendar",
       georgian: "https://www.vivida.ge/astrologiuri-kalendari",
     });
   });
 
-  it("keeps the Search Console canonical examples on clean Armenian URLs", () => {
-    expect(withArmenianPrefix("/zodiac/amomavali")).toBe(
-      "/am/zodiac/rising-sign",
+  it("keeps the Search Console canonical examples on clean English URLs", () => {
+    expect(localizedHref("/zodiac/amomavali", "en")).toBe(
+      "/zodiac/rising-sign",
     );
-    expect(withArmenianPrefix("/zodiac/tavsebadoba/aries-scorpio")).toBe(
-      "/am/zodiac/compatibility/aries-scorpio",
+    expect(localizedHref("/zodiac/tavsebadoba/aries-scorpio", "en")).toBe(
+      "/zodiac/compatibility/aries-scorpio",
     );
   });
 });

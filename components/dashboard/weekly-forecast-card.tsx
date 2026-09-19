@@ -59,7 +59,6 @@ export function WeeklyForecastCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
@@ -72,13 +71,16 @@ export function WeeklyForecastCard({
       <header className="relative mb-5 flex items-baseline justify-between gap-3">
         <div>
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {am ? "Հաջորդ 7 օրը" : en ? "Next 7 days" : "შემდეგი 7 დღე"}
+            {en ? "Next 7 days" : "შემდეგი 7 დღე"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight sm:text-xl">
-            {am ? "Ձեր շաբաթը երկնքում" : en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
+            {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
-        <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" aria-hidden />
+        <Sparkles
+          className="size-5 shrink-0 text-[var(--vivida-cyan)]"
+          aria-hidden
+        />
       </header>
 
       <ol className="relative space-y-3.5">
@@ -117,16 +119,21 @@ function DayRow({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const dayNum = parseDateNum(day.dateIso);
   const weekShort = en
-    ? new Intl.DateTimeFormat("en", { weekday: "short", timeZone: "UTC" }).format(new Date(`${day.dateIso}T00:00:00Z`))
-    : WEEKDAY_SHORT_KA[day.weekdayKa] ?? day.weekdayKa.slice(0, 3);
+    ? new Intl.DateTimeFormat("en", {
+        weekday: "short",
+        timeZone: "UTC",
+      }).format(new Date(`${day.dateIso}T00:00:00Z`))
+    : (WEEKDAY_SHORT_KA[day.weekdayKa] ?? day.weekdayKa.slice(0, 3));
   const total = day.harmonyScore + day.challengeScore;
   const harmonicPct = total > 0 ? (day.harmonyScore / total) * 100 : 50;
   const challengePct = total > 0 ? (day.challengeScore / total) * 100 : 50;
   // Overall "intensity" — quiet days get a faded bar so the eye sees them as low-energy.
-  const intensity = Math.min(1, Math.max(day.harmonyScore, day.challengeScore) / 70);
+  const intensity = Math.min(
+    1,
+    Math.max(day.harmonyScore, day.challengeScore) / 70,
+  );
   // Threshold tuned to the post-amplification curve: tilted days now
   // produce wider gaps, so 18 keeps "შერეული" honest for genuinely
   // mixed days instead of every-other-day getting a directional label.
@@ -179,7 +186,7 @@ function DayRow({
           tone.bgHover,
           tone.border,
           tone.borderHover,
-          open && [tone.glow, "ring-1 ring-foreground/10"]
+          open && [tone.glow, "ring-1 ring-foreground/10"],
         )}
         aria-expanded={open}
       >
@@ -188,7 +195,7 @@ function DayRow({
           className={cn(
             "absolute inset-y-0 left-0 w-1.5",
             tone.stripe,
-            open && "shadow-[0_0_14px_oklch(0.65_0.24_305/0.7)]"
+            open && "shadow-[0_0_14px_oklch(0.65_0.24_305/0.7)]",
           )}
         />
         <div className="flex items-start gap-3 sm:gap-4">
@@ -198,7 +205,7 @@ function DayRow({
               "flex shrink-0 flex-col items-center justify-center rounded-lg border px-2.5 py-1.5 transition-colors sm:px-3 sm:py-2",
               open
                 ? "border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/15"
-                : "border-border bg-[oklch(0.27_0.05_285/0.7)]"
+                : "border-border bg-[oklch(0.27_0.05_285/0.7)]",
             )}
           >
             <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
@@ -217,14 +224,16 @@ function DayRow({
                   {day.headline || "—"}
                 </p>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  {am ? "Լուսին" : en ? "Moon" : "მთვარე"} {en ? day.moonSignEn : day.moonSignKa} · {labelForTilt(tilt, locale)}
+                  {en ? "Moon" : "მთვარე"}{" "}
+                  {en ? day.moonSignEn : day.moonSignKa} ·{" "}
+                  {labelForTilt(tilt, locale)}
                 </p>
               </div>
               <ChevronDown
                 aria-hidden
                 className={cn(
                   "mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform",
-                  open && "rotate-180"
+                  open && "rotate-180",
                 )}
               />
             </div>
@@ -234,7 +243,11 @@ function DayRow({
               className="relative mt-2.5 h-2 overflow-hidden rounded-full bg-foreground/[0.06]"
               style={{ opacity: 0.55 + intensity * 0.45 }}
               role="img"
-              aria-label={en ? `Harmony ${day.harmonyScore}, challenge ${day.challengeScore}` : `ჰარმონია ${day.harmonyScore}, დაძაბულობა ${day.challengeScore}`}
+              aria-label={
+                en
+                  ? `Harmony ${day.harmonyScore}, challenge ${day.challengeScore}`
+                  : `ჰარმონია ${day.harmonyScore}, დაძაბულობა ${day.challengeScore}`
+              }
             >
               <div
                 className="absolute inset-y-0 left-0 rounded-l-full bg-[var(--vivida-cyan)]"
@@ -276,13 +289,13 @@ function DayRow({
         <div className="mt-2 grid gap-3 rounded-xl border border-[var(--vivida-violet)]/30 bg-[oklch(0.20_0.04_283/0.7)] p-3 sm:p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <Block
-              label={am ? "Աջակցող" : en ? "Supportive" : "ჰარმონიული"}
+              label={en ? "Supportive" : "ჰარმონიული"}
               dotClass="bg-[var(--vivida-cyan)]"
               borderClass="border-[var(--vivida-cyan)]/45"
               text={day.harmonicReason || "—"}
             />
             <Block
-              label={am ? "Դժվարին" : en ? "Challenging" : "დაძაბული"}
+              label={en ? "Challenging" : "დაძაბული"}
               dotClass="bg-[var(--vivida-pink)]"
               borderClass="border-[var(--vivida-pink)]/45"
               text={day.challengingReason || "—"}
@@ -297,7 +310,7 @@ function DayRow({
           {day.drivers && day.drivers.length > 0 && (
             <div>
               <div className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {am ? "Ակտիվ ասպեկտներ" : en ? "Active aspects" : "მოქმედი ასპექტები"}
+                {en ? "Active aspects" : "მოქმედი ასპექტები"}
               </div>
               <ul className="flex flex-wrap gap-1.5">
                 {day.drivers.slice(0, 4).map((dr, j) => (
@@ -309,7 +322,7 @@ function DayRow({
                         ? "border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/10 text-foreground/90"
                         : dr.family === "tense"
                           ? "border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/10 text-foreground/90"
-                          : "border-border/60 bg-background/40 text-foreground/80"
+                          : "border-border/60 bg-background/40 text-foreground/80",
                     )}
                     title={`${(en ? FAMILY_HINT_EN : FAMILY_HINT_KA)[dr.family] ?? ""} · orb ${dr.orb.toFixed(1)}°`}
                   >
@@ -317,7 +330,8 @@ function DayRow({
                       {bodyLabel(dr.transit, locale)}
                     </span>
                     <span className="text-muted-foreground">
-                      {(en ? ASPECT_LABEL_EN : ASPECT_LABEL_KA)[dr.kind] ?? dr.kind}
+                      {(en ? ASPECT_LABEL_EN : ASPECT_LABEL_KA)[dr.kind] ??
+                        dr.kind}
                     </span>
                     <span className="font-medium">
                       {bodyLabel(dr.natal, locale)}
@@ -348,7 +362,7 @@ function Block({
     <div
       className={cn(
         "rounded-lg border bg-[oklch(0.25_0.05_285/0.85)] px-3 py-2.5 ring-1 ring-foreground/5",
-        borderClass
+        borderClass,
       )}
     >
       <div className="mb-1 flex items-center gap-1.5">
@@ -362,7 +376,10 @@ function Block({
   );
 }
 
-function labelForTilt(tilt: "harmonic" | "challenging" | "balanced", locale: UserLocale): string {
+function labelForTilt(
+  tilt: "harmonic" | "challenging" | "balanced",
+  locale: UserLocale,
+): string {
   if (locale !== "ka") {
     if (tilt === "harmonic") return "supportive day";
     if (tilt === "challenging") return "challenging day";

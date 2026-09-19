@@ -9,12 +9,14 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * Pure function — safe to call from server or client; no Date.now()
  * snapshot is taken at module load.
  */
-export function feedTimeAgo(date: Date | string, locale: UserLocale = "ka"): string {
+export function feedTimeAgo(
+  date: Date | string,
+  locale: UserLocale = "ka",
+): string {
   const en = locale !== "ka";
-  const am = locale === "am";
   const ts = typeof date === "string" ? new Date(date) : date;
   const seconds = Math.floor((Date.now() - ts.getTime()) / 1000);
-  if (seconds < 45) return am ? "հենց հիմա" : en ? "just now" : "ახლახან";
+  if (seconds < 45) return en ? "just now" : "ახლახან";
   // 45–59s falls past "ახლახან" but floors to 0 — clamp so we never
   // render "0 წუთის წინ".
   const minutes = Math.max(1, Math.floor(seconds / 60));
@@ -24,6 +26,8 @@ export function feedTimeAgo(date: Date | string, locale: UserLocale = "ka"): str
   const days = Math.floor(hours / 24);
   if (days < 7) return en ? `${days}d ago` : `${days} დღის წინ`;
   return en
-    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(ts)
+    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(
+        ts,
+      )
     : kaShortDate(ts);
 }

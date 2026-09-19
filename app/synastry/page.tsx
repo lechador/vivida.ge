@@ -17,14 +17,12 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
-  return { title: am ? "Համատեղելիություն" : am ? "Համատեղելիություն" : en ? "Compatibility" : "თავსებადობა" };
+  return { title: en ? "Compatibility" : "თავსებადობა" };
 }
 
 export default async function SynastryPage() {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   const user = await requireUser();
   const [partners, used] = await Promise.all([
     listRelationshipsForViewer(user.id),
@@ -72,7 +70,7 @@ export default async function SynastryPage() {
               <Button asChild variant="mystic" size="lg">
                 <Link href="/synastry/new">
                   <Plus className="size-4" />
-                  {am ? "Ավելացնել գործընկեր" : en ? "Add partner" : "ახალი პარტნიორი"}
+                  {en ? "Add partner" : "ახალი პარტნიორი"}
                 </Link>
               </Button>
             ) : (
@@ -80,7 +78,7 @@ export default async function SynastryPage() {
               // can't navigate anywhere unhelpful.
               <Button variant="outline" size="lg" disabled>
                 <Plus className="size-4" />
-                {am ? "Հասանելի է հաջորդ ամիս" : en ? "Available next month" : "შემდეგი თვიდან"}
+                {en ? "Available next month" : "შემდეგი თვიდან"}
               </Button>
             )}
           </div>
@@ -118,7 +116,6 @@ function EmptyState({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   return (
     <div className="rounded-2xl border border-border/60 bg-card/50 p-10 text-center backdrop-blur-xl">
       <Heart
@@ -126,7 +123,7 @@ function EmptyState({
         aria-hidden
       />
       <h2 className="mt-4 text-balance text-xl font-semibold tracking-tight">
-        {am ? "Դուք դեռ ոչ ոքի չեք ավելացրել" : en ? "You haven't added anyone yet" : "ჯერ პარტნიორი არ დაგიმატებია"}
+        {en ? "You haven't added anyone yet" : "ჯერ პარტნიორი არ დაგიმატებია"}
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
         {en
@@ -137,7 +134,7 @@ function EmptyState({
         <Button asChild className="mt-6" variant="mystic" size="lg">
           <Link href="/synastry/new">
             <Plus className="size-4" />
-            {am ? "Ավելացրեք Ձեր առաջին անձին" : en ? "Add your first person" : "დაამატე პირველი"}
+            {en ? "Add your first person" : "დაამატე პირველი"}
           </Link>
         </Button>
       )}

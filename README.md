@@ -1,12 +1,11 @@
 # vivida.ge — Vivida web app
 
-Trilingual astrology platform (Next.js 16 App Router, React 19):
+Bilingual astrology platform (Next.js 16 App Router, React 19):
 
 - `ka` — Georgian, served on the vivida.ge host
 - `en` — English, served on the vividaastro.com host (clean URLs rewritten to the internal `/en` tree)
-- `am` — Armenian, served under `/am` on the international host
 
-See `docs/armenian-parity-handoff.md` for the locale-routing invariants before touching `proxy.ts`, rewrites, or hreflang.
+Retired `/am` (Armenian) URLs 308-redirect to the same path without the prefix (see `proxy.ts`).
 
 ## Stack
 
@@ -42,7 +41,6 @@ npm run check:env   # fails when code reads a key missing from .env.example
 | `npm test`                                                     | vitest unit suite                                                                                |
 | `npm run test:e2e`                                             | Playwright smoke + accessibility sweep                                                           |
 | `npm run perf:ci`                                              | Lighthouse budgets (/, /horoskopi, /nataluri-ruka, /en) — CLS ≤ 0.1 hard gate, LCP/perf warnings |
-| `npm run qa:armenian`                                          | Armenian launch audit (`scripts/audit-armenian-launch.mjs`)                                      |
 | `npm run audit:prod`                                           | `npm audit` for prod deps, high+                                                                 |
 | `npm run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle schema workflow                                                                          |
 
@@ -66,5 +64,4 @@ Integration tests (`tests/*.integration.test.ts`) need a scratch Postgres via `T
 
 - `docs/product-growth-priorities.md` — retention/monetization roadmap, funnel event contract, credit-economy guardrails
 - `docs/production-monitoring.md` — Sentry setup and alerting
-- `docs/armenian-parity-handoff.md` — locale routing, currency, and translation invariants
 - `scripts/README.md` — ops/content script catalog

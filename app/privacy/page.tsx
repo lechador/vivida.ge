@@ -9,9 +9,8 @@ import { LEGAL_ENTITY } from "@/lib/legal-entity";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   return {
-    title: am ? "Գաղտնիության քաղաքականություն" : en ? "Privacy Policy" : "კონფიდენციალურობა",
+    title: en ? "Privacy Policy" : "კონფიდენციალურობა",
     description: en
       ? "Vivida's Privacy Policy explains how we collect, use, protect, and retain personal data."
       : "Vivida-ს კონფიდენციალურობის პოლიტიკა — როგორ ვაგროვებთ და ვინახავთ თქვენს მონაცემებს.",
@@ -265,7 +264,7 @@ export default async function PrivacyPage() {
               .
             </p>
             <p className="mt-3 leading-relaxed">
-              ასევე უფლება გაქვთ საჩივრით მიმართოთ ზედამხედველ ორგანოს — 
+              ასევე უფლება გაქვთ საჩივრით მიმართოთ ზედამხედველ ორგანოს —
               საქართველოში ეს არის სახელმწიფო აუდიტის სამსახური{" "}
               <a
                 href="https://pdp.sao.ge"
@@ -350,8 +349,8 @@ export default async function PrivacyPage() {
               ამიტომ გადაცემა ხორციელდება თქვენ მიერ მოთხოვნილი სერვისის
               მიწოდების აუცილებლობიდან გამომდინარე, ხოლო ჩვენი პარტნიორებისგან
               ვითხოვთ შესაბამის საკონტრაქტო დაცვის მექანიზმებს. კონკრეტული
-              გადაცემის დაცვის მექანიზმების შესახებ ინფორმაციის მიღება
-              შეგიძლიათ ჩვენთან დაკავშირებით.
+              გადაცემის დაცვის მექანიზმების შესახებ ინფორმაციის მიღება შეგიძლიათ
+              ჩვენთან დაკავშირებით.
             </p>
           </section>
 

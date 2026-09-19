@@ -19,28 +19,34 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 const COPY = {
   ka: {
     title: "სტატიები ფსიქოლოგიაზე, ფილოსოფიასა და თვითგანვითარებაზე",
-    description: "დაფიქრებული და პრაქტიკული საკითხავი საკუთარი თავის, ურთიერთობებისა და უფრო გააზრებული ცხოვრების შესახებ.",
+    description:
+      "დაფიქრებული და პრაქტიკული საკითხავი საკუთარი თავის, ურთიერთობებისა და უფრო გააზრებული ცხოვრების შესახებ.",
     eyebrow: "Vivida Journal",
     heading: "აზრები უფრო გააზრებული ცხოვრებისთვის",
-    intro: "ფსიქოლოგია, ფილოსოფია, ურთიერთობები და თვითგანვითარება — სიღრმით, სიმშვიდით და ყოველდღიურ ცხოვრებაში გამოსაყენებელი ხედვით.",
+    intro:
+      "ფსიქოლოგია, ფილოსოფია, ურთიერთობები და თვითგანვითარება — სიღრმით, სიმშვიდით და ყოველდღიურ ცხოვრებაში გამოსაყენებელი ხედვით.",
     all: "ყველა",
     empty: "ამ კატეგორიაში სტატია მალე გამოჩნდება.",
   },
   en: {
     title: "Psychology, Philosophy & Self-Development Articles",
-    description: "Thoughtful, practical reading about the mind, relationships and living with greater clarity.",
+    description:
+      "Thoughtful, practical reading about the mind, relationships and living with greater clarity.",
     eyebrow: "Vivida Journal",
     heading: "Ideas for a more examined life",
-    intro: "Psychology, philosophy, relationships and self-development — thoughtful perspectives you can carry into everyday life.",
+    intro:
+      "Psychology, philosophy, relationships and self-development — thoughtful perspectives you can carry into everyday life.",
     all: "All",
     empty: "Articles in this category are coming soon.",
   },
   am: {
     title: "Հոգեբանության, փիլիսոփայության և ինքնազարգացման հոդվածներ",
-    description: "Մտածված և գործնական ընթերցանություն ինքնաճանաչման, հարաբերությունների և ավելի գիտակցված կյանքի մասին:",
+    description:
+      "Մտածված և գործնական ընթերցանություն ինքնաճանաչման, հարաբերությունների և ավելի գիտակցված կյանքի մասին:",
     eyebrow: "Vivida Journal",
     heading: "Մտքեր ավելի գիտակցված կյանքի համար",
-    intro: "Հոգեբանություն, փիլիսոփայություն, հարաբերություններ և ինքնազարգացում՝ խորությամբ ու առօրյայում կիրառելի հայացքով:",
+    intro:
+      "Հոգեբանություն, փիլիսոփայություն, հարաբերություններ և ինքնազարգացում՝ խորությամբ ու առօրյայում կիրառելի հայացքով:",
     all: "Բոլորը",
     empty: "Այս բաժնի հոդվածները շուտով կհրապարակվեն:",
   },
@@ -58,8 +64,6 @@ export async function generateMetadata(): Promise<Metadata> {
       languages: {
         "ka-GE": articleUrl("ka"),
         en: articleUrl("en"),
-        "hy-AM": articleUrl("am"),
-        hy: articleUrl("am"),
         "x-default": articleUrl("en"),
       },
     },
@@ -80,7 +84,9 @@ export default async function ArticlesPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const [locale, query] = await Promise.all([getRequestLocale(), searchParams]);
-  const selected = isArticleCategory(query.category) ? query.category : undefined;
+  const selected = isArticleCategory(query.category)
+    ? query.category
+    : undefined;
   const items = await listPublishedArticles(locale, { category: selected });
   const copy = COPY[locale];
 
@@ -96,7 +102,6 @@ export default async function ArticlesPage({
         locale={locale}
         georgianPath="/articles"
         englishPath="/articles"
-        armenianPath="/articles"
       />
 
       <main className="relative z-10 flex-1">
@@ -113,7 +118,9 @@ export default async function ArticlesPage({
         </section>
 
         <nav
-          aria-label={locale === "ka" ? "სტატიების კატეგორიები" : locale === "am" ? "Հոդվածների բաժիններ" : "Article categories"}
+          aria-label={
+            locale === "ka" ? "სტატიების კატეგორიები" : "Article categories"
+          }
           className="article-category-nav mx-auto flex w-full max-w-6xl gap-2 overflow-x-auto px-4 pb-8 sm:flex-wrap sm:justify-center sm:px-6"
         >
           <Link
@@ -147,7 +154,14 @@ export default async function ArticlesPage({
           {items.length ? (
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {items.map((article, index) => (
-                <div key={article.id} className={index === 0 && !selected ? "md:col-span-2 lg:col-span-3" : ""}>
+                <div
+                  key={article.id}
+                  className={
+                    index === 0 && !selected
+                      ? "md:col-span-2 lg:col-span-3"
+                      : ""
+                  }
+                >
                   <ArticleCard
                     article={article}
                     locale={locale}
@@ -158,7 +172,10 @@ export default async function ArticlesPage({
             </div>
           ) : (
             <div className="mx-auto max-w-xl rounded-3xl border border-border bg-card/55 px-6 py-14 text-center backdrop-blur-xl">
-              <BookOpenText className="mx-auto size-9 text-[var(--vivida-violet)]" aria-hidden />
+              <BookOpenText
+                className="mx-auto size-9 text-[var(--vivida-violet)]"
+                aria-hidden
+              />
               <p className="mt-4 text-foreground/75">{copy.empty}</p>
             </div>
           )}

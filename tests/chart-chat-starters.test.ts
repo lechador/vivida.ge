@@ -17,6 +17,6 @@ describe("chart chat starters", () => {
   it("provides localized, stable options", () => {
     expect(chartStarterOptions("en")).toHaveLength(4);
     expect(chartStarterText("emotions", "ka")).toContain("მთვარე");
-    expect(chartStarterText("emotions", "am")).toContain("Լուսին");
+    expect(chartStarterText("emotions", "en")).toContain("Moon");
   });
 });

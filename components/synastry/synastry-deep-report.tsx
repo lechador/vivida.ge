@@ -99,7 +99,6 @@ export function SynastryDeepReport({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const messages = en ? GEN_MESSAGES_EN : GEN_MESSAGES;
   const sections = en ? SECTIONS_EN : SECTIONS;
   const [report, setReport] = useState<SynastryDeepReportJson | null>(initial);
@@ -161,7 +160,7 @@ export function SynastryDeepReport({
       <article className="mt-8 rounded-2xl border border-[var(--vivida-violet)]/30 bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
         <div className="mb-4 flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)]">
           <Sparkles className="size-4" />
-          {am ? "Խորը զեկույց" : en ? "In-depth report" : "ღრმა ანგარიში"}
+          {en ? "In-depth report" : "ღრმა ანგარიში"}
         </div>
         <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
           {paras(report.intro).map((p, i) => (
@@ -192,7 +191,7 @@ export function SynastryDeepReport({
         {report.advice.length > 0 && (
           <section className="mt-8 rounded-xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/5 p-5">
             <h3 className="mb-3 text-sm font-medium uppercase tracking-[0.16em] text-[var(--vivida-cyan)]">
-              {am ? "Գործնական խորհուրդներ" : en ? "Practical advice" : "რჩევები"}
+              {en ? "Practical advice" : "რჩევები"}
             </h3>
             <ul className="space-y-2 text-sm leading-relaxed text-foreground/90">
               {report.advice.map((a, i) => (
@@ -226,7 +225,7 @@ export function SynastryDeepReport({
           />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          {am ? "Սա կարող է տևել մինչև մեկ րոպե։" : en ? "This may take up to a minute." : "ერთ წუთამდე სჭირდება."}
+          {en ? "This may take up to a minute." : "ერთ წუთამდე სჭირდება."}
         </p>
       </div>
     );
@@ -239,7 +238,7 @@ export function SynastryDeepReport({
         <Lock className="size-5" />
       </div>
       <h3 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-        {am ? "Համատեղելիության խորը զեկույց" : en ? "In-depth compatibility report" : "ღრმა თავსებადობის ანგარიში"}
+        {en ? "In-depth compatibility report" : "ღრმა თავსებადობის ანგარიში"}
       </h3>
       <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground">
         {en
@@ -248,7 +247,7 @@ export function SynastryDeepReport({
       </p>
       <Button variant="mystic" size="lg" className="mt-5" onClick={generate}>
         <Sparkles className="size-4" />
-        {am ? "Ստեղծել խորը զեկույց" : en ? "Create in-depth report" : "შექმენი ღრმა ანგარიში"}
+        {en ? "Create in-depth report" : "შექმენი ღრმა ანგარიში"}
       </Button>
       {status === "error" && error && (
         <p className="mt-3 text-sm text-[var(--vivida-pink)]">{error}</p>

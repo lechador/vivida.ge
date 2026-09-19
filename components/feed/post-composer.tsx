@@ -32,7 +32,6 @@ export function PostComposer({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -80,7 +79,9 @@ export function PostComposer({
           />
           <div className="mt-2 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <CreditHint tone="earn">{am ? "+5 ձեր այսօրվա առաջին գրառման համար" : en ? "+5 for your first post today" : "დღის პირველ პოსტზე +5"}</CreditHint>
+              <CreditHint tone="earn">
+                {en ? "+5 for your first post today" : "დღის პირველ პოსტზე +5"}
+              </CreditHint>
               <span
                 className={`text-xs tabular-nums ${
                   overflow
@@ -108,7 +109,7 @@ export function PostComposer({
                 ) : (
                   <Send className="size-3.5" />
                 )}
-                {am ? "Գրառում" : en ? "Post" : "გაგზავნა"}
+                {en ? "Post" : "გაგზავნა"}
               </Button>
             </div>
           </div>

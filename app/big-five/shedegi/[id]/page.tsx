@@ -18,7 +18,14 @@ import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
-export async function generateMetadata() { const locale = await getRequestLocale(); const en = locale !== "ka"; const am = locale === "am"; return { title: am ? "Ձեր Մեծ Հնգյակի Արդյունքը" : en ? "Your Big Five Result" : "შენი Big Five შედეგი", robots: { index: false } }; }
+export async function generateMetadata() {
+  const locale = await getRequestLocale();
+  const en = locale !== "ka";
+  return {
+    title: en ? "Your Big Five Result" : "შენი Big Five შედეგი",
+    robots: { index: false },
+  };
+}
 export const dynamic = "force-dynamic";
 
 /**
@@ -36,7 +43,6 @@ export default async function SavedBigFiveResultPage({
   const user = await requireUser();
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
 
   const [row] = await db
     .select()
@@ -53,7 +59,10 @@ export default async function SavedBigFiveResultPage({
   ]);
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_265/0.4),transparent_70%)]"
@@ -77,14 +86,22 @@ export default async function SavedBigFiveResultPage({
               resultId={row.id}
               cost={CREDIT_COST.bigFiveTest}
               balance={balance}
-              title={am ? "Բացահայտեք մանրամասն վերլուծությունը" : en ? "Unlock the detailed analysis" : "დეტალური ანალიზის გახსნა"}
-              blurb={am ? "Կարդացեք, թե ինչ է նշանակում Ձեր մակարդակը յուրաքանչյուր հինգ հատկանիշի համար։ Վճարեք մեկ անգամ և պահպանեք արդյունքը։" : en ? "Read what your level means for each of the five traits. Pay once and keep the result." : "ნახე თითოეული თვისების სრული ანალიზი — რას ნიშნავს შენი დონე ხუთივე თვისებაზე. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."}
+              title={
+                en ? "Unlock the detailed analysis" : "დეტალური ანალიზის გახსნა"
+              }
+              blurb={
+                en
+                  ? "Read what your level means for each of the five traits. Pay once and keep the result."
+                  : "ნახე თითოეული თვისების სრული ანალიზი — რას ნიშნავს შენი დონე ხუთივე თვისებაზე. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+              }
               locale={locale}
             />
           </div>
         )}
 
-        {unlocked && <ProfileVisibilityToggle kind="big-five" locale={locale} />}
+        {unlocked && (
+          <ProfileVisibilityToggle kind="big-five" locale={locale} />
+        )}
 
         <NextTestWidget completed="big-five" locale={locale} />
 
@@ -92,7 +109,7 @@ export default async function SavedBigFiveResultPage({
           <Button asChild variant="outline">
             <Link href="/big-five">
               <RotateCcw className="size-4" />
-              {am ? "Կրկնել թեստը" : en ? "Retake the test" : "ტესტის თავიდან გავლა"}
+              {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
             </Link>
           </Button>
         </div>

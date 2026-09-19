@@ -6,7 +6,6 @@ import { ChevronLeft, Focus, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MBTI_LIKERT, type MbtiQuestion } from "@/lib/mbti-questions";
-import { MBTI_LIKERT_AM } from "@/lib/tests-content-am";
 
 export type MbtiSubmitResult = { ok: true } | { ok: false; error: string };
 
@@ -35,8 +34,7 @@ export function MbtiQuiz({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
-  const scale = am ? MBTI_LIKERT_AM : MBTI_LIKERT;
+  const scale = MBTI_LIKERT;
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [index, setIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -93,7 +91,9 @@ export function MbtiQuiz({
       // jump to the first unanswered question
       const missing = questions.findIndex((qq) => answers[qq.id] === undefined);
       if (missing >= 0) setIndex(missing);
-      setError(am ? "Խնդրում ենք պատասխանել բոլոր հարցերին։" : en ? "Please answer every question." : "გთხოვ, უპასუხე ყველა კითხვას.");
+      setError(
+        en ? "Please answer every question." : "გთხოვ, უპასუხე ყველა კითხვას.",
+      );
       return;
     }
     setError(null);
@@ -111,7 +111,9 @@ export function MbtiQuiz({
         <div className="mx-auto grid size-14 place-items-center rounded-full bg-[var(--vivida-violet)]/15 ring-1 ring-[var(--vivida-violet)]/40">
           <Sparkles className="size-7 animate-pulse text-[var(--vivida-violet)]" />
         </div>
-        <h2 className="mt-5 text-xl font-semibold tracking-tight">{workingLabel}</h2>
+        <h2 className="mt-5 text-xl font-semibold tracking-tight">
+          {workingLabel}
+        </h2>
         <Loader2 className="mx-auto mt-6 size-5 animate-spin text-muted-foreground" />
       </div>
     );
@@ -135,7 +137,7 @@ export function MbtiQuiz({
           "rounded-3xl border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8",
           focus
             ? "relative z-40 border-[var(--vivida-violet)]/40 vivida-focus-card"
-            : "border-border"
+            : "border-border",
         )}
       >
         {/* Focus-mode toggle — a small chip on the card's corner */}
@@ -143,143 +145,157 @@ export function MbtiQuiz({
           type="button"
           onClick={toggleFocus}
           aria-pressed={focus}
-          aria-label={focus ? (am ? "Անջատել կենտրոնացման ռեժիմը" : en ? "Exit focus mode" : "ფოკუს-რეჟიმის გამორთვა") : (am ? "Միացնել կենտրոնացման ռեժիմը" : en ? "Enter focus mode" : "ფოკუს-რეჟიმის ჩართვა")}
-          title={focus ? (am ? "Անջատել կենտրոնացման ռեժիմը" : en ? "Exit focus mode" : "ფოკუს-რეჟიმის გამორთვა") : (am ? "Կենտրոնացման ռեժիմ" : en ? "Focus mode" : "ფოკუს-რეჟიმი")}
+          aria-label={
+            focus
+              ? en
+                ? "Exit focus mode"
+                : "ფოკუს-რეჟიმის გამორთვა"
+              : en
+                ? "Enter focus mode"
+                : "ფოკუს-რეჟიმის ჩართვა"
+          }
+          title={
+            focus
+              ? en
+                ? "Exit focus mode"
+                : "ფოკუს-რეჟიმის გამორთვა"
+              : en
+                ? "Focus mode"
+                : "ფოკუს-რეჟიმი"
+          }
           className={cn(
             "absolute -right-2.5 -top-2.5 grid size-8 place-items-center rounded-full border backdrop-blur-xl transition-all hover:scale-105 sm:-right-3 sm:-top-3",
             focus
               ? "border-[var(--vivida-violet)]/60 bg-[oklch(0.18_0.07_300/0.85)] text-[var(--vivida-cyan)] shadow-[0_0_18px_-4px_oklch(0.65_0.24_305/0.8)]"
-              : "border-border bg-card/80 text-muted-foreground"
+              : "border-border bg-card/80 text-muted-foreground",
           )}
         >
           <Focus className="size-4" />
         </button>
 
-      {/* Progress */}
-      <div className="mb-6">
-        <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
-          <span>
-            {am ? "Հարց" : en ? "Question" : "კითხვა"} {index + 1} / {total}
-          </span>
-          <span className="tabular-nums">{progressPct}%</span>
+        {/* Progress */}
+        <div className="mb-6">
+          <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <span>
+              {en ? "Question" : "კითხვა"} {index + 1} / {total}
+            </span>
+            <span className="tabular-nums">{progressPct}%</span>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-border/60">
+            <div
+              className="h-full rounded-full bg-[linear-gradient(90deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] transition-[width] duration-300"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-border/60">
+
+        {/* Question */}
+        <div key={q.id} className="animate-in fade-in duration-300">
+          <p className="min-h-[3.5rem] text-balance text-lg font-medium leading-snug sm:text-xl">
+            {en ? (q.textEn ?? q.textKa) : q.textKa}
+          </p>
+
+          {/* Likert scale — graduated agree (cyan) ↔ disagree (pink) */}
           <div
-            className="h-full rounded-full bg-[linear-gradient(90deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] transition-[width] duration-300"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Question */}
-      <div key={q.id} className="animate-in fade-in duration-300">
-        <p className="min-h-[3.5rem] text-balance text-lg font-medium leading-snug sm:text-xl">
-          {am || en ? q.textEn ?? q.textKa : q.textKa}
-        </p>
-
-        {/* Likert scale — graduated agree (cyan) ↔ disagree (pink) */}
-        <div
-          role="radiogroup"
-          aria-label={am ? "Ձեր պատասխանը" : en ? "Your answer" : "შენი პასუხი"}
-          className="mt-7 flex items-center justify-center gap-2 sm:gap-3"
-        >
-          {scale.map((opt) => {
-            const selected = current === opt.value;
-            const magnitude = Math.abs(opt.value); // 0,1,2,3
-            const size =
-              magnitude === 3
-                ? "size-12 sm:size-14"
-                : magnitude === 2
-                  ? "size-10 sm:size-12"
-                  : magnitude === 1
-                    ? "size-9 sm:size-10"
-                    : "size-7 sm:size-8";
-            const tone =
-              opt.value > 0
-                ? "var(--vivida-cyan)"
-                : opt.value < 0
-                  ? "var(--vivida-pink)"
-                  : "var(--muted-foreground)";
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                aria-label={am || en ? opt.labelEn : opt.labelKa}
-                title={am || en ? opt.labelEn : opt.labelKa}
-                onClick={() => pick(opt.value)}
-                className={cn(
-                  "grid shrink-0 place-items-center rounded-full border-2 transition-all duration-150 hover:scale-110",
-                  size
-                )}
-                style={{
-                  borderColor: `color-mix(in oklch, ${tone} ${selected ? "100%" : "45%"}, transparent)`,
-                  backgroundColor: selected
-                    ? `color-mix(in oklch, ${tone} 22%, transparent)`
-                    : "transparent",
-                  boxShadow: selected
-                    ? `0 0 18px -4px ${tone}`
-                    : undefined,
-                }}
-              >
-                {selected && (
-                  <span
-                    className="size-2.5 rounded-full"
-                    style={{ backgroundColor: tone }}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-        <div className="mt-3 flex items-center justify-between px-1 text-xs text-muted-foreground">
-          <span>{am ? "Համաձայն եմ" : en ? "Agree" : "ვეთანხმები"}</span>
-          <span>{am ? "Համաձայն չեմ" : en ? "Disagree" : "არ ვეთანხმები"}</span>
-        </div>
-      </div>
-
-      {error && (
-        <p className="mt-5 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
-          {error}
-        </p>
-      )}
-
-      {/* Nav */}
-      <div className="mt-8 flex items-center justify-between gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => setIndex((i) => Math.max(0, i - 1))}
-          disabled={index === 0}
-          className="gap-1"
-        >
-          <ChevronLeft className="size-4" />
-          {am ? "Նախորդը" : en ? "Previous" : "წინა"}
-        </Button>
-
-        {isLast ? (
-          <Button
-            type="button"
-            variant="mystic"
-            size="lg"
-            onClick={submit}
-            disabled={current === undefined}
+            role="radiogroup"
+            aria-label={en ? "Your answer" : "შენი პასუხი"}
+            className="mt-7 flex items-center justify-center gap-2 sm:gap-3"
           >
-            <Sparkles className="size-4" />
-            {submitLabel}
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setIndex((i) => Math.min(total - 1, i + 1))}
-            disabled={current === undefined}
-          >
-            {am ? "Հաջորդը" : en ? "Next" : "შემდეგი"}
-          </Button>
+            {scale.map((opt) => {
+              const selected = current === opt.value;
+              const magnitude = Math.abs(opt.value); // 0,1,2,3
+              const size =
+                magnitude === 3
+                  ? "size-12 sm:size-14"
+                  : magnitude === 2
+                    ? "size-10 sm:size-12"
+                    : magnitude === 1
+                      ? "size-9 sm:size-10"
+                      : "size-7 sm:size-8";
+              const tone =
+                opt.value > 0
+                  ? "var(--vivida-cyan)"
+                  : opt.value < 0
+                    ? "var(--vivida-pink)"
+                    : "var(--muted-foreground)";
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  aria-label={en ? opt.labelEn : opt.labelKa}
+                  title={en ? opt.labelEn : opt.labelKa}
+                  onClick={() => pick(opt.value)}
+                  className={cn(
+                    "grid shrink-0 place-items-center rounded-full border-2 transition-all duration-150 hover:scale-110",
+                    size,
+                  )}
+                  style={{
+                    borderColor: `color-mix(in oklch, ${tone} ${selected ? "100%" : "45%"}, transparent)`,
+                    backgroundColor: selected
+                      ? `color-mix(in oklch, ${tone} 22%, transparent)`
+                      : "transparent",
+                    boxShadow: selected ? `0 0 18px -4px ${tone}` : undefined,
+                  }}
+                >
+                  {selected && (
+                    <span
+                      className="size-2.5 rounded-full"
+                      style={{ backgroundColor: tone }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-3 flex items-center justify-between px-1 text-xs text-muted-foreground">
+            <span>{en ? "Agree" : "ვეთანხმები"}</span>
+            <span>{en ? "Disagree" : "არ ვეთანხმები"}</span>
+          </div>
+        </div>
+
+        {error && (
+          <p className="mt-5 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
+            {error}
+          </p>
         )}
-      </div>
+
+        {/* Nav */}
+        <div className="mt-8 flex items-center justify-between gap-3">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setIndex((i) => Math.max(0, i - 1))}
+            disabled={index === 0}
+            className="gap-1"
+          >
+            <ChevronLeft className="size-4" />
+            {en ? "Previous" : "წინა"}
+          </Button>
+
+          {isLast ? (
+            <Button
+              type="button"
+              variant="mystic"
+              size="lg"
+              onClick={submit}
+              disabled={current === undefined}
+            >
+              <Sparkles className="size-4" />
+              {submitLabel}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIndex((i) => Math.min(total - 1, i + 1))}
+              disabled={current === undefined}
+            >
+              {en ? "Next" : "შემდეგი"}
+            </Button>
+          )}
+        </div>
       </div>
     </>
   );

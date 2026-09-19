@@ -6,7 +6,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { LifePathNumberPageEn } from "@/components/seo/numerology-en";
-import { LifePathNumberPageAm } from "@/components/seo/numerology-am";
+
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -14,10 +14,14 @@ import { LIFE_PATH_NUMBERS, isLifePathNumber } from "@/lib/numerology";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { LIFE_PATH_CONTENT } from "@/lib/seo/numerology-content";
 import { LIFE_PATH_CONTENT_EN } from "@/lib/seo/numerology-content-en";
-import { LIFE_PATH_CONTENT_AM } from "@/lib/seo/numerology-content-am";
+
 import { NUMEROLOGY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -36,34 +40,6 @@ export async function generateMetadata({
   if (!isLifePathNumber(number)) return {};
   const locale = await getRequestLocale();
 
-  if (locale === "am") {
-    const content = LIFE_PATH_CONTENT_AM[number];
-    const path = `/numerologia/${number}`;
-    const title = `${content.title} — Նշանակությունը նումերոլոգիայում`;
-    const description = `${content.essence} Իմացեք Կյանքի ուղի ${number}-ի ուժեղ կողմերի, մարտահրավերների, սիրային համատեղելիության և կարիերայի մասին:`;
-    return {
-      title: { absolute: `${title} — Vivida` },
-      description,
-      keywords: [
-        `կյանքի ուղու թիվ ${number}`,
-        `թիվ ${number} նշանակություն`,
-        "նումերոլոգիա",
-        "կյանքի ուղի",
-      ],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "article",
-        url: armenianSiteHref(path, false),
-        title,
-        description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title, description },
-    };
-  }
-
   if (locale === "en") {
     const content = LIFE_PATH_CONTENT_EN[number];
     const path = `/numerologia/${number}`;
@@ -73,7 +49,15 @@ export async function generateMetadata({
       title: { absolute: title },
       description,
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url: englishSiteHref(path, false), title, description, siteName: "Vivida", locale: "en_US" },
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: englishSiteHref(path, false),
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
       twitter: { card: "summary_large_image", title, description },
     };
   }
@@ -93,7 +77,11 @@ export async function generateMetadata({
       "numerologia",
       "bedis ricxvi",
     ],
-    alternates: localizedAlternates(`/numerologia/${number}`, `/numerologia/${number}`, "ka"),
+    alternates: localizedAlternates(
+      `/numerologia/${number}`,
+      `/numerologia/${number}`,
+      "ka",
+    ),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "article",
@@ -115,11 +103,13 @@ export default async function LifePathNumberPage({
   const { number } = await params;
   if (!isLifePathNumber(number)) notFound();
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    return <LifePathNumberPageAm number={number} content={LIFE_PATH_CONTENT_AM[number]} />;
-  }
   if (locale === "en") {
-    return <LifePathNumberPageEn number={number} content={LIFE_PATH_CONTENT_EN[number]} />;
+    return (
+      <LifePathNumberPageEn
+        number={number}
+        content={LIFE_PATH_CONTENT_EN[number]}
+      />
+    );
   }
   const c = LIFE_PATH_CONTENT[number];
   const master = number.length > 1;
@@ -140,10 +130,26 @@ export default async function LifePathNumberPage({
   ];
 
   const sections = [
-    { title: "ძლიერი მხარეები", body: c.strengthsKa, accent: "var(--vivida-cyan)" },
-    { title: "გამოწვევები", body: c.challengesKa, accent: "var(--vivida-pink)" },
-    { title: "სიყვარული და ურთიერთობები", body: c.loveKa, accent: "var(--vivida-violet)" },
-    { title: "კარიერა და ფული", body: c.careerKa, accent: "var(--vivida-gold, #eac358)" },
+    {
+      title: "ძლიერი მხარეები",
+      body: c.strengthsKa,
+      accent: "var(--vivida-cyan)",
+    },
+    {
+      title: "გამოწვევები",
+      body: c.challengesKa,
+      accent: "var(--vivida-pink)",
+    },
+    {
+      title: "სიყვარული და ურთიერთობები",
+      body: c.loveKa,
+      accent: "var(--vivida-violet)",
+    },
+    {
+      title: "კარიერა და ფული",
+      body: c.careerKa,
+      accent: "var(--vivida-gold, #eac358)",
+    },
   ];
 
   return (

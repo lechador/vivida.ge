@@ -6,6 +6,7 @@ import { Clock, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import { localizedHref } from "@/lib/seo/public-paths";
 import { cn } from "@/lib/utils";
 import { Figure, FigureBlank } from "@/lib/iq/figures";
 import {
@@ -21,8 +22,6 @@ import {
   nextAdaptiveItem,
 } from "@/lib/iq/adaptive";
 import type { UserLocale } from "@/lib/i18n/user-locale";
-import { localeHref } from "@/lib/i18n/armenian-routes";
-import { IQ_STEM_PROMPT_AM, IQ_TEXT_AM } from "@/lib/tests-content-am";
 
 /**
  * The timed, *adaptive* IQ test (computerised adaptive testing). One item per
@@ -36,8 +35,7 @@ import { IQ_STEM_PROMPT_AM, IQ_TEXT_AM } from "@/lib/tests-content-am";
 export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const en = locale === "en";
-  const am = locale === "am";
-  const prompt = am ? IQ_STEM_PROMPT_AM : en ? STEM_PROMPT_EN : STEM_PROMPT_KA;
+  const prompt = en ? STEM_PROMPT_EN : STEM_PROMPT_KA;
 
   const [administered, setAdministered] = useState<IqItem[]>(() => [
     firstAdaptiveItem(),
@@ -85,7 +83,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
           answers: complete,
           timeUsedSec: IQ_TIME_LIMIT_SEC - timeLeftRef.current,
           attemptId: crypto.randomUUID(),
-        })
+        }),
       );
     } catch {
       /* private mode — result page will bounce back if it can't read */
@@ -95,7 +93,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
       items: administeredRef.current.length,
       time_used_sec: IQ_TIME_LIMIT_SEC - timeLeftRef.current,
     });
-    router.push(localeHref("/iq-testi/shedegi", locale));
+    router.push(localizedHref("/iq-testi/shedegi", locale));
   }
 
   // One stable countdown — never re-armed, so answering never resets it.
@@ -148,7 +146,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
           <Sparkles className="size-7 animate-pulse text-[var(--vivida-violet)]" />
         </div>
         <h2 className="mt-5 text-xl font-semibold tracking-tight">
-          {am ? "Հաշվում ենք ձեր արդյունքը…" : en ? "Calculating your result…" : "ვთვლი შენს შედეგს…"}
+          {en ? "Calculating your result…" : "ვთვლი შენს შედეგს…"}
         </h2>
         <Loader2 className="mx-auto mt-6 size-5 animate-spin text-muted-foreground" />
       </div>
@@ -161,12 +159,12 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>
-            {am ? "Առաջադրանք" : en ? "Task" : "დავალება"} {step} / {IQ_ADAPTIVE_LENGTH}
+            {en ? "Task" : "დავალება"} {step} / {IQ_ADAPTIVE_LENGTH}
           </span>
           <span
             className={cn(
               "inline-flex items-center gap-1.5 tabular-nums",
-              lowTime && "text-[var(--vivida-pink)]"
+              lowTime && "text-[var(--vivida-pink)]",
             )}
           >
             <Clock className="size-3.5" />
@@ -205,7 +203,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
         {isLast ? (
           <Button type="button" variant="mystic" size="lg" onClick={advance}>
             <Sparkles className="size-4" />
-            {am ? "Ավարտել" : en ? "Finish" : "დასრულება"}
+            {en ? "Finish" : "დასრულება"}
           </Button>
         ) : (
           <Button
@@ -213,17 +211,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
             variant={answered ? "mystic" : "outline"}
             onClick={advance}
           >
-            {answered
-              ? am
-                ? "Հաջորդը"
-                : en
-                ? "Next"
-                : "შემდეგი"
-              : am
-                ? "Բաց թողնել"
-                : en
-                ? "Skip"
-                : "გამოტოვება"}
+            {answered ? (en ? "Next" : "შემდეგი") : en ? "Skip" : "გამოტოვება"}
           </Button>
         )}
       </div>
@@ -245,7 +233,7 @@ function Cell({
         "grid aspect-square place-items-center rounded-xl border",
         muted
           ? "border-dashed border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/5 text-[var(--vivida-violet)]"
-          : "border-border bg-background/40"
+          : "border-border bg-background/40",
       )}
     >
       {children}
@@ -259,7 +247,7 @@ function IqStem({ item, locale }: { item: IqItem; locale: UserLocale }) {
   if (s.type === "logic") {
     return (
       <p className="min-h-[3.5rem] text-balance text-center text-lg font-medium leading-snug sm:text-xl">
-        {locale === "am" ? (IQ_TEXT_AM.get(item.id)?.text ?? s.textEn) : locale === "en" ? s.textEn : s.textKa}
+        {locale === "en" ? s.textEn : s.textKa}
       </p>
     );
   }
@@ -287,7 +275,11 @@ function IqStem({ item, locale }: { item: IqItem; locale: UserLocale }) {
       <div className="mx-auto grid max-w-[300px] grid-cols-3 gap-2">
         {s.cells.map((cell, i) => (
           <Cell key={i} muted={cell === null}>
-            {cell === null ? <FigureBlank size={54} /> : <Figure spec={cell} size={64} />}
+            {cell === null ? (
+              <FigureBlank size={54} />
+            ) : (
+              <Figure spec={cell} size={64} />
+            )}
           </Cell>
         ))}
       </div>
@@ -337,7 +329,7 @@ function IqOptions({
     <div
       className={cn(
         "mt-2 grid gap-2.5 sm:gap-3",
-        isFigure ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-1"
+        isFigure ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-1",
       )}
     >
       {item.options.map((opt, i) => {
@@ -353,9 +345,7 @@ function IqOptions({
             // letter is the same identity the text options show in their badge.
             aria-label={
               opt.kind === "figure"
-                ? locale === "am"
-                  ? `Տարբերակ ${String.fromCharCode(65 + i)}`
-                  : locale === "en"
+                ? locale === "en"
                   ? `Option ${String.fromCharCode(65 + i)}`
                   : `ვარიანტი ${String.fromCharCode(65 + i)}`
                 : undefined
@@ -367,7 +357,7 @@ function IqOptions({
                 : "px-4 py-3.5 text-left text-[15px] font-medium",
               active
                 ? "border-[var(--vivida-cyan)] bg-[var(--vivida-cyan)]/10 text-foreground shadow-[0_0_20px_-6px_var(--vivida-cyan)]"
-                : "border-border bg-background/40 text-foreground/85 hover:border-[var(--vivida-violet)]/50 hover:bg-[var(--vivida-violet)]/5"
+                : "border-border bg-background/40 text-foreground/85 hover:border-[var(--vivida-violet)]/50 hover:bg-[var(--vivida-violet)]/5",
             )}
           >
             {opt.kind === "figure" ? (
@@ -379,12 +369,12 @@ function IqOptions({
                     "grid size-6 shrink-0 place-items-center rounded-full border text-xs font-semibold",
                     active
                       ? "border-[var(--vivida-cyan)] text-[var(--vivida-cyan)]"
-                      : "border-border text-muted-foreground"
+                      : "border-border text-muted-foreground",
                   )}
                 >
                   {String.fromCharCode(65 + i)}
                 </span>
-                {locale === "am" ? (IQ_TEXT_AM.get(item.id)?.options[i] ?? opt.textEn ?? opt.text) : locale === "en" ? opt.textEn ?? opt.text : opt.text}
+                {locale === "en" ? (opt.textEn ?? opt.text) : opt.text}
               </span>
             )}
           </button>

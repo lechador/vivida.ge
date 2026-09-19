@@ -6,8 +6,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
-import { ANGEL_HUB_EN, AngelNumbersHubEn } from "@/components/seo/angel-numbers-en";
-import { ANGEL_HUB_AM, AngelNumbersHubAm } from "@/components/seo/angel-numbers-am";
+import {
+  ANGEL_HUB_EN,
+  AngelNumbersHubEn,
+} from "@/components/seo/angel-numbers-en";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   ANGEL_FAQ,
@@ -15,7 +18,11 @@ import {
   ANGEL_NUMBERS,
 } from "@/lib/seo/angel-numbers";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -40,7 +47,11 @@ const KA_METADATA: Metadata = {
     "angeluri ricxvebi",
     "11 11 ras nishnavs",
   ],
-  alternates: localizedAlternates("/angeluri-ricxvebi", "/angeluri-ricxvebi", "ka"),
+  alternates: localizedAlternates(
+    "/angeluri-ricxvebi",
+    "/angeluri-ricxvebi",
+    "ka",
+  ),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     type: "website",
@@ -50,40 +61,43 @@ const KA_METADATA: Metadata = {
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
-  if (locale === "am") {
-    const path = "/angeluri-ricxvebi";
-    return {
-      title: { absolute: `${ANGEL_HUB_AM.title} — Vivida` },
-      description: ANGEL_HUB_AM.description,
-      keywords: ["հրեշտակային թվեր", "111 նշանակություն", "222 նշանակություն", "11:11 նշանակություն", "կրկնվող թվեր"],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: armenianSiteHref(path, false),
-        title: ANGEL_HUB_AM.title,
-        description: ANGEL_HUB_AM.description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title: ANGEL_HUB_AM.title, description: ANGEL_HUB_AM.description },
-    };
-  }
   if (locale === "en") {
     const path = "/angeluri-ricxvebi";
     return {
       title: { absolute: ANGEL_HUB_EN.title },
       description: ANGEL_HUB_EN.description,
-      keywords: ["angel numbers", "111 meaning", "222 meaning", "11:11 meaning", "repeating numbers"],
+      keywords: [
+        "angel numbers",
+        "111 meaning",
+        "222 meaning",
+        "11:11 meaning",
+        "repeating numbers",
+      ],
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: englishSiteHref(path, false), title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
-      twitter: { card: "summary_large_image", title: ANGEL_HUB_EN.title, description: ANGEL_HUB_EN.description },
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: englishSiteHref(path, false),
+        title: ANGEL_HUB_EN.title,
+        description: ANGEL_HUB_EN.description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: ANGEL_HUB_EN.title,
+        description: ANGEL_HUB_EN.description,
+      },
     };
   }
   return KA_METADATA;
@@ -91,7 +105,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AngelNumbersHubPage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <AngelNumbersHubAm />;
   if (locale === "en") return <AngelNumbersHubEn />;
   const ld = [
     articleLd({
@@ -158,8 +171,8 @@ export default async function AngelNumbersHubPage() {
           </h1>
           <p className="mx-auto mt-3.5 max-w-xl text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
             ხშირად ხედავ 11:11-ს საათზე? ან 222-ს ყველგან? აირჩიე რიცხვი და
-            წაიკითხე, რას ნიშნავს ის სიყვარულში, საქმეში და რა ნაბიჯს
-            გთავაზობს ახლა.
+            წაიკითხე, რას ნიშნავს ის სიყვარულში, საქმეში და რა ნაბიჯს გთავაზობს
+            ახლა.
           </p>
         </header>
 
@@ -197,16 +210,16 @@ export default async function AngelNumbersHubPage() {
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
             ორი ახსნა არსებობს და ისინი ერთმანეთს არ ეწინააღმდეგება.
-            ფსიქოლოგიური: როცა რომელიმე რიცხვი ერთხელ შეამჩნიე, ტვინი მას
-            შემდეგ ყოველთვის გამოყოფს ფონიდან — ამას სელექციური ყურადღება
-            ჰქვია. სიმბოლური: სწორედ ის მომენტები, როცა ასეთ დამთხვევას
-            ამჩნევ, ჩვეულებრივ ემთხვევა პერიოდს, როცა რაღაც მნიშვნელოვან
+            ფსიქოლოგიური: როცა რომელიმე რიცხვი ერთხელ შეამჩნიე, ტვინი მას შემდეგ
+            ყოველთვის გამოყოფს ფონიდან — ამას სელექციური ყურადღება ჰქვია.
+            სიმბოლური: სწორედ ის მომენტები, როცა ასეთ დამთხვევას ამჩნევ,
+            ჩვეულებრივ ემთხვევა პერიოდს, როცა რაღაც მნიშვნელოვან
             გადაწყვეტილებაზე ფიქრობ.
           </p>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            პრაქტიკული სარგებელი ორივე შემთხვევაში ერთია: რიცხვი პაუზის
-            მიზეზი ხდება. და სწორედ პაუზაში ჩნდება ის კითხვა, რომელსაც
-            ჩვეულებრივ გაურბიხარ.
+            პრაქტიკული სარგებელი ორივე შემთხვევაში ერთია: რიცხვი პაუზის მიზეზი
+            ხდება. და სწორედ პაუზაში ჩნდება ის კითხვა, რომელსაც ჩვეულებრივ
+            გაურბიხარ.
           </p>
         </section>
 

@@ -6,12 +6,17 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { EqTestClient } from "@/components/eq/eq-test-client";
 import { PopularSearches } from "@/components/seo/popular-searches";
-import { ArmenianEqAssessmentPage } from "@/components/tests/armenian-assessment-pages";
+
 import { EQ_QUESTION_COUNT, EQ_DOMAINS } from "@/lib/eq/questions";
 import { EQ_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  GEORGIAN_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const TITLE_KA = "EQ ტესტი — ემოციური ინტელექტის ტესტი ქართულად";
 const DESCRIPTION_KA =
@@ -22,21 +27,38 @@ const DESCRIPTION_EN =
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const title = "Անվճար EQ թեստ — էմոցիոնալ ինտելեկտի գնահատում";
-    const description = "Պատասխանեք 40 հարցի և ուսումնասիրեք ինքնագիտակցությունը, ինքնակարգավորումը, մոտիվացիան, ապրումակցումը և սոցիալական հմտությունները։";
-    const url = `${ARMENIAN_SITE_URL}/eq-testi`;
-    return { title: { absolute: title }, description, keywords: ["անվճար EQ թեստ", "էմոցիոնալ ինտելեկտի թեստ", "ապրումակցման թեստ", "ինքնագիտակցության թեստ"], alternates: localizedAlternates("/am/eq-testi", "/eq-testi", "am"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "hy_AM" }, twitter: { card: "summary_large_image", title, description } };
-  }
   const en = locale === "en";
   const title = en ? TITLE_EN : TITLE_KA;
   const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   return {
-    title: { absolute: title }, description,
-    keywords: en ? ["free EQ test", "emotional intelligence test", "empathy test", "self awareness test", "emotional intelligence assessment"] : ["eq ტესტი", "ემოციური ინტელექტი", "ემოციური ინტელექტის ტესტი", "უფასო eq ტესტი", "ემპათიის ტესტი"],
+    title: { absolute: title },
+    description,
+    keywords: en
+      ? [
+          "free EQ test",
+          "emotional intelligence test",
+          "empathy test",
+          "self awareness test",
+          "emotional intelligence assessment",
+        ]
+      : [
+          "eq ტესტი",
+          "ემოციური ინტელექტი",
+          "ემოციური ინტელექტის ტესტი",
+          "უფასო eq ტესტი",
+          "ემპათიის ტესტი",
+        ],
     alternates: localizedAlternates("/eq-testi", "/eq-testi", en ? "en" : "ka"),
-    openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${siteUrl}/eq-testi`, title, description, siteName: "Vivida", locale: en ? "en_US" : "ka_GE" },
+    openGraph: {
+      images: [DEFAULT_OG_IMAGE],
+      type: "website",
+      url: `${siteUrl}/eq-testi`,
+      title,
+      description,
+      siteName: "Vivida",
+      locale: en ? "en_US" : "ka_GE",
+    },
     twitter: { card: "summary_large_image", title, description },
   };
 }
@@ -61,10 +83,22 @@ const EQ_FAQ = [
 ];
 
 const EQ_FAQ_EN = [
-  { q: "What is emotional intelligence (EQ)?", a: "Emotional intelligence describes how we recognize, understand and manage our own emotions and respond to other people's emotions. This assessment uses five familiar areas: self-awareness, self-regulation, motivation, empathy and social skills." },
-  { q: "How is the EQ score calculated?", a: "You answer each statement on a five-point agreement scale. Reverse-keyed items reduce agreement bias, each domain is normalized to 0–100, and the overall score is the mean of all five domains." },
-  { q: "Is the test free?", a: "The test and core EQ score are free. You can complete the assessment without an account; creating one lets you save the result, while any optional credit-based analysis is clearly marked." },
-  { q: "Is EQ more important than IQ?", a: "They describe different abilities. IQ assessments focus on reasoning, while EQ self-reports explore emotional and interpersonal habits. Neither number captures a person's overall worth or potential." },
+  {
+    q: "What is emotional intelligence (EQ)?",
+    a: "Emotional intelligence describes how we recognize, understand and manage our own emotions and respond to other people's emotions. This assessment uses five familiar areas: self-awareness, self-regulation, motivation, empathy and social skills.",
+  },
+  {
+    q: "How is the EQ score calculated?",
+    a: "You answer each statement on a five-point agreement scale. Reverse-keyed items reduce agreement bias, each domain is normalized to 0–100, and the overall score is the mean of all five domains.",
+  },
+  {
+    q: "Is the test free?",
+    a: "The test and core EQ score are free. You can complete the assessment without an account; creating one lets you save the result, while any optional credit-based analysis is clearly marked.",
+  },
+  {
+    q: "Is EQ more important than IQ?",
+    a: "They describe different abilities. IQ assessments focus on reasoning, while EQ self-reports explore emotional and interpersonal habits. Neither number captures a person's overall worth or potential.",
+  },
 ];
 
 /**
@@ -77,7 +111,6 @@ export default async function EqTestPage() {
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
   const en = locale === "en";
-  if (locale === "am") return <ArmenianEqAssessmentPage authed={authed} />;
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
   const faq = en ? EQ_FAQ_EN : EQ_FAQ;
@@ -95,7 +128,9 @@ export default async function EqTestPage() {
       about: {
         "@type": "Thing",
         name: en ? "Emotional intelligence (EQ)" : "ემოციური ინტელექტი (EQ)",
-        alternateName: en ? ["EQ", "emotional intelligence", "EQ test"] : ["EQ", "ემოციური ინტელექტი", "eq ტესტი"],
+        alternateName: en
+          ? ["EQ", "emotional intelligence", "EQ test"]
+          : ["EQ", "ემოციური ინტელექტი", "eq ტესტი"],
       },
     },
     faqLd(faq),
@@ -107,7 +142,10 @@ export default async function EqTestPage() {
   ];
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_350/0.4),transparent_70%),radial-gradient(40%_35%_at_15%_80%,oklch(0.30_0.15_200/0.35),transparent_70%)]"
@@ -118,7 +156,11 @@ export default async function EqTestPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/eq-testi" />}
+      {authed ? (
+        <AppHeader authed active="tests" />
+      ) : (
+        <SmartHeader active="tests" locale={locale} georgianPath="/eq-testi" />
+      )}
 
       <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-4 pb-10 pt-4 sm:px-6 sm:pb-14 sm:pt-6">
         <header className="mb-5 text-center">
@@ -132,7 +174,9 @@ export default async function EqTestPage() {
             </span>
           </h1>
           <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-            {en ? `${EQ_QUESTION_COUNT} questions · about 7 minutes · free` : `${EQ_QUESTION_COUNT} კითხვა · ~7 წუთი · უფასო`}
+            {en
+              ? `${EQ_QUESTION_COUNT} questions · about 7 minutes · free`
+              : `${EQ_QUESTION_COUNT} კითხვა · ~7 წუთი · უფასო`}
           </p>
         </header>
 
@@ -143,7 +187,9 @@ export default async function EqTestPage() {
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
-            {en ? "What is emotional intelligence?" : "რა არის ემოციური ინტელექტი?"}
+            {en
+              ? "What is emotional intelligence?"
+              : "რა არის ემოციური ინტელექტი?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
             {en
@@ -152,7 +198,9 @@ export default async function EqTestPage() {
           </p>
 
           <h2 className="mt-8 text-xl font-semibold tracking-tight">
-            {en ? "The five areas in this assessment" : "ხუთი სფერო, რომელსაც ტესტი ზომავს"}
+            {en
+              ? "The five areas in this assessment"
+              : "ხუთი სფერო, რომელსაც ტესტი ზომავს"}
           </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {EQ_DOMAINS.map((d) => (
@@ -193,7 +241,19 @@ export default async function EqTestPage() {
             ))}
           </div>
 
-          <PopularSearches queries={en ? ["free emotional intelligence test", "online EQ test", "empathy and self awareness test", "emotional intelligence score"] : EQ_LATIN_QUERIES} locale={locale} />
+          <PopularSearches
+            queries={
+              en
+                ? [
+                    "free emotional intelligence test",
+                    "online EQ test",
+                    "empathy and self awareness test",
+                    "emotional intelligence score",
+                  ]
+                : EQ_LATIN_QUERIES
+            }
+            locale={locale}
+          />
         </div>
       </section>
     </main>

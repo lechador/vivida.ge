@@ -21,8 +21,10 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 export async function generateMetadata() {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
-  return { title: am ? "Ձեր ԶԳ Արդյունքը" : en ? "Your EQ Result" : "შენი EQ შედეგი", robots: { index: false } };
+  return {
+    title: en ? "Your EQ Result" : "შენი EQ შედეგი",
+    robots: { index: false },
+  };
 }
 export const dynamic = "force-dynamic";
 
@@ -42,7 +44,6 @@ export default async function SavedEqResultPage({
   const user = await requireUser();
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
 
   const [row] = await db
     .select()
@@ -60,7 +61,10 @@ export default async function SavedEqResultPage({
   ]);
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_350/0.4),transparent_70%)]"
@@ -101,14 +105,24 @@ export default async function SavedEqResultPage({
               resultId={row.id}
               cost={CREDIT_COST.eqTest}
               balance={balance}
-              title={am ? "Բացահայտեք Ձեր էմոցիոնալ պրոֆիլը" : en ? "Unlock your emotional profile" : "ემოციური რუკის გახსნა"}
-              blurb={am ? "Ուսումնասիրեք բոլոր հինգ ոլորտները՝ ինքնագիտակցություն, ինքնակարգավորում, մոտիվացիա, կարեկցանք և սոցիալական հմտություններ՝ մեկնաբանություններով և գործնական առաջարկներով։ Վճարեք մեկ անգամ և պահպանեք արդյունքը։" : en ? "Explore all five areas—self-awareness, self-regulation, motivation, empathy and social skills—with interpretations and practical suggestions. Pay once and keep the result." : "ნახე შენი პროფილი ხუთ სფეროში — თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები, თითოეულის ანალიზითა და რჩევებით. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."}
+              title={
+                en ? "Unlock your emotional profile" : "ემოციური რუკის გახსნა"
+              }
+              blurb={
+                en
+                  ? "Explore all five areas—self-awareness, self-regulation, motivation, empathy and social skills—with interpretations and practical suggestions. Pay once and keep the result."
+                  : "ნახე შენი პროფილი ხუთ სფეროში — თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები, თითოეულის ანალიზითა და რჩევებით. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+              }
               locale={locale}
             />
           </div>
         )}
 
-        {!en && <div className="mt-4"><EqArticleRecommendations result={result} /></div>}
+        {!en && (
+          <div className="mt-4">
+            <EqArticleRecommendations result={result} />
+          </div>
+        )}
 
         {unlocked && <ProfileVisibilityToggle kind="eq" locale={locale} />}
 
@@ -118,7 +132,7 @@ export default async function SavedEqResultPage({
           <Button asChild variant="outline">
             <Link href="/eq-testi">
               <RotateCcw className="size-4" />
-              {am ? "Կրկնել թեստը" : en ? "Retake the test" : "ტესტის თავიდან გავლა"}
+              {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
             </Link>
           </Button>
         </div>

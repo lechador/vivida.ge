@@ -41,7 +41,10 @@ function resolveFrom(envVal: string | undefined, fallback: string): string {
   return envVal.includes("<") ? envVal : `Vivida <${envVal}>`;
 }
 
-const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <onboarding@resend.dev>");
+const FROM = resolveFrom(
+  process.env.RESEND_FROM,
+  "Vivida <onboarding@resend.dev>",
+);
 // Default to production so emails never ship localhost links when APP_ORIGIN
 // is unset (e.g. Vercel cron). Local dev sets APP_ORIGIN to override.
 const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
@@ -98,12 +101,15 @@ export async function sendVerificationEmail({
       "[email] RESEND_API_KEY missing — would have sent verification to",
       to,
       "→",
-      verifyUrl
+      verifyUrl,
     );
     return;
   }
   const locale = localeForOrigin(origin);
-  const subject = locale === "en" ? "Verify your email · Vivida" : "დაადასტურე შენი ელფოსტა · Vivida";
+  const subject =
+    locale === "en"
+      ? "Verify your email · Vivida"
+      : "დაადასტურე შენი ელფოსტა · Vivida";
   const result = await c.emails.send({
     from: FROM,
     to,
@@ -112,7 +118,13 @@ export async function sendVerificationEmail({
   });
   if (result.error) {
     console.error("[email] verification send failed:", result.error);
-    await recordSentByEmail(to, "verification", subject, "failed", result.error.message);
+    await recordSentByEmail(
+      to,
+      "verification",
+      subject,
+      "failed",
+      result.error.message,
+    );
     throw new Error(result.error.message ?? "verification send failed");
   }
   await recordSentByEmail(to, "verification", subject, "sent");
@@ -136,12 +148,15 @@ export async function sendPasswordResetEmail({
       "[email] RESEND_API_KEY missing — would have sent reset to",
       to,
       "→",
-      resetUrl
+      resetUrl,
     );
     return;
   }
   const locale = localeForOrigin(origin);
-  const subject = locale === "en" ? "Reset your password · Vivida" : "პაროლის აღდგენა · Vivida";
+  const subject =
+    locale === "en"
+      ? "Reset your password · Vivida"
+      : "პაროლის აღდგენა · Vivida";
   const result = await c.emails.send({
     from: FROM,
     to,
@@ -150,7 +165,13 @@ export async function sendPasswordResetEmail({
   });
   if (result.error) {
     console.error("[email] password reset send failed:", result.error);
-    await recordSentByEmail(to, "password_reset", subject, "failed", result.error.message);
+    await recordSentByEmail(
+      to,
+      "password_reset",
+      subject,
+      "failed",
+      result.error.message,
+    );
     throw new Error(result.error.message ?? "password reset send failed");
   }
   await recordSentByEmail(to, "password_reset", subject, "sent");
@@ -170,10 +191,7 @@ const ABSENCE_THRESHOLD_MIN = 60;
 const NOTIFICATION_THROTTLE_MIN = 60;
 
 /** Has any send for this (userId, kind) ever happened? Welcome guard. */
-async function hasSentBefore(
-  userId: string,
-  kind: string
-): Promise<boolean> {
+async function hasSentBefore(userId: string, kind: string): Promise<boolean> {
   const [row] = await db
     .select({ id: emailSendLog.id })
     .from(emailSendLog)
@@ -186,7 +204,7 @@ async function hasSentBefore(
 async function sentRecently(
   userId: string,
   kind: string,
-  minutes: number
+  minutes: number,
 ): Promise<boolean> {
   const cutoff = new Date(Date.now() - minutes * 60_000);
   const [row] = await db
@@ -196,8 +214,8 @@ async function sentRecently(
       and(
         eq(emailSendLog.userId, userId),
         eq(emailSendLog.kind, kind),
-        gt(emailSendLog.sentAt, cutoff)
-      )
+        gt(emailSendLog.sentAt, cutoff),
+      ),
     )
     .orderBy(desc(emailSendLog.sentAt))
     .limit(1);
@@ -207,7 +225,12 @@ async function sentRecently(
 async function recordSent(
   userId: string,
   kind: string,
-  extra?: { email?: string | null; subject?: string; status?: string; error?: string }
+  extra?: {
+    email?: string | null;
+    subject?: string;
+    status?: string;
+    error?: string;
+  },
 ): Promise<void> {
   await db.insert(emailSendLog).values({
     userId,
@@ -229,7 +252,7 @@ async function recordSentByEmail(
   kind: string,
   subject: string,
   status: "sent" | "failed",
-  error?: string
+  error?: string,
 ): Promise<void> {
   try {
     const [u] = await db
@@ -247,7 +270,7 @@ async function recordSentByEmail(
 /** True when the user hasn't logged in / pinged activity for `minutes`. */
 async function userAbsentFor(
   userId: string,
-  minutes: number
+  minutes: number,
 ): Promise<boolean> {
   const [row] = await db
     .select({ lastLoginAt: users.lastLoginAt })
@@ -288,9 +311,10 @@ export async function sendWelcomeEmail({
   if (await hasSentBefore(userId, "welcome")) return;
 
   const dashboardUrl = absUrl("/dashboard", originForLocale(locale));
-  const subject = locale === "en"
-    ? "Your cosmic journey begins · Vivida"
-    : "შენი კოსმიური მოგზაურობა იწყება · Vivida";
+  const subject =
+    locale === "en"
+      ? "Your cosmic journey begins · Vivida"
+      : "შენი კოსმიური მოგზაურობა იწყება · Vivida";
 
   try {
     const result = await c.emails.send(
@@ -304,7 +328,7 @@ export async function sendWelcomeEmail({
           locale,
         }),
       },
-      { idempotencyKey: `welcome:${userId}` }
+      { idempotencyKey: `welcome:${userId}` },
     );
     if (result.error) {
       console.error("[email] welcome send failed:", result.error);
@@ -349,9 +373,8 @@ export async function sendVerifiedBadgeGiftEmail({
     username ? `/u/${encodeURIComponent(username)}` : "/dashboard",
     originForLocale(locale),
   );
-  const subject = locale === "am"
-    ? "Դուք նվեր եք ստացել Verified Badge · Vivida"
-    : locale === "en"
+  const subject =
+    locale === "en"
       ? "You received a Verified Badge as a gift · Vivida"
       : "Verified Badge საჩუქრად მიიღე · Vivida";
 
@@ -419,12 +442,16 @@ export async function sendMbtiResultEmail({
 }): Promise<void> {
   const c = client();
   if (!c) {
-    console.warn("[email] RESEND_API_KEY missing — skipping MBTI result to", to);
+    console.warn(
+      "[email] RESEND_API_KEY missing — skipping MBTI result to",
+      to,
+    );
     return;
   }
-  const subject = locale === "en"
-    ? `Your type is ${mbtiType} — ${archetypeNameGe} · Vivida`
-    : `შენი ტიპია ${mbtiType} — ${archetypeNameGe} · Vivida`;
+  const subject =
+    locale === "en"
+      ? `Your type is ${mbtiType} — ${archetypeNameGe} · Vivida`
+      : `შენი ტიპია ${mbtiType} — ${archetypeNameGe} · Vivida`;
   try {
     const result = await c.emails.send(
       {
@@ -444,11 +471,15 @@ export async function sendMbtiResultEmail({
               : "შენი პიროვნების ღრმა ფსიქოლოგიური და ასტროლოგიური ანალიზი მზადაა."),
         }),
       },
-      { idempotencyKey: `mbti:${resultId}` }
+      { idempotencyKey: `mbti:${resultId}` },
     );
     if (result.error) {
       console.error("[email] mbti result send failed:", result.error);
-      await recordSent(userId, "mbti_result", { email: to, subject, status: "failed" });
+      await recordSent(userId, "mbti_result", {
+        email: to,
+        subject,
+        status: "failed",
+      });
       return;
     }
     await recordSent(userId, "mbti_result", { email: to, subject });
@@ -501,7 +532,7 @@ export async function sendReportPdfEmail({
   }
 
   const reportUrl = absUrl(`/reports/${reportId}`, originForLocale(locale));
-  const subject = `${reportTitle ?? (locale === "am" ? "Ձեր նատալ զեկույցը" : locale === "en" ? "Your natal report" : "შენი ნატალური ანგარიში")} · Vivida`;
+  const subject = `${reportTitle ?? (locale === "en" ? "Your natal report" : "შენი ნატალური ანგარიში")} · Vivida`;
 
   try {
     // Dynamic import so the AWS SDK stays out of every module that merely
@@ -513,7 +544,7 @@ export async function sendReportPdfEmail({
       pdf = bytes.byteLength <= MAX_ATTACHMENT_BYTES ? bytes : null;
       if (!pdf) {
         console.warn(
-          `[email] report ${reportId} PDF too large to attach (${bytes.byteLength} bytes) — sending link only`
+          `[email] report ${reportId} PDF too large to attach (${bytes.byteLength} bytes) — sending link only`,
         );
       }
     } catch (err) {
@@ -521,7 +552,7 @@ export async function sendReportPdfEmail({
       // so send that rather than nothing.
       console.error(
         "[email] report PDF fetch failed, sending link only:",
-        (err as Error).message
+        (err as Error).message,
       );
     }
 
@@ -591,20 +622,39 @@ export async function sendPersonalReminderEmail({
   const actionUrl = absUrl(path, originForLocale(locale));
   const subject = `${title} · Vivida`;
   try {
-    const result = await c.emails.send({
-      from: FROM,
-      to,
-      subject,
-      react: PersonalReminderEmail({ name: name?.split(" ")[0] ?? null, title, body, actionUrl, locale }),
-    }, { idempotencyKey });
+    const result = await c.emails.send(
+      {
+        from: FROM,
+        to,
+        subject,
+        react: PersonalReminderEmail({
+          name: name?.split(" ")[0] ?? null,
+          title,
+          body,
+          actionUrl,
+          locale,
+        }),
+      },
+      { idempotencyKey },
+    );
     if (result.error) {
-      await recordSent(userId, "personal_reminder", { email: to, subject, status: "failed", error: result.error.message });
+      await recordSent(userId, "personal_reminder", {
+        email: to,
+        subject,
+        status: "failed",
+        error: result.error.message,
+      });
       return false;
     }
     await recordSent(userId, "personal_reminder", { email: to, subject });
     return true;
   } catch (error) {
-    await recordSent(userId, "personal_reminder", { email: to, subject, status: "failed", error: (error as Error).message.slice(0, 500) }).catch(() => undefined);
+    await recordSent(userId, "personal_reminder", {
+      email: to,
+      subject,
+      status: "failed",
+      error: (error as Error).message.slice(0, 500),
+    }).catch(() => undefined);
     return false;
   }
 }
@@ -685,7 +735,7 @@ export async function sendFriendRequestEmail({
     await sentRecently(
       recipientUserId,
       "friend_request",
-      NOTIFICATION_THROTTLE_MIN
+      NOTIFICATION_THROTTLE_MIN,
     )
   ) {
     return;
@@ -696,9 +746,10 @@ export async function sendFriendRequestEmail({
   const origin = originForLocale(locale);
   const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`, origin);
   const friendsUrl = absUrl("/friends", origin);
-  const subject = locale === "en"
-    ? `${fromName} sent you a friend request · Vivida`
-    : `${fromName}-მ მეგობრობა გთხოვა · Vivida`;
+  const subject =
+    locale === "en"
+      ? `${fromName} sent you a friend request · Vivida`
+      : `${fromName}-მ მეგობრობა გთხოვა · Vivida`;
 
   try {
     const result = await c.emails.send(
@@ -723,9 +774,9 @@ export async function sendFriendRequestEmail({
       // suppresses duplicates; key just guards against races.
       {
         idempotencyKey: `friend_request:${recipientUserId}:${Math.floor(
-          Date.now() / 3600_000
+          Date.now() / 3600_000,
         )}`,
-      }
+      },
     );
     if (result.error) {
       console.error("[email] friend-request send failed:", result.error);
@@ -794,12 +845,12 @@ export async function sendMessageEmail({
     `/messages?with=${encodeURIComponent(fromUserId)}`,
     origin,
   );
-  const subject = locale === "en"
-    ? `${fromName} sent you a message · Vivida`
-    : `${fromName}-მ წერილი მოგწერა · Vivida`;
+  const subject =
+    locale === "en"
+      ? `${fromName} sent you a message · Vivida`
+      : `${fromName}-მ წერილი მოგწერა · Vivida`;
 
-  const snippet =
-    body.length > 140 ? `${body.slice(0, 140).trimEnd()}…` : body;
+  const snippet = body.length > 140 ? `${body.slice(0, 140).trimEnd()}…` : body;
 
   try {
     const result = await c.emails.send(
@@ -823,9 +874,9 @@ export async function sendMessageEmail({
       },
       {
         idempotencyKey: `message:${recipientUserId}:${Math.floor(
-          Date.now() / 3600_000
+          Date.now() / 3600_000,
         )}`,
-      }
+      },
     );
     if (result.error) {
       console.error("[email] message send failed:", result.error);
@@ -895,7 +946,8 @@ export async function sendFeedActivityEmail({
     .limit(1);
   if (!recipient?.email) return false;
   if (recipient.emailNudges === false) return false;
-  if (!(await userAbsentFor(recipientUserId, ABSENCE_THRESHOLD_MIN))) return false;
+  if (!(await userAbsentFor(recipientUserId, ABSENCE_THRESHOLD_MIN)))
+    return false;
   if (await sentRecently(recipientUserId, kind, NOTIFICATION_THROTTLE_MIN)) {
     return false;
   }
@@ -944,9 +996,9 @@ export async function sendFeedActivityEmail({
       },
       {
         idempotencyKey: `${kind}:${recipientUserId}:${Math.floor(
-          Date.now() / 3600_000
+          Date.now() / 3600_000,
         )}`,
-      }
+      },
     );
     if (result.error) {
       console.error("[email] feed-activity send failed:", result.error);
@@ -967,7 +1019,7 @@ export async function sendFeedActivityEmail({
 async function sentSince(
   userId: string,
   kind: string,
-  since: Date
+  since: Date,
 ): Promise<boolean> {
   const [row] = await db
     .select({ id: emailSendLog.id })
@@ -976,8 +1028,8 @@ async function sentSince(
       and(
         eq(emailSendLog.userId, userId),
         eq(emailSendLog.kind, kind),
-        gte(emailSendLog.sentAt, since)
-      )
+        gte(emailSendLog.sentAt, since),
+      ),
     )
     .limit(1);
   return !!row;
@@ -1016,8 +1068,8 @@ export async function flushUnreadFeedActivityEmails(): Promise<{
           isNull(notifications.readAt),
           gt(notifications.createdAt, oldest),
           lt(notifications.createdAt, due),
-          eq(users.emailNudges, true)
-        )
+          eq(users.emailNudges, true),
+        ),
       )
       .orderBy(desc(notifications.createdAt));
 
@@ -1049,10 +1101,7 @@ export async function flushUnreadFeedActivityEmails(): Promise<{
 
     return { candidates: latest.size, sent };
   } catch (err) {
-    console.error(
-      "[email] feed-activity flush threw:",
-      (err as Error).message
-    );
+    console.error("[email] feed-activity flush threw:", (err as Error).message);
     return { candidates: 0, sent: 0 };
   }
 }

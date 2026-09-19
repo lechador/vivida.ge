@@ -45,7 +45,6 @@ export function PushOptIn({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [state, setState] = useState<State>("loading");
   const [error, setError] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
@@ -123,7 +122,9 @@ export function PushOptIn({
       await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID as string) as BufferSource,
+        applicationServerKey: urlBase64ToUint8Array(
+          VAPID as string,
+        ) as BufferSource,
       });
       const res = await fetch("/api/push/subscribe", {
         method: "POST",
@@ -134,7 +135,11 @@ export function PushOptIn({
       trackEvent(ANALYTICS_EVENT.pushEnabled, { surface: variant });
       setState("on");
     } catch {
-      setError(am ? "Հնարավոր չէր միացնել ծանուցումները։ Խնդրում ենք նորից փորձել։" : en ? "Could not enable notifications. Please try again." : "ვერ ჩაირთო. სცადე ხელახლა.");
+      setError(
+        en
+          ? "Could not enable notifications. Please try again."
+          : "ვერ ჩაირთო. სცადე ხელახლა.",
+      );
       setState("off");
     }
   }
@@ -175,14 +180,16 @@ export function PushOptIn({
       <div className="mb-6 flex items-center gap-3 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 to-[var(--vivida-cyan)]/8 p-4 ring-1 ring-foreground/5 backdrop-blur-xl">
         <Bell className="size-5 shrink-0 text-[var(--vivida-violet)]" />
         <p className="min-w-0 flex-1 text-sm text-foreground/90">
-          {am ? "Միացրեք ծանուցումները՝ ամեն առավոտ ձեր ամենօրյա հորոսկոպը ստանալու համար։" : en ? "Enable notifications to receive your daily horoscope each morning." : "ჩართე შეტყობინებები — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."}
+          {en
+            ? "Enable notifications to receive your daily horoscope each morning."
+            : "ჩართე შეტყობინებები — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."}
         </p>
         <Button type="button" variant="mystic" size="sm" onClick={enable}>
-          {am ? "Միացնել" : en ? "Enable" : "ჩართვა"}
+          {en ? "Enable" : "ჩართვა"}
         </Button>
         <button
           type="button"
-          aria-label={am ? "Փակել" : en ? "Close" : "დახურვა"}
+          aria-label={en ? "Close" : "დახურვა"}
           onClick={dismiss}
           className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/60 hover:text-foreground"
         >
@@ -197,31 +204,49 @@ export function PushOptIn({
     <div className="rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
       <div className="flex items-start gap-4">
         <div className="mt-0.5 grid size-10 shrink-0 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
-          {state === "on" ? <Bell className="size-5" /> : <BellOff className="size-5" />}
+          {state === "on" ? (
+            <Bell className="size-5" />
+          ) : (
+            <BellOff className="size-5" />
+          )}
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-semibold tracking-tight">{am ? "Ծանուցումներ" : en ? "Notifications" : "შეტყობინებები"}</h2>
+          <h2 className="text-lg font-semibold tracking-tight">
+            {en ? "Notifications" : "შეტყობინებები"}
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {state === "on"
-              ? am ? "Միացված է — ձեր ամենօրյա հորոսկոպը կժամանի ամեն առավոտ։" : en ? "Enabled — your daily horoscope arrives each morning." : "ჩართულია — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."
-              : am ? "Միացրեք ծանուցումները՝ ամեն առավոտ ձեր հեռախոսով ամենօրյա հորոսկոպը ստանալու համար։" : en ? "Enable notifications to receive your daily horoscope on your phone each morning." : "ჩართე და ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს პირდაპირ ტელეფონზე."}
+              ? en
+                ? "Enabled — your daily horoscope arrives each morning."
+                : "ჩართულია — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."
+              : en
+                ? "Enable notifications to receive your daily horoscope on your phone each morning."
+                : "ჩართე და ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს პირდაპირ ტელეფონზე."}
           </p>
 
           {state === "unsupported" && (
             <p className="mt-3 text-sm text-muted-foreground">
               {isIOS
-                ? am ? "iPhone-ում նախ Vivida-ն ավելացրեք ձեր հիմնական էկրանին, բացեք այնտեղ, ապա միացրեք ծանուցումները։" : en ? "On iPhone, add Vivida to your Home Screen first, open it there, then enable notifications." : "iPhone-ზე ჯერ დაამატე Vivida მთავარ ეკრანზე (Share → „Add to Home Screen“), გახსენი იქიდან და შემდეგ ჩართე შეტყობინებები."
-                : am ? "Ծանուցումները հասանելի չեն այս բրաուզերում։ Փորձեք Chrome։" : en ? "Notifications are unavailable in this browser. Try Chrome." : "ამ ბრაუზერში შეტყობინებები არ არის ხელმისაწვდომი. სცადე Chrome-ით."}
+                ? en
+                  ? "On iPhone, add Vivida to your Home Screen first, open it there, then enable notifications."
+                  : "iPhone-ზე ჯერ დაამატე Vivida მთავარ ეკრანზე (Share → „Add to Home Screen“), გახსენი იქიდან და შემდეგ ჩართე შეტყობინებები."
+                : en
+                  ? "Notifications are unavailable in this browser. Try Chrome."
+                  : "ამ ბრაუზერში შეტყობინებები არ არის ხელმისაწვდომი. სცადე Chrome-ით."}
             </p>
           )}
           {state === "unconfigured" && (
             <p className="mt-3 text-sm text-muted-foreground">
-              {am ? "Ծանուցումները ժամանակավորապես անհասանելի են։ Ավելի ուշ նորից փորձեք։" : en ? "Notifications are temporarily unavailable. Try again later." : "შეტყობინებები დროებით მიუწვდომელია. სცადე მოგვიანებით."}
+              {en
+                ? "Notifications are temporarily unavailable. Try again later."
+                : "შეტყობინებები დროებით მიუწვდომელია. სცადე მოგვიანებით."}
             </p>
           )}
           {state === "denied" && (
             <p className="mt-3 text-sm text-[var(--vivida-pink)]">
-              {am ? "Ծանուցումներն արգելափակված են ձեր բրաուզերում։ Միացրեք դրանք բրաուզերի կարգավորումներում։" : en ? "Notifications are blocked in your browser. Enable them in browser settings." : "შეტყობინებები დაბლოკილია ბრაუზერში — ჩართე ბრაუზერის პარამეტრებიდან."}
+              {en
+                ? "Notifications are blocked in your browser. Enable them in browser settings."
+                : "შეტყობინებები დაბლოკილია ბრაუზერში — ჩართე ბრაუზერის პარამეტრებიდან."}
             </p>
           )}
 
@@ -230,17 +255,22 @@ export function PushOptIn({
               {state === "on" ? (
                 <>
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--vivida-violet)]/15 px-3 py-1.5 text-sm font-medium text-[var(--vivida-violet)]">
-                    <Check className="size-4" /> {am ? "Միացված է" : en ? "Enabled" : "ჩართულია"}
+                    <Check className="size-4" /> {en ? "Enabled" : "ჩართულია"}
                   </span>
-                  <Button type="button" variant="outline" size="sm" onClick={disable}>
-                    {am ? "Անջատել" : en ? "Disable" : "გამორთვა"}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={disable}
+                  >
+                    {en ? "Disable" : "გამორთვა"}
                   </Button>
                   <button
                     type="button"
                     onClick={() => fetch("/api/push/test", { method: "POST" })}
                     className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                   >
-                    {am ? "Ուղարկել փորձնական ծանուցում" : en ? "Send test notification" : "სატესტო შეტყობინება"}
+                    {en ? "Send test notification" : "სატესტო შეტყობინება"}
                   </button>
                 </>
               ) : (
@@ -255,13 +285,15 @@ export function PushOptIn({
                   ) : (
                     <Bell className="size-4" />
                   )}
-                  {am ? "Միացնել ծանուցումները" : en ? "Enable notifications" : "ჩართე შეტყობინებები"}
+                  {en ? "Enable notifications" : "ჩართე შეტყობინებები"}
                 </Button>
               )}
             </div>
           )}
 
-          {error && <p className="mt-2 text-sm text-[var(--vivida-pink)]">{error}</p>}
+          {error && (
+            <p className="mt-2 text-sm text-[var(--vivida-pink)]">{error}</p>
+          )}
         </div>
       </div>
     </div>

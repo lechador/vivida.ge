@@ -17,16 +17,8 @@ export function VerifiedBadgeGiftEmail({
   profileUrl: string;
   locale?: UserLocale;
 }) {
-  const copy = locale === "am"
-    ? {
-        preview: "Ձեր Vivida պրոֆիլը ստացել է Verified Badge",
-        heading: "Դուք նվեր եք ստացել Verified Badge",
-        greeting: name ? `Բարև, ${name}։` : "Բարև։",
-        body: "Vivida-ի թիմը ձեր պրոֆիլին նվիրել է Verified Badge։ Այն արդեն տեսանելի է ձեր անվան կողքին՝ պրոֆիլում, համայնքում և մեկնաբանություններում։",
-        note: "Badge-ը նվեր է և վճարովի բաժանորդագրություն չի պահանջում։",
-        cta: "Դիտել իմ պրոֆիլը",
-      }
-    : locale === "en"
+  const copy =
+    locale === "en"
       ? {
           preview: "Your Vivida profile received a Verified Badge",
           heading: "You received a Verified Badge as a gift",

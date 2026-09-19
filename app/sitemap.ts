@@ -12,7 +12,6 @@ import { LIFE_PATH_NUMBERS } from "@/lib/numerology";
 import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
 import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
 import { ALL_MBTI_SLUGS } from "@/lib/seo/mbti-seo";
-import { TAROT_CARDS } from "@/lib/tarot/deck";
 import { tarotDetailSlugs } from "@/lib/tarot/detail";
 import { EQ_ARTICLE_SLUGS } from "@/lib/seo/eq-articles";
 import { ALL_HOROSCOPE_THEMES, themeUrl } from "@/lib/seo/thematic-horoscope";
@@ -884,12 +883,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const georgianWithAlternates = georgianPages.map((entry) => {
     const path = new URL(entry.url).pathname;
     const pair = pairByKaPath.get(path);
-    // Every translated Armenian page must be reciprocal from the Georgian
-    // sitemap too. Previously only the small core pair table received
-    // alternates, leaving hundreds of valid Armenian long-tail URLs one-way.
-    if (!pair && !hasArmenianVersion(path)) return entry;
-    // Same builder the English and Armenian sections use, so all three sides
-    // of a pair agree on whether an Armenian alternate exists.
+    if (!pair) return entry;
     return {
       ...entry,
       alternates: alternatesFor(pair?.ka ?? path, pair?.en ?? path),

@@ -168,7 +168,9 @@ export function billingPeriodMonths(start: Date, end: Date): number {
   return Math.max(1, Math.round(days / 30.44));
 }
 
-export function normalizeCountryCode(value: string | null | undefined): string | null {
+export function normalizeCountryCode(
+  value: string | null | undefined,
+): string | null {
   const code = value?.trim().toUpperCase();
   return code && /^[A-Z]{2}$/.test(code) ? code : null;
 }
@@ -185,7 +187,10 @@ export function creditPackForCountry(
   countryCode: string | null | undefined,
   packId: unknown,
 ): CreditPack | null {
-  return creditPacksForCountry(countryCode).find((pack) => pack.id === packId) ?? null;
+  return (
+    creditPacksForCountry(countryCode).find((pack) => pack.id === packId) ??
+    null
+  );
 }
 
 /** Use Georgian PRO pricing until a country-specific market is launched. */
@@ -193,7 +198,9 @@ export function premiumPlanForCountry(
   countryCode: string | null | undefined,
 ): PremiumPlan {
   const code = normalizeCountryCode(countryCode);
-  return (code && PREMIUM_PLANS_BY_COUNTRY[code]) || PREMIUM_PLANS_BY_COUNTRY.GE;
+  return (
+    (code && PREMIUM_PLANS_BY_COUNTRY[code]) || PREMIUM_PLANS_BY_COUNTRY.GE
+  );
 }
 
 /** The public multi-month deal for this market, when one is available. */
@@ -225,7 +232,10 @@ export function premiumPlanByKeyForCountry(
 export function featuredPremiumPlanForCountry(
   countryCode: string | null | undefined,
 ): PremiumPlan {
-  return discountedPremiumPlanForCountry(countryCode) ?? premiumPlanForCountry(countryCode);
+  return (
+    discountedPremiumPlanForCountry(countryCode) ??
+    premiumPlanForCountry(countryCode)
+  );
 }
 
 export function premiumPlanSavingsPercent(
@@ -235,7 +245,10 @@ export function premiumPlanSavingsPercent(
   const months = discounted.intervalCount ?? 1;
   const regularTotal = standard.amountMinor * months;
   if (regularTotal <= 0 || standard.currency !== discounted.currency) return 0;
-  return Math.max(0, Math.round((1 - discounted.amountMinor / regularTotal) * 100));
+  return Math.max(
+    0,
+    Math.round((1 - discounted.amountMinor / regularTotal) * 100),
+  );
 }
 
 const CURRENCY_SYMBOL: Record<string, string> = {
@@ -279,11 +292,11 @@ export function formatBillingAmount(
   const fractionDigits = WHOLE_UNIT_DISPLAY_CURRENCIES.has(code) ? 0 : 2;
   const amount = amountMinor / 100;
 
-  // Armenian has the same hazard Georgian does — browsers ship no `hy` locale
-  // data either, so an Intl call under it resolves differently on the server
-  // than in the client and React throws the markup away. Both get their symbol
-  // attached here, over digits grouped by a locale every runtime has.
-  if ((locale === "ka" || locale === "am") && symbol) {
+  // Browsers ship no `ka` locale data, so an Intl call under it resolves
+  // differently on the server than in the client and React throws the markup
+  // away. Georgian gets its symbol attached here, over digits grouped by a
+  // locale every runtime has.
+  if (locale === "ka" && symbol) {
     const digits = new Intl.NumberFormat("en-GB", {
       minimumFractionDigits: fractionDigits,
       maximumFractionDigits: fractionDigits,

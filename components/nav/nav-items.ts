@@ -73,7 +73,6 @@ function navVisible(item: NavItem): boolean {
  * Resolve the visible label for the current interface language.
  */
 export function navLabel(item: NavItem, locale: UserLocale = "ka"): string {
-  if (locale === "am") return item.labelAm;
   if (locale === "en") return item.labelEn;
   return item.label;
 }
@@ -269,7 +268,6 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
     hue: "oklch(0.78 0.18 200)",
   },
 ];
-
 
 /** Visible mobile tab bar — same flag filtering as the desktop nav. */
 export const MOBILE_TAB_ITEMS: NavItem[] =

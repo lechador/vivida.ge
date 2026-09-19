@@ -41,11 +41,10 @@ export function PositionsTable({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
-  const planetHeader = am ? "Մոլորակ" : en ? "Planet" : "პლანეტა";
-  const signHeader = am ? "Նշան" : en ? "Sign" : "ნიშანი";
-  const degreeHeader = am ? "Աստիճան" : en ? "Degree" : "გრადუსი";
-  const houseHeader = am ? "Տուն" : en ? "House" : "სახლი";
+  const planetHeader = en ? "Planet" : "პლანეტა";
+  const signHeader = en ? "Sign" : "ნიშანი";
+  const degreeHeader = en ? "Degree" : "გრადუსი";
+  const houseHeader = en ? "House" : "სახლი";
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
@@ -65,16 +64,10 @@ export function PositionsTable({
           const sign = signByIndex(point.signIndex);
           const color = signColor(sign);
           const house = key === "ascendant" ? 1 : point.house;
-          const planetLabel = am
-            ? meta?.labelAm ?? key
-            : en
-            ? meta?.labelEn ?? key
-            : meta?.labelKa ?? key;
-          const signLabel = am
-            ? sign.labelAm
-            : en
-            ? sign.labelEn
-            : sign.labelKa;
+          const planetLabel = en
+            ? (meta?.labelEn ?? key)
+            : (meta?.labelKa ?? key);
+          const signLabel = en ? sign.labelEn : sign.labelKa;
 
           return (
             <li key={key} className="border-t border-border/50">
@@ -141,12 +134,7 @@ export function HousesTable({
       {houses.map((h) => {
         const sign = signByIndex(h.signIndex);
         const color = signColor(sign);
-        const signLabel =
-          locale === "am"
-            ? sign.labelAm
-            : locale === "en"
-            ? sign.labelEn
-            : sign.labelKa;
+        const signLabel = locale === "en" ? sign.labelEn : sign.labelKa;
         return (
           <a
             key={h.number}

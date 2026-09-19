@@ -30,7 +30,3 @@ export function isEnglish(locale: UserLocale): boolean {
 export function usesEnglishCopy(locale: UserLocale): boolean {
   return locale !== "ka";
 }
-
-export function isArmenian(locale: UserLocale): boolean {
-  return locale === "am";
-}

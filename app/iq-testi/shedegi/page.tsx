@@ -10,9 +10,8 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   return {
-    title: am ? "Ձեր Ինտելեկտի Գործակցի Արդյունքը" : en ? "Your IQ Result" : "შენი IQ შედეგი",
+    title: en ? "Your IQ Result" : "შენი IQ შედეგი",
     description: en
       ? "Your estimated IQ score, percentile and reasoning profile."
       : "შენი ინტელექტის ტესტის შედეგი — IQ ქულა, პროცენტილი და აზროვნების ანალიზი.",
@@ -31,14 +30,25 @@ export default async function IqResultPage() {
   const locale = await getRequestLocale();
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_265/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_190/0.4),transparent_70%)]"
       />
       <Starfield count={110} shooting={2} />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/iq-testi/shedegi" />}
+      {authed ? (
+        <AppHeader authed active="tests" />
+      ) : (
+        <SmartHeader
+          active="tests"
+          locale={locale}
+          georgianPath="/iq-testi/shedegi"
+        />
+      )}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <IqResultClient locale={locale} />

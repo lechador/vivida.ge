@@ -23,24 +23,17 @@ import { localizedAlternates } from "@/lib/seo/locales";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
   return {
-    title: am ? "Vivida-ի հնարավորությունները" : en ? "Features" : "ფუნქციები",
-    description: am
-      ? "Նատալ քարտեզ, ամենօրյա կանխատեսումներ, համատեղելիություն, AI վերլուծություն և հանրային պրոֆիլ՝ Vivida-ի բոլոր հնարավորությունները մեկ տեղում։"
-      : en
-        ? "Birth charts, daily forecasts, compatibility, AI insights, and a public profile—explore every Vivida feature."
-        : "ნატალური რუკა, ყოველდღიური პროგნოზი, თავსებადობა, AI ანალიზი, საჯარო პროფილი — Vivida-ს ყველა ფუნქცია ერთ ადგილას.",
+    title: en ? "Features" : "ფუნქციები",
+    description: en
+      ? "Birth charts, daily forecasts, compatibility, AI insights, and a public profile—explore every Vivida feature."
+      : "ნატალური რუკა, ყოველდღიური პროგნოზი, თავსებადობა, AI ანალიზი, საჯარო პროფილი — Vivida-ს ყველა ფუნქცია ერთ ადგილას.",
     // Same-path pair: the English version lives at /features on the
     // international host. Self-canonicalizes per domain AND declares the
     // reciprocal hreflang — the sitemap alone was one-way (only the English
     // side named a Georgian partner), so Google dropped the pair and treated
     // the two domains as competing duplicates.
-    alternates: localizedAlternates(
-      am ? "/am/features" : "/features",
-      "/features",
-      locale,
-    ),
+    alternates: localizedAlternates("/features", "/features", locale),
   };
 }
 
@@ -165,68 +158,10 @@ const FEATURES_EN: Feature[] = [
   },
 ];
 
-const FEATURES_AM: Feature[] = [
-  {
-    Icon: Sun,
-    title: "Ամենօրյա կանխատեսում",
-    body: "Այսօրվա ձեր անձնական երկինքը՝ նատալ քարտեզի հիման վրա։ Տեսեք էմոցիոնալ ֆոնը, հնարավորություններն ու ուշադրության հիմնական ուղղությունը։",
-    hue: "oklch(0.82 0.16 80)",
-  },
-  {
-    Icon: Compass,
-    title: "Ամբողջական նատալ քարտեզ",
-    body: "Ինտերակտիվ քարտեզ՝ 12 նշանով, 12 տնով, 10-ից ավելի մոլորակներով և հիմնական ասպեկտներով։ Կենտրոնում ձեր Արեգակը, Լուսինն ու ասցենդենտն են։",
-    hue: "oklch(0.78 0.18 305)",
-  },
-  {
-    Icon: Heart,
-    title: "Համատեղելիություն",
-    body: "Ուսումնասիրեք ռոմանտիկ, ընկերական, հաղորդակցական, աճի, քիմիայի և աշխատանքային համատեղելիությունը՝ հստակ գնահատականներով ու մանրամասն բացատրություններով։",
-    hue: "oklch(0.72 0.22 0)",
-  },
-  {
-    Icon: Brain,
-    title: "AI մեկնաբանություն",
-    body: "Ձեր քարտեզի անհատական էմոցիոնալ պատկերը։ Սա ընդհանուր հորոսկոպ չէ․ յուրաքանչյուր դիտարկում հիմնված է ձեր ծննդյան տվյալների վրա։",
-    hue: "oklch(0.78 0.15 195)",
-  },
-  {
-    Icon: Sparkles,
-    title: "Քարտեզի կարևոր շեշտադրումներ",
-    body: "Vivida-ն գտնում է ձեր քարտեզի առավել առանձնահատուկ օրինաչափությունները՝ ստելիումները, ուժեղ ասպեկտներն ու ուշադրության արժանի դիրքերը։",
-    hue: "oklch(0.72 0.22 350)",
-  },
-  {
-    Icon: UserCircle,
-    title: "Հանրային պրոֆիլ",
-    body: "Ընտրեք օգտանուն, ավելացրեք լուսանկարներ ու ձեր մասին տեղեկություն, որպեսզի մարդիկ գտնեն ձեզ և անմիջապես տեսնեն ձեր ընդհանուր համատեղելիությունը։",
-    hue: "oklch(0.72 0.18 145)",
-  },
-  {
-    Icon: Globe2,
-    title: "Մարդկանց բացահայտում",
-    body: "Ծանոթացեք մարդկանց՝ ընդհանուր տարրերի, կենդանակերպի նշանների և քարտեզների նշանակալի կապերի միջոցով, կամ պարզապես տեսեք՝ ովքեր են մոտակայքում։",
-    hue: "oklch(0.78 0.15 195)",
-  },
-  {
-    Icon: Users,
-    title: "Ընկերների շրջանակ",
-    body: "Հրավիրեք ընկերների, կառավարեք հարցումները և մեկ հպումով բացեք ձեր համատեղելիությունը։ Ձեր մարդիկ ու ընդհանուր երկինքը միշտ միասին են։",
-    hue: "oklch(0.72 0.22 0)",
-  },
-  {
-    Icon: MessageCircle,
-    title: "Անձնական հաղորդագրություններ",
-    body: "Զրուցեք ընկերների հետ իրական ժամանակում՝ կարդալու նշումներով, մուտքագրման ցուցիչներով և ծանուցումներով։",
-    hue: "oklch(0.78 0.18 305)",
-  },
-];
-
 export default async function FeaturesPage() {
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
-  const features = am ? FEATURES_AM : en ? FEATURES_EN : FEATURES;
+  const features = en ? FEATURES_EN : FEATURES;
   return (
     <main
       lang={locale}
@@ -246,29 +181,19 @@ export default async function FeaturesPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {am ? "Հնարավորություններ" : en ? "Features" : "ფუნქციები"}
+          {en ? "Features" : "ფუნქციები"}
         </div>
         <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-          {am
-            ? "Այն ամենը, ինչ "
-            : en
-              ? "Everything that makes "
-              : "ყველაფერი, რაც "}
+          {en ? "Everything that makes " : "ყველაფერი, რაც "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {am
-              ? "կենդանացնում է ձեր քարտեզը"
-              : en
-                ? "your chart"
-                : "შენს რუკას"}
+            {en ? "your chart" : "შენს რუკას"}
           </span>{" "}
-          {am ? "" : en ? " come alive" : " ცოცხალს ხდის"}
+          {en ? " come alive" : " ცოცხალს ხდის"}
         </h1>
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
-          {am
-            ? "Vivida-ն պարզապես հորոսկոպի հավելված չէ։ Այն ձեր անձնական ուղեցույցն է՝ ծննդյան պահից մինչև ամենօրյա ընտրությունները։"
-            : en
-              ? "Vivida goes beyond a horoscope app. It is a personal guide from the moment of your birth to the choices you make every day."
-              : "Vivida არ არის უბრალო ჰოროსკოპის აპი. ეს არის შენი პერსონალური კოსმიური თანამგზავრი — დაბადებიდან ყოველდღიურ გადაწყვეტილებებამდე."}
+          {en
+            ? "Vivida goes beyond a horoscope app. It is a personal guide from the moment of your birth to the choices you make every day."
+            : "Vivida არ არის უბრალო ჰოროსკოპის აპი. ეს არის შენი პერსონალური კოსმიური თანამგზავრი — დაბადებიდან ყოველდღიურ გადაწყვეტილებებამდე."}
         </p>
 
         <div className="mt-12 grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -321,23 +246,17 @@ export default async function FeaturesPage() {
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            {am
-              ? "Ամեն ինչ՝ մեկ տեղում"
-              : en
-                ? "Everything in one place"
-                : "ყველაფერი ერთ ადგილას"}
+            {en ? "Everything in one place" : "ყველაფერი ერთ ადგილას"}
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            {am
-              ? "Սկսեք անվճար և ձեր անձնական երկինքը միշտ պահեք ձեռքի տակ։"
-              : en
-                ? "Start with Vivida for free and keep your personal sky within reach."
-                : "ყველა ფუნქცია სრულად უფასოა — შენი კოსმოსი ერთ დაკლიკვაზე."}
+            {en
+              ? "Start with Vivida for free and keep your personal sky within reach."
+              : "ყველა ფუნქცია სრულად უფასოა — შენი კოსმოსი ერთ დაკლიკვაზე."}
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic" size="lg">
               <Link href="/signup">
-                {am ? "Սկսել անվճար" : en ? "Start for free" : "დაიწყე უფასოდ"}
+                {en ? "Start for free" : "დაიწყე უფასოდ"}
               </Link>
             </Button>
           </div>

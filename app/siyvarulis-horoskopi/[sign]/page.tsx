@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ThematicHoroscopeDetail, thematicDetailMetadata } from "@/components/seo/thematic-horoscope-pages";
-import { ThematicHoroscopeDetailEn, thematicDetailMetadataEn } from "@/components/seo/thematic-horoscope-pages-en";
-import { ThematicHoroscopeDetailAm, thematicDetailMetadataAm } from "@/components/seo/thematic-horoscope-pages-am";
+import {
+  ThematicHoroscopeDetail,
+  thematicDetailMetadata,
+} from "@/components/seo/thematic-horoscope-pages";
+import {
+  ThematicHoroscopeDetailEn,
+  thematicDetailMetadataEn,
+} from "@/components/seo/thematic-horoscope-pages-en";
+
 import { ALL_SLUGS, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
@@ -20,7 +26,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { sign } = await params;
   if (!valid(sign)) return {};
   const locale = await getRequestLocale();
-  if (locale === "am") return thematicDetailMetadataAm("love", sign);
   if (locale === "en") return thematicDetailMetadataEn("love", sign);
   return thematicDetailMetadata("love", sign);
 }
@@ -29,7 +34,7 @@ export default async function LoveSignPage({ params }: Props) {
   const { sign } = await params;
   if (!valid(sign)) notFound();
   const locale = await getRequestLocale();
-  if (locale === "am") return <ThematicHoroscopeDetailAm theme="love" sign={sign} />;
-  if (locale === "en") return <ThematicHoroscopeDetailEn theme="love" sign={sign} />;
+  if (locale === "en")
+    return <ThematicHoroscopeDetailEn theme="love" sign={sign} />;
   return <ThematicHoroscopeDetail theme="love" sign={sign} />;
 }

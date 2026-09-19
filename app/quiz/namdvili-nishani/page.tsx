@@ -11,7 +11,12 @@ import { TS_QUESTION_COUNT } from "@/lib/true-sign/quiz";
 import { TRUE_SIGN_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  GEORGIAN_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const TITLE = "რომელი ზოდიაქოს ნიშანი ხარ სინამდვილეში? — ტესტი";
 const DESCRIPTION =
@@ -29,7 +34,11 @@ const METADATA_KA: Metadata = {
     "ზოდიაქოს ტესტი ქართულად",
   ],
   // Reciprocal — the English side already points here.
-  alternates: localizedAlternates("/quiz/namdvili-nishani", "/quiz/namdvili-nishani", "ka"),
+  alternates: localizedAlternates(
+    "/quiz/namdvili-nishani",
+    "/quiz/namdvili-nishani",
+    "ka",
+  ),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     type: "website",
@@ -39,22 +48,45 @@ const METADATA_KA: Metadata = {
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const title = "Կենդանակերպի ո՞ր նշանն է համապատասխանում ձեր բնավորությանը — թեստ";
-    const description = "Պատասխանեք 12 զվարճալի հարցի և պարզեք, թե կենդանակերպի ո՞ր նշանի էներգիան է առավել համապատասխանում ձեր բնավորությանը։ Անվճար և ակնթարթային թեստ։";
-    const url = `${ARMENIAN_SITE_URL}/quiz/namdvili-nishani`;
-    return { title: { absolute: title }, description, keywords: ["կենդանակերպի թեստ", "կենդանակերպի որ նշանն եմ", "անհատականության թեստ", "աստղաբանական թեստ"], alternates: localizedAlternates("/am/quiz/namdvili-nishani", "/quiz/namdvili-nishani", "am"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "hy_AM" }, twitter: { card: "summary_large_image", title, description } };
-  }
   if (locale === "ka") return METADATA_KA;
   const title = "Which Zodiac Sign Matches Your Personality? — Quiz";
-  const description = "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality. Free and instant.";
+  const description =
+    "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality. Free and instant.";
   const url = `${ENGLISH_SITE_URL}/quiz/namdvili-nishani`;
-  return { title: { absolute: title }, description, keywords: ["zodiac personality quiz", "which zodiac sign am I", "zodiac sign test", "free astrology quiz"], alternates: localizedAlternates("/quiz/namdvili-nishani", "/quiz/namdvili-nishani", "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title, description } };
+  return {
+    title: { absolute: title },
+    description,
+    keywords: [
+      "zodiac personality quiz",
+      "which zodiac sign am I",
+      "zodiac sign test",
+      "free astrology quiz",
+    ],
+    alternates: localizedAlternates(
+      "/quiz/namdvili-nishani",
+      "/quiz/namdvili-nishani",
+      "en",
+    ),
+    openGraph: {
+      images: [DEFAULT_OG_IMAGE],
+      type: "website",
+      url,
+      title,
+      description,
+      siteName: "Vivida",
+      locale: "en_US",
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
 }
 
 export default async function TrueSignQuizPage() {
@@ -62,10 +94,11 @@ export default async function TrueSignQuizPage() {
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
-  const siteUrl = am ? ARMENIAN_SITE_URL : en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const title = am ? "Կենդանակերպի ո՞ր նշանն է համապատասխանում ձեր բնավորությանը։" : en ? "Which Zodiac Sign Matches Your Personality?" : TITLE;
-  const description = am ? "Պատասխանեք 12 հարցի և պարզեք, թե որ նշանի տարրն ու դինամիկան են առավել համապատասխանում ձեր բնավորությանը։" : en ? "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality." : DESCRIPTION;
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = en ? "Which Zodiac Sign Matches Your Personality?" : TITLE;
+  const description = en
+    ? "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality."
+    : DESCRIPTION;
 
   const ld = [
     {
@@ -73,24 +106,32 @@ export default async function TrueSignQuizPage() {
       "@type": "Quiz",
       name: title,
       description,
-      inLanguage: am ? "hy-AM" : en ? "en" : "ka-GE",
+      inLanguage: en ? "en" : "ka-GE",
       url: `${siteUrl}/quiz/namdvili-nishani`,
       numberOfQuestions: TS_QUESTION_COUNT,
       about: {
         "@type": "Thing",
-        name: am ? "Կենդանակերպի նշաններ" : en ? "Zodiac signs" : "ზოდიაქოს ნიშნები",
-        alternateName: am ? ["կենդանակերպ", "աստղաբանություն", "անհատականության թեստ"] : en ? ["zodiac", "astrology", "personality quiz"] : ["ზოდიაქო", "ასტროლოგია", "პიროვნების ტესტი"],
+        name: en ? "Zodiac signs" : "ზოდიაქოს ნიშნები",
+        alternateName: en
+          ? ["zodiac", "astrology", "personality quiz"]
+          : ["ზოდიაქო", "ასტროლოგია", "პიროვნების ტესტი"],
       },
     },
     breadcrumbLd([
-      { name: am ? "Գլխավոր" : en ? "Home" : "მთავარი", url: siteUrl },
-      { name: am ? "Թեստեր" : en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
-      { name: am ? "Կենդանակերպի անհատականության թեստ" : en ? "Zodiac personality quiz" : "რომელი ნიშანი ხარ", url: `${siteUrl}/quiz/namdvili-nishani` },
+      { name: en ? "Home" : "მთავარი", url: siteUrl },
+      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
+      {
+        name: en ? "Zodiac personality quiz" : "რომელი ნიშანი ხარ",
+        url: `${siteUrl}/quiz/namdvili-nishani`,
+      },
     ]),
   ];
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
@@ -101,7 +142,15 @@ export default async function TrueSignQuizPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/quiz/namdvili-nishani" />}
+      {authed ? (
+        <AppHeader authed active="tests" />
+      ) : (
+        <SmartHeader
+          active="tests"
+          locale={locale}
+          georgianPath="/quiz/namdvili-nishani"
+        />
+      )}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <header className="mb-6 text-center">
@@ -109,13 +158,21 @@ export default async function TrueSignQuizPage() {
             Vivida Quiz
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            {am ? "Կենդանակերպի ո՞ր նշանն է" : en ? "Which zodiac sign" : "რომელი ნიშანი ხარ"}{" "}
+            {en ? "Which zodiac sign" : "რომელი ნიშანი ხარ"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {am ? "համապատասխանում ձեզ։" : en ? "matches your personality?" : "სინამდვილეში?"}
+              {en ? "matches your personality?" : "სინამდვილეში?"}
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
-            {am ? `Պատասխանեք ${TS_QUESTION_COUNT} հարցի և պարզեք, թե որ նշանի էներգիան է առավել համապատասխանում ձեր բնավորությանը, նույնիսկ եթե այն տարբերվում է ձեր ծննդյան նշանից։` : en ? `Answer ${TS_QUESTION_COUNT} questions to discover which zodiac sign’s energy best matches your character—even if it differs from your birth sign.` : <>უპასუხე {TS_QUESTION_COUNT} კითხვას და გაიგე, რომელი ზოდიაქოს ნიშნის ენერგია შეესაბამება შენს ხასიათს — შესაძლოა, შედეგი დაბადების ნიშანს არ დაემთხვეს.</>}
+            {en ? (
+              `Answer ${TS_QUESTION_COUNT} questions to discover which zodiac sign’s energy best matches your character—even if it differs from your birth sign.`
+            ) : (
+              <>
+                უპასუხე {TS_QUESTION_COUNT} კითხვას და გაიგე, რომელი ზოდიაქოს
+                ნიშნის ენერგია შეესაბამება შენს ხასიათს — შესაძლოა, შედეგი
+                დაბადების ნიშანს არ დაემთხვეს.
+              </>
+            )}
           </p>
         </header>
 
@@ -123,23 +180,57 @@ export default async function TrueSignQuizPage() {
 
         <div className="mt-12 rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-lg font-semibold tracking-tight">
-            {am ? "Ինչպե՞ս է աշխատում թեստը։" : en ? "How does the quiz work?" : "როგორ მუშაობს ტესტი?"}
+            {en ? "How does the quiz work?" : "როგორ მუშაობს ტესტი?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {am ? <>Կենդանակերպի յուրաքանչյուր նշան միավորում է <strong>տարրը</strong> (կրակ, հող, օդ կամ ջուր) և <strong>դինամիկան</strong> (կարդինալ, ֆիքսված կամ փոփոխական)։ Ձեր պատասխանները որոշում են գերակշռող զույգը, որի հատումը մատնանշում է տասներկու նշաններից մեկը։</> : en ? <>Every zodiac sign combines an <strong>element</strong> (Fire, Earth, Air or Water) with a <strong>modality</strong> (Cardinal, Fixed or Mutable). Your answers estimate the dominant pair, whose intersection points to one of the twelve signs.</> : <>ყოველი ზოდიაქოს ნიშანი ორი რამის კომბინაციაა — <strong>ელემენტი</strong>{" "}
-            (ცეცხლი, მიწა, ჰაერი, წყალი) და <strong>დინამიკა</strong> (კარდინალური,
-            ფიქსირებული, მუტაბელური). ტესტი შენი პასუხებით განსაზღვრავს, რომელი
-            ელემენტი და დინამიკა ჭარბობს შენში — მათი გადაკვეთა კი ერთ-ერთ 12
-            ნიშანს განსაზღვრავს. ეს არის ნიშანი, რომლის თვისებებიც შენს ხასიათს
-            ყველაზე მეტად შეესაბამება.</>}
+            {en ? (
+              <>
+                Every zodiac sign combines an <strong>element</strong> (Fire,
+                Earth, Air or Water) with a <strong>modality</strong> (Cardinal,
+                Fixed or Mutable). Your answers estimate the dominant pair,
+                whose intersection points to one of the twelve signs.
+              </>
+            ) : (
+              <>
+                ყოველი ზოდიაქოს ნიშანი ორი რამის კომბინაციაა —{" "}
+                <strong>ელემენტი</strong> (ცეცხლი, მიწა, ჰაერი, წყალი) და{" "}
+                <strong>დინამიკა</strong> (კარდინალური, ფიქსირებული,
+                მუტაბელური). ტესტი შენი პასუხებით განსაზღვრავს, რომელი ელემენტი
+                და დინამიკა ჭარბობს შენში — მათი გადაკვეთა კი ერთ-ერთ 12 ნიშანს
+                განსაზღვრავს. ეს არის ნიშანი, რომლის თვისებებიც შენს ხასიათს
+                ყველაზე მეტად შეესაბამება.
+              </>
+            )}
           </p>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {am ? <>Հիշեք՝ սա ժամանցային թեստ է։ Ձեր իրական <strong>ծննդյան նշանը</strong> որոշվում է ծննդյան ամսաթվով և ժամով, որոնք կարող եք ուսումնասիրել անվճար նատալ քարտեզում։</> : en ? <>Remember: this is an entertainment quiz. Your actual <strong>birth sign</strong> is determined by your date and time of birth, which you can explore in a free natal chart.</> : <>გახსოვდეს: ეს გასართობი ტესტია. შენი{" "}
-            <strong>ნამდვილი დაბადების ნიშანი</strong> დაბადების თარიღით
-            განისაზღვრება — მას უფასო ნატალურ რუკაში ნახავ.</>}
+            {en ? (
+              <>
+                Remember: this is an entertainment quiz. Your actual{" "}
+                <strong>birth sign</strong> is determined by your date and time
+                of birth, which you can explore in a free natal chart.
+              </>
+            ) : (
+              <>
+                გახსოვდეს: ეს გასართობი ტესტია. შენი{" "}
+                <strong>ნამდვილი დაბადების ნიშანი</strong> დაბადების თარიღით
+                განისაზღვრება — მას უფასო ნატალურ რუკაში ნახავ.
+              </>
+            )}
           </p>
 
-          <PopularSearches queries={am ? ["կենդանակերպի թեստ", "կենդանակերպի որ նշանն եմ", "կենդանակերպի տարրերի թեստ", "անհատականության թեստ"] : en ? ["zodiac personality quiz", "which zodiac sign am I", "zodiac element quiz", "zodiac sign test"] : TRUE_SIGN_LATIN_QUERIES} locale={locale} />
+          <PopularSearches
+            queries={
+              en
+                ? [
+                    "zodiac personality quiz",
+                    "which zodiac sign am I",
+                    "zodiac element quiz",
+                    "zodiac sign test",
+                  ]
+                : TRUE_SIGN_LATIN_QUERIES
+            }
+            locale={locale}
+          />
         </div>
       </section>
       <SiteFooter locale={locale} />

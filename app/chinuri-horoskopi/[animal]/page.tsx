@@ -8,7 +8,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
 import { ChineseAnimalPageEn } from "@/components/seo/chinese-zodiac-en";
-import { ChineseAnimalPageAm } from "@/components/seo/chinese-zodiac-am";
+
 import { ensureChineseZodiac } from "@/actions/chinese-zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -18,11 +18,12 @@ import {
   yearsForAnimal,
 } from "@/lib/seo/chinese-zodiac";
 import { chineseZodiacContentEnBySlug } from "@/lib/seo/chinese-zodiac-en";
+
 import {
-  CHINESE_ANIMALS_AM,
-  CHINESE_ZODIAC_AM_BY_SLUG,
-} from "@/lib/seo/chinese-zodiac-am";
-import { englishSiteHref, armenianSiteHref, ENGLISH_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+  englishSiteHref,
+  ENGLISH_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -48,36 +49,6 @@ export async function generateMetadata({
   if (!animal) return {};
   const locale = await getRequestLocale();
 
-  if (locale === "am") {
-    const content = CHINESE_ZODIAC_AM_BY_SLUG[slug];
-    if (!content) return {};
-    const amName = content.name || CHINESE_ANIMALS_AM[slug]?.name || animal.nameEn;
-    const path = `/chinuri-horoskopi/${slug}`;
-    const title = `${amName} — Չինական կենդանակերպի տարիները, բնավորությունը և համատեղելիությունը`;
-    const description = `${content.headline}. Բացահայտեք ${amName}ի ծննդյան տարեթվերը, բնավորությունը, ուժեղ կողմերը, սիրային համատեղելիությունը և կարիերան:`;
-    return {
-      title: { absolute: `${title} — Vivida` },
-      description,
-      keywords: [
-        `չինական հորոսկոպ ${amName}`,
-        `${amName}ի տարի`,
-        "չինական կենդանակերպ",
-        "չինական նշաններ",
-      ],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "article",
-        url: armenianSiteHref(path, false),
-        title,
-        description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title, description },
-    };
-  }
-
   if (locale === "en") {
     const content = chineseZodiacContentEnBySlug(slug);
     if (!content) return {};
@@ -98,13 +69,17 @@ export async function generateMetadata({
         locale: "en_US",
         images: [{ url: ogEn, width: 1200, height: 630 }],
       },
-      twitter: { card: "summary_large_image", title, description, images: [ogEn] },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [ogEn],
+      },
     };
   }
   const content = await ensureChineseZodiac(slug);
   const url = `${SITE_URL}/chinuri-horoskopi/${slug}`;
-  const title =
-    content?.pageTitle ?? `${animal.nameKa} — ჩინური ჰოროსკოპი`;
+  const title = content?.pageTitle ?? `${animal.nameKa} — ჩინური ჰოროსკოპი`;
   const description =
     content?.metaDescription ??
     `${animal.nameKa} ჩინური ჰოროსკოპის ნიშანი — ხასიათი, დაბადების წლები და თავსებადობა, ქართულად.`;
@@ -140,11 +115,6 @@ export default async function ChineseAnimalPage({
   if (!animal) notFound();
 
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const content = CHINESE_ZODIAC_AM_BY_SLUG[slug];
-    if (!content) notFound();
-    return <ChineseAnimalPageAm animal={animal} content={content} />;
-  }
   if (locale === "en") {
     const content = chineseZodiacContentEnBySlug(slug);
     if (!content) notFound();
@@ -208,11 +178,20 @@ export default async function ChineseAnimalPage({
       <Starfield count={120} shooting={3} />
       <SmartHeader />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+      />
       {faqLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
       )}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
@@ -268,18 +247,24 @@ export default async function ChineseAnimalPage({
 
         {/* Intro / personality */}
         {c?.intro && <Prose className="mt-8" body={c.intro} />}
-        {c?.personality && (
-          <Section title="ხასიათი" body={c.personality} />
-        )}
+        {c?.personality && <Section title="ხასიათი" body={c.personality} />}
 
         {/* Strengths / weaknesses */}
-        {(c?.strengths?.length || c?.weaknesses?.length) ? (
+        {c?.strengths?.length || c?.weaknesses?.length ? (
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {c?.strengths && c.strengths.length > 0 && (
-              <Traits title="ძლიერი მხარეები" items={c.strengths} color="var(--vivida-cyan)" />
+              <Traits
+                title="ძლიერი მხარეები"
+                items={c.strengths}
+                color="var(--vivida-cyan)"
+              />
             )}
             {c?.weaknesses && c.weaknesses.length > 0 && (
-              <Traits title="გამოწვევები" items={c.weaknesses} color="var(--vivida-pink)" />
+              <Traits
+                title="გამოწვევები"
+                items={c.weaknesses}
+                color="var(--vivida-pink)"
+              />
             )}
           </div>
         ) : null}
@@ -320,7 +305,9 @@ export default async function ChineseAnimalPage({
                             {item.level}
                           </span>
                         </div>
-                        <p className="mt-1 text-sm text-foreground/80">{item.note}</p>
+                        <p className="mt-1 text-sm text-foreground/80">
+                          {item.note}
+                        </p>
                       </div>
                     </Link>
                   </li>
@@ -344,7 +331,10 @@ export default async function ChineseAnimalPage({
                 >
                   <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
                     <span>{item.q}</span>
-                    <span aria-hidden className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45">
+                    <span
+                      aria-hidden
+                      className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45"
+                    >
                       ✦
                     </span>
                   </summary>
@@ -407,7 +397,9 @@ export default async function ChineseAnimalPage({
 
 function Prose({ body, className }: { body: string; className?: string }) {
   return (
-    <div className={`max-w-3xl space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg ${className ?? ""}`}>
+    <div
+      className={`max-w-3xl space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg ${className ?? ""}`}
+    >
       {paragraphs(body).map((p, i) => (
         <p key={i}>{p}</p>
       ))}
@@ -418,13 +410,23 @@ function Prose({ body, className }: { body: string; className?: string }) {
 function Section({ title, body }: { title: string; body: string }) {
   return (
     <section className="mt-12 max-w-3xl">
-      <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
+      <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+        {title}
+      </h2>
       <Prose body={body} />
     </section>
   );
 }
 
-function Traits({ title, items, color }: { title: string; items: string[]; color: string }) {
+function Traits({
+  title,
+  items,
+  color,
+}: {
+  title: string;
+  items: string[];
+  color: string;
+}) {
   return (
     <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
       <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -432,7 +434,10 @@ function Traits({ title, items, color }: { title: string; items: string[]; color
       </div>
       <ul className="mt-3 space-y-2">
         {items.map((it, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-foreground/85">
+          <li
+            key={i}
+            className="flex items-start gap-2 text-sm text-foreground/85"
+          >
             <span aria-hidden style={{ color }}>
               ◆
             </span>

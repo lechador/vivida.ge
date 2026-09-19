@@ -61,20 +61,20 @@ export function SynastryShareButton({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [open, setOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
   const [loadState, setLoadState] = useState<
     "idle" | "rendering" | "ready" | "error"
   >("idle");
-  const [actionState, setActionState] = useState<
-    "idle" | "working" | "done"
-  >("idle");
+  const [actionState, setActionState] = useState<"idle" | "working" | "done">(
+    "idle",
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const portalRoot = open && typeof document !== "undefined" ? document.body : null;
+  const portalRoot =
+    open && typeof document !== "undefined" ? document.body : null;
   // Track latest loadState across renders so the open-effect can read it
   // without depending on it (and triggering its own cleanup mid-async).
   const loadStateRef = useRef(loadState);
@@ -108,10 +108,7 @@ export function SynastryShareButton({
         await new Promise((r) => requestAnimationFrame(() => r(null)));
         await new Promise((r) => requestAnimationFrame(() => r(null)));
 
-        console.log(
-          "[share] after rAF, cardRef.current is:",
-          cardRef.current
-        );
+        console.log("[share] after rAF, cardRef.current is:", cardRef.current);
 
         if (!cardRef.current) {
           throw new Error("card not mounted");
@@ -125,7 +122,7 @@ export function SynastryShareButton({
           "[share] capturing node, dimensions:",
           cardRef.current.offsetWidth,
           "x",
-          cardRef.current.offsetHeight
+          cardRef.current.offsetHeight,
         );
 
         // Bisect via toCanvas → manual canvas.toBlob, with a hard 15s
@@ -142,8 +139,8 @@ export function SynastryShareButton({
             new Promise<never>((_, rej) =>
               setTimeout(
                 () => rej(new Error(`toCanvas timed out after ${timeoutMs}ms`)),
-                timeoutMs
-              )
+                timeoutMs,
+              ),
             ),
           ]);
 
@@ -152,11 +149,11 @@ export function SynastryShareButton({
           "[share] toCanvas returned, dimensions:",
           canvas.width,
           "x",
-          canvas.height
+          canvas.height,
         );
 
         const fresh = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob((b) => resolve(b), "image/png")
+          canvas.toBlob((b) => resolve(b), "image/png"),
         );
         console.log("[share] canvas.toBlob returned:", fresh);
 
@@ -177,7 +174,7 @@ export function SynastryShareButton({
         setErrorMessage(
           en
             ? `Could not create the card (${detail || "unknown error"})`
-            : `ვერ მოხერხდა (${detail || "უცნობი შეცდომა"})`
+            : `ვერ მოხერხდა (${detail || "უცნობი შეცდომა"})`,
         );
         setLoadState("error");
       }
@@ -203,13 +200,13 @@ export function SynastryShareButton({
     if (!blob) return "unsupported";
     const file = new File([blob], fileName, { type: "image/png" });
     const shareData: ShareData = {
-      title: am ? "Vivida — մեր համատեղելիությունը" : en ? "Vivida — our compatibility" : "Vivida — ჩვენი თავსებადობა",
+      title: en ? "Vivida — our compatibility" : "Vivida — ჩვენი თავსებადობა",
       text: en
         ? `My compatibility with ${cardProps.partnerName} — ${Math.round(
-            cardProps.result.overall
+            cardProps.result.overall,
           )}% ✦ vivida.ge`
         : `${cardProps.partnerName}-სთან ჩემი თავსებადობა — ${Math.round(
-            cardProps.result.overall
+            cardProps.result.overall,
           )}% ✦ vivida.ge`,
       files: [file],
     };
@@ -277,7 +274,9 @@ export function SynastryShareButton({
       return;
     }
     setErrorMessage(
-      am ? "Ինչ-որ բան այն չէր։ Խնդրում ենք նորից փորձել։" : am ? "Ինչ-որ բան այն չէր։ Խնդրում ենք նորից փորձել։" : en ? "Something went wrong. Please try again." : "ვერ მოხერხდა. სცადე თავიდან."
+      en
+        ? "Something went wrong. Please try again."
+        : "ვერ მოხერხდა. სცადე თავიდან.",
     );
     setActionState("idle");
   };
@@ -288,7 +287,9 @@ export function SynastryShareButton({
       finishOk();
     } else {
       setErrorMessage(
-        en ? "Something went wrong. Please try again." : "ვერ მოხერხდა. სცადე თავიდან."
+        en
+          ? "Something went wrong. Please try again."
+          : "ვერ მოხერხდა. სცადე თავიდან.",
       );
     }
   };
@@ -305,7 +306,7 @@ export function SynastryShareButton({
         }}
       >
         <InstagramIcon className="size-4" />
-        {am ? "Կիսվել համատեղելիությամբ" : en ? "Share compatibility" : "გააზიარე თავსებადობა"}
+        {en ? "Share compatibility" : "გააზიარე თავსებადობა"}
       </Button>
 
       {/* Off-screen card mounted only while the dialog is open. The
@@ -328,7 +329,7 @@ export function SynastryShareButton({
                 <CompatibilityCard {...cardProps} locale={locale} />
               </div>
             </div>,
-            portalRoot
+            portalRoot,
           )
         : null}
 
@@ -345,7 +346,7 @@ export function SynastryShareButton({
         <DialogContent className="max-w-sm gap-4 p-5 sm:p-6">
           <DialogHeader className="text-left">
             <DialogTitle className="text-lg">
-              {am ? "Համատեղելիության քարտ" : en ? "Compatibility card" : "თავსებადობის ბარათი"}
+              {en ? "Compatibility card" : "თავსებადობის ბარათი"}
             </DialogTitle>
             <DialogDescription>
               {en
@@ -358,7 +359,7 @@ export function SynastryShareButton({
           <div
             className={cn(
               "relative mx-auto w-full max-w-[240px] overflow-hidden rounded-xl border border-border bg-[#0b0814]",
-              "aspect-[9/16]"
+              "aspect-[9/16]",
             )}
           >
             {(loadState === "rendering" || loadState === "idle") && (
@@ -368,14 +369,17 @@ export function SynastryShareButton({
             )}
             {loadState === "error" && (
               <div className="absolute inset-0 grid place-items-center px-3 text-center text-xs text-muted-foreground">
-                {errorMessage ?? (am ? "Հնարավոր չէր ստեղծել քարտը" : en ? "Could not create the card" : "ვერ მოხერხდა")}
+                {errorMessage ??
+                  (en ? "Could not create the card" : "ვერ მოხერხდა")}
               </div>
             )}
             {previewUrl && loadState === "ready" && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={previewUrl}
-                alt={am ? "Մեր համատեղելիության քարտը" : en ? "Our compatibility card" : "ჩვენი თავსებადობის ბარათი"}
+                alt={
+                  en ? "Our compatibility card" : "ჩვენი თავსებადობის ბარათი"
+                }
                 className="absolute inset-0 size-full object-cover"
               />
             )}
@@ -419,7 +423,7 @@ export function SynastryShareButton({
               disabled={loadState !== "ready"}
             >
               <Download className="size-4" />
-              {am ? "Ներբեռնել" : en ? "Download" : "ჩამოტვირთვა"}
+              {en ? "Download" : "ჩამოტვირთვა"}
             </Button>
           </div>
 

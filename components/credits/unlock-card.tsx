@@ -19,7 +19,10 @@ import {
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 
-function resultPath(kind: "iq" | "eq" | "big-five" | "mbti" | "synastry", resultId: string): string {
+function resultPath(
+  kind: "iq" | "eq" | "big-five" | "mbti" | "synastry",
+  resultId: string,
+): string {
   if (kind === "iq") return `/iq-testi/shedegi/${resultId}`;
   if (kind === "eq") return `/eq-testi/shedegi/${resultId}`;
   if (kind === "big-five") return `/big-five/shedegi/${resultId}`;
@@ -45,7 +48,6 @@ export function UnlockCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [short, setShort] = useState(balance < cost);
@@ -117,7 +119,7 @@ export function UnlockCard({
         <Lock className="size-7 text-[var(--vivida-violet)]" />
       </div>
       <h3 className="mt-4 text-xl font-semibold tracking-tight">
-        {title ?? (am ? "Բացել ամբողջական արդյունքը" : en ? "Unlock the full result" : "სრული შედეგის გახსნა")}
+        {title ?? (en ? "Unlock the full result" : "სრული შედეგის გახსნა")}
       </h3>
       <p className="mx-auto mt-1.5 max-w-md text-sm text-foreground/80">
         {blurb ??
@@ -128,8 +130,12 @@ export function UnlockCard({
 
       <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1 text-sm">
         <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-        <span className="font-semibold">{cost} {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}</span>
-        <span className="text-muted-foreground">· {am ? "մնացորդ" : en ? "balance" : "ბალანსი"} {balance}</span>
+        <span className="font-semibold">
+          {cost} {en ? "credits" : "კრედიტი"}
+        </span>
+        <span className="text-muted-foreground">
+          · {en ? "balance" : "ბალანსი"} {balance}
+        </span>
       </div>
 
       {!short ? (
@@ -142,7 +148,11 @@ export function UnlockCard({
             onClick={unlock}
             className="gap-1.5"
           >
-            {pending ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
+            {pending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Lock className="size-4" />
+            )}
             {en ? `Unlock for ${cost} credits` : `გახსნა ${cost} კრედიტით`}
           </Button>
           {failed && (
@@ -155,7 +165,14 @@ export function UnlockCard({
         </div>
       ) : (
         <div className="mt-5 space-y-3">
-          <ContextualPaywallActions locale={locale} balance={balance} cost={cost} product={kind} returnTo={resultPath(kind, resultId)} placement="result_unlock_shortfall" />
+          <ContextualPaywallActions
+            locale={locale}
+            balance={balance}
+            cost={cost}
+            product={kind}
+            returnTo={resultPath(kind, resultId)}
+            placement="result_unlock_shortfall"
+          />
         </div>
       )}
     </div>

@@ -33,10 +33,12 @@ export default async function PeoplePage() {
     getUserLocale(user.id),
   ]);
   const en = locale !== "ka";
-  const am = locale === "am";
 
   return (
-    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex flex-1 flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%)]"
@@ -47,12 +49,12 @@ export default async function PeoplePage() {
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {am ? "Համայնք" : en ? "Community" : "საზოგადოება"}
+          {en ? "Community" : "საზოგადოება"}
         </div>
         <h1 className="mb-6 text-balance text-3xl font-semibold tracking-tight sm:mb-8 sm:text-4xl">
-          {am ? "Մարդիկ " : en ? "People " : "ხალხი "}
+          {en ? "People " : "ხალხი "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {am ? "Vivida-ում" : en ? "on Vivida" : "ვივიდაზე"}
+            {en ? "on Vivida" : "ვივიდაზე"}
           </span>
         </h1>
 

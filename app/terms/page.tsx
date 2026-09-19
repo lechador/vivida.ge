@@ -9,9 +9,8 @@ import { LEGAL_ENTITY } from "@/lib/legal-entity";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   return {
-    title: am ? "Պայմաններ և դրույթներ" : en ? "Terms and Conditions" : "წესები და პირობები",
+    title: en ? "Terms and Conditions" : "წესები და პირობები",
     description: en
       ? "Terms and Conditions governing your use of Vivida."
       : "Vivida-ს გამოყენების წესები და პირობები — სამომხმარებლო ხელშეკრულება.",
@@ -92,11 +91,11 @@ export default async function TermsPage() {
               4. უფასო ფუნქციები, კრედიტები და გადახდა
             </h2>
             <p className="mt-2 leading-relaxed">
-              Vivida გთავაზობს უფასო ფუნქციებს, ერთჯერად კრედიტების პაკეტებსა
-              და ქვეყნის მიხედვით განსაზღვრულ Vivida PRO გეგმებს. PRO
-              ავტომატურად განახლებადი გამოწერაა, სანამ არ გააუქმებ; ფასი,
-              გადახდის პერიოდულობა, წვდომა და განახლების თარიღი ნაჩვენებია
-              შეძენამდე და გამოწერის გვერდზე.
+              Vivida გთავაზობს უფასო ფუნქციებს, ერთჯერად კრედიტების პაკეტებსა და
+              ქვეყნის მიხედვით განსაზღვრულ Vivida PRO გეგმებს. PRO ავტომატურად
+              განახლებადი გამოწერაა, სანამ არ გააუქმებ; ფასი, გადახდის
+              პერიოდულობა, წვდომა და განახლების თარიღი ნაჩვენებია შეძენამდე და
+              გამოწერის გვერდზე.
             </p>
             <p className="mt-3 leading-relaxed">
               მოქმედების ღირებულება კრედიტებში და კრედიტების პაკეტის ფასი
@@ -107,7 +106,9 @@ export default async function TermsPage() {
               მოქმედი კანონმდებლობით.
             </p>
             <p className="mt-3 leading-relaxed">
-              <strong className="text-foreground">გაუქმება და ანაზღაურება.</strong>{" "}
+              <strong className="text-foreground">
+                გაუქმება და ანაზღაურება.
+              </strong>{" "}
               თუ მომხმარებელი ხარ გაერთიანებულ სამეფოში ან ევროკავშირში,
               დისტანციურ ხელშეკრულებაზე უარის თქმის 14-დღიანი ვადა გაქვს.
               კრედიტები და PRO წვდომა ციფრული პროდუქტია, რომლის მიწოდებასაც

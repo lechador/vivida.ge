@@ -2,8 +2,10 @@ import { cookies, headers } from "next/headers";
 
 import { isEnglishHost } from "@/lib/seo/locales";
 
-import { LOCALE_CHOICE_COOKIE } from "./armenian-routes";
 import type { UserLocale } from "./locale";
+
+/** Surviving language-choice cookie: only ever promotes English now. */
+const LOCALE_CHOICE_COOKIE = "vivida_lang";
 
 const DEPLOYMENT_LOCALE =
   process.env.VIVIDA_DEPLOYMENT_LOCALE === "ka" ||
@@ -23,6 +25,7 @@ export function localeForHost(
   host: string | null | undefined,
   _preferred?: string | null,
 ): UserLocale {
+  void _preferred; // The domain decides; kept for call-site compatibility.
   if (!isEnglishHost(host)) return "ka";
   return "en";
 }
@@ -33,6 +36,7 @@ export function localeForHost(
 export async function getRequestLocale(
   _preferred?: string | null,
 ): Promise<UserLocale> {
+  void _preferred; // The domain decides; kept for call-site compatibility.
   // Cost-optimized split deployments set a build-time locale, making public
   // pages truly static/ISR because no request-time API is touched.
   if (DEPLOYMENT_LOCALE) {

@@ -23,7 +23,10 @@ import {
   premiumPlanForCountry,
   shouldShowPurchasePromotion,
 } from "@/lib/billing-config";
-import { countryCodeFromHeaders, setResidenceCountryIfMissing } from "@/lib/residence";
+import {
+  countryCodeFromHeaders,
+  setResidenceCountryIfMissing,
+} from "@/lib/residence";
 import { PremiumPlanCard } from "@/components/subscription/premium-plan-card";
 import { LowCreditOfferCard } from "@/components/subscription/low-credit-offer-card";
 import { getLowCreditOffer } from "@/lib/promo-offer";
@@ -39,15 +42,13 @@ import { normalizeReturnPath } from "@/lib/safe-return-path";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
-  return { title: am ? "Կրեդիտներ" : en ? "Credits" : "კრედიტები", robots: { index: false } };
+  return { title: en ? "Credits" : "კრედიტები", robots: { index: false } };
 }
 export const dynamic = "force-dynamic";
 
 const SITE_URL: Record<UserLocale, string> = {
   ka: "https://www.vivida.ge",
   en: "https://www.vividaastro.com",
-  am: "https://www.vividaastro.com/am",
 };
 
 /**
@@ -69,15 +70,24 @@ export default async function CreditsPage({
   const returnTo = rawNext ? normalizeReturnPath(rawNext) : null;
   const rawNeed = Array.isArray(query.need) ? query.need[0] : query.need;
   const parsedNeed = Number.parseInt(rawNeed ?? "", 10);
-  const neededCredits = Number.isFinite(parsedNeed) && parsedNeed > 0 && parsedNeed <= 100 ? parsedNeed : null;
+  const neededCredits =
+    Number.isFinite(parsedNeed) && parsedNeed > 0 && parsedNeed <= 100
+      ? parsedNeed
+      : null;
   const loginQuery = new URLSearchParams();
   if (returnTo) loginQuery.set("next", returnTo);
   if (neededCredits) loginQuery.set("need", String(neededCredits));
-  const rawProduct = Array.isArray(query.product) ? query.product[0] : query.product;
-  if (typeof rawProduct === "string" && /^[a-z0-9_-]{1,60}$/i.test(rawProduct)) {
+  const rawProduct = Array.isArray(query.product)
+    ? query.product[0]
+    : query.product;
+  if (
+    typeof rawProduct === "string" &&
+    /^[a-z0-9_-]{1,60}$/i.test(rawProduct)
+  ) {
     loginQuery.set("product", rawProduct);
   }
-  const loginReturn = loginQuery.size > 0 ? `/credits?${loginQuery.toString()}` : "/credits";
+  const loginReturn =
+    loginQuery.size > 0 ? `/credits?${loginQuery.toString()}` : "/credits";
   // Campaign emails link here directly. Preserve the destination for readers
   // whose browser session expired so signing in still lands on their offer.
   const user = await requireUser(loginReturn);
@@ -86,26 +96,31 @@ export default async function CreditsPage({
   // once signed in.
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
-  const am = locale === "am";
-  const historyParam = Array.isArray(query.history) ? query.history[0] : query.history;
+  const historyParam = Array.isArray(query.history)
+    ? query.history[0]
+    : query.history;
   const historyFilter: CreditHistoryFilter =
-    historyParam === "earned" || historyParam === "spent" ? historyParam : "all";
+    historyParam === "earned" || historyParam === "spent"
+      ? historyParam
+      : "all";
   const pageParam = Array.isArray(query.page) ? query.page[0] : query.page;
   const parsedPage = Number.parseInt(pageParam ?? "1", 10);
-  const historyPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
-  const [balance, ref, storedIdentity, premium, offer, history] = await Promise.all([
-    getBalance(user.id),
-    getReferralStats(user.id),
-    getBillingIdentity(user.id),
-    isPremiumUser(user.id),
-    // Null for everyone the low-credit campaign did not email, which is the
-    // whole point — the promo price must not leak to the rest of Georgia.
-    getLowCreditOffer(user.id),
-    getCreditHistoryPage(user.id, {
-      filter: historyFilter,
-      page: historyPage,
-    }),
-  ]);
+  const historyPage =
+    Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const [balance, ref, storedIdentity, premium, offer, history] =
+    await Promise.all([
+      getBalance(user.id),
+      getReferralStats(user.id),
+      getBillingIdentity(user.id),
+      isPremiumUser(user.id),
+      // Null for everyone the low-credit campaign did not email, which is the
+      // whole point — the promo price must not leak to the rest of Georgia.
+      getLowCreditOffer(user.id),
+      getCreditHistoryPage(user.id, {
+        filter: historyFilter,
+        page: historyPage,
+      }),
+    ]);
   // Accounts created before residence tracking have no country, which would
   // hide PRO and fall the packs back to GEL by luck rather than by geo. Same
   // one-time backfill /subscription does.
@@ -133,13 +148,15 @@ export default async function CreditsPage({
       />
       <Starfield count={110} shooting={2} />
       <AppHeader authed />
-      <Suspense fallback={null}><CheckoutSuccessTracker /></Suspense>
+      <Suspense fallback={null}>
+        <CheckoutSuccessTracker />
+      </Suspense>
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         {/* Balance */}
         <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {am ? "Ձեր հաշվեկշիռը" : en ? "Your balance" : "შენი ბალანსი"}
+            {en ? "Your balance" : "შენი ბალანსი"}
           </div>
           <div className="mt-2 flex items-center justify-center gap-2">
             <Sparkles className="size-7 text-[var(--vivida-cyan)]" />
@@ -148,7 +165,7 @@ export default async function CreditsPage({
             </span>
           </div>
           <div className="mt-1 text-sm text-muted-foreground">
-            {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}
+            {en ? "credits" : "კრედიტი"}
           </div>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/75">
             {en
@@ -158,7 +175,11 @@ export default async function CreditsPage({
         </div>
 
         <div className="mt-4">
-          <CreditProgressCard balance={balance} nextMonthlyDate={nextMonthlyBonusDate()} locale={locale} />
+          <CreditProgressCard
+            balance={balance}
+            nextMonthlyDate={nextMonthlyBonusDate()}
+            locale={locale}
+          />
         </div>
 
         {showPurchasePromotions && !offer && (
@@ -181,7 +202,9 @@ export default async function CreditsPage({
           >
             <span className="flex items-center gap-3 font-semibold">
               <Crown className="size-5 text-[var(--vivida-gold)]" />
-              {am ? "Կառավարեք Ձեր Vivida PRO բաժանորդագրությունը" : en ? "Manage your Vivida PRO subscription" : "Vivida PRO გამოწერის მართვა"}
+              {en
+                ? "Manage your Vivida PRO subscription"
+                : "Vivida PRO გამოწერის მართვა"}
             </span>
             <span aria-hidden>→</span>
           </Link>
@@ -216,7 +239,13 @@ export default async function CreditsPage({
 
         {/* Top-up is kept directly below the balance so there is no hunt or scroll. */}
         <div id="credit-packs" className="mt-4 scroll-mt-20">
-          <TopUpCard locale={locale} countryCode={identity?.countryCode} balance={balance} neededCredits={neededCredits} returnTo={returnTo} />
+          <TopUpCard
+            locale={locale}
+            countryCode={identity?.countryCode}
+            balance={balance}
+            neededCredits={neededCredits}
+            returnTo={returnTo}
+          />
         </div>
 
         <div className="mt-4">

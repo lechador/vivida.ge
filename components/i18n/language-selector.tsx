@@ -14,27 +14,28 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const LANGUAGES = {
   en: { flag: "🇬🇧", name: "English", nativeName: "English", hrefLang: "en" },
-  am: { flag: "🇦🇲", name: "Armenian", nativeName: "Հայերեն", hrefLang: "hy-AM" },
-  ka: { flag: "🇬🇪", name: "Georgian", nativeName: "ქართული", hrefLang: "ka-GE" },
+  ka: {
+    flag: "🇬🇪",
+    name: "Georgian",
+    nativeName: "ქართული",
+    hrefLang: "ka-GE",
+  },
 } as const;
 
-const ORDER: readonly UserLocale[] = ["en", "am", "ka"];
+const ORDER: readonly UserLocale[] = ["en", "ka"];
 
 export function LanguageSelector({
   currentLocale,
   englishHref,
-  armenianHref,
   georgianHref,
 }: {
   currentLocale: UserLocale;
   englishHref: string;
-  armenianHref: string;
   georgianHref: string;
 }) {
   const current = LANGUAGES[currentLocale];
   const hrefs: Record<UserLocale, string> = {
     en: englishHref,
-    am: armenianHref,
     ka: georgianHref,
   };
 
@@ -76,9 +77,13 @@ export function LanguageSelector({
                   {language.flag}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block font-medium text-foreground">{language.nativeName}</span>
+                  <span className="block font-medium text-foreground">
+                    {language.nativeName}
+                  </span>
                   {language.nativeName !== language.name && (
-                    <span className="block text-[11px] text-muted-foreground">{language.name}</span>
+                    <span className="block text-[11px] text-muted-foreground">
+                      {language.name}
+                    </span>
                   )}
                 </span>
                 <Check className="size-4 text-[var(--vivida-cyan)]" />
@@ -87,15 +92,26 @@ export function LanguageSelector({
           }
 
           return (
-            <DropdownMenuItem key={locale} asChild className="group rounded-xl px-3 py-2.5">
+            <DropdownMenuItem
+              key={locale}
+              asChild
+              className="group rounded-xl px-3 py-2.5"
+            >
               <Link href={hrefs[locale]} hrefLang={language.hrefLang}>
-                <span className="text-xl leading-none transition-transform group-hover:scale-105" aria-hidden>
+                <span
+                  className="text-xl leading-none transition-transform group-hover:scale-105"
+                  aria-hidden
+                >
                   {language.flag}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block font-medium text-foreground">{language.nativeName}</span>
+                  <span className="block font-medium text-foreground">
+                    {language.nativeName}
+                  </span>
                   {language.nativeName !== language.name && (
-                    <span className="block text-[11px] text-muted-foreground">{language.name}</span>
+                    <span className="block text-[11px] text-muted-foreground">
+                      {language.name}
+                    </span>
                   )}
                 </span>
               </Link>
