@@ -5,6 +5,7 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { normalizeUserLocale } from "@/lib/i18n/locale";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { performReading } from "@/lib/tarot/reading";
+import { tarotSpreadById } from "@/lib/tarot/spreads";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,8 +27,32 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as {
     question?: unknown;
     locale?: unknown;
+    requestId?: unknown;
+    spreadId?: unknown;
+    optionA?: unknown;
+    optionB?: unknown;
   };
   const question = typeof body.question === "string" ? body.question : "";
+  const requestId =
+    typeof body.requestId === "string" ? body.requestId : undefined;
+  if (requestId !== undefined && !/^[A-Za-z0-9_-]{8,64}$/.test(requestId)) {
+    return NextResponse.json({ error: "bad_request" }, { status: 400 });
+  }
+  const spread =
+    body.spreadId === undefined
+      ? tarotSpreadById("situation")
+      : tarotSpreadById(body.spreadId);
+  if (!spread) {
+    return NextResponse.json({ error: "bad_request" }, { status: 400 });
+  }
+  const optionA =
+    typeof body.optionA === "string" ? body.optionA.trim().slice(0, 100) : "";
+  const optionB =
+    typeof body.optionB === "string" ? body.optionB.trim().slice(0, 100) : "";
+  const spreadOptions =
+    spread.id === "choice" && optionA && optionB
+      ? { a: optionA, b: optionB }
+      : undefined;
 
   // Daily cap on the AI call, matching the other LLM routes. Credits alone are
   // not a bound: spendCredits is a no-op for premium accounts.
@@ -46,7 +71,14 @@ export async function POST(req: Request) {
     body.locale === "am" || body.locale === "en" || body.locale === "ka"
       ? normalizeUserLocale(body.locale)
       : await getRequestLocale();
-  const result = await performReading(userId, question, locale);
+  const result = await performReading(
+    userId,
+    question,
+    locale,
+    requestId,
+    spread.id,
+    spreadOptions,
+  );
   if (!result.ok) {
     if (result.error === "insufficient") {
       return NextResponse.json(

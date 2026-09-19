@@ -140,12 +140,30 @@ export type LibraryEntryContent =
         slug: string;
         name: string;
         glyph: string;
+        image?: string;
         reversed: boolean;
         position: string;
         interpretation: string;
       }>;
       reading: string;
       advice: string;
+      /** What this attempt settled: 0/free for the first reading, cost otherwise. */
+      charged?: number;
+      free?: boolean;
+      /** True when the AI call failed and the static fallback was used. */
+      degraded?: boolean;
+      /** Which spread framed the draw. */
+      spreadId?: string;
+      /** The compared options, only for the choice spread. */
+      spreadOptions?: { a: string; b: string };
+      /** Follow-up questions on the same spread, oldest first. */
+      followups?: Array<{
+        question: string;
+        answer: string;
+        degraded?: boolean;
+        charged?: number;
+        free?: boolean;
+      }>;
     }
   | {
       type: "ai";

@@ -13,6 +13,7 @@ import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
 import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
 import { ALL_MBTI_SLUGS } from "@/lib/seo/mbti-seo";
 import { TAROT_CARDS } from "@/lib/tarot/deck";
+import { tarotDetailSlugs } from "@/lib/tarot/detail";
 import { EQ_ARTICLE_SLUGS } from "@/lib/seo/eq-articles";
 import { ALL_HOROSCOPE_THEMES, themeUrl } from "@/lib/seo/thematic-horoscope";
 import {
@@ -41,10 +42,7 @@ import { HOUSE_NUMBERS, PLANET_SLUGS } from "@/lib/seo/astrology-guides";
 import { ALL_DREAM_SLUGS } from "@/lib/seo/dreams";
 import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
-import {
-  articleUrl,
-  listPublishedArticleSitemapItems,
-} from "@/lib/articles";
+import { articleUrl, listPublishedArticleSitemapItems } from "@/lib/articles";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
@@ -131,8 +129,7 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     url: `${ENGLISH_SITE_URL}${withArmenianPrefix(path)}`,
     lastModified: ARMENIAN_PUBLISHED,
     changeFrequency: (path === "/about" ? "yearly" : "monthly") as
-      | "yearly"
-      | "monthly",
+      "yearly" | "monthly",
     priority: path === "/" ? 0.9 : path === "/about" ? 0.5 : 0.7,
     alternates: alternatesFor(
       CORE_LANGUAGE_PAIRS.find((pair) => pair.en === path)?.ka ?? null,
@@ -154,8 +151,7 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     url: `${ENGLISH_SITE_URL}/am${path}`,
     lastModified: ARMENIAN_PUBLISHED,
     changeFrequency: (path === "/horoskopi" ? "daily" : "weekly") as
-      | "daily"
-      | "weekly",
+      "daily" | "weekly",
     priority: 0.75,
     alternates: alternatesFor(path, path),
   }));
@@ -411,19 +407,18 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor("/savse-mtvare", "/savse-mtvare"),
   };
 
-  const savseMtvareEntries = moonEvents(
-    "full",
-    SITEMAP_MOON_EVENT_DAYS,
-  ).map((event) => ({
-    url: `${ENGLISH_SITE_URL}/am/savse-mtvare/${event.iso}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-    alternates: alternatesFor(
-      `/savse-mtvare/${event.iso}`,
-      `/savse-mtvare/${event.iso}`,
-    ),
-  }));
+  const savseMtvareEntries = moonEvents("full", SITEMAP_MOON_EVENT_DAYS).map(
+    (event) => ({
+      url: `${ENGLISH_SITE_URL}/am/savse-mtvare/${event.iso}`,
+      lastModified: ARMENIAN_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+      alternates: alternatesFor(
+        `/savse-mtvare/${event.iso}`,
+        `/savse-mtvare/${event.iso}`,
+      ),
+    }),
+  );
 
   const akhaliMtvareHubEntry = {
     url: `${ENGLISH_SITE_URL}/am/akhali-mtvare`,
@@ -433,19 +428,18 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     alternates: alternatesFor("/akhali-mtvare", "/akhali-mtvare"),
   };
 
-  const akhaliMtvareEntries = moonEvents(
-    "new",
-    SITEMAP_MOON_EVENT_DAYS,
-  ).map((event) => ({
-    url: `${ENGLISH_SITE_URL}/am/akhali-mtvare/${event.iso}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-    alternates: alternatesFor(
-      `/akhali-mtvare/${event.iso}`,
-      `/akhali-mtvare/${event.iso}`,
-    ),
-  }));
+  const akhaliMtvareEntries = moonEvents("new", SITEMAP_MOON_EVENT_DAYS).map(
+    (event) => ({
+      url: `${ENGLISH_SITE_URL}/am/akhali-mtvare/${event.iso}`,
+      lastModified: ARMENIAN_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+      alternates: alternatesFor(
+        `/akhali-mtvare/${event.iso}`,
+        `/akhali-mtvare/${event.iso}`,
+      ),
+    }),
+  );
 
   const astrologyCalendarHubEntry = {
     url: `${ENGLISH_SITE_URL}/am/astrologiuri-kalendari`,
@@ -458,18 +452,18 @@ function armenianSitemap(): MetadataRoute.Sitemap {
     ),
   };
 
-  const astrologyCalendarEntries = calendarWindow(
-    SITEMAP_CALENDAR_DAYS,
-  ).map((day) => ({
-    url: `${ENGLISH_SITE_URL}/am/astrologiuri-kalendari/${day.iso}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "daily" as const,
-    priority: 0.65,
-    alternates: alternatesFor(
-      `/astrologiuri-kalendari/${day.iso}`,
-      `/astrologiuri-kalendari/${day.iso}`,
-    ),
-  }));
+  const astrologyCalendarEntries = calendarWindow(SITEMAP_CALENDAR_DAYS).map(
+    (day) => ({
+      url: `${ENGLISH_SITE_URL}/am/astrologiuri-kalendari/${day.iso}`,
+      lastModified: ARMENIAN_PUBLISHED,
+      changeFrequency: "daily" as const,
+      priority: 0.65,
+      alternates: alternatesFor(
+        `/astrologiuri-kalendari/${day.iso}`,
+        `/astrologiuri-kalendari/${day.iso}`,
+      ),
+    }),
+  );
 
   const luckyDaysEntry = {
     url: `${ENGLISH_SITE_URL}/am/ighbliani-dgheebi`,
@@ -637,23 +631,31 @@ function armenianSitemap(): MetadataRoute.Sitemap {
   ];
 }
 
-type SitemapArticle = Awaited<ReturnType<typeof listPublishedArticleSitemapItems>>[number];
+type SitemapArticle = Awaited<
+  ReturnType<typeof listPublishedArticleSitemapItems>
+>[number];
 
 function articleAlternates(
   current: SitemapArticle,
   all: SitemapArticle[],
 ): NonNullable<MetadataRoute.Sitemap[number]["alternates"]> {
-  const siblings = all.filter((item) => item.translationKey === current.translationKey);
+  const siblings = all.filter(
+    (item) => item.translationKey === current.translationKey,
+  );
   const languages: Record<string, string> = {};
   for (const sibling of siblings) {
-    if (sibling.language === "ka") languages["ka-GE"] = articleUrl("ka", sibling.slug);
-    if (sibling.language === "en") languages.en = articleUrl("en", sibling.slug);
+    if (sibling.language === "ka")
+      languages["ka-GE"] = articleUrl("ka", sibling.slug);
+    if (sibling.language === "en")
+      languages.en = articleUrl("en", sibling.slug);
     if (sibling.language === "am") {
       languages["hy-AM"] = articleUrl("am", sibling.slug);
       languages.hy = articleUrl("am", sibling.slug);
     }
   }
-  languages["x-default"] = languages.en ?? articleUrl(current.language as "ka" | "en" | "am", current.slug);
+  languages["x-default"] =
+    languages.en ??
+    articleUrl(current.language as "ka" | "en" | "am", current.slug);
   return { languages };
 }
 
@@ -777,8 +779,8 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
   const eclipsePages = ECLIPSES.map((eclipse) =>
     samePathEntry(`/dabnelebebi/${eclipse.slug}`, "monthly", 0.7),
   );
-  const tarotPages = TAROT_CARDS.map((card) =>
-    samePathEntry(`/taro/${card.slug}`, "monthly", 0.7),
+  const tarotPages = tarotDetailSlugs().map((slug) =>
+    samePathEntry(`/taro/${slug}`, "monthly", 0.7),
   );
   const mbtiPages = ALL_MBTI_SLUGS.map((type) =>
     samePathEntry(`/mbti/${type}`, "monthly", 0.7),
@@ -817,8 +819,7 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
       url: `${ENGLISH_SITE_URL}${route.en}`,
       lastModified: ENGLISH_PUBLISHED,
       changeFrequency: (route.en === "/about" ? "yearly" : "monthly") as
-        | "yearly"
-        | "monthly",
+        "yearly" | "monthly",
       priority: route.en === "/about" ? 0.5 : 0.7,
       // No Georgian twin, but /about and /horoscope do have Armenian ones.
       alternates: alternatesFor(null, route.en),
@@ -1007,13 +1008,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  // Tarot — the 22 Major Arcana card pages ("ტარო [კარტი]").
-  const tarotCardPages: MetadataRoute.Sitemap = TAROT_CARDS.map((c) => ({
-    url: `${BASE}/taro/${c.slug}`,
-    lastModified: EVERGREEN,
-    changeFrequency: "monthly",
-    priority: 0.65,
-  }));
+  // Tarot — all 78 card pages ("ტარო [კარტი]").
+  const tarotCardPages: MetadataRoute.Sitemap = tarotDetailSlugs().map(
+    (slug) => ({
+      url: `${BASE}/taro/${slug}`,
+      lastModified: EVERGREEN,
+      changeFrequency: "monthly",
+      priority: 0.65,
+    }),
+  );
 
   const thematicHoroscopePages: MetadataRoute.Sitemap =
     ALL_HOROSCOPE_THEMES.flatMap((theme) => [
@@ -1033,14 +1036,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const astrologyCalendarPages: MetadataRoute.Sitemap = calendarWindow(
     SITEMAP_CALENDAR_DAYS,
-  ).map(
-    (day) => ({
-      url: `${BASE}/astrologiuri-kalendari/${day.iso}`,
-      lastModified: CONTENT_PUBLISHED,
-      changeFrequency: "daily" as const,
-      priority: 0.65,
-    }),
-  );
+  ).map((day) => ({
+    url: `${BASE}/astrologiuri-kalendari/${day.iso}`,
+    lastModified: CONTENT_PUBLISHED,
+    changeFrequency: "daily" as const,
+    priority: 0.65,
+  }));
   const moonEventPages: MetadataRoute.Sitemap = (
     ["full", "new"] as const
   ).flatMap((kind) =>

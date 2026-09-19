@@ -14,6 +14,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { TAROT_CARDS } from "@/lib/tarot/deck";
 import { TAROT_CARDS_EN } from "@/lib/tarot/deck-en";
 import { TAROT_CARDS_AM } from "@/lib/tarot/deck-am";
+import { tarotDetailDeck, type TarotDetailCard } from "@/lib/tarot/detail";
 import { localeHref } from "@/lib/i18n/armenian-routes";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -31,10 +32,10 @@ export const dynamic = "force-dynamic";
 
 const TITLE_KA = "ტარო ქართულად — ტაროზე მკითხაობა და ონლაინ გაშლა";
 const DESCRIPTION_KA =
-  "ტაროზე მკითხაობა ონლაინ, ქართულად: დაუსვი კითხვა და მიიღე ცოცხალი, პერსონალური პასუხი. ტაროს გაშლა 22 დიდი არკანით — პირველი კითხვა უფასო, რეგისტრაციის გარეშე.";
+  "ტაროზე მკითხაობა ონლაინ, ქართულად: დაუსვი კითხვა და მიიღე ცოცხალი, პერსონალური პასუხი. ტაროს გაშლა სრული 78-კარტიანი დასტით — პირველი კითხვა უფასო, რეგისტრაციის გარეშე.";
 const TITLE_EN = "Free Online Tarot Reading — Three-Card Spread";
 const DESCRIPTION_EN =
-  "Ask a question and receive a personal three-card tarot reading. Explore clear upright and reversed meanings for all 22 Major Arcana cards.";
+  "Ask a question and receive a personal three-card tarot reading. Explore clear upright and reversed meanings for all 78 cards of the full deck.";
 const TITLE_AM = "Տարո առցանց ընթերցում — Տարոյի 22 Մեծ Արկաններ";
 const DESCRIPTION_AM =
   "Տարո առցանց ընթերցում հայերենով. տվեք հարց և ստացեք անձնական պատասխան 3 քարտերի միջոցով: Տարոյի 22 Մեծ Արկաններ — առաջին հարցն անվճար:";
@@ -54,7 +55,7 @@ const FAQ_KA = [
   },
   {
     q: "რომელ კარტებს იყენებთ?",
-    a: "22 დიდ არკანს — ტაროს ყველაზე ძლიერ და სიმბოლურ კარტებს, ბრიყვიდან სამყარომდე. თითო კარტს აქვს პირდაპირი და შებრუნებული მნიშვნელობა.",
+    a: "სრულ 78-კარტიან დასტას — 22 დიდ არკანსა და 56 მცირე არკანას (თასები, ხმლები, კვერთხები, მონეტები). თითო კარტს აქვს პირდაპირი და შებრუნებული მნიშვნელობა.",
   },
 ];
 
@@ -73,7 +74,7 @@ const FAQ_EN = [
   },
   {
     q: "Which tarot cards does Vivida use?",
-    a: "The 22 Major Arcana, from The Fool to The World. These archetypal cards are especially useful for concise, reflective three-card readings.",
+    a: "The full 78-card deck: the 22 Major Arcana plus all 56 Minor Arcana across the Cups, Swords, Wands and Pentacles. Every card carries upright and reversed meanings.",
   },
 ];
 
@@ -206,15 +207,20 @@ export default async function TaroHubPage() {
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      itemListElement: cards.map((c, i) => ({
+      itemListElement: (am
+        ? cards.map((c) => ({
+            slug: c.slug,
+            name: (c as (typeof TAROT_CARDS_AM)[number]).name,
+          }))
+        : tarotDetailDeck(en ? "en" : "ka").map((c) => ({
+            slug: c.slug,
+            name: c.name,
+          }))
+      ).map((c, i) => ({
         "@type": "ListItem",
         position: i + 1,
         url: `${siteUrl}/taro/${c.slug}`,
-        name: am
-          ? (c as (typeof TAROT_CARDS_AM)[number]).name
-          : en
-            ? (c as (typeof TAROT_CARDS_EN)[number]).name
-            : (c as (typeof TAROT_CARDS)[number]).nameKa,
+        name: c.name,
       })),
     },
   ];
@@ -309,8 +315,8 @@ export default async function TaroHubPage() {
             {am
               ? "Տարոյի 22 Մեծ Արկանները"
               : en
-                ? "The 22 Major Arcana cards"
-                : "ტაროს დიდი არკანა — 22 კარტი"}
+                ? "The full tarot deck — 78 cards"
+                : "ტაროს სრული დასტა — 78 კარტი"}
           </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
             {am
@@ -320,17 +326,13 @@ export default async function TaroHubPage() {
                 : "აღმოაჩინე თითო კარტის მნიშვნელობა — პირდაპირი და შებრუნებული."}
           </p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {cards.map((c) => {
+            {(am ? cards : tarotDetailDeck(en ? "en" : "ka")).map((c) => {
               const name = am
                 ? (c as (typeof TAROT_CARDS_AM)[number]).name
-                : en
-                  ? (c as (typeof TAROT_CARDS_EN)[number]).name
-                  : (c as (typeof TAROT_CARDS)[number]).nameKa;
+                : (c as TarotDetailCard).name;
               const keywords = am
                 ? (c as (typeof TAROT_CARDS_AM)[number]).keywords
-                : en
-                  ? (c as (typeof TAROT_CARDS_EN)[number]).keywords
-                  : (c as (typeof TAROT_CARDS)[number]).keywordsKa;
+                : (c as TarotDetailCard).keywords;
               return (
                 <Link
                   key={c.slug}

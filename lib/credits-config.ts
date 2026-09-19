@@ -63,6 +63,8 @@ export const CREDIT_COST = {
   pdfReport: 5,
   weeklyForecast: 10,
   tarot: 10,
+  /** A follow-up question on an already-drawn tarot spread. */
+  tarotFollowup: 5,
 } as const;
 
 /** Free before credits are needed. */
@@ -96,6 +98,7 @@ export type CreditReason =
   | "spend_report"
   | "spend_weekly"
   | "spend_tarot"
+  | "spend_tarot_followup"
   | "grandfather"
   | "admin_grant";
 
@@ -125,6 +128,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   spend_report: "PDF რუკა",
   spend_weekly: "7-დღიანი პროგნოზი",
   spend_tarot: "ტარო კითხვა",
+  spend_tarot_followup: "ტაროს დაზუსტება",
   grandfather: "საჩუქარი",
   admin_grant: "საჩუქარი",
 };
@@ -150,6 +154,7 @@ export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
   spend_report: "PDF chart",
   spend_weekly: "7-day forecast",
   spend_tarot: "Tarot reading",
+  spend_tarot_followup: "Tarot follow-up",
   grandfather: "Gift",
   admin_grant: "Gift",
 };
@@ -175,6 +180,7 @@ export const CREDIT_REASON_LABEL_AM: Record<CreditReason, string> = {
   spend_report: "PDF քարտեզ",
   spend_weekly: "7-օրյա կանխատեսում",
   spend_tarot: "Տարոյի ընթերցում",
+  spend_tarot_followup: "Տարոյի լրացուցիչ հարց",
   grandfather: "Նվեր",
   admin_grant: "Նվեր",
 };

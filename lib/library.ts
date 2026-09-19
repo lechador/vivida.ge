@@ -1,14 +1,6 @@
 import "server-only";
 
-import {
-  and,
-  desc,
-  eq,
-  ilike,
-  or,
-  sql,
-  type SQL,
-} from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -87,6 +79,25 @@ export async function getLibraryEntry(
   return entry ?? null;
 }
 
+export async function getLibraryEntryBySource(
+  userId: string,
+  kind: LibraryEntryKind,
+  sourceId: string,
+): Promise<LibraryEntry | null> {
+  const [entry] = await db
+    .select()
+    .from(libraryEntries)
+    .where(
+      and(
+        eq(libraryEntries.userId, userId),
+        eq(libraryEntries.kind, kind),
+        eq(libraryEntries.sourceId, sourceId),
+      ),
+    )
+    .limit(1);
+  return entry ?? null;
+}
+
 export async function listLibraryEntries(
   userId: string,
   options: {
@@ -98,7 +109,10 @@ export async function listLibraryEntries(
   } = {},
 ): Promise<LibraryPage> {
   const filter = options.filter ?? "all";
-  const pageSize = Math.min(Math.max(Math.trunc(options.pageSize ?? 18), 1), 50);
+  const pageSize = Math.min(
+    Math.max(Math.trunc(options.pageSize ?? 18), 1),
+    50,
+  );
   const requestedPage = Math.max(Math.trunc(options.page ?? 1), 1);
   const conditions: SQL[] = [eq(libraryEntries.userId, userId)];
   if (filter !== "all") conditions.push(eq(libraryEntries.kind, filter));
