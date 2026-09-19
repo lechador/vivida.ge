@@ -48,6 +48,8 @@ export type TarotReading = {
   free: boolean;
   balance: number;
   libraryId?: string;
+  /** True when the AI call failed and the static fallback was used. */
+  degraded: boolean;
 };
 
 export type TarotResult =
@@ -166,6 +168,7 @@ export async function performReading(
           free: existing.content.free ?? false,
           balance,
           libraryId: existing.id,
+          degraded: existing.content.degraded ?? false,
         },
       };
     }
@@ -258,9 +261,12 @@ export async function performReading(
   };
 
   let ai: Awaited<ReturnType<typeof generateTarotReading>> = null;
+  let degraded = false;
   try {
     ai = await generateTarotReading(aiInput);
+    if (!ai) degraded = true;
   } catch (err) {
+    degraded = true;
     console.warn(
       "[tarot] AI reading failed, using fallback:",
       (err as Error).message,
@@ -292,6 +298,7 @@ export async function performReading(
       advice: composed.advice,
       charged,
       free,
+      degraded,
     },
     language: locale,
   }).catch((error) => {
@@ -309,6 +316,7 @@ export async function performReading(
       free,
       balance,
       libraryId: libraryEntry?.id,
+      degraded,
     },
   };
 }

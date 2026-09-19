@@ -149,6 +149,8 @@ export type LibraryEntryContent =
       /** What this attempt settled: 0/free for the first reading, cost otherwise. */
       charged?: number;
       free?: boolean;
+      /** True when the AI call failed and the static fallback was used. */
+      degraded?: boolean;
     }
   | {
       type: "ai";

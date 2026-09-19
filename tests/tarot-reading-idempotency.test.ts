@@ -101,6 +101,7 @@ describe("performReading request idempotency", () => {
         free: true,
         balance: 5,
         libraryId: "lib-stored",
+        degraded: false,
       },
     });
     expect(mocks.countUnlocks).not.toHaveBeenCalled();

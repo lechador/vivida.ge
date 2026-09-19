@@ -42,6 +42,7 @@ type Reading = {
   free: boolean;
   balance: number;
   libraryId?: string;
+  degraded: boolean;
 };
 
 /**
@@ -290,6 +291,16 @@ export function TarotReader({
               {reading.headline}
             </h3>
           </div>
+
+          {reading.degraded && (
+            <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-center text-sm leading-relaxed text-foreground/90">
+              {am
+                ? "Անհատական AI մեկնաբանությունը ժամանակավորապես անհասանելի էր, ուստի այս ընթերցումը կառուցված է քարտերի հիմնական իմաստների վրա։"
+                : en
+                  ? "The personalized AI interpretation was temporarily unavailable, so this reading is built from the cards' core meanings."
+                  : "პერსონალური AI განმარტება დროებით მიუწვდომელი იყო, ამიტომ ეს პასუხი კარტების ძირითად მნიშვნელობებზეა აგებული."}
+            </p>
+          )}
 
           <div className="space-y-2.5">
             {reading.cards.map((c, i) => (
