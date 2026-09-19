@@ -15,6 +15,10 @@ import {
 } from "@/lib/analytics";
 import { fbTrack, fbTrackCustom } from "@/lib/fb-pixel";
 import type { UserLocale } from "@/lib/i18n/locale";
+import {
+  nextTarotAttempt,
+  type TarotAttempt,
+} from "@/lib/tarot/request-attempt";
 import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 
 type SpreadCard = {
@@ -58,6 +62,7 @@ export function TarotReader({
   const am = locale === "am";
   const router = useRouter();
   const [question, setQuestion] = useState("");
+  const [attempt, setAttempt] = useState<TarotAttempt | null>(null);
   const [reading, setReading] = useState<Reading | null>(null);
   const [status, setStatus] = useState<"idle" | "drawing" | "short" | "error">(
     "idle",
@@ -84,14 +89,24 @@ export function TarotReader({
     }
     setStatus("drawing");
     setReading(null);
+    // Retries of the same question reuse one request id so the server can
+    // replay the reading instead of charging twice.
+    const nextAttempt = nextTarotAttempt(attempt, q);
+    setAttempt(nextAttempt);
     try {
       const res = await fetch("/api/tarot/reading", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q, locale }),
+        body: JSON.stringify({
+          question: q,
+          locale,
+          requestId: nextAttempt.requestId,
+        }),
       });
       if (res.status === 402) {
-        const data = (await res.json().catch(() => ({}))) as { balance?: number };
+        const data = (await res.json().catch(() => ({}))) as {
+          balance?: number;
+        };
         setShortBalance(typeof data.balance === "number" ? data.balance : 0);
         trackEvent(ANALYTICS_EVENT.tarotCreditsShort, {
           widget: "tarot_reader",
@@ -150,6 +165,7 @@ export function TarotReader({
   function reset() {
     setReading(null);
     setQuestion("");
+    setAttempt(null);
     setStatus("idle");
   }
 
@@ -214,7 +230,14 @@ export function TarotReader({
       {/* Short-balance prompt */}
       {status === "short" && (
         <div className="mt-5 rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
-          <ContextualPaywallActions locale={locale} balance={shortBalance} cost={cost} product="tarot" returnTo={am ? "/am/taro" : "/taro"} placement="tarot_shortfall" />
+          <ContextualPaywallActions
+            locale={locale}
+            balance={shortBalance}
+            cost={cost}
+            product="tarot"
+            returnTo={am ? "/am/taro" : "/taro"}
+            placement="tarot_shortfall"
+          />
         </div>
       )}
       {status === "error" && (
