@@ -2,16 +2,10 @@ import type { Metadata } from "next";
 
 // Relative, not "@/": this module is imported by next.config.ts, which is
 // loaded outside the app's tsconfig path aliases.
-import {
-  hasArmenianVersion,
-  stripArmenianPrefix,
-  withArmenianPrefix,
-} from "../i18n/armenian-routes";
 import { internationalPublicPath } from "./public-paths";
 
 export const GEORGIAN_SITE_URL = "https://www.vivida.ge";
 export const ENGLISH_SITE_URL = "https://www.vividaastro.com";
-export const ARMENIAN_SITE_URL = "https://www.vividaastro.com/am";
 
 export const GEORGIAN_HOSTS = ["vivida.ge", "www.vivida.ge"] as const;
 export const ENGLISH_HOSTS = [
@@ -108,8 +102,7 @@ export function resolveEnglishPath(path: string): string {
 export function localizedAlternates(
   canonicalPath: string,
   pairedPath: string,
-  locale: "ka" | "en" | "am" | string,
-  armenianPath?: string,
+  locale: "ka" | "en" | string,
 ): NonNullable<Metadata["alternates"]> {
   const kaPath =
     locale === "ka"
@@ -124,42 +117,21 @@ export function localizedAlternates(
   const rawEnPath =
     locale === "en"
       ? publicEnglishPath(canonicalPath)
-      : resolveEnglishPath(
-          locale === "am"
-            ? (stripArmenianPrefix(canonicalPath) ?? canonicalPath)
-            : pairedPath,
-        );
+      : resolveEnglishPath(pairedPath);
   const enPath = internationalPublicPath(rawEnPath);
 
-  const rawAm =
-    locale === "am"
-      ? canonicalPath
-      : (armenianPath ?? (enPath === "/" ? "/am" : `/am${enPath}`));
-  const amPath = withArmenianPrefix(rawAm);
-
   const canonical =
-    locale === "am"
-      ? `${ENGLISH_SITE_URL}${amPath}`
-      : locale === "en"
-        ? `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`
-        : `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
+    locale === "en"
+      ? `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`
+      : `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
   const englishUrl = `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
   const georgianUrl = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
-  const armenianUrl = `${ENGLISH_SITE_URL}${amPath}`;
-
-  // An Armenian alternate is a promise that the URL resolves. Most of the
-  // ~1,200 Georgian and English pages have no Armenian twin yet, and pointing
-  // hreflang at a 404 makes Google discard the entire annotation cluster for
-  // the page — including the ka↔en pair that does work.
-  const includeArmenian =
-    locale === "am" || hasArmenianVersion(stripArmenianPrefix(amPath) ?? "/");
 
   return {
     canonical,
     languages: {
       "ka-GE": georgianUrl,
       en: englishUrl,
-      ...(includeArmenian ? { "hy-AM": armenianUrl, hy: armenianUrl } : {}),
       "x-default": englishUrl,
     },
   };
@@ -188,15 +160,6 @@ export function englishSiteHref(path: string, onEnglishHost: boolean): string {
   const publicPath = internationalPublicPath(path);
   if (onEnglishHost) return publicPath;
   return `${ENGLISH_SITE_URL}${publicPath === "/" ? "" : publicPath}`;
-}
-
-/**
- * Resolve an Armenian-site content link for whichever host is serving.
- */
-export function armenianSiteHref(path: string, onEnglishHost: boolean): string {
-  const amPath = withArmenianPrefix(path);
-  if (onEnglishHost) return amPath;
-  return `${ENGLISH_SITE_URL}${amPath}`;
 }
 
 /**
