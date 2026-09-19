@@ -19,6 +19,10 @@ import {
   nextTarotAttempt,
   type TarotAttempt,
 } from "@/lib/tarot/request-attempt";
+import {
+  savePendingTarotQuestion,
+  takePendingTarotQuestion,
+} from "@/lib/tarot/pending-question";
 import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 
 type SpreadCard = {
@@ -61,7 +65,11 @@ export function TarotReader({
   const en = locale === "en";
   const am = locale === "am";
   const router = useRouter();
-  const [question, setQuestion] = useState("");
+  const [question, setQuestion] = useState(() => {
+    // Restore the question after the sign-in or top-up redirect consumes it.
+    if (typeof window === "undefined") return "";
+    return takePendingTarotQuestion(sessionStorage) ?? "";
+  });
   const [attempt, setAttempt] = useState<TarotAttempt | null>(null);
   const [reading, setReading] = useState<Reading | null>(null);
   const [status, setStatus] = useState<"idle" | "drawing" | "short" | "error">(
@@ -78,7 +86,8 @@ export function TarotReader({
     if (!authed) {
       // The sign-in wall is the single biggest drop-off on this funnel —
       // track it separately from a completed reading so the two are
-      // distinguishable in GA4.
+      // distinguishable in GA4. Keep the question so it survives login.
+      savePendingTarotQuestion(sessionStorage, q);
       trackEvent(ANALYTICS_EVENT.tarotLoginRequired, {
         widget: "tarot_reader",
       });
@@ -122,6 +131,8 @@ export function TarotReader({
           cost,
         });
         setStatus("short");
+        // The top-up flow leaves this page; restore the question on return.
+        savePendingTarotQuestion(sessionStorage, q);
         return;
       }
       if (!res.ok) {
