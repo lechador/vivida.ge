@@ -1,9 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Loader2, RotateCcw, Sparkles, Wand2 } from "lucide-react";
+import {
+  BookOpen,
+  ChevronDown,
+  History,
+  Loader2,
+  RotateCcw,
+  Sparkles,
+  Wand2,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
@@ -61,6 +69,42 @@ type Reading = {
   followups: TarotFollowup[];
   spreadId: string;
   spreadOptions?: { a: string; b: string };
+  /** Loaded from history rather than freshly drawn — cost line stays hidden. */
+  fromHistory?: boolean;
+};
+
+type HistoryItem = {
+  id: string;
+  question: string;
+  headline: string;
+  createdAt: string;
+  reading?: {
+    question: string;
+    headline?: string;
+    cards: Array<{
+      slug: string;
+      name: string;
+      glyph: string;
+      image?: string;
+      reversed: boolean;
+      position: string;
+      interpretation: string;
+    }>;
+    reading: string;
+    advice: string;
+    charged?: number;
+    free?: boolean;
+    degraded?: boolean;
+    spreadId?: string;
+    spreadOptions?: { a: string; b: string };
+    followups?: Array<{
+      question: string;
+      answer: string;
+      degraded?: boolean;
+      charged?: number;
+      free?: boolean;
+    }>;
+  };
 };
 
 /**
@@ -119,6 +163,68 @@ export function TarotReader({
     balance: 0,
     cost: CREDIT_COST.tarotFollowup,
   });
+  const [history, setHistory] = useState<HistoryItem[] | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
+
+  // Previous readings, so a past spread can be reopened (reply) or a fresh
+  // question started without leaving the page.
+  useEffect(() => {
+    if (!authed) return;
+    let cancelled = false;
+    fetch("/api/tarot/history")
+      .then((res) => (res.ok ? res.json() : { items: [] }))
+      .then((data: { items?: HistoryItem[] }) => {
+        if (!cancelled) setHistory(data.items ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setHistory([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authed]);
+
+  function loadHistoryItem(item: HistoryItem) {
+    const content = item.reading;
+    if (!content) return;
+    setQuestion(content.question);
+    setSpreadId(tarotSpreadById(content.spreadId)?.id ?? "situation");
+    setAttempt(null);
+    setFollowupQuestion("");
+    setFollowupStatus("idle");
+    setActiveHistoryId(item.id);
+    setReading({
+      headline: item.headline,
+      cards: content.cards.map((c) => ({
+        slug: c.slug,
+        name: c.name,
+        glyph: c.glyph,
+        image: c.image || `/tarot/${c.slug}.webp`,
+        reversed: c.reversed,
+        position: c.position,
+        interpretation: c.interpretation,
+      })),
+      reading: content.reading,
+      advice: content.advice,
+      charged: content.charged ?? 0,
+      free: content.free ?? false,
+      balance: 0,
+      libraryId: item.id,
+      degraded: content.degraded ?? false,
+      followups: (content.followups ?? []).map((f) => ({
+        question: f.question,
+        answer: f.answer,
+        degraded: f.degraded ?? false,
+        charged: f.charged ?? 0,
+        free: f.free ?? false,
+      })),
+      spreadId: tarotSpreadById(content.spreadId)?.id ?? "situation",
+      spreadOptions: content.spreadOptions,
+      fromHistory: true,
+    });
+    setStatus("idle");
+  }
 
   async function ask() {
     // A second Enter while the first request is in flight would spend the
@@ -221,6 +327,7 @@ export function TarotReader({
         });
       }
       setReading(next);
+      setActiveHistoryId(null);
       setStatus("idle");
     } catch {
       setStatus("error");
@@ -234,6 +341,7 @@ export function TarotReader({
     setFollowupQuestion("");
     setFollowupStatus("idle");
     setStatus("idle");
+    setActiveHistoryId(null);
   }
 
   const FOLLOWUP_SUGGESTIONS: Record<UserLocale, string[]> = {
@@ -336,6 +444,67 @@ export function TarotReader({
 
   return (
     <div className="rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/10 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+      {/* Previous questions — reopen a spread (reply) or start fresh. */}
+      {authed && history !== null && history.length > 0 && (
+        <div className="mb-4 rounded-2xl border border-border/60 bg-background/35">
+          <button
+            type="button"
+            onClick={() => setHistoryOpen((open) => !open)}
+            aria-expanded={historyOpen}
+            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-foreground/85"
+          >
+            <History className="size-4 text-[var(--vivida-violet)]" />
+            {en ? "Previous questions" : "წინა კითხვები"}
+            <span className="text-xs text-muted-foreground">
+              · {history.length}
+            </span>
+            <ChevronDown
+              className={`ml-auto size-4 text-muted-foreground transition-transform ${historyOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+          {historyOpen && (
+            <ul className="max-h-56 space-y-1 overflow-y-auto px-2 pb-2">
+              {history.map((item) => {
+                const active = item.id === activeHistoryId;
+                return (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => loadHistoryItem(item)}
+                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                        active
+                          ? "bg-[var(--vivida-violet)]/15 text-foreground"
+                          : "text-foreground/80 hover:bg-card/70"
+                      }`}
+                    >
+                      <span className="min-w-0 flex-1 truncate">
+                        {item.question}
+                      </span>
+                      <span className="shrink-0 text-[11px] text-muted-foreground">
+                        {new Date(item.createdAt).toLocaleDateString(
+                          en ? "en-US" : "ka-GE",
+                          { month: "short", day: "numeric" },
+                        )}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {activeHistoryId && (
+            <div className="px-4 pb-3">
+              <button
+                type="button"
+                onClick={reset}
+                className="text-xs font-medium text-[var(--vivida-violet)] hover:underline"
+              >
+                {en ? "＋ New question" : "＋ ახალი კითხვა"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       {/* Spread picker */}
       <div
         className="mb-3 flex flex-wrap gap-2"
@@ -630,15 +799,17 @@ export function TarotReader({
           )}
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="text-xs text-muted-foreground">
-              {reading.free
-                ? en
-                  ? "First reading — free ✦"
-                  : "პირველი კითხვა — უფასო ✦"
-                : en
-                  ? `−${reading.charged} credits · ${reading.balance} remaining`
-                  : `−${reading.charged} კრედიტი · ბალანსი ${reading.balance}`}
-            </span>
+            {!reading.fromHistory && (
+              <span className="text-xs text-muted-foreground">
+                {reading.free
+                  ? en
+                    ? "First reading — free ✦"
+                    : "პირველი კითხვა — უფასო ✦"
+                  : en
+                    ? `−${reading.charged} credits · ${reading.balance} remaining`
+                    : `−${reading.charged} კრედიტი · ბალანსი ${reading.balance}`}
+              </span>
+            )}
             <div className="flex flex-wrap gap-2">
               {reading.libraryId && (
                 <Button asChild variant="outline" className="gap-1.5">

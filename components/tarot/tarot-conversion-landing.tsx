@@ -24,7 +24,7 @@ import {
   premiumPlanForCountry,
 } from "@/lib/billing-config";
 import { CREDIT_COST } from "@/lib/credits-config";
-import { TAROT_CARDS } from "@/lib/tarot/deck";
+import { tarotDetailDeck } from "@/lib/tarot/detail";
 
 const FAQ = [
   {
@@ -492,18 +492,18 @@ export function TarotConversionLanding({
           }`}
         >
           <summary className="flex cursor-pointer list-none items-center justify-center gap-2 text-sm font-medium text-white/55 transition hover:text-white/80 [&::-webkit-details-marker]:hidden">
-            ტაროს 22 დიდი არკანის მნიშვნელობები
+            ტაროს 78 კარტის მნიშვნელობები
             <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
           </summary>
           <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {TAROT_CARDS.map((card) => (
+            {tarotDetailDeck("ka").map((card) => (
               <Link
                 key={card.slug}
                 href={`/taro/${card.slug}`}
                 className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.025] px-3.5 py-3 text-sm text-white/65 transition hover:border-[#a88dff]/25 hover:bg-white/[0.045] hover:text-white"
               >
                 <span className="text-lg">{card.glyph}</span>
-                <span className="truncate">{card.nameKa}</span>
+                <span className="truncate">{card.name}</span>
               </Link>
             ))}
           </div>
