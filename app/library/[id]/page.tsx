@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { getLibraryEntry } from "@/lib/library";
+import { tarotSpreadById } from "@/lib/tarot/spreads";
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { LibraryFavoriteButton } from "@/components/library/favorite-button";
@@ -221,6 +222,22 @@ function LibraryContent({
               {am ? "Հարց" : en ? "Question" : "კითხვა"}
             </div>
             <p className="mt-2 text-foreground/90">{content.question}</p>
+            {content.spreadId && content.spreadId !== "situation" && (
+              <p className="mt-2 text-xs text-[var(--vivida-violet)]">
+                {
+                  (tarotSpreadById(content.spreadId)?.name ?? {
+                    ka: "ტარო",
+                    en: "Tarot",
+                    am: "Տարո",
+                  })[locale]
+                }
+              </p>
+            )}
+            {content.spreadOptions && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {`A — ${content.spreadOptions.a} · B — ${content.spreadOptions.b}`}
+              </p>
+            )}
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             {content.cards.map((card, index) => (

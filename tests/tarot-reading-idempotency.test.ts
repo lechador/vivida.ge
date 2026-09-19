@@ -103,6 +103,7 @@ describe("performReading request idempotency", () => {
         libraryId: "lib-stored",
         degraded: false,
         followups: [],
+        spreadId: "situation",
       },
     });
     expect(mocks.countUnlocks).not.toHaveBeenCalled();

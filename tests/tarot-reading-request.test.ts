@@ -57,4 +57,41 @@ describe("POST /api/tarot/reading request identity", () => {
     expect(response.status).toBe(400);
     expect(mocks.performReading).not.toHaveBeenCalled();
   });
+
+  it("rejects an unknown spread before drawing or charging", async () => {
+    const response = await POST(
+      request({
+        question: "რა უნდა დავინახო ამ ურთიერთობაში?",
+        locale: "ka",
+        requestId: "req-spread-1",
+        spreadId: "nope",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(mocks.performReading).not.toHaveBeenCalled();
+  });
+
+  it("forwards a known spread with its options", async () => {
+    const response = await POST(
+      request({
+        question: "რომელი გზა ავირჩიო?",
+        locale: "ka",
+        requestId: "req-spread-2",
+        spreadId: "choice",
+        optionA: "დარჩენა",
+        optionB: "წასვლა",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.performReading).toHaveBeenCalledWith(
+      "user-tarot",
+      "რომელი გზა ავირჩიო?",
+      "ka",
+      "req-spread-2",
+      "choice",
+      { a: "დარჩენა", b: "წასვლა" },
+    );
+  });
 });

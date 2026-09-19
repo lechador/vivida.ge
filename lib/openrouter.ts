@@ -1944,6 +1944,41 @@ const TAROT_SYSTEM_PROMPT_AM = `Դու փորձառու, բարեհամբույ�
 
 JSON ձևաչափ՝ {"headline": "կարճ, ազդեցիկ վերնագիր (3-7 բառ)", "cards": ["յուրաքանչյուր քարտի կոնկրետ մեկնաբանություն հարցի համատեքստում՝ 3 տարր, յուրաքանչյուրը 1-2 նախադասություն՝ ըստ դիրքերի"], "reading": "1-2 պարբերություն, 3 քարտերի սինթեզը հարցի հետ", "advice": "մեկ կոնկրետ, գործնական խորհուրդ"}`;
 
+/**
+ * Extra user-message lines for non-default spreads. Empty for the default
+ * situation spread, keeping its long-standing prompt byte-identical.
+ */
+function spreadContextLines(
+  input: {
+    spreadLogic?: string;
+    spreadOptions?: { a: string; b: string };
+  },
+  am: boolean,
+  en: boolean,
+): string[] {
+  const lines: string[] = [];
+  if (input.spreadLogic) {
+    lines.push(
+      am
+        ? "Դասավորության տրամաբանությունը՝"
+        : en
+          ? "Spread logic:"
+          : "გაშლის ლოგიკა:",
+      input.spreadLogic,
+    );
+  }
+  if (input.spreadOptions) {
+    lines.push(
+      am
+        ? `Համեմատվող տարբերակները՝ A — «${input.spreadOptions.a}», B — «${input.spreadOptions.b}»`
+        : en
+          ? `Options being compared: A — “${input.spreadOptions.a}”, B — “${input.spreadOptions.b}”`
+          : `შესადარებელი ვარიანტები: A — „${input.spreadOptions.a}“, B — „${input.spreadOptions.b}“`,
+    );
+  }
+  return lines;
+}
+
 export type TarotReadingResult = {
   headline: string;
   cards: string[];
@@ -1967,6 +2002,8 @@ export type TarotCardInput = {
 export async function generateTarotReading(input: {
   question: string;
   cards: TarotCardInput[];
+  spreadLogic?: string;
+  spreadOptions?: { a: string; b: string };
   locale?: UserLocale;
 }): Promise<TarotReadingResult | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -1992,6 +2029,7 @@ export async function generateTarotReading(input: {
     "",
     am ? "Բացված քարտերը՝" : en ? "Cards drawn:" : "გამოსული კარტები:",
     cardLines,
+    ...spreadContextLines(input, am, en),
     "",
     am
       ? "Գրիր ընթերցումը JSON ձևաչափով:"

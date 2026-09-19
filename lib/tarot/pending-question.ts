@@ -9,6 +9,8 @@ export type PendingTarotAttempt = {
   question: string;
   /** The idempotent request id, when the question was already sent once. */
   requestId: string | null;
+  /** The spread the pending question belongs to. */
+  spreadId: string | null;
 };
 
 /**
@@ -20,6 +22,7 @@ export function savePendingTarotQuestion(
   storage: WritableStorage,
   question: string,
   requestId?: string | null,
+  spreadId?: string | null,
 ): void {
   const normalized = question.trim().slice(0, MAX_QUESTION_LENGTH);
   if (normalized.length < 3) return;
@@ -32,6 +35,8 @@ export function savePendingTarotQuestion(
           typeof requestId === "string" && requestId.length > 0
             ? requestId
             : null,
+        spreadId:
+          typeof spreadId === "string" && spreadId.length > 0 ? spreadId : null,
         savedAt: Date.now(),
       }),
     );
@@ -60,6 +65,7 @@ export function takePendingTarotQuestion(
     const parsed = JSON.parse(raw) as {
       question?: unknown;
       requestId?: unknown;
+      spreadId?: unknown;
       savedAt?: unknown;
     };
     if (typeof parsed.question !== "string") return null;
@@ -72,6 +78,10 @@ export function takePendingTarotQuestion(
       requestId:
         typeof parsed.requestId === "string" && parsed.requestId.length > 0
           ? parsed.requestId
+          : null,
+      spreadId:
+        typeof parsed.spreadId === "string" && parsed.spreadId.length > 0
+          ? parsed.spreadId
           : null,
     };
   } catch {

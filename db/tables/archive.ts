@@ -151,6 +151,10 @@ export type LibraryEntryContent =
       free?: boolean;
       /** True when the AI call failed and the static fallback was used. */
       degraded?: boolean;
+      /** Which spread framed the draw. */
+      spreadId?: string;
+      /** The compared options, only for the choice spread. */
+      spreadOptions?: { a: string; b: string };
       /** Follow-up questions on the same spread, oldest first. */
       followups?: Array<{
         question: string;

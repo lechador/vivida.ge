@@ -11,12 +11,9 @@ import {
   spendOnce,
 } from "@/lib/credits";
 import { generateTarotReading } from "@/lib/openrouter";
-import {
-  SPREAD_POSITIONS_KA,
-  TAROT_CARDS,
-  type DrawnCard,
-} from "@/lib/tarot/deck";
-import { SPREAD_POSITIONS_EN, TAROT_EN_BY_SLUG } from "@/lib/tarot/deck-en";
+import { TAROT_CARDS, type DrawnCard } from "@/lib/tarot/deck";
+import { TAROT_EN_BY_SLUG } from "@/lib/tarot/deck-en";
+import { tarotSpreadById, type TarotSpreadId } from "@/lib/tarot/spreads";
 import { tarotCardBySlugAm } from "@/lib/tarot/deck-am";
 import type { TarotFollowupEntry } from "@/lib/tarot/followup";
 import type { UserLocale } from "@/lib/i18n/locale";
@@ -53,6 +50,10 @@ export type TarotReading = {
   degraded: boolean;
   /** Follow-up questions on the same spread, oldest first. */
   followups: TarotFollowupEntry[];
+  /** Which spread framed the draw. */
+  spreadId: TarotSpreadId;
+  /** The compared options, only for the choice spread. */
+  spreadOptions?: { a: string; b: string };
 };
 
 export type TarotResult =
@@ -148,9 +149,31 @@ export async function performReading(
   question: string,
   locale: UserLocale = "ka",
   requestId?: string,
+  spreadId?: unknown,
+  spreadOptions?: unknown,
 ): Promise<TarotResult> {
   const q = question.trim().slice(0, 300);
   if (q.length < 3) return { ok: false, error: "bad_request" };
+
+  // Thematic spreads share the 3-card engine; only the positions and the AI
+  // framing differ. Unknown ids are rejected before any charging.
+  const spread =
+    spreadId === undefined
+      ? tarotSpreadById("situation")
+      : tarotSpreadById(spreadId);
+  if (!spread) return { ok: false, error: "bad_request" };
+
+  let options: { a: string; b: string } | undefined;
+  if (
+    spread.id === "choice" &&
+    typeof spreadOptions === "object" &&
+    spreadOptions !== null
+  ) {
+    const { a, b } = spreadOptions as { a?: unknown; b?: unknown };
+    const optionA = typeof a === "string" ? a.trim().slice(0, 100) : "";
+    const optionB = typeof b === "string" ? b.trim().slice(0, 100) : "";
+    if (optionA && optionB) options = { a: optionA, b: optionB };
+  }
 
   // A stable client request id makes retries safe: a completed reading is
   // replayed, and a crashed attempt resumes without charging twice.
@@ -169,6 +192,9 @@ export async function performReading(
         charged: item.charged ?? 0,
         free: item.free ?? false,
       }));
+      const replayedSpread =
+        tarotSpreadById(existing.content.spreadId) ??
+        tarotSpreadById("situation")!;
       return {
         ok: true,
         reading: {
@@ -182,6 +208,8 @@ export async function performReading(
           libraryId: existing.id,
           degraded: existing.content.degraded ?? false,
           followups,
+          spreadId: replayedSpread.id,
+          spreadOptions: existing.content.spreadOptions,
         },
       };
     }
@@ -245,12 +273,7 @@ export async function performReading(
 
   // ── Draw + interpret ─────────────────────────────────────────────────────
   const drawn = drawSpread();
-  const positions =
-    locale === "am"
-      ? (["անցյալ / արմատ", "ներկա / առանցք", "ապագա / ուղի"] as const)
-      : locale === "en"
-        ? SPREAD_POSITIONS_EN
-        : SPREAD_POSITIONS_KA;
+  const positions = spread.positions[locale];
   const aiInput = {
     question: q,
     cards: drawn.map((d, i) => ({
@@ -270,6 +293,9 @@ export async function performReading(
               : "პირდაპირი",
       meaning: cardCopy(d, locale).meaning,
     })),
+    spreadLogic:
+      spread.id === "situation" ? undefined : spread.readingLogic[locale],
+    spreadOptions: options,
     locale,
   };
 
@@ -313,6 +339,8 @@ export async function performReading(
       free,
       degraded,
       followups: [],
+      spreadId: spread.id,
+      spreadOptions: options,
     },
     language: locale,
   }).catch((error) => {
@@ -332,6 +360,8 @@ export async function performReading(
       libraryId: libraryEntry?.id,
       degraded,
       followups: [],
+      spreadId: spread.id,
+      spreadOptions: options,
     },
   };
 }

@@ -26,6 +26,7 @@ describe("pending tarot question", () => {
     expect(takePendingTarotQuestion(storage)).toEqual({
       question: "რა უნდა დავინახო?",
       requestId: null,
+      spreadId: null,
     });
     expect(takePendingTarotQuestion(storage)).toBeNull();
   });
@@ -37,6 +38,23 @@ describe("pending tarot question", () => {
     expect(takePendingTarotQuestion(storage)).toEqual({
       question: "რა უნდა დავინახო?",
       requestId: "req-abc-123",
+      spreadId: null,
+    });
+  });
+
+  it("round-trips the spread so the retry replays the same spread", () => {
+    const storage = memoryStorage();
+
+    savePendingTarotQuestion(
+      storage,
+      "რა უნდა დავინახო?",
+      "req-abc-123",
+      "relationship",
+    );
+    expect(takePendingTarotQuestion(storage)).toEqual({
+      question: "რა უნდა დავინახო?",
+      requestId: "req-abc-123",
+      spreadId: "relationship",
     });
   });
 

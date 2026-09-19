@@ -21,6 +21,11 @@ import {
   type TarotAttempt,
 } from "@/lib/tarot/request-attempt";
 import {
+  TAROT_SPREADS,
+  tarotSpreadById,
+  type TarotSpreadId,
+} from "@/lib/tarot/spreads";
+import {
   savePendingTarotQuestion,
   takePendingTarotQuestion,
   type PendingTarotAttempt,
@@ -53,6 +58,8 @@ type Reading = {
   libraryId?: string;
   degraded: boolean;
   followups: TarotFollowup[];
+  spreadId: string;
+  spreadOptions?: { a: string; b: string };
 };
 
 /**
@@ -82,9 +89,18 @@ export function TarotReader({
     return takePendingTarotQuestion(sessionStorage);
   });
   const [question, setQuestion] = useState(pending?.question ?? "");
+  const [spreadId, setSpreadId] = useState<TarotSpreadId>(
+    () => tarotSpreadById(pending?.spreadId)?.id ?? "situation",
+  );
+  const [optionA, setOptionA] = useState("");
+  const [optionB, setOptionB] = useState("");
   const [attempt, setAttempt] = useState<TarotAttempt | null>(
     pending?.requestId
-      ? { question: pending.question, requestId: pending.requestId }
+      ? {
+          question: pending.question,
+          spreadId: tarotSpreadById(pending.spreadId)?.id ?? "situation",
+          requestId: pending.requestId,
+        }
       : null,
   );
   const [reading, setReading] = useState<Reading | null>(null);
@@ -127,8 +143,10 @@ export function TarotReader({
     setReading(null);
     // Retries of the same question reuse one request id so the server can
     // replay the reading instead of charging twice.
-    const nextAttempt = nextTarotAttempt(attempt, q);
+    const nextAttempt = nextTarotAttempt(attempt, q, spreadId);
     setAttempt(nextAttempt);
+    const trimmedA = optionA.trim().slice(0, 100);
+    const trimmedB = optionB.trim().slice(0, 100);
     try {
       const res = await fetch("/api/tarot/reading", {
         method: "POST",
@@ -137,6 +155,10 @@ export function TarotReader({
           question: q,
           locale,
           requestId: nextAttempt.requestId,
+          spreadId,
+          ...(spreadId === "choice" && trimmedA && trimmedB
+            ? { optionA: trimmedA, optionB: trimmedB }
+            : {}),
         }),
       });
       if (res.status === 402) {
@@ -160,7 +182,12 @@ export function TarotReader({
         setStatus("short");
         // The top-up flow leaves this page; restore the question (and its
         // request id, so the retry replays instead of charging again).
-        savePendingTarotQuestion(sessionStorage, q, nextAttempt.requestId);
+        savePendingTarotQuestion(
+          sessionStorage,
+          q,
+          nextAttempt.requestId,
+          spreadId,
+        );
         return;
       }
       if (!res.ok) {
@@ -170,6 +197,7 @@ export function TarotReader({
       const next = (await res.json()) as Reading;
       trackEvent(ANALYTICS_EVENT.tarotReadingCompleted, {
         free: next.free ? 1 : 0,
+        spread: next.spreadId,
       });
       if (next.charged > 0) {
         trackEvent(ANALYTICS_EVENT.creditUnlock, {
@@ -268,7 +296,12 @@ export function TarotReader({
           surface: "tarot_followup_short",
           cost: CREDIT_COST.tarotFollowup,
         });
-        savePendingTarotQuestion(sessionStorage, question, attempt?.requestId);
+        savePendingTarotQuestion(
+          sessionStorage,
+          question,
+          attempt?.requestId,
+          spreadId,
+        );
         setFollowupStatus("short");
         return;
       }
@@ -310,6 +343,31 @@ export function TarotReader({
 
   return (
     <div className="rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/10 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+      {/* Spread picker */}
+      <div
+        className="mb-3 flex flex-wrap gap-2"
+        role="group"
+        aria-label={
+          am ? "Դասավորության տեսակ" : en ? "Spread type" : "გაშლის ტიპი"
+        }
+      >
+        {TAROT_SPREADS.map((spread) => (
+          <button
+            key={spread.id}
+            type="button"
+            onClick={() => setSpreadId(spread.id)}
+            disabled={status === "drawing"}
+            aria-pressed={spreadId === spread.id}
+            className={`rounded-full border px-3.5 py-2 text-sm transition-colors disabled:opacity-50 ${
+              spreadId === spread.id
+                ? "border-[var(--vivida-violet)]/60 bg-[var(--vivida-violet)]/15 text-foreground"
+                : "border-border bg-card/55 text-foreground/70 hover:bg-card/80"
+            }`}
+          >
+            {spread.name[locale]}
+          </button>
+        ))}
+      </div>
       {/* Question box */}
       <label
         htmlFor="tarot-question"
@@ -356,6 +414,30 @@ export function TarotReader({
           {am ? "Բացել քարտերը" : en ? "Draw the cards" : "გაშალე კარტები"}
         </Button>
       </div>
+      {spreadId === "choice" && !reading && (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <input
+            id="tarot-option-a"
+            type="text"
+            value={optionA}
+            onChange={(e) => setOptionA(e.target.value)}
+            disabled={status === "drawing"}
+            maxLength={100}
+            placeholder={am ? "Տարբերակ A" : en ? "Option A" : "ვარიანტი A"}
+            className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+          />
+          <input
+            id="tarot-option-b"
+            type="text"
+            value={optionB}
+            onChange={(e) => setOptionB(e.target.value)}
+            disabled={status === "drawing"}
+            maxLength={100}
+            placeholder={am ? "Տարբերակ B" : en ? "Option B" : "ვარიანტი B"}
+            className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+          />
+        </div>
+      )}
       <div className="mt-2">
         <CreditHint>
           {am
@@ -412,7 +494,13 @@ export function TarotReader({
 
           <div className="text-center">
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {am ? "Ձեր ընթերցումը" : en ? "Your reading" : "შენი კითხვა"}
+              {
+                (tarotSpreadById(reading.spreadId)?.name ?? {
+                  ka: "ტარო",
+                  en: "Tarot",
+                  am: "Տարո",
+                })[locale]
+              }
             </div>
             <h3 className="mt-1 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
               {reading.headline}

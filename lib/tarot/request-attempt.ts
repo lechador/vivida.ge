@@ -1,19 +1,26 @@
 export type TarotAttempt = {
   question: string;
+  spreadId: string;
   requestId: string;
 };
 
 /**
- * Keep one stable request id per logical tarot question. Network retries of
- * the same question reuse the id (so the server replays instead of charging
- * again); editing the question starts a new logical attempt.
+ * Keep one stable request id per logical tarot attempt (question + spread).
+ * Network retries reuse the id (so the server replays instead of charging
+ * again); editing the question or switching the spread starts a new attempt.
  */
 export function nextTarotAttempt(
   previous: TarotAttempt | null,
   question: string,
+  spreadId: string = "situation",
   createId: () => string = () => crypto.randomUUID(),
 ): TarotAttempt {
   const normalized = question.trim();
-  if (previous && previous.question === normalized) return previous;
-  return { question: normalized, requestId: createId() };
+  if (
+    previous &&
+    previous.question === normalized &&
+    previous.spreadId === spreadId
+  )
+    return previous;
+  return { question: normalized, spreadId, requestId: createId() };
 }
