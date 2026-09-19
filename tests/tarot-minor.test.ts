@@ -99,7 +99,7 @@ describe("full 78-card deck", () => {
   it("serves major art locally and minor art from R2", () => {
     expect(tarotImageUrl("the-fool")).toBe("/tarot/the-fool.webp");
     expect(tarotImageUrl("ace-of-swords")).toBe(
-      "https://example-r2.test/tarot/ace-of-swords.webp",
+      "https://example-r2.test/tarot/ace-of-swords.webp?v=2",
     );
   });
 

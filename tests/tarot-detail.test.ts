@@ -22,7 +22,7 @@ describe("tarot detail catalog", () => {
       name: "თასების ტუზი",
       arcana: "minor",
       suit: "cups",
-      image: "https://example-r2.test/tarot/ace-of-cups.webp",
+      image: "https://example-r2.test/tarot/ace-of-cups.webp?v=2",
     });
     expect(card?.eyebrow).toMatch(/მცირე არკანა/);
     expect(card?.upright.length).toBeGreaterThan(40);

@@ -40,5 +40,7 @@ export function englishCardBySlug(
 export function tarotImageUrl(slug: string): string {
   if (!MINOR_BY_SLUG[slug]) return `/tarot/${slug}.webp`;
   const base = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
-  return base ? `${base}/tarot/${slug}.webp` : `/tarot/${slug}.webp`;
+  // ?v=2 — minors were re-processed to 2:3 (blur-padded) after the first
+  // upload; the query breaks stale CDN/browser caches of the 9:16 originals.
+  return base ? `${base}/tarot/${slug}.webp?v=2` : `/tarot/${slug}.webp`;
 }
