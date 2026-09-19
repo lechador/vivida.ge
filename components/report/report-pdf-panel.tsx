@@ -7,6 +7,7 @@ import { pdfReports } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import { CREDIT_COST, getBalance } from "@/lib/credits";
 import { BuyReportCta } from "./buy-report-cta";
+import { ReportDownloadButton, ReportOpenTracker } from "./report-trackers";
 import { SendReportEmailButton } from "./send-report-email-button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
@@ -45,6 +46,7 @@ export async function ReportPdfPanel({
   if (report?.status === "ready") {
     return (
       <div className="rounded-2xl border border-[var(--vivida-cyan)]/30 bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
+        <ReportOpenTracker locale={locale} />
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-[var(--vivida-cyan)]" />
@@ -63,10 +65,10 @@ export async function ReportPdfPanel({
           </div>
           <div className="flex shrink-0 flex-col items-stretch gap-2 sm:min-w-52">
             <Button asChild variant="mystic" size="lg">
-              <a href={`/api/reports/${report.id}/download`}>
+              <ReportDownloadButton reportId={report.id} locale={locale}>
                 <Download className="size-4" />
                 {en ? "Download PDF" : "ჩამოტვირთე PDF"}
-              </a>
+              </ReportDownloadButton>
             </Button>
             <SendReportEmailButton reportId={report.id} locale={locale} />
           </div>

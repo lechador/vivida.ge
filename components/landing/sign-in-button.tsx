@@ -39,15 +39,15 @@ export function SignInButton({
               surface: "home_hero",
               method: "google",
             });
-            await signInWithGoogle("/dashboard");
+            await signInWithGoogle("/post-login");
           })
         }
         className="relative bg-[linear-gradient(120deg,var(--vivida-cyan),var(--vivida-pink))] shadow-[0_14px_44px_-10px_oklch(0.78_0.18_200/0.55)]"
       >
         <Sparkles className="size-5" />
         {isPending
-          ? loadingLabel ?? "ვარსკვლავებს ვალაგებთ…"
-          : label ?? "შექმენი შენი რუკა ახლავე"}
+          ? (loadingLabel ?? "ვარსკვლავებს ვალაგებთ…")
+          : (label ?? "შექმენი შენი რუკა ახლავე")}
       </Button>
     </motion.div>
   );

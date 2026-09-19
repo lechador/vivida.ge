@@ -149,7 +149,7 @@ export default async function CreditsPage({
       <Starfield count={110} shooting={2} />
       <AppHeader authed />
       <Suspense fallback={null}>
-        <CheckoutSuccessTracker />
+        <CheckoutSuccessTracker locale={locale} />
       </Suspense>
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">

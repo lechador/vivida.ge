@@ -103,7 +103,12 @@ export function StepDate({
       </div>
 
       <div className="mx-auto max-w-md space-y-1.5">
-        <Label>{genderLabel}</Label>
+        <Label>
+          {genderLabel}{" "}
+          <span className="font-normal text-muted-foreground">
+            ({en ? "optional" : "სურვილისამებრ"})
+          </span>
+        </Label>
         <div className="grid grid-cols-2 gap-3">
           {(
             [

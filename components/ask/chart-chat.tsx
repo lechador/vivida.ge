@@ -5,7 +5,7 @@ import { Send, Sparkles } from "lucide-react";
 
 import { CreditHint } from "@/components/credits/credit-hint";
 import type { UserLocale } from "@/lib/i18n/user-locale";
-import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT, productEventBase, trackEvent } from "@/lib/analytics";
 import {
   chartStarterOptions,
   chartStarterText,
@@ -114,15 +114,25 @@ export function ChartChat({
       }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+      let answeredChars = 0;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
+        answeredChars += chunk.length;
         setMessages((prev) => {
           const copy = [...prev];
           const last = copy[copy.length - 1];
           copy[copy.length - 1] = { ...last, content: last.content + chunk };
           return copy;
+        });
+      }
+      // Stream finished without error = the user received a full answer.
+      // (Error branches above return early, so this only fires on success.)
+      if (answeredChars > 0) {
+        trackEvent(ANALYTICS_EVENT.aiAnswerCompleted, {
+          ...productEventBase("ai_chat", "chart_chat", locale),
+          outcome: "answered",
         });
       }
     } catch {

@@ -9,7 +9,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /** Compact Google sign-in button for the /login and /signup forms. */
 export function GoogleButton({
-  callbackUrl = "/dashboard",
+  callbackUrl = "/post-login",
   label,
   locale = "ka",
 }: {
@@ -41,7 +41,8 @@ export function GoogleButton({
         ? locale !== "ka"
           ? "Connecting…"
           : "ვაკავშირდებით…"
-        : label ?? (locale !== "ka" ? "Continue with Google" : "შემოდი Google-ით")}
+        : (label ??
+          (locale !== "ka" ? "Continue with Google" : "შემოდი Google-ით"))}
     </Button>
   );
 }

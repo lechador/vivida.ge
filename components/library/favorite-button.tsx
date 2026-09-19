@@ -5,16 +5,19 @@ import { Star } from "lucide-react";
 
 import { setLibraryFavorite } from "@/actions/library";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { ANALYTICS_EVENT, productEventBase, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 export function LibraryFavoriteButton({
   entryId,
   initialFavorite,
   locale,
+  surface = "library_card",
 }: {
   entryId: string;
   initialFavorite: boolean;
   locale: UserLocale;
+  surface?: string;
 }) {
   const [favorite, setFavorite] = useState(initialFavorite);
   const [pending, startTransition] = useTransition();
@@ -39,6 +42,10 @@ export function LibraryFavoriteButton({
         startTransition(async () => {
           try {
             await setLibraryFavorite(entryId, next);
+            trackEvent(ANALYTICS_EVENT.libraryItemFavorited, {
+              ...productEventBase("library", surface, locale),
+              outcome: next ? "favorited" : "unfavorited",
+            });
           } catch {
             setFavorite(!next);
           }

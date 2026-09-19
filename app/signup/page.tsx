@@ -39,7 +39,10 @@ export default async function SignupPage({
   const locale = await getRequestLocale();
   const en = locale !== "ka";
   const session = await auth();
-  if (session?.user?.id) redirect(dest ?? "/dashboard");
+  if (session?.user?.id)
+    redirect(
+      dest ? `/post-login?next=${encodeURIComponent(dest)}` : "/post-login",
+    );
 
   const loginHref = dest ? `/login?next=${encodeURIComponent(dest)}` : "/login";
 
@@ -68,12 +71,20 @@ export default async function SignupPage({
         <GoogleButton
           locale={locale}
           label={en ? "Sign up with Google" : "რეგისტრაცია Google-ით"}
-          callbackUrl={dest ?? "/dashboard"}
+          callbackUrl={
+            dest
+              ? `/post-login?next=${encodeURIComponent(dest)}`
+              : "/post-login"
+          }
         />
         <AppleButton
           locale={locale}
           label={en ? "Sign up with Apple" : "რეგისტრაცია Apple-ით"}
-          callbackUrl={dest ?? "/dashboard"}
+          callbackUrl={
+            dest
+              ? `/post-login?next=${encodeURIComponent(dest)}`
+              : "/post-login"
+          }
         />
       </div>
       <AuthDivider locale={locale} />

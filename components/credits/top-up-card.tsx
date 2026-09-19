@@ -34,6 +34,7 @@ export function TopUpCard({
   const en = locale !== "ka";
   const packs = creditPacksForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const deficit =
     neededCredits && neededCredits > balance ? neededCredits - balance : null;
   const recommendedId = deficit
@@ -60,6 +61,7 @@ export function TopUpCard({
       currency: selected?.currency,
     });
     setPending(packId);
+    setError(null);
     try {
       const r = await fetch("/api/credits/checkout", {
         method: "POST",
@@ -72,6 +74,7 @@ export function TopUpCard({
         value?: number;
         currency?: string;
         contentId?: string;
+        error?: string;
       };
       if (data.url) {
         const params = {
@@ -87,8 +90,35 @@ export function TopUpCard({
           currency: data.currency,
         });
         window.location.assign(data.url);
-      } else setPending(null);
+        return;
+      }
+      // No URL — visible failure, safe to retry (each attempt mints a fresh
+      // Stripe session; nothing is charged until checkout completes there).
+      const reason = !r.ok ? `http_${r.status}` : "no_url";
+      trackEvent(ANALYTICS_EVENT.checkoutFailed, {
+        product: packId,
+        surface: "credits_hub",
+        payment_model: "one_time",
+        reason,
+      });
+      setError(
+        en
+          ? "Checkout could not start. Check your connection and try again — you won't be charged twice."
+          : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ — ორჯერ ჩამოჭრა არ მოხდება.",
+      );
+      setPending(null);
     } catch {
+      trackEvent(ANALYTICS_EVENT.checkoutFailed, {
+        product: packId,
+        surface: "credits_hub",
+        payment_model: "one_time",
+        reason: "network",
+      });
+      setError(
+        en
+          ? "Checkout could not start. Check your connection and try again — you won't be charged twice."
+          : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ — ორჯერ ჩამოჭრა არ მოხდება.",
+      );
       setPending(null);
     }
   }
@@ -186,6 +216,11 @@ export function TopUpCard({
           ? "Select a pack to continue to secure checkout."
           : "ღილაკზე დაჭერით პირდაპირ გადახდაზე გადახვალ."}
       </p>
+      {error && (
+        <p role="alert" className="mt-2 text-center text-xs text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

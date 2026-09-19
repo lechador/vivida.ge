@@ -41,7 +41,10 @@ export default async function LoginPage({
   const locale = await getRequestLocale();
   const en = locale !== "ka";
   const session = await auth();
-  if (session?.user?.id) redirect(dest ?? "/dashboard");
+  if (session?.user?.id)
+    redirect(
+      dest ? `/post-login?next=${encodeURIComponent(dest)}` : "/post-login",
+    );
 
   return (
     <AuthLayout
@@ -63,8 +66,22 @@ export default async function LoginPage({
       }
     >
       <div className="space-y-3">
-        <GoogleButton locale={locale} callbackUrl={dest ?? "/dashboard"} />
-        <AppleButton locale={locale} callbackUrl={dest ?? "/dashboard"} />
+        <GoogleButton
+          locale={locale}
+          callbackUrl={
+            dest
+              ? `/post-login?next=${encodeURIComponent(dest)}`
+              : "/post-login"
+          }
+        />
+        <AppleButton
+          locale={locale}
+          callbackUrl={
+            dest
+              ? `/post-login?next=${encodeURIComponent(dest)}`
+              : "/post-login"
+          }
+        />
       </div>
       <AuthDivider locale={locale} />
       {/* useSearchParams in LoginForm requires a Suspense boundary. */}

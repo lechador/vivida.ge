@@ -9,6 +9,7 @@ import { CornerDownLeft, Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { ANALYTICS_EVENT, productEventBase, trackEvent } from "@/lib/analytics";
 
 type Result = {
   userId: string;
@@ -32,6 +33,22 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  // W04 search funnel — fire search_opened once per mount, and no_result at
+  // most once per distinct query (debounced fetches would otherwise spam).
+  const openedTracked = useRef(false);
+  const noResultTracked = useRef<Set<string>>(new Set());
+
+  function trackResultSelected(username: string) {
+    trackEvent(ANALYTICS_EVENT.searchResultSelected, {
+      ...productEventBase("search", "authed_header", locale),
+      result_type: "people",
+      // selection rate per surface is what the funnel needs.
+      outcome: "selected",
+    });
+    router.push(`/u/${username}`);
+    setOpen(false);
+    setQuery("");
+  }
 
   // Debounced fetch — only when the trimmed query is long enough.
   // Stale results from a longer prior query stay in state but the dropdown
@@ -55,6 +72,25 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
         setResults(data.results ?? []);
         setHighlight(0);
         setOpen(true);
+        if (!openedTracked.current) {
+          openedTracked.current = true;
+          trackEvent(ANALYTICS_EVENT.searchOpened, {
+            ...productEventBase("search", "authed_header", locale),
+            result_type: "people",
+          });
+        }
+        if (
+          (data.results ?? []).length === 0 &&
+          trimmed.length >= 3 &&
+          !noResultTracked.current.has(trimmed) &&
+          noResultTracked.current.size < 50
+        ) {
+          noResultTracked.current.add(trimmed);
+          trackEvent(ANALYTICS_EVENT.searchNoResult, {
+            ...productEventBase("search", "authed_header", locale),
+            result_type: "people",
+          });
+        }
       } catch (e) {
         if ((e as Error).name !== "AbortError") setResults([]);
       } finally {
@@ -65,7 +101,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
       clearTimeout(t);
       ctrl.abort();
     };
-  }, [trimmed, hasQuery]);
+  }, [trimmed, hasQuery, locale]);
 
   // Click outside closes
   useEffect(() => {
@@ -114,9 +150,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
               setHighlight((h) => Math.max(h - 1, 0));
             } else if (e.key === "Enter" && results[highlight]) {
               e.preventDefault();
-              router.push(`/u/${results[highlight].username}`);
-              setOpen(false);
-              setQuery("");
+              trackResultSelected(results[highlight].username);
             } else if (e.key === "Escape") {
               setOpen(false);
               inputRef.current?.blur();
@@ -134,9 +168,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
             onClick={() => {
               const target = results[highlight];
               if (target) {
-                router.push(`/u/${target.username}`);
-                setOpen(false);
-                setQuery("");
+                trackResultSelected(target.username);
               } else {
                 inputRef.current?.focus();
               }
@@ -155,6 +187,11 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
               <Link
                 href={`/u/${r.username}`}
                 onClick={() => {
+                  trackEvent(ANALYTICS_EVENT.searchResultSelected, {
+                    ...productEventBase("search", "authed_header", locale),
+                    result_type: "people",
+                    outcome: "selected",
+                  });
                   setOpen(false);
                   setQuery("");
                 }}

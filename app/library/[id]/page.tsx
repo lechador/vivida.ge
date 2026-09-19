@@ -13,6 +13,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
 import { LibraryFavoriteButton } from "@/components/library/favorite-button";
 import { LibraryNoteEditor } from "@/components/library/note-editor";
+import { LibraryOpenTracker } from "@/components/library/open-tracker";
 import {
   dailyLibraryDate,
   libraryKindLabel,
@@ -68,6 +69,7 @@ export default async function LibraryEntryPage({
       />
       <Starfield count={110} shooting={2} />
       <AppHeader authed active="library" />
+      <LibraryOpenTracker kind={entry.kind} locale={locale} />
 
       <article className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-28 pt-6 sm:px-6 sm:pt-10 lg:pb-16">
         <Link
@@ -102,6 +104,7 @@ export default async function LibraryEntryPage({
               entryId={entry.id}
               initialFavorite={entry.favorite}
               locale={locale}
+              surface="library_detail"
             />
           </div>
         </header>

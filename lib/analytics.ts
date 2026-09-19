@@ -61,9 +61,27 @@ export const ANALYTICS_EVENT = {
   proExposure: "pro_exposure",
   experimentAssigned: "experiment_assigned",
   checkoutStarted: "checkout_started",
+  checkoutFailed: "checkout_failed",
+  checkoutCancelReturn: "checkout_cancel_return",
   checkoutSuccess: "checkout_success",
   purchaseCompleted: "purchase_completed",
+  entitlementActivated: "entitlement_activated",
   subscriptionStarted: "subscription_started",
+  aiAnswerCompleted: "ai_answer_completed",
+  libraryItemOpened: "library_item_opened",
+  libraryItemFavorited: "library_item_favorited",
+  libraryNoteSaved: "library_note_saved",
+  reportReady: "report_ready",
+  reportOpened: "report_opened",
+  reportDownloaded: "report_downloaded",
+  relationshipInsightOpened: "relationship_insight_opened",
+  timingWindowOpened: "timing_window_opened",
+  searchOpened: "search_opened",
+  searchResultSelected: "search_result_selected",
+  searchNoResult: "search_no_result",
+  navItemSelected: "nav_item_selected",
+  emptyStateSeen: "empty_state_seen",
+  onboardingAbandoned: "onboarding_abandoned",
 } as const;
 
 export type AnalyticsEventName =
@@ -79,9 +97,38 @@ const VALUE_ACTION_EVENTS = new Set<AnalyticsEventName>([
   ANALYTICS_EVENT.natalChartComputed,
   ANALYTICS_EVENT.publicHoroscopeRead,
   ANALYTICS_EVENT.dailyHoroscopeRead,
+  ANALYTICS_EVENT.dailyRitualCompleted,
   ANALYTICS_EVENT.tarotReadingCompleted,
+  ANALYTICS_EVENT.tarotFollowupCompleted,
+  ANALYTICS_EVENT.aiAnswerCompleted,
+  ANALYTICS_EVENT.libraryItemOpened,
+  ANALYTICS_EVENT.reportOpened,
+  ANALYTICS_EVENT.relationshipInsightOpened,
+  ANALYTICS_EVENT.timingWindowOpened,
   ANALYTICS_EVENT.testCompleted,
 ]);
+
+/**
+ * W04 event contract: every product event carries these dimensions so
+ * funnels split by platform / feature / surface / locale without new
+ * instrumentation. `v` is the contract version — bump it if a shared
+ * param is renamed. Never put user IDs, birth data, or free text here.
+ */
+export const EVENT_CONTRACT_VERSION = 1;
+
+export function productEventBase(
+  feature: string,
+  surface: string,
+  locale: string,
+): GtagParams {
+  return {
+    platform: "web",
+    feature,
+    surface,
+    locale,
+    v: EVENT_CONTRACT_VERSION,
+  };
+}
 
 /**
  * GA4 reserves these event-parameter names for campaign attribution. Sending

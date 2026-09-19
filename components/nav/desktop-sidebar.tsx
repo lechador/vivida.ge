@@ -4,6 +4,7 @@ import { MessageCircle } from "lucide-react";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { cn } from "@/lib/utils";
 import { MessagesTabBadge } from "./messages-tab-badge";
+import { NavItemLink } from "./nav-item-link";
 import {
   NAV_ITEMS,
   navLabel,
@@ -83,8 +84,11 @@ export function DesktopSidebar({
             const isActive = active === item.key;
             return (
               <li key={item.key}>
-                <Link
+                <NavItemLink
                   href={item.href}
+                  itemKey={item.key}
+                  surface="desktop_sidebar"
+                  locale={locale}
                   aria-current={isActive ? "page" : undefined}
                   title={navLabel(item, locale)}
                   className={cn(
@@ -120,7 +124,7 @@ export function DesktopSidebar({
                       className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-[var(--vivida-violet)] shadow-[0_0_8px_oklch(0.65_0.24_305/0.85)]"
                     />
                   )}
-                </Link>
+                </NavItemLink>
               </li>
             );
           })}

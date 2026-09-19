@@ -51,16 +51,15 @@ async function clientIpFromHeaders(): Promise<string> {
 // ─── OAuth (existing) ────────────────────────────────────────────────────
 
 /**
- * After OAuth, land on /feed — that's the community surface and the
- * default destination once a user is set up. /feed redirects to
- * /onboarding when the profile is missing, so first-time sign-ins
- * still get funnelled through birth-data entry.
+ * After OAuth, land on /post-login — the intent-aware resolver that sends
+ * incomplete profiles to /onboarding (preserving their destination as
+ * ?next=) and complete ones straight to their goal or /dashboard.
  */
-export async function signInWithGoogle(callbackUrl: string = "/dashboard") {
+export async function signInWithGoogle(callbackUrl: string = "/post-login") {
   await signIn("google", { redirectTo: callbackUrl });
 }
 
-export async function signInWithApple(callbackUrl: string = "/dashboard") {
+export async function signInWithApple(callbackUrl: string = "/post-login") {
   await signIn("apple", { redirectTo: callbackUrl });
 }
 
@@ -68,7 +67,8 @@ export async function signOutAction() {
   await signOut({ redirectTo: "/" });
 }
 
-const TURNSTILE_ERROR_EN = "We could not verify that you are human. Please try again.";
+const TURNSTILE_ERROR_EN =
+  "We could not verify that you are human. Please try again.";
 
 function localized(locale: UserLocale, ka: string, en: string): string {
   // Georgian for Georgian, English for everyone else. Testing `=== "en"` sent
@@ -83,7 +83,11 @@ function registerError(error: string, locale: UserLocale): string {
     case "invalid_name":
       return localized(locale, "შეიყვანე შენი სახელი", "Enter your name");
     case "invalid_email":
-      return localized(locale, "არასწორი ელფოსტა", "Enter a valid email address");
+      return localized(
+        locale,
+        "არასწორი ელფოსტა",
+        "Enter a valid email address",
+      );
     case "weak_password":
       return localized(
         locale,
@@ -120,7 +124,7 @@ export type SignUpInput = {
 export type SignUpResult = { ok: true } | { ok: false; error: string };
 
 export async function signUpWithEmail(
-  input: SignUpInput
+  input: SignUpInput,
 ): Promise<SignUpResult> {
   // Sign-up runs on the shared, unprefixed /signup route, so the host cannot
   // tell an Armenian visitor from an English one — see getSignupLocale.
@@ -173,7 +177,7 @@ export async function signUpWithEmail(
     } catch (err) {
       console.warn(
         "[signUpWithEmail] background verification email failed:",
-        (err as Error).message
+        (err as Error).message,
       );
     }
   });
@@ -184,8 +188,7 @@ export async function signUpWithEmail(
 // ─── Resend verification ─────────────────────────────────────────────────
 
 export type RequestVerificationResult =
-  | { ok: true }
-  | { ok: false; error: string };
+  { ok: true } | { ok: false; error: string };
 
 /**
  * Re-issue a verification email for an unverified user. Always returns
@@ -200,7 +203,11 @@ export async function requestVerificationEmail(input: {
   if (!isValidEmail(email)) {
     return {
       ok: false,
-      error: localized(locale, "არასწორი ელფოსტა", "Enter a valid email address"),
+      error: localized(
+        locale,
+        "არასწორი ელფოსტა",
+        "Enter a valid email address",
+      ),
     };
   }
 
@@ -217,7 +224,7 @@ export async function requestVerificationEmail(input: {
     } catch (err) {
       console.warn(
         "[requestVerificationEmail] send failed:",
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }
@@ -227,15 +234,14 @@ export async function requestVerificationEmail(input: {
 // ─── Verify-email link handler ───────────────────────────────────────────
 
 export type VerifyEmailResult =
-  | { ok: true; userId: string }
-  | { ok: false; error: "invalid" | "expired" };
+  { ok: true; userId: string } | { ok: false; error: "invalid" | "expired" };
 
 /**
  * Consume a verification token. Called from `/api/auth/verify-email`.
  * Thin re-export of the shared core so the route's import is unchanged.
  */
 export async function verifyEmailToken(
-  token: string
+  token: string,
 ): Promise<VerifyEmailResult> {
   return consumeEmailVerifyToken(token);
 }
@@ -243,8 +249,7 @@ export async function verifyEmailToken(
 // ─── Verify-email OTP code (link alternative) ────────────────────────────
 
 export type VerifyCodeResult =
-  | { ok: true; signedIn: boolean }
-  | { ok: false; error: string };
+  { ok: true; signedIn: boolean } | { ok: false; error: string };
 
 /**
  * Verify an account by the 6-digit code from the email — the easier path for
@@ -270,7 +275,11 @@ export async function verifyEmailWithCode(input: {
   if (!isValidEmail(email)) {
     return {
       ok: false,
-      error: localized(locale, "არასწორი ელფოსტა", "Enter a valid email address"),
+      error: localized(
+        locale,
+        "არასწორი ელფოსტა",
+        "Enter a valid email address",
+      ),
     };
   }
 
@@ -303,8 +312,16 @@ export async function verifyEmailWithCode(input: {
       ok: false,
       error:
         result.error === "expired"
-          ? localized(locale, "კოდს ვადა გაუვიდა. მოითხოვე ახალი.", "This code has expired. Request a new one.")
-          : localized(locale, "კოდი არასწორია. შეამოწმე და სცადე ხელახლა.", "That code is incorrect. Check it and try again."),
+          ? localized(
+              locale,
+              "კოდს ვადა გაუვიდა. მოითხოვე ახალი.",
+              "This code has expired. Request a new one.",
+            )
+          : localized(
+              locale,
+              "კოდი არასწორია. შეამოწმე და სცადე ხელახლა.",
+              "That code is incorrect. Check it and try again.",
+            ),
     };
   }
 
@@ -347,7 +364,11 @@ export async function requestPasswordReset(input: {
   if (!isValidEmail(email)) {
     return {
       ok: false,
-      error: localized(locale, "არასწორი ელფოსტა", "Enter a valid email address"),
+      error: localized(
+        locale,
+        "არასწორი ელფოსტა",
+        "Enter a valid email address",
+      ),
     };
   }
 
@@ -363,7 +384,7 @@ export async function requestPasswordReset(input: {
     } catch (err) {
       console.warn(
         "[requestPasswordReset] send failed:",
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }
@@ -385,8 +406,16 @@ export async function resetPassword(input: {
       ok: false,
       error:
         result.error === "weak_password"
-          ? localized(locale, `პაროლი მინიმუმ ${MIN_PASSWORD_LEN} სიმბოლო უნდა იყოს`, `Password must be at least ${MIN_PASSWORD_LEN} characters`)
-          : localized(locale, "ლინკი არასწორია ან ვადაგასულია", "This link is invalid or has expired"),
+          ? localized(
+              locale,
+              `პაროლი მინიმუმ ${MIN_PASSWORD_LEN} სიმბოლო უნდა იყოს`,
+              `Password must be at least ${MIN_PASSWORD_LEN} characters`,
+            )
+          : localized(
+              locale,
+              "ლინკი არასწორია ან ვადაგასულია",
+              "This link is invalid or has expired",
+            ),
     };
   }
   return { ok: true };
@@ -401,11 +430,10 @@ export type SignInInput = {
 };
 
 export type SignInResult =
-  | { ok: true }
-  | { ok: false; error: string; code?: "email_unverified" };
+  { ok: true } | { ok: false; error: string; code?: "email_unverified" };
 
 export async function signInWithEmail(
-  input: SignInInput
+  input: SignInInput,
 ): Promise<SignInResult> {
   const locale = await getRequestLocale();
   // Bot gate before we even hit the password-hash compare — keeps
@@ -441,7 +469,11 @@ export async function signInWithEmail(
     // Auth.js wraps everything as "CredentialsSignin" — treat as bad creds.
     return {
       ok: false,
-      error: localized(locale, "ელფოსტა ან პაროლი არასწორია", "Incorrect email or password"),
+      error: localized(
+        locale,
+        "ელფოსტა ან პაროლი არასწორია",
+        "Incorrect email or password",
+      ),
     };
   }
 }

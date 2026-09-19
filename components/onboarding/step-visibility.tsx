@@ -42,6 +42,7 @@ export function StepVisibility({
             value={value.username}
             onChange={(e) =>
               onChange({
+                ...value,
                 username: e.target.value.toLowerCase().replace(/\s/g, ""),
               })
             }
@@ -55,6 +56,48 @@ export function StepVisibility({
             ? "3–24 characters—only a–z, 0–9 and _"
             : "3-24 სიმბოლო — მხოლოდ a-z, 0-9 და _"}
         </p>
+      </div>
+
+      {/* W05: explicit stranger-discovery choice. On by default for new
+          accounts (public); the profile stays reachable by direct link
+          either way. */}
+      <div className="mx-auto max-w-md">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={value.discoverable}
+          onClick={() =>
+            onChange({ ...value, discoverable: !value.discoverable })
+          }
+          className="flex w-full items-start gap-3 rounded-xl border border-border bg-background/40 p-4 text-left transition-colors hover:border-[var(--vivida-violet)]/50"
+        >
+          <span
+            aria-hidden
+            className={`mt-0.5 grid h-6 w-11 shrink-0 place-items-center rounded-full transition-colors ${
+              value.discoverable
+                ? "bg-[var(--vivida-violet)]"
+                : "bg-foreground/15"
+            }`}
+          >
+            <span
+              className={`size-5 rounded-full bg-white shadow transition-transform ${
+                value.discoverable ? "translate-x-2.5" : "-translate-x-2.5"
+              }`}
+            />
+          </span>
+          <span>
+            <span className="block text-sm font-medium text-foreground">
+              {en
+                ? "Let new people discover me"
+                : "ახალმა ადამიანებმა აღმომაჩინონ"}
+            </span>
+            <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+              {en
+                ? "Off: only people with your link can open your profile. On: you can also appear in People, search and suggestions."
+                : "გამორთული: პროფილს მხოლოდ ბმულის მქონე ნახავს. ჩართული: ასევე გამოჩნდები People-ში, ძიებასა და რეკომენდაციებში."}
+            </span>
+          </span>
+        </button>
       </div>
     </div>
   );

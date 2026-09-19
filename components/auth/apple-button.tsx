@@ -9,7 +9,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /** Sign in with Apple for the shared web login and signup surfaces. */
 export function AppleButton({
-  callbackUrl = "/dashboard",
+  callbackUrl = "/post-login",
   label,
   locale = "ka",
 }: {
@@ -37,8 +37,8 @@ export function AppleButton({
         ? locale !== "ka"
           ? "Connecting…"
           : "ვაკავშირდებით…"
-        : label ??
-          (locale !== "ka" ? "Continue with Apple" : "შემოდი Apple-ით")}
+        : (label ??
+          (locale !== "ka" ? "Continue with Apple" : "შემოდი Apple-ით"))}
     </Button>
   );
 }

@@ -47,8 +47,9 @@ export const profiles = pgTable(
     /**
      * Whether this user appears on stranger-discovery surfaces: the /people
      * directory, people search, and "suggested people" rails. Default true
-     * (opt-out, toggle in Account). Their /u/[username] page stays reachable
-     * by direct link either way — this only controls being *browsable*.
+     * (public for new accounts; explicit opt-out toggle in onboarding +
+     * Account). Their /u/[username] page stays reachable by direct link
+     * either way — this only controls being *browsable*.
      */
     discoverable: boolean("discoverable").notNull().default(true),
     /** Opt-in: show the user's latest test results on their public /u/[username]

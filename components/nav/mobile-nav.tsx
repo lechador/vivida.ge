@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { NavItemLink } from "./nav-item-link";
 import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -98,10 +99,13 @@ export function MobileNav({
                     const { Icon } = item;
                     const isActive = item.key === active;
                     return (
-                      <Link
+                      <NavItemLink
                         key={item.key}
                         href={item.href}
-                        onClick={() => setOpen(false)}
+                        itemKey={item.key}
+                        surface="mobile_nav"
+                        locale={locale}
+                        onNavigate={() => setOpen(false)}
                         aria-current={isActive ? "page" : undefined}
                         className={cn(
                           "group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium transition-colors",
@@ -147,7 +151,7 @@ export function MobileNav({
                         <span className="relative z-10">
                           {navLabel(item, locale)}
                         </span>
-                      </Link>
+                      </NavItemLink>
                     );
                   })}
                 </nav>

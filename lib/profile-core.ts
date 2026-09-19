@@ -40,6 +40,10 @@ export type SaveBirthDataInput = {
   gender?: "male" | "female" | null;
   /** Optional username — wizard sets it on first save. */
   username?: string | null;
+  /** Explicit stranger-discovery choice from onboarding. Only
+      written when the caller passes a boolean — never defaulted here, so
+      mobile callers that don't send it leave the stored value untouched. */
+  discoverable?: boolean;
 };
 
 export type ProfileWriteResult = { ok: true } | { ok: false; error: string };
@@ -54,7 +58,7 @@ export type ProfileWriteResult = { ok: true } | { ok: false; error: string };
  */
 export async function saveBirthDataCore(
   userId: string,
-  input: SaveBirthDataInput
+  input: SaveBirthDataInput,
 ): Promise<ProfileWriteResult> {
   // Validation — server is the source of truth, never trust the client.
   if (!DATE_RE.test(input.dateOfBirth)) {
@@ -140,6 +144,14 @@ export async function saveBirthDataCore(
       ? { gender: input.gender, genderSource: "self" as const }
       : {};
 
+  // Explicit choice from onboarding. Written only when provided, so
+  // existing users' stored choice is never flipped by callers that don't
+  // carry it (e.g. mobile birth-data saves).
+  const discoverableFields =
+    typeof input.discoverable === "boolean"
+      ? { discoverable: input.discoverable }
+      : {};
+
   try {
     await db
       .insert(profiles)
@@ -153,6 +165,7 @@ export async function saveBirthDataCore(
         timezone: input.timezone,
         ...genderFields,
         ...(usernameProvided ? { username } : {}),
+        ...discoverableFields,
       })
       .onConflictDoUpdate({
         target: profiles.userId,
@@ -171,6 +184,7 @@ export async function saveBirthDataCore(
           timezone: input.timezone,
           ...genderFields,
           ...(usernameProvided ? { username } : {}),
+          ...discoverableFields,
           updatedAt: new Date(),
         },
       });
@@ -214,7 +228,7 @@ export type UpdatePublicProfileInput = {
  */
 export async function updatePublicProfileCore(
   userId: string,
-  input: UpdatePublicProfileInput
+  input: UpdatePublicProfileInput,
 ): Promise<{ ok: true; username: string } | { ok: false; error: string }> {
   const username = input.username.trim().toLowerCase();
   if (!username) {
@@ -278,7 +292,7 @@ export type AccountSettingsInput = {
  */
 export async function updateAccountSettingsCore(
   userId: string,
-  input: AccountSettingsInput
+  input: AccountSettingsInput,
 ): Promise<void> {
   const set: Partial<typeof profiles.$inferInsert> = {};
   if (typeof input.discoverable === "boolean") {

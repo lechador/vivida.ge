@@ -5,6 +5,7 @@ import { Check, Loader2, NotebookPen } from "lucide-react";
 
 import { saveLibraryNote } from "@/actions/library";
 import { Button } from "@/components/ui/button";
+import { ANALYTICS_EVENT, productEventBase, trackEvent } from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function LibraryNoteEditor({
@@ -62,6 +63,14 @@ export function LibraryNoteEditor({
               setSavedNote(note.trim());
               setNote(note.trim());
               setSaved(true);
+              // Note content never leaves the device in analytics — only the
+              // fact that a (non-empty) note was saved.
+              if (note.trim().length > 0) {
+                trackEvent(ANALYTICS_EVENT.libraryNoteSaved, {
+                  ...productEventBase("library", "library_detail", locale),
+                  outcome: "saved",
+                });
+              }
             });
           }}
         >

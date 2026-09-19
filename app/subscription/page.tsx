@@ -79,7 +79,7 @@ export default async function SubscriptionPage({
       <Starfield count={100} shooting={2} />
       <AppHeader authed />
       <Suspense fallback={null}>
-        <CheckoutSuccessTracker />
+        <CheckoutSuccessTracker locale={locale} />
       </Suspense>
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-7 sm:px-6 sm:pt-10">

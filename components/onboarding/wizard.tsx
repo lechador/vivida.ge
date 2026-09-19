@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 
@@ -47,7 +47,10 @@ function initialState(
       time: { hour: "", minute: "", unknown: false },
       place: null,
       gender: null,
-      visibility: { username: suggestUsername(defaultName) },
+      visibility: {
+        username: suggestUsername(defaultName),
+        discoverable: true,
+      },
     };
   }
   const [y, m, d] = (profile.dateOfBirth ?? "").split("-");
@@ -83,6 +86,8 @@ function initialState(
         : null,
     visibility: {
       username: profile.username ?? suggestUsername(defaultName),
+      // Edit flow: reflect the stored choice, never silently flip it (W05).
+      discoverable: profile.discoverable ?? true,
     },
   };
 }
@@ -188,9 +193,31 @@ export function OnboardingWizard({
 
   const currentStep = STEPS[step];
 
+  // W04: abandonment = unmount without submit (carries the last seen step).
+  // The submit path sets submittedRef first, so successful completions never
+  // fire this. Synchronous gtag survives SPA unmount.
+  const submittedRef = useRef(false);
+  const stepRef = useRef(STEPS[step]);
+  // Keep the last seen step for the abandonment event below.
+  useEffect(() => {
+    stepRef.current = STEPS[step];
+  }, [step, STEPS]);
+  useEffect(() => {
+    return () => {
+      if (!submittedRef.current) {
+        trackEvent(ANALYTICS_EVENT.onboardingAbandoned, {
+          flow,
+          step_name: stepRef.current,
+        });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const stepValid = useMemo(() => {
-    if (currentStep === "date")
-      return validateDate(data.date) !== null && data.gender !== null;
+    // Gender is optional (server stores it only for male/female) and must
+    // never block the first natal value — see W03.
+    if (currentStep === "date") return validateDate(data.date) !== null;
     if (currentStep === "time") return validateTime(data.time).ok;
     if (currentStep === "place") return data.place !== null;
     if (currentStep === "visibility")
@@ -240,6 +267,7 @@ export function OnboardingWizard({
       total_steps: STEPS.length,
       exact_time: timeRes.time ? 1 : 0,
     });
+    submittedRef.current = true;
     startTransition(async () => {
       const result = await saveProfile(
         {
@@ -251,6 +279,7 @@ export function OnboardingWizard({
           timezone: data.place!.timezone,
           gender: data.gender,
           username: data.visibility.username,
+          discoverable: data.visibility.discoverable,
         },
         next,
         !dateLocked,

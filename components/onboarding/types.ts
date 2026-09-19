@@ -6,6 +6,8 @@ export type PlaceValue = GeocodeResult | null;
 export type Gender = "male" | "female";
 export type VisibilityValue = {
   username: string;
+  /** Stranger discovery choice (/people, people search, suggestions). */
+  discoverable: boolean;
 };
 
 export type WizardData = {
