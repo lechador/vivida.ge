@@ -107,7 +107,7 @@ export function MobileNav({
                           "group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium transition-colors",
                           isActive
                             ? "text-foreground"
-                            : "text-muted-foreground hover:text-foreground"
+                            : "text-muted-foreground hover:text-foreground",
                         )}
                         style={
                           {
@@ -144,12 +144,9 @@ export function MobileNav({
                               : undefined
                           }
                         />
-                        <span className="relative z-10">{navLabel(item, locale)}</span>
-                        {item.badgeKa && (
-                          <span className="relative z-10 ml-auto rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]">
-                            {locale !== "ka" ? item.badgeEn : item.badgeKa}
-                          </span>
-                        )}
+                        <span className="relative z-10">
+                          {navLabel(item, locale)}
+                        </span>
                       </Link>
                     );
                   })}
