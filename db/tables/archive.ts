@@ -151,6 +151,14 @@ export type LibraryEntryContent =
       free?: boolean;
       /** True when the AI call failed and the static fallback was used. */
       degraded?: boolean;
+      /** Follow-up questions on the same spread, oldest first. */
+      followups?: Array<{
+        question: string;
+        answer: string;
+        degraded?: boolean;
+        charged?: number;
+        free?: boolean;
+      }>;
     }
   | {
       type: "ai";
