@@ -30,7 +30,6 @@ export function EmailLayout({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   return (
     <Html lang={locale}>
       <Head />
@@ -93,11 +92,9 @@ export function EmailLayout({
                 margin: 0,
               }}
             >
-              {am
-                ? "Այս նամակն ավտոմատ կերպով ուղարկվել է Vivida-ից։ Եթե դուք հաշիվ չեք ստեղծել, կարող եք անտեսել այս հաղորդագրությունը։"
-                : en
-                  ? "This email was sent automatically by Vivida. If you did not create an account, you can ignore this message."
-                  : "ეს წერილი ავტომატურად გამოიგზავნა vivida.ge-დან. თუ არ დარეგისტრირებულხარ, უგულებელყავი ეს შეტყობინება."}
+              {en
+                ? "This email was sent automatically by Vivida. If you did not create an account, you can ignore this message."
+                : "ეს წერილი ავტომატურად გამოიგზავნა vivida.ge-დან. თუ არ დარეგისტრირებულხარ, უგულებელყავი ეს შეტყობინება."}
             </Text>
             {unsubscribeUrl ? (
               <Text
@@ -112,11 +109,7 @@ export function EmailLayout({
                   href={unsubscribeUrl}
                   style={{ color: "#c4b5fd", textDecoration: "underline" }}
                 >
-                  {am
-                    ? "Չեղարկել բաժանորդագրությունը"
-                    : en
-                      ? "Unsubscribe"
-                      : "გამოწერის გაუქმება"}
+                  {en ? "Unsubscribe" : "გამოწერის გაუქმება"}
                 </a>
               </Text>
             ) : null}
@@ -128,8 +121,7 @@ export function EmailLayout({
 }
 
 export const buttonStyle: React.CSSProperties = {
-  background:
-    "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+  background: "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
   borderRadius: "9999px",
   color: "#0b0814",
   display: "inline-block",

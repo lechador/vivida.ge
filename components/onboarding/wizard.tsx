@@ -37,7 +37,7 @@ type Direction = 1 | -1;
 
 function initialState(
   profile: Profile | null,
-  defaultName: string | null
+  defaultName: string | null,
 ): WizardData {
   if (!profile) {
     // Seed the username from their name so they never hit an empty field
@@ -100,7 +100,6 @@ export function OnboardingWizard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   // Birth date is locked after first registration (the server enforces this
   // — see actions/profile.ts). When the user comes back to edit, hide the
   // date step entirely so they don't waste time on a read-only field, and
@@ -113,11 +112,11 @@ export function OnboardingWizard({
       dateLocked
         ? FULL_STEPS.filter((s) => s !== "date" && s !== "photos")
         : FULL_STEPS,
-    [dateLocked]
+    [dateLocked],
   );
 
   const [data, setData] = useState<WizardData>(() =>
-    initialState(initialProfile, defaultName)
+    initialState(initialProfile, defaultName),
   );
   const [step, setStep] = useState(0);
   const flow = dateLocked ? "edit" : "new";
@@ -194,7 +193,8 @@ export function OnboardingWizard({
       return validateDate(data.date) !== null && data.gender !== null;
     if (currentStep === "time") return validateTime(data.time).ok;
     if (currentStep === "place") return data.place !== null;
-    if (currentStep === "visibility") return validateVisibility(data.visibility);
+    if (currentStep === "visibility")
+      return validateVisibility(data.visibility);
     if (currentStep === "photos") return true; // photos are optional
     return false;
   }, [currentStep, data]);
@@ -230,7 +230,9 @@ export function OnboardingWizard({
     const date = validateDate(data.date);
     const timeRes = validateTime(data.time);
     if (!date || !timeRes.ok || !data.place) {
-      setError(am ? "Խնդրում ենք լրացնել բոլոր դաշտերը:" : en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.");
+      setError(
+        en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.",
+      );
       return;
     }
     trackEvent(ANALYTICS_EVENT.onboardingSubmitted, {
@@ -251,7 +253,7 @@ export function OnboardingWizard({
           username: data.visibility.username,
         },
         next,
-        !dateLocked
+        !dateLocked,
       );
       if (result && !result.ok) {
         setError(result.error);
@@ -335,7 +337,7 @@ export function OnboardingWizard({
             className={step === 0 ? "invisible" : ""}
           >
             <ArrowLeft />
-            {am ? "Ետ" : en ? "Back" : "უკან"}
+            {en ? "Back" : "უკან"}
           </Button>
 
           <Button
@@ -358,7 +360,7 @@ export function OnboardingWizard({
               </>
             ) : (
               <>
-                {am ? "Շարունակել" : en ? "Continue" : "გაგრძელება"}
+                {en ? "Continue" : "გაგრძელება"}
                 <ArrowRight />
               </>
             )}

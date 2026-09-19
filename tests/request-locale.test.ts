@@ -17,9 +17,8 @@ vi.mock("next/headers", () => ({
   },
 }));
 
-const { getRequestLocale, localeForHost, requestIsEnglishHost } = await import(
-  "@/lib/i18n/request-locale"
-);
+const { getRequestLocale, localeForHost, requestIsEnglishHost } =
+  await import("@/lib/i18n/request-locale");
 
 beforeEach(() => {
   request.host = "www.vivida.ge";
@@ -37,7 +36,6 @@ describe("localeForHost", () => {
     // the layout and public pages in Georgian (they pass no preference) and
     // the authed surfaces in another language, on the same screen.
     expect(localeForHost("www.vivida.ge", "en")).toBe("ka");
-    expect(localeForHost("www.vivida.ge", "am")).toBe("ka");
     expect(localeForHost("www.vivida.ge", "ka")).toBe("ka");
   });
 
@@ -66,7 +64,6 @@ describe("getRequestLocale", () => {
     // therefore split a single page across two languages for anyone whose
     // account was not on "ka".
     await expect(getRequestLocale("en")).resolves.toBe("ka");
-    await expect(getRequestLocale("am")).resolves.toBe("ka");
     await expect(getRequestLocale("ka")).resolves.toBe("ka");
   });
 });

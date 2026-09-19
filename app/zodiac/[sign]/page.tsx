@@ -31,15 +31,10 @@ import { ELEMENT_COLOR } from "@/lib/pdf/theme";
 import { cn } from "@/lib/utils";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacSignPageEn } from "@/components/seo/zodiac-sign-page-en";
-import { ZodiacSignPageAm } from "@/components/seo/zodiac-sign-page-am";
+
 import { ZODIAC_SIGN_EN } from "@/lib/zodiac-sign-en";
-import { ZODIAC_SIGN_AM } from "@/lib/zodiac-sign-am";
-import {
-  ARMENIAN_SITE_URL,
-  DEFAULT_OG_IMAGE,
-  ENGLISH_SITE_URL,
-  localizedAlternates,
-} from "@/lib/seo/locales";
+
+import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -65,30 +60,6 @@ export async function generateMetadata({
   const locale = await getRequestLocale();
   const accent = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
 
-  if (locale === "am") {
-    const signInfo = signMetaBySlug(sign);
-    const name = signInfo?.labelAm || meta?.labelKa || sign;
-    const amContent = ZODIAC_SIGN_AM[sign];
-    const title = `${name} կենդանակերպի նշան. Ամսաթվեր, բնավորություն, սեր և համատեղելիություն`;
-    const description = `${name} կենդանակերպի նշանի ուղեցույց. ${amContent.tagline} Բացահայտիր ամսաթվերը, բնավորության գծերը, ուժեղ կողմերը, մարտահրավերները, սերը, կարիերան և համատեղելիությունը:`;
-    const path = `/am/zodiac/${sign}`;
-    return {
-      title: { absolute: `${title} — Vivida` },
-      description,
-      alternates: localizedAlternates(path, `/zodiac/${sign}`, "am"),
-      openGraph: {
-        type: "article",
-        url: `${ARMENIAN_SITE_URL}/zodiac/${sign}`,
-        title,
-        description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-        images: [DEFAULT_OG_IMAGE],
-      },
-      twitter: { card: "summary_large_image", title, description },
-    };
-  }
-
   if (locale === "en" && meta) {
     const name = meta.labelEn;
     const title = `${name} Zodiac Sign: Dates, Traits, Love and Compatibility`;
@@ -97,7 +68,11 @@ export async function generateMetadata({
     return {
       title: { absolute: title },
       description,
-      alternates: localizedAlternates(`/zodiac/${sign}`, `/zodiac/${sign}`, "en"),
+      alternates: localizedAlternates(
+        `/zodiac/${sign}`,
+        `/zodiac/${sign}`,
+        "en",
+      ),
       openGraph: {
         type: "article",
         url: `${ENGLISH_SITE_URL}/zodiac/${sign}`,
@@ -107,7 +82,12 @@ export async function generateMetadata({
         locale: "en_US",
         images: [{ url: ogEn, width: 1200, height: 630 }],
       },
-      twitter: { card: "summary_large_image", title, description, images: [ogEn] },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [ogEn],
+      },
     };
   }
   const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(c.labelKa)}&k=${encodeURIComponent("ზოდიაქოს ნიშანი")}&a=${encodeURIComponent(accent)}`;
@@ -147,7 +127,6 @@ export default async function ZodiacSignPage({
   const { sign } = await params;
   if (!isSlug(sign)) notFound();
   const locale = await getRequestLocale();
-  if (locale === "am") return <ZodiacSignPageAm sign={sign} />;
   if (locale === "en") return <ZodiacSignPageEn sign={sign} />;
   const c = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign);

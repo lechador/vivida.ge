@@ -1,40 +1,33 @@
 import type { Metadata } from "next";
 import { MoonPhaseHub } from "@/components/seo/moon-event-pages";
-import { MOON_PHASE_META_EN, MoonPhaseHubEn } from "@/components/seo/moon-event-pages-en";
-import { MOON_PHASE_META_AM, MoonPhaseHubAm } from "@/components/seo/moon-event-pages-am";
+import {
+  MOON_PHASE_META_EN,
+  MoonPhaseHubEn,
+} from "@/components/seo/moon-event-pages-en";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
   const path = "/savse-mtvare";
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const meta = MOON_PHASE_META_AM.full;
-    return {
-      title: { absolute: `${meta.title} — Vivida` },
-      description: meta.description,
-      keywords: ["լիալուսնի օրացույց", "լիալուսին", "լիալուսնի ամսաթվեր", "լիալուսին նշաններ"],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: armenianSiteHref(path, false),
-        title: meta.title,
-        description: meta.description,
-        locale: "hy_AM",
-        siteName: "Vivida",
-      },
-      twitter: { card: "summary_large_image", title: meta.title, description: meta.description },
-    };
-  }
   if (locale === "en") {
     const meta = MOON_PHASE_META_EN.full;
     return {
       title: { absolute: meta.title },
       description: meta.description,
-      keywords: ["full moon calendar", "next full moon", "full moon dates", "full moon zodiac sign"],
+      keywords: [
+        "full moon calendar",
+        "next full moon",
+        "full moon dates",
+        "full moon zodiac sign",
+      ],
       alternates: localizedAlternates(path, path, "en"),
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
@@ -45,7 +38,11 @@ export async function generateMetadata(): Promise<Metadata> {
         locale: "en_US",
         siteName: "Vivida",
       },
-      twitter: { card: "summary_large_image", title: meta.title, description: meta.description },
+      twitter: {
+        card: "summary_large_image",
+        title: meta.title,
+        description: meta.description,
+      },
     };
   }
   const title = "სავსე მთვარე — თარიღები, დრო და მნიშვნელობა";
@@ -55,13 +52,16 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { absolute: title },
     description,
     alternates: localizedAlternates(path, path, "ka"),
-    keywords: ["სავსე მთვარე", "როდის არის სავსე მთვარე", "შემდეგი სავსე მთვარე"],
+    keywords: [
+      "სავსე მთვარე",
+      "როდის არის სავსე მთვარე",
+      "შემდეგი სავსე მთვარე",
+    ],
   };
 }
 
 export default async function Page() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <MoonPhaseHubAm kind="full" />;
   if (locale === "en") return <MoonPhaseHubEn kind="full" />;
   return <MoonPhaseHub kind="full" />;
 }

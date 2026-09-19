@@ -3,7 +3,14 @@
 import { useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, Crown, LogOut, Settings, Sparkles, User } from "lucide-react";
+import {
+  BookOpen,
+  Crown,
+  LogOut,
+  Settings,
+  Sparkles,
+  User,
+} from "lucide-react";
 
 import {
   DropdownMenu,
@@ -42,20 +49,21 @@ export function UserMenu({
 }) {
   const [isPending, startTransition] = useTransition();
   const en = locale !== "ka";
-  const am = locale === "am";
   const featuredPro = featuredPremiumPlanForCountry(countryCode);
   const proMonths = featuredPro.intervalCount ?? 1;
-  const showProEntry = isPremium || shouldShowPurchasePromotion({
-    isPremium,
-    balance: balance ?? 0,
-  });
+  const showProEntry =
+    isPremium ||
+    shouldShowPurchasePromotion({
+      isPremium,
+      balance: balance ?? 0,
+    });
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={am ? "Օգտատիրոջ ընտրացանկ" : en ? "User menu" : "მენიუ"}
+          aria-label={en ? "User menu" : "მენიუ"}
           className="relative grid size-12 shrink-0 place-items-center rounded-full border border-border bg-card/50 text-foreground/80 transition-all hover:border-foreground/30 hover:bg-card/80"
         >
           <Image
@@ -77,7 +85,9 @@ export function UserMenu({
             className="size-10 shrink-0 rounded-full border border-border/60 object-cover"
           />
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-semibold">{name ?? (am ? "Դուք" : en ? "You" : "შენ")}</div>
+            <div className="truncate text-sm font-semibold">
+              {name ?? (en ? "You" : "შენ")}
+            </div>
             {email && (
               <div className="truncate text-xs text-muted-foreground">
                 {email}
@@ -92,14 +102,14 @@ export function UserMenu({
           <DropdownMenuItem asChild>
             <Link href={`/u/${username}`} className="cursor-pointer">
               <User className="size-4" />
-              {am ? "Հանրային պրոֆիլ" : en ? "Public profile" : "საჯარო პროფილი"}
+              {en ? "Public profile" : "საჯარო პროფილი"}
             </Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild>
           <Link href="/credits" className="cursor-pointer">
             <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-            {am ? "Կրեդիտներ" : en ? "Credits" : "კრედიტები"}
+            {en ? "Credits" : "კრედიტები"}
             {typeof balance === "number" && (
               <span className="ml-auto rounded-full bg-[var(--vivida-cyan)]/15 px-2 py-0.5 text-xs font-semibold tabular-nums text-[var(--vivida-cyan)]">
                 {balance}
@@ -110,7 +120,7 @@ export function UserMenu({
         <DropdownMenuItem asChild>
           <Link href="/library" className="cursor-pointer">
             <BookOpen className="size-4 text-[var(--vivida-violet)]" />
-            {am ? "Իմ գրադարանը" : en ? "My library" : "ჩემი ბიბლიოთეკა"}
+            {en ? "My library" : "ჩემი ბიბლიოთეკა"}
           </Link>
         </DropdownMenuItem>
         {showProEntry && (
@@ -118,13 +128,23 @@ export function UserMenu({
             <Link href="/subscription" className="cursor-pointer">
               <Crown className="size-4 text-[var(--vivida-gold)]" />
               {isPremium
-                ? (am ? "Կառավարել PRO-ն" : en ? "Manage PRO" : "PRO-ს მართვა")
+                ? en
+                  ? "Manage PRO"
+                  : "PRO-ს მართვა"
                 : proMonths > 1
-                  ? (am ? `${proMonths} ամիս PRO` : en ? `${proMonths} months of PRO` : `${proMonths} თვე PRO`)
-                  : (am ? "Ստանալ PRO" : en ? "Get PRO" : "გახდი PRO")}
+                  ? en
+                    ? `${proMonths} months of PRO`
+                    : `${proMonths} თვე PRO`
+                  : en
+                    ? "Get PRO"
+                    : "გახდი PRO"}
               {!isPremium && (
                 <span className="ml-auto text-xs font-semibold text-[var(--vivida-gold)]">
-                  {formatBillingAmount(featuredPro.amountMinor, featuredPro.currency, locale)}
+                  {formatBillingAmount(
+                    featuredPro.amountMinor,
+                    featuredPro.currency,
+                    locale,
+                  )}
                 </span>
               )}
             </Link>
@@ -133,7 +153,7 @@ export function UserMenu({
         <DropdownMenuItem asChild>
           <Link href="/account" className="cursor-pointer">
             <Settings className="size-4" />
-            {am ? "Հաշիվ" : en ? "Account" : "ანგარიში"}
+            {en ? "Account" : "ანგარიში"}
           </Link>
         </DropdownMenuItem>
 
@@ -148,7 +168,13 @@ export function UserMenu({
           className="cursor-pointer text-destructive focus:text-destructive"
         >
           <LogOut className="size-4" />
-          {isPending ? (am ? "Դուրս է գալիս…" : en ? "Signing out…" : "გასვლა…") : (am ? "Դուրս գալ" : en ? "Sign out" : "გასვლა")}
+          {isPending
+            ? en
+              ? "Signing out…"
+              : "გასვლა…"
+            : en
+              ? "Sign out"
+              : "გასვლა"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

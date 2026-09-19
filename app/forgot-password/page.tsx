@@ -13,19 +13,18 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ForgotPasswordPage() {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   return (
     <AuthLayout
       locale={locale}
-      title={am ? "Վերականգնել ձեր գաղտնաբառը" : en ? "Reset your password" : "პაროლის აღდგენა"}
+      title={en ? "Reset your password" : "პაროლის აღდგენა"}
       footer={
         <>
-          {am ? "Հիշո՞ւմ եք այն" : en ? "Remember it?" : "გახსოვს?"}{" "}
+          {en ? "Remember it?" : "გახსოვს?"}{" "}
           <Link
             href="/login"
             className="text-foreground underline-offset-2 hover:underline"
           >
-            {am ? "Մուտք գործել" : en ? "Sign in" : "შესვლა"}
+            {en ? "Sign in" : "შესვლა"}
           </Link>
         </>
       }

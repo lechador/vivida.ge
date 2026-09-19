@@ -16,7 +16,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: locale !== "ka" ? "Create an account" : "რეგისტრაცია",
     // Same-path language pair — see the note in app/login/page.tsx.
-    alternates: localizedAlternates("/signup", "/signup", locale !== "ka" ? "en" : "ka"),
+    alternates: localizedAlternates(
+      "/signup",
+      "/signup",
+      locale !== "ka" ? "en" : "ka",
+    ),
   };
 }
 
@@ -34,7 +38,6 @@ export default async function SignupPage({
   const dest = safeNext(next);
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   const session = await auth();
   if (session?.user?.id) redirect(dest ?? "/dashboard");
 
@@ -43,16 +46,20 @@ export default async function SignupPage({
   return (
     <AuthLayout
       locale={locale}
-      title={am ? "Ստեղծել Ձեր հաշիվը" : en ? "Create your account" : "შექმენი შენი ანგარიში"}
-      subtitle={am ? "Դա կտևի մեկ րոպե. Ձեր տիեզերքը սպասում է։" : en ? "It takes a minute—your cosmos is waiting." : "ერთ წუთში — შენი კოსმოსი გელოდება."}
+      title={en ? "Create your account" : "შექმენი შენი ანგარიში"}
+      subtitle={
+        en
+          ? "It takes a minute—your cosmos is waiting."
+          : "ერთ წუთში — შენი კოსმოსი გელოდება."
+      }
       footer={
         <>
-          {am ? "Արդեն ունե՞ք հաշիվ։" : en ? "Already have an account?" : "უკვე გაქვს ანგარიში?"}{" "}
+          {en ? "Already have an account?" : "უკვე გაქვს ანგარიში?"}{" "}
           <Link
             href={loginHref}
             className="text-foreground underline-offset-2 hover:underline"
           >
-            {am ? "Մուտք գործել" : en ? "Sign in" : "შესვლა"}
+            {en ? "Sign in" : "შესვლა"}
           </Link>
         </>
       }
@@ -60,12 +67,12 @@ export default async function SignupPage({
       <div className="space-y-3">
         <GoogleButton
           locale={locale}
-          label={am ? "Գրանցվել Google-ի միջոցով" : en ? "Sign up with Google" : "რეგისტრაცია Google-ით"}
+          label={en ? "Sign up with Google" : "რეგისტრაცია Google-ით"}
           callbackUrl={dest ?? "/dashboard"}
         />
         <AppleButton
           locale={locale}
-          label={am ? "Գրանցվել Apple-ի միջոցով" : en ? "Sign up with Apple" : "რეგისტრაცია Apple-ით"}
+          label={en ? "Sign up with Apple" : "რეგისტრაცია Apple-ით"}
           callbackUrl={dest ?? "/dashboard"}
         />
       </div>

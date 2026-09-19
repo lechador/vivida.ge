@@ -4,7 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Compass, RotateCcw } from "lucide-react";
-import { AnimatePresence, motion, useMotionValue, animate } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  animate,
+} from "framer-motion";
 
 import { sendFriendRequest } from "@/actions/friendship";
 import { Button } from "@/components/ui/button";
@@ -94,15 +99,12 @@ export function SwipeDeck({
         onComplete: advance,
       });
     },
-    [advance, en, x]
+    [advance, en, x],
   );
 
   if (exhausted || deck.length === 0) {
     return (
-      <DeckExhausted
-        locale={locale}
-        onReshuffle={() => router.refresh()}
-      />
+      <DeckExhausted locale={locale} onReshuffle={() => router.refresh()} />
     );
   }
 
@@ -169,12 +171,11 @@ function DeckExhausted({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   return (
     <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center">
       <Compass className="mx-auto mb-3 size-8 text-muted-foreground" />
       <h2 className="text-lg font-semibold">
-        {am ? "Այսօրվա համար բոլորն այսքանն էին" : en ? "That is everyone for today" : "დღეს ეს იყო"}
+        {en ? "That is everyone for today" : "დღეს ეს იყო"}
       </h2>
       <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
         {en
@@ -184,11 +185,11 @@ function DeckExhausted({
       <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
         <Button onClick={onReshuffle} variant="outline" size="sm">
           <RotateCcw className="size-4" />
-          {am ? "Թարմացնել" : en ? "Refresh" : "ხელახლა"}
+          {en ? "Refresh" : "ხელახლა"}
         </Button>
         <Button asChild variant="ghost" size="sm">
           <Link href="/friends">
-            {am ? "Իմ ընկերները →" : en ? "My friends →" : "ჩემი მეგობრები →"}
+            {en ? "My friends →" : "ჩემი მეგობრები →"}
           </Link>
         </Button>
       </div>

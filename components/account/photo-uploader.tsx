@@ -19,9 +19,9 @@ const JPEG_QUALITY = 0.85;
 type ServerPhoto = { id: string; url: string; ready: boolean };
 
 type PendingUpload = {
-  id: string;        // local UUID for keying
-  preview: string;   // object URL
-  progress: number;  // 0..1
+  id: string; // local UUID for keying
+  preview: string; // object URL
+  progress: number; // 0..1
   error?: string;
 };
 
@@ -33,7 +33,6 @@ export function PhotoUploader({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [photos, setPhotos] = useState<ServerPhoto[]>(initial);
   const [pending, setPending] = useState<PendingUpload[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -54,21 +53,18 @@ export function PhotoUploader({
   async function uploadOne(file: File) {
     const localId = crypto.randomUUID();
     const preview = URL.createObjectURL(file);
-    setPending((p) => [
-      ...p,
-      { id: localId, preview, progress: 0 },
-    ]);
+    setPending((p) => [...p, { id: localId, preview, progress: 0 }]);
 
     const setProgress = (progress: number) => {
       setPending((p) =>
-        p.map((row) => (row.id === localId ? { ...row, progress } : row))
+        p.map((row) => (row.id === localId ? { ...row, progress } : row)),
       );
     };
     const setError = (error: string) => {
       setPending((p) =>
         p.map((row) =>
-          row.id === localId ? { ...row, error, progress: 1 } : row
-        )
+          row.id === localId ? { ...row, error, progress: 1 } : row,
+        ),
       );
     };
     const finishLocal = (photo?: ServerPhoto) => {
@@ -119,14 +115,26 @@ export function PhotoUploader({
             status: xhr.status,
             response: xhr.responseText?.slice(0, 500),
           });
-          reject(new Error(en ? `Upload failed (${xhr.status})` : `ატვირთვა ვერ შესრულდა (${xhr.status})`));
+          reject(
+            new Error(
+              en
+                ? `Upload failed (${xhr.status})`
+                : `ატვირთვა ვერ შესრულდა (${xhr.status})`,
+            ),
+          );
         };
         xhr.onerror = () => {
           // onerror with no status almost always means CORS preflight
           // rejection (R2 bucket CORS missing / not allowing this origin)
           // or a network drop.
           console.error("[photo-upload] R2 PUT network/CORS error");
-          reject(new Error(am ? "Ցանցի սխալ. խնդրում ենք նորից փորձել" : en ? "Network error — please try again" : "ქსელის შეცდომა — სცადე თავიდან"));
+          reject(
+            new Error(
+              en
+                ? "Network error — please try again"
+                : "ქსელის შეცდომა — სცადე თავიდან",
+            ),
+          );
         };
         xhr.open("PUT", uploadUrl);
         xhr.setRequestHeader("Content-Type", file.type);
@@ -153,7 +161,11 @@ export function PhotoUploader({
           ...data,
         });
         const reason = data?.error ?? `${finalRes.status}`;
-        throw new Error(en ? `Could not verify upload (${reason})` : `ვერ დადასტურდა ატვირთვა (${reason})`);
+        throw new Error(
+          en
+            ? `Could not verify upload (${reason})`
+            : `ვერ დადასტურდა ატვირთვა (${reason})`,
+        );
       }
 
       finishLocal({ id: photoId, url: publicUrl, ready: true });
@@ -171,7 +183,11 @@ export function PhotoUploader({
 
     const room = MAX_PHOTOS - totalCount;
     if (room <= 0) {
-      setTopError(am ? "Դուք արդեն ունեք առավելագույնը 6 լուսանկար" : am ? "Դուք արդեն ունեք առավելագույնը 6 լուսանկար" : en ? "You already have the maximum of 6 photos" : "მაქსიმალური 6 ფოტო უკვე გყავს");
+      setTopError(
+        en
+          ? "You already have the maximum of 6 photos"
+          : "მაქსიმალური 6 ფოტო უკვე გყავს",
+      );
       return;
     }
 
@@ -197,8 +213,13 @@ export function PhotoUploader({
 
     const msgs: string[] = [];
     if (unreadable > 0)
-      msgs.push(am ? "Այս ֆայլի ձևաչափը հնարավոր չէ բացել. փորձեք JPEG կամ PNG" : en ? "This file format cannot be opened — try JPEG or PNG" : "ფაილის ფორმატი არ იხსნება — სცადე JPEG ან PNG");
-    if (tooBig > 0) msgs.push(am ? "Ֆայլը 10 ՄԲ-ից մեծ է" : en ? "The file is larger than 10 MB" : "ფაილი 10 MB-ზე დიდია");
+      msgs.push(
+        en
+          ? "This file format cannot be opened — try JPEG or PNG"
+          : "ფაილის ფორმატი არ იხსნება — სცადე JPEG ან PNG",
+      );
+    if (tooBig > 0)
+      msgs.push(en ? "The file is larger than 10 MB" : "ფაილი 10 MB-ზე დიდია");
     if (msgs.length > 0) setTopError(msgs.join(" · "));
   }
 
@@ -224,7 +245,11 @@ export function PhotoUploader({
       });
       if (!res.ok) throw new Error(`promote failed (${res.status})`);
     } catch {
-      setTopError(am ? "Հնարավոր չեղավ հիմնական լուսանկարը դնել" : en ? "Could not set the main photo" : "მთავარი ფოტოს დაყენება ვერ მოხერხდა");
+      setTopError(
+        en
+          ? "Could not set the main photo"
+          : "მთავარი ფოტოს დაყენება ვერ მოხერხდა",
+      );
     }
   }
 
@@ -249,7 +274,7 @@ export function PhotoUploader({
         "relative overflow-hidden rounded-2xl border bg-card/65 p-6 ring-1 backdrop-blur-xl",
         isEmpty
           ? "border-[var(--vivida-violet)]/40 ring-[var(--vivida-violet)]/20"
-          : "border-border ring-foreground/5"
+          : "border-border ring-foreground/5",
       )}
     >
       {isEmpty && (
@@ -262,7 +287,13 @@ export function PhotoUploader({
       <header className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">
-            {en ? (isEmpty ? "Add your photos" : "Photos") : (isEmpty ? "დაამატე შენი ფოტოები" : "ფოტოები")}
+            {en
+              ? isEmpty
+                ? "Add your photos"
+                : "Photos"
+              : isEmpty
+                ? "დაამატე შენი ფოტოები"
+                : "ფოტოები"}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {en
@@ -288,20 +319,24 @@ export function PhotoUploader({
             "group flex w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-all",
             dragOver
               ? "border-[var(--vivida-violet)] bg-[var(--vivida-violet)]/15 scale-[1.01]"
-              : "border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/[0.04] hover:border-[var(--vivida-violet)] hover:bg-[var(--vivida-violet)]/10"
+              : "border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/[0.04] hover:border-[var(--vivida-violet)] hover:bg-[var(--vivida-violet)]/10",
           )}
         >
           <span className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-[var(--vivida-violet)]/35 to-[var(--vivida-pink)]/35 ring-1 ring-[var(--vivida-violet)]/40">
             <Camera className="size-7 text-[var(--vivida-violet)]" />
           </span>
           <div>
-            <div className="text-base font-semibold">{am ? "Ընտրեք կամ գցեք լուսանկար" : en ? "Choose or drop a photo" : "აირჩიე ან ჩააგდე ფოტო"}</div>
+            <div className="text-base font-semibold">
+              {en ? "Choose or drop a photo" : "აირჩიე ან ჩააგდე ფოტო"}
+            </div>
             <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-              {am ? "JPEG · PNG · WebP — ներառյալ բջջային լուսանկարները։ Միանգամից մինչև 6։" : en ? "JPEG · PNG · WebP — including mobile photos. Up to 6 at once." : "JPEG · PNG · WebP — მობილურიდანაც. 6-მდე ფოტო ერთად."}
+              {en
+                ? "JPEG · PNG · WebP — including mobile photos. Up to 6 at once."
+                : "JPEG · PNG · WebP — მობილურიდანაც. 6-მდე ფოტო ერთად."}
             </p>
           </div>
           <span className="mt-1 inline-flex items-center rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2 text-sm font-medium text-white shadow-lg shadow-[var(--vivida-violet)]/25">
-            {am ? "Ընտրել ֆայլեր" : en ? "Choose files" : "ფაილის არჩევა"}
+            {en ? "Choose files" : "ფაილის არჩევა"}
           </span>
         </button>
       ) : (
@@ -338,7 +373,7 @@ export function PhotoUploader({
                 "group flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed transition-all",
                 dragOver
                   ? "border-[var(--vivida-violet)] bg-[var(--vivida-violet)]/15 scale-[1.02]"
-                  : "border-border bg-card/30 hover:border-[var(--vivida-violet)]/50 hover:bg-card/50"
+                  : "border-border bg-card/30 hover:border-[var(--vivida-violet)]/50 hover:bg-card/50",
               )}
             >
               <Camera
@@ -346,11 +381,11 @@ export function PhotoUploader({
                   "size-8 transition-colors",
                   dragOver
                     ? "text-[var(--vivida-violet)]"
-                    : "text-muted-foreground group-hover:text-foreground"
+                    : "text-muted-foreground group-hover:text-foreground",
                 )}
               />
               <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
-                {am ? "Ավելացնել լուսանկար" : en ? "Add photo" : "დაამატე ფოტო"}
+                {en ? "Add photo" : "დაამატე ფოტო"}
               </span>
               <span className="text-[10px] text-muted-foreground/70">
                 {en ? `${remaining} left` : `${remaining} დარჩა`}
@@ -380,7 +415,9 @@ export function PhotoUploader({
 
       {!isEmpty && (
         <p className="mt-4 text-xs text-muted-foreground">
-          {am ? "JPEG · PNG · WebP — բջջային լուսանկարները ավտոմատ կերպով չափափոխվում են" : en ? "JPEG · PNG · WebP — mobile photos are resized automatically" : "JPEG · PNG · WebP — მობილურიდან ავტომატურად მცირდება"}
+          {en
+            ? "JPEG · PNG · WebP — mobile photos are resized automatically"
+            : "JPEG · PNG · WebP — მობილურიდან ავტომატურად მცირდება"}
         </p>
       )}
     </div>
@@ -401,7 +438,6 @@ function PhotoTile({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   return (
     <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-border ring-1 ring-foreground/5">
       <Image
@@ -414,7 +450,7 @@ function PhotoTile({
       <button
         type="button"
         onClick={onDelete}
-        aria-label={am ? "Ջնջել" : en ? "Delete" : "წაშლა"}
+        aria-label={en ? "Delete" : "წაშლა"}
         className="absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-black/70 text-white backdrop-blur transition-opacity hover:bg-black/85 sm:opacity-0 sm:group-hover:opacity-100"
       >
         <X className="size-3.5" />
@@ -422,17 +458,17 @@ function PhotoTile({
       {isMain ? (
         <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-violet)]/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
           <Star className="size-3 fill-white" />
-          {am ? "Գլխավոր" : en ? "Main" : "მთავარი"}
+          {en ? "Main" : "მთავარი"}
         </span>
       ) : onPromote ? (
         <button
           type="button"
           onClick={onPromote}
-          aria-label={am ? "Սահմանել որպես հիմնական լուսանկար" : en ? "Set as main photo" : "მთავარ ფოტოდ დაყენება"}
+          aria-label={en ? "Set as main photo" : "მთავარ ფოტოდ დაყენება"}
           className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur transition-colors hover:bg-[var(--vivida-violet)]/90"
         >
           <Star className="size-3" />
-          {am ? "Դարձնել հիմնական" : en ? "Make main" : "მთავარი გახადე"}
+          {en ? "Make main" : "მთავარი გახადე"}
         </button>
       ) : null}
     </div>
@@ -503,7 +539,7 @@ async function compressToJpeg(file: File): Promise<File> {
     canvas.toBlob(
       (b) => (b ? resolve(b) : reject(new Error("encode failed"))),
       "image/jpeg",
-      JPEG_QUALITY
+      JPEG_QUALITY,
     );
   });
 
@@ -532,19 +568,22 @@ async function decodeViaImg(file: File): Promise<ImageBitmap> {
 
 function errorToMessage(code: string | undefined, locale: UserLocale): string {
   const en = locale !== "ka";
-  const am = locale === "am";
   switch (code) {
     case "limit_reached":
-      return en ? "You already have the maximum of 6 photos" : "მაქსიმალური 6 ფოტო უკვე გყავს";
+      return en
+        ? "You already have the maximum of 6 photos"
+        : "მაქსიმალური 6 ფოტო უკვე გყავს";
     case "invalid_type":
-      return am ? "Անվավեր ֆայլի ձևաչափ" : en ? "Invalid file format" : "ფაილის ფორმატი არასწორია";
+      return en ? "Invalid file format" : "ფაილის ფორმატი არასწორია";
     case "too_large":
-      return am ? "Ֆայլը 5 ՄԲ-ից մեծ է" : en ? "The file is larger than 5 MB" : "ფაილი 5 MB-ზე დიდია";
+      return en ? "The file is larger than 5 MB" : "ფაილი 5 MB-ზე დიდია";
     case "storage_not_configured":
-      return am ? "Լուսանկարների պահեստը կարգավորված չէ" : en ? "Photo storage is not configured" : "შენახვა ჯერ არ არის ჩართული";
+      return en
+        ? "Photo storage is not configured"
+        : "შენახვა ჯერ არ არის ჩართული";
     case "unauthorized":
-      return am ? "Խնդրում ենք նորից մուտք գործել" : en ? "Please sign in again" : "გთხოვ, ხელახლა შემოდი";
+      return en ? "Please sign in again" : "გთხოვ, ხელახლა შემოდი";
     default:
-      return am ? "Բեռնման սխալ" : en ? "Upload error" : "ატვირთვის შეცდომა";
+      return en ? "Upload error" : "ატვირთვის შეცდომა";
   }
 }

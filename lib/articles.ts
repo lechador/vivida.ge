@@ -5,11 +5,7 @@ import { unstable_cache } from "next/cache";
 import { db } from "@/db";
 import { articles, type ArticleRow } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/locale";
-import {
-  ARMENIAN_SITE_URL,
-  ENGLISH_SITE_URL,
-  GEORGIAN_SITE_URL,
-} from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 
 export const ARTICLE_CATEGORIES = [
   "psychology",
@@ -44,16 +40,11 @@ export const ARTICLE_CATEGORY_LABELS: Record<
     relationships: "Relationships",
     wellbeing: "Wellbeing",
   },
-  am: {
-    psychology: "Հոգեբանություն",
-    philosophy: "Փիլիսոփայություն",
-    "self-development": "Ինքնազարգացում",
-    relationships: "Հարաբերություններ",
-    wellbeing: "Բարեկեցություն",
-  },
 };
 
-export function isArticleCategory(value: string | undefined): value is ArticleCategory {
+export function isArticleCategory(
+  value: string | undefined,
+): value is ArticleCategory {
   return ARTICLE_CATEGORIES.includes(value as ArticleCategory);
 }
 
@@ -63,7 +54,10 @@ async function safely<T>(query: () => Promise<T>, fallback: T): Promise<T> {
     return await query();
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
-      console.warn("Article query unavailable; returning an empty result.", error);
+      console.warn(
+        "Article query unavailable; returning an empty result.",
+        error,
+      );
     }
     return fallback;
   }
@@ -160,14 +154,20 @@ const listPublishedArticlePreviewsAcrossRequests = unstable_cache(
 );
 
 export const listPublishedArticlePreviews = cache(
-  async (locale: UserLocale, requestedLimit = 60): Promise<ArticlePreview[]> => {
+  async (
+    locale: UserLocale,
+    requestedLimit = 60,
+  ): Promise<ArticlePreview[]> => {
     const limit = Math.min(Math.max(requestedLimit, 1), 60);
     return listPublishedArticlePreviewsAcrossRequests(locale, limit);
   },
 );
 
 const getPublishedArticleAcrossRequests = unstable_cache(
-  async (locale: UserLocale, slug: string): Promise<PublishedArticle | null> => {
+  async (
+    locale: UserLocale,
+    slug: string,
+  ): Promise<PublishedArticle | null> => {
     const rows = await safely(
       () =>
         db
@@ -191,7 +191,10 @@ const getPublishedArticleAcrossRequests = unstable_cache(
 );
 
 export const getPublishedArticle = cache(
-  async (locale: UserLocale, slug: string): Promise<PublishedArticle | null> => {
+  async (
+    locale: UserLocale,
+    slug: string,
+  ): Promise<PublishedArticle | null> => {
     const article = await getPublishedArticleAcrossRequests(locale, slug);
     return article ? restoreArticleDates(article) : null;
   },
@@ -219,7 +222,8 @@ const getPublishedArticleTranslationsAcrossRequests = unstable_cache(
 
 export const getPublishedArticleTranslations = cache(
   async (translationKey: string): Promise<PublishedArticle[]> => {
-    const items = await getPublishedArticleTranslationsAcrossRequests(translationKey);
+    const items =
+      await getPublishedArticleTranslationsAcrossRequests(translationKey);
     return items.map(restoreArticleDates);
   },
 );
@@ -265,7 +269,10 @@ export const listRelatedArticles = cache(
     const sameCategory = cachedSameCategory.map(restoreArticleDates);
     if (sameCategory.length >= safeLimit) return sameCategory;
 
-    const excludedIds = new Set([article.id, ...sameCategory.map((item) => item.id)]);
+    const excludedIds = new Set([
+      article.id,
+      ...sameCategory.map((item) => item.id),
+    ]);
     const recent = await listPublishedArticles(article.language as UserLocale, {
       limit: safeLimit + excludedIds.size,
     });
@@ -277,48 +284,46 @@ export const listRelatedArticles = cache(
 );
 
 const listPublishedArticleSitemapItemsAcrossRequests = unstable_cache(
-  async () => safely(
-    () =>
-      db
-        .select({
-          language: articles.language,
-          slug: articles.slug,
-          translationKey: articles.translationKey,
-          updatedAt: articles.updatedAt,
-        })
-        .from(articles)
-        .where(
-          and(
-            eq(articles.status, "published"),
-            lte(articles.publishedAt, new Date()),
-          ),
-        )
-        .orderBy(desc(articles.publishedAt)),
-    [],
-  ),
+  async () =>
+    safely(
+      () =>
+        db
+          .select({
+            language: articles.language,
+            slug: articles.slug,
+            translationKey: articles.translationKey,
+            updatedAt: articles.updatedAt,
+          })
+          .from(articles)
+          .where(
+            and(
+              eq(articles.status, "published"),
+              lte(articles.publishedAt, new Date()),
+            ),
+          )
+          .orderBy(desc(articles.publishedAt)),
+      [],
+    ),
   ["published-article-sitemap-items"],
   { revalidate: ARTICLE_REVALIDATE_SECONDS, tags: ["articles"] },
 );
 
-export const listPublishedArticleSitemapItems = cache(
-  async () => {
-    const items = await listPublishedArticleSitemapItemsAcrossRequests();
-    return items.map((item) => ({
-      ...item,
-      updatedAt: restoreDate(item.updatedAt),
-    }));
-  },
-);
+export const listPublishedArticleSitemapItems = cache(async () => {
+  const items = await listPublishedArticleSitemapItemsAcrossRequests();
+  return items.map((item) => ({
+    ...item,
+    updatedAt: restoreDate(item.updatedAt),
+  }));
+});
 
 export function articlePath(locale: UserLocale, slug?: string): string {
   const path = `/articles${slug ? `/${slug}` : ""}`;
-  return locale === "am" ? `/am${path}` : path;
+  return path;
 }
 
 export function articleUrl(locale: UserLocale, slug?: string): string {
   const path = `/articles${slug ? `/${slug}` : ""}`;
   if (locale === "ka") return `${GEORGIAN_SITE_URL}${path}`;
-  if (locale === "am") return `${ARMENIAN_SITE_URL}${path}`;
   return `${ENGLISH_SITE_URL}${path}`;
 }
 
@@ -327,10 +332,14 @@ export function readingMinutes(content: string): number {
   return Math.max(1, Math.ceil(words / 210));
 }
 
-export function formatArticleDate(date: Date | null, locale: UserLocale): string {
+export function formatArticleDate(
+  date: Date | null,
+  locale: UserLocale,
+): string {
   if (!date) return "";
-  return new Intl.DateTimeFormat(
-    locale === "ka" ? "ka-GE" : locale === "am" ? "hy-AM" : "en-US",
-    { day: "numeric", month: "long", year: "numeric" },
-  ).format(date);
+  return new Intl.DateTimeFormat(locale === "ka" ? "ka-GE" : "en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
 }

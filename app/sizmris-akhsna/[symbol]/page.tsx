@@ -8,7 +8,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { DreamSymbolPageEn } from "@/components/seo/dreams-en";
-import { DreamSymbolPageAm } from "@/components/seo/dreams-am";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   ALL_DREAM_SLUGS,
@@ -17,9 +17,13 @@ import {
   isDreamSlug,
 } from "@/lib/seo/dreams";
 import { DREAM_EN_BY_SLUG } from "@/lib/seo/dreams-en";
-import { DREAM_AM_BY_SLUG } from "@/lib/seo/dreams-am";
+
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -39,30 +43,6 @@ export async function generateMetadata({
   const s = DREAM_BY_SLUG[symbol];
   const locale = await getRequestLocale();
 
-  if (locale === "am") {
-    const content = DREAM_AM_BY_SLUG[symbol];
-    if (!content) return {};
-    const path = `/sizmris-akhsna/${symbol}`;
-    const title = `Երազում ${content.title} տեսնելու իմաստը — Երազահան`;
-    const description = `${content.summary} Իմացեք տարածված սցենարների, դրական նշանակության և զգուշացումների մասին:`;
-    return {
-      title: { absolute: `${title} — Vivida` },
-      description,
-      keywords: [`${content.title} երազում`, `${content.title} երազահան`, "երազների մեկնաբանություն"],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "article",
-        url: armenianSiteHref(path, false),
-        title,
-        description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title, description },
-    };
-  }
-
   if (locale === "en") {
     const content = DREAM_EN_BY_SLUG[symbol];
     if (!content) return {};
@@ -73,7 +53,15 @@ export async function generateMetadata({
       title: { absolute: title },
       description,
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], type: "article", url: englishSiteHref(path, false), title, description, siteName: "Vivida", locale: "en_US" },
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: englishSiteHref(path, false),
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
       twitter: { card: "summary_large_image", title, description },
     };
   }
@@ -97,7 +85,11 @@ export async function generateMetadata({
       ...s.latin,
       "sizmris axsna",
     ],
-    alternates: localizedAlternates(`/sizmris-akhsna/${symbol}`, `/sizmris-akhsna/${symbol}`, "ka"),
+    alternates: localizedAlternates(
+      `/sizmris-akhsna/${symbol}`,
+      `/sizmris-akhsna/${symbol}`,
+      "ka",
+    ),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "article",
@@ -120,11 +112,6 @@ export default async function DreamSymbolPage({
   if (!isDreamSlug(symbol)) notFound();
   const s = DREAM_BY_SLUG[symbol];
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const content = DREAM_AM_BY_SLUG[symbol];
-    if (!content) notFound();
-    return <DreamSymbolPageAm base={s} content={content} />;
-  }
   if (locale === "en") {
     const content = DREAM_EN_BY_SLUG[symbol];
     if (!content) notFound();
@@ -159,14 +146,12 @@ export default async function DreamSymbolPage({
     faqLd(faq),
   ];
 
-  const related = s.related
-    .map((slug) => DREAM_BY_SLUG[slug])
-    .filter(Boolean);
+  const related = s.related.map((slug) => DREAM_BY_SLUG[slug]).filter(Boolean);
 
   // A few more symbols to keep every page well-linked even when `related`
   // is short — orphan pages are the usual reason a cluster never indexes.
   const alsoSee = DREAM_SYMBOLS.filter(
-    (x) => x.slug !== s.slug && !s.related.includes(x.slug)
+    (x) => x.slug !== s.slug && !s.related.includes(x.slug),
   ).slice(0, 12);
 
   return (
@@ -238,9 +223,7 @@ export default async function DreamSymbolPage({
                 key={v.whenKa}
                 className="rounded-2xl border border-border/70 bg-card/40 p-4 ring-1 ring-foreground/5 sm:p-5"
               >
-                <h3 className="font-semibold text-foreground/95">
-                  {v.whenKa}
-                </h3>
+                <h3 className="font-semibold text-foreground/95">{v.whenKa}</h3>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-foreground/85">
                   {v.meansKa}
                 </p>
@@ -321,8 +304,8 @@ export default async function DreamSymbolPage({
             გაქვს კითხვა, რომელზეც სიზმარმა პასუხი არ გასცა?
           </h2>
           <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground sm:text-base">
-            დაუსვი კითხვა ტაროს და მიიღე პერსონალური პასუხი ქართულად —
-            პირველი გაშლა უფასოა.
+            დაუსვი კითხვა ტაროს და მიიღე პერსონალური პასუხი ქართულად — პირველი
+            გაშლა უფასოა.
           </p>
           <Link
             href="/taro"

@@ -17,7 +17,20 @@ const R_HOUSE_IN = 168;
 const R_TRANSIT = 192; // transiting planets ride between the two bands
 const R_NATAL = 148; // natal dots just inside the house band
 
-const SIGN_GLYPHS = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"];
+const SIGN_GLYPHS = [
+  "♈",
+  "♉",
+  "♊",
+  "♋",
+  "♌",
+  "♍",
+  "♎",
+  "♏",
+  "♐",
+  "♑",
+  "♒",
+  "♓",
+];
 
 const ELEMENT_FILL: Record<string, string> = {
   ცეცხლი: "oklch(0.55 0.2 25 / 0.08)",
@@ -73,7 +86,12 @@ function sectorPath(r1: number, r2: number, a1: number, a2: number): string {
 }
 
 /** Extrapolated longitude at time t (ms) from the server sample. */
-function lngAt(base: number, speedDegPerHour: number, sampledAt: number, t: number) {
+function lngAt(
+  base: number,
+  speedDegPerHour: number,
+  sampledAt: number,
+  t: number,
+) {
   const lng = base + (speedDegPerHour * (t - sampledAt)) / 3600_000;
   return ((lng % 360) + 360) % 360;
 }
@@ -96,7 +114,6 @@ export function LiveSky({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   // One shared 1s clock drives every readout + the wheel positions. The
   // planets move sub-pixel per tick (CSS transition smooths it), but the
   // Moon's arcsecond readout visibly counts up — that's the "it's alive"
@@ -121,7 +138,7 @@ export function LiveSky({
         const mid = clockAngle(i * 30 + 15, data.ascLng);
         return { i, path: sectorPath(R_OUTER, R_ZODIAC_IN, a1, a2), mid };
       }),
-    [data.ascLng]
+    [data.ascLng],
   );
 
   const houseSectors = useMemo(() => {
@@ -146,7 +163,11 @@ export function LiveSky({
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           className="h-auto w-full drop-shadow-[0_0_60px_oklch(0.4_0.18_300/0.35)]"
           role="img"
-          aria-label={am ? "Կենդանի երկնքի քարտեզ—մոլորակների ընթացիկ դիրքերը ձեր նատալ տներում" : en ? "Live sky chart—current planetary positions in your natal houses" : "ცოცხალი ცის რუკა — პლანეტების ამჟამინდელი პოზიციები შენს ნატალურ სახლებში"}
+          aria-label={
+            en
+              ? "Live sky chart—current planetary positions in your natal houses"
+              : "ცოცხალი ცის რუკა — პლანეტების ამჟამინდელი პოზიციები შენს ნატალურ სახლებში"
+          }
         >
           <defs>
             <radialGradient id="sky-center" cx="50%" cy="50%" r="50%">
@@ -237,7 +258,12 @@ export function LiveSky({
 
           {/* Transiting planets — the living layer */}
           {data.planets.map((p) => {
-            const lng = lngAt(p.longitude, p.speedDegPerHour, data.sampledAt, now);
+            const lng = lngAt(
+              p.longitude,
+              p.speedDegPerHour,
+              data.sampledAt,
+              now,
+            );
             const ang = clockAngle(lng, data.ascLng);
             const pos = polar(R_TRANSIT, ang);
             const accent = PLANET_ACCENT[p.key] ?? "oklch(0.85 0.05 300)";
@@ -251,7 +277,12 @@ export function LiveSky({
                 }}
               >
                 {isMoon && (
-                  <circle r="17" fill="none" stroke={accent} strokeOpacity="0.5">
+                  <circle
+                    r="17"
+                    fill="none"
+                    stroke={accent}
+                    strokeOpacity="0.5"
+                  >
                     <animate
                       attributeName="r"
                       values="15;21;15"
@@ -271,7 +302,9 @@ export function LiveSky({
                   fill="oklch(0.2 0.06 290 / 0.9)"
                   stroke={accent}
                   strokeWidth="1.3"
-                  style={{ filter: `drop-shadow(0 0 ${isMoon ? 10 : 6}px ${accent})` }}
+                  style={{
+                    filter: `drop-shadow(0 0 ${isMoon ? 10 : 6}px ${accent})`,
+                  }}
                 />
                 <text
                   textAnchor="middle"
@@ -282,12 +315,7 @@ export function LiveSky({
                   {BODIES[p.key]?.symbol ?? "•"}
                 </text>
                 {p.retrograde && (
-                  <text
-                    x="10"
-                    y="-9"
-                    fontSize="8"
-                    fill="oklch(0.72 0.22 350)"
-                  >
+                  <text x="10" y="-9" fontSize="8" fill="oklch(0.72 0.22 350)">
                     ℞
                   </text>
                 )}
@@ -311,7 +339,12 @@ export function LiveSky({
       {/* ── Planet cards ──────────────────────────────────────────── */}
       <div className="space-y-3">
         {data.planets.map((p) => {
-          const lng = lngAt(p.longitude, p.speedDegPerHour, data.sampledAt, now);
+          const lng = lngAt(
+            p.longitude,
+            p.speedDegPerHour,
+            data.sampledAt,
+            now,
+          );
           const sign = signByIndex(Math.floor(lng / 30));
           const meta = BODIES[p.key];
           const accent = PLANET_ACCENT[p.key] ?? "oklch(0.85 0.05 300)";
@@ -321,7 +354,7 @@ export function LiveSky({
             ? p.house
               ? `${meta?.labelEn ?? p.key} highlights ${HOUSES[p.house]?.themeEn.toLowerCase()}. ${HOUSES[p.house]?.meaningEn}`
               : `${meta?.labelEn ?? p.key} reflects ${meta?.meaningEn ?? "a current planetary theme"}.`
-            : p.houseText ?? p.signText;
+            : (p.houseText ?? p.signText);
           return (
             <details
               key={p.key}
@@ -341,14 +374,18 @@ export function LiveSky({
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-baseline gap-x-2">
-                    <span className="font-semibold">{en ? meta?.labelEn ?? p.key : meta?.labelKa ?? p.key}</span>
+                    <span className="font-semibold">
+                      {en ? (meta?.labelEn ?? p.key) : (meta?.labelKa ?? p.key)}
+                    </span>
                     <span className="text-sm text-muted-foreground">
                       {en ? sign.labelEn : sign.labelKa}{" "}
-                      <span className="tabular-nums">{formatDegrees(lng, isMoon)}</span>
+                      <span className="tabular-nums">
+                        {formatDegrees(lng, isMoon)}
+                      </span>
                     </span>
                     {p.retrograde && (
                       <span className="rounded-full border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/10 px-1.5 text-[10px] font-medium text-[var(--vivida-pink)]">
-                        ℞ {am ? "հետընթաց" : en ? "retrograde" : "რეტროგრადული"}
+                        ℞ {en ? "retrograde" : "რეტროგრადული"}
                       </span>
                     )}
                   </span>
@@ -362,7 +399,7 @@ export function LiveSky({
                         : "სახლის გარეშე (დაბადების დრო უცნობია)"}
                     {" · "}
                     {degPerDay >= 0.1
-                      ? `${degPerDay.toFixed(1)}°/${am ? "օր" : am ? "օր" : en ? "day" : "დღეში"}`
+                      ? `${degPerDay.toFixed(1)}°/${en ? "day" : "დღეში"}`
                       : `${(degPerDay * 60).toFixed(1)}′/${en ? "day" : "დღეში"}`}
                   </span>
                 </span>

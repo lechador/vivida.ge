@@ -4,11 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Sparkles, UserPlus, X } from "lucide-react";
-import {
-  motion,
-  type MotionValue,
-  useTransform,
-} from "framer-motion";
+import { motion, type MotionValue, useTransform } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
@@ -50,9 +46,9 @@ export function SwipeCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [photoIdx, setPhotoIdx] = useState(0);
-  const photos = card.photos.length > 0 ? card.photos : card.photoUrl ? [card.photoUrl] : [];
+  const photos =
+    card.photos.length > 0 ? card.photos : card.photoUrl ? [card.photoUrl] : [];
   const heroSrc = photos[photoIdx] ?? card.image ?? null;
 
   // Stack effect: each card behind sits a touch lower and smaller. While
@@ -62,13 +58,13 @@ export function SwipeCard({
   const followScale = useTransform(
     x,
     [-200, 0, 200],
-    [
-      Math.min(1, baseScale + 0.04),
-      baseScale,
-      Math.min(1, baseScale + 0.04),
-    ]
+    [Math.min(1, baseScale + 0.04), baseScale, Math.min(1, baseScale + 0.04)],
   );
-  const followY = useTransform(x, [-200, 0, 200], [baseY - 6, baseY, baseY - 6]);
+  const followY = useTransform(
+    x,
+    [-200, 0, 200],
+    [baseY - 6, baseY, baseY - 6],
+  );
 
   // Top-card overlays follow the drag — pink ❤ on right, red ✕ on left.
   const likeOpacity = useTransform(x, [40, 140], [0, 1]);
@@ -90,9 +86,7 @@ export function SwipeCard({
   return (
     <motion.article
       style={
-        isTop
-          ? { x, rotate: cardRotate }
-          : { scale: followScale, y: followY }
+        isTop ? { x, rotate: cardRotate } : { scale: followScale, y: followY }
       }
       drag={isTop ? "x" : false}
       dragElastic={0.7}
@@ -104,7 +98,7 @@ export function SwipeCard({
       className={cn(
         "absolute inset-0 select-none overflow-hidden rounded-3xl border-2 border-[var(--vivida-violet)]/45 bg-[oklch(0.16_0.05_290/0.95)] shadow-[0_25px_60px_-12px_oklch(0.13_0.03_280/0.7)]",
         isTop ? "cursor-grab active:cursor-grabbing" : "pointer-events-none",
-        !isTop && "shadow-none"
+        !isTop && "shadow-none",
       )}
       aria-hidden={!isTop}
     >
@@ -126,13 +120,13 @@ export function SwipeCard({
             <button
               type="button"
               onClick={prevPhoto}
-              aria-label={am ? "Նախորդ լուսանկար" : en ? "Previous photo" : "წინა ფოტო"}
+              aria-label={en ? "Previous photo" : "წინა ფოტო"}
               className="absolute inset-y-0 left-0 z-10 w-1/3"
             />
             <button
               type="button"
               onClick={nextPhoto}
-              aria-label={am ? "Հաջորդ լուսանկար" : en ? "Next photo" : "შემდეგი ფოტო"}
+              aria-label={en ? "Next photo" : "შემდეგი ფოტო"}
               className="absolute inset-y-0 right-0 z-10 w-1/3"
             />
             {/* Photo dots */}
@@ -142,9 +136,7 @@ export function SwipeCard({
                   key={i}
                   className={cn(
                     "h-1 flex-1 max-w-12 rounded-full transition-colors",
-                    i === photoIdx
-                      ? "bg-white/95"
-                      : "bg-white/25"
+                    i === photoIdx ? "bg-white/95" : "bg-white/25",
                   )}
                 />
               ))}
@@ -166,13 +158,13 @@ export function SwipeCard({
               style={{ opacity: likeOpacity }}
               className="pointer-events-none absolute left-6 top-8 z-30 rotate-[-12deg] rounded-xl border-4 border-[var(--vivida-pink)] px-3 py-1 text-2xl font-black uppercase tracking-widest text-[var(--vivida-pink)]"
             >
-              {am ? "ՄԻԱՆԱԼ" : en ? "CONNECT" : "მეგობრობა"}
+              {en ? "CONNECT" : "მეგობრობა"}
             </motion.div>
             <motion.div
               style={{ opacity: passOpacity }}
               className="pointer-events-none absolute right-6 top-8 z-30 rotate-[12deg] rounded-xl border-4 border-[var(--destructive)] px-3 py-1 text-2xl font-black uppercase tracking-widest text-[var(--destructive)]"
             >
-              {am ? "ԱՆՑՆԵԼ" : en ? "PASS" : "გავტოვო"}
+              {en ? "PASS" : "გავტოვო"}
             </motion.div>
           </>
         )}
@@ -182,19 +174,21 @@ export function SwipeCard({
           <div className="flex flex-wrap items-end gap-x-2 gap-y-1">
             <h3 className="text-pretty text-2xl font-semibold tracking-tight text-foreground">
               {card.displayName}
-              {card.verified && <VerifiedBadge className="ml-1.5 inline-flex align-middle" />}
+              {card.verified && (
+                <VerifiedBadge className="ml-1.5 inline-flex align-middle" />
+              )}
               <span className="text-foreground/85">{ageLabel}</span>
             </h3>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
-            <span
-              className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-xs text-foreground/95 backdrop-blur"
-            >
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-xs text-foreground/95 backdrop-blur">
               <span aria-hidden>{card.sunSign.symbol}</span>
               {en ? card.sunSign.labelEn : card.sunSign.labelKa}
             </span>
             <span className="text-xs text-foreground/65">
-              {en ? ELEMENT_EN[card.sunElement] ?? card.sunElement : card.sunElement}
+              {en
+                ? (ELEMENT_EN[card.sunElement] ?? card.sunElement)
+                : card.sunElement}
             </span>
           </div>
           {card.bio && (
@@ -207,14 +201,14 @@ export function SwipeCard({
               <button
                 type="button"
                 onClick={onPass}
-                aria-label={am ? "Անցնել" : en ? "Pass" : "გავტოვო"}
+                aria-label={en ? "Pass" : "გავტოვო"}
                 className="grid size-11 place-items-center rounded-full border border-[var(--destructive)]/55 bg-background/60 text-[var(--destructive)] backdrop-blur transition-all hover:scale-105 hover:bg-[var(--destructive)]/15 active:scale-95"
               >
                 <X className="size-5" />
               </button>
               <Link
                 href={`/u/${card.username}`}
-                aria-label={am ? "Պրոֆիլ" : am ? "Պրոֆիլ" : en ? "Profile" : "პროფილი"}
+                aria-label={en ? "Profile" : "პროფილი"}
                 className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-foreground/95 backdrop-blur transition-all hover:bg-white/15"
               >
                 <Sparkles className="size-3.5" />
@@ -223,7 +217,7 @@ export function SwipeCard({
               <button
                 type="button"
                 onClick={onLike}
-                aria-label={am ? "Ուղարկել ընկերության հարցում" : en ? "Send friend request" : "მეგობრობის თხოვნა"}
+                aria-label={en ? "Send friend request" : "მეგობრობის თხოვნა"}
                 className="grid size-12 place-items-center rounded-full border-2 border-[var(--vivida-pink)] bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] text-white shadow-[0_10px_28px_-8px_oklch(0.72_0.22_350/0.7)] transition-all hover:scale-105 active:scale-95"
               >
                 <UserPlus className="size-5" />
@@ -255,7 +249,7 @@ function CompatChip({ percent }: { percent: number }) {
     <span
       className={cn(
         "rounded-full border border-white/20 px-2.5 py-1 text-sm font-bold tabular-nums backdrop-blur-md",
-        styles
+        styles,
       )}
     >
       {percent}

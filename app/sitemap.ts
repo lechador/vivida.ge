@@ -12,7 +12,6 @@ import { LIFE_PATH_NUMBERS } from "@/lib/numerology";
 import { ALL_RANKING_SLUGS } from "@/lib/seo/rankings";
 import { ALL_CHINESE_SLUGS } from "@/lib/seo/chinese-zodiac";
 import { ALL_MBTI_SLUGS } from "@/lib/seo/mbti-seo";
-import { TAROT_CARDS } from "@/lib/tarot/deck";
 import { tarotDetailSlugs } from "@/lib/tarot/detail";
 import { EQ_ARTICLE_SLUGS } from "@/lib/seo/eq-articles";
 import { ALL_HOROSCOPE_THEMES, themeUrl } from "@/lib/seo/thematic-horoscope";
@@ -32,12 +31,6 @@ import {
   GEORGIAN_SITE_URL,
   isEnglishHost,
 } from "@/lib/seo/locales";
-import {
-  ARMENIAN_CORE_ROUTES,
-  hasArmenianVersion,
-  stripArmenianPrefix,
-  withArmenianPrefix,
-} from "@/lib/i18n/armenian-routes";
 import { HOUSE_NUMBERS, PLANET_SLUGS } from "@/lib/seo/astrology-guides";
 import { ALL_DREAM_SLUGS } from "@/lib/seo/dreams";
 import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
@@ -67,8 +60,6 @@ const CONTENT_PUBLISHED = new Date("2026-07-20");
 const ENGLISH_PUBLISHED = new Date("2026-07-27");
 const ENGLISH_ASTROLOGY_PUBLISHED = new Date("2026-08-13");
 const ASTROLOGY_GUIDES_PUBLISHED = new Date("2026-07-27");
-/** Armenian launch — bump as translated clusters land. */
-const ARMENIAN_PUBLISHED = new Date("2026-08-17");
 /** მკითხაობა / სიზმრის ახსნა / ანგელოზური რიცხვები clusters. */
 const NEW_CLUSTERS_PUBLISHED = new Date("2026-07-29");
 
@@ -94,10 +85,7 @@ const VIEW_PRIORITY: Record<(typeof ALL_HOROSCOPE_VIEWS)[number], number> = {
 };
 
 /**
- * Language alternates for one page, with Armenian included only where it
- * exists. Shared by the English and Armenian sections so the two can never
- * disagree about whether a page has an Armenian twin — a one-way annotation
- * is discarded by Google, which is the failure mode /features hit in Aug 2026.
+ * Language alternates for one page (Georgian ↔ English).
  */
 function alternatesFor(
   kaPath: string | null,
@@ -110,525 +98,8 @@ function alternatesFor(
     languages["ka-GE"] = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
   }
   languages.en = englishUrl;
-  if (hasArmenianVersion(enPath)) {
-    languages["hy-AM"] = `${ENGLISH_SITE_URL}${withArmenianPrefix(enPath)}`;
-  }
   languages["x-default"] = englishUrl;
   return { languages };
-}
-
-/**
- * The Armenian URLs themselves.
- *
- * They live on the international host, so they belong in *that* host's
- * sitemap — there is one sitemap.xml per domain, and vividaastro.com serves
- * English at the root and Armenian under /am.
- */
-function armenianSitemap(): MetadataRoute.Sitemap {
-  const coreEntries = ARMENIAN_CORE_ROUTES.map((path) => ({
-    url: `${ENGLISH_SITE_URL}${withArmenianPrefix(path)}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: (path === "/about" ? "yearly" : "monthly") as
-      "yearly" | "monthly",
-    priority: path === "/" ? 0.9 : path === "/about" ? 0.5 : 0.7,
-    alternates: alternatesFor(
-      CORE_LANGUAGE_PAIRS.find((pair) => pair.en === path)?.ka ?? null,
-      path,
-    ),
-  }));
-
-  const signEntries = ALL_SLUGS.map((slug) => ({
-    url: `${ENGLISH_SITE_URL}/am/zodiac/${slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.78,
-    alternates: alternatesFor(`/zodiac/${slug}`, `/zodiac/${slug}`),
-  }));
-
-  const periodEntries = (
-    ["/horoskopi", "/horoskopi/kvireuli", "/horoskopi/tviuri"] as const
-  ).map((path) => ({
-    url: `${ENGLISH_SITE_URL}/am${path}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: (path === "/horoskopi" ? "daily" : "weekly") as
-      "daily" | "weekly",
-    priority: 0.75,
-    alternates: alternatesFor(path, path),
-  }));
-
-  const signPeriodEntries = ALL_SLUGS.flatMap((sign) =>
-    ALL_HOROSCOPE_VIEWS.map((view) => {
-      const path = `/zodiac/${sign}/${VIEW_PATH[view]}`;
-      return {
-        url: `${ENGLISH_SITE_URL}/am${path}`,
-        lastModified: NOW,
-        changeFrequency: VIEW_CHANGE_FREQ[view],
-        priority: VIEW_PRIORITY[view],
-        alternates: alternatesFor(path, path),
-      };
-    }),
-  );
-
-  const yearlyEntries = ALL_YEARLY_YEARS.flatMap((year) =>
-    ALL_SLUGS.filter((sign) => yearlyContentFor(sign, year)).map((sign) => {
-      const path = `/zodiac/${sign}/${year}`;
-      return {
-        url: `${ENGLISH_SITE_URL}/am${path}`,
-        lastModified: ARMENIAN_PUBLISHED,
-        changeFrequency: "yearly" as const,
-        priority: 0.74,
-        alternates: alternatesFor(path, path),
-      };
-    }),
-  );
-
-  const zodiacGuideHubEntries = [
-    "/zodiac/mtvare",
-    "/zodiac/amomavali",
-    "/zodiac/elementebi",
-    "/zodiac/datit",
-    "/zodiac/gzamkvlevi",
-  ].map((path) => ({
-    url: `${ENGLISH_SITE_URL}/am${path}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: path === "/zodiac/gzamkvlevi" ? 0.82 : 0.78,
-    alternates: alternatesFor(path, path),
-  }));
-
-  const productGuideEntries = ["/features", "/how-it-works"].map((path) => ({
-    url: `${ENGLISH_SITE_URL}/am${path}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.65,
-    alternates: alternatesFor(path, path),
-  }));
-
-  const quizEntries = [
-    ["/quiz/namdvili-nishani", 0.8],
-    ["/quiz/varskvlavebis-zodiaqo", 0.75],
-  ] as const;
-  const armenianQuizEntries = quizEntries.map(([path, priority]) => ({
-    url: `${ENGLISH_SITE_URL}/am${path}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority,
-    alternates: alternatesFor(path, path),
-  }));
-
-  const armenianAssessmentEntries = [
-    "/pirovnebis-testi",
-    "/iq-testi",
-    "/eq-testi",
-    "/big-five",
-  ].map((path) => ({
-    url: `${ENGLISH_SITE_URL}/am${path}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.9,
-    alternates: alternatesFor(path, path),
-  }));
-
-  const placementEntries = (["mtvare", "amomavali"] as const).flatMap(
-    (placement) =>
-      ALL_SLUGS.map((sign) => {
-        const path = `/zodiac/${placement}/${sign}`;
-        return {
-          url: `${ENGLISH_SITE_URL}/am${path}`,
-          lastModified: ARMENIAN_PUBLISHED,
-          changeFrequency: "monthly" as const,
-          priority: 0.7,
-          alternates: alternatesFor(path, path),
-        };
-      }),
-  );
-
-  const elementEntries = ALL_ELEMENT_SLUGS.map((element) => {
-    const path = `/zodiac/elementebi/${element}`;
-    return {
-      url: `${ENGLISH_SITE_URL}/am${path}`,
-      lastModified: ARMENIAN_PUBLISHED,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-      alternates: alternatesFor(path, path),
-    };
-  });
-
-  const thematicHubEntries = ALL_HOROSCOPE_THEMES.map((theme) => ({
-    url: `${ENGLISH_SITE_URL}/am${themeUrl(theme)}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.78,
-    alternates: alternatesFor(themeUrl(theme), themeUrl(theme)),
-  }));
-
-  const thematicSignEntries = ALL_HOROSCOPE_THEMES.flatMap((theme) =>
-    ALL_SLUGS.map((sign) => ({
-      url: `${ENGLISH_SITE_URL}/am${themeUrl(theme, sign)}`,
-      lastModified: ARMENIAN_PUBLISHED,
-      changeFrequency: "monthly" as const,
-      priority: 0.68,
-      alternates: alternatesFor(themeUrl(theme, sign), themeUrl(theme, sign)),
-    })),
-  );
-
-  const pairEntries = ALL_PAIR_SLUGS.map((pair) => ({
-    url: `${ENGLISH_SITE_URL}/am/zodiac/tavsebadoba/${pair}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.72,
-    alternates: alternatesFor(
-      `/zodiac/tavsebadoba/${pair}`,
-      `/zodiac/tavsebadoba/${pair}`,
-    ),
-  }));
-
-  const taroHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/taro`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/taro", "/taro"),
-  };
-
-  const tarotCardEntries = TAROT_CARDS.map((card) => ({
-    url: `${ENGLISH_SITE_URL}/am/taro/${card.slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-    alternates: alternatesFor(`/taro/${card.slug}`, `/taro/${card.slug}`),
-  }));
-
-  const mbtiHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/mbti`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/mbti", "/mbti"),
-  };
-
-  const mbtiEntries = ALL_MBTI_SLUGS.map((slug) => ({
-    url: `${ENGLISH_SITE_URL}/am/mbti/${slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.72,
-    alternates: alternatesFor(`/mbti/${slug}`, `/mbti/${slug}`),
-  }));
-
-  const dreamsHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/sizmris-akhsna`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/sizmris-akhsna", "/sizmris-akhsna"),
-  };
-
-  const dreamEntries = ALL_DREAM_SLUGS.map((slug) => ({
-    url: `${ENGLISH_SITE_URL}/am/sizmris-akhsna/${slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.72,
-    alternates: alternatesFor(
-      `/sizmris-akhsna/${slug}`,
-      `/sizmris-akhsna/${slug}`,
-    ),
-  }));
-
-  const numerologyHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/numerologia`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/numerologia", "/numerologia"),
-  };
-
-  const numerologyEntries = LIFE_PATH_NUMBERS.map((number) => ({
-    url: `${ENGLISH_SITE_URL}/am/numerologia/${number}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.72,
-    alternates: alternatesFor(
-      `/numerologia/${number}`,
-      `/numerologia/${number}`,
-    ),
-  }));
-
-  const angelHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/angeluri-ricxvebi`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/angeluri-ricxvebi", "/angeluri-ricxvebi"),
-  };
-
-  const angelEntries = ALL_ANGEL_SLUGS.map((slug) => ({
-    url: `${ENGLISH_SITE_URL}/am/angeluri-ricxvebi/${slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.72,
-    alternates: alternatesFor(
-      `/angeluri-ricxvebi/${slug}`,
-      `/angeluri-ricxvebi/${slug}`,
-    ),
-  }));
-
-  const chineseHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/chinuri-horoskopi`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/chinuri-horoskopi", "/chinuri-horoskopi"),
-  };
-
-  const chineseEntries = ALL_CHINESE_SLUGS.map((slug) => ({
-    url: `${ENGLISH_SITE_URL}/am/chinuri-horoskopi/${slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.72,
-    alternates: alternatesFor(
-      `/chinuri-horoskopi/${slug}`,
-      `/chinuri-horoskopi/${slug}`,
-    ),
-  }));
-
-  const moonCalendarHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/mtvaris-kalendari`,
-    lastModified: NOW,
-    changeFrequency: "daily" as const,
-    priority: 0.85,
-    alternates: alternatesFor("/mtvaris-kalendari", "/mtvaris-kalendari"),
-  };
-
-  const savseMtvareHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/savse-mtvare`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/savse-mtvare", "/savse-mtvare"),
-  };
-
-  const savseMtvareEntries = moonEvents("full", SITEMAP_MOON_EVENT_DAYS).map(
-    (event) => ({
-      url: `${ENGLISH_SITE_URL}/am/savse-mtvare/${event.iso}`,
-      lastModified: ARMENIAN_PUBLISHED,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-      alternates: alternatesFor(
-        `/savse-mtvare/${event.iso}`,
-        `/savse-mtvare/${event.iso}`,
-      ),
-    }),
-  );
-
-  const akhaliMtvareHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/akhali-mtvare`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/akhali-mtvare", "/akhali-mtvare"),
-  };
-
-  const akhaliMtvareEntries = moonEvents("new", SITEMAP_MOON_EVENT_DAYS).map(
-    (event) => ({
-      url: `${ENGLISH_SITE_URL}/am/akhali-mtvare/${event.iso}`,
-      lastModified: ARMENIAN_PUBLISHED,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-      alternates: alternatesFor(
-        `/akhali-mtvare/${event.iso}`,
-        `/akhali-mtvare/${event.iso}`,
-      ),
-    }),
-  );
-
-  const astrologyCalendarHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/astrologiuri-kalendari`,
-    lastModified: NOW,
-    changeFrequency: "daily" as const,
-    priority: 0.8,
-    alternates: alternatesFor(
-      "/astrologiuri-kalendari",
-      "/astrologiuri-kalendari",
-    ),
-  };
-
-  const astrologyCalendarEntries = calendarWindow(SITEMAP_CALENDAR_DAYS).map(
-    (day) => ({
-      url: `${ENGLISH_SITE_URL}/am/astrologiuri-kalendari/${day.iso}`,
-      lastModified: ARMENIAN_PUBLISHED,
-      changeFrequency: "daily" as const,
-      priority: 0.65,
-      alternates: alternatesFor(
-        `/astrologiuri-kalendari/${day.iso}`,
-        `/astrologiuri-kalendari/${day.iso}`,
-      ),
-    }),
-  );
-
-  const luckyDaysEntry = {
-    url: `${ENGLISH_SITE_URL}/am/ighbliani-dgheebi`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "weekly" as const,
-    priority: 0.75,
-    alternates: alternatesFor("/ighbliani-dgheebi", "/ighbliani-dgheebi"),
-  };
-
-  const cautionDaysEntry = {
-    url: `${ENGLISH_SITE_URL}/am/frtxili-dgheebi`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "weekly" as const,
-    priority: 0.75,
-    alternates: alternatesFor("/frtxili-dgheebi", "/frtxili-dgheebi"),
-  };
-
-  const eclipseHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/dabnelebebi`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/dabnelebebi", "/dabnelebebi"),
-  };
-
-  const eclipseEntries = ECLIPSES.map((eclipse) => ({
-    url: `${ENGLISH_SITE_URL}/am/dabnelebebi/${eclipse.slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-    alternates: alternatesFor(
-      `/dabnelebebi/${eclipse.slug}`,
-      `/dabnelebebi/${eclipse.slug}`,
-    ),
-  }));
-
-  const retrogradeHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/merkuri-retrogradi`,
-    lastModified: NOW,
-    changeFrequency: "daily" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/merkuri-retrogradi", "/merkuri-retrogradi"),
-  };
-
-  const rankingsHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/zodiac/reitingebi`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-    alternates: alternatesFor("/zodiac/reitingebi", "/zodiac/reitingebi"),
-  };
-
-  const rankingEntries = ALL_RANKING_SLUGS.map((slug) => ({
-    url: `${ENGLISH_SITE_URL}/am/zodiac/reitingebi/${slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.72,
-    alternates: alternatesFor(
-      `/zodiac/reitingebi/${slug}`,
-      `/zodiac/reitingebi/${slug}`,
-    ),
-  }));
-
-  const eqHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/emociuri-inteleqti`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.76,
-    alternates: alternatesFor("/emociuri-inteleqti", "/emociuri-inteleqti"),
-  };
-
-  const eqArticleEntries = EQ_ARTICLE_SLUGS.map((slug) => ({
-    url: `${ENGLISH_SITE_URL}/am/emociuri-inteleqti/${slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.68,
-    alternates: alternatesFor(
-      `/emociuri-inteleqti/${slug}`,
-      `/emociuri-inteleqti/${slug}`,
-    ),
-  }));
-
-  const armenianHousesHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/astrologiuri-saxlebi`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.82,
-    alternates: alternatesFor("/astrologiuri-saxlebi", "/astrologiuri-saxlebi"),
-  };
-
-  const armenianHouseEntries = HOUSE_NUMBERS.map((number) => ({
-    url: `${ENGLISH_SITE_URL}/am/astrologiuri-saxlebi/${number}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.72,
-    alternates: alternatesFor(
-      `/astrologiuri-saxlebi/${number}`,
-      `/astrologiuri-saxlebi/${number}`,
-    ),
-  }));
-
-  const armenianPlanetsHubEntry = {
-    url: `${ENGLISH_SITE_URL}/am/planetebi`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.82,
-    alternates: alternatesFor("/planetebi", "/planetebi"),
-  };
-
-  const armenianPlanetEntries = PLANET_SLUGS.map((slug) => ({
-    url: `${ENGLISH_SITE_URL}/am/planetebi/${slug}`,
-    lastModified: ARMENIAN_PUBLISHED,
-    changeFrequency: "monthly" as const,
-    priority: 0.72,
-    alternates: alternatesFor(`/planetebi/${slug}`, `/planetebi/${slug}`),
-  }));
-
-  return [
-    ...coreEntries,
-    ...signEntries,
-    ...periodEntries,
-    ...signPeriodEntries,
-    ...yearlyEntries,
-    ...zodiacGuideHubEntries,
-    ...productGuideEntries,
-    ...armenianQuizEntries,
-    ...armenianAssessmentEntries,
-    ...placementEntries,
-    ...elementEntries,
-    ...thematicHubEntries,
-    ...thematicSignEntries,
-    ...pairEntries,
-    taroHubEntry,
-    ...tarotCardEntries,
-    mbtiHubEntry,
-    ...mbtiEntries,
-    dreamsHubEntry,
-    ...dreamEntries,
-    numerologyHubEntry,
-    ...numerologyEntries,
-    angelHubEntry,
-    ...angelEntries,
-    chineseHubEntry,
-    ...chineseEntries,
-    moonCalendarHubEntry,
-    savseMtvareHubEntry,
-    ...savseMtvareEntries,
-    akhaliMtvareHubEntry,
-    ...akhaliMtvareEntries,
-    astrologyCalendarHubEntry,
-    ...astrologyCalendarEntries,
-    luckyDaysEntry,
-    cautionDaysEntry,
-    eclipseHubEntry,
-    ...eclipseEntries,
-    retrogradeHubEntry,
-    rankingsHubEntry,
-    ...rankingEntries,
-    eqHubEntry,
-    ...eqArticleEntries,
-    armenianHousesHubEntry,
-    ...armenianHouseEntries,
-    armenianPlanetsHubEntry,
-    ...armenianPlanetEntries,
-  ];
 }
 
 type SitemapArticle = Awaited<
@@ -648,14 +119,9 @@ function articleAlternates(
       languages["ka-GE"] = articleUrl("ka", sibling.slug);
     if (sibling.language === "en")
       languages.en = articleUrl("en", sibling.slug);
-    if (sibling.language === "am") {
-      languages["hy-AM"] = articleUrl("am", sibling.slug);
-      languages.hy = articleUrl("am", sibling.slug);
-    }
   }
   languages["x-default"] =
-    languages.en ??
-    articleUrl(current.language as "ka" | "en" | "am", current.slug);
+    languages.en ?? articleUrl(current.language as "ka" | "en", current.slug);
   return { languages };
 }
 
@@ -666,7 +132,7 @@ function articleSitemapEntries(
   return all
     .filter((item) => languages.has(item.language))
     .map((item) => ({
-      url: articleUrl(item.language as "ka" | "en" | "am", item.slug),
+      url: articleUrl(item.language as "ka" | "en", item.slug),
       lastModified: item.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.72,
@@ -675,7 +141,7 @@ function articleSitemapEntries(
 }
 
 function articleHubEntry(
-  locale: "ka" | "en" | "am",
+  locale: "ka" | "en",
   all: SitemapArticle[],
 ): MetadataRoute.Sitemap[number] {
   const localeUpdates = all
@@ -694,8 +160,6 @@ function articleHubEntry(
       languages: {
         "ka-GE": articleUrl("ka"),
         en: articleUrl("en"),
-        "hy-AM": articleUrl("am"),
-        hy: articleUrl("am"),
         "x-default": articleUrl("en"),
       },
     },
@@ -896,20 +360,11 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
     ...eqArticlePages,
     articleHubEntry("en", articleItems),
     ...articleSitemapEntries(articleItems, new Set(["en"])),
-    // Armenian shares this domain, so its URLs are declared here rather than
-    // in a sitemap of their own.
-    ...armenianSitemap(),
-    articleHubEntry("am", articleItems),
-    ...articleSitemapEntries(articleItems, new Set(["am"])),
   ];
 
   return entries.map((entry) => {
     const parsed = new URL(entry.url);
-    const armenianPath = stripArmenianPrefix(parsed.pathname);
-    parsed.pathname =
-      armenianPath === null
-        ? internationalPublicPath(parsed.pathname)
-        : withArmenianPrefix(armenianPath);
+    parsed.pathname = internationalPublicPath(parsed.pathname);
     return { ...entry, url: parsed.toString().replace(/\/$/, "") };
   });
 }
@@ -1428,12 +883,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const georgianWithAlternates = georgianPages.map((entry) => {
     const path = new URL(entry.url).pathname;
     const pair = pairByKaPath.get(path);
-    // Every translated Armenian page must be reciprocal from the Georgian
-    // sitemap too. Previously only the small core pair table received
-    // alternates, leaving hundreds of valid Armenian long-tail URLs one-way.
-    if (!pair && !hasArmenianVersion(path)) return entry;
-    // Same builder the English and Armenian sections use, so all three sides
-    // of a pair agree on whether an Armenian alternate exists.
+    if (!pair) return entry;
     return {
       ...entry,
       alternates: alternatesFor(pair?.ka ?? path, pair?.en ?? path),

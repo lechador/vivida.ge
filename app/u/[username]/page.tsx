@@ -8,10 +8,7 @@ import { db } from "@/db";
 import { profiles, profilePhotos, users } from "@/db/schema";
 import { auth } from "@/auth";
 import { ensureChartFor } from "@/actions/chart";
-import {
-  countPostsByUser,
-  listRecentPostsByUser,
-} from "@/actions/feed";
+import { countPostsByUser, listRecentPostsByUser } from "@/actions/feed";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { computeElementBalance } from "@/lib/elements";
@@ -226,10 +223,7 @@ export default async function PublicProfilePage({
     .select({ id: profilePhotos.id, url: profilePhotos.url })
     .from(profilePhotos)
     .where(
-      and(
-        eq(profilePhotos.userId, owner.id),
-        eq(profilePhotos.ready, true)
-      )
+      and(eq(profilePhotos.userId, owner.id), eq(profilePhotos.ready, true)),
     )
     .orderBy(orderAsc(profilePhotos.sortOrder));
 
@@ -247,7 +241,10 @@ export default async function PublicProfilePage({
   const age = ageFromDob(profile.dateOfBirth);
 
   return (
-    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex flex-1 flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
@@ -288,9 +285,7 @@ export default async function PublicProfilePage({
               )}
 
               {/* Owner-only: regenerate a brand-styled AI avatar in place */}
-              {isOwner && (
-                <AiAvatarButton locale={locale} />
-              )}
+              {isOwner && <AiAvatarButton locale={locale} />}
             </div>
 
             <div className="min-w-0">
@@ -346,7 +341,10 @@ export default async function PublicProfilePage({
                 </h1>
                 <CountryBadge
                   countryCode={owner.residenceCountryCode}
-                  countryName={countryDisplayName(owner.residenceCountryCode, locale)}
+                  countryName={countryDisplayName(
+                    owner.residenceCountryCode,
+                    locale,
+                  )}
                 />
               </div>
 
@@ -400,7 +398,11 @@ export default async function PublicProfilePage({
                 {balance && (
                   <Pill
                     label={en ? "Dominant" : "დომინანტი"}
-                    value={en ? ELEMENT_EN[balance.dominant] ?? balance.dominant : balance.dominant}
+                    value={
+                      en
+                        ? (ELEMENT_EN[balance.dominant] ?? balance.dominant)
+                        : balance.dominant
+                    }
                     glyph={ELEMENT_GLYPH[balance.dominant]}
                     accent={ELEMENT_COLOR[balance.dominant]}
                   />
@@ -458,23 +460,23 @@ export default async function PublicProfilePage({
                 interpretations={synastryTexts}
                 locale={locale}
                 shareCardProps={
-                viewerName && viewerSunSign && sun
-                  ? {
-                      viewerName,
-                      viewerSignLabel: en
-                        ? viewerSunSign.labelEn
-                        : viewerSunSign.labelKa,
-                      viewerSignSymbol: viewerSunSign.symbol,
-                      partnerName: displayName,
-                      partnerSignLabel: en ? sun.labelEn : sun.labelKa,
-                      partnerSignSymbol: sun.symbol,
-                      result: synastry,
-                      verdict: en
-                        ? overallVerdictEn(synastry.overall)
-                        : overallVerdict(synastry.overall),
-                      locale,
-                    }
-                  : undefined
+                  viewerName && viewerSunSign && sun
+                    ? {
+                        viewerName,
+                        viewerSignLabel: en
+                          ? viewerSunSign.labelEn
+                          : viewerSunSign.labelKa,
+                        viewerSignSymbol: viewerSunSign.symbol,
+                        partnerName: displayName,
+                        partnerSignLabel: en ? sun.labelEn : sun.labelKa,
+                        partnerSignSymbol: sun.symbol,
+                        result: synastry,
+                        verdict: en
+                          ? overallVerdictEn(synastry.overall)
+                          : overallVerdict(synastry.overall),
+                        locale,
+                      }
+                    : undefined
                 }
               />
             )}
@@ -536,17 +538,25 @@ export default async function PublicProfilePage({
             whose data is actually absent: nudging the viewer to onboarding
             when it's the profile owner who never filled in birth details
             just confuses them (there's nothing for them to fix). */}
-        {viewerId && !synastry && !isOwner && (
-          ownerChart ? (
+        {viewerId &&
+          !synastry &&
+          !isOwner &&
+          (ownerChart ? (
             <section className="mt-10 rounded-2xl border border-border bg-card/65 p-6 text-center backdrop-blur-xl ring-1 ring-foreground/5">
               <h2 className="text-xl font-semibold tracking-tight">
-                {en ? "To see your compatibility" : "თქვენი თავსებადობის სანახავად"}
+                {en
+                  ? "To see your compatibility"
+                  : "თქვენი თავსებადობის სანახავად"}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                {en ? "Add your birth details first." : "ჯერ შეავსე დაბადების მონაცემები."}
+                {en
+                  ? "Add your birth details first."
+                  : "ჯერ შეავსე დაბადების მონაცემები."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
-                <Link href="/onboarding">{en ? "Add details now" : "შეავსე ახლავე"}</Link>
+                <Link href="/onboarding">
+                  {en ? "Add details now" : "შეავსე ახლავე"}
+                </Link>
               </Button>
             </section>
           ) : (
@@ -562,8 +572,7 @@ export default async function PublicProfilePage({
                   : "როგორც შეავსებს, თქვენი თავსებადობა აქ გამოჩნდება."}
               </p>
             </section>
-          )
-        )}
+          ))}
       </section>
     </main>
   );
@@ -609,20 +618,15 @@ function ProfileStats({
   posts: number;
   locale: UserLocale;
 }) {
-  const am = locale === "am";
   const en = locale === "en";
   return (
     <dl className="mt-5 inline-flex items-stretch divide-x divide-border/60 rounded-2xl border border-border/60 bg-card/35 px-1 backdrop-blur-xl">
       <Stat
-        label={am ? "Ընկերներ" : en ? "Friends" : "მეგობრები"}
+        label={en ? "Friends" : "მეგობრები"}
         value={friends}
         locale={locale}
       />
-      <Stat
-        label={am ? "Հրապարակումներ" : en ? "Posts" : "პოსტი"}
-        value={posts}
-        locale={locale}
-      />
+      <Stat label={en ? "Posts" : "პოსტი"} value={posts} locale={locale} />
     </dl>
   );
 }
@@ -639,9 +643,7 @@ function Stat({
   return (
     <div className="flex min-w-[68px] flex-col items-center gap-0.5 px-3 py-2 sm:min-w-[88px] sm:px-4">
       <dd className="text-base font-semibold tabular-nums leading-none text-foreground sm:text-lg">
-        {Intl.NumberFormat(
-          locale === "am" ? "hy-AM" : locale === "en" ? "en" : "ka-GE"
-        ).format(value)}
+        {Intl.NumberFormat(locale === "en" ? "en" : "ka-GE").format(value)}
       </dd>
       <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">
         {label}
@@ -688,7 +690,11 @@ function MutualFriendsPill({
       )}
       <span className="text-foreground/90">
         <span className="font-medium">{count}</span>{" "}
-        {locale === "en" ? (count === 1 ? "mutual friend" : "mutual friends") : "საერთო მეგობარი"}
+        {locale === "en"
+          ? count === 1
+            ? "mutual friend"
+            : "mutual friends"
+          : "საერთო მეგობარი"}
       </span>
     </div>
   );

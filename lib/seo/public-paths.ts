@@ -4,9 +4,6 @@
  * The shared App Router tree intentionally keeps its established Georgian
  * route names so vivida.ge never moves. vividaastro.com exposes these clean
  * public paths and the proxy rewrites them back to the shared internal tree.
- * Armenian uses the same stable paths below /am; the language prefix, content,
- * metadata and hreflang identify Armenian while no Georgian words leak into
- * the URL shown to readers.
  */
 const PATH_PREFIXES = [
   ["/zodiac/tavsebadoba", "/zodiac/compatibility"],
@@ -124,10 +121,7 @@ export function internationalInternalPath(path: string): string {
     ([legacy, clean]) => [clean, legacy] as const,
   );
   return mapPathname(path, (normalized) =>
-    replacePrefix(
-      replaceHoroscopeView(normalized, viewEntries),
-      prefixEntries,
-    ),
+    replacePrefix(replaceHoroscopeView(normalized, viewEntries), prefixEntries),
   );
 }
 
@@ -139,4 +133,43 @@ export function isInternationalLegacyPath(path: string): boolean {
 export function isInternationalCleanPath(path: string): boolean {
   const normalized = normalize(path);
   return internationalInternalPath(normalized) !== normalized;
+}
+
+/**
+ * Resolve a shared-tree path to the href a locale should render: Georgian
+ * renders the tree as-is, English renders the public English-readable
+ * vocabulary (rewritten back internally by the proxy).
+ */
+export function localizedHref(path: string, locale?: "ka" | "en"): string {
+  if (
+    !path ||
+    path.startsWith("http://") ||
+    path.startsWith("https://") ||
+    path.startsWith("mailto:") ||
+    path.startsWith("tel:") ||
+    path.startsWith("#")
+  ) {
+    return path;
+  }
+  if (
+    path.startsWith("/api/") ||
+    path.startsWith("/login") ||
+    path.startsWith("/signup") ||
+    path.startsWith("/forgot-password") ||
+    path.startsWith("/reset-password") ||
+    path.startsWith("/dashboard") ||
+    path.startsWith("/account") ||
+    path.startsWith("/feed") ||
+    path.startsWith("/messages") ||
+    path.startsWith("/friends") ||
+    path.startsWith("/people") ||
+    path.startsWith("/subscription") ||
+    path.startsWith("/credits") ||
+    path.startsWith("/admin") ||
+    path.startsWith("/u/")
+  ) {
+    return path;
+  }
+  if (locale === "en") return internationalPublicPath(path);
+  return path;
 }

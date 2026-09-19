@@ -10,10 +10,11 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   return {
-    title: am ? "Ձեր ԶԳ Արդյունքը" : en ? "Your EQ Result" : "შენი EQ შედეგი",
-    description: am ? "Ձեր էմոցիոնալ ինտելեկտի միավորը և հինգ ոլորտների էմոցիոնալ պրոֆիլը։" : en ? "Your emotional intelligence score and five-domain emotional profile." : "შენი ემოციური ინტელექტის ტესტის შედეგი — EQ ქულა და ემოციური რუკა ხუთ სფეროში.",
+    title: en ? "Your EQ Result" : "შენი EQ შედეგი",
+    description: en
+      ? "Your emotional intelligence score and five-domain emotional profile."
+      : "შენი ემოციური ინტელექტის ტესტის შედეგი — EQ ქულა და ემოციური რუკა ხუთ სფეროში.",
     robots: { index: false, follow: false },
   };
 }
@@ -29,14 +30,25 @@ export default async function EqResultPage() {
   const locale = await getRequestLocale();
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_350/0.4),transparent_70%)]"
       />
       <Starfield count={110} shooting={2} />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/eq-testi/shedegi" />}
+      {authed ? (
+        <AppHeader authed active="tests" />
+      ) : (
+        <SmartHeader
+          active="tests"
+          locale={locale}
+          georgianPath="/eq-testi/shedegi"
+        />
+      )}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <EqResultClient locale={locale} />

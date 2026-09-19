@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { EnglishFooter } from "@/components/en/english-footer";
-import { ArmenianFooter } from "@/components/am/armenian-footer";
 import type { UserLocale } from "@/lib/i18n/locale";
 
 const PRODUCT_LINKS = [
@@ -43,7 +42,6 @@ const LEGAL_LINKS = [
   { href: "/terms", label: "წესები და პირობები" },
   { href: "/privacy", label: "კონფიდენციალურობა" },
   { href: "/en", label: "English" },
-  { href: "/am", label: "Հայերեն" },
 ];
 
 /**
@@ -51,7 +49,6 @@ const LEGAL_LINKS = [
  * — they have their own bottom UI density and the chat launcher.
  */
 export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
-  if (locale === "am") return <ArmenianFooter />;
   if (locale === "en") return <EnglishFooter />;
 
   const year = new Date().getFullYear();
@@ -73,8 +70,8 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
             </span>
           </Link>
           <p className="mt-3 text-sm text-muted-foreground">
-            შენი კოსმიური რუკა, ცოცხალი და პერსონალური. ყოველდღიური
-            პროგნოზები, ნატალური რუკა და თავსებადობა.
+            შენი კოსმიური რუკა, ცოცხალი და პერსონალური. ყოველდღიური პროგნოზები,
+            ნატალური რუკა და თავსებადობა.
           </p>
         </div>
 
@@ -160,10 +157,18 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
               უსაფრთხო გადახდა
             </span>
             <div className="flex flex-wrap items-center gap-2">
-              <PaymentMark><VisaMark /></PaymentMark>
-              <PaymentMark><MastercardMark /></PaymentMark>
-              <PaymentMark><GooglePayMark /></PaymentMark>
-              <PaymentMark><ApplePayMark /></PaymentMark>
+              <PaymentMark>
+                <VisaMark />
+              </PaymentMark>
+              <PaymentMark>
+                <MastercardMark />
+              </PaymentMark>
+              <PaymentMark>
+                <GooglePayMark />
+              </PaymentMark>
+              <PaymentMark>
+                <ApplePayMark />
+              </PaymentMark>
             </div>
           </div>
 
@@ -256,10 +261,7 @@ function MastercardMark() {
     >
       <circle cx="13" cy="11" r="9" fill="#eb001b" />
       <circle cx="23" cy="11" r="9" fill="#f79e1b" />
-      <path
-        d="M18 4.5a9 9 0 0 1 0 13 9 9 0 0 1 0-13z"
-        fill="#ff5f00"
-      />
+      <path d="M18 4.5a9 9 0 0 1 0 13 9 9 0 0 1 0-13z" fill="#ff5f00" />
     </svg>
   );
 }
@@ -414,8 +416,14 @@ function PlayStoreBadge() {
       <g transform="translate(11.5, 9.5)">
         <path d="M0 0v21l11.2-10.5L0 0z" fill="#00C2D6" />
         <path d="M0 0l11.2 10.5L14.7 7 1.7-.7C1-.4.5-.2 0 0z" fill="#FFD400" />
-        <path d="M0 21l11.2-10.5L14.7 14 1.7 21.7c-.7-.3-1.2-.5-1.7-.7z" fill="#FF3946" />
-        <path d="M14.7 7l-3.5 3.5 3.5 3.5L20 11.6c.6-.4 1-.7 1-1.1 0-.4-.4-.7-1-1.1L14.7 7z" fill="#00E676" />
+        <path
+          d="M0 21l11.2-10.5L14.7 14 1.7 21.7c-.7-.3-1.2-.5-1.7-.7z"
+          fill="#FF3946"
+        />
+        <path
+          d="M14.7 7l-3.5 3.5 3.5 3.5L20 11.6c.6-.4 1-.7 1-1.1 0-.4-.4-.7-1-1.1L14.7 7z"
+          fill="#00E676"
+        />
       </g>
       {/* Captions */}
       <text

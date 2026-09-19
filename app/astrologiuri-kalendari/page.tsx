@@ -4,12 +4,9 @@ import {
   AstrologyCalendarHubEn,
   CALENDAR_META_EN,
 } from "@/components/seo/astrology-calendar-pages-en";
-import {
-  AstrologyCalendarHubAm,
-  CALENDAR_META_AM,
-} from "@/components/seo/astrology-calendar-pages-am";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 const title = "ასტროლოგიური კალენდარი — იღბლიანი და ფრთხილი დღეები";
@@ -21,31 +18,6 @@ export const revalidate = 86400;
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const path = "/astrologiuri-kalendari";
-
-  if (locale === "am") {
-    const am = CALENDAR_META_AM.all;
-    return {
-      title: { absolute: `${am.title} — Vivida` },
-      description: am.description,
-      keywords: [
-        "աստղաբանական օրացույց",
-        "բարենպաստ օրեր",
-        "զգուշության օրեր",
-        "օրվա աստղաբանական կանխատեսում",
-      ],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: `${ARMENIAN_SITE_URL}${internationalPublicPath(path)}`,
-        title: am.title,
-        description: am.description,
-        locale: "hy_AM",
-        siteName: "Vivida",
-      },
-      twitter: { card: "summary_large_image", title: am.title, description: am.description },
-    };
-  }
 
   if (locale === "en") {
     const en = CALENDAR_META_EN.all;
@@ -68,7 +40,11 @@ export async function generateMetadata(): Promise<Metadata> {
         locale: "en_US",
         siteName: "Vivida",
       },
-      twitter: { card: "summary_large_image", title: en.title, description: en.description },
+      twitter: {
+        card: "summary_large_image",
+        title: en.title,
+        description: en.description,
+      },
     };
   }
 
@@ -96,7 +72,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <AstrologyCalendarHubAm />;
   if (locale === "en") return <AstrologyCalendarHubEn />;
   return <AstrologyCalendarHub />;
 }

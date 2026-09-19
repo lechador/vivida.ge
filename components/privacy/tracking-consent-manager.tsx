@@ -74,7 +74,6 @@ export function TrackingConsentManager({
   }
 
   const en = locale === "en";
-  const am = locale === "am";
   const showPanel = ready && (consent === null || settingsOpen);
   const trackingAllowed = trackingEnabled && consent === "granted";
 
@@ -114,13 +113,7 @@ export function TrackingConsentManager({
         <button
           type="button"
           data-privacy-reopen
-          aria-label={
-            am
-              ? "Գաղտնիության ընտրություններ"
-              : en
-                ? "Privacy choices"
-                : "კონფიდენციალურობა"
-          }
+          aria-label={en ? "Privacy choices" : "კონფიდენციალურობა"}
           onClick={() => setSettingsOpen(true)}
           className="fixed bottom-3 left-3 z-[90] inline-flex size-8 items-center justify-center rounded-full border border-border/70 bg-background/85 text-muted-foreground shadow-lg backdrop-blur transition-colors hover:text-foreground"
         >
@@ -137,19 +130,20 @@ export function TrackingConsentManager({
       {showPanel && (
         <div
           ref={panelRef}
-          className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-h-[60svh] max-w-2xl flex-col overflow-y-auto rounded-2xl border border-border bg-background/95 p-4 shadow-2xl backdrop-blur-xl sm:bottom-5 sm:p-6">
+          className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-h-[60svh] max-w-2xl flex-col overflow-y-auto rounded-2xl border border-border bg-background/95 p-4 shadow-2xl backdrop-blur-xl sm:bottom-5 sm:p-6"
+        >
           <div className="flex items-start gap-3">
             <div className="hidden size-9 shrink-0 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)] sm:grid">
               <ShieldCheck className="size-4.5" />
             </div>
             <div>
               <h2 className="text-sm font-semibold sm:text-base">
-                {am ? "Գաղտնիության ձեր ընտրությունները" : en ? "Your privacy choices" : "შენი კონფიდენციალურობის არჩევანი"}
+                {en
+                  ? "Your privacy choices"
+                  : "შენი კონფიდენციალურობის არჩევანი"}
               </h2>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                {am
-                  ? "Անհրաժեշտ cookie-ներն ապահովում են Vivida-ի աշխատանքը։ Ձեր թույլտվությամբ վերլուծական և Meta cookie-ներն օգնում են չափել, թե որ արշավներն են հանգեցնում օգտակար այցելությունների և գնումների։"
-                  : en
+                {en
                   ? "Essential cookies keep Vivida working. With your permission, analytics and Meta cookies help us measure which campaigns lead to useful visits and purchases."
                   : "აუცილებელი cookie-ები Vivida-ს მუშაობას უზრუნველყოფს. შენი თანხმობით, ანალიტიკა და Meta cookie-ები გვეხმარება გავიგოთ რომელი კამპანია იწვევს სასარგებლო ვიზიტებსა და ყიდვებს."}
               </p>
@@ -165,7 +159,7 @@ export function TrackingConsentManager({
               size="sm"
               onClick={() => choose("denied")}
             >
-              {am ? "Միայն անհրաժեշտները" : en ? "Essential only" : "მხოლოდ აუცილებელი"}
+              {en ? "Essential only" : "მხოლოდ აუცილებელი"}
             </Button>
             <Button
               type="button"
@@ -173,7 +167,7 @@ export function TrackingConsentManager({
               size="sm"
               onClick={() => choose("granted")}
             >
-              {am ? "Թույլատրել վերլուծությունն ու Meta-ն" : en ? "Allow analytics & Meta" : "ანალიტიკისა და Meta-ს დაშვება"}
+              {en ? "Allow analytics & Meta" : "ანალიტიკისა და Meta-ს დაშვება"}
             </Button>
           </div>
         </div>

@@ -18,7 +18,11 @@ export async function generateMetadata(): Promise<Metadata> {
     // Both hosts serve this path in their own language, and both were
     // indexable while self-canonicalizing — without hreflang that reads as
     // two duplicates rather than one page in two languages.
-    alternates: localizedAlternates("/login", "/login", locale !== "ka" ? "en" : "ka"),
+    alternates: localizedAlternates(
+      "/login",
+      "/login",
+      locale !== "ka" ? "en" : "ka",
+    ),
   };
 }
 
@@ -36,23 +40,24 @@ export default async function LoginPage({
   const dest = safeNext(next);
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   const session = await auth();
   if (session?.user?.id) redirect(dest ?? "/dashboard");
 
   return (
     <AuthLayout
       locale={locale}
-      title={am ? "Բարի վերադարձ" : en ? "Welcome back" : "კეთილი იყოს შენი დაბრუნება"}
-      subtitle={am ? "Վերադարձեք ձեր տիեզերական քարտեզին։" : en ? "Step back into your cosmic map." : "შემოდი შენს კოსმიურ რუკაში."}
+      title={en ? "Welcome back" : "კეთილი იყოს შენი დაბრუნება"}
+      subtitle={
+        en ? "Step back into your cosmic map." : "შემოდი შენს კოსმიურ რუკაში."
+      }
       footer={
         <>
-          {am ? "Նոր եք Vivida-ում։" : en ? "New to Vivida?" : "ჯერ არ გაქვს ანგარიში?"}{" "}
+          {en ? "New to Vivida?" : "ჯერ არ გაქვს ანგარიში?"}{" "}
           <Link
             href={dest ? `/signup?next=${encodeURIComponent(dest)}` : "/signup"}
             className="text-foreground underline-offset-2 hover:underline"
           >
-            {am ? "Ստեղծել հաշիվ" : en ? "Create an account" : "დარეგისტრირდი"}
+            {en ? "Create an account" : "დარეგისტრირდი"}
           </Link>
         </>
       }

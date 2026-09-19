@@ -4,11 +4,15 @@ import { notFound } from "next/navigation";
 import { EclipseDetail } from "@/components/seo/moon-event-pages";
 import { ECLIPSES } from "@/lib/seo/moon-events";
 import { EclipseDetailEn } from "@/components/seo/moon-event-pages-en";
-import { EclipseDetailAm } from "@/components/seo/moon-event-pages-am";
+
 import { eclipseEnBySlug } from "@/lib/seo/eclipse-en";
-import { eclipseAmBySlug } from "@/lib/seo/eclipse-am";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -20,27 +24,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const path = `/dabnelebebi/${slug}`;
   const locale = await getRequestLocale();
-
-  if (locale === "am") {
-    const e = eclipseAmBySlug(slug);
-    if (!e) return {};
-    const description = `${e.description} Տեսանելիություն, խավարման տեսակ, անվտանգ դիտում և աստղաբանական համատեքստ:`;
-    return {
-      title: { absolute: `${e.title} — Vivida` },
-      description,
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        title: e.title,
-        description,
-        url: armenianSiteHref(path, false),
-        type: "article",
-        locale: "hy_AM",
-        siteName: "Vivida",
-      },
-      twitter: { card: "summary_large_image", title: e.title, description },
-    };
-  }
 
   if (locale === "en") {
     const e = eclipseEnBySlug(slug);
@@ -75,12 +58,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { slug } = await params;
   const locale = await getRequestLocale();
-
-  if (locale === "am") {
-    const e = eclipseAmBySlug(slug);
-    if (!e) notFound();
-    return <EclipseDetailAm eclipse={e} />;
-  }
 
   if (locale === "en") {
     const e = eclipseEnBySlug(slug);

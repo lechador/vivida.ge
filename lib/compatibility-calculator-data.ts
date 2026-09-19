@@ -20,7 +20,6 @@ import {
 import { signColor } from "@/lib/zodiac";
 import { pairPercent } from "@/lib/compatibility-score";
 import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
-import { zodiacPairArmenian } from "@/lib/zodiac-pair-am";
 
 /**
  * The editorial category is what drives `percent` (see compatibility-score),
@@ -33,12 +32,6 @@ const SCORE_EN: Record<CompatibilityScore, string> = {
   ძლიერი: "Strong",
   ჰარმონიული: "Harmonious",
   გამომწვევი: "Dynamic",
-};
-
-const SCORE_AM: Record<CompatibilityScore, string> = {
-  ძლიერი: "Ուժեղ",
-  ჰარმონიული: "Ներդաշնակ",
-  გამომწვევი: "Դինամիկ",
 };
 
 export type CalcSign = {
@@ -64,20 +57,15 @@ export type CalculatorData = {
 };
 
 export function buildCalculatorData(
-  locale: "ka" | "en" | "am" = "ka",
+  locale: "ka" | "en" = "ka",
 ): CalculatorData {
   const en = locale === "en";
-  const am = locale === "am";
   const signs: CalcSign[] = ALL_SLUGS.map((slug) => {
     const meta = signMetaBySlug(slug);
     const c = SIGNS_CONTENT[slug];
     return {
       slug,
-      label: am
-        ? (meta?.labelAm ?? slug)
-        : en
-          ? (meta?.labelEn ?? slug)
-          : c.labelKa,
+      label: en ? (meta?.labelEn ?? slug) : c.labelKa,
       symbol: c.symbol,
       color: meta ? signColor(meta) : "var(--vivida-violet)",
     };
@@ -89,37 +77,18 @@ export function buildCalculatorData(
       const percent = pairPercent(slug, c.overallScore);
       const [aSlug, bSlug] = slug.split("-") as [ZodiacSlug, ZodiacSlug];
       const enContent = en ? zodiacPairEnglish(aSlug, bSlug) : null;
-      const amContent = am ? zodiacPairArmenian(aSlug, bSlug) : null;
-      const score = am
-        ? SCORE_AM[c.overallScore]
-        : en
-          ? SCORE_EN[c.overallScore]
-          : c.overallScore;
+      const score = en ? SCORE_EN[c.overallScore] : c.overallScore;
 
       pairs[slug] = {
         slug,
         percent,
         score,
-        tagline: amContent
-          ? amContent.tagline
-          : enContent
-            ? enContent.tagline
-            : c.tagline,
-        strengths: amContent
-          ? amContent.strengths.slice(0, 3)
-          : enContent
-            ? enContent.strengths.slice(0, 3)
-            : c.strengths.slice(0, 3),
-        labelA: am
-          ? (signMetaBySlug(aSlug)?.labelAm ?? c.labelA)
-          : en
-            ? (signMetaBySlug(aSlug)?.labelEn ?? c.labelA)
-            : c.labelA,
-        labelB: am
-          ? (signMetaBySlug(bSlug)?.labelAm ?? c.labelB)
-          : en
-            ? (signMetaBySlug(bSlug)?.labelEn ?? c.labelB)
-            : c.labelB,
+        tagline: enContent ? enContent.tagline : c.tagline,
+        strengths: enContent
+          ? enContent.strengths.slice(0, 3)
+          : c.strengths.slice(0, 3),
+        labelA: en ? (signMetaBySlug(aSlug)?.labelEn ?? c.labelA) : c.labelA,
+        labelB: en ? (signMetaBySlug(bSlug)?.labelEn ?? c.labelB) : c.labelB,
       };
     }
   }

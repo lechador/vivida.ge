@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { Noto_Sans_Georgian } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
@@ -33,14 +33,10 @@ const TITLE_EN = "Vivida — Natal Charts, Horoscopes and Zodiac Guides";
 const DESCRIPTION_EN =
   "Personal astrology, daily horoscopes and a free natal chart built from your exact birth moment. Understand what your chart actually says about you.";
 
-const TITLE_AM = "Vivida — Նատալ քարտեզներ, հորոսկոպներ և կենդանակերպի ուղեցույցներ";
-const DESCRIPTION_AM =
-  "Անհատական աստղագուշակություն, ամենօրյա հորոսկոպներ և անվճար նատալ քարտեզ՝ կազմված ձեր ծննդյան ճշգրիտ պահից: Իմացեք, թե իրականում ինչ է ասում ձեր քարտեզը ձեր մասին:";
-
 /** `lang` attribute per locale — Armenian is `hy`, the ISO 639-1 code. */
-const HTML_LANG = { ka: "ka", en: "en", am: "hy" } as const;
+const HTML_LANG = { ka: "ka", en: "en" } as const;
 
-const OG_LOCALE = { ka: "ka_GE", en: "en_US", am: "hy_AM" } as const;
+const OG_LOCALE = { ka: "ka_GE", en: "en_US" } as const;
 
 /**
  * Site-wide metadata defaults. Per-page `metadata` exports override these
@@ -54,13 +50,12 @@ const OG_LOCALE = { ka: "ka_GE", en: "en_US", am: "hy_AM" } as const;
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
   // Armenian is a path prefix on the international domain, so its origin is
   // that domain plus /am — a bare ENGLISH_SITE_URL here would resolve every
   // relative canonical on an Armenian page onto its English twin.
-  const origin = am ? ARMENIAN_SITE_URL : en ? ENGLISH_SITE_URL : SITE_URL;
-  const title = am ? TITLE_AM : en ? TITLE_EN : TITLE;
-  const description = am ? DESCRIPTION_AM : en ? DESCRIPTION_EN : DESCRIPTION;
+  const origin = en ? ENGLISH_SITE_URL : SITE_URL;
+  const title = en ? TITLE_EN : TITLE;
+  const description = en ? DESCRIPTION_EN : DESCRIPTION;
 
   return {
     // Host-aware so relative canonicals and OG/image URLs in child pages
@@ -132,7 +127,8 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 // Keep analytics and advertising scripts limited to the real production
 // deployment. Vercel preview deploys also ship as NODE_ENV=production.
 const TRACKING_ENABLED =
-  process.env.NODE_ENV === "production" && process.env.VERCEL_ENV === "production";
+  process.env.NODE_ENV === "production" &&
+  process.env.VERCEL_ENV === "production";
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
 
 export default async function RootLayout({
@@ -164,11 +160,9 @@ export default async function RootLayout({
           href="#main-content"
           className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-xl border border-[var(--vivida-violet)]/60 bg-background px-4 py-2.5 text-sm font-semibold text-foreground shadow-xl transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[var(--vivida-violet)] focus:ring-offset-2 focus:ring-offset-background"
         >
-          {locale === "am"
-            ? "Անցնել հիմնական բովանդակությանը"
-            : locale === "en"
-              ? "Skip to main content"
-              : "მთავარ კონტენტზე გადასვლა"}
+          {locale === "en"
+            ? "Skip to main content"
+            : "მთავარ კონტენტზე გადასვლა"}
         </a>
         <NextTopLoader
           color="oklch(0.78 0.18 305)"

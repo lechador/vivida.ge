@@ -55,7 +55,6 @@ export function CompatibilityCard({
   locale = "ka",
 }: CompatibilityCardProps) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const overall = Math.round(result.overall);
 
   return (
@@ -73,8 +72,7 @@ export function CompatibilityCard({
           `linear-gradient(160deg, #1a0f33 0%, #0b0814 50%, #2a1145 100%)`,
         ].join(", "),
         color: "#ffffff",
-        fontFamily:
-          "'Noto Sans Georgian', 'Noto Sans', system-ui, sans-serif",
+        fontFamily: "'Noto Sans Georgian', 'Noto Sans', system-ui, sans-serif",
         padding: "120px 80px 100px",
         display: "flex",
         flexDirection: "column",
@@ -203,7 +201,7 @@ export function CompatibilityCard({
             marginBottom: 12,
           }}
         >
-          {am ? "ՀԱՄԱՏԵՂԵԼԻՈՒԹՅՈՒՆ" : en ? "COMPATIBILITY" : "თავსებადობა"}
+          {en ? "COMPATIBILITY" : "თავსებადობა"}
         </div>
         <div
           style={{
@@ -275,7 +273,7 @@ export function CompatibilityCard({
             color: "rgba(255,255,255,0.6)",
           }}
         >
-          {am ? "Բացահայտեք ձեր համատեղելիությունը" : en ? "Discover your compatibility" : "გაიგე შენი თავსებადობა"}
+          {en ? "Discover your compatibility" : "გაიგე შენი თავსებადობა"}
         </div>
         <div
           style={{

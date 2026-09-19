@@ -1,10 +1,6 @@
 import Link from "next/link";
 
-import {
-  ARMENIAN_SITE_URL,
-  GEORGIAN_SITE_URL,
-  englishSiteHref,
-} from "@/lib/seo/locales";
+import { GEORGIAN_SITE_URL, englishSiteHref } from "@/lib/seo/locales";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
 
@@ -70,48 +66,109 @@ export async function EnglishFooter() {
             <span className="text-xl font-semibold">vivida</span>
           </Link>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Personal astrology, natal charts and self-discovery tools, with core assessments and personalized readings available in English.
+            Personal astrology, natal charts and self-discovery tools, with core
+            assessments and personalized readings available in English.
           </p>
-          <a href="mailto:hello@vivida.ge" className="mt-3 inline-block text-sm text-[var(--vivida-cyan)] hover:underline">
+          <a
+            href="mailto:hello@vivida.ge"
+            className="mt-3 inline-block text-sm text-[var(--vivida-cyan)] hover:underline"
+          >
             hello@vivida.ge
           </a>
         </div>
 
         <div>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Explore</h2>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Explore
+          </h2>
           <ul className="space-y-2 text-sm">
             {EXPLORE.map((item) => (
-              <li key={item.href}><Link href={href(item.href)} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
+              <li key={item.href}>
+                <Link
+                  href={href(item.href)}
+                  className="text-foreground/85 hover:text-foreground"
+                >
+                  {item.label}
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
 
         <div>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Learn</h2>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Learn
+          </h2>
           <ul className="space-y-2 text-sm">
             {LEARN.map((item) => (
-              <li key={item.href}><Link href={href(item.href)} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
+              <li key={item.href}>
+                <Link
+                  href={href(item.href)}
+                  className="text-foreground/85 hover:text-foreground"
+                >
+                  {item.label}
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
 
         <div>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Tools</h2>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Tools
+          </h2>
           <ul className="space-y-2 text-sm">
             {TOOLS.map((item) => (
-              <li key={item.href}><Link href={href(item.href)} className="text-foreground/85 hover:text-foreground">{item.label}</Link></li>
+              <li key={item.href}>
+                <Link
+                  href={href(item.href)}
+                  className="text-foreground/85 hover:text-foreground"
+                >
+                  {item.label}
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
 
         <div>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Company</h2>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Company
+          </h2>
           <ul className="space-y-2 text-sm">
-            <li><Link href={href("/about")} className="text-foreground/85 hover:text-foreground">About Vivida</Link></li>
-            <li><Link href={href("/privacy")} className="text-foreground/85 hover:text-foreground">Privacy policy</Link></li>
-            <li><Link href={href("/terms")} className="text-foreground/85 hover:text-foreground">Terms and conditions</Link></li>
-            <li><Link href={ARMENIAN_SITE_URL} hrefLang="hy-AM" className="text-foreground/85 hover:text-foreground">Հայերեն</Link></li>
-            <li><Link href={GEORGIAN_SITE_URL} hrefLang="ka-GE" className="text-foreground/85 hover:text-foreground">ქართული ვერსია</Link></li>
+            <li>
+              <Link
+                href={href("/about")}
+                className="text-foreground/85 hover:text-foreground"
+              >
+                About Vivida
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={href("/privacy")}
+                className="text-foreground/85 hover:text-foreground"
+              >
+                Privacy policy
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={href("/terms")}
+                className="text-foreground/85 hover:text-foreground"
+              >
+                Terms and conditions
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={GEORGIAN_SITE_URL}
+                hrefLang="ka-GE"
+                className="text-foreground/85 hover:text-foreground"
+              >
+                ქართული ვერსია
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

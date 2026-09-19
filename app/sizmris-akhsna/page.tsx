@@ -7,7 +7,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { DREAMS_HUB_EN, DreamsHubEn } from "@/components/seo/dreams-en";
-import { DREAMS_HUB_AM, DreamsHubAm } from "@/components/seo/dreams-am";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   DREAMS_FAQ,
@@ -16,7 +16,11 @@ import {
   dreamsByLetter,
 } from "@/lib/seo/dreams";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -50,40 +54,42 @@ const KA_METADATA: Metadata = {
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
-  if (locale === "am") {
-    const path = "/sizmris-akhsna";
-    return {
-      title: { absolute: `${DREAMS_HUB_AM.title} — Vivida` },
-      description: DREAMS_HUB_AM.description,
-      keywords: ["երազահան", "երազների մեկնաբանություն", "երազի նշանակություն", "տարածված երազներ"],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: armenianSiteHref(path, false),
-        title: DREAMS_HUB_AM.title,
-        description: DREAMS_HUB_AM.description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title: DREAMS_HUB_AM.title, description: DREAMS_HUB_AM.description },
-    };
-  }
   if (locale === "en") {
     const path = "/sizmris-akhsna";
     return {
       title: { absolute: DREAMS_HUB_EN.title },
       description: DREAMS_HUB_EN.description,
-      keywords: ["dream dictionary", "dream meanings", "dream interpretation", "common dream symbols"],
+      keywords: [
+        "dream dictionary",
+        "dream meanings",
+        "dream interpretation",
+        "common dream symbols",
+      ],
       alternates: localizedAlternates(path, path, "en"),
-      openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: englishSiteHref(path, false), title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description, siteName: "Vivida", locale: "en_US" },
-      twitter: { card: "summary_large_image", title: DREAMS_HUB_EN.title, description: DREAMS_HUB_EN.description },
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: englishSiteHref(path, false),
+        title: DREAMS_HUB_EN.title,
+        description: DREAMS_HUB_EN.description,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: DREAMS_HUB_EN.title,
+        description: DREAMS_HUB_EN.description,
+      },
     };
   }
   return KA_METADATA;
@@ -91,7 +97,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function DreamsHubPage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <DreamsHubAm />;
   if (locale === "en") return <DreamsHubEn />;
   const groups = dreamsByLetter();
 
@@ -104,7 +109,11 @@ export default async function DreamsHubPage() {
       about: {
         "@type": "Thing",
         name: "სიზმრის ახსნა",
-        alternateName: ["სიზმრების ახსნა", "sizmris axsna", "dream interpretation"],
+        alternateName: [
+          "სიზმრების ახსნა",
+          "sizmris axsna",
+          "dream interpretation",
+        ],
       },
     }),
     breadcrumbLd([
@@ -161,8 +170,7 @@ export default async function DreamsHubPage() {
           <p className="mx-auto mt-3.5 max-w-xl text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
             იპოვე ის, რაც სიზმრად ნახე — გველი, წყალი, კბილი, ბავშვი,
             მიცვალებული — და წაიკითხე, რას ნიშნავს ტრადიციულად და რას ამბობს
-            იმავე სიმბოლოზე თანამედროვე ფსიქოლოგია. უფასოა, რეგისტრაციის
-            გარეშე.
+            იმავე სიმბოლოზე თანამედროვე ფსიქოლოგია. უფასოა, რეგისტრაციის გარეშე.
           </p>
         </header>
 
@@ -205,10 +213,10 @@ export default async function DreamsHubPage() {
             როგორ გავშიფროთ სიზმარი სწორად
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            სიმბოლოს მნიშვნელობა ამოსავალი წერტილია და არა საბოლოო პასუხი.
-            ერთი და იგივე გველი სხვადასხვა ადამიანთან სხვადასხვას ნიშნავს —
-            იმიტომ, რომ სიზმარს შენი ცხოვრება ხსნის და არა ლექსიკონი. სამი
-            კითხვა, რომელიც ყველაზე მეტად ეხმარება:
+            სიმბოლოს მნიშვნელობა ამოსავალი წერტილია და არა საბოლოო პასუხი. ერთი
+            და იგივე გველი სხვადასხვა ადამიანთან სხვადასხვას ნიშნავს — იმიტომ,
+            რომ სიზმარს შენი ცხოვრება ხსნის და არა ლექსიკონი. სამი კითხვა,
+            რომელიც ყველაზე მეტად ეხმარება:
           </p>
           <ol className="mt-4 space-y-2.5 text-[15px] leading-relaxed text-foreground/85">
             <li className="flex gap-3">
@@ -225,8 +233,8 @@ export default async function DreamsHubPage() {
                 2
               </span>
               <span>
-                <strong>რა ხდება ახლა შენს ცხოვრებაში?</strong> სიზმარი
-                თითქმის ყოველთვის ბოლო დღეების თემას ამუშავებს.
+                <strong>რა ხდება ახლა შენს ცხოვრებაში?</strong> სიზმარი თითქმის
+                ყოველთვის ბოლო დღეების თემას ამუშავებს.
               </span>
             </li>
             <li className="flex gap-3">
@@ -272,8 +280,8 @@ export default async function DreamsHubPage() {
             სიზმარი ერთი ღამეა — რუკა მთელი შენი ისტორიაა
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            მთვარე ნატალურ რუკაში სწორედ იმაზე ამბობს, როგორ განიცდი, ოცნებობ
-            და რას მალავ. შექმენი შენი რუკა უფასოდ.
+            მთვარე ნატალურ რუკაში სწორედ იმაზე ამბობს, როგორ განიცდი, ოცნებობ და
+            რას მალავ. შექმენი შენი რუკა უფასოდ.
           </p>
           <Link
             href="/nataluri-ruka"

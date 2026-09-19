@@ -1,21 +1,9 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  CornerDownRight,
-  Loader2,
-  Reply,
-  Send,
-  Trash2,
-} from "lucide-react";
+import { CornerDownRight, Loader2, Reply, Send, Trash2 } from "lucide-react";
 
 import {
   addComment,
@@ -64,7 +52,6 @@ export function CommentSection({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [comments, setComments] = useState<FeedComment[] | null>(null);
   const [body, setBody] = useState("");
   const [replyParentId, setReplyParentId] = useState<string | null>(null);
@@ -118,7 +105,7 @@ export function CommentSection({
 
   const topLevel = useMemo(
     () => (comments ?? []).filter((c) => !c.parentId),
-    [comments]
+    [comments],
   );
 
   function refreshComments() {
@@ -134,7 +121,9 @@ export function CommentSection({
     startTransition(async () => {
       const res = await addComment(postId, trimmed);
       if (!res.ok) {
-        setError(en ? "Could not add the comment. Please try again." : res.error);
+        setError(
+          en ? "Could not add the comment. Please try again." : res.error,
+        );
         return;
       }
       setBody("");
@@ -164,7 +153,9 @@ export function CommentSection({
     startTransition(async () => {
       const res = await deleteComment(commentId);
       if (!res.ok) {
-        setError(en ? "Could not delete the comment. Please try again." : res.error);
+        setError(
+          en ? "Could not delete the comment. Please try again." : res.error,
+        );
         return;
       }
       await refreshComments();
@@ -181,144 +172,146 @@ export function CommentSection({
   return (
     <div className="w-full">
       <div className="mt-3 space-y-4">
-          {loading && (
-            <div className="flex justify-center py-4">
-              <Loader2 className="size-4 animate-spin text-muted-foreground" />
-            </div>
-          )}
+        {loading && (
+          <div className="flex justify-center py-4">
+            <Loader2 className="size-4 animate-spin text-muted-foreground" />
+          </div>
+        )}
 
-          {loadFailed && (
-            <div className="flex flex-col items-center gap-2 py-4 text-center">
-              <p className="text-xs text-muted-foreground">
-                {en
-                  ? "Could not load the comments."
-                  : "კომენტარები ვერ ჩაიტვირთა."}
-              </p>
+        {loadFailed && (
+          <div className="flex flex-col items-center gap-2 py-4 text-center">
+            <p className="text-xs text-muted-foreground">
+              {en
+                ? "Could not load the comments."
+                : "კომენტარები ვერ ჩაიტვირთა."}
+            </p>
+            <button
+              type="button"
+              onClick={() => setLoadFailed(false)}
+              className="rounded-full border border-border px-3 py-1.5 text-[11px] text-foreground transition-colors hover:bg-card/80"
+            >
+              {en ? "Try again" : "სცადე ხელახლა"}
+            </button>
+          </div>
+        )}
+
+        {topLevel.length > 0 && (
+          <ul className="space-y-3">
+            {topLevel.map((c) => {
+              const replies = repliesByParent.get(c.id) ?? [];
+              return (
+                <li key={c.id} className="space-y-2">
+                  <CommentRow
+                    comment={c}
+                    viewerId={viewerId}
+                    viewerIsAdmin={viewerIsAdmin}
+                    postAuthorId={postAuthorId}
+                    isReply={false}
+                    isPending={isPending}
+                    onDelete={removeComment}
+                    onReply={() => {
+                      setReplyParentId(c.id);
+                      setReplyBody("");
+                    }}
+                    locale={locale}
+                  />
+
+                  {(replies.length > 0 || replyParentId === c.id) && (
+                    <div className="relative ml-5 space-y-2 border-l border-border/50 pl-4">
+                      {replies.map((r) => (
+                        <CommentRow
+                          key={r.id}
+                          comment={r}
+                          viewerId={viewerId}
+                          viewerIsAdmin={viewerIsAdmin}
+                          postAuthorId={postAuthorId}
+                          isReply
+                          isPending={isPending}
+                          onDelete={removeComment}
+                          locale={locale}
+                        />
+                      ))}
+
+                      {replyParentId === c.id && (
+                        <ReplyComposer
+                          ref={replyRef}
+                          value={replyBody}
+                          onChange={setReplyBody}
+                          onSubmit={submitReply}
+                          onCancel={() => {
+                            setReplyParentId(null);
+                            setReplyBody("");
+                          }}
+                          isPending={isPending}
+                          error={error}
+                          locale={locale}
+                        />
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
+        {comments && comments.length === 0 && !loading && (
+          <p className="px-1 text-xs text-muted-foreground/80">
+            {en
+              ? "No comments yet—start the conversation."
+              : "ჯერ კომენტარი არ არის — დაიწყე საუბარი."}
+          </p>
+        )}
+
+        {/* Top-level composer */}
+        <div className="rounded-2xl border border-border/60 bg-background/40 p-2.5">
+          <MentionInput
+            textareaRef={textareaRef}
+            value={body}
+            onChange={setBody}
+            locale={locale}
+            onKeyDown={(e) => {
+              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit();
+            }}
+            placeholder={en ? "Write a comment…" : "დაწერე კომენტარი..."}
+            rows={2}
+            maxLength={COMMENT_BODY_MAX + 20}
+            className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            disabled={isPending}
+          />
+          <div className="mt-1.5 flex items-center justify-between gap-3">
+            <span
+              className={cn(
+                "text-[10px] tabular-nums",
+                overflow
+                  ? "text-[var(--vivida-pink)]"
+                  : "text-muted-foreground/70",
+              )}
+            >
+              {remaining}
+            </span>
+            <div className="flex items-center gap-2">
+              {error && !replyParentId && (
+                <span className="text-[11px] text-[var(--vivida-pink)]">
+                  {error}
+                </span>
+              )}
               <button
                 type="button"
-                onClick={() => setLoadFailed(false)}
-                className="rounded-full border border-border px-3 py-1.5 text-[11px] text-foreground transition-colors hover:bg-card/80"
+                onClick={submit}
+                disabled={submitDisabled}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-3 py-1.5 text-xs font-medium text-background shadow-[0_8px_20px_-8px_oklch(0.72_0.22_350/0.55)] transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
               >
-                {am ? "Կրկին փորձել" : en ? "Try again" : "სცადე ხელახლა"}
+                {isPending ? (
+                  <Loader2 className="size-3 animate-spin" />
+                ) : (
+                  <Send className="size-3" />
+                )}
+                {en ? "Add" : "დამატება"}
               </button>
             </div>
-          )}
-
-          {topLevel.length > 0 && (
-            <ul className="space-y-3">
-              {topLevel.map((c) => {
-                const replies = repliesByParent.get(c.id) ?? [];
-                return (
-                  <li key={c.id} className="space-y-2">
-                    <CommentRow
-                      comment={c}
-                      viewerId={viewerId}
-                      viewerIsAdmin={viewerIsAdmin}
-                      postAuthorId={postAuthorId}
-                      isReply={false}
-                      isPending={isPending}
-                      onDelete={removeComment}
-                      onReply={() => {
-                        setReplyParentId(c.id);
-                        setReplyBody("");
-                      }}
-                      locale={locale}
-                    />
-
-                    {(replies.length > 0 || replyParentId === c.id) && (
-                      <div className="relative ml-5 space-y-2 border-l border-border/50 pl-4">
-                        {replies.map((r) => (
-                          <CommentRow
-                            key={r.id}
-                            comment={r}
-                            viewerId={viewerId}
-                            viewerIsAdmin={viewerIsAdmin}
-                            postAuthorId={postAuthorId}
-                            isReply
-                            isPending={isPending}
-                            onDelete={removeComment}
-                            locale={locale}
-                          />
-                        ))}
-
-                        {replyParentId === c.id && (
-                          <ReplyComposer
-                            ref={replyRef}
-                            value={replyBody}
-                            onChange={setReplyBody}
-                            onSubmit={submitReply}
-                            onCancel={() => {
-                              setReplyParentId(null);
-                              setReplyBody("");
-                            }}
-                            isPending={isPending}
-                            error={error}
-                            locale={locale}
-                          />
-                        )}
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-
-          {comments && comments.length === 0 && !loading && (
-            <p className="px-1 text-xs text-muted-foreground/80">
-              {am ? "Դեռ մեկնաբանություններ չկան. սկսեք զրույցը։" : en ? "No comments yet—start the conversation." : "ჯერ კომენტარი არ არის — დაიწყე საუბარი."}
-            </p>
-          )}
-
-          {/* Top-level composer */}
-          <div className="rounded-2xl border border-border/60 bg-background/40 p-2.5">
-            <MentionInput
-              textareaRef={textareaRef}
-              value={body}
-              onChange={setBody}
-              locale={locale}
-              onKeyDown={(e) => {
-                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit();
-              }}
-              placeholder={am ? "Գրել մեկնաբանություն…" : en ? "Write a comment…" : "დაწერე კომენტარი..."}
-              rows={2}
-              maxLength={COMMENT_BODY_MAX + 20}
-              className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
-              disabled={isPending}
-            />
-            <div className="mt-1.5 flex items-center justify-between gap-3">
-              <span
-                className={cn(
-                  "text-[10px] tabular-nums",
-                  overflow
-                    ? "text-[var(--vivida-pink)]"
-                    : "text-muted-foreground/70"
-                )}
-              >
-                {remaining}
-              </span>
-              <div className="flex items-center gap-2">
-                {error && !replyParentId && (
-                  <span className="text-[11px] text-[var(--vivida-pink)]">
-                    {error}
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={submit}
-                  disabled={submitDisabled}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-3 py-1.5 text-xs font-medium text-background shadow-[0_8px_20px_-8px_oklch(0.72_0.22_350/0.55)] transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
-                >
-                  {isPending ? (
-                    <Loader2 className="size-3 animate-spin" />
-                  ) : (
-                    <Send className="size-3" />
-                  )}
-                  {am ? "Ավելացնել" : en ? "Add" : "დამატება"}
-                </button>
-              </div>
-            </div>
           </div>
+        </div>
       </div>
     </div>
   );
@@ -349,7 +342,6 @@ function CommentRow({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const canDelete =
     comment.author.id === viewerId ||
     postAuthorId === viewerId ||
@@ -358,7 +350,7 @@ function CommentRow({
     comment.author.displayName ??
     comment.author.name?.split(" ")[0] ??
     comment.author.username ??
-    (am ? "Աստղադիտող" : en ? "Stargazer" : "ვარსკვლავო");
+    (en ? "Stargazer" : "ვარსკვლავო");
   const profileHref = comment.author.username
     ? `/u/${comment.author.username}`
     : null;
@@ -373,7 +365,7 @@ function CommentRow({
         alt=""
         className={cn(
           "shrink-0 rounded-full border border-border/80 object-cover",
-          avatarSize
+          avatarSize,
         )}
       />
 
@@ -381,7 +373,7 @@ function CommentRow({
         <div
           className={cn(
             "rounded-2xl bg-card/45 px-3 py-2 ring-1 ring-foreground/5",
-            isReply && "bg-card/30"
+            isReply && "bg-card/30",
           )}
         >
           <div className="flex items-baseline gap-2">
@@ -425,7 +417,7 @@ function CommentRow({
                 className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
               >
                 <Reply className="size-3" />
-                {am ? "Պատասխանել" : en ? "Reply" : "უპასუხე"}
+                {en ? "Reply" : "უპასუხე"}
               </button>
             )}
             {canDelete && (
@@ -433,7 +425,7 @@ function CommentRow({
                 type="button"
                 onClick={() => onDelete(comment.id)}
                 disabled={isPending}
-                aria-label={am ? "Ջնջել" : am ? "Ջնջել" : en ? "Delete" : "წაშლა"}
+                aria-label={en ? "Delete" : "წაშლა"}
                 className="inline-flex items-center gap-1 transition-colors hover:text-[var(--vivida-pink)]"
               >
                 <Trash2 className="size-3" />
@@ -473,7 +465,6 @@ function ReplyComposer({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const remaining = COMMENT_BODY_MAX - value.length;
   const overflow = remaining < 0;
   const disabled = isPending || value.trim().length === 0 || overflow;
@@ -489,7 +480,7 @@ function ReplyComposer({
           if ((e.metaKey || e.ctrlKey) && e.key === "Enter") onSubmit();
           if (e.key === "Escape") onCancel();
         }}
-        placeholder={am ? "Գրել պատասխան…" : en ? "Write a reply…" : "დაწერე პასუხი..."}
+        placeholder={en ? "Write a reply…" : "დაწერე პასუხი..."}
         rows={2}
         maxLength={COMMENT_BODY_MAX + 20}
         className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
@@ -499,9 +490,7 @@ function ReplyComposer({
         <span
           className={cn(
             "text-[10px] tabular-nums",
-            overflow
-              ? "text-[var(--vivida-pink)]"
-              : "text-muted-foreground/70"
+            overflow ? "text-[var(--vivida-pink)]" : "text-muted-foreground/70",
           )}
         >
           {remaining}
@@ -518,7 +507,7 @@ function ReplyComposer({
             disabled={isPending}
             className="text-[11px] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
           >
-            {am ? "Չեղարկել" : en ? "Cancel" : "გაუქმება"}
+            {en ? "Cancel" : "გაუქმება"}
           </button>
           <button
             type="button"
@@ -531,7 +520,7 @@ function ReplyComposer({
             ) : (
               <Send className="size-3" />
             )}
-            {am ? "Պատասխանել" : en ? "Reply" : "პასუხი"}
+            {en ? "Reply" : "პასუხი"}
           </button>
         </div>
       </div>

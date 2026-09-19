@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import {
-  Check,
-  Clock,
-  UserCheck,
-  UserMinus,
-  UserPlus,
-  X,
-} from "lucide-react";
+import { Check, Clock, UserCheck, UserMinus, UserPlus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,14 +26,13 @@ export function FriendButton({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [status, setStatus] = useState<FriendshipStatus>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const run = (
     fn: () => Promise<{ ok: boolean; error?: string }>,
-    nextStatus: FriendshipStatus
+    nextStatus: FriendshipStatus,
   ) => {
     setError(null);
     startTransition(async () => {
@@ -48,7 +40,7 @@ export function FriendButton({
       if (result.ok) {
         setStatus(nextStatus);
       } else {
-        setError(result.error ?? (am ? "Ինչ-որ բան սխալ է տեղի ունեցել" : en ? "Something went wrong" : "შეცდომა"));
+        setError(result.error ?? (en ? "Something went wrong" : "შეცდომა"));
       }
     });
   };
@@ -66,12 +58,18 @@ export function FriendButton({
           onClick={() =>
             run(
               () => sendFriendRequest(targetUserId, targetUsername),
-              "pending_outgoing"
+              "pending_outgoing",
             )
           }
         >
           <UserPlus className="size-4" />
-          {isPending ? (am ? "Ուղարկվում է…" : en ? "Sending…" : "იგზავნება…") : (am ? "Ավելացնել ընկեր" : en ? "Add friend" : "მეგობრობის თხოვნა")}
+          {isPending
+            ? en
+              ? "Sending…"
+              : "იგზავნება…"
+            : en
+              ? "Add friend"
+              : "მეგობრობის თხოვნა"}
         </Button>
       )}
 
@@ -80,14 +78,17 @@ export function FriendButton({
           variant="outline"
           disabled={isPending}
           onClick={() =>
-            run(
-              () => cancelFriendRequest(targetUserId, targetUsername),
-              "none"
-            )
+            run(() => cancelFriendRequest(targetUserId, targetUsername), "none")
           }
         >
           <Clock className="size-4" />
-          {isPending ? (am ? "Չեղարկվում է…" : en ? "Cancelling…" : "უქმდება…") : (am ? "Հարցումն ուղարկված է" : en ? "Request sent" : "მოთხოვნა გაგზავნილია")}
+          {isPending
+            ? en
+              ? "Cancelling…"
+              : "უქმდება…"
+            : en
+              ? "Request sent"
+              : "მოთხოვნა გაგზავნილია"}
         </Button>
       )}
 
@@ -99,12 +100,12 @@ export function FriendButton({
             onClick={() =>
               run(
                 () => acceptFriendRequest(targetUserId, targetUsername),
-                "friends"
+                "friends",
               )
             }
           >
             <Check className="size-4" />
-            {am ? "Ընդունել" : en ? "Accept" : "მიიღე"}
+            {en ? "Accept" : "მიიღე"}
           </Button>
           <Button
             variant="outline"
@@ -112,12 +113,12 @@ export function FriendButton({
             onClick={() =>
               run(
                 () => declineFriendRequest(targetUserId, targetUsername),
-                "none"
+                "none",
               )
             }
           >
             <X className="size-4" />
-            {am ? "Մերժել" : en ? "Decline" : "უარი"}
+            {en ? "Decline" : "უარი"}
           </Button>
         </>
       )}
@@ -127,19 +128,22 @@ export function FriendButton({
           variant="outline"
           disabled={isPending}
           onClick={() => {
-            const sure = window.confirm(am ? "Վստա՞հ եք" : en ? "Are you sure?" : "დარწმუნებული ხარ?");
-            if (!sure) return;
-            run(
-              () => removeFriend(targetUserId, targetUsername),
-              "none"
+            const sure = window.confirm(
+              en ? "Are you sure?" : "დარწმუნებული ხარ?",
             );
+            if (!sure) return;
+            run(() => removeFriend(targetUserId, targetUsername), "none");
           }}
           className="group"
         >
           <UserCheck className="size-4 group-hover:hidden" />
           <UserMinus className="hidden size-4 group-hover:inline" />
-          <span className="group-hover:hidden">{am ? "Ընկեր" : en ? "Friend" : "მეგობარი"}</span>
-          <span className="hidden group-hover:inline">{am ? "Հեռացնել" : en ? "Remove" : "წაშლა"}</span>
+          <span className="group-hover:hidden">
+            {en ? "Friend" : "მეგობარი"}
+          </span>
+          <span className="hidden group-hover:inline">
+            {en ? "Remove" : "წაშლა"}
+          </span>
         </Button>
       )}
 

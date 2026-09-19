@@ -77,27 +77,12 @@ const nextConfig: NextConfig = {
     };
   },
   async headers() {
-    // The international domain serves English at the root and Armenian under
-    // /am. Every matching rule is applied, so the English rule has to exclude
-    // the Armenian prefix explicitly — otherwise /am/* would come back with
-    // two Content-Language values.
-    return ENGLISH_HOSTS.flatMap((host) => [
-      {
-        source: "/am/:path*",
-        has: [{ type: "host" as const, value: host }],
-        headers: [{ key: "Content-Language", value: "hy" }],
-      },
-      {
-        source: "/am",
-        has: [{ type: "host" as const, value: host }],
-        headers: [{ key: "Content-Language", value: "hy" }],
-      },
-      {
-        source: "/((?!am(?:/|$)).*)",
-        has: [{ type: "host" as const, value: host }],
-        headers: [{ key: "Content-Language", value: "en" }],
-      },
-    ]);
+    // The international domain serves English.
+    return ENGLISH_HOSTS.map((host) => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value: host }],
+      headers: [{ key: "Content-Language", value: "en" }],
+    }));
   },
   images: {
     // User photos are immutable R2 keys. Keep optimized derivatives for a

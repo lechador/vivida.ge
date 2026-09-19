@@ -37,15 +37,10 @@ export default async function OnboardingPage({
   const user = await requireUser();
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   const { next, fast } = await searchParams;
 
   const [[existing], assignment] = await Promise.all([
-    db
-      .select()
-      .from(profiles)
-      .where(eq(profiles.userId, user.id))
-      .limit(1),
+    db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     getSignupCreditAssignment(user.id),
   ]);
   if (assignment && !assignment.exposedAt) {
@@ -56,7 +51,10 @@ export default async function OnboardingPage({
   if (fast === "1" && existing) redirect(destination ?? "/report");
 
   return (
-    <main lang={locale} className="relative isolate flex flex-1 flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex flex-1 flex-col overflow-hidden"
+    >
       {assignment && (
         <ExperimentAssignmentTracker
           experiment={SIGNUP_CREDITS_EXPERIMENT}
@@ -84,7 +82,8 @@ export default async function OnboardingPage({
           </span>
         </Link>
         <div className="text-right text-xs text-muted-foreground">
-          {am ? "Բարև" : en ? "Hi" : "სალამი"}, {user.name?.split(" ")[0] ?? (am ? "աստղադիտող" : en ? "stargazer" : "ვარსკვლავო")} ✨
+          {en ? "Hi" : "სალამი"},{" "}
+          {user.name?.split(" ")[0] ?? (en ? "stargazer" : "ვარსკვლავო")} ✨
         </div>
       </header>
 

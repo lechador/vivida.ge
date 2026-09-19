@@ -35,13 +35,8 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import {
-  ARMENIAN_SITE_URL,
-  DEFAULT_OG_IMAGE,
-  localizedAlternates,
-} from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { ZodiacGuideIndexEn } from "@/components/seo/zodiac-guides-en";
-import { ZodiacGuideIndexAm } from "@/components/seo/zodiac-guides-am";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/gzamkvlevi";
@@ -74,27 +69,6 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
-  if (locale === "am") {
-    const title =
-      "Կենդանակերպի ամբողջական ուղեցույց՝ նշաններ, Լուսին, ասցենդենտ և համատեղելիություն";
-    const description =
-      "Բացահայտեք կենդանակերպի բոլոր նշանները, Լուսնի նշանները, ասցենդենտները, չորս տարրերը, հորոսկոպներն ու համատեղելիության բոլոր 78 զույգերը։";
-    return {
-      title: { absolute: title },
-      description,
-      alternates: localizedAlternates(`/am${PATH}`, PATH, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: `${ARMENIAN_SITE_URL}${PATH}`,
-        title,
-        description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title, description },
-    };
-  }
   if (locale === "en") {
     const title =
       "Complete Zodiac Guide: Signs, Moon, Rising and Compatibility";
@@ -128,7 +102,6 @@ const ELEMENT_ACCENT: Record<string, string> = {
 
 export default async function GuideIndexPage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <ZodiacGuideIndexAm />;
   if (locale === "en") return <ZodiacGuideIndexEn />;
   // Build a flat list of all canonical pages for the JSON-LD ItemList.
   const allUrls: Array<{ url: string; name: string }> = [

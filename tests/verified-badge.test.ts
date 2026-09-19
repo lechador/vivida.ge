@@ -9,37 +9,54 @@ describe("verified badge entitlement", () => {
   const now = Date.parse("2026-08-26T10:00:00.000Z");
 
   it("keeps an admin-gifted badge independent from Premium", () => {
-    expect(hasVerifiedBadge({
-      isPremium: false,
-      premiumUntil: null,
-      verifiedBadgeGrantedAt: new Date("2026-08-25T10:00:00.000Z"),
-    }, now)).toBe(true);
+    expect(
+      hasVerifiedBadge(
+        {
+          isPremium: false,
+          premiumUntil: null,
+          verifiedBadgeGrantedAt: new Date("2026-08-25T10:00:00.000Z"),
+        },
+        now,
+      ),
+    ).toBe(true);
   });
 
   it("continues to show the badge for an active Premium user", () => {
-    expect(hasVerifiedBadge({
-      isPremium: true,
-      premiumUntil: new Date("2026-09-26T10:00:00.000Z"),
-      verifiedBadgeGrantedAt: null,
-    }, now)).toBe(true);
+    expect(
+      hasVerifiedBadge(
+        {
+          isPremium: true,
+          premiumUntil: new Date("2026-09-26T10:00:00.000Z"),
+          verifiedBadgeGrantedAt: null,
+        },
+        now,
+      ),
+    ).toBe(true);
   });
 
   it("does not show a badge after Premium expires without a manual gift", () => {
-    expect(hasVerifiedBadge({
-      isPremium: true,
-      premiumUntil: new Date("2026-08-25T10:00:00.000Z"),
-      verifiedBadgeGrantedAt: null,
-    }, now)).toBe(false);
+    expect(
+      hasVerifiedBadge(
+        {
+          isPremium: true,
+          premiumUntil: new Date("2026-08-25T10:00:00.000Z"),
+          verifiedBadgeGrantedAt: null,
+        },
+        now,
+      ),
+    ).toBe(false);
   });
 });
 
 describe("VerifiedBadgeGiftEmail", () => {
-  async function email(locale: "ka" | "en" | "am") {
-    return render(createElement(VerifiedBadgeGiftEmail, {
-      name: "Nino",
-      profileUrl: "https://vivida.ge/u/nino",
-      locale,
-    }));
+  async function email(locale: "ka" | "en") {
+    return render(
+      createElement(VerifiedBadgeGiftEmail, {
+        name: "Nino",
+        profileUrl: "https://vivida.ge/u/nino",
+        locale,
+      }),
+    );
   }
 
   it("renders the Georgian gift notice and profile link", async () => {
@@ -49,8 +66,9 @@ describe("VerifiedBadgeGiftEmail", () => {
     expect(html).toContain("https://vivida.ge/u/nino");
   });
 
-  it("renders localized English and Armenian notices", async () => {
-    await expect(email("en")).resolves.toContain("You received a Verified Badge as a gift");
-    await expect(email("am")).resolves.toContain("Դուք նվեր եք ստացել Verified Badge");
+  it("renders the localized English notice", async () => {
+    await expect(email("en")).resolves.toContain(
+      "You received a Verified Badge as a gift",
+    );
   });
 });

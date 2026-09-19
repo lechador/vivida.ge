@@ -50,15 +50,24 @@ import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 
 const CAMPAIGN_KEY = "token_growth_2026_08_28";
 const EXPECTED_CANDIDATES = 368;
-const ORIGIN = (process.env.EMAIL_ORIGIN ?? "https://vivida.ge").replace(/\/$/, "");
+const ORIGIN = (process.env.EMAIL_ORIGIN ?? "https://vivida.ge").replace(
+  /\/$/,
+  "",
+);
 const FROM = (() => {
   const configured = process.env.RESEND_FROM;
   if (!configured) return "Vivida <hello@vivida.ge>";
   return configured.includes("<") ? configured : `Vivida <${configured}>`;
 })();
 
-const analysisRoot = resolve(process.cwd(), "../analysis/token-growth-2026-08-28");
-const candidatePath = resolve(analysisRoot, "output/05-potential-buyers-ranked.csv");
+const analysisRoot = resolve(
+  process.cwd(),
+  "../analysis/token-growth-2026-08-28",
+);
+const candidatePath = resolve(
+  analysisRoot,
+  "output/05-potential-buyers-ranked.csv",
+);
 const reportPath = resolve(analysisRoot, "campaign-live-preflight.json");
 const assignmentPath = resolve(analysisRoot, "campaign-live-assignments.csv");
 
@@ -117,7 +126,11 @@ type Assignment = {
   suppressionReasons: string[];
 };
 
-async function withRetry<T>(label: string, work: () => Promise<T>, attempts = 5): Promise<T> {
+async function withRetry<T>(
+  label: string,
+  work: () => Promise<T>,
+  attempts = 5,
+): Promise<T> {
   let lastError: unknown;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
@@ -126,7 +139,9 @@ async function withRetry<T>(label: string, work: () => Promise<T>, attempts = 5)
       lastError = error;
       if (attempt === attempts) break;
       const delayMs = 500 * 2 ** (attempt - 1);
-      console.warn(`[campaign] ${label} failed (attempt ${attempt}/${attempts}); retrying in ${delayMs}ms`);
+      console.warn(
+        `[campaign] ${label} failed (attempt ${attempt}/${attempts}); retrying in ${delayMs}ms`,
+      );
       await new Promise((resolveDelay) => setTimeout(resolveDelay, delayMs));
     }
   }
@@ -173,7 +188,9 @@ function parseCsv(input: string): Candidate[] {
   }
   const [header, ...body] = rows.filter((r) => r.some((cell) => cell.length));
   if (!header) return [];
-  return body.map((values) => Object.fromEntries(header.map((key, index) => [key, values[index] ?? ""]))) as Candidate[];
+  return body.map((values) =>
+    Object.fromEntries(header.map((key, index) => [key, values[index] ?? ""])),
+  ) as Candidate[];
 }
 
 function csvCell(value: unknown): string {
@@ -186,27 +203,35 @@ function ageOn(dateOfBirth: string | null, now = new Date()): number | null {
   const [year, month, day] = dateOfBirth.split("-").map(Number);
   if (!year || !month || !day) return null;
   let age = now.getUTCFullYear() - year;
-  const beforeBirthday = now.getUTCMonth() + 1 < month ||
+  const beforeBirthday =
+    now.getUTCMonth() + 1 < month ||
     (now.getUTCMonth() + 1 === month && now.getUTCDate() < day);
   if (beforeBirthday) age -= 1;
   return age;
 }
 
 function isCurrentPremium(live: LiveUser): boolean {
-  return Boolean(live.isPremium && live.premiumUntil && live.premiumUntil.getTime() > Date.now());
+  return Boolean(
+    live.isPremium &&
+    live.premiumUntil &&
+    live.premiumUntil.getTime() > Date.now(),
+  );
 }
 
 function chooseOffer(candidate: Candidate, live: LiveUser | null): Offer {
-  if (live?.lowCreditOfferSent || bool(candidate.low_credit_offer_sent)) return "existing_pro_deadline";
+  if (live?.lowCreditOfferSent || bool(candidate.low_credit_offer_sent))
+    return "existing_pro_deadline";
   if (
     candidate.segment === "HOT — depleted and returned" &&
     (live?.country ?? candidate.country) === "GE" &&
     (live?.balance ?? Number(candidate.balance)) <= 4
-  ) return "pro_3mo_29";
+  )
+    return "pro_3mo_29";
   if (candidate.segment === "WARM — strong paid-feature use") {
     const spend = Number(candidate.credits_spent_lifetime);
     const features = Number(candidate.distinct_paid_features);
-    if (spend >= 20 || features >= 3 || candidate.best_feature === "AI ჩატი") return "standard_pro";
+    if (spend >= 20 || features >= 3 || candidate.best_feature === "AI ჩატი")
+      return "standard_pro";
     return "refill_75";
   }
   return "starter_30";
@@ -219,11 +244,14 @@ function evaluate(candidate: Candidate, live: LiveUser | null): Assignment {
   if (live?.restricted) suppressionReasons.push("restricted");
   const age = live ? ageOn(live.dateOfBirth) : null;
   if (age !== null && age < 18) suppressionReasons.push("under_18");
-  if (live && live.purchaseCount > 0) suppressionReasons.push("converted_to_buyer");
+  if (live && live.purchaseCount > 0)
+    suppressionReasons.push("converted_to_buyer");
   const baseEligible = suppressionReasons.length === 0;
   const offer = chooseOffer(candidate, live);
   const highIntent = candidate.segment !== "WARM — light feature intent";
-  const duplicateOfferEmail = Boolean(live?.lowCreditOfferSent || bool(candidate.low_credit_offer_sent));
+  const duplicateOfferEmail = Boolean(
+    live?.lowCreditOfferSent || bool(candidate.low_credit_offer_sent),
+  );
   const emailPlanned = Boolean(
     baseEligible &&
     highIntent &&
@@ -233,12 +261,15 @@ function evaluate(candidate: Candidate, live: LiveUser | null): Assignment {
     live.emailVerified,
   );
   if (baseEligible && highIntent && !emailPlanned) {
-    if (duplicateOfferEmail) suppressionReasons.push("email_existing_offer_recipient");
-    if (!live?.emailMarketing) suppressionReasons.push("email_marketing_opt_out");
+    if (duplicateOfferEmail)
+      suppressionReasons.push("email_existing_offer_recipient");
+    if (!live?.emailMarketing)
+      suppressionReasons.push("email_marketing_opt_out");
     if (!live?.emailVerified) suppressionReasons.push("email_unverified");
     if (!live?.email) suppressionReasons.push("email_missing");
   }
-  if (baseEligible && !highIntent) suppressionReasons.push("email_in_app_only_light_intent");
+  if (baseEligible && !highIntent)
+    suppressionReasons.push("email_in_app_only_light_intent");
   return {
     candidate,
     live,
@@ -251,16 +282,16 @@ function evaluate(candidate: Candidate, live: LiveUser | null): Assignment {
 }
 
 const FEATURE: Record<string, Record<UserLocale, string>> = {
-  "ტარო": { ka: "ტარო", en: "tarot", am: "տարո" },
-  "PDF რუკა": { ka: "PDF რუკა", en: "PDF reports", am: "PDF հաշվետվությունները" },
-  "7-დღიანი პროგნოზი": { ka: "7-დღიანი პროგნოზი", en: "7-day forecasts", am: "7-օրյա կանխատեսումները" },
-  "თავსებადობა": { ka: "თავსებადობა", en: "compatibility readings", am: "համատեղելիության վերլուծությունը" },
-  "AI ჩატი": { ka: "AI ჩატი", en: "AI chat", am: "AI չատը" },
-  "MBTI": { ka: "MBTI", en: "MBTI", am: "MBTI" },
-  "Big Five": { ka: "Big Five", en: "Big Five", am: "Big Five" },
-  "აუდიო ჰოროსკოპი": { ka: "აუდიო ჰოროსკოპი", en: "audio horoscope", am: "աուդիո հորոսկոպը" },
-  "IQ ტესტი": { ka: "IQ ტესტი", en: "IQ test", am: "IQ թեստը" },
-  "EQ ტესტი": { ka: "EQ ტესტი", en: "EQ test", am: "EQ թեստը" },
+  ტარო: { ka: "ტარო", en: "tarot" },
+  "PDF რუკა": { ka: "PDF რუკა", en: "PDF reports" },
+  "7-დღიანი პროგნოზი": { ka: "7-დღიანი პროგნოზი", en: "7-day forecasts" },
+  თავსებადობა: { ka: "თავსებადობა", en: "compatibility readings" },
+  "AI ჩატი": { ka: "AI ჩატი", en: "AI chat" },
+  MBTI: { ka: "MBTI", en: "MBTI" },
+  "Big Five": { ka: "Big Five", en: "Big Five" },
+  "აუდიო ჰოროსკოპი": { ka: "აუდიო ჰოროსკოპი", en: "audio horoscope" },
+  "IQ ტესტი": { ka: "IQ ტესტი", en: "IQ test" },
+  "EQ ტესტი": { ka: "EQ ტესტი", en: "EQ test" },
 };
 
 function featureLabel(candidate: Candidate, locale: UserLocale): string {
@@ -274,21 +305,28 @@ function offerDestination(offer: Offer): string {
     utm_campaign: CAMPAIGN_KEY,
     utm_content: offer,
   });
-  if (offer === "starter_30" || offer === "refill_75") return `/credits?${params}#credit-packs`;
+  if (offer === "starter_30" || offer === "refill_75")
+    return `/credits?${params}#credit-packs`;
   if (offer === "standard_pro") return `/credits?${params}#pro-plan`;
   return `/credits?${params}`;
 }
 
 function offerPrice(live: LiveUser, offer: Offer, locale: UserLocale): string {
   if (offer === "pro_3mo_29" || offer === "existing_pro_deadline") {
-    return formatBillingAmount(LOW_CREDIT_PROMO_PLAN.amountMinor, LOW_CREDIT_PROMO_PLAN.currency, locale);
+    return formatBillingAmount(
+      LOW_CREDIT_PROMO_PLAN.amountMinor,
+      LOW_CREDIT_PROMO_PLAN.currency,
+      locale,
+    );
   }
   if (offer === "standard_pro") {
     const plan = premiumPlanForCountry(live.country);
     return formatBillingAmount(plan.amountMinor, plan.currency, locale);
   }
   const packId = offer === "refill_75" ? "m" : "s";
-  const pack = creditPacksForCountry(live.country).find((item) => item.id === packId)!;
+  const pack = creditPacksForCountry(live.country).find(
+    (item) => item.id === packId,
+  )!;
   return formatBillingAmount(pack.amountMinor, pack.currency, locale);
 }
 
@@ -303,45 +341,29 @@ function copyFor(assignment: Assignment): {
   const locale = normalizeUserLocale(live.locale);
   const feature = featureLabel(assignment.candidate, locale);
   const price = offerPrice(live, assignment.offer, locale);
-  if (locale === "am") {
-    if (assignment.offer === "existing_pro_deadline" || assignment.offer === "pro_3mo_29") return {
-      subject: `3 ամիս անսահմանափակ Vivida՝ ${price}-ով`,
-      title: assignment.offer === "existing_pro_deadline" ? "Քո PRO առաջարկը դեռ ակտիվ է" : "Կրեդիտներն ավարտվել են, բայց Vivida-ն շարունակում է",
-      body: `3 ամիս անսահմանափակ Vivida՝ ${price}-ով։ Առաջարկը գործում է մինչև սեպտեմբերի 1-ը։`,
-      emailBody: `Քո կրեդիտները գրեթե սպառվել են։ Բացիր բոլոր գործառույթները 3 ամբողջ ամսով՝ առանց կրեդիտների և սահմանափակումների։\n\nԱռաջարկը գործում է մինչև սեպտեմբերի 1-ը։`,
-      cta: "Ակտիվացնել առաջարկը",
-    };
-    if (assignment.offer === "standard_pro") return {
-      subject: `Բացիր ${feature}-ն և ամբողջ Vivida-ն առանց սահմանափակման`,
-      title: "Բացիր Vivida-ն առանց սահմանափակման",
-      body: `PRO-ով ${feature}-ն և մյուս գործառույթները հասանելի են առանց կրեդիտների՝ ${price}/ամիս։`,
-      emailBody: `Դու ակտիվորեն օգտագործում ես ${feature}-ն։ Vivida PRO-ով այն և մյուս բոլոր գործառույթները հասանելի կլինեն առանց կրեդիտների ու սահմանափակումների։\n\nPRO-ի արժեքը՝ ${price} ամսական։`,
-      cta: "Բացել PRO-ն",
-    };
-    const credits = assignment.offer === "refill_75" ? 75 : 30;
-    return {
-      subject: `${credits} կրեդիտ՝ ${feature}-ն շարունակելու համար`,
-      title: `Շարունակիր ${feature}-ն առանց ընդհատման`,
-      body: `${credits} կրեդիտը հասանելի է ${price}-ով։ Շարունակիր հենց այնտեղից, որտեղ կանգ առար։`,
-      emailBody: `Քո ակտիվությունից երևում է, որ ${feature}-ն քեզ հետաքրքրում է։ ${credits} կրեդիտով կարող ես շարունակել հենց այնտեղից, որտեղ կանգ առար։\n\nԳինը՝ ${price}։`,
-      cta: "Լրացնել կրեդիտները",
-    };
-  }
   if (locale === "en") {
-    if (assignment.offer === "existing_pro_deadline" || assignment.offer === "pro_3mo_29") return {
-      subject: `3 months of unlimited Vivida for ${price}`,
-      title: assignment.offer === "existing_pro_deadline" ? "Your PRO offer is still active" : "Your credits ran out, but Vivida can keep going",
-      body: `Get 3 months of unlimited Vivida for ${price}. Available through 1 September.`,
-      emailBody: `Your credits are nearly gone. Open every feature for three full months — without credits or limits.\n\nThis offer is available through 1 September.`,
-      cta: "Activate the offer",
-    };
-    if (assignment.offer === "standard_pro") return {
-      subject: `Unlock ${feature} and all of Vivida without limits`,
-      title: "Open Vivida without limits",
-      body: `With PRO, ${feature} and every other feature are unlimited for ${price}/month.`,
-      emailBody: `You are one of the people getting real value from ${feature}. With Vivida PRO, it and every other feature stay open without credits or limits.\n\nPRO is ${price} per month.`,
-      cta: "Unlock PRO",
-    };
+    if (
+      assignment.offer === "existing_pro_deadline" ||
+      assignment.offer === "pro_3mo_29"
+    )
+      return {
+        subject: `3 months of unlimited Vivida for ${price}`,
+        title:
+          assignment.offer === "existing_pro_deadline"
+            ? "Your PRO offer is still active"
+            : "Your credits ran out, but Vivida can keep going",
+        body: `Get 3 months of unlimited Vivida for ${price}. Available through 1 September.`,
+        emailBody: `Your credits are nearly gone. Open every feature for three full months — without credits or limits.\n\nThis offer is available through 1 September.`,
+        cta: "Activate the offer",
+      };
+    if (assignment.offer === "standard_pro")
+      return {
+        subject: `Unlock ${feature} and all of Vivida without limits`,
+        title: "Open Vivida without limits",
+        body: `With PRO, ${feature} and every other feature are unlimited for ${price}/month.`,
+        emailBody: `You are one of the people getting real value from ${feature}. With Vivida PRO, it and every other feature stay open without credits or limits.\n\nPRO is ${price} per month.`,
+        cta: "Unlock PRO",
+      };
     const credits = assignment.offer === "refill_75" ? 75 : 30;
     return {
       subject: `${credits} credits to keep using ${feature}`,
@@ -351,20 +373,28 @@ function copyFor(assignment: Assignment): {
       cta: "Top up credits",
     };
   }
-  if (assignment.offer === "existing_pro_deadline" || assignment.offer === "pro_3mo_29") return {
-    subject: `3 თვე ულიმიტო Vivida — ${price}`,
-    title: assignment.offer === "existing_pro_deadline" ? "შენი PRO შეთავაზება ისევ აქტიურია" : "კრედიტები დასრულდა, Vivida კი შეგიძლია გააგრძელო",
-    body: `3 თვე ულიმიტო Vivida ${price}-ად — შეთავაზება ძალაშია 1 სექტემბრის ჩათვლით.`,
-    emailBody: `შენი კრედიტები თითქმის დასრულებულია. გახსენი ყველა ფუნქცია 3 სრული თვით — კრედიტებისა და ლიმიტების გარეშე.\n\nშეთავაზება ძალაშია 1 სექტემბრის ჩათვლით.`,
-    cta: "გაააქტიურე შეთავაზება",
-  };
-  if (assignment.offer === "standard_pro") return {
-    subject: `გახსენი ${feature} და მთელი Vivida ლიმიტების გარეშე`,
-    title: "გახსენი Vivida ულიმიტოდ",
-    body: `PRO-ით ${feature} და ყველა სხვა ფუნქცია ულიმიტოა — ${price} თვეში.`,
-    emailBody: `შენი აქტივობიდან ჩანს, რომ ${feature} შენთვის რეალურ ღირებულებას ქმნის. Vivida PRO-ით ის და ყველა სხვა ფუნქცია კრედიტებისა და ლიმიტების გარეშე გაიხსნება.\n\nPRO-ის ფასი არის ${price} თვეში.`,
-    cta: "გახსენი PRO",
-  };
+  if (
+    assignment.offer === "existing_pro_deadline" ||
+    assignment.offer === "pro_3mo_29"
+  )
+    return {
+      subject: `3 თვე ულიმიტო Vivida — ${price}`,
+      title:
+        assignment.offer === "existing_pro_deadline"
+          ? "შენი PRO შეთავაზება ისევ აქტიურია"
+          : "კრედიტები დასრულდა, Vivida კი შეგიძლია გააგრძელო",
+      body: `3 თვე ულიმიტო Vivida ${price}-ად — შეთავაზება ძალაშია 1 სექტემბრის ჩათვლით.`,
+      emailBody: `შენი კრედიტები თითქმის დასრულებულია. გახსენი ყველა ფუნქცია 3 სრული თვით — კრედიტებისა და ლიმიტების გარეშე.\n\nშეთავაზება ძალაშია 1 სექტემბრის ჩათვლით.`,
+      cta: "გაააქტიურე შეთავაზება",
+    };
+  if (assignment.offer === "standard_pro")
+    return {
+      subject: `გახსენი ${feature} და მთელი Vivida ლიმიტების გარეშე`,
+      title: "გახსენი Vivida ულიმიტოდ",
+      body: `PRO-ით ${feature} და ყველა სხვა ფუნქცია ულიმიტოა — ${price} თვეში.`,
+      emailBody: `შენი აქტივობიდან ჩანს, რომ ${feature} შენთვის რეალურ ღირებულებას ქმნის. Vivida PRO-ით ის და ყველა სხვა ფუნქცია კრედიტებისა და ლიმიტების გარეშე გაიხსნება.\n\nPRO-ის ფასი არის ${price} თვეში.`,
+      cta: "გახსენი PRO",
+    };
   const credits = assignment.offer === "refill_75" ? 75 : 30;
   return {
     subject: `${credits} კრედიტი — გააგრძელე ${feature}`,
@@ -375,7 +405,9 @@ function copyFor(assignment: Assignment): {
   };
 }
 
-async function loadLiveUsers(candidateIds: string[]): Promise<Map<string, LiveUser>> {
+async function loadLiveUsers(
+  candidateIds: string[],
+): Promise<Map<string, LiveUser>> {
   const rows = await db
     .select({
       id: users.id,
@@ -407,55 +439,93 @@ async function loadLiveUsers(candidateIds: string[]): Promise<Map<string, LiveUs
     .leftJoin(profiles, eq(profiles.userId, users.id))
     .leftJoin(creditAccounts, eq(creditAccounts.userId, users.id))
     .where(inArray(users.id, candidateIds));
-  return new Map(rows.map((row) => [row.id, {
-    ...row,
-    balance: Number(row.balance),
-    purchaseCount: Number(row.purchaseCount),
-    lowCreditOfferSent: Boolean(row.lowCreditOfferSent),
-  }]));
+  return new Map(
+    rows.map((row) => [
+      row.id,
+      {
+        ...row,
+        balance: Number(row.balance),
+        purchaseCount: Number(row.purchaseCount),
+        lowCreditOfferSent: Boolean(row.lowCreditOfferSent),
+      },
+    ]),
+  );
 }
 
 async function reloadLiveUser(userId: string): Promise<LiveUser | null> {
-  const usersById = await withRetry(`live eligibility ${userId}`, () => loadLiveUsers([userId]));
+  const usersById = await withRetry(`live eligibility ${userId}`, () =>
+    loadLiveUsers([userId]),
+  );
   return usersById.get(userId) ?? null;
 }
 
-async function claimDelivery(assignment: Assignment, channel: "email" | "in_app"): Promise<{ id: string; existing: boolean } | null> {
+async function claimDelivery(
+  assignment: Assignment,
+  channel: "email" | "in_app",
+): Promise<{ id: string; existing: boolean } | null> {
   const deliveryKey = `${assignment.offer}:v1`;
   const destination = offerDestination(assignment.offer);
-  const [inserted] = await withRetry(`claim ${channel} ${assignment.candidate.user_id}`, () => db.insert(reminderDeliveries).values({
-      userId: assignment.candidate.user_id,
-      topic: CAMPAIGN_KEY,
-      channel,
-      deliveryKey,
-      destination,
-    }).onConflictDoNothing().returning({ id: reminderDeliveries.id }));
+  const [inserted] = await withRetry(
+    `claim ${channel} ${assignment.candidate.user_id}`,
+    () =>
+      db
+        .insert(reminderDeliveries)
+        .values({
+          userId: assignment.candidate.user_id,
+          topic: CAMPAIGN_KEY,
+          channel,
+          deliveryKey,
+          destination,
+        })
+        .onConflictDoNothing()
+        .returning({ id: reminderDeliveries.id }),
+  );
   if (inserted) return { id: inserted.id, existing: false };
-  const [existing] = await withRetry(`read claim ${channel} ${assignment.candidate.user_id}`, () => db
-    .select({ id: reminderDeliveries.id, status: reminderDeliveries.status })
-      .from(reminderDeliveries)
-      .where(and(
-        eq(reminderDeliveries.userId, assignment.candidate.user_id),
-        eq(reminderDeliveries.topic, CAMPAIGN_KEY),
-        eq(reminderDeliveries.channel, channel),
-        eq(reminderDeliveries.deliveryKey, deliveryKey),
-      ))
-      .limit(1));
+  const [existing] = await withRetry(
+    `read claim ${channel} ${assignment.candidate.user_id}`,
+    () =>
+      db
+        .select({
+          id: reminderDeliveries.id,
+          status: reminderDeliveries.status,
+        })
+        .from(reminderDeliveries)
+        .where(
+          and(
+            eq(reminderDeliveries.userId, assignment.candidate.user_id),
+            eq(reminderDeliveries.topic, CAMPAIGN_KEY),
+            eq(reminderDeliveries.channel, channel),
+            eq(reminderDeliveries.deliveryKey, deliveryKey),
+          ),
+        )
+        .limit(1),
+  );
   if (!existing || existing.status === "sent") return null;
-  await withRetry(`reclaim ${channel} ${assignment.candidate.user_id}`, () => db
-    .update(reminderDeliveries).set({ status: "claimed", failedAt: null })
-      .where(eq(reminderDeliveries.id, existing.id)));
+  await withRetry(`reclaim ${channel} ${assignment.candidate.user_id}`, () =>
+    db
+      .update(reminderDeliveries)
+      .set({ status: "claimed", failedAt: null })
+      .where(eq(reminderDeliveries.id, existing.id)),
+  );
   return { id: existing.id, existing: true };
 }
 
 async function markDelivery(id: string, sent: boolean): Promise<void> {
-  await withRetry(`mark delivery ${id}`, () => db.update(reminderDeliveries).set(sent
-      ? { status: "sent", sentAt: new Date(), failedAt: null }
-      : { status: "failed", failedAt: new Date() }
-    ).where(eq(reminderDeliveries.id, id)));
+  await withRetry(`mark delivery ${id}`, () =>
+    db
+      .update(reminderDeliveries)
+      .set(
+        sent
+          ? { status: "sent", sentAt: new Date(), failedAt: null }
+          : { status: "failed", failedAt: new Date() },
+      )
+      .where(eq(reminderDeliveries.id, id)),
+  );
 }
 
-async function sendInApp(assignment: Assignment): Promise<"sent" | "skipped" | "failed"> {
+async function sendInApp(
+  assignment: Assignment,
+): Promise<"sent" | "skipped" | "failed"> {
   const live = await reloadLiveUser(assignment.candidate.user_id);
   const refreshed = evaluate(assignment.candidate, live);
   if (!refreshed.inAppPlanned) return "skipped";
@@ -464,54 +534,75 @@ async function sendInApp(assignment: Assignment): Promise<"sent" | "skipped" | "
   const copy = copyFor(refreshed);
   const reminderUrl = `/reminders/${encodeURIComponent(claimed.id)}`;
   try {
-    const [alreadyInserted] = await withRetry(`read in-app ${refreshed.candidate.user_id}`, () => db
-      .select({ id: notifications.id })
-      .from(notifications)
-      .where(and(
-        eq(notifications.userId, refreshed.candidate.user_id),
-        sql`${notifications.payload}->>'reminderUrl' = ${reminderUrl}`,
-      ))
-      .limit(1));
+    const [alreadyInserted] = await withRetry(
+      `read in-app ${refreshed.candidate.user_id}`,
+      () =>
+        db
+          .select({ id: notifications.id })
+          .from(notifications)
+          .where(
+            and(
+              eq(notifications.userId, refreshed.candidate.user_id),
+              sql`${notifications.payload}->>'reminderUrl' = ${reminderUrl}`,
+            ),
+          )
+          .limit(1),
+    );
     if (!alreadyInserted) {
-      await withRetry(`insert in-app ${refreshed.candidate.user_id}`, () => db.insert(notifications).values({
-        userId: refreshed.candidate.user_id,
-        kind: "timing_reminder",
-        payload: {
-          reminderTitle: copy.title,
-          reminderBody: copy.body,
-          reminderUrl,
-        },
-      }));
+      await withRetry(`insert in-app ${refreshed.candidate.user_id}`, () =>
+        db.insert(notifications).values({
+          userId: refreshed.candidate.user_id,
+          kind: "timing_reminder",
+          payload: {
+            reminderTitle: copy.title,
+            reminderBody: copy.body,
+            reminderUrl,
+          },
+        }),
+      );
     }
     await markDelivery(claimed.id, true);
     return "sent";
   } catch (error) {
     await markDelivery(claimed.id, false);
-    console.error(`[campaign] in-app failed for ${refreshed.candidate.user_id}:`, error);
+    console.error(
+      `[campaign] in-app failed for ${refreshed.candidate.user_id}:`,
+      error,
+    );
     return "failed";
   }
 }
 
 async function ensurePromoCampaign(): Promise<string> {
   const subject = `${LOW_CREDIT_PROMO_MONTHS} თვე ულიმიტო Vivida — მხოლოდ ₾29`;
-  const [campaign] = await db.insert(emailCampaigns).values({
-    slug: LOW_CREDIT_OFFER_CAMPAIGN_SLUG,
-    name: "Low credits · 3 months PRO for ₾29",
-    template: "low_credit_offer",
-    subject,
-    rewardCredits: 0,
-    status: "launched",
-    launchedAt: new Date(),
-    ctaLabel: "გაააქტიურე შეთავაზება",
-    ctaUrl: "/credits",
-  }).onConflictDoUpdate({
-    target: emailCampaigns.slug,
-    set: { subject, status: "launched", launchedAt: new Date() },
-  }).returning({ id: emailCampaigns.id });
+  const [campaign] = await db
+    .insert(emailCampaigns)
+    .values({
+      slug: LOW_CREDIT_OFFER_CAMPAIGN_SLUG,
+      name: "Low credits · 3 months PRO for ₾29",
+      template: "low_credit_offer",
+      subject,
+      rewardCredits: 0,
+      status: "launched",
+      launchedAt: new Date(),
+      ctaLabel: "გაააქტიურე შეთავაზება",
+      ctaUrl: "/credits",
+    })
+    .onConflictDoUpdate({
+      target: emailCampaigns.slug,
+      set: { subject, status: "launched", launchedAt: new Date() },
+    })
+    .returning({ id: emailCampaigns.id });
   return campaign.id;
 }
 
-async function logEmail(input: { userId: string; email: string; kind: string; subject: string; error?: string }): Promise<void> {
+async function logEmail(input: {
+  userId: string;
+  email: string;
+  kind: string;
+  subject: string;
+  error?: string;
+}): Promise<void> {
   await db.insert(emailSendLog).values({
     userId: input.userId,
     kind: input.kind,
@@ -522,7 +613,10 @@ async function logEmail(input: { userId: string; email: string; kind: string; su
   });
 }
 
-async function sendEmail(assignment: Assignment, resend: Resend): Promise<"sent" | "skipped" | "failed"> {
+async function sendEmail(
+  assignment: Assignment,
+  resend: Resend,
+): Promise<"sent" | "skipped" | "failed"> {
   const live = await reloadLiveUser(assignment.candidate.user_id);
   const refreshed = evaluate(assignment.candidate, live);
   if (!refreshed.emailPlanned || !live?.email) return "skipped";
@@ -538,53 +632,75 @@ async function sendEmail(assignment: Assignment, resend: Resend): Promise<"sent"
   try {
     if (refreshed.offer === "pro_3mo_29") {
       promoCampaignId = await ensurePromoCampaign();
-      await db.insert(emailCampaignRecipients).values({
-        campaignId: promoCampaignId,
-        userId: live.id,
-        email: live.email,
-      }).onConflictDoUpdate({
-        target: [emailCampaignRecipients.campaignId, emailCampaignRecipients.userId],
-        set: { email: live.email, status: "pending", error: null },
-      });
+      await db
+        .insert(emailCampaignRecipients)
+        .values({
+          campaignId: promoCampaignId,
+          userId: live.id,
+          email: live.email,
+        })
+        .onConflictDoUpdate({
+          target: [
+            emailCampaignRecipients.campaignId,
+            emailCampaignRecipients.userId,
+          ],
+          set: { email: live.email, status: "pending", error: null },
+        });
     }
-    const html = refreshed.offer === "pro_3mo_29"
-      ? await render(<LowCreditOfferEmail
-          name={name}
-          balance={live.balance}
-          priceLabel={formatBillingAmount(LOW_CREDIT_PROMO_PLAN.amountMinor, LOW_CREDIT_PROMO_PLAN.currency, locale)}
-          months={LOW_CREDIT_PROMO_MONTHS}
-          deadlineLabel={locale === "ka" ? "1 სექტემბრის" : locale === "am" ? "սեպտեմբերի 1-ը" : "1 September"}
-          creditsUrl={ctaUrl}
-          unsubscribeUrl={unsubscribeUrl}
-          locale={locale}
-        />)
-      : await render(<MarketingEmail
-          name={name}
-          heading={copy.subject}
-          body={copy.emailBody}
-          ctaLabel={copy.cta}
-          ctaUrl={ctaUrl}
-          unsubscribeUrl={unsubscribeUrl}
-          locale={locale}
-        />);
+    const html =
+      refreshed.offer === "pro_3mo_29"
+        ? await render(
+            <LowCreditOfferEmail
+              name={name}
+              balance={live.balance}
+              priceLabel={formatBillingAmount(
+                LOW_CREDIT_PROMO_PLAN.amountMinor,
+                LOW_CREDIT_PROMO_PLAN.currency,
+                locale,
+              )}
+              months={LOW_CREDIT_PROMO_MONTHS}
+              deadlineLabel={locale === "ka" ? "1 სექტემბრის" : "1 September"}
+              creditsUrl={ctaUrl}
+              unsubscribeUrl={unsubscribeUrl}
+              locale={locale}
+            />,
+          )
+        : await render(
+            <MarketingEmail
+              name={name}
+              heading={copy.subject}
+              body={copy.emailBody}
+              ctaLabel={copy.cta}
+              ctaUrl={ctaUrl}
+              unsubscribeUrl={unsubscribeUrl}
+              locale={locale}
+            />,
+          );
     await acquireResendSlot();
-    const result = await resend.emails.send({
-      from: FROM,
-      to: live.email,
-      subject: copy.subject,
-      html,
-      headers: {
-        "List-Unsubscribe": `<${unsubscribeUrl}>`,
-        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    const result = await resend.emails.send(
+      {
+        from: FROM,
+        to: live.email,
+        subject: copy.subject,
+        html,
+        headers: {
+          "List-Unsubscribe": `<${unsubscribeUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
       },
-    }, { idempotencyKey: `${CAMPAIGN_KEY}:${refreshed.offer}:${live.id}` });
+      { idempotencyKey: `${CAMPAIGN_KEY}:${refreshed.offer}:${live.id}` },
+    );
     if (result.error) throw new Error(result.error.message ?? "send failed");
     if (promoCampaignId) {
-      await db.update(emailCampaignRecipients).set({ status: "sent", sentAt: new Date(), error: null })
-        .where(and(
-          eq(emailCampaignRecipients.campaignId, promoCampaignId),
-          eq(emailCampaignRecipients.userId, live.id),
-        ));
+      await db
+        .update(emailCampaignRecipients)
+        .set({ status: "sent", sentAt: new Date(), error: null })
+        .where(
+          and(
+            eq(emailCampaignRecipients.campaignId, promoCampaignId),
+            eq(emailCampaignRecipients.userId, live.id),
+          ),
+        );
     }
     await logEmail({
       userId: live.id,
@@ -597,20 +713,33 @@ async function sendEmail(assignment: Assignment, resend: Resend): Promise<"sent"
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (promoCampaignId) {
-      await db.update(emailCampaignRecipients).set({ status: "failed", sentAt: null, error: message })
-        .where(and(
-          eq(emailCampaignRecipients.campaignId, promoCampaignId),
-          eq(emailCampaignRecipients.userId, live.id),
-        ));
+      await db
+        .update(emailCampaignRecipients)
+        .set({ status: "failed", sentAt: null, error: message })
+        .where(
+          and(
+            eq(emailCampaignRecipients.campaignId, promoCampaignId),
+            eq(emailCampaignRecipients.userId, live.id),
+          ),
+        );
     }
-    await logEmail({ userId: live.id, email: live.email, kind: "marketing", subject: copy.subject, error: message }).catch(() => undefined);
+    await logEmail({
+      userId: live.id,
+      email: live.email,
+      kind: "marketing",
+      subject: copy.subject,
+      error: message,
+    }).catch(() => undefined);
     await markDelivery(claimed.id, false);
     console.error(`[campaign] email failed for ${live.id}: ${message}`);
     return "failed";
   }
 }
 
-function countBy<T>(items: T[], key: (item: T) => string): Record<string, number> {
+function countBy<T>(
+  items: T[],
+  key: (item: T) => string,
+): Record<string, number> {
   return items.reduce<Record<string, number>>((counts, item) => {
     const value = key(item);
     counts[value] = (counts[value] ?? 0) + 1;
@@ -622,17 +751,26 @@ async function main(): Promise<void> {
   const execute = process.argv.includes("--execute");
   const channelArg = process.argv.find((arg) => arg.startsWith("--channel="));
   const channel = (channelArg?.split("=")[1] ?? "all") as Channel;
-  if (!(["all", "email", "in-app"] as string[]).includes(channel)) throw new Error(`Invalid channel: ${channel}`);
+  if (!(["all", "email", "in-app"] as string[]).includes(channel))
+    throw new Error(`Invalid channel: ${channel}`);
   const candidates = parseCsv(await readFile(candidatePath, "utf8"));
   if (candidates.length !== EXPECTED_CANDIDATES) {
-    throw new Error(`Candidate guard failed: expected ${EXPECTED_CANDIDATES}, found ${candidates.length}`);
+    throw new Error(
+      `Candidate guard failed: expected ${EXPECTED_CANDIDATES}, found ${candidates.length}`,
+    );
   }
-  if (new Set(candidates.map((row) => row.user_id)).size !== EXPECTED_CANDIDATES) {
+  if (
+    new Set(candidates.map((row) => row.user_id)).size !== EXPECTED_CANDIDATES
+  ) {
     throw new Error("Candidate guard failed: duplicate user IDs found");
   }
   const liveById = await loadLiveUsers(candidates.map((row) => row.user_id));
-  const assignments = candidates.map((candidate) => evaluate(candidate, liveById.get(candidate.user_id) ?? null));
-  const livePremium = assignments.filter((item) => item.suppressionReasons.includes("current_pro")).length;
+  const assignments = candidates.map((candidate) =>
+    evaluate(candidate, liveById.get(candidate.user_id) ?? null),
+  );
+  const livePremium = assignments.filter((item) =>
+    item.suppressionReasons.includes("current_pro"),
+  ).length;
   const report = {
     campaign: CAMPAIGN_KEY,
     generatedAt: new Date().toISOString(),
@@ -644,18 +782,40 @@ async function main(): Promise<void> {
     baseEligible: assignments.filter((item) => item.baseEligible).length,
     inAppPlanned: assignments.filter((item) => item.inAppPlanned).length,
     emailPlanned: assignments.filter((item) => item.emailPlanned).length,
-    offerCounts: countBy(assignments.filter((item) => item.baseEligible), (item) => item.offer),
-    emailOfferCounts: countBy(assignments.filter((item) => item.emailPlanned), (item) => item.offer),
-    segmentCounts: countBy(assignments.filter((item) => item.baseEligible), (item) => item.candidate.segment),
+    offerCounts: countBy(
+      assignments.filter((item) => item.baseEligible),
+      (item) => item.offer,
+    ),
+    emailOfferCounts: countBy(
+      assignments.filter((item) => item.emailPlanned),
+      (item) => item.offer,
+    ),
+    segmentCounts: countBy(
+      assignments.filter((item) => item.baseEligible),
+      (item) => item.candidate.segment,
+    ),
     suppressionCounts: countBy(
-      assignments.flatMap((item) => item.suppressionReasons.map((reason) => ({ reason }))),
+      assignments.flatMap((item) =>
+        item.suppressionReasons.map((reason) => ({ reason })),
+      ),
       (item) => item.reason,
     ),
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
   const assignmentHeader = [
-    "user_id", "name", "email", "segment", "propensity_score", "best_feature", "live_country", "live_locale",
-    "live_balance", "offer", "email_planned", "in_app_planned", "suppression_reasons",
+    "user_id",
+    "name",
+    "email",
+    "segment",
+    "propensity_score",
+    "best_feature",
+    "live_country",
+    "live_locale",
+    "live_balance",
+    "offer",
+    "email_planned",
+    "in_app_planned",
+    "suppression_reasons",
   ];
   const assignmentRows = assignments.map((item) => [
     item.candidate.user_id,
@@ -672,7 +832,11 @@ async function main(): Promise<void> {
     item.inAppPlanned,
     item.suppressionReasons.join("; "),
   ]);
-  await writeFile(assignmentPath, `${[assignmentHeader, ...assignmentRows].map((row) => row.map(csvCell).join(",")).join("\n")}\n`, "utf8");
+  await writeFile(
+    assignmentPath,
+    `${[assignmentHeader, ...assignmentRows].map((row) => row.map(csvCell).join(",")).join("\n")}\n`,
+    "utf8",
+  );
   console.log(JSON.stringify(report, null, 2));
   if (!execute) return;
 
@@ -687,11 +851,16 @@ async function main(): Promise<void> {
       try {
         outcome = await sendInApp(assignment);
       } catch (error) {
-        console.error(`[campaign] in-app exhausted retries for ${assignment.candidate.user_id}:`, error);
+        console.error(
+          `[campaign] in-app exhausted retries for ${assignment.candidate.user_id}:`,
+          error,
+        );
       }
       results.inApp[outcome] += 1;
       if ((index + 1) % 25 === 0 || index + 1 === planned.length) {
-        console.log(`[campaign] in-app progress ${index + 1}/${planned.length}`);
+        console.log(
+          `[campaign] in-app progress ${index + 1}/${planned.length}`,
+        );
       }
     }
   }
@@ -705,7 +874,10 @@ async function main(): Promise<void> {
       try {
         outcome = await sendEmail(assignment, resend);
       } catch (error) {
-        console.error(`[campaign] email exhausted retries for ${assignment.candidate.user_id}:`, error);
+        console.error(
+          `[campaign] email exhausted retries for ${assignment.candidate.user_id}:`,
+          error,
+        );
       }
       results.email[outcome] += 1;
       if ((index + 1) % 10 === 0 || index + 1 === planned.length) {
@@ -713,8 +885,16 @@ async function main(): Promise<void> {
       }
     }
   }
-  const finalReport = { ...report, completedAt: new Date().toISOString(), results };
-  await writeFile(reportPath, `${JSON.stringify(finalReport, null, 2)}\n`, "utf8");
+  const finalReport = {
+    ...report,
+    completedAt: new Date().toISOString(),
+    results,
+  };
+  await writeFile(
+    reportPath,
+    `${JSON.stringify(finalReport, null, 2)}\n`,
+    "utf8",
+  );
   console.log(JSON.stringify({ campaign: CAMPAIGN_KEY, results }, null, 2));
 }
 

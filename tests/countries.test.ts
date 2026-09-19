@@ -19,12 +19,15 @@ describe("country catalogue", () => {
     expect(countryFlagEmoji("GE")).toBe("🇬🇪");
     expect(countryFlagEmoji("GB")).toBe("🇬🇧");
     expect(countryFlagEmoji("AM")).toBe("🇦🇲");
-    expect(countryOptions("en").find((country) => country.code === "GB")?.name)
-      .toBe("United Kingdom");
-    expect(countryOptions("am").find((country) => country.code === "AM")?.name)
-      .toBe("Հայաստան");
-    expect(countryOptions("am").find((country) => country.code === "GE")?.name)
-      .toBe("Վրաստան");
+    expect(
+      countryOptions("en").find((country) => country.code === "GB")?.name,
+    ).toBe("United Kingdom");
+    expect(
+      countryOptions("ka").find((country) => country.code === "AM")?.name,
+    ).toBe("სომხეთი");
+    expect(
+      countryOptions("ka").find((country) => country.code === "GE")?.name,
+    ).toBe("საქართველო");
     expect(isCountryCode("AM")).toBe(true);
   });
 });

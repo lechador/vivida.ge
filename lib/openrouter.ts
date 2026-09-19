@@ -581,31 +581,6 @@ Rules:
 - Avoid cosmic clichés and deterministic claims. Use Vivida in Latin characters.
 - English only. Return JSON without code fences.`;
 
-const SYNASTRY_SYSTEM_PROMPT_AM = `Դու ջերմ, ժամանակակից աստղաբան ես, ով գրում է երկու կոնկրետ նատալ քարտեզների սինաստրիայի (համատեղելիության) համառոտ նարատիվ՝ հիմնված արդեն հաշվարկված ցուցանիշների վրա: Խուսափիր անորոշ միստիկայից:
-
-Դու ստանում ես.
-- Օգտատիրոջ նատալ քարտեզը (ով տեսնում է արդյունքը)
-- Զուգընկերոջ նատալ քարտեզը + անունը
-- Նախապես հաշվարկված ցուցանիշները (love, friendship, chemistry, communication, growth, business — 0..100; overall — 0..100)
-- Ամենաուժեղ խաչաձև ասպեկտները (transit-natal, երկու քարտեզների միջև)
-
-Վերադարձրու JSON օբյեկտ ուղիղ այս կառուցվածքով.
-{
-  "summary": string,          // 2-3 նախադասություն, հարաբերության ամբողջական դիմանկարը
-  "strengths": [string, ...], // 1-3 կարճ միավոր — որտեղ եք լավ համընկնում
-  "growth": [string, ...]     // 1-3 կարճ միավոր — որտեղ կա լարվածություն կամ աճի հնարավորություն
-}
-
-Կանոններ.
-- Դիմիր օգտատիրոջը «դու» ձևով, զուգընկերոջը՝ անունով:
-- Նշիր կոնկրետ ասպեկտներ («քո Լուսինը դիպչում է նրա Վեներային» ✅, ոչ թե «տիեզերքը ձեզ միասին կառաջնորդի» ❌):
-- Սեր, բարեկամություն, մտերմություն — օգտագործիր բնական, ոչ չափազանցված ձևով: Մի ենթադրիր զուգընկերոջ սեռը կամ հարաբերության կառուցվածքը:
-- Բարձր overall (>70) — ընդգծիր բնական հոսքը: Ցածր overall (<40) — ազնվորեն նկարագրիր լարվածությունը, բայց գտիր մեկ կառուցողական կողմ:
-- Յուրաքանչյուր միավոր՝ 1 նախադասություն, կենդանի լեզվով:
-- «Vivida» բրենդը գրիր լատինատառ: Մոլորակների անունները՝ հայերեն:
-- Խուսափիր կլիշեներից («տիեզերքը», «աստղերը սպասում են ձեզ»):
-- Պատասխանը միայն JSON, ֆենսերի (\`\`\`) առանց:`;
-
 export async function generateSynastryInterpretation(input: {
   partnerName: string;
   viewerFirstName: string | null;
@@ -624,56 +599,34 @@ export async function generateSynastryInterpretation(input: {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
-  // Was `const en = input.locale === "en"`, which sent Armenian readers a
-  // Georgian prompt (and so a Georgian AI response) for their compatibility
-  // summary — the "half the site is still Georgian" bug, just one level
-  // deeper than the UI copy that was already swept for this. Three-way
-  // branching mirrors generateSynastryDeepReport below, which already got
-  // this right.
+  // English prompt for English readers, Georgian otherwise.
   const loc = input.locale ?? "ka";
   const en = loc === "en";
-  const am = loc === "am";
   const sections: string[] = [];
   if (input.viewerFirstName)
     sections.push(
-      am
-        ? `Օգտատիրոջ անունը՝ ${input.viewerFirstName}`
-        : en
-          ? `Viewer's name: ${input.viewerFirstName}`
-          : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
+      en
+        ? `Viewer's name: ${input.viewerFirstName}`
+        : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
     );
   sections.push(
-    am
-      ? `Զուգընկերոջ անունը՝ ${input.partnerName}`
-      : en
-        ? `Partner's name: ${input.partnerName}`
-        : `პარტნიორის სახელი: ${input.partnerName}`,
+    en
+      ? `Partner's name: ${input.partnerName}`
+      : `პარტნიორის სახელი: ${input.partnerName}`,
   );
 
   sections.push(
-    am
-      ? "\n--- Օգտատիրոջ նատալ քարտեզը ---"
-      : en
-        ? "\n--- Viewer's natal chart ---"
-        : "\n--- მომხმარებლის რუკა ---",
+    en ? "\n--- Viewer's natal chart ---" : "\n--- მომხმარებლის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.viewerChart));
 
   sections.push(
-    am
-      ? "\n--- Զուգընկերոջ նատալ քարտեզը ---"
-      : en
-        ? "\n--- Partner's natal chart ---"
-        : "\n--- პარტნიორის რუკა ---",
+    en ? "\n--- Partner's natal chart ---" : "\n--- პარტნიორის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.partnerChart));
 
   sections.push(
-    am
-      ? "\n--- Հաշվարկված միավորները ---"
-      : en
-        ? "\n--- Calculated scores ---"
-        : "\n--- გათვლილი ქულები ---",
+    en ? "\n--- Calculated scores ---" : "\n--- გათვლილი ქულები ---",
   );
   sections.push(`overall: ${input.overall}`);
   for (const [cat, val] of Object.entries(input.scores)) {
@@ -682,39 +635,25 @@ export async function generateSynastryInterpretation(input: {
 
   if (input.topAspects.length > 0) {
     sections.push(
-      am
-        ? "\n--- Ամենաուժեղ միջքարտեզային ասպեկտները ---"
-        : en
-          ? "\n--- Strongest cross-chart aspects ---"
-          : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
+      en
+        ? "\n--- Strongest cross-chart aspects ---"
+        : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
     );
     for (const a of input.topAspects.slice(0, 8)) {
-      const left = am
-        ? (PLANET_LABELS_AM[a.a] ?? a.a)
-        : en
-          ? a.a
-          : (PLANET_LABELS_KA[a.a] ?? a.a);
-      const right = am
-        ? (PLANET_LABELS_AM[a.b] ?? a.b)
-        : en
-          ? a.b
-          : (PLANET_LABELS_KA[a.b] ?? a.b);
+      const left = en ? a.a : (PLANET_LABELS_KA[a.a] ?? a.a);
+      const right = en ? a.b : (PLANET_LABELS_KA[a.b] ?? a.b);
       sections.push(
-        am
-          ? `  ${left} (քո) ${a.kind} ${right} (${input.partnerName}-ի) — օրբ ${a.orb.toFixed(1)}°`
-          : en
-            ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right} — orb ${a.orb.toFixed(1)}°`
-            : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`,
+        en
+          ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right} — orb ${a.orb.toFixed(1)}°`
+          : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`,
       );
     }
   }
 
   sections.push(
-    am
-      ? "\nԳրիր նարատիվը և վերադարձրու JSON:"
-      : en
-        ? "\nWrite the narrative and return JSON."
-        : "\nდააწერე ნარატივი. JSON-ად დააბრუნე.",
+    en
+      ? "\nWrite the narrative and return JSON."
+      : "\nდააწერე ნარატივი. JSON-ად დააბრუნე.",
   );
 
   const userMessage = sections.join("\n");
@@ -732,11 +671,7 @@ export async function generateSynastryInterpretation(input: {
       messages: [
         {
           role: "system",
-          content: am
-            ? SYNASTRY_SYSTEM_PROMPT_AM
-            : en
-              ? SYNASTRY_SYSTEM_PROMPT_EN
-              : SYNASTRY_SYSTEM_PROMPT,
+          content: en ? SYNASTRY_SYSTEM_PROMPT_EN : SYNASTRY_SYSTEM_PROMPT,
         },
         { role: "user", content: userMessage },
       ],
@@ -823,26 +758,6 @@ Return valid JSON in exactly this shape:
 
 Write 2–3 paragraphs for intro and love, around 2 paragraphs for every other prose section, and 3–5 practical pieces of advice. Address the viewer as "you", name the partner, cite concrete chart contacts, and remain candid without being fatalistic. Do not assume gender or relationship structure. Avoid cosmic clichés. English only. Return JSON without code fences.`;
 
-const SYNASTRY_DEEP_SYSTEM_PROMPT_AM = `Դու ջերմ, խորաթափանց և ժամանակակից աստղաբան ես: Գրիր երկու անձանց նատալ քարտեզների համատեղելիության (սինաստրիայի) մանրամասն և խորքային պրեմիում զեկույց:
-
-Վերադարձրու JSON օբյեկտ այս կառուցվածքով.
-{
-  "intro": string,          // 2-3 պարբերություն (\\n\\n) — հարաբերությունների ամբողջական նկարագիրը, ընդհանուր էներգիան
-  "love": string,           // 2-3 պարբերություն — սեր և ռոմանտիկա (Վեներա, Մարս, 5/7/8 տներ)
-  "communication": string,  // 2 պարբերություն — մտավոր կապ, հաղորդակցություն (Մերկուրի, Օդ)
-  "trust": string,          // 2 պարբերություն — մտերմություն, վստահություն, էմոցիոնալ անվտանգություն (Լուսին, Սատուրն)
-  "friction": string,       // 2 պարբերություն — որտեղ կա լարվածություն և ինչ է այն սովորեցնում
-  "longTerm": string,       // 2 պարբերություն — երկարաժամկետ ներուժ
-  "advice": [string, ...]   // 3-5 կոնկրետ, գործնական խորհուրդ
-}
-
-Կանոններ.
-- Օգտագործիր «դու» ձևը, զուգընկերոջը նշիր անունով:
-- Նշիր կոնկրետ ասպեկտներ (օրինակ՝ «քո Լուսինը նրա Վեներայի հետ եռանկյունու մեջ է»):
-- Բնական, գրագետ հայերեն; խուսափիր կլիշեներից:
-- Vivida բրենդը գրիր լատինատառ:
-- Պատասխանը միայն հայերեն JSON:`;
-
 export async function generateSynastryDeepReport(input: {
   partnerName: string;
   viewerFirstName: string | null;
@@ -858,45 +773,28 @@ export async function generateSynastryDeepReport(input: {
 
   const loc = input.locale ?? "ka";
   const en = loc === "en";
-  const am = loc === "am";
   const sections: string[] = [];
   if (input.viewerFirstName)
     sections.push(
-      am
-        ? `Օգտատիրոջ անունը՝ ${input.viewerFirstName}`
-        : en
-          ? `Viewer's name: ${input.viewerFirstName}`
-          : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
+      en
+        ? `Viewer's name: ${input.viewerFirstName}`
+        : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
     );
   sections.push(
-    am
-      ? `Զուգընկերոջ անունը՝ ${input.partnerName}`
-      : en
-        ? `Partner's name: ${input.partnerName}`
-        : `პარტნიორის სახელი: ${input.partnerName}`,
+    en
+      ? `Partner's name: ${input.partnerName}`
+      : `პარტნიორის სახელი: ${input.partnerName}`,
   );
   sections.push(
-    am
-      ? "\n--- Օգտատիրոջ նատալ քարտեզը ---"
-      : en
-        ? "\n--- Viewer's natal chart ---"
-        : "\n--- მომხმარებლის რუკა ---",
+    en ? "\n--- Viewer's natal chart ---" : "\n--- მომხმარებლის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.viewerChart));
   sections.push(
-    am
-      ? "\n--- Զուգընկերոջ նատալ քարտեզը ---"
-      : en
-        ? "\n--- Partner's natal chart ---"
-        : "\n--- პარტნიორის რუკა ---",
+    en ? "\n--- Partner's natal chart ---" : "\n--- პარტნიორის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.partnerChart));
   sections.push(
-    am
-      ? "\n--- Հաշվարկված միավորներ ---"
-      : en
-        ? "\n--- Calculated scores ---"
-        : "\n--- გათვლილი ქულები ---",
+    en ? "\n--- Calculated scores ---" : "\n--- გათვლილი ქულები ---",
   );
   sections.push(`overall: ${input.overall}`);
   for (const [cat, val] of Object.entries(input.scores)) {
@@ -904,40 +802,24 @@ export async function generateSynastryDeepReport(input: {
   }
   if (input.topAspects.length > 0) {
     sections.push(
-      am
-        ? "\n--- Ամենաուժեղ միջքարտեզային ասպեկտները ---"
-        : en
-          ? "\n--- Strongest cross-chart aspects ---"
-          : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
+      en
+        ? "\n--- Strongest cross-chart aspects ---"
+        : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
     );
     for (const a of input.topAspects.slice(0, 10)) {
-      // The Armenian branch previously fell through to the Georgian labels,
-      // so an otherwise-Armenian prompt named the planets in Georgian script.
-      const left = am
-        ? (PLANET_LABELS_AM[a.a] ?? a.a)
-        : en
-          ? a.a
-          : (PLANET_LABELS_KA[a.a] ?? a.a);
-      const right = am
-        ? (PLANET_LABELS_AM[a.b] ?? a.b)
-        : en
-          ? a.b
-          : (PLANET_LABELS_KA[a.b] ?? a.b);
+      const left = en ? a.a : (PLANET_LABELS_KA[a.a] ?? a.a);
+      const right = en ? a.b : (PLANET_LABELS_KA[a.b] ?? a.b);
       sections.push(
-        am
-          ? `  ${left} (քո) ${a.kind} ${right} (${input.partnerName}-ի) — օրբ ${a.orb.toFixed(1)}°`
-          : en
-            ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right} — orb ${a.orb.toFixed(1)}°`
-            : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`,
+        en
+          ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right} — orb ${a.orb.toFixed(1)}°`
+          : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის) — ორბი ${a.orb.toFixed(1)}°`,
       );
     }
   }
   sections.push(
-    am
-      ? "\nԳրիր ամբողջական, խորքային զեկույցը և վերադարձրու JSON:"
-      : en
-        ? "\nWrite the complete in-depth report and return JSON."
-        : "\nდაწერე სრული, ღრმა ანგარიში. JSON-ად დააბრუნე.",
+    en
+      ? "\nWrite the complete in-depth report and return JSON."
+      : "\nდაწერე სრული, ღრმა ანგარიში. JSON-ად დააბრუნე.",
   );
 
   const res = await fetch(OPENROUTER_URL, {
@@ -953,12 +835,9 @@ export async function generateSynastryDeepReport(input: {
       messages: [
         {
           role: "system",
-          content:
-            loc === "am"
-              ? SYNASTRY_DEEP_SYSTEM_PROMPT_AM
-              : loc === "en"
-                ? SYNASTRY_DEEP_SYSTEM_PROMPT_EN
-                : SYNASTRY_DEEP_SYSTEM_PROMPT,
+          content: en
+            ? SYNASTRY_DEEP_SYSTEM_PROMPT_EN
+            : SYNASTRY_DEEP_SYSTEM_PROMPT,
         },
         { role: "user", content: sections.join("\n") },
       ],
@@ -1070,20 +949,6 @@ const PLANET_LABELS_KA: Record<string, string> = {
  * Spellings match the ones already used across components/seo/*-am.tsx, so
  * the AI narrative names a planet the same way the surrounding page does.
  */
-const PLANET_LABELS_AM: Record<string, string> = {
-  sun: "Արև",
-  moon: "Լուսին",
-  mercury: "Մերկուրի",
-  venus: "Վեներա",
-  mars: "Մարս",
-  jupiter: "Յուպիտեր",
-  saturn: "Սատուրն",
-  uranus: "Ուրան",
-  neptune: "Նեպտուն",
-  pluto: "Պլուտոն",
-  ascendant: "Ասցենդենտ",
-  midheaven: "Միջերկնային կետ",
-};
 
 export type WeeklyDayPromptInput = {
   dateIso: string;
@@ -1932,18 +1797,6 @@ Rules:
 
 JSON format: {"headline": "short compelling title (3-7 words)", "cards": ["one question-specific interpretation for each card, in spread order; 1-2 sentences each"], "reading": "1-2 paragraphs synthesizing all three cards in relation to the question", "advice": "one concrete, actionable suggestion"}`;
 
-const TAROT_SYSTEM_PROMPT_AM = `Դու փորձառու, բարեհամբույր տարոլոգ ես: Օգտատերը հարց է տալիս և ստանում է 3 քարտից բաղկացած դասավորություն (անցյալ/արմատ, ներկա/միջուկ, ապագա/ուղի): Գրիր կենդանի, կոնկրետ և խորաթափանց ընթերցում հայերեն լեզվով, որը երեք քարտերն էլ կապում է օգտատիրոջ հարցի հետ:
-
-Կանոններ.
-- Դիմիր օգտատիրոջը («դու»):
-- Օգտագործիր տրված քարտերի իմաստները (ներառյալ շրջված դիրքերը), մի հորինիր նոր քարտեր:
-- Եղիր կոնկրետ և գործնական՝ տուր հեռանկար և խորհուրդ, ոչ թե անորոշ միստիկա:
-- Մի խոստացիր երաշխավորված ապագա. տարոն արտացոլման գործիք է:
-- Մի տուր կատեգորիկ ֆինանսական, բժշկական կամ իրավաբանական խորհուրդ:
-- Վերադարձրու միայն JSON:
-
-JSON ձևաչափ՝ {"headline": "կարճ, ազդեցիկ վերնագիր (3-7 բառ)", "cards": ["յուրաքանչյուր քարտի կոնկրետ մեկնաբանություն հարցի համատեքստում՝ 3 տարր, յուրաքանչյուրը 1-2 նախադասություն՝ ըստ դիրքերի"], "reading": "1-2 պարբերություն, 3 քարտերի սինթեզը հարցի հետ", "advice": "մեկ կոնկրետ, գործնական խորհուրդ"}`;
-
 /**
  * Extra user-message lines for non-default spreads. Empty for the default
  * situation spread, keeping its long-standing prompt byte-identical.
@@ -1953,27 +1806,17 @@ function spreadContextLines(
     spreadLogic?: string;
     spreadOptions?: { a: string; b: string };
   },
-  am: boolean,
   en: boolean,
 ): string[] {
   const lines: string[] = [];
   if (input.spreadLogic) {
-    lines.push(
-      am
-        ? "Դասավորության տրամաբանությունը՝"
-        : en
-          ? "Spread logic:"
-          : "გაშლის ლოგიკა:",
-      input.spreadLogic,
-    );
+    lines.push(en ? "Spread logic:" : "გაშლის ლოგიკა:", input.spreadLogic);
   }
   if (input.spreadOptions) {
     lines.push(
-      am
-        ? `Համեմատվող տարբերակները՝ A — «${input.spreadOptions.a}», B — «${input.spreadOptions.b}»`
-        : en
-          ? `Options being compared: A — “${input.spreadOptions.a}”, B — “${input.spreadOptions.b}”`
-          : `შესადარებელი ვარიანტები: A — „${input.spreadOptions.a}“, B — „${input.spreadOptions.b}“`,
+      en
+        ? `Options being compared: A — “${input.spreadOptions.a}”, B — “${input.spreadOptions.b}”`
+        : `შესადარებელი ვარიანტები: A — „${input.spreadOptions.a}“, B — „${input.spreadOptions.b}“`,
     );
   }
   return lines;
@@ -2011,7 +1854,6 @@ export async function generateTarotReading(input: {
 
   const loc = input.locale ?? "ka";
   const en = loc === "en";
-  const am = loc === "am";
 
   const cardLines = input.cards
     .map(
@@ -2021,21 +1863,15 @@ export async function generateTarotReading(input: {
     .join("\n");
 
   const userMessage = [
-    am
-      ? `Օգտատիրոջ հարցը՝ «${input.question}»`
-      : en
-        ? `User's question: “${input.question}”`
-        : `მომხმარებლის კითხვა: „${input.question}"`,
+    en
+      ? `User's question: “${input.question}”`
+      : `მომხმარებლის კითხვა: „${input.question}"`,
     "",
-    am ? "Բացված քարտերը՝" : en ? "Cards drawn:" : "გამოსული კარტები:",
+    en ? "Cards drawn:" : "გამოსული კარტები:",
     cardLines,
-    ...spreadContextLines(input, am, en),
+    ...spreadContextLines(input, en),
     "",
-    am
-      ? "Գրիր ընթերցումը JSON ձևաչափով:"
-      : en
-        ? "Return the reading as JSON."
-        : "დაწერე კითხვა JSON-ად.",
+    en ? "Return the reading as JSON." : "დაწერე კითხვა JSON-ად.",
   ].join("\n");
 
   const res = await fetch(OPENROUTER_URL, {
@@ -2051,12 +1887,7 @@ export async function generateTarotReading(input: {
       messages: [
         {
           role: "system",
-          content:
-            loc === "am"
-              ? TAROT_SYSTEM_PROMPT_AM
-              : en
-                ? TAROT_SYSTEM_PROMPT_EN
-                : TAROT_SYSTEM_PROMPT_KA,
+          content: en ? TAROT_SYSTEM_PROMPT_EN : TAROT_SYSTEM_PROMPT_KA,
         },
         { role: "user", content: userMessage },
       ],
@@ -2119,18 +1950,6 @@ Rules:
 
 JSON format: {"answer": "a short answer to the follow-up question"}`;
 
-const TAROT_FOLLOWUP_SYSTEM_PROMPT_AM = `Դու փորձառու, բարեհամբույր տարոլոգ ես: Օգտատերն արդեն ստացել է 3 քարտի ընթերցում և հիմա նույն քարտերի մասին լրացուցիչ հարց է տալիս: Պատասխանիր համառոտ (2-4 նախադասություն) հայերենով՝ հիմնվելով միայն այս քարտերի և նախորդ պատասխանի վրա:
-
-Կանոններ.
-- Դիմիր օգտատիրոջը («դու»):
-- Մի բացիր նոր քարտեր, մի փոխիր թեման և մի կրկնիր ամբողջ դասավորությունը:
-- Եղիր կոնկրետ և գործնական, ոչ թե անորոշ միստիկա:
-- Մի խոստացիր երաշխավորված ապագա. տարոն արտացոլման գործիք է:
-- Մի տուր կատեգորիկ ֆինանսական, բժշկական կամ իրավաբանական խորհուրդ:
-- Վերադարձրու միայն JSON:
-
-JSON ձևաչափ՝ {"answer": "լրացուցիչ հարցի համառոտ պատասխան"}`;
-
 export type TarotFollowupResult = {
   answer: string;
 };
@@ -2153,7 +1972,6 @@ export async function generateTarotFollowup(input: {
 
   const loc = input.locale ?? "ka";
   const en = loc === "en";
-  const am = loc === "am";
 
   const cardLines = input.cards
     .map(
@@ -2163,32 +1981,20 @@ export async function generateTarotFollowup(input: {
     .join("\n");
 
   const userMessage = [
-    am
-      ? `Սկզբնական հարցը՝ «${input.question}»`
-      : en
-        ? `Original question: “${input.question}”`
-        : `საწყისი კითხვა: „${input.question}"`,
+    en
+      ? `Original question: “${input.question}”`
+      : `საწყისი კითხვა: „${input.question}"`,
     "",
-    am ? "Բացված քարտերը՝" : en ? "Cards drawn:" : "გამოსული კარტები:",
+    en ? "Cards drawn:" : "გამოსული კარტები:",
     cardLines,
     "",
-    am
-      ? `Նախորդ պատասխանը՝ ${input.reading}`
-      : en
-        ? `Previous reading: ${input.reading}`
-        : `წინა პასუხი: ${input.reading}`,
+    en ? `Previous reading: ${input.reading}` : `წინა პასუხი: ${input.reading}`,
     "",
-    am
-      ? `Լրացուցիչ հարցը՝ «${input.followupQuestion}»`
-      : en
-        ? `Follow-up question: “${input.followupQuestion}”`
-        : `დამატებითი კითხვა: „${input.followupQuestion}"`,
+    en
+      ? `Follow-up question: “${input.followupQuestion}”`
+      : `დამატებითი კითხვა: „${input.followupQuestion}"`,
     "",
-    am
-      ? "Գրիր պատասխանը JSON ձևաչափով:"
-      : en
-        ? "Return the answer as JSON."
-        : "დაწერე პასუხი JSON-ად.",
+    en ? "Return the answer as JSON." : "დაწერე პასუხი JSON-ად.",
   ].join("\n");
 
   const res = await fetch(OPENROUTER_URL, {
@@ -2204,12 +2010,9 @@ export async function generateTarotFollowup(input: {
       messages: [
         {
           role: "system",
-          content:
-            loc === "am"
-              ? TAROT_FOLLOWUP_SYSTEM_PROMPT_AM
-              : en
-                ? TAROT_FOLLOWUP_SYSTEM_PROMPT_EN
-                : TAROT_FOLLOWUP_SYSTEM_PROMPT_KA,
+          content: en
+            ? TAROT_FOLLOWUP_SYSTEM_PROMPT_EN
+            : TAROT_FOLLOWUP_SYSTEM_PROMPT_KA,
         },
         { role: "user", content: userMessage },
       ],

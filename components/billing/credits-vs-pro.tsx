@@ -44,7 +44,6 @@ export function CreditsVsPro({
   isPremium?: boolean;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   const starterPack = creditPacksForCountry(countryCode)[0];
   const standardPro = premiumPlanForCountry(countryCode);
   const discountedPro = discountedPremiumPlanForCountry(countryCode);
@@ -54,9 +53,10 @@ export function CreditsVsPro({
     ? premiumPlanSavingsPercent(standardPro, discountedPro)
     : 0;
   const variant = useExperiment(EXPERIMENTS.pricingPresentation, placement);
-  const showPromotion = balance == null
-    ? !isPremium
-    : shouldShowPurchasePromotion({ isPremium, balance });
+  const showPromotion =
+    balance == null
+      ? !isPremium
+      : shouldShowPurchasePromotion({ isPremium, balance });
 
   useEffect(() => {
     if (!showPromotion) return;
@@ -84,16 +84,12 @@ export function CreditsVsPro({
 
   const heading =
     context === "natal_report"
-      ? am
-        ? "Ընտրեք՝ ինչպես բացել ավելի խորքային վերլուծությունը"
-        : en
-          ? "Choose how to unlock deeper insight"
-          : "აირჩიე, როგორ გახსნა ღრმა ანალიზი"
-      : am
-        ? "Ընտրեք Ձեզ հարմար տարբերակը"
-        : en
-          ? "Choose what fits your rhythm"
-          : "აირჩიე შენთვის მოსახერხებელი გზა";
+      ? en
+        ? "Choose how to unlock deeper insight"
+        : "აირჩიე, როგორ გახსნა ღრმა ანალიზი"
+      : en
+        ? "Choose what fits your rhythm"
+        : "აირჩიე შენთვის მოსახერხებელი გზა";
 
   if (!showPromotion) return null;
 
@@ -106,54 +102,68 @@ export function CreditsVsPro({
     >
       <div className="max-w-2xl">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {am ? "Պարզ գնագոյացում" : en ? "Simple pricing" : "მარტივი არჩევანი"}
+          {en ? "Simple pricing" : "მარტივი არჩევანი"}
         </p>
-        <h2 className={cn("mt-2 font-semibold tracking-tight", compact ? "text-xl" : "text-2xl")}>
+        <h2
+          className={cn(
+            "mt-2 font-semibold tracking-tight",
+            compact ? "text-xl" : "text-2xl",
+          )}
+        >
           {heading}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-foreground/70">
           {context === "natal_report"
-            ? am
-              ? "Վճարեք մեկ անգամ կրեդիտներով այս զեկույցի համար կամ ընտրեք PRO՝ զեկույցների, տարոյի, AI զրույցի և կանխատեսումների անսահմանափակ օգտագործման համար։"
-              : en
-                ? "Pay once with credits for this report, or choose PRO for unlimited reports, tarot, AI chat, and forecasts."
-                : "ამ ანგარიშისთვის გადაიხადე ერთხელ კრედიტებით, ან აირჩიე PRO — ულიმიტო ანგარიშებისთვის, ტაროსთვის, AI ჩატისა და პროგნოზებისთვის."
-            : am
+            ? en
+              ? "Pay once with credits for this report, or choose PRO for unlimited reports, tarot, AI chat, and forecasts."
+              : "ამ ანგარიშისთვის გადაიხადე ერთხელ კრედიტებით, ან აირჩიე PRO — ულიმიტო ანგარიშებისთვის, ტაროსთვის, AI ჩატისა და პროგნოზებისთვის."
+            : en
               ? discountedPro
-                ? "Կրեդիտները միանվագ գնում են, իսկ PRO-ն 3 ամսով բացում է ամեն ինչ՝ զեղչված գնով։"
-                : "Կրեդիտները միանվագ գնում են, իսկ PRO-ն՝ ամսական անսահմանափակ հասանելիություն։"
-              : en
-                ? discountedPro
-                  ? "Credits are a one-time purchase. PRO unlocks everything for 3 months at a discounted price."
-                  : "Credits are a one-time purchase. PRO is unlimited monthly access."
-                : discountedPro
-                  ? "კრედიტები ერთჯერადი შენაძენია, PRO კი ყველაფერს 3 თვით, ფასდაკლებით ხსნის."
-                  : "კრედიტები ერთჯერადი შენაძენია, PRO კი — ყოველთვიური ულიმიტო წვდომა."}
+                ? "Credits are a one-time purchase. PRO unlocks everything for 3 months at a discounted price."
+                : "Credits are a one-time purchase. PRO is unlimited monthly access."
+              : discountedPro
+                ? "კრედიტები ერთჯერადი შენაძენია, PRO კი ყველაფერს 3 თვით, ფასდაკლებით ხსნის."
+                : "კრედიტები ერთჯერადი შენაძენია, PRO კი — ყოველთვიური ულიმიტო წვდომა."}
         </p>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <article className={cn("flex flex-col rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/7 p-5", variant === "pro_first" && "sm:order-2")}>
+        <article
+          className={cn(
+            "flex flex-col rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/7 p-5",
+            variant === "pro_first" && "sm:order-2",
+          )}
+        >
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--vivida-cyan)]">
             <Coins className="size-4" />
-            {am ? "Վճարել ըստ օգտագործման" : en ? "Pay as you go" : "გადაიხადე საჭიროებისას"}
+            {en ? "Pay as you go" : "გადაიხადე საჭიროებისას"}
           </div>
           <h3 className="mt-3 text-xl font-semibold">
-            {am ? "Կրեդիտներ" : en ? "Credits" : "კრედიტები"}
+            {en ? "Credits" : "კრედიტები"}
           </h3>
           <div className="mt-1 flex items-baseline gap-1.5">
             <span className="text-2xl font-bold tracking-tight">
-              {formatBillingAmount(starterPack.amountMinor, starterPack.currency, locale)}
+              {formatBillingAmount(
+                starterPack.amountMinor,
+                starterPack.currency,
+                locale,
+              )}
             </span>
             <span className="text-xs text-muted-foreground">
-              / {starterPack.credits} {am ? "կրեդիտ" : en ? "credits" : "კრედიტი"}
+              / {starterPack.credits} {en ? "credits" : "კრედიტი"}
             </span>
           </div>
           <ul className="mt-4 flex-1 space-y-2 text-sm text-foreground/75">
             {[
-              am ? "Հարմար է առանձին արդյունքների համար" : en ? "Best for occasional unlocks" : "საუკეთესოა იშვიათი გახსნებისთვის",
-              am ? "Առանց բաժանորդագրության կամ ավտոմատ երկարաձգման" : en ? "No subscription or auto-renewal" : "გამოწერისა და ავტოგანახლების გარეშე",
-              am ? "Չօգտագործված կրեդիտները մնում են հաշվեկշռում" : en ? "Unused credits stay in your balance" : "დარჩენილი კრედიტები ბალანსზე ინახება",
+              en
+                ? "Best for occasional unlocks"
+                : "საუკეთესოა იშვიათი გახსნებისთვის",
+              en
+                ? "No subscription or auto-renewal"
+                : "გამოწერისა და ავტოგანახლების გარეშე",
+              en
+                ? "Unused credits stay in your balance"
+                : "დარჩენილი კრედიტები ბალანსზე ინახება",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2">
                 <Check className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
@@ -163,14 +173,22 @@ export function CreditsVsPro({
           </ul>
           <Button asChild variant="outline" className="mt-5 w-full">
             <Link href={creditHref} onClick={() => trackChoice("credits")}>
-              {am ? "Ընտրել կրեդիտներ" : en ? "Choose credits" : "აირჩიე კრედიტები"}
+              {en ? "Choose credits" : "აირჩიე კრედიტები"}
               <ArrowRight className="size-4" />
             </Link>
           </Button>
         </article>
 
-        <article className={cn("relative flex flex-col overflow-hidden rounded-2xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-gold)]/12 to-[var(--vivida-violet)]/10 p-5", variant === "pro_first" && "sm:order-1")}>
-          <div aria-hidden className="absolute -right-10 -top-12 size-36 rounded-full bg-[var(--vivida-gold)]/12 blur-3xl" />
+        <article
+          className={cn(
+            "relative flex flex-col overflow-hidden rounded-2xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-gold)]/12 to-[var(--vivida-violet)]/10 p-5",
+            variant === "pro_first" && "sm:order-1",
+          )}
+        >
+          <div
+            aria-hidden
+            className="absolute -right-10 -top-12 size-36 rounded-full bg-[var(--vivida-gold)]/12 blur-3xl"
+          />
           <div className="relative flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--vivida-gold)]">
             <Crown className="size-4" /> Vivida PRO
             {discountedPro && (
@@ -180,28 +198,43 @@ export function CreditsVsPro({
             )}
           </div>
           <h3 className="relative mt-3 text-xl font-semibold">
-            {am ? "Անսահմանափակ հասանելիություն" : en ? "Unlimited access" : "ულიმიტო წვდომა"}
+            {en ? "Unlimited access" : "ულიმიტო წვდომა"}
           </h3>
           <div className="relative mt-1 flex items-baseline gap-1.5">
             <span className="text-2xl font-bold tracking-tight">
               {formatBillingAmount(pro.amountMinor, pro.currency, locale)}
             </span>
             <span className="text-xs text-muted-foreground">
-              / {proMonths === 1 ? (am ? "ամիս" : en ? "month" : "თვე") : (am ? `${proMonths} ամիս` : en ? `${proMonths} months` : `${proMonths} თვე`)}
+              /{" "}
+              {proMonths === 1
+                ? en
+                  ? "month"
+                  : "თვე"
+                : en
+                  ? `${proMonths} months`
+                  : `${proMonths} თვე`}
             </span>
           </div>
           {discountedPro && (
             <p className="relative mt-1 text-xs font-medium text-[var(--vivida-gold)]">
-              {am ? "Ընդամենը" : en ? "Only" : "მხოლოდ"}{" "}
-              {formatBillingAmount(Math.round(pro.amountMinor / proMonths), pro.currency, locale)}
-              {am ? " ամսական" : en ? " per month" : " თვეში"}
+              {en ? "Only" : "მხოლოდ"}{" "}
+              {formatBillingAmount(
+                Math.round(pro.amountMinor / proMonths),
+                pro.currency,
+                locale,
+              )}
+              {en ? " per month" : " თვეში"}
             </p>
           )}
           <ul className="relative mt-4 flex-1 space-y-2 text-sm text-foreground/75">
             {[
-              am ? "Բոլոր կրեդիտային գործառույթներն առանց սահմանափակումների" : en ? "Every credit-gated feature, unlimited" : "ყველა კრედიტიანი ფუნქცია ულიმიტოდ",
-              am ? "Լավագույնը հաճախակի ընթերցումների և հարցերի համար" : en ? "Best for frequent readings and questions" : "საუკეთესოა ხშირი კითხვებისა და წაკითხვებისთვის",
-              am ? "Չեղարկեք ցանկացած պահի" : en ? "Cancel anytime" : "გააუქმე ნებისმიერ დროს",
+              en
+                ? "Every credit-gated feature, unlimited"
+                : "ყველა კრედიტიანი ფუნქცია ულიმიტოდ",
+              en
+                ? "Best for frequent readings and questions"
+                : "საუკეთესოა ხშირი კითხვებისა და წაკითხვებისთვის",
+              en ? "Cancel anytime" : "გააუქმე ნებისმიერ დროს",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2">
                 <Check className="mt-0.5 size-4 shrink-0 text-[var(--vivida-gold)]" />
@@ -211,7 +244,7 @@ export function CreditsVsPro({
           </ul>
           <Button asChild variant="mystic" className="relative mt-5 w-full">
             <Link href={proHref} onClick={() => trackChoice("subscription")}>
-              {am ? "Ընտրել PRO" : en ? "Choose PRO" : "აირჩიე PRO"}
+              {en ? "Choose PRO" : "აირჩიე PRO"}
               <ArrowRight className="size-4" />
             </Link>
           </Button>

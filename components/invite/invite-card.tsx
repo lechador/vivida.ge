@@ -24,7 +24,6 @@ export function InviteCard({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -56,12 +55,12 @@ export function InviteCard({
     <div className="rounded-3xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/12 to-[var(--vivida-cyan)]/12 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
       <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
         <Users className="size-4 text-[var(--vivida-violet)]" />
-        {am ? "Հրավիրել ընկերների" : en ? "Invite friends" : "მოიწვიე მეგობრები"}
+        {en ? "Invite friends" : "მოიწვიე მეგობრები"}
       </div>
       <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-        {am ? "Վաստակեք յուրաքանչյուր ընկերոջ համար" : en ? "Earn for every friend " : "თითო მეგობარზე "}
+        {en ? "Earn for every friend " : "თითო მეგობარზე "}
         <span className="text-[var(--vivida-cyan)]">
-          +{REFERRAL_REWARD} {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}
+          +{REFERRAL_REWARD} {en ? "credits" : "კრედიტი"}
         </span>
       </h2>
       <p className="mt-1 max-w-md text-sm text-foreground/80">
@@ -81,7 +80,7 @@ export function InviteCard({
           className="gap-1.5"
         >
           {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-          {copied ? (am ? "Պատճենված է" : en ? "Copied" : "დაკოპირდა") : am ? "Պատճենել" : en ? "Copy" : "კოპირება"}
+          {copied ? (en ? "Copied" : "დაკოპირდა") : en ? "Copy" : "კოპირება"}
         </Button>
       </div>
 
@@ -93,13 +92,13 @@ export function InviteCard({
           className="gap-1.5"
         >
           <Share2 className="size-4" />
-          {am ? "Կիսվել" : en ? "Share" : "გაზიარება"}
+          {en ? "Share" : "გაზიარება"}
         </Button>
         <div className="ml-auto flex gap-5 text-sm">
           <div>
             <div className="font-semibold tabular-nums">{invited}</div>
             <div className="text-xs text-muted-foreground">
-              {am ? "Հրավիրված" : en ? "Invited" : "მოწვეული"}
+              {en ? "Invited" : "მოწვეული"}
             </div>
           </div>
           <div>
@@ -107,7 +106,7 @@ export function InviteCard({
               {qualified}
             </div>
             <div className="text-xs text-muted-foreground">
-              {am ? "Ակտիվացված" : en ? "Activated" : "გააქტიურდა"}
+              {en ? "Activated" : "გააქტიურდა"}
             </div>
           </div>
         </div>

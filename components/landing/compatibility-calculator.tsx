@@ -18,9 +18,6 @@ const SCORE_COLOR: Record<string, string> = {
   Strong: "oklch(0.78 0.18 305)",
   Harmonious: "oklch(0.78 0.16 200)",
   Dynamic: "oklch(0.72 0.20 30)",
-  Ուժեղ: "oklch(0.78 0.18 305)",
-  Ներդաշնակ: "oklch(0.78 0.16 200)",
-  Դինամիկ: "oklch(0.72 0.20 30)",
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -34,10 +31,9 @@ export function CompatibilityCalculator({
 }: {
   signs: CalcSign[];
   pairs: Record<string, CalcPair>;
-  locale?: "ka" | "en" | "am";
+  locale?: "ka" | "en";
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   const [a, setA] = useState<ZodiacSlug | null>(null);
   const [b, setB] = useState<ZodiacSlug | null>(null);
   const [active, setActive] = useState<Slot>("a");
@@ -101,7 +97,7 @@ export function CompatibilityCalculator({
       {/* Chosen-pair slots */}
       <div className="flex items-stretch gap-3 sm:gap-4">
         <Slot
-          label={am ? "Ձեր նշանը" : en ? "Your sign" : "შენი ნიშანი"}
+          label={en ? "Your sign" : "შენი ნიშანი"}
           sign={signA}
           active={active === "a"}
           onClick={() => setActive("a")}
@@ -113,7 +109,7 @@ export function CompatibilityCalculator({
           />
         </div>
         <Slot
-          label={am ? "Նրանց նշանը" : en ? "Their sign" : "მისი ნიშანი"}
+          label={en ? "Their sign" : "მისი ნიშანი"}
           sign={signB}
           active={active === "b"}
           onClick={() => setActive("b")}
@@ -168,16 +164,12 @@ export function CompatibilityCalculator({
         >
           <Sparkles className="size-5" />
           {result
-            ? am
-              ? "Կրկին հաշվարկել"
-              : en
-                ? "Calculate again"
-                : "ხელახლა გამოთვალე"
-            : am
-              ? "Հաշվել համատեղելիությունը"
-              : en
-                ? "Calculate compatibility"
-                : "გამოთვალე თავსებადობა"}
+            ? en
+              ? "Calculate again"
+              : "ხელახლა გამოთვალე"
+            : en
+              ? "Calculate compatibility"
+              : "გამოთვალე თავსებადობა"}
         </Button>
         {(a || b) && (
           <button
@@ -186,7 +178,7 @@ export function CompatibilityCalculator({
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <RotateCcw className="size-4" />
-            {am ? "Մաքրել" : en ? "Reset" : "თავიდან"}
+            {en ? "Reset" : "თავიდან"}
           </button>
         )}
       </div>
@@ -269,31 +261,22 @@ function ResultCard({
   result: CalcPair;
   signA: CalcSign;
   signB: CalcSign;
-  locale: "ka" | "en" | "am";
+  locale: "ka" | "en";
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   const color = SCORE_COLOR[result.score] ?? "var(--vivida-violet)";
   const percent = useCountUp(result.percent);
 
   async function share() {
-    const url = am
-      ? `https://www.vividaastro.com/am/zodiac/tavsebadoba/${result.slug}`
-      : `${en ? "https://www.vividaastro.com" : "https://www.vivida.ge"}/zodiac/tavsebadoba/${result.slug}`;
-    const text = am
-      ? `${signA.label} × ${signB.label} — ${result.percent}% համատեղելիություն Vivida-ում ✨`
-      : en
-        ? `${signA.label} × ${signB.label} — ${result.percent}% compatibility on Vivida ✨`
-        : `${signA.label} × ${signB.label} — ${result.percent}% თავსებადობა Vivida-ზე ✨`;
+    const url = `${en ? "https://www.vividaastro.com" : "https://www.vivida.ge"}/zodiac/tavsebadoba/${result.slug}`;
+    const text = en
+      ? `${signA.label} × ${signB.label} — ${result.percent}% compatibility on Vivida ✨`
+      : `${signA.label} × ${signB.label} — ${result.percent}% თავსებადობა Vivida-ზე ✨`;
     fbTrackCustom("CompatibilityShare", { pair: result.slug });
     try {
       if (navigator.share) {
         await navigator.share({
-          title: am
-            ? "Vivida համատեղելիություն"
-            : en
-              ? "Vivida compatibility"
-              : "Vivida თავსებადობა",
+          title: en ? "Vivida compatibility" : "Vivida თავსებადობა",
           text,
           url,
         });
@@ -392,7 +375,7 @@ function ResultCard({
       >
         <span className="font-semibold">{result.score}</span>
         <span className="text-foreground/70">
-          {am ? "համատեղելիություն" : en ? "compatibility" : "თავსებადობა"}
+          {en ? "compatibility" : "თავსებადობა"}
         </span>
       </div>
 
@@ -424,18 +407,10 @@ function ResultCard({
           <Button asChild variant="outline" size="default">
             <Link
               href={
-                am
-                  ? `/am/compatibility`
-                  : en
-                    ? `/compatibility`
-                    : `/zodiac/tavsebadoba/${result.slug}`
+                en ? `/compatibility` : `/zodiac/tavsebadoba/${result.slug}`
               }
             >
-              {am
-                ? "Ամբողջական համատեղելիություն"
-                : en
-                  ? "View full analysis"
-                  : "ნახე სრული ანალიზი"}
+              {en ? "View full analysis" : "ნახე სრული ანალიზი"}
             </Link>
           </Button>
           <button
@@ -444,22 +419,14 @@ function ResultCard({
             className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/60 px-4 py-2 text-sm font-medium text-foreground/90 transition-colors hover:bg-card"
           >
             <Share2 className="size-4" />
-            {am ? "Կիսվել" : en ? "Share" : "გააზიარე"}
+            {en ? "Share" : "გააზიარე"}
           </button>
         </div>
 
         {/* The hook into the actual product */}
         <div className="mt-4 w-full rounded-2xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/8 p-5">
           <p className="text-pretty text-sm text-foreground/85">
-            {am ? (
-              <>
-                Սա համեմատում է միայն ձեր{" "}
-                <strong className="text-foreground">Արևի նշանները</strong>՝
-                մակերեսային շերտը: Խորքային համատեղելիությունը ներառում է
-                Լուսինը, Վեներան, Մարսը, տները և ասպեկտները: Vivida-ն հաշվարկում
-                է ամբողջական քարտեզը:
-              </>
-            ) : en ? (
+            {en ? (
               <>
                 This compares only your{" "}
                 <strong className="text-foreground">Sun signs</strong>—the
@@ -485,11 +452,7 @@ function ResultCard({
           >
             <Link href="/signup">
               <Sparkles className="size-5" />
-              {am
-                ? "Ստեղծել անվճար պրոֆիլ"
-                : en
-                  ? "Create a free profile"
-                  : "შექმენი პროფილი უფასოდ"}
+              {en ? "Create a free profile" : "შექმენი პროფილი უფასოდ"}
             </Link>
           </Button>
         </div>

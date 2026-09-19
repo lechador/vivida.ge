@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { buildCalculatorData } from "@/lib/compatibility-calculator-data";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/tavsebadoba";
@@ -22,26 +22,6 @@ const PATH = "/tavsebadoba";
  */
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const title = "Կենդանակերպի համատեղելիության հաշվիչ — Ստուգիր քո զույգը | Vivida";
-    const description = "Ընտրիր կենդանակերպի երկու նշան և ստուգիր սիրային համատեղելիությունը անմիջապես, անվճար և առանց գրանցման:";
-    return {
-      title: { absolute: title },
-      description,
-      keywords: ["կենդանակերպի համատեղելիություն", "համատեղելիության հաշվիչ", "սիրային հորոսկոպ"],
-      alternates: localizedAlternates(`/am${PATH}`, PATH, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: `${ARMENIAN_SITE_URL}${PATH}`,
-        title,
-        description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title, description },
-    };
-  }
 
   const en = locale === "en";
   const title = en
@@ -89,12 +69,6 @@ const TRUST_KA = [
   { icon: Sparkles, label: "ქართულად" },
 ];
 
-const TRUST_AM = [
-  { icon: Check, label: "Անվճար՝ առանց բանկային քարտի" },
-  { icon: Lock, label: "Առանց գրանցման" },
-  { icon: Sparkles, label: "Ակնթարթային արդյունք" },
-];
-
 const TRUST_EN = [
   { icon: Check, label: "Free—no card required" },
   { icon: Lock, label: "No registration" },
@@ -104,9 +78,8 @@ const TRUST_EN = [
 export default async function TavsebadobaPage() {
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
   const { signs, pairs } = buildCalculatorData(locale);
-  const trustList = am ? TRUST_AM : en ? TRUST_EN : TRUST_KA;
+  const trustList = en ? TRUST_EN : TRUST_KA;
 
   return (
     <main
@@ -121,7 +94,7 @@ export default async function TavsebadobaPage() {
 
       {/* Minimal header — fewer exits on cold ad traffic */}
       <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
-        <Link href={am ? "/am" : "/"} className="flex items-center gap-2">
+        <Link href={"/"} className="flex items-center gap-2">
           <VividaMark size={36} id="tavsebadoba" />
           <span
             className="bg-clip-text text-lg font-semibold tracking-tight text-transparent"
@@ -137,7 +110,7 @@ export default async function TavsebadobaPage() {
           href="/login"
           className="text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          {am ? "Մուտք" : en ? "Log in" : "შესვლა"}
+          {en ? "Log in" : "შესვლა"}
         </Link>
       </header>
 
@@ -147,20 +120,18 @@ export default async function TavsebadobaPage() {
             className="size-3.5 text-[var(--vivida-pink)]"
             fill="currentColor"
           />
-          {am ? "Կենդանակերպի համատեղելիություն" : en ? "Zodiac compatibility" : "ზოდიაქოს თავსებადობა"}
+          {en ? "Zodiac compatibility" : "ზოდიაქოს თავსებადობა"}
         </span>
 
         <h1 className="text-balance text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
-          {am ? "Որքանո՞վ եք համատեղելի " : en ? "How compatible are " : "რამდენად თავსებადი ხართ "}
+          {en ? "How compatible are " : "რამდენად თავსებადი ხართ "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {am ? "դու և քո սիրելին:" : en ? "you and your person?" : "შენ და შენი სიყვარული?"}
+            {en ? "you and your person?" : "შენ და შენი სიყვარული?"}
           </span>
         </h1>
 
         <p className="mx-auto mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg">
-          {am
-            ? "Ընտրիր երկու նշան և բացահայտիր ձեր համատեղելիությունը ակնթարթորեն՝ անվճար:"
-            : en
+          {en
             ? "Choose two zodiac signs and discover your compatibility instantly—free."
             : "აირჩიე ორი ნიშანი და გაიგე თქვენი თავსებადობა მყისიერად — უფასოდ."}
         </p>

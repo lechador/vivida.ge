@@ -23,12 +23,11 @@ import { elementPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacElementPageEn } from "@/components/seo/zodiac-elements-en";
-import { ZodiacElementPageAm } from "@/components/seo/zodiac-element-pages-am";
+
 import { ELEMENT_ENGLISH } from "@/lib/zodiac-element-en";
-import { elementArmenian } from "@/lib/zodiac-placements-am";
+
 import {
   DEFAULT_OG_IMAGE,
-  armenianSiteHref,
   englishSiteHref,
   localizedAlternates,
 } from "@/lib/seo/locales";
@@ -67,29 +66,6 @@ export async function generateMetadata({
   const { element } = await params;
   if (!isElement(element) || !ELEMENTS_CONTENT) return {};
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const c = elementArmenian(element);
-    const path = `/zodiac/elementebi/${element}`;
-    return {
-      title: { absolute: c.title },
-      description: c.description,
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "article",
-        url: armenianSiteHref(path, false),
-        title: c.title,
-        description: c.description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: c.title,
-        description: c.description,
-      },
-    };
-  }
   if (locale === "en") {
     const c = ELEMENT_ENGLISH[element];
     const title = `${c.name}: Traits, Love and Compatibility`;
@@ -150,7 +126,6 @@ export default async function ElementDetailPage({
   const { element } = await params;
   if (!isElement(element) || !ELEMENTS_CONTENT) notFound();
   const locale = await getRequestLocale();
-  if (locale === "am") return <ZodiacElementPageAm element={element} />;
   if (locale === "en") return <ZodiacElementPageEn element={element} />;
   const c = ELEMENTS_CONTENT[element];
   if (!c) notFound();

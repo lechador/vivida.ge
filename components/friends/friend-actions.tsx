@@ -29,13 +29,14 @@ export function FriendActions({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [isPending, startTransition] = useTransition();
   const [removed, setRemoved] = useState(false);
 
   if (removed) {
     return (
-      <span className="text-xs text-muted-foreground">{am ? "Հեռացված է" : en ? "Removed" : "წაიშალა"}</span>
+      <span className="text-xs text-muted-foreground">
+        {en ? "Removed" : "წაიშალა"}
+      </span>
     );
   }
 
@@ -54,7 +55,7 @@ export function FriendActions({
             }
           >
             <Check className="size-3.5" />
-            {am ? "Ընդունել" : en ? "Accept" : "მიიღე"}
+            {en ? "Accept" : "მიიღე"}
           </Button>
           <Button
             size="sm"
@@ -68,7 +69,7 @@ export function FriendActions({
             }
           >
             <X className="size-3.5" />
-            {am ? "Մերժել" : en ? "Decline" : "უარი"}
+            {en ? "Decline" : "უარი"}
           </Button>
         </>
       )}
@@ -85,7 +86,7 @@ export function FriendActions({
           }
         >
           <Clock className="size-3.5" />
-          {am ? "Չեղարկել" : en ? "Cancel" : "გაუქმება"}
+          {en ? "Cancel" : "გაუქმება"}
         </Button>
       )}
       {variant === "friends" && (
@@ -94,7 +95,9 @@ export function FriendActions({
           variant="outline"
           disabled={isPending}
           onClick={() => {
-            const sure = window.confirm(am ? "Հեռացնե՞լ այս ընկերոջը" : en ? "Remove this friend?" : "მართლა წავშალოთ?");
+            const sure = window.confirm(
+              en ? "Remove this friend?" : "მართლა წავშალოთ?",
+            );
             if (!sure) return;
             startTransition(async () => {
               await removeFriend(otherUserId, otherUsername);
@@ -103,7 +106,7 @@ export function FriendActions({
           }}
         >
           <UserMinus className="size-3.5" />
-          {am ? "Հեռացնել" : en ? "Remove" : "წაშლა"}
+          {en ? "Remove" : "წაშლა"}
         </Button>
       )}
     </div>

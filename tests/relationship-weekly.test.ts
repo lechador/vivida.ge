@@ -31,24 +31,48 @@ const chart: NatalChartJson = {
 
 describe("recurring relationship weekly update", () => {
   it("anchors every date in a timezone to Monday", () => {
-    expect(relationshipWeekStart(new Date("2026-08-26T20:30:00Z"), "Asia/Tbilisi")).toBe("2026-08-24");
-    expect(relationshipWeekStart(new Date("2026-08-23T20:30:00Z"), "Asia/Tbilisi")).toBe("2026-08-24");
+    expect(
+      relationshipWeekStart(new Date("2026-08-26T20:30:00Z"), "Asia/Tbilisi"),
+    ).toBe("2026-08-24");
+    expect(
+      relationshipWeekStart(new Date("2026-08-23T20:30:00Z"), "Asia/Tbilisi"),
+    ).toBe("2026-08-24");
   });
 
   it("is deterministic, seven days long, and keeps the scores balanced", () => {
     const at = new Date("2026-08-26T10:00:00Z");
-    const first = computeRelationshipWeekly(chart, chart, at, "Asia/Tbilisi", "ka");
-    const second = computeRelationshipWeekly(chart, chart, at, "Asia/Tbilisi", "ka");
+    const first = computeRelationshipWeekly(
+      chart,
+      chart,
+      at,
+      "Asia/Tbilisi",
+      "ka",
+    );
+    const second = computeRelationshipWeekly(
+      chart,
+      chart,
+      at,
+      "Asia/Tbilisi",
+      "ka",
+    );
     expect(first).toEqual(second);
     expect(first.weekStart).toBe("2026-08-24");
     expect(first.days).toHaveLength(7);
     expect(first.questions).toHaveLength(3);
     expect(first.harmonyScore + first.challengeScore).toBe(100);
-    expect(new Set(first.questions.map((question) => question.key)).size).toBe(3);
+    expect(new Set(first.questions.map((question) => question.key)).size).toBe(
+      3,
+    );
   });
 
-  it("renders Armenian recurring copy without Georgian text", () => {
-    const result = computeRelationshipWeekly(chart, chart, new Date("2026-08-26T10:00:00Z"), "Asia/Yerevan", "am");
+  it("renders English recurring copy without Georgian text", () => {
+    const result = computeRelationshipWeekly(
+      chart,
+      chart,
+      new Date("2026-08-26T10:00:00Z"),
+      "Asia/Tbilisi",
+      "en",
+    );
     expect(JSON.stringify(result)).not.toMatch(/[ა-ჰ]/);
   });
 });

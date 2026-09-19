@@ -32,7 +32,6 @@ export async function generateMetadata(): Promise<Metadata> {
 const DATE_LOCALE: Record<UserLocale, string> = {
   ka: "ka-GE",
   en: "en-GB",
-  am: "hy-AM",
 };
 
 export default async function LibraryEntryPage({
@@ -48,7 +47,6 @@ export default async function LibraryEntryPage({
   ]);
   if (!entry) notFound();
   const en = locale === "en";
-  const am = locale === "am";
   const date = new Intl.DateTimeFormat(DATE_LOCALE[locale], {
     day: "numeric",
     month: "long",
@@ -77,11 +75,7 @@ export default async function LibraryEntryPage({
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          {am
-            ? "Վերադառնալ գրադարան"
-            : en
-              ? "Back to library"
-              : "ბიბლიოთეკაში დაბრუნება"}
+          {en ? "Back to library" : "ბიბლიოთეკაში დაბრუნება"}
         </Link>
 
         <header className="mt-6 rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
@@ -120,11 +114,7 @@ export default async function LibraryEntryPage({
           <div className="mt-4 flex justify-end">
             <Button asChild variant="outline">
               <Link href={entry.href}>
-                {am
-                  ? "Բացել սկզբնական բաժինը"
-                  : en
-                    ? "Open original"
-                    : "საწყისი გვერდის გახსნა"}
+                {en ? "Open original" : "საწყისი გვერდის გახსნა"}
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
@@ -151,7 +141,6 @@ function LibraryContent({
   locale: UserLocale;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
 
   switch (content.type) {
     case "daily":
@@ -219,7 +208,7 @@ function LibraryContent({
         <section className="space-y-4 rounded-3xl border border-[var(--vivida-violet)]/30 bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <div className="rounded-2xl bg-background/30 p-4">
             <div className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
-              {am ? "Հարց" : en ? "Question" : "კითხვა"}
+              {en ? "Question" : "კითხვა"}
             </div>
             <p className="mt-2 text-foreground/90">{content.question}</p>
             {content.spreadId && content.spreadId !== "situation" && (
@@ -228,7 +217,6 @@ function LibraryContent({
                   (tarotSpreadById(content.spreadId)?.name ?? {
                     ka: "ტარო",
                     en: "Tarot",
-                    am: "Տարո",
                   })[locale]
                 }
               </p>
@@ -251,13 +239,7 @@ function LibraryContent({
                 </div>
                 <h3 className="mt-1 font-semibold">
                   {card.name}
-                  {card.reversed
-                    ? am
-                      ? " · շրջված"
-                      : en
-                        ? " · reversed"
-                        : " · შებრუნებული"
-                    : ""}
+                  {card.reversed ? (en ? " · reversed" : " · შებრუნებული") : ""}
                 </h3>
                 <p className="mt-2 text-xs leading-6 text-foreground/70">
                   {card.interpretation}
@@ -280,7 +262,7 @@ function LibraryContent({
               className="rounded-2xl border border-border bg-background/25 p-4"
             >
               <div className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                {am ? "Լրացուցիչ հարց" : en ? "Follow-up" : "დაზუსტება"}
+                {en ? "Follow-up" : "დაზუსტება"}
               </div>
               <p className="mt-2 text-sm font-medium text-foreground/90">
                 {followup.question}
@@ -308,18 +290,12 @@ function LibraryContent({
         <section className="rounded-3xl border border-[var(--vivida-cyan)]/30 bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
           <Sparkles className="mx-auto size-8 text-[var(--vivida-cyan)]" />
           <h2 className="mt-4 text-xl font-semibold">
-            {am
-              ? "Ձեր PDF զեկույցը"
-              : en
-                ? "Your PDF report"
-                : "შენი PDF რეპორტი"}
+            {en ? "Your PDF report" : "შენი PDF რეპორტი"}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            {am
-              ? "Բացեք սկզբնական բաժինը՝ կարգավիճակը տեսնելու կամ PDF-ը ներբեռնելու համար։"
-              : en
-                ? "Open the original report to check its status or download the PDF."
-                : "გახსენი საწყისი რეპორტი სტატუსის სანახავად ან PDF-ის ჩამოსატვირთად."}
+            {en
+              ? "Open the original report to check its status or download the PDF."
+              : "გახსენი საწყისი რეპორტი სტატუსის სანახავად ან PDF-ის ჩამოსატვირთად."}
           </p>
         </section>
       );

@@ -42,16 +42,18 @@ export function PremiumPlanCard({
   returnTo?: string | null;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
   const discountedPlan = discountedPremiumPlanForCountry(plan.countryCode);
   const [selectedKey, setSelectedKey] = useState(
     () => discountedPlan?.key ?? plan.key,
   );
-  const selectedPlan = discountedPlan?.key === selectedKey ? discountedPlan : plan;
+  const selectedPlan =
+    discountedPlan?.key === selectedKey ? discountedPlan : plan;
   const months = selectedPlan.intervalCount ?? 1;
-  const isDiscounted = Boolean(discountedPlan && selectedPlan.key === discountedPlan.key);
+  const isDiscounted = Boolean(
+    discountedPlan && selectedPlan.key === discountedPlan.key,
+  );
   const savings = discountedPlan
     ? premiumPlanSavingsPercent(plan, discountedPlan)
     : 0;
@@ -69,7 +71,13 @@ export function PremiumPlanCard({
       ...params,
       surface: placement,
     });
-  }, [active, placement, selectedPlan.amountMinor, selectedPlan.currency, selectedPlan.key]);
+  }, [
+    active,
+    placement,
+    selectedPlan.amountMinor,
+    selectedPlan.currency,
+    selectedPlan.key,
+  ]);
 
   async function subscribe() {
     trackEvent(ANALYTICS_EVENT.productSelected, {
@@ -88,11 +96,28 @@ export function PremiumPlanCard({
         body: JSON.stringify({ planKey: selectedPlan.key, returnTo }),
       });
       const data = (await response.json().catch(() => ({}))) as {
-        url?: string; eventId?: string; value?: number; currency?: string; contentId?: string;
+        url?: string;
+        eventId?: string;
+        value?: number;
+        currency?: string;
+        contentId?: string;
       };
       if (data.url) {
-        fbTrack("InitiateCheckout", { value: data.value, currency: data.currency, content_ids: [data.contentId], content_type: "product" }, data.eventId);
-        trackEvent(ANALYTICS_EVENT.checkoutStarted, { product: data.contentId, value: data.value, currency: data.currency });
+        fbTrack(
+          "InitiateCheckout",
+          {
+            value: data.value,
+            currency: data.currency,
+            content_ids: [data.contentId],
+            content_type: "product",
+          },
+          data.eventId,
+        );
+        trackEvent(ANALYTICS_EVENT.checkoutStarted, {
+          product: data.contentId,
+          value: data.value,
+          currency: data.currency,
+        });
         window.location.assign(data.url);
         return;
       }
@@ -105,14 +130,19 @@ export function PremiumPlanCard({
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-gold)]/14 via-card/70 to-[var(--vivida-violet)]/12 p-6 ring-1 ring-foreground/5 sm:p-8">
-      <div aria-hidden className="absolute -right-16 -top-20 size-56 rounded-full bg-[var(--vivida-gold)]/15 blur-3xl" />
+      <div
+        aria-hidden
+        className="absolute -right-16 -top-20 size-56 rounded-full bg-[var(--vivida-gold)]/15 blur-3xl"
+      />
       <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
             <Crown className="size-4" /> Vivida PRO
           </div>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-            {am ? "Ամեն ինչ՝ առանց վարկային սահմանափակումների" : en ? "Everything, without credit limits" : "ყველაფერი, კრედიტების ლიმიტის გარეშე"}
+            {en
+              ? "Everything, without credit limits"
+              : "ყველაფერი, კრედიტების ლიმიტის გარეშე"}
           </h2>
           <ul className="mt-4 space-y-2 text-sm text-foreground/80">
             {(en ? FEATURES_EN : FEATURES_KA).map((feature) => (
@@ -132,7 +162,7 @@ export function PremiumPlanCard({
                 className={`rounded-lg px-2 py-2 font-semibold transition-colors ${isDiscounted ? "bg-[var(--vivida-gold)]/18 text-[var(--vivida-gold)]" : "text-muted-foreground hover:text-foreground"}`}
                 aria-pressed={isDiscounted}
               >
-                {am ? "3 ամիս" : en ? "3 months" : "3 თვე"}
+                {en ? "3 months" : "3 თვე"}
               </button>
               <button
                 type="button"
@@ -140,57 +170,84 @@ export function PremiumPlanCard({
                 className={`rounded-lg px-2 py-2 font-semibold transition-colors ${!isDiscounted ? "bg-card text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                 aria-pressed={!isDiscounted}
               >
-                {am ? "Ամսական" : en ? "Monthly" : "თვიური"}
+                {en ? "Monthly" : "თვიური"}
               </button>
             </div>
           )}
           {isDiscounted && (
             <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-gold)]/16 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--vivida-gold)]">
               <Sparkles className="size-3" />
-              {am ? `Խնայեք ${savings}%` : en ? `Save ${savings}%` : `დაზოგე ${savings}%`}
+              {en ? `Save ${savings}%` : `დაზოგე ${savings}%`}
             </div>
           )}
           <div className="text-3xl font-bold tracking-tight">
-            {formatBillingAmount(selectedPlan.amountMinor, selectedPlan.currency, locale)}
+            {formatBillingAmount(
+              selectedPlan.amountMinor,
+              selectedPlan.currency,
+              locale,
+            )}
           </div>
           <div className="text-xs text-muted-foreground">
-            /{months === 1 ? (am ? "ամիս" : en ? "month" : "თვე") : (am ? `${months} ամիս` : en ? `${months} months` : `${months} თვე`)}
+            /
+            {months === 1
+              ? en
+                ? "month"
+                : "თვე"
+              : en
+                ? `${months} months`
+                : `${months} თვე`}
           </div>
           {isDiscounted && (
             <div className="mt-1 text-xs text-foreground/70">
-              {am ? "Ընդամենը" : en ? "Only" : "მხოლოდ"}{" "}
+              {en ? "Only" : "მხოლოდ"}{" "}
               <span className="font-semibold text-foreground">
-                {formatBillingAmount(Math.round(selectedPlan.amountMinor / months), selectedPlan.currency, locale)}
+                {formatBillingAmount(
+                  Math.round(selectedPlan.amountMinor / months),
+                  selectedPlan.currency,
+                  locale,
+                )}
               </span>{" "}
-              {am ? "ամսական" : en ? "per month" : "თვეში"}
+              {en ? "per month" : "თვეში"}
             </div>
           )}
           {active ? (
             <Button asChild variant="outline" className="mt-3 w-full">
-              <Link href="/subscription">{am ? "Կառավարել PRO-ն" : en ? "Manage PRO" : "PRO-ს მართვა"}</Link>
+              <Link href="/subscription">
+                {en ? "Manage PRO" : "PRO-ს მართვა"}
+              </Link>
             </Button>
           ) : (
-            <Button type="button" variant="mystic" className="mt-3 w-full" onClick={subscribe} disabled={pending}>
+            <Button
+              type="button"
+              variant="mystic"
+              className="mt-3 w-full"
+              onClick={subscribe}
+              disabled={pending}
+            >
               {pending && <Loader2 className="size-4 animate-spin" />}
               {isDiscounted
-                ? am ? "Ստանալ 3 ամիս" : en ? "Get 3 months" : "მიიღე 3 თვე"
-                : am ? "Ստանալ PRO" : en ? "Get PRO" : "გახდი PRO"}
+                ? en
+                  ? "Get 3 months"
+                  : "მიიღე 3 თვე"
+                : en
+                  ? "Get PRO"
+                  : "გახდი PRO"}
             </Button>
           )}
           {error && (
             <p className="mt-2 text-xs text-destructive">
-              {am ? "Վճարումը չհաջողվեց սկսել։" : en ? "Checkout could not start." : "გადახდა ვერ დაიწყო."}
+              {en ? "Checkout could not start." : "გადახდა ვერ დაიწყო."}
             </p>
           )}
           {!active && (
             <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
               {isDiscounted
-                ? am
-                  ? "Նույն գնով թարմացվում է յուրաքանչյուր 3 ամիսը մեկ։ Կարող եք չեղարկել ցանկացած պահի։"
-                  : en
-                    ? "Renews every 3 months at the same price. Cancel anytime."
-                    : "იგივე ფასად ყოველ 3 თვეში განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."
-                : am ? "Ավտոմատ կերպով թարմացվում է ամեն ամիս։ Կարող եք չեղարկել ցանկացած պահի։" : en ? "Renews automatically each month. Cancel anytime." : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
+                ? en
+                  ? "Renews every 3 months at the same price. Cancel anytime."
+                  : "იგივე ფასად ყოველ 3 თვეში განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."
+                : en
+                  ? "Renews automatically each month. Cancel anytime."
+                  : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
             </p>
           )}
         </div>

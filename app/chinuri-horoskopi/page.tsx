@@ -10,21 +10,21 @@ import {
   CHINESE_HUB_EN,
   ChineseZodiacHubEn,
 } from "@/components/seo/chinese-zodiac-en";
-import {
-  CHINESE_HUB_AM,
-  ChineseZodiacHubAm,
-} from "@/components/seo/chinese-zodiac-am";
+
 import { ensureChineseZodiacHub } from "@/actions/chinese-zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { CHINESE_ANIMALS, yearsForAnimal } from "@/lib/seo/chinese-zodiac";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
 
 const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/chinuri-horoskopi`;
 
-const FALLBACK_TITLE =
-  "ჩინური ჰოროსკოპი — ზოდიაქოს ნიშნები წლების მიხედვით";
+const FALLBACK_TITLE = "ჩინური ჰოროსკოპი — ზოდიაქოს ნიშნები წლების მიხედვით";
 const FALLBACK_DESC =
   "ჩინური ჰოროსკოპი ქართულად — გაიგე შენი ცხოველი დაბადების წლის მიხედვით. 12 ნიშანი: ვირთხა, ხარი, ვეფხვი, კურდღელი, დრაკონი, გველი, ცხენი, თხა, მაიმუნი, მამალი, ძაღლი, ღორი.";
 
@@ -32,34 +32,6 @@ export const revalidate = 604800;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const path = "/chinuri-horoskopi";
-    return {
-      title: { absolute: `${CHINESE_HUB_AM.title} — Vivida` },
-      description: CHINESE_HUB_AM.description,
-      keywords: [
-        "չինական կենդանակերպ",
-        "չինական հորոսկոպ",
-        "կենդանակերպի նշաններ ըստ տարիների",
-        "արևելյան հորոսկոպ",
-      ],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: armenianSiteHref(path, false),
-        title: CHINESE_HUB_AM.title,
-        description: CHINESE_HUB_AM.description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: CHINESE_HUB_AM.title,
-        description: CHINESE_HUB_AM.description,
-      },
-    };
-  }
   if (locale === "en") {
     const path = "/chinuri-horoskopi";
     return {
@@ -122,7 +94,6 @@ const HUB_QUERIES = [
 
 export default async function ChineseZodiacHubPage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <ChineseZodiacHubAm />;
   if (locale === "en") return <ChineseZodiacHubEn />;
 
   const hub = await ensureChineseZodiacHub();
@@ -169,10 +140,19 @@ export default async function ChineseZodiacHubPage() {
       <Starfield count={140} shooting={3} />
       <SmartHeader />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       {faqLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
       )}
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
@@ -250,7 +230,10 @@ export default async function ChineseZodiacHubPage() {
                 >
                   <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
                     <span>{item.q}</span>
-                    <span aria-hidden className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45">
+                    <span
+                      aria-hidden
+                      className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45"
+                    >
                       ✦
                     </span>
                   </summary>

@@ -11,9 +11,14 @@ import { fbTrack } from "@/lib/fb-pixel";
 import { readPendingNatalProfile } from "@/lib/pending-natal-profile";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
-export function FastOnboarding({ next, locale }: { next?: string; locale: UserLocale }) {
+export function FastOnboarding({
+  next,
+  locale,
+}: {
+  next?: string;
+  locale: UserLocale;
+}) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [missing, setMissing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
@@ -30,18 +35,29 @@ export function FastOnboarding({ next, locale }: { next?: string; locale: UserLo
         fbTrack("CompleteRegistration");
         localStorage.setItem(flag, "1");
       }
-      trackEvent(ANALYTICS_EVENT.onboardingPrefilled, { origin: "uk_landing", exact_time: pending.timeOfBirth ? 1 : 0 });
-      trackEvent(ANALYTICS_EVENT.onboardingSubmitted, { flow: "fast", total_steps: 0, exact_time: pending.timeOfBirth ? 1 : 0 });
+      trackEvent(ANALYTICS_EVENT.onboardingPrefilled, {
+        origin: "uk_landing",
+        exact_time: pending.timeOfBirth ? 1 : 0,
+      });
+      trackEvent(ANALYTICS_EVENT.onboardingSubmitted, {
+        flow: "fast",
+        total_steps: 0,
+        exact_time: pending.timeOfBirth ? 1 : 0,
+      });
       startTransition(async () => {
-        const result = await saveProfile({
-          dateOfBirth: pending.dateOfBirth,
-          timeOfBirth: pending.timeOfBirth,
-          cityName: pending.place.displayName,
-          latitude: pending.place.latitude,
-          longitude: pending.place.longitude,
-          timezone: pending.place.timezone,
-          gender: null,
-        }, next, true);
+        const result = await saveProfile(
+          {
+            dateOfBirth: pending.dateOfBirth,
+            timeOfBirth: pending.timeOfBirth,
+            cityName: pending.place.displayName,
+            latitude: pending.place.latitude,
+            longitude: pending.place.longitude,
+            timezone: pending.place.timezone,
+            gender: null,
+          },
+          next,
+          true,
+        );
         if (result && !result.ok) setError(result.error);
       });
     });
@@ -52,9 +68,22 @@ export function FastOnboarding({ next, locale }: { next?: string; locale: UserLo
     return (
       <div className="w-full max-w-lg rounded-3xl border border-border bg-card/65 p-8 text-center backdrop-blur-xl">
         <Sparkles className="mx-auto size-8 text-[var(--vivida-violet)]" />
-        <h1 className="mt-4 text-2xl font-semibold">{am ? "Մեկ արագ քայլ" : en ? "One quick step" : "ერთი მოკლე ნაბიჯი"}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{error ?? (am ? "Ձեր պահված քարտեզի մանրամասների ժամկետը լրացել է։ Շարունակելու համար դրանք նորից ավելացրեք։" : en ? "Your saved chart details expired. Add them once more to continue." : "შენახული მონაცემების ვადა გავიდა. გასაგრძელებლად კიდევ ერთხელ მიუთითე.")}</p>
-        <Button asChild variant="mystic" className="mt-5"><Link href={`/onboarding${next ? `?next=${encodeURIComponent(next)}` : ""}`}>{am ? "Շարունակել" : en ? "Continue" : "გაგრძელება"}</Link></Button>
+        <h1 className="mt-4 text-2xl font-semibold">
+          {en ? "One quick step" : "ერთი მოკლე ნაბიჯი"}
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {error ??
+            (en
+              ? "Your saved chart details expired. Add them once more to continue."
+              : "შენახული მონაცემების ვადა გავიდა. გასაგრძელებლად კიდევ ერთხელ მიუთითე.")}
+        </p>
+        <Button asChild variant="mystic" className="mt-5">
+          <Link
+            href={`/onboarding${next ? `?next=${encodeURIComponent(next)}` : ""}`}
+          >
+            {en ? "Continue" : "გაგრძელება"}
+          </Link>
+        </Button>
       </div>
     );
   }
@@ -62,8 +91,14 @@ export function FastOnboarding({ next, locale }: { next?: string; locale: UserLo
   return (
     <div className="text-center">
       <Loader2 className="mx-auto size-9 animate-spin text-[var(--vivida-violet)]" />
-      <h1 className="mt-5 text-2xl font-semibold">{am ? "Պատրաստվում է Ձեր անձնական քարտեզը…" : en ? "Preparing your personal chart…" : "შენი პირადი რუკა მზადდება…"}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{am ? "Ձեր ծննդյան տվյալներն արդեն պահպանված են. կարիք չկա կրկին մուտքագրելու:" : en ? "Your birth details are already saved — no need to enter them twice." : "დაბადების მონაცემები უკვე შენახულია — მეორედ შეყვანა აღარ დაგჭირდება."}</p>
+      <h1 className="mt-5 text-2xl font-semibold">
+        {en ? "Preparing your personal chart…" : "შენი პირადი რუკა მზადდება…"}
+      </h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {en
+          ? "Your birth details are already saved — no need to enter them twice."
+          : "დაბადების მონაცემები უკვე შენახულია — მეორედ შეყვანა აღარ დაგჭირდება."}
+      </p>
     </div>
   );
 }

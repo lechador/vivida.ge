@@ -5,12 +5,16 @@
  * forecast's scoring philosophy.
  */
 import type { NatalChartJson } from "@/db/schema";
-import { computeTransits, detectCrossAspects, localDateString } from "./transits";
+import {
+  computeTransits,
+  detectCrossAspects,
+  localDateString,
+} from "./transits";
 import { ASPECTS, type AspectFamily } from "./aspects";
 import type { UserLocale } from "./i18n/user-locale";
 
 const ASPECT_FAMILY: Record<string, AspectFamily> = Object.fromEntries(
-  ASPECTS.map((a) => [a.kind, a.family])
+  ASPECTS.map((a) => [a.kind, a.family]),
 );
 const TENSE_CONJ = new Set(["mars", "saturn", "pluto"]);
 const HARMONIC_CONJ = new Set(["venus", "jupiter", "sun", "moon"]);
@@ -46,18 +50,33 @@ const TRANSIT_WEIGHT: Record<string, number> = {
 
 const WEEKDAYS_KA = ["კვ", "ორ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ"];
 const WEEKDAYS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const WEEKDAYS_AM = ["Կիր", "Երկ", "Երք", "Չոր", "Հնգ", "Ուրբ", "Շաբ"];
 const MONTHS_KA = [
-  "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
-  "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი",
+  "იანვარი",
+  "თებერვალი",
+  "მარტი",
+  "აპრილი",
+  "მაისი",
+  "ივნისი",
+  "ივლისი",
+  "აგვისტო",
+  "სექტემბერი",
+  "ოქტომბერი",
+  "ნოემბერი",
+  "დეკემბერი",
 ];
 const MONTHS_EN = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-const MONTHS_AM = [
-  "հունվար", "փետրվար", "մարտ", "ապրիլ", "մայիս", "հունիս",
-  "հուլիս", "օգոստոս", "սեպտեմբեր", "հոկտեմբեր", "նոյեմբեր", "դեկտեմբեր",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 export type DayTier = "great" | "good" | "calm" | "tough";
@@ -103,28 +122,6 @@ const KIND_KA: Record<string, string> = {
   trine: "ტრინი",
   opposition: "ოპოზიცია",
 };
-const TRANSIT_AM: Record<string, string> = {
-  venus: "Վեներա",
-  mars: "Մարս",
-  jupiter: "Յուպիտեր",
-  saturn: "Սատուրն",
-};
-const NATAL_AM_GENITIVE: Record<string, string> = {
-  sun: "Արևի",
-  moon: "Լուսնի",
-  mercury: "Մերկուրիի",
-  venus: "Վեներայի",
-  mars: "Մարսի",
-  ascendant: "Ասցենդենտի",
-  midheaven: "MC-ի",
-};
-const KIND_AM: Record<string, string> = {
-  conjunction: "միացում",
-  sextile: "սեքստիլ",
-  square: "քառակուսի",
-  trine: "տրին",
-  opposition: "ընդդիմություն",
-};
 const PLANET_MEANING: Record<string, string> = {
   venus: "სიყვარულის, ჰარმონიისა და სიამოვნების ენერგია",
   mars: "ენერგიის, ინიციატივისა და მოქმედების ბიძგი",
@@ -165,30 +162,16 @@ const FAMILY_TONE_EN: Record<AspectFamily, string> = {
   tense: "This can bring friction; stay flexible and patient.",
   neutral: "This is a meaningful emphasis worth noticing.",
 };
-const PLANET_MEANING_AM: Record<string, string> = {
-  venus: "Սիրո, ներդաշնակության և հաճույքի էներգիան",
-  mars: "Գործողության, նախաձեռնության և էներգիայի ուժը",
-  jupiter: "Աճի, հնարավորության և վստահության ալիքը",
-  saturn: "Պատասխանատվության, կառուցվածքի և հետևողական ջանքի պահանջը",
-};
-const NATAL_AREA_AM: Record<string, string> = {
-  sun: "ձեր ինքնությանն ու կենսունակությանը",
-  moon: "ձեր զգացմունքներին ու ներաշխարհին",
-  mercury: "ձեր մտածողությանն ու հաղորդակցությանը",
-  venus: "ձեր հարաբերություններին ու արժեքներին",
-  mars: "ձեր շարժիչ ուժին ու գործողություններին",
-  ascendant: "ձեր ինքնարտահայտմանն ու արտաքին ոճին",
-  midheaven: "ձեր կարիերային ու հանրային ուղղությանը",
-};
-const FAMILY_TONE_AM: Record<AspectFamily, string> = {
-  harmonic: "Սա աջակցող հնարավորություն է․ օգտագործեք այն գիտակցաբար։",
-  tense: "Սա կարող է լարվածություն բերել․ պահպանեք ճկունությունն ու համբերությունը։",
-  neutral: "Սա կարևոր շեշտադրում է, որն արժե նկատել։",
-};
 
 const NOTABLE_TRANSITS = new Set(["venus", "mars", "jupiter", "saturn"]);
 const NOTABLE_NATALS = new Set([
-  "sun", "moon", "mercury", "venus", "mars", "ascendant", "midheaven",
+  "sun",
+  "moon",
+  "mercury",
+  "venus",
+  "mars",
+  "ascendant",
+  "midheaven",
 ]);
 
 function familyOf(transit: string, kind: string): AspectFamily {
@@ -215,13 +198,14 @@ export function computeTiming(
   locale: UserLocale = "ka",
 ): { days: TimingDay[]; notable: NotableTransit[] } {
   const en = locale === "en";
-  const am = locale === "am";
   const natalPoints: Record<string, { longitude: number }> = {};
   for (const [k, v] of Object.entries(natal.bodies)) {
     natalPoints[k] = { longitude: v.longitude };
   }
-  if (natal.ascendant) natalPoints.ascendant = { longitude: natal.ascendant.longitude };
-  if (natal.midheaven) natalPoints.midheaven = { longitude: natal.midheaven.longitude };
+  if (natal.ascendant)
+    natalPoints.ascendant = { longitude: natal.ascendant.longitude };
+  if (natal.midheaven)
+    natalPoints.midheaven = { longitude: natal.midheaven.longitude };
 
   const out: TimingDay[] = [];
   // (transit,natal,kind) → tightest occurrence in the window
@@ -233,14 +217,18 @@ export function computeTiming(
     at.setUTCDate(at.getUTCDate() + i);
 
     const transits = computeTransits(at);
-    const aspects = detectCrossAspects(transits, natalPoints).filter((a) => a.orb <= 5);
+    const aspects = detectCrossAspects(transits, natalPoints).filter(
+      (a) => a.orb <= 5,
+    );
 
     let harmony = 0;
     let challenge = 0;
     for (const a of aspects.slice(0, 12)) {
       const fam = familyOf(a.transit, a.kind);
       const w =
-        a.intensity * (POINT_WEIGHT[a.natal] ?? 1) * (TRANSIT_WEIGHT[a.transit] ?? 0.6);
+        a.intensity *
+        (POINT_WEIGHT[a.natal] ?? 1) *
+        (TRANSIT_WEIGHT[a.transit] ?? 0.6);
       if (fam === "harmonic") harmony += w;
       else if (fam === "tense") challenge += w;
       else {
@@ -249,14 +237,15 @@ export function computeTiming(
       }
     }
     const total = harmony + challenge;
-    const score = total > 0 ? Math.round(((harmony - challenge) / total) * 100) : 0;
+    const score =
+      total > 0 ? Math.round(((harmony - challenge) / total) * 100) : 0;
 
     const dateIso = localDateString(at, timezone);
     const local = new Date(`${dateIso}T12:00:00Z`);
     out.push({
       dateIso,
       dom: local.getUTCDate(),
-      weekdayKa: (am ? WEEKDAYS_AM : en ? WEEKDAYS_EN : WEEKDAYS_KA)[local.getUTCDay()],
+      weekdayKa: (en ? WEEKDAYS_EN : WEEKDAYS_KA)[local.getUTCDay()],
       score,
       tier: tierFor(score),
     });
@@ -264,7 +253,8 @@ export function computeTiming(
     // Collect near-exact notable transits.
     for (const a of aspects) {
       if (a.orb > 1.3) continue;
-      if (!NOTABLE_TRANSITS.has(a.transit) || !NOTABLE_NATALS.has(a.natal)) continue;
+      if (!NOTABLE_TRANSITS.has(a.transit) || !NOTABLE_NATALS.has(a.natal))
+        continue;
       const key = `${a.transit}-${a.natal}-${a.kind}`;
       const prev = notableMap.get(key);
       if (prev && prev.orb <= a.orb) continue;
@@ -273,21 +263,17 @@ export function computeTiming(
         orb: a.orb,
         item: {
           dateIso,
-          dateLabelKa: `${local.getUTCDate()} ${(am ? MONTHS_AM : en ? MONTHS_EN : MONTHS_KA)[local.getUTCMonth()]}`,
+          dateLabelKa: `${local.getUTCDate()} ${(en ? MONTHS_EN : MONTHS_KA)[local.getUTCMonth()]}`,
           transit: a.transit,
           natal: a.natal,
           kind: a.kind,
           family: fam,
-          title: am
-            ? `${TRANSIT_AM[a.transit]}՝ ${KIND_AM[a.kind]} նատալ ${NATAL_AM_GENITIVE[a.natal]} հետ`
-            : en
-              ? `${a.transit[0].toUpperCase() + a.transit.slice(1)} ${a.kind} natal ${a.natal[0].toUpperCase() + a.natal.slice(1)}`
-              : `${TRANSIT_KA[a.transit]} ${KIND_KA[a.kind]} ${NATAL_KA[a.natal]}-თან`,
-          meaning: am
-            ? `${PLANET_MEANING_AM[a.transit]} հանդիպում է ${NATAL_AREA_AM[a.natal]}։ ${FAMILY_TONE_AM[fam]}`
-            : en
-              ? `${PLANET_MEANING_EN[a.transit]} meets ${NATAL_AREA_EN[a.natal]}. ${FAMILY_TONE_EN[fam]}`
-              : `${PLANET_MEANING[a.transit]} ხვდება ${NATAL_AREA[a.natal]}. ${FAMILY_TONE[fam]}`,
+          title: en
+            ? `${a.transit[0].toUpperCase() + a.transit.slice(1)} ${a.kind} natal ${a.natal[0].toUpperCase() + a.natal.slice(1)}`
+            : `${TRANSIT_KA[a.transit]} ${KIND_KA[a.kind]} ${NATAL_KA[a.natal]}-თან`,
+          meaning: en
+            ? `${PLANET_MEANING_EN[a.transit]} meets ${NATAL_AREA_EN[a.natal]}. ${FAMILY_TONE_EN[fam]}`
+            : `${PLANET_MEANING[a.transit]} ხვდება ${NATAL_AREA[a.natal]}. ${FAMILY_TONE[fam]}`,
         },
       });
     }

@@ -22,23 +22,17 @@ const STARTERS: Record<UserLocale, Record<ChartStarterId, string>> = {
     relationships: "What am I like in relationships?",
     career: "What kind of career suits me?",
   },
-  am: {
-    strengths: "Որո՞նք են իմ ամենաուժեղ կողմերը։",
-    emotions: "Ի՞նչ է ասում իմ Լուսինն իմ զգացմունքների մասին։",
-    relationships: "Ինչպիսի՞ն եմ ես հարաբերություններում։",
-    career: "Ինչպիսի՞ կարիերա է ինձ համապատասխանում։",
-  },
 };
 
 export function normalizeChartStarter(
-  value: string | undefined
+  value: string | undefined,
 ): ChartStarterId | undefined {
   return CHART_STARTER_IDS.find((id) => id === value);
 }
 
 export function chartStarterText(
   id: ChartStarterId,
-  locale: UserLocale
+  locale: UserLocale,
 ): string {
   return STARTERS[locale][id];
 }

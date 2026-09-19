@@ -27,7 +27,6 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function PartnerForm({ locale }: { locale: UserLocale }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const router = useRouter();
   const [name, setName] = useState("");
   const [date, setDate] = useState<DateValue>({ day: "", month: "", year: "" });
@@ -54,7 +53,7 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
     const dateStr = validateDate(date);
     if (!name.trim() || !dateStr || !timeRes.ok || !place) {
       setError(
-        am ? "Խնդրում ենք լրացնել բոլոր դաշտերը:" : en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.",
+        en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.",
       );
       return;
     }
@@ -79,11 +78,11 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
   return (
     <div className="space-y-6">
       {/* Name */}
-      <Section label={am ? "Գործընկերոջ անունը" : en ? "Partner's name" : "პარტნიორის სახელი"}>
+      <Section label={en ? "Partner's name" : "პარტნიორის სახელი"}>
         <Input
           value={name}
           onChange={(e) => setName(e.target.value.slice(0, 60))}
-          placeholder={am ? "օրինակ՝ Ալեքս" : en ? "e.g. Alex" : "მაგ. ნინო"}
+          placeholder={en ? "e.g. Alex" : "მაგ. ნინო"}
           maxLength={60}
           autoFocus
         />
@@ -91,7 +90,7 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
 
       {/* Date */}
       <Section
-        label={am ? "Ծննդյան ամսաթիվ" : en ? "Birth date" : "დაბადების თარიღი"}
+        label={en ? "Birth date" : "დაბადების თარიღი"}
         hint={
           en
             ? "Your Sun, Moon, and core chart patterns begin here."
@@ -141,7 +140,7 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
 
       {/* Time */}
       <Section
-        label={am ? "Ծննդյան ժամը" : en ? "Birth time" : "დაბადების დრო"}
+        label={en ? "Birth time" : "დაბადების დრო"}
         hint={
           en
             ? "Birth time determines the rising sign and houses. If you don't know it, we'll use noon."
@@ -200,13 +199,13 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
                 : "border-muted-foreground",
             )}
           />
-          {am ? "Ես չգիտեմ ճշգրիտ ժամը" : en ? "I don't know the exact time" : "ზუსტი დრო არ ვიცი"}
+          {en ? "I don't know the exact time" : "ზუსტი დრო არ ვიცი"}
         </button>
       </Section>
 
       {/* Place */}
       <Section
-        label={am ? "Ծննդավայր" : en ? "Birthplace" : "დაბადების ადგილი"}
+        label={en ? "Birthplace" : "დაბადების ადგილი"}
         hint={
           en
             ? "Search in any language."
@@ -268,7 +267,6 @@ function PlaceField({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [query, setQuery] = useState(value?.displayName ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -330,7 +328,7 @@ function PlaceField({
             if (value) onChange(null);
           }}
           placeholder={
-            am ? "Լոնդոն, Փարիզ, Նյու Յորք..." : en ? "London, Paris, New York..." : "თბილისი, Tbilisi, ნიუ-იორკი..."
+            en ? "London, Paris, New York..." : "თბილისი, Tbilisi, ნიუ-იორკი..."
           }
           className="pl-9 pr-9"
         />
@@ -344,7 +342,7 @@ function PlaceField({
               onChange(null);
             }}
             className="absolute right-2 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
-            aria-label={am ? "Մաքրել" : en ? "Clear" : "გასუფთავება"}
+            aria-label={en ? "Clear" : "გასუფთავება"}
           >
             <X className="size-3.5" />
           </button>

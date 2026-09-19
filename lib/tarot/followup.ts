@@ -33,7 +33,6 @@ export type FollowupResult =
   | { ok: false; error: "insufficient"; cost: number; balance: number };
 
 function orientationFor(reversed: boolean, locale: UserLocale): string {
-  if (locale === "am") return reversed ? "շրջված" : "ուղիղ";
   if (locale === "en") return reversed ? "reversed" : "upright";
   return reversed ? "შებრუნებული" : "პირდაპირი";
 }
@@ -41,12 +40,6 @@ function orientationFor(reversed: boolean, locale: UserLocale): string {
 /** Static answer used when the AI call fails — a paid follow-up never returns empty. */
 function fallbackAnswer(interpretations: string[], locale: UserLocale): string {
   const joined = interpretations.join(" ");
-  if (locale === "am") {
-    return (
-      `AI մեկնաբանությունը ժամանակավորապես անհասանելի է: Ձեր լրացուցիչ հարցի ` +
-      `առնչությամբ քարտերը նշում են. ${joined}`
-    );
-  }
   if (locale === "en") {
     return (
       `The AI interpretation is temporarily unavailable. On your follow-up ` +

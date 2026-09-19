@@ -22,26 +22,21 @@ export function StepDate({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   const monthRef = useRef<HTMLInputElement>(null);
   const yearRef = useRef<HTMLInputElement>(null);
 
-  const headingText = am
-    ? "Ե՞րբ է սկսվել ձեր պատմությունը:"
-    : en
+  const headingText = en
     ? "When did your story begin?"
     : "როდის დაიწყო შენი ისტორია?";
-  const descText = am
-    ? "Ծննդյան օրը որոշում է ձեր Արևը, Լուսինը և հիմնական արխետիպերը:"
-    : en
+  const descText = en
     ? "Your birth date determines your Sun, Moon and core archetypes."
     : "დაბადების დღე განსაზღვრავს შენს მზეს, მთვარეს და ძირითად არქეტიპებს.";
-  const dayLabel = am ? "Օր" : en ? "Day" : "რიცხვი";
-  const monthLabel = am ? "Ամիս" : en ? "Month" : "თვე";
-  const yearLabel = am ? "Տարի" : en ? "Year" : "წელი";
-  const genderLabel = am ? "Սեռ" : en ? "Gender" : "სქესი";
-  const femaleLabel = am ? "Իգական" : en ? "Female" : "მდედრობითი";
-  const maleLabel = am ? "Արական" : en ? "Male" : "მამრობითი";
+  const dayLabel = en ? "Day" : "რიცხვი";
+  const monthLabel = en ? "Month" : "თვე";
+  const yearLabel = en ? "Year" : "წელი";
+  const genderLabel = en ? "Gender" : "სქესი";
+  const femaleLabel = en ? "Female" : "მდედრობითი";
+  const maleLabel = en ? "Male" : "მამრობითი";
 
   return (
     <div className="space-y-6">
@@ -125,7 +120,7 @@ export function StepDate({
                 "flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all",
                 gender === opt.key
                   ? "border-[var(--vivida-violet)] bg-[var(--vivida-violet)]/10 text-foreground shadow-[0_0_20px_-6px_var(--vivida-violet)]"
-                  : "border-border bg-background/40 text-foreground/80 hover:border-[var(--vivida-violet)]/50 hover:bg-[var(--vivida-violet)]/5"
+                  : "border-border bg-background/40 text-foreground/80 hover:border-[var(--vivida-violet)]/50 hover:bg-[var(--vivida-violet)]/5",
               )}
             >
               <span className="text-lg text-[var(--vivida-violet)]">

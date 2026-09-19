@@ -18,7 +18,6 @@ import {
   type DeckCard,
 } from "@/lib/tarot/deck-full";
 import { tarotSpreadById, type TarotSpreadId } from "@/lib/tarot/spreads";
-import { tarotCardBySlugAm } from "@/lib/tarot/deck-am";
 import type { TarotFollowupEntry } from "@/lib/tarot/followup";
 import type { UserLocale } from "@/lib/i18n/locale";
 import { archiveLibraryEntry, getLibraryEntryBySource } from "@/lib/library";
@@ -84,17 +83,6 @@ function cardCopy(
   drawn: { card: DeckCard; reversed: boolean },
   locale: UserLocale,
 ) {
-  if (locale === "am") {
-    const card = tarotCardBySlugAm(drawn.card.slug);
-    if (card) {
-      return {
-        name: card.name,
-        meaning: drawn.reversed ? card.reversed : card.upright,
-      };
-    }
-    // No Armenian minor content (Armenian is being removed): fall through
-    // to the Georgian copy rather than failing the reading.
-  }
   if (locale === "en") {
     return englishCardBySlug(drawn.card.slug, drawn.reversed);
   }
@@ -116,16 +104,6 @@ function fallbackReading(
   const copy = drawn.map((card) => cardCopy(card, locale));
   const perCard = copy.map((card) => card.meaning);
   const [past, present, future] = copy.map((card) => card.name);
-  if (locale === "am") {
-    return {
-      headline: `${present}-ի լույսի ներքո`,
-      cards: perCard,
-      reading:
-        `Երեք քարտ պատասխանում են ձեր հարցին: Արմատում ${past}-ն է, ներկան սահմանում է ${present}-ը, իսկ առաջիկա ուղին բացում է ${future}-ը: ` +
-        perCard.join(" "),
-      advice: perCard[1],
-    };
-  }
   if (locale === "en") {
     return {
       headline: `In the light of ${present}`,
@@ -293,17 +271,13 @@ export async function performReading(
       position: positions[i],
       name: cardCopy(d, locale).name,
       orientation:
-        locale === "am"
+        locale === "en"
           ? d.reversed
-            ? "շրջված"
-            : "ուղիղ"
-          : locale === "en"
-            ? d.reversed
-              ? "reversed"
-              : "upright"
-            : d.reversed
-              ? "შებრუნებული"
-              : "პირდაპირი",
+            ? "reversed"
+            : "upright"
+          : d.reversed
+            ? "შებრუნებული"
+            : "პირდაპირი",
       meaning: cardCopy(d, locale).meaning,
     })),
     spreadLogic:

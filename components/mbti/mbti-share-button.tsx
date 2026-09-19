@@ -24,11 +24,11 @@ export function MbtiShareButton({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [copied, setCopied] = useState(false);
 
   async function share() {
-    const url = typeof window !== "undefined" ? window.location.origin + path : path;
+    const url =
+      typeof window !== "undefined" ? window.location.origin + path : path;
     const text = en
       ? `My personality type is ${type} — ${archetype}. Take the test on Vivida:`
       : `ჩემი ფსიქოლოგიური ტიპია ${type} — ${archetype}. გაიარე ტესტი Vivida-ზე:`;
@@ -52,7 +52,13 @@ export function MbtiShareButton({
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-2">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? (am ? "Հղումը պատճենված է" : en ? "Link copied" : "ბმული დაკოპირდა") : (am ? "Կիսվել" : en ? "Share" : "გააზიარე")}
+      {copied
+        ? en
+          ? "Link copied"
+          : "ბმული დაკოპირდა"
+        : en
+          ? "Share"
+          : "გააზიარე"}
     </Button>
   );
 }

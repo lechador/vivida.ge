@@ -73,10 +73,13 @@ export default async function MbtiSharePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [r, session, locale] = await Promise.all([getResult(id), auth(), getRequestLocale()]);
+  const [r, session, locale] = await Promise.all([
+    getResult(id),
+    auth(),
+    getRequestLocale(),
+  ]);
   if (!r) notFound();
   const en = locale !== "ka";
-  const am = locale === "am";
   const authed = !!session?.user?.id;
   const archetype = en ? mbtiArchetypeEn(r.mbtiType) : r.archetypeNameGe;
 
@@ -103,18 +106,28 @@ export default async function MbtiSharePage({
           locale={locale}
         />
 
-        {!en ? <div className="mt-4"><MbtiFamousPeople type={r.mbtiType} /></div> : null}
+        {!en ? (
+          <div className="mt-4">
+            <MbtiFamousPeople type={r.mbtiType} />
+          </div>
+        ) : null}
 
         {/* CTA to take the test yourself */}
         <div className="mt-8 rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
-            {en ? `Are you a ${mbtiArchetypeEn(r.mbtiType)} too?` : `${mbtiArchetypeKa(r.mbtiType)} ხარ შენც?`}
+            {en
+              ? `Are you a ${mbtiArchetypeEn(r.mbtiType)} too?`
+              : `${mbtiArchetypeKa(r.mbtiType)} ხარ შენც?`}
           </h2>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-            {am ? "Անցեք անվճար թեստը և բացահայտեք ձեր անհատականության տեսակը։" : en ? "Take the free test and discover your personality type." : "გაიარე უფასო ტესტი და აღმოაჩინე შენი ფსიქოლოგიური ტიპი."}
+            {en
+              ? "Take the free test and discover your personality type."
+              : "გაიარე უფასო ტესტი და აღმოაჩინე შენი ფსიქოლოგიური ტიპი."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
-            <Link href="/pirovnebis-testi">{am ? "Սկսել թեստը" : en ? "Start the test" : "დაიწყე ტესტი"}</Link>
+            <Link href="/pirovnebis-testi">
+              {en ? "Start the test" : "დაიწყე ტესტი"}
+            </Link>
           </Button>
         </div>
       </section>

@@ -14,7 +14,7 @@ export { OPTIONS } from "@/lib/api/cors";
 
 const Body = z.object({
   question: z.string().trim().min(3).max(300),
-  locale: z.enum(["ka", "en", "am"]).default("ka"),
+  locale: z.enum(["ka", "en"]).default("ka"),
 });
 
 /**

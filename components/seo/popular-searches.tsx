@@ -27,7 +27,7 @@ export function PopularSearches({
     <section
       className={cn(
         "mt-14 rounded-2xl border border-border/60 bg-card/40 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6",
-        className
+        className,
       )}
       aria-labelledby="popular-searches-heading"
     >
@@ -35,12 +35,7 @@ export function PopularSearches({
         id="popular-searches-heading"
         className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground"
       >
-        {title ??
-          (locale === "am"
-            ? "Հաճախակի որոնումներ"
-            : locale === "en"
-            ? "Popular searches"
-            : "ხშირი ძიებები")}
+        {title ?? (locale === "en" ? "Popular searches" : "ხშირი ძიებები")}
       </h2>
       <ul className="flex flex-wrap gap-2">
         {queries.map((q, i) => (

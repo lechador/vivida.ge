@@ -9,16 +9,29 @@
 import { mbtiArchetypeKa } from "@/lib/mbti-questions";
 import { mbtiFamousFor } from "@/lib/mbti-characters";
 import { mbtiEnglishContent } from "@/lib/mbti-content-en";
-import { mbtiByCodeAm } from "@/lib/mbti-content-am";
 
 export const ALL_MBTI_TYPES = [
-  "ISTJ", "ISFJ", "INFJ", "INTJ",
-  "ISTP", "ISFP", "INFP", "INTP",
-  "ESTP", "ESFP", "ENFP", "ENTP",
-  "ESTJ", "ESFJ", "ENFJ", "ENTJ",
+  "ISTJ",
+  "ISFJ",
+  "INFJ",
+  "INTJ",
+  "ISTP",
+  "ISFP",
+  "INFP",
+  "INTP",
+  "ESTP",
+  "ESFP",
+  "ENFP",
+  "ENTP",
+  "ESTJ",
+  "ESFJ",
+  "ENFJ",
+  "ENTJ",
 ] as const;
 
-export const ALL_MBTI_SLUGS: string[] = ALL_MBTI_TYPES.map((t) => t.toLowerCase());
+export const ALL_MBTI_SLUGS: string[] = ALL_MBTI_TYPES.map((t) =>
+  t.toLowerCase(),
+);
 
 /** "infp" → "INFP"; returns null for anything not one of the 16. */
 export function mbtiCodeFromSlug(slug: string): string | null {
@@ -27,23 +40,90 @@ export function mbtiCodeFromSlug(slug: string): string | null {
 }
 
 /** The four 16Personalities groups, with localized labels. */
-export const MBTI_GROUP: Record<string, { key: string; labelKa: string; labelEn: string; labelAm: string }> = {
-  INTJ: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts", labelAm: "Անալիտիկներ" },
-  INTP: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts", labelAm: "Անալիտիկներ" },
-  ENTJ: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts", labelAm: "Անալիտիկներ" },
-  ENTP: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts", labelAm: "Անալիտիկներ" },
-  INFJ: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats", labelAm: "Դիվանագետներ" },
-  INFP: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats", labelAm: "Դիվանագետներ" },
-  ENFJ: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats", labelAm: "Դիվանագետներ" },
-  ENFP: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats", labelAm: "Դիվանագետներ" },
-  ISTJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels", labelAm: "Պահապաններ" },
-  ISFJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels", labelAm: "Պահապաններ" },
-  ESTJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels", labelAm: "Պահապաններ" },
-  ESFJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels", labelAm: "Պահապաններ" },
-  ISTP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers", labelAm: "Հետազոտողներ" },
-  ISFP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers", labelAm: "Հետազոտողներ" },
-  ESTP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers", labelAm: "Հետազոտողներ" },
-  ESFP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers", labelAm: "Հետազոտողներ" },
+export const MBTI_GROUP: Record<
+  string,
+  { key: string; labelKa: string; labelEn: string }
+> = {
+  INTJ: {
+    key: "analysts",
+    labelKa: "ანალიტიკოსები",
+    labelEn: "Analysts",
+  },
+  INTP: {
+    key: "analysts",
+    labelKa: "ანალიტიკოსები",
+    labelEn: "Analysts",
+  },
+  ENTJ: {
+    key: "analysts",
+    labelKa: "ანალიტიკოსები",
+    labelEn: "Analysts",
+  },
+  ENTP: {
+    key: "analysts",
+    labelKa: "ანალიტიკოსები",
+    labelEn: "Analysts",
+  },
+  INFJ: {
+    key: "diplomats",
+    labelKa: "დიპლომატები",
+    labelEn: "Diplomats",
+  },
+  INFP: {
+    key: "diplomats",
+    labelKa: "დიპლომატები",
+    labelEn: "Diplomats",
+  },
+  ENFJ: {
+    key: "diplomats",
+    labelKa: "დიპლომატები",
+    labelEn: "Diplomats",
+  },
+  ENFP: {
+    key: "diplomats",
+    labelKa: "დიპლომატები",
+    labelEn: "Diplomats",
+  },
+  ISTJ: {
+    key: "sentinels",
+    labelKa: "მცველები",
+    labelEn: "Sentinels",
+  },
+  ISFJ: {
+    key: "sentinels",
+    labelKa: "მცველები",
+    labelEn: "Sentinels",
+  },
+  ESTJ: {
+    key: "sentinels",
+    labelKa: "მცველები",
+    labelEn: "Sentinels",
+  },
+  ESFJ: {
+    key: "sentinels",
+    labelKa: "მცველები",
+    labelEn: "Sentinels",
+  },
+  ISTP: {
+    key: "explorers",
+    labelKa: "მკვლევრები",
+    labelEn: "Explorers",
+  },
+  ISFP: {
+    key: "explorers",
+    labelKa: "მკვლევრები",
+    labelEn: "Explorers",
+  },
+  ESTP: {
+    key: "explorers",
+    labelKa: "მკვლევრები",
+    labelEn: "Explorers",
+  },
+  ESFP: {
+    key: "explorers",
+    labelKa: "მკვლევრები",
+    labelEn: "Explorers",
+  },
 };
 
 /** Short evocative tagline per type — used in hero + meta. */
@@ -82,7 +162,7 @@ export type MbtiSeo = {
 export function buildMbtiSeo(code: string): MbtiSeo {
   const archetypeKa = mbtiArchetypeKa(code);
   const taglineKa = MBTI_TAGLINE_KA[code] ?? "";
-  const group = MBTI_GROUP[code] ?? { key: "", labelKa: "" };
+  const group = MBTI_GROUP[code] ?? { key: "", labelKa: "", labelEn: "" };
   const famous = mbtiFamousFor(code).slice(0, 3).join(", ");
 
   return {
@@ -138,7 +218,11 @@ export type MbtiSeoEn = {
 
 export function buildMbtiSeoEn(code: string): MbtiSeoEn {
   const content = mbtiEnglishContent(code);
-  const group = MBTI_GROUP[code] ?? { key: "", labelKa: "", labelEn: "", labelAm: "" };
+  const group = MBTI_GROUP[code] ?? {
+    key: "",
+    labelKa: "",
+    labelEn: "",
+  };
   const famous = mbtiFamousFor(code).slice(0, 3).join(", ");
   return {
     code,
@@ -164,46 +248,14 @@ export function buildMbtiSeoEn(code: string): MbtiSeoEn {
           : `Public-figure personality typings are informal interpretations rather than verified facts.`,
       },
     ],
-    queries: [code, `${code} personality type`, `${code} strengths`, `${code} relationships`, `MBTI ${code}`, "16 personality types", "personality test"],
-  };
-}
-
-export type MbtiSeoAm = {
-  code: string;
-  slug: string;
-  archetype: string;
-  tagline: string;
-  group: { key: string; labelAm: string };
-  pageTitle: string;
-  metaDescription: string;
-  faq: { q: string; a: string }[];
-  queries: string[];
-};
-
-export function buildMbtiSeoAm(code: string): MbtiSeoAm {
-  const content = mbtiByCodeAm(code);
-  const group = MBTI_GROUP[code] ?? { key: "", labelKa: "", labelEn: "", labelAm: "" };
-  const archetype = content ? content.archetype : code;
-  const tagline = content ? content.tagline : "";
-  return {
-    code,
-    slug: code.toLowerCase(),
-    archetype,
-    tagline,
-    group: { key: group.key, labelAm: group.labelAm },
-    pageTitle: `${code} — ${archetype} | Անհատականության տիպ`,
-    metaDescription: `${code} (${archetype}) անհատականության տիպի ամբողջական նկարագրությունը հայերենով. ուժեղ և թույլ կողմեր, հարաբերություններ, կարիերա: Անցեք անվճար թեստ Vivida-ում:`,
-    faq: [
-      {
-        q: `Ի՞նչ է նշանակում ${code} տիպը:`,
-        a: `${code} կամ „${archetype}“՝ 16 անհատականության տիպերից մեկն է: ${tagline}`,
-      },
-      {
-        q: `Ինչպե՞ս պարզել՝ արդյոք ես ${code} եմ:`,
-        a: "Անցեք Vivida-ի անվճար անհատականության թեստը և ստացեք ձեր տիպի մանրամասն վերլուծությունը:",
-      },
+    queries: [
+      code,
+      `${code} personality type`,
+      `${code} strengths`,
+      `${code} relationships`,
+      `MBTI ${code}`,
+      "16 personality types",
+      "personality test",
     ],
-    queries: [code, `${code} հայերեն`, `${code} տիպ`, `MBTI ${code}`, "16 անհատականության տիպեր", "անձի թեստ"],
   };
 }
-

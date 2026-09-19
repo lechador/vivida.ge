@@ -17,14 +17,8 @@ import { BY_DATE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 
 import { SignByDatePicker } from "./sign-by-date-picker";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import {
-  ARMENIAN_SITE_URL,
-  DEFAULT_OG_IMAGE,
-  localizedAlternates,
-} from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { ZodiacByDatePageEn } from "@/components/seo/zodiac-guides-en";
-import { ZodiacByDatePageAm } from "@/components/seo/zodiac-guides-am";
-import { ZODIAC_PLACEMENTS_AM } from "@/lib/zodiac-placements-am";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/datit";
@@ -52,28 +46,6 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
-  if (locale === "am") {
-    const content = ZODIAC_PLACEMENTS_AM.byDate;
-    return {
-      title: { absolute: content.pageTitle },
-      description: content.metaDescription,
-      alternates: localizedAlternates(`/am${PATH}`, PATH, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: `${ARMENIAN_SITE_URL}${PATH}`,
-        title: content.pageTitle,
-        description: content.metaDescription,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: content.pageTitle,
-        description: content.metaDescription,
-      },
-    };
-  }
   if (locale === "en") {
     const title = "What Is My Zodiac Sign? Find Your Sign by Birth Date";
     const description =
@@ -128,7 +100,6 @@ const BREADCRUMB_LD = {
 
 export default async function ZodiacByDatePage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <ZodiacByDatePageAm />;
   if (locale === "en") return <ZodiacByDatePageEn />;
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">

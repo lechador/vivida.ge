@@ -19,18 +19,13 @@ export function LibraryFavoriteButton({
   const [favorite, setFavorite] = useState(initialFavorite);
   const [pending, startTransition] = useTransition();
   const en = locale === "en";
-  const am = locale === "am";
   const label = favorite
-    ? am
-      ? "Հեռացնել ընտրյալներից"
-      : en
-        ? "Remove from favorites"
-        : "რჩეულებიდან ამოშლა"
-    : am
-      ? "Ավելացնել ընտրյալներին"
-      : en
-        ? "Add to favorites"
-        : "რჩეულებში დამატება";
+    ? en
+      ? "Remove from favorites"
+      : "რჩეულებიდან ამოშლა"
+    : en
+      ? "Add to favorites"
+      : "რჩეულებში დამატება";
 
   return (
     <button

@@ -32,15 +32,14 @@ export function TopUpCard({
   returnTo?: string | null;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const packs = creditPacksForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
-  const deficit = neededCredits && neededCredits > balance
-    ? neededCredits - balance
-    : null;
+  const deficit =
+    neededCredits && neededCredits > balance ? neededCredits - balance : null;
   const recommendedId = deficit
-    ? (packs.find((pack) => pack.credits >= deficit) ?? packs[packs.length - 1]).id
-    : packs[1]?.id ?? packs[0].id;
+    ? (packs.find((pack) => pack.credits >= deficit) ?? packs[packs.length - 1])
+        .id
+    : (packs[1]?.id ?? packs[0].id);
 
   useEffect(() => {
     trackEvent(ANALYTICS_EVENT.paywallViewed, {
@@ -68,15 +67,27 @@ export function TopUpCard({
         body: JSON.stringify({ packId, returnTo }),
       });
       const data = (await r.json().catch(() => ({}))) as {
-        url?: string; eventId?: string; value?: number; currency?: string; contentId?: string;
+        url?: string;
+        eventId?: string;
+        value?: number;
+        currency?: string;
+        contentId?: string;
       };
       if (data.url) {
-        const params = { value: data.value, currency: data.currency, content_ids: [data.contentId], content_type: "product" };
+        const params = {
+          value: data.value,
+          currency: data.currency,
+          content_ids: [data.contentId],
+          content_type: "product",
+        };
         fbTrack("InitiateCheckout", params, data.eventId);
-        trackEvent(ANALYTICS_EVENT.checkoutStarted, { product: data.contentId, value: data.value, currency: data.currency });
+        trackEvent(ANALYTICS_EVENT.checkoutStarted, {
+          product: data.contentId,
+          value: data.value,
+          currency: data.currency,
+        });
         window.location.assign(data.url);
-      }
-      else setPending(null);
+      } else setPending(null);
     } catch {
       setPending(null);
     }
@@ -87,26 +98,43 @@ export function TopUpCard({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           <CreditCard className="size-4 text-[var(--vivida-cyan)]" />
-          {am ? "Լիցքավորել հաշվեկշիռը" : en ? "Top up balance" : "ბალანსის შევსება"}
+          {en ? "Top up balance" : "ბალანსის შევსება"}
         </div>
         <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
           <Check className="size-3.5 text-[var(--vivida-cyan)]" />
-          {am ? "Անվտանգ միանվագ վճարում" : en ? "Secure one-time payment" : "ერთჯერადი უსაფრთხო გადახდა"}
+          {en ? "Secure one-time payment" : "ერთჯერადი უსაფრთხო გადახდა"}
         </span>
       </div>
       <h2 className="mt-2 text-xl font-semibold tracking-tight">
-        {am ? "Քանի՞ կրեդիտ է ձեզ անհրաժեշտ։" : en ? "How many credits do you need?" : "რამდენი კრედიტი გჭირდება?"}
+        {en ? "How many credits do you need?" : "რამდენი კრედიტი გჭირდება?"}
       </h2>
       {deficit && (
         <p className="mt-2 rounded-xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 px-3 py-2 text-sm text-foreground/80">
-          {am ? `Այս բացման համար պակասում է ${deficit} կրեդիտ։` : en ? `You need ${deficit} more credit${deficit === 1 ? "" : "s"} for this unlock.` : `ამ გახსნისთვის გაკლია ${deficit} კრედიტი.`}
+          {en
+            ? `You need ${deficit} more credit${deficit === 1 ? "" : "s"} for this unlock.`
+            : `ამ გახსნისთვის გაკლია ${deficit} კრედიტი.`}
         </p>
       )}
 
       <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
         {packs.map((p, i) => {
           const featured = p.id === recommendedId;
-          const badge = featured && deficit ? (am ? "Առաջարկվող" : en ? "Recommended" : "რეკომენდებული") : i === 0 ? (am ? "Սկզբնական" : en ? "Starter" : "საწყისი") : i === 1 ? (am ? "Ամենահանրաճանաչը" : en ? "Most popular" : "რჩეული") : (am ? "Լավագույն արժեք" : en ? "Best value" : "საუკეთესო ფასი");
+          const badge =
+            featured && deficit
+              ? en
+                ? "Recommended"
+                : "რეკომენდებული"
+              : i === 0
+                ? en
+                  ? "Starter"
+                  : "საწყისი"
+                : i === 1
+                  ? en
+                    ? "Most popular"
+                    : "რჩეული"
+                  : en
+                    ? "Best value"
+                    : "საუკეთესო ფასი";
           return (
             <button
               key={p.id}
@@ -120,7 +148,16 @@ export function TopUpCard({
                   : "border-border bg-background/40 hover:border-[var(--vivida-violet)]/50",
               )}
             >
-              <span className={cn("absolute -top-2.5 rounded-full px-2 py-0.5 text-[10px] font-semibold", featured ? "bg-[var(--vivida-cyan)] text-[oklch(0.14_0.02_260)]" : "border border-border bg-background text-muted-foreground")}>{badge}</span>
+              <span
+                className={cn(
+                  "absolute -top-2.5 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                  featured
+                    ? "bg-[var(--vivida-cyan)] text-[oklch(0.14_0.02_260)]"
+                    : "border border-border bg-background text-muted-foreground",
+                )}
+              >
+                {badge}
+              </span>
               <div className="flex items-center gap-1.5 text-2xl font-bold tabular-nums">
                 {pending === p.id ? (
                   <Loader2 className="size-6 animate-spin" />
@@ -132,12 +169,14 @@ export function TopUpCard({
                 )}
               </div>
               <div className="text-xs text-muted-foreground">
-                {am ? "կրեդիտներ" : en ? "credits" : "კრედიტი"}
+                {en ? "credits" : "კრედიტი"}
               </div>
               <div className="mt-1 text-lg font-semibold">
                 {formatBillingAmount(p.amountMinor, p.currency, locale)}
               </div>
-              <div className="text-[10px] text-muted-foreground">≈ {Math.floor(p.credits / 5)} {am ? "բացում է" : en ? "unlocks" : "გახსნა"}</div>
+              <div className="text-[10px] text-muted-foreground">
+                ≈ {Math.floor(p.credits / 5)} {en ? "unlocks" : "გახსნა"}
+              </div>
             </button>
           );
         })}

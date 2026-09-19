@@ -24,11 +24,9 @@ import { ELEMENTS_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacElementsHubEn } from "@/components/seo/zodiac-elements-en";
-import { ZodiacElementsHubAm } from "@/components/seo/zodiac-element-pages-am";
-import { ZODIAC_PLACEMENTS_AM } from "@/lib/zodiac-placements-am";
+
 import {
   DEFAULT_OG_IMAGE,
-  armenianSiteHref,
   englishSiteHref,
   localizedAlternates,
 } from "@/lib/seo/locales";
@@ -62,28 +60,6 @@ const BLURB_KEY: Record<
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const content = ZODIAC_PLACEMENTS_AM.elementsHub;
-    return {
-      title: { absolute: content.pageTitle },
-      description: content.metaDescription,
-      alternates: localizedAlternates(`/am${PATH}`, PATH, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: armenianSiteHref(PATH, false),
-        title: content.pageTitle,
-        description: content.metaDescription,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: content.pageTitle,
-        description: content.metaDescription,
-      },
-    };
-  }
   if (locale === "en") {
     const title = "The Four Zodiac Elements: Fire, Earth, Air and Water";
     const description =
@@ -129,7 +105,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ElementsHubPage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <ZodiacElementsHubAm />;
   if (locale === "en") return <ZodiacElementsHubEn />;
   if (!ELEMENTS_HUB_CONTENT) notFound();
   const c = ELEMENTS_HUB_CONTENT;

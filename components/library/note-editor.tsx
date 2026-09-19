@@ -21,22 +21,17 @@ export function LibraryNoteEditor({
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
   const en = locale === "en";
-  const am = locale === "am";
 
   return (
     <section className="rounded-3xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
       <div className="flex items-center gap-2">
         <NotebookPen className="size-5 text-[var(--vivida-cyan)]" />
-        <h2 className="font-semibold">
-          {am ? "Իմ նշումը" : en ? "My note" : "ჩემი ჩანაწერი"}
-        </h2>
+        <h2 className="font-semibold">{en ? "My note" : "ჩემი ჩანაწერი"}</h2>
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
-        {am
-          ? "Այս նշումը մասնավոր է և տեսանելի է միայն ձեզ։"
-          : en
-            ? "This note is private and visible only to you."
-            : "ეს ჩანაწერი პირადია და მხოლოდ შენ ხედავ."}
+        {en
+          ? "This note is private and visible only to you."
+          : "ეს ჩანაწერი პირადია და მხოლოდ შენ ხედავ."}
       </p>
       <textarea
         value={note}
@@ -47,11 +42,9 @@ export function LibraryNoteEditor({
         maxLength={2000}
         rows={5}
         placeholder={
-          am
-            ? "Ի՞նչն էր կարևոր այս ընթերցման մեջ։"
-            : en
-              ? "What felt important in this reading?"
-              : "რა იყო ამ კითხვაში შენთვის მნიშვნელოვანი?"
+          en
+            ? "What felt important in this reading?"
+            : "რა იყო ამ კითხვაში შენთვის მნიშვნელოვანი?"
         }
         className="mt-4 w-full resize-y rounded-2xl border border-border bg-background/35 px-4 py-3 text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:border-[var(--vivida-violet)]/55"
       />
@@ -80,22 +73,16 @@ export function LibraryNoteEditor({
             <NotebookPen className="size-4" />
           )}
           {pending
-            ? am
-              ? "Պահպանվում է…"
-              : en
-                ? "Saving…"
-                : "ინახება…"
+            ? en
+              ? "Saving…"
+              : "ინახება…"
             : saved
-              ? am
-                ? "Պահված է"
-                : en
-                  ? "Saved"
-                  : "შენახულია"
-              : am
-                ? "Պահպանել"
-                : en
-                  ? "Save note"
-                  : "ჩანაწერის შენახვა"}
+              ? en
+                ? "Saved"
+                : "შენახულია"
+              : en
+                ? "Save note"
+                : "ჩანაწერის შენახვა"}
         </Button>
       </div>
     </section>

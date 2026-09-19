@@ -46,21 +46,6 @@ const COPY = {
     invalidComment: "Write a comment before publishing.",
     user: "Vivida member",
   },
-  am: {
-    discussion: "Քննարկում",
-    comments: "մեկնաբանություն",
-    like: "Հավանել",
-    unlike: "Հեռացնել հավանումը",
-    placeholder: "Կիսվեք ձեր կարծիքով…",
-    publish: "Հրապարակել",
-    empty: "Մեկնաբանություններ դեռ չկան՝ սկսեք զրույցը։",
-    loginTitle: "Միացեք քննարկմանը",
-    loginText: "Մուտք գործեք՝ հոդվածը հավանելու կամ մեկնաբանելու համար։",
-    login: "Մուտք գործել",
-    genericError: "Գործողությունը չհաջողվեց։ Փորձեք կրկին։",
-    invalidComment: "Հրապարակելուց առաջ գրեք մեկնաբանություն։",
-    user: "Vivida-ի անդամ",
-  },
 } as const;
 
 type ClientComment = Omit<ArticleComment, "createdAt"> & {
@@ -83,10 +68,10 @@ const EMPTY_ENGAGEMENT: ArticleEngagement = {
 };
 
 function commentDate(value: Date | string, locale: UserLocale): string {
-  return new Intl.DateTimeFormat(
-    locale === "ka" ? "ka-GE" : locale === "am" ? "hy-AM" : "en-US",
-    { dateStyle: "medium", timeStyle: "short" },
-  ).format(new Date(value));
+  return new Intl.DateTimeFormat(locale === "ka" ? "ka-GE" : "en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
 }
 
 async function responseError(response: Response, fallback: string) {
@@ -101,17 +86,17 @@ async function responseError(response: Response, fallback: string) {
   return fallback;
 }
 
-export function ArticleEngagement({
-  articleId,
-  locale,
-  loginHref,
-}: Props) {
+export function ArticleEngagement({ articleId, locale, loginHref }: Props) {
   const copy = COPY[locale];
   const router = useRouter();
   const [liked, setLiked] = useState(EMPTY_ENGAGEMENT.viewerLiked);
   const [likeCount, setLikeCount] = useState(EMPTY_ENGAGEMENT.likeCount);
-  const [commentCount, setCommentCount] = useState(EMPTY_ENGAGEMENT.commentCount);
-  const [comments, setComments] = useState<ClientComment[]>(EMPTY_ENGAGEMENT.comments);
+  const [commentCount, setCommentCount] = useState(
+    EMPTY_ENGAGEMENT.commentCount,
+  );
+  const [comments, setComments] = useState<ClientComment[]>(
+    EMPTY_ENGAGEMENT.comments,
+  );
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [engagementReady, setEngagementReady] = useState(false);
   const [body, setBody] = useState("");
@@ -176,7 +161,8 @@ export function ArticleEngagement({
         router.push(loginHref);
         return;
       }
-      if (!response.ok) throw new Error(await responseError(response, copy.genericError));
+      if (!response.ok)
+        throw new Error(await responseError(response, copy.genericError));
       const payload = (await response.json()) as {
         liked: boolean;
         likeCount: number;
@@ -213,7 +199,8 @@ export function ArticleEngagement({
         router.push(loginHref);
         return;
       }
-      if (!response.ok) throw new Error(await responseError(response, copy.genericError));
+      if (!response.ok)
+        throw new Error(await responseError(response, copy.genericError));
       const payload = (await response.json()) as { comment: ClientComment };
       setComments((current) => [...current, payload.comment]);
       setCommentCount((count) => count + 1);
@@ -234,7 +221,10 @@ export function ArticleEngagement({
       <div className="rounded-3xl border border-border/70 bg-card/45 p-5 shadow-[0_28px_90px_-55px_oklch(0.65_0.24_305/0.7)] backdrop-blur-xl sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-5">
           <div>
-            <h2 id="discussion-title" className="text-2xl font-semibold sm:text-3xl">
+            <h2
+              id="discussion-title"
+              className="text-2xl font-semibold sm:text-3xl"
+            >
               {copy.discussion}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -256,7 +246,10 @@ export function ArticleEngagement({
             {likePending ? (
               <Loader2 className="size-4 animate-spin" aria-hidden />
             ) : (
-              <Heart className={`size-4 ${liked ? "fill-current" : ""}`} aria-hidden />
+              <Heart
+                className={`size-4 ${liked ? "fill-current" : ""}`}
+                aria-hidden
+              />
             )}
             {copy.like} · {likeCount}
           </button>
@@ -303,7 +296,9 @@ export function ArticleEngagement({
           <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-[var(--vivida-violet)]/25 bg-[var(--vivida-violet)]/8 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-semibold">{copy.loginTitle}</p>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{copy.loginText}</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {copy.loginText}
+              </p>
             </div>
             <Link
               href={loginHref}
@@ -358,7 +353,10 @@ export function ArticleEngagement({
                   <div className="min-w-0 flex-1 rounded-2xl bg-background/30 px-4 py-3 ring-1 ring-foreground/5">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       {profileHref ? (
-                        <Link href={profileHref} className="font-semibold hover:text-[var(--vivida-violet)]">
+                        <Link
+                          href={profileHref}
+                          className="font-semibold hover:text-[var(--vivida-violet)]"
+                        >
                           {displayName}
                         </Link>
                       ) : (

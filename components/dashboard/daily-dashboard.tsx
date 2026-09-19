@@ -40,7 +40,6 @@ export function DailyDashboard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const router = useRouter();
   const [core, setCore] = useState<DashboardCore | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +67,9 @@ export function DailyDashboard({
   if (error) {
     return (
       <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
-        {am ? "Չհաջողվեց բեռնել։ Խնդրում ենք թարմացնել էջը։" : en ? "Could not load. Please refresh the page." : "ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი."}
+        {en
+          ? "Could not load. Please refresh the page."
+          : "ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი."}
       </div>
     );
   }
@@ -81,7 +82,14 @@ export function DailyDashboard({
     );
   }
 
-  const { chart, canDaily, weeklyUnlocked, balance, suggestions, ritualProgress } = core;
+  const {
+    chart,
+    canDaily,
+    weeklyUnlocked,
+    balance,
+    suggestions,
+    ritualProgress,
+  } = core;
 
   return (
     <div className="space-y-8">
@@ -108,13 +116,13 @@ export function DailyDashboard({
       <section>
         <header className="mb-3 flex items-baseline justify-between">
           <h2 className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {am ? "Ձեր երեք գլխավորները" : en ? "Your big three" : "შენი დიდი სამეული"}
+            {en ? "Your big three" : "შენი დიდი სამეული"}
           </h2>
           <Link
             href="/report"
             className="text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            {am ? "Ամբողջական քարտեզ →" : en ? "Full chart →" : "სრული რუკა →"}
+            {en ? "Full chart →" : "სრული რუკა →"}
           </Link>
         </header>
         <MiniBigThree chart={chart.data} locale={locale} />
@@ -124,7 +132,7 @@ export function DailyDashboard({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-lg font-semibold tracking-tight">
-              {am ? "Ձեր ամբողջական նատալ քարտեզը" : en ? "Your complete natal chart" : "შენი სრული ნატალური რუკა"}
+              {en ? "Your complete natal chart" : "შენი სრული ნატალური რუკა"}
             </h3>
             <p className="mt-1 max-w-md text-sm text-muted-foreground">
               {en
@@ -134,7 +142,7 @@ export function DailyDashboard({
           </div>
           <Button asChild variant="mystic" size="lg" className="shrink-0">
             <Link href="/report">
-              {am ? "Դիտել քարտեզը" : en ? "View chart" : "ნახე რუკა"}
+              {en ? "View chart" : "ნახე რუკა"}
               <ArrowRight className="size-4" />
             </Link>
           </Button>
@@ -165,7 +173,6 @@ function DashboardExtrasSection({
   ritualProgress: import("@/lib/streak-credits").StreakProgress;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [extras, setExtras] = useState<DashboardExtras | null>(null);
 
   useEffect(() => {
@@ -196,7 +203,9 @@ function DashboardExtrasSection({
     <HoroscopeLoading locale={locale} />
   ) : extras.daily ? null : canDaily ? (
     <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
-      {am ? "Այսօրվա հորոսկոպը պատրաստվում է։ Կրկին փորձեք մի փոքր ուշ։" : en ? "Today's horoscope is being prepared. Try again shortly." : "დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში."}
+      {en
+        ? "Today's horoscope is being prepared. Try again shortly."
+        : "დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში."}
     </div>
   ) : null;
 
@@ -210,7 +219,7 @@ function DashboardExtrasSection({
     <>
       {(!loading && extras.daily) || dailySlot || moonSlot ? (
         <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
-          {(!loading && extras.daily) ? (
+          {!loading && extras.daily ? (
             <div className="min-w-0 xl:col-span-7">
               <DailyRitual
                 userId={userId}
@@ -242,7 +251,10 @@ function DashboardExtrasSection({
       ) : (
         extras?.weeklyForecast &&
         extras.weeklyForecast.days.length > 0 && (
-          <WeeklyForecastCard days={extras.weeklyForecast.days} locale={locale} />
+          <WeeklyForecastCard
+            days={extras.weeklyForecast.days}
+            locale={locale}
+          />
         )
       )}
     </>

@@ -1,6 +1,11 @@
 import { Button, Heading, Text } from "@react-email/components";
 
-import { EmailLayout, buttonStyle, mutedStyle, paragraphStyle } from "./_layout";
+import {
+  EmailLayout,
+  buttonStyle,
+  mutedStyle,
+  paragraphStyle,
+} from "./_layout";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -27,21 +32,18 @@ export function ReportReadyEmail({
   reportTitle?: string;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
 
-  const preview = reportTitle ?? (am ? "Ձեր ամբողջական զեկույցը" : en ? "Your complete personal report" : "შენი სრული პერსონალური რეპორტი");
+  const preview =
+    reportTitle ??
+    (en ? "Your complete personal report" : "შენი სრული პერსონალური რეპორტი");
 
   const greeting = name
-    ? am
-      ? `Բարև, ${name}։`
-      : en
-        ? `Hello, ${name}!`
-        : `სალამი, ${name}!`
-    : am
-      ? "Բարև։"
-      : en
-        ? "Hello!"
-        : "სალამი!";
+    ? en
+      ? `Hello, ${name}!`
+      : `სალამი, ${name}!`
+    : en
+      ? "Hello!"
+      : "სალამი!";
 
   return (
     <EmailLayout preview={preview} locale={locale}>
@@ -56,39 +58,29 @@ export function ReportReadyEmail({
           margin: "0 0 16px",
         }}
       >
-        {reportTitle ?? (am ? "Ձեր զեկույցը" : en ? "Your report" : "შენი რეპორტი")}
+        {reportTitle ?? (en ? "Your report" : "შენი რეპორტი")}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
 
       <Text style={paragraphStyle}>
         {attached
-          ? am
-            ? "Ձեր անձնական զեկույցը կցված է այս նամակին PDF ֆայլով։ Պահեք այն ձեզ մոտ՝ ցանկացած պահի կարդալու համար։"
-            : en
-              ? "Your personal report is attached to this email as a PDF. Save it — it's yours to keep and read whenever you like."
-              : "შენი პერსონალური რეპორტი ამ წერილს PDF-ად ახლავს. შეინახე — ის სამუდამოდ შენთან რჩება."
-          : am
-            ? "Ձեր անձնական զեկույցը պատրաստ է։ Ներբեռնեք այն ստորև նշված հղումով։"
-            : en
-              ? "Your personal report is ready. Download it from the link below."
-              : "შენი პერსონალური რეპორტი მზადაა. ჩამოტვირთე ქვემოთ მოცემული ბმულით."}
+          ? en
+            ? "Your personal report is attached to this email as a PDF. Save it — it's yours to keep and read whenever you like."
+            : "შენი პერსონალური რეპორტი ამ წერილს PDF-ად ახლავს. შეინახე — ის სამუდამოდ შენთან რჩება."
+          : en
+            ? "Your personal report is ready. Download it from the link below."
+            : "შენი პერსონალური რეპორტი მზადაა. ჩამოტვირთე ქვემოთ მოცემული ბმულით."}
       </Text>
 
       <Button href={reportUrl} style={buttonStyle}>
-        {am
-          ? "Բացել զեկույցը"
-          : en
-            ? "Open your report"
-            : "გახსენი ანგარიში"}
+        {en ? "Open your report" : "გახსენი ანგარიში"}
       </Button>
 
       <Text style={mutedStyle}>
-        {am
-          ? "Զեկույցը միշտ հասանելի է ձեր հաշվում ևս։ Հարցի դեպքում պատասխանեք այս նամակին։"
-          : en
-            ? "The report also stays in your account, ready to download any time. If you have a question, just reply to this email."
-            : "ანგარიში შენს პროფილზეც რჩება — ჩამოტვირთვა ნებისმიერ დროს შეგიძლია. თუ შეკითხვა გაქვს, უპასუხე ამ წერილს."}
+        {en
+          ? "The report also stays in your account, ready to download any time. If you have a question, just reply to this email."
+          : "ანგარიში შენს პროფილზეც რჩება — ჩამოტვირთვა ნებისმიერ დროს შეგიძლია. თუ შეკითხვა გაქვს, უპასუხე ამ წერილს."}
       </Text>
     </EmailLayout>
   );

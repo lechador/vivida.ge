@@ -4,11 +4,14 @@ import { notFound } from "next/navigation";
 import { MoonPhaseDetail } from "@/components/seo/moon-event-pages";
 import { moonEvents } from "@/lib/seo/moon-events";
 import { MoonPhaseDetailEn } from "@/components/seo/moon-event-pages-en";
-import { MoonPhaseDetailAm } from "@/components/seo/moon-event-pages-am";
-import { formatAmDate } from "@/lib/i18n/am-date";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { signByIndex } from "@/lib/zodiac";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 type Props = { params: Promise<{ date: string }> };
 export const revalidate = 86400;
@@ -23,28 +26,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!e) return {};
   const path = `/savse-mtvare/${date}`;
   const locale = await getRequestLocale();
-
-  if (locale === "am") {
-    const label = formatAmDate(e.date);
-    const signAm = signByIndex(e.snapshot.signIndex).labelAm;
-    const title = `Լիալուսին ${label} — Ժամը և նշանը`;
-    const description = `${label} Լիալուսին ${signAm} նշանում. ճշգրիտ ժամը, լուսավորվածությունը, աստղագիտական տվյալներն ու աստղաբանական նշանակությունը:`;
-    return {
-      title: { absolute: `${title} — Vivida` },
-      description,
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        title,
-        description,
-        url: armenianSiteHref(path, false),
-        type: "article",
-        locale: "hy_AM",
-        siteName: "Vivida",
-      },
-      twitter: { card: "summary_large_image", title, description },
-    };
-  }
 
   if (locale === "en") {
     const label = new Intl.DateTimeFormat("en-US", {
@@ -73,7 +54,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const title = `სავსე მთვარე ${e.label} — დრო და ნიშანი`;
   const description = `${e.label} სავსე მთვარე ${e.snapshot.signKa}-ში: ზუსტი თბილისის დრო, განათება, ასტრონომიული მონაცემები და ასტროლოგიური მნიშვნელობა.`;
-  return { title: { absolute: title }, description, alternates: localizedAlternates(path, path, "ka") };
+  return {
+    title: { absolute: title },
+    description,
+    alternates: localizedAlternates(path, path, "ka"),
+  };
 }
 
 export default async function Page({ params }: Props) {
@@ -81,7 +66,6 @@ export default async function Page({ params }: Props) {
   const e = moonEvents("full").find((x) => x.iso === date);
   if (!e) notFound();
   const locale = await getRequestLocale();
-  if (locale === "am") return <MoonPhaseDetailAm event={e} />;
   if (locale === "en") return <MoonPhaseDetailEn event={e} />;
   return <MoonPhaseDetail event={e} />;
 }

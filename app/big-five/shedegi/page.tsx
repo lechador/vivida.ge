@@ -10,8 +10,13 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
-  return { title: am ? "Ձեր Մեծ Հնգյակի Արդյունքը" : en ? "Your Big Five Result" : "შენი Big Five შედეგი", description: am ? "Ձեր հինգ հատկանիշներից բաղկացած Մեծ Հնգյակի անհատականության պրոֆիլը։" : en ? "Your five-trait Big Five personality profile." : "შენი Big Five (დიდი ხუთეული) ტესტის შედეგი — ხუთ თვისებაზე დაფუძნებული პიროვნების პროფილი.", robots: { index: false, follow: false } };
+  return {
+    title: en ? "Your Big Five Result" : "შენი Big Five შედეგი",
+    description: en
+      ? "Your five-trait Big Five personality profile."
+      : "შენი Big Five (დიდი ხუთეული) ტესტის შედეგი — ხუთ თვისებაზე დაფუძნებული პიროვნების პროფილი.",
+    robots: { index: false, follow: false },
+  };
 }
 
 /**
@@ -25,14 +30,25 @@ export default async function BigFiveResultPage() {
   const locale = await getRequestLocale();
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.16_265/0.4),transparent_70%)]"
       />
       <Starfield count={110} shooting={2} />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/big-five/shedegi" />}
+      {authed ? (
+        <AppHeader authed active="tests" />
+      ) : (
+        <SmartHeader
+          active="tests"
+          locale={locale}
+          georgianPath="/big-five/shedegi"
+        />
+      )}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <BigFiveResultClient locale={locale} />

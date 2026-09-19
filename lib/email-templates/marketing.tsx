@@ -1,10 +1,6 @@
 import { Button, Heading, Text } from "@react-email/components";
 
-import {
-  EmailLayout,
-  buttonStyle,
-  paragraphStyle,
-} from "./_layout";
+import { EmailLayout, buttonStyle, paragraphStyle } from "./_layout";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -31,13 +27,20 @@ export function MarketingEmail({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   const greeting = name
-    ? am ? `Բարև, ${name}!` : en ? `Hello, ${name}!` : `სალამი, ${name}!`
-    : am ? "Բարև!" : en ? "Hello!" : "სალამი!";
+    ? en
+      ? `Hello, ${name}!`
+      : `სალამი, ${name}!`
+    : en
+      ? "Hello!"
+      : "სალამი!";
   const paragraphs = body.split(/\n\n+/).filter(Boolean);
   return (
-    <EmailLayout preview={heading} unsubscribeUrl={unsubscribeUrl} locale={locale}>
+    <EmailLayout
+      preview={heading}
+      unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
+    >
       <Heading
         as="h1"
         style={{

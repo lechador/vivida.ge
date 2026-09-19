@@ -16,12 +16,15 @@ export default async function ResetPasswordPage({
   const { token } = await searchParams;
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   return (
     <AuthLayout
       locale={locale}
-      title={am ? "Ընտրեք նոր գաղտնաբառ" : en ? "Choose a new password" : "ახალი პაროლი"}
-      subtitle={am ? "Սահմանեք նոր գաղտնաբառ Ձեր հաշվի համար։" : en ? "Set a new password for your account." : "დააყენე ახალი პაროლი ანგარიშისთვის."}
+      title={en ? "Choose a new password" : "ახალი პაროლი"}
+      subtitle={
+        en
+          ? "Set a new password for your account."
+          : "დააყენე ახალი პაროლი ანგარიშისთვის."
+      }
     >
       <ResetPasswordForm token={token ?? ""} locale={locale} />
     </AuthLayout>

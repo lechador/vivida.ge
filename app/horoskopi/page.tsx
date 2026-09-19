@@ -23,10 +23,7 @@ import { signColor } from "@/lib/zodiac";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { HoroscopeHubEn } from "@/components/seo/horoscope-hub-en";
-import {
-  PeriodHoroscopeHubAm,
-  periodHubMetadataAm,
-} from "@/components/seo/period-horoscope-hub-am";
+
 import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -45,7 +42,6 @@ const DESCRIPTION =
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") return periodHubMetadataAm("day");
   const en = locale === "en";
   const title = en ? "Daily Horoscope Today — All Zodiac Signs" : TITLE;
   const description = en
@@ -86,7 +82,11 @@ export async function generateMetadata(): Promise<Metadata> {
     // "/en/horoscope" as the paired path, which on the English branch emitted
     // ka-GE -> vivida.ge/en/horoscope — an internal English path, on the
     // Georgian domain, that only 301s back here.)
-    alternates: localizedAlternates("/horoskopi", "/horoskopi", en ? "en" : "ka"),
+    alternates: localizedAlternates(
+      "/horoskopi",
+      "/horoskopi",
+      en ? "en" : "ka",
+    ),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "website",
@@ -127,7 +127,6 @@ const FAQ = [
 
 export default async function HoroskopiHubPage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <PeriodHoroscopeHubAm period="day" />;
   if (locale === "en") return <HoroscopeHubEn />;
   const now = new Date();
   const todayLabel = signHoroscopePeriodLabel(now, "day");

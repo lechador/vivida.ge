@@ -11,7 +11,10 @@ import {
 } from "@/lib/articles";
 import type { UserLocale } from "@/lib/i18n/locale";
 
-const READ = { ka: "წთ საკითხავი", en: "min read", am: "րոպե ընթերցում" } as const;
+const READ = {
+  ka: "წთ საკითხავი",
+  en: "min read",
+} as const;
 
 export function ArticleCard({
   article,
@@ -54,10 +57,16 @@ export function ArticleCard({
         />
       </Link>
 
-      <div className={`flex flex-1 flex-col ${featured ? "p-6 sm:p-8 lg:p-10" : "p-5 sm:p-6"}`}>
+      <div
+        className={`flex flex-1 flex-col ${featured ? "p-6 sm:p-8 lg:p-10" : "p-5 sm:p-6"}`}
+      >
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
           <span className="rounded-full border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-2.5 py-1 font-medium text-[var(--vivida-violet)]">
-            {ARTICLE_CATEGORY_LABELS[locale][article.category as keyof (typeof ARTICLE_CATEGORY_LABELS)[typeof locale]]}
+            {
+              ARTICLE_CATEGORY_LABELS[locale][
+                article.category as keyof (typeof ARTICLE_CATEGORY_LABELS)[typeof locale]
+              ]
+            }
           </span>
           <span>{formatArticleDate(article.publishedAt, locale)}</span>
           <span className="inline-flex items-center gap-1">
@@ -66,10 +75,14 @@ export function ArticleCard({
           </span>
         </div>
 
-        <h3 className={`${featured ? "mt-5 text-2xl sm:text-3xl" : "mt-4 text-xl"} text-balance font-semibold leading-tight tracking-tight`}>
+        <h3
+          className={`${featured ? "mt-5 text-2xl sm:text-3xl" : "mt-4 text-xl"} text-balance font-semibold leading-tight tracking-tight`}
+        >
           <Link href={articlePath(locale, article.slug)}>{article.title}</Link>
         </h3>
-        <p className={`${featured ? "mt-4 text-base" : "mt-3 text-sm"} line-clamp-3 text-pretty leading-relaxed text-foreground/72`}>
+        <p
+          className={`${featured ? "mt-4 text-base" : "mt-3 text-sm"} line-clamp-3 text-pretty leading-relaxed text-foreground/72`}
+        >
           {article.excerpt}
         </p>
 
@@ -77,8 +90,11 @@ export function ArticleCard({
           href={articlePath(locale, article.slug)}
           className="mt-6 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-[var(--vivida-cyan)]"
         >
-          {locale === "ka" ? "წაიკითხე" : locale === "am" ? "Կարդալ" : "Read article"}
-          <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+          {locale === "ka" ? "წაიკითხე" : "Read article"}
+          <ArrowUpRight
+            className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            aria-hidden
+          />
         </Link>
       </div>
     </article>

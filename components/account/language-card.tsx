@@ -8,10 +8,13 @@ import { updateInterfaceLanguage } from "@/actions/interface-language";
 import { cn } from "@/lib/utils";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
-const OPTIONS: Array<{ value: UserLocale; label: string; nativeLabel: string }> = [
+const OPTIONS: Array<{
+  value: UserLocale;
+  label: string;
+  nativeLabel: string;
+}> = [
   { value: "ka", label: "Georgian", nativeLabel: "ქართული" },
   { value: "en", label: "English", nativeLabel: "English" },
-  { value: "am", label: "Armenian", nativeLabel: "Հայերեն" },
 ];
 
 export function LanguageCard({ initial }: { initial: UserLocale }) {
@@ -19,7 +22,6 @@ export function LanguageCard({ initial }: { initial: UserLocale }) {
   const [locale, setLocale] = useState(initial);
   const [isPending, startTransition] = useTransition();
   const en = locale === "en";
-  const am = locale === "am";
 
   function select(next: UserLocale) {
     if (next === locale || isPending) return;
@@ -34,16 +36,17 @@ export function LanguageCard({ initial }: { initial: UserLocale }) {
     });
   }
 
-  const title = am ? "Լեզու" : en ? "Language" : "ენა";
-  const description = am
-    ? "Ընտրեք ձեր հաշվի և նավիգացիայի լեզուն:"
-    : en
+  const title = en ? "Language" : "ენა";
+  const description = en
     ? "Choose the language used across your account and authenticated navigation."
     : "აირჩიე ანგარიშისა და ავტორიზებული ნავიგაციის ენა.";
-  const updatingText = am ? "Թարմացվում է…" : en ? "Updating…" : "ახლდება…";
+  const updatingText = en ? "Updating…" : "ახლდება…";
 
   return (
-    <section lang={locale} className="rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
+    <section
+      lang={locale}
+      className="rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl"
+    >
       <header className="mb-5 flex items-start gap-3">
         <span className="rounded-xl bg-[var(--vivida-cyan)]/12 p-2.5 text-[var(--vivida-cyan)]">
           <Languages className="size-5" />
@@ -54,7 +57,7 @@ export function LanguageCard({ initial }: { initial: UserLocale }) {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {OPTIONS.map((option) => {
           const selected = locale === option.value;
           return (
@@ -72,14 +75,19 @@ export function LanguageCard({ initial }: { initial: UserLocale }) {
                 isPending && "opacity-70",
               )}
             >
-              <span className="block text-sm font-semibold">{option.nativeLabel}</span>
-              <span className="mt-0.5 block text-xs text-muted-foreground">{option.label}</span>
+              <span className="block text-sm font-semibold">
+                {option.nativeLabel}
+              </span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                {option.label}
+              </span>
             </button>
           );
         })}
       </div>
-      {isPending && <p className="mt-3 text-xs text-muted-foreground">{updatingText}</p>}
+      {isPending && (
+        <p className="mt-3 text-xs text-muted-foreground">{updatingText}</p>
+      )}
     </section>
   );
 }
-

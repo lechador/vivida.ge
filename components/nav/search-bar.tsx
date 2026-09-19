@@ -24,7 +24,6 @@ type Result = {
  */
 export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [open, setOpen] = useState(false);
@@ -49,7 +48,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
       try {
         const res = await fetch(
           `/api/users/search?q=${encodeURIComponent(trimmed)}`,
-          { signal: ctrl.signal }
+          { signal: ctrl.signal },
         );
         if (!res.ok) throw new Error("search failed");
         const data = (await res.json()) as { results: Result[] };
@@ -104,7 +103,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder={am ? "Անուն կամ @" : en ? "Name or @" : "სახელი ან @"}
+          placeholder={en ? "Name or @" : "სახელი ან @"}
           className="h-12 w-full rounded-full border border-border bg-card/50 pl-11 pr-10 text-base outline-none ring-offset-background backdrop-blur transition-colors placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-ring"
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
@@ -130,7 +129,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
         ) : (
           <button
             type="button"
-            aria-label={am ? "Գնալ" : en ? "Go" : "გადასვლა"}
+            aria-label={en ? "Go" : "გადასვლა"}
             tabIndex={-1}
             onClick={() => {
               const target = results[highlight];
@@ -162,9 +161,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
                 onMouseEnter={() => setHighlight(i)}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors",
-                  i === highlight
-                    ? "bg-accent/15"
-                    : "hover:bg-accent/10"
+                  i === highlight ? "bg-accent/15" : "hover:bg-accent/10",
                 )}
               >
                 <Image
@@ -190,7 +187,9 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
 
       {open && hasQuery && !loading && results.length === 0 && (
         <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 rounded-xl border border-border bg-popover/95 p-4 text-center text-sm text-muted-foreground shadow-2xl backdrop-blur-md">
-          {am ? "Հանրային պրոֆիլներ չեն գտնվել" : en ? "No public profiles found" : "არცერთი საჯარო პროფილი არ მოიძებნა"}
+          {en
+            ? "No public profiles found"
+            : "არცერთი საჯარო პროფილი არ მოიძებნა"}
         </div>
       )}
     </div>

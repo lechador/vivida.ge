@@ -38,18 +38,10 @@ import {
   VIEW_LABEL_EN,
 } from "@/components/seo/sign-horoscope-page-en";
 import { YearlyHoroscopePageEn } from "@/components/seo/yearly-horoscope-page-en";
-import { YearlyHoroscopePageAm } from "@/components/seo/yearly-horoscope-page-am";
-import {
-  SignHoroscopePageAm,
-  VIEW_LABEL_AM,
-} from "@/components/seo/sign-horoscope-page-am";
+
 import { yearlyHoroscopeEnglish } from "@/lib/yearly-horoscope-en";
-import { yearlyHoroscopeArmenian } from "@/lib/yearly-horoscope-am";
-import {
-  DEFAULT_OG_IMAGE,
-  armenianSiteHref,
-  localizedAlternates,
-} from "@/lib/seo/locales";
+
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -113,33 +105,9 @@ export async function generateMetadata({
   if (!isSlug(sign)) return {};
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
 
   const view = viewFromPath(slug);
   if (view) {
-    if (am) {
-      const meta = signMetaBySlug(sign);
-      const name = meta?.labelAm || meta?.labelKa || sign;
-      const title = `${name} — ${VIEW_LABEL_AM[view]}`;
-      const description = `${name} նշանի ${VIEW_LABEL_AM[view].toLowerCase()}՝ գործնական խորհուրդներ հարաբերությունների, առաջնահերթությունների, աշխատանքի և անձնական աճի համար։`;
-      const path = `/zodiac/${sign}/${slug}`;
-      return {
-        title: { absolute: title },
-        description,
-        keywords: [`${name} հորոսկոպ`, `${name} այսօրվա հորոսկոպ`, VIEW_LABEL_AM[view], "օրական հորոսկոպ"],
-        alternates: localizedAlternates(`/am${path}`, path, "am"),
-        openGraph: {
-          images: [DEFAULT_OG_IMAGE],
-          type: "article",
-          url: armenianSiteHref(path, false),
-          title,
-          description,
-          siteName: "Vivida",
-          locale: "hy_AM",
-        },
-        twitter: { card: "summary_large_image", title, description },
-      };
-    }
     const sc = SIGNS_CONTENT[sign];
     const url = `${SITE_URL}/zodiac/${sign}/${slug}`;
     const anchor = anchorForView(view);
@@ -197,30 +165,6 @@ export async function generateMetadata({
   if (yearNum == null) return {};
   const c = yearlyContentFor(sign, yearNum);
   if (!c) return {};
-  if (am) {
-    const armenian = yearlyHoroscopeArmenian(sign, yearNum);
-    if (!armenian) return {};
-    const path = `/zodiac/${sign}/${slug}`;
-    return {
-      title: { absolute: armenian.title },
-      description: armenian.description,
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "article",
-        url: armenianSiteHref(path, false),
-        title: armenian.title,
-        description: armenian.description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: armenian.title,
-        description: armenian.description,
-      },
-    };
-  }
   if (en) {
     const english = yearlyHoroscopeEnglish(sign, yearNum);
     const url = `https://www.vividaastro.com/zodiac/${sign}/${slug}`;
@@ -284,10 +228,7 @@ export default async function ZodiacSignSlugPage({
   const view = viewFromPath(slug);
   if (view) {
     const locale = await getRequestLocale();
-    if (locale === "am")
-      return <SignHoroscopePageAm sign={sign} view={view} />;
-    if (locale === "en")
-      return <SignHoroscopePageEn sign={sign} view={view} />;
+    if (locale === "en") return <SignHoroscopePageEn sign={sign} view={view} />;
     return <HoroscopeView sign={sign} view={view} />;
   }
 
@@ -296,10 +237,6 @@ export default async function ZodiacSignSlugPage({
   const c = yearlyContentFor(sign, yearNum);
   if (!c) notFound();
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    if (!yearlyHoroscopeArmenian(sign, yearNum)) notFound();
-    return <YearlyHoroscopePageAm sign={sign} year={yearNum} />;
-  }
   if (locale === "en")
     return <YearlyHoroscopePageEn sign={sign} year={yearNum} />;
   const year = slug;

@@ -9,15 +9,11 @@ import {
 } from "lucide-react";
 
 import {
-  CREDIT_REASON_LABEL_AM,
   CREDIT_REASON_LABEL_EN,
   CREDIT_REASON_LABEL_KA,
   type CreditReason,
 } from "@/lib/credits-config";
-import type {
-  CreditHistoryFilter,
-  CreditHistoryPage,
-} from "@/lib/credits";
+import type { CreditHistoryFilter, CreditHistoryPage } from "@/lib/credits";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +26,6 @@ type Props = {
 const DATE_LOCALE: Record<UserLocale, string> = {
   ka: "ka-GE",
   en: "en-GB",
-  am: "hy-AM",
 };
 
 function historyHref(filter: CreditHistoryFilter, page?: number) {
@@ -43,11 +38,7 @@ function historyHref(filter: CreditHistoryFilter, page?: number) {
 
 function reasonLabel(reason: string, locale: UserLocale) {
   const labels =
-    locale === "am"
-      ? CREDIT_REASON_LABEL_AM
-      : locale === "en"
-        ? CREDIT_REASON_LABEL_EN
-        : CREDIT_REASON_LABEL_KA;
+    locale === "en" ? CREDIT_REASON_LABEL_EN : CREDIT_REASON_LABEL_KA;
   return labels[reason as CreditReason] ?? reason.replaceAll("_", " ");
 }
 
@@ -63,11 +54,10 @@ function formatDate(value: Date | string, locale: UserLocale) {
 
 export function CreditHistory({ history, filter, locale }: Props) {
   const en = locale === "en";
-  const am = locale === "am";
   const tabs: Array<{ value: CreditHistoryFilter; label: string }> = [
-    { value: "all", label: am ? "Բոլորը" : en ? "All" : "ყველა" },
-    { value: "earned", label: am ? "Ստացված" : en ? "Received" : "მიღებული" },
-    { value: "spent", label: am ? "Ծախսված" : en ? "Spent" : "დახარჯული" },
+    { value: "all", label: en ? "All" : "ყველა" },
+    { value: "earned", label: en ? "Received" : "მიღებული" },
+    { value: "spent", label: en ? "Spent" : "დახარჯული" },
   ];
 
   return (
@@ -81,14 +71,12 @@ export function CreditHistory({ history, filter, locale }: Props) {
         </div>
         <div>
           <h2 className="text-lg font-semibold">
-            {am ? "Կրեդիտների պատմություն" : en ? "Credit history" : "კრედიტების ისტორია"}
+            {en ? "Credit history" : "კრედიტების ისტორია"}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {am
-              ? "Ձեր ստացած և ծախսած բոլոր կրեդիտները։"
-              : en
-                ? "Every credit you have received and spent."
-                : "შენი ყველა მიღებული და დახარჯული კრედიტი."}
+            {en
+              ? "Every credit you have received and spent."
+              : "შენი ყველა მიღებული და დახარჯული კრედიტი."}
           </p>
         </div>
       </header>
@@ -96,7 +84,7 @@ export function CreditHistory({ history, filter, locale }: Props) {
       <div className="mt-5 grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 p-4">
           <div className="text-xs text-muted-foreground">
-            {am ? "Ընդամենը ստացված" : en ? "Total received" : "სულ მიღებული"}
+            {en ? "Total received" : "სულ მიღებული"}
           </div>
           <div className="mt-1 text-xl font-semibold tabular-nums text-[var(--vivida-cyan)]">
             +{history.summary.earned}
@@ -104,7 +92,7 @@ export function CreditHistory({ history, filter, locale }: Props) {
         </div>
         <div className="rounded-2xl border border-[var(--vivida-pink)]/25 bg-[var(--vivida-pink)]/8 p-4">
           <div className="text-xs text-muted-foreground">
-            {am ? "Ընդամենը ծախսված" : en ? "Total spent" : "სულ დახარჯული"}
+            {en ? "Total spent" : "სულ დახარჯული"}
           </div>
           <div className="mt-1 text-xl font-semibold tabular-nums text-[var(--vivida-pink)]">
             −{history.summary.spent}
@@ -113,7 +101,7 @@ export function CreditHistory({ history, filter, locale }: Props) {
       </div>
 
       <nav
-        aria-label={am ? "Պատմության ֆիլտր" : en ? "History filter" : "ისტორიის ფილტრი"}
+        aria-label={en ? "History filter" : "ისტორიის ფილტრი"}
         className="mt-4 grid grid-cols-3 rounded-xl border border-border/70 bg-background/25 p-1"
       >
         {tabs.map((tab) => (
@@ -125,7 +113,7 @@ export function CreditHistory({ history, filter, locale }: Props) {
               "rounded-lg px-2 py-2 text-center text-xs font-medium transition-colors sm:text-sm",
               filter === tab.value
                 ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             {tab.label}
@@ -135,18 +123,20 @@ export function CreditHistory({ history, filter, locale }: Props) {
 
       {history.items.length === 0 ? (
         <div className="py-10 text-center text-sm text-muted-foreground">
-          {am
-            ? "Այս բաժնում դեռ գործարքներ չկան։"
-            : en
-              ? "There are no transactions in this view yet."
-              : "ამ განყოფილებაში ოპერაციები ჯერ არ არის."}
+          {en
+            ? "There are no transactions in this view yet."
+            : "ამ განყოფილებაში ოპერაციები ჯერ არ არის."}
         </div>
       ) : (
         <ol className="mt-2 divide-y divide-border/60">
           {history.items.map((item) => {
             const earned = item.amount > 0;
             const free = item.amount === 0;
-            const AmountIcon = free ? Minus : earned ? ArrowDownLeft : ArrowUpRight;
+            const AmountIcon = free
+              ? Minus
+              : earned
+                ? ArrowDownLeft
+                : ArrowUpRight;
 
             return (
               <li key={item.id} className="flex items-center gap-3 py-4">
@@ -157,7 +147,7 @@ export function CreditHistory({ history, filter, locale }: Props) {
                       ? "border-border bg-background/30 text-muted-foreground"
                       : earned
                         ? "border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/10 text-[var(--vivida-cyan)]"
-                        : "border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/10 text-[var(--vivida-pink)]"
+                        : "border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/10 text-[var(--vivida-pink)]",
                   )}
                 >
                   <AmountIcon className="size-4" />
@@ -166,7 +156,10 @@ export function CreditHistory({ history, filter, locale }: Props) {
                   <div className="truncate text-sm font-medium">
                     {reasonLabel(item.reason, locale)}
                   </div>
-                  <time className="mt-0.5 block text-xs text-muted-foreground" dateTime={new Date(item.createdAt).toISOString()}>
+                  <time
+                    className="mt-0.5 block text-xs text-muted-foreground"
+                    dateTime={new Date(item.createdAt).toISOString()}
+                  >
                     {formatDate(item.createdAt, locale)}
                   </time>
                 </div>
@@ -178,14 +171,14 @@ export function CreditHistory({ history, filter, locale }: Props) {
                         ? "text-muted-foreground"
                         : earned
                           ? "text-[var(--vivida-cyan)]"
-                          : "text-[var(--vivida-pink)]"
+                          : "text-[var(--vivida-pink)]",
                     )}
                   >
                     {earned ? "+" : item.amount < 0 ? "−" : ""}
                     {Math.abs(item.amount)}
                   </div>
                   <div className="mt-0.5 text-[11px] tabular-nums text-muted-foreground">
-                    {am ? "Մնացորդ" : en ? "Balance" : "ბალანსი"}: {item.balanceAfter}
+                    {en ? "Balance" : "ბალანსი"}: {item.balanceAfter}
                   </div>
                 </div>
               </li>
@@ -196,7 +189,7 @@ export function CreditHistory({ history, filter, locale }: Props) {
 
       {history.totalPages > 1 && (
         <nav
-          aria-label={am ? "Պատմության էջեր" : en ? "History pages" : "ისტორიის გვერდები"}
+          aria-label={en ? "History pages" : "ისტორიის გვერდები"}
           className="mt-3 flex items-center justify-between border-t border-border/60 pt-4"
         >
           {history.page > 1 ? (
@@ -205,7 +198,7 @@ export function CreditHistory({ history, filter, locale }: Props) {
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium transition-colors hover:bg-card"
             >
               <ArrowLeft className="size-3.5" />
-              {am ? "Նախորդ" : en ? "Previous" : "წინა"}
+              {en ? "Previous" : "წინა"}
             </Link>
           ) : (
             <span />
@@ -218,7 +211,7 @@ export function CreditHistory({ history, filter, locale }: Props) {
               href={historyHref(filter, history.page + 1)}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium transition-colors hover:bg-card"
             >
-              {am ? "Հաջորդ" : en ? "Next" : "შემდეგი"}
+              {en ? "Next" : "შემდეგი"}
               <ArrowRight className="size-3.5" />
             </Link>
           ) : (

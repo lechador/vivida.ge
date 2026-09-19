@@ -19,29 +19,18 @@ export function StepTime({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
-  const am = locale === "am";
   const minuteRef = useRef<HTMLInputElement>(null);
 
-  const headingText = am
-    ? "Ճշգրիտ ժամը նույնպես կարևոր է:"
-    : en
+  const headingText = en
     ? "The exact time matters too."
     : "ზუსტი დროც მნიშვნელოვანია.";
-  const descText = am
-    ? "Ծննդյան ժամը բացահայտում է ձեր Ասցենդենտը և տները՝ քարտեզի ամենախորքային շերտը:"
-    : en
+  const descText = en
     ? "Your birth time reveals your rising sign and houses—the chart's deepest layer."
     : "დაბადების დრო ხსნის შენს ამომავალ ნიშანსა და სახლებს — რუკის ყველაზე ღრმა შრეს.";
-  const hourLabel = am ? "Ժամ" : en ? "Hour" : "საათი";
-  const minuteLabel = am ? "Րոպե" : en ? "Minute" : "წუთი";
-  const unknownLabel = am
-    ? "Չգիտեմ ճշգրիտ ժամը"
-    : en
-    ? "I don't know the exact time"
-    : "არ ვიცი ზუსტი დრო";
-  const unknownHint = am
-    ? "Այս դեպքում կօգտագործենք 12:00: Ձեր Արևը և մոլորակների մեծ մասը կլինեն ճշգրիտ, բայց Ասցենդենտը և տները կարող են լինել մոտավոր:"
-    : en
+  const hourLabel = en ? "Hour" : "საათი";
+  const minuteLabel = en ? "Minute" : "წუთი";
+  const unknownLabel = en ? "I don't know the exact time" : "არ ვიცი ზუსტი დრო";
+  const unknownHint = en
     ? "We'll use 12:00 in this case. Your Sun and most planets will remain accurate, but your rising sign and houses may not be."
     : "ამ შემთხვევაში, დროს 12:00-ად ჩავთვლით. შენი მზე და პლანეტების უმეტესობა ზუსტი იქნება, თუმცა ამომავალი ნიშანი და სახლები, შესაძლოა, არ იყოს ზუსტი.";
 
@@ -57,7 +46,7 @@ export function StepTime({
       <div
         className={cn(
           "mx-auto grid max-w-xs grid-cols-2 gap-3 transition-opacity",
-          value.unknown && "pointer-events-none opacity-40"
+          value.unknown && "pointer-events-none opacity-40",
         )}
       >
         <div className="space-y-1.5">
@@ -107,7 +96,7 @@ export function StepTime({
           "mx-auto flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium transition-all",
           value.unknown
             ? "border-[var(--vivida-cyan)]/60 bg-[var(--vivida-cyan)]/10 text-[var(--vivida-cyan)]"
-            : "border-border text-muted-foreground hover:text-foreground"
+            : "border-border text-muted-foreground hover:text-foreground",
         )}
       >
         <span
@@ -115,7 +104,7 @@ export function StepTime({
             "size-3 rounded-full border-2 transition-colors",
             value.unknown
               ? "border-[var(--vivida-cyan)] bg-[var(--vivida-cyan)]"
-              : "border-muted-foreground"
+              : "border-muted-foreground",
           )}
         />
         {unknownLabel}
@@ -130,9 +119,9 @@ export function StepTime({
   );
 }
 
-export function validateTime(value: TimeValue):
-  | { ok: true; time: string | null }
-  | { ok: false } {
+export function validateTime(
+  value: TimeValue,
+): { ok: true; time: string | null } | { ok: false } {
   if (value.unknown) return { ok: true, time: null };
   const h = Number(value.hour);
   const m = Number(value.minute);

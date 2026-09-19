@@ -14,7 +14,9 @@ vi.mock("@/lib/credits", async () => {
   );
   return { creditPackForCountry: config.creditPackForCountry };
 });
-vi.mock("@/lib/premium", () => ({ getBillingIdentity: mocks.getBillingIdentity }));
+vi.mock("@/lib/premium", () => ({
+  getBillingIdentity: mocks.getBillingIdentity,
+}));
 vi.mock("@/lib/stripe", () => ({
   createCreditCheckoutSession: mocks.createCheckout,
   isStripeConfigured: mocks.isStripeConfigured,
@@ -74,16 +76,18 @@ describe("POST /api/credits/checkout", () => {
       currency: "GEL",
       contentId: "credits_30",
     });
-    expect(mocks.createCheckout).toHaveBeenCalledWith(expect.objectContaining({
-      userId: "user-1",
-      email: "user@example.com",
-      origin: "https://vivida.ge",
-      credits: 30,
-      amountMinor: 690,
-      currency: "gel",
-      locale: "ka",
-      trackingMetadata: { tracking_consent: "denied" },
-    }));
+    expect(mocks.createCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: "user-1",
+        email: "user@example.com",
+        origin: "https://vivida.ge",
+        credits: 30,
+        amountMinor: 690,
+        currency: "gel",
+        locale: "ka",
+        trackingMetadata: { tracking_consent: "denied" },
+      }),
+    );
   });
 
   it("creates an English Checkout session on the international domain", async () => {
@@ -97,7 +101,12 @@ describe("POST /api/credits/checkout", () => {
 
     expect(response.status).toBe(200);
     expect(mocks.createCheckout).toHaveBeenCalledWith(
-      expect.objectContaining({ locale: "en", credits: 75, amountMinor: 1490, currency: "gel" }),
+      expect.objectContaining({
+        locale: "en",
+        credits: 75,
+        amountMinor: 1490,
+        currency: "gel",
+      }),
     );
   });
 
@@ -108,14 +117,18 @@ describe("POST /api/credits/checkout", () => {
 
     expect(response.status).toBe(200);
     expect(mocks.createCheckout).toHaveBeenCalledWith(
-      expect.objectContaining({ credits: 75, amountMinor: 599, currency: "gbp" }),
+      expect.objectContaining({
+        credits: 75,
+        amountMinor: 599,
+        currency: "gbp",
+      }),
     );
   });
 
   it("creates an Armenian AMD Checkout session for Armenian residents", async () => {
     mocks.getBillingIdentity.mockResolvedValue({
       countryCode: "AM",
-      interfaceLanguage: "am",
+      interfaceLanguage: "en",
     });
 
     const response = await POST(
@@ -139,7 +152,7 @@ describe("POST /api/credits/checkout", () => {
         credits: 30,
         amountMinor: 99_000,
         currency: "amd",
-        locale: "am",
+        locale: "en",
       }),
     );
   });

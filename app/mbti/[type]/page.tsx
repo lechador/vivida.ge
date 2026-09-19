@@ -12,7 +12,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { MbtiProfileSections } from "@/components/mbti/mbti-profile-sections";
 import { MbtiFamousPeople } from "@/components/mbti/mbti-famous-people";
 import { MbtiEnglishTypeDetails } from "@/components/mbti/mbti-english-type-details";
-import { MbtiArmenianTypeDetails } from "@/components/mbti/mbti-armenian-type-details";
+
 import { mbtiCharacterSrc } from "@/lib/mbti-characters";
 import {
   getMbtiLibraryEntries,
@@ -20,10 +20,19 @@ import {
   mbtiTypeKey,
   MBTI_TYPES,
 } from "@/lib/mbti-library";
-import { ALL_MBTI_SLUGS, buildMbtiSeo, buildMbtiSeoEn, buildMbtiSeoAm, mbtiCodeFromSlug } from "@/lib/seo/mbti-seo";
+import {
+  ALL_MBTI_SLUGS,
+  buildMbtiSeo,
+  buildMbtiSeoEn,
+  mbtiCodeFromSlug,
+} from "@/lib/seo/mbti-seo";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import {
+  ENGLISH_SITE_URL,
+  GEORGIAN_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 // Library-backed content is stable; refresh daily so admin edits propagate.
 export const revalidate = 86400;
@@ -43,31 +52,6 @@ export async function generateMetadata({
   const locale = await getRequestLocale();
   const seoKa = buildMbtiSeo(code);
   const seoEn = buildMbtiSeoEn(code);
-  const seoAm = buildMbtiSeoAm(code);
-
-  if (locale === "am") {
-    const url = `${ARMENIAN_SITE_URL}/mbti/${seoAm.slug}`;
-    return {
-      title: { absolute: `${seoAm.pageTitle} — Vivida` },
-      description: seoAm.metaDescription,
-      keywords: seoAm.queries,
-      alternates: localizedAlternates(`/am/mbti/${seoAm.slug}`, `/mbti/${seoKa.slug}`, "am"),
-      openGraph: {
-        type: "article",
-        url,
-        title: seoAm.pageTitle,
-        description: seoAm.metaDescription,
-        siteName: "Vivida",
-        locale: "hy_AM",
-        images: [DEFAULT_OG_IMAGE],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: seoAm.pageTitle,
-        description: seoAm.metaDescription,
-      },
-    };
-  }
 
   const en = locale === "en";
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
@@ -80,7 +64,11 @@ export async function generateMetadata({
     title: { absolute: title },
     description,
     keywords: en ? seoEn.queries : seoKa.queries,
-    alternates: localizedAlternates(`/mbti/${seoKa.slug}`, `/mbti/${seoKa.slug}`, en ? "en" : "ka"),
+    alternates: localizedAlternates(
+      `/mbti/${seoKa.slug}`,
+      `/mbti/${seoKa.slug}`,
+      en ? "en" : "ka",
+    ),
     openGraph: {
       type: "article",
       url,
@@ -100,7 +88,10 @@ export async function generateMetadata({
 }
 
 function paragraphs(text: string): string[] {
-  return text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  return text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 }
 
 export default async function MbtiTypePage({
@@ -113,20 +104,18 @@ export default async function MbtiTypePage({
   if (!code) notFound();
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
   const seoKa = buildMbtiSeo(code);
   const seoEn = buildMbtiSeoEn(code);
-  const seoAm = buildMbtiSeoAm(code);
-  const siteUrl = am ? ARMENIAN_SITE_URL : en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const url = `${siteUrl}/mbti/${seoKa.slug}`;
-  const archetype = am ? seoAm.archetype : en ? seoEn.archetype : seoKa.archetypeKa;
-  const tagline = am ? seoAm.tagline : en ? seoEn.tagline : seoKa.taglineKa;
-  const pageTitle = am ? seoAm.pageTitle : en ? seoEn.pageTitle : seoKa.pageTitle;
-  const metaDescription = am ? seoAm.metaDescription : en ? seoEn.metaDescription : seoKa.metaDescription;
-  const faq = am ? seoAm.faq : en ? seoEn.faq : seoKa.faq;
-  const queries = am ? seoAm.queries : en ? seoEn.queries : seoKa.queries;
+  const archetype = en ? seoEn.archetype : seoKa.archetypeKa;
+  const tagline = en ? seoEn.tagline : seoKa.taglineKa;
+  const pageTitle = en ? seoEn.pageTitle : seoKa.pageTitle;
+  const metaDescription = en ? seoEn.metaDescription : seoKa.metaDescription;
+  const faq = en ? seoEn.faq : seoKa.faq;
+  const queries = en ? seoEn.queries : seoKa.queries;
 
-  const library = en || am
+  const library = en
     ? null
     : await Promise.all([
         getMbtiLibraryEntries([mbtiTypeKey(code)]),
@@ -152,15 +141,21 @@ export default async function MbtiTypePage({
     }),
     faqLd(faq),
     breadcrumbLd([
-      { name: am ? "Գլխավոր" : en ? "Home" : "მთავარი", url: siteUrl },
-      { name: am ? "Թեստեր" : en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
-      { name: am ? "Անհատականության տիպեր" : en ? "Personality types" : "პიროვნების ტიპები", url: `${siteUrl}/mbti` },
+      { name: en ? "Home" : "მთავარი", url: siteUrl },
+      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
+      {
+        name: en ? "Personality types" : "პიროვნების ტიპები",
+        url: `${siteUrl}/mbti`,
+      },
       { name: code, url },
     ]),
   ];
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
@@ -171,17 +166,21 @@ export default async function MbtiTypePage({
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      <SmartHeader active="tests" locale={locale} georgianPath={`/mbti/${seoKa.slug}`} />
+      <SmartHeader
+        active="tests"
+        locale={locale}
+        georgianPath={`/mbti/${seoKa.slug}`}
+      />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
         {/* Breadcrumb */}
         <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-          <Link href={am ? "/am/tests" : "/tests"} className="hover:text-foreground">
-            {am ? "Թեստեր" : en ? "Tests" : "ტესტები"}
+          <Link href={"/tests"} className="hover:text-foreground">
+            {en ? "Tests" : "ტესტები"}
           </Link>
           <span>/</span>
-          <Link href={am ? "/am/mbti" : "/mbti"} className="hover:text-foreground">
-            {am ? "Անհատականության տիպեր" : en ? "Personality types" : "პიროვნების ტიპები"}
+          <Link href={"/mbti"} className="hover:text-foreground">
+            {en ? "Personality types" : "პიროვნების ტიპები"}
           </Link>
           <span>/</span>
           <span className="text-foreground">{code}</span>
@@ -198,7 +197,7 @@ export default async function MbtiTypePage({
             className="mx-auto mb-5 h-40 w-40 object-contain drop-shadow-[0_8px_30px_rgba(167,139,250,0.35)] sm:h-52 sm:w-52"
           />
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {am ? seoAm.group.labelAm : en ? seoEn.group.labelEn : seoKa.group.labelKa}
+            {en ? seoEn.group.labelEn : seoKa.group.labelKa}
           </div>
           <h1 className="mt-1 text-5xl font-bold tracking-[0.12em] sm:text-7xl">
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
@@ -212,15 +211,17 @@ export default async function MbtiTypePage({
             {tagline}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href={am ? "/am/tests" : "/pirovnebis-testi"}>
+            <Link href={"/pirovnebis-testi"}>
               <Sparkles className="size-4" />
-              {am ? "Բացահայտիր քո տիպը — անցիր թեստը" : en ? "Discover your type — take the test" : "გაიგე შენი ტიპი — გაიარე ტესტი"}
+              {en
+                ? "Discover your type — take the test"
+                : "გაიგე შენი ტიპი — გაიარე ტესტი"}
             </Link>
           </Button>
         </header>
 
         {/* Portrait */}
-        {!en && !am && portrait && (
+        {!en && portrait && (
           <article className="mt-8 space-y-4 rounded-2xl border border-border bg-card/50 p-6 text-[15px] leading-relaxed text-foreground/90 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
             <h2 className="text-lg font-semibold tracking-tight">
               {code} ({seoKa.archetypeKa}) — ვინ არის ეს ტიპი
@@ -232,7 +233,11 @@ export default async function MbtiTypePage({
         )}
 
         {/* Strengths/weaknesses + life-domain sections */}
-        {am ? <MbtiArmenianTypeDetails type={code} /> : en ? <MbtiEnglishTypeDetails type={code} /> : <MbtiProfileSections sections={sections} />}
+        {en ? (
+          <MbtiEnglishTypeDetails type={code} />
+        ) : (
+          <MbtiProfileSections sections={sections} />
+        )}
 
         {/* Famous people */}
         <div className="mt-4">
@@ -242,7 +247,7 @@ export default async function MbtiTypePage({
         {/* FAQ */}
         <section className="mt-10">
           <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {am ? "Հաճախ տրվող հարցեր" : en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
+            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="space-y-3">
             {faq.map((item) => (
@@ -252,7 +257,9 @@ export default async function MbtiTypePage({
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium [&::-webkit-details-marker]:hidden">
                   {item.q}
-                  <span className="text-muted-foreground transition-transform group-open:rotate-45">+</span>
+                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
                 </summary>
                 <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
                   {item.a}
@@ -265,18 +272,16 @@ export default async function MbtiTypePage({
         {/* CTA */}
         <div className="mt-10 rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
-            {am ? "Ո՞ր անհատականության տիպն ես դու:" : en ? "Which personality type are you?" : "რომელი ტიპი ხარ შენ?"}
+            {en ? "Which personality type are you?" : "რომელი ტიპი ხარ შენ?"}
           </h2>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-            {am
-              ? "Անցեք անվճար անձի թեստը և բացահայտեք ձեր նախասիրությունները:"
-              : en
+            {en
               ? "Take the free 60-question personality test and discover your preferences in about seven minutes."
               : "გაიარე უფასო Astro-MBTI ტესტი და აღმოაჩინე შენი ზუსტი ტიპი — 60 კითხვა, 7 წუთი."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
-            <Link href={am ? "/am/tests" : "/pirovnebis-testi"}>
-              {am ? "Սկսել թեստը" : en ? "Start the test" : "დაიწყე ტესტი"}
+            <Link href={"/pirovnebis-testi"}>
+              {en ? "Start the test" : "დაიწყე ტესტი"}
             </Link>
           </Button>
         </div>
@@ -284,28 +289,31 @@ export default async function MbtiTypePage({
         {/* Internal links — the other 15 types */}
         <section className="mt-10">
           <h2 className="mb-4 text-sm font-semibold tracking-tight">
-            {am ? "16 անհատականության տիպեր" : en ? "The 16 personality types" : "16 პიროვნების ტიპი"}
+            {en ? "The 16 personality types" : "16 პიროვნების ტიპი"}
           </h2>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {others.map((t) => (
               <Link
                 key={t}
-                href={am ? `/am/mbti/${t.toLowerCase()}` : `/mbti/${t.toLowerCase()}`}
+                href={`/mbti/${t.toLowerCase()}`}
                 className="flex flex-col rounded-xl border border-border/60 bg-card/40 px-3 py-2.5 transition-colors hover:border-[var(--vivida-violet)]/50 hover:bg-card/60"
               >
                 <span className="text-sm font-semibold">{t}</span>
                 <span className="text-xs text-muted-foreground">
-                  {am ? buildMbtiSeoAm(t).archetype : en ? buildMbtiSeoEn(t).archetype : buildMbtiSeo(t).archetypeKa}
+                  {en
+                    ? buildMbtiSeoEn(t).archetype
+                    : buildMbtiSeo(t).archetypeKa}
                 </span>
               </Link>
             ))}
           </div>
           <div className="mt-4">
             <Link
-              href={am ? "/am/mbti" : "/mbti"}
+              href={"/mbti"}
               className="inline-flex items-center gap-1 text-sm text-[var(--vivida-cyan)] hover:underline"
             >
-              {am ? "Բոլոր տիպերը" : en ? "View all types" : "ყველა ტიპი"} <ArrowRight className="size-3.5" />
+              {en ? "View all types" : "ყველა ტიპი"}{" "}
+              <ArrowRight className="size-3.5" />
             </Link>
           </div>
         </section>

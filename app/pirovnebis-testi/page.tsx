@@ -10,13 +10,16 @@ import { MbtiTestClient } from "@/components/mbti/mbti-test-client";
 import { TestMusicPlayer } from "@/components/mbti/test-music-player";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
-import { ArmenianMbtiAssessmentPage } from "@/components/tests/armenian-assessment-pages";
+
 import { PERSONALITY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { MBTI_QUESTIONS_EN } from "@/lib/mbti-questions";
-import { ARMENIAN_SITE_URL, DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
-import { MBTI_QUESTIONS_AM } from "@/lib/tests-content-am";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -25,49 +28,81 @@ const DESCRIPTION =
   "გაიარე უფასო პიროვნების ტესტი ქართულად — 60 კითხვა, ~7 წუთი. გაიგე შენი MBTI ტიპი 16-დან, ძლიერი და სუსტი მხარეები, ურთიერთობები და კარიერა. რეგისტრაციის გარეშე.";
 
 const TITLE_EN = "Free Personality Test — Discover Your 16-Type Profile";
-const DESCRIPTION_EN = "Take a free 60-question personality test and explore your preferences across energy, information, decisions, structure and identity.";
+const DESCRIPTION_EN =
+  "Take a free 60-question personality test and explore your preferences across energy, information, decisions, structure and identity.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    const title = "Անվճար անհատականության թեստ — բացահայտեք ձեր 16 տիպերից մեկը";
-    const description = "Պատասխանեք 60 հարցի և բացահայտեք ձեր նախընտրությունները էներգիայի, տեղեկատվության, որոշումների, կառուցվածքի և ինքնության ոլորտներում։";
-    const url = `${ARMENIAN_SITE_URL}/pirovnebis-testi`;
-    return { title: { absolute: title }, description, keywords: ["անվճար անհատականության թեստ", "MBTI թեստ հայերեն", "16 տիպերի թեստ", "հոգեբանական թեստ"], alternates: localizedAlternates("/am/pirovnebis-testi", "/pirovnebis-testi", "am"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url, title, description, siteName: "Vivida", locale: "hy_AM" }, twitter: { card: "summary_large_image", title, description } };
-  }
   const en = locale === "en";
-  if (en) return { title: { absolute: TITLE_EN }, description: DESCRIPTION_EN, keywords: ["free personality test", "16 personalities test", "MBTI style test", "personality type test"], alternates: localizedAlternates("/pirovnebis-testi", "/pirovnebis-testi", "en"), openGraph: { images: [DEFAULT_OG_IMAGE], type: "website", url: `${ENGLISH_SITE_URL}/pirovnebis-testi`, title: TITLE_EN, description: DESCRIPTION_EN, siteName: "Vivida", locale: "en_US" }, twitter: { card: "summary_large_image", title: TITLE_EN, description: DESCRIPTION_EN } };
+  if (en)
+    return {
+      title: { absolute: TITLE_EN },
+      description: DESCRIPTION_EN,
+      keywords: [
+        "free personality test",
+        "16 personalities test",
+        "MBTI style test",
+        "personality type test",
+      ],
+      alternates: localizedAlternates(
+        "/pirovnebis-testi",
+        "/pirovnebis-testi",
+        "en",
+      ),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ENGLISH_SITE_URL}/pirovnebis-testi`,
+        title: TITLE_EN,
+        description: DESCRIPTION_EN,
+        siteName: "Vivida",
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: TITLE_EN,
+        description: DESCRIPTION_EN,
+      },
+    };
   return {
-  title: { absolute: TITLE },
-  description: DESCRIPTION,
-  keywords: [
-    "პიროვნების ტესტი",
-    "პიროვნების ტესტი ქართულად",
-    "mbti ტესტი",
-    "mbti ტესტი ქართულად",
-    "16 personalities ქართულად",
-    "ფსიქოლოგიური ტესტი",
-    "უფასო პიროვნების ტესტი",
-    "ხასიათის ტესტი",
-    "ტესტი ხასიათზე",
-    "რომელი ტიპი ვარ",
-    "pirovnebis testi",
-    "mbti testi qartulad",
-    "psikologiuri testi",
-  ],
-  // Reciprocal — the English side already points here, and hreflang pairs
-  // are discarded unless both directions agree.
-  alternates: localizedAlternates("/pirovnebis-testi", "/pirovnebis-testi", "ka"),
-  openGraph: {
-    images: [DEFAULT_OG_IMAGE],
-    type: "website",
-    url: `${SITE_URL}/pirovnebis-testi`,
-    title: TITLE,
+    title: { absolute: TITLE },
     description: DESCRIPTION,
-    siteName: "Vivida",
-    locale: "ka_GE",
-  },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+    keywords: [
+      "პიროვნების ტესტი",
+      "პიროვნების ტესტი ქართულად",
+      "mbti ტესტი",
+      "mbti ტესტი ქართულად",
+      "16 personalities ქართულად",
+      "ფსიქოლოგიური ტესტი",
+      "უფასო პიროვნების ტესტი",
+      "ხასიათის ტესტი",
+      "ტესტი ხასიათზე",
+      "რომელი ტიპი ვარ",
+      "pirovnebis testi",
+      "mbti testi qartulad",
+      "psikologiuri testi",
+    ],
+    // Reciprocal — the English side already points here, and hreflang pairs
+    // are discarded unless both directions agree.
+    alternates: localizedAlternates(
+      "/pirovnebis-testi",
+      "/pirovnebis-testi",
+      "ka",
+    ),
+    openGraph: {
+      images: [DEFAULT_OG_IMAGE],
+      type: "website",
+      url: `${SITE_URL}/pirovnebis-testi`,
+      title: TITLE,
+      description: DESCRIPTION,
+      siteName: "Vivida",
+      locale: "ka_GE",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: TITLE,
+      description: DESCRIPTION,
+    },
   };
 }
 
@@ -95,9 +130,7 @@ export default async function TestPage() {
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
-  const questions = am ? MBTI_QUESTIONS_AM : en ? MBTI_QUESTIONS_EN : await getMbtiQuestions();
-  if (am) return <ArmenianMbtiAssessmentPage authed={authed} questions={questions} />;
+  const questions = en ? MBTI_QUESTIONS_EN : await getMbtiQuestions();
   const siteUrl = en ? ENGLISH_SITE_URL : SITE_URL;
   const description = en ? DESCRIPTION_EN : DESCRIPTION;
 
@@ -114,23 +147,44 @@ export default async function TestPage() {
       about: {
         "@type": "Thing",
         name: en ? "Personality type (MBTI-style)" : "პიროვნების ტიპი (MBTI)",
-        alternateName: en ? ["MBTI", "16 personality types", "personality test"] : ["MBTI", "16 personalities", "პიროვნების ტესტი"],
+        alternateName: en
+          ? ["MBTI", "16 personality types", "personality test"]
+          : ["MBTI", "16 personalities", "პიროვნების ტესტი"],
       },
     },
-    faqLd(en ? [
-      { q: "How many questions are in the test?", a: "There are 60 statements answered on a seven-point agreement scale." },
-      { q: "Is the personality test free?", a: "You can take the test and see your type for free. An account lets you save the result; optional deeper analysis is clearly marked." },
-      { q: "What does the result include?", a: "You receive a five-letter profile and percentages across energy, information, decisions, structure and identity." },
-    ] : TEST_FAQ),
+    faqLd(
+      en
+        ? [
+            {
+              q: "How many questions are in the test?",
+              a: "There are 60 statements answered on a seven-point agreement scale.",
+            },
+            {
+              q: "Is the personality test free?",
+              a: "You can take the test and see your type for free. An account lets you save the result; optional deeper analysis is clearly marked.",
+            },
+            {
+              q: "What does the result include?",
+              a: "You receive a five-letter profile and percentages across energy, information, decisions, structure and identity.",
+            },
+          ]
+        : TEST_FAQ,
+    ),
     breadcrumbLd([
       { name: en ? "Home" : "მთავარი", url: siteUrl },
       { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
-      { name: en ? "Personality Test" : "პიროვნების ტესტი", url: `${siteUrl}/pirovnebis-testi` },
+      {
+        name: en ? "Personality Test" : "პიროვნების ტესტი",
+        url: `${siteUrl}/pirovnebis-testi`,
+      },
     ]),
   ];
 
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_35%_at_15%_80%,oklch(0.30_0.16_350/0.4),transparent_70%)]"
@@ -147,7 +201,15 @@ export default async function TestPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      {authed ? <AppHeader authed active="tests" /> : <SmartHeader active="tests" locale={locale} georgianPath="/pirovnebis-testi" />}
+      {authed ? (
+        <AppHeader authed active="tests" />
+      ) : (
+        <SmartHeader
+          active="tests"
+          locale={locale}
+          georgianPath="/pirovnebis-testi"
+        />
+      )}
 
       <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-4 pb-10 pt-4 sm:px-6 sm:pb-14 sm:pt-6">
         <header className="mb-5 text-center">
@@ -161,7 +223,9 @@ export default async function TestPage() {
             </span>
           </h1>
           <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-            {en ? "60 questions · about 7 minutes · personal profile" : "60 კითხვა · ~7 წუთი · ღრმა, პერსონალური ანალიზი"}
+            {en
+              ? "60 questions · about 7 minutes · personal profile"
+              : "60 კითხვა · ~7 წუთი · ღრმა, პერსონალური ანალიზი"}
           </p>
         </header>
 
@@ -174,36 +238,69 @@ export default async function TestPage() {
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
-            {en ? "What does this personality test measure?" : "რა არის პიროვნების ტესტი?"}
+            {en
+              ? "What does this personality test measure?"
+              : "რა არის პიროვნების ტესტი?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {en ? <>This MBTI-style framework describes preferences across four paired dimensions, plus an identity dimension. There is no “good” or “bad” type: the result describes <em>how</em> you tend to process information and make decisions, not how intelligent you are.</> : <>პიროვნების ტესტი (ცნობილი როგორც <strong>MBTI</strong> ან 16&nbsp;Personalities) შენს ფსიქოლოგიურ ტიპს განსაზღვრავს ოთხი ღერძის მიხედვით. ეს არ არის „კარგი“ ან „ცუდი“ შედეგი — ტიპი აღწერს იმას, <em>როგორ</em> ფიქრობ და იღებ გადაწყვეტილებას, და არა იმას, რამდენად ჭკვიანი ხარ.</>}
+            {en ? (
+              <>
+                This MBTI-style framework describes preferences across four
+                paired dimensions, plus an identity dimension. There is no
+                “good” or “bad” type: the result describes <em>how</em> you tend
+                to process information and make decisions, not how intelligent
+                you are.
+              </>
+            ) : (
+              <>
+                პიროვნების ტესტი (ცნობილი როგორც <strong>MBTI</strong> ან
+                16&nbsp;Personalities) შენს ფსიქოლოგიურ ტიპს განსაზღვრავს ოთხი
+                ღერძის მიხედვით. ეს არ არის „კარგი“ ან „ცუდი“ შედეგი — ტიპი
+                აღწერს იმას, <em>როგორ</em> ფიქრობ და იღებ გადაწყვეტილებას, და
+                არა იმას, რამდენად ჭკვიანი ხარ.
+              </>
+            )}
           </p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {(en ? [
-              { t: "E ↔ I — Energy", d: "Whether interaction or solitude tends to recharge you" },
-              { t: "S ↔ N — Information", d: "Concrete facts versus patterns and possibilities" },
-              { t: "T ↔ F — Decisions", d: "Impersonal logic versus values and human impact" },
-              { t: "J ↔ P — Structure", d: "Planning and closure versus flexibility and open options" },
-            ] : [
-              {
-                t: "E ↔ I — ენერგია",
-                d: "ენერგიას ადამიანებისგან იღებ თუ მარტოობისგან",
-              },
-              {
-                t: "S ↔ N — აღქმა",
-                d: "კონკრეტულ ფაქტებს ენდობი თუ იდეებსა და შესაძლებლობებს",
-              },
-              {
-                t: "T ↔ F — გადაწყვეტილება",
-                d: "ლოგიკით წყვეტ თუ ღირებულებებითა და ადამიანებით",
-              },
-              {
-                t: "J ↔ P — ცხოვრების წესი",
-                d: "გეგმა გირჩევნია თუ მოქნილობა და ღია ვარიანტები",
-              },
-            ]).map((x) => (
+            {(en
+              ? [
+                  {
+                    t: "E ↔ I — Energy",
+                    d: "Whether interaction or solitude tends to recharge you",
+                  },
+                  {
+                    t: "S ↔ N — Information",
+                    d: "Concrete facts versus patterns and possibilities",
+                  },
+                  {
+                    t: "T ↔ F — Decisions",
+                    d: "Impersonal logic versus values and human impact",
+                  },
+                  {
+                    t: "J ↔ P — Structure",
+                    d: "Planning and closure versus flexibility and open options",
+                  },
+                ]
+              : [
+                  {
+                    t: "E ↔ I — ენერგია",
+                    d: "ენერგიას ადამიანებისგან იღებ თუ მარტოობისგან",
+                  },
+                  {
+                    t: "S ↔ N — აღქმა",
+                    d: "კონკრეტულ ფაქტებს ენდობი თუ იდეებსა და შესაძლებლობებს",
+                  },
+                  {
+                    t: "T ↔ F — გადაწყვეტილება",
+                    d: "ლოგიკით წყვეტ თუ ღირებულებებითა და ადამიანებით",
+                  },
+                  {
+                    t: "J ↔ P — ცხოვრების წესი",
+                    d: "გეგმა გირჩევნია თუ მოქნილობა და ღია ვარიანტები",
+                  },
+                ]
+            ).map((x) => (
               <div
                 key={x.t}
                 className="rounded-2xl border border-border bg-background/40 px-4 py-3.5"
@@ -220,18 +317,32 @@ export default async function TestPage() {
             {en ? "How to use your result" : "რით განსხვავდება Astro-MBTI?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {en ? "Treat your type as a vocabulary for recurring preferences, not a fixed box or diagnosis. People can adapt across situations, and percentages near the midpoint often indicate genuine flexibility." : "კლასიკური ტესტი მხოლოდ პასუხებს აფასებს. Vivida-ზე შედეგს ემატება ასტროლოგიური ფენა — შენი ნიშნის ტემპერამენტი ისე ეხმიანება ტიპს, რომ აღწერა უფრო ცოცხალი და ამოსაცნობი ხდება. ორივე ნაწილი ცალკეც იკითხება, თუ მხოლოდ ერთი გაინტერესებს."}
+            {en
+              ? "Treat your type as a vocabulary for recurring preferences, not a fixed box or diagnosis. People can adapt across situations, and percentages near the midpoint often indicate genuine flexibility."
+              : "კლასიკური ტესტი მხოლოდ პასუხებს აფასებს. Vivida-ზე შედეგს ემატება ასტროლოგიური ფენა — შენი ნიშნის ტემპერამენტი ისე ეხმიანება ტიპს, რომ აღწერა უფრო ცოცხალი და ამოსაცნობი ხდება. ორივე ნაწილი ცალკეც იკითხება, თუ მხოლოდ ერთი გაინტერესებს."}
           </p>
 
           <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="mt-4 space-y-3">
-            {(en ? [
-              { q: "How many questions are there?", a: "There are 60 statements on a seven-point agreement scale." },
-              { q: "Is the test free?", a: "Yes. You can complete the test and see your type for free." },
-              { q: "Is this a diagnosis?", a: "No. It is a self-reflection framework, not a clinical assessment." },
-            ] : TEST_FAQ).map((item) => (
+            {(en
+              ? [
+                  {
+                    q: "How many questions are there?",
+                    a: "There are 60 statements on a seven-point agreement scale.",
+                  },
+                  {
+                    q: "Is the test free?",
+                    a: "Yes. You can complete the test and see your type for free.",
+                  },
+                  {
+                    q: "Is this a diagnosis?",
+                    a: "No. It is a self-reflection framework, not a clinical assessment.",
+                  },
+                ]
+              : TEST_FAQ
+            ).map((item) => (
               <details
                 key={item.q}
                 className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5"
@@ -255,33 +366,52 @@ export default async function TestPage() {
             {en ? "Explore more" : "16 ტიპი და სხვა ტესტები"}
           </h2>
           <div className="grid gap-2 sm:grid-cols-2">
-            {(en ? [
-              { href: "/mbti", label: "16 personality types", sub: "Browse all type descriptions" },
-              { href: "/iq-testi", label: "IQ Test", sub: "Adaptive reasoning assessment" },
-              { href: "/eq-testi", label: "EQ Test", sub: "Emotional intelligence profile" },
-              { href: "/big-five", label: "Big Five Test", sub: "Five broad personality traits" },
-            ] : [
-              {
-                href: "/mbti",
-                label: "16 პიროვნების ტიპი",
-                sub: "ყველა ტიპის სრული აღწერა",
-              },
-              {
-                href: "/iq-testi",
-                label: "IQ ტესტი",
-                sub: "ადაპტიური ინტელექტის ტესტი",
-              },
-              {
-                href: "/eq-testi",
-                label: "EQ ტესტი",
-                sub: "ემოციური ინტელექტის შეფასება",
-              },
-              {
-                href: "/big-five",
-                label: "Big Five ტესტი",
-                sub: "დიდი ხუთეული — 5 თვისება",
-              },
-            ]).map((t) => (
+            {(en
+              ? [
+                  {
+                    href: "/mbti",
+                    label: "16 personality types",
+                    sub: "Browse all type descriptions",
+                  },
+                  {
+                    href: "/iq-testi",
+                    label: "IQ Test",
+                    sub: "Adaptive reasoning assessment",
+                  },
+                  {
+                    href: "/eq-testi",
+                    label: "EQ Test",
+                    sub: "Emotional intelligence profile",
+                  },
+                  {
+                    href: "/big-five",
+                    label: "Big Five Test",
+                    sub: "Five broad personality traits",
+                  },
+                ]
+              : [
+                  {
+                    href: "/mbti",
+                    label: "16 პიროვნების ტიპი",
+                    sub: "ყველა ტიპის სრული აღწერა",
+                  },
+                  {
+                    href: "/iq-testi",
+                    label: "IQ ტესტი",
+                    sub: "ადაპტიური ინტელექტის ტესტი",
+                  },
+                  {
+                    href: "/eq-testi",
+                    label: "EQ ტესტი",
+                    sub: "ემოციური ინტელექტის შეფასება",
+                  },
+                  {
+                    href: "/big-five",
+                    label: "Big Five ტესტი",
+                    sub: "დიდი ხუთეული — 5 თვისება",
+                  },
+                ]
+            ).map((t) => (
               <Link
                 key={t.href}
                 href={t.href}
@@ -298,7 +428,19 @@ export default async function TestPage() {
           </div>
         </section>
 
-        <PopularSearches queries={en ? ["free personality type test", "16 personalities test", "MBTI style test", "discover my personality type"] : PERSONALITY_LATIN_QUERIES} locale={locale} />
+        <PopularSearches
+          queries={
+            en
+              ? [
+                  "free personality type test",
+                  "16 personalities test",
+                  "MBTI style test",
+                  "discover my personality type",
+                ]
+              : PERSONALITY_LATIN_QUERIES
+          }
+          locale={locale}
+        />
       </section>
 
       <SiteFooter locale={locale} />

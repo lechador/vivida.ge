@@ -20,25 +20,14 @@ import { localizedAlternates } from "@/lib/seo/locales";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
   return {
-    title: am
-      ? "Ինչպես է աշխատում Vivida-ն"
-      : en
-        ? "How Vivida works"
-        : "როგორ მუშაობს",
-    description: am
-      ? "Տեսեք, թե ինչպես է Vivida-ն ծննդյան տվյալները վերածում անձնական նատալ քարտեզի, կանխատեսման և AI մեկնաբանության։"
-      : en
-        ? "See how Vivida turns your birth details into a personal chart, forecast, and AI-powered interpretation."
-        : "ნახე როგორ ქმნის Vivida შენს პერსონალურ კოსმიურ რუკას — დაბადების მონაცემიდან AI ინტერპრეტაციამდე.",
+    title: en ? "How Vivida works" : "როგორ მუშაობს",
+    description: en
+      ? "See how Vivida turns your birth details into a personal chart, forecast, and AI-powered interpretation."
+      : "ნახე როგორ ქმნის Vivida შენს პერსონალურ კოსმიურ რუკას — დაბადების მონაცემიდან AI ინტერპრეტაციამდე.",
     // Same-path pair — see the note in app/features/page.tsx: the sitemap
     // declared this pair from the English side only, so it never held.
-    alternates: localizedAlternates(
-      am ? "/am/how-it-works" : "/how-it-works",
-      "/how-it-works",
-      locale,
-    ),
+    alternates: localizedAlternates("/how-it-works", "/how-it-works", locale),
   };
 }
 
@@ -140,56 +129,10 @@ const STEPS_EN: Step[] = [
   },
 ];
 
-const STEPS_AM: Step[] = [
-  {
-    number: "01",
-    Icon: UserPlus,
-    title: "Ստեղծեք հաշիվ",
-    body: "Գրանցվեք Google-ով կամ էլփոստով և սկսեք մի քանի ակնթարթում։ Ձեր հաշիվը քարտեզն ու մեկնաբանությունները հասանելի է պահում բոլոր սարքերում։",
-    hue: "oklch(0.78 0.18 305)",
-  },
-  {
-    number: "02",
-    Icon: Calendar,
-    title: "Մուտքագրեք ծննդյան տվյալները",
-    body: "Նշեք ծննդյան ամսաթիվը, ժամը և վայրը։ Vivida-ն գտնում է ճշգրիտ քարտեզի համար անհրաժեշտ կոորդինատներն ու ժամային գոտին։",
-    hue: "oklch(0.85 0.16 85)",
-  },
-  {
-    number: "03",
-    Icon: Compass,
-    title: "Ուսումնասիրեք նատալ քարտեզը",
-    body: "Տեսեք ձեր ծննդյան պահի երկինքը՝ Արեգակը, Լուսինը, ասցենդենտը, 12 տներն ու հիմնական ասպեկտները ինտերակտիվ քարտեզում։",
-    hue: "oklch(0.78 0.15 195)",
-  },
-  {
-    number: "04",
-    Icon: Sparkles,
-    title: "Ստացեք անձնական մեկնաբանություն",
-    body: "Vivida-ն քարտեզը վերածում է ձեր մեծ եռյակի, ուժեղ կողմերի, լարվածությունների և կրկնվող կյանքի թեմաների հասկանալի պատկերի։",
-    hue: "oklch(0.72 0.22 0)",
-  },
-  {
-    number: "05",
-    Icon: Telescope,
-    title: "Բացահայտեք համատեղելիությունը",
-    body: "Համեմատեք երկու քարտեզները սիրո, ընկերության, հաղորդակցության, աճի, քիմիայի և համատեղ աշխատանքի ոլորտներում։",
-    hue: "oklch(0.72 0.22 350)",
-  },
-  {
-    number: "06",
-    Icon: MapPin,
-    title: "Կիսվեք ձեր պայմաններով",
-    body: "Ստեղծեք հանրային պրոֆիլ, որպեսզի մարդիկ գտնեն ձեզ նշանով կամ օգտանունով։ Դուք միշտ վերահսկում եք, թե ինչ եք հրապարակում։",
-    hue: "oklch(0.72 0.18 145)",
-  },
-];
-
 export default async function HowItWorksPage() {
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const am = locale === "am";
-  const steps = am ? STEPS_AM : en ? STEPS_EN : STEPS;
+  const steps = en ? STEPS_EN : STEPS;
   return (
     <main
       lang={locale}
@@ -213,24 +156,18 @@ export default async function HowItWorksPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {am ? "Ինչպես է աշխատում" : en ? "How it works" : "როგორ მუშაობს"}
+          {en ? "How it works" : "როგორ მუშაობს"}
         </div>
         <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-          {am ? "Վեց քայլ դեպի " : en ? "Six steps to " : "ექვსი ნაბიჯი "}
+          {en ? "Six steps to " : "ექვსი ნაბიჯი "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {am
-              ? "ձեր անձնական երկինքը"
-              : en
-                ? "your personal sky"
-                : "შენს კოსმოსამდე"}
+            {en ? "your personal sky" : "შენს კოსმოსამდე"}
           </span>
         </h1>
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
-          {am
-            ? "Vivida-ն ձեր ծննդյան ճշգրիտ պահը վերածում է կենդանի անձնական ուղեցույցի։ Սկսելու համար անհրաժեշտ է ընդամենը մի քանի րոպե։"
-            : en
-              ? "Vivida transforms the exact moment of your birth into a living personal guide. It takes only a few minutes to begin."
-              : "Vivida გადააქცევს შენი დაბადების ზუსტ მომენტს ცოცხალ, პირად გზამკვლევად. გზა რამდენიმე წუთიანია — შედეგი მთელი ცხოვრებისთვის."}
+          {en
+            ? "Vivida transforms the exact moment of your birth into a living personal guide. It takes only a few minutes to begin."
+            : "Vivida გადააქცევს შენი დაბადების ზუსტ მომენტს ცოცხალ, პირად გზამკვლევად. გზა რამდენიმე წუთიანია — შედეგი მთელი ცხოვრებისთვის."}
         </p>
 
         <div className="mt-12 space-y-4 sm:space-y-5">
@@ -289,22 +226,16 @@ export default async function HowItWorksPage() {
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            {am
-              ? "Պատրա՞ստ եք տեսնել ձեր երկինքը"
-              : en
-                ? "Ready to see your sky?"
-                : "მზად ხარ შენი ცის სანახავად?"}
+            {en ? "Ready to see your sky?" : "მზად ხარ შენი ცის სანახავად?"}
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            {am
-              ? "Սկսեք անվճար։ Ձեր նատալ քարտեզը, ամենօրյա կանխատեսումն ու համատեղելիության մեկնաբանությունները միշտ հասանելի կլինեն։"
-              : en
-                ? "Start for free. Keep your birth chart, daily forecast, and compatibility readings close at hand."
-                : "დაიწყე უფასოდ. ნატალური რუკა, ყოველდღიური პროგნოზი და თავსებადობა ყოველთვის შენთან."}
+            {en
+              ? "Start for free. Keep your birth chart, daily forecast, and compatibility readings close at hand."
+              : "დაიწყე უფასოდ. ნატალური რუკა, ყოველდღიური პროგნოზი და თავსებადობა ყოველთვის შენთან."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/signup">
-              {am ? "Սկսել անվճար" : en ? "Start for free" : "დაიწყე უფასოდ"}
+              {en ? "Start for free" : "დაიწყე უფასოდ"}
             </Link>
           </Button>
         </div>

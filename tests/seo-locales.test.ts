@@ -20,23 +20,6 @@ describe("international SEO locale helpers", () => {
         "ka-GE": `${GEORGIAN_SITE_URL}/nataluri-ruka`,
         en: `${ENGLISH_SITE_URL}/natal-chart`,
         "x-default": `${ENGLISH_SITE_URL}/natal-chart`,
-        hy: `${ENGLISH_SITE_URL}/am/natal-chart`,
-        "hy-AM": `${ENGLISH_SITE_URL}/am/natal-chart`,
-      },
-    });
-  });
-
-  it("publishes Armenian pages with canonical and hreflang", () => {
-    expect(
-      localizedAlternates("/am/natal-chart", "/nataluri-ruka", "am"),
-    ).toEqual({
-      canonical: `${ENGLISH_SITE_URL}/am/natal-chart`,
-      languages: {
-        "ka-GE": `${GEORGIAN_SITE_URL}/nataluri-ruka`,
-        en: `${ENGLISH_SITE_URL}/natal-chart`,
-        "x-default": `${ENGLISH_SITE_URL}/natal-chart`,
-        hy: `${ENGLISH_SITE_URL}/am/natal-chart`,
-        "hy-AM": `${ENGLISH_SITE_URL}/am/natal-chart`,
       },
     });
   });
@@ -48,8 +31,6 @@ describe("international SEO locale helpers", () => {
         "ka-GE": GEORGIAN_SITE_URL,
         en: ENGLISH_SITE_URL,
         "x-default": ENGLISH_SITE_URL,
-        hy: `${ENGLISH_SITE_URL}/am`,
-        "hy-AM": `${ENGLISH_SITE_URL}/am`,
       },
     });
   });

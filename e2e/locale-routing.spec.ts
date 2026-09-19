@@ -127,27 +127,22 @@ test.describe("locale routing", () => {
     });
   }
 
-  test("Armenian URL on the Georgian host moves to the .com host", async ({
+  test("retired Armenian URLs strip the /am prefix on the same host", async ({
     request,
   }) => {
-    const res = await request.get("/am", {
+    const ge = await request.get("/am", {
       headers: { host: GE_HOST },
       maxRedirects: 0,
     });
+    expect(ge.status()).toBe(308);
+    expect(ge.headers()["location"]).toMatch(/\/$/);
 
-    expect(res.status()).toBe(308);
-    expect(res.headers()["location"]).toBe("https://www.vividaastro.com/am");
-  });
-
-  test("Armenian core route renders with the Armenian content language", async ({
-    request,
-  }) => {
-    const res = await request.get("/am/natal-chart", {
+    const en = await request.get("/am/natal-chart", {
       headers: { host: EN_HOST },
+      maxRedirects: 0,
     });
-
-    expect(res.status()).toBe(200);
-    expect(res.headers()["content-language"]).toBe("hy");
+    expect(en.status()).toBe(308);
+    expect(en.headers()["location"]).toMatch(/\/natal-chart$/);
   });
 
   test("English root declares the English content language", async ({
@@ -166,7 +161,7 @@ test.describe("locale routing", () => {
     expect(res.headers()["location"]).toMatch(/\/pirovnebis-testi$/);
   });
 
-  test.describe("Armenian geo redirect", () => {
+  test.describe("retired Armenian geo redirect", () => {
     const geoHeaders = {
       host: EN_HOST,
       accept: "text/html",
@@ -174,20 +169,15 @@ test.describe("locale routing", () => {
       "x-vercel-ip-country": "AM",
     };
 
-    test("Armenian visitor is sent to /am once", async ({ request }) => {
+    test("Armenian visitors stay on the English page (no redirect)", async ({
+      request,
+    }) => {
       const res = await request.get("/horoscope", {
         headers: geoHeaders,
         maxRedirects: 0,
       });
 
-      expect(res.status()).toBe(307);
-      expect(res.headers()["location"]).toMatch(/\/am\/horoscope$/);
-      const setCookie = res
-        .headersArray()
-        .filter((h) => h.name.toLowerCase() === "set-cookie")
-        .map((h) => h.value)
-        .join("; ");
-      expect(setCookie).toContain("vivida_lang=am");
+      expect(res.status()).toBe(200);
     });
 
     test("crawlers are never geo-redirected", async ({ request }) => {

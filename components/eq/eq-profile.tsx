@@ -16,9 +16,14 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * domain (score, band, interpretation, a concrete practice). Pure/server-safe
  * so it renders on the saved page and (blurred) on the anonymous teaser.
  */
-export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?: UserLocale }) {
+export function EqProfile({
+  result,
+  locale = "ka",
+}: {
+  result: EqResult;
+  locale?: UserLocale;
+}) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const top = result.domains.find((d) => d.key === result.topKey)!;
   const low = result.domains.find((d) => d.key === result.lowKey)!;
 
@@ -27,7 +32,7 @@ export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?
       {/* Radar */}
       <div className="rounded-3xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
         <h2 className="mb-2 text-center text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {am ? "Ձեր էմոցիոնալ պրոֆիլը" : en ? "Your emotional profile" : "შენი ემოციური რუკა"}
+          {en ? "Your emotional profile" : "შენი ემოციური რუკა"}
         </h2>
         <EqRadar domains={result.domains} locale={locale} />
       </div>
@@ -37,7 +42,7 @@ export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?
         <div className="rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 p-4 ring-1 ring-foreground/5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--vivida-cyan)]">
             <ArrowUpRight className="size-4" />
-            {am ? "Ձեր ուժը" : en ? "Your strength" : "შენი ძალა"}
+            {en ? "Your strength" : "შენი ძალა"}
           </div>
           <div className="mt-1.5 flex items-center gap-2 text-lg font-semibold">
             <span>{top.glyph}</span>
@@ -50,7 +55,7 @@ export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?
         <div className="rounded-2xl border border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/8 p-4 ring-1 ring-foreground/5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--vivida-pink)]">
             <Sprout className="size-4" />
-            {am ? "Աճի հնարավորություն" : en ? "Growth opportunity" : "ზრდის სივრცე"}
+            {en ? "Growth opportunity" : "ზრდის სივრცე"}
           </div>
           <div className="mt-1.5 flex items-center gap-2 text-lg font-semibold">
             <span>{low.glyph}</span>
@@ -73,7 +78,9 @@ export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?
               <div className="flex items-center gap-2.5">
                 <span className="text-xl">{d.glyph}</span>
                 <div>
-                  <h3 className="font-semibold leading-tight">{en ? d.nameEn : d.nameKa}</h3>
+                  <h3 className="font-semibold leading-tight">
+                    {en ? d.nameEn : d.nameKa}
+                  </h3>
                   <p className="text-[11px] text-muted-foreground">
                     {en ? d.taglineEn : d.taglineKa}
                   </p>
@@ -93,7 +100,9 @@ export function EqProfile({ result, locale = "ka" }: { result: EqResult; locale?
                     background: `color-mix(in oklch, ${EQ_BAND_META[d.band].hue} 16%, transparent)`,
                   }}
                 >
-                  {en ? EQ_BAND_META[d.band].labelEn : EQ_BAND_META[d.band].labelKa}
+                  {en
+                    ? EQ_BAND_META[d.band].labelEn
+                    : EQ_BAND_META[d.band].labelKa}
                 </div>
               </div>
             </div>

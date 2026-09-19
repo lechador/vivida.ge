@@ -13,11 +13,10 @@ import { MbtiClaimRunner } from "@/components/mbti/mbti-claim-runner";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  const am = locale === "am";
   // Transient per-user result state, like the /shedegi pages — keep it out of
   // the index rather than letting it self-canonicalize as content.
   return {
-    title: am ? "Ձեր Աստրո-ՄԲՏԻ արդյունքը" : en ? "Your Astro-MBTI result" : "შენი შედეგი",
+    title: en ? "Your Astro-MBTI result" : "შენი შედეგი",
     robots: { index: false },
   };
 }
@@ -38,7 +37,11 @@ export default async function TestClaimPage() {
   const authed = !!session?.user?.id;
   // The anonymous teaser recomputes the type client-side from the stored
   // answers, so it needs the question structure. Only loaded when anon.
-  const questions = authed ? null : en ? MBTI_QUESTIONS_EN : await getMbtiQuestions();
+  const questions = authed
+    ? null
+    : en
+      ? MBTI_QUESTIONS_EN
+      : await getMbtiQuestions();
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -48,10 +51,22 @@ export default async function TestClaimPage() {
       />
       <Starfield count={110} shooting={2} />
 
-      {authed ? <AppHeader authed /> : <SmartHeader active="tests" locale={locale} georgianPath="/pirovnebis-testi/claim" />}
+      {authed ? (
+        <AppHeader authed />
+      ) : (
+        <SmartHeader
+          active="tests"
+          locale={locale}
+          georgianPath="/pirovnebis-testi/claim"
+        />
+      )}
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        {authed ? <MbtiClaimRunner locale={locale} /> : <MbtiGate questions={questions!} locale={locale} />}
+        {authed ? (
+          <MbtiClaimRunner locale={locale} />
+        ) : (
+          <MbtiGate questions={questions!} locale={locale} />
+        )}
       </section>
     </main>
   );

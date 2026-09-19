@@ -17,12 +17,13 @@ import {
   MERCURY_RETROGRADE_EN,
   MercuryRetrogradePageEn,
 } from "@/components/seo/mercury-retrograde-en";
-import {
-  MERCURY_RETROGRADE_AM,
-  MercuryRetrogradePageAm,
-} from "@/components/seo/mercury-retrograde-am";
+
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { englishSiteHref, armenianSiteHref, DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  DEFAULT_OG_IMAGE,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -47,7 +48,11 @@ const KA_METADATA: Metadata = {
     "merkuri retrogradshi",
     "retrograduli merkuri",
   ],
-  alternates: localizedAlternates("/merkuri-retrogradi", "/merkuri-retrogradi", "ka"),
+  alternates: localizedAlternates(
+    "/merkuri-retrogradi",
+    "/merkuri-retrogradi",
+    "ka",
+  ),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     type: "website",
@@ -57,37 +62,16 @@ const KA_METADATA: Metadata = {
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
-  if (locale === "am") {
-    const path = "/merkuri-retrogradi";
-    const { title, description } = MERCURY_RETROGRADE_AM;
-    return {
-      title: { absolute: `${title} — Vivida` },
-      description,
-      keywords: [
-        "Մերկուրիի ռետրոգրադ",
-        "Մերկուրի ռետրոգրադ",
-        "ռետրոգրադ Մերկուրի 2026",
-        "հետընթաց Մերկուրի",
-      ],
-      alternates: localizedAlternates(`/am${path}`, path, "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: armenianSiteHref(path, false),
-        title,
-        description,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: { card: "summary_large_image", title, description },
-    };
-  }
   if (locale === "en") {
     const path = "/merkuri-retrogradi";
     const { title, description } = MERCURY_RETROGRADE_EN;
@@ -146,7 +130,6 @@ function formatKa(isoDate: string): string {
 
 export default async function MercuryRetrogradePage() {
   const locale = await getRequestLocale();
-  if (locale === "am") return <MercuryRetrogradePageAm />;
   if (locale === "en") return <MercuryRetrogradePageEn />;
   const now = new Date();
   const year = now.getUTCFullYear();
@@ -272,8 +255,8 @@ export default async function MercuryRetrogradePage() {
               მერკური კომუნიკაციის, ტექნიკის, გზებისა და შეთანხმებების პლანეტაა.
               რეტროგრადის დროს ხშირდება გაუგებრობები მიმოწერაში, ტექნიკური
               შეფერხებები, დაგვიანებული ტრანსპორტი და „წარსულიდან დაბრუნებული“
-              ადამიანები თუ თემები. ეს კატასტროფა არ არის — უბრალოდ ცა
-              გირჩევს, ორჯერ გადაამოწმო.
+              ადამიანები თუ თემები. ეს კატასტროფა არ არის — უბრალოდ ცა გირჩევს,
+              ორჯერ გადაამოწმო.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
@@ -281,10 +264,10 @@ export default async function MercuryRetrogradePage() {
               რისთვის არის კარგი
             </h2>
             <p className="mt-2 text-[15px] leading-relaxed text-foreground/90">
-              ყველაფრისთვის, რაც „რე“-თი იწყება: რევიზია, რედაქტირება,
-              რემონტი, შერიგება, დაბრუნება. დაასრულე გაჩერებული პროექტები,
-              გადახედე ბიუჯეტს, დაუბრუნდი ძველ იდეებს — რეტროგრადი ამ საქმეებს
-              უჭერს მხარს.
+              ყველაფრისთვის, რაც „რე“-თი იწყება: რევიზია, რედაქტირება, რემონტი,
+              შერიგება, დაბრუნება. დაასრულე გაჩერებული პროექტები, გადახედე
+              ბიუჯეტს, დაუბრუნდი ძველ იდეებს — რეტროგრადი ამ საქმეებს უჭერს
+              მხარს.
             </p>
           </div>
         </section>
@@ -321,8 +304,8 @@ export default async function MercuryRetrogradePage() {
             როგორ მოქმედებს რეტროგრადი ზუსტად შენზე?
           </h2>
           <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground sm:text-base">
-            პასუხი შენს ნატალურ რუკაშია — სად დგას შენი მერკური და რომელ
-            სახლში გადის ტრანზიტი. შექმენი უფასოდ.
+            პასუხი შენს ნატალურ რუკაშია — სად დგას შენი მერკური და რომელ სახლში
+            გადის ტრანზიტი. შექმენი უფასოდ.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
             <Link href="/nataluri-ruka">

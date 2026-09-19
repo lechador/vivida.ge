@@ -5,11 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Flag, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
-import {
-  deletePost,
-  editPost,
-  type FeedPost,
-} from "@/actions/feed";
+import { deletePost, editPost, type FeedPost } from "@/actions/feed";
 import { DEFAULT_AVATAR } from "@/lib/avatar";
 import { POST_BODY_MAX, POST_EDIT_WINDOW_MS } from "@/lib/feed-config";
 import {
@@ -67,7 +63,6 @@ export function PostCard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const am = locale === "am";
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editing, setEditing] = useState(false);
@@ -82,11 +77,10 @@ export function PostCard({
 
   useEffect(() => {
     const remaining =
-      POST_EDIT_WINDOW_MS -
-      (Date.now() - new Date(post.createdAt).getTime());
+      POST_EDIT_WINDOW_MS - (Date.now() - new Date(post.createdAt).getTime());
     const revealTimer = setTimeout(
       () => setWithinEditWindow(isOwner && remaining > 0),
-      0
+      0,
     );
     const expiryTimer =
       isOwner && remaining > 0
@@ -114,11 +108,13 @@ export function PostCard({
     post.author.displayName ??
     post.author.name?.split(" ")[0] ??
     post.author.username ??
-    (am ? "Աստղադիտող" : en ? "Stargazer" : "ვარსკვლავო");
-  const profileHref = post.author.username ? `/u/${post.author.username}` : null;
+    (en ? "Stargazer" : "ვარსკვლავო");
+  const profileHref = post.author.username
+    ? `/u/${post.author.username}`
+    : null;
 
   function handleDelete() {
-    if (!confirm(am ? "Ջնջե՞լ այս գրառումը։" : en ? "Delete this post?" : "წავშალო ეს პოსტი?")) return;
+    if (!confirm(en ? "Delete this post?" : "წავშალო ეს პოსტი?")) return;
     startTransition(async () => {
       const res = await deletePost(post.id);
       if (!res.ok) {
@@ -143,7 +139,9 @@ export function PostCard({
     startTransition(async () => {
       const res = await editPost(post.id, draft);
       if (!res.ok) {
-        setEditError(en ? "Could not save your changes. Please try again." : res.error);
+        setEditError(
+          en ? "Could not save your changes. Please try again." : res.error,
+        );
         return;
       }
       setEditing(false);
@@ -166,12 +164,15 @@ export function PostCard({
       onClick={onCardClick}
       className={cn(
         "rounded-2xl border border-foreground/12 bg-[oklch(0.23_0.04_285/0.88)] p-4 shadow-[0_16px_40px_-24px_oklch(0.05_0.05_280/0.85)] ring-1 ring-inset ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-[oklch(0.25_0.04_285/0.92)] sm:p-5",
-        mode === "feed" && "cursor-pointer"
+        mode === "feed" && "cursor-pointer",
       )}
     >
       <header className="flex items-start gap-3">
         {profileHref ? (
-          <Link href={profileHref} aria-label={en ? `${display}'s profile` : `${display}-ის პროფილი`}>
+          <Link
+            href={profileHref}
+            aria-label={en ? `${display}'s profile` : `${display}-ის პროფილი`}
+          >
             {avatar}
           </Link>
         ) : (
@@ -207,7 +208,9 @@ export function PostCard({
             {post.edited && (
               <>
                 <span>·</span>
-                <span className="italic">{am ? "Խմբագրված է" : en ? "Edited" : "რედაქტირებული"}</span>
+                <span className="italic">
+                  {en ? "Edited" : "რედაქტირებული"}
+                </span>
               </>
             )}
           </div>
@@ -217,7 +220,7 @@ export function PostCard({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                aria-label={am ? "Մենյու" : en ? "Menu" : "მენიუ"}
+                aria-label={en ? "Menu" : "მენიუ"}
                 className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
               >
                 {isPending ? (
@@ -237,7 +240,7 @@ export function PostCard({
                   className="cursor-pointer"
                 >
                   <Pencil className="size-4" />
-                  {am ? "Խմբագրել" : en ? "Edit" : "რედაქტირება"}
+                  {en ? "Edit" : "რედაქტირება"}
                 </DropdownMenuItem>
               )}
               {canDelete && (
@@ -250,7 +253,13 @@ export function PostCard({
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <Trash2 className="size-4" />
-                  {isOwner ? (am ? "Ջնջել" : en ? "Delete" : "წაშლა") : (am ? "Մոդերացիա՝ ջնջել" : en ? "Moderation: delete" : "მოდერაცია: წაშლა")}
+                  {isOwner
+                    ? en
+                      ? "Delete"
+                      : "წაშლა"
+                    : en
+                      ? "Moderation: delete"
+                      : "მოდერაცია: წაშლა"}
                 </DropdownMenuItem>
               )}
               {!isOwner && (
@@ -262,7 +271,7 @@ export function PostCard({
                   className="cursor-pointer"
                 >
                   <Flag className="size-4" />
-                  {am ? "Հաղորդել" : en ? "Report" : "დაარეპორტე"}
+                  {en ? "Report" : "დაარეპორტე"}
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -296,7 +305,7 @@ export function PostCard({
                 "text-xs tabular-nums",
                 draft.length > POST_BODY_MAX
                   ? "text-[var(--vivida-pink)]"
-                  : "text-muted-foreground/70"
+                  : "text-muted-foreground/70",
               )}
             >
               {POST_BODY_MAX - draft.length}
@@ -313,7 +322,7 @@ export function PostCard({
                 onClick={() => setEditing(false)}
                 disabled={isPending}
               >
-                {am ? "Չեղարկել" : en ? "Cancel" : "გაუქმება"}
+                {en ? "Cancel" : "გაუქმება"}
               </Button>
               <Button
                 variant="mystic"
@@ -325,10 +334,8 @@ export function PostCard({
                   draft.length > POST_BODY_MAX
                 }
               >
-                {isPending ? (
-                  <Loader2 className="size-3 animate-spin" />
-                ) : null}
-                {am ? "Պահպանել" : en ? "Save" : "შენახვა"}
+                {isPending ? <Loader2 className="size-3 animate-spin" /> : null}
+                {en ? "Save" : "შენახვა"}
               </Button>
             </div>
           </div>
