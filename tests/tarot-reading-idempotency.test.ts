@@ -90,6 +90,7 @@ describe("performReading request idempotency", () => {
             slug: "the-fool",
             name: "Fool",
             glyph: "🃏",
+            image: "/tarot/the-fool.webp",
             reversed: false,
             position: "Past / root",
             interpretation: "Stored interpretation",

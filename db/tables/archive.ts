@@ -140,6 +140,7 @@ export type LibraryEntryContent =
         slug: string;
         name: string;
         glyph: string;
+        image?: string;
         reversed: boolean;
         position: string;
         interpretation: string;

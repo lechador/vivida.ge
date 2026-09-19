@@ -11,8 +11,12 @@ import {
   spendOnce,
 } from "@/lib/credits";
 import { generateTarotReading } from "@/lib/openrouter";
-import { TAROT_CARDS, type DrawnCard } from "@/lib/tarot/deck";
-import { TAROT_EN_BY_SLUG } from "@/lib/tarot/deck-en";
+import {
+  FULL_DECK_KA,
+  englishCardBySlug,
+  tarotImageUrl,
+  type DeckCard,
+} from "@/lib/tarot/deck-full";
 import { tarotSpreadById, type TarotSpreadId } from "@/lib/tarot/spreads";
 import { tarotCardBySlugAm } from "@/lib/tarot/deck-am";
 import type { TarotFollowupEntry } from "@/lib/tarot/followup";
@@ -31,6 +35,8 @@ export type TarotSpreadCard = {
   slug: string;
   name: string;
   glyph: string;
+  /** Resolved illustration URL (bundle for majors, R2 for minors). */
+  image: string;
   reversed: boolean;
   position: string;
   /** AI's per-card interpretation for this question, or the static fallback. */
@@ -61,33 +67,36 @@ export type TarotResult =
   | { ok: false; error: "insufficient"; cost: number; balance: number }
   | { ok: false; error: "bad_request" };
 
-/** Draw 3 distinct Major Arcana, each independently upright or reversed. */
-function drawSpread(): DrawnCard[] {
-  const pool = [...TAROT_CARDS];
-  const out: DrawnCard[] = [];
+/** Draw 3 distinct cards from the full 78-card deck, each independently upright or reversed. */
+function drawSpread(): Array<{ card: DeckCard; reversed: boolean }> {
+  const pool = [...FULL_DECK_KA];
+  const out: Array<{ card: DeckCard; reversed: boolean }> = [];
   for (let i = 0; i < 3; i++) {
     const idx = Math.floor(Math.random() * pool.length);
     const [card] = pool.splice(idx, 1);
-    out.push({ card, reversed: Math.random() < 0.35 });
+    out.push({ card: card!, reversed: Math.random() < 0.35 });
   }
   return out;
 }
 
 /** Compose a readable fallback answer purely from the static card meanings. */
-function cardCopy(drawn: DrawnCard, locale: UserLocale) {
+function cardCopy(
+  drawn: { card: DeckCard; reversed: boolean },
+  locale: UserLocale,
+) {
   if (locale === "am") {
-    const card = tarotCardBySlugAm(drawn.card.slug)!;
-    return {
-      name: card.name,
-      meaning: drawn.reversed ? card.reversed : card.upright,
-    };
+    const card = tarotCardBySlugAm(drawn.card.slug);
+    if (card) {
+      return {
+        name: card.name,
+        meaning: drawn.reversed ? card.reversed : card.upright,
+      };
+    }
+    // No Armenian minor content (Armenian is being removed): fall through
+    // to the Georgian copy rather than failing the reading.
   }
   if (locale === "en") {
-    const card = TAROT_EN_BY_SLUG[drawn.card.slug];
-    return {
-      name: card.name,
-      meaning: drawn.reversed ? card.reversed : card.upright,
-    };
+    return englishCardBySlug(drawn.card.slug, drawn.reversed);
   }
   return {
     name: drawn.card.nameKa,
@@ -96,7 +105,7 @@ function cardCopy(drawn: DrawnCard, locale: UserLocale) {
 }
 
 function fallbackReading(
-  drawn: DrawnCard[],
+  drawn: Array<{ card: DeckCard; reversed: boolean }>,
   locale: UserLocale,
 ): {
   headline: string;
@@ -192,6 +201,10 @@ export async function performReading(
         charged: item.charged ?? 0,
         free: item.free ?? false,
       }));
+      const replayedCards = existing.content.cards.map((card) => ({
+        ...card,
+        image: card.image ?? tarotImageUrl(card.slug),
+      }));
       const replayedSpread =
         tarotSpreadById(existing.content.spreadId) ??
         tarotSpreadById("situation")!;
@@ -199,7 +212,7 @@ export async function performReading(
         ok: true,
         reading: {
           headline: existing.title,
-          cards: existing.content.cards,
+          cards: replayedCards,
           reading: existing.content.reading,
           advice: existing.content.advice,
           charged: existing.content.charged ?? 0,
@@ -317,6 +330,7 @@ export async function performReading(
     slug: d.card.slug,
     name: cardCopy(d, locale).name,
     glyph: d.card.glyph,
+    image: tarotImageUrl(d.card.slug),
     reversed: d.reversed,
     position: positions[i],
     interpretation: composed.cards[i] ?? cardCopy(d, locale).meaning,

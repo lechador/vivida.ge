@@ -36,6 +36,7 @@ type SpreadCard = {
   slug: string;
   name: string;
   glyph: string;
+  image: string;
   reversed: boolean;
   position: string;
   interpretation: string;
@@ -778,7 +779,7 @@ function TarotCardFace({
         {imgOk ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={`/tarot/${card.slug}.webp`}
+            src={card.image || `/tarot/${card.slug}.webp`}
             alt={card.name}
             loading="lazy"
             onError={() => setImgOk(false)}
