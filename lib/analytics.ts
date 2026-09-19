@@ -50,6 +50,7 @@ export const ANALYTICS_EVENT = {
   tarotLoginRequired: "tarot_login_required",
   tarotCreditsShort: "tarot_credits_short",
   tarotReadingCompleted: "tarot_reading_completed",
+  tarotFollowupCompleted: "tarot_followup_completed",
   testCompleted: "test_completed",
   firstResultViewed: "first_result_viewed",
   recommendationClicked: "recommendation_clicked",
@@ -107,7 +108,7 @@ function stripCampaignParams(params: GtagParams): GtagParams {
     if (RESERVED_CAMPAIGN_PARAMS.has(key)) {
       if (process.env.NODE_ENV !== "production") {
         console.warn(
-          `[analytics] dropped reserved GA4 campaign param "${key}" — it would overwrite session attribution. Rename it (e.g. "widget").`
+          `[analytics] dropped reserved GA4 campaign param "${key}" — it would overwrite session attribution. Rename it (e.g. "widget").`,
         );
       }
       continue;
@@ -119,7 +120,7 @@ function stripCampaignParams(params: GtagParams): GtagParams {
 
 export function trackEvent(
   name: AnalyticsEventName,
-  params?: GtagParams
+  params?: GtagParams,
 ): boolean {
   if (typeof window === "undefined") return false;
   const gtag = (
@@ -189,7 +190,7 @@ export function creditBalanceBucket(balance: number): string {
 export function trackExperimentAssignment(
   experiment: string,
   variant: string,
-  params?: GtagParams
+  params?: GtagParams,
 ): boolean {
   return trackEvent(ANALYTICS_EVENT.experimentAssigned, {
     ...params,

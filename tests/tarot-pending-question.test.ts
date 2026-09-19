@@ -23,8 +23,21 @@ describe("pending tarot question", () => {
     const storage = memoryStorage();
 
     savePendingTarotQuestion(storage, "  რა უნდა დავინახო?  ");
-    expect(takePendingTarotQuestion(storage)).toBe("რა უნდა დავინახო?");
+    expect(takePendingTarotQuestion(storage)).toEqual({
+      question: "რა უნდა დავინახო?",
+      requestId: null,
+    });
     expect(takePendingTarotQuestion(storage)).toBeNull();
+  });
+
+  it("round-trips the request id so retries stay idempotent", () => {
+    const storage = memoryStorage();
+
+    savePendingTarotQuestion(storage, "რა უნდა დავინახო?", "req-abc-123");
+    expect(takePendingTarotQuestion(storage)).toEqual({
+      question: "რა უნდა დავინახო?",
+      requestId: "req-abc-123",
+    });
   });
 
   it("ignores stale or malformed payloads", () => {

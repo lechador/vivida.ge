@@ -18,6 +18,7 @@ import {
 } from "@/lib/tarot/deck";
 import { SPREAD_POSITIONS_EN, TAROT_EN_BY_SLUG } from "@/lib/tarot/deck-en";
 import { tarotCardBySlugAm } from "@/lib/tarot/deck-am";
+import type { TarotFollowupEntry } from "@/lib/tarot/followup";
 import type { UserLocale } from "@/lib/i18n/locale";
 import { archiveLibraryEntry, getLibraryEntryBySource } from "@/lib/library";
 import { isPremiumUser } from "@/lib/premium";
@@ -50,6 +51,8 @@ export type TarotReading = {
   libraryId?: string;
   /** True when the AI call failed and the static fallback was used. */
   degraded: boolean;
+  /** Follow-up questions on the same spread, oldest first. */
+  followups: TarotFollowupEntry[];
 };
 
 export type TarotResult =
@@ -157,6 +160,15 @@ export async function performReading(
     const existing = await getLibraryEntryBySource(userId, "tarot", requestKey);
     if (existing && existing.content.type === "tarot") {
       const balance = await getBalance(userId);
+      const followups: TarotFollowupEntry[] = (
+        existing.content.followups ?? []
+      ).map((item) => ({
+        question: item.question,
+        answer: item.answer,
+        degraded: item.degraded ?? false,
+        charged: item.charged ?? 0,
+        free: item.free ?? false,
+      }));
       return {
         ok: true,
         reading: {
@@ -169,6 +181,7 @@ export async function performReading(
           balance,
           libraryId: existing.id,
           degraded: existing.content.degraded ?? false,
+          followups,
         },
       };
     }
@@ -299,6 +312,7 @@ export async function performReading(
       charged,
       free,
       degraded,
+      followups: [],
     },
     language: locale,
   }).catch((error) => {
@@ -317,6 +331,7 @@ export async function performReading(
       balance,
       libraryId: libraryEntry?.id,
       degraded,
+      followups: [],
     },
   };
 }

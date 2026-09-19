@@ -7,6 +7,7 @@ import { BookOpen, Loader2, RotateCcw, Sparkles, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
+import { CREDIT_COST } from "@/lib/credits-config";
 import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
 import {
   ANALYTICS_EVENT,
@@ -22,6 +23,7 @@ import {
 import {
   savePendingTarotQuestion,
   takePendingTarotQuestion,
+  type PendingTarotAttempt,
 } from "@/lib/tarot/pending-question";
 import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 
@@ -33,6 +35,13 @@ type SpreadCard = {
   position: string;
   interpretation: string;
 };
+type TarotFollowup = {
+  question: string;
+  answer: string;
+  degraded: boolean;
+  charged: number;
+  free: boolean;
+};
 type Reading = {
   headline: string;
   cards: SpreadCard[];
@@ -43,6 +52,7 @@ type Reading = {
   balance: number;
   libraryId?: string;
   degraded: boolean;
+  followups: TarotFollowup[];
 };
 
 /**
@@ -66,17 +76,33 @@ export function TarotReader({
   const en = locale === "en";
   const am = locale === "am";
   const router = useRouter();
-  const [question, setQuestion] = useState(() => {
+  const [pending] = useState<PendingTarotAttempt | null>(() => {
     // Restore the question after the sign-in or top-up redirect consumes it.
-    if (typeof window === "undefined") return "";
-    return takePendingTarotQuestion(sessionStorage) ?? "";
+    if (typeof window === "undefined") return null;
+    return takePendingTarotQuestion(sessionStorage);
   });
-  const [attempt, setAttempt] = useState<TarotAttempt | null>(null);
+  const [question, setQuestion] = useState(pending?.question ?? "");
+  const [attempt, setAttempt] = useState<TarotAttempt | null>(
+    pending?.requestId
+      ? { question: pending.question, requestId: pending.requestId }
+      : null,
+  );
   const [reading, setReading] = useState<Reading | null>(null);
   const [status, setStatus] = useState<"idle" | "drawing" | "short" | "error">(
     "idle",
   );
   const [shortBalance, setShortBalance] = useState(0);
+  const [followupQuestion, setFollowupQuestion] = useState("");
+  const [followupStatus, setFollowupStatus] = useState<
+    "idle" | "sending" | "short" | "error"
+  >("idle");
+  const [followupShort, setFollowupShort] = useState<{
+    balance: number;
+    cost: number;
+  }>({
+    balance: 0,
+    cost: CREDIT_COST.tarotFollowup,
+  });
 
   async function ask() {
     // A second Enter while the first request is in flight would spend the
@@ -132,8 +158,9 @@ export function TarotReader({
           cost,
         });
         setStatus("short");
-        // The top-up flow leaves this page; restore the question on return.
-        savePendingTarotQuestion(sessionStorage, q);
+        // The top-up flow leaves this page; restore the question (and its
+        // request id, so the retry replays instead of charging again).
+        savePendingTarotQuestion(sessionStorage, q, nextAttempt.requestId);
         return;
       }
       if (!res.ok) {
@@ -178,7 +205,107 @@ export function TarotReader({
     setReading(null);
     setQuestion("");
     setAttempt(null);
+    setFollowupQuestion("");
+    setFollowupStatus("idle");
     setStatus("idle");
+  }
+
+  const FOLLOWUP_SUGGESTIONS: Record<UserLocale, string[]> = {
+    ka: [
+      "უფრო მარტივად ამიხსენი",
+      "ეს ჩემს სიტუაციას როგორ უკავშირდება?",
+      "რომელ ნაბიჯზე დავფიქრდე?",
+    ],
+    en: [
+      "Explain this more simply",
+      "How does this connect to my situation?",
+      "Which next step should I consider?",
+    ],
+    am: [
+      "Բացատրեք ավելի պարզ",
+      "Ինչպե՞ս է սա կապված իմ իրավիճակի հետ",
+      "Ո՞ր քայլի մասին մտածեմ",
+    ],
+  };
+
+  async function askFollowup(preset?: string) {
+    if (!reading?.libraryId || followupStatus === "sending") return;
+    const fq = (preset ?? followupQuestion).trim();
+    if (fq.length < 3) return;
+    setFollowupStatus("sending");
+    try {
+      const res = await fetch("/api/tarot/followup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          libraryId: reading.libraryId,
+          question: fq,
+          locale,
+        }),
+      });
+      if (res.status === 402) {
+        const data = (await res.json().catch(() => ({}))) as {
+          balance?: number;
+          cost?: number;
+        };
+        setFollowupShort({
+          balance: typeof data.balance === "number" ? data.balance : 0,
+          cost:
+            typeof data.cost === "number"
+              ? data.cost
+              : CREDIT_COST.tarotFollowup,
+        });
+        trackEvent(ANALYTICS_EVENT.tarotCreditsShort, {
+          widget: "tarot_followup",
+        });
+        trackEvent(ANALYTICS_EVENT.insufficientCredits, {
+          product: "tarot_followup",
+          surface: "tarot_followup",
+          cost: CREDIT_COST.tarotFollowup,
+        });
+        trackEvent(ANALYTICS_EVENT.paywallViewed, {
+          product: "tarot_followup",
+          surface: "tarot_followup_short",
+          cost: CREDIT_COST.tarotFollowup,
+        });
+        savePendingTarotQuestion(sessionStorage, question, attempt?.requestId);
+        setFollowupStatus("short");
+        return;
+      }
+      if (!res.ok) {
+        setFollowupStatus("error");
+        return;
+      }
+      const next = (await res.json()) as {
+        answer: string;
+        degraded: boolean;
+        charged: number;
+        free: boolean;
+        balance: number;
+        libraryId: string;
+        followups: TarotFollowup[];
+      };
+      trackEvent(ANALYTICS_EVENT.tarotFollowupCompleted, {
+        free: next.free ? 1 : 0,
+      });
+      if (next.charged > 0) {
+        trackEvent(ANALYTICS_EVENT.creditUnlock, {
+          product: "tarot_followup",
+          surface: "tarot_followup",
+          cost: next.charged,
+          outcome: "unlocked",
+        });
+      }
+      fbTrackCustom("TarotFollowupCompleted", {
+        free: next.free ? 1 : 0,
+        content_name: "tarot_followup",
+      });
+      setReading({ ...reading, followups: next.followups });
+      setFollowupQuestion("");
+      setFollowupStatus("idle");
+    } catch {
+      setFollowupStatus("error");
+    }
   }
 
   return (
@@ -331,6 +458,125 @@ export function TarotReader({
               </p>
             )}
           </div>
+
+          {/* Follow-up — a next question on the same cards, no new spread. */}
+          {reading.libraryId && (
+            <div className="rounded-2xl border border-border bg-background/35 p-4 sm:p-5">
+              <div className="text-sm font-semibold text-foreground">
+                {am
+                  ? "Խորացեք այս դասավորության մեջ"
+                  : en
+                    ? "Go deeper into this spread"
+                    : "ჩაუღრმავდი ამ გაშლას"}
+              </div>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                {am
+                  ? "Նույն քարտերի մասին՝ առանց նոր դասավորության։"
+                  : en
+                    ? "About the same cards — no new spread is drawn."
+                    : "იგივე კარტებზე — ახალი გაშლა არ იშლება."}{" "}
+                {reading.followups.length === 0
+                  ? am
+                    ? "Առաջին լրացուցիչ հարցն անվճար է։"
+                    : en
+                      ? "Your first follow-up is free."
+                      : "პირველი დაზუსტება უფასოა."
+                  : am
+                    ? `Հաջորդը՝ ${CREDIT_COST.tarotFollowup} կրեդիտ։`
+                    : en
+                      ? `Next follow-up — ${CREDIT_COST.tarotFollowup} credits.`
+                      : `შემდეგი დაზუსტება — ${CREDIT_COST.tarotFollowup} კრედიტი.`}
+              </p>
+
+              {reading.followups.map((followup, index) => (
+                <div
+                  key={index}
+                  className="mt-3 rounded-xl border border-border/60 bg-background/40 p-3"
+                >
+                  <p className="text-xs font-medium text-[var(--vivida-violet)]">
+                    {followup.question}
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">
+                    {followup.answer}
+                  </p>
+                </div>
+              ))}
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {FOLLOWUP_SUGGESTIONS[locale].map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => askFollowup(suggestion)}
+                    disabled={followupStatus === "sending"}
+                    className="rounded-full border border-border bg-card/55 px-3 py-1.5 text-xs text-foreground/85 transition-colors hover:bg-card/80 disabled:opacity-50"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+                <input
+                  id="tarot-followup"
+                  type="text"
+                  value={followupQuestion}
+                  onChange={(e) => setFollowupQuestion(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") askFollowup();
+                  }}
+                  disabled={followupStatus === "sending"}
+                  maxLength={300}
+                  placeholder={
+                    am
+                      ? "Օրինակ՝ ինչպե՞ս է սա կապված իմ իրավիճակի հետ։"
+                      : en
+                        ? "For example: How does this connect to my situation?"
+                        : "მაგ: ეს ჩემს სიტუაციას როგორ უკავშირდება?"
+                  }
+                  className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => askFollowup()}
+                  disabled={
+                    followupStatus === "sending" ||
+                    followupQuestion.trim().length < 3
+                  }
+                  className="shrink-0 gap-1.5"
+                >
+                  {followupStatus === "sending" ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="size-4" />
+                  )}
+                  {am ? "Հարցնել" : en ? "Ask" : "კითხვა"}
+                </Button>
+              </div>
+
+              {followupStatus === "short" && (
+                <div className="mt-3 rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
+                  <ContextualPaywallActions
+                    locale={locale}
+                    balance={followupShort.balance}
+                    cost={followupShort.cost}
+                    product="tarot_followup"
+                    returnTo={am ? "/am/taro" : "/taro"}
+                    placement="tarot_followup_short"
+                  />
+                </div>
+              )}
+              {followupStatus === "error" && (
+                <p className="mt-2 text-sm text-[var(--vivida-pink)]">
+                  {am
+                    ? "Ինչ-որ բան սխալ ստացվեց: Խնդրում ենք կրկին փորձել:"
+                    : en
+                      ? "Something went wrong. Please try again."
+                      : "რაღაც ვერ მოხერხდა — სცადე ხელახლა."}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-xs text-muted-foreground">
