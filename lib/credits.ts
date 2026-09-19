@@ -30,7 +30,7 @@ async function notifyCredit(
   userId: string,
   amount: number,
   reason: CreditReason,
-  balance: number | null
+  balance: number | null,
 ): Promise<void> {
   try {
     await db.insert(notifications).values({
@@ -46,7 +46,7 @@ async function notifyCredit(
   } catch (err) {
     console.warn(
       "[credits] notification failed:",
-      err instanceof Error ? err.message : String(err)
+      err instanceof Error ? err.message : String(err),
     );
   }
 }
@@ -79,7 +79,7 @@ export async function grantCredits(
   amount: number,
   reason: CreditReason,
   ref?: string,
-  opts?: { notify?: boolean }
+  opts?: { notify?: boolean },
 ): Promise<void> {
   if (amount <= 0) return;
   const [acct] = await db
@@ -110,7 +110,7 @@ export async function grantCreditsOnce(
   amount: number,
   reason: CreditReason,
   ref: string,
-  opts?: { notify?: boolean }
+  opts?: { notify?: boolean },
 ): Promise<boolean> {
   if (amount <= 0 || !ref) return false;
   const result = await db.execute<{
@@ -142,7 +142,7 @@ export async function spendCredits(
   amount: number,
   reason: CreditReason,
   ref?: string,
-  opts?: { notify?: boolean }
+  opts?: { notify?: boolean },
 ): Promise<boolean> {
   if (amount <= 0) return true;
   if (await isPremiumUser(userId)) return true;
@@ -153,7 +153,10 @@ export async function spendCredits(
       updatedAt: new Date(),
     })
     .where(
-      and(eq(creditAccounts.userId, userId), gte(creditAccounts.balance, amount))
+      and(
+        eq(creditAccounts.userId, userId),
+        gte(creditAccounts.balance, amount),
+      ),
     )
     .returning({ balance: creditAccounts.balance });
   if (updated.length === 0) return false;
@@ -174,7 +177,7 @@ export async function spendCredits(
 export async function grantPurchaseCredits(
   userId: string,
   amount: number,
-  sessionId: string
+  sessionId: string,
 ): Promise<void> {
   if (amount <= 0) return;
   const result = await db.execute<{
@@ -198,7 +201,7 @@ export async function grantPurchaseCredits(
 export async function isUnlocked(
   userId: string,
   ref: string,
-  reason: CreditReason
+  reason: CreditReason,
 ): Promise<boolean> {
   if (reason.startsWith("spend_") && (await isPremiumUser(userId))) {
     return true;
@@ -210,11 +213,31 @@ export async function isUnlocked(
       and(
         eq(creditTransactions.userId, userId),
         eq(creditTransactions.ref, ref),
-        eq(creditTransactions.reason, reason)
-      )
+        eq(creditTransactions.reason, reason),
+      ),
     )
     .limit(1);
   return !!row;
+}
+
+/** Amount already settled for a ref-keyed unlock, or null when untouched. */
+export async function getUnlockAmount(
+  userId: string,
+  reason: CreditReason,
+  ref: string,
+): Promise<number | null> {
+  const [row] = await db
+    .select({ amount: creditTransactions.amount })
+    .from(creditTransactions)
+    .where(
+      and(
+        eq(creditTransactions.userId, userId),
+        eq(creditTransactions.reason, reason),
+        eq(creditTransactions.ref, ref),
+      ),
+    )
+    .limit(1);
+  return row?.amount ?? null;
 }
 
 export type UnlockResult = "already" | "unlocked" | "insufficient";
@@ -229,7 +252,7 @@ export async function spendOnce(
   userId: string,
   cost: number,
   reason: CreditReason,
-  ref: string
+  ref: string,
 ): Promise<UnlockResult> {
   if (await isPremiumUser(userId)) return "already";
   const result = await db.execute<{
@@ -260,7 +283,7 @@ export async function earnDailyCapped(
   userId: string,
   amount: number,
   reason: CreditReason,
-  cap: number
+  cap: number,
 ): Promise<boolean> {
   const [row] = await db
     .select({ n: sql<number>`count(*)::int` })
@@ -269,8 +292,8 @@ export async function earnDailyCapped(
       and(
         eq(creditTransactions.userId, userId),
         eq(creditTransactions.reason, reason),
-        sql`${creditTransactions.createdAt} >= date_trunc('day', now())`
-      )
+        sql`${creditTransactions.createdAt} >= date_trunc('day', now())`,
+      ),
     );
   if ((row?.n ?? 0) >= cap) return false;
   await grantCredits(userId, amount, reason);
@@ -295,12 +318,17 @@ export async function earnWeeklyFeedReward(
 export async function earnOnce(
   userId: string,
   amount: number,
-  reason: CreditReason
+  reason: CreditReason,
 ): Promise<boolean> {
   const [row] = await db
     .select({ id: creditTransactions.id })
     .from(creditTransactions)
-    .where(and(eq(creditTransactions.userId, userId), eq(creditTransactions.reason, reason)))
+    .where(
+      and(
+        eq(creditTransactions.userId, userId),
+        eq(creditTransactions.reason, reason),
+      ),
+    )
     .limit(1);
   if (row) return false;
   await grantCredits(userId, amount, reason);
@@ -316,7 +344,7 @@ export async function earnOnce(
 export async function recordFreeUse(
   userId: string,
   reason: CreditReason,
-  ref?: string
+  ref?: string,
 ): Promise<void> {
   await db
     .insert(creditTransactions)
@@ -330,7 +358,7 @@ export async function recordFreeUse(
  */
 export async function countUnlocks(
   userId: string,
-  reason: CreditReason
+  reason: CreditReason,
 ): Promise<number> {
   const [row] = await db
     .select({ n: sql<number>`count(*)::int` })
@@ -338,8 +366,8 @@ export async function countUnlocks(
     .where(
       and(
         eq(creditTransactions.userId, userId),
-        eq(creditTransactions.reason, reason)
-      )
+        eq(creditTransactions.reason, reason),
+      ),
     );
   return row?.n ?? 0;
 }
@@ -387,10 +415,13 @@ export async function getCreditHistoryPage(
     filter?: CreditHistoryFilter;
     page?: number;
     pageSize?: number;
-  } = {}
+  } = {},
 ): Promise<CreditHistoryPage> {
   const filter = options.filter ?? "all";
-  const pageSize = Math.min(Math.max(Math.trunc(options.pageSize ?? 20), 1), 50);
+  const pageSize = Math.min(
+    Math.max(Math.trunc(options.pageSize ?? 20), 1),
+    50,
+  );
   const requestedPage = Math.max(Math.trunc(options.page ?? 1), 1);
   const amountFilter =
     filter === "earned"

@@ -146,6 +146,9 @@ export type LibraryEntryContent =
       }>;
       reading: string;
       advice: string;
+      /** What this attempt settled: 0/free for the first reading, cost otherwise. */
+      charged?: number;
+      free?: boolean;
     }
   | {
       type: "ai";

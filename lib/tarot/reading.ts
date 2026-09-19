@@ -5,8 +5,10 @@ import {
   FREE_ALLOWANCE,
   countUnlocks,
   getBalance,
+  getUnlockAmount,
   recordFreeUse,
   spendCredits,
+  spendOnce,
 } from "@/lib/credits";
 import { generateTarotReading } from "@/lib/openrouter";
 import {
@@ -17,7 +19,8 @@ import {
 import { SPREAD_POSITIONS_EN, TAROT_EN_BY_SLUG } from "@/lib/tarot/deck-en";
 import { tarotCardBySlugAm } from "@/lib/tarot/deck-am";
 import type { UserLocale } from "@/lib/i18n/locale";
-import { archiveLibraryEntry } from "@/lib/library";
+import { archiveLibraryEntry, getLibraryEntryBySource } from "@/lib/library";
+import { isPremiumUser } from "@/lib/premium";
 
 /**
  * The tarot Q&A engine. Draws a 3-card spread, charges credits (first reading
@@ -139,29 +142,89 @@ export async function performReading(
   userId: string,
   question: string,
   locale: UserLocale = "ka",
+  requestId?: string,
 ): Promise<TarotResult> {
   const q = question.trim().slice(0, 300);
   if (q.length < 3) return { ok: false, error: "bad_request" };
 
-  // ── Gate: first reading free, then CREDIT_COST.tarot each ────────────────
-  const used = await countUnlocks(userId, "spend_tarot");
-  let charged = 0;
-  let free = false;
-  if (used < FREE_ALLOWANCE.tarot) {
-    await recordFreeUse(userId, "spend_tarot");
-    free = true;
-  } else {
-    const paid = await spendCredits(userId, CREDIT_COST.tarot, "spend_tarot");
-    if (!paid) {
+  // A stable client request id makes retries safe: a completed reading is
+  // replayed, and a crashed attempt resumes without charging twice.
+  const requestKey = requestId && requestId.length > 0 ? requestId : undefined;
+  const unlockRef = requestKey ? `tarot:${requestKey}` : undefined;
+  if (requestKey && unlockRef) {
+    const existing = await getLibraryEntryBySource(userId, "tarot", requestKey);
+    if (existing && existing.content.type === "tarot") {
       const balance = await getBalance(userId);
       return {
-        ok: false,
-        error: "insufficient",
-        cost: CREDIT_COST.tarot,
-        balance,
+        ok: true,
+        reading: {
+          headline: existing.title,
+          cards: existing.content.cards,
+          reading: existing.content.reading,
+          advice: existing.content.advice,
+          charged: existing.content.charged ?? 0,
+          free: existing.content.free ?? false,
+          balance,
+          libraryId: existing.id,
+        },
       };
     }
-    charged = CREDIT_COST.tarot;
+  }
+
+  // ── Gate: first reading free, then CREDIT_COST.tarot each ────────────────
+  let charged = 0;
+  let free = false;
+  if (unlockRef) {
+    if (await isPremiumUser(userId)) {
+      charged = CREDIT_COST.tarot;
+    } else {
+      const prior = await getUnlockAmount(userId, "spend_tarot", unlockRef);
+      if (prior !== null) {
+        free = prior === 0;
+        charged = prior < 0 ? -prior : 0;
+      } else {
+        const used = await countUnlocks(userId, "spend_tarot");
+        if (used < FREE_ALLOWANCE.tarot) {
+          await spendOnce(userId, 0, "spend_tarot", unlockRef);
+          free = true;
+        } else {
+          const outcome = await spendOnce(
+            userId,
+            CREDIT_COST.tarot,
+            "spend_tarot",
+            unlockRef,
+          );
+          if (outcome === "insufficient") {
+            const balance = await getBalance(userId);
+            return {
+              ok: false,
+              error: "insufficient",
+              cost: CREDIT_COST.tarot,
+              balance,
+            };
+          }
+          charged = outcome === "unlocked" ? CREDIT_COST.tarot : 0;
+        }
+      }
+    }
+  } else {
+    const used = await countUnlocks(userId, "spend_tarot");
+    if (used < FREE_ALLOWANCE.tarot) {
+      await recordFreeUse(userId, "spend_tarot");
+      free = true;
+    } else {
+      const paid = await spendCredits(userId, CREDIT_COST.tarot, "spend_tarot");
+      if (!paid) {
+        const balance = await getBalance(userId);
+        return {
+          ok: false,
+          error: "insufficient",
+          cost: CREDIT_COST.tarot,
+          balance,
+        };
+      }
+      charged = CREDIT_COST.tarot;
+    }
   }
 
   // ── Draw + interpret ─────────────────────────────────────────────────────
@@ -218,7 +281,7 @@ export async function performReading(
   const libraryEntry = await archiveLibraryEntry({
     userId,
     kind: "tarot",
-    sourceId: crypto.randomUUID(),
+    sourceId: requestKey ?? crypto.randomUUID(),
     title: composed.headline,
     summary: q,
     content: {
@@ -227,6 +290,8 @@ export async function performReading(
       cards,
       reading: composed.reading,
       advice: composed.advice,
+      charged,
+      free,
     },
     language: locale,
   }).catch((error) => {

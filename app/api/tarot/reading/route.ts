@@ -26,8 +26,14 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as {
     question?: unknown;
     locale?: unknown;
+    requestId?: unknown;
   };
   const question = typeof body.question === "string" ? body.question : "";
+  const requestId =
+    typeof body.requestId === "string" ? body.requestId : undefined;
+  if (requestId !== undefined && !/^[A-Za-z0-9_-]{8,64}$/.test(requestId)) {
+    return NextResponse.json({ error: "bad_request" }, { status: 400 });
+  }
 
   // Daily cap on the AI call, matching the other LLM routes. Credits alone are
   // not a bound: spendCredits is a no-op for premium accounts.
@@ -46,7 +52,7 @@ export async function POST(req: Request) {
     body.locale === "am" || body.locale === "en" || body.locale === "ka"
       ? normalizeUserLocale(body.locale)
       : await getRequestLocale();
-  const result = await performReading(userId, question, locale);
+  const result = await performReading(userId, question, locale, requestId);
   if (!result.ok) {
     if (result.error === "insufficient") {
       return NextResponse.json(
