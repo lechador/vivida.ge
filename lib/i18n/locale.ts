@@ -1,11 +1,13 @@
-export const USER_LOCALES = ["ka", "en", "am"] as const;
+export const USER_LOCALES = ["ka", "en"] as const;
 export type UserLocale = (typeof USER_LOCALES)[number];
 
 export function normalizeUserLocale(
   value: string | null | undefined,
 ): UserLocale {
   if (value === "en") return "en";
-  if (value === "am" || value === "hy") return "am";
+  // Armenian was removed: stored "am"/"hy" preferences resolve to English so
+  // existing users keep a working language instead of falling back to Georgian.
+  if (value === "am" || value === "hy") return "en";
   return "ka";
 }
 

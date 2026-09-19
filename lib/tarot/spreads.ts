@@ -20,44 +20,38 @@ export type TarotSpread = {
 export const TAROT_SPREADS: readonly TarotSpread[] = [
   {
     id: "situation",
-    name: { ka: "სიტუაცია", en: "Situation", am: "Իրավիճակ" },
+    name: { ka: "სიტუაცია", en: "Situation" },
     positions: {
       ka: SPREAD_POSITIONS_KA,
       en: SPREAD_POSITIONS_EN,
-      am: ["անցյալ / արմատ", "ներկա / առանցք", "ապագա / ուղի"],
     },
     readingLogic: {
       ka: "წარსული/ფესვი, აწმყო/ბირთვი, მომავალი/გზა",
       en: "past/root, present/core, future/path",
-      am: "անցյալ/արմատ, ներկա/միջուկ, ապագա/ուղի",
     },
   },
   {
     id: "relationship",
-    name: { ka: "ურთიერთობა", en: "Relationship", am: "Հարաբերություն" },
+    name: { ka: "ურთიერთობა", en: "Relationship" },
     positions: {
       ka: ["ჩემი საჭიროება", "დაძაბულობა", "შესაძლო ნაბიჯი"],
       en: ["My need", "The tension", "A possible step"],
-      am: ["Իմ կարիքը", "Լարվածությունը", "Հնարավոր քայլը"],
     },
     readingLogic: {
       ka: "ურთიერთობის დინამიკა: ჩემი საჭიროება, დაძაბულობა, შესაძლო ნაბიჯი",
       en: "relationship dynamic: my need, the tension, a possible step",
-      am: "հարաբերության դինամիկա. իմ կարիքը, լարվածությունը, հնարավոր քայլը",
     },
   },
   {
     id: "choice",
-    name: { ka: "ორი გზა", en: "Two paths", am: "Երկու ուղի" },
+    name: { ka: "ორი გზა", en: "Two paths" },
     positions: {
       ka: ["პირველი გზა", "მეორე გზა", "საერთო რჩევა"],
       en: ["First path", "Second path", "Shared counsel"],
-      am: ["Առաջին ուղի", "Երկրորդ ուղի", "Ընդհանուր խորհուրդ"],
     },
     readingLogic: {
       ka: "ორი გზის შედარება: პირველი გზა, მეორე გზა, საერთო რჩევა",
       en: "comparing two paths: first path, second path, shared counsel",
-      am: "երկու ուղիների համեմատություն. առաջին ուղի, երկրորդ ուղի, ընդհանուր խորհուրդ",
     },
   },
 ];

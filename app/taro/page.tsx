@@ -11,14 +11,9 @@ import { TarotReader } from "@/components/tarot/tarot-reader";
 import { TarotConversionLanding } from "@/components/tarot/tarot-conversion-landing";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
-import { TAROT_CARDS } from "@/lib/tarot/deck";
-import { TAROT_CARDS_EN } from "@/lib/tarot/deck-en";
-import { TAROT_CARDS_AM } from "@/lib/tarot/deck-am";
 import { tarotDetailDeck, type TarotDetailCard } from "@/lib/tarot/detail";
-import { localeHref } from "@/lib/i18n/armenian-routes";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
-  ARMENIAN_SITE_URL,
   DEFAULT_OG_IMAGE,
   ENGLISH_SITE_URL,
   GEORGIAN_SITE_URL,
@@ -36,9 +31,6 @@ const DESCRIPTION_KA =
 const TITLE_EN = "Free Online Tarot Reading — Three-Card Spread";
 const DESCRIPTION_EN =
   "Ask a question and receive a personal three-card tarot reading. Explore clear upright and reversed meanings for all 78 cards of the full deck.";
-const TITLE_AM = "Տարո առցանց ընթերցում — Տարոյի 22 Մեծ Արկաններ";
-const DESCRIPTION_AM =
-  "Տարո առցանց ընթերցում հայերենով. տվեք հարց և ստացեք անձնական պատասխան 3 քարտերի միջոցով: Տարոյի 22 Մեծ Արկաններ — առաջին հարցն անվճար:";
 
 const FAQ_KA = [
   {
@@ -78,55 +70,8 @@ const FAQ_EN = [
   },
 ];
 
-const FAQ_AM = [
-  {
-    q: "Ինչպե՞ս է աշխատում առցանց տարո ընթերցումը Vivida-ում:",
-    a: "Գրեք ձեր հարցը, և մենք պատահականորեն բացում ենք 3 քարտ (արմատ, ներկա, ուղի): AI տարոլոգը կազմում է անհատական պատասխան հայերենով՝ կապելով 3 քարտերը ձեր հարցի հետ:",
-  },
-  {
-    q: "Որքա՞ն արժե տարո ընթերցումը:",
-    a: `Առաջին հարցը լիովին անվճար է: Յուրաքանչյուր հաջորդ հարցն արժե ${CREDIT_COST.tarot} կրեդիտ:`,
-  },
-  {
-    q: "Արդյո՞ք տարոն կանխատեսում է ապագան:",
-    a: "Տարոն ինքնաճանաչման և իրավիճակը տարբեր տեսանկյուններից տեսնելու գործիք է, ոչ թե ճակատագրի անխուսափելի կանխատեսում:",
-  },
-  {
-    q: "Ո՞ր քարտերն են օգտագործվում:",
-    a: "22 Մեծ Արկանները՝ Հիմարից մինչև Աշխարհ: Յուրաքանչյուր քարտ ունի ուղիղ և շրջված իմաստներ:",
-  },
-];
-
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  if (locale === "am") {
-    return {
-      title: { absolute: TITLE_AM },
-      description: DESCRIPTION_AM,
-      keywords: [
-        "տարո",
-        "տարո առցանց",
-        "տարոյի քարտեր",
-        "տարո ընթերցում",
-        "մեծ արկաններ",
-      ],
-      alternates: localizedAlternates("/am/taro", "/taro", "am"),
-      openGraph: {
-        images: [DEFAULT_OG_IMAGE],
-        type: "website",
-        url: `${ARMENIAN_SITE_URL}/taro`,
-        title: TITLE_AM,
-        description: DESCRIPTION_AM,
-        siteName: "Vivida",
-        locale: "hy_AM",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: TITLE_AM,
-        description: DESCRIPTION_AM,
-      },
-    };
-  }
 
   const en = locale === "en";
   const title = en ? TITLE_EN : TITLE_KA;
@@ -177,20 +122,10 @@ export default async function TaroHubPage() {
     userId ? isPremiumUser(userId) : false,
   ]);
   const en = locale === "en";
-  const am = locale === "am";
-  const siteUrl = am
-    ? ARMENIAN_SITE_URL
-    : en
-      ? ENGLISH_SITE_URL
-      : GEORGIAN_SITE_URL;
-  const title = am ? TITLE_AM : en ? TITLE_EN : TITLE_KA;
-  const description = am
-    ? DESCRIPTION_AM
-    : en
-      ? DESCRIPTION_EN
-      : DESCRIPTION_KA;
-  const faq = am ? FAQ_AM : en ? FAQ_EN : FAQ_KA;
-  const cards = am ? TAROT_CARDS_AM : en ? TAROT_CARDS_EN : TAROT_CARDS;
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = en ? TITLE_EN : TITLE_KA;
+  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
+  const faq = en ? FAQ_EN : FAQ_KA;
 
   const ld = [
     articleLd({
@@ -200,23 +135,14 @@ export default async function TaroHubPage() {
       datePublished: "2026-07-14T00:00:00.000Z",
     }),
     breadcrumbLd([
-      { name: am ? "Գլխավոր" : en ? "Home" : "მთავარი", url: siteUrl },
-      { name: am ? "Տարո" : en ? "Tarot" : "ტარო", url: `${siteUrl}/taro` },
+      { name: en ? "Home" : "მთავარი", url: siteUrl },
+      { name: en ? "Tarot" : "ტარო", url: `${siteUrl}/taro` },
     ]),
     faqLd(faq),
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      itemListElement: (am
-        ? cards.map((c) => ({
-            slug: c.slug,
-            name: (c as (typeof TAROT_CARDS_AM)[number]).name,
-          }))
-        : tarotDetailDeck(en ? "en" : "ka").map((c) => ({
-            slug: c.slug,
-            name: c.name,
-          }))
-      ).map((c, i) => ({
+      itemListElement: tarotDetailDeck(en ? "en" : "ka").map((c, i) => ({
         "@type": "ListItem",
         position: i + 1,
         url: `${siteUrl}/taro/${c.slug}`,
@@ -264,38 +190,29 @@ export default async function TaroHubPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link
-            href={localeHref("/", locale)}
-            className="hover:text-foreground"
-          >
-            {am ? "Գլխավոր" : en ? "Home" : "მთავარი"}
+          <Link href="/" className="hover:text-foreground">
+            {en ? "Home" : "მთავარი"}
           </Link>
           <span>/</span>
-          <span className="text-foreground/80">
-            {am ? "Տարո" : en ? "Tarot" : "ტარო"}
-          </span>
+          <span className="text-foreground/80">{en ? "Tarot" : "ტარო"}</span>
         </nav>
 
         <header className="mb-6 text-center">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {am
-              ? "Առցանց տարո · երեք քարտի բացում"
-              : en
-                ? "Online tarot · three-card reading"
-                : "ონლაინ ტარო · ტაროზე მკითხაობა"}
+            {en
+              ? "Online tarot · three-card reading"
+              : "ონლაინ ტარო · ტაროზე მკითხაობა"}
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            {am ? "Կարդացեք " : en ? "Read the " : "ტარო"}{" "}
+            {en ? "Read the " : "ტარო"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {am ? "քարտերը" : en ? "cards" : "ქართულად"}
+              {en ? "cards" : "ქართულად"}
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
-            {am
-              ? "Տվեք ձեր հարցը և ստացեք մտածված, անհատական երեք քարտանոց ընթերցում: Առաջին ընթերցումն անվճար է:"
-              : en
-                ? "Ask a question and receive a thoughtful, personal three-card reading. Your first reading is free."
-                : "ტაროზე მკითხაობა ონლაინ — დაუსვი კითხვა კარტებს და მიიღე ცოცხალი, პერსონალური პასუხი. პირველი კითხვა უფასოა."}
+            {en
+              ? "Ask a question and receive a thoughtful, personal three-card reading. Your first reading is free."
+              : "ტაროზე მკითხაობა ონლაინ — დაუსვი კითხვა კარტებს და მიიღე ცოცხალი, პერსონალური პასუხი. პირველი კითხვა უფასოა."}
           </p>
         </header>
 
@@ -303,40 +220,30 @@ export default async function TaroHubPage() {
           authed={authed}
           cost={CREDIT_COST.tarot}
           locale={locale}
-          countryCode={
-            billingIdentity?.countryCode ?? (locale === "am" ? "AM" : "GB")
-          }
+          countryCode={billingIdentity?.countryCode ?? "GB"}
           premium={premium}
         />
 
         {/* All cards — internal linking + SEO cluster */}
         <section className="mt-12">
           <h2 className="text-xl font-semibold tracking-tight">
-            {am
-              ? "Տարոյի 22 Մեծ Արկանները"
-              : en
-                ? "The full tarot deck — 78 cards"
-                : "ტაროს სრული დასტა — 78 კარტი"}
+            {en
+              ? "The full tarot deck — 78 cards"
+              : "ტაროს სრული დასტა — 78 კარტი"}
           </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            {am
-              ? "Բացահայտեք յուրաքանչյուր քարտի ուղիղ և շրջված իմաստները:"
-              : en
-                ? "Explore the upright and reversed meaning of every card."
-                : "აღმოაჩინე თითო კარტის მნიშვნელობა — პირდაპირი და შებრუნებული."}
+            {en
+              ? "Explore the upright and reversed meaning of every card."
+              : "აღმოაჩინე თითო კარტის მნიშვნელობა — პირდაპირი და შებრუნებული."}
           </p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {(am ? cards : tarotDetailDeck(en ? "en" : "ka")).map((c) => {
-              const name = am
-                ? (c as (typeof TAROT_CARDS_AM)[number]).name
-                : (c as TarotDetailCard).name;
-              const keywords = am
-                ? (c as (typeof TAROT_CARDS_AM)[number]).keywords
-                : (c as TarotDetailCard).keywords;
+            {tarotDetailDeck(en ? "en" : "ka").map((c: TarotDetailCard) => {
+              const name = c.name;
+              const keywords = c.keywords;
               return (
                 <Link
                   key={c.slug}
-                  href={localeHref(`/taro/${c.slug}`, locale)}
+                  href={`/taro/${c.slug}`}
                   className="flex items-center gap-3 rounded-xl border border-border/60 bg-card/40 px-3.5 py-2.5 text-sm transition-colors hover:bg-card/70"
                 >
                   <span className="text-lg">{c.glyph}</span>
@@ -357,11 +264,7 @@ export default async function TaroHubPage() {
         {/* FAQ */}
         <section className="mt-12">
           <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {am
-              ? "Հաճախակի տրվող հարցեր"
-              : en
-                ? "Frequently asked questions"
-                : "ხშირად დასმული კითხვები"}
+            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="space-y-3">
             {faq.map((item) => (
@@ -388,28 +291,18 @@ export default async function TaroHubPage() {
           <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
             <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
             <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              {am
-                ? "Քարտերն ու աստղերը՝ միասին"
-                : en
-                  ? "Cards and stars, together"
-                  : "ტაროც და ვარსკვლავებიც"}
+              {en ? "Cards and stars, together" : "ტაროც და ვარსკვლავებიც"}
             </h2>
             <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-              {am
-                ? "Ծննդյան քարտեզը լրացնում է պատկերը՝ Լուսին, Վեներա, մոլորակներ և բոլոր տասներկու տները: Ստեղծեք այն անվճար:"
-                : en
-                  ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
-                  : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს — მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
+              {en
+                ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
+                : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს — მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
             </p>
             <Link
-              href={localeHref(en ? "/natal-chart" : "/nataluri-ruka", locale)}
+              href={en ? "/natal-chart" : "/nataluri-ruka"}
               className="mt-6 inline-flex items-center gap-1.5 rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2.5 text-sm font-semibold text-white"
             >
-              {am
-                ? "Ստեղծել ծննդյան քարտեզը"
-                : en
-                  ? "Create my natal chart"
-                  : "ჩემი ნატალური რუკა"}
+              {en ? "Create my natal chart" : "ჩემი ნატალური რუკა"}
               <ArrowRight className="size-4" />
             </Link>
           </div>
@@ -419,21 +312,14 @@ export default async function TaroHubPage() {
           <PopularSearches
             locale={locale}
             queries={
-              am
+              en
                 ? [
-                    "տարո առցանց հայերեն",
-                    "երեք քարտի տարո բացում",
-                    "Մեծ Արկանների իմաստները",
-                    "ուղիղ և շրջված տարո քարտեր",
+                    "free online tarot reading",
+                    "three card tarot spread",
+                    "Major Arcana meanings",
+                    "upright and reversed tarot cards",
                   ]
-                : en
-                  ? [
-                      "free online tarot reading",
-                      "three card tarot spread",
-                      "Major Arcana meanings",
-                      "upright and reversed tarot cards",
-                    ]
-                  : TAROT_LATIN_QUERIES
+                : TAROT_LATIN_QUERIES
             }
           />
         )}
