@@ -164,7 +164,7 @@ export function TarotReader({
     cost: CREDIT_COST.tarotFollowup,
   });
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
-  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(true);
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
 
   // Previous readings, so a past spread can be reopened (reply) or a fresh
@@ -442,6 +442,112 @@ export function TarotReader({
     }
   }
 
+  function renderFollowup(inputId: string) {
+    if (!reading?.libraryId) return null;
+    return (
+      <div className="rounded-2xl border border-border bg-background/35 p-4 sm:p-5">
+        <div className="text-sm font-semibold text-foreground">
+          {en ? "Go deeper into this spread" : "ჩაუღრმავდი ამ გაშლას"}
+        </div>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          {en
+            ? "About the same cards — no new spread is drawn."
+            : "იგივე კარტებზე — ახალი გაშლა არ იშლება."}{" "}
+          {reading.followups.length === 0
+            ? en
+              ? "Your first follow-up is free."
+              : "პირველი დაზუსტება უფასოა."
+            : en
+              ? `Next follow-up — ${CREDIT_COST.tarotFollowup} credits.`
+              : `შემდეგი დაზუსტება — ${CREDIT_COST.tarotFollowup} კრედიტი.`}
+        </p>
+
+        {reading.followups.map((followup, index) => (
+          <div
+            key={index}
+            className="mt-3 rounded-xl border border-border/60 bg-background/40 p-3"
+          >
+            <p className="text-xs font-medium text-[var(--vivida-violet)]">
+              {followup.question}
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-foreground/90">
+              {followup.answer}
+            </p>
+          </div>
+        ))}
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {FOLLOWUP_SUGGESTIONS[locale].map((suggestion) => (
+            <button
+              key={suggestion}
+              type="button"
+              onClick={() => askFollowup(suggestion)}
+              disabled={followupStatus === "sending"}
+              className="rounded-full border border-border bg-card/55 px-3 py-1.5 text-xs text-foreground/85 transition-colors hover:bg-card/80 disabled:opacity-50"
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+          <input
+            id={inputId}
+            type="text"
+            value={followupQuestion}
+            onChange={(e) => setFollowupQuestion(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") askFollowup();
+            }}
+            disabled={followupStatus === "sending"}
+            maxLength={300}
+            placeholder={
+              en
+                ? "For example: How does this connect to my situation?"
+                : "მაგ: ეს ჩემს სიტუაციას როგორ უკავშირდება?"
+            }
+            className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => askFollowup()}
+            disabled={
+              followupStatus === "sending" || followupQuestion.trim().length < 3
+            }
+            className="shrink-0 gap-1.5"
+          >
+            {followupStatus === "sending" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Sparkles className="size-4" />
+            )}
+            {en ? "Ask" : "კითხვა"}
+          </Button>
+        </div>
+
+        {followupStatus === "short" && (
+          <div className="mt-3 rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
+            <ContextualPaywallActions
+              locale={locale}
+              balance={followupShort.balance}
+              cost={followupShort.cost}
+              product="tarot_followup"
+              returnTo="/taro"
+              placement="tarot_followup_short"
+            />
+          </div>
+        )}
+        {followupStatus === "error" && (
+          <p className="mt-2 text-sm text-[var(--vivida-pink)]">
+            {en
+              ? "Something went wrong. Please try again."
+              : "რაღაც ვერ მოხერხდა — სცადე ხელახლა."}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/10 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
       {/* Previous questions — reopen a spread (reply) or start fresh. */}
@@ -516,7 +622,7 @@ export function TarotReader({
             key={spread.id}
             type="button"
             onClick={() => setSpreadId(spread.id)}
-            disabled={status === "drawing"}
+            disabled={status === "drawing" || !!reading?.fromHistory}
             aria-pressed={spreadId === spread.id}
             className={`rounded-full border px-3.5 py-2 text-sm transition-colors disabled:opacity-50 ${
               spreadId === spread.id
@@ -529,45 +635,59 @@ export function TarotReader({
         ))}
       </div>
       {/* Question box */}
-      <label
-        htmlFor="tarot-question"
-        className="block text-sm font-medium text-foreground/90"
-      >
-        {en ? "Ask the cards a question" : "დაუსვი კითხვა კარტებს"}
-      </label>
-      <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-        <input
-          id="tarot-question"
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") ask();
-          }}
-          disabled={status === "drawing"}
-          maxLength={300}
-          placeholder={
-            en
-              ? "For example: What should I understand about this relationship?"
-              : "მაგ: რას მიპირებს ეს ურთიერთობა?"
-          }
-          className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
-        />
-        <Button
-          type="button"
-          variant="mystic"
-          onClick={ask}
-          disabled={status === "drawing" || question.trim().length < 3}
-          className="shrink-0 gap-1.5"
-        >
-          {status === "drawing" ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <Wand2 className="size-4" />
-          )}
-          {en ? "Draw the cards" : "გაშალე კარტები"}
-        </Button>
-      </div>
+      {reading?.fromHistory ? (
+        <>
+          <div className="block text-sm font-medium text-foreground/90">
+            {en ? "Question" : "კითხვა"}
+          </div>
+          <div className="mt-2 rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground/85">
+            {question}
+          </div>
+          <div className="mt-4">{renderFollowup("tarot-followup-top")}</div>
+        </>
+      ) : (
+        <>
+          <label
+            htmlFor="tarot-question"
+            className="block text-sm font-medium text-foreground/90"
+          >
+            {en ? "Ask the cards a question" : "დაუსვი კითხვა კარტებს"}
+          </label>
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+            <input
+              id="tarot-question"
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") ask();
+              }}
+              disabled={status === "drawing"}
+              maxLength={300}
+              placeholder={
+                en
+                  ? "For example: What should I understand about this relationship?"
+                  : "მაგ: რას მიპირებს ეს ურთიერთობა?"
+              }
+              className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+            />
+            <Button
+              type="button"
+              variant="mystic"
+              onClick={ask}
+              disabled={status === "drawing" || question.trim().length < 3}
+              className="shrink-0 gap-1.5"
+            >
+              {status === "drawing" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Wand2 className="size-4" />
+              )}
+              {en ? "Draw the cards" : "გაშალე კარტები"}
+            </Button>
+          </div>
+        </>
+      )}
       {spreadId === "choice" && !reading && (
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <input
@@ -694,109 +814,9 @@ export function TarotReader({
           </div>
 
           {/* Follow-up — a next question on the same cards, no new spread. */}
-          {reading.libraryId && (
-            <div className="rounded-2xl border border-border bg-background/35 p-4 sm:p-5">
-              <div className="text-sm font-semibold text-foreground">
-                {en ? "Go deeper into this spread" : "ჩაუღრმავდი ამ გაშლას"}
-              </div>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                {en
-                  ? "About the same cards — no new spread is drawn."
-                  : "იგივე კარტებზე — ახალი გაშლა არ იშლება."}{" "}
-                {reading.followups.length === 0
-                  ? en
-                    ? "Your first follow-up is free."
-                    : "პირველი დაზუსტება უფასოა."
-                  : en
-                    ? `Next follow-up — ${CREDIT_COST.tarotFollowup} credits.`
-                    : `შემდეგი დაზუსტება — ${CREDIT_COST.tarotFollowup} კრედიტი.`}
-              </p>
-
-              {reading.followups.map((followup, index) => (
-                <div
-                  key={index}
-                  className="mt-3 rounded-xl border border-border/60 bg-background/40 p-3"
-                >
-                  <p className="text-xs font-medium text-[var(--vivida-violet)]">
-                    {followup.question}
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">
-                    {followup.answer}
-                  </p>
-                </div>
-              ))}
-
-              <div className="mt-3 flex flex-wrap gap-2">
-                {FOLLOWUP_SUGGESTIONS[locale].map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    type="button"
-                    onClick={() => askFollowup(suggestion)}
-                    disabled={followupStatus === "sending"}
-                    className="rounded-full border border-border bg-card/55 px-3 py-1.5 text-xs text-foreground/85 transition-colors hover:bg-card/80 disabled:opacity-50"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-                <input
-                  id="tarot-followup"
-                  type="text"
-                  value={followupQuestion}
-                  onChange={(e) => setFollowupQuestion(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") askFollowup();
-                  }}
-                  disabled={followupStatus === "sending"}
-                  maxLength={300}
-                  placeholder={
-                    en
-                      ? "For example: How does this connect to my situation?"
-                      : "მაგ: ეს ჩემს სიტუაციას როგორ უკავშირდება?"
-                  }
-                  className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => askFollowup()}
-                  disabled={
-                    followupStatus === "sending" ||
-                    followupQuestion.trim().length < 3
-                  }
-                  className="shrink-0 gap-1.5"
-                >
-                  {followupStatus === "sending" ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="size-4" />
-                  )}
-                  {en ? "Ask" : "კითხვა"}
-                </Button>
-              </div>
-
-              {followupStatus === "short" && (
-                <div className="mt-3 rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
-                  <ContextualPaywallActions
-                    locale={locale}
-                    balance={followupShort.balance}
-                    cost={followupShort.cost}
-                    product="tarot_followup"
-                    returnTo="/taro"
-                    placement="tarot_followup_short"
-                  />
-                </div>
-              )}
-              {followupStatus === "error" && (
-                <p className="mt-2 text-sm text-[var(--vivida-pink)]">
-                  {en
-                    ? "Something went wrong. Please try again."
-                    : "რაღაც ვერ მოხერხდა — სცადე ხელახლა."}
-                </p>
-              )}
-            </div>
-          )}
+          {reading.libraryId &&
+            !reading.fromHistory &&
+            renderFollowup("tarot-followup")}
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             {!reading.fromHistory && (
