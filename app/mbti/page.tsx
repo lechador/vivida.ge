@@ -97,8 +97,6 @@ const GROUP_LABEL: Record<
     blurbKa: string;
     labelEn: string;
     blurbEn: string;
-    labelAm: string;
-    blurbAm: string;
   }
 > = {
   analysts: {
@@ -106,32 +104,24 @@ const GROUP_LABEL: Record<
     blurbKa: "ლოგიკა, სტრატეგია და დამოუკიდებელი აზროვნება.",
     labelEn: "Analysts",
     blurbEn: "Logic, strategy and independent thinking.",
-    labelAm: "Անալիտիկներ",
-    blurbAm: "Տրամաբանություն, ռազմավարություն և անկախ մտածողություն:",
   },
   diplomats: {
     labelKa: "დიპლომატები",
     blurbKa: "ემპათია, იდეალიზმი და ღრმა ღირებულებები.",
     labelEn: "Diplomats",
     blurbEn: "Empathy, imagination and values-led connection.",
-    labelAm: "Դիվանագետներ",
-    blurbAm: "Էմպաթիա, իդեալիզմ և խորը արժեքներ:",
   },
   sentinels: {
     labelKa: "მცველები",
     blurbKa: "წესრიგი, საიმედოობა და პრაქტიკულობა.",
     labelEn: "Sentinels",
     blurbEn: "Structure, reliability and practical care.",
-    labelAm: "Պահապաններ",
-    blurbAm: "Կարգուկանոն, հուսալիություն և գործնականություն:",
   },
   explorers: {
     labelKa: "მკვლევრები",
     blurbKa: "სპონტანურობა, ხელოვნება და მოქმედება.",
     labelEn: "Explorers",
     blurbEn: "Adaptability, direct experience and action.",
-    labelAm: "Հետազոտողներ",
-    blurbAm: "Ինքնաբուխություն, արվեստ և գործողություն:",
   },
 };
 

@@ -13,7 +13,6 @@ import type { UserLocale } from "@/lib/i18n/locale";
 const COPY = {
   ka: { title: "საკითხავი შენთვის", all: "ყველა სტატია" },
   en: { title: "Recommended reading", all: "All articles" },
-  am: { title: "Ընթերցանություն ձեզ համար", all: "Բոլոր հոդվածները" },
 } as const;
 
 export function DashboardArticleRecommendations({
@@ -70,7 +69,11 @@ export function DashboardArticleRecommendations({
 
             <span className="flex min-w-0 flex-1 flex-col justify-center p-3">
               <span className="mb-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--vivida-cyan)]">
-                {ARTICLE_CATEGORY_LABELS[locale][article.category as ArticleCategory]}
+                {
+                  ARTICLE_CATEGORY_LABELS[locale][
+                    article.category as ArticleCategory
+                  ]
+                }
               </span>
               <span className="line-clamp-3 text-sm font-semibold leading-snug tracking-tight text-foreground/90 transition-colors group-hover:text-foreground">
                 {article.title}

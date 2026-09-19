@@ -18,9 +18,6 @@ const SCORE_COLOR: Record<string, string> = {
   Strong: "oklch(0.78 0.18 305)",
   Harmonious: "oklch(0.78 0.16 200)",
   Dynamic: "oklch(0.72 0.20 30)",
-  Ուժեղ: "oklch(0.78 0.18 305)",
-  Ներդաշնակ: "oklch(0.78 0.16 200)",
-  Դինամիկ: "oklch(0.72 0.20 30)",
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -34,7 +31,7 @@ export function CompatibilityCalculator({
 }: {
   signs: CalcSign[];
   pairs: Record<string, CalcPair>;
-  locale?: "ka" | "en" | "am";
+  locale?: "ka" | "en";
 }) {
   const en = locale === "en";
   const [a, setA] = useState<ZodiacSlug | null>(null);
@@ -264,7 +261,7 @@ function ResultCard({
   result: CalcPair;
   signA: CalcSign;
   signB: CalcSign;
-  locale: "ka" | "en" | "am";
+  locale: "ka" | "en";
 }) {
   const en = locale === "en";
   const color = SCORE_COLOR[result.score] ?? "var(--vivida-violet)";

@@ -14,7 +14,6 @@ import type { UserLocale } from "@/lib/i18n/locale";
 const READ = {
   ka: "წთ საკითხავი",
   en: "min read",
-  am: "րոպե ընթերցում",
 } as const;
 
 export function ArticleCard({

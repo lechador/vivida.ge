@@ -46,21 +46,6 @@ const COPY = {
     invalidComment: "Write a comment before publishing.",
     user: "Vivida member",
   },
-  am: {
-    discussion: "Քննարկում",
-    comments: "մեկնաբանություն",
-    like: "Հավանել",
-    unlike: "Հեռացնել հավանումը",
-    placeholder: "Կիսվեք ձեր կարծիքով…",
-    publish: "Հրապարակել",
-    empty: "Մեկնաբանություններ դեռ չկան՝ սկսեք զրույցը։",
-    loginTitle: "Միացեք քննարկմանը",
-    loginText: "Մուտք գործեք՝ հոդվածը հավանելու կամ մեկնաբանելու համար։",
-    login: "Մուտք գործել",
-    genericError: "Գործողությունը չհաջողվեց։ Փորձեք կրկին։",
-    invalidComment: "Հրապարակելուց առաջ գրեք մեկնաբանություն։",
-    user: "Vivida-ի անդամ",
-  },
 } as const;
 
 type ClientComment = Omit<ArticleComment, "createdAt"> & {

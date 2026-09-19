@@ -42,103 +42,87 @@ export function mbtiCodeFromSlug(slug: string): string | null {
 /** The four 16Personalities groups, with localized labels. */
 export const MBTI_GROUP: Record<
   string,
-  { key: string; labelKa: string; labelEn: string; labelAm: string }
+  { key: string; labelKa: string; labelEn: string }
 > = {
   INTJ: {
     key: "analysts",
     labelKa: "ანალიტიკოსები",
     labelEn: "Analysts",
-    labelAm: "Անալիտիկներ",
   },
   INTP: {
     key: "analysts",
     labelKa: "ანალიტიკოსები",
     labelEn: "Analysts",
-    labelAm: "Անալիտիկներ",
   },
   ENTJ: {
     key: "analysts",
     labelKa: "ანალიტიკოსები",
     labelEn: "Analysts",
-    labelAm: "Անալիտիկներ",
   },
   ENTP: {
     key: "analysts",
     labelKa: "ანალიტიკოსები",
     labelEn: "Analysts",
-    labelAm: "Անալիտիկներ",
   },
   INFJ: {
     key: "diplomats",
     labelKa: "დიპლომატები",
     labelEn: "Diplomats",
-    labelAm: "Դիվանագետներ",
   },
   INFP: {
     key: "diplomats",
     labelKa: "დიპლომატები",
     labelEn: "Diplomats",
-    labelAm: "Դիվանագետներ",
   },
   ENFJ: {
     key: "diplomats",
     labelKa: "დიპლომატები",
     labelEn: "Diplomats",
-    labelAm: "Դիվանագետներ",
   },
   ENFP: {
     key: "diplomats",
     labelKa: "დიპლომატები",
     labelEn: "Diplomats",
-    labelAm: "Դիվանագետներ",
   },
   ISTJ: {
     key: "sentinels",
     labelKa: "მცველები",
     labelEn: "Sentinels",
-    labelAm: "Պահապաններ",
   },
   ISFJ: {
     key: "sentinels",
     labelKa: "მცველები",
     labelEn: "Sentinels",
-    labelAm: "Պահապաններ",
   },
   ESTJ: {
     key: "sentinels",
     labelKa: "მცველები",
     labelEn: "Sentinels",
-    labelAm: "Պահապաններ",
   },
   ESFJ: {
     key: "sentinels",
     labelKa: "მცველები",
     labelEn: "Sentinels",
-    labelAm: "Պահապաններ",
   },
   ISTP: {
     key: "explorers",
     labelKa: "მკვლევრები",
     labelEn: "Explorers",
-    labelAm: "Հետազոտողներ",
   },
   ISFP: {
     key: "explorers",
     labelKa: "მკვლევრები",
     labelEn: "Explorers",
-    labelAm: "Հետազոտողներ",
   },
   ESTP: {
     key: "explorers",
     labelKa: "მკვლევრები",
     labelEn: "Explorers",
-    labelAm: "Հետազոտողներ",
   },
   ESFP: {
     key: "explorers",
     labelKa: "მკვლევრები",
     labelEn: "Explorers",
-    labelAm: "Հետազոտողներ",
   },
 };
 
@@ -178,7 +162,7 @@ export type MbtiSeo = {
 export function buildMbtiSeo(code: string): MbtiSeo {
   const archetypeKa = mbtiArchetypeKa(code);
   const taglineKa = MBTI_TAGLINE_KA[code] ?? "";
-  const group = MBTI_GROUP[code] ?? { key: "", labelKa: "" };
+  const group = MBTI_GROUP[code] ?? { key: "", labelKa: "", labelEn: "" };
   const famous = mbtiFamousFor(code).slice(0, 3).join(", ");
 
   return {
@@ -238,7 +222,6 @@ export function buildMbtiSeoEn(code: string): MbtiSeoEn {
     key: "",
     labelKa: "",
     labelEn: "",
-    labelAm: "",
   };
   const famous = mbtiFamousFor(code).slice(0, 3).join(", ");
   return {
@@ -273,58 +256,6 @@ export function buildMbtiSeoEn(code: string): MbtiSeoEn {
       `MBTI ${code}`,
       "16 personality types",
       "personality test",
-    ],
-  };
-}
-
-export type MbtiSeoAm = {
-  code: string;
-  slug: string;
-  archetype: string;
-  tagline: string;
-  group: { key: string; labelAm: string };
-  pageTitle: string;
-  metaDescription: string;
-  faq: { q: string; a: string }[];
-  queries: string[];
-};
-
-export function buildMbtiSeoAm(code: string): MbtiSeoAm {
-  // Armenian MBTI library removed: no Armenian body copy remains. The export
-  // stays until app/mbti/[type] drops its `am` branch (cross-area).
-  const group = MBTI_GROUP[code] ?? {
-    key: "",
-    labelKa: "",
-    labelEn: "",
-    labelAm: "",
-  };
-  const archetype = code;
-  const tagline = "";
-  return {
-    code,
-    slug: code.toLowerCase(),
-    archetype,
-    tagline,
-    group: { key: group.key, labelAm: group.labelAm },
-    pageTitle: `${code} — ${archetype} | Անհատականության տիպ`,
-    metaDescription: `${code} (${archetype}) անհատականության տիպի ամբողջական նկարագրությունը հայերենով. ուժեղ և թույլ կողմեր, հարաբերություններ, կարիերա: Անցեք անվճար թեստ Vivida-ում:`,
-    faq: [
-      {
-        q: `Ի՞նչ է նշանակում ${code} տիպը:`,
-        a: `${code} կամ „${archetype}“՝ 16 անհատականության տիպերից մեկն է: ${tagline}`,
-      },
-      {
-        q: `Ինչպե՞ս պարզել՝ արդյոք ես ${code} եմ:`,
-        a: "Անցեք Vivida-ի անվճար անհատականության թեստը և ստացեք ձեր տիպի մանրամասն վերլուծությունը:",
-      },
-    ],
-    queries: [
-      code,
-      `${code} հայերեն`,
-      `${code} տիպ`,
-      `MBTI ${code}`,
-      "16 անհատականության տիպեր",
-      "անձի թեստ",
     ],
   };
 }

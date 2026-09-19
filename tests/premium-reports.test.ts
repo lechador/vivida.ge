@@ -89,7 +89,6 @@ describe("premium report content", () => {
       });
       const serialized = JSON.stringify(content);
       expect(serialized).not.toMatch(/[ა-ჰ]/);
-      expect(serialized).not.toMatch(/[Ա-ֆ]/);
       expect(content.sections).toHaveLength(4);
     }
   });
@@ -255,13 +254,11 @@ describe("report depth and language purity", () => {
           now: new Date("2026-08-26T12:00:00Z"),
         });
         const serialized = JSON.stringify(content);
-        // Hyphen-glued case endings are never grammatical in ka/am.
+        // Hyphen-glued case endings are never grammatical in ka.
         expect(serialized).not.toMatch(/[ა-ჰ]-ში/);
         expect(serialized).not.toMatch(/[ა-ჰ]-ის/);
-        expect(serialized).not.toMatch(/[Ա-ֆ]-ում/);
         if (locale === "ka") {
           expect(serialized).toMatch(/[ა-ჰ]/);
-          expect(serialized).not.toMatch(/[Ա-ֆ]/);
           if (type === "relationship") {
             expect(serialized).not.toMatch(
               /conjunction|sextile|square|trine|opposition/,
@@ -270,7 +267,6 @@ describe("report depth and language purity", () => {
         }
         if (locale === "en") {
           expect(serialized).not.toMatch(/[ა-ჰ]/);
-          expect(serialized).not.toMatch(/[Ա-ֆ]/);
         }
       });
     }

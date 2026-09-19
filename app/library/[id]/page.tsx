@@ -217,7 +217,6 @@ function LibraryContent({
                   (tarotSpreadById(content.spreadId)?.name ?? {
                     ka: "ტარო",
                     en: "Tarot",
-                    am: "Տարո",
                   })[locale]
                 }
               </p>

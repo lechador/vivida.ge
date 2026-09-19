@@ -43,15 +43,6 @@ const WEEKDAYS = {
     "Friday",
     "Saturday",
   ],
-  am: [
-    "Կիրակի",
-    "Երկուշաբթի",
-    "Երեքշաբթի",
-    "Չորեքշաբթի",
-    "Հինգշաբթի",
-    "Ուրբաթ",
-    "Շաբաթ",
-  ],
 };
 
 export function ReminderPreferencesCard({

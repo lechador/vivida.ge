@@ -4,7 +4,12 @@ import { MessageCircle } from "lucide-react";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { cn } from "@/lib/utils";
 import { MessagesTabBadge } from "./messages-tab-badge";
-import { NAV_ITEMS, navLabel, type NavActiveKey, type NavItem } from "./nav-items";
+import {
+  NAV_ITEMS,
+  navLabel,
+  type NavActiveKey,
+  type NavItem,
+} from "./nav-items";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -31,14 +36,14 @@ export function DesktopSidebar({
       href: "/messages",
       label: "ჩატი",
       labelEn: "Chat",
-      labelAm: "Չատ",
       Icon: MessageCircle,
       hue: "oklch(0.78 0.18 200)",
     },
   ];
 
   // Labels/wordmark fade in when the rail is hovered.
-  const reveal = "opacity-0 transition-opacity duration-150 group-hover:opacity-100";
+  const reveal =
+    "opacity-0 transition-opacity duration-150 group-hover:opacity-100";
 
   return (
     <aside
@@ -50,10 +55,13 @@ export function DesktopSidebar({
         "overflow-hidden transition-[width] duration-200 ease-out",
         "flex-col border-r border-[var(--vivida-violet)]/30 bg-[oklch(0.15_0.05_290/0.97)] backdrop-blur-2xl",
         "shadow-[8px_0_32px_-12px_oklch(0.65_0.24_305/0.18)]",
-        "after:pointer-events-none after:absolute after:inset-y-8 after:right-0 after:w-px after:bg-[linear-gradient(180deg,transparent,oklch(0.78_0.18_305/0.45),transparent)]"
+        "after:pointer-events-none after:absolute after:inset-y-8 after:right-0 after:w-px after:bg-[linear-gradient(180deg,transparent,oklch(0.78_0.18_305/0.45),transparent)]",
       )}
     >
-      <Link href="/dashboard" className="flex shrink-0 items-center gap-2.5 px-[1.15rem] pb-3 pt-4">
+      <Link
+        href="/dashboard"
+        className="flex shrink-0 items-center gap-2.5 px-[1.15rem] pb-3 pt-4"
+      >
         <VividaMark size={36} id="sidebar-mark" className="!size-9 shrink-0" />
         <span className={cn("flex items-center gap-2", reveal)}>
           <span
@@ -75,59 +83,61 @@ export function DesktopSidebar({
 
       <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <ul className="mt-2 flex flex-col gap-0.5">
-        {items.map((item) => {
-          const isActive = active === item.key;
-          return (
-            <li key={item.key}>
-              <Link
-                href={item.href}
-                aria-current={isActive ? "page" : undefined}
-                title={navLabel(item, locale)}
-                className={cn(
-                  "group/link relative flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-[var(--vivida-violet)]/15 text-foreground"
-                    : "text-muted-foreground hover:bg-card/50 hover:text-foreground"
-                )}
-              >
-                <span
+          {items.map((item) => {
+            const isActive = active === item.key;
+            return (
+              <li key={item.key}>
+                <Link
+                  href={item.href}
+                  aria-current={isActive ? "page" : undefined}
+                  title={navLabel(item, locale)}
                   className={cn(
-                    "relative grid size-8 shrink-0 place-items-center rounded-lg transition-all",
+                    "group/link relative flex items-center gap-3 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-[var(--vivida-violet)]/30 ring-1 ring-[var(--vivida-violet)]/55 shadow-[0_0_18px_-4px_oklch(0.65_0.24_305/0.55)]"
-                      : "bg-card/40 ring-1 ring-border/40 group-hover/link:ring-border"
+                      ? "bg-[var(--vivida-violet)]/15 text-foreground"
+                      : "text-muted-foreground hover:bg-card/50 hover:text-foreground",
                   )}
-                  style={isActive ? { color: item.hue } : undefined}
                 >
-                  <item.Icon className="size-4" />
-                  {item.key === "messages" && (
-                    <MessagesTabBadge
-                      initial={unreadMessages}
-                      locale={locale}
-                    />
-                  )}
-                </span>
-                <span className={cn("truncate", reveal)}>{navLabel(item, locale)}</span>
-                {item.badgeKa && (
                   <span
                     className={cn(
-                      "ml-auto shrink-0 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]",
-                      reveal
+                      "relative grid size-8 shrink-0 place-items-center rounded-lg transition-all",
+                      isActive
+                        ? "bg-[var(--vivida-violet)]/30 ring-1 ring-[var(--vivida-violet)]/55 shadow-[0_0_18px_-4px_oklch(0.65_0.24_305/0.55)]"
+                        : "bg-card/40 ring-1 ring-border/40 group-hover/link:ring-border",
                     )}
+                    style={isActive ? { color: item.hue } : undefined}
                   >
-                    {locale !== "ka" ? item.badgeEn : item.badgeKa}
+                    <item.Icon className="size-4" />
+                    {item.key === "messages" && (
+                      <MessagesTabBadge
+                        initial={unreadMessages}
+                        locale={locale}
+                      />
+                    )}
                   </span>
-                )}
-                {isActive && (
-                  <span
-                    aria-hidden
-                    className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-[var(--vivida-violet)] shadow-[0_0_8px_oklch(0.65_0.24_305/0.85)]"
-                  />
-                )}
-              </Link>
-            </li>
-          );
-        })}
+                  <span className={cn("truncate", reveal)}>
+                    {navLabel(item, locale)}
+                  </span>
+                  {item.badgeKa && (
+                    <span
+                      className={cn(
+                        "ml-auto shrink-0 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]",
+                        reveal,
+                      )}
+                    >
+                      {locale !== "ka" ? item.badgeEn : item.badgeKa}
+                    </span>
+                  )}
+                  {isActive && (
+                    <span
+                      aria-hidden
+                      className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-[var(--vivida-violet)] shadow-[0_0_8px_oklch(0.65_0.24_305/0.85)]"
+                    />
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 
@@ -140,10 +150,12 @@ export function DesktopSidebar({
           href="/account"
           className={cn(
             "block whitespace-nowrap text-xs text-muted-foreground hover:text-foreground",
-            reveal
+            reveal,
           )}
         >
-          {locale !== "ka" ? "Account & settings →" : "ანგარიში & პარამეტრები →"}
+          {locale !== "ka"
+            ? "Account & settings →"
+            : "ანგარიში & პარამეტრები →"}
         </Link>
       </div>
     </aside>
