@@ -118,9 +118,9 @@ export function TarotConversionLanding({
             </h1>
 
             <p className="mt-6 max-w-xl text-pretty text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
-              ჩაიფიქრე კითხვა. სამი კარტი გაჩვენებს სიტუაციის ფესვს,
-              აწმყოსა და შესაძლო გზას. Vivida-ს AI ტაროლოგი კი შენთვის
-              შექმნის პირად განმარტებას — ქართულად, რამდენიმე წამში.
+              ჩაიფიქრე კითხვა. სამი კარტი გაჩვენებს სიტუაციის ფესვს, აწმყოსა და
+              შესაძლო გზას. Vivida-ს AI ტაროლოგი კი შენთვის შექმნის პირად
+              განმარტებას — ქართულად, რამდენიმე წამში.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -184,7 +184,7 @@ export function TarotConversionLanding({
               />
             </div>
             <div className="absolute bottom-0 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/10 bg-[#0c0c1d]/88 px-4 py-2 text-xs font-medium text-white/75 shadow-xl backdrop-blur-xl sm:bottom-2">
-              22 დიდი არკანა · თითო გაშლა უნიკალურია
+              78 კარტი · თითო გაშლა უნიკალურია
             </div>
           </div>
         </section>
@@ -205,8 +205,8 @@ export function TarotConversionLanding({
               რა კითხვა არ გასვენებს?
             </ReaderHeading>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/60 sm:text-base">
-              ღია კითხვა უკეთეს პასუხს გაძლევს. მაგალითად: „რა უნდა დავინახო
-              ამ ურთიერთობაში?“
+              ღია კითხვა უკეთეს პასუხს გაძლევს. მაგალითად: „რა უნდა დავინახო ამ
+              ურთიერთობაში?“
             </p>
           </div>
           <TarotReader
@@ -218,8 +218,8 @@ export function TarotConversionLanding({
           />
           {!authed && (
             <p className="mt-4 text-center text-xs leading-5 text-white/45">
-              პასუხის მისაღებად გაივლი სწრაფ რეგისტრაციას — შენი პირველი
-              გაშლა ანგარიშზე ავტომატურად უფასოა.
+              პასუხის მისაღებად გაივლი სწრაფ რეგისტრაციას — შენი პირველი გაშლა
+              ანგარიშზე ავტომატურად უფასოა.
             </p>
           )}
         </div>
@@ -247,10 +247,16 @@ export function TarotConversionLanding({
                     <span className="grid size-11 place-items-center rounded-2xl bg-[#8d67ff]/12 text-[#c7b5ff] ring-1 ring-[#a78cff]/20">
                       <Icon className="size-5" />
                     </span>
-                    <span className="font-mono text-xs text-white/25">{step.n}</span>
+                    <span className="font-mono text-xs text-white/25">
+                      {step.n}
+                    </span>
                   </div>
-                  <h3 className="mt-6 text-xl font-semibold text-white">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-white/58">{step.text}</p>
+                  <h3 className="mt-6 text-xl font-semibold text-white">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-white/58">
+                    {step.text}
+                  </p>
                 </article>
               );
             })}
@@ -292,7 +298,10 @@ export function TarotConversionLanding({
                   "გზა — სად ღირს ყურადღების მიმართვა",
                   "მოკლე პრაქტიკული მინიშნება შემდეგი ნაბიჯისთვის",
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/72 sm:text-base">
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 text-sm text-white/72 sm:text-base"
+                  >
                     <Check className="mt-0.5 size-5 shrink-0 text-[#bca8ff]" />
                     {item}
                   </li>
@@ -304,7 +313,10 @@ export function TarotConversionLanding({
       )}
 
       {!authed && (
-        <section id="pricing" className="relative z-10 mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+        <section
+          id="pricing"
+          className="relative z-10 mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-28"
+        >
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#cab8ff]">
               მარტივი და გამჭვირვალე ფასი
@@ -323,8 +335,12 @@ export function TarotConversionLanding({
               <span className="w-fit rounded-full bg-[#c8b5ff]/14 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#d8ccff]">
                 დაიწყე აქ
               </span>
-              <h3 className="mt-5 text-lg font-semibold text-white">პირველი გაშლა</h3>
-              <div className="mt-2 text-4xl font-bold tracking-tight text-white">₾0</div>
+              <h3 className="mt-5 text-lg font-semibold text-white">
+                პირველი გაშლა
+              </h3>
+              <div className="mt-2 text-4xl font-bold tracking-tight text-white">
+                ₾0
+              </div>
               <p className="mt-3 text-sm leading-6 text-white/58">
                 სრული პერსონალური პასუხი, სამივე კარტითა და მინიშნებით.
               </p>
@@ -348,8 +364,14 @@ export function TarotConversionLanding({
                       : "border-white/10 bg-white/[0.035]"
                   }`}
                 >
-                  <span className={`w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${featured ? "bg-[#d3bb79]/14 text-[#ead69f]" : "bg-white/6 text-white/45"}`}>
-                    {index === 0 ? "საწყისი" : index === 1 ? "ყველაზე პოპულარული" : "საუკეთესო ფასი"}
+                  <span
+                    className={`w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${featured ? "bg-[#d3bb79]/14 text-[#ead69f]" : "bg-white/6 text-white/45"}`}
+                  >
+                    {index === 0
+                      ? "საწყისი"
+                      : index === 1
+                        ? "ყველაზე პოპულარული"
+                        : "საუკეთესო ფასი"}
                   </span>
                   <h3 className="mt-5 text-lg font-semibold text-white">
                     {readings} დამატებითი კითხვა
@@ -378,9 +400,12 @@ export function TarotConversionLanding({
                   <Crown className="size-5" />
                 </span>
                 <div>
-                  <h3 className="font-semibold text-white">გინდა ტარო შეზღუდვის გარეშე?</h3>
+                  <h3 className="font-semibold text-white">
+                    გინდა ტარო შეზღუდვის გარეშე?
+                  </h3>
                   <p className="mt-1 text-sm leading-6 text-white/55">
-                    Vivida PRO მოიცავს ულიმიტო ტაროს, AI ჩატს, პროგნოზებსა და PDF ანგარიშებს.
+                    Vivida PRO მოიცავს ულიმიტო ტაროს, AI ჩატს, პროგნოზებსა და
+                    PDF ანგარიშებს.
                   </p>
                 </div>
               </div>
@@ -395,9 +420,15 @@ export function TarotConversionLanding({
           )}
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-white/42">
-            <span className="flex items-center gap-1.5"><ShieldCheck className="size-4" /> უსაფრთხო გადახდა</span>
-            <span className="flex items-center gap-1.5"><LockKeyhole className="size-4" /> პირადი კითხვა</span>
-            <span className="flex items-center gap-1.5"><CircleCheck className="size-4" /> პაკეტებზე ავტოგანახლება არ არის</span>
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="size-4" /> უსაფრთხო გადახდა
+            </span>
+            <span className="flex items-center gap-1.5">
+              <LockKeyhole className="size-4" /> პირადი კითხვა
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CircleCheck className="size-4" /> პაკეტებზე ავტოგანახლება არ არის
+            </span>
           </div>
         </section>
       )}
@@ -422,7 +453,9 @@ export function TarotConversionLanding({
                   {item.q}
                   <ChevronDown className="size-4 shrink-0 text-white/40 transition-transform group-open:rotate-180" />
                 </summary>
-                <p className="px-5 pb-5 text-sm leading-7 text-white/58">{item.a}</p>
+                <p className="px-5 pb-5 text-sm leading-7 text-white/58">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>

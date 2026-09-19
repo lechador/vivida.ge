@@ -4,15 +4,17 @@ import { useState } from "react";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * A single tarot illustration with a styled fallback. The 22 artworks live at
- * /tarot/<slug>.webp; until they're added (or if one fails to load) we show a
- * card-back with the glyph + Georgian name so the page never renders a broken
- * image. Client component only because it needs the <img> onError hook.
+ * A single tarot illustration with a styled fallback. Majors live at
+ * /tarot/<slug>.webp; minors come from `src` (R2). Until an artwork exists
+ * (or if one fails to load) we show a card-back with the glyph + name so the
+ * page never renders a broken image. Client component only because it needs
+ * the <img> onError hook.
  */
 export function CardImage({
   slug,
   name,
   glyph,
+  src,
   className,
   priority,
   locale = "ka",
@@ -20,6 +22,7 @@ export function CardImage({
   slug: string;
   name: string;
   glyph: string;
+  src?: string;
   className?: string;
   priority?: boolean;
   locale?: UserLocale;
@@ -35,8 +38,14 @@ export function CardImage({
         {ok ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={`/tarot/${slug}.webp`}
-            alt={locale === "am" ? `Տարո քարտ — ${name}` : locale === "en" ? `${name} tarot card` : `ტაროს კარტი — ${name}`}
+            src={src || `/tarot/${slug}.webp`}
+            alt={
+              locale === "am"
+                ? `Տարո քարտ — ${name}`
+                : locale === "en"
+                  ? `${name} tarot card`
+                  : `ტაროს კარტი — ${name}`
+            }
             loading={priority ? "eager" : "lazy"}
             onError={() => setOk(false)}
             className="size-full object-cover"
