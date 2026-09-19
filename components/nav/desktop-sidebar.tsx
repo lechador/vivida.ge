@@ -13,12 +13,9 @@ import {
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Desktop-only left sidebar — a COMPACT icon rail that expands on hover.
- * Collapsed it's just icons (4.5rem wide) so pages get most of the width back;
- * hovering slides it open to 15rem to reveal labels, overlaying content rather
- * than pushing it (content is offset only by the collapsed width via the
- * `[data-desktop-sidebar]` body rule in globals.css). Icons/labels reveal via
- * `group-hover`.
+ * Desktop-only left sidebar — always expanded (15rem) so labels are visible
+ * without hovering. Content is offset by the same width via the
+ * `[data-desktop-sidebar]` body rule in globals.css.
  */
 export function DesktopSidebar({
   active,
@@ -41,18 +38,17 @@ export function DesktopSidebar({
     },
   ];
 
-  // Labels/wordmark fade in when the rail is hovered.
-  const reveal =
-    "opacity-0 transition-opacity duration-150 group-hover:opacity-100";
+  // Labels are always visible — no hover reveal.
+  const reveal = "";
 
   return (
     <aside
       data-desktop-sidebar
       aria-label={locale !== "ka" ? "Main navigation" : "ძირითადი ნავიგაცია"}
       className={cn(
-        "group hidden lg:flex",
-        "fixed left-0 top-0 z-40 h-[100dvh] w-[4.5rem] hover:w-60",
-        "overflow-hidden transition-[width] duration-200 ease-out",
+        "hidden lg:flex",
+        "fixed left-0 top-0 z-40 h-[100dvh] w-60",
+        "overflow-hidden",
         "flex-col border-r border-[var(--vivida-violet)]/30 bg-[oklch(0.15_0.05_290/0.97)] backdrop-blur-2xl",
         "shadow-[8px_0_32px_-12px_oklch(0.65_0.24_305/0.18)]",
         "after:pointer-events-none after:absolute after:inset-y-8 after:right-0 after:w-px after:bg-[linear-gradient(180deg,transparent,oklch(0.78_0.18_305/0.45),transparent)]",
@@ -115,19 +111,9 @@ export function DesktopSidebar({
                       />
                     )}
                   </span>
-                  <span className={cn("truncate", reveal)}>
+                  <span className={cn("truncate")}>
                     {navLabel(item, locale)}
                   </span>
-                  {item.badgeKa && (
-                    <span
-                      className={cn(
-                        "ml-auto shrink-0 rounded-full border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/12 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-cyan)]",
-                        reveal,
-                      )}
-                    >
-                      {locale !== "ka" ? item.badgeEn : item.badgeKa}
-                    </span>
-                  )}
                   {isActive && (
                     <span
                       aria-hidden

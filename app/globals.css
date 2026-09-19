@@ -50,19 +50,19 @@ html[lang="hy"] .locale-ka-only {
 
 .dark {
   /* Mystical, deep-cosmos palette */
-  --background: oklch(0.13 0.03 280);            /* near-black violet */
-  --foreground: oklch(0.97 0.01 280);            /* moonlight white */
+  --background: oklch(0.13 0.03 280); /* near-black violet */
+  --foreground: oklch(0.97 0.01 280); /* moonlight white */
   --card: oklch(0.17 0.04 280);
   --card-foreground: oklch(0.97 0.01 280);
   --popover: oklch(0.17 0.04 280);
   --popover-foreground: oklch(0.97 0.01 280);
-  --primary: oklch(0.78 0.18 305);               /* vibrant magenta-violet */
+  --primary: oklch(0.78 0.18 305); /* vibrant magenta-violet */
   --primary-foreground: oklch(0.13 0.03 280);
   --secondary: oklch(0.22 0.05 280);
   --secondary-foreground: oklch(0.97 0.01 280);
   --muted: oklch(0.22 0.04 280);
   --muted-foreground: oklch(0.72 0.04 280);
-  --accent: oklch(0.72 0.18 200);                /* electric cyan */
+  --accent: oklch(0.72 0.18 200); /* electric cyan */
   --accent-foreground: oklch(0.13 0.03 280);
   --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.97 0.01 280);
@@ -72,9 +72,9 @@ html[lang="hy"] .locale-ka-only {
 
   /* Brand-only mystic accents (used in gradients, glows) */
   --vivida-violet: oklch(0.65 0.24 305);
-  --vivida-pink:   oklch(0.72 0.22 350);
-  --vivida-cyan:   oklch(0.78 0.18 200);
-  --vivida-gold:   oklch(0.85 0.16 85);
+  --vivida-pink: oklch(0.72 0.22 350);
+  --vivida-cyan: oklch(0.78 0.18 200);
+  --vivida-gold: oklch(0.85 0.16 85);
 }
 
 @theme inline {
@@ -179,8 +179,7 @@ html[lang="hy"] .locale-ka-only {
    */
   @media (min-width: 1024px) {
     body:has([data-desktop-sidebar]) {
-      padding-left: 4.5rem; /* matches the collapsed icon-rail width; it
-                               expands over content on hover, not by shifting */
+      padding-left: 15rem; /* matches the always-expanded sidebar width */
     }
 
     /*
@@ -200,7 +199,7 @@ html[lang="hy"] .locale-ka-only {
      * stable across open/close.
      */
     body[data-scroll-locked]:has([data-desktop-sidebar]) {
-      padding-left: 4.5rem !important;
+      padding-left: 15rem !important;
       padding-right: 0 !important;
       margin-right: 0 !important;
       margin-left: 0 !important;
@@ -230,13 +229,12 @@ html[lang="hy"] .locale-ka-only {
   }
 }
 
-/* Keep the privacy control outside the desktop navigation rail. In its old
- * bottom-left position it sat directly over the sidebar's account/settings
- * link. The lower z-index also lets the expanded rail cover the pill while it
- * is being used, instead of the pill floating above the menu. */
+/* Keep the privacy control on the right side on desktop, clear of the
+ * always-expanded navigation rail and its account/settings link. */
 @media (min-width: 1024px) {
   body:has([data-desktop-sidebar]) [data-privacy-reopen] {
-    left: calc(4.5rem + 0.75rem);
+    left: auto;
+    right: 0.75rem;
     z-index: 30;
   }
 }
@@ -246,9 +244,15 @@ html[lang="hy"] .locale-ka-only {
  * `will-change: transform` promotes it to its own composite layer (the drift
  * animation is transform-only, so this is cheap and avoids constant relayout). */
 @keyframes vivida-drift {
-  0%   { transform: translate3d(0, 0, 0); }
-  50%  { transform: translate3d(-2%, -3%, 0); }
-  100% { transform: translate3d(0, 0, 0); }
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-2%, -3%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
 }
 .vivida-stars {
   animation: vivida-drift 60s ease-in-out infinite;
@@ -257,8 +261,13 @@ html[lang="hy"] .locale-ka-only {
 }
 
 @keyframes vivida-pulse {
-  0%, 100% { opacity: 0.55; }
-  50%      { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 .vivida-pulse {
   animation: vivida-pulse 4s ease-in-out infinite;
@@ -297,7 +306,11 @@ html[lang="hy"] .locale-ka-only {
 .article-prose a {
   color: var(--vivida-cyan);
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklch, var(--vivida-cyan) 45%, transparent);
+  text-decoration-color: color-mix(
+    in oklch,
+    var(--vivida-cyan) 45%,
+    transparent
+  );
   text-underline-offset: 0.22em;
 }
 .article-prose blockquote {
@@ -315,10 +328,18 @@ html[lang="hy"] .locale-ka-only {
 .article-prose ol {
   padding-left: 1.45rem;
 }
-.article-prose ul { list-style: disc; }
-.article-prose ol { list-style: decimal; }
-.article-prose li { padding-left: 0.35rem; }
-.article-prose li + li { margin-top: 0.5rem; }
+.article-prose ul {
+  list-style: disc;
+}
+.article-prose ol {
+  list-style: decimal;
+}
+.article-prose li {
+  padding-left: 0.35rem;
+}
+.article-prose li + li {
+  margin-top: 0.5rem;
+}
 .article-category-nav {
   scrollbar-width: none;
 }
@@ -339,7 +360,9 @@ html[lang="hy"] .locale-ka-only {
     transform: translate3d(0, 0, 0) rotate(-25deg) scaleX(0);
     opacity: 0;
   }
-  10% { opacity: 1; }
+  10% {
+    opacity: 1;
+  }
   60% {
     transform: translate3d(220px, 90px, 0) rotate(-25deg) scaleX(1);
     opacity: 1;
@@ -354,8 +377,13 @@ html[lang="hy"] .locale-ka-only {
  * `will-change: transform` puts this on its own GPU layer so the 30s drift
  * doesn't repaint the (expensive, gradient-heavy) backdrop on every frame. */
 @keyframes vivida-nebula-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50%      { transform: translate3d(2%, -1%, 0) scale(1.05); }
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -1%, 0) scale(1.05);
+  }
 }
 .vivida-nebula-drift {
   animation: vivida-nebula-drift 30s ease-in-out infinite;
@@ -363,8 +391,13 @@ html[lang="hy"] .locale-ka-only {
 }
 
 @keyframes vivida-float {
-  0%, 100% { transform: translateY(0px); }
-  50%      { transform: translateY(-3px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
 }
 .vivida-float {
   animation: vivida-float 4s ease-in-out infinite;
@@ -372,8 +405,14 @@ html[lang="hy"] .locale-ka-only {
 
 /* Tarot card reveal — fade + rise + settle, staggered per card. */
 @keyframes tarot-card-in {
-  0%   { opacity: 0; transform: translateY(14px) scale(0.94); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 .tarot-card-in {
   opacity: 0;
@@ -381,14 +420,27 @@ html[lang="hy"] .locale-ka-only {
 }
 
 @keyframes vivida-typing-bounce {
-  0%, 80%, 100% { transform: translateY(0);    opacity: 0.45; }
-  40%           { transform: translateY(-3px); opacity: 1;    }
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  40% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
 }
 
 /* Equalizer bars for the audio-horoscope player while it's playing. */
 @keyframes vivida-eq {
-  0%, 100% { transform: scaleY(0.35); }
-  50%      { transform: scaleY(1);    }
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
 }
 .vivida-eq-bar {
   transform-origin: bottom;
@@ -397,9 +449,21 @@ html[lang="hy"] .locale-ka-only {
 
 /* Soft violet ring pulse inviting the user to turn on the test's ambient music. */
 @keyframes vivida-music-pulse {
-  0%   { box-shadow: 0 0 0 0 oklch(0.65 0.24 305 / 0.55), 0 0 24px -6px oklch(0.65 0.24 305 / 0.7); }
-  70%  { box-shadow: 0 0 0 12px oklch(0.65 0.24 305 / 0), 0 0 24px -6px oklch(0.65 0.24 305 / 0.7); }
-  100% { box-shadow: 0 0 0 0 oklch(0.65 0.24 305 / 0), 0 0 24px -6px oklch(0.65 0.24 305 / 0.7); }
+  0% {
+    box-shadow:
+      0 0 0 0 oklch(0.65 0.24 305 / 0.55),
+      0 0 24px -6px oklch(0.65 0.24 305 / 0.7);
+  }
+  70% {
+    box-shadow:
+      0 0 0 12px oklch(0.65 0.24 305 / 0),
+      0 0 24px -6px oklch(0.65 0.24 305 / 0.7);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 oklch(0.65 0.24 305 / 0),
+      0 0 24px -6px oklch(0.65 0.24 305 / 0.7);
+  }
 }
 .vivida-music-pulse {
   animation: vivida-music-pulse 2.4s ease-out infinite;
@@ -408,7 +472,8 @@ html[lang="hy"] .locale-ka-only {
 /* Focus mode — a slow, breathing violet↔cyan glow around the quiz card so it
  * reads as the spotlit focal point while the surroundings are dimmed. */
 @keyframes vivida-focus-breathe {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 0 1px oklch(0.65 0.24 305 / 0.3),
       0 0 55px -14px oklch(0.6 0.22 300 / 0.55);
@@ -437,8 +502,12 @@ html[lang="hy"] .locale-ka-only {
  * render commits, no rAF callbacks). Shaves measurable CPU off long loads.
  */
 @keyframes vivida-spin-slow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 .vivida-spin-slow {
   animation: vivida-spin-slow 30s linear infinite;
@@ -447,8 +516,13 @@ html[lang="hy"] .locale-ka-only {
 }
 
 @keyframes vivida-pulse-soft {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.2); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
 }
 .vivida-pulse-soft {
   animation: vivida-pulse-soft 2.5s ease-in-out infinite;
@@ -466,8 +540,10 @@ html[lang="hy"] .locale-ka-only {
   opacity: 0;
   transform: translateY(var(--reveal-y, 24px));
   transition:
-    opacity var(--reveal-dur, 700ms) cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
-    transform var(--reveal-dur, 700ms) cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+    opacity var(--reveal-dur, 700ms) cubic-bezier(0.22, 1, 0.36, 1)
+      var(--reveal-delay, 0ms),
+    transform var(--reveal-dur, 700ms) cubic-bezier(0.22, 1, 0.36, 1)
+      var(--reveal-delay, 0ms);
 }
 .reveal[data-revealed="true"] {
   opacity: 1;
@@ -484,12 +560,27 @@ html[lang="hy"] .locale-ka-only {
 
 /* Slow background rotations for the final-CTA aura (were framer-motion
  * infinite-rotate motion.divs — now pure compositor animations). */
-@keyframes vivida-spin-60 { to { transform: rotate(360deg); } }
-@keyframes vivida-spin-80 { to { transform: rotate(-360deg); } }
-.vivida-spin-60 { animation: vivida-spin-60 60s linear infinite; }
-.vivida-spin-80 { animation: vivida-spin-80 80s linear infinite; }
+@keyframes vivida-spin-60 {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes vivida-spin-80 {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+.vivida-spin-60 {
+  animation: vivida-spin-60 60s linear infinite;
+}
+.vivida-spin-80 {
+  animation: vivida-spin-80 80s linear infinite;
+}
 @media (prefers-reduced-motion: reduce) {
-  .vivida-spin-60, .vivida-spin-80 { animation: none; }
+  .vivida-spin-60,
+  .vivida-spin-80 {
+    animation: none;
+  }
 }
 
 /*

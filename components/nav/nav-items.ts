@@ -46,9 +46,6 @@ export type NavItem = {
   Icon: LucideIcon;
   /** Hue used for the active glow + hover icon tint. Roughly the brand axis. */
   hue: string;
-  /** Small pill next to the label ("ახალი") — drop it once the feature ages. */
-  badgeKa?: string;
-  badgeEn?: string;
 };
 
 /**
@@ -107,8 +104,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     labelEn: "Reports",
     Icon: ScrollText,
     hue: "oklch(0.80 0.16 55)",
-    badgeKa: "ახალი",
-    badgeEn: "New",
   },
   {
     key: "ask",
@@ -125,8 +120,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     labelEn: "Library",
     Icon: BookOpen,
     hue: "oklch(0.80 0.15 190)",
-    badgeKa: "ახალი",
-    badgeEn: "New",
   },
   {
     key: "tarot",
@@ -135,8 +128,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     labelEn: "Tarot",
     Icon: Wand2,
     hue: "oklch(0.78 0.18 305)",
-    badgeKa: "ახალი",
-    badgeEn: "New",
   },
   {
     key: "timing",

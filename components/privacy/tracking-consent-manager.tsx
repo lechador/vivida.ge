@@ -115,7 +115,7 @@ export function TrackingConsentManager({
           data-privacy-reopen
           aria-label={en ? "Privacy choices" : "კონფიდენციალურობა"}
           onClick={() => setSettingsOpen(true)}
-          className="fixed bottom-3 left-3 z-[90] inline-flex size-8 items-center justify-center rounded-full border border-border/70 bg-background/85 text-muted-foreground shadow-lg backdrop-blur transition-colors hover:text-foreground"
+          className="fixed bottom-3 left-3 z-[90] inline-flex size-8 items-center justify-center rounded-full border border-border/70 bg-background/85 text-muted-foreground shadow-lg backdrop-blur transition-colors hover:text-foreground lg:left-auto lg:right-3"
         >
           <ShieldCheck className="size-3.5 shrink-0" />
         </button>
