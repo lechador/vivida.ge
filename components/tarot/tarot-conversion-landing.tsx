@@ -86,8 +86,6 @@ export function TarotConversionLanding({
   // Signed-in users came to pull cards, not to be sold to: the hero banner and
   // every sales block (steps, pitch, pricing, closing CTA) render for logged-out
   // visitors only. SEO is untouched — crawlers are always unauthenticated.
-  // With the hero gone the reader block carries the page's <h1>.
-  const ReaderHeading = authed ? "h1" : "h2";
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-[#070713]">
@@ -197,19 +195,8 @@ export function TarotConversionLanding({
           authed ? "border-b" : "border-y"
         }`}
       >
-        <div className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-          <div className="mb-7 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#cab8ff]">
-              დაიწყე აქ
-            </p>
-            <ReaderHeading className="mt-2 text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              რა კითხვა არ გასვენებს?
-            </ReaderHeading>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/60 sm:text-base">
-              ღია კითხვა უკეთეს პასუხს გაძლევს. მაგალითად: „რა უნდა დავინახო ამ
-              ურთიერთობაში?“
-            </p>
-          </div>
+        <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+          {authed && <h1 className="sr-only">ტაროს კითხვა</h1>}
           <TarotReader
             authed={authed}
             cost={CREDIT_COST.tarot}

@@ -163,7 +163,7 @@ export function TarotReader({
     cost: CREDIT_COST.tarotFollowup,
   });
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
-  const [historyOpen, setHistoryOpen] = useState(true);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
 
   // Previous readings, so a past spread can be reopened (reply) or a fresh
@@ -544,7 +544,7 @@ export function TarotReader({
   }
 
   return (
-    <div className="rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/10 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+    <div className="rounded-3xl border border-[var(--vivida-violet)]/50 bg-gradient-to-br from-[var(--vivida-violet)]/16 via-card/70 to-[var(--vivida-cyan)]/12 p-5 shadow-[0_28px_90px_-48px_rgba(141,103,255,0.9)] ring-1 ring-white/10 backdrop-blur-xl sm:p-8">
       {/* Previous questions — reopen a spread (reply) or start fresh. */}
       {authed && history !== null && history.length > 0 && (
         <div className="mb-4 rounded-2xl border border-border/60 bg-background/35">
@@ -644,9 +644,9 @@ export function TarotReader({
         <>
           <label
             htmlFor="tarot-question"
-            className="block text-sm font-medium text-foreground/90"
+            className="block text-base font-semibold text-foreground"
           >
-            {en ? "Ask the cards a question" : "დაუსვი კითხვა კარტებს"}
+            {en ? "Your question" : "შენი კითხვა"}
           </label>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <input
@@ -664,14 +664,14 @@ export function TarotReader({
                   ? "For example: What should I understand about this relationship?"
                   : "მაგ: რას მიპირებს ეს ურთიერთობა?"
               }
-              className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+              className="min-h-14 w-full rounded-2xl border border-[var(--vivida-violet)]/55 bg-[#09091a]/90 px-5 py-4 text-base text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_35px_-24px_rgba(141,103,255,0.9)] outline-none ring-1 ring-white/5 transition placeholder:text-muted-foreground/65 focus:border-[#c4adff] focus:ring-4 focus:ring-[var(--vivida-violet)]/15"
             />
             <Button
               type="button"
               variant="mystic"
               onClick={ask}
               disabled={status === "drawing" || question.trim().length < 3}
-              className="shrink-0 gap-1.5"
+              className="min-h-14 shrink-0 gap-2 rounded-2xl px-6 text-base shadow-[0_16px_36px_-20px_rgba(201,88,164,0.9)]"
             >
               {status === "drawing" ? (
                 <Loader2 className="size-4 animate-spin" />
