@@ -20,13 +20,17 @@ import { neon } from "@neondatabase/serverless";
 import { GoogleGenAI } from "@google/genai";
 
 try {
-  for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+  for (const line of readFileSync(
+    new URL("../.env.local", import.meta.url),
+    "utf8",
+  ).split("\n")) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    if (m && !process.env[m[1]])
+      process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
   }
 } catch {}
 
-const MODEL = "gemini-2.5-flash"; // classification — flash is plenty
+const MODEL = "gemini-3.5-flash-lite"; // classification — Flash Lite is plenty
 const BATCH = 40;
 const dry = process.argv.includes("--dry");
 
@@ -42,7 +46,8 @@ const SYSTEM =
 const ai = new GoogleGenAI({
   vertexai: true,
   project: process.env.GOOGLE_CLOUD_PROJECT,
-  location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+  // Gemini 3.5 Flash Lite is available through Vertex's global endpoint.
+  location: "global",
 });
 
 async function classify(batch) {
@@ -55,12 +60,16 @@ async function classify(batch) {
       responseMimeType: "application/json",
     },
   });
-  const raw = (res.text ?? "").trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+  const raw = (res.text ?? "")
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "");
   return JSON.parse(raw);
 }
 
 async function main() {
-  if (!process.env.GOOGLE_CLOUD_PROJECT) throw new Error("GOOGLE_CLOUD_PROJECT missing");
+  if (!process.env.GOOGLE_CLOUD_PROJECT)
+    throw new Error("GOOGLE_CLOUD_PROJECT missing");
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
   const sql = neon(process.env.DATABASE_URL);
 
@@ -73,7 +82,9 @@ async function main() {
       AND COALESCE(p.display_name, u.name) IS NOT NULL
       AND btrim(COALESCE(p.display_name, u.name)) <> ''`;
 
-  console.log(`candidates: ${rows.length} (model=${MODEL}${dry ? ", DRY RUN" : ""})`);
+  console.log(
+    `candidates: ${rows.length} (model=${MODEL}${dry ? ", DRY RUN" : ""})`,
+  );
   const tally = { male: 0, female: 0, unknown: 0, written: 0 };
 
   for (let i = 0; i < rows.length; i += BATCH) {
@@ -105,8 +116,11 @@ async function main() {
 
   console.log(
     `done: male ${tally.male}, female ${tally.female}, unknown ${tally.unknown}` +
-      (dry ? " (nothing written)" : `, written ${tally.written}`)
+      (dry ? " (nothing written)" : `, written ${tally.written}`),
   );
 }
 
-main().catch((e) => { console.error(e.message); process.exit(1); });
+main().catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

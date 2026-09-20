@@ -12,11 +12,8 @@ import { aspectKey } from "./aspects";
 import type { CrossAspect } from "./transits";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-// Gemini Flash for ~5× faster generation than 2.5 Pro at the cost of
-// slightly less polished prose. Big UX win for new users on first chart
-// + daily generation. Switch back to "google/gemini-2.5-pro" if quality
-// regressions show up.
-const DEFAULT_MODEL = "google/gemini-2.5-flash";
+// Shared text model for chart interpretations, forecasts, tarot, and chat.
+const DEFAULT_MODEL = "google/gemini-3.5-flash-lite";
 
 export const OPENROUTER_MODEL = DEFAULT_MODEL;
 

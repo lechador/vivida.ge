@@ -27,7 +27,8 @@ import { getHouseLibraryEntries, houseLibraryKey } from "@/lib/house-library";
  */
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = process.env.OPENROUTER_REPORT_MODEL || "google/gemini-2.5-flash";
+const MODEL =
+  process.env.OPENROUTER_REPORT_MODEL || "google/gemini-3.5-flash-lite";
 
 type OpenRouterResponse = {
   choices?: Array<{ message?: { content?: string } }>;
@@ -37,7 +38,7 @@ type OpenRouterResponse = {
 async function chatJson<T>(
   system: string,
   user: string,
-  maxTokens: number
+  maxTokens: number,
 ): Promise<T | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
@@ -64,7 +65,7 @@ async function chatJson<T>(
   });
   if (!res.ok) {
     throw new Error(
-      `OpenRouter ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`
+      `OpenRouter ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`,
     );
   }
   const json = (await res.json()) as OpenRouterResponse;
@@ -131,13 +132,15 @@ const PLANET_KEYS = [
 function planetFacts(chart: NatalChartJson): string {
   const lines: string[] = [];
   const asc = signByIndex(chart.ascendant.signIndex);
-  lines.push(`ამომავალი (ასცენდენტი): ${asc.labelKa}, ${formatDegree(chart.ascendant.signDegree)}`);
+  lines.push(
+    `ამომავალი (ასცენდენტი): ${asc.labelKa}, ${formatDegree(chart.ascendant.signDegree)}`,
+  );
   for (const key of PLANET_KEYS) {
     const p = chart.bodies[key];
     if (!p) continue;
     const sign = signByIndex(p.signIndex);
     lines.push(
-      `${bodyMeta(key)?.labelKa ?? key}: ${sign.labelKa}, ${formatDegree(p.signDegree)}${p.house ? `, მე-${p.house} სახლი` : ""}${p.retrograde ? ", რეტროგრადული" : ""}`
+      `${bodyMeta(key)?.labelKa ?? key}: ${sign.labelKa}, ${formatDegree(p.signDegree)}${p.house ? `, მე-${p.house} სახლი` : ""}${p.retrograde ? ", რეტროგრადული" : ""}`,
     );
   }
   return lines.join("\n");
@@ -146,12 +149,15 @@ function planetFacts(chart: NatalChartJson): string {
 function houseFacts(chart: NatalChartJson): string {
   const occupants: Record<number, string[]> = {};
   for (const [key, p] of Object.entries(chart.bodies)) {
-    if (p.house) (occupants[p.house] ??= []).push(bodyMeta(key)?.labelKa ?? key);
+    if (p.house)
+      (occupants[p.house] ??= []).push(bodyMeta(key)?.labelKa ?? key);
   }
   return HOUSE_NUMBERS.map((n) => {
     const cusp = chart.houses.find((h) => h.number === n);
     const sign = cusp ? signByIndex(cusp.signIndex).labelKa : "—";
-    const occ = occupants[n]?.length ? `, შიგნით: ${occupants[n].join(", ")}` : "";
+    const occ = occupants[n]?.length
+      ? `, შიგნით: ${occupants[n].join(", ")}`
+      : "";
     return `მე-${n} სახლი (${houseDef(n).themeKa}): ${sign}${occ}`;
   }).join("\n");
 }
@@ -172,15 +178,24 @@ async function generateNarrative(input: {
     .map((m) => `  ${m}: ${pct(s.modality.percentages[m])}`)
     .join("\n");
   const aspectLines = s.tightestAspects
-    .map((a) => `  ${a.aLabel}–${a.bLabel} (${a.kind}, ${a.family}, ორბი ${a.orb.toFixed(1)}°)`)
+    .map(
+      (a) =>
+        `  ${a.aLabel}–${a.bLabel} (${a.kind}, ${a.family}, ორბი ${a.orb.toFixed(1)}°)`,
+    )
     .join("\n");
   const angular = s.angularPlanets.length
-    ? s.angularPlanets.map((p) => `  ${p.label} ≈ ${p.angle} (${p.orb.toFixed(1)}°)`).join("\n")
+    ? s.angularPlanets
+        .map((p) => `  ${p.label} ≈ ${p.angle} (${p.orb.toFixed(1)}°)`)
+        .join("\n")
     : "  (არცერთი)";
   const stelliums = s.stelliums.length
-    ? s.stelliums.map((st) => `  ${st.label}: ${st.planets.join(", ")}`).join("\n")
+    ? s.stelliums
+        .map((st) => `  ${st.label}: ${st.planets.join(", ")}`)
+        .join("\n")
     : "  (არცერთი)";
-  const retro = s.retrogrades.length ? s.retrogrades.map((r) => r.label).join(", ") : "(არცერთი)";
+  const retro = s.retrogrades.length
+    ? s.retrogrades.map((r) => r.label).join(", ")
+    : "(არცერთი)";
 
   const user = `გამოთვლილი მონაცემები${input.firstName ? ` (${input.firstName})` : ""}:
 
@@ -216,7 +231,7 @@ ${stelliums}
 }
 
 async function generatePlanets(
-  chart: NatalChartJson
+  chart: NatalChartJson,
 ): Promise<Record<string, string> | null> {
   const user = `რუკის პლანეტარული განლაგება:
 ${planetFacts(chart)}
@@ -227,7 +242,7 @@ ${planetFacts(chart)}
 }
 
 async function generateHouses(
-  chart: NatalChartJson
+  chart: NatalChartJson,
 ): Promise<Record<string, string> | null> {
   const user = `რუკის 12 სახლი:
 ${houseFacts(chart)}
@@ -239,12 +254,12 @@ ${houseFacts(chart)}
 
 async function generateAspects(
   chart: NatalChartJson,
-  salience: ChartSalience
+  salience: ChartSalience,
 ): Promise<Record<string, string> | null> {
   const list = salience.tightestAspects
     .map(
       (a, i) =>
-        `${i + 1}. ${a.aLabel}–${a.bLabel} | kind=${a.kind} | family=${a.family} | ორბი ${a.orb.toFixed(1)}° | key=${aspectKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2])}`
+        `${i + 1}. ${a.aLabel}–${a.bLabel} | kind=${a.kind} | family=${a.family} | ორბი ${a.orb.toFixed(1)}° | key=${aspectKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2])}`,
     )
     .join("\n");
   const user = `ამ რუკის ყველაზე ძლიერი ასპექტები (ზუსტი = ძლიერი):
@@ -269,7 +284,7 @@ export async function generateNatalReport(input: {
   // on-the-fly generation if the library isn't seeded.
   const placements = placementsForChart(chart);
   const lib = await getLibraryEntries(
-    placements.map((p) => libraryKey(p.subject, p.sign))
+    placements.map((p) => libraryKey(p.subject, p.sign)),
   ).catch(() => new Map<string, string>());
   const libPlanets: Record<string, string> = {};
   for (const p of placements) {
@@ -285,8 +300,8 @@ export async function generateNatalReport(input: {
   const tightest = input.salience.tightestAspects;
   const aspectLib = await getAspectLibraryEntries(
     tightest.map((a) =>
-      aspectLibraryKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2])
-    )
+      aspectLibraryKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2]),
+    ),
   ).catch(() => new Map<string, string>());
   const libAspects: Record<string, string> = {};
   for (const a of tightest) {
@@ -297,7 +312,9 @@ export async function generateNatalReport(input: {
   const aspectsComplete =
     tightest.length > 0 &&
     tightest.every((a) =>
-      aspectLib.has(aspectLibraryKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2]))
+      aspectLib.has(
+        aspectLibraryKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2]),
+      ),
     );
 
   // Same idea for houses: compose each house's cusp-sign text + its occupant
@@ -306,14 +323,17 @@ export async function generateNatalReport(input: {
   const houseCusps: { house: number; sign: string }[] = [];
   for (const n of HOUSE_NUMBERS) {
     const cusp = chart.houses.find((h) => h.number === n);
-    if (cusp) houseCusps.push({ house: n, sign: signByIndex(cusp.signIndex).key });
+    if (cusp)
+      houseCusps.push({ house: n, sign: signByIndex(cusp.signIndex).key });
   }
   const houseOccupants = Object.entries(chart.bodies)
     .filter(([, p]) => p.house)
     .map(([key, p]) => ({ house: p.house as number, planet: key }));
   const houseLib = await getHouseLibraryEntries([
     ...houseCusps.map((c) => houseLibraryKey("cusp", c.house, c.sign)),
-    ...houseOccupants.map((o) => houseLibraryKey("occupant", o.house, o.planet)),
+    ...houseOccupants.map((o) =>
+      houseLibraryKey("occupant", o.house, o.planet),
+    ),
   ]).catch(() => new Map<string, string>());
   const libHouses: Record<string, string> = {};
   for (const c of houseCusps) {
@@ -327,8 +347,12 @@ export async function generateNatalReport(input: {
   }
   const housesComplete =
     houseCusps.length > 0 &&
-    houseCusps.every((c) => houseLib.has(houseLibraryKey("cusp", c.house, c.sign))) &&
-    houseOccupants.every((o) => houseLib.has(houseLibraryKey("occupant", o.house, o.planet)));
+    houseCusps.every((c) =>
+      houseLib.has(houseLibraryKey("cusp", c.house, c.sign)),
+    ) &&
+    houseOccupants.every((o) =>
+      houseLib.has(houseLibraryKey("occupant", o.house, o.planet)),
+    );
 
   const [narrative, planets, houses, aspects] = await Promise.all([
     generateNarrative(input).catch((e) => {

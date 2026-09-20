@@ -1,15 +1,17 @@
 /**
- * AI zodiac avatar generator. Uses OpenRouter's Gemini 2.5 Flash Image
- * ("Nano Banana") to render a brand-styled cosmic emblem for the user's
+ * AI zodiac avatar generator. Uses OpenRouter's Gemini 3.1 Flash Lite Image
+ * ("Nano Banana 2 Lite") to render a brand-styled cosmic emblem for the user's
  * sun sign. Returns PNG bytes the caller stores in R2 and sets as the
  * user's main profile photo. Returns null when OPENROUTER_API_KEY is unset.
  */
 
+import sharp from "sharp";
+
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-// GA "Nano Banana" image model. The -preview alias was retired; this id
-// returns a base64 PNG data URL at choices[0].message.images[0].image_url.url
+// Nano Banana 2 Lite returns a base64 image data URL at
+// choices[0].message.images[0].image_url.url
 // when modalities includes "image".
-const AVATAR_MODEL = "google/gemini-2.5-flash-image";
+const AVATAR_MODEL = "google/gemini-3.1-flash-lite-image";
 
 /** Per-sign visual motif, in English, fed into the image prompt. */
 const SIGN_MOTIF: Record<string, string> = {
@@ -44,7 +46,7 @@ interface ImageResponse {
  * the API key is missing.
  */
 export async function generateZodiacAvatar(
-  signKey: string
+  signKey: string,
 ): Promise<Buffer | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
@@ -72,6 +74,7 @@ export async function generateZodiacAvatar(
     body: JSON.stringify({
       model: AVATAR_MODEL,
       modalities: ["image", "text"],
+      image_config: { aspect_ratio: "1:1" },
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -91,5 +94,6 @@ export async function generateZodiacAvatar(
   const b64 = url.split(",")[1] ?? "";
   const bytes = Buffer.from(b64, "base64");
   if (bytes.length === 0) throw new Error("OpenRouter returned empty image");
-  return bytes;
+  // Providers can return JPEG; the upload route stores avatars as image/png.
+  return sharp(bytes).png().toBuffer();
 }

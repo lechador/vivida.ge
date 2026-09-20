@@ -1,6 +1,6 @@
 /**
  * Generate Georgian copy for synastry aspect detail modals via OpenRouter
- * (Gemini 2.5 Flash). Produces a `positive` paragraph + `negative`
+ * (Gemini 3.5 Flash Lite). Produces a `positive` paragraph + `negative`
  * paragraph + `takeaway` for every (aspect-kind × body-pair) combo —
  * 5 aspects × 91 unique body pairs = 455 entries.
  *
@@ -21,7 +21,7 @@ import { resolve, dirname } from "path";
 config({ path: ".env.local" });
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3.5-flash-lite";
 const KEY = process.env.OPENROUTER_API_KEY;
 if (!KEY) {
   console.error("OPENROUTER_API_KEY is not set in .env.local — aborting.");
@@ -245,7 +245,7 @@ async function processOne(job) {
     try {
       const out = await callOpenRouter(
         SYSTEM_PROMPT,
-        userPrompt(job.kind, job.a, job.b)
+        userPrompt(job.kind, job.a, job.b),
       );
       return {
         positive: out.positive.trim(),
@@ -269,7 +269,7 @@ async function main() {
   const todo = force ? jobs : jobs.filter((j) => !data[j.key]);
 
   console.log(
-    `→ ${todo.length}/${jobs.length} entries to generate (force=${force}, concurrency=${CONCURRENCY})`
+    `→ ${todo.length}/${jobs.length} entries to generate (force=${force}, concurrency=${CONCURRENCY})`,
   );
   if (todo.length === 0) {
     console.log("nothing to do");

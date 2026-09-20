@@ -1,6 +1,6 @@
 /**
  * Translate all rich Georgian astrology SEO content from lib/seo/zodiac-content.json
- * into natural, comprehensive English using OpenRouter (Gemini 2.5 Flash).
+ * into natural, comprehensive English using OpenRouter (Gemini 3.5 Flash Lite).
  *
  * Saves output to lib/seo/zodiac-content-en.json
  *
@@ -16,7 +16,7 @@ import { resolve, dirname } from "path";
 config({ path: ".env.local" });
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3.5-flash-lite";
 const KEY = process.env.OPENROUTER_API_KEY;
 if (!KEY) {
   console.error("OPENROUTER_API_KEY is not set in .env.local — aborting.");
@@ -38,7 +38,7 @@ outData.elements = outData.elements || {};
 outData.moons = outData.moons || {};
 outData.risings = outData.risings || {};
 outData.pairs = outData.pairs || {};
-outData.yearly = outData.yearly || { "2026": {} };
+outData.yearly = outData.yearly || { 2026: {} };
 outData.yearly["2026"] = outData.yearly["2026"] || {};
 
 const force = process.argv.includes("--force");
@@ -109,7 +109,10 @@ async function mapConcurrent(items, concurrency, fn) {
       results[i] = await fn(items[i], i);
     }
   }
-  const workers = Array.from({ length: Math.min(concurrency, items.length) }, () => worker());
+  const workers = Array.from(
+    { length: Math.min(concurrency, items.length) },
+    () => worker(),
+  );
   await Promise.all(workers);
   return results;
 }
@@ -226,10 +229,12 @@ ${JSON.stringify(item, null, 2)}`;
 async function translatePairs() {
   console.log("\n--- Translating Compatibility Pairs ---");
   const entries = Object.entries(srcData.pairs || {});
-  
+
   await mapConcurrent(entries, 6, async ([slug, item], i) => {
     if (outData.pairs[slug] && !force) {
-      console.log(`✓ Pair (${i + 1}/${entries.length}) ${slug} already translated`);
+      console.log(
+        `✓ Pair (${i + 1}/${entries.length}) ${slug} already translated`,
+      );
       return;
     }
     console.log(`Translating pair (${i + 1}/${entries.length}): ${slug}...`);
@@ -285,7 +290,14 @@ ${JSON.stringify(item, null, 2)}`;
 
 async function translateHubs() {
   console.log("\n--- Translating Hubs ---");
-  const hubs = ["hub", "elementsHub", "compatibilityHub", "moonHub", "risingHub", "byDate"];
+  const hubs = [
+    "hub",
+    "elementsHub",
+    "compatibilityHub",
+    "moonHub",
+    "risingHub",
+    "byDate",
+  ];
   for (const hubKey of hubs) {
     if (srcData[hubKey] && (!outData[hubKey] || force)) {
       console.log(`Translating hub: ${hubKey}...`);
@@ -302,7 +314,9 @@ ${JSON.stringify(srcData[hubKey], null, 2)}`;
 }
 
 async function main() {
-  console.log("Starting full direct translation of zodiac-content.json to English...");
+  console.log(
+    "Starting full direct translation of zodiac-content.json to English...",
+  );
   await translateSigns();
   await translateElements();
   await translateMoons();

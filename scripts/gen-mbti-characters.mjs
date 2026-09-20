@@ -1,5 +1,5 @@
 // Generate the 16 Astro-MBTI type characters — original Vivida-style low-poly
-// avatars (NOT copies of 16Personalities' art) via gemini-2.5-flash-image on
+// avatars (NOT copies of 16Personalities' art) via Nano Banana 2 Lite on
 // Vertex (Google credits). Each is resized to a compact webp in public/mbti/.
 //
 // Usage:
@@ -11,16 +11,25 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { GoogleGenAI } from "@google/genai";
 import sharp from "sharp";
 
-for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+for (const line of readFileSync(
+  new URL("../.env.local", import.meta.url),
+  "utf8",
+).split("\n")) {
   const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-  if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  if (m && !process.env[m[1]])
+    process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
 }
 
-const MODEL = "gemini-2.5-flash-image";
+const MODEL = "gemini-3.1-flash-lite-image";
 const OUT = new URL("../public/mbti/", import.meta.url);
 const force = process.argv.includes("--force");
 const onlyArg = process.argv.find((a) => a.startsWith("--only="));
-const only = onlyArg ? onlyArg.slice("--only=".length).split(",").map((s) => s.toUpperCase()) : null;
+const only = onlyArg
+  ? onlyArg
+      .slice("--only=".length)
+      .split(",")
+      .map((s) => s.toUpperCase())
+  : null;
 
 const STYLE =
   "Original low-poly geometric flat-vector character illustration, faceted " +
@@ -56,7 +65,8 @@ const SUBJECTS = {
 const ai = new GoogleGenAI({
   vertexai: true,
   project: process.env.GOOGLE_CLOUD_PROJECT,
-  location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+  // Nano Banana 2 Lite is available through Vertex's global endpoint.
+  location: "global",
 });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -71,7 +81,9 @@ async function genOne(type) {
         contents: STYLE + SUBJECTS[type],
         config: { responseModalities: ["IMAGE"] },
       });
-      const part = (res?.candidates?.[0]?.content?.parts || []).find((p) => p.inlineData?.data);
+      const part = (res?.candidates?.[0]?.content?.parts || []).find(
+        (p) => p.inlineData?.data,
+      );
       if (!part) throw new Error("no image returned");
       const png = Buffer.from(part.inlineData.data, "base64");
       const webp = await sharp(png)
@@ -90,13 +102,18 @@ async function genOne(type) {
 }
 
 async function main() {
-  if (!process.env.GOOGLE_CLOUD_PROJECT) throw new Error("GOOGLE_CLOUD_PROJECT missing");
+  if (!process.env.GOOGLE_CLOUD_PROJECT)
+    throw new Error("GOOGLE_CLOUD_PROJECT missing");
   let types = Object.keys(SUBJECTS);
   if (only) types = types.filter((t) => only.includes(t));
-  if (!force) types = types.filter((t) => !existsSync(new URL(`${t.toLowerCase()}.webp`, OUT)));
+  if (!force)
+    types = types.filter(
+      (t) => !existsSync(new URL(`${t.toLowerCase()}.webp`, OUT)),
+    );
 
   console.log(`generating ${types.length}: ${types.join(", ") || "(none)"}`);
-  let ok = 0, fail = 0;
+  let ok = 0,
+    fail = 0;
   // Sequential + spacing to respect the image model's per-minute quota.
   for (const t of types) {
     try {
@@ -112,4 +129,7 @@ async function main() {
   console.log(`done: ${ok} generated, ${fail} failed`);
 }
 
-main().catch((e) => { console.error(e.message); process.exit(1); });
+main().catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

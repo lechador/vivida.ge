@@ -19,7 +19,7 @@ try {
 
 const sql = neon(process.env.DATABASE_URL);
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3.5-flash-lite";
 const API_KEY = process.env.OPENROUTER_API_KEY;
 
 if (!API_KEY) {
@@ -63,7 +63,9 @@ async function translateText(text) {
 
       if (!res.ok) {
         const errTxt = await res.text();
-        console.warn(`[HTTP ${res.status}] Attempt ${attempt + 1} failed: ${errTxt.slice(0, 100)}`);
+        console.warn(
+          `[HTTP ${res.status}] Attempt ${attempt + 1} failed: ${errTxt.slice(0, 100)}`,
+        );
         await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
         continue;
       }
@@ -71,7 +73,10 @@ async function translateText(text) {
       const json = await res.json();
       const content = json.choices?.[0]?.message?.content?.trim();
       if (!content) throw new Error("Empty translation returned");
-      return content.replace(/^```(?:json|markdown)?\s*/i, "").replace(/\s*```$/, "").trim();
+      return content
+        .replace(/^```(?:json|markdown)?\s*/i, "")
+        .replace(/\s*```$/, "")
+        .trim();
     } catch (err) {
       console.warn(`[Error] Attempt ${attempt + 1}: ${err.message}`);
       await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
@@ -105,7 +110,9 @@ async function translateAspectJson(item) {
 
       if (!res.ok) {
         const errTxt = await res.text();
-        console.warn(`[HTTP ${res.status}] Attempt ${attempt + 1} failed: ${errTxt.slice(0, 100)}`);
+        console.warn(
+          `[HTTP ${res.status}] Attempt ${attempt + 1} failed: ${errTxt.slice(0, 100)}`,
+        );
         await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
         continue;
       }
@@ -113,7 +120,10 @@ async function translateAspectJson(item) {
       const json = await res.json();
       const content = json.choices?.[0]?.message?.content?.trim();
       if (!content) throw new Error("Empty translation returned");
-      const clean = content.replace(/^```(?:json|markdown)?\s*/i, "").replace(/\s*```$/, "").trim();
+      const clean = content
+        .replace(/^```(?:json|markdown)?\s*/i, "")
+        .replace(/\s*```$/, "")
+        .trim();
       const parsed = JSON.parse(clean);
       if (!parsed.positive || !parsed.negative || !parsed.takeaway) {
         throw new Error("Missing fields in translated JSON");
@@ -143,12 +153,16 @@ async function runWorkerPool(items, workerFn, concurrency = 16) {
       }
       completed++;
       if (completed % 25 === 0 || completed === total) {
-        console.log(`Progress: ${completed}/${total} (${Math.round((completed / total) * 100)}%)`);
+        console.log(
+          `Progress: ${completed}/${total} (${Math.round((completed / total) * 100)}%)`,
+        );
       }
     }
   }
 
-  const workers = Array.from({ length: Math.min(concurrency, total) }, () => worker());
+  const workers = Array.from({ length: Math.min(concurrency, total) }, () =>
+    worker(),
+  );
   await Promise.all(workers);
 }
 
@@ -163,21 +177,34 @@ async function main() {
       libEn = JSON.parse(fs.readFileSync(libFile, "utf8"));
     } catch {}
   }
-  const libRows = await sql`SELECT key, body FROM synastry_interpretation_library`;
-  console.log(`Fetched ${libRows.length} synastry_interpretation_library rows from DB.`);
-  const missingLib = libRows.filter((r) => !libEn[r.key] || libEn[r.key].length < 30);
-  console.log(`Missing synastry library rows to translate: ${missingLib.length}`);
+  const libRows =
+    await sql`SELECT key, body FROM synastry_interpretation_library`;
+  console.log(
+    `Fetched ${libRows.length} synastry_interpretation_library rows from DB.`,
+  );
+  const missingLib = libRows.filter(
+    (r) => !libEn[r.key] || libEn[r.key].length < 30,
+  );
+  console.log(
+    `Missing synastry library rows to translate: ${missingLib.length}`,
+  );
 
   if (missingLib.length > 0) {
-    await runWorkerPool(missingLib, async (row) => {
-      const translated = await translateText(row.body);
-      libEn[row.key] = translated;
-      if (Math.random() < 0.1) {
-        fs.writeFileSync(libFile, JSON.stringify(libEn, null, 2));
-      }
-    }, 16);
+    await runWorkerPool(
+      missingLib,
+      async (row) => {
+        const translated = await translateText(row.body);
+        libEn[row.key] = translated;
+        if (Math.random() < 0.1) {
+          fs.writeFileSync(libFile, JSON.stringify(libEn, null, 2));
+        }
+      },
+      16,
+    );
     fs.writeFileSync(libFile, JSON.stringify(libEn, null, 2));
-    console.log(`Saved ${Object.keys(libEn).length} synastry library entries to ${libFile}`);
+    console.log(
+      `Saved ${Object.keys(libEn).length} synastry library entries to ${libFile}`,
+    );
   }
 
   // 2. synastry-aspects.json (455 items)
@@ -190,27 +217,41 @@ async function main() {
   }
   const aspectsKaPath = path.join(rootDir, "lib/seo/synastry-aspects.json");
   const aspectsKa = JSON.parse(fs.readFileSync(aspectsKaPath, "utf8"));
-  const aspectEntries = Object.entries(aspectsKa).map(([key, val]) => ({ key, ...val }));
+  const aspectEntries = Object.entries(aspectsKa).map(([key, val]) => ({
+    key,
+    ...val,
+  }));
   console.log(`Loaded ${aspectEntries.length} synastry aspect detail items.`);
   const missingAspects = aspectEntries.filter(
-    (a) => !aspectsEn[a.key] || !aspectsEn[a.key].positive || !aspectsEn[a.key].takeaway
+    (a) =>
+      !aspectsEn[a.key] ||
+      !aspectsEn[a.key].positive ||
+      !aspectsEn[a.key].takeaway,
   );
-  console.log(`Missing synastry aspect detail items to translate: ${missingAspects.length}`);
+  console.log(
+    `Missing synastry aspect detail items to translate: ${missingAspects.length}`,
+  );
 
   if (missingAspects.length > 0) {
-    await runWorkerPool(missingAspects, async (item) => {
-      const translated = await translateAspectJson({
-        positive: item.positive,
-        negative: item.negative,
-        takeaway: item.takeaway,
-      });
-      aspectsEn[item.key] = translated;
-      if (Math.random() < 0.1) {
-        fs.writeFileSync(aspectsEnFile, JSON.stringify(aspectsEn, null, 2));
-      }
-    }, 16);
+    await runWorkerPool(
+      missingAspects,
+      async (item) => {
+        const translated = await translateAspectJson({
+          positive: item.positive,
+          negative: item.negative,
+          takeaway: item.takeaway,
+        });
+        aspectsEn[item.key] = translated;
+        if (Math.random() < 0.1) {
+          fs.writeFileSync(aspectsEnFile, JSON.stringify(aspectsEn, null, 2));
+        }
+      },
+      16,
+    );
     fs.writeFileSync(aspectsEnFile, JSON.stringify(aspectsEn, null, 2));
-    console.log(`Saved ${Object.keys(aspectsEn).length} synastry aspect details to ${aspectsEnFile}`);
+    console.log(
+      `Saved ${Object.keys(aspectsEn).length} synastry aspect details to ${aspectsEnFile}`,
+    );
   }
 
   console.log("=== All Synastry Translations Completed Successfully! ===");

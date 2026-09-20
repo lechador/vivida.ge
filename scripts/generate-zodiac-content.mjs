@@ -1,6 +1,6 @@
 /**
  * Generate Georgian SEO copy for the public zodiac pages via OpenRouter
- * (Gemini 2.5 Flash). Idempotent + resumable: skips slugs already present
+ * (Gemini 3.5 Flash Lite). Idempotent + resumable: skips slugs already present
  * in lib/seo/zodiac-content.json unless --force is passed.
  *
  * Usage:
@@ -19,7 +19,7 @@ import { resolve, dirname } from "path";
 config({ path: ".env.local" });
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3.5-flash-lite";
 const KEY = process.env.OPENROUTER_API_KEY;
 if (!KEY) {
   console.error("OPENROUTER_API_KEY is not set in .env.local — aborting.");
@@ -34,18 +34,114 @@ const force = args.includes("--force");
 const explicit = args.filter((a) => !a.startsWith("--"));
 
 const SIGN_INPUTS = [
-  { slug: "aries", labelKa: "ვერძი", symbol: "♈", element: "ცეცხლი", modality: "კარდინალური", ruler: "მარსი", dates: "21 მარტი – 19 აპრილი" },
-  { slug: "taurus", labelKa: "კურო", symbol: "♉", element: "მიწა", modality: "ფიქსირებული", ruler: "ვენერა", dates: "20 აპრილი – 20 მაისი" },
-  { slug: "gemini", labelKa: "ტყუპები", symbol: "♊", element: "ჰაერი", modality: "მუტაბელური", ruler: "მერკური", dates: "21 მაისი – 20 ივნისი" },
-  { slug: "cancer", labelKa: "კირჩხიბი", symbol: "♋", element: "წყალი", modality: "კარდინალური", ruler: "მთვარე", dates: "21 ივნისი – 22 ივლისი" },
-  { slug: "leo", labelKa: "ლომი", symbol: "♌", element: "ცეცხლი", modality: "ფიქსირებული", ruler: "მზე", dates: "23 ივლისი – 22 აგვისტო" },
-  { slug: "virgo", labelKa: "ქალწული", symbol: "♍", element: "მიწა", modality: "მუტაბელური", ruler: "მერკური", dates: "23 აგვისტო – 22 სექტემბერი" },
-  { slug: "libra", labelKa: "სასწორი", symbol: "♎", element: "ჰაერი", modality: "კარდინალური", ruler: "ვენერა", dates: "23 სექტემბერი – 22 ოქტომბერი" },
-  { slug: "scorpio", labelKa: "მორიელი", symbol: "♏", element: "წყალი", modality: "ფიქსირებული", ruler: "პლუტონი", dates: "23 ოქტომბერი – 21 ნოემბერი" },
-  { slug: "sagittarius", labelKa: "მშვილდოსანი", symbol: "♐", element: "ცეცხლი", modality: "მუტაბელური", ruler: "იუპიტერი", dates: "22 ნოემბერი – 21 დეკემბერი" },
-  { slug: "capricorn", labelKa: "თხის რქა", symbol: "♑", element: "მიწა", modality: "კარდინალური", ruler: "სატურნი", dates: "22 დეკემბერი – 19 იანვარი" },
-  { slug: "aquarius", labelKa: "მერწყული", symbol: "♒", element: "ჰაერი", modality: "ფიქსირებული", ruler: "ურანი", dates: "20 იანვარი – 18 თებერვალი" },
-  { slug: "pisces", labelKa: "თევზები", symbol: "♓", element: "წყალი", modality: "მუტაბელური", ruler: "ნეპტუნი", dates: "19 თებერვალი – 20 მარტი" },
+  {
+    slug: "aries",
+    labelKa: "ვერძი",
+    symbol: "♈",
+    element: "ცეცხლი",
+    modality: "კარდინალური",
+    ruler: "მარსი",
+    dates: "21 მარტი – 19 აპრილი",
+  },
+  {
+    slug: "taurus",
+    labelKa: "კურო",
+    symbol: "♉",
+    element: "მიწა",
+    modality: "ფიქსირებული",
+    ruler: "ვენერა",
+    dates: "20 აპრილი – 20 მაისი",
+  },
+  {
+    slug: "gemini",
+    labelKa: "ტყუპები",
+    symbol: "♊",
+    element: "ჰაერი",
+    modality: "მუტაბელური",
+    ruler: "მერკური",
+    dates: "21 მაისი – 20 ივნისი",
+  },
+  {
+    slug: "cancer",
+    labelKa: "კირჩხიბი",
+    symbol: "♋",
+    element: "წყალი",
+    modality: "კარდინალური",
+    ruler: "მთვარე",
+    dates: "21 ივნისი – 22 ივლისი",
+  },
+  {
+    slug: "leo",
+    labelKa: "ლომი",
+    symbol: "♌",
+    element: "ცეცხლი",
+    modality: "ფიქსირებული",
+    ruler: "მზე",
+    dates: "23 ივლისი – 22 აგვისტო",
+  },
+  {
+    slug: "virgo",
+    labelKa: "ქალწული",
+    symbol: "♍",
+    element: "მიწა",
+    modality: "მუტაბელური",
+    ruler: "მერკური",
+    dates: "23 აგვისტო – 22 სექტემბერი",
+  },
+  {
+    slug: "libra",
+    labelKa: "სასწორი",
+    symbol: "♎",
+    element: "ჰაერი",
+    modality: "კარდინალური",
+    ruler: "ვენერა",
+    dates: "23 სექტემბერი – 22 ოქტომბერი",
+  },
+  {
+    slug: "scorpio",
+    labelKa: "მორიელი",
+    symbol: "♏",
+    element: "წყალი",
+    modality: "ფიქსირებული",
+    ruler: "პლუტონი",
+    dates: "23 ოქტომბერი – 21 ნოემბერი",
+  },
+  {
+    slug: "sagittarius",
+    labelKa: "მშვილდოსანი",
+    symbol: "♐",
+    element: "ცეცხლი",
+    modality: "მუტაბელური",
+    ruler: "იუპიტერი",
+    dates: "22 ნოემბერი – 21 დეკემბერი",
+  },
+  {
+    slug: "capricorn",
+    labelKa: "თხის რქა",
+    symbol: "♑",
+    element: "მიწა",
+    modality: "კარდინალური",
+    ruler: "სატურნი",
+    dates: "22 დეკემბერი – 19 იანვარი",
+  },
+  {
+    slug: "aquarius",
+    labelKa: "მერწყული",
+    symbol: "♒",
+    element: "ჰაერი",
+    modality: "ფიქსირებული",
+    ruler: "ურანი",
+    dates: "20 იანვარი – 18 თებერვალი",
+  },
+  {
+    slug: "pisces",
+    labelKa: "თევზები",
+    symbol: "♓",
+    element: "წყალი",
+    modality: "მუტაბელური",
+    ruler: "ნეპტუნი",
+    dates: "19 თებერვალი – 20 მარტი",
+  },
 ];
 
 const SIGN_SYSTEM_PROMPT = `შენ ხარ თბილი, გამოცდილი ქართველი ასტროლოგი/რედაქტორი. წერ ქართულად, თანამედროვე ახალგაზრდა აუდიტორიისთვის. ენა — სუფთა, პოეტური, მაგრამ მკაფიო და გრამატიკულად სწორი. SEO ფოკუსით.
@@ -158,7 +254,7 @@ async function callOpenRouter(systemPrompt, userPrompt, label) {
     return JSON.parse(stripped);
   } catch (err) {
     throw new Error(
-      `Invalid JSON for ${label}: ${err.message}\n--- raw head ---\n${raw.slice(0, 600)}`
+      `Invalid JSON for ${label}: ${err.message}\n--- raw head ---\n${raw.slice(0, 600)}`,
     );
   }
 }
@@ -179,7 +275,7 @@ async function generateHub() {
   return callOpenRouter(
     HUB_SYSTEM_PROMPT,
     "დააწერე SEO ჰაბი 12 ცის ნიშნისთვის. JSON-ად დააბრუნე.",
-    "hub"
+    "hub",
   );
 }
 
@@ -187,7 +283,7 @@ async function generateByDate() {
   return callOpenRouter(
     BY_DATE_SYSTEM_PROMPT,
     "დააწერე SEO გვერდი 'ცის ნიშანი დაბადების თარიღის მიხედვით'-სთვის. JSON-ად დააბრუნე.",
-    "byDate"
+    "byDate",
   );
 }
 
@@ -217,7 +313,7 @@ async function run() {
 
   // Generate signs concurrently in batches of 3 to be polite to rate limits
   const signTargets = targets.filter((t) =>
-    SIGN_INPUTS.some((s) => s.slug === t)
+    SIGN_INPUTS.some((s) => s.slug === t),
   );
   const wantHub = targets.includes("hub");
   const wantByDate = targets.includes("byDate");
@@ -247,7 +343,7 @@ async function run() {
         };
         writeFileSync(OUT, JSON.stringify(data, null, 2));
         console.log(`  ✓ ${slug} done in ${(Date.now() - t0) / 1000}s`);
-      })
+      }),
     );
   }
 

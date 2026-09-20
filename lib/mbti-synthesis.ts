@@ -16,12 +16,18 @@
 import type { NatalChartJson } from "@/db/schema";
 import { signByIndex } from "@/lib/zodiac";
 import type { MbtiScores } from "@/lib/mbti-questions";
-import { AXIS_LABEL_EN, AXIS_LABEL_KA, mbtiArchetypeEn, mbtiArchetypeKa, mbtiBaseType } from "@/lib/mbti-questions";
+import {
+  AXIS_LABEL_EN,
+  AXIS_LABEL_KA,
+  mbtiArchetypeEn,
+  mbtiArchetypeKa,
+  mbtiBaseType,
+} from "@/lib/mbti-questions";
 import { getTypeAndSun } from "@/lib/mbti-library";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = "google/gemini-2.5-flash";
-const GOOGLE_MODEL = "gemini-2.5-flash";
+const OPENROUTER_MODEL = "google/gemini-3.5-flash-lite";
+const GOOGLE_MODEL = "gemini-3.5-flash-lite";
 
 export type MbtiSynthesis = {
   archetypeNameGe: string;
@@ -82,17 +88,21 @@ function scoresSummaryEn(scores: MbtiScores): string {
 
 async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
   if (input.locale === "en") {
-    const sunSign = input.chart != null
-      ? signByIndex(input.chart.bodies.sun?.signIndex ?? 0).labelEn
-      : null;
+    const sunSign =
+      input.chart != null
+        ? signByIndex(input.chart.bodies.sun?.signIndex ?? 0).labelEn
+        : null;
     const lines: string[] = [];
     if (input.firstName) lines.push(`First name: ${input.firstName}`);
     lines.push(`Type: ${input.type} (${mbtiArchetypeEn(input.type)})`);
     lines.push(`Dimension strengths: ${scoresSummaryEn(input.scores)}`);
-    if (sunSign) lines.push(`Sun sign: ${sunSign}. Use this only as one subtle metaphor, not as evidence or a second assessment.`);
+    if (sunSign)
+      lines.push(
+        `Sun sign: ${sunSign}. Use this only as one subtle metaphor, not as evidence or a second assessment.`,
+      );
     lines.push(
       "Write a cohesive, individualized portrait in 5–6 short paragraphs. Explain how this pattern may appear in thought, emotion, relationships, work and stress; include concrete strengths and balanced growth suggestions. " +
-      "Use careful language such as ‘tends to’ and ‘may’, avoid stereotypes, and mention that close-to-midpoint scores can indicate flexibility."
+        "Use careful language such as ‘tends to’ and ‘may’, avoid stereotypes, and mention that close-to-midpoint scores can indicate flexibility.",
     );
     return lines.join("\n");
   }
@@ -116,17 +126,19 @@ async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
   const lines: string[] = [];
   if (input.firstName) lines.push(`მომხმარებლის სახელი: ${input.firstName}`);
   lines.push(`ტიპი: ${input.type} (${mbtiArchetypeKa(input.type)})`);
-  lines.push(`ღერძების ბალანსი (პროცენტებით): ${scoresSummaryKa(input.scores)}`);
+  lines.push(
+    `ღერძების ბალანსი (პროცენტებით): ${scoresSummaryKa(input.scores)}`,
+  );
   if (identityKa) {
     lines.push(
       `იდენტობის ღერძი (თვითრწმენა): ${identityKa} — ` +
-        "ჩართე ეს ნიუანსი: როგორ ხვდება სტრესს, თვითკრიტიკას, შედეგზე დამოკიდებულებას."
+        "ჩართე ეს ნიუანსი: როგორ ხვდება სტრესს, თვითკრიტიკას, შედეგზე დამოკიდებულებას.",
     );
   }
   if (sunSignKa) {
     lines.push(
       `ზოდიაქოს ნიშანი: ${sunSignKa} (გამოიყენე მხოლოდ არქეტიპის სახელისთვის, ` +
-        `მაგ. „${sunSignKa} ${mbtiArchetypeKa(input.type)}“, და ერთი მსუბუქი შტრიხისთვის — მეტი არა).`
+        `მაგ. „${sunSignKa} ${mbtiArchetypeKa(input.type)}“, და ერთი მსუბუქი შტრიხისთვის — მეტი არა).`,
     );
   }
 
@@ -143,7 +155,7 @@ async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
         ? `ზოდიაქოს ${sunSignKa} ჩართე მხოლოდ არქეტიპის სახელსა და ერთ მსუბუქ შტრიხში. `
         : "") +
       "პლანეტების, სახლების ან ასპექტების ჩამოთვლა არ არის საჭირო. 5-6 აბზაცი. " +
-      "დაწერე უნაკლო, ბუნებრივი ქართულით."
+      "დაწერე უნაკლო, ბუნებრივი ქართულით.",
   );
   return lines.join("\n");
 }
@@ -162,7 +174,10 @@ function parseSynthesis(raw: string): MbtiSynthesis {
   };
 }
 
-async function viaOpenRouter(prompt: string, locale: UserLocale): Promise<MbtiSynthesis> {
+async function viaOpenRouter(
+  prompt: string,
+  locale: UserLocale,
+): Promise<MbtiSynthesis> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
   const res = await fetch(OPENROUTER_URL, {
@@ -176,7 +191,10 @@ async function viaOpenRouter(prompt: string, locale: UserLocale): Promise<MbtiSy
     body: JSON.stringify({
       model: OPENROUTER_MODEL,
       messages: [
-        { role: "system", content: locale === "en" ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: locale === "en" ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT,
+        },
         { role: "user", content: prompt },
       ],
       response_format: { type: "json_object" },
@@ -200,7 +218,10 @@ async function viaOpenRouter(prompt: string, locale: UserLocale): Promise<MbtiSy
   return parseSynthesis(raw);
 }
 
-async function viaGoogle(prompt: string, locale: UserLocale): Promise<MbtiSynthesis> {
+async function viaGoogle(
+  prompt: string,
+  locale: UserLocale,
+): Promise<MbtiSynthesis> {
   const { GoogleGenAI } = await import("@google/genai");
   const apiKey = process.env.GEMINI_API_KEY;
   const ai = apiKey
@@ -208,7 +229,8 @@ async function viaGoogle(prompt: string, locale: UserLocale): Promise<MbtiSynthe
     : new GoogleGenAI({
         vertexai: true,
         project: process.env.GOOGLE_CLOUD_PROJECT,
-        location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+        // Gemini 3.5 Flash Lite is exposed through Vertex's global endpoint.
+        location: "global",
       });
   const res = await ai.models.generateContent({
     model: GOOGLE_MODEL,
@@ -238,7 +260,7 @@ function preferGoogle(): boolean {
  * fails (caller then falls back to the static archetype so a result renders).
  */
 export async function generateMbtiSynthesis(
-  input: MbtiSynthesisInput
+  input: MbtiSynthesisInput,
 ): Promise<(MbtiSynthesis & { model: string }) | null> {
   const locale = input.locale ?? "ka";
   const prompt = await buildUserPrompt(input);
@@ -250,7 +272,7 @@ export async function generateMbtiSynthesis(
     } catch (err) {
       console.warn(
         "[mbti-synthesis] Google path failed, falling back to OpenRouter:",
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }
@@ -258,7 +280,10 @@ export async function generateMbtiSynthesis(
     const r = await viaOpenRouter(prompt, locale);
     return { ...r, model: OPENROUTER_MODEL };
   } catch (err) {
-    console.error("[mbti-synthesis] all providers failed:", (err as Error).message);
+    console.error(
+      "[mbti-synthesis] all providers failed:",
+      (err as Error).message,
+    );
     return null;
   }
 }

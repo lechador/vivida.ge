@@ -1,6 +1,6 @@
 /**
  * Generate Georgian SEO copy for the yearly horoscope pages
- * (/zodiac/[sign]/[year]) via OpenRouter (Gemini 2.5 Flash).
+ * (/zodiac/[sign]/[year]) via OpenRouter (Gemini 3.5 Flash Lite).
  *
  * Idempotent + resumable: skips entries already present in
  * lib/seo/zodiac-content.json under `yearly[year][slug]` unless --force
@@ -20,7 +20,7 @@ import { resolve, dirname } from "path";
 config({ path: ".env.local" });
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3.5-flash-lite";
 const KEY = process.env.OPENROUTER_API_KEY;
 if (!KEY) {
   console.error("OPENROUTER_API_KEY is not set in .env.local — aborting.");
@@ -38,7 +38,7 @@ function arg(flag) {
 }
 const YEAR = Number(arg("--year") ?? 2026);
 const explicit = args.filter(
-  (a, i) => !a.startsWith("--") && args[i - 1] !== "--year"
+  (a, i) => !a.startsWith("--") && args[i - 1] !== "--year",
 );
 
 const SIGN_INPUTS = [
@@ -50,7 +50,12 @@ const SIGN_INPUTS = [
   { slug: "virgo", labelKa: "ქალწული", element: "მიწა", ruler: "მერკური" },
   { slug: "libra", labelKa: "სასწორი", element: "ჰაერი", ruler: "ვენერა" },
   { slug: "scorpio", labelKa: "მორიელი", element: "წყალი", ruler: "პლუტონი" },
-  { slug: "sagittarius", labelKa: "მშვილდოსანი", element: "ცეცხლი", ruler: "იუპიტერი" },
+  {
+    slug: "sagittarius",
+    labelKa: "მშვილდოსანი",
+    element: "ცეცხლი",
+    ruler: "იუპიტერი",
+  },
   { slug: "capricorn", labelKa: "თხის რქა", element: "მიწა", ruler: "სატურნი" },
   { slug: "aquarius", labelKa: "მერწყული", element: "ჰაერი", ruler: "ურანი" },
   { slug: "pisces", labelKa: "თევზები", element: "წყალი", ruler: "ნეპტუნი" },
@@ -129,7 +134,9 @@ async function callOpenRouter(systemPrompt, userPrompt) {
   try {
     parsed = JSON.parse(content);
   } catch (err) {
-    throw new Error(`Model returned invalid JSON: ${err.message}\n${content.slice(0, 400)}`);
+    throw new Error(
+      `Model returned invalid JSON: ${err.message}\n${content.slice(0, 400)}`,
+    );
   }
   return parsed;
 }
@@ -153,12 +160,13 @@ async function main() {
   data.yearly[String(YEAR)] ??= {};
   const yearMap = data.yearly[String(YEAR)];
 
-  const targets = explicit.length > 0
-    ? SIGN_INPUTS.filter((s) => explicit.includes(s.slug))
-    : SIGN_INPUTS;
+  const targets =
+    explicit.length > 0
+      ? SIGN_INPUTS.filter((s) => explicit.includes(s.slug))
+      : SIGN_INPUTS;
 
   console.log(
-    `→ generating yearly content for ${YEAR}, ${targets.length} signs (force=${force})`
+    `→ generating yearly content for ${YEAR}, ${targets.length} signs (force=${force})`,
   );
 
   for (const sign of targets) {

@@ -1,6 +1,6 @@
 /**
  * Generate Georgian SEO copy for the additional zodiac layers via OpenRouter
- * (Gemini 2.5 Flash). Targets: elementsHub, 4 element detail pages,
+ * (Gemini 3.5 Flash Lite). Targets: elementsHub, 4 element detail pages,
  * compatibility hub, 78 pair pages (12 signs × 12 / 2 + same-sign).
  *
  * Idempotent + resumable: skips items already present in lib/seo/zodiac-
@@ -21,7 +21,7 @@ import { resolve, dirname } from "path";
 config({ path: ".env.local" });
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3.5-flash-lite";
 const KEY = process.env.OPENROUTER_API_KEY;
 if (!KEY) {
   console.error("OPENROUTER_API_KEY is not set in .env.local — aborting.");
@@ -43,7 +43,7 @@ const explicit = args.filter(
     args[i - 1] !== "--pair" &&
     args[i - 1] !== "--element" &&
     args[i - 1] !== "--moon" &&
-    args[i - 1] !== "--rising"
+    args[i - 1] !== "--rising",
 );
 
 function arg(flag) {
@@ -52,18 +52,73 @@ function arg(flag) {
 }
 
 const SIGN_META = {
-  aries: { labelKa: "ვერძი", element: "fire", elementKa: "ცეცხლი", symbol: "♈" },
-  taurus: { labelKa: "კურო", element: "earth", elementKa: "მიწა", symbol: "♉" },
-  gemini: { labelKa: "ტყუპები", element: "air", elementKa: "ჰაერი", symbol: "♊" },
-  cancer: { labelKa: "კირჩხიბი", element: "water", elementKa: "წყალი", symbol: "♋" },
+  aries: {
+    labelKa: "ვერძი",
+    element: "fire",
+    elementKa: "ცეცხლი",
+    symbol: "♈",
+  },
+  taurus: {
+    labelKa: "კურო",
+    element: "earth",
+    elementKa: "მიწა",
+    symbol: "♉",
+  },
+  gemini: {
+    labelKa: "ტყუპები",
+    element: "air",
+    elementKa: "ჰაერი",
+    symbol: "♊",
+  },
+  cancer: {
+    labelKa: "კირჩხიბი",
+    element: "water",
+    elementKa: "წყალი",
+    symbol: "♋",
+  },
   leo: { labelKa: "ლომი", element: "fire", elementKa: "ცეცხლი", symbol: "♌" },
-  virgo: { labelKa: "ქალწული", element: "earth", elementKa: "მიწა", symbol: "♍" },
-  libra: { labelKa: "სასწორი", element: "air", elementKa: "ჰაერი", symbol: "♎" },
-  scorpio: { labelKa: "მორიელი", element: "water", elementKa: "წყალი", symbol: "♏" },
-  sagittarius: { labelKa: "მშვილდოსანი", element: "fire", elementKa: "ცეცხლი", symbol: "♐" },
-  capricorn: { labelKa: "თხის რქა", element: "earth", elementKa: "მიწა", symbol: "♑" },
-  aquarius: { labelKa: "მერწყული", element: "air", elementKa: "ჰაერი", symbol: "♒" },
-  pisces: { labelKa: "თევზები", element: "water", elementKa: "წყალი", symbol: "♓" },
+  virgo: {
+    labelKa: "ქალწული",
+    element: "earth",
+    elementKa: "მიწა",
+    symbol: "♍",
+  },
+  libra: {
+    labelKa: "სასწორი",
+    element: "air",
+    elementKa: "ჰაერი",
+    symbol: "♎",
+  },
+  scorpio: {
+    labelKa: "მორიელი",
+    element: "water",
+    elementKa: "წყალი",
+    symbol: "♏",
+  },
+  sagittarius: {
+    labelKa: "მშვილდოსანი",
+    element: "fire",
+    elementKa: "ცეცხლი",
+    symbol: "♐",
+  },
+  capricorn: {
+    labelKa: "თხის რქა",
+    element: "earth",
+    elementKa: "მიწა",
+    symbol: "♑",
+  },
+  aquarius: {
+    labelKa: "მერწყული",
+    element: "air",
+    elementKa: "ჰაერი",
+    symbol: "♒",
+  },
+  pisces: {
+    labelKa: "თევზები",
+    element: "water",
+    elementKa: "წყალი",
+    symbol: "♓",
+  },
 };
 
 const ALL_SLUGS = Object.keys(SIGN_META);
@@ -295,7 +350,7 @@ async function generateElementsHub() {
   return callOpenRouter(
     ELEMENTS_HUB_PROMPT,
     "დააწერე ცის ნიშნების ელემენტების SEO ჰაბი. JSON-ად დააბრუნე.",
-    "elementsHub"
+    "elementsHub",
   );
 }
 
@@ -305,14 +360,18 @@ async function generateElement(el) {
 ამ ელემენტს ეკუთვნის: ${signsKa}.
 
 დააწერე SEO გვერდი ამ ელემენტისთვის. JSON-ად დააბრუნე.`;
-  return callOpenRouter(ELEMENT_DETAIL_PROMPT, userPrompt, `element:${el.slug}`);
+  return callOpenRouter(
+    ELEMENT_DETAIL_PROMPT,
+    userPrompt,
+    `element:${el.slug}`,
+  );
 }
 
 async function generateCompatHub() {
   return callOpenRouter(
     COMPAT_HUB_PROMPT,
     "დააწერე SEO ჰაბი ცის ნიშნების თავსებადობაზე. JSON-ად დააბრუნე.",
-    "compatibilityHub"
+    "compatibilityHub",
   );
 }
 
@@ -320,7 +379,7 @@ async function generateMoonHub() {
   return callOpenRouter(
     MOON_HUB_PROMPT,
     "დააწერე SEO ჰაბი მთვარის ნიშანზე ქართულად. JSON-ად დააბრუნე.",
-    "moonHub"
+    "moonHub",
   );
 }
 
@@ -336,7 +395,7 @@ async function generateRisingHub() {
   return callOpenRouter(
     RISING_HUB_PROMPT,
     "დააწერე SEO ჰაბი ამომავალ ნიშანზე (ასცენდენტი) ქართულად. JSON-ად დააბრუნე.",
-    "risingHub"
+    "risingHub",
   );
 }
 
@@ -385,7 +444,8 @@ async function run() {
   // Specific overrides
   if (onlyPair) {
     const [a, b] = onlyPair.split("-");
-    if (!SIGN_META[a] || !SIGN_META[b]) throw new Error(`bad pair: ${onlyPair}`);
+    if (!SIGN_META[a] || !SIGN_META[b])
+      throw new Error(`bad pair: ${onlyPair}`);
     const slug = `${a}-${b}`;
     console.log(`→ pair ${slug}`);
     const t0 = Date.now();
@@ -526,7 +586,7 @@ async function run() {
       save();
       done++;
       console.log(
-        `  ✓ ${slug} ${(Date.now() - t0) / 1000}s (${done}/${pairs.length})`
+        `  ✓ ${slug} ${(Date.now() - t0) / 1000}s (${done}/${pairs.length})`,
       );
     });
   }

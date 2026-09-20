@@ -19,7 +19,7 @@ try {
 
 const sql = neon(process.env.DATABASE_URL);
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3.5-flash-lite";
 const API_KEY = process.env.OPENROUTER_API_KEY;
 
 if (!API_KEY) {
@@ -58,7 +58,9 @@ async function translateText(text) {
 
       if (!res.ok) {
         const errTxt = await res.text();
-        console.warn(`[HTTP ${res.status}] Attempt ${attempt + 1} failed: ${errTxt.slice(0, 100)}`);
+        console.warn(
+          `[HTTP ${res.status}] Attempt ${attempt + 1} failed: ${errTxt.slice(0, 100)}`,
+        );
         await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
         continue;
       }
@@ -66,7 +68,10 @@ async function translateText(text) {
       const json = await res.json();
       const content = json.choices?.[0]?.message?.content?.trim();
       if (!content) throw new Error("Empty translation returned");
-      return content.replace(/^```(?:json|markdown)?\s*/i, "").replace(/\s*```$/, "").trim();
+      return content
+        .replace(/^```(?:json|markdown)?\s*/i, "")
+        .replace(/\s*```$/, "")
+        .trim();
     } catch (err) {
       console.warn(`[Error] Attempt ${attempt + 1}: ${err.message}`);
       await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
@@ -91,12 +96,16 @@ async function runWorkerPool(items, workerFn, concurrency = 12) {
       }
       completed++;
       if (completed % 25 === 0 || completed === total) {
-        console.log(`Progress: ${completed}/${total} (${Math.round((completed / total) * 100)}%)`);
+        console.log(
+          `Progress: ${completed}/${total} (${Math.round((completed / total) * 100)}%)`,
+        );
       }
     }
   }
 
-  const workers = Array.from({ length: Math.min(concurrency, total) }, () => worker());
+  const workers = Array.from({ length: Math.min(concurrency, total) }, () =>
+    worker(),
+  );
   await Promise.all(workers);
 }
 
@@ -104,7 +113,10 @@ async function main() {
   console.log("=== Translating Natal Interpretation Libraries to English ===");
 
   // 1. Placements (132 rows)
-  const interpFile = path.join(rootDir, "lib/seo/interpretation-library-en.json");
+  const interpFile = path.join(
+    rootDir,
+    "lib/seo/interpretation-library-en.json",
+  );
   let interpEn = {};
   if (fs.existsSync(interpFile)) {
     try {
@@ -112,20 +124,32 @@ async function main() {
     } catch {}
   }
   const interpRows = await sql`SELECT key, body FROM interpretation_library`;
-  console.log(`Fetched ${interpRows.length} interpretation_library rows from DB.`);
-  const missingInterps = interpRows.filter((r) => !interpEn[r.key] || interpEn[r.key].length < 50);
-  console.log(`Missing/incomplete placements to translate: ${missingInterps.length}`);
+  console.log(
+    `Fetched ${interpRows.length} interpretation_library rows from DB.`,
+  );
+  const missingInterps = interpRows.filter(
+    (r) => !interpEn[r.key] || interpEn[r.key].length < 50,
+  );
+  console.log(
+    `Missing/incomplete placements to translate: ${missingInterps.length}`,
+  );
 
   if (missingInterps.length > 0) {
-    await runWorkerPool(missingInterps, async (row) => {
-      const translated = await translateText(row.body);
-      interpEn[row.key] = translated;
-      if (Math.random() < 0.1) {
-        fs.writeFileSync(interpFile, JSON.stringify(interpEn, null, 2));
-      }
-    }, 12);
+    await runWorkerPool(
+      missingInterps,
+      async (row) => {
+        const translated = await translateText(row.body);
+        interpEn[row.key] = translated;
+        if (Math.random() < 0.1) {
+          fs.writeFileSync(interpFile, JSON.stringify(interpEn, null, 2));
+        }
+      },
+      12,
+    );
     fs.writeFileSync(interpFile, JSON.stringify(interpEn, null, 2));
-    console.log(`Saved ${Object.keys(interpEn).length} placements to ${interpFile}`);
+    console.log(
+      `Saved ${Object.keys(interpEn).length} placements to ${interpFile}`,
+    );
   }
 
   // 2. House library (276 rows)
@@ -136,19 +160,30 @@ async function main() {
       houseEn = JSON.parse(fs.readFileSync(houseFile, "utf8"));
     } catch {}
   }
-  const houseRows = await sql`SELECT key, body FROM house_interpretation_library`;
-  console.log(`Fetched ${houseRows.length} house_interpretation_library rows from DB.`);
-  const missingHouses = houseRows.filter((r) => !houseEn[r.key] || houseEn[r.key].length < 50);
-  console.log(`Missing/incomplete houses to translate: ${missingHouses.length}`);
+  const houseRows =
+    await sql`SELECT key, body FROM house_interpretation_library`;
+  console.log(
+    `Fetched ${houseRows.length} house_interpretation_library rows from DB.`,
+  );
+  const missingHouses = houseRows.filter(
+    (r) => !houseEn[r.key] || houseEn[r.key].length < 50,
+  );
+  console.log(
+    `Missing/incomplete houses to translate: ${missingHouses.length}`,
+  );
 
   if (missingHouses.length > 0) {
-    await runWorkerPool(missingHouses, async (row) => {
-      const translated = await translateText(row.body);
-      houseEn[row.key] = translated;
-      if (Math.random() < 0.1) {
-        fs.writeFileSync(houseFile, JSON.stringify(houseEn, null, 2));
-      }
-    }, 12);
+    await runWorkerPool(
+      missingHouses,
+      async (row) => {
+        const translated = await translateText(row.body);
+        houseEn[row.key] = translated;
+        if (Math.random() < 0.1) {
+          fs.writeFileSync(houseFile, JSON.stringify(houseEn, null, 2));
+        }
+      },
+      12,
+    );
     fs.writeFileSync(houseFile, JSON.stringify(houseEn, null, 2));
     console.log(`Saved ${Object.keys(houseEn).length} houses to ${houseFile}`);
   }
@@ -161,24 +196,39 @@ async function main() {
       aspectEn = JSON.parse(fs.readFileSync(aspectFile, "utf8"));
     } catch {}
   }
-  const aspectRows = await sql`SELECT key, body FROM aspect_interpretation_library`;
-  console.log(`Fetched ${aspectRows.length} aspect_interpretation_library rows from DB.`);
-  const missingAspects = aspectRows.filter((r) => !aspectEn[r.key] || aspectEn[r.key].length < 50);
-  console.log(`Missing/incomplete aspects to translate: ${missingAspects.length}`);
+  const aspectRows =
+    await sql`SELECT key, body FROM aspect_interpretation_library`;
+  console.log(
+    `Fetched ${aspectRows.length} aspect_interpretation_library rows from DB.`,
+  );
+  const missingAspects = aspectRows.filter(
+    (r) => !aspectEn[r.key] || aspectEn[r.key].length < 50,
+  );
+  console.log(
+    `Missing/incomplete aspects to translate: ${missingAspects.length}`,
+  );
 
   if (missingAspects.length > 0) {
-    await runWorkerPool(missingAspects, async (row) => {
-      const translated = await translateText(row.body);
-      aspectEn[row.key] = translated;
-      if (Math.random() < 0.1) {
-        fs.writeFileSync(aspectFile, JSON.stringify(aspectEn, null, 2));
-      }
-    }, 12);
+    await runWorkerPool(
+      missingAspects,
+      async (row) => {
+        const translated = await translateText(row.body);
+        aspectEn[row.key] = translated;
+        if (Math.random() < 0.1) {
+          fs.writeFileSync(aspectFile, JSON.stringify(aspectEn, null, 2));
+        }
+      },
+      12,
+    );
     fs.writeFileSync(aspectFile, JSON.stringify(aspectEn, null, 2));
-    console.log(`Saved ${Object.keys(aspectEn).length} aspects to ${aspectFile}`);
+    console.log(
+      `Saved ${Object.keys(aspectEn).length} aspects to ${aspectFile}`,
+    );
   }
 
-  console.log("=== All Natal Interpretation Libraries Successfully Translated! ===");
+  console.log(
+    "=== All Natal Interpretation Libraries Successfully Translated! ===",
+  );
 }
 
 main().catch((err) => {
