@@ -52,7 +52,7 @@ export async function POST(req: Request) {
             uid,
             [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
             "purchase_completed",
-            "stripe_webhook",
+            `stripe_webhook:${sessionObj.metadata?.purchase_context ?? "premium"}`,
             sessionObj.id,
           );
         }
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
             uid,
             [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
             "purchase_completed",
-            "stripe_webhook",
+            `stripe_webhook:${sessionObj.metadata?.purchase_context ?? "credits"}`,
             sessionObj.id,
           );
         } catch (err) {

@@ -42,12 +42,28 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SubscriptionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string | string[] }>;
+  searchParams: Promise<{
+    next?: string | string[];
+    product?: string | string[];
+  }>;
 }) {
-  const user = await requireUser();
   const query = await searchParams;
   const rawNext = Array.isArray(query.next) ? query.next[0] : query.next;
   const returnTo = rawNext ? normalizeReturnPath(rawNext) : null;
+  const rawProduct = Array.isArray(query.product)
+    ? query.product[0]
+    : query.product;
+  const product =
+    typeof rawProduct === "string" && /^[a-z0-9_-]{1,60}$/i.test(rawProduct)
+      ? rawProduct
+      : null;
+  const loginQuery = new URLSearchParams();
+  if (returnTo) loginQuery.set("next", returnTo);
+  if (product) loginQuery.set("product", product);
+  const loginReturn = loginQuery.size
+    ? `/subscription?${loginQuery.toString()}`
+    : "/subscription";
+  const user = await requireUser(loginReturn);
   // See app/credits/page.tsx — authed surfaces carry no `/am` prefix, so the
   // stored preference is what keeps an Armenian user in Armenian.
   const locale = await getUserLocale(user.id);
@@ -177,6 +193,7 @@ export default async function SubscriptionPage({
                   locale={locale}
                   placement="subscription_page_reactivation"
                   returnTo={returnTo}
+                  product={product}
                 />
               </div>
             )}
@@ -187,6 +204,7 @@ export default async function SubscriptionPage({
             locale={locale}
             placement="subscription_page"
             returnTo={returnTo}
+            product={product}
           />
         )}
       </section>

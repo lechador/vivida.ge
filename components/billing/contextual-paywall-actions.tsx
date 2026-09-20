@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { CreditCard, Crown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,11 @@ import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { EXPERIMENTS } from "@/lib/experiment-catalog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { trackExperimentOutcome, useExperiment } from "@/lib/use-experiment";
+import {
+  creditPacksForCountry,
+  formatBillingAmount,
+} from "@/lib/billing-config";
+import { CREDIT_COST } from "@/lib/credits-config";
 
 export function ContextualPaywallActions({
   locale,
@@ -20,6 +26,7 @@ export function ContextualPaywallActions({
   product,
   returnTo,
   placement,
+  countryCode,
 }: {
   locale: UserLocale;
   balance: number;
@@ -27,17 +34,30 @@ export function ContextualPaywallActions({
   product: string;
   returnTo: string;
   placement: string;
+  countryCode?: string | null;
 }) {
   const en = locale === "en";
   const missing = Math.max(1, cost - balance);
   const next = normalizeReturnPath(returnTo);
+  const starterPack = creditPacksForCountry(countryCode)[0];
+  const isTarot = product === "tarot";
   const creditsHref = contextualCreditsHref({
     returnTo: next,
     need: cost,
     product,
+    packId: isTarot ? starterPack.id : null,
   });
-  const proHref = `/subscription?next=${encodeURIComponent(next)}`;
+  const proHref = `/subscription?${new URLSearchParams({ next, product }).toString()}`;
   const variant = useExperiment(EXPERIMENTS.contextualPaywall, placement);
+
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENT.paywallViewed, {
+      product,
+      surface: placement,
+      cost,
+      balance,
+    });
+  }, [balance, cost, placement, product]);
 
   function trackChoice(destination: "credits" | "pro") {
     trackEvent(ANALYTICS_EVENT.recommendationClicked, {
@@ -67,7 +87,13 @@ export function ContextualPaywallActions({
         <Button asChild variant="mystic">
           <Link href={creditsHref} onClick={() => trackChoice("credits")}>
             <CreditCard className="size-4" />
-            {en ? "Top up and return" : "შეავსე და დაბრუნდი"}
+            {isTarot
+              ? en
+                ? `${Math.floor(starterPack.credits / CREDIT_COST.tarot)} more readings — ${formatBillingAmount(starterPack.amountMinor, starterPack.currency, locale)}`
+                : `${Math.floor(starterPack.credits / CREDIT_COST.tarot)} დამატებითი კითხვა — ${formatBillingAmount(starterPack.amountMinor, starterPack.currency, locale)}`
+              : en
+                ? "Top up and return"
+                : "შეავსე და დაბრუნდი"}
           </Link>
         </Button>
         <Button asChild variant="outline">
@@ -78,9 +104,13 @@ export function ContextualPaywallActions({
         </Button>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        {en
-          ? "Credits are one-time; PRO is for frequent use."
-          : "კრედიტები ერთჯერადია, PRO — ხშირი გამოყენებისთვის."}
+        {isTarot
+          ? en
+            ? `${starterPack.credits} credits · one-time payment · no auto-renewal`
+            : `${starterPack.credits} კრედიტი · ერთჯერადი გადახდა · ავტოგანახლების გარეშე`
+          : en
+            ? "Credits are one-time; PRO is for frequent use."
+            : "კრედიტები ერთჯერადია, PRO — ხშირი გამოყენებისთვის."}
       </p>
     </div>
   );

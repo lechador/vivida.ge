@@ -19,11 +19,15 @@ export function contextualCreditsHref(opts: {
   returnTo: string;
   need: number;
   product: string;
+  packId?: string | null;
 }): string {
   const query = new URLSearchParams({
     next: normalizeReturnPath(opts.returnTo),
     need: String(Math.max(1, Math.round(opts.need))),
     product: opts.product.slice(0, 60),
   });
+  if (opts.packId && /^(s|m|l)$/.test(opts.packId)) {
+    query.set("pack", opts.packId);
+  }
   return `/credits?${query.toString()}#credit-packs`;
 }

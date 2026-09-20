@@ -62,12 +62,14 @@ export function CheckoutSuccessTracker({
         fbTrack("Purchase", params, data.purchaseEventId);
         trackEvent(ANALYTICS_EVENT.checkoutSuccess, {
           product: data.contentId,
+          purchase_context: data.purchaseContext,
           kind: data.kind,
           value: data.value,
           currency: data.currency,
         });
         trackEvent(ANALYTICS_EVENT.purchaseCompleted, {
           product: data.contentId,
+          purchase_context: data.purchaseContext,
           value: data.value,
           currency: data.currency,
         });
@@ -76,6 +78,7 @@ export function CheckoutSuccessTracker({
         // succeeded" signal, not the Stripe redirect alone.
         trackEvent(ANALYTICS_EVENT.entitlementActivated, {
           product: data.contentId,
+          purchase_context: data.purchaseContext,
           kind: data.kind,
           value: data.value,
           currency: data.currency,

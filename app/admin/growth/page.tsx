@@ -1,4 +1,4 @@
-import { Activity, BellRing, FlaskConical, Gauge, Users, WalletCards } from "lucide-react";
+import { Activity, BellRing, CreditCard, FlaskConical, Gauge, Users, WalletCards } from "lucide-react";
 import Link from "next/link";
 
 import { requireAdmin } from "@/lib/admin-auth";
@@ -78,6 +78,29 @@ export default async function AdminGrowthPage({
         </div>
       </section>
 
+      <section className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <SummaryCard
+          label={`პირველი ვებშენაძენი · ${days} დღე`}
+          value={metrics.firstPurchases.total}
+          icon={WalletCards}
+        />
+        <SummaryCard
+          label={`კრედიტი / PRO · ${days} დღე`}
+          value={`${metrics.firstPurchases.credits} / ${metrics.firstPurchases.premium}`}
+          icon={CreditCard}
+        />
+        <SummaryCard
+          label="ახალი / დაბრუნებული მომხმარებელი"
+          value={`${metrics.firstPurchases.newRegistrations} / ${metrics.firstPurchases.returningUsers}`}
+          icon={Users}
+        />
+        <SummaryCard
+          label="შენაძენიდან 24სთ-ში მიღებული შედეგი"
+          value={`${metrics.firstPurchases.valueDelivered24h} · ${percent(metrics.firstPurchases.valueDelivered24h, metrics.firstPurchases.total)}`}
+          icon={Gauge}
+        />
+      </section>
+
       <section className="mt-8 rounded-2xl border border-border bg-card/45 p-5 sm:p-6">
         <div className="flex items-center gap-2"><FlaskConical className="size-5 text-[var(--vivida-violet)]" /><h2 className="text-lg font-semibold">A/B ექსპერიმენტები</h2></div>
         <p className="mt-1 text-xs text-muted-foreground">Assigned = ახალი assignment არჩეულ პერიოდში; დანარჩენი ეტაპები = მოვლენები იმავე პერიოდში. Purchase მხოლოდ Stripe-ის დასრულებული webhook-ია.</p>
@@ -122,12 +145,12 @@ export default async function AdminGrowthPage({
         </div>
       </section>
 
-      <p className="mt-6 text-xs text-muted-foreground">განახლება: გვერდის ყოველ გახსნაზე · დროის ზონა: Asia/Tbilisi · მონაცემთა წყაროები: experiment_assignment/event, reminder_preference_event/delivery, credit_transaction.</p>
+      <p className="mt-6 text-xs text-muted-foreground">განახლება: გვერდის ყოველ გახსნაზე · დროის ზონა: Asia/Tbilisi · მონაცემთა წყაროები: experiment_assignment/event, reminder_preference_event/delivery, credit_transaction, premium_subscription და library_entry. პირველი შენაძენი აქ ნიშნავს პირველ Stripe ვებშენაძენს; native store-ის ისტორია არ შედის.</p>
     </main>
   );
 }
 
-function SummaryCard({ label, value, icon: Icon }: { label: string; value: number; icon: typeof Activity }) {
+function SummaryCard({ label, value, icon: Icon }: { label: string; value: string | number; icon: typeof Activity }) {
   return <div className="rounded-2xl border border-border bg-card/55 p-5"><div className="flex items-center gap-2 text-xs text-muted-foreground"><Icon className="size-4" />{label}</div><div className="mt-2 text-3xl font-semibold tabular-nums">{value}</div></div>;
 }
 

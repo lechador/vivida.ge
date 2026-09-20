@@ -26,10 +26,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "unavailable" }, { status: 503 });
   }
 
-  const body = (await req.json().catch(() => ({}))) as { packId?: unknown; returnTo?: unknown };
+  const body = (await req.json().catch(() => ({}))) as {
+    packId?: unknown;
+    returnTo?: unknown;
+    product?: unknown;
+  };
   const returnTo = typeof body.returnTo === "string"
     ? normalizeReturnPath(body.returnTo)
     : null;
+  const purchaseContext =
+    typeof body.product === "string" && /^[a-z0-9_-]{1,60}$/i.test(body.product)
+      ? body.product
+      : "credits_hub";
   const billingUser = await getBillingIdentity(userId);
   const pack = creditPackForCountry(billingUser?.countryCode, body.packId);
   if (!pack) return NextResponse.json({ error: "bad_pack" }, { status: 400 });
@@ -53,7 +61,11 @@ export async function POST(req: Request) {
       amountMinor: pack.amountMinor,
       currency: pack.currency,
       locale,
-      trackingMetadata: checkoutTrackingMetadata(tracking),
+      trackingMetadata: {
+        ...checkoutTrackingMetadata(tracking),
+        purchase_context: purchaseContext,
+        selected_pack_id: pack.id,
+      },
       returnTo,
     });
     await recordExperimentOutcomesBestEffort(

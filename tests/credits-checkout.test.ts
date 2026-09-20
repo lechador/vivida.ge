@@ -85,7 +85,28 @@ describe("POST /api/credits/checkout", () => {
         amountMinor: 690,
         currency: "gel",
         locale: "ka",
-        trackingMetadata: { tracking_consent: "denied" },
+        trackingMetadata: {
+          tracking_consent: "denied",
+          purchase_context: "credits_hub",
+          selected_pack_id: "s",
+        },
+      }),
+    );
+  });
+
+  it("keeps a safe product context through checkout", async () => {
+    const response = await POST(
+      request({ packId: "s", product: "tarot", returnTo: "/taro" }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.createCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        returnTo: "/taro",
+        trackingMetadata: expect.objectContaining({
+          purchase_context: "tarot",
+          selected_pack_id: "s",
+        }),
       }),
     );
   });

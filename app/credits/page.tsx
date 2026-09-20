@@ -63,6 +63,7 @@ export default async function CreditsPage({
     next?: string | string[];
     need?: string | string[];
     product?: string | string[];
+    pack?: string | string[];
   }>;
 }) {
   const query = await searchParams;
@@ -80,12 +81,17 @@ export default async function CreditsPage({
   const rawProduct = Array.isArray(query.product)
     ? query.product[0]
     : query.product;
-  if (
+  const product =
     typeof rawProduct === "string" &&
     /^[a-z0-9_-]{1,60}$/i.test(rawProduct)
-  ) {
-    loginQuery.set("product", rawProduct);
-  }
+      ? rawProduct
+      : null;
+  if (product) loginQuery.set("product", product);
+  const rawPack = Array.isArray(query.pack) ? query.pack[0] : query.pack;
+  const selectedPackId = rawPack === "s" || rawPack === "m" || rawPack === "l"
+    ? rawPack
+    : null;
+  if (selectedPackId) loginQuery.set("pack", selectedPackId);
   const loginReturn =
     loginQuery.size > 0 ? `/credits?${loginQuery.toString()}` : "/credits";
   // Campaign emails link here directly. Preserve the destination for readers
@@ -245,6 +251,8 @@ export default async function CreditsPage({
             balance={balance}
             neededCredits={neededCredits}
             returnTo={returnTo}
+            product={product}
+            selectedPackId={selectedPackId}
           />
         </div>
 

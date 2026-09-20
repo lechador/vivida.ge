@@ -17,5 +17,13 @@ describe("checkout return paths", () => {
   it("builds a contextual credits link", () => {
     expect(contextualCreditsHref({ returnTo: "/taro", need: 10, product: "tarot" }))
       .toBe("/credits?next=%2Ftaro&need=10&product=tarot#credit-packs");
+    expect(contextualCreditsHref({
+      returnTo: "/taro",
+      need: 10,
+      product: "tarot",
+      packId: "s",
+    })).toBe(
+      "/credits?next=%2Ftaro&need=10&product=tarot&pack=s#credit-packs",
+    );
   });
 });

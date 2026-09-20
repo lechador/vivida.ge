@@ -31,6 +31,7 @@ export async function GET(req: Request) {
     const contentId = kind === "premium" ? checkout.metadata.planKey ?? "vivida_pro" : `credits_${checkout.metadata.credits ?? "pack"}`;
     return NextResponse.json({
       kind,
+      purchaseContext: checkout.metadata.purchase_context ?? null,
       value: (checkout.amount_total ?? 0) / 100,
       currency: (checkout.currency ?? "gbp").toUpperCase(),
       contentId,

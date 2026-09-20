@@ -6,6 +6,7 @@ import { Check, CreditCard, Loader2, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   creditPacksForCountry,
+  CREDIT_COST,
   formatBillingAmount,
 } from "@/lib/credits-config";
 import { fbTrack } from "@/lib/fb-pixel";
@@ -24,12 +25,16 @@ export function TopUpCard({
   balance,
   neededCredits,
   returnTo,
+  product,
+  selectedPackId,
 }: {
   locale: UserLocale;
   countryCode?: string | null;
   balance: number;
   neededCredits?: number | null;
   returnTo?: string | null;
+  product?: string | null;
+  selectedPackId?: "s" | "m" | "l" | null;
 }) {
   const en = locale !== "ka";
   const packs = creditPacksForCountry(countryCode);
@@ -37,10 +42,14 @@ export function TopUpCard({
   const [error, setError] = useState<string | null>(null);
   const deficit =
     neededCredits && neededCredits > balance ? neededCredits - balance : null;
-  const recommendedId = deficit
-    ? (packs.find((pack) => pack.credits >= deficit) ?? packs[packs.length - 1])
-        .id
-    : (packs[1]?.id ?? packs[0].id);
+  const selectedPack = packs.find((pack) => pack.id === selectedPackId);
+  const recommendedId = selectedPack
+    ? selectedPack.id
+    : deficit
+      ? (packs.find((pack) => pack.credits >= deficit) ?? packs[packs.length - 1])
+          .id
+      : (packs[1]?.id ?? packs[0].id);
+  const isTarot = product === "tarot";
 
   useEffect(() => {
     trackEvent(ANALYTICS_EVENT.paywallViewed, {
@@ -66,7 +75,7 @@ export function TopUpCard({
       const r = await fetch("/api/credits/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ packId, returnTo }),
+        body: JSON.stringify({ packId, returnTo, product }),
       });
       const data = (await r.json().catch(() => ({}))) as {
         url?: string;
@@ -136,7 +145,13 @@ export function TopUpCard({
         </span>
       </div>
       <h2 className="mt-2 text-xl font-semibold tracking-tight">
-        {en ? "How many credits do you need?" : "რამდენი კრედიტი გჭირდება?"}
+        {isTarot
+          ? en
+            ? "How many more readings do you want?"
+            : "რამდენი დამატებითი კითხვა გინდა?"
+          : en
+            ? "How many credits do you need?"
+            : "რამდენი კრედიტი გჭირდება?"}
       </h2>
       {deficit && (
         <p className="mt-2 rounded-xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 px-3 py-2 text-sm text-foreground/80">
@@ -150,7 +165,11 @@ export function TopUpCard({
         {packs.map((p, i) => {
           const featured = p.id === recommendedId;
           const badge =
-            featured && deficit
+            p.id === selectedPack?.id
+              ? en
+                ? "Your choice"
+                : "შენი არჩევანი"
+              : featured && deficit
               ? en
                 ? "Recommended"
                 : "რეკომენდებული"
@@ -205,7 +224,9 @@ export function TopUpCard({
                 {formatBillingAmount(p.amountMinor, p.currency, locale)}
               </div>
               <div className="text-[10px] text-muted-foreground">
-                ≈ {Math.floor(p.credits / 5)} {en ? "unlocks" : "გახსნა"}
+                {isTarot
+                  ? `${Math.floor(p.credits / CREDIT_COST.tarot)} ${en ? "tarot readings" : "ტარო კითხვა"}`
+                  : `≈ ${Math.floor(p.credits / 5)} ${en ? "unlocks" : "გახსნა"}`}
               </div>
             </button>
           );

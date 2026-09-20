@@ -11,14 +11,18 @@ import { getGrowthMetrics } from "@/lib/growth-metrics";
 
 const empty = { rows: [] as Array<Record<string, unknown>> };
 
-function queueExecutions(relationshipRows: Array<Record<string, unknown>>) {
+function queueExecutions(
+  relationshipRows: Array<Record<string, unknown>>,
+  firstPurchaseRows: Array<Record<string, unknown>> = [],
+) {
   mocks.execute
     .mockResolvedValueOnce({ ...empty })
     .mockResolvedValueOnce({ ...empty })
     .mockResolvedValueOnce({ ...empty })
     .mockResolvedValueOnce({ ...empty })
     .mockResolvedValueOnce({ ...empty })
-    .mockResolvedValueOnce({ rows: relationshipRows });
+    .mockResolvedValueOnce({ rows: relationshipRows })
+    .mockResolvedValueOnce({ rows: firstPurchaseRows });
 }
 
 beforeEach(() => {
@@ -51,7 +55,7 @@ describe("growth relationship metrics", () => {
       answerUsers: 18,
       weeklyUpdates: 60,
     });
-    expect(mocks.execute).toHaveBeenCalledTimes(6);
+    expect(mocks.execute).toHaveBeenCalledTimes(7);
   });
 
   it("defaults every relationship metric to zero when the query returns no row", async () => {
@@ -67,6 +71,30 @@ describe("growth relationship metrics", () => {
       answers: 0,
       answerUsers: 0,
       weeklyUpdates: 0,
+    });
+  });
+
+  it("maps first web purchases and delivered value", async () => {
+    queueExecutions([], [
+      {
+        total: 14,
+        credits: 11,
+        premium: 3,
+        new_registrations: 8,
+        returning_users: 6,
+        value_delivered_24h: 10,
+      },
+    ]);
+
+    const metrics = await getGrowthMetrics(28);
+
+    expect(metrics.firstPurchases).toEqual({
+      total: 14,
+      credits: 11,
+      premium: 3,
+      newRegistrations: 8,
+      returningUsers: 6,
+      valueDelivered24h: 10,
     });
   });
 });

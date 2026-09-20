@@ -16,7 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
 import { CREDIT_COST } from "@/lib/credits-config";
-import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
 import {
   ANALYTICS_EVENT,
   trackEvent,
@@ -278,11 +277,6 @@ export function TarotReader({
           surface: "tarot_reader",
           cost,
         });
-        trackEvent(ANALYTICS_EVENT.paywallViewed, {
-          product: "tarot",
-          surface: "tarot_shortfall",
-          cost,
-        });
         setStatus("short");
         // The top-up flow leaves this page; restore the question (and its
         // request id, so the retry replays instead of charging again).
@@ -534,6 +528,7 @@ export function TarotReader({
               product="tarot_followup"
               returnTo="/taro"
               placement="tarot_followup_short"
+              countryCode={countryCode}
             />
           </div>
         )}
@@ -730,6 +725,7 @@ export function TarotReader({
             product="tarot"
             returnTo="/taro"
             placement="tarot_shortfall"
+            countryCode={countryCode}
           />
         </div>
       )}
@@ -851,16 +847,37 @@ export function TarotReader({
             </div>
           </div>
 
-          {authed && reading.free && !premium && (
-            <CreditsVsPro
-              locale={locale}
-              countryCode={countryCode}
-              placement="tarot_first_result_comparison"
-              creditHref="/credits"
-              proHref="/subscription"
-              compact
-              balance={reading.balance}
-            />
+          {authed && !premium && !reading.fromHistory && (
+            reading.balance >= cost ? (
+              <div className="rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 p-4 text-center">
+                <p className="text-sm font-medium text-foreground/90">
+                  {en
+                    ? `You have ${reading.balance} credits — enough for ${Math.floor(reading.balance / cost)} more reading${Math.floor(reading.balance / cost) === 1 ? "" : "s"}.`
+                    : `შენ გაქვს ${reading.balance} კრედიტი — კიდევ ${Math.floor(reading.balance / cost)} კითხვა შეგიძლია.`}
+                </p>
+                <Button
+                  type="button"
+                  variant="mystic"
+                  onClick={reset}
+                  className="mt-3 gap-1.5"
+                >
+                  <RotateCcw className="size-4" />
+                  {en ? "Ask another question" : "დასვი ახალი კითხვა"}
+                </Button>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center">
+                <ContextualPaywallActions
+                  locale={locale}
+                  balance={reading.balance}
+                  cost={cost}
+                  product="tarot"
+                  returnTo="/taro"
+                  placement="tarot_result_next_step"
+                  countryCode={countryCode}
+                />
+              </div>
+            )
           )}
 
           {/* Free second-action rail — a next step at the peak-engagement

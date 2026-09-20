@@ -37,9 +37,14 @@ export async function POST(req: Request) {
     offer?: unknown;
     planKey?: unknown;
     returnTo?: unknown;
+    product?: unknown;
   } | null;
   const wantsOffer = body?.offer === "low_credits";
   const returnTo = typeof body?.returnTo === "string" ? normalizeReturnPath(body.returnTo) : null;
+  const purchaseContext =
+    typeof body?.product === "string" && /^[a-z0-9_-]{1,60}$/i.test(body.product)
+      ? body.product
+      : "subscription";
 
   const identity = await getBillingIdentity(userId);
   const offer = wantsOffer ? await getLowCreditOffer(userId) : null;
@@ -64,7 +69,10 @@ export async function POST(req: Request) {
       stripeCustomerId: identity?.stripeCustomerId ?? null,
       origin: new URL(req.url).origin,
       plan,
-      trackingMetadata: checkoutTrackingMetadata(tracking),
+      trackingMetadata: {
+        ...checkoutTrackingMetadata(tracking),
+        purchase_context: purchaseContext,
+      },
       returnTo,
     });
     await recordExperimentOutcomesBestEffort(

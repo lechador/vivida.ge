@@ -34,12 +34,14 @@ export function PremiumPlanCard({
   active = false,
   placement = "premium_plan_card",
   returnTo,
+  product,
 }: {
   plan: PremiumPlan;
   locale: UserLocale;
   active?: boolean;
   placement?: string;
   returnTo?: string | null;
+  product?: string | null;
 }) {
   const en = locale !== "ka";
   const [pending, setPending] = useState(false);
@@ -93,7 +95,7 @@ export function PremiumPlanCard({
       const response = await fetch("/api/subscription/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ planKey: selectedPlan.key, returnTo }),
+        body: JSON.stringify({ planKey: selectedPlan.key, returnTo, product }),
       });
       const data = (await response.json().catch(() => ({}))) as {
         url?: string;

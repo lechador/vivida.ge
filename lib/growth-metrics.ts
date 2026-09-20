@@ -45,6 +45,15 @@ export type RelationshipMetrics = {
   weeklyUpdates: number;
 };
 
+export type FirstPurchaseMetrics = {
+  total: number;
+  credits: number;
+  premium: number;
+  newRegistrations: number;
+  returningUsers: number;
+  valueDelivered24h: number;
+};
+
 function numberValue(value: unknown): number {
   const number = Number(value ?? 0);
   return Number.isFinite(number) ? number : 0;
@@ -56,9 +65,10 @@ export async function getGrowthMetrics(days: 28 | 84): Promise<{
   creditWeeks: CreditWeekRow[];
   creditSummary: { freeIssued: number; purchased: number; spent: number };
   relationships: RelationshipMetrics;
+  firstPurchases: FirstPurchaseMetrics;
 }> {
   const interval = `${days} days`;
-  const [experimentResult, preferenceResult, deliveryResult, creditResult, creditSummaryResult, relationshipResult] = await Promise.all([
+  const [experimentResult, preferenceResult, deliveryResult, creditResult, creditSummaryResult, relationshipResult, firstPurchaseResult] = await Promise.all([
     db.execute(sql`
       SELECT
         a.experiment,
@@ -168,6 +178,54 @@ export async function getGrowthMetrics(days: 28 | 84): Promise<{
         (SELECT count(*)::int FROM relationship_weekly_update
           WHERE created_at >= now() - ${interval}::interval) AS weekly_updates
     `),
+    db.execute(sql`
+      WITH purchase_events AS (
+        SELECT user_id, created_at AS purchased_at, 'credits'::text AS product
+        FROM credit_transaction
+        WHERE reason = 'purchase'
+          AND left(ref, 3) = 'cs_'
+        UNION ALL
+        SELECT user_id, created_at AS purchased_at, 'premium'::text AS product
+        FROM premium_subscription
+        WHERE source = 'stripe'
+      ), first_purchase AS (
+        SELECT DISTINCT ON (user_id)
+          user_id,
+          purchased_at,
+          product
+        FROM purchase_events
+        ORDER BY user_id, purchased_at, product
+      ), scoped AS (
+        SELECT
+          f.user_id,
+          f.purchased_at,
+          f.product,
+          u.created_at AS registered_at
+        FROM first_purchase f
+        JOIN "user" u ON u.id = f.user_id
+        WHERE f.purchased_at >= now() - ${interval}::interval
+      )
+      SELECT
+        count(*)::int AS total,
+        count(*) FILTER (WHERE product = 'credits')::int AS credits,
+        count(*) FILTER (WHERE product = 'premium')::int AS premium,
+        count(*) FILTER (
+          WHERE purchased_at < registered_at + interval '7 days'
+        )::int AS new_registrations,
+        count(*) FILTER (
+          WHERE purchased_at >= registered_at + interval '7 days'
+        )::int AS returning_users,
+        count(*) FILTER (
+          WHERE EXISTS (
+            SELECT 1
+            FROM library_entry l
+            WHERE l.user_id = scoped.user_id
+              AND l.created_at >= scoped.purchased_at
+              AND l.created_at < scoped.purchased_at + interval '24 hours'
+          )
+        )::int AS value_delivered_24h
+      FROM scoped
+    `),
   ]);
 
   const experiments = experimentResult.rows.map((row) => ({
@@ -229,6 +287,15 @@ export async function getGrowthMetrics(days: 28 | 84): Promise<{
     answerUsers: numberValue(relationshipRow.answer_users),
     weeklyUpdates: numberValue(relationshipRow.weekly_updates),
   };
+  const firstPurchaseRow = firstPurchaseResult.rows[0] ?? {};
+  const firstPurchases: FirstPurchaseMetrics = {
+    total: numberValue(firstPurchaseRow.total),
+    credits: numberValue(firstPurchaseRow.credits),
+    premium: numberValue(firstPurchaseRow.premium),
+    newRegistrations: numberValue(firstPurchaseRow.new_registrations),
+    returningUsers: numberValue(firstPurchaseRow.returning_users),
+    valueDelivered24h: numberValue(firstPurchaseRow.value_delivered_24h),
+  };
 
   return {
     experiments,
@@ -240,5 +307,6 @@ export async function getGrowthMetrics(days: 28 | 84): Promise<{
       spent: numberValue(creditSummaryResult.rows[0]?.spent),
     },
     relationships,
+    firstPurchases,
   };
 }

@@ -86,7 +86,10 @@ describe("POST /api/subscription/checkout", () => {
       new Request("https://vivida.ge/api/subscription/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ planKey: "promo_ge_quarterly" }),
+        body: JSON.stringify({
+          planKey: "promo_ge_quarterly",
+          product: "tarot",
+        }),
       }),
     );
 
@@ -98,6 +101,9 @@ describe("POST /api/subscription/checkout", () => {
           amountMinor: 2900,
           currency: "gel",
           intervalCount: 3,
+        }),
+        trackingMetadata: expect.objectContaining({
+          purchase_context: "tarot",
         }),
       }),
     );

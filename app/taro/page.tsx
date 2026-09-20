@@ -27,7 +27,7 @@ export const dynamic = "force-dynamic";
 
 const TITLE_KA = "ტარო ქართულად — ტაროზე მკითხაობა და ონლაინ გაშლა";
 const DESCRIPTION_KA =
-  "ტაროზე მკითხაობა ონლაინ, ქართულად: დაუსვი კითხვა და მიიღე ცოცხალი, პერსონალური პასუხი. ტაროს გაშლა სრული 78-კარტიანი დასტით — პირველი კითხვა უფასო, რეგისტრაციის გარეშე.";
+  "ტაროზე მკითხაობა ონლაინ, ქართულად: დაუსვი კითხვა და მიიღე ცოცხალი, პერსონალური პასუხი. ტაროს გაშლა სრული 78-კარტიანი დასტით — პირველი კითხვა უფასოა და პასუხისთვის სწრაფი ანგარიშია საჭირო.";
 const TITLE_EN = "Free Online Tarot Reading — Three-Card Spread";
 const DESCRIPTION_EN =
   "Ask a question and receive a personal three-card tarot reading. Explore clear upright and reversed meanings for all 78 cards of the full deck.";

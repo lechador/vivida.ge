@@ -20,10 +20,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { TarotReader } from "@/components/tarot/tarot-reader";
 import {
   creditPacksForCountry,
+  featuredPremiumPlanForCountry,
   formatBillingAmount,
-  premiumPlanForCountry,
 } from "@/lib/billing-config";
 import { CREDIT_COST } from "@/lib/credits-config";
+import { contextualCreditsHref } from "@/lib/safe-return-path";
 import { tarotDetailDeck } from "@/lib/tarot/detail";
 
 const FAQ = [
@@ -79,9 +80,9 @@ export function TarotConversionLanding({
   countryCode?: string | null;
   premium?: boolean;
 }) {
-  const packs = creditPacksForCountry("GE");
-  const pro = premiumPlanForCountry("GE");
-  const creditsHref = authed ? "/credits" : "/login?next=%2Fcredits";
+  const packs = creditPacksForCountry(countryCode);
+  const pro = featuredPremiumPlanForCountry(countryCode);
+  const proMonths = pro.intervalCount ?? 1;
   // Signed-in users came to pull cards, not to be sold to: the hero banner and
   // every sales block (steps, pitch, pricing, closing CTA) render for logged-out
   // visitors only. SEO is untouched — crawlers are always unauthenticated.
@@ -103,24 +104,23 @@ export function TarotConversionLanding({
       )}
 
       {!authed && (
-        <section className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-10 px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6 lg:pb-24 lg:pt-20">
+        <section className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-8 px-4 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6 lg:pb-16 lg:pt-12">
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#d7ba72]/30 bg-[#d7ba72]/8 px-3 py-1.5 text-xs font-semibold text-[#ead69f] ring-1 ring-white/5">
               <Sparkles className="size-3.5" />
               პერსონალური 3-კარტიანი გაშლა ქართულად
             </div>
 
-            <h1 className="mt-5 text-balance text-[2.65rem] font-semibold leading-[1.08] tracking-[-0.04em] text-white sm:text-6xl lg:text-[4.35rem]">
-              პასუხი შეიძლება უკვე შენშია.
+            <h1 className="mt-5 text-balance text-[2.45rem] font-semibold leading-[1.06] tracking-[-0.04em] text-white sm:text-5xl lg:text-[3.6rem]">
+              შენი კითხვა. სამი კარტი.
               <span className="mt-2 block bg-[linear-gradient(100deg,#eee2bc_5%,#d7a8ff_48%,#9fc9ff_92%)] bg-clip-text text-transparent">
-                ტარო დაგეხმარება მის დანახვაში.
+                პირადი განმარტება.
               </span>
             </h1>
 
             <p className="mt-6 max-w-xl text-pretty text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
-              ჩაიფიქრე კითხვა. სამი კარტი გაჩვენებს სიტუაციის ფესვს, აწმყოსა და
-              შესაძლო გზას. Vivida-ს AI ტაროლოგი კი შენთვის შექმნის პირად
-              განმარტებას — ქართულად, რამდენიმე წამში.
+              დაწერე კითხვა და მიიღე შენს სიტუაციაზე მორგებული პასუხი — სამი
+              კარტით, მათი ახსნითა და პრაქტიკული მინიშნებით.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -132,8 +132,8 @@ export function TarotConversionLanding({
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </a>
               <span className="text-center text-xs leading-5 text-white/45 sm:text-left">
-                ბარათის მონაცემები არ გჭირდება
-                <br className="hidden sm:block" /> · პასუხი პირადია
+                პასუხისთვის საჭიროა ანგარიში
+                <br className="hidden sm:block" /> · ბარათი არ გჭირდება
               </span>
             </div>
 
@@ -150,21 +150,22 @@ export function TarotConversionLanding({
             </ul>
           </div>
 
-          <div className="relative mx-auto h-[350px] w-full max-w-[470px] sm:h-[470px] lg:h-[540px]">
+          <div className="relative mx-auto h-[330px] w-full max-w-[440px] sm:h-[420px] lg:h-[450px]">
             <div
               aria-hidden
               className="absolute inset-12 rounded-full bg-[radial-gradient(circle,rgba(140,103,255,0.26),rgba(102,62,161,0.05)_58%,transparent_72%)] blur-2xl"
             />
-            <div className="absolute left-1/2 top-1/2 h-[330px] w-[220px] -translate-x-[93%] -translate-y-1/2 -rotate-[14deg] overflow-hidden rounded-[1.1rem] border border-[#d9bd79]/35 bg-[#111128] shadow-2xl sm:h-[405px] sm:w-[270px]">
+            <div className="absolute left-1/2 top-1/2 h-[310px] w-[207px] -translate-x-[93%] -translate-y-1/2 -rotate-[14deg] overflow-hidden rounded-[1.1rem] border border-[#d9bd79]/35 bg-[#111128] shadow-2xl sm:h-[365px] sm:w-[243px]">
               <Image
                 src="/tarot/the-star.webp"
                 alt="ვარსკვლავის ტაროს კარტი"
                 fill
+                loading="eager"
                 sizes="(max-width: 640px) 220px, 270px"
                 className="object-cover"
               />
             </div>
-            <div className="absolute left-1/2 top-1/2 z-20 h-[350px] w-[233px] -translate-x-1/2 -translate-y-[53%] overflow-hidden rounded-[1.1rem] border border-[#f1d794]/60 bg-[#111128] shadow-[0_30px_80px_-28px_rgba(0,0,0,0.95),0_0_55px_-28px_rgba(224,191,113,0.8)] sm:h-[440px] sm:w-[293px]">
+            <div className="absolute left-1/2 top-1/2 z-20 h-[330px] w-[220px] -translate-x-1/2 -translate-y-[53%] overflow-hidden rounded-[1.1rem] border border-[#f1d794]/60 bg-[#111128] shadow-[0_30px_80px_-28px_rgba(0,0,0,0.95),0_0_55px_-28px_rgba(224,191,113,0.8)] sm:h-[395px] sm:w-[263px]">
               <Image
                 src="/tarot/the-high-priestess.webp"
                 alt="უმაღლესი ქურუმი — ტაროს კარტი"
@@ -174,7 +175,7 @@ export function TarotConversionLanding({
                 className="object-cover"
               />
             </div>
-            <div className="absolute left-1/2 top-1/2 z-10 h-[330px] w-[220px] -translate-x-[7%] -translate-y-1/2 rotate-[14deg] overflow-hidden rounded-[1.1rem] border border-[#d9bd79]/35 bg-[#111128] shadow-2xl sm:h-[405px] sm:w-[270px]">
+            <div className="absolute left-1/2 top-1/2 z-10 h-[310px] w-[207px] -translate-x-[7%] -translate-y-1/2 rotate-[14deg] overflow-hidden rounded-[1.1rem] border border-[#d9bd79]/35 bg-[#111128] shadow-2xl sm:h-[365px] sm:w-[243px]">
               <Image
                 src="/tarot/the-moon.webp"
                 alt="მთვარის ტაროს კარტი"
@@ -383,7 +384,12 @@ export function TarotConversionLanding({
                     {pack.credits} კრედიტი · ერთჯერადი უსაფრთხო გადახდა
                   </p>
                   <Link
-                    href={creditsHref}
+                    href={contextualCreditsHref({
+                      returnTo: "/taro",
+                      need: CREDIT_COST.tarot,
+                      product: "tarot",
+                      packId: pack.id,
+                    })}
                     className={`mt-auto inline-flex min-h-11 items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition ${featured ? "bg-[#d3bb79] text-[#17130b] hover:bg-[#ead69f]" : "border border-white/12 bg-white/6 text-white hover:bg-white/10"}`}
                   >
                     პაკეტის არჩევა
@@ -410,10 +416,10 @@ export function TarotConversionLanding({
                 </div>
               </div>
               <Link
-                href={creditsHref}
+                href={`/subscription?${new URLSearchParams({ next: "/taro", product: "tarot" }).toString()}`}
                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-[#d3bb79]/35 bg-[#d3bb79]/10 px-5 py-3 text-sm font-semibold text-[#ead69f] transition hover:bg-[#d3bb79]/16"
               >
-                {formatBillingAmount(pro.amountMinor, pro.currency, "ka")} / თვე
+                {formatBillingAmount(pro.amountMinor, pro.currency, "ka")} / {proMonths === 1 ? "თვე" : `${proMonths} თვე`}
                 <ArrowRight className="size-4" />
               </Link>
             </div>
