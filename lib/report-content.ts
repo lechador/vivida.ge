@@ -27,8 +27,7 @@ import { getHouseLibraryEntries, houseLibraryKey } from "@/lib/house-library";
  */
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL =
-  process.env.OPENROUTER_REPORT_MODEL || "google/gemini-3.5-flash-lite";
+const MODEL = process.env.OPENROUTER_REPORT_MODEL || "google/gemini-3.8-flash";
 
 type OpenRouterResponse = {
   choices?: Array<{ message?: { content?: string } }>;
@@ -52,6 +51,7 @@ async function chatJson<T>(
     },
     body: JSON.stringify({
       model: MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },

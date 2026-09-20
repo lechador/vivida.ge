@@ -16,7 +16,7 @@ import { resolve, dirname } from "path";
 config({ path: ".env.local" });
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-3.5-flash-lite";
+const MODEL = "google/gemini-3.8-flash";
 const KEY = process.env.OPENROUTER_API_KEY;
 if (!KEY) {
   console.error("OPENROUTER_API_KEY is not set in .env.local — aborting.");
@@ -60,6 +60,7 @@ async function callOpenRouter(systemPrompt, userPrompt) {
           model: MODEL,
           temperature: 0.3,
           response_format: { type: "json_object" },
+          reasoning: { effort: "low" },
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },

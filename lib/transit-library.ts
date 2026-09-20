@@ -35,7 +35,7 @@ import { dailyHeadlineKa } from "./daily-headline";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 /** Same higher-quality model used for the other libraries. */
-export const TRANSIT_LIBRARY_MODEL = "google/gemini-3.1-pro-preview";
+export const TRANSIT_LIBRARY_MODEL = "google/gemini-3.8-flash";
 
 /** Bodies that transit (today's sky). Same 10 as lib/transits.ts computes. */
 export const TRANSIT_LIBRARY_BODIES = [
@@ -81,7 +81,7 @@ const TIMESCALE_KA: Record<string, string> = {
 export function transitAspectKey(
   transit: string,
   kind: AspectKind,
-  natal: string
+  natal: string,
 ): string {
   return `aspect:${transit}:${kind}:${natal}`;
 }
@@ -147,7 +147,10 @@ export function allTransitCombos(): TransitCombo[] {
 
 export type TransitEntry = { title: string; body: string };
 
-const ASPECT_EN: Record<AspectKind, { label: string; dynamic: string; advice: string }> = {
+const ASPECT_EN: Record<
+  AspectKind,
+  { label: string; dynamic: string; advice: string }
+> = {
   conjunction: {
     label: "conjunct",
     dynamic: "The two themes become concentrated and difficult to separate.",
@@ -155,22 +158,28 @@ const ASPECT_EN: Record<AspectKind, { label: string; dynamic: string; advice: st
   },
   sextile: {
     label: "sextile",
-    dynamic: "A useful opening appears, but it works best when you choose to use it.",
+    dynamic:
+      "A useful opening appears, but it works best when you choose to use it.",
     advice: "Take the small opportunity instead of waiting for a perfect one.",
   },
   square: {
     label: "square",
-    dynamic: "Friction makes the underlying need harder to ignore and asks for an adjustment.",
-    advice: "Pause before reacting, then turn the pressure into one practical action.",
+    dynamic:
+      "Friction makes the underlying need harder to ignore and asks for an adjustment.",
+    advice:
+      "Pause before reacting, then turn the pressure into one practical action.",
   },
   trine: {
     label: "trine",
-    dynamic: "The two themes cooperate naturally and can restore momentum with less resistance.",
-    advice: "Use the ease deliberately rather than assuming it will carry the day by itself.",
+    dynamic:
+      "The two themes cooperate naturally and can restore momentum with less resistance.",
+    advice:
+      "Use the ease deliberately rather than assuming it will carry the day by itself.",
   },
   opposition: {
     label: "opposite",
-    dynamic: "Two valid needs pull in different directions and become visible through contrast.",
+    dynamic:
+      "Two valid needs pull in different directions and become visible through contrast.",
     advice: "Make room for both sides before choosing the next step.",
   },
 };
@@ -196,7 +205,8 @@ function englishTransitEntry(key: string): TransitEntry | null {
   const [kind, transit, subjectA, subjectB] = key.split(":");
   const transitMeta = BODIES[transit];
   const transitLabel = transitMeta?.labelEn ?? titleCase(transit);
-  const transitMeaning = transitMeta?.meaningEn ?? "the way you direct this energy";
+  const transitMeaning =
+    transitMeta?.meaningEn ?? "the way you direct this energy";
   const timescale = TRANSIT_TIMESCALE_EN[transit] ?? "during this period";
 
   if (kind === "aspect") {
@@ -205,7 +215,8 @@ function englishTransitEntry(key: string): TransitEntry | null {
     if (!aspect || !subjectB) return null;
     const natalMeta = BODIES[subjectB];
     const natalLabel = natalMeta?.labelEn ?? titleCase(subjectB);
-    const natalMeaning = natalMeta?.meaningEn ?? "an established part of your natal pattern";
+    const natalMeaning =
+      natalMeta?.meaningEn ?? "an established part of your natal pattern";
     return {
       title: `${transitLabel} ${aspect.label} natal ${natalLabel}`,
       body: `Transiting ${transitLabel} forms a ${aspect.label} aspect to your natal ${natalLabel} ${timescale}. ${transitLabel} activates ${transitMeaning.toLowerCase()}, while natal ${natalLabel} describes ${natalMeaning.toLowerCase()}. ${aspect.dynamic} ${aspect.advice}`,
@@ -249,7 +260,9 @@ export async function getTransitLibraryEntries(
     return new Map(
       keys
         .map((key) => [key, englishTransitEntry(key)] as const)
-        .filter((entry): entry is readonly [string, TransitEntry] => Boolean(entry[1])),
+        .filter((entry): entry is readonly [string, TransitEntry] =>
+          Boolean(entry[1]),
+        ),
     );
   }
 
@@ -267,7 +280,9 @@ export async function getTransitLibraryEntries(
         eq(transitInterpretationLibrary.language, locale),
       ),
     );
-  const found = new Map(rows.map((r) => [r.key, { title: r.title, body: r.body }]));
+  const found = new Map(
+    rows.map((r) => [r.key, { title: r.title, body: r.body }]),
+  );
 
   // A missing Armenian row must fall back to ENGLISH, never to the Georgian
   // row that shares its key — Georgian script on an Armenian page is the
@@ -371,7 +386,7 @@ export function parseTransitEntryJson(raw: string): TransitEntry {
 
 /** Generate one entry via OpenRouter (live self-heal path). Throws on error. */
 export async function generateTransitEntry(
-  combo: TransitCombo
+  combo: TransitCombo,
 ): Promise<TransitEntry> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
@@ -386,13 +401,14 @@ export async function generateTransitEntry(
     },
     body: JSON.stringify({
       model: TRANSIT_LIBRARY_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: buildTransitPrompt(combo) },
       ],
       response_format: { type: "json_object" },
       temperature: 0.8,
-      // gemini-3.1-pro always reasons — leave headroom past the thinking budget.
+      // Leave headroom past the thinking budget.
       max_tokens: 8000,
     }),
   });
@@ -413,7 +429,7 @@ export async function generateTransitEntry(
  * on a render path; gaps fall back to the full-AI daily instead.
  */
 export async function ensureTransitLibraryFor(
-  combos: TransitCombo[]
+  combos: TransitCombo[],
 ): Promise<void> {
   // Georgian only. `generateTransitEntry`'s prompt is Georgian, so this can
   // only ever produce a `ka` row — now that (key, language) is the primary
@@ -422,7 +438,10 @@ export async function ensureTransitLibraryFor(
   // Armenian is backfilled by scripts/translate-transit-library.mjs; a gap
   // there falls back to English at read time rather than being generated
   // live, so an Armenian reader never waits on a model call.
-  const have = await getTransitLibraryEntries(combos.map((c) => c.key), "ka");
+  const have = await getTransitLibraryEntries(
+    combos.map((c) => c.key),
+    "ka",
+  );
   const missing = combos.filter((c) => !have.has(c.key));
   for (const c of missing) {
     try {
@@ -444,7 +463,7 @@ export async function ensureTransitLibraryFor(
     } catch (err) {
       console.warn(
         `[transit-library] generate failed for ${c.key}:`,
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }
@@ -721,7 +740,7 @@ export async function composeWeeklyFromLibrary(
   const pick = (
     drivers: WeeklyDayDriver[],
     used: Set<string>,
-    dayIndex: number
+    dayIndex: number,
   ): { key: string; entry: TransitEntry } | null => {
     const candidates: Array<{ key: string; entry: TransitEntry }> = [];
     for (const dr of drivers) {
@@ -751,14 +770,26 @@ export async function composeWeeklyFromLibrary(
       if (!entries.has(key)) return null;
     }
 
-    const harmonic = pick(d.drivers.filter((x) => x.family === "harmonic"), usedHarmonic, i);
-    const tense = pick(d.drivers.filter((x) => x.family === "tense"), usedTense, i);
+    const harmonic = pick(
+      d.drivers.filter((x) => x.family === "harmonic"),
+      usedHarmonic,
+      i,
+    );
+    const tense = pick(
+      d.drivers.filter((x) => x.family === "tense"),
+      usedTense,
+      i,
+    );
     const neutral = d.drivers.filter((x) => x.family === "neutral");
     const neutralEntry =
       neutral.length > 0
-        ? entries.get(
-            transitAspectKey(neutral[0].transit, neutral[0].kind as AspectKind, neutral[0].natal)
-          ) ?? null
+        ? (entries.get(
+            transitAspectKey(
+              neutral[0].transit,
+              neutral[0].kind as AspectKind,
+              neutral[0].natal,
+            ),
+          ) ?? null)
         : null;
 
     const headlinePick = pick(d.drivers, usedHeadline, i);
@@ -822,7 +853,7 @@ export async function overlayTransitAspects(
   const out: TransitBreakdownItem[] = [];
   for (const a of top) {
     const entry = entries.get(
-      transitAspectKey(a.transit, a.kind as AspectKind, a.natal)
+      transitAspectKey(a.transit, a.kind as AspectKind, a.natal),
     );
     if (!entry) continue;
     out.push({

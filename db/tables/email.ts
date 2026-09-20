@@ -28,7 +28,7 @@ export const dailyHoroscopes = pgTable(
     body: text("body").notNull(),
     themes: jsonb("themes").$type<string[]>().notNull().default([]),
     transits: jsonb("transits").$type<DailyTransitsJson>(),
-    model: text("model").notNull(), // e.g. 'google/gemini-2.5-pro'
+    model: text("model").notNull(), // e.g. 'google/gemini-3.8-flash'
     language: text("language").notNull().default("ka"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()

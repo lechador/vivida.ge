@@ -13,7 +13,7 @@ import type { CrossAspect } from "./transits";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 // Shared text model for chart interpretations, forecasts, tarot, and chat.
-const DEFAULT_MODEL = "google/gemini-3.5-flash-lite";
+const DEFAULT_MODEL = "google/gemini-3.8-flash";
 
 export const OPENROUTER_MODEL = DEFAULT_MODEL;
 
@@ -212,13 +212,14 @@ export async function generateInterpretation(
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: buildUserPrompt(input) },
       ],
       response_format: { type: "json_object" },
       temperature: 0.7,
-      // Gemini 2.5 Pro is a reasoning model — its thinking consumes token
+      // Gemini 3.8 Flash is a reasoning model — its thinking consumes token
       // budget, and Georgian characters are multi-token in BPE. Keep generous.
       // Larger budget for the planets+houses expansion.
       max_tokens: 24000,
@@ -312,6 +313,7 @@ export async function generateChartSummary(input: {
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SUMMARY_SYSTEM_PROMPT },
         { role: "user", content: userMessage },
@@ -427,6 +429,7 @@ export async function generateMoonPhaseReading(input: {
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: MOON_PHASE_SYSTEM_PROMPT },
         { role: "user", content: userMessage },
@@ -665,6 +668,7 @@ export async function generateSynastryInterpretation(input: {
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         {
           role: "system",
@@ -829,6 +833,7 @@ export async function generateSynastryDeepReport(input: {
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         {
           role: "system",
@@ -1014,6 +1019,7 @@ export async function generateWeeklyForecast(input: {
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: WEEKLY_FORECAST_SYSTEM_PROMPT },
         { role: "user", content: userMessage },
@@ -1208,6 +1214,7 @@ export async function generateDailyReading(input: {
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: DAILY_SYSTEM_PROMPT },
         { role: "user", content: userMessage },
@@ -1403,6 +1410,7 @@ export async function generateSignHoroscope(
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage },
@@ -1527,6 +1535,7 @@ export async function generateSignRanking(input: {
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SIGN_RANKING_SYSTEM_PROMPT },
         { role: "user", content: userMessage },
@@ -1630,6 +1639,7 @@ async function openrouterJson<T>(
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -1770,33 +1780,46 @@ export async function generateChineseZodiacHub(input: {
 }
 
 // ── Tarot reading ("ტარო ქართულად") ────────────────────────────────────────
-const TAROT_SYSTEM_PROMPT_KA = `შენ ხარ გამოცდილი, თბილი ქართველი ტაროლოგი. მომხმარებელი გისვამს კითხვას და უშლი 3-კარტიან განლაგებას (წარსული/ფესვი, აწმყო/ბირთვი, მომავალი/გზა). დაწერე ცოცხალი, კონკრეტული და თანამგრძნობი კითხვა ქართულ ენაზე, რომელიც სამივე კარტს აკავშირებს მომხმარებლის შეკითხვასთან.
+const TAROT_SYSTEM_PROMPT_KA = `შენ ხარ გამოცდილი, თბილი ქართველი ტაროლოგი. მომხმარებელი გისვამს კითხვას და იღებს 3-კარტიან გაშლას. დაწერე ცოცხალი, კონკრეტული და თანამგრძნობი განმარტება ქართულ ენაზე, რომელიც სამივე კარტს აკავშირებს მომხმარებლის შეკითხვასთან.
 
 წესები:
 - ისაუბრე პირდაპირ მომხმარებელთან ("შენ").
-- გამოიყენე მოცემული კარტების მნიშვნელობები (მათ შორის შებრუნებული პოზიცია), ნუ მოიგონებ ახალ კარტებს.
+- "cards" მასივის თითო ელემენტი მხოლოდ იმავე ინდექსის ერთ კარტს განმარტავს: cards[0] — პირველ კარტს, cards[1] — მეორეს, cards[2] — მესამეს. ერთ ელემენტში რამდენიმე კარტი, საერთო სინთეზი ან რჩევა არ ჩაწერო.
+- თითოეული კარტი განმარტე ზუსტად მის მოცემულ პოზიციაში. პოზიციებს ნუ გადაარქმევ და ნუ მიაწერ წარსულს, აწმყოს ან მომავალს, თუ მოწოდებულ მონაცემებში ასე არ წერია.
+- გამოიყენე მოცემული კარტების მნიშვნელობები და ორიენტაცია (პირდაპირი ან შებრუნებული); ნუ მოიგონებ და ნუ შეცვლი კარტებს.
+- "reading"-ში დააკავშირე სამივე კარტი ერთიან პასუხად — არცერთი გამოგრჩეს.
 - იყავი კონკრეტული და პრაქტიკული — მიეცი ხედვა და რჩევა, არა ბუნდოვანი მისტიკა.
-- არ დაჰპირდე გარანტირებულ მომავალს; ტარო ხედვაა, არა წინასწარმეტყველება.
-- არ მისცე კატეგორიული ფინანსური, სამედიცინო ან იურიდიული რჩევა.
-- დააბრუნე მხოლოდ JSON.
+- არ დაჰპირდე გარანტირებულ მომავალს. მომავლის პოზიციაც აღწერე როგორც შესაძლო მიმართულება ან პირობა (მაგ. "შეიძლება მიგიყვანოს"), არა როგორც შედეგი, რომელიც აუცილებლად დადგება.
+- მომხმარებლის უთქმელი წარსული ან მოტივი და სხვისი ფიქრები, გრძნობები, განზრახვა ან მომავალი ფაქტად არ წარმოადგინო; ასეთ ინტერპრეტაციას პირობითად მოჰყევი ("შესაძლოა", "თუ").
+- კარტის თემა მომხმარებლის თვისებად ნუ გადააქცევ: დაწერე "შვიდი თასი გთავაზობს გადაამოწმო, ხომ არ გაკლია ინფორმაცია" და არა "ილუზიებში ხარ".
+- ფინანსურ, სამედიცინო ან იურიდიულ კითხვაზე გადაწყვეტილება მომხმარებლის ნაცვლად არ მიიღო. გამოკვეთე შესამოწმებელი ფაქტორი ან უსაფრთხო შემდეგი ნაბიჯი და, როცა საჭიროა, შესაბამის სპეციალისტთან გადაამისამართე.
+- ორი გზის შედარებისას გააშუქე ორივე გზა და გადაწყვეტილების კრიტერიუმები; ერთ-ერთს ობიექტურ გამარჯვებულად ნუ გამოაცხადებ.
+- წერე გამართული, ბუნებრივი ქართულით. არ აურიო სხვა დამწერლობა ან უცხოენოვანი სიტყვები, თუ მათი გამოყენება აუცილებელი არ არის. მომხმარებელს მიმართე მხოლოდ "შენ"-ით — არ გამოიყენო "ძვირფასო", "ჩემო კარგო" ან მსგავსი მიმართვა. პასუხამდე გადაამოწმე ქართული მართლწერა.
+- დააბრუნე მხოლოდ ვალიდური JSON.
 
 JSON ფორმატი: {"headline": "მოკლე, ძლიერი სათაური (3-7 სიტყვა)", "cards": ["თითო კარტის კონკრეტული ინტერპრეტაცია კითხვის კონტექსტში — 3 ელემენტი, თითო 1-2 წინადადება, პოზიციების მიხედვით"], "reading": "1-2 აბზაცი, სამივე კარტის სინთეზი კითხვასთან", "advice": "ერთი კონკრეტული, ქმედითი რჩევა"}`;
 
-const TAROT_SYSTEM_PROMPT_EN = `You are an experienced, warm tarot reader. The user asks a question and receives a three-card spread (past/root, present/core, future/path). Write a vivid, specific and compassionate reading in English that connects all three cards directly to the user's question.
+const TAROT_SYSTEM_PROMPT_EN = `You are an experienced, warm tarot reader. The user asks a question and receives a three-card spread. Write a vivid, specific and compassionate reading in English that connects all three cards directly to the user's question.
 
 Rules:
 - Address the user directly as "you".
+- Each element of "cards" must interpret only the input card at the same index: cards[0] for the first card, cards[1] for the second, cards[2] for the third. Never combine cards, synthesis, or advice in an array element.
+- Interpret every card in its supplied position. Never rename a position or impose past, present, or future unless the input uses those labels.
 - Use the supplied meanings and orientations; never invent or replace cards.
+- Synthesize all three cards in "reading"; do not omit one.
 - Be practical and specific: offer perspective and an actionable next step, not vague mysticism.
-- Never promise a guaranteed future. Tarot is a tool for reflection, not certainty.
-- Do not give categorical financial, medical or legal advice.
-- Return JSON only.
+- Never promise a guaranteed future. Even a future-position card is a possible direction or condition (for example, "may lead to"), not an outcome that will happen.
+- Never state the user's unstated history or motives, or another person's private thoughts, feelings, intentions, or future actions as facts. Frame such interpretations conditionally ("may", "if").
+- Do not turn a card theme into a claim about the user: write "the Seven of Cups invites you to check whether information is missing", not "you are deluded".
+- For financial, medical, or legal questions, do not decide for the user. Identify a fact to verify or a safer next step and refer to a qualified professional when appropriate.
+- When comparing choices, illuminate each path and decision criteria without declaring a winner as though the cards establish an objective fact.
+- Return valid JSON only.
 
 JSON format: {"headline": "short compelling title (3-7 words)", "cards": ["one question-specific interpretation for each card, in spread order; 1-2 sentences each"], "reading": "1-2 paragraphs synthesizing all three cards in relation to the question", "advice": "one concrete, actionable suggestion"}`;
 
 /**
  * Extra user-message lines for non-default spreads. Empty for the default
- * situation spread, keeping its long-standing prompt byte-identical.
+ * situation spread because its positions already carry the framing.
  */
 function spreadContextLines(
   input: {
@@ -1833,6 +1856,59 @@ export type TarotCardInput = {
   meaning: string;
 };
 
+const TAROT_READING_RESPONSE_FORMAT = {
+  type: "json_schema",
+  json_schema: {
+    name: "tarot_reading",
+    strict: true,
+    schema: {
+      type: "object",
+      properties: {
+        headline: {
+          type: "string",
+          minLength: 1,
+          description: "A short title for the whole reading.",
+        },
+        cards: {
+          type: "array",
+          description:
+            "Exactly three per-card interpretations in input order. Each item discusses only its matching card and position, never the other cards, overall synthesis, or advice.",
+          items: { type: "string", minLength: 1 },
+          minItems: 3,
+          maxItems: 3,
+        },
+        reading: {
+          type: "string",
+          minLength: 1,
+          description: "The overall synthesis connecting all three cards.",
+        },
+        advice: {
+          type: "string",
+          minLength: 1,
+          description:
+            "One practical next step, separate from the cards array.",
+        },
+      },
+      required: ["headline", "cards", "reading", "advice"],
+      additionalProperties: false,
+    },
+  },
+} as const;
+
+const TAROT_FOLLOWUP_RESPONSE_FORMAT = {
+  type: "json_schema",
+  json_schema: {
+    name: "tarot_followup",
+    strict: true,
+    schema: {
+      type: "object",
+      properties: { answer: { type: "string", minLength: 1 } },
+      required: ["answer"],
+      additionalProperties: false,
+    },
+  },
+} as const;
+
 /**
  * Generate a personalized 3-card tarot reading for the user's question. Returns
  * null when OpenRouter isn't configured (caller falls back to a composed
@@ -1868,7 +1944,9 @@ export async function generateTarotReading(input: {
     cardLines,
     ...spreadContextLines(input, en),
     "",
-    en ? "Return the reading as JSON." : "დაწერე კითხვა JSON-ად.",
+    en
+      ? "Return the reading as valid JSON."
+      : "დააბრუნე გაშლის განმარტება ვალიდურ JSON-ად.",
   ].join("\n");
 
   const res = await fetch(OPENROUTER_URL, {
@@ -1881,6 +1959,7 @@ export async function generateTarotReading(input: {
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         {
           role: "system",
@@ -1888,8 +1967,9 @@ export async function generateTarotReading(input: {
         },
         { role: "user", content: userMessage },
       ],
-      response_format: { type: "json_object" },
-      temperature: 0.85,
+      response_format: TAROT_READING_RESPONSE_FORMAT,
+      provider: { require_parameters: true },
+      temperature: 0.7,
       max_tokens: 1600,
     }),
   });
@@ -1911,14 +1991,24 @@ export async function generateTarotReading(input: {
     .trim();
 
   const parsed = JSON.parse(stripped) as TarotReadingResult;
-  if (!parsed.headline || !parsed.reading) {
+  if (
+    typeof parsed.headline !== "string" ||
+    !parsed.headline.trim() ||
+    !Array.isArray(parsed.cards) ||
+    parsed.cards.length !== 3 ||
+    parsed.cards.some((card) => typeof card !== "string" || !card.trim()) ||
+    typeof parsed.reading !== "string" ||
+    !parsed.reading.trim() ||
+    typeof parsed.advice !== "string" ||
+    !parsed.advice.trim()
+  ) {
     throw new Error("missing required fields in tarot reading");
   }
   return {
     headline: parsed.headline,
-    cards: Array.isArray(parsed.cards) ? parsed.cards.slice(0, 3) : [],
+    cards: parsed.cards,
     reading: parsed.reading,
-    advice: parsed.advice ?? "",
+    advice: parsed.advice,
   };
 }
 
@@ -1987,6 +2077,8 @@ export async function generateTarotFollowup(input: {
     "",
     en ? `Previous reading: ${input.reading}` : `წინა პასუხი: ${input.reading}`,
     "",
+    en ? `Previous advice: ${input.advice}` : `წინა რჩევა: ${input.advice}`,
+    "",
     en
       ? `Follow-up question: “${input.followupQuestion}”`
       : `დამატებითი კითხვა: „${input.followupQuestion}"`,
@@ -2004,6 +2096,7 @@ export async function generateTarotFollowup(input: {
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         {
           role: "system",
@@ -2013,7 +2106,8 @@ export async function generateTarotFollowup(input: {
         },
         { role: "user", content: userMessage },
       ],
-      response_format: { type: "json_object" },
+      response_format: TAROT_FOLLOWUP_RESPONSE_FORMAT,
+      provider: { require_parameters: true },
       temperature: 0.8,
       max_tokens: 800,
     }),
@@ -2036,7 +2130,7 @@ export async function generateTarotFollowup(input: {
     .trim();
 
   const parsed = JSON.parse(stripped) as TarotFollowupResult;
-  if (!parsed.answer) {
+  if (typeof parsed.answer !== "string" || !parsed.answer.trim()) {
     throw new Error("missing required fields in tarot follow-up");
   }
   return { answer: parsed.answer };
@@ -2069,6 +2163,7 @@ export async function* streamChatCompletion(
     },
     body: JSON.stringify({
       model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
       messages,
       stream: true,
       temperature: opts.temperature ?? 0.85,

@@ -4,7 +4,7 @@
 //   - "type_sun" — (mbtiType, sun sign): how the type expresses through the sign. 192
 // Total 208. One AI call per row.
 //
-// Uses Vertex AI Gemini (gemini-2.5-pro) via the GCP project set up for Veo —
+// Uses Vertex AI Gemini (gemini-3.8-flash) via the GCP project set up for Veo —
 // auth via local ADC (`gcloud auth application-default login`). Local one-time
 // bulk seed only; the live self-heal (lib/mbti-library.ts) uses OpenRouter.
 //
@@ -19,13 +19,17 @@ import { neon } from "@neondatabase/serverless";
 import { GoogleGenAI } from "@google/genai";
 
 try {
-  for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+  for (const line of readFileSync(
+    new URL("../.env.local", import.meta.url),
+    "utf8",
+  ).split("\n")) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    if (m && !process.env[m[1]])
+      process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
   }
 } catch {}
 
-const MODEL = "gemini-2.5-pro";
+const MODEL = "gemini-3.8-flash";
 const CONCURRENCY = 5;
 const force = process.argv.includes("--force");
 const kindArg = process.argv.find((a) => a.startsWith("--kind="));
@@ -34,27 +38,70 @@ const typeArg = process.argv.find((a) => a.startsWith("--type="));
 const onlyTypes = typeArg ? typeArg.slice("--type=".length).split(",") : null;
 
 const TYPES = [
-  "ISTJ", "ISFJ", "INFJ", "INTJ", "ISTP", "ISFP", "INFP", "INTP",
-  "ESTP", "ESFP", "ENFP", "ENTP", "ESTJ", "ESFJ", "ENFJ", "ENTJ",
+  "ISTJ",
+  "ISFJ",
+  "INFJ",
+  "INTJ",
+  "ISTP",
+  "ISFP",
+  "INFP",
+  "INTP",
+  "ESTP",
+  "ESFP",
+  "ENFP",
+  "ENTP",
+  "ESTJ",
+  "ESFJ",
+  "ENFJ",
+  "ENTJ",
 ];
 
 const ARCHETYPE_KA = {
-  ISTJ: "ლოგისტიკოსი", ISFJ: "დამცველი", INFJ: "ადვოკატი", INTJ: "არქიტექტორი",
-  ISTP: "ვირტუოზი", ISFP: "ავანტიურისტი", INFP: "შუამავალი", INTP: "ლოგიკოსი",
-  ESTP: "მეწარმე", ESFP: "გამრთობი", ENFP: "ენთუზიასტი", ENTP: "პოლემისტი",
-  ESTJ: "აღმასრულებელი", ESFJ: "კონსული", ENFJ: "პროტაგონისტი", ENTJ: "მეთაური",
+  ISTJ: "ლოგისტიკოსი",
+  ISFJ: "დამცველი",
+  INFJ: "ადვოკატი",
+  INTJ: "არქიტექტორი",
+  ISTP: "ვირტუოზი",
+  ISFP: "ავანტიურისტი",
+  INFP: "შუამავალი",
+  INTP: "ლოგიკოსი",
+  ESTP: "მეწარმე",
+  ESFP: "გამრთობი",
+  ENFP: "ენთუზიასტი",
+  ENTP: "პოლემისტი",
+  ESTJ: "აღმასრულებელი",
+  ESFJ: "კონსული",
+  ENFJ: "პროტაგონისტი",
+  ENTJ: "მეთაური",
 };
 
 const SIGN_KA = {
-  aries: "ვერძი", taurus: "კურო", gemini: "ტყუპები", cancer: "კირჩხიბი",
-  leo: "ლომი", virgo: "ქალწული", libra: "სასწორი", scorpio: "მორიელი",
-  sagittarius: "მშვილდოსანი", capricorn: "თხის რქა", aquarius: "მერწყული", pisces: "თევზები",
+  aries: "ვერძი",
+  taurus: "კურო",
+  gemini: "ტყუპები",
+  cancer: "კირჩხიბი",
+  leo: "ლომი",
+  virgo: "ქალწული",
+  libra: "სასწორი",
+  scorpio: "მორიელი",
+  sagittarius: "მშვილდოსანი",
+  capricorn: "თხის რქა",
+  aquarius: "მერწყული",
+  pisces: "თევზები",
 };
 const SIGN_ELEMENT = {
-  aries: "ცეცხლის", leo: "ცეცხლის", sagittarius: "ცეცხლის",
-  taurus: "მიწის", virgo: "მიწის", capricorn: "მიწის",
-  gemini: "ჰაერის", libra: "ჰაერის", aquarius: "ჰაერის",
-  cancer: "წყლის", scorpio: "წყლის", pisces: "წყლის",
+  aries: "ცეცხლის",
+  leo: "ცეცხლის",
+  sagittarius: "ცეცხლის",
+  taurus: "მიწის",
+  virgo: "მიწის",
+  capricorn: "მიწის",
+  gemini: "ჰაერის",
+  libra: "ჰაერის",
+  aquarius: "ჰაერის",
+  cancer: "წყლის",
+  scorpio: "წყლის",
+  pisces: "წყლის",
 };
 const SIGN_KEYS = Object.keys(SIGN_KA);
 
@@ -116,18 +163,26 @@ function sectionPrompt(kind, type) {
     case "strengths":
       return `დაწერე ${label}-ის ძლიერი მხარეები ქართულად.\n${listFmt}`;
     case "weaknesses":
-      return `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
-        `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`;
+      return (
+        `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
+        `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`
+      );
     case "romantic":
-      return dual("რომანტიკულ ურთიერთობებში (როგორ იქცევა, რას ეძებს პარტნიორში, როგორ იჩენს სიყვარულს)");
+      return dual(
+        "რომანტიკულ ურთიერთობებში (როგორ იქცევა, რას ეძებს პარტნიორში, როგორ იჩენს სიყვარულს)",
+      );
     case "friendship":
       return dual("მეგობრობასა და სოციალურ კავშირებში");
     case "career":
       return dual("კარიერასა და პროფესიულ გზაზე");
     case "workplace":
-      return dual("სამუშაო ადგილზე და გუნდში (როგორც კოლეგა, ხელქვეითი და ლიდერი)");
+      return dual(
+        "სამუშაო ადგილზე და გუნდში (როგორც კოლეგა, ხელქვეითი და ლიდერი)",
+      );
     case "growth":
-      return dual("პიროვნული ზრდის თვალსაზრისით (რა არის საყრდენი და რაზე უნდა იმუშაოს)");
+      return dual(
+        "პიროვნული ზრდის თვალსაზრისით (რა არის საყრდენი და რაზე უნდა იმუშაოს)",
+      );
     default:
       throw new Error(`unknown section ${kind}`);
   }
@@ -136,14 +191,18 @@ function sectionPrompt(kind, type) {
 const ai = new GoogleGenAI({
   vertexai: true,
   project: process.env.GOOGLE_CLOUD_PROJECT,
-  location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+  location: "global",
 });
 
 async function generate(prompt, system = SYSTEM, temperature = 0.8) {
   const res = await ai.models.generateContent({
     model: MODEL,
     contents: prompt,
-    config: { systemInstruction: system, temperature },
+    config: {
+      thinkingConfig: { thinkingLevel: "LOW" },
+      systemInstruction: system,
+      temperature,
+    },
   });
   const body = res.text?.trim();
   if (!body) throw new Error("empty");
@@ -151,12 +210,15 @@ async function generate(prompt, system = SYSTEM, temperature = 0.8) {
 }
 
 async function main() {
-  if (!process.env.GOOGLE_CLOUD_PROJECT) throw new Error("GOOGLE_CLOUD_PROJECT missing");
+  if (!process.env.GOOGLE_CLOUD_PROJECT)
+    throw new Error("GOOGLE_CLOUD_PROJECT missing");
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
   const sql = neon(process.env.DATABASE_URL);
 
   const existing = new Map(
-    (await sql`SELECT key, edited FROM mbti_interpretation_library`).map((r) => [r.key, r.edited])
+    (await sql`SELECT key, edited FROM mbti_interpretation_library`).map(
+      (r) => [r.key, r.edited],
+    ),
   );
 
   const types = TYPES.filter((t) => !onlyTypes || onlyTypes.includes(t));
@@ -181,12 +243,22 @@ async function main() {
       const key = `${section.kind}:${type}`;
       if (existing.get(key) === true) continue;
       if (existing.has(key) && !force) continue;
-      tasks.push({ kind: section.kind, type, sign: null, key, titleKa: section.titleKa });
+      tasks.push({
+        kind: section.kind,
+        type,
+        sign: null,
+        key,
+        titleKa: section.titleKa,
+      });
     }
   }
 
-  console.log(`tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`);
-  let done = 0, ok = 0, fail = 0;
+  console.log(
+    `tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`,
+  );
+  let done = 0,
+    ok = 0,
+    fail = 0;
 
   async function worker(queue) {
     for (;;) {
@@ -203,7 +275,11 @@ async function main() {
         } else {
           // Sections are strict lists — use the structured system + low temp so
           // the writer voice doesn't turn them back into prose.
-          body = await generate(sectionPrompt(t.kind, t.type), SYSTEM_STRUCTURED, 0.4);
+          body = await generate(
+            sectionPrompt(t.kind, t.type),
+            SYSTEM_STRUCTURED,
+            0.4,
+          );
           title = t.titleKa ?? null;
         }
         await sql`
@@ -227,4 +303,7 @@ async function main() {
   console.log(`done: ${ok} written, ${fail} failed`);
 }
 
-main().catch((e) => { console.error(e.message); process.exit(1); });
+main().catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

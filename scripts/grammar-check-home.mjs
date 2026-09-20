@@ -16,7 +16,7 @@ import { resolve } from "path";
 config({ path: ".env.local" });
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-pro";
+const MODEL = "google/gemini-3.8-flash";
 const KEY = process.env.OPENROUTER_API_KEY;
 if (!KEY) {
   console.error("OPENROUTER_API_KEY is not set in .env.local — aborting.");
@@ -66,6 +66,7 @@ async function callOpenRouter(content) {
     },
     body: JSON.stringify({
       model: MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         {
@@ -75,7 +76,7 @@ async function callOpenRouter(content) {
       ],
       response_format: { type: "json_object" },
       temperature: 0.2, // editorial work — be conservative
-      // Gemini 2.5 Pro spends a chunk on reasoning tokens before emitting
+      // Gemini 3.8 Flash spends a chunk on reasoning tokens before emitting
       // visible output; cap high enough that the JSON body still fits.
       max_tokens: 32000,
     }),
@@ -149,7 +150,9 @@ async function run() {
   const beforeKeys = Object.keys(before).sort().join(",");
   const afterKeys = Object.keys(after).sort().join(",");
   if (beforeKeys !== afterKeys) {
-    console.error(`✗ key mismatch: before [${beforeKeys}] vs after [${afterKeys}]`);
+    console.error(
+      `✗ key mismatch: before [${beforeKeys}] vs after [${afterKeys}]`,
+    );
     process.exit(1);
   }
 

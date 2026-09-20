@@ -14,30 +14,51 @@ import { readFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
 
 try {
-  for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+  for (const line of readFileSync(
+    new URL("../.env.local", import.meta.url),
+    "utf8",
+  ).split("\n")) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    if (m && !process.env[m[1]])
+      process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
   }
 } catch {}
 
 const KEY = process.env.OPENROUTER_API_KEY;
-const MODEL = "google/gemini-3.1-pro-preview";
+const MODEL = "google/gemini-3.8-flash";
 const CONCURRENCY = 5;
 const force = process.argv.includes("--force");
 const onlyArg = process.argv.find((a) => a.startsWith("--only="));
 const only = onlyArg ? onlyArg.slice("--only=".length).split(",") : null;
 
 const SIGN_KA = {
-  aries: "ვერძი", taurus: "კურო", gemini: "ტყუპები", cancer: "კირჩხიბი",
-  leo: "ლომი", virgo: "ქალწული", libra: "სასწორი", scorpio: "მორიელი",
-  sagittarius: "მშვილდოსანი", capricorn: "თხის რქა", aquarius: "მერწყული", pisces: "თევზები",
+  aries: "ვერძი",
+  taurus: "კურო",
+  gemini: "ტყუპები",
+  cancer: "კირჩხიბი",
+  leo: "ლომი",
+  virgo: "ქალწული",
+  libra: "სასწორი",
+  scorpio: "მორიელი",
+  sagittarius: "მშვილდოსანი",
+  capricorn: "თხის რქა",
+  aquarius: "მერწყული",
+  pisces: "თევზები",
 };
 const SIGN_KEYS = Object.keys(SIGN_KA);
 
 const SUBJECT_KA = {
-  sun: "მზე", moon: "მთვარე", mercury: "მერკური", venus: "ვენერა", mars: "მარსი",
-  jupiter: "იუპიტერი", saturn: "სატურნი", uranus: "ურანი", neptune: "ნეპტუნი",
-  pluto: "პლუტონი", ascendant: "ამომავალი ნიშანი",
+  sun: "მზე",
+  moon: "მთვარე",
+  mercury: "მერკური",
+  venus: "ვენერა",
+  mars: "მარსი",
+  jupiter: "იუპიტერი",
+  saturn: "სატურნი",
+  uranus: "ურანი",
+  neptune: "ნეპტუნი",
+  pluto: "პლუტონი",
+  ascendant: "ამომავალი ნიშანი",
 };
 const SUBJECT_DOMAIN_KA = {
   sun: "ბირთვი, იდენტობა, სასიცოცხლო ენერგია და თვითგამოხატვა",
@@ -50,12 +71,13 @@ const SUBJECT_DOMAIN_KA = {
   uranus: "ცვლილება, ორიგინალურობა, თავისუფლება და მოულოდნელობა",
   neptune: "ოცნება, ინტუიცია, სულიერება და შემოქმედებითი წარმოსახვა",
   pluto: "ღრმა ტრანსფორმაცია, ძალა, კონტროლი და აღორძინება",
-  ascendant: "პირველი შთაბეჭდილება — როგორ აღგიქვამენ სხვები პირველი შეხვედრისას",
+  ascendant:
+    "პირველი შთაბეჭდილება — როგორ აღგიქვამენ სხვები პირველი შეხვედრისას",
 };
 
 const SYSTEM =
-  'შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, ' +
-  'ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. ' +
+  "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
+  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   'თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები ("ვარსკვლავები გელიან").';
 
 function prompt(subject, sign) {
@@ -82,17 +104,21 @@ async function generate(subject, sign) {
     },
     body: JSON.stringify({
       model: MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SYSTEM },
         { role: "user", content: prompt(subject, sign) },
       ],
       temperature: 0.8,
-      // gemini-3.1-pro always reasons; give the answer room beyond the
+      // Give the answer room beyond the
       // thinking budget so it isn't truncated.
       max_tokens: 12000,
     }),
   });
-  if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  if (!res.ok)
+    throw new Error(
+      `OpenRouter ${res.status}: ${(await res.text()).slice(0, 200)}`,
+    );
   const json = await res.json();
   if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
   const body = json.choices?.[0]?.message?.content?.trim();
@@ -105,11 +131,16 @@ async function main() {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
   const sql = neon(process.env.DATABASE_URL);
 
-  const subjects = Object.keys(SUBJECT_KA).filter((s) => !only || only.includes(s));
+  const subjects = Object.keys(SUBJECT_KA).filter(
+    (s) => !only || only.includes(s),
+  );
 
   // Existing rows → decide what to (re)generate without wasting AI calls.
   const existing = new Map(
-    (await sql`SELECT key, edited FROM interpretation_library`).map((r) => [r.key, r.edited])
+    (await sql`SELECT key, edited FROM interpretation_library`).map((r) => [
+      r.key,
+      r.edited,
+    ]),
   );
   const tasks = [];
   for (const subject of subjects) {
@@ -124,7 +155,9 @@ async function main() {
   }
 
   console.log(`tasks: ${tasks.length} (force=${force}, model=${MODEL})`);
-  let done = 0, ok = 0, fail = 0;
+  let done = 0,
+    ok = 0,
+    fail = 0;
 
   async function worker(queue) {
     for (;;) {
@@ -153,4 +186,7 @@ async function main() {
   console.log(`done: ${ok} written, ${fail} failed`);
 }
 
-main().catch((e) => { console.error(e.message); process.exit(1); });
+main().catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

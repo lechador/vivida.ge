@@ -22,7 +22,7 @@ import { aspectKey, type AspectKind } from "./aspects";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 /** Same higher-quality model used for the sign-placement library. */
-export const ASPECT_LIBRARY_MODEL = "google/gemini-3.1-pro-preview";
+export const ASPECT_LIBRARY_MODEL = "google/gemini-3.8-flash";
 
 /** The 13 chart points that can participate in an aspect. */
 export const ASPECT_BODIES = [
@@ -76,7 +76,11 @@ export function libraryKindKa(kind: AspectKind): string {
   return KIND_KA[kind] ?? kind;
 }
 
-export function aspectLibraryKey(a: string, b: string, kind: AspectKind): string {
+export function aspectLibraryKey(
+  a: string,
+  b: string,
+  kind: AspectKind,
+): string {
   return aspectKey(a, b, kind);
 }
 
@@ -101,7 +105,7 @@ export function allAspectCombos(): AspectPlacement[] {
  * row reflects for every user on their next view.
  */
 export async function getAspectLibraryEntries(
-  keys: string[]
+  keys: string[],
 ): Promise<Map<string, string>> {
   if (keys.length === 0) return new Map();
   const rows = await db
@@ -121,7 +125,11 @@ const SYSTEM_PROMPT =
   '("ვარსკვლავები გელიან", "მიენდე სამყაროს").';
 
 /** Build the user prompt for a single (a, b, kind) aspect combo. */
-export function buildAspectPrompt(a: string, b: string, kind: AspectKind): string {
+export function buildAspectPrompt(
+  a: string,
+  b: string,
+  kind: AspectKind,
+): string {
   const aMeta = BODIES[a];
   const bMeta = BODIES[b];
   const aLabel = aMeta?.labelKa ?? a;
@@ -151,7 +159,7 @@ interface OpenRouterJson {
 export async function generateAspectEntry(
   a: string,
   b: string,
-  kind: AspectKind
+  kind: AspectKind,
 ): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
@@ -166,12 +174,13 @@ export async function generateAspectEntry(
     },
     body: JSON.stringify({
       model: ASPECT_LIBRARY_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: buildAspectPrompt(a, b, kind) },
       ],
       temperature: 0.8,
-      // gemini-3.1-pro always reasons (~2-3k tokens) — leave headroom so the
+      // Leave headroom for reasoning so the
       // answer isn't truncated by the thinking budget.
       max_tokens: 12000,
     }),
@@ -193,12 +202,12 @@ export async function generateAspectEntry(
  * map for the requested placements. Background path — never blocks a render.
  */
 export async function ensureAspectLibraryFor(
-  placements: AspectPlacement[]
+  placements: AspectPlacement[],
 ): Promise<Map<string, string>> {
   const keys = placements.map((p) => aspectLibraryKey(p.a, p.b, p.kind));
   const have = await getAspectLibraryEntries(keys);
   const missing = placements.filter(
-    (p) => !have.has(aspectLibraryKey(p.a, p.b, p.kind))
+    (p) => !have.has(aspectLibraryKey(p.a, p.b, p.kind)),
   );
   if (missing.length === 0) return have;
 
@@ -221,7 +230,7 @@ export async function ensureAspectLibraryFor(
     } catch (err) {
       console.warn(
         `[aspect-library] generate failed for ${p.a}-${p.b}-${p.kind}:`,
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }

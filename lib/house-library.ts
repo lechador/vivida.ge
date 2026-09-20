@@ -30,7 +30,7 @@ import { HOUSE_NUMBERS, houseDef } from "./houses";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 /** Same higher-quality model used for the sign/aspect libraries. */
-export const HOUSE_LIBRARY_MODEL = "google/gemini-3.1-pro-preview";
+export const HOUSE_LIBRARY_MODEL = "google/gemini-3.8-flash";
 
 /** The 11 chart bodies that can occupy a house (Asc/MC define houses instead). */
 export const HOUSE_OCCUPANT_BODIES = [
@@ -52,7 +52,7 @@ export type HouseLibraryKind = "cusp" | "occupant";
 export function houseLibraryKey(
   kind: HouseLibraryKind,
   house: number,
-  subject: string
+  subject: string,
 ): string {
   return `${kind}:${house}:${subject}`;
 }
@@ -84,7 +84,7 @@ export function allHouseOccupantCombos(): HouseOccupantPlacement[] {
  * row reflects for every user on their next view.
  */
 export async function getHouseLibraryEntries(
-  keys: string[]
+  keys: string[],
 ): Promise<Map<string, string>> {
   if (keys.length === 0) return new Map();
   const rows = await db
@@ -155,12 +155,13 @@ async function callOpenRouter(prompt: string): Promise<string> {
     },
     body: JSON.stringify({
       model: HOUSE_LIBRARY_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: prompt },
       ],
       temperature: 0.8,
-      // gemini-3.1-pro always reasons; leave headroom beyond the thinking
+      // Leave headroom beyond the thinking
       // budget so the answer isn't truncated.
       max_tokens: 12000,
     }),
@@ -179,7 +180,7 @@ async function callOpenRouter(prompt: string): Promise<string> {
 /** Generate a single reusable cusp interpretation. Throws on API/empty errors. */
 export async function generateHouseCuspEntry(
   house: number,
-  signKey: string
+  signKey: string,
 ): Promise<string> {
   return callOpenRouter(cuspPrompt(house, signKey));
 }
@@ -187,7 +188,7 @@ export async function generateHouseCuspEntry(
 /** Generate a single reusable occupant interpretation. Throws on API/empty errors. */
 export async function generateHouseOccupantEntry(
   house: number,
-  planetKey: string
+  planetKey: string,
 ): Promise<string> {
   return callOpenRouter(occupantPrompt(house, planetKey));
 }
@@ -199,19 +200,19 @@ export async function generateHouseOccupantEntry(
  */
 export async function ensureHouseLibraryFor(
   cusps: HouseCuspPlacement[],
-  occupants: HouseOccupantPlacement[]
+  occupants: HouseOccupantPlacement[],
 ): Promise<Map<string, string>> {
   const cuspKeys = cusps.map((c) => houseLibraryKey("cusp", c.house, c.sign));
   const occKeys = occupants.map((o) =>
-    houseLibraryKey("occupant", o.house, o.planet)
+    houseLibraryKey("occupant", o.house, o.planet),
   );
   const have = await getHouseLibraryEntries([...cuspKeys, ...occKeys]);
 
   const missingCusps = cusps.filter(
-    (c) => !have.has(houseLibraryKey("cusp", c.house, c.sign))
+    (c) => !have.has(houseLibraryKey("cusp", c.house, c.sign)),
   );
   const missingOccupants = occupants.filter(
-    (o) => !have.has(houseLibraryKey("occupant", o.house, o.planet))
+    (o) => !have.has(houseLibraryKey("occupant", o.house, o.planet)),
   );
   if (missingCusps.length === 0 && missingOccupants.length === 0) return have;
 
@@ -221,13 +222,20 @@ export async function ensureHouseLibraryFor(
       const key = houseLibraryKey("cusp", c.house, c.sign);
       await db
         .insert(houseInterpretationLibrary)
-        .values({ key, kind: "cusp", house: c.house, subject: c.sign, body, model: HOUSE_LIBRARY_MODEL })
+        .values({
+          key,
+          kind: "cusp",
+          house: c.house,
+          subject: c.sign,
+          body,
+          model: HOUSE_LIBRARY_MODEL,
+        })
         .onConflictDoNothing();
       have.set(key, body);
     } catch (err) {
       console.warn(
         `[house-library] cusp generate failed for house ${c.house}/${c.sign}:`,
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }
@@ -237,13 +245,20 @@ export async function ensureHouseLibraryFor(
       const key = houseLibraryKey("occupant", o.house, o.planet);
       await db
         .insert(houseInterpretationLibrary)
-        .values({ key, kind: "occupant", house: o.house, subject: o.planet, body, model: HOUSE_LIBRARY_MODEL })
+        .values({
+          key,
+          kind: "occupant",
+          house: o.house,
+          subject: o.planet,
+          body,
+          model: HOUSE_LIBRARY_MODEL,
+        })
         .onConflictDoNothing();
       have.set(key, body);
     } catch (err) {
       console.warn(
         `[house-library] occupant generate failed for house ${o.house}/${o.planet}:`,
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }

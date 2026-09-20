@@ -13,7 +13,7 @@
 //   node scripts/seed-moon-library.mjs --force   → also overwrite non-edited rows
 //   node scripts/seed-moon-library.mjs --phase=full_moon,new_moon
 //
-// Reads GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION / DATABASE_URL from
+// Reads GOOGLE_CLOUD_PROJECT / DATABASE_URL from
 // .env.local or the environment.
 
 import { readFileSync } from "node:fs";
@@ -21,17 +21,23 @@ import { neon } from "@neondatabase/serverless";
 import { GoogleGenAI } from "@google/genai";
 
 try {
-  for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+  for (const line of readFileSync(
+    new URL("../.env.local", import.meta.url),
+    "utf8",
+  ).split("\n")) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    if (m && !process.env[m[1]])
+      process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
   }
 } catch {}
 
-const MODEL = "gemini-2.5-pro";
+const MODEL = "gemini-3.8-flash";
 const CONCURRENCY = 4;
 const force = process.argv.includes("--force");
 const phaseArg = process.argv.find((a) => a.startsWith("--phase="));
-const onlyPhases = phaseArg ? phaseArg.slice("--phase=".length).split(",") : null;
+const onlyPhases = phaseArg
+  ? phaseArg.slice("--phase=".length).split(",")
+  : null;
 
 // Midpoint angle per phase; illumination/age derive from it. These are the
 // "representative numbers" woven into the prompt — the interpretation itself
@@ -49,14 +55,32 @@ const PHASES = {
 const SYNODIC = 29.530588853;
 
 const SIGN_KA = {
-  aries: "ვერძი", taurus: "კურო", gemini: "ტყუპები", cancer: "კირჩხიბი",
-  leo: "ლომი", virgo: "ქალწული", libra: "სასწორი", scorpio: "მორიელი",
-  sagittarius: "მშვილდოსანი", capricorn: "თხის რქა", aquarius: "მერწყული", pisces: "თევზები",
+  aries: "ვერძი",
+  taurus: "კურო",
+  gemini: "ტყუპები",
+  cancer: "კირჩხიბი",
+  leo: "ლომი",
+  virgo: "ქალწული",
+  libra: "სასწორი",
+  scorpio: "მორიელი",
+  sagittarius: "მშვილდოსანი",
+  capricorn: "თხის რქა",
+  aquarius: "მერწყული",
+  pisces: "თევზები",
 };
 const SIGN_EN = {
-  aries: "Aries", taurus: "Taurus", gemini: "Gemini", cancer: "Cancer",
-  leo: "Leo", virgo: "Virgo", libra: "Libra", scorpio: "Scorpio",
-  sagittarius: "Sagittarius", capricorn: "Capricorn", aquarius: "Aquarius", pisces: "Pisces",
+  aries: "Aries",
+  taurus: "Taurus",
+  gemini: "Gemini",
+  cancer: "Cancer",
+  leo: "Leo",
+  virgo: "Virgo",
+  libra: "Libra",
+  scorpio: "Scorpio",
+  sagittarius: "Sagittarius",
+  capricorn: "Capricorn",
+  aquarius: "Aquarius",
+  pisces: "Pisces",
 };
 
 // Mirrors MOON_PHASE_SYSTEM_PROMPT in lib/openrouter.ts so seeded and
@@ -96,7 +120,7 @@ function prompt(phaseKey, sign) {
 const ai = new GoogleGenAI({
   vertexai: true,
   project: process.env.GOOGLE_CLOUD_PROJECT,
-  location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+  location: "global",
 });
 
 async function generate(phaseKey, sign) {
@@ -104,6 +128,7 @@ async function generate(phaseKey, sign) {
     model: MODEL,
     contents: prompt(phaseKey, sign),
     config: {
+      thinkingConfig: { thinkingLevel: "LOW" },
       systemInstruction: SYSTEM,
       temperature: 0.8,
       responseMimeType: "application/json",
@@ -111,24 +136,33 @@ async function generate(phaseKey, sign) {
   });
   const raw = res.text?.trim();
   if (!raw) throw new Error("empty");
-  const stripped = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  const stripped = raw
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
   const parsed = JSON.parse(stripped);
-  if (!parsed.headline || !parsed.summary || !parsed.body) throw new Error("missing fields");
+  if (!parsed.headline || !parsed.summary || !parsed.body)
+    throw new Error("missing fields");
   return {
     headline: String(parsed.headline).trim(),
     summary: String(parsed.summary).trim(),
     body: String(parsed.body).trim(),
-    themes: Array.isArray(parsed.themes) ? parsed.themes.slice(0, 3).map(String) : [],
+    themes: Array.isArray(parsed.themes)
+      ? parsed.themes.slice(0, 3).map(String)
+      : [],
   };
 }
 
 async function main() {
-  if (!process.env.GOOGLE_CLOUD_PROJECT) throw new Error("GOOGLE_CLOUD_PROJECT missing");
+  if (!process.env.GOOGLE_CLOUD_PROJECT)
+    throw new Error("GOOGLE_CLOUD_PROJECT missing");
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
   const sql = neon(process.env.DATABASE_URL);
 
   const existing = new Map(
-    (await sql`SELECT key, edited FROM moon_phase_interpretation_library`).map((r) => [r.key, r.edited])
+    (await sql`SELECT key, edited FROM moon_phase_interpretation_library`).map(
+      (r) => [r.key, r.edited],
+    ),
   );
 
   const tasks = [];
@@ -142,8 +176,12 @@ async function main() {
     }
   }
 
-  console.log(`tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`);
-  let done = 0, ok = 0, fail = 0;
+  console.log(
+    `tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`,
+  );
+  let done = 0,
+    ok = 0,
+    fail = 0;
 
   async function worker(queue) {
     for (;;) {
@@ -174,4 +212,7 @@ async function main() {
   console.log(`done: ${ok} written, ${fail} failed`);
 }
 
-main().catch((e) => { console.error(e.message); process.exit(1); });
+main().catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

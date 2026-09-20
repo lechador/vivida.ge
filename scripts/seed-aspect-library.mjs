@@ -17,7 +17,7 @@
 //   node scripts/seed-aspect-library.mjs --kind=square,trine
 //   node scripts/seed-aspect-library.mjs --body=chiron   → only combos involving these bodies
 //
-// Reads GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION / DATABASE_URL from
+// Reads GOOGLE_CLOUD_PROJECT / DATABASE_URL from
 // .env.local or the environment.
 
 import { readFileSync } from "node:fs";
@@ -25,13 +25,17 @@ import { neon } from "@neondatabase/serverless";
 import { GoogleGenAI } from "@google/genai";
 
 try {
-  for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+  for (const line of readFileSync(
+    new URL("../.env.local", import.meta.url),
+    "utf8",
+  ).split("\n")) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    if (m && !process.env[m[1]])
+      process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
   }
 } catch {}
 
-const MODEL = "gemini-2.5-pro";
+const MODEL = "gemini-3.8-flash";
 const CONCURRENCY = 5;
 const force = process.argv.includes("--force");
 const kindArg = process.argv.find((a) => a.startsWith("--kind="));
@@ -40,14 +44,35 @@ const bodyArg = process.argv.find((a) => a.startsWith("--body="));
 const onlyBodies = bodyArg ? bodyArg.slice("--body=".length).split(",") : null;
 
 const BODIES = [
-  "sun", "moon", "mercury", "venus", "mars", "jupiter",
-  "saturn", "uranus", "neptune", "pluto", "chiron", "ascendant", "midheaven",
+  "sun",
+  "moon",
+  "mercury",
+  "venus",
+  "mars",
+  "jupiter",
+  "saturn",
+  "uranus",
+  "neptune",
+  "pluto",
+  "chiron",
+  "ascendant",
+  "midheaven",
 ];
 
 const BODY_KA = {
-  sun: "მზე", moon: "მთვარე", mercury: "მერკური", venus: "ვენერა", mars: "მარსი",
-  jupiter: "იუპიტერი", saturn: "სატურნი", uranus: "ურანი", neptune: "ნეპტუნი",
-  pluto: "პლუტონი", chiron: "ქირონი", ascendant: "ამომავალი", midheaven: "ზენიტი",
+  sun: "მზე",
+  moon: "მთვარე",
+  mercury: "მერკური",
+  venus: "ვენერა",
+  mars: "მარსი",
+  jupiter: "იუპიტერი",
+  saturn: "სატურნი",
+  uranus: "ურანი",
+  neptune: "ნეპტუნი",
+  pluto: "პლუტონი",
+  chiron: "ქირონი",
+  ascendant: "ამომავალი",
+  midheaven: "ზენიტი",
 };
 const BODY_MEANING_KA = {
   sun: "ბირთვი, იდენტობა, სიცოცხლის ცეცხლი",
@@ -74,20 +99,26 @@ const KIND_KA = {
   opposition: "ოპოზიცია (opposition)",
 };
 const KIND_DYNAMIC_KA = {
-  conjunction: "ორი ენერგია ერთმანეთში ერწყმის და ერთ ძალად მოქმედებს — არც კონფლიქტი, არც შვება, უბრალოდ შერწყმა, რომლის ხასიათი პლანეტებზეა დამოკიდებული.",
-  sextile: "ორი ენერგია ბუნებრივად თანამშრომლობს — ადვილად ხელმისაწვდომი შესაძლებლობა, რომელიც მოქმედებას საჭიროებს გასააქტიურებლად.",
-  square: "ორი ენერგია ერთმანეთს ეწინააღმდეგება — შინაგანი ხახუნი და დაძაბულობა, რომელიც ზრდის ყველაზე ძლიერი წყაროა, თუმცა თავიდან რთულად იგრძნობა.",
-  trine: "ორი ენერგია ჰარმონიულად და ბუნებრივად მიედინება — ნიჭი და სიმარტივე, რომელიც ხანდახან თვითკმაყოფილებაშიც შეიძლება გადაიზარდოს.",
-  opposition: "ორი ენერგია ერთმანეთის საპირისპირო პოლუსზეა — ცნობიერების საჭიროება ბალანსის საპოვნელად ორ უკიდურესობას შორის.",
+  conjunction:
+    "ორი ენერგია ერთმანეთში ერწყმის და ერთ ძალად მოქმედებს — არც კონფლიქტი, არც შვება, უბრალოდ შერწყმა, რომლის ხასიათი პლანეტებზეა დამოკიდებული.",
+  sextile:
+    "ორი ენერგია ბუნებრივად თანამშრომლობს — ადვილად ხელმისაწვდომი შესაძლებლობა, რომელიც მოქმედებას საჭიროებს გასააქტიურებლად.",
+  square:
+    "ორი ენერგია ერთმანეთს ეწინააღმდეგება — შინაგანი ხახუნი და დაძაბულობა, რომელიც ზრდის ყველაზე ძლიერი წყაროა, თუმცა თავიდან რთულად იგრძნობა.",
+  trine:
+    "ორი ენერგია ჰარმონიულად და ბუნებრივად მიედინება — ნიჭი და სიმარტივე, რომელიც ხანდახან თვითკმაყოფილებაშიც შეიძლება გადაიზარდოს.",
+  opposition:
+    "ორი ენერგია ერთმანეთის საპირისპირო პოლუსზეა — ცნობიერების საჭიროება ბალანსის საპოვნელად ორ უკიდურესობას შორის.",
 };
 
 const SYSTEM =
-  'შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, ' +
-  'ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. ' +
+  "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
+  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   'თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები ("ვარსკვლავები გელიან").';
 
 function prompt(a, b, kind) {
-  const aLabel = BODY_KA[a], bLabel = BODY_KA[b];
+  const aLabel = BODY_KA[a],
+    bLabel = BODY_KA[b];
   return (
     `დაწერე ნატალური ასპექტის ინტერპრეტაცია: "${aLabel} ${KIND_KA[kind]} ${bLabel}".\n` +
     `${aLabel} — ${BODY_MEANING_KA[a]}. ${bLabel} — ${BODY_MEANING_KA[b]}.\n` +
@@ -103,7 +134,7 @@ function prompt(a, b, kind) {
 const ai = new GoogleGenAI({
   vertexai: true,
   project: process.env.GOOGLE_CLOUD_PROJECT,
-  location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+  location: "global",
 });
 
 async function generate(a, b, kind) {
@@ -111,6 +142,7 @@ async function generate(a, b, kind) {
     model: MODEL,
     contents: prompt(a, b, kind),
     config: {
+      thinkingConfig: { thinkingLevel: "LOW" },
       systemInstruction: SYSTEM,
       temperature: 0.8,
     },
@@ -121,7 +153,8 @@ async function generate(a, b, kind) {
 }
 
 async function main() {
-  if (!process.env.GOOGLE_CLOUD_PROJECT) throw new Error("GOOGLE_CLOUD_PROJECT missing");
+  if (!process.env.GOOGLE_CLOUD_PROJECT)
+    throw new Error("GOOGLE_CLOUD_PROJECT missing");
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
   const sql = neon(process.env.DATABASE_URL);
 
@@ -129,14 +162,17 @@ async function main() {
 
   // Existing rows → decide what to (re)generate without wasting AI calls.
   const existing = new Map(
-    (await sql`SELECT key, edited FROM aspect_interpretation_library`).map((r) => [r.key, r.edited])
+    (await sql`SELECT key, edited FROM aspect_interpretation_library`).map(
+      (r) => [r.key, r.edited],
+    ),
   );
 
   const tasks = [];
   for (let i = 0; i < BODIES.length; i++) {
     for (let j = i + 1; j < BODIES.length; j++) {
       const [a, b] = [BODIES[i], BODIES[j]].sort();
-      if (onlyBodies && !onlyBodies.includes(a) && !onlyBodies.includes(b)) continue;
+      if (onlyBodies && !onlyBodies.includes(a) && !onlyBodies.includes(b))
+        continue;
       for (const kind of kinds) {
         const key = `${a}-${b}-${kind}`;
         const edited = existing.get(key) === true;
@@ -147,8 +183,12 @@ async function main() {
     }
   }
 
-  console.log(`tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`);
-  let done = 0, ok = 0, fail = 0;
+  console.log(
+    `tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`,
+  );
+  let done = 0,
+    ok = 0,
+    fail = 0;
 
   async function worker(queue) {
     for (;;) {
@@ -177,4 +217,7 @@ async function main() {
   console.log(`done: ${ok} written, ${fail} failed`);
 }
 
-main().catch((e) => { console.error(e.message); process.exit(1); });
+main().catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

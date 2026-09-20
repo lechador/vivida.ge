@@ -1,6 +1,6 @@
 // Grammar/orthography proofread of the user-facing MBTI library rows — the type
 // portraits and the 7 profile sections (strengths, weaknesses, romantic,
-// friendship, career, workplace, growth). One gemini-2.5-pro call per row,
+// friendship, career, workplace, growth). One gemini-3.8-flash call per row,
 // preserving meaning AND format (**bold** list markers, paragraph breaks,
 // "შენ"-form). Skips admin-edited rows. The type_sun astro-fusion rows are
 // excluded — they're no longer used by the (now psychology-focused) synthesis.
@@ -12,15 +12,28 @@ import { readFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
 import { GoogleGenAI } from "@google/genai";
 
-for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+for (const line of readFileSync(
+  new URL("../.env.local", import.meta.url),
+  "utf8",
+).split("\n")) {
   const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-  if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  if (m && !process.env[m[1]])
+    process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
 }
 
-const MODEL = "gemini-2.5-pro";
+const MODEL = "gemini-3.8-flash";
 const CONCURRENCY = 5;
 const force = process.argv.includes("--force");
-const KINDS = ["type", "strengths", "weaknesses", "romantic", "friendship", "career", "workplace", "growth"];
+const KINDS = [
+  "type",
+  "strengths",
+  "weaknesses",
+  "romantic",
+  "friendship",
+  "career",
+  "workplace",
+  "growth",
+];
 
 const SYSTEM =
   "შენ ხარ ქართული ენის პროფესიონალი კორექტორი. გისწორებ ტექსტს მხოლოდ გრამატიკულად, " +
@@ -33,14 +46,18 @@ const SYSTEM =
 const ai = new GoogleGenAI({
   vertexai: true,
   project: process.env.GOOGLE_CLOUD_PROJECT,
-  location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+  location: "global",
 });
 
 async function proofread(text) {
   const res = await ai.models.generateContent({
     model: MODEL,
     contents: "გაასწორე შემდეგი ტექსტი:\n\n" + text,
-    config: { systemInstruction: SYSTEM, temperature: 0.2 },
+    config: {
+      thinkingConfig: { thinkingLevel: "LOW" },
+      systemInstruction: SYSTEM,
+      temperature: 0.2,
+    },
   });
   const out = (res.text ?? "").trim();
   if (!out) throw new Error("empty");
@@ -49,7 +66,8 @@ async function proofread(text) {
 
 async function main() {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
-  if (!process.env.GOOGLE_CLOUD_PROJECT) throw new Error("GOOGLE_CLOUD_PROJECT missing");
+  if (!process.env.GOOGLE_CLOUD_PROJECT)
+    throw new Error("GOOGLE_CLOUD_PROJECT missing");
   const sql = neon(process.env.DATABASE_URL);
 
   const rows = force
@@ -57,7 +75,9 @@ async function main() {
     : await sql`SELECT key, body FROM mbti_interpretation_library WHERE kind = ANY(${KINDS}) AND edited = false`;
 
   console.log(`proofreading ${rows.length} rows (model=${MODEL})`);
-  let done = 0, changed = 0, fail = 0;
+  let done = 0,
+    changed = 0,
+    fail = 0;
   const queue = [...rows];
 
   async function worker() {
@@ -87,4 +107,7 @@ async function main() {
   console.log(`done: ${changed} changed, ${fail} failed, ${rows.length} total`);
 }
 
-main().catch((e) => { console.error(e.message); process.exit(1); });
+main().catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

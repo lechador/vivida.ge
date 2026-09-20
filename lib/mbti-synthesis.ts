@@ -1,7 +1,7 @@
 /**
  * Astro-MBTI synthesis — the small, fast, live personalization pass.
  *
- * The heavy lifting is pre-written by gemini-2.5-pro into the MBTI library
+ * The heavy lifting is pre-written into the MBTI library
  * (lib/mbti-library.ts): the type's psychological portrait + how it expresses
  * through the user's Sun sign. This live call just STITCHES those together and
  * adds the irreducible individual color — the user's name, exact axis %s, and
@@ -26,8 +26,8 @@ import {
 import { getTypeAndSun } from "@/lib/mbti-library";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = "google/gemini-3.5-flash-lite";
-const GOOGLE_MODEL = "gemini-3.5-flash-lite";
+const OPENROUTER_MODEL = "google/gemini-3.8-flash";
+const GOOGLE_MODEL = "gemini-3.8-flash";
 
 export type MbtiSynthesis = {
   archetypeNameGe: string;
@@ -190,6 +190,7 @@ async function viaOpenRouter(
     },
     body: JSON.stringify({
       model: OPENROUTER_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         {
           role: "system",
@@ -200,8 +201,6 @@ async function viaOpenRouter(
       response_format: { type: "json_object" },
       temperature: 0.85,
       max_tokens: 4000,
-      // Compose task, not reasoning — keep flash fast in prod too.
-      reasoning: { enabled: false },
     }),
   });
   if (!res.ok) {
@@ -222,14 +221,14 @@ async function viaGoogle(
   prompt: string,
   locale: UserLocale,
 ): Promise<MbtiSynthesis> {
-  const { GoogleGenAI } = await import("@google/genai");
+  const { GoogleGenAI, ThinkingLevel } = await import("@google/genai");
   const apiKey = process.env.GEMINI_API_KEY;
   const ai = apiKey
     ? new GoogleGenAI({ apiKey })
     : new GoogleGenAI({
         vertexai: true,
         project: process.env.GOOGLE_CLOUD_PROJECT,
-        // Gemini 3.5 Flash Lite is exposed through Vertex's global endpoint.
+        // Use the global endpoint supported by Gemini 3.8 Flash.
         location: "global",
       });
   const res = await ai.models.generateContent({
@@ -239,9 +238,8 @@ async function viaGoogle(
       systemInstruction: locale === "en" ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT,
       temperature: 0.85,
       responseMimeType: "application/json",
-      // This is a compose-over-pre-written-material task, not deep reasoning —
-      // flash's default "thinking" adds ~30s for no quality gain here.
-      thinkingConfig: { thinkingBudget: 0 },
+      // Gemini 3.8 supports low/medium/high thinking; use low for this live task.
+      thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
     },
   });
   const raw = res.text?.trim();

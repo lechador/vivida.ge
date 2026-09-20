@@ -26,7 +26,7 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
  * reused for everyone, so we spend the better model here (richer, more natural
  * Georgian) rather than the fast model used for per-request generation.
  */
-export const LIBRARY_MODEL = "google/gemini-3.1-pro-preview";
+export const LIBRARY_MODEL = "google/gemini-3.8-flash";
 
 /** Subjects whose sign-level text is reusable (Big Three + planets). */
 export const LIBRARY_SUBJECTS = [
@@ -71,11 +71,12 @@ const SUBJECT_DOMAIN_KA: Record<LibrarySubject, string> = {
   uranus: "ცვლილება, ორიგინალურობა, თავისუფლება და მოულოდნელობა",
   neptune: "ოცნება, ინტუიცია, სულიერება და შემოქმედებითი წარმოსახვა",
   pluto: "ღრმა ტრანსფორმაცია, ძალა, კონტროლი და აღორძინება",
-  ascendant: "პირველი შთაბეჭდილება — როგორ აღგიქვამენ სხვები პირველი შეხვედრისას",
+  ascendant:
+    "პირველი შთაბეჭდილება — როგორ აღგიქვამენ სხვები პირველი შეხვედრისას",
 };
 
 const SIGN_KA: Record<string, string> = Object.fromEntries(
-  SIGNS.map((s) => [s.key, s.labelKa])
+  SIGNS.map((s) => [s.key, s.labelKa]),
 );
 
 export function libraryKey(subject: string, sign: string): string {
@@ -90,7 +91,10 @@ export type Placement = { subject: LibrarySubject; sign: string };
  */
 export function placementsForChart(data: NatalChartJson): Placement[] {
   const out: Placement[] = [];
-  out.push({ subject: "ascendant", sign: signByIndex(data.ascendant.signIndex).key });
+  out.push({
+    subject: "ascendant",
+    sign: signByIndex(data.ascendant.signIndex).key,
+  });
   for (const subject of LIBRARY_SUBJECTS) {
     if (subject === "ascendant") continue;
     const body = data.bodies[subject];
@@ -105,11 +109,14 @@ export function placementsForChart(data: NatalChartJson): Placement[] {
  * row reflects for every user on their next view.
  */
 export async function getLibraryEntries(
-  keys: string[]
+  keys: string[],
 ): Promise<Map<string, string>> {
   if (keys.length === 0) return new Map();
   const rows = await db
-    .select({ key: interpretationLibrary.key, body: interpretationLibrary.body })
+    .select({
+      key: interpretationLibrary.key,
+      body: interpretationLibrary.body,
+    })
     .from(interpretationLibrary)
     .where(inArray(interpretationLibrary.key, keys));
   return new Map(rows.map((r) => [r.key, r.body]));
@@ -122,7 +129,10 @@ const SYSTEM_PROMPT =
   '("ვარსკვლავები გელიან", "მიენდე სამყაროს").';
 
 /** Build the user prompt for a single (subject, sign) placement. */
-export function buildEntryPrompt(subject: LibrarySubject, sign: string): string {
+export function buildEntryPrompt(
+  subject: LibrarySubject,
+  sign: string,
+): string {
   const subjectKa = SUBJECT_KA[subject];
   const signKa = SIGN_KA[sign] ?? sign;
   const domain = SUBJECT_DOMAIN_KA[subject];
@@ -147,7 +157,7 @@ interface OpenRouterJson {
 /** Generate a single reusable interpretation. Throws on API/empty errors. */
 export async function generateEntry(
   subject: LibrarySubject,
-  sign: string
+  sign: string,
 ): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
@@ -162,12 +172,13 @@ export async function generateEntry(
     },
     body: JSON.stringify({
       model: LIBRARY_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: buildEntryPrompt(subject, sign) },
       ],
       temperature: 0.8,
-      // gemini-3.1-pro always reasons (~2-3k tokens); leave ample headroom so
+      // Leave ample headroom for reasoning so
       // the actual answer isn't truncated by the thinking budget.
       max_tokens: 12000,
     }),
@@ -189,12 +200,12 @@ export async function generateEntry(
  * the requested placements. Background path — never blocks a page render.
  */
 export async function ensureLibraryFor(
-  placements: Placement[]
+  placements: Placement[],
 ): Promise<Map<string, string>> {
   const keys = placements.map((p) => libraryKey(p.subject, p.sign));
   const have = await getLibraryEntries(keys);
   const missing = placements.filter(
-    (p) => !have.has(libraryKey(p.subject, p.sign))
+    (p) => !have.has(libraryKey(p.subject, p.sign)),
   );
   if (missing.length === 0) return have;
 
@@ -204,13 +215,19 @@ export async function ensureLibraryFor(
       const key = libraryKey(p.subject, p.sign);
       await db
         .insert(interpretationLibrary)
-        .values({ key, subject: p.subject, sign: p.sign, body, model: LIBRARY_MODEL })
+        .values({
+          key,
+          subject: p.subject,
+          sign: p.sign,
+          body,
+          model: LIBRARY_MODEL,
+        })
         .onConflictDoNothing();
       have.set(key, body);
     } catch (err) {
       console.warn(
         `[interp-library] generate failed for ${p.subject}:${p.sign}:`,
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }

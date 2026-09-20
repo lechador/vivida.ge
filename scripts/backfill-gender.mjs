@@ -12,7 +12,7 @@
 //   node scripts/backfill-gender.mjs --dry   → classify + print counts, no write
 //   node scripts/backfill-gender.mjs         → write results
 //
-// Reads GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION / DATABASE_URL from
+// Reads GOOGLE_CLOUD_PROJECT / DATABASE_URL from
 // .env.local or the environment.
 
 import { readFileSync } from "node:fs";
@@ -30,7 +30,7 @@ try {
   }
 } catch {}
 
-const MODEL = "gemini-3.5-flash-lite"; // classification — Flash Lite is plenty
+const MODEL = "gemini-3.8-flash"; // lightweight classification
 const BATCH = 40;
 const dry = process.argv.includes("--dry");
 
@@ -55,6 +55,7 @@ async function classify(batch) {
     model: MODEL,
     contents: JSON.stringify(batch.map((r) => ({ id: r.id, name: r.name }))),
     config: {
+      thinkingConfig: { thinkingLevel: "LOW" },
       systemInstruction: SYSTEM,
       temperature: 0,
       responseMimeType: "application/json",

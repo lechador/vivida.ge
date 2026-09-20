@@ -25,7 +25,7 @@ import { signByIndex } from "@/lib/zodiac";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 // Same high-quality model as the interpretation library — volume is a few
 // emails a day, so we spend the good model on warmth.
-const BIRTHDAY_MODEL = "google/gemini-3.1-pro-preview";
+const BIRTHDAY_MODEL = "google/gemini-3.8-flash";
 
 // RESEND_FROM may be a bare address or a full "Name <email>" string —
 // normalize so the sender always shows "Vivida", never a raw mailbox name.
@@ -34,7 +34,10 @@ function resolveFrom(envVal: string | undefined, fallback: string): string {
   return envVal.includes("<") ? envVal : `Vivida <${envVal}>`;
 }
 
-const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <onboarding@resend.dev>");
+const FROM = resolveFrom(
+  process.env.RESEND_FROM,
+  "Vivida <onboarding@resend.dev>",
+);
 const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -107,8 +110,8 @@ async function alreadyGiftedThisYear(userId: string): Promise<boolean> {
       and(
         eq(emailSendLog.userId, userId),
         eq(emailSendLog.kind, "birthday"),
-        gt(emailSendLog.sentAt, cutoff)
-      )
+        gt(emailSendLog.sentAt, cutoff),
+      ),
     )
     .limit(1);
   return !!row;
@@ -134,7 +137,7 @@ interface OpenRouterJson {
  */
 export async function generateBirthdayCopy(
   name: string | null,
-  sunSignKa: string | null
+  sunSignKa: string | null,
 ): Promise<string[]> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
@@ -165,6 +168,7 @@ export async function generateBirthdayCopy(
     },
     body: JSON.stringify({
       model: BIRTHDAY_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -186,7 +190,7 @@ export async function generateBirthdayCopy(
     .trim();
   const parsed = JSON.parse(stripped) as { p1?: string; p2?: string };
   const out = [parsed.p1, parsed.p2].filter(
-    (p): p is string => typeof p === "string" && p.trim().length > 0
+    (p): p is string => typeof p === "string" && p.trim().length > 0,
   );
   if (out.length === 0) throw new Error("empty birthday copy");
   return out;
@@ -238,7 +242,10 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
         // Gift applied but no way to email — mark so admin can see it.
         await db
           .update(emailSendLog)
-          .set({ status: "failed", error: resend ? "no email address" : "resend not configured" })
+          .set({
+            status: "failed",
+            error: resend ? "no email address" : "resend not configured",
+          })
           .where(eq(emailSendLog.id, claim.id));
         result.failed++;
         continue;
@@ -254,7 +261,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
       } catch (err) {
         console.warn(
           "[birthday] AI copy failed, using fallback:",
-          (err as Error).message
+          (err as Error).message,
         );
         paragraphs = FALLBACK_PARAGRAPHS;
       }
@@ -273,7 +280,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
             dashboardUrl: `${ORIGIN.replace(/\/$/, "")}/dashboard`,
           }),
         },
-        { idempotencyKey: `birthday:${u.userId}:${year}` }
+        { idempotencyKey: `birthday:${u.userId}:${year}` },
       );
 
       if (send.error) {
@@ -293,7 +300,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
       result.failed++;
       console.warn(
         `[birthday] failed for ${u.userId}:`,
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }

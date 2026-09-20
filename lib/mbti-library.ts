@@ -7,7 +7,7 @@
  *                  the Georgian archetype name.
  *   - `type_sun` — how each type expresses through each Sun sign (16 × 12 = 192).
  *
- * Bulk seeding runs via scripts/seed-mbti-library.mjs (Vertex, gemini-2.5-pro).
+ * Bulk seeding runs via scripts/seed-mbti-library.mjs (Vertex, gemini-3.8-flash).
  * The generators here (OpenRouter) are the live self-heal path for gaps.
  */
 
@@ -20,13 +20,25 @@ import { mbtiArchetypeKa } from "@/lib/mbti-questions";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 /** Self-heal uses the strong model to match seed quality. */
-export const MBTI_LIBRARY_MODEL = "google/gemini-3.1-pro-preview";
+export const MBTI_LIBRARY_MODEL = "google/gemini-3.8-flash";
 
 export const MBTI_TYPES = [
-  "ISTJ", "ISFJ", "INFJ", "INTJ",
-  "ISTP", "ISFP", "INFP", "INTP",
-  "ESTP", "ESFP", "ENFP", "ENTP",
-  "ESTJ", "ESFJ", "ENFJ", "ENTJ",
+  "ISTJ",
+  "ISFJ",
+  "INFJ",
+  "INTJ",
+  "ISTP",
+  "ISFP",
+  "INFP",
+  "INTP",
+  "ESTP",
+  "ESFP",
+  "ENFP",
+  "ENTP",
+  "ESTJ",
+  "ESFJ",
+  "ENFJ",
+  "ENTJ",
 ] as const;
 
 export function mbtiTypeKey(type: string): string {
@@ -99,7 +111,7 @@ export type MbtiLibraryEntry = { title: string | null; body: string };
 
 /** Batched read: key → {title, body}. Pure read — never generates. */
 export async function getMbtiLibraryEntries(
-  keys: string[]
+  keys: string[],
 ): Promise<Map<string, MbtiLibraryEntry>> {
   if (keys.length === 0) return new Map();
   const rows = await db
@@ -116,14 +128,17 @@ export async function getMbtiLibraryEntries(
 /** Convenience: fetch a type profile + its type×sun fusion in one read. */
 export async function getTypeAndSun(
   type: string,
-  signKey: string | null
-): Promise<{ typeEntry: MbtiLibraryEntry | null; sunEntry: MbtiLibraryEntry | null }> {
+  signKey: string | null,
+): Promise<{
+  typeEntry: MbtiLibraryEntry | null;
+  sunEntry: MbtiLibraryEntry | null;
+}> {
   const keys = [mbtiTypeKey(type)];
   if (signKey) keys.push(mbtiTypeSunKey(type, signKey));
   const map = await getMbtiLibraryEntries(keys);
   return {
     typeEntry: map.get(mbtiTypeKey(type)) ?? null,
-    sunEntry: signKey ? map.get(mbtiTypeSunKey(type, signKey)) ?? null : null,
+    sunEntry: signKey ? (map.get(mbtiTypeSunKey(type, signKey)) ?? null) : null,
   };
 }
 
@@ -141,12 +156,14 @@ export type MbtiSection = {
  */
 export async function getTypeSections(type: string): Promise<MbtiSection[]> {
   const map = await getMbtiLibraryEntries(
-    MBTI_SECTIONS.map((s) => mbtiSectionKey(s.kind, type))
+    MBTI_SECTIONS.map((s) => mbtiSectionKey(s.kind, type)),
   );
   return MBTI_SECTIONS.flatMap((s) => {
     const entry = map.get(mbtiSectionKey(s.kind, type));
     if (!entry?.body) return [];
-    return [{ kind: s.kind, titleKa: s.titleKa, format: s.format, body: entry.body }];
+    return [
+      { kind: s.kind, titleKa: s.titleKa, format: s.format, body: entry.body },
+    ];
   });
 }
 
@@ -179,7 +196,10 @@ export function buildTypeSunPrompt(type: string, signKey: string): string {
 }
 
 /** Prompt for a rich profile section (strengths/weaknesses/relationships/…). */
-export function buildSectionPrompt(kind: MbtiSectionKind, type: string): string {
+export function buildSectionPrompt(
+  kind: MbtiSectionKind,
+  type: string,
+): string {
   const label = `MBTI ტიპი ${type} (${mbtiArchetypeKa(type)})`;
   const listFmt =
     `ჩამოთვალე 6 პუნქტი. თითოეული ცალკე ხაზზე ფორმატით: **სათაური** — ერთი-ორი ` +
@@ -199,18 +219,26 @@ export function buildSectionPrompt(kind: MbtiSectionKind, type: string): string 
     case "strengths":
       return `დაწერე ${label}-ის ძლიერი მხარეები ქართულად.\n${listFmt}`;
     case "weaknesses":
-      return `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
-        `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`;
+      return (
+        `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
+        `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`
+      );
     case "romantic":
-      return dual("რომანტიკულ ურთიერთობებში (როგორ იქცევა, რას ეძებს პარტნიორში, როგორ იჩენს სიყვარულს)");
+      return dual(
+        "რომანტიკულ ურთიერთობებში (როგორ იქცევა, რას ეძებს პარტნიორში, როგორ იჩენს სიყვარულს)",
+      );
     case "friendship":
       return dual("მეგობრობასა და სოციალურ კავშირებში");
     case "career":
       return dual("კარიერასა და პროფესიულ გზაზე");
     case "workplace":
-      return dual("სამუშაო ადგილზე და გუნდში (როგორც კოლეგა, ხელქვეითი და ლიდერი)");
+      return dual(
+        "სამუშაო ადგილზე და გუნდში (როგორც კოლეგა, ხელქვეითი და ლიდერი)",
+      );
     case "growth":
-      return dual("პიროვნული ზრდის თვალსაზრისით (რა არის საყრდენი და რაზე უნდა იმუშაოს)");
+      return dual(
+        "პიროვნული ზრდის თვალსაზრისით (რა არის საყრდენი და რაზე უნდა იმუშაოს)",
+      );
   }
 }
 
@@ -232,6 +260,7 @@ async function generateBody(prompt: string): Promise<string> {
     },
     body: JSON.stringify({
       model: MBTI_LIBRARY_MODEL,
+      reasoning: { effort: "low" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: prompt },
@@ -286,7 +315,10 @@ export async function ensureMbtiLibraryFor(combos: MbtiCombo[]): Promise<void> {
         })
         .onConflictDoNothing();
     } catch (err) {
-      console.warn(`[mbti-library] generate failed for ${c.key}:`, (err as Error).message);
+      console.warn(
+        `[mbti-library] generate failed for ${c.key}:`,
+        (err as Error).message,
+      );
     }
   }
 }

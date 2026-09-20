@@ -17,7 +17,7 @@
 //   node scripts/seed-synastry-library.mjs --force        → overwrite non-edited
 //   node scripts/seed-synastry-library.mjs --kind=aspect  → only one kind
 //
-// Reads GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION / DATABASE_URL from
+// Reads GOOGLE_CLOUD_PROJECT / DATABASE_URL from
 // .env.local or the environment.
 
 import { readFileSync } from "node:fs";
@@ -25,13 +25,17 @@ import { neon } from "@neondatabase/serverless";
 import { GoogleGenAI } from "@google/genai";
 
 try {
-  for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+  for (const line of readFileSync(
+    new URL("../.env.local", import.meta.url),
+    "utf8",
+  ).split("\n")) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    if (m && !process.env[m[1]])
+      process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
   }
 } catch {}
 
-const MODEL = "gemini-2.5-pro";
+const MODEL = "gemini-3.8-flash";
 const CONCURRENCY = 5;
 const force = process.argv.includes("--force");
 const kindArg = process.argv.find((a) => a.startsWith("--kind="));
@@ -39,10 +43,19 @@ const onlyKinds = kindArg ? kindArg.slice("--kind=".length).split(",") : null;
 
 // ── Georgian vocabulary (mirrors lib/synastry-interpretation.ts labels) ──────
 const BODY_KA = {
-  sun: "მზე", moon: "მთვარე", mercury: "მერკური", venus: "ვენერა",
-  mars: "მარსი", jupiter: "იუპიტერი", saturn: "სატურნი", uranus: "ურანი",
-  neptune: "ნეპტუნი", pluto: "პლუტონი", chiron: "ქირონი",
-  ascendant: "ასცენდენტი", midheaven: "MC (ზენიტი)",
+  sun: "მზე",
+  moon: "მთვარე",
+  mercury: "მერკური",
+  venus: "ვენერა",
+  mars: "მარსი",
+  jupiter: "იუპიტერი",
+  saturn: "სატურნი",
+  uranus: "ურანი",
+  neptune: "ნეპტუნი",
+  pluto: "პლუტონი",
+  chiron: "ქირონი",
+  ascendant: "ასცენდენტი",
+  midheaven: "MC (ზენიტი)",
 };
 const BODY_MEANING_KA = {
   sun: "იდენტობა, ეგო, სასიცოცხლო ენერგია",
@@ -62,11 +75,26 @@ const BODY_MEANING_KA = {
 const BODY_KEYS = Object.keys(BODY_KA);
 
 const KIND_KA = {
-  conjunction: { label: "შეერთება", nature: "ძლიერი შერწყმა — ორი ენერგია ერთ წერტილში ერთიანდება" },
-  sextile: { label: "სექსტილი", nature: "მსუბუქი ჰარმონია — შესაძლებლობა, რომელიც ცოტა ძალისხმევას ითხოვს" },
-  square: { label: "კვადრატი", nature: "დაძაბულობა და ხახუნი — მაგრამ ზრდის მთავარი ძრავა" },
-  trine: { label: "ტრიგონი", nature: "ბუნებრივი, უპრობლემო დინება ორ ენერგიას შორის" },
-  opposition: { label: "ოპოზიცია", nature: "პოლარობა — მიზიდულობაც და დაპირისპირებაც, ბალანსის ძიება" },
+  conjunction: {
+    label: "შეერთება",
+    nature: "ძლიერი შერწყმა — ორი ენერგია ერთ წერტილში ერთიანდება",
+  },
+  sextile: {
+    label: "სექსტილი",
+    nature: "მსუბუქი ჰარმონია — შესაძლებლობა, რომელიც ცოტა ძალისხმევას ითხოვს",
+  },
+  square: {
+    label: "კვადრატი",
+    nature: "დაძაბულობა და ხახუნი — მაგრამ ზრდის მთავარი ძრავა",
+  },
+  trine: {
+    label: "ტრიგონი",
+    nature: "ბუნებრივი, უპრობლემო დინება ორ ენერგიას შორის",
+  },
+  opposition: {
+    label: "ოპოზიცია",
+    nature: "პოლარობა — მიზიდულობაც და დაპირისპირებაც, ბალანსის ძიება",
+  },
 };
 const ASPECT_KINDS = Object.keys(KIND_KA);
 
@@ -128,14 +156,18 @@ function overlayPrompt(body, house) {
 const ai = new GoogleGenAI({
   vertexai: true,
   project: process.env.GOOGLE_CLOUD_PROJECT,
-  location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+  location: "global",
 });
 
 async function generate(prompt) {
   const res = await ai.models.generateContent({
     model: MODEL,
     contents: prompt,
-    config: { systemInstruction: SYSTEM, temperature: 0.8 },
+    config: {
+      thinkingConfig: { thinkingLevel: "LOW" },
+      systemInstruction: SYSTEM,
+      temperature: 0.8,
+    },
   });
   const body = res.text?.trim();
   if (!body) throw new Error("empty");
@@ -143,13 +175,18 @@ async function generate(prompt) {
 }
 
 async function main() {
-  if (!process.env.GOOGLE_CLOUD_PROJECT) throw new Error("GOOGLE_CLOUD_PROJECT missing");
+  if (!process.env.GOOGLE_CLOUD_PROJECT)
+    throw new Error("GOOGLE_CLOUD_PROJECT missing");
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
   const sql = neon(process.env.DATABASE_URL);
 
-  const kinds = ["aspect", "overlay"].filter((k) => !onlyKinds || onlyKinds.includes(k));
+  const kinds = ["aspect", "overlay"].filter(
+    (k) => !onlyKinds || onlyKinds.includes(k),
+  );
   const existing = new Map(
-    (await sql`SELECT key, edited FROM synastry_interpretation_library`).map((r) => [r.key, r.edited])
+    (await sql`SELECT key, edited FROM synastry_interpretation_library`).map(
+      (r) => [r.key, r.edited],
+    ),
   );
 
   const tasks = [];
@@ -177,8 +214,12 @@ async function main() {
     }
   }
 
-  console.log(`tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`);
-  let done = 0, ok = 0, fail = 0;
+  console.log(
+    `tasks: ${tasks.length} (force=${force}, model=${MODEL} via Vertex AI)`,
+  );
+  let done = 0,
+    ok = 0,
+    fail = 0;
 
   async function worker(queue) {
     for (;;) {
@@ -186,7 +227,9 @@ async function main() {
       if (!t) return;
       try {
         const prompt =
-          t.kind === "aspect" ? aspectPrompt(t.a, t.b, t.aspectKind) : overlayPrompt(t.a, t.house);
+          t.kind === "aspect"
+            ? aspectPrompt(t.a, t.b, t.aspectKind)
+            : overlayPrompt(t.a, t.house);
         const body = await generate(prompt);
         await sql`
           INSERT INTO synastry_interpretation_library
@@ -211,4 +254,7 @@ async function main() {
   console.log(`done: ${ok} written, ${fail} failed`);
 }
 
-main().catch((e) => { console.error(e.message); process.exit(1); });
+main().catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

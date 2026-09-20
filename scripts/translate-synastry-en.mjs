@@ -19,7 +19,7 @@ try {
 
 const sql = neon(process.env.DATABASE_URL);
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-3.5-flash-lite";
+const MODEL = "google/gemini-3.8-flash";
 const API_KEY = process.env.OPENROUTER_API_KEY;
 
 if (!API_KEY) {
@@ -52,6 +52,7 @@ async function translateText(text) {
         },
         body: JSON.stringify({
           model: MODEL,
+          reasoning: { effort: "low" },
           messages: [
             { role: "system", content: SYSTEM_PROMPT },
             { role: "user", content: text },
@@ -98,6 +99,7 @@ async function translateAspectJson(item) {
         },
         body: JSON.stringify({
           model: MODEL,
+          reasoning: { effort: "low" },
           messages: [
             { role: "system", content: SYSTEM_PROMPT_JSON },
             { role: "user", content: JSON.stringify(item) },
