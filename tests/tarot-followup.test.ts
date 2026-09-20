@@ -65,7 +65,14 @@ describe("performFollowup", () => {
   beforeEach(() => {
     mocks.getBalance.mockResolvedValue(20);
     mocks.spendOnce.mockResolvedValue("unlocked");
-    mocks.generateTarotFollowup.mockResolvedValue({ answer: "AI answer" });
+    mocks.generateTarotFollowup.mockResolvedValue({
+      answer: "AI answer",
+      followupSuggestions: [
+        "What should I notice?",
+        "What can I clarify?",
+        "What step can I take?",
+      ],
+    });
     mocks.getLibraryEntry.mockResolvedValue(storedEntry());
     mocks.archiveLibraryEntry.mockResolvedValue({ id: "lib-1" });
     mocks.isPremiumUser.mockResolvedValue(false);
@@ -112,6 +119,22 @@ describe("performFollowup", () => {
       }),
     );
     expect(result.followup.followups).toHaveLength(1);
+    expect(result.followup.followupSuggestions).toEqual([
+      "What should I notice?",
+      "What can I clarify?",
+      "What step can I take?",
+    ]);
+    expect(mocks.archiveLibraryEntry).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.objectContaining({
+          followupSuggestions: [
+            "What should I notice?",
+            "What can I clarify?",
+            "What step can I take?",
+          ],
+        }),
+      }),
+    );
   });
 
   it("charges the follow-up price from the second follow-up on", async () => {

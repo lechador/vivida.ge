@@ -37,6 +37,7 @@ import {
   takePendingTarotQuestion,
   type PendingTarotAttempt,
 } from "@/lib/tarot/pending-question";
+import { normalizeTarotFollowupSuggestions } from "@/lib/tarot/followup-suggestions";
 import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 
 type SpreadCard = {
@@ -60,6 +61,7 @@ type Reading = {
   cards: SpreadCard[];
   reading: string;
   advice: string;
+  followupSuggestions: string[];
   charged: number;
   free: boolean;
   balance: number;
@@ -91,6 +93,7 @@ type HistoryItem = {
     }>;
     reading: string;
     advice: string;
+    followupSuggestions?: string[];
     charged?: number;
     free?: boolean;
     degraded?: boolean;
@@ -206,6 +209,11 @@ export function TarotReader({
       })),
       reading: content.reading,
       advice: content.advice,
+      followupSuggestions: normalizeTarotFollowupSuggestions(
+        content.followupSuggestions,
+        locale,
+        (content.followups ?? []).map((followup) => followup.question),
+      ),
       charged: content.charged ?? 0,
       free: content.free ?? false,
       balance: 0,
@@ -338,19 +346,6 @@ export function TarotReader({
     setActiveHistoryId(null);
   }
 
-  const FOLLOWUP_SUGGESTIONS: Record<UserLocale, string[]> = {
-    ka: [
-      "უფრო მარტივად ამიხსენი",
-      "ეს ჩემს სიტუაციას როგორ უკავშირდება?",
-      "რომელ ნაბიჯზე დავფიქრდე?",
-    ],
-    en: [
-      "Explain this more simply",
-      "How does this connect to my situation?",
-      "Which next step should I consider?",
-    ],
-  };
-
   async function askFollowup(preset?: string) {
     if (!reading?.libraryId || followupStatus === "sending") return;
     const fq = (preset ?? followupQuestion).trim();
@@ -412,6 +407,7 @@ export function TarotReader({
         balance: number;
         libraryId: string;
         followups: TarotFollowup[];
+        followupSuggestions: string[];
       };
       trackEvent(ANALYTICS_EVENT.tarotFollowupCompleted, {
         free: next.free ? 1 : 0,
@@ -428,7 +424,15 @@ export function TarotReader({
         free: next.free ? 1 : 0,
         content_name: "tarot_followup",
       });
-      setReading({ ...reading, followups: next.followups });
+      setReading({
+        ...reading,
+        followups: next.followups,
+        followupSuggestions: normalizeTarotFollowupSuggestions(
+          next.followupSuggestions,
+          locale,
+          next.followups.map((followup) => followup.question),
+        ),
+      });
       setFollowupQuestion("");
       setFollowupStatus("idle");
     } catch {
@@ -438,6 +442,11 @@ export function TarotReader({
 
   function renderFollowup(inputId: string) {
     if (!reading?.libraryId) return null;
+    const followupSuggestions = normalizeTarotFollowupSuggestions(
+      reading.followupSuggestions,
+      locale,
+      reading.followups.map((followup) => followup.question),
+    );
     return (
       <div className="rounded-2xl border border-border bg-background/35 p-4 sm:p-5">
         <div className="text-sm font-semibold text-foreground">
@@ -471,7 +480,7 @@ export function TarotReader({
         ))}
 
         <div className="mt-3 flex flex-wrap gap-2">
-          {FOLLOWUP_SUGGESTIONS[locale].map((suggestion) => (
+          {followupSuggestions.map((suggestion) => (
             <button
               key={suggestion}
               type="button"
@@ -847,8 +856,10 @@ export function TarotReader({
             </div>
           </div>
 
-          {authed && !premium && !reading.fromHistory && (
-            reading.balance >= cost ? (
+          {authed &&
+            !premium &&
+            !reading.fromHistory &&
+            (reading.balance >= cost ? (
               <div className="rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 p-4 text-center">
                 <p className="text-sm font-medium text-foreground/90">
                   {en
@@ -877,8 +888,7 @@ export function TarotReader({
                   countryCode={countryCode}
                 />
               </div>
-            )
-          )}
+            ))}
 
           {/* Free second-action rail — a next step at the peak-engagement
               moment, instead of dead-ending at the credit-gated new question. */}

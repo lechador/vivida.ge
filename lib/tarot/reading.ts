@@ -18,6 +18,10 @@ import {
   type DeckCard,
 } from "@/lib/tarot/deck-full";
 import { tarotSpreadById, type TarotSpreadId } from "@/lib/tarot/spreads";
+import {
+  normalizeTarotFollowupSuggestions,
+  tarotFollowupFallback,
+} from "@/lib/tarot/followup-suggestions";
 import type { TarotFollowupEntry } from "@/lib/tarot/followup";
 import type { UserLocale } from "@/lib/i18n/locale";
 import { archiveLibraryEntry, getLibraryEntryBySource } from "@/lib/library";
@@ -47,6 +51,8 @@ export type TarotReading = {
   cards: TarotSpreadCard[];
   reading: string;
   advice: string;
+  /** Contextual questions generated from this reading. */
+  followupSuggestions: string[];
   charged: number;
   free: boolean;
   balance: number;
@@ -100,6 +106,7 @@ function fallbackReading(
   cards: string[];
   reading: string;
   advice: string;
+  followupSuggestions: string[];
 } {
   const copy = drawn.map((card) => cardCopy(card, locale));
   const perCard = copy.map((card) => card.meaning);
@@ -112,6 +119,7 @@ function fallbackReading(
         `Three cards speak to your question. ${past} stands at the root, ${present} defines the present, and ${future} opens the path ahead. ` +
         perCard.join(" "),
       advice: perCard[1],
+      followupSuggestions: tarotFollowupFallback(locale),
     };
   }
   return {
@@ -123,6 +131,7 @@ function fallbackReading(
     advice: drawn[1].reversed
       ? drawn[1].card.reversedKa
       : drawn[1].card.uprightKa,
+    followupSuggestions: tarotFollowupFallback(locale),
   };
 }
 
@@ -193,6 +202,11 @@ export async function performReading(
           cards: replayedCards,
           reading: existing.content.reading,
           advice: existing.content.advice,
+          followupSuggestions: normalizeTarotFollowupSuggestions(
+            existing.content.followupSuggestions,
+            locale,
+            followups.map((item) => item.question),
+          ),
           charged: existing.content.charged ?? 0,
           free: existing.content.free ?? false,
           balance,
@@ -299,6 +313,11 @@ export async function performReading(
     );
   }
   const composed = ai ?? fallbackReading(drawn, locale);
+  const followupSuggestions = normalizeTarotFollowupSuggestions(
+    composed.followupSuggestions,
+    locale,
+    [q],
+  );
 
   const cards: TarotSpreadCard[] = drawn.map((d, i) => ({
     slug: d.card.slug,
@@ -323,6 +342,7 @@ export async function performReading(
       cards,
       reading: composed.reading,
       advice: composed.advice,
+      followupSuggestions,
       charged,
       free,
       degraded,
@@ -342,6 +362,7 @@ export async function performReading(
       cards,
       reading: composed.reading,
       advice: composed.advice,
+      followupSuggestions,
       charged,
       free,
       balance,

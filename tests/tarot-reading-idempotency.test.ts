@@ -67,6 +67,11 @@ describe("performReading request idempotency", () => {
         ],
         reading: "Stored reading",
         advice: "Stored advice",
+        followupSuggestions: [
+          "What should I notice?",
+          "What can I clarify?",
+          "What step can I take?",
+        ],
         charged: 0,
         free: true,
       },
@@ -98,6 +103,11 @@ describe("performReading request idempotency", () => {
         ],
         reading: "Stored reading",
         advice: "Stored advice",
+        followupSuggestions: [
+          "What should I notice?",
+          "What can I clarify?",
+          "What step can I take?",
+        ],
         charged: 0,
         free: true,
         balance: 5,

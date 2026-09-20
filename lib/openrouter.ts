@@ -1795,9 +1795,10 @@ const TAROT_SYSTEM_PROMPT_KA = `შენ ხარ გამოცდილი,
 - ფინანსურ, სამედიცინო ან იურიდიულ კითხვაზე გადაწყვეტილება მომხმარებლის ნაცვლად არ მიიღო. გამოკვეთე შესამოწმებელი ფაქტორი ან უსაფრთხო შემდეგი ნაბიჯი და, როცა საჭიროა, შესაბამის სპეციალისტთან გადაამისამართე.
 - ორი გზის შედარებისას გააშუქე ორივე გზა და გადაწყვეტილების კრიტერიუმები; ერთ-ერთს ობიექტურ გამარჯვებულად ნუ გამოაცხადებ.
 - წერე გამართული, ბუნებრივი ქართულით. არ აურიო სხვა დამწერლობა ან უცხოენოვანი სიტყვები, თუ მათი გამოყენება აუცილებელი არ არის. მომხმარებელს მიმართე მხოლოდ "შენ"-ით — არ გამოიყენო "ძვირფასო", "ჩემო კარგო" ან მსგავსი მიმართვა. პასუხამდე გადაამოწმე ქართული მართლწერა.
+- "followupSuggestions"-ში დაწერე ზუსტად 3 მოკლე კითხვა, რომელთა დასმაც მომხმარებელს ამავე გაშლის გასაღრმავებლად ბუნებრივად მოუნდება. კითხვები უნდა ეფუძნებოდეს კონკრეტულად შენს პასუხს, ეხებოდეს სამ განსხვავებულ ჯერ კიდევ გასარკვევ თემას, არ იმეორებდეს საწყის კითხვას და არ ითხოვდეს ახალი კარტების გაშლას.
 - დააბრუნე მხოლოდ ვალიდური JSON.
 
-JSON ფორმატი: {"headline": "მოკლე, ძლიერი სათაური (3-7 სიტყვა)", "cards": ["თითო კარტის კონკრეტული ინტერპრეტაცია კითხვის კონტექსტში — 3 ელემენტი, თითო 1-2 წინადადება, პოზიციების მიხედვით"], "reading": "1-2 აბზაცი, სამივე კარტის სინთეზი კითხვასთან", "advice": "ერთი კონკრეტული, ქმედითი რჩევა"}`;
+JSON ფორმატი: {"headline": "მოკლე, ძლიერი სათაური (3-7 სიტყვა)", "cards": ["თითო კარტის კონკრეტული ინტერპრეტაცია კითხვის კონტექსტში — 3 ელემენტი, თითო 1-2 წინადადება, პოზიციების მიხედვით"], "reading": "1-2 აბზაცი, სამივე კარტის სინთეზი კითხვასთან", "advice": "ერთი კონკრეტული, ქმედითი რჩევა", "followupSuggestions": ["ზუსტად 3 მოკლე, პასუხზე მორგებული ჩასაღრმავებელი კითხვა"]}`;
 
 const TAROT_SYSTEM_PROMPT_EN = `You are an experienced, warm tarot reader. The user asks a question and receives a three-card spread. Write a vivid, specific and compassionate reading in English that connects all three cards directly to the user's question.
 
@@ -1813,9 +1814,10 @@ Rules:
 - Do not turn a card theme into a claim about the user: write "the Seven of Cups invites you to check whether information is missing", not "you are deluded".
 - For financial, medical, or legal questions, do not decide for the user. Identify a fact to verify or a safer next step and refer to a qualified professional when appropriate.
 - When comparing choices, illuminate each path and decision criteria without declaring a winner as though the cards establish an objective fact.
+- In "followupSuggestions", write exactly 3 short questions the user would naturally ask to explore this same reading further. Ground them in your specific answer, cover three distinct unresolved angles, do not repeat the original question, and do not ask for a new card draw.
 - Return valid JSON only.
 
-JSON format: {"headline": "short compelling title (3-7 words)", "cards": ["one question-specific interpretation for each card, in spread order; 1-2 sentences each"], "reading": "1-2 paragraphs synthesizing all three cards in relation to the question", "advice": "one concrete, actionable suggestion"}`;
+JSON format: {"headline": "short compelling title (3-7 words)", "cards": ["one question-specific interpretation for each card, in spread order; 1-2 sentences each"], "reading": "1-2 paragraphs synthesizing all three cards in relation to the question", "advice": "one concrete, actionable suggestion", "followupSuggestions": ["exactly 3 short, response-specific follow-up questions"]}`;
 
 /**
  * Extra user-message lines for non-default spreads. Empty for the default
@@ -1847,6 +1849,7 @@ export type TarotReadingResult = {
   cards: string[];
   reading: string;
   advice: string;
+  followupSuggestions: string[];
 };
 
 export type TarotCardInput = {
@@ -1888,8 +1891,22 @@ const TAROT_READING_RESPONSE_FORMAT = {
           description:
             "One practical next step, separate from the cards array.",
         },
+        followupSuggestions: {
+          type: "array",
+          description:
+            "Exactly three short, distinct questions grounded in this response that explore unresolved angles without requesting a new draw.",
+          items: { type: "string", minLength: 3 },
+          minItems: 3,
+          maxItems: 3,
+        },
       },
-      required: ["headline", "cards", "reading", "advice"],
+      required: [
+        "headline",
+        "cards",
+        "reading",
+        "advice",
+        "followupSuggestions",
+      ],
       additionalProperties: false,
     },
   },
@@ -1902,8 +1919,18 @@ const TAROT_FOLLOWUP_RESPONSE_FORMAT = {
     strict: true,
     schema: {
       type: "object",
-      properties: { answer: { type: "string", minLength: 1 } },
-      required: ["answer"],
+      properties: {
+        answer: { type: "string", minLength: 1 },
+        followupSuggestions: {
+          type: "array",
+          description:
+            "Exactly three short, distinct questions grounded in the latest answer for continuing with the same cards.",
+          items: { type: "string", minLength: 3 },
+          minItems: 3,
+          maxItems: 3,
+        },
+      },
+      required: ["answer", "followupSuggestions"],
       additionalProperties: false,
     },
   },
@@ -2000,7 +2027,12 @@ export async function generateTarotReading(input: {
     typeof parsed.reading !== "string" ||
     !parsed.reading.trim() ||
     typeof parsed.advice !== "string" ||
-    !parsed.advice.trim()
+    !parsed.advice.trim() ||
+    !Array.isArray(parsed.followupSuggestions) ||
+    parsed.followupSuggestions.length !== 3 ||
+    parsed.followupSuggestions.some(
+      (suggestion) => typeof suggestion !== "string" || !suggestion.trim(),
+    )
   ) {
     throw new Error("missing required fields in tarot reading");
   }
@@ -2009,6 +2041,9 @@ export async function generateTarotReading(input: {
     cards: parsed.cards,
     reading: parsed.reading,
     advice: parsed.advice,
+    followupSuggestions: parsed.followupSuggestions.map((suggestion) =>
+      suggestion.trim(),
+    ),
   };
 }
 
@@ -2021,9 +2056,10 @@ const TAROT_FOLLOWUP_SYSTEM_PROMPT_KA = `შენ ხარ გამოცდ�
 - იყავი კონკრეტული და პრაქტიკული, არა ბუნდოვანი მისტიკა.
 - არ დაჰპირდე გარანტირებულ მომავალს; ტარო ხედვაა, არა წინასწარმეტყველება.
 - არ მისცე კატეგორიული ფინანსური, სამედიცინო ან იურიდიული რჩევა.
+- "followupSuggestions"-ში დაწერე ზუსტად 3 მოკლე, ერთმანეთისგან განსხვავებული კითხვა, რომლებიც შენს ახალ პასუხში დარჩენილ თემებს ამავე კარტებით გააღრმავებს. არ გაიმეორო უკვე დასმული კითხვები და არ შესთავაზო ახალი გაშლა.
 - დააბრუნე მხოლოდ JSON.
 
-JSON ფორმატი: {"answer": "მოკლე პასუხი დამატებით კითხვაზე"}`;
+JSON ფორმატი: {"answer": "მოკლე პასუხი დამატებით კითხვაზე", "followupSuggestions": ["ზუსტად 3 მოკლე კითხვა შემდეგი დაზუსტებისთვის"]}`;
 
 const TAROT_FOLLOWUP_SYSTEM_PROMPT_EN = `You are an experienced, warm tarot reader. The user already received a three-card reading and now asks a follow-up question about the same cards. Answer briefly (2-4 sentences) in English, grounding your answer only in these cards and the previous reading.
 
@@ -2033,12 +2069,14 @@ Rules:
 - Be practical and specific, not vague mysticism.
 - Never promise a guaranteed future. Tarot is a tool for reflection, not certainty.
 - Do not give categorical financial, medical or legal advice.
+- In "followupSuggestions", write exactly 3 short, distinct questions grounded in the latest answer that continue exploring the same cards. Do not repeat questions already asked or suggest a new draw.
 - Return JSON only.
 
-JSON format: {"answer": "a short answer to the follow-up question"}`;
+JSON format: {"answer": "a short answer to the follow-up question", "followupSuggestions": ["exactly 3 short questions for the next clarification"]}`;
 
 export type TarotFollowupResult = {
   answer: string;
+  followupSuggestions: string[];
 };
 
 /**
@@ -2052,6 +2090,7 @@ export async function generateTarotFollowup(input: {
   reading: string;
   advice: string;
   followupQuestion: string;
+  previousFollowupQuestions?: string[];
   locale?: UserLocale;
 }): Promise<TarotFollowupResult | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -2079,6 +2118,13 @@ export async function generateTarotFollowup(input: {
     "",
     en ? `Previous advice: ${input.advice}` : `წინა რჩევა: ${input.advice}`,
     "",
+    ...(input.previousFollowupQuestions?.length
+      ? [
+          en ? "Questions already asked:" : "უკვე დასმული კითხვები:",
+          ...input.previousFollowupQuestions.map((question) => `- ${question}`),
+          "",
+        ]
+      : []),
     en
       ? `Follow-up question: “${input.followupQuestion}”`
       : `დამატებითი კითხვა: „${input.followupQuestion}"`,
@@ -2130,10 +2176,23 @@ export async function generateTarotFollowup(input: {
     .trim();
 
   const parsed = JSON.parse(stripped) as TarotFollowupResult;
-  if (typeof parsed.answer !== "string" || !parsed.answer.trim()) {
+  if (
+    typeof parsed.answer !== "string" ||
+    !parsed.answer.trim() ||
+    !Array.isArray(parsed.followupSuggestions) ||
+    parsed.followupSuggestions.length !== 3 ||
+    parsed.followupSuggestions.some(
+      (suggestion) => typeof suggestion !== "string" || !suggestion.trim(),
+    )
+  ) {
     throw new Error("missing required fields in tarot follow-up");
   }
-  return { answer: parsed.answer };
+  return {
+    answer: parsed.answer,
+    followupSuggestions: parsed.followupSuggestions.map((suggestion) =>
+      suggestion.trim(),
+    ),
+  };
 }
 
 // ── Streaming chat (chart chat / "ჰკითხე ვარსკვლავებს") ─────────────────────

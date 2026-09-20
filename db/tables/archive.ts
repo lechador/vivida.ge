@@ -147,6 +147,8 @@ export type LibraryEntryContent =
       }>;
       reading: string;
       advice: string;
+      /** Three contextual questions generated from the latest AI response. */
+      followupSuggestions?: string[];
       /** What this attempt settled: 0/free for the first reading, cost otherwise. */
       charged?: number;
       free?: boolean;

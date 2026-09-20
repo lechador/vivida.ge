@@ -45,6 +45,11 @@ describe("tarot OpenRouter prompts", () => {
       cards: ["ერთი", "ორი", "სამი"],
       reading: "პასუხი",
       advice: "რჩევა",
+      followupSuggestions: [
+        "რა მჭირდება ახლა?",
+        "რა ქმნის დაძაბულობას?",
+        "როგორ დავიწყო საუბარი?",
+      ],
     });
 
     await generateTarotReading({
@@ -90,7 +95,13 @@ describe("tarot OpenRouter prompts", () => {
       json_schema: {
         strict: true,
         schema: {
-          required: ["headline", "cards", "reading", "advice"],
+          required: [
+            "headline",
+            "cards",
+            "reading",
+            "advice",
+            "followupSuggestions",
+          ],
           additionalProperties: false,
         },
       },
@@ -99,7 +110,14 @@ describe("tarot OpenRouter prompts", () => {
   });
 
   it("includes the previous advice when answering a follow-up", async () => {
-    const fetchMock = mockOpenRouter({ answer: "დაზუსტებული პასუხი" });
+    const fetchMock = mockOpenRouter({
+      answer: "დაზუსტებული პასუხი",
+      followupSuggestions: [
+        "რომელი ფაქტი გადავამოწმო?",
+        "რა რისკი გავითვალისწინო?",
+        "როგორ შევადარო ვარიანტები?",
+      ],
+    });
 
     await generateTarotFollowup({
       question: "რომელი ნაბიჯია ახლა სასარგებლო?",
@@ -114,6 +132,7 @@ describe("tarot OpenRouter prompts", () => {
       reading: "ჯერ ყველა ფაქტი შეაგროვე.",
       advice: "შეადარე პირობები წერილობით.",
       followupQuestion: "კონკრეტულად რა შევამოწმო?",
+      previousFollowupQuestions: ["რომელი ინფორმაცია მაკლია?"],
       locale: "ka",
     });
 
@@ -121,12 +140,15 @@ describe("tarot OpenRouter prompts", () => {
     expect(request.messages[1]?.content).toContain(
       "წინა რჩევა: შეადარე პირობები წერილობით.",
     );
+    expect(request.messages[1]?.content).toContain(
+      "- რომელი ინფორმაცია მაკლია?",
+    );
     expect(request.response_format).toMatchObject({
       type: "json_schema",
       json_schema: {
         strict: true,
         schema: {
-          required: ["answer"],
+          required: ["answer", "followupSuggestions"],
           additionalProperties: false,
         },
       },
@@ -140,6 +162,7 @@ describe("tarot OpenRouter prompts", () => {
       cards: ["ერთი", "ორი"],
       reading: "პასუხი",
       advice: "რჩევა",
+      followupSuggestions: ["ერთი?", "ორი?", "სამი?"],
     });
 
     await expect(

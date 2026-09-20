@@ -5,6 +5,7 @@ import { generateTarotFollowup } from "@/lib/openrouter";
 import { archiveLibraryEntry, getLibraryEntry } from "@/lib/library";
 import { isPremiumUser } from "@/lib/premium";
 import type { UserLocale } from "@/lib/i18n/locale";
+import { normalizeTarotFollowupSuggestions } from "@/lib/tarot/followup-suggestions";
 
 /**
  * A follow-up question on an already-drawn spread. The first follow-up per
@@ -27,6 +28,7 @@ export type FollowupResult =
         balance: number;
         libraryId: string;
         followups: TarotFollowupEntry[];
+        followupSuggestions: string[];
       };
     }
   | { ok: false; error: "bad_request" | "not_found" }
@@ -104,6 +106,7 @@ export async function performFollowup(
   }));
 
   let answer: string | null = null;
+  let generatedSuggestions: string[] | null = null;
   let degraded = false;
   try {
     const ai = await generateTarotFollowup({
@@ -112,9 +115,11 @@ export async function performFollowup(
       reading: content.reading,
       advice: content.advice,
       followupQuestion: q,
+      previousFollowupQuestions: previous.map((item) => item.question),
       locale,
     });
     answer = ai?.answer ?? null;
+    generatedSuggestions = ai?.followupSuggestions ?? null;
     if (!answer) degraded = true;
   } catch (err) {
     degraded = true;
@@ -136,6 +141,11 @@ export async function performFollowup(
     free: first,
   };
   const followups = [...previous, next];
+  const followupSuggestions = normalizeTarotFollowupSuggestions(
+    generatedSuggestions ?? content.followupSuggestions,
+    locale,
+    [content.question, ...followups.map((item) => item.question)],
+  );
 
   await archiveLibraryEntry({
     userId,
@@ -143,7 +153,7 @@ export async function performFollowup(
     sourceId: entry.sourceId,
     title: entry.title,
     summary: entry.summary,
-    content: { ...content, followups },
+    content: { ...content, followups, followupSuggestions },
     href: entry.href,
     language: entry.language,
     occurredAt: entry.occurredAt,
@@ -154,6 +164,12 @@ export async function performFollowup(
   const balance = await getBalance(userId);
   return {
     ok: true,
-    followup: { ...next, balance, libraryId: entry.id, followups },
+    followup: {
+      ...next,
+      balance,
+      libraryId: entry.id,
+      followups,
+      followupSuggestions,
+    },
   };
 }
