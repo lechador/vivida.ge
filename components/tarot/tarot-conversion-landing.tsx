@@ -129,7 +129,7 @@ export function TarotConversionLanding({
                 ჩემი პირველი კითხვა — ₾0
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </a>
-              <span className="text-center text-xs leading-5 text-white/45 sm:text-left">
+              <span className="text-center text-xs leading-5 text-white/60 sm:text-left">
                 პასუხისთვის საჭიროა ანგარიში
                 <br className="hidden sm:block" /> · ბარათი არ გჭირდება
               </span>
@@ -406,7 +406,8 @@ export function TarotConversionLanding({
                 href={`/subscription?${new URLSearchParams({ next: "/taro", product: "tarot" }).toString()}`}
                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-[#d3bb79]/35 bg-[#d3bb79]/10 px-5 py-3 text-sm font-semibold text-[#ead69f] transition hover:bg-[#d3bb79]/16"
               >
-                {formatBillingAmount(pro.amountMinor, pro.currency, "ka")} / {proMonths === 1 ? "თვე" : `${proMonths} თვე`}
+                {formatBillingAmount(pro.amountMinor, pro.currency, "ka")} /{" "}
+                {proMonths === 1 ? "თვე" : `${proMonths} თვე`}
                 <ArrowRight className="size-4" />
               </Link>
             </div>
