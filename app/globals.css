@@ -529,6 +529,45 @@ html[lang="hy"] .locale-ka-only {
   will-change: transform;
 }
 
+/* Chat message entrance — quick fade + rise for newly arrived bubbles.
+   History already on screen stays static; only new turns animate. */
+@keyframes chat-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.chat-msg-in {
+  animation: chat-msg-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Chat panel entrance — the whole thread fades up once on open instead of
+   scrolling through the full history top-to-bottom. */
+@keyframes chat-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.chat-panel-in {
+  animation: chat-panel-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-msg-in,
+  .chat-panel-in {
+    animation: none;
+  }
+}
+
 /*
  * Scroll-reveal (see components/landing/reveal.tsx) — the CSS replacement for
  * framer-motion's fade-up on landing sections. Hidden until the shared

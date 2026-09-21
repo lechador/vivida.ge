@@ -15,11 +15,16 @@ import { ContextualPaywallActions } from "@/components/billing/contextual-paywal
 
 type Msg = { role: "user" | "assistant"; content: string };
 
+/** Client-side composer cap — mirrors MAX_MESSAGE_LEN in app/api/ask/route.ts. */
+export const CHAT_MAX_INPUT_LEN = 4000;
+/** Counter appears once the draft gets long or nears the cap. */
+const COUNTER_VISIBLE_FROM = 1200;
+
 const ERRORS_KA: Record<string, string> = {
   rate_limited: "დღევანდელი ლიმიტი ამოიწურა. სცადე ხვალ.",
   no_chart: "ჯერ შენი რუკა უნდა შეიქმნას.",
   unavailable: "სერვისი დროებით მიუწვდომელია.",
-  invalid_message: "შეტყობინება ცარიელია ან ძალიან გრძელია.",
+  invalid_message: "შეტყობინება ცარიელია ან 4000 სიმბოლოზე გრძელია.",
   needs_credits:
     "ბალანსი არ არის საკმარისი. მოიწვიე მეგობარი ან შეავსე ბალანსი.",
 };
@@ -28,7 +33,7 @@ const ERRORS_EN: Record<string, string> = {
   rate_limited: "You've reached today's limit. Try again tomorrow.",
   no_chart: "Create your natal chart first.",
   unavailable: "The service is temporarily unavailable.",
-  invalid_message: "Your message is empty or too long.",
+  invalid_message: "Your message is empty or longer than 4000 characters.",
   needs_credits: "You need more credits to ask another question.",
 };
 
@@ -56,20 +61,65 @@ export function ChartChat({
   const [needsCredits, setNeedsCredits] = useState(false);
   const [creditShortfall, setCreditShortfall] = useState({
     balance: 0,
-    cost: 1,
+    cost: 2,
   });
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
+  /** History rendered on open never animates / smooth-scrolls. */
+  const [initialCount] = useState(initialMessages.length);
+  const openedRef = useRef(false);
+  /** False once the reader scrolls up — streaming won't yank them back. */
+  const stickRef = useRef(true);
 
+  // Open at the bottom instantly: no top-to-bottom scroll sweep through
+  // the whole history. The panel itself fades up via .chat-panel-in.
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages]);
+    const el = listRef.current;
+    if (el && !openedRef.current) {
+      openedRef.current = true;
+      el.scrollTop = el.scrollHeight;
+    }
+  }, []);
+
+  // New turns glide to the bottom — unless the reader scrolled up to read.
+  useEffect(() => {
+    if (!openedRef.current || messages.length <= initialCount) return;
+    const el = listRef.current;
+    if (el && stickRef.current) {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    }
+  }, [messages, initialCount]);
+
+  function handleListScroll() {
+    const el = listRef.current;
+    if (!el) return;
+    stickRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+  }
+
+  // Auto-grow the composer up to its CSS cap.
+  function autosize() {
+    const el = composerRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }
+
+  useEffect(autosize, [input]);
 
   async function send(text: string) {
     const msg = text.trim();
     if (!msg || sending) return;
+    if (msg.length > CHAT_MAX_INPUT_LEN) {
+      setError(
+        (en ? ERRORS_EN : ERRORS_KA).invalid_message ??
+          (en ? "Message too long." : "შეტყობინება ძალიან გრძელია."),
+      );
+      return;
+    }
     setError(null);
     setNeedsCredits(false);
     setInput("");
+    stickRef.current = true;
     setMessages((prev) => [
       ...prev,
       { role: "user", content: msg },
@@ -148,22 +198,37 @@ export function ChartChat({
   }
 
   const empty = messages.length === 0;
+  const overLimit = input.trim().length > CHAT_MAX_INPUT_LEN;
+  const showCounter =
+    input.length >= COUNTER_VISIBLE_FROM ||
+    CHAT_MAX_INPUT_LEN - input.length < 500;
+  const remaining = CHAT_MAX_INPUT_LEN - input.length;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="chat-panel-in flex min-h-0 flex-1 flex-col">
       {/* Messages — the only scrolling region, so the header and composer
           stay put no matter how long the answer gets. */}
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+      <div
+        ref={listRef}
+        onScroll={handleListScroll}
+        className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1"
+      >
         {empty && (
-          <div className="rounded-2xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
-            <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-            <p className="text-pretty text-base text-foreground/85">
+          <div className="relative overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/25 bg-card/55 p-6 text-center shadow-[0_8px_40px_-16px_var(--vivida-violet)] ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--vivida-violet),var(--vivida-pink),transparent)]"
+            />
+            <div className="mx-auto mb-4 grid size-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] text-white shadow-lg shadow-[var(--vivida-violet)]/30">
+              <Sparkles className="size-5" />
+            </div>
+            <p className="text-pretty text-[15px] leading-relaxed text-foreground/85">
               {firstName ? `${firstName}, ` : ""}
               {en
-                ? "ask me anything about your chart—personality, emotions, relationships, career or timing."
+                ? "ask me anything about your chart — personality, emotions, relationships, career or timing."
                 : "დამისვი შეკითხვა შენი რუკის შესახებ — ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო."}
             </p>
-            <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
               {starters.map((starter) => (
                 <button
                   key={starter.id}
@@ -177,7 +242,7 @@ export function ChartChat({
                     });
                     void send(starter.text);
                   }}
-                  className="rounded-full border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-3 py-1.5 text-sm text-foreground/85 transition-colors hover:bg-[var(--vivida-violet)]/20"
+                  className="rounded-full border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-3.5 py-1.5 text-[13px] text-foreground/85 shadow-sm transition-all hover:-translate-y-px hover:bg-[var(--vivida-violet)]/20 hover:shadow"
                 >
                   {starter.text}
                 </button>
@@ -188,23 +253,28 @@ export function ChartChat({
 
         {messages.map((m, i) =>
           m.role === "user" ? (
-            <div key={i} className="flex justify-end">
-              <div className="max-w-[85%] rounded-2xl rounded-br-md bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm text-white shadow-md">
+            <div
+              key={i}
+              className={`flex justify-end ${i >= initialCount ? "chat-msg-in" : ""}`}
+            >
+              <div className="max-w-[85%] rounded-2xl rounded-br-md border border-white/15 bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap text-white shadow-lg shadow-[var(--vivida-violet)]/20">
                 {m.content}
               </div>
             </div>
           ) : (
-            <div key={i} className="flex items-start gap-2.5">
-              <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
+            <div
+              key={i}
+              className={`flex items-start gap-2.5 ${i >= initialCount ? "chat-msg-in" : ""}`}
+            >
+              <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-cyan))] text-white shadow-md shadow-[var(--vivida-violet)]/25">
                 <Sparkles className="size-3.5" />
               </div>
-              <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-tl-md border border-border bg-card/60 px-4 py-2.5 text-sm leading-relaxed text-foreground/90 ring-1 ring-foreground/5 backdrop-blur-xl">
+              <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-[var(--vivida-violet)]/15 bg-card/70 px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap text-foreground/90 shadow-sm ring-1 ring-foreground/5 backdrop-blur-xl">
                 {m.content || <TypingDots />}
               </div>
             </div>
           ),
         )}
-        <div ref={scrollRef} />
       </div>
 
       {error && (
@@ -233,35 +303,52 @@ export function ChartChat({
         }}
         className="mt-4 shrink-0"
       >
-        <div className="flex items-end gap-2 rounded-2xl border border-border bg-card/80 p-2 shadow-xl ring-1 ring-foreground/5 backdrop-blur-xl">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send(input);
-              }
-            }}
-            rows={1}
-            placeholder={en ? "Write your question…" : "დაწერე შეკითხვა…"}
-            disabled={sending}
-            className="max-h-32 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground"
-          />
-          <button
-            type="submit"
-            disabled={sending || !input.trim()}
-            aria-label={en ? "Send" : "გაგზავნა"}
-            className="grid size-10 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-md transition-opacity disabled:opacity-40"
-          >
-            <Send className="size-4" />
-          </button>
+        <div className="rounded-2xl border border-border bg-card/80 shadow-xl ring-1 ring-foreground/5 backdrop-blur-xl transition-shadow focus-within:border-[var(--vivida-violet)]/50 focus-within:shadow-[0_0_0_3px_var(--vivida-violet)/15,0_8px_40px_-16px_var(--vivida-violet)]">
+          <div className="flex items-end gap-2 p-2">
+            <textarea
+              ref={composerRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send(input);
+                }
+              }}
+              rows={1}
+              maxLength={CHAT_MAX_INPUT_LEN + 200}
+              placeholder={en ? "Write your question…" : "დაწერე შეკითხვა…"}
+              disabled={sending}
+              aria-describedby="chat-char-counter"
+              className="max-h-[200px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm leading-relaxed outline-none placeholder:text-muted-foreground"
+            />
+            <button
+              type="submit"
+              disabled={sending || !input.trim() || overLimit}
+              aria-label={en ? "Send" : "გაგზავნა"}
+              className="grid size-10 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-md transition-all hover:scale-105 hover:shadow-lg active:scale-95 disabled:scale-100 disabled:opacity-40"
+            >
+              <Send className="size-4" />
+            </button>
+          </div>
+          {showCounter && (
+            <div className="flex justify-end px-3 pb-1.5">
+              <span
+                id="chat-char-counter"
+                className={`text-[11px] tabular-nums ${remaining < 0 || overLimit ? "text-[var(--vivida-pink)]" : remaining < 500 ? "text-muted-foreground" : "text-muted-foreground/70"}`}
+              >
+                {en
+                  ? `${input.length.toLocaleString("en-US")} / ${CHAT_MAX_INPUT_LEN.toLocaleString("en-US")}`
+                  : `${input.length.toLocaleString("ka-GE")} / ${CHAT_MAX_INPUT_LEN.toLocaleString("ka-GE")}`}
+              </span>
+            </div>
+          )}
         </div>
         <div className="mt-2 flex justify-center">
           <CreditHint>
             {en
-              ? "2 free questions per day, then −1 credit"
-              : "დღეში 2 უფასო შეკითხვა, შემდეგ −1 კრედიტი"}
+              ? "2 free questions per day, then −2 credits"
+              : "დღეში 2 უფასო შეკითხვა, შემდეგ −2 კრედიტი"}
           </CreditHint>
         </div>
         <p className="mt-1.5 text-center text-[11px] text-muted-foreground">

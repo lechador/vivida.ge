@@ -55,7 +55,7 @@ export const RITUAL_STREAK_MILESTONES = [
 /** What each gated action costs (beyond its free allowance). */
 export const CREDIT_COST = {
   synastry: 5,
-  chat: 1,
+  chat: 2,
   mbtiTest: 5,
   iqTest: 5,
   eqTest: 5,

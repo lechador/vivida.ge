@@ -3,11 +3,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { charts, chartChatMessages } from "@/db/schema";
-import {
-  CREDIT_COST,
-  FREE_ALLOWANCE,
-  spendCredits,
-} from "@/lib/credits";
+import { CREDIT_COST, FREE_ALLOWANCE, spendCredits } from "@/lib/credits";
 import { computeChartSalience } from "@/lib/report-salience";
 import { buildChartChatSystem } from "@/lib/chart-chat";
 import {
@@ -24,7 +20,8 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const HISTORY_LIMIT = 12;
-const MAX_MESSAGE_LEN = 1000;
+/** Generous cap: long personal stories welcome, unbounded blobs rejected. */
+const MAX_MESSAGE_LEN = 4000;
 
 /**
  * "Chat with your chart" — streams an AI astrologer reply grounded in the
@@ -52,8 +49,7 @@ export async function POST(req: Request) {
   }
 
   const body = (await req.json().catch(() => ({}))) as { message?: unknown };
-  const message =
-    typeof body.message === "string" ? body.message.trim() : "";
+  const message = typeof body.message === "string" ? body.message.trim() : "";
   if (!message || message.length > MAX_MESSAGE_LEN) {
     return Response.json({ error: "invalid_message" }, { status: 400 });
   }
@@ -77,7 +73,10 @@ export async function POST(req: Request) {
   // Recent history (oldest→newest) for conversational continuity.
   const history = (
     await db
-      .select({ role: chartChatMessages.role, content: chartChatMessages.content })
+      .select({
+        role: chartChatMessages.role,
+        content: chartChatMessages.content,
+      })
       .from(chartChatMessages)
       .where(eq(chartChatMessages.userId, userId))
       .orderBy(desc(chartChatMessages.createdAt))
@@ -95,21 +94,23 @@ export async function POST(req: Request) {
       and(
         eq(chartChatMessages.userId, userId),
         eq(chartChatMessages.role, "user"),
-        sql`${chartChatMessages.createdAt} >= date_trunc('day', now())`
-      )
+        sql`${chartChatMessages.createdAt} >= date_trunc('day', now())`,
+      ),
     );
   if ((used?.n ?? 0) >= FREE_ALLOWANCE.chatPerDay) {
     const paid = await spendCredits(userId, CREDIT_COST.chat, "spend_chat");
     if (!paid) {
       return Response.json(
         { error: "needs_credits", cost: CREDIT_COST.chat },
-        { status: 402 }
+        { status: 402 },
       );
     }
   }
 
   // Persist the user's turn before we stream the answer.
-  await db.insert(chartChatMessages).values({ userId, role: "user", content: message });
+  await db
+    .insert(chartChatMessages)
+    .values({ userId, role: "user", content: message });
 
   const messages: ChatMessage[] = [
     { role: "system", content: system },
@@ -125,7 +126,9 @@ export async function POST(req: Request) {
     async start(controller) {
       let full = "";
       try {
-        for await (const delta of streamChatCompletion(messages, { maxTokens: 900 })) {
+        for await (const delta of streamChatCompletion(messages, {
+          maxTokens: 900,
+        })) {
           full += delta;
           controller.enqueue(encoder.encode(delta));
         }
@@ -137,7 +140,7 @@ export async function POST(req: Request) {
               locale !== "ka"
                 ? "Sorry, I couldn't generate a response. Please try again."
                 : "ბოდიში, პასუხის გენერაცია ვერ მოხერხდა. სცადე ხელახლა.",
-            )
+            ),
           );
         }
       } finally {
