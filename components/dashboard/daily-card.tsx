@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
 import type { DailyHoroscope } from "@/db/schema";
@@ -141,40 +140,8 @@ export function DailyCard({
         />
       </header>
 
-      {/* Tarot entry — the "I have a specific question" hook, which the daily
-          horoscope can't answer. First reading is free, so lead with that. */}
-      <Link
-        href="/taro"
-        onClick={() =>
-          trackEvent(ANALYTICS_EVENT.recommendationClicked, {
-            placement: "daily_horoscope",
-            destination: "tarot",
-            product: "tarot",
-          })
-        }
-        className="group relative mt-5 flex items-center justify-between gap-3 rounded-xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/8 px-4 py-3 transition-colors hover:border-[var(--vivida-violet)]/60 hover:bg-[var(--vivida-violet)]/15"
-      >
-        <span className="flex flex-wrap items-center gap-2.5 text-sm font-medium">
-          <span aria-hidden className="text-base leading-none">
-            🔮
-          </span>
-          {en
-            ? "Tarot—ask the cards a question"
-            : "ტარო — დაუსვი კითხვა კარტებს"}
-          <span className="rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/15 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-[var(--vivida-violet)]">
-            {en ? "First free" : "პირველი უფასოდ"}
-          </span>
-        </span>
-        <span
-          aria-hidden
-          className="text-[var(--vivida-violet)] transition-transform group-hover:translate-x-0.5"
-        >
-          →
-        </span>
-      </Link>
-
       {horoscope.themes.length > 0 && (
-        <div className="relative mt-4 flex flex-wrap gap-2">
+        <div className="relative mt-5 flex flex-wrap gap-2">
           {horoscope.themes.map((theme, i) => (
             <span
               key={i}
