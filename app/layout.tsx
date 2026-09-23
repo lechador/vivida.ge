@@ -174,12 +174,6 @@ export default async function RootLayout({
         />
         <BfcacheRefresher />
         <RefCapture />
-        <TrackingConsentManager
-          gaId={GA_ID}
-          fbPixelId={FB_PIXEL_ID}
-          trackingEnabled={TRACKING_ENABLED}
-          locale={locale}
-        />
         <div
           id="main-content"
           tabIndex={-1}
@@ -187,6 +181,12 @@ export default async function RootLayout({
         >
           {children}
         </div>
+        <TrackingConsentManager
+          gaId={GA_ID}
+          fbPixelId={FB_PIXEL_ID}
+          trackingEnabled={TRACKING_ENABLED}
+          locale={locale}
+        />
       </body>
     </html>
   );

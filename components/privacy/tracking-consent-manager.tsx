@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import Script from "next/script";
 import { ShieldCheck } from "lucide-react";
 
 import { AttributionCapture } from "@/components/marketing/attribution-capture";
@@ -109,6 +110,16 @@ export function TrackingConsentManager({
         </>
       )}
 
+      {trackingEnabled && locale === "ka" && (
+        <>
+          <div id="top-ge-counter-container" data-site-id="118976" />
+          <Script
+            src="https://counter.top.ge/counter.js"
+            strategy="afterInteractive"
+          />
+        </>
+      )}
+
       {ready && consent !== null && !settingsOpen && (
         <button
           type="button"
@@ -144,8 +155,8 @@ export function TrackingConsentManager({
               </h2>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
                 {en
-                  ? "Essential cookies keep Vivida working. With your permission, analytics and Meta cookies help us measure which campaigns lead to useful visits and purchases."
-                  : "აუცილებელი cookie-ები Vivida-ს მუშაობას უზრუნველყოფს. შენი თანხმობით, ანალიტიკა და Meta cookie-ები გვეხმარება გავიგოთ რომელი კამპანია იწვევს სასარგებლო ვიზიტებსა და ყიდვებს."}
+                  ? "Top.ge counts visits on vivida.ge regardless of this choice. With your permission, Google Analytics and Meta cookies measure campaign visits and purchases."
+                  : "Top.ge ვიზიტებს ითვლის vivida.ge-ზე ამ არჩევანის მიუხედავად. შენი თანხმობით, Google Analytics-ისა და Meta-ს cookie-ები კამპანიებისა და შესყიდვების გაზომვაში გვეხმარება."}
               </p>
             </div>
           </div>
@@ -159,7 +170,7 @@ export function TrackingConsentManager({
               size="sm"
               onClick={() => choose("denied")}
             >
-              {en ? "Essential only" : "მხოლოდ აუცილებელი"}
+              {en ? "Continue without consent" : "თანხმობის გარეშე გაგრძელება"}
             </Button>
             <Button
               type="button"

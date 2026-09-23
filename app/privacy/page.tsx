@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const LAST_UPDATED = "2026-08-16";
+const LAST_UPDATED = "2026-09-23";
 
 export default async function PrivacyPage() {
   return (
@@ -196,6 +196,10 @@ export default async function PrivacyPage() {
                 დაბადების ზუსტ მონაცემებს.
               </li>
               <li>
+                <strong className="text-foreground">Top.ge:</strong>{" "}
+                vivida.ge-ზე ვიზიტების დათვლა.
+              </li>
+              <li>
                 <strong className="text-foreground">
                   Cloudflare Turnstile:
                 </strong>{" "}
@@ -322,16 +326,11 @@ export default async function PrivacyPage() {
               </li>
             </ul>
             <p className="mt-3 leading-relaxed">
-              ანალიტიკის გათიშვა შეგიძლია ბრაუზერის Do Not Track-ით ან{" "}
-              <a
-                href="https://tools.google.com/dlpage/gaoptout"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--vivida-violet)] underline-offset-2 hover:underline"
-              >
-                Google-ის ოფიციალური Opt-Out დანამატით
-              </a>
-              .
+              Top.ge-ის მრიცხველი vivida.ge-ზე იტვირთება ანალიტიკის თანხმობის
+              მიუხედავად. Google Analytics, Meta Pixel და კამპანიის გაზომვის
+              არასავალდებულო ხელსაწყოები მხოლოდ შენი თანხმობის შემდეგ ირთვება.
+              ამ არჩევანის შეცვლა ნებისმიერ გვერდზე კონფიდენციალურობის ღილაკით
+              შეგიძლია.
             </p>
           </section>
 
