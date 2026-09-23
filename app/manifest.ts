@@ -21,14 +21,26 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["lifestyle", "entertainment", "personalization"],
     icons: [
       {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/pwa/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
       },
       {
-        src: "/apple-icon.png",
-        sizes: "180x180",
+        src: "/pwa/icon-512.png",
+        sizes: "512x512",
         type: "image/png",
+      },
+      {
+        src: "/pwa/icon-maskable-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable",
+      },
+      {
+        src: "/pwa/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
   };

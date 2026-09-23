@@ -27,22 +27,22 @@ inventory only after those foundations are measurable.
 
 ## Priority order
 
-| Priority | Initiative | Why now | Success signal |
-| --- | --- | --- | --- |
-| P0 — shipped 2026-08-22 | Full value and paywall measurement | We can see some value actions, but not the complete exposure → selection → shortfall → checkout → unlock journey. | Reliable value, paywall, D1/D7/D30, and payer-conversion baselines. |
-| P0 — shipped | Preserve calculator data through signup/onboarding | The public calculator already collects the exact birth inputs onboarding asks for again. | Higher calculator-to-profile completion and shorter onboarding time. |
-| P0 — shipped 2026-08-22 | First onboarding “aha” result | New users now see their personalized Big Three immediately, then receive tracked, prefilled AI question recommendations. | Higher first-value completion, recommendation click-through, and D1 return. |
-| P0 — shipped 2026-08-22 | Credits vs PRO comparison | Public natal promos, natal and first-free-tarot result states, and the Credits hub now explain one-time credits versus monthly unlimited PRO before a balance shortfall. | Higher monetization-choice click-through and payer conversion before users reach zero credits. |
-| P0 — implemented 2026-08-22 | Signup-credit cohort test | Future signups are assigned 50/50 to 20 credits immediately or 10 immediately plus 5 after a 24-hour return; legacy balances remain untouched. | Variant-level D1/D7 retention, seven-day credit use, and 30-day payer conversion. |
-| P1 — shipped 2026-08-26 | Daily “Today” ritual | Daily reading, chosen focus, server-truth streak, and lifetime milestones now create a compact reason to return. | Higher DAU/MAU, active days per MAU, and D7 retention. |
-| P1 — shipped 2026-08-26 | Contextual paywalls and credit-economy experiments | Shortfalls now name the deficit, compare credits with PRO, recommend the smallest sufficient pack, and return to content after verified checkout. Repeatable free earning is capped. | Higher paywall-to-checkout and 30-day payer conversion without lower retention. |
-| P1 — shipped 2026-09-05 | Reading history and journal | Tarot, forecasts, and AI insight do not accumulate into durable personal value. | Higher weekly repeat use and history reopen rate. |
-| P2 — shipped 2026-09-05 | Paid report store and bundles | Demand is concentrated in tarot and natal PDFs, but the paid catalog is narrow. | Higher ARPPU and report attach rate. |
-| P2 — shipped 2026-09-05 | Recurring relationship experience | Synastry is mainly a static, one-time unlock. | Higher partner invites and weekly relationship-feature retention. |
-| P2 | Annual PRO, gifting, and bundles | Monetization is limited to monthly PRO, credits, and one targeted quarterly offer. | Higher subscription conversion, prepaid revenue, and gift purchases. |
-| P2 — implemented 2026-08-26 | Personalized return channels | Users now control transit, forecast, and relationship reminders by channel, cadence, local time, and private calendar sync. | Higher notification-to-value completion with stable opt-out rates. |
-| P2 | Next-best-action content graph | Long pages offer many equal choices instead of one relevant continuation. | More meaningful actions per valuable session. |
-| P3 | Utility-led social loops | Sharing a chart or compatibility result has value even at low community density. | More qualified invites and shared-result landings. |
+| Priority                    | Initiative                                         | Why now                                                                                                                                                                              | Success signal                                                                                 |
+| --------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| P0 — shipped 2026-08-22     | Full value and paywall measurement                 | We can see some value actions, but not the complete exposure → selection → shortfall → checkout → unlock journey.                                                                    | Reliable value, paywall, D1/D7/D30, and payer-conversion baselines.                            |
+| P0 — shipped                | Preserve calculator data through signup/onboarding | The public calculator already collects the exact birth inputs onboarding asks for again.                                                                                             | Higher calculator-to-profile completion and shorter onboarding time.                           |
+| P0 — shipped 2026-08-22     | First onboarding “aha” result                      | New users now see their personalized Big Three immediately, then receive tracked, prefilled AI question recommendations.                                                             | Higher first-value completion, recommendation click-through, and D1 return.                    |
+| P0 — shipped 2026-08-22     | Credits vs PRO comparison                          | Public natal promos, natal and first-free-tarot result states, and the Credits hub now explain one-time credits versus monthly unlimited PRO before a balance shortfall.             | Higher monetization-choice click-through and payer conversion before users reach zero credits. |
+| P0 — implemented 2026-08-22 | Signup-credit cohort test                          | Future signups are assigned 50/50 to 20 credits immediately or 10 immediately plus 5 after a 24-hour return; legacy balances remain untouched.                                       | Variant-level D1/D7 retention, seven-day credit use, and 30-day payer conversion.              |
+| P1 — shipped 2026-08-26     | Daily “Today” ritual                               | Daily reading, chosen focus, server-truth streak, and lifetime milestones now create a compact reason to return.                                                                     | Higher DAU/MAU, active days per MAU, and D7 retention.                                         |
+| P1 — shipped 2026-08-26     | Contextual paywalls and credit-economy experiments | Shortfalls now name the deficit, compare credits with PRO, recommend the smallest sufficient pack, and return to content after verified checkout. Repeatable free earning is capped. | Higher paywall-to-checkout and 30-day payer conversion without lower retention.                |
+| P1 — shipped 2026-09-05     | Reading history and journal                        | Tarot, forecasts, and AI insight do not accumulate into durable personal value.                                                                                                      | Higher weekly repeat use and history reopen rate.                                              |
+| P2 — shipped 2026-09-05     | Paid report store and bundles                      | Demand is concentrated in tarot and natal PDFs, but the paid catalog is narrow.                                                                                                      | Higher ARPPU and report attach rate.                                                           |
+| P2 — shipped 2026-09-05     | Recurring relationship experience                  | Synastry is mainly a static, one-time unlock.                                                                                                                                        | Higher partner invites and weekly relationship-feature retention.                              |
+| P2                          | Annual PRO, gifting, and bundles                   | Monetization is limited to monthly PRO, credits, and one targeted quarterly offer.                                                                                                   | Higher subscription conversion, prepaid revenue, and gift purchases.                           |
+| P2 — implemented 2026-08-26 | Personalized return channels                       | Users now control transit, forecast, and relationship reminders by channel, cadence, local time, and private calendar sync.                                                          | Higher notification-to-value completion with stable opt-out rates.                             |
+| P2                          | Next-best-action content graph                     | Long pages offer many equal choices instead of one relevant continuation.                                                                                                            | More meaningful actions per valuable session.                                                  |
+| P3                          | Utility-led social loops                           | Sharing a chart or compatibility result has value even at low community density.                                                                                                     | More qualified invites and shared-result landings.                                             |
 
 ## 90-day roadmap
 
@@ -114,18 +114,18 @@ inventory only after those foundations are measurable.
 All events are aggregate and non-identifying. Never include email, name, user
 ID, birth details, location, free text, messages, or profile content.
 
-| Event | Fire when | Required low-cardinality properties |
-| --- | --- | --- |
-| `first_result_viewed` | The browser sees its first completed Vivida result | `product`, `surface` |
-| `recommendation_clicked` | A curated next-best-action link is selected | `placement`, `destination`, `product` |
-| `paywall_viewed` | A credit, report, pack, or PRO gate becomes visible | `product`, `surface`; add `cost`, `balance_bucket`, or `offer` when applicable |
-| `product_selected` | The visitor selects a paid product or unlock | `product`, `surface`, `payment_model`; add price/currency or credit cost |
-| `insufficient_credits` | A rendered balance check or server response blocks an unlock | `product`, `surface`, `cost`, `balance_bucket` when known |
-| `checkout_started` | Stripe returns a valid checkout URL | `product`, `value`, `currency` |
-| `checkout_success` | A verified checkout session is read on the return page | `product`, `kind`, `value`, `currency` |
-| `credit_unlock` | The server confirms a credit-backed unlock or paid generation | `product`, `surface`, `cost`, `outcome` |
-| `pro_exposure` | An eligible visitor sees a standard or promotional PRO offer | `product`, `placement`, `value`, `currency`; add `offer` when applicable |
-| `experiment_assigned` | Eligibility logic assigns a stable variant | `experiment`, `variant`, `eligibility` when applicable |
+| Event                    | Fire when                                                     | Required low-cardinality properties                                            |
+| ------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `first_result_viewed`    | The browser sees its first completed Vivida result            | `product`, `surface`                                                           |
+| `recommendation_clicked` | A curated next-best-action link is selected                   | `placement`, `destination`, `product`                                          |
+| `paywall_viewed`         | A credit, report, pack, or PRO gate becomes visible           | `product`, `surface`; add `cost`, `balance_bucket`, or `offer` when applicable |
+| `product_selected`       | The visitor selects a paid product or unlock                  | `product`, `surface`, `payment_model`; add price/currency or credit cost       |
+| `insufficient_credits`   | A rendered balance check or server response blocks an unlock  | `product`, `surface`, `cost`, `balance_bucket` when known                      |
+| `checkout_started`       | Stripe returns a valid checkout URL                           | `product`, `value`, `currency`                                                 |
+| `checkout_success`       | A verified checkout session is read on the return page        | `product`, `kind`, `value`, `currency`                                         |
+| `credit_unlock`          | The server confirms a credit-backed unlock or paid generation | `product`, `surface`, `cost`, `outcome`                                        |
+| `pro_exposure`           | An eligible visitor sees a standard or promotional PRO offer  | `product`, `placement`, `value`, `currency`; add `offer` when applicable       |
+| `experiment_assigned`    | Eligibility logic assigns a stable variant                    | `experiment`, `variant`, `eligibility` when applicable                         |
 
 Use `surface`, `placement`, `destination`, and `widget` instead of GA4-reserved
 campaign parameter names such as `source`, `medium`, and `campaign`.
@@ -158,7 +158,7 @@ of truth.
 
 - Gift credits, gift reports, and partner/seasonal packages.
 - A standard annual PRO plan.
-- Offline PWA content caching; the current service worker is push-focused.
+- Offline PWA content caching; the current service worker provides push and a basic offline fallback, but does not cache app content.
 
 ## Credit-economy guardrails (shipped 2026-08-26)
 
@@ -214,15 +214,15 @@ not a value action.
 
 ### Supporting funnels
 
-| Funnel | Events |
-| --- | --- |
-| Home acquisition | `home_primary_cta_click`, `compatibility_check_completed`, `compatibility_share` |
-| Free natal tool | `natal_chart_computed`, `natal_chart_shared`, `register_click`, `horoscope_email_subscribed` |
-| Email signup | `sign_up_submitted`, `sign_up_verified` |
-| Onboarding | `onboarding_started`, `onboarding_prefilled`, `onboarding_step_viewed`, `onboarding_step_completed`, `onboarding_submitted` |
-| Daily horoscope | `daily_horoscope_viewed`, `daily_horoscope_read` |
-| Anonymous horoscope | `public_horoscope_read` by `sign` and `view` |
-| Push opt-in | `push_prompt_viewed`, `push_enabled`, `push_permission_denied`, `push_dismissed` |
+| Funnel              | Events                                                                                                                      |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Home acquisition    | `home_primary_cta_click`, `compatibility_check_completed`, `compatibility_share`                                            |
+| Free natal tool     | `natal_chart_computed`, `natal_chart_shared`, `register_click`, `horoscope_email_subscribed`                                |
+| Email signup        | `sign_up_submitted`, `sign_up_verified`                                                                                     |
+| Onboarding          | `onboarding_started`, `onboarding_prefilled`, `onboarding_step_viewed`, `onboarding_step_completed`, `onboarding_submitted` |
+| Daily horoscope     | `daily_horoscope_viewed`, `daily_horoscope_read`                                                                            |
+| Anonymous horoscope | `public_horoscope_read` by `sign` and `view`                                                                                |
+| Push opt-in         | `push_prompt_viewed`, `push_enabled`, `push_permission_denied`, `push_dismissed`                                            |
 
 ### KPI definitions
 

@@ -4,32 +4,240 @@ import { LEGAL_ENTITY } from "@/lib/legal-entity";
 import Link from "next/link";
 
 import { EnglishGuide } from "@/components/en/english-guide";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, GEORGIAN_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  GEORGIAN_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
 const PATH = "/en/privacy";
 const TITLE = "Privacy Policy";
-const DESCRIPTION = "Vivida's English privacy policy: what information is collected, why it is used, service providers, retention, cookies and your data rights.";
+const DESCRIPTION =
+  "Vivida's English privacy policy: what information is collected, why it is used, service providers, retention, cookies and your data rights.";
 const LAST_UPDATED = "September 23, 2026";
 
 export const metadata: Metadata = {
-  title: { absolute: `${TITLE} — Vivida` }, description: DESCRIPTION,
+  title: { absolute: `${TITLE} — Vivida` },
+  description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/privacy", "en"),
-  openGraph: { images: [DEFAULT_OG_IMAGE], title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/privacy`, locale: "en_US", alternateLocale: ["ka_GE"] },
+  openGraph: {
+    images: [DEFAULT_OG_IMAGE],
+    title: TITLE,
+    description: DESCRIPTION,
+    url: `${ENGLISH_SITE_URL}/privacy`,
+    locale: "en_US",
+    alternateLocale: ["ka_GE"],
+  },
 };
 
 export default function EnglishPrivacyPage() {
   return (
-    <EnglishGuide eyebrow="Legal" title="Privacy policy" intro={`Last updated: ${LAST_UPDATED}. This policy explains how Vivida collects, uses and protects information when you use vivida.ge or vividaastro.com.`} georgianPath="/privacy">
-      <section><h2>1. Who operates Vivida</h2><p>Vivida is operated by <strong>{LEGAL_ENTITY.name}</strong>, a limited liability company registered in Wyoming, United States (filing ID {LEGAL_ENTITY.filingId}), with its registered address at {LEGAL_ENTITY.address}. Privacy questions and data requests can be sent to <a href="mailto:hello@vivida.ge" className="text-[var(--vivida-cyan)] hover:underline">hello@vivida.ge</a>.</p></section>
-      <section><h2>2. Information we collect</h2><ul className="mt-4 list-disc"><li>Account information received through Google sign-in, such as your name, email address and profile image.</li><li>Birth details you provide for chart calculations, including date, time and place of birth.</li><li>Profile content you choose to add, including a biography, preferences, visibility settings and uploaded photographs.</li><li>Content and interactions you create through community features, such as messages, posts and reactions.</li><li>Technical and usage information, including device, browser, approximate location, referral and interaction events collected through essential logs and configured analytics.</li><li>Payment and transaction references when you purchase a paid feature. Full card details are processed by the payment provider and are not stored by Vivida.</li></ul><p>An email address is required to hold an account, and birth date, time and place are required to calculate a chart — without them those features cannot be provided. Everything else (photographs, biography, gender, city, community activity) is optional, and declining it only limits the related feature.</p></section>
-      <section><h2>3. Why we use information</h2><p>We use information to create and secure accounts, calculate natal charts, provide requested interpretations and forecasts, operate social features, process purchases, respond to support requests, prevent abuse and understand how the service performs. Where required, processing is based on your consent, performance of our agreement, legal obligations or our legitimate interest in running a safe and reliable service.</p></section>
-      <section><h2>4. Service providers</h2><p>Vivida uses carefully selected providers to operate the service. These may include Google for authentication, Neon/PostgreSQL and hosting infrastructure for application data, Cloudflare R2 for media storage, analytics and advertising measurement providers when configured, payment processors, and AI providers used to generate requested interpretations. We share only the information reasonably necessary for the relevant function.</p><p>Natal-chart calculations are performed from birth coordinates and time. AI interpretation requests are designed to use chart data rather than unnecessary contact information.</p></section>
-      <section><h2>5. Retention and deletion</h2><p>Account information is generally retained while your account remains active. When an account is deleted, profile content, photos and messages are scheduled for deletion; birth data and cached chart material may remain in backups or deletion queues for up to 30 days. Financial records may be retained for the period required by tax and accounting law.</p></section>
-      <section><h2>6. Your rights</h2><p>Depending on applicable law, you may request access, correction, deletion, restriction or export of your personal data, and may withdraw consent for future processing. You can change many profile settings inside your account or contact us at <a href="mailto:hello@vivida.ge" className="text-[var(--vivida-cyan)] hover:underline">hello@vivida.ge</a>. You may also complain to your supervisory authority: in Georgia the State Audit Office (<a href="https://pdp.sao.ge" className="text-[var(--vivida-cyan)] hover:underline">pdp.sao.ge</a>), which took over data-protection supervision in March 2026; in the United Kingdom the Information Commissioner’s Office (<a href="https://ico.org.uk" className="text-[var(--vivida-cyan)] hover:underline">ico.org.uk</a>).</p></section>
-      <section><h2>7. Cookies, analytics and advertising</h2><p>Essential cookies keep sessions secure and remember necessary settings. The Top.ge counter loads on vivida.ge to count visits regardless of your optional analytics choice. Google Analytics, Meta Pixel, campaign attribution cookies and server-side Meta conversion measurement activate only after you choose “Allow analytics &amp; Meta”. Meta may receive browser and campaign identifiers, IP address and user agent, plus hashed email, internal account ID and country for checkout matching. We never send exact birth details, chart inputs, messages or card details. You can reopen Privacy choices on any page and withdraw consent for future optional measurement.</p></section>
-      <section><h2>8. International transfers</h2><p>{LEGAL_ENTITY.name} is established in the United States, and the providers listed above operate internationally. Using Vivida therefore involves transferring your personal data outside Georgia and outside the United Kingdom. Neither Georgia nor the UK currently recognises the United States generally as providing an adequate level of protection, so the transfer is made because it is necessary to provide the service you have asked us for, and we require our providers to apply appropriate contractual safeguards. You can ask us for details of the safeguards that apply to a particular transfer.</p></section><section><h2>9. Security</h2><p>Information is transmitted over HTTPS and protected through access controls and modern infrastructure practices. No internet service can guarantee absolute security.</p></section>
-      <section><h2>10. Age requirement</h2><p>Vivida is intended for adults aged 18 or older. Registration and birth-data validation enforce this requirement.</p></section>
-      <section><h2>11. Changes and contact</h2><p>We may update this policy as the service changes. The date above will be revised when material changes are published. Questions can be sent to <a href="mailto:hello@vivida.ge" className="text-[var(--vivida-cyan)] hover:underline">hello@vivida.ge</a>. The Georgian policy remains available at <Link href={`${GEORGIAN_SITE_URL}/privacy`} hrefLang="ka-GE" className="text-[var(--vivida-cyan)] hover:underline">vivida.ge/privacy</Link>.</p></section>
+    <EnglishGuide
+      eyebrow="Legal"
+      title="Privacy policy"
+      intro={`Last updated: ${LAST_UPDATED}. This policy explains how Vivida collects, uses and protects information when you use vivida.ge or vividaastro.com.`}
+      georgianPath="/privacy"
+    >
+      <section>
+        <h2>1. Who operates Vivida</h2>
+        <p>
+          Vivida is operated by <strong>{LEGAL_ENTITY.name}</strong>, a limited
+          liability company registered in Wyoming, United States (filing ID{" "}
+          {LEGAL_ENTITY.filingId}), with its registered address at{" "}
+          {LEGAL_ENTITY.address}. Privacy questions and data requests can be
+          sent to{" "}
+          <a
+            href="mailto:hello@vivida.ge"
+            className="text-[var(--vivida-cyan)] hover:underline"
+          >
+            hello@vivida.ge
+          </a>
+          .
+        </p>
+      </section>
+      <section>
+        <h2>2. Information we collect</h2>
+        <ul className="mt-4 list-disc">
+          <li>
+            Account information received through Google sign-in, such as your
+            name, email address and profile image.
+          </li>
+          <li>
+            Birth details you provide for chart calculations, including date,
+            time and place of birth.
+          </li>
+          <li>
+            Profile content you choose to add, including a biography,
+            preferences, visibility settings and uploaded photographs.
+          </li>
+          <li>
+            Content and interactions you create through community features, such
+            as messages, posts and reactions.
+          </li>
+          <li>
+            Technical and usage information, including device, browser,
+            approximate location, referral and interaction events collected
+            through essential logs and configured analytics.
+          </li>
+          <li>
+            Payment and transaction references when you purchase a paid feature.
+            Full card details are processed by the payment provider and are not
+            stored by Vivida.
+          </li>
+        </ul>
+        <p>
+          An email address is required to hold an account, and birth date, time
+          and place are required to calculate a chart — without them those
+          features cannot be provided. Everything else (photographs, biography,
+          gender, city, community activity) is optional, and declining it only
+          limits the related feature.
+        </p>
+      </section>
+      <section>
+        <h2>3. Why we use information</h2>
+        <p>
+          We use information to create and secure accounts, calculate natal
+          charts, provide requested interpretations and forecasts, operate
+          social features, process purchases, respond to support requests,
+          prevent abuse and understand how the service performs. Where required,
+          processing is based on your consent, performance of our agreement,
+          legal obligations or our legitimate interest in running a safe and
+          reliable service.
+        </p>
+      </section>
+      <section>
+        <h2>4. Service providers</h2>
+        <p>
+          Vivida uses carefully selected providers to operate the service. These
+          may include Google for authentication, Neon/PostgreSQL and hosting
+          infrastructure for application data, Cloudflare R2 for media storage,
+          analytics and advertising measurement providers when configured,
+          payment processors, and AI providers used to generate requested
+          interpretations. We share only the information reasonably necessary
+          for the relevant function.
+        </p>
+        <p>
+          Natal-chart calculations are performed from birth coordinates and
+          time. AI interpretation requests are designed to use chart data rather
+          than unnecessary contact information.
+        </p>
+      </section>
+      <section>
+        <h2>5. Retention and deletion</h2>
+        <p>
+          Account information is generally retained while your account remains
+          active. When an account is deleted, profile content, photos and
+          messages are scheduled for deletion; birth data and cached chart
+          material may remain in backups or deletion queues for up to 30 days.
+          Financial records may be retained for the period required by tax and
+          accounting law.
+        </p>
+      </section>
+      <section>
+        <h2>6. Your rights</h2>
+        <p>
+          Depending on applicable law, you may request access, correction,
+          deletion, restriction or export of your personal data, and may
+          withdraw consent for future processing. You can change many profile
+          settings inside your account or contact us at{" "}
+          <a
+            href="mailto:hello@vivida.ge"
+            className="text-[var(--vivida-cyan)] hover:underline"
+          >
+            hello@vivida.ge
+          </a>
+          . You may also complain to your supervisory authority: in Georgia the
+          State Audit Office (
+          <a
+            href="https://pdp.sao.ge"
+            className="text-[var(--vivida-cyan)] hover:underline"
+          >
+            pdp.sao.ge
+          </a>
+          ), which took over data-protection supervision in March 2026; in the
+          United Kingdom the Information Commissioner’s Office (
+          <a
+            href="https://ico.org.uk"
+            className="text-[var(--vivida-cyan)] hover:underline"
+          >
+            ico.org.uk
+          </a>
+          ).
+        </p>
+      </section>
+      <section>
+        <h2>7. Cookies, analytics and advertising</h2>
+        <p>
+          Essential cookies keep sessions secure and remember necessary
+          settings. The Top.ge counter loads on vivida.ge to count visits
+          regardless of your optional analytics choice. Google Analytics, Meta
+          Pixel, campaign attribution cookies and server-side Meta conversion
+          measurement activate only after you choose “Allow analytics &amp;
+          Meta”. If you add the web app to your home screen and allow analytics,
+          we also store a random installation identifier with its first and
+          latest open dates to count observed installations. This record
+          contains no name, email or birth details and is deleted 13 months
+          after its last open. Meta may receive browser and campaign
+          identifiers, IP address and user agent, plus hashed email, internal
+          account ID and country for checkout matching. We never send exact
+          birth details, chart inputs, messages or card details. You can reopen
+          Privacy choices on any page and withdraw consent for future optional
+          measurement.
+        </p>
+      </section>
+      <section>
+        <h2>8. International transfers</h2>
+        <p>
+          {LEGAL_ENTITY.name} is established in the United States, and the
+          providers listed above operate internationally. Using Vivida therefore
+          involves transferring your personal data outside Georgia and outside
+          the United Kingdom. Neither Georgia nor the UK currently recognises
+          the United States generally as providing an adequate level of
+          protection, so the transfer is made because it is necessary to provide
+          the service you have asked us for, and we require our providers to
+          apply appropriate contractual safeguards. You can ask us for details
+          of the safeguards that apply to a particular transfer.
+        </p>
+      </section>
+      <section>
+        <h2>9. Security</h2>
+        <p>
+          Information is transmitted over HTTPS and protected through access
+          controls and modern infrastructure practices. No internet service can
+          guarantee absolute security.
+        </p>
+      </section>
+      <section>
+        <h2>10. Age requirement</h2>
+        <p>
+          Vivida is intended for adults aged 18 or older. Registration and
+          birth-data validation enforce this requirement.
+        </p>
+      </section>
+      <section>
+        <h2>11. Changes and contact</h2>
+        <p>
+          We may update this policy as the service changes. The date above will
+          be revised when material changes are published. Questions can be sent
+          to{" "}
+          <a
+            href="mailto:hello@vivida.ge"
+            className="text-[var(--vivida-cyan)] hover:underline"
+          >
+            hello@vivida.ge
+          </a>
+          . The Georgian policy remains available at{" "}
+          <Link
+            href={`${GEORGIAN_SITE_URL}/privacy`}
+            hrefLang="ka-GE"
+            className="text-[var(--vivida-cyan)] hover:underline"
+          >
+            vivida.ge/privacy
+          </Link>
+          .
+        </p>
+      </section>
     </EnglishGuide>
   );
 }

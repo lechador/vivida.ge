@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { EnglishFooter } from "@/components/en/english-footer";
+import { InstallAppButton } from "@/components/pwa/install-button";
 import type { UserLocale } from "@/lib/i18n/locale";
 
 const PRODUCT_LINKS = [
@@ -148,7 +149,7 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
         </div>
       </div>
 
-      {/* Payments + apps row */}
+      {/* Payments + web app row */}
       <div className="border-t border-border/30">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-7 sm:px-6 md:flex-row md:items-center md:justify-between">
           {/* Payment methods */}
@@ -172,19 +173,14 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
             </div>
           </div>
 
-          {/* App store badges (placeholder — apps in development) */}
-          <div className="flex flex-col gap-2.5 md:items-end">
+          <div className="flex max-w-xs flex-col gap-2 md:items-end md:text-right">
             <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-              მობილური აპი — მალე
+              Vivida ვებზე
             </span>
-            <div className="flex flex-wrap items-center gap-2">
-              <StoreBadge>
-                <AppStoreBadge />
-              </StoreBadge>
-              <StoreBadge>
-                <PlayStoreBadge />
-              </StoreBadge>
-            </div>
+            <p className="text-xs leading-relaxed text-foreground/75">
+              გამოიყენე ბრაუზერში ან დაამატე მთავარ ეკრანზე სწრაფი წვდომისთვის.
+            </p>
+            <InstallAppButton locale={locale} surface="site_footer" />
           </div>
         </div>
       </div>
@@ -203,21 +199,6 @@ function PaymentMark({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex h-7 min-w-[44px] items-center justify-center rounded-md border border-border/70 bg-card/40 px-2 backdrop-blur-sm">
       {children}
-    </span>
-  );
-}
-
-function StoreBadge({ children }: { children: React.ReactNode }) {
-  return (
-    <span
-      aria-disabled
-      title="აპი მუშავდება"
-      className="relative inline-flex opacity-65 transition-opacity hover:opacity-90"
-    >
-      {children}
-      <span className="absolute -right-1.5 -top-1.5 inline-flex items-center rounded-full border border-[var(--vivida-pink)]/45 bg-background px-1.5 py-px text-[8px] font-semibold uppercase tracking-wider text-[var(--vivida-pink)]">
-        მალე
-      </span>
     </span>
   );
 }
@@ -337,114 +318,6 @@ function ApplePayMark() {
           Pay
         </text>
       </g>
-    </svg>
-  );
-}
-
-/**
- * Apple App Store badge — black rounded rectangle with the Apple logo,
- * "Download on the" caption and "App Store" wordmark. Simplified from
- * Apple's official marketing badge.
- */
-function AppStoreBadge() {
-  return (
-    <svg
-      viewBox="0 0 124 40"
-      className="h-9 w-auto"
-      role="img"
-      aria-label="Download on the App Store"
-    >
-      <rect
-        width="124"
-        height="40"
-        rx="6"
-        fill="#000"
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-      />
-      {/* Apple logo */}
-      <path
-        d="M19.6 13.4c.55-.66.92-1.58.82-2.5-.79.04-1.74.52-2.3 1.18-.5.59-.94 1.55-.83 2.45.88.07 1.78-.45 2.3-1.13zM20.4 14.7c-1.27-.07-2.36.72-2.97.72-.6 0-1.55-.69-2.55-.67-1.31.02-2.52.76-3.19 1.94-1.36 2.36-.35 5.86 1 7.78.65.94 1.43 2 2.45 1.96 1-.04 1.36-.63 2.55-.63 1.18 0 1.5.63 2.55.61 1.05-.02 1.71-.95 2.36-1.9.74-1.09 1.05-2.13 1.06-2.18-.02-.01-2.04-.78-2.06-3.1-.02-1.94 1.59-2.87 1.66-2.92-.91-1.34-2.31-1.49-2.81-1.51z"
-        fill="#fff"
-      />
-      {/* Captions */}
-      <text
-        x="33"
-        y="17"
-        fontFamily="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif"
-        fontSize="7"
-        fill="#fff"
-      >
-        Download on the
-      </text>
-      <text
-        x="33"
-        y="30"
-        fontFamily="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif"
-        fontSize="14"
-        fontWeight="600"
-        fill="#fff"
-      >
-        App Store
-      </text>
-    </svg>
-  );
-}
-
-/**
- * Google Play (Play Store) badge — black rounded rectangle with the
- * 4-color Play triangle, "GET IT ON" caption and "Google Play"
- * wordmark. Simplified from Google's official Play badge.
- */
-function PlayStoreBadge() {
-  return (
-    <svg
-      viewBox="0 0 134 40"
-      className="h-9 w-auto"
-      role="img"
-      aria-label="Get it on Google Play"
-    >
-      <rect
-        width="134"
-        height="40"
-        rx="6"
-        fill="#000"
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-      />
-      {/* Play triangle composed of 4 colored shapes */}
-      <g transform="translate(11.5, 9.5)">
-        <path d="M0 0v21l11.2-10.5L0 0z" fill="#00C2D6" />
-        <path d="M0 0l11.2 10.5L14.7 7 1.7-.7C1-.4.5-.2 0 0z" fill="#FFD400" />
-        <path
-          d="M0 21l11.2-10.5L14.7 14 1.7 21.7c-.7-.3-1.2-.5-1.7-.7z"
-          fill="#FF3946"
-        />
-        <path
-          d="M14.7 7l-3.5 3.5 3.5 3.5L20 11.6c.6-.4 1-.7 1-1.1 0-.4-.4-.7-1-1.1L14.7 7z"
-          fill="#00E676"
-        />
-      </g>
-      {/* Captions */}
-      <text
-        x="40"
-        y="17"
-        fontFamily="-apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif"
-        fontSize="7"
-        fill="#fff"
-      >
-        GET IT ON
-      </text>
-      <text
-        x="40"
-        y="30"
-        fontFamily="-apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif"
-        fontSize="14"
-        fontWeight="600"
-        fill="#fff"
-      >
-        Google Play
-      </text>
     </svg>
   );
 }

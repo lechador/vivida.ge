@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { InstallAppButton } from "@/components/pwa/install-button";
 import { NavItemLink } from "./nav-item-link";
 import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -94,7 +95,7 @@ export function MobileNav({
                 </DialogPrimitive.Title>
 
                 {/* Nav items */}
-                <nav className="flex flex-col gap-1 mb-2">
+                <nav className="mb-2 flex flex-col gap-1 overflow-y-auto">
                   {NAV_ITEMS.map((item) => {
                     const { Icon } = item;
                     const isActive = item.key === active;
@@ -155,6 +156,13 @@ export function MobileNav({
                     );
                   })}
                 </nav>
+                <div className="mt-auto border-t border-border/60 pt-4">
+                  <InstallAppButton
+                    locale={locale}
+                    surface="mobile_nav"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-3 py-2.5 text-sm font-medium text-foreground"
+                  />
+                </div>
               </motion.aside>
             </DialogPrimitive.Content>
           </DialogPrimitive.Portal>

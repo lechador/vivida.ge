@@ -1,4 +1,7 @@
-/* Vivida service worker — web push only (no offline caching for now). */
+/* Vivida service worker — push plus an offline fallback for page navigation. */
+
+const OFFLINE_CACHE = "vivida-offline-v1";
+const OFFLINE_PAGE = "/offline.html";
 
 self.addEventListener("push", (event) => {
   let data = {};
@@ -38,7 +41,22 @@ self.addEventListener("notificationclick", (event) => {
 });
 
 // Activate immediately on update so pushes keep working after a deploy.
-self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(OFFLINE_CACHE).then((cache) => cache.add(OFFLINE_PAGE))
+  );
+  self.skipWaiting();
+});
 self.addEventListener("activate", (event) =>
   event.waitUntil(self.clients.claim())
 );
+
+self.addEventListener("fetch", (event) => {
+  if (event.request.mode !== "navigate") return;
+  event.respondWith(
+    fetch(event.request).catch(async () => {
+      const cached = await caches.match(OFFLINE_PAGE);
+      return cached || Response.error();
+    })
+  );
+});

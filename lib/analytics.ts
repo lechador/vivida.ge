@@ -82,6 +82,14 @@ export const ANALYTICS_EVENT = {
   navItemSelected: "nav_item_selected",
   emptyStateSeen: "empty_state_seen",
   onboardingAbandoned: "onboarding_abandoned",
+  pwaInstallCtaViewed: "pwa_install_cta_viewed",
+  pwaInstallCtaClicked: "pwa_install_cta_clicked",
+  pwaInstallPromptShown: "pwa_install_prompt_shown",
+  pwaInstallPromptAccepted: "pwa_install_prompt_accepted",
+  pwaInstallPromptDismissed: "pwa_install_prompt_dismissed",
+  pwaAppInstalled: "pwa_appinstalled",
+  pwaStandaloneOpened: "pwa_standalone_opened",
+  pwaStandaloneFirstOpen: "pwa_standalone_first_open",
 } as const;
 
 export type AnalyticsEventName =
@@ -170,6 +178,9 @@ export function trackEvent(
   params?: GtagParams,
 ): boolean {
   if (typeof window === "undefined") return false;
+  if (VALUE_ACTION_EVENTS.has(name)) {
+    window.dispatchEvent(new Event("vivida:pwa-value-action"));
+  }
   const gtag = (
     window as unknown as {
       gtag?: (command: string, eventName: string, params?: GtagParams) => void;

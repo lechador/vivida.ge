@@ -12,3 +12,4 @@ export * from "./tables/relationships";
 export * from "./tables/community";
 export * from "./tables/articles";
 export * from "./tables/relations";
+export * from "./tables/pwa";

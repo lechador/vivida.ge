@@ -3,7 +3,11 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { Noto_Sans_Georgian } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
+import Script from "next/script";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
+import { PwaInstallTracker } from "@/components/pwa/install-tracker";
+import { PwaServiceWorkerRegister } from "@/components/pwa/service-worker-register";
+import { InstallNudge } from "@/components/pwa/install-nudge";
 import { RefCapture } from "@/components/ref-capture";
 import { TrackingConsentManager } from "@/components/privacy/tracking-consent-manager";
 import "./globals.css";
@@ -151,6 +155,13 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <Script id="pwa-install-capture" strategy="beforeInteractive">{`
+          window.addEventListener('beforeinstallprompt', function (event) {
+            event.preventDefault();
+            window.__vividaInstallPrompt = event;
+            window.dispatchEvent(new Event('vivida:pwa-prompt-ready'));
+          });
+        `}</Script>
         {/* Scroll-reveal sections start opacity:0 and are shown by JS. With
             JS disabled, force them visible so content is never hidden. */}
         <noscript>
@@ -173,6 +184,9 @@ export default async function RootLayout({
           speed={400}
         />
         <BfcacheRefresher />
+        <PwaServiceWorkerRegister />
+        <PwaInstallTracker locale={locale} />
+        <InstallNudge locale={locale} />
         <RefCapture />
         <div
           id="main-content"

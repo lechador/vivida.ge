@@ -26,6 +26,19 @@ These prove received value and feed the "valuable sessions" metric:
 
 ## Funnel / diagnostic events
 
+### Web app installation
+
+`pwa_install_cta_viewed`, `pwa_install_cta_clicked`, `pwa_install_prompt_shown`,
+`pwa_install_prompt_accepted`, `pwa_install_prompt_dismissed`, and
+`pwa_appinstalled` describe the browser installation path. `pwa_standalone_opened`
+counts launches and `pwa_standalone_first_open` fires once per browser storage
+after the installed web app opens. They carry the shared event contract and are
+consent-gated. The first-open count includes earlier installs that open after
+instrumentation starts, and does not reveal whether the shortcut remains on a
+device. A consented first-party `/api/pwa/open` call also records a random
+browser-storage profile ID in `pwa_installation`, with first and latest open
+dates; the admin PWA page displays both sources separately.
+
 | event                                                               | when                                                                                             | key params                        |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------- |
 | `onboarding_started/step_viewed/step_completed/submitted/abandoned` | wizard lifecycle; abandoned = unmount without submit + last `step_name`                          | `flow`, `step_name`               |

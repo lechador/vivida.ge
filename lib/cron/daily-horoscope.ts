@@ -1,14 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { sendBirthdayGifts } from "@/lib/birthday";
-import {
-  sendDailyHoroscopeBlast,
-  utcDateKey,
-} from "@/lib/email-marketing";
+import { sendDailyHoroscopeBlast, utcDateKey } from "@/lib/email-marketing";
 import { pruneGenerationLocks } from "@/lib/generation-lock";
 import { sendDailyHoroscopeToLeads } from "@/lib/horoscope-leads";
 import { sendDailyPushBlast } from "@/lib/push";
 import { pruneRateLimits } from "@/lib/rate-limit";
+import { prunePwaInstallations } from "@/lib/pwa-installations";
 import {
   sendProfileIncompleteRenudges,
   sendVerificationRenudges,
@@ -101,7 +99,11 @@ export async function runDailyHoroscopeCron(
     console.warn("[cron] re-nudge failed:", (err as Error).message);
   }
 
-  await Promise.all([pruneRateLimits(), pruneGenerationLocks()]);
+  await Promise.all([
+    pruneRateLimits(),
+    pruneGenerationLocks(),
+    prunePwaInstallations(),
+  ]);
 
   return NextResponse.json({
     sendDate,
