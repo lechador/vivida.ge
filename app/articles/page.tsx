@@ -18,24 +18,24 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 const COPY = {
   ka: {
-    title: "სტატიები ფსიქოლოგიაზე, ფილოსოფიასა და თვითგანვითარებაზე",
+    title: "სტატიები ფსიქოლოგიაზე, თვითგანვითარებასა და ასტროლოგიაზე",
     description:
-      "დაფიქრებული და პრაქტიკული საკითხავი საკუთარი თავის, ურთიერთობებისა და უფრო გააზრებული ცხოვრების შესახებ.",
+      "საკითხავი ფსიქოლოგიაზე, ურთიერთობებზე, თვითგანვითარებასა და ასტროლოგიაზე — მარტივად, სიღრმით და პრაქტიკული ხედვით.",
     eyebrow: "Vivida Journal",
     heading: "აზრები უფრო გააზრებული ცხოვრებისთვის",
     intro:
-      "ფსიქოლოგია, ფილოსოფია, ურთიერთობები და თვითგანვითარება — სიღრმით, სიმშვიდით და ყოველდღიურ ცხოვრებაში გამოსაყენებელი ხედვით.",
+      "ფსიქოლოგია, ფილოსოფია, ურთიერთობები, თვითგანვითარება და ასტროლოგია — სიღრმით, სიმშვიდით და ყოველდღიურ ცხოვრებაში გამოსაყენებელი ხედვით.",
     all: "ყველა",
     empty: "ამ კატეგორიაში სტატია მალე გამოჩნდება.",
   },
   en: {
-    title: "Psychology, Philosophy & Self-Development Articles",
+    title: "Psychology, Self-Development & Astrology Articles",
     description:
-      "Thoughtful, practical reading about the mind, relationships and living with greater clarity.",
+      "Thoughtful reading about psychology, relationships, self-development and astrology.",
     eyebrow: "Vivida Journal",
     heading: "Ideas for a more examined life",
     intro:
-      "Psychology, philosophy, relationships and self-development — thoughtful perspectives you can carry into everyday life.",
+      "Psychology, philosophy, relationships, self-development and astrology — thoughtful perspectives for everyday life.",
     all: "All",
     empty: "Articles in this category are coming soon.",
   },
@@ -55,6 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
         en: articleUrl("en"),
         "x-default": articleUrl("en"),
       },
+      types: { "application/rss+xml": `${canonical}/feed.xml` },
     },
     openGraph: {
       type: "website",

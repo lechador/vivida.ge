@@ -36,6 +36,8 @@ const COPY = {
     contents: "ამ სტატიაში",
     related: "წაიკითხე შემდეგ",
     note: "ეს სტატია განკუთვნილია საგანმანათლებლო და თვითრეფლექსიის მიზნებისთვის და არ ცვლის პროფესიონალურ ფსიქოლოგიურ ან სამედიცინო დახმარებას.",
+    astrologyNote:
+      "ასტროლოგიური განმარტებები თვითრეფლექსიისთვისაა. ისინი არ წარმოადგენს მეცნიერულ პროგნოზს და არ უნდა ჩაანაცვლოს სამედიცინო, ფინანსური ან სხვა მნიშვნელოვანი გადაწყვეტილების საფუძველი.",
     cta: "გაიცანი საკუთარი თავი უკეთ",
     ctaText:
       "გააგრძელე თვითშემეცნება Vivida-ს პიროვნების ტესტებითა და პერსონალური რუკით.",
@@ -47,6 +49,8 @@ const COPY = {
     contents: "In this article",
     related: "Read next",
     note: "This article is for education and self-reflection. It is not a substitute for professional psychological or medical care.",
+    astrologyNote:
+      "Astrological interpretations are for reflection. They are not scientific predictions or a basis for medical, financial, or other important decisions.",
     cta: "Understand yourself more clearly",
     ctaText:
       "Continue your self-discovery with Vivida's personality assessments and personal chart.",
@@ -291,7 +295,9 @@ export default async function ArticlePage({ params }: Props) {
             <div data-article-body>
               <ArticleMarkdown content={article.content} />
               <p className="mt-12 rounded-2xl border border-border/70 bg-card/45 p-5 text-sm leading-relaxed text-muted-foreground">
-                {copy.note}
+                {article.category === "astrology"
+                  ? copy.astrologyNote
+                  : copy.note}
               </p>
             </div>
             {headings.length > 1 && (

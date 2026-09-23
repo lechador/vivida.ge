@@ -35,7 +35,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         ],
       },
     ],
-    sitemap: `${origin}/sitemap.xml`,
+    sitemap: [`${origin}/sitemap.xml`, `${origin}/articles/feed.xml`],
     host: origin,
   };
 }

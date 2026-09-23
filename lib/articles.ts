@@ -13,6 +13,7 @@ export const ARTICLE_CATEGORIES = [
   "self-development",
   "relationships",
   "wellbeing",
+  "astrology",
 ] as const;
 
 export type ArticleCategory = (typeof ARTICLE_CATEGORIES)[number];
@@ -32,6 +33,7 @@ export const ARTICLE_CATEGORY_LABELS: Record<
     "self-development": "თვითგანვითარება",
     relationships: "ურთიერთობები",
     wellbeing: "კეთილდღეობა",
+    astrology: "ასტროლოგია",
   },
   en: {
     psychology: "Psychology",
@@ -39,6 +41,7 @@ export const ARTICLE_CATEGORY_LABELS: Record<
     "self-development": "Self-development",
     relationships: "Relationships",
     wellbeing: "Wellbeing",
+    astrology: "Astrology",
   },
 };
 
@@ -111,7 +114,7 @@ export const listPublishedArticles = cache(
     locale: UserLocale,
     options: { limit?: number; category?: ArticleCategory } = {},
   ): Promise<PublishedArticle[]> => {
-    const limit = Math.min(Math.max(options.limit ?? 24, 1), 60);
+    const limit = Math.min(Math.max(options.limit ?? 60, 1), 60);
     const items = await listPublishedArticlesAcrossRequests(
       locale,
       limit,
