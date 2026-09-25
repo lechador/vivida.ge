@@ -58,11 +58,17 @@ export function FastOnboarding({
           next,
           true,
         );
-        if (result && !result.ok) setError(result.error);
+        if (result && !result.ok) {
+          setError(
+            result.code === "possible_duplicate" && en
+              ? "You may already have an account with these birth details. Review this in the next step."
+              : result.error,
+          );
+        }
       });
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [next]);
+  }, [next, en]);
 
   if (missing || error) {
     return (

@@ -63,8 +63,8 @@ export async function signInWithApple(callbackUrl: string = "/post-login") {
   await signIn("apple", { redirectTo: callbackUrl });
 }
 
-export async function signOutAction() {
-  await signOut({ redirectTo: "/" });
+export async function signOutAction(destination: "/" | "/login" = "/") {
+  await signOut({ redirectTo: destination });
 }
 
 const TURNSTILE_ERROR_EN =

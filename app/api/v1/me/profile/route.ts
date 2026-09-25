@@ -8,10 +8,7 @@ import { parseBody } from "@/lib/api/validate";
 import { ensureChartFor } from "@/actions/chart";
 import { sendWelcomeIfEligible } from "@/lib/email";
 import { invalidateProfileForUser } from "@/lib/header-cache";
-import {
-  saveBirthDataCore,
-  updatePublicProfileCore,
-} from "@/lib/profile-core";
+import { saveBirthDataCore, updatePublicProfileCore } from "@/lib/profile-core";
 import { awardReputation, RepSubject } from "@/lib/reputation";
 
 export const runtime = "nodejs";
@@ -25,6 +22,7 @@ const BirthBody = z.object({
   longitude: z.number(),
   timezone: z.string(),
   username: z.string().nullable().optional(),
+  confirmPossibleDuplicate: z.boolean().optional(),
 });
 
 const PublicBody = z.object({
@@ -50,7 +48,11 @@ export async function PUT(req: Request) {
 
     const result = await saveBirthDataCore(user.id, input);
     if (!result.ok) {
-      return fail(422, "profile_rejected", result.error);
+      return fail(
+        result.code === "possible_duplicate" ? 409 : 422,
+        result.code ?? "profile_rejected",
+        result.error,
+      );
     }
 
     const userId = user.id;
@@ -60,7 +62,7 @@ export async function PUT(req: Request) {
       } catch (err) {
         console.warn(
           "[api/v1/me/profile] background chart pre-gen failed:",
-          (err as Error).message
+          (err as Error).message,
         );
       }
       await awardReputation({

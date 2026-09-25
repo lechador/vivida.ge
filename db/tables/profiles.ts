@@ -67,6 +67,7 @@ export const profiles = pgTable(
       .notNull(),
   },
   (t) => [
+    index("profile_birth_date_idx").on(t.dateOfBirth),
     index("profile_username_trgm_idx").using(
       "gin",
       t.username.asc().op("gin_trgm_ops"),

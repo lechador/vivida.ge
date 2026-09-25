@@ -6,6 +6,7 @@ import { ageFromDob } from "@/lib/profile-utils";
 import { qualifyReferral } from "@/lib/referral";
 import { completeEligibleEmailCampaigns } from "@/lib/email-campaigns";
 import { ensureUsername } from "@/lib/username";
+import { hasLikelyDuplicateAccount } from "@/lib/duplicate-account";
 
 /**
  * Framework-agnostic profile *write* logic, shared by the website (Server
@@ -44,9 +45,12 @@ export type SaveBirthDataInput = {
       written when the caller passes a boolean — never defaulted here, so
       mobile callers that don't send it leave the stored value untouched. */
   discoverable?: boolean;
+  /** User explicitly chose to continue after a possible duplicate warning. */
+  confirmPossibleDuplicate?: boolean;
 };
 
-export type ProfileWriteResult = { ok: true } | { ok: false; error: string };
+export type ProfileWriteResult =
+  { ok: true } | { ok: false; error: string; code?: "possible_duplicate" };
 
 /**
  * Validate birth data and upsert the user's profile row. Birth date is
@@ -151,6 +155,26 @@ export async function saveBirthDataCore(
     typeof input.discoverable === "boolean"
       ? { discoverable: input.discoverable }
       : {};
+
+  // Ask only on the first birth-profile save. Matching a name, exact birth
+  // minute and nearby birthplace is a useful signal, but twins and shared
+  // names exist, so the user may explicitly continue.
+  if (!existingProfile?.dateOfBirth && !input.confirmPossibleDuplicate) {
+    const duplicate = await hasLikelyDuplicateAccount(userId, {
+      dateOfBirth: lockedDate,
+      timeOfBirth: input.timeOfBirth,
+      latitude: input.latitude,
+      longitude: input.longitude,
+    });
+    if (duplicate) {
+      return {
+        ok: false,
+        code: "possible_duplicate",
+        error:
+          "შესაძლოა, ამ მონაცემებით ანგარიში უკვე გაქვს. ჯერ სცადე ძველ ანგარიშში შესვლა. თუ ეს ახალი ანგარიშია, შეგიძლია გააგრძელო.",
+      };
+    }
+  }
 
   try {
     await db

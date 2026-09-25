@@ -17,13 +17,12 @@ import {
   updatePublicProfileCore,
   type SaveBirthDataInput,
   type UpdatePublicProfileInput,
+  type ProfileWriteResult,
 } from "@/lib/profile-core";
 
 export type SaveProfileInput = SaveBirthDataInput;
 
-export type SaveProfileResult =
-  | { ok: true }
-  | { ok: false; error: string };
+export type SaveProfileResult = ProfileWriteResult;
 
 /** Same-origin relative path only (no open redirect). */
 function safeNext(v: string | undefined): string | null {
@@ -33,7 +32,7 @@ function safeNext(v: string | undefined): string | null {
 export async function saveProfile(
   input: SaveProfileInput,
   next?: string,
-  showResult = false
+  showResult = false,
 ): Promise<SaveProfileResult> {
   const user = await requireUser();
 
@@ -56,7 +55,7 @@ export async function saveProfile(
     } catch (err) {
       console.warn(
         "[saveProfile] background chart pre-gen failed; dashboard will retry:",
-        (err as Error).message
+        (err as Error).message,
       );
     }
     // Reputation — credit the one-shot profile_completed milestone.
@@ -79,7 +78,7 @@ export async function saveProfile(
   const requestedDest = safeNext(next);
   const dest = showResult
     ? `/onboarding/result${requestedDest ? `?next=${encodeURIComponent(requestedDest)}` : ""}`
-    : requestedDest ?? "/report";
+    : (requestedDest ?? "/report");
   revalidatePath("/dashboard");
   revalidatePath("/report");
   revalidatePath("/onboarding");
@@ -93,15 +92,14 @@ export async function saveProfile(
 export type UpdateProfileFieldsInput = UpdatePublicProfileInput;
 
 export type UpdateProfileFieldsResult =
-  | { ok: true }
-  | { ok: false; error: string };
+  { ok: true } | { ok: false; error: string };
 
 /**
  * Edit the public-profile fields. Every profile is public, so this just
  * validates and saves username/displayName/bio via the shared core.
  */
 export async function updateProfileFields(
-  input: UpdateProfileFieldsInput
+  input: UpdateProfileFieldsInput,
 ): Promise<UpdateProfileFieldsResult> {
   const user = await requireUser();
 

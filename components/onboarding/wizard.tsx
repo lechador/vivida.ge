@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { saveProfile } from "@/actions/profile";
+import { signOutAction } from "@/actions/auth";
 import { fbTrack } from "@/lib/fb-pixel";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { ProgressDots } from "./progress-dots";
@@ -189,6 +190,7 @@ export function OnboardingWizard({
   }, [flow, step, STEPS]);
   const [direction, setDirection] = useState<Direction>(1);
   const [error, setError] = useState<string | null>(null);
+  const [possibleDuplicate, setPossibleDuplicate] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const currentStep = STEPS[step];
@@ -244,12 +246,14 @@ export function OnboardingWizard({
 
   const goBack = () => {
     if (step === 0) return;
+    setPossibleDuplicate(false);
     setDirection(-1);
     setStep((s) => s - 1);
   };
 
-  const submit = () => {
+  const submit = (confirmPossibleDuplicate = false) => {
     setError(null);
+    setPossibleDuplicate(false);
     // When the date step was skipped (locked), the existing date in `data`
     // is whatever we initialized from the profile. The server still re-
     // validates it AND ignores the input in favour of the stored value, so
@@ -280,12 +284,18 @@ export function OnboardingWizard({
           gender: data.gender,
           username: data.visibility.username,
           discoverable: data.visibility.discoverable,
+          confirmPossibleDuplicate,
         },
         next,
         !dateLocked,
       );
       if (result && !result.ok) {
-        setError(result.error);
+        submittedRef.current = false;
+        if (result.code === "possible_duplicate") {
+          setPossibleDuplicate(true);
+        } else {
+          setError(result.error);
+        }
       }
     });
   };
@@ -357,6 +367,39 @@ export function OnboardingWizard({
           <p className="mt-6 text-center text-sm text-destructive">{error}</p>
         )}
 
+        {possibleDuplicate && (
+          <div className="mt-6 rounded-xl border border-amber-400/40 bg-amber-400/10 p-4 text-sm">
+            <p className="font-medium">
+              {en
+                ? "You may already have an account"
+                : "შესაძლოა, ანგარიში უკვე გაქვს"}
+            </p>
+            <p className="mt-2 text-muted-foreground">
+              {en
+                ? "We found a verified account with the same name and birth details. Sign in to your existing account if it is yours. If these details belong to someone else, you can continue."
+                : "ამ სახელითა და დაბადების მონაცემებით დადასტურებული ანგარიში ვიპოვეთ. თუ შენია, შედი ძველ ანგარიშში. თუ მონაცემები სხვა ადამიანს ეკუთვნის, შეგიძლია გააგრძელო."}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isPending}
+                onClick={() => startTransition(() => signOutAction("/login"))}
+              >
+                {en ? "Sign in to existing account" : "ძველ ანგარიშში შესვლა"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={isPending}
+                onClick={() => submit(true)}
+              >
+                {en ? "Continue with this account" : "ამ ანგარიშით გაგრძელება"}
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="mt-10 flex items-center justify-between gap-3">
           <Button
             type="button"
@@ -374,7 +417,7 @@ export function OnboardingWizard({
             variant={isLast ? "mystic" : "default"}
             size="lg"
             onClick={goNext}
-            disabled={!stepValid || isPending}
+            disabled={!stepValid || isPending || possibleDuplicate}
           >
             {isLast ? (
               <>

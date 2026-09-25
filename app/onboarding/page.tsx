@@ -48,7 +48,7 @@ export default async function OnboardingPage({
   }
 
   const destination = safeNext(next);
-  if (fast === "1" && existing) redirect(destination ?? "/report");
+  if (fast === "1" && existing?.dateOfBirth) redirect(destination ?? "/report");
 
   return (
     <main
