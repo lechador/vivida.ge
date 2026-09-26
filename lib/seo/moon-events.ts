@@ -1,4 +1,8 @@
-import { computeMoonPhase, type MoonPhaseSnapshot } from "@/lib/moon-phase";
+import {
+  computeMoonPhase,
+  utcDateString,
+  type MoonPhaseSnapshot,
+} from "@/lib/moon-phase";
 import { MONTHS_KA, dateIso } from "@/lib/seo/astrology-calendar";
 
 export type MoonEventKind = "full" | "new";
@@ -11,6 +15,17 @@ export type MoonEvent = {
   exactTimeKa: string;
 };
 const eventCache = new Map<string, MoonEvent[]>();
+const eventSnapshotCache = new Map<string, MoonPhaseSnapshot | null>();
+
+/** Moon event scans use noon-UTC transits, even for hourly refine candidates. */
+function eventSnapshot(date: Date): MoonPhaseSnapshot | null {
+  const key = utcDateString(date);
+  if (eventSnapshotCache.has(key)) return eventSnapshotCache.get(key) ?? null;
+  const snapshot = computeMoonPhase(date);
+  if (eventSnapshotCache.size >= 512) eventSnapshotCache.clear();
+  eventSnapshotCache.set(key, snapshot);
+  return snapshot;
+}
 
 /**
  * Publish detail pages only when an event is close enough to be useful. The
@@ -37,7 +52,7 @@ function refine(day: Date, kind: MoonEventKind) {
   let bestValue = -1;
   for (let hour = -18; hour <= 42; hour++) {
     const at = new Date(day.getTime() + hour * 3600000);
-    const value = closeness(computeMoonPhase(at), kind);
+    const value = closeness(eventSnapshot(at), kind);
     if (value > bestValue) {
       bestValue = value;
       best = at;
@@ -59,7 +74,7 @@ export function moonEvents(
     const date = new Date(start);
     date.setUTCDate(date.getUTCDate() + i - 1);
     date.setUTCHours(12, 0, 0, 0);
-    return { date, value: closeness(computeMoonPhase(date), kind) };
+    return { date, value: closeness(eventSnapshot(date), kind) };
   });
   const events: MoonEvent[] = [];
   for (let i = 1; i < samples.length - 1; i++) {
@@ -73,7 +88,7 @@ export function moonEvents(
     const local = new Date(exact.getTime() + 4 * 3600000);
     const iso = dateIso(local);
     if (events.some((event) => event.iso === iso)) continue;
-    const snapshot = computeMoonPhase(exact);
+    const snapshot = eventSnapshot(exact);
     if (!snapshot) continue;
     events.push({
       kind,

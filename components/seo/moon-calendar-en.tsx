@@ -35,7 +35,7 @@ const cachedUpcomingEvents = unstable_cache(
       }));
     return { newEvents: serialize("new"), fullEvents: serialize("full") };
   },
-  ["moon-calendar-upcoming-v1"],
+  ["moon-calendar-upcoming-v2"],
   { revalidate: 86400 },
 );
 export const moonCalendarEnCopy = (year: number) => ({
