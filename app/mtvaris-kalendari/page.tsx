@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
+import { unstable_cache } from "next/cache";
 import { ArrowRight, Moon, Sparkles } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
@@ -216,18 +217,17 @@ function majorEventsForYears(startYear: number, endYear: number): MajorEvent[] {
   return events.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
-// Annual ephemeris samples are stable for a given year. Keep one year's pair
-// per server instance while daily output is rendered for each fresh request.
-const annualEventsCache = new Map<number, MajorEvent[]>();
-
-function annualEventsForYear(year: number): MajorEvent[] {
-  const cached = annualEventsCache.get(year);
-  if (cached) return cached;
-  const events = majorEventsForYears(year, year + 1);
-  annualEventsCache.clear();
-  annualEventsCache.set(year, events);
-  return events;
-}
+// Keep the expensive, year-stable ephemeris in Next's persistent data cache.
+// Dates are serialized explicitly because cached values may cross processes.
+const cachedAnnualEvents = unstable_cache(
+  async (year: number) =>
+    majorEventsForYears(year, year + 1).map(({ date, ...event }) => ({
+      ...event,
+      dateIso: date.toISOString(),
+    })),
+  ["moon-calendar-annual-v1"],
+  { revalidate: 30 * 86400 },
+);
 
 function EventList({ events, label }: { events: MajorEvent[]; label: string }) {
   return (
@@ -269,7 +269,9 @@ export default async function MoonCalendarPage() {
     const date = new Date(todayNoonUtc.getTime() + i * DAY_MS);
     return { date, snapshot: computeMoonPhase(date) };
   });
-  const annualEvents = annualEventsForYear(currentYear);
+  const annualEvents = (await cachedAnnualEvents(currentYear)).map(
+    ({ dateIso, ...event }) => ({ ...event, date: new Date(dateIso) }),
+  );
   const yearEvents = annualEvents.filter(
     (event) => tbilisiCalendarParts(event.date).year === currentYear,
   );

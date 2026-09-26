@@ -77,6 +77,7 @@ export async function ReportPromo({ className }: { className?: string }) {
             compact
             balance={balance}
             isPremium={premium}
+            experimentEnabled={Boolean(userId)}
           />
         </div>
       )}

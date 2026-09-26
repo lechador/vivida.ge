@@ -22,8 +22,8 @@ export const MOON_EVENT_DAYS = 210;
 /** The sitemap prioritises roughly the next four lunations of each kind. */
 export const SITEMAP_MOON_EVENT_DAYS = 120;
 
-function tbilisiStart() {
-  const iso = new Date(Date.now() + 4 * 3600000).toISOString().slice(0, 10);
+function tbilisiStart(asOf: Date) {
+  const iso = new Date(asOf.getTime() + 4 * 3600000).toISOString().slice(0, 10);
   return new Date(`${iso}T00:00:00Z`);
 }
 
@@ -46,8 +46,12 @@ function refine(day: Date, kind: MoonEventKind) {
   return best;
 }
 
-export function moonEvents(kind: MoonEventKind, days = MOON_EVENT_DAYS) {
-  const start = tbilisiStart();
+export function moonEvents(
+  kind: MoonEventKind,
+  days = MOON_EVENT_DAYS,
+  asOf = new Date(),
+) {
+  const start = tbilisiStart(asOf);
   const cacheKey = `${kind}-${days}-${start.toISOString()}`;
   const cached = eventCache.get(cacheKey);
   if (cached) return cached;

@@ -205,7 +205,7 @@ export function TarotConversionLanding({
             premium={premium}
           />
           {!authed && (
-            <p className="mt-4 text-center text-xs leading-5 text-white/45">
+            <p className="mt-4 text-center text-xs leading-5 text-white/70">
               პასუხის მისაღებად გაივლი სწრაფ რეგისტრაციას — შენი პირველი გაშლა
               ანგარიშზე ავტომატურად უფასოა.
             </p>
@@ -235,7 +235,7 @@ export function TarotConversionLanding({
                     <span className="grid size-11 place-items-center rounded-2xl bg-[#8d67ff]/12 text-[#c7b5ff] ring-1 ring-[#a78cff]/20">
                       <Icon className="size-5" />
                     </span>
-                    <span className="font-mono text-xs text-white/25">
+                    <span className="font-mono text-xs text-white/70">
                       {step.n}
                     </span>
                   </div>
@@ -353,7 +353,7 @@ export function TarotConversionLanding({
                   }`}
                 >
                   <span
-                    className={`w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${featured ? "bg-[#d3bb79]/14 text-[#ead69f]" : "bg-white/6 text-white/45"}`}
+                    className={`w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${featured ? "bg-[#d3bb79]/14 text-[#ead69f]" : "bg-white/6 text-white/70"}`}
                   >
                     {index === 0
                       ? "საწყისი"
@@ -413,7 +413,7 @@ export function TarotConversionLanding({
             </div>
           )}
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-white/42">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-white/70">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="size-4" /> უსაფრთხო გადახდა
             </span>

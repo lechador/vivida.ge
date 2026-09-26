@@ -32,6 +32,7 @@ export function CreditsVsPro({
   compact = false,
   balance,
   isPremium = false,
+  experimentEnabled = true,
 }: {
   locale: UserLocale;
   countryCode?: string | null;
@@ -42,6 +43,7 @@ export function CreditsVsPro({
   compact?: boolean;
   balance?: number;
   isPremium?: boolean;
+  experimentEnabled?: boolean;
 }) {
   const en = locale === "en";
   const starterPack = creditPacksForCountry(countryCode)[0];
@@ -52,7 +54,11 @@ export function CreditsVsPro({
   const proSavings = discountedPro
     ? premiumPlanSavingsPercent(standardPro, discountedPro)
     : 0;
-  const variant = useExperiment(EXPERIMENTS.pricingPresentation, placement);
+  const variant = useExperiment(
+    EXPERIMENTS.pricingPresentation,
+    placement,
+    experimentEnabled,
+  );
   const showPromotion =
     balance == null
       ? !isPremium
@@ -75,11 +81,13 @@ export function CreditsVsPro({
       product: "billing_choice",
       payment_model: destination === "credits" ? "one_time" : "subscription",
     });
-    trackExperimentOutcome(
-      EXPERIMENTS.pricingPresentation,
-      placement,
-      destination === "credits" ? "choice_credits" : "choice_pro",
-    );
+    if (experimentEnabled) {
+      trackExperimentOutcome(
+        EXPERIMENTS.pricingPresentation,
+        placement,
+        destination === "credits" ? "choice_credits" : "choice_pro",
+      );
+    }
   }
 
   const heading =

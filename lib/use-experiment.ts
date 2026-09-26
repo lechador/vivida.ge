@@ -4,21 +4,31 @@ import { useEffect, useState } from "react";
 
 import type { ExperimentName } from "@/lib/experiment-catalog";
 
-export function useExperiment(experiment: ExperimentName, surface: string): string | null {
+export function useExperiment(
+  experiment: ExperimentName,
+  surface: string,
+  enabled = true,
+): string | null {
   const [variant, setVariant] = useState<string | null>(null);
   useEffect(() => {
+    if (!enabled) return;
     const controller = new AbortController();
-    void fetch(`/api/experiments/${experiment}?surface=${encodeURIComponent(surface)}`, {
-      credentials: "same-origin",
-      signal: controller.signal,
-    }).then(async (response) => {
-      if (!response.ok) return;
-      const body = await response.json() as { variant?: unknown };
-      if (typeof body.variant === "string") setVariant(body.variant);
-    }).catch(() => undefined);
+    void fetch(
+      `/api/experiments/${experiment}?surface=${encodeURIComponent(surface)}`,
+      {
+        credentials: "same-origin",
+        signal: controller.signal,
+      },
+    )
+      .then(async (response) => {
+        if (!response.ok) return;
+        const body = (await response.json()) as { variant?: unknown };
+        if (typeof body.variant === "string") setVariant(body.variant);
+      })
+      .catch(() => undefined);
     return () => controller.abort();
-  }, [experiment, surface]);
-  return variant;
+  }, [experiment, surface, enabled]);
+  return enabled ? variant : null;
 }
 
 export function trackExperimentOutcome(

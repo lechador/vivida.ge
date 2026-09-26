@@ -1,4 +1,5 @@
 import { EnglishLink as Link } from "@/components/i18n/international-link";
+import { unstable_cache } from "next/cache";
 import { ArrowRight, Moon, Sparkles } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
@@ -11,13 +12,32 @@ import {
   type PhaseKey,
 } from "@/lib/moon-phase";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { moonEvents, type MoonEvent } from "@/lib/seo/moon-events";
+import {
+  MOON_EVENT_DAYS,
+  moonEvents,
+  type MoonEvent,
+} from "@/lib/seo/moon-events";
 import { lunarDayFromAge } from "@/lib/seo/moon-reference";
 import { tbilisiCalendarParts, tbilisiNoonUtc } from "@/lib/moon-calendar-date";
 
 const SITE = "https://www.vividaastro.com";
 const PATH = "/mtvaris-kalendari";
 const DAY = 86400000;
+// A Tbilisi date in the key refreshes upcoming events at local midnight.
+// Only event lists are cached; today's phase and the 30-day view stay live.
+const cachedUpcomingEvents = unstable_cache(
+  async (dayKey: string) => {
+    const asOf = new Date(`${dayKey}T00:00:00+04:00`);
+    const serialize = (kind: "new" | "full") =>
+      moonEvents(kind, MOON_EVENT_DAYS, asOf).map(({ date, ...event }) => ({
+        ...event,
+        dateIso: date.toISOString(),
+      }));
+    return { newEvents: serialize("new"), fullEvents: serialize("full") };
+  },
+  ["moon-calendar-upcoming-v1"],
+  { revalidate: 86400 },
+);
 export const moonCalendarEnCopy = (year: number) => ({
   title: `Moon Calendar ${year}: Today's Phase and Zodiac Sign`,
   description: `Moon calendar for ${year}: today's phase, illumination and zodiac sign, upcoming New and Full Moon dates, and a daily 30-day lunar forecast.`,
@@ -117,13 +137,20 @@ function EventList({ events, label }: { events: MoonEvent[]; label: string }) {
   );
 }
 
-export function MoonCalendarPageEn() {
+export async function MoonCalendarPageEn() {
   const now = new Date();
   const year = tbilisiCalendarParts(now).year;
   const copy = moonCalendarEnCopy(year);
   const today = computeMoonPhase(now);
-  const upcomingNew = moonEvents("new");
-  const upcomingFull = moonEvents("full");
+  const dayKey = tbilisiNoonUtc(now).toISOString().slice(0, 10);
+  const cachedEvents = await cachedUpcomingEvents(dayKey);
+  const revive = (events: typeof cachedEvents.newEvents): MoonEvent[] =>
+    events.map(({ dateIso, ...event }) => ({
+      ...event,
+      date: new Date(dateIso),
+    }));
+  const upcomingNew = revive(cachedEvents.newEvents);
+  const upcomingFull = revive(cachedEvents.fullEvents);
   const noon = tbilisiNoonUtc(now);
   const days = Array.from({ length: 30 }, (_, index) => {
     const date = new Date(noon.getTime() + index * DAY);
