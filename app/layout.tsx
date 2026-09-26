@@ -10,16 +10,19 @@ import { PwaServiceWorkerRegister } from "@/components/pwa/service-worker-regist
 import { InstallNudge } from "@/components/pwa/install-nudge";
 import { RefCapture } from "@/components/ref-capture";
 import { TrackingConsentManager } from "@/components/privacy/tracking-consent-manager";
+import { localAnalyticsDebugRequested } from "@/lib/analytics-debug";
 import { SENSITIVE_NAVIGATION_GUARD_SCRIPT } from "@/lib/privacy/sensitive-navigation-script";
 import "./globals.css";
 
 const notoGeorgian = Noto_Sans_Georgian({
   variable: "--font-sans",
   subsets: ["georgian", "latin"],
-  display: "swap",
+  // Keep the first paint stable on slow connections instead of swapping a
+  // late font into an already visible form. Cached fonts still render normally.
+  display: "optional",
   // Metric-adjusted fallback (size-adjust/ascent-override) so the system font
-  // shown during the swap window occupies the same space as Noto — minimizes
-  // the layout shift (CLS) when the web font finishes loading on mobile.
+  // used when the web font misses its initial display window stays as close
+  // as possible to Noto's metrics across cold and cached visits.
   adjustFontFallback: true,
   fallback: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
 });
@@ -129,6 +132,10 @@ export const viewport: Viewport = {
 };
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const LOCAL_GA_DEBUG_MODE = localAnalyticsDebugRequested(
+  process.env.VERCEL,
+  process.env.GA_DEBUG_MODE,
+);
 // Keep analytics and advertising scripts limited to the real production
 // deployment. Vercel preview deploys also ship as NODE_ENV=production.
 const TRACKING_ENABLED =
@@ -203,6 +210,7 @@ export default async function RootLayout({
           gaId={GA_ID}
           fbPixelId={FB_PIXEL_ID}
           trackingEnabled={TRACKING_ENABLED}
+          debugModeRequested={LOCAL_GA_DEBUG_MODE}
           locale={locale}
         />
       </body>

@@ -72,8 +72,19 @@ jobs:
       - name: End-to-end smoke tests
         run: npm run test:e2e
 
+      - name: Upload Playwright failure reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-reports
+          path: test-results/
+          if-no-files-found: ignore
+
       - name: Lighthouse performance budgets
         run: npm run perf:ci
+
+      - name: Check Lighthouse report integrity
+        run: node scripts/check-lighthouse-reports.mjs .lighthouserc
 
       - name: Upload Lighthouse reports
         if: always()
@@ -81,3 +92,4 @@ jobs:
         with:
           name: lighthouse-reports
           path: .lighthouserc/
+          include-hidden-files: true

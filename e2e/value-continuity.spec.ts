@@ -80,6 +80,12 @@ test.describe("calculator to signup continuity", () => {
     await expect(
       page.getByRole("heading", { name: "პლანეტების პოზიციები" }),
     ).toBeVisible();
+    // Verify the computed content, not only the surrounding section heading.
+    await expect(
+      page.getByRole("img", { name: "ნატალური რუკის ბორბალი" }),
+    ).toBeVisible();
+    await expect(page.locator('a[href="#planet-sun"]')).toBeVisible();
+    await expect(page.locator('a[href="#house-1"]')).toBeVisible();
 
     const draft = await page.evaluate(() => {
       const raw = sessionStorage.getItem("vivida_pending_natal_profile_v1");

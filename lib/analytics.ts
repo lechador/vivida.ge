@@ -4,8 +4,8 @@ import { browserTrackingAllowed } from "@/lib/tracking-consent";
 
 /**
  * Thin, safe wrapper over the GA4 `gtag` that @next/third-parties installs in
- * production (see app/layout.tsx — GA is gated to NODE_ENV=production). When
- * gtag isn't loaded (dev / preview) this is a no-op, so call sites never have
+ * production or an explicit local DebugView session (see app/layout.tsx). When
+ * gtag isn't loaded (normal dev / preview) this is a no-op, so call sites never have
  * to guard. Use for conversion events on the public acquisition funnel
  * (chart computed → email subscribed → register clicked), which — unlike raw
  * bounce rate — actually tell you whether the free tools convert.

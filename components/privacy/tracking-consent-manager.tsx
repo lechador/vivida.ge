@@ -18,6 +18,10 @@ import {
 } from "@/lib/tracking-consent";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { isSensitiveTrackingLocation } from "@/lib/privacy/sensitive-routes";
+import {
+  gaTrackingAllowed,
+  localAnalyticsDebugAllowed,
+} from "@/lib/analytics-debug";
 
 function clearMarketingCookies() {
   const names = document.cookie
@@ -47,11 +51,14 @@ export function TrackingConsentManager({
   gaId,
   fbPixelId,
   trackingEnabled,
+  debugModeRequested = false,
   locale = "ka",
 }: {
   gaId?: string;
   fbPixelId?: string;
   trackingEnabled: boolean;
+  /** Server-only opt-in; it still requires a loopback browser origin. */
+  debugModeRequested?: boolean;
   locale?: UserLocale;
 }) {
   const [consent, setConsent] = useState<TrackingConsent>(null);
@@ -64,6 +71,19 @@ export function TrackingConsentManager({
     pathname ?? "",
     typeof window === "undefined" ? "" : window.location.pathname,
   );
+  const localDebugMode = localAnalyticsDebugAllowed(
+    debugModeRequested,
+    typeof window === "undefined" ? "" : window.location.origin,
+  );
+  const productionTrackingAllowed =
+    trackingEnabled && consent === "granted" && !sensitivePath;
+  const gaTrackingIsAllowed = gaTrackingAllowed({
+    trackingEnabled,
+    debugRequested: debugModeRequested,
+    origin: typeof window === "undefined" ? "" : window.location.origin,
+    consentGranted: consent === "granted",
+    sensitivePath,
+  });
   const panelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -75,8 +95,7 @@ export function TrackingConsentManager({
   }, []);
 
   function choose(next: Exclude<TrackingConsent, null>) {
-    const hadLoadedTrackers =
-      consent === "granted" && trackingEnabled && !sensitivePath;
+    const hadLoadedTrackers = gaTrackingIsAllowed;
     const secure = window.location.protocol === "https:" ? "; secure" : "";
     document.cookie = `${TRACKING_CONSENT_COOKIE}=${next}; path=/; max-age=${TRACKING_CONSENT_MAX_AGE_SECONDS}; samesite=lax${secure}`;
     if (next === "denied") clearMarketingCookies();
@@ -90,9 +109,6 @@ export function TrackingConsentManager({
 
   const en = locale === "en";
   const showPanel = ready && (consent === null || settingsOpen);
-  const trackingAllowed =
-    trackingEnabled && consent === "granted" && !sensitivePath;
-
   // Reserve document space equal to the panel's height while it is open. The
   // panel is `fixed`, so without this it sits on top of whatever is at the
   // bottom of the page and that content can never be scrolled clear — on
@@ -114,16 +130,18 @@ export function TrackingConsentManager({
 
   return (
     <>
-      {trackingAllowed && (
+      {productionTrackingAllowed && (
         <>
           {fbPixelId ? <FbPixel pixelId={fbPixelId} /> : null}
-          {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
           <VercelObservability />
           <Suspense fallback={null}>
             <AttributionCapture />
           </Suspense>
         </>
       )}
+      {gaTrackingIsAllowed && gaId ? (
+        <GoogleAnalytics gaId={gaId} debugMode={localDebugMode} />
+      ) : null}
 
       {trackingEnabled && locale === "ka" && !sensitivePath && (
         <>
