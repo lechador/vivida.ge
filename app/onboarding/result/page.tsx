@@ -97,13 +97,21 @@ export default async function OnboardingResultPage({
         </Link>
       </header>
 
-      <section className="relative z-10 flex flex-1 items-center px-4 pb-16 pt-4 sm:px-6 sm:pb-20 sm:pt-6">
+      <section className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 pb-16 pt-4 sm:px-6 sm:pb-20 sm:pt-6">
         <AhaResult
           firstName={user.name?.split(" ")[0] ?? null}
           placements={placements}
           next={safeNext(next)}
           locale={locale}
         />
+        <Link
+          href="/account#profile-photos"
+          className="mt-8 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+        >
+          {locale === "en"
+            ? "Add a profile photo later in Account"
+            : "პროფილის ფოტო მოგვიანებით დაამატე ანგარიშში"}
+        </Link>
       </section>
     </main>
   );

@@ -7,6 +7,8 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { DREAMS_HUB_EN, DreamsHubEn } from "@/components/seo/dreams-en";
+import { DreamSymbolFilter } from "@/components/seo/dream-symbol-filter";
+import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -174,10 +176,11 @@ export default async function DreamsHubPage() {
           </p>
         </header>
 
-        {/* A–Z index */}
-        <div className="space-y-6">
+        <DreamSymbolFilter />
+        {/* The full index remains in server-rendered HTML for links and crawlers. */}
+        <div id="dream-symbol-index" className="space-y-6">
           {groups.map((g) => (
-            <section key={g.letter}>
+            <section key={g.letter} data-dream-group>
               <h2 className="mb-2.5 flex items-center gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/12 text-lg font-semibold text-[var(--vivida-violet)]">
                   {g.letter}
@@ -186,8 +189,15 @@ export default async function DreamsHubPage() {
               </h2>
               <div className="grid gap-2 sm:grid-cols-2">
                 {g.items.map((s) => (
-                  <Link
+                  <TrackedPublicLink
                     key={s.slug}
+                    event="dream"
+                    target={s.slug}
+                    feature="dreams"
+                    surface="dream_index"
+                    data-dream-symbol={[s.titleKa, ...s.latin]
+                      .join(" ")
+                      .toLocaleLowerCase()}
                     href={`/sizmris-akhsna/${s.slug}`}
                     className="group flex items-start gap-3 rounded-xl border border-border/60 bg-card/40 px-3.5 py-3 transition-colors hover:bg-card/75"
                   >
@@ -200,7 +210,7 @@ export default async function DreamsHubPage() {
                         {s.summaryKa}
                       </span>
                     </span>
-                  </Link>
+                  </TrackedPublicLink>
                 ))}
               </div>
             </section>
@@ -283,13 +293,17 @@ export default async function DreamsHubPage() {
             მთვარე ნატალურ რუკაში სწორედ იმაზე ამბობს, როგორ განიცდი, ოცნებობ და
             რას მალავ. შექმენი შენი რუკა უფასოდ.
           </p>
-          <Link
+          <TrackedPublicLink
             href="/nataluri-ruka"
+            event="next"
+            target="/nataluri-ruka"
+            feature="dreams"
+            surface="dream_hub_cta"
             className="mt-6 inline-flex items-center gap-1.5 rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2.5 text-sm font-semibold text-white"
           >
             ჩემი ნატალური რუკა
             <ArrowRight className="size-4" />
-          </Link>
+          </TrackedPublicLink>
         </div>
 
         <PopularSearches queries={DREAMS_LATIN_QUERIES} />

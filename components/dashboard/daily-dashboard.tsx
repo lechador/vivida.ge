@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -35,9 +35,11 @@ import { DailyRitual } from "./daily-ritual";
 export function DailyDashboard({
   userId,
   locale = "ka",
+  shortcuts,
 }: {
   userId: string;
   locale?: UserLocale;
+  shortcuts: ReactNode;
 }) {
   const en = locale !== "ka";
   const router = useRouter();
@@ -66,18 +68,24 @@ export function DailyDashboard({
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
-        {en
-          ? "Could not load. Please refresh the page."
-          : "ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი."}
+      <div className="space-y-6">
+        <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
+          {en
+            ? "Could not load. Please refresh the page."
+            : "ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი."}
+        </div>
+        {shortcuts}
       </div>
     );
   }
 
   if (!core || core.kind === "no-chart") {
     return (
-      <div className="flex min-h-[45vh] items-center justify-center">
-        <CosmicLoader embedded progressive locale={locale} />
+      <div className="space-y-6">
+        <div className="flex min-h-[240px] items-center justify-center">
+          <CosmicLoader embedded progressive locale={locale} />
+        </div>
+        {shortcuts}
       </div>
     );
   }
@@ -93,15 +101,6 @@ export function DailyDashboard({
 
   return (
     <div className="space-y-8">
-      {/* Suggested people — a "find strangers to add" surface, flag-gated
-          off at low user density. When off, the dashboard focuses on the
-          user's own chart/transits/reading. `suggestions` is empty in that
-          case (the server skips the query), but we also guard the render so
-          flipping the flag is the single switch. */}
-      {SOCIAL_FEATURES.suggestedPeopleRail && (
-        <SuggestedPeopleRail suggestions={suggestions} locale={locale} />
-      )}
-
       {/* AI cards stream in here behind skeletons so the page never blocks
           on generation latency. */}
       <DashboardExtrasSection
@@ -111,6 +110,7 @@ export function DailyDashboard({
         balance={balance}
         locale={locale}
         ritualProgress={ritualProgress}
+        shortcuts={shortcuts}
       />
 
       <section>
@@ -148,6 +148,10 @@ export function DailyDashboard({
           </Button>
         </div>
       </section>
+
+      {SOCIAL_FEATURES.suggestedPeopleRail && (
+        <SuggestedPeopleRail suggestions={suggestions} locale={locale} />
+      )}
     </div>
   );
 }
@@ -164,6 +168,7 @@ function DashboardExtrasSection({
   balance,
   locale,
   ritualProgress,
+  shortcuts,
 }: {
   userId: string;
   canDaily: boolean;
@@ -171,6 +176,7 @@ function DashboardExtrasSection({
   balance: number;
   locale: UserLocale;
   ritualProgress: import("@/lib/streak-credits").StreakProgress;
+  shortcuts: ReactNode;
 }) {
   const en = locale !== "ka";
   const [extras, setExtras] = useState<DashboardExtras | null>(null);
@@ -239,6 +245,8 @@ function DashboardExtrasSection({
           )}
         </div>
       ) : null}
+
+      {shortcuts}
 
       {!weeklyUnlocked ? (
         <WeeklyForecastLocked

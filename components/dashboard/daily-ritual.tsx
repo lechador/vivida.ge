@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { Check, Flame, Gift, Loader2 } from "lucide-react";
 
 import { completeDailyRitual } from "@/actions/daily-ritual";
@@ -182,16 +183,24 @@ export function DailyRitual({
             </div>
           )}
           {completed && (
-            <p className="mt-2 flex items-center gap-1.5 text-xs text-[var(--vivida-cyan)]">
-              <Check className="size-4" />
-              {earned > 0
-                ? en
-                  ? `Milestone: +${earned} credits`
-                  : `ნიშნული: +${earned} კრედიტი`
-                : en
-                  ? "Return tomorrow to continue the streak"
-                  : "სერიის გასაგრძელებლად ხვალ დაბრუნდი"}
-            </p>
+            <div className="mt-2 space-y-2">
+              <p className="flex items-center gap-1.5 text-xs text-[var(--vivida-cyan)]">
+                <Check className="size-4" />
+                {earned > 0
+                  ? en
+                    ? `Milestone: +${earned} credits`
+                    : `ნიშნული: +${earned} კრედიტი`
+                  : en
+                    ? "Return tomorrow to continue the streak"
+                    : "სერიის გასაგრძელებლად ხვალ დაბრუნდი"}
+              </p>
+              <Link
+                href="/account#reminders"
+                className="inline-block text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                {en ? "Choose your reminders →" : "აირჩიე შეხსენებები →"}
+              </Link>
+            </div>
           )}
         </div>
       </section>

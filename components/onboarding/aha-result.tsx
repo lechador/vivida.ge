@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -12,11 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   ANALYTICS_EVENT,
+  productEventBase,
   trackEvent,
   trackFirstResultViewed,
 } from "@/lib/analytics";
 import { chartStarterOptions } from "@/lib/chart-chat-starters";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { browserTrackingAllowed } from "@/lib/tracking-consent";
 
 export type AhaPlacement = {
   kind: "sun" | "moon" | "ascendant";
@@ -42,13 +44,60 @@ export function AhaResult({
   const en = locale === "en";
   const starters = chartStarterOptions(locale).slice(0, 3);
   const featureDestination = next !== "/report";
+  const resultTracked = useRef(false);
 
   useEffect(() => {
-    trackFirstResultViewed({
-      product: "natal_chart",
-      surface: "onboarding_aha",
-    });
-  }, []);
+    let retryTimer: ReturnType<typeof setInterval> | undefined;
+
+    function stopRetry() {
+      if (retryTimer) clearInterval(retryTimer);
+      retryTimer = undefined;
+    }
+
+    function recordResult() {
+      trackFirstResultViewed({
+        product: "natal_chart",
+        surface: "onboarding_aha",
+      });
+      if (!resultTracked.current) {
+        resultTracked.current = trackEvent(
+          ANALYTICS_EVENT.onboardingResultViewed,
+          {
+            ...productEventBase("natal_chart", "onboarding_aha", locale),
+            outcome: "rendered",
+          },
+        );
+      }
+    }
+
+    function startTracking() {
+      stopRetry();
+      recordResult();
+      // Consent can be granted before the analytics script has mounted.
+      // Retry briefly without counting the same rendered result twice.
+      if (!browserTrackingAllowed() || resultTracked.current) return;
+      let attempts = 0;
+      retryTimer = setInterval(() => {
+        recordResult();
+        if (
+          ++attempts >= 20 ||
+          resultTracked.current ||
+          !browserTrackingAllowed()
+        ) {
+          stopRetry();
+        }
+      }, 250);
+    }
+
+    startTracking();
+    window.addEventListener("vivida:tracking-granted", startTracking);
+    window.addEventListener("vivida:tracking-denied", stopRetry);
+    return () => {
+      stopRetry();
+      window.removeEventListener("vivida:tracking-granted", startTracking);
+      window.removeEventListener("vivida:tracking-denied", stopRetry);
+    };
+  }, [locale]);
 
   function trackRecommendation(destination: string, recommendation: string) {
     trackEvent(ANALYTICS_EVENT.recommendationClicked, {

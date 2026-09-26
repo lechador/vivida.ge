@@ -10,6 +10,7 @@ import { PwaServiceWorkerRegister } from "@/components/pwa/service-worker-regist
 import { InstallNudge } from "@/components/pwa/install-nudge";
 import { RefCapture } from "@/components/ref-capture";
 import { TrackingConsentManager } from "@/components/privacy/tracking-consent-manager";
+import { SENSITIVE_NAVIGATION_GUARD_SCRIPT } from "@/lib/privacy/sensitive-navigation-script";
 import "./globals.css";
 
 const notoGeorgian = Noto_Sans_Georgian({
@@ -155,6 +156,9 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <Script id="sensitive-navigation-guard" strategy="beforeInteractive">
+          {SENSITIVE_NAVIGATION_GUARD_SCRIPT}
+        </Script>
         <Script id="pwa-install-capture" strategy="beforeInteractive">{`
           window.addEventListener('beforeinstallprompt', function (event) {
             event.preventDefault();

@@ -1,5 +1,7 @@
 "use client";
 
+import { browserTrackingAllowed } from "@/lib/tracking-consent";
+
 /**
  * Thin, safe wrapper over the GA4 `gtag` that @next/third-parties installs in
  * production (see app/layout.tsx — GA is gated to NODE_ENV=production). When
@@ -79,6 +81,11 @@ export const ANALYTICS_EVENT = {
   searchOpened: "search_opened",
   searchResultSelected: "search_result_selected",
   searchNoResult: "search_no_result",
+  dreamSymbolSelected: "dream_symbol_selected",
+  moonSectionSelected: "moon_section_selected",
+  publicNextLinkSelected: "public_next_link_selected",
+  contentFeedback: "content_feedback",
+  onboardingResultViewed: "onboarding_result_viewed",
   navItemSelected: "nav_item_selected",
   emptyStateSeen: "empty_state_seen",
   onboardingAbandoned: "onboarding_abandoned",
@@ -181,6 +188,7 @@ export function trackEvent(
   if (VALUE_ACTION_EVENTS.has(name)) {
     window.dispatchEvent(new Event("vivida:pwa-value-action"));
   }
+  if (!browserTrackingAllowed()) return false;
   const gtag = (
     window as unknown as {
       gtag?: (command: string, eventName: string, params?: GtagParams) => void;

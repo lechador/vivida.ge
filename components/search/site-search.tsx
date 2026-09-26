@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Loader2, Search } from "lucide-react";
 
 import { DEFAULT_AVATAR } from "@/lib/avatar";
+import { ANALYTICS_EVENT, productEventBase, trackEvent } from "@/lib/analytics";
 
 type PageHit = {
   title: string;
@@ -48,14 +49,20 @@ export function SiteSearch({
     term: string;
     pages: PageHit[];
     users: UserHit[];
+    failed?: boolean;
   }>({ term: "", pages: [], users: [] });
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(
-    null
-  );
+  const [pos, setPos] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
+  const openedTracked = useRef(false);
+  const noResultTracked = useRef(new Set<string>());
+  const surface = compact ? "public_header" : "public_home";
   const term = q.trim();
   const currentResult = result.term === term;
   const { pages, users } = useMemo(
@@ -63,7 +70,7 @@ export function SiteSearch({
       currentResult
         ? { pages: result.pages, users: result.users }
         : { pages: [], users: [] },
-    [currentResult, result.pages, result.users]
+    [currentResult, result.pages, result.users],
   );
   const loading = term.length >= 2 && !currentResult;
 
@@ -82,16 +89,33 @@ export function SiteSearch({
         const res = await fetch(`/api/search?q=${encodeURIComponent(term)}`, {
           signal: ctrl.signal,
         });
-        const data = (await res.json()) as { pages: PageHit[]; users: UserHit[] };
+        if (!res.ok) throw new Error("Search unavailable");
+        const data = (await res.json()) as {
+          pages: PageHit[];
+          users: UserHit[];
+        };
+        if (ctrl.signal.aborted) return;
         setResult({
           term,
           pages: data.pages ?? [],
           users: data.users ?? [],
         });
         setActive(0);
+        if (
+          !data.pages?.length &&
+          !data.users?.length &&
+          !noResultTracked.current.has(term) &&
+          noResultTracked.current.size < 50 &&
+          trackEvent(ANALYTICS_EVENT.searchNoResult, {
+            ...productEventBase("search", surface, "ka"),
+            result_type: "mixed",
+          })
+        ) {
+          noResultTracked.current.add(term);
+        }
       } catch {
         if (!ctrl.signal.aborted) {
-          setResult({ term, pages: [], users: [] });
+          setResult({ term, pages: [], users: [], failed: true });
         }
       }
     }, 200);
@@ -99,7 +123,7 @@ export function SiteSearch({
       clearTimeout(t);
       ctrl.abort();
     };
-  }, [term]);
+  }, [term, surface]);
 
   // Close on outside click — the panel is portalled to <body>, so check both
   // the input box and the panel itself.
@@ -135,12 +159,16 @@ export function SiteSearch({
         href: `/u/${hit.username}`,
       })),
     ],
-    [pages, users]
+    [pages, users],
   );
 
   const showPanel = open && q.trim().length >= 2;
 
-  function go(href: string) {
+  function go(href: string, kind: Flat["kind"]) {
+    trackEvent(ANALYTICS_EVENT.searchResultSelected, {
+      ...productEventBase("search", surface, "ka"),
+      result_type: kind,
+    });
     setOpen(false);
     router.push(href);
   }
@@ -159,7 +187,7 @@ export function SiteSearch({
     } else if (e.key === "Enter") {
       e.preventDefault();
       const sel = flat[active];
-      if (sel) go(sel.href);
+      if (sel) go(sel.href, sel.kind);
     } else if (e.key === "Escape") {
       setOpen(false);
     }
@@ -183,7 +211,15 @@ export function SiteSearch({
             setQ(e.target.value);
             setOpen(true);
           }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            setOpen(true);
+            if (!openedTracked.current) {
+              openedTracked.current = trackEvent(ANALYTICS_EVENT.searchOpened, {
+                ...productEventBase("search", surface, "ka"),
+                result_type: "mixed",
+              });
+            }
+          }}
           onKeyDown={onKeyDown}
           placeholder={placeholder}
           aria-label="ძებნა საიტზე"
@@ -205,81 +241,83 @@ export function SiteSearch({
       {showPanel &&
         pos &&
         createPortal(
-        <div
-          ref={popRef}
-          style={{
-            position: "fixed",
-            top: pos.top,
-            left: pos.left,
-            width: pos.width,
-            minWidth: 260,
-          }}
-          className="z-[1000] max-h-[60vh] overflow-y-auto rounded-2xl border border-border bg-[oklch(0.18_0.04_285/0.97)] p-1.5 text-left shadow-2xl ring-1 ring-foreground/10 backdrop-blur-2xl"
-        >
-          {flat.length === 0 ? (
-            <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-              {loading ? "ძებნა…" : "ვერაფერი მოიძებნა"}
-            </div>
-          ) : (
-            <ul>
-              {pages.length > 0 && (
-                <SectionLabel>გვერდები</SectionLabel>
-              )}
-              {pages.map((hit, i) => (
-                <Row
-                  key={hit.url}
-                  active={active === i}
-                  onMouseEnter={() => setActive(i)}
-                  onClick={() => go(hit.url)}
-                >
-                  <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--vivida-violet)]/12 text-base">
-                    {hit.icon ?? "✦"}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium text-foreground">
-                      {hit.title}
-                    </span>
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {hit.sub}
-                    </span>
-                  </span>
-                </Row>
-              ))}
-
-              {users.length > 0 && <SectionLabel>ხალხი</SectionLabel>}
-              {users.map((hit, i) => {
-                const idx = pages.length + i;
-                const display =
-                  hit.displayName ?? hit.name?.split(" ")[0] ?? hit.username;
-                return (
+          <div
+            ref={popRef}
+            style={{
+              position: "fixed",
+              top: pos.top,
+              left: pos.left,
+              width: pos.width,
+              minWidth: 260,
+            }}
+            className="z-[1000] max-h-[60vh] overflow-y-auto rounded-2xl border border-border bg-[oklch(0.18_0.04_285/0.97)] p-1.5 text-left shadow-2xl ring-1 ring-foreground/10 backdrop-blur-2xl"
+          >
+            {flat.length === 0 ? (
+              <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+                {loading
+                  ? "ძებნა…"
+                  : result.failed
+                    ? "ძიება დროებით მიუწვდომელია. სცადე მოგვიანებით."
+                    : "ვერაფერი მოიძებნა"}
+              </div>
+            ) : (
+              <ul>
+                {pages.length > 0 && <SectionLabel>გვერდები</SectionLabel>}
+                {pages.map((hit, i) => (
                   <Row
-                    key={hit.username}
-                    active={active === idx}
-                    onMouseEnter={() => setActive(idx)}
-                    onClick={() => go(`/u/${hit.username}`)}
+                    key={hit.url}
+                    active={active === i}
+                    onMouseEnter={() => setActive(i)}
+                    onClick={() => go(hit.url, "page")}
                   >
-                    <Image
-                      src={hit.image || DEFAULT_AVATAR}
-                      alt=""
-                      width={32}
-                      height={32}
-                      className="size-8 shrink-0 rounded-full border border-border/60 object-cover"
-                    />
+                    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--vivida-violet)]/12 text-base">
+                      {hit.icon ?? "✦"}
+                    </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium text-foreground">
-                        {display}
+                        {hit.title}
                       </span>
                       <span className="block truncate text-xs text-muted-foreground">
-                        @{hit.username}
+                        {hit.sub}
                       </span>
                     </span>
                   </Row>
-                );
-              })}
-            </ul>
-          )}
-        </div>,
-          document.body
+                ))}
+
+                {users.length > 0 && <SectionLabel>ხალხი</SectionLabel>}
+                {users.map((hit, i) => {
+                  const idx = pages.length + i;
+                  const display =
+                    hit.displayName ?? hit.name?.split(" ")[0] ?? hit.username;
+                  return (
+                    <Row
+                      key={hit.username}
+                      active={active === idx}
+                      onMouseEnter={() => setActive(idx)}
+                      onClick={() => go(`/u/${hit.username}`, "user")}
+                    >
+                      <Image
+                        src={hit.image || DEFAULT_AVATAR}
+                        alt=""
+                        width={32}
+                        height={32}
+                        className="size-8 shrink-0 rounded-full border border-border/60 object-cover"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium text-foreground">
+                          {display}
+                        </span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          @{hit.username}
+                        </span>
+                      </span>
+                    </Row>
+                  );
+                })}
+              </ul>
+            )}
+          </div>,
+          document.body,
         )}
     </div>
   );

@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
+import { usePathname } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 
 import { AttributionCapture } from "@/components/marketing/attribution-capture";
@@ -16,6 +17,7 @@ import {
   type TrackingConsent,
 } from "@/lib/tracking-consent";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { isSensitiveTrackingLocation } from "@/lib/privacy/sensitive-routes";
 
 function clearMarketingCookies() {
   const names = document.cookie
@@ -55,6 +57,13 @@ export function TrackingConsentManager({
   const [consent, setConsent] = useState<TrackingConsent>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const pathname = usePathname();
+  // During a router transition the rendered pathname can move ahead of the
+  // document URL. Keep trackers off until the full-document guard takes over.
+  const sensitivePath = isSensitiveTrackingLocation(
+    pathname ?? "",
+    typeof window === "undefined" ? "" : window.location.pathname,
+  );
   const panelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -66,17 +75,23 @@ export function TrackingConsentManager({
   }, []);
 
   function choose(next: Exclude<TrackingConsent, null>) {
+    const hadLoadedTrackers =
+      consent === "granted" && trackingEnabled && !sensitivePath;
     const secure = window.location.protocol === "https:" ? "; secure" : "";
     document.cookie = `${TRACKING_CONSENT_COOKIE}=${next}; path=/; max-age=${TRACKING_CONSENT_MAX_AGE_SECONDS}; samesite=lax${secure}`;
     if (next === "denied") clearMarketingCookies();
     setConsent(next);
     setSettingsOpen(false);
     window.dispatchEvent(new CustomEvent(`vivida:tracking-${next}`));
+    // Removing React components does not stop third-party scripts that are
+    // already running in this document. Reload with the denied cookie in place.
+    if (next === "denied" && hadLoadedTrackers) window.location.reload();
   }
 
   const en = locale === "en";
   const showPanel = ready && (consent === null || settingsOpen);
-  const trackingAllowed = trackingEnabled && consent === "granted";
+  const trackingAllowed =
+    trackingEnabled && consent === "granted" && !sensitivePath;
 
   // Reserve document space equal to the panel's height while it is open. The
   // panel is `fixed`, so without this it sits on top of whatever is at the
@@ -110,7 +125,7 @@ export function TrackingConsentManager({
         </>
       )}
 
-      {trackingEnabled && locale === "ka" && (
+      {trackingEnabled && locale === "ka" && !sensitivePath && (
         <>
           <div id="top-ge-counter-container" data-site-id="118976" />
           <Script

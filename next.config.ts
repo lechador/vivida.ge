@@ -78,11 +78,19 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     // The international domain serves English.
-    return ENGLISH_HOSTS.map((host) => ({
-      source: "/:path*",
-      has: [{ type: "host" as const, value: host }],
-      headers: [{ key: "Content-Language", value: "en" }],
-    }));
+    return [
+      ...["/reset-password", "/unsubscribe", "/api/auth/verify-email"].map(
+        (source) => ({
+          source,
+          headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+        }),
+      ),
+      ...ENGLISH_HOSTS.map((host) => ({
+        source: "/:path*",
+        has: [{ type: "host" as const, value: host }],
+        headers: [{ key: "Content-Language", value: "en" }],
+      })),
+    ];
   },
   images: {
     // User photos are immutable R2 keys. Keep optimized derivatives for a

@@ -163,6 +163,62 @@ export default async function DashboardPage() {
   const suggestedTest = pool[seedValue % pool.length];
   const suggestedArticles = pickDailyArticles(publishedArticles, seedValue);
 
+  const shortcuts = (
+    <nav
+      aria-label={en ? "Most used" : "ყველაზე გამოყენებადი"}
+      className="grid gap-3 sm:grid-cols-2"
+    >
+      <Link
+        href="/taro"
+        className="group relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-card/60 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-[var(--vivida-violet)]/50 hover:shadow-[0_12px_40px_-16px_var(--vivida-violet)]"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--vivida-violet),transparent)]"
+        />
+        <div className="flex items-center gap-3">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] text-white shadow-md shadow-[var(--vivida-violet)]/30">
+            <Wand2 className="size-5" />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-[15px] font-semibold tracking-tight">
+              {en ? "Tarot reading" : "ტარო"}
+            </span>
+            <span className="block truncate text-[13px] text-muted-foreground">
+              {en
+                ? "Ask a question, draw 3 cards"
+                : "დასვი კითხვა, გააშლე 3 კარტი"}
+            </span>
+          </span>
+          <ArrowRight className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-foreground" />
+        </div>
+      </Link>
+      <Link
+        href="/ask"
+        className="group relative overflow-hidden rounded-2xl border border-[var(--vivida-cyan)]/25 bg-gradient-to-br from-[var(--vivida-cyan)]/10 via-card/60 to-card/60 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-[var(--vivida-cyan)]/45 hover:shadow-[0_12px_40px_-16px_var(--vivida-cyan)]"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--vivida-cyan),transparent)]"
+        />
+        <div className="flex items-center gap-3">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-cyan))] text-white shadow-md shadow-[var(--vivida-cyan)]/25">
+            <Stars className="size-5" />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-[15px] font-semibold tracking-tight">
+              {en ? "Ask your chart" : "ჰკითხე ვარსკვლავებს"}
+            </span>
+            <span className="block truncate text-[13px] text-muted-foreground">
+              {en ? "Personal AI astrologer" : "პირადი AI ასტროლოგი"}
+            </span>
+          </span>
+          <ArrowRight className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-foreground" />
+        </div>
+      </Link>
+    </nav>
+  );
+
   return (
     <main
       lang={locale}
@@ -189,70 +245,17 @@ export default async function DashboardPage() {
           </span>
         </h1>
 
-        {/* Most-used shortcuts — tarot + chart chat, one tap away. */}
-        <nav
-          aria-label={en ? "Most used" : "ყველაზე გამოყენებადი"}
-          className="mb-8 grid gap-3 sm:grid-cols-2"
-        >
-          <Link
-            href="/taro"
-            className="group relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-card/60 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-[var(--vivida-violet)]/50 hover:shadow-[0_12px_40px_-16px_var(--vivida-violet)]"
-          >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--vivida-violet),transparent)]"
-            />
-            <div className="flex items-center gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] text-white shadow-md shadow-[var(--vivida-violet)]/30">
-                <Wand2 className="size-5" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[15px] font-semibold tracking-tight">
-                  {en ? "Tarot reading" : "ტარო"}
-                </span>
-                <span className="block truncate text-[13px] text-muted-foreground">
-                  {en
-                    ? "Ask a question, draw 3 cards"
-                    : "დასვი კითხვა, გააშლე 3 კარტი"}
-                </span>
-              </span>
-              <ArrowRight className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-foreground" />
-            </div>
-          </Link>
-          <Link
-            href="/ask"
-            className="group relative overflow-hidden rounded-2xl border border-[var(--vivida-cyan)]/25 bg-gradient-to-br from-[var(--vivida-cyan)]/10 via-card/60 to-card/60 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-[var(--vivida-cyan)]/45 hover:shadow-[0_12px_40px_-16px_var(--vivida-cyan)]"
-          >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--vivida-cyan),transparent)]"
-            />
-            <div className="flex items-center gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-cyan))] text-white shadow-md shadow-[var(--vivida-cyan)]/25">
-                <Stars className="size-5" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[15px] font-semibold tracking-tight">
-                  {en ? "Ask your chart" : "ჰკითხე ვარსკვლავებს"}
-                </span>
-                <span className="block truncate text-[13px] text-muted-foreground">
-                  {en ? "Personal AI astrologer" : "პირადი AI ასტროლოგი"}
-                </span>
-              </span>
-              <ArrowRight className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-foreground" />
-            </div>
-          </Link>
-        </nav>
+        {/* Daily content and its loading state lead the page. The shortcuts
+            slot follows that content before the weekly and chart blocks. */}
+        <DailyDashboard
+          userId={user.id}
+          locale={locale}
+          shortcuts={shortcuts}
+        />
 
         {/* Soft prompt to enable daily push — hides itself once enabled,
             unsupported, or dismissed. */}
         <PushOptIn variant="banner" locale={locale} />
-
-        {/* DailyDashboard is a client component — it fetches the heavy AI
-            data via a server action after first paint, so the response
-            stream closes immediately and the browser tab spinner stops.
-            Our internal CosmicLoader covers the AI generation window. */}
-        <DailyDashboard userId={user.id} locale={locale} />
 
         {shouldShowPurchasePromotion({
           isPremium: userRow?.isPremium ?? false,

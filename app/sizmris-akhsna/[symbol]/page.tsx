@@ -8,6 +8,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { DreamSymbolPageEn } from "@/components/seo/dreams-en";
+import { ContentFeedback } from "@/components/analytics/content-feedback";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -250,6 +251,8 @@ export default async function DreamSymbolPage({
             </p>
           </section>
         </div>
+
+        <ContentFeedback key={s.slug} surface="dream_result" />
 
         {related.length > 0 && (
           <section className="mt-10">

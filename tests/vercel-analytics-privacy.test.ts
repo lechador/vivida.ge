@@ -14,4 +14,19 @@ describe("Vercel Analytics privacy", () => {
       url: "https://www.vivida.ge/reports/[id]",
     });
   });
+
+  it("drops all page views on token-bearing routes", () => {
+    for (const path of [
+      "/reset-password",
+      "/unsubscribe",
+      "/api/auth/verify-email",
+    ]) {
+      expect(
+        redactVercelAnalyticsEvent({
+          type: "pageview",
+          url: `https://www.vivida.ge${path}?token=synthetic`,
+        }),
+      ).toBeNull();
+    }
+  });
 });

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { ensureChartFor } from "@/actions/chart";
+import { ContentFeedback } from "@/components/analytics/content-feedback";
 
 import { AspectCards } from "./aspect-cards";
 import { BigThreeCard } from "./big-three-card";
@@ -270,6 +271,7 @@ export async function ChartSection({
           />
         </CollapsibleSection>
       </div>
+      <ContentFeedback surface="natal_report" locale={locale} />
     </div>
   );
 }

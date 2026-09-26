@@ -11,6 +11,7 @@ import { LIFE_PATH_NUMBERS } from "@/lib/numerology";
 import { LIFE_PATH_CONTENT } from "@/lib/seo/numerology-content";
 import { CHINESE_ANIMALS } from "@/lib/seo/chinese-zodiac";
 import { RANKING_TOPICS } from "@/lib/seo/rankings";
+import { DREAM_SYMBOLS } from "@/lib/seo/dreams";
 
 /**
  * Static, in-memory catalog of every public page worth surfacing in site
@@ -29,7 +30,8 @@ export type SearchCategory =
   | "mbti"
   | "numerology"
   | "chinese"
-  | "ranking";
+  | "ranking"
+  | "dream";
 
 export type SearchEntry = {
   title: string;
@@ -50,7 +52,13 @@ const PAGES: SearchEntry[] = [
     url: "/horoskopi",
     category: "horoscope",
     icon: "🔮",
-    terms: ["horoskopi", "dgis horoskopi", "dghis horoskopi", "დღის", "დღევანდელი"],
+    terms: [
+      "horoskopi",
+      "dgis horoskopi",
+      "dghis horoskopi",
+      "დღის",
+      "დღევანდელი",
+    ],
   },
   {
     title: "კვირის ჰოროსკოპი",
@@ -74,7 +82,11 @@ const PAGES: SearchEntry[] = [
     url: "/siyvarulis-horoskopi",
     category: "horoscope",
     icon: "♥️",
-    terms: ["siyvarulis horoskopi", "ურთიერთობის ჰოროსკოპი", "ზოდიაქო სიყვარულში"],
+    terms: [
+      "siyvarulis horoskopi",
+      "ურთიერთობის ჰოროსკოპი",
+      "ზოდიაქო სიყვარულში",
+    ],
   },
   {
     title: "ფინანსური ჰოროსკოპი",
@@ -90,7 +102,11 @@ const PAGES: SearchEntry[] = [
     url: "/karieris-horoskopi",
     category: "horoscope",
     icon: "💼",
-    terms: ["karieris horoskopi", "profesia zodiaqos mixedvit", "ზოდიაქო და კარიერა"],
+    terms: [
+      "karieris horoskopi",
+      "profesia zodiaqos mixedvit",
+      "ზოდიაქო და კარიერა",
+    ],
   },
   {
     title: "ნატალური რუკა",
@@ -115,6 +131,14 @@ const PAGES: SearchEntry[] = [
       "ტაროზე მკითხაობა",
       "მკითხავი",
     ],
+  },
+  {
+    title: "ტარო",
+    sub: "სამკარტიანი კითხვა · პირველი კითხვა უფასოა",
+    url: "/taro",
+    category: "page",
+    icon: "🔮",
+    terms: ["taro", "tarot", "ტაროზე მკითხაობა", "ტაროს გაშლა"],
   },
   {
     title: "სიზმრის ახსნა",
@@ -210,7 +234,12 @@ const PAGES: SearchEntry[] = [
     url: "/astrologiuri-kalendari",
     category: "horoscope",
     icon: "📅",
-    terms: ["astrologiuri kalendari", "იღბლიანი დღეები", "ფრთხილი დღეები", "დღის ასტროლოგია"],
+    terms: [
+      "astrologiuri kalendari",
+      "იღბლიანი დღეები",
+      "ფრთხილი დღეები",
+      "დღის ასტროლოგია",
+    ],
   },
   {
     title: "სავსე მთვარე",
@@ -234,7 +263,12 @@ const PAGES: SearchEntry[] = [
     url: "/dabnelebebi",
     category: "horoscope",
     icon: "🌘",
-    terms: ["dabneleba", "mzis dabneleba", "mtvaris dabneleba", "შემდეგი დაბნელება"],
+    terms: [
+      "dabneleba",
+      "mzis dabneleba",
+      "mtvaris dabneleba",
+      "შემდეგი დაბნელება",
+    ],
   },
   {
     title: "იღბლიანი დღეები",
@@ -312,6 +346,17 @@ const PAGES: SearchEntry[] = [
 
 function buildCatalog(): SearchEntry[] {
   const out: SearchEntry[] = [...PAGES];
+
+  for (const symbol of DREAM_SYMBOLS) {
+    out.push({
+      title: symbol.titleKa,
+      sub: "სიზმრის სიმბოლოს ახსნა",
+      url: `/sizmris-akhsna/${symbol.slug}`,
+      category: "dream",
+      icon: symbol.glyph,
+      terms: [...symbol.latin, `${symbol.titleKa} სიზმარში`],
+    });
+  }
 
   // Zodiac signs → sign hub. Terms cover Latin spellings + "<sign> ჰოროსკოპი".
   for (const slug of ALL_SLUGS) {
@@ -397,7 +442,10 @@ function buildCatalog(): SearchEntry[] {
   // Pre-lowercase every match token once (title + terms) for fast matching.
   for (const e of out) {
     e.terms = Array.from(
-      new Set([e.title.toLowerCase(), ...e.terms.filter(Boolean).map((t) => t.toLowerCase())])
+      new Set([
+        e.title.toLowerCase(),
+        ...e.terms.filter(Boolean).map((t) => t.toLowerCase()),
+      ]),
     );
   }
   return out;

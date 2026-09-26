@@ -15,7 +15,7 @@ function installGtag(): Hit[] {
   (globalThis as { gtag?: unknown }).gtag = (
     _cmd: string,
     name: string,
-    params?: Record<string, unknown>
+    params?: Record<string, unknown>,
   ) => {
     hits.push({ name, params });
   };
@@ -25,12 +25,20 @@ function installGtag(): Hit[] {
 describe("trackEvent", () => {
   beforeEach(() => {
     (globalThis as { window?: unknown }).window = globalThis;
+    (globalThis as { dispatchEvent?: unknown }).dispatchEvent = () => true;
+    (globalThis as { document?: unknown }).document = {
+      cookie: "vivida_tracking_consent=granted",
+    };
+    (globalThis as { location?: unknown }).location = { pathname: "/report" };
   });
 
   afterEach(() => {
     delete (globalThis as { gtag?: unknown }).gtag;
     delete (globalThis as { localStorage?: unknown }).localStorage;
     delete (globalThis as { window?: unknown }).window;
+    delete (globalThis as { document?: unknown }).document;
+    delete (globalThis as { location?: unknown }).location;
+    delete (globalThis as { dispatchEvent?: unknown }).dispatchEvent;
   });
 
   it("passes ordinary params through untouched", () => {
@@ -84,15 +92,49 @@ describe("trackEvent", () => {
 
   it("is a no-op when gtag is not loaded", () => {
     expect(trackEvent(ANALYTICS_EVENT.registerClick, { widget: "x" })).toBe(
-      false
+      false,
     );
+  });
+
+  it("stops events immediately after consent is revoked", () => {
+    const hits = installGtag();
+    expect(trackEvent(ANALYTICS_EVENT.signUpSubmitted)).toBe(true);
+    (globalThis as { document: { cookie: string } }).document.cookie =
+      "vivida_tracking_consent=denied";
+    expect(trackEvent(ANALYTICS_EVENT.signUpSubmitted)).toBe(false);
+    expect(hits).toHaveLength(1);
+  });
+
+  it("keeps the first-party PWA value signal when consent is denied", () => {
+    const signals: string[] = [];
+    (globalThis as { dispatchEvent: (event: Event) => boolean }).dispatchEvent =
+      (event) => {
+        signals.push(event.type);
+        return true;
+      };
+    const hits = installGtag();
+    (globalThis as { document: { cookie: string } }).document.cookie =
+      "vivida_tracking_consent=denied";
+    expect(trackEvent(ANALYTICS_EVENT.testCompleted)).toBe(false);
+    expect(signals).toEqual(["vivida:pwa-value-action"]);
+    expect(hits).toEqual([]);
+  });
+
+  it("never sends GA4 events from a token route despite existing consent and gtag", () => {
+    const hits = installGtag();
+    (globalThis as { location: { pathname: string } }).location.pathname =
+      "/reset-password";
+    expect(trackEvent(ANALYTICS_EVENT.signUpSubmitted)).toBe(false);
+    expect(hits).toEqual([]);
   });
 
   it("tracks experiment assignments with stable experiment and variant fields", () => {
     const hits = installGtag();
-    expect(trackExperimentAssignment("signup_credits_v1", "staged", {
-      eligibility: "new_user",
-    })).toBe(true);
+    expect(
+      trackExperimentAssignment("signup_credits_v1", "staged", {
+        eligibility: "new_user",
+      }),
+    ).toBe(true);
     expect(hits).toEqual([
       {
         name: "experiment_assigned",

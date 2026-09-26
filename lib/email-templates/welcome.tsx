@@ -11,8 +11,8 @@ import {
  * Sent once when a user finishes signup. Pitches what they get from Vivida
  * and funnels them into the dashboard. No unsubscribe — transactional.
  *
- * The site is currently 100% free; copy reflects that. When paid plans
- * return, swap the body for the upsell version.
+ * Free features and credit-gated actions are described separately because
+ * the signup credit grant can differ by experiment cohort.
  */
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -27,10 +27,21 @@ export function WelcomeEmail({
 }) {
   const en = locale === "en";
   const greeting = name
-    ? en ? `Welcome, ${name}!` : `კეთილი იყოს მობრძანება, ${name}!`
-    : en ? "Welcome!" : "კეთილი იყოს მობრძანება!";
+    ? en
+      ? `Welcome, ${name}!`
+      : `კეთილი იყოს მობრძანება, ${name}!`
+    : en
+      ? "Welcome!"
+      : "კეთილი იყოს მობრძანება!";
   return (
-    <EmailLayout preview={en ? "Your cosmic journey begins — Vivida" : "შენი კოსმიური მოგზაურობა იწყება — Vivida"} locale={locale}>
+    <EmailLayout
+      preview={
+        en
+          ? "Your cosmic journey begins — Vivida"
+          : "შენი კოსმიური მოგზაურობა იწყება — Vivida"
+      }
+      locale={locale}
+    >
       <Heading
         as="h1"
         style={{
@@ -48,8 +59,8 @@ export function WelcomeEmail({
       <Text style={paragraphStyle}>{greeting}</Text>
       <Text style={paragraphStyle}>
         {en
-          ? "Your personal astrology experience is ready. Open your dashboard to explore your chart, forecasts, compatibility, and current cosmic events."
-          : "Vivida-ში ყველა ფუნქცია სრულად ხელმისაწვდომია — ბარათის გარეშე, ლიმიტის გარეშე. შენი კოსმიური მოგზაურობა ერთ დაკლიკვაზე იწყება."}
+          ? "Your natal chart and daily horoscope are ready to explore. Your first compatibility comparison and tarot reading are free; further readings and some other actions use credits. Your starting credits are in your account."
+          : "შენი ნატალური რუკა და ყოველდღიური ჰოროსკოპი ხელმისაწვდომია უფასოდ. თავსებადობის პირველი შედარება და ტაროს პირველი კითხვა უფასოა; მომდევნო კითხვები და ზოგი სხვა მოქმედება კრედიტებს იყენებს. საწყისი კრედიტები შენს ანგარიშზეა."}
       </Text>
 
       <Text style={{ ...paragraphStyle, fontWeight: 600, color: "#ffffff" }}>
@@ -64,10 +75,30 @@ export function WelcomeEmail({
           paddingLeft: 22,
         }}
       >
-        <li><strong>{en ? "Natal chart" : "ნატალური რუკა"}</strong> — {en ? "complete interpretations of planets, houses, and aspects" : "სრული ინტერპრეტაცია, პლანეტები, სახლები და ასპექტები"}</li>
-        <li><strong>{en ? "Daily horoscope" : "ყოველდღიური ჰოროსკოპი"}</strong> — {en ? "personalized to your chart" : "შენს რუკაზე მორგებული, AI-ით გენერირებული"}</li>
-        <li><strong>{en ? "Compatibility" : "თავსებადობა"}</strong> — {en ? "compare charts with friends and partners" : "შეადარე თავი მეგობრებს, პარტნიორებს, ცნობილ ადამიანებს"}</li>
-        <li><strong>{en ? "Cosmic events" : "კოსმიური მოვლენები"}</strong> — {en ? "new moons, retrogrades, and transits" : "ახალმთვარეები, რეტროგრადები, ტრანზიტები"}</li>
+        <li>
+          <strong>{en ? "Natal chart" : "ნატალური რუკა"}</strong> —{" "}
+          {en
+            ? "complete interpretations of planets, houses, and aspects"
+            : "სრული ინტერპრეტაცია, პლანეტები, სახლები და ასპექტები"}
+        </li>
+        <li>
+          <strong>{en ? "Daily horoscope" : "ყოველდღიური ჰოროსკოპი"}</strong> —{" "}
+          {en
+            ? "personalized to your chart"
+            : "შენს რუკაზე მორგებული, AI-ით გენერირებული"}
+        </li>
+        <li>
+          <strong>{en ? "Compatibility" : "თავსებადობა"}</strong> —{" "}
+          {en
+            ? "compare charts with friends and partners"
+            : "შეადარე თავი მეგობრებს, პარტნიორებს, ცნობილ ადამიანებს"}
+        </li>
+        <li>
+          <strong>{en ? "Cosmic events" : "კოსმიური მოვლენები"}</strong> —{" "}
+          {en
+            ? "new moons, retrogrades, and transits"
+            : "ახალმთვარეები, რეტროგრადები, ტრანზიტები"}
+        </li>
       </ul>
 
       <Button href={dashboardUrl} style={buttonStyle}>
@@ -75,7 +106,9 @@ export function WelcomeEmail({
       </Button>
 
       <Text style={mutedStyle}>
-        {en ? "If you have a question, simply reply to this email." : "თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს."}
+        {en
+          ? "If you have a question, simply reply to this email."
+          : "თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს."}
       </Text>
     </EmailLayout>
   );

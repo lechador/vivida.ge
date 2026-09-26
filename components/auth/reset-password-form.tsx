@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,6 @@ export function ResetPasswordForm({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -39,8 +37,10 @@ export function ResetPasswordForm({
         setDone(true);
         // Auto-redirect after a beat so the user sees the confirmation.
         setTimeout(() => {
-          router.push("/login");
-          router.refresh();
+          // Leave the token URL with a fresh document before analytics can load.
+          window.location.assign(
+            new URL("/login", window.location.origin).href,
+          );
         }, 1800);
       } else {
         setError(result.error);

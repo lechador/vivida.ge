@@ -122,26 +122,12 @@ export default async function ReportPage({
             : "ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე."}
         </p>
 
-        {showUkOffer && (
-          <div className="mb-6">
-            <div className="mb-3 rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 px-5 py-4 text-sm text-foreground/80">
-              <strong className="text-foreground">Your chart is ready.</strong>{" "}
-              Go unlimited with PRO, or scroll to explore your free chart first.
-            </div>
-            <PremiumPlanCard plan={premiumPlanForCountry("GB")!} locale="en" />
-          </div>
-        )}
-
-        <div className="mb-10">
-          <Suspense fallback={null}>
-            <ReportPdfPanel
-              userId={user.id}
-              locale={locale}
-              countryCode={userPrefs?.countryCode}
-              premium={premium}
-            />
-          </Suspense>
-        </div>
+        <a
+          href="#pdf-report"
+          className="mb-6 inline-flex text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+        >
+          {en ? "PDF report and downloads" : "PDF ანგარიში და ჩამოტვირთვა"}
+        </a>
 
         <Suspense
           fallback={
@@ -152,6 +138,32 @@ export default async function ReportPage({
         >
           <ChartSection userId={user.id} locale={locale} />
         </Suspense>
+
+        <section id="pdf-report" className="mt-10 scroll-mt-24">
+          <h2 className="mb-4 text-xl font-semibold">
+            {en ? "Your PDF report" : "შენი PDF ანგარიში"}
+          </h2>
+          <Suspense fallback={null}>
+            <ReportPdfPanel
+              userId={user.id}
+              locale={locale}
+              countryCode={userPrefs?.countryCode}
+              premium={premium}
+            />
+          </Suspense>
+        </section>
+
+        {showUkOffer && (
+          <div className="mt-6">
+            <div className="mb-3 rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 px-5 py-4 text-sm text-foreground/80">
+              <strong className="text-foreground">
+                Explore more with PRO.
+              </strong>{" "}
+              See the plan below for additional features and included access.
+            </div>
+            <PremiumPlanCard plan={premiumPlanForCountry("GB")!} locale="en" />
+          </div>
+        )}
 
         <div className="mt-12 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">

@@ -1,4 +1,5 @@
 import type { BeforeSendEvent } from "@vercel/analytics/next";
+import { isSensitiveTokenPath } from "@/lib/privacy/sensitive-routes";
 
 const PRIVATE_DYNAMIC_PATHS: Array<[RegExp, string]> = [
   [/^\/r\/[^/]+(?:\/opengraph-image)?$/, "/r/[id]"],
@@ -22,6 +23,7 @@ export function redactVercelAnalyticsEvent(
 ): BeforeSendEvent | null {
   try {
     const url = new URL(event.url);
+    if (isSensitiveTokenPath(url.pathname)) return null;
     const matched = PRIVATE_DYNAMIC_PATHS.find(([pattern]) =>
       pattern.test(url.pathname),
     );

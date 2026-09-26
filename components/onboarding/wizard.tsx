@@ -14,7 +14,6 @@ import { StepDate, validateDate } from "./step-date";
 import { StepTime, validateTime } from "./step-time";
 import { StepPlace } from "./step-place";
 import { StepVisibility, validateVisibility } from "./step-visibility";
-import { StepPhotos } from "./step-photos";
 import type { Profile } from "@/db/schema";
 import type { GeocodeResult } from "@/lib/geocoding";
 import { suggestUsername } from "@/lib/profile-utils";
@@ -25,13 +24,12 @@ import {
   readPendingNatalProfile,
 } from "@/lib/pending-natal-profile";
 
-type StepName = "date" | "time" | "place" | "visibility" | "photos";
+type StepName = "date" | "time" | "place" | "visibility";
 const FULL_STEPS: readonly StepName[] = [
   "date",
   "time",
   "place",
   "visibility",
-  "photos",
 ] as const;
 
 type Direction = 1 | -1;
@@ -110,14 +108,10 @@ export function OnboardingWizard({
   // — see actions/profile.ts). When the user comes back to edit, hide the
   // date step entirely so they don't waste time on a read-only field, and
   // surface a one-line lock notice on the first remaining step instead.
-  // The photos step is also first-run only — returning users manage photos
-  // from /account, not from this wizard.
+  // Photos are managed from /account after the first chart is shown.
   const dateLocked = !!initialProfile?.dateOfBirth;
   const STEPS = useMemo<readonly StepName[]>(
-    () =>
-      dateLocked
-        ? FULL_STEPS.filter((s) => s !== "date" && s !== "photos")
-        : FULL_STEPS,
+    () => (dateLocked ? FULL_STEPS.filter((s) => s !== "date") : FULL_STEPS),
     [dateLocked],
   );
 
@@ -141,7 +135,7 @@ export function OnboardingWizard({
   }, [initialProfile]);
 
   useEffect(() => {
-    if (initialProfile) {
+    if (initialProfile?.dateOfBirth) {
       clearPendingNatalProfile();
       return;
     }
@@ -224,7 +218,6 @@ export function OnboardingWizard({
     if (currentStep === "place") return data.place !== null;
     if (currentStep === "visibility")
       return validateVisibility(data.visibility);
-    if (currentStep === "photos") return true; // photos are optional
     return false;
   }, [currentStep, data]);
 
@@ -268,6 +261,7 @@ export function OnboardingWizard({
     }
     trackEvent(ANALYTICS_EVENT.onboardingSubmitted, {
       flow,
+      outcome: "attempt",
       total_steps: STEPS.length,
       exact_time: timeRes.time ? 1 : 0,
     });
@@ -359,7 +353,6 @@ export function OnboardingWizard({
                 locale={locale}
               />
             )}
-            {currentStep === "photos" && <StepPhotos locale={locale} />}
           </motion.div>
         </AnimatePresence>
 

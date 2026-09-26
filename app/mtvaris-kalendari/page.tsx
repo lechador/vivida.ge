@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { ArrowRight, Moon, Sparkles } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
@@ -7,6 +8,7 @@ import { ReportPromo } from "@/components/report/report-promo";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Button } from "@/components/ui/button";
+import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
 import {
   computeMoonPhase,
   type MoonPhaseSnapshot,
@@ -21,11 +23,12 @@ import {
 } from "@/lib/seo/moon-reference";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
-  MOON_CALENDAR_EN,
+  moonCalendarEnCopy,
   MoonCalendarPageEn,
 } from "@/components/seo/moon-calendar-en";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { tbilisiCalendarParts, tbilisiNoonUtc } from "@/lib/moon-calendar-date";
 import {
   englishSiteHref,
   DEFAULT_OG_IMAGE,
@@ -34,13 +37,10 @@ import {
 
 const SITE_URL = "https://www.vivida.ge";
 const PAGE_URL = `${SITE_URL}/mtvaris-kalendari`;
-const TBILISI_OFFSET_MS = 4 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export const revalidate = 86400;
-
-const CURRENT_YEAR = new Date(Date.now() + TBILISI_OFFSET_MS).getUTCFullYear();
-const TITLE = `მთვარის კალენდარი ${CURRENT_YEAR} — მთვარე დღეს, ფაზა და ნიშანი`;
+const titleForYear = (year: number) =>
+  `მთვარის კალენდარი ${year} — მთვარე დღეს, ფაზა და ნიშანი`;
 /**
  * The Latin spelling is in the description on purpose: GSC shows this page
  * sitting at position ~9 for "mtvaris kalendari" (168 impressions / 1 click
@@ -49,58 +49,65 @@ const TITLE = `მთვარის კალენდარი ${CURRENT_YEAR}
  * the token here — not in the title — tests that without uglifying the SERP
  * line for the far larger Georgian-script audience.
  */
-const DESCRIPTION = `მთვარის კალენდარი ${CURRENT_YEAR} (mtvaris kalendari): რომელ ფაზაშია მთვარე დღეს, რომელ ნიშანშია და რამდენად არის განათებული. ახალი და სავსე მთვარის თარიღები საქართველოს დროით, თვე-თვე.`;
+const descriptionForYear = (year: number) =>
+  `მთვარის კალენდარი ${year} (mtvaris kalendari): რომელ ფაზაშია მთვარე დღეს, რომელ ნიშანშია და რამდენად არის განათებული. ახალი და სავსე მთვარის თარიღები საქართველოს დროით, თვე-თვე.`;
 
-const KA_METADATA: Metadata = {
-  title: { absolute: TITLE },
-  description: DESCRIPTION,
-  keywords: [
-    "მთვარის კალენდარი",
-    `მთვარის კალენდარი ${CURRENT_YEAR}`,
-    `მთვარის დღეების კალენდარი ${CURRENT_YEAR}`,
-    "მთვარე დღეს",
-    "მთვარის ფაზა დღეს",
-    "მთვარის ფაზები",
-    "ახალი მთვარის კალენდარი",
-    "ახალი მთვარე კალენდარი",
-    "სავსე მთვარის კალენდარი",
-    `სავსე მთვარე რომელ რიცხვშია ${CURRENT_YEAR}`,
-    "mtvaris kalendari",
-  ],
-  alternates: localizedAlternates(
-    "/mtvaris-kalendari",
-    "/mtvaris-kalendari",
-    "ka",
-  ),
-  robots: { index: true, follow: true },
-  openGraph: {
-    images: [DEFAULT_OG_IMAGE],
-    type: "website",
-    url: PAGE_URL,
-    title: TITLE,
-    description: DESCRIPTION,
-    siteName: "Vivida",
-    locale: "ka_GE",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-};
+function kaMetadata(year: number): Metadata {
+  const title = titleForYear(year);
+  const description = descriptionForYear(year);
+  return {
+    title: { absolute: title },
+    description,
+    keywords: [
+      "მთვარის კალენდარი",
+      `მთვარის კალენდარი ${year}`,
+      `მთვარის დღეების კალენდარი ${year}`,
+      "მთვარე დღეს",
+      "მთვარის ფაზა დღეს",
+      "მთვარის ფაზები",
+      "ახალი მთვარის კალენდარი",
+      "ახალი მთვარე კალენდარი",
+      "სავსე მთვარის კალენდარი",
+      `სავსე მთვარე რომელ რიცხვშია ${year}`,
+      "mtvaris kalendari",
+    ],
+    alternates: localizedAlternates(
+      "/mtvaris-kalendari",
+      "/mtvaris-kalendari",
+      "ka",
+    ),
+    robots: { index: true, follow: true },
+    openGraph: {
+      images: [DEFAULT_OG_IMAGE],
+      type: "website",
+      url: PAGE_URL,
+      title,
+      description,
+      siteName: "Vivida",
+      locale: "ka_GE",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 export async function generateMetadata(): Promise<Metadata> {
+  await connection();
+  const currentYear = tbilisiCalendarParts(new Date()).year;
   const locale = await getRequestLocale();
-  if (locale === "ka") return KA_METADATA;
+  if (locale === "ka") return kaMetadata(currentYear);
   if (locale === "en") {
     const path = "/mtvaris-kalendari";
-    const { title, description } = MOON_CALENDAR_EN;
+    const { title, description } = moonCalendarEnCopy(currentYear);
     return {
       title: { absolute: title },
       description,
       keywords: [
         "moon calendar",
-        `moon calendar ${CURRENT_YEAR}`,
+        `moon calendar ${currentYear}`,
         "moon phase today",
         "next full moon",
         "next new moon",
@@ -118,7 +125,7 @@ export async function generateMetadata(): Promise<Metadata> {
       twitter: { card: "summary_large_image", title, description },
     };
   }
-  return KA_METADATA;
+  return kaMetadata(currentYear);
 }
 
 const MONTHS_KA = [
@@ -154,20 +161,8 @@ type MajorEvent = {
   snapshot: MoonPhaseSnapshot;
 };
 
-function tbilisiParts(date: Date) {
-  const local = new Date(date.getTime() + TBILISI_OFFSET_MS);
-  return {
-    year: local.getUTCFullYear(),
-    month: local.getUTCMonth(),
-    day: local.getUTCDate(),
-    weekday: local.getUTCDay(),
-    hour: local.getUTCHours(),
-    minute: local.getUTCMinutes(),
-  };
-}
-
 function formatDateKa(date: Date, includeYear = true) {
-  const p = tbilisiParts(date);
+  const p = tbilisiCalendarParts(date);
   return `${p.day} ${MONTHS_KA[p.month]}${includeYear ? ` ${p.year}` : ""}`;
 }
 
@@ -213,12 +208,25 @@ function majorEventsForYears(startYear: number, endYear: number): MajorEvent[] {
       );
       const date = refineEvent(estimate, kind);
       const snapshot = computeMoonPhase(date);
-      const year = tbilisiParts(date).year;
+      const year = tbilisiCalendarParts(date).year;
       if (snapshot && year >= startYear && year <= endYear)
         events.push({ kind, date, snapshot });
     }
   }
   return events.sort((a, b) => a.date.getTime() - b.date.getTime());
+}
+
+// Annual ephemeris samples are stable for a given year. Keep one year's pair
+// per server instance while daily output is rendered for each fresh request.
+const annualEventsCache = new Map<number, MajorEvent[]>();
+
+function annualEventsForYear(year: number): MajorEvent[] {
+  const cached = annualEventsCache.get(year);
+  if (cached) return cached;
+  const events = majorEventsForYears(year, year + 1);
+  annualEventsCache.clear();
+  annualEventsCache.set(year, events);
+  return events;
 }
 
 function EventList({ events, label }: { events: MajorEvent[]; label: string }) {
@@ -248,21 +256,22 @@ function EventList({ events, label }: { events: MajorEvent[]; label: string }) {
 }
 
 export default async function MoonCalendarPage() {
+  await connection();
   const locale = await getRequestLocale();
   if (locale === "en") return <MoonCalendarPageEn />;
   const now = new Date();
-  const localToday = tbilisiParts(now);
-  const todayNoonUtc = new Date(
-    Date.UTC(localToday.year, localToday.month, localToday.day, 8),
-  );
+  const currentYear = tbilisiCalendarParts(now).year;
+  const title = titleForYear(currentYear);
+  const description = descriptionForYear(currentYear);
+  const todayNoonUtc = tbilisiNoonUtc(now);
   const todaySnapshot = computeMoonPhase(now);
   const days: Day[] = Array.from({ length: 30 }, (_, i) => {
     const date = new Date(todayNoonUtc.getTime() + i * DAY_MS);
     return { date, snapshot: computeMoonPhase(date) };
   });
-  const annualEvents = majorEventsForYears(CURRENT_YEAR, CURRENT_YEAR + 1);
+  const annualEvents = annualEventsForYear(currentYear);
   const yearEvents = annualEvents.filter(
-    (event) => tbilisiParts(event.date).year === CURRENT_YEAR,
+    (event) => tbilisiCalendarParts(event.date).year === currentYear,
   );
   const newMoons = yearEvents.filter((event) => event.kind === "new");
   const fullMoons = yearEvents.filter((event) => event.kind === "full");
@@ -281,8 +290,8 @@ export default async function MoonCalendarPage() {
         : "დღევანდელი ფაზა კალენდრის ზედა ნაწილში ყოველდღიურად ახლდება.",
     },
     {
-      q: `სავსე მთვარე რომელ რიცხვშია ${CURRENT_YEAR} წელს?`,
-      a: `${CURRENT_YEAR} წლის სავსე მთვარის ყველა თარიღი მოცემულია ამ გვერდის „სავსე მთვარის თარიღების“ სექციაში. უახლოესი სავსე მთვარეა ${nextFull ? formatDateKa(nextFull.date) : "კალენდარში მითითებულ თარიღში"}.`,
+      q: `სავსე მთვარე რომელ რიცხვშია ${currentYear} წელს?`,
+      a: `${currentYear} წლის სავსე მთვარის ყველა თარიღი მოცემულია ამ გვერდის „სავსე მთვარის თარიღების“ სექციაში. უახლოესი სავსე მთვარეა ${nextFull ? formatDateKa(nextFull.date) : "კალენდარში მითითებულ თარიღში"}.`,
     },
     {
       q: "როდის არის შემდეგი ახალი მთვარე?",
@@ -319,8 +328,8 @@ export default async function MoonCalendarPage() {
     "@type": "WebPage",
     "@id": PAGE_URL,
     url: PAGE_URL,
-    name: TITLE,
-    description: DESCRIPTION,
+    name: title,
+    description,
     inLanguage: "ka-GE",
     dateModified: now.toISOString(),
     about: { "@type": "Thing", name: "მთვარის ფაზები" },
@@ -369,7 +378,7 @@ export default async function MoonCalendarPage() {
           <h1 className="mt-2 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
             მთვარის კალენდარი{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {CURRENT_YEAR}
+              {currentYear}
             </span>
           </h1>
           <p className="mt-4 text-pretty text-base leading-7 text-foreground/85 sm:text-lg">
@@ -378,6 +387,29 @@ export default async function MoonCalendarPage() {
             30 დღის ყოველდღიური მიმოხილვა.
           </p>
         </header>
+
+        <nav
+          aria-label="მთვარის კალენდრის სექციები"
+          className="mb-8 flex flex-wrap gap-2"
+        >
+          {[
+            ["#moon-today", "დღეს"],
+            ["#next-days", "შემდეგი 30 დღე"],
+            ["#year-calendar", "ახალი და სავსე მთვარე"],
+          ].map(([href, label]) => (
+            <TrackedPublicLink
+              key={href}
+              href={href}
+              event="moon"
+              target={href.slice(1)}
+              feature="moon_calendar"
+              surface="section_nav"
+              className="rounded-full border border-border bg-card/55 px-4 py-2 text-sm font-medium transition-colors hover:border-[var(--vivida-violet)]/50 hover:bg-card/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--vivida-violet)]"
+            >
+              {label}
+            </TrackedPublicLink>
+          ))}
+        </nav>
 
         {todaySnapshot && (
           <section
@@ -389,7 +421,7 @@ export default async function MoonCalendarPage() {
             </p>
             <h2
               id="moon-today"
-              className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl"
+              className="mt-2 scroll-mt-24 text-2xl font-semibold tracking-tight sm:text-3xl"
             >
               მთვარის რომელი ფაზაა დღეს?
             </h2>
@@ -444,9 +476,9 @@ export default async function MoonCalendarPage() {
         <section aria-labelledby="year-calendar" className="mb-14">
           <h2
             id="year-calendar"
-            className="text-3xl font-semibold tracking-tight"
+            className="scroll-mt-24 text-3xl font-semibold tracking-tight"
           >
-            {CURRENT_YEAR} წლის მთვარის კალენდარი
+            {currentYear} წლის მთვარის კალენდარი
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-foreground/80">
             ქვემოთ მოცემულია წლის ყველა ახალი და სავსე მთვარის გამოთვლილი თარიღი
@@ -460,7 +492,7 @@ export default async function MoonCalendarPage() {
               </h3>
               <EventList
                 events={newMoons}
-                label={`${CURRENT_YEAR} წლის ახალი მთვარის კალენდარი`}
+                label={`${currentYear} წლის ახალი მთვარის კალენდარი`}
               />
               <Link
                 href="/akhali-mtvare"
@@ -476,7 +508,7 @@ export default async function MoonCalendarPage() {
               </h3>
               <EventList
                 events={fullMoons}
-                label={`${CURRENT_YEAR} წლის სავსე მთვარის კალენდარი`}
+                label={`${currentYear} წლის სავსე მთვარის კალენდარი`}
               />
               <Link
                 href="/savse-mtvare"
@@ -490,7 +522,10 @@ export default async function MoonCalendarPage() {
         </section>
 
         <section aria-labelledby="next-days" className="mb-14">
-          <h2 id="next-days" className="text-3xl font-semibold tracking-tight">
+          <h2
+            id="next-days"
+            className="scroll-mt-24 text-3xl font-semibold tracking-tight"
+          >
             მთვარის ფაზები — შემდეგი 30 დღე
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-foreground/80">
@@ -500,7 +535,7 @@ export default async function MoonCalendarPage() {
           </p>
           <ul className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
             {days.map((day) => {
-              const p = tbilisiParts(day.date);
+              const p = tbilisiCalendarParts(day.date);
               const snapshot = day.snapshot;
               return (
                 <li

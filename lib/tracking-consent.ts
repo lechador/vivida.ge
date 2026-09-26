@@ -1,3 +1,5 @@
+import { isSensitiveTokenPath } from "@/lib/privacy/sensitive-routes";
+
 export const TRACKING_CONSENT_COOKIE = "vivida_tracking_consent";
 export const TRACKING_CONSENT_MAX_AGE_SECONDS = 60 * 60 * 24 * 180;
 
@@ -20,5 +22,8 @@ export function browserTrackingConsent(): TrackingConsent {
 }
 
 export function browserTrackingAllowed(): boolean {
+  if (typeof window === "undefined") return false;
+  // Consent never authorizes third-party calls from bearer-token pages.
+  if (isSensitiveTokenPath(window.location.pathname)) return false;
   return browserTrackingConsent() === "granted";
 }

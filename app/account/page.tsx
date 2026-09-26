@@ -150,7 +150,7 @@ export default async function AccountPage() {
         )}
 
         {/* Profile photos — surfaced near the top so it's easy to find */}
-        <div className="mb-6">
+        <div id="profile-photos" className="mb-6 scroll-mt-24">
           <PhotoUploader
             initial={photos
               .filter((p) => p.ready)
@@ -206,7 +206,7 @@ export default async function AccountPage() {
           <PushOptIn locale={locale} />
         </div>
 
-        <div className="mb-6">
+        <div id="reminders" className="mb-6 scroll-mt-24">
           <ReminderPreferencesCard
             initial={reminderData.preferences}
             initialCalendarToken={reminderData.calendarToken}
