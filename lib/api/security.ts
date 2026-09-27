@@ -10,13 +10,21 @@ import { ApiError } from "./errors";
  * constant so a missing header degrades to one coarse shared bucket rather
  * than disabling the limiter entirely.
  */
-export function getClientIp(req: Request): string {
-  const fwd = req.headers.get("x-forwarded-for");
+export function clientIpFromHeaders(headers: Pick<Headers, "get">): string {
+  // Vercel overwrites forwarded IP headers at its edge. Prefer its dedicated
+  // copy so any extra proxy in front of the app cannot replace the value.
+  const fwd =
+    (process.env.VERCEL ? headers.get("x-vercel-forwarded-for") : null) ??
+    headers.get("x-forwarded-for");
   if (fwd) {
     const first = fwd.split(",")[0]?.trim();
     if (first) return first;
   }
-  return req.headers.get("x-real-ip")?.trim() || "unknown";
+  return headers.get("x-real-ip")?.trim() || "unknown";
+}
+
+export function getClientIp(req: Request): string {
+  return clientIpFromHeaders(req.headers);
 }
 
 /**
@@ -27,14 +35,14 @@ export function getClientIp(req: Request): string {
  */
 export async function requireTurnstile(
   token: string | null | undefined,
-  ip: string | null
+  ip: string | null,
 ): Promise<void> {
   const human = await verifyTurnstile(token, ip);
   if (!human) {
     throw new ApiError(
       403,
       "turnstile_failed",
-      "Bot verification failed. Please try again."
+      "Bot verification failed. Please try again.",
     );
   }
 }

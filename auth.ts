@@ -15,6 +15,8 @@ import {
   setResidenceCountryIfMissing,
 } from "@/lib/residence";
 import { getSignupLocale } from "@/lib/i18n/request-locale";
+import { clientIpFromHeaders } from "@/lib/api/security";
+import { checkNewSignup, hashSignupIp } from "@/lib/signup-abuse";
 
 /**
  * Credentials provider for the email/password login flow. Lives in
@@ -73,6 +75,50 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     verificationTokensTable: verificationTokens,
   }),
   providers: [...authConfig.providers, credentialsProvider],
+  callbacks: {
+    ...authConfig.callbacks,
+    // Auth.js calls signIn before the adapter inserts a new OAuth user. Keep
+    // existing provider accounts and email-linked accounts free to sign in;
+    // only a genuinely new identity consumes the signup abuse allowance.
+    async signIn({ user, account }) {
+      if (account?.type !== "oauth" && account?.type !== "oidc") return true;
+
+      const [linked] = await db
+        .select({ userId: accounts.userId })
+        .from(accounts)
+        .where(
+          and(
+            eq(accounts.provider, account.provider),
+            eq(accounts.providerAccountId, account.providerAccountId),
+          ),
+        )
+        .limit(1);
+      if (linked) return true;
+
+      const email = user.email?.trim() ?? null;
+      if (!email) return "/signup?error=duplicate_registration";
+      const [existing] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+      if (existing) return true;
+
+      const signupCheck = await checkNewSignup({
+        ip: clientIpFromHeaders(await headers()),
+        name: user.name,
+        email,
+      });
+      if (!signupCheck.allowed) {
+        return `/signup?error=${
+          signupCheck.reason === "duplicate"
+            ? "duplicate_registration"
+            : "signup_rate_limited"
+        }`;
+      }
+      return true;
+    },
+  },
   events: {
     // Stamp users.lastLoginAt on every successful sign-in. Wrapped so a
     // transient DB blip can never break the auth flow itself — losing one
@@ -87,7 +133,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } catch (err) {
         console.warn(
           "[auth.signIn] failed to update lastLoginAt:",
-          (err as Error).message
+          (err as Error).message,
         );
       }
     },
@@ -98,6 +144,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // (earnOnce) + best-effort, so it can't double-grant or break the callback.
     async createUser({ user }) {
       if (!user?.id) return;
+      // The adapter inserts OAuth users; attach a keyed IP hash before the
+      // signup bonus so the next new-account check can see this signup.
+      try {
+        const signupIpHash = hashSignupIp(clientIpFromHeaders(await headers()));
+        if (signupIpHash) {
+          await db
+            .update(users)
+            .set({ signupIpHash })
+            .where(eq(users.id, user.id));
+        }
+      } catch (err) {
+        console.warn(
+          "[auth.createUser] signup IP stamp failed:",
+          (err as Error).message,
+        );
+      }
       // Adapter-created users are OAuth sign-ups (our credentials flow
       // creates users itself, gated on email verification). Google asserts
       // email_verified, but NextAuth's default profile mapping doesn't stamp
@@ -111,7 +173,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } catch (err) {
         console.warn(
           "[auth.createUser] emailVerified stamp failed:",
-          (err as Error).message
+          (err as Error).message,
         );
       }
       try {
@@ -155,7 +217,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } catch (err) {
         console.warn(
           "[auth.createUser] signup bonus failed:",
-          (err as Error).message
+          (err as Error).message,
         );
       }
       // Assign the username here too — the adapter creates these users, so
@@ -167,7 +229,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } catch (err) {
         console.warn(
           "[auth.createUser] username assignment failed:",
-          (err as Error).message
+          (err as Error).message,
         );
       }
     },

@@ -16,13 +16,14 @@ import {
   registerUser,
 } from "@/lib/auth-core";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/email";
-import { enforceAuthRateLimit } from "@/lib/rate-limit";
+import { enforceAuthRateLimit, enforceRateLimit } from "@/lib/rate-limit";
 import { ApiError } from "@/lib/api/errors";
 import { TURNSTILE_ERROR_KA, verifyTurnstile } from "@/lib/turnstile";
 import { siteOriginForHost } from "@/lib/seo/locales";
 import { getRequestLocale, getSignupLocale } from "@/lib/i18n/request-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { countryCodeFromHeaders } from "@/lib/residence";
+import { clientIpFromHeaders as getIpFromHeaders } from "@/lib/api/security";
 
 async function siteOriginFromHeaders(): Promise<string> {
   const h = await headers();
@@ -31,13 +32,7 @@ async function siteOriginFromHeaders(): Promise<string> {
 
 /** Best-effort client IP from the incoming request headers (Vercel proxy). */
 async function clientIpFromHeaders(): Promise<string> {
-  const h = await headers();
-  const fwd = h.get("x-forwarded-for");
-  if (fwd) {
-    const first = fwd.split(",")[0]?.trim();
-    if (first) return first;
-  }
-  return h.get("x-real-ip")?.trim() || "unknown";
+  return getIpFromHeaders(await headers());
 }
 
 /**
@@ -101,6 +96,18 @@ function registerError(error: string, locale: UserLocale): string {
         "ეს ელფოსტა უკვე დარეგისტრირებულია. სცადე შესვლა ან პაროლის აღდგენა.",
         "This email is already registered. Try signing in or resetting your password.",
       );
+    case "duplicate_registration":
+      return localized(
+        locale,
+        "ამ მონაცემებით რეგისტრაცია დამატებით შემოწმებას საჭიროებს. სცადე არსებულ ანგარიშში შესვლა ან მოგვწერე მხარდაჭერას.",
+        "This registration needs review. Try signing in to your existing account or contact support.",
+      );
+    case "signup_rate_limited":
+      return localized(
+        locale,
+        "ამ კავშირიდან ძალიან ბევრი რეგისტრაციის მცდელობა იყო. სცადე მოგვიანებით.",
+        "Too many registration attempts from this connection. Please try again later.",
+      );
     case "failed":
     default:
       return localized(
@@ -129,7 +136,8 @@ export async function signUpWithEmail(
   // Sign-up runs on the shared, unprefixed /signup route, so the host cannot
   // tell an Armenian visitor from an English one — see getSignupLocale.
   const locale = await getSignupLocale();
-  // Bot gate first — fast path before we touch the DB or hash anything.
+  // Require a human proof before an attempt can consume another address's
+  // rate-limit allowance.
   const human = await verifyTurnstile(input.turnstileToken);
   if (!human) {
     return {
@@ -138,6 +146,35 @@ export async function signUpWithEmail(
     };
   }
 
+  const ip = await clientIpFromHeaders();
+  try {
+    if (ip !== "unknown") {
+      await enforceAuthRateLimit({
+        action: "register",
+        ip,
+        email: input.email,
+        ipLimit: 5,
+        emailLimit: 3,
+        windowMs: 60 * 60 * 1000,
+      });
+    } else {
+      await enforceRateLimit({
+        bucket: "register_email",
+        identifier: input.email.trim().toLowerCase(),
+        limit: 3,
+        windowMs: 60 * 60 * 1000,
+      });
+    }
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 429) {
+      return { ok: false, error: registerError("signup_rate_limited", locale) };
+    }
+    console.warn(
+      "[signUpWithEmail] rate limit check failed:",
+      (err as Error).message,
+    );
+    return { ok: false, error: registerError("failed", locale) };
+  }
   // Any thrown error (transient DB blip, etc.) must land as an inline
   // "try again" on the form — never a crashed page. Registration is
   // resumable (see registerUser), so a retry after a mid-register failure
@@ -151,6 +188,7 @@ export async function signUpWithEmail(
       password: input.password,
       interfaceLanguage: locale,
       residenceCountryCode: countryCodeFromHeaders(requestHeaders),
+      ip,
     });
   } catch (err) {
     console.warn("[signUpWithEmail] register failed:", (err as Error).message);

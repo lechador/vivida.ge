@@ -19,14 +19,19 @@ import { provisionSignupCredits } from "@/lib/signup-credit-experiment";
  *      (REF_COOKIE); on signup we attribute them to the referrer (once).
  *   3. When that invited user *activates* — verifies email AND fills birth
  *      data — the referral qualifies and the referrer is paid REFERRAL_REWARD,
- *      exactly once. This gate is the anti-fraud: a fake/duplicate/abandoned
- *      signup never qualifies, and self-referral is blocked at attribution.
+ *      exactly once. Verification and a completed birth profile reduce
+ *      abandoned signups; the profile duplicate guard blocks strong matches,
+ *      and self-referral is blocked at attribution.
  */
 
 export const REF_COOKIE = "vivida_ref";
 
 function genCode(): string {
-  return randomBytes(6).toString("base64url").replace(/[-_]/g, "").slice(0, 7).toLowerCase();
+  return randomBytes(6)
+    .toString("base64url")
+    .replace(/[-_]/g, "")
+    .slice(0, 7)
+    .toLowerCase();
 }
 
 /** Get (or lazily create) this user's referral code. */
@@ -41,7 +46,10 @@ export async function ensureReferralCode(userId: string): Promise<string> {
   for (let i = 0; i < 6; i++) {
     const code = genCode();
     try {
-      await db.update(users).set({ referralCode: code }).where(eq(users.id, userId));
+      await db
+        .update(users)
+        .set({ referralCode: code })
+        .where(eq(users.id, userId));
       return code;
     } catch (e) {
       if ((e as { code?: string }).code === "23505") continue; // code collision — retry
@@ -56,7 +64,10 @@ export async function ensureReferralCode(userId: string): Promise<string> {
  * No-ops on unknown code, self-referral, or an already-attributed invitee (the
  * unique constraint on invited_user_id guarantees at most one referrer).
  */
-export async function attributeReferral(invitedUserId: string, rawCode: string): Promise<void> {
+export async function attributeReferral(
+  invitedUserId: string,
+  rawCode: string,
+): Promise<void> {
   const code = rawCode.trim().toLowerCase();
   if (!code) return;
   const [referrer] = await db
@@ -81,7 +92,12 @@ export async function qualifyReferral(invitedUserId: string): Promise<void> {
   const [ref] = await db
     .select({ id: referrals.id, referrerId: referrals.referrerId })
     .from(referrals)
-    .where(and(eq(referrals.invitedUserId, invitedUserId), isNull(referrals.creditedAt)))
+    .where(
+      and(
+        eq(referrals.invitedUserId, invitedUserId),
+        isNull(referrals.creditedAt),
+      ),
+    )
     .limit(1);
   if (!ref) return;
 
@@ -96,12 +112,21 @@ export async function qualifyReferral(invitedUserId: string): Promise<void> {
   // Claim the payout atomically — only the caller that flips credited_at wins.
   const claimed = await db
     .update(referrals)
-    .set({ status: "qualified", qualifiedAt: new Date(), creditedAt: new Date() })
+    .set({
+      status: "qualified",
+      qualifiedAt: new Date(),
+      creditedAt: new Date(),
+    })
     .where(and(eq(referrals.id, ref.id), isNull(referrals.creditedAt)))
     .returning({ id: referrals.id });
   if (claimed.length === 0) return;
 
-  await grantCredits(ref.referrerId, REFERRAL_REWARD, "referral", invitedUserId);
+  await grantCredits(
+    ref.referrerId,
+    REFERRAL_REWARD,
+    "referral",
+    invitedUserId,
+  );
 }
 
 /**
@@ -117,7 +142,10 @@ export async function onUserSignedUp(userId: string): Promise<void> {
     // create hooks or a later recovery visit cannot double-credit the account.
     await provisionSignupCredits(userId);
   } catch (err) {
-    console.warn("[referral.onUserSignedUp] bonus failed:", (err as Error).message);
+    console.warn(
+      "[referral.onUserSignedUp] bonus failed:",
+      (err as Error).message,
+    );
   }
   try {
     const ref = (await cookies()).get(REF_COOKIE)?.value;
@@ -127,7 +155,11 @@ export async function onUserSignedUp(userId: string): Promise<void> {
   }
 }
 
-export type ReferralStats = { code: string; invited: number; qualified: number };
+export type ReferralStats = {
+  code: string;
+  invited: number;
+  qualified: number;
+};
 
 export async function getReferralStats(userId: string): Promise<ReferralStats> {
   const code = await ensureReferralCode(userId);

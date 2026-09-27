@@ -49,7 +49,10 @@ export async function PUT(req: Request) {
     const result = await saveBirthDataCore(user.id, input);
     if (!result.ok) {
       return fail(
-        result.code === "possible_duplicate" ? 409 : 422,
+        result.code === "possible_duplicate" ||
+          result.code === "duplicate_account"
+          ? 409
+          : 422,
         result.code ?? "profile_rejected",
         result.error,
       );

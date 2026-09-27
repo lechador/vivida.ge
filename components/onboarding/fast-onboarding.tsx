@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Loader2, Sparkles } from "lucide-react";
 
 import { saveProfile } from "@/actions/profile";
+import { signOutAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { fbTrack } from "@/lib/fb-pixel";
@@ -21,7 +22,8 @@ export function FastOnboarding({
   const en = locale !== "ka";
   const [missing, setMissing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
+  const [duplicateAccount, setDuplicateAccount] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -59,10 +61,13 @@ export function FastOnboarding({
           true,
         );
         if (result && !result.ok) {
+          setDuplicateAccount(result.code === "duplicate_account");
           setError(
             result.code === "possible_duplicate" && en
               ? "You may already have an account with these birth details. Review this in the next step."
-              : result.error,
+              : result.code === "duplicate_account" && en
+                ? "An account with these details already exists. Sign in to your existing account or contact support."
+                : result.error,
           );
         }
       });
@@ -83,13 +88,24 @@ export function FastOnboarding({
               ? "Your saved chart details expired. Add them once more to continue."
               : "შენახული მონაცემების ვადა გავიდა. გასაგრძელებლად კიდევ ერთხელ მიუთითე.")}
         </p>
-        <Button asChild variant="mystic" className="mt-5">
-          <Link
-            href={`/onboarding${next ? `?next=${encodeURIComponent(next)}` : ""}`}
+        {duplicateAccount ? (
+          <Button
+            variant="mystic"
+            className="mt-5"
+            disabled={isPending}
+            onClick={() => startTransition(() => signOutAction("/login"))}
           >
-            {en ? "Continue" : "გაგრძელება"}
-          </Link>
-        </Button>
+            {en ? "Sign in to existing account" : "ძველ ანგარიშში შესვლა"}
+          </Button>
+        ) : (
+          <Button asChild variant="mystic" className="mt-5">
+            <Link
+              href={`/onboarding${next ? `?next=${encodeURIComponent(next)}` : ""}`}
+            >
+              {en ? "Continue" : "გაგრძელება"}
+            </Link>
+          </Button>
+        )}
       </div>
     );
   }

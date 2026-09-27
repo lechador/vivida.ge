@@ -56,6 +56,8 @@ export const users = pgTable(
     interfaceLanguage: text("interface_language").notNull().default("ka"),
     /** ISO 3166-1 alpha-2 residence country captured from the registration IP. */
     residenceCountryCode: text("residence_country_code"),
+    /** HMAC of the registration IP, used only for short-window abuse checks. */
+    signupIpHash: text("signup_ip_hash"),
     /** User-entered residence city; intentionally blank at registration. */
     residenceCity: text("residence_city"),
     /** Stripe customer is kept on the user so canceled subscribers can return. */
@@ -99,6 +101,7 @@ export const users = pgTable(
   },
   (t) => [
     index("user_name_trgm_idx").using("gin", t.name.asc().op("gin_trgm_ops")),
+    index("user_signup_ip_created_idx").on(t.signupIpHash, t.createdAt),
   ],
 );
 

@@ -185,6 +185,7 @@ export function OnboardingWizard({
   const [direction, setDirection] = useState<Direction>(1);
   const [error, setError] = useState<string | null>(null);
   const [possibleDuplicate, setPossibleDuplicate] = useState(false);
+  const [duplicateAccount, setDuplicateAccount] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const currentStep = STEPS[step];
@@ -240,6 +241,7 @@ export function OnboardingWizard({
   const goBack = () => {
     if (step === 0) return;
     setPossibleDuplicate(false);
+    setDuplicateAccount(false);
     setDirection(-1);
     setStep((s) => s - 1);
   };
@@ -247,6 +249,7 @@ export function OnboardingWizard({
   const submit = (confirmPossibleDuplicate = false) => {
     setError(null);
     setPossibleDuplicate(false);
+    setDuplicateAccount(false);
     // When the date step was skipped (locked), the existing date in `data`
     // is whatever we initialized from the profile. The server still re-
     // validates it AND ignores the input in favour of the stored value, so
@@ -288,7 +291,12 @@ export function OnboardingWizard({
         if (result.code === "possible_duplicate") {
           setPossibleDuplicate(true);
         } else {
-          setError(result.error);
+          setDuplicateAccount(result.code === "duplicate_account");
+          setError(
+            result.code === "duplicate_account" && en
+              ? "An account with these details already exists. Sign in to your existing account or contact support."
+              : result.error,
+          );
         }
       }
     });
@@ -357,7 +365,20 @@ export function OnboardingWizard({
         </AnimatePresence>
 
         {error && (
-          <p className="mt-6 text-center text-sm text-destructive">{error}</p>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-destructive">{error}</p>
+            {duplicateAccount && (
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-3"
+                disabled={isPending}
+                onClick={() => startTransition(() => signOutAction("/login"))}
+              >
+                {en ? "Sign in to existing account" : "ძველ ანგარიშში შესვლა"}
+              </Button>
+            )}
+          </div>
         )}
 
         {possibleDuplicate && (

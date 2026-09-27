@@ -8,13 +8,14 @@ import { issueRefreshToken } from "@/lib/api/refresh";
 import { fail, ok } from "@/lib/api/respond";
 import { parseBody } from "@/lib/api/validate";
 import { countryCodeFromHeaders } from "@/lib/residence";
+import { getClientIp } from "@/lib/api/security";
 
 export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
 
 const APPLE_ISSUER = "https://appleid.apple.com";
 const APPLE_JWKS = createRemoteJWKSet(
-  new URL("https://appleid.apple.com/auth/keys")
+  new URL("https://appleid.apple.com/auth/keys"),
 );
 const DEFAULT_IOS_BUNDLE_ID = "ge.vivida.vividaApp";
 
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
       return fail(
         401,
         "apple_email_unverified",
-        "Apple account email not verified"
+        "Apple account email not verified",
       );
     }
 
@@ -69,11 +70,12 @@ export async function POST(req: Request) {
       name: name ?? null,
       image: null,
       residenceCountryCode: countryCodeFromHeaders(req.headers),
+      ip: getClientIp(req),
     });
     const accessToken = await signAccessToken(user.userId);
     const refreshToken = await issueRefreshToken(
       user.userId,
-      req.headers.get("user-agent")
+      req.headers.get("user-agent"),
     );
 
     return ok({

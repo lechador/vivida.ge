@@ -30,6 +30,10 @@ const MESSAGES: Record<RegisterError, string> = {
   weak_password: "Password is too short",
   email_taken: "This email is already registered",
   oauth_only: "This email is already registered with Google",
+  duplicate_registration:
+    "This registration needs review. Please sign in to your existing account or contact support.",
+  signup_rate_limited:
+    "Too many new accounts from this connection. Please try again later.",
   failed: "Could not create the account",
 };
 
@@ -44,6 +48,8 @@ const MESSAGES: Record<RegisterError, string> = {
  *  1. Rate limit by IP + email (caps volume before any expensive work).
  *  2. Turnstile — hard-required in production; a script can't get a token,
  *     so it can't make us send verification emails.
+ *  3. Shared new-account gate checks recent same-connection identities and
+ *     caps new accounts across email and OAuth registration routes.
  */
 export async function POST(req: Request) {
   return handle(async () => {
@@ -65,20 +71,32 @@ export async function POST(req: Request) {
       email: body.email,
       password: body.password,
       residenceCountryCode: countryCodeFromHeaders(req.headers),
+      ip,
     });
     if (!result.ok) {
-      const status = result.error === "email_taken" ? 409 : 422;
+      const status =
+        result.error === "signup_rate_limited"
+          ? 429
+          : result.error === "email_taken" ||
+              result.error === "duplicate_registration"
+            ? 409
+            : 422;
       return fail(status, result.error, MESSAGES[result.error]);
     }
 
     const { email, name, verifyToken, verifyCode } = result;
     after(async () => {
       try {
-        await sendVerificationEmail({ to: email, name, token: verifyToken, code: verifyCode });
+        await sendVerificationEmail({
+          to: email,
+          name,
+          token: verifyToken,
+          code: verifyCode,
+        });
       } catch (err) {
         console.warn(
           "[api/v1/register] verification email failed:",
-          (err as Error).message
+          (err as Error).message,
         );
       }
     });

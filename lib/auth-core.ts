@@ -7,6 +7,8 @@ import { authTokens, users, type AuthTokenPurpose } from "@/db/schema";
 import { awardJoinedReputation } from "@/lib/reputation";
 import { onUserSignedUp, qualifyReferral } from "@/lib/referral";
 import { ensureUsername } from "@/lib/username";
+import { checkNewSignup } from "@/lib/signup-abuse";
+import { ApiError } from "@/lib/api/errors";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -56,7 +58,7 @@ export async function issueAuthToken(
   userId: string,
   purpose: AuthTokenPurpose,
   ttlMs: number,
-  code: string | null = null
+  code: string | null = null,
 ): Promise<string> {
   await db
     .delete(authTokens)
@@ -81,6 +83,8 @@ export type RegisterError =
   | "weak_password"
   | "email_taken"
   | "oauth_only"
+  | "duplicate_registration"
+  | "signup_rate_limited"
   | "failed";
 
 export type RegisterResult =
@@ -110,6 +114,7 @@ export async function registerUser(input: {
   password: string;
   interfaceLanguage?: UserLocale;
   residenceCountryCode?: string | null;
+  ip?: string | null;
 }): Promise<RegisterResult> {
   const name = input.name.trim();
   const email = normalizeEmail(input.email);
@@ -170,9 +175,31 @@ export async function registerUser(input: {
       existing.id,
       "email_verify",
       VERIFY_TTL_MS,
-      verifyCode
+      verifyCode,
     );
-    return { ok: true, userId: existing.id, email, name, verifyToken, verifyCode };
+    return {
+      ok: true,
+      userId: existing.id,
+      email,
+      name,
+      verifyToken,
+      verifyCode,
+    };
+  }
+
+  const signupCheck = await checkNewSignup({
+    ip: input.ip,
+    name,
+    email,
+  });
+  if (!signupCheck.allowed) {
+    return {
+      ok: false,
+      error:
+        signupCheck.reason === "duplicate"
+          ? "duplicate_registration"
+          : "signup_rate_limited",
+    };
   }
 
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
@@ -184,6 +211,7 @@ export async function registerUser(input: {
       passwordHash,
       interfaceLanguage: input.interfaceLanguage ?? "ka",
       residenceCountryCode: input.residenceCountryCode ?? null,
+      signupIpHash: signupCheck.signupIpHash,
     })
     .returning({ id: users.id, email: users.email, name: users.name });
   if (!created) return { ok: false, error: "failed" };
@@ -200,7 +228,7 @@ export async function registerUser(input: {
   } catch (err) {
     console.warn(
       "[registerUser] username assignment failed:",
-      (err as Error).message
+      (err as Error).message,
     );
   }
 
@@ -209,7 +237,7 @@ export async function registerUser(input: {
     created.id,
     "email_verify",
     VERIFY_TTL_MS,
-    verifyCode
+    verifyCode,
   );
 
   return {
@@ -245,6 +273,7 @@ export async function findOrCreateOAuthUser(input: {
   name: string | null;
   image: string | null;
   residenceCountryCode?: string | null;
+  ip?: string | null;
 }): Promise<OAuthUser> {
   const email = normalizeEmail(input.email);
 
@@ -265,10 +294,7 @@ export async function findOrCreateOAuthUser(input: {
         .update(users)
         .set({ residenceCountryCode: input.residenceCountryCode })
         .where(
-          and(
-            eq(users.id, existing.id),
-            isNull(users.residenceCountryCode),
-          ),
+          and(eq(users.id, existing.id), isNull(users.residenceCountryCode)),
         );
     }
     return {
@@ -279,6 +305,23 @@ export async function findOrCreateOAuthUser(input: {
     };
   }
 
+  const signupCheck = await checkNewSignup({
+    ip: input.ip,
+    name: input.name,
+    email,
+  });
+  if (!signupCheck.allowed) {
+    throw new ApiError(
+      signupCheck.reason === "duplicate" ? 409 : 429,
+      signupCheck.reason === "duplicate"
+        ? "duplicate_registration"
+        : "signup_rate_limited",
+      signupCheck.reason === "duplicate"
+        ? "This registration needs review. Please sign in to your existing account or contact support."
+        : "Too many new accounts from this connection. Please try again later.",
+    );
+  }
+
   const [created] = await db
     .insert(users)
     .values({
@@ -287,6 +330,7 @@ export async function findOrCreateOAuthUser(input: {
       image: input.image,
       emailVerified: new Date(),
       residenceCountryCode: input.residenceCountryCode ?? null,
+      signupIpHash: signupCheck.signupIpHash,
     })
     .returning({
       id: users.id,
@@ -305,7 +349,7 @@ export async function findOrCreateOAuthUser(input: {
   } catch (err) {
     console.warn(
       "[findOrCreateOAuthUser] username assignment failed:",
-      (err as Error).message
+      (err as Error).message,
     );
   }
 
@@ -338,7 +382,7 @@ export type EmailDispatch =
 
 /** Prepare a fresh verification email for an unverified password user. */
 export async function prepareVerificationResend(
-  rawEmail: string
+  rawEmail: string,
 ): Promise<EmailDispatch> {
   const email = normalizeEmail(rawEmail);
   if (!isValidEmail(email)) return { send: false };
@@ -355,7 +399,7 @@ export async function prepareVerificationResend(
       user.id,
       "email_verify",
       VERIFY_TTL_MS,
-      code
+      code,
     );
     return { send: true, email, name: user.name, token, code };
   }
@@ -364,7 +408,7 @@ export async function prepareVerificationResend(
 
 /** Prepare a password-reset email for a user who has a password set. */
 export async function preparePasswordReset(
-  rawEmail: string
+  rawEmail: string,
 ): Promise<EmailDispatch> {
   const email = normalizeEmail(rawEmail);
   if (!isValidEmail(email)) return { send: false };
@@ -385,12 +429,11 @@ export async function preparePasswordReset(
 // ─── Consume verify-email / reset tokens ─────────────────────────────────
 
 export type VerifyEmailResult =
-  | { ok: true; userId: string }
-  | { ok: false; error: "invalid" | "expired" };
+  { ok: true; userId: string } | { ok: false; error: "invalid" | "expired" };
 
 /** Consume an email_verify token, marking the user verified. Single-use. */
 export async function consumeEmailVerifyToken(
-  token: string
+  token: string,
 ): Promise<VerifyEmailResult> {
   if (!token) return { ok: false, error: "invalid" };
 
@@ -398,7 +441,7 @@ export async function consumeEmailVerifyToken(
     .select()
     .from(authTokens)
     .where(
-      and(eq(authTokens.token, token), eq(authTokens.purpose, "email_verify"))
+      and(eq(authTokens.token, token), eq(authTokens.purpose, "email_verify")),
     )
     .limit(1);
 
@@ -454,8 +497,8 @@ export async function consumeEmailVerifyCode(input: {
     .where(
       and(
         eq(authTokens.userId, user.id),
-        eq(authTokens.purpose, "email_verify")
-      )
+        eq(authTokens.purpose, "email_verify"),
+      ),
     )
     .limit(1);
 
@@ -505,8 +548,8 @@ export async function consumePasswordReset(input: {
       and(
         eq(authTokens.token, input.token),
         eq(authTokens.purpose, "password_reset"),
-        gt(authTokens.expiresAt, new Date())
-      )
+        gt(authTokens.expiresAt, new Date()),
+      ),
     )
     .limit(1);
 

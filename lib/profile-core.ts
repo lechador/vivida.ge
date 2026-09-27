@@ -6,7 +6,7 @@ import { ageFromDob } from "@/lib/profile-utils";
 import { qualifyReferral } from "@/lib/referral";
 import { completeEligibleEmailCampaigns } from "@/lib/email-campaigns";
 import { ensureUsername } from "@/lib/username";
-import { hasLikelyDuplicateAccount } from "@/lib/duplicate-account";
+import { findDuplicateAccountSignal } from "@/lib/duplicate-account";
 
 /**
  * Framework-agnostic profile *write* logic, shared by the website (Server
@@ -50,7 +50,12 @@ export type SaveBirthDataInput = {
 };
 
 export type ProfileWriteResult =
-  { ok: true } | { ok: false; error: string; code?: "possible_duplicate" };
+  | { ok: true }
+  | {
+      ok: false;
+      error: string;
+      code?: "possible_duplicate" | "duplicate_account";
+    };
 
 /**
  * Validate birth data and upsert the user's profile row. Birth date is
@@ -156,24 +161,35 @@ export async function saveBirthDataCore(
       ? { discoverable: input.discoverable }
       : {};
 
-  // Ask only on the first birth-profile save. Matching a name, exact birth
-  // minute and nearby birthplace is a useful signal, but twins and shared
-  // names exist, so the user may explicitly continue.
-  if (!existingProfile?.dateOfBirth && !input.confirmPossibleDuplicate) {
-    const duplicate = await hasLikelyDuplicateAccount(userId, {
-      dateOfBirth: lockedDate,
-      timeOfBirth: input.timeOfBirth,
-      latitude: input.latitude,
-      longitude: input.longitude,
-    });
-    if (duplicate) {
-      return {
-        ok: false,
-        code: "possible_duplicate",
-        error:
-          "შესაძლოა, ამ მონაცემებით ანგარიში უკვე გაქვს. ჯერ სცადე ძველ ანგარიშში შესვლა. თუ ეს ახალი ანგარიშია, შეგიძლია გააგრძელო.",
-      };
-    }
+  // Check the strong signal on every save, including later time/place edits.
+  // Otherwise someone could save a false birth minute on their first visit
+  // and switch it to the duplicate's minute afterward. The weaker exact-name
+  // warning stays limited to the first save and remains dismissible.
+  const duplicate = await findDuplicateAccountSignal(userId, {
+    dateOfBirth: lockedDate,
+    timeOfBirth: input.timeOfBirth,
+    latitude: input.latitude,
+    longitude: input.longitude,
+  });
+  if (duplicate === "confirmed_duplicate") {
+    return {
+      ok: false,
+      code: "duplicate_account",
+      error:
+        "ამ მონაცემებით ანგარიში უკვე არსებობს. გთხოვ, შეხვიდე არსებულ ანგარიშში ან დაუკავშირდე მხარდაჭერას.",
+    };
+  }
+  if (
+    !existingProfile?.dateOfBirth &&
+    duplicate === "possible_duplicate" &&
+    !input.confirmPossibleDuplicate
+  ) {
+    return {
+      ok: false,
+      code: "possible_duplicate",
+      error:
+        "შესაძლოა, ამ მონაცემებით ანგარიში უკვე გაქვს. ჯერ სცადე ძველ ანგარიშში შესვლა. თუ ეს ახალი ანგარიშია, შეგიძლია გააგრძელო.",
+    };
   }
 
   try {

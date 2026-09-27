@@ -8,13 +8,14 @@ import { issueRefreshToken } from "@/lib/api/refresh";
 import { ok, fail } from "@/lib/api/respond";
 import { parseBody } from "@/lib/api/validate";
 import { countryCodeFromHeaders } from "@/lib/residence";
+import { getClientIp } from "@/lib/api/security";
 
 export const runtime = "nodejs";
 export { OPTIONS } from "@/lib/api/cors";
 
 // Google's public signing keys (cached across requests by jose).
 const GOOGLE_JWKS = createRemoteJWKSet(
-  new URL("https://www.googleapis.com/oauth2/v3/certs")
+  new URL("https://www.googleapis.com/oauth2/v3/certs"),
 );
 const GOOGLE_ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
 
@@ -51,7 +52,11 @@ export async function POST(req: Request) {
 
     const audiences = acceptedAudiences();
     if (audiences.length === 0) {
-      return fail(503, "google_not_configured", "Google sign-in is not configured");
+      return fail(
+        503,
+        "google_not_configured",
+        "Google sign-in is not configured",
+      );
     }
 
     let payload;
@@ -62,14 +67,22 @@ export async function POST(req: Request) {
       });
       payload = result.payload;
     } catch {
-      return fail(401, "invalid_google_token", "Invalid or expired Google token");
+      return fail(
+        401,
+        "invalid_google_token",
+        "Invalid or expired Google token",
+      );
     }
 
     const email = typeof payload.email === "string" ? payload.email : null;
     const emailVerified =
       payload.email_verified === true || payload.email_verified === "true";
     if (!email || !emailVerified) {
-      return fail(401, "google_email_unverified", "Google account email not verified");
+      return fail(
+        401,
+        "google_email_unverified",
+        "Google account email not verified",
+      );
     }
 
     const user = await findOrCreateOAuthUser({
@@ -77,12 +90,13 @@ export async function POST(req: Request) {
       name: typeof payload.name === "string" ? payload.name : null,
       image: typeof payload.picture === "string" ? payload.picture : null,
       residenceCountryCode: countryCodeFromHeaders(req.headers),
+      ip: getClientIp(req),
     });
 
     const accessToken = await signAccessToken(user.userId);
     const refreshToken = await issueRefreshToken(
       user.userId,
-      req.headers.get("user-agent")
+      req.headers.get("user-agent"),
     );
 
     return ok({

@@ -32,9 +32,9 @@ function safeNext(v: string | undefined): string | null {
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; error?: string }>;
 }) {
-  const { next } = await searchParams;
+  const { next, error } = await searchParams;
   const dest = safeNext(next);
   const locale = await getRequestLocale();
   const en = locale !== "ka";
@@ -67,6 +67,21 @@ export default async function SignupPage({
         </>
       }
     >
+      {(error === "duplicate_registration" ||
+        error === "signup_rate_limited") && (
+        <p
+          role="alert"
+          className="mb-5 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+        >
+          {error === "duplicate_registration"
+            ? en
+              ? "This registration needs review. Try signing in to your existing account or contact support."
+              : "ამ მონაცემებით რეგისტრაცია დამატებით შემოწმებას საჭიროებს. სცადე არსებულ ანგარიშში შესვლა ან მოგვწერე მხარდაჭერას."
+            : en
+              ? "Too many new accounts from this connection. Please try again later."
+              : "ამ კავშირიდან ძალიან ბევრი ახალი ანგარიში შეიქმნა. სცადე მოგვიანებით."}
+        </p>
+      )}
       <div className="space-y-3">
         <GoogleButton
           locale={locale}

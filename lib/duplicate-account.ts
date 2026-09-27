@@ -4,31 +4,33 @@ import { db } from "@/db";
 import { profiles, users } from "@/db/schema";
 import {
   matchesBirthIdentity,
+  matchesConfirmedDuplicate,
   normalizeAccountName,
   type BirthIdentity,
 } from "@/lib/duplicate-account-match";
 
 /**
- * A cautious onboarding signal, never proof of identity. Require the same
- * account name, birth date and minute, and birthplace within roughly 3 km.
- * An unknown birth time only matches another unknown time. We show a warning
- * with an explicit continue option instead of refusing the profile.
+ * An exact-name birth match is an advisory onboarding signal. A matching
+ * signup IP plus a known exact birth minute and near-identical full name is
+ * strong enough to refuse a repeated profile, even when the user confirms
+ * the advisory warning. Both signals use the current birth-data save.
  */
-export async function hasLikelyDuplicateAccount(
+export async function findDuplicateAccountSignal(
   userId: string,
   birth: Omit<BirthIdentity, "name">,
-): Promise<boolean> {
+): Promise<"confirmed_duplicate" | "possible_duplicate" | null> {
   const [current] = await db
-    .select({ name: users.name })
+    .select({ name: users.name, signupIpHash: users.signupIpHash })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
   const name = normalizeAccountName(current?.name ?? null);
-  if (!name) return false;
+  if (!name) return null;
 
   const candidates = await db
     .select({
       name: users.name,
+      signupIpHash: users.signupIpHash,
       verified: users.emailVerified,
       dateOfBirth: profiles.dateOfBirth,
       timeOfBirth: profiles.timeOfBirth,
@@ -44,7 +46,22 @@ export async function hasLikelyDuplicateAccount(
       ),
     );
 
-  return candidates.some((candidate) =>
-    matchesBirthIdentity({ ...birth, name }, candidate),
-  );
+  const identity = {
+    ...birth,
+    name,
+    signupIpHash: current?.signupIpHash ?? null,
+  };
+  if (
+    candidates.some((candidate) =>
+      matchesConfirmedDuplicate(identity, candidate),
+    )
+  ) {
+    return "confirmed_duplicate";
+  }
+  if (
+    candidates.some((candidate) => matchesBirthIdentity(identity, candidate))
+  ) {
+    return "possible_duplicate";
+  }
+  return null;
 }
