@@ -153,7 +153,7 @@ export async function signUpWithEmail(
         action: "register",
         ip,
         email: input.email,
-        ipLimit: 5,
+        ipLimit: 10,
         emailLimit: 3,
         windowMs: 60 * 60 * 1000,
       });

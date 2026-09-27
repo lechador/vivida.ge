@@ -104,15 +104,15 @@ describe("new signup gate", () => {
       signupIpHash: hash,
     });
     expect(mocks.enforceRateLimit).toHaveBeenCalledWith({
-      bucket: "new_signup_ip_5m",
+      bucket: "new_signup_ip_burst",
       identifier: hash,
-      limit: 1,
-      windowMs: 5 * 60 * 1000,
+      limit: 3,
+      windowMs: 10 * 60 * 1000,
     });
     expect(mocks.enforceRateLimit).toHaveBeenCalledWith({
-      bucket: "new_signup_ip_24h",
+      bucket: "new_signup_ip_day",
       identifier: hash,
-      limit: 4,
+      limit: 10,
       windowMs: 24 * 60 * 60 * 1000,
     });
     expect(mocks.where).toHaveBeenCalledOnce();

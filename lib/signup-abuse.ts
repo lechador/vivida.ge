@@ -9,7 +9,9 @@ import { enforceRateLimit } from "@/lib/rate-limit";
 import { isLikelySameSignupPerson } from "@/lib/signup-abuse-match";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const BURST_WINDOW_MS = 5 * 60 * 1000;
+const BURST_WINDOW_MS = 10 * 60 * 1000;
+const BURST_LIMIT = 3;
+const DAY_LIMIT = 10;
 const DUPLICATE_WINDOW_MS = 30 * DAY_MS;
 
 type NewSignupInput = {
@@ -45,8 +47,9 @@ export function hashSignupIp(ip: string | null | undefined): string | null {
 
 /**
  * Check before creating a new account on every web/mobile auth path. The
- * atomic one-attempt/5m and four-attempt/24h limits stop parallel bursts;
- * an independent 30-day identity
+ * atomic three-attempt/10m and ten-attempt/24h limits stop parallel bursts
+ * without false-blocking carrier-NAT neighbours (several unrelated visitors
+ * routinely share one public IPv4); an independent 30-day identity
  * check catches name/email variations from already verified accounts sharing
  * the same IP. A shared IP by itself never counts as a duplicate. Missing or
  * invalid IPs are ignored because a common "unknown" bucket would block
@@ -62,18 +65,18 @@ export async function checkNewSignup(
   if (!signupIpHash) return { allowed: true, signupIpHash: null };
 
   try {
-    // A short single-attempt window closes the common race where two OAuth
+    // A short few-attempt window closes the common race where two OAuth
     // callbacks both query before either new user has been inserted.
     await enforceRateLimit({
-      bucket: "new_signup_ip_5m",
+      bucket: "new_signup_ip_burst",
       identifier: signupIpHash,
-      limit: 1,
+      limit: BURST_LIMIT,
       windowMs: BURST_WINDOW_MS,
     });
     await enforceRateLimit({
-      bucket: "new_signup_ip_24h",
+      bucket: "new_signup_ip_day",
       identifier: signupIpHash,
-      limit: 4,
+      limit: DAY_LIMIT,
       windowMs: DAY_MS,
     });
   } catch (error) {
