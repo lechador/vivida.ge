@@ -154,6 +154,14 @@ export function HoroscopeHubEn() {
           ))}
         </div>
 
+        <div className="mb-8">
+          <PopularTools
+            locale="en"
+            placement="horoscope_before_signs"
+            publicEntry
+          />
+        </div>
+
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {ALL_SLUGS.map((slug) => {
             const content = SIGNS_CONTENT[slug];
@@ -200,14 +208,6 @@ export function HoroscopeHubEn() {
               </Link>
             );
           })}
-        </div>
-
-        <div className="mt-8">
-          <PopularTools
-            locale="en"
-            placement="horoscope_after_signs"
-            publicEntry
-          />
         </div>
 
         <section className="mt-12">

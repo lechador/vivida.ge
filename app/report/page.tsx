@@ -123,6 +123,10 @@ export default async function ReportPage({
             : "ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე."}
         </p>
 
+        <div className="mb-6">
+          <PopularTools locale={locale} placement="report_top" />
+        </div>
+
         <a
           href="#pdf-report"
           className="mb-6 inline-flex text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
@@ -139,10 +143,6 @@ export default async function ReportPage({
         >
           <ChartSection userId={user.id} locale={locale} />
         </Suspense>
-
-        <div className="mt-8">
-          <PopularTools locale={locale} placement="report_after_chart" />
-        </div>
 
         <section id="pdf-report" className="mt-10 scroll-mt-24">
           <h2 className="mb-4 text-xl font-semibold">

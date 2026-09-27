@@ -280,6 +280,10 @@ export default async function HoroskopiHubPage() {
           </Link>
         </div>
 
+        <div className="mb-8">
+          <PopularTools placement="horoscope_before_signs" publicEntry />
+        </div>
+
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {horoscopes.map(({ slug, row }) => {
             const sc = SIGNS_CONTENT[slug];
@@ -339,10 +343,6 @@ export default async function HoroskopiHubPage() {
               </Link>
             );
           })}
-        </div>
-
-        <div className="mt-8">
-          <PopularTools placement="horoscope_after_signs" publicEntry />
         </div>
 
         {/* Today's real sky — the transits this horoscope is built on. */}
