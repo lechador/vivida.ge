@@ -7,8 +7,11 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularSearches } from "@/components/seo/popular-searches";
 import { DREAMS_HUB_EN, DreamsHubEn } from "@/components/seo/dreams-en";
+import { DreamInterpreter } from "@/components/seo/dream-interpreter";
 import { DreamSymbolFilter } from "@/components/seo/dream-symbol-filter";
 import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
+
+import { auth } from "@/auth";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -28,7 +31,7 @@ const SITE_URL = "https://www.vivida.ge";
 
 const TITLE = "სიზმრის ახსნა ანბანის მიხედვით — რას ნიშნავს შენი სიზმარი";
 const DESCRIPTION =
-  "სიზმრის ახსნა ქართულად და უფასოდ: გველი, წყალი, კბილი, ბავშვი, მიცვალებული, ფული და კიდევ ათეულობით სიმბოლო ანბანის მიხედვით. თითოეულს აქვს ზოგადი მნიშვნელობაც და კონკრეტული ვარიანტებიც — იპოვე, რას ნიშნავს ის, რაც სიზმრად ნახე.";
+  "სიზმრის ახსნა ქართულად და უფასოდ: გველი, წყალი, კბილი, ბავშვი, მიცვალებული, ფული, მზე, მთვარე, ძაღლი, გამოცდა და კიდევ ათეულობით სიმბოლო ანბანის მიხედვით. თითოეულს აქვს ზოგადი მნიშვნელობაც და კონკრეტული ვარიანტებიც — ან მოუყევი შენი სიზმარი AI-ს და მიიღე პერსონალური ინტერპრეტაცია.";
 
 const KA_METADATA: Metadata = {
   title: { absolute: TITLE },
@@ -99,7 +102,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function DreamsHubPage() {
   const locale = await getRequestLocale();
-  if (locale === "en") return <DreamsHubEn />;
+  const session = await auth();
+  const authed = !!session?.user?.id;
+  if (locale === "en") return <DreamsHubEn authed={authed} />;
   const groups = dreamsByLetter();
 
   const ld = [
@@ -172,9 +177,13 @@ export default async function DreamsHubPage() {
           <p className="mx-auto mt-3.5 max-w-xl text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
             იპოვე ის, რაც სიზმრად ნახე — გველი, წყალი, კბილი, ბავშვი,
             მიცვალებული — და წაიკითხე, რას ნიშნავს ტრადიციულად და რას ამბობს
-            იმავე სიმბოლოზე თანამედროვე ფსიქოლოგია. უფასოა, რეგისტრაციის გარეშე.
+            იმავე სიმბოლოზე თანამედროვე ფსიქოლოგია. ლექსიკონი უფასოა,
+            რეგისტრაციის გარეშე — ხოლო შენი სიზმრის პერსონალური AI ახსნა 2
+            კრედიტი ღირს.
           </p>
         </header>
+
+        <DreamInterpreter authed={authed} locale="ka" />
 
         <DreamSymbolFilter />
         {/* The full index remains in server-rendered HTML for links and crawlers. */}

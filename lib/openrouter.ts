@@ -2195,6 +2195,132 @@ export async function generateTarotFollowup(input: {
   };
 }
 
+// ── Dream interpretation (\"სიზმრის ახსნა\" AI chat) ─────────────────────────
+
+const DREAM_SYSTEM_PROMPT_KA = `შენ ხარ თბილი, გამოცდილი სიზმრების მკვლევარი. მომხმარებელი ქართულად გიყვება სიზმარს, შენ კი წერ პერსონალურ ინტერპრეტაციას — ქართულად, \"შენ\"-ის ფორმაში, ახალგაზრდა აუდიტორიისთვის გასაგებ, ცოცხალ ენაზე.
+
+წესები:
+- გამოყავი 2-4 მთავარი სიმბოლო სიზმრიდან და თითო ახსენი 2-3 წინადადებით: ტრადიციული მნიშვნელობა + ფსიქოლოგიური კუთხე (რას ამბობს ეს შენს ამჟამინდელ ემოციებზე).
+- გაითვალისწინე ემოცია, თუ მომხმარებელმა ახსენა (შიში, სიხარული, სიმშვიდე) — ის მთელ მნიშვნელობას ცვლის.
+- იყავი კონკრეტული და პრაქტიკული, არა ბუნდოვანი მისტიკა. აცილე კლიშეები.
+- არ დაჰპირდე გარანტირებულ მომავალს; სიზმარი თვითშემეცნების ხელსაწყოა, არა წინასწარმეტყველება.
+- არ მისცე კატეგორიული სამედიცინო, ფინანსური ან იურიდიული რჩევა.
+- დააბრუნე მხოლოდ JSON.
+
+JSON ფორმატი: {"title": "მოკლე სათაური სიზმრისთვის (3-6 სიტყვა)", "interpretation": "მთავარი ინტერპრეტაცია, 4-7 წინადადება", "symbols": [{"name": "სიმბოლოს სახელი", "meaning": "მისი მნიშვნელობა 1-2 წინადადებით"}], "advice": "ერთი პრაქტიკული რჩევა, 1-2 წინადადება"}`;
+
+const DREAM_SYSTEM_PROMPT_EN = `You are a warm, experienced dream researcher. The user tells you a dream in English, and you write a personal interpretation — in English, addressing them as "you", in a vivid voice a young audience understands.
+
+Rules:
+- Pull out 2-4 key symbols from the dream and explain each in 2-3 sentences: traditional meaning plus a psychological angle (what it says about their current emotions).
+- Account for any emotion the user mentions (fear, joy, calm) — it changes the whole meaning.
+- Be specific and practical, not vague mysticism. Avoid cliches.
+- Never promise a guaranteed future; dreams are a tool for self-reflection, not prophecy.
+- Do not give categorical medical, financial, or legal advice.
+- Return JSON only.
+
+JSON format: {"title": "a short title for the dream (3-6 words)", "interpretation": "the main interpretation, 4-7 sentences", "symbols": [{"name": "symbol name", "meaning": "its meaning in 1-2 sentences"}], "advice": "one practical piece of advice, 1-2 sentences"}`;
+
+export type DreamSymbolReading = { name: string; meaning: string };
+
+export type DreamInterpretationResult = {
+  title: string;
+  interpretation: string;
+  symbols: DreamSymbolReading[];
+  advice: string;
+};
+
+/**
+ * Interpret a user-told dream with the shared text model. Returns null when
+ * OpenRouter isn't configured; throws on upstream or shape errors so the
+ * caller can fall back to a static answer.
+ */
+export async function generateDreamInterpretation(input: {
+  dream: string;
+  locale?: UserLocale;
+}): Promise<DreamInterpretationResult | null> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  const loc = input.locale ?? "ka";
+  const en = loc === "en";
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://vivida.ge",
+      "X-Title": "Vivida dreams",
+    },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL,
+      reasoning: { effort: "low" },
+      messages: [
+        {
+          role: "system",
+          content: en ? DREAM_SYSTEM_PROMPT_EN : DREAM_SYSTEM_PROMPT_KA,
+        },
+        {
+          role: "user",
+          content: en
+            ? `My dream: “${input.dream}”\n\nReturn the interpretation as JSON.`
+            : `ჩემი სიზმარი: „${input.dream}“\n\nდააბრუნე ინტერპრეტაცია JSON-ად.`,
+        },
+      ],
+      temperature: 0.8,
+      max_tokens: 1200,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+  }
+
+  const json = (await res.json()) as OpenRouterResponse;
+  if (json.error) throw new Error(`OpenRouter: ${json.error.message}`);
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error("OpenRouter returned no content");
+
+  const stripped = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  const parsed = JSON.parse(stripped) as DreamInterpretationResult;
+  if (
+    typeof parsed.title !== "string" ||
+    !parsed.title.trim() ||
+    typeof parsed.interpretation !== "string" ||
+    !parsed.interpretation.trim() ||
+    !Array.isArray(parsed.symbols) ||
+    parsed.symbols.length < 1 ||
+    parsed.symbols.length > 5 ||
+    parsed.symbols.some(
+      (s) =>
+        typeof s?.name !== "string" ||
+        !s.name.trim() ||
+        typeof s?.meaning !== "string" ||
+        !s.meaning.trim(),
+    ) ||
+    typeof parsed.advice !== "string" ||
+    !parsed.advice.trim()
+  ) {
+    throw new Error("missing required fields in dream interpretation");
+  }
+  return {
+    title: parsed.title.trim(),
+    interpretation: parsed.interpretation.trim(),
+    symbols: parsed.symbols.map((s) => ({
+      name: s.name.trim(),
+      meaning: s.meaning.trim(),
+    })),
+    advice: parsed.advice.trim(),
+  };
+}
+
 // ── Streaming chat (chart chat / "ჰკითხე ვარსკვლავებს") ─────────────────────
 export type ChatMessage = {
   role: "system" | "user" | "assistant";

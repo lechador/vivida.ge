@@ -56,6 +56,8 @@ export const RITUAL_STREAK_MILESTONES = [
 export const CREDIT_COST = {
   synastry: 5,
   chat: 2,
+  /** One AI dream interpretation. No free allowance — every reading costs. */
+  dream: 2,
   mbtiTest: 5,
   iqTest: 5,
   eqTest: 5,
@@ -90,6 +92,7 @@ export type CreditReason =
   | "earn_profile_photo"
   | "spend_synastry"
   | "spend_chat"
+  | "spend_dream"
   | "spend_mbti"
   | "spend_iq"
   | "spend_eq"
@@ -120,6 +123,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   earn_profile_photo: "პროფილის ფოტო",
   spend_synastry: "თავსებადობა",
   spend_chat: "AI ჩატი",
+  spend_dream: "სიზმრის AI ახსნა",
   spend_mbti: "პიროვნების ტესტი",
   spend_iq: "IQ ტესტი",
   spend_eq: "EQ ტესტი",
@@ -146,6 +150,7 @@ export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
   earn_profile_photo: "Profile photo",
   spend_synastry: "Compatibility",
   spend_chat: "AI chat",
+  spend_dream: "AI dream interpretation",
   spend_mbti: "Personality test",
   spend_iq: "IQ test",
   spend_eq: "EQ test",
