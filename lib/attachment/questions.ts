@@ -36,7 +36,8 @@ export const ATTACHMENT_QUESTIONS: AttachmentQuestion[] = [
     id: 1,
     axis: "anxiety",
     reverse: false,
-    textKa: "ხშირად ვღელავ, რომ პარტნიორი ჩემზე ნაკლებად განიცდის.",
+    textKa:
+      "ხშირად ვღელავ, რომ პარტნიორს ჩემზე ნაკლებად ადარდებს ჩვენი ურთიერთობა.",
   },
   {
     id: 2,
@@ -60,7 +61,7 @@ export const ATTACHMENT_QUESTIONS: AttachmentQuestion[] = [
     id: 5,
     axis: "anxiety",
     reverse: false,
-    textKa: "ვშიშობ, რომ მიმატოვებენ, თუ ნამდვილ სისუსტეებს ვაჩვენებ.",
+    textKa: "ვშიშობ, რომ პარტნიორი მიმატოვებს, თუ ჩემს სისუსტეებს დავანახებ.",
   },
   {
     id: 6,
@@ -72,7 +73,7 @@ export const ATTACHMENT_QUESTIONS: AttachmentQuestion[] = [
     id: 7,
     axis: "anxiety",
     reverse: false,
-    textKa: "პარტნიორის ყურადღება რომ მოაკლდება, თავს მიტოვებულად ვგრძნობ.",
+    textKa: "როცა პარტნიორის ყურადღება მაკლდება, თავს მიტოვებულად ვგრძნობ.",
   },
   {
     id: 8,
@@ -115,13 +116,13 @@ export const ATTACHMENT_QUESTIONS: AttachmentQuestion[] = [
     id: 14,
     axis: "avoidance",
     reverse: false,
-    textKa: "ემოციურ სიახლოვესთან შედარებით დამოუკიდებლობას ვამჯობინებ.",
+    textKa: "ემოციურ სიახლოვესთან შედარებით დამოუკიდებლობა მირჩევნია.",
   },
   {
     id: 15,
     axis: "avoidance",
     reverse: false,
-    textKa: "როცა პარტნიორი ძალიან მახლოვდება, უკან დახევის სურვილი მიჩნდება.",
+    textKa: "როცა პარტნიორი ძალიან მიახლოვდება, უკან დახევის სურვილი მიჩნდება.",
   },
   {
     id: 16,
@@ -164,7 +165,7 @@ export const ATTACHMENT_QUESTIONS: AttachmentQuestion[] = [
     id: 22,
     axis: "avoidance",
     reverse: true,
-    textKa: "პარტნიორზე დაყრდნობა კომფორტულია ჩემთვის.",
+    textKa: "პარტნიორზე დაყრდნობა ჩემთვის ბუნებრივი და მარტივია.",
   },
   {
     id: 23,

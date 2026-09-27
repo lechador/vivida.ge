@@ -147,7 +147,7 @@ export function AttachmentTest() {
         <section className="rounded-3xl border border-border bg-card/50 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Heart className="size-4 text-[var(--vivida-pink)]" />
-            პარტნიორისთვის — როგორ გესმოდეს
+            გზამკვლევი პარტნიორისთვის — როგორ გაგიგოს უკეთ
           </div>
           <ul className="mt-4 space-y-3">
             {result.partnerTipsKa.map((tip) => (
@@ -165,7 +165,7 @@ export function AttachmentTest() {
         <section className="rounded-3xl border border-border bg-card/50 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="size-4 text-[var(--vivida-violet)]" />
-            ერთი პრაქტიკული ნაბიჯი
+            პრაქტიკული ნაბიჯები შენთვის
           </div>
           <ul className="mt-4 space-y-3">
             {result.nextStepsKa.map((step) => (

@@ -11,7 +11,7 @@ import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/mijachvulobis-testi";
-const TITLE = "მიჯაჭვულობის სტილის ტესტი — როგორ გიყვარს ქართულად";
+const TITLE = "მიჯაჭვულობის სტილის ტესტი — როგორ გიყვარს?";
 const DESCRIPTION =
   "გაიარე მიჯაჭვულობის 24-კითხვიანი ტესტი ქართულად. გაიგე შენი სტილი — უსაფრთხო, შფოთიანი, აცილებადი თუ შიშით-აცილებადი — და მიიღე პერსონალური განმარტება ურთიერთობებისთვის.";
 
