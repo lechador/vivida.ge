@@ -105,6 +105,23 @@ export const TESTS: TestCatalogEntry[] = [
     available: true,
   },
   {
+    slug: "attachment",
+    kind: "featured",
+    href: "/mijachvulobis-testi",
+    titleKa: "მიჯაჭვულობის სტილის ტესტი",
+    titleEn: "Attachment Style Test",
+    taglineKa: "როგორ გიყვარს?",
+    taglineEn: "How do you attach?",
+    descKa:
+      "24-კითხვიანი ტესტი შფოთისა და აცილების ორ ღერძზე — გაიგე, ხარ თუ არა უსაფრთხო, შფოთიანი, აცილებადი თუ შიშით-აცილებადი და რა სჭირდება შენს ურთიერთობას.",
+    descEn:
+      "A 24-item assessment across the anxiety and avoidance axes — secure, anxious, avoidant or fearful-avoidant.",
+    metaKa: "24 კითხვა · ~5 წუთი · უფასო",
+    metaEn: "24 questions · about 5 minutes · free",
+    available: true,
+    locales: ["ka"],
+  },
+  {
     slug: "true-sign",
     kind: "quiz",
     href: "/quiz/namdvili-nishani",
