@@ -23,7 +23,7 @@ export default async function AskPage({
 }: {
   searchParams: Promise<{ starter?: string }>;
 }) {
-  const user = await requireUser();
+  const user = await requireUser("/ask");
   const { starter } = await searchParams;
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";

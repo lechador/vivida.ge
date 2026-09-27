@@ -6,6 +6,7 @@ import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import { PopularTools } from "@/components/nav/popular-tools";
 import {
   ALL_SLUGS,
   ZODIAC_DATES,
@@ -127,7 +128,11 @@ export function HoroscopeHubEn() {
 
         <div className="mb-10 flex flex-wrap gap-2">
           {[
-            { href: "/daily-horoscope", label: "Daily horoscope", active: true },
+            {
+              href: "/daily-horoscope",
+              label: "Daily horoscope",
+              active: true,
+            },
             { href: "/weekly-horoscope", label: "Weekly horoscope" },
             { href: "/monthly-horoscope", label: "Monthly horoscope" },
             { href: "/love-horoscope", label: "Love horoscope" },
@@ -157,7 +162,9 @@ export function HoroscopeHubEn() {
             return (
               <Link
                 key={slug}
-                href={internationalPublicPath(`/zodiac/${slug}/${VIEW_PATH.today}`)}
+                href={internationalPublicPath(
+                  `/zodiac/${slug}/${VIEW_PATH.today}`,
+                )}
                 className="group relative overflow-hidden rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-card/80"
               >
                 <div
@@ -193,6 +200,14 @@ export function HoroscopeHubEn() {
               </Link>
             );
           })}
+        </div>
+
+        <div className="mt-8">
+          <PopularTools
+            locale="en"
+            placement="horoscope_after_signs"
+            publicEntry
+          />
         </div>
 
         <section className="mt-12">

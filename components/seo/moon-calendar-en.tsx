@@ -5,6 +5,7 @@ import { ArrowRight, Moon, Sparkles } from "lucide-react";
 import { Starfield } from "@/components/landing/starfield";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
+import { PopularTools } from "@/components/nav/popular-tools";
 import { Button } from "@/components/ui/button";
 import {
   computeMoonPhase,
@@ -277,6 +278,9 @@ export async function MoonCalendarPageEn() {
             </dl>
           </section>
         )}
+        <div className="mb-10">
+          <PopularTools locale="en" placement="moon_after_today" publicEntry />
+        </div>
         <section className="mb-14">
           <h2 className="text-3xl font-semibold">
             Upcoming New and Full Moons

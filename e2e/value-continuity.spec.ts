@@ -102,3 +102,14 @@ test.describe("calculator to signup continuity", () => {
     ).toHaveAttribute("href", "/signup?next=%2Fonboarding%3Fnext%3D%2Freport");
   });
 });
+
+test("public Ask shortcut preserves the destination through login and signup", async ({
+  page,
+}) => {
+  await page.goto("/mtvaris-kalendari");
+  const tools = page.getByRole("navigation", { name: "ყველაზე გამოყენებადი" });
+  await tools.getByRole("link", { name: /ჰკითხე ვარსკვლავებს/ }).click();
+  await expect(page).toHaveURL(/\/login\?next=%2Fask$/);
+  await page.getByRole("link", { name: "დარეგისტრირდი", exact: true }).click();
+  await expect(page).toHaveURL(/\/signup\?next=%2Fask$/);
+});

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import { PopularTools } from "@/components/nav/popular-tools";
 import { ensureSignHoroscope } from "@/actions/sign-horoscope";
 import { MundaneSkySection } from "@/components/seo/mundane-sky-section";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
@@ -338,6 +339,10 @@ export default async function HoroskopiHubPage() {
               </Link>
             );
           })}
+        </div>
+
+        <div className="mt-8">
+          <PopularTools placement="horoscope_after_signs" publicEntry />
         </div>
 
         {/* Today's real sky — the transits this horoscope is built on. */}

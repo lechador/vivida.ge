@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -35,11 +35,9 @@ import { DailyRitual } from "./daily-ritual";
 export function DailyDashboard({
   userId,
   locale = "ka",
-  shortcuts,
 }: {
   userId: string;
   locale?: UserLocale;
-  shortcuts: ReactNode;
 }) {
   const en = locale !== "ka";
   const router = useRouter();
@@ -74,7 +72,6 @@ export function DailyDashboard({
             ? "Could not load. Please refresh the page."
             : "ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი."}
         </div>
-        {shortcuts}
       </div>
     );
   }
@@ -85,7 +82,6 @@ export function DailyDashboard({
         <div className="flex min-h-[240px] items-center justify-center">
           <CosmicLoader embedded progressive locale={locale} />
         </div>
-        {shortcuts}
       </div>
     );
   }
@@ -110,7 +106,6 @@ export function DailyDashboard({
         balance={balance}
         locale={locale}
         ritualProgress={ritualProgress}
-        shortcuts={shortcuts}
       />
 
       <section>
@@ -168,7 +163,6 @@ function DashboardExtrasSection({
   balance,
   locale,
   ritualProgress,
-  shortcuts,
 }: {
   userId: string;
   canDaily: boolean;
@@ -176,7 +170,6 @@ function DashboardExtrasSection({
   balance: number;
   locale: UserLocale;
   ritualProgress: import("@/lib/streak-credits").StreakProgress;
-  shortcuts: ReactNode;
 }) {
   const en = locale !== "ka";
   const [extras, setExtras] = useState<DashboardExtras | null>(null);
@@ -245,8 +238,6 @@ function DashboardExtrasSection({
           )}
         </div>
       ) : null}
-
-      {shortcuts}
 
       {!weeklyUnlocked ? (
         <WeeklyForecastLocked

@@ -10,6 +10,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Button } from "@/components/ui/button";
 import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
+import { PopularTools } from "@/components/nav/popular-tools";
 import {
   computeMoonPhase,
   type MoonPhaseSnapshot,
@@ -474,6 +475,10 @@ export default async function MoonCalendarPage() {
             </dl>
           </section>
         )}
+
+        <div className="mb-10">
+          <PopularTools placement="moon_after_today" publicEntry />
+        </div>
 
         <section aria-labelledby="year-calendar" className="mb-14">
           <h2

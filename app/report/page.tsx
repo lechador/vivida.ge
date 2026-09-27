@@ -9,6 +9,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import { Button } from "@/components/ui/button";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
+import { PopularTools } from "@/components/nav/popular-tools";
 import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartSection } from "@/components/dashboard/chart-section";
 import { CosmicLoader } from "@/components/dashboard/cosmic-loader";
@@ -138,6 +139,10 @@ export default async function ReportPage({
         >
           <ChartSection userId={user.id} locale={locale} />
         </Suspense>
+
+        <div className="mt-8">
+          <PopularTools locale={locale} placement="report_after_chart" />
+        </div>
 
         <section id="pdf-report" className="mt-10 scroll-mt-24">
           <h2 className="mb-4 text-xl font-semibold">
