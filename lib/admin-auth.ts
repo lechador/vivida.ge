@@ -1,16 +1,12 @@
-import { redirect } from "next/navigation";
-
-import { auth } from "@/auth";
-
 /**
- * Comma-separated allow-list of admin emails. Anyone whose session email
- * matches an entry can access `/admin/*` pages. The list is kept in an
- * env var (not the DB) so promoting/demoting an admin is a Vercel
- * config edit, not a SQL migration.
+ * Comma-separated allow-list of admin emails. Used by the token-authed
+ * `/api/admin/*` endpoints (which serve the separate vivida-admin app) and
+ * by admin powers inside the public UI (e.g. moderating any feed post).
+ * The list is kept in an env var (not the DB) so promoting/demoting an
+ * admin is a Vercel config edit, not a SQL migration.
  *
- * Falls back to a single hardcoded founder email so /admin works in
- * dev without env wiring, matching how the API-token admin endpoints
- * degrade. Set ADMIN_EMAILS in production to override.
+ * Falls back to a single hardcoded founder email so admin checks work in
+ * dev without env wiring. Set ADMIN_EMAILS in production to override.
  */
 const FOUNDER_EMAIL = "endeladzegivi@gmail.com";
 
@@ -27,18 +23,4 @@ function adminEmails(): string[] {
 export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false;
   return adminEmails().includes(email.toLowerCase());
-}
-
-/**
- * Gate for `/admin/*` Server Components and admin server actions.
- * Redirects non-admins to `/` so admin URLs don't leak existence to
- * curious users. Returns the (verified) session user for callers that
- * want to log who performed the action.
- */
-export async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user?.email || !isAdminEmail(session.user.email)) {
-    redirect("/");
-  }
-  return session.user;
 }

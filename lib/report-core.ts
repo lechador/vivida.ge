@@ -5,8 +5,9 @@ import { reports, type ReportTargetType } from "@/db/schema";
 
 /**
  * Report *write* logic. Deliberately minimal — capture the report for the
- * `/admin/safety` review queue. Moderation decisions and restrictions are
- * handled separately in lib/admin-safety.ts.
+ * safety review queue (moderated from the separate vivida-admin app).
+ * Moderation decisions and restrictions are handled separately in
+ * lib/admin-safety.ts.
  */
 
 const MAX_REASON = 1000;
@@ -19,12 +20,11 @@ export type ReportInput = {
 };
 
 export type ReportResult =
-  | { ok: true; deduped?: boolean }
-  | { ok: false; error: string };
+  { ok: true; deduped?: boolean } | { ok: false; error: string };
 
 export async function createReportCore(
   reporterId: string,
-  input: ReportInput
+  input: ReportInput,
 ): Promise<ReportResult> {
   if (!input.targetId) {
     return { ok: false, error: "ვერ მოიძებნა საჩივრის ობიექტი" };
@@ -45,8 +45,8 @@ export async function createReportCore(
         eq(reports.reporterId, reporterId),
         eq(reports.targetType, input.targetType),
         eq(reports.targetId, input.targetId),
-        eq(reports.status, "open")
-      )
+        eq(reports.status, "open"),
+      ),
     )
     .limit(1);
   if (existing) return { ok: true, deduped: true };

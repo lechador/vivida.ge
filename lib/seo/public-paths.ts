@@ -165,7 +165,6 @@ export function localizedHref(path: string, locale?: "ka" | "en"): string {
     path.startsWith("/people") ||
     path.startsWith("/subscription") ||
     path.startsWith("/credits") ||
-    path.startsWith("/admin") ||
     path.startsWith("/u/")
   ) {
     return path;

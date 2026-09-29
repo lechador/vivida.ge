@@ -8,10 +8,7 @@ import { posts, type PostReactionKind } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { CREDIT_REWARD, earnWeeklyFeedReward } from "@/lib/credits";
 import { rewardWeekKey } from "@/lib/credit-economy";
-import {
-  listFeedPage,
-  listRecentPostsByUserPage,
-} from "@/lib/feed-core";
+import { listFeedPage, listRecentPostsByUserPage } from "@/lib/feed-core";
 import {
   addCommentCore,
   createPostCore,
@@ -27,11 +24,7 @@ import {
 // lib/feed-write-core so the mobile API (app/api/v1/*) shares them. Re-export
 // the public types here so existing component imports from "@/actions/feed"
 // keep working.
-export type {
-  FeedAuthor,
-  FeedPost,
-  FeedReactionCounts,
-} from "@/lib/feed-core";
+export type { FeedAuthor, FeedPost, FeedReactionCounts } from "@/lib/feed-core";
 export type { FeedComment } from "@/lib/feed-write-core";
 
 /**
@@ -43,7 +36,7 @@ export async function listFeed(
   opts: {
     cursor?: string;
     limit?: number;
-  } = {}
+  } = {},
 ): Promise<import("@/lib/feed-core").FeedPost[]> {
   const user = await requireUser();
   return listFeedPage({ viewerId: user.id, ...opts });
@@ -66,7 +59,7 @@ export async function countPostsByUser(userId: string): Promise<number> {
  */
 export async function listRecentPostsByUser(
   userId: string,
-  limit = 5
+  limit = 5,
 ): Promise<import("@/lib/feed-core").FeedPost[]> {
   const viewer = await requireUser();
   return listRecentPostsByUserPage({ viewerId: viewer.id, userId, limit });
@@ -74,7 +67,7 @@ export async function listRecentPostsByUser(
 
 /** Comments for one post, in tree-render order. */
 export async function listComments(
-  postId: string
+  postId: string,
 ): Promise<import("@/lib/feed-write-core").FeedComment[]> {
   const viewer = await requireUser();
   return listCommentsCore(postId, viewer.id);
@@ -89,7 +82,11 @@ export async function createPost(rawBody: string): Promise<FeedActionResult> {
     revalidatePath("/feed");
     // One small reward per week; atomic ref prevents concurrent farming.
     try {
-      await earnWeeklyFeedReward(user.id, CREDIT_REWARD.feedPost, rewardWeekKey());
+      await earnWeeklyFeedReward(
+        user.id,
+        CREDIT_REWARD.feedPost,
+        rewardWeekKey(),
+      );
     } catch {
       /* reward is best-effort */
     }
@@ -100,7 +97,7 @@ export async function createPost(rawBody: string): Promise<FeedActionResult> {
 /** Edit a post within the 5-minute grace window. Author only. */
 export async function editPost(
   postId: string,
-  rawBody: string
+  rawBody: string,
 ): Promise<FeedActionResult> {
   const user = await requireUser();
   const result = await editPostCore(user.id, postId, rawBody);
@@ -113,11 +110,10 @@ export async function deletePost(postId: string): Promise<FeedActionResult> {
   const user = await requireUser();
   const result = await deletePostCore(
     { id: user.id, email: user.email },
-    postId
+    postId,
   );
   if (result.ok) {
     revalidatePath("/feed");
-    revalidatePath("/admin/feed");
   }
   return result;
 }
@@ -129,26 +125,30 @@ export async function deletePost(postId: string): Promise<FeedActionResult> {
 export async function addComment(
   postId: string,
   rawBody: string,
-  parentCommentId: string | null = null
+  parentCommentId: string | null = null,
 ): Promise<FeedActionResult<{ commentId: string }>> {
   const user = await requireUser();
-  const result = await addCommentCore(user.id, postId, rawBody, parentCommentId);
+  const result = await addCommentCore(
+    user.id,
+    postId,
+    rawBody,
+    parentCommentId,
+  );
   if (result.ok) revalidatePath("/feed");
   return result;
 }
 
 /** Delete a comment. Author OR admin OR post-author. */
 export async function deleteComment(
-  commentId: string
+  commentId: string,
 ): Promise<FeedActionResult> {
   const user = await requireUser();
   const result = await deleteCommentCore(
     { id: user.id, email: user.email },
-    commentId
+    commentId,
   );
   if (result.ok) {
     revalidatePath("/feed");
-    revalidatePath("/admin/feed");
   }
   return result;
 }
@@ -156,7 +156,7 @@ export async function deleteComment(
 /** Toggle a reaction on a post. */
 export async function reactToPost(
   postId: string,
-  kind: PostReactionKind
+  kind: PostReactionKind,
 ): Promise<FeedActionResult<{ active: PostReactionKind | null }>> {
   const user = await requireUser();
   const result = await reactToPostCore(user.id, postId, kind);

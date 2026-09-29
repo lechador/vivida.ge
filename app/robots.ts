@@ -23,7 +23,6 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         // Allow prefix wins over the shorter Disallow for Google and Bing.
         allow: ["/", "/api/og/"],
         disallow: [
-          "/admin",
           "/api/",
           "/dashboard",
           "/report",
