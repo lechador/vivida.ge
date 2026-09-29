@@ -1,4 +1,5 @@
 import { and, desc, eq, sql } from "drizzle-orm";
+import { after } from "next/server";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
@@ -6,6 +7,12 @@ import { charts, chartChatMessages } from "@/db/schema";
 import { CREDIT_COST, FREE_ALLOWANCE, spendCredits } from "@/lib/credits";
 import { computeChartSalience } from "@/lib/report-salience";
 import { buildChartChatSystem } from "@/lib/chart-chat";
+import {
+  buildMemoryBlock,
+  getAskMemory,
+  inferVerbosity,
+  refreshAskMemory,
+} from "@/lib/ask-memory";
 import {
   isOpenRouterConfigured,
   streamChatCompletion,
@@ -63,12 +70,8 @@ export async function POST(req: Request) {
 
   const salience = computeChartSalience(chartRow.data);
   const locale = await getUserLocale(userId);
-  const system = buildChartChatSystem(
-    session.user?.name?.split(" ")[0] ?? null,
-    chartRow.data,
-    salience,
-    locale,
-  );
+  // Long-term memory: rolling portrait (PK lookup, free). Never fails the request.
+  const storedMemory = await getAskMemory(userId).catch(() => null);
 
   // Recent history (oldest→newest) for conversational continuity.
   const history = (
@@ -111,6 +114,41 @@ export async function POST(req: Request) {
   await db
     .insert(chartChatMessages)
     .values({ userId, role: "user", content: message });
+
+  // System prompt: chart grounding + long-term memory + style mirroring.
+  // Stored portrait wins; for newcomers (no portrait yet) infer verbosity
+  // deterministically from their own turns so adaptation is instant.
+  let memoryBlock = buildMemoryBlock(storedMemory, locale);
+  if (!memoryBlock) {
+    const userTurns = history
+      .filter((m) => m.role !== "assistant")
+      .map((m) => m.content);
+    userTurns.push(message);
+    if (userTurns.length >= 2) {
+      const v = inferVerbosity(userTurns);
+      memoryBlock =
+        locale === "en"
+          ? `The person writes ${v === "short" ? "short, simple" : v === "detailed" ? "long, elaborate" : "medium-length"} messages — match that length and simplicity.`
+          : `ადამიანი წერს ${v === "short" ? "მოკლე, მარტივ" : v === "detailed" ? "გრძელ, გაშლილ" : "საშუალო სიგრძის"} შეტყობინებებს — პასუხის სიგრძე და სიმარტივე ამას შეუსაბამე.`;
+    }
+  }
+  const system = buildChartChatSystem(
+    session.user?.name?.split(" ")[0] ?? null,
+    chartRow.data,
+    salience,
+    locale,
+    memoryBlock,
+  );
+
+  // Refresh the rolling portrait in the background (cheap merge, throttled
+  // inside to ≤1 call per 5 turns). Runs after the response; never blocks it.
+  try {
+    after(() => {
+      void refreshAskMemory(userId, locale);
+    });
+  } catch {
+    /* after() unavailable outside request scope in some runtimes — skip */
+  }
 
   const messages: ChatMessage[] = [
     { role: "system", content: system },

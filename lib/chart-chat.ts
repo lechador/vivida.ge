@@ -53,19 +53,30 @@ export function buildChartContext(
   for (const key of PLANET_ORDER) {
     const p = chart.bodies[key];
     if (!p) continue;
-    const label = en ? key[0].toUpperCase() + key.slice(1) : bodyMeta(key)?.labelKa ?? key;
-    const house = p.house ? (en ? `, house ${p.house}` : `, მე-${p.house} სახლი`) : "";
+    const label = en
+      ? key[0].toUpperCase() + key.slice(1)
+      : (bodyMeta(key)?.labelKa ?? key);
+    const house = p.house
+      ? en
+        ? `, house ${p.house}`
+        : `, მე-${p.house} სახლი`
+      : "";
     const retro = p.retrograde ? (en ? ", retrograde" : ", რეტროგრადი") : "";
     const sign = signByIndex(p.signIndex);
-    lines.push(`- ${label}: ${en ? sign.labelEn : sign.labelKa}${house}${retro}`);
+    lines.push(
+      `- ${label}: ${en ? sign.labelEn : sign.labelKa}${house}${retro}`,
+    );
   }
 
   const houses = [...chart.houses].sort((a, b) => a.number - b.number);
   lines.push(
     (en ? "House signs: " : "სახლების ნიშნები: ") +
       houses
-        .map((h) => `${h.number}-${en ? signByIndex(h.signIndex).labelEn : signByIndex(h.signIndex).labelKa}`)
-        .join(", ")
+        .map(
+          (h) =>
+            `${h.number}-${en ? signByIndex(h.signIndex).labelEn : signByIndex(h.signIndex).labelKa}`,
+        )
+        .join(", "),
   );
 
   const ep = salience.elements.percentages;
@@ -88,10 +99,12 @@ export function buildChartContext(
   );
 
   if (salience.tightestAspects.length > 0) {
-    lines.push(en ? "Major aspects (tightest):" : "მთავარი ასპექტები (ყველაზე მჭიდრო):");
+    lines.push(
+      en ? "Major aspects (tightest):" : "მთავარი ასპექტები (ყველაზე მჭიდრო):",
+    );
     for (const a of salience.tightestAspects.slice(0, 6)) {
       lines.push(
-        `- ${a.aLabel} ${en ? a.kind : ASPECT_KA[a.kind] ?? a.kind} ${a.bLabel} (${en ? "orb" : "ორბი"} ${a.orb.toFixed(1)}°)`,
+        `- ${a.aLabel} ${en ? a.kind : (ASPECT_KA[a.kind] ?? a.kind)} ${a.bLabel} (${en ? "orb" : "ორბი"} ${a.orb.toFixed(1)}°)`,
       );
     }
   }
@@ -99,21 +112,28 @@ export function buildChartContext(
   return lines.join("\n");
 }
 
-/** Full system prompt: persona + rules + the user's chart context. */
+/** Full system prompt: persona + rules + memory + the user's chart context. */
 export function buildChartChatSystem(
   firstName: string | null,
   chart: NatalChartJson,
   salience: ChartSalience,
   locale: UserLocale = "ka",
+  memoryBlock = "",
 ): string {
   if (locale === "en") {
     const name = firstName || "the user";
+    const memory = memoryBlock.trim()
+      ? `\n${memoryBlock.trim()}\nUse it naturally — refer back to earlier topics by name, never recite it verbatim.\n`
+      : "";
     return `You are ${name}'s personal astrologer on Vivida. You have their exact natal chart data below. Answer questions about personality, emotions, relationships, career, timing and self-understanding using this specific chart.
-
+${memory}
 Rules:
 - Rely only on the supplied chart data. Never invent placements. If the data does not support something, say so.
-- Write in warm, specific, contemporary English. Avoid vague mysticism and clichés.
-- Keep answers concise and useful: no more than 2–4 paragraphs. Name the exact planet, sign, house or aspect behind the interpretation.
+- Write in warm, specific, contemporary English — plain everyday language (~8th-grade level). Avoid vague mysticism and clichés.
+- Explain simply: the first time you use an astrology term in an answer, add a 3–6 word plain explanation in parentheses (e.g. "square (a tense angle between two planets)"). Never stack unexplained terms.
+- Give one concrete everyday example for each abstract claim.
+- Keep answers concise and useful: no more than 2–4 paragraphs. If the memory says they prefer short answers, keep it to 1–2 short paragraphs; if detailed, you may use the full 4. Name the exact planet, sign, house or aspect behind the interpretation.
+- Mirror the person: match their length and tone (short/simple questions get short/simple answers; elaborate ones may go deeper).
 - Address the person directly in an equal, supportive tone.
 - If a question is unclear, ask one short clarifying question.
 - If a question is unrelated to astrology, the chart or the user's life, gently bring it back on topic.
@@ -124,12 +144,18 @@ ${name}'s natal chart:
 ${buildChartContext(chart, salience, "en")}`;
   }
   const name = firstName || "მომხმარებლის";
+  const memory = memoryBlock.trim()
+    ? `\n${memoryBlock.trim()}\nგამოიყენე ბუნებრივად — ძველი თემები სახელით ახსენე, სიტყვა-სიტყვით ნუ ჩამოთვლი.\n`
+    : "";
   return `შენ ხარ ${name}-ის პერსონალური ასტროლოგი Vivida-ზე. გაქვს მისი ნატალური რუკის ზუსტი მონაცემები (ქვემოთ). უპასუხე მის შეკითხვებს ხასიათზე, ემოციებზე, ურთიერთობებზე, კარიერაზე, დროსა და თვითშემეცნებაზე — ყველაფერი ამ კონკრეტულ რუკაზე დაყრდნობით.
-
+${memory}
 წესები:
 - დაეყრდენი მხოლოდ მოცემულ მონაცემებს. ნუ მოიგონებ პოზიციებს, რომლებიც აქ არ წერია. თუ რაღაც არ იცი, თქვი გულახდილად.
-- თბილი, კონკრეტული, თანამედროვე ქართული. არა ბუნდოვანი მისტიკა, არა კლიშეები ("ვარსკვლავები გელიან").
-- მოკლე, საქმიანი პასუხები — 2-4 აბზაცი მაქსიმუმ. დაასახელე კონკრეტული პლანეტა/ნიშანი/სახლი, რომელსაც ეყრდნობი.
+- თბილი, კონკრეტული, თანამედროვე ქართული — მარტივი ყოველდღიური ენა (~მე-8 კლასის დონე). არა ბუნდოვანი მისტიკა, არა კლიშეები ("ვარსკვლავები გელიან").
+- ახსენი მარტივად: ასტროლოგიური ტერმინის პირველ ხსენებაზე ყოველ პასუხში ფრჩხილებში 3-6 სიტყვით განმარტე (მაგ. "კვადრატი (დაძაბული კუთხე ორ პლანეტას შორის)"). გაუგებარი ტერმინები ზედიზედ არ დააწყო.
+- ყოველ აბსტრაქტულ დასკვნას ერთი კონკრეტული ცხოვრებისეული მაგალითი დაურთე.
+- მოკლე, საქმიანი პასუხები — 2-4 აბზაცი მაქსიმუმ. თუ მეხსიერებაში "მოკლე" უპირატესობა წერია, 1-2 მოკლე აბზაცით შემოიფარგლე; "დეტალური" უპირატესობისას სრული 4 გამოიყენე. დაასახელე კონკრეტული პლანეტა/ნიშანი/სახლი, რომელსაც ეყრდნობი.
+- მოერგე ადამიანს: მოკლე/მარტივი კითხვა → მოკლე/მარტივი პასუხი; გაშლილი კითხვა → შეგიძლია ჩაღრმავდე. დაიჭირე მისი ტონი (მხიარული/სერიოზული).
 - მიმართე "შენ"-ით, თბილი და თანასწორი ტონით.
 - თუ შეკითხვა ბუნდოვანია — დააზუსტე ერთი მოკლე კითხვით.
 - თუ შეკითხვა საერთოდ არ ეხება ასტროლოგიას, რუკას ან ცხოვრებას — თავაზიანად დააბრუნე თემაზე.

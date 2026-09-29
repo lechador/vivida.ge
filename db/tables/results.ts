@@ -39,6 +39,44 @@ export const chartChatMessages = pgTable(
 export type ChartChatMessage = typeof chartChatMessages.$inferSelect;
 
 /**
+ * Long-term memory for \"chat with your chart\" — one row per user.
+ * A rolling portrait the model refines over time (who the user is, what
+ * they care about, how they like to be spoken to), so replies adapt beyond
+ * the last-12-messages window. Refreshed by a cheap background LLM merge
+ * every few exchanges; reads are free (single PK lookup per request).
+ */
+export const askUserMemories = pgTable("ask_user_memory", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  /**
+   * Rolling portrait in the user's language (≤1500 chars): life context,
+   * recurring topics, emotional patterns. Never medical/financial directives.
+   */
+  summary: text("summary").notNull().default(""),
+  /**
+   * Structured traits the prompt mirrors:
+   * style: { verbosity: 'short'|'medium'|'detailed', tone: string } —
+   * topics: string[] — recurring interests; notes: short-lived context.
+   */
+  traits: jsonb("traits").$type<AskUserMemoryTraits>().notNull().default({}),
+  /** Total user turns seen when the memory was last refreshed. */
+  turnsSeen: integer("turns_seen").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type AskUserMemoryTraits = {
+  verbosity?: "short" | "medium" | "detailed";
+  tone?: string;
+  topics?: string[];
+  notes?: string;
+};
+
+export type AskUserMemory = typeof askUserMemories.$inferSelect;
+
+/**
  * 7-day forecast for the dashboard, one row per user. The same row is
  * overwritten each new local-day — we never need a history of forecasts.
  * Each entry in `days` is a (computed scores + AI narrative) pair for one
