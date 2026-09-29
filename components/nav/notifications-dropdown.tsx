@@ -45,6 +45,7 @@ const KIND_ICON: Record<string, LucideIcon> = {
   relationship_transit: Sparkles,
   timing_reminder: Sparkles,
   forecast_reminder: CalendarDays,
+  ask_nudge: Sparkles,
 };
 
 const REACTION_LABEL_KA: Record<string, string> = {
@@ -111,6 +112,7 @@ function notificationLabel(
           : "— მნიშვნელოვანი ტრანზიტი ახლოვდება";
     case "timing_reminder":
     case "forecast_reminder":
+    case "ask_nudge":
       return payload?.reminderBody ?? "";
     default:
       return "";
@@ -419,7 +421,9 @@ function DbNotificationRow({
     n.kind === "relationship_weekly" ||
     n.kind === "relationship_transit";
   const isReminder =
-    n.kind === "timing_reminder" || n.kind === "forecast_reminder";
+    n.kind === "timing_reminder" ||
+    n.kind === "forecast_reminder" ||
+    n.kind === "ask_nudge";
   const href =
     (isReminder || isRelationship) && n.payload?.reminderUrl
       ? n.payload.reminderUrl

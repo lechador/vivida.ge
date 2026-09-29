@@ -3,6 +3,7 @@ import {
   text,
   timestamp,
   integer,
+  boolean,
   doublePrecision,
   date,
   jsonb,
@@ -62,6 +63,8 @@ export const askUserMemories = pgTable("ask_user_memory", {
   traits: jsonb("traits").$type<AskUserMemoryTraits>().notNull().default({}),
   /** Total user turns seen when the memory was last refreshed. */
   turnsSeen: integer("turns_seen").notNull().default(0),
+  /** Proactive ask nudges (open-loop follow-ups). One-tap off in the memory panel. */
+  nudgesEnabled: boolean("nudges_enabled").notNull().default(true),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

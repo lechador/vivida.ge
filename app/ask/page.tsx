@@ -9,6 +9,7 @@ import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartChat } from "@/components/ask/chart-chat";
 import type { AskMemoryView } from "@/components/ask/chart-chat";
 import { getAskMemory } from "@/lib/ask-memory";
+import { markAskNudgesOpened } from "@/lib/ask-nudges";
 import {
   buildFollowUpQuestion,
   buildTopicStarter,
@@ -82,6 +83,8 @@ export default async function AskPage({
   // first open loop, topic chips from recurring interests, and the
   // transparency snapshot. A failed read hides the extras, never the chat.
   const storedMemory = await getAskMemory(user.id).catch(() => null);
+  // Visiting ask clears the nudge badge (single UPDATE, no-op when none).
+  await markAskNudgesOpened(user.id).catch(() => {});
   const followUp = storedMemory?.traits?.openLoops?.[0]?.trim()
     ? buildFollowUpQuestion(storedMemory.traits.openLoops[0], locale)
     : null;
@@ -98,6 +101,7 @@ export default async function AskPage({
             tone: storedMemory.traits?.tone,
             topics: storedMemory.traits?.topics,
           },
+          nudgesEnabled: storedMemory.nudgesEnabled ?? true,
         }
       : null;
 

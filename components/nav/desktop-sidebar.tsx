@@ -3,6 +3,7 @@ import { MessageCircle } from "lucide-react";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { cn } from "@/lib/utils";
+import { AskTabBadge } from "./ask-tab-badge";
 import { MessagesTabBadge } from "./messages-tab-badge";
 import { NavItemLink } from "./nav-item-link";
 import {
@@ -21,10 +22,13 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function DesktopSidebar({
   active,
   unreadMessages = 0,
+  pendingAskNudges = 0,
   locale = "ka",
 }: {
   active?: NavActiveKey;
   unreadMessages?: number;
+  /** Unopened proactive astrologer nudges — dot on the ask item. */
+  pendingAskNudges?: number;
   locale?: UserLocale;
 }) {
   const items: NavItem[] = [
@@ -113,6 +117,9 @@ export function DesktopSidebar({
                         initial={unreadMessages}
                         locale={locale}
                       />
+                    )}
+                    {item.key === "ask" && (
+                      <AskTabBadge pending={pendingAskNudges} locale={locale} />
                     )}
                   </span>
                   <span className={cn("truncate")}>

@@ -2,7 +2,11 @@ import { after } from "next/server";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { users, type NotificationKind, type NotificationPayload } from "@/db/schema";
+import {
+  users,
+  type NotificationKind,
+  type NotificationPayload,
+} from "@/db/schema";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { isPushConfigured, sendPushToUser } from "@/lib/push";
 import type { NativePushCategory } from "@/lib/native-push";
@@ -48,7 +52,10 @@ function copyFor(
   locale: UserLocale,
 ): { title: string; body: string; url: string; tag: string } | null {
   const en = locale === "en";
-  const name = payload.fromName ?? payload.fromUsername ?? (en ? "A Vivida member" : "Vivida-ის წევრი");
+  const name =
+    payload.fromName ??
+    payload.fromUsername ??
+    (en ? "A Vivida member" : "Vivida-ის წევრი");
   // Single-post route, not /feed#post-<id>: the anchor only exists while the
   // post is inside the feed's first page.
   const postUrl = payload.postId ? `/feed/${payload.postId}` : "/feed";
@@ -56,20 +63,26 @@ function copyFor(
     case "friend_request":
       return {
         title: en ? "Friend request ➕" : "მეგობრობის თხოვნა ➕",
-        body: en ? `${name} sent you a friend request` : `${name} გთხოვს დამეგობრებას`,
+        body: en
+          ? `${name} sent you a friend request`
+          : `${name} გთხოვს დამეგობრებას`,
         url: "/friends?tab=incoming",
         tag: "friend-request",
       };
     case "friend_accepted":
       return {
         title: en ? "Request accepted ✨" : "მოთხოვნა მიღებულია ✨",
-        body: en ? `${name} accepted your friend request` : `${name}-მ მიიღო შენი მეგობრობის თხოვნა`,
+        body: en
+          ? `${name} accepted your friend request`
+          : `${name}-მ მიიღო შენი მეგობრობის თხოვნა`,
         url: payload.fromUsername ? `/u/${payload.fromUsername}` : "/friends",
         tag: "friend-accepted",
       };
     case "post_comment":
       return {
-        title: en ? `💬 ${name} commented on your post` : `💬 ${name} დააკომენტარა შენს პოსტს`,
+        title: en
+          ? `💬 ${name} commented on your post`
+          : `💬 ${name} დააკომენტარა შენს პოსტს`,
         body: payload.preview ?? "",
         url: postUrl,
         tag: `post-${payload.postId ?? "x"}`,
@@ -100,33 +113,54 @@ function copyFor(
     case "new_match":
       return {
         title: en ? "New match ✨" : "ახალი მეჩი ✨",
-        body: en ? `You and ${name} liked each other` : `თქვენ და ${name} მოეწონეთ ერთმანეთს`,
+        body: en
+          ? `You and ${name} liked each other`
+          : `თქვენ და ${name} მოეწონეთ ერთმანეთს`,
         url: "/messages",
         tag: "new-match",
       };
     case "relationship_connected":
       return {
         title: en ? "Partner connected 💞" : "პარტნიორი დაკავშირებულია 💞",
-        body: en ? `${name} accepted your relationship invitation` : `${name}-მ მიიღო შენი ურთიერთობის მოწვევა`,
-        url: payload.reminderUrl ?? (payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry"),
+        body: en
+          ? `${name} accepted your relationship invitation`
+          : `${name}-მ მიიღო შენი ურთიერთობის მოწვევა`,
+        url:
+          payload.reminderUrl ??
+          (payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry"),
         tag: `relationship-connected-${payload.partnerId ?? "x"}`,
       };
     case "relationship_weekly":
       return {
-        title: en ? "Your weekly relationship update" : "ურთიერთობის ახალი კვირა",
-        body: payload.relationshipHeadline ?? (en ? "See what this week brings for both of you" : "ნახე, რას გთავაზობთ ეს კვირა ორივეს"),
-        url: payload.reminderUrl ?? (payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry"),
+        title: en
+          ? "Your weekly relationship update"
+          : "ურთიერთობის ახალი კვირა",
+        body:
+          payload.relationshipHeadline ??
+          (en
+            ? "See what this week brings for both of you"
+            : "ნახე, რას გთავაზობთ ეს კვირა ორივეს"),
+        url:
+          payload.reminderUrl ??
+          (payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry"),
         tag: `relationship-weekly-${payload.partnerId ?? "x"}`,
       };
     case "relationship_transit":
       return {
-        title: en ? "Important relationship transit" : "ურთიერთობის მნიშვნელოვანი ტრანზიტი",
-        body: payload.transitTitle ?? (en ? "A meaningful moment is approaching" : "მნიშვნელოვანი მომენტი ახლოვდება"),
+        title: en
+          ? "Important relationship transit"
+          : "ურთიერთობის მნიშვნელოვანი ტრანზიტი",
+        body:
+          payload.transitTitle ??
+          (en
+            ? "A meaningful moment is approaching"
+            : "მნიშვნელოვანი მომენტი ახლოვდება"),
         url: payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry",
         tag: `relationship-transit-${payload.partnerId ?? "x"}`,
       };
     case "timing_reminder":
     case "forecast_reminder":
+    case "ask_nudge":
       return payload.reminderTitle && payload.reminderBody
         ? {
             title: payload.reminderTitle,
@@ -154,14 +188,14 @@ function categoryFor(kind: NotificationKind): NativePushCategory | undefined {
 export function queueNotificationPush(
   recipientId: string,
   kind: NotificationKind,
-  payload: NotificationPayload
+  payload: NotificationPayload,
 ): void {
   if (!isPushConfigured()) return;
   const task = async () => {
     try {
       if (
         payload.fromUserId &&
-        await isBlockedEitherWay(recipientId, payload.fromUserId)
+        (await isBlockedEitherWay(recipientId, payload.fromUserId))
       ) {
         return;
       }
@@ -170,14 +204,15 @@ export function queueNotificationPush(
         .from(users)
         .where(eq(users.id, recipientId))
         .limit(1);
-      const copy = copyFor(kind, payload, normalizeUserLocale(recipient?.locale));
+      const copy = copyFor(
+        kind,
+        payload,
+        normalizeUserLocale(recipient?.locale),
+      );
       if (!copy) return;
       await sendPushToUser(recipientId, copy, categoryFor(kind));
     } catch (err) {
-      console.warn(
-        "[notification-push] send failed:",
-        (err as Error).message
-      );
+      console.warn("[notification-push] send failed:", (err as Error).message);
     }
   };
   try {
@@ -223,10 +258,14 @@ export async function sendMessagePush(opts: {
   } catch {
     return; // already nudged for this conversation recently
   }
-  await sendPushToUser(opts.recipientUserId, {
-    title: `💬 ${opts.fromName}`,
-    body: opts.body.slice(0, 120),
-    url: `/messages?with=${encodeURIComponent(opts.fromUserId)}`,
-    tag: `msg-${opts.fromUserId}`,
-  }, "messages");
+  await sendPushToUser(
+    opts.recipientUserId,
+    {
+      title: `💬 ${opts.fromName}`,
+      body: opts.body.slice(0, 120),
+      url: `/messages?with=${encodeURIComponent(opts.fromUserId)}`,
+      tag: `msg-${opts.fromUserId}`,
+    },
+    "messages",
+  );
 }

@@ -21,6 +21,10 @@
     {
       "path": "/api/cron/personal-reminders",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/ask-nudges",
+      "schedule": "30 6 * * *"
     }
   ]
 }

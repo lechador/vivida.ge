@@ -9,6 +9,7 @@ import {
   listRecentNotifications,
   type NotificationView,
 } from "@/lib/notifications";
+import { countPendingAskNudges } from "@/lib/ask-nudges";
 
 export type HeaderData = {
   username: string | null;
@@ -19,6 +20,8 @@ export type HeaderData = {
   avatarUrl: string | null;
   /** Unread chat messages — drives the bottom-bar messages tab badge. */
   unreadMessages: number;
+  /** Unopened proactive astrologer nudges — dot on the ask tab. */
+  pendingAskNudges: number;
   isPremium: boolean;
   residenceCountryCode: string | null;
 };
@@ -35,37 +38,45 @@ export type HeaderData = {
 export async function getHeaderData(userId: string): Promise<HeaderData> {
   return unstable_cache(
     async () => {
-      const [profileRow, notifications, unread, avatarRow, unreadMessages, userRow] =
-        await Promise.all([
-          db
-            .select({ username: profiles.username })
-            .from(profiles)
-            .where(eq(profiles.userId, userId))
-            .limit(1),
-          listRecentNotifications(userId),
-          countUnreadNotifications(userId),
-          db
-            .select({ url: profilePhotos.url })
-            .from(profilePhotos)
-            .where(
-              and(
-                eq(profilePhotos.userId, userId),
-                eq(profilePhotos.ready, true)
-              )
-            )
-            .orderBy(asc(profilePhotos.sortOrder))
-            .limit(1),
-          countUnreadMessages(userId),
-          db
-            .select({
-              isPremium: users.isPremium,
-              premiumUntil: users.premiumUntil,
-              residenceCountryCode: users.residenceCountryCode,
-            })
-            .from(users)
-            .where(eq(users.id, userId))
-            .limit(1),
-        ]);
+      const [
+        profileRow,
+        notifications,
+        unread,
+        avatarRow,
+        unreadMessages,
+        userRow,
+        pendingAskNudges,
+      ] = await Promise.all([
+        db
+          .select({ username: profiles.username })
+          .from(profiles)
+          .where(eq(profiles.userId, userId))
+          .limit(1),
+        listRecentNotifications(userId),
+        countUnreadNotifications(userId),
+        db
+          .select({ url: profilePhotos.url })
+          .from(profilePhotos)
+          .where(
+            and(
+              eq(profilePhotos.userId, userId),
+              eq(profilePhotos.ready, true),
+            ),
+          )
+          .orderBy(asc(profilePhotos.sortOrder))
+          .limit(1),
+        countUnreadMessages(userId),
+        db
+          .select({
+            isPremium: users.isPremium,
+            premiumUntil: users.premiumUntil,
+            residenceCountryCode: users.residenceCountryCode,
+          })
+          .from(users)
+          .where(eq(users.id, userId))
+          .limit(1),
+        countPendingAskNudges(userId),
+      ]);
       const premiumUntil = userRow[0]?.premiumUntil;
       return {
         username: profileRow[0]?.username ?? null,
@@ -73,10 +84,11 @@ export async function getHeaderData(userId: string): Promise<HeaderData> {
         unread,
         avatarUrl: avatarRow[0]?.url ?? null,
         unreadMessages,
+        pendingAskNudges,
         isPremium: Boolean(
           userRow[0]?.isPremium &&
-            premiumUntil &&
-            premiumUntil.getTime() > Date.now(),
+          premiumUntil &&
+          premiumUntil.getTime() > Date.now(),
         ),
         residenceCountryCode: userRow[0]?.residenceCountryCode ?? null,
       };
@@ -85,7 +97,7 @@ export async function getHeaderData(userId: string): Promise<HeaderData> {
     {
       revalidate: 30,
       tags: [`header:${userId}`, `profile:${userId}`],
-    }
+    },
   )();
 }
 

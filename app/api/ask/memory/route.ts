@@ -32,6 +32,7 @@ export async function GET() {
     .select({
       summary: askUserMemories.summary,
       traits: askUserMemories.traits,
+      nudgesEnabled: askUserMemories.nudgesEnabled,
       updatedAt: askUserMemories.updatedAt,
     })
     .from(askUserMemories)
@@ -64,4 +65,32 @@ export async function DELETE() {
 
   await db.delete(askUserMemories).where(eq(askUserMemories.userId, userId));
   return Response.json({ ok: true });
+}
+
+/** Opt-out toggle for proactive nudges — one tap, no confirmation needed. */
+export async function PATCH(req: Request) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return Response.json({ error: "unauthorized" }, { status: 401 });
+
+  const body = (await req.json().catch(() => ({}))) as {
+    nudgesEnabled?: unknown;
+  };
+  if (typeof body.nudgesEnabled !== "boolean") {
+    return Response.json({ error: "invalid_nudges_enabled" }, { status: 400 });
+  }
+
+  await db
+    .insert(askUserMemories)
+    .values({
+      userId,
+      summary: "",
+      traits: {},
+      nudgesEnabled: body.nudgesEnabled,
+    })
+    .onConflictDoUpdate({
+      target: askUserMemories.userId,
+      set: { nudgesEnabled: body.nudgesEnabled, updatedAt: new Date() },
+    });
+  return Response.json({ ok: true, nudgesEnabled: body.nudgesEnabled });
 }

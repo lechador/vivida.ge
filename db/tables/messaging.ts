@@ -90,6 +90,8 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "relationship_transit",
   "timing_reminder",
   "forecast_reminder",
+  // Proactive AI-astrologer follow-up (open loop from ask memory) — bell + push.
+  "ask_nudge",
 ]);
 
 /**

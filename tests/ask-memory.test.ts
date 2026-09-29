@@ -60,6 +60,7 @@ describe("ask memory", () => {
           notes: "ახალი სამსახური",
         },
         turnsSeen: 10,
+        nudgesEnabled: true,
         updatedAt: new Date(),
       },
       "ka",

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { AskTabBadge } from "./ask-tab-badge";
 import { MessagesTabBadge } from "./messages-tab-badge";
 import { NavItemLink } from "./nav-item-link";
 import { MOBILE_TAB_ITEMS, type NavActiveKey } from "./nav-items";
@@ -17,10 +18,13 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function MobileTabBar({
   active,
   unreadMessages = 0,
+  pendingAskNudges = 0,
   locale = "ka",
 }: {
   active?: NavActiveKey;
   unreadMessages?: number;
+  /** Unopened proactive astrologer nudges — dot on the ask tab. */
+  pendingAskNudges?: number;
   locale?: UserLocale;
 }) {
   return (
@@ -71,6 +75,9 @@ export function MobileTabBar({
                       initial={unreadMessages}
                       locale={locale}
                     />
+                  )}
+                  {item.key === "ask" && (
+                    <AskTabBadge pending={pendingAskNudges} locale={locale} />
                   )}
                 </span>
                 <span className="truncate">{navLabel(item, locale)}</span>

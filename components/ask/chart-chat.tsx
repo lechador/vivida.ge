@@ -45,6 +45,7 @@ const ERRORS_EN: Record<string, string> = {
 export type AskMemoryView = {
   summary: string;
   traits: { tone?: string; topics?: string[] };
+  nudgesEnabled: boolean;
 };
 
 /** Device-level answer-depth preference (mirrors the server default "auto"). */
@@ -126,6 +127,22 @@ export function ChartChat({
       }
     } finally {
       setForgetting(false);
+    }
+  }
+
+  async function toggleNudges() {
+    if (!memory) return;
+    const next = !memory.nudgesEnabled;
+    setMemory({ ...memory, nudgesEnabled: next });
+    try {
+      const res = await fetch("/api/ask/memory", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nudgesEnabled: next }),
+      });
+      if (!res.ok) throw new Error("toggle failed");
+    } catch {
+      setMemory({ ...memory, nudgesEnabled: !next });
     }
   }
   const [creditShortfall, setCreditShortfall] = useState({
@@ -495,6 +512,32 @@ export function ChartChat({
                       ? "Forget everything about me"
                       : "დაავიწყე ჩემ შესახებ ყველაფერი"}
               </button>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-border/60 pt-2.5">
+                <span className="text-muted-foreground">
+                  {en ? "Proactive check-ins" : "პროაქტიული შეხსენებები"}
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={memory.nudgesEnabled}
+                  aria-label={
+                    en ? "Proactive check-ins" : "პროაქტიული შეხსენებები"
+                  }
+                  onClick={() => void toggleNudges()}
+                  className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+                    memory.nudgesEnabled
+                      ? "bg-[var(--vivida-violet)]"
+                      : "bg-foreground/15"
+                  }`}
+                >
+                  <span
+                    aria-hidden
+                    className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-all ${
+                      memory.nudgesEnabled ? "left-[22px]" : "left-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
             </>
           ) : (
             <p className="text-muted-foreground">
