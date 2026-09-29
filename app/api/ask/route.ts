@@ -8,9 +8,12 @@ import { CREDIT_COST, FREE_ALLOWANCE, spendCredits } from "@/lib/credits";
 import { computeChartSalience } from "@/lib/report-salience";
 import { buildChartChatSystem } from "@/lib/chart-chat";
 import {
+  ASK_DEPTH_TOKENS,
   buildMemoryBlock,
+  detectDistress,
   getAskMemory,
   inferVerbosity,
+  normalizeAskDepth,
   refreshAskMemory,
 } from "@/lib/ask-memory";
 import {
@@ -55,8 +58,13 @@ export async function POST(req: Request) {
     return Response.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  const body = (await req.json().catch(() => ({}))) as { message?: unknown };
+  const body = (await req.json().catch(() => ({}))) as {
+    message?: unknown;
+    depth?: unknown;
+  };
   const message = typeof body.message === "string" ? body.message.trim() : "";
+  const depth = normalizeAskDepth(body.depth);
+  const distress = detectDistress(message);
   if (!message || message.length > MAX_MESSAGE_LEN) {
     return Response.json({ error: "invalid_message" }, { status: 400 });
   }
@@ -138,6 +146,7 @@ export async function POST(req: Request) {
     salience,
     locale,
     memoryBlock,
+    { depth, distress },
   );
 
   // Refresh the rolling portrait in the background (cheap merge, throttled
@@ -165,7 +174,7 @@ export async function POST(req: Request) {
       let full = "";
       try {
         for await (const delta of streamChatCompletion(messages, {
-          maxTokens: 900,
+          maxTokens: ASK_DEPTH_TOKENS[depth],
         })) {
           full += delta;
           controller.enqueue(encoder.encode(delta));

@@ -7,6 +7,12 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { ChartChat } from "@/components/ask/chart-chat";
+import type { AskMemoryView } from "@/components/ask/chart-chat";
+import { getAskMemory } from "@/lib/ask-memory";
+import {
+  buildFollowUpQuestion,
+  buildTopicStarter,
+} from "@/lib/ask-memory-pure";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { normalizeChartStarter } from "@/lib/chart-chat-starters";
@@ -72,6 +78,29 @@ export default async function AskPage({
   }));
   const premium = await isPremiumUser(user.id);
 
+  // Personalization from long-term memory: proactive follow-up from the
+  // first open loop, topic chips from recurring interests, and the
+  // transparency snapshot. A failed read hides the extras, never the chat.
+  const storedMemory = await getAskMemory(user.id).catch(() => null);
+  const followUp = storedMemory?.traits?.openLoops?.[0]?.trim()
+    ? buildFollowUpQuestion(storedMemory.traits.openLoops[0], locale)
+    : null;
+  const topicStarters = (storedMemory?.traits?.topics ?? [])
+    .slice(0, 3)
+    .map((t) => buildTopicStarter(t, locale));
+  const initialMemory: AskMemoryView | null =
+    storedMemory &&
+    (storedMemory.summary.trim() ||
+      Object.keys(storedMemory.traits ?? {}).length > 0)
+      ? {
+          summary: storedMemory.summary,
+          traits: {
+            tone: storedMemory.traits?.tone,
+            topics: storedMemory.traits?.topics,
+          },
+        }
+      : null;
+
   return (
     <main
       lang={locale}
@@ -106,6 +135,9 @@ export default async function AskPage({
           firstName={firstName}
           locale={locale}
           premium={premium}
+          followUp={followUp}
+          topicStarters={topicStarters}
+          initialMemory={initialMemory}
         />
       </section>
     </main>

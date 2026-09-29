@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Send, Sparkles } from "lucide-react";
+import { Brain, Send, Sparkles, X } from "lucide-react";
 
 import { CreditHint } from "@/components/credits/credit-hint";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import {
+  normalizeAskDepth,
+  type AskDepth,
+  type TopicStarter,
+} from "@/lib/ask-memory-pure";
 import { ANALYTICS_EVENT, productEventBase, trackEvent } from "@/lib/analytics";
 import {
   chartStarterOptions,
@@ -37,12 +42,25 @@ const ERRORS_EN: Record<string, string> = {
   needs_credits: "You need more credits to ask another question.",
 };
 
+export type AskMemoryView = {
+  summary: string;
+  traits: { tone?: string; topics?: string[] };
+};
+
+/** Device-level answer-depth preference (mirrors the server default "auto"). */
+const DEPTH_KEY = "vivida_ask_depth_v1";
+
+const DEPTHS: AskDepth[] = ["auto", "short", "detailed"];
+
 export function ChartChat({
   initialMessages,
   initialStarter,
   firstName,
   locale = "ka",
   premium = false,
+  followUp = null,
+  topicStarters = [],
+  initialMemory = null,
 }: {
   initialMessages: Msg[];
   initialStarter?: ChartStarterId;
@@ -50,9 +68,18 @@ export function ChartChat({
   locale?: UserLocale;
   /** PRO users bypass every credit gate — hide the free-allowance hint. */
   premium?: boolean;
+  /** Proactive follow-up built from a remembered open loop (null when none). */
+  followUp?: string | null;
+  /** Chips built from remembered recurring topics (empty when none). */
+  topicStarters?: TopicStarter[];
+  /** Transparency snapshot of what the model remembers (null when nothing). */
+  initialMemory?: AskMemoryView | null;
 }) {
   const en = locale !== "ka";
   const starters = chartStarterOptions(locale);
+  const depthLabels: Record<AskDepth, string> = en
+    ? { auto: "Auto", short: "Brief", detailed: "Detailed" }
+    : { auto: "ავტო", short: "მოკლედ", detailed: "დეტალურად" };
   const [messages, setMessages] = useState<Msg[]>(initialMessages);
   const [input, setInput] = useState(() =>
     initialStarter ? chartStarterText(initialStarter, locale) : "",
@@ -62,6 +89,45 @@ export function ChartChat({
   // Tracked separately from the message so the 402 branch can also offer
   // the standard invite/top-up CTA, like every other credit gate.
   const [needsCredits, setNeedsCredits] = useState(false);
+  const [depth, setDepth] = useState<AskDepth>(() =>
+    typeof window === "undefined"
+      ? "auto"
+      : normalizeAskDepth(window.localStorage.getItem(DEPTH_KEY)),
+  );
+  /** Proactive follow-up chip is dismissible per open. */
+  const [followUpDismissed, setFollowUpDismissed] = useState(false);
+  /** Transparency panel: what the model remembers + forget button. */
+  const [memoryOpen, setMemoryOpen] = useState(false);
+  const [memory, setMemory] = useState<AskMemoryView | null>(initialMemory);
+  const [forgetArmed, setForgetArmed] = useState(false);
+  const [forgetting, setForgetting] = useState(false);
+
+  function pickDepth(d: AskDepth) {
+    setDepth(d);
+    try {
+      window.localStorage.setItem(DEPTH_KEY, d);
+    } catch {
+      /* private mode — preference just won't persist */
+    }
+  }
+
+  async function forgetMemory() {
+    if (!forgetArmed) {
+      setForgetArmed(true);
+      return;
+    }
+    setForgetting(true);
+    try {
+      const res = await fetch("/api/ask/memory", { method: "DELETE" });
+      if (res.ok) {
+        setMemory(null);
+        setForgetArmed(false);
+        setMemoryOpen(false);
+      }
+    } finally {
+      setForgetting(false);
+    }
+  }
   const [creditShortfall, setCreditShortfall] = useState({
     balance: 0,
     cost: 2,
@@ -134,7 +200,7 @@ export function ChartChat({
       const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg }),
+        body: JSON.stringify({ message: msg, depth }),
       });
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => ({}));
@@ -250,6 +316,24 @@ export function ChartChat({
                   {starter.text}
                 </button>
               ))}
+              {topicStarters.map((topic) => (
+                <button
+                  key={topic.label}
+                  type="button"
+                  onClick={() => {
+                    trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+                      placement: "chart_chat_topic",
+                      destination: "ai_chart_chat",
+                      product: "ai_chart_chat",
+                      recommendation: topic.label,
+                    });
+                    void send(topic.prompt);
+                  }}
+                  className="rounded-full border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/10 px-3.5 py-1.5 text-[13px] text-foreground/85 shadow-sm transition-all hover:-translate-y-px hover:bg-[var(--vivida-cyan)]/20 hover:shadow"
+                >
+                  {topic.label}
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -299,6 +383,129 @@ export function ChartChat({
       )}
 
       {/* Composer — pinned at the bottom of the chat panel */}
+      {followUp && !followUpDismissed && (
+        <div className="mb-2 flex shrink-0 items-center gap-2 rounded-2xl border border-[var(--vivida-pink)]/25 bg-[var(--vivida-pink)]/8 px-3 py-2">
+          <button
+            type="button"
+            onClick={() => {
+              trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+                placement: "chart_chat_followup",
+                destination: "ai_chart_chat",
+                product: "ai_chart_chat",
+                recommendation: "open_loop",
+              });
+              setFollowUpDismissed(true);
+              void send(followUp);
+            }}
+            className="flex-1 truncate text-left text-[13px] text-foreground/90 hover:underline"
+          >
+            {"↩ "}
+            {followUp}
+          </button>
+          <button
+            type="button"
+            aria-label={en ? "Dismiss" : "დახურვა"}
+            onClick={() => setFollowUpDismissed(true)}
+            className="grid size-6 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/10"
+          >
+            <X className="size-3.5" />
+          </button>
+        </div>
+      )}
+
+      <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
+        <div
+          role="group"
+          aria-label={en ? "Answer length" : "პასუხის სიგრძე"}
+          className="flex rounded-full border border-border bg-card/70 p-0.5 text-[12px] backdrop-blur-xl"
+        >
+          {DEPTHS.map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => pickDepth(d)}
+              aria-pressed={depth === d}
+              className={`rounded-full px-3 py-1 transition-all ${
+                depth === d
+                  ? "bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] font-medium text-white shadow"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {depthLabels[d]}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setForgetArmed(false);
+            setMemoryOpen((v) => !v);
+          }}
+          aria-expanded={memoryOpen}
+          className="flex items-center gap-1.5 rounded-full border border-border bg-card/70 px-3 py-1.5 text-[12px] text-muted-foreground backdrop-blur-xl transition-colors hover:text-foreground"
+        >
+          <Brain className="size-3.5" />
+          {en ? "Memory" : "მეხსიერება"}
+        </button>
+      </div>
+
+      {memoryOpen && (
+        <div className="mb-2 shrink-0 rounded-2xl border border-border bg-card/80 p-3.5 text-[13px] leading-relaxed backdrop-blur-xl">
+          <p className="mb-1.5 font-medium text-foreground/90">
+            {en ? "What I remember about you" : "რა მახსოვს შენზე"}
+          </p>
+          {memory ? (
+            <>
+              <p className="text-foreground/80">{memory.summary}</p>
+              {(memory.traits.tone || memory.traits.topics?.length) && (
+                <p className="mt-1.5 text-muted-foreground">
+                  {[
+                    memory.traits.tone
+                      ? en
+                        ? `Tone: ${memory.traits.tone}`
+                        : `ტონი: ${memory.traits.tone}`
+                      : null,
+                    memory.traits.topics?.length
+                      ? en
+                        ? `Topics: ${memory.traits.topics.join(", ")}`
+                        : `თემები: ${memory.traits.topics.join(", ")}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={() => void forgetMemory()}
+                disabled={forgetting}
+                className={`mt-2.5 rounded-full border px-3 py-1 text-[12px] transition-colors disabled:opacity-50 ${
+                  forgetArmed
+                    ? "border-[var(--vivida-pink)]/50 bg-[var(--vivida-pink)]/15 text-foreground"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {forgetting
+                  ? "…"
+                  : forgetArmed
+                    ? en
+                      ? "Tap again to confirm forgetting"
+                      : "დააწკაპე კიდევ ერთხელ დასადასტურებლად"
+                    : en
+                      ? "Forget everything about me"
+                      : "დაავიწყე ჩემ შესახებ ყველაფერი"}
+              </button>
+            </>
+          ) : (
+            <p className="text-muted-foreground">
+              {en
+                ? "Nothing remembered yet — after a few conversations your astrologer will start recognizing you here."
+                : "ჯერ არაფერი მახსოვს — რამდენიმე საუბრის მერე შენი ასტროლოგი აქ გიცნობს."}
+            </p>
+          )}
+        </div>
+      )}
+
       <form
         onSubmit={(e) => {
           e.preventDefault();

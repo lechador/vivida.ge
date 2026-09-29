@@ -72,6 +72,8 @@ export type AskUserMemoryTraits = {
   tone?: string;
   topics?: string[];
   notes?: string;
+  /** ≤3 unresolved threads worth gently asking about later (upcoming events, ongoing situations). */
+  openLoops?: string[];
 };
 
 export type AskUserMemory = typeof askUserMemories.$inferSelect;

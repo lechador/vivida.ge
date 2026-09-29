@@ -11,8 +11,20 @@ export {
   buildMemoryBlock,
   inferVerbosity,
   sanitizeMergedMemory,
+  ASK_DEPTH_TOKENS,
+  buildFollowUpQuestion,
+  buildTopicStarter,
+  depthInstruction,
+  detectDistress,
+  distressInstruction,
+  normalizeAskDepth,
 } from "@/lib/ask-memory-pure";
-export type { MergedMemory } from "@/lib/ask-memory-pure";
+export type {
+  MergedMemory,
+  AskDepth,
+  DistressLevel,
+  TopicStarter,
+} from "@/lib/ask-memory-pure";
 
 /**
  * Long-term memory for \"chat with your chart\".
@@ -49,8 +61,9 @@ export async function getAskMemory(
 
 const MERGE_SYSTEM = `You maintain a rolling portrait of a user chatting with their personal astrologer. Merge the old portrait with the recent conversation into an updated one. Rules:
 - Remember durable facts only: life context (relationships, work, studies), recurring interests, emotional patterns, how they like to be spoken to (short/detailed, playful/serious). Drop one-off details.
+- Track open loops: up to 3 unresolved threads worth asking about later (an upcoming interview, an ongoing conflict, a decision they keep returning to). Each ≤8 words. Drop loops that resolved.
 - Never store passwords, contact details, or exact birth data. Never include medical, legal or financial directives.
-- Reply ONLY as JSON: { "summary": string (≤8 sentences, plain everyday language), "traits": { "verbosity": "short"|"medium"|"detailed", "tone": string (≤5 words), "topics": string[] (≤8), "notes": string (short-lived context, ≤2 sentences) } }.`;
+- Reply ONLY as JSON: { "summary": string (≤8 sentences, plain everyday language), "traits": { "verbosity": "short"|"medium"|"detailed", "tone": string (≤5 words), "topics": string[] (≤8), "notes": string (short-lived context, ≤2 sentences), "openLoops": string[] (≤3) } }.`;
 
 /**
  * Refresh the rolling portrait when ≥5 new user turns accumulated since the

@@ -7,6 +7,12 @@ import { bodyMeta, formatDegree, signByIndex } from "@/lib/zodiac";
 import type { ChartSalience } from "@/lib/report-salience";
 import type { NatalChartJson } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import {
+  depthInstruction,
+  distressInstruction,
+  type AskDepth,
+  type DistressLevel,
+} from "@/lib/ask-memory-pure";
 
 const ASPECT_KA: Record<string, string> = {
   conjunction: "კონიუნქცია",
@@ -119,14 +125,22 @@ export function buildChartChatSystem(
   salience: ChartSalience,
   locale: UserLocale = "ka",
   memoryBlock = "",
+  opts: { depth?: AskDepth; distress?: DistressLevel } = {},
 ): string {
+  const extras = [
+    depthInstruction(opts.depth ?? "auto", locale),
+    distressInstruction(opts.distress ?? "none", locale),
+  ]
+    .filter(Boolean)
+    .join("\n");
+  const extraBlock = extras ? `\n${extras}\n` : "";
   if (locale === "en") {
     const name = firstName || "the user";
     const memory = memoryBlock.trim()
       ? `\n${memoryBlock.trim()}\nUse it naturally — refer back to earlier topics by name, never recite it verbatim.\n`
       : "";
     return `You are ${name}'s personal astrologer on Vivida. You have their exact natal chart data below. Answer questions about personality, emotions, relationships, career, timing and self-understanding using this specific chart.
-${memory}
+${memory}${extraBlock}
 Rules:
 - Rely only on the supplied chart data. Never invent placements. If the data does not support something, say so.
 - Write in warm, specific, contemporary English — plain everyday language (~8th-grade level). Avoid vague mysticism and clichés.
@@ -148,7 +162,7 @@ ${buildChartContext(chart, salience, "en")}`;
     ? `\n${memoryBlock.trim()}\nგამოიყენე ბუნებრივად — ძველი თემები სახელით ახსენე, სიტყვა-სიტყვით ნუ ჩამოთვლი.\n`
     : "";
   return `შენ ხარ ${name}-ის პერსონალური ასტროლოგი Vivida-ზე. გაქვს მისი ნატალური რუკის ზუსტი მონაცემები (ქვემოთ). უპასუხე მის შეკითხვებს ხასიათზე, ემოციებზე, ურთიერთობებზე, კარიერაზე, დროსა და თვითშემეცნებაზე — ყველაფერი ამ კონკრეტულ რუკაზე დაყრდნობით.
-${memory}
+${memory}${extraBlock}
 წესები:
 - დაეყრდენი მხოლოდ მოცემულ მონაცემებს. ნუ მოიგონებ პოზიციებს, რომლებიც აქ არ წერია. თუ რაღაც არ იცი, თქვი გულახდილად.
 - თბილი, კონკრეტული, თანამედროვე ქართული — მარტივი ყოველდღიური ენა (~მე-8 კლასის დონე). არა ბუნდოვანი მისტიკა, არა კლიშეები ("ვარსკვლავები გელიან").
