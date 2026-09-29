@@ -9,17 +9,14 @@ import { ensureDailyFor } from "@/actions/daily";
 import { ensureMoonPhase, type MoonPhaseRow } from "@/actions/moon-phase";
 import { ensureWeeklyForecast } from "@/actions/weekly-forecast";
 import { getBalance, isUnlocked } from "@/lib/credits";
+import { isPremiumUser } from "@/lib/premium";
 import { getDashboardSuggestions } from "@/lib/suggestions";
 import {
   overlayTransitAspects,
   type TransitBreakdownItem,
 } from "@/lib/transit-library";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
-import type {
-  Chart,
-  DailyHoroscope,
-  WeeklyForecast,
-} from "@/db/schema";
+import type { Chart, DailyHoroscope, WeeklyForecast } from "@/db/schema";
 import type { DiscoverCard } from "@/lib/discover";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { getDailyRitualProgress } from "@/lib/daily-ritual-core";
@@ -51,11 +48,15 @@ export type DashboardCore =
       weeklyUnlocked: boolean;
       /** Credit balance — used by the locked-forecast unlock CTA. */
       balance: number;
+      /** PRO entitlement — gates the PRO daily brief layer. */
+      isPremium: boolean;
       ritualProgress: StreakProgress;
       suggestions: DiscoverCard[];
     };
 
-export async function loadDashboardCore(userId: string): Promise<DashboardCore> {
+export async function loadDashboardCore(
+  userId: string,
+): Promise<DashboardCore> {
   // Fast path: returns the static chart immediately, AI narrative lands in
   // the background. Positions + big-three render with zero AI latency.
   const chart = await ensureChartFor(userId, { aiUpgrade: "defer" });
@@ -63,7 +64,14 @@ export async function loadDashboardCore(userId: string): Promise<DashboardCore> 
 
   // Skip the "suggested people" query entirely when the rail is flagged off
   // — no point ranking strangers we won't show. Render is also guarded.
-  const [profileRow, suggestions, weeklyUnlocked, balance, ritualProgress] = await Promise.all([
+  const [
+    profileRow,
+    suggestions,
+    weeklyUnlocked,
+    balance,
+    ritualProgress,
+    isPremium,
+  ] = await Promise.all([
     db
       .select({ timezone: profiles.timezone })
       .from(profiles)
@@ -75,6 +83,7 @@ export async function loadDashboardCore(userId: string): Promise<DashboardCore> 
     isUnlocked(userId, "weekly", "spend_weekly"),
     getBalance(userId),
     getDailyRitualProgress(userId),
+    isPremiumUser(userId),
   ]);
 
   return {
@@ -84,6 +93,7 @@ export async function loadDashboardCore(userId: string): Promise<DashboardCore> 
     canDaily: true,
     weeklyUnlocked,
     balance,
+    isPremium,
     ritualProgress,
     suggestions,
   };
@@ -111,9 +121,9 @@ export async function loadDashboardExtras(
 
   const [daily, moonPhase, weeklyForecast] = await Promise.all([
     ensureDailyFor(userId, locale).catch((err) => {
-          console.warn("[dashboard:daily]", (err as Error).message);
-          return null;
-        }),
+      console.warn("[dashboard:daily]", (err as Error).message);
+      return null;
+    }),
     ensureMoonPhase(locale).catch((err) => {
       console.warn("[dashboard:moon]", (err as Error).message);
       return null;
@@ -131,7 +141,7 @@ export async function loadDashboardExtras(
   // persisted; aspects without a library row yet are simply skipped.
   const transitBreakdown = daily?.transits?.topAspects?.length
     ? await overlayTransitAspects(daily.transits.topAspects, 5, locale).catch(
-        () => [] as TransitBreakdownItem[]
+        () => [] as TransitBreakdownItem[],
       )
     : [];
 

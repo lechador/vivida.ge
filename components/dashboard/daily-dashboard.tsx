@@ -24,6 +24,7 @@ import { WeeklyForecastCard } from "./weekly-forecast-card";
 import { WeeklyForecastLocked } from "./weekly-forecast-locked";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { DailyRitual } from "./daily-ritual";
+import { ProDailyBrief } from "./pro-daily-brief";
 
 /**
  * Dashboard content loaded after first paint via server actions. The page
@@ -91,6 +92,7 @@ export function DailyDashboard({
     canDaily,
     weeklyUnlocked,
     balance,
+    isPremium,
     suggestions,
     ritualProgress,
   } = core;
@@ -104,6 +106,7 @@ export function DailyDashboard({
         canDaily={canDaily}
         weeklyUnlocked={weeklyUnlocked}
         balance={balance}
+        isPremium={isPremium}
         locale={locale}
         ritualProgress={ritualProgress}
       />
@@ -161,6 +164,7 @@ function DashboardExtrasSection({
   canDaily,
   weeklyUnlocked,
   balance,
+  isPremium,
   locale,
   ritualProgress,
 }: {
@@ -168,6 +172,7 @@ function DashboardExtrasSection({
   canDaily: boolean;
   weeklyUnlocked: boolean;
   balance: number;
+  isPremium: boolean;
   locale: UserLocale;
   ritualProgress: import("@/lib/streak-credits").StreakProgress;
 }) {
@@ -216,6 +221,17 @@ function DashboardExtrasSection({
 
   return (
     <>
+      {!loading && extras.daily ? (
+        <ProDailyBrief
+          userId={userId}
+          dateIso={extras.daily.date}
+          transits={extras.transitBreakdown}
+          isPremium={isPremium}
+          locale={locale}
+        />
+      ) : loading ? (
+        <CardSkeleton className="min-h-[180px]" />
+      ) : null}
       {(!loading && extras.daily) || dailySlot || moonSlot ? (
         <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
           {!loading && extras.daily ? (
