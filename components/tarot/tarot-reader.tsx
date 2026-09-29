@@ -478,14 +478,15 @@ export function TarotReader({
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
           {en
             ? "About the same cards — no new spread is drawn."
-            : "იგივე კარტებზე — ახალი გაშლა არ იშლება."}{" "}
-          {reading.followups.length === 0
-            ? en
-              ? "Your first follow-up is free."
-              : "პირველი დაზუსტება უფასოა."
-            : en
-              ? `Next follow-up — ${CREDIT_COST.tarotFollowup} credits.`
-              : `შემდეგი დაზუსტება — ${CREDIT_COST.tarotFollowup} კრედიტი.`}
+            : "იგივე კარტებზე — ახალი გაშლა არ იშლება."}
+          {!premium &&
+            (reading.followups.length === 0
+              ? en
+                ? " Your first follow-up is free."
+                : " პირველი დაზუსტება უფასოა."
+              : en
+                ? ` Next follow-up — ${CREDIT_COST.tarotFollowup} credits.`
+                : ` შემდეგი დაზუსტება — ${CREDIT_COST.tarotFollowup} კრედიტი.`)}
         </p>
 
         {reading.followups.map((followup, index) => (
@@ -740,11 +741,13 @@ export function TarotReader({
         </div>
       )}
       <div className="mt-2">
-        <CreditHint>
-          {en
-            ? `Your first question is free, then ${cost} credits`
-            : `პირველი კითხვა უფასოა, შემდეგ −${cost} კრედიტი`}
-        </CreditHint>
+        {!premium && (
+          <CreditHint>
+            {en
+              ? `Your first question is free, then ${cost} credits`
+              : `პირველი კითხვა უფასოა, შემდეგ −${cost} კრედიტი`}
+          </CreditHint>
+        )}
       </div>
 
       {/* Short-balance prompt — with the drawn spread as a teaser when the

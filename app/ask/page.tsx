@@ -10,6 +10,7 @@ import { ChartChat } from "@/components/ask/chart-chat";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { normalizeChartStarter } from "@/lib/chart-chat-starters";
+import { isPremiumUser } from "@/lib/premium";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -69,6 +70,7 @@ export default async function AskPage({
     role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
     content: m.content,
   }));
+  const premium = await isPremiumUser(user.id);
 
   return (
     <main
@@ -103,6 +105,7 @@ export default async function AskPage({
           initialStarter={normalizeChartStarter(starter)}
           firstName={firstName}
           locale={locale}
+          premium={premium}
         />
       </section>
     </main>

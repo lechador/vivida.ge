@@ -208,9 +208,18 @@ export default async function TaroHubPage() {
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
-            {en
-              ? "Ask a question and receive a thoughtful, personal three-card reading. Your first reading is free."
-              : "ტაროზე მკითხაობა ონლაინ — დაუსვი კითხვა კარტებს და მიიღე ცოცხალი, პერსონალური პასუხი. პირველი კითხვა უფასოა."}
+            {en ? (
+              <>
+                Ask a question and receive a thoughtful, personal three-card
+                reading. {!premium && "Your first reading is free."}
+              </>
+            ) : (
+              <>
+                ტაროზე მკითხაობა ონლაინ — დაუსვი კითხვა კარტებს და მიიღე
+                ცოცხალი, პერსონალური პასუხი.{" "}
+                {!premium && "პირველი კითხვა უფასოა."}
+              </>
+            )}
           </p>
         </header>
 
@@ -305,7 +314,6 @@ export default async function TaroHubPage() {
             </Link>
           </div>
         )}
-
       </section>
 
       <SiteFooter locale={locale} />

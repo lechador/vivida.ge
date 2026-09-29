@@ -42,11 +42,14 @@ export function ChartChat({
   initialStarter,
   firstName,
   locale = "ka",
+  premium = false,
 }: {
   initialMessages: Msg[];
   initialStarter?: ChartStarterId;
   firstName: string | null;
   locale?: UserLocale;
+  /** PRO users bypass every credit gate — hide the free-allowance hint. */
+  premium?: boolean;
 }) {
   const en = locale !== "ka";
   const starters = chartStarterOptions(locale);
@@ -345,11 +348,13 @@ export function ChartChat({
           )}
         </div>
         <div className="mt-2 flex justify-center">
-          <CreditHint>
-            {en
-              ? "2 free questions per day, then −2 credits"
-              : "დღეში 2 უფასო შეკითხვა, შემდეგ −2 კრედიტი"}
-          </CreditHint>
+          {!premium && (
+            <CreditHint>
+              {en
+                ? "2 free questions per day, then −2 credits"
+                : "დღეში 2 უფასო შეკითხვა, შემდეგ −2 კრედიტი"}
+            </CreditHint>
+          )}
         </div>
         <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
           {en
