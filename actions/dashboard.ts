@@ -16,10 +16,16 @@ import {
   type TransitBreakdownItem,
 } from "@/lib/transit-library";
 import { SOCIAL_FEATURES } from "@/lib/social-flags";
-import type { Chart, DailyHoroscope, WeeklyForecast } from "@/db/schema";
+import type {
+  Chart,
+  DailyHoroscope,
+  WeeklyForecast,
+  WeeklyForecastDay,
+} from "@/db/schema";
 import type { DiscoverCard } from "@/lib/discover";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { getDailyRitualProgress } from "@/lib/daily-ritual-core";
+import { stripWeeklyTeaser } from "@/lib/weekly-teaser";
 import type { StreakProgress } from "@/lib/streak-credits";
 
 /**
@@ -106,6 +112,12 @@ export type DashboardExtras = {
   transitBreakdown: TransitBreakdownItem[];
   moonPhase: MoonPhaseRow | null;
   weeklyForecast: WeeklyForecast | null;
+  /**
+   * Locked-week teaser: real days with scores + dates, but the narrative
+   * (headline, reasons, advice, drivers) stripped for every day after the
+   * first. The locked card shows day 1 fully and blurs the rest.
+   */
+  weeklyTeaser: WeeklyForecastDay[] | null;
 };
 
 /**
@@ -128,12 +140,13 @@ export async function loadDashboardExtras(
       console.warn("[dashboard:moon]", (err as Error).message);
       return null;
     }),
-    canWeekly
-      ? ensureWeeklyForecast(userId, locale).catch((err) => {
-          console.warn("[dashboard:weekly]", (err as Error).message);
-          return null;
-        })
-      : Promise.resolve(null),
+    // The forecast composes from the pre-generated transit library (zero AI
+    // when seeded), so locked users get a real teaser: day 1 fully visible,
+    // later days as blurred score rows. Narrative is stripped server-side.
+    ensureWeeklyForecast(userId, locale).catch((err) => {
+      console.warn("[dashboard:weekly]", (err as Error).message);
+      return null;
+    }),
   ]);
 
   // Overlay the stored top aspects with library interpretations. Works for
@@ -145,5 +158,14 @@ export async function loadDashboardExtras(
       )
     : [];
 
-  return { daily, transitBreakdown, moonPhase, weeklyForecast };
+  return {
+    daily,
+    transitBreakdown,
+    moonPhase,
+    weeklyForecast: canWeekly ? weeklyForecast : null,
+    weeklyTeaser:
+      !canWeekly && weeklyForecast && weeklyForecast.days.length > 0
+        ? stripWeeklyTeaser(weeklyForecast.days)
+        : null,
+  };
 }

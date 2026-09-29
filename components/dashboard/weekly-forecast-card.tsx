@@ -107,16 +107,22 @@ export function WeeklyForecastCard({
   );
 }
 
-function DayRow({
+export function DayRow({
   day,
   open,
   onToggle,
   locale,
+  locked = false,
 }: {
   day: WeeklyForecastDay;
   open: boolean;
   onToggle: () => void;
   locale: UserLocale;
+  /**
+   * Locked teaser row: the button is disabled (out of the tab order) so the
+   * parent can blur it as a pure visual tease with no interaction.
+   */
+  locked?: boolean;
 }) {
   const en = locale !== "ka";
   const dayNum = parseDateNum(day.dateIso);
@@ -180,6 +186,7 @@ function DayRow({
       <button
         type="button"
         onClick={onToggle}
+        disabled={locked}
         className={cn(
           "group relative w-full overflow-hidden rounded-xl border-2 p-3 pl-5 text-left transition-all sm:p-4 sm:pl-6",
           tone.bg,

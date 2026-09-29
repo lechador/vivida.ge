@@ -51,6 +51,7 @@ export const ANALYTICS_EVENT = {
   pushPermissionDenied: "push_permission_denied",
   tarotLoginRequired: "tarot_login_required",
   tarotCreditsShort: "tarot_credits_short",
+  tarotTeaserShown: "tarot_teaser_shown",
   tarotReadingCompleted: "tarot_reading_completed",
   tarotFollowupCompleted: "tarot_followup_completed",
   testCompleted: "test_completed",

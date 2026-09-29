@@ -82,7 +82,13 @@ export async function POST(req: Request) {
   if (!result.ok) {
     if (result.error === "insufficient") {
       return NextResponse.json(
-        { error: "needs_credits", cost: result.cost, balance: result.balance },
+        {
+          error: "needs_credits",
+          cost: result.cost,
+          balance: result.balance,
+          // Free teaser: drawn card art/positions, no interpretations.
+          ...(result.preview ? { preview: result.preview } : {}),
+        },
         { status: 402 },
       );
     }

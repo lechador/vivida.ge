@@ -193,6 +193,7 @@ function DashboardExtrasSection({
             transitBreakdown: [],
             moonPhase: null,
             weeklyForecast: null,
+            weeklyTeaser: null,
           });
         }
       });
@@ -259,6 +260,7 @@ function DashboardExtrasSection({
         <WeeklyForecastLocked
           cost={CREDIT_COST.weeklyForecast}
           balance={balance}
+          teaserDays={extras?.weeklyTeaser}
           locale={locale}
         />
       ) : loading ? (

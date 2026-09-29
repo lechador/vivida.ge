@@ -8,6 +8,7 @@ import {
   ChevronDown,
   History,
   Loader2,
+  Lock,
   RotateCcw,
   Sparkles,
   Wand2,
@@ -55,6 +56,18 @@ type TarotFollowup = {
   degraded: boolean;
   charged: number;
   free: boolean;
+};
+/** Free teaser from a 402: drawn card art/positions, no interpretations. */
+type TarotTeaser = {
+  spreadId: string;
+  cards: Array<{
+    slug: string;
+    name: string;
+    glyph: string;
+    image: string;
+    reversed: boolean;
+    position: string;
+  }>;
 };
 type Reading = {
   headline: string;
@@ -154,6 +167,7 @@ export function TarotReader({
     "idle",
   );
   const [shortBalance, setShortBalance] = useState(0);
+  const [teaserPreview, setTeaserPreview] = useState<TarotTeaser | null>(null);
   const [followupQuestion, setFollowupQuestion] = useState("");
   const [followupStatus, setFollowupStatus] = useState<
     "idle" | "sending" | "short" | "error"
@@ -252,6 +266,7 @@ export function TarotReader({
     }
     setStatus("drawing");
     setReading(null);
+    setTeaserPreview(null);
     // Retries of the same question reuse one request id so the server can
     // replay the reading instead of charging twice.
     const nextAttempt = nextTarotAttempt(attempt, q, spreadId);
@@ -275,8 +290,14 @@ export function TarotReader({
       if (res.status === 402) {
         const data = (await res.json().catch(() => ({}))) as {
           balance?: number;
+          preview?: TarotTeaser;
         };
         setShortBalance(typeof data.balance === "number" ? data.balance : 0);
+        setTeaserPreview(
+          data.preview && data.preview.cards?.length === 3
+            ? data.preview
+            : null,
+        );
         trackEvent(ANALYTICS_EVENT.tarotCreditsShort, {
           widget: "tarot_reader",
         });
@@ -329,6 +350,7 @@ export function TarotReader({
         });
       }
       setReading(next);
+      setTeaserPreview(null);
       setActiveHistoryId(null);
       setStatus("idle");
     } catch {
@@ -338,6 +360,7 @@ export function TarotReader({
 
   function reset() {
     setReading(null);
+    setTeaserPreview(null);
     setQuestion("");
     setAttempt(null);
     setFollowupQuestion("");
@@ -724,18 +747,24 @@ export function TarotReader({
         </CreditHint>
       </div>
 
-      {/* Short-balance prompt */}
+      {/* Short-balance prompt — with the drawn spread as a teaser when the
+          server dealt one (same cards the paid retry will interpret). */}
       {status === "short" && (
-        <div className="mt-5 rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
-          <ContextualPaywallActions
-            locale={locale}
-            balance={shortBalance}
-            cost={cost}
-            product="tarot"
-            returnTo="/taro"
-            placement="tarot_shortfall"
-            countryCode={countryCode}
-          />
+        <div className="mt-8 space-y-5">
+          {teaserPreview && (
+            <TarotTeaserPreview preview={teaserPreview} locale={locale} />
+          )}
+          <div className="rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
+            <ContextualPaywallActions
+              locale={locale}
+              balance={shortBalance}
+              cost={cost}
+              product="tarot"
+              returnTo="/taro"
+              placement="tarot_shortfall"
+              countryCode={countryCode}
+            />
+          </div>
         </div>
       )}
       {status === "error" && (
@@ -966,5 +995,90 @@ function TarotCardFace({
         {card.name}
       </figcaption>
     </figure>
+  );
+}
+
+/**
+ * Free teaser on a 402: the exact spread the paid retry will interpret —
+ * first card face-up, the other two face-down, every interpretation locked.
+ */
+export function TarotTeaserPreview({
+  preview,
+  locale,
+}: {
+  preview: TarotTeaser;
+  locale: UserLocale;
+}) {
+  const en = locale !== "ka";
+
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENT.tarotTeaserShown, {
+      widget: "tarot_reader",
+      spread: preview.spreadId,
+    });
+  }, [preview.spreadId]);
+
+  const [first, ...rest] = preview.cards;
+
+  return (
+    <div>
+      <div className="text-center">
+        <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          {en ? "Your spread is ready" : "შენი გაშლა მზადაა"}
+        </div>
+        <h3 className="mt-1 text-balance text-xl font-semibold tracking-tight">
+          {en
+            ? "The first card is face-up — the rest unlocks with the reading"
+            : "პირველი კარტი ღიაა — დანარჩენი პასუხთან ერთად გაიხსნება"}
+        </h3>
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-3 sm:gap-4">
+        {first && (
+          <div>
+            <p className="mb-1.5 text-center text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {first.position}
+            </p>
+            <TarotCardFace
+              card={{ ...first, interpretation: "" }}
+              delayMs={0}
+            />
+          </div>
+        )}
+        {rest.map((card, i) => (
+          <div key={i}>
+            <p className="mb-1.5 text-center text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {card.position}
+            </p>
+            <TarotCardBack delayMs={(i + 1) * 140} />
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+        <Lock className="size-3.5 text-[var(--vivida-gold)]" />
+        {en
+          ? "Card meanings and your personal answer unlock below"
+          : "კარტების მნიშვნელობები და პირადი პასუხი ქვემოთ გაიხსნება"}
+      </p>
+    </div>
+  );
+}
+
+/** Face-down card — hides identity, keeps the spread's shape. */
+function TarotCardBack({ delayMs }: { delayMs: number }) {
+  return (
+    <div
+      className="tarot-card-in overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/40 bg-[oklch(0.18_0.05_285)] ring-1 ring-foreground/10"
+      style={{ animationDelay: `${delayMs}ms` }}
+    >
+      <div className="flex aspect-[2/3] flex-col items-center justify-center gap-2 bg-[radial-gradient(70%_60%_at_50%_30%,oklch(0.35_0.16_300/0.65),transparent_70%)] p-2">
+        <Sparkles className="size-7 text-[var(--vivida-violet)]" aria-hidden />
+        <span
+          aria-hidden
+          className="text-[10px] font-medium uppercase tracking-[0.3em] text-foreground/40"
+        >
+          ✦ ✦ ✦
+        </span>
+      </div>
+    </div>
   );
 }

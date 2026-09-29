@@ -69,19 +69,105 @@ export type TarotReading = {
 
 export type TarotResult =
   | { ok: true; reading: TarotReading }
-  | { ok: false; error: "insufficient"; cost: number; balance: number }
+  | {
+      ok: false;
+      error: "insufficient";
+      cost: number;
+      balance: number;
+      /**
+       * Free teaser: the exact cards the paid retry will interpret (the draw
+       * is seeded by the client request id), minus every interpretation.
+       * Absent when there is no stable request id to seed from.
+       */
+      preview?: TarotPreview;
+    }
   | { ok: false; error: "bad_request" };
 
-/** Draw 3 distinct cards from the full 78-card deck, each independently upright or reversed. */
-function drawSpread(): Array<{ card: DeckCard; reversed: boolean }> {
+/** One drawn card with its art and position — no interpretation. */
+export type TarotPreviewCard = {
+  slug: string;
+  name: string;
+  glyph: string;
+  image: string;
+  reversed: boolean;
+  position: string;
+};
+
+export type TarotPreview = {
+  spreadId: TarotSpreadId;
+  cards: TarotPreviewCard[];
+};
+
+/** cyrb53 string hash → 53-bit seed folded for mulberry32. */
+function hashSeed(seed: string): number {
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < seed.length; i++) {
+    const ch = seed.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 =
+    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
+    Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 =
+    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
+    Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (h2 >>> 0) * 4294967296 + (h1 >>> 0);
+}
+
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Draw 3 distinct cards from the full 78-card deck, each independently
+ * upright or reversed. Seeded by the client request id when present, so a
+ * free teaser preview and its paid retry draw the identical spread;
+ * unseeded (legacy callers) draws stay fully random.
+ */
+export function drawSpread(
+  seed?: string,
+): Array<{ card: DeckCard; reversed: boolean }> {
+  const rand = seed ? mulberry32(hashSeed(seed)) : Math.random;
   const pool = [...FULL_DECK_KA];
   const out: Array<{ card: DeckCard; reversed: boolean }> = [];
   for (let i = 0; i < 3; i++) {
-    const idx = Math.floor(Math.random() * pool.length);
+    const idx = Math.floor(rand() * pool.length);
     const [card] = pool.splice(idx, 1);
-    out.push({ card: card!, reversed: Math.random() < 0.35 });
+    out.push({ card: card!, reversed: rand() < 0.35 });
   }
   return out;
+}
+
+/**
+ * Free preview of a spread: art, names and positions only. Pure deck lookup
+ * — no charge, no AI, no library writes. Only meaningful with a stable
+ * request id, which guarantees the paid retry interprets these same cards.
+ */
+export function previewSpread(
+  requestKey: string,
+  spreadId: TarotSpreadId,
+  locale: UserLocale = "ka",
+): TarotPreview {
+  const spread = tarotSpreadById(spreadId) ?? tarotSpreadById("situation")!;
+  const positions = spread.positions[locale];
+  const cards = drawSpread(requestKey).map((d, i) => ({
+    slug: d.card.slug,
+    name: cardCopy(d, locale).name,
+    glyph: d.card.glyph,
+    image: tarotImageUrl(d.card.slug),
+    reversed: d.reversed,
+    position: positions[i],
+  }));
+  return { spreadId: spread.id, cards };
 }
 
 /** Compose a readable fallback answer purely from the static card meanings. */
@@ -250,6 +336,11 @@ export async function performReading(
               error: "insufficient",
               cost: CREDIT_COST.tarot,
               balance,
+              // The teaser draws the exact spread the paid retry will
+              // interpret (seeded by request id) — art only, no meanings.
+              preview: requestKey
+                ? previewSpread(requestKey, spread.id, locale)
+                : undefined,
             };
           }
           charged = outcome === "unlocked" ? CREDIT_COST.tarot : 0;
@@ -277,7 +368,9 @@ export async function performReading(
   }
 
   // ── Draw + interpret ─────────────────────────────────────────────────────
-  const drawn = drawSpread();
+  // Seeded by the client request id when present, so the paid retry draws
+  // the identical spread the free teaser previewed.
+  const drawn = drawSpread(requestKey);
   const positions = spread.positions[locale];
   const aiInput = {
     question: q,

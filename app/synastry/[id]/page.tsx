@@ -27,6 +27,7 @@ import { SYNASTRY_DEEP_PROMPT_VERSION } from "@/lib/openrouter";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { UnlockCard } from "@/components/credits/unlock-card";
+import { SynastryTeaser } from "@/components/synastry/synastry-teaser";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { SynastryDeepReport } from "@/components/synastry/synastry-deep-report";
 import { SynastryDisplayEn } from "@/components/synastry/synastry-display-en";
@@ -95,6 +96,12 @@ export default async function SynastryDetailPage({
 
   if (!unlocked) {
     const balance = isOwner ? await getBalance(partner.userId) : 0;
+    // Tease, don't block: the overall score is cheap deterministic compute,
+    // so owners see their number + blurred breakdown before paying. The AI
+    // narrative and weekly updates below stay behind the unlock.
+    const teaserScores = isOwner
+      ? computeSynastry(viewerChart.data, partner.chart)
+      : null;
     return (
       <main
         lang={locale}
@@ -125,23 +132,28 @@ export default async function SynastryDetailPage({
             {partner.dateOfBirth} · {partner.cityName}
           </p>
           {isOwner ? (
-            <UnlockCard
-              kind="synastry"
-              resultId={partner.id}
-              cost={CREDIT_COST.synastry}
-              balance={balance}
-              title={
-                en
-                  ? "Unlock your compatibility reading"
-                  : "თქვენი თავსებადობის გახსნა"
-              }
-              blurb={
-                en
-                  ? "See the complete synastry reading—key aspects, strengths, and points of friction. Pay once and this partner remains unlocked."
-                  : "ნახე სრული სინასტრია — ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
-              }
-              locale={locale}
-            />
+            <>
+              {teaserScores && (
+                <SynastryTeaser result={teaserScores} locale={locale} />
+              )}
+              <UnlockCard
+                kind="synastry"
+                resultId={partner.id}
+                cost={CREDIT_COST.synastry}
+                balance={balance}
+                title={
+                  en
+                    ? "Unlock your compatibility reading"
+                    : "თქვენი თავსებადობის გახსნა"
+                }
+                blurb={
+                  en
+                    ? "See the complete synastry reading—key aspects, strengths, and points of friction. Pay once and this partner remains unlocked."
+                    : "ნახე სრული სინასტრია — ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
+                }
+                locale={locale}
+              />
+            </>
           ) : (
             <div className="rounded-2xl border border-border bg-card/70 p-6 text-sm text-muted-foreground">
               {en
