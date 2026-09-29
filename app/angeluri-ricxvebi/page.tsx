@@ -5,18 +5,13 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import {
   ANGEL_HUB_EN,
   AngelNumbersHubEn,
 } from "@/components/seo/angel-numbers-en";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import {
-  ANGEL_FAQ,
-  ANGEL_LATIN_QUERIES,
-  ANGEL_NUMBERS,
-} from "@/lib/seo/angel-numbers";
+import { ANGEL_FAQ, ANGEL_NUMBERS } from "@/lib/seo/angel-numbers";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   englishSiteHref,
@@ -115,7 +110,7 @@ export default async function AngelNumbersHubPage() {
       about: {
         "@type": "Thing",
         name: "ანგელოზური რიცხვები",
-        alternateName: ["angel numbers", "angeluri ricxvebi", "11:11"],
+        alternateName: "angel numbers",
       },
     }),
     breadcrumbLd([
@@ -265,7 +260,6 @@ export default async function AngelNumbersHubPage() {
           </Link>
         </div>
 
-        <PopularSearches queries={ANGEL_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

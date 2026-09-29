@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { LifePathNumberPageEn } from "@/components/seo/numerology-en";
 
 import { SiteFooter } from "@/components/site-footer";
@@ -15,7 +14,6 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { LIFE_PATH_CONTENT } from "@/lib/seo/numerology-content";
 import { LIFE_PATH_CONTENT_EN } from "@/lib/seo/numerology-content-en";
 
-import { NUMEROLOGY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   englishSiteHref,
@@ -280,7 +278,6 @@ export default async function LifePathNumberPage({
           </Button>
         </div>
 
-        <PopularSearches queries={NUMEROLOGY_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

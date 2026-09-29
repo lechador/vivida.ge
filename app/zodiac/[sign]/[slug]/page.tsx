@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { Calendar, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -22,7 +21,6 @@ import {
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
 import { genitiveKa } from "@/lib/georgian";
-import { yearlyPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import {
   anchorForView,
@@ -245,7 +243,6 @@ export default async function ZodiacSignSlugPage({
   const meta = signMetaBySlug(sign);
   const accent = meta ? signColor(meta) : "var(--vivida-violet)";
   const dates = ZODIAC_DATES[sign];
-  const latinQueries = yearlyPageLatinQueries(sign, yearNum);
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -262,7 +259,6 @@ export default async function ZodiacSignSlugPage({
     about: {
       "@type": "Thing",
       name: `${c.labelKa} ${yearNum}`,
-      alternateName: latinQueries,
     },
     datePublished: `${yearNum}-01-01`,
   };
@@ -546,7 +542,6 @@ export default async function ZodiacSignSlugPage({
           </div>
         </section>
 
-        <PopularSearches queries={latinQueries} />
       </section>
 
       <SiteFooter />

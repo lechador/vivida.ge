@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -20,7 +19,6 @@ import {
   signMetaBySlug,
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
-import { COMPAT_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
@@ -177,7 +175,6 @@ export default function CompatibilityHubPage() {
           </div>
         </section>
 
-        <PopularSearches queries={COMPAT_HUB_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

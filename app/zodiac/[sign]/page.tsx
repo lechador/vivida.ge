@@ -5,7 +5,6 @@ import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ReportPromo } from "@/components/report/report-promo";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -25,7 +24,6 @@ import {
   signMetaBySlug,
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
-import { signPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { ELEMENT_COLOR } from "@/lib/pdf/theme";
 import { cn } from "@/lib/utils";
@@ -132,7 +130,6 @@ export default async function ZodiacSignPage({
   const meta = signMetaBySlug(sign);
   const accent = meta ? signColor(meta) : "var(--vivida-violet)";
   const dates = ZODIAC_DATES[sign];
-  const latinQueries = signPageLatinQueries(sign);
   const availableYears = ALL_YEARLY_YEARS.filter((y) =>
     yearlyContentFor(sign, y),
   );
@@ -152,7 +149,6 @@ export default async function ZodiacSignPage({
     about: {
       "@type": "Thing",
       name: c.labelKa,
-      alternateName: latinQueries,
       description: `${c.labelKa} (${dates.rangeEn}) — ${c.tagline}`,
     },
   };
@@ -539,7 +535,6 @@ export default async function ZodiacSignPage({
           </Button>
         </div>
 
-        <PopularSearches queries={latinQueries} />
       </section>
 
       <SiteFooter />

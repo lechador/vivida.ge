@@ -7,7 +7,6 @@ import { ReportPromo } from "@/components/report/report-promo";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import {
   HUB_CONTENT,
   SIGNS_CONTENT,
@@ -18,7 +17,6 @@ import {
   ZODIAC_DATES,
   signMetaBySlug,
 } from "@/lib/seo/zodiac-dates";
-import { HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -61,7 +59,6 @@ const HUB_LD = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: HUB_CONTENT.pageTitle,
-  alternateName: HUB_LATIN_QUERIES,
   description: HUB_CONTENT.metaDescription,
   url: `${SITE_URL}${PATH}`,
   inLanguage: "ka-GE",
@@ -431,7 +428,6 @@ export default async function ZodiacHubPage() {
           </div>
         </div>
 
-        <PopularSearches queries={HUB_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

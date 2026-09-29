@@ -31,9 +31,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
-import { TESTS_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
@@ -256,8 +254,6 @@ export default async function TestsPage() {
             ))}
           </div>
         </section>
-
-        <PopularSearches queries={TESTS_HUB_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

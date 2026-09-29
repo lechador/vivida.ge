@@ -2,8 +2,6 @@ import Link from "next/link";
 import { Sparkles, Calendar } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
-import { signHoroscopeLatinQueries } from "@/lib/seo/transliteration";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -284,7 +282,6 @@ export async function HoroscopeView({
           </Button>
         </div>
 
-        <PopularSearches queries={signHoroscopeLatinQueries(sign)} />
       </section>
 
       <SiteFooter />

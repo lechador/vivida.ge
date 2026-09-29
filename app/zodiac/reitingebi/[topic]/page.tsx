@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { ReportPromo } from "@/components/report/report-promo";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
@@ -11,7 +10,6 @@ import { ensureSignRanking } from "@/actions/sign-ranking";
 import {
   ALL_RANKING_SLUGS,
   RANKING_TOPICS,
-  rankingQueries,
   rankingTopicBySlug,
 } from "@/lib/seo/rankings";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
@@ -131,7 +129,6 @@ export default async function RankingTopicPage({
     ranking?.intro ??
     `${topic.titleKa}. ქვემოთ ნახავ 12-ვე ნიშანს ${topic.shortKa} თვისების მიხედვით დალაგებულს.`;
   const faq = ranking?.faq ?? [];
-  const queries = rankingQueries(topic);
 
   const sorted = [...items].sort((a, b) => a.rank - b.rank);
 
@@ -361,7 +358,6 @@ export default async function RankingTopicPage({
           </div>
         </section>
 
-        <PopularSearches queries={queries} />
       </section>
 
       <SiteFooter />

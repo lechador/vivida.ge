@@ -47,9 +47,9 @@ export interface ArticleInput {
   /** Plain string for <h1>/search results — NOT html. */
   headline: string;
   description: string;
-  /** ISO 8601. Defaults to build time for evergreen pages. */
+  /** Actual publication date in ISO 8601, when known. */
   datePublished?: string;
-  /** ISO 8601. Set when content regenerates (daily horoscopes). */
+  /** Actual content update date in ISO 8601, when known. */
   dateModified?: string;
   /** Optional related entity (Thing/Person/Place). */
   about?: JsonLd;
@@ -58,7 +58,6 @@ export interface ArticleInput {
 }
 
 export function articleLd(input: ArticleInput): JsonLd {
-  const now = new Date().toISOString();
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -68,8 +67,10 @@ export function articleLd(input: ArticleInput): JsonLd {
     mainEntityOfPage: { "@type": "WebPage", "@id": input.url },
     author: ORG,
     publisher: ORG,
-    datePublished: input.datePublished ?? now,
-    dateModified: input.dateModified ?? input.datePublished ?? now,
+    ...(input.datePublished && { datePublished: input.datePublished }),
+    ...((input.dateModified ?? input.datePublished) && {
+      dateModified: input.dateModified ?? input.datePublished,
+    }),
     ...(input.about && { about: input.about }),
     ...(input.image && { image: input.image }),
   };
@@ -115,11 +116,7 @@ export function faqLd(entries: FaqEntry[]): JsonLd {
   };
 }
 
-/**
- * WebSite + SearchAction — emitted once on the home page so Google's
- * sitelinks search box surfaces in branded queries ("vivida" → results
- * with an inline search). Don't emit per-page; only on `/`.
- */
+/** WebSite identity, emitted once on the home page. */
 export function websiteLd(): JsonLd {
   return {
     "@context": "https://schema.org",
@@ -128,11 +125,6 @@ export function websiteLd(): JsonLd {
     name: "Vivida",
     inLanguage: "ka-GE",
     publisher: ORG,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${SITE_URL}/zodiac/datit?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
   };
 }
 

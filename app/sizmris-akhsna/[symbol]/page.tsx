@@ -6,7 +6,6 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { DreamSymbolPageEn } from "@/components/seo/dreams-en";
 import { ContentFeedback } from "@/components/analytics/content-feedback";
 
@@ -136,7 +135,6 @@ export default async function DreamSymbolPage({
       about: {
         "@type": "Thing",
         name: `${s.titleKa} სიზმარში`,
-        alternateName: s.latin,
       },
     }),
     breadcrumbLd([
@@ -319,14 +317,6 @@ export default async function DreamSymbolPage({
           </Link>
         </div>
 
-        <PopularSearches
-          queries={[
-            ...s.latin,
-            `${s.slug} sizmarshi`,
-            "sizmris axsna",
-            "sizmris axsna anbanis mixedvit",
-          ]}
-        />
       </section>
 
       <SiteFooter />

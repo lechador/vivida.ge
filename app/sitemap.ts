@@ -566,6 +566,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${BASE}/tvit-shepasebis-testi`,
+      lastModified: new Date("2026-08-28"),
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE}/mijachvulobis-testi`,
+      lastModified: new Date("2026-09-27"),
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
       url: `${BASE}/emociuri-inteleqti`,
       lastModified: CONTENT_PUBLISHED,
       changeFrequency: "monthly",

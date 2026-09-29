@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -13,7 +12,6 @@ import {
   SIGNS_CONTENT,
 } from "@/lib/seo/zodiac-content";
 import { ALL_SLUGS, ZODIAC_DATES } from "@/lib/seo/zodiac-dates";
-import { BY_DATE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 
 import { SignByDatePicker } from "./sign-by-date-picker";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -270,7 +268,6 @@ export default async function ZodiacByDatePage() {
           </div>
         </section>
 
-        <PopularSearches queries={BY_DATE_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -380,14 +379,6 @@ export default async function ChineseAnimalPage({
           </div>
         </section>
 
-        <PopularSearches
-          queries={[
-            `${animal.nameKa} ჩინური ჰოროსკოპი`,
-            `${animal.nameKa} წელი`,
-            "ჩინური ჰოროსკოპი",
-            "ზოდიაქოს ნიშნები წლების მიხედვით",
-          ]}
-        />
       </section>
 
       <SiteFooter />

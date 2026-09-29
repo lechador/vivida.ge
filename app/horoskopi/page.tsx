@@ -11,9 +11,7 @@ import { ensureSignHoroscope } from "@/actions/sign-horoscope";
 import { MundaneSkySection } from "@/components/seo/mundane-sky-section";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { VIEW_PATH, signHoroscopePeriodLabel } from "@/lib/sign-horoscope";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { genitiveKa } from "@/lib/georgian";
-import { HOROSKOPI_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import {
   ALL_SLUGS,
@@ -423,7 +421,6 @@ export default async function HoroskopiHubPage() {
           </Button>
         </div>
 
-        <PopularSearches queries={HOROSKOPI_HUB_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

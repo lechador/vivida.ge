@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -84,13 +83,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const HUB_QUERIES = [
-  "ჩინური ჰოროსკოპი",
-  "ზოდიაქოს ნიშნები წლების მიხედვით",
-  "ჩინური ზოდიაქო",
-  "ჩინური ნიშნები",
-  "ჩინური ჰოროსკოპი წლების მიხედვით",
-];
 
 export default async function ChineseZodiacHubPage() {
   const locale = await getRequestLocale();
@@ -246,7 +238,6 @@ export default async function ChineseZodiacHubPage() {
           </section>
         )}
 
-        <PopularSearches queries={HUB_QUERIES} />
       </section>
 
       <SiteFooter />

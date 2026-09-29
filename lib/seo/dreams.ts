@@ -2132,19 +2132,6 @@ export function dreamsByLetter(): { letter: string; items: DreamSymbol[] }[] {
     .sort((a, b) => a.letter.localeCompare(b.letter, "ka"));
 }
 
-/** Latin-on-QWERTY spellings for the hub's popular-searches strip. */
-export const DREAMS_LATIN_QUERIES = [
-  "sizmris axsna",
-  "sizmris akhsna",
-  "sizmrebis axsna",
-  "sizmris axsna anbanis mixedvit",
-  "sizmarshi vnaxe",
-  "sizmris axsna qartulad",
-  "sizmrebi",
-  "ras nishnavs sizmari",
-  "sizmris ganmarteba",
-];
-
 export const DREAMS_FAQ = [
   {
     q: "როგორ ვიპოვო კონკრეტული სიზმრის ახსნა?",

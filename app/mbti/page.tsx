@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -296,26 +295,6 @@ export default async function MbtiHubPage() {
           </div>
         </section>
 
-        <PopularSearches
-          locale={locale}
-          queries={
-            en
-              ? [
-                  "16 personality types",
-                  "MBTI type descriptions",
-                  "free personality test",
-                  "personality type strengths",
-                  "discover my personality type",
-                ]
-              : [
-                  "16 პიროვნების ტიპი",
-                  "პიროვნების ტესტი",
-                  "mbti ქართულად",
-                  "16 personalities ქართულად",
-                  "ფსიქოლოგიური ტესტი",
-                ]
-          }
-        />
       </section>
 
       <SiteFooter locale={locale} />

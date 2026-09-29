@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { ReportPromo } from "@/components/report/report-promo";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
@@ -77,14 +76,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return KA_METADATA;
 }
 
-const HUB_QUERIES = [
-  "ზოდიაქოს ნიშნების რეიტინგი",
-  "ყველაზე თავსებადი ზოდიაქოს ნიშნები",
-  "ყველაზე ჭკვიანი ზოდიაქოს ნიშნები",
-  "ყველაზე ეჭვიანი ნიშნები",
-  "საუკეთესო ზოდიაქოს ნიშნები",
-  "ზოდიაქოს ნიშნების დახასიათება",
-];
 
 export default async function RankingsHubPage() {
   const locale = await getRequestLocale();
@@ -197,7 +188,6 @@ export default async function RankingsHubPage() {
           <ReportPromo />
         </div>
 
-        <PopularSearches queries={HUB_QUERIES} />
       </section>
 
       <SiteFooter />

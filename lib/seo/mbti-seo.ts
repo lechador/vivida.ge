@@ -155,7 +155,7 @@ export type MbtiSeo = {
   pageTitle: string;
   metaDescription: string;
   faq: { q: string; a: string }[];
-  /** Query variants (Georgian + Latin) for PopularSearches + JSON-LD. */
+  /** Query variants (Georgian + Latin) used in metadata. */
   queries: string[];
 };
 

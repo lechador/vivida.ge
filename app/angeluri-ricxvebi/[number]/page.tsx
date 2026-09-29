@@ -6,7 +6,6 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { AngelNumberPageEn } from "@/components/seo/angel-numbers-en";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -269,17 +268,6 @@ export default async function AngelNumberPage({
           </Link>
         </div>
 
-        <PopularSearches
-          queries={[
-            `${a.slug} mnishvneloba`,
-            `${a.slug} ras nishnavs`,
-            ...(a.clockKa ? [`${a.clockKa} ras nishnavs`] : []),
-            "angeluri ricxvebi",
-            "erturi cifrebi saatze",
-            "numerologia",
-            "bedis ricxvi",
-          ]}
-        />
       </section>
 
       <SiteFooter />

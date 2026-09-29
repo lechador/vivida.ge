@@ -5,13 +5,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { PopularSearches } from "@/components/seo/popular-searches";
-import {
-  FORTUNE_METHODS,
-  MKITXAOBA_FAQ,
-  MKITXAOBA_KEYWORDS_KA,
-  MKITXAOBA_LATIN_QUERIES,
-} from "@/lib/seo/fortune-telling";
+import { FORTUNE_METHODS, MKITXAOBA_FAQ, MKITXAOBA_KEYWORDS_KA } from "@/lib/seo/fortune-telling";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
 
@@ -54,12 +48,6 @@ export default function MkitxaobaPage() {
       about: {
         "@type": "Thing",
         name: "მკითხაობა",
-        alternateName: [
-          "ტაროზე მკითხაობა",
-          "ონლაინ მკითხაობა",
-          "mkitxaoba",
-          "taroze mkitxaoba",
-        ],
       },
     }),
     breadcrumbLd([
@@ -256,7 +244,6 @@ export default function MkitxaobaPage() {
           </Link>
         </div>
 
-        <PopularSearches queries={MKITXAOBA_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

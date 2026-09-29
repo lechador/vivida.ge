@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowRight, Heart, Briefcase, Wand2 } from "lucide-react";
 
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -403,27 +402,6 @@ export default async function TarotCardPage({
           </div>
         </section>
 
-        <PopularSearches
-          locale={locale}
-          queries={
-            en
-              ? [
-                  `${card.name} tarot meaning`,
-                  `${card.name} reversed`,
-                  `${card.name} love meaning`,
-                  card.arcana === "major"
-                    ? "Major Arcana meanings"
-                    : "Minor Arcana meanings",
-                ]
-              : [
-                  `ტარო ${card.name}`,
-                  `${card.name} მნიშვნელობა`,
-                  `${card.name} შებრუნებული`,
-                  "ტარო ქართულად",
-                  "ტაროს კარტების მნიშვნელობა",
-                ]
-          }
-        />
       </section>
 
       <SiteFooter locale={locale} />

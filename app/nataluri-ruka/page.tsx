@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -171,7 +170,6 @@ export default async function NataluriRukaPage() {
     applicationCategory: "LifestyleApplication",
     operatingSystem: "Web",
     inLanguage: "ka-GE",
-    alternateName: KEYWORDS,
     offers: { "@type": "Offer", price: "0", priceCurrency: "GEL" },
     publisher: { "@type": "Organization", name: "Vivida", url: SITE_URL },
   };
@@ -422,7 +420,6 @@ export default async function NataluriRukaPage() {
           </section>
         </article>
 
-        <PopularSearches queries={KEYWORDS} />
       </section>
 
       <SiteFooter />

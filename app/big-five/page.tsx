@@ -5,7 +5,6 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { BigFiveTestClient } from "@/components/big-five/big-five-test-client";
-import { PopularSearches } from "@/components/seo/popular-searches";
 
 import { BIG5_QUESTION_COUNT, BIG5_TRAITS } from "@/lib/big-five/questions";
 import {
@@ -16,7 +15,6 @@ import {
   BIG5_FAQ,
   BIG5_FAQ_EN,
 } from "@/lib/big-five/content";
-import { BIGFIVE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -87,9 +85,7 @@ export default async function BigFiveTestPage() {
       about: {
         "@type": "Thing",
         name: en ? "Big Five personality traits" : "დიდი ხუთეული (Big Five)",
-        alternateName: en
-          ? ["Big Five", "OCEAN", "personality traits"]
-          : ["Big Five", "OCEAN", "დიდი ხუთეული", "პიროვნების ტესტი"],
+        alternateName: "OCEAN",
       },
     },
     faqLd(faq),
@@ -202,19 +198,6 @@ export default async function BigFiveTestPage() {
             ))}
           </div>
 
-          <PopularSearches
-            queries={
-              en
-                ? [
-                    "free Big Five personality test",
-                    "OCEAN personality test",
-                    "five personality traits",
-                    "Big Five profile",
-                  ]
-                : BIGFIVE_LATIN_QUERIES
-            }
-            locale={locale}
-          />
         </div>
       </section>
     </main>

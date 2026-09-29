@@ -4,7 +4,6 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LifePathCalculator } from "@/components/seo/life-path-calculator";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import {
   NUMEROLOGY_HUB_EN,
   NumerologyHubEn,
@@ -19,7 +18,6 @@ import {
   LIFE_PATH_CONTENT,
   NUMEROLOGY_FAQ,
 } from "@/lib/seo/numerology-content";
-import { NUMEROLOGY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   englishSiteHref,
@@ -258,7 +256,6 @@ export default async function NumerologiaHubPage() {
           </Button>
         </div>
 
-        <PopularSearches queries={NUMEROLOGY_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

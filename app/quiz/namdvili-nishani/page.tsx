@@ -6,9 +6,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Starfield } from "@/components/landing/starfield";
 import { TrueSignQuiz } from "@/components/true-sign/true-sign-quiz";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { TS_QUESTION_COUNT } from "@/lib/true-sign/quiz";
-import { TRUE_SIGN_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -112,9 +110,7 @@ export default async function TrueSignQuizPage() {
       about: {
         "@type": "Thing",
         name: en ? "Zodiac signs" : "ზოდიაქოს ნიშნები",
-        alternateName: en
-          ? ["zodiac", "astrology", "personality quiz"]
-          : ["ზოდიაქო", "ასტროლოგია", "პიროვნების ტესტი"],
+        alternateName: en ? "zodiac" : "ზოდიაქო",
       },
     },
     breadcrumbLd([
@@ -218,19 +214,6 @@ export default async function TrueSignQuizPage() {
             )}
           </p>
 
-          <PopularSearches
-            queries={
-              en
-                ? [
-                    "zodiac personality quiz",
-                    "which zodiac sign am I",
-                    "zodiac element quiz",
-                    "zodiac sign test",
-                  ]
-                : TRUE_SIGN_LATIN_QUERIES
-            }
-            locale={locale}
-          />
         </div>
       </section>
       <SiteFooter locale={locale} />

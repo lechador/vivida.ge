@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { genitiveKa } from "@/lib/georgian";
 import { SIGNS_CONTENT, paragraphs } from "@/lib/seo/zodiac-content";
@@ -104,7 +103,6 @@ export function ThematicHoroscopeHub({ theme }: { theme: HoroscopeTheme }) {
         <section className="mt-12"><h2 className="text-2xl font-semibold">ხშირად დასმული კითხვები</h2><div className="mt-5 space-y-3">{faq.map((item) => <details key={item.q} className="rounded-2xl border border-border bg-card/50 p-5"><summary className="cursor-pointer font-medium">{item.q}</summary><p className="mt-3 leading-7 text-foreground/78">{item.a}</p></details>)}</div></section>
 
         <div className="mt-14 rounded-3xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 p-7 text-center"><Sparkles className="mx-auto size-6 text-[var(--vivida-cyan)]" /><h2 className="mt-3 text-2xl font-semibold">გაიგე შენი სრული ასტროლოგიური პროფილი</h2><p className="mx-auto mt-2 max-w-lg text-sm text-foreground/75">მზის ნიშანი მხოლოდ დასაწყისია — პირადი რუკა ითვალისწინებს დაბადების დროს, ადგილს და ყველა პლანეტას.</p><Button asChild variant="mystic" className="mt-5"><Link href="/piradi-ruka">პირადი რუკის შედგენა</Link></Button></div>
-        <PopularSearches queries={cfg.keywords} />
       </section>
       <SiteFooter />
     </main>
@@ -124,7 +122,6 @@ export function ThematicHoroscopeDetail({ theme, sign }: { theme: HoroscopeTheme
     { q: `რას უნდა მიაქციოს ყურადღება ${sc.labelKa}-მა?`, a: content.watch },
   ];
   const ld = [articleLd({ url, headline: `${genitiveKa(sc.labelKa)} ${cfg.label}`, description: content.focus, datePublished: "2026-07-21T00:00:00+04:00", dateModified: "2026-07-21T00:00:00+04:00", about: { "@type": "Thing", name: sc.labelKa } }), breadcrumbLd([{ name: "მთავარი", url: SITE_URL }, { name: cfg.label, url: `${SITE_URL}${themeUrl(theme)}` }, { name: sc.labelKa, url }]), faqLd(faq)];
-  const latinQueries = [`${SIGN_LATIN_NAMES[sign][0]} ${cfg.slug.replaceAll("-", " ")}`, `${SIGN_LATIN_NAMES[sign][0]} ${theme === "love" ? "siyvaruli" : theme === "finance" ? "finansebi" : "kariera"}`, ...cfg.keywords];
 
   return <main className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={90} shooting={1} /><SmartHeader /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeLd(ld) }} />
     <article className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
@@ -136,6 +133,5 @@ export function ThematicHoroscopeDetail({ theme, sign }: { theme: HoroscopeTheme
       <section className="mt-12"><h2 className="text-2xl font-semibold">სხვა ნიშნების {cfg.label.toLowerCase()}</h2><div className="mt-4 flex flex-wrap gap-2">{ALL_SLUGS.filter((item) => item !== sign).map((item) => <Link key={item} href={themeUrl(theme, item)} className="rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm hover:bg-card/80">{SIGNS_CONTENT[item].symbol} {SIGNS_CONTENT[item].labelKa}</Link>)}</div></section>
       <section className="mt-12"><h2 className="text-2xl font-semibold">ხშირად დასმული კითხვები</h2><div className="mt-5 space-y-3">{faq.map((item) => <details key={item.q} className="rounded-2xl border border-border bg-card/50 p-5"><summary className="cursor-pointer font-medium">{item.q}</summary><p className="mt-3 leading-7 text-foreground/78">{item.a}</p></details>)}</div></section>
       <div className="mt-12 rounded-3xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 p-7 text-center"><h2 className="text-2xl font-semibold">ეს მზის ნიშნის ზოგადი სურათია</h2><p className="mt-2 text-sm text-foreground/75">შენი პირადი რუკა უფრო ზუსტად აჩვენებს {cfg.genitive} თემას.</p><Button asChild variant="mystic" className="mt-5"><Link href="/piradi-ruka">ჩემი პირადი რუკა</Link></Button></div>
-      <PopularSearches queries={latinQueries} />
     </article><SiteFooter /></main>;
 }

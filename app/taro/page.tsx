@@ -9,7 +9,6 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { TarotReader } from "@/components/tarot/tarot-reader";
 import { TarotConversionLanding } from "@/components/tarot/tarot-conversion-landing";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { tarotDetailDeck, type TarotDetailCard } from "@/lib/tarot/detail";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -19,7 +18,6 @@ import {
   GEORGIAN_SITE_URL,
   localizedAlternates,
 } from "@/lib/seo/locales";
-import { TAROT_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 
@@ -308,21 +306,6 @@ export default async function TaroHubPage() {
           </div>
         )}
 
-        {!authed && (
-          <PopularSearches
-            locale={locale}
-            queries={
-              en
-                ? [
-                    "free online tarot reading",
-                    "three card tarot spread",
-                    "Major Arcana meanings",
-                    "upright and reversed tarot cards",
-                  ]
-                : TAROT_LATIN_QUERIES
-            }
-          />
-        )}
       </section>
 
       <SiteFooter locale={locale} />

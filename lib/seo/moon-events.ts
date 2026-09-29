@@ -3,7 +3,11 @@ import {
   utcDateString,
   type MoonPhaseSnapshot,
 } from "@/lib/moon-phase";
-import { MONTHS_KA, dateIso } from "@/lib/seo/astrology-calendar";
+import {
+  MONTHS_KA,
+  dateIso,
+  parseCalendarDate,
+} from "@/lib/seo/astrology-calendar";
 
 export type MoonEventKind = "full" | "new";
 export type MoonEvent = {
@@ -102,6 +106,29 @@ export function moonEvents(
   if (eventCache.size > 12) eventCache.clear();
   eventCache.set(cacheKey, events);
   return events;
+}
+
+/**
+ * Resolve a detail URL from its own date rather than today's upcoming list.
+ * That list intentionally has a short discovery horizon, but a URL already
+ * published or linked must keep working after the event passes. The focused
+ * seven-day scan still verifies that the requested date is an actual event.
+ */
+export function moonEventForDate(
+  kind: MoonEventKind,
+  iso: string,
+): MoonEvent | null {
+  const date = parseCalendarDate(iso);
+  if (!date) return null;
+
+  // The site began publishing these pages in 2026. Keep requests within a
+  // useful calendar range so malformed or extreme years never reach the
+  // ephemeris calculation.
+  const year = date.getUTCFullYear();
+  if (year < 2026 || year > 2100) return null;
+
+  date.setUTCDate(date.getUTCDate() - 3);
+  return moonEvents(kind, 7, date).find((event) => event.iso === iso) ?? null;
 }
 
 export type Eclipse = {

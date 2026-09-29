@@ -4,7 +4,6 @@ import { ArrowRight, CalendarDays, ShieldAlert, Sparkles } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { astrologyDay, calendarWindow, dayAdvice, WEEKDAYS_KA, type AstrologyCalendarDay, type CalendarTone } from "@/lib/seo/astrology-calendar";
 
@@ -49,7 +48,6 @@ export function AstrologyCalendarHub({ filter = "all" }: { filter?: "all" | "luc
       {filter === "all" && <div className="mt-14 grid gap-6 lg:grid-cols-2"><section><h2 className="text-2xl font-semibold">უახლოესი იღბლიანი დღეები</h2><div className="mt-4 space-y-2">{lucky.map((day) => <DayCard key={day.iso} day={day} />)}</div></section><section><h2 className="text-2xl font-semibold">უახლოესი ფრთხილი დღეები</h2><div className="mt-4 space-y-2">{careful.map((day) => <DayCard key={day.iso} day={day} />)}</div></section></div>}
       <section className="mt-14 max-w-3xl"><h2 className="text-2xl font-semibold">როგორ გამოიყენო კალენდარი</h2><p className="mt-4 leading-8 text-foreground/80">საერთო ასტროლოგიური კალენდარი აჩვენებს კოლექტიურ ფონს. აირჩიე თარიღი, ნახე დღის მთავარი ასპექტები და გამოიყენე რეკომენდაციები დაგეგმვის დამატებით ინსტრუმენტად. ჯანმრთელობის, ფინანსური ან სამართლებრივი გადაწყვეტილება მხოლოდ ასტროლოგიურ შეფასებაზე არ დააფუძნო.</p></section>
       <section className="mt-12"><h2 className="text-2xl font-semibold">ხშირად დასმული კითხვები</h2><div className="mt-5 space-y-3">{faq.map((item) => <details key={item.q} className="rounded-2xl border border-border bg-card/50 p-5"><summary className="cursor-pointer font-medium">{item.q}</summary><p className="mt-3 leading-7 text-foreground/78">{item.a}</p></details>)}</div></section>
-      <PopularSearches queries={["ასტროლოგიური კალენდარი", "იღბლიანი დღეები", "ფრთხილი დღეები", "დღის ასტროლოგიური პროგნოზი", "როდის არის კარგი დღე", "astrologiuri kalendari"]} />
     </section><SiteFooter /></main>;
 }
 

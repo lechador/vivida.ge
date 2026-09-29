@@ -7,10 +7,8 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { IqTestClient } from "@/components/iq/iq-test";
 import { IQ_ADAPTIVE_LENGTH } from "@/lib/iq/adaptive";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 
-import { IQ_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -124,9 +122,7 @@ export default async function IqTestPage() {
       about: {
         "@type": "Thing",
         name: en ? "Intelligence quotient (IQ)" : "ინტელექტის კოეფიციენტი (IQ)",
-        alternateName: en
-          ? ["IQ", "intelligence test", "reasoning test"]
-          : ["IQ", "ინტელექტის ტესტი", "iq ტესტი"],
+        alternateName: "IQ",
       },
     },
     faqLd(faq),
@@ -373,19 +369,6 @@ export default async function IqTestPage() {
           </div>
         </section>
 
-        <PopularSearches
-          locale={locale}
-          queries={
-            en
-              ? [
-                  "free online IQ test",
-                  "adaptive IQ test",
-                  "logic and pattern test",
-                  "estimated IQ score",
-                ]
-              : IQ_LATIN_QUERIES
-          }
-        />
       </section>
 
       <SiteFooter locale={locale} />

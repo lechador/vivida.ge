@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { MoonPhaseDetail } from "@/components/seo/moon-event-pages";
-import { moonEvents } from "@/lib/seo/moon-events";
+import { moonEventForDate, moonEvents } from "@/lib/seo/moon-events";
 import { MoonPhaseDetailEn } from "@/components/seo/moon-event-pages-en";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -22,7 +22,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { date } = await params;
-  const e = moonEvents("new").find((x) => x.iso === date);
+  const e = moonEventForDate("new", date);
   if (!e) return {};
   const path = `/akhali-mtvare/${date}`;
   const locale = await getRequestLocale();
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { date } = await params;
-  const e = moonEvents("new").find((x) => x.iso === date);
+  const e = moonEventForDate("new", date);
   if (!e) notFound();
   const locale = await getRequestLocale();
   if (locale === "en") return <MoonPhaseDetailEn event={e} />;

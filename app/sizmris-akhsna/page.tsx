@@ -5,7 +5,6 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { DREAMS_HUB_EN, DreamsHubEn } from "@/components/seo/dreams-en";
 import { DreamInterpreter } from "@/components/seo/dream-interpreter";
 import { DreamSymbolFilter } from "@/components/seo/dream-symbol-filter";
@@ -14,12 +13,7 @@ import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
 import { auth } from "@/auth";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import {
-  DREAMS_FAQ,
-  DREAMS_LATIN_QUERIES,
-  DREAM_SYMBOLS,
-  dreamsByLetter,
-} from "@/lib/seo/dreams";
+import { DREAMS_FAQ, DREAM_SYMBOLS, dreamsByLetter } from "@/lib/seo/dreams";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   englishSiteHref,
@@ -116,11 +110,7 @@ export default async function DreamsHubPage() {
       about: {
         "@type": "Thing",
         name: "სიზმრის ახსნა",
-        alternateName: [
-          "სიზმრების ახსნა",
-          "sizmris axsna",
-          "dream interpretation",
-        ],
+        alternateName: "სიზმრების ახსნა",
       },
     }),
     breadcrumbLd([
@@ -315,7 +305,6 @@ export default async function DreamsHubPage() {
           </TrackedPublicLink>
         </div>
 
-        <PopularSearches queries={DREAMS_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />

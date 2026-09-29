@@ -8,10 +8,8 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { MbtiTestClient } from "@/components/mbti/mbti-test-client";
 import { TestMusicPlayer } from "@/components/mbti/test-music-player";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 
-import { PERSONALITY_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { MBTI_QUESTIONS_EN } from "@/lib/mbti-questions";
@@ -147,9 +145,7 @@ export default async function TestPage() {
       about: {
         "@type": "Thing",
         name: en ? "Personality type (MBTI-style)" : "პიროვნების ტიპი (MBTI)",
-        alternateName: en
-          ? ["MBTI", "16 personality types", "personality test"]
-          : ["MBTI", "16 personalities", "პიროვნების ტესტი"],
+        alternateName: "MBTI",
       },
     },
     faqLd(
@@ -428,19 +424,6 @@ export default async function TestPage() {
           </div>
         </section>
 
-        <PopularSearches
-          queries={
-            en
-              ? [
-                  "free personality type test",
-                  "16 personalities test",
-                  "MBTI style test",
-                  "discover my personality type",
-                ]
-              : PERSONALITY_LATIN_QUERIES
-          }
-          locale={locale}
-        />
       </section>
 
       <SiteFooter locale={locale} />

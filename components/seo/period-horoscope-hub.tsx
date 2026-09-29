@@ -6,10 +6,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { ensureSignHoroscope } from "@/actions/sign-horoscope";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { genitiveKa } from "@/lib/georgian";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { PERIOD_HUB_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { VIEW_PATH, signHoroscopePeriodLabel } from "@/lib/sign-horoscope";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { ALL_SLUGS, ZODIAC_DATES, signMetaBySlug } from "@/lib/seo/zodiac-dates";
@@ -365,7 +363,6 @@ export async function PeriodHoroscopeHub({ period }: { period: Period }) {
           </Button>
         </div>
 
-        <PopularSearches queries={PERIOD_HUB_LATIN_QUERIES[period]} />
       </section>
 
       <SiteFooter />

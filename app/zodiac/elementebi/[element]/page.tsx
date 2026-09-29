@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -19,7 +18,6 @@ import {
   signMetaBySlug,
   type ElementSlug,
 } from "@/lib/seo/zodiac-dates";
-import { elementPageLatinQueries } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacElementPageEn } from "@/components/seo/zodiac-elements-en";
@@ -132,7 +130,6 @@ export default async function ElementDetailPage({
 
   const accent = ELEMENT_ACCENT[element];
   const labelKa = ELEMENT_LABEL_KA[element];
-  const latinQueries = elementPageLatinQueries(element);
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -146,7 +143,7 @@ export default async function ElementDetailPage({
     },
     author: { "@type": "Organization", name: "Vivida", url: SITE_URL },
     publisher: { "@type": "Organization", name: "Vivida", url: SITE_URL },
-    about: { "@type": "Thing", name: labelKa, alternateName: latinQueries },
+    about: { "@type": "Thing", name: labelKa },
   };
 
   const faqLd = {
@@ -396,7 +393,6 @@ export default async function ElementDetailPage({
           </Button>
         </div>
 
-        <PopularSearches queries={latinQueries} />
       </section>
 
       <SiteFooter />

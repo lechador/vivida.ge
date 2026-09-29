@@ -254,14 +254,3 @@ export const ALL_RANKING_SLUGS = RANKING_TOPICS.map((t) => t.slug);
 export function rankingTopicBySlug(slug: string): RankingTopic | undefined {
   return RANKING_TOPICS.find((t) => t.slug === slug);
 }
-
-/** A few search-style strings for the PopularSearches strip on a topic page. */
-export function rankingQueries(topic: RankingTopic): string[] {
-  return [
-    topic.titleKa,
-    `${topic.shortKa} ნიშანი`,
-    `${topic.shortKa} ვინ არის`,
-    "ზოდიაქოს ნიშნები რეიტინგი",
-    "ზოდიაქოს ნიშნების დახასიათება",
-  ];
-}

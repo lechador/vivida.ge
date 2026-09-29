@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -113,7 +112,6 @@ export default async function MbtiTypePage({
   const pageTitle = en ? seoEn.pageTitle : seoKa.pageTitle;
   const metaDescription = en ? seoEn.metaDescription : seoKa.metaDescription;
   const faq = en ? seoEn.faq : seoKa.faq;
-  const queries = en ? seoEn.queries : seoKa.queries;
 
   const library = en
     ? null
@@ -135,7 +133,6 @@ export default async function MbtiTypePage({
       about: {
         "@type": "Thing",
         name: `${code} — ${archetype}`,
-        alternateName: queries,
         description: tagline,
       },
     }),
@@ -318,7 +315,6 @@ export default async function MbtiTypePage({
           </div>
         </section>
 
-        <PopularSearches queries={queries} locale={locale} />
       </section>
 
       <SiteFooter locale={locale} />

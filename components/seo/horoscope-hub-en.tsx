@@ -2,7 +2,6 @@ import { EnglishLink as Link } from "@/components/i18n/international-link";
 import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -247,16 +246,6 @@ export function HoroscopeHubEn() {
             <Link href="/natal-chart">Calculate my birth chart</Link>
           </Button>
         </div>
-        <PopularSearches
-          locale="en"
-          queries={[
-            "daily horoscope",
-            "today horoscope",
-            "zodiac horoscope",
-            "weekly horoscope",
-            "monthly horoscope",
-          ]}
-        />
       </section>
       <SiteFooter locale="en" />
     </main>

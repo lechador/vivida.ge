@@ -1,7 +1,6 @@
 import { EnglishLink as Link } from "@/components/i18n/international-link";
 
 import { PublicNatalCalculator } from "@/components/calculator/public-natal-calculator";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -232,16 +231,6 @@ export function NatalChartPageEn() {
           </section>
         </article>
 
-        <PopularSearches
-          locale="en"
-          queries={[
-            "free birth chart",
-            "natal chart calculator",
-            "astrology birth chart",
-            "calculate rising sign",
-            "birth chart houses",
-          ]}
-        />
       </section>
       <SiteFooter locale="en" />
     </main>

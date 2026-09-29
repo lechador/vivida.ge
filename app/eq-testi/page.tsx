@@ -5,10 +5,8 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { EqTestClient } from "@/components/eq/eq-test-client";
-import { PopularSearches } from "@/components/seo/popular-searches";
 
 import { EQ_QUESTION_COUNT, EQ_DOMAINS } from "@/lib/eq/questions";
-import { EQ_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -128,9 +126,7 @@ export default async function EqTestPage() {
       about: {
         "@type": "Thing",
         name: en ? "Emotional intelligence (EQ)" : "ემოციური ინტელექტი (EQ)",
-        alternateName: en
-          ? ["EQ", "emotional intelligence", "EQ test"]
-          : ["EQ", "ემოციური ინტელექტი", "eq ტესტი"],
+        alternateName: "EQ",
       },
     },
     faqLd(faq),
@@ -241,19 +237,6 @@ export default async function EqTestPage() {
             ))}
           </div>
 
-          <PopularSearches
-            queries={
-              en
-                ? [
-                    "free emotional intelligence test",
-                    "online EQ test",
-                    "empathy and self awareness test",
-                    "emotional intelligence score",
-                  ]
-                : EQ_LATIN_QUERIES
-            }
-            locale={locale}
-          />
         </div>
       </section>
     </main>

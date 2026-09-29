@@ -16,13 +16,7 @@ import {
   type MoonPhaseSnapshot,
   type PhaseKey,
 } from "@/lib/moon-phase";
-import { PopularSearches } from "@/components/seo/popular-searches";
-import {
-  LUNAR_DAY_NOTES,
-  MOON_LATIN_QUERIES,
-  PHASE_GUIDE,
-  lunarDayFromAge,
-} from "@/lib/seo/moon-reference";
+import { LUNAR_DAY_NOTES, PHASE_GUIDE, lunarDayFromAge } from "@/lib/seo/moon-reference";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   moonCalendarEnCopy,
@@ -761,7 +755,6 @@ export default async function MoonCalendarPage() {
           </div>
         </section>
 
-        <PopularSearches queries={MOON_LATIN_QUERIES} className="mb-14 mt-0" />
 
         <ReportPromo className="mt-16" />
         <div className="mt-6 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10">

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowRight, RotateCcw, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PopularSearches } from "@/components/seo/popular-searches";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -11,7 +10,6 @@ import {
   isMercuryRetrogradeNow,
   mercuryRetrogradePeriods,
 } from "@/lib/retrograde";
-import { RETROGRADE_LATIN_QUERIES } from "@/lib/seo/transliteration";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   MERCURY_RETROGRADE_EN,
@@ -315,7 +313,6 @@ export default async function MercuryRetrogradePage() {
           </Button>
         </div>
 
-        <PopularSearches queries={RETROGRADE_LATIN_QUERIES} />
       </section>
 
       <SiteFooter />
