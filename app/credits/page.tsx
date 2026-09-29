@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import {
   getBalance,
   getCreditHistoryPage,
+  getRecentSpend,
   type CreditHistoryFilter,
 } from "@/lib/credits";
 import { getReferralStats } from "@/lib/referral";
@@ -34,6 +35,7 @@ import { kaDayMonthGenitive } from "@/lib/i18n/ka-date";
 import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
 import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
+import { SpendAnchor } from "@/components/billing/spend-anchor";
 import { CreditHistory } from "@/components/credits/credit-history";
 import { CreditProgressCard } from "@/components/credits/credit-progress-card";
 import { nextMonthlyBonusDate } from "@/lib/credit-progress";
@@ -82,15 +84,13 @@ export default async function CreditsPage({
     ? query.product[0]
     : query.product;
   const product =
-    typeof rawProduct === "string" &&
-    /^[a-z0-9_-]{1,60}$/i.test(rawProduct)
+    typeof rawProduct === "string" && /^[a-z0-9_-]{1,60}$/i.test(rawProduct)
       ? rawProduct
       : null;
   if (product) loginQuery.set("product", product);
   const rawPack = Array.isArray(query.pack) ? query.pack[0] : query.pack;
-  const selectedPackId = rawPack === "s" || rawPack === "m" || rawPack === "l"
-    ? rawPack
-    : null;
+  const selectedPackId =
+    rawPack === "s" || rawPack === "m" || rawPack === "l" ? rawPack : null;
   if (selectedPackId) loginQuery.set("pack", selectedPackId);
   const loginReturn =
     loginQuery.size > 0 ? `/credits?${loginQuery.toString()}` : "/credits";
@@ -113,7 +113,7 @@ export default async function CreditsPage({
   const parsedPage = Number.parseInt(pageParam ?? "1", 10);
   const historyPage =
     Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
-  const [balance, ref, storedIdentity, premium, offer, history] =
+  const [balance, ref, storedIdentity, premium, offer, history, recentSpend] =
     await Promise.all([
       getBalance(user.id),
       getReferralStats(user.id),
@@ -126,6 +126,9 @@ export default async function CreditsPage({
         filter: historyFilter,
         page: historyPage,
       }),
+      // Trailing-30-day gated-action spend for the PRO value anchor (one
+      // indexed SUM; the component stays hidden for premium/light spenders).
+      getRecentSpend(user.id),
     ]);
   // Accounts created before residence tracking have no country, which would
   // hide PRO and fall the packs back to GEL by luck rather than by geo. Same
@@ -187,6 +190,16 @@ export default async function CreditsPage({
             locale={locale}
           />
         </div>
+
+        {!premium && (
+          <div className="mt-4">
+            <SpendAnchor
+              spend={recentSpend}
+              countryCode={identity?.countryCode}
+              locale={locale}
+            />
+          </div>
+        )}
 
         {showPurchasePromotions && !offer && (
           <div className="mt-4">

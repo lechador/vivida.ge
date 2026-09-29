@@ -70,6 +70,34 @@ export async function getBalance(userId: string): Promise<number> {
 }
 
 /**
+ * Credits consumed on gated actions (`spend_*` ledger rows) in the trailing
+ * `days` window. Free allowances record zero-amount rows, so they contribute
+ * nothing; purchases and grants are positive and excluded by construction.
+ * Used for the PRO-vs-spend anchor — a value signal, not a cash total, since
+ * the ledger doesn't record which spend came from paid packs.
+ */
+export async function getRecentSpend(
+  userId: string,
+  days = 30,
+): Promise<number> {
+  const since = new Date(Date.now() - days * 86_400_000);
+  const [row] = await db
+    .select({
+      total: sql<number>`coalesce(sum(-${creditTransactions.amount}), 0)`,
+    })
+    .from(creditTransactions)
+    .where(
+      and(
+        eq(creditTransactions.userId, userId),
+        gte(creditTransactions.createdAt, since),
+        sql`${creditTransactions.amount} < 0`,
+        sql`${creditTransactions.reason} LIKE 'spend_%'`,
+      ),
+    );
+  return Math.max(0, Math.round(Number(row?.total ?? 0)));
+}
+
+/**
  * Add credits (idempotency is the caller's job via a unique `ref` when needed —
  * e.g. one referral row, one stripe session). Upserts the account and appends a
  * ledger row.
