@@ -17,6 +17,9 @@ import {
 import { getSignupLocale } from "@/lib/i18n/request-locale";
 import { clientIpFromHeaders } from "@/lib/api/security";
 import { checkNewSignup, hashSignupIp } from "@/lib/signup-abuse";
+import { normalizeGeorgianMobile } from "@/lib/phone";
+import { completePhoneLogin } from "@/lib/phone-auth";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 /**
  * Credentials provider for the email/password login flow. Lives in
@@ -66,6 +69,59 @@ const credentialsProvider = Credentials({
   },
 });
 
+/**
+ * Credentials provider for phone-number login. The user requests an SMS
+ * code (server action in actions/phone.ts), then signs in with
+ * (phone, code). The code is consumed here server-side (single-use,
+ * 5-attempt cap, 10-minute TTL — see lib/phone-auth.ts), so posting to
+ * this provider directly is safe: a wrong or replayed code simply fails.
+ * The PHONE_* sentinel errors let the calling action render localized
+ * copy instead of a generic "wrong credentials".
+ */
+const phoneProvider = Credentials({
+  id: "phone",
+  name: "Phone",
+  credentials: {
+    phone: { label: "Phone", type: "tel" },
+    code: { label: "Code", type: "text" },
+  },
+  async authorize(raw, request) {
+    const phone = normalizeGeorgianMobile(
+      typeof raw?.phone === "string" ? raw.phone : "",
+    );
+    const code = typeof raw?.code === "string" ? raw.code.trim() : "";
+    if (!phone || !/^\d{6}$/.test(code)) return null;
+
+    // Direct posts to /api/auth/callback/phone bypass the action's
+    // checks, so the provider carries its own per-IP attempt cap.
+    try {
+      await enforceRateLimit({
+        bucket: "phone_login_verify_ip",
+        identifier: clientIpFromHeaders(request.headers),
+        limit: 30,
+        windowMs: 15 * 60 * 1000,
+      });
+    } catch {
+      throw new Error("PHONE_RATE_LIMITED");
+    }
+
+    const result = await completePhoneLogin({ phone, code });
+    if (!result.ok) {
+      // "Invalid/expired" returns null → Auth.js reports CredentialsSignin;
+      // the no-account case gets a distinct sentinel for better UX copy.
+      if (result.error === "no_account") throw new Error("PHONE_NO_ACCOUNT");
+      return null;
+    }
+
+    return {
+      id: result.user.id,
+      name: result.user.name,
+      email: result.user.email,
+      image: result.user.image,
+    };
+  },
+});
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: DrizzleAdapter(db, {
@@ -74,7 +130,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }),
-  providers: [...authConfig.providers, credentialsProvider],
+  providers: [...authConfig.providers, credentialsProvider, phoneProvider],
   callbacks: {
     ...authConfig.callbacks,
     // Auth.js calls signIn before the adapter inserts a new OAuth user. Keep

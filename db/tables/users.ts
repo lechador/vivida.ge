@@ -32,6 +32,14 @@ export const users = pgTable(
      * via the OAuth provider instead of a stored hash.
      */
     passwordHash: text("password_hash"),
+    /**
+     * E.164 mobile number (+995XXXXXXXXX). Only ever set after an SMS code
+     * proves control of the number; unique so a number maps to at most one
+     * account (phone login resolves the account through this column).
+     */
+    phone: text("phone").unique(),
+    /** Timestamp of the SMS OTP verification that proved control of `phone`. */
+    phoneVerifiedAt: timestamp("phone_verified_at", { withTimezone: true }),
     // ── Email preferences ──────────────────────────────────────────────
     // Default ON: users registered specifically for an astrology service,
     // so daily horoscope + nudges are expected. Marketing also defaults ON
@@ -180,6 +188,52 @@ export const authTokens = pgTable(
 );
 
 /**
+ * Short-lived SMS OTP challenges for the phone flows: optional verification
+ * during signup, phone-number login, and adding/changing the number in the
+ * account. The 6-digit code is single-use, expires fast, and is stored only
+ * as a hash. A challenge becomes claimable once the code was entered
+ * correctly (`verifiedAt`); signup passes `claimToken` back to bind the
+ * verified number, so a browser can never attach a number it didn't prove
+ * control of.
+ */
+export const phoneVerificationPurposeEnum = pgEnum(
+  "phone_verification_purpose",
+  ["signup", "login", "account"],
+);
+
+export const phoneVerifications = pgTable(
+  "phone_verification",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    /** E.164 (+995XXXXXXXXX) — see lib/phone.ts normalization. */
+    phone: text("phone").notNull(),
+    purpose: phoneVerificationPurposeEnum("purpose").notNull(),
+    /** SHA-256 of `${phone}:${code}` — the raw code never touches the DB. */
+    codeHash: text("code_hash").notNull(),
+    /** Random token handed to the client only after a correct code entry;
+     *  signup submits it to bind the verified number to the new account. */
+    claimToken: text("claim_token").notNull().unique(),
+    /** Owner for the account purpose; NULL for signup/login challenges,
+     *  which run before (or without) a session. */
+    userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+    /** Wrong-code guesses consumed so far; the row dies at the cap. */
+    attempts: integer("attempts").notNull().default(0),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    /** Set when the correct code was entered. */
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    /** Set when the verification was used up (session established, claim
+     *  bound to an account, number saved). */
+    consumedAt: timestamp("consumed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("phone_verification_phone_purpose_idx").on(t.phone, t.purpose)],
+);
+
+/**
  * Refresh tokens for the mobile (Flutter) API.
  *
  * The website uses Auth.js cookie sessions; native apps can't, so the
@@ -252,3 +306,10 @@ export type RateLimitHit = typeof rateLimitHits.$inferSelect;
 export type NewRateLimitHit = typeof rateLimitHits.$inferInsert;
 
 export type AuthTokenPurpose = (typeof authTokenPurposeEnum.enumValues)[number];
+
+export type PhoneVerification = typeof phoneVerifications.$inferSelect;
+
+export type NewPhoneVerification = typeof phoneVerifications.$inferInsert;
+
+export type PhoneVerificationPurpose =
+  (typeof phoneVerificationPurposeEnum.enumValues)[number];

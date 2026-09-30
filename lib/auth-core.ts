@@ -4,6 +4,8 @@ import { randomBytes } from "node:crypto";
 
 import { db } from "@/db";
 import { authTokens, users, type AuthTokenPurpose } from "@/db/schema";
+import { generateOtpCode } from "@/lib/otp";
+import { bindSignupPhoneClaim } from "@/lib/phone-auth";
 import { awardJoinedReputation } from "@/lib/reputation";
 import { onUserSignedUp, qualifyReferral } from "@/lib/referral";
 import { ensureUsername } from "@/lib/username";
@@ -38,14 +40,7 @@ export function isValidEmail(email: string): boolean {
 }
 
 /** A 6-digit numeric OTP (zero-padded, uniform over 000000–999999). */
-export function generateOtpCode(): string {
-  // rejection-sample a uniform 0–999999 to avoid modulo bias
-  let n: number;
-  do {
-    n = randomBytes(3).readUIntBE(0, 3); // 0 .. 16_777_215
-  } while (n >= 16_000_000);
-  return String(n % 1_000_000).padStart(6, "0");
-}
+export { generateOtpCode };
 
 /**
  * Issue a single-use auth token, superseding any existing token of the
@@ -77,6 +72,24 @@ export async function issueAuthToken(
 
 // ─── Register ────────────────────────────────────────────────────────────
 
+/**
+ * Apply an optional signup-time phone verification claim to a (possibly
+ * just-created) account. Returns a RegisterError code when the claim is
+ * stale/gone or the number already belongs to another account, null when
+ * there was nothing to bind or the bind succeeded. The claim row only
+ * exists server-side after a correct SMS code entry, so a browser can
+ * never attach a number it did not prove control of.
+ */
+async function bindSignupPhoneIfClaimed(
+  userId: string,
+  claimToken: string | null | undefined,
+): Promise<RegisterError | null> {
+  if (!claimToken) return null;
+  const bound = await bindSignupPhoneClaim({ userId, claimToken });
+  if (bound.ok) return null;
+  return bound.error === "phone_taken" ? "phone_taken" : "phone_claim_invalid";
+}
+
 export type RegisterError =
   | "invalid_name"
   | "invalid_email"
@@ -85,6 +98,8 @@ export type RegisterError =
   | "oauth_only"
   | "duplicate_registration"
   | "signup_rate_limited"
+  | "phone_taken"
+  | "phone_claim_invalid"
   | "failed";
 
 export type RegisterResult =
@@ -115,6 +130,9 @@ export async function registerUser(input: {
   interfaceLanguage?: UserLocale;
   residenceCountryCode?: string | null;
   ip?: string | null;
+  /** Optional signup-time phone verification claim (see lib/phone-auth):
+   *  when present, the verified number is bound to the account. */
+  phoneClaimToken?: string | null;
 }): Promise<RegisterResult> {
   const name = input.name.trim();
   const email = normalizeEmail(input.email);
@@ -170,6 +188,11 @@ export async function registerUser(input: {
     } catch {
       /* best-effort — never block the resume */
     }
+    const phoneError = await bindSignupPhoneIfClaimed(
+      existing.id,
+      input.phoneClaimToken,
+    );
+    if (phoneError) return { ok: false, error: phoneError };
     const verifyCode = generateOtpCode();
     const verifyToken = await issueAuthToken(
       existing.id,
@@ -231,6 +254,12 @@ export async function registerUser(input: {
       (err as Error).message,
     );
   }
+
+  const phoneError = await bindSignupPhoneIfClaimed(
+    created.id,
+    input.phoneClaimToken,
+  );
+  if (phoneError) return { ok: false, error: phoneError };
 
   const verifyCode = generateOtpCode();
   const verifyToken = await issueAuthToken(

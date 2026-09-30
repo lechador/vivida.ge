@@ -100,6 +100,9 @@ export const ANALYTICS_EVENT = {
   pwaStandaloneFirstOpen: "pwa_standalone_first_open",
   proBriefViewed: "pro_brief_viewed",
   proBriefAnswered: "pro_brief_answered",
+  phoneCodeSent: "phone_code_sent",
+  phoneVerified: "phone_verified",
+  phoneLoginCompleted: "phone_login_completed",
 } as const;
 
 export type AnalyticsEventName =

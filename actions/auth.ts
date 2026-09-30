@@ -15,6 +15,7 @@ import {
   prepareVerificationResend,
   registerUser,
 } from "@/lib/auth-core";
+import { authErrorText } from "@/lib/auth-error";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/email";
 import { enforceAuthRateLimit, enforceRateLimit } from "@/lib/rate-limit";
 import { ApiError } from "@/lib/api/errors";
@@ -108,6 +109,18 @@ function registerError(error: string, locale: UserLocale): string {
         "ამ კავშირიდან ძალიან ბევრი რეგისტრაციის მცდელობა იყო. სცადე მოგვიანებით.",
         "Too many registration attempts from this connection. Please try again later.",
       );
+    case "phone_taken":
+      return localized(
+        locale,
+        "ეს ნომერი უკვე მიბმულია სხვა ანგარიშზე. სცადე შესვლა ნომრით ან მიუთითე სხვა ნომერი.",
+        "This number is already linked to another account. Sign in with it or use a different number.",
+      );
+    case "phone_claim_invalid":
+      return localized(
+        locale,
+        "ნომრის დადასტურებას ვადა გაუვიდა. დაადასტურე ხელახლა ან წაშალე ნომერი და გააგრძელე მის გარეშე.",
+        "Your phone verification has expired. Verify it again, or remove the number and continue without it.",
+      );
     case "failed":
     default:
       return localized(
@@ -126,6 +139,9 @@ export type SignUpInput = {
   password: string;
   /** Cloudflare Turnstile token from the client widget. */
   turnstileToken: string | null;
+  /** Signup-time phone verification claim (see actions/phone.ts). When
+   *  present, the verified number is bound to the new account. */
+  phoneClaimToken?: string | null;
 };
 
 export type SignUpResult = { ok: true } | { ok: false; error: string };
@@ -189,6 +205,7 @@ export async function signUpWithEmail(
       interfaceLanguage: locale,
       residenceCountryCode: countryCodeFromHeaders(requestHeaders),
       ip,
+      phoneClaimToken: input.phoneClaimToken ?? null,
     });
   } catch (err) {
     console.warn("[signUpWithEmail] register failed:", (err as Error).message);
@@ -492,7 +509,10 @@ export async function signInWithEmail(
     });
     return { ok: true };
   } catch (err) {
-    const message = (err as Error).message ?? "";
+    // The provider's sentinel lives in the error *cause* — Auth.js wraps a
+    // thrown plain Error in a CallbackRouteError whose own message is just a
+    // docs link (see lib/auth-error.ts).
+    const message = authErrorText(err);
     if (message.includes("EMAIL_NOT_VERIFIED")) {
       return {
         ok: false,

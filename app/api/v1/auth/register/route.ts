@@ -34,6 +34,8 @@ const MESSAGES: Record<RegisterError, string> = {
     "This registration needs review. Please sign in to your existing account or contact support.",
   signup_rate_limited:
     "Too many new accounts from this connection. Please try again later.",
+  phone_taken: "This number is already linked to another account",
+  phone_claim_invalid: "Phone verification has expired",
   failed: "Could not create the account",
 };
 

@@ -19,6 +19,7 @@ import { AiAvatarGenerator } from "@/components/account/ai-avatar-generator";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { EmailPreferencesCard } from "@/components/account/email-preferences-card";
 import { LanguageCard } from "@/components/account/language-card";
+import { PhoneCard } from "@/components/account/phone-card";
 import { ResidenceCard } from "@/components/account/residence-card";
 import { ReminderPreferencesCard } from "@/components/account/reminder-preferences-card";
 import { VerifiedBadge } from "@/components/profile/verified-badge";
@@ -61,6 +62,7 @@ export default async function AccountPage() {
           locale: users.interfaceLanguage,
           countryCode: users.residenceCountryCode,
           city: users.residenceCity,
+          phone: users.phone,
         })
         .from(users)
         .where(eq(users.id, user.id))
@@ -230,6 +232,11 @@ export default async function AccountPage() {
             initialCity={emailPrefs?.city ?? null}
             locale={locale}
           />
+        </div>
+
+        {/* Mobile number — SMS-verified phone login */}
+        <div className="mb-6">
+          <PhoneCard initialPhone={emailPrefs?.phone ?? null} locale={locale} />
         </div>
 
         {/* Public profile fields */}

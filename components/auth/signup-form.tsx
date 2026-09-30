@@ -8,6 +8,7 @@ import { CheckCircle2, Loader2, MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneVerify } from "@/components/auth/phone-verify";
 import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { signUpWithEmail, verifyEmailWithCode } from "@/actions/auth";
@@ -32,6 +33,13 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Optional SMS verification of a mobile number (see PhoneVerify).
+  const [phoneInput, setPhoneInput] = useState("");
+  const [phoneClaim, setPhoneClaim] = useState<{
+    phone: string;
+    claimToken: string | null;
+  } | null>(null);
 
   // Code-entry (OTP) state on the "check your inbox" screen.
   const [code, setCode] = useState("");
@@ -82,18 +90,32 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    // A half-filled, unverified number would silently be dropped server-
+    // side — ask the user to verify it or remove it instead.
+    if (phoneInput.trim() && !phoneClaim) {
+      setError(
+        en
+          ? "Your number isn't verified yet — verify it with the SMS code, or remove it."
+          : "ნომერი ჯერ არ არის დადასტურებული — დაადასტურე SMS კოდით, ან წაშალე ნომერი.",
+      );
+      return;
+    }
     startTransition(async () => {
       const result = await signUpWithEmail({
         name,
         email,
         password,
         turnstileToken,
+        phoneClaimToken: phoneClaim?.claimToken ?? null,
       });
       if (result.ok) {
         // Account created, but email is not verified yet — a distinct step
         // from sign_up_verified below. Tracking both is what makes the
         // credential-signup abandonment rate visible in GA4.
-        trackEvent(ANALYTICS_EVENT.signUpSubmitted, { method: "email" });
+        trackEvent(ANALYTICS_EVENT.signUpSubmitted, {
+          method: "email",
+          phone_verified: phoneClaim ? 1 : 0,
+        });
         setDone(true);
       } else {
         setError(result.error);
@@ -223,6 +245,30 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         />
         <p className="text-xs text-muted-foreground">
           {en ? "At least 8 characters." : "მინიმუმ 8 სიმბოლო."}
+        </p>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label>
+          {en
+            ? "Mobile number (optional)"
+            : "მობილურის ნომერი (არასავალდებულო)"}
+        </Label>
+        <PhoneVerify
+          locale={locale}
+          purpose="signup"
+          disabled={isPending}
+          onVerified={({ phone: verifiedPhone, claimToken }) => {
+            setPhoneClaim({ phone: verifiedPhone, claimToken });
+            setError(null);
+          }}
+          onReset={() => setPhoneClaim(null)}
+          onInputChange={setPhoneInput}
+        />
+        <p className="text-xs text-muted-foreground">
+          {en
+            ? "Verify it now and you can later sign in with this number. You can also add it later in your account."
+            : "დაადასტურე ახლა — მოგვიანებით ამ ნომრითაც შეძლებ შესვლას. ანგარიშიდან მოგვიანებითაც შეგიძლია დამატება."}
         </p>
       </div>
 
