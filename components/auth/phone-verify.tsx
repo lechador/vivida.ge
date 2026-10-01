@@ -36,7 +36,7 @@ export function PhoneVerify({
   onVerified: (result: { phone: string; claimToken: string | null }) => void;
   /** Fired when a previously entered number is edited/reset. */
   onReset?: () => void;
-  /** Mirrors raw input so the parent can block half-filled submits. */
+  /** Mirrors raw input so signup can explain when a number will be omitted. */
   onInputChange?: (value: string) => void;
 }) {
   const en = locale !== "ka";

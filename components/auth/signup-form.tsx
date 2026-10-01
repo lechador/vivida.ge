@@ -98,20 +98,11 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
   // Disable submit until Turnstile passes (when enabled). When the env var
   // is missing we let the form work — server still fails-closed via verifyTurnstile.
   const submitDisabled = isPending || (TURNSTILE_ENABLED && !turnstileToken);
+  const hasUnverifiedPhone = !!phoneInput.trim() && !phoneClaim;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    // A half-filled, unverified number would silently be dropped server-
-    // side — ask the user to verify it or remove it instead.
-    if (phoneInput.trim() && !phoneClaim) {
-      setError(
-        en
-          ? "Your number isn't verified yet — verify it with the SMS code, or remove it."
-          : "ნომერი ჯერ არ არის დადასტურებული — დაადასტურე SMS კოდით, ან წაშალე ნომერი.",
-      );
-      return;
-    }
     startTransition(async () => {
       try {
         const result = await signUpWithEmail({
@@ -207,6 +198,13 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
               {en
                 ? "Use the email code below to link the number you just verified. If you use the email link, add the number later in Account."
                 : "ახლახან დადასტურებული ნომრის მისაბმელად ქვემოთ ელფოსტის კოდი გამოიყენე. თუ ელფოსტის ლინკს გახსნი, ნომერს მოგვიანებით ანგარიშიდან დაამატებ."}
+            </p>
+          )}
+          {hasUnverifiedPhone && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {en
+                ? "The unverified number was not added. You can add it later in Account."
+                : "დაუდასტურებელი ნომერი არ დამატებულა. მისი დამატება მოგვიანებით ანგარიშიდან შეგიძლია."}
             </p>
           )}
         </div>
@@ -343,6 +341,13 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
             ? "After the SMS code, complete email verification with the code sent to your inbox to link this number for sign-in. You can also add it later in Account."
             : "SMS კოდის შემდეგ ელფოსტაზეც გამოგზავნილი კოდი შეიყვანე, რომ ნომრით შესვლა ჩაირთოს. ნომრის დამატება მოგვიანებითაც შეგიძლია ანგარიშიდან."}
         </p>
+        {hasUnverifiedPhone && (
+          <p role="status" className="text-xs text-muted-foreground">
+            {en
+              ? "You can create your account now. This number will only be added after SMS verification."
+              : "ანგარიშის შექმნა ახლაც შეგიძლია. ნომერი მხოლოდ SMS დადასტურების შემდეგ დაემატება."}
+          </p>
+        )}
         <SmsMarketingToggle
           locale={locale}
           checked={smsMarketing}
