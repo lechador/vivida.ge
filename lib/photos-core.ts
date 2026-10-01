@@ -14,12 +14,11 @@ import {
 } from "@/lib/r2";
 
 /**
- * Framework-agnostic profile-photo logic, shared by the website
- * (app/api/photos/*) and the mobile API (app/api/v1/me/photos/*). Callers do
- * their own auth and pass the resolved user id in; these functions return a
- * discriminated result with a stable `code` so each transport can map it to
- * the right HTTP status. Cache invalidation (in-memory header cache) stays
- * here so the navbar avatar refreshes for both clients.
+ * Profile-photo logic used by the website's app/api/photos/* routes. Callers
+ * resolve auth and pass the user id in; these functions return a
+ * discriminated result with a stable `code` for mapping to HTTP status.
+ * Cache invalidation stays here so the navbar avatar refreshes after a photo
+ * change.
  */
 
 export type PhotoUploadResult =
@@ -51,7 +50,7 @@ export async function listOwnPhotos(userId: string): Promise<ProfilePhoto[]> {
  */
 export async function createPhotoUpload(
   userId: string,
-  input: { contentType?: unknown; contentLength?: unknown }
+  input: { contentType?: unknown; contentLength?: unknown },
 ): Promise<PhotoUploadResult> {
   if (!isR2Configured()) return { ok: false, code: "storage_not_configured" };
 
@@ -65,7 +64,7 @@ export async function createPhotoUpload(
   const contentLength = input.contentLength;
   if (
     !PHOTO_LIMITS.ALLOWED_TYPES.includes(
-      contentType as (typeof PHOTO_LIMITS.ALLOWED_TYPES)[number]
+      contentType as (typeof PHOTO_LIMITS.ALLOWED_TYPES)[number],
     )
   ) {
     return { ok: false, code: "invalid_type" };
@@ -139,8 +138,10 @@ export async function createPhotoUpload(
  */
 export async function finalizePhoto(
   userId: string,
-  photoId: string
-): Promise<{ ok: true; photo: ProfilePhoto } | { ok: false; code: "not_found" }> {
+  photoId: string,
+): Promise<
+  { ok: true; photo: ProfilePhoto } | { ok: false; code: "not_found" }
+> {
   const [photo] = await db
     .select()
     .from(profilePhotos)
@@ -180,7 +181,7 @@ export async function finalizePhoto(
       console.warn("[photos/finalize] profile-photo reward failed", {
         userId,
         message: (err as Error)?.message,
-      })
+      }),
   );
 
   return { ok: true, photo: { ...photo, ready: true } };
@@ -192,7 +193,7 @@ export async function finalizePhoto(
  */
 export async function promotePhoto(
   userId: string,
-  photoId: string
+  photoId: string,
 ): Promise<{ ok: true } | { ok: false; code: "not_found" }> {
   const [target] = await db
     .select({ id: profilePhotos.id })
@@ -233,7 +234,7 @@ export async function promotePhoto(
 /** Delete a photo. Owner-only. Removes the R2 object and the DB row. */
 export async function deletePhoto(
   userId: string,
-  photoId: string
+  photoId: string,
 ): Promise<{ ok: true } | { ok: false; code: "not_found" }> {
   const [photo] = await db
     .select()

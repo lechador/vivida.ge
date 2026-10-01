@@ -7,8 +7,8 @@ import { isBlockedEitherWay } from "@/lib/block";
 import { isAccountRestricted, RESTRICTED_MESSAGE } from "@/lib/restriction";
 
 /**
- * Framework-agnostic messaging *write* logic, shared by the website (Server
- * Actions in actions/messages.ts) and the mobile API (app/api/v1/messages/*).
+ * Messaging *write* logic used by website Server Actions in
+ * actions/messages.ts.
  * Callers do their own auth and pass the resolved user id in; these functions
  * never touch sessions, send email, or revalidate Next's cache (those stay in
  * the wrappers). Read logic lives in lib/messages.ts.
@@ -17,8 +17,7 @@ import { isAccountRestricted, RESTRICTED_MESSAGE } from "@/lib/restriction";
 const MAX_BODY = 2000;
 
 export type SendMessageResult =
-  | { ok: true; message: Message }
-  | { ok: false; error: string };
+  { ok: true; message: Message } | { ok: false; error: string };
 
 /**
  * Whether `a` may message `b` — message gating. Restricted to MUTUAL
@@ -42,8 +41,8 @@ async function canMessage(a: string, b: string): Promise<boolean> {
     .where(
       or(
         and(eq(friendships.requesterId, a), eq(friendships.recipientId, b)),
-        and(eq(friendships.requesterId, b), eq(friendships.recipientId, a))
-      )
+        and(eq(friendships.requesterId, b), eq(friendships.recipientId, a)),
+      ),
     )
     .limit(1);
   // A block always wins; otherwise only an accepted friendship unlocks chat.
@@ -59,7 +58,7 @@ async function canMessage(a: string, b: string): Promise<boolean> {
 export async function sendMessageCore(
   senderId: string,
   recipientId: string,
-  body: string
+  body: string,
 ): Promise<SendMessageResult> {
   if (recipientId === senderId) {
     return { ok: false, error: "ვერ აგზავნი საკუთარ თავს" };
@@ -96,7 +95,7 @@ export async function sendMessageCore(
  */
 export async function pingTypingCore(
   senderId: string,
-  recipientId: string
+  recipientId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (recipientId === senderId) return { ok: false, error: "self" };
   if (!(await canMessage(senderId, recipientId))) {
@@ -109,7 +108,7 @@ export async function pingTypingCore(
 /** Mark all messages from a partner to me as read. */
 export async function markConversationReadCore(
   viewerId: string,
-  partnerId: string
+  partnerId: string,
 ): Promise<{ ok: true }> {
   await db
     .update(messages)
@@ -118,8 +117,8 @@ export async function markConversationReadCore(
       and(
         eq(messages.senderId, partnerId),
         eq(messages.recipientId, viewerId),
-        isNull(messages.readAt)
-      )
+        isNull(messages.readAt),
+      ),
     );
   return { ok: true };
 }

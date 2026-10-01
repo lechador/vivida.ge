@@ -15,10 +15,9 @@ import {
 } from "@/db/schema";
 
 /**
- * Framework-agnostic feed read logic, shared by the website (Server
- * Actions in actions/feed.ts) and the mobile API (app/api/v1/feed).
- * Callers do their own auth (requireUser / requireMobileUser) and pass
- * the resolved viewer id in — these functions never touch sessions.
+ * Feed read logic used by website Server Actions in actions/feed.ts and
+ * feed pages. Callers resolve authentication and pass the viewer id in;
+ * these functions never touch sessions.
  */
 
 export type FeedAuthor = {
@@ -91,14 +90,17 @@ type PostRow = {
  * profile_photo row (lowest sortOrder) overrides the OAuth avatar.
  */
 export async function loadProfilePhotos(
-  userIds: string[]
+  userIds: string[],
 ): Promise<Map<string, string>> {
   if (userIds.length === 0) return new Map();
   const rows = await db
     .select({ userId: profilePhotos.userId, url: profilePhotos.url })
     .from(profilePhotos)
     .where(
-      and(inArray(profilePhotos.userId, userIds), eq(profilePhotos.ready, true))
+      and(
+        inArray(profilePhotos.userId, userIds),
+        eq(profilePhotos.ready, true),
+      ),
     )
     .orderBy(asc(profilePhotos.sortOrder));
   const map = new Map<string, string>();
@@ -122,7 +124,7 @@ async function enrichPostRows(
 
   const postIds = rows.map((r) => r.id);
   const authorIds = Array.from(new Set(rows.map((r) => r.authorId)));
-  const blockedIds = knownBlockedIds ?? await getBlockedUserIds(viewerId);
+  const blockedIds = knownBlockedIds ?? (await getBlockedUserIds(viewerId));
 
   const { getReputationFor } = await import("@/lib/reputation");
   const [counts, mine, comments, reputations, photos] = await Promise.all([
@@ -148,8 +150,8 @@ async function enrichPostRows(
       .where(
         and(
           inArray(postReactions.postId, postIds),
-          eq(postReactions.userId, viewerId)
-        )
+          eq(postReactions.userId, viewerId),
+        ),
       ),
     db
       .select({
@@ -242,7 +244,7 @@ export async function listFeedPage(opts: {
 /** A single post in the same enriched shape as the feed, or null if gone. */
 export async function getPostForViewer(
   viewerId: string,
-  postId: string
+  postId: string,
 ): Promise<FeedPost | null> {
   const blockedIds = await getBlockedUserIds(viewerId);
   const rows = await db

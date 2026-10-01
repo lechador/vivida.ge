@@ -10,9 +10,8 @@ import {
 } from "@/db/schema";
 
 /**
- * Block *write* logic, framework-agnostic (shared by web Server Actions and,
- * later, the mobile API). Callers resolve auth and pass ids in. Read helpers
- * live in lib/block.ts.
+ * Block *write* logic used by web Server Actions. Callers resolve auth and
+ * pass ids in. Read helpers live in lib/block.ts.
  */
 
 export type BlockResult = { ok: true } | { ok: false; error: string };
@@ -32,7 +31,7 @@ function orderedPair(a: string, b: string): [string, string] {
  */
 export async function blockUserCore(
   blockerId: string,
-  blockedId: string
+  blockedId: string,
 ): Promise<BlockResult> {
   if (blockerId === blockedId) {
     return { ok: false, error: "ვერ დაბლოკავ საკუთარ თავს" };
@@ -49,13 +48,13 @@ export async function blockUserCore(
       or(
         and(
           eq(friendships.requesterId, blockerId),
-          eq(friendships.recipientId, blockedId)
+          eq(friendships.recipientId, blockedId),
         ),
         and(
           eq(friendships.requesterId, blockedId),
-          eq(friendships.recipientId, blockerId)
-        )
-      )
+          eq(friendships.recipientId, blockerId),
+        ),
+      ),
     );
 
   // Actor details are denormalized into notification JSON. Remove historical
@@ -84,8 +83,8 @@ export async function blockUserCore(
       and(
         eq(matches.userAId, a),
         eq(matches.userBId, b),
-        isNull(matches.unmatchedAt)
-      )
+        isNull(matches.unmatchedAt),
+      ),
     );
 
   // A linked relationship invite is another mutual social connection. Sever
@@ -113,12 +112,12 @@ export async function blockUserCore(
 /** Remove `blockerId`'s block on `blockedId`. Friendship is NOT restored. */
 export async function unblockUserCore(
   blockerId: string,
-  blockedId: string
+  blockedId: string,
 ): Promise<BlockResult> {
   await db
     .delete(blocks)
     .where(
-      and(eq(blocks.blockerId, blockerId), eq(blocks.blockedId, blockedId))
+      and(eq(blocks.blockerId, blockerId), eq(blocks.blockedId, blockedId)),
     );
   return { ok: true };
 }

@@ -22,8 +22,7 @@ import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
 import type { UserLocale } from "@/lib/i18n/locale";
 
 /**
- * Framework-agnostic synastry-partner logic, shared by the website (Server
- * Actions in actions/partners.ts) and the mobile API (app/api/v1/partners/*).
+ * Synastry-partner logic used by website Server Actions in actions/partners.ts.
  * Callers do their own auth and pass the resolved user id in — these
  * functions never touch sessions or revalidate Next's cache.
  */
@@ -44,8 +43,7 @@ export type CreatePartnerInput = {
 };
 
 export type CreatePartnerResult =
-  | { ok: true; id: string }
-  | { ok: false; error: string };
+  { ok: true; id: string } | { ok: false; error: string };
 
 /** Start of the current calendar month in UTC. */
 function startOfCurrentMonth(): Date {
@@ -71,11 +69,9 @@ export async function partnerCreationsThisMonth(
 /**
  * A partner row without the credit-gated AI payloads.
  *
- * The list is served unauthenticated-by-entitlement (you own the row, but you
- * have not necessarily unlocked its reading), and `GET /api/v1/partners`
- * returns it verbatim to the mobile client — so `db.select()` here handed out
- * the paid `aiInterpretation`/`deepReport` for free. The per-partner routes
- * gate those two fields; the list must not carry them at all.
+ * A user may own a partner row without unlocking its reading. Keep the paid
+ * `aiInterpretation`/`deepReport` out of list responses; the per-partner
+ * reading path checks entitlement before serving them.
  */
 export type PartnerListItem = Omit<
   Partner,
@@ -87,9 +83,7 @@ export type PartnerListItem = Omit<
   | "inviteAcceptedAt"
 >;
 
-export async function listPartners(
-  userId: string,
-): Promise<PartnerListItem[]> {
+export async function listPartners(userId: string): Promise<PartnerListItem[]> {
   return await db
     .select({
       id: partners.id,

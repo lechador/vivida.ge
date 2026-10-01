@@ -19,15 +19,13 @@ import { queueNotificationPush } from "@/lib/notification-push";
 import { awardReputation, RepSubject } from "@/lib/reputation";
 
 /**
- * Framework-agnostic friendship write logic, shared by the website
- * (actions/friendship.ts) and the mobile API (app/api/v1/friends/*).
+ * Friendship write logic used by website actions/friendship.ts.
  * Callers resolve the actor and pass the id/name in; these functions never
  * touch sessions or revalidate Next's cache (that stays in the web wrappers).
  */
 
 export type FriendshipActionResult =
-  | { ok: true }
-  | { ok: false; error: string };
+  { ok: true } | { ok: false; error: string };
 
 export type FriendActor = { id: string; name: string | null };
 
@@ -82,7 +80,7 @@ async function emitNotification({
 export async function sendFriendRequestCore(
   actor: FriendActor,
   targetUserId: string,
-  locale: UserLocale = "ka"
+  locale: UserLocale = "ka",
 ): Promise<FriendshipActionResult> {
   const en = locale === "en";
 
@@ -120,13 +118,13 @@ export async function sendFriendRequestCore(
       or(
         and(
           eq(friendships.requesterId, actor.id),
-          eq(friendships.recipientId, targetUserId)
+          eq(friendships.recipientId, targetUserId),
         ),
         and(
           eq(friendships.requesterId, targetUserId),
-          eq(friendships.recipientId, actor.id)
-        )
-      )
+          eq(friendships.recipientId, actor.id),
+        ),
+      ),
     )
     .limit(1);
 
@@ -148,8 +146,8 @@ export async function sendFriendRequestCore(
           .where(
             and(
               eq(friendships.requesterId, targetUserId),
-              eq(friendships.recipientId, actor.id)
-            )
+              eq(friendships.recipientId, actor.id),
+            ),
           );
         await emitNotification({
           toUserId: targetUserId,
@@ -195,7 +193,7 @@ export async function sendFriendRequestCore(
     } catch (err) {
       console.warn(
         "[friendship] friend-request email after-hook failed:",
-        (err as Error).message
+        (err as Error).message,
       );
     }
   });
@@ -207,7 +205,7 @@ export async function sendFriendRequestCore(
 export async function acceptFriendRequestCore(
   userId: string,
   requesterId: string,
-  locale: UserLocale = "ka"
+  locale: UserLocale = "ka",
 ): Promise<FriendshipActionResult> {
   const en = locale === "en";
 
@@ -231,8 +229,8 @@ export async function acceptFriendRequestCore(
       and(
         eq(friendships.requesterId, requesterId),
         eq(friendships.recipientId, userId),
-        eq(friendships.status, "pending")
-      )
+        eq(friendships.status, "pending"),
+      ),
     )
     .returning({ requesterId: friendships.requesterId });
   if (accepted.length === 0) {
@@ -255,7 +253,7 @@ export async function acceptFriendRequestCore(
 /** Decline / delete a pending request that someone sent to me. */
 export async function declineFriendRequestCore(
   userId: string,
-  requesterId: string
+  requesterId: string,
 ): Promise<FriendshipActionResult> {
   await db
     .delete(friendships)
@@ -263,8 +261,8 @@ export async function declineFriendRequestCore(
       and(
         eq(friendships.requesterId, requesterId),
         eq(friendships.recipientId, userId),
-        eq(friendships.status, "pending")
-      )
+        eq(friendships.status, "pending"),
+      ),
     );
   return { ok: true };
 }
@@ -272,7 +270,7 @@ export async function declineFriendRequestCore(
 /** Cancel a pending request *I* sent. */
 export async function cancelFriendRequestCore(
   userId: string,
-  targetUserId: string
+  targetUserId: string,
 ): Promise<FriendshipActionResult> {
   await db
     .delete(friendships)
@@ -280,8 +278,8 @@ export async function cancelFriendRequestCore(
       and(
         eq(friendships.requesterId, userId),
         eq(friendships.recipientId, targetUserId),
-        eq(friendships.status, "pending")
-      )
+        eq(friendships.status, "pending"),
+      ),
     );
   return { ok: true };
 }
@@ -289,7 +287,7 @@ export async function cancelFriendRequestCore(
 /** Remove an existing friendship (either side can call). */
 export async function removeFriendCore(
   userId: string,
-  otherUserId: string
+  otherUserId: string,
 ): Promise<FriendshipActionResult> {
   await db
     .delete(friendships)
@@ -299,14 +297,14 @@ export async function removeFriendCore(
         or(
           and(
             eq(friendships.requesterId, userId),
-            eq(friendships.recipientId, otherUserId)
+            eq(friendships.recipientId, otherUserId),
           ),
           and(
             eq(friendships.requesterId, otherUserId),
-            eq(friendships.recipientId, userId)
-          )
-        )
-      )
+            eq(friendships.recipientId, userId),
+          ),
+        ),
+      ),
     );
   return { ok: true };
 }

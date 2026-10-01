@@ -46,7 +46,7 @@ export function hashSignupIp(ip: string | null | undefined): string | null {
 }
 
 /**
- * Check before creating a new account on every web/mobile auth path. The
+ * Check before creating a new account through the website. The
  * atomic three-attempt/10m and ten-attempt/24h limits stop parallel bursts
  * without false-blocking carrier-NAT neighbours (several unrelated visitors
  * routinely share one public IPv4); an independent 30-day identity

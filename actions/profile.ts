@@ -32,8 +32,8 @@ export async function saveProfile(
 ): Promise<SaveProfileResult> {
   const user = await requireUser();
 
-  // Validation + upsert live in the shared core so web and mobile stay
-  // byte-for-byte identical. Only the side effects below are web-specific.
+  // Validation and upsert live in the shared core. This action adds the
+  // page-specific side effects below.
   const result = await saveBirthDataCore(user.id, input);
   if (!result.ok) return result;
 

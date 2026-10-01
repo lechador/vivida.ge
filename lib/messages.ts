@@ -1,14 +1,4 @@
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  gt,
-  isNull,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, isNull, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -35,7 +25,7 @@ export type ConversationSummary = {
  * recency.
  */
 export async function listConversations(
-  userId: string
+  userId: string,
 ): Promise<ConversationSummary[]> {
   const friends = await listFriends(userId);
   if (friends.length === 0) return [];
@@ -45,19 +35,11 @@ export async function listConversations(
   const rows = await db
     .select()
     .from(messages)
-    .where(
-      or(
-        eq(messages.senderId, userId),
-        eq(messages.recipientId, userId)
-      )
-    )
+    .where(or(eq(messages.senderId, userId), eq(messages.recipientId, userId)))
     .orderBy(desc(messages.createdAt))
     .limit(2000);
 
-  const byPartner = new Map<
-    string,
-    { last: Message; unread: number }
-  >();
+  const byPartner = new Map<string, { last: Message; unread: number }>();
   for (const m of rows) {
     const partnerId = m.senderId === userId ? m.recipientId : m.senderId;
     if (!byPartner.has(partnerId)) {
@@ -94,18 +76,12 @@ export async function listConversations(
 export async function listMessages(
   viewerId: string,
   partnerId: string,
-  options: { limit?: number; since?: Date } = {}
+  options: { limit?: number; since?: Date } = {},
 ): Promise<Message[]> {
   const limit = options.limit ?? 100;
   const baseWhere = or(
-    and(
-      eq(messages.senderId, viewerId),
-      eq(messages.recipientId, partnerId)
-    ),
-    and(
-      eq(messages.senderId, partnerId),
-      eq(messages.recipientId, viewerId)
-    )
+    and(eq(messages.senderId, viewerId), eq(messages.recipientId, partnerId)),
+    and(eq(messages.senderId, partnerId), eq(messages.recipientId, viewerId)),
   );
   const where = options.since
     ? and(baseWhere, gt(messages.createdAt, options.since))
@@ -128,7 +104,7 @@ export type InboundStreamMessage = Message & {
 
 /**
  * Inbound messages for the viewer with createdAt > since, oldest-first.
- * Joined with sender profile info so the website/mobile poll can deliver
+ * Joined with sender profile info so the website poll can deliver
  * everything the bell + chat panel need without a follow-up fetch.
  */
 export async function pollInboundMessages(
@@ -157,7 +133,7 @@ export async function pollInboundMessages(
         eq(messages.recipientId, viewerId),
         gt(messages.createdAt, since),
         senderId ? eq(messages.senderId, senderId) : undefined,
-      )
+      ),
     )
     .orderBy(asc(messages.createdAt))
     .limit(50);
@@ -171,8 +147,8 @@ export async function pollInboundMessages(
 
 /**
  * Active typing indicators targeting the viewer (recipientId = viewer,
- * expiresAt > now). A website poll can scope this to the open conversation;
- * mobile callers can omit senderId to retain their all-conversations feed.
+ * expiresAt > now). The poll can scope this to the open conversation or omit
+ * senderId to include all conversations.
  */
 export async function pollTypingIndicators(
   viewerId: string,
@@ -189,15 +165,15 @@ export async function pollTypingIndicators(
         eq(typingIndicators.recipientId, viewerId),
         gt(typingIndicators.expiresAt, new Date()),
         senderId ? eq(typingIndicators.senderId, senderId) : undefined,
-      )
+      ),
     );
 }
 
 /**
  * For each partner the viewer has sent messages to, the latest readAt
  * timestamp among the viewer's sent messages, restricted to read events
- * that happened after `since`. Website polling scopes this to the open
- * conversation; mobile polling can continue requesting every partner.
+ * that happened after `since`. Callers may scope the poll to an open
+ * conversation or include every partner.
  */
 export async function pollReadReceipts(
   viewerId: string,
@@ -215,7 +191,7 @@ export async function pollReadReceipts(
         eq(messages.senderId, viewerId),
         gt(messages.readAt, since),
         partnerId ? eq(messages.recipientId, partnerId) : undefined,
-      )
+      ),
     )
     .groupBy(messages.recipientId);
   return rows
@@ -230,7 +206,7 @@ export async function pollReadReceipts(
 export async function recordTyping(
   senderId: string,
   recipientId: string,
-  ttlMs = 15000
+  ttlMs = 15000,
 ): Promise<void> {
   if (senderId === recipientId) return;
   const expiresAt = new Date(Date.now() + ttlMs);
@@ -258,12 +234,7 @@ export async function countUnreadMessages(userId: string): Promise<number> {
   const [row] = await db
     .select({ value: count() })
     .from(messages)
-    .where(
-      and(
-        eq(messages.recipientId, userId),
-        isNull(messages.readAt)
-      )
-    );
+    .where(and(eq(messages.recipientId, userId), isNull(messages.readAt)));
   return Number(row?.value ?? 0);
 }
 

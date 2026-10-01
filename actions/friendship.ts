@@ -12,8 +12,8 @@ import {
   type FriendshipActionResult,
 } from "@/lib/friendship-core";
 
-// Friendship write logic lives in lib/friendship-core so the mobile API
-// (app/api/v1/friends) shares it. These wrappers add auth + path revalidation.
+// Friendship write logic lives in lib/friendship-core. These wrappers add
+// auth and path revalidation.
 export type { FriendshipActionResult } from "@/lib/friendship-core";
 
 /**
@@ -22,12 +22,12 @@ export type { FriendshipActionResult } from "@/lib/friendship-core";
  */
 export async function sendFriendRequest(
   targetUserId: string,
-  targetUsername?: string | null
+  targetUsername?: string | null,
 ): Promise<FriendshipActionResult> {
   const user = await requireUser();
   const result = await sendFriendRequestCore(
     { id: user.id, name: user.name ?? null },
-    targetUserId
+    targetUserId,
   );
   if (result.ok) {
     revalidatePath("/friends");
@@ -39,7 +39,7 @@ export async function sendFriendRequest(
 /** Accept a pending request that someone sent to me. */
 export async function acceptFriendRequest(
   requesterId: string,
-  requesterUsername?: string | null
+  requesterUsername?: string | null,
 ): Promise<FriendshipActionResult> {
   const user = await requireUser();
   const result = await acceptFriendRequestCore(user.id, requesterId);
@@ -53,7 +53,7 @@ export async function acceptFriendRequest(
 /** Decline / delete a pending request that someone sent to me. */
 export async function declineFriendRequest(
   requesterId: string,
-  requesterUsername?: string | null
+  requesterUsername?: string | null,
 ): Promise<FriendshipActionResult> {
   const user = await requireUser();
   const result = await declineFriendRequestCore(user.id, requesterId);
@@ -67,7 +67,7 @@ export async function declineFriendRequest(
 /** Cancel a pending request *I* sent. */
 export async function cancelFriendRequest(
   targetUserId: string,
-  targetUsername?: string | null
+  targetUsername?: string | null,
 ): Promise<FriendshipActionResult> {
   const user = await requireUser();
   const result = await cancelFriendRequestCore(user.id, targetUserId);
@@ -81,7 +81,7 @@ export async function cancelFriendRequest(
 /** Remove an existing friendship (either side can call). */
 export async function removeFriend(
   otherUserId: string,
-  otherUsername?: string | null
+  otherUsername?: string | null,
 ): Promise<FriendshipActionResult> {
   const user = await requireUser();
   const result = await removeFriendCore(user.id, otherUserId);

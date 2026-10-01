@@ -9,13 +9,11 @@ import { ensureUsername } from "@/lib/username";
 import { findDuplicateAccountSignal } from "@/lib/duplicate-account";
 
 /**
- * Framework-agnostic profile *write* logic, shared by the website (Server
- * Actions in actions/profile.ts) and the mobile API (app/api/v1/me/profile).
+ * Profile *write* logic used by website Server Actions in actions/profile.ts.
  * Callers do their own auth and pass the resolved user id in — these
  * functions never touch sessions, revalidate Next's cache, or redirect.
  *
- * Errors come back as `{ ok: false, error }` with the same Georgian strings
- * the website already shows, so web and mobile surface identical copy.
+ * Errors come back as `{ ok: false, error }` with Georgian UI strings.
  */
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -41,9 +39,9 @@ export type SaveBirthDataInput = {
   gender?: "male" | "female" | null;
   /** Optional username — wizard sets it on first save. */
   username?: string | null;
-  /** Explicit stranger-discovery choice from onboarding. Only
-      written when the caller passes a boolean — never defaulted here, so
-      mobile callers that don't send it leave the stored value untouched. */
+  /** Explicit stranger-discovery choice from onboarding. Only written when
+      the caller passes a boolean; omitted values leave the stored choice
+      untouched. */
   discoverable?: boolean;
   /** User explicitly chose to continue after a possible duplicate warning. */
   confirmPossibleDuplicate?: boolean;
@@ -154,8 +152,7 @@ export async function saveBirthDataCore(
       : {};
 
   // Explicit choice from onboarding. Written only when provided, so
-  // existing users' stored choice is never flipped by callers that don't
-  // carry it (e.g. mobile birth-data saves).
+  // existing users' stored choice is never flipped by callers that omit it.
   const discoverableFields =
     typeof input.discoverable === "boolean"
       ? { discoverable: input.discoverable }
@@ -312,48 +309,4 @@ export async function updatePublicProfileCore(
   }
 
   return { ok: true, username };
-}
-
-export type AccountSettingsInput = {
-  /** Discovery opt-out toggle. */
-  discoverable?: boolean;
-  /** Self-reported sex; only 'male' | 'female' are accepted. */
-  gender?: "male" | "female";
-};
-
-/**
- * Update lightweight account/privacy settings (discoverability + self-reported
- * gender) in one call. Only fields that are present are written; gender is
- * always stamped source='self' so the AI name-inference backfill never
- * overwrites it. Upserts the profile row so a user who registered without
- * birth data still gets one. Backs the mobile PATCH /api/v1/me/settings
- * endpoint; mirrors the website's setDiscoverable / updateGender Server
- * Actions.
- */
-export async function updateAccountSettingsCore(
-  userId: string,
-  input: AccountSettingsInput,
-): Promise<void> {
-  const set: Partial<typeof profiles.$inferInsert> = {};
-  if (typeof input.discoverable === "boolean") {
-    set.discoverable = input.discoverable;
-  }
-  if (input.gender === "male" || input.gender === "female") {
-    set.gender = input.gender;
-    set.genderSource = "self";
-  }
-  if (Object.keys(set).length === 0) return;
-  set.updatedAt = new Date();
-  await db
-    .insert(profiles)
-    .values({ userId, ...set })
-    .onConflictDoUpdate({ target: profiles.userId, set });
-  // Same reason as in setTestVisibility: this upsert can mint a bare profile
-  // row for a legacy user, and a row without a username is invisible on every
-  // people surface. Best-effort — never fail the settings write over it.
-  try {
-    await ensureUsername(userId);
-  } catch {
-    /* the settings change is what the user asked for */
-  }
 }

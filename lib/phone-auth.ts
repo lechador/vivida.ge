@@ -9,9 +9,8 @@ import { generateOtpCode } from "@/lib/otp";
 /**
  * Database-side core for the SMS phone flows — optional verification at
  * signup, phone-number login, and adding/changing the number in the
- * account. Framework-agnostic (shared by the website's server actions and
- * a future mobile API): callers own rate limiting, locale copy and the
- * actual SMS send (lib/sms.ts).
+ * account. The website's server actions handle rate limiting, locale copy,
+ * and the actual SMS send (lib/sms.ts).
  *
  * Security model: the 6-digit code is stored only as a hash, single-use,
  * expires in 10 minutes and dies after 5 wrong guesses. A correct code

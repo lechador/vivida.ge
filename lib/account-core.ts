@@ -9,10 +9,9 @@ import {
 import { deleteObject } from "@/lib/r2";
 
 /**
- * Framework-agnostic account-management logic, shared by the website (Server
- * Actions in actions/*) and the mobile API (app/api/v1/me/*). Callers do
- * their own auth and pass the resolved user id in; the web action layers
- * signOut() on top of deleteAccountCore.
+ * Account-management logic used by website Server Actions in actions/*.
+ * Callers resolve authentication and pass the user id in; the account action
+ * calls signOut() after deleteAccountCore.
  */
 
 export type EmailPreferences = {
@@ -23,7 +22,7 @@ export type EmailPreferences = {
 
 /** Read the user's current email preferences. */
 export async function getEmailPreferences(
-  userId: string
+  userId: string,
 ): Promise<EmailPreferences> {
   const [row] = await db
     .select({
@@ -44,7 +43,7 @@ export async function getEmailPreferences(
 /** Persist the user's email preferences. */
 export async function updateEmailPreferencesCore(
   userId: string,
-  input: EmailPreferences
+  input: EmailPreferences,
 ): Promise<{ ok: true }> {
   await db
     .update(users)
@@ -57,9 +56,7 @@ export async function updateEmailPreferencesCore(
   return { ok: true };
 }
 
-export type DeleteAccountResult =
-  | { ok: true }
-  | { ok: false; error: string };
+export type DeleteAccountResult = { ok: true } | { ok: false; error: string };
 
 /**
  * Permanently delete the user and everything that references them. Best-
@@ -71,7 +68,7 @@ export type DeleteAccountResult =
  */
 export async function deleteAccountCore(
   userId: string,
-  confirmation: string
+  confirmation: string,
 ): Promise<DeleteAccountResult> {
   if (
     confirmation !== DELETE_ACCOUNT_CONFIRM_PHRASE &&
@@ -95,7 +92,7 @@ export async function deleteAccountCore(
   } catch (err) {
     console.warn(
       "[deleteAccount] R2 photo cleanup failed (continuing):",
-      (err as Error).message
+      (err as Error).message,
     );
   }
 

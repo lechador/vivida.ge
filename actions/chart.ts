@@ -49,7 +49,7 @@ import type { NatalChartJson } from "@/db/schema";
  * How the AI narrative is handled relative to the caller:
  *  - "wait"  (default): generate + persist AI inline, blocking until done.
  *            Use where the page genuinely renders the narrative server-side
- *            (e.g. /report, mobile chart API).
+ *            (e.g. /report).
  *  - "defer": persist the fast static chart, return it immediately, and run
  *            the AI upgrade in the background via `after()`. Use on the
  *            dashboard so the user never stares at a spinner — the chart
@@ -62,14 +62,12 @@ type AiUpgradeMode = "wait" | "defer" | "skip";
 
 async function resolveChart(
   userId: string,
-  opts: { aiUpgrade?: AiUpgradeMode } = {}
+  opts: { aiUpgrade?: AiUpgradeMode } = {},
 ): Promise<Chart | null> {
   const mode = opts.aiUpgrade ?? "wait";
   // AI summaries are available to every account when OpenRouter is configured.
   // `skip` callers opt out entirely.
-  const wantAi =
-    mode !== "skip" &&
-    isOpenRouterConfigured();
+  const wantAi = mode !== "skip" && isOpenRouterConfigured();
   const [profile] = await db
     .select()
     .from(profiles)
@@ -155,7 +153,7 @@ async function resolveChart(
     computed.source,
     computed.data,
     interpretation,
-    "static"
+    "static",
   );
 
   if (wantAi) {
@@ -175,7 +173,7 @@ async function resolveChart(
       } catch (err) {
         console.warn(
           "[resolveChart] inline AI upgrade failed; serving static chart:",
-          (err as Error).message
+          (err as Error).message,
         );
       }
     }
@@ -199,7 +197,11 @@ function isTransientDbError(err: unknown): boolean {
   let e: unknown = err;
   for (let i = 0; i < 4 && e; i++) {
     const msg = (e as { message?: string }).message ?? "";
-    if (/fetch failed|error connecting to database|econnreset|etimedout/i.test(msg)) {
+    if (
+      /fetch failed|error connecting to database|econnreset|etimedout/i.test(
+        msg,
+      )
+    ) {
       return true;
     }
     e = (e as { cause?: unknown }).cause;
@@ -222,7 +224,7 @@ function isTransientDbError(err: unknown): boolean {
  */
 export async function ensureChartFor(
   userId: string,
-  opts: { aiUpgrade?: AiUpgradeMode } = {}
+  opts: { aiUpgrade?: AiUpgradeMode } = {},
 ): Promise<Chart | null> {
   try {
     const chart = await resolveChart(userId, opts);
@@ -231,7 +233,7 @@ export async function ensureChartFor(
     if (!isTransientDbError(err)) throw err;
     console.warn(
       "[ensureChartFor] transient DB error, retrying once:",
-      (err as Error).message
+      (err as Error).message,
     );
     await new Promise((r) => setTimeout(r, 300));
     const chart = await resolveChart(userId, opts);
@@ -271,8 +273,8 @@ async function overlayLibrary(chart: Chart): Promise<Chart> {
       getLibraryEntries(placements.map((p) => libraryKey(p.subject, p.sign))),
       getAspectLibraryEntries(
         (chart.data.aspects ?? []).map((a) =>
-          aspectLibraryKey(a.a, a.b, a.kind)
-        )
+          aspectLibraryKey(a.a, a.b, a.kind),
+        ),
       ),
       getHouseLibraryEntries([
         ...cusps.map((c) => houseLibraryKey("cusp", c.house, c.sign)),
@@ -319,7 +321,9 @@ async function overlayLibrary(chart: Chart): Promise<Chart> {
     const cuspBody = houseLib.get(houseLibraryKey("cusp", c.house, c.sign));
     if (!cuspBody) continue;
     const occupantBodies = (occupantsByHouse.get(c.house) ?? [])
-      .map((planet) => houseLib.get(houseLibraryKey("occupant", c.house, planet)))
+      .map((planet) =>
+        houseLib.get(houseLibraryKey("occupant", c.house, planet)),
+      )
       .filter((b): b is string => Boolean(b));
     houses[String(c.house)] = [cuspBody, ...occupantBodies].join("\n\n");
   }
@@ -330,7 +334,7 @@ async function overlayLibrary(chart: Chart): Promise<Chart> {
 
 /** Static (zero-latency) interpretation seed for a freshly computed chart. */
 function buildStaticInterpretation(
-  data: NatalChartJson
+  data: NatalChartJson,
 ): NonNullable<Chart["interpretation"]> {
   const ascSign = signByIndex(data.ascendant.signIndex).key;
   const sunSign = data.bodies.sun && signByIndex(data.bodies.sun.signIndex).key;
@@ -355,7 +359,7 @@ async function upsertChartRow(
   source: string,
   data: NatalChartJson,
   interpretation: NonNullable<Chart["interpretation"]>,
-  interpretationModel: string
+  interpretationModel: string,
 ): Promise<void> {
   const now = new Date();
   await db
@@ -393,14 +397,14 @@ async function upsertChartRow(
 function scheduleAiUpgrade(
   userId: string,
   inputHash: string,
-  data: NatalChartJson
+  data: NatalChartJson,
 ): void {
   const run = () =>
     upgradeChartAi(userId, inputHash, data).catch((err) =>
       console.warn(
         "[chart] background AI upgrade failed:",
-        (err as Error).message
-      )
+        (err as Error).message,
+      ),
     );
   try {
     after(run);
@@ -420,7 +424,7 @@ function scheduleAiUpgrade(
 async function upgradeChartAi(
   userId: string,
   inputHash: string,
-  data: NatalChartJson
+  data: NatalChartJson,
 ): Promise<void> {
   const [current] = await db
     .select()
@@ -434,15 +438,21 @@ async function upgradeChartAi(
   const { cusps, occupants } = houseCombosForChart(data);
   await Promise.all([
     ensureLibraryFor(placementsForChart(data)).catch((err) =>
-      console.warn("[chart] library ensure failed:", (err as Error).message)
+      console.warn("[chart] library ensure failed:", (err as Error).message),
     ),
     ensureAspectLibraryFor(
-      (data.aspects ?? []).map((a) => ({ a: a.a, b: a.b, kind: a.kind }))
+      (data.aspects ?? []).map((a) => ({ a: a.a, b: a.b, kind: a.kind })),
     ).catch((err) =>
-      console.warn("[chart] aspect library ensure failed:", (err as Error).message)
+      console.warn(
+        "[chart] aspect library ensure failed:",
+        (err as Error).message,
+      ),
     ),
     ensureHouseLibraryFor(cusps, occupants).catch((err) =>
-      console.warn("[chart] house library ensure failed:", (err as Error).message)
+      console.warn(
+        "[chart] house library ensure failed:",
+        (err as Error).message,
+      ),
     ),
   ]);
 
@@ -505,7 +515,8 @@ function buildStaticPlanetTexts(chart: NatalChartJson): Record<string, string> {
     const sign = signByIndex(body.signIndex);
     const housePart = body.house ? `, ${body.house}-ე სახლში` : "";
     const retro = body.retrograde ? " რეტროგრადული მოძრაობით" : "";
-    out[key] = `${meta?.labelKa ?? key} (${meta?.meaningKa ?? ""}) ${sign.labelKa}-შია${housePart}${retro}. ${sign.element}-ის ენერგია ფერავს ამ სფეროს.`;
+    out[key] =
+      `${meta?.labelKa ?? key} (${meta?.meaningKa ?? ""}) ${sign.labelKa}-შია${housePart}${retro}. ${sign.element}-ის ენერგია ფერავს ამ სფეროს.`;
   }
   return out;
 }
@@ -555,9 +566,7 @@ function buildStaticHouseTexts(chart: NatalChartJson): Record<string, string> {
     const cuspSign = cusp ? signByIndex(cusp.signIndex) : null;
     const occ = occupants[n] ?? [];
 
-    const cuspLine = cuspSign
-      ? `${cuspSign.labelKa} მართავს ამ სფეროს.`
-      : "";
+    const cuspLine = cuspSign ? `${cuspSign.labelKa} მართავს ამ სფეროს.` : "";
     const occLine =
       occ.length > 0
         ? ` შიგნით — ${occ.join(", ")}.`

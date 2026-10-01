@@ -1,6 +1,7 @@
 # Safety follow-ups
 
 > ## 🚨 HARD GATE — photo moderation (#1) before ANY ads or growth push
+>
 > Unmoderated public profile photos become an **acute** risk the moment we
 > pull in strangers. **Do not promote Vivida** — no Facebook/Instagram ads, no
 > growth campaigns, no public launch push — until **#1 (photo moderation)** is
@@ -13,8 +14,8 @@ completed work is recorded below to prevent regressions.
 
 ## Block enforcement — RESOLVED (2026-08-26)
 
-Block relationships are now enforced server-side across the web and mobile
-API surfaces:
+Block relationships are enforced server-side across website actions and API
+routes:
 
 - Feed posts and direct permalinks, comments/replies, reactions, and their
   visible aggregate counts.
@@ -33,7 +34,7 @@ API surfaces:
 - Account-level restriction now exists (`lib/restriction.ts`,
   `isAccountRestricted`): effective restriction = `users.restricted` (manual
   override) **OR** under-min-age by DOB. Enforced server-side in the shared
-  cores (chat, friend send/accept, post + comment create) → mobile inherits it.
+  cores (chat, friend send/accept, post + comment create).
   Restricted accounts keep read-only astrology; a notice shows on the dashboard.
 - The **3 existing under-18 accounts** (ages 16–17) are restricted **by DOB**,
   not by the manual flag — so the restriction **auto-lifts at 18** with nothing
@@ -41,11 +42,6 @@ API surfaces:
   is reserved for non-age cases.
 - Remaining: no automated re-scan/alerting for future edge cases (not needed
   while onboarding blocks under-18).
-
-## Mobile API parity — RESOLVED (2026-08-26)
-
-- `/api/v1/discover` and `/api/v1/people` now use the same feature flags as
-  their web surfaces and return `404 feature_disabled` while disabled.
 
 ## Reports
 

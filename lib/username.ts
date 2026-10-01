@@ -14,9 +14,8 @@ import { suggestUsername } from "@/lib/profile-utils";
  *
  * Username used to be assigned lazily, on the first profile save, which left
  * two holes: users who signed up and never onboarded had no profile row at
- * all, and the two upserts that create a bare row (updateAccountSettingsCore,
- * setTestResultVisibility) never set one. Both are closed by calling this at
- * account-creation time instead — see the callers in lib/auth-core.ts and the
+ * all, and the setTestResultVisibility upsert that creates a bare row never
+ * set one. Account creation now calls this — see lib/auth-core.ts and the
  * `createUser` event in auth.ts.
  *
  * Idempotent: returns the existing username untouched when there is one, so it
@@ -28,7 +27,7 @@ import { suggestUsername } from "@/lib/profile-utils";
  */
 export async function ensureUsername(
   userId: string,
-  name?: string | null
+  name?: string | null,
 ): Promise<string | null> {
   const [existing] = await db
     .select({ username: profiles.username })

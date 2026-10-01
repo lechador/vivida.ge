@@ -40,7 +40,7 @@ export type PersonRow = {
  * `"<1|0>:<ISO>"` — the country bucket plus the createdAt keyset.
  *
  * A bare ISO string (a cursor issued by the previous version and still held by
- * a mobile client mid-scroll) is read as the same-country bucket, which at
+ * a client mid-scroll) is read as the same-country bucket, which at
  * worst repeats a few rows once rather than erroring.
  */
 function parseCursor(
@@ -78,7 +78,7 @@ function encodeCursor(row: {
  */
 export async function listPeople(
   viewerId: string,
-  opts: { cursor?: string; limit?: number; q?: string } = {}
+  opts: { cursor?: string; limit?: number; q?: string } = {},
 ): Promise<{ rows: PersonRow[]; nextCursor: string | null }> {
   const limit = Math.min(Math.max(opts.limit ?? 30, 1), 60);
   const cursor = parseCursor(opts.cursor);
@@ -118,7 +118,7 @@ export async function listPeople(
     const search = or(
       ilike(profiles.username, pattern),
       ilike(profiles.displayName, pattern),
-      ilike(users.name, pattern)
+      ilike(users.name, pattern),
     );
     if (search) conditions.push(search);
   }
@@ -162,13 +162,13 @@ export async function listPeople(
       and(
         or(
           eq(friendships.requesterId, viewerId),
-          eq(friendships.recipientId, viewerId)
+          eq(friendships.recipientId, viewerId),
         ),
         or(
           inArray(friendships.requesterId, userIds),
-          inArray(friendships.recipientId, userIds)
-        )
-      )
+          inArray(friendships.recipientId, userIds),
+        ),
+      ),
     );
 
   const statusByPartner = new Map<string, FriendshipStatus>();

@@ -21,11 +21,9 @@ import { ENGLISH_SITE_URL, GEORGIAN_SITE_URL } from "@/lib/seo/locales";
 /**
  * Claim + generate an Astro-MBTI result for an already-authenticated user.
  *
- * Framework-agnostic per the `lib/<feature>-core.ts` convention: the website
- * Server Action (`actions/submit-mbti.ts`) and the mobile API route both call
- * this, so a phone submission runs the same authoritative re-scoring, the same
- * per-account rate limit, the same Gemini synthesis and the same result email
- * as a browser one. Nothing about the flow is duplicated per client.
+ * The website Server Action (`actions/submit-mbti.ts`) calls this for
+ * authoritative re-scoring, the per-account rate limit, Gemini synthesis,
+ * and the result email.
  */
 export type MbtiSubmission = {
   id: string;
@@ -65,7 +63,7 @@ export async function submitMbtiFor(input: {
 
   // Positions only; never wait on / trigger chart AI here.
   const chart = await ensureChartFor(userId, { aiUpgrade: "skip" }).catch(
-    () => null
+    () => null,
   );
 
   const [u] = await db
@@ -133,7 +131,10 @@ export async function submitMbtiFor(input: {
         });
       }
     } catch (err) {
-      console.warn("[submitMbtiFor] result email failed:", (err as Error).message);
+      console.warn(
+        "[submitMbtiFor] result email failed:",
+        (err as Error).message,
+      );
     }
   });
 

@@ -38,11 +38,10 @@ async function clientIpFromHeaders(): Promise<string> {
 }
 
 /**
- * Web (Server Action) auth surface. The actual DB logic lives in
- * lib/auth-core.ts so the mobile API (app/api/v1/auth/*) shares it
- * verbatim. This layer adds the website-only concerns: Turnstile bot
- * gating, Auth.js cookie sign-in, deferred email sends, and mapping
- * core result codes to Georgian UI strings.
+ * Web (Server Action) auth surface. Database operations live in
+ * lib/auth-core.ts. This layer adds Turnstile bot gating, Auth.js cookie
+ * sign-in, deferred email sends, and mapping core result codes to
+ * Georgian UI strings.
  */
 
 // ─── OAuth (existing) ────────────────────────────────────────────────────

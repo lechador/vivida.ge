@@ -11,8 +11,7 @@ import { submitMbtiFor } from "@/lib/mbti-submit-core";
 import { ApiError } from "@/lib/api/errors";
 
 export type SubmitMbtiResult =
-  | { ok: true; id: string }
-  | { ok: false; error: string };
+  { ok: true; id: string } | { ok: false; error: string };
 
 /** Best-effort client IP from request headers (for rate limiting). */
 async function clientIp(): Promise<string> {
@@ -31,12 +30,11 @@ async function clientIp(): Promise<string> {
  * but the expensive Gemini synthesis only runs for a signed-in user (so an
  * anonymous visitor can't burn AI budget), and it's rate-limited on top.
  *
- * The work itself lives in `lib/mbti-submit-core.ts` so the mobile API runs
- * the identical flow; this action only supplies the web's notion of "who is
- * asking" and turns thrown errors back into the form's result shape.
+ * The work itself lives in `lib/mbti-submit-core.ts`; this action supplies
+ * the authenticated user and turns thrown errors into the form's result shape.
  */
 export async function submitMbti(
-  answers: Record<number, number>
+  answers: Record<number, number>,
 ): Promise<SubmitMbtiResult> {
   const user = await requireUser();
   const locale = await getRequestLocale();

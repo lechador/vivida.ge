@@ -662,7 +662,7 @@ export async function sendPersonalReminderEmail({
 /**
  * Send the welcome email only once the account is a fully onboarded member:
  * email verified AND birth data (a profile row) present. Called from the
- * profile-save background hooks (web + mobile) — the moment onboarding
+ * profile-save background hook — the moment onboarding
  * finishes — NOT at registration, so a signup that stops at "check your
  * inbox" never gets a premature "your cosmic journey begins."
  *

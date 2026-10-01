@@ -11,9 +11,8 @@ import {
   type CreatePartnerResult,
 } from "@/lib/partners-core";
 
-// Read + AI logic lives in lib/partners-core so the mobile API
-// (app/api/v1/partners/*) shares it. A "use server" file may only export
-// async functions, so the read helpers (partnerCreationsThisMonth,
+// Read + AI logic lives in lib/partners-core. A "use server" file may only
+// export async functions, so the read helpers (partnerCreationsThisMonth,
 // listPartners, getPartnerForViewer, ensureSynastryInterpretation) are
 // imported straight from "@/lib/partners-core" by the pages that need them —
 // not re-exported here. Type-only re-exports are still fine.

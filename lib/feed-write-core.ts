@@ -37,14 +37,12 @@ import { filterBlockedCommentThreads } from "@/lib/block-visibility";
 export type FeedActor = { id: string; email: string | null | undefined };
 
 /**
- * Framework-agnostic feed *write* logic — the create/comment/react paths
- * shared by the website (Server Actions in actions/feed.ts) and the mobile
- * API (app/api/v1/posts/*). Callers do their own auth and pass the resolved
- * actor id in; these functions never touch sessions or revalidate Next's
- * cache (that stays in the web action wrappers).
+ * Feed *write* logic for the create/comment/react paths used by website
+ * Server Actions in actions/feed.ts. Callers resolve auth and pass the actor
+ * id in; these functions never touch sessions or revalidate Next's cache
+ * (that stays in the action wrappers).
  *
- * Errors come back as `{ ok: false, error }` with the same Georgian strings
- * the website already shows, so web and mobile surface identical copy.
+ * Errors come back as `{ ok: false, error }` with Georgian UI strings.
  */
 
 /** Minimum gap between a user's posts / comments — anti-spam throttles. */
@@ -62,8 +60,7 @@ export type FeedComment = {
 };
 
 export type FeedActionResult<T = undefined> =
-  | { ok: true; data?: T }
-  | { ok: false; error: string };
+  { ok: true; data?: T } | { ok: false; error: string };
 
 /**
  * Fan out `mention` notifications for a post or comment. Best-effort:
@@ -132,7 +129,7 @@ async function notifyFeedActivity(opts: {
 }): Promise<void> {
   const blockedIds = new Set(await getBlockedUserIds(opts.actorId));
   const recipients = [...new Set(opts.recipientIds)].filter(
-    (id) => id !== opts.actorId && !blockedIds.has(id)
+    (id) => id !== opts.actorId && !blockedIds.has(id),
   );
   if (recipients.length === 0) return;
 
@@ -164,7 +161,7 @@ async function notifyFeedActivity(opts: {
       userId,
       kind: opts.kind,
       payload,
-    }))
+    })),
   );
   for (const id of recipients) {
     invalidateHeaderForUser(id);
@@ -187,7 +184,7 @@ async function notifyFeedActivity(opts: {
       } catch (err) {
         console.warn(
           "[feed.notifyFeedActivity] email failed:",
-          (err as Error).message
+          (err as Error).message,
         );
       }
     }
@@ -197,7 +194,7 @@ async function notifyFeedActivity(opts: {
 /** Create a post. Caps at POST_BODY_MAX and throttles per user. */
 export async function createPostCore(
   userId: string,
-  rawBody: string
+  rawBody: string,
 ): Promise<FeedActionResult<{ postId: string }>> {
   if (await isAccountRestricted(userId)) {
     return { ok: false, error: RESTRICTED_MESSAGE };
@@ -269,7 +266,7 @@ export async function addCommentCore(
   userId: string,
   postId: string,
   rawBody: string,
-  parentCommentId: string | null = null
+  parentCommentId: string | null = null,
 ): Promise<FeedActionResult<{ commentId: string }>> {
   if (await isAccountRestricted(userId)) {
     return { ok: false, error: RESTRICTED_MESSAGE };
@@ -289,7 +286,10 @@ export async function addCommentCore(
     .where(eq(posts.id, postId))
     .limit(1);
   if (!post) return { ok: false, error: "პოსტი ვერ მოიძებნა" };
-  if (post.userId !== userId && await isBlockedEitherWay(userId, post.userId)) {
+  if (
+    post.userId !== userId &&
+    (await isBlockedEitherWay(userId, post.userId))
+  ) {
     return { ok: false, error: "პოსტთან მოქმედება შეუძლებელია" };
   }
 
@@ -315,7 +315,10 @@ export async function addCommentCore(
         error: "პასუხების პასუხი ჯერ არ შეიძლება — უპასუხე ძირითად კომენტარს.",
       };
     }
-    if (row.userId !== userId && await isBlockedEitherWay(userId, row.userId)) {
+    if (
+      row.userId !== userId &&
+      (await isBlockedEitherWay(userId, row.userId))
+    ) {
       return { ok: false, error: "კომენტართან მოქმედება შეუძლებელია" };
     }
     parent = { id: row.id, userId: row.userId, parentId: row.parentId };
@@ -328,8 +331,8 @@ export async function addCommentCore(
     .where(
       and(
         eq(postComments.userId, userId),
-        sql`${postComments.createdAt} > ${cutoff}`
-      )
+        sql`${postComments.createdAt} > ${cutoff}`,
+      ),
     )
     .limit(1);
   if (recent) return { ok: false, error: "ცოტა დაიცადე — ახლახან დაწერე." };
@@ -353,7 +356,7 @@ export async function addCommentCore(
     const commentId = inserted.id;
     const repRecipientId = parent ? parent.userId : post.userId;
     const mentionExclude = [...new Set(recipientIds)].filter(
-      (id) => id !== userId
+      (id) => id !== userId,
     );
     after(async () => {
       await awardReputation({
@@ -391,7 +394,7 @@ export async function addCommentCore(
 export async function reactToPostCore(
   userId: string,
   postId: string,
-  kind: PostReactionKind
+  kind: PostReactionKind,
 ): Promise<FeedActionResult<{ active: PostReactionKind | null }>> {
   const [post] = await db
     .select({ userId: posts.userId })
@@ -399,7 +402,10 @@ export async function reactToPostCore(
     .where(eq(posts.id, postId))
     .limit(1);
   if (!post) return { ok: false, error: "პოსტი ვერ მოიძებნა" };
-  if (post.userId !== userId && await isBlockedEitherWay(userId, post.userId)) {
+  if (
+    post.userId !== userId &&
+    (await isBlockedEitherWay(userId, post.userId))
+  ) {
     return { ok: false, error: "პოსტთან მოქმედება შეუძლებელია" };
   }
 
@@ -407,7 +413,7 @@ export async function reactToPostCore(
     .select({ kind: postReactions.kind })
     .from(postReactions)
     .where(
-      and(eq(postReactions.postId, postId), eq(postReactions.userId, userId))
+      and(eq(postReactions.postId, postId), eq(postReactions.userId, userId)),
     )
     .limit(1);
 
@@ -415,7 +421,7 @@ export async function reactToPostCore(
     await db
       .delete(postReactions)
       .where(
-        and(eq(postReactions.postId, postId), eq(postReactions.userId, userId))
+        and(eq(postReactions.postId, postId), eq(postReactions.userId, userId)),
       );
     return { ok: true, data: { active: null } };
   }
@@ -535,7 +541,7 @@ export async function listCommentsCore(
 export async function editPostCore(
   userId: string,
   postId: string,
-  rawBody: string
+  rawBody: string,
 ): Promise<FeedActionResult> {
   const body = rawBody.trim();
   if (!body) return { ok: false, error: "ცარიელ პოსტს ვერ შევინახავთ" };
@@ -559,14 +565,17 @@ export async function editPostCore(
     return { ok: false, error: "რედაქტირების დრო (5 წუთი) გავიდა" };
   }
 
-  await db.update(posts).set({ body, edited: true }).where(eq(posts.id, postId));
+  await db
+    .update(posts)
+    .set({ body, edited: true })
+    .where(eq(posts.id, postId));
   return { ok: true };
 }
 
 /** Delete a post. Author can delete their own; admins can delete any. */
 export async function deletePostCore(
   actor: FeedActor,
-  postId: string
+  postId: string,
 ): Promise<FeedActionResult> {
   const [post] = await db
     .select({ userId: posts.userId })
@@ -627,7 +636,7 @@ export async function deletePostCore(
 /** Delete a comment. Author OR admin OR post-author. */
 export async function deleteCommentCore(
   actor: FeedActor,
-  commentId: string
+  commentId: string,
 ): Promise<FeedActionResult> {
   const [row] = await db
     .select({

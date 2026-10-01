@@ -14,15 +14,12 @@ import { ApiError } from "@/lib/api/errors";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Framework-agnostic email/password auth logic, shared by the website
- * (Server Actions in actions/auth.ts) and the mobile API (app/api/v1/auth/*).
+ * Email/password auth logic used by website Server Actions in actions/auth.ts.
  *
  * These functions deal only with the database and return stable result
- * *codes* — never user-facing strings. Each caller maps codes to its own
- * presentation: the web action maps them to Georgian messages; the mobile
- * route returns the code so Flutter can localize. Email *sending* is left
- * to the caller (a one-line lib/email call) so the website can keep
- * deferring it via `after()` for a snappier signup response.
+ * *codes* — never user-facing strings. The action maps codes to Georgian
+ * messages. Email *sending* is left to the caller (a one-line lib/email call)
+ * so the website can defer it via `after()` for a faster signup response.
  */
 
 export const MIN_PASSWORD_LEN = 8;
@@ -103,7 +100,7 @@ export type RegisterResult =
 /**
  * Create an email/password account (unverified) and provision its trial.
  * Does NOT send the verification email — returns the token so the caller
- * can send (deferred on web, awaited on mobile).
+ * can send it after the account is created.
  */
 export async function registerUser(input: {
   name: string;

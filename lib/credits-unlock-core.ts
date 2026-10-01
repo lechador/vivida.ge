@@ -16,10 +16,8 @@ import {
 } from "@/lib/credits";
 
 /**
- * Paying credits to unlock a deep result, shared by the website's
- * `POST /api/credits/unlock` and the mobile `POST /api/v1/credits/unlock`
- * so both surfaces charge the same price for the same thing and run the
- * same ownership check.
+ * Paying credits to unlock a deep result for the website's
+ * `POST /api/credits/unlock`. Enforces the price and ownership check.
  */
 
 export const UNLOCK_KINDS = [
@@ -63,7 +61,7 @@ export type UnlockOutcome =
 async function ownsResult(
   userId: string,
   kind: Exclude<UnlockKind, "weekly">,
-  resultId: string
+  resultId: string,
 ): Promise<boolean> {
   const table = {
     iq: iqResults,
@@ -92,7 +90,7 @@ async function ownsResult(
 export async function unlockForUser(
   userId: string,
   kind: UnlockKind,
-  resultId?: string | null
+  resultId?: string | null,
 ): Promise<UnlockOutcome> {
   let ref: string;
   if (kind === "weekly") {

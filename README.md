@@ -9,7 +9,7 @@ Retired `/am` (Armenian) URLs 308-redirect to the same path without the prefix (
 
 ## Stack
 
-Next.js 16 · React 19 · Auth.js v5 (Google + Apple + credentials) · Drizzle ORM + Neon Postgres · Stripe + RevenueCat · Resend email · Cloudflare R2 + Turnstile · Sentry · Vercel (region `fra1`)
+Next.js 16 · React 19 · Auth.js v5 (Google + Apple + credentials) · Drizzle ORM + Neon Postgres · Stripe · Resend email · Cloudflare R2 + Turnstile · Sentry · Vercel (region `fra1`)
 
 ## Getting started
 

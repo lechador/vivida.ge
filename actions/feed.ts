@@ -21,9 +21,8 @@ import {
 } from "@/lib/feed-write-core";
 
 // Feed read types/logic live in lib/feed-core and write logic in
-// lib/feed-write-core so the mobile API (app/api/v1/*) shares them. Re-export
-// the public types here so existing component imports from "@/actions/feed"
-// keep working.
+// lib/feed-write-core. Re-export the public types here so existing component
+// imports from "@/actions/feed" keep working.
 export type { FeedAuthor, FeedPost, FeedReactionCounts } from "@/lib/feed-core";
 export type { FeedComment } from "@/lib/feed-write-core";
 
