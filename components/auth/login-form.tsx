@@ -16,6 +16,7 @@ import {
   verifyEmailWithCode,
 } from "@/actions/auth";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -35,10 +36,9 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
   // Defaults to the intent-aware resolver: incomplete profiles land on
   // onboarding, complete ones on their destination (or dashboard).
   const nextParam = params.get("next");
-  const safeNext =
-    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
-      ? nextParam
-      : null;
+  const safeNext = nextParam
+    ? normalizeReturnPath(nextParam, "") || null
+    : null;
   const dest = safeNext
     ? `/post-login?next=${encodeURIComponent(safeNext)}`
     : "/post-login";
@@ -46,6 +46,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resentMsg, setResentMsg] = useState<string | null>(null);
@@ -64,10 +65,13 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
   // doesn't loop the message.
   useEffect(() => {
     if (verified || verifyError) {
-      const t = setTimeout(() => router.replace("/login"), 5000);
+      const loginPath = safeNext
+        ? `/login?next=${encodeURIComponent(safeNext)}`
+        : "/login";
+      const t = setTimeout(() => router.replace(loginPath), 5000);
       return () => clearTimeout(t);
     }
-  }, [verified, verifyError, router]);
+  }, [verified, verifyError, router, safeNext]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,19 +79,31 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
     setUnverifiedEmail(null);
     setResentMsg(null);
     startTransition(async () => {
-      const result = await signInWithEmail({
-        email,
-        password,
-        turnstileToken,
-      });
-      if (result.ok) {
-        router.push(dest);
-        router.refresh();
-        return;
-      }
-      setError(result.error);
-      if (result.code === "email_unverified") {
-        setUnverifiedEmail(email);
+      try {
+        const result = await signInWithEmail({
+          email,
+          password,
+          turnstileToken,
+        });
+        if (result.ok) {
+          router.push(dest);
+          router.refresh();
+          return;
+        }
+        setError(result.error);
+        if (result.code === "email_unverified") {
+          setUnverifiedEmail(email);
+        }
+      } catch {
+        setError(
+          en
+            ? "Could not sign in. Please try again."
+            : "შესვლა ვერ მოხერხდა. სცადე ხელახლა.",
+        );
+      } finally {
+        // Turnstile tokens are single-use, including when credentials fail.
+        setTurnstileToken(null);
+        setTurnstileResetKey((key) => key + 1);
       }
     });
   };
@@ -96,12 +112,27 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
     if (!unverifiedEmail) return;
     setResentMsg(null);
     startResendTransition(async () => {
-      await requestVerificationEmail({ email: unverifiedEmail });
-      setResentMsg(
-        en
-          ? "Check your inbox—a new code and link have been sent."
-          : "შემოწმე საფოსტო ყუთი — ახალი კოდი და ლინკი გაიგზავნა.",
-      );
+      try {
+        const result = await requestVerificationEmail({
+          email: unverifiedEmail,
+        });
+        if (result.ok) {
+          setCodeError(null);
+          setResentMsg(
+            en
+              ? "Check your inbox—a new code and link have been sent."
+              : "შემოწმე საფოსტო ყუთი — ახალი კოდი და ლინკი გაიგზავნა.",
+          );
+        } else {
+          setCodeError(result.error);
+        }
+      } catch {
+        setCodeError(
+          en
+            ? "Could not send a new code. Please try again."
+            : "ახალი კოდის გაგზავნა ვერ მოხერხდა. სცადე ხელახლა.",
+        );
+      }
     });
   };
 
@@ -109,24 +140,32 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
     if (!unverifiedEmail || code.length !== 6) return;
     setCodeError(null);
     startCodeTransition(async () => {
-      // Pass the password they just typed so a correct code both verifies
-      // AND signs them in — straight into the app, no second "შესვლა".
-      const res = await verifyEmailWithCode({
-        email: unverifiedEmail,
-        code: code.trim(),
-        password,
-      });
-      if (res.ok && res.signedIn) {
-        router.push(dest);
-        router.refresh();
-      } else if (res.ok) {
-        // Verified but auto-signin didn't take — clear the wall so they can
-        // press "შესვლა" with the password they already typed.
-        setCodeVerified(true);
-        setError(null);
-        setUnverifiedEmail(null);
-      } else {
-        setCodeError(res.error);
+      try {
+        // Pass the password they just typed so a correct code both verifies
+        // AND signs them in — straight into the app, no second "შესვლა".
+        const res = await verifyEmailWithCode({
+          email: unverifiedEmail,
+          code: code.trim(),
+          password,
+        });
+        if (res.ok && res.signedIn) {
+          router.push(dest);
+          router.refresh();
+        } else if (res.ok) {
+          // Verified but auto-signin didn't take — clear the wall so they can
+          // press "შესვლა" with the password they already typed.
+          setCodeVerified(true);
+          setError(null);
+          setUnverifiedEmail(null);
+        } else {
+          setCodeError(res.error);
+        }
+      } catch {
+        setCodeError(
+          en
+            ? "Could not verify the code. Please try again."
+            : "კოდის შემოწმება ვერ მოხერხდა. სცადე ხელახლა.",
+        );
       }
     });
   };
@@ -305,7 +344,11 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
             </div>
           )}
 
-          <TurnstileWidget locale={locale} onChange={setTurnstileToken} />
+          <TurnstileWidget
+            key={turnstileResetKey}
+            locale={locale}
+            onChange={setTurnstileToken}
+          />
 
           <Button
             type="submit"

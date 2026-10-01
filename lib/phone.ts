@@ -25,6 +25,21 @@ export function normalizeGeorgianMobile(raw: string): string | null {
   return `+995${national}`;
 }
 
+/** Digits shown in the local-number field. Accept a pasted full Georgian
+ * number while keeping the fixed +995 prefix outside the editable input. */
+export function georgianMobileInputDigits(raw: string): string {
+  let digits = raw.replace(/\D/g, "");
+  if (
+    (raw.trimStart().startsWith("+995") || digits.length > 9) &&
+    digits.startsWith("995")
+  ) {
+    digits = digits.slice(3);
+  } else if (digits.startsWith("0") && digits.length > 9) {
+    digits = digits.slice(1);
+  }
+  return digits.slice(0, 9);
+}
+
 /** True for the 9-digit national form of a Georgian mobile (5XXXXXXXX). */
 export function isNationalMobile(national: string): boolean {
   return /^5\d{8}$/.test(national);

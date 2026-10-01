@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  georgianMobileInputDigits,
   formatGeorgianMobile,
   isNationalMobile,
   isValidGeorgianMobile,
@@ -11,6 +12,13 @@ import {
 import { buildOtpSms } from "@/lib/sms";
 
 describe("phone normalization", () => {
+  it("keeps a fixed +995 prefix when a full number is pasted into the local field", () => {
+    expect(georgianMobileInputDigits("555 123 456")).toBe("555123456");
+    expect(georgianMobileInputDigits("+995 555 123 456")).toBe("555123456");
+    expect(georgianMobileInputDigits("995555123456")).toBe("555123456");
+    expect(georgianMobileInputDigits("0555123456")).toBe("555123456");
+  });
+
   it("normalizes every common Georgian input to E.164", () => {
     expect(normalizeGeorgianMobile("555123456")).toBe("+995555123456");
     expect(normalizeGeorgianMobile("555 123 456")).toBe("+995555123456");

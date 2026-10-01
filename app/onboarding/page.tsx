@@ -18,15 +18,11 @@ import {
   SIGNUP_CREDITS_EXPERIMENT,
 } from "@/lib/signup-credit-experiment";
 import { after } from "next/server";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return { title: locale !== "ka" ? "Set up your chart" : "გაცნობა" };
-}
-
-/** Same-origin relative path only (no open redirect). */
-function safeNext(v: string | undefined): string | undefined {
-  return v && v.startsWith("/") && !v.startsWith("//") ? v : undefined;
 }
 
 export default async function OnboardingPage({
@@ -47,7 +43,9 @@ export default async function OnboardingPage({
     after(() => markSignupCreditExperimentExposed(user.id));
   }
 
-  const destination = safeNext(next);
+  const destination = next
+    ? normalizeReturnPath(next, "") || undefined
+    : undefined;
   if (fast === "1" && existing?.dateOfBirth) redirect(destination ?? "/report");
 
   return (

@@ -17,6 +17,7 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
   const [email, setEmail] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -28,6 +29,8 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
     setError(null);
     startTransition(async () => {
       const result = await requestPasswordReset({ email, turnstileToken });
+      setTurnstileToken(null);
+      setTurnstileResetKey((key) => key + 1);
       if (result.ok) {
         setDone(true);
       } else {
@@ -90,7 +93,11 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
         </div>
       )}
 
-      <TurnstileWidget locale={locale} onChange={setTurnstileToken} />
+      <TurnstileWidget
+        key={turnstileResetKey}
+        locale={locale}
+        onChange={setTurnstileToken}
+      />
 
       <Button
         type="submit"

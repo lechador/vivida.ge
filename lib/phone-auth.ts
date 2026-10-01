@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { and, desc, eq, isNotNull, isNull, lt, ne } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, lt, ne, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { phoneVerifications, users } from "@/db/schema";
@@ -159,7 +159,15 @@ export type PhoneLoginUser = {
 
 export type PhoneLoginResult =
   | { ok: true; user: PhoneLoginUser }
-  | { ok: false; error: "invalid" | "expired" | "no_account" };
+  | {
+      ok: false;
+      error:
+        | "invalid"
+        | "expired"
+        | "no_account"
+        | "email_unverified"
+        | "phone_reverification_required";
+    };
 
 /**
  * Complete a phone login: verify the code, then resolve the account whose
@@ -184,12 +192,36 @@ export async function completePhoneLogin(input: {
       name: users.name,
       email: users.email,
       image: users.image,
+      emailVerified: users.emailVerified,
+      passwordHash: users.passwordHash,
+      phoneVerifiedAt: users.phoneVerifiedAt,
     })
     .from(users)
     .where(and(eq(users.phone, input.phone), isNotNull(users.phoneVerifiedAt)))
     .limit(1);
   if (!user) return { ok: false, error: "no_account" };
-  return { ok: true, user };
+  // Legacy signup claims could be bound before email verification. Do not
+  // let such a provisional password account log in by phone.
+  if (user.passwordHash && !user.emailVerified) {
+    return { ok: false, error: "email_unverified" };
+  }
+  if (
+    user.passwordHash &&
+    user.emailVerified &&
+    user.phoneVerifiedAt &&
+    user.phoneVerifiedAt.getTime() < user.emailVerified.getTime()
+  ) {
+    return { ok: false, error: "phone_reverification_required" };
+  }
+  return {
+    ok: true,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+    },
+  };
 }
 
 export type AccountPhoneResult =
@@ -224,7 +256,14 @@ export async function bindAccountPhone(input: {
   try {
     await db
       .update(users)
-      .set({ phone: input.phone, phoneVerifiedAt: new Date() })
+      .set({
+        phone: input.phone,
+        phoneVerifiedAt: new Date(),
+        // Consent belongs to a specific verified number. Keep it only when
+        // the user re-verifies the same number; a replacement starts opted out.
+        smsMarketing: sql`CASE WHEN ${users.phone} = ${input.phone} THEN ${users.smsMarketing} ELSE false END`,
+        smsMarketingConsentedAt: sql`CASE WHEN ${users.phone} = ${input.phone} THEN ${users.smsMarketingConsentedAt} ELSE NULL END`,
+      })
       .where(eq(users.id, input.userId));
   } catch (err) {
     if (isUniqueViolation(err)) return { ok: false, error: "phone_taken" };
@@ -239,10 +278,9 @@ export type PhoneClaimResult =
   | { ok: false; error: "invalid_claim" | "phone_taken" };
 
 /**
- * Bind a signup-time verified number to the just-created account, using the
- * claim token the browser received when it entered the code. This is what
- * makes the optional signup verification trustworthy: the claim exists
- * server-side only after a correct code entry.
+ * Bind a signup-time verified number after the account's email is verified,
+ * using the claim token the browser received when it entered the SMS code.
+ * Both proofs must be present before phone login can be enabled.
  */
 export async function bindSignupPhoneClaim(input: {
   userId: string;
@@ -269,6 +307,16 @@ export async function bindSignupPhoneClaim(input: {
     return { ok: false, error: "invalid_claim" };
   }
 
+  // A signup claim can only be finalized once the inbox has been proven.
+  // This prevents an attacker from registering someone else's email with
+  // their own phone and waiting for the recipient to click a verify link.
+  const [account] = await db
+    .select({ emailVerified: users.emailVerified })
+    .from(users)
+    .where(eq(users.id, input.userId))
+    .limit(1);
+  if (!account?.emailVerified) return { ok: false, error: "invalid_claim" };
+
   const [taken] = await db
     .select({ id: users.id })
     .from(users)
@@ -279,7 +327,12 @@ export async function bindSignupPhoneClaim(input: {
   try {
     await db
       .update(users)
-      .set({ phone: row.phone, phoneVerifiedAt: row.verifiedAt })
+      .set({
+        phone: row.phone,
+        phoneVerifiedAt: new Date(
+          Math.max(Date.now(), account.emailVerified.getTime() + 1),
+        ),
+      })
       .where(eq(users.id, input.userId));
   } catch (err) {
     if (isUniqueViolation(err)) return { ok: false, error: "phone_taken" };

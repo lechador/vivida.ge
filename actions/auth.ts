@@ -1,13 +1,14 @@
 "use server";
 
 import { after } from "next/server";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { signIn, signOut } from "@/auth";
 import {
   consumeEmailVerifyCode,
   consumeEmailVerifyToken,
   consumePasswordReset,
+  finalizeSignupPhoneClaim,
   isValidEmail,
   MIN_PASSWORD_LEN,
   normalizeEmail,
@@ -139,8 +140,7 @@ export type SignUpInput = {
   password: string;
   /** Cloudflare Turnstile token from the client widget. */
   turnstileToken: string | null;
-  /** Signup-time phone verification claim (see actions/phone.ts). When
-   *  present, the verified number is bound to the new account. */
+  /** Signup-time phone claim is finalized only after email-code proof. */
   phoneClaimToken?: string | null;
 };
 
@@ -205,7 +205,6 @@ export async function signUpWithEmail(
       interfaceLanguage: locale,
       residenceCountryCode: countryCodeFromHeaders(requestHeaders),
       ip,
-      phoneClaimToken: input.phoneClaimToken ?? null,
     });
   } catch (err) {
     console.warn("[signUpWithEmail] register failed:", (err as Error).message);
@@ -266,6 +265,29 @@ export async function requestVerificationEmail(input: {
     };
   }
 
+  try {
+    await enforceAuthRateLimit({
+      action: "resend_verification",
+      ip: await clientIpFromHeaders(),
+      email,
+      ipLimit: 5,
+      emailLimit: 3,
+      windowMs: 60 * 60 * 1000,
+    });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 429) {
+      return {
+        ok: false,
+        error: localized(
+          locale,
+          "ბევრი მცდელობა იყო. სცადე მოგვიანებით.",
+          "Too many attempts. Please try again later.",
+        ),
+      };
+    }
+    throw err;
+  }
+
   const dispatch = await prepareVerificationResend(email);
   if (dispatch.send) {
     try {
@@ -286,25 +308,76 @@ export async function requestVerificationEmail(input: {
   return { ok: true };
 }
 
-// ─── Verify-email link handler ───────────────────────────────────────────
+// ─── Verify-email link password setup ────────────────────────────────────
 
-export type VerifyEmailResult =
-  { ok: true; userId: string } | { ok: false; error: "invalid" | "expired" };
+export type VerifyEmailLinkResult = { ok: true } | { ok: false; error: string };
 
 /**
- * Consume a verification token. Called from `/api/auth/verify-email`.
- * Thin re-export of the shared core so the route's import is unchanged.
+ * A verification link proves inbox control, but the pending password may
+ * have been chosen by somebody who preregistered another person's address.
+ * Let the inbox owner choose the final password before activating the account.
  */
-export async function verifyEmailToken(
-  token: string,
-): Promise<VerifyEmailResult> {
-  return consumeEmailVerifyToken(token);
+export async function verifyEmailFromLink(input: {
+  password: string;
+}): Promise<VerifyEmailLinkResult> {
+  const locale = await getRequestLocale();
+  const cookieStore = await cookies();
+  const token = cookieStore.get("vivida_email_verify")?.value;
+  if (!token) {
+    return {
+      ok: false,
+      error: localized(
+        locale,
+        "ლინკი არასწორია ან უკვე გამოყენებულია.",
+        "This link is invalid or has already been used.",
+      ),
+    };
+  }
+  const result = await consumeEmailVerifyToken({
+    token,
+    password: input.password,
+  });
+  if (result.ok) {
+    cookieStore.set("vivida_email_verify", "", {
+      path: "/verify-email",
+      maxAge: 0,
+    });
+    return { ok: true };
+  }
+  if (result.error !== "weak_password") {
+    cookieStore.set("vivida_email_verify", "", {
+      path: "/verify-email",
+      maxAge: 0,
+    });
+  }
+  return {
+    ok: false,
+    error:
+      result.error === "weak_password"
+        ? localized(
+            locale,
+            `პაროლი მინიმუმ ${MIN_PASSWORD_LEN} სიმბოლო უნდა იყოს`,
+            `Password must be at least ${MIN_PASSWORD_LEN} characters`,
+          )
+        : result.error === "expired"
+          ? localized(
+              locale,
+              "ლინკს ვადა გაუვიდა. ანგარიში პაროლის აღდგენით დაასრულე.",
+              "This link has expired. Complete the account through password recovery.",
+            )
+          : localized(
+              locale,
+              "ლინკი არასწორია ან უკვე გამოყენებულია.",
+              "This link is invalid or has already been used.",
+            ),
+  };
 }
 
 // ─── Verify-email OTP code (link alternative) ────────────────────────────
 
 export type VerifyCodeResult =
-  { ok: true; signedIn: boolean } | { ok: false; error: string };
+  | { ok: true; signedIn: boolean; phoneLinked?: boolean }
+  | { ok: false; error: string };
 
 /**
  * Verify an account by the 6-digit code from the email — the easier path for
@@ -312,18 +385,17 @@ export type VerifyCodeResult =
  * 6-digit code is small, so the attempt cap is what makes brute force
  * infeasible.
  *
- * When `password` is supplied (the signup / login screens still hold it in
- * memory), we sign the user in immediately on success — no bounce to the
- * login page to re-type the password they just used. This is *stronger*
- * proof than a normal login: they've shown both inbox control (the code) AND
- * the password. No Turnstile needed for that reason, and it's rate-limited.
- * `signedIn` tells the client whether a session was established; on any
- * signin hiccup it stays false and the client falls back to the login page.
+ * The inbox owner chooses the final password while submitting the code.
+ * This prevents a preregistered address from becoming usable with a password
+ * chosen by somebody else. We sign in immediately on success; `signedIn`
+ * tells the client whether session setup worked, with a login fallback.
  */
 export async function verifyEmailWithCode(input: {
   email: string;
   code: string;
-  password?: string;
+  password: string;
+  phoneClaimToken?: string | null;
+  smsMarketing?: boolean;
 }): Promise<VerifyCodeResult> {
   const locale = await getRequestLocale();
   const email = normalizeEmail(input.email);
@@ -361,40 +433,65 @@ export async function verifyEmailWithCode(input: {
     throw err;
   }
 
-  const result = await consumeEmailVerifyCode({ email, code: input.code });
+  const result = await consumeEmailVerifyCode({
+    email,
+    code: input.code,
+    password: input.password,
+  });
   if (!result.ok) {
     return {
       ok: false,
       error:
-        result.error === "expired"
+        result.error === "weak_password"
           ? localized(
               locale,
-              "კოდს ვადა გაუვიდა. მოითხოვე ახალი.",
-              "This code has expired. Request a new one.",
+              `პაროლი მინიმუმ ${MIN_PASSWORD_LEN} სიმბოლო უნდა იყოს`,
+              `Password must be at least ${MIN_PASSWORD_LEN} characters`,
             )
-          : localized(
-              locale,
-              "კოდი არასწორია. შეამოწმე და სცადე ხელახლა.",
-              "That code is incorrect. Check it and try again.",
-            ),
+          : result.error === "expired"
+            ? localized(
+                locale,
+                "კოდს ვადა გაუვიდა. მოითხოვე ახალი.",
+                "This code has expired. Request a new one.",
+              )
+            : localized(
+                locale,
+                "კოდი არასწორია. შეამოწმე და სცადე ხელახლა.",
+                "That code is incorrect. Check it and try again.",
+              ),
     };
+  }
+
+  let phoneLinked: boolean | undefined;
+  if (input.phoneClaimToken) {
+    try {
+      phoneLinked = await finalizeSignupPhoneClaim(
+        result.userId,
+        input.phoneClaimToken,
+        input.smsMarketing === true,
+      );
+    } catch (err) {
+      console.warn(
+        "[verifyEmailWithCode] phone claim finalize failed:",
+        (err as Error).message,
+      );
+      phoneLinked = false;
+    }
   }
 
   // Account is now verified. If we have the password, establish a session so
   // the user lands straight in the app instead of retyping it on /login.
-  if (input.password) {
-    try {
-      await signIn("credentials", {
-        email,
-        password: input.password,
-        redirect: false,
-      });
-      return { ok: true, signedIn: true };
-    } catch {
-      // Verified fine, but auto-signin failed — client falls back to /login.
-    }
+  try {
+    await signIn("credentials", {
+      email,
+      password: input.password,
+      redirect: false,
+    });
+    return { ok: true, signedIn: true, phoneLinked };
+  } catch {
+    // Verified fine, but auto-signin failed — client falls back to /login.
   }
-  return { ok: true, signedIn: false };
+  return { ok: true, signedIn: false, phoneLinked };
 }
 
 // ─── Password reset request ──────────────────────────────────────────────
@@ -425,6 +522,29 @@ export async function requestPasswordReset(input: {
         "Enter a valid email address",
       ),
     };
+  }
+
+  try {
+    await enforceAuthRateLimit({
+      action: "forgot_password",
+      ip: await clientIpFromHeaders(),
+      email,
+      ipLimit: 5,
+      emailLimit: 3,
+      windowMs: 60 * 60 * 1000,
+    });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 429) {
+      return {
+        ok: false,
+        error: localized(
+          locale,
+          "ბევრი მცდელობა იყო. სცადე მოგვიანებით.",
+          "Too many attempts. Please try again later.",
+        ),
+      };
+    }
+    throw err;
   }
 
   const dispatch = await preparePasswordReset(email);
@@ -513,6 +633,16 @@ export async function signInWithEmail(
     // thrown plain Error in a CallbackRouteError whose own message is just a
     // docs link (see lib/auth-error.ts).
     const message = authErrorText(err);
+    if (message.includes("EMAIL_LOGIN_RATE_LIMITED")) {
+      return {
+        ok: false,
+        error: localized(
+          locale,
+          "შესვლის ძალიან ბევრი მცდელობა იყო. სცადე ცოტა ხანში.",
+          "Too many sign-in attempts. Please try again in a few minutes.",
+        ),
+      };
+    }
     if (message.includes("EMAIL_NOT_VERIFIED")) {
       return {
         ok: false,

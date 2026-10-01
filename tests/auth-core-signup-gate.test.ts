@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   events: [] as string[],
   insertedUsers: [] as Record<string, unknown>[],
+  updatedUsers: [] as Record<string, unknown>[],
   existing: null as null | Record<string, unknown>,
   selected: vi.fn(),
   inserted: vi.fn(),
@@ -57,6 +58,7 @@ describe("auth-core new-account gate", () => {
     vi.clearAllMocks();
     mocks.events.length = 0;
     mocks.insertedUsers.length = 0;
+    mocks.updatedUsers.length = 0;
     mocks.existing = null;
     mocks.selected.mockImplementation(() => ({
       from: () => ({
@@ -85,7 +87,12 @@ describe("auth-core new-account gate", () => {
         return {};
       },
     }));
-    mocks.updated.mockReturnValue({ set: () => ({ where: async () => {} }) });
+    mocks.updated.mockReturnValue({
+      set: (values: Record<string, unknown>) => {
+        mocks.updatedUsers.push(values);
+        return { where: async () => {} };
+      },
+    });
     mocks.deleted.mockReturnValue({ where: async () => {} });
     mocks.checkNewSignup.mockImplementation(async () => {
       mocks.events.push("gate");
@@ -162,6 +169,12 @@ describe("auth-core new-account gate", () => {
     });
     expect(mocks.checkNewSignup).not.toHaveBeenCalled();
     expect(mocks.onUserSignedUp).not.toHaveBeenCalled();
+    expect(mocks.updatedUsers[0]).toMatchObject({
+      phone: null,
+      phoneVerifiedAt: null,
+      smsMarketing: false,
+      smsMarketingConsentedAt: null,
+    });
   });
 
   it("checks a new email account before insertion and bonus issuance", async () => {

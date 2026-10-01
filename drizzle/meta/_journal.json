@@ -645,6 +645,13 @@
       "when": 1790800419004,
       "tag": "0091_romantic_power_man",
       "breakpoints": true
+    },
+    {
+      "idx": 92,
+      "version": "7",
+      "when": 1790803109725,
+      "tag": "0092_nostalgic_human_cannonball",
+      "breakpoints": true
     }
   ]
 }

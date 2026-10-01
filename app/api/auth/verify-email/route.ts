@@ -1,24 +1,31 @@
 import { NextResponse } from "next/server";
 
-import { verifyEmailToken } from "@/actions/auth";
-
 export const runtime = "nodejs";
 
 /**
- * Inbound link from the verification email. We process server-side and
- * redirect to /login with a query flag the page picks up to render a
- * one-time success/failure banner.
+ * Inbound link from the verification email. Opening the link alone must not
+ * activate an account with a password possibly chosen by a preregistration
+ * attacker (or by a mail scanner). Hand the token to a short-lived HttpOnly
+ * cookie and let the inbox owner set the final password on /verify-email.
  */
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token") ?? "";
-  const result = await verifyEmailToken(token);
-
-  const redirect = new URL("/login", url.origin);
-  if (result.ok) {
-    redirect.searchParams.set("verified", "1");
+  const response = NextResponse.redirect(new URL("/verify-email", url.origin));
+  response.headers.set("Cache-Control", "no-store");
+  if (/^[0-9a-f]{64}$/i.test(token)) {
+    response.cookies.set("vivida_email_verify", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/verify-email",
+      maxAge: 24 * 60 * 60,
+    });
   } else {
-    redirect.searchParams.set("verify_error", result.error);
+    response.cookies.set("vivida_email_verify", "", {
+      path: "/verify-email",
+      maxAge: 0,
+    });
   }
-  return NextResponse.redirect(redirect);
+  return response;
 }

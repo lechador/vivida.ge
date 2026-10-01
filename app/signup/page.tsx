@@ -9,6 +9,7 @@ import { GoogleButton } from "@/components/auth/google-button";
 import { SignupForm } from "@/components/auth/signup-form";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { localizedAlternates } from "@/lib/seo/locales";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,9 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-/** Same-origin relative path only (no open redirect). */
 function safeNext(v: string | undefined): string | null {
-  return v && v.startsWith("/") && !v.startsWith("//") ? v : null;
+  return v ? normalizeReturnPath(v, "") || null : null;
 }
 
 export default async function SignupPage({
@@ -68,18 +68,23 @@ export default async function SignupPage({
       }
     >
       {(error === "duplicate_registration" ||
-        error === "signup_rate_limited") && (
+        error === "signup_rate_limited" ||
+        error === "oauth_email_unverified") && (
         <p
           role="alert"
           className="mb-5 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
         >
-          {error === "duplicate_registration"
+          {error === "oauth_email_unverified"
             ? en
-              ? "This registration needs review. Try signing in to your existing account or contact support."
-              : "ამ მონაცემებით რეგისტრაცია დამატებით შემოწმებას საჭიროებს. სცადე არსებულ ანგარიშში შესვლა ან მოგვწერე მხარდაჭერას."
-            : en
-              ? "Too many new accounts from this connection. Please try again later."
-              : "ამ კავშირიდან ძალიან ბევრი ახალი ანგარიში შეიქმნა. სცადე მოგვიანებით."}
+              ? "Your Google or Apple account has no verified email address. Verify it with the provider, then try again."
+              : "Google-ის ან Apple-ის ანგარიშს დადასტურებული ელფოსტა არ აქვს. დაადასტურე ის პროვაიდერთან და სცადე ხელახლა."
+            : error === "duplicate_registration"
+              ? en
+                ? "This registration needs review. Try signing in to your existing account or contact support."
+                : "ამ მონაცემებით რეგისტრაცია დამატებით შემოწმებას საჭიროებს. სცადე არსებულ ანგარიშში შესვლა ან მოგვწერე მხარდაჭერას."
+              : en
+                ? "Too many new accounts from this connection. Please try again later."
+                : "ამ კავშირიდან ძალიან ბევრი ახალი ანგარიში შეიქმნა. სცადე მოგვიანებით."}
         </p>
       )}
       <div className="space-y-3">

@@ -5,6 +5,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { GeorgianMobileInput } from "@/components/auth/georgian-mobile-input";
 import {
   sendPhoneVerificationCode,
   verifyAccountPhone,
@@ -160,19 +161,15 @@ export function PhoneVerify({
     <div className="space-y-2">
       {step === "enter" ? (
         <div className="flex gap-2">
-          <Input
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            placeholder="+995 5XX XXX XXX"
+          <GeorgianMobileInput
+            locale={locale}
             value={phone}
-            onChange={(e) => {
-              setPhone(e.target.value);
+            onChange={(digits) => {
+              setPhone(digits);
               setError(null);
-              onInputChange?.(e.target.value);
+              onInputChange?.(digits);
             }}
             disabled={pending || disabled}
-            aria-label={en ? "Mobile number" : "მობილურის ნომერი"}
           />
           <Button
             type="button"

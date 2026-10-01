@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GeorgianMobileInput } from "@/components/auth/georgian-mobile-input";
 import {
   sendPhoneVerificationCode,
   signInWithPhoneCode,
@@ -120,15 +121,12 @@ export function PhoneLoginForm({
         <Label htmlFor="phone-login">
           {en ? "Mobile number" : "მობილურის ნომერი"}
         </Label>
-        <Input
+        <GeorgianMobileInput
           id="phone-login"
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          placeholder="+995 5XX XXX XXX"
+          locale={locale}
           value={phone}
-          onChange={(e) => {
-            setPhone(e.target.value);
+          onChange={(digits) => {
+            setPhone(digits);
             setError(null);
           }}
           disabled={pending || step === "code"}

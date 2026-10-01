@@ -12,6 +12,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { requireUser } from "@/lib/auth-helpers";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getUserLocale } from "@/lib/i18n/user-locale";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 import { buildEnglishChartInterpretation } from "@/lib/report-content-en";
 import { BODIES, signByIndex } from "@/lib/zodiac";
 
@@ -23,9 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 function safeNext(value: string | undefined): string {
-  return value && value.startsWith("/") && !value.startsWith("//")
-    ? value
-    : "/report";
+  return normalizeReturnPath(value, "/report");
 }
 
 function firstSentence(value: string | undefined): string | undefined {

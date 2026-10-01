@@ -50,6 +50,11 @@ export const users = pgTable(
       .default(true),
     emailMarketing: boolean("email_marketing").notNull().default(true),
     emailNudges: boolean("email_nudges").notNull().default(true),
+    /** Separate, explicit opt-in for promotional SMS to the verified phone. */
+    smsMarketing: boolean("sms_marketing").notNull().default(false),
+    smsMarketingConsentedAt: timestamp("sms_marketing_consented_at", {
+      withTimezone: true,
+    }),
     // ── Native mobile push preferences ───────────────────────────────────
     // The master switch starts OFF until the user grants the OS notification
     // permission. Category choices default ON so the first opt-in enables the

@@ -72,24 +72,6 @@ export async function issueAuthToken(
 
 // ─── Register ────────────────────────────────────────────────────────────
 
-/**
- * Apply an optional signup-time phone verification claim to a (possibly
- * just-created) account. Returns a RegisterError code when the claim is
- * stale/gone or the number already belongs to another account, null when
- * there was nothing to bind or the bind succeeded. The claim row only
- * exists server-side after a correct SMS code entry, so a browser can
- * never attach a number it did not prove control of.
- */
-async function bindSignupPhoneIfClaimed(
-  userId: string,
-  claimToken: string | null | undefined,
-): Promise<RegisterError | null> {
-  if (!claimToken) return null;
-  const bound = await bindSignupPhoneClaim({ userId, claimToken });
-  if (bound.ok) return null;
-  return bound.error === "phone_taken" ? "phone_taken" : "phone_claim_invalid";
-}
-
 export type RegisterError =
   | "invalid_name"
   | "invalid_email"
@@ -130,9 +112,6 @@ export async function registerUser(input: {
   interfaceLanguage?: UserLocale;
   residenceCountryCode?: string | null;
   ip?: string | null;
-  /** Optional signup-time phone verification claim (see lib/phone-auth):
-   *  when present, the verified number is bound to the account. */
-  phoneClaimToken?: string | null;
 }): Promise<RegisterResult> {
   const name = input.name.trim();
   const email = normalizeEmail(input.email);
@@ -172,6 +151,13 @@ export async function registerUser(input: {
       .set({
         name,
         passwordHash,
+        // A fresh signup attempt supersedes the provisional one. Otherwise
+        // the first applicant's verified phone could survive when the real
+        // email owner resumes and verifies the account without a phone.
+        phone: null,
+        phoneVerifiedAt: null,
+        smsMarketing: false,
+        smsMarketingConsentedAt: null,
         ...(input.interfaceLanguage
           ? { interfaceLanguage: input.interfaceLanguage }
           : {}),
@@ -188,11 +174,6 @@ export async function registerUser(input: {
     } catch {
       /* best-effort — never block the resume */
     }
-    const phoneError = await bindSignupPhoneIfClaimed(
-      existing.id,
-      input.phoneClaimToken,
-    );
-    if (phoneError) return { ok: false, error: phoneError };
     const verifyCode = generateOtpCode();
     const verifyToken = await issueAuthToken(
       existing.id,
@@ -255,12 +236,6 @@ export async function registerUser(input: {
     );
   }
 
-  const phoneError = await bindSignupPhoneIfClaimed(
-    created.id,
-    input.phoneClaimToken,
-  );
-  if (phoneError) return { ok: false, error: phoneError };
-
   const verifyCode = generateOtpCode();
   const verifyToken = await issueAuthToken(
     created.id,
@@ -277,6 +252,32 @@ export async function registerUser(input: {
     verifyToken,
     verifyCode,
   };
+}
+
+/** Bind a signup phone only after the same browser proves inbox control with
+ * the email code and presents the SMS claim. Clicking an unsolicited email
+ * link in another browser must never activate someone else's phone. */
+export async function finalizeSignupPhoneClaim(
+  userId: string,
+  claimToken: string,
+  smsMarketing: boolean,
+): Promise<boolean> {
+  const [user] = await db
+    .select({ emailVerified: users.emailVerified })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  if (!user?.emailVerified) return false;
+
+  const bound = await bindSignupPhoneClaim({ userId, claimToken });
+  if (!bound.ok) return false;
+  if (smsMarketing === true) {
+    await db
+      .update(users)
+      .set({ smsMarketing: true, smsMarketingConsentedAt: new Date() })
+      .where(eq(users.id, userId));
+  }
+  return true;
 }
 
 // ─── OAuth (Google) ──────────────────────────────────────────────────────
@@ -312,12 +313,29 @@ export async function findOrCreateOAuthUser(input: {
       email: users.email,
       name: users.name,
       image: users.image,
+      emailVerified: users.emailVerified,
+      passwordHash: users.passwordHash,
     })
     .from(users)
     .where(eq(users.email, email))
     .limit(1);
 
   if (existing) {
+    if (!existing.emailVerified) {
+      // A verified OAuth inbox may match a provisional password signup that
+      // somebody else initiated. Do not inherit their password or phone.
+      await db
+        .update(users)
+        .set({
+          emailVerified: new Date(),
+          passwordHash: null,
+          phone: null,
+          phoneVerifiedAt: null,
+          smsMarketing: false,
+          smsMarketingConsentedAt: null,
+        })
+        .where(eq(users.id, existing.id));
+    }
     if (input.residenceCountryCode) {
       await db
         .update(users)
@@ -458,33 +476,52 @@ export async function preparePasswordReset(
 // ─── Consume verify-email / reset tokens ─────────────────────────────────
 
 export type VerifyEmailResult =
-  { ok: true; userId: string } | { ok: false; error: "invalid" | "expired" };
+  | { ok: true; userId: string }
+  | { ok: false; error: "invalid" | "expired" | "weak_password" };
 
 /** Consume an email_verify token, marking the user verified. Single-use. */
-export async function consumeEmailVerifyToken(
-  token: string,
-): Promise<VerifyEmailResult> {
-  if (!token) return { ok: false, error: "invalid" };
+export async function consumeEmailVerifyToken(input: {
+  token: string;
+  password: string;
+}): Promise<VerifyEmailResult> {
+  if (!input.token) return { ok: false, error: "invalid" };
+  if (
+    typeof input.password !== "string" ||
+    input.password.length < MIN_PASSWORD_LEN
+  ) {
+    return { ok: false, error: "weak_password" };
+  }
 
   const [row] = await db
     .select()
     .from(authTokens)
     .where(
-      and(eq(authTokens.token, token), eq(authTokens.purpose, "email_verify")),
+      and(
+        eq(authTokens.token, input.token),
+        eq(authTokens.purpose, "email_verify"),
+      ),
     )
     .limit(1);
 
   if (!row) return { ok: false, error: "invalid" };
   if (row.expiresAt.getTime() < Date.now()) {
-    await db.delete(authTokens).where(eq(authTokens.token, token));
+    await db.delete(authTokens).where(eq(authTokens.token, input.token));
     return { ok: false, error: "expired" };
   }
 
+  const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
   await db
     .update(users)
-    .set({ emailVerified: new Date() })
+    .set({
+      emailVerified: new Date(),
+      passwordHash,
+      phone: null,
+      phoneVerifiedAt: null,
+      smsMarketing: false,
+      smsMarketingConsentedAt: null,
+    })
     .where(eq(users.id, row.userId));
-  await db.delete(authTokens).where(eq(authTokens.token, token));
+  await db.delete(authTokens).where(eq(authTokens.token, input.token));
 
   try {
     await qualifyReferral(row.userId);
@@ -506,9 +543,16 @@ export async function consumeEmailVerifyToken(
 export async function consumeEmailVerifyCode(input: {
   email: string;
   code: string;
+  password: string;
 }): Promise<VerifyEmailResult> {
   const email = normalizeEmail(input.email);
   const code = input.code.trim();
+  if (
+    typeof input.password !== "string" ||
+    input.password.length < MIN_PASSWORD_LEN
+  ) {
+    return { ok: false, error: "weak_password" };
+  }
   if (!isValidEmail(email) || !/^\d{6}$/.test(code)) {
     return { ok: false, error: "invalid" };
   }
@@ -538,9 +582,17 @@ export async function consumeEmailVerifyCode(input: {
   }
   if (row.code !== code) return { ok: false, error: "invalid" };
 
+  const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
   await db
     .update(users)
-    .set({ emailVerified: new Date() })
+    .set({
+      emailVerified: new Date(),
+      passwordHash,
+      phone: null,
+      phoneVerifiedAt: null,
+      smsMarketing: false,
+      smsMarketingConsentedAt: null,
+    })
     .where(eq(users.id, user.id));
   await db.delete(authTokens).where(eq(authTokens.token, row.token));
 

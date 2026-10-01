@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 import { invalidateProfileForUser } from "@/lib/header-cache";
 import { ensureChartFor } from "@/actions/chart";
 import { sendWelcomeIfEligible } from "@/lib/email";
@@ -23,11 +24,6 @@ import {
 export type SaveProfileInput = SaveBirthDataInput;
 
 export type SaveProfileResult = ProfileWriteResult;
-
-/** Same-origin relative path only (no open redirect). */
-function safeNext(v: string | undefined): string | null {
-  return v && v.startsWith("/") && !v.startsWith("//") ? v : null;
-}
 
 export async function saveProfile(
   input: SaveProfileInput,
@@ -75,7 +71,7 @@ export async function saveProfile(
   // First-time onboarding gets a compact, immediate value reveal before the
   // full report. Keep feature-specific destinations (e.g. /sky) attached so
   // the reveal can continue users into the flow they originally unlocked.
-  const requestedDest = safeNext(next);
+  const requestedDest = next ? normalizeReturnPath(next, "") || null : null;
   const dest = showResult
     ? `/onboarding/result${requestedDest ? `?next=${encodeURIComponent(requestedDest)}` : ""}`
     : (requestedDest ?? "/report");

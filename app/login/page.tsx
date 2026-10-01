@@ -9,6 +9,7 @@ import { GoogleButton } from "@/components/auth/google-button";
 import { LoginForm } from "@/components/auth/login-form";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { localizedAlternates } from "@/lib/seo/locales";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,18 +27,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-/** Same-origin relative path only (no open redirect). */
-function safeNext(v: string | undefined): string | null {
-  return v && v.startsWith("/") && !v.startsWith("//") ? v : null;
-}
-
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ next?: string }>;
 }) {
   const { next } = await searchParams;
-  const dest = safeNext(next);
+  const dest = next ? normalizeReturnPath(next, "") || null : null;
   const locale = await getRequestLocale();
   const en = locale !== "ka";
   const session = await auth();

@@ -19,7 +19,8 @@ import { clientIpFromHeaders } from "@/lib/api/security";
 import { checkNewSignup, hashSignupIp } from "@/lib/signup-abuse";
 import { normalizeGeorgianMobile } from "@/lib/phone";
 import { completePhoneLogin } from "@/lib/phone-auth";
-import { enforceRateLimit } from "@/lib/rate-limit";
+import { enforceAuthRateLimit, enforceRateLimit } from "@/lib/rate-limit";
+import { ApiError } from "@/lib/api/errors";
 
 /**
  * Credentials provider for the email/password login flow. Lives in
@@ -37,11 +38,41 @@ const credentialsProvider = Credentials({
     email: { label: "Email", type: "email" },
     password: { label: "Password", type: "password" },
   },
-  async authorize(raw) {
+  async authorize(raw, request) {
     const email =
       typeof raw?.email === "string" ? raw.email.trim().toLowerCase() : null;
     const password = typeof raw?.password === "string" ? raw.password : null;
     if (!email || !password) return null;
+
+    // The Auth.js callback is public and can be posted to directly, bypassing
+    // the website action's Turnstile check. Bound attempts here as well.
+    try {
+      const ip = clientIpFromHeaders(request.headers);
+      if (ip === "unknown") {
+        // Avoid one shared-IP bucket locking out every account if a proxy
+        // unexpectedly omits IP headers; the per-email cap still applies.
+        await enforceRateLimit({
+          bucket: "web_login_email",
+          identifier: email,
+          limit: 10,
+          windowMs: 15 * 60 * 1000,
+        });
+      } else {
+        await enforceAuthRateLimit({
+          action: "web_login",
+          ip,
+          email,
+          ipLimit: 30,
+          emailLimit: 10,
+          windowMs: 15 * 60 * 1000,
+        });
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 429) {
+        throw new Error("EMAIL_LOGIN_RATE_LIMITED");
+      }
+      throw err;
+    }
 
     const [user] = await db
       .select()
@@ -110,6 +141,12 @@ const phoneProvider = Credentials({
       // "Invalid/expired" returns null → Auth.js reports CredentialsSignin;
       // the no-account case gets a distinct sentinel for better UX copy.
       if (result.error === "no_account") throw new Error("PHONE_NO_ACCOUNT");
+      if (result.error === "email_unverified") {
+        throw new Error("PHONE_EMAIL_UNVERIFIED");
+      }
+      if (result.error === "phone_reverification_required") {
+        throw new Error("PHONE_REVERIFICATION_REQUIRED");
+      }
       return null;
     }
 
@@ -136,7 +173,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // Auth.js calls signIn before the adapter inserts a new OAuth user. Keep
     // existing provider accounts and email-linked accounts free to sign in;
     // only a genuinely new identity consumes the signup abuse allowance.
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account?.type !== "oauth" && account?.type !== "oidc") return true;
 
       const [linked] = await db
@@ -151,14 +188,48 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         .limit(1);
       if (linked) return true;
 
+      // Email-based account linking is enabled for Google and Apple. Only
+      // link (or create) when the provider has actually verified that email,
+      // matching the native mobile OAuth routes' policy.
+      const emailVerifiedClaim: unknown = profile?.email_verified;
+      const verifiedEmail =
+        emailVerifiedClaim === true || emailVerifiedClaim === "true";
+      if (!verifiedEmail) return "/signup?error=oauth_email_unverified";
+
       const email = user.email?.trim() ?? null;
       if (!email) return "/signup?error=duplicate_registration";
       const [existing] = await db
-        .select({ id: users.id })
+        .select({
+          id: users.id,
+          emailVerified: users.emailVerified,
+          passwordHash: users.passwordHash,
+        })
         .from(users)
         .where(eq(users.email, email))
         .limit(1);
-      if (existing) return true;
+      if (existing) {
+        if (!existing.emailVerified) {
+          // A different person may have preregistered this verified OAuth
+          // email with their own password and phone. Remove both credentials
+          // before Auth.js links the OAuth identity to that provisional row.
+          await db
+            .update(users)
+            .set({
+              emailVerified: new Date(),
+              ...(existing.passwordHash
+                ? {
+                    passwordHash: null,
+                    phone: null,
+                    phoneVerifiedAt: null,
+                    smsMarketing: false,
+                    smsMarketingConsentedAt: null,
+                  }
+                : {}),
+            })
+            .where(and(eq(users.id, existing.id), isNull(users.emailVerified)));
+        }
+        return true;
+      }
 
       const signupCheck = await checkNewSignup({
         ip: clientIpFromHeaders(await headers()),

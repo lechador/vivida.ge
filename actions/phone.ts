@@ -33,6 +33,8 @@ export type PhoneActionErrorCode =
   | "expired"
   | "rate_limited"
   | "no_account"
+  | "email_unverified"
+  | "phone_reverification_required"
   | "phone_taken"
   | "sms_failed"
   | "sms_unavailable"
@@ -90,6 +92,18 @@ function phoneErrorCopy(
         locale,
         "ამ ნომერზე ანგარიში ვერ მოიძებნა. დარეგისტრირდი ან გამოიყენე ელფოსტა.",
         "No account found for this number. Sign up, or use email instead.",
+      );
+    case "email_unverified":
+      return localized(
+        locale,
+        "ამ ნომრით შესვლამდე დაადასტურე ელფოსტა. კოდი უკვე გამოგზავნილია რეგისტრაციისას; ახალი კოდის მოთხოვნაც შეგიძლია ელფოსტით შესვლის გვერდიდან.",
+        "Verify your email before signing in with this number. You can request a new email verification code from the email sign-in page.",
+      );
+    case "phone_reverification_required":
+      return localized(
+        locale,
+        "ნომრით შესასვლელად ჯერ ელფოსტით შედი და ანგარიშის გვერდზე ნომერი ხელახლა დაადასტურე.",
+        "Sign in with email, then verify this number again in Account to use phone sign-in.",
       );
     case "phone_taken":
       return localized(
@@ -341,6 +355,12 @@ export async function signInWithPhoneCode(input: {
     const text = authErrorText(err);
     if (text.includes("PHONE_NO_ACCOUNT")) {
       return failure("no_account", locale);
+    }
+    if (text.includes("PHONE_EMAIL_UNVERIFIED")) {
+      return failure("email_unverified", locale);
+    }
+    if (text.includes("PHONE_REVERIFICATION_REQUIRED")) {
+      return failure("phone_reverification_required", locale);
     }
     if (text.includes("PHONE_RATE_LIMITED")) {
       return failure("rate_limited", locale);

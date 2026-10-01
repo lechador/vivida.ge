@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import Link from "next/link";
 import Image from "next/image";
 import { Pencil, Sparkles } from "lucide-react";
@@ -63,6 +63,10 @@ export default async function AccountPage() {
           countryCode: users.residenceCountryCode,
           city: users.residenceCity,
           phone: users.phone,
+          phoneVerifiedAt: users.phoneVerifiedAt,
+          emailVerified: users.emailVerified,
+          hasPassword: sql<boolean>`${users.passwordHash} IS NOT NULL`,
+          smsMarketing: users.smsMarketing,
         })
         .from(users)
         .where(eq(users.id, user.id))
@@ -220,9 +224,11 @@ export default async function AccountPage() {
         <div className="mb-6">
           <EmailPreferencesCard
             locale={locale}
-            initial={
-              emailPrefs ?? { daily: true, marketing: true, nudges: true }
-            }
+            initial={{
+              daily: emailPrefs?.daily ?? true,
+              marketing: emailPrefs?.marketing ?? true,
+              nudges: emailPrefs?.nudges ?? true,
+            }}
           />
         </div>
 
@@ -236,7 +242,20 @@ export default async function AccountPage() {
 
         {/* Mobile number — SMS-verified phone login */}
         <div className="mb-6">
-          <PhoneCard initialPhone={emailPrefs?.phone ?? null} locale={locale} />
+          <PhoneCard
+            initialPhone={emailPrefs?.phone ?? null}
+            initialPhoneLoginReady={
+              !emailPrefs?.hasPassword ||
+              Boolean(
+                emailPrefs.phoneVerifiedAt &&
+                emailPrefs.emailVerified &&
+                emailPrefs.phoneVerifiedAt.getTime() >=
+                  emailPrefs.emailVerified.getTime(),
+              )
+            }
+            initialSmsMarketing={emailPrefs?.smsMarketing ?? false}
+            locale={locale}
+          />
         </div>
 
         {/* Public profile fields */}

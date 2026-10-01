@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 /**
  * Intent-aware post-auth landing (W03).
@@ -17,10 +18,6 @@ import { requireUser } from "@/lib/auth-helpers";
  *   without a profile and restores the pending question from sessionStorage,
  *   so auth must not swallow the draft behind onboarding.
  */
-function safeNext(v: string | undefined): string | null {
-  return v && v.startsWith("/") && !v.startsWith("//") ? v : null;
-}
-
 export default async function PostLoginPage({
   searchParams,
 }: {
@@ -28,15 +25,17 @@ export default async function PostLoginPage({
 }) {
   const user = await requireUser();
   const { next } = await searchParams;
-  const raw = safeNext(next);
+  const raw = next ? normalizeReturnPath(next, "") || null : null;
   // Never resolve to an auth-loop destination: the resolver itself and the
   // auth pages fall back to the dashboard instead of bouncing forever.
+  const requestedPathname = raw
+    ? new URL(raw, "https://vivida.invalid").pathname
+    : null;
   const dest =
     !raw ||
-    raw === "/post-login" ||
-    raw.startsWith("/post-login?") ||
-    raw === "/login" ||
-    raw === "/signup"
+    requestedPathname === "/post-login" ||
+    requestedPathname === "/login" ||
+    requestedPathname === "/signup"
       ? "/dashboard"
       : raw;
 

@@ -9,10 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhoneVerify } from "@/components/auth/phone-verify";
+import { SmsMarketingToggle } from "@/components/auth/sms-marketing-toggle";
 import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { signUpWithEmail, verifyEmailWithCode } from "@/actions/auth";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 const TURNSTILE_ENABLED = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -22,14 +24,14 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
   const params = useSearchParams();
   // Where to land after signup — same-origin relative paths only.
   const nextParam = params.get("next");
-  const safeNext =
-    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
-      ? nextParam
-      : null;
+  const safeNext = nextParam
+    ? normalizeReturnPath(nextParam, "") || null
+    : null;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -40,11 +42,14 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
     phone: string;
     claimToken: string | null;
   } | null>(null);
+  const [smsMarketing, setSmsMarketing] = useState(false);
 
   // Code-entry (OTP) state on the "check your inbox" screen.
   const [code, setCode] = useState("");
   const [codeError, setCodeError] = useState<string | null>(null);
   const [verifying, startVerify] = useTransition();
+  const [phoneLinkNeedsRetry, setPhoneLinkNeedsRetry] = useState(false);
+  const [verifiedSignedIn, setVerifiedSignedIn] = useState(false);
 
   const verifyCode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,12 +62,19 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         email,
         code: code.trim(),
         password,
+        phoneClaimToken: phoneClaim?.claimToken ?? null,
+        smsMarketing: !!phoneClaim && smsMarketing,
       });
       if (res.ok) {
         trackEvent(ANALYTICS_EVENT.signUpVerified, {
           method: "email",
           auto_signed_in: res.signedIn ? 1 : 0,
         });
+        if (phoneClaim && res.phoneLinked === false) {
+          setVerifiedSignedIn(res.signedIn);
+          setPhoneLinkNeedsRetry(true);
+          return;
+        }
         if (res.signedIn) {
           // Intent-aware landing: incomplete profiles go to onboarding first,
           // complete ones straight to their destination (or dashboard).
@@ -101,27 +113,77 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
       return;
     }
     startTransition(async () => {
-      const result = await signUpWithEmail({
-        name,
-        email,
-        password,
-        turnstileToken,
-        phoneClaimToken: phoneClaim?.claimToken ?? null,
-      });
-      if (result.ok) {
-        // Account created, but email is not verified yet — a distinct step
-        // from sign_up_verified below. Tracking both is what makes the
-        // credential-signup abandonment rate visible in GA4.
-        trackEvent(ANALYTICS_EVENT.signUpSubmitted, {
-          method: "email",
-          phone_verified: phoneClaim ? 1 : 0,
+      try {
+        const result = await signUpWithEmail({
+          name,
+          email,
+          password,
+          turnstileToken,
         });
-        setDone(true);
-      } else {
-        setError(result.error);
+        if (result.ok) {
+          // Account created, but email is not verified yet — a distinct step
+          // from sign_up_verified below. Tracking both is what makes the
+          // credential-signup abandonment rate visible in GA4.
+          trackEvent(ANALYTICS_EVENT.signUpSubmitted, {
+            method: "email",
+            phone_verified: phoneClaim ? 1 : 0,
+          });
+          setDone(true);
+        } else {
+          setError(result.error);
+        }
+      } catch {
+        setError(
+          en
+            ? "Could not create the account. Please try again."
+            : "ანგარიშის შექმნა ვერ მოხერხდა. სცადე ხელახლა.",
+        );
+      } finally {
+        // Turnstile proof is single-use, including failed server attempts.
+        setTurnstileToken(null);
+        setTurnstileKey((key) => key + 1);
       }
     });
   };
+
+  if (phoneLinkNeedsRetry) {
+    const continueHref = verifiedSignedIn
+      ? safeNext
+        ? `/post-login?next=${encodeURIComponent(safeNext)}`
+        : "/post-login"
+      : safeNext
+        ? `/login?verified=1&next=${encodeURIComponent(safeNext)}`
+        : "/login?verified=1";
+    return (
+      <div className="space-y-4 text-center">
+        <CheckCircle2 className="mx-auto size-9 text-[var(--vivida-cyan)]" />
+        <h3 className="text-lg font-semibold">
+          {en ? "Email verified" : "ელფოსტა დადასტურდა"}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {en
+            ? "Your phone verification expired or could not be linked. Add the number again in Account to use phone sign-in and choose promotional SMS."
+            : "ნომრის დადასტურებას ვადა გაუვიდა ან მიბმა ვერ მოხერხდა. ტელეფონით შესასვლელად და მარკეტინგული SMS-ის ასარჩევად ნომერი ანგარიშიდან ხელახლა დაამატე."}
+        </p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+          <Button asChild variant="mystic">
+            <Link href={verifiedSignedIn ? "/account" : "/login?verified=1"}>
+              {verifiedSignedIn
+                ? en
+                  ? "Add number in Account"
+                  : "ნომრის დამატება ანგარიშში"
+                : en
+                  ? "Sign in"
+                  : "შესვლა"}
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={continueHref}>{en ? "Continue" : "გაგრძელება"}</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (done) {
     return (
@@ -137,9 +199,16 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
             {en ? "We sent an email to " : "გამოგიგზავნეთ წერილი "}
             <span className="text-foreground">{email}</span>
             {en
-              ? ". Enter the 6-digit code from the email, or simply open the link."
-              : "-ზე. შეიყვანე მასში მითითებული 6-ნიშნა კოდი, ან უბრალოდ დააჭირე ლინკს."}
+              ? ". Enter the 6-digit email code below, or open the link and choose your password there."
+              : "-ზე. ქვემოთ შეიყვანე ელფოსტის 6-ნიშნა კოდი, ან გახსენი ლინკი და იქ დააყენე პაროლი."}
           </p>
+          {phoneClaim && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {en
+                ? "Use the email code below to link the number you just verified. If you use the email link, add the number later in Account."
+                : "ახლახან დადასტურებული ნომრის მისაბმელად ქვემოთ ელფოსტის კოდი გამოიყენე. თუ ელფოსტის ლინკს გახსნი, ნომერს მოგვიანებით ანგარიშიდან დაამატებ."}
+            </p>
+          )}
         </div>
 
         {/* OTP code entry — the easy path for users who struggle with links */}
@@ -260,16 +329,33 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           disabled={isPending}
           onVerified={({ phone: verifiedPhone, claimToken }) => {
             setPhoneClaim({ phone: verifiedPhone, claimToken });
+            setSmsMarketing(false);
             setError(null);
           }}
-          onReset={() => setPhoneClaim(null)}
+          onReset={() => {
+            setPhoneClaim(null);
+            setSmsMarketing(false);
+          }}
           onInputChange={setPhoneInput}
         />
         <p className="text-xs text-muted-foreground">
           {en
-            ? "Verify it now and you can later sign in with this number. You can also add it later in your account."
-            : "დაადასტურე ახლა — მოგვიანებით ამ ნომრითაც შეძლებ შესვლას. ანგარიშიდან მოგვიანებითაც შეგიძლია დამატება."}
+            ? "After the SMS code, complete email verification with the code sent to your inbox to link this number for sign-in. You can also add it later in Account."
+            : "SMS კოდის შემდეგ ელფოსტაზეც გამოგზავნილი კოდი შეიყვანე, რომ ნომრით შესვლა ჩაირთოს. ნომრის დამატება მოგვიანებითაც შეგიძლია ანგარიშიდან."}
         </p>
+        <SmsMarketingToggle
+          locale={locale}
+          checked={smsMarketing}
+          onChange={setSmsMarketing}
+          disabled={!phoneClaim || isPending}
+        />
+        {!phoneClaim && (
+          <p className="text-xs text-muted-foreground">
+            {en
+              ? "Verify your number to choose promotional SMS. Verification codes are sent regardless of this setting."
+              : "მარკეტინგული SMS-ის ასარჩევად ჯერ ნომერი დაადასტურე. დადასტურების კოდი ამ პარამეტრზე არ არის დამოკიდებული."}
+          </p>
+        )}
       </div>
 
       {error && (
@@ -278,7 +364,11 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         </div>
       )}
 
-      <TurnstileWidget locale={locale} onChange={setTurnstileToken} />
+      <TurnstileWidget
+        key={turnstileKey}
+        locale={locale}
+        onChange={setTurnstileToken}
+      />
 
       <Button
         type="submit"

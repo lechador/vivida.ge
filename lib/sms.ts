@@ -12,7 +12,8 @@ import { nationalDigits } from "@/lib/phone";
  *     smsno       — 1 = with SmsNo (advertising), 2 = without (informational)
  *     destination — 9-digit Georgian mobile number, no +995
  *     content     — message text (unicode)
- *   success response: { messageId, qnt, statusId: 1 }; errors: { message }
+ *   success response: { data: [{ messageId, statusId: 1 }] };
+ *   errors: { message }
  */
 
 const SEND_URL = "https://sender.ge/api/send.php";
@@ -78,8 +79,8 @@ export async function sendOtpSms(input: {
 
   const text = await response.text();
   type SenderGeResponse = {
+    data?: Array<{ statusId?: unknown }>;
     statusId?: unknown;
-    messageId?: unknown;
     message?: unknown;
   };
   let data: SenderGeResponse | null = null;
@@ -89,9 +90,11 @@ export async function sendOtpSms(input: {
     data = null;
   }
 
-  // Success is strictly { statusId: 1 } — anything else (including the
-  // documented { message: "apikey incorrect" } shape) is a failure.
-  if (!response.ok || !data || Number(data.statusId) !== 1) {
+  // Sender.ge wraps the send result in `data` (an array even for one SMS).
+  // Accept the older flat shape as well, but never mistake an error body
+  // or an empty data array for a successful send.
+  const sendResult = Array.isArray(data?.data) ? data.data[0] : data;
+  if (!response.ok || !sendResult || Number(sendResult.statusId) !== 1) {
     const detail =
       data && typeof data.message === "string"
         ? data.message
