@@ -38,6 +38,9 @@ import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
 import { SpendAnchor } from "@/components/billing/spend-anchor";
 import { CreditHistory } from "@/components/credits/credit-history";
 import { CreditProgressCard } from "@/components/credits/credit-progress-card";
+import { PhoneGiftCard } from "@/components/phone-gift/phone-gift-card";
+import { getPhoneGiftState } from "@/lib/phone-gift";
+import { phoneGiftCardEligible } from "@/lib/phone-gift-pure";
 import { nextMonthlyBonusDate } from "@/lib/credit-progress";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
 
@@ -113,23 +116,33 @@ export default async function CreditsPage({
   const parsedPage = Number.parseInt(pageParam ?? "1", 10);
   const historyPage =
     Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
-  const [balance, ref, storedIdentity, premium, offer, history, recentSpend] =
-    await Promise.all([
-      getBalance(user.id),
-      getReferralStats(user.id),
-      getBillingIdentity(user.id),
-      isPremiumUser(user.id),
-      // Null for everyone the low-credit campaign did not email, which is the
-      // whole point — the promo price must not leak to the rest of Georgia.
-      getLowCreditOffer(user.id),
-      getCreditHistoryPage(user.id, {
-        filter: historyFilter,
-        page: historyPage,
-      }),
-      // Trailing-30-day gated-action spend for the PRO value anchor (one
-      // indexed SUM; the component stays hidden for premium/light spenders).
-      getRecentSpend(user.id),
-    ]);
+  const [
+    balance,
+    ref,
+    storedIdentity,
+    premium,
+    offer,
+    history,
+    recentSpend,
+    giftState,
+  ] = await Promise.all([
+    getBalance(user.id),
+    getReferralStats(user.id),
+    getBillingIdentity(user.id),
+    isPremiumUser(user.id),
+    // Null for everyone the low-credit campaign did not email, which is the
+    // whole point — the promo price must not leak to the rest of Georgia.
+    getLowCreditOffer(user.id),
+    getCreditHistoryPage(user.id, {
+      filter: historyFilter,
+      page: historyPage,
+    }),
+    // Trailing-30-day gated-action spend for the PRO value anchor (one
+    // indexed SUM; the component stays hidden for premium/light spenders).
+    getRecentSpend(user.id),
+    // Phone-gift campaign eligibility for the verify-your-number card.
+    getPhoneGiftState(user.id),
+  ]);
   // Accounts created before residence tracking have no country, which would
   // hide PRO and fall the packs back to GEL by luck rather than by geo. Same
   // one-time backfill /subscription does.
@@ -182,6 +195,12 @@ export default async function CreditsPage({
               : "კრედიტებით ხსნი ტესტების სრულ შედეგებს, სინასტრიებს, AI-ჩატს, პროგნოზებსა და რეპორტებს. მოიწვიე მეგობრები ან შეავსე ბალანსი."}
           </p>
         </div>
+
+        {phoneGiftCardEligible(giftState) && (
+          <div className="mt-4">
+            <PhoneGiftCard locale={locale} />
+          </div>
+        )}
 
         <div className="mt-4">
           <CreditProgressCard

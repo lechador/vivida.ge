@@ -224,13 +224,20 @@ export async function completePhoneLogin(input: {
 }
 
 export type AccountPhoneResult =
-  | { ok: true; phone: string }
+  | {
+      ok: true;
+      phone: string;
+      /** True when this is the account's first-ever verified number. */
+      firstVerification: boolean;
+    }
   | { ok: false; error: "invalid" | "expired" | "phone_taken" };
 
 /**
  * Bind a freshly verified number to a logged-in user (account card).
  * Replaces any previously bound number; the one-number-one-account rule is
- * enforced by the unique index and the explicit taken check.
+ * enforced by the unique index and the explicit taken check. Reports whether
+ * this was the account's first verification so the caller can pay the
+ * one-time phone-verify gift.
  */
 export async function bindAccountPhone(input: {
   userId: string;
@@ -252,6 +259,12 @@ export async function bindAccountPhone(input: {
     .limit(1);
   if (taken) return { ok: false, error: "phone_taken" };
 
+  const [before] = await db
+    .select({ phoneVerifiedAt: users.phoneVerifiedAt })
+    .from(users)
+    .where(eq(users.id, input.userId))
+    .limit(1);
+
   try {
     await db
       .update(users)
@@ -269,7 +282,11 @@ export async function bindAccountPhone(input: {
     throw err;
   }
   await burnChallenge(checked.claimToken);
-  return { ok: true, phone: input.phone };
+  return {
+    ok: true,
+    phone: input.phone,
+    firstVerification: !before?.phoneVerifiedAt,
+  };
 }
 
 export type PhoneClaimResult =

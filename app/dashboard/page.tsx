@@ -21,6 +21,7 @@ import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
 import { DashboardArticleRecommendations } from "@/components/dashboard/article-recommendations";
 import { DashboardBillingNudge } from "@/components/dashboard/billing-nudge";
+import { PhoneGiftPopup } from "@/components/phone-gift/phone-gift-popup";
 import { TESTS } from "@/lib/tests-catalog";
 import {
   listPublishedArticlePreviews,
@@ -30,6 +31,8 @@ import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getBalance } from "@/lib/credits";
 import { shouldShowPurchasePromotion } from "@/lib/billing-config";
+import { phoneGiftPopupEligible } from "@/lib/phone-gift-pure";
+import { isPremiumUser } from "@/lib/premium";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -68,6 +71,7 @@ export default async function DashboardPage() {
     [eqResult],
     [bigFiveResult],
     balance,
+    isPremium,
   ] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     db
@@ -75,6 +79,8 @@ export default async function DashboardPage() {
         locale: users.interfaceLanguage,
         countryCode: users.residenceCountryCode,
         isPremium: users.isPremium,
+        phoneVerifiedAt: users.phoneVerifiedAt,
+        phoneGiftPopupDismissedAt: users.phoneGiftPopupDismissedAt,
       })
       .from(users)
       .where(eq(users.id, user.id))
@@ -100,6 +106,7 @@ export default async function DashboardPage() {
       .where(eq(bigFiveResults.userId, user.id))
       .limit(1),
     getBalance(user.id),
+    isPremiumUser(user.id),
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
   const en = locale !== "ka";
@@ -161,6 +168,12 @@ export default async function DashboardPage() {
   );
   const suggestedTest = pool[seedValue % pool.length];
   const suggestedArticles = pickDailyArticles(publishedArticles, seedValue);
+  const showPhoneGiftPopup = phoneGiftPopupEligible({
+    hasVerifiedPhone: Boolean(userRow?.phoneVerifiedAt),
+    isPremium,
+    restricted,
+    popupDismissed: Boolean(userRow?.phoneGiftPopupDismissedAt),
+  });
 
   return (
     <main
@@ -178,6 +191,8 @@ export default async function DashboardPage() {
       <Starfield count={120} shooting={3} />
 
       <AppHeader authed active="today" />
+
+      {showPhoneGiftPopup && <PhoneGiftPopup locale={locale} />}
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         {restricted && <RestrictedNotice locale={locale} />}

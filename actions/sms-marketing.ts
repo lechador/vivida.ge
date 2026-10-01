@@ -1,14 +1,17 @@
 "use server";
 
-import { and, eq, isNotNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-import { db } from "@/db";
-import { users } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { normalizeGeorgianMobile } from "@/lib/phone";
+import { setSmsMarketingConsent } from "@/lib/sms-consent";
 
-/** Consent applies to the exact verified phone displayed when it was given. */
+/**
+ * Account-page promotional-SMS toggle. The DB core (guards + the one-time
+ * consent grant) lives in lib/sms-consent.ts, shared with the phone-gift
+ * flow. Consent applies to the exact verified phone displayed when it was
+ * given.
+ */
 export async function updateSmsMarketingConsent(input: {
   phone: string;
   enabled: boolean;
@@ -24,43 +27,8 @@ export async function updateSmsMarketingConsent(input: {
     return { ok: false, reason: "phone_changed" };
   }
 
-  const [account] = await db
-    .select({
-      phone: users.phone,
-      phoneVerifiedAt: users.phoneVerifiedAt,
-      emailVerified: users.emailVerified,
-      passwordHash: users.passwordHash,
-    })
-    .from(users)
-    .where(eq(users.id, user.id))
-    .limit(1);
-  if (!account || account.phone !== phone) {
-    return { ok: false, reason: "phone_changed" };
-  }
-  if (
-    !account.phoneVerifiedAt ||
-    (account.passwordHash &&
-      (!account.emailVerified ||
-        account.phoneVerifiedAt.getTime() < account.emailVerified.getTime()))
-  ) {
-    return { ok: false, reason: "verification_required" };
-  }
-
-  const [updated] = await db
-    .update(users)
-    .set({
-      smsMarketing: input.enabled,
-      smsMarketingConsentedAt: input.enabled ? new Date() : null,
-    })
-    .where(
-      and(
-        eq(users.id, user.id),
-        eq(users.phone, phone),
-        isNotNull(users.phoneVerifiedAt),
-      ),
-    )
-    .returning({ id: users.id });
-  if (!updated) return { ok: false, reason: "phone_changed" };
+  const result = await setSmsMarketingConsent(user.id, phone, input.enabled);
+  if (!result.ok) return result;
   revalidatePath("/account");
   return { ok: true };
 }

@@ -103,6 +103,9 @@ export const ANALYTICS_EVENT = {
   phoneCodeSent: "phone_code_sent",
   phoneVerified: "phone_verified",
   phoneLoginCompleted: "phone_login_completed",
+  phoneGiftViewed: "phone_gift_viewed",
+  phoneGiftClaimed: "phone_gift_claimed",
+  phoneGiftDismissed: "phone_gift_dismissed",
 } as const;
 
 export type AnalyticsEventName =

@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "phone_gift_popup_dismissed_at" timestamp with time zone;

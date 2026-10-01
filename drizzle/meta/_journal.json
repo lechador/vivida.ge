@@ -652,6 +652,13 @@
       "when": 1790803109725,
       "tag": "0092_nostalgic_human_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 93,
+      "version": "7",
+      "when": 1790864741009,
+      "tag": "0093_slow_sentinels",
+      "breakpoints": true
     }
   ]
 }

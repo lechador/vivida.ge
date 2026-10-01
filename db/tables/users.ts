@@ -40,6 +40,14 @@ export const users = pgTable(
     phone: text("phone").unique(),
     /** Timestamp of the SMS OTP verification that proved control of `phone`. */
     phoneVerifiedAt: timestamp("phone_verified_at", { withTimezone: true }),
+    /**
+     * Set when the one-time dashboard phone-gift popup (verify the number →
+     * 10/20 credits) is dismissed. The popup never returns after this; the
+     * offer itself stays claimable from the credits page.
+     */
+    phoneGiftPopupDismissedAt: timestamp("phone_gift_popup_dismissed_at", {
+      withTimezone: true,
+    }),
     // ── Email preferences ──────────────────────────────────────────────
     // Default ON: users registered specifically for an astrology service,
     // so daily horoscope + nudges are expected. Marketing also defaults ON

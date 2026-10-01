@@ -17,6 +17,10 @@ export const STAGED_RETURN_BONUS = 5;
 export const REFERRAL_REWARD = 10;
 /** Free credits granted to every user on the first day of each month. */
 export const MONTHLY_BONUS = 5;
+/** Phone-gift campaign: one-time reward for verifying a mobile number. */
+export const PHONE_VERIFY_GIFT = 10;
+/** …granted on top of the above when promotional-SMS consent first turns on. */
+export const SMS_CONSENT_GIFT = 10;
 
 export {
   creditPackForCountry,
@@ -90,6 +94,8 @@ export type CreditReason =
   | "campaign_reward"
   | "earn_feed_post"
   | "earn_profile_photo"
+  | "earn_phone_verify"
+  | "earn_sms_consent"
   | "spend_synastry"
   | "spend_chat"
   | "spend_dream"
@@ -121,6 +127,8 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   campaign_reward: "დაბადების დეტალების შევსების ბონუსი",
   earn_feed_post: "პოსტი ფიდში",
   earn_profile_photo: "პროფილის ფოტო",
+  earn_phone_verify: "ნომრის დადასტურება",
+  earn_sms_consent: "მარკეტინგული SMS",
   spend_synastry: "თავსებადობა",
   spend_chat: "AI ჩატი",
   spend_dream: "სიზმრის AI ახსნა",
@@ -148,6 +156,8 @@ export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
   campaign_reward: "Birth details completion bonus",
   earn_feed_post: "Feed post",
   earn_profile_photo: "Profile photo",
+  earn_phone_verify: "Phone verification",
+  earn_sms_consent: "Promotional SMS",
   spend_synastry: "Compatibility",
   spend_chat: "AI chat",
   spend_dream: "AI dream interpretation",
