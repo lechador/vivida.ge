@@ -13,7 +13,7 @@ import { MINIMUM_AGE_YEARS } from "@/lib/profile-core";
  *
  * The *effective* restriction is DOB-driven OR a manual override:
  *   - under MINIMUM_AGE_YEARS by birth date → restricted, and it **auto-lifts
- *     the day they turn 18** (nothing to remember to clear); or
+ *     the day they reach the threshold** (nothing to remember to clear); or
  *   - `users.restricted = true` → a manual override for non-age cases.
  *
  * Shared Georgian copy so restricted actions show the same message. The wording

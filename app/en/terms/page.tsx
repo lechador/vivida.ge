@@ -53,8 +53,9 @@ export default function EnglishTermsPage() {
         <h2>2. Eligibility and accounts</h2>
         <p>
           You must be at least 16 years old; if you are under 16, a parent or
-          legal guardian must consent to your use of Vivida. If you are under
-          18, a parent or legal guardian must approve any paid purchase.
+          legal guardian must consent — contact us at hello@vivida.ge to arrange
+          this, as registration technically requires age 16 or older. If you are
+          under 18, a parent or legal guardian must approve any paid purchase.
           Accounts may be created through Google sign-in or email. You are
           responsible for protecting access to your account and for activity
           performed through it.

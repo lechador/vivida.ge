@@ -21,12 +21,13 @@ const TIME_RE = /^\d{2}:\d{2}$/;
 const USERNAME_RE = /^[a-z0-9_]{3,24}$/;
 
 /**
- * Minimum age to register/use Vivida. The app has 1:1 chat and a social feed
- * (and shipped with a dating-style match deck), so we gate on adulthood.
+ * Minimum age to register/use Vivida — mirrors the terms (16+, under-16 only
+ * with parental consent, under-18 needs approval for paid purchases).
  * Derived from the natal birth date the user already provides — no separate
- * age field. Adjust this single constant to change the threshold.
+ * age field. Adjust this single constant to change the threshold; the
+ * onboarding error message and lib/restriction.ts follow it automatically.
  */
-export const MINIMUM_AGE_YEARS = 18;
+export const MINIMUM_AGE_YEARS = 16;
 
 export type SaveBirthDataInput = {
   dateOfBirth: string; // YYYY-MM-DD
