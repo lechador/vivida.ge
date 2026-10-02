@@ -32,6 +32,8 @@ import {
 import { countryDisplayName } from "@/lib/residence";
 import type { Metadata } from "next";
 import { getReminderPreferences } from "@/lib/reminder-settings";
+import { getPremiumSubscription } from "@/lib/premium";
+import { SubscriptionCancelLink } from "@/components/subscription/subscription-cancel-link";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -42,38 +44,45 @@ export const dynamic = "force-dynamic";
 export default async function AccountPage() {
   const user = await requireUser();
 
-  const [[profile], photos, [emailPrefs], headerData, reminderData] =
-    await Promise.all([
-      db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
-      db
-        .select({
-          id: profilePhotos.id,
-          url: profilePhotos.url,
-          ready: profilePhotos.ready,
-        })
-        .from(profilePhotos)
-        .where(eq(profilePhotos.userId, user.id))
-        .orderBy(asc(profilePhotos.sortOrder)),
-      db
-        .select({
-          daily: users.emailDailyHoroscope,
-          marketing: users.emailMarketing,
-          nudges: users.emailNudges,
-          locale: users.interfaceLanguage,
-          countryCode: users.residenceCountryCode,
-          city: users.residenceCity,
-          phone: users.phone,
-          phoneVerifiedAt: users.phoneVerifiedAt,
-          emailVerified: users.emailVerified,
-          hasPassword: sql<boolean>`${users.passwordHash} IS NOT NULL`,
-          smsMarketing: users.smsMarketing,
-        })
-        .from(users)
-        .where(eq(users.id, user.id))
-        .limit(1),
-      getHeaderData(user.id),
-      getReminderPreferences(user.id),
-    ]);
+  const [
+    [profile],
+    photos,
+    [emailPrefs],
+    headerData,
+    reminderData,
+    subscription,
+  ] = await Promise.all([
+    db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
+    db
+      .select({
+        id: profilePhotos.id,
+        url: profilePhotos.url,
+        ready: profilePhotos.ready,
+      })
+      .from(profilePhotos)
+      .where(eq(profilePhotos.userId, user.id))
+      .orderBy(asc(profilePhotos.sortOrder)),
+    db
+      .select({
+        daily: users.emailDailyHoroscope,
+        marketing: users.emailMarketing,
+        nudges: users.emailNudges,
+        locale: users.interfaceLanguage,
+        countryCode: users.residenceCountryCode,
+        city: users.residenceCity,
+        phone: users.phone,
+        phoneVerifiedAt: users.phoneVerifiedAt,
+        emailVerified: users.emailVerified,
+        hasPassword: sql<boolean>`${users.passwordHash} IS NOT NULL`,
+        smsMarketing: users.smsMarketing,
+      })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1),
+    getHeaderData(user.id),
+    getReminderPreferences(user.id),
+    getPremiumSubscription(user.id),
+  ]);
   // Same avatar resolution as the navbar so they never disagree.
   const accountAvatar = headerData.avatarUrl ?? user.image ?? null;
   const locale = await getRequestLocale(
@@ -205,6 +214,35 @@ export default async function AccountPage() {
               →
             </span>
           </Link>
+          {headerData.isPremium && subscription && (
+            <p className="mt-2 px-1 text-xs text-muted-foreground">
+              {subscription.source === "stripe" ? (
+                <>
+                  {subscription.cancelAtPeriodEnd
+                    ? en
+                      ? `Vivida PRO · ends ${formatAccountDate(subscription.currentPeriodEnd, locale)} · `
+                      : `Vivida PRO · დასრულდება ${formatAccountDate(subscription.currentPeriodEnd, locale)} · `
+                    : en
+                      ? `Vivida PRO · renews ${formatAccountDate(subscription.currentPeriodEnd, locale)} · `
+                      : `Vivida PRO · განახლდება ${formatAccountDate(subscription.currentPeriodEnd, locale)} · `}
+                  <SubscriptionCancelLink
+                    locale={locale}
+                    cancelAtPeriodEnd={subscription.cancelAtPeriodEnd}
+                  />
+                </>
+              ) : subscription.rcStore === "PLAY_STORE" ? (
+                en ? (
+                  "Vivida PRO · billed through Google Play — manage it in the Play Store settings."
+                ) : (
+                  "Vivida PRO · გადახდა Google Play-ით — მართე Play Store-ის პარამეტრებიდან."
+                )
+              ) : en ? (
+                "Vivida PRO · billed through the App Store — manage it in the App Store settings."
+              ) : (
+                "Vivida PRO · გადახდა App Store-ით — მართე App Store-ის პარამეტრებიდან."
+              )}
+            </p>
+          )}
         </div>
 
         {/* Push notifications */}
@@ -343,6 +381,14 @@ export default async function AccountPage() {
       </section>
     </main>
   );
+}
+
+function formatAccountDate(date: Date, locale: string) {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "ka-GE", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
 }
 
 function Field({

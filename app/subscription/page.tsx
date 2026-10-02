@@ -240,11 +240,7 @@ export default async function SubscriptionPage({
 
               <SubscriptionActions
                 locale={locale}
-                active={active}
-                cancelAtPeriodEnd={subscription.cancelAtPeriodEnd}
                 hasCustomer={Boolean(identity?.stripeCustomerId)}
-                source={subscription.source}
-                store={subscription.rcStore}
               />
             </section>
             {!active && (
