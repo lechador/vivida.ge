@@ -53,9 +53,13 @@ export function PhoneCard({
               ? en
                 ? "Verify this number again before enabling promotional SMS."
                 : "მარკეტინგული SMS-ის ჩასართავად ნომერი ხელახლა დაადასტურე."
-              : en
-                ? "The number changed. Refresh this page and try again."
-                : "ნომერი შეიცვალა. განაახლე გვერდი და სცადე ხელახლა.",
+              : result.reason === "unavailable"
+                ? en
+                  ? "Promotional SMS is only available on vivida.ge."
+                  : "მარკეტინგული SMS მხოლოდ vivida.ge-ზეა ხელმისაწვდომი."
+                : en
+                  ? "The number changed. Refresh this page and try again."
+                  : "ნომერი შეიცვალა. განაახლე გვერდი და სცადე ხელახლა.",
           );
           return;
         }

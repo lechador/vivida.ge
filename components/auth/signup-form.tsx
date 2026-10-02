@@ -315,53 +315,57 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         </p>
       </div>
 
-      <div className="space-y-1.5">
-        <Label>
-          {en
-            ? "Mobile number (optional)"
-            : "მობილურის ნომერი (არასავალდებულო)"}
-        </Label>
-        <PhoneVerify
-          locale={locale}
-          purpose="signup"
-          disabled={isPending}
-          onVerified={({ phone: verifiedPhone, claimToken }) => {
-            setPhoneClaim({ phone: verifiedPhone, claimToken });
-            setSmsMarketing(false);
-            setError(null);
-          }}
-          onReset={() => {
-            setPhoneClaim(null);
-            setSmsMarketing(false);
-          }}
-          onInputChange={setPhoneInput}
-        />
-        <p className="text-xs text-muted-foreground">
-          {en
-            ? "After the SMS code, complete email verification with the code sent to your inbox to link this number for sign-in. You can also add it later in Account."
-            : "SMS კოდის შემდეგ ელფოსტაზეც გამოგზავნილი კოდი შეიყვანე, რომ ნომრით შესვლა ჩაირთოს. ნომრის დამატება მოგვიანებითაც შეგიძლია ანგარიშიდან."}
-        </p>
-        {hasUnverifiedPhone && (
-          <p role="status" className="text-xs text-muted-foreground">
+      {/* Phone verification is Georgian-host only (SMS codes go to Georgian
+          numbers); the whole optional-number block stays off on English. */}
+      {!en && (
+        <div className="space-y-1.5">
+          <Label>
             {en
-              ? "You can create your account now. This number will only be added after SMS verification."
-              : "ანგარიშის შექმნა ახლაც შეგიძლია. ნომერი მხოლოდ SMS დადასტურების შემდეგ დაემატება."}
-          </p>
-        )}
-        <SmsMarketingToggle
-          locale={locale}
-          checked={smsMarketing}
-          onChange={setSmsMarketing}
-          disabled={!phoneClaim || isPending}
-        />
-        {!phoneClaim && (
+              ? "Mobile number (optional)"
+              : "მობილურის ნომერი (არასავალდებულო)"}
+          </Label>
+          <PhoneVerify
+            locale={locale}
+            purpose="signup"
+            disabled={isPending}
+            onVerified={({ phone: verifiedPhone, claimToken }) => {
+              setPhoneClaim({ phone: verifiedPhone, claimToken });
+              setSmsMarketing(false);
+              setError(null);
+            }}
+            onReset={() => {
+              setPhoneClaim(null);
+              setSmsMarketing(false);
+            }}
+            onInputChange={setPhoneInput}
+          />
           <p className="text-xs text-muted-foreground">
             {en
-              ? "Verify your number to choose promotional SMS. Verification codes are sent regardless of this setting."
-              : "მარკეტინგული SMS-ის ასარჩევად ჯერ ნომერი დაადასტურე. დადასტურების კოდი ამ პარამეტრზე არ არის დამოკიდებული."}
+              ? "After the SMS code, complete email verification with the code sent to your inbox to link this number for sign-in. You can also add it later in Account."
+              : "SMS კოდის შემდეგ ელფოსტაზეც გამოგზავნილი კოდი შეიყვანე, რომ ნომრით შესვლა ჩაირთოს. ნომრის დამატება მოგვიანებითაც შეგიძლია ანგარიშიდან."}
           </p>
-        )}
-      </div>
+          {hasUnverifiedPhone && (
+            <p role="status" className="text-xs text-muted-foreground">
+              {en
+                ? "You can create your account now. This number will only be added after SMS verification."
+                : "ანგარიშის შექმნა ახლაც შეგიძლია. ნომერი მხოლოდ SMS დადასტურების შემდეგ დაემატება."}
+            </p>
+          )}
+          <SmsMarketingToggle
+            locale={locale}
+            checked={smsMarketing}
+            onChange={setSmsMarketing}
+            disabled={!phoneClaim || isPending}
+          />
+          {!phoneClaim && (
+            <p className="text-xs text-muted-foreground">
+              {en
+                ? "Verify your number to choose promotional SMS. Verification codes are sent regardless of this setting."
+                : "მარკეტინგული SMS-ის ასარჩევად ჯერ ნომერი დაადასტურე. დადასტურების კოდი ამ პარამეტრზე არ არის დამოკიდებული."}
+            </p>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">

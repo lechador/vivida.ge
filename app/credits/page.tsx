@@ -116,6 +116,10 @@ export default async function CreditsPage({
   const parsedPage = Number.parseInt(pageParam ?? "1", 10);
   const historyPage =
     Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  // Phone-gift needs a Georgian number: gate by host, not by the stored
+  // interface preference (an English-preference account on vivida.ge keeps
+  // the card; a Georgian-preference account on vividaastro.com hides it).
+  const hostEn = (await getRequestLocale()) === "en";
   const [
     balance,
     ref,
@@ -196,7 +200,7 @@ export default async function CreditsPage({
           </p>
         </div>
 
-        {phoneGiftCardEligible(giftState) && (
+        {!hostEn && phoneGiftCardEligible(giftState) && (
           <div className="mt-4">
             <PhoneGiftCard locale={locale} />
           </div>

@@ -462,7 +462,9 @@ export async function verifyEmailWithCode(input: {
   }
 
   let phoneLinked: boolean | undefined;
-  if (input.phoneClaimToken) {
+  // Phone claims are Georgian-host only (SMS codes go to Georgian numbers);
+  // an English-host token is ignored even if posted directly.
+  if (input.phoneClaimToken && locale !== "en") {
     try {
       phoneLinked = await finalizeSignupPhoneClaim(
         result.userId,

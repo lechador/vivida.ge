@@ -15,6 +15,7 @@ import {
   setResidenceCountryIfMissing,
 } from "@/lib/residence";
 import { getSignupLocale } from "@/lib/i18n/request-locale";
+import { isEnglishHost } from "@/lib/seo/locales";
 import { clientIpFromHeaders } from "@/lib/api/security";
 import { checkNewSignup, hashSignupIp } from "@/lib/signup-abuse";
 import { normalizeGeorgianMobile } from "@/lib/phone";
@@ -117,6 +118,12 @@ const phoneProvider = Credentials({
     code: { label: "Code", type: "text" },
   },
   async authorize(raw, request) {
+    // SMS codes go only to Georgian numbers: phone sign-in is Georgian-host
+    // only. The action layer rejects English-host callers first; this covers
+    // direct posts to /api/auth/callback/phone.
+    const host =
+      request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+    if (isEnglishHost(host)) throw new Error("PHONE_UNAVAILABLE");
     const phone = normalizeGeorgianMobile(
       typeof raw?.phone === "string" ? raw.phone : "",
     );

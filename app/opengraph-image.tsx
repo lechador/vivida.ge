@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
+import { headers } from "next/headers";
 
+import { isEnglishHost } from "@/lib/seo/locales";
 import { readFontBuffer } from "./_fonts/load";
 
 // Static URL literals so Webpack copies the .ttf into the function
@@ -7,11 +9,11 @@ import { readFontBuffer } from "./_fonts/load";
 // the asset reference invisible to the bundler.
 const NOTO_REGULAR_URL = new URL(
   "./_fonts/NotoSansGeorgian-Regular.ttf",
-  import.meta.url
+  import.meta.url,
 );
 const NOTO_BOLD_URL = new URL(
   "./_fonts/NotoSansGeorgian-Bold.ttf",
-  import.meta.url
+  import.meta.url,
 );
 
 /**
@@ -34,139 +36,149 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OpengraphImage() {
+  const requestHeaders = await headers();
+  // Social shares of vividaastro.com URLs (including paid-ad link posts)
+  // must not render a Georgian-text card — the image copy follows the host.
+  const en = isEnglishHost(
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host"),
+  );
+  const headline = en
+    ? "Your cosmic map, alive every day"
+    : "შენი კოსმიური რუკა ყოველდღე ცოცხლდება";
+  const tagline = en
+    ? "Natal chart · Daily horoscope · Compatibility"
+    : "ნატალური რუკა · ყოველდღიური ჰოროსკოპი · თავსებადობა";
   const [regular, bold] = await Promise.all([
     readFontBuffer(NOTO_REGULAR_URL),
     readFontBuffer(NOTO_BOLD_URL),
   ]);
 
   return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#0b0814",
-          backgroundImage:
-            "radial-gradient(60% 50% at 50% 30%, rgba(167,139,250,0.35), transparent 70%), radial-gradient(45% 35% at 85% 70%, rgba(34,211,238,0.25), transparent 70%), radial-gradient(40% 30% at 15% 75%, rgba(244,114,182,0.20), transparent 70%)",
-          color: "#ffffff",
-          fontFamily: "Noto",
-          padding: "80px",
-          position: "relative",
-        }}
-      >
-        {/* Star sparkles for cosmic feel — tiny solid circles. */}
-        {[
-          { top: 90, left: 140, size: 6 },
-          { top: 140, left: 1050, size: 8 },
-          { top: 470, left: 220, size: 5 },
-          { top: 510, left: 980, size: 7 },
-          { top: 80, left: 700, size: 4 },
-          { top: 540, left: 600, size: 5 },
-        ].map((s, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              top: s.top,
-              left: s.left,
-              width: s.size,
-              height: s.size,
-              borderRadius: "9999px",
-              backgroundColor: "#ffffff",
-              opacity: 0.85,
-              boxShadow: "0 0 12px rgba(167,139,250,0.7)",
-              display: "flex",
-            }}
-          />
-        ))}
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#0b0814",
+        backgroundImage:
+          "radial-gradient(60% 50% at 50% 30%, rgba(167,139,250,0.35), transparent 70%), radial-gradient(45% 35% at 85% 70%, rgba(34,211,238,0.25), transparent 70%), radial-gradient(40% 30% at 15% 75%, rgba(244,114,182,0.20), transparent 70%)",
+        color: "#ffffff",
+        fontFamily: "Noto",
+        padding: "80px",
+        position: "relative",
+      }}
+    >
+      {/* Star sparkles for cosmic feel — tiny solid circles. */}
+      {[
+        { top: 90, left: 140, size: 6 },
+        { top: 140, left: 1050, size: 8 },
+        { top: 470, left: 220, size: 5 },
+        { top: 510, left: 980, size: 7 },
+        { top: 80, left: 700, size: 4 },
+        { top: 540, left: 600, size: 5 },
+      ].map((s, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            top: s.top,
+            left: s.left,
+            width: s.size,
+            height: s.size,
+            borderRadius: "9999px",
+            backgroundColor: "#ffffff",
+            opacity: 0.85,
+            boxShadow: "0 0 12px rgba(167,139,250,0.7)",
+            display: "flex",
+          }}
+        />
+      ))}
 
-        {/* Brand sparkle + wordmark. The sparkle is an inline SVG (not the
+      {/* Brand sparkle + wordmark. The sparkle is an inline SVG (not the
             ✦ glyph) because NotoSansGeorgian doesn't ship that codepoint —
             satori would otherwise try to fetch a dynamic fallback font from
             Google Fonts and fail with a 400. */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 24,
+          marginBottom: 40,
+        }}
+      >
+        <svg
+          width={96}
+          height={96}
+          viewBox="0 0 48 48"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="sparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#a78bfa" />
+              <stop offset="55%" stopColor="#f472b6" />
+              <stop offset="100%" stopColor="#22d3ee" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M24 0 L27 21 L48 24 L27 27 L24 48 L21 27 L0 24 L21 21 Z"
+            fill="url(#sparkle)"
+          />
+        </svg>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 24,
-            marginBottom: 40,
+            fontSize: 132,
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            backgroundImage:
+              "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
+            backgroundClip: "text",
+            color: "transparent",
+            lineHeight: 1,
           }}
         >
-          <svg
-            width={96}
-            height={96}
-            viewBox="0 0 48 48"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient id="sparkle" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#a78bfa" />
-                <stop offset="55%" stopColor="#f472b6" />
-                <stop offset="100%" stopColor="#22d3ee" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M24 0 L27 21 L48 24 L27 27 L24 48 L21 27 L0 24 L21 21 Z"
-              fill="url(#sparkle)"
-            />
-          </svg>
-          <div
-            style={{
-              fontSize: 132,
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-              backgroundClip: "text",
-              color: "transparent",
-              lineHeight: 1,
-            }}
-          >
-            vivida
-          </div>
-        </div>
-
-        {/* Headline */}
-        <div
-          style={{
-            display: "flex",
-            fontSize: 56,
-            fontWeight: 600,
-            color: "#ffffff",
-            letterSpacing: "-0.02em",
-            textAlign: "center",
-            lineHeight: 1.15,
-            maxWidth: 900,
-            justifyContent: "center",
-          }}
-        >
-          შენი კოსმიური რუკა ყოველდღე ცოცხლდება
-        </div>
-
-        {/* Tagline */}
-        <div
-          style={{
-            display: "flex",
-            fontSize: 28,
-            color: "#c4b5fd",
-            marginTop: 28,
-            textAlign: "center",
-          }}
-        >
-          ნატალური რუკა · ყოველდღიური ჰოროსკოპი · თავსებადობა
+          vivida
         </div>
       </div>
-    ),
+
+      {/* Headline */}
+      <div
+        style={{
+          display: "flex",
+          fontSize: 56,
+          fontWeight: 600,
+          color: "#ffffff",
+          letterSpacing: "-0.02em",
+          textAlign: "center",
+          lineHeight: 1.15,
+          maxWidth: 900,
+          justifyContent: "center",
+        }}
+      >
+        {headline}
+      </div>
+
+      {/* Tagline */}
+      <div
+        style={{
+          display: "flex",
+          fontSize: 28,
+          color: "#c4b5fd",
+          marginTop: 28,
+          textAlign: "center",
+        }}
+      >
+        {tagline}
+      </div>
+    </div>,
     {
       ...size,
       fonts: [
         { name: "Noto", data: regular, weight: 400, style: "normal" },
         { name: "Noto", data: bold, weight: 700, style: "normal" },
       ],
-    }
+    },
   );
 }

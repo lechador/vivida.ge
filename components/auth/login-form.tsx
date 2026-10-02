@@ -172,40 +172,44 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
 
   return (
     <div className="space-y-4">
-      <div
-        role="tablist"
-        aria-label={en ? "Sign-in method" : "შესვლის მეთოდი"}
-        className="grid grid-cols-2 gap-1 rounded-xl border border-border/60 bg-card/40 p-1"
-      >
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === "email"}
-          onClick={() => setMode("email")}
-          className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-            mode === "email"
-              ? "bg-background text-foreground shadow-sm ring-1 ring-border/60"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
+      {/* Phone sign-in is Georgian-host only (SMS codes go to Georgian
+          numbers); English visitors get email sign-in with no method tabs. */}
+      {!en && (
+        <div
+          role="tablist"
+          aria-label={en ? "Sign-in method" : "შესვლის მეთოდი"}
+          className="grid grid-cols-2 gap-1 rounded-xl border border-border/60 bg-card/40 p-1"
         >
-          {en ? "Email" : "ელფოსტით"}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === "phone"}
-          onClick={() => setMode("phone")}
-          className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-            mode === "phone"
-              ? "bg-background text-foreground shadow-sm ring-1 ring-border/60"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {en ? "Mobile number" : "ნომრით"}
-        </button>
-      </div>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === "email"}
+            onClick={() => setMode("email")}
+            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              mode === "email"
+                ? "bg-background text-foreground shadow-sm ring-1 ring-border/60"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {en ? "Email" : "ელფოსტით"}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === "phone"}
+            onClick={() => setMode("phone")}
+            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              mode === "phone"
+                ? "bg-background text-foreground shadow-sm ring-1 ring-border/60"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {en ? "Mobile number" : "ნომრით"}
+          </button>
+        </div>
+      )}
 
-      {mode === "phone" ? (
+      {mode === "phone" && !en ? (
         <PhoneLoginForm locale={locale} dest={dest} nextPath={safeNext} />
       ) : (
         <form onSubmit={submit} className="space-y-4">

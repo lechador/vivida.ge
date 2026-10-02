@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth-helpers";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { normalizeGeorgianMobile } from "@/lib/phone";
 import { setSmsMarketingConsent } from "@/lib/sms-consent";
 
@@ -17,8 +18,17 @@ export async function updateSmsMarketingConsent(input: {
   enabled: boolean;
 }): Promise<
   | { ok: true }
-  | { ok: false; reason: "phone_changed" | "verification_required" }
+  | {
+      ok: false;
+      reason: "phone_changed" | "verification_required" | "unavailable";
+    }
 > {
+  // Promotional SMS is a Georgian-numbers channel; no opt-ins from the
+  // English host (its UI never renders the toggle). Checked before auth so
+  // the gate holds logged-out too.
+  if ((await getRequestLocale()) === "en") {
+    return { ok: false, reason: "unavailable" };
+  }
   const user = await requireUser();
   const phone = normalizeGeorgianMobile(
     typeof input?.phone === "string" ? input.phone : "",

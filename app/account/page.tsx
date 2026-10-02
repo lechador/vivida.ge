@@ -278,23 +278,26 @@ export default async function AccountPage() {
           />
         </div>
 
-        {/* Mobile number — SMS-verified phone login */}
-        <div className="mb-6">
-          <PhoneCard
-            initialPhone={emailPrefs?.phone ?? null}
-            initialPhoneLoginReady={
-              !emailPrefs?.hasPassword ||
-              Boolean(
-                emailPrefs.phoneVerifiedAt &&
-                emailPrefs.emailVerified &&
-                emailPrefs.phoneVerifiedAt.getTime() >=
-                  emailPrefs.emailVerified.getTime(),
-              )
-            }
-            initialSmsMarketing={emailPrefs?.smsMarketing ?? false}
-            locale={locale}
-          />
-        </div>
+        {/* Mobile number — SMS-verified phone login (Georgian host only;
+            SMS codes go to Georgian numbers, so the card stays off English). */}
+        {!onEnglishHost && (
+          <div className="mb-6">
+            <PhoneCard
+              initialPhone={emailPrefs?.phone ?? null}
+              initialPhoneLoginReady={
+                !emailPrefs?.hasPassword ||
+                Boolean(
+                  emailPrefs.phoneVerifiedAt &&
+                  emailPrefs.emailVerified &&
+                  emailPrefs.phoneVerifiedAt.getTime() >=
+                    emailPrefs.emailVerified.getTime(),
+                )
+              }
+              initialSmsMarketing={emailPrefs?.smsMarketing ?? false}
+              locale={locale}
+            />
+          </div>
+        )}
 
         {/* Public profile fields */}
         <div className="mb-6">

@@ -168,12 +168,16 @@ export default async function DashboardPage() {
   );
   const suggestedTest = pool[seedValue % pool.length];
   const suggestedArticles = pickDailyArticles(publishedArticles, seedValue);
-  const showPhoneGiftPopup = phoneGiftPopupEligible({
-    hasVerifiedPhone: Boolean(userRow?.phoneVerifiedAt),
-    isPremium,
-    restricted,
-    popupDismissed: Boolean(userRow?.phoneGiftPopupDismissedAt),
-  });
+  // Phone-gift campaign is Georgian-numbers only (verify a +995 number →
+  // credits), so the popup never shows on the English host.
+  const showPhoneGiftPopup =
+    !en &&
+    phoneGiftPopupEligible({
+      hasVerifiedPhone: Boolean(userRow?.phoneVerifiedAt),
+      isPremium,
+      restricted,
+      popupDismissed: Boolean(userRow?.phoneGiftPopupDismissedAt),
+    });
 
   return (
     <main

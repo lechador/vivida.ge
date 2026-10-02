@@ -46,6 +46,7 @@ export type PhoneActionErrorCode =
   | "phone_taken"
   | "sms_failed"
   | "sms_unavailable"
+  | "unavailable_region"
   | "failed";
 
 export type PhoneActionFailure = {
@@ -131,6 +132,15 @@ function phoneErrorCopy(
         "SMS ვერ გაიგზავნა. სცადე ხელახლა.",
         "Could not send the SMS. Please try again.",
       );
+    case "unavailable_region":
+      // SMS codes go only to Georgian numbers, so the phone stack lives on
+      // vivida.ge. English-host callers are rejected before any rate limit,
+      // code issue, or DB write.
+      return localized(
+        locale,
+        "ტელეფონის დადასტურება მხოლოდ vivida.ge-ზეა ხელმისაწვდომი.",
+        "Phone verification is only available on vivida.ge.",
+      );
     case "failed":
     default:
       return localized(
@@ -164,6 +174,7 @@ export async function sendPhoneVerificationCode(input: {
   purpose: SendPhoneCodePurpose;
 }): Promise<PhoneActionResult> {
   const locale = await getRequestLocale();
+  if (locale === "en") return failure("unavailable_region", locale);
   const phone = normalizeGeorgianMobile(input.phone ?? "");
   if (!phone) return failure("invalid_phone", locale);
 
@@ -253,6 +264,7 @@ export async function verifySignupPhone(input: {
   code: string;
 }): Promise<VerifySignupPhoneResult> {
   const locale = await getRequestLocale();
+  if (locale === "en") return failure("unavailable_region", locale);
   const phone = normalizeGeorgianMobile(input.phone ?? "");
   if (!phone) return failure("invalid_phone", locale);
   const code = (input.code ?? "").trim();
@@ -304,6 +316,9 @@ async function verifyAccountCode(input: {
   code: string;
 }): Promise<AccountVerification> {
   const locale = await getRequestLocale();
+  if (locale === "en") {
+    return { ok: false, failure: failure("unavailable_region", locale) };
+  }
   const user = await requireUser();
   const phone = normalizeGeorgianMobile(input.phone ?? "");
   if (!phone) return { ok: false, failure: failure("invalid_phone", locale) };
@@ -418,6 +433,9 @@ export async function verifyPhoneGift(input: {
  * offer itself stays claimable from the credits page.
  */
 export async function dismissPhoneGiftPopup(): Promise<{ ok: true }> {
+  const locale = await getRequestLocale();
+  // The popup never renders on the English host; a posted dismiss is a no-op.
+  if (locale === "en") return { ok: true };
   const user = await requireUser();
   await db
     .update(users)
@@ -440,6 +458,7 @@ export async function signInWithPhoneCode(input: {
   code: string;
 }): Promise<PhoneActionResult> {
   const locale = await getRequestLocale();
+  if (locale === "en") return failure("unavailable_region", locale);
   const phone = normalizeGeorgianMobile(input.phone ?? "");
   if (!phone) return failure("invalid_phone", locale);
   const code = (input.code ?? "").trim();
@@ -450,6 +469,9 @@ export async function signInWithPhoneCode(input: {
     return { ok: true };
   } catch (err) {
     const text = authErrorText(err);
+    if (text.includes("PHONE_UNAVAILABLE")) {
+      return failure("unavailable_region", locale);
+    }
     if (text.includes("PHONE_NO_ACCOUNT")) {
       return failure("no_account", locale);
     }
