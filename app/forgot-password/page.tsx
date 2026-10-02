@@ -7,7 +7,11 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale !== "ka" ? "Reset password" : "პაროლის აღდგენა" };
+  return {
+    title: locale !== "ka" ? "Reset password" : "პაროლის აღდგენა",
+    // Auth utility page — out of the index, links still followed.
+    robots: { index: false, follow: true },
+  };
 }
 
 export default async function ForgotPasswordPage() {

@@ -16,6 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
     title: locale !== "ka" ? "Create an account" : "რეგისტრაცია",
+    // Auth utility page — keep it crawlable for link equity but out of the
+    // index (thin copy was indexable on both hosts).
+    robots: { index: false, follow: true },
     // Same-path language pair — see the note in app/login/page.tsx.
     alternates: localizedAlternates(
       "/signup",

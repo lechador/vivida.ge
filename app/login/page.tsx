@@ -16,6 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
     title: locale !== "ka" ? "Sign in" : "შესვლა",
+    // Auth utility page — keep it crawlable for link equity but out of the
+    // index (it was ranking in site: queries on both hosts with thin copy).
+    robots: { index: false, follow: true },
     // Both hosts serve this path in their own language, and both were
     // indexable while self-canonicalizing — without hreflang that reads as
     // two duplicates rather than one page in two languages.
