@@ -15,7 +15,7 @@ const PATH = "/en/privacy";
 const TITLE = "Privacy Policy";
 const DESCRIPTION =
   "Vivida's English privacy policy: what information is collected, why it is used, service providers, retention, cookies and your data rights.";
-const LAST_UPDATED = "September 23, 2026";
+const LAST_UPDATED = "October 2, 2026";
 
 export const metadata: Metadata = {
   title: { absolute: `${TITLE} — Vivida` },
@@ -211,8 +211,8 @@ export default function EnglishPrivacyPage() {
       <section>
         <h2>10. Age requirement</h2>
         <p>
-          Vivida is intended for adults aged 18 or older. Registration and
-          birth-data validation enforce this requirement.
+          Vivida is intended for users aged 16 or older. If we discover that we
+          hold data of a younger user without parental consent, we delete it.
         </p>
       </section>
       <section>

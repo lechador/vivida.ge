@@ -52,9 +52,12 @@ export default function EnglishTermsPage() {
       <section>
         <h2>2. Eligibility and accounts</h2>
         <p>
-          You must be at least 18 years old. Accounts may be created through
-          Google sign-in or email. You are responsible for protecting access to
-          your account and for activity performed through it.
+          You must be at least 16 years old; if you are under 16, a parent or
+          legal guardian must consent to your use of Vivida. If you are under
+          18, a parent or legal guardian must approve any paid purchase.
+          Accounts may be created through Google sign-in or email. You are
+          responsible for protecting access to your account and for activity
+          performed through it.
         </p>
       </section>
       <section>
