@@ -17,6 +17,11 @@ import {
   isDreamSlug,
 } from "@/lib/seo/dreams";
 import { DREAM_EN_BY_SLUG } from "@/lib/seo/dreams-en";
+import {
+  ALL_DREAM_EN_SLUGS,
+  dreamPublicSlug,
+  resolveDreamSlug,
+} from "@/lib/seo/en-slugs";
 
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
@@ -30,7 +35,12 @@ const SITE_URL = "https://www.vivida.ge";
 type Params = { symbol: string };
 
 export function generateStaticParams() {
-  return ALL_DREAM_SLUGS.map((symbol) => ({ symbol }));
+  // English keyword slugs pre-render on the English deployment; Georgian
+  // slugs stay the only params that resolve on the Georgian host.
+  return [
+    ...ALL_DREAM_SLUGS.map((symbol) => ({ symbol })),
+    ...ALL_DREAM_EN_SLUGS.map((symbol) => ({ symbol })),
+  ];
 }
 
 export async function generateMetadata({
@@ -38,21 +48,32 @@ export async function generateMetadata({
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
-  const { symbol } = await params;
-  if (!isDreamSlug(symbol)) return {};
-  const s = DREAM_BY_SLUG[symbol];
+  const { symbol: rawSymbol } = await params;
   const locale = await getRequestLocale();
+  // English host resolves both the keyword slug and (as a fallback behind
+  // the host-scoped 308) the internal slug; Georgian host only the internal.
+  const symbol =
+    locale === "en"
+      ? resolveDreamSlug(rawSymbol, "en", isDreamSlug)
+      : isDreamSlug(rawSymbol)
+        ? rawSymbol
+        : null;
+  if (!symbol) return {};
+  const s = DREAM_BY_SLUG[symbol];
 
   if (locale === "en") {
     const content = DREAM_EN_BY_SLUG[symbol];
     if (!content) return {};
-    const path = `/sizmris-akhsna/${symbol}`;
+    const kaPath = `/sizmris-akhsna/${symbol}`;
+    // Canonical English URL carries the keyword slug; the Georgian path is
+    // advertised as the ka-GE alternate only.
+    const path = `/dream-meanings/${dreamPublicSlug(symbol, "en")}`;
     const title = `${content.title} Dream Meaning: Symbolism and Common Scenarios`;
     const description = `${content.summary} Explore common scenarios, a positive reading, and what the dream may invite you to notice.`;
     return {
       title: { absolute: title },
       description,
-      alternates: localizedAlternates(path, path, "en"),
+      alternates: localizedAlternates(path, kaPath, "en"),
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "article",
@@ -108,10 +129,16 @@ export default async function DreamSymbolPage({
 }: {
   params: Promise<Params>;
 }) {
-  const { symbol } = await params;
-  if (!isDreamSlug(symbol)) notFound();
-  const s = DREAM_BY_SLUG[symbol];
+  const { symbol: rawSymbol } = await params;
   const locale = await getRequestLocale();
+  const symbol =
+    locale === "en"
+      ? resolveDreamSlug(rawSymbol, "en", isDreamSlug)
+      : isDreamSlug(rawSymbol)
+        ? rawSymbol
+        : null;
+  if (!symbol) notFound();
+  const s = DREAM_BY_SLUG[symbol];
   if (locale === "en") {
     const content = DREAM_EN_BY_SLUG[symbol];
     if (!content) notFound();
@@ -316,7 +343,6 @@ export default async function DreamSymbolPage({
             <ArrowRight className="size-4" />
           </Link>
         </div>
-
       </section>
 
       <SiteFooter />

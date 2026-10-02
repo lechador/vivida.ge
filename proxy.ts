@@ -9,6 +9,7 @@ import {
 import { authConfig } from "@/auth.config";
 import { signedInLandingTarget } from "@/lib/landing-redirect";
 import { isEnglishHost } from "@/lib/seo/locales";
+import { upgradeEnglishDetailSlug } from "@/lib/seo/en-slugs";
 import {
   internationalInternalPath,
   internationalPublicPath,
@@ -56,7 +57,10 @@ function internationalEnglishRouting(
   const { pathname } = request.nextUrl;
   if (pathname === "/am" || pathname.startsWith("/am/")) return undefined;
 
-  const cleanPath = internationalPublicPath(pathname);
+  // Legacy Georgian path → clean English URL, with transliterated detail
+  // slugs upgraded to keyword slugs in the same hop
+  // (/sizmris-akhsna/gveli → /dream-meanings/snake, not /dream-meanings/gveli).
+  const cleanPath = upgradeEnglishDetailSlug(internationalPublicPath(pathname));
   if (cleanPath !== pathname) {
     const target = request.nextUrl.clone();
     target.pathname = cleanPath;

@@ -15,6 +15,7 @@ import {
   DREAM_SYMBOLS_EN,
   type DreamSymbolEn,
 } from "@/lib/seo/dreams-en";
+import { dreamPublicSlug } from "@/lib/seo/en-slugs";
 
 const SITE = "https://www.vividaastro.com";
 
@@ -56,7 +57,7 @@ export function DreamsHubEn({ authed = false }: { authed?: boolean } = {}) {
       headline: DREAMS_HUB_EN.title,
       description: DREAMS_HUB_EN.description,
       inLanguage: "en",
-      mainEntityOfPage: `${SITE}/sizmris-akhsna`,
+      mainEntityOfPage: `${SITE}/dream-meanings`,
       publisher: { "@type": "Organization", name: "Vivida", url: SITE },
     },
     {
@@ -68,7 +69,7 @@ export function DreamsHubEn({ authed = false }: { authed?: boolean } = {}) {
         "@type": "ListItem",
         position: index + 1,
         name: item.title,
-        url: `${SITE}/sizmris-akhsna/${item.slug}`,
+        url: `${SITE}/dream-meanings/${dreamPublicSlug(item.slug, "en")}`,
       })),
     },
     {
@@ -136,7 +137,7 @@ export function DreamsHubEn({ authed = false }: { authed?: boolean } = {}) {
                   return (
                     <Link
                       key={item.slug}
-                      href={`/sizmris-akhsna/${item.slug}`}
+                      href={`/sizmris-akhsna/${dreamPublicSlug(item.slug, "en")}`}
                       className="group flex items-start gap-3 rounded-xl border border-border/60 bg-card/40 px-3.5 py-3 transition-colors hover:bg-card/75"
                     >
                       <span className="text-xl leading-none">
@@ -233,7 +234,7 @@ export function DreamSymbolPageEn({
   base: DreamSymbol;
   content: DreamSymbolEn;
 }) {
-  const url = `${SITE}/sizmris-akhsna/${base.slug}`;
+  const url = `${SITE}/dream-meanings/${dreamPublicSlug(base.slug, "en")}`;
   const related = base.related
     .map((slug) => ({ base: DREAM_BY_SLUG[slug], en: DREAM_EN_BY_SLUG[slug] }))
     .filter((item) => item.base && item.en);
@@ -276,7 +277,7 @@ export function DreamSymbolPageEn({
           "@type": "ListItem",
           position: 2,
           name: "Dream dictionary",
-          item: `${SITE}/sizmris-akhsna`,
+          item: `${SITE}/dream-meanings`,
         },
         { "@type": "ListItem", position: 3, name: content.title, item: url },
       ],
@@ -383,7 +384,7 @@ export function DreamSymbolPageEn({
               {related.map((item) => (
                 <Link
                   key={item.base.slug}
-                  href={`/sizmris-akhsna/${item.base.slug}`}
+                  href={`/sizmris-akhsna/${dreamPublicSlug(item.base.slug, "en")}`}
                   className="flex items-center gap-2.5 rounded-xl border border-border/60 bg-card/45 px-3.5 py-2.5 text-sm"
                 >
                   <span className="text-lg">{item.base.glyph}</span>
@@ -402,7 +403,7 @@ export function DreamSymbolPageEn({
             {alsoSee.map((item) => (
               <Link
                 key={item.slug}
-                href={`/sizmris-akhsna/${item.slug}`}
+                href={`/sizmris-akhsna/${dreamPublicSlug(item.slug, "en")}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-xs"
               >
                 <span>{item.glyph}</span>

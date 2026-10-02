@@ -32,6 +32,11 @@ import {
   isEnglishHost,
 } from "@/lib/seo/locales";
 import { HOUSE_NUMBERS, PLANET_SLUGS } from "@/lib/seo/astrology-guides";
+import {
+  DREAM_EN_SLUGS,
+  EQ_EN_SLUGS,
+  PLANET_EN_SLUGS,
+} from "@/lib/seo/en-slugs";
 import { ALL_DREAM_SLUGS } from "@/lib/seo/dreams";
 import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
@@ -180,6 +185,24 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
     alternates: alternatesFor(path, path),
   });
 
+  /**
+   * Detail page whose English URL carries a keyword slug while the Georgian
+   * twin keeps the internal slug: /sizmris-akhsna/gveli ↔ /dream-meanings/snake.
+   */
+  const translatedEntry = (
+    kaPath: string,
+    enPath: string,
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"],
+    priority: number,
+    lastModified: Date = ENGLISH_ASTROLOGY_PUBLISHED,
+  ): MetadataRoute.Sitemap[number] => ({
+    url: `${ENGLISH_SITE_URL}${enPath}`,
+    lastModified,
+    changeFrequency,
+    priority,
+    alternates: alternatesFor(kaPath, enPath),
+  });
+
   const signPages = ALL_SLUGS.map((slug) =>
     samePathEntry(`/zodiac/${slug}`, "monthly", 0.78),
   );
@@ -219,8 +242,13 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
   const housePages = HOUSE_NUMBERS.map((number) =>
     samePathEntry(`/astrologiuri-saxlebi/${number}`, "monthly", 0.68),
   );
-  const planetPages = PLANET_SLUGS.map((planet) =>
-    samePathEntry(`/planetebi/${planet}`, "monthly", 0.68),
+  const planetPages = PLANET_EN_SLUGS.map(({ ka, en }) =>
+    translatedEntry(
+      `/planetebi/${ka}`,
+      `/astrology-planets/${en}`,
+      "monthly",
+      0.68,
+    ),
   );
   const astrologyCalendarPages = calendarWindow(SITEMAP_CALENDAR_DAYS).map(
     (day) =>
@@ -255,8 +283,13 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
   const chinesePages = ALL_CHINESE_SLUGS.map((slug) =>
     samePathEntry(`/chinuri-horoskopi/${slug}`, "monthly", 0.7),
   );
-  const dreamPages = ALL_DREAM_SLUGS.map((slug) =>
-    samePathEntry(`/sizmris-akhsna/${slug}`, "monthly", 0.68),
+  const dreamPages = DREAM_EN_SLUGS.map(({ ka, en }) =>
+    translatedEntry(
+      `/sizmris-akhsna/${ka}`,
+      `/dream-meanings/${en}`,
+      "monthly",
+      0.68,
+    ),
   );
   const numerologyPages = LIFE_PATH_NUMBERS.map((number) =>
     samePathEntry(`/numerologia/${number}`, "monthly", 0.7),
@@ -264,8 +297,13 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
   const angelNumberPages = ALL_ANGEL_SLUGS.map((number) =>
     samePathEntry(`/angeluri-ricxvebi/${number}`, "monthly", 0.68),
   );
-  const eqArticlePages = EQ_ARTICLE_SLUGS.map((slug) =>
-    samePathEntry(`/emociuri-inteleqti/${slug}`, "monthly", 0.68),
+  const eqArticlePages = EQ_EN_SLUGS.map(({ ka, en }) =>
+    translatedEntry(
+      `/emociuri-inteleqti/${ka}`,
+      `/emotional-intelligence/${en}`,
+      "monthly",
+      0.68,
+    ),
   );
 
   const entries: MetadataRoute.Sitemap = [

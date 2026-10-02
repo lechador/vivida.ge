@@ -16,6 +16,11 @@ import { EqArticlePageEn } from "@/components/seo/eq-articles-en";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { EQ_ARTICLES, eqArticleBySlug } from "@/lib/seo/eq-articles";
 import { eqArticleEnBySlug } from "@/lib/seo/eq-articles-en";
+import {
+  ALL_EQ_EN_SLUGS,
+  eqPublicSlug,
+  resolveEqSlug,
+} from "@/lib/seo/en-slugs";
 
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
@@ -27,7 +32,10 @@ import {
 const BASE = "https://www.vivida.ge/emociuri-inteleqti";
 
 export function generateStaticParams() {
-  return EQ_ARTICLES.map(({ slug }) => ({ slug }));
+  return [
+    ...EQ_ARTICLES.map(({ slug }) => ({ slug })),
+    ...ALL_EQ_EN_SLUGS.map((slug) => ({ slug })),
+  ];
 }
 
 export async function generateMetadata({
@@ -35,12 +43,20 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
   const locale = await getRequestLocale();
+  const kaSlug =
+    locale === "en"
+      ? resolveEqSlug(rawSlug, "en", (s) => Boolean(eqArticleBySlug(s)))
+      : eqArticleBySlug(rawSlug)
+        ? rawSlug
+        : null;
   if (locale === "en") {
-    const item = eqArticleEnBySlug(slug);
-    if (!item) return { title: "Article not found" };
-    const path = `/emociuri-inteleqti/${slug}`;
+    const item = kaSlug ? eqArticleEnBySlug(kaSlug) : undefined;
+    if (!item || !kaSlug) return { title: "Article not found" };
+    const kaPath = `/emociuri-inteleqti/${kaSlug}`;
+    // Canonical English URL carries the keyword slug.
+    const path = `/emotional-intelligence/${eqPublicSlug(kaSlug, "en")}`;
     return {
       title: { absolute: item.title },
       description: item.description,
@@ -50,7 +66,7 @@ export async function generateMetadata({
         "EQ",
         ...item.domains,
       ],
-      alternates: localizedAlternates(path, path, "en"),
+      alternates: localizedAlternates(path, kaPath, "en"),
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         title: item.title,
@@ -68,6 +84,7 @@ export async function generateMetadata({
       },
     };
   }
+  const slug = rawSlug;
   const item = eqArticleBySlug(slug);
   if (!item) return { title: "სტატია ვერ მოიძებნა" };
   const url = `${BASE}/${item.slug}`;
@@ -98,13 +115,17 @@ export default async function EqArticlePage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
   const locale = await getRequestLocale();
   if (locale === "en") {
-    const englishItem = eqArticleEnBySlug(slug);
+    const kaSlug = resolveEqSlug(rawSlug, "en", (s) =>
+      Boolean(eqArticleBySlug(s)),
+    );
+    const englishItem = kaSlug ? eqArticleEnBySlug(kaSlug) : undefined;
     if (!englishItem) notFound();
     return <EqArticlePageEn item={englishItem} />;
   }
+  const slug = rawSlug;
   const item = eqArticleBySlug(slug);
   if (!item) notFound();
   const url = `${BASE}/${item.slug}`;

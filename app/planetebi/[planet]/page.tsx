@@ -17,6 +17,11 @@ import {
   planetBySlug,
 } from "@/lib/seo/astrology-guides";
 import { planetBySlugEn } from "@/lib/seo/astrology-guides-en";
+import {
+  ALL_PLANET_EN_SLUGS,
+  planetPublicSlug,
+  resolvePlanetSlug,
+} from "@/lib/seo/en-slugs";
 
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
@@ -28,17 +33,28 @@ import {
 const BASE = "https://www.vivida.ge";
 type Props = { params: Promise<{ planet: string }> };
 export function generateStaticParams() {
-  return PLANET_SLUGS.map((planet) => ({ planet }));
+  return [
+    ...PLANET_SLUGS.map((planet) => ({ planet })),
+    ...ALL_PLANET_EN_SLUGS.map((planet) => ({ planet })),
+  ];
 }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slug = (await params).planet;
+  const raw = (await params).planet;
   const locale = await getRequestLocale();
+  const kaSlug =
+    locale === "en"
+      ? resolvePlanetSlug(raw, "en", (s) => Boolean(planetBySlug(s)))
+      : planetBySlug(raw)
+        ? raw
+        : null;
   if (locale === "en") {
-    const planet = planetBySlugEn(slug);
-    if (!planet) return {};
+    const planet = kaSlug ? planetBySlugEn(kaSlug) : undefined;
+    if (!planet || !kaSlug) return {};
     const title = `${planet.name} in the Birth Chart: Meaning in Astrology`;
     const description = `Learn what ${planet.name} means in a birth chart, including ${planet.role.toLowerCase()}, ruling signs, balanced expression, and common challenges.`;
-    const path = `/planetebi/${planet.slug}`;
+    const kaPath = `/planetebi/${kaSlug}`;
+    // Canonical English URL carries the keyword slug.
+    const path = `/astrology-planets/${planetPublicSlug(kaSlug, "en")}`;
     return {
       title: { absolute: title },
       description,
@@ -47,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         `${planet.name} astrology meaning`,
         ...planet.keywords,
       ],
-      alternates: localizedAlternates(path, path, "en"),
+      alternates: localizedAlternates(path, kaPath, "en"),
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         title,
@@ -60,6 +76,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       twitter: { card: "summary_large_image", title, description },
     };
   }
+  const slug = raw;
   const planet = planetBySlug(slug);
   if (!planet) return {};
   const title = `${planet.name} ნატალურ რუკაში — მნიშვნელობა ასტროლოგიაში`;
@@ -91,13 +108,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 export default async function PlanetPage({ params }: Props) {
-  const slug = (await params).planet;
+  const raw = (await params).planet;
   const locale = await getRequestLocale();
   if (locale === "en") {
-    const planet = planetBySlugEn(slug);
+    const kaSlug = resolvePlanetSlug(raw, "en", (s) =>
+      Boolean(planetBySlug(s)),
+    );
+    const planet = kaSlug ? planetBySlugEn(kaSlug) : undefined;
     if (!planet) notFound();
     return <PlanetPageEn planet={planet} />;
   }
+  const slug = raw;
   const planet = planetBySlug(slug);
   if (!planet) notFound();
   const url = `${BASE}/planetebi/${planet.slug}`;
