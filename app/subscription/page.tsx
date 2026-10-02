@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { CalendarDays, Crown, CreditCard } from "lucide-react";
+import {
+  CalendarDays,
+  Crown,
+  CreditCard,
+  Hourglass,
+  History,
+} from "lucide-react";
 
 import { requireUser } from "@/lib/auth-helpers";
 import { AppHeader } from "@/components/nav/app-header";
@@ -83,6 +89,35 @@ export default async function SubscriptionPage({
   const plan = premiumPlanForCountry(identity?.countryCode);
   const country = countryDisplayName(identity?.countryCode, locale);
 
+  // Period progress for the "how much time is left" detail. Ceiled so a
+  // period ending later today still reads as a day rather than zero.
+  // eslint-disable-next-line react-hooks/purity -- server component, force-dynamic: evaluated once per request.
+  const nowMs = Date.now();
+  const periodStartMs = subscription?.currentPeriodStart.getTime() ?? nowMs;
+  const periodEndMs = subscription?.currentPeriodEnd.getTime() ?? nowMs;
+  const daysLeft = subscription
+    ? Math.max(0, Math.ceil((periodEndMs - nowMs) / 86_400_000))
+    : 0;
+  const elapsedPct =
+    subscription && periodEndMs > periodStartMs
+      ? Math.min(
+          100,
+          Math.max(
+            0,
+            ((nowMs - periodStartMs) / (periodEndMs - periodStartMs)) * 100,
+          ),
+        )
+      : 0;
+  // PRO granted without a subscription row (manual grant, store receipt not
+  // yet mirrored): there is no period to bill against, only premiumUntil.
+  const directPremiumUntilMs = !subscription
+    ? (identity?.premiumUntil?.getTime() ?? null)
+    : null;
+  const directDaysLeft =
+    directPremiumUntilMs != null
+      ? Math.max(0, Math.ceil((directPremiumUntilMs - nowMs) / 86_400_000))
+      : 0;
+
   return (
     <main
       lang={locale}
@@ -152,6 +187,16 @@ export default async function SubscriptionPage({
 
               <dl className="mt-6 grid gap-3 sm:grid-cols-2">
                 <Detail
+                  icon={History}
+                  label={en ? "Subscribed since" : "გამოწერილია"}
+                  value={formatDate(subscription.createdAt, locale)}
+                />
+                <Detail
+                  icon={Hourglass}
+                  label={en ? "Time remaining" : "დარჩენილი დრო"}
+                  value={remainingLabel(daysLeft, en)}
+                />
+                <Detail
                   icon={CalendarDays}
                   label={
                     subscription.cancelAtPeriodEnd
@@ -179,11 +224,27 @@ export default async function SubscriptionPage({
                 />
               </dl>
 
+              <div
+                className="mt-4 h-1.5 overflow-hidden rounded-full bg-foreground/10"
+                role="progressbar"
+                aria-valuenow={Math.round(elapsedPct)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={en ? "Billing period elapsed" : "საბილინგო პერიოდი"}
+              >
+                <div
+                  className="h-full rounded-full bg-[var(--vivida-gold)]/80"
+                  style={{ width: `${elapsedPct}%` }}
+                />
+              </div>
+
               <SubscriptionActions
                 locale={locale}
                 active={active}
                 cancelAtPeriodEnd={subscription.cancelAtPeriodEnd}
                 hasCustomer={Boolean(identity?.stripeCustomerId)}
+                source={subscription.source}
+                store={subscription.rcStore}
               />
             </section>
             {!active && (
@@ -198,6 +259,35 @@ export default async function SubscriptionPage({
               </div>
             )}
           </>
+        ) : active && identity?.premiumUntil ? (
+          // PRO is on but there is no subscription row to bill against, so
+          // the buy card would be a lie — show the status and the time left.
+          <section className="rounded-3xl border border-[var(--vivida-gold)]/35 bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="text-sm text-muted-foreground">Vivida PRO</div>
+                <div className="mt-1 text-2xl font-semibold">
+                  {en ? "PRO is active" : "PRO ჩართულია"}
+                </div>
+              </div>
+              <span className="rounded-full bg-emerald-400/12 px-3 py-1 text-xs font-semibold text-emerald-300">
+                PRO
+              </span>
+            </div>
+
+            <dl className="mt-6 grid gap-3 sm:grid-cols-2">
+              <Detail
+                icon={CalendarDays}
+                label={en ? "Active until" : "აქტიურია"}
+                value={formatDate(identity.premiumUntil, locale)}
+              />
+              <Detail
+                icon={Hourglass}
+                label={en ? "Time remaining" : "დარჩენილი დრო"}
+                value={remainingLabel(directDaysLeft, en)}
+              />
+            </dl>
+          </section>
         ) : (
           <PremiumPlanCard
             plan={plan}
@@ -220,6 +310,13 @@ function formatDate(date: Date, locale: UserLocale) {
     month: "long",
     year: "numeric",
   }).format(date);
+}
+
+/** "23 days left" — the remaining-time value under the subscription dates. */
+function remainingLabel(daysLeft: number, en: boolean): string {
+  if (daysLeft <= 0) return en ? "Ended" : "დასრულდა";
+  if (daysLeft === 1) return en ? "1 day left" : "დარჩა 1 დღე";
+  return en ? `${daysLeft} days left` : `დარჩა ${daysLeft} დღე`;
 }
 
 /** "month" / "3 months" — the denominator under a subscription's price. */
