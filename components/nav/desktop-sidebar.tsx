@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { MessageCircle } from "lucide-react";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { cn } from "@/lib/utils";
@@ -31,17 +30,9 @@ export function DesktopSidebar({
   pendingAskNudges?: number;
   locale?: UserLocale;
 }) {
-  const items: NavItem[] = [
-    ...NAV_ITEMS,
-    {
-      key: "messages",
-      href: "/messages",
-      label: "ჩატი",
-      labelEn: "Chat",
-      Icon: MessageCircle,
-      hue: "oklch(0.78 0.18 200)",
-    },
-  ];
+  // NAV_ITEMS already leads with Today/Tarot/Ask/History and carries every
+  // other destination (My chart, messages, tests, reports…) as secondary.
+  const items: NavItem[] = NAV_ITEMS;
 
   // Labels are always visible — no hover reveal.
   const reveal = "";

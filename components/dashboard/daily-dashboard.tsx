@@ -222,17 +222,6 @@ function DashboardExtrasSection({
 
   return (
     <>
-      {!loading && extras.daily ? (
-        <ProDailyBrief
-          userId={userId}
-          dateIso={extras.daily.date}
-          transits={extras.transitBreakdown}
-          isPremium={isPremium}
-          locale={locale}
-        />
-      ) : loading ? (
-        <CardSkeleton className="min-h-[180px]" />
-      ) : null}
       {(!loading && extras.daily) || dailySlot || moonSlot ? (
         <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
           {!loading && extras.daily ? (
@@ -254,6 +243,20 @@ function DashboardExtrasSection({
             </div>
           )}
         </div>
+      ) : null}
+
+      {/* PRO layer sits below the delivered free insight — premium answers
+          stay fully unlocked, free viewers get the score tease + CTA. */}
+      {!loading && extras.daily ? (
+        <ProDailyBrief
+          userId={userId}
+          dateIso={extras.daily.date}
+          transits={extras.transitBreakdown}
+          isPremium={isPremium}
+          locale={locale}
+        />
+      ) : loading ? (
+        <CardSkeleton className="min-h-[180px]" />
       ) : null}
 
       {!weeklyUnlocked ? (

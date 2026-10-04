@@ -195,7 +195,9 @@ export function trackEvent(
 ): boolean {
   if (typeof window === "undefined") return false;
   if (VALUE_ACTION_EVENTS.has(name)) {
-    window.dispatchEvent(new Event("vivida:pwa-value-action"));
+    window.dispatchEvent(
+      new CustomEvent("vivida:pwa-value-action", { detail: { action: name } }),
+    );
   }
   if (!browserTrackingAllowed()) return false;
   const gtag = (

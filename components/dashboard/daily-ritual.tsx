@@ -104,14 +104,16 @@ export function DailyRitual({
   const progressPercent = completed ? 100 : completedSteps * 50;
 
   return (
-    <div className="space-y-3">
-      <DailyCard
-        horoscope={horoscope}
-        transits={transits}
-        onRead={onRead}
-        locale={locale}
-      />
-      <section className="rounded-2xl border border-[var(--vivida-violet)]/35 bg-card/65 p-4 backdrop-blur-xl sm:p-5">
+    <DailyCard
+      horoscope={horoscope}
+      transits={transits}
+      onRead={onRead}
+      locale={locale}
+    >
+      <section
+        data-daily-ritual={completed ? "complete" : "pending"}
+        className="rounded-2xl border border-[var(--vivida-violet)]/35 bg-card/65 p-4 backdrop-blur-xl sm:p-5"
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Flame className="size-5 text-[var(--vivida-pink)]" />
@@ -204,6 +206,6 @@ export function DailyRitual({
           )}
         </div>
       </section>
-    </div>
+    </DailyCard>
   );
 }

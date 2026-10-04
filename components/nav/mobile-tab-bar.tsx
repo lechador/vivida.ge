@@ -1,16 +1,19 @@
 import { cn } from "@/lib/utils";
 import { AskTabBadge } from "./ask-tab-badge";
-import { MessagesTabBadge } from "./messages-tab-badge";
+import { MobileNav } from "./mobile-nav";
 import { NavItemLink } from "./nav-item-link";
-import { MOBILE_TAB_ITEMS, type NavActiveKey } from "./nav-items";
-import { navLabel } from "./nav-items";
+import {
+  MOBILE_TAB_ITEMS,
+  mobileTabLabel,
+  type NavActiveKey,
+} from "./nav-items";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * iOS/Android-style fixed bottom tab bar. Mirrors the desktop NavLinks
- * destinations so authed users on phones get one-tap access to every
- * primary destination without opening the hamburger drawer. Hidden on
- * lg+ where the inline header nav already covers it.
+ * iOS/Android-style fixed bottom tab bar. Four primary destinations
+ * (Today / Tarot / Ask / My history) plus a More entry point that opens
+ * the full nav drawer — every other route stays one tap behind More.
+ * Hidden on lg+ where the desktop sidebar already covers it.
  *
  * Respects safe-area insets so it sits above the iOS home indicator
  * instead of being clipped under it.
@@ -70,21 +73,24 @@ export function MobileTabBar({
                   style={isActive ? { color: item.hue } : undefined}
                 >
                   <item.Icon className="size-5" />
-                  {item.key === "messages" && (
-                    <MessagesTabBadge
-                      initial={unreadMessages}
-                      locale={locale}
-                    />
-                  )}
                   {item.key === "ask" && (
                     <AskTabBadge pending={pendingAskNudges} locale={locale} />
                   )}
                 </span>
-                <span className="truncate">{navLabel(item, locale)}</span>
+                <span className="truncate">{mobileTabLabel(item, locale)}</span>
               </NavItemLink>
             </li>
           );
         })}
+        <li className="flex-1">
+          <MobileNav
+            variant="tab"
+            active={active}
+            locale={locale}
+            unreadMessages={unreadMessages}
+            pendingAskNudges={pendingAskNudges}
+          />
+        </li>
       </ul>
     </nav>
   );

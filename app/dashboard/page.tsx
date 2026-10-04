@@ -21,7 +21,6 @@ import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
 import { DashboardArticleRecommendations } from "@/components/dashboard/article-recommendations";
 import { DashboardBillingNudge } from "@/components/dashboard/billing-nudge";
-import { PhoneGiftPopup } from "@/components/phone-gift/phone-gift-popup";
 import { TESTS } from "@/lib/tests-catalog";
 import {
   listPublishedArticlePreviews,
@@ -31,8 +30,6 @@ import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getBalance } from "@/lib/credits";
 import { shouldShowPurchasePromotion } from "@/lib/billing-config";
-import { phoneGiftPopupEligible } from "@/lib/phone-gift-pure";
-import { isPremiumUser } from "@/lib/premium";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -71,7 +68,6 @@ export default async function DashboardPage() {
     [eqResult],
     [bigFiveResult],
     balance,
-    isPremium,
   ] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     db
@@ -79,8 +75,6 @@ export default async function DashboardPage() {
         locale: users.interfaceLanguage,
         countryCode: users.residenceCountryCode,
         isPremium: users.isPremium,
-        phoneVerifiedAt: users.phoneVerifiedAt,
-        phoneGiftPopupDismissedAt: users.phoneGiftPopupDismissedAt,
       })
       .from(users)
       .where(eq(users.id, user.id))
@@ -106,7 +100,6 @@ export default async function DashboardPage() {
       .where(eq(bigFiveResults.userId, user.id))
       .limit(1),
     getBalance(user.id),
-    isPremiumUser(user.id),
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
   const en = locale !== "ka";
@@ -168,16 +161,6 @@ export default async function DashboardPage() {
   );
   const suggestedTest = pool[seedValue % pool.length];
   const suggestedArticles = pickDailyArticles(publishedArticles, seedValue);
-  // Phone-gift campaign is Georgian-numbers only (verify a +995 number →
-  // credits), so the popup never shows on the English host.
-  const showPhoneGiftPopup =
-    !en &&
-    phoneGiftPopupEligible({
-      hasVerifiedPhone: Boolean(userRow?.phoneVerifiedAt),
-      isPremium,
-      restricted,
-      popupDismissed: Boolean(userRow?.phoneGiftPopupDismissedAt),
-    });
 
   return (
     <main
@@ -196,8 +179,6 @@ export default async function DashboardPage() {
 
       <AppHeader authed active="today" />
 
-      {showPhoneGiftPopup && <PhoneGiftPopup locale={locale} />}
-
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         {restricted && <RestrictedNotice locale={locale} />}
         <h1 className="mb-5 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
@@ -207,11 +188,12 @@ export default async function DashboardPage() {
           </span>
         </h1>
 
-        <div className="mb-8">
+        <DailyDashboard userId={user.id} locale={locale} />
+
+        {/* Tarot + AI stay one tap away, below the delivered daily value. */}
+        <div className="mt-8">
           <PopularTools locale={locale} placement="dashboard_top" />
         </div>
-
-        <DailyDashboard userId={user.id} locale={locale} />
 
         {/* Soft prompt to enable daily push — hides itself once enabled,
             unsupported, or dismissed. */}

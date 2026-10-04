@@ -120,6 +120,18 @@ describe("trackEvent", () => {
     expect(hits).toEqual([]);
   });
 
+  it("identifies only the completed action in the local PWA signal even without analytics consent", () => {
+    const dispatch = vi.fn((event: Event) => Boolean(event));
+    (globalThis as { dispatchEvent: (event: Event) => boolean }).dispatchEvent =
+      dispatch;
+    (globalThis as { document: { cookie: string } }).document.cookie =
+      "vivida_tracking_consent=denied";
+    trackEvent(ANALYTICS_EVENT.dailyHoroscopeRead, { date: "2026-10-04" });
+    const event = dispatch.mock.calls[0]?.[0] as unknown as CustomEvent;
+    expect(event.type).toBe("vivida:pwa-value-action");
+    expect(event.detail).toEqual({ action: "daily_horoscope_read" });
+  });
+
   it("never sends GA4 events from a token route despite existing consent and gtag", () => {
     const hits = installGtag();
     (globalThis as { location: { pathname: string } }).location.pathname =

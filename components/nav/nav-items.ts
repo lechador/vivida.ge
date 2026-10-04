@@ -46,6 +46,13 @@ export type NavItem = {
   Icon: LucideIcon;
   /** Hue used for the active glow + hover icon tint. Roughly the brand axis. */
   hue: string;
+  /**
+   * Optional bottom-tab-bar-only label override. The /library destination
+   * reads as "My history" in the tab bar while drawer/sidebar keep the
+   * canonical library name.
+   */
+  tabLabel?: string;
+  tabLabelEn?: string;
 };
 
 /**
@@ -72,6 +79,18 @@ export function navLabel(item: NavItem, locale: UserLocale = "ka"): string {
   return item.label;
 }
 
+/**
+ * Bottom-tab-bar label: honors the per-item tab override (history naming
+ * for /library) and falls back to the canonical label.
+ */
+export function mobileTabLabel(
+  item: NavItem,
+  locale: UserLocale = "ka",
+): string {
+  if (locale === "en") return item.tabLabelEn ?? item.labelEn;
+  return item.tabLabel ?? item.label;
+}
+
 const ALL_NAV_ITEMS: NavItem[] = [
   {
     key: "today",
@@ -82,28 +101,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     hue: "oklch(0.82 0.16 80)",
   },
   {
-    key: "sky",
-    href: "/sky",
-    label: "ცა ახლა",
-    labelEn: "Sky now",
-    Icon: Orbit,
-    hue: "oklch(0.80 0.15 200)",
-  },
-  {
-    key: "report",
-    href: "/report",
-    label: "ჩემი რუკა",
-    labelEn: "My chart",
-    Icon: Compass,
+    key: "tarot",
+    href: "/taro",
+    label: "ტარო",
+    labelEn: "Tarot",
+    Icon: Wand2,
     hue: "oklch(0.78 0.18 305)",
-  },
-  {
-    key: "reports",
-    href: "/reports",
-    label: "რეპორტები",
-    labelEn: "Reports",
-    Icon: ScrollText,
-    hue: "oklch(0.80 0.16 55)",
   },
   {
     key: "ask",
@@ -122,12 +125,28 @@ const ALL_NAV_ITEMS: NavItem[] = [
     hue: "oklch(0.80 0.15 190)",
   },
   {
-    key: "tarot",
-    href: "/taro",
-    label: "ტარო",
-    labelEn: "Tarot",
-    Icon: Wand2,
+    key: "report",
+    href: "/report",
+    label: "ჩემი რუკა",
+    labelEn: "My chart",
+    Icon: Compass,
     hue: "oklch(0.78 0.18 305)",
+  },
+  {
+    key: "sky",
+    href: "/sky",
+    label: "ცა ახლა",
+    labelEn: "Sky now",
+    Icon: Orbit,
+    hue: "oklch(0.80 0.15 200)",
+  },
+  {
+    key: "reports",
+    href: "/reports",
+    label: "რეპორტები",
+    labelEn: "Reports",
+    Icon: ScrollText,
+    hue: "oklch(0.80 0.16 55)",
   },
   {
     key: "timing",
@@ -152,6 +171,14 @@ const ALL_NAV_ITEMS: NavItem[] = [
     labelEn: "Tests",
     Icon: Brain,
     hue: "oklch(0.78 0.16 300)",
+  },
+  {
+    key: "messages",
+    href: "/messages",
+    label: "წერილები",
+    labelEn: "Messages",
+    Icon: MessageCircle,
+    hue: "oklch(0.78 0.18 200)",
   },
   {
     key: "discover",
@@ -188,52 +215,28 @@ const ALL_NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * The mobile bottom tab bar shows a curated 5-item subset of the nav:
- * today / chart / tarot / tests / chat.
+ * The mobile bottom tab bar shows four link destinations —
+ * Today / Tarot / Ask / My history — plus a More entry point that opens
+ * the full nav drawer (rendered by MobileTabBar, not a link here).
+ * Tab entries reuse the canonical item (href/icon/hue/labels) so the two
+ * surfaces cannot drift; /library carries its tab-only history naming.
  */
 export const NAV_ITEMS: NavItem[] = ALL_NAV_ITEMS.filter(navVisible);
 
+function mobileTab(key: NavActiveKey): NavItem {
+  const item = ALL_NAV_ITEMS.find((entry) => entry.key === key);
+  if (!item) throw new Error(`unknown mobile tab ${key}`);
+  if (key === "library") {
+    return { ...item, tabLabel: "ჩემი ისტორია", tabLabelEn: "My history" };
+  }
+  return { ...item };
+}
+
 const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
-  {
-    key: "today",
-    href: "/dashboard",
-    label: "დღეს",
-    labelEn: "Today",
-    Icon: Sun,
-    hue: "oklch(0.82 0.16 80)",
-  },
-  {
-    key: "report",
-    href: "/report",
-    label: "ჩემი რუკა",
-    labelEn: "My chart",
-    Icon: Compass,
-    hue: "oklch(0.78 0.18 305)",
-  },
-  {
-    key: "tarot",
-    href: "/taro",
-    label: "ტარო",
-    labelEn: "Tarot",
-    Icon: Wand2,
-    hue: "oklch(0.78 0.18 305)",
-  },
-  {
-    key: "tests",
-    href: "/tests",
-    label: "ტესტები",
-    labelEn: "Tests",
-    Icon: Brain,
-    hue: "oklch(0.78 0.16 300)",
-  },
-  {
-    key: "messages",
-    href: "/messages",
-    label: "ჩატი",
-    labelEn: "Chat",
-    Icon: MessageCircle,
-    hue: "oklch(0.78 0.18 200)",
-  },
+  mobileTab("today"),
+  mobileTab("tarot"),
+  mobileTab("ask"),
+  mobileTab("library"),
 ];
 
 /** Visible mobile tab bar — same flag filtering as the desktop nav. */

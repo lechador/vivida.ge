@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Sparkles } from "lucide-react";
 
 import type { DailyHoroscope } from "@/db/schema";
@@ -54,17 +54,33 @@ export function DailyCard({
   horoscope,
   transits = [],
   onRead,
+  children,
   locale = "ka",
 }: {
   horoscope: DailyHoroscope;
   /** Today's strongest transit aspects + their library interpretations. */
   transits?: TransitBreakdownItem[];
   onRead?: () => void;
+  /** Primary daily action stays next to the summary, before optional details. */
+  children?: ReactNode;
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
   const readSentinelRef = useRef<HTMLParagraphElement>(null);
   const readTrackedRef = useRef(false);
+
+  // Longer body paragraphs (library duplicates already filtered) — rendered
+  // inside the expandable details block so the headline + summary stay the
+  // first thing on screen.
+  const detailParagraphs = horoscope.body
+    .split(/\n{2,}/)
+    .filter(Boolean)
+    // Library-composed bodies reuse the same texts the transit
+    // breakdown below shows verbatim — drop those paragraphs here so
+    // nothing reads twice. Surfaces without the breakdown (email,
+    // mobile) keep the full body.
+    .filter((para) => !transits.some((t) => t.body.trim() === para.trim()));
+  const hasDetails = detailParagraphs.length > 0 || transits.length > 0;
 
   useEffect(() => {
     readTrackedRef.current = false;
@@ -153,79 +169,80 @@ export function DailyCard({
         </div>
       )}
 
-      <p className="relative mt-5 text-base leading-relaxed text-foreground/90">
+      <p
+        ref={readSentinelRef}
+        className="relative mt-5 text-base leading-relaxed text-foreground/90"
+      >
         {horoscope.summary}
       </p>
 
-      <div className="relative mt-5 space-y-4 text-sm leading-relaxed text-foreground/85">
-        {horoscope.body
-          .split(/\n{2,}/)
-          .filter(Boolean)
-          // Library-composed bodies reuse the same texts the transit
-          // breakdown below shows verbatim — drop those paragraphs here so
-          // nothing reads twice. Surfaces without the breakdown (email,
-          // mobile) keep the full body.
-          .filter(
-            (para) => !transits.some((t) => t.body.trim() === para.trim()),
-          )
-          .map((para, i) => (
-            <p key={i}>{para}</p>
-          ))}
-      </div>
+      {children != null && <div className="relative mt-4">{children}</div>}
 
-      {transits.length > 0 && (
-        <section className="relative mt-6 border-t border-border/40 pt-5">
-          <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Today's transits" : "დღის ტრანზიტები"}
-          </h3>
-          <ul className="mt-3 space-y-3">
-            {transits.map((t, i) => {
-              const tone = ASPECT_TONE[t.kind] ?? "var(--vivida-violet)";
-              const transitBody = BODIES[t.transit];
-              const natalBody = BODIES[t.natal];
-              return (
-                <li
-                  key={i}
-                  className="rounded-xl border border-border/50 bg-background/30 p-3.5"
-                >
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                    <span
-                      className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-medium"
-                      style={{
-                        color: tone,
-                        borderColor: `color-mix(in oklch, ${tone} 40%, transparent)`,
-                        backgroundColor: `color-mix(in oklch, ${tone} 10%, transparent)`,
-                      }}
-                    >
-                      {transitBody?.symbol}{" "}
-                      {(en ? transitBody?.labelEn : transitBody?.labelKa) ??
-                        t.transit}
-                      <span aria-hidden>{ASPECT_GLYPH[t.kind] ?? "·"}</span>
-                      {natalBody?.symbol}{" "}
-                      {(en ? natalBody?.labelEn : natalBody?.labelKa) ??
-                        t.natal}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {(en ? ASPECT_EN : ASPECT_KA)[t.kind] ?? t.kind}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm font-medium text-foreground/95">
-                    {t.title}
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed text-foreground/80">
-                    {t.body}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
+      {hasDetails && (
+        <details className="relative mt-5 rounded-xl border border-border/50 bg-background/30">
+          <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-foreground/90 transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
+            {en ? "Details and transits" : "დეტალები და ტრანზიტები"}
+          </summary>
+          <div className="space-y-4 px-4 pb-4 text-sm leading-relaxed text-foreground/85">
+            {detailParagraphs.map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+            {transits.length > 0 && (
+              <section className="border-t border-border/40 pt-4">
+                <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  {en ? "Today's transits" : "დღის ტრანზიტები"}
+                </h3>
+                <ul className="mt-3 space-y-3">
+                  {transits.map((t, i) => {
+                    const tone = ASPECT_TONE[t.kind] ?? "var(--vivida-violet)";
+                    const transitBody = BODIES[t.transit];
+                    const natalBody = BODIES[t.natal];
+                    return (
+                      <li
+                        key={i}
+                        className="rounded-xl border border-border/50 bg-background/30 p-3.5"
+                      >
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                          <span
+                            className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-medium"
+                            style={{
+                              color: tone,
+                              borderColor: `color-mix(in oklch, ${tone} 40%, transparent)`,
+                              backgroundColor: `color-mix(in oklch, ${tone} 10%, transparent)`,
+                            }}
+                          >
+                            {transitBody?.symbol}{" "}
+                            {(en
+                              ? transitBody?.labelEn
+                              : transitBody?.labelKa) ?? t.transit}
+                            <span aria-hidden>
+                              {ASPECT_GLYPH[t.kind] ?? "·"}
+                            </span>
+                            {natalBody?.symbol}{" "}
+                            {(en ? natalBody?.labelEn : natalBody?.labelKa) ??
+                              t.natal}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {(en ? ASPECT_EN : ASPECT_KA)[t.kind] ?? t.kind}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm font-medium text-foreground/95">
+                          {t.title}
+                        </p>
+                        <p className="mt-1 text-sm leading-relaxed text-foreground/80">
+                          {t.body}
+                        </p>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
+          </div>
+        </details>
       )}
 
-      <p
-        ref={readSentinelRef}
-        className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground"
-      >
+      <p className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground">
         {en
           ? "A new reading will be waiting tomorrow."
           : "ხვალ ახალი წინასწარმეტყველება გელოდება."}

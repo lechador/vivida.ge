@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Ellipsis, Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { InstallAppButton } from "@/components/pwa/install-button";
+import { AskTabBadge } from "./ask-tab-badge";
+import { MessagesTabBadge } from "./messages-tab-badge";
 import { NavItemLink } from "./nav-item-link";
 import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -16,26 +18,65 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 /**
  * Mobile-only slide-in nav drawer. The desktop NavLinks is `hidden lg:flex`,
  * so phones/tablets need a hamburger entry point. Renders nothing above lg.
+ *
+ * The `tab` variant renders a bottom-tab-bar-styled "More" trigger instead
+ * of the header hamburger, so the fifth tab opens this same drawer — no
+ * dead links, no parallel menu to drift.
  */
 export function MobileNav({
   active,
   locale = "ka",
+  variant = "menu",
+  unreadMessages = 0,
+  pendingAskNudges = 0,
 }: {
   active?: NavActiveKey;
   locale?: UserLocale;
+  variant?: "menu" | "tab";
+  unreadMessages?: number;
+  /** Unopened proactive astrologer nudges — dot on the ask row. */
+  pendingAskNudges?: number;
 }) {
   const [open, setOpen] = useState(false);
+  const moreLabel = locale !== "ka" ? "More" : "მეტი";
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Trigger asChild>
-        <button
-          type="button"
-          aria-label={locale !== "ka" ? "Menu" : "მენიუ"}
-          className="grid size-11 shrink-0 place-items-center rounded-full text-foreground/85 transition-colors hover:bg-card/60 hover:text-foreground lg:hidden"
-        >
-          <Menu className="size-5" />
-        </button>
+        {variant === "tab" ? (
+          <button
+            type="button"
+            aria-label={moreLabel}
+            aria-expanded={open}
+            className={cn(
+              "group flex w-full flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[10px] font-medium transition-colors",
+              open
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <span
+              className={cn(
+                "relative grid size-9 place-items-center rounded-xl transition-all",
+                open
+                  ? "bg-[var(--vivida-violet)]/25 ring-1 ring-[var(--vivida-violet)]/60 shadow-[0_0_18px_-4px_oklch(0.65_0.24_305/0.6)]"
+                  : "group-active:scale-95",
+              )}
+              style={open ? { color: "oklch(0.78 0.18 305)" } : undefined}
+            >
+              <Ellipsis className="size-5" />
+            </span>
+            <span className="truncate">{moreLabel}</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            aria-label={locale !== "ka" ? "Menu" : "მენიუ"}
+            className="grid size-11 shrink-0 place-items-center rounded-full text-foreground/85 transition-colors hover:bg-card/60 hover:text-foreground lg:hidden"
+          >
+            <Menu className="size-5" />
+          </button>
+        )}
       </DialogPrimitive.Trigger>
 
       <AnimatePresence>
@@ -51,11 +92,7 @@ export function MobileNav({
               />
             </DialogPrimitive.Overlay>
 
-            <DialogPrimitive.Content
-              asChild
-              aria-describedby={undefined}
-              onOpenAutoFocus={(e) => e.preventDefault()}
-            >
+            <DialogPrimitive.Content asChild aria-describedby={undefined}>
               <motion.aside
                 initial={{ x: "-100%" }}
                 animate={{ x: 0 }}
@@ -138,17 +175,31 @@ export function MobileNav({
                             className="absolute inset-0 rounded-2xl bg-card/40 opacity-0 ring-1 ring-foreground/5 transition-opacity duration-150 group-hover:opacity-100"
                           />
                         )}
-                        <Icon
-                          className="relative z-10 size-5 transition-transform duration-200 group-hover:-rotate-6"
-                          style={
-                            isActive
-                              ? {
-                                  color: item.hue,
-                                  filter: `drop-shadow(0 0 6px ${item.hue})`,
-                                }
-                              : undefined
-                          }
-                        />
+                        <span className="relative z-10 grid place-items-center">
+                          <Icon
+                            className="size-5 transition-transform duration-200 group-hover:-rotate-6"
+                            style={
+                              isActive
+                                ? {
+                                    color: item.hue,
+                                    filter: `drop-shadow(0 0 6px ${item.hue})`,
+                                  }
+                                : undefined
+                            }
+                          />
+                          {item.key === "messages" && (
+                            <MessagesTabBadge
+                              initial={unreadMessages}
+                              locale={locale}
+                            />
+                          )}
+                          {item.key === "ask" && (
+                            <AskTabBadge
+                              pending={pendingAskNudges}
+                              locale={locale}
+                            />
+                          )}
+                        </span>
                         <span className="relative z-10">
                           {navLabel(item, locale)}
                         </span>
@@ -156,7 +207,19 @@ export function MobileNav({
                     );
                   })}
                 </nav>
-                <div className="mt-auto border-t border-border/60 pt-4">
+                <div className="mt-auto space-y-3 border-t border-border/60 pt-4">
+                  <NavItemLink
+                    href="/account"
+                    itemKey="account"
+                    surface="mobile_nav"
+                    locale={locale}
+                    onNavigate={() => setOpen(false)}
+                    className="block text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {locale === "en"
+                      ? "Account & settings →"
+                      : "ანგარიში და პარამეტრები →"}
+                  </NavItemLink>
                   <InstallAppButton
                     locale={locale}
                     surface="mobile_nav"

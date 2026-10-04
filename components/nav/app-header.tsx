@@ -102,6 +102,8 @@ export async function AppHeader({
           <MobileNav
             active={active as NavActiveKey | undefined}
             locale={locale}
+            unreadMessages={unreadMessages}
+            pendingAskNudges={pendingAskNudges}
           />
         )}
 

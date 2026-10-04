@@ -5,6 +5,8 @@ import { X } from "lucide-react";
 
 import { InstallAppButton } from "./install-button";
 import { browserTrackingConsent } from "@/lib/tracking-consent";
+import { ANALYTICS_EVENT } from "@/lib/analytics";
+import { canPromptAfterDailyValue } from "@/lib/daily-ritual";
 import type { UserLocale } from "@/lib/i18n/locale";
 
 const SNOOZE_KEY = "vivida_pwa_nudge_after";
@@ -18,10 +20,21 @@ export function InstallNudge({ locale }: { locale: UserLocale }) {
     const standalone = () =>
       window.matchMedia("(display-mode: standalone)").matches ||
       Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
-    const onValue = () => {
+    const onValue = (event: Event) => {
       if (standalone() || !window.matchMedia("(max-width: 767px)").matches)
         return;
       if (browserTrackingConsent() === null) return;
+      const pendingRitual = Boolean(
+        document.querySelector('[data-daily-ritual="pending"]'),
+      );
+      const action = (event as CustomEvent<{ action?: string }>).detail?.action;
+      if (
+        !canPromptAfterDailyValue(
+          pendingRitual,
+          action === ANALYTICS_EVENT.dailyRitualCompleted,
+        )
+      )
+        return;
       try {
         if (Number(localStorage.getItem(SNOOZE_KEY) ?? 0) > Date.now()) return;
       } catch {
