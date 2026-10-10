@@ -176,3 +176,29 @@ export const bazaarReviews = pgTable(
 );
 
 export type BazaarReview = typeof bazaarReviews.$inferSelect;
+
+/**
+ * Panel-owned payment verification log. One row per verify attempt
+ * (success or failure) so stuck buyers and RPC outages are visible in the
+ * admin Bazaar → Payments tab instead of silent. No PII beyond the booking
+ * link and an 8-char signature prefix.
+ */
+export const bazaarPaymentAttempts = pgTable(
+  "bazaar_payment_attempt",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    bookingId: text("booking_id")
+      .notNull()
+      .references(() => bazaarBookings.id, { onDelete: "cascade" }),
+    reason: text("reason").notNull(),
+    sigPrefix: text("sig_prefix"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("bazaar_payment_attempt_booking_idx").on(t.bookingId)],
+);
+
+export type BazaarPaymentAttempt = typeof bazaarPaymentAttempts.$inferSelect;

@@ -666,6 +666,13 @@
       "when": 1791639078383,
       "tag": "0094_lean_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1791645252529,
+      "tag": "0095_flimsy_catseye",
+      "breakpoints": true
     }
   ]
 }

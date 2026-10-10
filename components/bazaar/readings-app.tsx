@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import QRCode from "qrcode";
+
+import { buildSolanaPayUrl } from "@/lib/bazaar-pure";
 
 /**
  * Insight Bazaar — single-view marketplace client. One public URL
@@ -660,19 +663,47 @@ function PaymentStep({
   copy: (t: string) => void;
 }) {
   const [sig, setSig] = useState("");
+  const [payer, setPayer] = useState("");
+  const [qr, setQr] = useState<string | null>(null);
   const [state, setState] = useState<
     "idle" | "checking" | "paid" | "pending" | "failed"
   >("idle");
   const [detail, setDetail] = useState<string | null>(null);
 
+  const payUrl = buildSolanaPayUrl({
+    recipient: wallet ?? providerWallet,
+    priceUsdcCents,
+    label: "Vivida",
+    message: "Insight Bazaar reading",
+  });
+
+  useEffect(() => {
+    if (!payUrl) return;
+    let live = true;
+    QRCode.toDataURL(payUrl, { width: 200, margin: 1 })
+      .then((url) => {
+        if (live) setQr(url);
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [payUrl]);
+
   async function verify() {
-    if (!sig.trim()) return;
+    if (!sig.trim() || !payer.trim()) return;
     setState("checking");
     setDetail(null);
     try {
       const d = await api<{ ok: boolean; status: string }>(
         `/api/bazaar/bookings/${bookingId}/verify-payment`,
-        { method: "POST", body: JSON.stringify({ txSignature: sig.trim() }) },
+        {
+          method: "POST",
+          body: JSON.stringify({
+            txSignature: sig.trim(),
+            payerWallet: payer.trim(),
+          }),
+        },
       );
       if (d.status === "paid" || d.status === "delivered") setState("paid");
     } catch (e) {
@@ -687,6 +718,16 @@ function PaymentStep({
         setState("failed");
         setDetail(
           `This transaction paid less than ${price(priceUsdcCents)} USDC to the reader's wallet. Send the full amount, then submit the new signature.`,
+        );
+      } else if (reason === "already_used") {
+        setState("failed");
+        setDetail(
+          "This payment is already linked to another booking. Each on-chain payment funds exactly one reading.",
+        );
+      } else if (reason === "not_signer") {
+        setState("failed");
+        setDetail(
+          "That transaction wasn't sent from the wallet address above. Check the address matches the wallet you paid with.",
         );
       } else {
         setState("failed");
@@ -714,12 +755,33 @@ function PaymentStep({
       <p className="font-semibold">Pay {price(priceUsdcCents)} USDC</p>
       <ol className="mt-3 list-decimal space-y-3 pl-5 text-muted-foreground">
         <li>
-          Send exactly{" "}
+          Pay exactly{" "}
           <strong className="text-foreground">
             {price(priceUsdcCents)} USDC
           </strong>{" "}
-          on <strong className="text-foreground">Solana</strong> from Phantom,
-          Solflare, or any wallet to:
+          on <strong className="text-foreground">Solana</strong> — scan the code
+          or open your wallet with the amount prefilled:
+          {qr && payUrl ? (
+            <div className="mt-3 flex flex-col items-center gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qr}
+                alt={`QR code: pay ${price(priceUsdcCents)} USDC to the reader`}
+                width={180}
+                height={180}
+                className="rounded-xl border border-border/60 bg-white p-2"
+              />
+              <a
+                href={payUrl}
+                className="rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2 text-sm font-semibold text-white"
+              >
+                Open in wallet
+              </a>
+            </div>
+          ) : null}
+          <p className="mt-2">
+            Or send manually from Phantom, Solflare, or any wallet to:
+          </p>
           <div className="mt-2 flex items-center gap-2">
             <code className="min-w-0 flex-1 break-all rounded-lg bg-background/70 px-2 py-1.5 font-mono text-[11px] text-foreground">
               {wallet ?? providerWallet}
@@ -731,6 +793,20 @@ function PaymentStep({
               {copied === (wallet ?? providerWallet) ? "Copied" : "Copy"}
             </button>
           </div>
+        </li>
+        <li>
+          Paste the wallet address you paid from — we check the payment was
+          really sent by you.
+          <input
+            value={payer}
+            onChange={(e) => {
+              setPayer(e.target.value);
+              if (state !== "idle") setState("idle");
+            }}
+            placeholder="Your Solana wallet address"
+            spellCheck={false}
+            className="mt-2 w-full rounded-xl border border-border/60 bg-background/60 px-3 py-2 font-mono text-xs outline-none placeholder:font-sans placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60"
+          />
         </li>
         <li>
           Paste the transaction signature below.
@@ -753,7 +829,7 @@ function PaymentStep({
       ) : null}
       <button
         onClick={verify}
-        disabled={state === "checking" || !sig.trim()}
+        disabled={state === "checking" || !sig.trim() || !payer.trim()}
         className="mt-4 w-full rounded-xl bg-foreground px-4 py-3 text-sm font-semibold text-background disabled:opacity-50"
       >
         {state === "checking" ? "Checking Solana…" : "I've paid — verify"}
@@ -1063,6 +1139,7 @@ function BuyerBookingCard({
   onDone: () => void;
 }) {
   const [sig, setSig] = useState("");
+  const [payer, setPayer] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [review, setReview] = useState("");
@@ -1070,21 +1147,40 @@ function BuyerBookingCard({
   const [reviewBusy, setReviewBusy] = useState(false);
   const [reviewed, setReviewed] = useState(false);
 
+  const payUrl = buildSolanaPayUrl({
+    recipient: booking.providerWallet,
+    priceUsdcCents: booking.priceUsdcCents,
+    label: "Vivida",
+    message: "Insight Bazaar reading",
+  });
+
   async function verify() {
     setBusy(true);
     setMsg(null);
     try {
       await api(`/api/bazaar/bookings/${booking.id}/verify-payment`, {
         method: "POST",
-        body: JSON.stringify({ txSignature: sig.trim() }),
+        body: JSON.stringify({
+          txSignature: sig.trim(),
+          payerWallet: payer.trim(),
+        }),
       });
       onDone();
     } catch (e) {
       const status = (e as { status?: number }).status;
+      const reason = (e as { reason?: string }).reason;
       setMsg(
         status === 202
           ? "Not indexed yet — wait a minute and try again."
-          : "No matching payment found. Check the signature and try again.",
+          : reason === "underpaid"
+            ? `That payment is short of ${price(booking.priceUsdcCents)} USDC. Send the full amount, then verify the new signature.`
+            : reason === "already_used"
+              ? "That payment already funds another booking."
+              : reason === "not_signer"
+                ? "That transaction wasn't sent from the wallet above."
+                : (e as Error).message === "invalid_payer_wallet"
+                  ? "Enter the wallet address you paid from."
+                  : "No matching payment found. Check the signature and try again.",
       );
     } finally {
       setBusy(false);
@@ -1148,23 +1244,42 @@ function BuyerBookingCard({
             <code className="break-all font-mono text-[11px] text-foreground">
               {booking.providerWallet}
             </code>{" "}
-            then verify the signature:
+            {payUrl ? (
+              <>
+                —{" "}
+                <a
+                  href={payUrl}
+                  className="font-medium text-[var(--vivida-cyan)] underline-offset-2 hover:underline"
+                >
+                  open in your wallet with the amount prefilled
+                </a>
+              </>
+            ) : null}
           </p>
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+          <div className="mt-2 grid gap-2">
             <input
-              value={sig}
-              onChange={(e) => setSig(e.target.value)}
-              placeholder="Transaction signature"
+              value={payer}
+              onChange={(e) => setPayer(e.target.value)}
+              placeholder="Your Solana wallet address (you paid from)"
               spellCheck={false}
-              className="flex-1 rounded-xl border border-border/60 bg-background/60 px-3 py-2 font-mono text-xs outline-none focus:border-[var(--vivida-cyan)]/60"
+              className="w-full rounded-xl border border-border/60 bg-background/60 px-3 py-2 font-mono text-xs outline-none placeholder:font-sans placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60"
             />
-            <button
-              onClick={verify}
-              disabled={busy || !sig.trim()}
-              className="rounded-xl bg-foreground px-4 py-2 text-sm font-semibold text-background disabled:opacity-50"
-            >
-              {busy ? "Checking…" : "Verify"}
-            </button>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <input
+                value={sig}
+                onChange={(e) => setSig(e.target.value)}
+                placeholder="Transaction signature"
+                spellCheck={false}
+                className="flex-1 rounded-xl border border-border/60 bg-background/60 px-3 py-2 font-mono text-xs outline-none placeholder:font-sans placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60"
+              />
+              <button
+                onClick={verify}
+                disabled={busy || !sig.trim() || !payer.trim()}
+                className="rounded-xl bg-foreground px-4 py-2 text-sm font-semibold text-background disabled:opacity-50"
+              >
+                {busy ? "Checking…" : "Verify"}
+              </button>
+            </div>
           </div>
           {msg && <p className="mt-2 text-xs text-muted-foreground">{msg}</p>}
           <button

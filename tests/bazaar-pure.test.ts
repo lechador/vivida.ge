@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatUsdc,
+  buildSolanaPayUrl,
   isValidSolanaAddress,
   normalizeCategory,
   normalizeSignature,
@@ -144,5 +145,23 @@ describe("bazaar-pure", () => {
     expect(validateRating(0)).toBe(null);
     expect(validateRating(6)).toBe(null);
     expect(validateRating("4")).toBe(4);
+  });
+
+  it("builds Solana Pay URLs for exact-amount checkout", () => {
+    const url = buildSolanaPayUrl({
+      recipient: PROVIDER,
+      priceUsdcCents: 1999,
+      label: "Vivida",
+      message: "Reading",
+    });
+    expect(url).toBe(
+      `solana:${PROVIDER}?amount=19.99&spl-token=${USDC_MINT}&label=Vivida&message=Reading`,
+    );
+    expect(buildSolanaPayUrl({ recipient: "nope", priceUsdcCents: 1999 })).toBe(
+      null,
+    );
+    expect(buildSolanaPayUrl({ recipient: PROVIDER, priceUsdcCents: 0 })).toBe(
+      null,
+    );
   });
 });

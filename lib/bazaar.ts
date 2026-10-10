@@ -354,11 +354,25 @@ export async function refreshProviderRating(providerId: string) {
 
 export type PaymentCheck =
   | { ok: true }
-  | { ok: false; reason: "not_found" | "failed" | "underpaid" | "unavailable" };
+  | {
+      ok: false;
+      reason:
+        | "not_found"
+        | "failed"
+        | "underpaid"
+        | "unavailable"
+        | "already_used"
+        | "not_signer";
+    };
+
+type RpcAccountKey = { pubkey?: unknown; signer?: unknown };
 
 type RpcTx = {
   value: {
     err: unknown;
+    transaction?: {
+      message?: { accountKeys?: RpcAccountKey[] };
+    };
     meta?: {
       err?: unknown;
       preTokenBalances?: Array<{
@@ -414,11 +428,16 @@ export async function verifyBookingPayment(input: {
   expectedProviderWallet: string;
   expectedPriceCents: number;
   alreadyUsed: boolean;
+  /**
+   * Claimed payer wallet. When present it MUST appear as a signer on the
+   * transaction — otherwise anyone could claim a stranger's payment to the
+   * same provider as their own and get a free reading.
+   */
+  expectedSigner?: string | null;
 }): Promise<PaymentCheck> {
   const signature = normalizeSignature(input.signature);
-  if (!signature || input.alreadyUsed) {
-    return { ok: false, reason: "not_found" };
-  }
+  if (!signature) return { ok: false, reason: "not_found" };
+  if (input.alreadyUsed) return { ok: false, reason: "already_used" };
   let tx: RpcTx | null;
   try {
     tx = await fetchConfirmedTransaction(signature);
@@ -438,6 +457,14 @@ export async function verifyBookingPayment(input: {
   );
   const expected = BigInt(usdcCentsToBaseUnits(input.expectedPriceCents));
   if (credited < expected) return { ok: false, reason: "underpaid" };
+  if (input.expectedSigner) {
+    const signers = (tx.value.transaction?.message?.accountKeys ?? [])
+      .filter((k) => k?.signer === true)
+      .map((k) => String(k?.pubkey ?? ""));
+    if (!signers.includes(input.expectedSigner)) {
+      return { ok: false, reason: "not_signer" };
+    }
+  }
   return { ok: true };
 }
 

@@ -224,3 +224,30 @@ export function normalizeSignature(value: unknown): string | null {
   if (!/^[1-9A-HJ-NP-Za-km-z]{80,128}$/.test(trimmed)) return null;
   return trimmed;
 }
+
+/**
+ * Solana Pay transfer URL for one fixed-price USDC payment. Opens the
+ * buyer's wallet with recipient + exact amount prefilled — scan or tap.
+ * Returns null for invalid input. Reference: Solana Pay spec
+ * (https://docs.solanapay.com/specification).
+ */
+export function buildSolanaPayUrl(input: {
+  recipient: string;
+  priceUsdcCents: number;
+  label?: string;
+  message?: string;
+}): string | null {
+  const to = typeof input.recipient === "string" ? input.recipient.trim() : "";
+  const cents = Math.round(Number(input.priceUsdcCents));
+  if (!isValidSolanaAddress(to) || !Number.isInteger(cents) || cents <= 0) {
+    return null;
+  }
+  const amount = (cents / 100).toFixed(2);
+  const params = new URLSearchParams({
+    amount,
+    "spl-token": USDC_MINT,
+  });
+  if (input.label) params.set("label", input.label);
+  if (input.message) params.set("message", input.message);
+  return `solana:${to}?${params.toString()}`;
+}
