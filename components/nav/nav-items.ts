@@ -9,6 +9,7 @@ import {
   Orbit,
   Sparkles,
   Stars,
+  Store,
   Sun,
   Telescope,
   UserPlus,
@@ -32,6 +33,7 @@ export type NavActiveKey =
   | "timing"
   | "feed"
   | "tests"
+  | "readings"
   | "discover"
   | "people"
   | "synastry"
@@ -63,6 +65,15 @@ export type NavItem = {
 const NAV_FEATURE_GATE: Partial<Record<NavActiveKey, SocialFeature>> = {
   discover: "swipeDeck",
   people: "peopleDirectory",
+};
+
+/**
+ * Locale allowlist per nav key. The Insight Bazaar ships English-only, so
+ * its entry renders on the English host only — a Georgian-host link would
+ * 404 (no /readings route exists there, rewrites are English-host-only).
+ */
+const NAV_LOCALE_GATE: Partial<Record<NavActiveKey, readonly UserLocale[]>> = {
+  readings: ["en"],
 };
 
 function navVisible(item: NavItem): boolean {
@@ -173,6 +184,14 @@ const ALL_NAV_ITEMS: NavItem[] = [
     hue: "oklch(0.78 0.16 300)",
   },
   {
+    key: "readings",
+    href: "/readings",
+    label: "რიდინგები",
+    labelEn: "Readings",
+    Icon: Store,
+    hue: "oklch(0.75 0.18 340)",
+  },
+  {
     key: "messages",
     href: "/messages",
     label: "წერილები",
@@ -222,6 +241,17 @@ const ALL_NAV_ITEMS: NavItem[] = [
  * surfaces cannot drift; /library carries its tab-only history naming.
  */
 export const NAV_ITEMS: NavItem[] = ALL_NAV_ITEMS.filter(navVisible);
+
+/**
+ * Sidebar/drawer items for an interface language — feature flags plus the
+ * locale gates (English-only destinations never render dead links).
+ */
+export function navItems(locale: UserLocale = "ka"): NavItem[] {
+  return NAV_ITEMS.filter((item) => {
+    const gate = NAV_LOCALE_GATE[item.key];
+    return !gate || gate.includes(locale);
+  });
+}
 
 function mobileTab(key: NavActiveKey): NavItem {
   const item = ALL_NAV_ITEMS.find((entry) => entry.key === key);

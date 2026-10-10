@@ -12,7 +12,7 @@ import { InstallAppButton } from "@/components/pwa/install-button";
 import { AskTabBadge } from "./ask-tab-badge";
 import { MessagesTabBadge } from "./messages-tab-badge";
 import { NavItemLink } from "./nav-item-link";
-import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
+import { navItems, navLabel, type NavActiveKey } from "./nav-items";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -133,7 +133,7 @@ export function MobileNav({
 
                 {/* Nav items */}
                 <nav className="mb-2 flex flex-col gap-1 overflow-y-auto">
-                  {NAV_ITEMS.map((item) => {
+                  {navItems(locale).map((item) => {
                     const { Icon } = item;
                     const isActive = item.key === active;
                     return (

@@ -6,7 +6,7 @@ import { AskTabBadge } from "./ask-tab-badge";
 import { MessagesTabBadge } from "./messages-tab-badge";
 import { NavItemLink } from "./nav-item-link";
 import {
-  NAV_ITEMS,
+  navItems,
   navLabel,
   type NavActiveKey,
   type NavItem,
@@ -32,7 +32,7 @@ export function DesktopSidebar({
 }) {
   // NAV_ITEMS already leads with Today/Tarot/Ask/History and carries every
   // other destination (My chart, messages, tests, reports…) as secondary.
-  const items: NavItem[] = NAV_ITEMS;
+  const items: NavItem[] = navItems(locale);
 
   // Labels are always visible — no hover reveal.
   const reveal = "";

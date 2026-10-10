@@ -17,6 +17,7 @@ import {
   MOBILE_TAB_ITEMS,
   NAV_ITEMS,
   mobileTabLabel,
+  navItems,
   navLabel,
   type NavItem,
 } from "@/components/nav/nav-items";
@@ -106,5 +107,20 @@ describe("MobileTabBar runtime output", () => {
     expect(html).toContain("My history");
     expect(html).toContain("More");
     expect(html).toContain("New message from your astrologer");
+  });
+});
+
+describe("readings nav gating (Insight Bazaar is English-only)", () => {
+  it("shows Readings → /readings on the English host, hides it in Georgian", () => {
+    const en = navItems("en");
+    const entry = en.find((i) => i.key === "readings");
+    expect(entry).toBeDefined();
+    expect(entry?.href).toBe("/readings");
+    expect(navLabel(entry!, "en")).toBe("Readings");
+    expect(navItems("ka").some((i) => i.key === "readings")).toBe(false);
+  });
+
+  it("keeps the mobile tab bar at four entries (readings stays out)", () => {
+    expect(MOBILE_TAB_ITEMS.some((i) => i.key === "readings")).toBe(false);
   });
 });
