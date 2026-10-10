@@ -165,3 +165,14 @@ describe("bazaar-pure", () => {
     );
   });
 });
+
+describe("serviceCover", () => {
+  it("prefers the service image, else the category cover", async () => {
+    const { serviceCover } = await import("@/lib/bazaar-pure");
+    expect(serviceCover("https://x.test/a.webp", "tarot")).toBe(
+      "https://x.test/a.webp",
+    );
+    expect(serviceCover(null, "natal")).toContain("r2.dev/bazaar/");
+    expect(serviceCover(null, "bogus")).toContain("saturn-return");
+  });
+});

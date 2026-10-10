@@ -38,6 +38,32 @@ export const BAZAAR_CATEGORIES = [
 ] as const;
 export type BazaarCategory = (typeof BAZAAR_CATEGORIES)[number];
 
+/**
+ * Editorial cover art for services without their own image. Same R2 bucket
+ * as reader-uploaded covers; if the bucket's public base ever moves, these
+ * four constants move with it.
+ */
+const BAZAAR_ART_BASE =
+  "https://pub-7559ca5914024ba3a9e93e5f87debf06.r2.dev/bazaar";
+
+const CATEGORY_COVERS: Record<string, string> = {
+  tarot: `${BAZAAR_ART_BASE}/celtic-cross.webp`,
+  natal: `${BAZAAR_ART_BASE}/natal-blueprint.webp`,
+  compatibility: `${BAZAAR_ART_BASE}/compatibility-spread.webp`,
+  other: `${BAZAAR_ART_BASE}/saturn-return.webp`,
+};
+
+/** Service cover: its own R2 image, else the category editorial cover. */
+export function serviceCover(
+  imageUrl: string | null | undefined,
+  category: string,
+): string {
+  if (typeof imageUrl === "string" && imageUrl.startsWith("https://")) {
+    return imageUrl;
+  }
+  return CATEGORY_COVERS[category] ?? CATEGORY_COVERS.other;
+}
+
 export function normalizeCategory(value: unknown): BazaarCategory {
   return typeof value === "string" &&
     (BAZAAR_CATEGORIES as readonly string[]).includes(value)

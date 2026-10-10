@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import QRCode from "qrcode";
 
-import { buildSolanaPayUrl } from "@/lib/bazaar-pure";
+import { buildSolanaPayUrl, serviceCover } from "@/lib/bazaar-pure";
 
 /**
  * Insight Bazaar — single-view marketplace client. One public URL
@@ -21,6 +22,7 @@ type ProviderRef = {
   specialties: string[];
   avgRating100: number | null;
   reviewCount: number;
+  avatarUrl?: string | null;
 };
 
 type Service = {
@@ -30,6 +32,7 @@ type Service = {
   category: string;
   priceUsdcCents: number;
   deliveryPromise: string;
+  imageUrl?: string | null;
   provider: ProviderRef;
 };
 
@@ -89,6 +92,45 @@ function categoryLabel(slug: string): string {
 
 function reviewCountLabel(n: number): string {
   return `${n} review${n === 1 ? "" : "s"}`;
+}
+
+/** Reader portrait; initials on cosmic gradient when no photo yet. */
+function ReaderAvatar({
+  name,
+  avatarUrl,
+  size = 40,
+}: {
+  name: string;
+  avatarUrl?: string | null;
+  size?: number;
+}) {
+  if (avatarUrl) {
+    return (
+      <Image
+        src={avatarUrl}
+        alt={`${name}, astrology reader`}
+        width={size}
+        height={size}
+        className="shrink-0 rounded-full object-cover ring-1 ring-border/60"
+      />
+    );
+  }
+  const initials = name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  return (
+    <span
+      aria-hidden
+      style={{ width: size, height: size, fontSize: size * 0.36 }}
+      className="grid shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] font-semibold text-white"
+    >
+      {initials || "✦"}
+    </span>
+  );
 }
 
 function statusLabel(status: string): string {
@@ -327,50 +369,135 @@ export function ReadingsApp() {
                 )}
               </div>
             )}
-            <ul className="divide-y divide-border/40">
-              {filtered.map((s) => (
-                <li key={s.id}>
-                  <button
-                    onClick={() => go({ service: s.id })}
-                    className="group flex w-full flex-col gap-3 py-5 text-left sm:flex-row sm:items-center sm:gap-6"
-                  >
-                    <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-pink)]">
-                        {categoryLabel(s.category)} · {s.provider.displayName} ·{" "}
-                        {rating(s.provider.avgRating100)}
-                        {s.provider.reviewCount > 0 &&
-                          ` (${s.provider.reviewCount})`}
+            {/* Listing — featured banner + card grid. */}
+            <div className="mt-6">
+              {filtered.length > 0 && (
+                <button
+                  onClick={() => go({ service: filtered[0].id })}
+                  className="group relative block w-full overflow-hidden rounded-3xl border border-border/40 text-left"
+                >
+                  <div className="relative aspect-[16/10] sm:aspect-[16/6]">
+                    <Image
+                      src={serviceCover(
+                        filtered[0].imageUrl,
+                        filtered[0].category,
+                      )}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, 1152px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      priority
+                    />
+                    <div
+                      aria-hidden
+                      className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,oklch(0.08_0.02_280/0.55)_62%,oklch(0.07_0.02_280/0.94)_100%)]"
+                    />
+                    <div className="absolute left-4 top-4 flex flex-wrap gap-2 sm:left-6 sm:top-6">
+                      <span className="rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-pink)] backdrop-blur">
+                        {categoryLabel(filtered[0].category)}
                       </span>
-                      <span className="text-lg font-semibold leading-snug group-hover:underline sm:text-xl">
-                        {s.title}
-                      </span>
-                      <span className="line-clamp-2 text-sm text-muted-foreground">
-                        {s.description}
-                      </span>
-                      {s.deliveryPromise && (
-                        <span className="text-xs text-muted-foreground/80">
-                          {s.deliveryPromise}
+                      {filtered[0].deliveryPromise && (
+                        <span className="rounded-full bg-black/55 px-3 py-1 text-[11px] font-medium text-white/85 backdrop-blur">
+                          {filtered[0].deliveryPromise}
                         </span>
                       )}
                     </div>
-                    <div className="flex shrink-0 items-center gap-4">
-                      <span className="text-xl font-semibold tabular-nums">
-                        {price(s.priceUsdcCents)}
-                        <span className="ml-1 text-xs font-normal text-muted-foreground">
-                          USDC
-                        </span>
+                    <span className="absolute right-4 top-4 rounded-full bg-black/55 px-3.5 py-1.5 text-base font-semibold tabular-nums text-white backdrop-blur sm:right-6 sm:top-6">
+                      {price(filtered[0].priceUsdcCents)}{" "}
+                      <span className="text-xs font-normal text-white/70">
+                        USDC
                       </span>
+                    </span>
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4 sm:p-6">
+                      <div className="min-w-0">
+                        <p className="text-2xl font-semibold leading-tight tracking-tight text-white drop-shadow sm:text-4xl">
+                          {filtered[0].title}
+                        </p>
+                        <div className="mt-2 flex items-center gap-2.5">
+                          <ReaderAvatar
+                            name={filtered[0].provider.displayName}
+                            avatarUrl={filtered[0].provider.avatarUrl}
+                            size={32}
+                          />
+                          <p className="truncate text-sm text-white/85">
+                            {filtered[0].provider.displayName} ·{" "}
+                            {rating(filtered[0].provider.avgRating100)}
+                            {filtered[0].provider.reviewCount > 0 &&
+                              ` (${filtered[0].provider.reviewCount})`}
+                          </p>
+                        </div>
+                      </div>
                       <span
                         aria-hidden
-                        className="text-muted-foreground transition-transform group-hover:translate-x-1"
+                        className="hidden shrink-0 items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-transform group-hover:translate-x-1 sm:inline-flex"
                       >
-                        →
+                        Book →
                       </span>
                     </div>
-                  </button>
-                </li>
-              ))}
-            </ul>
+                  </div>
+                </button>
+              )}
+              {filtered.length > 1 && (
+                <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+                  {filtered.slice(1).map((s) => (
+                    <li key={s.id}>
+                      <button
+                        onClick={() => go({ service: s.id })}
+                        className="group block w-full overflow-hidden rounded-3xl border border-border/40 bg-card/30 text-left transition-colors hover:border-foreground/25"
+                      >
+                        <div className="relative aspect-[16/8]">
+                          <Image
+                            src={serviceCover(s.imageUrl, s.category)}
+                            alt=""
+                            fill
+                            sizes="(max-width: 768px) 100vw, 568px"
+                            className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                            loading="lazy"
+                          />
+                          <div
+                            aria-hidden
+                            className="absolute inset-0 bg-[linear-gradient(180deg,transparent_45%,oklch(0.07_0.02_280/0.85)_100%)]"
+                          />
+                          <span className="absolute left-3 top-3 rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--vivida-pink)] backdrop-blur">
+                            {categoryLabel(s.category)}
+                          </span>
+                          <span className="absolute bottom-3 right-3 rounded-full bg-black/55 px-3 py-1 text-sm font-semibold tabular-nums text-white backdrop-blur">
+                            {price(s.priceUsdcCents)}{" "}
+                            <span className="text-[11px] font-normal text-white/70">
+                              USDC
+                            </span>
+                          </span>
+                        </div>
+                        <div className="p-4">
+                          <p className="text-lg font-semibold leading-snug group-hover:underline">
+                            {s.title}
+                          </p>
+                          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                            {s.description}
+                          </p>
+                          <div className="mt-3 flex items-center gap-2">
+                            <ReaderAvatar
+                              name={s.provider.displayName}
+                              avatarUrl={s.provider.avatarUrl}
+                              size={28}
+                            />
+                            <p className="truncate text-xs text-muted-foreground">
+                              {s.provider.displayName} ·{" "}
+                              {rating(s.provider.avgRating100)}
+                              {s.provider.reviewCount > 0 &&
+                                ` (${s.provider.reviewCount})`}
+                              {s.deliveryPromise
+                                ? ` · ${s.deliveryPromise}`
+                                : ""}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
           {/* Trust strip */}
@@ -482,22 +609,45 @@ function ServiceView({
 
   return (
     <DetailShell onBack={onBack}>
-      <div className="grid gap-10 md:grid-cols-[1fr_340px]">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--vivida-pink)]">
+      <div className="relative overflow-hidden rounded-3xl border border-border/40">
+        <div className="relative aspect-[16/8] sm:aspect-[16/5]">
+          <Image
+            src={serviceCover(service.imageUrl, service.category)}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 1152px"
+            className="object-cover"
+            priority
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-[linear-gradient(180deg,transparent_40%,oklch(0.07_0.02_280/0.88)_100%)]"
+          />
+          <span className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-pink)] backdrop-blur sm:left-6 sm:top-6">
             {categoryLabel(service.category)}
-          </p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+          </span>
+        </div>
+      </div>
+      <div className="mt-6 grid gap-10 md:grid-cols-[1fr_340px]">
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             {service.title}
           </h2>
           <button
             onClick={() => onProvider(service.provider.id)}
-            className="mt-3 text-sm text-muted-foreground hover:text-foreground hover:underline"
+            className="mt-3 flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground hover:underline"
           >
-            by {service.provider.displayName} ·{" "}
-            {rating(service.provider.avgRating100)}
-            {service.provider.reviewCount > 0 &&
-              ` · ${service.provider.reviewCount} review${service.provider.reviewCount === 1 ? "" : "s"}`}
+            <ReaderAvatar
+              name={service.provider.displayName}
+              avatarUrl={service.provider.avatarUrl}
+              size={28}
+            />
+            <span>
+              by {service.provider.displayName} ·{" "}
+              {rating(service.provider.avgRating100)}
+              {service.provider.reviewCount > 0 &&
+                ` · ${service.provider.reviewCount} ${reviewCountLabel(service.provider.reviewCount)}`}
+            </span>
           </button>
           <p className="mt-5 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
             {service.description}
@@ -867,6 +1017,7 @@ function ProviderView({
     specialties: string[];
     avgRating100: number | null;
     reviewCount: number;
+    avatarUrl: string | null;
     services: Array<{
       id: string;
       title: string;
@@ -927,15 +1078,24 @@ function ProviderView({
       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--vivida-cyan)]">
         Reader profile
       </p>
-      <h2 className="mt-2 text-3xl font-semibold tracking-tight">{name}</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        {data?.headline ?? fallback[0]?.provider.headline ?? ""} ·{" "}
-        {rating(
-          data?.avgRating100 ?? fallback[0]?.provider.avgRating100 ?? null,
-        )}
-        {(data?.reviewCount ?? 0) > 0 &&
-          ` · ${reviewCountLabel(data?.reviewCount ?? 0)}`}
-      </p>
+      <div className="mt-2 flex items-center gap-4">
+        <ReaderAvatar
+          name={name}
+          avatarUrl={data?.avatarUrl ?? fallback[0]?.provider.avatarUrl}
+          size={64}
+        />
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight">{name}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {data?.headline ?? fallback[0]?.provider.headline ?? ""} ·{" "}
+            {rating(
+              data?.avgRating100 ?? fallback[0]?.provider.avgRating100 ?? null,
+            )}
+            {(data?.reviewCount ?? 0) > 0 &&
+              ` · ${reviewCountLabel(data?.reviewCount ?? 0)}`}
+          </p>
+        </div>
+      </div>
       {(data?.specialties ?? fallback[0]?.provider.specialties ?? []).length >
         0 && (
         <div className="mt-3 flex flex-wrap gap-2">

@@ -37,6 +37,8 @@ export const bazaarProviders = pgTable(
     specialties: text("specialties").notNull().default(""),
     /** Solana mainnet address receiving the buyer's USDC. */
     solanaWallet: text("solana_wallet").notNull(),
+    /** Reader portrait (R2 URL). Null renders initials instead. */
+    avatarUrl: text("avatar_url"),
     /** pending → admin review; approved → publicly listed; suspended → hidden. */
     status: text("status").notNull().default("pending"),
     /** Denormalized from bazaar_review for fast listing (average × 100). */
@@ -71,6 +73,8 @@ export const bazaarServices = pgTable(
     priceUsdcCents: integer("price_usdc_cents").notNull(),
     /** Human promise, e.g. "Delivered within 24 hours". */
     deliveryPromise: text("delivery_promise").notNull().default(""),
+    /** Service cover art (R2 URL). Null falls back to the category cover. */
+    imageUrl: text("image_url"),
     /** active → bookable; paused → hidden from listings, keeps history. */
     status: text("status").notNull().default("active"),
     createdAt: timestamp("created_at", { withTimezone: true })

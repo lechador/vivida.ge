@@ -28,6 +28,7 @@ export type PublicService = {
   category: string;
   priceUsdcCents: number;
   deliveryPromise: string;
+  imageUrl: string | null;
   provider: {
     id: string;
     displayName: string;
@@ -36,6 +37,7 @@ export type PublicService = {
     specialties: string[];
     avgRating100: number | null;
     reviewCount: number;
+    avatarUrl: string | null;
   };
 };
 
@@ -72,6 +74,7 @@ export async function listActiveServices(): Promise<PublicService[]> {
     category: service.category,
     priceUsdcCents: service.priceUsdcCents,
     deliveryPromise: service.deliveryPromise,
+    imageUrl: service.imageUrl,
     provider: {
       id: provider.id,
       displayName: provider.displayName,
@@ -80,6 +83,7 @@ export async function listActiveServices(): Promise<PublicService[]> {
       specialties: specialtiesOf(provider),
       avgRating100: provider.avgRating100,
       reviewCount: provider.reviewCount,
+      avatarUrl: provider.avatarUrl,
     },
   }));
 }
@@ -116,6 +120,7 @@ export async function getPublicProvider(providerId: string) {
     specialties: specialtiesOf(provider),
     avgRating100: provider.avgRating100,
     reviewCount: provider.reviewCount,
+    avatarUrl: provider.avatarUrl,
     services: services.map((s) => ({
       id: s.id,
       title: s.title,
@@ -123,6 +128,7 @@ export async function getPublicProvider(providerId: string) {
       category: s.category,
       priceUsdcCents: s.priceUsdcCents,
       deliveryPromise: s.deliveryPromise,
+      imageUrl: s.imageUrl,
     })),
     // Public review shape: no buyer ids, no booking linkage.
     reviews: reviews.map((r) => ({
@@ -162,6 +168,7 @@ export async function getPublicService(serviceId: string) {
     category: row.service.category,
     priceUsdcCents: row.service.priceUsdcCents,
     deliveryPromise: row.service.deliveryPromise,
+    imageUrl: row.service.imageUrl,
     // The buyer pays THIS address from their own wallet app.
     providerWallet: row.provider.solanaWallet,
     provider: {
@@ -172,6 +179,7 @@ export async function getPublicService(serviceId: string) {
       specialties: specialtiesOf(row.provider),
       avgRating100: row.provider.avgRating100,
       reviewCount: row.provider.reviewCount,
+      avatarUrl: row.provider.avatarUrl,
     },
   };
 }
