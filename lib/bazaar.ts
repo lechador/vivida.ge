@@ -185,6 +185,53 @@ export async function getProviderByUser(userId: string) {
   return rows[0] ?? null;
 }
 
+/** Service + provider when the viewer owns the provider profile, else null. */
+export async function getOwnedService(serviceId: string, userId: string) {
+  const rows = await db
+    .select({
+      service: bazaarServices,
+      provider: bazaarProviders,
+    })
+    .from(bazaarServices)
+    .innerJoin(
+      bazaarProviders,
+      eq(bazaarServices.providerId, bazaarProviders.id),
+    )
+    .where(eq(bazaarServices.id, serviceId))
+    .limit(1);
+  const row = rows[0];
+  if (!row || row.provider.userId !== userId) return null;
+  return row;
+}
+
+/** Owner user id of a service's provider (self-booking guard). */
+export async function getServiceOwnerUserId(
+  serviceId: string,
+): Promise<string | null> {
+  const rows = await db
+    .select({ userId: bazaarProviders.userId })
+    .from(bazaarServices)
+    .innerJoin(
+      bazaarProviders,
+      eq(bazaarServices.providerId, bazaarProviders.id),
+    )
+    .where(eq(bazaarServices.id, serviceId))
+    .limit(1);
+  return rows[0]?.userId ?? null;
+}
+
+/** All services of the viewer's own provider profile (any status). */
+export async function listOwnServices(userId: string) {
+  const provider = await getProviderByUser(userId);
+  if (!provider) return { provider: null, services: [] };
+  const services = await db
+    .select()
+    .from(bazaarServices)
+    .where(eq(bazaarServices.providerId, provider.id))
+    .orderBy(desc(bazaarServices.createdAt));
+  return { provider, services };
+}
+
 export async function getBookingForViewer(bookingId: string, userId: string) {
   const rows = await db
     .select({

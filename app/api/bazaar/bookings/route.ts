@@ -3,7 +3,11 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { bazaarBookings } from "@/db/schema";
-import { getPublicService, listBookingsForUser } from "@/lib/bazaar";
+import {
+  getPublicService,
+  getServiceOwnerUserId,
+  listBookingsForUser,
+} from "@/lib/bazaar";
 import { limits } from "@/lib/bazaar-pure";
 import { enforceRateLimit } from "@/lib/rate-limit";
 
@@ -51,6 +55,10 @@ export async function POST(req: Request) {
   const service = await getPublicService(body.serviceId);
   if (!service) {
     return NextResponse.json({ error: "service_unavailable" }, { status: 404 });
+  }
+  // No self-dealing: reviews and ratings must come from real buyers.
+  if ((await getServiceOwnerUserId(body.serviceId)) === userId) {
+    return NextResponse.json({ error: "own_service" }, { status: 403 });
   }
   const buyerNote =
     typeof body.buyerNote === "string"

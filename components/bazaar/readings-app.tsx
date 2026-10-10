@@ -1029,6 +1029,13 @@ function BookingsView({ onBack }: { onBack: () => void }) {
         </section>
       )}
 
+      {data.ownProvider && (
+        <ProviderServicesSection
+          providerStatus={data.ownProvider.status}
+          displayName={data.ownProvider.displayName}
+        />
+      )}
+
       <section className={data.asProvider.length > 0 ? "mt-10" : "mt-6"}>
         <h3 className="text-lg font-semibold">My bookings</h3>
         {data.asBuyer.length === 0 ? (
@@ -1104,6 +1111,23 @@ function BuyerBookingCard({
     }
   }
 
+  async function cancelBooking() {
+    if (!window.confirm("Cancel this booking? No payment has been made.")) {
+      return;
+    }
+    setBusy(true);
+    try {
+      await api(`/api/bazaar/bookings/${booking.id}/cancel`, {
+        method: "POST",
+      });
+      onDone();
+    } catch {
+      setMsg("Couldn't cancel. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <li className="rounded-2xl border border-border/40 bg-card/30 p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -1143,6 +1167,13 @@ function BuyerBookingCard({
             </button>
           </div>
           {msg && <p className="mt-2 text-xs text-muted-foreground">{msg}</p>}
+          <button
+            onClick={cancelBooking}
+            disabled={busy}
+            className="mt-3 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline disabled:opacity-50"
+          >
+            Cancel this booking
+          </button>
         </div>
       )}
 
@@ -1234,6 +1265,23 @@ function ProviderOrderCard({
     }
   }
 
+  async function decline() {
+    if (!window.confirm("Decline this order? The buyer hasn't paid yet.")) {
+      return;
+    }
+    setBusy(true);
+    try {
+      await api(`/api/bazaar/bookings/${booking.id}/cancel`, {
+        method: "POST",
+      });
+      onDone();
+    } catch {
+      setMsg("Couldn't decline. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <li className="rounded-2xl border border-border/40 bg-card/30 p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -1250,6 +1298,22 @@ function ProviderOrderCard({
           <p className="mt-1 whitespace-pre-wrap leading-relaxed">
             {booking.buyerNote}
           </p>
+        </div>
+      )}
+      {booking.status === "pending_payment" && (
+        <div className="mt-3 border-t border-border/40 pt-3 text-sm">
+          <p className="text-muted-foreground">
+            Waiting for the buyer&apos;s USDC payment. Decline removes the order
+            before any money moves.
+          </p>
+          <button
+            onClick={decline}
+            disabled={busy}
+            className="mt-2 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline disabled:opacity-50"
+          >
+            Decline order
+          </button>
+          {msg && <p className="mt-2 text-xs text-red-400">{msg}</p>}
         </div>
       )}
       {booking.status === "paid" && (
@@ -1279,6 +1343,303 @@ function ProviderOrderCard({
         </p>
       )}
     </li>
+  );
+}
+
+/* ── Reader service management ────────────────────────────────────────── */
+
+type OwnService = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  priceUsdcCents: number;
+  deliveryPromise: string;
+  status: string;
+};
+
+function ProviderServicesSection({
+  providerStatus,
+  displayName,
+}: {
+  providerStatus: string;
+  displayName: string;
+}) {
+  const [services, setServices] = useState<OwnService[] | null>(null);
+  const [showNew, setShowNew] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const reload = useCallback(() => {
+    api<{ services: OwnService[] }>("/api/bazaar/mine")
+      .then((d) => setServices(d.services))
+      .catch(() => setMsg("Couldn't load your services."));
+  }, []);
+
+  useEffect(reload, [reload]);
+
+  async function setStatus(id: string, status: "active" | "paused") {
+    setMsg(null);
+    try {
+      await api(`/api/bazaar/services/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
+      reload();
+    } catch {
+      setMsg("Couldn't update that service. Try again.");
+    }
+  }
+
+  return (
+    <section className="mt-10">
+      <h3 className="text-lg font-semibold">Your services</h3>
+      {providerStatus === "pending" && (
+        <p className="mt-3 rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm">
+          {displayName} is under review — you can draft services now, and
+          they&apos;ll go live the moment the Vivida team approves your profile.
+        </p>
+      )}
+      {providerStatus === "suspended" && (
+        <p className="mt-3 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm">
+          Your reader profile is suspended — listings are hidden. Contact us to
+          resolve this.
+        </p>
+      )}
+      {msg && <p className="mt-3 text-sm text-red-400">{msg}</p>}
+      {services === null ? (
+        <div className="mt-3 h-20 animate-pulse rounded-2xl bg-card/40" />
+      ) : (
+        <ul className="mt-3 space-y-3">
+          {services.map((s) => (
+            <li
+              key={s.id}
+              className="rounded-2xl border border-border/40 bg-card/30 p-4"
+            >
+              {editingId === s.id ? (
+                <ServiceForm
+                  initial={s}
+                  onDone={() => {
+                    setEditingId(null);
+                    reload();
+                  }}
+                  onCancel={() => setEditingId(null)}
+                />
+              ) : (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold">
+                      {s.title}{" "}
+                      <span
+                        className={`ml-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                          s.status === "active"
+                            ? "bg-emerald-400/15 text-emerald-300"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {s.status === "active" ? "Live" : "Paused"}
+                      </span>
+                    </p>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                      {categoryLabel(s.category)} · {price(s.priceUsdcCents)}{" "}
+                      USDC
+                      {s.deliveryPromise ? ` · ${s.deliveryPromise}` : ""}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 gap-2">
+                    <button
+                      onClick={() => setEditingId(s.id)}
+                      className="rounded-xl border border-border/60 px-3 py-1.5 text-xs font-medium hover:border-foreground/40"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() =>
+                        setStatus(
+                          s.id,
+                          s.status === "active" ? "paused" : "active",
+                        )
+                      }
+                      className="rounded-xl border border-border/60 px-3 py-1.5 text-xs font-medium hover:border-foreground/40"
+                    >
+                      {s.status === "active" ? "Pause" : "Resume"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {providerStatus === "approved" && !showNew && (
+        <button
+          onClick={() => setShowNew(true)}
+          className="mt-3 rounded-xl border border-dashed border-border/60 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+        >
+          + List a new service
+        </button>
+      )}
+      {showNew && (
+        <div className="mt-3 rounded-2xl border border-border/40 bg-card/30 p-4">
+          <ServiceForm
+            onDone={() => {
+              setShowNew(false);
+              reload();
+            }}
+            onCancel={() => setShowNew(false)}
+          />
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ServiceForm({
+  initial,
+  onDone,
+  onCancel,
+}: {
+  initial?: OwnService;
+  onDone: () => void;
+  onCancel: () => void;
+}) {
+  const [title, setTitle] = useState(initial?.title ?? "");
+  const [description, setDescription] = useState(initial?.description ?? "");
+  const [category, setCategory] = useState(initial?.category ?? "tarot");
+  const [dollars, setDollars] = useState(
+    initial ? (initial.priceUsdcCents / 100).toFixed(2) : "",
+  );
+  const [promise, setPromise] = useState(initial?.deliveryPromise ?? "");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit() {
+    setBusy(true);
+    setError(null);
+    const cents = Math.round(Number(dollars) * 100);
+    try {
+      if (initial) {
+        await api(`/api/bazaar/services/${initial.id}`, {
+          method: "PATCH",
+          body: JSON.stringify({
+            title,
+            description,
+            category,
+            priceUsdcCents: cents,
+            deliveryPromise: promise,
+          }),
+        });
+      } else {
+        await api("/api/bazaar/services", {
+          method: "POST",
+          body: JSON.stringify({
+            title,
+            description,
+            category,
+            priceUsdcCents: cents,
+            deliveryPromise: promise,
+          }),
+        });
+      }
+      onDone();
+    } catch (e) {
+      const code = (e as Error).message;
+      setError(
+        code === "invalid_price"
+          ? "Price must be between 1 and 500 USDC."
+          : code === "provider_not_approved"
+            ? "Your reader profile isn't approved yet."
+            : "Couldn't save. Check every field and try again.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const valid =
+    title.trim().length > 0 &&
+    description.trim().length > 0 &&
+    Number.isFinite(Number(dollars)) &&
+    Number(dollars) > 0;
+
+  return (
+    <div className="grid gap-3">
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        maxLength={90}
+        placeholder="Service title — e.g. Celtic Cross Deep-Dive"
+        aria-label="Service title"
+        className={inputCls}
+      />
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        rows={4}
+        maxLength={4000}
+        placeholder="What the buyer gets, format, length…"
+        aria-label="Service description"
+        className={inputCls}
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-muted-foreground">
+            Category
+          </span>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className={`${inputCls} bg-card`}
+          >
+            {(["tarot", "natal", "compatibility", "other"] as const).map(
+              (c) => (
+                <option key={c} value={c}>
+                  {categoryLabel(c)}
+                </option>
+              ),
+            )}
+          </select>
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-muted-foreground">
+            Price (USDC)
+          </span>
+          <input
+            value={dollars}
+            onChange={(e) => setDollars(e.target.value)}
+            inputMode="decimal"
+            placeholder="19.99"
+            aria-label="Price in USDC"
+            className={inputCls}
+          />
+        </label>
+      </div>
+      <input
+        value={promise}
+        onChange={(e) => setPromise(e.target.value)}
+        maxLength={120}
+        placeholder="Delivery promise — e.g. Delivered within 24 hours (optional)"
+        aria-label="Delivery promise"
+        className={inputCls}
+      />
+      {error && <p className="text-sm text-red-400">{error}</p>}
+      <div className="flex gap-2">
+        <button
+          onClick={submit}
+          disabled={busy || !valid}
+          className="rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          {busy ? "Saving…" : initial ? "Save changes" : "List service"}
+        </button>
+        <button
+          onClick={onCancel}
+          disabled={busy}
+          className="rounded-xl border border-border/60 px-4 py-2.5 text-sm font-medium hover:border-foreground/40"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
   );
 }
 
