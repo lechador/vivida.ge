@@ -41,7 +41,7 @@ export type PublicService = {
   };
 };
 
-function specialtiesOf(row: { specialties: string }): string[] {
+export function specialtiesOf(row: { specialties: string }): string[] {
   return row.specialties
     .split(",")
     .map((s) => s.trim())
@@ -375,31 +375,42 @@ export type PaymentCheck =
 
 type RpcAccountKey = { pubkey?: unknown; signer?: unknown };
 
-type RpcTx = {
-  value: {
-    err: unknown;
-    transaction?: {
-      message?: { accountKeys?: RpcAccountKey[] };
-    };
-    meta?: {
-      err?: unknown;
-      preTokenBalances?: Array<{
-        mint?: unknown;
-        owner?: unknown;
-        uiTokenAmount?: { amount?: unknown };
-      }>;
-      postTokenBalances?: Array<{
-        mint?: unknown;
-        owner?: unknown;
-        uiTokenAmount?: { amount?: unknown };
-      }>;
-    } | null;
+type RpcTxValue = {
+  err: unknown;
+  transaction?: {
+    message?: { accountKeys?: RpcAccountKey[] };
+  };
+  meta?: {
+    err?: unknown;
+    preTokenBalances?: Array<{
+      mint?: unknown;
+      owner?: unknown;
+      uiTokenAmount?: { amount?: unknown };
+    }>;
+    postTokenBalances?: Array<{
+      mint?: unknown;
+      owner?: unknown;
+      uiTokenAmount?: { amount?: unknown };
+    }>;
   } | null;
 };
 
+/**
+ * Outcomes stay distinct on purpose: `not_found` means the RPC answered
+ * cleanly and the chain hasn't indexed this signature yet (normal for
+ * seconds after a fresh payment — the caller maps it to a retryable 202);
+ * `unavailable` means we never got an answer (timeout/HTTP/RPC error).
+ * Collapsing the two once surfaced "no matching payment" to buyers who had
+ * simply verified inside the indexing window.
+ */
+type TxFetchOutcome =
+  | { kind: "ok"; value: RpcTxValue }
+  | { kind: "not_found" }
+  | { kind: "unavailable" };
+
 async function fetchConfirmedTransaction(
   signature: string,
-): Promise<RpcTx | null> {
+): Promise<TxFetchOutcome> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15_000);
   try {
@@ -417,15 +428,17 @@ async function fetchConfirmedTransaction(
         ],
       }),
     });
-    if (!res.ok) return null;
+    if (!res.ok) return { kind: "unavailable" };
     const json = (await res.json().catch(() => null)) as {
-      result?: RpcTx["value"];
+      result?: RpcTxValue | null;
     } | null;
-    if (!json || !("result" in json)) return null;
-    const result = (json as { result: RpcTx["value"] }).result;
-    return result == null ? null : { value: result };
+    if (!json || !("result" in json)) return { kind: "unavailable" };
+    // JSON-RPC answered: a null result = the signature is unknown to the
+    // chain (typically just-sent txs the RPC hasn't indexed yet).
+    if (json.result == null) return { kind: "not_found" };
+    return { kind: "ok", value: json.result };
   } catch {
-    return null;
+    return { kind: "unavailable" };
   } finally {
     clearTimeout(timer);
   }
@@ -446,27 +459,24 @@ export async function verifyBookingPayment(input: {
   const signature = normalizeSignature(input.signature);
   if (!signature) return { ok: false, reason: "not_found" };
   if (input.alreadyUsed) return { ok: false, reason: "already_used" };
-  let tx: RpcTx | null;
-  try {
-    tx = await fetchConfirmedTransaction(signature);
-  } catch {
+  const fetched = await fetchConfirmedTransaction(signature);
+  if (fetched.kind === "unavailable")
     return { ok: false, reason: "unavailable" };
-  }
-  if (tx === null) return { ok: false, reason: "unavailable" };
-  if (!tx.value) return { ok: false, reason: "not_found" };
-  if (tx.value.err != null || tx.value.meta?.err != null) {
+  if (fetched.kind === "not_found") return { ok: false, reason: "not_found" };
+  const tx = fetched.value;
+  if (tx.err != null || tx.meta?.err != null) {
     return { ok: false, reason: "failed" };
   }
   const credited = usdcDeltaForRecipient(
-    tx.value.meta?.preTokenBalances,
-    tx.value.meta?.postTokenBalances,
+    tx.meta?.preTokenBalances,
+    tx.meta?.postTokenBalances,
     input.expectedProviderWallet,
     USDC_MINT,
   );
   const expected = BigInt(usdcCentsToBaseUnits(input.expectedPriceCents));
   if (credited < expected) return { ok: false, reason: "underpaid" };
   if (input.expectedSigner) {
-    const signers = (tx.value.transaction?.message?.accountKeys ?? [])
+    const signers = (tx.transaction?.message?.accountKeys ?? [])
       .filter((k) => k?.signer === true)
       .map((k) => String(k?.pubkey ?? ""));
     if (!signers.includes(input.expectedSigner)) {

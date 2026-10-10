@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
-import { listOwnServices } from "@/lib/bazaar";
+import { listOwnServices, specialtiesOf } from "@/lib/bazaar";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,7 +25,7 @@ export async function GET() {
           displayName: provider.displayName,
           headline: provider.headline,
           bio: provider.bio,
-          specialties: provider.specialties,
+          specialties: specialtiesOf(provider),
           solanaWallet: provider.solanaWallet,
           avgRating100: provider.avgRating100,
           reviewCount: provider.reviewCount,

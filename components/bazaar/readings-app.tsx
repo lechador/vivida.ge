@@ -845,7 +845,7 @@ function PaymentStep({
     setState("checking");
     setDetail(null);
     try {
-      const d = await api<{ ok: boolean; status: string }>(
+      const d = await api<{ ok: boolean; status?: string; reason?: string }>(
         `/api/bazaar/bookings/${bookingId}/verify-payment`,
         {
           method: "POST",
@@ -855,14 +855,22 @@ function PaymentStep({
           }),
         },
       );
-      if (d.status === "paid" || d.status === "delivered") setState("paid");
+      if (d.status === "paid" || d.status === "delivered") {
+        setState("paid");
+        return;
+      }
+      // 202: accepted, the chain just hasn't indexed the signature yet.
+      setState("pending");
+      setDetail(
+        "The network hasn't indexed this transaction yet — it usually appears within a minute. Wait a little, then check again.",
+      );
     } catch (e) {
       const status = (e as { status?: number }).status;
       const reason = (e as { reason?: string }).reason;
-      if (status === 202) {
+      if (status === 503 || reason === "unavailable") {
         setState("pending");
         setDetail(
-          "The network hasn't indexed this transaction yet — it usually appears within a minute. Wait a little, then check again.",
+          "We couldn't reach the payment network just now — give it a minute and check again.",
         );
       } else if (reason === "underpaid") {
         setState("failed");
@@ -1321,20 +1329,28 @@ function BuyerBookingCard({
     setBusy(true);
     setMsg(null);
     try {
-      await api(`/api/bazaar/bookings/${booking.id}/verify-payment`, {
-        method: "POST",
-        body: JSON.stringify({
-          txSignature: sig.trim(),
-          payerWallet: payer.trim(),
-        }),
-      });
-      onDone();
+      const d = await api<{ ok: boolean; status?: string; reason?: string }>(
+        `/api/bazaar/bookings/${booking.id}/verify-payment`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            txSignature: sig.trim(),
+            payerWallet: payer.trim(),
+          }),
+        },
+      );
+      if (d.status === "paid" || d.status === "delivered") {
+        onDone();
+        return;
+      }
+      // 202: accepted, the chain just hasn't indexed the signature yet.
+      setMsg("Not indexed yet — wait a minute and try again.");
     } catch (e) {
       const status = (e as { status?: number }).status;
       const reason = (e as { reason?: string }).reason;
       setMsg(
-        status === 202
-          ? "Not indexed yet — wait a minute and try again."
+        status === 503 || reason === "unavailable"
+          ? "We couldn't reach the payment network just now — give it a minute and check again."
           : reason === "underpaid"
             ? `That payment is short of ${price(booking.priceUsdcCents)} USDC. Send the full amount, then verify the new signature.`
             : reason === "already_used"
@@ -1716,8 +1732,8 @@ function ProviderServicesSection({
       <h3 className="text-lg font-semibold">Your services</h3>
       {providerStatus === "pending" && (
         <p className="mt-3 rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm">
-          {displayName} is under review — you can draft services now, and
-          they&apos;ll go live the moment the Vivida team approves your profile.
+          {displayName} is under review — the Vivida team approves readers by
+          hand. You can list services here as soon as your profile is approved.
         </p>
       )}
       {providerStatus === "suspended" && (

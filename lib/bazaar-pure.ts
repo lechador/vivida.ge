@@ -243,12 +243,48 @@ export function usdcDeltaForRecipient(
   return sum(postTokenBalances) - sum(preTokenBalances);
 }
 
-/** Base58 signatures run 87–88 chars; bounds stay lenient, charset strict. */
+/** Base58 signatures run 87–88 chars for 64 bytes. */
+const BASE58_ALPHABET =
+  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+/**
+ * Decoded byte length of a base58 string (big-endian; leading '1's are
+ * leading zero bytes). -1 when the string contains non-base58 characters.
+ */
+function base58ByteLength(value: string): number {
+  let leadingZeros = 0;
+  for (const ch of value) {
+    if (ch !== "1") break;
+    leadingZeros += 1;
+  }
+  let n = BigInt(0);
+  const base = BigInt(58);
+  for (const ch of value) {
+    const digit = BASE58_ALPHABET.indexOf(ch);
+    if (digit === -1) return -1;
+    n = n * base + BigInt(digit);
+  }
+  let bytes = leadingZeros;
+  const byte = BigInt(256);
+  while (n > BigInt(0)) {
+    n = n / byte;
+    bytes += 1;
+  }
+  return bytes;
+}
+
+/**
+ * Signature check: bounds and charset stay lenient, but the string must
+ * decode to exactly 64 bytes — a real signature's size. Charset alone is
+ * not enough: 88 chars of valid base58 can decode to 65+ bytes, which the
+ * RPC rejects as `WrongSize`, surfacing to the buyer as unrelated
+ * "network trouble" instead of "that's not a signature".
+ */
 export function normalizeSignature(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
   if (!/^[1-9A-HJ-NP-Za-km-z]{80,128}$/.test(trimmed)) return null;
-  return trimmed;
+  return base58ByteLength(trimmed) === 64 ? trimmed : null;
 }
 
 /**

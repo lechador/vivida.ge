@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
@@ -102,20 +102,24 @@ export async function POST(req: Request, ctx: Params) {
   });
   if (!check.ok) {
     await logAttempt(check.reason);
-    // 202 keeps the client polling: not_found usually means the RPC hasn't
-    // indexed the transaction yet (buyer just sent it). 409 means the
-    // payment belongs to another booking — polling won't help.
+    // 202/503 keep the client retrying: a clean "not indexed yet" (buyer
+    // just sent it) or a brief RPC outage — both resolve on retry. 409
+    // means the signature funds another booking; 402 means the payment
+    // itself is the problem (underpaid / failed / not sent by the claimed
+    // wallet).
     const status =
       check.reason === "not_found"
         ? 202
-        : check.reason === "already_used"
-          ? 409
-          : 402;
+        : check.reason === "unavailable"
+          ? 503
+          : check.reason === "already_used"
+            ? 409
+            : 402;
     return NextResponse.json({ ok: false, reason: check.reason }, { status });
   }
 
   try {
-    await db
+    const updated = await db
       .update(bazaarBookings)
       .set({
         status: "paid",
@@ -124,7 +128,31 @@ export async function POST(req: Request, ctx: Params) {
         txVerifiedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(bazaarBookings.id, booking.id));
+      .where(
+        and(
+          eq(bazaarBookings.id, booking.id),
+          // paid/delivered are terminal for this update; a `cancelled`
+          // booking accepts the update because on-chain money is the
+          // source of truth — a cancel that raced this verification must
+          // not leave a paid booking untracked.
+          inArray(bazaarBookings.status, ["pending_payment", "cancelled"]),
+        ),
+      )
+      .returning({ id: bazaarBookings.id });
+    if (updated.length === 0) {
+      // The row moved on mid-verification (another tab / device verified,
+      // or it was delivered). Answer idempotently from a fresh read.
+      const current = await getBookingForViewer(id, userId);
+      if (
+        current &&
+        (current.status === "paid" || current.status === "delivered")
+      ) {
+        await logAttempt("paid");
+        return NextResponse.json({ ok: true, status: current.status });
+      }
+      await logAttempt("booking_closed");
+      return NextResponse.json({ error: "booking_closed" }, { status: 409 });
+    }
   } catch (e) {
     // Lost a simultaneous claim race for this signature (unique
     // tx_signature): re-read to answer idempotently instead of 500ing.

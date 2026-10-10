@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
@@ -35,9 +35,25 @@ export async function POST(_req: Request, ctx: Params) {
     return NextResponse.json({ error: "cancel_closed" }, { status: 409 });
   }
 
-  await db
+  // Conditional so a concurrent payment verification wins: once a booking
+  // is paid (money already in the reader's wallet), cancel must not flip it
+  // back. Zero rows updated = the row moved on after our read.
+  const updated = await db
     .update(bazaarBookings)
     .set({ status: "cancelled", updatedAt: new Date() })
-    .where(eq(bazaarBookings.id, booking.id));
+    .where(
+      and(
+        eq(bazaarBookings.id, booking.id),
+        eq(bazaarBookings.status, "pending_payment"),
+      ),
+    )
+    .returning({ id: bazaarBookings.id });
+  if (updated.length === 0) {
+    const current = await getBookingForViewer(id, userId);
+    if (current?.status === "cancelled") {
+      return NextResponse.json({ ok: true, status: "cancelled" });
+    }
+    return NextResponse.json({ error: "cancel_closed" }, { status: 409 });
+  }
   return NextResponse.json({ ok: true, status: "cancelled" });
 }

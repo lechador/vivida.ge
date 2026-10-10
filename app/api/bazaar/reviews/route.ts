@@ -71,8 +71,16 @@ export async function POST(req: Request) {
       .returning({ id: bazaarReviews.id });
     await refreshProviderRating(booking.providerId);
     return NextResponse.json({ ok: true, id: review.id }, { status: 201 });
-  } catch {
-    // Unique booking_id — this booking was already reviewed.
-    return NextResponse.json({ error: "already_reviewed" }, { status: 409 });
+  } catch (e) {
+    // Unique booking_id (23505) — this booking was already reviewed.
+    // Anything else must surface as a real error, not as "already reviewed".
+    if (
+      typeof e === "object" &&
+      e !== null &&
+      (e as { code?: unknown }).code === "23505"
+    ) {
+      return NextResponse.json({ error: "already_reviewed" }, { status: 409 });
+    }
+    throw e;
   }
 }
