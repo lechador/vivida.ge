@@ -22,7 +22,8 @@ export type CoreEnglishPath =
   | "/compatibility"
   | "/tests"
   | "/privacy"
-  | "/terms";
+  | "/terms"
+  | "/readings";
 
 export type CoreEnglishInternalPath =
   "/en" | `/en${Exclude<CoreEnglishPath, "/">}`;
@@ -62,6 +63,8 @@ export const ENGLISH_ONLY_ROUTES: ReadonlyArray<{
   // Pairing an explainer with a daily hub mismatched the content on both
   // sides and left the English daily hub with no counterpart at all.
   { en: "/horoscope", internalEn: "/en/horoscope" },
+  // Insight Bazaar — English-only reader marketplace (no Georgian twin).
+  { en: "/readings", internalEn: "/en/readings" },
 ];
 
 export const ENGLISH_PUBLIC_ROUTES: ReadonlyArray<{
