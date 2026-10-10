@@ -1105,3 +1105,124 @@ export async function flushUnreadFeedActivityEmails(): Promise<{
     return { candidates: 0, sent: 0 };
   }
 }
+
+/**
+ * Bazaar transactional mail — paid order (to the reader) and delivered
+ * reading (to the buyer). Unlike nudge mail these send immediately with no
+ * absence gate or throttle: exactly-once is enforced by the caller's
+ * reminder-delivery claim key per booking. Honors the bazaar_updates
+ * opt-out. Never throws (callers fire-and-forget after flipping status).
+ */
+export async function sendBazaarBookingPaidEmail({
+  recipientUserId,
+  buyerName,
+  serviceTitle,
+  amountUsdc,
+}: {
+  recipientUserId: string;
+  buyerName: string;
+  serviceTitle: string;
+  amountUsdc: string;
+}): Promise<void> {
+  const c = client();
+  if (!c) return;
+
+  const [recipient] = await db
+    .select({
+      email: users.email,
+      name: users.name,
+      bazaarUpdates: users.bazaarUpdates,
+    })
+    .from(users)
+    .where(eq(users.id, recipientUserId))
+    .limit(1);
+  if (!recipient?.email || recipient.bazaarUpdates === false) return;
+
+  const { bookingPaidSubject, BookingPaidEmail } =
+    await import("@/lib/email-templates/bazaar-booking-paid");
+  const subject = bookingPaidSubject(serviceTitle, "en");
+  const orderUrl = `${ENGLISH_SITE_URL}/readings?view=bookings`;
+
+  try {
+    const result = await c.emails.send({
+      from: FROM,
+      to: recipient.email,
+      subject,
+      react: BookingPaidEmail({
+        recipientName: recipient.name?.split(" ")[0] ?? null,
+        buyerName,
+        serviceTitle,
+        amountUsdc,
+        orderUrl,
+        locale: "en",
+      }),
+    });
+    if (result.error) {
+      console.error("[email] bazaar booking-paid failed:", result.error);
+      return;
+    }
+    await recordSent(recipientUserId, "bazaar_booking_paid", {
+      email: recipient.email,
+      subject,
+    });
+  } catch (err) {
+    console.error("[email] bazaar booking-paid threw:", (err as Error).message);
+  }
+}
+
+export async function sendBazaarReadingDeliveredEmail({
+  recipientUserId,
+  readerName,
+  serviceTitle,
+}: {
+  recipientUserId: string;
+  readerName: string;
+  serviceTitle: string;
+}): Promise<void> {
+  const c = client();
+  if (!c) return;
+
+  const [recipient] = await db
+    .select({
+      email: users.email,
+      name: users.name,
+      bazaarUpdates: users.bazaarUpdates,
+    })
+    .from(users)
+    .where(eq(users.id, recipientUserId))
+    .limit(1);
+  if (!recipient?.email || recipient.bazaarUpdates === false) return;
+
+  const { readingDeliveredSubject, ReadingDeliveredEmail } =
+    await import("@/lib/email-templates/bazaar-reading-delivered");
+  const subject = readingDeliveredSubject("en");
+  const readingUrl = `${ENGLISH_SITE_URL}/readings?view=bookings`;
+
+  try {
+    const result = await c.emails.send({
+      from: FROM,
+      to: recipient.email,
+      subject,
+      react: ReadingDeliveredEmail({
+        recipientName: recipient.name?.split(" ")[0] ?? null,
+        readerName,
+        serviceTitle,
+        readingUrl,
+        locale: "en",
+      }),
+    });
+    if (result.error) {
+      console.error("[email] bazaar reading-delivered failed:", result.error);
+      return;
+    }
+    await recordSent(recipientUserId, "bazaar_reading_delivered", {
+      email: recipient.email,
+      subject,
+    });
+  } catch (err) {
+    console.error(
+      "[email] bazaar reading-delivered threw:",
+      (err as Error).message,
+    );
+  }
+}

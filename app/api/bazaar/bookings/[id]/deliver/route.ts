@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { bazaarBookings } from "@/db/schema";
 import { getBookingForViewer } from "@/lib/bazaar";
 import { limits } from "@/lib/bazaar-pure";
+import { notifyReadingDelivered } from "@/lib/bazaar-notify";
 import { enforceRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -64,5 +65,6 @@ export async function POST(req: Request, ctx: Params) {
       updatedAt: new Date(),
     })
     .where(eq(bazaarBookings.id, booking.id));
+  await notifyReadingDelivered(booking.id);
   return NextResponse.json({ ok: true, status: "delivered" });
 }

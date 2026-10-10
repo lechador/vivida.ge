@@ -92,6 +92,10 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "forecast_reminder",
   // Proactive AI-astrologer follow-up (open loop from ask memory) — bell + push.
   "ask_nudge",
+  // Insight Bazaar: buyer paid (reader notified) / reading delivered (buyer
+  // notified). Bell + transactional email, deep-linking to My readings.
+  "booking_paid",
+  "reading_delivered",
 ]);
 
 /**

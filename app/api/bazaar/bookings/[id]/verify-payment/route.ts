@@ -10,6 +10,7 @@ import {
   verifyBookingPayment,
 } from "@/lib/bazaar";
 import { isValidSolanaAddress, normalizeSignature } from "@/lib/bazaar-pure";
+import { notifyBookingPaid } from "@/lib/bazaar-notify";
 import { enforceRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -146,5 +147,6 @@ export async function POST(req: Request, ctx: Params) {
     throw e;
   }
   await logAttempt("paid");
+  await notifyBookingPaid(booking.id);
   return NextResponse.json({ ok: true, status: "paid" });
 }

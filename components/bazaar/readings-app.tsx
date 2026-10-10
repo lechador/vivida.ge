@@ -1252,7 +1252,10 @@ function BookingsView({ onBack }: { onBack: () => void }) {
 
   return (
     <DetailShell onBack={onBack}>
-      <h2 className="text-2xl font-semibold tracking-tight">My readings</h2>
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <h2 className="text-2xl font-semibold tracking-tight">My readings</h2>
+        <UpdatesToggle />
+      </div>
 
       {data.asProvider.length > 0 && (
         <section className="mt-8">
@@ -1621,8 +1624,50 @@ function ProviderOrderCard({
   );
 }
 
-/* ── Reader service management ────────────────────────────────────────── */
+/** One-tap email opt-out for marketplace mail (paid orders, deliveries). */
+function UpdatesToggle() {
+  const [on, setOn] = useState<boolean | null>(null);
 
+  useEffect(() => {
+    let live = true;
+    api<{ bazaarUpdates: boolean }>("/api/bazaar/updates")
+      .then((d) => {
+        if (live) setOn(d.bazaarUpdates);
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  async function flip() {
+    if (on === null) return;
+    const next = !on;
+    setOn(next);
+    try {
+      await api("/api/bazaar/updates", {
+        method: "POST",
+        body: JSON.stringify({ enabled: next }),
+      });
+    } catch {
+      setOn(!next);
+    }
+  }
+
+  if (on === null) return null;
+  return (
+    <button
+      onClick={flip}
+      aria-pressed={on}
+      className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+      title="Order and delivery emails for your readings"
+    >
+      {on ? "✓ Order emails on" : "Order emails off"}
+    </button>
+  );
+}
+
+/* ── Reader service management ────────────────────────────────────────── */
 type OwnService = {
   id: string;
   title: string;

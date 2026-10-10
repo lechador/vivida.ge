@@ -8,7 +8,9 @@ import {
   AtSign,
   Bell,
   CalendarDays,
+  HandCoins,
   HeartHandshake,
+  MailCheck,
   MessageCircle,
   MessageSquare,
   Sparkles,
@@ -46,6 +48,8 @@ const KIND_ICON: Record<string, LucideIcon> = {
   timing_reminder: Sparkles,
   forecast_reminder: CalendarDays,
   ask_nudge: Sparkles,
+  booking_paid: HandCoins,
+  reading_delivered: MailCheck,
 };
 
 const REACTION_LABEL_KA: Record<string, string> = {
@@ -113,6 +117,8 @@ function notificationLabel(
     case "timing_reminder":
     case "forecast_reminder":
     case "ask_nudge":
+    case "booking_paid":
+    case "reading_delivered":
       return payload?.reminderBody ?? "";
     default:
       return "";
@@ -423,6 +429,8 @@ function DbNotificationRow({
   const isReminder =
     n.kind === "timing_reminder" ||
     n.kind === "forecast_reminder" ||
+    n.kind === "booking_paid" ||
+    n.kind === "reading_delivered" ||
     n.kind === "ask_nudge";
   const href =
     (isReminder || isRelationship) && n.payload?.reminderUrl

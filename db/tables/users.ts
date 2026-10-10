@@ -58,6 +58,10 @@ export const users = pgTable(
       .default(true),
     emailMarketing: boolean("email_marketing").notNull().default(true),
     emailNudges: boolean("email_nudges").notNull().default(true),
+    /** Transactional marketplace mail (paid order / reading delivered).
+     * Default ON; toggled from My readings. Covers both buyer and reader
+     * roles in one flag. */
+    bazaarUpdates: boolean("bazaar_updates").notNull().default(true),
     /** Separate, explicit opt-in for promotional SMS to the verified phone. */
     smsMarketing: boolean("sms_marketing").notNull().default(false),
     smsMarketingConsentedAt: timestamp("sms_marketing_consented_at", {
