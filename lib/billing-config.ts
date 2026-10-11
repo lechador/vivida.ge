@@ -1,6 +1,7 @@
 /** Client-safe, country-aware product catalogue. Stripe IDs never come from clients. */
 
-export type BillingCurrency = "gel" | "gbp" | "amd";
+export type BillingCurrency =
+  "gel" | "gbp" | "amd" | "usd" | "cad" | "aud" | "nzd";
 
 export type CreditPack = {
   id: "s" | "m" | "l";
@@ -78,10 +79,48 @@ const AM_CREDIT_PACKS: readonly CreditPack[] = [
   { id: "l", credits: 180, amountMinor: 429_000, currency: "amd" },
 ];
 
+/**
+ * US one-time alternatives to the $9.99/month unlimited plan.
+ *
+ * Same shape as GB: credits per dollar rises with pack size, and PRO
+ * undercuts the largest pack. All four dollar markets are standard
+ * two-decimal Stripe currencies — amounts here are plain cents.
+ */
+const US_CREDIT_PACKS: readonly CreditPack[] = [
+  { id: "s", credits: 30, amountMinor: 299, currency: "usd" },
+  { id: "m", credits: 75, amountMinor: 599, currency: "usd" },
+  { id: "l", credits: 180, amountMinor: 1199, currency: "usd" },
+];
+
+/** Canadian one-time alternatives to the CA$13.99/month unlimited plan. */
+const CA_CREDIT_PACKS: readonly CreditPack[] = [
+  { id: "s", credits: 30, amountMinor: 399, currency: "cad" },
+  { id: "m", credits: 75, amountMinor: 799, currency: "cad" },
+  { id: "l", credits: 180, amountMinor: 1599, currency: "cad" },
+];
+
+/** Australian one-time alternatives to the A$14.99/month unlimited plan. */
+const AU_CREDIT_PACKS: readonly CreditPack[] = [
+  { id: "s", credits: 30, amountMinor: 499, currency: "aud" },
+  { id: "m", credits: 75, amountMinor: 899, currency: "aud" },
+  { id: "l", credits: 180, amountMinor: 1699, currency: "aud" },
+];
+
+/** New Zealand one-time alternatives to the NZ$16.99/month unlimited plan. */
+const NZ_CREDIT_PACKS: readonly CreditPack[] = [
+  { id: "s", credits: 30, amountMinor: 599, currency: "nzd" },
+  { id: "m", credits: 75, amountMinor: 999, currency: "nzd" },
+  { id: "l", credits: 180, amountMinor: 1899, currency: "nzd" },
+];
+
 const CREDIT_PACKS_BY_COUNTRY: Record<string, readonly CreditPack[]> = {
   AM: AM_CREDIT_PACKS,
+  AU: AU_CREDIT_PACKS,
+  CA: CA_CREDIT_PACKS,
   GB: GB_CREDIT_PACKS,
   GE: GE_CREDIT_PACKS,
+  NZ: NZ_CREDIT_PACKS,
+  US: US_CREDIT_PACKS,
 };
 
 export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
@@ -109,6 +148,38 @@ export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
     currency: "gel",
     interval: "month",
     stripeLookupKey: "vivida_premium_ge_monthly_1990_v1",
+  },
+  US: {
+    key: "premium_us_monthly",
+    countryCode: "US",
+    amountMinor: 999,
+    currency: "usd",
+    interval: "month",
+    stripeLookupKey: "vivida_premium_us_monthly_999_v1",
+  },
+  CA: {
+    key: "premium_ca_monthly",
+    countryCode: "CA",
+    amountMinor: 1399,
+    currency: "cad",
+    interval: "month",
+    stripeLookupKey: "vivida_premium_ca_monthly_1399_v1",
+  },
+  AU: {
+    key: "premium_au_monthly",
+    countryCode: "AU",
+    amountMinor: 1499,
+    currency: "aud",
+    interval: "month",
+    stripeLookupKey: "vivida_premium_au_monthly_1499_v1",
+  },
+  NZ: {
+    key: "premium_nz_monthly",
+    countryCode: "NZ",
+    amountMinor: 1699,
+    currency: "nzd",
+    interval: "month",
+    stripeLookupKey: "vivida_premium_nz_monthly_1699_v1",
   },
 };
 
@@ -255,6 +326,10 @@ const CURRENCY_SYMBOL: Record<string, string> = {
   gel: "₾",
   gbp: "£",
   amd: "֏",
+  usd: "$",
+  cad: "CA$",
+  aud: "A$",
+  nzd: "NZ$",
 };
 
 /**

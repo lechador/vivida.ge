@@ -24,10 +24,11 @@ Conventions:
 
 ## Infra setup (run once per environment)
 
-| Script                             | Purpose                                                                                |
-| ---------------------------------- | -------------------------------------------------------------------------------------- |
-| `generate-apple-client-secret.mjs` | Mints Apple's 6-month client-secret JWT for `AUTH_APPLE_SECRET`. Re-run before expiry. |
-| `create-am-stripe-price.mjs`       | Idempotently creates the AMD Stripe price.                                             |
+| Script                                   | Purpose                                                                                |
+| ---------------------------------------- | -------------------------------------------------------------------------------------- |
+| `generate-apple-client-secret.mjs`       | Mints Apple's 6-month client-secret JWT for `AUTH_APPLE_SECRET`. Re-run before expiry. |
+| `create-am-stripe-price.mjs`             | Idempotently creates the AMD Stripe price.                                             |
+| `create-dollar-market-stripe-prices.mjs` | Idempotently creates the US/CA/AU/NZ Stripe prices (`--apply`, `--checkout-smoke`).    |
 
 ## One-shot ops (archived — do not re-run without reading the header)
 

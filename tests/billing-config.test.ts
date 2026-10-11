@@ -43,6 +43,10 @@ describe("country billing catalogue", () => {
   it("prices each market in its own currency", () => {
     expect(premiumPlanForCountry("GE")!.currency).toBe("gel");
     expect(premiumPlanForCountry("GB")!.currency).toBe("gbp");
+    expect(premiumPlanForCountry("US")!.currency).toBe("usd");
+    expect(premiumPlanForCountry("CA")!.currency).toBe("cad");
+    expect(premiumPlanForCountry("AU")!.currency).toBe("aud");
+    expect(premiumPlanForCountry("NZ")!.currency).toBe("nzd");
     expect(premiumPlanForCountry("GE")!.amountMinor).not.toBe(
       premiumPlanForCountry("GB")!.amountMinor,
     );
@@ -64,26 +68,80 @@ describe("country billing catalogue", () => {
     ]);
   });
 
+  it("offers the four dollar-market monthly PRO plans", () => {
+    expect(premiumPlanForCountry("us")).toEqual({
+      key: "premium_us_monthly",
+      countryCode: "US",
+      amountMinor: 999,
+      currency: "usd",
+      interval: "month",
+      stripeLookupKey: "vivida_premium_us_monthly_999_v1",
+    });
+    expect(premiumPlanForCountry("CA")).toEqual({
+      key: "premium_ca_monthly",
+      countryCode: "CA",
+      amountMinor: 1399,
+      currency: "cad",
+      interval: "month",
+      stripeLookupKey: "vivida_premium_ca_monthly_1399_v1",
+    });
+    expect(premiumPlanForCountry("AU")).toEqual({
+      key: "premium_au_monthly",
+      countryCode: "AU",
+      amountMinor: 1499,
+      currency: "aud",
+      interval: "month",
+      stripeLookupKey: "vivida_premium_au_monthly_1499_v1",
+    });
+    expect(premiumPlanForCountry("NZ")).toEqual({
+      key: "premium_nz_monthly",
+      countryCode: "NZ",
+      amountMinor: 1699,
+      currency: "nzd",
+      interval: "month",
+      stripeLookupKey: "vivida_premium_nz_monthly_1699_v1",
+    });
+  });
+
+  it("uses dollar-market credit packs for US/CA/AU/NZ residents", () => {
+    expect(creditPacksForCountry("US")).toEqual([
+      { id: "s", credits: 30, amountMinor: 299, currency: "usd" },
+      { id: "m", credits: 75, amountMinor: 599, currency: "usd" },
+      { id: "l", credits: 180, amountMinor: 1199, currency: "usd" },
+    ]);
+    expect(creditPacksForCountry("CA")).toEqual([
+      { id: "s", credits: 30, amountMinor: 399, currency: "cad" },
+      { id: "m", credits: 75, amountMinor: 799, currency: "cad" },
+      { id: "l", credits: 180, amountMinor: 1599, currency: "cad" },
+    ]);
+    expect(creditPacksForCountry("AU")).toEqual([
+      { id: "s", credits: 30, amountMinor: 499, currency: "aud" },
+      { id: "m", credits: 75, amountMinor: 899, currency: "aud" },
+      { id: "l", credits: 180, amountMinor: 1699, currency: "aud" },
+    ]);
+    expect(creditPacksForCountry("NZ")).toEqual([
+      { id: "s", credits: 30, amountMinor: 599, currency: "nzd" },
+      { id: "m", credits: 75, amountMinor: 999, currency: "nzd" },
+      { id: "l", credits: 180, amountMinor: 1899, currency: "nzd" },
+    ]);
+  });
+
   it("never trusts a client-supplied pack", () => {
     expect(creditPackForCountry("GB", "custom")).toBeNull();
   });
 
   it("keeps the Georgian catalogue as the rollout fallback", () => {
-    expect(creditPackForCountry("US", "s")).toEqual({
+    expect(creditPackForCountry("DE", "s")).toEqual({
       id: "s",
       credits: 30,
       amountMinor: 690,
       currency: "gel",
     });
-    expect(premiumPlanForCountry("US")).toEqual(
-      PREMIUM_PLANS_BY_COUNTRY.GE,
-    );
-    expect(premiumPlanForCountry(null)).toEqual(
-      PREMIUM_PLANS_BY_COUNTRY.GE,
-    );
+    expect(premiumPlanForCountry("DE")).toEqual(PREMIUM_PLANS_BY_COUNTRY.GE);
+    expect(premiumPlanForCountry(null)).toEqual(PREMIUM_PLANS_BY_COUNTRY.GE);
   });
 
-  it.each(["GE", "GB"])(
+  it.each(["GE", "GB", "AM", "US", "CA", "AU", "NZ"])(
     "makes every %s pack a better per-credit deal than the one below it",
     (country) => {
       const packs = creditPacksForCountry(country);
@@ -93,7 +151,7 @@ describe("country billing catalogue", () => {
     },
   );
 
-  it.each(["GE", "GB"])(
+  it.each(["GE", "GB", "AM", "US", "CA", "AU", "NZ"])(
     "keeps %s PRO cheaper than the largest credit pack",
     (country) => {
       const plan = premiumPlanForCountry(country)!;
@@ -140,7 +198,9 @@ describe("low-credit win-back promo", () => {
 
 describe("public discounted PRO plan", () => {
   it("features the quarterly ₾29 plan in Georgia", () => {
-    expect(discountedPremiumPlanForCountry("GE")).toEqual(LOW_CREDIT_PROMO_PLAN);
+    expect(discountedPremiumPlanForCountry("GE")).toEqual(
+      LOW_CREDIT_PROMO_PLAN,
+    );
     expect(featuredPremiumPlanForCountry("GE")).toEqual(LOW_CREDIT_PROMO_PLAN);
   });
 
@@ -149,12 +209,18 @@ describe("public discounted PRO plan", () => {
     expect(featuredPremiumPlanForCountry("GB")).toEqual(
       premiumPlanForCountry("GB"),
     );
+    for (const market of ["US", "CA", "AU", "NZ"]) {
+      expect(discountedPremiumPlanForCountry(market)).toBeNull();
+      expect(featuredPremiumPlanForCountry(market)).toEqual(
+        premiumPlanForCountry(market),
+      );
+    }
   });
 
   it("only resolves server-approved plans for the user's market", () => {
-    expect(
-      premiumPlanByKeyForCountry("GE", LOW_CREDIT_PROMO_PLAN.key),
-    ).toEqual(LOW_CREDIT_PROMO_PLAN);
+    expect(premiumPlanByKeyForCountry("GE", LOW_CREDIT_PROMO_PLAN.key)).toEqual(
+      LOW_CREDIT_PROMO_PLAN,
+    );
     expect(
       premiumPlanByKeyForCountry("GB", LOW_CREDIT_PROMO_PLAN.key),
     ).toBeNull();
@@ -174,24 +240,24 @@ describe("public discounted PRO plan", () => {
 describe("purchase-promotion eligibility", () => {
   it("shows acquisition prompts below 25 credits", () => {
     expect(PURCHASE_PROMOTION_CREDIT_THRESHOLD).toBe(25);
-    expect(
-      shouldShowPurchasePromotion({ isPremium: false, balance: 24 }),
-    ).toBe(true);
+    expect(shouldShowPurchasePromotion({ isPremium: false, balance: 24 })).toBe(
+      true,
+    );
   });
 
   it("suppresses acquisition prompts at 25 credits and above", () => {
-    expect(
-      shouldShowPurchasePromotion({ isPremium: false, balance: 25 }),
-    ).toBe(false);
+    expect(shouldShowPurchasePromotion({ isPremium: false, balance: 25 })).toBe(
+      false,
+    );
     expect(
       shouldShowPurchasePromotion({ isPremium: false, balance: 180 }),
     ).toBe(false);
   });
 
   it("always suppresses acquisition prompts for PRO subscribers", () => {
-    expect(
-      shouldShowPurchasePromotion({ isPremium: true, balance: 0 }),
-    ).toBe(false);
+    expect(shouldShowPurchasePromotion({ isPremium: true, balance: 0 })).toBe(
+      false,
+    );
   });
 });
 
@@ -232,6 +298,17 @@ describe("formatBillingAmount", () => {
     expect(formatBillingAmount(1990, "gel", "en")).toBe("GEL\u00A019.90");
   });
 
+  it("writes the dollar markets unambiguously in both locales", () => {
+    expect(formatBillingAmount(999, "usd", "en")).toBe("US$9.99");
+    expect(formatBillingAmount(1399, "cad", "en")).toBe("CA$13.99");
+    expect(formatBillingAmount(1499, "aud", "en")).toBe("A$14.99");
+    expect(formatBillingAmount(1699, "nzd", "en")).toBe("NZ$16.99");
+    expect(formatBillingAmount(999, "usd", "ka")).toBe("$9.99");
+    expect(formatBillingAmount(1399, "cad", "ka")).toBe("CA$13.99");
+    expect(formatBillingAmount(1499, "aud", "ka")).toBe("A$14.99");
+    expect(formatBillingAmount(1699, "nzd", "ka")).toBe("NZ$16.99");
+  });
+
   /**
    * The regression that matters: browsers carry no `ka` data and resolve the
    * locale to en-GB, so anything Intl decides *because* the locale is Georgian
@@ -244,7 +321,11 @@ describe("formatBillingAmount", () => {
 
     const full = Intl.NumberFormat;
     // Stand in for a browser: every locale negotiation lands on en-GB.
-    function ReducedIcu(this: unknown, _locales?: unknown, options?: Intl.NumberFormatOptions) {
+    function ReducedIcu(
+      this: unknown,
+      _locales?: unknown,
+      options?: Intl.NumberFormatOptions,
+    ) {
       return new full("en-GB", options);
     }
     ReducedIcu.supportedLocalesOf = () => [];
