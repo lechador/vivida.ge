@@ -148,6 +148,35 @@ function statusLabel(status: string): string {
   }
 }
 
+/** First-4…last-4 rendering for long base58 addresses. */
+function shortWallet(address: string): string {
+  return address.length > 12
+    ? `${address.slice(0, 4)}…${address.slice(-4)}`
+    : address;
+}
+
+/** Tiny copy-to-clipboard chip with a transient "Copied" label. */
+function CopyChip({ text, label = "Copy" }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void navigator.clipboard?.writeText(text).then(
+          () => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1600);
+          },
+          () => undefined,
+        );
+      }}
+      className="shrink-0 rounded-lg border border-border/60 px-2.5 py-1.5 text-xs font-medium transition-colors hover:border-foreground/40"
+    >
+      {copied ? "Copied" : label}
+    </button>
+  );
+}
+
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
     ...init,
@@ -265,7 +294,12 @@ export function ReadingsApp() {
       </div>
 
       {view === "bookings" ? (
-        <BookingsView onBack={() => go({ view: null })} />
+        <BookingsView
+          onBack={() => go({ view: null })}
+          onManageProfile={() => go({ view: "apply" })}
+          onViewProfile={(id) => go({ provider: id, view: null })}
+          onPreviewService={(id) => go({ service: id, view: null })}
+        />
       ) : view === "apply" ? (
         <ApplyView onBack={() => go({ view: null })} />
       ) : providerId ? (
@@ -1084,7 +1118,17 @@ function ProviderView({
 
 /* ── My readings (buyer + provider) ───────────────────────────────────── */
 
-function BookingsView({ onBack }: { onBack: () => void }) {
+function BookingsView({
+  onBack,
+  onManageProfile,
+  onViewProfile,
+  onPreviewService,
+}: {
+  onBack: () => void;
+  onManageProfile: () => void;
+  onViewProfile: (id: string) => void;
+  onPreviewService: (id: string) => void;
+}) {
   const [data, setData] = useState<{
     asBuyer: BookingBuyer[];
     asProvider: BookingProvider[];
@@ -1141,12 +1185,77 @@ function BookingsView({ onBack }: { onBack: () => void }) {
     );
   }
 
+  const provider = data.ownProvider;
+  const providerStatusText =
+    provider?.status === "approved"
+      ? "Live"
+      : provider?.status === "suspended"
+        ? "Suspended"
+        : "Under review";
+  const providerChipCls =
+    provider?.status === "approved"
+      ? "bg-emerald-400/15 text-emerald-300"
+      : provider?.status === "suspended"
+        ? "bg-red-400/15 text-red-300"
+        : "bg-amber-300/15 text-amber-200";
+
   return (
     <DetailShell onBack={onBack}>
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h2 className="text-2xl font-semibold tracking-tight">My readings</h2>
-        <UpdatesToggle />
-      </div>
+      <h2 className="text-2xl font-semibold tracking-tight">My readings</h2>
+
+      {provider && (
+        <section className="mt-6 rounded-2xl border border-border/40 bg-card/30 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <p className="font-semibold">{provider.displayName}</p>
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${providerChipCls}`}
+              >
+                {providerStatusText}
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <UpdatesToggle />
+              <button
+                onClick={onManageProfile}
+                className="text-xs font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              >
+                Manage profile
+              </button>
+              <button
+                onClick={() => onViewProfile(provider.id)}
+                className="text-xs font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              >
+                View public profile →
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Payout wallet · USDC
+            </span>
+            <code className="rounded-lg bg-background/70 px-2 py-1 font-mono text-[11px] text-foreground">
+              {shortWallet(provider.solanaWallet)}
+            </code>
+            <CopyChip text={provider.solanaWallet} label="Copy wallet" />
+          </div>
+
+          {provider.status === "pending" && (
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+              Your reader profile is under review — the Vivida team approves
+              readers by hand, and we&apos;ll email you. You can keep editing it
+              meanwhile.
+            </p>
+          )}
+          {provider.status === "suspended" && (
+            <p className="mt-3 text-xs leading-relaxed text-red-300/90">
+              Your reader profile is suspended — listings are hidden. Contact us
+              to resolve this.
+            </p>
+          )}
+        </section>
+      )}
 
       {data.asProvider.length > 0 && (
         <section className="mt-8">
@@ -1159,10 +1268,12 @@ function BookingsView({ onBack }: { onBack: () => void }) {
         </section>
       )}
 
-      {data.ownProvider && (
+      {provider && (
         <ProviderServicesSection
-          providerStatus={data.ownProvider.status}
-          displayName={data.ownProvider.displayName}
+          providerId={provider.id}
+          providerStatus={provider.status}
+          displayName={provider.displayName}
+          onPreview={onPreviewService}
         />
       )}
 
@@ -1394,6 +1505,7 @@ function ProviderOrderCard({
   const [text, setText] = useState(booking.deliveryText ?? "");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
 
   async function deliver() {
     setBusy(true);
@@ -1403,6 +1515,7 @@ function ProviderOrderCard({
         method: "POST",
         body: JSON.stringify({ deliveryText: text }),
       });
+      setEditing(false);
       onDone();
     } catch (e) {
       const status = (e as { status?: number }).status;
@@ -1454,8 +1567,8 @@ function ProviderOrderCard({
       {booking.status === "pending_payment" && (
         <div className="mt-3 border-t border-border/40 pt-3 text-sm">
           <p className="text-muted-foreground">
-            Waiting for the buyer&apos;s USDC payment. Decline removes the order
-            before any money moves.
+            We&apos;ve emailed the buyer their payment link — most orders pay
+            within minutes. You can decline any order before it&apos;s paid.
           </p>
           <button
             onClick={decline}
@@ -1470,6 +1583,10 @@ function ProviderOrderCard({
       {booking.status === "paid" && (
         <div className="mt-3">
           <label className="text-sm font-medium">Deliver the reading</label>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            The buyer sees it instantly in My readings and gets an email. You
+            can edit it afterwards if you spot a typo.
+          </p>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -1478,20 +1595,76 @@ function ProviderOrderCard({
             placeholder="Write the full reading here…"
             className="mt-2 w-full rounded-xl border border-border/60 bg-background/60 px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60"
           />
+          <span className="mt-1.5 block text-xs tabular-nums text-muted-foreground">
+            {text.length.toLocaleString()} / 20,000 characters
+          </span>
           {msg && <p className="mt-2 text-xs text-red-400">{msg}</p>}
           <button
             onClick={deliver}
             disabled={busy || !text.trim()}
             className="mt-2 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {busy ? "Delivering…" : "Deliver reading"}
+            {busy ? "Sending…" : "Send to buyer"}
           </button>
         </div>
       )}
       {booking.status === "delivered" && booking.deliveryText && (
-        <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
-          {booking.deliveryText}
-        </p>
+        <div className="mt-3 border-t border-border/40 pt-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-300">
+              Delivered ✓
+            </p>
+            {!editing && (
+              <button
+                onClick={() => {
+                  setText(booking.deliveryText ?? "");
+                  setEditing(true);
+                }}
+                className="text-xs font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              >
+                Edit reading
+              </button>
+            )}
+          </div>
+          {editing ? (
+            <>
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                rows={6}
+                maxLength={20000}
+                className="mt-2 w-full rounded-xl border border-border/60 bg-background/60 px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60"
+              />
+              <span className="mt-1.5 block text-xs tabular-nums text-muted-foreground">
+                {text.length.toLocaleString()} / 20,000 characters
+              </span>
+              {msg && <p className="mt-2 text-xs text-red-400">{msg}</p>}
+              <div className="mt-2 flex gap-2">
+                <button
+                  onClick={deliver}
+                  disabled={busy || !text.trim()}
+                  className="rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  {busy ? "Saving…" : "Save changes"}
+                </button>
+                <button
+                  onClick={() => {
+                    setEditing(false);
+                    setMsg(null);
+                  }}
+                  disabled={busy}
+                  className="rounded-xl border border-border/60 px-4 py-2.5 text-sm font-medium hover:border-foreground/40"
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+              {booking.deliveryText}
+            </p>
+          )}
+        </div>
       )}
     </li>
   );
@@ -1552,11 +1725,15 @@ type OwnService = {
 };
 
 function ProviderServicesSection({
+  providerId,
   providerStatus,
   displayName,
+  onPreview,
 }: {
+  providerId: string;
   providerStatus: string;
   displayName: string;
+  onPreview: (id: string) => void;
 }) {
   const [services, setServices] = useState<OwnService[] | null>(null);
   const [showNew, setShowNew] = useState(false);
@@ -1589,17 +1766,38 @@ function ProviderServicesSection({
       <h3 className="text-lg font-semibold">Your services</h3>
       {providerStatus === "pending" && (
         <p className="mt-3 rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm">
-          {displayName} is under review — the Vivida team approves readers by
-          hand. You can list services here as soon as your profile is approved.
+          Services unlock as soon as the Vivida team approves {displayName}
+          &apos;s profile — listing happens right here.
         </p>
       )}
       {providerStatus === "suspended" && (
         <p className="mt-3 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm">
-          Your reader profile is suspended — listings are hidden. Contact us to
-          resolve this.
+          Your listings are hidden while your profile is suspended. Contact us
+          to resolve this.
         </p>
       )}
       {msg && <p className="mt-3 text-sm text-red-400">{msg}</p>}
+      {services !== null &&
+        services.length === 0 &&
+        providerStatus === "approved" &&
+        !showNew && (
+          <div className="mt-3 rounded-2xl border border-dashed border-border/60 p-5">
+            <p className="text-sm font-semibold">
+              You&apos;re live — list your first service
+            </p>
+            <p className="mt-1 max-w-md text-sm leading-relaxed text-muted-foreground">
+              Buyers book what you list. One clear offer is enough to start —
+              e.g. &ldquo;Three-card tarot reading, delivered within 24
+              hours.&rdquo;
+            </p>
+            <button
+              onClick={() => setShowNew(true)}
+              className="mt-3 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm font-semibold text-white"
+            >
+              + List your first service
+            </button>
+          </div>
+        )}
       {services === null ? (
         <div className="mt-3 h-20 animate-pulse rounded-2xl bg-card/40" />
       ) : (
@@ -1641,6 +1839,12 @@ function ProviderServicesSection({
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <button
+                      onClick={() => onPreview(s.id)}
+                      className="rounded-xl border border-border/60 px-3 py-1.5 text-xs font-medium hover:border-foreground/40"
+                    >
+                      Preview
+                    </button>
+                    <button
                       onClick={() => setEditingId(s.id)}
                       className="rounded-xl border border-border/60 px-3 py-1.5 text-xs font-medium hover:border-foreground/40"
                     >
@@ -1664,14 +1868,17 @@ function ProviderServicesSection({
           ))}
         </ul>
       )}
-      {providerStatus === "approved" && !showNew && (
-        <button
-          onClick={() => setShowNew(true)}
-          className="mt-3 rounded-xl border border-dashed border-border/60 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:border-foreground/40 hover:text-foreground"
-        >
-          + List a new service
-        </button>
-      )}
+      {providerStatus === "approved" &&
+        !showNew &&
+        services !== null &&
+        services.length > 0 && (
+          <button
+            onClick={() => setShowNew(true)}
+            className="mt-3 rounded-xl border border-dashed border-border/60 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+          >
+            + List a new service
+          </button>
+        )}
       {showNew && (
         <div className="mt-3 rounded-2xl border border-border/40 bg-card/30 p-4">
           <ServiceForm
@@ -1681,6 +1888,21 @@ function ProviderServicesSection({
             }}
             onCancel={() => setShowNew(false)}
           />
+        </div>
+      )}
+      {providerStatus === "approved" && (
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span className="font-medium uppercase tracking-wider">
+            Your reader page
+          </span>
+          <code className="rounded-lg bg-background/70 px-2 py-1 font-mono text-[11px] text-foreground">
+            /readings?provider={providerId}
+          </code>
+          <CopyChip
+            text={`${typeof window === "undefined" ? "" : window.location.origin}/readings?provider=${providerId}`}
+            label="Copy link"
+          />
+          <span>— share it anywhere seekers find you.</span>
         </div>
       )}
     </section>
@@ -1805,6 +2027,9 @@ function ServiceForm({
             aria-label="Price in USDC"
             className={inputCls}
           />
+          <span className="mt-1.5 block text-xs leading-relaxed text-muted-foreground">
+            You receive this in USDC. Most readings sell for $9.99–$29.99.
+          </span>
         </label>
       </div>
       <input
@@ -1850,6 +2075,39 @@ function ApplyView({ onBack }: { onBack: () => void }) {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Existing readers get the same form prefilled — it doubles as profile
+  // management (the apply endpoint updates an existing row in place and
+  // never downgrades an approved status).
+  const [existingStatus, setExistingStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    api<{
+      provider: {
+        status: string;
+        displayName: string;
+        headline: string;
+        bio: string;
+        specialties: string[];
+        solanaWallet: string;
+      } | null;
+    }>("/api/bazaar/mine")
+      .then((d) => {
+        if (!live || !d.provider) return;
+        setExistingStatus(d.provider.status);
+        setForm({
+          displayName: d.provider.displayName,
+          headline: d.provider.headline,
+          bio: d.provider.bio,
+          solanaWallet: d.provider.solanaWallet,
+          specialties: d.provider.specialties,
+        });
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, []);
 
   function toggleSpecialty(s: string) {
     setForm((f) => ({
@@ -1873,9 +2131,13 @@ function ApplyView({ onBack }: { onBack: () => void }) {
         },
       );
       setResult(
-        d.status === "approved"
-          ? "Your reader profile is live — list your first service from My readings once logged in."
-          : "Application received. The Vivida team reviews every reader before they go live — we'll email you.",
+        existingStatus
+          ? d.status === "approved"
+            ? "Profile saved — you're live. List services and see orders in My readings."
+            : "Profile saved. Your application is still under review — we'll email you."
+          : d.status === "approved"
+            ? "Your reader profile is live — list your first service from My readings once logged in."
+            : "Application received. The Vivida team reviews every reader before they go live — we'll email you.",
       );
     } catch (e) {
       const status = (e as { status?: number }).status;
@@ -1904,12 +2166,14 @@ function ApplyView({ onBack }: { onBack: () => void }) {
         For readers
       </p>
       <h2 className="mt-2 max-w-xl text-3xl font-semibold tracking-tight">
-        Offer readings to thousands of seekers
+        {existingStatus
+          ? "Your reader profile"
+          : "Offer readings to thousands of seekers"}
       </h2>
       <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-        Set your own services and prices in USDC. Buyers pay your Solana wallet
-        directly — no revenue share in the MVP. Every reader is approved by the
-        Vivida team before appearing publicly.
+        {existingStatus
+          ? "Update how you appear in the marketplace. Approved readers stay live — a wallet change applies to future orders only."
+          : "Set your own services and prices in USDC. Buyers pay by card and the USDC lands in your Solana wallet — no revenue share in the MVP. Every reader is approved by the Vivida team before appearing publicly."}
       </p>
 
       {result ? (
@@ -1966,7 +2230,7 @@ function ApplyView({ onBack }: { onBack: () => void }) {
               ))}
             </div>
           </Field>
-          <Field label="Solana wallet (USDC receiver, mainnet)">
+          <Field label="Solana wallet — where your USDC lands (mainnet)">
             <input
               value={form.solanaWallet}
               onChange={(e) =>
@@ -1976,9 +2240,17 @@ function ApplyView({ onBack }: { onBack: () => void }) {
               placeholder="Your public receiving address"
               className={`${inputCls} font-mono text-xs`}
             />
-            <p className="mt-1.5 text-xs text-muted-foreground">
-              Buyers send USDC here from their own wallets. Never share seed
-              phrases — Vivida will never ask for them.
+            <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+              This is the public address your payments arrive at. No wallet yet?{" "}
+              <a
+                href="https://phantom.app"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-[var(--vivida-cyan)] underline-offset-2 hover:underline"
+              >
+                Get Phantom — free, two minutes
+              </a>
+              . Never share seed phrases — Vivida will never ask for them.
             </p>
           </Field>
           {error && <p className="text-sm text-red-400">{error}</p>}
@@ -1993,7 +2265,11 @@ function ApplyView({ onBack }: { onBack: () => void }) {
             }
             className="rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-950/30 disabled:opacity-50"
           >
-            {busy ? "Submitting…" : "Apply as a reader"}
+            {busy
+              ? "Saving…"
+              : existingStatus
+                ? "Save profile"
+                : "Apply as a reader"}
           </button>
         </div>
       )}

@@ -16,7 +16,8 @@ type Params = { params: Promise<{ id: string }> };
 
 /**
  * POST /api/bazaar/bookings/[id]/deliver { deliveryText } — the provider
- * posts the finished reading. Only the paid booking's provider, only once.
+ * posts the finished reading. Only the booking's own provider; the first
+ * delivery notifies the buyer, later saves update the text silently.
  */
 export async function POST(req: Request, ctx: Params) {
   const session = await auth();
@@ -29,12 +30,12 @@ export async function POST(req: Request, ctx: Params) {
   if (!booking || booking.viewerRole !== "provider") {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
-  if (booking.status === "delivered") {
-    return NextResponse.json({ ok: true, status: "delivered" });
-  }
-  if (booking.status !== "paid") {
+  // Delivered readings stay editable — readers fix typos after the fact.
+  // Anything else (pending payment, cancelled) cannot deliver.
+  if (booking.status !== "paid" && booking.status !== "delivered") {
     return NextResponse.json({ error: "not_paid" }, { status: 409 });
   }
+  const firstDelivery = booking.status === "paid";
 
   try {
     await enforceRateLimit({
@@ -61,10 +62,12 @@ export async function POST(req: Request, ctx: Params) {
     .set({
       status: "delivered",
       deliveryText,
-      deliveredAt: new Date(),
+      ...(firstDelivery ? { deliveredAt: new Date() } : {}),
       updatedAt: new Date(),
     })
     .where(eq(bazaarBookings.id, booking.id));
-  await notifyReadingDelivered(booking.id);
+  // Notify once, on the first delivery — edits are silent (the buyer sees
+  // the updated text live in My readings).
+  if (firstDelivery) await notifyReadingDelivered(booking.id);
   return NextResponse.json({ ok: true, status: "delivered" });
 }
