@@ -63,6 +63,14 @@ const RPC_WS_URL = RPC_URL.replace(/^https:\/\//, "wss://").replace(
   "ws://",
 );
 
+/**
+ * Test-only sandbox mode for the card onramp: Stripe's sandbox accepts test
+ * values (US/EU phone format, code 000000, card 4242…) and moves no real
+ * funds. Set NEXT_PUBLIC_PRIVY_ONRAMP_SANDBOX=1 for a test deploy; never in
+ * production.
+ */
+const ONRAMP_SANDBOX = process.env.NEXT_PUBLIC_PRIVY_ONRAMP_SANDBOX === "1";
+
 export type CryptoPayRequest = {
   kind: "credits" | "premium_pass";
   packId?: "s" | "m" | "l";
@@ -428,6 +436,7 @@ function PayDialogBody({
           // Pay, Google Pay). Falls back to other providers when Stripe has
           // no quote — e.g. MoonPay, which completes on their own site.
           preferredProvider: "stripe",
+          ...(ONRAMP_SANDBOX ? { environment: "sandbox" as const } : {}),
         },
       });
       if (
@@ -715,7 +724,7 @@ function PayDialogBody({
             </div>
           )}
 
-          {authenticated && funded && (
+          {authenticated && funded && !ONRAMP_SANDBOX && (
             <div className="rounded-2xl border border-border bg-background/40 p-3.5">
               <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 Complete payment
@@ -740,6 +749,16 @@ function PayDialogBody({
               {completeError && (
                 <p className="mt-2 text-xs text-destructive">{completeError}</p>
               )}
+            </div>
+          )}
+
+          {authenticated && funded && ONRAMP_SANDBOX && (
+            <div className="rounded-2xl border border-border bg-background/40 p-3.5">
+              <p className="text-xs text-muted-foreground">
+                Sandbox mode — the card flow is verified end to end and no real
+                funds move. Unset NEXT_PUBLIC_PRIVY_ONRAMP_SANDBOX to take live
+                payments.
+              </p>
             </div>
           )}
 
