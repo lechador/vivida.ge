@@ -28,23 +28,12 @@ export async function AppHeader({
   active,
 }: {
   authed: boolean;
-  active?:
-    | "today"
-    | "sky"
-    | "report"
-    | "reports"
-    | "ask"
-    | "library"
-    | "tarot"
-    | "timing"
-    | "feed"
-    | "tests"
-    | "discover"
-    | "people"
-    | "synastry"
-    | "friends"
-    | "messages"
-    | "account";
+  /**
+   * Derived from NavActiveKey instead of a hand-kept copy: the literal union
+   * silently missed new destinations (e.g. "readings") and the only symptom
+   * was a sidebar with no active highlight.
+   */
+  active?: NavActiveKey | "account";
 }) {
   let userInfo: {
     id: string;
