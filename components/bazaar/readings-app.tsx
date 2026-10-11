@@ -3,10 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import QRCode from "qrcode";
 
 import { PayBookingByCard } from "@/components/crypto/crypto-pay";
-import { buildSolanaPayUrl, serviceCover } from "@/lib/bazaar-pure";
+import { serviceCover } from "@/lib/bazaar-pure";
 
 /**
  * Insight Bazaar — single-view marketplace client. One public URL
@@ -171,21 +170,6 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
   return json as T;
 }
 
-/** Copy helper with a transient "Copied" label. */
-function useCopy(): [string | null, (text: string) => void] {
-  const [copied, setCopied] = useState<string | null>(null);
-  const copy = useCallback((text: string) => {
-    void navigator.clipboard?.writeText(text).then(
-      () => {
-        setCopied(text);
-        setTimeout(() => setCopied(null), 1600);
-      },
-      () => undefined,
-    );
-  }, []);
-  return [copied, copy];
-}
-
 export function ReadingsApp() {
   const router = useRouter();
   const params = useSearchParams();
@@ -257,9 +241,9 @@ export function ReadingsApp() {
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Tarot spreads, birth-chart interpretations, and compatibility
-            sessions from vetted readers. Pay by card or in USDC on Solana —
-            straight to your reader&apos;s wallet. Birth details stay private
-            and off-chain, always.
+            sessions from vetted readers. Pay by card — straight to your
+            reader&apos;s wallet. Birth details stay private and off-chain,
+            always.
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
@@ -512,8 +496,8 @@ export function ReadingsApp() {
             <div>
               <p className="font-semibold">Direct payment to your reader</p>
               <p className="mt-1 text-muted-foreground">
-                Pay by card or in USDC — your reader&apos;s wallet is paid
-                directly, verified on-chain before the reading begins.
+                Pay by card — your reader&apos;s wallet is paid directly,
+                verified on-chain before the reading begins.
               </p>
             </div>
             <div>
@@ -707,7 +691,6 @@ function BookingCard({
   } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, copy] = useCopy();
 
   async function reserve() {
     setBusy(true);
@@ -790,8 +773,6 @@ function BookingCard({
           priceUsdcCents={booking.priceUsdcCents}
           providerWallet={booking.providerWallet}
           wallet={wallet}
-          copied={copied}
-          copy={copy}
         />
       )}
     </div>
@@ -803,102 +784,77 @@ function PaymentStep({
   priceUsdcCents,
   providerWallet,
   wallet,
-  copied,
-  copy,
 }: {
   bookingId: string;
   priceUsdcCents: number;
   providerWallet: string;
   wallet: string | null;
-  copied: string | null;
-  copy: (t: string) => void;
 }) {
-  const [sig, setSig] = useState("");
-  const [payer, setPayer] = useState("");
-  const [qr, setQr] = useState<string | null>(null);
   const [state, setState] = useState<
     "idle" | "checking" | "paid" | "pending" | "failed"
   >("idle");
   const [detail, setDetail] = useState<string | null>(null);
 
-  const payUrl = buildSolanaPayUrl({
-    recipient: wallet ?? providerWallet,
-    priceUsdcCents,
-    label: "Vivida",
-    message: "Insight Bazaar reading",
-  });
-
-  useEffect(() => {
-    if (!payUrl) return;
-    let live = true;
-    QRCode.toDataURL(payUrl, { width: 200, margin: 1 })
-      .then((url) => {
-        if (live) setQr(url);
-      })
-      .catch(() => undefined);
-    return () => {
-      live = false;
-    };
-  }, [payUrl]);
-
   async function verifyWith(txSignature: string, payerWallet: string) {
     if (!txSignature.trim() || !payerWallet.trim()) return;
     setState("checking");
     setDetail(null);
-    try {
-      const d = await api<{ ok: boolean; status?: string; reason?: string }>(
-        `/api/bazaar/bookings/${bookingId}/verify-payment`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            txSignature: txSignature.trim(),
-            payerWallet: payerWallet.trim(),
-          }),
-        },
-      );
-      if (d.status === "paid" || d.status === "delivered") {
-        setState("paid");
-        return;
+    // 202 (accepted, not indexed yet) and 503 (RPC busy) are transient — the
+    // chain usually catches up within a minute, so poll before giving up.
+    for (let attempt = 0; attempt < 8; attempt++) {
+      try {
+        const d = await api<{ ok: boolean; status?: string; reason?: string }>(
+          `/api/bazaar/bookings/${bookingId}/verify-payment`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              txSignature: txSignature.trim(),
+              payerWallet: payerWallet.trim(),
+            }),
+          },
+        );
+        if (d.status === "paid" || d.status === "delivered") {
+          setState("paid");
+          return;
+        }
+        // 202: accepted but not indexed yet — poll again below.
+      } catch (e) {
+        const status = (e as { status?: number }).status;
+        const reason = (e as { reason?: string }).reason;
+        if (status === 503 || reason === "unavailable") {
+          // RPC busy — retry below.
+        } else if (reason === "underpaid") {
+          setState("failed");
+          setDetail(
+            `This payment paid less than ${price(priceUsdcCents)} USDC to the reader's wallet — contact support with your transaction.`,
+          );
+          return;
+        } else if (reason === "already_used") {
+          setState("failed");
+          setDetail(
+            "This payment is already linked to another booking. Each on-chain payment funds exactly one reading.",
+          );
+          return;
+        } else if (reason === "not_signer") {
+          setState("failed");
+          setDetail(
+            "That transaction wasn't sent from your wallet — contact support with your transaction.",
+          );
+          return;
+        } else {
+          setState("failed");
+          setDetail(
+            "We couldn't match this payment to your booking — contact support with your transaction.",
+          );
+          return;
+        }
       }
-      // 202: accepted, the chain just hasn't indexed the signature yet.
-      setState("pending");
-      setDetail(
-        "The network hasn't indexed this transaction yet — it usually appears within a minute. Wait a little, then check again.",
-      );
-    } catch (e) {
-      const status = (e as { status?: number }).status;
-      const reason = (e as { reason?: string }).reason;
-      if (status === 503 || reason === "unavailable") {
-        setState("pending");
-        setDetail(
-          "We couldn't reach the payment network just now — give it a minute and check again.",
-        );
-      } else if (reason === "underpaid") {
-        setState("failed");
-        setDetail(
-          `This transaction paid less than ${price(priceUsdcCents)} USDC to the reader's wallet. Send the full amount, then submit the new signature.`,
-        );
-      } else if (reason === "already_used") {
-        setState("failed");
-        setDetail(
-          "This payment is already linked to another booking. Each on-chain payment funds exactly one reading.",
-        );
-      } else if (reason === "not_signer") {
-        setState("failed");
-        setDetail(
-          "That transaction wasn't sent from the wallet address above. Check the address matches the wallet you paid with.",
-        );
-      } else {
-        setState("failed");
-        setDetail(
-          "We couldn't match this signature to your payment. Double-check you pasted the full signature of the transfer to the address above.",
-        );
-      }
+      await new Promise((r) => setTimeout(r, 5000));
     }
-  }
-
-  async function verify() {
-    await verifyWith(sig, payer);
+    setState("pending");
+    setDetail(
+      "The network hasn't indexed this transaction yet. It usually appears within a minute — refresh the page shortly and the booking will show as paid.",
+    );
   }
 
   if (state === "paid") {
@@ -922,98 +878,11 @@ function PaymentStep({
           void verifyWith(signature, payerWallet)
         }
       />
-      <p className="mt-5 border-t border-border/40 pt-5 font-semibold">
-        Or pay {price(priceUsdcCents)} USDC from your wallet
-      </p>
-      <ol className="mt-3 list-decimal space-y-3 pl-5 text-muted-foreground">
-        <li>
-          Pay exactly{" "}
-          <strong className="text-foreground">
-            {price(priceUsdcCents)} USDC
-          </strong>{" "}
-          on <strong className="text-foreground">Solana</strong> — scan the code
-          or open your wallet with the amount prefilled:
-          {qr && payUrl ? (
-            <div className="mt-3 flex flex-col items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={qr}
-                alt={`QR code: pay ${price(priceUsdcCents)} USDC to the reader`}
-                width={180}
-                height={180}
-                className="rounded-xl border border-border/60 bg-white p-2"
-              />
-              <a
-                href={payUrl}
-                className="rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2 text-sm font-semibold text-white"
-              >
-                Open in wallet
-              </a>
-            </div>
-          ) : null}
-          <p className="mt-2">
-            Or send manually from Phantom, Solflare, or any wallet to:
-          </p>
-          <div className="mt-2 flex items-center gap-2">
-            <code className="min-w-0 flex-1 break-all rounded-lg bg-background/70 px-2 py-1.5 font-mono text-[11px] text-foreground">
-              {wallet ?? providerWallet}
-            </code>
-            <button
-              onClick={() => copy(wallet ?? providerWallet)}
-              className="shrink-0 rounded-lg border border-border/60 px-2.5 py-1.5 text-xs font-medium hover:border-foreground/40"
-            >
-              {copied === (wallet ?? providerWallet) ? "Copied" : "Copy"}
-            </button>
-          </div>
-        </li>
-        <li>
-          Paste the wallet address you paid from — we check the payment was
-          really sent by you.
-          <input
-            value={payer}
-            onChange={(e) => {
-              setPayer(e.target.value);
-              if (state !== "idle") setState("idle");
-            }}
-            placeholder="Your Solana wallet address"
-            spellCheck={false}
-            className="mt-2 w-full rounded-xl border border-border/60 bg-background/60 px-3 py-2 font-mono text-xs outline-none placeholder:font-sans placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60"
-          />
-        </li>
-        <li>
-          Paste the transaction signature below.
-          <input
-            value={sig}
-            onChange={(e) => {
-              setSig(e.target.value);
-              if (state !== "idle") setState("idle");
-            }}
-            placeholder="e.g. 5UfDu…"
-            spellCheck={false}
-            className="mt-2 w-full rounded-xl border border-border/60 bg-background/60 px-3 py-2 font-mono text-xs outline-none placeholder:font-sans placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60"
-          />
-        </li>
-      </ol>
       {state === "pending" || state === "failed" ? (
         <p className="mt-3 rounded-xl bg-card/60 p-3 text-xs leading-relaxed text-muted-foreground">
           {detail}
         </p>
       ) : null}
-      <button
-        onClick={verify}
-        disabled={state === "checking" || !sig.trim() || !payer.trim()}
-        className="mt-4 w-full rounded-xl bg-foreground px-4 py-3 text-sm font-semibold text-background disabled:opacity-50"
-      >
-        {state === "checking" ? "Checking Solana…" : "I've paid — verify"}
-      </button>
-      <a
-        href={`https://solscan.io/account/${wallet ?? providerWallet}`}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-3 block text-center text-xs text-muted-foreground underline-offset-2 hover:underline"
-      >
-        View the reader&apos;s wallet on Solscan
-      </a>
     </div>
   );
 }
@@ -1323,8 +1192,6 @@ function BuyerBookingCard({
   booking: BookingBuyer;
   onDone: () => void;
 }) {
-  const [sig, setSig] = useState("");
-  const [payer, setPayer] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [review, setReview] = useState("");
@@ -1332,56 +1199,63 @@ function BuyerBookingCard({
   const [reviewBusy, setReviewBusy] = useState(false);
   const [reviewed, setReviewed] = useState(false);
 
-  const payUrl = buildSolanaPayUrl({
-    recipient: booking.providerWallet,
-    priceUsdcCents: booking.priceUsdcCents,
-    label: "Vivida",
-    message: "Insight Bazaar reading",
-  });
-
   async function verifyWith(txSignature: string, payerWallet: string) {
     setBusy(true);
     setMsg(null);
     try {
-      const d = await api<{ ok: boolean; status?: string; reason?: string }>(
-        `/api/bazaar/bookings/${booking.id}/verify-payment`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            txSignature: txSignature.trim(),
-            payerWallet: payerWallet.trim(),
-          }),
-        },
-      );
-      if (d.status === "paid" || d.status === "delivered") {
-        onDone();
-        return;
+      // 202 (accepted, not indexed yet) and 503 (RPC busy) are transient —
+      // the chain usually catches up within a minute, so poll before giving up.
+      for (let attempt = 0; attempt < 8; attempt++) {
+        try {
+          const d = await api<{
+            ok: boolean;
+            status?: string;
+            reason?: string;
+          }>(`/api/bazaar/bookings/${booking.id}/verify-payment`, {
+            method: "POST",
+            body: JSON.stringify({
+              txSignature: txSignature.trim(),
+              payerWallet: payerWallet.trim(),
+            }),
+          });
+          if (d.status === "paid" || d.status === "delivered") {
+            onDone();
+            return;
+          }
+          // 202: accepted but not indexed yet — poll again below.
+        } catch (e) {
+          const status = (e as { status?: number }).status;
+          const reason = (e as { reason?: string }).reason;
+          if (status === 503 || reason === "unavailable") {
+            // RPC busy — retry below.
+          } else if (reason === "underpaid") {
+            setMsg(
+              `That payment is short of ${price(booking.priceUsdcCents)} USDC — contact support with your transaction.`,
+            );
+            return;
+          } else if (reason === "already_used") {
+            setMsg("That payment already funds another booking.");
+            return;
+          } else if (reason === "not_signer") {
+            setMsg(
+              "That transaction wasn't sent from your wallet — contact support with your transaction.",
+            );
+            return;
+          } else {
+            setMsg(
+              "We couldn't match this payment to your booking — contact support with your transaction.",
+            );
+            return;
+          }
+        }
+        await new Promise((r) => setTimeout(r, 5000));
       }
-      // 202: accepted, the chain just hasn't indexed the signature yet.
-      setMsg("Not indexed yet — wait a minute and try again.");
-    } catch (e) {
-      const status = (e as { status?: number }).status;
-      const reason = (e as { reason?: string }).reason;
       setMsg(
-        status === 503 || reason === "unavailable"
-          ? "We couldn't reach the payment network just now — give it a minute and check again."
-          : reason === "underpaid"
-            ? `That payment is short of ${price(booking.priceUsdcCents)} USDC. Send the full amount, then verify the new signature.`
-            : reason === "already_used"
-              ? "That payment already funds another booking."
-              : reason === "not_signer"
-                ? "That transaction wasn't sent from the wallet above."
-                : (e as Error).message === "invalid_payer_wallet"
-                  ? "Enter the wallet address you paid from."
-                  : "No matching payment found. Check the signature and try again.",
+        "The network hasn't indexed this transaction yet. It usually appears within a minute — check back shortly.",
       );
     } finally {
       setBusy(false);
     }
-  }
-
-  async function verify() {
-    await verifyWith(sig, payer);
   }
 
   async function sendReview() {
@@ -1443,49 +1317,7 @@ function BuyerBookingCard({
               void verifyWith(signature, payerWallet)
             }
           />
-          <p className="mt-4 border-t border-border/40 pt-4 text-muted-foreground">
-            Or pay {price(booking.priceUsdcCents)} USDC on Solana to{" "}
-            <code className="break-all font-mono text-[11px] text-foreground">
-              {booking.providerWallet}
-            </code>{" "}
-            {payUrl ? (
-              <>
-                —{" "}
-                <a
-                  href={payUrl}
-                  className="font-medium text-[var(--vivida-cyan)] underline-offset-2 hover:underline"
-                >
-                  open in your wallet with the amount prefilled
-                </a>
-              </>
-            ) : null}
-          </p>
-          <div className="mt-2 grid gap-2">
-            <input
-              value={payer}
-              onChange={(e) => setPayer(e.target.value)}
-              placeholder="Your Solana wallet address (you paid from)"
-              spellCheck={false}
-              className="w-full rounded-xl border border-border/60 bg-background/60 px-3 py-2 font-mono text-xs outline-none placeholder:font-sans placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60"
-            />
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <input
-                value={sig}
-                onChange={(e) => setSig(e.target.value)}
-                placeholder="Transaction signature"
-                spellCheck={false}
-                className="flex-1 rounded-xl border border-border/60 bg-background/60 px-3 py-2 font-mono text-xs outline-none placeholder:font-sans placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60"
-              />
-              <button
-                onClick={verify}
-                disabled={busy || !sig.trim() || !payer.trim()}
-                className="rounded-xl bg-foreground px-4 py-2 text-sm font-semibold text-background disabled:opacity-50"
-              >
-                {busy ? "Checking…" : "Verify"}
-              </button>
-            </div>
-          </div>
-          {msg && <p className="mt-2 text-xs text-muted-foreground">{msg}</p>}
+          {msg && <p className="mt-3 text-xs text-muted-foreground">{msg}</p>}
           <button
             onClick={cancelBooking}
             disabled={busy}
