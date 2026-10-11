@@ -28,10 +28,15 @@ import {
   countryDisplayName,
   setResidenceCountryIfMissing,
 } from "@/lib/residence";
-import { getRequestLocale } from "@/lib/i18n/request-locale";
+import {
+  getRequestLocale,
+  requestIsEnglishHost,
+} from "@/lib/i18n/request-locale";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
+import { CryptoPayHost } from "@/components/crypto/crypto-pay";
+import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export const dynamic = "force-dynamic";
@@ -86,6 +91,9 @@ export default async function SubscriptionPage({
     getPremiumSubscription(user.id),
     isPremiumUser(user.id),
   ]);
+  // English host pays in USDC (Stripe checkout is off there); the Georgian
+  // site keeps its Stripe surfaces untouched.
+  const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
   const plan = premiumPlanForCountry(identity?.countryCode);
   const country = countryDisplayName(identity?.countryCode, locale);
 
@@ -119,182 +127,199 @@ export default async function SubscriptionPage({
       : 0;
 
   return (
-    <main
-      lang={locale}
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
-    >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.36_0.16_70/0.28),transparent_70%),radial-gradient(45%_35%_at_85%_45%,oklch(0.30_0.16_300/0.4),transparent_70%)]"
-      />
-      <Starfield count={100} shooting={2} />
-      <AppHeader authed />
-      <Suspense fallback={null}>
-        <CheckoutSuccessTracker locale={locale} />
-      </Suspense>
+    <CryptoPayHost>
+      <main
+        lang={locale}
+        className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      >
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.36_0.16_70/0.28),transparent_70%),radial-gradient(45%_35%_at_85%_45%,oklch(0.30_0.16_300/0.4),transparent_70%)]"
+        />
+        <Starfield count={100} shooting={2} />
+        <AppHeader authed />
+        <Suspense fallback={null}>
+          <CheckoutSuccessTracker locale={locale} />
+        </Suspense>
 
-      <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-7 sm:px-6 sm:pt-10">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
-            <Crown className="size-4" /> Vivida PRO
+        <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-7 sm:px-6 sm:pt-10">
+          <div className="mb-6">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
+              <Crown className="size-4" /> Vivida PRO
+            </div>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-5xl">
+              {active
+                ? en
+                  ? "Your subscription"
+                  : "შენი გამოწერა"
+                : en
+                  ? "Unlimited Vivida"
+                  : "ულიმიტო Vivida"}
+            </h1>
           </div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-5xl">
-            {active
-              ? en
-                ? "Your subscription"
-                : "შენი გამოწერა"
-              : en
-                ? "Unlimited Vivida"
-                : "ულიმიტო Vivida"}
-          </h1>
-        </div>
 
-        {subscription ? (
-          <>
+          {subscription ? (
+            <>
+              <section className="rounded-3xl border border-[var(--vivida-gold)]/35 bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <div className="text-sm text-muted-foreground">
+                      Vivida PRO · {country}
+                    </div>
+                    <div className="mt-1 text-2xl font-semibold">
+                      {formatBillingAmount(
+                        subscription.amountMinor,
+                        subscription.currency,
+                        locale,
+                      )}
+                      {/* Read from the subscription, not assumed monthly — the
+                      ₾29 promo bills quarterly, and telling its buyers they
+                      pay that every month would be a false billing claim. */}
+                      <span className="text-sm font-normal text-muted-foreground">
+                        /
+                        {subscription.source === "crypto"
+                          ? en
+                            ? "one-time pass"
+                            : "ერთჯერადი პასი"
+                          : billingCadenceLabel(
+                              billingPeriodMonths(
+                                subscription.currentPeriodStart,
+                                subscription.currentPeriodEnd,
+                              ),
+                              en,
+                            )}
+                      </span>
+                    </div>
+                  </div>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${active ? "bg-emerald-400/12 text-emerald-300" : "bg-foreground/10 text-muted-foreground"}`}
+                  >
+                    {active ? "PRO" : subscription.status.replaceAll("_", " ")}
+                  </span>
+                </div>
+
+                <dl className="mt-6 grid gap-3 sm:grid-cols-2">
+                  <Detail
+                    icon={History}
+                    label={en ? "Subscribed since" : "გამოწერილია"}
+                    value={formatDate(subscription.createdAt, locale)}
+                  />
+                  <Detail
+                    icon={Hourglass}
+                    label={en ? "Time remaining" : "დარჩენილი დრო"}
+                    value={remainingLabel(daysLeft, en)}
+                  />
+                  <Detail
+                    icon={CalendarDays}
+                    label={
+                      subscription.cancelAtPeriodEnd ||
+                      subscription.source === "crypto"
+                        ? en
+                          ? "Access ends"
+                          : "წვდომა დასრულდება"
+                        : en
+                          ? "Next renewal"
+                          : "შემდეგი განახლება"
+                    }
+                    value={formatDate(subscription.currentPeriodEnd, locale)}
+                  />
+                  <Detail
+                    icon={CreditCard}
+                    label={en ? "Billing" : "გადახდა"}
+                    value={
+                      subscription.source === "crypto"
+                        ? en
+                          ? "One-time payment (USDC)"
+                          : "ერთჯერადი გადახდა (USDC)"
+                        : subscription.cancelAtPeriodEnd
+                          ? en
+                            ? "Cancellation scheduled"
+                            : "გაუქმება დაგეგმილია"
+                          : en
+                            ? "Renews automatically"
+                            : "ავტომატურად განახლდება"
+                    }
+                  />
+                </dl>
+
+                <div
+                  className="mt-4 h-1.5 overflow-hidden rounded-full bg-foreground/10"
+                  role="progressbar"
+                  aria-valuenow={Math.round(elapsedPct)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={
+                    en ? "Billing period elapsed" : "საბილინგო პერიოდი"
+                  }
+                >
+                  <div
+                    className="h-full rounded-full bg-[var(--vivida-gold)]/80"
+                    style={{ width: `${elapsedPct}%` }}
+                  />
+                </div>
+
+                <SubscriptionActions
+                  locale={locale}
+                  hasCustomer={Boolean(identity?.stripeCustomerId)}
+                />
+              </section>
+              {!active && (
+                <div className="mt-4">
+                  <PremiumPlanCard
+                    plan={plan}
+                    locale={locale}
+                    placement="subscription_page_reactivation"
+                    returnTo={returnTo}
+                    product={product}
+                    crypto={cryptoPay}
+                  />
+                </div>
+              )}
+            </>
+          ) : active && identity?.premiumUntil ? (
+            // PRO is on but there is no subscription row to bill against, so
+            // the buy card would be a lie — show the status and the time left.
             <section className="rounded-3xl border border-[var(--vivida-gold)]/35 bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="text-sm text-muted-foreground">
-                    Vivida PRO · {country}
+                    Vivida PRO
                   </div>
                   <div className="mt-1 text-2xl font-semibold">
-                    {formatBillingAmount(
-                      subscription.amountMinor,
-                      subscription.currency,
-                      locale,
-                    )}
-                    {/* Read from the subscription, not assumed monthly — the
-                      ₾29 promo bills quarterly, and telling its buyers they
-                      pay that every month would be a false billing claim. */}
-                    <span className="text-sm font-normal text-muted-foreground">
-                      /
-                      {billingCadenceLabel(
-                        billingPeriodMonths(
-                          subscription.currentPeriodStart,
-                          subscription.currentPeriodEnd,
-                        ),
-                        en,
-                      )}
-                    </span>
+                    {en ? "PRO is active" : "PRO ჩართულია"}
                   </div>
                 </div>
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-semibold ${active ? "bg-emerald-400/12 text-emerald-300" : "bg-foreground/10 text-muted-foreground"}`}
-                >
-                  {active ? "PRO" : subscription.status.replaceAll("_", " ")}
+                <span className="rounded-full bg-emerald-400/12 px-3 py-1 text-xs font-semibold text-emerald-300">
+                  PRO
                 </span>
               </div>
 
               <dl className="mt-6 grid gap-3 sm:grid-cols-2">
                 <Detail
-                  icon={History}
-                  label={en ? "Subscribed since" : "გამოწერილია"}
-                  value={formatDate(subscription.createdAt, locale)}
+                  icon={CalendarDays}
+                  label={en ? "Active until" : "აქტიურია"}
+                  value={formatDate(identity.premiumUntil, locale)}
                 />
                 <Detail
                   icon={Hourglass}
                   label={en ? "Time remaining" : "დარჩენილი დრო"}
-                  value={remainingLabel(daysLeft, en)}
-                />
-                <Detail
-                  icon={CalendarDays}
-                  label={
-                    subscription.cancelAtPeriodEnd
-                      ? en
-                        ? "Access ends"
-                        : "წვდომა დასრულდება"
-                      : en
-                        ? "Next renewal"
-                        : "შემდეგი განახლება"
-                  }
-                  value={formatDate(subscription.currentPeriodEnd, locale)}
-                />
-                <Detail
-                  icon={CreditCard}
-                  label={en ? "Billing" : "გადახდა"}
-                  value={
-                    subscription.cancelAtPeriodEnd
-                      ? en
-                        ? "Cancellation scheduled"
-                        : "გაუქმება დაგეგმილია"
-                      : en
-                        ? "Renews automatically"
-                        : "ავტომატურად განახლდება"
-                  }
+                  value={remainingLabel(directDaysLeft, en)}
                 />
               </dl>
-
-              <div
-                className="mt-4 h-1.5 overflow-hidden rounded-full bg-foreground/10"
-                role="progressbar"
-                aria-valuenow={Math.round(elapsedPct)}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={en ? "Billing period elapsed" : "საბილინგო პერიოდი"}
-              >
-                <div
-                  className="h-full rounded-full bg-[var(--vivida-gold)]/80"
-                  style={{ width: `${elapsedPct}%` }}
-                />
-              </div>
-
-              <SubscriptionActions
-                locale={locale}
-                hasCustomer={Boolean(identity?.stripeCustomerId)}
-              />
             </section>
-            {!active && (
-              <div className="mt-4">
-                <PremiumPlanCard
-                  plan={plan}
-                  locale={locale}
-                  placement="subscription_page_reactivation"
-                  returnTo={returnTo}
-                  product={product}
-                />
-              </div>
-            )}
-          </>
-        ) : active && identity?.premiumUntil ? (
-          // PRO is on but there is no subscription row to bill against, so
-          // the buy card would be a lie — show the status and the time left.
-          <section className="rounded-3xl border border-[var(--vivida-gold)]/35 bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <div className="text-sm text-muted-foreground">Vivida PRO</div>
-                <div className="mt-1 text-2xl font-semibold">
-                  {en ? "PRO is active" : "PRO ჩართულია"}
-                </div>
-              </div>
-              <span className="rounded-full bg-emerald-400/12 px-3 py-1 text-xs font-semibold text-emerald-300">
-                PRO
-              </span>
-            </div>
-
-            <dl className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Detail
-                icon={CalendarDays}
-                label={en ? "Active until" : "აქტიურია"}
-                value={formatDate(identity.premiumUntil, locale)}
-              />
-              <Detail
-                icon={Hourglass}
-                label={en ? "Time remaining" : "დარჩენილი დრო"}
-                value={remainingLabel(directDaysLeft, en)}
-              />
-            </dl>
-          </section>
-        ) : (
-          <PremiumPlanCard
-            plan={plan}
-            locale={locale}
-            placement="subscription_page"
-            returnTo={returnTo}
-            product={product}
-          />
-        )}
-      </section>
-    </main>
+          ) : (
+            <PremiumPlanCard
+              plan={plan}
+              locale={locale}
+              placement="subscription_page"
+              returnTo={returnTo}
+              product={product}
+              crypto={cryptoPay}
+            />
+          )}
+        </section>
+      </main>
+    </CryptoPayHost>
   );
 }
 

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   createCheckout: vi.fn(),
+  isCryptoPayConfigured: vi.fn(),
   isStripeConfigured: vi.fn(),
   getBillingIdentity: vi.fn(),
 }));
@@ -21,6 +22,9 @@ vi.mock("@/lib/stripe", () => ({
   createCreditCheckoutSession: mocks.createCheckout,
   isStripeConfigured: mocks.isStripeConfigured,
 }));
+vi.mock("@/lib/crypto-pay", () => ({
+  isCryptoPayConfigured: mocks.isCryptoPayConfigured,
+}));
 
 import { POST } from "@/app/api/credits/checkout/route";
 
@@ -38,6 +42,7 @@ describe("POST /api/credits/checkout", () => {
       user: { id: "user-1", email: "user@example.com" },
     });
     mocks.isStripeConfigured.mockReturnValue(true);
+    mocks.isCryptoPayConfigured.mockReturnValue(true);
     mocks.getBillingIdentity.mockResolvedValue({ countryCode: "GE" });
     mocks.createCheckout.mockResolvedValue({
       id: "cs_test_1",
@@ -111,7 +116,7 @@ describe("POST /api/credits/checkout", () => {
     );
   });
 
-  it("creates an English Checkout session on the international domain", async () => {
+  it("refuses Stripe checkout on the English domain (crypto rail only)", async () => {
     const response = await POST(
       new Request("https://vividaastro.com/api/credits/checkout", {
         method: "POST",
@@ -120,15 +125,24 @@ describe("POST /api/credits/checkout", () => {
       }),
     );
 
-    expect(response.status).toBe(200);
-    expect(mocks.createCheckout).toHaveBeenCalledWith(
-      expect.objectContaining({
-        locale: "en",
-        credits: 75,
-        amountMinor: 1490,
-        currency: "gel",
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({ error: "crypto_only" });
+    expect(mocks.createCheckout).not.toHaveBeenCalled();
+  });
+
+  it("keeps Stripe on the English domain until the crypto rail is configured", async () => {
+    mocks.isCryptoPayConfigured.mockReturnValue(false);
+
+    const response = await POST(
+      new Request("https://vividaastro.com/api/credits/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ packId: "s" }),
       }),
     );
+
+    expect(response.status).toBe(200);
+    expect(mocks.createCheckout).toHaveBeenCalled();
   });
 
   it("uses the UK credit catalogue for UK residents", async () => {
@@ -153,7 +167,7 @@ describe("POST /api/credits/checkout", () => {
     });
 
     const response = await POST(
-      new Request("https://vividaastro.com/api/credits/checkout", {
+      new Request("https://vivida.ge/api/credits/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ packId: "s" }),
@@ -173,7 +187,7 @@ describe("POST /api/credits/checkout", () => {
         credits: 30,
         amountMinor: 99_000,
         currency: "amd",
-        locale: "en",
+        locale: "ka",
       }),
     );
   });

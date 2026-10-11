@@ -1,34 +1,26 @@
 /**
  * Insight Bazaar pure helpers — zero `@/db` imports so vitest loads this
  * without DATABASE_URL. DB access lives in `lib/bazaar.ts`.
+ *
+ * The USDC / Solana payment primitives moved to `lib/usdc-pure.ts` (shared
+ * with the platform crypto rail) and are re-exported here so existing
+ * bazaar imports keep working unchanged.
  */
 
-/** Solana mainnet USDC mint (6 decimals). */
-export const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
-export const USDC_DECIMALS = 6;
+import { isValidSolanaAddress } from "./usdc-pure";
 
-export function solanaRpcUrl(): string {
-  return (
-    process.env.SOLANA_RPC_URL?.trim() || "https://api.mainnet-beta.solana.com"
-  );
-}
-
-const BASE58 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-
-/** Loose mainnet address check (base58, 32–44 chars). */
-export function isValidSolanaAddress(value: unknown): value is string {
-  return typeof value === "string" && BASE58.test(value.trim());
-}
-
-/** USDC cents (999) → base units (9_990_000). MVP cents keep 2-decimal math. */
-export function usdcCentsToBaseUnits(cents: number): number {
-  return Math.round(cents) * 10_000;
-}
-
-/** Base units → display string, e.g. 9_990_000 → "9.99". */
-export function formatUsdc(cents: number): string {
-  return `${(cents / 100).toFixed(2)} USDC`;
-}
+export {
+  USDC_MINT,
+  USDC_DECIMALS,
+  solanaRpcUrl,
+  isValidSolanaAddress,
+  base58Encode,
+  usdcCentsToBaseUnits,
+  formatUsdc,
+  normalizeSignature,
+  usdcDeltaForRecipient,
+  buildSolanaPayUrl,
+} from "./usdc-pure";
 
 export const BAZAAR_CATEGORIES = [
   "tarot",
@@ -196,120 +188,4 @@ export function validateServiceInput(body: {
 export function validateRating(value: unknown): number | null {
   const n = typeof value === "number" ? value : Number(value);
   return Number.isInteger(n) && n >= 1 && n <= 5 ? n : null;
-}
-
-// ── On-chain USDC payment parsing ──────────────────────────────────────────
-// getTransaction(jsonParsed) reports SPL balances in
-// meta.preTokenBalances / postTokenBalances: [{ mint, owner, uiTokenAmount:
-// { amount: "<base units>" } }]. The buyer pays the provider's plain wallet,
-// so the credit lands in their associated token account with owner == wallet.
-// Summing the owner's delta across all accounts handles that without ever
-// touching ATA derivation.
-
-type TokenBalance = {
-  mint?: unknown;
-  owner?: unknown;
-  uiTokenAmount?: { amount?: unknown };
-};
-
-function balanceAmount(b: TokenBalance): bigint {
-  const raw = b?.uiTokenAmount?.amount;
-  if (typeof raw !== "string" || !/^\d+$/.test(raw)) return BigInt(0);
-  try {
-    return BigInt(raw);
-  } catch {
-    return BigInt(0);
-  }
-}
-
-/**
- * Net USDC base-unit delta credited to `recipientWallet` in one confirmed
- * transaction. Returns 0n when the tx carries no USDC movement to them.
- */
-export function usdcDeltaForRecipient(
-  preTokenBalances: TokenBalance[] | null | undefined,
-  postTokenBalances: TokenBalance[] | null | undefined,
-  recipientWallet: string,
-  mint: string = USDC_MINT,
-): bigint {
-  const sum = (rows: TokenBalance[] | null | undefined): bigint =>
-    (rows ?? []).reduce(
-      (acc, b) =>
-        b?.mint === mint && b?.owner === recipientWallet
-          ? acc + balanceAmount(b)
-          : acc,
-      BigInt(0),
-    );
-  return sum(postTokenBalances) - sum(preTokenBalances);
-}
-
-/** Base58 signatures run 87–88 chars for 64 bytes. */
-const BASE58_ALPHABET =
-  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
-/**
- * Decoded byte length of a base58 string (big-endian; leading '1's are
- * leading zero bytes). -1 when the string contains non-base58 characters.
- */
-function base58ByteLength(value: string): number {
-  let leadingZeros = 0;
-  for (const ch of value) {
-    if (ch !== "1") break;
-    leadingZeros += 1;
-  }
-  let n = BigInt(0);
-  const base = BigInt(58);
-  for (const ch of value) {
-    const digit = BASE58_ALPHABET.indexOf(ch);
-    if (digit === -1) return -1;
-    n = n * base + BigInt(digit);
-  }
-  let bytes = leadingZeros;
-  const byte = BigInt(256);
-  while (n > BigInt(0)) {
-    n = n / byte;
-    bytes += 1;
-  }
-  return bytes;
-}
-
-/**
- * Signature check: bounds and charset stay lenient, but the string must
- * decode to exactly 64 bytes — a real signature's size. Charset alone is
- * not enough: 88 chars of valid base58 can decode to 65+ bytes, which the
- * RPC rejects as `WrongSize`, surfacing to the buyer as unrelated
- * "network trouble" instead of "that's not a signature".
- */
-export function normalizeSignature(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  if (!/^[1-9A-HJ-NP-Za-km-z]{80,128}$/.test(trimmed)) return null;
-  return base58ByteLength(trimmed) === 64 ? trimmed : null;
-}
-
-/**
- * Solana Pay transfer URL for one fixed-price USDC payment. Opens the
- * buyer's wallet with recipient + exact amount prefilled — scan or tap.
- * Returns null for invalid input. Reference: Solana Pay spec
- * (https://docs.solanapay.com/specification).
- */
-export function buildSolanaPayUrl(input: {
-  recipient: string;
-  priceUsdcCents: number;
-  label?: string;
-  message?: string;
-}): string | null {
-  const to = typeof input.recipient === "string" ? input.recipient.trim() : "";
-  const cents = Math.round(Number(input.priceUsdcCents));
-  if (!isValidSolanaAddress(to) || !Number.isInteger(cents) || cents <= 0) {
-    return null;
-  }
-  const amount = (cents / 100).toFixed(2);
-  const params = new URLSearchParams({
-    amount,
-    "spl-token": USDC_MINT,
-  });
-  if (input.label) params.set("label", input.label);
-  if (input.message) params.set("message", input.message);
-  return `solana:${to}?${params.toString()}`;
 }

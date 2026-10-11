@@ -14,3 +14,4 @@ export * from "./tables/articles";
 export * from "./tables/relations";
 export * from "./tables/pwa";
 export * from "./tables/bazaar";
+export * from "./tables/crypto";

@@ -17,6 +17,7 @@ import {
   formatBillingAmount,
   shouldShowPurchasePromotion,
 } from "@/lib/credits-config";
+import { USDC_CREDIT_PACKS, USDC_PREMIUM_PASS } from "@/lib/crypto-config";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import {
   DropdownMenu,
@@ -33,16 +34,26 @@ export function CreditBalanceMenu({
   locale,
   isPremium = false,
   countryCode,
+  crypto = false,
 }: {
   balance: number;
   locale: UserLocale;
   isPremium?: boolean;
   countryCode?: string | null;
+  /** English site: quick top-up links to the USDC dialog on /credits. */
+  crypto?: boolean;
 }) {
   const [pending, setPending] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const en = locale !== "ka";
-  const packs = creditPacksForCountry(countryCode);
+  const packs: readonly {
+    id: "s" | "m" | "l";
+    credits: number;
+    amountMinor: number;
+    currency: string;
+  }[] = crypto
+    ? USDC_CREDIT_PACKS.map((pack) => ({ ...pack, currency: "usdc" }))
+    : creditPacksForCountry(countryCode);
   const featuredPro = featuredPremiumPlanForCountry(countryCode);
   const proMonths = featuredPro.intervalCount ?? 1;
 
@@ -123,34 +134,51 @@ export function CreditBalanceMenu({
         </div>
 
         <div className="grid grid-cols-3 gap-2">
-          {packs.map((pack, index) => (
-            <button
-              key={pack.id}
-              type="button"
-              disabled={pending !== null}
-              onClick={() => buy(pack.id)}
-              className="relative flex min-h-24 flex-col items-center justify-center rounded-2xl border border-border/70 bg-background/45 px-2 py-3 text-center transition-all hover:-translate-y-0.5 hover:border-[var(--vivida-cyan)]/55 hover:bg-[var(--vivida-cyan)]/8 disabled:opacity-60"
-            >
-              {index === 0 && (
-                <span className="absolute -top-1.5 rounded-full bg-[var(--vivida-cyan)] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[oklch(0.14_0.02_260)]">
-                  {en ? "Popular" : "რჩეული"}
+          {packs.map((pack, index) => {
+            const cardClass =
+              "relative flex min-h-24 flex-col items-center justify-center rounded-2xl border border-border/70 bg-background/45 px-2 py-3 text-center transition-all hover:-translate-y-0.5 hover:border-[var(--vivida-cyan)]/55 hover:bg-[var(--vivida-cyan)]/8 disabled:opacity-60";
+            const cardBody = (
+              <>
+                {index === 0 && (
+                  <span className="absolute -top-1.5 rounded-full bg-[var(--vivida-cyan)] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[oklch(0.14_0.02_260)]">
+                    {en ? "Popular" : "რჩეული"}
+                  </span>
+                )}
+                {pending === pack.id ? (
+                  <Loader2 className="size-5 animate-spin text-[var(--vivida-cyan)]" />
+                ) : (
+                  <span className="text-lg font-bold tabular-nums">
+                    {pack.credits}
+                  </span>
+                )}
+                <span className="text-[10px] text-muted-foreground">
+                  {en ? "credits" : "კრედიტი"}
                 </span>
-              )}
-              {pending === pack.id ? (
-                <Loader2 className="size-5 animate-spin text-[var(--vivida-cyan)]" />
-              ) : (
-                <span className="text-lg font-bold tabular-nums">
-                  {pack.credits}
+                <span className="mt-1 text-sm font-semibold tabular-nums">
+                  {formatBillingAmount(pack.amountMinor, pack.currency, locale)}
                 </span>
-              )}
-              <span className="text-[10px] text-muted-foreground">
-                {en ? "credits" : "კრედიტი"}
-              </span>
-              <span className="mt-1 text-sm font-semibold tabular-nums">
-                {formatBillingAmount(pack.amountMinor, pack.currency, locale)}
-              </span>
-            </button>
-          ))}
+              </>
+            );
+            return crypto ? (
+              <Link
+                key={pack.id}
+                href={`/credits?pack=${pack.id}&product=header_menu`}
+                className={cardClass}
+              >
+                {cardBody}
+              </Link>
+            ) : (
+              <button
+                key={pack.id}
+                type="button"
+                disabled={pending !== null}
+                onClick={() => buy(pack.id)}
+                className={cardClass}
+              >
+                {cardBody}
+              </button>
+            );
+          })}
         </div>
 
         {shouldShowPurchasePromotion({ isPremium, balance }) && (
@@ -163,13 +191,15 @@ export function CreditBalanceMenu({
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-xs font-semibold text-foreground">
-                {proMonths > 1
-                  ? en
-                    ? `${proMonths} months of Vivida PRO`
-                    : `${proMonths} თვე Vivida PRO`
-                  : en
-                    ? "Unlimited with PRO"
-                    : "ულიმიტო წვდომა PRO-თი"}
+                {crypto
+                  ? "Vivida PRO — 30-day pass"
+                  : proMonths > 1
+                    ? en
+                      ? `${proMonths} months of Vivida PRO`
+                      : `${proMonths} თვე Vivida PRO`
+                    : en
+                      ? "Unlimited with PRO"
+                      : "ულიმიტო წვდომა PRO-თი"}
               </span>
               <span className="block text-[10px] text-muted-foreground">
                 {en
@@ -179,21 +209,29 @@ export function CreditBalanceMenu({
             </span>
             <span className="shrink-0 text-right">
               <span className="block text-sm font-bold text-[var(--vivida-gold)]">
-                {formatBillingAmount(
-                  featuredPro.amountMinor,
-                  featuredPro.currency,
-                  locale,
-                )}
+                {crypto
+                  ? formatBillingAmount(
+                      USDC_PREMIUM_PASS.amountMinor,
+                      "usdc",
+                      locale,
+                    )
+                  : formatBillingAmount(
+                      featuredPro.amountMinor,
+                      featuredPro.currency,
+                      locale,
+                    )}
               </span>
               <span className="block text-[9px] text-muted-foreground">
                 /
-                {proMonths > 1
-                  ? en
-                    ? `${proMonths} mo`
-                    : `${proMonths} თვე`
-                  : en
-                    ? "mo"
-                    : "თვე"}
+                {crypto
+                  ? "30 days"
+                  : proMonths > 1
+                    ? en
+                      ? `${proMonths} mo`
+                      : `${proMonths} თვე`
+                    : en
+                      ? "mo"
+                      : "თვე"}
               </span>
             </span>
             <ArrowRight className="size-3.5 shrink-0 text-[var(--vivida-gold)]" />

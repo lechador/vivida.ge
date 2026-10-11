@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   createCheckout: vi.fn(),
   getBillingIdentity: vi.fn(),
   getLowCreditOffer: vi.fn(),
+  isCryptoPayConfigured: vi.fn(),
   isPremiumUser: vi.fn(),
   isStripeConfigured: vi.fn(),
 }));
@@ -20,6 +21,9 @@ vi.mock("@/lib/promo-offer", () => ({
 vi.mock("@/lib/stripe", () => ({
   createPremiumCheckoutSession: mocks.createCheckout,
   isStripeConfigured: mocks.isStripeConfigured,
+}));
+vi.mock("@/lib/crypto-pay", () => ({
+  isCryptoPayConfigured: mocks.isCryptoPayConfigured,
 }));
 
 import { POST } from "@/app/api/subscription/checkout/route";
@@ -41,11 +45,12 @@ describe("POST /api/subscription/checkout", () => {
     mocks.getLowCreditOffer.mockResolvedValue(null);
     mocks.isPremiumUser.mockResolvedValue(false);
     mocks.isStripeConfigured.mockReturnValue(true);
+    mocks.isCryptoPayConfigured.mockReturnValue(true);
   });
 
   it("uses the live Armenian catalogue values rather than the Georgian fallback", async () => {
     const response = await POST(
-      new Request("https://vividaastro.com/api/subscription/checkout", {
+      new Request("https://vivida.ge/api/subscription/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({}),
@@ -111,7 +116,7 @@ describe("POST /api/subscription/checkout", () => {
 
   it("rejects a plan that is not available in the user's market", async () => {
     const response = await POST(
-      new Request("https://vividaastro.com/api/subscription/checkout", {
+      new Request("https://vivida.ge/api/subscription/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ planKey: "promo_ge_quarterly" }),
@@ -121,5 +126,34 @@ describe("POST /api/subscription/checkout", () => {
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({ error: "invalid_plan" });
     expect(mocks.createCheckout).not.toHaveBeenCalled();
+  });
+
+  it("refuses Stripe checkout on the English domain (crypto rail only)", async () => {
+    const response = await POST(
+      new Request("https://vividaastro.com/api/subscription/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({}),
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({ error: "crypto_only" });
+    expect(mocks.createCheckout).not.toHaveBeenCalled();
+  });
+
+  it("keeps Stripe on the English domain until the crypto rail is configured", async () => {
+    mocks.isCryptoPayConfigured.mockReturnValue(false);
+
+    const response = await POST(
+      new Request("https://vividaastro.com/api/subscription/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({}),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.createCheckout).toHaveBeenCalled();
   });
 });

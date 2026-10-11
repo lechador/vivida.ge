@@ -9,15 +9,17 @@ import {
   CREDIT_COST,
   formatBillingAmount,
 } from "@/lib/credits-config";
+import { USDC_CREDIT_PACKS } from "@/lib/crypto-config";
+import { PayWithUsdcButton } from "@/components/crypto/crypto-pay";
 import { fbTrack } from "@/lib/fb-pixel";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Stripe credit top-up — pick a pack, redirect to Checkout. The webhook awards
- * the credits on completion, so on return the /credits balance is already
- * updated.
+ * Credit top-up — Stripe Checkout on the Georgian site; on the English site
+ * (`crypto`) a pack opens the USDC payment dialog instead, and the server
+ * verifies the on-chain transfer before awarding the credits.
  */
 export function TopUpCard({
   locale,
@@ -27,6 +29,7 @@ export function TopUpCard({
   returnTo,
   product,
   selectedPackId,
+  crypto = false,
 }: {
   locale: UserLocale;
   countryCode?: string | null;
@@ -35,9 +38,18 @@ export function TopUpCard({
   returnTo?: string | null;
   product?: string | null;
   selectedPackId?: "s" | "m" | "l" | null;
+  /** English site: pay in USDC on Solana (Stripe is off there). */
+  crypto?: boolean;
 }) {
   const en = locale !== "ka";
-  const packs = creditPacksForCountry(countryCode);
+  const packs: readonly {
+    id: "s" | "m" | "l";
+    credits: number;
+    amountMinor: number;
+    currency: string;
+  }[] = crypto
+    ? USDC_CREDIT_PACKS.map((pack) => ({ ...pack, currency: "usdc" }))
+    : creditPacksForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const deficit =
@@ -46,8 +58,10 @@ export function TopUpCard({
   const recommendedId = selectedPack
     ? selectedPack.id
     : deficit
-      ? (packs.find((pack) => pack.credits >= deficit) ?? packs[packs.length - 1])
-          .id
+      ? (
+          packs.find((pack) => pack.credits >= deficit) ??
+          packs[packs.length - 1]
+        ).id
       : (packs[1]?.id ?? packs[0].id);
   const isTarot = product === "tarot";
 
@@ -141,7 +155,11 @@ export function TopUpCard({
         </div>
         <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
           <Check className="size-3.5 text-[var(--vivida-cyan)]" />
-          {en ? "Secure one-time payment" : "ერთჯერადი უსაფრთხო გადახდა"}
+          {crypto
+            ? "Pay in USDC · Solana"
+            : en
+              ? "Secure one-time payment"
+              : "ერთჯერადი უსაფრთხო გადახდა"}
         </span>
       </div>
       <h2 className="mt-2 text-xl font-semibold tracking-tight">
@@ -170,33 +188,28 @@ export function TopUpCard({
                 ? "Your choice"
                 : "შენი არჩევანი"
               : featured && deficit
-              ? en
-                ? "Recommended"
-                : "რეკომენდებული"
-              : i === 0
                 ? en
-                  ? "Starter"
-                  : "საწყისი"
-                : i === 1
+                  ? "Recommended"
+                  : "რეკომენდებული"
+                : i === 0
                   ? en
-                    ? "Most popular"
-                    : "რჩეული"
-                  : en
-                    ? "Best value"
-                    : "საუკეთესო ფასი";
-          return (
-            <button
-              key={p.id}
-              type="button"
-              disabled={pending !== null}
-              onClick={() => buy(p.id)}
-              className={cn(
-                "relative flex min-w-0 flex-col items-center gap-1 rounded-2xl border-2 px-2 py-4 transition-all hover:-translate-y-0.5 disabled:opacity-60 sm:p-5",
-                featured
-                  ? "border-[var(--vivida-cyan)] bg-[var(--vivida-cyan)]/8 shadow-[0_0_28px_-10px_var(--vivida-cyan)]"
-                  : "border-border bg-background/40 hover:border-[var(--vivida-violet)]/50",
-              )}
-            >
+                    ? "Starter"
+                    : "საწყისი"
+                  : i === 1
+                    ? en
+                      ? "Most popular"
+                      : "რჩეული"
+                    : en
+                      ? "Best value"
+                      : "საუკეთესო ფასი";
+          const cardClass = cn(
+            "relative flex h-auto min-w-0 flex-col items-center gap-1 rounded-2xl border-2 px-2 py-4 transition-all hover:-translate-y-0.5 disabled:opacity-60 sm:p-5",
+            featured
+              ? "border-[var(--vivida-cyan)] bg-[var(--vivida-cyan)]/8 shadow-[0_0_28px_-10px_var(--vivida-cyan)]"
+              : "border-border bg-background/40 hover:border-[var(--vivida-violet)]/50",
+          );
+          const cardBody = (
+            <>
               <span
                 className={cn(
                   "absolute -top-2.5 rounded-full px-2 py-0.5 text-[10px] font-semibold",
@@ -228,14 +241,41 @@ export function TopUpCard({
                   ? `${Math.floor(p.credits / CREDIT_COST.tarot)} ${en ? "tarot readings" : "ტარო კითხვა"}`
                   : `≈ ${Math.floor(p.credits / 5)} ${en ? "unlocks" : "გახსნა"}`}
               </div>
+            </>
+          );
+          return crypto ? (
+            <PayWithUsdcButton
+              key={p.id}
+              kind="credits"
+              packId={p.id}
+              credits={p.credits}
+              amountUsdcCents={p.amountMinor}
+              product={product}
+              returnTo={returnTo}
+              variant="ghost"
+              className={cardClass}
+            >
+              {cardBody}
+            </PayWithUsdcButton>
+          ) : (
+            <button
+              key={p.id}
+              type="button"
+              disabled={pending !== null}
+              onClick={() => buy(p.id)}
+              className={cardClass}
+            >
+              {cardBody}
             </button>
           );
         })}
       </div>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        {en
-          ? "Select a pack to continue to secure checkout."
-          : "ღილაკზე დაჭერით პირდაპირ გადახდაზე გადახვალ."}
+        {crypto
+          ? "Select a pack to pay with USDC."
+          : en
+            ? "Select a pack to continue to secure checkout."
+            : "ღილაკზე დაჭერით პირდაპირ გადახდაზე გადახვალ."}
       </p>
       {error && (
         <p role="alert" className="mt-2 text-center text-xs text-destructive">

@@ -97,3 +97,19 @@ export async function requestIsEnglishHost(): Promise<boolean> {
 // Re-exported so existing imports keep working; Armenian no longer exists,
 // so every stored value resolves to a supported locale.
 export { normalizeUserLocale } from "./locale";
+
+/**
+ * Route-handler-safe English-host check.
+ *
+ * Reads the Request directly (no `next/headers`), so route tests can call
+ * handlers with plain Request objects — and it honours the split-deployment
+ * override exactly like `requestIsEnglishHost()`, keeping page gating and
+ * API gating in agreement (including local `VIVIDA_DEPLOYMENT_LOCALE=en`
+ * runs of the English surface).
+ */
+export function requestHostIsEnglish(req: Request): boolean {
+  if (DEPLOYMENT_LOCALE) return DEPLOYMENT_LOCALE !== "ka";
+  return isEnglishHost(
+    req.headers.get("x-forwarded-host") ?? new URL(req.url).host,
+  );
+}

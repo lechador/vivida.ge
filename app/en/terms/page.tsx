@@ -15,7 +15,7 @@ const PATH = "/en/terms";
 const TITLE = "Terms and Conditions";
 const DESCRIPTION =
   "The English terms governing use of Vivida's astrology, self-discovery, account and community features.";
-const LAST_UPDATED = "October 2, 2026";
+const LAST_UPDATED = "October 11, 2026";
 
 export const metadata: Metadata = {
   title: { absolute: `${TITLE} — Vivida` },
@@ -64,13 +64,17 @@ export default function EnglishTermsPage() {
       <section>
         <h2>3. Service availability and payments</h2>
         <p>
-          Vivida may offer free features, one-time credit packs and
-          automatically renewing PRO subscriptions. The price, currency, billing
-          interval and included access are shown before purchase. PRO renews
-          automatically at the interval shown before purchase until cancelled;
-          you can cancel from the account page and keep access until the paid
-          period ends. Cancelling stops the next charge; the current paid period
-          is not refunded.
+          Vivida may offer free features, one-time credit packs and PRO access.
+          The price, currency and included access are shown before purchase. On
+          the English site, purchases are paid in USDC on the Solana network and
+          PRO is sold as a one-time 30-day pass that does not renew
+          automatically — when it ends, access simply stops and you can buy
+          another pass whenever you like. Where a PRO subscription is offered
+          instead (for example on the Georgian site), it renews automatically at
+          the interval shown before purchase until cancelled; you can cancel
+          from the account page and keep access until the paid period ends.
+          Cancelling stops the next charge; the current paid period is not
+          refunded.
         </p>
         <p>
           <strong>Cancellation and refunds.</strong> If you are a consumer in
@@ -80,7 +84,9 @@ export default function EnglishTermsPage() {
           completing checkout you ask us to begin supply immediately and accept
           that the 14-day withdrawal right does not apply to content that has
           already been delivered to you. Unused PRO time can be cancelled at any
-          time as described above. Nothing here removes a right you have under
+          time as described above; a one-time pass simply runs to its end date
+          and needs no cancellation. Crypto payments are final once the transfer
+          is confirmed on-chain. Nothing here removes a right you have under
           mandatory consumer law, including where content is faulty, not as
           described, or not delivered.
         </p>

@@ -367,6 +367,16 @@ export function formatBillingAmount(
   const fractionDigits = WHOLE_UNIT_DISPLAY_CURRENCIES.has(code) ? 0 : 2;
   const amount = amountMinor / 100;
 
+  // USDC is a token, not an ISO currency — Intl rejects the 4-letter code,
+  // so both locales get the same explicit "9.99 USDC" formatting.
+  if (code === "usdc") {
+    const digits = new Intl.NumberFormat("en-GB", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+    return `${digits} USDC`;
+  }
+
   // Browsers ship no `ka` locale data, so an Intl call under it resolves
   // differently on the server than in the client and React throws the markup
   // away. Georgian gets its symbol attached here, over digits grouped by a

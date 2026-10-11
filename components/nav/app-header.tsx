@@ -17,6 +17,8 @@ import { SearchBar } from "./search-bar";
 import { UserMenu } from "./user-menu";
 import { CreditBalanceMenu } from "@/components/credits/credit-balance-menu";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
+import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
+import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 
 /**
  * App-wide top navigation. Server component that fetches its own session
@@ -83,6 +85,10 @@ export async function AppHeader({
     }
   }
 
+  // The English site pays in USDC (Stripe is off there); the Georgian site
+  // keeps Stripe. Computed here so every page's header chip stays in sync.
+  const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
+
   return (
     <>
       <header className="relative z-30 mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-4 sm:gap-5 sm:px-6 sm:py-5">
@@ -142,6 +148,7 @@ export async function AppHeader({
                 locale={locale}
                 isPremium={isPremium}
                 countryCode={residenceCountryCode}
+                crypto={cryptoPay}
               />
               <NotificationsDropdown
                 initial={notifications}

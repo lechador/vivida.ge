@@ -6,11 +6,14 @@ import {
   premiumPlanForCountry,
 } from "@/lib/billing-config";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
+import { createPremiumCheckoutSession, isStripeConfigured } from "@/lib/stripe";
+import { requestHostIsEnglish } from "@/lib/i18n/request-locale";
+import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 import {
-  createPremiumCheckoutSession,
-  isStripeConfigured,
-} from "@/lib/stripe";
-import { checkoutTrackingFromRequest, checkoutTrackingMetadata, trackCheckoutStarted } from "@/lib/checkout-tracking";
+  checkoutTrackingFromRequest,
+  checkoutTrackingMetadata,
+  trackCheckoutStarted,
+} from "@/lib/checkout-tracking";
 import { getLowCreditOffer } from "@/lib/promo-offer";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
 import { EXPERIMENTS } from "@/lib/experiment-catalog";
@@ -22,7 +25,15 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!userId)
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  // The English site pays in USDC on Solana (the crypto rail); Stripe
+  // checkout exists only on the Georgian site — but only once the crypto
+  // rail is actually configured, so a half-rolled-out deploy never leaves
+  // the English site with no working payment path.
+  if (requestHostIsEnglish(req) && isCryptoPayConfigured()) {
+    return NextResponse.json({ error: "crypto_only" }, { status: 403 });
+  }
   if (!isStripeConfigured()) {
     return NextResponse.json({ error: "unavailable" }, { status: 503 });
   }
@@ -40,9 +51,13 @@ export async function POST(req: Request) {
     product?: unknown;
   } | null;
   const wantsOffer = body?.offer === "low_credits";
-  const returnTo = typeof body?.returnTo === "string" ? normalizeReturnPath(body.returnTo) : null;
+  const returnTo =
+    typeof body?.returnTo === "string"
+      ? normalizeReturnPath(body.returnTo)
+      : null;
   const purchaseContext =
-    typeof body?.product === "string" && /^[a-z0-9_-]{1,60}$/i.test(body.product)
+    typeof body?.product === "string" &&
+    /^[a-z0-9_-]{1,60}$/i.test(body.product)
       ? body.product
       : "subscription";
 
@@ -52,14 +67,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "offer_unavailable" }, { status: 403 });
   }
 
-  const selectedPlan = body?.planKey == null
-    ? null
-    : premiumPlanByKeyForCountry(identity?.countryCode, body.planKey);
+  const selectedPlan =
+    body?.planKey == null
+      ? null
+      : premiumPlanByKeyForCountry(identity?.countryCode, body.planKey);
   if (body?.planKey != null && !selectedPlan) {
     return NextResponse.json({ error: "invalid_plan" }, { status: 400 });
   }
 
-  const plan = offer?.plan ?? selectedPlan ?? premiumPlanForCountry(identity?.countryCode);
+  const plan =
+    offer?.plan ?? selectedPlan ?? premiumPlanForCountry(identity?.countryCode);
 
   try {
     const tracking = checkoutTrackingFromRequest(req);
@@ -82,16 +99,19 @@ export async function POST(req: Request) {
       "subscription_checkout",
       checkout.id,
     );
-    if (tracking.allowed) after(() => trackCheckoutStarted({
-      session: checkout,
-      tracking,
-      userId,
-      email: identity?.email ?? session.user.email,
-      countryCode: identity?.countryCode,
-      value: plan.amountMinor / 100,
-      currency: plan.currency,
-      contentId: plan.key,
-    }));
+    if (tracking.allowed)
+      after(() =>
+        trackCheckoutStarted({
+          session: checkout,
+          tracking,
+          userId,
+          email: identity?.email ?? session.user.email,
+          countryCode: identity?.countryCode,
+          value: plan.amountMinor / 100,
+          currency: plan.currency,
+          contentId: plan.key,
+        }),
+      );
     return NextResponse.json({
       url: checkout.url,
       eventId: `${checkout.id}:initiate_checkout`,

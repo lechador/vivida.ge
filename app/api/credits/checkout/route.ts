@@ -4,8 +4,13 @@ import { auth } from "@/auth";
 import { creditPackForCountry } from "@/lib/credits";
 import { getBillingIdentity } from "@/lib/premium";
 import { createCreditCheckoutSession, isStripeConfigured } from "@/lib/stripe";
-import { localeForHost } from "@/lib/i18n/request-locale";
-import { checkoutTrackingFromRequest, checkoutTrackingMetadata, trackCheckoutStarted } from "@/lib/checkout-tracking";
+import { localeForHost, requestHostIsEnglish } from "@/lib/i18n/request-locale";
+import { isCryptoPayConfigured } from "@/lib/crypto-pay";
+import {
+  checkoutTrackingFromRequest,
+  checkoutTrackingMetadata,
+  trackCheckoutStarted,
+} from "@/lib/checkout-tracking";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
 import { EXPERIMENTS } from "@/lib/experiment-catalog";
 import { recordExperimentOutcomesBestEffort } from "@/lib/experiment-outcomes";
@@ -22,6 +27,13 @@ export async function POST(req: Request) {
   const userId = session?.user?.id;
   if (!userId)
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  // The English site pays in USDC on Solana (the crypto rail); Stripe
+  // checkout exists only on the Georgian site — but only once the crypto
+  // rail is actually configured, so a half-rolled-out deploy never leaves
+  // the English site with no working payment path.
+  if (requestHostIsEnglish(req) && isCryptoPayConfigured()) {
+    return NextResponse.json({ error: "crypto_only" }, { status: 403 });
+  }
   if (!isStripeConfigured()) {
     return NextResponse.json({ error: "unavailable" }, { status: 503 });
   }
@@ -31,9 +43,10 @@ export async function POST(req: Request) {
     returnTo?: unknown;
     product?: unknown;
   };
-  const returnTo = typeof body.returnTo === "string"
-    ? normalizeReturnPath(body.returnTo)
-    : null;
+  const returnTo =
+    typeof body.returnTo === "string"
+      ? normalizeReturnPath(body.returnTo)
+      : null;
   const purchaseContext =
     typeof body.product === "string" && /^[a-z0-9_-]{1,60}$/i.test(body.product)
       ? body.product
@@ -75,16 +88,19 @@ export async function POST(req: Request) {
       "credits_checkout",
       checkout.id,
     );
-    if (tracking.allowed) after(() => trackCheckoutStarted({
-      session: checkout,
-      tracking,
-      userId,
-      email: session.user?.email,
-      countryCode: billingUser?.countryCode,
-      value: pack.amountMinor / 100,
-      currency: pack.currency,
-      contentId: `credits_${pack.credits}`,
-    }));
+    if (tracking.allowed)
+      after(() =>
+        trackCheckoutStarted({
+          session: checkout,
+          tracking,
+          userId,
+          email: session.user?.email,
+          countryCode: billingUser?.countryCode,
+          value: pack.amountMinor / 100,
+          currency: pack.currency,
+          contentId: `credits_${pack.credits}`,
+        }),
+      );
     return NextResponse.json({
       url: checkout.url,
       eventId: `${checkout.id}:initiate_checkout`,

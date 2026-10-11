@@ -93,8 +93,10 @@ export type ExperimentEvent = typeof experimentEvents.$inferSelect;
 /**
  * Who is billing this subscription. Stripe is the website's processor; the
  * store builds cannot use it (Apple 3.1.1 / Play Billing), so an app purchase
- * arrives through RevenueCat instead. One user still has at most one PRO row —
- * `source` says which processor owns it, and a webhook may only deactivate a
- * row whose source matches, so neither can cancel the other's subscription.
+ * arrives through RevenueCat instead. The English site's crypto rail sells
+ * one-time PRO passes — source "crypto", never auto-renewing. One user still
+ * has at most one PRO row — `source` says which processor owns it, and a
+ * webhook may only deactivate a row whose source matches, so neither can
+ * cancel the other's subscription.
  */
-export type PremiumSource = "stripe" | "revenuecat";
+export type PremiumSource = "stripe" | "revenuecat" | "crypto";

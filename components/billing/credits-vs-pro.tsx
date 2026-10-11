@@ -14,6 +14,11 @@ import {
   premiumPlanForCountry,
   shouldShowPurchasePromotion,
 } from "@/lib/billing-config";
+import {
+  USDC_CREDIT_PACKS,
+  USDC_CURRENCY,
+  USDC_PREMIUM_PASS,
+} from "@/lib/crypto-config";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { EXPERIMENTS } from "@/lib/experiment-catalog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -32,6 +37,7 @@ export function CreditsVsPro({
   compact = false,
   balance,
   isPremium = false,
+  crypto = false,
   experimentEnabled = true,
 }: {
   locale: UserLocale;
@@ -43,17 +49,34 @@ export function CreditsVsPro({
   compact?: boolean;
   balance?: number;
   isPremium?: boolean;
+  crypto?: boolean;
   experimentEnabled?: boolean;
 }) {
   const en = locale === "en";
+  // Crypto rail (English host): the comparison prices the USDC pack and the
+  // one-time 30-day PRO pass instead of the Stripe catalogue, and there is no
+  // discounted multi-month plan to upsell.
+  const cryptoPack = USDC_CREDIT_PACKS[0];
   const starterPack = creditPacksForCountry(countryCode)[0];
   const standardPro = premiumPlanForCountry(countryCode);
-  const discountedPro = discountedPremiumPlanForCountry(countryCode);
+  const discountedPro = crypto
+    ? undefined
+    : discountedPremiumPlanForCountry(countryCode);
   const pro = featuredPremiumPlanForCountry(countryCode);
   const proMonths = pro.intervalCount ?? 1;
   const proSavings = discountedPro
     ? premiumPlanSavingsPercent(standardPro, discountedPro)
     : 0;
+  const creditAmountMinor = crypto
+    ? cryptoPack.amountMinor
+    : starterPack.amountMinor;
+  const creditCurrency = crypto ? USDC_CURRENCY : starterPack.currency;
+  const creditCount = crypto ? cryptoPack.credits : starterPack.credits;
+  const proAmountMinor = crypto
+    ? USDC_PREMIUM_PASS.amountMinor
+    : pro.amountMinor;
+  const proCurrency = crypto ? USDC_CURRENCY : pro.currency;
+  const proTrackingKey = crypto ? USDC_PREMIUM_PASS.key : pro.key;
   const variant = useExperiment(
     EXPERIMENTS.pricingPresentation,
     placement,
@@ -67,12 +90,12 @@ export function CreditsVsPro({
   useEffect(() => {
     if (!showPromotion) return;
     trackEvent(ANALYTICS_EVENT.proExposure, {
-      product: pro.key,
+      product: proTrackingKey,
       placement,
-      value: pro.amountMinor / 100,
-      currency: pro.currency,
+      value: proAmountMinor / 100,
+      currency: proCurrency,
     });
-  }, [placement, pro.amountMinor, pro.currency, pro.key, showPromotion]);
+  }, [placement, proAmountMinor, proCurrency, proTrackingKey, showPromotion]);
 
   function trackChoice(destination: "credits" | "subscription") {
     trackEvent(ANALYTICS_EVENT.recommendationClicked, {
@@ -123,12 +146,16 @@ export function CreditsVsPro({
         <p className="mt-2 text-sm leading-relaxed text-foreground/70">
           {context === "natal_report"
             ? en
-              ? "Pay once with credits for this report, or choose PRO for unlimited reports, tarot, AI chat, and forecasts."
+              ? crypto
+                ? "Pay once with credits for this report, or get 30 days of PRO — unlimited reports, tarot, AI chat, and forecasts."
+                : "Pay once with credits for this report, or choose PRO for unlimited reports, tarot, AI chat, and forecasts."
               : "ამ ანგარიშისთვის გადაიხადე ერთხელ კრედიტებით, ან აირჩიე PRO — ულიმიტო ანგარიშებისთვის, ტაროსთვის, AI ჩატისა და პროგნოზებისთვის."
             : en
-              ? discountedPro
-                ? "Credits are a one-time purchase. PRO unlocks everything for 3 months at a discounted price."
-                : "Credits are a one-time purchase. PRO is unlimited monthly access."
+              ? crypto
+                ? "Credits are a one-time purchase. PRO is a one-time 30-day pass — no auto-renewal."
+                : discountedPro
+                  ? "Credits are a one-time purchase. PRO unlocks everything for 3 months at a discounted price."
+                  : "Credits are a one-time purchase. PRO is unlimited monthly access."
               : discountedPro
                 ? "კრედიტები ერთჯერადი შენაძენია, PRO კი ყველაფერს 3 თვით, ფასდაკლებით ხსნის."
                 : "კრედიტები ერთჯერადი შენაძენია, PRO კი — ყოველთვიური ულიმიტო წვდომა."}
@@ -151,14 +178,10 @@ export function CreditsVsPro({
           </h3>
           <div className="mt-1 flex items-baseline gap-1.5">
             <span className="text-2xl font-bold tracking-tight">
-              {formatBillingAmount(
-                starterPack.amountMinor,
-                starterPack.currency,
-                locale,
-              )}
+              {formatBillingAmount(creditAmountMinor, creditCurrency, locale)}
             </span>
             <span className="text-xs text-muted-foreground">
-              / {starterPack.credits} {en ? "credits" : "კრედიტი"}
+              / {creditCount} {en ? "credits" : "კრედიტი"}
             </span>
           </div>
           <ul className="mt-4 flex-1 space-y-2 text-sm text-foreground/75">
@@ -210,17 +233,21 @@ export function CreditsVsPro({
           </h3>
           <div className="relative mt-1 flex items-baseline gap-1.5">
             <span className="text-2xl font-bold tracking-tight">
-              {formatBillingAmount(pro.amountMinor, pro.currency, locale)}
+              {formatBillingAmount(proAmountMinor, proCurrency, locale)}
             </span>
             <span className="text-xs text-muted-foreground">
               /{" "}
-              {proMonths === 1
+              {crypto
                 ? en
-                  ? "month"
-                  : "თვე"
-                : en
-                  ? `${proMonths} months`
-                  : `${proMonths} თვე`}
+                  ? "30 days"
+                  : "30 დღე"
+                : proMonths === 1
+                  ? en
+                    ? "month"
+                    : "თვე"
+                  : en
+                    ? `${proMonths} months`
+                    : `${proMonths} თვე`}
             </span>
           </div>
           {discountedPro && (
@@ -242,7 +269,11 @@ export function CreditsVsPro({
               en
                 ? "Best for frequent readings and questions"
                 : "საუკეთესოა ხშირი კითხვებისა და წაკითხვებისთვის",
-              en ? "Cancel anytime" : "გააუქმე ნებისმიერ დროს",
+              crypto
+                ? "No auto-renewal — buy again anytime"
+                : en
+                  ? "Cancel anytime"
+                  : "გააუქმე ნებისმიერ დროს",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2">
                 <Check className="mt-0.5 size-4 shrink-0 text-[var(--vivida-gold)]" />

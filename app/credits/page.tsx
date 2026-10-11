@@ -16,7 +16,10 @@ import { Starfield } from "@/components/landing/starfield";
 import { InviteCard } from "@/components/invite/invite-card";
 import { TopUpCard } from "@/components/credits/top-up-card";
 import { CreditEarnInfo } from "@/components/credits/earn-info";
-import { getRequestLocale } from "@/lib/i18n/request-locale";
+import {
+  getRequestLocale,
+  requestIsEnglishHost,
+} from "@/lib/i18n/request-locale";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
@@ -39,6 +42,8 @@ import { SpendAnchor } from "@/components/billing/spend-anchor";
 import { CreditHistory } from "@/components/credits/credit-history";
 import { CreditProgressCard } from "@/components/credits/credit-progress-card";
 import { PhoneGiftCard } from "@/components/phone-gift/phone-gift-card";
+import { CryptoPayHost } from "@/components/crypto/crypto-pay";
+import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 import { getPhoneGiftState } from "@/lib/phone-gift";
 import { phoneGiftCardEligible } from "@/lib/phone-gift-pure";
 import { nextMonthlyBonusDate } from "@/lib/credit-progress";
@@ -120,6 +125,9 @@ export default async function CreditsPage({
   // interface preference (an English-preference account on vivida.ge keeps
   // the card; a Georgian-preference account on vividaastro.com hides it).
   const hostEn = (await getRequestLocale()) === "en";
+  // English host pays in USDC (Stripe checkout is disabled there); the
+  // Georgian site keeps its Stripe surfaces untouched.
+  const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
   const [
     balance,
     ref,
@@ -164,157 +172,170 @@ export default async function CreditsPage({
   });
 
   return (
-    <main
-      lang={locale}
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
-    >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.4),transparent_70%)]"
-      />
-      <Starfield count={110} shooting={2} />
-      <AppHeader authed />
-      <Suspense fallback={null}>
-        <CheckoutSuccessTracker locale={locale} />
-      </Suspense>
+    <CryptoPayHost>
+      <main
+        lang={locale}
+        className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      >
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.4),transparent_70%)]"
+        />
+        <Starfield count={110} shooting={2} />
+        <AppHeader authed />
+        <Suspense fallback={null}>
+          <CheckoutSuccessTracker locale={locale} />
+        </Suspense>
 
-      <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        {/* Balance */}
-        <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
-          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Your balance" : "შენი ბალანსი"}
-          </div>
-          <div className="mt-2 flex items-center justify-center gap-2">
-            <Sparkles className="size-7 text-[var(--vivida-cyan)]" />
-            <span className="text-6xl font-bold tabular-nums tracking-tight">
-              {balance}
-            </span>
-          </div>
-          <div className="mt-1 text-sm text-muted-foreground">
-            {en ? "credits" : "კრედიტი"}
-          </div>
-          <p className="mx-auto mt-3 max-w-md text-sm text-foreground/75">
-            {en
-              ? "Use credits to unlock full test results, compatibility readings, AI chat, forecasts, and reports. Invite friends or top up your balance."
-              : "კრედიტებით ხსნი ტესტების სრულ შედეგებს, სინასტრიებს, AI-ჩატს, პროგნოზებსა და რეპორტებს. მოიწვიე მეგობრები ან შეავსე ბალანსი."}
-          </p>
-        </div>
-
-        {!hostEn && phoneGiftCardEligible(giftState) && (
-          <div className="mt-4">
-            <PhoneGiftCard locale={locale} />
-          </div>
-        )}
-
-        <div className="mt-4">
-          <CreditProgressCard
-            balance={balance}
-            nextMonthlyDate={nextMonthlyBonusDate()}
-            locale={locale}
-          />
-        </div>
-
-        {!premium && (
-          <div className="mt-4">
-            <SpendAnchor
-              spend={recentSpend}
-              countryCode={identity?.countryCode}
-              locale={locale}
-            />
-          </div>
-        )}
-
-        {showPurchasePromotions && !offer && (
-          <div className="mt-4">
-            <CreditsVsPro
-              locale={locale}
-              countryCode={identity?.countryCode}
-              placement="credits_hub_comparison"
-              creditHref="#credit-packs"
-              proHref="#pro-plan"
-              balance={balance}
-            />
-          </div>
-        )}
-
-        {premium ? (
-          <Link
-            href="/subscription"
-            className="mt-4 flex items-center justify-between rounded-3xl border border-[var(--vivida-gold)]/35 bg-[var(--vivida-gold)]/8 p-6 transition-colors hover:bg-[var(--vivida-gold)]/12"
-          >
-            <span className="flex items-center gap-3 font-semibold">
-              <Crown className="size-5 text-[var(--vivida-gold)]" />
+        <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
+          {/* Balance */}
+          <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+            <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              {en ? "Your balance" : "შენი ბალანსი"}
+            </div>
+            <div className="mt-2 flex items-center justify-center gap-2">
+              <Sparkles className="size-7 text-[var(--vivida-cyan)]" />
+              <span className="text-6xl font-bold tabular-nums tracking-tight">
+                {balance}
+              </span>
+            </div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              {en ? "credits" : "კრედიტი"}
+            </div>
+            <p className="mx-auto mt-3 max-w-md text-sm text-foreground/75">
               {en
-                ? "Manage your Vivida PRO subscription"
-                : "Vivida PRO გამოწერის მართვა"}
-            </span>
-            <span aria-hidden>→</span>
-          </Link>
-        ) : showPurchasePromotions && offer ? (
-          // The offer replaces the standard PRO card rather than sitting beside
-          // it: two prices for the same thing is a reason to hesitate.
+                ? "Use credits to unlock full test results, compatibility readings, AI chat, forecasts, and reports. Invite friends or top up your balance."
+                : "კრედიტებით ხსნი ტესტების სრულ შედეგებს, სინასტრიებს, AI-ჩატს, პროგნოზებსა და რეპორტებს. მოიწვიე მეგობრები ან შეავსე ბალანსი."}
+            </p>
+          </div>
+
+          {!hostEn && phoneGiftCardEligible(giftState) && (
+            <div className="mt-4">
+              <PhoneGiftCard locale={locale} />
+            </div>
+          )}
+
           <div className="mt-4">
-            <LowCreditOfferCard
-              plan={offer.plan}
-              months={offer.months}
-              deadlineLabel={
-                locale === "ka"
-                  ? kaDayMonthGenitive(offer.endsAt)
-                  : new Intl.DateTimeFormat("en-GB", {
-                      day: "numeric",
-                      month: "long",
-                    }).format(offer.endsAt)
-              }
-              standardPlan={premiumPlan}
+            <CreditProgressCard
+              balance={balance}
+              nextMonthlyDate={nextMonthlyBonusDate()}
               locale={locale}
             />
           </div>
-        ) : showPurchasePromotions && premiumPlan ? (
-          <div id="pro-plan" className="mt-4 scroll-mt-20">
-            <PremiumPlanCard
-              plan={premiumPlan}
+
+          {!premium && (
+            <div className="mt-4">
+              <SpendAnchor
+                spend={recentSpend}
+                countryCode={identity?.countryCode}
+                locale={locale}
+              />
+            </div>
+          )}
+
+          {showPurchasePromotions && !offer && (
+            <div className="mt-4">
+              <CreditsVsPro
+                locale={locale}
+                countryCode={identity?.countryCode}
+                placement="credits_hub_comparison"
+                creditHref="#credit-packs"
+                proHref="#pro-plan"
+                balance={balance}
+                crypto={cryptoPay}
+              />
+            </div>
+          )}
+
+          {premium ? (
+            <Link
+              href="/subscription"
+              className="mt-4 flex items-center justify-between rounded-3xl border border-[var(--vivida-gold)]/35 bg-[var(--vivida-gold)]/8 p-6 transition-colors hover:bg-[var(--vivida-gold)]/12"
+            >
+              <span className="flex items-center gap-3 font-semibold">
+                <Crown className="size-5 text-[var(--vivida-gold)]" />
+                {en
+                  ? "Manage your Vivida PRO subscription"
+                  : "Vivida PRO გამოწერის მართვა"}
+              </span>
+              <span aria-hidden>→</span>
+            </Link>
+          ) : showPurchasePromotions && cryptoPay ? (
+            <div id="pro-plan" className="mt-4 scroll-mt-20">
+              <PremiumPlanCard
+                plan={premiumPlan}
+                locale={locale}
+                placement="credits_hub"
+                crypto
+              />
+            </div>
+          ) : showPurchasePromotions && offer ? (
+            // The offer replaces the standard PRO card rather than sitting beside
+            // it: two prices for the same thing is a reason to hesitate.
+            <div className="mt-4">
+              <LowCreditOfferCard
+                plan={offer.plan}
+                months={offer.months}
+                deadlineLabel={
+                  locale === "ka"
+                    ? kaDayMonthGenitive(offer.endsAt)
+                    : new Intl.DateTimeFormat("en-GB", {
+                        day: "numeric",
+                        month: "long",
+                      }).format(offer.endsAt)
+                }
+                standardPlan={premiumPlan}
+                locale={locale}
+              />
+            </div>
+          ) : showPurchasePromotions && premiumPlan ? (
+            <div id="pro-plan" className="mt-4 scroll-mt-20">
+              <PremiumPlanCard
+                plan={premiumPlan}
+                locale={locale}
+                placement="credits_hub"
+              />
+            </div>
+          ) : null}
+
+          {/* Top-up is kept directly below the balance so there is no hunt or scroll. */}
+          <div id="credit-packs" className="mt-4 scroll-mt-20">
+            <TopUpCard
               locale={locale}
-              placement="credits_hub"
+              countryCode={identity?.countryCode}
+              balance={balance}
+              neededCredits={neededCredits}
+              returnTo={returnTo}
+              product={product}
+              selectedPackId={selectedPackId}
+              crypto={cryptoPay}
             />
           </div>
-        ) : null}
 
-        {/* Top-up is kept directly below the balance so there is no hunt or scroll. */}
-        <div id="credit-packs" className="mt-4 scroll-mt-20">
-          <TopUpCard
-            locale={locale}
-            countryCode={identity?.countryCode}
-            balance={balance}
-            neededCredits={neededCredits}
-            returnTo={returnTo}
-            product={product}
-            selectedPackId={selectedPackId}
-          />
-        </div>
+          <div className="mt-4">
+            <CreditHistory
+              history={history}
+              filter={historyFilter}
+              locale={locale}
+            />
+          </div>
 
-        <div className="mt-4">
-          <CreditHistory
-            history={history}
-            filter={historyFilter}
-            locale={locale}
-          />
-        </div>
+          {/* How to earn for free. */}
+          <div className="mt-4">
+            <CreditEarnInfo locale={locale} />
+          </div>
 
-        {/* How to earn for free. */}
-        <div className="mt-4">
-          <CreditEarnInfo locale={locale} />
-        </div>
-
-        {/* Invite / earn */}
-        <div className="mt-4">
-          <InviteCard
-            link={link}
-            invited={ref.invited}
-            qualified={ref.qualified}
-            locale={locale}
-          />
-        </div>
-      </section>
-    </main>
+          {/* Invite / earn */}
+          <div className="mt-4">
+            <InviteCard
+              link={link}
+              invited={ref.invited}
+              qualified={ref.qualified}
+              locale={locale}
+            />
+          </div>
+        </section>
+      </main>
+    </CryptoPayHost>
   );
 }

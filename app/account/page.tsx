@@ -216,7 +216,13 @@ export default async function AccountPage() {
           </Link>
           {headerData.isPremium && subscription && (
             <p className="mt-2 px-1 text-xs text-muted-foreground">
-              {subscription.source === "stripe" ? (
+              {subscription.source === "crypto" ? (
+                en ? (
+                  `Vivida PRO · one-time pass · ends ${formatAccountDate(subscription.currentPeriodEnd, locale)} · no auto-renew`
+                ) : (
+                  `Vivida PRO · ერთჯერადი პასი · დასრულდება ${formatAccountDate(subscription.currentPeriodEnd, locale)} · ავტომატური განახლების გარეშე`
+                )
+              ) : subscription.source === "stripe" ? (
                 <>
                   {subscription.cancelAtPeriodEnd
                     ? en

@@ -1,10 +1,11 @@
-import { eq, or } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import type Stripe from "stripe";
 
 import { db } from "@/db";
-import { premiumSubscriptions, users } from "@/db/schema";
+import { cryptoPurchases, premiumSubscriptions, users } from "@/db/schema";
 import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { normalizeCountryCode } from "@/lib/billing-config";
+import { USDC_PREMIUM_PASS } from "@/lib/crypto-config";
 import { stripe } from "@/lib/stripe";
 
 const ENTITLED_STATUSES = new Set(["active", "trialing"]);
@@ -21,7 +22,9 @@ export async function isPremiumUser(userId: string): Promise<boolean> {
     .where(eq(users.id, userId))
     .limit(1);
   return Boolean(
-    row?.isPremium && row.premiumUntil && row.premiumUntil.getTime() > Date.now(),
+    row?.isPremium &&
+    row.premiumUntil &&
+    row.premiumUntil.getTime() > Date.now(),
   );
 }
 
@@ -54,7 +57,7 @@ export async function getBillingIdentity(userId: string) {
 }
 
 function idOf(value: string | { id: string } | null): string | null {
-  return typeof value === "string" ? value : value?.id ?? null;
+  return typeof value === "string" ? value : (value?.id ?? null);
 }
 
 /**
@@ -84,7 +87,8 @@ export async function syncPremiumSubscription(
   const price = item.price;
   const countryCode =
     normalizeCountryCode(subscription.metadata?.countryCode) ?? "GB";
-  const planKey = subscription.metadata?.planKey || price.lookup_key || "premium";
+  const planKey =
+    subscription.metadata?.planKey || price.lookup_key || "premium";
   const amountMinor = price.unit_amount ?? 0;
   const periodStart = new Date(item.current_period_start * 1000);
   const periodEnd = new Date(item.current_period_end * 1000);
@@ -200,10 +204,7 @@ export async function findUserIdForStripeSubscription(
   const [row] = await db
     .select({ id: users.id })
     .from(users)
-    .leftJoin(
-      premiumSubscriptions,
-      eq(premiumSubscriptions.userId, users.id),
-    )
+    .leftJoin(premiumSubscriptions, eq(premiumSubscriptions.userId, users.id))
     .where(
       or(
         eq(users.stripeCustomerId, customerId),
@@ -212,4 +213,104 @@ export async function findUserIdForStripeSubscription(
     )
     .limit(1);
   return row?.id ?? null;
+}
+
+/**
+ * Grant a one-time PRO pass bought with crypto (English site).
+ *
+ * Crypto transfers cannot auto-renew, so the pass simply extends
+ * `premiumUntil` by `days` — stacking on whatever time the user already
+ * has. Exactly-once is enforced by electing a single runner through the
+ * purchase row's `grantedAt` (a conditional NULL → now() update): a poll
+ * that races the original confirmation can re-call this safely, and a
+ * confirmed row that never got its grant self-heals on the next read.
+ *
+ * The subscription row keeps the one-row-per-user model: it is written with
+ * source "crypto" and no processor IDs. A row owned by a still-entitled
+ * Stripe/RevenueCat subscription is left untouched (the crypto purchase
+ * route refuses that case up front; this is belt-and-braces for a race).
+ */
+export async function grantPremiumPassFromCrypto(input: {
+  purchaseId: string;
+  userId: string;
+  days: number;
+  amountMinor: number;
+  txSignature: string;
+}): Promise<void> {
+  // Elect exactly one grant runner for this purchase.
+  const elected = await db
+    .update(cryptoPurchases)
+    .set({ grantedAt: new Date() })
+    .where(
+      and(
+        eq(cryptoPurchases.id, input.purchaseId),
+        isNull(cryptoPurchases.grantedAt),
+      ),
+    )
+    .returning({ id: cryptoPurchases.id });
+  if (elected.length === 0) return; // already granted
+
+  const [row] = await db
+    .select({
+      premiumUntil: users.premiumUntil,
+      countryCode: users.residenceCountryCode,
+    })
+    .from(users)
+    .where(eq(users.id, input.userId))
+    .limit(1);
+  const now = new Date();
+  const base =
+    row?.premiumUntil && row.premiumUntil.getTime() > now.getTime()
+      ? row.premiumUntil
+      : now;
+  const until = new Date(base.getTime() + input.days * 86_400_000);
+
+  await db
+    .update(users)
+    .set({ isPremium: true, premiumUntil: until })
+    .where(eq(users.id, input.userId));
+
+  const [existing] = await db
+    .select({
+      source: premiumSubscriptions.source,
+      status: premiumSubscriptions.status,
+    })
+    .from(premiumSubscriptions)
+    .where(eq(premiumSubscriptions.userId, input.userId))
+    .limit(1);
+
+  const keepProcessorRow =
+    existing &&
+    existing.source !== "crypto" &&
+    statusHasPremiumAccess(existing.status);
+
+  if (!keepProcessorRow) {
+    const record = {
+      planKey: USDC_PREMIUM_PASS.key,
+      countryCode: normalizeCountryCode(row?.countryCode) ?? "US",
+      source: "crypto" as const,
+      stripeSubscriptionId: null,
+      stripePriceId: null,
+      rcOriginalTransactionId: null,
+      rcProductId: null,
+      rcStore: null,
+      status: "active",
+      currency: "usdc",
+      amountMinor: input.amountMinor,
+      currentPeriodStart: now,
+      currentPeriodEnd: until,
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      updatedAt: now,
+    };
+    await db
+      .insert(premiumSubscriptions)
+      .values({ userId: input.userId, ...record })
+      .onConflictDoUpdate({
+        target: premiumSubscriptions.userId,
+        set: record,
+      });
+  }
+
+  invalidateHeaderForUser(input.userId);
 }
