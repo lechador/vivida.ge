@@ -8,6 +8,7 @@ import {
   ENGLISH_SITE_URL,
   GEORGIAN_HOSTS,
 } from "./lib/seo/locales";
+import { englishSecurityHeaders } from "./lib/security-headers";
 
 // Every route that may render a report PDF reads the Georgian TTFs via fs;
 // Vercel's tracer won't follow the dynamic path, so bundle them explicitly.
@@ -89,6 +90,16 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         has: [{ type: "host" as const, value: host }],
         headers: [{ key: "Content-Language", value: "en" }],
+      })),
+      // Privy production surface: framing is denied outright (nothing in the
+      // app expects to be framed), and the full Privy-recommended CSP ships
+      // in Report-Only mode until validated, then flips to enforcing (see
+      // lib/security-headers.ts). Scoped to the English hosts so the
+      // Georgian host's Stripe frames/scripts are untouched.
+      ...ENGLISH_HOSTS.map((host) => ({
+        source: "/:path*",
+        has: [{ type: "host" as const, value: host }],
+        headers: englishSecurityHeaders(),
       })),
     ];
   },
