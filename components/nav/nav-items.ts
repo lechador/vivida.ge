@@ -253,6 +253,29 @@ export function navItems(locale: UserLocale = "ka"): NavItem[] {
   });
 }
 
+/**
+ * English-host compact sidebar: only these stay visible; every other
+ * destination moves into the "Others" dialog. The Georgian host keeps the
+ * full list (this split is only applied when the sidebar renders compact).
+ */
+export const EN_COMPACT_PRIMARY_KEYS: readonly NavActiveKey[] = [
+  "today",
+  "tarot",
+  "readings",
+];
+
+/** Split the locale's nav into the compact primary rail + the Others set. */
+export function splitCompactNav(locale: UserLocale = "ka"): {
+  primary: NavItem[];
+  others: NavItem[];
+} {
+  const items = navItems(locale);
+  return {
+    primary: items.filter((item) => EN_COMPACT_PRIMARY_KEYS.includes(item.key)),
+    others: items.filter((item) => !EN_COMPACT_PRIMARY_KEYS.includes(item.key)),
+  };
+}
+
 function mobileTab(key: NavActiveKey): NavItem {
   const item = ALL_NAV_ITEMS.find((entry) => entry.key === key);
   if (!item) throw new Error(`unknown mobile tab ${key}`);

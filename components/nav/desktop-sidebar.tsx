@@ -8,9 +8,11 @@ import { NavItemLink } from "./nav-item-link";
 import {
   navItems,
   navLabel,
+  splitCompactNav,
   type NavActiveKey,
   type NavItem,
 } from "./nav-items";
+import { SidebarOthers } from "./sidebar-others";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -23,16 +25,21 @@ export function DesktopSidebar({
   unreadMessages = 0,
   pendingAskNudges = 0,
   locale = "ka",
+  compact = false,
 }: {
   active?: NavActiveKey;
   unreadMessages?: number;
   /** Unopened proactive astrologer nudges — dot on the ask item. */
   pendingAskNudges?: number;
   locale?: UserLocale;
+  /** English host: a few primary destinations + an "Others" dialog. */
+  compact?: boolean;
 }) {
-  // NAV_ITEMS already leads with Today/Tarot/Ask/History and carries every
-  // other destination (My chart, messages, tests, reports…) as secondary.
-  const items: NavItem[] = navItems(locale);
+  // Compact (vividaastro.com): only Today/Tarot/Readings stay visible and
+  // everything else moves into the Others dialog. Otherwise the full rail.
+  const { primary, others } = compact
+    ? splitCompactNav(locale)
+    : { primary: navItems(locale), others: [] as NavItem[] };
 
   // Labels are always visible — no hover reveal.
   const reveal = "";
@@ -75,7 +82,7 @@ export function DesktopSidebar({
 
       <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <ul className="mt-2 flex flex-col gap-0.5">
-          {items.map((item) => {
+          {primary.map((item) => {
             const isActive = active === item.key;
             return (
               <li key={item.key}>
@@ -126,6 +133,35 @@ export function DesktopSidebar({
               </li>
             );
           })}
+
+          {others.length > 0 && (
+            <li>
+              <SidebarOthers
+                locale={locale}
+                hasUnread={unreadMessages > 0 || pendingAskNudges > 0}
+              >
+                {others.map((item) => (
+                  <NavItemLink
+                    key={item.key}
+                    href={item.href}
+                    itemKey={item.key}
+                    surface="desktop_sidebar"
+                    locale={locale}
+                    title={navLabel(item, locale)}
+                    className="group/other flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-card/50 hover:text-foreground"
+                  >
+                    <span
+                      className="grid size-7 shrink-0 place-items-center rounded-lg bg-card/40 ring-1 ring-border/40"
+                      style={{ color: item.hue }}
+                    >
+                      <item.Icon className="size-3.5" />
+                    </span>
+                    <span className="truncate">{navLabel(item, locale)}</span>
+                  </NavItemLink>
+                ))}
+              </SidebarOthers>
+            </li>
+          )}
         </ul>
       </nav>
 

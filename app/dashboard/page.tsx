@@ -16,6 +16,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { PopularTools } from "@/components/nav/popular-tools";
 import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
+import { NoChartDashboard } from "@/components/dashboard/no-chart-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
@@ -27,7 +28,11 @@ import {
   type ArticlePreview,
 } from "@/lib/articles";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
-import { getRequestLocale } from "@/lib/i18n/request-locale";
+import {
+  getRequestLocale,
+  requestIsEnglishHost,
+} from "@/lib/i18n/request-locale";
+import { ensureMoonPhase } from "@/actions/moon-phase";
 import { getBalance } from "@/lib/credits";
 import { shouldShowPurchasePromotion } from "@/lib/billing-config";
 import type { Metadata } from "next";
@@ -104,7 +109,13 @@ export default async function DashboardPage() {
   const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
   const en = locale !== "ka";
 
-  if (!profile?.dateOfBirth) {
+  // English host: an account without birth details still gets a filled
+  // dashboard (chart-free data + prompts) instead of a full-page wall. The
+  // Georgian host keeps the original locked shell.
+  const englishHost = await requestIsEnglishHost();
+  const noChart = !profile?.dateOfBirth;
+
+  if (noChart && !englishHost) {
     return (
       <AstroLockedMain
         active="today"
@@ -124,9 +135,10 @@ export default async function DashboardPage() {
     );
   }
 
-  const [restricted, publishedArticles] = await Promise.all([
+  const [restricted, publishedArticles, moonPhase] = await Promise.all([
     isAccountRestricted(user.id),
     listPublishedArticlePreviews(locale),
+    noChart ? ensureMoonPhase(locale).catch(() => null) : Promise.resolve(null),
   ]);
   const firstName =
     user.name?.split(" ")[0] ?? (en ? "stargazer" : "ვარსკვლავო");
@@ -162,6 +174,19 @@ export default async function DashboardPage() {
   const suggestedTest = pool[seedValue % pool.length];
   const suggestedArticles = pickDailyArticles(publishedArticles, seedValue);
 
+  if (noChart) {
+    return (
+      <NoChartDashboard
+        locale={locale}
+        firstName={firstName}
+        restricted={restricted}
+        moonPhase={moonPhase}
+        articles={suggestedArticles}
+        suggestedTest={suggestedTest}
+        testsAllCompleted={unfinished.length === 0}
+      />
+    );
+  }
   return (
     <main
       lang={locale}

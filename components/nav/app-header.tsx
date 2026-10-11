@@ -85,9 +85,11 @@ export async function AppHeader({
     }
   }
 
-  // The English site pays by card (Stripe is off there); the Georgian site
-  // keeps Stripe. Computed here so every page's header chip stays in sync.
-  const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
+  // The English site pays by card (Stripe is off there) and uses the compact
+  // sidebar; the Georgian site keeps Stripe and the full nav. Computed here
+  // so every page's header stays in sync.
+  const englishHost = await requestIsEnglishHost();
+  const cryptoPay = englishHost && isCryptoPayConfigured();
 
   return (
     <>
@@ -188,6 +190,7 @@ export async function AppHeader({
             unreadMessages={unreadMessages}
             pendingAskNudges={pendingAskNudges}
             locale={locale}
+            compact={englishHost}
           />
         </>
       )}
