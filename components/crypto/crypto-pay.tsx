@@ -849,14 +849,15 @@ function PayDialogBody({
             </div>
           )}
 
-          {!isFiat && !authenticated ? (
+          {!authenticated ? (
             <Button
               variant="mystic"
               className="w-full"
               disabled={!ready}
               onClick={() => login()}
             >
-              <Wallet className="size-4" /> Continue with a wallet
+              <Wallet className="size-4" />{" "}
+              {isFiat ? "Sign in to pay by card" : "Continue with a wallet"}
             </Button>
           ) : !isFiat && wallet ? (
             <div className="rounded-2xl border border-border bg-background/40 p-3.5">
