@@ -10,7 +10,7 @@ import {
   formatBillingAmount,
 } from "@/lib/credits-config";
 import { USDC_CREDIT_PACKS } from "@/lib/crypto-config";
-import { PayWithUsdcButton } from "@/components/crypto/crypto-pay";
+import { PayByCardButton } from "@/components/crypto/crypto-pay";
 import { fbTrack } from "@/lib/fb-pixel";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
@@ -18,7 +18,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Credit top-up — Stripe Checkout on the Georgian site; on the English site
- * (`crypto`) a pack opens the USDC payment dialog instead, and the server
+ * (`crypto`) a pack opens the card payment dialog instead, and the server
  * verifies the on-chain transfer before awarding the credits.
  */
 export function TopUpCard({
@@ -38,7 +38,7 @@ export function TopUpCard({
   returnTo?: string | null;
   product?: string | null;
   selectedPackId?: "s" | "m" | "l" | null;
-  /** English site: pay in USDC on Solana (Stripe is off there). */
+  /** English site: pay by card (Stripe is off there). */
   crypto?: boolean;
 }) {
   const en = locale !== "ka";
@@ -156,7 +156,7 @@ export function TopUpCard({
         <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
           <Check className="size-3.5 text-[var(--vivida-cyan)]" />
           {crypto
-            ? "Pay in USDC · Solana"
+            ? "Pay by card"
             : en
               ? "Secure one-time payment"
               : "ერთჯერადი უსაფრთხო გადახდა"}
@@ -244,7 +244,7 @@ export function TopUpCard({
             </>
           );
           return crypto ? (
-            <PayWithUsdcButton
+            <PayByCardButton
               key={p.id}
               kind="credits"
               packId={p.id}
@@ -256,7 +256,7 @@ export function TopUpCard({
               className={cardClass}
             >
               {cardBody}
-            </PayWithUsdcButton>
+            </PayByCardButton>
           ) : (
             <button
               key={p.id}
@@ -272,7 +272,7 @@ export function TopUpCard({
       </div>
       <p className="mt-3 text-center text-xs text-muted-foreground">
         {crypto
-          ? "Select a pack to pay with USDC."
+          ? "Select a pack to pay by card."
           : en
             ? "Select a pack to continue to secure checkout."
             : "ღილაკზე დაჭერით პირდაპირ გადახდაზე გადახვალ."}

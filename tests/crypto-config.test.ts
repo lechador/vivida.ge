@@ -49,8 +49,8 @@ describe("USDC crypto catalogue", () => {
     expect(usdcCreditPack(null)).toBe(null);
   });
 
-  it("formats USDC amounts in both locales", () => {
-    expect(formatBillingAmount(299, "usdc", "en")).toBe("2.99 USDC");
-    expect(formatBillingAmount(999, "usdc", "ka")).toBe("9.99 USDC");
+  it("formats catalogue amounts as fiat dollars (buyers pay by card)", () => {
+    expect(formatBillingAmount(299, "usdc", "en")).toBe("$2.99");
+    expect(formatBillingAmount(999, "usdc", "ka")).toBe("$9.99");
   });
 });

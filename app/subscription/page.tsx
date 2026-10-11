@@ -91,7 +91,7 @@ export default async function SubscriptionPage({
     getPremiumSubscription(user.id),
     isPremiumUser(user.id),
   ]);
-  // English host pays in USDC (Stripe checkout is off there); the Georgian
+  // English host pays by card (Stripe checkout is off there); the Georgian
   // site keeps its Stripe surfaces untouched.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
   const plan = premiumPlanForCountry(identity?.countryCode);
@@ -229,8 +229,8 @@ export default async function SubscriptionPage({
                     value={
                       subscription.source === "crypto"
                         ? en
-                          ? "One-time payment (USDC)"
-                          : "ერთჯერადი გადახდა (USDC)"
+                          ? "One-time card payment"
+                          : "ერთჯერადი გადახდა (ბარათით)"
                         : subscription.cancelAtPeriodEnd
                           ? en
                             ? "Cancellation scheduled"

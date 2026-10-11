@@ -367,14 +367,15 @@ export function formatBillingAmount(
   const fractionDigits = WHOLE_UNIT_DISPLAY_CURRENCIES.has(code) ? 0 : 2;
   const amount = amountMinor / 100;
 
-  // USDC is a token, not an ISO currency — Intl rejects the 4-letter code,
-  // so both locales get the same explicit "9.99 USDC" formatting.
+  // Card-direct buyers pay fiat USD (Privy converts behind the scenes), so
+  // the English-site catalogue renders as dollars — not the USDC the chain
+  // settles in. (On-chain amounts still use formatUsdc, which keeps "USDC".)
   if (code === "usdc") {
     const digits = new Intl.NumberFormat("en-GB", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
-    return `${digits} USDC`;
+    return `$${digits}`;
   }
 
   // Browsers ship no `ka` locale data, so an Intl call under it resolves

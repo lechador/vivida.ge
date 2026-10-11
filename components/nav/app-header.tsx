@@ -85,7 +85,7 @@ export async function AppHeader({
     }
   }
 
-  // The English site pays in USDC (Stripe is off there); the Georgian site
+  // The English site pays by card (Stripe is off there); the Georgian site
   // keeps Stripe. Computed here so every page's header chip stays in sync.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
 

@@ -12,7 +12,7 @@ import {
   type PremiumPlan,
 } from "@/lib/billing-config";
 import { USDC_PREMIUM_PASS } from "@/lib/crypto-config";
-import { PayWithUsdcButton } from "@/components/crypto/crypto-pay";
+import { PayByCardButton } from "@/components/crypto/crypto-pay";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { fbTrack } from "@/lib/fb-pixel";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
@@ -45,7 +45,7 @@ export function PremiumPlanCard({
   placement?: string;
   returnTo?: string | null;
   product?: string | null;
-  /** English site: one-time USDC pass instead of a Stripe subscription. */
+  /** English site: one-time card pass instead of a Stripe subscription. */
   crypto?: boolean;
 }) {
   const en = locale !== "ka";
@@ -136,7 +136,7 @@ export function PremiumPlanCard({
   }
 
   // English site: crypto cannot auto-renew, so the card sells a one-time
-  // 30-day pass paid in USDC — no plan toggles, no renewal promise.
+  // 30-day pass paid by card — no plan toggles, no renewal promise.
   if (crypto && !active) {
     return (
       <section className="relative overflow-hidden rounded-3xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-gold)]/14 via-card/70 to-[var(--vivida-violet)]/12 p-6 ring-1 ring-foreground/5 sm:p-8">
@@ -166,7 +166,7 @@ export function PremiumPlanCard({
               {formatBillingAmount(USDC_PREMIUM_PASS.amountMinor, "usdc", "en")}
             </div>
             <div className="text-xs text-muted-foreground">30-day pass</div>
-            <PayWithUsdcButton
+            <PayByCardButton
               kind="premium_pass"
               days={USDC_PREMIUM_PASS.days}
               amountUsdcCents={USDC_PREMIUM_PASS.amountMinor}
@@ -175,10 +175,10 @@ export function PremiumPlanCard({
               className="mt-3 w-full"
             >
               Get 30 days of PRO
-            </PayWithUsdcButton>
+            </PayByCardButton>
             <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
-              One-time payment in USDC on Solana. No auto-renewal — buy another
-              pass whenever you like.
+              One-time card payment. No auto-renewal — buy another pass whenever
+              you like.
             </p>
           </div>
         </div>

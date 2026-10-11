@@ -58,7 +58,7 @@ export default async function ReportPage({
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userPrefs?.locale));
   const en = locale !== "ka";
-  // English host pays in USDC (Stripe checkout is off there); the Georgian
+  // English host pays by card (Stripe checkout is off there); the Georgian
   // site keeps its Stripe surfaces untouched.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
   // Only pay the balance-query cost on the explicit campaign landing path.

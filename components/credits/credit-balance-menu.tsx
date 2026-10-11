@@ -40,7 +40,7 @@ export function CreditBalanceMenu({
   locale: UserLocale;
   isPremium?: boolean;
   countryCode?: string | null;
-  /** English site: quick top-up links to the USDC dialog on /credits. */
+  /** English site: quick top-up links to the card dialog on /credits. */
   crypto?: boolean;
 }) {
   const [pending, setPending] = useState<string | null>(null);
