@@ -16,13 +16,18 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/crypto/checkout { packId } | { kind: "premium_pass" }
+ * POST /api/crypto/checkout { packId, method? } | { kind: "premium_pass", method? }
  *
  * Creates a pending USDC purchase on Solana for the English site and returns
  * everything the payment UI needs: the snapshotted recipient, the per-order
- * reference, and the Solana Pay URL (QR / deep link). The buyer pays from
- * their own wallet; the status route verifies on-chain and grants. The
- * Georgian site keeps Stripe — this route refuses non-English hosts.
+ * reference, and the Solana Pay URL (QR / deep link).
+ *
+ * `method: "fiat"` marks a card-direct purchase: the buyer pays by card in
+ * Privy's fund modal with `destination.wallet` set to the snapshotted
+ * recipient, so USDC lands in OUR wallet and the buyer never touches crypto.
+ * The reference/URL are still returned (harmless) but unused; verification
+ * matches by time window + tolerance-floored amount instead. The Georgian
+ * site keeps Stripe — this route refuses non-English hosts.
  */
 export async function POST(req: Request) {
   const session = await auth();
@@ -51,10 +56,12 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as {
     packId?: unknown;
     kind?: unknown;
+    method?: unknown;
     returnTo?: unknown;
     product?: unknown;
   };
   const kind = body.kind === "premium_pass" ? "premium_pass" : "credits";
+  const method = body.method === "fiat" ? "fiat" : "wallet";
   const returnTo =
     typeof body.returnTo === "string"
       ? normalizeReturnPath(body.returnTo)
@@ -77,6 +84,7 @@ export async function POST(req: Request) {
     const purchase = await createPendingCryptoPurchase({
       userId,
       kind,
+      method,
       packId: body.packId,
       product,
       returnTo,
@@ -94,6 +102,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       id: purchase.id,
       kind: purchase.kind,
+      method: purchase.method,
       credits: purchase.credits,
       days: purchase.days,
       amountUsdcCents: purchase.amountUsdcCents,

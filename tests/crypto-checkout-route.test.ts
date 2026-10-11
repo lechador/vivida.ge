@@ -27,6 +27,7 @@ import { POST } from "@/app/api/crypto/checkout/route";
 const PURCHASE = {
   id: "cp-1",
   kind: "credits",
+  method: "wallet",
   credits: 30,
   days: null,
   amountUsdcCents: 299,
@@ -136,10 +137,30 @@ describe("POST /api/crypto/checkout", () => {
     expect(mocks.createPendingCryptoPurchase).toHaveBeenCalledWith({
       userId: "user-1",
       kind: "credits",
+      method: "wallet",
       packId: "s",
       product: "tarot",
       returnTo: "/taro",
     });
+  });
+
+  it("passes the fiat method through for card-direct purchases", async () => {
+    mocks.createPendingCryptoPurchase.mockResolvedValueOnce({
+      ...PURCHASE,
+      method: "fiat",
+    });
+    const response = await POST(
+      request("https://vividaastro.com/api/crypto/checkout", {
+        packId: "s",
+        method: "fiat",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({ method: "fiat" });
+    expect(mocks.createPendingCryptoPurchase).toHaveBeenCalledWith(
+      expect.objectContaining({ method: "fiat" }),
+    );
   });
 
   it("refuses a PRO pass while a processor subscription is entitled", async () => {

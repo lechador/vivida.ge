@@ -12,7 +12,7 @@ import {
   Wallet,
 } from "lucide-react";
 import QRCode from "qrcode";
-import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
+import { PrivyProvider, useDepositFunds, usePrivy } from "@privy-io/react-auth";
 import {
   toSolanaWalletConnectors,
   useSignAndSendTransaction,
@@ -75,6 +75,8 @@ const RPC_WS_URL = RPC_URL.replace(/^https:\/\//, "wss://").replace(
 
 export type CryptoPayRequest = {
   kind: "credits" | "premium_pass";
+  /** Wallet pays from the buyer's wallet; fiat pays by card straight to our wallet. */
+  method?: "wallet" | "fiat";
   packId?: "s" | "m" | "l";
   credits?: number | null;
   days?: number | null;
@@ -152,6 +154,7 @@ export function CryptoPayHost({ children }: { children: React.ReactNode }) {
 
 export function PayWithUsdcButton({
   kind,
+  method = "wallet",
   packId,
   credits,
   days,
@@ -188,6 +191,7 @@ export function PayWithUsdcButton({
         });
         context?.open({
           kind,
+          method,
           packId,
           credits,
           days,
@@ -237,6 +241,7 @@ function PayDialog({
 type PurchaseInfo = {
   id: string;
   kind: "credits" | "premium_pass";
+  method: string;
   credits: number | null;
   days: number | null;
   amountUsdcCents: number;
@@ -270,6 +275,8 @@ function PayDialogBody({
   const { ready, authenticated, login } = usePrivy();
   const { wallets } = useWallets();
   const { signAndSendTransaction } = useSignAndSendTransaction();
+  const { depositFunds } = useDepositFunds();
+  const cryptoContext = React.useContext(CryptoPayContext);
 
   const [phase, setPhase] = React.useState<Phase>("creating");
   const [purchase, setPurchase] = React.useState<PurchaseInfo | null>(null);
@@ -283,6 +290,8 @@ function PayDialogBody({
   const [pasteError, setPasteError] = React.useState<string | null>(null);
   const [walletBusy, setWalletBusy] = React.useState(false);
   const [walletError, setWalletError] = React.useState<string | null>(null);
+  const [cardBusy, setCardBusy] = React.useState(false);
+  const [cardError, setCardError] = React.useState<string | null>(null);
   const [balanceBaseUnits, setBalanceBaseUnits] = React.useState<bigint | null>(
     null,
   );
@@ -290,6 +299,8 @@ function PayDialogBody({
   const [copied, setCopied] = React.useState<string | null>(null);
 
   const amountLabel = formatUsdc(request.amountUsdcCents);
+  const fiatLabel = `$${(request.amountUsdcCents / 100).toFixed(2)}`;
+  const isFiat = purchase?.method === "fiat";
   const itemLabel =
     request.kind === "credits"
       ? `${request.credits ?? ""} Vivida credits`
@@ -311,6 +322,7 @@ function PayDialogBody({
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
             kind: request.kind,
+            method: request.method ?? "wallet",
             packId: request.packId,
             product: request.product ?? undefined,
             returnTo: request.returnTo ?? undefined,
@@ -320,6 +332,7 @@ function PayDialogBody({
           alreadyPremium?: boolean;
           id?: string;
           kind?: "credits" | "premium_pass";
+          method?: string;
           credits?: number | null;
           days?: number | null;
           amountUsdcCents?: number;
@@ -341,6 +354,7 @@ function PayDialogBody({
         setPurchase({
           id: data.id,
           kind: data.kind ?? request.kind,
+          method: data.method ?? "wallet",
           credits: data.credits ?? null,
           days: data.days ?? null,
           amountUsdcCents: data.amountUsdcCents ?? request.amountUsdcCents,
@@ -596,6 +610,91 @@ function PayDialogBody({
     }
   };
 
+  /**
+   * Card-direct payment: Privy's fund modal with destination.wallet set to
+   * the platform wallet, so USDC lands in OUR wallet and the buyer never
+   * touches crypto. The modal returns no transaction proof — only
+   * submitted/confirmed — so we notify the server, which window-scans for
+   * the incoming transfer while the existing poll watches for confirmation.
+   */
+  const payByCard = async () => {
+    if (!purchase || cardBusy) return;
+    if (!authenticated) {
+      setCardError("Sign in first, then pay by card.");
+      return;
+    }
+    setCardBusy(true);
+    setCardError(null);
+    try {
+      const result = await depositFunds({
+        destination: {
+          asset: "usdc",
+          chain: "solana",
+          wallet: purchase.recipient,
+        },
+        fiat: {
+          source: { defaultAsset: "usd" },
+          defaultAmount: (purchase.amountUsdcCents / 100).toFixed(2),
+        },
+      });
+      if (
+        result.method !== "fiat" ||
+        (result.status !== "confirmed" && result.status !== "submitted")
+      ) {
+        setCardError("The card payment didn't complete. Please try again.");
+        return;
+      }
+      const res = await fetch(`/api/crypto/checkout/${purchase.id}/fiat`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ depositStatus: result.status }),
+      });
+      if (!res.ok) {
+        setCardError(
+          "We couldn't start tracking your payment. Please try again.",
+        );
+        return;
+      }
+      fbTrack(
+        "AddPaymentInfo",
+        {
+          value: purchase.amountUsdcCents / 100,
+          currency: "USD",
+          content_ids: [
+            request.kind === "credits"
+              ? `credits_${request.credits}`
+              : "premium_crypto_30d",
+          ],
+          content_type: "product",
+        },
+        `${purchase.id}:add_payment_info`,
+      );
+      // Stay in awaiting — the status poll detects the on-chain arrival.
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setCardError(
+        /cancel|dismiss|close|exit|denied/i.test(message)
+          ? "Card payment cancelled."
+          : "Card payment failed. Please try again.",
+      );
+    } finally {
+      setCardBusy(false);
+    }
+  };
+
+  const switchMethod = () => {
+    cryptoContext?.open({
+      kind: request.kind,
+      method: isFiat ? "wallet" : "fiat",
+      packId: request.packId,
+      credits: request.credits,
+      days: request.days,
+      amountUsdcCents: request.amountUsdcCents,
+      product: request.product,
+      returnTo: request.returnTo,
+    });
+  };
+
   const checkPasted = async () => {
     if (!purchase || !paste.trim()) return;
     setChecking(true);
@@ -653,8 +752,13 @@ function PayDialogBody({
   return (
     <div className="space-y-4">
       <DialogHeader>
-        <DialogTitle className="text-xl">Pay with USDC</DialogTitle>
-        <DialogDescription>{itemLabel} · Solana network</DialogDescription>
+        <DialogTitle className="text-xl">
+          {isFiat ? "Pay by card" : "Pay with USDC"}
+        </DialogTitle>
+        <DialogDescription>
+          {itemLabel}
+          {isFiat ? " · card payment" : " · Solana network"}
+        </DialogDescription>
       </DialogHeader>
 
       {phase === "creating" && (
@@ -702,14 +806,50 @@ function PayDialogBody({
         <>
           <div className="rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 p-4 text-center">
             <div className="text-3xl font-bold tracking-tight">
-              {amountLabel}
+              {isFiat ? fiatLabel : amountLabel}
             </div>
             <div className="mt-0.5 text-xs text-muted-foreground">
               {itemLabel}
             </div>
+            <button
+              type="button"
+              onClick={switchMethod}
+              className="mt-2 text-xs font-medium text-[var(--vivida-cyan)] underline decoration-dotted underline-offset-4"
+            >
+              {isFiat ? "← Pay with USDC instead" : "Pay by card instead →"}
+            </button>
           </div>
 
-          {!authenticated ? (
+          {isFiat && authenticated && (
+            <div className="rounded-2xl border border-border bg-background/40 p-3.5">
+              <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                Card payment
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Pay with your card — Apple Pay and Google Pay supported where
+                available. The crypto is handled for you; you never touch a
+                wallet.
+              </p>
+              <Button
+                variant="mystic"
+                className="mt-3 w-full"
+                disabled={cardBusy}
+                onClick={() => void payByCard()}
+              >
+                {cardBusy ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Wallet className="size-4" />
+                )}
+                Pay {fiatLabel} by card
+              </Button>
+              {cardError && (
+                <p className="mt-2 text-xs text-destructive">{cardError}</p>
+              )}
+            </div>
+          )}
+
+          {!isFiat && !authenticated ? (
             <Button
               variant="mystic"
               className="w-full"
@@ -718,7 +858,7 @@ function PayDialogBody({
             >
               <Wallet className="size-4" /> Continue with a wallet
             </Button>
-          ) : wallet ? (
+          ) : !isFiat && wallet ? (
             <div className="rounded-2xl border border-border bg-background/40 p-3.5">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
@@ -784,76 +924,80 @@ function PayDialogBody({
                 <p className="mt-2 text-xs text-destructive">{walletError}</p>
               )}
             </div>
-          ) : (
+          ) : !isFiat ? (
             <p className="text-center text-sm text-muted-foreground">
               Setting up your wallet…
             </p>
-          )}
+          ) : null}
 
-          <div className="rounded-2xl border border-border bg-background/40 p-3.5">
-            <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              Or pay from any Solana wallet
-            </div>
-            <div className="mt-2 flex items-center gap-3">
-              {qr ? (
-                // eslint-disable-next-line @next/next/no-img-element -- data URL QR
-                <img
-                  src={qr}
-                  alt="Scan to pay"
-                  className="size-28 rounded-lg bg-white p-1"
-                />
-              ) : (
-                <div className="size-28 shrink-0 animate-pulse rounded-lg bg-foreground/5" />
-              )}
-              <div className="min-w-0 flex-1 text-xs text-muted-foreground">
-                <p>
-                  Scan with Phantom, Solflare, or any wallet app — the amount
-                  and order are prefilled.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => void copy(purchase.recipient, "recipient")}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-2 py-1 font-mono text-[11px] text-foreground"
-                >
-                  {shortAddress(purchase.recipient)}
-                  {copied === "recipient" ? (
-                    <Check className="size-3" />
+          {!isFiat && (
+            <>
+              <div className="rounded-2xl border border-border bg-background/40 p-3.5">
+                <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  Or pay from any Solana wallet
+                </div>
+                <div className="mt-2 flex items-center gap-3">
+                  {qr ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- data URL QR
+                    <img
+                      src={qr}
+                      alt="Scan to pay"
+                      className="size-28 rounded-lg bg-white p-1"
+                    />
                   ) : (
-                    <Copy className="size-3" />
+                    <div className="size-28 shrink-0 animate-pulse rounded-lg bg-foreground/5" />
                   )}
-                </button>
+                  <div className="min-w-0 flex-1 text-xs text-muted-foreground">
+                    <p>
+                      Scan with Phantom, Solflare, or any wallet app — the
+                      amount and order are prefilled.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => void copy(purchase.recipient, "recipient")}
+                      className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-2 py-1 font-mono text-[11px] text-foreground"
+                    >
+                      {shortAddress(purchase.recipient)}
+                      {copied === "recipient" ? (
+                        <Check className="size-3" />
+                      ) : (
+                        <Copy className="size-3" />
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div className="rounded-2xl border border-border bg-background/40 p-3.5">
-            <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              Already paid?
-            </div>
-            <div className="mt-2 flex gap-2">
-              <Input
-                value={paste}
-                onChange={(e) => setPaste(e.target.value)}
-                placeholder="Paste the transaction ID"
-                className="font-mono text-xs"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void checkPasted()}
-                disabled={checking || !paste.trim()}
-              >
-                {checking ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  "Check"
+              <div className="rounded-2xl border border-border bg-background/40 p-3.5">
+                <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  Already paid?
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <Input
+                    value={paste}
+                    onChange={(e) => setPaste(e.target.value)}
+                    placeholder="Paste the transaction ID"
+                    className="font-mono text-xs"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void checkPasted()}
+                    disabled={checking || !paste.trim()}
+                  >
+                    {checking ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      "Check"
+                    )}
+                  </Button>
+                </div>
+                {pasteError && (
+                  <p className="mt-2 text-xs text-destructive">{pasteError}</p>
                 )}
-              </Button>
-            </div>
-            {pasteError && (
-              <p className="mt-2 text-xs text-destructive">{pasteError}</p>
-            )}
-          </div>
+              </div>
+            </>
+          )}
 
           <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
             <Loader2 className="size-3 animate-spin" />

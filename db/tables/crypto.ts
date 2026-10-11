@@ -5,14 +5,20 @@ import { users } from "./users";
  * Platform crypto purchases (English site): credit packs and PRO passes paid
  * in USDC on Solana.
  *
- * The buyer pays from their own wallet (Privy embedded wallet or any
- * external wallet) DIRECTLY to the platform wallet snapshotted on the row —
- * the app never sends transactions and never sees private keys. The server
- * verifies the submitted transaction signature against a public RPC: a
- * finalized USDC credit to `recipientWallet` for at least `amountUsdcCents`
- * carrying this row's `reference` account. One payment funds one purchase
- * (unique `txSignature`), and grants are idempotent so redelivered polls can
- * never double-credit.
+ * Two payment methods share this table:
+ * - `wallet`: the buyer pays from their own wallet (Privy embedded wallet or
+ *   any external wallet) DIRECTLY to the platform wallet snapshotted on the
+ *   row. The server finds the transfer by this row's `reference` account.
+ * - `fiat`: the buyer pays by card/Apple Pay/Google Pay in Privy's fund
+ *   modal, with `destination.wallet` set to the platform wallet — USDC lands
+ *   in OUR wallet and the buyer never touches crypto. The fund modal returns
+ *   no transaction proof, so the server matches the transfer by time window
+ *   (blockTime at/after purchase creation) plus a tolerance-floored amount,
+ *   first-unmatched-wins.
+ *
+ * The app never sends transactions and never sees private keys. Grants are
+ * idempotent (unique tx signature) so redelivered polls can never
+ * double-credit.
  */
 export const cryptoPurchases = pgTable(
   "crypto_purchase",
@@ -41,6 +47,14 @@ export const cryptoPurchases = pgTable(
      * getSignaturesForAddress without the buyer pasting anything.
      */
     reference: text("reference").notNull().unique(),
+    /** 'wallet' | 'fiat' — wallet pays from the buyer's wallet (reference-matched); fiat pays by card straight to our wallet (window-matched). */
+    method: text("method").notNull().default("wallet"),
+    /**
+     * Set when the buyer's fiat fund flow reaches submitted/confirmed — the
+     * moment the server starts window-scanning for the incoming transfer.
+     * Null on wallet-method purchases (their reference scan runs from creation).
+     */
+    fiatConfirmedAt: timestamp("fiat_confirmed_at", { withTimezone: true }),
     /** pending → confirmed (or expired). */
     status: text("status").notNull().default("pending"),
     /** Verified mainnet signature. Unique = each payment funds one purchase. */

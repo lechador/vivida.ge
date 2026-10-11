@@ -232,3 +232,54 @@ describe("Solana Pay URL + address strictness", () => {
     expect(isValidSolanaAddress(RECIPIENT)).toBe(true);
   });
 });
+
+describe("fiat-direct verification (no reference, tolerance floor, window)", () => {
+  it("accepts a reference-free credit at the tolerance floor", async () => {
+    const { checkPaidTransaction, FIAT_MIN_FRACTION_BPS } =
+      await import("@/lib/crypto-pay");
+    // 9.99 USDC due; floor is 90% = 8.991 USDC = 8991000 base units.
+    expect(FIAT_MIN_FRACTION_BPS).toBe(9000);
+    const floor = (9990000 * FIAT_MIN_FRACTION_BPS) / 10000;
+    expect(
+      checkPaidTransaction(txValue({ includeReference: false }), PURCHASE, {
+        requireReference: false,
+        minBaseUnits: BigInt(Math.floor(floor)),
+      }),
+    ).toEqual({ ok: true });
+    expect(
+      checkPaidTransaction(
+        txValue({ includeReference: false, amount: "8991000" }),
+        PURCHASE,
+        { requireReference: false, minBaseUnits: BigInt(8991000) },
+      ),
+    ).toEqual({ ok: true });
+  });
+
+  it("reports the shortfall against the full price, not the floor", async () => {
+    const { checkPaidTransaction } = await import("@/lib/crypto-pay");
+    // 8.00 USDC arrived against 9.99 due → 199 cents short, even though the
+    // floor check is what failed.
+    expect(
+      checkPaidTransaction(
+        txValue({ includeReference: false, amount: "8000000" }),
+        PURCHASE,
+        { requireReference: false, minBaseUnits: BigInt(8991000) },
+      ),
+    ).toEqual({ ok: false, reason: "underpaid", shortfallUsdcCents: 199 });
+  });
+
+  it("filters window candidates oldest-first, dropping failures and stale rows", async () => {
+    const { filterFiatCandidates } = await import("@/lib/crypto-pay");
+    const sinceMs = 1_700_000_000_000;
+    const rows = [
+      { signature: "new", blockTime: sinceMs / 1000 + 60, err: null },
+      { signature: "failed", blockTime: sinceMs / 1000 + 30, err: {} },
+      { signature: "old", blockTime: sinceMs / 1000 - 600, err: null },
+      { signature: "notime", blockTime: null, err: null },
+      { signature: "first", blockTime: sinceMs / 1000 + 10, err: null },
+    ];
+    // FIFO: oldest in-window match first, so concurrent same-pack purchases
+    // split transfers fairly instead of double-claiming the newest.
+    expect(filterFiatCandidates(rows, sinceMs)).toEqual(["first", "new"]);
+  });
+});

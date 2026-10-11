@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { cryptoPurchases } from "@/db/schema";
 import {
   confirmCryptoPurchase,
+  confirmFiatCryptoPurchase,
   getCryptoPurchase,
   trackCryptoPurchaseCompletedBestEffort,
 } from "@/lib/crypto-pay";
@@ -20,9 +21,11 @@ type Params = { params: Promise<{ id: string }> };
 /**
  * GET /api/crypto/checkout/[id] — poll a pending purchase.
  *
- * The server auto-detects the payment by scanning the purchase's reference
- * key (getSignaturesForAddress) and verifies the on-chain transfer; the
- * buyer never has to paste anything. Returns:
+ * Wallet-method purchases auto-detect by scanning the purchase's reference
+ * key; fiat-direct purchases (card paid straight to our wallet) match by
+ * time window + tolerance-floored amount once the client reports the fund
+ * flow submitted/confirmed. Either way the buyer never pastes anything.
+ * Returns:
  *   pending   — nothing matched yet (keep polling)
  *   confirmed — verified + granted (idempotent)
  *   problem   — a matching payment exists but cannot be credited (underpaid…)
@@ -39,7 +42,10 @@ export async function GET(req: Request, ctx: Params) {
   if (!purchase)
     return NextResponse.json({ error: "not_found" }, { status: 404 });
 
-  const outcome = await confirmCryptoPurchase({ purchase });
+  const outcome =
+    purchase.method === "fiat"
+      ? await confirmFiatCryptoPurchase({ purchase })
+      : await confirmCryptoPurchase({ purchase });
 
   if (outcome.status === "confirmed") {
     if (!outcome.already) {

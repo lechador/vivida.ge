@@ -25,6 +25,13 @@ import {
  * their own wallet (Privy embedded or external) and the server verifies the
  * on-chain transfer against the pending purchase row, then grants exactly
  * once (unique tx signature + idempotent grant).
+ *
+ * `fiat` purchases skip the wallet entirely: the buyer pays by card in
+ * Privy's fund modal with `destination.wallet` set to the platform wallet,
+ * so USDC lands in OUR wallet and the buyer never touches crypto. The fund
+ * modal returns no transaction proof — only submitted/confirmed — so those
+ * purchases are matched by time window plus a tolerance-floored amount,
+ * first-unmatched-wins (see confirmFiatCryptoPurchase).
  */
 
 export const CRYPTO_PURCHASE_TTL_MS = 60 * 60 * 1000;
@@ -51,15 +58,21 @@ export function newPaymentReference(): string {
 
 export type CryptoPurchaseKind = "credits" | "premium_pass";
 
+export type CryptoPurchaseMethod = "wallet" | "fiat";
+
 export async function createPendingCryptoPurchase(input: {
   userId: string;
   kind: CryptoPurchaseKind;
+  method?: unknown;
   packId?: unknown;
   product?: string | null;
   returnTo?: string | null;
 }): Promise<CryptoPurchase> {
   const wallet = receivingWallet();
   if (!wallet) throw new Error("crypto rail is not configured");
+
+  const method: CryptoPurchaseMethod =
+    input.method === "fiat" ? "fiat" : "wallet";
 
   let packId: string | null = null;
   let credits: number | null = null;
@@ -88,6 +101,7 @@ export async function createPendingCryptoPurchase(input: {
       amountUsdcCents,
       recipientWallet: wallet,
       reference: newPaymentReference(),
+      method,
       expiresAt: new Date(Date.now() + CRYPTO_PURCHASE_TTL_MS),
       product: input.product ?? null,
       returnTo: input.returnTo ?? null,
@@ -236,23 +250,29 @@ type PaidCheck =
 
 /**
  * The payment contract: a finalized, successful USDC credit to the
- * snapshotted recipient wallet for at least the snapshotted price, in a
- * transaction that carries this purchase's reference account. The reference
- * binding is what makes self-serve claims safe — a stranger's payment to the
- * same platform wallet can never be claimed against another purchase.
+ * snapshotted recipient wallet for at least the snapshotted price — in a
+ * transaction that carries this purchase's reference account, unless the
+ * caller opts out (fiat-direct payments carry no reference; the on-ramp
+ * sends plain USDC). `minBaseUnits` floors the accepted amount: card
+ * on-ramps take a fee/FX spread, so the USDC that lands is virtually always
+ * slightly under nominal — the shortfall is still reported against the full
+ * price for honest UI copy.
  */
 export function checkPaidTransaction(
   tx: RpcTxValue,
   purchase: CryptoPurchase,
+  opts?: { requireReference?: boolean; minBaseUnits?: bigint },
 ): PaidCheck {
   if (tx.err != null || tx.meta?.err != null) {
     return { ok: false, reason: "failed" };
   }
-  const accountKeys = (tx.transaction?.message?.accountKeys ?? []).map((k) =>
-    String(k?.pubkey ?? ""),
-  );
-  if (!accountKeys.includes(purchase.reference)) {
-    return { ok: false, reason: "no_reference" };
+  if (opts?.requireReference !== false) {
+    const accountKeys = (tx.transaction?.message?.accountKeys ?? []).map((k) =>
+      String(k?.pubkey ?? ""),
+    );
+    if (!accountKeys.includes(purchase.reference)) {
+      return { ok: false, reason: "no_reference" };
+    }
   }
   const credited = usdcDeltaForRecipient(
     tx.meta?.preTokenBalances,
@@ -260,9 +280,11 @@ export function checkPaidTransaction(
     purchase.recipientWallet,
     USDC_MINT,
   );
-  const expected = BigInt(usdcCentsToBaseUnits(purchase.amountUsdcCents));
-  if (credited < expected) {
-    const shortfallBaseUnits = expected - credited;
+  const fullExpected = BigInt(usdcCentsToBaseUnits(purchase.amountUsdcCents));
+  const floor = opts?.minBaseUnits ?? fullExpected;
+  if (credited < floor) {
+    const shortfallBaseUnits =
+      fullExpected > credited ? fullExpected - credited : BigInt(0);
     const shortfallUsdcCents = Math.ceil(Number(shortfallBaseUnits) / 10_000);
     return { ok: false, reason: "underpaid", shortfallUsdcCents };
   }
@@ -333,6 +355,91 @@ async function applyGrant(purchase: CryptoPurchase): Promise<void> {
 }
 
 /**
+ * Fiat-direct matching constants.
+ *
+ * The fund modal returns no transaction proof, so these purchases match by
+ * window: transfers touching the platform wallet at/after purchase creation
+ * (minus skew for clock drift and pre-created orders). The amount floor
+ * absorbs the on-ramp fee/FX spread — the USDC that lands is virtually
+ * always slightly under the nominal pack price.
+ */
+export const FIAT_SCAN_LIMIT = 25;
+export const FIAT_WINDOW_SKEW_MS = 120_000;
+export const FIAT_MIN_FRACTION_BPS = 9000;
+
+export type AddressSignatureRow = {
+  signature: string;
+  /** Unix seconds (null when the RPC omits it — row is unusable). */
+  blockTime: number | null;
+  err: unknown;
+};
+
+/** Recent signatures touching an address, newest-first (RPC order). */
+export async function recentSignaturesForAddress(
+  address: string,
+  limit: number,
+): Promise<AddressSignatureRow[] | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15_000);
+  try {
+    const res = await fetch(solanaRpcUrl(), {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      signal: controller.signal,
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "getSignaturesForAddress",
+        params: [address, { limit }],
+      }),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json().catch(() => null)) as {
+      result?: Array<{
+        signature?: unknown;
+        blockTime?: unknown;
+        err?: unknown;
+      }> | null;
+    } | null;
+    const rows = json?.result ?? [];
+    return rows.flatMap((row) => {
+      if (typeof row?.signature !== "string") return [];
+      return [
+        {
+          signature: row.signature,
+          blockTime: typeof row.blockTime === "number" ? row.blockTime : null,
+          err: row.err,
+        },
+      ];
+    });
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Pure window filter for fiat matching: drop failed transactions and
+ * anything older than the purchase window, oldest-first so concurrent
+ * same-pack purchases claim FIFO (first-unmatched-wins stays fair).
+ */
+export function filterFiatCandidates(
+  rows: AddressSignatureRow[],
+  sinceMs: number,
+): string[] {
+  return rows
+    .filter(
+      (row) =>
+        row.err == null &&
+        row.blockTime != null &&
+        row.blockTime * 1000 >= sinceMs,
+    )
+    .sort((a, b) => (a.blockTime as number) - (b.blockTime as number))
+    .map((row) => row.signature);
+}
+
+/**
  * Verify + confirm one purchase.
  *
  * `signature` set → explicit submit (the wallet client just sent it, or the
@@ -361,6 +468,19 @@ export async function confirmCryptoPurchase(input: {
     if (!signature) return { status: "pending" };
   }
 
+  return verifyAndClaim(purchase, signature, { requireReference: true });
+}
+
+/**
+ * Verify one already-fetched signature and claim it for the purchase.
+ * Shared by the wallet flow (reference-bound) and the fiat flow
+ * (window-matched with a tolerance floor).
+ */
+async function verifyAndClaim(
+  purchase: CryptoPurchase,
+  signature: string,
+  opts?: { requireReference?: boolean; minBaseUnits?: bigint },
+): Promise<CryptoConfirmOutcome> {
   // One signature funds one purchase. Pre-check, then catch the unique
   // constraint at claim time (a pre-check alone races under concurrency).
   const [claimedBy] = await db
@@ -381,7 +501,7 @@ export async function confirmCryptoPurchase(input: {
     return { status: "failed", reason: "not_found" };
   }
 
-  const check = checkPaidTransaction(fetched.value, purchase);
+  const check = checkPaidTransaction(fetched.value, purchase, opts);
   if (!check.ok) {
     console.warn(
       `[crypto/verify] ${purchase.id} rejected: ${check.reason}` +
@@ -396,10 +516,18 @@ export async function confirmCryptoPurchase(input: {
     };
   }
 
-  const payerWallet = firstSigner(fetched.value);
+  return claimRow(purchase, signature, firstSigner(fetched.value));
+}
 
-  // Claim: pending (or expired — on-chain money is the source of truth) →
-  // confirmed, exactly once. A conditional UPDATE, not a blind write.
+/**
+ * Claim: pending (or expired — on-chain money is the source of truth) →
+ * confirmed, exactly once. A conditional UPDATE, not a blind write.
+ */
+async function claimRow(
+  purchase: CryptoPurchase,
+  signature: string,
+  payerWallet: string | null,
+): Promise<CryptoConfirmOutcome> {
   let claimed: CryptoPurchase | null = null;
   try {
     const rows = await db
@@ -444,6 +572,98 @@ export async function confirmCryptoPurchase(input: {
 
   await applyGrant(claimed);
   return { status: "confirmed", purchase: claimed, already: false };
+}
+
+/**
+ * Verify + confirm a fiat-direct purchase.
+ *
+ * No reference exists (the on-ramp sends plain USDC), so this scans the
+ * platform wallet's recent transfers: oldest in-window transfer at/above
+ * the tolerance floor wins. Already-claimed signatures are skipped, so
+ * concurrent same-pack purchases split transfers FIFO instead of
+ * double-claiming. Returns pending until the client reports the fund flow
+ * reached submitted/confirmed (fiatConfirmedAt) — no point burning RPC
+ * calls before the buyer has paid.
+ */
+export async function confirmFiatCryptoPurchase(input: {
+  purchase: CryptoPurchase;
+}): Promise<CryptoConfirmOutcome> {
+  const purchase = input.purchase;
+
+  if (purchase.status === "confirmed") {
+    await applyGrant(purchase);
+    return { status: "confirmed", purchase, already: true };
+  }
+  if (purchase.method !== "fiat" || !purchase.fiatConfirmedAt) {
+    return { status: "pending" };
+  }
+
+  const sinceMs = purchase.createdAt.getTime() - FIAT_WINDOW_SKEW_MS;
+  const fullExpected = BigInt(usdcCentsToBaseUnits(purchase.amountUsdcCents));
+  const floor = (fullExpected * BigInt(FIAT_MIN_FRACTION_BPS)) / BigInt(10000);
+
+  const rows = await recentSignaturesForAddress(
+    purchase.recipientWallet,
+    FIAT_SCAN_LIMIT,
+  );
+  if (!rows) return { status: "pending" };
+  const candidates = filterFiatCandidates(rows, sinceMs);
+  if (candidates.length === 0) return { status: "pending" };
+
+  const claimedRows = await db
+    .select({ sig: cryptoPurchases.txSignature })
+    .from(cryptoPurchases)
+    .where(inArray(cryptoPurchases.txSignature, candidates));
+  const claimed = new Set(
+    claimedRows.map((row) => row.sig).filter((sig) => sig != null),
+  );
+
+  let underpaidShortfall: number | undefined;
+  for (const signature of candidates) {
+    if (claimed.has(signature)) continue;
+    const fetched = await fetchConfirmedTransaction(signature);
+    if (fetched.kind !== "ok") continue;
+    const check = checkPaidTransaction(fetched.value, purchase, {
+      requireReference: false,
+      minBaseUnits: floor,
+    });
+    if (check.ok) {
+      return claimMatchedSignature(purchase, signature, fetched.value);
+    }
+    if (check.reason === "underpaid" && underpaidShortfall === undefined) {
+      underpaidShortfall = check.shortfallUsdcCents;
+    }
+    // Errored transactions are skipped — keep looking for ours.
+  }
+  if (underpaidShortfall !== undefined) {
+    return {
+      status: "failed",
+      reason: "underpaid",
+      shortfallUsdcCents: underpaidShortfall,
+    };
+  }
+  return { status: "pending" };
+}
+
+/**
+ * Claim a fiat-matched signature. verifyAndClaim's pre-check + fetch would
+ * re-fetch an already-fetched transaction, so this reuses its check result
+ * and goes straight to the conditional claim.
+ */
+async function claimMatchedSignature(
+  purchase: CryptoPurchase,
+  signature: string,
+  tx: RpcTxValue,
+): Promise<CryptoConfirmOutcome> {
+  const [claimedBy] = await db
+    .select({ id: cryptoPurchases.id })
+    .from(cryptoPurchases)
+    .where(eq(cryptoPurchases.txSignature, signature))
+    .limit(1);
+  if (claimedBy && claimedBy.id !== purchase.id) {
+    return { status: "failed", reason: "already_used" };
+  }
+  return claimRow(purchase, signature, firstSigner(tx));
 }
 
 /** Best-effort Meta CAPI Purchase for a freshly confirmed crypto purchase. */
