@@ -53,12 +53,6 @@ const PRIVY_CONNECT_SRC = [
 
 /**
  * This app's own client-side sources on the English host.
- *
- * NOTE: `NEXT_PUBLIC_SOLANA_RPC_URL` is operator-configurable. The default
- * public cluster endpoint is allowlisted here; if a custom RPC host is set
- * (e.g. Helius), its https:// origin (and wss:// for subscriptions) must be
- * appended to `connect-src` before enforcing, or wallet balance reads and
- * transaction polling will be blocked.
  */
 const APP_SCRIPT_SRC = [
   // GA4 via @next/third-parties/google (consent-gated).
@@ -100,7 +94,7 @@ const APP_IMG_SRC = [
  * The full policy, single-line (multi-line header values are legal but
  * brittle across proxies — join to one line at the boundary).
  */
-export function englishCspPolicy(): string {
+export function englishCspPolicy(extraConnectSrc: string[] = []): string {
   return [
     "default-src 'self'",
     [
@@ -118,9 +112,13 @@ export function englishCspPolicy(): string {
     "frame-ancestors 'none'",
     ["child-src", ...PRIVY_CHILD_SRC].join(" "),
     ["frame-src", ...PRIVY_FRAME_SRC].join(" "),
-    ["connect-src", "'self'", ...PRIVY_CONNECT_SRC, ...APP_CONNECT_SRC].join(
-      " ",
-    ),
+    [
+      "connect-src",
+      "'self'",
+      ...PRIVY_CONNECT_SRC,
+      ...APP_CONNECT_SRC,
+      ...extraConnectSrc,
+    ].join(" "),
     "worker-src 'self'",
     "manifest-src 'self'",
   ].join("; ");
@@ -133,13 +131,40 @@ export function englishCspHeaderName(): string {
     : "Content-Security-Policy";
 }
 
+/**
+ * Derives the CSP `connect-src` origins for an operator-configured Solana
+ * RPC endpoint (`NEXT_PUBLIC_SOLANA_RPC_URL`).
+ *
+ * Only the origins are ever emitted — never the full URL. RPC URLs commonly
+ * carry API keys in the path or query string (e.g. `?api-key=…`), and those
+ * must not land in a response header. Invalid/empty input yields no origins
+ * (the default public endpoint below already covers the unset case).
+ */
+export function cspOriginsForRpcUrl(raw: unknown): string[] {
+  if (typeof raw !== "string") return [];
+  const trimmed = raw.trim();
+  if (!trimmed) return [];
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return [];
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") return [];
+  const wsProtocol = url.protocol === "https:" ? "wss:" : "ws:";
+  return [`https://${url.host}`, `${wsProtocol}//${url.host}`];
+}
+
 /** The `{ key, value }` pairs next.config's `headers()` spreads in. */
-export function englishSecurityHeaders(): Array<{
+export function englishSecurityHeaders(extraConnectSrc: string[] = []): Array<{
   key: string;
   value: string;
 }> {
   return [
     { key: "X-Frame-Options", value: X_FRAME_OPTIONS },
-    { key: englishCspHeaderName(), value: englishCspPolicy() },
+    {
+      key: englishCspHeaderName(),
+      value: englishCspPolicy(extraConnectSrc),
+    },
   ];
 }

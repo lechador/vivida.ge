@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   ENGLISH_CSP_REPORT_ONLY,
   X_FRAME_OPTIONS,
+  cspOriginsForRpcUrl,
   englishCspHeaderName,
   englishCspPolicy,
   englishSecurityHeaders,
@@ -53,5 +54,22 @@ describe("englishSecurityHeaders", () => {
     const policy = englishCspPolicy();
     expect(policy).not.toContain("\n");
     expect(policy.length).toBeGreaterThan(200);
+  });
+
+  it("appends a custom RPC origin without leaking URL keys", () => {
+    expect(cspOriginsForRpcUrl(undefined)).toEqual([]);
+    expect(cspOriginsForRpcUrl("")).toEqual([]);
+    expect(cspOriginsForRpcUrl("not a url")).toEqual([]);
+    const origins = cspOriginsForRpcUrl(
+      "https://mainnet.helius-rpc.com/?api-key=SECRET123",
+    );
+    expect(origins).toEqual([
+      "https://mainnet.helius-rpc.com",
+      "wss://mainnet.helius-rpc.com",
+    ]);
+    const policy = englishCspPolicy(origins);
+    expect(policy).toContain("https://mainnet.helius-rpc.com");
+    expect(policy).toContain("wss://mainnet.helius-rpc.com");
+    expect(policy).not.toContain("SECRET123");
   });
 });

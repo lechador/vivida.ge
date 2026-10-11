@@ -8,7 +8,10 @@ import {
   ENGLISH_SITE_URL,
   GEORGIAN_HOSTS,
 } from "./lib/seo/locales";
-import { englishSecurityHeaders } from "./lib/security-headers";
+import {
+  englishSecurityHeaders,
+  cspOriginsForRpcUrl,
+} from "./lib/security-headers";
 
 // Every route that may render a report PDF reads the Georgian TTFs via fs;
 // Vercel's tracer won't follow the dynamic path, so bundle them explicitly.
@@ -95,11 +98,15 @@ const nextConfig: NextConfig = {
       // app expects to be framed), and the full Privy-recommended CSP ships
       // in Report-Only mode until validated, then flips to enforcing (see
       // lib/security-headers.ts). Scoped to the English hosts so the
-      // Georgian host's Stripe frames/scripts are untouched.
+      // Georgian host's Stripe frames/scripts are untouched. The custom RPC
+      // origin (if NEXT_PUBLIC_SOLANA_RPC_URL is set) is appended
+      // automatically — only origins reach the header, never URL keys.
       ...ENGLISH_HOSTS.map((host) => ({
         source: "/:path*",
         has: [{ type: "host" as const, value: host }],
-        headers: englishSecurityHeaders(),
+        headers: englishSecurityHeaders(
+          cspOriginsForRpcUrl(process.env.NEXT_PUBLIC_SOLANA_RPC_URL),
+        ),
       })),
     ];
   },
