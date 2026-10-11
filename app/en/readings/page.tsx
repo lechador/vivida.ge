@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 const URL = `${ENGLISH_SITE_URL}/readings`;
 const TITLE = "Insight Bazaar — Book a Personal Astrology Reading";
 const DESCRIPTION =
-  "Commission a one-off tarot reading, birth-chart interpretation, or compatibility session from a vetted Vivida reader. Pay in USDC on Solana; birth details stay private and off-chain.";
+  "Commission a one-off tarot reading, birth-chart interpretation, or compatibility session from a vetted Vivida reader. Pay by card or in USDC on Solana; birth details stay private and off-chain.";
 
 export const metadata: Metadata = {
   title: { absolute: `${TITLE} — Vivida` },

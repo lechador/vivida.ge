@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import QRCode from "qrcode";
 
+import { PayBookingByCard } from "@/components/crypto/crypto-pay";
 import { buildSolanaPayUrl, serviceCover } from "@/lib/bazaar-pure";
 
 /**
@@ -256,9 +257,9 @@ export function ReadingsApp() {
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Tarot spreads, birth-chart interpretations, and compatibility
-            sessions from vetted readers. You pay in USDC on Solana — straight
-            to your reader&apos;s wallet. Birth details stay private and
-            off-chain, always.
+            sessions from vetted readers. Pay by card or in USDC on Solana —
+            straight to your reader&apos;s wallet. Birth details stay private
+            and off-chain, always.
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
@@ -509,10 +510,10 @@ export function ReadingsApp() {
               </p>
             </div>
             <div>
-              <p className="font-semibold">Direct USDC payment</p>
+              <p className="font-semibold">Direct payment to your reader</p>
               <p className="mt-1 text-muted-foreground">
-                You pay your reader&apos;s Solana wallet from your own app —
-                verified on-chain before the reading begins.
+                Pay by card or in USDC — your reader&apos;s wallet is paid
+                directly, verified on-chain before the reading begins.
               </p>
             </div>
             <div>
@@ -840,8 +841,8 @@ function PaymentStep({
     };
   }, [payUrl]);
 
-  async function verify() {
-    if (!sig.trim() || !payer.trim()) return;
+  async function verifyWith(txSignature: string, payerWallet: string) {
+    if (!txSignature.trim() || !payerWallet.trim()) return;
     setState("checking");
     setDetail(null);
     try {
@@ -850,8 +851,8 @@ function PaymentStep({
         {
           method: "POST",
           body: JSON.stringify({
-            txSignature: sig.trim(),
-            payerWallet: payer.trim(),
+            txSignature: txSignature.trim(),
+            payerWallet: payerWallet.trim(),
           }),
         },
       );
@@ -896,6 +897,10 @@ function PaymentStep({
     }
   }
 
+  async function verify() {
+    await verifyWith(sig, payer);
+  }
+
   if (state === "paid") {
     return (
       <div className="mt-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm">
@@ -910,7 +915,16 @@ function PaymentStep({
 
   return (
     <div className="mt-5 border-t border-border/40 pt-5 text-sm">
-      <p className="font-semibold">Pay {price(priceUsdcCents)} USDC</p>
+      <PayBookingByCard
+        priceUsdcCents={priceUsdcCents}
+        recipient={wallet ?? providerWallet}
+        onSignature={(signature, payerWallet) =>
+          void verifyWith(signature, payerWallet)
+        }
+      />
+      <p className="mt-5 border-t border-border/40 pt-5 font-semibold">
+        Or pay {price(priceUsdcCents)} USDC from your wallet
+      </p>
       <ol className="mt-3 list-decimal space-y-3 pl-5 text-muted-foreground">
         <li>
           Pay exactly{" "}
@@ -1325,7 +1339,7 @@ function BuyerBookingCard({
     message: "Insight Bazaar reading",
   });
 
-  async function verify() {
+  async function verifyWith(txSignature: string, payerWallet: string) {
     setBusy(true);
     setMsg(null);
     try {
@@ -1334,8 +1348,8 @@ function BuyerBookingCard({
         {
           method: "POST",
           body: JSON.stringify({
-            txSignature: sig.trim(),
-            payerWallet: payer.trim(),
+            txSignature: txSignature.trim(),
+            payerWallet: payerWallet.trim(),
           }),
         },
       );
@@ -1364,6 +1378,10 @@ function BuyerBookingCard({
     } finally {
       setBusy(false);
     }
+  }
+
+  async function verify() {
+    await verifyWith(sig, payer);
   }
 
   async function sendReview() {
@@ -1418,8 +1436,15 @@ function BuyerBookingCard({
 
       {booking.status === "pending_payment" && (
         <div className="mt-4 border-t border-border/40 pt-4 text-sm">
-          <p className="text-muted-foreground">
-            Pay {price(booking.priceUsdcCents)} USDC on Solana to{" "}
+          <PayBookingByCard
+            priceUsdcCents={booking.priceUsdcCents}
+            recipient={booking.providerWallet}
+            onSignature={(signature, payerWallet) =>
+              void verifyWith(signature, payerWallet)
+            }
+          />
+          <p className="mt-4 border-t border-border/40 pt-4 text-muted-foreground">
+            Or pay {price(booking.priceUsdcCents)} USDC on Solana to{" "}
             <code className="break-all font-mono text-[11px] text-foreground">
               {booking.providerWallet}
             </code>{" "}

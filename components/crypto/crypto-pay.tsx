@@ -71,6 +71,126 @@ const RPC_WS_URL = RPC_URL.replace(/^https:\/\//, "wss://").replace(
  */
 const ONRAMP_SANDBOX = process.env.NEXT_PUBLIC_PRIVY_ONRAMP_SANDBOX === "1";
 
+/** Shared Privy client config — one identity for the credits dialog and the readings card panel. */
+function privySolanaConfig(): NonNullable<
+  React.ComponentProps<typeof PrivyProvider>["config"]
+> {
+  return {
+    appearance: { theme: "dark", accentColor: "#22d3ee" },
+    loginMethods: ["email", "wallet"],
+    embeddedWallets: {
+      solana: { createOnLogin: "users-without-wallets" },
+    },
+    externalWallets: {
+      solana: { connectors: toSolanaWalletConnectors() },
+    },
+    solana: {
+      rpcs: {
+        "solana:mainnet": {
+          rpc: createSolanaRpc(RPC_URL),
+          rpcSubscriptions: createSolanaRpcSubscriptions(RPC_WS_URL),
+        },
+      },
+    },
+  };
+}
+
+type PrivyWalletEntry = ReturnType<typeof useWallets>["wallets"][number];
+
+/** The buyer's embedded (Privy) wallet — where card on-ramp funds land. */
+function pickEmbeddedWallet(
+  wallets: PrivyWalletEntry[],
+): PrivyWalletEntry | null {
+  return (
+    wallets.find(
+      (w) => (w as { walletClientType?: string }).walletClientType === "privy",
+    ) ??
+    wallets[0] ??
+    null
+  );
+}
+
+/**
+ * Build, sign and send a USDC transfer from the buyer's embedded wallet.
+ * Shared by the credits dialog (exact amount to the platform wallet) and the
+ * readings card panel (exact amount to the reader's wallet); an order
+ * reference, when present, rides along as a read-only account.
+ */
+function useUsdcTransfer() {
+  const { signAndSendTransaction } = useSignAndSendTransaction();
+  return React.useCallback(
+    async (input: {
+      wallet: PrivyWalletEntry;
+      recipient: string;
+      amountBaseUnits: bigint;
+      reference?: string | null;
+    }): Promise<string> => {
+      const rpc = createSolanaRpc(RPC_URL);
+      const mint = address(USDC_MINT);
+      const from = address(input.wallet.address);
+      const to = address(input.recipient);
+      const [fromAta] = await findAssociatedTokenPda({
+        owner: from,
+        mint,
+        tokenProgram: TOKEN_PROGRAM_ADDRESS,
+      });
+      const [toAta] = await findAssociatedTokenPda({
+        owner: to,
+        mint,
+        tokenProgram: TOKEN_PROGRAM_ADDRESS,
+      });
+      const transfer = getTransferCheckedInstruction({
+        source: fromAta,
+        mint,
+        destination: toAta,
+        authority: createNoopSigner(from),
+        amount: input.amountBaseUnits,
+        decimals: 6,
+      });
+      // Carry the order's reference as a read-only account so the server can
+      // match this exact payment.
+      const transferWithReference = input.reference
+        ? {
+            ...transfer,
+            accounts: [
+              ...transfer.accounts,
+              { address: address(input.reference), role: AccountRole.READONLY },
+            ],
+          }
+        : transfer;
+      // The receiving wallet's USDC token account may not exist yet — the
+      // first payment creates it (idempotent; a no-op afterwards).
+      const createAta =
+        await getCreateAssociatedTokenIdempotentInstructionAsync({
+          payer: createNoopSigner(from),
+          mint,
+          owner: to,
+        });
+      const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
+      const message = pipe(
+        createTransactionMessage({ version: 0 }),
+        (tx) => setTransactionMessageFeePayer(from, tx),
+        (tx) =>
+          setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
+        (tx) =>
+          appendTransactionMessageInstructions(
+            [createAta, transferWithReference],
+            tx,
+          ),
+      );
+      const bytes = new Uint8Array(
+        getTransactionEncoder().encode(compileTransaction(message)),
+      );
+      const { signature } = await signAndSendTransaction({
+        transaction: bytes,
+        wallet: input.wallet,
+      });
+      return getBase58Decoder().decode(signature);
+    },
+    [signAndSendTransaction],
+  );
+}
+
 export type CryptoPayRequest = {
   kind: "credits" | "premium_pass";
   packId?: "s" | "m" | "l";
@@ -116,27 +236,7 @@ export function CryptoPayHost({ children }: { children: React.ReactNode }) {
     <CryptoPayContext.Provider value={value}>
       {children}
       {everOpened && appId ? (
-        <PrivyProvider
-          appId={appId}
-          config={{
-            appearance: { theme: "dark", accentColor: "#22d3ee" },
-            loginMethods: ["email", "wallet"],
-            embeddedWallets: {
-              solana: { createOnLogin: "users-without-wallets" },
-            },
-            externalWallets: {
-              solana: { connectors: toSolanaWalletConnectors() },
-            },
-            solana: {
-              rpcs: {
-                "solana:mainnet": {
-                  rpc: createSolanaRpc(RPC_URL),
-                  rpcSubscriptions: createSolanaRpcSubscriptions(RPC_WS_URL),
-                },
-              },
-            },
-          }}
-        >
+        <PrivyProvider appId={appId} config={privySolanaConfig()}>
           <PayDialog
             request={request}
             lastRequest={lastRequest}
@@ -264,7 +364,7 @@ function PayDialogBody({
   const router = useRouter();
   const { ready, authenticated, login } = usePrivy();
   const { wallets } = useWallets();
-  const { signAndSendTransaction } = useSignAndSendTransaction();
+  const sendUsdcTransfer = useUsdcTransfer();
   const { depositFunds } = useDepositFunds();
 
   const [phase, setPhase] = React.useState<Phase>("creating");
@@ -503,13 +603,7 @@ function PayDialogBody({
    */
   const completePayment = async () => {
     if (!purchase || completeBusy) return;
-    const embedded =
-      wallets.find(
-        (w) =>
-          (w as { walletClientType?: string }).walletClientType === "privy",
-      ) ??
-      wallets[0] ??
-      null;
+    const embedded = pickEmbeddedWallet(wallets);
     if (!embedded) {
       setCompleteError("Your wallet isn't ready yet. Wait a moment and retry.");
       return;
@@ -518,12 +612,9 @@ function PayDialogBody({
     setCompleteError(null);
     try {
       const rpc = createSolanaRpc(RPC_URL);
-      const mint = address(USDC_MINT);
-      const from = address(embedded.address);
-      const to = address(purchase.recipient);
       const [fromAta] = await findAssociatedTokenPda({
-        owner: from,
-        mint,
+        owner: address(embedded.address),
+        mint: address(USDC_MINT),
         tokenProgram: TOKEN_PROGRAM_ADDRESS,
       });
       let balance: bigint;
@@ -544,57 +635,12 @@ function PayDialogBody({
         return;
       }
       const amount = balance >= price ? price : balance;
-      const transfer = getTransferCheckedInstruction({
-        source: fromAta,
-        mint,
-        destination: (
-          await findAssociatedTokenPda({
-            owner: to,
-            mint,
-            tokenProgram: TOKEN_PROGRAM_ADDRESS,
-          })
-        )[0],
-        authority: createNoopSigner(from),
-        amount,
-        decimals: 6,
-      });
-      // Carry the order's reference as a read-only account so the server can
-      // match this exact payment.
-      const transferWithReference = {
-        ...transfer,
-        accounts: [
-          ...transfer.accounts,
-          { address: address(purchase.reference), role: AccountRole.READONLY },
-        ],
-      };
-      // The receiving wallet's USDC token account may not exist yet — the
-      // first payment creates it (idempotent; a no-op afterwards).
-      const createAta =
-        await getCreateAssociatedTokenIdempotentInstructionAsync({
-          payer: createNoopSigner(from),
-          mint,
-          owner: to,
-        });
-      const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
-      const message = pipe(
-        createTransactionMessage({ version: 0 }),
-        (tx) => setTransactionMessageFeePayer(from, tx),
-        (tx) =>
-          setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
-        (tx) =>
-          appendTransactionMessageInstructions(
-            [createAta, transferWithReference],
-            tx,
-          ),
-      );
-      const bytes = new Uint8Array(
-        getTransactionEncoder().encode(compileTransaction(message)),
-      );
-      const { signature } = await signAndSendTransaction({
-        transaction: bytes,
+      const signatureBase58 = await sendUsdcTransfer({
         wallet: embedded,
+        recipient: purchase.recipient,
+        amountBaseUnits: amount,
+        reference: purchase.reference,
       });
-      const signatureBase58 = getBase58Decoder().decode(signature);
       setPhase("confirming");
       const res = await fetch(`/api/crypto/checkout/${purchase.id}/submit`, {
         method: "POST",
@@ -829,6 +875,257 @@ function PayDialogBody({
             Done
           </Button>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ── Readings (Insight Bazaar) card payments ───────────────────────────────
+
+/**
+ * Card payment for an Insight Bazaar booking. The buyer funds their embedded
+ * wallet by card, then one tap sends the exact USDC to the reader's wallet —
+ * the signature goes to the caller, which submits it to the booking's
+ * verify-payment endpoint (same on-chain checks as the manual wallet flow).
+ * Self-contained: mounts its own Privy provider so the readings page needs
+ * no CryptoPayHost.
+ */
+export function PayBookingByCard({
+  priceUsdcCents,
+  recipient,
+  onSignature,
+}: {
+  priceUsdcCents: number;
+  recipient: string;
+  onSignature: (signature: string, payerWallet: string) => void;
+}) {
+  const appId = (process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? "").trim();
+  if (!appId) return null;
+  return (
+    <PrivyProvider appId={appId} config={privySolanaConfig()}>
+      <BookingCardPanel
+        priceUsdcCents={priceUsdcCents}
+        recipient={recipient}
+        onSignature={onSignature}
+      />
+    </PrivyProvider>
+  );
+}
+
+/**
+ * Card funding carries the on-ramp's fee/spread, so we ask for a small
+ * buffer above the reading price; the reader still receives the exact price
+ * and any leftover USDC stays in the buyer's wallet.
+ */
+const BOOKING_CARD_BUFFER_BPS = 600;
+
+type BookingCardStage = "idle" | "funding" | "funded" | "sending" | "sent";
+
+function BookingCardPanel({
+  priceUsdcCents,
+  recipient,
+  onSignature,
+}: {
+  priceUsdcCents: number;
+  recipient: string;
+  onSignature: (signature: string, payerWallet: string) => void;
+}) {
+  const { ready, authenticated, login } = usePrivy();
+  const { wallets } = useWallets();
+  const { depositFunds } = useDepositFunds();
+  const sendUsdcTransfer = useUsdcTransfer();
+
+  const [stage, setStage] = React.useState<BookingCardStage>("idle");
+  const [error, setError] = React.useState<string | null>(null);
+
+  const priceLabel = `$${(priceUsdcCents / 100).toFixed(2)}`;
+  const fundCents = Math.ceil(
+    (priceUsdcCents * (10000 + BOOKING_CARD_BUFFER_BPS)) / 10000,
+  );
+  const fundLabel = `$${(fundCents / 100).toFixed(2)}`;
+
+  const embedded = pickEmbeddedWallet(wallets);
+
+  const fund = async () => {
+    if (stage === "funding") return;
+    if (!authenticated) return;
+    setStage("funding");
+    setError(null);
+    try {
+      // No destination.wallet: the card purchase funds the buyer's own
+      // embedded wallet (Privy rejects third-party addresses); the second
+      // tap moves the exact price to the reader.
+      const result = await depositFunds({
+        destination: { asset: "usdc", chain: "solana" },
+        fiat: {
+          source: { defaultAsset: "usd" },
+          defaultAmount: (fundCents / 100).toFixed(2),
+          // Prefer Stripe's embedded onramp; falls back to other providers
+          // when Stripe has no quote for the buyer's region.
+          preferredProvider: "stripe",
+          ...(ONRAMP_SANDBOX ? { environment: "sandbox" as const } : {}),
+        },
+      });
+      if (
+        result.method !== "fiat" ||
+        (result.status !== "confirmed" && result.status !== "submitted")
+      ) {
+        setError("The card payment didn't complete. Please try again.");
+        setStage("idle");
+        return;
+      }
+      setStage("funded");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("[bazaar/card] depositFunds failed:", message);
+      if (/cancel|dismiss|close|exit|denied/i.test(message)) {
+        setError("Card payment cancelled.");
+      } else if (message && message.length <= 160) {
+        setError(message);
+      } else {
+        setError("Card payment failed. Please try again.");
+      }
+      setStage("idle");
+    }
+  };
+
+  const complete = async () => {
+    if (stage === "sending") return;
+    if (!embedded) {
+      setError("Your wallet isn't ready yet. Wait a moment and retry.");
+      return;
+    }
+    setStage("sending");
+    setError(null);
+    try {
+      // The reader must receive the full price, so only send when the funded
+      // balance covers it — a short transfer would fail on-chain
+      // verification and strand the money in the buyer's wallet.
+      const rpc = createSolanaRpc(RPC_URL);
+      const [fromAta] = await findAssociatedTokenPda({
+        owner: address(embedded.address),
+        mint: address(USDC_MINT),
+        tokenProgram: TOKEN_PROGRAM_ADDRESS,
+      });
+      let balance: bigint;
+      try {
+        const res = await rpc.getTokenAccountBalance(fromAta).send();
+        balance = BigInt(res.value.amount);
+      } catch {
+        balance = BigInt(0);
+      }
+      const price = BigInt(usdcCentsToBaseUnits(priceUsdcCents));
+      if (balance < price) {
+        const have = (Number(balance) / 1_000_000).toFixed(2);
+        setError(
+          `Only ${have} USDC arrived (${priceLabel} needed). Add more funds — nothing was sent, your USDC is still in your wallet.`,
+        );
+        setStage("funded");
+        return;
+      }
+      const signature = await sendUsdcTransfer({
+        wallet: embedded,
+        recipient,
+        amountBaseUnits: price,
+      });
+      setStage("sent");
+      onSignature(signature, embedded.address);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("[bazaar/card] transfer failed:", message);
+      setError(
+        /reject|denied|cancel|dismiss|close|exit/i.test(message)
+          ? "Payment cancelled."
+          : "Couldn't send the payment. Please try again.",
+      );
+      setStage("funded");
+    }
+  };
+
+  return (
+    <div>
+      <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        Pay by card
+      </div>
+      {!authenticated ? (
+        <>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Pay with your card — Apple Pay and Google Pay supported where
+            available. The crypto is handled for you; your reader is paid
+            straight from your card purchase.
+          </p>
+          <Button
+            variant="mystic"
+            className="mt-3 w-full"
+            disabled={!ready}
+            onClick={() => login()}
+          >
+            <Wallet className="size-4" /> Sign in to pay by card
+          </Button>
+        </>
+      ) : stage === "idle" || stage === "funding" ? (
+        <>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Pay {fundLabel} by card — the {priceLabel} reading price plus a
+            small buffer for card processing. Any leftover USDC stays in your
+            wallet.
+          </p>
+          <Button
+            variant="mystic"
+            className="mt-3 w-full"
+            disabled={stage === "funding"}
+            onClick={() => void fund()}
+          >
+            {stage === "funding" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Wallet className="size-4" />
+            )}
+            Pay {fundLabel} by card
+          </Button>
+          {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
+        </>
+      ) : stage === "sent" ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Payment sent — verifying on Solana…
+        </p>
+      ) : ONRAMP_SANDBOX ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Sandbox mode — the card flow is verified end to end and no real funds
+          move. Unset NEXT_PUBLIC_PRIVY_ONRAMP_SANDBOX to take live payments.
+        </p>
+      ) : (
+        <>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Your card payment arrived. Send {priceLabel} USDC to your reader —
+            one tap, no addresses to copy.
+          </p>
+          <Button
+            variant="mystic"
+            className="mt-3 w-full"
+            disabled={stage === "sending"}
+            onClick={() => void complete()}
+          >
+            {stage === "sending" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Wallet className="size-4" />
+            )}
+            Send {priceLabel} to your reader
+          </Button>
+          {error && (
+            <>
+              <p className="mt-2 text-xs text-destructive">{error}</p>
+              <button
+                type="button"
+                onClick={() => void fund()}
+                className="mt-2 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              >
+                Add more funds
+              </button>
+            </>
+          )}
+        </>
       )}
     </div>
   );
