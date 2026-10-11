@@ -413,11 +413,13 @@ function PayDialogBody({
     setCardBusy(true);
     setCardError(null);
     try {
+      // No destination.wallet: omitting it funds the buyer's own embedded
+      // wallet (Privy rejects third-party addresses here). Step 2 moves the
+      // exact amount to the platform wallet with the order reference.
       const result = await depositFunds({
         destination: {
           asset: "usdc",
           chain: "solana",
-          wallet: purchase.recipient,
         },
         fiat: {
           source: { defaultAsset: "usd" },
