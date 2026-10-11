@@ -19,6 +19,7 @@ import {
   GEORGIAN_SITE_URL,
   localizedAlternates,
 } from "@/lib/seo/locales";
+import { localizedHref } from "@/lib/seo/public-paths";
 
 export const revalidate = 604800;
 
@@ -38,7 +39,7 @@ export async function generateMetadata({
   const card = tarotDetailCard(slug, en ? "en" : "ka");
   if (!card) return {};
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const url = `${siteUrl}/taro/${slug}`;
+  const url = `${siteUrl}${localizedHref(`/taro/${slug}`, locale)}`;
   const arcanaEn = card.arcana === "major" ? "Major Arcana" : "Minor Arcana";
   const title = en
     ? `${card.name} Tarot Card Meaning — Upright and Reversed`
@@ -104,7 +105,7 @@ export default async function TarotCardPage({
   const idx = deck.findIndex((c) => c.slug === slug);
   const prev = idx > 0 ? deck[idx - 1] : null;
   const next = idx < deck.length - 1 ? deck[idx + 1] : null;
-  const url = `${siteUrl}/taro/${slug}`;
+  const url = `${siteUrl}${localizedHref(`/taro/${slug}`, locale)}`;
 
   const faq = [
     {
@@ -163,7 +164,7 @@ export default async function TarotCardPage({
         "@type": "ListItem",
         position: 2,
         name: en ? "Tarot" : "ტარო",
-        item: `${siteUrl}/taro`,
+        item: `${siteUrl}${localizedHref("/taro", locale)}`,
       },
       { "@type": "ListItem", position: 3, name: card.name, item: url },
     ],
@@ -200,7 +201,10 @@ export default async function TarotCardPage({
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/taro" className="hover:text-foreground">
+          <Link
+            href={localizedHref("/taro", locale)}
+            className="hover:text-foreground"
+          >
             {en ? "Tarot" : "ტარო"}
           </Link>
           <span>/</span>
@@ -310,7 +314,7 @@ export default async function TarotCardPage({
               : "გაშალე 3-კარტიანი განლაგება და მიიღე ცოცხალი, პერსონალური პასუხი ქართულად. პირველი კითხვა უფასოა."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/taro">
+            <Link href={localizedHref("/taro", locale)}>
               {en ? "Draw the cards" : "გაშალე კარტები"}
               <ArrowRight className="size-4" />
             </Link>
@@ -349,7 +353,7 @@ export default async function TarotCardPage({
         <div className="mt-12 flex items-stretch justify-between gap-3">
           {prev ? (
             <Link
-              href={`/taro/${prev.slug}`}
+              href={localizedHref(`/taro/${prev.slug}`, locale)}
               className="group flex flex-1 items-center gap-3 rounded-2xl border border-border bg-card/55 p-4 transition-colors hover:bg-card/80"
             >
               <span className="text-2xl">{prev.glyph}</span>
@@ -365,7 +369,7 @@ export default async function TarotCardPage({
           )}
           {next ? (
             <Link
-              href={`/taro/${next.slug}`}
+              href={localizedHref(`/taro/${next.slug}`, locale)}
               className="group flex flex-1 items-center justify-end gap-3 rounded-2xl border border-border bg-card/55 p-4 text-right transition-colors hover:bg-card/80"
             >
               <span className="min-w-0">
@@ -392,7 +396,7 @@ export default async function TarotCardPage({
               .map((c) => (
                 <Link
                   key={c.slug}
-                  href={`/taro/${c.slug}`}
+                  href={localizedHref(`/taro/${c.slug}`, locale)}
                   className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
                 >
                   <span aria-hidden>{c.glyph}</span>
@@ -401,7 +405,6 @@ export default async function TarotCardPage({
               ))}
           </div>
         </section>
-
       </section>
 
       <SiteFooter locale={locale} />

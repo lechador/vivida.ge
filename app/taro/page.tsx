@@ -19,6 +19,7 @@ import {
   localizedAlternates,
 } from "@/lib/seo/locales";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import { localizedHref } from "@/lib/seo/public-paths";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 
 export const dynamic = "force-dynamic";
@@ -100,7 +101,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "website",
-      url: `${siteUrl}/taro`,
+      url: `${siteUrl}${localizedHref("/taro", locale)}`,
       title,
       description,
       siteName: "Vivida",
@@ -127,14 +128,17 @@ export default async function TaroHubPage() {
 
   const ld = [
     articleLd({
-      url: `${siteUrl}/taro`,
+      url: `${siteUrl}${localizedHref("/taro", locale)}`,
       headline: title,
       description,
       datePublished: "2026-07-14T00:00:00.000Z",
     }),
     breadcrumbLd([
       { name: en ? "Home" : "მთავარი", url: siteUrl },
-      { name: en ? "Tarot" : "ტარო", url: `${siteUrl}/taro` },
+      {
+        name: en ? "Tarot" : "ტარო",
+        url: `${siteUrl}${localizedHref("/taro", locale)}`,
+      },
     ]),
     faqLd(faq),
     {
@@ -143,7 +147,7 @@ export default async function TaroHubPage() {
       itemListElement: tarotDetailDeck(en ? "en" : "ka").map((c, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: `${siteUrl}/taro/${c.slug}`,
+        url: `${siteUrl}${localizedHref(`/taro/${c.slug}`, locale)}`,
         name: c.name,
       })),
     },
@@ -250,7 +254,7 @@ export default async function TaroHubPage() {
               return (
                 <Link
                   key={c.slug}
-                  href={`/taro/${c.slug}`}
+                  href={localizedHref(`/taro/${c.slug}`, locale)}
                   className="flex items-center gap-3 rounded-xl border border-border/60 bg-card/40 px-3.5 py-2.5 text-sm transition-colors hover:bg-card/70"
                 >
                   <span className="text-lg">{c.glyph}</span>

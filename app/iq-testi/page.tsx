@@ -17,6 +17,7 @@ import {
   GEORGIAN_SITE_URL,
   localizedAlternates,
 } from "@/lib/seo/locales";
+import { localizedHref } from "@/lib/seo/public-paths";
 
 const TITLE_KA = "IQ ტესტი — უფასო ინტელექტის ტესტი ქართულად";
 const DESCRIPTION_KA =
@@ -55,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "website",
-      url: `${siteUrl}/iq-testi`,
+      url: `${siteUrl}${localizedHref("/iq-testi", locale)}`,
       title,
       description,
       siteName: "Vivida",
@@ -116,7 +117,7 @@ export default async function IqTestPage() {
       name: en ? "Vivida IQ Test" : "Vivida IQ ტესტი",
       description,
       inLanguage: en ? "en" : "ka-GE",
-      url: `${siteUrl}/iq-testi`,
+      url: `${siteUrl}${localizedHref("/iq-testi", locale)}`,
       educationalLevel: "beginner",
       numberOfQuestions: IQ_ADAPTIVE_LENGTH,
       about: {
@@ -129,7 +130,10 @@ export default async function IqTestPage() {
     breadcrumbLd([
       { name: en ? "Home" : "მთავარი", url: siteUrl },
       { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
-      { name: en ? "IQ Test" : "IQ ტესტი", url: `${siteUrl}/iq-testi` },
+      {
+        name: en ? "IQ Test" : "IQ ტესტი",
+        url: `${siteUrl}${localizedHref("/iq-testi", locale)}`,
+      },
     ]),
   ];
 
@@ -310,12 +314,12 @@ export default async function IqTestPage() {
             {(en
               ? [
                   {
-                    href: "/pirovnebis-testi",
+                    href: "/personality-test",
                     label: "Astro-MBTI",
                     sub: "Discover your personality type",
                   },
                   {
-                    href: "/eq-testi",
+                    href: "/eq-test",
                     label: "EQ Test",
                     sub: "Explore emotional intelligence",
                   },
@@ -368,7 +372,6 @@ export default async function IqTestPage() {
             ))}
           </div>
         </section>
-
       </section>
 
       <SiteFooter locale={locale} />

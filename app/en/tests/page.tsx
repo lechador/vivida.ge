@@ -15,7 +15,12 @@ import { Starfield } from "@/components/landing/starfield";
 import { SmartHeader } from "@/components/smart-header";
 import { SiteFooter } from "@/components/site-footer";
 import { TESTS, type TestCatalogEntry } from "@/lib/tests-catalog";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const PATH = "/en/tests";
@@ -89,18 +94,19 @@ export default function EnglishTestsPage() {
       itemListElement: TESTS.filter(
         (test) =>
           test.available && (!test.locales || test.locales.includes("en")),
-      ).map(
-        (test, index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          name: test.titleEn,
-          url: `${ENGLISH_SITE_URL}${test.href}`,
-        }),
-      ),
+      ).map((test, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: test.titleEn,
+        url: `${ENGLISH_SITE_URL}${internationalPublicPath(test.href)}`,
+      })),
     },
   ];
   return (
-    <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang="en"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
@@ -164,7 +170,9 @@ export default function EnglishTestsPage() {
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium [&::-webkit-details-marker]:hidden">
                   {item.q}
-                  <span className="text-muted-foreground transition-transform group-open:rotate-45">+</span>
+                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
                 </summary>
                 <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
                   {item.a}
@@ -219,8 +227,12 @@ function TestSection({
                   <Icon className="size-5" />
                 </span>
                 <div>
-                  <h3 className="text-lg font-semibold tracking-tight">{test.titleEn}</h3>
-                  <p className="text-sm text-muted-foreground">{test.taglineEn}</p>
+                  <h3 className="text-lg font-semibold tracking-tight">
+                    {test.titleEn}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {test.taglineEn}
+                  </p>
                 </div>
               </div>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground/85">
@@ -231,7 +243,7 @@ function TestSection({
                 {test.metaEn}
               </div>
               <Link
-                href={test.href}
+                href={internationalPublicPath(test.href)}
                 className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm font-semibold text-white"
               >
                 {test.kind === "quiz" ? "Play quiz" : "Start test"}

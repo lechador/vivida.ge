@@ -18,6 +18,7 @@ import {
   ENGLISH_SITE_URL,
   localizedAlternates,
 } from "@/lib/seo/locales";
+import { localizedHref } from "@/lib/seo/public-paths";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -50,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
       openGraph: {
         images: [DEFAULT_OG_IMAGE],
         type: "website",
-        url: `${ENGLISH_SITE_URL}/pirovnebis-testi`,
+        url: `${ENGLISH_SITE_URL}/personality-test`,
         title: TITLE_EN,
         description: DESCRIPTION_EN,
         siteName: "Vivida",
@@ -139,7 +140,7 @@ export default async function TestPage() {
       name: en ? "Vivida Personality Test" : "Astro-MBTI პიროვნების ტესტი",
       description,
       inLanguage: en ? "en" : "ka-GE",
-      url: `${siteUrl}/pirovnebis-testi`,
+      url: `${siteUrl}${localizedHref("/pirovnebis-testi", locale)}`,
       educationalLevel: "beginner",
       numberOfQuestions: questions.length,
       about: {
@@ -171,7 +172,7 @@ export default async function TestPage() {
       { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
       {
         name: en ? "Personality Test" : "პიროვნების ტესტი",
-        url: `${siteUrl}/pirovnebis-testi`,
+        url: `${siteUrl}${localizedHref("/pirovnebis-testi", locale)}`,
       },
     ]),
   ];
@@ -370,12 +371,12 @@ export default async function TestPage() {
                     sub: "Browse all type descriptions",
                   },
                   {
-                    href: "/iq-testi",
+                    href: "/iq-test",
                     label: "IQ Test",
                     sub: "Adaptive reasoning assessment",
                   },
                   {
-                    href: "/eq-testi",
+                    href: "/eq-test",
                     label: "EQ Test",
                     sub: "Emotional intelligence profile",
                   },
@@ -423,7 +424,6 @@ export default async function TestPage() {
             ))}
           </div>
         </section>
-
       </section>
 
       <SiteFooter locale={locale} />

@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { EnglishGuide } from "@/components/en/english-guide";
 import { SIGNS } from "@/lib/zodiac";
+import { VIEW_PATH } from "@/lib/sign-horoscope";
+import { internationalPublicPath } from "@/lib/seo/public-paths";
 import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { articleLd, breadcrumbLd, faqLd } from "@/lib/seo/jsonld";
 
@@ -111,7 +113,9 @@ export default function EnglishHoroscopePage() {
           {SIGNS.map((sign) => (
             <Link
               key={sign.key}
-              href={`/zodiac/${sign.key}/dghes`}
+              href={internationalPublicPath(
+                `/zodiac/${sign.key}/${VIEW_PATH.today}`,
+              )}
               className="flex items-center gap-3 rounded-2xl border border-border bg-card/50 p-4 hover:border-[var(--vivida-violet)]/45 hover:bg-card"
             >
               <span className="text-2xl text-[var(--vivida-violet)]">

@@ -221,7 +221,7 @@ export default async function MbtiHubPage() {
               : "აირჩიე ტიპი და წაიკითხე სრული აღწერა ქართულად — ან გაიარე ტესტი და გაიგე შენი ტიპი."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
-            <Link href={"/pirovnebis-testi"}>
+            <Link href={en ? "/personality-test" : "/pirovnebis-testi"}>
               {en ? "Take the personality test" : "გაიარე ტესტი"}
             </Link>
           </Button>
@@ -294,7 +294,6 @@ export default async function MbtiHubPage() {
             ))}
           </div>
         </section>
-
       </section>
 
       <SiteFooter locale={locale} />
