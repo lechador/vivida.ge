@@ -5,8 +5,32 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, Loader2, Wallet } from "lucide-react";
 import { PrivyProvider, useDepositFunds, usePrivy } from "@privy-io/react-auth";
-import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
-import { createSolanaRpc, createSolanaRpcSubscriptions } from "@solana/kit";
+import {
+  toSolanaWalletConnectors,
+  useSignAndSendTransaction,
+  useWallets,
+} from "@privy-io/react-auth/solana";
+import {
+  AccountRole,
+  address,
+  appendTransactionMessageInstructions,
+  compileTransaction,
+  createNoopSigner,
+  createSolanaRpc,
+  createSolanaRpcSubscriptions,
+  createTransactionMessage,
+  getBase58Decoder,
+  getTransactionEncoder,
+  pipe,
+  setTransactionMessageFeePayer,
+  setTransactionMessageLifetimeUsingBlockhash,
+} from "@solana/kit";
+import {
+  TOKEN_PROGRAM_ADDRESS,
+  findAssociatedTokenPda,
+  getCreateAssociatedTokenIdempotentInstructionAsync,
+  getTransferCheckedInstruction,
+} from "@solana-program/token";
 
 import { Button, type ButtonProps } from "@/components/ui/button";
 import {
@@ -16,7 +40,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatUsdc } from "@/lib/usdc-pure";
+import { USDC_MINT, formatUsdc, usdcCentsToBaseUnits } from "@/lib/usdc-pure";
 import { fbTrack } from "@/lib/fb-pixel";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
@@ -231,6 +255,8 @@ function PayDialogBody({
 }) {
   const router = useRouter();
   const { ready, authenticated, login } = usePrivy();
+  const { wallets } = useWallets();
+  const { signAndSendTransaction } = useSignAndSendTransaction();
   const { depositFunds } = useDepositFunds();
 
   const [phase, setPhase] = React.useState<Phase>("creating");
@@ -241,6 +267,9 @@ function PayDialogBody({
   } | null>(null);
   const [cardBusy, setCardBusy] = React.useState(false);
   const [cardError, setCardError] = React.useState<string | null>(null);
+  const [funded, setFunded] = React.useState(false);
+  const [completeBusy, setCompleteBusy] = React.useState(false);
+  const [completeError, setCompleteError] = React.useState<string | null>(null);
 
   const fiatLabel = `$${(request.amountUsdcCents / 100).toFixed(2)}`;
   const itemLabel =
@@ -363,6 +392,11 @@ function PayDialogBody({
     };
   }, [phase, purchase, router]);
 
+  const markConfirmed = () => {
+    setPhase("done");
+    router.refresh();
+  };
+
   /**
    * Card-direct payment: Privy's fund modal with destination.wallet set to
    * the platform wallet, so USDC lands in OUR wallet and the buyer never
@@ -422,6 +456,9 @@ function PayDialogBody({
         },
         `${purchase.id}:add_payment_info`,
       );
+      // Fund flow confirmed — advance to step 2 (exact transfer) while the
+      // status poll keeps watching as a fallback.
+      setFunded(true);
       // Stay in awaiting — the status poll detects the on-chain arrival.
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -437,6 +474,152 @@ function PayDialogBody({
       }
     } finally {
       setCardBusy(false);
+    }
+  };
+
+  /**
+   * Step 2: send the exact USDC transfer from the funded embedded wallet to
+   * the platform wallet, carrying the purchase reference so the server
+   * matches it exactly (no window guessing). Amount is the pack price when
+   * the balance covers it, otherwise the full balance — the tolerance floor
+   * still confirms it when the on-ramp spread is small. Below the floor we
+   * refuse to send dust that could never credit; funds stay in the buyer's
+   * wallet.
+   */
+  const completePayment = async () => {
+    if (!purchase || completeBusy) return;
+    const embedded =
+      wallets.find(
+        (w) =>
+          (w as { walletClientType?: string }).walletClientType === "privy",
+      ) ??
+      wallets[0] ??
+      null;
+    if (!embedded) {
+      setCompleteError("Your wallet isn't ready yet. Wait a moment and retry.");
+      return;
+    }
+    setCompleteBusy(true);
+    setCompleteError(null);
+    try {
+      const rpc = createSolanaRpc(RPC_URL);
+      const mint = address(USDC_MINT);
+      const from = address(embedded.address);
+      const to = address(purchase.recipient);
+      const [fromAta] = await findAssociatedTokenPda({
+        owner: from,
+        mint,
+        tokenProgram: TOKEN_PROGRAM_ADDRESS,
+      });
+      let balance: bigint;
+      try {
+        const res = await rpc.getTokenAccountBalance(fromAta).send();
+        balance = BigInt(res.value.amount);
+      } catch {
+        balance = BigInt(0);
+      }
+      const price = BigInt(usdcCentsToBaseUnits(purchase.amountUsdcCents));
+      const floor = (price * BigInt(9000)) / BigInt(10000);
+      if (balance < floor) {
+        const have = (Number(balance) / 1_000_000).toFixed(2);
+        const need = (Number(price) / 1_000_000).toFixed(2);
+        setCompleteError(
+          `Only ${have} USDC arrived (about ${need} needed). Contact support — your funds stayed in your wallet.`,
+        );
+        return;
+      }
+      const amount = balance >= price ? price : balance;
+      const transfer = getTransferCheckedInstruction({
+        source: fromAta,
+        mint,
+        destination: (
+          await findAssociatedTokenPda({
+            owner: to,
+            mint,
+            tokenProgram: TOKEN_PROGRAM_ADDRESS,
+          })
+        )[0],
+        authority: createNoopSigner(from),
+        amount,
+        decimals: 6,
+      });
+      // Carry the order's reference as a read-only account so the server can
+      // match this exact payment.
+      const transferWithReference = {
+        ...transfer,
+        accounts: [
+          ...transfer.accounts,
+          { address: address(purchase.reference), role: AccountRole.READONLY },
+        ],
+      };
+      // The receiving wallet's USDC token account may not exist yet — the
+      // first payment creates it (idempotent; a no-op afterwards).
+      const createAta =
+        await getCreateAssociatedTokenIdempotentInstructionAsync({
+          payer: createNoopSigner(from),
+          mint,
+          owner: to,
+        });
+      const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
+      const message = pipe(
+        createTransactionMessage({ version: 0 }),
+        (tx) => setTransactionMessageFeePayer(from, tx),
+        (tx) =>
+          setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
+        (tx) =>
+          appendTransactionMessageInstructions(
+            [createAta, transferWithReference],
+            tx,
+          ),
+      );
+      const bytes = new Uint8Array(
+        getTransactionEncoder().encode(compileTransaction(message)),
+      );
+      const { signature } = await signAndSendTransaction({
+        transaction: bytes,
+        wallet: embedded,
+      });
+      const signatureBase58 = getBase58Decoder().decode(signature);
+      setPhase("confirming");
+      const res = await fetch(`/api/crypto/checkout/${purchase.id}/submit`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ signature: signatureBase58 }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        status?: string;
+        reason?: string;
+        shortfallUsdcCents?: number;
+      };
+      if (res.ok && data.status === "confirmed") {
+        markConfirmed();
+        return;
+      }
+      if (res.status === 202 || res.status === 503) {
+        // Sent, not indexed yet (or RPC busy) — fall back to polling, which
+        // matches by reference or window.
+        setPhase("awaiting");
+        return;
+      }
+      if (res.status === 402 || res.status === 409) {
+        setProblem({
+          reason: data.reason ?? "failed",
+          shortfallUsdcCents: data.shortfallUsdcCents,
+        });
+        setPhase("problem");
+        return;
+      }
+      setPhase("awaiting");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setCompleteError(
+        /reject|denied|cancel|dismiss|close|exit/i.test(message)
+          ? "Payment cancelled."
+          : "Couldn't send the payment. Please try again.",
+      );
+      setPhase("awaiting");
+    } finally {
+      setCompleteBusy(false);
     }
   };
 
@@ -497,7 +680,7 @@ function PayDialogBody({
             </div>
           </div>
 
-          {authenticated && (
+          {authenticated && !funded && (
             <div className="rounded-2xl border border-border bg-background/40 p-3.5">
               <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 Card payment
@@ -522,6 +705,34 @@ function PayDialogBody({
               </Button>
               {cardError && (
                 <p className="mt-2 text-xs text-destructive">{cardError}</p>
+              )}
+            </div>
+          )}
+
+          {authenticated && funded && (
+            <div className="rounded-2xl border border-border bg-background/40 p-3.5">
+              <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                Complete payment
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Your card payment arrived. Send it to activate — one tap, no
+                addresses to copy.
+              </p>
+              <Button
+                variant="mystic"
+                className="mt-3 w-full"
+                disabled={completeBusy}
+                onClick={() => void completePayment()}
+              >
+                {completeBusy ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Wallet className="size-4" />
+                )}
+                Complete payment
+              </Button>
+              {completeError && (
+                <p className="mt-2 text-xs text-destructive">{completeError}</p>
               )}
             </div>
           )}
