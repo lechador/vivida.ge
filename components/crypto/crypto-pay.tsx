@@ -424,6 +424,10 @@ function PayDialogBody({
         fiat: {
           source: { defaultAsset: "usd" },
           defaultAmount: (purchase.amountUsdcCents / 100).toFixed(2),
+          // Prefer Stripe's embedded onramp (stays in-app for cards, Apple
+          // Pay, Google Pay). Falls back to other providers when Stripe has
+          // no quote — e.g. MoonPay, which completes on their own site.
+          preferredProvider: "stripe",
         },
       });
       if (
