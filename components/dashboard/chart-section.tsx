@@ -9,6 +9,7 @@ import {
 
 import { ensureChartFor } from "@/actions/chart";
 import { ContentFeedback } from "@/components/analytics/content-feedback";
+import { Accent } from "@/components/en/editorial";
 
 import { AspectCards } from "./aspect-cards";
 import { BigThreeCard } from "./big-three-card";
@@ -74,11 +75,21 @@ export async function ChartSection({
             />
             <div className="relative grid gap-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
               <div className="order-2 sm:order-1">
-                <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                <h2
+                  className={
+                    en
+                      ? "font-display text-3xl font-medium tracking-[-0.01em] sm:text-4xl"
+                      : "text-3xl font-semibold tracking-tight sm:text-4xl"
+                  }
+                >
                   {en ? "Your sky" : "შენი ცის"}{" "}
-                  <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-                    {en ? "at birth" : "მომენტი"}
-                  </span>
+                  {en ? (
+                    <Accent>at birth</Accent>
+                  ) : (
+                    <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
+                      მომენტი
+                    </span>
+                  )}
                 </h2>
                 <p className="mt-3 max-w-md text-sm text-foreground/80">
                   {en

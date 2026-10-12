@@ -13,6 +13,7 @@ import {
   trackFirstResultViewed,
 } from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { Accent } from "@/components/en/editorial";
 
 const ASPECT_GLYPH: Record<string, string> = {
   conjunction: "☌",
@@ -144,10 +145,20 @@ export function DailyCard({
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             {en ? "Today" : "დღევანდელი დღე"} · {date}
           </div>
-          <h2 className="mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {horoscope.headline}
-            </span>
+          <h2
+            className={
+              en
+                ? "font-display mt-1 text-balance text-2xl font-medium leading-tight tracking-[-0.01em] sm:text-3xl"
+                : "mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl"
+            }
+          >
+            {en ? (
+              <Accent>{horoscope.headline}</Accent>
+            ) : (
+              <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
+                {horoscope.headline}
+              </span>
+            )}
           </h2>
         </div>
         <Sparkles

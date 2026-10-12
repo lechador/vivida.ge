@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { auth } from "@/auth";
 import { CREDIT_COST } from "@/lib/credits-config";
@@ -10,6 +10,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { TarotReader } from "@/components/tarot/tarot-reader";
 import { TarotConversionLanding } from "@/components/tarot/tarot-conversion-landing";
 import { SiteFooter } from "@/components/site-footer";
+import { Accent } from "@/components/en/editorial";
 import { tarotDetailDeck, type TarotDetailCard } from "@/lib/tarot/detail";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -176,9 +177,9 @@ export default async function TaroHubPage() {
     >
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(50%_30%_at_50%_-5%,oklch(0.26_0.12_305/0.30),transparent_70%)]"
       />
-      <Starfield count={120} shooting={2} />
+      <Starfield count={70} shooting={1} />
       {authed ? (
         <AppHeader authed active="tarot" />
       ) : (
@@ -205,11 +206,9 @@ export default async function TaroHubPage() {
               ? "Online tarot · three-card reading"
               : "ონლაინ ტარო · ტაროზე მკითხაობა"}
           </div>
-          <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="font-display mt-1 text-balance text-4xl font-medium leading-[1.05] tracking-[-0.015em] sm:text-5xl">
             {en ? "Read the " : "ტარო"}{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "cards" : "ქართულად"}
-            </span>
+            <Accent>{en ? "cards" : "ქართულად"}</Accent>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
             {en ? (
@@ -299,12 +298,18 @@ export default async function TaroHubPage() {
 
         {/* CTA → natal chart (logged-out visitors only) */}
         {!authed && (
-          <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
-            <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-            <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+          <div className="mt-14 rounded-3xl border border-border bg-card/40 p-7 sm:p-10">
+            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--vivida-cyan)]">
+              <span
+                aria-hidden
+                className="inline-block h-px w-8 bg-[var(--vivida-cyan)]/60"
+              />
+              {en ? "Go deeper" : "უფრო ღრმად"}
+            </p>
+            <h2 className="font-display mt-3 max-w-xl text-balance text-3xl font-medium tracking-[-0.01em] sm:text-4xl">
               {en ? "Cards and stars, together" : "ტაროც და ვარსკვლავებიც"}
             </h2>
-            <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
+            <p className="mt-3 max-w-md text-pretty text-base text-muted-foreground">
               {en
                 ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
                 : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს — მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
