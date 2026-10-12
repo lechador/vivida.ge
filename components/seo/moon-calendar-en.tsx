@@ -242,7 +242,7 @@ export async function MoonCalendarPageEn() {
             <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
               Updated daily
             </p>
-            <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">
+            <h2 className="font-display mt-2 text-2xl font-medium sm:text-3xl">
               What Moon phase is it today?
             </h2>
             <p className="mt-3 text-lg leading-8 text-foreground/90">
@@ -280,7 +280,7 @@ export async function MoonCalendarPageEn() {
           <PopularTools locale="en" placement="moon_after_today" publicEntry />
         </div>
         <section className="mb-14">
-          <h2 className="text-3xl font-semibold">
+          <h2 className="font-display text-3xl font-medium">
             Upcoming New and Full Moons
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-foreground/80">
@@ -318,7 +318,9 @@ export async function MoonCalendarPageEn() {
           </div>
         </section>
         <section className="mb-14">
-          <h2 className="text-3xl font-semibold">The next 30 days</h2>
+          <h2 className="font-display text-3xl font-medium">
+            The next 30 days
+          </h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {days.map(
               ({ date, snapshot }) =>
@@ -349,7 +351,9 @@ export async function MoonCalendarPageEn() {
           </div>
         </section>
         <section className="mb-14">
-          <h2 className="text-3xl font-semibold">The eight Moon phases</h2>
+          <h2 className="font-display text-3xl font-medium">
+            The eight Moon phases
+          </h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             {PHASES.map((phase) => (
               <div
@@ -375,7 +379,9 @@ export async function MoonCalendarPageEn() {
           </div>
         </section>
         <section className="mb-14 max-w-3xl">
-          <h2 className="text-3xl font-semibold">Frequently asked questions</h2>
+          <h2 className="font-display text-3xl font-medium">
+            Frequently asked questions
+          </h2>
           <div className="mt-5 space-y-4">
             {faq.map((item) => (
               <details
@@ -392,7 +398,7 @@ export async function MoonCalendarPageEn() {
         </section>
         <div className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-2xl font-semibold sm:text-3xl">
+          <h2 className="font-display text-balance text-2xl font-medium sm:text-3xl">
             Find your Moon sign
           </h2>
           <p className="mx-auto mt-3 max-w-md text-muted-foreground">

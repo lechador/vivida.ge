@@ -227,7 +227,7 @@ export function AstrologyHousePageEn({ house }: { house: HouseGuide }) {
         </header>
         <section className="mt-10 space-y-5">
           <div className="rounded-2xl border border-border bg-card/55 p-6">
-            <h2 className="text-2xl font-semibold">
+            <h2 className="font-display text-2xl font-medium">
               What the {ordinal(house.number)} house means
             </h2>
             <p className="mt-4 leading-8 text-foreground/82">{house.meaning}</p>
@@ -247,13 +247,13 @@ export function AstrologyHousePageEn({ house }: { house: HouseGuide }) {
             </div>
           </div>
           <div className="rounded-2xl border border-border bg-card/55 p-6">
-            <h2 className="text-2xl font-semibold">
+            <h2 className="font-display text-2xl font-medium">
               When this house is emphasized
             </h2>
             <p className="mt-4 leading-8 text-foreground/82">{house.strong}</p>
           </div>
           <div className="rounded-2xl border border-border bg-card/55 p-6">
-            <h2 className="text-2xl font-semibold">
+            <h2 className="font-display text-2xl font-medium">
               How to interpret it accurately
             </h2>
             <p className="mt-4 leading-8 text-foreground/82">{house.reading}</p>
@@ -374,7 +374,7 @@ export function PlanetsHubEn() {
           ))}
         </section>
         <section className="mt-12 rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
-          <h2 className="text-2xl font-semibold">
+          <h2 className="font-display text-2xl font-medium">
             Planet + sign + house + aspect
           </h2>
           <p className="mt-4 max-w-3xl leading-8 text-foreground/80">
@@ -477,7 +477,7 @@ export function PlanetPageEn({ planet }: { planet: PlanetGuide }) {
         </header>
         <section className="mt-10 space-y-5">
           <div className="rounded-2xl border border-border bg-card/55 p-6">
-            <h2 className="text-2xl font-semibold">
+            <h2 className="font-display text-2xl font-medium">
               What {planet.name} means in astrology
             </h2>
             <p className="mt-4 leading-8 text-foreground/82">

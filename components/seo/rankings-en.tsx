@@ -278,7 +278,7 @@ export function RankingTopicPageEn({ topic }: { topic: RankingTopicEn }) {
           })}
         </ol>
         <section className="mt-14 max-w-3xl">
-          <h2 className="mb-5 text-2xl font-semibold sm:text-3xl">
+          <h2 className="mb-5 font-display text-2xl font-medium sm:text-3xl">
             Frequently asked questions
           </h2>
           <div className="space-y-3">

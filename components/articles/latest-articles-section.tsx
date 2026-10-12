@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { ArticleCard } from "@/components/articles/article-card";
+import { Kicker } from "@/components/en/editorial";
 import { articlePath, listPublishedArticles } from "@/lib/articles";
 import type { UserLocale } from "@/lib/i18n/locale";
 
@@ -28,15 +29,26 @@ export async function LatestArticlesSection({
   const articles = await listPublishedArticles(locale, { limit: 3 });
   if (!articles.length) return null;
   const copy = COPY[locale];
+  const en = locale === "en";
 
   return (
     <section className="relative z-10 mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
       <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold text-[var(--vivida-cyan)]">
-            {copy.eyebrow}
-          </p>
-          <h2 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
+          {en ? (
+            <Kicker>{copy.eyebrow}</Kicker>
+          ) : (
+            <p className="text-sm font-semibold text-[var(--vivida-cyan)]">
+              {copy.eyebrow}
+            </p>
+          )}
+          <h2
+            className={
+              en
+                ? "font-display mt-3 text-balance text-3xl font-medium tracking-[-0.01em] sm:text-5xl"
+                : "mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-5xl"
+            }
+          >
             {copy.title}
           </h2>
           <p className="mt-4 text-pretty leading-relaxed text-foreground/72 sm:text-lg">

@@ -86,7 +86,9 @@ export function EqArticlesHubEn() {
         <div className="mt-14 space-y-12">
           {categories.map((category) => (
             <section key={category}>
-              <h2 className="mb-4 text-2xl font-semibold">{category}</h2>
+              <h2 className="font-display mb-4 text-2xl font-medium">
+                {category}
+              </h2>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {EQ_ARTICLES_EN.filter(
                   (item) => item.category === category,
@@ -219,7 +221,7 @@ export function EqArticlePageEn({ item }: { item: EqArticleEn }) {
         <div className="mt-10 space-y-10">
           {item.sections.map((section) => (
             <section key={section.heading}>
-              <h2 className="text-2xl font-semibold tracking-tight">
+              <h2 className="font-display text-2xl font-medium tracking-tight">
                 {section.heading}
               </h2>
               <div className="mt-4 space-y-4 text-[1.02rem] leading-8 text-foreground/82">
@@ -230,7 +232,9 @@ export function EqArticlePageEn({ item }: { item: EqArticleEn }) {
             </section>
           ))}
           <section className="rounded-3xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/8 p-6 sm:p-8">
-            <h2 className="text-2xl font-semibold">Practical plan</h2>
+            <h2 className="font-display text-2xl font-medium">
+              Practical plan
+            </h2>
             <ol className="mt-5 space-y-3">
               {item.steps.map((step, index) => (
                 <li key={step} className="flex gap-3">
@@ -243,7 +247,7 @@ export function EqArticlePageEn({ item }: { item: EqArticleEn }) {
             </ol>
           </section>
           <section>
-            <h2 className="text-2xl font-semibold">
+            <h2 className="font-display text-2xl font-medium">
               Frequently asked questions
             </h2>
             <div className="mt-4 space-y-3">
@@ -303,7 +307,7 @@ export function EqArticlePageEn({ item }: { item: EqArticleEn }) {
         </div>
 
         <section className="mt-14 border-t border-border pt-9">
-          <h2 className="text-2xl font-semibold">Read next</h2>
+          <h2 className="font-display text-2xl font-medium">Read next</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {related.map((other) => (
               <Link
@@ -320,7 +324,7 @@ export function EqArticlePageEn({ item }: { item: EqArticleEn }) {
 
         <div className="mt-12 rounded-3xl bg-gradient-to-br from-[var(--vivida-violet)]/20 to-[var(--vivida-pink)]/15 p-7 text-center">
           <Check className="mx-auto size-6 text-[var(--vivida-cyan)]" />
-          <h2 className="mt-3 text-2xl font-semibold">
+          <h2 className="font-display mt-3 text-2xl font-medium">
             Which skill is your growth area?
           </h2>
           <p className="mt-2 text-sm text-foreground/75">

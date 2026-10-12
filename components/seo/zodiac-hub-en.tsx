@@ -160,7 +160,7 @@ export function ZodiacHubEn() {
           </p>
         </div>
 
-        <h2 className="mb-5 mt-16 text-2xl font-semibold tracking-tight sm:text-3xl">
+        <h2 className="font-display mb-5 mt-16 text-2xl font-medium tracking-tight sm:text-3xl">
           All zodiac signs
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
@@ -209,7 +209,7 @@ export function ZodiacHubEn() {
 
         <article className="mt-16 grid gap-8 lg:grid-cols-3">
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight">
+            <h2 className="font-display text-2xl font-medium tracking-tight">
               What is the zodiac?
             </h2>
             <p className="mt-3 leading-relaxed text-foreground/85">
@@ -220,7 +220,7 @@ export function ZodiacHubEn() {
             </p>
           </section>
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight">
+            <h2 className="font-display text-2xl font-medium tracking-tight">
               Four elements
             </h2>
             <p className="mt-3 leading-relaxed text-foreground/85">
@@ -230,7 +230,7 @@ export function ZodiacHubEn() {
             </p>
           </section>
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight">
+            <h2 className="font-display text-2xl font-medium tracking-tight">
               Three modalities
             </h2>
             <p className="mt-3 leading-relaxed text-foreground/85">
@@ -242,7 +242,7 @@ export function ZodiacHubEn() {
         </article>
 
         <section className="mt-16">
-          <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display mb-5 text-2xl font-medium tracking-tight sm:text-3xl">
             Explore deeper
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -295,7 +295,7 @@ export function ZodiacHubEn() {
         </section>
 
         <section className="mt-16 max-w-3xl">
-          <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display mb-5 text-2xl font-medium tracking-tight sm:text-3xl">
             Frequently asked questions
           </h2>
           <div className="space-y-3">
@@ -324,7 +324,7 @@ export function ZodiacHubEn() {
         <ReportPromo className="mt-16" />
         <div className="mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display text-balance text-2xl font-medium tracking-tight sm:text-3xl">
             Your zodiac sign is only one part of the chart
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">

@@ -6,7 +6,15 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { SignByDatePicker } from "@/app/zodiac/datit/sign-by-date-picker";
-import { ALL_ELEMENT_SLUGS, ALL_PAIR_SLUGS, ALL_SLUGS, SIGNS_BY_ELEMENT, ZODIAC_DATES, parsePairSlug, signMetaBySlug } from "@/lib/seo/zodiac-dates";
+import {
+  ALL_ELEMENT_SLUGS,
+  ALL_PAIR_SLUGS,
+  ALL_SLUGS,
+  SIGNS_BY_ELEMENT,
+  ZODIAC_DATES,
+  parsePairSlug,
+  signMetaBySlug,
+} from "@/lib/seo/zodiac-dates";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signColor } from "@/lib/zodiac";
 import { ELEMENT_ENGLISH } from "@/lib/zodiac-element-en";
@@ -16,46 +24,465 @@ import { englishSiteHref } from "@/lib/seo/locales";
 
 export function ZodiacByDatePageEn() {
   const faq = [
-    { q: "How is my zodiac sign determined?", a: "Your Sun sign is determined by the Sun's position at your birth. Conventional date ranges provide a quick answer for most birthdays." },
-    { q: "What if I was born on a cusp date?", a: "The exact time when the Sun changes signs varies by year and time zone. If your birthday is near a boundary, calculate a natal chart with your exact birth time and place." },
-    { q: "Is my zodiac sign my whole birth chart?", a: "No. It is your Sun sign. The Moon, rising sign, planets, houses, and aspects add essential layers." },
+    {
+      q: "How is my zodiac sign determined?",
+      a: "Your Sun sign is determined by the Sun's position at your birth. Conventional date ranges provide a quick answer for most birthdays.",
+    },
+    {
+      q: "What if I was born on a cusp date?",
+      a: "The exact time when the Sun changes signs varies by year and time zone. If your birthday is near a boundary, calculate a natal chart with your exact birth time and place.",
+    },
+    {
+      q: "Is my zodiac sign my whole birth chart?",
+      a: "No. It is your Sun sign. The Moon, rising sign, planets, houses, and aspects add essential layers.",
+    },
   ];
-  const ld = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) };
-  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={130} shooting={3} /><SmartHeader locale="en" georgianPath="/zodiac/datit" /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeLd(ld) }} />
-    <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-      <nav className="mb-6 flex gap-2 text-xs text-muted-foreground"><Link href="/zodiac">Zodiac signs</Link><span>/</span><span className="text-foreground/80">Sign by date</span></nav>
-      <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Sun sign calculator</div><h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">What Is My Zodiac Sign?</h1><p className="max-w-2xl text-pretty text-lg text-muted-foreground">Choose your birth month and day to find your conventional Western tropical Sun sign.</p>
-      <div className="mt-8"><SignByDatePicker locale="en" /></div>
-      <Text title="How zodiac dates work" body="The zodiac divides the Sun's apparent annual path into twelve signs. Your Sun sign is the sign occupied by the Sun at birth. Common date ranges are useful shortcuts, but the exact change from one sign to the next can shift by several hours depending on the year and time zone." />
-      <Text title="Born on a cusp?" body="A cusp is the boundary between two signs, not a separate hybrid Sun sign. If you were born near the first or last date of a conventional range, an exact natal chart calculation is the reliable way to confirm the result." />
-      <section className="mt-12"><h2 className="mb-4 text-2xl font-semibold sm:text-3xl">Zodiac sign dates</h2><div className="overflow-hidden rounded-2xl border border-border bg-card/40"><table className="w-full text-sm"><thead className="border-b border-border/60 bg-card/60 text-xs uppercase text-muted-foreground"><tr><th className="px-4 py-3 text-left">Sign</th><th className="px-4 py-3 text-left">Dates</th><th className="px-4 py-3 text-left">Element</th></tr></thead><tbody>{ALL_SLUGS.map((sign) => { const meta = signMetaBySlug(sign)!; return <tr key={sign} className="border-b border-border/30"><td className="px-4 py-3"><Link href={`/zodiac/${sign}`} className="inline-flex items-center gap-2"><span>{SIGNS_CONTENT[sign].symbol}</span><strong>{meta.labelEn}</strong></Link></td><td className="px-4 py-3">{ZODIAC_DATES[sign].rangeEn}</td><td className="px-4 py-3 text-muted-foreground">{ELEMENT_ENGLISH[meta.element === "ცეცხლი" ? "fire" : meta.element === "მიწა" ? "earth" : meta.element === "ჰაერი" ? "air" : "water"].name.replace(" signs", "")}</td></tr>; })}</tbody></table></div></section>
-      <Text title="Beyond the Sun sign" body="Your Sun sign describes identity and direction, but a complete natal chart also includes your Moon, rising sign, every planet, all twelve houses, and the aspects between them." />
-      <Button asChild variant="mystic" size="lg" className="mt-6"><Link href="/natal-chart"><Sparkles className="size-4" />Calculate my complete chart</Link></Button>
-      <Faq items={faq} />
-    </section><SiteFooter locale="en" /></main>;
+  const ld = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  };
+  return (
+    <main
+      lang="en"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
+      <Starfield count={130} shooting={3} />
+      <SmartHeader locale="en" georgianPath="/zodiac/datit" />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
+      />
+      <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
+        <nav className="mb-6 flex gap-2 text-xs text-muted-foreground">
+          <Link href="/zodiac">Zodiac signs</Link>
+          <span>/</span>
+          <span className="text-foreground/80">Sign by date</span>
+        </nav>
+        <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          Sun sign calculator
+        </div>
+        <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
+          What Is My Zodiac Sign?
+        </h1>
+        <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
+          Choose your birth month and day to find your conventional Western
+          tropical Sun sign.
+        </p>
+        <div className="mt-8">
+          <SignByDatePicker locale="en" />
+        </div>
+        <Text
+          title="How zodiac dates work"
+          body="The zodiac divides the Sun's apparent annual path into twelve signs. Your Sun sign is the sign occupied by the Sun at birth. Common date ranges are useful shortcuts, but the exact change from one sign to the next can shift by several hours depending on the year and time zone."
+        />
+        <Text
+          title="Born on a cusp?"
+          body="A cusp is the boundary between two signs, not a separate hybrid Sun sign. If you were born near the first or last date of a conventional range, an exact natal chart calculation is the reliable way to confirm the result."
+        />
+        <section className="mt-12">
+          <h2 className="font-display mb-4 text-2xl font-medium sm:text-3xl">
+            Zodiac sign dates
+          </h2>
+          <div className="overflow-hidden rounded-2xl border border-border bg-card/40">
+            <table className="w-full text-sm">
+              <thead className="border-b border-border/60 bg-card/60 text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 text-left">Sign</th>
+                  <th className="px-4 py-3 text-left">Dates</th>
+                  <th className="px-4 py-3 text-left">Element</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ALL_SLUGS.map((sign) => {
+                  const meta = signMetaBySlug(sign)!;
+                  return (
+                    <tr key={sign} className="border-b border-border/30">
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/zodiac/${sign}`}
+                          className="inline-flex items-center gap-2"
+                        >
+                          <span>{SIGNS_CONTENT[sign].symbol}</span>
+                          <strong>{meta.labelEn}</strong>
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        {ZODIAC_DATES[sign].rangeEn}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {ELEMENT_ENGLISH[
+                          meta.element === "ცეცხლი"
+                            ? "fire"
+                            : meta.element === "მიწა"
+                              ? "earth"
+                              : meta.element === "ჰაერი"
+                                ? "air"
+                                : "water"
+                        ].name.replace(" signs", "")}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <Text
+          title="Beyond the Sun sign"
+          body="Your Sun sign describes identity and direction, but a complete natal chart also includes your Moon, rising sign, every planet, all twelve houses, and the aspects between them."
+        />
+        <Button asChild variant="mystic" size="lg" className="mt-6">
+          <Link href="/natal-chart">
+            <Sparkles className="size-4" />
+            Calculate my complete chart
+          </Link>
+        </Button>
+        <Faq items={faq} />
+      </section>
+      <SiteFooter locale="en" />
+    </main>
+  );
 }
 
 export function ZodiacGuideIndexEn() {
   const url = englishSiteHref("/zodiac/gzamkvlevi", false);
-  const links = ["/zodiac", "/zodiac/datit", "/zodiac/mtvare", "/zodiac/amomavali", "/zodiac/elementebi", "/compatibility"];
-  const ld = { "@context": "https://schema.org", "@type": "CollectionPage", name: "Complete Zodiac Guide", description: "Explore zodiac signs, Moon signs, rising signs, elements, horoscope periods, and all 78 compatibility pairings.", url, inLanguage: "en", mainEntity: { "@type": "ItemList", itemListElement: links.map((item, index) => ({ "@type": "ListItem", position: index + 1, url: `https://www.vividaastro.com${item}` })) } };
-  return <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden"><Starfield count={130} shooting={3} /><SmartHeader locale="en" georgianPath="/zodiac/gzamkvlevi" /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeLd(ld) }} />
-    <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-      <nav className="mb-6 flex gap-2 text-xs text-muted-foreground"><Link href="/zodiac">Zodiac signs</Link><span>/</span><span className="text-foreground/80">Complete guide</span></nav>
-      <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground"><Compass className="size-3.5" />Astrology library</div><h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">Complete Zodiac Guide</h1><p className="max-w-2xl text-pretty text-lg text-muted-foreground">Explore all 12 signs, Moon and rising placements, four elements, horoscope periods, and every zodiac compatibility pairing.</p>
-      <GuideSection icon={<Sun className="size-4" />} title="The 12 Sun signs" subtitle="Identity, motivation, traits, love, and work"><CardGrid>{ALL_SLUGS.map((sign) => <SignCard key={sign} href={`/zodiac/${sign}`} sign={sign} label={signMetaBySlug(sign)!.labelEn} note={ZODIAC_DATES[sign].rangeEn} />)}</CardGrid></GuideSection>
-      <GuideSection icon={<Moon className="size-4" />} title="The 12 Moon signs" subtitle="Emotional needs and instinctive reactions"><CardGrid>{ALL_SLUGS.map((sign) => <SignCard key={sign} href={`/zodiac/mtvare/${sign}`} sign={sign} label={`Moon in ${signMetaBySlug(sign)!.labelEn}`} note={ZODIAC_SIGN_EN[sign].tagline} />)}</CardGrid><HubLink href="/zodiac/mtvare" label="Explore all Moon signs" /></GuideSection>
-      <GuideSection icon={<Sunrise className="size-4" />} title="The 12 rising signs" subtitle="First impressions, approach, and outward style"><CardGrid>{ALL_SLUGS.map((sign) => <SignCard key={sign} href={`/zodiac/amomavali/${sign}`} sign={sign} label={`${signMetaBySlug(sign)!.labelEn} rising`} note={ZODIAC_SIGN_EN[sign].tagline} />)}</CardGrid><HubLink href="/zodiac/amomavali" label="Explore all rising signs" /></GuideSection>
-      <GuideSection icon={<Sparkles className="size-4" />} title="The four elements" subtitle="Fire, Earth, Air, and Water"><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{ALL_ELEMENT_SLUGS.map((element) => <Link key={element} href={`/zodiac/elementebi/${element}`} className="rounded-2xl border border-border bg-card/55 p-4"><h3 className="font-semibold">{ELEMENT_ENGLISH[element].name}</h3><p className="mt-1 text-xs text-muted-foreground">{SIGNS_BY_ELEMENT[element].map((sign) => signMetaBySlug(sign)!.labelEn).join(" · ")}</p></Link>)}</div></GuideSection>
-      <GuideSection icon={<Sparkles className="size-4" />} title="All 78 compatibility pairings" subtitle="Every unique Sun-sign combination"><div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{ALL_SLUGS.map((sign) => <details key={sign} className="rounded-2xl border border-border bg-card/45 p-4"><summary className="cursor-pointer font-medium">{SIGNS_CONTENT[sign].symbol} {signMetaBySlug(sign)!.labelEn}</summary><ul className="mt-3 space-y-1">{ALL_PAIR_SLUGS.filter((pair) => parsePairSlug(pair)?.includes(sign)).map((pair) => { const parsed = parsePairSlug(pair)!; return <li key={pair}><Link href={`/zodiac/tavsebadoba/${pair}`} className="block rounded-lg px-2 py-1 text-sm hover:bg-foreground/5">{parsed.map((item) => signMetaBySlug(item)!.labelEn).join(" + ")}</Link></li>; })}</ul></details>)}</div></GuideSection>
-      <GuideSection icon={<Compass className="size-4" />} title="Calculators and hubs" subtitle="Start with the question you want to explore"><div className="grid gap-3 sm:grid-cols-2">{[{ href: "/zodiac/datit", title: "Zodiac sign by date", text: "Find your conventional Sun sign from a birthday." }, { href: "/natal-chart", title: "Natal chart calculator", text: "Calculate planets, houses, aspects, Moon, and Ascendant." }, { href: "/horoscope", title: "Horoscope hub", text: "Daily, weekly, monthly, and yearly guidance." }, { href: "/compatibility", title: "Compatibility calculator", text: "Compare any two zodiac signs." }].map((item) => <Link key={item.href} href={item.href} className="rounded-2xl border border-border bg-card/55 p-4"><h3 className="font-semibold">{item.title}</h3><p className="mt-1 text-xs text-muted-foreground">{item.text}</p></Link>)}</div></GuideSection>
-      <div className="mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 p-8 text-center"><h2 className="text-2xl font-semibold">Build your complete astrology profile</h2><p className="mx-auto mt-2 max-w-lg text-muted-foreground">Bring the signs, planets, houses, and aspects together in one birth chart.</p><Button asChild variant="mystic" className="mt-5"><Link href="/natal-chart">Calculate my birth chart</Link></Button></div>
-    </section><SiteFooter locale="en" /></main>;
+  const links = [
+    "/zodiac",
+    "/zodiac/datit",
+    "/zodiac/mtvare",
+    "/zodiac/amomavali",
+    "/zodiac/elementebi",
+    "/compatibility",
+  ];
+  const ld = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Complete Zodiac Guide",
+    description:
+      "Explore zodiac signs, Moon signs, rising signs, elements, horoscope periods, and all 78 compatibility pairings.",
+    url,
+    inLanguage: "en",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: links.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `https://www.vividaastro.com${item}`,
+      })),
+    },
+  };
+  return (
+    <main
+      lang="en"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
+      <Starfield count={130} shooting={3} />
+      <SmartHeader locale="en" georgianPath="/zodiac/gzamkvlevi" />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
+      />
+      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
+        <nav className="mb-6 flex gap-2 text-xs text-muted-foreground">
+          <Link href="/zodiac">Zodiac signs</Link>
+          <span>/</span>
+          <span className="text-foreground/80">Complete guide</span>
+        </nav>
+        <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <Compass className="size-3.5" />
+          Astrology library
+        </div>
+        <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
+          Complete Zodiac Guide
+        </h1>
+        <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
+          Explore all 12 signs, Moon and rising placements, four elements,
+          horoscope periods, and every zodiac compatibility pairing.
+        </p>
+        <GuideSection
+          icon={<Sun className="size-4" />}
+          title="The 12 Sun signs"
+          subtitle="Identity, motivation, traits, love, and work"
+        >
+          <CardGrid>
+            {ALL_SLUGS.map((sign) => (
+              <SignCard
+                key={sign}
+                href={`/zodiac/${sign}`}
+                sign={sign}
+                label={signMetaBySlug(sign)!.labelEn}
+                note={ZODIAC_DATES[sign].rangeEn}
+              />
+            ))}
+          </CardGrid>
+        </GuideSection>
+        <GuideSection
+          icon={<Moon className="size-4" />}
+          title="The 12 Moon signs"
+          subtitle="Emotional needs and instinctive reactions"
+        >
+          <CardGrid>
+            {ALL_SLUGS.map((sign) => (
+              <SignCard
+                key={sign}
+                href={`/zodiac/mtvare/${sign}`}
+                sign={sign}
+                label={`Moon in ${signMetaBySlug(sign)!.labelEn}`}
+                note={ZODIAC_SIGN_EN[sign].tagline}
+              />
+            ))}
+          </CardGrid>
+          <HubLink href="/zodiac/mtvare" label="Explore all Moon signs" />
+        </GuideSection>
+        <GuideSection
+          icon={<Sunrise className="size-4" />}
+          title="The 12 rising signs"
+          subtitle="First impressions, approach, and outward style"
+        >
+          <CardGrid>
+            {ALL_SLUGS.map((sign) => (
+              <SignCard
+                key={sign}
+                href={`/zodiac/amomavali/${sign}`}
+                sign={sign}
+                label={`${signMetaBySlug(sign)!.labelEn} rising`}
+                note={ZODIAC_SIGN_EN[sign].tagline}
+              />
+            ))}
+          </CardGrid>
+          <HubLink href="/zodiac/amomavali" label="Explore all rising signs" />
+        </GuideSection>
+        <GuideSection
+          icon={<Sparkles className="size-4" />}
+          title="The four elements"
+          subtitle="Fire, Earth, Air, and Water"
+        >
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {ALL_ELEMENT_SLUGS.map((element) => (
+              <Link
+                key={element}
+                href={`/zodiac/elementebi/${element}`}
+                className="rounded-2xl border border-border bg-card/55 p-4"
+              >
+                <h3 className="font-semibold">
+                  {ELEMENT_ENGLISH[element].name}
+                </h3>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {SIGNS_BY_ELEMENT[element]
+                    .map((sign) => signMetaBySlug(sign)!.labelEn)
+                    .join(" · ")}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </GuideSection>
+        <GuideSection
+          icon={<Sparkles className="size-4" />}
+          title="All 78 compatibility pairings"
+          subtitle="Every unique Sun-sign combination"
+        >
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {ALL_SLUGS.map((sign) => (
+              <details
+                key={sign}
+                className="rounded-2xl border border-border bg-card/45 p-4"
+              >
+                <summary className="cursor-pointer font-medium">
+                  {SIGNS_CONTENT[sign].symbol} {signMetaBySlug(sign)!.labelEn}
+                </summary>
+                <ul className="mt-3 space-y-1">
+                  {ALL_PAIR_SLUGS.filter((pair) =>
+                    parsePairSlug(pair)?.includes(sign),
+                  ).map((pair) => {
+                    const parsed = parsePairSlug(pair)!;
+                    return (
+                      <li key={pair}>
+                        <Link
+                          href={`/zodiac/tavsebadoba/${pair}`}
+                          className="block rounded-lg px-2 py-1 text-sm hover:bg-foreground/5"
+                        >
+                          {parsed
+                            .map((item) => signMetaBySlug(item)!.labelEn)
+                            .join(" + ")}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </details>
+            ))}
+          </div>
+        </GuideSection>
+        <GuideSection
+          icon={<Compass className="size-4" />}
+          title="Calculators and hubs"
+          subtitle="Start with the question you want to explore"
+        >
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              {
+                href: "/zodiac/datit",
+                title: "Zodiac sign by date",
+                text: "Find your conventional Sun sign from a birthday.",
+              },
+              {
+                href: "/natal-chart",
+                title: "Natal chart calculator",
+                text: "Calculate planets, houses, aspects, Moon, and Ascendant.",
+              },
+              {
+                href: "/horoscope",
+                title: "Horoscope hub",
+                text: "Daily, weekly, monthly, and yearly guidance.",
+              },
+              {
+                href: "/compatibility",
+                title: "Compatibility calculator",
+                text: "Compare any two zodiac signs.",
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-2xl border border-border bg-card/55 p-4"
+              >
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {item.text}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </GuideSection>
+        <div className="mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 p-8 text-center">
+          <h2 className="font-display text-2xl font-medium">
+            Build your complete astrology profile
+          </h2>
+          <p className="mx-auto mt-2 max-w-lg text-muted-foreground">
+            Bring the signs, planets, houses, and aspects together in one birth
+            chart.
+          </p>
+          <Button asChild variant="mystic" className="mt-5">
+            <Link href="/natal-chart">Calculate my birth chart</Link>
+          </Button>
+        </div>
+      </section>
+      <SiteFooter locale="en" />
+    </main>
+  );
 }
 
-function Text({ title, body }: { title: string; body: string }) { return <section className="mt-12 max-w-3xl"><h2 className="mb-3 text-2xl font-semibold sm:text-3xl">{title}</h2><p className="text-base leading-relaxed text-foreground/90">{body}</p></section>; }
-function Faq({ items }: { items: Array<{ q: string; a: string }> }) { return <section className="mt-14 max-w-3xl"><h2 className="mb-5 text-2xl font-semibold">Frequently asked questions</h2><div className="space-y-3">{items.map((item) => <details key={item.q} className="rounded-2xl border border-border bg-card/55 p-5"><summary className="cursor-pointer font-medium">{item.q}</summary><p className="mt-3 text-sm leading-relaxed text-foreground/85">{item.a}</p></details>)}</div></section>; }
-function GuideSection({ icon, title, subtitle, children }: { icon: React.ReactNode; title: string; subtitle: string; children: React.ReactNode }) { return <section className="mt-14"><div className="mb-5 flex items-baseline gap-3"><span className="grid size-7 place-items-center rounded-lg border border-border bg-card/65">{icon}</span><div><h2 className="text-2xl font-semibold sm:text-3xl">{title}</h2><p className="text-sm text-muted-foreground">{subtitle}</p></div></div>{children}</section>; }
-function CardGrid({ children }: { children: React.ReactNode }) { return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{children}</div>; }
-function SignCard({ href, sign, label, note }: { href: string; sign: typeof ALL_SLUGS[number]; label: string; note: string }) { const meta = signMetaBySlug(sign)!; const color = signColor(meta); return <Link href={href} className="flex items-center gap-3 rounded-2xl border border-border bg-card/55 p-4"><span className="grid size-9 place-items-center rounded-xl text-lg" style={{ color, background: `color-mix(in oklch, ${color} 18%, transparent)` }}>{SIGNS_CONTENT[sign].symbol}</span><div className="min-w-0"><div className="font-semibold">{label}</div><div className="line-clamp-1 text-xs text-muted-foreground">{note}</div></div></Link>; }
-function HubLink({ href, label }: { href: string; label: string }) { return <Link href={href} className="mt-3 inline-block text-sm text-muted-foreground hover:text-foreground">{label} →</Link>; }
+function Text({ title, body }: { title: string; body: string }) {
+  return (
+    <section className="mt-12 max-w-3xl">
+      <h2 className="font-display mb-3 text-2xl font-medium sm:text-3xl">
+        {title}
+      </h2>
+      <p className="text-base leading-relaxed text-foreground/90">{body}</p>
+    </section>
+  );
+}
+function Faq({ items }: { items: Array<{ q: string; a: string }> }) {
+  return (
+    <section className="mt-14 max-w-3xl">
+      <h2 className="font-display mb-5 text-2xl font-medium">
+        Frequently asked questions
+      </h2>
+      <div className="space-y-3">
+        {items.map((item) => (
+          <details
+            key={item.q}
+            className="rounded-2xl border border-border bg-card/55 p-5"
+          >
+            <summary className="cursor-pointer font-medium">{item.q}</summary>
+            <p className="mt-3 text-sm leading-relaxed text-foreground/85">
+              {item.a}
+            </p>
+          </details>
+        ))}
+      </div>
+    </section>
+  );
+}
+function GuideSection({
+  icon,
+  title,
+  subtitle,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-14">
+      <div className="mb-5 flex items-baseline gap-3">
+        <span className="grid size-7 place-items-center rounded-lg border border-border bg-card/65">
+          {icon}
+        </span>
+        <div>
+          <h2 className="font-display text-2xl font-medium sm:text-3xl">
+            {title}
+          </h2>
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+function CardGrid({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{children}</div>
+  );
+}
+function SignCard({
+  href,
+  sign,
+  label,
+  note,
+}: {
+  href: string;
+  sign: (typeof ALL_SLUGS)[number];
+  label: string;
+  note: string;
+}) {
+  const meta = signMetaBySlug(sign)!;
+  const color = signColor(meta);
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-3 rounded-2xl border border-border bg-card/55 p-4"
+    >
+      <span
+        className="grid size-9 place-items-center rounded-xl text-lg"
+        style={{
+          color,
+          background: `color-mix(in oklch, ${color} 18%, transparent)`,
+        }}
+      >
+        {SIGNS_CONTENT[sign].symbol}
+      </span>
+      <div className="min-w-0">
+        <div className="font-semibold">{label}</div>
+        <div className="line-clamp-1 text-xs text-muted-foreground">{note}</div>
+      </div>
+    </Link>
+  );
+}
+function HubLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="mt-3 inline-block text-sm text-muted-foreground hover:text-foreground"
+    >
+      {label} →
+    </Link>
+  );
+}

@@ -102,7 +102,7 @@ export function NatalChartPageEn() {
 
         <article className="mt-16 space-y-10">
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
               What is a birth chart?
             </h2>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
@@ -116,7 +116,7 @@ export function NatalChartPageEn() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
               How to read your chart
             </h2>
             <ul className="mt-4 space-y-3 text-base leading-relaxed text-foreground/85">
@@ -153,7 +153,7 @@ export function NatalChartPageEn() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
               Why birth time matters
             </h2>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
@@ -166,7 +166,7 @@ export function NatalChartPageEn() {
           </section>
 
           <section className="rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
               After the chart: your changing sky
             </h2>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
@@ -184,7 +184,7 @@ export function NatalChartPageEn() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
               Frequently asked questions
             </h2>
             <div className="mt-5 space-y-3">

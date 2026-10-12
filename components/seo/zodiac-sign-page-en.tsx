@@ -40,21 +40,26 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
   const name = meta.labelEn;
   const accent = signColor(meta);
   const dates = ZODIAC_DATES[sign];
-  const faq = signEn?.faq?.length ? signEn.faq : [
-    {
-      q: `What dates are ${name}?`,
-      a: `${name} is conventionally associated with ${dates.rangeEn}. If you were born at the beginning or end of this range, calculate your birth chart because the exact solar ingress varies by year and time zone.`,
-    },
-    {
-      q: `What element is ${name}?`,
-      a: `${name} is a ${ELEMENT_EN[meta.element]} sign. Its element describes the basic style through which the sign processes experience and expresses energy.`,
-    },
-    { q: `What is ${name} like in love?`, a: signEn?.love || ZODIAC_SIGN_EN[sign].love },
-    {
-      q: `Is a Sun sign the whole personality?`,
-      a: `No. ${name} describes the Sun's placement, while the Moon, rising sign, planets, houses, and aspects add essential layers to a complete natal chart.`,
-    },
-  ];
+  const faq = signEn?.faq?.length
+    ? signEn.faq
+    : [
+        {
+          q: `What dates are ${name}?`,
+          a: `${name} is conventionally associated with ${dates.rangeEn}. If you were born at the beginning or end of this range, calculate your birth chart because the exact solar ingress varies by year and time zone.`,
+        },
+        {
+          q: `What element is ${name}?`,
+          a: `${name} is a ${ELEMENT_EN[meta.element]} sign. Its element describes the basic style through which the sign processes experience and expresses energy.`,
+        },
+        {
+          q: `What is ${name} like in love?`,
+          a: signEn?.love || ZODIAC_SIGN_EN[sign].love,
+        },
+        {
+          q: `Is a Sun sign the whole personality?`,
+          a: `No. ${name} describes the Sun's placement, while the Moon, rising sign, planets, houses, and aspects add essential layers to a complete natal chart.`,
+        },
+      ];
 
   const ld = [
     {
@@ -171,7 +176,8 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
                 <Pill
                   label="Modality"
                   value={
-                    MODALITY_EN[signEn?.modality || ""] ?? (signEn?.modality || "Cardinal")
+                    MODALITY_EN[signEn?.modality || ""] ??
+                    (signEn?.modality || "Cardinal")
                   }
                   accent={accent}
                 />
@@ -191,7 +197,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
         {/* Deep Personality */}
         {personalityParagraphs.length > 0 && (
           <section className="mt-12 max-w-3xl">
-            <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="font-display mb-4 text-2xl font-medium tracking-tight sm:text-3xl">
               {name} Personality & Core Character
             </h2>
             <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
@@ -206,19 +212,27 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
         <section className="mt-12 grid gap-6 sm:grid-cols-2">
           <ListCard
             title="Strengths"
-            items={signEn?.strengths?.length ? signEn.strengths : ZODIAC_SIGN_EN[sign].strengths}
+            items={
+              signEn?.strengths?.length
+                ? signEn.strengths
+                : ZODIAC_SIGN_EN[sign].strengths
+            }
             accent={accent}
           />
           <ListCard
             title="Growth Areas & Challenges"
-            items={signEn?.weaknesses?.length ? signEn.weaknesses : ZODIAC_SIGN_EN[sign].challenges}
+            items={
+              signEn?.weaknesses?.length
+                ? signEn.weaknesses
+                : ZODIAC_SIGN_EN[sign].challenges
+            }
             accent="var(--muted-foreground)"
           />
         </section>
 
         {/* Love */}
         <section className="mt-12 max-w-3xl">
-          <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display mb-4 text-2xl font-medium tracking-tight sm:text-3xl">
             {name} in Love & Relationships
           </h2>
           <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
@@ -230,7 +244,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
 
         {/* Career */}
         <section className="mt-12 max-w-3xl">
-          <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display mb-4 text-2xl font-medium tracking-tight sm:text-3xl">
             {name} in Career & Financial Path
           </h2>
           <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
@@ -243,7 +257,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
         {/* Compatibility Matrix with specific notes */}
         <section className="mt-12">
           <div className="mb-5 flex items-baseline justify-between gap-3">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
               Compatibility with other signs
             </h2>
             <Link
@@ -265,7 +279,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
               const matchedSlug = ALL_SLUGS.find(
                 (s) =>
                   signMetaBySlug(s)!.labelEn.toLowerCase() ===
-                  (item.signEn || "").toLowerCase()
+                  (item.signEn || "").toLowerCase(),
               );
               const otherSlug = matchedSlug || sign;
               const otherMeta = signMetaBySlug(otherSlug);
@@ -318,7 +332,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
 
         {/* FAQ */}
         <section className="mt-12 max-w-3xl">
-          <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display mb-5 text-2xl font-medium tracking-tight sm:text-3xl">
             Frequently asked questions
           </h2>
           <div className="space-y-3">
@@ -398,7 +412,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
         <ReportPromo className="mt-16" />
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display text-balance text-2xl font-medium tracking-tight sm:text-3xl">
             Your Sun sign is only the beginning
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">

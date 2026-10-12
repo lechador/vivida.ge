@@ -136,7 +136,7 @@ export function AngelNumbersHubEn() {
         </section>
 
         <section className="mt-12">
-          <h2 className="mb-4 text-2xl font-semibold tracking-tight">
+          <h2 className="font-display mb-4 text-2xl font-medium tracking-tight">
             Frequently asked questions
           </h2>
           <div className="space-y-3">
@@ -158,7 +158,7 @@ export function AngelNumbersHubEn() {
 
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display text-balance text-2xl font-medium tracking-tight sm:text-3xl">
             Calculate your life path number
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">

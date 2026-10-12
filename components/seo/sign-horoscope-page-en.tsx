@@ -143,12 +143,30 @@ export function SignHoroscopePageEn({
   const url = `https://www.vividaastro.com${publicPath}`;
   const faq = [
     { q: `What can ${name} expect ${seo.horizon}?`, a: reading.summary },
-    { q: `Should I read my ${name} Sun sign or rising sign?`, a: "Start with your Sun sign, then read your rising sign for another perspective on timing and life areas. A personal forecast uses the complete birth chart." },
-    { q: "Is this horoscope a guaranteed prediction?", a: "No. A Sun-sign horoscope offers general themes and reflection prompts. Your choices, circumstances, complete birth chart, and exact transits all matter." },
+    {
+      q: `Should I read my ${name} Sun sign or rising sign?`,
+      a: "Start with your Sun sign, then read your rising sign for another perspective on timing and life areas. A personal forecast uses the complete birth chart.",
+    },
+    {
+      q: "Is this horoscope a guaranteed prediction?",
+      a: "No. A Sun-sign horoscope offers general themes and reflection prompts. Your choices, circumstances, complete birth chart, and exact transits all matter.",
+    },
   ];
   const ld = [
-    articleLd({ url, headline: seo.heading, description: seo.description, datePublished: "2026-08-13T00:00:00Z", dateModified: new Date().toISOString(), about: { "@type": "Thing", name: seo.heading } }),
-    breadcrumbLd([{ name: "Home", url: "https://www.vividaastro.com" }, { name: "Zodiac signs", url: "https://www.vividaastro.com/zodiac" }, { name, url: `https://www.vividaastro.com/zodiac/${sign}` }, { name: seo.heading, url }]),
+    articleLd({
+      url,
+      headline: seo.heading,
+      description: seo.description,
+      datePublished: "2026-08-13T00:00:00Z",
+      dateModified: new Date().toISOString(),
+      about: { "@type": "Thing", name: seo.heading },
+    }),
+    breadcrumbLd([
+      { name: "Home", url: "https://www.vividaastro.com" },
+      { name: "Zodiac signs", url: "https://www.vividaastro.com/zodiac" },
+      { name, url: `https://www.vividaastro.com/zodiac/${sign}` },
+      { name: seo.heading, url },
+    ]),
     faqLd(faq),
   ];
 
@@ -258,7 +276,9 @@ export function SignHoroscopePageEn({
             {ALL_HOROSCOPE_VIEWS.filter((item) => item !== view).map((item) => (
               <Link
                 key={item}
-                href={internationalPublicPath(`/zodiac/${sign}/${VIEW_PATH[item]}`)}
+                href={internationalPublicPath(
+                  `/zodiac/${sign}/${VIEW_PATH[item]}`,
+                )}
                 className="rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm hover:bg-card/80"
               >
                 {VIEW_LABEL_EN[item]}
@@ -283,7 +303,9 @@ export function SignHoroscopePageEn({
               return (
                 <Link
                   key={slug}
-                  href={internationalPublicPath(`/zodiac/${slug}/${VIEW_PATH[view]}`)}
+                  href={internationalPublicPath(
+                    `/zodiac/${slug}/${VIEW_PATH[view]}`,
+                  )}
                   className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm hover:bg-card/80"
                 >
                   <span>{SIGNS_CONTENT[slug].symbol}</span>
@@ -295,11 +317,18 @@ export function SignHoroscopePageEn({
         </section>
 
         <section className="mt-12">
-          <h2 className="text-2xl font-semibold">Frequently asked questions</h2>
+          <h2 className="font-display text-2xl font-medium">
+            Frequently asked questions
+          </h2>
           <div className="mt-5 space-y-3">
             {faq.map((item) => (
-              <details key={item.q} className="rounded-2xl border border-border bg-card/50 p-5">
-                <summary className="cursor-pointer font-medium">{item.q}</summary>
+              <details
+                key={item.q}
+                className="rounded-2xl border border-border bg-card/50 p-5"
+              >
+                <summary className="cursor-pointer font-medium">
+                  {item.q}
+                </summary>
                 <p className="mt-3 leading-7 text-foreground/78">{item.a}</p>
               </details>
             ))}
@@ -308,7 +337,7 @@ export function SignHoroscopePageEn({
 
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display text-balance text-2xl font-medium tracking-tight sm:text-3xl">
             Your personal horoscope goes beyond the Sun sign
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">

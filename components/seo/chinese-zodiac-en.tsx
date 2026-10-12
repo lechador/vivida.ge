@@ -130,7 +130,7 @@ export function ChineseZodiacHubEn() {
         </div>
 
         <article className="mt-14 max-w-3xl space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          <h2 className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
             How the Chinese zodiac works
           </h2>
           <p>
@@ -149,7 +149,7 @@ export function ChineseZodiacHubEn() {
         </article>
 
         <section className="mt-12 max-w-3xl">
-          <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display mb-5 text-2xl font-medium tracking-tight sm:text-3xl">
             Frequently asked questions
           </h2>
           <div className="space-y-3">
@@ -319,7 +319,7 @@ export function ChineseAnimalPageEn({
         <TextSection title="Career and work style" body={content.career} />
 
         <section className="mt-12">
-          <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display mb-4 text-2xl font-medium tracking-tight sm:text-3xl">
             Compatibility
           </h2>
           <CompatibilityGroup
@@ -342,7 +342,7 @@ export function ChineseAnimalPageEn({
         </section>
 
         <section className="mt-12">
-          <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display mb-5 text-2xl font-medium tracking-tight sm:text-3xl">
             Frequently asked questions
           </h2>
           <div className="space-y-3">
@@ -363,7 +363,7 @@ export function ChineseAnimalPageEn({
         </section>
 
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center sm:p-10">
-          <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="font-display text-balance text-2xl font-medium tracking-tight sm:text-3xl">
             Explore your Western birth chart
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
@@ -423,7 +423,7 @@ function Prose({ body, className }: { body: string; className?: string }) {
 function TextSection({ title, body }: { title: string; body: string }) {
   return (
     <section className="mt-12 max-w-3xl">
-      <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+      <h2 className="font-display mb-3 text-2xl font-medium tracking-tight sm:text-3xl">
         {title}
       </h2>
       <Prose body={body} />

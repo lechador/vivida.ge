@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Compass, Heart, Orbit, Sparkles } from "lucide-react";
+import { ArrowRight, Heart, Orbit, Sparkles } from "lucide-react";
 
 import { EnglishShell } from "@/components/en/english-shell";
 import { Accent, Kicker } from "@/components/en/editorial";
@@ -34,25 +34,21 @@ export const metadata: Metadata = {
 const GUIDES = [
   {
     href: "/natal-chart",
-    icon: Orbit,
     title: "Natal chart",
     text: "Learn what a birth chart contains and how planets, signs, houses and aspects work together.",
   },
   {
     href: "/horoscope",
-    icon: Sparkles,
     title: "Horoscope",
     text: "Understand how daily forecasts are created from current planetary movements.",
   },
   {
     href: "/zodiac",
-    icon: Compass,
     title: "Zodiac signs",
     text: "Explore the twelve signs, their elements, modalities and traditional ruling planets.",
   },
   {
     href: "/compatibility",
-    icon: Heart,
     title: "Compatibility",
     text: "See why meaningful compatibility considers more than two Sun signs.",
   },
@@ -187,11 +183,9 @@ export default function EnglishHomePage() {
 
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-20">
         <div className="mb-9 max-w-3xl">
-          <p className="text-sm font-medium text-[var(--vivida-cyan)]">
-            A thoughtful starting point
-          </p>
-          <h2 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-            Astrology is a system of relationships
+          <Kicker>A thoughtful starting point</Kicker>
+          <h2 className="font-display mt-3 text-balance text-3xl font-medium tracking-[-0.01em] sm:text-5xl">
+            Astrology is a <Accent>system of relationships</Accent>
           </h2>
           <p className="mt-5 text-pretty text-base leading-relaxed text-foreground/80 sm:text-lg">
             A single zodiac sign is only one part of the picture. A natal chart
@@ -207,34 +201,36 @@ export default function EnglishHomePage() {
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          {GUIDES.map(({ href, icon: Icon, title, text }) => (
-            <Link
-              key={href}
-              href={href}
-              className="group rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-[var(--vivida-violet)]/45 hover:bg-card/75"
-            >
-              <Icon className="size-6 text-[var(--vivida-violet)]" />
-              <h3 className="mt-4 text-xl font-semibold">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                {text}
-              </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[var(--vivida-cyan)]">
-                Read the guide{" "}
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </Link>
+        <ol className="border-t border-border/60">
+          {GUIDES.map(({ href, title, text }, i) => (
+            <li key={href} className="border-b border-border/60">
+              <Link
+                href={href}
+                className="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 py-6 sm:gap-8 sm:py-7"
+              >
+                <span className="font-display text-sm italic text-muted-foreground">
+                  0{i + 1}
+                </span>
+                <span className="min-w-0">
+                  <span className="font-display block text-balance text-2xl font-medium tracking-[-0.01em] sm:text-3xl">
+                    {title}
+                  </span>
+                  <span className="mt-1.5 block max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+                    {text}
+                  </span>
+                </span>
+                <ArrowRight className="size-5 shrink-0 text-[var(--vivida-cyan)] transition-transform group-hover:translate-x-1" />
+              </Link>
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
       <LatestArticlesSection locale="en" />
 
-      <section className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 sm:py-20">
-        <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
-          How Vivida works
-        </h2>
-        <div className="mt-10 grid gap-5 sm:grid-cols-3">
+      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-20">
+        <Kicker>How Vivida works</Kicker>
+        <div className="mt-8 grid gap-8 sm:grid-cols-3 sm:gap-6">
           {[
             [
               "01",
@@ -252,14 +248,13 @@ export default function EnglishHomePage() {
               "Use recurring themes as questions and perspectives rather than fixed outcomes.",
             ],
           ].map(([n, title, text]) => (
-            <article
-              key={n}
-              className="rounded-2xl border border-border/60 bg-card/40 p-5"
-            >
-              <span className="text-sm font-semibold text-[var(--vivida-pink)]">
+            <article key={n} className="border-t border-border/60 pt-5">
+              <span className="font-display text-4xl italic text-muted-foreground">
                 {n}
               </span>
-              <h3 className="mt-3 text-lg font-semibold">{title}</h3>
+              <h3 className="font-display mt-3 text-xl font-medium tracking-[-0.01em]">
+                {title}
+              </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {text}
               </p>
@@ -269,10 +264,11 @@ export default function EnglishHomePage() {
       </section>
 
       <section className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
-        <h2 className="mb-8 text-center text-3xl font-semibold tracking-tight">
+        <Kicker>Questions</Kicker>
+        <h2 className="font-display mt-3 text-3xl font-medium tracking-[-0.01em] sm:text-4xl">
           Frequently asked questions
         </h2>
-        <div className="space-y-3">
+        <div className="mt-8 space-y-3">
           {FAQ.map((item) => (
             <details
               key={item.q}
