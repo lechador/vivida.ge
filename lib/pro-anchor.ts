@@ -4,7 +4,7 @@ import {
   type BillingCurrency,
 } from "./billing-config";
 
-/** Below this 30-day spend the line stays hidden — not a real pattern yet. */
+/** Below this 30-day spend the line stays hidden, not a real pattern yet. */
 export const PRO_ANCHOR_MIN_SPEND = 10;
 
 export type ProAnchorKind = "saves" | "pace";
@@ -24,7 +24,7 @@ export type ProAnchor = {
 
 /**
  * Anchor PRO against the user's real trailing spend. Spend is valued at the
- * best per-credit pack rate (conservative — small-pack buyers paid more) and
+ * best per-credit pack rate (conservative, small-pack buyers paid more) and
  * compared against the featured plan's monthly equivalent, so multi-month
  * deals anchor honestly instead of against the legacy monthly sticker.
  *

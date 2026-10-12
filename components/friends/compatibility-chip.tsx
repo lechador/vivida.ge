@@ -7,7 +7,7 @@ import {
 import { synastryAccent } from "./synastry-visuals";
 
 /**
- * Compact pill — mini ring + percentage + top-category emoji.
+ * Compact pill, mini ring + percentage + top-category emoji.
  * Used inline on the friends-tab row to make the existing synastry
  * surface visible without forcing the user to click into a profile.
  */

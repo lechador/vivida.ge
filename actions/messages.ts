@@ -45,7 +45,7 @@ export async function sendMessage(
         (err as Error).message
       );
     }
-    // Web push for away recipients — throttled per conversation inside.
+    // Web push for away recipients, throttled per conversation inside.
     try {
       await sendMessagePush({
         recipientUserId: recipientId,
@@ -61,7 +61,7 @@ export async function sendMessage(
     }
   });
 
-  // Light revalidation — chat panel reads fresh data on next mount
+  // Light revalidation, chat panel reads fresh data on next mount
   revalidatePath("/dashboard");
   revalidatePath("/report");
   revalidatePath("/friends");
@@ -70,7 +70,7 @@ export async function sendMessage(
 }
 
 /**
- * Sender pings while they're typing. Friendship-checked. Idempotent — each
+ * Sender pings while they're typing. Friendship-checked. Idempotent, each
  * ping refreshes the TTL; the recipient's active-chat poll picks up the row.
  */
 export async function pingTyping(

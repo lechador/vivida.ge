@@ -111,7 +111,7 @@ export function QuickStats({
           glyph="◇"
           accent="oklch(0.72 0.22 350)"
           subValue="ძირითადი"
-          /* No modal — aspect detail lives in its own section. Hash bounce
+          /* No modal, aspect detail lives in its own section. Hash bounce
              also auto-expands the section if it's collapsed. */
           asLink="#aspects"
           index={4}

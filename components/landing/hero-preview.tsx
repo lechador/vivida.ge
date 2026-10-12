@@ -8,7 +8,7 @@ import { ZodiacWheel } from "./zodiac-wheel";
 const EASE_OUT_EXPO = [0.22, 1, 0.36, 1] as const;
 
 /**
- * Hero centerpiece — the spinning zodiac wheel flanked by two floating
+ * Hero centerpiece, the spinning zodiac wheel flanked by two floating
  * product-snippet cards that mimic real dashboard UI ("Big Three" and
  * "Today's horoscope"). Cold visitors see what they'll get instead of
  * a decorative animation. Cards hide below `sm` to avoid mobile clutter.
@@ -31,7 +31,7 @@ export function HeroPreview() {
         <ZodiacWheel size={180} />
       </motion.div>
 
-      {/* "Big Three" — floats above-left of the wheel */}
+      {/* "Big Three", floats above-left of the wheel */}
       <motion.div
         initial={{ opacity: 0, y: -8, x: -12 }}
         animate={{ opacity: 1, y: 0, x: 0 }}
@@ -59,7 +59,7 @@ export function HeroPreview() {
         </div>
       </motion.div>
 
-      {/* "Today's horoscope" — floats below-right of the wheel */}
+      {/* "Today's horoscope", floats below-right of the wheel */}
       <motion.div
         initial={{ opacity: 0, y: 8, x: 12 }}
         animate={{ opacity: 1, y: 0, x: 0 }}
@@ -72,7 +72,7 @@ export function HeroPreview() {
             დღევანდელი დღე
           </div>
           <div className="mt-1.5 text-sm font-medium leading-snug text-foreground/95">
-            მთვარე შენს მე-7 სახლში გადადის — საუკეთესო დღე ახლო ადამიანებთან
+            მთვარე შენს მე-7 სახლში გადადის, საუკეთესო დღე ახლო ადამიანებთან
             გულწრფელი საუბრისთვის.
           </div>
         </div>

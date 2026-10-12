@@ -23,7 +23,7 @@ export type FriendshipStatus =
   | "blocked";
 
 /**
- * Symmetric lookup — returns the relationship as seen from `viewerId`'s
+ * Symmetric lookup, returns the relationship as seen from `viewerId`'s
  * perspective. "pending_outgoing" means viewer sent the request; "pending_
  * incoming" means viewer received it.
  */
@@ -70,7 +70,7 @@ export type FriendshipUser = {
 
 /**
  * List the user's accepted friends. We need to look at both sides of the
- * directed friendship row — when this user is the requester, the friend is
+ * directed friendship row, when this user is the requester, the friend is
  * recipient, and vice versa. We run two queries and merge.
  */
 export async function listFriends(userId: string): Promise<FriendshipUser[]> {
@@ -245,12 +245,12 @@ export async function countFriends(
 }
 
 /**
- * Batched version of `countFriends` for many users at once — used by
+ * Batched version of `countFriends` for many users at once, used by
  * the suggested-people rail so we don't fire one COUNT per card.
  * Returns a map keyed by userId; missing users have an implicit 0.
  *
  * Implementation: two GROUP BY queries (one per side of the friendship
- * row) summed in JS. Both queries are index-bound — friendship's PK is
+ * row) summed in JS. Both queries are index-bound, friendship's PK is
  * (requester_id, recipient_id), so each side hits a covering index.
  */
 export async function countFriendsBatch(
@@ -314,8 +314,8 @@ export async function countFriendsBatch(
 
 /**
  * Number of people who are friends with BOTH `viewerId` and `otherId`.
- * Implementation: intersect each side's friend-id set in SQL with a CTE
- * — one round trip, no per-card N+1.
+ * Implementation: intersect each side's friend-id set in SQL with a CTE,
+ * one round trip, no per-card N+1.
  *
  * Returns 0 when viewer and other are the same user (so the UI can hide
  * the indicator without a separate self-check).
@@ -413,7 +413,7 @@ export async function listMutualFriendsPreview(
   }));
 }
 
-/** Just the count — used for the AppHeader notification dot. */
+/** Just the count, used for the AppHeader notification dot. */
 export async function countPendingRequests(userId: string): Promise<number> {
   const blockedIds = await getBlockedUserIds(userId);
   const [row] = await db

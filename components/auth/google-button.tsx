@@ -28,7 +28,7 @@ export function GoogleButton({
         startTransition(async () => {
           // Fired before the redirect leaves the page. Google accounts are
           // the bulk of sign-ups, and the OAuth round-trip means we never
-          // get a client-side "verified" event for them — so this click is
+          // get a client-side "verified" event for them, so this click is
           // the only GA4 signal for that path.
           trackEvent(ANALYTICS_EVENT.signUpGoogleClick, { method: "google" });
           await signInWithGoogle(callbackUrl);

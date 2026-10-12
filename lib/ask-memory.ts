@@ -35,7 +35,7 @@ export type {
  * be spoken to even when the verbatim window has moved on.
  *
  * Reads are a single PK lookup (free). Writes happen in `after()` via
- * `refreshAskMemory()` — a cheap small-model JSON merge, throttled to at
+ * `refreshAskMemory()`, a cheap small-model JSON merge, throttled to at
  * most one call per 5 new user turns. Failures only log; chat never breaks.
  */
 
@@ -67,7 +67,7 @@ const MERGE_SYSTEM = `You maintain a rolling portrait of a user chatting with th
 
 /**
  * Refresh the rolling portrait when ≥5 new user turns accumulated since the
- * last refresh. Runs in `after()` — throws nothing, returns false on skip/fail.
+ * last refresh. Runs in `after()`, throws nothing, returns false on skip/fail.
  */
 export async function refreshAskMemory(
   userId: string,
@@ -115,7 +115,7 @@ export async function refreshAskMemory(
       .join("\n");
     const oldPortrait = existing?.summary?.trim()
       ? `OLD PORTRAIT:\n${existing.summary.slice(0, MAX_SUMMARY_CHARS)}\nOld traits: ${JSON.stringify(existing.traits ?? {})}\n\n`
-      : "No old portrait yet — create the first one.\n\n";
+      : "No old portrait yet, create the first one.\n\n";
     const langLine =
       locale === "en"
         ? "Write summary, tone, topics and notes in English."

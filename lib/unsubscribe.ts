@@ -10,7 +10,7 @@ import { users } from "@/db/schema";
  * before we added the column).
  *
  * Token is opaque, 32 hex chars, stored unique on the user row. No salt
- * needed — the row IS the lookup, and we don't expose any other PII via
+ * needed, the row IS the lookup, and we don't expose any other PII via
  * the token endpoint.
  */
 export async function getOrCreateUnsubscribeToken(

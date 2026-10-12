@@ -21,7 +21,7 @@ import {
  * claim pages both need it).
  *
  * Only the WORDING is DB-driven; axis/pole are validated against the static
- * structure so a stray value can never corrupt scoring — an unknown axis falls
+ * structure so a stray value can never corrupt scoring, an unknown axis falls
  * back to the static question with that id.
  */
 const getMbtiQuestionsCached = unstable_cache(async (): Promise<MbtiQuestion[]> => {

@@ -14,13 +14,13 @@ import { MentionInput } from "./mention-input";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /** Single static composer placeholder. Less cute than the rotating
- *  prompts, more consistent — users now read the same opener every
+ *  prompts, more consistent, users now read the same opener every
  *  visit so it stops being a moving target. */
 const PLACEHOLDER = "გააზიარე ფიქრები";
 
 /**
  * Top-of-feed composer. Plain textarea + submit. No attachments, no
- * markdown — product spec is text only. Submits via the createPost
+ * markdown, product spec is text only. Submits via the createPost
  * server action; refresh on success picks up the freshly-revalidated
  * page so the new post slides in at the top.
  */

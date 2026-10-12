@@ -14,14 +14,14 @@ export async function generateMetadata(): Promise<Metadata> {
     title: en ? "Your IQ Result" : "შენი IQ შედეგი",
     description: en
       ? "Your estimated IQ score, percentile and reasoning profile."
-      : "შენი ინტელექტის ტესტის შედეგი — IQ ქულა, პროცენტილი და აზროვნების ანალიზი.",
+      : "შენი ინტელექტის ტესტის შედეგი, IQ ქულა, პროცენტილი და აზროვნების ანალიზი.",
     robots: { index: false, follow: false },
   };
 }
 
 /**
  * IQ result page. The result is computed client-side from the answers stashed
- * by the test (localStorage) — so this page renders for anyone; the client
+ * by the test (localStorage), so this page renders for anyone; the client
  * component gates the deep breakdown behind login.
  */
 export default async function IqResultPage() {

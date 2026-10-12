@@ -84,7 +84,7 @@ export function signHoroscopeSeoEn(
     period,
     horizon,
     heading: `${name} ${phrase}`,
-    title: `${name} ${phrase} — ${period}`,
+    title: `${name} ${phrase}, ${period}`,
     description: `${name} horoscope ${horizon}: practical astrology guidance for love, relationships, career, priorities, and personal growth for ${period}.`,
   };
 }
@@ -111,7 +111,7 @@ function forecast(sign: ZodiacSlug, view: HoroscopeView) {
     headline,
     summary: `For ${horizon}, your strongest results come from using your natural gifts without letting familiar pressure patterns take control.`,
     paragraphs: [
-      `${profile.core} ${horizon[0].toUpperCase() + horizon.slice(1)}, notice where this familiar style helps you move forward—and where a more flexible response would create a better result.`,
+      `${profile.core} ${horizon[0].toUpperCase() + horizon.slice(1)}, notice where this familiar style helps you move forward, and where a more flexible response would create a better result.`,
       `In relationships, ${profile.love} Keep the conversation grounded in what is happening now instead of reacting to an old expectation.`,
       `For work and practical decisions, ${profile.career} Select one priority that can produce visible progress, and let consistency carry more weight than intensity.`,
     ],

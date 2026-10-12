@@ -9,9 +9,9 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
 
-const title = "ფრთხილი დღეები — როდის გვჭირდება მეტი ყურადღება";
+const title = "ფრთხილი დღეები, როდის გვჭირდება მეტი ყურადღება";
 const description =
-  "მომდევნო 30 დღის ფრთხილი თარიღები დაძაბული პლანეტარული ასპექტების მიხედვით — დაგეგმვის, გადამოწმებისა და მშვიდი რეაგირებისთვის.";
+  "მომდევნო 30 დღის ფრთხილი თარიღები დაძაბული პლანეტარული ასპექტების მიხედვით, დაგეგმვის, გადამოწმებისა და მშვიდი რეაგირებისთვის.";
 
 export const revalidate = 86400;
 

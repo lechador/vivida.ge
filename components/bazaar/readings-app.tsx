@@ -9,7 +9,7 @@ import { Accent } from "@/components/en/editorial";
 import { serviceCover } from "@/lib/bazaar-pure";
 
 /**
- * Insight Bazaar — single-view marketplace client. One public URL
+ * Insight Bazaar, single-view marketplace client. One public URL
  * (/readings) drives every state through query params so the English
  * rewrite table (exact paths only) keeps working: ?service=<id>,
  * ?provider=<id>, ?view=bookings|apply.
@@ -139,7 +139,7 @@ function statusLabel(status: string): string {
     case "pending_payment":
       return "Awaiting payment";
     case "paid":
-      return "Paid — reading in progress";
+      return "Paid, reading in progress";
     case "delivered":
       return "Delivered";
     case "cancelled":
@@ -257,7 +257,7 @@ export function ReadingsApp() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-24 pt-10 sm:px-6 sm:pt-14">
-      {/* Masthead — editorial row, not a centered hero. */}
+      {/* Masthead, editorial row, not a centered hero. */}
       <div className="flex flex-col gap-6 border-b border-border/40 pb-8 md:flex-row md:items-end md:justify-between">
         <div className="max-w-2xl">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--vivida-cyan)]">
@@ -267,7 +267,7 @@ export function ReadingsApp() {
             A human reading, <Accent>delivered in 24–48h</Accent>
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Pick a vetted reader, pay by card in USD — your reader receives USDC
+            Pick a vetted reader, pay by card in USD, your reader receives USDC
             on Solana, verified on-chain before the reading begins. Birth
             details stay private and off-chain, always.
           </p>
@@ -376,7 +376,7 @@ export function ReadingsApp() {
             />
           </div>
 
-          {/* Listing — horizontal rows, reader-first. */}
+          {/* Listing, horizontal rows, reader-first. */}
           <div className="mt-6">
             {services === null && !loadError && (
               <div className="space-y-3" aria-label="Loading">
@@ -399,7 +399,7 @@ export function ReadingsApp() {
                 <p className="text-lg font-semibold">No readings yet</p>
                 <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
                   {services.length === 0
-                    ? "Our first readers are being vetted right now. Check back soon — or apply to be one of them."
+                    ? "Our first readers are being vetted right now. Check back soon, or apply to be one of them."
                     : "Nothing matches that search. Try a different word or category."}
                 </p>
                 {services.length === 0 && (
@@ -412,7 +412,7 @@ export function ReadingsApp() {
                 )}
               </div>
             )}
-            {/* Listing — featured banner + card grid. */}
+            {/* Listing, featured banner + card grid. */}
             <div className="mt-6">
               {filtered.length > 0 && (
                 <button
@@ -535,7 +535,7 @@ export function ReadingsApp() {
                             </p>
                           </div>
                           <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[var(--vivida-cyan)]">
-                            Book — {price(s.priceUsdcCents)} USDC{" "}
+                            Book, {price(s.priceUsdcCents)} USDC{" "}
                             <span aria-hidden>→</span>
                           </span>
                         </div>
@@ -558,7 +558,7 @@ export function ReadingsApp() {
             <div>
               <p className="font-semibold">Direct payment to your reader</p>
               <p className="mt-1 text-muted-foreground">
-                You pay by card in USD — your reader&apos;s wallet receives USDC
+                You pay by card in USD, your reader&apos;s wallet receives USDC
                 on Solana, verified on-chain before the reading begins.
               </p>
             </div>
@@ -596,7 +596,7 @@ function ServiceView({
   const [wallet, setWallet] = useState<string | null>(null);
 
   // Deep-link entry: the marketplace list doesn't carry this service, so
-  // fetch it directly. Async callbacks only — no synchronous setState.
+  // fetch it directly. Async callbacks only, no synchronous setState.
   useEffect(() => {
     if (cached || fetched || fetchFailed) return;
     let live = true;
@@ -861,7 +861,7 @@ function PaymentStep({
     if (!txSignature.trim() || !payerWallet.trim()) return;
     setState("checking");
     setDetail(null);
-    // 202 (accepted, not indexed yet) and 503 (RPC busy) are transient — the
+    // 202 (accepted, not indexed yet) and 503 (RPC busy) are transient, the
     // chain usually catches up within a minute, so poll before giving up.
     for (let attempt = 0; attempt < 8; attempt++) {
       try {
@@ -879,16 +879,16 @@ function PaymentStep({
           setState("paid");
           return;
         }
-        // 202: accepted but not indexed yet — poll again below.
+        // 202: accepted but not indexed yet, poll again below.
       } catch (e) {
         const status = (e as { status?: number }).status;
         const reason = (e as { reason?: string }).reason;
         if (status === 503 || reason === "unavailable") {
-          // RPC busy — retry below.
+          // RPC busy, retry below.
         } else if (reason === "underpaid") {
           setState("failed");
           setDetail(
-            `This payment paid less than ${price(priceUsdcCents)} USDC to the reader's wallet — contact support with your transaction.`,
+            `This payment paid less than ${price(priceUsdcCents)} USDC to the reader's wallet, contact support with your transaction.`,
           );
           return;
         } else if (reason === "already_used") {
@@ -900,13 +900,13 @@ function PaymentStep({
         } else if (reason === "not_signer") {
           setState("failed");
           setDetail(
-            "That transaction wasn't sent from your wallet — contact support with your transaction.",
+            "That transaction wasn't sent from your wallet, contact support with your transaction.",
           );
           return;
         } else {
           setState("failed");
           setDetail(
-            "We couldn't match this payment to your booking — contact support with your transaction.",
+            "We couldn't match this payment to your booking, contact support with your transaction.",
           );
           return;
         }
@@ -915,7 +915,7 @@ function PaymentStep({
     }
     setState("pending");
     setDetail(
-      "The network hasn't indexed this transaction yet. It usually appears within a minute — refresh the page shortly and the booking will show as paid.",
+      "The network hasn't indexed this transaction yet. It usually appears within a minute, refresh the page shortly and the booking will show as paid.",
     );
   }
 
@@ -1271,14 +1271,14 @@ function BookingsView({
 
           {provider.status === "pending" && (
             <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-              Your reader profile is under review — the Vivida team approves
+              Your reader profile is under review, the Vivida team approves
               readers by hand, and we&apos;ll email you. You can keep editing it
               meanwhile.
             </p>
           )}
           {provider.status === "suspended" && (
             <p className="mt-3 text-xs leading-relaxed text-red-300/90">
-              Your reader profile is suspended — listings are hidden. Contact us
+              Your reader profile is suspended, listings are hidden. Contact us
               to resolve this.
             </p>
           )}
@@ -1309,8 +1309,8 @@ function BookingsView({
         <h3 className="text-lg font-semibold">My bookings</h3>
         {data.asBuyer.length === 0 ? (
           <p className="mt-3 rounded-2xl border border-dashed border-border/60 p-6 text-sm text-muted-foreground">
-            Nothing booked yet. Find a reading in the marketplace and reserve it
-            — it will appear here with its payment and delivery status.
+            Nothing booked yet. Find a reading in the marketplace and reserve
+            it, it will appear here with its payment and delivery status.
           </p>
         ) : (
           <ul className="mt-3 space-y-3">
@@ -1342,7 +1342,7 @@ function BuyerBookingCard({
     setBusy(true);
     setMsg(null);
     try {
-      // 202 (accepted, not indexed yet) and 503 (RPC busy) are transient —
+      // 202 (accepted, not indexed yet) and 503 (RPC busy) are transient,
       // the chain usually catches up within a minute, so poll before giving up.
       for (let attempt = 0; attempt < 8; attempt++) {
         try {
@@ -1361,15 +1361,15 @@ function BuyerBookingCard({
             onDone();
             return;
           }
-          // 202: accepted but not indexed yet — poll again below.
+          // 202: accepted but not indexed yet, poll again below.
         } catch (e) {
           const status = (e as { status?: number }).status;
           const reason = (e as { reason?: string }).reason;
           if (status === 503 || reason === "unavailable") {
-            // RPC busy — retry below.
+            // RPC busy, retry below.
           } else if (reason === "underpaid") {
             setMsg(
-              `That payment is short of ${price(booking.priceUsdcCents)} USDC — contact support with your transaction.`,
+              `That payment is short of ${price(booking.priceUsdcCents)} USDC, contact support with your transaction.`,
             );
             return;
           } else if (reason === "already_used") {
@@ -1377,12 +1377,12 @@ function BuyerBookingCard({
             return;
           } else if (reason === "not_signer") {
             setMsg(
-              "That transaction wasn't sent from your wallet — contact support with your transaction.",
+              "That transaction wasn't sent from your wallet, contact support with your transaction.",
             );
             return;
           } else {
             setMsg(
-              "We couldn't match this payment to your booking — contact support with your transaction.",
+              "We couldn't match this payment to your booking, contact support with your transaction.",
             );
             return;
           }
@@ -1390,7 +1390,7 @@ function BuyerBookingCard({
         await new Promise((r) => setTimeout(r, 5000));
       }
       setMsg(
-        "The network hasn't indexed this transaction yet. It usually appears within a minute — check back shortly.",
+        "The network hasn't indexed this transaction yet. It usually appears within a minute, check back shortly.",
       );
     } finally {
       setBusy(false);
@@ -1516,7 +1516,7 @@ function BuyerBookingCard({
       )}
       {reviewed && (
         <p className="mt-4 text-sm text-emerald-300">
-          Thanks — your review is live on the reader&apos;s profile.
+          Thanks, your review is live on the reader&apos;s profile.
         </p>
       )}
     </li>
@@ -1549,7 +1549,7 @@ function ProviderOrderCard({
       const status = (e as { status?: number }).status;
       setMsg(
         status === 409
-          ? "This order isn't paid yet — delivery unlocks after payment verifies."
+          ? "This order isn't paid yet, delivery unlocks after payment verifies."
           : "Couldn't deliver. Try again.",
       );
     } finally {
@@ -1595,7 +1595,7 @@ function ProviderOrderCard({
       {booking.status === "pending_payment" && (
         <div className="mt-3 border-t border-border/40 pt-3 text-sm">
           <p className="text-muted-foreground">
-            We&apos;ve emailed the buyer their payment link — most orders pay
+            We&apos;ve emailed the buyer their payment link, most orders pay
             within minutes. You can decline any order before it&apos;s paid.
           </p>
           <button
@@ -1795,7 +1795,7 @@ function ProviderServicesSection({
       {providerStatus === "pending" && (
         <p className="mt-3 rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm">
           Services unlock as soon as the Vivida team approves {displayName}
-          &apos;s profile — listing happens right here.
+          &apos;s profile, listing happens right here.
         </p>
       )}
       {providerStatus === "suspended" && (
@@ -1811,10 +1811,10 @@ function ProviderServicesSection({
         !showNew && (
           <div className="mt-3 rounded-2xl border border-dashed border-border/60 p-5">
             <p className="text-sm font-semibold">
-              You&apos;re live — list your first service
+              You&apos;re live, list your first service
             </p>
             <p className="mt-1 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Buyers book what you list. One clear offer is enough to start —
+              Buyers book what you list. One clear offer is enough to start,
               e.g. &ldquo;Three-card tarot reading, delivered within 24
               hours.&rdquo;
             </p>
@@ -1930,7 +1930,7 @@ function ProviderServicesSection({
             text={`${typeof window === "undefined" ? "" : window.location.origin}/readings?provider=${providerId}`}
             label="Copy link"
           />
-          <span>— share it anywhere seekers find you.</span>
+          <span>, share it anywhere seekers find you.</span>
         </div>
       )}
     </section>
@@ -2011,7 +2011,7 @@ function ServiceForm({
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         maxLength={90}
-        placeholder="Service title — e.g. Celtic Cross Deep-Dive"
+        placeholder="Service title, e.g. Celtic Cross Deep-Dive"
         aria-label="Service title"
         className={inputCls}
       />
@@ -2064,7 +2064,7 @@ function ServiceForm({
         value={promise}
         onChange={(e) => setPromise(e.target.value)}
         maxLength={120}
-        placeholder="Delivery promise — e.g. Delivered within 24 hours (optional)"
+        placeholder="Delivery promise, e.g. Delivered within 24 hours (optional)"
         aria-label="Delivery promise"
         className={inputCls}
       />
@@ -2103,7 +2103,7 @@ function ApplyView({ onBack }: { onBack: () => void }) {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Existing readers get the same form prefilled — it doubles as profile
+  // Existing readers get the same form prefilled, it doubles as profile
   // management (the apply endpoint updates an existing row in place and
   // never downgrades an approved status).
   const [existingStatus, setExistingStatus] = useState<string | null>(null);
@@ -2161,11 +2161,11 @@ function ApplyView({ onBack }: { onBack: () => void }) {
       setResult(
         existingStatus
           ? d.status === "approved"
-            ? "Profile saved — you're live. List services and see orders in My readings."
-            : "Profile saved. Your application is still under review — we'll email you."
+            ? "Profile saved, you're live. List services and see orders in My readings."
+            : "Profile saved. Your application is still under review, we'll email you."
           : d.status === "approved"
-            ? "Your reader profile is live — list your first service from My readings once logged in."
-            : "Application received. The Vivida team reviews every reader before they go live — we'll email you.",
+            ? "Your reader profile is live, list your first service from My readings once logged in."
+            : "Application received. The Vivida team reviews every reader before they go live, we'll email you.",
       );
     } catch (e) {
       const status = (e as { status?: number }).status;
@@ -2200,8 +2200,8 @@ function ApplyView({ onBack }: { onBack: () => void }) {
       </h2>
       <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
         {existingStatus
-          ? "Update how you appear in the marketplace. Approved readers stay live — a wallet change applies to future orders only."
-          : "Set your own services and prices in USDC. Buyers pay by card and the USDC lands in your Solana wallet — no revenue share in the MVP. Every reader is approved by the Vivida team before appearing publicly."}
+          ? "Update how you appear in the marketplace. Approved readers stay live, a wallet change applies to future orders only."
+          : "Set your own services and prices in USDC. Buyers pay by card and the USDC lands in your Solana wallet, no revenue share in the MVP. Every reader is approved by the Vivida team before appearing publicly."}
       </p>
 
       {result ? (
@@ -2258,7 +2258,7 @@ function ApplyView({ onBack }: { onBack: () => void }) {
               ))}
             </div>
           </Field>
-          <Field label="Solana wallet — where your USDC lands (mainnet)">
+          <Field label="Solana wallet, where your USDC lands (mainnet)">
             <input
               value={form.solanaWallet}
               onChange={(e) =>
@@ -2276,9 +2276,9 @@ function ApplyView({ onBack }: { onBack: () => void }) {
                 rel="noreferrer"
                 className="font-medium text-[var(--vivida-cyan)] underline-offset-2 hover:underline"
               >
-                Get Phantom — free, two minutes
+                Get Phantom, free, two minutes
               </a>
-              . Never share seed phrases — Vivida will never ask for them.
+              . Never share seed phrases, Vivida will never ask for them.
             </p>
           </Field>
           {error && <p className="text-sm text-red-400">{error}</p>}

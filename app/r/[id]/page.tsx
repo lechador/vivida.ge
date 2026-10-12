@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * PUBLIC share view of an Astro-MBTI result. Deliberately shows only the
- * non-sensitive, shareable surface — type, archetype, and axis percentages
+ * non-sensitive, shareable surface, type, archetype, and axis percentages
  * (plus the type's generic material). The private deep synthesis stays behind
  * the owner-gated /test-results/[id]. Anyone with the link can open this (the
  * owner chose to share it), and it unfurls on social via the colocated
@@ -51,14 +51,14 @@ export async function generateMetadata({
   if (!r) return { title: "Astro-MBTI" };
   const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   const archetype = en ? mbtiArchetypeEn(r.mbtiType) : r.archetypeNameGe;
-  const title = `${r.mbtiType} — ${archetype} · Astro-MBTI`;
+  const title = `${r.mbtiType}, ${archetype} · Astro-MBTI`;
   const description = en
     ? `My personality type is ${r.mbtiType}. Discover your type on Vivida.`
     : `ჩემი ფსიქოლოგიური ტიპია ${r.mbtiType}. აღმოაჩინე შენი ტიპი Vivida-ზე.`;
   return {
     title,
     description,
-    // Share landings exist for the OG preview, not for search — thousands of
+    // Share landings exist for the OG preview, not for search, thousands of
     // near-identical result pages would only dilute crawl budget and sit in
     // GSC as "Crawled – currently not indexed". Point authority at the test.
     robots: { index: false },

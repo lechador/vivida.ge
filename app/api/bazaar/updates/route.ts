@@ -9,10 +9,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/bazaar/updates → { bazaarUpdates } — the viewer's marketplace
+ * GET /api/bazaar/updates → { bazaarUpdates }, the viewer's marketplace
  * email preference (paid-order / reading-delivered mail, default ON).
  * POST /api/bazaar/updates { enabled } flips it. Bell notifications are
- * unaffected — this toggle is email-only.
+ * unaffected, this toggle is email-only.
  */
 export async function GET() {
   const session = await auth();

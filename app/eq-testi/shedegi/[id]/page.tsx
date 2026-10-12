@@ -29,7 +29,7 @@ export async function generateMetadata() {
 export const dynamic = "force-dynamic";
 
 /**
- * A saved EQ result, owner-only — the persistent view behind "ჩემი შედეგი" on
+ * A saved EQ result, owner-only, the persistent view behind "ჩემი შედეგი" on
  * the tests hub (the fresh /eq-testi/shedegi is localStorage-only). The overall
  * score + band are free; the deep 5-domain profile unlocks once for
  * CREDIT_COST.eqTest credits. Re-scored from the stored answers so it works on
@@ -73,7 +73,7 @@ export default async function SavedEqResultPage({
       <AppHeader authed active="tests" />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        {/* Headline — free */}
+        {/* Headline, free */}
         <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             VIVIDA EQ
@@ -93,7 +93,7 @@ export default async function SavedEqResultPage({
           </p>
         </div>
 
-        {/* Deep 5-domain profile — gated behind a one-time credit unlock */}
+        {/* Deep 5-domain profile, gated behind a one-time credit unlock */}
         {unlocked ? (
           <div className="mt-4">
             <EqProfile result={result} locale={locale} />
@@ -110,8 +110,8 @@ export default async function SavedEqResultPage({
               }
               blurb={
                 en
-                  ? "Explore all five areas—self-awareness, self-regulation, motivation, empathy and social skills—with interpretations and practical suggestions. Pay once and keep the result."
-                  : "ნახე შენი პროფილი ხუთ სფეროში — თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები, თითოეულის ანალიზითა და რჩევებით. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+                  ? "Explore all five areas, self-awareness, self-regulation, motivation, empathy and social skills, with interpretations and practical suggestions. Pay once and keep the result."
+                  : "ნახე შენი პროფილი ხუთ სფეროში, თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები, თითოეულის ანალიზითა და რჩევებით. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
               }
               locale={locale}
             />

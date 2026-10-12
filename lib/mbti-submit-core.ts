@@ -37,7 +37,7 @@ export async function submitMbtiFor(input: {
   userId: string;
   answers: Record<number, number>;
   locale: UserLocale;
-  /** Caller's IP, when it has one — the web action reads it from headers. */
+  /** Caller's IP, when it has one, the web action reads it from headers. */
   ip?: string;
 }): Promise<MbtiSubmission> {
   const { userId, answers, locale } = input;
@@ -56,7 +56,7 @@ export async function submitMbtiFor(input: {
     windowMs: 60 * 60 * 1000,
   });
 
-  // Server-side scoring is authoritative — never trust a client-sent type.
+  // Server-side scoring is authoritative, never trust a client-sent type.
   // Score against the live question set (axis/pole come from the invariant
   // static structure inside getMbtiQuestions, so wording edits can't skew it).
   const { type, scores } = calculateMbti(answers, await getMbtiQuestions());
@@ -89,8 +89,8 @@ export async function submitMbtiFor(input: {
   const aiSynthesisText =
     synthesis?.analysisText ??
     (en
-      ? `Your personality type is ${type} — ${mbtiArchetypeEn(type)}. A detailed analysis will be added soon.`
-      : `შენი ფსიქოლოგიური ტიპია ${type} — ${mbtiArchetypeKa(type)}. დეტალური ანალიზი მალე დაემატება.`);
+      ? `Your personality type is ${type}, ${mbtiArchetypeEn(type)}. A detailed analysis will be added soon.`
+      : `შენი ფსიქოლოგიური ტიპია ${type}, ${mbtiArchetypeKa(type)}. დეტალური ანალიზი მალე დაემატება.`);
   const model = `${locale}:${synthesis?.model ?? "fallback"}`;
 
   const [inserted] = await db
@@ -109,7 +109,7 @@ export async function submitMbtiFor(input: {
     throw new ApiError(500, "save_failed", "Could not save the MBTI result");
   }
 
-  // Email the result in the background — the "sent to email" requirement.
+  // Email the result in the background, the "sent to email" requirement.
   const resultId = inserted.id;
   after(async () => {
     try {

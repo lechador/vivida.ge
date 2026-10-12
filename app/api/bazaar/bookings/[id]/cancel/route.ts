@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 type Params = { params: Promise<{ id: string }> };
 
 /**
- * POST /api/bazaar/bookings/[id]/cancel — buyer or provider cancels a
+ * POST /api/bazaar/bookings/[id]/cancel, buyer or provider cancels a
  * booking that is still awaiting payment. Paid money already sits in the
  * provider's wallet (no escrow in the MVP), so paid/delivered bookings can
  * only be resolved between the parties, not cancelled here.

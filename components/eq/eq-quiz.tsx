@@ -17,7 +17,7 @@ const FOCUS_KEY = "vivida_test_focus"; // shared with the other tests
 const SCALE = [...EQ_LIKERT].sort((a, b) => b.value - a.value);
 
 /**
- * The EQ questionnaire — one Georgian statement per screen, answered on a
+ * The EQ questionnaire, one Georgian statement per screen, answered on a
  * 5-point agree↔disagree scale, auto-advancing so it feels quick. On the final
  * answer it hands the answers to `onSubmit`, which owns save + navigate.
  */

@@ -19,13 +19,13 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * Lightweight `@username` autocomplete wrapper around a plain
  * `<textarea>`. Detects when the caret is inside an `@word` token and
  * pops a suggestion list anchored below the textarea (not under the
- * caret — much simpler than measuring caret pixel position, and at
+ * caret, much simpler than measuring caret pixel position, and at
  * mobile sizes it's actually preferable). Keyboard: ↑/↓ move
  * selection, Enter/Tab insert the highlighted handle, Esc closes the
  * popover.
  *
  * Suggestions are fetched from `/api/users/search` (the existing
- * directory endpoint) — it already returns the shape we need and is
+ * directory endpoint), it already returns the shape we need and is
  * auth-gated, so no new API surface.
  *
  * Behaviour matches `<textarea>`: caller controls `value` + `onChange`,
@@ -77,7 +77,7 @@ export function MentionInput({
   // Recompute the "current @token" whenever value or caret moves.
   // Not manually memoized: it reads `ref.current`, which the React Compiler
   // cannot reconcile with a [ref, value] dependency list, and it is only ever
-  // called directly or passed as an event handler — never a hook dependency.
+  // called directly or passed as an event handler, never a hook dependency.
   function detectQuery() {
     const ta = ref.current;
     if (!ta) return;
@@ -93,7 +93,7 @@ export function MentionInput({
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
     onChange(e.target.value);
-    // detect after onChange flushes — defer to microtask so caret index
+    // detect after onChange flushes, defer to microtask so caret index
     // reflects the new value, not the pre-change one.
     queueMicrotask(detectQuery);
   }
@@ -172,7 +172,7 @@ export function MentionInput({
         });
         setActive(0);
       } catch {
-        // network blip — silently swallow; user can keep typing.
+        // network blip, silently swallow; user can keep typing.
       }
     }, FETCH_DEBOUNCE_MS);
     return () => {

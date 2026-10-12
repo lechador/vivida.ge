@@ -30,7 +30,7 @@ function englishHrefFor(pathname: string, override?: string): string {
 
 /**
  * Lightweight header for public marketing pages (/how-it-works, /features,
- * /terms, /privacy). The authed AppHeader is over-featured for these — we
+ * /terms, /privacy). The authed AppHeader is over-featured for these, we
  * just need brand + a few nav links + a CTA.
  *
  * Client-side only because of usePathname: the EN switcher has to point at the

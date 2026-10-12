@@ -21,7 +21,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Single-page form for adding a synastry partner. Same input shape as the
- * onboarding wizard (date / time / place), but flat — partner data is
+ * onboarding wizard (date / time / place), but flat, partner data is
  * something the user types in once and forgets, so the slow-paced
  * multi-step ceremony isn't appropriate here.
  */
@@ -94,7 +94,7 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
         hint={
           en
             ? "Your Sun, Moon, and core chart patterns begin here."
-            : "მზე, მთვარე და ძირითადი არქეტიპები — აქედან იწყება."
+            : "მზე, მთვარე და ძირითადი არქეტიპები, აქედან იწყება."
         }
       >
         <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-3">
@@ -209,7 +209,7 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
         hint={
           en
             ? "Search in any language."
-            : "ქართულად ან ლათინურად — ყველანაირი ვარიანტი მუშაობს."
+            : "ქართულად ან ლათინურად, ყველანაირი ვარიანტი მუშაობს."
         }
       >
         <PlaceField value={place} onChange={setPlace} locale={locale} />
@@ -256,7 +256,7 @@ function Section({
   );
 }
 
-/** Inline place typeahead — mirrors components/onboarding/step-place.tsx. */
+/** Inline place typeahead, mirrors components/onboarding/step-place.tsx. */
 function PlaceField({
   value,
   onChange,

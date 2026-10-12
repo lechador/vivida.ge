@@ -277,7 +277,7 @@ export function ReminderPreferencesCard({
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
               {en
                 ? "A private calendar link with your notable 90-day transits. Add it to Apple, Google or Outlook Calendar."
-                : "პირადი კალენდრის ბმული მომდევნო 90 დღის მნიშვნელოვანი ტრანზიტებით — Apple, Google ან Outlook Calendar-ისთვის."}
+                : "პირადი კალენდრის ბმული მომდევნო 90 დღის მნიშვნელოვანი ტრანზიტებით, Apple, Google ან Outlook Calendar-ისთვის."}
             </p>
           </div>
           <button

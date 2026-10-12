@@ -31,7 +31,7 @@ export function PhotoCarousel({
 
   if (total === 0) return null;
   // If `photos` shrank below `index` (e.g., a photo was deleted), clamp
-  // during render rather than via an effect — both the visible photo and
+  // during render rather than via an effect, both the visible photo and
   // the indicator dots use this safe value.
   const safeIndex = Math.min(index, total - 1);
 

@@ -14,7 +14,7 @@ import {
 // Read + AI logic lives in lib/partners-core. A "use server" file may only
 // export async functions, so the read helpers (partnerCreationsThisMonth,
 // listPartners, getPartnerForViewer, ensureSynastryInterpretation) are
-// imported straight from "@/lib/partners-core" by the pages that need them —
+// imported straight from "@/lib/partners-core" by the pages that need them,
 // not re-exported here. Type-only re-exports are still fine.
 export type {
   CreatePartnerInput,

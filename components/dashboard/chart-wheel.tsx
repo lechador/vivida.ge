@@ -70,7 +70,7 @@ function polar(cx: number, cy: number, r: number, ang: number) {
 
 /**
  * SVG path for an annular sector going CCW from clock angle a1 to a2.
- * (a1 should be the larger angle; a2 the smaller — i.e. moving with
+ * (a1 should be the larger angle; a2 the smaller, i.e. moving with
  * increasing ecliptic longitude on the wheel.)
  */
 function sectorPath(

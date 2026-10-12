@@ -124,7 +124,7 @@ export function AhaResult({
         <p className="mx-auto mt-3 max-w-2xl text-pretty text-sm text-foreground/75 sm:text-base">
           {en
             ? "Your Sun describes your core, your Moon your inner world, and your Rising sign how you meet life."
-            : "მზე შენს ბირთვს აღწერს, მთვარე — შინაგან სამყაროს, ამომავალი კი — როგორ ხვდები ცხოვრებას."}
+            : "მზე შენს ბირთვს აღწერს, მთვარე, შინაგან სამყაროს, ამომავალი კი, როგორ ხვდები ცხოვრებას."}
         </p>
       </div>
 

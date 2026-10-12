@@ -14,13 +14,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-/** Minimum dream length — shorter text has nothing to interpret. */
+/** Minimum dream length, shorter text has nothing to interpret. */
 const MIN_DREAM_LEN = 10;
 /** Generous cap: long personal stories welcome, unbounded blobs rejected. */
 const MAX_DREAM_LEN = 2000;
 
 /**
- * POST /api/dreams/interpret { dream } — interpret a user-told dream with AI.
+ * POST /api/dreams/interpret { dream }, interpret a user-told dream with AI.
  * Auth-gated (the client asks for sign-in before the request is sent) and
  * every interpretation costs CREDIT_COST.dream credits, charged BEFORE the
  * AI call so a failed upstream never spends the user's balance. 402 when

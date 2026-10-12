@@ -6,7 +6,7 @@ import { invalidateHeaderForUser } from "@/lib/header-cache";
 import { isPremiumUser } from "@/lib/premium";
 
 /**
- * Credit wallet — the currency that replaced the subscription model. Users earn
+ * Credit wallet, the currency that replaced the subscription model. Users earn
  * credits (signup bonus, qualified referrals, Stripe top-ups) and spend them on
  * gated actions beyond each feature's free allowance.
  *
@@ -23,7 +23,7 @@ import type { CreditReason } from "@/lib/credits-config";
 
 /**
  * Drop a "credit" notification into the bell so the user sees every balance
- * move (earned or spent) with its reason. Best-effort — a notification failure
+ * move (earned or spent) with its reason. Best-effort, a notification failure
  * must never break the underlying credit operation. `amount` is signed.
  */
 async function notifyCredit(
@@ -73,7 +73,7 @@ export async function getBalance(userId: string): Promise<number> {
  * Credits consumed on gated actions (`spend_*` ledger rows) in the trailing
  * `days` window. Free allowances record zero-amount rows, so they contribute
  * nothing; purchases and grants are positive and excluded by construction.
- * Used for the PRO-vs-spend anchor — a value signal, not a cash total, since
+ * Used for the PRO-vs-spend anchor, a value signal, not a cash total, since
  * the ledger doesn't record which spend came from paid packs.
  */
 export async function getRecentSpend(
@@ -98,7 +98,7 @@ export async function getRecentSpend(
 }
 
 /**
- * Add credits (idempotency is the caller's job via a unique `ref` when needed —
+ * Add credits (idempotency is the caller's job via a unique `ref` when needed,
  * e.g. one referral row, one stripe session). Upserts the account and appends a
  * ledger row.
  */
@@ -198,7 +198,7 @@ export async function spendCredits(
 }
 
 /**
- * Grant purchased credits, idempotent on the Stripe session id — Stripe can
+ * Grant purchased credits, idempotent on the Stripe session id, Stripe can
  * deliver the same `checkout.session.completed` more than once, and we must
  * never double-credit money.
  */
@@ -366,7 +366,7 @@ export async function earnOnce(
 /**
  * Record a zero-cost use of a metered feature. grantCredits/spendCredits both
  * short-circuit on amount<=0 (no ledger row), so a free use has to be logged
- * explicitly for countUnlocks() to see it — that's how "first one free, then
+ * explicitly for countUnlocks() to see it, that's how "first one free, then
  * charge" allowances get consumed. No balance change, no notification.
  */
 export async function recordFreeUse(
@@ -381,7 +381,7 @@ export async function recordFreeUse(
 
 /**
  * How many distinct items the user has unlocked under `reason` (free + paid).
- * Used to apply a lifetime free allowance before charging — e.g. the first
+ * Used to apply a lifetime free allowance before charging, e.g. the first
  * synastry is free, then each subsequent one costs credits.
  */
 export async function countUnlocks(

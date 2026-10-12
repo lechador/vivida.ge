@@ -117,8 +117,8 @@ export default async function TimingPage() {
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {en
-              ? "The next four weeks through your chart—when the current supports you and when to move more carefully."
-              : "მომდევნო 4 კვირა შენი რუკის მიხედვით — როდის უბერავს ქარი ზურგში და როდის ღირს სიფრთხილე."}
+              ? "The next four weeks through your chart, when the current supports you and when to move more carefully."
+              : "მომდევნო 4 კვირა შენი რუკის მიხედვით, როდის უბერავს ქარი ზურგში და როდის ღირს სიფრთხილე."}
           </p>
         </header>
 
@@ -272,8 +272,8 @@ export default async function TimingPage() {
 
         <p className="mt-8 text-center text-[11px] text-muted-foreground">
           {en
-            ? "Timing is a prompt, not a prediction—use it to support your planning."
-            : "დროის ენერგია მინიშნებაა, არა წინასწარმეტყველება — გამოიყენე დაგეგმვისთვის."}
+            ? "Timing is a prompt, not a prediction, use it to support your planning."
+            : "დროის ენერგია მინიშნებაა, არა წინასწარმეტყველება, გამოიყენე დაგეგმვისთვის."}
         </p>
       </section>
     </main>

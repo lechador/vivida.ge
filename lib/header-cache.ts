@@ -18,22 +18,22 @@ export type HeaderData = {
   /** First ready profile photo (sortOrder=0). Overrides the OAuth
    *  avatar so users see their chosen "main" photo in the navbar. */
   avatarUrl: string | null;
-  /** Unread chat messages — drives the bottom-bar messages tab badge. */
+  /** Unread chat messages, drives the bottom-bar messages tab badge. */
   unreadMessages: number;
-  /** Unopened proactive astrologer nudges — dot on the ask tab. */
+  /** Unopened proactive astrologer nudges, dot on the ask tab. */
   pendingAskNudges: number;
   isPremium: boolean;
   residenceCountryCode: string | null;
 };
 
 /**
- * AppHeader runs on every authed page render — three DB calls (profile,
+ * AppHeader runs on every authed page render, three DB calls (profile,
  * recent notifications, unread count). We combine them and cache for 30s
  * keyed by userId so navigation between pages doesn't re-hit Neon.
  *
  * Tags:
- *  - `header:${userId}` — busted when a notification arrives or is read
- *  - `profile:${userId}` — busted when the user changes username
+ *  - `header:${userId}`, busted when a notification arrives or is read
+ *  - `profile:${userId}`, busted when the user changes username
  */
 export async function getHeaderData(userId: string): Promise<HeaderData> {
   return unstable_cache(
@@ -106,8 +106,8 @@ export async function getHeaderData(userId: string): Promise<HeaderData> {
  * marked read. Uses `revalidateTag` rather than `updateTag` because Next
  * 16's `updateTag` only works inside Server Actions; this helper is also
  * called from Route Handlers (the photo upload / promote / delete
- * endpoints). The "max" profile gives stale-while-revalidate semantics
- * — the next page that reads the tag serves the cached value while the
+ * endpoints). The "max" profile gives stale-while-revalidate semantics,
+ * the next page that reads the tag serves the cached value while the
  * fresh one regenerates in the background, which is exactly what we
  * want for a 30s-cached header strip.
  */

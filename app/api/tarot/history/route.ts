@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { listLibraryEntries } from "@/lib/library";
 
 /**
- * The reader's own recent tarot readings, newest first — shown above the
+ * The reader's own recent tarot readings, newest first, shown above the
  * question box so a previous spread can be reopened (reply via follow-up)
  * without digging through the library.
  */

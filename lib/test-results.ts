@@ -92,7 +92,7 @@ export async function setTestVisibility(
     .values({ userId, ...set })
     .onConflictDoUpdate({ target: profiles.userId, set });
   // Keep "every profile row has a username" true no matter which path created
-  // the row — this one can mint a bare row for a legacy user who predates
+  // the row, this one can mint a bare row for a legacy user who predates
   // usernames being assigned at signup. Best-effort; never fail the toggle.
   try {
     await ensureUsername(userId);

@@ -8,7 +8,7 @@ import { profilePhotos } from "@/db/schema";
  * a Map keyed by userId. Used to override `users.image` (the OAuth avatar)
  * with the user's chosen "main" photo whenever they appear in a list.
  *
- * One query for the whole batch — safe to call from list endpoints
+ * One query for the whole batch, safe to call from list endpoints
  * (friends, search, messages) without N+1.
  */
 export async function firstReadyPhotoByUser(

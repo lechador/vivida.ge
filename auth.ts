@@ -26,7 +26,7 @@ import { ApiError } from "@/lib/api/errors";
 /**
  * Credentials provider for the email/password login flow. Lives in
  * auth.ts (not auth.config.ts) because the authorize callback hits the
- * database — the Edge runtime that imports auth.config for middleware
+ * database, the Edge runtime that imports auth.config for middleware
  * never needs to instantiate this provider.
  *
  * Sign-up itself (creating the user + sending the verification email) is
@@ -81,7 +81,7 @@ const credentialsProvider = Credentials({
       .where(eq(users.email, email))
       .limit(1);
 
-    // Don't leak which side failed (email vs. password) — uniform null.
+    // Don't leak which side failed (email vs. password), uniform null.
     if (!user || !user.passwordHash) return null;
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) return null;
@@ -105,7 +105,7 @@ const credentialsProvider = Credentials({
  * Credentials provider for phone-number login. The user requests an SMS
  * code (server action in actions/phone.ts), then signs in with
  * (phone, code). The code is consumed here server-side (single-use,
- * 5-attempt cap, 10-minute TTL — see lib/phone-auth.ts), so posting to
+ * 5-attempt cap, 10-minute TTL, see lib/phone-auth.ts), so posting to
  * this provider directly is safe: a wrong or replayed code simply fails.
  * The PHONE_* sentinel errors let the calling action render localized
  * copy instead of a generic "wrong credentials".
@@ -255,7 +255,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   events: {
     // Stamp users.lastLoginAt on every successful sign-in. Wrapped so a
-    // transient DB blip can never break the auth flow itself — losing one
+    // transient DB blip can never break the auth flow itself, losing one
     // last-login update is much better than refusing the login.
     async signIn({ user }) {
       if (!user?.id) return;
@@ -297,7 +297,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Adapter-created users are OAuth sign-ups (our credentials flow
       // creates users itself, gated on email verification). Google asserts
       // email_verified, but NextAuth's default profile mapping doesn't stamp
-      // emailVerified — do it here so these accounts count as verified and any
+      // emailVerified, do it here so these accounts count as verified and any
       // verification-keyed logic (metrics, future gates) is correct.
       try {
         await db
@@ -323,7 +323,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         );
       }
       // Only the credentials flow passes a locale (actions/auth.ts), so a Google
-      // sign-up on the English domain would keep the 'ka' schema default — and
+      // sign-up on the English domain would keep the 'ka' schema default, and
       // every email/push reads that column, not the host. Guarded on the default
       // so a later /account choice is never overwritten.
       try {
@@ -354,7 +354,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           (err as Error).message,
         );
       }
-      // Assign the username here too — the adapter creates these users, so
+      // Assign the username here too, the adapter creates these users, so
       // registerUser/findOrCreateOAuthUser never run for them. Without it a
       // web Google sign-up who skips onboarding has no profile row at all and
       // is invisible in /people, site search and @mentions. See lib/username.ts.

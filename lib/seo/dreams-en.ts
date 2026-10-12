@@ -21,9 +21,9 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Snake",
     glyph: "🐍",
     summary:
-      "The snake is one of the most potent symbols in dreams — representing both hidden danger and profound personal transformation.",
+      "The snake is one of the most potent symbols in dreams, representing both hidden danger and profound personal transformation.",
     meaning:
-      "Traditionally, dreaming of a snake points to a concealed threat or someone in your orbit who is not completely sincere. Yet the snake regularly sheds its skin — making it a timeless emblem of renewal, revitalization, and shedding exhausted life stages. Which meaning applies depends on how you felt in the dream: terror or quiet calm.",
+      "Traditionally, dreaming of a snake points to a concealed threat or someone in your orbit who is not completely sincere. Yet the snake regularly sheds its skin, making it a timeless emblem of renewal, revitalization, and shedding exhausted life stages. Which meaning applies depends on how you felt in the dream: terror or quiet calm.",
     variants: [
       {
         when: "A snake attacks or bites you",
@@ -38,12 +38,12 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "A white snake",
         means:
-          "A deeply benevolent sign — intuition warning you in advance, or valuable wisdom that will soon come your way.",
+          "A deeply benevolent sign, intuition warning you in advance, or valuable wisdom that will soon come your way.",
       },
       {
         when: "Many snakes clustered together",
         means:
-          "An environment where you feel emotionally unguarded — a workplace or social circle where trust is fragile.",
+          "An environment where you feel emotionally unguarded, a workplace or social circle where trust is fragile.",
       },
       {
         when: "Killing or fending off a snake",
@@ -52,7 +52,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
     ],
     positive:
-      "If you felt no fear in the dream, the snake signifies renewal — an old chapter is concluding to make room for fresh vitality.",
+      "If you felt no fear in the dream, the snake signifies renewal, an old chapter is concluding to make room for fresh vitality.",
     caution:
       "If anxiety lingers upon waking, reflect on who around you requires you to tread cautiously and measure every word.",
     related: ["sisxli", "tagvi", "wyali"],
@@ -62,7 +62,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Water",
     glyph: "💧",
     summary:
-      "Water in a dream mirrors your emotional state — and its clarity reveals more than anything else.",
+      "Water in a dream mirrors your emotional state, and its clarity reveals more than anything else.",
     meaning:
       "In the language of dreams, water is the substance of emotion. Crystal-clear water reflects mental peace, emotional lucidity, and balance; murky or dark water signals turbulent feelings you have not yet unraveled. Whether the water is still or rushing is equally significant: still water points to a plateau, while a flowing river indicates active life transition.",
     variants: [
@@ -79,7 +79,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "Drowning or sinking",
         means:
-          "Feeling overwhelmed by circumstances — responsibilities, emotions, or an environment where you struggle to catch your breath.",
+          "Feeling overwhelmed by circumstances, responsibilities, emotions, or an environment where you struggle to catch your breath.",
       },
       {
         when: "Drinking cold, fresh water",
@@ -105,7 +105,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     summary:
       "Teeth in dreams symbolize personal vitality, influence, control, and fear of sudden loss.",
     meaning:
-      "Losing a tooth is one of the most universal dreams across cultures. Psychologically, teeth represent power, self-assertion, and how securely you feel in your skin. When teeth crumble or fall out, it rarely relates to physical health — it usually mirrors fear of losing control, aging, or a sudden loss of confidence.",
+      "Losing a tooth is one of the most universal dreams across cultures. Psychologically, teeth represent power, self-assertion, and how securely you feel in your skin. When teeth crumble or fall out, it rarely relates to physical health, it usually mirrors fear of losing control, aging, or a sudden loss of confidence.",
     variants: [
       {
         when: "A tooth falls out painlessly with no blood",
@@ -161,7 +161,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "The deceased speaks or offers explicit advice",
         means:
-          "Pay rigorous attention to their exact words — your subconscious is handing you an important realization.",
+          "Pay rigorous attention to their exact words, your subconscious is handing you an important realization.",
       },
       {
         when: "The deceased embraces or kisses you",
@@ -187,7 +187,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     summary:
       "Pregnancy in dreams heralds the incubation of a new idea, venture, creative project, or inner evolution.",
     meaning:
-      "Dreaming of pregnancy rarely predicts literal childbirth; it is almost always an archetype of creative gestation. You are carrying something inside you — a concept, business plan, or emotional transformation — that requires time, protection, and nourishment before it is ready for the world.",
+      "Dreaming of pregnancy rarely predicts literal childbirth; it is almost always an archetype of creative gestation. You are carrying something inside you, a concept, business plan, or emotional transformation, that requires time, protection, and nourishment before it is ready for the world.",
     variants: [
       {
         when: "You are pregnant and feeling joyful",
@@ -269,7 +269,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     summary:
       "A wedding represents the sacred union of opposing forces, major agreements, and deep life transitions.",
     meaning:
-      "While popularly romanticized, a wedding in traditional dream analysis is fundamentally about commitment, integration, and transition. It signifies bringing together two parts of your personality — logic and intuition, ambition and rest — or entering an agreement whose terms will reshape your daily lifestyle.",
+      "While popularly romanticized, a wedding in traditional dream analysis is fundamentally about commitment, integration, and transition. It signifies bringing together two parts of your personality, logic and intuition, ambition and rest, or entering an agreement whose terms will reshape your daily lifestyle.",
     variants: [
       {
         when: "Attending your own wedding happily",
@@ -433,7 +433,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     summary:
       "Gold represents supreme value, enduring integrity, spiritual wisdom, and radiant success.",
     meaning:
-      "Gold does not tarnish or rust — hence in the subconscious it stands for unassailable truth, timeless wisdom, and supreme worth. Dreaming of gold signifies connecting with the most refined aspects of your character, gaining mastery in your profession, or recognizing the priceless value of true loyalty.",
+      "Gold does not tarnish or rust, hence in the subconscious it stands for unassailable truth, timeless wisdom, and supreme worth. Dreaming of gold signifies connecting with the most refined aspects of your character, gaining mastery in your profession, or recognizing the priceless value of true loyalty.",
     variants: [
       {
         when: "Finding gold jewelry or gold coins",
@@ -513,7 +513,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "House",
     glyph: "🏠",
     summary:
-      "A house represents your entire psyche — each room mirrors a different facet of your personality and memory.",
+      "A house represents your entire psyche, each room mirrors a different facet of your personality and memory.",
     meaning:
       "In psychological dream work, the house is the classic portrait of the self: the attic holds intellect and memories, the basement holds instinct and buried fears, the living room is your social persona, and the bedroom is private intimacy. The condition, size, and atmosphere of the house reflect your inner architecture.",
     variants: [
@@ -554,7 +554,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Door",
     glyph: "🚪",
     summary:
-      "A door marks the threshold between phases — opportunities, secrets, new choices, and boundaries.",
+      "A door marks the threshold between phases, opportunities, secrets, new choices, and boundaries.",
     meaning:
       "Doors are universal symbols of transition. An open door welcomes you into uncharted territory and fresh opportunity; a closed or locked door presents a challenge, a secret kept, or a path that is not yet ready for you to walk. Knocking on a door signifies seeking answers and new horizons.",
     variants: [
@@ -759,9 +759,9 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Being Chased",
     glyph: "🏃",
     summary:
-      "Being pursued points to avoidance — running away from responsibilities, emotions, or necessary confrontations.",
+      "Being pursued points to avoidance, running away from responsibilities, emotions, or necessary confrontations.",
     meaning:
-      "When something or someone pursues you in a dream, you are almost always fleeing an aspect of yourself — a difficult conversation, an unacknowledged truth, a deadline, or a guilt you refuse to confront. The pursuer represents the urgency of the matter you are trying to outrun.",
+      "When something or someone pursues you in a dream, you are almost always fleeing an aspect of yourself, a difficult conversation, an unacknowledged truth, a deadline, or a guilt you refuse to confront. The pursuer represents the urgency of the matter you are trying to outrun.",
     variants: [
       {
         when: "Being chased by a wild predator (wolf, bear)",
@@ -800,7 +800,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Death",
     glyph: "⏳",
     summary:
-      "Death in dreams is rarely literal — it signifies profound rebirth, transformation, and closing an era.",
+      "Death in dreams is rarely literal, it signifies profound rebirth, transformation, and closing an era.",
     meaning:
       "Death in the symbolic realm is the ultimate marker of transformation. Just as in the tarot, death means an old identity, outdated lifestyle, or worn-out relationship is passing away so that a revitalized version of you can be born. It represents radical shedding of the past.",
     variants: [
@@ -1022,7 +1022,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "Seeing a stranger or monster in the mirror",
         means:
-          "Confronting your shadow self — unacknowledged traits, suppressed impulses, or feeling alienated from yourself.",
+          "Confronting your shadow self, unacknowledged traits, suppressed impulses, or feeling alienated from yourself.",
       },
       {
         when: "A foggy mirror you try to wipe clean",
@@ -1251,7 +1251,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Spider",
     glyph: "🕷️",
     summary:
-      "The spider weaves destiny — symbolizing meticulous patience, intricate webs, entrapment, and creative craft.",
+      "The spider weaves destiny, symbolizing meticulous patience, intricate webs, entrapment, and creative craft.",
     meaning:
       "Spiders are master weavers. In dream symbolism, they represent weaving your destiny through patience, craft, and strategy. However, spiderwebs also symbolize traps, manipulation, and feeling entangled in toxic webs of intrigue spun by overbearing personalities.",
     variants: [
@@ -1374,7 +1374,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Bread",
     glyph: "🍞",
     summary:
-      "Bread is the foundational staple of life — symbolizing essential nourishment, honest sustenance, and hospitality.",
+      "Bread is the foundational staple of life, symbolizing essential nourishment, honest sustenance, and hospitality.",
     meaning:
       "Bread represents life's fundamental sustenance, earned through honest toil and shared with love. Warm, fragrant, freshly baked bread foretells security, hospitable fellowship, and abundant provision. Stale or moldy bread points to neglected needs or taking blessings for granted.",
     variants: [
@@ -1456,7 +1456,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Crying",
     glyph: "😭",
     summary:
-      "Crying in a dream is profound emotional catharsis — releasing suppressed grief and making space for joy.",
+      "Crying in a dream is profound emotional catharsis, releasing suppressed grief and making space for joy.",
     meaning:
       "Weeping in dreams is a classic paradoxical symbol. In folklore and psychology alike, shedding bitter tears while asleep often brings immense relief and joyful laughter upon waking. It is the psyche's natural pressure-release valve, washing away pent-up sorrow and stress.",
     variants: [
@@ -1579,14 +1579,14 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Sun",
     glyph: "☀️",
     summary:
-      "The sun in dreams symbolizes clarity, energy, and success — its light suggests something in your life is becoming clear.",
+      "The sun in dreams symbolizes clarity, energy, and success, its light suggests something in your life is becoming clear.",
     meaning:
       "Traditionally the sun is a fortunate sign: life force, recognition, and a happy period. A bright, warm sun means your efforts will soon pay off, while a setting or darkened sun points to temporary fatigue and low energy.",
     variants: [
       {
         when: "A bright sun is shining",
         means:
-          "Success and clarity — a difficult matter will soon resolve in your favor.",
+          "Success and clarity, a difficult matter will soon resolve in your favor.",
       },
       {
         when: "Sunrise",
@@ -1596,13 +1596,13 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "Sunset or an eclipse",
         means:
-          "Fatigue or the end of a chapter. Time to rest — this ending is natural.",
+          "Fatigue or the end of a chapter. Time to rest, this ending is natural.",
       },
     ],
     positive:
-      "Feeling the sun's warmth is one of the kindest dreams — a successful period lies ahead.",
+      "Feeling the sun's warmth is one of the kindest dreams, a successful period lies ahead.",
     caution:
-      "A burning sun warns of burnout — slow down before exhaustion catches you.",
+      "A burning sun warns of burnout, slow down before exhaustion catches you.",
     related: ["mtvare", "varskvlavi", "cecxli"],
   },
   {
@@ -1610,14 +1610,14 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Moon",
     glyph: "🌙",
     summary:
-      "The moon symbolizes intuition, emotions, and hidden desires — it lights up what daylight cannot show.",
+      "The moon symbolizes intuition, emotions, and hidden desires, it lights up what daylight cannot show.",
     meaning:
       "In dream language the moon is your inner world: feelings, intuition, and what you hide even from yourself. A full moon means emotional peak and clarity; a new moon, the birth of a feeling or idea. Walking in moonlight suggests you should trust your intuition.",
     variants: [
       {
         when: "A full moon",
         means:
-          "Emotional maturity and clarity — what troubled you will soon find its name.",
+          "Emotional maturity and clarity, what troubled you will soon find its name.",
       },
       {
         when: "A new or crescent moon",
@@ -1627,11 +1627,11 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "The moon hides behind clouds",
         means:
-          "Confusion in feelings — the answer is already within you, but you cannot see it yet. Give it time.",
+          "Confusion in feelings, the answer is already within you, but you cannot see it yet. Give it time.",
       },
     ],
     positive:
-      "A clear moon strengthens intuition — trust your inner voice especially now.",
+      "A clear moon strengthens intuition, trust your inner voice especially now.",
     caution:
       "A blood-red or unsettling moon asks you to check which feeling troubles you and with whom you are not honest.",
     related: ["mze", "varskvlavi", "zgva"],
@@ -1641,9 +1641,9 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Star",
     glyph: "⭐",
     summary:
-      "A star symbolizes hope, dreams, and guidance — a light leading you down a dark road.",
+      "A star symbolizes hope, dreams, and guidance, a light leading you down a dark road.",
     meaning:
-      "Traditionally a star in dreams means hope and high purpose. A sky full of bright stars says you are on the right path even if results are invisible yet. A falling star is a wish demanding fulfillment — or an opportunity not to be missed.",
+      "Traditionally a star in dreams means hope and high purpose. A sky full of bright stars says you are on the right path even if results are invisible yet. A falling star is a wish demanding fulfillment, or an opportunity not to be missed.",
     variants: [
       {
         when: "A sky studded with bright stars",
@@ -1653,7 +1653,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "A star is falling",
         means:
-          "Make a wish — this dream pushes you to act on what you keep postponing.",
+          "Make a wish, this dream pushes you to act on what you keep postponing.",
       },
       {
         when: "One bright star lights your way",
@@ -1661,9 +1661,9 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
     ],
     positive:
-      "A star is almost always a kind sign — it promises hope, guidance, and quiet protection on your road.",
+      "A star is almost always a kind sign, it promises hope, guidance, and quiet protection on your road.",
     caution:
-      "Fading stars ask whether you lost faith in your goal — the goal itself is sound.",
+      "Fading stars ask whether you lost faith in your goal, the goal itself is sound.",
     related: ["mze", "mtvare", "frena"],
   },
   {
@@ -1671,14 +1671,14 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "River",
     glyph: "🏞️",
     summary:
-      "A river symbolizes the flow of life — its speed and clarity mirror how your affairs are going.",
+      "A river symbolizes the flow of life, its speed and clarity mirror how your affairs are going.",
     meaning:
       "In dream language a river is time and the course of life. A calm, clear river means everything flows naturally; a flooded or muddy one means events rush you and control slips away. Crossing a river marks crossing an important threshold.",
     variants: [
       {
         when: "You see a calm, clear river",
         means:
-          "Harmony and natural rhythm — do not force events; they flow correctly on their own.",
+          "Harmony and natural rhythm, do not force events; they flow correctly on their own.",
       },
       {
         when: "A flooded or muddy river",
@@ -1702,28 +1702,28 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Well",
     glyph: "🪣",
     summary:
-      "A well symbolizes inner resources and depth — what you search for within yourself.",
+      "A well symbolizes inner resources and depth, what you search for within yourself.",
     meaning:
       "Traditionally a well means depth: inner wisdom, hidden reserves, or a forgotten memory. A full, clear well says you hold enough strength; a dry one signals depletion and the need to rest. Looking into a well is a call to self-knowledge.",
     variants: [
       {
         when: "A well full of clear water",
         means:
-          "Inner wealth — the answers and strength you seek are already within you.",
+          "Inner wealth, the answers and strength you seek are already within you.",
       },
       {
         when: "A dry or empty well",
         means:
-          "Depletion. You give too much and receive too little — restore the balance.",
+          "Depletion. You give too much and receive too little, restore the balance.",
       },
       {
         when: "You fall into a well",
         means:
-          "Fear of sinking into a situation. Stop and ask for help — that is no shame.",
+          "Fear of sinking into a situation. Stop and ask for help, that is no shame.",
       },
     ],
     positive:
-      "Drawing water from a well is an excellent sign — your work bears inner fruit.",
+      "Drawing water from a well is an excellent sign, your work bears inner fruit.",
     caution:
       "A dark, bottomless well warns against drowning in memories of the past.",
     related: ["wyali", "mdinare", "saxli"],
@@ -1733,7 +1733,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Storm",
     glyph: "🌪️",
     summary:
-      "A storm symbolizes powerful emotions or upheaval — it arrives, stirs everything, then clears the air.",
+      "A storm symbolizes powerful emotions or upheaval, it arrives, stirs everything, then clears the air.",
     meaning:
       "A storm in dreams almost always means an emotional storm: conflict, sudden change, or built-up tension seeking release. Where you stood matters: watching from shelter means you will weather change calmly; caught in the middle means change is already underway.",
     variants: [
@@ -1745,7 +1745,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "You are in the eye of the storm",
         means:
-          "A chaotic period — temporary. Above all, do not give in to panic.",
+          "A chaotic period, temporary. Above all, do not give in to panic.",
       },
       {
         when: "Calm and sun after the storm",
@@ -1753,9 +1753,9 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
     ],
     positive:
-      "Storms cleanse the air — often a sign of clearing the old for a fresh start.",
+      "Storms cleanse the air, often a sign of clearing the old for a fresh start.",
     caution:
-      "A recurring storm warns you avoid a conflict that will not vanish — talk it out.",
+      "A recurring storm warns you avoid a conflict that will not vanish, talk it out.",
     related: ["wvima", "zgva", "cecxli"],
   },
   {
@@ -1763,9 +1763,9 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Earthquake",
     glyph: "🏚️",
     summary:
-      "An earthquake symbolizes shaking foundations — what felt stable has suddenly shifted.",
+      "An earthquake symbolizes shaking foundations, what felt stable has suddenly shifted.",
     meaning:
-      "In dream language the ground is stability: job, home, relationships. An earthquake means that foundation shakes — unexpected news, changed plans, or a crisis of faith. Yet after every earthquake comes rebuilding: destruction and liberation at once.",
+      "In dream language the ground is stability: job, home, relationships. An earthquake means that foundation shakes, unexpected news, changed plans, or a crisis of faith. Yet after every earthquake comes rebuilding: destruction and liberation at once.",
     variants: [
       {
         when: "The ground trembles lightly",
@@ -1780,13 +1780,13 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "You survive the earthquake",
         means:
-          "Inner resilience — whatever happens, you will stay on your feet.",
+          "Inner resilience, whatever happens, you will stay on your feet.",
       },
     ],
     positive:
       "Staying calm in the dream means you meet even sudden change prepared, with inner steadiness.",
     caution:
-      "Panic reveals over-attachment to stability — practice flexibility so change stops feeling like collapse.",
+      "Panic reveals over-attachment to stability, practice flexibility so change stops feeling like collapse.",
     related: ["saxli", "karishkhali", "gza"],
   },
   {
@@ -1794,7 +1794,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Smoke",
     glyph: "💨",
     summary:
-      "Smoke symbolizes obscurity and hidden danger — it veils sight and thickens breath.",
+      "Smoke symbolizes obscurity and hidden danger, it veils sight and thickens breath.",
     meaning:
       "Smoke in dreams means you cannot see a situation fully: someone hides something, or you avoid the truth. Thick black smoke is a serious warning; thin white smoke is temporary confusion that will soon disperse.",
     variants: [
@@ -1806,7 +1806,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "Thin white smoke",
         means:
-          "Temporary uncertainty — the haze will lift; avoid hasty decisions.",
+          "Temporary uncertainty, the haze will lift; avoid hasty decisions.",
       },
       {
         when: "You choke in smoke",
@@ -1817,7 +1817,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     positive:
       "Dispersing smoke with clearing skies means the truth will soon surface.",
     caution:
-      "Smoke rarely comes without fire — find its source: which relationship clouds your eyes.",
+      "Smoke rarely comes without fire, find its source: which relationship clouds your eyes.",
     related: ["cecxli", "nisli", "saxli"],
   },
   {
@@ -1825,9 +1825,9 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Fog",
     glyph: "🌫️",
     summary:
-      "Fog symbolizes uncertainty and searching — the road exists, it is just not visible yet.",
+      "Fog symbolizes uncertainty and searching, the road exists, it is just not visible yet.",
     meaning:
-      "Fog marks a transitional period: the old has ended, the new is not yet visible. This is not a bad sign — fog is natural and always lifts. What matters is how you acted: walking calmly is right; panicking means you pressure yourself too much.",
+      "Fog marks a transitional period: the old has ended, the new is not yet visible. This is not a bad sign, fog is natural and always lifts. What matters is how you acted: walking calmly is right; panicking means you pressure yourself too much.",
     variants: [
       {
         when: "You walk through thick fog",
@@ -1836,7 +1836,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
       {
         when: "The fog lifts",
-        means: "Clarity arrives — the answer you await will soon appear.",
+        means: "Clarity arrives, the answer you await will soon appear.",
       },
       {
         when: "You are lost in fog",
@@ -1845,7 +1845,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
     ],
     positive:
-      "Calm walking in fog shows patience and faith — qualities that strengthen you now.",
+      "Calm walking in fog shows patience and faith, qualities that strengthen you now.",
     caution:
       "If the fog kept thickening, postpone major decisions until the picture clears.",
     related: ["kvamli", "gza", "mtvare"],
@@ -1855,13 +1855,13 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Garden",
     glyph: "🌷",
     summary:
-      "A garden symbolizes a tended inner world — what you lovingly care for quietly grows.",
+      "A garden symbolizes a tended inner world, what you lovingly care for quietly grows.",
     meaning:
-      "A garden in dreams is your inner life: a blooming garden means self-care bears fruit; a neglected, weedy one means you pushed yourself aside. Working in the garden — planting, watering — is one of the kindest signs: investing in the future.",
+      "A garden in dreams is your inner life: a blooming garden means self-care bears fruit; a neglected, weedy one means you pushed yourself aside. Working in the garden, planting, watering, is one of the kindest signs: investing in the future.",
     variants: [
       {
         when: "A blooming, tended garden",
-        means: "Inner harmony and a fruitful period — your efforts blossom.",
+        means: "Inner harmony and a fruitful period, your efforts blossom.",
       },
       {
         when: "An abandoned, withered garden",
@@ -1869,13 +1869,13 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
       {
         when: "You plant or water the garden",
-        means: "Sowing the future — what you do now will fruit in months.",
+        means: "Sowing the future, what you do now will fruit in months.",
       },
     ],
     positive:
-      "Gathering fruit or flowers from your garden is a sign of deserved reward — pause and enjoy the results.",
+      "Gathering fruit or flowers from your garden is a sign of deserved reward, pause and enjoy the results.",
     caution:
-      "Thorns and weeds overtaking the bed mean small grudges accumulated — clear them in time.",
+      "Thorns and weeds overtaking the bed mean small grudges accumulated, clear them in time.",
     related: ["yvavilebi", "xe", "vashli"],
   },
   {
@@ -1883,29 +1883,29 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Forest",
     glyph: "🌲",
     summary:
-      "A forest symbolizes the unknown and adventure — a place where you must find the path yourself.",
+      "A forest symbolizes the unknown and adventure, a place where you must find the path yourself.",
     meaning:
-      "A forest embodies the unconscious: what is still undiscovered in you. A bright forest means adventure and growth; a dark, frightening one means you fear some part of yourself. Leaving the forest is always a good sign — you pass the trial.",
+      "A forest embodies the unconscious: what is still undiscovered in you. A bright forest means adventure and growth; a dark, frightening one means you fear some part of yourself. Leaving the forest is always a good sign, you pass the trial.",
     variants: [
       {
         when: "You walk in a bright, sunlit forest",
         means:
-          "A healthy process of self-discovery — you slowly get to know yourself better.",
+          "A healthy process of self-discovery, you slowly get to know yourself better.",
       },
       {
         when: "You are lost in a dark forest",
         means:
-          "Fear of the unknown. Remember: every forest trail leads somewhere — keep moving.",
+          "Fear of the unknown. Remember: every forest trail leads somewhere, keep moving.",
       },
       {
         when: "You emerge from the forest into a field",
-        means: "The trial ends — a hard period closes and space opens up.",
+        means: "The trial ends, a hard period closes and space opens up.",
       },
     ],
     positive:
       "A friendly encounter with a forest animal means you made peace with your instincts.",
     caution:
-      "Being chased through the forest is the issue you flee — stop and face it.",
+      "Being chased through the forest is the issue you flee, stop and face it.",
     related: ["xe", "mgeli", "gza"],
   },
   {
@@ -1913,18 +1913,18 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Tree",
     glyph: "🌳",
     summary:
-      "A tree symbolizes growth, stability, and roots — what grows slowly but stands firm.",
+      "A tree symbolizes growth, stability, and roots, what grows slowly but stands firm.",
     meaning:
       "Traditionally a tree means life and family: roots are the past and kin, branches the future and opportunities. A green, strong tree signals health and stability; a withered one, low energy. Climbing a tree marks ambition and progress.",
     variants: [
       {
         when: "A green, mighty tree",
-        means: "Health, stability, growth — you stand on solid ground.",
+        means: "Health, stability, growth, you stand on solid ground.",
       },
       {
         when: "You climb a tree",
         means:
-          "Progress toward a goal — the higher you climb, the closer success.",
+          "Progress toward a goal, the higher you climb, the closer success.",
       },
       {
         when: "A withered or fallen tree",
@@ -1933,9 +1933,9 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
     ],
     positive:
-      "Resting under a tree signals protection — trustworthy people surround you.",
+      "Resting under a tree signals protection, trustworthy people surround you.",
     caution:
-      "A tree falling on you means excess burden weighs you down — something heavy must finally be let go.",
+      "A tree falling on you means excess burden weighs you down, something heavy must finally be let go.",
     related: ["tye", "bagi", "vashli"],
   },
   {
@@ -1943,17 +1943,17 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Apple",
     glyph: "🍎",
     summary:
-      "An apple symbolizes health, temptation, and sweet reward — a fruit patiently ripening.",
+      "An apple symbolizes health, temptation, and sweet reward, a fruit patiently ripening.",
     meaning:
       "An apple in dreams is traditionally kind: health, abundance, and deserved reward. A ripe red apple means a wish comes true; a rotten one, a missed chance. Eating an apple means savoring life's fruit.",
     variants: [
       {
         when: "A ripe red apple",
-        means: "A wish ripens — what you dreamed of approaches fulfillment.",
+        means: "A wish ripens, what you dreamed of approaches fulfillment.",
       },
       {
         when: "You eat an apple",
-        means: "Contentment and health — enjoy what you already have.",
+        means: "Contentment and health, enjoy what you already have.",
       },
       {
         when: "A rotten apple",
@@ -1964,7 +1964,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     positive:
       "An apple tree heavy with fruit is among the best signs of abundance and family joy.",
     caution:
-      "A bitter apple suggests your goal is not truly yours — recheck what you want.",
+      "A bitter apple suggests your goal is not truly yours, recheck what you want.",
     related: ["xe", "bagi", "yurdzeni"],
   },
   {
@@ -1972,18 +1972,18 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Grapes",
     glyph: "🍇",
     summary:
-      "Grapes symbolize abundance, friendship, and joy — a harvest gathered together.",
+      "Grapes symbolize abundance, friendship, and joy, a harvest gathered together.",
     meaning:
-      "In Georgian tradition grapes belong to harvest, plenty, and togetherness. Ripe grapes mean friendship and prosperity; picking them, the fruit of joint labor. Grapes pressed into wine mark transformation — ordinary days turning into celebration.",
+      "In Georgian tradition grapes belong to harvest, plenty, and togetherness. Ripe grapes mean friendship and prosperity; picking them, the fruit of joint labor. Grapes pressed into wine mark transformation, ordinary days turning into celebration.",
     variants: [
       {
         when: "Ripe clusters of grapes",
         means:
-          "Abundance and friendship — people surround you with whom joy is shared.",
+          "Abundance and friendship, people surround you with whom joy is shared.",
       },
       {
         when: "You pick grapes",
-        means: "The fruit of labor — what you long worked on nears harvest.",
+        means: "The fruit of labor, what you long worked on nears harvest.",
       },
       {
         when: "Sour or rotten grapes",
@@ -1994,7 +1994,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     positive:
       "A fruitful vine traditionally signals a stronger family and prosperity.",
     caution:
-      "Unreachable grapes mean your goal is not ripe yet — grant it more sun and wait patiently.",
+      "Unreachable grapes mean your goal is not ripe yet, grant it more sun and wait patiently.",
     related: ["vashli", "ghvino", "bagi"],
   },
   {
@@ -2002,29 +2002,29 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Wine",
     glyph: "🍷",
     summary:
-      "Wine symbolizes joy, abundance, and transformation — ordinary days turning into celebration.",
+      "Wine symbolizes joy, abundance, and transformation, ordinary days turning into celebration.",
     meaning:
-      "In Georgian tradition wine belongs to life and hospitality. Drinking wine with friends means joy and prosperity; spilled wine, lost joy or regret. Making wine marks patience — good things take time.",
+      "In Georgian tradition wine belongs to life and hospitality. Drinking wine with friends means joy and prosperity; spilled wine, lost joy or regret. Making wine marks patience, good things take time.",
     variants: [
       {
         when: "You drink wine with friends",
-        means: "Joy and togetherness — relationships around you grow stronger.",
+        means: "Joy and togetherness, relationships around you grow stronger.",
       },
       {
         when: "Wine is spilled",
         means:
-          "A lost opportunity or regret. What spilled will not return — look forward.",
+          "A lost opportunity or regret. What spilled will not return, look forward.",
       },
       {
         when: "You make wine or pour it into a qvevri",
         means:
-          "Patience and long-term plans — sown now, it will reward you richly later.",
+          "Patience and long-term plans, sown now, it will reward you richly later.",
       },
     ],
     positive:
       "A full cup of wine traditionally signals family abundance, warm hospitality, and lasting health.",
     caution:
-      "Feeling drunk warns of overindulgence in waking life — pleasure stays kind only when you keep measure.",
+      "Feeling drunk warns of overindulgence in waking life, pleasure stays kind only when you keep measure.",
     related: ["yurdzeni", "puri", "qorwili"],
   },
   {
@@ -2032,13 +2032,13 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Honey",
     glyph: "🍯",
     summary:
-      "Honey symbolizes sweet reward and the power of words — what comes through labor and leaves sweetness.",
+      "Honey symbolizes sweet reward and the power of words, what comes through labor and leaves sweetness.",
     meaning:
       "Honey in dreams is traditionally kind: sweet results, kind words, and honored work. Eating honey means tasting life's sweet side; honey seen with bees means reward comes through labor, not luck.",
     variants: [
       {
         when: "You eat honey",
-        means: "A sweet period — deserved joy to be savored slowly.",
+        means: "A sweet period, deserved joy to be savored slowly.",
       },
       {
         when: "You gather honey or stand among bees",
@@ -2048,13 +2048,13 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "Honey spills on you or sticks to you",
         means:
-          "Sweetness turned burden — excessive attention or obligation that binds you.",
+          "Sweetness turned burden, excessive attention or obligation that binds you.",
       },
     ],
     positive:
       "A full jar of honey signals steady financial stability and the quiet warmth of family life.",
     caution:
-      "Bitter honey warns that what seemed sweet proves otherwise — verify before you trust it fully.",
+      "Bitter honey warns that what seemed sweet proves otherwise, verify before you trust it fully.",
     related: ["futkari", "puri", "ghvino"],
   },
   {
@@ -2062,7 +2062,7 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Wolf",
     glyph: "🐺",
     summary:
-      "A wolf symbolizes instinct, freedom, and the pack — wild strength alive within you.",
+      "A wolf symbolizes instinct, freedom, and the pack, wild strength alive within you.",
     meaning:
       "A wolf is twofold: danger (rivalry, competition) and inner strength (instinct, loyalty to the pack). A wolf you do not fear is protection and power; one you fear is a lurking threat. A pack means belonging and team.",
     variants: [
@@ -2073,18 +2073,18 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
       {
         when: "A calm wolf stands beside you",
-        means: "Inner strength and a loyal ally — you are not alone.",
+        means: "Inner strength and a loyal ally, you are not alone.",
       },
       {
         when: "A pack of wolves",
         means:
-          "Belonging and team — your people seek you or already surround you.",
+          "Belonging and team, your people seek you or already surround you.",
       },
     ],
     positive:
-      "A white wolf is a rare and kind sign — spiritual protection, sharp instinct, and unusual clarity.",
+      "A white wolf is a rare and kind sign, spiritual protection, sharp instinct, and unusual clarity.",
     caution:
-      "A wolf stalking you in darkness means someone quietly works against you — open your eyes.",
+      "A wolf stalking you in darkness means someone quietly works against you, open your eyes.",
     related: ["dzaghli", "tye", "tagvi"],
   },
   {
@@ -2092,29 +2092,29 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Dog",
     glyph: "🐕",
     summary:
-      "A dog symbolizes loyalty, friendship, and protection — whoever stands by your side.",
+      "A dog symbolizes loyalty, friendship, and protection, whoever stands by your side.",
     meaning:
-      "A dog in dreams almost always means a person: a loyal friend, a protector, or your own faithfulness. A friendly dog is a good sign of trustworthy people around you. An aggressive one signals conflict with someone close — or fear of betrayal.",
+      "A dog in dreams almost always means a person: a loyal friend, a protector, or your own faithfulness. A friendly dog is a good sign of trustworthy people around you. An aggressive one signals conflict with someone close, or fear of betrayal.",
     variants: [
       {
         when: "A friendly dog follows or cuddles you",
-        means: "Loyal friendship — someone cares for you more than you think.",
+        means: "Loyal friendship, someone cares for you more than you think.",
       },
       {
         when: "A dog barks at or attacks you",
         means:
-          "Conflict with someone close or a sense of guilt — something to be cleared up.",
+          "Conflict with someone close or a sense of guilt, something to be cleared up.",
       },
       {
         when: "A lost dog",
         means:
-          "Fear of losing a friendship, or distance from an old friend — call them.",
+          "Fear of losing a friendship, or distance from an old friend, call them.",
       },
     ],
     positive:
       "A white or joyful dog signals sincere happiness and the arrival of a trustworthy new friendship.",
     caution:
-      "A sick dog warns that someone close to you needs help but stays silent — reach out first.",
+      "A sick dog warns that someone close to you needs help but stays silent, reach out first.",
     related: ["mgeli", "kata", "bavshvi"],
   },
   {
@@ -2122,14 +2122,14 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Lion",
     glyph: "🦁",
     summary:
-      "A lion symbolizes strength, leadership, and courage — a king demanding a decision.",
+      "A lion symbolizes strength, leadership, and courage, a king demanding a decision.",
     meaning:
       "A lion means authority: your own leadership or an influential person in your life. A calm lion signals protection and success; a raging one, conflict with authority or your own anger. Fighting a lion means facing a great challenge head-on.",
     variants: [
       {
         when: "A calm, majestic lion",
         means:
-          "Strength and protection — you control the situation even if it is not visible.",
+          "Strength and protection, you control the situation even if it is not visible.",
       },
       {
         when: "A raging lion chases you",
@@ -2139,13 +2139,13 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "You fight the lion and win",
         means:
-          "Victory over a great challenge — no one is stronger than you in this fight.",
+          "Victory over a great challenge, no one is stronger than you in this fight.",
       },
     ],
     positive:
-      "A lion's distant roar signals that your voice carries far — it will finally be heard.",
+      "A lion's distant roar signals that your voice carries far, it will finally be heard.",
     caution:
-      "Fleeing the lion means fleeing responsibility in waking life — stop running and face it calmly.",
+      "Fleeing the lion means fleeing responsibility in waking life, stop running and face it calmly.",
     related: ["datvi", "mgeli", "mze"],
   },
   {
@@ -2153,14 +2153,14 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Bear",
     glyph: "🐻",
     summary:
-      "A bear symbolizes strength, protection, and rest — one who sleeps through winter and wakes in spring.",
+      "A bear symbolizes strength, protection, and rest, one who sleeps through winter and wakes in spring.",
     meaning:
-      "A bear is twofold: a calm bear means maternal protection and inner strength; an aggressive one, danger invading personal space. A hibernating bear often says you need rest and recovery — not shame, but nature.",
+      "A bear is twofold: a calm bear means maternal protection and inner strength; an aggressive one, danger invading personal space. A hibernating bear often says you need rest and recovery, not shame, but nature.",
     variants: [
       {
         when: "A calm bear",
         means:
-          "Protection and strength — solid support stands behind you: family, tradition, character.",
+          "Protection and strength, solid support stands behind you: family, tradition, character.",
       },
       {
         when: "A bear attacks you",
@@ -2168,13 +2168,13 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
       {
         when: "A bear sleeps in its den",
-        means: "Time to rest — body and mind ask for recovery. Listen.",
+        means: "Time to rest, body and mind ask for recovery. Listen.",
       },
     ],
     positive:
       "Playful bear cubs signal coming family joy and warm news that gathers everyone together.",
     caution:
-      "Approaching a bear guarding cubs warns you meddle in others' affairs — step back.",
+      "Approaching a bear guarding cubs warns you meddle in others' affairs, step back.",
     related: ["lomi", "tye", "saxli"],
   },
   {
@@ -2182,28 +2182,28 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Goat",
     glyph: "🐐",
     summary:
-      "A goat symbolizes stubbornness, independence, and wealth — one that climbs even sheer cliffs.",
+      "A goat symbolizes stubbornness, independence, and wealth, one that climbs even sheer cliffs.",
     meaning:
-      "In rural tradition the goat measured wealth and endurance. A goat in dreams means you stubbornly follow your goal — and that is good, for a goat always reaches the peak. A white goat is kind; a black one warns of stubbornness that harms you.",
+      "In rural tradition the goat measured wealth and endurance. A goat in dreams means you stubbornly follow your goal, and that is good, for a goat always reaches the peak. A white goat is kind; a black one warns of stubbornness that harms you.",
     variants: [
       {
         when: "A white goat",
-        means: "Prosperity and success — your stubborn work pays off.",
+        means: "Prosperity and success, your stubborn work pays off.",
       },
       {
         when: "A goat climbs a mountain",
-        means: "Ambition and progress — a hard road, but you manage it.",
+        means: "Ambition and progress, a hard road, but you manage it.",
       },
       {
         when: "A goat butts you",
         means:
-          "Your stubbornness hurts someone — show flexibility; it is not weakness.",
+          "Your stubbornness hurts someone, show flexibility; it is not weakness.",
       },
     ],
     positive:
       "Drinking goat's milk signals steady abundance and the grounded well-being of family life.",
     caution:
-      "A goat heading for an abyss means your obstinacy nears a dangerous edge — stop and reassess.",
+      "A goat heading for an abyss means your obstinacy nears a dangerous edge, stop and reassess.",
     related: ["cxvari", "dzroxa", "rdze"],
   },
   {
@@ -2211,29 +2211,29 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Sheep",
     glyph: "🐑",
     summary:
-      "Sheep symbolize peace, prosperity, and togetherness — a flock grazing calmly.",
+      "Sheep symbolize peace, prosperity, and togetherness, a flock grazing calmly.",
     meaning:
       "Sheep are traditionally kind: peace, material stability, and family harmony. A flock means harmony around you; a lost sheep means someone close strayed and needs your attention.",
     variants: [
       {
         when: "A flock grazes peacefully",
-        means: "Peace and stability — everything is in its place; enjoy it.",
+        means: "Peace and stability, everything is in its place; enjoy it.",
       },
       {
         when: "A lamb",
         means:
-          "Innocence and fresh starts — a time for gentleness, toward yourself too.",
+          "Innocence and fresh starts, a time for gentleness, toward yourself too.",
       },
       {
         when: "A lost sheep",
         means:
-          "Someone close lost their way — they need your attention and a call.",
+          "Someone close lost their way, they need your attention and a call.",
       },
     ],
     positive:
       "A white sheep signals spiritual purity, gentle peace, and lasting family happiness.",
     caution:
-      "A wolf attacking the flock means your peaceful world is threatened — protect what is precious.",
+      "A wolf attacking the flock means your peaceful world is threatened, protect what is precious.",
     related: ["txa", "dzroxa", "mgeli"],
   },
   {
@@ -2241,28 +2241,28 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Chicken",
     glyph: "🐓",
     summary:
-      "A chicken symbolizes home, care, and everyday abundance — a yard buzzing with life.",
+      "A chicken symbolizes home, care, and everyday abundance, a yard buzzing with life.",
     meaning:
-      "A chicken marks home and family life. A laying hen means fertility and small but steady income; a hen with chicks, care and protection. A rooster marks awakening — time to open your eyes.",
+      "A chicken marks home and family life. A laying hen means fertility and small but steady income; a hen with chicks, care and protection. A rooster marks awakening, time to open your eyes.",
     variants: [
       {
         when: "A hen lays an egg",
-        means: "Small but steady fruit — your daily work pays off.",
+        means: "Small but steady fruit, your daily work pays off.",
       },
       {
         when: "A rooster crows",
         means:
-          "A wake-up call — you miss something already obvious. Open your eyes.",
+          "A wake-up call, you miss something already obvious. Open your eyes.",
       },
       {
         when: "Chicks around the hen",
-        means: "Family warmth and care — either you need it or you give it.",
+        means: "Family warmth and care, either you need it or you give it.",
       },
     ],
     positive:
-      "Many chickens in the yard signal family abundance and guests — the house fills with life.",
+      "Many chickens in the yard signal family abundance and guests, the house fills with life.",
     caution:
-      "Fighting hens mean small domestic friction over trifles — refuse to inflate it further.",
+      "Fighting hens mean small domestic friction over trifles, refuse to inflate it further.",
     related: ["kvercxi", "saxli", "bavshvi"],
   },
   {
@@ -2270,24 +2270,23 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Egg",
     glyph: "🥚",
     summary:
-      "An egg symbolizes new beginnings and hidden potential — everything not yet born.",
+      "An egg symbolizes new beginnings and hidden potential, everything not yet born.",
     meaning:
       "An egg is unrevealed opportunity: an idea, a pregnancy (literal or of a new project), or a future still ripening. A whole egg means hope; a broken one, a missed chance or premature reveal.",
     variants: [
       {
         when: "Whole, clean eggs",
         means:
-          "Potential and fresh starts — something good ripens; do not rush.",
+          "Potential and fresh starts, something good ripens; do not rush.",
       },
       {
         when: "An egg breaks",
         means:
-          "Premature reveal or a missed chance — next time, guard the timing.",
+          "Premature reveal or a missed chance, next time, guard the timing.",
       },
       {
         when: "Many eggs",
-        means:
-          "Abundance and fertility — you have choices, and that is luxury.",
+        means: "Abundance and fertility, you have choices, and that is luxury.",
       },
     ],
     positive:
@@ -2301,14 +2300,14 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Milk",
     glyph: "🥛",
     summary:
-      "Milk symbolizes nourishment, tenderness, and maternal care — the first food, the first love.",
+      "Milk symbolizes nourishment, tenderness, and maternal care, the first food, the first love.",
     meaning:
       "Milk is traditionally kind: prosperity, health, and care. Drinking pure milk means inner strengthening; spilled milk, a small loss not worth mourning; soured milk, something left unused too long.",
     variants: [
       {
         when: "You drink pure milk",
         means:
-          "Strengthening and health — you nourish yourself correctly, literally and otherwise.",
+          "Strengthening and health, you nourish yourself correctly, literally and otherwise.",
       },
       {
         when: "Milk is spilled",
@@ -2317,13 +2316,13 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       {
         when: "A mother gives you milk, or you feed a child",
         means:
-          "Care — either you need it or you have it to give. Both are kind signs.",
+          "Care, either you need it or you have it to give. Both are kind signs.",
       },
     ],
     positive:
       "Rivers of milk or full glasses signal flowing abundance and the secure well-being of family life.",
     caution:
-      "Bitter or soured milk means a once-nourishing bond has spoiled — admit it instead of pretending.",
+      "Bitter or soured milk means a once-nourishing bond has spoiled, admit it instead of pretending.",
     related: ["dzroxa", "bavshvi", "puri"],
   },
   {
@@ -2331,29 +2330,29 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Exam",
     glyph: "📝",
     summary:
-      "An exam symbolizes fear of judgment and readiness — life asks: are you ready?",
+      "An exam symbolizes fear of judgment and readiness, life asks: are you ready?",
     meaning:
-      "An exam in dreams is almost never about a real exam — it means life's tests: an interview, an important meeting, a decision where you feel judged. Being late signals fear of unreadiness; passing means overcoming self-doubt.",
+      "An exam in dreams is almost never about a real exam, it means life's tests: an interview, an important meeting, a decision where you feel judged. Being late signals fear of unreadiness; passing means overcoming self-doubt.",
     variants: [
       {
         when: "You are late for the exam",
         means:
-          "Fear of unreadiness. Often baseless — the preparation is already there.",
+          "Fear of unreadiness. Often baseless, the preparation is already there.",
       },
       {
         when: "You cannot answer the questions",
         means:
-          "A confidence crisis. Remember: no one answers everything in dreams — that is normal.",
+          "A confidence crisis. Remember: no one answers everything in dreams, that is normal.",
       },
       {
         when: "You pass the exam",
-        means: "Inner readiness — you are prepared for the challenge ahead.",
+        means: "Inner readiness, you are prepared for the challenge ahead.",
       },
     ],
     positive:
       "Realizing it is only a dream and calming down shows excellent self-control.",
     caution:
-      "Recurring exam dreams warn that perfectionism exhausts you — good enough is enough.",
+      "Recurring exam dreams warn that perfectionism exhausts you, good enough is enough.",
     related: ["gza", "nisli", "bavshvi"],
   },
   {
@@ -2361,29 +2360,29 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "War",
     glyph: "⚔️",
     summary:
-      "War symbolizes inner or outer conflict — a painful battle that urgently demands an ending.",
+      "War symbolizes inner or outer conflict, a painful battle that urgently demands an ending.",
     meaning:
-      "War in dreams is rarely about real war — it embodies conflict: in family, at work, or within yourself between desire and duty. Fighting means actively defending your own; fleeing means avoiding conflict. War's end is always hope of reconciliation.",
+      "War in dreams is rarely about real war, it embodies conflict: in family, at work, or within yourself between desire and duty. Fighting means actively defending your own; fleeing means avoiding conflict. War's end is always hope of reconciliation.",
     variants: [
       {
         when: "You fight in the war",
         means:
-          "An active fight for your own — you do not yield, and that is strength.",
+          "An active fight for your own, you do not yield, and that is strength.",
       },
       {
         when: "You flee or hide from the war",
         means:
-          "Escaping conflict — understandable, but the problem persists. Time for dialogue.",
+          "Escaping conflict, understandable, but the problem persists. Time for dialogue.",
       },
       {
         when: "The war ends and peace comes",
-        means: "Reconciliation nears — with others or with yourself.",
+        means: "Reconciliation nears, with others or with yourself.",
       },
     ],
     positive:
       "Protecting someone in the dream's war signals rare loyalty and the quiet courage to stand up.",
     caution:
-      "Recurring war dreams signal accumulated stress — your body and mind urgently need rest.",
+      "Recurring war dreams signal accumulated stress, your body and mind urgently need rest.",
     related: ["dana", "sisxli", "sikvdili"],
   },
   {
@@ -2391,14 +2390,14 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
     title: "Knife",
     glyph: "🔪",
     summary:
-      "A knife symbolizes discernment, decisions, and sometimes pain — it cuts, divides, and frees.",
+      "A knife symbolizes discernment, decisions, and sometimes pain, it cuts, divides, and frees.",
     meaning:
-      "A knife is twofold: in your hand it has purpose — discernment, clarity, cutting the knot. In another's hand it means danger and fear of betrayal. Being cut marks pain from words not yet healed.",
+      "A knife is twofold: in your hand it has purpose, discernment, clarity, cutting the knot. In another's hand it means danger and fear of betrayal. Being cut marks pain from words not yet healed.",
     variants: [
       {
         when: "You hold a knife and cut something",
         means:
-          "Decision and clarity — you cut away the excess and keep the essential.",
+          "Decision and clarity, you cut away the excess and keep the essential.",
       },
       {
         when: "Someone threatens you with a knife",
@@ -2412,9 +2411,9 @@ export const DREAM_SYMBOLS_EN: DreamSymbolEn[] = [
       },
     ],
     positive:
-      "A new, sharp knife signals a sharp mind — your decisions are precise now.",
+      "A new, sharp knife signals a sharp mind, your decisions are precise now.",
     caution:
-      "A rusty or broken knife warns that old grudges hinder you — let them go.",
+      "A rusty or broken knife warns that old grudges hinder you, let them go.",
     related: ["omi", "sisxli", "sikvdili"],
   },
 ];

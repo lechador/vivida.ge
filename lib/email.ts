@@ -21,8 +21,8 @@ import { ENGLISH_SITE_URL, isEnglishHost } from "@/lib/seo/locales";
 /**
  * Resend client. Lazily-instantiated so dev environments without the API
  * key (e.g. running migrations) don't crash at import time. Functions in
- * this module return early with a console warning when the key is absent
- * — matching how `lib/r2.ts` handles its credentials.
+ * this module return early with a console warning when the key is absent,
+ * matching how `lib/r2.ts` handles its credentials.
  */
 let _client: Resend | null = null;
 function client(): Resend | null {
@@ -34,7 +34,7 @@ function client(): Resend | null {
 }
 
 // RESEND_FROM may be set as a bare address ("hello@vivida.ge") or a full
-// "Name <email>" string — normalize to always show "Vivida" as the sender
+// "Name <email>" string, normalize to always show "Vivida" as the sender
 // name so inboxes never display a raw mailbox name like "hello".
 function resolveFrom(envVal: string | undefined, fallback: string): string {
   if (!envVal) return fallback;
@@ -98,7 +98,7 @@ export async function sendVerificationEmail({
   const verifyUrl = absUrl(`/api/auth/verify-email?token=${token}`, origin);
   if (!c) {
     console.warn(
-      "[email] RESEND_API_KEY missing — would have sent verification to",
+      "[email] RESEND_API_KEY missing, would have sent verification to",
       to,
       "→",
       verifyUrl,
@@ -145,7 +145,7 @@ export async function sendPasswordResetEmail({
   const resetUrl = absUrl(`/reset-password?token=${token}`, origin);
   if (!c) {
     console.warn(
-      "[email] RESEND_API_KEY missing — would have sent reset to",
+      "[email] RESEND_API_KEY missing, would have sent reset to",
       to,
       "→",
       resetUrl,
@@ -178,7 +178,7 @@ export async function sendPasswordResetEmail({
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Lifecycle / notification emails — welcome, friend-request, message,
+// Lifecycle / notification emails, welcome, friend-request, message,
 // feed activity (comment / reaction). Fire-and-forget from the call site
 // (typically wrapped in `after()`) and never throw. They guard against:
 //   - missing RESEND_API_KEY (early-return with warn)
@@ -278,17 +278,17 @@ async function userAbsentFor(
     .where(eq(users.id, userId))
     .limit(1);
   if (!row) return false;
-  if (!row.lastLoginAt) return true; // never seen — treat as absent
+  if (!row.lastLoginAt) return true; // never seen, treat as absent
   return Date.now() - row.lastLoginAt.getTime() > minutes * 60_000;
 }
 
 /**
- * Welcome email — sent once, on first signup, from the profile-save hooks
+ * Welcome email, sent once, on first signup, from the profile-save hooks
  * (sendWelcomeIfEligible) once the user has verified their email and filled
  * birth data. The site runs on credits (no paid plans), so the copy is a
- * neutral "your cosmic journey begins" framing — no trial pitch.
+ * neutral "your cosmic journey begins" framing, no trial pitch.
  *
- * Idempotent at the email_send_log level — a second call after the
+ * Idempotent at the email_send_log level, a second call after the
  * first success is a no-op. Always sends regardless of email
  * preferences (transactional).
  */
@@ -305,7 +305,7 @@ export async function sendWelcomeEmail({
 }): Promise<void> {
   const c = client();
   if (!c) {
-    console.warn("[email] RESEND_API_KEY missing — skipping welcome to", to);
+    console.warn("[email] RESEND_API_KEY missing, skipping welcome to", to);
     return;
   }
   if (await hasSentBefore(userId, "welcome")) return;
@@ -365,7 +365,7 @@ export async function sendVerifiedBadgeGiftEmail({
 }): Promise<{ ok: boolean; error?: "email_not_configured" | "send_failed" }> {
   const c = client();
   if (!c) {
-    console.warn("[email] RESEND_API_KEY missing — skipping badge gift to", to);
+    console.warn("[email] RESEND_API_KEY missing, skipping badge gift to", to);
     return { ok: false, error: "email_not_configured" };
   }
 
@@ -415,7 +415,7 @@ export async function sendVerifiedBadgeGiftEmail({
 }
 
 /**
- * Send an Astro-MBTI result email. Transactional (not deduped — a user can
+ * Send an Astro-MBTI result email. Transactional (not deduped, a user can
  * retake the test and each result gets its own email); the result also lives
  * on the site. `resultId` deep-links to /test-results/[id].
  */
@@ -442,16 +442,13 @@ export async function sendMbtiResultEmail({
 }): Promise<void> {
   const c = client();
   if (!c) {
-    console.warn(
-      "[email] RESEND_API_KEY missing — skipping MBTI result to",
-      to,
-    );
+    console.warn("[email] RESEND_API_KEY missing, skipping MBTI result to", to);
     return;
   }
   const subject =
     locale === "en"
-      ? `Your type is ${mbtiType} — ${archetypeNameGe} · Vivida`
-      : `შენი ტიპია ${mbtiType} — ${archetypeNameGe} · Vivida`;
+      ? `Your type is ${mbtiType}, ${archetypeNameGe} · Vivida`
+      : `შენი ტიპია ${mbtiType}, ${archetypeNameGe} · Vivida`;
   try {
     const result = await c.emails.send(
       {
@@ -498,7 +495,7 @@ const MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024;
 
 /**
  * Email a finished natal report PDF to its owner, on demand from the button on
- * /report and /reports/[id]. Transactional and deliberately re-sendable — the
+ * /report and /reports/[id]. Transactional and deliberately re-sendable, the
  * whole point of the button is "it didn't arrive, send it again", so there is
  * no idempotency key here; the route rate-limits instead.
  *
@@ -527,7 +524,7 @@ export async function sendReportPdfEmail({
 }): Promise<{ ok: boolean; error?: string }> {
   const c = client();
   if (!c) {
-    console.warn("[email] RESEND_API_KEY missing — skipping report PDF to", to);
+    console.warn("[email] RESEND_API_KEY missing, skipping report PDF to", to);
     return { ok: false, error: "email_not_configured" };
   }
 
@@ -544,7 +541,7 @@ export async function sendReportPdfEmail({
       pdf = bytes.byteLength <= MAX_ATTACHMENT_BYTES ? bytes : null;
       if (!pdf) {
         console.warn(
-          `[email] report ${reportId} PDF too large to attach (${bytes.byteLength} bytes) — sending link only`,
+          `[email] report ${reportId} PDF too large to attach (${bytes.byteLength} bytes), sending link only`,
         );
       }
     } catch (err) {
@@ -662,12 +659,12 @@ export async function sendPersonalReminderEmail({
 /**
  * Send the welcome email only once the account is a fully onboarded member:
  * email verified AND birth data (a profile row) present. Called from the
- * profile-save background hook — the moment onboarding
- * finishes — NOT at registration, so a signup that stops at "check your
+ * profile-save background hook, the moment onboarding
+ * finishes, NOT at registration, so a signup that stops at "check your
  * inbox" never gets a premature "your cosmic journey begins."
  *
  * "Email verified" = a verified password account (emailVerified set) OR an
- * OAuth account (no passwordHash — Google already proved the address). NB:
+ * OAuth account (no passwordHash, Google already proved the address). NB:
  * web Google users end up with emailVerified NULL in the DB, so gating on
  * that column alone would wrongly skip every Google signup. This mirrors the
  * login gate in auth.ts (unverified password users can't sign in at all).
@@ -702,7 +699,7 @@ export async function sendWelcomeIfEligible(userId: string): Promise<void> {
 }
 
 /**
- * Friend-request email — sent only when the recipient has been absent
+ * Friend-request email, sent only when the recipient has been absent
  * for ≥1h and we haven't sent them a friend-request email in the last
  * hour. Respects the `emailNudges` preference. Never throws.
  */
@@ -770,7 +767,7 @@ export async function sendFriendRequestEmail({
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
         },
       },
-      // Hour-bucketed key — within the same hour, the throttle already
+      // Hour-bucketed key, within the same hour, the throttle already
       // suppresses duplicates; key just guards against races.
       {
         idempotencyKey: `friend_request:${recipientUserId}:${Math.floor(
@@ -792,7 +789,7 @@ export async function sendFriendRequestEmail({
 }
 
 /**
- * Message-received email — same gating as friend-request. Includes the
+ * Message-received email, same gating as friend-request. Includes the
  * first 140 chars of the message body for context. Never throws.
  */
 export async function sendMessageEmail({
@@ -840,7 +837,7 @@ export async function sendMessageEmail({
   const locale = normalizeUserLocale(recipient.locale);
   const origin = originForLocale(locale);
   const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`, origin);
-  // The chat page reads `?with=<partnerId>` — see components/chat/message-button.tsx.
+  // The chat page reads `?with=<partnerId>`, see components/chat/message-button.tsx.
   const conversationUrl = absUrl(
     `/messages?with=${encodeURIComponent(fromUserId)}`,
     origin,
@@ -906,7 +903,7 @@ const REACTION_SUBJECT_EN: Record<string, string> = {
 };
 
 /**
- * Comment / reaction email — same gating as friend-request and message:
+ * Comment / reaction email, same gating as friend-request and message:
  * recipient absent ≥1h, emailNudges on, one send per kind per hour.
  * Never throws.
  */
@@ -970,7 +967,7 @@ export async function sendFeedActivityEmail({
         : `${fromName}-მ შენს პოსტს დააკომენტარა · Vivida`
       : en
         ? `${fromName} ${REACTION_SUBJECT_EN[reaction ?? ""] ?? "reacted to your post"} · Vivida`
-        : `${fromName} — ${REACTION_SUBJECT_KA[reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"} · Vivida`;
+        : `${fromName}, ${REACTION_SUBJECT_KA[reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"} · Vivida`;
 
   try {
     const result = await c.emails.send(
@@ -1107,7 +1104,7 @@ export async function flushUnreadFeedActivityEmails(): Promise<{
 }
 
 /**
- * Bazaar transactional mail — paid order (to the reader) and delivered
+ * Bazaar transactional mail, paid order (to the reader) and delivered
  * reading (to the buyer). Unlike nudge mail these send immediately with no
  * absence gate or throttle: exactly-once is enforced by the caller's
  * reminder-delivery claim key per booking. Honors the bazaar_updates

@@ -17,7 +17,7 @@ export function CheckoutSuccessTracker({
   const router = useRouter();
 
   useEffect(() => {
-    // W04: Stripe cancel_url returns here with ?status=canceled — the visible
+    // W04: Stripe cancel_url returns here with ?status=canceled, the visible
     // failure counterpart to checkout_failed (user gave up at Stripe, nothing
     // was charged, safe to retry).
     if (searchParams.get("status") === "canceled") {
@@ -74,7 +74,7 @@ export function CheckoutSuccessTracker({
           currency: data.currency,
         });
         // W04: fires only after /api/billing/session confirms the server
-        // granted the entitlement — this is the canonical "paid delivery
+        // granted the entitlement, this is the canonical "paid delivery
         // succeeded" signal, not the Stripe redirect alone.
         trackEvent(ANALYTICS_EVENT.entitlementActivated, {
           product: data.contentId,

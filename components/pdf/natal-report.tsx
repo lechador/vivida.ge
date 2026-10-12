@@ -237,7 +237,7 @@ const POINTS = [
 function Footer({ locale }: { locale: UserLocale }) {
   // NOTE: a dynamic `render: ({pageNumber}) => …` callback on a fixed element
   // crashes react-pdf ("unsupported number: -3.9e22") once the document grows
-  // past ~30 pages of block content — a confirmed engine limitation. A static
+  // past ~30 pages of block content, a confirmed engine limitation. A static
   // fixed footer is robust to 100+ pages, so we forgo the page number.
   return e(
     View,
@@ -622,7 +622,7 @@ export function NatalReport({ data }: { data: NatalReportData }) {
           // can run much longer than a single-planet house. Render each
           // paragraph as its own Text so react-pdf can break the page
           // between them instead of treating the whole entry as one atomic
-          // block — an oversized single block risks getting deferred whole
+          // block, an oversized single block risks getting deferred whole
           // to the next page, leaving blank space at the bottom of this one.
           // minPresenceAhead is dropped here for the same reason: it's an
           // orphan-prevention heuristic tuned for short entries, and

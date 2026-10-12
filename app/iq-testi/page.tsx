@@ -19,10 +19,10 @@ import {
 } from "@/lib/seo/locales";
 import { localizedHref } from "@/lib/seo/public-paths";
 
-const TITLE_KA = "IQ ტესტი — უფასო ინტელექტის ტესტი ქართულად";
+const TITLE_KA = "IQ ტესტი, უფასო ინტელექტის ტესტი ქართულად";
 const DESCRIPTION_KA =
-  "გაიარე უფასო IQ ტესტი ქართულად — ადაპტიური ტესტი, რომელიც შენს დონეს ერგება: ლოგიკური, რიცხვითი და სივრცითი აზროვნების 25 დავალება, ~25 წუთი. მიიღე შენი IQ ქულა, პროცენტილი და აზროვნების ანალიზი. კულტურულად ნეიტრალური, რეგისტრაციის გარეშე.";
-const TITLE_EN = "Free Online IQ Test — Adaptive Reasoning Assessment";
+  "გაიარე უფასო IQ ტესტი ქართულად, ადაპტიური ტესტი, რომელიც შენს დონეს ერგება: ლოგიკური, რიცხვითი და სივრცითი აზროვნების 25 დავალება, ~25 წუთი. მიიღე შენი IQ ქულა, პროცენტილი და აზროვნების ანალიზი. კულტურულად ნეიტრალური, რეგისტრაციის გარეშე.";
+const TITLE_EN = "Free Online IQ Test, Adaptive Reasoning Assessment";
 const DESCRIPTION_EN =
   "Take a free, adaptive 25-task IQ test covering numerical, logical, spatial and pattern reasoning. Receive an estimated IQ score and percentile in about 25 minutes.";
 
@@ -69,7 +69,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const IQ_FAQ = [
   {
     q: "როგორ ითვლება IQ ქულა?",
-    a: "შენი პასუხების პატერნი ფასდება დავალებების სირთულის მიხედვით (Rasch/IRT მოდელი), შემდეგ გადაჰყავს სტანდარტულ IQ სკალაზე — საშუალო 100, სტანდარტული გადახრა 15.",
+    a: "შენი პასუხების პატერნი ფასდება დავალებების სირთულის მიხედვით (Rasch/IRT მოდელი), შემდეგ გადაჰყავს სტანდარტულ IQ სკალაზე, საშუალო 100, სტანდარტული გადახრა 15.",
   },
   {
     q: "ტესტი უფასოა და საჭიროა თუ არა რეგისტრაცია?",
@@ -179,7 +179,7 @@ export default async function IqTestPage() {
         <IqTestClient locale={locale} />
       </section>
 
-      {/* SEO / informational content — below the fold, indexable. */}
+      {/* SEO / informational content, below the fold, indexable. */}
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
@@ -195,7 +195,7 @@ export default async function IqTestPage() {
               </>
             ) : (
               <>
-                IQ (ინტელექტის კოეფიციენტი) ზომავს აბსტრაქტულ აზროვნებას —
+                IQ (ინტელექტის კოეფიციენტი) ზომავს აბსტრაქტულ აზროვნებას,
                 რამდენად კარგად ამჩნევ კანონზომიერებებს, აგებ ლოგიკურ დასკვნებს
                 და აგვარებ ახალ, უცნობ ამოცანებს. Vivida-ს ტესტი{" "}
                 <strong>კულტურულად ნეიტრალურია</strong>: დავალებების უმეტესობა
@@ -220,7 +220,7 @@ export default async function IqTestPage() {
             ) : (
               <>
                 ტესტი აფასებს პასუხების <strong>პატერნს</strong>, და არა უბრალოდ
-                სწორი პასუხების რაოდენობას — რთული დავალების სწორად ამოხსნა უფრო
+                სწორი პასუხების რაოდენობას, რთული დავალების სწორად ამოხსნა უფრო
                 მეტს მატებს შედეგს, ვიდრე მარტივის. ეს არის იგივე პრინციპი (Item
                 Response Theory), რომელსაც პროფესიული ტესტები იყენებენ. შემდეგ
                 ქულა გადაჰყავს სტანდარტულ IQ სკალაზე, სადაც{" "}
@@ -304,7 +304,7 @@ export default async function IqTestPage() {
           </div>
         </div>
 
-        {/* Sibling tests — this page had no outbound links at all, which
+        {/* Sibling tests, this page had no outbound links at all, which
             left the rest of the tests cluster orphaned from it. */}
         <section className="mt-10">
           <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -338,7 +338,7 @@ export default async function IqTestPage() {
                   {
                     href: "/pirovnebis-testi",
                     label: "პიროვნების ტესტი",
-                    sub: "MBTI — 16 ტიპიდან რომელი ხარ",
+                    sub: "MBTI, 16 ტიპიდან რომელი ხარ",
                   },
                   {
                     href: "/eq-testi",
@@ -348,7 +348,7 @@ export default async function IqTestPage() {
                   {
                     href: "/big-five",
                     label: "Big Five ტესტი",
-                    sub: "დიდი ხუთეული — 5 ძირითადი თვისება",
+                    sub: "დიდი ხუთეული, 5 ძირითადი თვისება",
                   },
                   {
                     href: "/tests",

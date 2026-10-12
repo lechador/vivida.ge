@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
 
-  const title = "მზისა და მთვარის დაბნელებები — 2026–2028";
+  const title = "მზისა და მთვარის დაბნელებები, 2026–2028";
   const description =
     "მზისა და მთვარის დაბნელებების თარიღები, ტიპები, ხილვადობა და ცალკეული გზამკვლევები 2026–2028 წლებში NASA-ს მონაცემებით.";
   return {

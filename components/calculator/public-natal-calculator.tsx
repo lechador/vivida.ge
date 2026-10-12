@@ -135,7 +135,7 @@ export function PublicNatalCalculator({
         setTimeout(() => setCopied(false), 2000);
       }
     } catch {
-      /* share sheet dismissed — ignore */
+      /* share sheet dismissed, ignore */
     }
   }
 
@@ -212,7 +212,7 @@ export function PublicNatalCalculator({
     }
   }
 
-  // Personalize the "continue free" rail to the visitor's own sun sign — a
+  // Personalize the "continue free" rail to the visitor's own sun sign, a
   // highly relevant next click (and a 2nd pageview = an engaged, non-bounce
   // session in GA).
   const sunIdx = chart?.bodies.sun?.signIndex;
@@ -303,7 +303,7 @@ export function PublicNatalCalculator({
               <p className="text-xs text-muted-foreground">
                 {en
                   ? "We'll use 12:00 noon. Most planetary signs will remain accurate, but the rising sign and houses may not be."
-                  : "დროს 12:00-ად ჩავთვლით — მზე და პლანეტები ზუსტი იქნება, ამომავალი და სახლები შესაძლოა არა."}
+                  : "დროს 12:00-ად ჩავთვლით, მზე და პლანეტები ზუსტი იქნება, ამომავალი და სახლები შესაძლოა არა."}
               </p>
             )}
           </div>
@@ -326,7 +326,7 @@ export function PublicNatalCalculator({
               onClick={fillSample}
               className="w-full rounded-xl border border-dashed border-border/70 px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:border-[var(--vivida-cyan)]/50 hover:text-foreground"
             >
-              Try a sample — 14 Feb 1990, 09:30, London
+              Try a sample, 14 Feb 1990, 09:30, London
             </button>
           )}
 
@@ -473,7 +473,7 @@ export function PublicNatalCalculator({
             </div>
           )}
 
-          {/* Lower-friction return hook — get the daily horoscope by email
+          {/* Lower-friction return hook, get the daily horoscope by email
               without a full signup (the biggest lever on "nobody returns"). */}
           <HoroscopeEmailCapture
             sunSign={sunIdx}
@@ -481,7 +481,7 @@ export function PublicNatalCalculator({
             locale={locale}
           />
 
-          {/* Second-action rail — a free next step so a visitor who isn't ready
+          {/* Second-action rail, a free next step so a visitor who isn't ready
               to register still takes a 2nd action (a 2nd pageview is an engaged,
               non-bounce session) and discovers a reason to return. Personalized
               to their sun sign for relevance. */}
@@ -496,7 +496,7 @@ export function PublicNatalCalculator({
                   className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
                 >
                   <span aria-hidden>{sunSign.symbol}</span>
-                  {en ? sunSign.labelEn : sunSign.labelKa} —{" "}
+                  {en ? sunSign.labelEn : sunSign.labelKa},{" "}
                   {en ? "your sign" : "შენი ნიშანი"}
                 </Link>
               )}

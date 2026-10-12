@@ -93,8 +93,8 @@ export function StepPlace({
   const clearAriaLabel = en ? "Clear" : "წაშლა";
   const notFoundText = en ? "No place found" : "ვერაფერი მოიძებნა";
   const notFoundHint = en
-    ? "Try a different spelling, or pick the nearest larger city — it does not change your chart."
-    : "სცადე სხვა დაწერილობა ან აირჩიე უახლოესი დიდი ქალაქი — რუკას ეს არ ცვლის.";
+    ? "Try a different spelling, or pick the nearest larger city, it does not change your chart."
+    : "სცადე სხვა დაწერილობა ან აირჩიე უახლოესი დიდი ქალაქი, რუკას ეს არ ცვლის.";
   const errorText = en
     ? "Could not reach the search service."
     : "საძიებო სერვისს ვერ დავუკავშირდით.";

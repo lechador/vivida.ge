@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { countUnreadMessages, listConversations } from "@/lib/messages";
 
 /**
- * GET /api/chat/bootstrap — the data the background chat shell needs:
+ * GET /api/chat/bootstrap, the data the background chat shell needs:
  * viewer id, conversation list, and total unread. Moved off the root layout
  * (where it was fetched server-side and forced EVERY page to render
  * dynamically) so the chat can hydrate client-side and the public/SEO pages

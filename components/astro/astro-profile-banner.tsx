@@ -6,7 +6,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Slim prompt nudging an account without birth data to create its astro
- * profile. Non-blocking — shown atop the feed (and other open pages) so astrology
+ * profile. Non-blocking, shown atop the feed (and other open pages) so astrology
  * is opt-in rather than forced at signup. Onboarding lands on /report (the
  * natal chart) by default, so no `next` is threaded here.
  */

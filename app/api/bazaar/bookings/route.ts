@@ -14,7 +14,7 @@ import { enforceRateLimit } from "@/lib/rate-limit";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** GET /api/bazaar/bookings — buyer's bookings + provider's incoming orders. */
+/** GET /api/bazaar/bookings, buyer's bookings + provider's incoming orders. */
 export async function GET() {
   const session = await auth();
   const userId = session?.user?.id;
@@ -24,7 +24,7 @@ export async function GET() {
 }
 
 /**
- * POST /api/bazaar/bookings { serviceId, buyerNote? } — reserve a reading.
+ * POST /api/bazaar/bookings { serviceId, buyerNote? }, reserve a reading.
  * The booking snapshots price + provider wallet, then waits for the buyer
  * to pay on-chain and submit the signature for verification.
  */

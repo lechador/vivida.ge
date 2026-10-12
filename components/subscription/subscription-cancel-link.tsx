@@ -8,7 +8,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 /**
  * The one place a subscription can be cancelled: a modest inline text action
  * rendered under the Billing card on /account. Cancelling only turns off
- * auto-renew — access continues until the period end.
+ * auto-renew, access continues until the period end.
  */
 export function SubscriptionCancelLink({
   locale,

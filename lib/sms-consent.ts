@@ -11,7 +11,7 @@ import { grantSmsConsentGift } from "@/lib/phone-gift";
  *
  * Consent applies to the exact verified phone displayed when it was given:
  * the number must still match, and (for password accounts) the phone
- * verification must not predate the email verification — a signup claim must
+ * verification must not predate the email verification, a signup claim must
  * not turn into an SMS-marketing opt-in before the inbox was proven.
  */
 

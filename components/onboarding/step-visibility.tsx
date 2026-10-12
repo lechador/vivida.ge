@@ -24,8 +24,8 @@ export function StepVisibility({
         </h2>
         <p className="mx-auto max-w-md text-muted-foreground">
           {en
-            ? `This becomes your profile link—vividaastro.com/u/${value.username || "you"}. It helps other people find you.`
-            : `ეს სახელი იქნება შენი პროფილის ბმული — vivida.ge/u/${value.username || "you"}. მის გარეშე სხვები ვერ აღმოგაჩენენ.`}
+            ? `This becomes your profile link, vividaastro.com/u/${value.username || "you"}. It helps other people find you.`
+            : `ეს სახელი იქნება შენი პროფილის ბმული, vivida.ge/u/${value.username || "you"}. მის გარეშე სხვები ვერ აღმოგაჩენენ.`}
         </p>
       </header>
 
@@ -53,8 +53,8 @@ export function StepVisibility({
         </div>
         <p className="text-xs text-muted-foreground">
           {en
-            ? "3–24 characters—only a–z, 0–9 and _"
-            : "3-24 სიმბოლო — მხოლოდ a-z, 0-9 და _"}
+            ? "3–24 characters, only a–z, 0–9 and _"
+            : "3-24 სიმბოლო, მხოლოდ a-z, 0-9 და _"}
         </p>
       </div>
 

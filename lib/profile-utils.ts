@@ -4,7 +4,7 @@
  * slugs to the empty string and falls back to a meaningless `user_1234`.
  *
  * A few letters share a Latin form (თ/ტ → t, ქ/კ → k, ც/წ → ts, ჩ/ჭ → ch,
- * ფ/პ → p) — fine here, since the point is a readable handle, not a reversible
+ * ფ/პ → p), fine here, since the point is a readable handle, not a reversible
  * transcription, and the random suffix keeps handles distinct anyway.
  */
 const KA_TO_LATIN: Record<string, string> = {

@@ -10,14 +10,14 @@ import { enforceRateLimit } from "@/lib/rate-limit";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** GET /api/bazaar/services — public marketplace listing (approved only). */
+/** GET /api/bazaar/services, public marketplace listing (approved only). */
 export async function GET() {
   const services = await listActiveServices();
   return NextResponse.json({ services });
 }
 
 /**
- * POST /api/bazaar/services — an APPROVED provider lists a new service.
+ * POST /api/bazaar/services, an APPROVED provider lists a new service.
  * Providers apply via /api/bazaar/apply; admin approves via the admin API.
  */
 export async function POST(req: Request) {

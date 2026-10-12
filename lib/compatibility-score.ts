@@ -1,8 +1,8 @@
 /**
  * Turns the editorial compatibility *category* (ძლიერი / ჰარმონიული /
  * გამომწვევი) into a precise-feeling percentage for the interactive
- * calculator. The number is deterministic per pair slug — same couple
- * always gets the same score — so a shared result stays trustworthy and
+ * calculator. The number is deterministic per pair slug, same couple
+ * always gets the same score, so a shared result stays trustworthy and
  * reproducible, while still landing inside the band the curated content
  * already assigns. It is intentionally NOT random.
  */

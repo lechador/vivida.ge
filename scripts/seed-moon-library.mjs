@@ -2,7 +2,7 @@
 // A moon-phase reading is collective and fully determined by (phase, moon sign):
 // 8 phases × 12 signs = 96 combos, each holding the complete reading shape
 // (headline/summary/body/themes) that ensureMoonPhase copies into the daily
-// moon_phase row — zero AI calls at serve time.
+// moon_phase row, zero AI calls at serve time.
 //
 // Uses Vertex AI Gemini via the existing GCP project (auth via local ADC,
 // `gcloud auth application-default login`). Local one-time bulk seed only;
@@ -40,7 +40,7 @@ const onlyPhases = phaseArg
   : null;
 
 // Midpoint angle per phase; illumination/age derive from it. These are the
-// "representative numbers" woven into the prompt — the interpretation itself
+// "representative numbers" woven into the prompt, the interpretation itself
 // depends only on phase + sign.
 const PHASES = {
   new_moon: { labelKa: "ახალი მთვარე", angle: 0 },
@@ -85,7 +85,7 @@ const SIGN_EN = {
 
 // Mirrors MOON_PHASE_SYSTEM_PROMPT in lib/openrouter.ts so seeded and
 // self-healed entries share one voice and shape.
-const SYSTEM = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი/რედაქტორი. ცოცხალი, კონკრეტული ენა, არა ბუნდოვანი მისტიკა. წერ კოლექტიური მთვარის ენერგიის შესახებ — რას ნიშნავს ეს ფაზა + ნიშანი ყველასთვის ერთად, ნატალურ რუკასთან კავშირის გარეშე.
+const SYSTEM = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი/რედაქტორი. ცოცხალი, კონკრეტული ენა, არა ბუნდოვანი მისტიკა. წერ კოლექტიური მთვარის ენერგიის შესახებ, რას ნიშნავს ეს ფაზა + ნიშანი ყველასთვის ერთად, ნატალურ რუკასთან კავშირის გარეშე.
 
 დააბრუნე მხოლოდ ვალიდური JSON ამ სქემით:
 {
@@ -99,7 +99,7 @@ const SYSTEM = `შენ ხარ თბილი, თანამედრო
 - "შენ"-ის ფორმა, თანაბარი ტონი (არა ზედმეტად დრამატული, არა ცივი)
 - კონკრეტული, ხელშესახები მაგალითი (არა ზოგადი ფრაზები)
 - აცილე კლიშეები ("მოამზადე გული", "სამყარო გელის" და ა.შ.)
-- ფაზის+ნიშნის სპეციფიკური ენერგიის ხაზგასმა — არა უნივერსალური "მთვარე გრძნობებზეა"
+- ფაზის+ნიშნის სპეციფიკური ენერგიის ხაზგასმა, არა უნივერსალური "მთვარე გრძნობებზეა"
 - მხოლოდ JSON, ფენსების გარეშე`;
 
 function prompt(phaseKey, sign) {

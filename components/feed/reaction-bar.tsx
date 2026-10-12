@@ -11,7 +11,7 @@ import { REACTIONS, ReactionIcon, REACTION_BY_KIND } from "./reaction-icons";
 
 /**
  * Strip of four reaction buttons with live counts. Optimistic update on
- * click — the local state moves immediately, the server action settles
+ * click, the local state moves immediately, the server action settles
  * the truth in the background. If the action fails we roll back and
  * surface no error (reactions are low-stakes; users will just notice
  * the count snap back).
@@ -104,7 +104,7 @@ export function ReactionBar({
   );
 }
 
-/** Tiny presentation-only summary — used by post-card subtitle when the
+/** Tiny presentation-only summary, used by post-card subtitle when the
  *  full reaction bar is too noisy. Currently unused but exported for
  *  future inline summaries (e.g. comment-detail headers). */
 export function ReactionSummary({ counts }: { counts: FeedReactionCounts }) {

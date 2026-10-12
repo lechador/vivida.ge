@@ -21,7 +21,7 @@ import {
 
 /**
  * Platform crypto rail (English site): credit packs and PRO passes paid in
- * USDC on Solana. The app never sends transactions — the buyer pays from
+ * USDC on Solana. The app never sends transactions, the buyer pays from
  * their own wallet (Privy embedded or external) and the server verifies the
  * on-chain transfer against the pending purchase row, then grants exactly
  * once (unique tx signature + idempotent grant).
@@ -29,7 +29,7 @@ import {
  * `fiat` purchases skip the wallet entirely: the buyer pays by card in
  * Privy's fund modal with `destination.wallet` set to the platform wallet,
  * so USDC lands in OUR wallet and the buyer never touches crypto. The fund
- * modal returns no transaction proof — only submitted/confirmed — so those
+ * modal returns no transaction proof, only submitted/confirmed, so those
  * purchases are matched by time window plus a tolerance-floored amount,
  * first-unmatched-wins (see confirmFiatCryptoPurchase).
  */
@@ -50,7 +50,7 @@ export function isCryptoPayConfigured(): boolean {
  * Per-purchase reference key: 32 random bytes as base58. It rides in the
  * Solana Pay URL and the transaction as a read-only account, so the server
  * can find the payment via getSignaturesForAddress without the buyer
- * pasting anything — and only THIS purchase's URL contains it.
+ * pasting anything, and only THIS purchase's URL contains it.
  */
 export function newPaymentReference(): string {
   return base58Encode(randomBytes(32));
@@ -152,7 +152,7 @@ type TxFetchOutcome =
   | { kind: "unavailable"; code?: number };
 
 /**
- * `getTransaction` with `maxSupportedTransactionVersion: 255` — mainnet
+ * `getTransaction` with `maxSupportedTransactionVersion: 255`, mainnet
  * already carries versioned transactions, and with a lower cap the RPC
  * answers HTTP 200 with a JSON-RPC error and no result, which must never be
  * collapsed into "paid" or into a permanent failure. A clean `result: null`
@@ -187,7 +187,7 @@ export async function fetchConfirmedTransaction(
     if (!json) return { kind: "unavailable" };
     if (json.error) {
       // JSON-RPC error bodies are transient/retryable here (bad params for a
-      // malformed signature never reach this call — normalizeSignature
+      // malformed signature never reach this call, normalizeSignature
       // rejects those first). Log the code; never claim a terminal failure.
       console.warn(
         "[crypto/verify] rpc error body:",
@@ -250,12 +250,12 @@ type PaidCheck =
 
 /**
  * The payment contract: a finalized, successful USDC credit to the
- * snapshotted recipient wallet for at least the snapshotted price — in a
+ * snapshotted recipient wallet for at least the snapshotted price, in a
  * transaction that carries this purchase's reference account, unless the
  * caller opts out (fiat-direct payments carry no reference; the on-ramp
  * sends plain USDC). `minBaseUnits` floors the accepted amount: card
  * on-ramps take a fee/FX spread, so the USDC that lands is virtually always
- * slightly under nominal — the shortfall is still reported against the full
+ * slightly under nominal, the shortfall is still reported against the full
  * price for honest UI copy.
  */
 export function checkPaidTransaction(
@@ -330,7 +330,7 @@ export type CryptoConfirmOutcome =
 /**
  * Apply the purchase's grant. Runs on every confirmed read (not just the
  * first) on purpose: credit grants are idempotent on the tx signature, and
- * the premium pass elects a single grant runner via the row's grantedAt —
+ * the premium pass elects a single grant runner via the row's grantedAt,
  * so a poll that races the original confirm can never double-credit.
  */
 async function applyGrant(purchase: CryptoPurchase): Promise<void> {
@@ -360,7 +360,7 @@ async function applyGrant(purchase: CryptoPurchase): Promise<void> {
  * The fund modal returns no transaction proof, so these purchases match by
  * window: transfers touching the platform wallet at/after purchase creation
  * (minus skew for clock drift and pre-created orders). The amount floor
- * absorbs the on-ramp fee/FX spread — the USDC that lands is virtually
+ * absorbs the on-ramp fee/FX spread, the USDC that lands is virtually
  * always slightly under the nominal pack price.
  */
 export const FIAT_SCAN_LIMIT = 25;
@@ -369,7 +369,7 @@ export const FIAT_MIN_FRACTION_BPS = 9000;
 
 export type AddressSignatureRow = {
   signature: string;
-  /** Unix seconds (null when the RPC omits it — row is unusable). */
+  /** Unix seconds (null when the RPC omits it, row is unusable). */
   blockTime: number | null;
   err: unknown;
 };
@@ -497,7 +497,7 @@ async function verifyAndClaim(
     return { status: "failed", reason: "unavailable" };
   }
   if (fetched.kind === "not_found") {
-    // Clean "not indexed yet" — retryable (normal seconds after payment).
+    // Clean "not indexed yet", retryable (normal seconds after payment).
     return { status: "failed", reason: "not_found" };
   }
 
@@ -520,7 +520,7 @@ async function verifyAndClaim(
 }
 
 /**
- * Claim: pending (or expired — on-chain money is the source of truth) →
+ * Claim: pending (or expired, on-chain money is the source of truth) →
  * confirmed, exactly once. A conditional UPDATE, not a blind write.
  */
 async function claimRow(
@@ -560,7 +560,7 @@ async function claimRow(
   }
 
   if (!claimed) {
-    // Lost a simultaneous claim race (another tab/device verified) — answer
+    // Lost a simultaneous claim race (another tab/device verified), answer
     // from a fresh read instead of 500ing.
     const current = await getCryptoPurchase(purchase.id, purchase.userId);
     if (current?.status === "confirmed") {
@@ -582,7 +582,7 @@ async function claimRow(
  * the tolerance floor wins. Already-claimed signatures are skipped, so
  * concurrent same-pack purchases split transfers FIFO instead of
  * double-claiming. Returns pending until the client reports the fund flow
- * reached submitted/confirmed (fiatConfirmedAt) — no point burning RPC
+ * reached submitted/confirmed (fiatConfirmedAt), no point burning RPC
  * calls before the buyer has paid.
  */
 export async function confirmFiatCryptoPurchase(input: {
@@ -633,7 +633,7 @@ export async function confirmFiatCryptoPurchase(input: {
     if (check.reason === "underpaid" && underpaidShortfall === undefined) {
       underpaidShortfall = check.shortfallUsdcCents;
     }
-    // Errored transactions are skipped — keep looking for ours.
+    // Errored transactions are skipped, keep looking for ours.
   }
   if (underpaidShortfall !== undefined) {
     return {

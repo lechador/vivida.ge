@@ -327,7 +327,7 @@ export default async function MoonSignPage({
               მზის ნიშანი
             </div>
             <div className="mt-1 text-lg font-semibold tracking-tight">
-              {c.labelKa} — მზე
+              {c.labelKa}, მზე
             </div>
             <p className="mt-1 text-pretty text-sm text-foreground/80">
               ნახე ამავე ნიშნის მზის ინტერპრეტაცია.
@@ -341,10 +341,10 @@ export default async function MoonSignPage({
               ამომავალი ნიშანი
             </div>
             <div className="mt-1 text-lg font-semibold tracking-tight">
-              {c.labelKa} — ასცენდენტი
+              {c.labelKa}, ასცენდენტი
             </div>
             <p className="mt-1 text-pretty text-sm text-foreground/80">
-              როგორც ნიღაბი — როგორ გაჩვენებს სამყაროს.
+              როგორც ნიღაბი, როგორ გაჩვენებს სამყაროს.
             </p>
           </Link>
         </section>
@@ -384,7 +384,7 @@ export default async function MoonSignPage({
             დარწმუნდი, რომ მთვარე ნამდვილად {c.labelKa}-შია
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            მთვარე ცაში ~2.5 დღეში ცვლის ნიშანს — ზუსტი დაბადების დროა საჭირო.
+            მთვარე ცაში ~2.5 დღეში ცვლის ნიშანს, ზუსტი დაბადების დროა საჭირო.
             Vivida ერთ წუთში გითხრის.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">

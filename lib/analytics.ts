@@ -7,8 +7,8 @@ import { browserTrackingAllowed } from "@/lib/tracking-consent";
  * production or an explicit local DebugView session (see app/layout.tsx). When
  * gtag isn't loaded (normal dev / preview) this is a no-op, so call sites never have
  * to guard. Use for conversion events on the public acquisition funnel
- * (chart computed → email subscribed → register clicked), which — unlike raw
- * bounce rate — actually tell you whether the free tools convert.
+ * (chart computed → email subscribed → register clicked), which, unlike raw
+ * bounce rate, actually tell you whether the free tools convert.
  */
 export type GtagParams = Record<
   string,
@@ -135,7 +135,7 @@ const VALUE_ACTION_EVENTS = new Set<AnalyticsEventName>([
 /**
  * W04 event contract: every product event carries these dimensions so
  * funnels split by platform / feature / surface / locale without new
- * instrumentation. `v` is the contract version — bump it if a shared
+ * instrumentation. `v` is the contract version, bump it if a shared
  * param is renamed. Never put user IDs, birth data, or free text here.
  */
 export const EVENT_CONTRACT_VERSION = 1;
@@ -156,7 +156,7 @@ export function productEventBase(
 
 /**
  * GA4 reserves these event-parameter names for campaign attribution. Sending
- * one on an ordinary event silently rewrites the session's source/medium — a
+ * one on an ordinary event silently rewrites the session's source/medium, a
  * `{ source: "natal_calculator" }` param is what put ~150 sessions/2wk into the
  * "Unassigned" channel as `natal_calculator / (not set)`. Describe where an
  * event came from with a neutral key (`widget`, `test`, `method`) instead.
@@ -179,7 +179,7 @@ function stripCampaignParams(params: GtagParams): GtagParams {
     if (RESERVED_CAMPAIGN_PARAMS.has(key)) {
       if (process.env.NODE_ENV !== "production") {
         console.warn(
-          `[analytics] dropped reserved GA4 campaign param "${key}" — it would overwrite session attribution. Rename it (e.g. "widget").`,
+          `[analytics] dropped reserved GA4 campaign param "${key}", it would overwrite session attribution. Rename it (e.g. "widget").`,
         );
       }
       continue;
@@ -239,7 +239,7 @@ export function trackFirstResultViewed(params: GtagParams): void {
       return;
     }
   } catch {
-    /* private browsing / disabled storage — use the in-memory guard */
+    /* private browsing / disabled storage, use the in-memory guard */
   }
 
   if (!trackEvent(ANALYTICS_EVENT.firstResultViewed, params)) return;

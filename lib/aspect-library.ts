@@ -1,7 +1,7 @@
 /**
  * Reusable per-aspect interpretation library.
  *
- * "Sun conjunction Moon" reads identically for every user who has it — so
+ * "Sun conjunction Moon" reads identically for every user who has it, so
  * instead of a per-user AI call, we generate each of the 390 possible
  * (planetA, planetB, kind) combinations once, store it here, and reuse it.
  * The report's aspect section reads from here at render time instead of
@@ -57,19 +57,19 @@ const KIND_KA: Record<AspectKind, string> = {
   opposition: "ოპოზიცია (opposition)",
 };
 
-/** Tone guidance per aspect family — keeps the model from writing every
+/** Tone guidance per aspect family, keeps the model from writing every
  *  aspect as generically "good" or "bad". */
 const KIND_DYNAMIC_KA: Record<AspectKind, string> = {
   conjunction:
-    "ორი ენერგია ერთმანეთში ერწყმის და ერთ ძალად მოქმედებს — არც კონფლიქტი, არც შვება, უბრალოდ შერწყმა, რომლის ხასიათი პლანეტებზეა დამოკიდებული.",
+    "ორი ენერგია ერთმანეთში ერწყმის და ერთ ძალად მოქმედებს, არც კონფლიქტი, არც შვება, უბრალოდ შერწყმა, რომლის ხასიათი პლანეტებზეა დამოკიდებული.",
   sextile:
-    "ორი ენერგია ბუნებრივად თანამშრომლობს — ადვილად ხელმისაწვდომი შესაძლებლობა, რომელიც მოქმედებას საჭიროებს გასააქტიურებლად.",
+    "ორი ენერგია ბუნებრივად თანამშრომლობს, ადვილად ხელმისაწვდომი შესაძლებლობა, რომელიც მოქმედებას საჭიროებს გასააქტიურებლად.",
   square:
-    "ორი ენერგია ერთმანეთს ეწინააღმდეგება — შინაგანი ხახუნი და დაძაბულობა, რომელიც ზრდის ყველაზე ძლიერი წყაროა, თუმცა თავიდან რთულად იგრძნობა.",
+    "ორი ენერგია ერთმანეთს ეწინააღმდეგება, შინაგანი ხახუნი და დაძაბულობა, რომელიც ზრდის ყველაზე ძლიერი წყაროა, თუმცა თავიდან რთულად იგრძნობა.",
   trine:
-    "ორი ენერგია ჰარმონიულად და ბუნებრივად მიედინება — ნიჭი და სიმარტივე, რომელიც ხანდახან თვითკმაყოფილებაშიც შეიძლება გადაიზარდოს.",
+    "ორი ენერგია ჰარმონიულად და ბუნებრივად მიედინება, ნიჭი და სიმარტივე, რომელიც ხანდახან თვითკმაყოფილებაშიც შეიძლება გადაიზარდოს.",
   opposition:
-    "ორი ენერგია ერთმანეთის საპირისპირო პოლუსზეა — ცნობიერების საჭიროება ბალანსის საპოვნელად ორ უკიდურესობას შორის.",
+    "ორი ენერგია ერთმანეთის საპირისპირო პოლუსზეა, ცნობიერების საჭიროება ბალანსის საპოვნელად ორ უკიდურესობას შორის.",
 };
 
 export function libraryKindKa(kind: AspectKind): string {
@@ -101,7 +101,7 @@ export function allAspectCombos(): AspectPlacement[] {
 
 /**
  * Batched read: returns a Map of key → body for the requested keys. Pure
- * read — never generates. Used by the read-time overlay so editing a library
+ * read, never generates. Used by the read-time overlay so editing a library
  * row reflects for every user on their next view.
  */
 export async function getAspectLibraryEntries(
@@ -120,7 +120,7 @@ export async function getAspectLibraryEntries(
 
 const SYSTEM_PROMPT =
   "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
-  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   "თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები " +
   '("ვარსკვლავები გელიან", "მიენდე სამყაროს").';
 
@@ -140,12 +140,12 @@ export function buildAspectPrompt(
   const dynamic = KIND_DYNAMIC_KA[kind];
   return (
     `დაწერე ნატალური ასპექტის ინტერპრეტაცია: "${aLabel} ${kindKa} ${bLabel}".\n` +
-    `${aLabel} — ${aMeaning}. ${bLabel} — ${bMeaning}.\n` +
+    `${aLabel}, ${aMeaning}. ${bLabel}, ${bMeaning}.\n` +
     `ამ ასპექტის ბუნება: ${dynamic}\n\n` +
     `6-8 წინადადება (დაახ. 130-170 სიტყვა), "შენ"-ის ფორმა, თბილი და კონკრეტული. ` +
     `ახსენი: როგორ ერწყმის/ეჯახება ეს ორი ენერგია ერთმანეთს ცხოვრებაში, ` +
     `ერთი კონკრეტული ხელშესახები მაგალითი, და ერთი პრაქტიკული რჩევა ამ ` +
-    `დინამიკასთან სამუშაოდ. დააბრუნე მხოლოდ ტექსტი — სათაურის, ` +
+    `დინამიკასთან სამუშაოდ. დააბრუნე მხოლოდ ტექსტი, სათაურის, ` +
     `ფორმატირების და ფრჩხილების გარეშე.`
   );
 }
@@ -199,7 +199,7 @@ export async function generateAspectEntry(
 /**
  * Ensure library rows exist for the given aspect placements, generating any
  * missing ones (one AI call each) and persisting them. Returns a key → body
- * map for the requested placements. Background path — never blocks a render.
+ * map for the requested placements. Background path, never blocks a render.
  */
 export async function ensureAspectLibraryFor(
   placements: AspectPlacement[],

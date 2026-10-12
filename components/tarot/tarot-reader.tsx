@@ -83,7 +83,7 @@ type Reading = {
   followups: TarotFollowup[];
   spreadId: string;
   spreadOptions?: { a: string; b: string };
-  /** Loaded from history rather than freshly drawn — cost line stays hidden. */
+  /** Loaded from history rather than freshly drawn, cost line stays hidden. */
   fromHistory?: boolean;
 };
 
@@ -249,12 +249,12 @@ export function TarotReader({
 
   async function ask() {
     // A second Enter while the first request is in flight would spend the
-    // credits twice — the API has no dedupe, so the guard lives here.
+    // credits twice, the API has no dedupe, so the guard lives here.
     if (status === "drawing") return;
     const q = question.trim();
     if (q.length < 3) return;
     if (!authed) {
-      // The sign-in wall is the single biggest drop-off on this funnel —
+      // The sign-in wall is the single biggest drop-off on this funnel,
       // track it separately from a completed reading so the two are
       // distinguishable in GA4. Keep the question so it survives login.
       savePendingTarotQuestion(sessionStorage, q);
@@ -477,16 +477,16 @@ export function TarotReader({
         </div>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
           {en
-            ? "About the same cards — no new spread is drawn."
-            : "იგივე კარტებზე — ახალი გაშლა არ იშლება."}
+            ? "About the same cards, no new spread is drawn."
+            : "იგივე კარტებზე, ახალი გაშლა არ იშლება."}
           {!premium &&
             (reading.followups.length === 0
               ? en
                 ? " Your first follow-up is free."
                 : " პირველი დაზუსტება უფასოა."
               : en
-                ? ` Next follow-up — ${CREDIT_COST.tarotFollowup} credits.`
-                : ` შემდეგი დაზუსტება — ${CREDIT_COST.tarotFollowup} კრედიტი.`)}
+                ? ` Next follow-up, ${CREDIT_COST.tarotFollowup} credits.`
+                : ` შემდეგი დაზუსტება, ${CREDIT_COST.tarotFollowup} კრედიტი.`)}
         </p>
 
         {reading.followups.map((followup, index) => (
@@ -569,7 +569,7 @@ export function TarotReader({
           <p className="mt-2 text-sm text-[var(--vivida-pink)]">
             {en
               ? "Something went wrong. Please try again."
-              : "რაღაც ვერ მოხერხდა — სცადე ხელახლა."}
+              : "რაღაც ვერ მოხერხდა, სცადე ხელახლა."}
           </p>
         )}
       </div>
@@ -578,7 +578,7 @@ export function TarotReader({
 
   return (
     <div className="rounded-3xl border border-[var(--vivida-violet)]/50 bg-gradient-to-br from-[var(--vivida-violet)]/16 via-card/70 to-[var(--vivida-cyan)]/12 p-5 shadow-[0_28px_90px_-48px_rgba(141,103,255,0.9)] ring-1 ring-white/10 backdrop-blur-xl sm:p-8">
-      {/* Previous questions — reopen a spread (reply) or start fresh. */}
+      {/* Previous questions, reopen a spread (reply) or start fresh. */}
       {authed && history !== null && history.length > 0 && (
         <div className="mb-4 rounded-2xl border border-border/60 bg-background/35">
           <button
@@ -750,7 +750,7 @@ export function TarotReader({
         )}
       </div>
 
-      {/* Short-balance prompt — with the drawn spread as a teaser when the
+      {/* Short-balance prompt, with the drawn spread as a teaser when the
           server dealt one (same cards the paid retry will interpret). */}
       {status === "short" && (
         <div className="mt-8 space-y-5">
@@ -774,7 +774,7 @@ export function TarotReader({
         <p className="mt-4 text-sm text-[var(--vivida-pink)]">
           {en
             ? "Something went wrong. Please try again."
-            : "რაღაც ვერ მოხერხდა — სცადე ხელახლა."}
+            : "რაღაც ვერ მოხერხდა, სცადე ხელახლა."}
         </p>
       )}
 
@@ -850,7 +850,7 @@ export function TarotReader({
             )}
           </div>
 
-          {/* Follow-up — a next question on the same cards, no new spread. */}
+          {/* Follow-up, a next question on the same cards, no new spread. */}
           {reading.libraryId &&
             !reading.fromHistory &&
             renderFollowup("tarot-followup")}
@@ -860,8 +860,8 @@ export function TarotReader({
               <span className="text-xs text-muted-foreground">
                 {reading.free
                   ? en
-                    ? "First reading — free ✦"
-                    : "პირველი კითხვა — უფასო ✦"
+                    ? "First reading, free ✦"
+                    : "პირველი კითხვა, უფასო ✦"
                   : en
                     ? `−${reading.charged} credits · ${reading.balance} remaining`
                     : `−${reading.charged} კრედიტი · ბალანსი ${reading.balance}`}
@@ -895,8 +895,8 @@ export function TarotReader({
               <div className="rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 p-4 text-center">
                 <p className="text-sm font-medium text-foreground/90">
                   {en
-                    ? `You have ${reading.balance} credits — enough for ${Math.floor(reading.balance / cost)} more reading${Math.floor(reading.balance / cost) === 1 ? "" : "s"}.`
-                    : `შენ გაქვს ${reading.balance} კრედიტი — კიდევ ${Math.floor(reading.balance / cost)} კითხვა შეგიძლია.`}
+                    ? `You have ${reading.balance} credits, enough for ${Math.floor(reading.balance / cost)} more reading${Math.floor(reading.balance / cost) === 1 ? "" : "s"}.`
+                    : `შენ გაქვს ${reading.balance} კრედიტი, კიდევ ${Math.floor(reading.balance / cost)} კითხვა შეგიძლია.`}
                 </p>
                 <Button
                   type="button"
@@ -922,7 +922,7 @@ export function TarotReader({
               </div>
             ))}
 
-          {/* Free second-action rail — a next step at the peak-engagement
+          {/* Free second-action rail, a next step at the peak-engagement
               moment, instead of dead-ending at the credit-gated new question. */}
           <div className="border-t border-border/40 pt-5 text-center">
             <p className="text-xs text-muted-foreground">
@@ -955,7 +955,7 @@ export function TarotReader({
   );
 }
 
-/** A single revealed card — illustration with a styled fallback back. */
+/** A single revealed card, illustration with a styled fallback back. */
 function TarotCardFace({
   card,
   delayMs,
@@ -1002,7 +1002,7 @@ function TarotCardFace({
 }
 
 /**
- * Free teaser on a 402: the exact spread the paid retry will interpret —
+ * Free teaser on a 402: the exact spread the paid retry will interpret,
  * first card face-up, the other two face-down, every interpretation locked.
  */
 export function TarotTeaserPreview({
@@ -1031,8 +1031,8 @@ export function TarotTeaserPreview({
         </div>
         <h3 className="mt-1 text-balance text-xl font-semibold tracking-tight">
           {en
-            ? "The first card is face-up — the rest unlocks with the reading"
-            : "პირველი კარტი ღიაა — დანარჩენი პასუხთან ერთად გაიხსნება"}
+            ? "The first card is face-up, the rest unlocks with the reading"
+            : "პირველი კარტი ღიაა, დანარჩენი პასუხთან ერთად გაიხსნება"}
         </h3>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-3 sm:gap-4">
@@ -1066,7 +1066,7 @@ export function TarotTeaserPreview({
   );
 }
 
-/** Face-down card — hides identity, keeps the spread's shape. */
+/** Face-down card, hides identity, keeps the spread's shape. */
 function TarotCardBack({ delayMs }: { delayMs: number }) {
   return (
     <div

@@ -14,7 +14,7 @@ import type { ChineseCompatItem } from "./messaging";
 
 /**
  * Globally-cached moon phase + Gemini interpretation, one row per UTC date.
- * Universal (not per-user) — the moon's phase + sign is the same for everyone
+ * Universal (not per-user), the moon's phase + sign is the same for everyone
  * on a given day, so a single row is served to all users.
  *
  * Cache invalidates by bumping `promptVersion` after a prompt change.
@@ -50,7 +50,7 @@ export const moonPhases = pgTable("moon_phase", {
 /**
  * Per-sun-sign horoscope readings for SEO landing pages. Unlike
  * dailyHoroscopes (per user, requires natal chart), these are universal
- * for everyone with that sun sign — generated once per (sign, period,
+ * for everyone with that sun sign, generated once per (sign, period,
  * periodKey) and served to anonymous visitors at /zodiac/[sign]/dghes,
  * /kviris-horoskopi, /tvis-horoskopi.
  *
@@ -66,7 +66,7 @@ export const moonPhases = pgTable("moon_phase", {
 export const signHoroscopes = pgTable(
   "sign_horoscope",
   {
-    /** zodiac slug — see ALL_SLUGS in lib/seo/zodiac-dates */
+    /** zodiac slug, see ALL_SLUGS in lib/seo/zodiac-dates */
     sign: text("sign").notNull(),
     /** "day" | "week" | "month" */
     period: text("period").notNull(),
@@ -88,12 +88,12 @@ export const signHoroscopes = pgTable(
 
 /**
  * Evergreen "ranking" listicles ("ყველაზე ჭკვიანი / ეჭვიანი … ნიშნები").
- * One row per topic — all 12 signs ranked by a trait. Generated on-demand
+ * One row per topic, all 12 signs ranked by a trait. Generated on-demand
  * by the SEO page and cached; `promptVersion` invalidates after a prompt
  * change. `items` is the ordered ranking.
  */
 export type SignRankingItem = {
-  /** zodiac slug — see ALL_SLUGS */
+  /** zodiac slug, see ALL_SLUGS */
   slug: string;
   /** 1 = most, 12 = least */
   rank: number;
@@ -101,7 +101,7 @@ export type SignRankingItem = {
 };
 
 export const signRankings = pgTable("sign_ranking", {
-  /** topic slug — see RANKING_TOPICS in lib/seo/rankings */
+  /** topic slug, see RANKING_TOPICS in lib/seo/rankings */
   topic: text("topic").primaryKey(),
   headline: text("headline").notNull(),
   intro: text("intro").notNull(),
@@ -118,12 +118,12 @@ export const signRankings = pgTable("sign_ranking", {
 export type SignRanking = typeof signRankings.$inferSelect;
 
 /**
- * Reusable per-placement interpretation library — shared across all users.
+ * Reusable per-placement interpretation library, shared across all users.
  * One row per (subject, sign): subject ∈ sun/moon/mercury…/pluto/ascendant,
  * sign ∈ aries…pisces. `key` is `${subject}:${sign}` (e.g. "sun:scorpio").
  *
  * These are the sign-level texts that read identically for everyone with the
- * same placement, so we generate them once and reuse them — the report's
+ * same placement, so we generate them once and reuse them, the report's
  * Big Three + planet sections pull from here at render time instead of a
  * per-user AI call. `edited=true` marks a human-curated row so regeneration
  * leaves it alone. Editable from the admin panel (same DB).
@@ -139,7 +139,7 @@ export const interpretationLibrary = pgTable("interpretation_library", {
   body: text("body").notNull(),
   /** Model id that produced it, "curated", or "manual" after an admin edit. */
   model: text("model").notNull(),
-  /** True once a human edits it — regeneration skips edited rows. */
+  /** True once a human edits it, regeneration skips edited rows. */
   edited: boolean("edited").notNull().default(false),
   language: text("language").notNull().default("ka"),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -154,10 +154,10 @@ export type InterpretationLibraryRow =
   typeof interpretationLibrary.$inferSelect;
 
 /**
- * Reusable per-aspect interpretation library — the aspect counterpart of
+ * Reusable per-aspect interpretation library, the aspect counterpart of
  * `interpretation_library`. One row per (planetA, planetB, kind), e.g.
  * "Sun conjunction Moon" reads identically for every user who has it, so we
- * generate each once and reuse it. `key` is `aspectKey(a, b, kind)` — the
+ * generate each once and reuse it. `key` is `aspectKey(a, b, kind)`, the
  * SAME alphabetically-sorted "<a>-<b>-<kind>" id already used as the map key
  * in ChartInterpretationJson.aspects, so no translation layer is needed at
  * the call site. `edited=true` marks a human-curated row so regeneration
@@ -168,7 +168,7 @@ export const aspectInterpretationLibrary = pgTable(
   {
     /** `aspectKey(a, b, kind)`, e.g. "moon-sun-square". */
     key: text("key").primaryKey(),
-    /** Body keys, alphabetically sorted (a < b) — matches aspectKey's order. */
+    /** Body keys, alphabetically sorted (a < b), matches aspectKey's order. */
     planetA: text("planet_a").notNull(),
     planetB: text("planet_b").notNull(),
     /** conjunction | sextile | square | trine | opposition */
@@ -177,7 +177,7 @@ export const aspectInterpretationLibrary = pgTable(
     body: text("body").notNull(),
     /** Model id that produced it, "curated", or "manual" after an admin edit. */
     model: text("model").notNull(),
-    /** True once a human edits it — regeneration skips edited rows. */
+    /** True once a human edits it, regeneration skips edited rows. */
     edited: boolean("edited").notNull().default(false),
     language: text("language").notNull().default("ka"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -193,18 +193,18 @@ export type AspectInterpretationLibraryRow =
   typeof aspectInterpretationLibrary.$inferSelect;
 
 /**
- * Reusable synastry (compatibility) interpretation library — the two-chart
+ * Reusable synastry (compatibility) interpretation library, the two-chart
  * counterpart of the natal aspect/house libraries. "One person's Sun square
  * the other's Moon" reads identically for every pair that has it, so each
  * finite combination is generated once (rich Georgian, direction-neutral
- * wording — never "your"/"their", since either partner may be A or B) and
+ * wording, never "your"/"their", since either partner may be A or B) and
  * reused on every profile compatibility view. Two kinds:
  *
- *   - `kind='aspect'`  — (planetA, planetB, aspectKind): a cross-chart aspect
+ *   - `kind='aspect'`, (planetA, planetB, aspectKind): a cross-chart aspect
  *                        between the two people's planets. Pair is unordered
  *                        (A's Sun △ B's Moon ≡ A's Moon △ B's Sun), keys use
  *                        sorted body names: 91 pairs × 5 kinds = 455 rows.
- *   - `kind='overlay'` — (planetA, house): one person's planet falling in the
+ *   - `kind='overlay'`, (planetA, house): one person's planet falling in the
  *                        other's house. 13 bodies × 12 houses = 156 rows.
  *
  * `key` is `aspect:${a}-${b}-${kind}` or `overlay:${body}-${house}`.
@@ -222,7 +222,7 @@ export const synastryInterpretationLibrary = pgTable(
     planetB: text("planet_b"),
     /** Aspects only: conjunction | sextile | square | trine | opposition. */
     aspectKind: text("aspect_kind"),
-    /** Overlays only: 1–12 — whose-ever house the planet lands in. */
+    /** Overlays only: 1–12, whose-ever house the planet lands in. */
     house: integer("house"),
     /** Georgian interpretation shown on the compatibility view. */
     body: text("body").notNull(),
@@ -244,16 +244,16 @@ export type SynastryInterpretationLibraryRow =
   typeof synastryInterpretationLibrary.$inferSelect;
 
 /**
- * Reusable per-house interpretation library — the house counterpart of the
+ * Reusable per-house interpretation library, the house counterpart of the
  * sign/aspect libraries. Unlike a planet-in-sign or a two-planet aspect, a
  * house's full meaning depends on BOTH its cusp sign AND which (variable,
  * unbounded) set of planets occupy it, so it isn't a single finite lookup.
  * We decompose it into two reusable, finite pieces instead:
  *
- *   - `kind='cusp'`     — (house, sign): "what this life area looks like
- *                          under this sign" — 12 houses × 12 signs = 144.
- *   - `kind='occupant'` — (house, planet): "what it means for this planet's
- *                          energy to be active in this life area" —
+ *   - `kind='cusp'`, (house, sign): "what this life area looks like
+ *                          under this sign", 12 houses × 12 signs = 144.
+ *   - `kind='occupant'`, (house, planet): "what it means for this planet's
+ *                          energy to be active in this life area",
  *                          12 houses × 11 planets = 132.
  *
  * At render time the cusp text + each occupant's text are composed into the
@@ -276,7 +276,7 @@ export const houseInterpretationLibrary = pgTable(
     body: text("body").notNull(),
     /** Model id that produced it, "curated", or "manual" after an admin edit. */
     model: text("model").notNull(),
-    /** True once a human edits it — regeneration skips edited rows. */
+    /** True once a human edits it, regeneration skips edited rows. */
     edited: boolean("edited").notNull().default(false),
     language: text("language").notNull().default("ka"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -292,19 +292,19 @@ export type HouseInterpretationLibraryRow =
   typeof houseInterpretationLibrary.$inferSelect;
 
 /**
- * Reusable per-transit interpretation library — the daily-horoscope
+ * Reusable per-transit interpretation library, the daily-horoscope
  * counterpart of the natal libraries above. A transit means the same thing
  * for every user who has it ("transiting Moon square natal Venus" reads
  * identically for everyone), so each finite combination is generated once
- * and the daily reading is COMPOSED from these rows at generation time —
+ * and the daily reading is COMPOSED from these rows at generation time,
  * zero per-user AI calls (see actions/daily.ts). Three kinds:
  *
- *   - `kind='aspect'` — (transiting body, aspect kind, natal point):
- *                        10 × 5 × 13 = 650. Direction matters — transiting
+ *   - `kind='aspect'`, (transiting body, aspect kind, natal point):
+ *                        10 × 5 × 13 = 650. Direction matters, transiting
  *                        Moon → natal Venus ≠ transiting Venus → natal Moon.
- *   - `kind='house'`  — (transiting body, natal house): 10 × 12 = 120,
+ *   - `kind='house'`, (transiting body, natal house): 10 × 12 = 120,
  *                        "this energy is moving through this life area".
- *   - `kind='sign'`   — (fast body sun…mars, zodiac sign): 5 × 12 = 60,
+ *   - `kind='sign'`, (fast body sun…mars, zodiac sign): 5 × 12 = 60,
  *                        the collective daily/weekly mood (same for everyone).
  *
  * `key` is `${kind}:${transit}:${subject}` where subject is
@@ -332,7 +332,7 @@ export const transitInterpretationLibrary = pgTable(
     body: text("body").notNull(),
     /** Model id that produced it, "curated", or "manual" after an admin edit. */
     model: text("model").notNull(),
-    /** True once a human edits it — regeneration skips edited rows. */
+    /** True once a human edits it, regeneration skips edited rows. */
     edited: boolean("edited").notNull().default(false),
     language: text("language").notNull().default("ka"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -344,7 +344,7 @@ export const transitInterpretationLibrary = pgTable(
   },
   (table) => [
     /**
-     * (key, language) — NOT key alone.
+     * (key, language), NOT key alone.
      *
      * `language` has existed since the table was created, but `key` was the
      * primary key, so the table could physically hold only ONE row per combo
@@ -365,7 +365,7 @@ export type TransitInterpretationLibraryRow =
 
 /**
  * Reusable moon-phase reading library. A moon-phase reading is collective
- * (same for everyone) and fully determined by (phase, moon sign) — the
+ * (same for everyone) and fully determined by (phase, moon sign), the
  * illumination % and cycle age are numeric garnish, not interpretation
  * inputs. 8 phases × 12 signs = 96 combos, each holding the COMPLETE
  * reading shape the daily moon_phase row uses (headline/summary/body/
@@ -388,7 +388,7 @@ export const moonPhaseInterpretationLibrary = pgTable(
     themes: jsonb("themes").$type<string[]>().notNull().default([]),
     /** Model id that produced it, "curated", or "manual" after an admin edit. */
     model: text("model").notNull(),
-    /** True once a human edits it — regeneration skips edited rows. */
+    /** True once a human edits it, regeneration skips edited rows. */
     edited: boolean("edited").notNull().default(false),
     language: text("language").notNull().default("ka"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -441,15 +441,15 @@ export type NewSignHoroscope = typeof signHoroscopes.$inferInsert;
 export type SignHoroscopePeriod = "day" | "week" | "month";
 
 /**
- * Reusable Astro-MBTI interpretation library — the pro-written, pre-generated
+ * Reusable Astro-MBTI interpretation library, the pro-written, pre-generated
  * bulk that a fast live `flash` call composes over at test time (same pattern
  * as the transit/house libraries). Two kinds:
  *
- *   - `kind='type'`     — (mbtiType): the deep psychological portrait of the
+ *   - `kind='type'`, (mbtiType): the deep psychological portrait of the
  *                         type. `title` holds its Georgian archetype name.
  *                         16 rows.
- *   - `kind='type_sun'` — (mbtiType, sun sign): "how this type expresses
- *                         through this Sun sign" — the reducible astro fusion.
+ *   - `kind='type_sun'`, (mbtiType, sun sign): "how this type expresses
+ *                         through this Sun sign", the reducible astro fusion.
  *                         16 × 12 = 192 rows.
  *
  * `key` is `${kind}:${mbtiType}[:${sign}]`, e.g. "type:INFJ", "type_sun:INFJ:leo".
@@ -472,7 +472,7 @@ export const mbtiInterpretationLibrary = pgTable(
     body: text("body").notNull(),
     /** Model id that produced it, or "manual" after an admin edit. */
     model: text("model").notNull(),
-    /** True once a human edits it — regeneration skips edited rows. */
+    /** True once a human edits it, regeneration skips edited rows. */
     edited: boolean("edited").notNull().default(false),
     language: text("language").notNull().default("ka"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -488,7 +488,7 @@ export type MbtiInterpretationLibraryRow =
   typeof mbtiInterpretationLibrary.$inferSelect;
 
 /**
- * The Astro-MBTI quiz questions — the editable surface of the test. Seeded from
+ * The Astro-MBTI quiz questions, the editable surface of the test. Seeded from
  * the canonical list in lib/mbti-questions.ts (`MBTI_QUESTIONS`), which stays
  * the source of truth for the *structure* (id → axis → pole, 12-per-axis
  * balance). Admins edit only `textKa` here (wording/grammar fixes), so scoring
@@ -497,11 +497,11 @@ export type MbtiInterpretationLibraryRow =
  * empty or unreachable.
  */
 export const mbtiQuestions = pgTable("mbti_question", {
-  /** Stable 1..60 — matches the id answers are keyed by. */
+  /** Stable 1..60, matches the id answers are keyed by. */
   id: integer("id").primaryKey(),
-  /** 'EI' | 'SN' | 'TF' | 'JP' | 'AT' — fixed structural metadata. */
+  /** 'EI' | 'SN' | 'TF' | 'JP' | 'AT', fixed structural metadata. */
   axis: text("axis").notNull(),
-  /** The pole agreeing pushes toward (E/I/…/A/T) — fixed structural metadata. */
+  /** The pole agreeing pushes toward (E/I/…/A/T), fixed structural metadata. */
   pole: text("pole").notNull(),
   /** Georgian statement shown to the taker (the editable field). */
   textKa: text("text_ka").notNull(),

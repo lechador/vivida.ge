@@ -41,7 +41,7 @@ export function PhoneVerify({
 }) {
   const en = locale !== "ka";
   const [phone, setPhone] = useState("");
-  /** Display copy of the verified number (E.164) — the input state stays
+  /** Display copy of the verified number (E.164), the input state stays
    *  raw so "change" restores exactly what the user typed. */
   const [verifiedPhone, setVerifiedPhone] = useState("");
   const [step, setStep] = useState<"enter" | "code" | "verified">("enter");

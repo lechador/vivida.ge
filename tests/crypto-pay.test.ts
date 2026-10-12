@@ -13,15 +13,15 @@ import type { CryptoPurchase } from "@/db/schema";
  * builder (reference included, %20 not "+").
  *
  * lib/crypto-pay.ts transitively imports @/db, which throws when
- * DATABASE_URL is unset. The pool it builds is lazy and never connects here —
- * the tested helpers only talk to fetch — so a placeholder keeps this pin
+ * DATABASE_URL is unset. The pool it builds is lazy and never connects here,
+ * the tested helpers only talk to fetch, so a placeholder keeps this pin
  * running in a plain `vitest run`.
  */
 process.env.DATABASE_URL ||= "postgres://vitest:***@localhost:5432/vitest";
 
 // 32-byte base58 fixtures: all-1s is 32 zero bytes; "z"×43 decodes to 32
 // bytes (a valid address); "z"×44 decodes to 33 bytes (regex-valid but
-// unpayable — the case strict validation exists for).
+// unpayable, the case strict validation exists for).
 const RECIPIENT = "1".repeat(32);
 const REFERENCE = "z".repeat(43);
 const OTHER_WALLET = "1".repeat(31) + "2";
@@ -97,7 +97,7 @@ describe("fetchConfirmedTransaction outcome mapping", () => {
     expect(await fetchConfirmedTransaction(SIG)).toEqual({ kind: "not_found" });
   });
 
-  it("a JSON-RPC error body is unavailable with its code — never paid, never permanent", async () => {
+  it("a JSON-RPC error body is unavailable with its code, never paid, never permanent", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(async () =>

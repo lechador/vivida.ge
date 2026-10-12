@@ -70,8 +70,8 @@ test.describe("public smoke flows", () => {
     ).toBeVisible();
     // Since vividaastro.com launched, the public English URL is the clean
     // /natal-chart; next.config.ts rewrites it onto the internal /en tree on
-    // the English hosts. Asserting the clean href is what guards the contract
-    // — a regression to an internal /en/* link would ship the wrong URL into
+    // the English hosts. Asserting the clean href is what guards the contract,
+    // a regression to an internal /en/* link would ship the wrong URL into
     // every English page's markup.
     const natalGuideLink = page.getByRole("link", {
       name: /Start with your natal chart/i,

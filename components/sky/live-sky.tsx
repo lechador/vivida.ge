@@ -39,7 +39,7 @@ const ELEMENT_FILL: Record<string, string> = {
   წყალი: "oklch(0.5 0.18 280 / 0.10)",
 };
 
-/** Accent per planet — Moon leads, so it gets the brightest treatment. */
+/** Accent per planet, Moon leads, so it gets the brightest treatment. */
 const PLANET_ACCENT: Record<string, string> = {
   sun: "oklch(0.85 0.16 85)",
   moon: "oklch(0.92 0.05 280)",
@@ -116,7 +116,7 @@ export function LiveSky({
   const en = locale !== "ka";
   // One shared 1s clock drives every readout + the wheel positions. The
   // planets move sub-pixel per tick (CSS transition smooths it), but the
-  // Moon's arcsecond readout visibly counts up — that's the "it's alive"
+  // Moon's arcsecond readout visibly counts up, that's the "it's alive"
   // moment this page exists for.
   // Seeded from the server sample, not Date.now(): this initializer runs on
   // the server too, and any clock difference would change the rendered
@@ -165,8 +165,8 @@ export function LiveSky({
           role="img"
           aria-label={
             en
-              ? "Live sky chart—current planetary positions in your natal houses"
-              : "ცოცხალი ცის რუკა — პლანეტების ამჟამინდელი პოზიციები შენს ნატალურ სახლებში"
+              ? "Live sky chart, current planetary positions in your natal houses"
+              : "ცოცხალი ცის რუკა, პლანეტების ამჟამინდელი პოზიციები შენს ნატალურ სახლებში"
           }
         >
           <defs>
@@ -205,7 +205,7 @@ export function LiveSky({
             );
           })}
 
-          {/* House band — the user's OWN houses; this is what makes the
+          {/* House band, the user's OWN houses; this is what makes the
               live sky personal rather than a generic ephemeris. */}
           {houseSectors.map(({ n, a1, mid }) => {
             const cusp1 = polar(R_ZODIAC_IN, a1);
@@ -242,7 +242,7 @@ export function LiveSky({
             stroke="oklch(0.98 0.01 300 / 0.15)"
           />
 
-          {/* Natal planets — small fixed embers of "you" */}
+          {/* Natal planets, small fixed embers of "you" */}
           {data.natal.map((p) => {
             const pos = polar(R_NATAL, clockAngle(p.longitude, data.ascLng));
             return (
@@ -256,7 +256,7 @@ export function LiveSky({
             );
           })}
 
-          {/* Transiting planets — the living layer */}
+          {/* Transiting planets, the living layer */}
           {data.planets.map((p) => {
             const lng = lngAt(
               p.longitude,

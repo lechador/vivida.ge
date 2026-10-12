@@ -8,7 +8,7 @@
 import { readFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
 
-// Load .env.local (simple parser — no dotenv dependency).
+// Load .env.local (simple parser, no dotenv dependency).
 try {
   for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
@@ -18,7 +18,7 @@ try {
 
 const FOUNDER = "endeladzegivi@gmail.com";
 const SITE = "https://www.vivida.ge";
-// RESEND_FROM may be a bare address or a full "Name <email>" string —
+// RESEND_FROM may be a bare address or a full "Name <email>" string,
 // normalize so the sender always shows "Vivida", never a raw mailbox name.
 const rawFrom = process.env.RESEND_FROM || "hello@vivida.ge";
 const FROM = rawFrom.includes("<") ? rawFrom : `Vivida <${rawFrom}>`;
@@ -30,18 +30,18 @@ const dry = process.argv.includes("--dry");
 const C = {
   subject: "შენ გაქვს 1 თვე Vivida Pro საჩუქრად ✨",
   intro:
-    "Vivida-ში სულ ვფიქრობთ, როგორ გავაღრმავოთ შენი კავშირი ვარსკვლავებთან — და ბოლო პერიოდში ბევრი ლამაზი რამ შევქმენით. გვინდა პირველებმა შენ გაჩუქოთ.",
+    "Vivida-ში სულ ვფიქრობთ, როგორ გავაღრმავოთ შენი კავშირი ვარსკვლავებთან, და ბოლო პერიოდში ბევრი ლამაზი რამ შევქმენით. გვინდა პირველებმა შენ გაჩუქოთ.",
   features: [
-    { e: "🎧", t: "ჰოროსკოპის მოსმენა", d: "ყოველდღიური ჰოროსკოპის მოსმენა ხმით, პოდკასტის სტილში — როცა გინდა, სადაც გინდა." },
-    { e: "🔮", t: "ჰკითხე ვარსკვლავებს", d: "AI ასტროლოგი, რომელიც სწორედ შენს ნატალურ რუკას იცნობს და ნებისმიერ შეკითხვას უპასუხებს — ხასიათი, სიყვარული, კარიერა თუ დროის სწორად შერჩევა." },
-    { e: "🗓️", t: "საუკეთესო დღეები", d: "პერსონალური კალენდარი — როდის უბერავს ქარი ზურგში და როდის ღირს სიფრთხილე." },
-    { e: "❤️‍🔥", t: "ღრმა თავსებადობა", d: "სრული AI ანალიზი შენსა და ნებისმიერ ადამიანს შორის — როგორ ეწყობით ერთმანეთს ყველა დონეზე." },
+    { e: "🎧", t: "ჰოროსკოპის მოსმენა", d: "ყოველდღიური ჰოროსკოპის მოსმენა ხმით, პოდკასტის სტილში, როცა გინდა, სადაც გინდა." },
+    { e: "🔮", t: "ჰკითხე ვარსკვლავებს", d: "AI ასტროლოგი, რომელიც სწორედ შენს ნატალურ რუკას იცნობს და ნებისმიერ შეკითხვას უპასუხებს, ხასიათი, სიყვარული, კარიერა თუ დროის სწორად შერჩევა." },
+    { e: "🗓️", t: "საუკეთესო დღეები", d: "პერსონალური კალენდარი, როდის უბერავს ქარი ზურგში და როდის ღირს სიფრთხილე." },
+    { e: "❤️‍🔥", t: "ღრმა თავსებადობა", d: "სრული AI ანალიზი შენსა და ნებისმიერ ადამიანს შორის, როგორ ეწყობით ერთმანეთს ყველა დონეზე." },
     { e: "📄", t: "ნატალური რუკის სრული ანგარიში PDF-ში", d: "10+ გვერდიანი ღრმა ანალიზი შენი პიროვნების, ძლიერი მხარეებისა და ცხოვრების გზის შესახებ." },
   ],
-  giftTitle: "🎁 შენი საჩუქარი: 1 თვე Vivida Pro — უფასოდ",
+  giftTitle: "🎁 შენი საჩუქარი: 1 თვე Vivida Pro, უფასოდ",
   giftBody:
-    "რადგან შენ ჩვენი ერთ-ერთი პირველი მომხმარებელი ხარ, ვინც ნატალური რუკა შეავსო, საჩუქრად გჩუქნით 1 თვის Vivida Pro-ს სრულ წვდომას. საჩუქარი უკვე გააქტიურებულია — უბრალოდ შედი Vivida-ზე და ისიამოვნე ყველა ფუნქციით.",
-  upcoming: "ეს მხოლოდ დასაწყისია — კიდევ ბევრი საინტერესო რამ მოდის.",
+    "რადგან შენ ჩვენი ერთ-ერთი პირველი მომხმარებელი ხარ, ვინც ნატალური რუკა შეავსო, საჩუქრად გჩუქნით 1 თვის Vivida Pro-ს სრულ წვდომას. საჩუქარი უკვე გააქტიურებულია, უბრალოდ შედი Vivida-ზე და ისიამოვნე ყველა ფუნქციით.",
+  upcoming: "ეს მხოლოდ დასაწყისია, კიდევ ბევრი საინტერესო რამ მოდის.",
   feedback:
     "და ყველაზე მთავარი: ფუნქციების გამოცდის შემდეგ დაგვიწერე შთაბეჭდილება Vivida-ს ფიდზე. შენი აზრი ნამდვილად მნიშვნელოვანია ჩვენთვის.",
   button: "გახსენი Pro ფუნქციები",
@@ -145,7 +145,7 @@ async function main() {
     throw new Error(`unknown mode: ${mode}`);
   }
 
-  console.log(`mode=${mode} recipients=${recipients.length}${dry ? " (DRY RUN — nothing sent)" : ""}`);
+  console.log(`mode=${mode} recipients=${recipients.length}${dry ? " (DRY RUN, nothing sent)" : ""}`);
   if (dry) {
     recipients.slice(0, 10).forEach((r) => console.log(" -", r.email, r.name ?? ""));
     return;

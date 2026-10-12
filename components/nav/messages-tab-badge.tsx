@@ -16,7 +16,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  *   - vivida:chat-message → +1 (only fires when not actively viewing)
  *   - vivida:chat-cleared → -clearedCount when a conversation is opened
  *
- * The badge component never queries the DB itself — the SSE pump (modal
+ * The badge component never queries the DB itself, the SSE pump (modal
  * launcher in background mode, or the /messages page) is the source of
  * truth for "what's new".
  */

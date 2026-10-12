@@ -10,7 +10,7 @@ import { isAccountRestricted } from "@/lib/restriction";
 /**
  * Phone-gift campaign core: the credits the number-verification campaign pays
  * out. Both grants are exactly-once per user (advisory-locked ledger refs, so
- * concurrent retries can't double-pay) and never fire for PRO — the campaign
+ * concurrent retries can't double-pay) and never fire for PRO, the campaign
  * targets free users, and PRO bypasses every credit gate anyway. Amounts live
  * in lib/credits-config.ts.
  */
@@ -29,7 +29,7 @@ export async function grantPhoneVerifyGift(userId: string): Promise<boolean> {
       verifyGiftRef(userId),
     );
   } catch (err) {
-    // A grant failure must never fail the verification itself — by the time
+    // A grant failure must never fail the verification itself, by the time
     // this runs the SMS code is already consumed, so a retry cannot reach it.
     console.warn(
       "[phone-gift] verify grant failed:",

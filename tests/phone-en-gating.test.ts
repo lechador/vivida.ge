@@ -87,7 +87,7 @@ describe("phone stack on the Georgian host", () => {
       phone: "555123456",
       purpose: "login",
     });
-    // Either a rate-limit/code-send outcome — never the region gate.
+    // Either a rate-limit/code-send outcome, never the region gate.
     if (!result.ok) expect(result.code).not.toBe("unavailable_region");
   });
 });

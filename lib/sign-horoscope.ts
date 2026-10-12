@@ -1,5 +1,5 @@
 /**
- * Pure helpers for sign-level SEO horoscope pages — date-anchor math,
+ * Pure helpers for sign-level SEO horoscope pages, date-anchor math,
  * period-key derivation, Georgian-localized period labels. Kept separate
  * from actions/sign-horoscope.ts because Next.js 16 server-action files
  * may only export async functions; sync helpers belong here.
@@ -24,7 +24,7 @@ const WEEKDAYS_KA = [
  *   month → 1st of that month (UTC)
  *
  * UTC is the natural anchor because the horoscope is content-shared
- * across all readers — picking any single timezone would be arbitrary
+ * across all readers, picking any single timezone would be arbitrary
  * and computeTransits already runs at noon UTC internally.
  */
 export function periodAnchorDate(
@@ -83,7 +83,7 @@ export function signHoroscopePeriodKey(
 }
 
 /**
- * Human-readable Georgian label for the period — used in the page <h1>,
+ * Human-readable Georgian label for the period, used in the page <h1>,
  * meta description, and as a hint passed to the AI prompt. Examples:
  *   day   → "ხუთშაბათი, 4 მაისი 2026"
  *   week  → "4-10 მაისი 2026" (or "29 აპრილი – 5 მაისი 2026" across months)
@@ -110,7 +110,7 @@ export function signHoroscopePeriodLabel(
 }
 
 /**
- * View-level horoscope variant — what the URL exposes. Differs from the
+ * View-level horoscope variant, what the URL exposes. Differs from the
  * DB `SignHoroscopePeriod`: "today" and "tomorrow" both map to DB
  * period="day" but with different anchor dates. Treating these as one
  * concept at the URL/UI layer keeps page metadata + sibling-link logic

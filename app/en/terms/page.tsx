@@ -18,7 +18,7 @@ const DESCRIPTION =
 const LAST_UPDATED = "October 11, 2026";
 
 export const metadata: Metadata = {
-  title: { absolute: `${TITLE} — Vivida` },
+  title: { absolute: `${TITLE}, Vivida` },
   description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/terms", "en"),
   openGraph: {
@@ -53,7 +53,7 @@ export default function EnglishTermsPage() {
         <h2>2. Eligibility and accounts</h2>
         <p>
           You must be at least 16 years old; if you are under 16, a parent or
-          legal guardian must consent — contact us at hello@vivida.ge to arrange
+          legal guardian must consent, contact us at hello@vivida.ge to arrange
           this, as registration technically requires age 16 or older. If you are
           under 18, a parent or legal guardian must approve any paid purchase.
           Accounts may be created through Google sign-in or email. You are
@@ -68,7 +68,7 @@ export default function EnglishTermsPage() {
           The price, currency and included access are shown before purchase. On
           the English site, purchases are paid in USDC on the Solana network and
           PRO is sold as a one-time 30-day pass that does not renew
-          automatically — when it ends, access simply stops and you can buy
+          automatically, when it ends, access simply stops and you can buy
           another pass whenever you like. Where a PRO subscription is offered
           instead (for example on the Georgian site), it renews automatically at
           the interval shown before purchase until cancelled; you can cancel

@@ -100,7 +100,7 @@ export default async function ReportPage({
         className="relative isolate flex flex-1 flex-col overflow-hidden"
       >
         <ClearPendingNatalProfile />
-        {/* Layered nebula glows — three radial gradients at different points,
+        {/* Layered nebula glows, three radial gradients at different points,
           one slowly drifting for life. Together they lift the page out of
           a flat dark, evoking deep cosmos rather than a black screen. */}
         <div
@@ -129,7 +129,7 @@ export default async function ReportPage({
           <p className="mb-6 max-w-xl text-sm text-foreground/75 sm:text-base">
             {en
               ? "The sky at your birth moment, explored one layer at a time."
-              : "ცა შენი დაბადების წამში — ნელ-ნელა, ერთი ნაბიჯი მერე მეორე."}
+              : "ცა შენი დაბადების წამში, ნელ-ნელა, ერთი ნაბიჯი მერე მეორე."}
           </p>
 
           <div className="mb-6">

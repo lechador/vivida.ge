@@ -1,5 +1,5 @@
 /**
- * Georgian mobile-number helpers (pure — no DB, safe to unit-test).
+ * Georgian mobile-number helpers (pure, no DB, safe to unit-test).
  *
  * Storage format is E.164 (`+995XXXXXXXXX`); sender.ge wants the 9-digit
  * national form (`5XXXXXXXX`) as its `destination` parameter. Only Georgian
@@ -49,7 +49,7 @@ export function isValidGeorgianMobile(raw: string): boolean {
   return normalizeGeorgianMobile(raw) !== null;
 }
 
-/** 9-digit national form (`5XXXXXXXX`) — sender.ge's `destination` value. */
+/** 9-digit national form (`5XXXXXXXX`), sender.ge's `destination` value. */
 export function nationalDigits(e164: string): string | null {
   const match = /^\+995(\d{9})$/.exec(e164.trim());
   if (!match || !isNationalMobile(match[1])) return null;
@@ -63,7 +63,7 @@ export function formatGeorgianMobile(e164: string): string {
   return `+995 ${national.slice(0, 3)} ${national.slice(3, 6)} ${national.slice(6)}`;
 }
 
-/** Log-safe mask — keeps the country code and the first/last digit pair. */
+/** Log-safe mask, keeps the country code and the first/last digit pair. */
 export function maskGeorgianMobile(e164: string): string {
   const national = nationalDigits(e164);
   if (!national) return "…";

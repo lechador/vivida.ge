@@ -26,7 +26,7 @@ export const profiles = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     dateOfBirth: date("date_of_birth", { mode: "string" }),
     timeOfBirth: time("time_of_birth"),
-    /** Self-reported or AI-inferred sex — 'male' | 'female' (null = unknown /
+    /** Self-reported or AI-inferred sex, 'male' | 'female' (null = unknown /
      *  chose to skip). Used only for aggregate audience analytics, never shown
      *  publicly. */
     gender: text("gender"),
@@ -49,11 +49,11 @@ export const profiles = pgTable(
      * directory, people search, and "suggested people" rails. Default true
      * (public for new accounts; explicit opt-out toggle in onboarding +
      * Account). Their /u/[username] page stays reachable by direct link
-     * either way — this only controls being *browsable*.
+     * either way, this only controls being *browsable*.
      */
     discoverable: boolean("discoverable").notNull().default(true),
     /** Opt-in: show the user's latest test results on their public /u/[username]
-     *  page. Off by default — results are private until the taker chooses to
+     *  page. Off by default, results are private until the taker chooses to
      *  display them (toggle on the result page). Per test kind. */
     showMbtiResult: boolean("show_mbti_result").notNull().default(false),
     showIqResult: boolean("show_iq_result").notNull().default(false),
@@ -103,7 +103,7 @@ export const charts = pgTable("chart", {
 });
 
 /**
- * Profile photos — Tinder-style carousel for public profiles. Stored in
+ * Profile photos, Tinder-style carousel for public profiles. Stored in
  * Cloudflare R2 under `users/{userId}/{photoId}.{ext}`. `url` is the
  * cached public URL (precomputed so reads don't need extra resolution).
  * `ready=false` rows exist briefly between the presigned-URL handout and
@@ -116,9 +116,9 @@ export const profilePhotos = pgTable("profile_photo", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  /** R2 object key — used for delete + presigned URL generation. */
+  /** R2 object key, used for delete + presigned URL generation. */
   key: text("key").notNull().unique(),
-  /** Public URL — cached for fast reads on profile views. */
+  /** Public URL, cached for fast reads on profile views. */
   url: text("url").notNull(),
   sortOrder: integer("sort_order").notNull().default(0),
   /** false until the client confirms the file was successfully uploaded. */

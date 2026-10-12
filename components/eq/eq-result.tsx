@@ -146,7 +146,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
         </p>
       </div>
 
-      {/* 5-domain profile — gated behind login here */}
+      {/* 5-domain profile, gated behind login here */}
       <div className="relative overflow-hidden rounded-3xl">
         <div
           className={
@@ -165,7 +165,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
               <p className="mx-auto mt-3 max-w-xs text-pretty text-sm text-foreground/85">
                 {en
                   ? "Create a free account to save your result and explore all five areas of your emotional profile."
-                  : "დარეგისტრირდი უფასოდ და ნახე შენი ემოციური რუკა ხუთივე სფეროში — და შეინახე შედეგი."}
+                  : "დარეგისტრირდი უფასოდ და ნახე შენი ემოციური რუკა ხუთივე სფეროში, და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
                 <Link href="/signup?from=eq">
@@ -202,7 +202,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
       <p className="mx-auto max-w-lg text-center text-xs leading-relaxed text-muted-foreground">
         {en
           ? "This is a self-report assessment and reflects how you perceive your own emotional skills. It is not a clinical diagnosis."
-          : "ეს არის თვითშეფასების ტესტი — ის ასახავს იმას, როგორ აღიქვამ საკუთარ ემოციურ უნარებს. ეს არ არის კლინიკური დიაგნოზი."}
+          : "ეს არის თვითშეფასების ტესტი, ის ასახავს იმას, როგორ აღიქვამ საკუთარ ემოციურ უნარებს. ეს არ არის კლინიკური დიაგნოზი."}
       </p>
     </div>
   );

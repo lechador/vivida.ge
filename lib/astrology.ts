@@ -28,7 +28,7 @@ export function hashInput(input: NatalInput): string {
 
 /**
  * Compute the major chart-internal aspects (planets + Asc + MC) for a chart.
- * Exported so we can re-run it on every chart read — that way orb-tolerance
+ * Exported so we can re-run it on every chart read, that way orb-tolerance
  * tweaks (in lib/aspects.ts) propagate without needing to bust the DB cache.
  */
 export function computeAspectsFor(data: NatalChartJson): NatalAspectJson[] {
@@ -37,7 +37,7 @@ export function computeAspectsFor(data: NatalChartJson): NatalAspectJson[] {
   for (const [k, v] of Object.entries(data.bodies)) {
     points[k] = { longitude: v.longitude };
   }
-  // Include the angles — Asc + MC aspects matter a lot for personality.
+  // Include the angles, Asc + MC aspects matter a lot for personality.
   if (data.ascendant) {
     points.ascendant = { longitude: data.ascendant.longitude };
   }
@@ -48,7 +48,7 @@ export function computeAspectsFor(data: NatalChartJson): NatalAspectJson[] {
 }
 
 /**
- * Local computation is the primary source — it's the same Swiss Ephemeris
+ * Local computation is the primary source, it's the same Swiss Ephemeris
  * data freeastrologyapi.com uses, just in-process, with no rate limits and
  * no network failure modes.
  *

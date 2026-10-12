@@ -15,7 +15,7 @@ const PATH = "/tavsebadoba";
 
 /**
  * Focused, distraction-light landing page used as the Facebook ad
- * destination. The interactive compatibility calculator is the hero — cold
+ * destination. The interactive compatibility calculator is the hero, cold
  * traffic gets an instant, shareable result with no signup, then a single
  * CTA into the product. Kept separate from the SEO hub at
  * /zodiac/tavsebadoba so the ad message → page → action stays tight.
@@ -25,11 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const en = locale === "en";
   const title = en
-    ? "Zodiac Compatibility Calculator — Check Your Match | Vivida"
-    : "ზოდიაქოს თავსებადობა — შეამოწმე შენი წყვილი | Vivida";
+    ? "Zodiac Compatibility Calculator, Check Your Match | Vivida"
+    : "ზოდიაქოს თავსებადობა, შეამოწმე შენი წყვილი | Vivida";
   const description = en
     ? "Choose two zodiac signs and check your love compatibility instantly, free and without registration. Then explore complete natal-chart compatibility on Vivida."
-    : "გაიგე რამდენად თავსებადი ხართ შენ და შენი სიყვარული ზოდიაქოს ნიშნების მიხედვით — უფასოდ, 10 წამში. შემდეგ ნახე სრული ნატალური თავსებადობა Vivida-ზე.";
+    : "გაიგე რამდენად თავსებადი ხართ შენ და შენი სიყვარული ზოდიაქოს ნიშნების მიხედვით, უფასოდ, 10 წამში. შემდეგ ნახე სრული ნატალური თავსებადობა Vivida-ზე.";
   return {
     title: { absolute: title },
     description,
@@ -74,7 +74,7 @@ const TRUST_KA = [
 ];
 
 const TRUST_EN = [
-  { icon: Check, label: "Free—no card required" },
+  { icon: Check, label: "Free, no card required" },
   { icon: Lock, label: "No registration" },
   { icon: Sparkles, label: "Instant result" },
 ];
@@ -96,7 +96,7 @@ export default async function TavsebadobaPage() {
       />
       <Starfield count={140} shooting={3} />
 
-      {/* Minimal header — fewer exits on cold ad traffic */}
+      {/* Minimal header, fewer exits on cold ad traffic */}
       <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
         <Link href={"/"} className="flex items-center gap-2">
           <VividaMark size={36} id="tavsebadoba" />
@@ -136,8 +136,8 @@ export default async function TavsebadobaPage() {
 
         <p className="mx-auto mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg">
           {en
-            ? "Choose two zodiac signs and discover your compatibility instantly—free."
-            : "აირჩიე ორი ნიშანი და გაიგე თქვენი თავსებადობა მყისიერად — უფასოდ."}
+            ? "Choose two zodiac signs and discover your compatibility instantly, free."
+            : "აირჩიე ორი ნიშანი და გაიგე თქვენი თავსებადობა მყისიერად, უფასოდ."}
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">

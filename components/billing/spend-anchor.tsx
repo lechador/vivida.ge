@@ -7,9 +7,9 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Personalized PRO anchor for the credits hub: "your last-30-day spend was
- * worth ≈₾X — PRO would have been ₾Y". Renders nothing for premium users
+ * worth ≈₾X, PRO would have been ₾Y". Renders nothing for premium users
  * (the caller gates) or light spenders with nothing to anchor against.
- * Spend is a value signal, not a cash total — copy says "worth", never
+ * Spend is a value signal, not a cash total, copy says "worth", never
  * "you paid", since free-allowance spend rides the same ledger.
  */
 export function SpendAnchor({
@@ -58,7 +58,7 @@ export function SpendAnchor({
                 >
                   PRO ({pro}/mo)
                 </Link>{" "}
-                would have been cheaper — saving you {save}.
+                would have been cheaper, saving you {save}.
               </>
             ) : (
               <>
@@ -88,7 +88,7 @@ export function SpendAnchor({
                 >
                   PRO ({pro}/თვეში)
                 </Link>{" "}
-                იაფი დაგიჯდებოდა — დაზოგავდი {save}.
+                იაფი დაგიჯდებოდა, დაზოგავდი {save}.
               </>
             ) : (
               <>

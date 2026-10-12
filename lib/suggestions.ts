@@ -6,7 +6,7 @@ import { getDiscoveryFeed, shuffle, type DiscoverCard } from "./discover";
  * Quality + rotation, not a fixed leaderboard: taking the top-N by
  * compatibility verbatim meant the exact same faces in the exact same order
  * on every load. Instead we pool the strongest candidates (3× the requested
- * limit, compatibility-ranked — the discovery feed itself samples candidates
+ * limit, compatibility-ranked, the discovery feed itself samples candidates
  * randomly, so pool membership rotates too) and shuffle the pool, so every
  * visit surfaces a fresh mix that still skews compatible.
  */

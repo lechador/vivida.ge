@@ -297,7 +297,7 @@ export function RosenbergTest() {
 
       <div className="mt-6 flex items-start gap-2.5 border-t border-border/70 pt-5 text-xs leading-relaxed text-muted-foreground">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
-        პასუხები მხოლოდ ამ გვერდზე მუშავდება — ისინი Vivida-ს სერვერზე არ
+        პასუხები მხოლოდ ამ გვერდზე მუშავდება, ისინი Vivida-ს სერვერზე არ
         იგზავნება და გვერდის განახლების შემდეგ ქრება.
       </div>
     </div>

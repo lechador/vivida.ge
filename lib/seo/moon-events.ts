@@ -147,11 +147,11 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2026-08-12-mzis-sruli-dabneleba",
     date: "2026-08-12",
-    title: "მზის სრული დაბნელება — 12 აგვისტო 2026",
+    title: "მზის სრული დაბნელება, 12 აგვისტო 2026",
     type: "solar",
     subtype: "სრული",
     visibility:
-      "სრული ფაზა: გრენლანდია, ისლანდია, ესპანეთი, რუსეთი და პორტუგალიის მცირე ნაწილი; ნაწილობრივი ფაზა — ევროპისა და სხვა ფართო რეგიონებიდან.",
+      "სრული ფაზა: გრენლანდია, ისლანდია, ესპანეთი, რუსეთი და პორტუგალიის მცირე ნაწილი; ნაწილობრივი ფაზა, ევროპისა და სხვა ფართო რეგიონებიდან.",
     description: "მთვარე მზის დისკოს სრულად ფარავს სრული ფაზის ვიწრო ზოლში.",
     source:
       "https://science.nasa.gov/eclipses/future-eclipses/total-solar-eclipse-on-august-12-2026/",
@@ -159,7 +159,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2026-08-28-mtvaris-nawilobrivi-dabneleba",
     date: "2026-08-28",
-    title: "მთვარის ნაწილობრივი დაბნელება — 28 აგვისტო 2026",
+    title: "მთვარის ნაწილობრივი დაბნელება, 28 აგვისტო 2026",
     type: "lunar",
     subtype: "ნაწილობრივი",
     visibility: "აღმოსავლეთ წყნარი ოკეანე, ამერიკა, ევროპა და აფრიკა.",
@@ -169,7 +169,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2027-02-06-mzis-rgolisebri-dabneleba",
     date: "2027-02-06",
-    title: "მზის რგოლისებრი დაბნელება — 6 თებერვალი 2027",
+    title: "მზის რგოლისებრი დაბნელება, 6 თებერვალი 2027",
     type: "solar",
     subtype: "რგოლისებრი",
     visibility:
@@ -181,7 +181,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2027-02-20-mtvaris-naxevarchrdilovani-dabneleba",
     date: "2027-02-20",
-    title: "მთვარის ნახევარჩრდილოვანი დაბნელება — 20 თებერვალი 2027",
+    title: "მთვარის ნახევარჩრდილოვანი დაბნელება, 20 თებერვალი 2027",
     type: "lunar",
     subtype: "ნახევარჩრდილოვანი",
     visibility:
@@ -192,7 +192,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2027-07-18-mtvaris-naxevarchrdilovani-dabneleba",
     date: "2027-07-18",
-    title: "მთვარის ნახევარჩრდილოვანი დაბნელება — 18 ივლისი 2027",
+    title: "მთვარის ნახევარჩრდილოვანი დაბნელება, 18 ივლისი 2027",
     type: "lunar",
     subtype: "ნახევარჩრდილოვანი",
     visibility: "ანტარქტიდა, ავსტრალია და ინდოეთის ოკეანის რეგიონი.",
@@ -203,7 +203,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2027-08-02-mzis-sruli-dabneleba",
     date: "2027-08-02",
-    title: "მზის სრული დაბნელება — 2 აგვისტო 2027",
+    title: "მზის სრული დაბნელება, 2 აგვისტო 2027",
     type: "solar",
     subtype: "სრული",
     visibility:
@@ -215,7 +215,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2027-08-17-mtvaris-naxevarchrdilovani-dabneleba",
     date: "2027-08-17",
-    title: "მთვარის ნახევარჩრდილოვანი დაბნელება — 17 აგვისტო 2027",
+    title: "მთვარის ნახევარჩრდილოვანი დაბნელება, 17 აგვისტო 2027",
     type: "lunar",
     subtype: "ნახევარჩრდილოვანი",
     visibility: "წყნარი ოკეანის რეგიონი და მიმდებარე ტერიტორიები.",
@@ -225,7 +225,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2028-01-12-mtvaris-nawilobrivi-dabneleba",
     date: "2028-01-12",
-    title: "მთვარის ნაწილობრივი დაბნელება — 12 იანვარი 2028",
+    title: "მთვარის ნაწილობრივი დაბნელება, 12 იანვარი 2028",
     type: "lunar",
     subtype: "ნაწილობრივი",
     visibility: "ამერიკა, ევროპა და აფრიკა.",
@@ -235,7 +235,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2028-01-26-mzis-rgolisebri-dabneleba",
     date: "2028-01-26",
-    title: "მზის რგოლისებრი დაბნელება — 26 იანვარი 2028",
+    title: "მზის რგოლისებრი დაბნელება, 26 იანვარი 2028",
     type: "solar",
     subtype: "რგოლისებრი",
     visibility:
@@ -246,7 +246,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2028-07-06-mtvaris-nawilobrivi-dabneleba",
     date: "2028-07-06",
-    title: "მთვარის ნაწილობრივი დაბნელება — 6 ივლისი 2028",
+    title: "მთვარის ნაწილობრივი დაბნელება, 6 ივლისი 2028",
     type: "lunar",
     subtype: "ნაწილობრივი",
     visibility: "ევროპა, აფრიკა, აზია და ავსტრალია.",
@@ -256,7 +256,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2028-07-22-mzis-sruli-dabneleba",
     date: "2028-07-22",
-    title: "მზის სრული დაბნელება — 22 ივლისი 2028",
+    title: "მზის სრული დაბნელება, 22 ივლისი 2028",
     type: "solar",
     subtype: "სრული",
     visibility:
@@ -268,7 +268,7 @@ export const ECLIPSES: Eclipse[] = [
   {
     slug: "2028-12-31-mtvaris-sruli-dabneleba",
     date: "2028-12-31",
-    title: "მთვარის სრული დაბნელება — 31 დეკემბერი 2028",
+    title: "მთვარის სრული დაბნელება, 31 დეკემბერი 2028",
     type: "lunar",
     subtype: "სრული",
     visibility: "ევროპა, აფრიკა, აზია, ავსტრალია და წყნარი ოკეანე.",

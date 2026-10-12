@@ -12,12 +12,12 @@ import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/tvit-shepasebis-testi";
-const TITLE = "თვითშეფასების ტესტი — Rosenberg-ის 10-კითხვიანი სკალა";
+const TITLE = "თვითშეფასების ტესტი, Rosenberg-ის 10-კითხვიანი სკალა";
 const DESCRIPTION =
   "გაიარე Rosenberg-ის თვითშეფასების 10-კითხვიანი ტესტი ქართულად. მიიღე 0-30 ქულა, ფრთხილი განმარტება და შენს პასუხებზე მორგებული რეფლექსიის თემები.";
 
 export const metadata: Metadata = {
-  title: { absolute: TITLE + " — Vivida" },
+  title: { absolute: TITLE + ", Vivida" },
   description: DESCRIPTION,
   keywords: [
     "თვითშეფასების ტესტი",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "რას ზომავს Rosenberg-ის სკალა?",
-    a: "ის ზომავს გლობალურ თვითშეფასებას — რამდენად ღირებულად, საკმარისად და პატივისცემის ღირსად აღიქვამ საკუთარ თავს მთლიანობაში.",
+    a: "ის ზომავს გლობალურ თვითშეფასებას, რამდენად ღირებულად, საკმარისად და პატივისცემის ღირსად აღიქვამ საკუთარ თავს მთლიანობაში.",
   },
   {
     q: "როგორ ითვლება შედეგი?",
@@ -145,7 +145,7 @@ export default async function SelfEsteemTestPage() {
             რას ზომავს ეს ტესტი?
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            Rosenberg-ის სკალა ზომავს გლობალურ თვითშეფასებას — არა ერთ კონკრეტულ
+            Rosenberg-ის სკალა ზომავს გლობალურ თვითშეფასებას, არა ერთ კონკრეტულ
             უნარს ან გარეგნობით კმაყოფილებას, არამედ საკუთარ თავთან საერთო
             დამოკიდებულებას. მაღალი ქულა ნიშნავს უფრო მყარ მიღებასა და
             თვითპატივისცემას; ის არ ნიშნავს ნარცისიზმს ან სხვებზე აღმატებულობას.
@@ -158,7 +158,7 @@ export default async function SelfEsteemTestPage() {
             თითოეული პასუხი 0–3 ქულაა. დადებითად ფორმულირებული 1, 3, 4, 7 და 10
             პუნქტები პირდაპირ, ხოლო უარყოფითად ფორმულირებული 2, 5, 6, 8 და 9
             პუნქტები შებრუნებულად ითვლება. ჯამური ქულაა 0–30. ტესტში ნეიტრალური
-            პასუხი განზრახ არ არის — ეს ორიგინალი ოთხპასუხიანი ფორმატის ნაწილია.
+            პასუხი განზრახ არ არის, ეს ორიგინალი ოთხპასუხიანი ფორმატის ნაწილია.
           </p>
 
           <div className="mt-7 rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/7 p-4 text-sm leading-relaxed text-foreground/80">

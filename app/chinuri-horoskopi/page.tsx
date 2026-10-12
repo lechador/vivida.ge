@@ -23,9 +23,9 @@ import { paragraphs } from "@/lib/seo/zodiac-content";
 const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/chinuri-horoskopi`;
 
-const FALLBACK_TITLE = "ჩინური ჰოროსკოპი — ზოდიაქოს ნიშნები წლების მიხედვით";
+const FALLBACK_TITLE = "ჩინური ჰოროსკოპი, ზოდიაქოს ნიშნები წლების მიხედვით";
 const FALLBACK_DESC =
-  "ჩინური ჰოროსკოპი ქართულად — გაიგე შენი ცხოველი დაბადების წლის მიხედვით. 12 ნიშანი: ვირთხა, ხარი, ვეფხვი, კურდღელი, დრაკონი, გველი, ცხენი, თხა, მაიმუნი, მამალი, ძაღლი, ღორი.";
+  "ჩინური ჰოროსკოპი ქართულად, გაიგე შენი ცხოველი დაბადების წლის მიხედვით. 12 ნიშანი: ვირთხა, ხარი, ვეფხვი, კურდღელი, დრაკონი, გველი, ცხენი, თხა, მაიმუნი, მამალი, ძაღლი, ღორი.";
 
 export const revalidate = 604800;
 
@@ -164,7 +164,7 @@ export default async function ChineseZodiacHubPage() {
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-pretty text-base text-foreground/80 sm:text-lg">
-            ზოდიაქოს ნიშნები წლების მიხედვით — გაიგე შენი ცხოველი დაბადების წლით
+            ზოდიაქოს ნიშნები წლების მიხედვით, გაიგე შენი ცხოველი დაბადების წლით
             და აღმოაჩინე მისი ხასიათი, თავსებადობა და მეტი.
           </p>
         </header>

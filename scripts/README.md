@@ -1,14 +1,14 @@
-# scripts/ — catalog
+# scripts/, catalog
 
 One-off ops, content pipelines, and repo-health checks. Every script documents
-its own usage + idempotency in its header — read it before running. Nothing
+its own usage + idempotency in its header, read it before running. Nothing
 here runs in production on its own (except via explicit manual invocation);
 scheduled work lives in `vercel.json` crons → `app/api/cron/*`.
 
 Conventions:
 
-- `.mjs` — plain Node, `node scripts/<name>.mjs [--dry]`.
-- `.mts` / `.tsx` — TypeScript, `npx tsx scripts/<name>`.
+- `.mjs`, plain Node, `node scripts/<name>.mjs [--dry]`.
+- `.mts` / `.tsx`, TypeScript, `npx tsx scripts/<name>`.
 - Destructive scripts default to `--dry` / preflight mode. Never add a script
   that writes on a bare run.
 - Seeds and translators must be re-runnable (upserts, `IF NOT EXISTS`).
@@ -30,7 +30,7 @@ Conventions:
 | `create-am-stripe-price.mjs`             | Idempotently creates the AMD Stripe price.                                             |
 | `create-dollar-market-stripe-prices.mjs` | Idempotently creates the US/CA/AU/NZ Stripe prices (`--apply`, `--checkout-smoke`).    |
 
-## One-shot ops (archived — do not re-run without reading the header)
+## One-shot ops (archived, do not re-run without reading the header)
 
 | Script                                | Purpose                                                                             |
 | ------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -49,7 +49,7 @@ Conventions:
 | ------------------- | -------------------------------------------------------- |
 | `scan-underage.mjs` | Scans for under-age accounts. Takes no action by itself. |
 
-## Campaigns (idempotent — preflight first, `--execute` to send)
+## Campaigns (idempotent, preflight first, `--execute` to send)
 
 | Script                                                                   | Purpose                                                                                               |
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
@@ -57,7 +57,7 @@ Conventions:
 | `announce-email.mjs`, `announce-free-email.mjs`, `announce-iq-email.mjs` | Bulk announcement sends.                                                                              |
 | `post-iq-feed.mjs`                                                       | IQ feed post.                                                                                         |
 
-## Content generation (LLM-assisted — review the diff)
+## Content generation (LLM-assisted, review the diff)
 
 `generate-home-content.mjs`, `generate-synastry-aspects.mjs`,
 `generate-yearly-content.mjs`, `generate-zodiac-content.mjs`,

@@ -118,8 +118,8 @@ export function FastOnboarding({
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
         {en
-          ? "Your birth details are already saved — no need to enter them twice."
-          : "დაბადების მონაცემები უკვე შენახულია — მეორედ შეყვანა აღარ დაგჭირდება."}
+          ? "Your birth details are already saved, no need to enter them twice."
+          : "დაბადების მონაცემები უკვე შენახულია, მეორედ შეყვანა აღარ დაგჭირდება."}
       </p>
     </div>
   );

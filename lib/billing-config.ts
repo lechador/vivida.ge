@@ -16,7 +16,7 @@ export type PremiumPlan = {
   amountMinor: number;
   currency: BillingCurrency;
   interval: "month";
-  /** Months per billing cycle. Absent means 1 — the standard monthly plans. */
+  /** Months per billing cycle. Absent means 1, the standard monthly plans. */
   intervalCount?: number;
   stripeLookupKey: string;
 };
@@ -43,7 +43,7 @@ export function shouldShowPurchasePromotion({
  *
  * Priced for the local market rather than converted from the UK sheet: the
  * previous ladder charged ₾50 for 130 credits (more, in absolute terms, than
- * the UK paid for 180) and got *worse* per credit as the pack grew — ₾20/45
+ * the UK paid for 180) and got *worse* per credit as the pack grew, ₾20/45
  * was the weakest rung of the three. Credits per lari now rises with pack
  * size, and PRO undercuts the largest pack, same shape as GB.
  */
@@ -64,13 +64,13 @@ const GB_CREDIT_PACKS: readonly CreditPack[] = [
  * Armenian one-time alternatives to the ֏2,990/month unlimited plan.
  *
  * The Georgian ladder converted at parity (~142 AMD to the lari) rather than
- * discounted — Armenia and Georgia sit within a few percent of each other on
+ * discounted, Armenia and Georgia sit within a few percent of each other on
  * GDP per capita, so the same real price is the right starting point. Shape is
  * preserved from GE and GB: credits per dram rises with pack size, and PRO
  * undercuts the largest pack.
  *
  * CAUTION: Stripe treats AMD as a two-decimal currency (it is absent from the
- * zero-decimal list), so these minor units are luma — 100 to the dram. ֏990 is
+ * zero-decimal list), so these minor units are luma, 100 to the dram. ֏990 is
  * 99_000 here, not 990. Getting this wrong is a 100x pricing error.
  */
 const AM_CREDIT_PACKS: readonly CreditPack[] = [
@@ -84,7 +84,7 @@ const AM_CREDIT_PACKS: readonly CreditPack[] = [
  *
  * Same shape as GB: credits per dollar rises with pack size, and PRO
  * undercuts the largest pack. All four dollar markets are standard
- * two-decimal Stripe currencies — amounts here are plain cents.
+ * two-decimal Stripe currencies, amounts here are plain cents.
  */
 const US_CREDIT_PACKS: readonly CreditPack[] = [
   { id: "s", credits: 30, amountMinor: 299, currency: "usd" },
@@ -127,7 +127,7 @@ export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
   AM: {
     key: "premium_am_monthly",
     countryCode: "AM",
-    // ֏2,990/month — see AM_CREDIT_PACKS on the luma minor unit.
+    // ֏2,990/month, see AM_CREDIT_PACKS on the luma minor unit.
     amountMinor: 299_000,
     currency: "amd",
     interval: "month",
@@ -188,7 +188,7 @@ export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
  * now also the public discounted Georgian plan.
  *
  * A real quarterly Stripe subscription rather than a one-off grant, so every
- * existing entitlement path works untouched — syncPremiumSubscription writes
+ * existing entitlement path works untouched, syncPremiumSubscription writes
  * `premiumUntil` from the subscription's period end, which a 3-month interval
  * puts three months out, and the buyer can cancel from the billing portal like
  * any other subscriber. It renews at ₾29 per quarter, NOT at the ₾19.90
@@ -222,7 +222,7 @@ export const DISCOUNTED_PREMIUM_PLANS_BY_COUNTRY: Partial<
   GE: LOW_CREDIT_PROMO_PLAN,
 };
 
-/** Months of PRO one purchase of the promo buys — used in the offer copy. */
+/** Months of PRO one purchase of the promo buys, used in the offer copy. */
 export const LOW_CREDIT_PROMO_MONTHS = 3;
 
 /**
@@ -231,7 +231,7 @@ export const LOW_CREDIT_PROMO_MONTHS = 3;
  * Derived rather than stored: `premium_subscription` never recorded an
  * interval count (every plan was monthly when it was written), and the period
  * bounds Stripe already gives us are the authoritative answer for any cadence
- * without a migration. Rounded because months are not equal lengths — a
+ * without a migration. Rounded because months are not equal lengths, a
  * quarter spans 89 to 92 days depending on where in the year it starts.
  */
 export function billingPeriodMonths(start: Date, end: Date): number {
@@ -343,7 +343,7 @@ const CURRENCY_SYMBOL: Record<string, string> = {
 const WHOLE_UNIT_DISPLAY_CURRENCIES = new Set(["amd"]);
 
 /**
- * Georgian prices that do not depend on the runtime's ICU data — the same
+ * Georgian prices that do not depend on the runtime's ICU data, the same
  * hazard lib/i18n/ka-date.ts exists for, in the money half of the UI.
  *
  * Node's full-ICU build formats GEL under `ka-GE` as "19,90 ₾"; browsers ship
@@ -352,7 +352,7 @@ const WHOLE_UNIT_DISPLAY_CURRENCIES = new Set(["amd"]);
  * markup on every card showing a lari price, so Georgian gets its symbol
  * attached here instead, over digits grouped by a locale both runtimes have.
  *
- * English stays on Intl — en-GB data is universal — leaving "£9.99" and the
+ * English stays on Intl, en-GB data is universal, leaving "£9.99" and the
  * explicit "GEL 19.90" (where ₾ would be unfamiliar) exactly as they were.
  */
 import type { UserLocale } from "./i18n/user-locale";
@@ -368,7 +368,7 @@ export function formatBillingAmount(
   const amount = amountMinor / 100;
 
   // Card-direct buyers pay fiat USD (Privy converts behind the scenes), so
-  // the English-site catalogue renders as dollars — not the USDC the chain
+  // the English-site catalogue renders as dollars, not the USDC the chain
   // settles in. (On-chain amounts still use formatUsdc, which keeps "USDC".)
   if (code === "usdc") {
     const digits = new Intl.NumberFormat("en-GB", {

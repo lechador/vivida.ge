@@ -60,7 +60,7 @@ export type DeleteAccountResult = { ok: true } | { ok: false; error: string };
 
 /**
  * Permanently delete the user and everything that references them. Best-
- * effort R2 photo cleanup, then a single DELETE FROM "user" — every related
+ * effort R2 photo cleanup, then a single DELETE FROM "user", every related
  * table has ON DELETE CASCADE on the user FK (profile, credit account,
  * friendships, notifications, messages, charts, sessions, OAuth accounts,
  * photos, refresh tokens, typing indicators all go in one shot). The caller
@@ -80,7 +80,7 @@ export async function deleteAccountCore(
     };
   }
 
-  // 1) R2 photo cleanup — best-effort. Read keys, fire deletes in parallel.
+  // 1) R2 photo cleanup, best-effort. Read keys, fire deletes in parallel.
   try {
     const photos = await db
       .select({ key: profilePhotos.key })
@@ -96,7 +96,7 @@ export async function deleteAccountCore(
     );
   }
 
-  // 2) DB delete — CASCADE handles every related row.
+  // 2) DB delete, CASCADE handles every related row.
   await db.delete(users).where(eq(users.id, userId));
 
   return { ok: true };

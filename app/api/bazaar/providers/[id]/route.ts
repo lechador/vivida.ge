@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ id: string }> };
 
-/** GET /api/bazaar/providers/[id] — public reader profile + reviews. */
+/** GET /api/bazaar/providers/[id], public reader profile + reviews. */
 export async function GET(_req: Request, ctx: Params) {
   const { id } = await ctx.params;
   const provider = await getPublicProvider(id);

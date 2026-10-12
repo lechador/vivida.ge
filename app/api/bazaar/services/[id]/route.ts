@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ id: string }> };
 
-/** GET /api/bazaar/services/[id] — public service detail + provider wallet. */
+/** GET /api/bazaar/services/[id], public service detail + provider wallet. */
 export async function GET(_req: Request, ctx: Params) {
   const { id } = await ctx.params;
   const service = await getPublicService(id);
@@ -24,7 +24,7 @@ export async function GET(_req: Request, ctx: Params) {
 }
 
 /**
- * PATCH /api/bazaar/services/[id] — the owning reader edits their service.
+ * PATCH /api/bazaar/services/[id], the owning reader edits their service.
  * Partial body; provided fields re-validate against the same rules as
  * creation. `status` toggles active/paused. Price edits never rewrite past
  * bookings (each booking snapshots its price).

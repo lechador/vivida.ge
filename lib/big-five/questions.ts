@@ -1,10 +1,10 @@
 /**
  * The Big Five (OCEAN) personality test item bank.
  *
- * The Big Five is the scientific gold-standard model of personality — five
+ * The Big Five is the scientific gold-standard model of personality, five
  * broad, largely independent traits: Openness, Conscientiousness,
  * Extraversion, Agreeableness, Neuroticism. Unlike the EQ test, the traits are
- * BIPOLAR — neither pole is "better", so there is no overall score, just a
+ * BIPOLAR, neither pole is "better", so there is no overall score, just a
  * profile.
  *
  * Method: self-report, 5-point Likert, grounded in the public-domain IPIP item

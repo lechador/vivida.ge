@@ -20,7 +20,7 @@ const ELEMENT_EN: Record<Element, string> = {
 };
 
 /**
- * Slim element-balance bar — a single segmented bar (fire/earth/air/water by
+ * Slim element-balance bar, a single segmented bar (fire/earth/air/water by
  * proportion) plus a one-line legend. Replaces the old full-height panel.
  */
 export function ElementsCard({

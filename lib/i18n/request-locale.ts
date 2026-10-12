@@ -83,7 +83,7 @@ export async function requestIsEnglish(
  * Is this request being served from the English domain?
  *
  * Distinct from `requestIsEnglish()`: that asks which language to render,
- * this asks which site the URL belongs to — which is what decides whether an
+ * this asks which site the URL belongs to, which is what decides whether an
  * internal link resolves.
  */
 export async function requestIsEnglishHost(): Promise<boolean> {
@@ -102,7 +102,7 @@ export { normalizeUserLocale } from "./locale";
  * Route-handler-safe English-host check.
  *
  * Reads the Request directly (no `next/headers`), so route tests can call
- * handlers with plain Request objects — and it honours the split-deployment
+ * handlers with plain Request objects, and it honours the split-deployment
  * override exactly like `requestIsEnglishHost()`, keeping page gating and
  * API gating in agreement (including local `VIVIDA_DEPLOYMENT_LOCALE=en`
  * runs of the English surface).

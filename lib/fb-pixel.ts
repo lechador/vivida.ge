@@ -2,7 +2,7 @@ import { browserTrackingAllowed } from "@/lib/tracking-consent";
 
 /**
  * Thin wrapper around the Meta Pixel client SDK. The pixel itself is loaded
- * once in `components/fb-pixel.tsx` (mounted at the root layout) — this
+ * once in `components/fb-pixel.tsx` (mounted at the root layout), this
  * module just gives the rest of the app a typed, no-op-when-missing way to
  * fire conversion events.
  */

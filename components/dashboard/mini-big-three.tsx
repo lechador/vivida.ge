@@ -18,7 +18,7 @@ const ITEMS: Array<{
 ];
 
 /**
- * Compact glance at the user's Sun / Moon / Ascendant — three small tiles,
+ * Compact glance at the user's Sun / Moon / Ascendant, three small tiles,
  * no interpretations. Lives on the home page; click-through goes to the
  * full /report.
  */

@@ -4,7 +4,7 @@ import { locativeKa } from "@/lib/georgian";
 import { computeMundaneSky } from "@/lib/mundane-sky";
 
 /**
- * "Today's sky" strip for the horoscope SEO hubs — real ephemeris data
+ * "Today's sky" strip for the horoscope SEO hubs, real ephemeris data
  * (planet-in-sign chips + the day's tightest aspects), Georgian-labelled.
  * Server component, pure math: refreshes with each ISR revalidation, giving
  * the hubs unique transit-based content that changes daily.
@@ -12,7 +12,7 @@ import { computeMundaneSky } from "@/lib/mundane-sky";
 export function MundaneSkySection({
   date,
   heading = "დღევანდელი ცა",
-  sub = "პლანეტების რეალური მდებარეობა და დღის მთავარი ასპექტები — ეს ის ფონია, რომელზეც დღის ჰოროსკოპი დგება.",
+  sub = "პლანეტების რეალური მდებარეობა და დღის მთავარი ასპექტები, ეს ის ფონია, რომელზეც დღის ჰოროსკოპი დგება.",
 }: {
   date: Date;
   heading?: string;
@@ -66,7 +66,7 @@ export function MundaneSkySection({
                   style={{ background: FAMILY_TONE[a.family] }}
                 />
                 <span className="text-foreground/90">
-                  {a.aSymbol} {a.aKa} — {a.kindKa} — {a.bSymbol} {a.bKa}
+                  {a.aSymbol} {a.aKa}, {a.kindKa}, {a.bSymbol} {a.bKa}
                 </span>
                 <span className="ml-auto shrink-0 text-xs tabular-nums text-muted-foreground">
                   {a.orb.toFixed(1)}°
@@ -78,7 +78,7 @@ export function MundaneSkySection({
       )}
 
       <p className="mt-4 text-xs text-muted-foreground">
-        ცოცხალი ცის სრული სურათი წუთობრივი სიზუსტით —{" "}
+        ცოცხალი ცის სრული სურათი წუთობრივი სიზუსტით,{" "}
         <Link href="/sky" className="text-[var(--vivida-cyan)] hover:underline">
           ცა ახლა →
         </Link>

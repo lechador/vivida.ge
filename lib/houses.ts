@@ -1,6 +1,6 @@
 /**
  * The 12 astrological houses with Georgian labels and one-line descriptors.
- * Each house represents an "area of life" — where the planet's energy plays out.
+ * Each house represents an "area of life", where the planet's energy plays out.
  *
  * Names follow the convention used in modern Georgian astrology blogs:
  *   "1-ლი სახლი", "მე-2 სახლი", … "მე-12 სახლი".
@@ -23,8 +23,8 @@ export const HOUSES: Record<number, HouseDef> = {
     labelEn: "1st house",
     themeKa: "ჩემი თავი",
     themeEn: "Self and identity",
-    meaningKa: "ის, თუ როგორ შემოდიხარ ოთახში — შენი თვითპრეზენტაცია და პირველი შთაბეჭდილება.",
-    meaningEn: "How you enter the room—your self-presentation, identity and first impression.",
+    meaningKa: "ის, თუ როგორ შემოდიხარ ოთახში, შენი თვითპრეზენტაცია და პირველი შთაბეჭდილება.",
+    meaningEn: "How you enter the room, your self-presentation, identity and first impression.",
   },
   2: {
     number: 2,
@@ -77,7 +77,7 @@ export const HOUSES: Record<number, HouseDef> = {
     labelEn: "7th house",
     themeKa: "მე და შენ",
     themeEn: "Partnerships",
-    meaningKa: "ერთ-ერთი ადამიანი, ვისთანაც ცხოვრობ — სასიყვარულო, საქმიანი ან მოწინააღმდეგე.",
+    meaningKa: "ერთ-ერთი ადამიანი, ვისთანაც ცხოვრობ, სასიყვარულო, საქმიანი ან მოწინააღმდეგე.",
     meaningEn: "One-to-one relationships: romantic, professional and openly adversarial.",
   },
   8: {
@@ -104,8 +104,8 @@ export const HOUSES: Record<number, HouseDef> = {
     labelEn: "10th house",
     themeKa: "კარიერა, სტატუსი",
     themeEn: "Career and status",
-    meaningKa: "ის, რითაც გცნობენ საზოგადოებაში — კარიერა, ავტორიტეტი, წარმატება.",
-    meaningEn: "How the world knows you—career, authority, reputation and achievement.",
+    meaningKa: "ის, რითაც გცნობენ საზოგადოებაში, კარიერა, ავტორიტეტი, წარმატება.",
+    meaningEn: "How the world knows you, career, authority, reputation and achievement.",
   },
   11: {
     number: 11,
@@ -131,7 +131,7 @@ export function houseDef(number: number): HouseDef {
   return HOUSES[number];
 }
 
-/** "პირველ სახლში" / "მე-5 სახლში" — locative phrase for "in your Nth house". */
+/** "პირველ სახლში" / "მე-5 სახლში", locative phrase for "in your Nth house". */
 export function houseLocativeKa(n: number): string {
   return n === 1 ? "პირველ სახლში" : `მე-${n} სახლში`;
 }

@@ -72,7 +72,7 @@ export function DashboardBillingNudge({
               {months > 1
                 ? en
                   ? `Unlock everything for ${months} months for ${formatBillingAmount(pro.amountMinor, pro.currency, locale)}.`
-                  : `გახსენი ყველაფერი ${months} თვით — ${formatBillingAmount(pro.amountMinor, pro.currency, locale)}-ად.`
+                  : `გახსენი ყველაფერი ${months} თვით, ${formatBillingAmount(pro.amountMinor, pro.currency, locale)}-ად.`
                 : en
                   ? "Unlock every paid feature without credit limits."
                   : "გახსენი ყველა ფასიანი ფუნქცია კრედიტების ლიმიტის გარეშე."}

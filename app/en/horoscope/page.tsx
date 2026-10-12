@@ -8,7 +8,7 @@ import { internationalPublicPath } from "@/lib/seo/public-paths";
 import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { articleLd, breadcrumbLd, faqLd } from "@/lib/seo/jsonld";
 
-const TITLE = "How Daily Horoscopes Work — Vivida";
+const TITLE = "How Daily Horoscopes Work, Vivida";
 const DESCRIPTION =
   "Learn how daily, weekly and monthly horoscopes use current planetary transits, and read Vivida's English forecasts for all twelve zodiac signs.";
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   // English-only explainer, like /about. The Georgian /horoskopi is a daily
-  // hub, not an equivalent of this page — it now pairs with the English
+  // hub, not an equivalent of this page, it now pairs with the English
   // /horoskopi instead.
   alternates: {
     canonical: `${ENGLISH_SITE_URL}/horoscope`,
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 export default function EnglishHoroscopePage() {
   const url = `${ENGLISH_SITE_URL}/horoscope`;
   const ld = [
-    // TITLE carries the " — Vivida" brand suffix for the <title> tag; the
+    // TITLE carries the ", Vivida" brand suffix for the <title> tag; the
     // structured-data headline should be the bare topic.
     articleLd({
       url,
@@ -67,7 +67,7 @@ export default function EnglishHoroscopePage() {
     <EnglishGuide
       eyebrow="Current sky"
       title="How horoscopes work"
-      intro="A horoscope connects current planetary movements—called transits—with a zodiac sign or a complete natal chart. It changes as the sky changes."
+      intro="A horoscope connects current planetary movements, called transits, with a zodiac sign or a complete natal chart. It changes as the sky changes."
       georgianPath="/horoskopi"
       jsonLd={ld}
     >

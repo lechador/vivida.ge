@@ -1,7 +1,7 @@
 import { dots, type FigureSpec, type Mark, type ShapeKind } from "@/lib/iq/figures";
 
 /**
- * The IQ item bank — ~28 culture-fair items across four reasoning domains.
+ * The IQ item bank, ~28 culture-fair items across four reasoning domains.
  *
  * Each item carries a Rasch difficulty `b` on the logit scale (roughly −2 easy
  * … +2 hard); the scorer (lib/iq/scoring.ts) uses the *pattern* of right/wrong
@@ -10,7 +10,7 @@ import { dots, type FigureSpec, type Mark, type ShapeKind } from "@/lib/iq/figur
  * so the answer cell is produced by the same transformation as the givens and
  * is correct by construction.
  *
- * The bank is FIXED and ordered by difficulty within domain — everyone takes
+ * The bank is FIXED and ordered by difficulty within domain, everyone takes
  * the same test, which keeps scores comparable and lets us self-norm later
  * from real responses.
  */
@@ -55,7 +55,7 @@ export type IqItem = {
 export const STEM_PROMPT_KA: Record<IqStem["type"], string> = {
   "number-series": "რომელი რიცხვი აგრძელებს მიმდევრობას?",
   matrix: "რომელი ფიგურა უნდა იყოს კითხვის ნიშნის ადგილას?",
-  analogy: "როგორც პირველ წყვილში — ისე მეორეში. რომელი ფიგურაა გამოტოვებული?",
+  analogy: "როგორც პირველ წყვილში, ისე მეორეში. რომელი ფიგურაა გამოტოვებული?",
   "odd-one-out": "აირჩიე ზედმეტი ფიგურა.",
   logic: "", // the stem text is the prompt
 };
@@ -185,7 +185,7 @@ const RAW_ITEMS: IqItem[] = [
   ns("n9", 1.2, [2, 6, 12, 20, 30], [40, 42, 44, 36], 1), // +4,+6,+8,+10
   ns("n10", 1.8, [1, 3, 7, 15, 31], [47, 63, 62, 64], 1), // ×2+1
   ns("n11", 0.9, [6, 7, 9, 12, 16], [20, 21, 19, 22], 1), // +1,+2,+3,+4,+5
-  // hard tier — multi-rule / interleaved, to separate high scorers
+  // hard tier, multi-rule / interleaved, to separate high scorers
   ns("n12", 1.5, [2, 3, 5, 7, 11, 13], [15, 16, 17, 19], 2), // primes → 17
   ns("n16", 1.9, [2, 100, 4, 90, 8, 80], [16, 70, 12, 32], 0), // two interleaved series → 16
   ns("n14", 2.1, [3, 5, 10, 12, 24], [26, 36, 48, 28], 0), // +2,×2 alternating → 26
@@ -213,8 +213,8 @@ const RAW_ITEMS: IqItem[] = [
   logic(
     "l3",
     0.5,
-    "ორშაბათი, ოთხშაბათი, პარასკევი, … — რომელი დღე მოდის შემდეგ?",
-    "Monday, Wednesday, Friday, … — which day comes next?",
+    "ორშაბათი, ოთხშაბათი, პარასკევი, …, რომელი დღე მოდის შემდეგ?",
+    "Monday, Wednesday, Friday, …, which day comes next?",
     ["შაბათი", "კვირა", "ორშაბათი", "ხუთშაბათი"],
     ["Saturday", "Sunday", "Monday", "Thursday"],
     1
@@ -238,12 +238,12 @@ const RAW_ITEMS: IqItem[] = [
     0
   ),
 
-  // hard tier — letter series, transitive ordering, syllogism with a trap
+  // hard tier, letter series, transitive ordering, syllogism with a trap
   logic(
     "l8",
     1.3,
-    "ა, გ, ე, ზ, … — რომელი ასო მოდის შემდეგ?",
-    "A, C, E, G, … — which letter comes next?",
+    "ა, გ, ე, ზ, …, რომელი ასო მოდის შემდეგ?",
+    "A, C, E, G, …, which letter comes next?",
     ["თ", "ი", "კ", "ლ"],
     ["H", "I", "J", "K"],
     1
@@ -318,7 +318,7 @@ const RAW_ITEMS: IqItem[] = [
     2
   ),
 
-  // hard: two independent rotation rules — rows add 90°, columns add 45°
+  // hard: two independent rotation rules, rows add 90°, columns add 45°
   // rot(r,c) = r·90 + c·45 → (2,2) = 180 + 90 = 270°
   matrix(
     "s4",
@@ -449,7 +449,7 @@ const RAW_ITEMS: IqItem[] = [
     ],
     0
   ),
-  // hard: TWO attributes at once — shape distributed by (r+c)%3, fill by
+  // hard: TWO attributes at once, shape distributed by (r+c)%3, fill by
   // (r+c) parity → (2,2) = filled square
   matrix(
     "p10",
@@ -541,7 +541,7 @@ const RAW_ITEMS: IqItem[] = [
     ],
     0
   ),
-  // two simultaneous transforms — rotate 180° AND add a centre dot
+  // two simultaneous transforms, rotate 180° AND add a centre dot
   analogy(
     "s5",
     "spatial",
@@ -562,19 +562,19 @@ const RAW_ITEMS: IqItem[] = [
 /**
  * Presented easy → hard (a Raven-style difficulty ramp): gentle warm-ups first,
  * genuinely hard items last. Scoring uses the response *pattern* against each
- * item's `b`, not the order, so the ramp only shapes the taker's experience —
+ * item's `b`, not the order, so the ramp only shapes the taker's experience,
  * it doesn't bias the score. Sorting also interleaves domains naturally, since
  * difficulties overlap across them.
  */
 export const IQ_ITEMS: IqItem[] = [...RAW_ITEMS].sort((a, b) => a.b - b.b);
 
-/** How many items — used by the UI and scoring. */
+/** How many items, used by the UI and scoring. */
 export const IQ_ITEM_COUNT = IQ_ITEMS.length;
 
 /** localStorage key the test writes answers to for the result page to read. */
 export const IQ_ANSWERS_STORAGE_KEY = "vivida_iq_answers";
 
-/** Overall time budget (seconds). ~60s/item over the adaptive 25 — brisk but
+/** Overall time budget (seconds). ~60s/item over the adaptive 25, brisk but
  *  not frantic; adaptive items sit near your ability, so they take longer. */
 export const IQ_TIME_LIMIT_SEC = 25 * 60;
 

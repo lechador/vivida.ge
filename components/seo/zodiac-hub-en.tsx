@@ -61,7 +61,7 @@ const FAQ = [
   },
   {
     q: "What are zodiac elements and modalities?",
-    a: "Every sign belongs to one of four elements—Fire, Earth, Air, or Water—and one of three modalities—Cardinal, Fixed, or Mutable. Together they describe a sign's basic style and rhythm.",
+    a: "Every sign belongs to one of four elements, Fire, Earth, Air, or Water, and one of three modalities, Cardinal, Fixed, or Mutable. Together they describe a sign's basic style and rhythm.",
   },
 ];
 
@@ -127,7 +127,7 @@ export function ZodiacHubEn() {
           The 12 <Accent>zodiac signs</Accent>
         </h1>
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
-          Explore every zodiac sign—dates, symbols, elements, modalities,
+          Explore every zodiac sign, dates, symbols, elements, modalities,
           personality patterns, relationships, and the deeper layers behind your
           Sun sign.
         </p>
@@ -267,7 +267,7 @@ export function ZodiacHubEn() {
               },
               {
                 // /zodiac/tavsebadoba 308s to /compatibility on the English
-                // hosts (ENGLISH_LEGACY_CONTENT_REDIRECTS) — link the
+                // hosts (ENGLISH_LEGACY_CONTENT_REDIRECTS), link the
                 // destination directly rather than spending a hop.
                 href: "/compatibility",
                 eyebrow: "Compatibility",

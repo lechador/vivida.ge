@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { saveBigFiveResult, sanitizeBigFiveAnswers } from "@/lib/big-five/store";
 
 /**
- * POST /api/big-five/submit — persist a finished Big Five attempt
+ * POST /api/big-five/submit, persist a finished Big Five attempt
  * (fire-and-forget from the result page). Best-effort: any failure is swallowed
  * so the result page is never affected. Scoring is redone server-side from the
  * raw answers, so a tampered client body can't inject a fake profile.

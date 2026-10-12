@@ -32,7 +32,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
   const verified = params.get("verified") === "1";
   const verifyError = params.get("verify_error");
-  // Post-login destination — only same-origin relative paths (no open redirect).
+  // Post-login destination, only same-origin relative paths (no open redirect).
   // Defaults to the intent-aware resolver: incomplete profiles land on
   // onboarding, complete ones on their destination (or dashboard).
   const nextParam = params.get("next");
@@ -120,8 +120,8 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
           setCodeError(null);
           setResentMsg(
             en
-              ? "Check your inbox—a new code and link have been sent."
-              : "შემოწმე საფოსტო ყუთი — ახალი კოდი და ლინკი გაიგზავნა.",
+              ? "Check your inbox, a new code and link have been sent."
+              : "შემოწმე საფოსტო ყუთი, ახალი კოდი და ლინკი გაიგზავნა.",
           );
         } else {
           setCodeError(result.error);
@@ -142,7 +142,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
     startCodeTransition(async () => {
       try {
         // Pass the password they just typed so a correct code both verifies
-        // AND signs them in — straight into the app, no second "შესვლა".
+        // AND signs them in, straight into the app, no second "შესვლა".
         const res = await verifyEmailWithCode({
           email: unverifiedEmail,
           code: code.trim(),
@@ -152,7 +152,7 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
           router.push(dest);
           router.refresh();
         } else if (res.ok) {
-          // Verified but auto-signin didn't take — clear the wall so they can
+          // Verified but auto-signin didn't take, clear the wall so they can
           // press "შესვლა" with the password they already typed.
           setCodeVerified(true);
           setError(null);

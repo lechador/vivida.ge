@@ -25,7 +25,7 @@ export async function EnglishHeader({
 }) {
   // Also rendered on the Georgian host (signed-in user reading English), where
   // /natal-chart, /horoscope and /compatibility are hard 404s. `/login` is
-  // deliberately left relative — the session cookie is per-domain.
+  // deliberately left relative, the session cookie is per-domain.
   const onEnglishHost = await requestIsEnglishHost();
   const href = (path: string) => englishSiteHref(path, onEnglishHost);
   const georgianHref = `${GEORGIAN_SITE_URL}${georgianPath === "/" ? "" : georgianPath}`;

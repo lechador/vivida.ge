@@ -115,8 +115,8 @@ export function AiAvatarGenerator({
                 : "ვქმნით შენს კოსმიურ ავატარს… (~10 წამი)"
               : hasGenerated
                 ? en
-                  ? "Ready — it is now your profile image. How does it look?"
-                  : "მზადაა — დაყენდა შენს პროფილზე. მოგწონს თუ არა?"
+                  ? "Ready, it is now your profile image. How does it look?"
+                  : "მზადაა, დაყენდა შენს პროფილზე. მოგწონს თუ არა?"
                 : en
                   ? "Create a personal avatar for your zodiac sign in Vivida's style."
                   : "შექმენი შენი ზოდიაქოს ნიშნის პერსონალური ავატარი Vivida-ს სტილში."}

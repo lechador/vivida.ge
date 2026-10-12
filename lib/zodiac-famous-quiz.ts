@@ -200,7 +200,7 @@ export const FAMOUS_ZODIAC_QUESTIONS: FamousZodiacQuestion[] = [
   },
 ];
 
-/** Fixed round length — the pool is shuffled and trimmed to this each attempt. */
+/** Fixed round length, the pool is shuffled and trimmed to this each attempt. */
 export const FAMOUS_ZODIAC_ROUND = 20;
 
 export function signFor(key: string) {

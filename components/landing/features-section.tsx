@@ -18,7 +18,7 @@ export function FeaturesSection() {
 
   return (
     <section className="relative z-10 mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-24">
-      {/* What is a natal chart — explainer */}
+      {/* What is a natal chart, explainer */}
       <Reveal y={20} className="mx-auto mb-10 max-w-3xl text-center sm:mb-20">
         {what.kicker && (
           <div className="mb-3 text-sm font-medium text-muted-foreground">

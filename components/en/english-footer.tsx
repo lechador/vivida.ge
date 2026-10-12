@@ -10,7 +10,7 @@ import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
  * sitewide internal link at all and depended entirely on the sitemap for
  * discovery. On a domain with no backlinks yet, that is the binding
  * constraint on crawling. Every href below is verified live on the English
- * host — Georgian slugs are intentional (the English site reuses them).
+ * host, Georgian slugs are intentional (the English site reuses them).
  */
 const EXPLORE = [
   { href: "/natal-chart", label: "Natal chart" },
@@ -53,7 +53,7 @@ const TOOLS = [
 
 export async function EnglishFooter() {
   // Rendered on the Georgian host too (signed-in user reading English), where
-  // a bare English path either 404s or serves Georgian — so content links are
+  // a bare English path either 404s or serves Georgian, so content links are
   // resolved against the English domain whenever this is not that domain.
   const onEnglishHost = await requestIsEnglishHost();
   const href = (path: string) => englishSiteHref(path, onEnglishHost);

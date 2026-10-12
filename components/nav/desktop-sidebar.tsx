@@ -16,7 +16,7 @@ import { SidebarOthers } from "./sidebar-others";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Desktop-only left sidebar — always expanded (15rem) so labels are visible
+ * Desktop-only left sidebar, always expanded (15rem) so labels are visible
  * without hovering. Content is offset by the same width via the
  * `[data-desktop-sidebar]` body rule in globals.css.
  */
@@ -29,7 +29,7 @@ export function DesktopSidebar({
 }: {
   active?: NavActiveKey;
   unreadMessages?: number;
-  /** Unopened proactive astrologer nudges — dot on the ask item. */
+  /** Unopened proactive astrologer nudges, dot on the ask item. */
   pendingAskNudges?: number;
   locale?: UserLocale;
   /** English host: a few primary destinations + an "Others" dialog. */
@@ -41,7 +41,7 @@ export function DesktopSidebar({
     ? splitCompactNav(locale)
     : { primary: navItems(locale), others: [] as NavItem[] };
 
-  // Labels are always visible — no hover reveal.
+  // Labels are always visible, no hover reveal.
   const reveal = "";
 
   return (

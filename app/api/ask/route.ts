@@ -34,7 +34,7 @@ const HISTORY_LIMIT = 12;
 const MAX_MESSAGE_LEN = 4000;
 
 /**
- * "Chat with your chart" — streams an AI astrologer reply grounded in the
+ * "Chat with your chart", streams an AI astrologer reply grounded in the
  * user's natal chart. Plain-text streaming body; both turns are persisted.
  * Daily per-user cap keeps AI cost bounded.
  */
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
   // Credit gate: FREE_ALLOWANCE.chatPerDay free messages/day, then spend
   // CREDIT_COST.chat per message. 402 tells the client to open the credit
   // unlock screen (invite or buy). Kept last so a request rejected by any of
-  // the checks above (503/429/400) is never charged — there is no refund path.
+  // the checks above (503/429/400) is never charged, there is no refund path.
   const [used] = await db
     .select({ n: sql<number>`count(*)::int` })
     .from(chartChatMessages)
@@ -136,8 +136,8 @@ export async function POST(req: Request) {
       const v = inferVerbosity(userTurns);
       memoryBlock =
         locale === "en"
-          ? `The person writes ${v === "short" ? "short, simple" : v === "detailed" ? "long, elaborate" : "medium-length"} messages — match that length and simplicity.`
-          : `ადამიანი წერს ${v === "short" ? "მოკლე, მარტივ" : v === "detailed" ? "გრძელ, გაშლილ" : "საშუალო სიგრძის"} შეტყობინებებს — პასუხის სიგრძე და სიმარტივე ამას შეუსაბამე.`;
+          ? `The person writes ${v === "short" ? "short, simple" : v === "detailed" ? "long, elaborate" : "medium-length"} messages, match that length and simplicity.`
+          : `ადამიანი წერს ${v === "short" ? "მოკლე, მარტივ" : v === "detailed" ? "გრძელ, გაშლილ" : "საშუალო სიგრძის"} შეტყობინებებს, პასუხის სიგრძე და სიმარტივე ამას შეუსაბამე.`;
     }
   }
   const system = buildChartChatSystem(
@@ -156,7 +156,7 @@ export async function POST(req: Request) {
       void refreshAskMemory(userId, locale);
     });
   } catch {
-    /* after() unavailable outside request scope in some runtimes — skip */
+    /* after() unavailable outside request scope in some runtimes, skip */
   }
 
   const messages: ChatMessage[] = [

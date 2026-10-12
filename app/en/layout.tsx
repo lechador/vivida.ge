@@ -5,7 +5,7 @@ import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 export const metadata: Metadata = {
   metadataBase: new URL(ENGLISH_SITE_URL),
   title: {
-    default: "Vivida in English — Natal Charts and Astrology",
+    default: "Vivida in English, Natal Charts and Astrology",
     template: "%s · Vivida",
   },
   description:

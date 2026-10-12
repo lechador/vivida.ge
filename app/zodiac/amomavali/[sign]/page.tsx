@@ -322,7 +322,7 @@ export default async function RisingSignPage({
               მზის ნიშანი
             </div>
             <div className="mt-1 text-lg font-semibold tracking-tight">
-              {c.labelKa} — მზე
+              {c.labelKa}, მზე
             </div>
             <p className="mt-1 text-pretty text-sm text-foreground/80">
               ნახე ამავე ნიშნის მზის ინტერპრეტაცია.
@@ -375,7 +375,7 @@ export default async function RisingSignPage({
             ნამდვილად {c.labelKa} ამომავალი ხარ?
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ასცენდენტი ~2 საათში ცვლის ნიშანს — დაბადების ზუსტი დრო ცვლის
+            ასცენდენტი ~2 საათში ცვლის ნიშანს, დაბადების ზუსტი დრო ცვლის
             სურათს. Vivida უფასოდ შენი სრული რუკის გენერაცია.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">

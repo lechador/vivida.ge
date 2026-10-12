@@ -1,14 +1,14 @@
 import type { PostReactionKind } from "@/db/schema";
 
 /**
- * Custom reaction icons — designed to feel cosmic + on-brand rather than
+ * Custom reaction icons, designed to feel cosmic + on-brand rather than
  * pulling in stock emoji. Each one is a 24×24 inline SVG that scales with
  * font-size and inherits its own brand hue.
  *
- *  ❤  like     — sparkle heart   (vivida pink / violet)
- *  ☾  dislike  — waning crescent (cool slate)
- *  ★  funny    — wonky star with squint eyes + crooked smile (warm gold)
- *  💧 sad     — crescent + falling cosmic tear (cool cyan)
+ *  ❤  like, sparkle heart   (vivida pink / violet)
+ *  ☾  dislike, waning crescent (cool slate)
+ *  ★  funny, wonky star with squint eyes + crooked smile (warm gold)
+ *  💧 sad, crescent + falling cosmic tear (cool cyan)
  *
  * The icons are stateless presentation only. `<ReactionBar>` handles the
  * active/idle styling around them.
@@ -44,7 +44,7 @@ type IconProps = {
   className?: string;
 };
 
-/** Sparkle heart — heart with a 4-point star embedded near the centre.
+/** Sparkle heart, heart with a 4-point star embedded near the centre.
  *  Pulses faintly when active. */
 export function LikeIcon({ active = false, size = 22, className }: IconProps) {
   return (
@@ -79,7 +79,7 @@ export function LikeIcon({ active = false, size = 22, className }: IconProps) {
   );
 }
 
-/** Waning crescent — a dim "fading" moon. Reads as "dislike" without the
+/** Waning crescent, a dim "fading" moon. Reads as "dislike" without the
  *  heavy thumbs-down baggage; matches the cosmic theme. */
 export function DislikeIcon({
   active = false,
@@ -113,7 +113,7 @@ export function DislikeIcon({
         strokeWidth="1.6"
         mask="url(#vivida-dislike-mask)"
       />
-      {/* tiny minus stripe — only visible on the active fill so the idle
+      {/* tiny minus stripe, only visible on the active fill so the idle
           state stays a clean crescent outline */}
       {active && (
         <rect
@@ -130,7 +130,7 @@ export function DislikeIcon({
   );
 }
 
-/** Wonky 5-point star with squint eyes and a crooked smile — captures
+/** Wonky 5-point star with squint eyes and a crooked smile, captures
  *  "haha" without resorting to a 😂 emoji. */
 export function FunnyIcon({ active = false, size = 22, className }: IconProps) {
   return (
@@ -212,7 +212,7 @@ export function SadIcon({ active = false, size = 22, className }: IconProps) {
         strokeWidth="1.6"
         strokeLinejoin="round"
       />
-      {/* Falling tear — pinched ellipse */}
+      {/* Falling tear, pinched ellipse */}
       <path
         d="M9.2 16.5c-1 1.4-1.5 2.4-1.5 3 0 .9.7 1.6 1.5 1.6.9 0 1.5-.7 1.5-1.6 0-.6-.5-1.6-1.5-3z"
         fill={active ? "url(#vivida-sad-tear)" : "transparent"}

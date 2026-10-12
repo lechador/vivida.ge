@@ -17,7 +17,7 @@ export type DeleteAccountResult =
  * Permanently delete the current user. Shared core does the R2 cleanup +
  * cascading DB delete; the web action layers signOut() on top (which throws
  * an internal redirect to "/", so the ok:true case never actually returns
- * here — the type is kept for the validation/not-authed failure path).
+ * here, the type is kept for the validation/not-authed failure path).
  */
 export async function deleteAccount(
   input: DeleteAccountInput
@@ -31,6 +31,6 @@ export async function deleteAccount(
   // area. signOut() throws an internal redirect.
   await signOut({ redirectTo: "/" });
 
-  // Unreachable — signOut redirects. Return is here for type completeness.
+  // Unreachable, signOut redirects. Return is here for type completeness.
   return { ok: true };
 }

@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const house = houseByNumber(number);
   if (!house) return {};
-  const title = `${house.number}-ე სახლი ასტროლოგიაში — ${house.name}`;
+  const title = `${house.number}-ე სახლი ასტროლოგიაში, ${house.name}`;
   const description = `რას ნიშნავს ${house.number}-ე სახლი ნატალურ რუკაში: ${house.area}. მმართველი, საკვანძო თემები და ინტერპრეტაცია ქართულად.`;
   const url = `${BASE}/astrologiuri-saxlebi/${house.number}`;
   return {
@@ -101,7 +101,7 @@ export default async function HousePage({ params }: Props) {
   const house = houseByNumber(number);
   if (!house) notFound();
   const url = `${BASE}/astrologiuri-saxlebi/${house.number}`;
-  const title = `${house.number}-ე სახლი ასტროლოგიაში — ${house.name}`;
+  const title = `${house.number}-ე სახლი ასტროლოგიაში, ${house.name}`;
   const description = `რას ნიშნავს ${house.number}-ე სახლი ნატალურ რუკაში: ${house.area}.`;
   const faq = [
     {
@@ -110,7 +110,7 @@ export default async function HousePage({ params }: Props) {
     },
     {
       q: `რომელი ნიშანი და პლანეტა უკავშირდება ${house.number}-ე სახლს?`,
-      a: `ბუნებრივ ზოდიაქოს ანალოგიაში ${house.number}-ე სახლს უკავშირდება ${house.sign}, ხოლო მმართველ სიმბოლოდ — ${house.planet}. პირად რუკაში კი სახლის რეალური ნიშანი დაბადების დროსა და ადგილზეა დამოკიდებული.`,
+      a: `ბუნებრივ ზოდიაქოს ანალოგიაში ${house.number}-ე სახლს უკავშირდება ${house.sign}, ხოლო მმართველ სიმბოლოდ, ${house.planet}. პირად რუკაში კი სახლის რეალური ნიშანი დაბადების დროსა და ადგილზეა დამოკიდებული.`,
     },
     {
       q: `რას ნიშნავს ბევრი პლანეტა ${house.number}-ე სახლში?`,

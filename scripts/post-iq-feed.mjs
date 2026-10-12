@@ -1,5 +1,5 @@
 // One-off: post the IQ-test launch announcement to the feed under the official
-// "Vivida" brand account. Idempotent — skips if the exact body is already
+// "Vivida" brand account. Idempotent, skips if the exact body is already
 // posted, so it's safe to re-run.
 //
 // Usage: node scripts/post-iq-feed.mjs
@@ -18,11 +18,11 @@ try {
 
 const VIVIDA_EMAIL = "team@vivida.ge";
 
-const BODY = `🧠 ახალი ტესტი Vivida-ზე — IQ ტესტი
+const BODY = `🧠 ახალი ტესტი Vivida-ზე, IQ ტესტი
 
-ადაპტიური და კულტურულად ნეიტრალური ტესტი, რომელიც შენს დონეს ერგება: რაც უფრო სწორად პასუხობ, მით უფრო რთულდება. ლოგიკა, რიცხვები, სივრცე და პატერნები — ერთ ადგილას.
+ადაპტიური და კულტურულად ნეიტრალური ტესტი, რომელიც შენს დონეს ერგება: რაც უფრო სწორად პასუხობ, მით უფრო რთულდება. ლოგიკა, რიცხვები, სივრცე და პატერნები, ერთ ადგილას.
 
-მიიღე შენი IQ ქულა, პროცენტილი და აზროვნების პროფილი — უფასოდ, რეგისტრაციის გარეშე. შედეგი, თუ გინდა, შენს პროფილზეც გამოაჩინე.
+მიიღე შენი IQ ქულა, პროცენტილი და აზროვნების პროფილი, უფასოდ, რეგისტრაციის გარეშე. შედეგი, თუ გინდა, შენს პროფილზეც გამოაჩინე.
 
 გაიარე და დაწერე კომენტარში, რა ქულა მიიღე 👇
 vivida.ge/iq-testi`;
@@ -32,11 +32,11 @@ async function main() {
   const sql = neon(process.env.DATABASE_URL);
 
   const [user] = await sql`SELECT id FROM "user" WHERE email = ${VIVIDA_EMAIL}`;
-  if (!user) throw new Error("Vivida brand account not found — run seed-vivida-posts.mjs first");
+  if (!user) throw new Error("Vivida brand account not found, run seed-vivida-posts.mjs first");
 
   const existing = await sql`SELECT 1 FROM post WHERE user_id = ${user.id} AND body = ${BODY}`;
   if (existing.length) {
-    console.log("already posted — nothing to do");
+    console.log("already posted, nothing to do");
     return;
   }
 

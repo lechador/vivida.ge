@@ -293,7 +293,7 @@ export default async function ElementsHubPage() {
             ნახე შენი ელემენტი ცოცხალ რუკაში
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            შენი ელემენტური ბალანსი — ცეცხლი, მიწა, ჰაერი, წყალი — ნატალურ
+            შენი ელემენტური ბალანსი, ცეცხლი, მიწა, ჰაერი, წყალი, ნატალურ
             რუკაშია. ერთი წუთში დაიწყე უფასოდ.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">

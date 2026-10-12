@@ -20,11 +20,11 @@ export type SendMessageResult =
   { ok: true; message: Message } | { ok: false; error: string };
 
 /**
- * Whether `a` may message `b` — message gating. Restricted to MUTUAL
+ * Whether `a` may message `b`, message gating. Restricted to MUTUAL
  * (accepted) friends only. The match-deck path was intentionally removed as
  * part of the low-density safety cleanup: with the deck flagged off, matches
  * no longer form, and any pre-existing match-only threads are now locked
- * (message history is preserved — only sending is blocked). A `blocked`
+ * (message history is preserved, only sending is blocked). A `blocked`
  * friendship row is a hard deny. To re-open match-based chat later, restore
  * the `areMatched(a, b)` fallback here (and re-enable the deck flag).
  */
@@ -51,7 +51,7 @@ async function canMessage(a: string, b: string): Promise<boolean> {
 }
 
 /**
- * Send a message to another user. Restricted to mutual (accepted) friends —
+ * Send a message to another user. Restricted to mutual (accepted) friends,
  * enforced server-side regardless of UI state. Returns the inserted row; the
  * caller handles the (fire-and-forget) notification email.
  */
@@ -90,7 +90,7 @@ export async function sendMessageCore(
 }
 
 /**
- * Sender pings while typing. Friendship-checked, idempotent — each ping
+ * Sender pings while typing. Friendship-checked, idempotent, each ping
  * refreshes the typing-indicator TTL.
  */
 export async function pingTypingCore(

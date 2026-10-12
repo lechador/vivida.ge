@@ -15,7 +15,7 @@ import type { NatalChartJson } from "./profiles";
 import { users } from "./users";
 
 /**
- * Partners — people the user has computed synastry against. One row per
+ * Partners, people the user has computed synastry against. One row per
  * partner saved, soft-deleted via `deletedAt` (we keep deleted rows so
  * the monthly creation cap stays non-gameable). The partner's natal
  * chart is cached on the row; AI interpretation also caches inline,
@@ -32,7 +32,7 @@ export const partners = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     dateOfBirth: date("date_of_birth", { mode: "string" }).notNull(),
-    /** NULL when birth time unknown — chart still computes against 12:00. */
+    /** NULL when birth time unknown, chart still computes against 12:00. */
     timeOfBirth: time("time_of_birth"),
     latitude: doublePrecision("latitude").notNull(),
     longitude: doublePrecision("longitude").notNull(),
@@ -40,7 +40,7 @@ export const partners = pgTable(
     timezone: text("timezone").notNull(),
     /** Cached natal chart for this partner. */
     chart: jsonb("chart").$type<NatalChartJson>().notNull(),
-    /** Hash of the partner's own birth inputs — busts AI interp cache when
+    /** Hash of the partner's own birth inputs, busts AI interp cache when
      *  the partner's data changes (currently we don't allow edit, but
      *  reserved). */
     inputHash: text("input_hash").notNull(),
@@ -48,7 +48,7 @@ export const partners = pgTable(
     aiInterpretation: jsonb(
       "ai_interpretation",
     ).$type<SynastryInterpretationJson | null>(),
-    /** Hash of the *viewer's* natal chart at interp time — invalidate when
+    /** Hash of the *viewer's* natal chart at interp time, invalidate when
      *  the user's own chart changes (e.g. they fixed their birth time). */
     aiViewerHash: text("ai_viewer_hash"),
     aiModel: text("ai_model"),
@@ -233,7 +233,7 @@ export type SynastryDeepReportJson = {
   communication: string;
   /** Friendship, trust & emotional safety. */
   trust: string;
-  /** Friction & growth — where it's hard and what it teaches. */
+  /** Friction & growth, where it's hard and what it teaches. */
   friction: string;
   /** Long-term potential. */
   longTerm: string;

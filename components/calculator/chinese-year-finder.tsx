@@ -11,7 +11,7 @@ import { animalForYear } from "@/lib/seo/chinese-zodiac";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * "ზოდიაქოს ნიშანი წლების მიხედვით" — type a birth year, get the Chinese
+ * "ზოდიაქოს ნიშანი წლების მიხედვით", type a birth year, get the Chinese
  * animal. Pure client, no API (the mapping is deterministic).
  */
 export function ChineseYearFinder({ locale = "ka" }: { locale?: UserLocale }) {
@@ -91,7 +91,7 @@ export function ChineseYearFinder({ locale = "ka" }: { locale?: UserLocale }) {
       <p className="mt-3 text-xs text-muted-foreground">
         {en
           ? "If you were born in January or early February, you may belong to the previous animal year because Chinese New Year changes date each year."
-          : "თუ იანვარში ან თებერვლის დასაწყისში დაიბადე, შესაძლოა წინა წლის ცხოველი იყოს — ჩინური ახალი წელი იცვლება იანვრის ბოლოს/თებერვალში."}
+          : "თუ იანვარში ან თებერვლის დასაწყისში დაიბადე, შესაძლოა წინა წლის ცხოველი იყოს, ჩინური ახალი წელი იცვლება იანვრის ბოლოს/თებერვალში."}
       </p>
     </div>
   );

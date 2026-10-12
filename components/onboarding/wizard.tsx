@@ -104,8 +104,8 @@ export function OnboardingWizard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  // Birth date is locked after first registration (the server enforces this
-  // — see actions/profile.ts). When the user comes back to edit, hide the
+  // Birth date is locked after first registration (the server enforces this,
+  // see actions/profile.ts). When the user comes back to edit, hide the
   // date step entirely so they don't waste time on a read-only field, and
   // surface a one-line lock notice on the first remaining step instead.
   // Photos are managed from /account after the first chart is shown.
@@ -122,7 +122,7 @@ export function OnboardingWizard({
   const flow = dateLocked ? "edit" : "new";
 
   // Fire FB Pixel CompleteRegistration the first time a brand-new user
-  // arrives at onboarding — they've just completed Google OAuth or email
+  // arrives at onboarding, they've just completed Google OAuth or email
   // verification, which is the conversion FB ads should be optimised for.
   // localStorage flag prevents re-fires on hard reloads or back-navigation.
   useEffect(() => {
@@ -213,7 +213,7 @@ export function OnboardingWizard({
 
   const stepValid = useMemo(() => {
     // Gender is optional (server stores it only for male/female) and must
-    // never block the first natal value — see W03.
+    // never block the first natal value, see W03.
     if (currentStep === "date") return validateDate(data.date) !== null;
     if (currentStep === "time") return validateTime(data.time).ok;
     if (currentStep === "place") return data.place !== null;

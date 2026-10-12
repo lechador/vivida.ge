@@ -1,19 +1,19 @@
 /**
- * Winback nudges — the daily cron calls `sendWinbackNudges()`, which finds
+ * Winback nudges, the daily cron calls `sendWinbackNudges()`, which finds
  * users who WERE active but have now been quiet for 7+ days and sends one
  * personal "the sky kept moving" email (+ web push when they have push subs).
  *
  * Audience: last authed visit (user_activity_day) between 7 and 14 days ago.
- * The 14-day upper bound means long-dormant users aren't nagged forever —
+ * The 14-day upper bound means long-dormant users aren't nagged forever,
  * each dormancy spell gets exactly one shot, in its second week.
  *
  * Idempotency: an email_send_log claim row (kind='winback') is inserted
- * before sending, and anyone with a winback in the last 30 days is skipped —
+ * before sending, and anyone with a winback in the last 30 days is skipped,
  * so the 05:30 retry tick can't double-send, and a user who returns then
  * lapses again isn't nudged more than monthly.
  *
  * Personalization (all best-effort): today's cached horoscope headline for
- * their sun sign (from date_of_birth — no chart needed) and their credit
+ * their sun sign (from date_of_birth, no chart needed) and their credit
  * balance. Missing pieces degrade to the generic copy, never block the send.
  */
 
@@ -137,7 +137,7 @@ export type WinbackResult = {
   failed: number;
 };
 
-/** Cron entrypoint — one personal nudge per user per dormancy spell. */
+/** Cron entrypoint, one personal nudge per user per dormancy spell. */
 export async function sendWinbackNudges(): Promise<WinbackResult> {
   const found = await findDormantUsers();
   const result: WinbackResult = {
@@ -161,7 +161,7 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
       const row = await ensureSignHoroscope(slug, "day");
       headline = row?.headline ?? null;
     } catch {
-      /* horoscope is garnish — never block the nudge */
+      /* horoscope is garnish, never block the nudge */
     }
     headlineBySlug.set(slug, headline);
     return headline;
@@ -178,7 +178,7 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
         continue;
       }
 
-      // Claim first — the once-per-spell guard — so the 05:30 retry tick
+      // Claim first, the once-per-spell guard, so the 05:30 retry tick
       // can't double-send even if this run dies mid-loop.
       const [claim] = await db
         .insert(emailSendLog)
@@ -201,7 +201,7 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
           ? (await ensureDailyFor(u.userId, "en"))?.headline ?? null
           : slug ? await headlineFor(slug) : null;
       } catch {
-        /* horoscope is garnish — never block the nudge */
+        /* horoscope is garnish, never block the nudge */
       }
       let balance = 0;
       try {
@@ -211,7 +211,7 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
       }
       const firstName = u.name?.split(" ")[0] ?? null;
 
-      // Web push (independent of email prefs — its own opt-in channel).
+      // Web push (independent of email prefs, its own opt-in channel).
       if (isPushConfigured()) {
         try {
           const sent = await sendPushToUser(u.userId, {
@@ -232,7 +232,7 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
         }
       }
 
-      // Email — only with an address and nudges not opted out.
+      // Email, only with an address and nudges not opted out.
       if (!resend || !u.email || u.emailNudges === false) {
         await db
           .update(emailSendLog)

@@ -272,8 +272,8 @@ export default async function MoonHubPage() {
             გაიგე შენი ზუსტი მთვარის ნიშანი
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            შენი დაბადების დროიდან Vivida ერთ წუთში დაგიფიქსირებს მთვარის ნიშანს
-            — და ცის 12 სახლის სრულ რუკას.
+            შენი დაბადების დროიდან Vivida ერთ წუთში დაგიფიქსირებს მთვარის
+            ნიშანს, და ცის 12 სახლის სრულ რუკას.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/signup">დაიწყე უფასოდ</Link>

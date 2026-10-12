@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/bazaar/reviews { bookingId, rating, comment? } — the buyer
+ * POST /api/bazaar/reviews { bookingId, rating, comment? }, the buyer
  * reviews a DELIVERED booking exactly once. Public review rows carry no
  * buyer identity and no booking linkage beyond the private row.
  */
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     await refreshProviderRating(booking.providerId);
     return NextResponse.json({ ok: true, id: review.id }, { status: 201 });
   } catch (e) {
-    // Unique booking_id (23505) — this booking was already reviewed.
+    // Unique booking_id (23505), this booking was already reviewed.
     // Anything else must surface as a real error, not as "already reviewed".
     if (
       typeof e === "object" &&

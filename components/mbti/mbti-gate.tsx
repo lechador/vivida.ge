@@ -17,7 +17,7 @@ import {
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Anonymous teaser gate. Computes the type client-side (free — no AI, no
+ * Anonymous teaser gate. Computes the type client-side (free, no AI, no
  * server) from the stored answers and shows it with the axis bars, but keeps
  * the deep synthesis locked behind login/registration. The CTAs carry
  * `next=/pirovnebis-testi/claim` so the user returns here and auto-generates after auth.
@@ -34,7 +34,7 @@ export function MbtiGate({
   const [noAnswers, setNoAnswers] = useState(false);
 
   useEffect(() => {
-    // One-shot localStorage read (client-only external system) — intentional.
+    // One-shot localStorage read (client-only external system), intentional.
     /* eslint-disable react-hooks/set-state-in-effect */
     try {
       const raw = window.localStorage.getItem(MBTI_ANSWERS_STORAGE_KEY);
@@ -92,7 +92,7 @@ export function MbtiGate({
         <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
           {en
             ? "Sign in or create an account to save your result and unlock the complete personality profile."
-            : "შედი ან დარეგისტრირდი, რომ ნახო სრული ფსიქოლოგიურ-ასტროლოგიური ანალიზი — მიიღებ ელფოსტაზეც."}
+            : "შედი ან დარეგისტრირდი, რომ ნახო სრული ფსიქოლოგიურ-ასტროლოგიური ანალიზი, მიიღებ ელფოსტაზეც."}
         </p>
         <div className="mt-5 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
           <Button asChild variant="mystic" size="lg">

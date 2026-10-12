@@ -3,9 +3,9 @@
  *
  * The pro-written, pre-generated bulk that the fast live `flash` synthesis
  * composes over (mirrors the transit/house libraries):
- *   - `type`     — deep psychological portrait per MBTI type (16). `title` is
+ *   - `type`, deep psychological portrait per MBTI type (16). `title` is
  *                  the Georgian archetype name.
- *   - `type_sun` — how each type expresses through each Sun sign (16 × 12 = 192).
+ *   - `type_sun`, how each type expresses through each Sun sign (16 × 12 = 192).
  *
  * Bulk seeding runs via scripts/seed-mbti-library.mjs (Vertex, gemini-3.8-flash).
  * The generators here (OpenRouter) are the live self-heal path for gaps.
@@ -49,13 +49,13 @@ export function mbtiTypeSunKey(type: string, sign: string): string {
 }
 
 /**
- * The rich, 16Personalities-style profile sections — pre-written per 4-letter
+ * The rich, 16Personalities-style profile sections, pre-written per 4-letter
  * type (astrology stays in the live synthesis, so these are type-stable and
  * render with zero per-test cost). 7 × 16 = 112 rows.
  *
  * Formats:
- *   - "list" — one bulleted "**Title** — body" list (strengths / weaknesses).
- *   - "dual" — a "ძლიერი მხარეები:" list followed by a "სუსტი მხარეები:" list,
+ *   - "list", one bulleted "**Title**, body" list (strengths / weaknesses).
+ *   - "dual", a "ძლიერი მხარეები:" list followed by a "სუსტი მხარეები:" list,
  *     so each life-domain (relationships, career, …) shows both sides.
  */
 export const MBTI_SECTIONS = [
@@ -109,7 +109,7 @@ export function allMbtiCombos(): MbtiCombo[] {
 
 export type MbtiLibraryEntry = { title: string | null; body: string };
 
-/** Batched read: key → {title, body}. Pure read — never generates. */
+/** Batched read: key → {title, body}. Pure read, never generates. */
 export async function getMbtiLibraryEntries(
   keys: string[],
 ): Promise<Map<string, MbtiLibraryEntry>> {
@@ -152,7 +152,7 @@ export type MbtiSection = {
 /**
  * Fetch all present profile sections for a type, in canonical order. Missing
  * sections are simply omitted (the results page renders whatever exists). Pure
- * read — never generates.
+ * read, never generates.
  */
 export async function getTypeSections(type: string): Promise<MbtiSection[]> {
   const map = await getMbtiLibraryEntries(
@@ -171,12 +171,12 @@ export async function getTypeSections(type: string): Promise<MbtiSection[]> {
 
 const SYSTEM_PROMPT =
   "შენ ხარ გამოცდილი ქართველი ფსიქოანალიტიკოსი და მწერალი. წერ ბუნებრივ, " +
-  "მდიდარ, ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "მდიდარ, ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   "თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები.";
 
 export function buildTypePrompt(type: string): string {
   return (
-    `დაწერე MBTI ტიპის — ${type} (${mbtiArchetypeKa(type)}) — ღრმა ფსიქოლოგიური პორტრეტი ქართულად.\n` +
+    `დაწერე MBTI ტიპის, ${type} (${mbtiArchetypeKa(type)}), ღრმა ფსიქოლოგიური პორტრეტი ქართულად.\n` +
     `ახსენი: ამ ტიპის ბირთვული მოტივაცია, ძლიერი მხარეები, ბრმა წერტილები, ` +
     `როგორ ფიქრობს, გრძნობს და იღებს გადაწყვეტილებებს. 4-6 აბზაცი, "შენ"-ის ფორმა, ` +
     `თბილი და კონკრეტული. დააბრუნე მხოლოდ ტექსტი.`
@@ -189,8 +189,8 @@ export function buildTypeSunPrompt(type: string, signKey: string): string {
   return (
     `დაწერე, როგორ ვლინდება MBTI ტიპი ${type} (${mbtiArchetypeKa(type)}), როცა ` +
     `ადამიანის მზის ნიშანი ${signKa}-ია.\n` +
-    `${signKa} — ${sign?.element ?? ""} ელემენტის ნიშანი. ახსენი, სად ამძაფრებს ან ` +
-    `არბილებს ${signKa}-ის მზე ამ ტიპის ბუნებას — კონკრეტული, ცოცხალი ნიუანსებით. ` +
+    `${signKa}, ${sign?.element ?? ""} ელემენტის ნიშანი. ახსენი, სად ამძაფრებს ან ` +
+    `არბილებს ${signKa}-ის მზე ამ ტიპის ბუნებას, კონკრეტული, ცოცხალი ნიუანსებით. ` +
     `3-4 აბზაცი, "შენ"-ის ფორმა. დააბრუნე მხოლოდ ტექსტი.`
   );
 }
@@ -202,7 +202,7 @@ export function buildSectionPrompt(
 ): string {
   const label = `MBTI ტიპი ${type} (${mbtiArchetypeKa(type)})`;
   const listFmt =
-    `ჩამოთვალე 6 პუნქტი. თითოეული ცალკე ხაზზე ფორმატით: **სათაური** — ერთი-ორი ` +
+    `ჩამოთვალე 6 პუნქტი. თითოეული ცალკე ხაზზე ფორმატით: **სათაური**, ერთი-ორი ` +
     `წინადადება ახსნა. არ გამოიყენო ნუმერაცია ან ტირეები დასაწყისში. მხოლოდ ეს პუნქტები.`;
 
   // Each life-domain gets both sides: 3 strengths + 3 challenges, in a strict
@@ -211,16 +211,16 @@ export function buildSectionPrompt(
     `დაწერე, როგორია ${label} ${domain}. მოიყვანე 3 ძლიერი მხარე და 3 სუსტი მხარე/` +
     `გამოწვევა ამ სფეროში, "შენ"-ის ფორმით, გამართული ქართულით. დააბრუნე ზუსტად ამ ` +
     `ფორმატში, დამატებითი ტექსტისა და ნუმერაციის გარეშე:\n` +
-    `ძლიერი მხარეები:\n**სათაური** — ერთი წინადადება.\n**სათაური** — ერთი წინადადება.\n` +
-    `**სათაური** — ერთი წინადადება.\n\nსუსტი მხარეები:\n**სათაური** — ერთი წინადადება.\n` +
-    `**სათაური** — ერთი წინადადება.\n**სათაური** — ერთი წინადადება.`;
+    `ძლიერი მხარეები:\n**სათაური**, ერთი წინადადება.\n**სათაური**, ერთი წინადადება.\n` +
+    `**სათაური**, ერთი წინადადება.\n\nსუსტი მხარეები:\n**სათაური**, ერთი წინადადება.\n` +
+    `**სათაური**, ერთი წინადადება.\n**სათაური**, ერთი წინადადება.`;
 
   switch (kind) {
     case "strengths":
       return `დაწერე ${label}-ის ძლიერი მხარეები ქართულად.\n${listFmt}`;
     case "weaknesses":
       return (
-        `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
+        `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად, ` +
         `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`
       );
     case "romantic":
@@ -282,7 +282,7 @@ async function generateBody(prompt: string): Promise<string> {
 
 /**
  * Ensure the given combos exist, generating any missing ones (self-heal).
- * Background path — callers must NOT await this on a render path; a gap just
+ * Background path, callers must NOT await this on a render path; a gap just
  * means the live synthesis has slightly less pre-written context that round.
  */
 export async function ensureMbtiLibraryFor(combos: MbtiCombo[]): Promise<void> {

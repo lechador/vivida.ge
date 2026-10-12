@@ -15,7 +15,7 @@ import {
 import { getHouseLibraryEntries, houseLibraryKey } from "@/lib/house-library";
 
 /**
- * Long-form report content — generated SPECIFICALLY for the premium PDF, not
+ * Long-form report content, generated SPECIFICALLY for the premium PDF, not
  * reused from the (short) website interpretations. Every section is richer and
  * deeper than the on-site text so a paid report feels like a real product:
  * multi-paragraph per-placement depth, plus synthesis sections (chart
@@ -81,12 +81,12 @@ async function chatJson<T>(
 }
 
 const SYSTEM = `შენ ხარ გამოცდილი, თბილი და ღრმა ცოდნის მქონე ასტროლოგი, რომელიც წერს ფასიან, პრემიუმ ნატალურ ანგარიშს ქართულ ენაზე.
-ეს არ არის უფასო, მოკლე აღწერა — ეს არის სიღრმისეული, ღირებული პროდუქტი, რომელშიც ადამიანმა ფული გადაიხადა.
-სტილი: მდიდარი, ლიტერატურული, ფსიქოლოგიურად ღრმა, მაგრამ კონკრეტული და პიროვნული. თითო პლანეტა/სახლი/ასპექტი დაამუშავე ღრმად — ფსიქოლოგია, გამოვლინება, ძლიერი მხარე და ზრდის ზონა.
+ეს არ არის უფასო, მოკლე აღწერა, ეს არის სიღრმისეული, ღირებული პროდუქტი, რომელშიც ადამიანმა ფული გადაიხადა.
+სტილი: მდიდარი, ლიტერატურული, ფსიქოლოგიურად ღრმა, მაგრამ კონკრეტული და პიროვნული. თითო პლანეტა/სახლი/ასპექტი დაამუშავე ღრმად, ფსიქოლოგია, გამოვლინება, ძლიერი მხარე და ზრდის ზონა.
 წესები:
 - წერe მხოლოდ ქართულად, გამართულად, მდიდარი ლექსიკით.
 - მიმართე მკითხველს მეორე პირში ("შენ").
-- იყავი კონკრეტული ამ რუკის მიმართ — არა ზოგადი ჰოროსკოპული ფრაზები.
+- იყავი კონკრეტული ამ რუკის მიმართ, არა ზოგადი ჰოროსკოპული ფრაზები.
 - არ გაიმეორო ერთი და იგივე აზრი.
 - დააბრუნე მხოლოდ ვალიდური JSON ზუსტად მოთხოვნილი ფორმით.`;
 
@@ -95,7 +95,7 @@ const SYSTEM = `შენ ხარ გამოცდილი, თბილი
 export type NatalNarrative = {
   /** 4–6 bespoke highlights, most-striking-first, driven by the salience. */
   standout: Array<{ title: string; body: string }>;
-  /** A synthesising "chart signature" — the core archetype of this chart. */
+  /** A synthesising "chart signature", the core archetype of this chart. */
   signature: string;
   /** Elemental + modal balance synthesis, including the weak/missing end. */
   balance: string;
@@ -221,10 +221,10 @@ ${stelliums}
 დააბრუნე JSON:
 {
   "standout": [ { "title": "...", "body": "3-5 წინადადება" } ],   // 4-6 ელემენტი, ყველაზე თვალშისაცემიდან, გამოთვლილ მონაცემებზე დაყრდნობით
-  "signature": "5-7 წინადადება — ამ რუკის ბირთვული არქეტიპი/ხელწერა, სინთეზი",
+  "signature": "5-7 წინადადება, ამ რუკის ბირთვული არქეტიპი/ხელწერა, სინთეზი",
   "balance": "4-6 წინადადება ელემენტებსა და მოდალობებზე, სუსტი მხარის ჩათვლით",
   "strengths": "5-7 წინადადება კონკრეტული ძლიერი მხარეები და ნიჭები",
-  "growth": "5-7 წინადადება ზრდის ზონები და ჩრდილი — როგორ იმუშაოს მათზე",
+  "growth": "5-7 წინადადება ზრდის ზონები და ჩრდილი, როგორ იმუშაოს მათზე",
   "closing": "4-5 წინადადებიანი თბილი დასკვნა"
 }`;
   return chatJson<NatalNarrative>(SYSTEM, user, 12000);
@@ -236,7 +236,7 @@ async function generatePlanets(
   const user = `რუკის პლანეტარული განლაგება:
 ${planetFacts(chart)}
 
-დააბრუნე JSON, სადაც თითო პლანეტა (sun, moon, ascendant, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto) ღრმად არის ინტერპრეტირებული — თითო 6-9 წინადადება, რომელიც მოიცავს: პლანეტის ფუნქციას ფსიქიკაში, ნიშნის გავლენას, სახლის (ცხოვრების სფერო) მნიშვნელობას, რეტროგრადულობას თუ აქვს, კონკრეტულ ძლიერ მხარესა და ზრდის ზონას.
+დააბრუნე JSON, სადაც თითო პლანეტა (sun, moon, ascendant, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto) ღრმად არის ინტერპრეტირებული, თითო 6-9 წინადადება, რომელიც მოიცავს: პლანეტის ფუნქციას ფსიქიკაში, ნიშნის გავლენას, სახლის (ცხოვრების სფერო) მნიშვნელობას, რეტროგრადულობას თუ აქვს, კონკრეტულ ძლიერ მხარესა და ზრდის ზონას.
 ფორმატი: { "sun": "...", "moon": "...", "ascendant": "...", "mercury": "...", ... }`;
   return chatJson<Record<string, string>>(SYSTEM, user, 24000);
 }
@@ -247,7 +247,7 @@ async function generateHouses(
   const user = `რუკის 12 სახლი:
 ${houseFacts(chart)}
 
-დააბრუნე JSON, სადაც თითო სახლი ("1".."12") ღრმად არის ინტერპრეტირებული — თითო 5-7 წინადადება: ცხოვრების სფერო, კუსპის ნიშნისა და შიგა პლანეტების გავლენა, რა უნდა განავითაროს ამ სფეროში.
+დააბრუნე JSON, სადაც თითო სახლი ("1".."12") ღრმად არის ინტერპრეტირებული, თითო 5-7 წინადადება: ცხოვრების სფერო, კუსპის ნიშნისა და შიგა პლანეტების გავლენა, რა უნდა განავითაროს ამ სფეროში.
 ფორმატი: { "1": "...", "2": "...", ..., "12": "..." }`;
   return chatJson<Record<string, string>>(SYSTEM, user, 24000);
 }
@@ -265,7 +265,7 @@ async function generateAspects(
   const user = `ამ რუკის ყველაზე ძლიერი ასპექტები (ზუსტი = ძლიერი):
 ${list}
 
-დააბრუნე JSON, სადაც გასაღები არის თითო ასპექტის "key" და მნიშვნელობა — ღრმა ინტერპრეტაცია (5-7 წინადადება): ორ პლანეტას შორის დინამიკა, ჰარმონიული/დაძაბული ბუნება, როგორ ვლინდება ცხოვრებაში, როგორ იმუშაოს მასთან.
+დააბრუნე JSON, სადაც გასაღები არის თითო ასპექტის "key" და მნიშვნელობა, ღრმა ინტერპრეტაცია (5-7 წინადადება): ორ პლანეტას შორის დინამიკა, ჰარმონიული/დაძაბული ბუნება, როგორ ვლინდება ცხოვრებაში, როგორ იმუშაოს მასთან.
 ფორმატი: { "<key>": "...", ... }`;
   return chatJson<Record<string, string>>(SYSTEM, user, 16000);
 }
@@ -278,7 +278,7 @@ export async function generateNatalReport(input: {
   const { chart } = input;
 
   // The per-placement (Big Three + planet) section reuses the shared
-  // interpretation library — the same text the website report shows — so the
+  // interpretation library, the same text the website report shows, so the
   // PDF reads consistently and, when the library covers every placement, we
   // skip the heavy per-PDF planets AI call entirely (faster). Falls back to
   // on-the-fly generation if the library isn't seeded.

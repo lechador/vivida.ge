@@ -8,7 +8,7 @@ import {
 } from "./_layout";
 
 /**
- * Notification email — fired only when the recipient has been absent
+ * Notification email, fired only when the recipient has been absent
  * from the site for >1h, throttled to one per hour. The "from" name is
  * the requester; we send to the *recipient* of the friend request.
  */

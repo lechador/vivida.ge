@@ -11,7 +11,7 @@ const DESCRIPTION =
   "Learn what Vivida is, how its astrology and self-discovery content is created, and how to contact the team in Georgia.";
 
 export const metadata: Metadata = {
-  title: { absolute: `${TITLE} — Astrology and Self-Discovery` },
+  title: { absolute: `${TITLE}, Astrology and Self-Discovery` },
   description: DESCRIPTION,
   alternates: {
     canonical: `${ENGLISH_SITE_URL}/about`,

@@ -35,7 +35,7 @@ export function MbtiClaimRunner({ locale = "ka" }: { locale?: UserLocale }) {
       /* fall through */
     }
     if (!answers || Object.keys(answers).length === 0) {
-      // One-shot localStorage read (client-only external system) — intentional.
+      // One-shot localStorage read (client-only external system), intentional.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setNoAnswers(true);
       return;
@@ -102,8 +102,8 @@ export function MbtiClaimRunner({ locale = "ka" }: { locale?: UserLocale }) {
       </h2>
       <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
         {en
-          ? "We are preparing your detailed personality portrait. This may take a few seconds—please keep this page open."
-          : "ვაერთიანებ შენს ფსიქოლოგიურ ტიპსა და ნატალურ რუკას. ეს რამდენიმე წამს გრძელდება — გვერდი არ დახურო."}
+          ? "We are preparing your detailed personality portrait. This may take a few seconds, please keep this page open."
+          : "ვაერთიანებ შენს ფსიქოლოგიურ ტიპსა და ნატალურ რუკას. ეს რამდენიმე წამს გრძელდება, გვერდი არ დახურო."}
       </p>
       <Loader2 className="mx-auto mt-6 size-5 animate-spin text-muted-foreground" />
     </div>

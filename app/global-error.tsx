@@ -10,12 +10,12 @@ import { isEnglishHost } from "@/lib/seo/locales";
 const subscribeNever = () => () => {};
 
 /**
- * App-wide error boundary — the last line of defense. It catches errors that
+ * App-wide error boundary, the last line of defense. It catches errors that
  * escape every route (including ones thrown by the root layout itself), so a
  * single unhandled throw never leaves the user on a blank/broken page.
  *
  * global-error REPLACES the root layout when active, so it must render its own
- * <html>/<body> and can't rely on the app's Tailwind being loaded — everything
+ * <html>/<body> and can't rely on the app's Tailwind being loaded, everything
  * here is inline-styled to match the dark theme unconditionally.
  *
  * Behaviour mirrors app/report/error.tsx: one automatic retry (transient blips
@@ -34,7 +34,7 @@ export default function GlobalError({
 }) {
   const [retrying, setRetrying] = useState(false);
   // The host can only be sniffed in the browser, and this page also renders on
-  // the server — so the two snapshots are declared separately instead of
+  // the server, so the two snapshots are declared separately instead of
   // reconciled in an effect. Georgian stays the server-side fallback.
   const en = useSyncExternalStore(
     subscribeNever,
@@ -52,7 +52,7 @@ export default function GlobalError({
     try {
       alreadyRetried = sessionStorage.getItem("vivida_global_retried") === "1";
     } catch {
-      /* private mode — skip auto-retry */
+      /* private mode, skip auto-retry */
     }
     if (alreadyRetried) return;
     try {
@@ -146,8 +146,8 @@ export default function GlobalError({
               }}
             >
               {en
-                ? "This was a temporary glitch. Try again — this usually resolves immediately."
-                : "დროებითი შეფერხება იყო. სცადე ხელახლა — ჩვეულებრივ მაშინვე ეშველება."}
+                ? "This was a temporary glitch. Try again, this usually resolves immediately."
+                : "დროებითი შეფერხება იყო. სცადე ხელახლა, ჩვეულებრივ მაშინვე ეშველება."}
             </p>
             <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
               <button type="button" onClick={manualRetry} style={primaryBtn}>

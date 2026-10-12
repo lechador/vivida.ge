@@ -9,14 +9,14 @@ import { cn } from "@/lib/utils";
 /**
  * A collapsible report section. Header is always visible; clicking it
  * (or the chevron) toggles the body. Auto-expands when a URL hash matches
- * its id — so clicking a ReportNav pill or any deep-link expands the
+ * its id, so clicking a ReportNav pill or any deep-link expands the
  * destination section instead of dropping the user on a closed accordion.
  */
 export function CollapsibleSection({
   id,
   /** Pre-rendered icon JSX, e.g. <Sparkles className="size-5" />. We accept
    *  rendered JSX rather than a component so this client component can be
-   *  used from RSC parents — components-as-props don't cross the boundary. */
+   *  used from RSC parents, components-as-props don't cross the boundary. */
   icon,
   title,
   subtitle,
@@ -55,7 +55,7 @@ export function CollapsibleSection({
       // threshold (amount: 0.15) breaks on tall sections: houses/aspects can
       // exceed viewport_height / 0.15, so 15% of them is never on-screen at
       // once, whileInView never fires, and the section stays invisible while
-      // still occupying layout space — a giant blank gap in the report.
+      // still occupying layout space, a giant blank gap in the report.
       viewport={{ once: true, amount: "some" }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >

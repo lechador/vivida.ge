@@ -17,7 +17,7 @@ export function genitiveKa(nounKa: string): string {
   if (nounKa.endsWith("ი")) return `${nounKa.slice(0, -1)}ის`;
   if (nounKa.endsWith("ა")) return `${nounKa.slice(0, -1)}ის`;
   if (nounKa.endsWith("ე")) return `${nounKa}ს`;
-  return `${nounKa}ს`; // ო/უ etc. — "კუროს", "მთვარეს"
+  return `${nounKa}ს`; // ო/უ etc., "კუროს", "მთვარეს"
 }
 
 /** "ვერძი" → "ვერძში", "ტყუპები" → "ტყუპებში", "კურო" → "კუროში". */

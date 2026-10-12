@@ -14,7 +14,7 @@ import { isBlockedEitherWay } from "@/lib/block";
 
 /**
  * Web-push mirrors for social notifications. Until now push fired exactly
- * once a day (the morning horoscope blast) — social events (comments,
+ * once a day (the morning horoscope blast), social events (comments,
  * reactions, mentions, friend requests, matches, messages) only reached the
  * in-app bell, so nobody learned about a reply until their next visit. This
  * turns those events into return visits.
@@ -24,10 +24,10 @@ import { isBlockedEitherWay } from "@/lib/block";
  *    Fire-and-forget via after() so it never adds latency or failure risk to
  *    the write path. Copy mirrors the bell dropdown's Georgian labels.
  *  - sendMessagePush(): chat messages don't create notification rows (they're
- *    SSE-driven in-app), so they get their own path — gated on the recipient
+ *    SSE-driven in-app), so they get their own path, gated on the recipient
  *    being away from the app and throttled per sender→recipient pair so a
  *    rapid-fire conversation doesn't spam the lockscreen.
- *  - The `credit` notification kind is deliberately NOT pushed — balance
+ *  - The `credit` notification kind is deliberately NOT pushed, balance
  *    changes are ambient info, not something to interrupt someone's day for.
  */
 
@@ -91,7 +91,7 @@ function copyFor(
         title: en ? "New reaction to your post" : "შენს პოსტს გამოეხმაურნენ",
         body: en
           ? `${name} ${REACTION_EN[payload.reaction ?? ""] ?? "reacted to your post"}`
-          : `${name} — ${REACTION_KA[payload.reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"}`,
+          : `${name}, ${REACTION_KA[payload.reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"}`,
         url: postUrl,
         // Collapse repeated reactions on the same post into one banner.
         tag: `reactions-${payload.postId ?? "x"}`,
@@ -169,7 +169,7 @@ function copyFor(
           }
         : null;
     default:
-      return null; // e.g. "credit" — bell-only by design
+      return null; // e.g. "credit", bell-only by design
   }
 }
 

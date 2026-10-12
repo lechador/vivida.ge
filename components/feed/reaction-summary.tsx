@@ -4,7 +4,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 import { ReactionIcon, REACTIONS } from "./reaction-icons";
 
 /**
- * "👍❤ 10" Facebook-style summary line — stacked thumbnails of every
+ * "👍❤ 10" Facebook-style summary line, stacked thumbnails of every
  * reaction that has at least one tally, followed by the total.
  *
  * Returns null when the post has no reactions at all so the row

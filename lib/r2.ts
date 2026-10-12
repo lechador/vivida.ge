@@ -121,7 +121,7 @@ export async function presignedDownloadUrl({
 
 /**
  * Read a private object back out of R2 as bytes. Most consumers get a
- * presigned URL instead, but some need the file itself server-side — e.g.
+ * presigned URL instead, but some need the file itself server-side, e.g.
  * attaching a generated report PDF to an email.
  */
 export async function getObjectBytes(key: string): Promise<Uint8Array> {

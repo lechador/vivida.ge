@@ -269,8 +269,8 @@ export default async function RisingHubPage() {
             გაიგე შენი ზუსტი ამომავალი
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ასცენდენტი ცაში ~2 საათში იცვლება. დაბადების ზუსტი დრო და ადგილი —
-            და Vivida ერთ წუთში დაგიფიქსირებს.
+            ასცენდენტი ცაში ~2 საათში იცვლება. დაბადების ზუსტი დრო და ადგილი, და
+            Vivida ერთ წუთში დაგიფიქსირებს.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/signup">დაიწყე უფასოდ</Link>

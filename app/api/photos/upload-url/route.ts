@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       detail,
       stack: (err as Error)?.stack?.split("\n").slice(0, 6).join("\n"),
     });
-    // Detail stays in the server log only — the SDK's cause chain leaks
+    // Detail stays in the server log only, the SDK's cause chain leaks
     // bucket/endpoint/credential state to the client.
     return NextResponse.json({ error: "presign_failed" }, { status: 500 });
   }

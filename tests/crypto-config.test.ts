@@ -8,7 +8,7 @@ import {
 import { formatBillingAmount } from "@/lib/billing-config";
 
 /**
- * Pins the USDC catalogue's shape invariants — the same guarantees the Stripe
+ * Pins the USDC catalogue's shape invariants, the same guarantees the Stripe
  * markets carry: the per-credit rate improves with pack size, and the PRO
  * pass undercuts the largest pack (a pass must never cost more than buying
  * credits for the same month).

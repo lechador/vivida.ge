@@ -1,5 +1,5 @@
 /**
- * Credit-economy constants — the pure, client-safe half of the credit system.
+ * Credit-economy constants, the pure, client-safe half of the credit system.
  *
  * Split out from lib/credits.ts (which imports the DB) so client components
  * (top-up card, invite card, etc.) can read prices/rewards without pulling
@@ -35,7 +35,7 @@ export {
 } from "@/lib/billing-config";
 
 /** Credits EARNED by activity (beyond signup/referral/purchase). Capped to
- *  prevent farming — see the caps below. */
+ *  prevent farming, see the caps below. */
 export const CREDIT_REWARD = {
   /** One small weekly reward keeps the feed loop alive without replacing purchases. */
   feedPost: 1,
@@ -60,7 +60,7 @@ export const RITUAL_STREAK_MILESTONES = [
 export const CREDIT_COST = {
   synastry: 5,
   chat: 2,
-  /** One AI dream interpretation. No free allowance — every reading costs. */
+  /** One AI dream interpretation. No free allowance, every reading costs. */
   dream: 2,
   mbtiTest: 5,
   iqTest: 5,
@@ -112,7 +112,7 @@ export type CreditReason =
   | "admin_grant";
 
 /**
- * Short Georgian label per reason — used in the credit notification row so the
+ * Short Georgian label per reason, used in the credit notification row so the
  * user sees *why* their balance moved. Kept here (client-safe) so the
  * notifications dropdown can read it without pulling in server code.
  */

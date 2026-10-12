@@ -4,7 +4,7 @@
  * and moon ecliptic longitudes, then turns the angular separation into
  * one of the eight canonical phases plus illumination + age.
  *
- * The result is universal — same for everyone on a given UTC day — so
+ * The result is universal, same for everyone on a given UTC day, so
  * it's cached globally in the `moon_phases` table by date alone.
  */
 
@@ -90,7 +90,7 @@ export function ageDaysFromAngle(angle: number): number {
 
 /**
  * Compute the universal moon phase for a given moment. Lat/lng aren't
- * passed because the moon's ecliptic longitude is geocentric — it's the
+ * passed because the moon's ecliptic longitude is geocentric, it's the
  * same from anywhere on Earth (parallax is sub-arcminute and ignored
  * here).
  */
@@ -119,7 +119,7 @@ export function computeMoonPhase(date: Date): MoonPhaseSnapshot | null {
   };
 }
 
-/** UTC date string (YYYY-MM-DD) — moon phase cache key. */
+/** UTC date string (YYYY-MM-DD), moon phase cache key. */
 export function utcDateString(date: Date): string {
   return date.toISOString().slice(0, 10);
 }

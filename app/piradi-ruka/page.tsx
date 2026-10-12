@@ -14,17 +14,17 @@ const URL = `${SITE_URL}/piradi-ruka`;
 // This page targets that term head-on (slug + title + H1 + body) and owns it
 // cleanly: GSC 2026-08 has it at position 2.3 with 46.8% CTR.
 //
-// The old split — this page owning "შედგენა", /nataluri-ruka owning
-// "გამოთვლა" — did not hold. Three pages now surface for "ნატალური რუკა"
+// The old split, this page owning "შედგენა", /nataluri-ruka owning
+// "გამოთვლა", did not hold. Three pages now surface for "ნატალური რუკა"
 // (homepage 2.8, this page 4.5, /nataluri-ruka 6.4), so the term earns 23.6%
 // CTR against 28.9% for the cleanly-owned "პირადი რუკა". Step one of merging
-// them is to give this page the ნატალური vocabulary — description, keywords
-// and an FAQ entry using "გამოთვლა" phrasing — while leaving the title and H1
+// them is to give this page the ნატალური vocabulary, description, keywords
+// and an FAQ entry using "გამოთვლა" phrasing, while leaving the title and H1
 // alone, since they are what earns the 46.8%. If this page takes the head
 // term, /nataluri-ruka gets 301'd here; if not, nothing has been lost.
 //
 // GSC (2026-07): "პირადი რუკის შედგენა [ონლაინ/უფასოდ/ქართულად]" gets real
-// impressions (21 combined) but almost zero clicks — the page never used
+// impressions (21 combined) but almost zero clicks, the page never used
 // the word "შედგენა" anywhere, so it wasn't a strong match for that intent.
 // Added below, plus the "რუქა" typo and standalone "ასტროლოგიური რუკა".
 const KEYWORDS = [
@@ -56,24 +56,24 @@ const KEYWORDS = [
 ];
 
 export const metadata: Metadata = {
-  title: { absolute: "პირადი რუკა ონლაინ — უფასო გამოთვლა" },
+  title: { absolute: "პირადი რუკა ონლაინ, უფასო გამოთვლა" },
   description:
-    "პირადი რუკის (ნატალური რუკის) შედგენა და გამოთვლა ონლაინ, უფასოდ და ქართულად. შეიყვანე დაბადების თარიღი, დრო და ადგილი — ნახე პლანეტები, ასცენდენტი, 12 სახლი და ასპექტები რეგისტრაციის გარეშე.",
+    "პირადი რუკის (ნატალური რუკის) შედგენა და გამოთვლა ონლაინ, უფასოდ და ქართულად. შეიყვანე დაბადების თარიღი, დრო და ადგილი, ნახე პლანეტები, ასცენდენტი, 12 სახლი და ასპექტები რეგისტრაციის გარეშე.",
   keywords: KEYWORDS,
   alternates: { canonical: URL },
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: URL,
-    title: "პირადი რუკა ონლაინ — უფასო გამოთვლა",
+    title: "პირადი რუკა ონლაინ, უფასო გამოთვლა",
     description:
-      "შენი პირადი (ნატალური) რუკა ონლაინ, უფასოდ — პლანეტები, ასცენდენტი, სახლები და ასპექტები ქართულად.",
+      "შენი პირადი (ნატალური) რუკა ონლაინ, უფასოდ, პლანეტები, ასცენდენტი, სახლები და ასპექტები ქართულად.",
     siteName: "Vivida",
     locale: "ka_GE",
   },
   twitter: {
     card: "summary_large_image",
-    title: "პირადი რუკა ონლაინ — უფასო გამოთვლა",
+    title: "პირადი რუკა ონლაინ, უფასო გამოთვლა",
     description: "შენი პირადი (ნატალური) რუკა ონლაინ, უფასოდ.",
   },
 };
@@ -81,15 +81,15 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "როგორ შევადგინო პირადი რუკა?",
-    a: "პირადი რუკის შედგენა 3 ნაბიჯშია: (1) შეიყვანე დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ კალკულატორში, (2) დააჭირე „გამოთვლას“ — შედეგი მყისიერად გამოჩნდება, (3) ნახე პლანეტების პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები. რეგისტრაცია არ სჭირდება.",
+    a: "პირადი რუკის შედგენა 3 ნაბიჯშია: (1) შეიყვანე დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ კალკულატორში, (2) დააჭირე „გამოთვლას“, შედეგი მყისიერად გამოჩნდება, (3) ნახე პლანეტების პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები. რეგისტრაცია არ სჭირდება.",
   },
   {
     q: "პირადი რუკა და ნატალური რუკა ერთი და იგივეა?",
-    a: "დიახ. „პირადი რუკა“ და „ნატალური რუკა“ (დაბადების რუკა) ერთი და იმავე რამის სხვადასხვა სახელია — ცის პერსონალური სურათი შენი დაბადების ზუსტ მომენტში. იგი მხოლოდ შენია, რადგან შენს ზუსტ დროსა და ადგილს ეფუძნება.",
+    a: "დიახ. „პირადი რუკა“ და „ნატალური რუკა“ (დაბადების რუკა) ერთი და იმავე რამის სხვადასხვა სახელია, ცის პერსონალური სურათი შენი დაბადების ზუსტ მომენტში. იგი მხოლოდ შენია, რადგან შენს ზუსტ დროსა და ადგილს ეფუძნება.",
   },
   {
     q: "როგორ გამოვთვალო ნატალური რუკა ონლაინ?",
-    a: "ნატალური რუკის გამოთვლა იგივეა, რაც პირადი რუკის შედგენა — შეიყვანე დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ კალკულატორში და შედეგს მყისიერად მიიღებ: პლანეტების პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები, ქართულად და უფასოდ, რეგისტრაციის გარეშე.",
+    a: "ნატალური რუკის გამოთვლა იგივეა, რაც პირადი რუკის შედგენა, შეიყვანე დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ კალკულატორში და შედეგს მყისიერად მიიღებ: პლანეტების პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები, ქართულად და უფასოდ, რეგისტრაციის გარეშე.",
   },
   {
     q: "უფასოა პირადი რუკის შედგენა?",
@@ -97,7 +97,7 @@ const FAQ = [
   },
   {
     q: "რას აჩვენებს ჩემი პირადი რუკა?",
-    a: "შენს ბირთვულ ხასიათს, ემოციურ ბუნებას, ძლიერ მხარეებსა და ცხოვრების სფეროებს — პლანეტების ნიშნების, 12 სახლისა და ასპექტების მეშვეობით.",
+    a: "შენს ბირთვულ ხასიათს, ემოციურ ბუნებას, ძლიერ მხარეებსა და ცხოვრების სფეროებს, პლანეტების ნიშნების, 12 სახლისა და ასპექტების მეშვეობით.",
   },
   {
     q: "როგორ ავირჩიო პირადი რუკის შესადგენი საიტი?",
@@ -109,7 +109,7 @@ const FAQ = [
   },
   {
     q: "მჭირდება დაბადების ზუსტი დრო?",
-    a: "მზის ნიშანი და პლანეტების უმეტესობა ზუსტი იქნება დროის გარეშეც. თუმცა ამომავალი ნიშანი (ასცენდენტი) და 12 სახლი დროზეა დამოკიდებული — ზუსტი დროით პირადი რუკა ბევრად ზუსტი იქნება.",
+    a: "მზის ნიშანი და პლანეტების უმეტესობა ზუსტი იქნება დროის გარეშეც. თუმცა ამომავალი ნიშანი (ასცენდენტი) და 12 სახლი დროზეა დამოკიდებული, ზუსტი დროით პირადი რუკა ბევრად ზუსტი იქნება.",
   },
 ];
 
@@ -127,7 +127,7 @@ export default function PiradiRukaPage() {
   const appLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "პირადი რუკა ონლაინ — Vivida",
+    name: "პირადი რუკა ონლაინ, Vivida",
     url: URL,
     applicationCategory: "LifestyleApplication",
     operatingSystem: "Web",
@@ -176,7 +176,7 @@ export default function PiradiRukaPage() {
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-pretty text-base text-foreground/80 sm:text-lg">
-            შენი პირადი რუკა მხოლოდ შენია — ცის სურათი შენი დაბადების წამში.
+            შენი პირადი რუკა მხოლოდ შენია, ცის სურათი შენი დაბადების წამში.
             შეიყვანე დაბადების თარიღი, დრო და ადგილი და ნახე ის უფასოდ,
             რეგისტრაციის გარეშე.
           </p>
@@ -201,7 +201,7 @@ export default function PiradiRukaPage() {
                 ნატალური რუკა
               </Link>{" "}
               ან დაბადების რუკა) არის ცის ზუსტი სურათი იმ წამში, როცა დაიბადე.
-              ის მხოლოდ შენია, რადგან შენს უნიკალურ დროსა და ადგილს ეფუძნება —
+              ის მხოლოდ შენია, რადგან შენს უნიკალურ დროსა და ადგილს ეფუძნება,
               და სწორედ ამიტომ აჩვენებს შენს პიროვნებას უფრო ღრმად, ვიდრე
               მხოლოდ მზის ნიშანი.
             </p>
@@ -209,7 +209,7 @@ export default function PiradiRukaPage() {
 
           <section>
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              პირადი რუკის შედგენა ონლაინ — რა უნდა შეეძლოს კარგ საიტს?
+              პირადი რუკის შედგენა ონლაინ, რა უნდა შეეძლოს კარგ საიტს?
             </h2>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
               პირადი რუკის შესადგენი საიტები მხოლოდ მზის ნიშანს არ უნდა
@@ -220,7 +220,7 @@ export default function PiradiRukaPage() {
               რეგისტრაციას არ მოითხოვს.
             </p>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85">
-              თუ პირველად ქმნი რუკას, ნახე დეტალური ინსტრუქცია —{" "}
+              თუ პირველად ქმნი რუკას, ნახე დეტალური ინსტრუქცია,{" "}
               <Link
                 href="/piradi-ruka/rogor-shevadginot"
                 className="text-[var(--vivida-violet)] underline-offset-4 hover:underline"
@@ -259,16 +259,16 @@ export default function PiradiRukaPage() {
             </p>
             <ol className="mt-4 space-y-3 text-base leading-relaxed text-foreground/85">
               <li>
-                <strong className="text-foreground">1. შეიყვანე მონაცემები</strong>{" "}
-                — დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ
+                <strong className="text-foreground">1. შეიყვანე მონაცემები</strong>{" "},
+                დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ
                 კალკულატორში.
               </li>
               <li>
-                <strong className="text-foreground">2. გამოთვალე</strong> —
+                <strong className="text-foreground">2. გამოთვალე</strong>,
                 შედეგი მყისიერად ჩნდება, რეგისტრაციის გარეშე.
               </li>
               <li>
-                <strong className="text-foreground">3. გაეცანი შედეგს</strong> —
+                <strong className="text-foreground">3. გაეცანი შედეგს</strong>,
                 პლანეტების პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები.
               </li>
             </ol>
@@ -280,20 +280,20 @@ export default function PiradiRukaPage() {
             </h2>
             <ul className="mt-4 space-y-3 text-base leading-relaxed text-foreground/85">
               <li>
-                <strong className="text-foreground">პლანეტები</strong> — შენი
+                <strong className="text-foreground">პლანეტები</strong>, შენი
                 შინაგანი ენერგიები: მზე (ბირთვი), მთვარე (ემოციები), მერკური
                 (აზროვნება) და სხვა.
               </li>
               <li>
-                <strong className="text-foreground">ნიშნები</strong> — როგორ
+                <strong className="text-foreground">ნიშნები</strong>, როგორ
                 გამოხატავ თითოეულ ამ ენერგიას.
               </li>
               <li>
-                <strong className="text-foreground">სახლები</strong> — ცხოვრების
+                <strong className="text-foreground">სახლები</strong>, ცხოვრების
                 რომელ სფეროში ვლინდება (კარიერა, ურთიერთობები, ფული…).
               </li>
               <li>
-                <strong className="text-foreground">ასპექტები</strong> — როგორ
+                <strong className="text-foreground">ასპექტები</strong>, როგორ
                 ერწყმის ეს ენერგიები ერთმანეთს შენს ხასიათში.
               </li>
             </ul>
@@ -311,19 +311,19 @@ export default function PiradiRukaPage() {
           </section>
 
           {/* Contextual hand-off into the horoscope hub.
-              GSC: this page ranks p4.0 with 2,514 impressions — it's the
-              strongest page on the site — while /horoskopi sits at p36 for
+              GSC: this page ranks p4.0 with 2,514 impressions, it's the
+              strongest page on the site, while /horoskopi sits at p36 for
               its head term. It linked here to nataluri-ruka and zodiac but
               never to the horoscope hub, so none of that authority reached
               it. Descriptive in-content anchors, not just a pill. */}
           <section className="rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              რუკა და ყოველდღიური პროგნოზი — როგორ უკავშირდება
+              რუკა და ყოველდღიური პროგნოზი, როგორ უკავშირდება
             </h2>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
               პირადი რუკა შენს მუდმივ სურათს ხატავს: სად იდგა თითოეული
               პლანეტა შენი დაბადების წუთს. ის არ იცვლება. რაც იცვლება, ის
-              პლანეტების დღევანდელი მდებარეობაა — და სწორედ ამ მოძრაობას
+              პლანეტების დღევანდელი მდებარეობაა, და სწორედ ამ მოძრაობას
               აღწერს{" "}
               <Link
                 href="/horoskopi"
@@ -332,7 +332,7 @@ export default function PiradiRukaPage() {
                 დღის ჰოროსკოპი
               </Link>
               . ორივე ერთად ბევრად მეტს ამბობს, ვიდრე ცალ-ცალკე: რუკა
-              გეუბნება, <em>ვინ ხარ</em>, ჰოროსკოპი კი — <em>რა ხდება ახლა</em>.
+              გეუბნება, <em>ვინ ხარ</em>, ჰოროსკოპი კი, <em>რა ხდება ახლა</em>.
             </p>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
               თუ მხოლოდ დღევანდელი პროგნოზი გაინტერესებს, გადადი{" "}
@@ -342,7 +342,7 @@ export default function PiradiRukaPage() {
               >
                 ჰოროსკოპზე ყველა ზოდიაქოს ნიშნისთვის
               </Link>
-              ; კვირისა და თვის ხედვისთვის კი —{" "}
+              ; კვირისა და თვის ხედვისთვის კი,{" "}
               <Link
                 href="/horoskopi/kvireuli"
                 className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"

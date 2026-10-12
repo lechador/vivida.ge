@@ -12,7 +12,7 @@ export type MbtiSubmitResult = { ok: true } | { ok: false; error: string };
 const FOCUS_KEY = "vivida_test_focus"; // localStorage: "on" | "off"
 
 /**
- * The Astro-MBTI quiz — one Georgian statement per screen, answered on a
+ * The Astro-MBTI quiz, one Georgian statement per screen, answered on a
  * 5-point agree↔disagree scale (16Personalities-style), auto-advancing so it
  * feels quick. On the final answer it hands the answers to `onSubmit`, which
  * owns what happens next (save + navigate). The quiz shows a "working" state
@@ -40,7 +40,7 @@ export function MbtiQuiz({
   const [error, setError] = useState<string | null>(null);
   const [submitting, startSubmit] = useTransition();
 
-  // Focus mode — spotlights the question card and softly dims everything else
+  // Focus mode, spotlights the question card and softly dims everything else
   // so it's easier to concentrate. On by default; the choice is remembered.
   const [focus, setFocus] = useState(true);
   // Start focused (matches SSR), then honour a remembered opt-out on the client.
@@ -140,7 +140,7 @@ export function MbtiQuiz({
             : "border-border",
         )}
       >
-        {/* Focus-mode toggle — a small chip on the card's corner */}
+        {/* Focus-mode toggle, a small chip on the card's corner */}
         <button
           type="button"
           onClick={toggleFocus}
@@ -195,7 +195,7 @@ export function MbtiQuiz({
             {en ? (q.textEn ?? q.textKa) : q.textKa}
           </p>
 
-          {/* Likert scale — graduated agree (cyan) ↔ disagree (pink) */}
+          {/* Likert scale, graduated agree (cyan) ↔ disagree (pink) */}
           <div
             role="radiogroup"
             aria-label={en ? "Your answer" : "შენი პასუხი"}

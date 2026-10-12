@@ -10,8 +10,8 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Win-back offer for users who have nearly run out of credits: three months of
- * PRO for ₾29. The reader's actual balance is on the page — the offer only
- * makes sense next to the number that prompted it — and the deadline is
+ * PRO for ₾29. The reader's actual balance is on the page, the offer only
+ * makes sense next to the number that prompted it, and the deadline is
  * spelled out rather than implied, since the card on /credits disappears on
  * its own when it lapses.
  *
@@ -30,13 +30,13 @@ export function LowCreditOfferEmail({
   locale = "ka",
 }: {
   name: string | null;
-  /** The reader's credit balance at send time — the reason for the email. */
+  /** The reader's credit balance at send time, the reason for the email. */
   balance: number;
   /** Pre-formatted price, e.g. "₾29.00". */
   priceLabel: string;
   months: number;
   /**
-   * Localised last day of the offer, already in the form the sentence needs —
+   * Localised last day of the offer, already in the form the sentence needs,
    * genitive in Georgian ("1 სექტემბრის"), plain in English ("1 September").
    */
   deadlineLabel: string;
@@ -53,14 +53,14 @@ export function LowCreditOfferEmail({
     ? [
         "Unlimited AI chat with your astrologer",
         "Compatibility readings with anyone, as often as you like",
-        "Full test results — personality, IQ, EQ, Big Five",
+        "Full test results, personality, IQ, EQ, Big Five",
         "7-day forecasts, tarot readings and PDF charts",
         "Verified badge on your profile",
       ]
     : [
         "ულიმიტო AI ჩატი შენს ასტროლოგთან",
         "თავსებადობა ნებისმიერთან, რამდენჯერაც გინდა",
-        "ტესტების სრული შედეგები — პიროვნება, IQ, EQ, Big Five",
+        "ტესტების სრული შედეგები, პიროვნება, IQ, EQ, Big Five",
         "7-დღიანი პროგნოზები, ტარო და PDF რუკები",
         "Verified badge შენს პროფილზე",
       ];
@@ -99,8 +99,8 @@ export function LowCreditOfferEmail({
         }}
       >
         {en
-          ? `${months} months of unlimited Vivida — ${priceLabel}`
-          : `${months} თვე ულიმიტო Vivida — ${priceLabel}`}
+          ? `${months} months of unlimited Vivida, ${priceLabel}`
+          : `${months} თვე ულიმიტო Vivida, ${priceLabel}`}
       </Heading>
 
       <Text style={{ ...paragraphStyle, color: "#cfc7df", fontSize: "16px" }}>
@@ -109,11 +109,11 @@ export function LowCreditOfferEmail({
 
       <Text style={paragraphStyle}>
         {en
-          ? `You have ${balance} ${balance === 1 ? "credit" : "credits"} left. Before they run out, here is something we are offering only to you: ${months} months of Vivida PRO for ${priceLabel} — no credits, no limits, everything open.`
-          : `შენს ბალანსზე ${balance} კრედიტია დარჩენილი. სანამ ისინი ამოიწურება, გთავაზობთ იმას, რაც მხოლოდ შენთვისაა: ${months} თვე Vivida PRO ${priceLabel}-ად — კრედიტების გარეშე, ლიმიტების გარეშე, ყველაფერი ღიაა.`}
+          ? `You have ${balance} ${balance === 1 ? "credit" : "credits"} left. Before they run out, here is something we are offering only to you: ${months} months of Vivida PRO for ${priceLabel}, no credits, no limits, everything open.`
+          : `შენს ბალანსზე ${balance} კრედიტია დარჩენილი. სანამ ისინი ამოიწურება, გთავაზობთ იმას, რაც მხოლოდ შენთვისაა: ${months} თვე Vivida PRO ${priceLabel}-ად, კრედიტების გარეშე, ლიმიტების გარეშე, ყველაფერი ღიაა.`}
       </Text>
 
-      {/* Offer block — the price gets its own frame so it survives a skim. */}
+      {/* Offer block, the price gets its own frame so it survives a skim. */}
       <div
         style={{
           background: "rgba(234, 195, 88, 0.07)",

@@ -110,7 +110,7 @@ const PAGES: SearchEntry[] = [
   },
   {
     title: "ნატალური რუკა",
-    sub: "შენი პერსონალური ცის რუკა — უფასოდ",
+    sub: "შენი პერსონალური ცის რუკა, უფასოდ",
     url: "/nataluri-ruka",
     category: "page",
     icon: "🪐",
@@ -158,7 +158,7 @@ const PAGES: SearchEntry[] = [
   },
   {
     title: "ანგელოზური რიცხვები",
-    sub: "111, 222, 11:11 — რას ნიშნავს",
+    sub: "111, 222, 11:11, რას ნიშნავს",
     url: "/angeluri-ricxvebi",
     category: "numerology",
     icon: "✨",
@@ -190,7 +190,7 @@ const PAGES: SearchEntry[] = [
   },
   {
     title: "IQ ტესტი",
-    sub: "გაზომე შენი ინტელექტი — უფასოდ",
+    sub: "გაზომე შენი ინტელექტი, უფასოდ",
     url: "/iq-testi",
     category: "test",
     icon: "🧠",
@@ -198,7 +198,7 @@ const PAGES: SearchEntry[] = [
   },
   {
     title: "პიროვნების ტესტი",
-    sub: "Astro-MBTI — შენი 16 ტიპიდან",
+    sub: "Astro-MBTI, შენი 16 ტიპიდან",
     url: "/pirovnebis-testi",
     category: "test",
     icon: "🧩",

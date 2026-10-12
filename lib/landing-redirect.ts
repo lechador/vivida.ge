@@ -2,7 +2,7 @@
  * Signed-in visitors belong in the app, not on the marketing landing.
  *
  * Typing "vivida.ge" is how most returning users open the product, and the
- * bare domain used to serve them the cold-traffic landing page — brand copy,
+ * bare domain used to serve them the cold-traffic landing page, brand copy,
  * a signup CTA and a "შესვლა" button, for someone who is already signed in.
  *
  * The decision lives here as a pure function for two reasons: it runs in the
@@ -16,7 +16,7 @@ export const APP_HOME = "/dashboard";
 /**
  * The landing page is the one route that exists per language: Georgian at `/`
  * on vivida.ge, English at `/` on vividaastro.com, Armenian at `/am` on the
- * same international host. `/en` is never a landing — the Georgian host 301s
+ * same international host. `/en` is never a landing, the Georgian host 301s
  * it to the international domain and the international host only reaches it
  * through an internal rewrite, which happens after the proxy has run.
  */
@@ -34,13 +34,13 @@ function isLandingPath(pathname: string, englishHost: boolean): boolean {
 }
 
 /**
- * True when a session cookie is present — deliberately *not* a proof of a
+ * True when a session cookie is present, deliberately *not* a proof of a
  * valid session.
  *
  * Decoding the JWT here would put crypto back on the site's highest-traffic
  * public page, which is exactly what the proxy's route split removed. A stale
  * or expired cookie therefore sends one wasted hop to /dashboard, whose own
- * auth check bounces back to `/?from=/dashboard` — and the `from` guard below
+ * auth check bounces back to `/?from=/dashboard`, and the `from` guard below
  * stops that from becoming a loop.
  */
 function hasSessionCookie(cookieNames: readonly string[]): boolean {

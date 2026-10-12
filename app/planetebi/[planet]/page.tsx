@@ -79,7 +79,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = raw;
   const planet = planetBySlug(slug);
   if (!planet) return {};
-  const title = `${planet.name} ნატალურ რუკაში — მნიშვნელობა ასტროლოგიაში`;
+  const title = `${planet.name} ნატალურ რუკაში, მნიშვნელობა ასტროლოგიაში`;
   const description = `რას ნიშნავს ${planet.name} ნატალურ რუკაში: ${planet.role.toLowerCase()}, მმართველი ნიშნები, ძლიერი და რთული გამოვლინებები. სრული ახსნა ქართულად.`;
   const url = `${BASE}/planetebi/${planet.slug}`;
   return {
@@ -122,7 +122,7 @@ export default async function PlanetPage({ params }: Props) {
   const planet = planetBySlug(slug);
   if (!planet) notFound();
   const url = `${BASE}/planetebi/${planet.slug}`;
-  const title = `${planet.name} ნატალურ რუკაში — მნიშვნელობა ასტროლოგიაში`;
+  const title = `${planet.name} ნატალურ რუკაში, მნიშვნელობა ასტროლოგიაში`;
   const description = `რას ნიშნავს ${planet.name} ნატალურ რუკაში: ${planet.role.toLowerCase()} და ინტერპრეტაცია ქართულად.`;
   const faq = [
     { q: `რას ნიშნავს ${planet.name} ნატალურ რუკაში?`, a: planet.meaning },
@@ -238,7 +238,7 @@ export default async function PlanetPage({ params }: Props) {
               >
                 ასტროლოგიური სახლი
               </Link>{" "}
-              — ცხოვრების სფეროს, ასპექტები კი სხვა ფსიქოლოგიურ ფუნქციებთან
+              , ცხოვრების სფეროს, ასპექტები კი სხვა ფსიქოლოგიურ ფუნქციებთან
               კავშირს. არც ერთი პოზიცია ცალკე არ არის საბოლოო განაჩენი.
             </p>
           </div>

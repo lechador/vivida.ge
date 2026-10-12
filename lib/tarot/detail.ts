@@ -5,7 +5,7 @@ import { MINOR_CARDS_EN, MINOR_EN_BY_SLUG } from "@/lib/tarot/deck-minor-en";
 import { tarotImageUrl } from "@/lib/tarot/deck-full";
 
 /**
- * The unified card catalog behind `/taro/[card]` — all 78 cards in Georgian
+ * The unified card catalog behind `/taro/[card]`, all 78 cards in Georgian
  * and English. Armenian stays on the 22 majors (no Armenian minor content
  * exists, and Armenian is being removed).
  */

@@ -30,14 +30,14 @@ export function MbtiShareButton({
     const url =
       typeof window !== "undefined" ? window.location.origin + path : path;
     const text = en
-      ? `My personality type is ${type} — ${archetype}. Take the test on Vivida:`
-      : `ჩემი ფსიქოლოგიური ტიპია ${type} — ${archetype}. გაიარე ტესტი Vivida-ზე:`;
+      ? `My personality type is ${type}, ${archetype}. Take the test on Vivida:`
+      : `ჩემი ფსიქოლოგიური ტიპია ${type}, ${archetype}. გაიარე ტესტი Vivida-ზე:`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({ title: "Vivida · Astro-MBTI", text, url });
         return;
       } catch {
-        /* user cancelled or unsupported — fall through to copy */
+        /* user cancelled or unsupported, fall through to copy */
       }
     }
     try {

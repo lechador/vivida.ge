@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { kaLongDate, kaShortDate } from "../lib/i18n/ka-date";
 
 /**
- * Vitest runs on Node, which ships full ICU — so ICU is the oracle here. The
+ * Vitest runs on Node, which ships full ICU, so ICU is the oracle here. The
  * point of the hand-written tables is to give browsers *without* Georgian
  * locale data the same output, which means any drift from ICU is a bug.
  */

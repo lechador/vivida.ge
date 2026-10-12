@@ -10,7 +10,7 @@ import { findDuplicateAccountSignal } from "@/lib/duplicate-account";
 
 /**
  * Profile *write* logic used by website Server Actions in actions/profile.ts.
- * Callers do their own auth and pass the resolved user id in — these
+ * Callers do their own auth and pass the resolved user id in, these
  * functions never touch sessions, revalidate Next's cache, or redirect.
  *
  * Errors come back as `{ ok: false, error }` with Georgian UI strings.
@@ -21,9 +21,9 @@ const TIME_RE = /^\d{2}:\d{2}$/;
 const USERNAME_RE = /^[a-z0-9_]{3,24}$/;
 
 /**
- * Minimum age to register/use Vivida — mirrors the terms (16+, under-16 only
+ * Minimum age to register/use Vivida, mirrors the terms (16+, under-16 only
  * with parental consent, under-18 needs approval for paid purchases).
- * Derived from the natal birth date the user already provides — no separate
+ * Derived from the natal birth date the user already provides, no separate
  * age field. Adjust this single constant to change the threshold; the
  * onboarding error message and lib/restriction.ts follow it automatically.
  */
@@ -38,7 +38,7 @@ export type SaveBirthDataInput = {
   timezone: string;
   /** Self-reported sex; null = skipped. */
   gender?: "male" | "female" | null;
-  /** Optional username — wizard sets it on first save. */
+  /** Optional username, wizard sets it on first save. */
   username?: string | null;
   /** Explicit stranger-discovery choice from onboarding. Only written when
       the caller passes a boolean; omitted values leave the stored choice
@@ -58,7 +58,7 @@ export type ProfileWriteResult =
 
 /**
  * Validate birth data and upsert the user's profile row. Birth date is
- * locked after the first save — the server ignores any date the client
+ * locked after the first save, the server ignores any date the client
  * sends thereafter and reuses the stored value (prevents one account from
  * spinning up unlimited charts / burning AI credits). Time + location
  * remain editable. Username is only validated/persisted when explicitly
@@ -68,7 +68,7 @@ export async function saveBirthDataCore(
   userId: string,
   input: SaveBirthDataInput,
 ): Promise<ProfileWriteResult> {
-  // Validation — server is the source of truth, never trust the client.
+  // Validation, server is the source of truth, never trust the client.
   if (!DATE_RE.test(input.dateOfBirth)) {
     return { ok: false, error: "დაბადების თარიღი არასწორია" };
   }
@@ -107,7 +107,7 @@ export async function saveBirthDataCore(
 
   // Minimum-age gate. Computed from the date that will actually be persisted
   // (locked on first save), so under-age users can't complete onboarding and
-  // thus can't get a profile/chart or reach chat. Server-enforced — the
+  // thus can't get a profile/chart or reach chat. Server-enforced, the
   // client never decides this.
   const age = ageFromDob(lockedDate);
   if (age !== null && age < MINIMUM_AGE_YEARS) {
@@ -120,7 +120,7 @@ export async function saveBirthDataCore(
   // Time stored as HH:MM:SS for Postgres `time` column.
   const timeForDb = input.timeOfBirth ? `${input.timeOfBirth}:00` : null;
 
-  // Username — only validate / persist when explicitly set in the call.
+  // Username, only validate / persist when explicitly set in the call.
   const usernameProvided = input.username !== undefined;
   let username: string | null = null;
   if (usernameProvided) {
@@ -145,7 +145,7 @@ export async function saveBirthDataCore(
   }
 
   // Only write gender when the user actually picked one (skipping leaves any
-  // existing value — incl. an AI-inferred one — untouched). Self-reported
+  // existing value, incl. an AI-inferred one, untouched). Self-reported
   // overrides AI: source='self'.
   const genderFields =
     input.gender === "male" || input.gender === "female"
@@ -240,7 +240,7 @@ export async function saveBirthDataCore(
     /* never block the save on this */
   }
 
-  // Filling birth data completes "activation" — pay out any pending referral
+  // Filling birth data completes "activation", pay out any pending referral
   // (the other half of the gate, email verification, is handled on verify).
   try {
     await qualifyReferral(userId);

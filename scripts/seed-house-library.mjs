@@ -1,12 +1,12 @@
 // Seed the reusable per-house interpretation library (house_interpretation_library).
 // A house's meaning depends on BOTH its cusp sign AND which planets occupy it, so
 // it's decomposed into two reusable, finite pieces:
-//   - "cusp"     — (house, sign): 12 houses × 12 signs = 144 combos
-//   - "occupant" — (house, planet): 12 houses × 11 planets = 132 combos
+//   - "cusp", (house, sign): 12 houses × 12 signs = 144 combos
+//   - "occupant", (house, planet): 12 houses × 11 planets = 132 combos
 // Total 276. One AI call per entry (Georgian is token-dense; batching truncates).
 //
 // Uses Vertex AI Gemini (not OpenRouter) via the existing GCP project set up
-// for Veo video generation — auth via local ADC (`gcloud auth
+// for Veo video generation, auth via local ADC (`gcloud auth
 // application-default login`), no API key needed. Only for this local,
 // one-time bulk seed; the live in-app self-heal fallback (lib/house-library.ts)
 // still uses OpenRouter since Vertex ADC isn't available in the deployed
@@ -52,7 +52,7 @@ const HOUSES = {
     labelKa: "1-ლი სახლი",
     themeKa: "ჩემი თავი",
     meaningKa:
-      "ის, თუ როგორ შემოდიხარ ოთახში — შენი თვითპრეზენტაცია და პირველი შთაბეჭდილება.",
+      "ის, თუ როგორ შემოდიხარ ოთახში, შენი თვითპრეზენტაცია და პირველი შთაბეჭდილება.",
   },
   2: {
     labelKa: "მე-2 სახლი",
@@ -85,7 +85,7 @@ const HOUSES = {
     labelKa: "მე-7 სახლი",
     themeKa: "მე და შენ",
     meaningKa:
-      "ერთ-ერთი ადამიანი, ვისთანაც ცხოვრობ — სასიყვარულო, საქმიანი ან მოწინააღმდეგე.",
+      "ერთ-ერთი ადამიანი, ვისთანაც ცხოვრობ, სასიყვარულო, საქმიანი ან მოწინააღმდეგე.",
   },
   8: {
     labelKa: "მე-8 სახლი",
@@ -103,7 +103,7 @@ const HOUSES = {
     labelKa: "მე-10 სახლი",
     themeKa: "კარიერა, სტატუსი",
     meaningKa:
-      "ის, რითაც გცნობენ საზოგადოებაში — კარიერა, ავტორიტეტი, წარმატება.",
+      "ის, რითაც გცნობენ საზოგადოებაში, კარიერა, ავტორიტეტი, წარმატება.",
   },
   11: {
     labelKa: "მე-11 სახლი",
@@ -178,19 +178,19 @@ const PLANET_KEYS = Object.keys(PLANET_KA);
 
 const SYSTEM =
   "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
-  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   'თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები ("ვარსკვლავები გელიან").';
 
 function cuspPrompt(house, sign) {
   const def = HOUSES[house];
   const signLabel = SIGN_KA[sign];
   return (
-    `დაწერე ინტერპრეტაცია: "${def.labelKa} (${def.themeKa}) — კუსპი ${signLabel}-ში".\n` +
+    `დაწერე ინტერპრეტაცია: "${def.labelKa} (${def.themeKa}), კუსპი ${signLabel}-ში".\n` +
     `ეს სახლი მართავს: ${def.meaningKa}\n` +
-    `${signLabel} — ${SIGN_NATURE_KA[sign]}.\n\n` +
+    `${signLabel}, ${SIGN_NATURE_KA[sign]}.\n\n` +
     `5-7 წინადადება (დაახ. 110-150 სიტყვა), "შენ"-ის ფორმა, თბილი და კონკრეტული. ` +
-    `ახსენი, როგორ ფერავს ${signLabel}-ის ბუნება ამ კონკრეტულ ცხოვრების სფეროს — ` +
-    `ერთი ცოცხალი მაგალითით. დააბრუნე მხოლოდ ტექსტი — სათაურის, ` +
+    `ახსენი, როგორ ფერავს ${signLabel}-ის ბუნება ამ კონკრეტულ ცხოვრების სფეროს, ` +
+    `ერთი ცოცხალი მაგალითით. დააბრუნე მხოლოდ ტექსტი, სათაურის, ` +
     `ფორმატირების და ფრჩხილების გარეშე.`
   );
 }
@@ -201,10 +201,10 @@ function occupantPrompt(house, planet) {
   return (
     `დაწერე ინტერპრეტაცია: "${planetLabel} ${def.labelKa}-ში (${def.themeKa})".\n` +
     `ეს სახლი მართავს: ${def.meaningKa}\n` +
-    `${planetLabel} — ${PLANET_MEANING_KA[planet]}.\n\n` +
+    `${planetLabel}, ${PLANET_MEANING_KA[planet]}.\n\n` +
     `5-7 წინადადება (დაახ. 110-150 სიტყვა), "შენ"-ის ფორმა, თბილი და კონკრეტული. ` +
     `ახსენი, როგორ გამოხატავს ${planetLabel}-ის ენერგია თავს კონკრეტულად ამ ` +
-    `ცხოვრების სფეროში — ერთი ცოცხალი მაგალითით. დააბრუნე მხოლოდ ტექსტი — ` +
+    `ცხოვრების სფეროში, ერთი ცოცხალი მაგალითით. დააბრუნე მხოლოდ ტექსტი, ` +
     `სათაურის, ფორმატირების და ფრჩხილების გარეშე.`
   );
 }

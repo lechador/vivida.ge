@@ -9,13 +9,13 @@ import { extractMentionTokens } from "@/lib/mentions-parse";
  * `whitespace-pre-wrap` on the wrapping element (set by the parent).
  *
  * We do the matching at render time rather than persisting a parsed
- * tree — keeps the DB rows plain text, lets users edit and re-render
+ * tree, keeps the DB rows plain text, lets users edit and re-render
  * naturally, and lets us change link routing without a backfill.
  *
  * `validHandles` is an optional allow-list of usernames that should
- * actually become links — passed in when the caller has already
+ * actually become links, passed in when the caller has already
  * resolved who exists (e.g. inside `MentionsContext`). If omitted,
- * every shape-valid handle becomes a link (cheap UX win — even if a
+ * every shape-valid handle becomes a link (cheap UX win, even if a
  * user mistyped, the link will route to a 404 page).
  */
 export function MentionText({

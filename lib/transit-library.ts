@@ -1,5 +1,5 @@
 /**
- * Reusable per-transit interpretation library — powers the daily horoscope.
+ * Reusable per-transit interpretation library, powers the daily horoscope.
  *
  * "Transiting Moon square natal Venus" means the same thing for every user
  * who has it today, so each finite combination is generated once with a
@@ -7,15 +7,15 @@
  * daily reading is COMPOSED from these rows (see composeDailyFromLibrary)
  * instead of one slow per-user AI call. Three kinds:
  *
- *   - aspect: (transiting body, aspect kind, natal point) — 10 × 5 × 13 = 650.
+ *   - aspect: (transiting body, aspect kind, natal point), 10 × 5 × 13 = 650.
  *             Directional: the transiting body is today's sky, the natal
- *             point is the person — so no alphabetical key sorting here.
- *   - house:  (transiting body, natal house) — 10 × 12 = 120.
- *   - sign:   (fast body sun…mars, zodiac sign) — 5 × 12 = 60. The
+ *             point is the person, so no alphabetical key sorting here.
+ *   - house:  (transiting body, natal house), 10 × 12 = 120.
+ *   - sign:   (fast body sun…mars, zodiac sign), 5 × 12 = 60. The
  *             collective mood; slow bodies' sign is generational noise.
  *
  * Rows flagged `edited` are never overwritten by regeneration. The
- * generators here (OpenRouter) are the live self-heal path only — bulk
+ * generators here (OpenRouter) are the live self-heal path only, bulk
  * seeding uses scripts/seed-transit-library.mjs (Vertex AI).
  */
 
@@ -60,7 +60,7 @@ export const TRANSIT_SIGN_BODIES = [
   "mars",
 ] as const;
 
-/** How long each transit's influence lasts — woven into prompts and copy. */
+/** How long each transit's influence lasts, woven into prompts and copy. */
 const TIMESCALE_KA: Record<string, string> = {
   moon: "დღეს (მთვარის ტრანზიტი 1-2 დღე გრძელდება)",
   sun: "ამ დღეებში (მზის ტრანზიტი რამდენიმე დღე გრძელდება)",
@@ -246,7 +246,7 @@ function englishTransitEntry(key: string): TransitEntry | null {
 }
 
 /**
- * Batched read: key → {title, body} for the requested keys. Pure read —
+ * Batched read: key → {title, body} for the requested keys. Pure read,
  * never generates. Editing a row in the admin reflects on next compose.
  */
 export async function getTransitLibraryEntries(
@@ -285,7 +285,7 @@ export async function getTransitLibraryEntries(
   );
 
   // A missing Armenian row must fall back to ENGLISH, never to the Georgian
-  // row that shares its key — Georgian script on an Armenian page is the
+  // row that shares its key, Georgian script on an Armenian page is the
   // worse of the two failures, and it is the exact bug this table caused
   // before it could hold a second language. `composeDailyFromLibrary` aborts
   // the whole composition on any gap, so without this a single untranslated
@@ -306,11 +306,11 @@ export async function getTransitLibraryEntries(
 
 const SYSTEM_PROMPT =
   "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
-  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   "თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები " +
   '("ვარსკვლავები გელიან", "მიენდე სამყაროს"). ' +
-  'დააბრუნე მხოლოდ JSON: {"title": "...", "body": "..."} — title არის ' +
-  "მოკლე სათაური (3-6 სიტყვა, წერტილის გარეშე), body — ტექსტი. " +
+  'დააბრუნე მხოლოდ JSON: {"title": "...", "body": "..."}, title არის ' +
+  "მოკლე სათაური (3-6 სიტყვა, წერტილის გარეშე), body, ტექსტი. " +
   "title-ში დაასახელე კონკრეტული თემა ან მოქმედება; არ გამოიყენო ორი " +
   "აბსტრაქტული არსებითი სახელის ფორმულა, ზედიზედ 'X და Y', ან ხშირად " +
   "გამეორებული სიტყვები: სული, გული, შინაგანი, ჰარმონია, დღე.";
@@ -330,8 +330,8 @@ export function buildTransitPrompt(combo: TransitCombo): string {
     return (
       `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ტრანზიტული ${tLabel} ${kindKa} ` +
       `ნატალურ ${nLabel}-სთან.\n` +
-      `ტრანზიტული ${tLabel} — დღევანდელი ცის ენერგია (${tMeaning}). ` +
-      `ნატალური ${nLabel} — ადამიანის თანდაყოლილი თვისება (${nMeaning}).\n` +
+      `ტრანზიტული ${tLabel}, დღევანდელი ცის ენერგია (${tMeaning}). ` +
+      `ნატალური ${nLabel}, ადამიანის თანდაყოლილი თვისება (${nMeaning}).\n` +
       `დროის მასშტაბი: ${timescale}.\n\n` +
       `2-4 წინადადება (დაახ. 40-70 სიტყვა), "შენ"-ის ფორმა. ახსენი რა იგრძნობა ` +
       `დღეს ამ ტრანზიტით და ერთი კონკრეტული, პრაქტიკული რჩევა. ` +
@@ -345,7 +345,7 @@ export function buildTransitPrompt(combo: TransitCombo): string {
     return (
       `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ტრანზიტული ${tLabel} გადის ` +
       `ნატალურ ${h.labelKa}-ში (${h.themeKa}).\n` +
-      `${tLabel} — ${tMeaning}. ${h.labelKa} — ${h.meaningKa}\n` +
+      `${tLabel}, ${tMeaning}. ${h.labelKa}, ${h.meaningKa}\n` +
       `დროის მასშტაბი: ${timescale}.\n\n` +
       `2-3 წინადადება (დაახ. 35-60 სიტყვა), "შენ"-ის ფორმა. რომელი ცხოვრების ` +
       `სფერო აქტიურდება და როგორ გამოიყენო ეს დღეს. ` +
@@ -356,9 +356,9 @@ export function buildTransitPrompt(combo: TransitCombo): string {
   const s = SIGNS.find((x) => x.key === combo.subject);
   const sLabel = s?.labelKa ?? combo.subject;
   return (
-    `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ${tLabel} ახლა ${sLabel}-შია — ` +
+    `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ${tLabel} ახლა ${sLabel}-შია, ` +
     `ეს ყველასთვის საერთო, კოლექტიური განწყობაა.\n` +
-    `${tLabel} — ${tMeaning}. ${sLabel}-ის ელემენტი: ${s?.element ?? ""}, ` +
+    `${tLabel}, ${tMeaning}. ${sLabel}-ის ელემენტი: ${s?.element ?? ""}, ` +
     `მოდალობა: ${s?.modality ?? ""}.\n` +
     `დროის მასშტაბი: ${timescale}.\n\n` +
     `2-3 წინადადება (დაახ. 35-60 სიტყვა), "შენ"-ის ფორმა. როგორი ემოციური/` +
@@ -425,14 +425,14 @@ export async function generateTransitEntry(
 
 /**
  * Ensure rows exist for the given combos, generating any missing ones and
- * persisting them. Background/self-heal path — callers should NOT await this
+ * persisting them. Background/self-heal path, callers should NOT await this
  * on a render path; gaps fall back to the full-AI daily instead.
  */
 export async function ensureTransitLibraryFor(
   combos: TransitCombo[],
 ): Promise<void> {
   // Georgian only. `generateTransitEntry`'s prompt is Georgian, so this can
-  // only ever produce a `ka` row — now that (key, language) is the primary
+  // only ever produce a `ka` row, now that (key, language) is the primary
   // key, the language has to be stated rather than left to the column
   // default, or a future generator would silently overwrite Georgian.
   // Armenian is backfilled by scripts/translate-transit-library.mjs; a gap
@@ -481,7 +481,7 @@ export type TransitDayFacts = {
   outerAspects: CrossAspect[];
 };
 
-/** Theme chip per transiting body — composed dailies pick from these. */
+/** Theme chip per transiting body, composed dailies pick from these. */
 const BODY_THEME_KA: Record<string, string> = {
   sun: "იდენტობა",
   moon: "ემოციები",
@@ -569,7 +569,7 @@ export type ComposedDaily = {
 };
 
 /**
- * Compose the daily reading purely from library entries — zero AI calls.
+ * Compose the daily reading purely from library entries, zero AI calls.
  * Returns null if any needed entry is missing (caller falls back to the
  * full-AI path and self-heals the gap in the background).
  *
@@ -687,15 +687,15 @@ export type WeeklyDayNarrative = {
   advice: string;
 };
 
-/** Last-resort copy for days genuinely missing a whole aspect family —
+/** Last-resort copy for days genuinely missing a whole aspect family,
  *  rotated by day index so consecutive quiet days don't repeat. */
 const NO_HARMONIC_KA = [
-  "დიდი შეღავათები ამ დღეს არ ჩანს — მშვიდი, სამუშაო ფონია, სადაც პროგრესს შენ თვითონ ქმნი.",
-  "ცა ამ დღეს ნეიტრალურია — მხარდაჭერა პატარა, შენივე შექმნილი წესრიგიდან მოვა.",
+  "დიდი შეღავათები ამ დღეს არ ჩანს, მშვიდი, სამუშაო ფონია, სადაც პროგრესს შენ თვითონ ქმნი.",
+  "ცა ამ დღეს ნეიტრალურია, მხარდაჭერა პატარა, შენივე შექმნილი წესრიგიდან მოვა.",
 ];
 const NO_TENSE_KA = [
-  "სერიოზული ხახუნი ამ დღეს არ ჩანს — მხოლოდ ნუ გადატვირთავ განრიგს, სიმშვიდე შენს სასარგებლოდ მუშაობს.",
-  "დაძაბული ასპექტები ამ დღეს თითქმის არ არის — ერთადერთი რისკი ზედმეტი თვითკმაყოფილებაა.",
+  "სერიოზული ხახუნი ამ დღეს არ ჩანს, მხოლოდ ნუ გადატვირთავ განრიგს, სიმშვიდე შენს სასარგებლოდ მუშაობს.",
+  "დაძაბული ასპექტები ამ დღეს თითქმის არ არის, ერთადერთი რისკი ზედმეტი თვითკმაყოფილებაა.",
 ];
 const NO_HARMONIC_EN = [
   "No major supportive aspect dominates this day, so progress comes through your own pacing, preparation, and steady follow-through.",
@@ -707,11 +707,11 @@ const NO_TENSE_EN = [
 ];
 
 /**
- * Compose the 7-day narratives purely from library entries — zero AI calls.
+ * Compose the 7-day narratives purely from library entries, zero AI calls.
  * Per day: headline = strongest driver's title, reasons = strongest
  * harmonic/tense drivers' bodies, advice = that day's Moon-sign mood.
  * Slow transits drive several days in a row, so each pick prefers an entry
- * not yet used in that field earlier in the week — the week reads varied
+ * not yet used in that field earlier in the week, the week reads varied
  * instead of repeating one Pluto aspect four times.
  *
  * Returns null if any needed entry is missing (caller falls back to AI).
@@ -795,7 +795,7 @@ export async function composeWeeklyFromLibrary(
     const headlinePick = pick(d.drivers, usedHeadline, i);
     const headline = headlinePick?.entry.title ?? moonSign.title;
 
-    // The neutral entry can stand in for at most ONE missing side — never
+    // The neutral entry can stand in for at most ONE missing side, never
     // both, or the two reasons would read identically.
     const harmonicReason =
       harmonic?.entry.body ??
@@ -828,7 +828,7 @@ export async function composeWeeklyFromLibrary(
 export type TransitBreakdownItem = {
   transit: string;
   natal: string;
-  /** Aspect kind — string, matching how topAspects is persisted in jsonb. */
+  /** Aspect kind, string, matching how topAspects is persisted in jsonb. */
   kind: string;
   orb: number;
   title: string;
@@ -838,7 +838,7 @@ export type TransitBreakdownItem = {
 /**
  * Map stored top aspects (dailyHoroscopes.transits.topAspects) to their
  * library interpretations for display. Aspects without a library row yet are
- * skipped — the section simply shows fewer items until the seed completes.
+ * skipped, the section simply shows fewer items until the seed completes.
  */
 export async function overlayTransitAspects(
   aspects: Array<{ transit: string; natal: string; kind: string; orb: number }>,

@@ -80,7 +80,7 @@ export function SpotlightCard({
       />
 
       <div className="relative flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
-        {/* Hero — circular avatar on desktop, banner on mobile */}
+        {/* Hero, circular avatar on desktop, banner on mobile */}
         <div className="relative shrink-0 self-start sm:self-center">
           <div
             className="relative size-32 overflow-hidden rounded-full sm:size-36"

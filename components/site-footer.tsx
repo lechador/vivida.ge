@@ -46,8 +46,8 @@ const LEGAL_LINKS = [
 ];
 
 /**
- * Site-wide footer for public marketing pages. Authed app pages skip this
- * — they have their own bottom UI density and the chat launcher.
+ * Site-wide footer for public marketing pages. Authed app pages skip this,
+ * they have their own bottom UI density and the chat launcher.
  */
 export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
   if (locale === "en") return <EnglishFooter />;
@@ -205,7 +205,7 @@ function PaymentMark({ children }: { children: React.ReactNode }) {
 
 // ─── Inline payment marks ────────────────────────────────────────────────
 // Simple SVGs of the brand wordmarks. Not the official lockups (which are
-// trademarked) — just recognizable monochrome-ish placeholders for the
+// trademarked), just recognizable monochrome-ish placeholders for the
 // payment-methods row.
 
 function VisaMark() {
@@ -248,7 +248,7 @@ function MastercardMark() {
 }
 
 /**
- * Google Pay official wordmark — the "G Pay" lockup with the Google
+ * Google Pay official wordmark, the "G Pay" lockup with the Google
  * 4-color G in a circle and "Pay" in dark grey. Path data simplified
  * from the published brand asset.
  */
@@ -260,7 +260,7 @@ function GooglePayMark() {
       role="img"
       aria-label="Google Pay"
     >
-      {/* G in circle — uses Google's 4 brand colors */}
+      {/* G in circle, uses Google's 4 brand colors */}
       <circle cx="11" cy="12" r="10" fill="#fff" />
       <path
         d="M16.5 12.2c0-.5-.04-.97-.13-1.42H11v2.7h3.08c-.13.7-.54 1.3-1.15 1.7v1.4h1.86c1.09-1 1.71-2.48 1.71-4.38z"
@@ -294,7 +294,7 @@ function GooglePayMark() {
 }
 
 /**
- * Apple Pay official wordmark — the Apple "" glyph + "Pay".
+ * Apple Pay official wordmark, the Apple "" glyph + "Pay".
  */
 function ApplePayMark() {
   return (

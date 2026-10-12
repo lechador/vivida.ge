@@ -1,5 +1,5 @@
 /**
- * "Know-when" timing engine — scores the next N days for the user and surfaces
+ * "Know-when" timing engine, scores the next N days for the user and surfaces
  * notable upcoming transits. Fully deterministic (reuses the transit + cross-
  * aspect machinery), so it's instant, free, and consistent with the weekly
  * forecast's scoring philosophy.
@@ -32,7 +32,7 @@ const POINT_WEIGHT: Record<string, number> = {
 /**
  * Transit-planet weight for the DAILY score. Fast movers (esp. the Moon) drive
  * day-to-day variation so the calendar isn't a monochrome block; slow heavy
- * transits (Saturn/Pluto) are de-emphasized here — they get their due in the
+ * transits (Saturn/Pluto) are de-emphasized here, they get their due in the
  * "notable transits" list instead of painting every day the same color.
  */
 const TRANSIT_WEIGHT: Record<string, number> = {
@@ -138,9 +138,9 @@ const NATAL_AREA: Record<string, string> = {
   midheaven: "შენს კარიერასა და საზოგადოებრივ როლს",
 };
 const FAMILY_TONE: Record<AspectFamily, string> = {
-  harmonic: "ხელშემწყობი მომენტია — ისარგებლე.",
-  tense: "შესაძლო დაძაბულობა — იყავი მოქნილი და მომთმენი.",
-  neutral: "მნიშვნელოვანი აქცენტი — მიაქციე ყურადღება.",
+  harmonic: "ხელშემწყობი მომენტია, ისარგებლე.",
+  tense: "შესაძლო დაძაბულობა, იყავი მოქნილი და მომთმენი.",
+  neutral: "მნიშვნელოვანი აქცენტი, მიაქციე ყურადღება.",
 };
 const PLANET_MEANING_EN: Record<string, string> = {
   venus: "Love, harmony and pleasure",
@@ -158,7 +158,7 @@ const NATAL_AREA_EN: Record<string, string> = {
   midheaven: "your career and public direction",
 };
 const FAMILY_TONE_EN: Record<AspectFamily, string> = {
-  harmonic: "This is a supportive opening—use it consciously.",
+  harmonic: "This is a supportive opening, use it consciously.",
   tense: "This can bring friction; stay flexible and patient.",
   neutral: "This is a meaningful emphasis worth noticing.",
 };

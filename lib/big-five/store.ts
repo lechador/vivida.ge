@@ -9,7 +9,7 @@ import { calculateBigFive, type BigFiveResult } from "@/lib/big-five/scoring";
  * Persist a completed Big Five attempt. Scores server-side (authoritative, same
  * function the client uses) and upserts by `attemptId` so a refreshed result
  * page doesn't create duplicate rows. Anonymous attempts are kept too
- * (`userId` null) — raw material for self-norming the score distribution.
+ * (`userId` null), raw material for self-norming the score distribution.
  */
 export async function saveBigFiveResult(input: {
   attemptId: string;

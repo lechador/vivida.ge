@@ -169,7 +169,7 @@ export async function generateAndStoreReport(reportId: string): Promise<boolean>
     return true;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(`[report-gen] ${reportId}: failed —`, msg);
+    console.error(`[report-gen] ${reportId}: failed, `, msg);
     await db
       .update(pdfReports)
       .set({ status: "failed", error: msg.slice(0, 500) })

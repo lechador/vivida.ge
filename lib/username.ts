@@ -8,14 +8,14 @@ import { suggestUsername } from "@/lib/profile-utils";
  * Guarantee a user ends up with a username, creating their `profile` row if
  * they don't have one yet.
  *
- * Every people surface — /people, the discovery feed, the match deck, site
- * search and @mention autocomplete — filters on `username IS NOT NULL`, so a
+ * Every people surface, /people, the discovery feed, the match deck, site
+ * search and @mention autocomplete, filters on `username IS NOT NULL`, so a
  * user without one is invisible to everybody and unreachable at /u/<name>.
  *
  * Username used to be assigned lazily, on the first profile save, which left
  * two holes: users who signed up and never onboarded had no profile row at
  * all, and the setTestResultVisibility upsert that creates a bare row never
- * set one. Account creation now calls this — see lib/auth-core.ts and the
+ * set one. Account creation now calls this, see lib/auth-core.ts and the
  * `createUser` event in auth.ts.
  *
  * Idempotent: returns the existing username untouched when there is one, so it
@@ -43,7 +43,7 @@ export async function ensureUsername(
       .from(users)
       .where(eq(users.id, userId))
       .limit(1);
-    if (!user) return null; // no such user — nothing to attach a profile to
+    if (!user) return null; // no such user, nothing to attach a profile to
     sourceName = user.name;
   }
 

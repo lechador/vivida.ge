@@ -52,7 +52,7 @@ export const ZERO_COUNTS: FeedReactionCounts = {
   sad: 0,
 };
 
-/** Columns selected for a feed row — shared by every feed query. */
+/** Columns selected for a feed row, shared by every feed query. */
 const POST_SELECT = {
   id: posts.id,
   body: posts.body,
@@ -86,7 +86,7 @@ type PostRow = {
 };
 
 /**
- * Batched "main profile photo URL by user id" — the first ready
+ * Batched "main profile photo URL by user id", the first ready
  * profile_photo row (lowest sortOrder) overrides the OAuth avatar.
  */
 export async function loadProfilePhotos(
@@ -112,7 +112,7 @@ export async function loadProfilePhotos(
 
 /**
  * Enrich raw post rows with reaction counts, the viewer's own reaction,
- * comment counts, author reputation, and chosen avatars — five batched
+ * comment counts, author reputation, and chosen avatars, five batched
  * queries per page instead of N+1.
  */
 async function enrichPostRows(

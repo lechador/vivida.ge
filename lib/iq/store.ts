@@ -9,7 +9,7 @@ import { scoreIq, type IqResult } from "@/lib/iq/scoring";
  * Persist a completed IQ attempt. Scores server-side (authoritative, same
  * function the client uses) and upserts by `attemptId` so a refreshed result
  * page doesn't create duplicate rows. Anonymous attempts are kept too
- * (`userId` null) — they're the raw material for self-norming.
+ * (`userId` null), they're the raw material for self-norming.
  */
 export async function saveIqResult(input: {
   attemptId: string;

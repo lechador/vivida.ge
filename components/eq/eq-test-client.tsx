@@ -14,7 +14,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Hosts the EQ quiz. On finish it stashes the answers + a fresh attemptId to
- * localStorage and routes to the result page — no scoring or AI runs here, so
+ * localStorage and routes to the result page, no scoring or AI runs here, so
  * an anonymous taker can complete the test without an account. The result page
  * computes the score client-side and persists it best-effort.
  */
@@ -36,7 +36,7 @@ export function EqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
         JSON.stringify({ answers, attemptId }),
       );
     } catch {
-      /* ignore — the result page falls back to a "retake" prompt */
+      /* ignore, the result page falls back to a "retake" prompt */
     }
     trackEvent(ANALYTICS_EVENT.testCompleted, {
       test: "eq",

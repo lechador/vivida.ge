@@ -15,7 +15,7 @@ export async function POST() {
 
   const sent = await sendPushToUser(userId, {
     title: "Vivida ✨",
-    body: "შეტყობინებები ჩართულია — აქ მიიღებ დღიურ ჰოროსკოპს.",
+    body: "შეტყობინებები ჩართულია, აქ მიიღებ დღიურ ჰოროსკოპს.",
     url: "/dashboard",
     tag: "test",
   });

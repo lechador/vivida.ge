@@ -164,7 +164,7 @@ export default async function AccountPage() {
           </div>
         )}
 
-        {/* Profile photos — surfaced near the top so it's easy to find */}
+        {/* Profile photos, surfaced near the top so it's easy to find */}
         <div id="profile-photos" className="mb-6 scroll-mt-24">
           <PhotoUploader
             initial={photos
@@ -238,14 +238,14 @@ export default async function AccountPage() {
                 </>
               ) : subscription.rcStore === "PLAY_STORE" ? (
                 en ? (
-                  "Vivida PRO · billed through Google Play — manage it in the Play Store settings."
+                  "Vivida PRO · billed through Google Play, manage it in the Play Store settings."
                 ) : (
-                  "Vivida PRO · გადახდა Google Play-ით — მართე Play Store-ის პარამეტრებიდან."
+                  "Vivida PRO · გადახდა Google Play-ით, მართე Play Store-ის პარამეტრებიდან."
                 )
               ) : en ? (
-                "Vivida PRO · billed through the App Store — manage it in the App Store settings."
+                "Vivida PRO · billed through the App Store, manage it in the App Store settings."
               ) : (
-                "Vivida PRO · გადახდა App Store-ით — მართე App Store-ის პარამეტრებიდან."
+                "Vivida PRO · გადახდა App Store-ით, მართე App Store-ის პარამეტრებიდან."
               )}
             </p>
           )}
@@ -284,7 +284,7 @@ export default async function AccountPage() {
           />
         </div>
 
-        {/* Mobile number — SMS-verified phone login (Georgian host only;
+        {/* Mobile number, SMS-verified phone login (Georgian host only;
             SMS codes go to Georgian numbers, so the card stays off English). */}
         {!onEnglishHost && (
           <div className="mb-6">

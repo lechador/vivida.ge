@@ -9,7 +9,7 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
 
-const title = "ასტროლოგიური კალენდარი — იღბლიანი და ფრთხილი დღეები";
+const title = "ასტროლოგიური კალენდარი, იღბლიანი და ფრთხილი დღეები";
 const description =
   "ასტროლოგიური კალენდარი ქართულად: დღის პლანეტარული ასპექტები, იღბლიანი და ფრთხილი დღეები, 30-დღიანი პროგნოზი და პრაქტიკული რჩევები.";
 

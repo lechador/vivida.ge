@@ -30,7 +30,7 @@ import { isPremiumUser } from "@/lib/premium";
 /**
  * The tarot Q&A engine. Draws a 3-card spread, charges credits (first reading
  * free, then CREDIT_COST.tarot each), then asks the AI to weave the cards into
- * a personalized answer — falling back to a reading composed from the static
+ * a personalized answer, falling back to a reading composed from the static
  * card meanings so a paid reading NEVER returns empty after a charge.
  */
 
@@ -83,7 +83,7 @@ export type TarotResult =
     }
   | { ok: false; error: "bad_request" };
 
-/** One drawn card with its art and position — no interpretation. */
+/** One drawn card with its art and position, no interpretation. */
 export type TarotPreviewCard = {
   slug: string;
   name: string;
@@ -148,8 +148,8 @@ export function drawSpread(
 }
 
 /**
- * Free preview of a spread: art, names and positions only. Pure deck lookup
- * — no charge, no AI, no library writes. Only meaningful with a stable
+ * Free preview of a spread: art, names and positions only. Pure deck lookup,
+ * no charge, no AI, no library writes. Only meaningful with a stable
  * request id, which guarantees the paid retry interprets these same cards.
  */
 export function previewSpread(
@@ -337,7 +337,7 @@ export async function performReading(
               cost: CREDIT_COST.tarot,
               balance,
               // The teaser draws the exact spread the paid retry will
-              // interpret (seeded by request id) — art only, no meanings.
+              // interpret (seeded by request id), art only, no meanings.
               preview: requestKey
                 ? previewSpread(requestKey, spread.id, locale)
                 : undefined,

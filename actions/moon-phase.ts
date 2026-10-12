@@ -28,7 +28,7 @@ export type MoonPhaseRow = MoonPhase & { snapshot: MoonPhaseSnapshot };
 
 /**
  * Returns today's moon-phase row, generating + caching it on first request
- * of the day. Universal across users — one row per UTC date — so the cache
+ * of the day. Universal across users, one row per UTC date, so the cache
  * is shared globally. Returns the live snapshot alongside the row so the UI
  * can pull computed fields (signSymbol, etc.) without a second compute pass.
  *
@@ -86,14 +86,14 @@ export async function ensureMoonPhase(
   try {
 
   // Fast path: the reading is fully determined by (phase, sign), so copy
-  // today's combo from the pre-generated library — no AI call.
+  // today's combo from the pre-generated library, no AI call.
   const signKey = signByIndex(snapshot.signIndex).key;
   let reading = await getMoonPhaseLibraryEntry(snapshot.phaseKey, signKey);
   let model = "library";
 
   if (!reading) {
     if (!isOpenRouterConfigured()) {
-      // No API key — return what we have if anything, else null. The UI can
+      // No API key, return what we have if anything, else null. The UI can
       // then render a placeholder using just the live snapshot.
       return existing ? { ...existing, snapshot } : null;
     }
@@ -110,7 +110,7 @@ export async function ensureMoonPhase(
     if (!reading) return existing ? { ...existing, snapshot } : null;
     model = OPENROUTER_MODEL;
 
-    // Self-heal: this one-off reading IS the library entry for this combo —
+    // Self-heal: this one-off reading IS the library entry for this combo,
     // save it so the same (phase, sign) never generates twice.
     void saveMoonPhaseLibraryEntry(
       snapshot.phaseKey,

@@ -1,12 +1,12 @@
 /**
- * "რომელი ზოდიაქოს ნიშანი ხარ სინამდვილეში?" — a personality quiz that guesses
+ * "რომელი ზოდიაქოს ნიშანი ხარ სინამდვილეში?", a personality quiz that guesses
  * the sign you actually EMBODY (which may differ from your birth sign).
  *
  * Astrologically principled scoring: every sign is one (element × modality)
- * pair — 4 elements × 3 modalities = the 12 signs. So the quiz just measures
+ * pair, 4 elements × 3 modalities = the 12 signs. So the quiz just measures
  * your dominant element (fire/earth/air/water) and modality (cardinal/fixed/
  * mutable), and their intersection is your "true" sign. This guarantees all 12
- * signs are reachable and balanced. A fun, free, shareable quiz — no scoring
+ * signs are reachable and balanced. A fun, free, shareable quiz, no scoring
  * dimensions to gate, no persistence.
  */
 
@@ -120,8 +120,8 @@ export const TS_QUESTIONS: TsQuestion[] = [
     textKa: "გეგმები ბოლო წუთს იცვლება. შენ...",
     options: [
       { textKa: "სწრაფად ვიღებ ინიციატივას", modality: C },
-      { textKa: "ვღიზიანდები — მიყვარს, როცა წინასწარ ვგეგმავ", modality: X },
-      { textKa: "ცვლილებას მშვიდად ვხვდები — ადვილად ვერგები", modality: M },
+      { textKa: "ვღიზიანდები, მიყვარს, როცა წინასწარ ვგეგმავ", modality: X },
+      { textKa: "ცვლილებას მშვიდად ვხვდები, ადვილად ვერგები", modality: M },
     ],
   },
   {
@@ -169,7 +169,7 @@ const TS_TEXT_EN = [
 ];
 
 const TS_OPTIONS_EN = [
-  ["In the middle of the dance floor, energizing everyone", "Talking to everyone and meeting new people", "In a corner, having a deep conversation with one person", "Helping the host—or leaving early"],
+  ["In the middle of the dance floor, energizing everyone", "Talking to everyone and meeting new people", "In a corner, having a deep conversation with one person", "Helping the host, or leaving early"],
   ["A slow, drawn-out pace", "Chaos and unexpected changes", "A dull, repetitive routine", "Coldness and emotional distance"],
   ["Quickly, by instinct", "By relying on facts and practical considerations", "Logically, after weighing every side", "By following my feelings and intuition"],
   ["Adventure, adrenaline and a new country", "Comfort, nature and excellent food", "New people, festivals and conversation", "Peace by the water with someone close"],
@@ -177,7 +177,7 @@ const TS_OPTIONS_EN = [
   ["Passion and confidence", "Stability and honesty", "Intelligence and humor", "Depth and sensitivity"],
   ["I act and burn off the energy", "I return to familiar, comforting activities", "I talk a lot or analyze everything", "I withdraw and feel everything intensely"],
   ["I start it and lead others", "I carry it through and refuse to give up", "I adapt and revise the plan as needed"],
-  ["I quickly take the initiative", "I get irritated—I like plans to stay settled", "I take it calmly and adapt with ease"],
+  ["I quickly take the initiative", "I get irritated, I like plans to stay settled", "I take it calmly and adapt with ease"],
   ["I am always setting a new goal", "I stick firmly to my routine", "I change them with circumstances and mood"],
   ["I state my position first and set the direction", "I hold firmly to my view", "I try to understand both sides"],
   ["Take initiative and create the direction", "Choose a path and follow it steadily", "Adapt to circumstances and move with the flow"],
@@ -191,32 +191,32 @@ export const TS_QUESTIONS_EN: TsQuestion[] = TS_QUESTIONS.map((question, index) 
 
 export const TS_QUESTION_COUNT = TS_QUESTIONS.length;
 
-/** One punchy, flattering line per sign — the "why you're really this" reveal. */
+/** One punchy, flattering line per sign, the "why you're really this" reveal. */
 export const TS_SIGN_BLURB: Record<ZodiacSign["key"], string> = {
   aries:
-    "შენში ცეცხლი და ინიციატივა ერთმანეთს ერწყმის — გამოწვევას პირველი ხვდები, მამაცი და შეუჩერებელი ხარ. ვერძის ენერგია გამოგარჩევს.",
+    "შენში ცეცხლი და ინიციატივა ერთმანეთს ერწყმის, გამოწვევას პირველი ხვდები, მამაცი და შეუჩერებელი ხარ. ვერძის ენერგია გამოგარჩევს.",
   leo:
-    "შენში ცეცხლი და სიმტკიცე ერთიანდება — ბრწყინავ და დიდი გულის მქონე ლიდერი ხარ, რომელსაც სითბო და აღიარება უყვარს. ლომის სული გაქვს.",
+    "შენში ცეცხლი და სიმტკიცე ერთიანდება, ბრწყინავ და დიდი გულის მქონე ლიდერი ხარ, რომელსაც სითბო და აღიარება უყვარს. ლომის სული გაქვს.",
   sagittarius:
-    "შენში ცეცხლი და თავისუფლების სიყვარული ერთიანდება — ცნობისმოყვარე, გულახდილი და თავგადასავლების მოყვარული ხარ. მშვილდოსნის სული გამოგარჩევს.",
+    "შენში ცეცხლი და თავისუფლების სიყვარული ერთიანდება, ცნობისმოყვარე, გულახდილი და თავგადასავლების მოყვარული ხარ. მშვილდოსნის სული გამოგარჩევს.",
   capricorn:
-    "შენში მიწის სიმტკიცე და ამბიცია ერთიანდება — მიზანდასახული, დისციპლინირებული და გამძლე ხარ. მწვერვალისკენ აუჩქარებლად, მაგრამ მტკიცედ მიიწევ. თხის რქის ხასიათი გაქვს.",
+    "შენში მიწის სიმტკიცე და ამბიცია ერთიანდება, მიზანდასახული, დისციპლინირებული და გამძლე ხარ. მწვერვალისკენ აუჩქარებლად, მაგრამ მტკიცედ მიიწევ. თხის რქის ხასიათი გაქვს.",
   taurus:
-    "შენში მიწის ენერგია და სიმტკიცე ერთიანდება — საიმედო, მომთმენი და კომფორტის მოყვარული ხარ. გადაწყვეტილებას რომ მიიღებ, უკან იშვიათად იხევ. კუროს ბუნება გაქვს.",
+    "შენში მიწის ენერგია და სიმტკიცე ერთიანდება, საიმედო, მომთმენი და კომფორტის მოყვარული ხარ. გადაწყვეტილებას რომ მიიღებ, უკან იშვიათად იხევ. კუროს ბუნება გაქვს.",
   virgo:
-    "შენში მიწის პრაქტიკულობა და ზუსტი გონება ერთიანდება — დეტალებს ამჩნევ და ყოველთვის მზად ხარ სხვების დასახმარებლად. ქალწულის ნიჭი გამოგარჩევს.",
+    "შენში მიწის პრაქტიკულობა და ზუსტი გონება ერთიანდება, დეტალებს ამჩნევ და ყოველთვის მზად ხარ სხვების დასახმარებლად. ქალწულის ნიჭი გამოგარჩევს.",
   libra:
-    "შენში ჰაერის სიმსუბუქე და ჰარმონიის სურვილი ერთიანდება — დიპლომატიური ხარ, სილამაზესა და სამართლიანობას აფასებ და ადამიანებს შორის კავშირებს ქმნი. სასწორის სული გაქვს.",
+    "შენში ჰაერის სიმსუბუქე და ჰარმონიის სურვილი ერთიანდება, დიპლომატიური ხარ, სილამაზესა და სამართლიანობას აფასებ და ადამიანებს შორის კავშირებს ქმნი. სასწორის სული გაქვს.",
   aquarius:
-    "შენში ჰაერის თავისუფლება და ორიგინალობა ერთიანდება — დამოუკიდებლად აზროვნებ, განსხვავებულ იდეებს არ უშინდები და მომავალზე ხარ ორიენტირებული. მერწყულის სული გამოგარჩევს.",
+    "შენში ჰაერის თავისუფლება და ორიგინალობა ერთიანდება, დამოუკიდებლად აზროვნებ, განსხვავებულ იდეებს არ უშინდები და მომავალზე ხარ ორიენტირებული. მერწყულის სული გამოგარჩევს.",
   gemini:
-    "შენში ჰაერის სიმსუბუქე და ცნობისმოყვარეობა ერთიანდება — მახვილგონივრული, კომუნიკაბელური და მრავალფეროვანი საკითხებით დაინტერესებული ხარ. ტყუპების ენერგია გაქვს.",
+    "შენში ჰაერის სიმსუბუქე და ცნობისმოყვარეობა ერთიანდება, მახვილგონივრული, კომუნიკაბელური და მრავალფეროვანი საკითხებით დაინტერესებული ხარ. ტყუპების ენერგია გაქვს.",
   cancer:
-    "შენში წყლის სიღრმე და მზრუნველობა ერთიანდება — ემოციური ხარ, ახლობლებისადმი ერთგული და ძლიერი ინტუიცია გაქვს. კირჩხიბის გული გაქვს.",
+    "შენში წყლის სიღრმე და მზრუნველობა ერთიანდება, ემოციური ხარ, ახლობლებისადმი ერთგული და ძლიერი ინტუიცია გაქვს. კირჩხიბის გული გაქვს.",
   scorpio:
-    "შენში წყლის სიღრმე და ძლიერი ვნება ერთიანდება — მიზანდასახული ხარ, მტკიცე ნება გაქვს და მოვლენებს ზედაპირულად არ უყურებ. მორიელის სული გამოგარჩევს.",
+    "შენში წყლის სიღრმე და ძლიერი ვნება ერთიანდება, მიზანდასახული ხარ, მტკიცე ნება გაქვს და მოვლენებს ზედაპირულად არ უყურებ. მორიელის სული გამოგარჩევს.",
   pisces:
-    "შენში წყლის სიღრმე და წარმოსახვა ერთიანდება — მგრძნობიარე, თანამგრძნობი და შემოქმედებითი ხარ, მდიდარი შინაგანი სამყარო გაქვს. თევზების სული გაქვს.",
+    "შენში წყლის სიღრმე და წარმოსახვა ერთიანდება, მგრძნობიარე, თანამგრძნობი და შემოქმედებითი ხარ, მდიდარი შინაგანი სამყარო გაქვს. თევზების სული გაქვს.",
 };
 
 export const TS_SIGN_BLURB_EN: Record<ZodiacSign["key"], string> = {

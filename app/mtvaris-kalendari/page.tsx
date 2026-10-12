@@ -36,13 +36,13 @@ const PAGE_URL = `${SITE_URL}/mtvaris-kalendari`;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const titleForYear = (year: number) =>
-  `მთვარის კალენდარი ${year} — მთვარე დღეს, ფაზა და ნიშანი`;
+  `მთვარის კალენდარი ${year}, მთვარე დღეს, ფაზა და ნიშანი`;
 /**
  * The Latin spelling is in the description on purpose: GSC shows this page
  * sitting at position ~9 for "mtvaris kalendari" (168 impressions / 1 click
  * in 28 days). The hypothesis is that people who type Latin don't recognise
  * an all-Georgian snippet, so Google has nothing to bold for them. Keeping
- * the token here — not in the title — tests that without uglifying the SERP
+ * the token here, not in the title, tests that without uglifying the SERP
  * line for the far larger Georgian-script audience.
  */
 const descriptionForYear = (year: number) =>
@@ -306,7 +306,7 @@ export default async function MoonCalendarPage() {
     },
     {
       q: "რა განსხვავებაა მთვარის დღესა და მთვარის ფაზას შორის?",
-      a: "მთვარის ფაზა აღწერს, დისკოს რა ნაწილი ჩანს განათებული — სულ რვა ფაზაა. მთვარის დღე კი ახალი მთვარიდან გასული დღეების ნომერია და 1-დან 29-ან 30-მდე იცვლება. ერთი ფაზა რამდენიმე მთვარის დღეს მოიცავს.",
+      a: "მთვარის ფაზა აღწერს, დისკოს რა ნაწილი ჩანს განათებული, სულ რვა ფაზაა. მთვარის დღე კი ახალი მთვარიდან გასული დღეების ნომერია და 1-დან 29-ან 30-მდე იცვლება. ერთი ფაზა რამდენიმე მთვარის დღეს მოიცავს.",
     },
     {
       q: "დღეს მერამდენე მთვარის დღეა?",
@@ -527,7 +527,7 @@ export default async function MoonCalendarPage() {
             id="next-days"
             className="scroll-mt-24 text-3xl font-semibold tracking-tight"
           >
-            მთვარის ფაზები — შემდეგი 30 დღე
+            მთვარის ფაზები, შემდეგი 30 დღე
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-foreground/80">
             ყოველდღიური სია აჩვენებს რვაფაზიან კატეგორიას და მთვარის ზოდიაქოს
@@ -579,14 +579,14 @@ export default async function MoonCalendarPage() {
         </section>
 
         {/* Eight-phase reference. The page ranked ~p16 for "მთვარის ფაზები"
-            while only offering a single paragraph on it — this section is
+            while only offering a single paragraph on it, this section is
             the actual answer to that query. */}
         <section aria-labelledby="phase-guide" className="mb-14">
           <h2
             id="phase-guide"
             className="text-3xl font-semibold tracking-tight"
           >
-            მთვარის ფაზები — რვავე ფაზა თანმიმდევრობით
+            მთვარის ფაზები, რვავე ფაზა თანმიმდევრობით
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-foreground/80">
             სრული ციკლი დაახლოებით 29.5 დღეს გრძელდება და რვა ფაზას მოიცავს.
@@ -625,11 +625,11 @@ export default async function MoonCalendarPage() {
           </div>
         </section>
 
-        {/* Lunar days — a distinct traditional system the page never covered,
+        {/* Lunar days, a distinct traditional system the page never covered,
             yet it ranked ~p23 for "მთვარის დღეების კალენდარი". */}
         <section aria-labelledby="lunar-days" className="mb-14">
           <h2 id="lunar-days" className="text-3xl font-semibold tracking-tight">
-            მთვარის დღეები — რა არის და როგორ ითვლება
+            მთვარის დღეები, რა არის და როგორ ითვლება
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-foreground/80">
             მთვარის დღე ფაზის სინონიმი არ არის. ეს ახალი მთვარიდან გასული
@@ -678,7 +678,7 @@ export default async function MoonCalendarPage() {
               ასტრონომიული დაკვირვებისთვის შეარჩიე ფაზა: სუსტი მთვარის შუქი
               ბნელი ცის სანახავად გამოგადგება, სავსე მთვარე კი თავად მთვარის
               მარტივად დასაკვირვებლად. ასტროლოგიურ პრაქტიკაში ზოგი ადამიანი ახალ
-              მთვარეს მიზნების დასახვას, სავსეს კი შეჯამებას უკავშირებს — ეს
+              მთვარეს მიზნების დასახვას, სავსეს კი შეჯამებას უკავშირებს, ეს
               სიმბოლური ტრადიციაა.
             </p>
           </div>

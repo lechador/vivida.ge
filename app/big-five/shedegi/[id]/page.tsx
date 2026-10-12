@@ -29,7 +29,7 @@ export async function generateMetadata() {
 export const dynamic = "force-dynamic";
 
 /**
- * A saved Big Five result, owner-only — the persistent view behind "ჩემი
+ * A saved Big Five result, owner-only, the persistent view behind "ჩემი
  * შედეგი" on the tests hub. The radar + trait scores are free; the per-trait
  * written analysis unlocks once for CREDIT_COST.bigFiveTest credits. Re-scored
  * from the stored answers so it works on any device.
@@ -71,10 +71,10 @@ export default async function SavedBigFiveResultPage({
       <AppHeader authed active="tests" />
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        {/* Profile chart — free */}
+        {/* Profile chart, free */}
         <BigFiveChart result={result} locale={locale} />
 
-        {/* Per-trait analysis — gated behind a one-time credit unlock */}
+        {/* Per-trait analysis, gated behind a one-time credit unlock */}
         {unlocked ? (
           <div className="mt-4">
             <BigFiveDetail result={result} locale={locale} />
@@ -92,7 +92,7 @@ export default async function SavedBigFiveResultPage({
               blurb={
                 en
                   ? "Read what your level means for each of the five traits. Pay once and keep the result."
-                  : "ნახე თითოეული თვისების სრული ანალიზი — რას ნიშნავს შენი დონე ხუთივე თვისებაზე. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+                  : "ნახე თითოეული თვისების სრული ანალიზი, რას ნიშნავს შენი დონე ხუთივე თვისებაზე. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
               }
               locale={locale}
             />

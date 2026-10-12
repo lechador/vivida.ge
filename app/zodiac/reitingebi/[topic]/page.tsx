@@ -32,7 +32,7 @@ import {
 
 const SITE_URL = "https://www.vivida.ge";
 
-// Evergreen — the ranking is cached in Postgres; re-render the page chrome
+// Evergreen, the ranking is cached in Postgres; re-render the page chrome
 // weekly. The AI cost is paid once per topic (then on promptVersion bumps).
 export const revalidate = 604800;
 
@@ -78,7 +78,7 @@ export async function generateMetadata({
   if (!topic) return {};
   const url = `${SITE_URL}/zodiac/reitingebi/${slug}`;
   const title = topic.titleKa;
-  const description = `${topic.titleKa} — 12-ვე ნიშნის სრული რეიტინგი, თითოეულზე ახსნა. ნახე, რომელი ნიშანი დგას პირველ ადგილზე და რატომ.`;
+  const description = `${topic.titleKa}, 12-ვე ნიშნის სრული რეიტინგი, თითოეულზე ახსნა. ნახე, რომელი ნიშანი დგას პირველ ადგილზე და რატომ.`;
   const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(title)}&k=${encodeURIComponent("რეიტინგი")}&a=${encodeURIComponent("#eac358")}`;
   return {
     title: { absolute: title },

@@ -2,7 +2,7 @@
 // them under the minimum age. The age gate (saveBirthDataCore) only catches
 // new/edited profiles, so accounts onboarded before it shipped are unchecked.
 //
-// This script ONLY SELECTs — it never writes, suspends, or deletes anything.
+// This script ONLY SELECTs, it never writes, suspends, or deletes anything.
 // Decide handling from the printed list.
 //
 //   node scripts/scan-underage.mjs

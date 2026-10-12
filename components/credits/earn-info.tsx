@@ -11,7 +11,7 @@ type EarnRow = {
 };
 
 /**
- * "How to earn credits" — the free side of the economy, shown above the paid
+ * "How to earn credits", the free side of the economy, shown above the paid
  * top-up options so users see they don't have to pay. Amounts read straight
  * from the economy config so copy never drifts from the real rewards.
  */
@@ -72,8 +72,8 @@ export function CreditEarnInfo({ locale }: { locale: UserLocale }) {
       </div>
       <p className="mb-4 text-sm text-muted-foreground">
         {en
-          ? "You don't have to buy credits—you can earn them by being active."
-          : "კრედიტების ყიდვა სავალდებულო არ არის — შეგიძლია დააგროვო აქტიურობით."}
+          ? "You don't have to buy credits, you can earn them by being active."
+          : "კრედიტების ყიდვა სავალდებულო არ არის, შეგიძლია დააგროვო აქტიურობით."}
       </p>
 
       <ul className="space-y-2.5">

@@ -266,7 +266,7 @@ export async function addArticleComment(
     )
     .limit(1);
   if (recent) {
-    return { ok: false, error: "ცოტა დაიცადე — ახლახან დაწერე კომენტარი." };
+    return { ok: false, error: "ცოტა დაიცადე, ახლახან დაწერე კომენტარი." };
   }
 
   const [inserted] = await db

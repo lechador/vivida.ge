@@ -4,7 +4,7 @@
  * `priceForPlan()` in lib/stripe.ts looks each price up by lookup key and
  * throws if it is missing or disagrees with the catalogue, so PRO checkout in
  * these markets stays broken until this has been run against the live account
- * once. (Credit packs need nothing — they are inline `price_data`.)
+ * once. (Credit packs need nothing, they are inline `price_data`.)
  *
  * Idempotent per market: re-running finds the existing price and verifies it
  * instead of creating a duplicate.
@@ -23,10 +23,10 @@ config({ path: ".env.local" });
 
 /**
  * Must stay in step with PREMIUM_PLANS_BY_COUNTRY in lib/billing-config.ts.
- * All four are standard two-decimal Stripe currencies — plain cents.
+ * All four are standard two-decimal Stripe currencies, plain cents.
  *
- * This account keeps ONE PRODUCT PER MARKET — "Vivida PRO Georgia",
- * "Vivida PRO UK", "Vivida PRO Armenia" — not one product carrying several
+ * This account keeps ONE PRODUCT PER MARKET, "Vivida PRO Georgia",
+ * "Vivida PRO UK", "Vivida PRO Armenia", not one product carrying several
  * currency prices. Follow that when adding the next market.
  */
 const PLANS = [
@@ -82,7 +82,7 @@ const apply = process.argv.includes("--apply");
 const checkoutSmoke = process.argv.includes("--checkout-smoke");
 const key = process.env.STRIPE_SECRET_KEY;
 if (!key) {
-  console.error("STRIPE_SECRET_KEY is not set in .env.local — aborting.");
+  console.error("STRIPE_SECRET_KEY is not set in .env.local, aborting.");
   process.exit(1);
 }
 
@@ -166,7 +166,7 @@ for (const plan of PLANS) {
     console.log(`  Price already exists: ${price.id}`);
     if (!matches) {
       console.error(
-        "  It does NOT match the catalogue — checkout will throw. Archive it " +
+        "  It does NOT match the catalogue, checkout will throw. Archive it " +
           "in Stripe and re-run, or correct lib/billing-config.ts.",
       );
       failures += 1;
@@ -175,7 +175,7 @@ for (const plan of PLANS) {
     console.log("  It matches the catalogue. Nothing to do.");
   } else if (!apply) {
     console.log(
-      "  Dry run — nothing created. Re-run with --apply to create it.",
+      "  Dry run, nothing created. Re-run with --apply to create it.",
     );
     continue;
   } else {
@@ -209,7 +209,7 @@ for (const plan of PLANS) {
 }
 
 if (failures > 0) {
-  console.error(`\n${failures} market(s) need attention — see above.`);
+  console.error(`\n${failures} market(s) need attention, see above.`);
   process.exit(1);
 }
 console.log("\nDone.");

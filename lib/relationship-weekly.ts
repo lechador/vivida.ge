@@ -77,13 +77,13 @@ const COPY: Record<
     },
     summaries: {
       communication:
-        "სიტყვები ამ კვირაში განსაკუთრებით მნიშვნელოვანია — თქვით სათქმელი მკაფიოდ და მოსმენასაც დაუთმეთ ადგილი.",
+        "სიტყვები ამ კვირაში განსაკუთრებით მნიშვნელოვანია, თქვით სათქმელი მკაფიოდ და მოსმენასაც დაუთმეთ ადგილი.",
       closeness:
         "პატარა ყურადღება და ხარისხიანი დრო კავშირს უფრო თბილსა და მყარად აქცევს.",
       emotions:
         "ემოციური ფონი გაძლიერებულია; ეცადეთ რეაქციების მიღმა ერთმანეთის საჭიროებები დაინახოთ.",
       boundaries:
-        "განსხვავებული ტემპი დაძაბულობას არ ნიშნავს — მკაფიო საზღვრები და პაუზა ახლა კავშირს იცავს.",
+        "განსხვავებული ტემპი დაძაბულობას არ ნიშნავს, მკაფიო საზღვრები და პაუზა ახლა კავშირს იცავს.",
       growth:
         "კარგი დროა შეთანხმდეთ ერთ პატარა საერთო მიზანზე და პირველი ნაბიჯი ერთად გადადგათ.",
     },
@@ -100,7 +100,7 @@ const COPY: Record<
       ],
       emotions: [
         "როგორ ხარ სინამდვილეში ამ კვირაში?",
-        "როდის გჭირდება ჩემგან მხარდაჭერა და როდის — სივრცე?",
+        "როდის გჭირდება ჩემგან მხარდაჭერა და როდის, სივრცე?",
         "რა ემოციის გაზიარება გიჭირს?",
       ],
       boundaries: [
@@ -115,11 +115,11 @@ const COPY: Record<
       ],
     },
     supportive:
-      "ეს დღე კავშირს მხარს უჭერს — გამოიყენეთ სიახლოვისა და შეთანხმებისთვის.",
+      "ეს დღე კავშირს მხარს უჭერს, გამოიყენეთ სიახლოვისა და შეთანხმებისთვის.",
     tense:
-      "შესაძლოა მეტი მგრძნობელობა ან ხახუნი იყოს — იჩქარეთ ნაკლებად და მოუსმინეთ მეტად.",
+      "შესაძლოა მეტი მგრძნობელობა ან ხახუნი იყოს, იჩქარეთ ნაკლებად და მოუსმინეთ მეტად.",
     neutral:
-      "ეს თემა ყურადღებას ითხოვს — გულწრფელი დაკვირვება ბევრს გაგაგებინებთ.",
+      "ეს თემა ყურადღებას ითხოვს, გულწრფელი დაკვირვება ბევრს გაგაგებინებთ.",
   },
   en: {
     headlines: {
@@ -168,9 +168,9 @@ const COPY: Record<
       ],
     },
     supportive:
-      "This supports the connection—use it for closeness and agreement.",
+      "This supports the connection, use it for closeness and agreement.",
     tense:
-      "Sensitivity or friction may rise—slow down and listen more carefully.",
+      "Sensitivity or friction may rise, slow down and listen more carefully.",
     neutral:
       "This theme deserves attention; honest observation can reveal a lot.",
   },
@@ -240,7 +240,7 @@ export function computeRelationshipWeekly(
     title:
       language === "en"
         ? `${PLANETS[language][item.transit] ?? item.transit} ${ASPECTS[language][item.kind] ?? item.kind} ${PLANETS[language][item.natal] ?? item.natal}`
-        : `${PLANETS[language][item.transit] ?? item.transit} — ${ASPECTS[language][item.kind] ?? item.kind} — ${PLANETS[language][item.natal] ?? item.natal}`,
+        : `${PLANETS[language][item.transit] ?? item.transit}, ${ASPECTS[language][item.kind] ?? item.kind}, ${PLANETS[language][item.natal] ?? item.natal}`,
     meaning:
       item.family === "harmonic"
         ? copy.supportive

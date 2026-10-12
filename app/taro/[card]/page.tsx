@@ -42,11 +42,11 @@ export async function generateMetadata({
   const url = `${siteUrl}${localizedHref(`/taro/${slug}`, locale)}`;
   const arcanaEn = card.arcana === "major" ? "Major Arcana" : "Minor Arcana";
   const title = en
-    ? `${card.name} Tarot Card Meaning — Upright and Reversed`
-    : `${card.name} — ტაროს კარტის მნიშვნელობა`;
+    ? `${card.name} Tarot Card Meaning, Upright and Reversed`
+    : `${card.name}, ტაროს კარტის მნიშვნელობა`;
   const description = en
     ? `Explore The ${card.name.replace(/^The /, "")} tarot card: upright and reversed meanings for love, career and personal reflection. ${card.keywords.slice(0, 3).join(", ")}.`
-    : `ტაროს კარტი „${card.name}" (${card.nameEn}): პირდაპირი და შებრუნებული მნიშვნელობა, სიყვარული და კარიერა — ქართულად. ${card.keywords.slice(0, 3).join(", ")}.`;
+    : `ტაროს კარტი „${card.name}" (${card.nameEn}): პირდაპირი და შებრუნებული მნიშვნელობა, სიყვარული და კარიერა, ქართულად. ${card.keywords.slice(0, 3).join(", ")}.`;
   const og = `${siteUrl}/api/og/page?t=${encodeURIComponent(card.name)}&k=${encodeURIComponent(en ? "Tarot card" : "ტაროს კარტა")}`;
   return {
     title: { absolute: title },
@@ -133,7 +133,7 @@ export default async function TarotCardPage({
     "@type": "Article",
     headline: en
       ? `${card.name} tarot card meaning`
-      : `${card.name} — ტაროს კარტის მნიშვნელობა`,
+      : `${card.name}, ტაროს კარტის მნიშვნელობა`,
     description: card.upright,
     inLanguage: en ? "en" : "ka-GE",
     mainEntityOfPage: { "@type": "WebPage", "@id": url },

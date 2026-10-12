@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 /**
- * POST /api/tarot/reading { question } — draw a 3-card spread and get an AI
+ * POST /api/tarot/reading { question }, draw a 3-card spread and get an AI
  * reading. First reading free, then CREDIT_COST.tarot each (charged inside
  * performReading). 402 when the balance is short; the client shows the
  * top-up/invite prompt.

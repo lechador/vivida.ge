@@ -87,7 +87,7 @@ export async function generateMetadata({
     };
   }
   const url = `${SITE_URL}/sizmris-akhsna/${s.slug}`;
-  const title = `${s.titleKa} სიზმარში — რას ნიშნავს, სიზმრის ახსნა`;
+  const title = `${s.titleKa} სიზმარში, რას ნიშნავს, სიზმრის ახსნა`;
   const description = `${s.summaryKa} ${s.meaningKa.slice(0, 110)}… ნახე ყველა ვარიანტი: ${s.variantsKa
     .slice(0, 3)
     .map((v) => v.whenKa)
@@ -146,7 +146,7 @@ export default async function DreamSymbolPage({
   }
   const url = `${SITE_URL}/sizmris-akhsna/${s.slug}`;
 
-  // The variants double as an FAQ — same content, but eligible for the
+  // The variants double as an FAQ, same content, but eligible for the
   // "People also ask" style rich result.
   const faq = s.variantsKa.map((v) => ({
     q: `რას ნიშნავს, თუ სიზმარში ${v.whenKa}?`,
@@ -156,7 +156,7 @@ export default async function DreamSymbolPage({
   const ld = [
     articleLd({
       url,
-      headline: `${s.titleKa} სიზმარში — რას ნიშნავს`,
+      headline: `${s.titleKa} სიზმარში, რას ნიშნავს`,
       description: s.summaryKa,
       datePublished: "2026-07-29T00:00:00.000Z",
       about: {
@@ -175,7 +175,7 @@ export default async function DreamSymbolPage({
   const related = s.related.map((slug) => DREAM_BY_SLUG[slug]).filter(Boolean);
 
   // A few more symbols to keep every page well-linked even when `related`
-  // is short — orphan pages are the usual reason a cluster never indexes.
+  // is short, orphan pages are the usual reason a cluster never indexes.
   const alsoSee = DREAM_SYMBOLS.filter(
     (x) => x.slug !== s.slug && !s.related.includes(x.slug),
   ).slice(0, 12);
@@ -238,7 +238,7 @@ export default async function DreamSymbolPage({
         {/* The long-tail body. */}
         <section className="mt-8">
           <h2 className="text-xl font-semibold tracking-tight">
-            რას ნიშნავს კონკრეტულად — {s.titleKa} სიზმარში
+            რას ნიშნავს კონკრეტულად, {s.titleKa} სიზმარში
           </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
             იპოვე ის ვარიანტი, რომელიც შენს სიზმარს ყველაზე ახლოს დგას.
@@ -332,7 +332,7 @@ export default async function DreamSymbolPage({
             გაქვს კითხვა, რომელზეც სიზმარმა პასუხი არ გასცა?
           </h2>
           <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground sm:text-base">
-            დაუსვი კითხვა ტაროს და მიიღე პერსონალური პასუხი ქართულად — პირველი
+            დაუსვი კითხვა ტაროს და მიიღე პერსონალური პასუხი ქართულად, პირველი
             გაშლა უფასოა.
           </p>
           <Link

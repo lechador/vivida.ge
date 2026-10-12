@@ -20,7 +20,7 @@ const KIND_GLYPH: Record<"sun" | "moon" | "ascendant", string> = {
 };
 
 /**
- * One flat Big-Three row (Sun / Moon / Ascendant) — same shape as the planet
+ * One flat Big-Three row (Sun / Moon / Ascendant), same shape as the planet
  * list rows: glyph · name · sign · degree, with the interpretation inline.
  * The positions table scrolls here via #planet-<kind>.
  */

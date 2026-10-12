@@ -5,7 +5,7 @@ import { estimateTheta } from "@/lib/iq/scoring";
  * Adaptive item selection (computerised adaptive testing) for the IQ test.
  *
  * After each answer we re-estimate the taker's ability θ (EAP) from everything
- * they've done so far, then serve the item whose difficulty sits closest to θ —
+ * they've done so far, then serve the item whose difficulty sits closest to θ,
  * for a Rasch item that's the most *informative* choice, so the test hones in
  * on ability fast. Strong takers get pulled up into the hard tier; weaker ones
  * settle onto items they can actually reason about. Fixed length so the taker

@@ -1,5 +1,5 @@
 /**
- * Elemental balance — computes how strongly each of the four classical
+ * Elemental balance, computes how strongly each of the four classical
  * elements (Fire, Earth, Air, Water) is represented in a natal chart.
  *
  * Each placement contributes a weighted point to the element of its sign:
@@ -24,7 +24,7 @@ export const ELEMENT_ORDER: Element[] = [
 ];
 
 const POINT_WEIGHTS: Record<string, number> = {
-  // Personality core — the big three carry the most signal
+  // Personality core, the big three carry the most signal
   sun: 3,
   moon: 3,
   ascendant: 3,
@@ -37,7 +37,7 @@ const POINT_WEIGHTS: Record<string, number> = {
   saturn: 1.5,
   // Career angle
   midheaven: 1.5,
-  // Generational planets — deliberately lower so they don't drown out personal placements
+  // Generational planets, deliberately lower so they don't drown out personal placements
   uranus: 1,
   neptune: 1,
   pluto: 1,

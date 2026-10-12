@@ -22,11 +22,11 @@ import { localizedHref } from "@/lib/seo/public-paths";
 
 const SITE_URL = "https://www.vivida.ge";
 
-const TITLE = "პიროვნების ტესტი — Astro-MBTI ქართულად (უფასო)";
+const TITLE = "პიროვნების ტესტი, Astro-MBTI ქართულად (უფასო)";
 const DESCRIPTION =
-  "გაიარე უფასო პიროვნების ტესტი ქართულად — 60 კითხვა, ~7 წუთი. გაიგე შენი MBTI ტიპი 16-დან, ძლიერი და სუსტი მხარეები, ურთიერთობები და კარიერა. რეგისტრაციის გარეშე.";
+  "გაიარე უფასო პიროვნების ტესტი ქართულად, 60 კითხვა, ~7 წუთი. გაიგე შენი MBTI ტიპი 16-დან, ძლიერი და სუსტი მხარეები, ურთიერთობები და კარიერა. რეგისტრაციის გარეშე.";
 
-const TITLE_EN = "Free Personality Test — Discover Your 16-Type Profile";
+const TITLE_EN = "Free Personality Test, Discover Your 16-Type Profile";
 const DESCRIPTION_EN =
   "Take a free 60-question personality test and explore your preferences across energy, information, decisions, structure and identity.";
 
@@ -81,7 +81,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "mbti testi qartulad",
       "psikologiuri testi",
     ],
-    // Reciprocal — the English side already points here, and hreflang pairs
+    // Reciprocal, the English side already points here, and hreflang pairs
     // are discarded unless both directions agree.
     alternates: localizedAlternates(
       "/pirovnebis-testi",
@@ -112,7 +112,7 @@ const TEST_FAQ = [
   },
   {
     q: "ტესტი უფასოა და საჭიროა თუ არა რეგისტრაცია?",
-    a: "ტესტი უფასოა და შეგიძლია გაიარო რეგისტრაციის გარეშე. სრული, პერსონალური შედეგის სანახავად საჭიროა მხოლოდ ერთი წუთი — შესვლა ან რეგისტრაცია.",
+    a: "ტესტი უფასოა და შეგიძლია გაიარო რეგისტრაციის გარეშე. სრული, პერსონალური შედეგის სანახავად საჭიროა მხოლოდ ერთი წუთი, შესვლა ან რეგისტრაცია.",
   },
   {
     q: "რას მივიღებ შედეგში?",
@@ -229,7 +229,7 @@ export default async function TestPage() {
         <MbtiTestClient questions={questions} locale={locale} />
       </section>
 
-      {/* SEO / informational content — below the fold, indexable. The page
+      {/* SEO / informational content, below the fold, indexable. The page
           previously ended at the test client, so it had no crawlable body
           copy and no outbound links at all. */}
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
@@ -252,7 +252,7 @@ export default async function TestPage() {
               <>
                 პიროვნების ტესტი (ცნობილი როგორც <strong>MBTI</strong> ან
                 16&nbsp;Personalities) შენს ფსიქოლოგიურ ტიპს განსაზღვრავს ოთხი
-                ღერძის მიხედვით. ეს არ არის „კარგი“ ან „ცუდი“ შედეგი — ტიპი
+                ღერძის მიხედვით. ეს არ არის „კარგი“ ან „ცუდი“ შედეგი, ტიპი
                 აღწერს იმას, <em>როგორ</em> ფიქრობ და იღებ გადაწყვეტილებას, და
                 არა იმას, რამდენად ჭკვიანი ხარ.
               </>
@@ -263,37 +263,37 @@ export default async function TestPage() {
             {(en
               ? [
                   {
-                    t: "E ↔ I — Energy",
+                    t: "E ↔ I, Energy",
                     d: "Whether interaction or solitude tends to recharge you",
                   },
                   {
-                    t: "S ↔ N — Information",
+                    t: "S ↔ N, Information",
                     d: "Concrete facts versus patterns and possibilities",
                   },
                   {
-                    t: "T ↔ F — Decisions",
+                    t: "T ↔ F, Decisions",
                     d: "Impersonal logic versus values and human impact",
                   },
                   {
-                    t: "J ↔ P — Structure",
+                    t: "J ↔ P, Structure",
                     d: "Planning and closure versus flexibility and open options",
                   },
                 ]
               : [
                   {
-                    t: "E ↔ I — ენერგია",
+                    t: "E ↔ I, ენერგია",
                     d: "ენერგიას ადამიანებისგან იღებ თუ მარტოობისგან",
                   },
                   {
-                    t: "S ↔ N — აღქმა",
+                    t: "S ↔ N, აღქმა",
                     d: "კონკრეტულ ფაქტებს ენდობი თუ იდეებსა და შესაძლებლობებს",
                   },
                   {
-                    t: "T ↔ F — გადაწყვეტილება",
+                    t: "T ↔ F, გადაწყვეტილება",
                     d: "ლოგიკით წყვეტ თუ ღირებულებებითა და ადამიანებით",
                   },
                   {
-                    t: "J ↔ P — ცხოვრების წესი",
+                    t: "J ↔ P, ცხოვრების წესი",
                     d: "გეგმა გირჩევნია თუ მოქნილობა და ღია ვარიანტები",
                   },
                 ]
@@ -316,7 +316,7 @@ export default async function TestPage() {
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
             {en
               ? "Treat your type as a vocabulary for recurring preferences, not a fixed box or diagnosis. People can adapt across situations, and percentages near the midpoint often indicate genuine flexibility."
-              : "კლასიკური ტესტი მხოლოდ პასუხებს აფასებს. Vivida-ზე შედეგს ემატება ასტროლოგიური ფენა — შენი ნიშნის ტემპერამენტი ისე ეხმიანება ტიპს, რომ აღწერა უფრო ცოცხალი და ამოსაცნობი ხდება. ორივე ნაწილი ცალკეც იკითხება, თუ მხოლოდ ერთი გაინტერესებს."}
+              : "კლასიკური ტესტი მხოლოდ პასუხებს აფასებს. Vivida-ზე შედეგს ემატება ასტროლოგიური ფენა, შენი ნიშნის ტემპერამენტი ისე ეხმიანება ტიპს, რომ აღწერა უფრო ცოცხალი და ამოსაცნობი ხდება. ორივე ნაწილი ცალკეც იკითხება, თუ მხოლოდ ერთი გაინტერესებს."}
           </p>
 
           <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -405,7 +405,7 @@ export default async function TestPage() {
                   {
                     href: "/big-five",
                     label: "Big Five ტესტი",
-                    sub: "დიდი ხუთეული — 5 თვისება",
+                    sub: "დიდი ხუთეული, 5 თვისება",
                   },
                 ]
             ).map((t) => (

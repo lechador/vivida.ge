@@ -13,7 +13,7 @@ export function SectionHeader({
   subtitle,
   locale = "ka",
 }: {
-  /** Two-digit string like "01", "02" — for visual rhythm */
+  /** Two-digit string like "01", "02", for visual rhythm */
   number: string;
   Icon: LucideIcon;
   title: string;

@@ -4,7 +4,7 @@ import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 // promotePhoto() invalidates the navbar avatar via Next's revalidateTag, which
-// needs a request store that doesn't exist outside a Next server. Stub it —
+// needs a request store that doesn't exist outside a Next server. Stub it,
 // these tests are about the reordering SQL, not cache plumbing.
 vi.mock("@/lib/header-cache", () => ({
   invalidateHeaderForUser: () => {},
@@ -27,7 +27,7 @@ const describeWithDatabase = databaseUrl ? describe : describe.skip;
 
 /**
  * promotePhoto() used a transaction, which the production neon-http driver
- * rejects outright ("No transactions support in neon-http driver") — so "set
+ * rejects outright ("No transactions support in neon-http driver"), so "set
  * as main" was broken in production while every unit test passed. These
  * exercise the single-statement renumbering against a real Postgres.
  */

@@ -27,9 +27,9 @@ import {
 
 const SITE_URL = "https://www.vivida.ge";
 
-const TITLE = "ნუმეროლოგია — ბედის რიცხვის გამოთვლა და მნიშვნელობა";
+const TITLE = "ნუმეროლოგია, ბედის რიცხვის გამოთვლა და მნიშვნელობა";
 const DESCRIPTION =
-  "ნუმეროლოგია ქართულად — გამოთვალე შენი ბედის რიცხვი დაბადების თარიღით (უფასო კალკულატორი) და წაიკითხე ყველა რიცხვის მნიშვნელობა: 1-დან 9-მდე და მასტერ-რიცხვები 11, 22, 33.";
+  "ნუმეროლოგია ქართულად, გამოთვალე შენი ბედის რიცხვი დაბადების თარიღით (უფასო კალკულატორი) და წაიკითხე ყველა რიცხვის მნიშვნელობა: 1-დან 9-მდე და მასტერ-რიცხვები 11, 22, 33.";
 
 const KA_METADATA: Metadata = {
   title: { absolute: TITLE },
@@ -153,14 +153,14 @@ export default async function NumerologiaHubPage() {
 
         <header className="mb-8 max-w-3xl">
           <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-            ნუმეროლოგია —{" "}
+            ნუმეროლოგია,{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
               ბედის რიცხვი
             </span>
           </h1>
           <p className="mt-4 text-pretty text-base text-foreground/85 sm:text-lg">
             ბედის რიცხვი დაბადების თარიღიდან ითვლება და შენი ცხოვრების მთავარ
-            თემას აღწერს — ძლიერ მხარეებს, გამოწვევებსა და მიმართულებას.
+            თემას აღწერს, ძლიერ მხარეებს, გამოწვევებსა და მიმართულებას.
             გამოთვალე შენი და წაიკითხე, რას ნიშნავს.
           </p>
         </header>
@@ -170,7 +170,7 @@ export default async function NumerologiaHubPage() {
         {/* All numbers grid */}
         <section className="mt-12">
           <h2 className="text-xl font-semibold tracking-tight">
-            რიცხვების მნიშვნელობა — 1-დან 33-მდე
+            რიცხვების მნიშვნელობა, 1-დან 33-მდე
           </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {LIFE_PATH_NUMBERS.map((n) => {
@@ -242,7 +242,7 @@ export default async function NumerologiaHubPage() {
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            რიცხვები დასაწყისია — ცა გრძელდება
+            რიცხვები დასაწყისია, ცა გრძელდება
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
             შენი დაბადების თარიღი ბევრად მეტს ამბობს: მთვარე, ვენერა, ამომავალი

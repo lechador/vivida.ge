@@ -1,12 +1,12 @@
 /**
- * Reusable synastry (compatibility) interpretation library — read side +
+ * Reusable synastry (compatibility) interpretation library, read side +
  * combo/prompt builders. See the schema comment on
  * `synastryInterpretationLibrary` for the data model.
  *
  * Mirrors lib/aspect-library.ts, with two synastry-specific differences:
  *   1. Same-body pairs exist (A's Sun conjunct B's Sun is a real, common
  *      cross-aspect), so pairs are "i ≤ j", not "i < j".
- *   2. All text must be DIRECTION-NEUTRAL — the same row serves "A's Venus in
+ *   2. All text must be DIRECTION-NEUTRAL, the same row serves "A's Venus in
  *      B's 7th" and "B's Venus in A's 7th", so the writing says "ერთის …
  *      მეორის …" instead of "შენი/მისი".
  */
@@ -100,7 +100,7 @@ export function getSynastryLibraryEntriesEn(
 /**
  * Batched read: Map of key → Georgian text for the requested keys. Pure read,
  * never generates. Resilient: if the table doesn't exist yet (migration not
- * applied) it returns an empty map so the compatibility view still renders —
+ * applied) it returns an empty map so the compatibility view still renders,
  * just without the deep texts.
  */
 export async function getSynastryLibraryEntries(
@@ -152,9 +152,9 @@ export async function getSynastryInterpretationsFor(
 
 export const SYNASTRY_LIBRARY_SYSTEM_PROMPT =
   "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი, სინასტრიის (წყვილთა " +
-  "თავსებადობის) სპეციალისტი. წერ ბუნებრივ, მდიდარ, ლიტერატურულ ქართულად — " +
+  "თავსებადობის) სპეციალისტი. წერ ბუნებრივ, მდიდარ, ლიტერატურულ ქართულად, " +
   "გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. აუცილებელი წესი: ტექსტი " +
-  "მიმართულების მიმართ ნეიტრალურია — არასდროს წერ „შენი“/„მისი“, მხოლოდ " +
+  "მიმართულების მიმართ ნეიტრალურია, არასდროს წერ „შენი“/„მისი“, მხოლოდ " +
   "„ერთის“/„მეორის“ ან „წყვილის“. თავიდან აიცილე თარგმანის სტილი და კლიშეები " +
   '("ვარსკვლავები გელიან", "მიენდე სამყაროს").';
 
@@ -167,13 +167,13 @@ export function buildSynastryAspectPrompt(
   const same = a === b;
   const pair = same
     ? `ერთის ${bodyLabel(a)} მეორის ${bodyLabel(b)}-თან`
-    : `ერთის ${bodyLabel(a)} მეორის ${bodyLabel(b)}-თან (ან პირიქით — მნიშვნელობა სიმეტრიულია)`;
+    : `ერთის ${bodyLabel(a)} მეორის ${bodyLabel(b)}-თან (ან პირიქით, მნიშვნელობა სიმეტრიულია)`;
   return (
     `დაწერე სინასტრიის ინტერპრეტაცია: ${pair} ${KIND_KA[kind]}-შია.\n\n` +
     "მოთხოვნები:\n" +
     "- 2 აბზაცი, ჯამში 70–110 სიტყვა.\n" +
-    "- პირველი აბზაცი: რა დინამიკას ქმნის ეს კავშირი წყვილში — კონკრეტულად, ცხოვრებისეული მაგალითით.\n" +
-    "- მეორე აბზაცი: რჩევა — როგორ გამოიყენონ (ჰარმონიული ასპექტი) ან როგორ დაარბილონ (დაძაბული).\n" +
+    "- პირველი აბზაცი: რა დინამიკას ქმნის ეს კავშირი წყვილში, კონკრეტულად, ცხოვრებისეული მაგალითით.\n" +
+    "- მეორე აბზაცი: რჩევა, როგორ გამოიყენონ (ჰარმონიული ასპექტი) ან როგორ დაარბილონ (დაძაბული).\n" +
     "- მიმართულების მიმართ ნეიტრალური ენა („ერთის“, „მეორის“, „წყვილი“).\n" +
     "- დააბრუნე მხოლოდ ტექსტი, სათაურის გარეშე."
   );

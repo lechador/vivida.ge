@@ -91,7 +91,7 @@ export function AttachmentTest() {
             </h2>
             {result.lean && (
               <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
-                შენი ქულები ორი სტილის საზღვართან ახლოსაა — აღწერა შენს
+                შენი ქულები ორი სტილის საზღვართან ახლოსაა, აღწერა შენს
                 დომინანტურ მხარეს ასახავს, მაგრამ მეზობელი სტილის თვისებებიც
                 გაქვს.
               </p>
@@ -147,7 +147,7 @@ export function AttachmentTest() {
         <section className="rounded-3xl border border-border bg-card/50 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Heart className="size-4 text-[var(--vivida-pink)]" />
-            გზამკვლევი პარტნიორისთვის — როგორ გაგიგოს უკეთ
+            გზამკვლევი პარტნიორისთვის, როგორ გაგიგოს უკეთ
           </div>
           <ul className="mt-4 space-y-3">
             {result.partnerTipsKa.map((tip) => (
@@ -185,8 +185,8 @@ export function AttachmentTest() {
             გაიგე, როგორ ეწყობით ერთმანეთს
           </h3>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-foreground/75">
-            მიჯაჭვულობის სტილი ნახევარი სურათია — მეორე ნახევარი თქვენი ორი
-            რუკის კომბინაციაა.
+            მიჯაჭვულობის სტილი ნახევარი სურათია, მეორე ნახევარი თქვენი ორი რუკის
+            კომბინაციაა.
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
             <Button asChild variant="mystic">
@@ -217,7 +217,7 @@ export function AttachmentTest() {
 
         <p className="mx-auto max-w-xl text-center text-xs leading-relaxed text-muted-foreground">
           ტესტი თვითრეფლექსიისთვისაა და დიაგნოზს არ ადგენს. სტილი რუკაა და არა
-          განაჩენი — ის ცხოვრების გამოცდილებით იცვლება და შეგნებული მუშაობით
+          განაჩენი, ის ცხოვრების გამოცდილებით იცვლება და შეგნებული მუშაობით
           უსაფრთხოსკენ იხრება.
         </p>
       </div>
@@ -246,7 +246,7 @@ export function AttachmentTest() {
           {question.textKa}
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          უპასუხე ისე, როგორც ურთიერთობებში უმეტესად გრძნობ — არა იდეალური,
+          უპასუხე ისე, როგორც ურთიერთობებში უმეტესად გრძნობ, არა იდეალური,
           არამედ ჩვეული ვერსიით.
         </p>
 
@@ -331,7 +331,7 @@ export function AttachmentTest() {
 
       <div className="mt-6 flex items-start gap-2.5 border-t border-border/70 pt-5 text-xs leading-relaxed text-muted-foreground">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
-        პასუხები მხოლოდ ამ გვერდზე მუშავდება — ისინი Vivida-ს სერვერზე არ
+        პასუხები მხოლოდ ამ გვერდზე მუშავდება, ისინი Vivida-ს სერვერზე არ
         იგზავნება და გვერდის განახლების შემდეგ ქრება.
       </div>
     </div>

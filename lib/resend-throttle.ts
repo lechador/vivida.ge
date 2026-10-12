@@ -2,7 +2,7 @@
  * Global spacing between Resend API calls within one invocation.
  *
  * The Resend account is rate-limited to 2 requests/second. The daily blast
- * used to stay under it by accident — each send was preceded by a ~30s
+ * used to stay under it by accident, each send was preceded by a ~30s
  * per-user AI generation. Since the interpretation libraries made
  * generation instant, a drain pass fires sends back-to-back and gets
  * 429-ed (2026-07-07: 121 of 141 daily emails failed). This gate is the
@@ -15,7 +15,7 @@
  * through without waiting.
  */
 
-// 2 req/s nominal limit, but 600ms spacing still tripped sporadic 429s —
+// 2 req/s nominal limit, but 600ms spacing still tripped sporadic 429s,
 // network jitter compresses arrivals so a rolling 1s window at Resend's
 // edge occasionally sees >2. ≥1s spacing keeps every window at 1 request.
 const RESEND_MIN_INTERVAL_MS = 1100;

@@ -12,7 +12,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 /**
  * iOS/Android-style fixed bottom tab bar. Four primary destinations
  * (Today / Tarot / Ask / My history) plus a More entry point that opens
- * the full nav drawer — every other route stays one tap behind More.
+ * the full nav drawer, every other route stays one tap behind More.
  * Hidden on lg+ where the desktop sidebar already covers it.
  *
  * Respects safe-area insets so it sits above the iOS home indicator
@@ -26,7 +26,7 @@ export function MobileTabBar({
 }: {
   active?: NavActiveKey;
   unreadMessages?: number;
-  /** Unopened proactive astrologer nudges — dot on the ask tab. */
+  /** Unopened proactive astrologer nudges, dot on the ask tab. */
   pendingAskNudges?: number;
   locale?: UserLocale;
 }) {

@@ -71,7 +71,7 @@ async function bell(opts: {
     deliveryKey: opts.deliveryKey,
     destination: ORDERS_URL,
   });
-  if (!claimId) return; // already notified — exactly once per booking event
+  if (!claimId) return; // already notified, exactly once per booking event
   try {
     await db.insert(notifications).values({
       userId: opts.userId,

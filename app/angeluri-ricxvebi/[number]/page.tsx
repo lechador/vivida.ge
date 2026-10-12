@@ -66,7 +66,7 @@ export async function generateMetadata({
   }
   const url = `${SITE_URL}/angeluri-ricxvebi/${a.slug}`;
   const clock = a.clockKa ? ` და ${a.clockKa}` : "";
-  const title = `${a.slug}${clock} — რას ნიშნავს ანგელოზური რიცხვი`;
+  const title = `${a.slug}${clock}, რას ნიშნავს ანგელოზური რიცხვი`;
   const description = `${a.essenceKa} ${a.meaningKa.slice(0, 120)}… ნახე, რას ნიშნავს ${a.slug} სიყვარულში, საქმეში და რა ნაბიჯი გადადგა.`;
 
   return {
@@ -117,7 +117,7 @@ export default async function AngelNumberPage({
 
   const faq = [
     { q: `რას ნიშნავს ${a.slug}?`, a: a.meaningKa },
-    { q: `${a.slug} სიყვარულში — რას ნიშნავს?`, a: a.loveKa },
+    { q: `${a.slug} სიყვარულში, რას ნიშნავს?`, a: a.loveKa },
     { q: `რა უნდა გავაკეთო, როცა ${a.slug}-ს ვხედავ?`, a: a.actionKa },
   ];
 
@@ -256,7 +256,7 @@ export default async function AngelNumberPage({
             გამოთვალე შენი ბედის რიცხვი
           </h2>
           <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground sm:text-base">
-            {a.slug} მომენტზე მიანიშნებს — ბედის რიცხვი კი მთელ შენს ხასიათს
+            {a.slug} მომენტზე მიანიშნებს, ბედის რიცხვი კი მთელ შენს ხასიათს
             აღწერს. უფასო კალკულატორი დაბადების თარიღით.
           </p>
           <Link

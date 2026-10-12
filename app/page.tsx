@@ -19,31 +19,31 @@ import { localizedAlternates } from "@/lib/seo/locales";
 const SITE_URL = "https://www.vivida.ge";
 
 /**
- * Home page is the brand landing — Google-facing copy lives here. Title is
+ * Home page is the brand landing, Google-facing copy lives here. Title is
  * absolute (no "· Vivida" suffix) so the brand reads as the primary name in
  * results. Description is keyword-tuned around what Georgians actually
  * search ("ნატალური რუკა", "ჰოროსკოპი ქართულად").
  */
 export const metadata: Metadata = {
-  // Keyword-first title — Google shows the brand ("vivida.ge") on its own line,
+  // Keyword-first title, Google shows the brand ("vivida.ge") on its own line,
   // so leading with "ნატალური რუკა" wins the bolded match instead of burying it
   // behind the brand.
   title: {
-    absolute: "ნატალური რუკა, ჰოროსკოპი და თავსებადობა ქართულად — Vivida",
+    absolute: "ნატალური რუკა, ჰოროსკოპი და თავსებადობა ქართულად, Vivida",
   },
   description:
-    "ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა — შენი დაბადების ზუსტი მომენტის მიხედვით. შექმენი შენი რუკა უფასოდ, ქართულად.",
+    "ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა, შენი დაბადების ზუსტი მომენტის მიხედვით. შექმენი შენი რუკა უფასოდ, ქართულად.",
   alternates: localizedAlternates("", "/en", "ka"),
   openGraph: {
-    title: "ნატალური რუკა და ჰოროსკოპი ქართულად — Vivida",
+    title: "ნატალური რუკა და ჰოროსკოპი ქართულად, Vivida",
     description:
-      "ცოცხალი ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობის ანალიზი — შენი დაბადების ზუსტი მომენტის მიხედვით.",
+      "ცოცხალი ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობის ანალიზი, შენი დაბადების ზუსტი მომენტის მიხედვით.",
     url: SITE_URL,
   },
   twitter: {
-    title: "Vivida — ნატალური რუკა ქართულად",
+    title: "Vivida, ნატალური რუკა ქართულად",
     description:
-      "ცოცხალი ნატალური რუკა და ყოველდღიური ჰოროსკოპი — შენი დაბადების ზუსტი მომენტის მიხედვით.",
+      "ცოცხალი ნატალური რუკა და ყოველდღიური ჰოროსკოპი, შენი დაბადების ზუსტი მომენტის მიხედვით.",
   },
 };
 
@@ -59,7 +59,7 @@ const ORGANIZATION_LD = {
   url: SITE_URL,
   logo: `${SITE_URL}/icon.svg`,
   description:
-    "პერსონალური ასტროლოგიური სერვისი — ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა ქართულად.",
+    "პერსონალური ასტროლოგიური სერვისი, ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა ქართულად.",
   sameAs: [],
   contactPoint: {
     "@type": "ContactPoint",
@@ -81,7 +81,7 @@ export default async function Home() {
   const { signs, pairs } = buildCalculatorData();
   return (
     <>
-      {/* Structured data — search engines parse these inline scripts even
+      {/* Structured data, search engines parse these inline scripts even
           though they're hidden from users. Two separate scripts so a
           parse error in one doesn't void the other. */}
       <script
@@ -162,7 +162,7 @@ export default async function Home() {
 
         <Hero />
 
-        {/* Interactive compatibility calculator — an instant, no-signup hook
+        {/* Interactive compatibility calculator, an instant, no-signup hook
             that turns cold traffic into engaged visitors before asking for
             anything. Shareable results feed the viral loop. */}
         <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-4 pt-4 sm:px-6">
@@ -175,13 +175,13 @@ export default async function Home() {
               ახლავე
             </h2>
             <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-muted-foreground sm:text-base">
-              აირჩიე ორი ნიშანი — დანარჩენს ვარსკვლავები ამბობენ.
+              აირჩიე ორი ნიშანი, დანარჩენს ვარსკვლავები ამბობენ.
             </p>
           </div>
           <CompatibilityCalculator signs={signs} pairs={pairs} />
         </section>
 
-        {/* Explore rail — internal links to popular public tools. The homepage is
+        {/* Explore rail, internal links to popular public tools. The homepage is
             high-traffic + high-bounce and previously linked to nothing
             SEO-relevant; this distributes crawl paths and gives cold visitors
             an obvious, low-commitment next step (a 2nd pageview = engaged). */}

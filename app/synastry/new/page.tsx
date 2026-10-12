@@ -21,7 +21,7 @@ export default async function NewPartnerPage() {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
   const user = await requireUser();
-  // Server-side cap check — keeps unauthorised users from bypassing the
+  // Server-side cap check, keeps unauthorised users from bypassing the
   // client-side disabled CTA.
   const used = await partnerCreationsThisMonth(user.id);
   const cap = PARTNER_CAP_PER_MONTH;
@@ -59,7 +59,7 @@ export default async function NewPartnerPage() {
         <p className="mb-8 text-sm text-muted-foreground">
           {en
             ? "Enter their birth details. This can be a romantic partner, family member, old friend, or anyone you're curious about."
-            : "ჩაწერე პარტნიორის დაბადების მონაცემები. პარტნიორი ვინც არ უნდა იყოს — საყვარელი, ოჯახის წევრი, ძველი მეგობარი ან ვინც გაინტერესებს."}
+            : "ჩაწერე პარტნიორის დაბადების მონაცემები. პარტნიორი ვინც არ უნდა იყოს, საყვარელი, ოჯახის წევრი, ძველი მეგობარი ან ვინც გაინტერესებს."}
         </p>
 
         <PartnerForm locale={locale} />

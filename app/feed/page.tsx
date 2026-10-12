@@ -43,10 +43,10 @@ export default async function FeedPage() {
     listFeed({ limit: 30 }),
     // Reuses the cached header lookup (also has avatarUrl), so showing
     // the viewer's chosen main photo in the composer doesn't add an
-    // extra DB roundtrip — it's already memoised for the navbar.
+    // extra DB roundtrip, it's already memoised for the navbar.
     getHeaderData(user.id),
     // Same "people you'd vibe with" rail the dashboard uses. Flag-gated off
-    // at low user density — skip the ranking query entirely when off.
+    // at low user density, skip the ranking query entirely when off.
     SOCIAL_FEATURES.suggestedPeopleRail
       ? getDashboardSuggestions(user.id, 8)
       : Promise.resolve(
@@ -85,7 +85,7 @@ export default async function FeedPage() {
           </h1>
         </div>
 
-        {/* Soft daily-push prompt — hides itself once enabled/dismissed.
+        {/* Soft daily-push prompt, hides itself once enabled/dismissed.
             Strongest same-day return trigger; also fires for feed visitors. */}
         <PushOptIn variant="banner" locale={locale} />
 
@@ -95,7 +95,7 @@ export default async function FeedPage() {
           </div>
         )}
 
-        {/* People-you'd-vibe-with rail — flag-gated off at low user density
+        {/* People-you'd-vibe-with rail, flag-gated off at low user density
             (same switch as the dashboard rail). When off, the feed focuses on
             community posts only. */}
         {SOCIAL_FEATURES.suggestedPeopleRail && (

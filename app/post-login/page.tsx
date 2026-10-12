@@ -14,7 +14,7 @@ import { normalizeReturnPath } from "@/lib/safe-return-path";
  * - new / incomplete profile → `/onboarding` (carrying the final destination
  *   as `?next=`, so the wizard returns the user to their original goal);
  * - complete profile → the requested destination, or `/dashboard`;
- * - `/taro` is honored directly even without birth data — the reader works
+ * - `/taro` is honored directly even without birth data, the reader works
  *   without a profile and restores the pending question from sessionStorage,
  *   so auth must not swallow the draft behind onboarding.
  */

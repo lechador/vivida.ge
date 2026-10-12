@@ -17,7 +17,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * Email/password auth logic used by website Server Actions in actions/auth.ts.
  *
  * These functions deal only with the database and return stable result
- * *codes* — never user-facing strings. The action maps codes to Georgian
+ * *codes*, never user-facing strings. The action maps codes to Georgian
  * messages. Email *sending* is left to the caller (a one-line lib/email call)
  * so the website can defer it via `after()` for a faster signup response.
  */
@@ -87,7 +87,7 @@ export type RegisterResult =
       userId: string;
       email: string;
       name: string | null;
-      /** email_verify token — caller is responsible for sending the email. */
+      /** email_verify token, caller is responsible for sending the email. */
       verifyToken: string;
       /** 6-digit OTP shown in the same email; caller passes it to the sender. */
       verifyCode: string;
@@ -99,7 +99,7 @@ export type RegisterResult =
 
 /**
  * Create an email/password account (unverified) and provision its trial.
- * Does NOT send the verification email — returns the token so the caller
+ * Does NOT send the verification email, returns the token so the caller
  * can send it after the account is created.
  */
 export async function registerUser(input: {
@@ -131,13 +131,13 @@ export async function registerUser(input: {
     .where(eq(users.email, email))
     .limit(1);
   if (existing) {
-    // An unverified password stub is a registration that never completed —
+    // An unverified password stub is a registration that never completed,
     // either the user abandoned it or a mid-register failure left it
     // half-created (user row exists, token/email possibly missing). Treat
     // re-signup as a RESUME: refresh name/password and fall through to
     // re-issue the verify token + email. Safe because the account was never
     // usable (login requires verification, verification requires the inbox),
-    // so whoever owns the inbox wins — same guarantee as a fresh signup.
+    // so whoever owns the inbox wins, same guarantee as a fresh signup.
     // Verified accounts and OAuth accounts (passwordHash null) stay taken.
     if (existing.emailVerified || !existing.passwordHash) {
       return { ok: false, error: "email_taken" };
@@ -169,7 +169,7 @@ export async function registerUser(input: {
     try {
       await ensureUsername(existing.id, name);
     } catch {
-      /* best-effort — never block the resume */
+      /* best-effort, never block the resume */
     }
     const verifyCode = generateOtpCode();
     const verifyToken = await issueAuthToken(
@@ -221,7 +221,7 @@ export async function registerUser(input: {
   await awardJoinedReputation(created.id);
   // Signup bonus + referral attribution (best-effort, never blocks signup).
   await onUserSignedUp(created.id);
-  // Every account gets a username from t=0, not on first profile save — users
+  // Every account gets a username from t=0, not on first profile save, users
   // who never finished onboarding used to have no profile row at all, which
   // made them invisible in /people, search and @mentions. See lib/username.ts.
   try {
@@ -291,7 +291,7 @@ export type OAuthUser = {
  * The email is already proven by the provider, so the account is created
  * pre-verified. New users get the trial provisioned, same as email signup.
  *
- * We intentionally don't write an `accounts` row here — the website's
+ * We intentionally don't write an `accounts` row here, the website's
  * Auth.js adapter links by email (allowDangerousEmailAccountLinking) if the
  * same person later signs in with Google on the web.
  */
@@ -410,7 +410,7 @@ export async function findOrCreateOAuthUser(input: {
 /**
  * Result of preparing an email-bearing flow (verify resend / password
  * reset). `send: false` covers "no such user", "already verified", or
- * "OAuth-only account" — the caller MUST still report success to avoid
+ * "OAuth-only account", the caller MUST still report success to avoid
  * turning the endpoint into an account-existence oracle.
  */
 export type EmailDispatch =
@@ -529,7 +529,7 @@ export async function consumeEmailVerifyToken(input: {
 }
 
 /**
- * Verify an unverified password account by (email, 6-digit code) — the OTP
+ * Verify an unverified password account by (email, 6-digit code), the OTP
  * alternative to clicking the link. Both live on the same auth_token row, so
  * this marks the user verified and deletes the row (invalidating the link
  * too). Callers MUST rate-limit by email + IP before invoking this: a
@@ -607,7 +607,7 @@ export type ResetPasswordResult =
 
 /**
  * Consume a password_reset token and set the new password. Also marks the
- * email verified — completing a reset proves inbox control, so we don't
+ * email verified, completing a reset proves inbox control, so we don't
  * want to then bounce the user off the unverified-login wall.
  */
 export async function consumePasswordReset(input: {

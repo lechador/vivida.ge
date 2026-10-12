@@ -3,7 +3,7 @@
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Dot badge for the ask tab — an unopened proactive nudge is waiting.
+ * Dot badge for the ask tab, an unopened proactive nudge is waiting.
  * Seeded from the server-side pending count (header data, 30s cache);
  * no live updates needed since visiting /ask clears it server-side.
  */

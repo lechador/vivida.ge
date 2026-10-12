@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
  * Wide accessibility + layout sweep over the public SEO surface.
  *
  * e2e/accessibility.spec.ts covers four pages; this covers the content
- * templates behind the ~600 indexed URLs — one representative page per
+ * templates behind the ~600 indexed URLs, one representative page per
  * template, since every URL in a cluster renders the same component tree.
  *
  * It caught the IQ test's figure answers shipping as buttons with no
@@ -52,7 +52,7 @@ const DEV_NOISE =
 
 test.describe("public surface sweep", () => {
   for (const path of PAGES) {
-    test(`${path} — a11y + layout`, async ({ page }) => {
+    test(`${path}, a11y + layout`, async ({ page }) => {
       const consoleErrors: string[] = [];
       page.on("console", (msg) => {
         if (msg.type() === "error" && !DEV_NOISE.test(msg.text())) {
@@ -78,10 +78,10 @@ test.describe("public surface sweep", () => {
         `${path} WCAG A/AA violations`,
       ).toEqual([]);
 
-      // Horizontal overflow — the classic mobile break. Georgian words are
+      // Horizontal overflow, the classic mobile break. Georgian words are
       // long and do not hyphenate, so this catches real regressions.
       // Ground truth for "does this page scroll sideways" is whether it can
-      // actually be scrolled — NOT `scrollWidth - clientWidth`. That delta
+      // actually be scrolled, NOT `scrollWidth - clientWidth`. That delta
       // reports several harmless things as overflow: decorative glows placed
       // past the edge and clipped by an `overflow-hidden` ancestor, and text
       // overhanging its column by a pixel or two once webfonts swap in (a long

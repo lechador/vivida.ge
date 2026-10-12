@@ -87,7 +87,7 @@ export function NatalCta({
   const desc =
     locale === "en"
       ? "Enter your birth date, exact time, and city. Vivida will calculate your planets, rising sign, and 12 houses for free."
-      : "შეიყვანე დაბადების თარიღი, ზუსტი დრო და ქალაქი — Vivida უფასოდ გამოთვლის შენს პლანეტებს, ასცენდენტსა და 12 სახლს.";
+      : "შეიყვანე დაბადების თარიღი, ზუსტი დრო და ქალაქი, Vivida უფასოდ გამოთვლის შენს პლანეტებს, ასცენდენტსა და 12 სახლს.";
   const ctaHref = locale === "en" ? "/natal-chart" : "/nataluri-ruka";
   const ctaLabel =
     locale === "en" ? "Calculate your birth chart" : "ნატალური რუკის გამოთვლა";

@@ -14,7 +14,7 @@ import { users } from "./users";
 
 /**
  * Direct messages between two users. We don't model "conversations"
- * explicitly — a conversation is implicit (any pair of users sharing
+ * explicitly, a conversation is implicit (any pair of users sharing
  * messages). `readAt` is set on the row when the recipient opens the
  * conversation containing it.
  */
@@ -72,7 +72,7 @@ export const typingIndicators = pgTable(
 );
 
 /**
- * Notification types we currently emit. Keep the enum lean — adding a new
+ * Notification types we currently emit. Keep the enum lean, adding a new
  * kind is cheap (jsonb payload), but enum values are forever.
  */
 export const notificationKindEnum = pgEnum("notification_kind", [
@@ -81,16 +81,16 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "post_comment",
   "post_reaction",
   "mention",
-  // Mutual like in the match deck — emitted to both users at once.
+  // Mutual like in the match deck, emitted to both users at once.
   "new_match",
-  // Credit balance moved (earned or spent) — deep-links to /credits.
+  // Credit balance moved (earned or spent), deep-links to /credits.
   "credit",
   "relationship_connected",
   "relationship_weekly",
   "relationship_transit",
   "timing_reminder",
   "forecast_reminder",
-  // Proactive AI-astrologer follow-up (open loop from ask memory) — bell + push.
+  // Proactive AI-astrologer follow-up (open loop from ask memory), bell + push.
   "ask_nudge",
   // Insight Bazaar: buyer paid (reader notified) / reading delivered (buyer
   // notified). Bell + transactional email, deep-linking to My readings.
@@ -113,15 +113,15 @@ export type NotificationPayload = {
   postId?: string;
   /** Optional preview of the comment body for the dropdown. */
   preview?: string;
-  /** Reaction kind for `post_reaction` notifications — drives the icon. */
+  /** Reaction kind for `post_reaction` notifications, drives the icon. */
   reaction?: "like" | "dislike" | "funny" | "sad";
-  /** "post" | "comment" — only set on `mention` kind so the row can show
+  /** "post" | "comment", only set on `mention` kind so the row can show
    *  "მოგიხსენიეს კომენტარში" vs. "მოგიხსენიეს პოსტში". */
   mentionContext?: "post" | "comment";
   /** Signed credit delta for `credit` kind (positive = earned, negative
    *  = spent). */
   creditAmount?: number;
-  /** CreditReason slug for `credit` kind — mapped to a Georgian label + icon. */
+  /** CreditReason slug for `credit` kind, mapped to a Georgian label + icon. */
   creditReason?: string;
   /** Resulting balance after the change, for `credit` kind. */
   creditBalance?: number;
@@ -151,7 +151,7 @@ export const notifications = pgTable("notification", {
 });
 
 /**
- * Web Push subscriptions — one row per browser/device a user opted into
+ * Web Push subscriptions, one row per browser/device a user opted into
  * notifications from. `endpoint` is unique (the push service URL); `p256dh`
  * and `auth` are the client's encryption keys. Presence of a row = the user
  * receives the daily push. Expired endpoints (HTTP 410) are pruned on send.
@@ -282,7 +282,7 @@ export type ReminderDelivery = typeof reminderDeliveries.$inferSelect;
  * lib/seo/chinese-zodiac, not here.
  */
 export type ChineseCompatItem = {
-  /** animal slug — see ALL_CHINESE_SLUGS */
+  /** animal slug, see ALL_CHINESE_SLUGS */
   slug: string;
   /** "ძლიერი" | "ჰარმონიული" | "გამომწვევი" */
   level: string;

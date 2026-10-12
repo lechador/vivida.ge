@@ -51,7 +51,7 @@ function base58ByteLength(value: string): number {
 /**
  * A Solana address is base58 for exactly 32 bytes. The 32–44-char shape is
  * not enough on its own: 44 valid base58 chars can decode to 33 bytes, which
- * no wallet can pay — validation must decode.
+ * no wallet can pay, validation must decode.
  */
 export function isValidSolanaAddress(value: unknown): value is string {
   if (typeof value !== "string") return false;
@@ -91,7 +91,7 @@ export function formatUsdc(cents: number): string {
 
 /**
  * Signature check: bounds and charset stay lenient, but the string must
- * decode to exactly 64 bytes — a real signature's size. Charset alone is
+ * decode to exactly 64 bytes, a real signature's size. Charset alone is
  * not enough: 88 chars of valid base58 can decode to 65+ bytes, which the
  * RPC rejects as `WrongSize`, surfacing to the buyer as unrelated
  * "network trouble" instead of "that's not a signature".
@@ -150,7 +150,7 @@ export function usdcDeltaForRecipient(
 
 /**
  * Solana Pay transfer URL for one fixed-price USDC payment. Opens the
- * buyer's wallet with recipient + exact amount prefilled — scan or tap.
+ * buyer's wallet with recipient + exact amount prefilled, scan or tap.
  * `reference` (optional) rides along so the server can auto-detect the
  * payment via getSignaturesForAddress.
  *

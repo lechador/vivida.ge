@@ -30,7 +30,7 @@ const DESCRIPTION =
   "Take Vivida's IQ, EQ, Big Five and Astro-MBTI assessments, or try a quick zodiac quiz. Clear results, thoughtful explanations and no cost to start.";
 
 export const metadata: Metadata = {
-  title: { absolute: `${TITLE} — Vivida` },
+  title: { absolute: `${TITLE}, Vivida` },
   description: DESCRIPTION,
   keywords: [
     "free personality test",
@@ -130,7 +130,7 @@ export default function EnglishTestsPage() {
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
             Thoughtful assessments for intelligence, personality and emotional
-            habits—plus quick zodiac quizzes when you want something lighter.
+            habits, plus quick zodiac quizzes when you want something lighter.
           </p>
         </header>
 

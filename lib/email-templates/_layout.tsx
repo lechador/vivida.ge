@@ -10,7 +10,7 @@ import {
 } from "@react-email/components";
 
 /**
- * Shared layout for transactional emails. Plain inline styles only —
+ * Shared layout for transactional emails. Plain inline styles only,
  * email clients (Gmail / iOS Mail / Outlook) ignore most CSS files,
  * so React Email guidance is to keep things explicit.
  */

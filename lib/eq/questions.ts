@@ -1,13 +1,13 @@
 /**
  * The EQ (emotional intelligence) test item bank.
  *
- * Methodology — self-report, grounded in the research on EQ measurement:
+ * Methodology, self-report, grounded in the research on EQ measurement:
  *   - Self-report Likert is the standard, buildable paradigm for a consumer
  *     test (ability tests like the MSCEIT need a licensed, consensus-scored
  *     answer key). Template: the Schutte SSEIT (Salovey–Mayer, 33 items,
  *     5-point Likert, reverse-keyed items, score bands).
- *   - Dimensions follow Goleman's five domains — the most recognizable framing
- *     for a general audience and a clean 5-spoke radar — each grounded in the
+ *   - Dimensions follow Goleman's five domains, the most recognizable framing
+ *     for a general audience and a clean 5-spoke radar, each grounded in the
  *     underlying Salovey–Mayer constructs (perceive / use / understand / manage).
  *   - 40 original Georgian items, 8 per domain, with ~2 REVERSE-keyed items per
  *     domain so acquiescence bias ("agree with everything") is controlled: a
@@ -30,13 +30,13 @@ export type EqDomain = {
   nameEn: string;
   taglineKa: string;
   taglineEn: string;
-  /** Fallback glyph + radar/accent hue (oklch) — 5 distinct hues. */
+  /** Fallback glyph + radar/accent hue (oklch), 5 distinct hues. */
   glyph: string;
   hue: string;
 };
 
 export type EqQuestion = {
-  /** Stable 1..40 — the persisted answer key. */
+  /** Stable 1..40, the persisted answer key. */
   id: number;
   domain: EqDomainKey;
   textKa: string;
@@ -113,7 +113,7 @@ export const EQ_QUESTIONS: EqQuestion[] = [
   { id: 3, domain: "self-awareness", reverse: false, textKa: "ვაცნობიერებ, როგორ მოქმედებს ჩემი ემოციები ჩემ გარშემო მყოფებზე." },
   { id: 4, domain: "self-awareness", reverse: true, textKa: "ხშირად საკუთარი ემოციური რეაქცია მიკვირს." },
   { id: 5, domain: "self-awareness", reverse: false, textKa: "ვიცი, რომელი სიტუაციები აღვიძებს ჩემში ძლიერ ემოციებს." },
-  { id: 6, domain: "self-awareness", reverse: false, textKa: "შემიძლია ერთმანეთისგან გავარჩიო მსგავსი ემოციები — მაგალითად, შფოთვა და აღელვება." },
+  { id: 6, domain: "self-awareness", reverse: false, textKa: "შემიძლია ერთმანეთისგან გავარჩიო მსგავსი ემოციები, მაგალითად, შფოთვა და აღელვება." },
   { id: 7, domain: "self-awareness", reverse: true, textKa: "იშვიათად ვჩერდები იმაზე დასაფიქრებლად, თუ რატომ ვგრძნობ ასე." },
   { id: 8, domain: "self-awareness", reverse: false, textKa: "რეალურად ვაფასებ ჩემს ემოციურ ძლიერ და სუსტ მხარეებს." },
 

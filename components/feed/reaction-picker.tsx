@@ -18,7 +18,7 @@ import { ReactionIcon, REACTIONS } from "./reaction-icons";
  *    pick a reaction to close.
  *
  * Click handlers fire `onPick(kind)` which the parent forwards to
- * the server action. The component is presentation-only — it does
+ * the server action. The component is presentation-only, it does
  * not own reaction state.
  */
 export function ReactionPicker({

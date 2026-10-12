@@ -6,13 +6,13 @@
  * transit_interpretation_library BEFORE the code that filters that table by
  * language was deployed. In that window the live query was still
  * `WHERE key IN (...)` with no language predicate, so it got TWO rows per key
- * and `new Map(rows.map(...))` silently kept whichever came last — often the
+ * and `new Map(rows.map(...))` silently kept whichever came last, often the
  * Armenian one. Georgian readers got Armenian interpretations, and the
  * composed result was cached stamped `language: 'ka'`.
  *
  * That stamp is what makes it permanent: `ensureDailyFor` compares
  * `existing.language === locale`, sees 'ka' === 'ka', and returns the poisoned
- * row forever. Nothing self-heals. Deleting is the repair — both tables are
+ * row forever. Nothing self-heals. Deleting is the repair, both tables are
  * caches that regenerate on the next request, and the read path is fixed now.
  *
  * Safe to re-run: it only ever deletes rows that are currently inconsistent.
@@ -61,7 +61,7 @@ for (const { table, columns, label } of TARGETS) {
     console.log(`${table}: ${n} rows stamped '${locale}' contain the wrong script`);
     if (APPLY) {
       await sql.query(`delete from "${table}" where ${where}`);
-      console.log(`  deleted — ${label} will regenerate on next request`);
+      console.log(`  deleted, ${label} will regenerate on next request`);
     }
   }
 }

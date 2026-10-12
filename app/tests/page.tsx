@@ -37,7 +37,7 @@ import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
-/** Per-test visual identity — icon + accent colour, keyed by catalog slug. */
+/** Per-test visual identity, icon + accent colour, keyed by catalog slug. */
 const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
   iq: { Icon: Brain, accent: "var(--vivida-cyan)" },
   eq: { Icon: HeartHandshake, accent: "var(--vivida-pink)" },
@@ -49,7 +49,7 @@ const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
 };
 const FALLBACK_THEME = { Icon: Brain, accent: "var(--vivida-violet)" };
 
-const TITLE = "ტესტები და ქვიზები ქართულად — IQ, პიროვნების ტესტი და ზოდიაქო";
+const TITLE = "ტესტები და ქვიზები ქართულად, IQ, პიროვნების ტესტი და ზოდიაქო";
 const DESCRIPTION =
   "გაიარე IQ და პიროვნების ტესტები ქართულად, აღმოაჩინე შენი შედეგი და გამოსცადე თავი სწრაფ ქვიზებში. უფასო, მარტივი და საინტერესო ტესტები Vivida-ზე.";
 
@@ -91,11 +91,11 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "რა განსხვავებაა ტესტსა და ქვიზს შორის?",
-    a: "ტესტები სიღრმისეულ შედეგს გაძლევს — მაგალითად IQ ქულას ან პიროვნების ტიპს. ქვიზები მოკლე, გასართობი გამოწვევებია, სადაც სწრაფად ამოწმებ ცოდნას.",
+    a: "ტესტები სიღრმისეულ შედეგს გაძლევს, მაგალითად IQ ქულას ან პიროვნების ტიპს. ქვიზები მოკლე, გასართობი გამოწვევებია, სადაც სწრაფად ამოწმებ ცოდნას.",
   },
   {
     q: "რა არის პიროვნების ტესტი?",
-    a: "პიროვნების ტესტი (MBTI / 16Personalities) განსაზღვრავს შენს ფსიქოლოგიურ ტიპს 16-დან — როგორ იღებ ენერგიას, აღიქვამ ინფორმაციას, იღებ გადაწყვეტილებებს და აწყობ ცხოვრებას.",
+    a: "პიროვნების ტესტი (MBTI / 16Personalities) განსაზღვრავს შენს ფსიქოლოგიურ ტიპს 16-დან, როგორ იღებ ენერგიას, აღიქვამ ინფორმაციას, იღებ გადაწყვეტილებებს და აწყობ ცხოვრებას.",
   },
   {
     q: "ტესტი უფასოა?",
@@ -108,7 +108,7 @@ const FAQ = [
 ];
 
 /**
- * The tests hub — one card per test from the catalog. A dedicated page (rather
+ * The tests hub, one card per test from the catalog. A dedicated page (rather
  * than one nav slot per test) so new tests are added without crowding the nav.
  * Public: works signed-out (SmartHeader) and signed-in (AppHeader).
  */
@@ -116,7 +116,7 @@ export default async function TestsPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
 
-  // Latest result per test, keyed by catalog slug — shown inline on the card
+  // Latest result per test, keyed by catalog slug, shown inline on the card
   // (the score itself, not just a "my result" link).
   type TestResult = { href: string; value: string; sub: string };
   const myResults: Record<string, TestResult> = {};
@@ -172,7 +172,7 @@ export default async function TestsPage() {
         "@type": "ListItem",
         position: i + 1,
         url: `${SITE_URL}${t.href}`,
-        name: `${t.titleKa} — ${t.taglineKa}`,
+        name: `${t.titleKa}, ${t.taglineKa}`,
       })),
     },
   ];
@@ -203,7 +203,7 @@ export default async function TestsPage() {
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-foreground/80 sm:text-base">
-            სიღრმისეული ტესტები შენს ინტელექტსა და პიროვნებაზე — და სწრაფი
+            სიღრმისეული ტესტები შენს ინტელექტსა და პიროვნებაზე, და სწრაფი
             ქვიზები, როცა ცოტა თამაში გინდა.
           </p>
         </header>
@@ -222,7 +222,7 @@ export default async function TestsPage() {
         <div className="mt-6 rounded-2xl border border-border bg-card/40 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
           <h2 className="text-base font-semibold tracking-tight">16 პიროვნების ტიპი</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            დაათვალიერე ყველა ტიპის სრული აღწერა ქართულად — ტესტის გავლის გარეშეც.
+            დაათვალიერე ყველა ტიპის სრული აღწერა ქართულად, ტესტის გავლის გარეშეც.
           </p>
           <Link
             href="/mbti"

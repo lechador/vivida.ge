@@ -14,7 +14,7 @@ export function FinalCta() {
         durationMs={800}
         className="relative overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/65 to-[var(--vivida-cyan)]/12 p-8 text-center ring-1 ring-foreground/10 backdrop-blur-xl sm:p-14"
       >
-        {/* Animated conic glow — compositor CSS spins (was framer-motion). */}
+        {/* Animated conic glow, compositor CSS spins (was framer-motion). */}
         <div
           aria-hidden
           className="vivida-spin-60 absolute -right-32 -top-32 size-96 rounded-full bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-20 blur-3xl"

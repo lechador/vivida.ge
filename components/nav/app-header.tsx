@@ -70,7 +70,7 @@ export async function AppHeader({
         name: session.user.name ?? null,
         email: session.user.email ?? null,
         // Prefer the user's chosen "main" profile photo over the OAuth
-        // avatar baked into the JWT — falls back when they have none yet.
+        // avatar baked into the JWT, falls back when they have none yet.
         image: data.avatarUrl ?? session.user.image ?? null,
       };
       notifications = data.notifications;
@@ -94,7 +94,7 @@ export async function AppHeader({
   return (
     <>
       <header className="relative z-30 mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-4 sm:gap-5 sm:px-6 sm:py-5">
-        {/* Mobile hamburger — authed users only (guests don't have nav). */}
+        {/* Mobile hamburger, authed users only (guests don't have nav). */}
         {userInfo && (
           <MobileNav
             active={active as NavActiveKey | undefined}
@@ -130,10 +130,10 @@ export async function AppHeader({
           </span>
         </Link>
 
-        {/* Authed nav — central pill links, hidden on mobile (drawer instead) */}
+        {/* Authed nav, central pill links, hidden on mobile (drawer instead) */}
         {userInfo && <NavLinks active={active as NavActiveKey | undefined} />}
 
-        {/* Search bar — desktop inline; mobile uses MobileSearch icon below. */}
+        {/* Search bar, desktop inline; mobile uses MobileSearch icon below. */}
         <div className="hidden flex-1 items-center justify-center md:flex">
           {userInfo && <SearchBar locale={locale} />}
         </div>

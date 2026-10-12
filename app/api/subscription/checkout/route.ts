@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   if (!userId)
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   // The English site pays in USDC on Solana (the crypto rail); Stripe
-  // checkout exists only on the Georgian site — but only once the crypto
+  // checkout exists only on the Georgian site, but only once the crypto
   // rail is actually configured, so a half-rolled-out deploy never leaves
   // the English site with no working payment path.
   if (requestHostIsEnglish(req) && isCryptoPayConfigured()) {
@@ -42,8 +42,8 @@ export async function POST(req: Request) {
   }
 
   // The promo is requested by name, never priced by the client. Eligibility is
-  // resolved from the campaign here, so a user who was never addressed — or
-  // whose offer has expired — cannot reach the ₾29 price by posting the flag.
+  // resolved from the campaign here, so a user who was never addressed, or
+  // whose offer has expired, cannot reach the ₾29 price by posting the flag.
   const body = (await req.json().catch(() => null)) as {
     offer?: unknown;
     planKey?: unknown;

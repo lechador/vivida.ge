@@ -47,7 +47,7 @@ async function clientIpFromHeaders(): Promise<string> {
 // ─── OAuth (existing) ────────────────────────────────────────────────────
 
 /**
- * After OAuth, land on /post-login — the intent-aware resolver that sends
+ * After OAuth, land on /post-login, the intent-aware resolver that sends
  * incomplete profiles to /onboarding (preserving their destination as
  * ?next=) and complete ones straight to their goal or /dashboard.
  */
@@ -149,7 +149,7 @@ export async function signUpWithEmail(
   input: SignUpInput,
 ): Promise<SignUpResult> {
   // Sign-up runs on the shared, unprefixed /signup route, so the host cannot
-  // tell an Armenian visitor from an English one — see getSignupLocale.
+  // tell an Armenian visitor from an English one, see getSignupLocale.
   const locale = await getSignupLocale();
   // Require a human proof before an attempt can consume another address's
   // rate-limit allowance.
@@ -191,7 +191,7 @@ export async function signUpWithEmail(
     return { ok: false, error: registerError("failed", locale) };
   }
   // Any thrown error (transient DB blip, etc.) must land as an inline
-  // "try again" on the form — never a crashed page. Registration is
+  // "try again" on the form, never a crashed page. Registration is
   // resumable (see registerUser), so a retry after a mid-register failure
   // picks up where it left off.
   let result: Awaited<ReturnType<typeof registerUser>>;
@@ -213,7 +213,7 @@ export async function signUpWithEmail(
     return { ok: false, error: registerError(result.error, locale) };
   }
 
-  // Email send is deferred — that's the slow leg (Resend HTTP call) and
+  // Email send is deferred, that's the slow leg (Resend HTTP call) and
   // it doesn't matter if it lands a few seconds after the user sees
   // "check your inbox." The token already exists, so the link resolves.
   const { email, name, verifyToken, verifyCode } = result;
@@ -245,7 +245,7 @@ export type RequestVerificationResult =
 
 /**
  * Re-issue a verification email for an unverified user. Always returns
- * `ok: true` once past the format check — we only actually send when the
+ * `ok: true` once past the format check, we only actually send when the
  * email maps to an unverified password user (privacy: no existence oracle).
  */
 export async function requestVerificationEmail(input: {
@@ -379,7 +379,7 @@ export type VerifyCodeResult =
   | { ok: false; error: string };
 
 /**
- * Verify an account by the 6-digit code from the email — the easier path for
+ * Verify an account by the 6-digit code from the email, the easier path for
  * users who struggle with links. Rate-limited hard (per IP + per email): a
  * 6-digit code is small, so the attempt cap is what makes brute force
  * infeasible.
@@ -490,7 +490,7 @@ export async function verifyEmailWithCode(input: {
     });
     return { ok: true, signedIn: true, phoneLinked };
   } catch {
-    // Verified fine, but auto-signin failed — client falls back to /login.
+    // Verified fine, but auto-signin failed, client falls back to /login.
   }
   return { ok: true, signedIn: false, phoneLinked };
 }
@@ -504,7 +504,7 @@ export async function requestPasswordReset(input: {
   turnstileToken: string | null;
 }): Promise<RequestResetResult> {
   const locale = await getRequestLocale();
-  // Bot gate first — without it this endpoint is a free email-bomb tool.
+  // Bot gate first, without it this endpoint is a free email-bomb tool.
   const human = await verifyTurnstile(input.turnstileToken);
   if (!human) {
     return {
@@ -612,7 +612,7 @@ export async function signInWithEmail(
   input: SignInInput,
 ): Promise<SignInResult> {
   const locale = await getRequestLocale();
-  // Bot gate before we even hit the password-hash compare — keeps
+  // Bot gate before we even hit the password-hash compare, keeps
   // credential-stuffing attempts from burning bcrypt CPU.
   const human = await verifyTurnstile(input.turnstileToken);
   if (!human) {
@@ -630,7 +630,7 @@ export async function signInWithEmail(
     });
     return { ok: true };
   } catch (err) {
-    // The provider's sentinel lives in the error *cause* — Auth.js wraps a
+    // The provider's sentinel lives in the error *cause*, Auth.js wraps a
     // thrown plain Error in a CallbackRouteError whose own message is just a
     // docs link (see lib/auth-error.ts).
     const message = authErrorText(err);
@@ -655,7 +655,7 @@ export async function signInWithEmail(
         ),
       };
     }
-    // Auth.js wraps everything as "CredentialsSignin" — treat as bad creds.
+    // Auth.js wraps everything as "CredentialsSignin", treat as bad creds.
     return {
       ok: false,
       error: localized(

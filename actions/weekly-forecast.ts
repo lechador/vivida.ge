@@ -48,7 +48,7 @@ async function archiveWeeklyForecast(userId: string, forecast: WeeklyForecast) {
 /**
  * Returns the user's 7-day forecast, regenerating + caching it whenever the
  * local week-start (= today, in the user's TZ) rolls forward. One row per
- * user — the forecast slides daily, no history kept.
+ * user, the forecast slides daily, no history kept.
  */
 export async function ensureWeeklyForecast(
   userId: string,
@@ -62,7 +62,7 @@ export async function ensureWeeklyForecast(
     .limit(1);
   if (!profile?.timezone) return null;
 
-  // Only positions are needed here (for transit scoring) — never the AI
+  // Only positions are needed here (for transit scoring), never the AI
   // narrative, so don't wait on or trigger a chart AI generation.
   const chart = await ensureChartFor(userId, { aiUpgrade: "skip" });
   if (!chart) return null;
@@ -96,14 +96,14 @@ export async function ensureWeeklyForecast(
 
   try {
     // Compute deterministic scores + drivers for each of the next 7 days,
-    // starting TOMORROW — today is already covered by the daily horoscope
+    // starting TOMORROW, today is already covered by the daily horoscope
     // card, so the "next 7 days" card shouldn't repeat it.
     const tomorrow = new Date(now);
     tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
     const ctx = computeWeeklyForecast(chart.data, tomorrow, profile.timezone);
 
     // Fast path: compose all 7 narratives from the pre-generated transit
-    // library — zero AI calls. Falls back to the model only when a needed
+    // library, zero AI calls. Falls back to the model only when a needed
     // library row is missing.
     let narratives = await composeWeeklyFromLibrary(
       ctx.map((d) => ({
@@ -159,7 +159,7 @@ export async function ensureWeeklyForecast(
       }));
     }
 
-    // Stitch deterministic fields with the narratives by dateIso — tolerant
+    // Stitch deterministic fields with the narratives by dateIso, tolerant
     // of ordering mismatch by indexing into a map.
     const byDate = new Map(narratives.map((d) => [d.dateIso, d]));
     const days: WeeklyForecastDay[] = ctx.map((d) => {

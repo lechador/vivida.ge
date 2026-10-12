@@ -80,7 +80,7 @@ export function buildEnglishNatalReportContent(
         : `Few of the tightest aspects are strongly tense. Growth may therefore depend on using your easier patterns intentionally, asking for honest feedback, and choosing challenges before circumstances choose them for you.`,
     closing: `${salutation} natal chart describes a starting pattern, not a fixed verdict. ${
       strongestAspect
-        ? `Its tightest highlighted connection—${bodyName(strongestAspect.a)} ${strongestAspect.kind} ${bodyName(strongestAspect.b)}—is one important thread, but it gains meaning only inside the whole chart.`
+        ? `Its tightest highlighted connection, ${bodyName(strongestAspect.a)} ${strongestAspect.kind} ${bodyName(strongestAspect.b)}, is one important thread, but it gains meaning only inside the whole chart.`
         : "Each placement gains meaning through its relationship with the whole chart."
     } Use the report as a language for reflection: keep what helps you recognize a real pattern, question what does not fit, and let lived experience remain the final authority.`,
   };

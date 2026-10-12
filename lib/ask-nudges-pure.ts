@@ -1,11 +1,11 @@
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Pure helpers for proactive ask nudges — no DB imports, unit-testable.
+ * Pure helpers for proactive ask nudges, no DB imports, unit-testable.
  * DB access + push/bell delivery live in `ask-nudges.ts`.
  *
  * Cost discipline: nudge copy is deterministic templates (zero AI per send).
- * AI is spent only when the user opens the app — through the normal
+ * AI is spent only when the user opens the app, through the normal
  * credit-gated chat flow.
  */
 
@@ -17,7 +17,7 @@ export const ASK_NUDGE_STALE_DAYS_MAX = 10;
 export const ASK_NUDGE_DORMANT_DAYS_MAX = 21;
 export const ASK_NUDGE_WEEK_CAP = 2;
 export const ASK_NUDGE_GAP_HOURS = 72;
-/** Global ceiling per cron run — bounds Neon writes + push fan-out. */
+/** Global ceiling per cron run, bounds Neon writes + push fan-out. */
 export const ASK_NUDGE_DAY_CAP = 200;
 /** Base candidates scanned per run (filtered down in memory). */
 export const ASK_NUDGE_SCAN_LIMIT = 400;
@@ -59,7 +59,7 @@ export function capsOk(sentAts: Date[], now: Date = new Date()): boolean {
   return true;
 }
 
-/** Stable dedupe key per user+loop — the same thread is never nudged twice. */
+/** Stable dedupe key per user+loop, the same thread is never nudged twice. */
 export function nudgeDeliveryKey(userId: string, loop: string): string {
   const s = `${userId}\n${loop.trim().toLowerCase()}`;
   let h = 0x811c9dc5;
@@ -70,7 +70,7 @@ export function nudgeDeliveryKey(userId: string, loop: string): string {
   return `ask-nudge-${(h >>> 0).toString(16).padStart(8, "0")}`;
 }
 
-// ── Copy (templates only — no LLM) ────────────────────────────────────────
+// ── Copy (templates only, no LLM) ────────────────────────────────────────
 
 export type NudgeCopy = { title: string; body: string };
 
@@ -88,6 +88,6 @@ export function nudgeCopy(
   }
   return {
     title: firstName ? `${firstName}, ერთი რამ მახსოვს…` : "ერთი რამ მახსოვს…",
-    body: `„${l}" — როგორ მიდის საქმე? ჩამოდი, რუკას გადავხედოთ.`,
+    body: `„${l}", როგორ მიდის საქმე? ჩამოდი, რუკას გადავხედოთ.`,
   };
 }

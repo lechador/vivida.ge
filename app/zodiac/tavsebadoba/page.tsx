@@ -111,7 +111,7 @@ export default function CompatibilityHubPage() {
           ))}
         </div>
 
-        {/* Pair table — 12×12 grid where each cell links to canonical pair */}
+        {/* Pair table, 12×12 grid where each cell links to canonical pair */}
         <section className="mt-12">
           <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
             ყველა წყვილი

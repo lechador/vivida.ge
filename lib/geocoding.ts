@@ -5,7 +5,7 @@
  *
  * Docs: https://open-meteo.com/en/docs/geocoding-api
  *
- * Open-Meteo's index doesn't have most cities labeled in Georgian script —
+ * Open-Meteo's index doesn't have most cities labeled in Georgian script,
  * passing language=ka returns weird matches (e.g. "თბილისი" → Tbilisi
  * International Airport instead of the city). To support Georgian input we
  * detect Georgian text and translate it to Latin before searching: dictionary
@@ -61,7 +61,7 @@ export function hasArmenianScript(s: string): boolean {
 }
 
 const KA_TO_EN_CITY: Record<string, string> = {
-  // Georgia — major
+  // Georgia, major
   "თბილისი": "Tbilisi",
   "ბათუმი": "Batumi",
   "ქუთაისი": "Kutaisi",
@@ -107,7 +107,7 @@ const KA_TO_EN_CITY: Record<string, string> = {
   "თიანეთი": "Tianeti",
   "ცხინვალი": "Tskhinvali",
   "სოხუმი": "Sukhumi",
-  // International — frequently typed
+  // International, frequently typed
   "მოსკოვი": "Moscow",
   "სანქტ-პეტერბურგი": "Saint Petersburg",
   "ერევანი": "Yerevan",
@@ -167,7 +167,7 @@ const KA_TO_EN_CITY: Record<string, string> = {
 
 /** Armenian city mapping */
 const AM_TO_EN_CITY: Record<string, string> = {
-  // Armenia — major
+  // Armenia, major
   "երևան": "Yerevan",
   "գյումրի": "Gyumri",
   "վանաձոր": "Vanadzor",

@@ -65,7 +65,7 @@ function bodyLabel(key: string, locale: UserLocale): string {
 
 /**
  * Flat aspects list, grouped by family (harmonic / tense / neutral), tightest
- * orb first. One scannable row per aspect — glyph · A · kind · B · orb — with
+ * orb first. One scannable row per aspect, glyph · A · kind · B · orb, with
  * the interpretation expanding inline. Replaces the old big aspect cards.
  */
 export function AspectCards({

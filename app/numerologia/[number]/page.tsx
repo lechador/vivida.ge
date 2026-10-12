@@ -61,8 +61,8 @@ export async function generateMetadata({
   }
   const c = LIFE_PATH_CONTENT[number];
   const url = `${SITE_URL}/numerologia/${number}`;
-  const title = `${c.titleKa} — მნიშვნელობა ნუმეროლოგიაში`;
-  const description = `რას ნიშნავს ბედის რიცხვი ${number} (${c.archetypeKa}) — ხასიათი, ძლიერი მხარეები, სიყვარული, კარიერა და რჩევა. ${c.essenceKa}`;
+  const title = `${c.titleKa}, მნიშვნელობა ნუმეროლოგიაში`;
+  const description = `რას ნიშნავს ბედის რიცხვი ${number} (${c.archetypeKa}), ხასიათი, ძლიერი მხარეები, სიყვარული, კარიერა და რჩევა. ${c.essenceKa}`;
   return {
     title: { absolute: title },
     description,
@@ -264,7 +264,7 @@ export default async function LifePathNumberPage({
         <div className="mt-12 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-9">
           <Sparkles className="mx-auto mb-3 size-6 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-            რიცხვი ერთი შტრიხია — ნახე მთელი სურათი
+            რიცხვი ერთი შტრიხია, ნახე მთელი სურათი
           </h2>
           <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground sm:text-base">
             შენი დაბადების თარიღი და დრო მთლიან კოსმიურ რუკას ხატავს. შექმენი

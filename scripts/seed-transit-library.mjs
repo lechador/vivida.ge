@@ -2,13 +2,13 @@
 // A transit reads identically for every user who has it, so each finite combo is
 // generated once and daily horoscopes are composed from these rows with zero
 // per-user AI calls (see lib/transit-library.ts + actions/daily.ts):
-//   - "aspect" — (transiting body, aspect kind, natal point): 10 × 5 × 13 = 650
-//   - "house"  — (transiting body, natal house): 10 × 12 = 120
-//   - "sign"   — (fast body sun…mars, sign): 5 × 12 = 60
+//   - "aspect", (transiting body, aspect kind, natal point): 10 × 5 × 13 = 650
+//   - "house", (transiting body, natal house): 10 × 12 = 120
+//   - "sign", (fast body sun…mars, sign): 5 × 12 = 60
 // Total 830. One AI call per entry, JSON {title, body} output.
 //
 // Uses Vertex AI Gemini (not OpenRouter) via the existing GCP project set up
-// for Veo video generation — auth via local ADC (`gcloud auth
+// for Veo video generation, auth via local ADC (`gcloud auth
 // application-default login`), no API key needed. Only for this local,
 // one-time bulk seed; the live in-app self-heal fallback
 // (lib/transit-library.ts) still uses OpenRouter since Vertex ADC isn't
@@ -130,7 +130,7 @@ const HOUSES = {
     labelKa: "1-ლი სახლი",
     themeKa: "ჩემი თავი",
     meaningKa:
-      "ის, თუ როგორ შემოდიხარ ოთახში — შენი თვითპრეზენტაცია და პირველი შთაბეჭდილება.",
+      "ის, თუ როგორ შემოდიხარ ოთახში, შენი თვითპრეზენტაცია და პირველი შთაბეჭდილება.",
   },
   2: {
     labelKa: "მე-2 სახლი",
@@ -163,7 +163,7 @@ const HOUSES = {
     labelKa: "მე-7 სახლი",
     themeKa: "მე და შენ",
     meaningKa:
-      "ერთ-ერთი ადამიანი, ვისთანაც ცხოვრობ — სასიყვარულო, საქმიანი ან მოწინააღმდეგე.",
+      "ერთ-ერთი ადამიანი, ვისთანაც ცხოვრობ, სასიყვარულო, საქმიანი ან მოწინააღმდეგე.",
   },
   8: {
     labelKa: "მე-8 სახლი",
@@ -181,7 +181,7 @@ const HOUSES = {
     labelKa: "მე-10 სახლი",
     themeKa: "კარიერა, სტატუსი",
     meaningKa:
-      "ის, რითაც გცნობენ საზოგადოებაში — კარიერა, ავტორიტეტი, წარმატება.",
+      "ის, რითაც გცნობენ საზოგადოებაში, კარიერა, ავტორიტეტი, წარმატება.",
   },
   11: {
     labelKa: "მე-11 სახლი",
@@ -228,10 +228,10 @@ const SIGN_KEYS = Object.keys(SIGN_KA);
 
 const SYSTEM =
   "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
-  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   'თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები ("ვარსკვლავები გელიან"). ' +
-  'დააბრუნე მხოლოდ JSON: {"title": "...", "body": "..."} — title არის ' +
-  "მოკლე სათაური (3-6 სიტყვა, წერტილის გარეშე), body — ტექსტი. title-ში " +
+  'დააბრუნე მხოლოდ JSON: {"title": "...", "body": "..."}, title არის ' +
+  "მოკლე სათაური (3-6 სიტყვა, წერტილის გარეშე), body, ტექსტი. title-ში " +
   "დაასახელე კონკრეტული თემა ან მოქმედება; არ გამოიყენო ორი აბსტრაქტული " +
   'არსებითი სახელის ფორმულა, ზედიზედ "X და Y", ან ხშირად გამეორებული ' +
   "სიტყვები: სული, გული, შინაგანი, ჰარმონია, დღე.";
@@ -241,8 +241,8 @@ function aspectPrompt(t, kind, n) {
   return (
     `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ტრანზიტული ${BODY_KA[t]} ${KIND_KA[kind]} ` +
     `ნატალურ ${BODY_KA[n]}-სთან.\n` +
-    `ტრანზიტული ${BODY_KA[t]} — დღევანდელი ცის ენერგია (${BODY_MEANING_KA[t]}). ` +
-    `ნატალური ${BODY_KA[n]} — ადამიანის თანდაყოლილი თვისება (${BODY_MEANING_KA[n]}).\n` +
+    `ტრანზიტული ${BODY_KA[t]}, დღევანდელი ცის ენერგია (${BODY_MEANING_KA[t]}). ` +
+    `ნატალური ${BODY_KA[n]}, ადამიანის თანდაყოლილი თვისება (${BODY_MEANING_KA[n]}).\n` +
     `დროის მასშტაბი: ${TIMESCALE_KA[t]}.\n\n` +
     `2-4 წინადადება (დაახ. 40-70 სიტყვა), "შენ"-ის ფორმა. ახსენი რა იგრძნობა ` +
     `დღეს ამ ტრანზიტით და ერთი კონკრეტული, პრაქტიკული რჩევა. ` +
@@ -256,7 +256,7 @@ function housePrompt(t, h) {
   return (
     `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ტრანზიტული ${BODY_KA[t]} გადის ` +
     `ნატალურ ${def.labelKa}-ში (${def.themeKa}).\n` +
-    `${BODY_KA[t]} — ${BODY_MEANING_KA[t]}. ${def.labelKa} — ${def.meaningKa}\n` +
+    `${BODY_KA[t]}, ${BODY_MEANING_KA[t]}. ${def.labelKa}, ${def.meaningKa}\n` +
     `დროის მასშტაბი: ${TIMESCALE_KA[t]}.\n\n` +
     `2-3 წინადადება (დაახ. 35-60 სიტყვა), "შენ"-ის ფორმა. რომელი ცხოვრების ` +
     `სფერო აქტიურდება და როგორ გამოიყენო ეს დღეს. title იყოს მოკლე, კონკრეტული ` +
@@ -266,9 +266,9 @@ function housePrompt(t, h) {
 
 function signPrompt(t, s) {
   return (
-    `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ${BODY_KA[t]} ახლა ${SIGN_KA[s]}-შია — ` +
+    `დაწერე დღიური ტრანზიტის ინტერპრეტაცია: ${BODY_KA[t]} ახლა ${SIGN_KA[s]}-შია, ` +
     `ეს ყველასთვის საერთო, კოლექტიური განწყობაა.\n` +
-    `${BODY_KA[t]} — ${BODY_MEANING_KA[t]}. ${SIGN_KA[s]} — ${SIGN_NATURE_KA[s]}.\n` +
+    `${BODY_KA[t]}, ${BODY_MEANING_KA[t]}. ${SIGN_KA[s]}, ${SIGN_NATURE_KA[s]}.\n` +
     `დროის მასშტაბი: ${TIMESCALE_KA[t]}.\n\n` +
     `2-3 წინადადება (დაახ. 35-60 სიტყვა), "შენ"-ის ფორმა. როგორი ემოციური/` +
     `ენერგეტიკული ფონია დღეს ამ განლაგებით და რას უწყობს ხელს. ` +

@@ -226,7 +226,7 @@ function LibraryContent({
             )}
             {content.spreadOptions && (
               <p className="mt-1 text-xs text-muted-foreground">
-                {`A — ${content.spreadOptions.a} · B — ${content.spreadOptions.b}`}
+                {`A, ${content.spreadOptions.a} · B, ${content.spreadOptions.b}`}
               </p>
             )}
           </div>

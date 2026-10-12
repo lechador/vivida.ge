@@ -14,7 +14,7 @@ import {
 /**
  * Server-side helper for protected pages.
  * Returns the session user or redirects to "/" if not signed in. Also
- * verifies the session's userId still exists in the DB — a JWT cookie
+ * verifies the session's userId still exists in the DB, a JWT cookie
  * can outlive its users row (admin deletes the account, Neon gets
  * reset), and any subsequent insert FK-violates against users.id. When
  * we detect a stale session we redirect to /api/auth/signout so the
@@ -54,7 +54,7 @@ export async function requireUser(loginDestination?: string) {
     .limit(1);
   if (!row) {
     console.warn(
-      "[requireUser] stale session — userId not in DB, redirecting to signout",
+      "[requireUser] stale session, userId not in DB, redirecting to signout",
       { userId }
     );
     redirect("/api/auth/signout?callbackUrl=/");

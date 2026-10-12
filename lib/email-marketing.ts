@@ -42,7 +42,7 @@ function client(): Resend | null {
   return _client;
 }
 
-// RESEND_FROM may be a bare address or a full "Name <email>" string —
+// RESEND_FROM may be a bare address or a full "Name <email>" string,
 // normalize so the sender always shows "Vivida", never a raw mailbox name.
 function resolveFrom(envVal: string | undefined, fallback: string): string {
   if (!envVal) return fallback;
@@ -68,11 +68,11 @@ export type EmailTemplateKind =
 
 export type SendOptions = {
   template: EmailTemplateKind;
-  /** Marketing only — admin-supplied subject line. */
+  /** Marketing only, admin-supplied subject line. */
   subject?: string;
-  /** Marketing only — admin-supplied body (paragraphs separated by blank lines). */
+  /** Marketing only, admin-supplied body (paragraphs separated by blank lines). */
   body?: string;
-  /** Marketing only — optional CTA. */
+  /** Marketing only, optional CTA. */
   ctaLabel?: string | null;
   ctaUrl?: string | null;
   /** When true, resolve the audience but don't actually send. Returns counts only. */
@@ -96,7 +96,7 @@ type Recipient = {
   name: string | null;
   locale: string;
   /** Credit balance at audience-resolution time. Only the offer template
-   *  reads it — it is the reason that email is being sent. */
+   *  reads it, it is the reason that email is being sent. */
   balance?: number;
 };
 
@@ -157,7 +157,7 @@ async function resolveAudience(
   if (template === "low_credit_offer") {
     // Georgian users who are nearly out of credits and are not already paying.
     // leftJoin, not innerJoin: a user with no wallet row has no credits at all,
-    // which is the most qualified state this campaign has — an innerJoin would
+    // which is the most qualified state this campaign has, an innerJoin would
     // silently drop exactly those people.
     const rows = await db
       .select({
@@ -232,12 +232,12 @@ export async function ensureBirthDetailsCampaign(): Promise<{ id: string }> {
 }
 
 const OFFER_SUBJECT = {
-  ka: `${LOW_CREDIT_PROMO_MONTHS} თვე ულიმიტო Vivida — მხოლოდ ${formatBillingAmount(
+  ka: `${LOW_CREDIT_PROMO_MONTHS} თვე ულიმიტო Vivida, მხოლოდ ${formatBillingAmount(
     LOW_CREDIT_PROMO_PLAN.amountMinor,
     LOW_CREDIT_PROMO_PLAN.currency,
     "ka",
   )}`,
-  en: `${LOW_CREDIT_PROMO_MONTHS} months of unlimited Vivida — just ${formatBillingAmount(
+  en: `${LOW_CREDIT_PROMO_MONTHS} months of unlimited Vivida, just ${formatBillingAmount(
     LOW_CREDIT_PROMO_PLAN.amountMinor,
     LOW_CREDIT_PROMO_PLAN.currency,
     "en",
@@ -272,7 +272,7 @@ export async function ensureLowCreditOfferCampaign(): Promise<{ id: string }> {
 /**
  * Send-with-concurrency-cap. Resend's free tier rate-limits at 2 req/s,
  * but the paid tier accepts much more. We default to 5 concurrent
- * requests — slow enough not to trip rate-limits, fast enough that even
+ * requests, slow enough not to trip rate-limits, fast enough that even
  * a few thousand recipients finish in a couple of minutes.
  */
 async function pMap<T, R>(
@@ -394,7 +394,7 @@ export async function sendBirthDetailsCampaignTest(to: string): Promise<boolean>
 /**
  * Send the low-credit offer to one named account, bypassing the audience
  * filters. The recipient row is written as a test so it stays out of the
- * campaign's conversion figures — but it is a real row with a real sent_at, so
+ * campaign's conversion figures, but it is a real row with a real sent_at, so
  * the tester genuinely sees the offer card and can walk the whole purchase.
  */
 export async function sendLowCreditOfferTest(to: string): Promise<boolean> {
@@ -471,7 +471,7 @@ async function dispatch(
 
   if (opts.template === "daily_horoscope") {
     const daily = await ensureDailyFor(recipient.userId, locale);
-    if (!daily) return false; // No chart or generation failed — skip silently
+    if (!daily) return false; // No chart or generation failed, skip silently
     const [profile] = await db
       .select({ timezone: profiles.timezone })
       .from(profiles)
@@ -539,10 +539,10 @@ async function dispatch(
     const subject = locale === "en"
       ? opts.campaignId
         ? "Complete your birth details and get 50 credits"
-        : "Your birth chart is waiting — complete your profile"
+        : "Your birth chart is waiting, complete your profile"
       : opts.campaignId
         ? "შეავსე დაბადების დეტალები და მიიღე 50 კრედიტი"
-        : "შენი ნატალური რუკა გელოდება — დაასრულე რეგისტრაცია";
+        : "შენი ნატალური რუკა გელოდება, დაასრულე რეგისტრაცია";
     await acquireResendSlot();
     const result = await c.emails.send({
       from: FROM,
@@ -708,7 +708,7 @@ async function dispatch(
 
 /**
  * Best-effort row in the unified email log (admin "Emails" page). The daily
- * template is NOT logged here — it already has daily_email_log, which the
+ * template is NOT logged here, it already has daily_email_log, which the
  * admin view merges in. Never throws.
  */
 async function logToUnifiedSendLog(
@@ -744,7 +744,7 @@ export async function audienceCount(
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Daily horoscope blast — cron-driven, idempotent, retry-safe.
+// Daily horoscope blast, cron-driven, idempotent, retry-safe.
 // ─────────────────────────────────────────────────────────────────────
 
 export type DailyBlastResult = {
@@ -758,7 +758,7 @@ export type DailyBlastResult = {
   sent: number;
   /** Dispatch returned false (no chart or user opted out mid-day). */
   skipped: number;
-  /** Threw — row left status='failed' for next cron tick to retry. */
+  /** Threw, row left status='failed' for next cron tick to retry. */
   failed: number;
   /** Pending+failed log rows still outstanding for `sendDate` after we returned. */
   remaining: number;
@@ -783,7 +783,7 @@ export type DailyBlastResult = {
  * tick (we run a safety cron 30 min later) picks up the remaining rows.
  */
 export async function sendDailyHoroscopeBlast(opts: {
-  /** YYYY-MM-DD — the calendar day this batch belongs to. Use the UTC date
+  /** YYYY-MM-DD, the calendar day this batch belongs to. Use the UTC date
    *  for the cron caller; `localizedDate` per recipient is computed inside
    *  dispatch from their profile timezone. */
   sendDate: string;
@@ -948,7 +948,7 @@ export async function sendDailyHoroscopeBlast(opts: {
   };
 }
 
-/** UTC date string in YYYY-MM-DD — what the cron should pass as sendDate. */
+/** UTC date string in YYYY-MM-DD, what the cron should pass as sendDate. */
 export function utcDateKey(d: Date = new Date()): string {
   return d.toISOString().slice(0, 10);
 }

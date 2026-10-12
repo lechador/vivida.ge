@@ -32,7 +32,7 @@ export async function listRecentNotifications(
     .limit(limit);
 }
 
-/** Count of unread notifications — used for the bell badge. */
+/** Count of unread notifications, used for the bell badge. */
 export async function countUnreadNotifications(
   userId: string,
 ): Promise<number> {

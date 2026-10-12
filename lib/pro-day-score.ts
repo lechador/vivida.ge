@@ -1,7 +1,7 @@
 import type { UserLocale } from "./i18n/user-locale";
 
 /**
- * PRO day score — a single 1–10 number summarizing today's sky from the
+ * PRO day score, a single 1–10 number summarizing today's sky from the
  * transit aspects already overlaid for the dashboard breakdown. Pure and
  * deterministic: harmonic aspects pull up, tense ones pull down, everything
  * else (conjunctions, unknowns) is neutral. No AI, no DB, no cost.
@@ -39,22 +39,22 @@ const BANDS_KA: Array<{ min: number; label: string; hint: string }> = [
   {
     min: 9,
     label: "ძლიერი დღე",
-    hint: "ცა შენს მხარესაა — გაბედე დიდი ნაბიჯი.",
+    hint: "ცა შენს მხარესაა, გაბედე დიდი ნაბიჯი.",
   },
   {
     min: 7,
     label: "კარგი დღე",
-    hint: "მხარდამჭერი ფონია — გამოიყენე ის შენს სასარგებლოდ.",
+    hint: "მხარდამჭერი ფონია, გამოიყენე ის შენს სასარგებლოდ.",
   },
   {
     min: 5,
     label: "წონასწორული დღე",
-    hint: "არც წინაღობა ჩანს, არც საჩუქარი — რიტმს შენ ქმნი.",
+    hint: "არც წინაღობა ჩანს, არც საჩუქარი, რიტმს შენ ქმნი.",
   },
   {
     min: 3,
     label: "მშვიდი დღე",
-    hint: "ნუ გადატვირთავ განრიგს — დაისვენე და დააკვირდი.",
+    hint: "ნუ გადატვირთავ განრიგს, დაისვენე და დააკვირდი.",
   },
   {
     min: 1,
@@ -67,22 +67,22 @@ const BANDS_EN: Array<{ min: number; label: string; hint: string }> = [
   {
     min: 9,
     label: "A power day",
-    hint: "The sky is on your side — take the bold step.",
+    hint: "The sky is on your side, take the bold step.",
   },
   {
     min: 7,
     label: "A good day",
-    hint: "Supportive background — put it to work for you.",
+    hint: "Supportive background, put it to work for you.",
   },
   {
     min: 5,
     label: "A balanced day",
-    hint: "No clear obstacle, no clear gift — you set the rhythm.",
+    hint: "No clear obstacle, no clear gift, you set the rhythm.",
   },
   {
     min: 3,
     label: "A quiet day",
-    hint: "Don't overload your schedule — rest and observe.",
+    hint: "Don't overload your schedule, rest and observe.",
   },
   {
     min: 1,

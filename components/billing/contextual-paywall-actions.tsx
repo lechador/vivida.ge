@@ -89,8 +89,8 @@ export function ContextualPaywallActions({
             <CreditCard className="size-4" />
             {isTarot
               ? en
-                ? `${Math.floor(starterPack.credits / CREDIT_COST.tarot)} more readings — ${formatBillingAmount(starterPack.amountMinor, starterPack.currency, locale)}`
-                : `${Math.floor(starterPack.credits / CREDIT_COST.tarot)} დამატებითი კითხვა — ${formatBillingAmount(starterPack.amountMinor, starterPack.currency, locale)}`
+                ? `${Math.floor(starterPack.credits / CREDIT_COST.tarot)} more readings, ${formatBillingAmount(starterPack.amountMinor, starterPack.currency, locale)}`
+                : `${Math.floor(starterPack.credits / CREDIT_COST.tarot)} დამატებითი კითხვა, ${formatBillingAmount(starterPack.amountMinor, starterPack.currency, locale)}`
               : en
                 ? "Top up and return"
                 : "შეავსე და დაბრუნდი"}
@@ -110,7 +110,7 @@ export function ContextualPaywallActions({
             : `${starterPack.credits} კრედიტი · ერთჯერადი გადახდა · ავტოგანახლების გარეშე`
           : en
             ? "Credits are one-time; PRO is for frequent use."
-            : "კრედიტები ერთჯერადია, PRO — ხშირი გამოყენებისთვის."}
+            : "კრედიტები ერთჯერადია, PRO, ხშირი გამოყენებისთვის."}
       </p>
     </div>
   );

@@ -2,12 +2,12 @@
  * Culture-fair figural primitives for the IQ test.
  *
  * Every figural item (matrix reasoning, figural analogy, odd-one-out, spatial)
- * is described as a `FigureSpec` — a small list of shape "marks" drawn into a
+ * is described as a `FigureSpec`, a small list of shape "marks" drawn into a
  * 100×100 viewBox. Keeping figures as data (not hand-drawn SVG) lets the item
  * bank build them by rule, so a matrix's answer cell is computed by the SAME
- * transformation as its givens — the item is correct by construction.
+ * transformation as its givens, the item is correct by construction.
  *
- * No text, no real-world objects, no colour-coded meaning required to solve —
+ * No text, no real-world objects, no colour-coded meaning required to solve,
  * this is what keeps the test language- and culture-fair (Raven-style).
  */
 
@@ -35,7 +35,7 @@ export type Mark = {
   rot?: number;
   /** Filled with `color` vs. outline only. Default outline. */
   fill?: boolean;
-  /** Stroke/fill colour — a CSS value. Default currentColor. */
+  /** Stroke/fill colour, a CSS value. Default currentColor. */
   color?: string;
   /** Stroke width in figure units. Default 6. */
   sw?: number;
@@ -148,7 +148,7 @@ function MarkEl({ mark }: { mark: Mark }) {
 }
 
 /**
- * `n` dots laid out on a centred grid — the count-based figural rule. Rows fill
+ * `n` dots laid out on a centred grid, the count-based figural rule. Rows fill
  * top-to-bottom so 1–9 read naturally.
  */
 export function dots(n: number, opts: { color?: string; size?: number } = {}): FigureSpec {

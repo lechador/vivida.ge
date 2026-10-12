@@ -12,7 +12,7 @@ import {
 } from "@/lib/email-templates/bazaar-reading-delivered";
 
 /**
- * Bazaar transactional mail carries money events — a wrong name, amount, or
+ * Bazaar transactional mail carries money events, a wrong name, amount, or
  * link reads as fraud. These pin the rendered copy (no sends here).
  */
 describe("bazaar emails", () => {

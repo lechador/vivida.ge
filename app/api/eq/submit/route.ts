@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { saveEqResult, sanitizeEqAnswers } from "@/lib/eq/store";
 
 /**
- * POST /api/eq/submit — persist a finished EQ attempt (fire-and-forget from the
+ * POST /api/eq/submit, persist a finished EQ attempt (fire-and-forget from the
  * result page). Best-effort: any failure is swallowed so the result page is
  * never affected. Scoring is redone server-side from the raw answers, so a
  * tampered client body can't inject a fake score.

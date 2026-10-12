@@ -26,7 +26,7 @@ function checkTable(
   pairs: Array<{ ka: string; en: string }>,
   internalSlugs: string[],
 ) {
-  // Every internal slug gets exactly one English slug and vice versa —
+  // Every internal slug gets exactly one English slug and vice versa,
   // a missing entry would 404 (or 308-loop) on the English host.
   expect(pairs.map((p) => p.ka).sort()).toEqual([...internalSlugs].sort());
   const enSlugs = pairs.map((p) => p.en);

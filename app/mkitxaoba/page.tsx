@@ -11,9 +11,9 @@ import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
-const TITLE = "მკითხაობა ონლაინ უფასოდ — ტაროზე მკითხაობა ქართულად";
+const TITLE = "მკითხაობა ონლაინ უფასოდ, ტაროზე მკითხაობა ქართულად";
 const DESCRIPTION =
-  "ონლაინ მკითხაობა ქართულად და უფასოდ: ტაროზე მკითხაობა კითხვა-პასუხით, დღის ჰოროსკოპი, ნატალური რუკა, სიყვარულის თავსებადობა და ბედის რიცხვი. რეგისტრაციის გარეშე იწყება — აირჩიე მეთოდი და დაუსვი შენი კითხვა.";
+  "ონლაინ მკითხაობა ქართულად და უფასოდ: ტაროზე მკითხაობა კითხვა-პასუხით, დღის ჰოროსკოპი, ნატალური რუკა, სიყვარულის თავსებადობა და ბედის რიცხვი. რეგისტრაციის გარეშე იწყება, აირჩიე მეთოდი და დაუსვი შენი კითხვა.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
@@ -102,13 +102,13 @@ export default function MkitxaobaPage() {
             </span>
           </h1>
           <p className="mx-auto mt-3.5 max-w-xl text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
-            ტაროზე მკითხაობა, ჰოროსკოპი, ნატალური რუკა და ბედის რიცხვი — ერთ
+            ტაროზე მკითხაობა, ჰოროსკოპი, ნატალური რუკა და ბედის რიცხვი, ერთ
             ადგილას, ქართულად. აირჩიე მეთოდი, დაუსვი კითხვა და პასუხს იმავე
             წუთს მიიღებ. დასაწყებად რეგისტრაცია არ გჭირდება.
           </p>
         </header>
 
-        {/* Primary CTA — tarot is the method the query usually means. */}
+        {/* Primary CTA, tarot is the method the query usually means. */}
         <Link
           href="/taro"
           className="group flex items-center gap-4 rounded-2xl border border-[var(--vivida-violet)]/35 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-pink)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:from-[var(--vivida-violet)]/22 sm:p-6"
@@ -119,13 +119,13 @@ export default function MkitxaobaPage() {
               დაიწყე ტაროზე მკითხაობით
             </span>
             <span className="mt-0.5 block text-sm text-muted-foreground">
-              დაწერე შენი კითხვა და გაშალე 3 კარტი — პირველი გაშლა უფასოა
+              დაწერე შენი კითხვა და გაშალე 3 კარტი, პირველი გაშლა უფასოა
             </span>
           </span>
           <ArrowRight className="size-5 shrink-0 text-[var(--vivida-violet)] transition-transform group-hover:translate-x-0.5" />
         </Link>
 
-        {/* Method directory — the body of the page. */}
+        {/* Method directory, the body of the page. */}
         <section className="mt-10">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
             მკითხაობის მეთოდები
@@ -162,14 +162,14 @@ export default function MkitxaobaPage() {
           </div>
         </section>
 
-        {/* Editorial section — gives the page real substance for the
+        {/* Editorial section, gives the page real substance for the
             bare-keyword query instead of being a bare link list. */}
         <section className="mt-12 rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
             რა არის მკითხაობა და როგორ დავსვათ სწორი კითხვა
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            მკითხაობა — ტაროზე, კარტებზე თუ ვარსკვლავებზე — არსებითად ერთ რამეს
+            მკითხაობა, ტაროზე, კარტებზე თუ ვარსკვლავებზე, არსებითად ერთ რამეს
             აკეთებს: სიმბოლოების ენაზე გაძლევს სიტუაციის სხვა კუთხით დანახვის
             საშუალებას. სწორედ ამიტომ არის კითხვის ფორმულირება იმაზე
             მნიშვნელოვანი, ვიდრე თავად მეთოდი.
@@ -180,7 +180,7 @@ export default function MkitxaobaPage() {
                 კარგი კითხვა
               </div>
               <p className="mt-1 text-[13px] leading-relaxed text-foreground/85">
-                „რას უნდა მივაქციო ყურადღება ამ ურთიერთობაში?“ — ღიაა, შენზეა
+                „რას უნდა მივაქციო ყურადღება ამ ურთიერთობაში?“, ღიაა, შენზეა
                 ორიენტირებული და პასუხისგან რჩევას ელოდები.
               </p>
             </div>
@@ -189,7 +189,7 @@ export default function MkitxaobaPage() {
                 სუსტი კითხვა
               </div>
               <p className="mt-1 text-[13px] leading-relaxed text-foreground/85">
-                „დამირეკავს თუ არა ხვალ?“ — დახურულია და მხოლოდ დიახ/არას
+                „დამირეკავს თუ არა ხვალ?“, დახურულია და მხოლოდ დიახ/არას
                 ითხოვს; პასუხიც ისეთივე ცარიელი დაბრუნდება.
               </p>
             </div>
@@ -197,7 +197,7 @@ export default function MkitxaobaPage() {
           <p className="mt-5 text-[15px] leading-relaxed text-foreground/85">
             და მთავარი: არცერთი მკითხაობა არ არის მომავლის გარანტია. თუ პასუხი
             გაფრთხილებაა, ის შენს გადაწყვეტილებას კი არ ცვლის, არამედ
-            გაფიქრებინებს — არჩევანი ბოლომდე შენს ხელშია.
+            გაფიქრებინებს, არჩევანი ბოლომდე შენს ხელშია.
           </p>
         </section>
 
@@ -229,11 +229,11 @@ export default function MkitxaobaPage() {
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            ერთი გაშლა ერთი დღეა — რუკა მთელი ცხოვრებაა
+            ერთი გაშლა ერთი დღეა, რუკა მთელი ცხოვრებაა
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
             თუ გინდა პასუხი არა მხოლოდ „ახლა რა ხდება“, არამედ „რატომ ვარ
-            ასეთი“ — დაიწყე შენი ნატალური რუკით. უფასოა.
+            ასეთი“, დაიწყე შენი ნატალური რუკით. უფასოა.
           </p>
           <Link
             href="/nataluri-ruka"

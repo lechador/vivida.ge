@@ -25,7 +25,7 @@ const TRANSIT_BODIES = [
 ] as const;
 
 /**
- * Compute today's transit positions at noon UTC — the daily-granularity
+ * Compute today's transit positions at noon UTC, the daily-granularity
  * convention every per-day cache (daily horoscope, weekly forecast) keys on.
  * Lat/lng matters only for the Asc/MC, which we don't use here, so we pass
  * safe defaults. For minute-resolution positions (the live sky page), use
@@ -174,7 +174,7 @@ function isLongitudeInArc(lng: number, start: number, end: number): boolean {
 
 /**
  * Format a Date as "YYYY-MM-DD" in the given IANA timezone. Used as the
- * cache key for daily horoscopes — defining "today" by the user's local
+ * cache key for daily horoscopes, defining "today" by the user's local
  * calendar, not UTC.
  */
 export function localDateString(date: Date, timezone: string): string {

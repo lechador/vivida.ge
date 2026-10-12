@@ -12,7 +12,7 @@ import {
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * The deep tier of the Big Five result — a written interpretation per trait
+ * The deep tier of the Big Five result, a written interpretation per trait
  * (matched to the level), framed neutrally since every pole is a valid
  * personality. Pure/server-safe so it renders on the saved page and (blurred)
  * on the anonymous teaser.

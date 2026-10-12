@@ -7,7 +7,7 @@ export function MbtiEnglishTypeDetails({ type }: { type: string }) {
   return (
     <div className="mt-8 space-y-4">
       <article className="space-y-4 rounded-2xl border border-border bg-card/50 p-6 text-[15px] leading-relaxed text-foreground/90 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
-        <h2 className="text-lg font-semibold tracking-tight">Understanding {type} — {profile.archetype}</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Understanding {type}, {profile.archetype}</h2>
         {profile.summary.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
       </article>
 

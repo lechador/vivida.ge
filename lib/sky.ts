@@ -1,10 +1,10 @@
 /**
- * Live-sky data for /sky — "where is every planet RIGHT NOW, in MY chart?"
+ * Live-sky data for /sky, "where is every planet RIGHT NOW, in MY chart?"
  *
  * Computes current transit positions plus each planet's angular speed (two
  * ephemeris samples → deg/hour; negative = retrograde), locates each transit
  * in the user's natal houses, and overlays the pre-generated transit library
- * so every placement ships with a ready interpretation — zero AI calls.
+ * so every placement ships with a ready interpretation, zero AI calls.
  *
  * The speed is what makes the client page feel alive: the wheel and degree
  * readouts extrapolate `longitude + speed × elapsed` every second, so the
@@ -47,14 +47,14 @@ export type SkyPlanet = {
 };
 
 export type SkyData = {
-  /** Epoch ms the positions were computed at — client extrapolates from here. */
+  /** Epoch ms the positions were computed at, client extrapolates from here. */
   sampledAt: number;
-  /** Ascendant longitude — orients the wheel exactly like the natal chart. */
+  /** Ascendant longitude, orients the wheel exactly like the natal chart. */
   ascLng: number;
   houses: NatalChartJson["houses"];
   natal: Array<{ key: string; longitude: number }>;
   planets: SkyPlanet[];
-  /** "Moon is in your Nth house right now" — the hero line. */
+  /** "Moon is in your Nth house right now", the hero line. */
   moon: { house: number | null; signIndex: number; houseText: string | null };
   /** Tightest currently-active transit aspects with library interpretations. */
   aspects: TransitBreakdownItem[];

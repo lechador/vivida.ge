@@ -6,7 +6,7 @@
  * fail-closed: missing/expired/replayed tokens always fall through.
  *
  * In dev, if `TURNSTILE_SECRET_KEY` is unset we log and let the request
- * pass — that way you can develop forms without a Cloudflare account.
+ * pass, that way you can develop forms without a Cloudflare account.
  * Production deploys MUST have the secret set; the absent-key path is
  * intentionally noisy in console output so it's hard to ship by accident.
  */
@@ -24,18 +24,18 @@ export async function verifyTurnstile(
 ): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
-    // In production, a missing secret is a fail-CLOSED situation — otherwise
+    // In production, a missing secret is a fail-CLOSED situation, otherwise
     // a forgotten env var rotation silently disables bot protection across
     // every signup/login/forgot-password endpoint. In dev, fail-open is
     // convenient so you can build forms without a Cloudflare account.
     if (process.env.NODE_ENV === "production") {
       console.error(
-        "[turnstile] TURNSTILE_SECRET_KEY missing in production — REJECTING request to fail closed"
+        "[turnstile] TURNSTILE_SECRET_KEY missing in production, REJECTING request to fail closed"
       );
       return false;
     }
     console.warn(
-      "[turnstile] TURNSTILE_SECRET_KEY missing — accepting request without verification (dev-only path)"
+      "[turnstile] TURNSTILE_SECRET_KEY missing, accepting request without verification (dev-only path)"
     );
     return true;
   }

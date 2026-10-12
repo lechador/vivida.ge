@@ -35,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-dynamic";
 
 /**
- * Astro-MBTI result — gated: only the owner can view. Renders the type,
+ * Astro-MBTI result, gated: only the owner can view. Renders the type,
  * archetype, axis bars, and the full Georgian synthesis.
  */
 export default async function TestResultPage({
@@ -55,7 +55,7 @@ export default async function TestResultPage({
   // Not found OR not the owner → 404 (don't leak that the id exists).
   if (!result) notFound();
 
-  // Rich 16Personalities-style sections — pre-written per 4-letter type. If any
+  // Rich 16Personalities-style sections, pre-written per 4-letter type. If any
   // are missing (unseeded), self-heal them in the background so the next view
   // is complete; this render shows whatever already exists.
   const baseType = mbtiBaseType(result.mbtiType);
@@ -137,7 +137,7 @@ export default async function TestResultPage({
                 blurb={
                   en
                     ? "Explore your core preferences, strengths, relationships and working style. Unlock once and keep it in your account."
-                    : "ღრმა ანალიზი, ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ცნობილი ადამიანები შენი ტიპით — გადაიხდი ერთხელ, სამუდამოდ შენია."
+                    : "ღრმა ანალიზი, ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ცნობილი ადამიანები შენი ტიპით, გადაიხდი ერთხელ, სამუდამოდ შენია."
                 }
                 locale={locale}
               />

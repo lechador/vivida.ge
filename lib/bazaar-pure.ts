@@ -1,5 +1,5 @@
 /**
- * Insight Bazaar pure helpers — zero `@/db` imports so vitest loads this
+ * Insight Bazaar pure helpers, zero `@/db` imports so vitest loads this
  * without DATABASE_URL. DB access lives in `lib/bazaar.ts`.
  *
  * The USDC / Solana payment primitives moved to `lib/usdc-pure.ts` (shared
@@ -72,7 +72,7 @@ export const BOOKING_STATUSES = [
   "cancelled",
 ] as const;
 
-export const PRICE_MIN_CENTS = 100; // $1 floor — dust payments aren't worth verifying
+export const PRICE_MIN_CENTS = 100; // $1 floor, dust payments aren't worth verifying
 export const PRICE_MAX_CENTS = 500_00; // $500 cap for the no-escrow MVP
 
 const MAX = {

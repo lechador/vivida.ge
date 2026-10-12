@@ -85,7 +85,7 @@ describe("tarot OpenRouter prompts", () => {
       "3-კარტიან განლაგებას (წარსული/ფესვი",
     );
     expect(request.messages[1]?.content).toContain(
-      "1. ჩემი საჭიროება — თასების დედოფალი (პირდაპირი)",
+      "1. ჩემი საჭიროება, თასების დედოფალი (პირდაპირი)",
     );
     expect(request.messages[1]?.content).toContain(
       "ურთიერთობის დინამიკა: ჩემი საჭიროება, დაძაბულობა, შესაძლო ნაბიჯი",

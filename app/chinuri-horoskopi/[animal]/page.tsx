@@ -78,10 +78,10 @@ export async function generateMetadata({
   }
   const content = await ensureChineseZodiac(slug);
   const url = `${SITE_URL}/chinuri-horoskopi/${slug}`;
-  const title = content?.pageTitle ?? `${animal.nameKa} — ჩინური ჰოროსკოპი`;
+  const title = content?.pageTitle ?? `${animal.nameKa}, ჩინური ჰოროსკოპი`;
   const description =
     content?.metaDescription ??
-    `${animal.nameKa} ჩინური ჰოროსკოპის ნიშანი — ხასიათი, დაბადების წლები და თავსებადობა, ქართულად.`;
+    `${animal.nameKa} ჩინური ჰოროსკოპის ნიშანი, ხასიათი, დაბადების წლები და თავსებადობა, ქართულად.`;
   const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(animal.nameKa)}&k=${encodeURIComponent("ჩინური ჰოროსკოპი")}`;
   return {
     title: { absolute: title },
@@ -126,7 +126,7 @@ export default async function ChineseAnimalPage({
   const articleLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: c?.pageTitle ?? `${animal.nameKa} — ჩინური ჰოროსკოპი`,
+    headline: c?.pageTitle ?? `${animal.nameKa}, ჩინური ჰოროსკოპი`,
     description: c?.metaDescription ?? "",
     inLanguage: "ka-GE",
     mainEntityOfPage: {
@@ -352,7 +352,7 @@ export default async function ChineseAnimalPage({
             იცი შენი დასავლური ნიშანიც?
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ჩინური ნიშანი წელს ეფუძნება — დასავლური ნატალური რუკა კი დაბადების
+            ჩინური ნიშანი წელს ეფუძნება, დასავლური ნატალური რუკა კი დაბადების
             ზუსტ წამს. გამოთვალე შენი რუკა უფასოდ.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">

@@ -1,11 +1,11 @@
 // Seed the reusable per-aspect interpretation library (aspect_interpretation_library).
-// Generates one rich Georgian text per (planetA, planetB, kind) — every possible
-// major aspect between the 13 chart points — so the report reuses them across
+// Generates one rich Georgian text per (planetA, planetB, kind), every possible
+// major aspect between the 13 chart points, so the report reuses them across
 // all users instead of a per-user AI call. One AI call per entry (Georgian is
 // token-dense; batching truncates).
 //
 // Uses Vertex AI Gemini (not OpenRouter) via the existing GCP project set up
-// for Veo video generation — auth via local ADC (`gcloud auth
+// for Veo video generation, auth via local ADC (`gcloud auth
 // application-default login`), no API key needed. Only for this local, one-time
 // bulk seed; the live in-app self-heal fallback (lib/aspect-library.ts) still
 // uses OpenRouter since Vertex ADC isn't available in the deployed serverless
@@ -100,20 +100,20 @@ const KIND_KA = {
 };
 const KIND_DYNAMIC_KA = {
   conjunction:
-    "ორი ენერგია ერთმანეთში ერწყმის და ერთ ძალად მოქმედებს — არც კონფლიქტი, არც შვება, უბრალოდ შერწყმა, რომლის ხასიათი პლანეტებზეა დამოკიდებული.",
+    "ორი ენერგია ერთმანეთში ერწყმის და ერთ ძალად მოქმედებს, არც კონფლიქტი, არც შვება, უბრალოდ შერწყმა, რომლის ხასიათი პლანეტებზეა დამოკიდებული.",
   sextile:
-    "ორი ენერგია ბუნებრივად თანამშრომლობს — ადვილად ხელმისაწვდომი შესაძლებლობა, რომელიც მოქმედებას საჭიროებს გასააქტიურებლად.",
+    "ორი ენერგია ბუნებრივად თანამშრომლობს, ადვილად ხელმისაწვდომი შესაძლებლობა, რომელიც მოქმედებას საჭიროებს გასააქტიურებლად.",
   square:
-    "ორი ენერგია ერთმანეთს ეწინააღმდეგება — შინაგანი ხახუნი და დაძაბულობა, რომელიც ზრდის ყველაზე ძლიერი წყაროა, თუმცა თავიდან რთულად იგრძნობა.",
+    "ორი ენერგია ერთმანეთს ეწინააღმდეგება, შინაგანი ხახუნი და დაძაბულობა, რომელიც ზრდის ყველაზე ძლიერი წყაროა, თუმცა თავიდან რთულად იგრძნობა.",
   trine:
-    "ორი ენერგია ჰარმონიულად და ბუნებრივად მიედინება — ნიჭი და სიმარტივე, რომელიც ხანდახან თვითკმაყოფილებაშიც შეიძლება გადაიზარდოს.",
+    "ორი ენერგია ჰარმონიულად და ბუნებრივად მიედინება, ნიჭი და სიმარტივე, რომელიც ხანდახან თვითკმაყოფილებაშიც შეიძლება გადაიზარდოს.",
   opposition:
-    "ორი ენერგია ერთმანეთის საპირისპირო პოლუსზეა — ცნობიერების საჭიროება ბალანსის საპოვნელად ორ უკიდურესობას შორის.",
+    "ორი ენერგია ერთმანეთის საპირისპირო პოლუსზეა, ცნობიერების საჭიროება ბალანსის საპოვნელად ორ უკიდურესობას შორის.",
 };
 
 const SYSTEM =
   "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
-  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   'თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები ("ვარსკვლავები გელიან").';
 
 function prompt(a, b, kind) {
@@ -121,12 +121,12 @@ function prompt(a, b, kind) {
     bLabel = BODY_KA[b];
   return (
     `დაწერე ნატალური ასპექტის ინტერპრეტაცია: "${aLabel} ${KIND_KA[kind]} ${bLabel}".\n` +
-    `${aLabel} — ${BODY_MEANING_KA[a]}. ${bLabel} — ${BODY_MEANING_KA[b]}.\n` +
+    `${aLabel}, ${BODY_MEANING_KA[a]}. ${bLabel}, ${BODY_MEANING_KA[b]}.\n` +
     `ამ ასპექტის ბუნება: ${KIND_DYNAMIC_KA[kind]}\n\n` +
     `6-8 წინადადება (დაახ. 130-170 სიტყვა), "შენ"-ის ფორმა, თბილი და კონკრეტული. ` +
     `ახსენი: როგორ ერწყმის/ეჯახება ეს ორი ენერგია ერთმანეთს ცხოვრებაში, ` +
     `ერთი კონკრეტული ხელშესახები მაგალითი, და ერთი პრაქტიკული რჩევა ამ ` +
-    `დინამიკასთან სამუშაოდ. დააბრუნე მხოლოდ ტექსტი — სათაურის, ` +
+    `დინამიკასთან სამუშაოდ. დააბრუნე მხოლოდ ტექსტი, სათაურის, ` +
     `ფორმატირების და ფრჩხილების გარეშე.`
   );
 }

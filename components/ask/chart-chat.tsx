@@ -20,7 +20,7 @@ import { ContextualPaywallActions } from "@/components/billing/contextual-paywal
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-/** Client-side composer cap — mirrors MAX_MESSAGE_LEN in app/api/ask/route.ts. */
+/** Client-side composer cap, mirrors MAX_MESSAGE_LEN in app/api/ask/route.ts. */
 export const CHAT_MAX_INPUT_LEN = 4000;
 /** Counter appears once the draft gets long or nears the cap. */
 const COUNTER_VISIBLE_FROM = 1200;
@@ -67,7 +67,7 @@ export function ChartChat({
   initialStarter?: ChartStarterId;
   firstName: string | null;
   locale?: UserLocale;
-  /** PRO users bypass every credit gate — hide the free-allowance hint. */
+  /** PRO users bypass every credit gate, hide the free-allowance hint. */
   premium?: boolean;
   /** Proactive follow-up built from a remembered open loop (null when none). */
   followUp?: string | null;
@@ -108,7 +108,7 @@ export function ChartChat({
     try {
       window.localStorage.setItem(DEPTH_KEY, d);
     } catch {
-      /* private mode — preference just won't persist */
+      /* private mode, preference just won't persist */
     }
   }
 
@@ -154,7 +154,7 @@ export function ChartChat({
   /** History rendered on open never animates / smooth-scrolls. */
   const [initialCount] = useState(initialMessages.length);
   const openedRef = useRef(false);
-  /** False once the reader scrolls up — streaming won't yank them back. */
+  /** False once the reader scrolls up, streaming won't yank them back. */
   const stickRef = useRef(true);
 
   // Open at the bottom instantly: no top-to-bottom scroll sweep through
@@ -167,7 +167,7 @@ export function ChartChat({
     }
   }, []);
 
-  // New turns glide to the bottom — unless the reader scrolled up to read.
+  // New turns glide to the bottom, unless the reader scrolled up to read.
   useEffect(() => {
     if (!openedRef.current || messages.length <= initialCount) return;
     const el = listRef.current;
@@ -292,7 +292,7 @@ export function ChartChat({
 
   return (
     <div className="chat-panel-in flex min-h-0 flex-1 flex-col">
-      {/* Messages — the only scrolling region, so the header and composer
+      {/* Messages, the only scrolling region, so the header and composer
           stay put no matter how long the answer gets. */}
       <div
         ref={listRef}
@@ -311,8 +311,8 @@ export function ChartChat({
             <p className="text-pretty text-[15px] leading-relaxed text-foreground/85">
               {firstName ? `${firstName}, ` : ""}
               {en
-                ? "ask me anything about your chart — personality, emotions, relationships, career or timing."
-                : "დამისვი შეკითხვა შენი რუკის შესახებ — ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო."}
+                ? "ask me anything about your chart, personality, emotions, relationships, career or timing."
+                : "დამისვი შეკითხვა შენი რუკის შესახებ, ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო."}
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               {starters.map((starter) => (
@@ -399,7 +399,7 @@ export function ChartChat({
         </div>
       )}
 
-      {/* Composer — pinned at the bottom of the chat panel */}
+      {/* Composer, pinned at the bottom of the chat panel */}
       {followUp && !followUpDismissed && (
         <div className="mb-2 flex shrink-0 items-center gap-2 rounded-2xl border border-[var(--vivida-pink)]/25 bg-[var(--vivida-pink)]/8 px-3 py-2">
           <button
@@ -542,8 +542,8 @@ export function ChartChat({
           ) : (
             <p className="text-muted-foreground">
               {en
-                ? "Nothing remembered yet — after a few conversations your astrologer will start recognizing you here."
-                : "ჯერ არაფერი მახსოვს — რამდენიმე საუბრის მერე შენი ასტროლოგი აქ გიცნობს."}
+                ? "Nothing remembered yet, after a few conversations your astrologer will start recognizing you here."
+                : "ჯერ არაფერი მახსოვს, რამდენიმე საუბრის მერე შენი ასტროლოგი აქ გიცნობს."}
             </p>
           )}
         </div>
@@ -608,8 +608,8 @@ export function ChartChat({
         </div>
         <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
           {en
-            ? "AI astrologers can be wrong—use this for reflection, not decisions."
-            : "AI ასტროლოგი ცდება — გამოიყენე რეფლექსიისთვის, არა გადაწყვეტილებებისთვის."}
+            ? "AI astrologers can be wrong, use this for reflection, not decisions."
+            : "AI ასტროლოგი ცდება, გამოიყენე რეფლექსიისთვის, არა გადაწყვეტილებებისთვის."}
         </p>
       </form>
     </div>

@@ -103,7 +103,7 @@ export function UnlockCard({
         return;
       }
       if (r.status === 402) setShort(true);
-      // Any other status is a server-side failure — say so, otherwise a
+      // Any other status is a server-side failure, say so, otherwise a
       // spend action looks like it silently did nothing.
       else setFailed(true);
     } catch {
@@ -125,7 +125,7 @@ export function UnlockCard({
         {blurb ??
           (en
             ? "Unlock the complete analysis with a one-time payment. This result remains yours."
-            : "გახსენი სრული, ღრმა ანალიზი. გადაიხდი ერთხელ — შემდეგ ეს შედეგი სამუდამოდ შენია.")}
+            : "გახსენი სრული, ღრმა ანალიზი. გადაიხდი ერთხელ, შემდეგ ეს შედეგი სამუდამოდ შენია.")}
       </p>
 
       <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1 text-sm">
@@ -158,8 +158,8 @@ export function UnlockCard({
           {failed && (
             <p className="mt-3 text-sm text-[var(--vivida-pink)]">
               {en
-                ? "Could not unlock — no credits were charged. Please try again."
-                : "გახსნა ვერ მოხერხდა — კრედიტი არ ჩამოგეჭრა. სცადე ხელახლა."}
+                ? "Could not unlock, no credits were charged. Please try again."
+                : "გახსნა ვერ მოხერხდა, კრედიტი არ ჩამოგეჭრა. სცადე ხელახლა."}
             </p>
           )}
         </div>

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * The IQ bell curve with the taker's score marked — a normal distribution
+ * The IQ bell curve with the taker's score marked, a normal distribution
  * (mean 100, SD 15) drawn over the 55–145 range, shaded up to the score so the
  * "where you land" reads instantly.
  */

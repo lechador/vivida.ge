@@ -81,7 +81,7 @@ describe("bazaar-pure", () => {
   });
 
   it("rejects base58 strings that don't decode to 64 bytes", () => {
-    // 88 valid base58 chars but 65 bytes — the RPC's `WrongSize` case.
+    // 88 valid base58 chars but 65 bytes, the RPC's `WrongSize` case.
     expect(normalizeSignature("z".repeat(88))).toBe(null);
     // 87 chars decoding to exactly 64 bytes stays accepted.
     const sig = "a".repeat(87);

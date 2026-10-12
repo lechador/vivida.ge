@@ -24,7 +24,7 @@ const SIGN_MOTIF: Record<string, string> = {
   libra: "a pair of perfectly balanced scales",
   scorpio: "a scorpion with a curved stinger tail",
   sagittarius: "an archer's bow with an arrow aimed skyward",
-  capricorn: "a sea-goat — a goat with a flowing fish tail",
+  capricorn: "a sea-goat, a goat with a flowing fish tail",
   aquarius: "a water-bearer pouring cosmic waves",
   pisces: "two fish circling each other",
 };
@@ -61,7 +61,7 @@ export async function generateZodiacAvatar(
     `against a near-black deep indigo background (#0b0814). Soft luminous ` +
     `glow, modern, premium, dreamy cosmic mood. No text, no letters, no ` +
     `numbers, no human face, no watermark. Composition balanced for a ` +
-    `circular crop — keep the emblem within the central circle.`;
+    `circular crop, keep the emblem within the central circle.`;
 
   const res = await fetch(OPENROUTER_URL, {
     method: "POST",

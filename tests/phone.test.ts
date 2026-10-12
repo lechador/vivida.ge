@@ -79,7 +79,7 @@ describe("OTP SMS content", () => {
     expect(ka).toContain("Vivida");
     expect(en).toContain("Vivida");
     // Georgian is UCS-2 (70 chars/part); Latin GSM-7 (160 chars/part).
-    // One part each — every extra part doubles the cost.
+    // One part each, every extra part doubles the cost.
     expect(ka.length).toBeLessThanOrEqual(70);
     expect(en.length).toBeLessThanOrEqual(160);
   });

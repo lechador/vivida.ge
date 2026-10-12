@@ -20,7 +20,7 @@ import type { FriendshipStatus } from "./friendship";
 import { hasVerifiedBadge } from "./verified-badge";
 
 /**
- * One row in the /people directory list. Shape kept lean — avatar,
+ * One row in the /people directory list. Shape kept lean, avatar,
  * handle, display name, optional bio, and the viewer's friendship
  * state with this user. Sun sign / reputation are intentionally not
  * here; this is a thin Facebook-style row, not a card.
@@ -37,7 +37,7 @@ export type PersonRow = {
 };
 
 /**
- * `"<1|0>:<ISO>"` — the country bucket plus the createdAt keyset.
+ * `"<1|0>:<ISO>"`, the country bucket plus the createdAt keyset.
  *
  * A bare ISO string (a cursor issued by the previous version and still held by
  * a client mid-scroll) is read as the same-country bucket, which at
@@ -66,7 +66,7 @@ function encodeCursor(row: {
  * Page of public-profile users for the /people directory.
  *
  * Sorted by the viewer's own residence country first, then `createdAt desc`
- * within each bucket. Prioritise, never filter — see `sameCountryFirst`.
+ * within each bucket. Prioritise, never filter, see `sameCountryFirst`.
  *
  * Because the country bucket is the PRIMARY sort key it has to be part of the
  * keyset cursor too; paginating on `createdAt` alone would restart at the top
@@ -100,7 +100,7 @@ export async function listPeople(
     isNotNull(profiles.dateOfBirth),
     eq(profiles.discoverable, true),
   ];
-  // A block in EITHER direction removes the row entirely — the profile page
+  // A block in EITHER direction removes the row entirely, the profile page
   // already 404s for blocked pairs, so the directory must not keep showing
   // the person's avatar/bio to someone they blocked (or vice versa). Blocks
   // live in `blocks`; blocking deletes the friendship row, so this can't be

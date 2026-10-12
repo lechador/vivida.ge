@@ -11,7 +11,7 @@ const SRC = "/audio/test-ambient.mp3";
 const VOLUME = 0.32;
 
 /**
- * Ambient background-music toggle for the personality test — a calm, mystic
+ * Ambient background-music toggle for the personality test, a calm, mystic
  * track (ElevenLabs) that loops while the user answers. Off by default (browser
  * autoplay policies block sound before a gesture); tapping it starts/stops and
  * the choice is remembered. If the visitor already opted in earlier we try to
@@ -38,7 +38,7 @@ export function TestMusicPlayer({ locale = "ka" }: { locale?: UserLocale }) {
         /* ignore */
       }
     } catch {
-      /* autoplay blocked — user can tap again */
+      /* autoplay blocked, user can tap again */
     }
   }
 

@@ -88,9 +88,9 @@ type Props = {
   initialConversations: ChatConversation[];
   initialUnreadTotal: number;
   /**
-   * "modal"      — legacy floating chat button + animated panel (desktop)
-   * "page"       — render inline as a full-page chat experience (/messages)
-   * "background" — retained as an inert compatibility mode; it performs no
+   * "modal", legacy floating chat button + animated panel (desktop)
+   * "page", render inline as a full-page chat experience (/messages)
+   * "background", retained as an inert compatibility mode; it performs no
    *                network or database work.
    */
   mode?: "modal" | "page" | "background";
@@ -112,7 +112,7 @@ export function ChatLauncher({
   locale = "ka",
 }: Props) {
   const en = locale !== "ka";
-  // In "page" mode the panel is always considered open — the route is
+  // In "page" mode the panel is always considered open, the route is
   // the panel. In other modes it's a togglable surface.
   const [open, setOpen] = useState(mode === "page");
   const [activePartnerId, setActivePartnerId] = useState<string | null>(
@@ -127,7 +127,7 @@ export function ChatLauncher({
   const [typingByPartner, setTypingByPartner] = useState<
     Record<string, number>
   >({});
-  // Per-thread load outcome — a failed /api/messages fetch must render a
+  // Per-thread load outcome, a failed /api/messages fetch must render a
   // retry row, not the indefinite spinner that `messages === null` gives.
   const [threadStatus, setThreadStatus] = useState<
     Record<string, ThreadStatus>
@@ -383,7 +383,7 @@ export function ChatLauncher({
     activePartnerRef.current = partnerId;
 
     // Read-then-write so we can fire side effects (state on other islands,
-    // window events) outside the updater. The updater itself must be pure —
+    // window events) outside the updater. The updater itself must be pure,
     // dispatching a CustomEvent inside it triggers cross-component setState
     // during render, which React errors on. Using the ref keeps handleSelect
     // stable (empty deps) without going stale.
@@ -460,7 +460,7 @@ export function ChatLauncher({
   }, [handleSelect]);
 
   // Page-mode auto-open when a `?with=<partnerId>` query is supplied.
-  // Mount-once effect — handleSelect is stable (empty deps).
+  // Mount-once effect, handleSelect is stable (empty deps).
   useEffect(() => {
     if (!initialPartnerId) return;
     const timeout = window.setTimeout(() => {
@@ -545,7 +545,7 @@ export function ChatLauncher({
   // Page mode: full-bleed on mobile (no card frame, no rounded edges,
   // chat fills the whole viewport between the header and the bottom
   // tab bar), card-styled on desktop. The parent <section> on /messages
-  // already constrains height + width — we just go flex-1 here.
+  // already constrains height + width, we just go flex-1 here.
   if (mode === "page") {
     return (
       <div
@@ -657,7 +657,7 @@ function ConversationList({
   conversations: ChatConversation[];
   viewerId: string;
   onSelect: (partnerId: string) => void;
-  /** null when rendered as a full page — the close affordance is hidden. */
+  /** null when rendered as a full page, the close affordance is hidden. */
   onClose: (() => void) | null;
   locale: UserLocale;
 }) {
@@ -685,7 +685,7 @@ function ConversationList({
           <p className="text-sm text-muted-foreground">
             {en
               ? "You have no friends yet. Add someone to start chatting."
-              : "ჯერ მეგობრები არ გყავს — დაამატე და დაიწყე ჩატი"}
+              : "ჯერ მეგობრები არ გყავს, დაამატე და დაიწყე ჩატი"}
           </p>
           {/* Point at the deck when it's enabled; otherwise send users to
               their friends page (always available) so the CTA never dead-ends. */}
@@ -881,7 +881,7 @@ function ChatView({
 
   const items = useMemo(() => messages ?? [], [messages]);
 
-  // Index of the latest message viewer sent that the partner has read —
+  // Index of the latest message viewer sent that the partner has read,
   // used to render a single read pip under it.
   const lastReadIndex = useMemo(() => {
     for (let i = items.length - 1; i >= 0; i--) {
@@ -956,7 +956,7 @@ function ChatView({
             <p className="text-xs text-muted-foreground">
               {en
                 ? "Start the conversation by sending the first message."
-                : "დაიწყე საუბარი — გამოგზავნე პირველი წერილი"}
+                : "დაიწყე საუბარი, გამოგზავნე პირველი წერილი"}
             </p>
           </div>
         ) : (

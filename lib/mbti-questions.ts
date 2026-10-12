@@ -1,9 +1,9 @@
 /**
- * Astro-MBTI test data + scoring — modeled on the 16Personalities test.
+ * Astro-MBTI test data + scoring, modeled on the 16Personalities test.
  *
  * 60 Georgian statements across 5 dimensions (12 each): the four Jungian
  * axes (E/I, S/N, T/F, J/P) plus the Identity axis (Assertive/Turbulent),
- * which 16Personalities appends as a suffix — e.g. "INFJ-T". Within each
+ * which 16Personalities appends as a suffix, e.g. "INFJ-T". Within each
  * dimension the statements are split ~6/6 toward each pole, so a user who
  * reflexively agrees with everything (acquiescence bias) still lands near the
  * middle instead of being pushed to an extreme.
@@ -24,7 +24,7 @@ export const AXIS_POLES: Record<MbtiAxis, readonly [string, string]> = {
   SN: ["S", "N"],
   TF: ["T", "F"],
   JP: ["J", "P"],
-  AT: ["A", "T"], // Assertive / Turbulent — the Identity dimension
+  AT: ["A", "T"], // Assertive / Turbulent, the Identity dimension
 };
 
 /** Short Georgian axis labels for the results UI. */
@@ -55,7 +55,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   { id: 2, axis: "EI", pole: "I", textKa: "ხანგრძლივი სოციალური ურთიერთობის შემდეგ, ენერგიის აღსადგენად მარტოობა მჭირდება." },
   { id: 3, axis: "EI", pole: "E", textKa: "უცნობ ადამიანთან საუბრის დაწყება ჩემთვის ბუნებრივი და ადვილია." },
   { id: 4, axis: "EI", pole: "I", textKa: "მირჩევნია, მყავდეს რამდენიმე ახლო მეგობარი, ვიდრე ბევრი ნაცნობი." },
-  { id: 5, axis: "EI", pole: "E", textKa: "ხმამაღლა ფიქრი მეხმარება — იდეები ხშირად საუბრისას მებადება." },
+  { id: 5, axis: "EI", pole: "E", textKa: "ხმამაღლა ფიქრი მეხმარება, იდეები ხშირად საუბრისას მებადება." },
   { id: 6, axis: "EI", pole: "I", textKa: "ღრმა, პირისპირ საუბარი მირჩევნია დიდ, ხმაურიან ჯგუფს." },
   { id: 7, axis: "EI", pole: "E", textKa: "ადვილად ვიჩენ ახალ ნაცნობებს." },
   { id: 8, axis: "EI", pole: "I", textKa: "მდიდარი შინაგანი სამყარო მაქვს და მარტოობა იშვიათად მბეზრდება." },
@@ -93,12 +93,12 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   { id: 36, axis: "TF", pole: "F", textKa: "ადვილად ვთანაუგრძნობ სხვის ტკივილს, თითქოს ჩემი იყოს." },
 
   // ── J / P (12) ───────────────────────────────────────────────────────────
-  { id: 37, axis: "JP", pole: "J", textKa: "მიყვარს გეგმები და სიები — როცა ყველაფერი წინასწარ დაგეგმილია, თავს კომფორტულად ვგრძნობ." },
+  { id: 37, axis: "JP", pole: "J", textKa: "მიყვარს გეგმები და სიები, როცა ყველაფერი წინასწარ დაგეგმილია, თავს კომფორტულად ვგრძნობ." },
   { id: 38, axis: "JP", pole: "P", textKa: "მირჩევნია, არჩევანი ღიად დავტოვო და გადაწყვეტილება ბოლო მომენტში მივიღო." },
   { id: 39, axis: "JP", pole: "J", textKa: "საქმეს ვადაზე ადრე ვასრულებ და არ მიყვარს ბოლო წუთამდე გადადება." },
   { id: 40, axis: "JP", pole: "P", textKa: "სპონტანურობა და მოულოდნელი ცვლილებები მახალისებს და არ მაღიზიანებს." },
   { id: 41, axis: "JP", pole: "J", textKa: "მოწესრიგებული გარემო და მკაფიო განრიგი მამშვიდებს." },
-  { id: 42, axis: "JP", pole: "P", textKa: "მკაცრი განრიგი მზღუდავს — თავისუფლება მირჩევნია." },
+  { id: 42, axis: "JP", pole: "P", textKa: "მკაცრი განრიგი მზღუდავს, თავისუფლება მირჩევნია." },
   { id: 43, axis: "JP", pole: "J", textKa: "როცა გადაწყვეტილებას ვიღებ, ვმშვიდდები; ღია საკითხები კი მაწუხებს." },
   { id: 44, axis: "JP", pole: "P", textKa: "ხშირად ვცვლი გეგმას, თუ გზად უკეთესი ვარიანტი გამოჩნდა." },
   { id: 45, axis: "JP", pole: "J", textKa: "სანამ დავისვენებ, ჯერ საქმეს ვასრულებ." },
@@ -114,10 +114,10 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   { id: 53, axis: "AT", pole: "A", textKa: "წარუმატებლობას ადვილად ვუმკლავდები და სწრაფად აღვიდგენ ძალებს." },
   { id: 54, axis: "AT", pole: "T", textKa: "შეცდომებზე დიდხანს ვნერვიულობ და საკუთარ თავს ვკიცხავ." },
   { id: 55, axis: "AT", pole: "A", textKa: "ჩემი განწყობა სტაბილურია და იშვიათად იცვლება." },
-  { id: 56, axis: "AT", pole: "T", textKa: "პერფექციონისტი ვარ — მინდა, ყველაფერი უნაკლო იყოს." },
-  { id: 57, axis: "AT", pole: "A", textKa: "იშვიათად ვღელავ მომავალზე — მჯერა, რომ თავს გავართმევ." },
+  { id: 56, axis: "AT", pole: "T", textKa: "პერფექციონისტი ვარ, მინდა, ყველაფერი უნაკლო იყოს." },
+  { id: 57, axis: "AT", pole: "A", textKa: "იშვიათად ვღელავ მომავალზე, მჯერა, რომ თავს გავართმევ." },
   { id: 58, axis: "AT", pole: "T", textKa: "ხშირად ვადარებ საკუთარ თავს სხვებს და ვღელავ, ვარ თუ არა საკმარისად კარგი." },
-  { id: 59, axis: "AT", pole: "A", textKa: "კრიტიკა ნაკლებად მაშფოთებს — ვითვალისწინებ და გზას ვაგრძელებ." },
+  { id: 59, axis: "AT", pole: "A", textKa: "კრიტიკა ნაკლებად მაშფოთებს, ვითვალისწინებ და გზას ვაგრძელებ." },
   { id: 60, axis: "AT", pole: "T", textKa: "სტრესის დროს დასვენება და დამშვიდება მიჭირს." },
 ];
 
@@ -143,7 +143,7 @@ export const MBTI_LIKERT: { value: number; labelKa: string; labelEn: string }[] 
   { value: -3, labelKa: "სრულიად არ ვეთანხმები", labelEn: "Strongly disagree" },
 ];
 
-/** Canonical Georgian archetype names — the AI names one too, but this is the
+/** Canonical Georgian archetype names, the AI names one too, but this is the
  *  deterministic fallback if that call fails, and a stable label everywhere. */
 export const MBTI_ARCHETYPE_KA: Record<string, string> = {
   ISTJ: "ლოგისტიკოსი",

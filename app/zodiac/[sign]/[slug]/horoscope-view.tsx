@@ -67,10 +67,10 @@ export async function HoroscopeView({
   const horoscope = await ensureSignHoroscope(sign, period, anchor);
 
   const url = `${SITE_URL}/zodiac/${sign}/${VIEW_PATH[view]}`;
-  const pageTitle = `${sc.labelKa} — ${periodLabelKa}`;
+  const pageTitle = `${sc.labelKa}, ${periodLabelKa}`;
   const description =
     horoscope?.summary ??
-    `${sc.labelKa}-ის ${periodLabelKa} — ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები. პერიოდი: ${periodLabel}.`;
+    `${sc.labelKa}-ის ${periodLabelKa}, ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები. პერიოდი: ${periodLabel}.`;
 
   const ld = [
     articleLd({
@@ -148,7 +148,7 @@ export async function HoroscopeView({
                 {periodLabel}
               </div>
               <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                {sc.labelKa} — {periodLabelKa}
+                {sc.labelKa}, {periodLabelKa}
               </h1>
               {horoscope?.headline && (
                 <p
@@ -176,7 +176,7 @@ export async function HoroscopeView({
         ) : (
           <section className="mt-10 max-w-2xl rounded-2xl border border-dashed border-border/80 bg-card/40 p-8 text-center">
             <p className="text-sm text-muted-foreground">
-              {periodLabelKa} მზადდება — სცადე ცოტა ხანში.
+              {periodLabelKa} მზადდება, სცადე ცოტა ხანში.
             </p>
           </section>
         )}
@@ -227,7 +227,7 @@ export async function HoroscopeView({
               href={`/zodiac/${sign}`}
               className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
             >
-              {sc.labelKa} — სრული პროფილი
+              {sc.labelKa}, სრული პროფილი
             </Link>
             <Link href={`/siyvarulis-horoskopi/${sign}`} className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80">
               სიყვარულის ჰოროსკოპი

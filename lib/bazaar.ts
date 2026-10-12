@@ -17,7 +17,7 @@ import {
 
 /**
  * Insight Bazaar data access. Public list/detail shapes deliberately OMIT
- * buyerNote / deliveryText / payerWallet — private reading content only
+ * buyerNote / deliveryText / payerWallet, private reading content only
  * leaves the DB through the booking-scoped getters below.
  */
 
@@ -398,7 +398,7 @@ type RpcTxValue = {
 /**
  * Outcomes stay distinct on purpose: `not_found` means the RPC answered
  * cleanly and the chain hasn't indexed this signature yet (normal for
- * seconds after a fresh payment — the caller maps it to a retryable 202);
+ * seconds after a fresh payment, the caller maps it to a retryable 202);
  * `unavailable` means we never got an answer (timeout/HTTP/RPC error).
  * Collapsing the two once surfaced "no matching payment" to buyers who had
  * simply verified inside the indexing window.
@@ -451,7 +451,7 @@ export async function verifyBookingPayment(input: {
   alreadyUsed: boolean;
   /**
    * Claimed payer wallet. When present it MUST appear as a signer on the
-   * transaction — otherwise anyone could claim a stranger's payment to the
+   * transaction, otherwise anyone could claim a stranger's payment to the
    * same provider as their own and get a free reading.
    */
   expectedSigner?: string | null;

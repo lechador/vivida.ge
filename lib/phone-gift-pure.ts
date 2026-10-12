@@ -1,7 +1,7 @@
 /**
  * Pure eligibility policy for the phone-gift campaign (verify a number → 10
  * credits, +10 more with promotional-SMS consent). Kept free of `@/db` so
- * unit tests can pin the rules without a database — the DB-side grants live
+ * unit tests can pin the rules without a database, the DB-side grants live
  * in lib/phone-gift.ts.
  */
 
@@ -28,7 +28,7 @@ export function phoneGiftPopupEligible(viewer: PhoneGiftViewer): boolean {
 
 /**
  * Credits-page card: the same audience, but it stays claimable after the
- * popup was dismissed — the dismissal only silences the popup.
+ * popup was dismissed, the dismissal only silences the popup.
  */
 export function phoneGiftCardEligible(
   viewer: Omit<PhoneGiftViewer, "popupDismissed">,

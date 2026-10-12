@@ -3,7 +3,7 @@
  * and soft-deleted rows in the current calendar month so users can't
  * dodge the cap by deleting and re-creating.
  *
- * Lives outside actions/partners.ts because that file is "use server" —
+ * Lives outside actions/partners.ts because that file is "use server",
  * which restricts exports to async functions only.
  *
  * Credits gate each compatibility unlock separately; this generous cap only

@@ -40,7 +40,7 @@ export function CardImage({
           <img
             src={src || `/tarot/${slug}.webp`}
             alt={
-              locale === "en" ? `${name} tarot card` : `ტაროს კარტი — ${name}`
+              locale === "en" ? `${name} tarot card` : `ტაროს კარტი, ${name}`
             }
             loading={priority ? "eager" : "lazy"}
             onError={() => setOk(false)}

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { signColor, type ZodiacSign } from "@/lib/zodiac";
 
 /**
- * Display badge for a zodiac sign — the glyph (♈, ♉, …) inside a tile
+ * Display badge for a zodiac sign, the glyph (♈, ♉, …) inside a tile
  * tinted with the sign's element color, with a soft halo. The sign is the
  * single most important piece of astrological identity on a card, so this
  * treatment is intentionally large and luminous.

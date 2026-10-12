@@ -5,8 +5,8 @@
 //   node scripts/announce-iq-email.mjs all           → sends to all marketing-opted-in users
 // Reads RESEND_API_KEY / RESEND_FROM / DATABASE_URL from .env.local or env.
 //
-// Audience: email_marketing = true (no birth-data gate — the IQ test needs
-// none), excluding the brand account. One send per run — do NOT re-run "all".
+// Audience: email_marketing = true (no birth-data gate, the IQ test needs
+// none), excluding the brand account. One send per run, do NOT re-run "all".
 
 import { readFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
@@ -30,14 +30,14 @@ const dry = process.argv.includes("--dry");
 const C = {
   subject: "🧠 ახალი: IQ ტესტი Vivida-ზე",
   intro:
-    "Vivida-ზე ახალი ტესტი გამოვიდა — IQ ტესტი. ის ადაპტიურია და კულტურულად ნეიტრალური: შენს დონეს ერგება, რაც უფრო სწორად პასუხობ, მით უფრო რთულდება — ისე, როგორც პროფესიულ ტესტებში.",
+    "Vivida-ზე ახალი ტესტი გამოვიდა, IQ ტესტი. ის ადაპტიურია და კულტურულად ნეიტრალური: შენს დონეს ერგება, რაც უფრო სწორად პასუხობ, მით უფრო რთულდება, ისე, როგორც პროფესიულ ტესტებში.",
   points: [
-    { e: "🎯", t: "შენი IQ ქულა და პროცენტილი", d: "ზუსტი შედეგი დიაპაზონით და გრაფიკით — სად ხარ მოსახლეობასთან შედარებით." },
-    { e: "🧩", t: "აზროვნების პროფილი", d: "ლოგიკა, რიცხვები, სივრცე და პატერნები — ცალ-ცალკე, რომ დაინახო შენი ძლიერი მხარეები." },
-    { e: "⏱️", t: "25 დავალება, ~25 წუთი", d: "დროზე გათვლილი, კულტურულად ნეიტრალური — უფასოდ, რეგისტრაციის გარეშე." },
+    { e: "🎯", t: "შენი IQ ქულა და პროცენტილი", d: "ზუსტი შედეგი დიაპაზონით და გრაფიკით, სად ხარ მოსახლეობასთან შედარებით." },
+    { e: "🧩", t: "აზროვნების პროფილი", d: "ლოგიკა, რიცხვები, სივრცე და პატერნები, ცალ-ცალკე, რომ დაინახო შენი ძლიერი მხარეები." },
+    { e: "⏱️", t: "25 დავალება, ~25 წუთი", d: "დროზე გათვლილი, კულტურულად ნეიტრალური, უფასოდ, რეგისტრაციის გარეშე." },
   ],
   profileNote:
-    "შედეგი, თუ გინდა, შენს საჯარო პროფილზეც გამოაჩინე — ან დაიტოვე მხოლოდ შენთვის.",
+    "შედეგი, თუ გინდა, შენს საჯარო პროფილზეც გამოაჩინე, ან დაიტოვე მხოლოდ შენთვის.",
   button: "გაიარე IQ ტესტი",
   closing: "სითბოთი და ვარსკვლავური ენერგიით,<br/>Vivida-ს გუნდი",
 };
@@ -125,7 +125,7 @@ async function main() {
     throw new Error(`unknown mode: ${mode}`);
   }
 
-  console.log(`mode=${mode} recipients=${recipients.length}${dry ? " (DRY RUN — nothing sent)" : ""}`);
+  console.log(`mode=${mode} recipients=${recipients.length}${dry ? " (DRY RUN, nothing sent)" : ""}`);
   if (dry) {
     console.log("subject:", C.subject);
     console.log(`(showing first 5 of ${recipients.length})`);

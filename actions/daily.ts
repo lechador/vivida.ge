@@ -71,14 +71,14 @@ export async function ensureDailyFor(
     .limit(1);
   if (!profile?.timezone) return null;
 
-  // Only positions are needed here (for transits) — never the AI narrative,
+  // Only positions are needed here (for transits), never the AI narrative,
   // so don't wait on or trigger a chart AI generation.
   const chart = await ensureChartFor(userId, { aiUpgrade: "skip" });
   if (!chart) return null;
 
   const today = localDateString(new Date(), profile.timezone);
 
-  // Cache check — same date, same prompt version, same natal data
+  // Cache check, same date, same prompt version, same natal data
   const [existing] = await db
     .select()
     .from(dailyHoroscopes)
@@ -200,7 +200,7 @@ export async function ensureDailyFor(
     outerAspects,
   };
 
-  // Fast path: compose the reading from the pre-generated transit library —
+  // Fast path: compose the reading from the pre-generated transit library,
   // zero AI calls, instant. Falls back to the full per-user model call only
   // when a needed library row is missing (self-healed in the background).
   let reading: {

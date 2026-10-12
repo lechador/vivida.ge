@@ -2,7 +2,7 @@ import { computeTransits } from "@/lib/transits";
 import { signByIndex } from "@/lib/zodiac";
 
 /**
- * Mercury-retrograde periods computed straight from the ephemeris — no
+ * Mercury-retrograde periods computed straight from the ephemeris, no
  * hardcoded date tables to go stale. Daily sampling is plenty: Mercury
  * stations are day-scale events, and the SEO page only needs dates.
  */

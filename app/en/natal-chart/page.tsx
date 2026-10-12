@@ -9,7 +9,7 @@ const TITLE = "What Is a Natal Chart? A Beginner's Birth Chart Guide";
 const DESCRIPTION = "Learn what a natal chart shows, why birth time matters, and how planets, zodiac signs, houses and aspects combine in a birth chart.";
 
 export const metadata: Metadata = {
-  title: { absolute: `${TITLE} — Vivida` },
+  title: { absolute: `${TITLE}, Vivida` },
   description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/nataluri-ruka", "en"),
   openGraph: { images: [DEFAULT_OG_IMAGE], title: TITLE, description: DESCRIPTION, url: URL, locale: "en_US", alternateLocale: ["ka_GE"] },

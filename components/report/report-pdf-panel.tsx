@@ -61,7 +61,7 @@ export async function ReportPdfPanel({
               <p className="mt-0.5 text-sm text-foreground/75">
                 {en
                   ? "Download your PDF whenever you need it."
-                  : "ჩამოტვირთე PDF — ხელმისაწვდომია ნებისმიერ დროს."}
+                  : "ჩამოტვირთე PDF, ხელმისაწვდომია ნებისმიერ დროს."}
               </p>
             </div>
           </div>
@@ -104,8 +104,8 @@ export async function ReportPdfPanel({
               <p className="mt-0.5 text-sm text-foreground/75">
                 {failed
                   ? en
-                    ? "Try again—there is no additional charge."
-                    : "სცადე ხელახლა — დამატებითი გადახდა საჭირო არ არის."
+                    ? "Try again, there is no additional charge."
+                    : "სცადე ხელახლა, დამატებითი გადახდა საჭირო არ არის."
                   : en
                     ? "This usually takes less than a minute."
                     : "ეს ჩვეულებრივ ერთ წუთზე ნაკლებს ანდომებს."}

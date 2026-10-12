@@ -25,17 +25,17 @@ import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 
 export const dynamic = "force-dynamic";
 
-const TITLE_KA = "ტარო ქართულად — ტაროზე მკითხაობა და ონლაინ გაშლა";
+const TITLE_KA = "ტარო ქართულად, ტაროზე მკითხაობა და ონლაინ გაშლა";
 const DESCRIPTION_KA =
-  "ტაროზე მკითხაობა ონლაინ, ქართულად: დაუსვი კითხვა და მიიღე ცოცხალი, პერსონალური პასუხი. ტაროს გაშლა სრული 78-კარტიანი დასტით — პირველი კითხვა უფასოა და პასუხისთვის სწრაფი ანგარიშია საჭირო.";
-const TITLE_EN = "Free Online Tarot Reading — Three-Card Spread";
+  "ტაროზე მკითხაობა ონლაინ, ქართულად: დაუსვი კითხვა და მიიღე ცოცხალი, პერსონალური პასუხი. ტაროს გაშლა სრული 78-კარტიანი დასტით, პირველი კითხვა უფასოა და პასუხისთვის სწრაფი ანგარიშია საჭირო.";
+const TITLE_EN = "Free Online Tarot Reading, Three-Card Spread";
 const DESCRIPTION_EN =
   "Ask a question and receive a personal three-card tarot reading. Explore clear upright and reversed meanings for all 78 cards of the full deck.";
 
 const FAQ_KA = [
   {
     q: "როგორ მუშაობს ონლაინ ტარო Vivida-ზე?",
-    a: "დაწერე შენი კითხვა, ჩვენ კი შემთხვევითად ვშლით 3-კარტიან განლაგებას (ფესვი, აწმყო, გზა) და AI ტაროლოგი წერს პერსონალურ პასუხს ქართულად — სამივე კარტს შენს კითხვასთან აკავშირებს.",
+    a: "დაწერე შენი კითხვა, ჩვენ კი შემთხვევითად ვშლით 3-კარტიან განლაგებას (ფესვი, აწმყო, გზა) და AI ტაროლოგი წერს პერსონალურ პასუხს ქართულად, სამივე კარტს შენს კითხვასთან აკავშირებს.",
   },
   {
     q: "რამდენი ღირს ტარო კითხვა?",
@@ -43,11 +43,11 @@ const FAQ_KA = [
   },
   {
     q: "ტარო მართლა წინასწარმეტყველებს მომავალს?",
-    a: "ტარო წინასწარმეტყველება კი არა, ხედვის ინსტრუმენტია — ის გეხმარება საკუთარი სიტუაცია სხვა კუთხიდან დაინახო და უკეთესი გადაწყვეტილება მიიღო. მომავალი შენს ხელთაა.",
+    a: "ტარო წინასწარმეტყველება კი არა, ხედვის ინსტრუმენტია, ის გეხმარება საკუთარი სიტუაცია სხვა კუთხიდან დაინახო და უკეთესი გადაწყვეტილება მიიღო. მომავალი შენს ხელთაა.",
   },
   {
     q: "რომელ კარტებს იყენებთ?",
-    a: "სრულ 78-კარტიან დასტას — 22 დიდ არკანსა და 56 მცირე არკანას (თასები, ხმლები, კვერთხები, მონეტები). თითო კარტს აქვს პირდაპირი და შებრუნებული მნიშვნელობა.",
+    a: "სრულ 78-კარტიან დასტას, 22 დიდ არკანსა და 56 მცირე არკანას (თასები, ხმლები, კვერთხები, მონეტები). თითო კარტს აქვს პირდაპირი და შებრუნებული მნიშვნელობა.",
   },
 ];
 
@@ -218,9 +218,8 @@ export default async function TaroHubPage() {
               </>
             ) : (
               <>
-                ტაროზე მკითხაობა ონლაინ — დაუსვი კითხვა კარტებს და მიიღე
-                ცოცხალი, პერსონალური პასუხი.{" "}
-                {!premium && "პირველი კითხვა უფასოა."}
+                ტაროზე მკითხაობა ონლაინ, დაუსვი კითხვა კარტებს და მიიღე ცოცხალი,
+                პერსონალური პასუხი. {!premium && "პირველი კითხვა უფასოა."}
               </>
             )}
           </p>
@@ -234,17 +233,17 @@ export default async function TaroHubPage() {
           premium={premium}
         />
 
-        {/* All cards — internal linking + SEO cluster */}
+        {/* All cards, internal linking + SEO cluster */}
         <section className="mt-12">
           <h2 className="text-xl font-semibold tracking-tight">
             {en
-              ? "The full tarot deck — 78 cards"
-              : "ტაროს სრული დასტა — 78 კარტი"}
+              ? "The full tarot deck, 78 cards"
+              : "ტაროს სრული დასტა, 78 კარტი"}
           </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
             {en
               ? "Explore the upright and reversed meaning of every card."
-              : "აღმოაჩინე თითო კარტის მნიშვნელობა — პირდაპირი და შებრუნებული."}
+              : "აღმოაჩინე თითო კარტის მნიშვნელობა, პირდაპირი და შებრუნებული."}
           </p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {tarotDetailDeck(en ? "en" : "ka").map((c: TarotDetailCard) => {
@@ -312,7 +311,7 @@ export default async function TaroHubPage() {
             <p className="mt-3 max-w-md text-pretty text-base text-muted-foreground">
               {en
                 ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
-                : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს — მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
+                : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს, მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
             </p>
             <Link
               href={en ? "/natal-chart" : "/nataluri-ruka"}

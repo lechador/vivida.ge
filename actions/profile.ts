@@ -37,7 +37,7 @@ export async function saveProfile(
   const result = await saveBirthDataCore(user.id, input);
   if (!result.ok) return result;
 
-  // Pre-generate the natal chart in the background — Gemini interpretation
+  // Pre-generate the natal chart in the background, Gemini interpretation
   // can take 10-30s on a cold call and was blocking the wizard submit
   // button. /dashboard renders a CosmicLoader inside <Suspense> for its
   // own ensureChartFor call, so the user sees progress immediately
@@ -54,7 +54,7 @@ export async function saveProfile(
         (err as Error).message,
       );
     }
-    // Reputation — credit the one-shot profile_completed milestone.
+    // Reputation, credit the one-shot profile_completed milestone.
     // Dedup index makes a second save a no-op so editing later doesn't
     // re-fire the bonus.
     await awardReputation({
@@ -62,7 +62,7 @@ export async function saveProfile(
       kind: "profile_completed",
       subjectId: RepSubject.oneShot(userId),
     });
-    // Welcome email — onboarding is now complete (email verified + birth
+    // Welcome email, onboarding is now complete (email verified + birth
     // data saved), so this is the right moment for "your cosmic journey
     // begins." Idempotent, so later profile edits never re-send.
     await sendWelcomeIfEligible(userId);
@@ -110,7 +110,7 @@ export async function updateProfileFields(
 
 /**
  * Toggle discovery opt-out. When off, the user disappears from the /people
- * directory, people search, and "suggested people" rails — their profile
+ * directory, people search, and "suggested people" rails, their profile
  * stays reachable by direct link. Instant-save (no Save button).
  */
 export async function setDiscoverable(value: boolean): Promise<void> {

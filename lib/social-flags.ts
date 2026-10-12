@@ -2,15 +2,15 @@
  * Central on/off switches for the density-dependent / higher-risk social
  * surfaces. These features only make sense at a healthy user density and
  * widen the safety surface (stranger discovery), so they ship OFF while the
- * user base is small. Flip a single env var per environment to re-enable —
+ * user base is small. Flip a single env var per environment to re-enable,
  * no code change, nothing is deleted.
  *
  * Values are read from NEXT_PUBLIC_* env vars so both server components
  * (route guards) and client components (nav, dashboard rail, chat empty
  * state) see the same answer. Accepted "on" values: "1" or "true".
  *
- * NOTE: each env var is referenced as a *literal* `process.env.NEXT_PUBLIC_…`
- * — Next only inlines literal accesses into the client bundle, so a dynamic
+ * NOTE: each env var is referenced as a *literal* `process.env.NEXT_PUBLIC_…`,
+ * Next only inlines literal accesses into the client bundle, so a dynamic
  * `process.env[name]` lookup would silently read undefined on the client.
  */
 

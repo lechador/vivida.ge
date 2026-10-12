@@ -18,7 +18,7 @@ const MESSAGES_EN = [
 ];
 
 /**
- * Live "your horoscope is being written" loader — an eased progress crawl with
+ * Live "your horoscope is being written" loader, an eased progress crawl with
  * rotating status messages. Replaces the pulsing skeleton so the wait feels
  * like something is actually happening. Generation is opaque (AI), so the bar
  * eases toward ~92% and the parent swaps in the real card when ready.

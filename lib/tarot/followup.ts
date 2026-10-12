@@ -10,7 +10,7 @@ import { normalizeTarotFollowupSuggestions } from "@/lib/tarot/followup-suggesti
 /**
  * A follow-up question on an already-drawn spread. The first follow-up per
  * reading is free; each next one costs CREDIT_COST.tarotFollowup. No new
- * cards are drawn — the answer stays inside the original spread.
+ * cards are drawn, the answer stays inside the original spread.
  */
 
 export type TarotFollowupEntry = {
@@ -39,7 +39,7 @@ function orientationFor(reversed: boolean, locale: UserLocale): string {
   return reversed ? "შებრუნებული" : "პირდაპირი";
 }
 
-/** Static answer used when the AI call fails — a paid follow-up never returns empty. */
+/** Static answer used when the AI call fails, a paid follow-up never returns empty. */
 function fallbackAnswer(interpretations: string[], locale: UserLocale): string {
   const joined = interpretations.join(" ");
   if (locale === "en") {

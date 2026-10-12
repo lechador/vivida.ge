@@ -27,7 +27,7 @@ export const users = pgTable(
     emailVerified: timestamp("emailVerified", { mode: "date" }),
     image: text("image"),
     /**
-     * bcrypt hash of the user's password — only set when they registered with
+     * bcrypt hash of the user's password, only set when they registered with
      * email/password. NULL for OAuth-only accounts (Google), which gate login
      * via the OAuth provider instead of a stored hash.
      */
@@ -102,7 +102,7 @@ export const users = pgTable(
       withTimezone: true,
     }),
     /** Random opaque token used in unsubscribe links. Lazily populated on
-     *  first send — see lib/unsubscribe.ts. Unique so a token resolves to
+     *  first send, see lib/unsubscribe.ts. Unique so a token resolves to
      *  at most one user. */
     unsubscribeToken: text("unsubscribe_token").unique(),
     /** Updated by Auth.js events.signIn whenever the user logs in. NULL
@@ -112,12 +112,12 @@ export const users = pgTable(
      * Manual restriction override for trust & safety. The *effective*
      * restriction (see lib/restriction.ts) is `restricted OR under-min-age`,
      * so under-age accounts are restricted by their birth date automatically
-     * and auto-lift at adulthood — this flag is for non-age cases (e.g. a bad
+     * and auto-lift at adulthood, this flag is for non-age cases (e.g. a bad
      * actor) and is NOT set for the underage accounts (that would defeat the
      * auto-reverse).
      */
     restricted: boolean("restricted").notNull().default(false),
-    /** This user's own referral code (short, unique) — lazily generated the
+    /** This user's own referral code (short, unique), lazily generated the
      *  first time they open the invite screen. Others sign up via /?ref=code. */
     referralCode: text("referral_code").unique(),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -224,10 +224,10 @@ export const phoneVerifications = pgTable(
     id: text("id")
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    /** E.164 (+995XXXXXXXXX) — see lib/phone.ts normalization. */
+    /** E.164 (+995XXXXXXXXX), see lib/phone.ts normalization. */
     phone: text("phone").notNull(),
     purpose: phoneVerificationPurposeEnum("purpose").notNull(),
-    /** SHA-256 of `${phone}:${code}` — the raw code never touches the DB. */
+    /** SHA-256 of `${phone}:${code}`, the raw code never touches the DB. */
     codeHash: text("code_hash").notNull(),
     /** Random token handed to the client only after a correct code entry;
      *  signup submits it to bind the verified number to the new account. */
@@ -255,8 +255,8 @@ export const phoneVerifications = pgTable(
  *
  * The website uses Auth.js cookie sessions; native apps can't, so the
  * mobile flow issues a short-lived JWT access token plus a long-lived
- * refresh token. We never store the raw refresh token — only its SHA-256
- * hash — so a DB leak can't be replayed. Rotation: each /auth/refresh
+ * refresh token. We never store the raw refresh token, only its SHA-256
+ * hash, so a DB leak can't be replayed. Rotation: each /auth/refresh
  * call revokes the presented token and issues a new one. Logout (and
  * "log out everywhere") revokes by setting revokedAt.
  */
@@ -286,8 +286,8 @@ export const mobileRefreshTokens = pgTable(
 /**
  * Fixed-window rate-limit counters, used to cap abuse on the mobile API's
  * unauthenticated endpoints (login, register, password reset). One row per
- * (bucket, identifier, window). The identifier is a SHA-256 hash — never a
- * raw IP or email — so this table holds no PII. Old windows are dead weight
+ * (bucket, identifier, window). The identifier is a SHA-256 hash, never a
+ * raw IP or email, so this table holds no PII. Old windows are dead weight
  * and pruned by the daily cron (see lib/rate-limit.pruneRateLimits).
  */
 export const rateLimitHits = pgTable(

@@ -1,5 +1,5 @@
-// Proofread the "true zodiac sign" quiz copy — questions, answer options and
-// the 12 sign blurbs — for Georgian grammar/orthography/naturalness. Sends
+// Proofread the "true zodiac sign" quiz copy, questions, answer options and
+// the 12 sign blurbs, for Georgian grammar/orthography/naturalness. Sends
 // everything to gemini-3.8-flash (Vertex) with a strict "fix language only,
 // preserve meaning + the element/modality it points to" instruction and prints
 // every change so the static source (lib/true-sign/quiz.ts) can be synced.
@@ -74,7 +74,7 @@ async function main() {
     console.log(`\n[${it.key}]\n  - ${it.text}\n  + ${fixed}`);
   }
   console.log(
-    `\n${changed} of ${items.length} strings changed (dry run — apply to source by hand).`,
+    `\n${changed} of ${items.length} strings changed (dry run, apply to source by hand).`,
   );
 }
 

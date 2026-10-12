@@ -3,9 +3,9 @@ import type { NatalChartJson, PointJson } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Compact, scannable planet-positions table — the at-a-glance data layer of
+ * Compact, scannable planet-positions table, the at-a-glance data layer of
  * the report. Each whole row is a single in-page anchor that scrolls down to
- * that point's interpretation (#planet-<key>) — no navigation away. Glyphs sit
+ * that point's interpretation (#planet-<key>), no navigation away. Glyphs sit
  * in fixed-width boxes so the names line up on a straight vertical edge.
  * Server component (native anchors, no client JS).
  */

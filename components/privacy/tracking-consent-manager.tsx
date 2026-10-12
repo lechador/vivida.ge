@@ -111,7 +111,7 @@ export function TrackingConsentManager({
   const showPanel = ready && (consent === null || settingsOpen);
   // Reserve document space equal to the panel's height while it is open. The
   // panel is `fixed`, so without this it sits on top of whatever is at the
-  // bottom of the page and that content can never be scrolled clear — on
+  // bottom of the page and that content can never be scrolled clear, on
   // /login that was the submit button and the sign-up link.
   useEffect(() => {
     const el = panelRef.current;
@@ -166,8 +166,8 @@ export function TrackingConsentManager({
       )}
 
       {/* The panel is deliberately compact on mobile: at 375px the roomier
-          desktop treatment grew tall enough to cover the whole /login form —
-          fields, submit and the sign-up link — so a first-time visitor could
+          desktop treatment grew tall enough to cover the whole /login form,
+          fields, submit and the sign-up link, so a first-time visitor could
           neither sign in nor register until they dismissed it. Georgian copy
           runs ~30% longer than English, which made it worse on the primary
           domain. Height is also hard-capped as a backstop. */}

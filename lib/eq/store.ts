@@ -9,7 +9,7 @@ import { calculateEq, type EqResult } from "@/lib/eq/scoring";
  * Persist a completed EQ attempt. Scores server-side (authoritative, same
  * function the client uses) and upserts by `attemptId` so a refreshed result
  * page doesn't create duplicate rows. Anonymous attempts are kept too
- * (`userId` null) — the raw material for self-norming the score distribution.
+ * (`userId` null), the raw material for self-norming the score distribution.
  */
 export async function saveEqResult(input: {
   attemptId: string;

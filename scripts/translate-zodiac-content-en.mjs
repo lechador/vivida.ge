@@ -19,7 +19,7 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "google/gemini-3.8-flash";
 const KEY = process.env.OPENROUTER_API_KEY;
 if (!KEY) {
-  console.error("OPENROUTER_API_KEY is not set in .env.local — aborting.");
+  console.error("OPENROUTER_API_KEY is not set in .env.local, aborting.");
   process.exit(1);
 }
 

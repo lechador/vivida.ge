@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { grantMonthlyCredits } from "@/lib/credits-monthly";
 
 /**
- * Monthly free-credit drop — cron-triggered.
+ * Monthly free-credit drop, cron-triggered.
  *
- * Schedule (vercel.json): `0 6 1 * *` — 06:00 UTC on the 1st of each month
+ * Schedule (vercel.json): `0 6 1 * *`, 06:00 UTC on the 1st of each month
  * (10:00 Asia/Tbilisi). grantMonthlyCredits is idempotent per month (keyed by
  * the YYYY-MM ref), so a manual re-fire or an accidental double-tick never
  * double-grants.

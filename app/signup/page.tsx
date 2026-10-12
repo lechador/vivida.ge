@@ -16,10 +16,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
     title: locale !== "ka" ? "Create an account" : "რეგისტრაცია",
-    // Auth utility page — keep it crawlable for link equity but out of the
+    // Auth utility page, keep it crawlable for link equity but out of the
     // index (thin copy was indexable on both hosts).
     robots: { index: false, follow: true },
-    // Same-path language pair — see the note in app/login/page.tsx.
+    // Same-path language pair, see the note in app/login/page.tsx.
     alternates: localizedAlternates(
       "/signup",
       "/signup",
@@ -55,8 +55,8 @@ export default async function SignupPage({
       title={en ? "Create your account" : "შექმენი შენი ანგარიში"}
       subtitle={
         en
-          ? "It takes a minute—your cosmos is waiting."
-          : "ერთ წუთში — შენი კოსმოსი გელოდება."
+          ? "It takes a minute, your cosmos is waiting."
+          : "ერთ წუთში, შენი კოსმოსი გელოდება."
       }
       footer={
         <>

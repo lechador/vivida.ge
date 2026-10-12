@@ -10,9 +10,9 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * Reusable cosmic loading state.
  *
  * Two visual modes:
- *  - Default (terse): single status line — used for route-level fallbacks
+ *  - Default (terse): single status line, used for route-level fallbacks
  *    where the wait is usually sub-second.
- *  - `progressive=true`: percentage bar + cycling stage messages — used
+ *  - `progressive=true`: percentage bar + cycling stage messages, used
  *    on the dashboard's first-paint loader because cold bundle loads can
  *    take 10–15s while AI calls warm up. The progress curve is purely
  *    cosmetic (we have no real percentage from the server) and uses an
@@ -72,12 +72,12 @@ function SimpleStatus({ locale }: { locale: UserLocale }) {
 }
 
 /**
- * Stages tied to the rough progression of `loadDashboardCore` — the fast,
+ * Stages tied to the rough progression of `loadDashboardCore`, the fast,
  * AI-free first wave (chart positions + suggestions). The AI cards (daily,
  * weekly, moon) load separately behind their own skeletons, so this loader
  * is usually on screen for ~1s.
  *
- * `at` is the progress threshold (0..1) — the message swaps when the
+ * `at` is the progress threshold (0..1), the message swaps when the
  * cosmetic bar crosses it.
  */
 const STAGES: Array<{ at: number; label: string }> = [
@@ -96,11 +96,11 @@ const STAGES_EN: Array<{ at: number; label: string }> = [
 function ProgressiveStatus({ locale }: { locale: UserLocale }) {
   const [progress, setProgress] = useState(0);
 
-  // Asymptotic ease — progress = 1 - e^(-t / tau). With tau≈2s, the bar
+  // Asymptotic ease, progress = 1 - e^(-t / tau). With tau≈2s, the bar
   // reaches ~95% at ~6s and approaches but never hits 100%, which is the
   // honest signal: we don't know exactly when core resolves. The core wave
   // is AI-free and usually settles in ~1s, so the bar moves briskly. When
-  // the parent unmounts us, the bar disappears — we never animate to 100%.
+  // the parent unmounts us, the bar disappears, we never animate to 100%.
   useEffect(() => {
     const start = performance.now();
     let raf = 0;
@@ -165,7 +165,7 @@ function ProgressiveStatus({ locale }: { locale: UserLocale }) {
 
 /**
  * SVG zodiac wheel skeleton with a slow rotation + planets drawing in.
- * Pure animation, no real data — just a hint of "shape forming".
+ * Pure animation, no real data, just a hint of "shape forming".
  */
 function SpinningChart() {
   const size = 220;

@@ -28,9 +28,9 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * screen; after each answer we re-estimate ability (EAP) and serve the item
  * whose difficulty best matches it, so strong takers climb into genuinely hard
  * territory and everyone reaches a precise score in fewer items. Fixed length
- * (IQ_ADAPTIVE_LENGTH); no going back — that would invalidate the adaptive path.
+ * (IQ_ADAPTIVE_LENGTH); no going back, that would invalidate the adaptive path.
  * A global countdown auto-submits at zero. Answers are stashed in localStorage
- * and scored on /iq-testi/shedegi — no server round-trip needed.
+ * and scored on /iq-testi/shedegi, no server round-trip needed.
  */
 export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
@@ -86,7 +86,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
         }),
       );
     } catch {
-      /* private mode — result page will bounce back if it can't read */
+      /* private mode, result page will bounce back if it can't read */
     }
     trackEvent(ANALYTICS_EVENT.testCompleted, {
       test: "iq",
@@ -96,7 +96,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
     router.push(localizedHref("/iq-testi/shedegi", locale));
   }
 
-  // One stable countdown — never re-armed, so answering never resets it.
+  // One stable countdown, never re-armed, so answering never resets it.
   useEffect(() => {
     const id = setInterval(() => {
       setTimeLeft((s) => {
@@ -117,7 +117,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   }
 
   // Forward-only: record this answer (or -1 skip), re-estimate θ, serve the
-  // next best-matched item — or finish once the fixed length is reached.
+  // next best-matched item, or finish once the fixed length is reached.
   function advance() {
     const chosen = answers[q.id] ?? -1;
     const nextAnswers = { ...answers, [q.id]: chosen };
@@ -198,7 +198,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
         />
       </div>
 
-      {/* Nav — adaptive: forward only */}
+      {/* Nav, adaptive: forward only */}
       <div className="mt-8 flex items-center justify-end gap-3">
         {isLast ? (
           <Button type="button" variant="mystic" size="lg" onClick={advance}>
@@ -308,7 +308,7 @@ function IqStem({ item, locale }: { item: IqItem; locale: UserLocale }) {
     );
   }
 
-  // odd-one-out has no separate stem — the options are the figures.
+  // odd-one-out has no separate stem, the options are the figures.
   return null;
 }
 

@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { reports, type ReportTargetType } from "@/db/schema";
 
 /**
- * Report *write* logic. Deliberately minimal — capture the report for the
+ * Report *write* logic. Deliberately minimal, capture the report for the
  * safety review queue (moderated from the separate vivida-admin app).
  * Moderation decisions and restrictions are handled separately in
  * lib/admin-safety.ts.
@@ -35,7 +35,7 @@ export async function createReportCore(
 
   const reason = (input.reason ?? "").trim().slice(0, MAX_REASON) || null;
 
-  // Dedup: one open report per (reporter, target) — repeat taps are no-ops
+  // Dedup: one open report per (reporter, target), repeat taps are no-ops
   // rather than flooding the queue.
   const [existing] = await db
     .select({ id: reports.id })

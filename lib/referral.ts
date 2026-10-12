@@ -12,13 +12,13 @@ import {
 import { provisionSignupCredits } from "@/lib/signup-credit-experiment";
 
 /**
- * Referral engine — the credit-earning growth loop.
+ * Referral engine, the credit-earning growth loop.
  *
  *   1. Every user has a short `referral_code`; they share /?ref=CODE.
  *   2. A visitor who lands with ?ref=CODE gets it stored in a cookie
  *      (REF_COOKIE); on signup we attribute them to the referrer (once).
- *   3. When that invited user *activates* — verifies email AND fills birth
- *      data — the referral qualifies and the referrer is paid REFERRAL_REWARD,
+ *   3. When that invited user *activates*, verifies email AND fills birth
+ *      data, the referral qualifies and the referrer is paid REFERRAL_REWARD,
  *      exactly once. Verification and a completed birth profile reduce
  *      abandoned signups; the profile duplicate guard blocks strong matches,
  *      and self-referral is blocked at attribution.
@@ -52,7 +52,7 @@ export async function ensureReferralCode(userId: string): Promise<string> {
         .where(eq(users.id, userId));
       return code;
     } catch (e) {
-      if ((e as { code?: string }).code === "23505") continue; // code collision — retry
+      if ((e as { code?: string }).code === "23505") continue; // code collision, retry
       throw e;
     }
   }
@@ -85,7 +85,7 @@ export async function attributeReferral(
 /**
  * Called when an invited user activates. If they meet the qualification gate
  * (verified email + birth data) and a still-unpaid referral exists, mark it
- * qualified and pay the referrer — atomically, exactly once. Safe to call on
+ * qualified and pay the referrer, atomically, exactly once. Safe to call on
  * every onboarding save; it's a cheap no-op once credited.
  */
 export async function qualifyReferral(invitedUserId: string): Promise<void> {
@@ -109,7 +109,7 @@ export async function qualifyReferral(invitedUserId: string): Promise<void> {
     .limit(1);
   if (!inv || !inv.verified || !inv.dob) return; // not activated yet
 
-  // Claim the payout atomically — only the caller that flips credited_at wins.
+  // Claim the payout atomically, only the caller that flips credited_at wins.
   const claimed = await db
     .update(referrals)
     .set({

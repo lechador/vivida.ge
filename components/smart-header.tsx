@@ -20,7 +20,7 @@ type MarketingActive =
  * an "open app" link after hydration for signed-in visitors.
  *
  * In-app authed pages (dashboard, feed, …) render `AppHeader` directly and stay
- * dynamic — this component is only for the public surface.
+ * dynamic, this component is only for the public surface.
  */
 export function SmartHeader({
   active,

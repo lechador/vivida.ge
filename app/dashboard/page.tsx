@@ -220,7 +220,7 @@ export default async function DashboardPage() {
           <PopularTools locale={locale} placement="dashboard_top" />
         </div>
 
-        {/* Soft prompt to enable daily push — hides itself once enabled,
+        {/* Soft prompt to enable daily push, hides itself once enabled,
             unsupported, or dismissed. */}
         <PushOptIn variant="banner" locale={locale} />
 

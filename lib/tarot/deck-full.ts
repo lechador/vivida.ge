@@ -7,7 +7,7 @@ import {
 } from "@/lib/tarot/deck-minor";
 import { MINOR_EN_BY_SLUG } from "@/lib/tarot/deck-minor-en";
 
-/** Any card the reader can draw — a major or a minor. */
+/** Any card the reader can draw, a major or a minor. */
 export type DeckCard = TarotCard | MinorTarotCard;
 
 export function isMinorCard(card: DeckCard): card is MinorTarotCard {
@@ -40,7 +40,7 @@ export function englishCardBySlug(
 export function tarotImageUrl(slug: string): string {
   if (!MINOR_BY_SLUG[slug]) return `/tarot/${slug}.webp`;
   const base = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
-  // ?v=2 — minors were re-processed to 2:3 (blur-padded) after the first
+  // ?v=2, minors were re-processed to 2:3 (blur-padded) after the first
   // upload; the query breaks stale CDN/browser caches of the 9:16 originals.
   return base ? `${base}/tarot/${slug}.webp?v=2` : `/tarot/${slug}.webp`;
 }

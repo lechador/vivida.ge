@@ -1,11 +1,11 @@
-// Recalibrate the IQ test from real responses — REPORT ONLY (never writes).
+// Recalibrate the IQ test from real responses, REPORT ONLY (never writes).
 //
 // Two outputs:
 //   1. Observed difficulty (b) per item, from the stored per-taker θ and each
 //      item's right/wrong (conditional Rasch MLE). Compare to the assigned b in
 //      lib/iq/items.ts and nudge the outliers.
 //   2. A suggested θ→IQ anchor (THETA_MEAN, THETA_SD) so the real population of
-//      takers maps to IQ mean 100 / SD 15 — replaces the provisional constants
+//      takers maps to IQ mean 100 / SD 15, replaces the provisional constants
 //      in lib/iq/scoring.ts once the sample is big enough.
 //
 // Usage: node scripts/recalibrate-iq.mjs   (needs DATABASE_URL in .env.local)
@@ -33,7 +33,7 @@ const rows = await sql`SELECT theta, item_correct
 console.log(`completed tests with per-item data: ${rows.length}`);
 if (rows.length < MIN_RESULTS) {
   console.log(
-    `\nNeed ≥ ${MIN_RESULTS} to re-norm with confidence — collecting. (Nothing changed.)`
+    `\nNeed ≥ ${MIN_RESULTS} to re-norm with confidence, collecting. (Nothing changed.)`
   );
   process.exit(0);
 }
@@ -84,7 +84,7 @@ for (const [id, pts] of byItem) {
     id,
     seen: pts.length,
     pass: Math.round(pass * 100),
-    b: pts.length >= MIN_EXPOSURES ? observedB(pts).toFixed(2) : "—(low n)",
+    b: pts.length >= MIN_EXPOSURES ? observedB(pts).toFixed(2) : ", (low n)",
   });
 }
 report.sort((a, b) => a.seen - b.seen);
@@ -96,4 +96,4 @@ for (const r of report) {
     `  ${r.id.padEnd(7)} ${String(r.seen).padStart(5)}  ${String(r.pass).padStart(5)}   ${r.b}`
   );
 }
-console.log("\nReport only — no changes written. Edit items.ts / scoring.ts by hand.");
+console.log("\nReport only, no changes written. Edit items.ts / scoring.ts by hand.");

@@ -69,7 +69,7 @@ export function SwipeDeck({
 
   const handleLike = useCallback(
     (card: DiscoverCard) => {
-      // Fire the friend request optimistically — animation runs in parallel
+      // Fire the friend request optimistically, animation runs in parallel
       // with the network call so the deck never feels laggy.
       sendFriendRequest(card.userId, card.username)
         .then((res) => {
@@ -88,8 +88,8 @@ export function SwipeDeck({
           setToast({
             kind: "err",
             text: en
-              ? "Could not send the request — please try again"
-              : "ვერ გაიგზავნა — სცადე თავიდან",
+              ? "Could not send the request, please try again"
+              : "ვერ გაიგზავნა, სცადე თავიდან",
           });
         });
 
@@ -135,7 +135,7 @@ export function SwipeDeck({
       <p className="mt-3 text-center text-xs text-muted-foreground">
         {en
           ? "Swipe right to connect · swipe left to pass"
-          : "მარჯვნივ — მეგობრობის თხოვნა · მარცხნივ — სხვა"}
+          : "მარჯვნივ, მეგობრობის თხოვნა · მარცხნივ, სხვა"}
       </p>
 
       <AnimatePresence>
@@ -180,7 +180,7 @@ function DeckExhausted({
       <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
         {en
           ? "More people are on the horizon. Check back later for new profiles."
-          : "ცა მომდევნო ხალხს გელის — ცოტა მოგვიანებით ახალი პროფილები გამოჩნდება."}
+          : "ცა მომდევნო ხალხს გელის, ცოტა მოგვიანებით ახალი პროფილები გამოჩნდება."}
       </p>
       <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
         <Button onClick={onReshuffle} variant="outline" size="sm">

@@ -18,7 +18,7 @@ const DESCRIPTION =
 const LAST_UPDATED = "October 2, 2026";
 
 export const metadata: Metadata = {
-  title: { absolute: `${TITLE} — Vivida` },
+  title: { absolute: `${TITLE}, Vivida` },
   description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/privacy", "en"),
   openGraph: {
@@ -88,7 +88,7 @@ export default function EnglishPrivacyPage() {
         </ul>
         <p>
           An email address is required to hold an account, and birth date, time
-          and place are required to calculate a chart — without them those
+          and place are required to calculate a chart, without them those
           features cannot be provided. Everything else (photographs, biography,
           gender, city, community activity) is optional, and declining it only
           limits the related feature.

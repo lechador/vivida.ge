@@ -6,8 +6,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/search?q= — site-wide search for the public homepage. Returns
- * matching pages (from the static catalog — instant, no DB) plus public
+ * GET /api/search?q=, site-wide search for the public homepage. Returns
+ * matching pages (from the static catalog, instant, no DB) plus public
  * profiles (discoverable users only). Short/empty queries return nothing.
  */
 export async function GET(req: Request) {

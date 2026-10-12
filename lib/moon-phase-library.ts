@@ -1,5 +1,5 @@
 /**
- * Reusable moon-phase reading library — the moon counterpart of the transit
+ * Reusable moon-phase reading library, the moon counterpart of the transit
  * library. A moon-phase reading is collective (identical for every user) and
  * fully determined by (phase, moon sign): 8 × 12 = 96 combos, each storing
  * the complete reading shape (headline/summary/body/themes). ensureMoonPhase
@@ -22,7 +22,7 @@ export function moonPhaseLibraryKey(phase: PhaseKey, sign: string): string {
   return `${phase}:${sign}`;
 }
 
-/** Pure read — never generates. Admin edits reflect on the next new day. */
+/** Pure read, never generates. Admin edits reflect on the next new day. */
 export async function getMoonPhaseLibraryEntry(
   phase: PhaseKey,
   sign: string
@@ -42,7 +42,7 @@ export async function getMoonPhaseLibraryEntry(
 
 /**
  * Save a generated reading as the library entry for its combo (self-heal).
- * Never overwrites — seeded or curated rows win over one-off generations.
+ * Never overwrites, seeded or curated rows win over one-off generations.
  */
 export async function saveMoonPhaseLibraryEntry(
   phase: PhaseKey,

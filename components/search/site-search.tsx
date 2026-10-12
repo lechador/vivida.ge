@@ -35,7 +35,7 @@ type Flat =
 export function SiteSearch({
   className,
   compact = false,
-  placeholder = "ძებნა — ნიშანი, ტესტი, ჰოროსკოპი, ხალხი…",
+  placeholder = "ძებნა, ნიშანი, ტესტი, ჰოროსკოპი, ხალხი…",
 }: {
   /** Root width/layout override (defaults to a hero-sized max width). */
   className?: string;
@@ -125,7 +125,7 @@ export function SiteSearch({
     };
   }, [term, surface]);
 
-  // Close on outside click — the panel is portalled to <body>, so check both
+  // Close on outside click, the panel is portalled to <body>, so check both
   // the input box and the panel itself.
   useEffect(() => {
     function onDown(e: MouseEvent) {

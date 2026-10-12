@@ -140,7 +140,7 @@ export async function moderateSafetyReportCore(
   if (needsTarget && !targetUser) {
     return {
       ok: false,
-      error: "საჩივრის სამიზნე მომხმარებელი აღარ არსებობს — restriction ვერ შეიცვლება.",
+      error: "საჩივრის სამიზნე მომხმარებელი აღარ არსებობს, restriction ვერ შეიცვლება.",
     };
   }
   if (input.action === "restrict" && isAdminEmail(targetUser?.email)) {

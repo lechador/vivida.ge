@@ -95,9 +95,9 @@ export async function sendPushToUser(
   return subs.length ? sendToSubs(subs, payload) : 0;
 }
 
-const GENERIC_BODY = "შენი დღევანდელი ჰოროსკოპი მზადაა — გახსენი და ნახე ✨";
+const GENERIC_BODY = "შენი დღევანდელი ჰოროსკოპი მზადაა, გახსენი და ნახე ✨";
 const GENERIC_BODY_EN =
-  "Your daily horoscope is ready — open it to read more ✨";
+  "Your daily horoscope is ready, open it to read more ✨";
 
 /**
  * Daily push blast. One notification per subscribed user, using today's

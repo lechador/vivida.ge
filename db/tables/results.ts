@@ -14,7 +14,7 @@ import type { MbtiScoresJson } from "./archive";
 import { users } from "./users";
 
 /**
- * "Chat with your chart" (ჰკითხე ვარსკვლავებს) — one ongoing thread per user.
+ * "Chat with your chart" (ჰკითხე ვარსკვლავებს), one ongoing thread per user.
  * Each row is a turn; `role` is 'user' | 'assistant'. The AI is grounded in
  * the user's natal chart at request time (not stored per message).
  */
@@ -40,7 +40,7 @@ export const chartChatMessages = pgTable(
 export type ChartChatMessage = typeof chartChatMessages.$inferSelect;
 
 /**
- * Long-term memory for \"chat with your chart\" — one row per user.
+ * Long-term memory for \"chat with your chart\", one row per user.
  * A rolling portrait the model refines over time (who the user is, what
  * they care about, how they like to be spoken to), so replies adapt beyond
  * the last-12-messages window. Refreshed by a cheap background LLM merge
@@ -57,8 +57,8 @@ export const askUserMemories = pgTable("ask_user_memory", {
   summary: text("summary").notNull().default(""),
   /**
    * Structured traits the prompt mirrors:
-   * style: { verbosity: 'short'|'medium'|'detailed', tone: string } —
-   * topics: string[] — recurring interests; notes: short-lived context.
+   * style: { verbosity: 'short'|'medium'|'detailed', tone: string },
+   * topics: string[], recurring interests; notes: short-lived context.
    */
   traits: jsonb("traits").$type<AskUserMemoryTraits>().notNull().default({}),
   /** Total user turns seen when the memory was last refreshed. */
@@ -83,7 +83,7 @@ export type AskUserMemory = typeof askUserMemories.$inferSelect;
 
 /**
  * 7-day forecast for the dashboard, one row per user. The same row is
- * overwritten each new local-day — we never need a history of forecasts.
+ * overwritten each new local-day, we never need a history of forecasts.
  * Each entry in `days` is a (computed scores + AI narrative) pair for one
  * calendar day.
  */
@@ -91,7 +91,7 @@ export const weeklyForecasts = pgTable("weekly_forecast", {
   userId: text("user_id")
     .primaryKey()
     .references(() => users.id, { onDelete: "cascade" }),
-  /** Local date (YYYY-MM-DD) of `days[0]` — the user's "today" when generated. */
+  /** Local date (YYYY-MM-DD) of `days[0]`, the user's "today" when generated. */
   weekStart: date("week_start", { mode: "string" }).notNull(),
   days: jsonb("days").$type<WeeklyForecastDay[]>().notNull(),
   promptVersion: integer("prompt_version").notNull().default(1),
@@ -107,9 +107,9 @@ export const weeklyForecasts = pgTable("weekly_forecast", {
 export type WeeklyForecastDay = {
   dateIso: string; // YYYY-MM-DD (user's local TZ)
   weekdayKa: string; // ე.ხ. "ორშაბათი"
-  /** 0-100 — intensity-weighted sum of harmonic transit-to-natal aspects. */
+  /** 0-100, intensity-weighted sum of harmonic transit-to-natal aspects. */
   harmonyScore: number;
-  /** 0-100 — intensity-weighted sum of tense transit-to-natal aspects. */
+  /** 0-100, intensity-weighted sum of tense transit-to-natal aspects. */
   challengeScore: number;
   moonSignKa: string;
   moonSignEn: string;
@@ -132,7 +132,7 @@ export type WeeklyForecast = typeof weeklyForecasts.$inferSelect;
 export type NewWeeklyForecast = typeof weeklyForecasts.$inferInsert;
 
 /**
- * "Astro-MBTI" test results — one row per completed test (users can retake,
+ * "Astro-MBTI" test results, one row per completed test (users can retake,
  * so history accumulates; the profile lists all of them newest-first).
  *
  * `mbtiType` is the 4-letter code (e.g. "ESTJ"); `archetypeNameGe` is the
@@ -185,7 +185,7 @@ export type IqDomainScoresJson = {
 
 /**
  * One row per completed IQ test. Kept for *both* signed-in users (history on
- * their profile) and anonymous takers (`user_id` null) — the anonymous rows are
+ * their profile) and anonymous takers (`user_id` null), the anonymous rows are
  * what let us self-norm: recompute each item's p-value and the θ→IQ mapping from
  * the real score distribution instead of the provisional item-difficulty guess.
  * `attempt_id` (client-generated) dedupes result-page refreshes/re-POSTs.
@@ -281,7 +281,7 @@ export type BigFiveTraitScoresJson = {
 /**
  * One row per completed Big Five test. Like the other tests, kept for both
  * signed-in users (history) and anonymous takers (`user_id` null) so the score
- * distribution can be self-normed later. Big Five is a bipolar profile — no
+ * distribution can be self-normed later. Big Five is a bipolar profile, no
  * overall score, just the five trait scores. `attempt_id` dedupes re-POSTs.
  */
 export const bigFiveResults = pgTable(
@@ -315,7 +315,7 @@ export type BigFiveResultRow = typeof bigFiveResults.$inferSelect;
 export type NewBigFiveResultRow = typeof bigFiveResults.$inferInsert;
 
 /**
- * One-shot in-app surveys — one row per (user, survey).
+ * One-shot in-app surveys, one row per (user, survey).
  *
  * The row's *existence* is what keeps the popup from coming back, so it is
  * written the moment the modal is shown and then updated in place when the
@@ -343,11 +343,11 @@ export const surveyResponses = pgTable(
     shownAt: timestamp("shown_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
-    /** When the user closed or submitted — null while status='shown'. */
+    /** When the user closed or submitted, null while status='shown'. */
     respondedAt: timestamp("responded_at", { withTimezone: true }),
   },
   (t) => [
-    // One row per user per survey — the upsert target, and the guarantee that
+    // One row per user per survey, the upsert target, and the guarantee that
     // a double-render can never produce two rows.
     uniqueIndex("survey_response_user_survey_uq").on(t.userId, t.surveyKey),
     index("survey_response_survey_status_idx").on(t.surveyKey, t.status),

@@ -86,7 +86,7 @@ export default async function UnsubscribePage({
                 {en ? "You’re unsubscribed" : "გამოწერა გაუქმდა"}
               </h1>
               <p className="text-sm text-muted-foreground">
-                {email ? <>{email} — </> : null}
+                {email ? <>{email}, </> : null}
                 <span className="text-foreground">
                   {en ? LABELS_EN[type] : LABELS[type]}
                 </span>{" "}
@@ -116,7 +116,7 @@ export default async function UnsubscribePage({
               <p className="text-sm text-muted-foreground">
                 {en
                   ? "This unsubscribe link is unknown. It may already have been used, or the account may have been deleted. You can manage subscriptions from your account."
-                  : "ეს გამოწერის ბმული უცნობია — შესაძლოა უკვე გამოყენებულია ან ანგარიში წაიშალა. გამოწერების მართვა შეგიძლია ანგარიშის გვერდზე."}
+                  : "ეს გამოწერის ბმული უცნობია, შესაძლოა უკვე გამოყენებულია ან ანგარიში წაიშალა. გამოწერების მართვა შეგიძლია ანგარიშის გვერდზე."}
               </p>
               <div className="mt-6 flex justify-center">
                 <Button asChild>

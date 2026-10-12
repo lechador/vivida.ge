@@ -33,7 +33,7 @@ export type FriendsWithSynastry = {
  * Enrich a friends list with each pair's synastry score.
  *
  * One batched DB read fetches the viewer's chart plus every friend's chart.
- * The synastry math itself is pure CPU per pair — sub-millisecond — so even
+ * The synastry math itself is pure CPU per pair, sub-millisecond, so even
  * a friend list in the dozens stays cheap.
  *
  * Synastry is null for any pair where either side has no cached chart yet.

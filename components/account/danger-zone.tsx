@@ -59,7 +59,7 @@ export function DangerZone({ locale = "ka" }: { locale?: UserLocale }) {
         }
       } catch (err) {
         // Server actions throw NEXT_REDIRECT errors as part of the happy
-        // path — those propagate up and the navigation completes. Any
+        // path, those propagate up and the navigation completes. Any
         // other error is real and worth surfacing.
         const message = (err as Error).message;
         if (!message?.includes("NEXT_REDIRECT")) {

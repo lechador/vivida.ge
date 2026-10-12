@@ -10,7 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/credits/unlock { kind, resultId } — pay once to unlock a deep
+ * POST /api/credits/unlock { kind, resultId }, pay once to unlock a deep
  * result. For "iq" | "eq" | "mbti" | "synastry", `resultId` identifies the row
  * and is verified to belong to the caller. "weekly" is a per-user lifetime
  * unlock (the 7-day forecast) keyed by a fixed ref, so no row lookup is

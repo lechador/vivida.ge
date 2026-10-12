@@ -9,7 +9,7 @@ import { REFERRAL_REWARD } from "@/lib/credits-config";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Invite panel — the credit-earning growth loop's UI. Shows the user's personal
+ * Invite panel, the credit-earning growth loop's UI. Shows the user's personal
  * link, a copy/share affordance, and their referral progress.
  */
 export function InviteCard({
@@ -39,7 +39,7 @@ export function InviteCard({
   async function share() {
     const text = en
       ? "Join me on Vivida for your birth chart, compatibility readings, and personality tests 🔮"
-      : "შემომიერთდი Vivida-ზე — შენი კოსმიური რუკა, თავსებადობა და ტესტები 🔮";
+      : "შემომიერთდი Vivida-ზე, შენი კოსმიური რუკა, თავსებადობა და ტესტები 🔮";
     try {
       if (navigator.share) {
         await navigator.share({ title: "Vivida", text, url: link });

@@ -39,20 +39,20 @@ device. A consented first-party `/api/pwa/open` call also records a random
 browser-storage profile ID in `pwa_installation`, with first and latest open
 dates; the admin PWA page displays both sources separately.
 
-| event                                                               | when                                                                                             | key params                        |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------- |
-| `onboarding_started/step_viewed/step_completed/submitted/abandoned` | wizard lifecycle; abandoned = unmount without submit + last `step_name`                          | `flow`, `step_name`               |
-| `search_opened/result_selected/no_result`                           | authed header people-search; no query text, `no_result` once per distinct query                  | `result_type: people`             |
-| `nav_item_selected`                                                 | sidebar / drawer / tab-bar taps                                                                  | `item` (nav key)                  |
-| `library_item_favorited`                                            | favorite toggle succeeds                                                                         | `outcome: favorited/unfavorited`  |
-| `library_note_saved`                                                | non-empty private note saved                                                                     | `outcome: saved`                  |
-| `report_downloaded`                                                 | PDF download click                                                                               | `report_type: natal`              |
-| `checkout_failed`                                                   | credit top-up could not start (no URL / HTTP / network)                                          | `reason: no_url/http_NNN/network` |
-| `checkout_cancel_return`                                            | Stripe `?status=canceled` return                                                                 | `outcome: canceled_at_stripe`     |
-| `checkout_started/success`                                          | session created / Stripe success return                                                          | product, value, currency          |
-| `purchase_completed` + `entitlement_activated`                      | **only after** `/api/billing/session` confirms the server grant — canonical paid-delivery signal | `kind: credits/premium`           |
-| `report_ready`                                                      | server marks PDF ready                                                                           | server-side (worker log → W10)    |
-| `empty_state_seen`                                                  | empty history / no-result states                                                                 | `empty_kind` (wired per surface)  |
+| event                                                               | when                                                                                            | key params                        |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------- |
+| `onboarding_started/step_viewed/step_completed/submitted/abandoned` | wizard lifecycle; abandoned = unmount without submit + last `step_name`                         | `flow`, `step_name`               |
+| `search_opened/result_selected/no_result`                           | authed header people-search; no query text, `no_result` once per distinct query                 | `result_type: people`             |
+| `nav_item_selected`                                                 | sidebar / drawer / tab-bar taps                                                                 | `item` (nav key)                  |
+| `library_item_favorited`                                            | favorite toggle succeeds                                                                        | `outcome: favorited/unfavorited`  |
+| `library_note_saved`                                                | non-empty private note saved                                                                    | `outcome: saved`                  |
+| `report_downloaded`                                                 | PDF download click                                                                              | `report_type: natal`              |
+| `checkout_failed`                                                   | credit top-up could not start (no URL / HTTP / network)                                         | `reason: no_url/http_NNN/network` |
+| `checkout_cancel_return`                                            | Stripe `?status=canceled` return                                                                | `outcome: canceled_at_stripe`     |
+| `checkout_started/success`                                          | session created / Stripe success return                                                         | product, value, currency          |
+| `purchase_completed` + `entitlement_activated`                      | **only after** `/api/billing/session` confirms the server grant, canonical paid-delivery signal | `kind: credits/premium`           |
+| `report_ready`                                                      | server marks PDF ready                                                                          | server-side (worker log → W10)    |
+| `empty_state_seen`                                                  | empty history / no-result states                                                                | `empty_kind` (wired per surface)  |
 
 ## Canonical vs directional
 
@@ -66,5 +66,5 @@ dates; the admin PWA page displays both sources separately.
 
 - Backend baseline (28d, 22 Aug–18 Sep 2026): `analysis/web-improvement-2026-09-19/usage-findings.md` + `data/usage-snapshot.json`.
 - Web-only baseline (route reach, funnel completion, paywall exposure) still
-  needs GA4 read-only access or an authoritative export — open item, not
+  needs GA4 read-only access or an authoritative export, open item, not
   blocked on code.

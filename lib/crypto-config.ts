@@ -1,8 +1,8 @@
 /**
  * Client-safe catalogue for the USDC crypto rail (English site only).
  *
- * Mirrors the US Stripe catalogue's price points — packs 2.99 / 5.99 / 11.99,
- * PRO pass 9.99 — so the two rails never disagree about what something costs.
+ * Mirrors the US Stripe catalogue's price points, packs 2.99 / 5.99 / 11.99,
+ * PRO pass 9.99, so the two rails never disagree about what something costs.
  * No Stripe IDs live here: the crypto rail prices everything in USDC, and the
  * amounts are plain cents of a dollar-pegged token (6-decimal base units via
  * lib/usdc-pure).

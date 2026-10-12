@@ -96,8 +96,8 @@ export function PhoneCard({
                   ? "You can sign in with this number using a one-time SMS code."
                   : "ამ ნომრით შესვლა შესაძლებელია ერთჯერადი SMS კოდით."
                 : en
-                  ? "Add your number and verify it with an SMS code — after that you can also sign in with it."
-                  : "დაამატე ნომერი და დაადასტურე SMS კოდით — ამის შემდეგ მისით შესვლაც შეძლებ."}
+                  ? "Add your number and verify it with an SMS code, after that you can also sign in with it."
+                  : "დაამატე ნომერი და დაადასტურე SMS კოდით, ამის შემდეგ მისით შესვლაც შეძლებ."}
           </p>
         </div>
       </header>

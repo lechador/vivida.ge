@@ -55,7 +55,7 @@ export default async function SynastryPage() {
             <p className="mt-2 max-w-xl text-sm text-foreground/75 sm:text-base">
               {en
                 ? "Add someone who matters to you and explore how your birth charts connect."
-                : "დაამატე ადამიანი, რომელიც შენთვის მნიშვნელოვანია — ნახე, როგორ ერთვით ცაში ერთმანეთს."}
+                : "დაამატე ადამიანი, რომელიც შენთვის მნიშვნელოვანია, ნახე, როგორ ერთვით ცაში ერთმანეთს."}
             </p>
             <div className="mt-2">
               <CreditHint>
@@ -74,7 +74,7 @@ export default async function SynastryPage() {
                 </Link>
               </Button>
             ) : (
-              // Monthly cap hit — render a disabled button so the click
+              // Monthly cap hit, render a disabled button so the click
               // can't navigate anywhere unhelpful.
               <Button variant="outline" size="lg" disabled>
                 <Plus className="size-4" />
@@ -128,7 +128,7 @@ function EmptyState({
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
         {en
           ? "Add a partner, close friend, family member, or anyone you're curious about to see how your charts fit together."
-          : "დაამატე ახლო ადამიანი, ძველი მეგობარი, თუ ვინც გაინტერესებს — ნახე თქვენი ცის რუკების ერთობლივი თავსებადობა."}
+          : "დაამატე ახლო ადამიანი, ძველი მეგობარი, თუ ვინც გაინტერესებს, ნახე თქვენი ცის რუკების ერთობლივი თავსებადობა."}
       </p>
       {canAdd && (
         <Button asChild className="mt-6" variant="mystic" size="lg">

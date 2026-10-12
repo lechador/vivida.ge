@@ -1,7 +1,7 @@
 /**
  * Stripe integration for one-time purchases and Vivida PRO subscriptions.
  *
- * We use **hosted Checkout** (redirect) — no client-side Stripe.js, no PCI
+ * We use **hosted Checkout** (redirect), no client-side Stripe.js, no PCI
  * surface. The flow is:
  *   1. create a hosted Checkout Session → redirect user to Stripe.
  *   2. Stripe redirects back to success_url; the `checkout.session.completed`
@@ -133,7 +133,7 @@ export async function createCreditCheckoutSession(opts: {
           unit_amount: amountMinor,
           product_data: {
             name: productName,
-            description: `Vivida · ${formatted} — ${credits} ${creditWord}`,
+            description: `Vivida · ${formatted}, ${credits} ${creditWord}`,
           },
         },
       },

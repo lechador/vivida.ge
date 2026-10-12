@@ -132,7 +132,7 @@ export async function createPhotoUpload(
 }
 
 /**
- * Confirm a successful upload — flips `ready` to true so the photo renders
+ * Confirm a successful upload, flips `ready` to true so the photo renders
  * publicly. A background HEAD probe logs on disagreement but never blocks
  * (read-after-write lag made blocking flaky in production).
  */
@@ -173,7 +173,7 @@ export async function finalizePhoto(
 
   invalidateHeaderForUser(userId);
 
-  // One-time reward for adding a profile picture. Idempotent — only the very
+  // One-time reward for adding a profile picture. Idempotent, only the very
   // first ready photo ever pays out (guarded by the ledger reason). Best-effort:
   // a credit hiccup must never fail the upload finalize.
   earnOnce(userId, CREDIT_REWARD.profilePhoto, "earn_profile_photo").catch(
@@ -243,7 +243,7 @@ export async function deletePhoto(
     .limit(1);
   if (!photo) return { ok: false, code: "not_found" };
 
-  // Best-effort R2 delete — don't block the DB cleanup if it fails.
+  // Best-effort R2 delete, don't block the DB cleanup if it fails.
   try {
     await deleteObject(photo.key);
   } catch (err) {

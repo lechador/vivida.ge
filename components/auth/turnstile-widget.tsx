@@ -13,7 +13,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  *  - exposes a reset() handle the caller can invoke after a failed submit
  *    so the user gets a fresh challenge automatically
  *
- * If NEXT_PUBLIC_TURNSTILE_SITE_KEY is unset we render nothing — keeps
+ * If NEXT_PUBLIC_TURNSTILE_SITE_KEY is unset we render nothing, keeps
  * local dev usable without a Cloudflare account.
  */
 export function TurnstileWidget({

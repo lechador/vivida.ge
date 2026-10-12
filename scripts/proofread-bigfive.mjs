@@ -1,5 +1,5 @@
-// Proofread ALL Georgian copy for the Big Five test — the 40 items, trait
-// names/taglines, the 15 trait interpretations, and the SEO page copy — for
+// Proofread ALL Georgian copy for the Big Five test, the 40 items, trait
+// names/taglines, the 15 trait interpretations, and the SEO page copy, for
 // grammar/orthography/naturalness. Sends everything to gemini-3.8-flash (Vertex,
 // Google credits) with a strict "fix language only, preserve meaning +
 // agree-direction" instruction and prints every change so the static source
@@ -87,7 +87,7 @@ async function main() {
     console.log(`  + ${fixed}`);
   }
   console.log(
-    `\n${changed} of ${items.length} strings changed (dry run — apply to source by hand).`,
+    `\n${changed} of ${items.length} strings changed (dry run, apply to source by hand).`,
   );
 }
 

@@ -9,9 +9,9 @@ import {
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Buyer notification — their reader delivered the reading. Transactional:
+ * Buyer notification, their reader delivered the reading. Transactional:
  * sent immediately, exactly once per booking. Never includes the reading
- * itself — the inbox holds the private content, the email is only the knock.
+ * itself, the inbox holds the private content, the email is only the knock.
  */
 export function ReadingDeliveredEmail({
   recipientName,
@@ -63,8 +63,8 @@ export function ReadingDeliveredEmail({
         {en ? "has delivered your" : "მოგაწოდა შენი"}{" "}
         <strong>{serviceTitle}</strong>
         {en
-          ? ". Take your time with it — it's waiting in your inbox."
-          : ". მშვიდად გაეცანი — ის შენს შემოსულებში გელოდება."}
+          ? ". Take your time with it, it's waiting in your inbox."
+          : ". მშვიდად გაეცანი, ის შენს შემოსულებში გელოდება."}
       </Text>
 
       <Button href={readingUrl} style={buttonStyle}>

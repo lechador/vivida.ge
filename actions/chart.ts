@@ -37,7 +37,7 @@ import type { NatalChartJson } from "@/db/schema";
 
 /**
  * Returns the user's natal chart, generating + caching it if needed.
- * Always returns *something* — local computation is the floor.
+ * Always returns *something*, local computation is the floor.
  *
  * Caching strategy:
  *   1. If the cached chart's `inputHash` matches the current profile, reuse it.
@@ -52,7 +52,7 @@ import type { NatalChartJson } from "@/db/schema";
  *            (e.g. /report).
  *  - "defer": persist the fast static chart, return it immediately, and run
  *            the AI upgrade in the background via `after()`. Use on the
- *            dashboard so the user never stares at a spinner — the chart
+ *            dashboard so the user never stares at a spinner, the chart
  *            renders instantly and the richer text lands on the next view.
  *  - "skip":  only chart *data* (positions) is needed, never the narrative.
  *            Neither waits for nor schedules AI. Used by the daily/weekly
@@ -122,12 +122,12 @@ async function resolveChart(
       },
     };
 
-    // The only per-user AI work left is the summary + highlights — the
+    // The only per-user AI work left is the summary + highlights, the
     // per-placement text comes from the shared library at read time. So we
     // only need an upgrade when the summary hasn't been generated yet.
     const canUpgrade = wantAi && !existing.interpretation.summary;
     if (!canUpgrade) return existing;
-    // Positions are already current — only the AI narrative needs work, and
+    // Positions are already current, only the AI narrative needs work, and
     // we have the data to do it without recomputing. In "defer" mode we hand
     // that to the background and return the (renderable) static chart now.
     if (mode === "defer") {
@@ -144,8 +144,8 @@ async function resolveChart(
   // zero AI latency. AI text is layered on top afterwards.
   const interpretation = buildStaticInterpretation(computed.data);
 
-  // Persist the static chart immediately. Every caller — especially the
-  // dashboard right after signup — gets a fast, complete chart back; the AI
+  // Persist the static chart immediately. Every caller, especially the
+  // dashboard right after signup, gets a fast, complete chart back; the AI
   // narrative is layered on via a guarded update that never blocks the page.
   await upsertChartRow(
     userId,
@@ -162,7 +162,7 @@ async function resolveChart(
     } else {
       // The static chart above is already fully renderable (library/static
       // text covers every placement); the AI only adds the summary paragraph.
-      // So an AI failure must NEVER crash the page — log it and return the
+      // So an AI failure must NEVER crash the page, log it and return the
       // static chart. This was the "/report errors right after onboarding,
       // works on refresh" bug: a transient OpenRouter/Gemini error threw
       // straight through the Server Component with no error boundary to catch
@@ -190,7 +190,7 @@ async function resolveChart(
 /**
  * True for transient network/connection failures (Neon HTTP driver blips,
  * DNS hiccups) as opposed to real query errors (bad SQL, constraint
- * violations) — walks the `.cause` chain since drizzle/neon wrap the
+ * violations), walks the `.cause` chain since drizzle/neon wrap the
  * original TypeError a couple of layers deep.
  */
 function isTransientDbError(err: unknown): boolean {
@@ -210,14 +210,14 @@ function isTransientDbError(err: unknown): boolean {
 }
 
 /**
- * Public accessor — resolves the chart, then overlays the shared per-placement
+ * Public accessor, resolves the chart, then overlays the shared per-placement
  * interpretation library (Big Three + planet sections) so every consumer
  * renders the same reusable text and an admin edit reflects for all users at
  * once. Falls back to the chart's own static/AI text when a row isn't seeded.
  *
- * This is the heaviest DB path in the app on a cache miss — profile select,
+ * This is the heaviest DB path in the app on a cache miss, profile select,
  * chart select/upsert, computeChart, plus a handful of per-placement library
- * selects — which is exactly the first /report view right after signup. A
+ * selects, which is exactly the first /report view right after signup. A
  * single transient Neon connection blip anywhere in that burst previously
  * surfaced as an opaque Server Component crash ("reload to try again"). One
  * silent retry recovers the same way the manual reload did.
@@ -263,7 +263,7 @@ async function overlayLibrary(chart: Chart): Promise<Chart> {
   if (!interp) return chart;
   const placements = placementsForChart(chart.data);
   const { cusps, occupants } = houseCombosForChart(chart.data);
-  // Never let a library lookup break a chart render — if the table isn't
+  // Never let a library lookup break a chart render, if the table isn't
   // migrated yet or the query fails, fall back to the chart's own text.
   let lib: Map<string, string>;
   let aspectLib: Map<string, string>;
@@ -308,7 +308,7 @@ async function overlayLibrary(chart: Chart): Promise<Chart> {
 
   // Houses compose two pieces: the cusp-sign text, plus each occupant
   // planet's text (a house can hold zero, one, or several planets). Only
-  // override when the cusp is covered — that's the always-present half;
+  // override when the cusp is covered, that's the always-present half;
   // occupant coverage layers on top of it.
   const houses = { ...(interp.houses ?? {}) };
   const occupantsByHouse = new Map<number, string[]>();
@@ -417,7 +417,7 @@ function scheduleAiUpgrade(
  * Background work for an already-persisted chart:
  *   1. Populate the shared per-placement interpretation library (no-op once
  *      seeded) so Big Three + planet text is reused across all users.
- *   2. Generate the one remaining per-user piece — the summary + highlights.
+ *   2. Generate the one remaining per-user piece, the summary + highlights.
  * Guarded so concurrent schedules don't double-spend, and so a birth-data
  * change mid-flight can't clobber the row.
  */
@@ -530,8 +530,8 @@ const ASPECT_KIND_KA: Record<string, string> = {
 };
 
 const ASPECT_FAMILY_LINE: Record<string, string> = {
-  harmonic: "ბუნებრივი ურთიერთობა — ენერგია მარტივად მიედინება.",
-  tense: "დაძაბული ურთიერთობა — გასაკეთებელი სამუშაო და ზრდის წყარო.",
+  harmonic: "ბუნებრივი ურთიერთობა, ენერგია მარტივად მიედინება.",
+  tense: "დაძაბული ურთიერთობა, გასაკეთებელი სამუშაო და ზრდის წყარო.",
   neutral: "ენერგიები ერთად მუშაობენ, ერთიანი ხმა იქცევიან.",
 };
 
@@ -569,8 +569,8 @@ function buildStaticHouseTexts(chart: NatalChartJson): Record<string, string> {
     const cuspLine = cuspSign ? `${cuspSign.labelKa} მართავს ამ სფეროს.` : "";
     const occLine =
       occ.length > 0
-        ? ` შიგნით — ${occ.join(", ")}.`
-        : " ცარიელი სახლი — გავლენას ნიშანი ანიჭებს.";
+        ? ` შიგნით, ${occ.join(", ")}.`
+        : " ცარიელი სახლი, გავლენას ნიშანი ანიჭებს.";
 
     out[String(n)] = `${def.meaningKa} ${cuspLine}${occLine}`;
   }

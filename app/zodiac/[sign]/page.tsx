@@ -149,7 +149,7 @@ export default async function ZodiacSignPage({
     about: {
       "@type": "Thing",
       name: c.labelKa,
-      description: `${c.labelKa} (${dates.rangeEn}) — ${c.tagline}`,
+      description: `${c.labelKa} (${dates.rangeEn}), ${c.tagline}`,
     },
   };
 
@@ -427,7 +427,7 @@ export default async function ZodiacSignPage({
           </div>
         </section>
 
-        {/* Go deeper — moon + rising for the same sign */}
+        {/* Go deeper, moon + rising for the same sign */}
         <section className="mt-14 grid gap-4 sm:grid-cols-2">
           <Link
             href={`/zodiac/mtvare/${sign}`}
@@ -459,7 +459,7 @@ export default async function ZodiacSignPage({
           </Link>
         </section>
 
-        {/* Yearly horoscope — only when content exists */}
+        {/* Yearly horoscope, only when content exists */}
         {availableYears.length > 0 && (
           <section className="mt-10">
             <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">

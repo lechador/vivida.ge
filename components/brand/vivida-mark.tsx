@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Vivida brand mark — a 4-pointed cosmic sparkle in the brand gradient,
+ * Vivida brand mark, a 4-pointed cosmic sparkle in the brand gradient,
  * with a small companion star. Reads as "your personal star in the cosmos".
  *
  * The gradient + glow IDs are uniquified so multiple marks can coexist on
@@ -18,7 +18,7 @@ export function VividaMark({
   size?: number;
   /** Soft radial halo behind the sparkle. Disable for tight layouts. */
   glow?: boolean;
-  /** Suffix for SVG <defs> ids — pass a unique value if rendering >1 on the page. */
+  /** Suffix for SVG <defs> ids, pass a unique value if rendering >1 on the page. */
   id?: string;
 }) {
   const gradId = `vivida-cosmic-${id}`;
@@ -46,7 +46,7 @@ export function VividaMark({
 
       {glow && <circle cx="32" cy="32" r="30" fill={`url(#${glowId})`} />}
 
-      {/* Main sparkle — slightly elongated points read better at small sizes */}
+      {/* Main sparkle, slightly elongated points read better at small sizes */}
       <path
         d="M 32 4 L 36 28 L 60 32 L 36 36 L 32 60 L 28 36 L 4 32 L 28 28 Z"
         fill={`url(#${gradId})`}
@@ -55,7 +55,7 @@ export function VividaMark({
       {/* Bright center highlight */}
       <circle cx="32" cy="32" r="3" fill="white" fillOpacity="0.85" />
 
-      {/* Companion star, upper right — adds asymmetry + cosmic feel */}
+      {/* Companion star, upper right, adds asymmetry + cosmic feel */}
       <path
         d="M 50 12 L 51 16 L 55 17 L 51 18 L 50 22 L 49 18 L 45 17 L 49 16 Z"
         fill="#22d3ee"

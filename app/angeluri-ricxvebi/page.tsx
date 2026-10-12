@@ -21,9 +21,9 @@ import {
 
 const SITE_URL = "https://www.vivida.ge";
 
-const TITLE = "ანგელოზური რიცხვები — 111, 222, 333, 11:11 მნიშვნელობა";
+const TITLE = "ანგელოზური რიცხვები, 111, 222, 333, 11:11 მნიშვნელობა";
 const DESCRIPTION =
-  "რას ნიშნავს ერთნაირი ციფრები საათზე: 111, 222, 333, 444, 555, 777, 888, 999, 11:11 და 12:12. თითოეული ანგელოზური რიცხვის მნიშვნელობა ქართულად — სიყვარულში, საქმეში და რა ნაბიჯი გადადგა, როცა მას ხედავ.";
+  "რას ნიშნავს ერთნაირი ციფრები საათზე: 111, 222, 333, 444, 555, 777, 888, 999, 11:11 და 12:12. თითოეული ანგელოზური რიცხვის მნიშვნელობა ქართულად, სიყვარულში, საქმეში და რა ნაბიჯი გადადგა, როცა მას ხედავ.";
 
 const KA_METADATA: Metadata = {
   title: { absolute: TITLE },
@@ -206,7 +206,7 @@ export default async function AngelNumbersHubPage() {
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
             ორი ახსნა არსებობს და ისინი ერთმანეთს არ ეწინააღმდეგება.
             ფსიქოლოგიური: როცა რომელიმე რიცხვი ერთხელ შეამჩნიე, ტვინი მას შემდეგ
-            ყოველთვის გამოყოფს ფონიდან — ამას სელექციური ყურადღება ჰქვია.
+            ყოველთვის გამოყოფს ფონიდან, ამას სელექციური ყურადღება ჰქვია.
             სიმბოლური: სწორედ ის მომენტები, როცა ასეთ დამთხვევას ამჩნევ,
             ჩვეულებრივ ემთხვევა პერიოდს, როცა რაღაც მნიშვნელოვან
             გადაწყვეტილებაზე ფიქრობ.
@@ -245,7 +245,7 @@ export default async function AngelNumbersHubPage() {
         <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
           <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            შენი მუდმივი რიცხვი — ბედის რიცხვი
+            შენი მუდმივი რიცხვი, ბედის რიცხვი
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
             ანგელოზური რიცხვი მომენტზეა, ბედის რიცხვი კი მთელ ცხოვრებაზე.

@@ -16,9 +16,9 @@ import {
   localizedAlternates,
 } from "@/lib/seo/locales";
 
-const TITLE = "რომელი ზოდიაქოს ნიშანი ხარ სინამდვილეში? — ტესტი";
+const TITLE = "რომელი ზოდიაქოს ნიშანი ხარ სინამდვილეში? ტესტი";
 const DESCRIPTION =
-  "გაიარე უფასო ტესტი და გაიგე, რომელი ზოდიაქოს ნიშნის ენერგია შეესაბამება შენს ხასიათს — შედეგი შეიძლება დაბადების ნიშანს არ ემთხვეოდეს. სწრაფი და სახალისო ქვიზი ქართულად.";
+  "გაიარე უფასო ტესტი და გაიგე, რომელი ზოდიაქოს ნიშნის ენერგია შეესაბამება შენს ხასიათს, შედეგი შეიძლება დაბადების ნიშანს არ ემთხვეოდეს. სწრაფი და სახალისო ქვიზი ქართულად.";
 
 const METADATA_KA: Metadata = {
   title: { absolute: TITLE },
@@ -31,7 +31,7 @@ const METADATA_KA: Metadata = {
     "პიროვნების ტესტი",
     "ზოდიაქოს ტესტი ქართულად",
   ],
-  // Reciprocal — the English side already points here.
+  // Reciprocal, the English side already points here.
   alternates: localizedAlternates(
     "/quiz/namdvili-nishani",
     "/quiz/namdvili-nishani",
@@ -56,7 +56,7 @@ const METADATA_KA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return METADATA_KA;
-  const title = "Which Zodiac Sign Matches Your Personality? — Quiz";
+  const title = "Which Zodiac Sign Matches Your Personality? Quiz";
   const description =
     "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality. Free and instant.";
   const url = `${ENGLISH_SITE_URL}/quiz/namdvili-nishani`;
@@ -161,11 +161,11 @@ export default async function TrueSignQuizPage() {
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
             {en ? (
-              `Answer ${TS_QUESTION_COUNT} questions to discover which zodiac sign’s energy best matches your character—even if it differs from your birth sign.`
+              `Answer ${TS_QUESTION_COUNT} questions to discover which zodiac sign’s energy best matches your character, even if it differs from your birth sign.`
             ) : (
               <>
                 უპასუხე {TS_QUESTION_COUNT} კითხვას და გაიგე, რომელი ზოდიაქოს
-                ნიშნის ენერგია შეესაბამება შენს ხასიათს — შესაძლოა, შედეგი
+                ნიშნის ენერგია შეესაბამება შენს ხასიათს, შესაძლოა, შედეგი
                 დაბადების ნიშანს არ დაემთხვეს.
               </>
             )}
@@ -188,11 +188,11 @@ export default async function TrueSignQuizPage() {
               </>
             ) : (
               <>
-                ყოველი ზოდიაქოს ნიშანი ორი რამის კომბინაციაა —{" "}
+                ყოველი ზოდიაქოს ნიშანი ორი რამის კომბინაციაა,{" "}
                 <strong>ელემენტი</strong> (ცეცხლი, მიწა, ჰაერი, წყალი) და{" "}
                 <strong>დინამიკა</strong> (კარდინალური, ფიქსირებული,
                 მუტაბელური). ტესტი შენი პასუხებით განსაზღვრავს, რომელი ელემენტი
-                და დინამიკა ჭარბობს შენში — მათი გადაკვეთა კი ერთ-ერთ 12 ნიშანს
+                და დინამიკა ჭარბობს შენში, მათი გადაკვეთა კი ერთ-ერთ 12 ნიშანს
                 განსაზღვრავს. ეს არის ნიშანი, რომლის თვისებებიც შენს ხასიათს
                 ყველაზე მეტად შეესაბამება.
               </>
@@ -209,7 +209,7 @@ export default async function TrueSignQuizPage() {
               <>
                 გახსოვდეს: ეს გასართობი ტესტია. შენი{" "}
                 <strong>ნამდვილი დაბადების ნიშანი</strong> დაბადების თარიღით
-                განისაზღვრება — მას უფასო ნატალურ რუკაში ნახავ.
+                განისაზღვრება, მას უფასო ნატალურ რუკაში ნახავ.
               </>
             )}
           </p>

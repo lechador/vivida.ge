@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { saveIqResult, sanitizeAnswers } from "@/lib/iq/store";
 
 /**
- * POST /api/iq/submit — persist a finished IQ attempt (fire-and-forget from the
+ * POST /api/iq/submit, persist a finished IQ attempt (fire-and-forget from the
  * result page). Best-effort: if the table isn't migrated yet, or anything else
  * fails, we swallow it so the user's result page is never affected. Scoring is
  * redone server-side from the raw answers, so a tampered client body can't
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       id: userId ? id : null,
     });
   } catch {
-    // Table may not exist yet, or a transient DB error — never surface to the UI.
+    // Table may not exist yet, or a transient DB error, never surface to the UI.
     return NextResponse.json({ ok: false }, { status: 200 });
   }
 }

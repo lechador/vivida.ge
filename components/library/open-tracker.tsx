@@ -7,7 +7,7 @@ import type { LibraryEntryKind } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * W04: fires library_item_opened once per mount — the "result actually
+ * W04: fires library_item_opened once per mount, the "result actually
  * viewed" signal (a server render or list impression is not a read).
  * Only the entry kind travels, never its content.
  */

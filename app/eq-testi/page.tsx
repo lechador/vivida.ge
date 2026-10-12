@@ -16,10 +16,10 @@ import {
   localizedAlternates,
 } from "@/lib/seo/locales";
 
-const TITLE_KA = "EQ ტესტი — ემოციური ინტელექტის ტესტი ქართულად";
+const TITLE_KA = "EQ ტესტი, ემოციური ინტელექტის ტესტი ქართულად";
 const DESCRIPTION_KA =
-  "გაიარე უფასო EQ ტესტი ქართულად — ემოციური ინტელექტის თვითშეფასება 5 სფეროში: თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები. 40 კითხვა, ~7 წუთი. მიიღე შენი EQ ქულა და ემოციური რუკა. რეგისტრაციის გარეშე.";
-const TITLE_EN = "Free Emotional Intelligence Test — EQ Assessment";
+  "გაიარე უფასო EQ ტესტი ქართულად, ემოციური ინტელექტის თვითშეფასება 5 სფეროში: თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები. 40 კითხვა, ~7 წუთი. მიიღე შენი EQ ქულა და ემოციური რუკა. რეგისტრაციის გარეშე.";
+const TITLE_EN = "Free Emotional Intelligence Test, EQ Assessment";
 const DESCRIPTION_EN =
   "Take a free 40-question emotional intelligence self-assessment across self-awareness, self-regulation, motivation, empathy and social skills.";
 
@@ -75,8 +75,8 @@ const EQ_FAQ = [
     a: "ტესტი და შენი EQ ქულა უფასოა და რეგისტრაციის გარეშე მიიღები. სრული ემოციური რუკა და თითო სფეროს ანალიზი მოითხოვს უფასო რეგისტრაციას.",
   },
   {
-    q: "EQ თუ IQ — რომელია მნიშვნელოვანი?",
-    a: "ორივე. IQ ზომავს აზროვნების უნარს, EQ კი — ემოციებთან და ადამიანებთან მუშაობის უნარს. კვლევები აჩვენებს, რომ EQ ხშირად უფრო მეტ როლს თამაშობს ურთიერთობებსა და ლიდერობაში.",
+    q: "EQ თუ IQ, რომელია მნიშვნელოვანი?",
+    a: "ორივე. IQ ზომავს აზროვნების უნარს, EQ კი, ემოციებთან და ადამიანებთან მუშაობის უნარს. კვლევები აჩვენებს, რომ EQ ხშირად უფრო მეტ როლს თამაშობს ურთიერთობებსა და ლიდერობაში.",
   },
 ];
 
@@ -179,7 +179,7 @@ export default async function EqTestPage() {
         <EqTestClient locale={locale} />
       </section>
 
-      {/* SEO / informational content — below the fold, indexable. */}
+      {/* SEO / informational content, below the fold, indexable. */}
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
@@ -189,8 +189,8 @@ export default async function EqTestPage() {
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
             {en
-              ? "Emotional intelligence describes the skills involved in recognizing, understanding and managing emotion—both your own and other people's. These habits affect communication, conflict, resilience and relationships, and they can develop through practice."
-              : "ემოციური ინტელექტი (EQ) არის უნარი ამოიცნო, გაიგო და მართო ემოციები — როგორც საკუთარი, ისე სხვისი. IQ-სგან განსხვავებით, EQ განისაზღვრავს იმას, თუ როგორ ვამყარებთ კავშირებს, ვაგვარებთ კონფლიქტს და ვმართავთ სტრესს. კარგი ამბავი: EQ, IQ-სგან განსხვავებით, მთელი ცხოვრება ვითარდება."}
+              ? "Emotional intelligence describes the skills involved in recognizing, understanding and managing emotion, both your own and other people's. These habits affect communication, conflict, resilience and relationships, and they can develop through practice."
+              : "ემოციური ინტელექტი (EQ) არის უნარი ამოიცნო, გაიგო და მართო ემოციები, როგორც საკუთარი, ისე სხვისი. IQ-სგან განსხვავებით, EQ განისაზღვრავს იმას, თუ როგორ ვამყარებთ კავშირებს, ვაგვარებთ კონფლიქტს და ვმართავთ სტრესს. კარგი ამბავი: EQ, IQ-სგან განსხვავებით, მთელი ცხოვრება ვითარდება."}
           </p>
 
           <h2 className="mt-8 text-xl font-semibold tracking-tight">

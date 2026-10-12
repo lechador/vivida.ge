@@ -2,11 +2,11 @@ import { kaShortDate } from "@/lib/i18n/ka-date";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Short relative time formatter — "ახლახან / X წუთის წინ / X საათის წინ /
+ * Short relative time formatter, "ახლახან / X წუთის წინ / X საათის წინ /
  * X დღის წინ" until a week passes, then a localised short date. Lives in
  * components/feed so feed and comment surfaces share the exact wording.
  *
- * Pure function — safe to call from server or client; no Date.now()
+ * Pure function, safe to call from server or client; no Date.now()
  * snapshot is taken at module load.
  */
 export function feedTimeAgo(
@@ -17,7 +17,7 @@ export function feedTimeAgo(
   const ts = typeof date === "string" ? new Date(date) : date;
   const seconds = Math.floor((Date.now() - ts.getTime()) / 1000);
   if (seconds < 45) return en ? "just now" : "ახლახან";
-  // 45–59s falls past "ახლახან" but floors to 0 — clamp so we never
+  // 45–59s falls past "ახლახან" but floors to 0, clamp so we never
   // render "0 წუთის წინ".
   const minutes = Math.max(1, Math.floor(seconds / 60));
   if (minutes < 60) return en ? `${minutes}m ago` : `${minutes} წუთის წინ`;

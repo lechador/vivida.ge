@@ -19,7 +19,7 @@ for (const line of readFileSync(
 }
 
 // Every Georgian string shown to the test-taker (numbers/letter/day/name options
-// are left out — they need no grammar). Keyed so corrections are easy to place.
+// are left out, they need no grammar). Keyed so corrections are easy to place.
 const STRINGS = [
   { key: "prompt.number-series", text: "რომელი რიცხვი აგრძელებს მიმდევრობას?" },
   {
@@ -28,7 +28,7 @@ const STRINGS = [
   },
   {
     key: "prompt.analogy",
-    text: "როგორც პირველი წყვილი — ისე მესამე. რომელი ფიგურაა გამოტოვებული?",
+    text: "როგორც პირველი წყვილი, ისე მესამე. რომელი ფიგურაა გამოტოვებული?",
   },
   { key: "prompt.odd-one-out", text: "აირჩიე ზედმეტი ფიგურა." },
   { key: "l1.q", text: "თუ A > B და B > C, მაშინ რომელი მტკიცებაა ჭეშმარიტი?" },
@@ -36,14 +36,14 @@ const STRINGS = [
   { key: "l2.q", text: "თუ „მზე“ = 3 და „გზა“ = 3, მაშინ „ბაღი“ = ?" },
   {
     key: "l3.q",
-    text: "ორშაბათი, ოთხშაბათი, პარასკევი, … — რომელი დღე მოდის შემდეგ?",
+    text: "ორშაბათი, ოთხშაბათი, პარასკევი, …, რომელი დღე მოდის შემდეგ?",
   },
   { key: "l4.q", text: "რომელი რიცხვია ზედმეტი? 3, 5, 7, 9, 11" },
   {
     key: "l5.q",
     text: "3 მუშა სამუშაოს ასრულებს 3 საათში. რამდენ ხანში დაასრულებს იმავე სამუშაოს 6 მუშა?",
   },
-  { key: "l8.q", text: "ა, გ, ე, ზ, … — რომელი ასო მოდის შემდეგ?" },
+  { key: "l8.q", text: "ა, გ, ე, ზ, …, რომელი ასო მოდის შემდეგ?" },
   {
     key: "l7.q",
     text: "ანა უფროსია ბექოზე. გია უფროსია ანაზე. დათო უმცროსია ბექოზე. ვინ არის ყველაზე უფროსი?",

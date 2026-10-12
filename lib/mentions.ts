@@ -15,7 +15,7 @@ export type ResolvedMention = {
 /**
  * Look up which extracted tokens correspond to real users. Returns
  * at most one row per handle (usernames are unique). Empty array when
- * the input has no tokens — saves a roundtrip.
+ * the input has no tokens, saves a roundtrip.
  *
  * Excludes a list of user ids so callers can skip self-mentions and
  * the author of the surrounding post/comment in one place.

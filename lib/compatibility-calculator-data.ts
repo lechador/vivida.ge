@@ -24,7 +24,7 @@ import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
 /**
  * The editorial category is what drives `percent` (see compatibility-score),
  * so the English label has to be a direct translation of it. Deriving the
- * label from the percentage instead lets the two disagree at a band edge —
+ * label from the percentage instead lets the two disagree at a band edge,
  * a ჰარმონიული pair scoring 80 would read "Strong" in English but
  * "ჰარმონიული" in Georgian for the same couple.
  */

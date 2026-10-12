@@ -4,7 +4,7 @@ import { expect, test } from "@playwright/test";
  * Host-scoped locale routing: proxy.ts + next.config.ts redirects/rewrites.
  *
  * The suite runs against 127.0.0.1, which is neither the Georgian nor the
- * English host — so every case below pins the host explicitly via the Host
+ * English host, so every case below pins the host explicitly via the Host
  * header (verified to reach the app through the request fixture). That is
  * what makes these assertions meaningful: without the override, the English
  * rewrite has no route (404) and the host-scoped redirects never fire.
@@ -55,7 +55,7 @@ test.describe("locale routing", () => {
   test("internal /en path on the English host renders, not redirects", async ({
     request,
   }) => {
-    // The rewrite destination must never redirect back to the clean URL —
+    // The rewrite destination must never redirect back to the clean URL,
     // that was the self-redirect loop on vividaastro.com/.
     const res = await request.get("/en/natal-chart", {
       headers: { host: EN_HOST },
@@ -122,7 +122,7 @@ test.describe("locale routing", () => {
         headers: { host: GE_HOST },
       });
       expect(ge.status()).toBe(200);
-      // Georgian URL, Georgian copy — never an English duplicate.
+      // Georgian URL, Georgian copy, never an English duplicate.
       expect(await ge.text()).toMatch(/[ა-ჰ]/);
     });
   }

@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: en ? "Your Big Five Result" : "შენი Big Five შედეგი",
     description: en
       ? "Your five-trait Big Five personality profile."
-      : "შენი Big Five (დიდი ხუთეული) ტესტის შედეგი — ხუთ თვისებაზე დაფუძნებული პიროვნების პროფილი.",
+      : "შენი Big Five (დიდი ხუთეული) ტესტის შედეგი, ხუთ თვისებაზე დაფუძნებული პიროვნების პროფილი.",
     robots: { index: false, follow: false },
   };
 }

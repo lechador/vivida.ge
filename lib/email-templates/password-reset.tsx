@@ -65,8 +65,8 @@ export function PasswordResetEmail({
 
       <Text style={mutedStyle}>
         {en
-          ? "This link is valid for one hour. If you did not request a reset, ignore this email—your password has not changed."
-          : "ლინკი მოქმედია 1 საათი. თუ შენ არ გითხოვია აღდგენა, უგულებელყავი ეს წერილი — შენი პაროლი იგივე დარჩა."}
+          ? "This link is valid for one hour. If you did not request a reset, ignore this email, your password has not changed."
+          : "ლინკი მოქმედია 1 საათი. თუ შენ არ გითხოვია აღდგენა, უგულებელყავი ეს წერილი, შენი პაროლი იგივე დარჩა."}
       </Text>
     </EmailLayout>
   );

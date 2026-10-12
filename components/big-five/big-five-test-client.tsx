@@ -19,7 +19,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Hosts the Big Five quiz. On finish it stashes the answers + a fresh attemptId
- * to localStorage and routes to the result page — no scoring runs here, so an
+ * to localStorage and routes to the result page, no scoring runs here, so an
  * anonymous taker can complete the test without an account.
  */
 export function BigFiveTestClient({ locale = "ka" }: { locale?: UserLocale }) {
@@ -41,7 +41,7 @@ export function BigFiveTestClient({ locale = "ka" }: { locale?: UserLocale }) {
         JSON.stringify({ answers, attemptId }),
       );
     } catch {
-      /* ignore — the result page falls back to a "retake" prompt */
+      /* ignore, the result page falls back to a "retake" prompt */
     }
     trackEvent(ANALYTICS_EVENT.testCompleted, {
       test: "big_five",

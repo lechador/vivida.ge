@@ -45,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     };
   }
-  const title = "ახალი მთვარე — თარიღები, დრო და მნიშვნელობა";
+  const title = "ახალი მთვარე, თარიღები, დრო და მნიშვნელობა";
   const description =
     "შემდეგი ახალი მთვარის თარიღი და თბილისის დრო, ზოდიაქოს ნიშანი და ახალი მთვარის კალენდარი და გზამკვლევი ქართულად.";
   return {

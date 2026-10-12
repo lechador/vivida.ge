@@ -2,7 +2,7 @@ import type { WeeklyForecastDay } from "@/db/schema";
 
 /**
  * Strip a forecast down to its locked-week teaser: day 1 keeps everything,
- * later days keep only scores, dates and the Moon sign — no headline,
+ * later days keep only scores, dates and the Moon sign, no headline,
  * reasons, advice or drivers.
  *
  * Runs server-side so locked narrative never reaches the page source.

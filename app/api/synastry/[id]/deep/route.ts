@@ -28,7 +28,7 @@ export async function POST(req: Request, ctx: Params) {
   const partner = await getRelationshipPartnerForViewer(id, userId);
   if (!partner) return Response.json({ error: "not_found" }, { status: 404 });
 
-  // Same credit gate as app/synastry/[id]/page.tsx — the deep report is only
+  // Same credit gate as app/synastry/[id]/page.tsx, the deep report is only
   // reachable there once the partner is unlocked, so we check (never grant)
   // the unlock here and refuse before paying for the AI call.
   if (!(await isUnlocked(partner.userId, partner.id, "spend_synastry"))) {

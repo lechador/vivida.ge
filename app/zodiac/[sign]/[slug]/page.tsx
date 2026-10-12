@@ -110,16 +110,16 @@ export async function generateMetadata({
     const url = `${SITE_URL}/zodiac/${sign}/${slug}`;
     const anchor = anchorForView(view);
     const periodLabel = signHoroscopePeriodLabel(anchor, periodForView(view));
-    // Lead with "<sign> ჰოროსკოპი" — the exact shape of the query ("ვერძი
-    // ჰოროსკოპი", "verdzi horoskopi") — then the view + live period label.
+    // Lead with "<sign> ჰოროსკოპი", the exact shape of the query ("ვერძი
+    // ჰოროსკოპი", "verdzi horoskopi"), then the view + live period label.
     const name = en ? (signMetaBySlug(sign)?.labelEn ?? sign) : sc.labelKa;
     const englishSeo = en ? signHoroscopeSeoEn(name, view) : null;
     const title = en
       ? englishSeo!.title
-      : `${sc.labelKa} ჰოროსკოპი — ${VIEW_TITLE_KA[view]} (${periodLabel})`;
+      : `${sc.labelKa} ჰოროსკოპი, ${VIEW_TITLE_KA[view]} (${periodLabel})`;
     const description = en
       ? englishSeo!.description
-      : `${sc.labelKa}-ის ${VIEW_TITLE_KA[view]} (${periodLabel}). ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები — რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.`;
+      : `${sc.labelKa}-ის ${VIEW_TITLE_KA[view]} (${periodLabel}). ცის ფონი, კონკრეტული რჩევა და ნიშნისთვის გასაღები მომენტები, რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.`;
     return {
       title: { absolute: title },
       description,
@@ -358,7 +358,7 @@ export default async function ZodiacSignSlugPage({
                 წლიური ჰოროსკოპი · {yearNum} · {dates.rangeKa}
               </div>
               <h1 className="mt-1 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-                {c.labelKa} — {yearNum} წლის ჰოროსკოპი
+                {c.labelKa}, {yearNum} წლის ჰოროსკოპი
               </h1>
               <p className="mt-3 max-w-xl text-pretty text-base text-foreground/85 sm:text-lg">
                 {c.tagline}
@@ -506,7 +506,7 @@ export default async function ZodiacSignSlugPage({
             წლიური ჰოროსკოპი მზის ნიშანზე საუბრობს
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            სრული წლის სცენარი ნატალურ რუკაშია — მთვარე, ვენერა, მარსი და ცის 12
+            სრული წლის სცენარი ნატალურ რუკაშია, მთვარე, ვენერა, მარსი და ცის 12
             სახლი. Vivida უფასოდ აერთიანებს ყველაფერს.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">

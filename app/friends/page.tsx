@@ -180,7 +180,7 @@ export default async function FriendsPage({
   );
 }
 
-/** Compatibility tab — viewer's friends ranked by synastry score. Friends
+/** Compatibility tab, viewer's friends ranked by synastry score. Friends
  *  without a chart sink to the bottom (sentinel score of -1). */
 function CompatibilityTab({
   viewerHasChart,
@@ -207,7 +207,7 @@ function CompatibilityTab({
       <p className="mb-4 text-xs text-muted-foreground sm:text-sm">
         {locale !== "ka"
           ? "Friends are ranked by combined chart compatibility. Select someone to view the complete English interpretation."
-          : "შენი მეგობრები დალაგებულია ცის რუკების ერთობლივი თავსებადობით. დააჭირე ვინმეს — ნახავ სრულ აღწერას."}
+          : "შენი მეგობრები დალაგებულია ცის რუკების ერთობლივი თავსებადობით. დააჭირე ვინმეს, ნახავ სრულ აღწერას."}
       </p>
       <ul className="grid gap-3">
         {ranked.map((u, i) => (
@@ -252,7 +252,7 @@ function NoChartBanner({
           <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
             {en
               ? "Add your birth details to calculate compatibility with your friends."
-              : "შეავსე დაბადების მონაცემები — გამოვთვლი თავსებადობას ყველა შენ მეგობართან."}
+              : "შეავსე დაბადების მონაცემები, გამოვთვლი თავსებადობას ყველა შენ მეგობართან."}
           </p>
         </div>
         <Button asChild variant="mystic" className={cn(full && "mt-2")}>
@@ -339,7 +339,7 @@ function FriendRow({
           topCategory={synastry.topCategory}
         />
       )}
-      {/* Message button for accepted friends only — same gate as the
+      {/* Message button for accepted friends only, same gate as the
           server action enforces. Renders before FriendActions so "remove"
           (the destructive action) sits last in tab order. */}
       {variant === "friends" && (
@@ -378,7 +378,7 @@ function EmptyState({ tab, locale }: { tab: Tab; locale: UserLocale }) {
     compatibility: {
       Icon: Sparkles,
       title: "თავსებადობა ჯერ ცარიელია",
-      body: "დაუმეგობრდი ვინმეს — შემდეგ აქ ნახავ ცის რუკების ერთობლივ ქულას.",
+      body: "დაუმეგობრდი ვინმეს, შემდეგ აქ ნახავ ცის რუკების ერთობლივ ქულას.",
     },
     incoming: {
       Icon: UserPlus,

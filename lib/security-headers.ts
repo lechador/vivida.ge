@@ -1,15 +1,15 @@
 /**
- * Security headers for the English host (vividaastro.com) — the Privy
+ * Security headers for the English host (vividaastro.com), the Privy
  * production surface.
  *
  * Privy's production checklist requires a strict Content Security Policy
  * plus framing protections. Their own deployment guide says to ship the
- * policy in Report-Only mode first, validate, then enforce — so this module
+ * policy in Report-Only mode first, validate, then enforce, so this module
  * builds the full Privy-recommended policy (plus this app's own sources:
  * GA4, Meta Pixel, Solana RPC, Turnstile, Sentry, R2/owned imagery) as
  * `Content-Security-Policy-Report-Only`, while `X-Frame-Options: DENY`
  * enforces the no-framing rule immediately (nothing in the app expects to
- * be framed — verified: zero first-party `<iframe>` usages).
+ * be framed, verified: zero first-party `<iframe>` usages).
  *
  * Scoped to the English hosts on purpose: the Georgian host keeps Stripe,
  * whose `js.stripe.com` frames/scripts are deliberately NOT in this policy.
@@ -92,7 +92,7 @@ const APP_IMG_SRC = [
 
 /**
  * The full policy, single-line (multi-line header values are legal but
- * brittle across proxies — join to one line at the boundary).
+ * brittle across proxies, join to one line at the boundary).
  */
 export function englishCspPolicy(extraConnectSrc: string[] = []): string {
   return [
@@ -135,7 +135,7 @@ export function englishCspHeaderName(): string {
  * Derives the CSP `connect-src` origins for an operator-configured Solana
  * RPC endpoint (`NEXT_PUBLIC_SOLANA_RPC_URL`).
  *
- * Only the origins are ever emitted — never the full URL. RPC URLs commonly
+ * Only the origins are ever emitted, never the full URL. RPC URLs commonly
  * carry API keys in the path or query string (e.g. `?api-key=…`), and those
  * must not land in a response header. Invalid/empty input yields no origins
  * (the default public endpoint below already covers the unset case).

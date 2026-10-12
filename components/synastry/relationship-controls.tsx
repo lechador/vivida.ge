@@ -82,7 +82,7 @@ export function RelationshipControls({
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
               {connected
                 ? en ? `You and ${partnerName} can answer the weekly questions together.` : `შენ და ${partnerName} ყოველკვირეულ კითხვებს ერთად უპასუხებთ.`
-                : en ? `Invite ${partnerName} with a private link. They will not pay for this unlocked relationship.` : `მოიწვიე ${partnerName} პირადი ბმულით — ამ უკვე გახსნილ ურთიერთობაზე კრედიტს აღარ გადაიხდის.`}
+                : en ? `Invite ${partnerName} with a private link. They will not pay for this unlocked relationship.` : `მოიწვიე ${partnerName} პირადი ბმულით, ამ უკვე გახსნილ ურთიერთობაზე კრედიტს აღარ გადაიხდის.`}
             </p>
             {isOwner && !connected && (
               <div className="mt-4 flex flex-wrap gap-2">

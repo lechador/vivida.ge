@@ -3,7 +3,7 @@
  *
  * These are the sign-level texts that read identically for everyone with the
  * same placement (e.g. "Sun in Scorpio"). We generate each once, store it in
- * the `interpretation_library` table, and reuse it across all users — the
+ * the `interpretation_library` table, and reuse it across all users, the
  * report's Big Three + planet sections read from here at render time instead
  * of a per-user AI call. That makes reports assemble instantly, keeps wording
  * consistent, and lets the copy be edited centrally (admin panel).
@@ -22,7 +22,7 @@ import type { NatalChartJson } from "@/db/schema";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 /**
- * Higher-quality model for the library copy — these texts are written once and
+ * Higher-quality model for the library copy, these texts are written once and
  * reused for everyone, so we spend the better model here (richer, more natural
  * Georgian) rather than the fast model used for per-request generation.
  */
@@ -59,7 +59,7 @@ const SUBJECT_KA: Record<LibrarySubject, string> = {
   ascendant: "ამომავალი ნიშანი",
 };
 
-/** What each subject governs — keeps the AI text focused on the right theme. */
+/** What each subject governs, keeps the AI text focused on the right theme. */
 const SUBJECT_DOMAIN_KA: Record<LibrarySubject, string> = {
   sun: "ბირთვი, იდენტობა, სასიცოცხლო ენერგია და თვითგამოხატვა",
   moon: "ემოციები, შინაგანი სამყარო და რა გაძლევს უსაფრთხოებას",
@@ -72,7 +72,7 @@ const SUBJECT_DOMAIN_KA: Record<LibrarySubject, string> = {
   neptune: "ოცნება, ინტუიცია, სულიერება და შემოქმედებითი წარმოსახვა",
   pluto: "ღრმა ტრანსფორმაცია, ძალა, კონტროლი და აღორძინება",
   ascendant:
-    "პირველი შთაბეჭდილება — როგორ აღგიქვამენ სხვები პირველი შეხვედრისას",
+    "პირველი შთაბეჭდილება, როგორ აღგიქვამენ სხვები პირველი შეხვედრისას",
 };
 
 const SIGN_KA: Record<string, string> = Object.fromEntries(
@@ -105,7 +105,7 @@ export function placementsForChart(data: NatalChartJson): Placement[] {
 
 /**
  * Batched read: returns a Map of key → body for the requested keys. Pure
- * read — never generates. Used by the read-time overlay so editing a library
+ * read, never generates. Used by the read-time overlay so editing a library
  * row reflects for every user on their next view.
  */
 export async function getLibraryEntries(
@@ -124,7 +124,7 @@ export async function getLibraryEntries(
 
 const SYSTEM_PROMPT =
   "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
-  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   "თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები " +
   '("ვარსკვლავები გელიან", "მიენდე სამყაროს").';
 
@@ -144,7 +144,7 @@ export function buildEntryPrompt(
     `დაწერე "${placementKa}"-ს ინტერპრეტაცია (თემა: ${domain}).\n` +
     `6-8 წინადადება (დაახ. 130-170 სიტყვა), "შენ"-ის ფორმა, თბილი და კონკრეტული. ` +
     `ჩაურთე ამ მდებარეობის ძლიერი მხარეც და გამოწვევაც, ცოცხალი, ხელშესახები ` +
-    `მაგალითებით. დააბრუნე მხოლოდ ტექსტი — სათაურის, ფორმატირების და ` +
+    `მაგალითებით. დააბრუნე მხოლოდ ტექსტი, სათაურის, ფორმატირების და ` +
     `ფრჩხილების გარეშე.`
   );
 }
@@ -197,7 +197,7 @@ export async function generateEntry(
 /**
  * Ensure library rows exist for the given placements, generating any missing
  * ones (one AI call each) and persisting them. Returns a key → body map for
- * the requested placements. Background path — never blocks a page render.
+ * the requested placements. Background path, never blocks a page render.
  */
 export async function ensureLibraryFor(
   placements: Placement[],

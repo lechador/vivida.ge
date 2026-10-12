@@ -11,9 +11,9 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * client code (Framer Motion, dialog, breakdown logic) and only renders
  * on /u/[username] when the viewer is logged in *and* has a chart. By
  * dynamically importing here we keep it out of the initial bundle for
- * anonymous traffic — the common case for FB/IG ad arrivals.
+ * anonymous traffic, the common case for FB/IG ad arrivals.
  *
- * `ssr: false` because the synastry visuals don't aid SEO/LCP — we'd rather
+ * `ssr: false` because the synastry visuals don't aid SEO/LCP, we'd rather
  * stream the page hero immediately and load this in parallel.
  */
 const SynastryDisplay = dynamic(

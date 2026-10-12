@@ -41,7 +41,7 @@ const SYSTEM =
   "'unknown' ONLY when the name is genuinely unisex, a nickname/handle with no " +
   "gender signal, empty, or not a personal name. Georgian male names typically " +
   "end in -ი (გიორგი, ლევანი, ნიკა), female in -ა/-ი (ნინო, თამარი, ანა, მარიამი) " +
-  "— judge by the actual name, not just the ending. Return ONLY a JSON array.";
+  ", judge by the actual name, not just the ending. Return ONLY a JSON array.";
 
 const ai = new GoogleGenAI({
   vertexai: true,

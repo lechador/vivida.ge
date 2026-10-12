@@ -9,7 +9,7 @@ import {
 
 /**
  * Sent once when a user finishes signup. Pitches what they get from Vivida
- * and funnels them into the dashboard. No unsubscribe — transactional.
+ * and funnels them into the dashboard. No unsubscribe, transactional.
  *
  * Free features and credit-gated actions are described separately because
  * the signup credit grant can differ by experiment cohort.
@@ -37,8 +37,8 @@ export function WelcomeEmail({
     <EmailLayout
       preview={
         en
-          ? "Your cosmic journey begins — Vivida"
-          : "შენი კოსმიური მოგზაურობა იწყება — Vivida"
+          ? "Your cosmic journey begins, Vivida"
+          : "შენი კოსმიური მოგზაურობა იწყება, Vivida"
       }
       locale={locale}
     >
@@ -76,25 +76,25 @@ export function WelcomeEmail({
         }}
       >
         <li>
-          <strong>{en ? "Natal chart" : "ნატალური რუკა"}</strong> —{" "}
+          <strong>{en ? "Natal chart" : "ნატალური რუკა"}</strong>,{" "}
           {en
             ? "complete interpretations of planets, houses, and aspects"
             : "სრული ინტერპრეტაცია, პლანეტები, სახლები და ასპექტები"}
         </li>
         <li>
-          <strong>{en ? "Daily horoscope" : "ყოველდღიური ჰოროსკოპი"}</strong> —{" "}
+          <strong>{en ? "Daily horoscope" : "ყოველდღიური ჰოროსკოპი"}</strong>,{" "}
           {en
             ? "personalized to your chart"
             : "შენს რუკაზე მორგებული, AI-ით გენერირებული"}
         </li>
         <li>
-          <strong>{en ? "Compatibility" : "თავსებადობა"}</strong> —{" "}
+          <strong>{en ? "Compatibility" : "თავსებადობა"}</strong>,{" "}
           {en
             ? "compare charts with friends and partners"
             : "შეადარე თავი მეგობრებს, პარტნიორებს, ცნობილ ადამიანებს"}
         </li>
         <li>
-          <strong>{en ? "Cosmic events" : "კოსმიური მოვლენები"}</strong> —{" "}
+          <strong>{en ? "Cosmic events" : "კოსმიური მოვლენები"}</strong>,{" "}
           {en
             ? "new moons, retrogrades, and transits"
             : "ახალმთვარეები, რეტროგრადები, ტრანზიტები"}

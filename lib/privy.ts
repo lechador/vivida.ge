@@ -1,7 +1,7 @@
 /**
  * Server-side Privy configuration.
  *
- * The browser SDK (`NEXT_PUBLIC_PRIVY_APP_ID`) drives the wallet UI — login,
+ * The browser SDK (`NEXT_PUBLIC_PRIVY_APP_ID`) drives the wallet UI, login,
  * embedded wallet creation, and one-tap USDC transfers. `PRIVY_APP_SECRET` is
  * the server credential for Privy's REST API (treasury / wallet operations).
  *

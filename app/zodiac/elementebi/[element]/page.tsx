@@ -385,8 +385,8 @@ export default async function ElementDetailPage({
             შენი {labelKa}-ის ბალანსი
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ნატალური რუკა გიჩვენებს, რამდენი ცეცხლი, მიწა, ჰაერი და წყალი გაქვს
-            — ეს უკეთ გაგარკვევს, რა გიხერხდება ბუნებრივად.
+            ნატალური რუკა გიჩვენებს, რამდენი ცეცხლი, მიწა, ჰაერი და წყალი გაქვს,
+            ეს უკეთ გაგარკვევს, რა გიხერხდება ბუნებრივად.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/signup">ჩემი სრული რუკა</Link>

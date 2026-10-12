@@ -23,7 +23,7 @@ import {
 } from "@/lib/ask-nudges-pure";
 
 /**
- * Proactive ask nudges — the AI astrologer follows up on remembered open
+ * Proactive ask nudges, the AI astrologer follows up on remembered open
  * loops ("როგორ მიდის გასაუბრების ამბავი?").
  *
  * Cost discipline (hard requirements):
@@ -159,7 +159,7 @@ export async function deliverAskNudges(
         stats.skippedSeen += 1;
         continue;
       }
-      // Max one unopened nudge — never stack.
+      // Max one unopened nudge, never stack.
       if (history.some((d) => d.status === "sent" && !d.openedAt)) {
         stats.skippedPending += 1;
         continue;
@@ -227,7 +227,7 @@ export async function deliverAskNudges(
   return stats;
 }
 
-/** Unopened nudges — drives the ask tab badge. */
+/** Unopened nudges, drives the ask tab badge. */
 export async function countPendingAskNudges(userId: string): Promise<number> {
   const rows = await db
     .select({ id: reminderDeliveries.id })

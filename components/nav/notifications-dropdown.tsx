@@ -104,16 +104,16 @@ function notificationLabel(
         : "მიიღო შენი ურთიერთობის მოწვევა";
     case "relationship_weekly":
       return payload?.relationshipHeadline
-        ? `— ${payload.relationshipHeadline}`
+        ? payload.relationshipHeadline
         : en
           ? "has a new weekly update"
-          : "— ახალი ყოველკვირეული განახლება";
+          : "ახალი ყოველკვირეული განახლება";
     case "relationship_transit":
       return payload?.transitTitle
-        ? `— ${payload.transitTitle}`
+        ? payload.transitTitle
         : en
           ? "has an important upcoming transit"
-          : "— მნიშვნელოვანი ტრანზიტი ახლოვდება";
+          : "მნიშვნელოვანი ტრანზიტი ახლოვდება";
     case "timing_reminder":
     case "forecast_reminder":
     case "ask_nudge":
@@ -217,7 +217,7 @@ export function NotificationsDropdown({
 
   const totalUnread = unread + msgNotifs.length;
 
-  // When the bell is opened, mark only DB notifications read — message
+  // When the bell is opened, mark only DB notifications read, message
   // notifications clear themselves when the user actually reads the chat.
   const handleOpenChange = (next: boolean) => {
     setOpen(next);

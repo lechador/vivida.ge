@@ -24,8 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: en ? "How Vivida works" : "როგორ მუშაობს",
     description: en
       ? "See how Vivida turns your birth details into a personal chart, forecast, and AI-powered interpretation."
-      : "ნახე როგორ ქმნის Vivida შენს პერსონალურ კოსმიურ რუკას — დაბადების მონაცემიდან AI ინტერპრეტაციამდე.",
-    // Same-path pair — see the note in app/features/page.tsx: the sitemap
+      : "ნახე როგორ ქმნის Vivida შენს პერსონალურ კოსმიურ რუკას, დაბადების მონაცემიდან AI ინტერპრეტაციამდე.",
+    // Same-path pair, see the note in app/features/page.tsx: the sitemap
     // declared this pair from the English side only, so it never held.
     alternates: localizedAlternates("/how-it-works", "/how-it-works", locale),
   };
@@ -44,7 +44,7 @@ const STEPS: Step[] = [
     number: "01",
     Icon: UserPlus,
     title: "შემოდი Google-ით",
-    body: "ერთი დაკლიკებით — ანგარიშის შექმნა არ გჭირდება. პაროლი, დადასტურებები, არაფერი. პირდაპირ კოსმოსში გადადი.",
+    body: "ერთი დაკლიკებით, ანგარიშის შექმნა არ გჭირდება. პაროლი, დადასტურებები, არაფერი. პირდაპირ კოსმოსში გადადი.",
     hue: "oklch(0.78 0.18 305)",
   },
   {
@@ -58,28 +58,28 @@ const STEPS: Step[] = [
     number: "03",
     Icon: Compass,
     title: "ნახე შენი ნატალური რუკა",
-    body: "ცის რუკა, რომელიც დახვდა შენს დაბადებას — მზე, მთვარე, ამომავალი ნიშანი, 12 სახლი, ყველა ასპექტი. ცოცხალი ვიზუალით.",
+    body: "ცის რუკა, რომელიც დახვდა შენს დაბადებას, მზე, მთვარე, ამომავალი ნიშანი, 12 სახლი, ყველა ასპექტი. ცოცხალი ვიზუალით.",
     hue: "oklch(0.78 0.15 195)",
   },
   {
     number: "04",
     Icon: Sparkles,
     title: "მიიღე AI ინტერპრეტაცია",
-    body: "ჩვენი AI შენი რუკის ემოციური პორტრეტს ქმნის — შენი დიდი სამეული, ძლიერი მხარეები და ცხოვრების ძირითადი თემები ცოცხალ ენაზე.",
+    body: "ჩვენი AI შენი რუკის ემოციური პორტრეტს ქმნის, შენი დიდი სამეული, ძლიერი მხარეები და ცხოვრების ძირითადი თემები ცოცხალ ენაზე.",
     hue: "oklch(0.72 0.22 0)",
   },
   {
     number: "05",
     Icon: Telescope,
     title: "აღმოაჩინე თავსებადი ხალხი",
-    body: "Vivida გიჩვენებს ვისთან რეზონირებ კოსმოსურად — სიყვარული, მეგობრობა, კომუნიკაცია, ზრდა, ქიმია. ხუთ სფეროში.",
+    body: "Vivida გიჩვენებს ვისთან რეზონირებ კოსმოსურად, სიყვარული, მეგობრობა, კომუნიკაცია, ზრდა, ქიმია. ხუთ სფეროში.",
     hue: "oklch(0.72 0.22 350)",
   },
   {
     number: "06",
     Icon: MapPin,
     title: "გაუზიარე სამყაროს",
-    body: "შექმენი საჯარო პროფილი — სხვებმა აღმოგაჩინონ შენი ნიშნით ან @username-ით. ყოველთვის შენი არჩევანია, რას აჩვენებ.",
+    body: "შექმენი საჯარო პროფილი, სხვებმა აღმოგაჩინონ შენი ნიშნით ან @username-ით. ყოველთვის შენი არჩევანია, რას აჩვენებ.",
     hue: "oklch(0.72 0.18 145)",
   },
 ];
@@ -103,7 +103,7 @@ const STEPS_EN: Step[] = [
     number: "03",
     Icon: Compass,
     title: "Explore your birth chart",
-    body: "See the sky at the moment you were born—your Sun, Moon, rising sign, 12 houses, and major aspects in an interactive chart.",
+    body: "See the sky at the moment you were born, your Sun, Moon, rising sign, 12 houses, and major aspects in an interactive chart.",
     hue: "oklch(0.78 0.15 195)",
   },
   {
@@ -167,7 +167,7 @@ export default async function HowItWorksPage() {
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
           {en
             ? "Vivida transforms the exact moment of your birth into a living personal guide. It takes only a few minutes to begin."
-            : "Vivida გადააქცევს შენი დაბადების ზუსტ მომენტს ცოცხალ, პირად გზამკვლევად. გზა რამდენიმე წუთიანია — შედეგი მთელი ცხოვრებისთვის."}
+            : "Vivida გადააქცევს შენი დაბადების ზუსტ მომენტს ცოცხალ, პირად გზამკვლევად. გზა რამდენიმე წუთიანია, შედეგი მთელი ცხოვრებისთვის."}
         </p>
 
         <div className="mt-12 space-y-4 sm:space-y-5">

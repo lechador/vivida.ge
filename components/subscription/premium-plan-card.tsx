@@ -136,7 +136,7 @@ export function PremiumPlanCard({
   }
 
   // English site: crypto cannot auto-renew, so the card sells a one-time
-  // 30-day pass paid by card — no plan toggles, no renewal promise.
+  // 30-day pass paid by card, no plan toggles, no renewal promise.
   if (crypto && !active) {
     return (
       <section className="relative overflow-hidden rounded-3xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-gold)]/14 via-card/70 to-[var(--vivida-violet)]/12 p-6 ring-1 ring-foreground/5 sm:p-8">
@@ -177,7 +177,7 @@ export function PremiumPlanCard({
               Get 30 days of PRO
             </PayByCardButton>
             <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
-              One-time card payment. No auto-renewal — buy another pass whenever
+              One-time card payment. No auto-renewal, buy another pass whenever
               you like.
             </p>
           </div>

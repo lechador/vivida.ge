@@ -116,8 +116,8 @@ export default async function LibraryPage({
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-foreground/70 sm:text-base">
               {en
-                ? "Your horoscopes, forecasts, tarot readings, AI insights and reports—kept together in one private place."
-                : "შენი ჰოროსკოპები, პროგნოზები, ტაროს კითხვები, AI რჩევები და რეპორტები — ერთ პირად სივრცეში."}
+                ? "Your horoscopes, forecasts, tarot readings, AI insights and reports, kept together in one private place."
+                : "შენი ჰოროსკოპები, პროგნოზები, ტაროს კითხვები, AI რჩევები და რეპორტები, ერთ პირად სივრცეში."}
             </p>
           </div>
           <Link

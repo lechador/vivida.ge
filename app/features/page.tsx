@@ -26,11 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: en ? "Features" : "ფუნქციები",
     description: en
-      ? "Birth charts, daily forecasts, compatibility, AI insights, and a public profile—explore every Vivida feature."
-      : "ნატალური რუკა, ყოველდღიური პროგნოზი, თავსებადობა, AI ანალიზი, საჯარო პროფილი — Vivida-ს ყველა ფუნქცია ერთ ადგილას.",
+      ? "Birth charts, daily forecasts, compatibility, AI insights, and a public profile, explore every Vivida feature."
+      : "ნატალური რუკა, ყოველდღიური პროგნოზი, თავსებადობა, AI ანალიზი, საჯარო პროფილი, Vivida-ს ყველა ფუნქცია ერთ ადგილას.",
     // Same-path pair: the English version lives at /features on the
     // international host. Self-canonicalizes per domain AND declares the
-    // reciprocal hreflang — the sitemap alone was one-way (only the English
+    // reciprocal hreflang, the sitemap alone was one-way (only the English
     // side named a Georgian partner), so Google dropped the pair and treated
     // the two domains as competing duplicates.
     alternates: localizedAlternates("/features", "/features", locale),
@@ -48,43 +48,43 @@ const FEATURES: Feature[] = [
   {
     Icon: Sun,
     title: "ყოველდღიური პროგნოზი",
-    body: "შენი დღევანდელი ცა — ერთხელ დაგენერირებული, შენი ნატალური რუკით პერსონალიზებული. ემოციური ფონი, შესაძლებლობა, ფოკუსის ზონა.",
+    body: "შენი დღევანდელი ცა, ერთხელ დაგენერირებული, შენი ნატალური რუკით პერსონალიზებული. ემოციური ფონი, შესაძლებლობა, ფოკუსის ზონა.",
     hue: "oklch(0.82 0.16 80)",
   },
   {
     Icon: Compass,
     title: "სრული ნატალური რუკა",
-    body: "ცოცხალი ვიზუალი — 12 ნიშანი, 12 სახლი, 10+ პლანეტა, ყველა ასპექტი. შენი დიდი სამეული (მზე, მთვარე, ამომავალი) ცენტრში.",
+    body: "ცოცხალი ვიზუალი, 12 ნიშანი, 12 სახლი, 10+ პლანეტა, ყველა ასპექტი. შენი დიდი სამეული (მზე, მთვარე, ამომავალი) ცენტრში.",
     hue: "oklch(0.78 0.18 305)",
   },
   {
     Icon: Heart,
     title: "თავსებადობა (Synastry)",
-    body: "ნახე ვისთან რეზონირებ კოსმოსურად — სიყვარული, მეგობრობა, კომუნიკაცია, ზრდა, ქიმია. პროცენტი + დეტალური ახსნა.",
+    body: "ნახე ვისთან რეზონირებ კოსმოსურად, სიყვარული, მეგობრობა, კომუნიკაცია, ზრდა, ქიმია. პროცენტი + დეტალური ახსნა.",
     hue: "oklch(0.72 0.22 0)",
   },
   {
     Icon: Brain,
     title: "AI ინტერპრეტაცია",
-    body: "შენი რუკის ემოციური პორტრეტი, შექმნილი AI-ს მიერ. არა ზოგადი ჰოროსკოპი — შენი მონაცემების მიხედვით პერსონალური ანალიზი.",
+    body: "შენი რუკის ემოციური პორტრეტი, შექმნილი AI-ს მიერ. არა ზოგადი ჰოროსკოპი, შენი მონაცემების მიხედვით პერსონალური ანალიზი.",
     hue: "oklch(0.78 0.15 195)",
   },
   {
     Icon: Sparkles,
     title: "მნიშვნელოვანი შტრიხები",
-    body: "AI შენს რუკაში ყველაზე საინტერესო კავშირებს პოულობს — სტელიუმები, ძლიერი ასპექტები, უნიკალური აქცენტები.",
+    body: "AI შენს რუკაში ყველაზე საინტერესო კავშირებს პოულობს, სტელიუმები, ძლიერი ასპექტები, უნიკალური აქცენტები.",
     hue: "oklch(0.72 0.22 350)",
   },
   {
     Icon: UserCircle,
     title: "საჯარო პროფილი",
-    body: "შექმენი @username, ატვირთე ფოტოები, დაწერე ბიო — სხვებმა აღმოგაჩინონ შენი ნიშნით და მაშინვე ნახონ თქვენი თავსებადობა.",
+    body: "შექმენი @username, ატვირთე ფოტოები, დაწერე ბიო, სხვებმა აღმოგაჩინონ შენი ნიშნით და მაშინვე ნახონ თქვენი თავსებადობა.",
     hue: "oklch(0.72 0.18 145)",
   },
   {
     Icon: Globe2,
     title: "აღმოაჩინე ცა",
-    body: "Vivida გიჩვენებს თავსებად ხალხს — შენი დომინანტი ელემენტის მიხედვით, შენი ნიშნით, ან უბრალოდ ვინც ახლოს არის.",
+    body: "Vivida გიჩვენებს თავსებად ხალხს, შენი დომინანტი ელემენტის მიხედვით, შენი ნიშნით, ან უბრალოდ ვინც ახლოს არის.",
     hue: "oklch(0.78 0.15 195)",
   },
   {
@@ -96,7 +96,7 @@ const FEATURES: Feature[] = [
   {
     Icon: MessageCircle,
     title: "პირდაპირი შეტყობინებები",
-    body: "ისაუბრე მეგობრებთან რეალურ დროში — write receipts, typing indicators, ფონური შეტყობინებები. ყველაფერი როგორც უნდა იყოს.",
+    body: "ისაუბრე მეგობრებთან რეალურ დროში, write receipts, typing indicators, ფონური შეტყობინებები. ყველაფერი როგორც უნდა იყოს.",
     hue: "oklch(0.78 0.18 305)",
   },
 ];
@@ -105,7 +105,7 @@ const FEATURES_EN: Feature[] = [
   {
     Icon: Sun,
     title: "Daily forecast",
-    body: "Your personal sky for today, generated from your natal chart—emotional tone, opportunity, and an area to focus on.",
+    body: "Your personal sky for today, generated from your natal chart, emotional tone, opportunity, and an area to focus on.",
     hue: "oklch(0.82 0.16 80)",
   },
   {
@@ -117,7 +117,7 @@ const FEATURES_EN: Feature[] = [
   {
     Icon: Heart,
     title: "Compatibility (synastry)",
-    body: "Explore romantic, friendship, communication, growth, chemistry, and work compatibility—with clear scores and detailed explanations.",
+    body: "Explore romantic, friendship, communication, growth, chemistry, and work compatibility, with clear scores and detailed explanations.",
     hue: "oklch(0.72 0.22 0)",
   },
   {
@@ -129,7 +129,7 @@ const FEATURES_EN: Feature[] = [
   {
     Icon: Sparkles,
     title: "Chart highlights",
-    body: "Vivida finds the most distinctive patterns in your chart—stelliums, powerful aspects, and the placements that deserve a closer look.",
+    body: "Vivida finds the most distinctive patterns in your chart, stelliums, powerful aspects, and the placements that deserve a closer look.",
     hue: "oklch(0.72 0.22 350)",
   },
   {
@@ -141,7 +141,7 @@ const FEATURES_EN: Feature[] = [
   {
     Icon: Globe2,
     title: "Discover people",
-    body: "Meet people through shared elements, zodiac signs, and meaningful chart connections—or simply see who is nearby.",
+    body: "Meet people through shared elements, zodiac signs, and meaningful chart connections, or simply see who is nearby.",
     hue: "oklch(0.78 0.15 195)",
   },
   {
@@ -193,7 +193,7 @@ export default async function FeaturesPage() {
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
           {en
             ? "Vivida goes beyond a horoscope app. It is a personal guide from the moment of your birth to the choices you make every day."
-            : "Vivida არ არის უბრალო ჰოროსკოპის აპი. ეს არის შენი პერსონალური კოსმიური თანამგზავრი — დაბადებიდან ყოველდღიურ გადაწყვეტილებებამდე."}
+            : "Vivida არ არის უბრალო ჰოროსკოპის აპი. ეს არის შენი პერსონალური კოსმიური თანამგზავრი, დაბადებიდან ყოველდღიურ გადაწყვეტილებებამდე."}
         </p>
 
         <div className="mt-12 grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -251,7 +251,7 @@ export default async function FeaturesPage() {
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
             {en
               ? "Start with Vivida for free and keep your personal sky within reach."
-              : "ყველა ფუნქცია სრულად უფასოა — შენი კოსმოსი ერთ დაკლიკვაზე."}
+              : "ყველა ფუნქცია სრულად უფასოა, შენი კოსმოსი ერთ დაკლიკვაზე."}
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic" size="lg">

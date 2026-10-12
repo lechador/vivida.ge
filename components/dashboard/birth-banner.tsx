@@ -23,8 +23,8 @@ export function BirthDataBanner({ locale = "ka" }: { locale?: UserLocale }) {
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             {en
-              ? "Add your birth details once — daily horoscope, live sky and compatibility open up."
-              : "შეავსე დაბადების მონაცემები ერთხელ — გაიხსნება დღიური ჰოროსკოპი, ცოცხალი ცა და თავსებადობა."}
+              ? "Add your birth details once, daily horoscope, live sky and compatibility open up."
+              : "შეავსე დაბადების მონაცემები ერთხელ, გაიხსნება დღიური ჰოროსკოპი, ცოცხალი ცა და თავსებადობა."}
           </p>
         </div>
       </div>

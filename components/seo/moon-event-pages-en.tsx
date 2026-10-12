@@ -104,7 +104,7 @@ export function MoonPhaseHubEn({ kind }: { kind: MoonEventKind }) {
       itemListElement: events.map((event, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        name: `${cfg.title} — ${eventDate(event)}`,
+        name: `${cfg.title}, ${eventDate(event)}`,
         url: `${url}/${event.iso}`,
       })),
     },
@@ -246,7 +246,7 @@ export function MoonPhaseDetailEn({ event }: { event: MoonEvent }) {
   const ld = [
     articleLd({
       url,
-      headline: `${cfg.title} — ${date}`,
+      headline: `${cfg.title}, ${date}`,
       description: meaning,
       datePublished: "2026-08-13T00:00:00Z",
       dateModified: "2026-08-24T00:00:00Z",
@@ -276,7 +276,7 @@ export function MoonPhaseDetailEn({ event }: { event: MoonEvent }) {
         <header className="mt-6 rounded-3xl border border-border bg-card/60 p-7 sm:p-9">
           <div className="text-5xl">{cfg.symbol}</div>
           <h1 className="mt-4 text-3xl font-semibold sm:text-4xl">
-            {cfg.title} — {date}
+            {cfg.title}, {date}
           </h1>
           <p className="mt-4 text-lg">
             {eventTime(event)} · {event.snapshot.signSymbol}{" "}

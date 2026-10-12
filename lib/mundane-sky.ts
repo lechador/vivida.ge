@@ -3,7 +3,7 @@ import { computeTransits } from "@/lib/transits";
 import { BODIES, signByIndex } from "@/lib/zodiac";
 
 /**
- * Mundane (no-natal) sky snapshot for the public horoscope SEO pages — which
+ * Mundane (no-natal) sky snapshot for the public horoscope SEO pages, which
  * sign every planet occupies today and the day's tightest planet-to-planet
  * aspects, all Georgian-labelled. Pure ephemeris math, no DB/AI, so the hubs
  * get genuinely fresh transit-based content on every ISR revalidation.
@@ -41,7 +41,7 @@ export const ASPECT_KA: Record<AspectKind, string> = {
   opposition: "ოპოზიცია",
 };
 
-/** Display order — luminaries and fast movers first (they change the most). */
+/** Display order, luminaries and fast movers first (they change the most). */
 const ORDER = [
   "moon",
   "sun",
@@ -56,7 +56,7 @@ const ORDER = [
 ] as const;
 
 /**
- * Compute the sky for a date (noon UTC — matches the daily horoscope
+ * Compute the sky for a date (noon UTC, matches the daily horoscope
  * generators). `maxAspects` keeps the aspect list to the genuinely notable
  * ones: pairs are deduped, sorted tightest-first, and slow-vs-slow pairs
  * (which barely move day to day) are skipped so the list actually changes
@@ -86,7 +86,7 @@ export function computeMundaneSky(
   }
 
   // Mundane aspects: every unordered planet pair, best aspect per pair. Skip
-  // outer-vs-outer pairs — Jupiter..Pluto aspects stay in orb for months and
+  // outer-vs-outer pairs, Jupiter..Pluto aspects stay in orb for months and
   // would crowd out the fast, day-defining contacts.
   const SLOW = new Set(["jupiter", "saturn", "uranus", "neptune", "pluto"]);
   const aspects: MundaneAspect[] = [];

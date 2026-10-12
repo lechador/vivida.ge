@@ -20,7 +20,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * so phones/tablets need a hamburger entry point. Renders nothing above lg.
  *
  * The `tab` variant renders a bottom-tab-bar-styled "More" trigger instead
- * of the header hamburger, so the fifth tab opens this same drawer — no
+ * of the header hamburger, so the fifth tab opens this same drawer, no
  * dead links, no parallel menu to drift.
  */
 export function MobileNav({
@@ -34,7 +34,7 @@ export function MobileNav({
   locale?: UserLocale;
   variant?: "menu" | "tab";
   unreadMessages?: number;
-  /** Unopened proactive astrologer nudges — dot on the ask row. */
+  /** Unopened proactive astrologer nudges, dot on the ask row. */
   pendingAskNudges?: number;
 }) {
   const [open, setOpen] = useState(false);
@@ -100,7 +100,7 @@ export function MobileNav({
                 transition={{ type: "spring", stiffness: 320, damping: 34 }}
                 className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col gap-6 border-r border-border bg-card/95 p-6 shadow-2xl ring-1 ring-foreground/10 backdrop-blur-xl"
               >
-                {/* Header — logo + close */}
+                {/* Header, logo + close */}
                 <div className="flex items-center justify-between">
                   <Link
                     href="/dashboard"
@@ -126,7 +126,7 @@ export function MobileNav({
                   </DialogPrimitive.Close>
                 </div>
 
-                {/* For accessibility — Radix requires DialogTitle inside content. */}
+                {/* For accessibility, Radix requires DialogTitle inside content. */}
                 <DialogPrimitive.Title className="sr-only">
                   {locale !== "ka" ? "Navigation" : "ნავიგაცია"}
                 </DialogPrimitive.Title>

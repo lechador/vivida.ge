@@ -10,7 +10,7 @@ const TIME_RE = /^\d{2}:\d{2}$/;
 
 /**
  * Public, no-auth natal chart computation for /nataluri-ruka. Returns PURE
- * chart data (positions, houses, aspects) — no AI interpretation, nothing
+ * chart data (positions, houses, aspects), no AI interpretation, nothing
  * persisted. Computation is local + deterministic (Swiss Ephemeris in-process).
  */
 export async function POST(req: Request) {

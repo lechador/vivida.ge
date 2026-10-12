@@ -69,7 +69,7 @@ const NAV_FEATURE_GATE: Partial<Record<NavActiveKey, SocialFeature>> = {
 
 /**
  * Locale allowlist per nav key. The Insight Bazaar ships English-only, so
- * its entry renders on the English host only — a Georgian-host link would
+ * its entry renders on the English host only, a Georgian-host link would
  * 404 (no /readings route exists there, rewrites are English-host-only).
  */
 const NAV_LOCALE_GATE: Partial<Record<NavActiveKey, readonly UserLocale[]>> = {
@@ -234,8 +234,8 @@ const ALL_NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * The mobile bottom tab bar shows four link destinations —
- * Today / Tarot / Ask / My history — plus a More entry point that opens
+ * The mobile bottom tab bar shows four link destinations,
+ * Today / Tarot / Ask / My history, plus a More entry point that opens
  * the full nav drawer (rendered by MobileTabBar, not a link here).
  * Tab entries reuse the canonical item (href/icon/hue/labels) so the two
  * surfaces cannot drift; /library carries its tab-only history naming.
@@ -243,7 +243,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
 export const NAV_ITEMS: NavItem[] = ALL_NAV_ITEMS.filter(navVisible);
 
 /**
- * Sidebar/drawer items for an interface language — feature flags plus the
+ * Sidebar/drawer items for an interface language, feature flags plus the
  * locale gates (English-only destinations never render dead links).
  */
 export function navItems(locale: UserLocale = "ka"): NavItem[] {
@@ -292,6 +292,6 @@ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
   mobileTab("library"),
 ];
 
-/** Visible mobile tab bar — same flag filtering as the desktop nav. */
+/** Visible mobile tab bar, same flag filtering as the desktop nav. */
 export const MOBILE_TAB_ITEMS: NavItem[] =
   ALL_MOBILE_TAB_ITEMS.filter(navVisible);

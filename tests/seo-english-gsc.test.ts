@@ -24,7 +24,7 @@ describe("English SEO copy informed by Search Console queries", () => {
       new Date("2026-01-31T12:00:00Z"),
     );
 
-    expect(seo.title).toBe("Aquarius Horoscope Next Month — February 2026");
+    expect(seo.title).toBe("Aquarius Horoscope Next Month, February 2026");
     expect(seo.heading).toBe("Aquarius Horoscope Next Month");
     expect(seo.description).toContain("Aquarius horoscope next month");
   });

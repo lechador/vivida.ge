@@ -14,7 +14,7 @@ const PLANETS_TO_SHOW = [
 ] as const;
 
 /**
- * Flat planet list — one tight, aligned row per planet (glyph · name · sign ·
+ * Flat planet list, one tight, aligned row per planet (glyph · name · sign ·
  * degree · house) with the interpretation shown inline beneath it (open by
  * default). The positions table links here via #planet-<key> anchors.
  */

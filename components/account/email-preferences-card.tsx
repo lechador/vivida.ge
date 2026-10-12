@@ -54,7 +54,7 @@ export function EmailPreferencesCard({
           subtitle={
             en
               ? "A short daily reading delivered in the morning."
-              : "დილით — შენი დღევანდელი მცირე ანალიზი ელფოსტაზე."
+              : "დილით, შენი დღევანდელი მცირე ანალიზი ელფოსტაზე."
           }
           on={prefs.daily}
           onChange={(v) => setPrefs((p) => ({ ...p, daily: v }))}
@@ -65,7 +65,7 @@ export function EmailPreferencesCard({
           subtitle={
             en
               ? "Friend requests, messages, and feed activity if you have not visited in an hour."
-              : "მეგობრობის მოთხოვნები, წერილები და ფიდის აქტივობა — თუ საიტზე 1 საათი არ შემოხვალ."
+              : "მეგობრობის მოთხოვნები, წერილები და ფიდის აქტივობა, თუ საიტზე 1 საათი არ შემოხვალ."
           }
           on={prefs.nudges}
           onChange={(v) => setPrefs((p) => ({ ...p, nudges: v }))}

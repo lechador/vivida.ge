@@ -13,7 +13,7 @@ import {
 
 /**
  * Admin-only bulk email send endpoint. Expected to be called from the
- * vivida_admin panel (which runs locally) — auth is a single shared
+ * vivida_admin panel (which runs locally), auth is a single shared
  * secret in `ADMIN_API_TOKEN`. The token never lives in the browser:
  * the admin panel forwards from its server side.
  *
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
   }
   const template = body.template as EmailTemplateKind;
 
-  // Cheap dry-run path — admin clicks "preview audience" without firing.
+  // Cheap dry-run path, admin clicks "preview audience" without firing.
   // Marketing skips the content check here; we want audience-counting to
   // work before the admin has typed the subject/body.
   if (body.dryRun === true) {
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ testEmail: body.testEmail, sent });
   }
 
-  // The offer template always runs under its campaign — the recipient rows are
+  // The offer template always runs under its campaign, the recipient rows are
   // what entitle a buyer to the ₾29 price, so a campaign-less send would mail
   // an offer nobody could actually redeem.
   const campaign =

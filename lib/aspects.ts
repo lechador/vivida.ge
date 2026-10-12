@@ -52,7 +52,7 @@ export function angularDistance(a: number, b: number): number {
 }
 
 /**
- * Canonical ID for an aspect — alphabetically sorted body keys + kind so the
+ * Canonical ID for an aspect, alphabetically sorted body keys + kind so the
  * same aspect always serializes identically (used as the AI dictionary key).
  */
 export function aspectKey(a: string, b: string, kind: AspectKind): string {

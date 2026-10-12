@@ -192,7 +192,7 @@ export function CreditBalanceMenu({
             <span className="min-w-0 flex-1">
               <span className="block text-xs font-semibold text-foreground">
                 {crypto
-                  ? "Vivida PRO — 30-day pass"
+                  ? "Vivida PRO, 30-day pass"
                   : proMonths > 1
                     ? en
                       ? `${proMonths} months of Vivida PRO`

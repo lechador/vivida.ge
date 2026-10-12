@@ -88,14 +88,14 @@ function SearchPanel({
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // Autofocus on mount — main reason to use a dedicated mobile component
+  // Autofocus on mount, main reason to use a dedicated mobile component
   // is that the user expects the keyboard to appear immediately.
   useEffect(() => {
     const t = setTimeout(() => inputRef.current?.focus(), 50);
     return () => clearTimeout(t);
   }, []);
 
-  // Debounced fetch — only when the trimmed query is long enough.
+  // Debounced fetch, only when the trimmed query is long enough.
   // When the query becomes too short, we don't fetch but also don't clear
   // here (rendering uses `hasQuery` to decide what to show, so stale results
   // are simply hidden until a new fetch resolves).

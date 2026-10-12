@@ -33,7 +33,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  // W04 search funnel — fire search_opened once per mount, and no_result at
+  // W04 search funnel, fire search_opened once per mount, and no_result at
   // most once per distinct query (debounced fetches would otherwise spam).
   const openedTracked = useRef(false);
   const noResultTracked = useRef<Set<string>>(new Set());
@@ -50,7 +50,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
     setQuery("");
   }
 
-  // Debounced fetch — only when the trimmed query is long enough.
+  // Debounced fetch, only when the trimmed query is long enough.
   // Stale results from a longer prior query stay in state but the dropdown
   // is gated below by `hasQuery`, so they never render.
   const trimmed = query.trim();
@@ -59,7 +59,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
     if (!hasQuery) return;
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
-      // Spinner shown only after debounce fires — avoids a flash on every
+      // Spinner shown only after debounce fires, avoids a flash on every
       // keystroke and satisfies the "no synchronous setState in effect" rule.
       setLoading(true);
       try {

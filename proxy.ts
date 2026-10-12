@@ -78,7 +78,7 @@ function internationalEnglishRouting(
  * Send a signed-in visitor from the marketing landing into the app.
  *
  * Runs ahead of the locale rules because language routing is irrelevant once
- * someone is signed in — the interface language of /dashboard is decided by
+ * someone is signed in, the interface language of /dashboard is decided by
  * host, which a same-host redirect preserves. The query string is carried
  * over so ref/utm capture in the root layout still sees it.
  */
@@ -130,7 +130,7 @@ export const config = {
   matcher: [
     /*
      * Match all routes except:
-     *  - api/auth (Auth.js handlers — they manage their own auth)
+     *  - api/auth (Auth.js handlers, they manage their own auth)
      *  - _next (static / image)
      *  - public files (favicon, svg, png, etc.)
      */

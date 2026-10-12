@@ -33,8 +33,8 @@ const PLAN = {
   currency: "amd",
   interval: "month",
   lookupKey: "vivida_premium_am_monthly_299000_v1",
-  // This account keeps ONE PRODUCT PER MARKET — "Vivida PRO Georgia",
-  // "Vivida PRO UK", "Vivida PRO Armenia" — not one product carrying several
+  // This account keeps ONE PRODUCT PER MARKET, "Vivida PRO Georgia",
+  // "Vivida PRO UK", "Vivida PRO Armenia", not one product carrying several
   // currency prices. Follow that when adding the next market.
   productName: "Vivida PRO Armenia",
   priceNickname: "Armenia monthly unlimited plan",
@@ -49,7 +49,7 @@ const apply = process.argv.includes("--apply");
 const checkoutSmoke = process.argv.includes("--checkout-smoke");
 const key = process.env.STRIPE_SECRET_KEY;
 if (!key) {
-  console.error("STRIPE_SECRET_KEY is not set in .env.local — aborting.");
+  console.error("STRIPE_SECRET_KEY is not set in .env.local, aborting.");
   process.exit(1);
 }
 
@@ -117,7 +117,7 @@ async function runCheckoutSmoke(price) {
         unit_amount: creditAmount,
         product_data: {
           name: "30 Vivida կրեդիտ",
-          description: "Vivida · 990 ֏ — 30 կրեդիտ",
+          description: "Vivida · 990 ֏, 30 կրեդիտ",
         },
       },
     }],
@@ -148,7 +148,7 @@ if (existing.data[0]) {
   console.log(`\nPrice already exists: ${price.id}`);
   if (!matches) {
     console.error(
-      "It does NOT match the catalogue — checkout will throw. Archive it in " +
+      "It does NOT match the catalogue, checkout will throw. Archive it in " +
         "Stripe and re-run, or correct lib/billing-config.ts.",
     );
     process.exit(1);
@@ -159,7 +159,7 @@ if (existing.data[0]) {
 }
 
 if (!apply) {
-  console.log("\nDry run — nothing created. Re-run with --apply to create it.");
+  console.log("\nDry run, nothing created. Re-run with --apply to create it.");
   process.exit(0);
 }
 

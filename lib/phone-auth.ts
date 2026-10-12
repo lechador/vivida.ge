@@ -7,7 +7,7 @@ import type { PhoneVerificationPurpose } from "@/db/schema";
 import { generateOtpCode } from "@/lib/otp";
 
 /**
- * Database-side core for the SMS phone flows — optional verification at
+ * Database-side core for the SMS phone flows, optional verification at
  * signup, phone-number login, and adding/changing the number in the
  * account. The website's server actions handle rate limiting, locale copy,
  * and the actual SMS send (lib/sms.ts).

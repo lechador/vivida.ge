@@ -31,10 +31,10 @@ import type { StreakProgress } from "@/lib/streak-credits";
 /**
  * The dashboard loads in two waves so the page never blocks on AI latency:
  *
- *   1. `loadDashboardCore` — chart positions + suggestions. All local
+ *   1. `loadDashboardCore`, chart positions + suggestions. All local
  *      compute + DB reads, no AI, so it returns in ~1s. The chart's AI
  *      narrative is upgraded in the background (aiUpgrade: "defer").
- *   2. `loadDashboardExtras` — the AI-generated daily horoscope, weekly
+ *   2. `loadDashboardExtras`, the AI-generated daily horoscope, weekly
  *      forecast, and moon reading, fetched in parallel and streamed into
  *      their own cards behind skeletons.
  *
@@ -52,9 +52,9 @@ export type DashboardCore =
       canDaily: boolean;
       /** The 7-day forecast is a one-time credit unlock. */
       weeklyUnlocked: boolean;
-      /** Credit balance — used by the locked-forecast unlock CTA. */
+      /** Credit balance, used by the locked-forecast unlock CTA. */
       balance: number;
-      /** PRO entitlement — gates the PRO daily brief layer. */
+      /** PRO entitlement, gates the PRO daily brief layer. */
       isPremium: boolean;
       ritualProgress: StreakProgress;
       suggestions: DiscoverCard[];
@@ -68,8 +68,8 @@ export async function loadDashboardCore(
   const chart = await ensureChartFor(userId, { aiUpgrade: "defer" });
   if (!chart) return { kind: "no-chart" };
 
-  // Skip the "suggested people" query entirely when the rail is flagged off
-  // — no point ranking strangers we won't show. Render is also guarded.
+  // Skip the "suggested people" query entirely when the rail is flagged off,
+  // no point ranking strangers we won't show. Render is also guarded.
   const [
     profileRow,
     suggestions,
@@ -107,7 +107,7 @@ export async function loadDashboardCore(
 
 export type DashboardExtras = {
   daily: DailyHoroscope | null;
-  /** Today's strongest transit aspects with their library interpretations —
+  /** Today's strongest transit aspects with their library interpretations,
    *  the "დღის ტრანზიტები" breakdown under the daily reading. */
   transitBreakdown: TransitBreakdownItem[];
   moonPhase: MoonPhaseRow | null;

@@ -12,7 +12,7 @@ if (!url) {
 }
 
 /**
- * `@neondatabase/serverless` talks HTTP to Neon's SQL endpoint — it does not
+ * `@neondatabase/serverless` talks HTTP to Neon's SQL endpoint, it does not
  * speak the Postgres wire protocol. Pointing it at a plain Postgres server
  * (CI's `postgres:17-alpine` service on localhost:5432) makes every query fail
  * with `NeonDbError: Error connecting to database: TypeError: fetch failed`,
@@ -26,7 +26,7 @@ function isNeonHost(connectionString: string): boolean {
   try {
     return new URL(connectionString).hostname.endsWith(".neon.tech");
   } catch {
-    // Not a parseable URL — let the Neon driver surface its own error rather
+    // Not a parseable URL, let the Neon driver surface its own error rather
     // than silently opening a TCP pool to somewhere unexpected.
     return true;
   }

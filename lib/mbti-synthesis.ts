@@ -1,10 +1,10 @@
 /**
- * Astro-MBTI synthesis — the small, fast, live personalization pass.
+ * Astro-MBTI synthesis, the small, fast, live personalization pass.
  *
  * The heavy lifting is pre-written into the MBTI library
  * (lib/mbti-library.ts): the type's psychological portrait + how it expresses
  * through the user's Sun sign. This live call just STITCHES those together and
- * adds the irreducible individual color — the user's name, exact axis %s, and
+ * adds the irreducible individual color, the user's name, exact axis %s, and
  * the rest of their chart (Moon, Mercury, Ascendant). That's a light job, so
  * a fast model handles it well.
  *
@@ -47,16 +47,16 @@ export type MbtiSynthesisInput = {
 
 const SYSTEM_PROMPT =
   "შენ ხარ გამოცდილი ქართველი ფსიქოლოგი, რომელიც ხსნის პიროვნების ტესტის (MBTI/" +
-  "16Personalities-ის ტიპის) შედეგს. წერ ბუნებრივ, მდიდარ, ლიტერატურულ ქართულად — " +
-  "გრამატიკულად და ორთოგრაფიულად უნაკლო, ცოცხალი და კონკრეტული. აქცენტი — სუფთა " +
+  "16Personalities-ის ტიპის) შედეგს. წერ ბუნებრივ, მდიდარ, ლიტერატურულ ქართულად, " +
+  "გრამატიკულად და ორთოგრაფიულად უნაკლო, ცოცხალი და კონკრეტული. აქცენტი, სუფთა " +
   "ფსიქოლოგიაზე: პიროვნების ტიპი, აზროვნების, გრძნობისა და გადაწყვეტილების წესი, " +
-  "ძლიერი მხარეები და ზრდის წერტილები. ეს ასტროლოგიური რუკის ანალიზი არ არის — " +
+  "ძლიერი მხარეები და ზრდის წერტილები. ეს ასტროლოგიური რუკის ანალიზი არ არის, " +
   "ზოდიაქოს ნიშანი მხოლოდ არქეტიპის სახელისა და ერთი მსუბუქი შტრიხისთვის ახსენე, " +
   "პლანეტების, სახლების ან ასპექტების ჩამოთვლის გარეშე. " +
-  "მოგეცემა წინასწარ დაწერილი ტიპის პორტრეტი — დაეყრდენი, მაგრამ არ გაიმეორო " +
+  "მოგეცემა წინასწარ დაწერილი ტიპის პორტრეტი, დაეყრდენი, მაგრამ არ გაიმეორო " +
   "სიტყვასიტყვით. დააბრუნე მხოლოდ ვალიდური JSON: " +
-  '{"archetypeNameGe": string, "analysisText": string}. archetypeNameGe — ' +
-  "ამ ადამიანის მოკლე, ცოცხალი ქართული არქეტიპი. analysisText — ტექსტი აბზაცებით (\\n\\n).";
+  '{"archetypeNameGe": string, "analysisText": string}. archetypeNameGe, ' +
+  "ამ ადამიანის მოკლე, ცოცხალი ქართული არქეტიპი. analysisText, ტექსტი აბზაცებით (\\n\\n).";
 
 const SYSTEM_PROMPT_EN =
   "You are an experienced personality-profile writer. Explain an MBTI-style result in natural, precise and warm English. " +
@@ -70,7 +70,7 @@ function scoresSummaryKa(scores: MbtiScores): string {
       const s = scores[axis];
       const [first, second] = AXIS_LABEL_KA[axis];
       const name = s.letter === axis[0] ? first : second;
-      return `${s.letter} (${name}) — ${s.pct}%`;
+      return `${s.letter} (${name}), ${s.pct}%`;
     })
     .join(", ");
 }
@@ -81,7 +81,7 @@ function scoresSummaryEn(scores: MbtiScores): string {
       const score = scores[axis];
       const [first, second] = AXIS_LABEL_EN[axis];
       const name = score.letter === axis[0] ? first : second;
-      return `${score.letter} (${name}) — ${score.pct}%`;
+      return `${score.letter} (${name}), ${score.pct}%`;
     })
     .join(", ");
 }
@@ -111,7 +111,7 @@ async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
     input.chart != null
       ? signByIndex(input.chart.bodies.sun?.signIndex ?? 0).labelKa
       : null;
-  // Only the type portrait feeds the synthesis now — the astro fusion is
+  // Only the type portrait feeds the synthesis now, the astro fusion is
   // deliberately dropped so the result stays focused on psychology.
   const { typeEntry } = await getTypeAndSun(mbtiBaseType(input.type), null);
 
@@ -119,8 +119,8 @@ async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
   const [assertiveKa, turbulentKa] = AXIS_LABEL_KA.AT;
   const identityKa = identity
     ? identity.letter === "A"
-      ? `${assertiveKa} (A) — ${identity.pct}%`
-      : `${turbulentKa} (T) — ${identity.pct}%`
+      ? `${assertiveKa} (A), ${identity.pct}%`
+      : `${turbulentKa} (T), ${identity.pct}%`
     : null;
 
   const lines: string[] = [];
@@ -131,14 +131,14 @@ async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
   );
   if (identityKa) {
     lines.push(
-      `იდენტობის ღერძი (თვითრწმენა): ${identityKa} — ` +
+      `იდენტობის ღერძი (თვითრწმენა): ${identityKa}, ` +
         "ჩართე ეს ნიუანსი: როგორ ხვდება სტრესს, თვითკრიტიკას, შედეგზე დამოკიდებულებას.",
     );
   }
   if (sunSignKa) {
     lines.push(
       `ზოდიაქოს ნიშანი: ${sunSignKa} (გამოიყენე მხოლოდ არქეტიპის სახელისთვის, ` +
-        `მაგ. „${sunSignKa} ${mbtiArchetypeKa(input.type)}“, და ერთი მსუბუქი შტრიხისთვის — მეტი არა).`,
+        `მაგ. „${sunSignKa} ${mbtiArchetypeKa(input.type)}“, და ერთი მსუბუქი შტრიხისთვის, მეტი არა).`,
     );
   }
 
@@ -149,7 +149,7 @@ async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
 
   lines.push(
     "\nდაწერე ერთიანი, პერსონალიზებული ფსიქოლოგიური სინთეზი ამ ტესტის შედეგზე. " +
-      "ფოკუსი — ტიპი და ღერძების პროცენტები: ვინ არის ეს ადამიანი, როგორ აზროვნებს, " +
+      "ფოკუსი, ტიპი და ღერძების პროცენტები: ვინ არის ეს ადამიანი, როგორ აზროვნებს, " +
       "გრძნობს და იღებს გადაწყვეტილებებს, რა არის მისი ძალა და ზრდის წერტილი. " +
       (sunSignKa
         ? `ზოდიაქოს ${sunSignKa} ჩართე მხოლოდ არქეტიპის სახელსა და ერთ მსუბუქ შტრიხში. `

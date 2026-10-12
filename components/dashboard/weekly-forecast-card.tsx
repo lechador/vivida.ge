@@ -49,7 +49,7 @@ const WEEKDAY_SHORT_KA: Record<string, string> = {
  * a one-line headline; click to expand the per-day breakdown (why it's
  * harmonic, why it's challenging, one piece of advice, and the top driving
  * aspects). All rows start collapsed so the week reads as a glanceable
- * list — users open the days they care about.
+ * list, users open the days they care about.
  */
 export function WeeklyForecastCard({
   days,
@@ -135,7 +135,7 @@ export function DayRow({
   const total = day.harmonyScore + day.challengeScore;
   const harmonicPct = total > 0 ? (day.harmonyScore / total) * 100 : 50;
   const challengePct = total > 0 ? (day.challengeScore / total) * 100 : 50;
-  // Overall "intensity" — quiet days get a faded bar so the eye sees them as low-energy.
+  // Overall "intensity", quiet days get a faded bar so the eye sees them as low-energy.
   const intensity = Math.min(
     1,
     Math.max(day.harmonyScore, day.challengeScore) / 70,
@@ -403,7 +403,7 @@ function bodyLabel(key: string, locale: UserLocale): string {
 }
 
 function parseDateNum(iso: string): string {
-  // Avoid timezone drift on the day number — slice the YYYY-MM-DD part directly.
+  // Avoid timezone drift on the day number, slice the YYYY-MM-DD part directly.
   const [, , dd] = iso.split("-");
   return dd ? String(parseInt(dd, 10)) : iso;
 }

@@ -129,7 +129,7 @@ export default async function AskPage({
           <p className="mt-1 text-sm text-muted-foreground">
             {en
               ? "A personal AI astrologer grounded in your real planets, houses and aspects."
-              : "შენი ნატალური რუკის პერსონალური AI ასტროლოგი — ეფუძნება შენს რეალურ პლანეტებსა და სახლებს."}
+              : "შენი ნატალური რუკის პერსონალური AI ასტროლოგი, ეფუძნება შენს რეალურ პლანეტებსა და სახლებს."}
           </p>
         </header>
 

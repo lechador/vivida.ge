@@ -1,10 +1,10 @@
 // Seed the reusable Astro-MBTI interpretation library (mbti_interpretation_library).
 // The pro-written bulk a fast live `flash` call composes over at test time:
-//   - "type"     — (mbtiType): deep psychological portrait; title = archetype. 16
-//   - "type_sun" — (mbtiType, sun sign): how the type expresses through the sign. 192
+//   - "type", (mbtiType): deep psychological portrait; title = archetype. 16
+//   - "type_sun", (mbtiType, sun sign): how the type expresses through the sign. 192
 // Total 208. One AI call per row.
 //
-// Uses Vertex AI Gemini (gemini-3.8-flash) via the GCP project set up for Veo —
+// Uses Vertex AI Gemini (gemini-3.8-flash) via the GCP project set up for Veo,
 // auth via local ADC (`gcloud auth application-default login`). Local one-time
 // bulk seed only; the live self-heal (lib/mbti-library.ts) uses OpenRouter.
 //
@@ -107,20 +107,20 @@ const SIGN_KEYS = Object.keys(SIGN_KA);
 
 const SYSTEM =
   "შენ ხარ გამოცდილი ქართველი ფსიქოანალიტიკოსი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
-  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. თავიდან აიცილე " +
+  "ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. თავიდან აიცილე " +
   "თარგმანის სტილი, გამეორებები და კლიშეები.";
 
 // Structured sections (strengths / weaknesses / the dual life-domains) must obey
-// the exact list format — this system prompt forbids prose so the writer voice
+// the exact list format, this system prompt forbids prose so the writer voice
 // above doesn't turn the lists back into paragraphs.
 const SYSTEM_STRUCTURED =
   "შენ ხარ ქართველი ფსიქოლოგი. წერ გამართულ, უნაკლო ქართულს. მკაცრად დაიცავი " +
   "მოთხოვნილი ფორმატი: მხოლოდ ის სია/პუნქტები, რასაც გთხოვენ. არ დაწერო შესავალი " +
-  "აბზაცი, დასკვნა ან რაიმე პროზა — მხოლოდ **მუქი სათაური** — მოკლე ახსნა, ხაზობრივად.";
+  "აბზაცი, დასკვნა ან რაიმე პროზა, მხოლოდ **მუქი სათაური**, მოკლე ახსნა, ხაზობრივად.";
 
 function typePrompt(type) {
   return (
-    `დაწერე MBTI ტიპის — ${type} (${ARCHETYPE_KA[type]}) — ღრმა ფსიქოლოგიური პორტრეტი ქართულად.\n` +
+    `დაწერე MBTI ტიპის, ${type} (${ARCHETYPE_KA[type]}), ღრმა ფსიქოლოგიური პორტრეტი ქართულად.\n` +
     `ახსენი: ამ ტიპის ბირთვული მოტივაცია, ძლიერი მხარეები, ბრმა წერტილები, როგორ ფიქრობს, ` +
     `გრძნობს და იღებს გადაწყვეტილებებს. 4-6 აბზაცი, "შენ"-ის ფორმა, თბილი და კონკრეტული. ` +
     `დააბრუნე მხოლოდ ტექსტი.`
@@ -130,13 +130,13 @@ function typeSunPrompt(type, sign) {
   return (
     `დაწერე, როგორ ვლინდება MBTI ტიპი ${type} (${ARCHETYPE_KA[type]}), როცა ადამიანის ` +
     `მზის ნიშანი ${SIGN_KA[sign]}-ია.\n` +
-    `${SIGN_KA[sign]} — ${SIGN_ELEMENT[sign]} ელემენტის ნიშანი. ახსენი, სად ამძაფრებს ან ` +
-    `არბილებს ${SIGN_KA[sign]}-ის მზე ამ ტიპის ბუნებას — კონკრეტული, ცოცხალი ნიუანსებით. ` +
+    `${SIGN_KA[sign]}, ${SIGN_ELEMENT[sign]} ელემენტის ნიშანი. ახსენი, სად ამძაფრებს ან ` +
+    `არბილებს ${SIGN_KA[sign]}-ის მზე ამ ტიპის ბუნებას, კონკრეტული, ცოცხალი ნიუანსებით. ` +
     `3-4 აბზაცი, "შენ"-ის ფორმა. დააბრუნე მხოლოდ ტექსტი.`
   );
 }
 
-// Rich 16Personalities-style profile sections — pre-written per 4-letter type.
+// Rich 16Personalities-style profile sections, pre-written per 4-letter type.
 // "list" = one bulleted list; "dual" = a ძლიერი block + a სუსტი block.
 const SECTIONS = [
   { kind: "strengths", titleKa: "ძლიერი მხარეები", format: "list" },
@@ -150,21 +150,21 @@ const SECTIONS = [
 function sectionPrompt(kind, type) {
   const label = `MBTI ტიპი ${type} (${ARCHETYPE_KA[type]})`;
   const listFmt =
-    `ჩამოთვალე 6 პუნქტი. თითოეული ცალკე ხაზზე ფორმატით: **სათაური** — ერთი-ორი ` +
+    `ჩამოთვალე 6 პუნქტი. თითოეული ცალკე ხაზზე ფორმატით: **სათაური**, ერთი-ორი ` +
     `წინადადება ახსნა. არ გამოიყენო ნუმერაცია ან ტირეები დასაწყისში. მხოლოდ ეს პუნქტები.`;
   const dual = (domain) =>
     `დაწერე, როგორია ${label} ${domain}. მოიყვანე 3 ძლიერი მხარე და 3 სუსტი მხარე/` +
     `გამოწვევა ამ სფეროში, "შენ"-ის ფორმით, გამართული ქართულით. დააბრუნე ზუსტად ამ ` +
     `ფორმატში, დამატებითი ტექსტისა და ნუმერაციის გარეშე:\n` +
-    `ძლიერი მხარეები:\n**სათაური** — ერთი წინადადება.\n**სათაური** — ერთი წინადადება.\n` +
-    `**სათაური** — ერთი წინადადება.\n\nსუსტი მხარეები:\n**სათაური** — ერთი წინადადება.\n` +
-    `**სათაური** — ერთი წინადადება.\n**სათაური** — ერთი წინადადება.`;
+    `ძლიერი მხარეები:\n**სათაური**, ერთი წინადადება.\n**სათაური**, ერთი წინადადება.\n` +
+    `**სათაური**, ერთი წინადადება.\n\nსუსტი მხარეები:\n**სათაური**, ერთი წინადადება.\n` +
+    `**სათაური**, ერთი წინადადება.\n**სათაური**, ერთი წინადადება.`;
   switch (kind) {
     case "strengths":
       return `დაწერე ${label}-ის ძლიერი მხარეები ქართულად.\n${listFmt}`;
     case "weaknesses":
       return (
-        `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად — ` +
+        `დაწერე ${label}-ის სუსტი მხარეები და ბრმა წერტილები ქართულად, ` +
         `გულწრფელად მაგრამ თანაგრძნობით.\n${listFmt}`
       );
     case "romantic":
@@ -273,7 +273,7 @@ async function main() {
           body = await generate(typeSunPrompt(t.type, t.sign));
           title = null;
         } else {
-          // Sections are strict lists — use the structured system + low temp so
+          // Sections are strict lists, use the structured system + low temp so
           // the writer voice doesn't turn them back into prose.
           body = await generate(
             sectionPrompt(t.kind, t.type),

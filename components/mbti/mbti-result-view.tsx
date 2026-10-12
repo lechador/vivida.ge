@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const AXES: MbtiAxis[] = ["EI", "SN", "TF", "JP", "AT"];
 
 /**
- * The visual result block — the type code, archetype, and the five axis bars.
+ * The visual result block, the type code, archetype, and the five axis bars.
  * Shared by the full results page and the anonymous teaser gate (which passes
  * `analysis={null}` to keep the deep text locked). Rows written before the
  * Identity axis existed lack `AT`; that bar is simply skipped for them.

@@ -8,7 +8,7 @@ import { MINIMUM_AGE_YEARS } from "@/lib/profile-core";
 /**
  * Account-level restriction for trust & safety. A restricted account keeps
  * read-only astrology access (chart, daily horoscope) but cannot write to the
- * social layer — no chat, no friend requests (in or out), no feed posts or
+ * social layer, no chat, no friend requests (in or out), no feed posts or
  * comments. Enforced in the website's write cores.
  *
  * The *effective* restriction is DOB-driven OR a manual override:
@@ -21,7 +21,7 @@ import { MINIMUM_AGE_YEARS } from "@/lib/profile-core";
  * disclosing an internal moderation decision.
  */
 export const RESTRICTED_MESSAGE =
-  "შენი ანგარიში უსაფრთხოების წესების გამო შეზღუდულია — ამ ფუნქციით ვერ ისარგებლებ.";
+  "შენი ანგარიში უსაფრთხოების წესების გამო შეზღუდულია, ამ ფუნქციით ვერ ისარგებლებ.";
 
 export async function isAccountRestricted(userId: string): Promise<boolean> {
   const [row] = await db

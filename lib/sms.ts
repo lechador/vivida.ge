@@ -1,17 +1,17 @@
 import { nationalDigits } from "@/lib/phone";
 
 /**
- * sender.ge SMS client — OTP delivery for the phone flows. Lazily
+ * sender.ge SMS client, OTP delivery for the phone flows. Lazily
  * configured like lib/email.ts: without SENDER_GE_API_KEY this module
  * still imports cleanly and the caller degrades (dev logs the code,
  * production returns a friendly error).
  *
  * API reference: https://sender.ge/docs/api.php
  *   POST https://sender.ge/api/send.php
- *     apikey      — the account API key (the sender title is bound to it)
- *     smsno       — 1 = with SmsNo (advertising), 2 = without (informational)
- *     destination — 9-digit Georgian mobile number, no +995
- *     content     — message text (unicode)
+ *     apikey, the account API key (the sender title is bound to it)
+ *     smsno, 1 = with SmsNo (advertising), 2 = without (informational)
+ *     destination, 9-digit Georgian mobile number, no +995
+ *     content, message text (unicode)
  *   success response: { data: [{ messageId, statusId: 1 }] };
  *   errors: { message }
  */
@@ -30,7 +30,7 @@ export function isSmsConfigured(): boolean {
   return !!process.env.SENDER_GE_API_KEY;
 }
 
-/** OTP text — keep it short; every extra SMS part costs money. */
+/** OTP text, keep it short; every extra SMS part costs money. */
 export function buildOtpSms(code: string, locale: "ka" | "en"): string {
   return locale === "ka"
     ? `Vivida: დადასტურების კოდი ${code}. არავის გაუზიარო. ვადა 10 წუთი.`
@@ -57,7 +57,7 @@ export async function sendOtpSms(input: {
 
   const body = new URLSearchParams({
     apikey: key,
-    smsno: "2", // informational route — advertising would need SmsNo
+    smsno: "2", // informational route, advertising would need SmsNo
     destination,
     content: buildOtpSms(input.code, input.locale ?? "ka"),
   });

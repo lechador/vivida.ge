@@ -34,7 +34,7 @@ export function Starfield({
 }) {
   // Purely decorative (aria-hidden, position:absolute), so we keep it OUT of
   // the server HTML and first paint and mount it after hydration. That frees
-  // the mobile main thread to paint the LCP text first — and since it never
+  // the mobile main thread to paint the LCP text first, and since it never
   // affects layout, deferring it can't cause CLS. We also thin the field and
   // drop animations on small screens / reduced-motion to cut paint cost.
   const [env, setEnv] = useState<{
@@ -111,7 +111,7 @@ export function Starfield({
     >
       {stars.map((star, i) => {
         // Only the brightest stars (feature + larger pinpoints) get the
-        // pulse animation — the field reads as alive without paying for
+        // pulse animation, the field reads as alive without paying for
         // 200+ simultaneously animating elements. Reduced-motion drops it.
         const animate = env.animate && (star.glow || star.size > 1.4);
         return (

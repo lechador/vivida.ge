@@ -66,7 +66,7 @@ export type SpotlightMatch = {
 };
 
 export type DiscoverFeed = {
-  /** Viewer's own sun element — null if no chart yet. */
+  /** Viewer's own sun element, null if no chart yet. */
   viewerElement: Element | null;
   /** Highest-compatibility candidate, surfaced above the grouped sections. */
   spotlight: SpotlightMatch | null;
@@ -102,10 +102,10 @@ export async function getDiscoveryFeed(
       ? signByIndex(viewerSunIndex).element
       : null;
 
-  // Viewer's residence country — recommendations are ranked country-first.
+  // Viewer's residence country, recommendations are ranked country-first.
   const viewerCountry = await getResidenceCountryCode(viewerId);
 
-  // 2. Build the exclusion set — self + anyone we already have a row with
+  // 2. Build the exclusion set, self + anyone we already have a row with
   //    (friends, pending, blocked).
   const [friendRows, blockedIds] = await Promise.all([
     db
@@ -146,10 +146,10 @@ export async function getDiscoveryFeed(
         // Profiles that haven't picked a username yet (post-signup, pre-
         // onboarding) would render with a broken /u/ link. Skip them.
         isNotNull(profiles.username),
-        // Respect the discovery opt-out — this feed powers both the swipe
+        // Respect the discovery opt-out, this feed powers both the swipe
         // deck and the "suggested people" rails.
         eq(profiles.discoverable, true),
-        // Exclude in SQL rather than materialising every user id in Node —
+        // Exclude in SQL rather than materialising every user id in Node,
         // the list is bounded by the viewer's own relationships.
         excludedList.length > 1
           ? notInArray(users.id, excludedList)
@@ -164,7 +164,7 @@ export async function getDiscoveryFeed(
     // compatriots would essentially never survive a plain random draw of
     // CANDIDATE_LIMIT rows, and the "suggested people" rail built on this feed
     // would show them nobody local. Random within the bucket still keeps the
-    // rotation the sample exists for — once the user base outgrows
+    // rotation the sample exists for, once the user base outgrows
     // CANDIDATE_LIMIT a stable scan order would surface the same faces forever.
     .orderBy(desc(sameCountryFirst(viewerCountry)), sql`random()`)
     .limit(CANDIDATE_LIMIT);
@@ -252,7 +252,7 @@ export async function getDiscoveryFeed(
     }
   }
 
-  // 6. Pick the spotlight — the highest-compat candidate across all groups.
+  // 6. Pick the spotlight, the highest-compat candidate across all groups.
   const allScored = [...tribe, ...magic, ...other].filter(
     (s) => s.synastry !== null
   );

@@ -52,7 +52,7 @@ export async function POST() {
     return Response.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  // Sun sign drives the motif — read it from the user's natal chart.
+  // Sun sign drives the motif, read it from the user's natal chart.
   const [chartRow] = await db
     .select({ data: charts.data })
     .from(charts)

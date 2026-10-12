@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 /**
- * POST /api/tarot/followup { libraryId, question } — ask a follow-up about
+ * POST /api/tarot/followup { libraryId, question }, ask a follow-up about
  * an already-drawn spread. First follow-up per reading free, then
  * CREDIT_COST.tarotFollowup each (charged inside performFollowup). 402 when
  * the balance is short; 404 when the reading isn't the user's.

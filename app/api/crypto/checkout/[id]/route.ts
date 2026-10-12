@@ -19,17 +19,17 @@ export const maxDuration = 60;
 type Params = { params: Promise<{ id: string }> };
 
 /**
- * GET /api/crypto/checkout/[id] — poll a pending purchase.
+ * GET /api/crypto/checkout/[id], poll a pending purchase.
  *
  * Wallet-method purchases auto-detect by scanning the purchase's reference
  * key; fiat-direct purchases (card paid straight to our wallet) match by
  * time window + tolerance-floored amount once the client reports the fund
  * flow submitted/confirmed. Either way the buyer never pastes anything.
  * Returns:
- *   pending   — nothing matched yet (keep polling)
- *   confirmed — verified + granted (idempotent)
- *   problem   — a matching payment exists but cannot be credited (underpaid…)
- *   expired   — past its window with nothing matched
+ *   pending, nothing matched yet (keep polling)
+ *   confirmed, verified + granted (idempotent)
+ *   problem, a matching payment exists but cannot be credited (underpaid…)
+ *   expired, past its window with nothing matched
  */
 export async function GET(req: Request, ctx: Params) {
   const session = await auth();
@@ -69,7 +69,7 @@ export async function GET(req: Request, ctx: Params) {
 
   if (outcome.status === "failed") {
     if (outcome.reason === "unavailable" || outcome.reason === "not_found") {
-      // RPC outage / not-indexed-yet — both resolve on retry; keep polling.
+      // RPC outage / not-indexed-yet, both resolve on retry; keep polling.
       return NextResponse.json({ status: "pending", warning: outcome.reason });
     }
     return NextResponse.json({
@@ -79,7 +79,7 @@ export async function GET(req: Request, ctx: Params) {
     });
   }
 
-  // Nothing matched yet — lazily expire so the UI can offer a fresh order.
+  // Nothing matched yet, lazily expire so the UI can offer a fresh order.
   if (purchase.expiresAt.getTime() < Date.now()) {
     await db
       .update(cryptoPurchases)

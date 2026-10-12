@@ -51,7 +51,7 @@ export function searchPages(q: string, limit = 8): PageHit[] {
 }
 
 /**
- * Public-profile user search — only users who claimed a username AND opted
+ * Public-profile user search, only users who claimed a username AND opted
  * into discovery (`discoverable`). No viewer needed; safe for the signed-out
  * homepage since these profiles are public by the user's own choice.
  */
@@ -77,7 +77,7 @@ async function searchPublicUsersUncached(
       and(
         isNotNull(profiles.username),
         // Usernames are assigned at signup, so they no longer imply an
-        // onboarded profile — gate on birth data to keep registered-but-never-
+        // onboarded profile, gate on birth data to keep registered-but-never-
         // onboarded accounts out of search results. Same rule as lib/people.ts.
         isNotNull(profiles.dateOfBirth),
         eq(profiles.discoverable, true),

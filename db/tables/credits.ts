@@ -12,7 +12,7 @@ import type { PremiumSource } from "./experiments";
 import { users } from "./users";
 
 /**
- * Credit wallet — one row per user, atomically updated. Balance is authoritative
+ * Credit wallet, one row per user, atomically updated. Balance is authoritative
  * and always kept in sync with the ledger (credit_transaction). We spend with a
  * single conditional UPDATE (`balance >= cost`) so two concurrent requests can
  * never overspend.
@@ -28,7 +28,7 @@ export const creditAccounts = pgTable("credit_account", {
 });
 
 /**
- * Append-only credit ledger — every grant (+) and spend (−) with a reason, for
+ * Append-only credit ledger, every grant (+) and spend (−) with a reason, for
  * audit + the account history. `ref` links to the source (referral's invited
  * user id, stripe session id, the synastry/partner id spent on, …).
  */
@@ -58,7 +58,7 @@ export const creditTransactions = pgTable(
 );
 
 /**
- * Referrals — one row per invited user (unique), so a person can be referred by
+ * Referrals, one row per invited user (unique), so a person can be referred by
  * at most one referrer. `status` goes pending → qualified when the invited user
  * verifies email AND completes birth data (the anti-fraud gate: a dead/duplicate
  * signup never qualifies, and only a qualified referral pays out, once).
@@ -108,13 +108,13 @@ export const premiumSubscriptions = pgTable(
     stripePriceId: text("stripe_price_id"),
     /**
      * RevenueCat-only. The *original* transaction id, which is stable across
-     * renewals — the per-renewal id is not, and keying on it would create a
+     * renewals, the per-renewal id is not, and keying on it would create a
      * new row every month.
      */
     rcOriginalTransactionId: text("rc_original_transaction_id").unique(),
     /** RevenueCat-only: the store product id, e.g. `ge.vivida.pro.monthly`. */
     rcProductId: text("rc_product_id"),
-    /** RevenueCat-only: "APP_STORE" | "PLAY_STORE" — decides where we send the
+    /** RevenueCat-only: "APP_STORE" | "PLAY_STORE", decides where we send the
      *  user to cancel, since we cannot cancel a store subscription ourselves. */
     rcStore: text("rc_store"),
     status: text("status").notNull(),
@@ -161,7 +161,7 @@ export const payments = pgTable("payment", {
   flittOrderId: text("flitt_order_id").notNull().unique(),
   amountCents: integer("amount_cents").notNull(),
   currency: text("currency").notNull(),
-  /** 'month' | 'year' — persisted at checkout so the webhook doesn't have to
+  /** 'month' | 'year', persisted at checkout so the webhook doesn't have to
    *  guess from amount. Nullable for legacy rows that pre-date this column. */
   interval: billingIntervalEnum("interval"),
   status: text("status").notNull(), // 'approved' | 'declined' | 'pending' | …

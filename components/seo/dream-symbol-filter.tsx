@@ -64,7 +64,7 @@ export function DreamSymbolFilter() {
         )}
       </div>
       <p role="status" className="mt-2 text-sm text-muted-foreground">
-        {resultCount === 0 ? "ვერ მოიძებნა — სცადე სხვა სიტყვა" : ""}
+        {resultCount === 0 ? "ვერ მოიძებნა, სცადე სხვა სიტყვა" : ""}
       </p>
     </div>
   );

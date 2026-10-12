@@ -8,7 +8,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Billing self-service on /subscription. Cancellation deliberately does NOT
- * live here — it lives on /account as a modest text action.
+ * live here, it lives on /account as a modest text action.
  */
 export function SubscriptionActions({
   locale,

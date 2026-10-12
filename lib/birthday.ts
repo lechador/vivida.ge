@@ -1,15 +1,15 @@
 /**
- * Birthday gifts — the daily cron calls `sendBirthdayGifts()` which, for
+ * Birthday gifts, the daily cron calls `sendBirthdayGifts()` which, for
  * every user whose birthday is today (Tbilisi time):
  *
- *   1. claims an email_send_log row (kind='birthday') — the once-a-year guard
+ *   1. claims an email_send_log row (kind='birthday'), the once-a-year guard
  *   2. gifts them BIRTHDAY_CREDITS credits (fires the usual credit notification)
  *   3. sends a short, warm AI-written email (Gemini via OpenRouter) with the
  *      gift announcement; a curated fallback body means the send never
  *      depends on the AI call succeeding
  *
  * The gift is applied before the send, so even an email failure never costs
- * the user their present — the log row records 'failed' for the admin panel.
+ * the user their present, the log row records 'failed' for the admin panel.
  */
 
 import { Resend } from "resend";
@@ -23,11 +23,11 @@ import { acquireResendSlot } from "@/lib/resend-throttle";
 import { signByIndex } from "@/lib/zodiac";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-// Same high-quality model as the interpretation library — volume is a few
+// Same high-quality model as the interpretation library, volume is a few
 // emails a day, so we spend the good model on warmth.
 const BIRTHDAY_MODEL = "google/gemini-3.8-flash";
 
-// RESEND_FROM may be a bare address or a full "Name <email>" string —
+// RESEND_FROM may be a bare address or a full "Name <email>" string,
 // normalize so the sender always shows "Vivida", never a raw mailbox name.
 function resolveFrom(envVal: string | undefined, fallback: string): string {
   if (!envVal) return fallback;
@@ -45,15 +45,15 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 /** Credits gifted on a user's birthday. */
 export const BIRTHDAY_CREDITS = 30;
 
-// Celebration-first subject — deliberately no gift mention (the gift is a
+// Celebration-first subject, deliberately no gift mention (the gift is a
 // P.S. inside, not the reason for the email).
 export const BIRTHDAY_SUBJECT = "დღეს შენი დღეა ✨ გილოცავ დაბადების დღეს!";
 const SUBJECT = BIRTHDAY_SUBJECT;
 
-/** Curated fallback body — used whenever the AI call fails or is unset. */
+/** Curated fallback body, used whenever the AI call fails or is unset. */
 export const FALLBACK_PARAGRAPHS = [
-  "დღეს შენი დღეა — და მთელი ცა შენკენ იყურება. გვინდა ვივიდას გუნდიდან გულით მოგილოცოთ დაბადების დღე: იყოს ეს წელი შენთვის ნათელი, თბილი და სავსე იმ რამით, რაც ნამდვილად გახარებს.",
-  "ვარსკვლავები დღეს შენს პატივსაცემად ანათებენ — ჩვენ კი პატარა საჩუქარი მოგიმზადეთ. ❤️",
+  "დღეს შენი დღეა, და მთელი ცა შენკენ იყურება. გვინდა ვივიდას გუნდიდან გულით მოგილოცოთ დაბადების დღე: იყოს ეს წელი შენთვის ნათელი, თბილი და სავსე იმ რამით, რაც ნამდვილად გახარებს.",
+  "ვარსკვლავები დღეს შენს პატივსაცემად ანათებენ, ჩვენ კი პატარა საჩუქარი მოგიმზადეთ. ❤️",
 ];
 
 type BirthdayUser = {
@@ -133,7 +133,7 @@ interface OpenRouterJson {
 
 /**
  * Two short, warm Georgian paragraphs from Gemini. Personalized with the
- * name and (when known) sun sign. Throws on failure — caller falls back.
+ * name and (when known) sun sign. Throws on failure, caller falls back.
  */
 export async function generateBirthdayCopy(
   name: string | null,
@@ -144,18 +144,18 @@ export async function generateBirthdayCopy(
 
   const system =
     "შენ ხარ Vivida-ს (ქართული ასტროლოგიური პლატფორმის) გუნდის თბილი ხმა. " +
-    "წერ გულწრფელ, ადამიანურ ქართულს — არა ოფიციალურს, არა გადამეტებულად " +
+    "წერ გულწრფელ, ადამიანურ ქართულს, არა ოფიციალურს, არა გადამეტებულად " +
     'პათეტიკურს. კლიშეების გარეშე ("ბედნიერების ოკეანე"). ' +
     "მთავარი მიზანი: ადამიანმა უნდა იგრძნოს, რომ ის ნამდვილად მნიშვნელოვანია " +
-    "და მისი დღე გულით აღინიშნება — არა შაბლონური მილოცვით.";
+    "და მისი დღე გულით აღინიშნება, არა შაბლონური მილოცვით.";
   const user =
     `დაწერე დაბადების დღის მისალოცი ${name ? `სახელად ${name}-სთვის` : "ჩვენი მომხმარებლისთვის"}` +
     (sunSignKa ? ` (ზოდიაქო: ${sunSignKa})` : "") +
     `. ზუსტად 2 მოკლე აბზაცი (თითო 2-3 წინადადება):\n` +
-    `- პირველი: პირადი, გულით ნათქვამი მილოცვა — იმის განცდა, რომ ეს დღე და ეს ადამიანი ` +
+    `- პირველი: პირადი, გულით ნათქვამი მილოცვა, იმის განცდა, რომ ეს დღე და ეს ადამიანი ` +
     `ნამდვილად განსაკუთრებულია${sunSignKa ? `, მისი ნიშნის უნიკალური ბუნების თბილი ხსენებით (რითაც ის გამორჩეულია)` : ""}.\n` +
-    `- მეორე: გულწრფელი სურვილი ახალი პირადი წლისთვის — რომ წინ საუკეთესო ელოდება, ვარსკვლავურ ნოტაზე.\n` +
-    `არავითარი პროდუქტის რეკლამა, არავითარი საჩუქრის ხსენება — მხოლოდ ადამიანი და მისი დღე. ` +
+    `- მეორე: გულწრფელი სურვილი ახალი პირადი წლისთვის, რომ წინ საუკეთესო ელოდება, ვარსკვლავურ ნოტაზე.\n` +
+    `არავითარი პროდუქტის რეკლამა, არავითარი საჩუქრის ხსენება, მხოლოდ ადამიანი და მისი დღე. ` +
     `დააბრუნე JSON: { "p1": string, "p2": string }`;
 
   const res = await fetch(OPENROUTER_URL, {
@@ -175,7 +175,7 @@ export async function generateBirthdayCopy(
       ],
       response_format: { type: "json_object" },
       temperature: 0.9,
-      // Reasoning model — leave headroom beyond the thinking budget.
+      // Reasoning model, leave headroom beyond the thinking budget.
       max_tokens: 8000,
     }),
   });
@@ -203,7 +203,7 @@ export type BirthdayResult = {
   failed: number;
 };
 
-/** Cron entrypoint — gift + email everyone whose birthday is today. */
+/** Cron entrypoint, gift + email everyone whose birthday is today. */
 export async function sendBirthdayGifts(): Promise<BirthdayResult> {
   const found = await findBirthdayUsers();
   const result: BirthdayResult = {
@@ -222,7 +222,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
     try {
       if (await alreadyGiftedThisYear(u.userId)) continue;
 
-      // Claim the year's slot first — the guard row — so a concurrent cron
+      // Claim the year's slot first, the guard row, so a concurrent cron
       // tick can't double-gift.
       const [claim] = await db
         .insert(emailSendLog)
@@ -239,7 +239,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
       result.gifted++;
 
       if (!resend || !u.email) {
-        // Gift applied but no way to email — mark so admin can see it.
+        // Gift applied but no way to email, mark so admin can see it.
         await db
           .update(emailSendLog)
           .set({

@@ -3,23 +3,23 @@
  *
  * Score components (in order of impact):
  *
- *   1. Cross-aspects — for every pair of bodies (one from each chart) we
+ *   1. Cross-aspects, for every pair of bodies (one from each chart) we
  *      look for the tightest major aspect within tolerance and award
  *      `valence * tightness^1.5 * bodyMul` to each category whose body
  *      set contains both endpoints. The 1.5 exponent on tightness biases
  *      toward exact aspects so a 0.5° conjunction outweighs a 5° one.
  *
- *   2. Pair magnifiers — specific body pairs (Sun-Moon, Venus-Mars,
+ *   2. Pair magnifiers, specific body pairs (Sun-Moon, Venus-Mars,
  *      Mercury-Mercury …) carry extra romantic / friendship weight on
  *      top of their bodyMul, mirroring how astrologers actually read
  *      synastry instead of treating every pair the same.
  *
- *   3. House overlays — where person A's planets fall in person B's
+ *   3. House overlays, where person A's planets fall in person B's
  *      house system (and vice versa). Venus in someone's 5th/7th, Mars
  *      in their 8th, Sun in their 1st, etc. This is a major synastry
  *      technique that aspect-only scoring misses entirely.
  *
- *   4. Element compatibility — Sun and Moon elements (Fire/Earth/Air/
+ *   4. Element compatibility, Sun and Moon elements (Fire/Earth/Air/
  *      Water) interacting along classical affinity rules. Small bias,
  *      but noticeable when the rest of the chart is borderline.
  *
@@ -67,8 +67,8 @@ const CATEGORY_BODIES: Record<SynastryCategory, Set<string>> = {
   ]),
 };
 
-/** Per-aspect "valence" — how much positive (or negative) signal it carries.
- *  Squares and oppositions are real friction, not just "passion lite" —
+/** Per-aspect "valence", how much positive (or negative) signal it carries.
+ *  Squares and oppositions are real friction, not just "passion lite",
  *  scored honestly negative so a chart full of hard aspects can drag the
  *  number into the 20s the way it should. */
 const ASPECT_VALENCE: Record<AspectKind, number> = {
@@ -79,7 +79,7 @@ const ASPECT_VALENCE: Record<AspectKind, number> = {
   opposition: -0.45,
 };
 
-/** Big-three weighting — Sun, Moon, and Ascendant carry the most personal
+/** Big-three weighting, Sun, Moon, and Ascendant carry the most personal
  *  signal. Asteroid-style points (Chiron etc.) get half weight. */
 const BODY_WEIGHT: Record<string, number> = {
   sun: 1.4,
@@ -98,7 +98,7 @@ const BODY_WEIGHT: Record<string, number> = {
 };
 
 /**
- * Pair-specific magnifiers — applied on top of bodyMul. Keys are sorted
+ * Pair-specific magnifiers, applied on top of bodyMul. Keys are sorted
  * `"a-b"` strings so the lookup is order-independent. These boost the
  * archetypal "synastry signature" pairs that astrologers weight heavily.
  */
@@ -134,7 +134,7 @@ const PAIR_MAGNIFIER: Record<string, number> = {
 /**
  * House overlay scoring: when a body from chart A falls into a house in
  * chart B, the relationship picks up that house's signature. Both
- * positive AND negative — overlays into the 6th and 12th houses are
+ * positive AND negative, overlays into the 6th and 12th houses are
  * real friction astrologically (service-mode / hidden) and their absence
  * shouldn't be scored as neutral.
  */
@@ -157,7 +157,7 @@ const HOUSE_OVERLAY: Record<
 };
 
 /** Bodies whose house-overlay placement we score. We don't bother with
- *  asteroids or outers in less-personal houses — keeps the signal-to-
+ *  asteroids or outers in less-personal houses, keeps the signal-to-
  *  noise ratio high. */
 const OVERLAY_BODY_WEIGHT: Record<string, number> = {
   sun: 1.4,
@@ -200,7 +200,7 @@ export type SynastryAspect = {
 };
 
 export type SynastryHouseOverlay = {
-  /** Whose body it is — "a" or "b". */
+  /** Whose body it is, "a" or "b". */
   source: "a" | "b";
   body: string;
   /** Which house in the other chart. */
@@ -410,7 +410,7 @@ export function computeSynastry(
   }
 
   // ── 4. Normalise to 16–95 % via tanh ──────────────────────────────
-  // Centered at 52 — slightly above neutral so an "OK" pair (a couple
+  // Centered at 52, slightly above neutral so an "OK" pair (a couple
   // of mild positives) reads as 60-ish instead of 56-ish, which felt
   // unfairly cool in casual testing. Amplitude 44 / divisor 7 keeps
   // the wide realistic spread: hostile pairs still hit the teens,
@@ -492,18 +492,18 @@ export const ELEMENT_EMOJI: Record<ChartElement, string> = {
 };
 
 export const HOUSE_LABEL_KA: Record<number, string> = {
-  1: "1-ლი — პირადი იდენტობა",
-  2: "მე-2 — ღირებულებები",
-  3: "მე-3 — კომუნიკაცია",
-  4: "მე-4 — სახლი, ფესვები",
-  5: "მე-5 — რომანი, შემოქმედება",
-  6: "მე-6 — ყოველდღიურობა",
-  7: "მე-7 — პარტნიორობა",
-  8: "მე-8 — სიღრმე, გარდასახვა",
-  9: "მე-9 — ჰორიზონტები",
-  10: "მე-10 — გზა, რეპუტაცია",
-  11: "მე-11 — მეგობრები, ოცნებები",
-  12: "მე-12 — შინაგანი სამყარო",
+  1: "1-ლი, პირადი იდენტობა",
+  2: "მე-2, ღირებულებები",
+  3: "მე-3, კომუნიკაცია",
+  4: "მე-4, სახლი, ფესვები",
+  5: "მე-5, რომანი, შემოქმედება",
+  6: "მე-6, ყოველდღიურობა",
+  7: "მე-7, პარტნიორობა",
+  8: "მე-8, სიღრმე, გარდასახვა",
+  9: "მე-9, ჰორიზონტები",
+  10: "მე-10, გზა, რეპუტაცია",
+  11: "მე-11, მეგობრები, ოცნებები",
+  12: "მე-12, შინაგანი სამყარო",
 };
 
 /** Human-friendly verdict for an overall percentage. Thresholds re-anchored

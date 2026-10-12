@@ -157,7 +157,7 @@ export function AstrologyCalendarHubEn({
       itemListElement: days.map((day, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        name: `${calendarDateLabelEn(day.date)} — ${TONE_EN[day.tone].label}`,
+        name: `${calendarDateLabelEn(day.date)}, ${TONE_EN[day.tone].label}`,
         url: `${SITE}${internationalPublicPath(`/astrologiuri-kalendari/${day.iso}`)}`,
       })),
     },
@@ -366,7 +366,7 @@ export function AstrologyCalendarDetailEn({ date }: { date: Date }) {
                 >
                   <div className="flex items-center justify-between gap-4">
                     <h3 className="font-semibold">
-                      {aspect.aSymbol} {planetEn(aspect.aKa)} — {aspect.bSymbol}{" "}
+                      {aspect.aSymbol} {planetEn(aspect.aKa)}, {aspect.bSymbol}{" "}
                       {planetEn(aspect.bKa)}
                     </h3>
                     <span className="text-xs text-muted-foreground">
@@ -397,7 +397,8 @@ export function AstrologyCalendarDetailEn({ date }: { date: Date }) {
           </h2>
           <p className="mt-3 leading-7 text-foreground/75">
             Tropical zodiac positions calculated for 12:00 UTC. Fast-moving
-            bodies—especially the Moon—may enter another sign later in the day.
+            bodies, especially the Moon, may enter another sign later in the
+            day.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {day.sky.planets.map((planet) => (
@@ -405,7 +406,7 @@ export function AstrologyCalendarDetailEn({ date }: { date: Date }) {
                 key={planet.key}
                 className="rounded-full border border-border bg-card/55 px-3 py-2 text-sm"
               >
-                {planet.symbol} {planetEn(planet.labelKa)} — {planet.signSymbol}{" "}
+                {planet.symbol} {planetEn(planet.labelKa)}, {planet.signSymbol}{" "}
                 {signByIndex(planet.signIndex).labelEn}
               </span>
             ))}

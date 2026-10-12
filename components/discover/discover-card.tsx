@@ -98,7 +98,7 @@ export function DiscoverCard({
 }
 
 /**
- * Inline compatibility pill — sized for the compact horizontal card.
+ * Inline compatibility pill, sized for the compact horizontal card.
  * Higher tiers get the brand gradient; lower tiers fall back to a quiet
  * neutral so the eye lands on the strongest matches first.
  */

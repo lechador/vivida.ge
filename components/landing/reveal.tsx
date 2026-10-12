@@ -5,12 +5,12 @@ import { useEffect, useRef, type CSSProperties, type ElementType, type ReactNode
 import { cn } from "@/lib/utils";
 
 /**
- * Lightweight scroll-reveal — the CSS replacement for framer-motion's
+ * Lightweight scroll-reveal, the CSS replacement for framer-motion's
  * `initial/whileInView` fade-up that used to make every landing section a
  * client island. Cuts hydration + main-thread animation work (the mobile INP
  * regression Search Console flagged): the animation runs on the compositor
  * via a CSS transition, and a single page-shared IntersectionObserver toggles
- * one attribute — versus framer-motion attaching a per-element observer and
+ * one attribute, versus framer-motion attaching a per-element observer and
  * running a JS rAF loop per node.
  *
  * The wrapped section itself can stay a server component; only this thin

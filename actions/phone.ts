@@ -28,7 +28,7 @@ import { setSmsMarketingConsent } from "@/lib/sms-consent";
 /**
  * Web (Server Action) surface for the SMS phone flows: optional number
  * verification during signup, phone-number login, and adding/changing the
- * number in the account — plus the one-time phone-gift campaign (verify the
+ * number in the account, plus the one-time phone-gift campaign (verify the
  * number → 10/20 credits; dashboard popup + credits-page card). The DB core
  * lives in lib/phone-auth.ts and SMS sending in lib/sms.ts; this layer owns
  * rate limits and localized copy.
@@ -166,7 +166,7 @@ async function clientIp(): Promise<string> {
 
 /**
  * Send a 6-digit SMS code. "login" intentionally sends to any valid number
- * (no account-existence oracle — whether an account exists is only revealed
+ * (no account-existence oracle, whether an account exists is only revealed
  * after a *correct* code entry, i.e. to whoever controls the number).
  */
 export async function sendPhoneVerificationCode(input: {
@@ -216,8 +216,8 @@ export async function sendPhoneVerificationCode(input: {
   }
 
   if (!isSmsConfigured() && process.env.NODE_ENV === "production") {
-    // Misconfiguration rather than user error — but the user needs a message.
-    console.error("[phone] SENDER_GE_API_KEY is not set — cannot send SMS");
+    // Misconfiguration rather than user error, but the user needs a message.
+    console.error("[phone] SENDER_GE_API_KEY is not set, cannot send SMS");
     return failure("sms_unavailable", locale);
   }
 
@@ -230,7 +230,7 @@ export async function sendPhoneVerificationCode(input: {
     if (!isSmsConfigured()) {
       // Local dev without a key: log the code so the flow stays testable.
       console.warn(
-        `[phone] SENDER_GE_API_KEY missing (dev) — code for ${maskGeorgianMobile(phone)}: ${code}`,
+        `[phone] SENDER_GE_API_KEY missing (dev), code for ${maskGeorgianMobile(phone)}: ${code}`,
       );
       return { ok: true };
     }
@@ -392,7 +392,7 @@ export type VerifyPhoneGiftResult =
  * and, when the marketing toggle was on, opt the user in to promotional SMS
  * in the same step. Returns how many credits the verification actually paid
  * out so the UI shows the granted amount (0 only when the grants were
- * already consumed — eligibility normally rules that out).
+ * already consumed, eligibility normally rules that out).
  */
 export async function verifyPhoneGift(input: {
   phone: string;

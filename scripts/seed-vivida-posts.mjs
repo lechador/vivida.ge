@@ -1,5 +1,5 @@
 // One-off: create the official "Vivida" brand account (if missing) and post
-// a couple of engagement-driving posts to the feed under it — a comment-
+// a couple of engagement-driving posts to the feed under it, a comment-
 // driven rating prompt and an icebreaker, both designed to pull people into
 // writing posts/comments rather than just reacting.
 //
@@ -26,8 +26,8 @@ const VIVIDA_EMAIL = "team@vivida.ge";
 const VIVIDA_USERNAME = "vivida";
 
 const POSTS = [
-  "1-დან 10-მდე, რამდენს დაუწერდი ვივიდას? ✨\n\nდაწერე შენი შეფასება კომენტარში — და ერთი სიტყვით დაამატე, რა გინდა ვნახოთ შემდეგში 👇",
-  "გავიცნოთ ერთმანეთი 🌌\n\nდაწერე კომენტარში: შენი მზის ნიშანი + ერთი სიტყვა, რომელიც ყველაზე კარგად გხატავს.\n\nდა თუ გაინტერესებს სხვა ვივიდელების გაცნობა — ეწვიე „ხალხის\" გვერდს, იქ ახალი ადამიანების პოვნა შეგიძლია 🔭",
+  "1-დან 10-მდე, რამდენს დაუწერდი ვივიდას? ✨\n\nდაწერე შენი შეფასება კომენტარში, და ერთი სიტყვით დაამატე, რა გინდა ვნახოთ შემდეგში 👇",
+  "გავიცნოთ ერთმანეთი 🌌\n\nდაწერე კომენტარში: შენი მზის ნიშანი + ერთი სიტყვა, რომელიც ყველაზე კარგად გხატავს.\n\nდა თუ გაინტერესებს სხვა ვივიდელების გაცნობა, ეწვიე „ხალხის\" გვერდს, იქ ახალი ადამიანების პოვნა შეგიძლია 🔭",
 ];
 
 async function main() {
@@ -41,7 +41,7 @@ async function main() {
       INSERT INTO "user" (id, name, email, image, "emailVerified")
       VALUES (${id}, ${"Vivida"}, ${VIVIDA_EMAIL}, ${`${SITE}/apple-icon.png`}, now())`;
     // Not discoverable: this is a brand account, not a person to "match"
-    // with via compatibility — keep it out of /people and suggestion rails.
+    // with via compatibility, keep it out of /people and suggestion rails.
     // It's still fully visible via the feed and its direct profile link.
     await sql`
       INSERT INTO profile (user_id, username, display_name, bio, discoverable)

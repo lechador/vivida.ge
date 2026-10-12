@@ -87,7 +87,7 @@ export async function POST(req: Request) {
           );
         } catch (err) {
           console.error("[stripe/webhook] credit grant failed:", err);
-          // 500 so Stripe redelivers — the grant is idempotent on the session
+          // 500 so Stripe redelivers, the grant is idempotent on the session
           // id, so a paid top-up can never be lost nor granted twice.
           return new Response("credit grant failed", { status: 500 });
         }

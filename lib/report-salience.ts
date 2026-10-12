@@ -3,7 +3,7 @@ import { bodyMeta, signByIndex } from "@/lib/zodiac";
 import { computeElementBalance, ELEMENT_ORDER, type Element } from "@/lib/elements";
 
 /**
- * Salience engine — before any prose is generated, compute what is genuinely
+ * Salience engine, before any prose is generated, compute what is genuinely
  * *prominent* about a specific chart so the report can LEAD with it instead of
  * walking every placement with equal weight. This is what makes a report feel
  * bespoke rather than a generic placement-by-placement dump.
@@ -60,7 +60,7 @@ export type ChartSalience = {
   };
   /** Tightest cross-aspects, strongest first (orb = exactness = strength). */
   tightestAspects: SalientAspect[];
-  /** Planets within orb of an angle (AC/MC/DC/IC) — loud, surface-level. */
+  /** Planets within orb of an angle (AC/MC/DC/IC), loud, surface-level. */
   angularPlanets: Array<{ key: string; label: string; angle: string; orb: number }>;
   /** 3+ planets sharing a sign or a house. */
   stelliums: Array<{ label: string; planets: string[] }>;

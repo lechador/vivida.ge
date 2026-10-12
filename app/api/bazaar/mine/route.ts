@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/bazaar/mine — the viewer's own reader profile (any status) plus
+ * GET /api/bazaar/mine, the viewer's own reader profile (any status) plus
  * all of its services (active and paused). Powers the provider dashboard
  * in My readings.
  */

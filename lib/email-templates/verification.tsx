@@ -86,8 +86,8 @@ export function VerificationEmail({
       ) : (
         <Text style={paragraphStyle}>
           {en
-            ? "Thanks for joining Vivida. Verify your email with the button below—your cosmic map is one step away."
-            : "მადლობა, რომ Vivida-ს შეუერთდი. დაადასტურე შენი ელფოსტა ქვემოთა ღილაკით — ერთ ნაბიჯში შენი კოსმიური რუკა გელოდება."}
+            ? "Thanks for joining Vivida. Verify your email with the button below, your cosmic map is one step away."
+            : "მადლობა, რომ Vivida-ს შეუერთდი. დაადასტურე შენი ელფოსტა ქვემოთა ღილაკით, ერთ ნაბიჯში შენი კოსმიური რუკა გელოდება."}
         </Text>
       )}
 

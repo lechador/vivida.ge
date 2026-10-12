@@ -12,7 +12,7 @@ import {
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
-// ISR hourly — the underlying monthly horoscope rows are cached per month.
+// ISR hourly, the underlying monthly horoscope rows are cached per month.
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {

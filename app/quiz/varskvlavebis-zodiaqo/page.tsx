@@ -17,10 +17,10 @@ import {
   localizedAlternates,
 } from "@/lib/seo/locales";
 
-const TITLE_KA = "ვარსკვლავების ზოდიაქო — გამოიცანი ცნობილი ადამიანების ნიშანი";
+const TITLE_KA = "ვარსკვლავების ზოდიაქო, გამოიცანი ცნობილი ადამიანების ნიშანი";
 const DESCRIPTION_KA =
-  "გამოიცანი 20 ცნობილი ადამიანის ზოდიაქოს ნიშანი. სწრაფი, უფასო ქვიზი ქართულად — შედეგი და გაზიარება დასრულებისთანავე.";
-const TITLE_EN = "Celebrity Zodiac Quiz — Guess Their Star Signs";
+  "გამოიცანი 20 ცნობილი ადამიანის ზოდიაქოს ნიშანი. სწრაფი, უფასო ქვიზი ქართულად, შედეგი და გაზიარება დასრულებისთანავე.";
+const TITLE_EN = "Celebrity Zodiac Quiz, Guess Their Star Signs";
 const DESCRIPTION_EN =
   "Can you guess the zodiac signs of 20 famous actors, musicians, athletes and public figures? Play free and see every correct answer.";
 

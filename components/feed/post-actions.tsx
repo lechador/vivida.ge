@@ -65,7 +65,7 @@ export function PostActions({
 
   function applyReaction(kind: PostReactionKind) {
     // Optimistic update. The reactToPost server action is idempotent
-    // on the (post, user) pair — same kind clicked twice = toggle off,
+    // on the (post, user) pair, same kind clicked twice = toggle off,
     // different kind = switch.
     const prevCounts = counts;
     const prevMine = mine;
@@ -121,7 +121,7 @@ export function PostActions({
     }
   }
   function onLikeClick() {
-    // Long-press already handled the open — swallow the trailing click.
+    // Long-press already handled the open, swallow the trailing click.
     if (longPressFired.current) {
       longPressFired.current = false;
       return;
@@ -142,7 +142,7 @@ export function PostActions({
       setTimeout(() => setShareLabel(null), 1800);
     } catch {
       // User cancelled the share sheet, or clipboard write blocked.
-      // Don't surface as an error — share is a non-essential nicety.
+      // Don't surface as an error, share is a non-essential nicety.
     }
   }
 
@@ -158,7 +158,7 @@ export function PostActions({
 
   return (
     <>
-      {/* Summary line — reactions on the left, comment count on the
+      {/* Summary line, reactions on the left, comment count on the
           right. Hidden when there's nothing to show on either side. */}
       {(counts.like + counts.dislike + counts.funny + counts.sad > 0 ||
         commentCount > 0) && (
@@ -177,7 +177,7 @@ export function PostActions({
         </div>
       )}
 
-      {/* Divider — sits above the action triplet, matches FB. */}
+      {/* Divider, sits above the action triplet, matches FB. */}
       <div className="mt-2 grid grid-cols-3 border-t border-border/50 pt-1">
         {/* Like */}
         <div
@@ -246,7 +246,7 @@ export function PostActions({
   );
 }
 
-/** Minimal speech-bubble glyph — Lucide's MessageCircle is fine but
+/** Minimal speech-bubble glyph, Lucide's MessageCircle is fine but
  *  visually heavier than the sleek thin-line look we want next to
  *  the bespoke reaction icons. */
 function CommentGlyph() {

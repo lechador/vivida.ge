@@ -21,10 +21,10 @@ import { users } from "./users";
  */
 export const pdfReportStatusEnum = pgEnum("pdf_report_status", [
   "pending", // checkout started, awaiting Stripe payment
-  "paid", // credit spend confirmed — generation queued
+  "paid", // credit spend confirmed, generation queued
   "generating", // worker is producing the PDF
   "ready", // PDF stored in R2, downloadable
-  "failed", // generation errored — retryable
+  "failed", // generation errored, retryable
 ]);
 
 export type PremiumReportContentJson = {
@@ -326,7 +326,7 @@ export type ReportModerationAction =
 
 /**
  * Per-axis MBTI score. `letter` is the winning pole of the axis; `pct` is how
- * strongly the user leaned toward it (50–100 — 50 is a dead tie, 100 is the
+ * strongly the user leaned toward it (50–100, 50 is a dead tie, 100 is the
  * extreme). Drives the four progress bars on the results page.
  */
 export type MbtiAxisScore = {

@@ -92,7 +92,7 @@ export function Hero() {
         {c.subhead}
       </p>
 
-      {/* Trust chips — promoted from gray micro-text into prominent
+      {/* Trust chips, promoted from gray micro-text into prominent
           check-pills. The "no card required" line is the strongest trust
           signal we have, so it deserves real visual weight on cold
           ad-driven traffic. */}
@@ -110,7 +110,7 @@ export function Hero() {
         ))}
       </div>
 
-      {/* Single secondary action — email signup. The header already has
+      {/* Single secondary action, email signup. The header already has
           "შესვლა" for returning users; one obvious primary action wins. */}
       <p
         className="order-6 mt-4 text-xs text-muted-foreground sm:order-7"

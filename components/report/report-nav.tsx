@@ -30,7 +30,7 @@ type Section = {
   label: string;
   labelEn: string;
   Icon: LucideIcon;
-  /** Per-tab hue for the active glow — keeps the nav playful but cohesive. */
+  /** Per-tab hue for the active glow, keeps the nav playful but cohesive. */
   hue: string;
 };
 
@@ -59,7 +59,7 @@ export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
   const [active, setActive] = useState<SectionId>("wheel");
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const tabRefs = useRef<Map<SectionId, HTMLAnchorElement>>(new Map());
-  // Suppresses scroll-spy briefly after a click — otherwise the IO fires
+  // Suppresses scroll-spy briefly after a click, otherwise the IO fires
   // mid-scroll and flips active to a section we're scrolling *through*.
   const suppressUntilRef = useRef(0);
 
@@ -135,7 +135,7 @@ export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
       className="sticky top-0 z-30 -mx-4 border-b border-border/40 bg-background/80 px-4 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 sm:-mx-6 sm:px-6 sm:py-3"
     >
       <div className="relative mx-auto max-w-6xl">
-        {/* Edge fades — hint that the nav scrolls horizontally. */}
+        {/* Edge fades, hint that the nav scrolls horizontally. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-background/95 to-transparent"
@@ -196,7 +196,7 @@ function NavPill({
       )}
       style={{ ["--pill-hue" as string]: section.hue } as React.CSSProperties}
     >
-      {/* Shared layout pill — slides smoothly between tabs. */}
+      {/* Shared layout pill, slides smoothly between tabs. */}
       {isActive && (
         <motion.span
           layoutId="report-nav-active"

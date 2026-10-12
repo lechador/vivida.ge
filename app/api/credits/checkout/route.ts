@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   if (!userId)
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   // The English site pays in USDC on Solana (the crypto rail); Stripe
-  // checkout exists only on the Georgian site — but only once the crypto
+  // checkout exists only on the Georgian site, but only once the crypto
   // rail is actually configured, so a half-rolled-out deploy never leaves
   // the English site with no working payment path.
   if (requestHostIsEnglish(req) && isCryptoPayConfigured()) {
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
   if (!pack) return NextResponse.json({ error: "bad_pack" }, { status: 400 });
 
   const origin = new URL(req.url).origin;
-  // Host alone cannot see Armenian — it is a path prefix, and this route is
+  // Host alone cannot see Armenian, it is a path prefix, and this route is
   // POSTed from an authed surface that has none. The stored preference rides
   // on the billing row already fetched above, so Armenian reaches the Stripe
   // Checkout page without a second query.

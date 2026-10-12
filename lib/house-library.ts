@@ -2,16 +2,16 @@
  * Reusable per-house interpretation library.
  *
  * A house's full meaning depends on BOTH its cusp sign AND whichever
- * (variable, unbounded) set of planets occupy it — unlike a planet-in-sign
+ * (variable, unbounded) set of planets occupy it, unlike a planet-in-sign
  * or a two-body aspect, that's not a single finite fact. We decompose it
  * into two reusable, finite pieces instead:
  *
- *   - "cusp"     — (house, sign): what this life area looks like colored by
+ *   - "cusp", (house, sign): what this life area looks like colored by
  *                  this sign. 12 houses × 12 signs = 144 combos.
- *   - "occupant" — (house, planet): what it means for this planet's energy
+ *   - "occupant", (house, planet): what it means for this planet's energy
  *                  to be active in this life area. 12 houses × 11 planets
  *                  (the 10 traditional planets + Chiron; Ascendant/Midheaven
- *                  never "occupy" a house — they define houses 1 and 10) =
+ *                  never "occupy" a house, they define houses 1 and 10) =
  *                  132 combos.
  *
  * At render time the cusp text plus each occupant's text are composed into
@@ -80,7 +80,7 @@ export function allHouseOccupantCombos(): HouseOccupantPlacement[] {
 
 /**
  * Batched read: returns a Map of key → body for the requested keys. Pure
- * read — never generates. Used by the read-time overlay so editing a library
+ * read, never generates. Used by the read-time overlay so editing a library
  * row reflects for every user on their next view.
  */
 export async function getHouseLibraryEntries(
@@ -99,7 +99,7 @@ export async function getHouseLibraryEntries(
 
 const SYSTEM_PROMPT =
   "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
-  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   "თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები " +
   '("ვარსკვლავები გელიან", "მიენდე სამყაროს").';
 
@@ -111,12 +111,12 @@ function cuspPrompt(house: number, signKey: string): string {
     ? `${sign.element}ის ${sign.modality} ნიშანი, რომელსაც განაგებს ${sign.ruler}`
     : "";
   return (
-    `დაწერე ინტერპრეტაცია: "${def.labelKa} (${def.themeKa}) — კუსპი ${signLabel}-ში".\n` +
+    `დაწერე ინტერპრეტაცია: "${def.labelKa} (${def.themeKa}), კუსპი ${signLabel}-ში".\n` +
     `ეს სახლი მართავს: ${def.meaningKa}\n` +
-    `${signLabel} — ${signNature}.\n\n` +
+    `${signLabel}, ${signNature}.\n\n` +
     `5-7 წინადადება (დაახ. 110-150 სიტყვა), "შენ"-ის ფორმა, თბილი და კონკრეტული. ` +
-    `ახსენი, როგორ ფერავს ${signLabel}-ის ბუნება ამ კონკრეტულ ცხოვრების სფეროს — ` +
-    `ერთი ცოცხალი მაგალითით. დააბრუნე მხოლოდ ტექსტი — სათაურის, ` +
+    `ახსენი, როგორ ფერავს ${signLabel}-ის ბუნება ამ კონკრეტულ ცხოვრების სფეროს, ` +
+    `ერთი ცოცხალი მაგალითით. დააბრუნე მხოლოდ ტექსტი, სათაურის, ` +
     `ფორმატირების და ფრჩხილების გარეშე.`
   );
 }
@@ -128,10 +128,10 @@ function occupantPrompt(house: number, planetKey: string): string {
   return (
     `დაწერე ინტერპრეტაცია: "${planetLabel} ${def.labelKa}-ში (${def.themeKa})".\n` +
     `ეს სახლი მართავს: ${def.meaningKa}\n` +
-    `${planetLabel} — ${planet?.meaningKa ?? ""}.\n\n` +
+    `${planetLabel}, ${planet?.meaningKa ?? ""}.\n\n` +
     `5-7 წინადადება (დაახ. 110-150 სიტყვა), "შენ"-ის ფორმა, თბილი და კონკრეტული. ` +
     `ახსენი, როგორ გამოხატავს ${planetLabel}-ის ენერგია თავს კონკრეტულად ამ ` +
-    `ცხოვრების სფეროში — ერთი ცოცხალი მაგალითით. დააბრუნე მხოლოდ ტექსტი — ` +
+    `ცხოვრების სფეროში, ერთი ცოცხალი მაგალითით. დააბრუნე მხოლოდ ტექსტი, ` +
     `სათაურის, ფორმატირების და ფრჩხილების გარეშე.`
   );
 }
@@ -196,7 +196,7 @@ export async function generateHouseOccupantEntry(
 /**
  * Ensure library rows exist for the given cusp + occupant placements,
  * generating any missing ones (one AI call each) and persisting them.
- * Returns a key → body map. Background path — never blocks a page render.
+ * Returns a key → body map. Background path, never blocks a page render.
  */
 export async function ensureHouseLibraryFor(
   cusps: HouseCuspPlacement[],

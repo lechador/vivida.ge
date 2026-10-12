@@ -35,7 +35,7 @@ export const dynamic = "force-dynamic";
 const DOMAINS: IqDomain[] = ["numeric", "logic", "spatial", "pattern"];
 
 /**
- * A saved IQ result, owner-only — the persistent view behind "ჩემი შედეგი" on
+ * A saved IQ result, owner-only, the persistent view behind "ჩემი შედეგი" on
  * the tests hub (the fresh /iq-testi/shedegi is localStorage-only). Renders from
  * the stored row so it works from any device.
  */
@@ -115,7 +115,7 @@ export default async function SavedIqResultPage({
           </div>
         </div>
 
-        {/* Per-domain breakdown — gated behind a one-time credit unlock */}
+        {/* Per-domain breakdown, gated behind a one-time credit unlock */}
         {unlocked ? (
           <div className="mt-4 rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
             <h2 className="mb-4 flex items-center gap-2 text-base font-semibold tracking-tight">
@@ -147,7 +147,7 @@ export default async function SavedIqResultPage({
               blurb={
                 en
                   ? "See your strengths across logic, numbers, spatial reasoning and patterns. Pay once and keep the result."
-                  : "ნახე შენი ძლიერი მხარეები ოთხ დომენში — ლოგიკა, რიცხვები, სივრცე და პატერნები. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+                  : "ნახე შენი ძლიერი მხარეები ოთხ დომენში, ლოგიკა, რიცხვები, სივრცე და პატერნები. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
               }
               locale={locale}
             />

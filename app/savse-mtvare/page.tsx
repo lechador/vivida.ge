@@ -45,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     };
   }
-  const title = "სავსე მთვარე — თარიღები, დრო და მნიშვნელობა";
+  const title = "სავსე მთვარე, თარიღები, დრო და მნიშვნელობა";
   const description =
     "შემდეგი სავსე მთვარის თარიღი და თბილისის დრო, ზოდიაქოს ნიშანი, განათება და სავსე მთვარის კალენდარი ქართულად.";
   return {

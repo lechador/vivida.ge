@@ -85,13 +85,13 @@ function annual(input: Input): PremiumReportContentJson {
   const asc = signName(input.chart.ascendant.signIndex, input.locale);
   if (input.locale === "ka")
     return {
-      title: `${year} — შენი პერსონალური წელი`,
+      title: `${year}, შენი პერსონალური წელი`,
       subtitle: `${baseName(input.firstName, input.locale)} · მზე ${sun} · მთვარე ${moon} · ასცენდენტი ${asc}`,
       overview: `ეს წელი იკითხება შენი ნატალური რუკისა და მომდევნო 12 თვის ტრანზიტების გადაკვეთით. მთავარი ამოცანაა ${kaSignGenitive(sun)} მიზანმიმართულობა, ${kaSignGenitive(moon)} ემოციური საჭიროებები და ${kaSignGenitive(asc)} მოქმედების სტილი ერთ მიმართულებად შეკრა.`,
       sections: [
         {
           title: "წლის მთავარი თემა",
-          body: `შენი მზის ნიშანი — ${sun} — გთხოვს, ენერგია იმ მიზნებში ჩადო, რომლებიც პირად მნიშვნელობას ატარებს. ასცენდენტი ${asc} გაჩვენებს, როგორ დაიწყო; მთვარე ${moon} კი როდის გჭირდება ტემპის შენელება და შინაგანი რესურსის აღდგენა.`,
+          body: `შენი მზის ნიშანი, ${sun}, გთხოვს, ენერგია იმ მიზნებში ჩადო, რომლებიც პირად მნიშვნელობას ატარებს. ასცენდენტი ${asc} გაჩვენებს, როგორ დაიწყო; მთვარე ${moon} კი როდის გჭირდება ტემპის შენელება და შინაგანი რესურსის აღდგენა.`,
           highlights: [
             "აირჩიე ერთი მთავარი წლიური მიმართულება",
             "შეაფასე პროგრესი ყოველ თვეში",
@@ -104,7 +104,7 @@ function annual(input: Input): PremiumReportContentJson {
         },
         {
           title: "საზღვრები და გარდაქმნა",
-          body: `დაძაბული პერიოდები აკრძალვა არ არის — ისინი გაჩვენებს, სად არის სტრუქტურა გასამყარებელი. სატურნის ენაზე საუკეთესო პასუხია გეგმა, ვადა და თანმიმდევრული პატარა ნაბიჯი.`,
+          body: `დაძაბული პერიოდები აკრძალვა არ არის, ისინი გაჩვენებს, სად არის სტრუქტურა გასამყარებელი. სატურნის ენაზე საუკეთესო პასუხია გეგმა, ვადა და თანმიმდევრული პატარა ნაბიჯი.`,
         },
         {
           title: "წლის რიტმი",
@@ -135,7 +135,7 @@ function annual(input: Input): PremiumReportContentJson {
         "ასტროლოგიური დრო მიმართულებას გაძლევს; არჩევანი და მოქმედება შენთან რჩება.",
     };
   return {
-    title: `${year} — Your personal year`,
+    title: `${year}, Your personal year`,
     subtitle: `${baseName(input.firstName, input.locale)} · Sun in ${sun} · Moon in ${moon} · ${asc} rising`,
     overview: `This outlook combines your natal chart with the next 12 months of transits. Your central task is to align the purpose of ${sun}, the emotional needs of ${moon}, and the outward style of ${asc}.`,
     sections: [
@@ -205,8 +205,8 @@ function timingReport(input: Input): PremiumReportContentJson {
       ? "A personal timing map for action, review and recovery"
       : "პერსონალური დროის რუკა მოქმედებისთვის, გადახედვისა და აღდგენისთვის",
     overview: en
-      ? "This report scores each day against your natal chart. It is a planning compass—not a guarantee—and works best when paired with your real priorities and constraints."
-      : "ეს რეპორტი თითოეულ დღეს შენს ნატალურ რუკასთან მიმართებით აფასებს. ის დაგეგმვის კომპასია და არა გარანტია — საუკეთესო შედეგს რეალურ პრიორიტეტებთან ერთად იძლევა.",
+      ? "This report scores each day against your natal chart. It is a planning compass, not a guarantee, and works best when paired with your real priorities and constraints."
+      : "ეს რეპორტი თითოეულ დღეს შენს ნატალურ რუკასთან მიმართებით აფასებს. ის დაგეგმვის კომპასია და არა გარანტია, საუკეთესო შედეგს რეალურ პრიორიტეტებთან ერთად იძლევა.",
     sections: [
       {
         title: en ? "How to use the calendar" : "როგორ გამოიყენო კალენდარი",
@@ -242,11 +242,11 @@ function timingReport(input: Input): PremiumReportContentJson {
           : "მნიშვნელოვანი პირადი ტრანზიტები",
         body: timing.notable.length
           ? timing.notable
-              .map((n) => `${n.dateLabelKa} — ${n.title}: ${n.meaning}`)
+              .map((n) => `${n.dateLabelKa}, ${n.title}: ${n.meaning}`)
               .join("\n\n")
           : en
             ? "No unusually exact major transit dominates this window; consistency matters more than a single date."
-            : "ამ პერიოდში ერთი გამოკვეთილად ზუსტი მთავარი ტრანზიტი არ დომინირებს — თანმიმდევრულობა ერთ კონკრეტულ თარიღზე მნიშვნელოვანია.",
+            : "ამ პერიოდში ერთი გამოკვეთილად ზუსტი მთავარი ტრანზიტი არ დომინირებს, თანმიმდევრულობა ერთ კონკრეტულ თარიღზე მნიშვნელოვანია.",
       },
     ],
     keyDates: [
@@ -282,7 +282,7 @@ function timingReport(input: Input): PremiumReportContentJson {
         ],
     closing: en
       ? "Good timing supports a good decision; it never replaces one."
-      : "კარგი დრო კარგ გადაწყვეტილებას ეხმარება — მას არ ცვლის.",
+      : "კარგი დრო კარგ გადაწყვეტილებას ეხმარება, მას არ ცვლის.",
   };
 }
 
@@ -304,7 +304,7 @@ function career(input: Input): PremiumReportContentJson {
       {
         title: en ? "Public direction" : "საზოგადოებრივი მიმართულება",
         body: en
-          ? `${mc} at the top of your chart favors a career path where its qualities become visible and useful. Build proof of work—not only potential—and let your reputation compound.`
+          ? `${mc} at the top of your chart favors a career path where its qualities become visible and useful. Build proof of work, not only potential, and let your reputation compound.`
           : `${mc} რუკის მწვერვალზე გიბიძგებს კარიერისკენ, სადაც ამ ნიშნის თვისებები ხილული და სასარგებლო ხდება. ააშენე შესრულებული საქმის მტკიცებულება და არა მხოლოდ პოტენციალი.`,
         highlights: en
           ? [
@@ -392,7 +392,7 @@ function relationship(input: Input): PremiumReportContentJson {
         body: sorted
           .map(
             (x) =>
-              `${label(x.key)} — ${x.score}% · ${areaTier(x.score, input.locale)}`,
+              `${label(x.key)}, ${x.score}% · ${areaTier(x.score, input.locale)}`,
           )
           .join("\n"),
         highlights: sorted
@@ -447,7 +447,7 @@ function relationship(input: Input): PremiumReportContentJson {
         ],
     closing: en
       ? "Compatibility is potential; relationship quality is the practice you build together."
-      : "თავსებადობა პოტენციალია; ურთიერთობის ხარისხი — პრაქტიკა, რომელსაც ერთად ქმნით.",
+      : "თავსებადობა პოტენციალია; ურთიერთობის ხარისხი, პრაქტიკა, რომელსაც ერთად ქმნით.",
   };
 }
 

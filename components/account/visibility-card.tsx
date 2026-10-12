@@ -22,7 +22,7 @@ export function VisibilityCard({
     bio: string | null;
     discoverable: boolean;
   };
-  /** Current user's name from auth — used as a starter for displayName */
+  /** Current user's name from auth, used as a starter for displayName */
   defaultName: string | null;
   locale?: UserLocale;
 }) {
@@ -40,7 +40,7 @@ export function VisibilityCard({
   const [isPending, startTransition] = useTransition();
   const [isTogglePending, startToggleTransition] = useTransition();
 
-  // Instant-save toggle (independent from the Save button) — optimistic,
+  // Instant-save toggle (independent from the Save button), optimistic,
   // reverts on failure.
   const onToggleDiscoverable = () => {
     const next = !discoverable;
@@ -82,7 +82,7 @@ export function VisibilityCard({
         <p className="mt-1 text-sm text-muted-foreground">
           {en
             ? "Choose a username, display name and bio. Other people can see your big three and your shared compatibility."
-            : "აირჩიე მომხმარებლის სახელი, ნაჩვენები სახელი და ბიო — სხვები ნახავენ შენს დიდ სამეულს და თქვენი თავსებადობა გამოჩნდება."}
+            : "აირჩიე მომხმარებლის სახელი, ნაჩვენები სახელი და ბიო, სხვები ნახავენ შენს დიდ სამეულს და თქვენი თავსებადობა გამოჩნდება."}
         </p>
       </header>
 
@@ -151,7 +151,7 @@ export function VisibilityCard({
           </div>
         </div>
 
-        {/* Discovery opt-out — saves instantly, no Save button needed */}
+        {/* Discovery opt-out, saves instantly, no Save button needed */}
         <div className="flex items-start justify-between gap-4 rounded-xl border border-border/70 bg-card/40 p-4">
           <div className="min-w-0">
             <div className="text-sm font-medium">

@@ -107,7 +107,7 @@ export function PhotoUploader({
         };
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) return resolve();
-          // Surface R2's response body — typically an XML <Error><Code>
+          // Surface R2's response body, typically an XML <Error><Code>
           // payload that tells us *why* (SignatureDoesNotMatch, AccessDenied,
           // etc). Without this the user just sees "R2 upload failed" with
           // no clue what to fix.
@@ -131,8 +131,8 @@ export function PhotoUploader({
           reject(
             new Error(
               en
-                ? "Network error — please try again"
-                : "ქსელის შეცდომა — სცადე თავიდან",
+                ? "Network error, please try again"
+                : "ქსელის შეცდომა, სცადე თავიდან",
             ),
           );
         };
@@ -215,8 +215,8 @@ export function PhotoUploader({
     if (unreadable > 0)
       msgs.push(
         en
-          ? "This file format cannot be opened — try JPEG or PNG"
-          : "ფაილის ფორმატი არ იხსნება — სცადე JPEG ან PNG",
+          ? "This file format cannot be opened, try JPEG or PNG"
+          : "ფაილის ფორმატი არ იხსნება, სცადე JPEG ან PNG",
       );
     if (tooBig > 0)
       msgs.push(en ? "The file is larger than 10 MB" : "ფაილი 10 MB-ზე დიდია");
@@ -228,7 +228,7 @@ export function PhotoUploader({
     try {
       await fetch(`/api/photos/${id}`, { method: "DELETE" });
     } catch {
-      // ignore — UI already updated; if delete failed we'll have a phantom
+      // ignore, UI already updated; if delete failed we'll have a phantom
     }
   }
 
@@ -301,7 +301,7 @@ export function PhotoUploader({
                 ? "Your first photo becomes your main profile image."
                 : "Add up to 6 photos. The first is your main profile image."
               : isEmpty
-                ? "პირველი ფოტო ხდება შენი მთავარი ნიღაბი — სხვები შენ აღმოგაჩენენ."
+                ? "პირველი ფოტო ხდება შენი მთავარი ნიღაბი, სხვები შენ აღმოგაჩენენ."
                 : "დაამატე 6-მდე ფოტო. პირველი ფოტო ხდება პროფილის ნიღაბი."}
           </p>
         </div>
@@ -331,8 +331,8 @@ export function PhotoUploader({
             </div>
             <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
               {en
-                ? "JPEG · PNG · WebP — including mobile photos. Up to 6 at once."
-                : "JPEG · PNG · WebP — მობილურიდანაც. 6-მდე ფოტო ერთად."}
+                ? "JPEG · PNG · WebP, including mobile photos. Up to 6 at once."
+                : "JPEG · PNG · WebP, მობილურიდანაც. 6-მდე ფოტო ერთად."}
             </p>
           </div>
           <span className="mt-1 inline-flex items-center rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2 text-sm font-medium text-white shadow-lg shadow-[var(--vivida-violet)]/25">
@@ -416,8 +416,8 @@ export function PhotoUploader({
       {!isEmpty && (
         <p className="mt-4 text-xs text-muted-foreground">
           {en
-            ? "JPEG · PNG · WebP — mobile photos are resized automatically"
-            : "JPEG · PNG · WebP — მობილურიდან ავტომატურად მცირდება"}
+            ? "JPEG · PNG · WebP, mobile photos are resized automatically"
+            : "JPEG · PNG · WebP, მობილურიდან ავტომატურად მცირდება"}
         </p>
       )}
     </div>

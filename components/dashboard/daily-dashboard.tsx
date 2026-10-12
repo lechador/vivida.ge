@@ -71,7 +71,7 @@ export function DailyDashboard({
         <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
           {en
             ? "Could not load. Please refresh the page."
-            : "ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი."}
+            : "ვერ ჩაიტვირთა, გთხოვ, გადატვირთო გვერდი."}
         </div>
       </div>
     );
@@ -134,8 +134,8 @@ export function DailyDashboard({
             </h3>
             <p className="mt-1 max-w-md text-sm text-muted-foreground">
               {en
-                ? "Chart wheel, personal analysis, twelve houses, aspects and every planet in one place—with complete English interpretations."
-                : "ცის რუკის ბორბალი, AI ანალიზი, 12 სახლი, ასპექტები და ყველა პლანეტა — დეტალურად, ერთად."}
+                ? "Chart wheel, personal analysis, twelve houses, aspects and every planet in one place, with complete English interpretations."
+                : "ცის რუკის ბორბალი, AI ანალიზი, 12 სახლი, ასპექტები და ყველა პლანეტა, დეტალურად, ერთად."}
             </p>
           </div>
           <Button asChild variant="mystic" size="lg" className="shrink-0">
@@ -186,7 +186,7 @@ function DashboardExtrasSection({
         if (!cancelled) setExtras(e);
       })
       .catch(() => {
-        // Degrade silently — the rest of the dashboard is already useful.
+        // Degrade silently, the rest of the dashboard is already useful.
         if (!cancelled) {
           setExtras({
             daily: null,
@@ -245,7 +245,7 @@ function DashboardExtrasSection({
         </div>
       ) : null}
 
-      {/* PRO layer sits below the delivered free insight — premium answers
+      {/* PRO layer sits below the delivered free insight, premium answers
           stay fully unlocked, free viewers get the score tease + CTA. */}
       {!loading && extras.daily ? (
         <ProDailyBrief

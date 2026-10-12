@@ -10,7 +10,7 @@ import {
 /**
  * Reputation event rules. Each kind has a point value and an optional
  * daily cap (per-user, per-kind). The cap is enforced by SUM-ing
- * today's earnings for that kind before inserting — over the cap, the
+ * today's earnings for that kind before inserting, over the cap, the
  * insert is a no-op.
  *
  * `dailyCap: null` means "one-shot or rate-managed by uniqueness alone"
@@ -38,11 +38,11 @@ export const REPUTATION_RULES: Record<
 
 /**
  * Credit a user with reputation for a specific event. Idempotent on
- * `(kind, subjectId)` — calling twice with the same identifiers is a
+ * `(kind, subjectId)`, calling twice with the same identifiers is a
  * no-op. Returns the number of points actually awarded (0 if deduped
  * or daily-capped).
  *
- * Errors are swallowed and logged — reputation is opportunistic,
+ * Errors are swallowed and logged, reputation is opportunistic,
  * never the reason a user-facing action fails.
  */
 export async function awardReputation(opts: {
@@ -126,7 +126,7 @@ export async function getReputation(userId: string): Promise<number> {
   return Number(row?.total ?? 0);
 }
 
-/** Batched lookup — returns a Map of userId → total for the supplied
+/** Batched lookup, returns a Map of userId → total for the supplied
  *  ids. Missing ids get 0 (no row in user_reputation yet). Used by
  *  feed/profile views to avoid N+1 reputation queries. */
 export async function getReputationFor(
@@ -157,11 +157,11 @@ export async function getReputationFor(
  * row per pair, so the SELECT is bounded by the number of pairs
  * passed in.
  *
- * Clamped at 0 — bookkeeping bugs (e.g. an event that was awarded
+ * Clamped at 0, bookkeeping bugs (e.g. an event that was awarded
  * but the running total later got reset) shouldn't be able to push a
  * user into negative reputation.
  *
- * Errors are swallowed and logged. Reputation is opportunistic — a
+ * Errors are swallowed and logged. Reputation is opportunistic, a
  * failed revocation shouldn't roll back a successful delete.
  */
 export async function revokeReputationForSubjects(
@@ -170,8 +170,8 @@ export async function revokeReputationForSubjects(
   if (pairs.length === 0) return;
   try {
     // OR-combine the (kind, subjectId) pairs into a single WHERE.
-    // Building per-pair AND clauses keeps the dedupe semantics tight
-    // — we never accidentally match a different event with the same
+    // Building per-pair AND clauses keeps the dedupe semantics tight,
+    // we never accidentally match a different event with the same
     // subjectId but a different kind.
     const conditions = pairs.map((p) =>
       and(
@@ -237,7 +237,7 @@ export async function revokeReputationForSubjects(
 /**
  * One-shot "joined Vivida" reputation, awarded once per user at signup. Lives
  * here (not coupled to the retired subscription/trial provisioning) so the
- * auth flow can award it directly. Best-effort — never throws.
+ * auth flow can award it directly. Best-effort, never throws.
  */
 export async function awardJoinedReputation(userId: string): Promise<void> {
   try {

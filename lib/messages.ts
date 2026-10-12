@@ -15,7 +15,7 @@ export type ConversationSummary = {
   partner: FriendshipUser;
   lastMessage: Message | null;
   unreadCount: number;
-  /** When the last message was sent — fallback to friendship.since for sort. */
+  /** When the last message was sent, fallback to friendship.since for sort. */
   lastActivityAt: Date;
 };
 
@@ -71,7 +71,7 @@ export async function listConversations(
 
 /**
  * Messages between viewer and a specific partner, oldest-first (display order).
- * Only friends are addressable — we verify the relationship at the action layer.
+ * Only friends are addressable, we verify the relationship at the action layer.
  */
 export async function listMessages(
   viewerId: string,
@@ -238,7 +238,7 @@ export async function countUnreadMessages(userId: string): Promise<number> {
   return Number(row?.value ?? 0);
 }
 
-/** Public profile snippet keyed by userId — used to render compose targets. */
+/** Public profile snippet keyed by userId, used to render compose targets. */
 export async function partnerSnippet(userId: string) {
   const [row] = await db
     .select({

@@ -26,7 +26,7 @@ export function SidebarOthers({
   locale = "ka",
 }: {
   children: React.ReactNode;
-  /** Unread messages / pending nudges — shown as a dot on the trigger. */
+  /** Unread messages / pending nudges, shown as a dot on the trigger. */
   hasUnread?: boolean;
   locale?: UserLocale;
 }) {

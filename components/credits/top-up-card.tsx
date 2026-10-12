@@ -17,7 +17,7 @@ import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Credit top-up — Stripe Checkout on the Georgian site; on the English site
+ * Credit top-up, Stripe Checkout on the Georgian site; on the English site
  * (`crypto`) a pack opens the card payment dialog instead, and the server
  * verifies the on-chain transfer before awarding the credits.
  */
@@ -115,7 +115,7 @@ export function TopUpCard({
         window.location.assign(data.url);
         return;
       }
-      // No URL — visible failure, safe to retry (each attempt mints a fresh
+      // No URL, visible failure, safe to retry (each attempt mints a fresh
       // Stripe session; nothing is charged until checkout completes there).
       const reason = !r.ok ? `http_${r.status}` : "no_url";
       trackEvent(ANALYTICS_EVENT.checkoutFailed, {
@@ -126,8 +126,8 @@ export function TopUpCard({
       });
       setError(
         en
-          ? "Checkout could not start. Check your connection and try again — you won't be charged twice."
-          : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ — ორჯერ ჩამოჭრა არ მოხდება.",
+          ? "Checkout could not start. Check your connection and try again, you won't be charged twice."
+          : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ, ორჯერ ჩამოჭრა არ მოხდება.",
       );
       setPending(null);
     } catch {
@@ -139,8 +139,8 @@ export function TopUpCard({
       });
       setError(
         en
-          ? "Checkout could not start. Check your connection and try again — you won't be charged twice."
-          : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ — ორჯერ ჩამოჭრა არ მოხდება.",
+          ? "Checkout could not start. Check your connection and try again, you won't be charged twice."
+          : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ, ორჯერ ჩამოჭრა არ მოხდება.",
       );
       setPending(null);
     }

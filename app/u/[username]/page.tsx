@@ -175,7 +175,7 @@ export default async function PublicProfilePage({
     notFound();
   }
 
-  // Profile stats — friends + posts, both public.
+  // Profile stats, friends + posts, both public.
   const [ownerFriendsCount, ownerPostsCount] = await Promise.all([
     countFriends(owner.id, viewerId ?? owner.id),
     countPostsByUser(owner.id),
@@ -203,7 +203,7 @@ export default async function PublicProfilePage({
       ? await getFriendshipStatus(viewerId, owner.id)
       : "none";
 
-  // Mutual friends — only meaningful for a logged-in non-owner viewer.
+  // Mutual friends, only meaningful for a logged-in non-owner viewer.
   const mutualCount =
     viewerId && !isOwner ? await countMutualFriends(viewerId, owner.id) : 0;
   const mutualPreview =
@@ -211,7 +211,7 @@ export default async function PublicProfilePage({
       ? await listMutualFriendsPreview(viewerId, owner.id, 4)
       : [];
 
-  // Recent posts visible only to signed-in viewers — the read path calls
+  // Recent posts visible only to signed-in viewers, the read path calls
   // requireUser() so we can't run it for anonymous visitors. The empty-
   // state branch hides the section when there's nothing to show.
   const recentPosts =
@@ -421,7 +421,7 @@ export default async function PublicProfilePage({
           </div>
         </article>
 
-        {/* Synastry — visible when a logged-in visitor (not owner) has a chart */}
+        {/* Synastry, visible when a logged-in visitor (not owner) has a chart */}
         {synastry && viewerName && (
           <section className="mt-10">
             <header className="mb-5">
@@ -483,7 +483,7 @@ export default async function PublicProfilePage({
           </section>
         )}
 
-        {/* Recent activity — viewer-only since the feed list assumes a session */}
+        {/* Recent activity, viewer-only since the feed list assumes a session */}
         {viewerId && recentPosts.length > 0 && (
           <section className="mt-10">
             <header className="mb-5 flex items-baseline justify-between gap-3">
@@ -525,7 +525,7 @@ export default async function PublicProfilePage({
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               {en
                 ? `Create an account and compare your natal chart with ${displayName} across five areas.`
-                : `დარეგისტრირდი — სანამ ${displayName}-ის ცის რუკა შენთან ხვდება, ჩვენ შენთვისაც ვითვლით თავსებადობას ხუთ სფეროში.`}
+                : `დარეგისტრირდი, სანამ ${displayName}-ის ცის რუკა შენთან ხვდება, ჩვენ შენთვისაც ვითვლით თავსებადობას ხუთ სფეროში.`}
             </p>
             <Button asChild variant="mystic" size="lg" className="mt-5">
               <Link href="/signup">{en ? "Start free" : "დაიწყე უფასოდ"}</Link>
@@ -533,7 +533,7 @@ export default async function PublicProfilePage({
           </section>
         )}
 
-        {/* No synastry for a logged-in visitor — two very different reasons.
+        {/* No synastry for a logged-in visitor, two very different reasons.
             `synastry` is null when *either* chart is missing, so branch on
             whose data is actually absent: nudging the viewer to onboarding
             when it's the profile owner who never filled in birth details
@@ -604,7 +604,7 @@ function Pill({
 
 /**
  * Three-cell stat row (friends · posts · reputation). Numbers are
- * the headline — stacked above the label like Instagram / Threads —
+ * the headline, stacked above the label like Instagram / Threads,
  * with thin dividers between cells so the row reads as a single unit
  * rather than three loose words. Sits between the bio and the social
  * pills.

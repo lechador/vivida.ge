@@ -1,5 +1,5 @@
 /**
- * Ranking / listicle SEO topics — "ყველაზე ჭკვიანი / ეჭვიანი / რომანტიული …
+ * Ranking / listicle SEO topics, "ყველაზე ჭკვიანი / ეჭვიანი / რომანტიული …
  * ზოდიაქოს ნიშნები". Each topic becomes a page at /zodiac/reitingebi/[topic]
  * that ranks all 12 signs by a trait. Content is generated on-demand by the
  * AI and cached in the `sign_ranking` table (see actions/sign-ranking).
@@ -51,7 +51,7 @@ export const RANKING_TOPICS: RankingTopic[] = [
     titleKa: "ყველაზე თავსებადი ზოდიაქოს ნიშნები",
     shortKa: "ყველაზე თავსებადი",
     traitKa:
-      "საერთო რომანტიული და ემოციური თავსებადობა — რომელ ნიშნებს ყველაზე ადვილად ეწყობათ ჰარმონიული ურთიერთობა",
+      "საერთო რომანტიული და ემოციური თავსებადობა, რომელ ნიშნებს ყველაზე ადვილად ეწყობათ ჰარმონიული ურთიერთობა",
     emoji: "💞",
     category: "love",
   },

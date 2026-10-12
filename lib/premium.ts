@@ -96,7 +96,7 @@ export async function syncPremiumSubscription(
 
   // Two sequential writes rather than a transaction: production runs the
   // neon-http driver, which throws "No transactions support in neon-http
-  // driver" the moment db.transaction() is called — so every PRO checkout
+  // driver" the moment db.transaction() is called, so every PRO checkout
   // failed to entitle its buyer in prod while CI (node-postgres) stayed green.
   // Both statements are idempotent, and any throw here propagates to the
   // webhook route, which answers 500 so Stripe redelivers until both land.
@@ -105,7 +105,7 @@ export async function syncPremiumSubscription(
     countryCode,
     // Stamp the owner explicitly. A Stripe write that left `source` at its
     // default would be indistinguishable from a store purchase the moment the
-    // default ever changes — and the RevenueCat path refuses to deactivate a
+    // default ever changes, and the RevenueCat path refuses to deactivate a
     // row it does not own, so this field decides who can cancel what.
     source: "stripe" as const,
     stripeSubscriptionId: subscription.id,
@@ -173,7 +173,7 @@ export async function activatePremiumFromCheckout(
 /**
  * Turn auto-renew off (or back on) for a Stripe subscription.
  *
- * Returns null when there is nothing we can cancel — no subscription, or one
+ * Returns null when there is nothing we can cancel, no subscription, or one
  * bought through the App Store / Play Store. A store subscription can only be
  * cancelled by its owner in the store's own account settings; there is no API
  * for us to do it, and the UI must send them there instead of showing a button
@@ -219,7 +219,7 @@ export async function findUserIdForStripeSubscription(
  * Grant a one-time PRO pass bought with crypto (English site).
  *
  * Crypto transfers cannot auto-renew, so the pass simply extends
- * `premiumUntil` by `days` — stacking on whatever time the user already
+ * `premiumUntil` by `days`, stacking on whatever time the user already
  * has. Exactly-once is enforced by electing a single runner through the
  * purchase row's `grantedAt` (a conditional NULL → now() update): a poll
  * that races the original confirmation can re-call this safely, and a

@@ -9,10 +9,10 @@ import {
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Reader notification — a buyer paid for one of their services and the
+ * Reader notification, a buyer paid for one of their services and the
  * payment verified on-chain. Transactional: sent immediately, exactly once
  * per booking (idempotency key on the booking id). Never includes the
- * buyer's question or birth details — those stay inside the booking.
+ * buyer's question or birth details, those stay inside the booking.
  */
 export function BookingPaidEmail({
   recipientName,
@@ -71,8 +71,8 @@ export function BookingPaidEmail({
       </Text>
       <Text style={paragraphStyle}>
         {en
-          ? "Their question and birth details are waiting in your inbox. Deliver the reading from there — the buyer is notified the moment you do."
-          : "მათი კითხვა და დაბადების მონაცემები შენს შემოსულებში გელოდება. საკითხავი იქიდან მიაწოდე — მყიდველი მაშინვე მიიღებს შეტყობინებას."}
+          ? "Their question and birth details are waiting in your inbox. Deliver the reading from there, the buyer is notified the moment you do."
+          : "მათი კითხვა და დაბადების მონაცემები შენს შემოსულებში გელოდება. საკითხავი იქიდან მიაწოდე, მყიდველი მაშინვე მიიღებს შეტყობინებას."}
       </Text>
 
       <Button href={orderUrl} style={buttonStyle}>

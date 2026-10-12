@@ -17,7 +17,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/admin/bazaar/approve — full operator control over the Bazaar.
+ * POST /api/admin/bazaar/approve, full operator control over the Bazaar.
  * Consumed by the separate vivida-admin app (x-admin-token) and by founder
  * sessions (admin email).
  *

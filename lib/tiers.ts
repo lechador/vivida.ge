@@ -1,5 +1,5 @@
 /**
- * Reputation tiers. Pure cosmetic — picking a tier doesn't unlock any
+ * Reputation tiers. Pure cosmetic, picking a tier doesn't unlock any
  * feature, the value comes from social signaling alone.
  *
  * Thresholds were chosen so the first three tiers feel reachable in a
@@ -30,7 +30,7 @@ export const TIERS: Tier[] = [
     labelKa: "ნოვა",
     min: 0,
     hue: "oklch(0.72 0.08 280)",
-    taglineKa: "ახალი ვარსკვლავი — ცა გელოდება.",
+    taglineKa: "ახალი ვარსკვლავი, ცა გელოდება.",
   },
   {
     key: "bright",

@@ -4,7 +4,7 @@
  * Two populations need it:
  *   1. Users with a `profile` row whose `username` is NULL (legacy private
  *      profiles, and the fast-onboarding funnel before ensureUsername existed).
- *   2. Users with NO `profile` row at all — they signed up and never entered
+ *   2. Users with NO `profile` row at all, they signed up and never entered
  *      birth data, so nothing ever created one. This is the large group, and
  *      the previous .mjs version of this script missed it entirely because it
  *      selected FROM profile.
@@ -13,8 +13,8 @@
  * deck, site search, @mention autocomplete all filter on username IS NOT NULL)
  * and unreachable at /u/<username>.
  *
- * Runs through lib/username.ts `ensureUsername` — the same function signup now
- * calls — so the backfill and the live path can never drift apart. Idempotent:
+ * Runs through lib/username.ts `ensureUsername`, the same function signup now
+ * calls, so the backfill and the live path can never drift apart. Idempotent:
  * users who already have a username are skipped by the query and, belt-and-
  * braces, by ensureUsername itself.
  *
@@ -64,7 +64,7 @@ if (dry) {
       `  would assign ${suggestUsername(t.name)}  ← ${t.name ?? "(no name)"}`
     );
   }
-  console.log("\nDry run — nothing written.");
+  console.log("\nDry run, nothing written.");
   process.exit(0);
 }
 

@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { finalizePhoto } from "@/lib/photos-core";
 
 /**
- * Confirm a successful upload — verifies the row belongs to the user and
+ * Confirm a successful upload, verifies the row belongs to the user and
  * flips `ready` to true. Only after this does the photo render publicly.
  */
 export async function POST(

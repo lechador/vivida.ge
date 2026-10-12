@@ -25,8 +25,8 @@ export function StepTime({
     ? "The exact time matters too."
     : "ზუსტი დროც მნიშვნელოვანია.";
   const descText = en
-    ? "Your birth time reveals your rising sign and houses—the chart's deepest layer."
-    : "დაბადების დრო ხსნის შენს ამომავალ ნიშანსა და სახლებს — რუკის ყველაზე ღრმა შრეს.";
+    ? "Your birth time reveals your rising sign and houses, the chart's deepest layer."
+    : "დაბადების დრო ხსნის შენს ამომავალ ნიშანსა და სახლებს, რუკის ყველაზე ღრმა შრეს.";
   const hourLabel = en ? "Hour" : "საათი";
   const minuteLabel = en ? "Minute" : "წუთი";
   const unknownLabel = en ? "I don't know the exact time" : "არ ვიცი ზუსტი დრო";

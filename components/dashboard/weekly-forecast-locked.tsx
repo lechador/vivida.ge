@@ -16,13 +16,13 @@ import { DayRow } from "./weekly-forecast-card";
 
 /**
  * Locked state for the 7-day forecast. The forecast is a one-time credit
- * unlock (CREDIT_COST.weeklyForecast) — pay once and it stays unlocked
+ * unlock (CREDIT_COST.weeklyForecast), pay once and it stays unlocked
  * forever.
  *
  * Tease, don't block: with real `teaserDays` the first day renders fully
  * (headline, reasons, advice) and the remaining days show their real
  * weekday/date/score rows blurred behind the lock. Locked narrative never
- * reaches the client — the server strips it (see stripWeeklyTeaser). Without
+ * reaches the client, the server strips it (see stripWeeklyTeaser). Without
  * teaser data it falls back to the generic blurred skeleton.
  *
  * A successful unlock does a full reload so the now-unlocked forecast
@@ -97,7 +97,7 @@ export function WeeklyForecastLocked({
       }
       if (r.status === 402) setShort(true);
     } catch {
-      /* ignore — button re-enables */
+      /* ignore, button re-enables */
     } finally {
       setPending(false);
     }
@@ -191,7 +191,7 @@ export function WeeklyForecastLocked({
         </div>
       )}
 
-      {/* Lock CTA — in flow below the teaser, not an overlay. */}
+      {/* Lock CTA, in flow below the teaser, not an overlay. */}
       <div className="relative mt-5 flex flex-col items-center gap-3 rounded-xl border border-[var(--vivida-violet)]/25 bg-background/30 px-4 py-5 text-center">
         <div className="grid size-11 place-items-center rounded-full bg-[var(--vivida-violet)]/15 ring-1 ring-[var(--vivida-violet)]/40">
           <Lock className="size-5 text-[var(--vivida-violet)]" />
@@ -199,11 +199,11 @@ export function WeeklyForecastLocked({
         <p className="max-w-xs text-sm text-foreground/85">
           {teaser
             ? en
-              ? "That was just the first day — unlock the full seven with reasons and guidance for each."
-              : "ეს მხოლოდ პირველი დღე იყო — გახსენი სრული შვიდეული: მიზეზები და რჩევები ყოველ დღეს."
+              ? "That was just the first day, unlock the full seven with reasons and guidance for each."
+              : "ეს მხოლოდ პირველი დღე იყო, გახსენი სრული შვიდეული: მიზეზები და რჩევები ყოველ დღეს."
             : en
               ? "Unlock a detailed seven-day forecast with daily harmony and challenge scores, reasons, and guidance."
-              : "გახსენი მომდევნო 7 დღის დეტალური პროგნოზი — ჰარმონიისა და დაძაბულობის ქულები ყოველ დღეს, მიზეზებით და რჩევებით."}
+              : "გახსენი მომდევნო 7 დღის დეტალური პროგნოზი, ჰარმონიისა და დაძაბულობის ქულები ყოველ დღეს, მიზეზებით და რჩევებით."}
         </p>
         <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-3 py-1 text-sm">
           <Sparkles className="size-4 text-[var(--vivida-cyan)]" />

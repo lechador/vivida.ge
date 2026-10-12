@@ -62,7 +62,7 @@ const SITE_URL: Record<UserLocale, string> = {
 };
 
 /**
- * Credits hub — balance, the invite/earn loop, and (Phase 3) Stripe top-up.
+ * Credits hub, balance, the invite/earn loop, and (Phase 3) Stripe top-up.
  */
 export default async function CreditsPage({
   searchParams,
@@ -143,7 +143,7 @@ export default async function CreditsPage({
     getBillingIdentity(user.id),
     isPremiumUser(user.id),
     // Null for everyone the low-credit campaign did not email, which is the
-    // whole point — the promo price must not leak to the rest of Georgia.
+    // whole point, the promo price must not leak to the rest of Georgia.
     getLowCreditOffer(user.id),
     getCreditHistoryPage(user.id, {
       filter: historyFilter,

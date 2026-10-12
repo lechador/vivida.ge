@@ -2,18 +2,18 @@
  * Reference content for the moon calendar page.
  *
  * Why this exists: GSC shows /mtvaris-kalendari carrying 1,501 impressions
- * at position ~10 with a 1.3% CTR — the site's 4th-biggest impression source
+ * at position ~10 with a 1.3% CTR, the site's 4th-biggest impression source
  * and its worst converter. Breaking the query band down, the page ranks for
  * "მთვარე დღეს" / "მთვარის ფაზა დღეს" (p≈8, which it answers well) but
  * drifts to p16-23 on two intents it does NOT actually cover:
  *
- *   - "მთვარის ფაზები" / "mtvaris fazebi" — wants the eight phases as a
+ *   - "მთვარის ფაზები" / "mtvaris fazebi", wants the eight phases as a
  *     reference, not just today's one. The page had a single paragraph.
- *   - "მთვარის დღეების კალენდარი" — wants the lunar DAY (1-30 within the
+ *   - "მთვარის დღეების კალენდარი", wants the lunar DAY (1-30 within the
  *     cycle), a distinct traditional system the page never mentioned.
  *
  * Both are reference content, so it lives here as hand-written data rather
- * than in the page component — same convention as the tarot deck and the
+ * than in the page component, same convention as the tarot deck and the
  * numerology cluster.
  */
 
@@ -40,7 +40,7 @@ export const PHASE_GUIDE: PhaseGuide[] = [
     illuminationKa: "0-2%",
     daysKa: "1-2 დღე",
     meaningKa:
-      "ციკლის დასაწყისი — მთვარე მზასთან ერთ ხაზზეა და ცაზე პრაქტიკულად არ ჩანს. ბნელი ცის გამო ეს საუკეთესო პერიოდია ვარსკვლავებზე დასაკვირვებლად. ტრადიციულად ახალ მთვარეს ახალი საქმის დაწყებასა და მიზნების დასახვას უკავშირებენ.",
+      "ციკლის დასაწყისი, მთვარე მზასთან ერთ ხაზზეა და ცაზე პრაქტიკულად არ ჩანს. ბნელი ცის გამო ეს საუკეთესო პერიოდია ვარსკვლავებზე დასაკვირვებლად. ტრადიციულად ახალ მთვარეს ახალი საქმის დაწყებასა და მიზნების დასახვას უკავშირებენ.",
   },
   {
     key: "waxing_crescent",
@@ -50,7 +50,7 @@ export const PHASE_GUIDE: PhaseGuide[] = [
     illuminationKa: "3-33%",
     daysKa: "3-6 დღე",
     meaningKa:
-      "თხელი ნამგალი დასავლეთით, მზის ჩასვლისთანავე. მთვარე იზრდება — ტრადიციულად ეს დაწყებული საქმის გაგრძელებისა და პირველი ნაბიჯების პერიოდია.",
+      "თხელი ნამგალი დასავლეთით, მზის ჩასვლისთანავე. მთვარე იზრდება, ტრადიციულად ეს დაწყებული საქმის გაგრძელებისა და პირველი ნაბიჯების პერიოდია.",
   },
   {
     key: "first_quarter",
@@ -60,7 +60,7 @@ export const PHASE_GUIDE: PhaseGuide[] = [
     illuminationKa: "≈50%",
     daysKa: "7-9 დღე",
     meaningKa:
-      "ზუსტად ნახევარი დისკოა განათებული. კრატერების დასაკვირვებლად საუკეთესო დროა — ტერმინატორის ხაზზე ჩრდილები ყველაზე მკვეთრია. სიმბოლურად გადაწყვეტილებისა და წინააღმდეგობის გადალახვის ფაზაა.",
+      "ზუსტად ნახევარი დისკოა განათებული. კრატერების დასაკვირვებლად საუკეთესო დროა, ტერმინატორის ხაზზე ჩრდილები ყველაზე მკვეთრია. სიმბოლურად გადაწყვეტილებისა და წინააღმდეგობის გადალახვის ფაზაა.",
   },
   {
     key: "waxing_gibbous",
@@ -80,7 +80,7 @@ export const PHASE_GUIDE: PhaseGuide[] = [
     illuminationKa: "97-100%",
     daysKa: "15-16 დღე",
     meaningKa:
-      "მთელი დისკო განათებულია — მთვარე მზის საპირისპიროდ დგას და მთელი ღამე ჩანს. ყველაზე ნათელი ფაზა და ამიტომ ყველაზე ცუდი დრო სუსტი ობიექტების სანახავად. ტრადიციულად შეჯამების, კულმინაციისა და ემოციური სიმძაფრის დროა.",
+      "მთელი დისკო განათებულია, მთვარე მზის საპირისპიროდ დგას და მთელი ღამე ჩანს. ყველაზე ნათელი ფაზა და ამიტომ ყველაზე ცუდი დრო სუსტი ობიექტების სანახავად. ტრადიციულად შეჯამების, კულმინაციისა და ემოციური სიმძაფრის დროა.",
   },
   {
     key: "waning_gibbous",
@@ -110,13 +110,13 @@ export const PHASE_GUIDE: PhaseGuide[] = [
     illuminationKa: "33-3%",
     daysKa: "25-29 დღე",
     meaningKa:
-      "თხელი ნამგალი აღმოსავლეთით, ცისკრისას. ციკლის დასასრული — დასვენების, აღდგენისა და ახალი მთვარისთვის მომზადების პერიოდად ითვლება.",
+      "თხელი ნამგალი აღმოსავლეთით, ცისკრისას. ციკლის დასასრული, დასვენების, აღდგენისა და ახალი მთვარისთვის მომზადების პერიოდად ითვლება.",
   },
 ];
 
 /**
  * The lunar day ("მთვარის დღე") is the count of days since the last new
- * moon — a traditional system that is NOT the same as the eight phases,
+ * moon, a traditional system that is NOT the same as the eight phases,
  * even though the two are related. We only annotate the turning points
  * rather than inventing 30 distinct prescriptions: the honest version is
  * that the tradition is symbolic, and pretending to per-day precision
@@ -126,27 +126,27 @@ export const LUNAR_DAY_NOTES: { range: string; titleKa: string; bodyKa: string }
   [
     {
       range: "1-7",
-      titleKa: "პირველი მეოთხედი — დაწყება",
+      titleKa: "პირველი მეოთხედი, დაწყება",
       bodyKa:
-        "ახალი მთვარიდან პირველ მეოთხედამდე. ტრადიციულად ახალი საქმის, გეგმისა და განზრახვის ჩამოყალიბების დროდ ითვლება — მაშინ, როცა ენერგია ჯერ იზრდება.",
+        "ახალი მთვარიდან პირველ მეოთხედამდე. ტრადიციულად ახალი საქმის, გეგმისა და განზრახვის ჩამოყალიბების დროდ ითვლება, მაშინ, როცა ენერგია ჯერ იზრდება.",
     },
     {
       range: "8-14",
-      titleKa: "მეორე მეოთხედი — ზრდა",
+      titleKa: "მეორე მეოთხედი, ზრდა",
       bodyKa:
         "აქტიური მოქმედების პერიოდი: დაწყებული საქმე ვითარდება და ძალისხმევა ყველაზე თვალსაჩინო შედეგს იძლევა. ხალხურად ამ დღეებს მზარდ დღეებს უწოდებდნენ.",
     },
     {
       range: "15-21",
-      titleKa: "სავსე მთვარე და შემდეგ — კულმინაცია",
+      titleKa: "სავსე მთვარე და შემდეგ, კულმინაცია",
       bodyKa:
         "მე-15 მთვარის დღე სავსე მთვარეს ემთხვევა. კულმინაციისა და შეჯამების პერიოდია; ტრადიციულად ითვლება, რომ ემოციები ყველაზე მძაფრია და ძილი ყველაზე მოუსვენარი.",
     },
     {
       range: "22-29",
-      titleKa: "ბოლო მეოთხედი — დასრულება",
+      titleKa: "ბოლო მეოთხედი, დასრულება",
       bodyKa:
-        "კლებადი მთვარე. ჩამოშორების, გაწმენდისა და დასვენების დღეებად ითვლება — ახალი ციკლისთვის მომზადება, და არა ახლის დაწყება.",
+        "კლებადი მთვარე. ჩამოშორების, გაწმენდისა და დასვენების დღეებად ითვლება, ახალი ციკლისთვის მომზადება, და არა ახლის დაწყება.",
     },
   ];
 

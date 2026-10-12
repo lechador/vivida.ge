@@ -1,4 +1,4 @@
-/* Vivida service worker — push plus an offline fallback for page navigation. */
+/* Vivida service worker, push plus an offline fallback for page navigation. */
 
 const OFFLINE_CACHE = "vivida-offline-v1";
 const OFFLINE_PAGE = "/offline.html";

@@ -50,7 +50,7 @@ export type DailyTransitsJson = {
   promptVersion?: number;
   /** Cache invalidates when the user's natal chart changes. */
   natalInputHash?: string;
-  /** Today's transiting moon — kept for quick UI access. */
+  /** Today's transiting moon, kept for quick UI access. */
   moonHouse?: number | null;
   moonSignEn?: string;
   /** The exact Moon aspect that drove the product headline, if any. */
@@ -75,8 +75,8 @@ export type DailyTransitsJson = {
  * Status meaning:
  *   - pending : freshly enqueued, never attempted
  *   - sent    : Resend accepted the request
- *   - failed  : Resend or pre-flight threw — eligible for retry
- *   - skipped : dispatch returned false (no chart, opted out, etc.) — terminal
+ *   - failed  : Resend or pre-flight threw, eligible for retry
+ *   - skipped : dispatch returned false (no chart, opted out, etc.), terminal
  */
 export const dailyEmailLog = pgTable(
   "daily_email_log",
@@ -103,10 +103,10 @@ export const dailyEmailLog = pgTable(
 
 /**
  * Append-only log of every transactional email we send. Two purposes:
- *   1. Idempotency for one-shot emails (e.g. welcome) — we check for an
+ *   1. Idempotency for one-shot emails (e.g. welcome), we check for an
  *      existing row before sending.
  *   2. Per-kind throttling for notification emails (friend-request,
- *      message, post_comment, post_reaction) — we suppress a second send
+ *      message, post_comment, post_reaction), we suppress a second send
  *      within a sliding 1h window so a chatty conversation doesn't spam
  *      the inbox.
  *
@@ -126,7 +126,7 @@ export const emailSendLog = pgTable(
     kind: text("kind").notNull(),
     /** Recipient address at send time (users can change email later). */
     email: text("email"),
-    /** Subject line as sent — makes the admin log self-explanatory. */
+    /** Subject line as sent, makes the admin log self-explanatory. */
     subject: text("subject"),
     /** 'sent' | 'failed'. Historical rows predate the column → null = sent. */
     status: text("status").default("sent"),
@@ -199,7 +199,7 @@ export type NewDailyHoroscope = typeof dailyHoroscopes.$inferInsert;
  */
 /**
  * Anonymous "daily horoscope by email" subscribers captured from the public
- * natal-chart calculator — a lower-friction alternative to full signup that
+ * natal-chart calculator, a lower-friction alternative to full signup that
  * still puts them on the daily email loop (the return hook). No account, no
  * password: just an email + the sun sign from the chart they just computed.
  * Converting a lead into a real account happens when they click through and
@@ -222,7 +222,7 @@ export const horoscopeLeads = pgTable(
     unsubscribeToken: text("unsubscribe_token")
       .notNull()
       .$defaultFn(() => crypto.randomUUID()),
-    /** YYYY-MM-DD of the last daily send — idempotency guard for the cron. */
+    /** YYYY-MM-DD of the last daily send, idempotency guard for the cron. */
     lastSentDate: text("last_sent_date"),
     /** Set when they opt out; NULL = active subscriber. */
     unsubscribedAt: timestamp("unsubscribed_at"),

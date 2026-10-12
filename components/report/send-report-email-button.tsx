@@ -12,7 +12,7 @@ type State = "idle" | "sending" | "sent" | "error";
 /**
  * "Email me the PDF" next to the download button on a finished report.
  *
- * The address is never asked for — it mails the account's own address, which
+ * The address is never asked for, it mails the account's own address, which
  * the success line then names, because the one thing a person needs to know
  * after pressing this is *which inbox* to go and look in.
  *
@@ -112,8 +112,8 @@ export function SendReportEmailButton({
         <p className="text-xs text-foreground/70">
           {sentTo
             ? en
-              ? `Sent to ${sentTo} — check your inbox.`
-              : `გაიგზავნა ${sentTo}-ზე — შეამოწმე ფოსტა.`
+              ? `Sent to ${sentTo}, check your inbox.`
+              : `გაიგზავნა ${sentTo}-ზე, შეამოწმე ფოსტა.`
             : en
               ? "Check your inbox."
               : "შეამოწმე ფოსტა."}

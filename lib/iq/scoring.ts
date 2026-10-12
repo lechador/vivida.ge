@@ -7,11 +7,11 @@ import {
 } from "@/lib/iq/items";
 
 /**
- * IQ scoring — the same shape a professional test uses, scaled to what an
+ * IQ scoring, the same shape a professional test uses, scaled to what an
  * online single-sitting can honestly claim.
  *
  * 1. Ability θ is estimated with a Rasch (1-parameter IRT) model from the
- *    *pattern* of right/wrong against each item's difficulty `b` — getting a
+ *    *pattern* of right/wrong against each item's difficulty `b`, getting a
  *    hard item right lifts θ more than getting an easy one right. (Bayesian EAP,
  *    which stays finite at the extremes instead of running off to ±∞.)
  * 2. θ is placed on the deviation-IQ scale: IQ = 100 + 15·(θ − θ_mean)/σθ, where
@@ -20,12 +20,12 @@ import {
  * 3. We report a *range* (± the measurement error from the test information),
  *    a percentile from the normal curve, a band, and per-domain subscores.
  *
- * ⚠️ The θ→IQ mapping (σθ, θ₀) is provisional — calibrated from item difficulty,
+ * ⚠️ The θ→IQ mapping (σθ, θ₀) is provisional, calibrated from item difficulty,
  * not a norming sample. Once enough real responses accumulate we re-derive both
  * from the actual score distribution (see the self-norming note in the admin).
  */
 
-// θ→IQ mapping constants. FIXED — deliberately NOT derived from which items a
+// θ→IQ mapping constants. FIXED, deliberately NOT derived from which items a
 // taker saw, so a full-bank (static) run and an adaptive subset land on the
 // same scale. Provisional until self-norming replaces them from real data.
 const THETA_MEAN = 0.55; // ability in logits that maps to IQ 100
@@ -119,37 +119,37 @@ export function estimateTheta(
 const BANDS: Record<IqBandKey, { labelKa: string; descKa: string; labelEn: string; descEn: string }> = {
   very_high: {
     labelKa: "ძალიან მაღალი",
-    descKa: "მოსახლეობის მხოლოდ მცირე ნაწილი აღწევს ამ დონეს — გამორჩეული აბსტრაქტული აზროვნება.",
+    descKa: "მოსახლეობის მხოლოდ მცირე ნაწილი აღწევს ამ დონეს, გამორჩეული აბსტრაქტული აზროვნება.",
     labelEn: "Very high",
     descEn: "Only a small share of the population reaches this range, indicating exceptional performance on abstract reasoning tasks.",
   },
   high: {
     labelKa: "მაღალი",
-    descKa: "საშუალოზე მკვეთრად მაღალი შედეგი — ძლიერი ლოგიკური და ანალიტიკური უნარი.",
+    descKa: "საშუალოზე მკვეთრად მაღალი შედეგი, ძლიერი ლოგიკური და ანალიტიკური უნარი.",
     labelEn: "High",
     descEn: "A result clearly above the population average, with strong logical and analytical performance.",
   },
   above: {
     labelKa: "საშუალოზე მაღალი",
-    descKa: "საშუალოზე მაღალი შედეგი — კარგად ართმევ თავს რთულ, არასტანდარტულ ამოცანებს.",
+    descKa: "საშუალოზე მაღალი შედეგი, კარგად ართმევ თავს რთულ, არასტანდარტულ ამოცანებს.",
     labelEn: "Above average",
     descEn: "An above-average result, suggesting confidence with complex and unfamiliar reasoning problems.",
   },
   average: {
     labelKa: "საშუალო",
-    descKa: "მოსახლეობის უმეტესობა სწორედ ამ დიაპაზონშია — დაბალანსებული აზროვნება.",
+    descKa: "მოსახლეობის უმეტესობა სწორედ ამ დიაპაზონშია, დაბალანსებული აზროვნება.",
     labelEn: "Average",
     descEn: "Most people fall within this range, reflecting a balanced performance across reasoning tasks.",
   },
   below: {
     labelKa: "საშუალოზე დაბალი",
-    descKa: "ზოგიერთი ტიპის ამოცანა უფრო მეტ დროსა და ვარჯიშს ითხოვს — ეს სავსებით ნორმალურია.",
+    descKa: "ზოგიერთი ტიპის ამოცანა უფრო მეტ დროსა და ვარჯიშს ითხოვს, ეს სავსებით ნორმალურია.",
     labelEn: "Below average",
     descEn: "Some task types may benefit from more time or practice. A single result does not define your ability.",
   },
   low: {
     labelKa: "დაბალი",
-    descKa: "ერთ ჯერზე გავლილი ონლაინ ტესტი ბევრ ფაქტორზეა დამოკიდებული — არ იჩქარო დასკვნებით.",
+    descKa: "ერთ ჯერზე გავლილი ონლაინ ტესტი ბევრ ფაქტორზეა დამოკიდებული, არ იჩქარო დასკვნებით.",
     labelEn: "Low",
     descEn: "One online attempt is affected by many factors, so avoid drawing broad conclusions from this score alone.",
   },
@@ -164,7 +164,7 @@ function bandFor(iq: number): IqBandKey {
   return "low";
 }
 
-/** Band (key + Georgian labels) for a raw IQ — for saved-result views that
+/** Band (key + Georgian labels) for a raw IQ, for saved-result views that
  *  render from stored fields instead of re-scoring from answers. */
 export function iqBand(iq: number): {
   key: IqBandKey;
@@ -182,7 +182,7 @@ export function iqBand(iq: number): {
  * a missing / -1 entry counts as incorrect (standard for a timed test).
  */
 export function scoreIq(answers: Record<string, number>): IqResult {
-  // Score only the items actually administered — the whole bank for the static
+  // Score only the items actually administered, the whole bank for the static
   // test, an adaptive subset otherwise. (Skips are recorded as -1, so they stay
   // in `answers` and count as incorrect; unadministered items are absent.)
   const items = IQ_ITEMS.filter((it) => it.id in answers);

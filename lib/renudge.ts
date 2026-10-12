@@ -13,7 +13,7 @@ import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
 /**
  * Lifecycle re-nudges, fired best-effort from the daily-horoscope cron. Two
- * low-volume, capped, idempotent nudges that recover abandoned sign-ups —
+ * low-volume, capped, idempotent nudges that recover abandoned sign-ups,
  * both a real one-and-done driver:
  *
  *  - verify_reminder: credentials login HARD-requires email verification, so a
@@ -52,7 +52,7 @@ function absUrlForLocale(p: string, locale: UserLocale): string {
   return `${origin.replace(/\/$/, "")}${p.startsWith("/") ? p : `/${p}`}`;
 }
 
-/** Prior sends of a given kind for a user — count + most-recent timestamp. */
+/** Prior sends of a given kind for a user, count + most-recent timestamp. */
 async function priorSends(
   userId: string,
   kind: string
@@ -98,8 +98,8 @@ export async function sendVerificationRenudges(): Promise<RenudgeResult> {
     if (!dispatch.send) continue;
     const locale = normalizeUserLocale(u.locale);
     const subject = locale === "en"
-      ? "Complete your registration — verify your email"
-      : "დაასრულე რეგისტრაცია — დაადასტურე ელფოსტა";
+      ? "Complete your registration, verify your email"
+      : "დაასრულე რეგისტრაცია, დაადასტურე ელფოსტა";
     try {
       await sendVerificationEmail({
         to: dispatch.email,
@@ -167,8 +167,8 @@ export async function sendProfileIncompleteRenudges(): Promise<RenudgeResult> {
     const locale = normalizeUserLocale(u.locale);
     const unsubUrl = absUrlForLocale(`/unsubscribe?token=${token}&type=nudges`, locale);
     const subject = locale === "en"
-      ? "Your birth chart is waiting — complete your profile"
-      : "შენი ნატალური რუკა გელოდება — დაასრულე პროფილი";
+      ? "Your birth chart is waiting, complete your profile"
+      : "შენი ნატალური რუკა გელოდება, დაასრულე პროფილი";
     try {
       await acquireResendSlot();
       const res = await c.emails.send({

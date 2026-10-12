@@ -1,4 +1,4 @@
-// Generate the 16 Astro-MBTI type characters — original Vivida-style low-poly
+// Generate the 16 Astro-MBTI type characters, original Vivida-style low-poly
 // avatars (NOT copies of 16Personalities' art) via Nano Banana 2 Lite on
 // Vertex (Google credits). Each is resized to a compact webp in public/mbti/.
 //
@@ -72,7 +72,7 @@ const ai = new GoogleGenAI({
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function genOne(type) {
-  // The image model has a tight per-minute quota — retry 429s with backoff.
+  // The image model has a tight per-minute quota, retry 429s with backoff.
   let lastErr;
   for (let attempt = 0; attempt < 6; attempt++) {
     try {

@@ -22,7 +22,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
   const router = useRouter();
   const params = useSearchParams();
-  // Where to land after signup — same-origin relative paths only.
+  // Where to land after signup, same-origin relative paths only.
   const nextParam = params.get("next");
   const safeNext = nextParam
     ? normalizeReturnPath(nextParam, "") || null
@@ -56,7 +56,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
     setCodeError(null);
     startVerify(async () => {
       // Pass the password we still hold so a correct code signs them straight
-      // in — no bounce to /login to retype it. Falls back to /login if the
+      // in, no bounce to /login to retype it. Falls back to /login if the
       // auto-signin didn't take.
       const res = await verifyEmailWithCode({
         email,
@@ -84,7 +84,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
               : "/post-login",
           );
         } else {
-          // Not auto-signed-in — bounce to login, carrying next along.
+          // Not auto-signed-in, bounce to login, carrying next along.
           const q = safeNext ? `&next=${encodeURIComponent(safeNext)}` : "";
           router.push(`/login?verified=1${q}`);
         }
@@ -96,7 +96,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
   };
 
   // Disable submit until Turnstile passes (when enabled). When the env var
-  // is missing we let the form work — server still fails-closed via verifyTurnstile.
+  // is missing we let the form work, server still fails-closed via verifyTurnstile.
   const submitDisabled = isPending || (TURNSTILE_ENABLED && !turnstileToken);
   const hasUnverifiedPhone = !!phoneInput.trim() && !phoneClaim;
 
@@ -112,7 +112,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           turnstileToken,
         });
         if (result.ok) {
-          // Account created, but email is not verified yet — a distinct step
+          // Account created, but email is not verified yet, a distinct step
           // from sign_up_verified below. Tracking both is what makes the
           // credential-signup abandonment rate visible in GA4.
           trackEvent(ANALYTICS_EVENT.signUpSubmitted, {
@@ -209,7 +209,7 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           )}
         </div>
 
-        {/* OTP code entry — the easy path for users who struggle with links */}
+        {/* OTP code entry, the easy path for users who struggle with links */}
         <form onSubmit={verifyCode} className="space-y-3 text-left">
           <div className="space-y-1.5">
             <Label htmlFor="code">

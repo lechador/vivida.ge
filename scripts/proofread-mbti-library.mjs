@@ -1,9 +1,9 @@
-// Grammar/orthography proofread of the user-facing MBTI library rows — the type
+// Grammar/orthography proofread of the user-facing MBTI library rows, the type
 // portraits and the 7 profile sections (strengths, weaknesses, romantic,
 // friendship, career, workplace, growth). One gemini-3.8-flash call per row,
 // preserving meaning AND format (**bold** list markers, paragraph breaks,
 // "შენ"-form). Skips admin-edited rows. The type_sun astro-fusion rows are
-// excluded — they're no longer used by the (now psychology-focused) synthesis.
+// excluded, they're no longer used by the (now psychology-focused) synthesis.
 //
 // Usage: node scripts/proofread-mbti-library.mjs [--force]
 //   --force also reproofreads edited rows.
@@ -37,8 +37,8 @@ const KINDS = [
 
 const SYSTEM =
   "შენ ხარ ქართული ენის პროფესიონალი კორექტორი. გისწორებ ტექსტს მხოლოდ გრამატიკულად, " +
-  "ორთოგრაფიულად და სტილისტურად — ბუნებრივ, გამართულ ქართულამდე. მკაცრი წესები: " +
-  "(1) არ შეცვალო აზრი, ინფორმაცია და ტონი; (2) ზუსტად შეინარჩუნე ფორმატი — თუ არის " +
+  "ორთოგრაფიულად და სტილისტურად, ბუნებრივ, გამართულ ქართულამდე. მკაცრი წესები: " +
+  "(1) არ შეცვალო აზრი, ინფორმაცია და ტონი; (2) ზუსტად შეინარჩუნე ფორმატი, თუ არის " +
   "**მუქი სათაურები**, დატოვე **ვარსკვლავები**; შეინარჩუნე ხაზები და აბზაცები; " +
   "(3) შეინარჩუნე „შენ“-ის მიმართვის ფორმა; (4) არ დაამატო ან წაშალო აბზაცი. " +
   "დააბრუნე მხოლოდ გასწორებული ტექსტი, ყოველგვარი კომენტარის გარეშე.";

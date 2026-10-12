@@ -64,8 +64,8 @@ export async function GET(
   );
   const calendarName =
     locale === "ka"
-      ? "Vivida — მნიშვნელოვანი ტრანზიტები"
-      : "Vivida — important transits";
+      ? "Vivida, მნიშვნელოვანი ტრანზიტები"
+      : "Vivida, important transits";
   const nowStamp = new Date()
     .toISOString()
     .replace(/[-:]/g, "")

@@ -7,7 +7,7 @@ import { localDateString } from "@/lib/transits";
  * Monthly free-credit drop. On the first of each month every user is gifted
  * MONTHLY_BONUS credits. Idempotent per month: the grant is keyed by the
  * `YYYY-MM` ref under the `monthly_bonus` reason, so re-running the cron (or a
- * safety-retry tick) never double-grants — grantCreditsOnce checks the ledger
+ * safety-retry tick) never double-grants, grantCreditsOnce checks the ledger
  * and increments the balance inside one advisory-locked statement, so even two
  * overlapping runs cannot both grant. Each grant still emits a "credit" bell
  * notification.
@@ -31,7 +31,7 @@ export async function grantMonthlyCredits(
 
   let granted = 0;
   let skipped = 0;
-  // Small concurrency pool — keeps the job well within the cron timeout while
+  // Small concurrency pool, keeps the job well within the cron timeout while
   // not hammering the pooled connection.
   const CHUNK = 20;
   for (let i = 0; i < rows.length; i += CHUNK) {

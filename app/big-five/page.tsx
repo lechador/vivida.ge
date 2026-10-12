@@ -24,8 +24,8 @@ import {
   localizedAlternates,
 } from "@/lib/seo/locales";
 
-const TITLE_KA = "Big Five ტესტი — დიდი ხუთეული, პიროვნების ტესტი ქართულად";
-const TITLE_EN = "Free Big Five Personality Test — OCEAN Profile";
+const TITLE_KA = "Big Five ტესტი, დიდი ხუთეული, პიროვნების ტესტი ქართულად";
+const TITLE_EN = "Free Big Five Personality Test, OCEAN Profile";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -141,7 +141,7 @@ export default async function BigFiveTestPage() {
         <BigFiveTestClient locale={locale} />
       </section>
 
-      {/* SEO / informational content — below the fold, indexable. */}
+      {/* SEO / informational content, below the fold, indexable. */}
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">

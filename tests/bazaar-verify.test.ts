@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { USDC_MINT } from "@/lib/bazaar-pure";
 
 /**
- * Pins the server-side mapping of Solana RPC answers to payment reasons —
+ * Pins the server-side mapping of Solana RPC answers to payment reasons,
  * the money-facing contract of the verify-payment route:
  *   not indexed yet → "not_found"  (route → 202, buyer retries)
  *   transport/RPC failure → "unavailable" (route → 503)
@@ -12,7 +12,7 @@ import { USDC_MINT } from "@/lib/bazaar-pure";
  *
  * lib/bazaar.ts transitively imports @/db, which throws when DATABASE_URL
  * is unset (vitest has no DB env). The pool it builds is lazy and never
- * connects here — verifyBookingPayment only talks to fetch — so a
+ * connects here, verifyBookingPayment only talks to fetch, so a
  * placeholder URL keeps this pin running in a plain `vitest run`.
  */
 process.env.DATABASE_URL ||= "postgres://vitest:vitest@localhost:5432/vitest";

@@ -20,7 +20,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 /**
  * Phone-number sign-in: request an SMS code, then exchange (phone, code)
  * for a session through the "phone" credentials provider (auth.ts). Shown
- * as the second tab on /login — the email form is untouched.
+ * as the second tab on /login, the email form is untouched.
  */
 export function PhoneLoginForm({
   locale,

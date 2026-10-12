@@ -67,7 +67,7 @@ export async function DELETE() {
   return Response.json({ ok: true });
 }
 
-/** Opt-out toggle for proactive nudges — one tap, no confirmation needed. */
+/** Opt-out toggle for proactive nudges, one tap, no confirmation needed. */
 export async function PATCH(req: Request) {
   const session = await auth();
   const userId = session?.user?.id;

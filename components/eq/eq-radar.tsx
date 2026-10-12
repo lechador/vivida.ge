@@ -2,7 +2,7 @@ import type { EqDomainScore } from "@/lib/eq/scoring";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Five-spoke radar of the EQ domains — the signature result visual. Pure SVG,
+ * Five-spoke radar of the EQ domains, the signature result visual. Pure SVG,
  * no hooks, so it renders on the server (saved result page) and the client
  * (fresh result) alike. Each vertex is a domain; the filled pentagon is the
  * user's shape.

@@ -28,7 +28,7 @@ export function MbtiResultEmail({
     ? (name ? `${name}, your result is ready!` : "Your result is ready!")
     : (name ? `${name}, შენი შედეგი მზადაა!` : "შენი შედეგი მზადაა!");
   return (
-    <EmailLayout preview={en ? `Your type is ${mbtiType} — ${archetypeNameGe}` : `შენი ტიპია ${mbtiType} — ${archetypeNameGe}`}>
+    <EmailLayout preview={en ? `Your type is ${mbtiType}, ${archetypeNameGe}` : `შენი ტიპია ${mbtiType}, ${archetypeNameGe}`}>
       <Heading
         as="h1"
         style={{

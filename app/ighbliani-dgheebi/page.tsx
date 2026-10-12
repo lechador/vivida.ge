@@ -9,9 +9,9 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
 
-const title = "იღბლიანი დღეები — უახლოესი ხელსაყრელი თარიღები";
+const title = "იღბლიანი დღეები, უახლოესი ხელსაყრელი თარიღები";
 const description =
-  "ნახე მომდევნო 30 დღის იღბლიანი და ხელსაყრელი თარიღები პლანეტარული ასპექტების მიხედვით — საქმეებისთვის, სიყვარულისა და ახალი დასაწყისისთვის.";
+  "ნახე მომდევნო 30 დღის იღბლიანი და ხელსაყრელი თარიღები პლანეტარული ასპექტების მიხედვით, საქმეებისთვის, სიყვარულისა და ახალი დასაწყისისთვის.";
 
 export const revalidate = 86400;
 

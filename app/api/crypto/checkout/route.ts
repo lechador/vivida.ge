@@ -27,7 +27,7 @@ export const dynamic = "force-dynamic";
  * recipient, so USDC lands in OUR wallet and the buyer never touches crypto.
  * The reference/URL are still returned (harmless) but unused; verification
  * matches by time window + tolerance-floored amount instead. The Georgian
- * site keeps Stripe — this route refuses non-English hosts.
+ * site keeps Stripe, this route refuses non-English hosts.
  */
 export async function POST(req: Request) {
   const session = await auth();
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
 
   if (kind === "premium_pass") {
     // One PRO row per user: a processor-billed, still-entitled subscription
-    // cannot be overwritten by a pass — holders manage what they have.
+    // cannot be overwritten by a pass, holders manage what they have.
     const sub = await getPremiumSubscription(userId);
     if (sub && statusHasPremiumAccess(sub.status)) {
       return NextResponse.json({ alreadyPremium: true });
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
       message:
         purchase.kind === "credits"
           ? `${purchase.credits} Vivida credits`
-          : "Vivida PRO — 30-day pass",
+          : "Vivida PRO, 30-day pass",
       reference: purchase.reference,
     });
     return NextResponse.json({

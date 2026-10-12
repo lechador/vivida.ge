@@ -25,7 +25,7 @@ export function ProfileIncompleteEmail({
     : en ? "Hello!" : "სალამი!";
   return (
     <EmailLayout
-      preview={en ? "Complete your profile — your birth chart is waiting" : "დაასრულე რეგისტრაცია — შენი ნატალური რუკა გელოდება"}
+      preview={en ? "Complete your profile, your birth chart is waiting" : "დაასრულე რეგისტრაცია, შენი ნატალური რუკა გელოდება"}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
     >
@@ -47,7 +47,7 @@ export function ProfileIncompleteEmail({
       <Text style={paragraphStyle}>
         {en
           ? "You created a Vivida account but have not added your birth date, time, and place yet, so we cannot calculate your natal chart."
-          : "შენ vivida.ge-ზე დარეგისტრირდი, მაგრამ ჯერ არ შეგიყვანია დაბადების თარიღი, დრო და ადგილი — ამიტომ ვერ ვუშვით შენი ნატალური რუკა."}
+          : "შენ vivida.ge-ზე დარეგისტრირდი, მაგრამ ჯერ არ შეგიყვანია დაბადების თარიღი, დრო და ადგილი, ამიტომ ვერ ვუშვით შენი ნატალური რუკა."}
       </Text>
       <Section
         style={{
@@ -96,7 +96,7 @@ export function ProfileIncompleteEmail({
           paddingLeft: 22,
         }}
       >
-        <li>{en ? "Your big three — Sun, Moon, and rising sign" : "შენი დიდი სამეული — მზე, მთვარე და ასცენდენტი"}</li>
+        <li>{en ? "Your big three, Sun, Moon, and rising sign" : "შენი დიდი სამეული, მზე, მთვარე და ასცენდენტი"}</li>
         <li>{en ? "A complete natal chart and interpretation" : "სრული ნატალური რუკა და ინტერპრეტაცია"}</li>
         <li>{en ? "A daily horoscope personalized to your chart" : "ყოველდღიური ჰოროსკოპი, შენს რუკაზე მორგებული"}</li>
         <li>{en ? "Compatibility with friends and partners" : "თავსებადობა მეგობრებთან და პარტნიორებთან"}</li>

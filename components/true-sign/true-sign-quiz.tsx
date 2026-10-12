@@ -28,10 +28,10 @@ import { signColor } from "@/lib/zodiac";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * "რომელი ზოდიაქოს ნიშანი ხარ სინამდვილეში?" — a free, fully client-side
+ * "რომელი ზოდიაქოს ნიშანი ხარ სინამდვილეში?", a free, fully client-side
  * personality quiz. One question per screen, auto-advancing; the result reveals
  * the sign you embody (element × modality), with a share button and a natal-
- * chart cross-sell (your BIRTH sign may differ — go find out for real).
+ * chart cross-sell (your BIRTH sign may differ, go find out for real).
  */
 export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale === "en";
@@ -82,7 +82,7 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
         });
         return;
       } catch {
-        /* dismissed — fall through to copy */
+        /* dismissed, fall through to copy */
       }
     }
     try {
@@ -143,7 +143,7 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
           </div>
         </section>
 
-        {/* Natal-chart cross-sell — your BIRTH sign may differ */}
+        {/* Natal-chart cross-sell, your BIRTH sign may differ */}
         <Link
           href={en ? "/natal-chart" : "/nataluri-ruka"}
           className="group flex items-center justify-between gap-3 rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 p-5 ring-1 ring-foreground/5 transition-colors hover:border-[var(--vivida-cyan)]/60 hover:bg-[var(--vivida-cyan)]/14"
@@ -159,7 +159,7 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
               <span className="block text-muted-foreground">
                 {en
                   ? "Find your exact birth sign and explore your natal chart for free."
-                  : "გაიგე შენი დაბადების ზუსტი ნიშანი და ნახე სრული ნატალური რუკა — უფასოდ."}
+                  : "გაიგე შენი დაბადების ზუსტი ნიშანი და ნახე სრული ნატალური რუკა, უფასოდ."}
               </span>
             </span>
           </span>

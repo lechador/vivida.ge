@@ -92,7 +92,7 @@ export function PeopleList({
             {query.trim().length >= 2
               ? en
                 ? "No one found. Try another search."
-                : "ვერავინ ვერ მოიძებნა — სცადე სხვა სიტყვით."
+                : "ვერავინ ვერ მოიძებნა, სცადე სხვა სიტყვით."
               : en
                 ? "No profiles yet."
                 : "ჯერ არავინ შემოსულა."}

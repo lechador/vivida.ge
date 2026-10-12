@@ -55,7 +55,7 @@ export const ENGLISH_ONLY_ROUTES: ReadonlyArray<{
   internalEn: CoreEnglishInternalPath;
 }> = [
   { en: "/about", internalEn: "/en/about" },
-  // "How daily horoscopes work" — an explainer with no Georgian equivalent.
+  // "How daily horoscopes work", an explainer with no Georgian equivalent.
   // It previously held the hreflang pair with the Georgian /horoskopi, but
   // that is the Georgian *daily hub*, whose real English counterpart is the
   // English daily-horoscope content from the shared /horoskopi route (publicly
@@ -63,7 +63,7 @@ export const ENGLISH_ONLY_ROUTES: ReadonlyArray<{
   // Pairing an explainer with a daily hub mismatched the content on both
   // sides and left the English daily hub with no counterpart at all.
   { en: "/horoscope", internalEn: "/en/horoscope" },
-  // Insight Bazaar — English-only reader marketplace (no Georgian twin).
+  // Insight Bazaar, English-only reader marketplace (no Georgian twin).
   { en: "/readings", internalEn: "/en/readings" },
 ];
 
@@ -149,7 +149,7 @@ export function localizedAlternates(
  * have to restate an image or they ship with none, and every share of that URL
  * renders as a bare text link.
  *
- * Relative on purpose — `metadataBase` in the root layout is host-aware, so
+ * Relative on purpose, `metadataBase` in the root layout is host-aware, so
  * this resolves to vivida.ge or vividaastro.com to match the domain served.
  * Pages with a tailored card (`/api/og/page?t=…`) should keep using it; this is
  * only the branded default for the rest.
@@ -180,7 +180,7 @@ export function englishSiteHref(path: string, onEnglishHost: boolean): string {
 export const ENGLISH_LEGACY_CONTENT_REDIRECTS = [
   // Renders the identical <NatalChartPageEn /> as /natal-chart, so on the
   // international host it was a straight duplicate of the canonical English
-  // URL — two self-canonicalling copies competing for the same query. The
+  // URL, two self-canonicalling copies competing for the same query. The
   // Georgian /nataluri-ruka is untouched: this is host-scoped.
   { source: "/nataluri-ruka", destination: "/natal-chart" },
   { source: "/piradi-ruka", destination: "/natal-chart" },

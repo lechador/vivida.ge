@@ -270,8 +270,8 @@ function ResultCard({
   async function share() {
     const url = `${en ? "https://www.vividaastro.com" : "https://www.vivida.ge"}/zodiac/tavsebadoba/${result.slug}`;
     const text = en
-      ? `${signA.label} × ${signB.label} — ${result.percent}% compatibility on Vivida ✨`
-      : `${signA.label} × ${signB.label} — ${result.percent}% თავსებადობა Vivida-ზე ✨`;
+      ? `${signA.label} × ${signB.label}, ${result.percent}% compatibility on Vivida ✨`
+      : `${signA.label} × ${signB.label}, ${result.percent}% თავსებადობა Vivida-ზე ✨`;
     fbTrackCustom("CompatibilityShare", { pair: result.slug });
     try {
       if (navigator.share) {
@@ -287,7 +287,7 @@ function ResultCard({
         return;
       }
     } catch {
-      // user cancelled the share sheet — nothing to do.
+      // user cancelled the share sheet, nothing to do.
       return;
     }
     try {
@@ -297,7 +297,7 @@ function ResultCard({
         method: "clipboard",
       });
     } catch {
-      // clipboard blocked — silently ignore, the full-analysis link remains.
+      // clipboard blocked, silently ignore, the full-analysis link remains.
     }
   }
 
@@ -429,7 +429,7 @@ function ResultCard({
             {en ? (
               <>
                 This compares only your{" "}
-                <strong className="text-foreground">Sun signs</strong>—the
+                <strong className="text-foreground">Sun signs</strong>, the
                 surface layer. Deeper compatibility includes the Moon, Venus,
                 Mars, houses, and cross-chart aspects. Vivida calculates the
                 complete picture.
@@ -437,7 +437,7 @@ function ResultCard({
             ) : (
               <>
                 ეს მხოლოდ{" "}
-                <strong className="text-foreground">მზის ნიშანია</strong> —
+                <strong className="text-foreground">მზის ნიშანია</strong>,
                 ზედაპირი. შენი ნამდვილი თავსებადობა მთვარეებსა და ვენერებზე
                 იწერება. Vivida ითვლის სრულ ნატალურ რუკას და გაცნობს ადამიანებს,
                 ვისთანაც მართლა ემთხვევი.

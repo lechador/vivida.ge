@@ -4,7 +4,7 @@ import { EmailLayout, buttonStyle, paragraphStyle } from "./_layout";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Generic marketing template — admin types subject + body in the panel,
+ * Generic marketing template, admin types subject + body in the panel,
  * we wrap it in the brand chrome. Body is split on \n\n into paragraphs.
  * No markdown rendering: we keep it deliberately plain so admin can't
  * accidentally embed JS/HTML.

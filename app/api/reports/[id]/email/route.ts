@@ -20,7 +20,7 @@ type Params = { params: Promise<{ id: string }> };
  *
  * Deliberately re-sendable: people press this again when the first one didn't
  * land, so nothing here dedupes. The rate limit is what keeps it from becoming
- * a way to fire mail at an inbox — generous enough that a genuine retry always
+ * a way to fire mail at an inbox, generous enough that a genuine retry always
  * goes through.
  */
 export async function POST(req: Request, ctx: Params) {

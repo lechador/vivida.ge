@@ -57,7 +57,7 @@ export type UnlockOutcome =
   | { ok: true; status: UnlockResult }
   | { ok: false; error: "bad_request" | "not_found" | "insufficient" };
 
-/** Does `resultId` belong to `userId`? Never let someone unlock — or probe — another's row. */
+/** Does `resultId` belong to `userId`? Never let someone unlock, or probe, another's row. */
 async function ownsResult(
   userId: string,
   kind: Exclude<UnlockKind, "weekly">,
@@ -80,7 +80,7 @@ async function ownsResult(
 }
 
 /**
- * Spend credits to unlock one result. Idempotent — re-unlocking an item the
+ * Spend credits to unlock one result. Idempotent, re-unlocking an item the
  * user already paid for costs nothing and returns "already".
  *
  * "weekly" is a per-user lifetime unlock (the 7-day forecast) keyed by a fixed

@@ -1,6 +1,6 @@
 // Seed the reusable per-placement interpretation library (interpretation_library).
-// Generates one rich Georgian text per (subject, sign) — Big Three + planets in
-// each sign — so the report reuses them across all users instead of a per-user
+// Generates one rich Georgian text per (subject, sign), Big Three + planets in
+// each sign, so the report reuses them across all users instead of a per-user
 // AI call. One AI call per entry (Georgian is token-dense; batching truncates).
 //
 // Usage:
@@ -72,12 +72,12 @@ const SUBJECT_DOMAIN_KA = {
   neptune: "ოცნება, ინტუიცია, სულიერება და შემოქმედებითი წარმოსახვა",
   pluto: "ღრმა ტრანსფორმაცია, ძალა, კონტროლი და აღორძინება",
   ascendant:
-    "პირველი შთაბეჭდილება — როგორ აღგიქვამენ სხვები პირველი შეხვედრისას",
+    "პირველი შთაბეჭდილება, როგორ აღგიქვამენ სხვები პირველი შეხვედრისას",
 };
 
 const SYSTEM =
   "შენ ხარ გამოცდილი ქართველი ასტროლოგი და მწერალი. წერ ბუნებრივ, მდიდარ, " +
-  "ლიტერატურულ ქართულად — გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
+  "ლიტერატურულ ქართულად, გრამატიკულად უნაკლო, ცოცხალი და კონკრეტული. " +
   'თავიდან აიცილე თარგმანის სტილი, გამეორებები და კლიშეები ("ვარსკვლავები გელიან").';
 
 function prompt(subject, sign) {
@@ -89,7 +89,7 @@ function prompt(subject, sign) {
     `დაწერე "${placementKa}"-ს ინტერპრეტაცია (თემა: ${SUBJECT_DOMAIN_KA[subject]}).\n` +
     `6-8 წინადადება (დაახ. 130-170 სიტყვა), "შენ"-ის ფორმა, თბილი და კონკრეტული. ` +
     `ჩაურთე ამ მდებარეობის ძლიერი მხარეც და გამოწვევაც, ცოცხალი მაგალითებით. ` +
-    `დააბრუნე მხოლოდ ტექსტი — სათაურის, ფორმატირების და ფრჩხილების გარეშე.`
+    `დააბრუნე მხოლოდ ტექსტი, სათაურის, ფორმატირების და ფრჩხილების გარეშე.`
   );
 }
 

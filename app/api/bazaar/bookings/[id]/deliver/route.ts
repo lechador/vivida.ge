@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 type Params = { params: Promise<{ id: string }> };
 
 /**
- * POST /api/bazaar/bookings/[id]/deliver { deliveryText } — the provider
+ * POST /api/bazaar/bookings/[id]/deliver { deliveryText }, the provider
  * posts the finished reading. Only the booking's own provider; the first
  * delivery notifies the buyer, later saves update the text silently.
  */
@@ -30,7 +30,7 @@ export async function POST(req: Request, ctx: Params) {
   if (!booking || booking.viewerRole !== "provider") {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
-  // Delivered readings stay editable — readers fix typos after the fact.
+  // Delivered readings stay editable, readers fix typos after the fact.
   // Anything else (pending payment, cancelled) cannot deliver.
   if (booking.status !== "paid" && booking.status !== "delivered") {
     return NextResponse.json({ error: "not_paid" }, { status: 409 });
@@ -66,7 +66,7 @@ export async function POST(req: Request, ctx: Params) {
       updatedAt: new Date(),
     })
     .where(eq(bazaarBookings.id, booking.id));
-  // Notify once, on the first delivery — edits are silent (the buyer sees
+  // Notify once, on the first delivery, edits are silent (the buyer sees
   // the updated text live in My readings).
   if (firstDelivery) await notifyReadingDelivered(booking.id);
   return NextResponse.json({ ok: true, status: "delivered" });

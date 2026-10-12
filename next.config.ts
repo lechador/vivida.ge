@@ -23,7 +23,7 @@ const REPORT_PDF_ROUTES = [
 ] as const;
 
 const nextConfig: NextConfig = {
-  // The PDF report route reads the Georgian TTFs at runtime via fs — Vercel's
+  // The PDF report route reads the Georgian TTFs at runtime via fs, Vercel's
   // tracer won't pick up a dynamic path on its own, so include them explicitly
   // in that function's bundle (otherwise the font is missing on the deploy and
   // Georgian renders as tofu).
@@ -100,7 +100,7 @@ const nextConfig: NextConfig = {
       // lib/security-headers.ts). Scoped to the English hosts so the
       // Georgian host's Stripe frames/scripts are untouched. The custom RPC
       // origin (if NEXT_PUBLIC_SOLANA_RPC_URL is set) is appended
-      // automatically — only origins reach the header, never URL keys.
+      // automatically, only origins reach the header, never URL keys.
       ...ENGLISH_HOSTS.map((host) => ({
         source: "/:path*",
         has: [{ type: "host" as const, value: host }],
@@ -123,7 +123,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "lh4.googleusercontent.com" },
       { protocol: "https", hostname: "lh5.googleusercontent.com" },
       { protocol: "https", hostname: "lh6.googleusercontent.com" },
-      // Cloudflare R2 — dev-mode public buckets + custom domains
+      // Cloudflare R2, dev-mode public buckets + custom domains
       { protocol: "https", hostname: "**.r2.dev" },
       { protocol: "https", hostname: "**.r2.cloudflarestorage.com" },
       // Local fallback before the production R2 seed is run.

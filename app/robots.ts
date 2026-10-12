@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { siteOriginForHost } from "@/lib/seo/locales";
 
 /**
- * robots.txt — allow all public pages, block authed app surfaces and any
+ * robots.txt, allow all public pages, block authed app surfaces and any
  * API routes from being indexed (they only return JSON or auth-required
  * HTML, both useless to search engines and noisy in results).
  */
@@ -19,7 +19,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       {
         userAgent: "*",
         // /api/og/* renders the og:image every social card points at, so it
-        // has to stay crawlable despite the blanket /api/ block — the longer
+        // has to stay crawlable despite the blanket /api/ block, the longer
         // Allow prefix wins over the shorter Disallow for Google and Bing.
         allow: ["/", "/api/og/"],
         disallow: [

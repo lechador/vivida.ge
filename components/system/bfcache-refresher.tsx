@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 /**
  * Mobile Chrome (and most modern browsers) freezes background tabs into
  * the back-forward cache and restores the page snapshot when the user
- * returns. The page restores instantly — but server-rendered data is
+ * returns. The page restores instantly, but server-rendered data is
  * frozen at the moment of suspension, so anything time-sensitive
  * (today's horoscope, trial countdown, fresh notifications, even the
  * auth session if it expired while suspended) ends up stale and the
- * user perceives the app as "broken — needs refresh."
+ * user perceives the app as "broken, needs refresh."
  *
  * We keep bfcache enabled (page restore stays instant) and trigger a
  * background `router.refresh()` on bfcache restore. Server components

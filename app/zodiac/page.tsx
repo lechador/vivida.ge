@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
   const title = en
-    ? "The 12 Zodiac Signs — Dates, Traits and Meanings"
+    ? "The 12 Zodiac Signs, Dates, Traits and Meanings"
     : HUB_CONTENT.pageTitle;
   const description = en
     ? "Explore all 12 zodiac signs, their dates, symbols, elements, modalities, personality traits, and compatibility. Find your sign and calculate your full birth chart."
@@ -263,7 +263,7 @@ export default async function ZodiacHubPage() {
                 ნიღაბი, რომელსაც სამყარო ხედავს
               </h3>
               <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
-                ასცენდენტი — როგორ შედიხარ ოთახში.
+                ასცენდენტი, როგორ შედიხარ ოთახში.
               </p>
             </Link>
             <Link
@@ -296,10 +296,10 @@ export default async function ZodiacHubPage() {
                 თავსებადობა
               </div>
               <h3 className="relative mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                ყველა წყვილი — 78 კავშირი
+                ყველა წყვილი, 78 კავშირი
               </h3>
               <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
-                ნახე სრული ცხრილი — ვერძი ლომთან, ქალწული თხის რქასთან, ყველა
+                ნახე სრული ცხრილი, ვერძი ლომთან, ქალწული თხის რქასთან, ყველა
                 შესაძლო კომბინაცია.
               </p>
             </Link>
@@ -345,7 +345,7 @@ export default async function ZodiacHubPage() {
                 ყველაზე ჭკვიანი, ეჭვიანი, რომანტიული ნიშნები
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-                12-ვე ნიშანი დალაგებული თვისებების მიხედვით — ნახე, სად დგას
+                12-ვე ნიშანი დალაგებული თვისებების მიხედვით, ნახე, სად დგას
                 შენი.
               </p>
             </div>
@@ -369,7 +369,7 @@ export default async function ZodiacHubPage() {
                 ზოდიაქოს ნიშნები წლების მიხედვით
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-                გაიგე შენი ჩინური ცხოველი დაბადების წლით — ვირთხა, დრაკონი,
+                გაიგე შენი ჩინური ცხოველი დაბადების წლით, ვირთხა, დრაკონი,
                 ვეფხვი…
               </p>
             </div>
@@ -390,7 +390,7 @@ export default async function ZodiacHubPage() {
                 ონლაინ ტარო
               </div>
               <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                ტარო ქართულად — დაუსვი კითხვა კარტებს
+                ტარო ქართულად, დაუსვი კითხვა კარტებს
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-foreground/85">
                 გაშალე 3-კარტიანი განლაგება და მიიღე ცოცხალი პასუხი. პირველი
@@ -415,7 +415,7 @@ export default async function ZodiacHubPage() {
             შენი ნიშანი ცის რუკის მცირე ნაწილია
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            მთვარე, ამომავალი, 12 სახლი, ყველა პლანეტა — ცოცხალ რუკაში. დაიწყე
+            მთვარე, ამომავალი, 12 სახლი, ყველა პლანეტა, ცოცხალ რუკაში. დაიწყე
             უფასოდ.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">

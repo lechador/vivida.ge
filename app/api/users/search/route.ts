@@ -47,11 +47,11 @@ export async function GET(req: Request) {
       and(
         ne(users.id, session.user.id),
         blockedIds.length ? notInArray(users.id, blockedIds) : undefined,
-        // Hide users who haven't picked a username yet — their card would
+        // Hide users who haven't picked a username yet, their card would
         // link to a broken /u/ URL.
         isNotNull(profiles.username),
         // Usernames now come with the account, so they no longer imply an
-        // onboarded profile — gate on birth data so @mention autocomplete only
+        // onboarded profile, gate on birth data so @mention autocomplete only
         // offers real profiles. Same rule as lib/people.ts.
         isNotNull(profiles.dateOfBirth),
         // Respect the discovery opt-out: opted-out users aren't findable

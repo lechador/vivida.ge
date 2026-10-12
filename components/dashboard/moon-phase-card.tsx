@@ -8,7 +8,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Render the universal moon-phase card on the dashboard.
- * Sized to live in a narrow sidebar column — vertical stack with a
+ * Sized to live in a narrow sidebar column, vertical stack with a
  * compact moon glyph, single-line headline, and a fold-out body.
  */
 export function MoonPhaseCard({
@@ -37,7 +37,7 @@ export function MoonPhaseCard({
         className="absolute -right-10 -top-10 size-40 rounded-full bg-[radial-gradient(circle,oklch(0.85_0.06_240/0.35)_0%,transparent_70%)] blur-3xl"
       />
 
-      {/* Hero row — small label + moon glyph aligned right */}
+      {/* Hero row, small label + moon glyph aligned right */}
       <div className="relative mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">

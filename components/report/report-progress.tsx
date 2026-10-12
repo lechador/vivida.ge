@@ -69,13 +69,13 @@ export function ReportProgress({
       if (data.status === "failed") setError(data.error ?? null);
       return data.status === "ready" || data.status === "failed";
     } catch {
-      /* transient — keep polling */
+      /* transient, keep polling */
       return false;
     }
   }, [reportId]);
 
   // Poll the status endpoint until the report reaches a terminal state. The
-  // effect re-runs when `terminal` flips and tears down the interval — legit
+  // effect re-runs when `terminal` flips and tears down the interval, legit
   // external-system subscription, hence the setState-in-callback.
   useEffect(() => {
     if (terminal) return;
@@ -153,7 +153,7 @@ export function ReportProgress({
           </div>
           <h2 className="text-2xl font-semibold">
             {title
-              ? `${title} — ${en ? "ready 🌟" : "მზადაა 🌟"}`
+              ? `${title}, ${en ? "ready 🌟" : "მზადაა 🌟"}`
               : en
                 ? "Your report is ready! 🌟"
                 : "ანგარიში მზადაა! 🌟"}
@@ -161,7 +161,7 @@ export function ReportProgress({
           <p className="mt-2 max-w-md text-sm text-foreground/75">
             {en
               ? "Your personal report is complete. Download it and keep it forever."
-              : "შენი პერსონალური რეპორტი დასრულდა. ჩამოტვირთე — ის სამუდამოდ შენთან რჩება."}
+              : "შენი პერსონალური რეპორტი დასრულდა. ჩამოტვირთე, ის სამუდამოდ შენთან რჩება."}
           </p>
           <Button asChild variant="mystic" size="xl" className="mt-6 min-w-56">
             <a href={`/api/reports/${reportId}/download`}>
@@ -183,7 +183,7 @@ export function ReportProgress({
           <p className="mt-2 max-w-md text-sm text-foreground/75">
             {en
               ? "Something went wrong while creating the PDF. Your payment is saved, so you can retry at no extra cost."
-              : "რაღაც ვერ მოხერხდა PDF-ის შექმნისას. გადახდა შენახულია — სცადე ხელახლა დამატებითი საფასურის გარეშე."}
+              : "რაღაც ვერ მოხერხდა PDF-ის შექმნისას. გადახდა შენახულია, სცადე ხელახლა დამატებითი საფასურის გარეშე."}
           </p>
           {error && (
             <p className="mt-2 text-xs text-muted-foreground">{error}</p>
@@ -223,7 +223,7 @@ export function ReportProgress({
           <p className="mt-3 text-xs text-muted-foreground">
             {en
               ? "Please keep this page open. It usually takes less than a minute."
-              : "გთხოვ, არ დახურო ეს გვერდი — ჩვეულებრივ ერთ წუთზე ნაკლები სჭირდება."}
+              : "გთხოვ, არ დახურო ეს გვერდი, ჩვეულებრივ ერთ წუთზე ნაკლები სჭირდება."}
           </p>
           {retryable && (
             <Button

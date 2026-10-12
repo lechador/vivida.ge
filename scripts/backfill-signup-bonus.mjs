@@ -2,9 +2,9 @@
 //
 // Root cause: web Google sign-ups are created by the Auth.js DrizzleAdapter,
 // which (until the createUser event hook was added) never called
-// onUserSignedUp — so those users got no signup bonus. This grants it
+// onUserSignedUp, so those users got no signup bonus. This grants it
 // retroactively, but ONLY to users who received no welcome grant through any
-// channel (signup_bonus / grandfather / admin_grant) — so grandfathered users
+// channel (signup_bonus / grandfather / admin_grant), so grandfathered users
 // and the ones already hand-fixed via the admin gift tool are left untouched.
 //
 // Idempotent: after a grant the user has a signup_bonus row, so re-running
@@ -39,7 +39,7 @@ const targets = await sql`
   )
   ORDER BY u.created_at`;
 
-console.log(`target users (no welcome grant): ${targets.length}${dry ? " (DRY RUN — nothing granted)" : ""}`);
+console.log(`target users (no welcome grant): ${targets.length}${dry ? " (DRY RUN, nothing granted)" : ""}`);
 if (dry) {
   targets.slice(0, 30).forEach((t) => console.log("  -", t.email ?? t.id));
   process.exit(0);

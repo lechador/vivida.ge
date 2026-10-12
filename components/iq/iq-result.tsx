@@ -159,7 +159,7 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
         </div>
       </div>
 
-      {/* Domain breakdown — gated behind login */}
+      {/* Domain breakdown, gated behind login */}
       <div className="relative overflow-hidden rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
         <div className="mb-5 flex items-center gap-2">
           <Brain className="size-5 text-[var(--vivida-cyan)]" />
@@ -192,7 +192,7 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
               <p className="mx-auto mt-3 max-w-xs text-pretty text-sm text-foreground/85">
                 {en
                   ? "Create a free account to save your result and explore your performance across all four reasoning domains."
-                  : "დარეგისტრირდი უფასოდ და ნახე შენი აზროვნების სრული ანალიზი დომენების მიხედვით — და შეინახე შედეგი."}
+                  : "დარეგისტრირდი უფასოდ და ნახე შენი აზროვნების სრული ანალიზი დომენების მიხედვით, და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
                 <Link href="/signup?from=iq">
@@ -254,7 +254,7 @@ function ShareButton({ iq, locale }: { iq: number; locale: UserLocale }) {
         });
         return;
       } catch {
-        /* cancelled — fall through to copy */
+        /* cancelled, fall through to copy */
       }
     }
     try {

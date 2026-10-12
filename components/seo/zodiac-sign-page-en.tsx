@@ -76,7 +76,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
       about: {
         "@type": "Thing",
         name,
-        description: `${name} (${dates.rangeEn}) — ${signEn?.tagline || c.tagline}`,
+        description: `${name} (${dates.rangeEn}), ${signEn?.tagline || c.tagline}`,
       },
     },
     {

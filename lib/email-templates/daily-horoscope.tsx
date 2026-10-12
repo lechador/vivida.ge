@@ -8,7 +8,7 @@ import {
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Daily horoscope teaser. Intentionally short — date, concrete product
+ * Daily horoscope teaser. Intentionally short, date, concrete product
  * headline, greeting, 1-2-sentence summary, CTA. The full reading (body
  * paragraphs, themes, moon phase, weekly stripe) lives on /dashboard.
  * Keeps inbox real-estate small and gives the button a real reason to
@@ -26,7 +26,7 @@ export function DailyHoroscopeEmail({
   name: string | null;
   /** Short, concrete title for today (from daily editorial composition). */
   headline: string;
-  /** 1-2 sentence executive summary — the hook. */
+  /** 1-2 sentence executive summary, the hook. */
   summary: string;
   /** Deep link back to the in-app daily card. */
   dashboardUrl: string;

@@ -124,13 +124,13 @@ export function BuyReportCta({
           </div>
           <h3 className="text-xl font-semibold tracking-tight">
             {en
-              ? "A deep reading of your natal chart—PDF"
-              : "შენი ნატალური რუკის ღრმა ანალიზი — PDF"}
+              ? "A deep reading of your natal chart, PDF"
+              : "შენი ნატალური რუკის ღრმა ანალიზი, PDF"}
           </h3>
           <p className="mt-1.5 text-sm text-foreground/75">
             {en
               ? "A beautifully formatted, downloadable report covering your chart's defining patterns, planets, houses, aspects, strengths and growth areas."
-              : "10+ გვერდიანი პერსონალური ანგარიში: რა გამოირჩევა შენს რუკაში, პლანეტების, სახლებისა და ასპექტების დეტალური ახსნა, ძლიერი მხარეები და ზრდის ზონები — ლამაზად გაფორმებული, ჩამოსატვირთად."}
+              : "10+ გვერდიანი პერსონალური ანგარიში: რა გამოირჩევა შენს რუკაში, პლანეტების, სახლებისა და ასპექტების დეტალური ახსნა, ძლიერი მხარეები და ზრდის ზონები, ლამაზად გაფორმებული, ჩამოსატვირთად."}
           </p>
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1 text-sm">
             <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
@@ -157,7 +157,7 @@ export function BuyReportCta({
                 ) : (
                   <FileText className="size-4" />
                 )}
-                {en ? "Create" : "შექმნა"} — {cost} {en ? "credits" : "კრედიტი"}
+                {en ? "Create" : "შექმნა"}, {cost} {en ? "credits" : "კრედიტი"}
               </Button>
               <span className="text-center text-xs text-muted-foreground sm:text-right">
                 {en

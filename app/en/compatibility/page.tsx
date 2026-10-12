@@ -10,10 +10,10 @@ import { articleLd, breadcrumbLd } from "@/lib/seo/jsonld";
 
 const PATH = "/en/compatibility";
 const TITLE = "Astrology Compatibility Beyond Sun Signs";
-const DESCRIPTION = "Learn how synastry compares two natal charts through the Sun, Moon, Venus, Mars, houses and planetary aspects—not only Sun signs.";
+const DESCRIPTION = "Learn how synastry compares two natal charts through the Sun, Moon, Venus, Mars, houses and planetary aspects, not only Sun signs.";
 
 export const metadata: Metadata = {
-  title: { absolute: `${TITLE} — Vivida` }, description: DESCRIPTION,
+  title: { absolute: `${TITLE}, Vivida` }, description: DESCRIPTION,
   alternates: localizedAlternates(PATH, "/zodiac/tavsebadoba", "en"),
   openGraph: { images: [DEFAULT_OG_IMAGE], title: TITLE, description: DESCRIPTION, url: `${ENGLISH_SITE_URL}/compatibility`, locale: "en_US", alternateLocale: ["ka_GE"] },
 };
@@ -60,7 +60,7 @@ export default function EnglishCompatibilityPage() {
       <div className="rounded-3xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-6 text-center sm:p-8">
         <Heart className="mx-auto size-7 text-[var(--vivida-pink)]" />
         <h2 className="mt-3">Try the free Sun-sign calculator</h2>
-        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">Create a free profile to compare complete birth charts, including the Moon, Venus, Mars, houses, and cross-chart aspects—in English.</p>
+        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">Create a free profile to compare complete birth charts, including the Moon, Venus, Mars, houses, and cross-chart aspects, in English.</p>
         <Link href="/signup" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-3 text-sm font-semibold text-white">Create my profile <ArrowRight className="size-4" /></Link>
       </div>
     </EnglishGuide>

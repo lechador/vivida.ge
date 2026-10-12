@@ -11,7 +11,7 @@ import { join, relative } from "node:path";
 const ROOT = new URL("..", import.meta.url).pathname;
 const EXAMPLE = join(ROOT, ".env.example");
 
-// Vercel/Next/Node built-ins — never belong in .env.example.
+// Vercel/Next/Node built-ins, never belong in .env.example.
 const ALLOWLIST = new Set(["NODE_ENV", "VERCEL", "VERCEL_ENV"]);
 
 const SCAN_DIRS = ["app", "lib", "actions", "components", "scripts"];
@@ -78,4 +78,4 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-console.log(`OK — ${used.size} env keys used, all documented in .env.example.`);
+console.log(`OK, ${used.size} env keys used, all documented in .env.example.`);

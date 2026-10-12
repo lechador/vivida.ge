@@ -39,4 +39,4 @@
 
 ჯერ გასწორდეს ხატულა და ინსტალაციის მოქმედება, შემდეგ დაემატოს მოვლენები და ადმინის ხედები. წარმატება ნიშნავს: Android-ზე ერთი დაჭერით იხსნება ბრაუზერის დიალოგი, iOS-ზე ჩანს გასაგები ინსტრუქცია, უკვე დაყენებულ აპში შეთავაზება ქრება, ხატულას თეთრი გვერდები არ აქვს და ადმინი აჩვენებს დათვლის დაწყების შემდეგ დაფიქსირებულ ინსტალაციებს მკაფიო საზღვრებით.
 
-საყრდენი დოკუმენტაცია: [web.dev — installation prompt](https://web.dev/learn/pwa/installation-prompt/), [MDN — install prompt](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt), [Apple — Home Screen icon](https://developer.apple.com/videos/play/wwdc2022/10048/), [Google Analytics Data API](https://developers.google.com/analytics/devguides/reporting/data/v1).
+საყრდენი დოკუმენტაცია: [web.dev, installation prompt](https://web.dev/learn/pwa/installation-prompt/), [MDN, install prompt](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt), [Apple, Home Screen icon](https://developer.apple.com/videos/play/wwdc2022/10048/), [Google Analytics Data API](https://developers.google.com/analytics/devguides/reporting/data/v1).

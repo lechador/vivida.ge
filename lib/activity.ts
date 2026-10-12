@@ -33,7 +33,7 @@ export function shouldRecordVisit(userId: string, now = Date.now()): boolean {
  * Best-effort "user was active today" record.
  *
  * Called via Next 16's `after()` from requireUser() so it never blocks
- * page render — if the DB write fails or the lookup is slow, the page
+ * page render, if the DB write fails or the lookup is slow, the page
  * has already streamed. Idempotent: at most one row per (user, day),
  * `onConflictDoNothing` makes repeat visits within the same local day
  * a single SELECT roundtrip on the unique-constraint check.
@@ -75,7 +75,7 @@ export async function recordVisit(
         )
     `);
   } catch (err) {
-    // Activity logging is opportunistic — drop the error rather than
+    // Activity logging is opportunistic, drop the error rather than
     // letting it bubble up into the page response.
     console.warn(
       "[activity.recordVisit] failed for",

@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const label = calendarDateLabel(date);
-  const title = `${label} — დღის ასტროლოგიური პროგნოზი`;
+  const title = `${label}, დღის ასტროლოგიური პროგნოზი`;
   const description = `${label}: დღის პლანეტარული ასპექტები, იღბლის ინდექსი, ხელსაყრელი და ფრთხილი თემები და პრაქტიკული ასტროლოგიური რჩევები.`;
   const url = `https://www.vivida.ge${path}`;
   return {

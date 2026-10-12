@@ -4,8 +4,8 @@ import { mbtiBaseType } from "@/lib/mbti-questions";
  * Per-type character art + the "famous people commonly typed as X" lists.
  *
  * The art is our own original low-poly set (public/mbti/<type>.webp), generated
- * for Vivida — not 16Personalities' characters. The famous-people lists are the
- * popular community associations (unofficial — these people never took the
+ * for Vivida, not 16Personalities' characters. The famous-people lists are the
+ * popular community associations (unofficial, these people never took the
  * test), shown for fun and flavour, so the UI frames them as "ხშირად ამ ტიპს
  * მიაწერენ" rather than as fact.
  */

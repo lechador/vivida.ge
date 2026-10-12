@@ -9,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
     title: locale !== "ka" ? "Reset password" : "პაროლის აღდგენა",
-    // Auth utility page — out of the index, links still followed.
+    // Auth utility page, out of the index, links still followed.
     robots: { index: false, follow: true },
   };
 }

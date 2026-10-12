@@ -13,7 +13,7 @@ import {
 import { users } from "./users";
 
 /**
- * Per-user-day visit log. One row per (userId, dateLocal) — the date is
+ * Per-user-day visit log. One row per (userId, dateLocal), the date is
  * stored as the user's local YYYY-MM-DD so an admin reading the
  * heatmap sees the same days the user lived. Deliberately schema-light
  * for the easy version: no per-page time, no session count. Bump later
@@ -47,11 +47,11 @@ export const userActivityDays = pgTable(
 export type UserActivityDay = typeof userActivityDays.$inferSelect;
 
 /**
- * Community feed — short text posts visible to every signed-in user.
+ * Community feed, short text posts visible to every signed-in user.
  * Hard delete on user removal (cascade) and on post author/admin
  * action; comments and reactions cascade with the parent post.
  *
- * No image uploads, no link parsing — body is plain text only by
+ * No image uploads, no link parsing, body is plain text only by
  * product spec. Length cap enforced in `createPost`.
  */
 export const posts = pgTable(
@@ -110,7 +110,7 @@ export const postComments = pgTable(
       .notNull(),
   },
   (t) => [
-    // Loading comments for a single post — always sorted oldest first.
+    // Loading comments for a single post, always sorted oldest first.
     index("post_comment_post_idx").on(t.postId, t.createdAt),
     // Fetching all replies under one parent (used when expanding a
     // long thread or counting reply depth in the future).
@@ -119,7 +119,7 @@ export const postComments = pgTable(
 );
 
 /**
- * Reaction taxonomy. Kept short on purpose — adding a kind means
+ * Reaction taxonomy. Kept short on purpose, adding a kind means
  * designing a new icon and updating every render site. Enum values are
  * forever; "haha"/"wow" can be aliased to existing kinds at the UI
  * level if the product splits later.
@@ -133,7 +133,7 @@ export const postReactionKindEnum = pgEnum("post_reaction_kind", [
 
 /**
  * Per-user reaction to a post. Composite PK (post, user) enforces
- * "one reaction per user per post" at the DB level — switching from
+ * "one reaction per user per post" at the DB level, switching from
  * `like` to `sad` is a single `INSERT … ON CONFLICT DO UPDATE`, no
  * race window where a user can stack reactions.
  */
@@ -159,7 +159,7 @@ export const postReactions = pgTable(
 );
 
 /**
- * Reputation — gamification layer. `user_reputation` is the running
+ * Reputation, gamification layer. `user_reputation` is the running
  * total, `reputation_event` is the audit log + dedup source. We never
  * compute the total by SUM'ing events; that would punish frequently-
  * visited profiles. The trigger-style "increment on insert" lives in
@@ -167,15 +167,15 @@ export const postReactions = pgTable(
  * dedupe index.
  *
  * Event kinds:
- *  - post_created        — you posted (cap 9/day)
- *  - comment_created     — you commented (cap 5/day)
- *  - reaction_received   — someone reacted to your post (cap 30/day)
- *  - comment_received    — someone commented on your post (cap 30/day)
- *  - friend_added        — you accepted a friend request (cap 20/day)
- *  - daily_visit         — retired legacy event kind
- *  - profile_completed   — one-shot, on first profile save
- *  - first_post          — one-shot, on the first post you ever publish
- *  - joined              — one-shot, on signup
+ *  - post_created, you posted (cap 9/day)
+ *  - comment_created, you commented (cap 5/day)
+ *  - reaction_received, someone reacted to your post (cap 30/day)
+ *  - comment_received, someone commented on your post (cap 30/day)
+ *  - friend_added, you accepted a friend request (cap 20/day)
+ *  - daily_visit, retired legacy event kind
+ *  - profile_completed, one-shot, on first profile save
+ *  - first_post, one-shot, on the first post you ever publish
+ *  - joined, one-shot, on signup
  */
 export const reputationEventKindEnum = pgEnum("reputation_event_kind", [
   "post_created",
@@ -221,7 +221,7 @@ export const reputationEvents = pgTable(
      *   - first_post         → `${userId}`
      *   - joined             → `${userId}`
      *
-     * Always populated — the unique index relies on a non-null value to
+     * Always populated, the unique index relies on a non-null value to
      * enforce dedup. */
     subjectId: text("subject_id").notNull(),
     points: integer("points").notNull(),

@@ -262,7 +262,7 @@ export function SynastryDisplay({
         </section>
       )}
 
-      {/* House overlays — where each one's planets land in the other's life */}
+      {/* House overlays, where each one's planets land in the other's life */}
       {result.breakdown.topOverlays.length > 0 && (
         <OverlaySection
           overlays={result.breakdown.topOverlays}
@@ -280,7 +280,7 @@ export function SynastryDisplay({
             description={
               en
                 ? "Harmonious links where energy flows more freely"
-                : "ჰარმონიული კავშირები — სადაც ენერგია თავისუფლად მიედინება"
+                : "ჰარმონიული კავშირები, სადაც ენერგია თავისუფლად მიედინება"
             }
             icon={<Sparkles className="size-4" />}
             accent="oklch(0.78 0.18 200)"
@@ -288,7 +288,7 @@ export function SynastryDisplay({
             empty={
               en
                 ? "There are fewer harmonious aspects, so this connection grows through conscious effort."
-                : "ცის რუკაში ჰარმონიული ასპექტები ნაკლებია — ეს ნიშნავს, რომ კავშირი მცდელობით აშენდება."
+                : "ცის რუკაში ჰარმონიული ასპექტები ნაკლებია, ეს ნიშნავს, რომ კავშირი მცდელობით აშენდება."
             }
             onSelect={setActiveAspect}
             locale={locale}
@@ -306,7 +306,7 @@ export function SynastryDisplay({
             empty={
               en
                 ? "No major tense aspects stand out, suggesting a naturally calmer dynamic."
-                : "ბოლო ცის რუკას მძაფრი დაძაბულობა არ ახლავს — ბუნებრივად მშვიდი დინამიკა."
+                : "ბოლო ცის რუკას მძაფრი დაძაბულობა არ ახლავს, ბუნებრივად მშვიდი დინამიკა."
             }
             onSelect={setActiveAspect}
             locale={locale}
@@ -314,7 +314,7 @@ export function SynastryDisplay({
         </section>
       )}
 
-      {/* The meta "how the number is built" — closes the story */}
+      {/* The meta "how the number is built", closes the story */}
       <ScoreBreakdown breakdown={result.breakdown} locale={locale} />
 
       <AspectDialog
@@ -346,7 +346,7 @@ function AspectRow({
 }: {
   aspect: SynastryAspect;
   index: number;
-  /** Library interpretation — shown (clamped) instead of the template line. */
+  /** Library interpretation, shown (clamped) instead of the template line. */
   text?: string;
   onSelect: () => void;
   locale: UserLocale;
@@ -374,7 +374,7 @@ function AspectRow({
         type="button"
         onClick={onSelect}
         className="group flex w-full items-start gap-3 rounded-2xl border border-border bg-card/55 p-4 text-left ring-1 ring-foreground/5 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-card/75 hover:ring-foreground/15 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-        aria-label={`${bodyLabelFor(aspect.a, en)} ${aspectLabelFor(aspect.kind, en)} ${bodyLabelFor(aspect.b, en)} — ${en ? "details" : "დეტალები"}`}
+        aria-label={`${bodyLabelFor(aspect.a, en)} ${aspectLabelFor(aspect.kind, en)} ${bodyLabelFor(aspect.b, en)}, ${en ? "details" : "დეტალები"}`}
       >
         <span
           className="grid size-10 shrink-0 place-items-center rounded-xl text-lg"
@@ -498,7 +498,7 @@ function ValenceColumn({
 }
 
 /**
- * "Whose planet lands in whose house" — the house-overlay layer, previously a
+ * "Whose planet lands in whose house", the house-overlay layer, previously a
  * bare list inside the score breakdown, now a first-class section with the
  * pre-generated interpretation under each overlay.
  */
@@ -523,7 +523,7 @@ function OverlaySection({
         <p className="mt-1 text-sm text-muted-foreground">
           {en
             ? "Where one person’s planets activate areas of the other person’s life"
-            : "სად ხვდება ერთის პლანეტები მეორის ცხოვრებაში — და რომელ სფეროს ააქტიურებს"}
+            : "სად ხვდება ერთის პლანეტები მეორის ცხოვრებაში, და რომელ სფეროს ააქტიურებს"}
         </p>
       </header>
       <ul className="grid gap-3 sm:grid-cols-2">
@@ -604,7 +604,7 @@ function AspectDialog({
   locale,
 }: {
   aspect: SynastryAspect | null;
-  /** Library interpretation — the dialog's lead text when present. */
+  /** Library interpretation, the dialog's lead text when present. */
   text?: string;
   onClose: () => void;
   locale: UserLocale;
@@ -660,7 +660,7 @@ function AspectDialog({
         </DialogHeader>
 
         <div className="space-y-5">
-          {/* Pre-generated library interpretation — the lead when present */}
+          {/* Pre-generated library interpretation, the lead when present */}
           {text && (
             <div
               className="rounded-xl border p-4"
@@ -886,8 +886,8 @@ function ScoreBreakdown({
       value: breakdown.aspectPoints,
       accent: "oklch(0.78 0.18 305)",
       note: en
-        ? "Planets connected by meaningful angles across the two charts—the tighter the aspect, the stronger it tends to feel."
-        : "ორ რუკაში სწორი კუთხეებით დაკავშირებული პლანეტები — რაც უფრო ზუსტია, მით ძლიერი.",
+        ? "Planets connected by meaningful angles across the two charts, the tighter the aspect, the stronger it tends to feel."
+        : "ორ რუკაში სწორი კუთხეებით დაკავშირებული პლანეტები, რაც უფრო ზუსტია, მით ძლიერი.",
     },
     {
       label: en ? "House overlays" : "სახლების გადაფარვა",
@@ -895,7 +895,7 @@ function ScoreBreakdown({
       accent: "oklch(0.78 0.18 200)",
       note: en
         ? "Where one person’s planets fall in the other person’s houses and activate an area of life."
-        : "ერთის პლანეტა მეორის რომელ სახლში ხვდება — სად ააქტიურებს ცხოვრების სფეროს.",
+        : "ერთის პლანეტა მეორის რომელ სახლში ხვდება, სად ააქტიურებს ცხოვრების სფეროს.",
     },
     {
       label: en ? "Element chemistry" : "ელემენტების ქიმია",
@@ -903,7 +903,7 @@ function ScoreBreakdown({
       accent: "oklch(0.85 0.16 85)",
       note: en
         ? "The Sun and Moon elements provide a baseline picture of energetic compatibility."
-        : "მზის და მთვარის ელემენტები — საბაზისო ენერგეტიკული თავსებადობა.",
+        : "მზის და მთვარის ელემენტები, საბაზისო ენერგეტიკული თავსებადობა.",
     },
   ];
   return (

@@ -44,7 +44,7 @@ import { articleUrl, listPublishedArticleSitemapItems } from "@/lib/articles";
 
 /**
  * Public-page sitemap. Authed surfaces (dashboard, report, friends,
- * profile editing, etc.) are excluded — they're either not crawlable
+ * profile editing, etc.) are excluded, they're either not crawlable
  * or behind the proxy redirect. Public profiles at /u/[username] would
  * benefit from inclusion but require enumerating the profiles table at
  * build time; punting that to a follow-up dynamic sitemap if SEO needs it.
@@ -55,7 +55,7 @@ const BASE = GEORGIAN_SITE_URL;
  * lastModified strategy: only pages whose CONTENT actually changes with time
  * (daily/weekly horoscope surfaces, moon calendar, retrograde tracker) get a
  * live `NOW` stamp. Evergreen pages get a stable stamp bumped manually on
- * real content overhauls — stamping everything NOW on every crawl teaches
+ * real content overhauls, stamping everything NOW on every crawl teaches
  * Google the lastmod is meaningless and slows recrawl of the fresh pages.
  */
 const NOW = new Date();
@@ -328,7 +328,7 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
     })),
     // Tests and quizzes. These render fully in English at their Georgian
     // slugs and are linked from the English /tests hub, but were missing
-    // from this sitemap — the strongest English commercial queries we have
+    // from this sitemap, the strongest English commercial queries we have
     // ("free personality test", "online IQ test") had no declared URL.
     samePathEntry("/pirovnebis-testi", "monthly", 0.9, ENGLISH_PUBLISHED),
     samePathEntry("/iq-testi", "monthly", 0.9, ENGLISH_PUBLISHED),
@@ -472,13 +472,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Sign-level daily/tomorrow/weekly/monthly horoscope pages — 48 routes
+  // Sign-level daily/tomorrow/weekly/monthly horoscope pages, 48 routes
   // total (12 signs × 4 views). High-volume Georgian queries; daily ones
   // get the freshest changeFrequency hint.
   const signHoroscopePages: MetadataRoute.Sitemap = ALL_SLUGS.flatMap((slug) =>
     ALL_HOROSCOPE_VIEWS.map((view) => ({
       url: `${BASE}/zodiac/${slug}/${VIEW_PATH[view]}`,
-      // Horoscope content genuinely regenerates per period — live stamp.
+      // Horoscope content genuinely regenerates per period, live stamp.
       lastModified: NOW,
       changeFrequency: VIEW_CHANGE_FREQ[view],
       priority: VIEW_PRIORITY[view],
@@ -501,7 +501,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  // Tarot — all 78 card pages ("ტარო [კარტი]").
+  // Tarot, all 78 card pages ("ტარო [კარტი]").
   const tarotCardPages: MetadataRoute.Sitemap = tarotDetailSlugs().map(
     (slug) => ({
       url: `${BASE}/taro/${slug}`,
@@ -917,7 +917,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/horoskopi",
     // These four render one tree in both languages at the same path. The
     // English sitemap already named vivida.ge as their Georgian partner, but
-    // this side named nobody — a one-way annotation, which Google discards.
+    // this side named nobody, a one-way annotation, which Google discards.
     "/features",
     "/how-it-works",
     "/login",

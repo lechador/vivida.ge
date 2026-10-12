@@ -15,7 +15,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * snapshots it pixel-perfect. Lives off-screen until the share dialog
  * triggers a screenshot.
  *
- * Inline styles only — no Tailwind, no CSS variables. html-to-image
+ * Inline styles only, no Tailwind, no CSS variables. html-to-image
  * sometimes loses external/var-based styles when serialising the SVG
  * foreignObject, and we'd rather take the verbosity hit than ship a
  * broken render.

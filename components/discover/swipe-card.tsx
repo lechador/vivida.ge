@@ -36,7 +36,7 @@ export function SwipeCard({
 }: {
   card: Card;
   isTop: boolean;
-  /** Stack offset — 0 is top, 1 sits behind, 2 sits even further back. */
+  /** Stack offset, 0 is top, 1 sits behind, 2 sits even further back. */
   index: number;
   /** Drag X motion value of the top card; lets the back cards subtly
    *  follow. Only respected when index > 0. */
@@ -66,7 +66,7 @@ export function SwipeCard({
     [baseY - 6, baseY, baseY - 6],
   );
 
-  // Top-card overlays follow the drag — pink ❤ on right, red ✕ on left.
+  // Top-card overlays follow the drag, pink ❤ on right, red ✕ on left.
   const likeOpacity = useTransform(x, [40, 140], [0, 1]);
   const passOpacity = useTransform(x, [-140, -40], [1, 0]);
   const cardRotate = useTransform(x, [-220, 0, 220], [-12, 0, 12]);
@@ -144,7 +144,7 @@ export function SwipeCard({
           </>
         )}
 
-        {/* Compatibility chip — top-right */}
+        {/* Compatibility chip, top-right */}
         {compatibility !== null && (
           <div className="pointer-events-none absolute right-3 top-3 z-20">
             <CompatChip percent={compatibility} />

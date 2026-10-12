@@ -75,7 +75,7 @@ export default async function SubscriptionPage({
     ? `/subscription?${loginQuery.toString()}`
     : "/subscription";
   const user = await requireUser(loginReturn);
-  // See app/credits/page.tsx — authed surfaces carry no `/am` prefix, so the
+  // See app/credits/page.tsx, authed surfaces carry no `/am` prefix, so the
   // stored preference is what keeps an Armenian user in Armenian.
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
@@ -172,7 +172,7 @@ export default async function SubscriptionPage({
                         subscription.currency,
                         locale,
                       )}
-                      {/* Read from the subscription, not assumed monthly — the
+                      {/* Read from the subscription, not assumed monthly, the
                       ₾29 promo bills quarterly, and telling its buyers they
                       pay that every month would be a false billing claim. */}
                       <span className="text-sm font-normal text-muted-foreground">
@@ -278,7 +278,7 @@ export default async function SubscriptionPage({
             </>
           ) : active && identity?.premiumUntil ? (
             // PRO is on but there is no subscription row to bill against, so
-            // the buy card would be a lie — show the status and the time left.
+            // the buy card would be a lie, show the status and the time left.
             <section className="rounded-3xl border border-[var(--vivida-gold)]/35 bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -333,14 +333,14 @@ function formatDate(date: Date, locale: UserLocale) {
   }).format(date);
 }
 
-/** "23 days left" — the remaining-time value under the subscription dates. */
+/** "23 days left", the remaining-time value under the subscription dates. */
 function remainingLabel(daysLeft: number, en: boolean): string {
   if (daysLeft <= 0) return en ? "Ended" : "დასრულდა";
   if (daysLeft === 1) return en ? "1 day left" : "დარჩა 1 დღე";
   return en ? `${daysLeft} days left` : `დარჩა ${daysLeft} დღე`;
 }
 
-/** "month" / "3 months" — the denominator under a subscription's price. */
+/** "month" / "3 months", the denominator under a subscription's price. */
 function billingCadenceLabel(months: number, en: boolean): string {
   if (months === 1) return en ? "month" : "თვე";
   return en ? `${months} months` : `${months} თვე`;

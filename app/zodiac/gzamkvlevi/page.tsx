@@ -40,9 +40,9 @@ const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/gzamkvlevi";
 
 const PAGE_TITLE =
-  "ცის სრული გზამკვლევი — ყველა ცის ნიშანი ერთ ადგილას | Vivida";
+  "ცის სრული გზამკვლევი, ყველა ცის ნიშანი ერთ ადგილას | Vivida";
 const META_DESCRIPTION =
-  "ცის ნიშნები, მთვარის ნიშანი, ამომავალი, ელემენტები და 78 თავსებადობის წყვილი — ვივიდას სრული ასტროლოგიური გზამკვლევი ერთ გვერდზე.";
+  "ცის ნიშნები, მთვარის ნიშანი, ამომავალი, ელემენტები და 78 თავსებადობის წყვილი, ვივიდას სრული ასტროლოგიური გზამკვლევი ერთ გვერდზე.";
 
 const KA_METADATA: Metadata = {
   title: { absolute: PAGE_TITLE },
@@ -103,7 +103,7 @@ export default async function GuideIndexPage() {
   if (locale === "en") return <ZodiacGuideIndexEn />;
   // Build a flat list of all canonical pages for the JSON-LD ItemList.
   const allUrls: Array<{ url: string; name: string }> = [
-    { url: `${SITE_URL}/zodiac`, name: "ცის ნიშნები — ჰაბი" },
+    { url: `${SITE_URL}/zodiac`, name: "ცის ნიშნები, ჰაბი" },
     { url: `${SITE_URL}/zodiac/datit`, name: "ცის ნიშანი თარიღით" },
     { url: `${SITE_URL}/zodiac/elementebi`, name: "ცის ელემენტები" },
     { url: `${SITE_URL}/zodiac/tavsebadoba`, name: "ცის ნიშნების თავსებადობა" },
@@ -127,7 +127,7 @@ export default async function GuideIndexPage() {
     })),
     ...ALL_PAIR_SLUGS.map((p) => ({
       url: `${SITE_URL}/zodiac/tavsebadoba/${p}`,
-      name: `თავსებადობა — ${p}`,
+      name: `თავსებადობა, ${p}`,
     })),
   ];
 
@@ -204,7 +204,7 @@ export default async function GuideIndexPage() {
           ცის სრული გზამკვლევი
         </h1>
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
-          ვივიდას ყველა ასტროლოგიური გვერდი ერთ ადგილას — 12 ცის ნიშანი, მთვარე,
+          ვივიდას ყველა ასტროლოგიური გვერდი ერთ ადგილას, 12 ცის ნიშანი, მთვარე,
           ამომავალი, ელემენტები და 78 თავსებადობის წყვილი.
         </p>
 
@@ -233,7 +233,7 @@ export default async function GuideIndexPage() {
           id="sun"
           icon={<Sun className="size-4" />}
           title="ცის 12 ნიშანი"
-          subtitle="მზის ნიშანი — ამოცნობილი ხასიათი"
+          subtitle="მზის ნიშანი, ამოცნობილი ხასიათი"
         >
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {ALL_SLUGS.map((slug) => {
@@ -379,7 +379,7 @@ export default async function GuideIndexPage() {
           </div>
         </Section>
 
-        {/* Compatibility — 78 pairs grouped by first sign */}
+        {/* Compatibility, 78 pairs grouped by first sign */}
         <Section
           id="compat"
           icon={<Heart className="size-4" />}
@@ -393,7 +393,7 @@ export default async function GuideIndexPage() {
                   სრული 12×12 ცხრილი
                 </div>
                 <div className="mt-0.5 text-xs text-muted-foreground">
-                  ნახე ყველა წყვილი ერთი მზერით — სტარეიტინგით
+                  ნახე ყველა წყვილი ერთი მზერით, სტარეიტინგით
                 </div>
               </div>
               <Link
@@ -432,7 +432,7 @@ export default async function GuideIndexPage() {
                       >
                         {SIGNS_CONTENT[firstSlug].symbol}
                       </span>
-                      {firstLabel} — {pairsForSign.length} წყვილი
+                      {firstLabel}, {pairsForSign.length} წყვილი
                     </span>
                     <span
                       aria-hidden
@@ -483,7 +483,7 @@ export default async function GuideIndexPage() {
               {
                 href: "/zodiac/datit",
                 title: "ნიშანი თარიღით",
-                desc: "შენი დაბადების თვე და დღე — ვუთხართ ცის ნიშანი წამში.",
+                desc: "შენი დაბადების თვე და დღე, ვუთხართ ცის ნიშანი წამში.",
               },
               {
                 href: "/zodiac",
@@ -498,17 +498,17 @@ export default async function GuideIndexPage() {
               {
                 href: "/zodiac/amomavali",
                 title: "ამომავალი ნიშნის ჰაბი",
-                desc: "ასცენდენტი — როგორ შედიხარ ცხოვრებაში.",
+                desc: "ასცენდენტი, როგორ შედიხარ ცხოვრებაში.",
               },
               {
                 href: "/zodiac/elementebi",
                 title: "ელემენტების ჰაბი",
-                desc: "ცეცხლი, მიწა, ჰაერი, წყალი — ცის ნიშნების ენერგიები.",
+                desc: "ცეცხლი, მიწა, ჰაერი, წყალი, ცის ნიშნების ენერგიები.",
               },
               {
                 href: "/zodiac/tavsebadoba",
                 title: "თავსებადობის ცხრილი",
-                desc: "12×12 სრული ცხრილი — ნახე ნებისმიერი კომბინაცია.",
+                desc: "12×12 სრული ცხრილი, ნახე ნებისმიერი კომბინაცია.",
               },
             ].map((t) => (
               <Link
@@ -534,7 +534,7 @@ export default async function GuideIndexPage() {
             ეს მხოლოდ შესავალია
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ცოცხალი ნატალური რუკა, ყოველდღიური პროგნოზი და სინასტრია — Vivida-ს
+            ცოცხალი ნატალური რუკა, ყოველდღიური პროგნოზი და სინასტრია, Vivida-ს
             აპლიკაციაში. ერთ წუთში დაიწყე უფასოდ.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">

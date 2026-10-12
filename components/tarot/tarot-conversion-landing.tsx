@@ -30,7 +30,7 @@ import { tarotDetailDeck } from "@/lib/tarot/detail";
 const FAQ = [
   {
     q: "როგორ მუშაობს Vivida-ს ტარო?",
-    a: "წერ შენს კითხვას, სისტემა შემთხვევითად შლის სამ კარტს — ფესვს, აწმყოსა და გზას — და AI ტაროლოგი თითოეულ მათგანს უშუალოდ შენს სიტუაციას უკავშირებს.",
+    a: "წერ შენს კითხვას, სისტემა შემთხვევითად შლის სამ კარტს, ფესვს, აწმყოსა და გზას, და AI ტაროლოგი თითოეულ მათგანს უშუალოდ შენს სიტუაციას უკავშირებს.",
   },
   {
     q: "პირველი კითხვა ნამდვილად უფასოა?",
@@ -46,7 +46,7 @@ const FAQ = [
   },
   {
     q: "რა თემაზე შემიძლია კითხვა?",
-    a: "ურთიერთობაზე, არჩევანზე, საქმეზე, ემოციურ მდგომარეობაზე ან მომდევნო ნაბიჯზე. ყველაზე სასარგებლოა ღია კითხვა — მაგალითად: „რა უნდა დავინახო ამ სიტუაციაში?“",
+    a: "ურთიერთობაზე, არჩევანზე, საქმეზე, ემოციურ მდგომარეობაზე ან მომდევნო ნაბიჯზე. ყველაზე სასარგებლოა ღია კითხვა, მაგალითად: „რა უნდა დავინახო ამ სიტუაციაში?“",
   },
 ];
 
@@ -61,7 +61,7 @@ const READING_STEPS = [
     n: "02",
     icon: Sparkles,
     title: "გაიშლება სამი კარტი",
-    text: "ფესვი, აწმყო და გზა — სამი პოზიცია, რომელიც სიტუაციას სხვადასხვა კუთხიდან გაჩვენებს.",
+    text: "ფესვი, აწმყო და გზა, სამი პოზიცია, რომელიც სიტუაციას სხვადასხვა კუთხიდან გაჩვენებს.",
   },
   {
     n: "03",
@@ -85,7 +85,7 @@ export function TarotConversionLanding({
   const proMonths = pro.intervalCount ?? 1;
   // Signed-in users came to pull cards, not to be sold to: the hero banner and
   // every sales block (steps, pitch, pricing, closing CTA) render for logged-out
-  // visitors only. SEO is untouched — crawlers are always unauthenticated.
+  // visitors only. SEO is untouched, crawlers are always unauthenticated.
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-[#070713]">
@@ -117,7 +117,7 @@ export function TarotConversionLanding({
             </h1>
 
             <p className="mt-6 max-w-xl text-pretty text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
-              დაწერე კითხვა და მიიღე შენს სიტუაციაზე მორგებული პასუხი — სამი
+              დაწერე კითხვა და მიიღე შენს სიტუაციაზე მორგებული პასუხი, სამი
               კარტით, მათი ახსნითა და პრაქტიკული მინიშნებით.
             </p>
 
@@ -126,7 +126,7 @@ export function TarotConversionLanding({
                 href="#tarot-reader"
                 className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#8d67ff,#c958a4)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_18px_55px_-20px_rgba(145,93,255,0.85)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_65px_-18px_rgba(145,93,255,0.95)] focus:outline-none focus:ring-2 focus:ring-[#c4adff] focus:ring-offset-2 focus:ring-offset-[#070713]"
               >
-                ჩემი პირველი კითხვა — ₾0
+                ჩემი პირველი კითხვა, ₾0
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </a>
               <span className="text-center text-xs leading-5 text-white/60 sm:text-left">
@@ -166,7 +166,7 @@ export function TarotConversionLanding({
             <div className="absolute left-1/2 top-1/2 z-20 h-[330px] w-[220px] -translate-x-1/2 -translate-y-[53%] overflow-hidden rounded-[1.1rem] border border-[#f1d794]/60 bg-[#111128] shadow-[0_30px_80px_-28px_rgba(0,0,0,0.95),0_0_55px_-28px_rgba(224,191,113,0.8)] sm:h-[395px] sm:w-[263px]">
               <Image
                 src="/tarot/the-high-priestess.webp"
-                alt="უმაღლესი ქურუმი — ტაროს კარტი"
+                alt="უმაღლესი ქურუმი, ტაროს კარტი"
                 fill
                 preload
                 sizes="(max-width: 640px) 233px, 293px"
@@ -206,7 +206,7 @@ export function TarotConversionLanding({
           />
           {!authed && (
             <p className="mt-4 text-center text-xs leading-5 text-white/70">
-              პასუხის მისაღებად გაივლი სწრაფ რეგისტრაციას — შენი პირველი გაშლა
+              პასუხის მისაღებად გაივლი სწრაფ რეგისტრაციას, შენი პირველი გაშლა
               ანგარიშზე ავტომატურად უფასოა.
             </p>
           )}
@@ -272,7 +272,7 @@ export function TarotConversionLanding({
                 შენზე მორგებული განმარტება
               </p>
               <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-                არა ზოგადი ტექსტი — პასუხი შენს კონკრეტულ კითხვაზე
+                არა ზოგადი ტექსტი, პასუხი შენს კონკრეტულ კითხვაზე
               </h2>
               <p className="mt-5 max-w-xl text-base leading-7 text-white/62">
                 Vivida არ გაჩვენებს მხოლოდ კარტების ცალკეულ მნიშვნელობებს. AI
@@ -281,9 +281,9 @@ export function TarotConversionLanding({
               </p>
               <ul className="mt-7 space-y-4">
                 {[
-                  "ფესვი — რა დგას სიტუაციის უკან",
-                  "აწმყო — რას გიჩვენებს ეს მომენტი",
-                  "გზა — სად ღირს ყურადღების მიმართვა",
+                  "ფესვი, რა დგას სიტუაციის უკან",
+                  "აწმყო, რას გიჩვენებს ეს მომენტი",
+                  "გზა, სად ღირს ყურადღების მიმართვა",
                   "მოკლე პრაქტიკული მინიშნება შემდეგი ნაბიჯისთვის",
                 ].map((item) => (
                   <li
@@ -314,7 +314,7 @@ export function TarotConversionLanding({
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/58 sm:text-base">
               დაიწყე უფასოდ. თუ კიდევ დაგჭირდება კითხვა, აირჩიე ერთჯერადი
-              კრედიტები — გამოწერის გარეშე.
+              კრედიტები, გამოწერის გარეშე.
             </p>
           </div>
 

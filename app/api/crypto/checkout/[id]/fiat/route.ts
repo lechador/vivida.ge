@@ -17,7 +17,7 @@ type Params = { params: Promise<{ id: string }> };
  *
  * The client calls this when Privy's fund modal reports `submitted` or
  * `confirmed` for a fiat-direct purchase (card paid straight to the
- * platform wallet — the buyer never touches crypto, and the modal returns
+ * platform wallet, the buyer never touches crypto, and the modal returns
  * no transaction proof). It stamps `fiatConfirmedAt`, which is the moment
  * the status poll starts window-scanning for the incoming USDC transfer.
  * Idempotent: repeat calls are a harmless no-op.

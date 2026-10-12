@@ -30,7 +30,7 @@ const notoGeorgian = Noto_Sans_Georgian({
 /**
  * Editorial serif for the English site only (vividaastro.com). The variable
  * is declared globally but no Georgian-host markup references it, so the
- * Georgian experience is byte-identical — only EN components opt in via the
+ * Georgian experience is byte-identical, only EN components opt in via the
  * `font-display` utility or `@/components/en/editorial` primitives.
  */
 const fraunces = Fraunces({
@@ -45,24 +45,24 @@ const fraunces = Fraunces({
 // canonical here so OG cards and emails skip the redirect hop.
 const SITE_URL = "https://www.vivida.ge";
 
-const TITLE = "Vivida — შენი კოსმიური რუკა";
+const TITLE = "Vivida, შენი კოსმიური რუკა";
 const DESCRIPTION =
   "პერსონალური ასტროლოგია, ყოველდღიური ჰოროსკოპი და ნატალური რუკა შენი დაბადების ზუსტი მომენტის მიხედვით. გაიგე, რას ამბობენ შენზე ვარსკვლავები.";
 
-// Fallbacks for the international domain — only surface on pages that set no
+// Fallbacks for the international domain, only surface on pages that set no
 // title/description of their own, which would otherwise inherit Georgian.
-const TITLE_EN = "Vivida — Natal Charts, Horoscopes and Zodiac Guides";
+const TITLE_EN = "Vivida, Natal Charts, Horoscopes and Zodiac Guides";
 const DESCRIPTION_EN =
   "Personal astrology, daily horoscopes and a free natal chart built from your exact birth moment. Understand what your chart actually says about you.";
 
-/** `lang` attribute per locale — Armenian is `hy`, the ISO 639-1 code. */
+/** `lang` attribute per locale, Armenian is `hy`, the ISO 639-1 code. */
 const HTML_LANG = { ka: "ka", en: "en" } as const;
 
 const OG_LOCALE = { ka: "ka_GE", en: "en_US" } as const;
 
 /**
  * Site-wide metadata defaults. Per-page `metadata` exports override these
- * surgically — e.g. /report sets its own `title` while inheriting OG/Twitter.
+ * surgically, e.g. /report sets its own `title` while inheriting OG/Twitter.
  *
  * `title.template` lets per-page titles be just the page name; the framework
  * appends "· Vivida" for us. The home page is the lone exception (uses
@@ -73,7 +73,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale === "en";
   // Armenian is a path prefix on the international domain, so its origin is
-  // that domain plus /am — a bare ENGLISH_SITE_URL here would resolve every
+  // that domain plus /am, a bare ENGLISH_SITE_URL here would resolve every
   // relative canonical on an Armenian page onto its English twin.
   const origin = en ? ENGLISH_SITE_URL : SITE_URL;
   const title = en ? TITLE_EN : TITLE;
@@ -97,7 +97,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     // Deliberately NO `alternates` here. A root-level canonical is inherited
     // by every page that doesn't set its own, which made unrelated pages
-    // (e.g. /features, /login) claim to be the Georgian homepage — and on the
+    // (e.g. /features, /login) claim to be the Georgian homepage, and on the
     // .com host that pointed the English domain at vivida.ge. Pages own their
     // canonical/hreflang; without one, engines self-canonicalize correctly.
     openGraph: {
@@ -134,7 +134,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * Viewport + theme color is its own export in Next 16 (split out from
  * `metadata` for clearer typing). The dark theme uses our deep cosmic
- * background — matches `--background` token in globals.css so the
+ * background, matches `--background` token in globals.css so the
  * Android URL bar and iOS status bar tint blend with the page chrome.
  */
 export const viewport: Viewport = {
@@ -164,7 +164,7 @@ export default async function RootLayout({
 }>) {
   // The same deployment serves two language domains, and Armenian off a path
   // prefix on one of them. Resolving the locale on the server puts the correct
-  // `lang` in the delivered HTML — an inline script only patches it after
+  // `lang` in the delivered HTML, an inline script only patches it after
   // parse, so crawlers that don't run JS (and every social/AI scraper) saw the
   // English domain declared Georgian.
   const locale = await getRequestLocale();

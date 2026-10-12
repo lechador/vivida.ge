@@ -6,7 +6,7 @@ import { AstroGate } from "@/components/astro/astro-gate";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Full-page "this feature needs an astro profile" shell — keeps the header and
+ * Full-page "this feature needs an astro profile" shell, keeps the header and
  * cosmic background so the page stays navigable, and centers the AstroGate CTA.
  * Rendered in place of a birth-data-gated page for accounts without birth data.
  */

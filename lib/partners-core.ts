@@ -23,7 +23,7 @@ import type { UserLocale } from "@/lib/i18n/locale";
 
 /**
  * Synastry-partner logic used by website Server Actions in actions/partners.ts.
- * Callers do their own auth and pass the resolved user id in — these
+ * Callers do their own auth and pass the resolved user id in, these
  * functions never touch sessions or revalidate Next's cache.
  */
 
@@ -52,7 +52,7 @@ function startOfCurrentMonth(): Date {
 }
 
 /**
- * How many partners the user has *created* this month — counts soft-deleted
+ * How many partners the user has *created* this month, counts soft-deleted
  * too so the cap is non-gameable.
  */
 export async function partnerCreationsThisMonth(
@@ -131,7 +131,7 @@ export async function getPartnerForViewer(
 
 /**
  * Validate input, compute the partner's natal chart, enforce the monthly
- * cap, and insert. Doesn't trigger AI generation here — that happens lazily
+ * cap, and insert. Doesn't trigger AI generation here, that happens lazily
  * on first synastry view.
  */
 export async function createPartnerCore(
@@ -198,7 +198,7 @@ export async function createPartnerCore(
     };
   }
 
-  // Cap enforcement — atomic-enough for a single user.
+  // Cap enforcement, atomic-enough for a single user.
   const used = await partnerCreationsThisMonth(userId);
   const cap = PARTNER_CAP_PER_MONTH;
   if (used >= cap) {
@@ -248,7 +248,7 @@ export async function createPartnerCore(
 }
 
 /**
- * Soft delete — sets deletedAt. The row stays so monthly creation counts
+ * Soft delete, sets deletedAt. The row stays so monthly creation counts
  * remain accurate. Idempotent and scoped to the owner.
  */
 export async function softDeletePartnerCore(
@@ -271,7 +271,7 @@ export async function softDeletePartnerCore(
 /**
  * Lazily generates + caches the AI synastry interpretation for a partner.
  * Cache invalidates when the viewer's natal chart changes (via inputHash) or
- * when the prompt version is bumped. Fails soft — returns the existing row
+ * when the prompt version is bumped. Fails soft, returns the existing row
  * (or the input partner) on any error, never throws.
  */
 export async function ensureSynastryInterpretation(

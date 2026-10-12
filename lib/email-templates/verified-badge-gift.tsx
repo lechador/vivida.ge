@@ -31,7 +31,7 @@ export function VerifiedBadgeGiftEmail({
           preview: "შენს Vivida პროფილს Verified Badge მიენიჭა",
           heading: "Verified Badge საჩუქრად მიიღე",
           greeting: name ? `გამარჯობა, ${name}!` : "გამარჯობა!",
-          body: "Vivida-ს გუნდმა შენს პროფილს Verified Badge აჩუქა. ნიშანი უკვე ჩანს შენი სახელის გვერდით — პროფილში, საზოგადოებასა და კომენტარებში.",
+          body: "Vivida-ს გუნდმა შენს პროფილს Verified Badge აჩუქა. ნიშანი უკვე ჩანს შენი სახელის გვერდით, პროფილში, საზოგადოებასა და კომენტარებში.",
           note: "Badge საჩუქარია და ფასიან გამოწერას არ საჭიროებს.",
           cta: "ნახე ჩემი პროფილი",
         };

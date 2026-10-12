@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
   const userAgent = req.headers.get("user-agent")?.slice(0, 300) ?? null;
 
-  // Endpoint is unique — reclaim it for this user + refresh keys if it moved.
+  // Endpoint is unique, reclaim it for this user + refresh keys if it moved.
   await db
     .insert(pushSubscriptions)
     .values({ userId, endpoint, p256dh, auth: authKey, userAgent })

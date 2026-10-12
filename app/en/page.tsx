@@ -12,7 +12,7 @@ import {
 } from "@/lib/seo/locales";
 
 const URL = ENGLISH_SITE_URL;
-const TITLE = "Natal Charts, Horoscopes and Zodiac Guides — Vivida";
+const TITLE = "Natal Charts, Horoscopes and Zodiac Guides, Vivida";
 const DESCRIPTION =
   "Understand your natal chart, zodiac signs and compatibility through clear English astrology guides. Vivida combines astronomical chart data with practical self-reflection tools.";
 
@@ -109,15 +109,15 @@ export default function EnglishHomePage() {
           </h1>
           <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-foreground/80 sm:text-xl">
             Free birth-chart calculator, AI tarot and an AI astrologer that
-            knows your chart — plus human readings from vetted readers,
-            delivered in 24–48h.
+            knows your chart, plus human readings from vetted readers, delivered
+            in 24–48h.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
               href="/natal-chart"
               className="inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-950/30"
             >
-              Calculate my chart — free <ArrowRight className="size-4" />
+              Calculate my chart, free <ArrowRight className="size-4" />
             </Link>
             <Link
               href="/tarot"
@@ -127,7 +127,7 @@ export default function EnglishHomePage() {
             </Link>
           </div>
           <p className="mt-4 text-xs text-muted-foreground">
-            Free calculator · No card required · Pay by card — readers receive
+            Free calculator · No card required · Pay by card, readers receive
             USDC on Solana
           </p>
         </div>
@@ -144,7 +144,7 @@ export default function EnglishHomePage() {
               <div>
                 <p className="font-semibold">Planets, houses &amp; aspects</p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Full placement data from your birth date, time and place —
+                  Full placement data from your birth date, time and place,
                   free, no registration.
                 </p>
               </div>
@@ -156,7 +156,7 @@ export default function EnglishHomePage() {
                   Plain-English Big Three + AI analysis
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Sun, Moon and Rising decoded — then ask the AI astrologer
+                  Sun, Moon and Rising decoded, then ask the AI astrologer
                   anything about your chart.
                 </p>
               </div>
@@ -166,7 +166,7 @@ export default function EnglishHomePage() {
               <div>
                 <p className="font-semibold">Human readings from $19.99</p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Commission a vetted reader — tarot, birth chart or
+                  Commission a vetted reader, tarot, birth chart or
                   compatibility, delivered in 24–48h.
                 </p>
               </div>
@@ -196,7 +196,7 @@ export default function EnglishHomePage() {
           </p>
           <p className="mt-4 text-pretty text-base leading-relaxed text-foreground/80 sm:text-lg">
             Vivida organizes these layers into approachable tools and
-            educational guides. Use them as prompts for reflection—not as
+            educational guides. Use them as prompts for reflection, not as
             certainty, diagnosis or a substitute for professional advice.
           </p>
         </div>
@@ -235,7 +235,7 @@ export default function EnglishHomePage() {
             [
               "01",
               "Enter accurate details",
-              "Your birth date, place and—when known—exact time establish the astronomical chart.",
+              "Your birth date, place and, when known, exact time establish the astronomical chart.",
             ],
             [
               "02",

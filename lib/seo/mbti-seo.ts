@@ -1,6 +1,6 @@
 /**
  * SEO data for the 16 MBTI personality-type landing pages (/mbti/[type]).
- * Slugs are the lowercase 4-letter codes (e.g. "infp") — they double as the
+ * Slugs are the lowercase 4-letter codes (e.g. "infp"), they double as the
  * search term ("infp ქართულად") and the URL. Titles/descriptions/FAQ are
  * templated from the archetype so all 16 stay consistent; the rich body copy
  * comes from the pre-generated library at render time.
@@ -126,7 +126,7 @@ export const MBTI_GROUP: Record<
   },
 };
 
-/** Short evocative tagline per type — used in hero + meta. */
+/** Short evocative tagline per type, used in hero + meta. */
 export const MBTI_TAGLINE_KA: Record<string, string> = {
   INTJ: "სტრატეგი მოაზროვნე, რომელიც ყველაფერს წინასწარ გეგმავს.",
   INTP: "ცნობისმოყვარე ანალიტიკოსი იდეებისა და თეორიების მიღმა.",
@@ -171,7 +171,7 @@ export function buildMbtiSeo(code: string): MbtiSeo {
     archetypeKa,
     taglineKa,
     group,
-    pageTitle: `${code} — ${archetypeKa} | პიროვნების ტიპი`,
+    pageTitle: `${code}, ${archetypeKa} | პიროვნების ტიპი`,
     metaDescription:
       `${code} (${archetypeKa}) პიროვნების ტიპის სრული აღწერა ქართულად: ` +
       `ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ცნობილი ${code}-ები. ` +
@@ -179,11 +179,11 @@ export function buildMbtiSeo(code: string): MbtiSeo {
     faq: [
       {
         q: `რას ნიშნავს ${code} ტიპი?`,
-        a: `${code} ანუ „${archetypeKa}“ — 16 პიროვნების ტიპიდან ერთ-ერთი. ${taglineKa} ეს ტიპი აღწერს, როგორ იღებ ენერგიას, აღიქვამ ინფორმაციას, იღებ გადაწყვეტილებებს და აწყობ ცხოვრებას.`,
+        a: `${code} ანუ „${archetypeKa}“, 16 პიროვნების ტიპიდან ერთ-ერთი. ${taglineKa} ეს ტიპი აღწერს, როგორ იღებ ენერგიას, აღიქვამ ინფორმაციას, იღებ გადაწყვეტილებებს და აწყობ ცხოვრებას.`,
       },
       {
         q: `როგორ გავიგო, ${code} ვარ თუ არა?`,
-        a: `გაიარე უფასო Astro-MBTI ტესტი — 60 კითხვა, დაახლოებით 7 წუთი. ტესტი განსაზღვრავს შენს ზუსტ ტიპს და მოგცემს დეტალურ, პერსონალურ ანალიზს.`,
+        a: `გაიარე უფასო Astro-MBTI ტესტი, 60 კითხვა, დაახლოებით 7 წუთი. ტესტი განსაზღვრავს შენს ზუსტ ტიპს და მოგცემს დეტალურ, პერსონალურ ანალიზს.`,
       },
       {
         q: `ცნობილი ${code}-ები?`,
@@ -230,7 +230,7 @@ export function buildMbtiSeoEn(code: string): MbtiSeoEn {
     archetype: content.archetype,
     tagline: content.tagline,
     group: { key: group.key, labelEn: group.labelEn },
-    pageTitle: `${code} — ${content.archetype} Personality Type`,
+    pageTitle: `${code}, ${content.archetype} Personality Type`,
     metaDescription: `Explore the ${code} (${content.archetype}) personality type: core preferences, strengths, challenges, relationships, career patterns and practical growth ideas.`,
     faq: [
       {

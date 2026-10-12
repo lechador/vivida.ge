@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/bazaar/apply — signed-in user applies (or re-submits) as a
+ * POST /api/bazaar/apply, signed-in user applies (or re-submits) as a
  * reader. Always lands in `pending`; only the admin API can approve.
  * Re-applying after approval keeps the approved status but updates the
  * profile copy and wallet.

@@ -1,7 +1,7 @@
 /**
  * Feed constants shared between the server actions and the client UI.
  *
- * Lives outside actions/feed.ts because that file is "use server" — and
+ * Lives outside actions/feed.ts because that file is "use server", and
  * Next.js 16 only allows async function exports from `"use server"`
  * modules. Re-exporting a `const` from there silently strips every
  * export in the file at bundle time (the build error reads "module has

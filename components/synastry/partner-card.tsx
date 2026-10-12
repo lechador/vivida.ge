@@ -10,7 +10,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Saved-partner row on /synastry. Click → /synastry/[id]; trash → soft delete.
- * Soft delete is intentional — the row stays in the DB so the monthly
+ * Soft delete is intentional, the row stays in the DB so the monthly
  * creation cap remains non-gameable, but the user sees the partner gone.
  */
 export function PartnerCard({
@@ -79,7 +79,7 @@ export function PartnerCard({
           onClick={onDelete}
           disabled={isPending}
           className="relative grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
-          aria-label={locale !== "ka" ? `Remove ${name}` : `წაშლა — ${name}`}
+          aria-label={locale !== "ka" ? `Remove ${name}` : `წაშლა, ${name}`}
           title={locale !== "ka" ? "Remove" : "წაშლა"}
         >
           <Trash2 className="size-4" />

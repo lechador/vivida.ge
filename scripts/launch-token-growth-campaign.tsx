@@ -73,10 +73,10 @@ const assignmentPath = resolve(analysisRoot, "campaign-live-assignments.csv");
 
 type Channel = "all" | "email" | "in-app";
 type Segment =
-  | "HOT — depleted and returned"
-  | "HOT — active low balance"
-  | "WARM — strong paid-feature use"
-  | "WARM — light feature intent";
+  | "HOT, depleted and returned"
+  | "HOT, active low balance"
+  | "WARM, strong paid-feature use"
+  | "WARM, light feature intent";
 type Offer =
   | "existing_pro_deadline"
   | "pro_3mo_29"
@@ -222,12 +222,12 @@ function chooseOffer(candidate: Candidate, live: LiveUser | null): Offer {
   if (live?.lowCreditOfferSent || bool(candidate.low_credit_offer_sent))
     return "existing_pro_deadline";
   if (
-    candidate.segment === "HOT — depleted and returned" &&
+    candidate.segment === "HOT, depleted and returned" &&
     (live?.country ?? candidate.country) === "GE" &&
     (live?.balance ?? Number(candidate.balance)) <= 4
   )
     return "pro_3mo_29";
-  if (candidate.segment === "WARM — strong paid-feature use") {
+  if (candidate.segment === "WARM, strong paid-feature use") {
     const spend = Number(candidate.credits_spent_lifetime);
     const features = Number(candidate.distinct_paid_features);
     if (spend >= 20 || features >= 3 || candidate.best_feature === "AI ჩატი")
@@ -248,7 +248,7 @@ function evaluate(candidate: Candidate, live: LiveUser | null): Assignment {
     suppressionReasons.push("converted_to_buyer");
   const baseEligible = suppressionReasons.length === 0;
   const offer = chooseOffer(candidate, live);
-  const highIntent = candidate.segment !== "WARM — light feature intent";
+  const highIntent = candidate.segment !== "WARM, light feature intent";
   const duplicateOfferEmail = Boolean(
     live?.lowCreditOfferSent || bool(candidate.low_credit_offer_sent),
   );
@@ -353,7 +353,7 @@ function copyFor(assignment: Assignment): {
             ? "Your PRO offer is still active"
             : "Your credits ran out, but Vivida can keep going",
         body: `Get 3 months of unlimited Vivida for ${price}. Available through 1 September.`,
-        emailBody: `Your credits are nearly gone. Open every feature for three full months — without credits or limits.\n\nThis offer is available through 1 September.`,
+        emailBody: `Your credits are nearly gone. Open every feature for three full months, without credits or limits.\n\nThis offer is available through 1 September.`,
         cta: "Activate the offer",
       };
     if (assignment.offer === "standard_pro")
@@ -378,28 +378,28 @@ function copyFor(assignment: Assignment): {
     assignment.offer === "pro_3mo_29"
   )
     return {
-      subject: `3 თვე ულიმიტო Vivida — ${price}`,
+      subject: `3 თვე ულიმიტო Vivida, ${price}`,
       title:
         assignment.offer === "existing_pro_deadline"
           ? "შენი PRO შეთავაზება ისევ აქტიურია"
           : "კრედიტები დასრულდა, Vivida კი შეგიძლია გააგრძელო",
-      body: `3 თვე ულიმიტო Vivida ${price}-ად — შეთავაზება ძალაშია 1 სექტემბრის ჩათვლით.`,
-      emailBody: `შენი კრედიტები თითქმის დასრულებულია. გახსენი ყველა ფუნქცია 3 სრული თვით — კრედიტებისა და ლიმიტების გარეშე.\n\nშეთავაზება ძალაშია 1 სექტემბრის ჩათვლით.`,
+      body: `3 თვე ულიმიტო Vivida ${price}-ად, შეთავაზება ძალაშია 1 სექტემბრის ჩათვლით.`,
+      emailBody: `შენი კრედიტები თითქმის დასრულებულია. გახსენი ყველა ფუნქცია 3 სრული თვით, კრედიტებისა და ლიმიტების გარეშე.\n\nშეთავაზება ძალაშია 1 სექტემბრის ჩათვლით.`,
       cta: "გაააქტიურე შეთავაზება",
     };
   if (assignment.offer === "standard_pro")
     return {
       subject: `გახსენი ${feature} და მთელი Vivida ლიმიტების გარეშე`,
       title: "გახსენი Vivida ულიმიტოდ",
-      body: `PRO-ით ${feature} და ყველა სხვა ფუნქცია ულიმიტოა — ${price} თვეში.`,
+      body: `PRO-ით ${feature} და ყველა სხვა ფუნქცია ულიმიტოა, ${price} თვეში.`,
       emailBody: `შენი აქტივობიდან ჩანს, რომ ${feature} შენთვის რეალურ ღირებულებას ქმნის. Vivida PRO-ით ის და ყველა სხვა ფუნქცია კრედიტებისა და ლიმიტების გარეშე გაიხსნება.\n\nPRO-ის ფასი არის ${price} თვეში.`,
       cta: "გახსენი PRO",
     };
   const credits = assignment.offer === "refill_75" ? 75 : 30;
   return {
-    subject: `${credits} კრედიტი — გააგრძელე ${feature}`,
+    subject: `${credits} კრედიტი, გააგრძელე ${feature}`,
     title: `გააგრძელე ${feature} შეფერხების გარეშე`,
-    body: `${credits} კრედიტი ხელმისაწვდომია ${price}-ად — გააგრძელე იქიდან, სადაც გაჩერდი.`,
+    body: `${credits} კრედიტი ხელმისაწვდომია ${price}-ად, გააგრძელე იქიდან, სადაც გაჩერდი.`,
     emailBody: `შენი აქტივობიდან ჩანს, რომ ${feature} გაინტერესებს. ${credits} კრედიტით შეგიძლია გააგრძელო ზუსტად იქიდან, სადაც გაჩერდი.\n\nფასი: ${price}.`,
     cta: "შეავსე კრედიტები",
   };
@@ -574,7 +574,7 @@ async function sendInApp(
 }
 
 async function ensurePromoCampaign(): Promise<string> {
-  const subject = `${LOW_CREDIT_PROMO_MONTHS} თვე ულიმიტო Vivida — მხოლოდ ₾29`;
+  const subject = `${LOW_CREDIT_PROMO_MONTHS} თვე ულიმიტო Vivida, მხოლოდ ₾29`;
   const [campaign] = await db
     .insert(emailCampaigns)
     .values({

@@ -12,12 +12,12 @@ import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL } from "@/lib/seo/locales";
 export const dynamic = "force-dynamic";
 
 const URL = `${ENGLISH_SITE_URL}/readings`;
-const TITLE = "Insight Bazaar — Book a Personal Astrology Reading";
+const TITLE = "Insight Bazaar, Book a Personal Astrology Reading";
 const DESCRIPTION =
   "Commission a one-off tarot reading, birth-chart interpretation, or compatibility session from a vetted Vivida reader. Pay by card; birth details stay private and off-chain.";
 
 export const metadata: Metadata = {
-  title: { absolute: `${TITLE} — Vivida` },
+  title: { absolute: `${TITLE}, Vivida` },
   description: DESCRIPTION,
   alternates: {
     canonical: URL,
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Public marketplace, auth-aware shell — the /taro pattern on the English
+ * Public marketplace, auth-aware shell, the /taro pattern on the English
  * host. Guests get the English marketing shell (header/footer, the landing);
  * signed-in users get the app space: left sidebar, top bar, mobile tab bar,
  * starfield. Crawlers are always guests, so SEO sees the same landing markup

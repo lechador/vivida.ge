@@ -33,7 +33,7 @@ export function NatalChartPageEn() {
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      name: "Free Birth Chart Calculator — Vivida",
+      name: "Free Birth Chart Calculator, Vivida",
       url: PAGE_URL,
       applicationCategory: "LifestyleApplication",
       operatingSystem: "Web",
@@ -91,8 +91,8 @@ export function NatalChartPageEn() {
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-pretty text-base text-foreground/80 sm:text-lg">
             Enter your birth date, time, and place to calculate your planets,
-            rising sign, 12 houses, and major aspects—free, with no registration
-            required.
+            rising sign, 12 houses, and major aspects, free, with no
+            registration required.
           </p>
         </header>
 

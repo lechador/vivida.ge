@@ -148,8 +148,8 @@ export default async function SynastryDetailPage({
                 }
                 blurb={
                   en
-                    ? "See the complete synastry reading—key aspects, strengths, and points of friction. Pay once and this partner remains unlocked."
-                    : "ნახე სრული სინასტრია — ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
+                    ? "See the complete synastry reading, key aspects, strengths, and points of friction. Pay once and this partner remains unlocked."
+                    : "ნახე სრული სინასტრია, ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
                 }
                 locale={locale}
               />
@@ -166,12 +166,12 @@ export default async function SynastryDetailPage({
     );
   }
 
-  // Cheap deterministic compute on every visit — keeps the result fresh
+  // Cheap deterministic compute on every visit, keeps the result fresh
   // without a cache while we tune scoring.
   const synastry = computeSynastry(viewerChart.data, partner.chart);
   const synastryTexts = await getSynastryInterpretationsFor(synastry, locale);
 
-  // Ensure AI interpretation exists (lazy generation — first visit pays
+  // Ensure AI interpretation exists (lazy generation, first visit pays
   // the Gemini call, subsequent visits read the cached row).
   const partnerWithAi = await ensureSynastryInterpretation(partner, locale);
   const ai = partnerWithAi.aiInterpretation;

@@ -42,7 +42,7 @@ import { feedTimeAgo } from "./time-ago";
  *
  * Reactions still use the 4 custom icons; hovering "ლაიქი" pops up
  * the picker, single-tap toggles `like` directly. The comment section
- * is controlled by this card — the "კომენტარი" button in the action
+ * is controlled by this card, the "კომენტარი" button in the action
  * bar opens/closes the same panel that the count link in the summary
  * row toggles. Edit (within 5 min) and delete (owner/admin) live in
  * the three-dot menu.
@@ -58,7 +58,7 @@ export function PostCard({
   viewerId: string;
   viewerIsAdmin: boolean;
   /** "feed": whole card opens the thread; comments live on the detail page.
-   *  "detail": the thread page — comments shown + replyable inline. */
+   *  "detail": the thread page, comments shown + replyable inline. */
   mode?: "feed" | "detail";
   locale?: UserLocale;
 }) {

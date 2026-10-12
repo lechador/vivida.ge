@@ -6,7 +6,7 @@ import { rateLimitHits } from "@/db/schema";
 import { ApiError } from "@/lib/api/errors";
 
 /**
- * Fixed-window rate limiter backed by Postgres — no Redis/KV dependency.
+ * Fixed-window rate limiter backed by Postgres, no Redis/KV dependency.
  *
  * Each call atomically increments a per-(bucket, identifier, window) counter
  * via an INSERT … ON CONFLICT DO UPDATE … RETURNING, which is race-safe even
@@ -24,7 +24,7 @@ function hashIdentifier(value: string): string {
 export async function enforceRateLimit(opts: {
   /** Logical limiter name, e.g. "login_ip". */
   bucket: string;
-  /** Raw IP or email — hashed before it touches the DB. */
+  /** Raw IP or email, hashed before it touches the DB. */
   identifier: string;
   /** Max requests allowed within the window. */
   limit: number;
@@ -97,13 +97,13 @@ export async function enforceAuthRateLimit(opts: {
 
 /**
  * Delete rate-limit rows whose window is well in the past. Called from the
- * daily cron — keeps the table from accumulating dead counters. Failures
+ * daily cron, keeps the table from accumulating dead counters. Failures
  * are swallowed; pruning is housekeeping, never request-critical.
  */
 export async function pruneRateLimits(): Promise<void> {
   try {
     // 31 days so long-window counters survive their full window before being
-    // pruned — e.g. the AI-avatar monthly cap is a 30-day fixed window, and a
+    // pruned, e.g. the AI-avatar monthly cap is a 30-day fixed window, and a
     // 24h cutoff would reset it daily. Short-window buckets are unaffected;
     // their stale rows just linger a little longer before cleanup.
     const cutoff = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000);

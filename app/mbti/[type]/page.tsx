@@ -132,7 +132,7 @@ export default async function MbtiTypePage({
       description: metaDescription,
       about: {
         "@type": "Thing",
-        name: `${code} — ${archetype}`,
+        name: `${code}, ${archetype}`,
         description: tagline,
       },
     }),
@@ -187,7 +187,7 @@ export default async function MbtiTypePage({
         <header className="rounded-3xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
           <Image
             src={mbtiCharacterSrc(code)}
-            alt={`${code} — ${archetype}`}
+            alt={`${code}, ${archetype}`}
             width={220}
             height={220}
             priority
@@ -211,8 +211,8 @@ export default async function MbtiTypePage({
             <Link href={en ? "/personality-test" : "/pirovnebis-testi"}>
               <Sparkles className="size-4" />
               {en
-                ? "Discover your type — take the test"
-                : "გაიგე შენი ტიპი — გაიარე ტესტი"}
+                ? "Discover your type, take the test"
+                : "გაიგე შენი ტიპი, გაიარე ტესტი"}
             </Link>
           </Button>
         </header>
@@ -221,7 +221,7 @@ export default async function MbtiTypePage({
         {!en && portrait && (
           <article className="mt-8 space-y-4 rounded-2xl border border-border bg-card/50 p-6 text-[15px] leading-relaxed text-foreground/90 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
             <h2 className="text-lg font-semibold tracking-tight">
-              {code} ({seoKa.archetypeKa}) — ვინ არის ეს ტიპი
+              {code} ({seoKa.archetypeKa}), ვინ არის ეს ტიპი
             </h2>
             {paragraphs(portrait).map((p, i) => (
               <p key={i}>{p}</p>
@@ -274,7 +274,7 @@ export default async function MbtiTypePage({
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
             {en
               ? "Take the free 60-question personality test and discover your preferences in about seven minutes."
-              : "გაიარე უფასო Astro-MBTI ტესტი და აღმოაჩინე შენი ზუსტი ტიპი — 60 კითხვა, 7 წუთი."}
+              : "გაიარე უფასო Astro-MBTI ტესტი და აღმოაჩინე შენი ზუსტი ტიპი, 60 კითხვა, 7 წუთი."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
             <Link href={en ? "/personality-test" : "/pirovnebis-testi"}>
@@ -283,7 +283,7 @@ export default async function MbtiTypePage({
           </Button>
         </div>
 
-        {/* Internal links — the other 15 types */}
+        {/* Internal links, the other 15 types */}
         <section className="mt-10">
           <h2 className="mb-4 text-sm font-semibold tracking-tight">
             {en ? "The 16 personality types" : "16 პიროვნების ტიპი"}

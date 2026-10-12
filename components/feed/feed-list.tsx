@@ -16,7 +16,7 @@ const PAGE_SIZE = 20;
 /**
  * Client-side wrapper around the feed list. Receives the first page from
  * the server, then "load more" pages via the `listFeed` server action
- * with a createdAt cursor. Sign filter is JS-side — the data is already
+ * with a createdAt cursor. Sign filter is JS-side, the data is already
  * fetched and the visible set is small, so an O(n) filter is fine.
  */
 export function FeedList({
@@ -174,7 +174,7 @@ function EmptyState({ locale }: { locale: UserLocale }) {
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
         {en
           ? "Be the first to share a thought, question, quote, or simply how you feel."
-          : "იყავი პირველი — დაწერე რასაც ფიქრობ, კითხვა, ციტატა, ან უბრალოდ როგორ ხარ."}
+          : "იყავი პირველი, დაწერე რასაც ფიქრობ, კითხვა, ციტატა, ან უბრალოდ როგორ ხარ."}
       </p>
     </div>
   );
@@ -186,8 +186,8 @@ function SignEmptyState({ locale }: { locale: UserLocale }) {
     <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-8 text-center">
       <p className="text-sm text-muted-foreground">
         {en
-          ? "No one with your sign has posted yet—will you be first?"
-          : "ჯერ შენი ნიშნით არავის დაუპოსტავს — შენ თუ პირველი იქნები?"}
+          ? "No one with your sign has posted yet, will you be first?"
+          : "ჯერ შენი ნიშნით არავის დაუპოსტავს, შენ თუ პირველი იქნები?"}
       </p>
       <Link
         href="/feed"

@@ -1,5 +1,5 @@
 /**
- * EQ scoring — turns raw Likert answers into an overall score + a 5-domain
+ * EQ scoring, turns raw Likert answers into an overall score + a 5-domain
  * profile with qualitative bands and Georgian interpretation.
  *
  * Per item: raw 1..5, reverse-keyed items score `6 - raw`. Each domain (8
@@ -38,7 +38,7 @@ export type EqResult = {
   overall: number;
   band: EqBand;
   domains: EqDomainScore[];
-  /** Highest / lowest domain — the "strength" and "growth area". */
+  /** Highest / lowest domain, the "strength" and "growth area". */
   topKey: EqDomainKey;
   lowKey: EqDomainKey;
 };
@@ -63,7 +63,7 @@ export const EQ_BAND_META: Record<
     labelEn: "Developing",
     hue: "oklch(0.72 0.20 15)",
     summaryKa:
-      "შენი ემოციური ინტელექტი განვითარების ეტაპზეა — ეს კუნთივით ვარჯიშდება და იზრდება. მცირე ყოველდღიური დაკვირვება დიდ ცვლილებას მოიტანს.",
+      "შენი ემოციური ინტელექტი განვითარების ეტაპზეა, ეს კუნთივით ვარჯიშდება და იზრდება. მცირე ყოველდღიური დაკვირვება დიდ ცვლილებას მოიტანს.",
     summaryEn: "Your emotional skills have meaningful room to grow. Like a muscle, they respond to deliberate, repeated practice.",
   },
   moderate: {
@@ -71,7 +71,7 @@ export const EQ_BAND_META: Record<
     labelEn: "Moderate",
     hue: "oklch(0.82 0.16 85)",
     summaryKa:
-      "მყარი საფუძველი გაქვს — ზოგ სფეროში ბუნებრივად ძლიერი ხარ, ზოგში კი წინსვლის კარგი სივრცე რჩება.",
+      "მყარი საფუძველი გაქვს, ზოგ სფეროში ბუნებრივად ძლიერი ხარ, ზოგში კი წინსვლის კარგი სივრცე რჩება.",
     summaryEn: "You have a solid foundation, with natural strengths in some areas and clear opportunities to develop others.",
   },
   strong: {
@@ -79,7 +79,7 @@ export const EQ_BAND_META: Record<
     labelEn: "Strong",
     hue: "oklch(0.80 0.15 200)",
     summaryKa:
-      "მაღალი ემოციური ინტელექტი — კარგად აღიქვამ და მართავ ემოციებს, საკუთარსაც და სხვისასაც. ეს რეალური უპირატესობაა ურთიერთობებში.",
+      "მაღალი ემოციური ინტელექტი, კარგად აღიქვამ და მართავ ემოციებს, საკუთარსაც და სხვისასაც. ეს რეალური უპირატესობაა ურთიერთობებში.",
     summaryEn: "You report strong emotional skills and generally navigate both your own feelings and other people's emotions effectively.",
   },
   exceptional: {
@@ -87,49 +87,49 @@ export const EQ_BAND_META: Record<
     labelEn: "Exceptional",
     hue: "oklch(0.78 0.18 305)",
     summaryKa:
-      "გამორჩეულად მაღალი ემოციური ინტელექტი — იშვიათი და ძვირფასი უნარი, რომელიც ლიდერობასა და ღრმა კავშირებში ბრწყინავს.",
+      "გამორჩეულად მაღალი ემოციური ინტელექტი, იშვიათი და ძვირფასი უნარი, რომელიც ლიდერობასა და ღრმა კავშირებში ბრწყინავს.",
     summaryEn: "You report exceptionally developed emotional skills that can support leadership, resilience and deep relationships.",
   },
 };
 
-/** One short line per (domain × band) — the deep-view interpretation. */
+/** One short line per (domain × band), the deep-view interpretation. */
 export const EQ_DOMAIN_INTERP: Record<EqDomainKey, Record<EqBand, string>> = {
   "self-awareness": {
     developing:
-      "ჯერ გიჭირს საკუთარი ემოციების რეალურ დროში ამოცნობა — ჩაისუნთქე და ჰკითხე თავს „რას ვგრძნობ ახლა?“",
+      "ჯერ გიჭირს საკუთარი ემოციების რეალურ დროში ამოცნობა, ჩაისუნთქე და ჰკითხე თავს „რას ვგრძნობ ახლა?“",
     moderate:
       "ხშირად ხვდები, რას გრძნობ, თუმცა ზოგჯერ ემოცია შეუმჩნევლად გერევა.",
     strong: "კარგად იცნობ საკუთარ ემოციებსა და მათ გამომწვევ მიზეზებს.",
     exceptional:
-      "ღრმად ხედავ საკუთარ შინაგან სამყაროს — ეს ყველა სხვა უნარის საძირკველია.",
+      "ღრმად ხედავ საკუთარ შინაგან სამყაროს, ეს ყველა სხვა უნარის საძირკველია.",
   },
   "self-regulation": {
     developing:
-      "ემოციები ხშირად გმართავს — პაუზისა და ღრმა სუნთქვის ტექნიკები სიმშვიდეს დაგიბრუნებს.",
+      "ემოციები ხშირად გმართავს, პაუზისა და ღრმა სუნთქვის ტექნიკები სიმშვიდეს დაგიბრუნებს.",
     moderate: "ჩვეულებრივ იკავებ თავს, თუმცა ძლიერი სტრესი ზოგჯერ სჯობნის.",
     strong: "მშვიდად ინარჩუნებ წონასწორობას წნეხის ქვეშაც.",
     exceptional:
-      "იშვიათი სიმშვიდით მართავ იმპულსებსა და რთულ ემოციებს — ქარიშხალშიც მყარად დგახარ.",
+      "იშვიათი სიმშვიდით მართავ იმპულსებსა და რთულ ემოციებს, ქარიშხალშიც მყარად დგახარ.",
   },
   motivation: {
     developing:
-      "მოტივაციის შენარჩუნება წარუმატებლობის შემდეგ გიჭირს — პატარა, მიღწევადი მიზნები დაგეხმარება.",
+      "მოტივაციის შენარჩუნება წარუმატებლობის შემდეგ გიჭირს, პატარა, მიღწევადი მიზნები დაგეხმარება.",
     moderate: "მიზნებისკენ მიდიხარ, თუმცა ენერგია ზოგჯერ იკლებს.",
     strong: "ოპტიმიზმითა და გამძლეობით მიიწევ წინ დაბრკოლებების მიუხედავად.",
     exceptional:
-      "შინაგანი ცეცხლი გამოგარჩევს — მარცხიც კი ბიძგად გექცევა.",
+      "შინაგანი ცეცხლი გამოგარჩევს, მარცხიც კი ბიძგად გექცევა.",
   },
   empathy: {
     developing:
-      "სხვისი ემოციების წაკითხვა ჯერ გიჭირს — ყურადღება ტონსა და სხეულის ენაზე დაგეხმარება.",
+      "სხვისი ემოციების წაკითხვა ჯერ გიჭირს, ყურადღება ტონსა და სხეულის ენაზე დაგეხმარება.",
     moderate: "ხშირად გრძნობ სხვის განწყობას, თუმცა ყოველთვის არა.",
     strong: "მშვენივრად აღიქვამ და გაიგებ სხვის ემოციებს.",
     exceptional:
-      "ღრმად გრძნობ სხვას — ადამიანები გცნობენ ისეთ ადამიანად, ვისაც ესმის.",
+      "ღრმად გრძნობ სხვას, ადამიანები გცნობენ ისეთ ადამიანად, ვისაც ესმის.",
   },
   "social-skills": {
     developing:
-      "ურთიერთობებში ზოგჯერ უხერხულობას გრძნობ — მცირე ნაბიჯები კავშირს გააძლიერებს.",
+      "ურთიერთობებში ზოგჯერ უხერხულობას გრძნობ, მცირე ნაბიჯები კავშირს გააძლიერებს.",
     moderate:
       "კარგად ურთიერთობ, თუმცა კონფლიქტი ან ახალი გარემო ზოგჯერ გამოწვევაა.",
     strong: "ადვილად ამყარებ კავშირს და აგვარებ უთანხმოებას.",
@@ -221,18 +221,18 @@ export function calculateEq(answers: Record<number, number>): EqResult {
   };
 }
 
-/** One concrete, actionable practice per domain — shown in the deep view. */
+/** One concrete, actionable practice per domain, shown in the deep view. */
 export const EQ_DOMAIN_TIP: Record<EqDomainKey, string> = {
   "self-awareness":
-    "დღეში ერთხელ ჩაიწერე ერთი წინადადება იმაზე, რაც იგრძენი და რამ გამოიწვია — კვირაში შენს ემოციურ ნიმუშებს დაინახავ.",
+    "დღეში ერთხელ ჩაიწერე ერთი წინადადება იმაზე, რაც იგრძენი და რამ გამოიწვია, კვირაში შენს ემოციურ ნიმუშებს დაინახავ.",
   "self-regulation":
-    "ძლიერი ემოციის მომენტში დაითვალე ექვსამდე და ღრმად ამოისუნთქე პასუხამდე — ეს პაუზა რეაქციას არჩევანად აქცევს.",
+    "ძლიერი ემოციის მომენტში დაითვალე ექვსამდე და ღრმად ამოისუნთქე პასუხამდე, ეს პაუზა რეაქციას არჩევანად აქცევს.",
   motivation:
-    "დიდი მიზანი დაშალე პატარა, ერთდღიან ნაბიჯებად — თითო მიღწევა ბიძგს გაძლევს შემდეგისთვის.",
+    "დიდი მიზანი დაშალე პატარა, ერთდღიან ნაბიჯებად, თითო მიღწევა ბიძგს გაძლევს შემდეგისთვის.",
   empathy:
-    "საუბრისას ერთი წუთით მხოლოდ მოსმენაზე გადართე ყურადღება — არა პასუხის მოფიქრებაზე — და დააკვირდი ტონსა და სახეს.",
+    "საუბრისას ერთი წუთით მხოლოდ მოსმენაზე გადართე ყურადღება, არა პასუხის მოფიქრებაზე, და დააკვირდი ტონსა და სახეს.",
   "social-skills":
-    "უთანხმოებისას ჯერ მეორე მხარის პოზიცია გაიმეორე შენი სიტყვებით — ეს დაძაბულობას ხსნის და ნდობას აჩენს.",
+    "უთანხმოებისას ჯერ მეორე მხარის პოზიცია გაიმეორე შენი სიტყვებით, ეს დაძაბულობას ხსნის და ნდობას აჩენს.",
 };
 
 export const EQ_DOMAIN_TIP_EN: Record<EqDomainKey, string> = {
@@ -246,5 +246,5 @@ export const EQ_DOMAIN_TIP_EN: Record<EqDomainKey, string> = {
 /** Short headline built from the standout domain. */
 export function eqHeadlineKa(result: EqResult): string {
   const top = result.domains.find((d) => d.key === result.topKey);
-  return top ? `შენი ძალა — ${top.nameKa}` : "შენი ემოციური პროფილი";
+  return top ? `შენი ძალა, ${top.nameKa}` : "შენი ემოციური პროფილი";
 }

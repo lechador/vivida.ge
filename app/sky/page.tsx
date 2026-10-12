@@ -35,7 +35,7 @@ const ASPECT_TONE: Record<string, string> = {
 };
 
 /**
- * The live sky — where every planet is RIGHT NOW, mapped onto the user's own
+ * The live sky, where every planet is RIGHT NOW, mapped onto the user's own
  * natal houses, with interpretations from the pre-generated transit library.
  * Positions extrapolate client-side from server-computed speeds, so the page
  * genuinely moves while you watch. The daily engagement loop's "come back
@@ -45,7 +45,7 @@ export default async function SkyPage() {
   const user = await requireUser();
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
-  // Positions only — never wait on (or trigger) chart AI here.
+  // Positions only, never wait on (or trigger) chart AI here.
   const chart = await ensureChartFor(user.id, { aiUpgrade: "skip" });
   if (!chart)
     return (
@@ -165,8 +165,8 @@ export default async function SkyPage() {
 
         <p className="mt-10 border-t border-border/40 pt-4 text-xs text-muted-foreground">
           {en
-            ? "Positions update every second. The Moon moves roughly half a degree per hour—come back tomorrow and the sky will already look different."
-            : "პოზიციები ცოცხლდება წამში ერთხელ — მთვარე ცაზე ყოველ საათში დაახლოებით ნახევარი გრადუსით მიიწევს. დაბრუნდი ხვალ — ცა უკვე სხვაგან იქნება."}
+            ? "Positions update every second. The Moon moves roughly half a degree per hour, come back tomorrow and the sky will already look different."
+            : "პოზიციები ცოცხლდება წამში ერთხელ, მთვარე ცაზე ყოველ საათში დაახლოებით ნახევარი გრადუსით მიიწევს. დაბრუნდი ხვალ, ცა უკვე სხვაგან იქნება."}
         </p>
       </section>
     </main>

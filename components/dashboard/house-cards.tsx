@@ -11,7 +11,7 @@ const HOUSE_LABEL: Record<number, string> = {
 };
 
 /**
- * Flat houses list — one tight, aligned row per house (axis/number · theme ·
+ * Flat houses list, one tight, aligned row per house (axis/number · theme ·
  * cusp sign · occupant planets) with the interpretation inline beneath it
  * (open by default).
  */

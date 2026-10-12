@@ -31,16 +31,16 @@ const KEYWORDS = [
 const BASE_META: Metadata = {
   // Keyword-first, brandless title (Google shows "vivida.ge" separately) using
   // the high-intent terms "ონლაინ" + "გამოთვლა".
-  title: { absolute: "ნატალური რუკა ონლაინ — უფასო გამოთვლა" },
+  title: { absolute: "ნატალური რუკა ონლაინ, უფასო გამოთვლა" },
   description:
-    "ნატალური რუკის ონლაინ გამოთვლა უფასოდ. შეიყვანე დაბადების თარიღი, დრო და ადგილი — მიიღე პლანეტების ზუსტი პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები ქართულად, რეგისტრაციის გარეშე.",
+    "ნატალური რუკის ონლაინ გამოთვლა უფასოდ. შეიყვანე დაბადების თარიღი, დრო და ადგილი, მიიღე პლანეტების ზუსტი პოზიციები, ასცენდენტი, 12 სახლი და ასპექტები ქართულად, რეგისტრაციის გარეშე.",
   keywords: KEYWORDS,
   alternates: localizedAlternates("/nataluri-ruka", "/en/natal-chart", "ka"),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     type: "website",
     url: URL,
-    title: "ნატალური რუკა ონლაინ — უფასო გამოთვლა",
+    title: "ნატალური რუკა ონლაინ, უფასო გამოთვლა",
     description:
       "ნატალური რუკის ონლაინ გამოთვლა უფასოდ, რეგისტრაციის გარეშე. პლანეტები, ასცენდენტი, სახლები და ასპექტები ქართულად.",
     siteName: "Vivida",
@@ -48,15 +48,15 @@ const BASE_META: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ნატალური რუკა ონლაინ — უფასო გამოთვლა",
+    title: "ნატალური რუკა ონლაინ, უფასო გამოთვლა",
     description: "ნატალური რუკის ონლაინ გამოთვლა უფასოდ, რეგისტრაციის გარეშე.",
   },
 };
 
 const BASE_META_EN: Metadata = {
-  title: { absolute: "Free Birth Chart Calculator — Natal Chart Online" },
+  title: { absolute: "Free Birth Chart Calculator, Natal Chart Online" },
   description:
-    "Calculate your natal chart online for free. Discover exact planet positions, your rising sign, 12 houses, and major aspects—no registration required.",
+    "Calculate your natal chart online for free. Discover exact planet positions, your rising sign, 12 houses, and major aspects, no registration required.",
   keywords: [
     "free birth chart",
     "birth chart calculator",
@@ -130,7 +130,7 @@ export async function generateMetadata({
 const FAQ = [
   {
     q: "რა არის ნატალური რუკა?",
-    a: "ნატალური რუკა არის ცის რუკა შენი დაბადების ზუსტ მომენტში — სად იდგა მზე, მთვარე და პლანეტები. ის აჩვენებს თითოეული პლანეტის ნიშანს, სახლსა და ერთმანეთთან კავშირებს (ასპექტებს).",
+    a: "ნატალური რუკა არის ცის რუკა შენი დაბადების ზუსტ მომენტში, სად იდგა მზე, მთვარე და პლანეტები. ის აჩვენებს თითოეული პლანეტის ნიშანს, სახლსა და ერთმანეთთან კავშირებს (ასპექტებს).",
   },
   {
     q: "უფასოა ნატალური რუკის გამოთვლა?",
@@ -138,7 +138,7 @@ const FAQ = [
   },
   {
     q: "მჭირდება დაბადების ზუსტი დრო?",
-    a: "მზის ნიშანი და პლანეტების უმეტესობა ზუსტი იქნება დროის გარეშეც. თუმცა ამომავალი ნიშანი (ასცენდენტი) და 12 სახლი დროზეა დამოკიდებული — ზუსტი დროით რუკა ბევრად ზუსტი იქნება.",
+    a: "მზის ნიშანი და პლანეტების უმეტესობა ზუსტი იქნება დროის გარეშეც. თუმცა ამომავალი ნიშანი (ასცენდენტი) და 12 სახლი დროზეა დამოკიდებული, ზუსტი დროით რუკა ბევრად ზუსტი იქნება.",
   },
   {
     q: "რა მონაცემები მჭირდება?",
@@ -165,7 +165,7 @@ export default async function NataluriRukaPage() {
   const appLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "ნატალური რუკა ონლაინ — Vivida",
+    name: "ნატალური რუკა ონლაინ, Vivida",
     url: URL,
     applicationCategory: "LifestyleApplication",
     operatingSystem: "Web",
@@ -214,7 +214,7 @@ export default async function NataluriRukaPage() {
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-pretty text-base text-foreground/80 sm:text-lg">
-            შეიყვანე დაბადების თარიღი, დრო და ადგილი — და მიიღე შენი რუკის სრული
+            შეიყვანე დაბადების თარიღი, დრო და ადგილი, და მიიღე შენი რუკის სრული
             მონაცემები უფასოდ, რეგისტრაციის გარეშე. პლანეტები, 12 სახლი და
             ასპექტები ქართულად.
           </p>
@@ -232,7 +232,7 @@ export default async function NataluriRukaPage() {
             </h2>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
               ნატალური რუკა (ანუ პირადი რუკა, დაბადების რუკა) არის ცის ზუსტი
-              სურათი იმ წამში, როცა დაიბადე — სად იდგა მზე, მთვარე და თითოეული
+              სურათი იმ წამში, როცა დაიბადე, სად იდგა მზე, მთვარე და თითოეული
               პლანეტა ზოდიაქოს ნიშნებსა და 12 სახლში. ის ასტროლოგიის საფუძველია:
               გვიჩვენებს შენს ხასიათს, ძლიერ მხარეებს, ემოციურ ბუნებასა და
               ცხოვრების სფეროებს.
@@ -245,20 +245,20 @@ export default async function NataluriRukaPage() {
             </h2>
             <ul className="mt-4 space-y-3 text-base leading-relaxed text-foreground/85">
               <li>
-                <strong className="text-foreground">პლანეტები</strong> — რას
-                წარმოადგენს თითოეული ენერგია (მზე — ბირთვი, მთვარე — ემოციები,
-                მერკური — აზროვნება და ა.შ.).
+                <strong className="text-foreground">პლანეტები</strong>, რას
+                წარმოადგენს თითოეული ენერგია (მზე, ბირთვი, მთვარე, ემოციები,
+                მერკური, აზროვნება და ა.შ.).
               </li>
               <li>
-                <strong className="text-foreground">ნიშნები</strong> — როგორ
+                <strong className="text-foreground">ნიშნები</strong>, როგორ
                 გამოხატავს თავს ეს ენერგია (ვერძი, კურო… თევზები).
               </li>
               <li>
-                <strong className="text-foreground">სახლები</strong> — ცხოვრების
+                <strong className="text-foreground">სახლები</strong>, ცხოვრების
                 რომელ სფეროში ვლინდება (კარიერა, ურთიერთობები, ფული…).
               </li>
               <li>
-                <strong className="text-foreground">ასპექტები</strong> — როგორ
+                <strong className="text-foreground">ასპექტები</strong>, როგორ
                 ურთიერთობენ პლანეტები ერთმანეთთან (ჰარმონია თუ დაძაბულობა).
               </li>
             </ul>
@@ -299,16 +299,16 @@ export default async function NataluriRukaPage() {
             </p>
           </section>
 
-          {/* Contextual hand-off into the horoscope hub — see the same note
+          {/* Contextual hand-off into the horoscope hub, see the same note
               on /piradi-ruka. This page carries 1,816 impressions at p6.5
               and previously reached /horoskopi only through a pill. */}
           <section className="rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              რუკის შემდეგ — ყოველდღიური ცა
+              რუკის შემდეგ, ყოველდღიური ცა
             </h2>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
               ნატალური რუკა ერთხელ იქმნება და აღარ იცვლება. პლანეტები კი
-              დღეს-დღეზე მოძრაობენ და შენს რუკას სხვადასხვა კუთხით ეხებიან —
+              დღეს-დღეზე მოძრაობენ და შენს რუკას სხვადასხვა კუთხით ეხებიან,
               ამას ტრანზიტი ჰქვია და სწორედ ამაზეა აგებული{" "}
               <Link
                 href="/horoskopi"
@@ -322,8 +322,8 @@ export default async function NataluriRukaPage() {
                 className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
               >
                 მთვარის დღევანდელ ფაზას
-              </Link>{" "}
-              — ხშირად სწორედ აქ ჩანს, რატომ გრძნობ თავს ასე კონკრეტულ დღეს.
+              </Link>{" "},
+              ხშირად სწორედ აქ ჩანს, რატომ გრძნობ თავს ასე კონკრეტულ დღეს.
             </p>
           </section>
 

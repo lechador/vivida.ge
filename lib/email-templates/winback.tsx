@@ -4,7 +4,7 @@ import { EmailLayout, buttonStyle, paragraphStyle } from "./_layout";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Winback email — sent once when a previously-active user has been quiet for
+ * Winback email, sent once when a previously-active user has been quiet for
  * a week. Personal, not promotional: leads with what the sky is doing for
  * THEIR sign today (real horoscope headline when available), reminds them of
  * their credit balance, one CTA. Nudge category → unsubscribable.
@@ -57,7 +57,7 @@ export function WinbackEmail({
       <Text style={{ ...paragraphStyle, fontSize: "16px", lineHeight: "26px" }}>
         {en
           ? "It has been a week since your last visit. The planets kept moving, and your personal horoscope continued to update each morning."
-          : "ერთი კვირაა არ გვინახიხარ — ამასობაში კი პლანეტები ადგილს იცვლიდნენ და შენი ჰოროსკოპი ყოველ დილით ახლდებოდა."}
+          : "ერთი კვირაა არ გვინახიხარ, ამასობაში კი პლანეტები ადგილს იცვლიდნენ და შენი ჰოროსკოპი ყოველ დილით ახლდებოდა."}
       </Text>
 
       {horoscopeHeadline && (
@@ -102,8 +102,8 @@ export function WinbackEmail({
             {balance} {en ? "credits" : "კრედიტი"}
           </span>{" "}
           {en
-            ? "waiting for you — use them for deep compatibility, AI chat, or a seven-day forecast."
-            : "გელოდება — შეგიძლია გახსნა ღრმა თავსებადობა, AI-ჩატი ან 7-დღიანი პროგნოზი."}
+            ? "waiting for you, use them for deep compatibility, AI chat, or a seven-day forecast."
+            : "გელოდება, შეგიძლია გახსნა ღრმა თავსებადობა, AI-ჩატი ან 7-დღიანი პროგნოზი."}
         </Text>
       )}
 

@@ -12,21 +12,21 @@ import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 const FEATURES_EN = [
   "Unlimited AI chat with your astrologer",
   "Compatibility readings with anyone, as often as you like",
-  "Full test results — personality, IQ, EQ, Big Five",
+  "Full test results, personality, IQ, EQ, Big Five",
   "7-day forecasts, tarot readings and PDF charts",
   "Verified badge on your profile",
 ];
 const FEATURES_KA = [
   "ულიმიტო AI ჩატი შენს ასტროლოგთან",
   "თავსებადობა ნებისმიერთან, რამდენჯერაც გინდა",
-  "ტესტების სრული შედეგები — პიროვნება, IQ, EQ, Big Five",
+  "ტესტების სრული შედეგები, პიროვნება, IQ, EQ, Big Five",
   "7-დღიანი პროგნოზები, ტარო და PDF რუკები",
   "Verified badge შენს პროფილზე",
 ];
 
 /**
  * The ₾29/3-month win-back offer, rendered only for users the low-credit
- * campaign actually emailed (see lib/promo-offer.ts — the page decides, this
+ * campaign actually emailed (see lib/promo-offer.ts, the page decides, this
  * component only draws).
  *
  * It posts `offer: "low_credits"` rather than a price: the checkout route
@@ -43,7 +43,7 @@ export function LowCreditOfferCard({
   plan: PremiumPlan;
   months: number;
   /**
-   * Localised last day of the offer, already in the form the sentence needs —
+   * Localised last day of the offer, already in the form the sentence needs,
    * genitive in Georgian ("1 სექტემბრის"), plain in English ("1 September").
    */
   deadlineLabel: string;
@@ -128,8 +128,8 @@ export function LowCreditOfferCard({
           </h2>
           <p className="mt-1.5 text-sm text-foreground/75">
             {en
-              ? "Your credits are nearly gone. Open everything instead — no credits, no limits."
-              : "შენი კრედიტები იწურება. ამის ნაცვლად გახსენი ყველაფერი — კრედიტების და ლიმიტების გარეშე."}
+              ? "Your credits are nearly gone. Open everything instead, no credits, no limits."
+              : "შენი კრედიტები იწურება. ამის ნაცვლად გახსენი ყველაფერი, კრედიტების და ლიმიტების გარეშე."}
           </p>
 
           <ul className="mt-4 space-y-2 text-sm text-foreground/80">

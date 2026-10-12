@@ -51,13 +51,13 @@ export async function ReportPromo({ className }: { className?: string }) {
           </div>
           <h2 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
             {en
-              ? "An in-depth reading of your birth chart—a downloadable PDF"
-              : "შენი ნატალური რუკის ღრმა ანალიზი — ჩამოსატვირთი PDF"}
+              ? "An in-depth reading of your birth chart, a downloadable PDF"
+              : "შენი ნატალური რუკის ღრმა ანალიზი, ჩამოსატვირთი PDF"}
           </h2>
           <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
             {en
               ? "A beautifully designed 10+ page personal report covering the standout patterns in your chart, planets, houses, aspects, strengths, and growth areas."
-              : "10+ გვერდიანი პერსონალური ანგარიში: რა გამოირჩევა შენს რუკაში, პლანეტების, სახლებისა და ასპექტების დეტალური ახსნა, ძლიერი მხარეები და ზრდის ზონები — ლამაზად გაფორმებული."}
+              : "10+ გვერდიანი პერსონალური ანგარიში: რა გამოირჩევა შენს რუკაში, პლანეტების, სახლებისა და ასპექტების დეტალური ახსნა, ძლიერი მხარეები და ზრდის ზონები, ლამაზად გაფორმებული."}
           </p>
         </div>
         <div className="flex flex-col items-stretch gap-2 sm:items-end">

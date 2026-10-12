@@ -338,7 +338,7 @@ const EMAIL_ASPECT_KA: Record<AspectKind, (topic: Topic) => string[]> = {
   ],
   sextile: (topic) => [
     "სად გეხსნება დღეს მარტივი გზა?",
-    `${topic.nominative} — შანსი, რომლის გამოყენებაც ღირს`,
+    `${topic.nominative}, შანსი, რომლის გამოყენებაც ღირს`,
   ],
   square: (topic) => [
     "სად ღირს დღეს ტემპის შენელება?",

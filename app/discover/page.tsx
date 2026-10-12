@@ -85,8 +85,8 @@ function EmptyState({
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
         {hasElement
           ? en
-            ? "There are no other public profiles yet. Check back soon — the sky changes."
-            : "სხვა საჯარო პროფილები ჯერ არ არიან. დაბრუნდი ცოტა ხანში — ცა იცვლება."
+            ? "There are no other public profiles yet. Check back soon, the sky changes."
+            : "სხვა საჯარო პროფილები ჯერ არ არიან. დაბრუნდი ცოტა ხანში, ცა იცვლება."
           : en
             ? "Add your birth details to discover compatible people."
             : "შეავსე დაბადების მონაცემები, რომ აღმოაჩინო შენთან თავსებადი ხალხი."}

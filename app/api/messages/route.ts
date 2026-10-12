@@ -6,7 +6,7 @@ import { listMessages } from "@/lib/messages";
 /**
  * GET /api/messages?with={userId}&since={iso}
  * Returns messages between viewer and partner. `since` filters to only
- * messages newer than the given timestamp — used by the active chat
+ * messages newer than the given timestamp, used by the active chat
  * window for incremental polling.
  */
 export async function GET(req: Request) {

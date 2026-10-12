@@ -2,7 +2,7 @@
  * Typed accessors for the LLM-generated zodiac SEO copy.
  *
  * The JSON itself is committed into the repo (see scripts/generate-zodiac-
- * content.mjs) so build-time pages don't need OPENROUTER_API_KEY at all —
+ * content.mjs) so build-time pages don't need OPENROUTER_API_KEY at all,
  * Vercel/CI just renders the cached output. Re-run the script + commit
  * when you want to refresh content.
  */
@@ -267,7 +267,7 @@ export const RISINGS_CONTENT: Record<ZodiacSlug, RisingSignContent> | null =
 export const YEARLY_CONTENT: Record<string, Record<ZodiacSlug, YearlyContent>> =
   (data.yearly as Record<string, Record<ZodiacSlug, YearlyContent>>) ?? {};
 
-/** Lookup helper for /zodiac/[sign]/[year] — returns null if unfilled. */
+/** Lookup helper for /zodiac/[sign]/[year], returns null if unfilled. */
 export function yearlyContentFor(
   sign: ZodiacSlug,
   year: number

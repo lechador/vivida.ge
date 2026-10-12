@@ -15,7 +15,7 @@ function savePendingDream(text: string) {
   try {
     sessionStorage.setItem(PENDING_KEY, text);
   } catch {
-    /* private mode — the redirect still works, the draft just won't survive */
+    /* private mode, the redirect still works, the draft just won't survive */
   }
 }
 
@@ -39,20 +39,20 @@ type DreamResult = {
 };
 
 const ERRORS_KA: Record<string, string> = {
-  invalid_dream: "მოუყევი სიზმარი ცოტა ვრცლად — მინიმუმ 10 სიმბოლო.",
+  invalid_dream: "მოუყევი სიზმარი ცოტა ვრცლად, მინიმუმ 10 სიმბოლო.",
   rate_limited: "დღევანდელი ლიმიტი ამოიწურა. სცადე ხვალ.",
   unavailable: "სერვისი დროებით მიუწვდომელია.",
   generation_failed: "ახსნის გენერაცია ვერ მოხერხდა. სცადე ხელახლა.",
-  needs_credits: "ბალანსი არ არის საკმარისი — შეავსე და სცადე ხელახლა.",
+  needs_credits: "ბალანსი არ არის საკმარისი, შეავსე და სცადე ხელახლა.",
 };
 
 const ERRORS_EN: Record<string, string> = {
   invalid_dream:
-    "Tell the dream in a little more detail — at least 10 characters.",
+    "Tell the dream in a little more detail, at least 10 characters.",
   rate_limited: "You've reached today's limit. Try again tomorrow.",
   unavailable: "The service is temporarily unavailable.",
   generation_failed: "Couldn't generate the interpretation. Please try again.",
-  needs_credits: "Not enough credits — top up and try again.",
+  needs_credits: "Not enough credits, top up and try again.",
 };
 
 const EXAMPLES_KA = [
@@ -161,13 +161,13 @@ export function DreamInterpreter({
           <div>
             <h2 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
               {en
-                ? "Tell me your dream — AI interprets it"
-                : "მოუყევი სიზმარი — AI აგიხსნის"}
+                ? "Tell me your dream, AI interprets it"
+                : "მოუყევი სიზმარი, AI აგიხსნის"}
             </h2>
             <p className="mt-0.5 text-[13px] text-muted-foreground">
               {en
                 ? "Personal interpretation, not a dictionary entry"
-                : "პერსონალური ინტერპრეტაცია — არა ლექსიკონის სტატია"}
+                : "პერსონალური ინტერპრეტაცია, არა ლექსიკონის სტატია"}
             </p>
           </div>
         </div>
@@ -286,7 +286,7 @@ export function DreamInterpreter({
                   <span className="font-semibold text-foreground">
                     {s.name}
                   </span>
-                  <span className="text-muted-foreground"> — </span>
+                  <span className="text-muted-foreground">, </span>
                   <span className="text-foreground/85">{s.meaning}</span>
                 </li>
               ))}

@@ -130,7 +130,7 @@ export function MercuryRetrogradePageEn() {
                   className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card/50 px-4 py-3"
                 >
                   <div className="text-[15px] font-medium">
-                    {format(period.startIso)} — {format(period.endIso)}
+                    {format(period.startIso)}, {format(period.endIso)}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {period.startSignEn === period.endSignEn

@@ -20,7 +20,7 @@ export function isEnglish(locale: UserLocale): boolean {
  *
  * Surfaces that have not been translated to Armenian yet ask whether to render
  * their English copy. Written as `locale === "en"` it excludes Armenian, which
- * then falls into the *Georgian* branch — the worst of the three answers for an
+ * then falls into the *Georgian* branch, the worst of the three answers for an
  * Armenian reader. `locale !== "ka"` keeps Georgian for Georgian and gives
  * everyone else English, which is a legible fallback.
  *

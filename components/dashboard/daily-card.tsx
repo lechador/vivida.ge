@@ -49,7 +49,7 @@ const ASPECT_TONE: Record<string, string> = {
 
 /**
  * Daily horoscope hero card. Shown above the chart wheel so it's
- * the first thing returning users see — the engagement loop.
+ * the first thing returning users see, the engagement loop.
  */
 export function DailyCard({
   horoscope,
@@ -70,14 +70,14 @@ export function DailyCard({
   const readSentinelRef = useRef<HTMLParagraphElement>(null);
   const readTrackedRef = useRef(false);
 
-  // Longer body paragraphs (library duplicates already filtered) — rendered
+  // Longer body paragraphs (library duplicates already filtered), rendered
   // inside the expandable details block so the headline + summary stay the
   // first thing on screen.
   const detailParagraphs = horoscope.body
     .split(/\n{2,}/)
     .filter(Boolean)
     // Library-composed bodies reuse the same texts the transit
-    // breakdown below shows verbatim — drop those paragraphs here so
+    // breakdown below shows verbatim, drop those paragraphs here so
     // nothing reads twice. Surfaces without the breakdown (email,
     // mobile) keep the full body.
     .filter((para) => !transits.some((t) => t.body.trim() === para.trim()));
@@ -118,7 +118,7 @@ export function DailyCard({
   }, [horoscope.date, onRead, transits.length]);
 
   // `horoscope.date` is already the user's local date, so it is rendered
-  // verbatim — no timezone shift, and no dependence on the browser shipping
+  // verbatim, no timezone shift, and no dependence on the browser shipping
   // Georgian locale data.
   const date = en
     ? new Intl.DateTimeFormat("en", {

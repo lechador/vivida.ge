@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { lifePathFromDate, type LifePathNumber } from "@/lib/numerology";
 
 /**
- * Life-path calculator for /numerologia — pure client-side math, no signup.
+ * Life-path calculator for /numerologia, pure client-side math, no signup.
  * Result shows the number + archetype and deep-links to the number's page;
  * the natal-chart CTA is the acquisition hook (same funnel pattern as the
  * compatibility calculator).
@@ -42,7 +42,7 @@ export function LifePathCalculator({
       <p className="mt-1.5 text-sm text-muted-foreground">
         {en
           ? "Enter your birth date. No signup required."
-          : "შეიყვანე დაბადების თარიღი — რეგისტრაცია არ სჭირდება."}
+          : "შეიყვანე დაბადების თარიღი, რეგისტრაცია არ სჭირდება."}
       </p>
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -81,7 +81,7 @@ export function LifePathCalculator({
           >
             {en
               ? `Read the full meaning of ${result}`
-              : `სრული აღწერა — რას ნიშნავს ${result}`}
+              : `სრული აღწერა, რას ნიშნავს ${result}`}
             <ArrowRight className="size-4" />
           </Link>
         </div>

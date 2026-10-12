@@ -20,11 +20,11 @@ const COPY = {
   ka: {
     title: "სტატიები ფსიქოლოგიაზე, თვითგანვითარებასა და ასტროლოგიაზე",
     description:
-      "საკითხავი ფსიქოლოგიაზე, ურთიერთობებზე, თვითგანვითარებასა და ასტროლოგიაზე — მარტივად, სიღრმით და პრაქტიკული ხედვით.",
+      "საკითხავი ფსიქოლოგიაზე, ურთიერთობებზე, თვითგანვითარებასა და ასტროლოგიაზე, მარტივად, სიღრმით და პრაქტიკული ხედვით.",
     eyebrow: "Vivida Journal",
     heading: "აზრები უფრო გააზრებული ცხოვრებისთვის",
     intro:
-      "ფსიქოლოგია, ფილოსოფია, ურთიერთობები, თვითგანვითარება და ასტროლოგია — სიღრმით, სიმშვიდით და ყოველდღიურ ცხოვრებაში გამოსაყენებელი ხედვით.",
+      "ფსიქოლოგია, ფილოსოფია, ურთიერთობები, თვითგანვითარება და ასტროლოგია, სიღრმით, სიმშვიდით და ყოველდღიურ ცხოვრებაში გამოსაყენებელი ხედვით.",
     all: "ყველა",
     empty: "ამ კატეგორიაში სტატია მალე გამოჩნდება.",
   },
@@ -35,7 +35,7 @@ const COPY = {
     eyebrow: "Vivida Journal",
     heading: "Ideas for a more examined life",
     intro:
-      "Psychology, philosophy, relationships, self-development and astrology — thoughtful perspectives for everyday life.",
+      "Psychology, philosophy, relationships, self-development and astrology, thoughtful perspectives for everyday life.",
     all: "All",
     empty: "Articles in this category are coming soon.",
   },

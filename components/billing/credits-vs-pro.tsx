@@ -147,18 +147,18 @@ export function CreditsVsPro({
           {context === "natal_report"
             ? en
               ? crypto
-                ? "Pay once with credits for this report, or get 30 days of PRO — unlimited reports, tarot, AI chat, and forecasts."
+                ? "Pay once with credits for this report, or get 30 days of PRO, unlimited reports, tarot, AI chat, and forecasts."
                 : "Pay once with credits for this report, or choose PRO for unlimited reports, tarot, AI chat, and forecasts."
-              : "ამ ანგარიშისთვის გადაიხადე ერთხელ კრედიტებით, ან აირჩიე PRO — ულიმიტო ანგარიშებისთვის, ტაროსთვის, AI ჩატისა და პროგნოზებისთვის."
+              : "ამ ანგარიშისთვის გადაიხადე ერთხელ კრედიტებით, ან აირჩიე PRO, ულიმიტო ანგარიშებისთვის, ტაროსთვის, AI ჩატისა და პროგნოზებისთვის."
             : en
               ? crypto
-                ? "Credits are a one-time purchase. PRO is a one-time 30-day pass — no auto-renewal."
+                ? "Credits are a one-time purchase. PRO is a one-time 30-day pass, no auto-renewal."
                 : discountedPro
                   ? "Credits are a one-time purchase. PRO unlocks everything for 3 months at a discounted price."
                   : "Credits are a one-time purchase. PRO is unlimited monthly access."
               : discountedPro
                 ? "კრედიტები ერთჯერადი შენაძენია, PRO კი ყველაფერს 3 თვით, ფასდაკლებით ხსნის."
-                : "კრედიტები ერთჯერადი შენაძენია, PRO კი — ყოველთვიური ულიმიტო წვდომა."}
+                : "კრედიტები ერთჯერადი შენაძენია, PRO კი, ყოველთვიური ულიმიტო წვდომა."}
         </p>
       </div>
 
@@ -270,7 +270,7 @@ export function CreditsVsPro({
                 ? "Best for frequent readings and questions"
                 : "საუკეთესოა ხშირი კითხვებისა და წაკითხვებისთვის",
               crypto
-                ? "No auto-renewal — buy again anytime"
+                ? "No auto-renewal, buy again anytime"
                 : en
                   ? "Cancel anytime"
                   : "გააუქმე ნებისმიერ დროს",

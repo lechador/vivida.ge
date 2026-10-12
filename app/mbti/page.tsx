@@ -18,9 +18,9 @@ import {
   localizedAlternates,
 } from "@/lib/seo/locales";
 
-const TITLE_KA = "16 პიროვნების ტიპი — MBTI ტიპები ქართულად";
+const TITLE_KA = "16 პიროვნების ტიპი, MBTI ტიპები ქართულად";
 const DESCRIPTION_KA =
-  "16 პიროვნების ტიპის სრული ჩამონათვალი ქართულად (MBTI / 16Personalities). აღწერა, ძლიერი და სუსტი მხარეები, ურთიერთობები და კარიერა — გაიარე უფასო პიროვნების ტესტი.";
+  "16 პიროვნების ტიპის სრული ჩამონათვალი ქართულად (MBTI / 16Personalities). აღწერა, ძლიერი და სუსტი მხარეები, ურთიერთობები და კარიერა, გაიარე უფასო პიროვნების ტესტი.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -57,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
 
-  const title = "16 Personality Types — Explore Every Type";
+  const title = "16 Personality Types, Explore Every Type";
   const description =
     "Explore all 16 MBTI-style personality types, including preferences, strengths, challenges, relationships, careers and practical growth ideas.";
   return {
@@ -158,7 +158,7 @@ export default async function MbtiHubPage() {
         },
         {
           q: "როგორ გავიგო ჩემი ტიპი?",
-          a: "გაიარე უფასო Astro-MBTI ტესტი — 60 კითხვა, დაახლოებით 7 წუთი. მიიღებ შენს ზუსტ ტიპსა და დეტალურ პერსონალურ ანალიზს.",
+          a: "გაიარე უფასო Astro-MBTI ტესტი, 60 კითხვა, დაახლოებით 7 წუთი. მიიღებ შენს ზუსტ ტიპსა და დეტალურ პერსონალურ ანალიზს.",
         },
       ];
 
@@ -182,7 +182,7 @@ export default async function MbtiHubPage() {
         "@type": "ListItem",
         position: i + 1,
         url: `${siteUrl}/mbti/${t.toLowerCase()}`,
-        name: `${t} — ${en ? buildMbtiSeoEn(t).archetype : buildMbtiSeo(t).archetypeKa}`,
+        name: `${t}, ${en ? buildMbtiSeoEn(t).archetype : buildMbtiSeo(t).archetypeKa}`,
       })),
     },
   ];
@@ -217,8 +217,8 @@ export default async function MbtiHubPage() {
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-pretty text-sm text-foreground/80 sm:text-base">
             {en
-              ? "Choose a type to explore its preferences, strengths, relationships and growth—or take the test to discover your own."
-              : "აირჩიე ტიპი და წაიკითხე სრული აღწერა ქართულად — ან გაიარე ტესტი და გაიგე შენი ტიპი."}
+              ? "Choose a type to explore its preferences, strengths, relationships and growth, or take the test to discover your own."
+              : "აირჩიე ტიპი და წაიკითხე სრული აღწერა ქართულად, ან გაიარე ტესტი და გაიგე შენი ტიპი."}
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-5">
             <Link href={en ? "/personality-test" : "/pirovnebis-testi"}>
@@ -251,7 +251,7 @@ export default async function MbtiHubPage() {
                     >
                       <Image
                         src={mbtiCharacterSrc(t)}
-                        alt={`${t} — ${archetype}`}
+                        alt={`${t}, ${archetype}`}
                         width={96}
                         height={96}
                         className="h-20 w-20 object-contain"

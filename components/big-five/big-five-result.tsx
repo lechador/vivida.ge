@@ -131,7 +131,7 @@ export function BigFiveResultClient({
       {/* Profile chart (free) */}
       <BigFiveChart result={result} locale={locale} />
 
-      {/* Per-trait analysis — gated behind login here */}
+      {/* Per-trait analysis, gated behind login here */}
       <div className="relative overflow-hidden rounded-3xl">
         <div
           className={
@@ -150,7 +150,7 @@ export function BigFiveResultClient({
               <p className="mx-auto mt-3 max-w-xs text-pretty text-sm text-foreground/85">
                 {en
                   ? "Create a free account to save your result and read the detailed interpretation of every trait."
-                  : "დარეგისტრირდი უფასოდ და ნახე თითოეული თვისების დეტალური ანალიზი — და შეინახე შედეგი."}
+                  : "დარეგისტრირდი უფასოდ და ნახე თითოეული თვისების დეტალური ანალიზი, და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
                 <Link href="/signup?from=big-five">
@@ -188,7 +188,7 @@ export function BigFiveResultClient({
       <p className="mx-auto max-w-lg text-center text-xs leading-relaxed text-muted-foreground">
         {en
           ? "This is a self-report assessment reflecting how you perceive yourself. It is not a clinical diagnosis."
-          : "ეს არის თვითშეფასების ტესტი — ის ასახავს იმას, თუ როგორ აღიქვამ საკუთარ თავს. ეს არ არის კლინიკური დიაგნოზი."}
+          : "ეს არის თვითშეფასების ტესტი, ის ასახავს იმას, თუ როგორ აღიქვამ საკუთარ თავს. ეს არ არის კლინიკური დიაგნოზი."}
       </p>
     </div>
   );
@@ -208,8 +208,8 @@ function ShareButton({
       ? "https://www.vividaastro.com/big-five"
       : "https://www.vivida.ge/big-five";
     const text = en
-      ? `${headline} — my Big Five profile on Vivida 🧬 What will you get?`
-      : `${headline} — ჩემი Big Five პროფილი Vivida-ზე 🧬 შენ რას მიიღებ?`;
+      ? `${headline}, my Big Five profile on Vivida 🧬 What will you get?`
+      : `${headline}, ჩემი Big Five პროფილი Vivida-ზე 🧬 შენ რას მიიღებ?`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({

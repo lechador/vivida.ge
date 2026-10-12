@@ -13,7 +13,7 @@ import { isInternationalCleanPath } from "@/lib/seo/public-paths";
  * Each entry keeps a Georgian keyword URL intact on vivida.ge while
  * consolidating the same path on the English host onto one canonical English
  * URL. If a new overlapping page is added without an entry here, the English
- * host serves two self-canonicalising copies competing for the same query —
+ * host serves two self-canonicalising copies competing for the same query,
  * exactly what this list exists to prevent.
  *
  * Behavior per entry (EN 308 / GE 200 + Georgian copy) is asserted in

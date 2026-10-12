@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, Download, Loader2, Share2 } from "lucide-react";
 
-// Inline Instagram glyph — the lucide-react version pinned here
+// Inline Instagram glyph, the lucide-react version pinned here
 // (1.14) doesn't ship one. Same 24x24 stroke style as the rest of
 // the icon set so it sits visually with surrounding lucide icons.
 function InstagramIcon({ className }: { className?: string }) {
@@ -50,7 +50,7 @@ import {
  * the OS share sheet (mobile) or a PNG download (desktop).
  *
  * We chose client-side rendering after multiple Vercel-side issues
- * with next/og — bundling, font URLs, and satori hangs — none of
+ * with next/og, bundling, font URLs, and satori hangs, none of
  * which can affect the user's own browser.
  */
 export function SynastryShareButton({
@@ -88,10 +88,10 @@ export function SynastryShareButton({
   // IMPORTANT: deps are `[open]` only. If we add `loadState`, calling
   // setLoadState inside the effect re-runs the cleanup, which flips
   // cancelled=true on the running closure and silently bails after
-  // toBlob — even though the work succeeded.
+  // toBlob, even though the work succeeded.
   useEffect(() => {
     if (!open) return;
-    // Cached from a previous open — keep the existing preview.
+    // Cached from a previous open, keep the existing preview.
     if (loadStateRef.current === "ready") return;
 
     let cancelled = false;
@@ -200,12 +200,12 @@ export function SynastryShareButton({
     if (!blob) return "unsupported";
     const file = new File([blob], fileName, { type: "image/png" });
     const shareData: ShareData = {
-      title: en ? "Vivida — our compatibility" : "Vivida — ჩვენი თავსებადობა",
+      title: en ? "Vivida, our compatibility" : "Vivida, ჩვენი თავსებადობა",
       text: en
-        ? `My compatibility with ${cardProps.partnerName} — ${Math.round(
+        ? `My compatibility with ${cardProps.partnerName}, ${Math.round(
             cardProps.result.overall,
           )}% ✦ vivida.ge`
-        : `${cardProps.partnerName}-სთან ჩემი თავსებადობა — ${Math.round(
+        : `${cardProps.partnerName}-სთან ჩემი თავსებადობა, ${Math.round(
             cardProps.result.overall,
           )}% ✦ vivida.ge`,
       files: [file],
@@ -430,7 +430,7 @@ export function SynastryShareButton({
           <p className="text-center text-[11px] text-muted-foreground">
             {en
               ? "On mobile, Share opens the Instagram/Facebook options. On desktop, it downloads a PNG."
-              : "მობილურზე ღილაკი „გააზიარე“ პირდაპირ აჩვენებს Instagram/Facebook არჩევანს. დესკტოპზე — ჩამოტვირთავს PNG-ს."}
+              : "მობილურზე ღილაკი „გააზიარე“ პირდაპირ აჩვენებს Instagram/Facebook არჩევანს. დესკტოპზე, ჩამოტვირთავს PNG-ს."}
           </p>
         </DialogContent>
       </Dialog>

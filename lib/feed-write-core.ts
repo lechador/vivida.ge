@@ -33,7 +33,7 @@ import { hasVerifiedBadge } from "@/lib/verified-badge";
 import { getBlockedUserIds, isBlockedEitherWay } from "@/lib/block";
 import { filterBlockedCommentThreads } from "@/lib/block-visibility";
 
-/** Identity an edit/delete acts on — id for ownership, email for admin. */
+/** Identity an edit/delete acts on, id for ownership, email for admin. */
 export type FeedActor = { id: string; email: string | null | undefined };
 
 /**
@@ -45,7 +45,7 @@ export type FeedActor = { id: string; email: string | null | undefined };
  * Errors come back as `{ ok: false, error }` with Georgian UI strings.
  */
 
-/** Minimum gap between a user's posts / comments — anti-spam throttles. */
+/** Minimum gap between a user's posts / comments, anti-spam throttles. */
 const POST_THROTTLE_MS = 20_000;
 const COMMENT_THROTTLE_MS = 5_000;
 
@@ -204,7 +204,7 @@ export async function createPostCore(
   if (body.length > POST_BODY_MAX) {
     return {
       ok: false,
-      error: `მაქსიმუმ ${POST_BODY_MAX} სიმბოლო — შენ შეიყვანე ${body.length}.`,
+      error: `მაქსიმუმ ${POST_BODY_MAX} სიმბოლო, შენ შეიყვანე ${body.length}.`,
     };
   }
 
@@ -215,7 +215,7 @@ export async function createPostCore(
     .where(and(eq(posts.userId, userId), sql`${posts.createdAt} > ${cutoff}`))
     .limit(1);
   if (recent) {
-    return { ok: false, error: "ცოტა დაიცადე — წინა პოსტი ახლახან გააგზავნე." };
+    return { ok: false, error: "ცოტა დაიცადე, წინა პოსტი ახლახან გააგზავნე." };
   }
 
   const [inserted] = await db
@@ -259,7 +259,7 @@ export async function createPostCore(
 }
 
 /**
- * Add a comment (or reply) to a post. One-level nesting only — a reply to
+ * Add a comment (or reply) to a post. One-level nesting only, a reply to
  * a reply is rejected.
  */
 export async function addCommentCore(
@@ -276,7 +276,7 @@ export async function addCommentCore(
   if (body.length > COMMENT_BODY_MAX) {
     return {
       ok: false,
-      error: `მაქსიმუმ ${COMMENT_BODY_MAX} სიმბოლო — შენ შეიყვანე ${body.length}.`,
+      error: `მაქსიმუმ ${COMMENT_BODY_MAX} სიმბოლო, შენ შეიყვანე ${body.length}.`,
     };
   }
 
@@ -312,7 +312,7 @@ export async function addCommentCore(
     if (row.parentId) {
       return {
         ok: false,
-        error: "პასუხების პასუხი ჯერ არ შეიძლება — უპასუხე ძირითად კომენტარს.",
+        error: "პასუხების პასუხი ჯერ არ შეიძლება, უპასუხე ძირითად კომენტარს.",
       };
     }
     if (
@@ -335,7 +335,7 @@ export async function addCommentCore(
       ),
     )
     .limit(1);
-  if (recent) return { ok: false, error: "ცოტა დაიცადე — ახლახან დაწერე." };
+  if (recent) return { ok: false, error: "ცოტა დაიცადე, ახლახან დაწერე." };
 
   const [inserted] = await db
     .insert(postComments)
@@ -548,7 +548,7 @@ export async function editPostCore(
   if (body.length > POST_BODY_MAX) {
     return {
       ok: false,
-      error: `მაქსიმუმ ${POST_BODY_MAX} სიმბოლო — შენ შეიყვანე ${body.length}.`,
+      error: `მაქსიმუმ ${POST_BODY_MAX} სიმბოლო, შენ შეიყვანე ${body.length}.`,
     };
   }
 

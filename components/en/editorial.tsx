@@ -2,7 +2,7 @@
  * Editorial primitives for the English site (vividaastro.com).
  *
  * The de-slop system: serif display headlines, hairline kickers instead of
- * pill badges, italic accents instead of gradient-clipped words. EN-only —
+ * pill badges, italic accents instead of gradient-clipped words. EN-only,
  * nothing here is imported by Georgian-host markup.
  */
 
@@ -29,7 +29,7 @@ export function Kicker({
 
 /**
  * Serif italic accent for one or two headline words. Replaces the
- * gradient-clipped span — same emphasis job, none of the AI-template look.
+ * gradient-clipped span, same emphasis job, none of the AI-template look.
  */
 export function Accent({ children }: { children: React.ReactNode }) {
   return (

@@ -1,6 +1,6 @@
 /**
  * Centralized JSON-LD builders. Every public SEO page emits structured
- * data — keeping the shapes in one module means rich-snippet eligibility
+ * data, keeping the shapes in one module means rich-snippet eligibility
  * doesn't drift as new routes are added (daily/weekly/monthly horoscopes,
  * love per sign, moon calendar). Each builder returns a plain object;
  * the caller serializes it into a <script type="application/ld+json">.
@@ -44,7 +44,7 @@ export type JsonLd = Record<string, unknown>;
 export interface ArticleInput {
   /** Page URL, absolute. */
   url: string;
-  /** Plain string for <h1>/search results — NOT html. */
+  /** Plain string for <h1>/search results, NOT html. */
   headline: string;
   description: string;
   /** Actual publication date in ISO 8601, when known. */
@@ -53,7 +53,7 @@ export interface ArticleInput {
   dateModified?: string;
   /** Optional related entity (Thing/Person/Place). */
   about?: JsonLd;
-  /** Optional image URL — pulls the per-page OG card if you have one. */
+  /** Optional image URL, pulls the per-page OG card if you have one. */
   image?: string;
 }
 
@@ -82,7 +82,7 @@ export interface BreadcrumbItem {
 }
 
 /**
- * BreadcrumbList — Google uses this to render the URL line in SERP as a
+ * BreadcrumbList, Google uses this to render the URL line in SERP as a
  * breadcrumb trail instead of the raw path. Always include the canonical
  * root so the trail is rooted, even on shallow pages.
  */
@@ -131,7 +131,7 @@ export function websiteLd(): JsonLd {
 /**
  * Renders a `<script type="application/ld+json">` payload. Returns the
  * raw string the page should set via dangerouslySetInnerHTML. Multiple
- * blocks per page are fine — bundle one per @type so Google can parse
+ * blocks per page are fine, bundle one per @type so Google can parse
  * each independently.
  */
 export function serializeLd(ld: JsonLd | JsonLd[]): string {

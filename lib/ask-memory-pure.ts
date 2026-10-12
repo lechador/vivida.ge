@@ -2,7 +2,7 @@ import type { AskUserMemory, AskUserMemoryTraits } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Pure helpers for ask long-term memory — no DB imports, so unit tests can
+ * Pure helpers for ask long-term memory, no DB imports, so unit tests can
  * load this module without DATABASE_URL. DB access lives in `ask-memory.ts`.
  */
 
@@ -11,7 +11,7 @@ export const MAX_SUMMARY_CHARS = 1500;
 export type MergedMemory = { summary: string; traits: AskUserMemoryTraits };
 
 /**
- * Deterministic style signal from the user's own messages — no AI needed.
+ * Deterministic style signal from the user's own messages, no AI needed.
  * Avg user-turn length decides verbosity; the prompt mirrors it.
  */
 export function inferVerbosity(
@@ -62,11 +62,11 @@ export function buildMemoryBlock(
   const body = [...parts, traitsLine].filter(Boolean).join("\n");
   if (!body) return "";
   return locale === "en"
-    ? `What you remember about this person (from earlier conversations — refer back to it naturally, never recite it verbatim):\n${body}`
-    : `რას გახსოვს ამ ადამიანზე (წინა საუბრებიდან — გამოიყენე ბუნებრივად, ნუ ჩამოთვლი სიტყვა-სიტყვით):\n${body}`;
+    ? `What you remember about this person (from earlier conversations, refer back to it naturally, never recite it verbatim):\n${body}`
+    : `რას გახსოვს ამ ადამიანზე (წინა საუბრებიდან, გამოიყენე ბუნებრივად, ნუ ჩამოთვლი სიტყვა-სიტყვით):\n${body}`;
 }
 
-/** Guard the LLM merge output before persisting — junk in, junk out otherwise. */
+/** Guard the LLM merge output before persisting, junk in, junk out otherwise. */
 export function sanitizeMergedMemory(raw: unknown): MergedMemory | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
@@ -111,7 +111,7 @@ export function normalizeAskDepth(value: unknown): AskDepth {
   return value === "short" || value === "detailed" ? value : "auto";
 }
 
-/** Token budget per depth — short stays cheap, detailed may use the full 4 paragraphs. */
+/** Token budget per depth, short stays cheap, detailed may use the full 4 paragraphs. */
 export const ASK_DEPTH_TOKENS: Record<AskDepth, number> = {
   auto: 900,
   short: 450,
@@ -231,8 +231,8 @@ export function distressInstruction(
   }
   if (level === "support") {
     return locale === "en"
-      ? "The person's message sounds heavy or vulnerable. Start with one warm validating sentence before any astrology. Keep the answer shorter than usual and gentle — no pep-talk clichés."
-      : "ადამიანის შეტყობინება მძიმე ან მოწყვლადია. ასტროლოგიამდე დაიწყე ერთი თბილი, დამადასტურებელი წინადადებით. პასუხი ჩვეულებრივზე მოკლე და ნაზი — გამამხნევებელი კლიშეების გარეშე.";
+      ? "The person's message sounds heavy or vulnerable. Start with one warm validating sentence before any astrology. Keep the answer shorter than usual and gentle, no pep-talk clichés."
+      : "ადამიანის შეტყობინება მძიმე ან მოწყვლადია. ასტროლოგიამდე დაიწყე ერთი თბილი, დამადასტურებელი წინადადებით. პასუხი ჩვეულებრივზე მოკლე და ნაზი, გამამხნევებელი კლიშეების გარეშე.";
   }
   return "";
 }

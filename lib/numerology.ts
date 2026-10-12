@@ -1,9 +1,9 @@
 /**
- * Life-path numerology math for the /numerologia SEO cluster. Pure functions —
+ * Life-path numerology math for the /numerologia SEO cluster. Pure functions,
  * shared by the client calculator and the server pages.
  *
  * Method (classic Pythagorean): sum all digits of the birth date (DDMMYYYY),
- * then repeatedly reduce by digit-summing until a single digit — unless the
+ * then repeatedly reduce by digit-summing until a single digit, unless the
  * intermediate total is a master number (11, 22, 33), which stays unreduced.
  */
 
@@ -45,7 +45,7 @@ export function reduceToLifePath(total: number): number {
 
 /**
  * Life path from a birth date. Reduces day, month, and year separately first
- * (the standard method — it preserves master numbers arising from components),
+ * (the standard method, it preserves master numbers arising from components),
  * then reduces their sum.
  */
 export function lifePathFromDate(

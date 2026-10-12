@@ -27,7 +27,7 @@ export const LOW_CREDIT_OFFER_THRESHOLD = 4;
 
 /**
  * Offer closes at midnight Tbilisi on 1 September 2026 (UTC+4). The deadline
- * is a constant rather than a column because it is the same for everyone —
+ * is a constant rather than a column because it is the same for everyone,
  * and because a lapsed offer must stop selling on its own, without anyone
  * remembering to archive the Stripe price.
  */
@@ -71,7 +71,7 @@ export async function getLowCreditOffer(
         eq(emailCampaignRecipients.userId, userId),
         // Sent, not merely addressed. A recipient row is written before the
         // send is attempted, and dispatch skips anyone who topped up in the
-        // meantime — without this, those skipped users would be shown an offer
+        // meantime, without this, those skipped users would be shown an offer
         // they were never told about.
         isNotNull(emailCampaignRecipients.sentAt),
       ),
@@ -84,7 +84,7 @@ export async function getLowCreditOffer(
   if (normalizeCountryCode(row.countryCode) !== LOW_CREDIT_PROMO_PLAN.countryCode) {
     return null;
   }
-  // Already paying — the same guard /api/subscription/checkout applies, so a
+  // Already paying, the same guard /api/subscription/checkout applies, so a
   // subscriber can't stack a second subscription on top of their current one.
   if (row.isPremium && row.premiumUntil && row.premiumUntil.getTime() > now) {
     return null;

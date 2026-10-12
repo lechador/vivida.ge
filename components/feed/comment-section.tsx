@@ -46,7 +46,7 @@ export function CommentSection({
   /** Whether the viewer is in the admin allow-list. */
   viewerIsAdmin: boolean;
   postAuthorId: string;
-  /** Controlled open state — parent decides when the panel renders.
+  /** Controlled open state, parent decides when the panel renders.
    *  Rendering returns null when `false`. */
   open: boolean;
   locale?: UserLocale;
@@ -258,8 +258,8 @@ export function CommentSection({
         {comments && comments.length === 0 && !loading && (
           <p className="px-1 text-xs text-muted-foreground/80">
             {en
-              ? "No comments yet—start the conversation."
-              : "ჯერ კომენტარი არ არის — დაიწყე საუბარი."}
+              ? "No comments yet, start the conversation."
+              : "ჯერ კომენტარი არ არის, დაიწყე საუბარი."}
           </p>
         )}
 
@@ -317,7 +317,7 @@ export function CommentSection({
   );
 }
 
-/** Single comment row — used for both top-level entries and their
+/** Single comment row, used for both top-level entries and their
  *  replies. Reply variant gets a tiny CornerDownRight glyph and a
  *  smaller avatar so the eye sees "this is nested" before reading. */
 function CommentRow({
@@ -405,7 +405,7 @@ function CommentRow({
           </p>
         </div>
 
-        {/* Sub-actions row — reply + delete. Sits below the body
+        {/* Sub-actions row, reply + delete. Sits below the body
             bubble so the bubble itself stays compact. */}
         {(!isReply || canDelete) && (
           <div className="mt-1 flex items-center gap-3 pl-2 text-[11px] text-muted-foreground/80">

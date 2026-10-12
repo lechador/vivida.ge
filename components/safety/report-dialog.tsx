@@ -16,7 +16,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Controlled report dialog with an optional free-text reason. Reusable across
- * profiles, feed posts, and chat threads — the trigger lives in the parent
+ * profiles, feed posts, and chat threads, the trigger lives in the parent
  * (a menu item or button) and just flips `open`.
  */
 export function ReportDialog({
@@ -66,8 +66,8 @@ export function ReportDialog({
           <DialogTitle>
             {done
               ? en
-                ? "Thank you—your report was received"
-                : "მადლობა — საჩივარი მიღებულია"
+                ? "Thank you, your report was received"
+                : "მადლობა, საჩივარი მიღებულია"
               : en
                 ? "Submit a report"
                 : "საჩივრის გაგზავნა"}

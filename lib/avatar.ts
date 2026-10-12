@@ -1,6 +1,6 @@
 /**
  * Default profile picture for users who haven't set one. A Vivida-style
- * cosmic star emblem — deliberately not a face or figure, so it reads as
+ * cosmic star emblem, deliberately not a face or figure, so it reads as
  * neutral for everyone. Served as a static asset (one cached request no
  * matter how many photo-less users are on screen).
  *

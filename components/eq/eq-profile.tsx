@@ -12,7 +12,7 @@ import { EqRadar } from "@/components/eq/eq-radar";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * The deep EQ profile — the radar, a strength/growth pair, and a card per
+ * The deep EQ profile, the radar, a strength/growth pair, and a card per
  * domain (score, band, interpretation, a concrete practice). Pure/server-safe
  * so it renders on the saved page and (blurred) on the anonymous teaser.
  */

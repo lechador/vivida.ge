@@ -39,7 +39,7 @@ describe("phoneGiftPopupEligible", () => {
     expect(phoneGiftPopupEligible(viewer)).toBe(true);
   });
 
-  it("hides for PRO accounts — the credit gift is noise for them", () => {
+  it("hides for PRO accounts, the credit gift is noise for them", () => {
     expect(phoneGiftPopupEligible({ ...viewer, isPremium: true })).toBe(false);
   });
 
@@ -53,7 +53,7 @@ describe("phoneGiftPopupEligible", () => {
     expect(phoneGiftPopupEligible({ ...viewer, restricted: true })).toBe(false);
   });
 
-  it("stays hidden after dismissal — the popup is strictly one-time", () => {
+  it("stays hidden after dismissal, the popup is strictly one-time", () => {
     expect(phoneGiftPopupEligible({ ...viewer, popupDismissed: true })).toBe(
       false,
     );
@@ -61,7 +61,7 @@ describe("phoneGiftPopupEligible", () => {
 });
 
 describe("phoneGiftCardEligible", () => {
-  it("survives the popup dismissal — the offer stays on the credits page", () => {
+  it("survives the popup dismissal, the offer stays on the credits page", () => {
     expect(
       phoneGiftCardEligible({
         hasVerifiedPhone: false,

@@ -9,7 +9,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 type LinkProps = Omit<ComponentProps<typeof Link>, "href" | "onClick">;
 
 /**
- * W04 nav funnel — a Next Link that fires nav_item_selected (contract v1:
+ * W04 nav funnel, a Next Link that fires nav_item_selected (contract v1:
  * platform/feature/surface/locale + item key) before navigating. Keeps
  * working when gtag is blocked; analytics must never break navigation.
  */

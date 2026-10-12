@@ -4,24 +4,26 @@ import type { MbtiSection } from "@/lib/mbti-library";
 
 type Item = { title: string; body: string };
 
-const STRONG = "#34d399"; // emerald — strengths
-const WEAK = "#fbbf24"; // amber — weaknesses / challenges
+const STRONG = "#34d399"; // emerald, strengths
+const WEAK = "#fbbf24"; // amber, weaknesses / challenges
 
-/** Parse a "**Title** — body" line into its parts (body optional). */
+/** Parse a "**Title**, body" line into its parts (body optional). */
 function parseListItem(line: string): Item | null {
-  // Strip leading bullets/numbering/space, but NOT "*" — the "**bold**" markers
+  // Strip leading bullets/numbering/space, but NOT "*", the "**bold**" markers
   // are how we detect the item title.
   const trimmed = line.replace(/^[\s•–—]*(?:\d+[.)]\s*)?[\s-]*/, "").trim();
   if (!trimmed) return null;
-  const m = trimmed.match(/^\*\*(.+?)\*\*\s*[—:–-]?\s*(.*)$/);
+  // The em dash stays in the separator classes below so rows seeded before the
+  // comma migration still parse.
+  const m = trimmed.match(/^\*\*(.+?)\*\*\s*[,—:–-]?\s*(.*)$/);
   if (m) return { title: m[1].trim(), body: m[2].trim() };
-  // No bold markers — fall back to first "—"/":" as the split point.
-  const split = trimmed.match(/^(.+?)\s*[—:–-]\s+(.*)$/);
+  // No bold markers, fall back to the first separator in the class below.
+  const split = trimmed.match(/^(.+?)\s*[,—:–-]\s+(.*)$/);
   if (split) return { title: split[1].trim(), body: split[2].trim() };
   return { title: trimmed, body: "" };
 }
 
-/** Bold-titled lines only — drops any preamble/outro or section-label lines. */
+/** Bold-titled lines only, drops any preamble/outro or section-label lines. */
 function parseItems(block: string): Item[] {
   return block
     .split(/\n+/)
@@ -116,7 +118,7 @@ function DualSection({ section }: { section: MbtiSection }) {
 /**
  * The 16Personalities-style rich profile: whole-type strengths/weaknesses as
  * two lists, then a collapsible section per life-domain (relationships, career,
- * growth, …) — each showing both its strengths and its challenges. All
+ * growth, …), each showing both its strengths and its challenges. All
  * pre-written per type. Renders nothing if the library hasn't been seeded yet.
  */
 export function MbtiProfileSections({ sections }: { sections: MbtiSection[] }) {

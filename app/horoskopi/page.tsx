@@ -35,14 +35,14 @@ const SITE_URL = "https://www.vivida.ge";
  */
 export const revalidate = 3600;
 
-const TITLE = "ჰოროსკოპი — დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის";
+const TITLE = "ჰოროსკოპი, დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის";
 const DESCRIPTION =
-  "დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის — ვერძი, კურო, ტყუპები, კირჩხიბი, ლომი, ქალწული, სასწორი, მორიელი, მშვილდოსანი, თხის რქა, მერწყული, თევზები. დღევანდელი, ხვალინდელი, კვირისა და თვის ჰოროსკოპი რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.";
+  "დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის, ვერძი, კურო, ტყუპები, კირჩხიბი, ლომი, ქალწული, სასწორი, მორიელი, მშვილდოსანი, თხის რქა, მერწყული, თევზები. დღევანდელი, ხვალინდელი, კვირისა და თვის ჰოროსკოპი რეალურ ტრანზიტებზე დაყრდნობით, ქართულად.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale === "en";
-  const title = en ? "Daily Horoscope Today — All Zodiac Signs" : TITLE;
+  const title = en ? "Daily Horoscope Today, All Zodiac Signs" : TITLE;
   const description = en
     ? "Read today's horoscope for every zodiac sign, with practical guidance based on the current sky. Explore daily, weekly, and monthly astrology forecasts."
     : DESCRIPTION;
@@ -79,7 +79,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // Same-path pair: this daily hub exists in both languages at /horoskopi,
     // exactly like its /kvireuli and /tviuri siblings. (It used to pass
     // "/en/horoscope" as the paired path, which on the English branch emitted
-    // ka-GE -> vivida.ge/en/horoscope — an internal English path, on the
+    // ka-GE -> vivida.ge/en/horoscope, an internal English path, on the
     // Georgian domain, that only 301s back here.)
     alternates: localizedAlternates(
       "/horoskopi",
@@ -108,19 +108,19 @@ export async function generateMetadata(): Promise<Metadata> {
 const FAQ = [
   {
     q: "როგორ დგება დღის ჰოროსკოპი?",
-    a: "Vivida-ს დღის ჰოროსკოპი რეალურ ასტრონომიულ ტრანზიტებზე დგება — ვანგარიშობთ პლანეტების ზუსტ მდებარეობას (მთვარე, მზე, მერკური, ვენერა, მარსი და სხვები) და დღის მთავარ ასპექტებს, შემდეგ კი თითოეული ზოდიაქოს ნიშნისთვის ვწერთ კონკრეტულ, პრაქტიკულ რჩევას ქართულად.",
+    a: "Vivida-ს დღის ჰოროსკოპი რეალურ ასტრონომიულ ტრანზიტებზე დგება, ვანგარიშობთ პლანეტების ზუსტ მდებარეობას (მთვარე, მზე, მერკური, ვენერა, მარსი და სხვები) და დღის მთავარ ასპექტებს, შემდეგ კი თითოეული ზოდიაქოს ნიშნისთვის ვწერთ კონკრეტულ, პრაქტიკულ რჩევას ქართულად.",
   },
   {
     q: "სად ვნახო ხვალინდელი ჰოროსკოპი?",
-    a: "თითოეული ნიშნის გვერდზე დღევანდელთან ერთად ხვალინდელი ჰოროსკოპიც გელოდება — აირჩიე შენი ნიშანი ქვემოთ და გადაერთე „ხვალ“-ზე.",
+    a: "თითოეული ნიშნის გვერდზე დღევანდელთან ერთად ხვალინდელი ჰოროსკოპიც გელოდება, აირჩიე შენი ნიშანი ქვემოთ და გადაერთე „ხვალ“-ზე.",
   },
   {
     q: "რით განსხვავდება კვირის და თვის ჰოროსკოპი დღიურისგან?",
-    a: "დღის ჰოროსკოპი სწრაფ ფონს ჰყვება (განსაკუთრებით მთვარის მოძრაობას), კვირის ჰოროსკოპი უფრო დიდ ტალღებს, თვის ჰოროსკოპი კი თვის მთავარ ციკლებს — ახალმთვარეობას, სავსემთვარეობას და ნელი პლანეტების გადასვლებს.",
+    a: "დღის ჰოროსკოპი სწრაფ ფონს ჰყვება (განსაკუთრებით მთვარის მოძრაობას), კვირის ჰოროსკოპი უფრო დიდ ტალღებს, თვის ჰოროსკოპი კი თვის მთავარ ციკლებს, ახალმთვარეობას, სავსემთვარეობას და ნელი პლანეტების გადასვლებს.",
   },
   {
     q: "ჰოროსკოპი უფასოა?",
-    a: "დიახ — დღის, კვირისა და თვის ჰოროსკოპი ყველა ნიშნისთვის სრულიად უფასოა. პერსონალური, შენს დაბადების მონაცემებზე მორგებული ჰოროსკოპისთვის კი შექმენი უფასო ნატალური რუკა Vivida-ზე.",
+    a: "დიახ, დღის, კვირისა და თვის ჰოროსკოპი ყველა ნიშნისთვის სრულიად უფასოა. პერსონალური, შენს დაბადების მონაცემებზე მორგებული ჰოროსკოპისთვის კი შექმენი უფასო ნატალური რუკა Vivida-ზე.",
   },
 ];
 
@@ -200,7 +200,7 @@ export default async function HoroskopiHubPage() {
             </span>
           </h1>
           <p className="mt-4 text-pretty text-base text-foreground/85 sm:text-lg">
-            ცის დღევანდელი ფონი ყველა 12 ნიშნისთვის — კონკრეტული, ცოცხალი ენით,
+            ცის დღევანდელი ფონი ყველა 12 ნიშნისთვის, კონკრეტული, ცოცხალი ენით,
             ქართულად. დააჭირე ნიშანს სრული ჰოროსკოპის სანახავად.
           </p>
         </header>
@@ -289,7 +289,7 @@ export default async function HoroskopiHubPage() {
             const accent = meta ? signColor(meta) : "var(--vivida-violet)";
             const dates = ZODIAC_DATES[slug];
             const summary =
-              row?.summary ?? "ჰოროსკოპი მზადდება — სცადე ცოტა ხანში.";
+              row?.summary ?? "ჰოროსკოპი მზადდება, სცადე ცოტა ხანში.";
 
             return (
               <Link
@@ -343,16 +343,16 @@ export default async function HoroskopiHubPage() {
           })}
         </div>
 
-        {/* Today's real sky — the transits this horoscope is built on. */}
+        {/* Today's real sky, the transits this horoscope is built on. */}
         <MundaneSkySection date={now} />
 
-        {/* Per-sign quick links — daily + tomorrow, keyword-rich anchors. */}
+        {/* Per-sign quick links, daily + tomorrow, keyword-rich anchors. */}
         <section className="mt-12">
           <h2 className="text-xl font-semibold tracking-tight">
             ჰოროსკოპი ზოდიაქოს ნიშნების მიხედვით
           </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            აირჩიე შენი ნიშანი — დღევანდელი და ხვალინდელი ჰოროსკოპი ცალ-ცალკე
+            აირჩიე შენი ნიშანი, დღევანდელი და ხვალინდელი ჰოროსკოპი ცალ-ცალკე
             გვერდებზე.
           </p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -413,7 +413,7 @@ export default async function HoroskopiHubPage() {
             მზის ნიშანი მცირე ნაწილია
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ნამდვილი ჰოროსკოპი მთლიან ნატალურ რუკას უყურებს — მთვარე, ვენერა,
+            ნამდვილი ჰოროსკოპი მთლიან ნატალურ რუკას უყურებს, მთვარე, ვენერა,
             მარსი, ცის 12 სახლი. Vivida უფასოდ ანგარიშობს ყველაფერს.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">

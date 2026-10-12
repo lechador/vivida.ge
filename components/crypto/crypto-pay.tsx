@@ -50,7 +50,7 @@ import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
  * One Privy provider + one payment dialog per page: every "Pay by card"
  * button opens the shared dialog through context. The buyer pays by
  * card/Apple Pay/Google Pay in Privy's fund modal with destination.wallet
- * set to the platform wallet — USDC lands in OUR wallet and the buyer never
+ * set to the platform wallet, USDC lands in OUR wallet and the buyer never
  * touches crypto. The server matches the transfer by time window + amount
  * once the fund flow reports submitted/confirmed, then grants exactly once.
  */
@@ -71,7 +71,7 @@ const RPC_WS_URL = RPC_URL.replace(/^https:\/\//, "wss://").replace(
  */
 const ONRAMP_SANDBOX = process.env.NEXT_PUBLIC_PRIVY_ONRAMP_SANDBOX === "1";
 
-/** Shared Privy client config — one identity for the credits dialog and the readings card panel. */
+/** Shared Privy client config, one identity for the credits dialog and the readings card panel. */
 function privySolanaConfig(): NonNullable<
   React.ComponentProps<typeof PrivyProvider>["config"]
 > {
@@ -97,7 +97,7 @@ function privySolanaConfig(): NonNullable<
 
 type PrivyWalletEntry = ReturnType<typeof useWallets>["wallets"][number];
 
-/** The buyer's embedded (Privy) wallet — where card on-ramp funds land. */
+/** The buyer's embedded (Privy) wallet, where card on-ramp funds land. */
 function pickEmbeddedWallet(
   wallets: PrivyWalletEntry[],
 ): PrivyWalletEntry | null {
@@ -158,7 +158,7 @@ function useUsdcTransfer() {
             ],
           }
         : transfer;
-      // The receiving wallet's USDC token account may not exist yet — the
+      // The receiving wallet's USDC token account may not exist yet, the
       // first payment creates it (idempotent; a no-op afterwards).
       const createAta =
         await getCreateAssociatedTokenIdempotentInstructionAsync({
@@ -489,7 +489,7 @@ function PayDialogBody({
           setPhase("expired");
         }
       } catch {
-        // Keep polling — transient network failures resolve.
+        // Keep polling, transient network failures resolve.
       }
     };
     const timer = setInterval(tick, 4000);
@@ -508,8 +508,8 @@ function PayDialogBody({
   /**
    * Card-direct payment: Privy's fund modal with destination.wallet set to
    * the platform wallet, so USDC lands in OUR wallet and the buyer never
-   * touches crypto. The modal returns no transaction proof — only
-   * submitted/confirmed — so we notify the server, which window-scans for
+   * touches crypto. The modal returns no transaction proof, only
+   * submitted/confirmed, so we notify the server, which window-scans for
    * the incoming transfer while the existing poll watches for confirmation.
    */
   const payByCard = async () => {
@@ -534,7 +534,7 @@ function PayDialogBody({
           defaultAmount: (purchase.amountUsdcCents / 100).toFixed(2),
           // Prefer Stripe's embedded onramp (stays in-app for cards, Apple
           // Pay, Google Pay). Falls back to other providers when Stripe has
-          // no quote — e.g. MoonPay, which completes on their own site.
+          // no quote, e.g. MoonPay, which completes on their own site.
           preferredProvider: "stripe",
           ...(ONRAMP_SANDBOX ? { environment: "sandbox" as const } : {}),
         },
@@ -571,10 +571,10 @@ function PayDialogBody({
         },
         `${purchase.id}:add_payment_info`,
       );
-      // Fund flow confirmed — advance to step 2 (exact transfer) while the
+      // Fund flow confirmed, advance to step 2 (exact transfer) while the
       // status poll keeps watching as a fallback.
       setFunded(true);
-      // Stay in awaiting — the status poll detects the on-chain arrival.
+      // Stay in awaiting, the status poll detects the on-chain arrival.
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       console.error("[crypto/card] depositFunds failed:", message);
@@ -596,7 +596,7 @@ function PayDialogBody({
    * Step 2: send the exact USDC transfer from the funded embedded wallet to
    * the platform wallet, carrying the purchase reference so the server
    * matches it exactly (no window guessing). Amount is the pack price when
-   * the balance covers it, otherwise the full balance — the tolerance floor
+   * the balance covers it, otherwise the full balance, the tolerance floor
    * still confirms it when the on-ramp spread is small. Below the floor we
    * refuse to send dust that could never credit; funds stay in the buyer's
    * wallet.
@@ -630,7 +630,7 @@ function PayDialogBody({
         const have = (Number(balance) / 1_000_000).toFixed(2);
         const need = (Number(price) / 1_000_000).toFixed(2);
         setCompleteError(
-          `Only ${have} USDC arrived (about ${need} needed). Contact support — your funds stayed in your wallet.`,
+          `Only ${have} USDC arrived (about ${need} needed). Contact support, your funds stayed in your wallet.`,
         );
         return;
       }
@@ -657,7 +657,7 @@ function PayDialogBody({
         return;
       }
       if (res.status === 202 || res.status === 503) {
-        // Sent, not indexed yet (or RPC busy) — fall back to polling, which
+        // Sent, not indexed yet (or RPC busy), fall back to polling, which
         // matches by reference or window.
         setPhase("awaiting");
         return;
@@ -711,7 +711,7 @@ function PayDialogBody({
       {phase === "already_premium" && (
         <div className="space-y-4 py-2">
           <p className="text-sm text-foreground/80">
-            You already have an active PRO subscription — manage it from your
+            You already have an active PRO subscription, manage it from your
             subscription page.
           </p>
           <Button asChild variant="mystic" className="w-full">
@@ -724,7 +724,7 @@ function PayDialogBody({
         <div className="space-y-4 py-2">
           <p className="text-sm text-foreground/80">
             This payment window expired before we saw a payment. No charge was
-            made — start a new one when you&apos;re ready.
+            made, start a new one when you&apos;re ready.
           </p>
           <Button variant="mystic" className="w-full" onClick={onClose}>
             Start a new payment
@@ -747,7 +747,7 @@ function PayDialogBody({
                 Card payment
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Pay with your card — Apple Pay and Google Pay supported where
+                Pay with your card, Apple Pay and Google Pay supported where
                 available. The crypto is handled for you; you never touch a
                 wallet.
               </p>
@@ -776,7 +776,7 @@ function PayDialogBody({
                 Complete payment
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Your card payment arrived. Send it to activate — one tap, no
+                Your card payment arrived. Send it to activate, one tap, no
                 addresses to copy.
               </p>
               <Button
@@ -801,7 +801,7 @@ function PayDialogBody({
           {authenticated && funded && ONRAMP_SANDBOX && (
             <div className="rounded-2xl border border-border bg-background/40 p-3.5">
               <p className="text-xs text-muted-foreground">
-                Sandbox mode — the card flow is verified end to end and no real
+                Sandbox mode, the card flow is verified end to end and no real
                 funds move. Unset NEXT_PUBLIC_PRIVY_ONRAMP_SANDBOX to take live
                 payments.
               </p>
@@ -884,7 +884,7 @@ function PayDialogBody({
 
 /**
  * Card payment for an Insight Bazaar booking. The buyer funds their embedded
- * wallet by card, then one tap sends the exact USDC to the reader's wallet —
+ * wallet by card, then one tap sends the exact USDC to the reader's wallet,
  * the signature goes to the caller, which submits it to the booking's
  * verify-payment endpoint (same on-chain checks as the manual wallet flow).
  * Self-contained: mounts its own Privy provider so the readings page needs
@@ -999,7 +999,7 @@ function BookingCardPanel({
     setError(null);
     try {
       // The reader must receive the full price, so only send when the funded
-      // balance covers it — a short transfer would fail on-chain
+      // balance covers it, a short transfer would fail on-chain
       // verification and strand the money in the buyer's wallet.
       const rpc = createSolanaRpc(RPC_URL);
       const [fromAta] = await findAssociatedTokenPda({
@@ -1018,7 +1018,7 @@ function BookingCardPanel({
       if (balance < price) {
         const have = (Number(balance) / 1_000_000).toFixed(2);
         setError(
-          `Only ${have} USDC arrived (${priceLabel} needed). Add more funds — nothing was sent, your USDC is still in your wallet.`,
+          `Only ${have} USDC arrived (${priceLabel} needed). Add more funds, nothing was sent, your USDC is still in your wallet.`,
         );
         setStage("funded");
         return;
@@ -1050,7 +1050,7 @@ function BookingCardPanel({
       {!authenticated ? (
         <>
           <p className="mt-2 text-xs text-muted-foreground">
-            Pay with your card — Apple Pay and Google Pay supported where
+            Pay with your card, Apple Pay and Google Pay supported where
             available. The crypto is handled for you; your reader is paid
             straight from your card purchase.
           </p>
@@ -1066,9 +1066,8 @@ function BookingCardPanel({
       ) : stage === "idle" || stage === "funding" ? (
         <>
           <p className="mt-2 text-xs text-muted-foreground">
-            Pay {fundLabel} by card — the {priceLabel} reading price plus a
-            small buffer for card processing. Any leftover USDC stays in your
-            wallet.
+            Pay {fundLabel} by card, the {priceLabel} reading price plus a small
+            buffer for card processing. Any leftover USDC stays in your wallet.
           </p>
           <Button
             variant="mystic"
@@ -1087,17 +1086,17 @@ function BookingCardPanel({
         </>
       ) : stage === "sent" ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Payment sent — verifying on Solana…
+          Payment sent, verifying on Solana…
         </p>
       ) : ONRAMP_SANDBOX ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Sandbox mode — the card flow is verified end to end and no real funds
+          Sandbox mode, the card flow is verified end to end and no real funds
           move. Unset NEXT_PUBLIC_PRIVY_ONRAMP_SANDBOX to take live payments.
         </p>
       ) : (
         <>
           <p className="mt-2 text-xs text-muted-foreground">
-            Your card payment arrived. Send {priceLabel} USDC to your reader —
+            Your card payment arrived. Send {priceLabel} USDC to your reader,
             one tap, no addresses to copy.
           </p>
           <Button

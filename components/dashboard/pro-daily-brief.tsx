@@ -58,7 +58,7 @@ function oneLiner(body: string, limit = 150): string {
 }
 
 /**
- * The PRO daily layer — the first card on the dashboard. Everything is
+ * The PRO daily layer, the first card on the dashboard. Everything is
  * composed from data the dashboard already loads (today's overlaid
  * transits) plus static copy: zero AI calls, zero extra queries.
  *
@@ -155,7 +155,7 @@ export function ProDailyBrief({
         <ScoreRing score={score} />
       </header>
 
-      {/* Day score — visible to everyone, the tease for non-PRO. */}
+      {/* Day score, visible to everyone, the tease for non-PRO. */}
       <div className="relative mt-4">
         <div className="h-2 overflow-hidden rounded-full bg-foreground/10">
           <div
@@ -327,7 +327,7 @@ export function ProDailyBrief({
   );
 }
 
-/** Gradient score ring — the card's visual anchor. Animates in on mount. */
+/** Gradient score ring, the card's visual anchor. Animates in on mount. */
 function ScoreRing({ score }: { score: number }) {
   const [on, setOn] = useState(false);
   useEffect(() => {

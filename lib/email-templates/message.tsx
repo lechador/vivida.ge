@@ -9,7 +9,7 @@ import {
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Notification email — fired only when the recipient has been absent
+ * Notification email, fired only when the recipient has been absent
  * from the site for >1h, throttled to one per hour. We include a short
  * snippet of the message body for context but keep it brief; the full
  * conversation is one click away.
@@ -26,7 +26,7 @@ export function MessageEmail({
   recipientName: string | null;
   fromName: string;
   fromUsername: string | null;
-  /** Short preview of the message body — already truncated by the caller. */
+  /** Short preview of the message body, already truncated by the caller. */
   snippet: string;
   conversationUrl: string;
   unsubscribeUrl: string;

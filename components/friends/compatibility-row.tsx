@@ -114,7 +114,7 @@ export function CompatibilityRow({
             <p className="mt-1 truncate text-xs text-muted-foreground">
               {en
                 ? "Natal chart not available yet"
-                : "ცის რუკა ჯერ არ აქვს — დაიცადე, სანამ შეავსებს"}
+                : "ცის რუკა ჯერ არ აქვს, დაიცადე, სანამ შეავსებს"}
             </p>
           )}
         </div>

@@ -10,7 +10,7 @@ import { signByIndex } from "@/lib/zodiac";
 import { slugByLabelKa } from "@/lib/seo/zodiac-content";
 
 /**
- * Anonymous "daily horoscope by email" leads — a lower-friction return hook
+ * Anonymous "daily horoscope by email" leads, a lower-friction return hook
  * captured from the free natal calculator. This owns a lean parallel to the
  * registered-user daily blast (lib/email-marketing.ts): same Resend transport
  * and throttle, but keyed on an email + sun sign instead of a user account,
@@ -112,11 +112,11 @@ async function sendToLead(
   const signupUrl = absUrl("/signup");
 
   const heading = opts?.welcome
-    ? `🌙 გამოწერა დადასტურდა — ${sign.labelKa}`
-    : `${sign.symbol} ${sign.labelKa} — ${row.headline}`;
+    ? `🌙 გამოწერა დადასტურდა, ${sign.labelKa}`
+    : `${sign.symbol} ${sign.labelKa}, ${row.headline}`;
 
   const body = opts?.welcome
-    ? `გილოცავ — გამოწერე დღიური ჰოროსკოპი! ყოველ დილით მიიღებ ${sign.labelKa}-ის ჰოროსკოპს ელფოსტაზე.\n\nდღეს: ${row.summary}\n\nგინდა შენს ნატალურ რუკაზე მორგებული, პერსონალური ჰოროსკოპი, AI ანალიზი და მეტი? შექმენი უფასო ანგარიში.`
+    ? `გილოცავ, გამოწერე დღიური ჰოროსკოპი! ყოველ დილით მიიღებ ${sign.labelKa}-ის ჰოროსკოპს ელფოსტაზე.\n\nდღეს: ${row.summary}\n\nგინდა შენს ნატალურ რუკაზე მორგებული, პერსონალური ჰოროსკოპი, AI ანალიზი და მეტი? შექმენი უფასო ანგარიში.`
     : `${row.summary}\n\n${row.body ?? ""}`;
 
   await acquireResendSlot();
@@ -125,8 +125,8 @@ async function sendToLead(
       from: FROM,
       to: lead.email,
       subject: opts?.welcome
-        ? `გამოწერა დადასტურდა — ${sign.labelKa}-ის დღიური ჰოროსკოპი`
-        : row.headline?.trim() || `${sign.labelKa} — დღევანდელი ჰოროსკოპი`,
+        ? `გამოწერა დადასტურდა, ${sign.labelKa}-ის დღიური ჰოროსკოპი`
+        : row.headline?.trim() || `${sign.labelKa}, დღევანდელი ჰოროსკოპი`,
       react: MarketingEmail({
         name: null,
         heading,
@@ -208,7 +208,7 @@ export async function sendDailyHoroscopeToLeads(opts: {
   let skipped = 0;
   let failed = 0;
 
-  // Serial loop — acquireResendSlot() already paces the actual sends under the
+  // Serial loop, acquireResendSlot() already paces the actual sends under the
   // account rate limit, and lead volume is small relative to the user blast.
   for (const lead of leads) {
     try {

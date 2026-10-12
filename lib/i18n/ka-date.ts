@@ -3,7 +3,7 @@
  *
  * `Intl.DateTimeFormat("ka-GE", …)` is only Georgian where the runtime ships
  * Georgian locale data. Reduced-ICU builds resolve `ka-GE` to `en-GB` and
- * silently render English dates inside an otherwise Georgian UI — and when
+ * silently render English dates inside an otherwise Georgian UI, and when
  * such a browser hydrates a server-rendered page, its output disagrees with
  * Node's Georgian and React discards the server HTML for that subtree.
  *
@@ -41,7 +41,7 @@ const KA_MONTHS_SHORT = [
   "დეკ",
 ];
 
-/** Indexed by `getDay()` / `getUTCDay()` — 0 is Sunday. */
+/** Indexed by `getDay()` / `getUTCDay()`, 0 is Sunday. */
 const KA_WEEKDAYS = [
   "კვირა",
   "ორშაბათი",
@@ -56,7 +56,7 @@ const KA_WEEKDAYS = [
  * "კვირა, 9 აგვისტო" from a plain YYYY-MM-DD.
  *
  * Daily dates are already stored local to the user, so the string is read
- * verbatim instead of being pushed through a timezone — which also drops an
+ * verbatim instead of being pushed through a timezone, which also drops an
  * off-by-one day for zones past UTC+12, where an anchored midday UTC instant
  * lands on the following date.
  *
@@ -84,7 +84,7 @@ export function kaDayMonth(date: Date): string {
 }
 
 /**
- * Genitive month names — the form a date takes before a postposition, as in
+ * Genitive month names, the form a date takes before a postposition, as in
  * "1 სექტემბრის ჩათვლით" (up to and including 1 September).
  *
  * Georgian does not build this by suffixing the nominative: "სექტემბერი" +
@@ -107,7 +107,7 @@ const KA_MONTHS_GENITIVE = [
   "დეკემბრის",
 ];
 
-/** "1 სექტემბრის" — pair with a postposition, e.g. `${…} ჩათვლით`. */
+/** "1 სექტემბრის", pair with a postposition, e.g. `${…} ჩათვლით`. */
 export function kaDayMonthGenitive(date: Date): string {
   return `${date.getDate()} ${KA_MONTHS_GENITIVE[date.getMonth()]}`;
 }

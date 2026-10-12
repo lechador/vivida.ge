@@ -32,11 +32,11 @@ const HARMONIC_PLANETS = new Set(["venus", "jupiter", "sun", "moon"]);
 export type WeeklyDayContext = {
   dateIso: string;       // YYYY-MM-DD in user's TZ
   weekdayKa: string;     // "ორშაბათი", ..
-  /** Date label used inside the prompt — "ორშაბათი, 5 მაისი". */
+  /** Date label used inside the prompt, "ორშაბათი, 5 მაისი". */
   promptLabel: string;
   moonSignKa: string;
   moonSignEn: string;
-  /** Sign key ("aries"…) — used to look up transit-library sign entries. */
+  /** Sign key ("aries"…), used to look up transit-library sign entries. */
   moonSignKey: string;
   harmonyScore: number;  // 0..100
   challengeScore: number;
@@ -52,8 +52,8 @@ export type WeeklyDayContext = {
 
 /**
  * Build the 7-day window starting from `startDate` interpreted in `timezone`.
- * Each day is computed at noon UTC for stability — same convention as
- * computeTransits used elsewhere — but date labels are rendered in the
+ * Each day is computed at noon UTC for stability, same convention as
+ * computeTransits used elsewhere, but date labels are rendered in the
  * user's timezone so "today" matches what they see on a wall calendar.
  */
 export function computeWeeklyForecast(
@@ -69,7 +69,7 @@ export function computeWeeklyForecast(
 
   for (let i = 0; i < FORECAST_DAYS; i++) {
     // Step day-by-day from startDate at UTC noon. We don't want DST edge
-    // cases — the transit positions move slowly enough that a few hours
+    // cases, the transit positions move slowly enough that a few hours
     // of TZ drift doesn't change the qualitative picture.
     const at = new Date(startDate);
     at.setUTCHours(12, 0, 0, 0);
@@ -119,7 +119,7 @@ function scoreDay(aspects: CrossAspect[]) {
       if (family === "harmonic") harmony += weight;
       else if (family === "tense") challenge += weight;
       else {
-        // "neutral" conjunction with neither side dominating — split.
+        // "neutral" conjunction with neither side dominating, split.
         harmony += weight * 0.5;
         challenge += weight * 0.5;
       }
@@ -134,7 +134,7 @@ function scoreDay(aspects: CrossAspect[]) {
     });
 
   // Tilt amplification: preserve the day's total energy but sharpen which
-  // side dominates. A day that's 60/40 raw becomes ~75/25 here — tilted
+  // side dominates. A day that's 60/40 raw becomes ~75/25 here, tilted
   // days feel decisively tilted. Truly balanced days (50/50) stay 50/50.
   // tanh keeps the response bounded and symmetric.
   const total = harmony + challenge;
@@ -145,7 +145,7 @@ function scoreDay(aspects: CrossAspect[]) {
     challenge = total * (0.5 - 0.5 * sharpened);
   }
 
-  // Calibrate to 0-100. Weighted intensity sum of ~3 saturates the bar —
+  // Calibrate to 0-100. Weighted intensity sum of ~3 saturates the bar,
   // keeps typical days landing in the visually interesting middle range.
   const harmonyScore = Math.min(100, Math.round((harmony / 3) * 100));
   const challengeScore = Math.min(100, Math.round((challenge / 3) * 100));
@@ -172,7 +172,7 @@ function planetWeight(a: CrossAspect): number {
   if (t === "moon") return 1.0;
   if (t === "sun" || t === "mercury" || t === "venus" || t === "mars") return 0.85;
   if (t === "jupiter" || t === "saturn") return 0.6;
-  return 0.4; // uranus, neptune, pluto — generational
+  return 0.4; // uranus, neptune, pluto, generational
 }
 
 /** YYYY-MM-DD in `timezone` for the day `offsetDays` after `startDate`. */

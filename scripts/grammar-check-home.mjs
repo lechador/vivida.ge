@@ -2,7 +2,7 @@
  * Run a Georgian grammar/style pass over lib/seo/home-content.json using
  * Gemini 2.5 Pro (higher quality than Flash for editorial work). Sends the
  * whole JSON, gets back a corrected JSON with the same structure, writes
- * it back. Idempotent — running twice should converge.
+ * it back. Idempotent, running twice should converge.
  *
  * Usage:
  *   node scripts/grammar-check-home.mjs
@@ -19,14 +19,14 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "google/gemini-3.8-flash";
 const KEY = process.env.OPENROUTER_API_KEY;
 if (!KEY) {
-  console.error("OPENROUTER_API_KEY is not set in .env.local — aborting.");
+  console.error("OPENROUTER_API_KEY is not set in .env.local, aborting.");
   process.exit(1);
 }
 
 const PATH = resolve("lib/seo/home-content.json");
 const showDiff = process.argv.includes("--diff");
 
-const SYSTEM_PROMPT = `შენ ხარ პროფესიონალი ქართული რედაქტორი/კორექტორი. მოგეცემა JSON ფაილი ვიდიდას — Vivida — ქართული B2C ასტროლოგიური ვებ-აპლიკაციის მთავარი გვერდის ქართული ტექსტებით.
+const SYSTEM_PROMPT = `შენ ხარ პროფესიონალი ქართული რედაქტორი/კორექტორი. მოგეცემა JSON ფაილი ვიდიდას, Vivida, ქართული B2C ასტროლოგიური ვებ-აპლიკაციის მთავარი გვერდის ქართული ტექსტებით.
 
 შენი დავალება: გადახედე ყველა ქართული ტექსტი და გაასწორე:
 - გრამატიკული შეცდომები (ბრუნვები, თანდებულები, ზმნური ფორმები)
@@ -40,14 +40,14 @@ const SYSTEM_PROMPT = `შენ ხარ პროფესიონალი 
 - შეინახე იდენტური JSON სტრუქტურა (ყველა გასაღები, მათი იერარქია)
 - შეინარჩუნე "შენ"-ის ფორმა (არა "თქვენ")
 - შეინარჩუნე ყველა ფაქტობრივი შინაარსი (10 პლანეტა, 12 სახლი, 78 წყვილი, AI Gemini, ვებ-აპი vivida.ge და ა.შ.)
-- "Big Three" — გამოიყენე "დიდი სამეული" (არა transliterate, არა ინგლისურად)
+- "Big Three", გამოიყენე "დიდი სამეული" (არა transliterate, არა ინგლისურად)
 - ბრენდის სახელი "Vivida" დარჩება ლათინურად
-- ტექნიკური სიტყვები — "Google", "AI", "Gemini" — ლათინურად
-- აცილე ცვლილებებს, რომლებიც აშკარა შეცდომებს არ ასწორებენ — მცირე გადახედვა, არა გადაწერა
+- ტექნიკური სიტყვები, "Google", "AI", "Gemini", ლათინურად
+- აცილე ცვლილებებს, რომლებიც აშკარა შეცდომებს არ ასწორებენ, მცირე გადახედვა, არა გადაწერა
 
 ფაქტობრივი ცნებები (გამოიყენე ეს ზუსტი ფორმები):
 - ნატალური რუკა (არა "ნატური", "ნატურული")
-- ასცენდენტი ან ამომავალი ნიშანი (არა "ასცედენტი" — ეს შეცდომაა)
+- ასცენდენტი ან ამომავალი ნიშანი (არა "ასცედენტი", ეს შეცდომაა)
 - სინასტრია, სინასტრიული
 - ტრანზიტი, ტრანზიტები
 - ცის ნიშანი (არა "ცას ნიშანი")
@@ -75,7 +75,7 @@ async function callOpenRouter(content) {
         },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.2, // editorial work — be conservative
+      temperature: 0.2, // editorial work, be conservative
       // Gemini 3.8 Flash spends a chunk on reasoning tokens before emitting
       // visible output; cap high enough that the JSON body still fits.
       max_tokens: 32000,

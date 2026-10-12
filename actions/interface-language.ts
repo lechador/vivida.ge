@@ -19,7 +19,7 @@ export async function updateInterfaceLanguage(value: UserLocale): Promise<{ ok: 
 
   // No locale cookie is written any more. It existed so public pages could
   // honour this preference without a DB read, but that made indexable Georgian
-  // URLs render English — and emit English canonicals — for cookie holders.
+  // URLs render English, and emit English canonicals, for cookie holders.
   // The signed-in surfaces that legitimately switch language read
   // `users.interfaceLanguage` directly instead.
   revalidatePath("/account");

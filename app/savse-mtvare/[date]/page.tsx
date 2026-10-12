@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       twitter: { card: "summary_large_image", title, description },
     };
   }
-  const title = `სავსე მთვარე ${e.label} — დრო და ნიშანი`;
+  const title = `სავსე მთვარე ${e.label}, დრო და ნიშანი`;
   const description = `${e.label} სავსე მთვარე ${e.snapshot.signKa}-ში: ზუსტი თბილისის დრო, განათება, ასტრონომიული მონაცემები და ასტროლოგიური მნიშვნელობა.`;
   return {
     title: { absolute: title },

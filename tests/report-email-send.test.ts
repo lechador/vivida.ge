@@ -86,7 +86,7 @@ describe("sendReportPdfEmail", () => {
     ]);
   });
 
-  it("is not deduped by an idempotency key — the button must be re-pressable", async () => {
+  it("is not deduped by an idempotency key, the button must be re-pressable", async () => {
     await sendReportPdfEmail(args());
     await sendReportPdfEmail(args());
 

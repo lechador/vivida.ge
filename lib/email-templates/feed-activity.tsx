@@ -23,7 +23,7 @@ const REACTION_EN: Record<string, string> = {
 };
 
 /**
- * Feed activity email — comment or reaction on a published post.
+ * Feed activity email, comment or reaction on a published post.
  * Fired only when the recipient has been absent from the site for >1h,
  * throttled to one per hour per kind (same gate as friend-request / message).
  */
@@ -42,7 +42,7 @@ export function FeedActivityEmail({
   fromName: string;
   fromUsername: string | null;
   kind: "post_comment" | "post_reaction";
-  /** Comment body preview — already truncated by the caller. */
+  /** Comment body preview, already truncated by the caller. */
   preview?: string | null;
   reaction?: string | null;
   postUrl: string;
@@ -75,7 +75,7 @@ export function FeedActivityEmail({
       : `${fromName}-მ შენს პოსტს დააკომენტარა`
     : en
       ? `${fromName} ${reactionLine}`
-      : `${fromName} — ${reactionLine}`;
+      : `${fromName}, ${reactionLine}`;
 
   return (
     <EmailLayout

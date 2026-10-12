@@ -8,8 +8,8 @@ import { Loader2, RotateCcw } from "lucide-react";
  * Error boundary for /report. The chart can still be generating right after
  * onboarding (the background pre-gen from saveProfile races the page's own
  * ensureChartFor), so a first-render error is almost always transient. We
- * auto-retry ONCE after a short delay — by then the static chart is persisted
- * — and only show a manual "try again" button if that retry also fails. The
+ * auto-retry ONCE after a short delay, by then the static chart is persisted,
+ * and only show a manual "try again" button if that retry also fails. The
  * one-shot guard (sessionStorage) prevents an infinite reload loop when the
  * error is real.
  */
@@ -32,7 +32,7 @@ export default function ReportError({
     try {
       alreadyRetried = sessionStorage.getItem("vivida_report_retried") === "1";
     } catch {
-      /* private mode — skip auto-retry */
+      /* private mode, skip auto-retry */
     }
     if (alreadyRetried) return;
     try {
@@ -80,8 +80,8 @@ export default function ReportError({
         <>
           <Loader2 className="size-8 animate-spin text-[var(--vivida-violet)]" />
           <p className="mt-4 text-sm text-muted-foreground">
-            <span className="locale-ka-only">შენი რუკა მზადდება — ერთი წამი…</span>
-            <span className="locale-en-only">Your chart is being prepared — one moment…</span>
+            <span className="locale-ka-only">შენი რუკა მზადდება, ერთი წამი…</span>
+            <span className="locale-en-only">Your chart is being prepared, one moment…</span>
           </p>
         </>
       ) : (
@@ -95,10 +95,10 @@ export default function ReportError({
           </h2>
           <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
             <span className="locale-ka-only">
-              შესაძლოა ჯერ მზადდება. სცადე ხელახლა — ჩვეულებრივ მაშინვე ეშველება.
+              შესაძლოა ჯერ მზადდება. სცადე ხელახლა, ჩვეულებრივ მაშინვე ეშველება.
             </span>
             <span className="locale-en-only">
-              It may still be generating. Try again — this usually resolves immediately.
+              It may still be generating. Try again, this usually resolves immediately.
             </span>
           </p>
           <button

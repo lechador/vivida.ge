@@ -16,7 +16,7 @@ import { ReportDialog } from "./report-dialog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Report + block menu for another user — used on their profile and in the
+ * Report + block menu for another user, used on their profile and in the
  * chat thread header. Block uses a two-tap confirm inside the menu (no extra
  * dialog primitive needed); on success we refresh so the now-hidden user
  * disappears (their profile 404s via the server-side block guard).
@@ -89,7 +89,7 @@ export function SafetyMenu({
             {confirmBlock
               ? en
                 ? "Confirm block"
-                : "დაადასტურე — დაბლოკე"
+                : "დაადასტურე, დაბლოკე"
               : en
                 ? "Block"
                 : "დაბლოკე"}

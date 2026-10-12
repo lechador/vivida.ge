@@ -242,8 +242,8 @@ export function SynastryDeepReport({
       </h3>
       <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground">
         {en
-          ? `A complete reading of your connection with ${partnerName}—love, communication, trust, friction, long-term potential, and practical advice.`
-          : `${partnerName}-თან თქვენი კავშირის სრული წაკითხვა — სიყვარული, კომუნიკაცია, ნდობა, ხახუნი, გრძელვადიანი პოტენციალი და პრაქტიკული რჩევები.`}
+          ? `A complete reading of your connection with ${partnerName}, love, communication, trust, friction, long-term potential, and practical advice.`
+          : `${partnerName}-თან თქვენი კავშირის სრული წაკითხვა, სიყვარული, კომუნიკაცია, ნდობა, ხახუნი, გრძელვადიანი პოტენციალი და პრაქტიკული რჩევები.`}
       </p>
       <Button variant="mystic" size="lg" className="mt-5" onClick={generate}>
         <Sparkles className="size-4" />

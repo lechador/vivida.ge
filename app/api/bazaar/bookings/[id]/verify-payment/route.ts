@@ -24,7 +24,7 @@ type Params = { params: Promise<{ id: string }> };
  * Buyer confirms their on-chain USDC transfer. The server checks the
  * signature against Solana mainnet: finalized USDC credit to the booking's
  * snapshotted provider wallet for at least the snapshotted price, sent by
- * the claimed payer wallet (signer proof — otherwise anyone could claim a
+ * the claimed payer wallet (signer proof, otherwise anyone could claim a
  * stranger's payment as their own). Flips pending_payment → paid exactly
  * once. Every attempt is logged for the admin Payments tab.
  */
@@ -103,7 +103,7 @@ export async function POST(req: Request, ctx: Params) {
   if (!check.ok) {
     await logAttempt(check.reason);
     // 202/503 keep the client retrying: a clean "not indexed yet" (buyer
-    // just sent it) or a brief RPC outage — both resolve on retry. 409
+    // just sent it) or a brief RPC outage, both resolve on retry. 409
     // means the signature funds another booking; 402 means the payment
     // itself is the problem (underpaid / failed / not sent by the claimed
     // wallet).
@@ -133,7 +133,7 @@ export async function POST(req: Request, ctx: Params) {
           eq(bazaarBookings.id, booking.id),
           // paid/delivered are terminal for this update; a `cancelled`
           // booking accepts the update because on-chain money is the
-          // source of truth — a cancel that raced this verification must
+          // source of truth, a cancel that raced this verification must
           // not leave a paid booking untracked.
           inArray(bazaarBookings.status, ["pending_payment", "cancelled"]),
         ),

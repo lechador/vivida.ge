@@ -179,7 +179,7 @@ export function elementSlugForSign(slug: ZodiacSlug): ElementSlug {
 // ─── Pair helpers ───────────────────────────────────────────────────────
 
 /**
- * Canonical pair slug — always sorted by canonical sign index so
+ * Canonical pair slug, always sorted by canonical sign index so
  * `aries-leo` and `leo-aries` resolve to the same key.
  */
 export function pairSlug(a: ZodiacSlug, b: ZodiacSlug): string {
@@ -211,7 +211,7 @@ export const ALL_PAIR_SLUGS: string[] = (() => {
 
 /**
  * Resolve the sun sign for a given (month, day). The boundaries follow
- * ZODIAC_DATES — Capricorn wraps across the year boundary so the lookup
+ * ZODIAC_DATES, Capricorn wraps across the year boundary so the lookup
  * needs explicit handling of both halves.
  */
 export function signSlugByDate(month: number, day: number): ZodiacSlug {

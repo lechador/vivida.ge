@@ -50,7 +50,7 @@ function resultCopy(score: number, total: number, locale: UserLocale) {
     if (pct >= 0.5)
       return [
         "A solid result!",
-        "A few signs slipped past you—your next round can be even stronger.",
+        "A few signs slipped past you, your next round can be even stronger.",
       ];
     return [
       "The stars kept a few secrets.",
@@ -67,7 +67,7 @@ function resultCopy(score: number, total: number, locale: UserLocale) {
   if (pct >= 0.5)
     return [
       "კარგი შედეგია!",
-      "რამდენიმე ნიშანი დაგისხლტა — შემდეგ ჯერზე კიდევ უკეთესად ითამაშებ.",
+      "რამდენიმე ნიშანი დაგისხლტა, შემდეგ ჯერზე კიდევ უკეთესად ითამაშებ.",
     ];
   return [
     "ვარსკვლავები ცოტა საიდუმლოს ინახავენ.",
@@ -391,7 +391,7 @@ function FamousZodiacQuizGame({
             ? en
               ? "Correct!"
               : "სწორია!"
-            : `${en ? "The correct answer is" : "სწორი პასუხია"} — ${signFor(question.sign).glyph} ${en ? signFor(question.sign).nameEn : signFor(question.sign).nameKa}`}
+            : `${en ? "The correct answer is" : "სწორი პასუხია"}, ${signFor(question.sign).glyph} ${en ? signFor(question.sign).nameEn : signFor(question.sign).nameKa}`}
         </div>
       )}
       <div className="mt-6 flex justify-end">

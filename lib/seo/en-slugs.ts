@@ -2,7 +2,7 @@
  * English URL slugs for clusters whose internal route slugs are Georgian
  * transliterations (dreams, EQ articles, planets).
  *
- * Georgian URLs are UNTOUCHED — same slug, same canonical, same content.
+ * Georgian URLs are UNTOUCHED, same slug, same canonical, same content.
  * On the English host these pages additionally resolve at a keyword-rich
  * English slug (canonical there), and the old transliterated English URL
  * 308-redirects to it (host-scoped, see next.config.ts).
@@ -12,7 +12,7 @@
  */
 
 export type SlugPair = {
-  /** Internal slug — also the Georgian public slug. Never changes. */
+  /** Internal slug, also the Georgian public slug. Never changes. */
   ka: string;
   /** English public slug. Must be unique within its cluster. */
   en: string;
@@ -135,7 +135,7 @@ export type SlugLocale = "ka" | "en";
 
 /**
  * Resolve a URL slug segment to the internal (Georgian) slug.
- * - Georgian host: only the internal slug resolves (English slugs 404 —
+ * - Georgian host: only the internal slug resolves (English slugs 404,
  *   Georgian URLs never move).
  * - English host: the English slug resolves, and the internal slug still
  *   resolves as a fallback (the host-scoped 308 in next.config.ts sends it

@@ -9,12 +9,12 @@ import {
 import { users } from "./users";
 
 /**
- * Vivida Insight Bazaar — English-only marketplace for one-off astrology
+ * Vivida Insight Bazaar, English-only marketplace for one-off astrology
  * readings (tarot, birth-chart interpretations, compatibility sessions).
  *
  * Money flow (MVP, no escrow): the buyer pays USDC on Solana mainnet
  * DIRECTLY to the provider's wallet from their own wallet app. The app never
- * sends transactions and never sees private keys — it only verifies the
+ * sends transactions and never sees private keys, it only verifies the
  * submitted transaction signature against a public RPC. Birth details and
  * delivered readings live only in these tables (off-chain), never on-chain.
  */
@@ -113,9 +113,9 @@ export const bazaarBookings = pgTable(
      * provider already holds the USDC.
      */
     status: text("status").notNull().default("pending_payment"),
-    /** Price snapshot (cents) — service price edits never rewrite history. */
+    /** Price snapshot (cents), service price edits never rewrite history. */
     priceUsdcCents: integer("price_usdc_cents").notNull(),
-    /** Provider wallet snapshot — wallet edits never rewrite history. */
+    /** Provider wallet snapshot, wallet edits never rewrite history. */
     providerWallet: text("provider_wallet").notNull(),
     /**
      * Buyer's question + birth details. PRIVATE: rendered only to the buyer

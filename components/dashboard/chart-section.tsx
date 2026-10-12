@@ -29,7 +29,7 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
  * Static natal report content. Computes once per user (cached) and never
- * changes after — we render this on /report.
+ * changes after, we render this on /report.
  */
 export async function ChartSection({
   userId,
@@ -66,7 +66,7 @@ export async function ChartSection({
       <ReportNav locale={locale} />
 
       <div className="mt-10 space-y-10">
-        {/* SECTION 01 — Chart wheel hero (always expanded) */}
+        {/* SECTION 01, Chart wheel hero (always expanded) */}
         <section id="wheel" className="scroll-mt-16 sm:scroll-mt-24">
           <article className="relative overflow-hidden rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
             <div
@@ -104,7 +104,7 @@ export async function ChartSection({
           </article>
         </section>
 
-        {/* Positions + houses — the scannable, clickable data layer. Planet
+        {/* Positions + houses, the scannable, clickable data layer. Planet
             rows jump to their interpretation in-page; signs link to /zodiac. */}
         <section id="positions" className="scroll-mt-16 sm:scroll-mt-24">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start">
@@ -125,7 +125,7 @@ export async function ChartSection({
           </div>
         </section>
 
-        {/* AI summary — inline, between sections */}
+        {/* AI summary, inline, between sections */}
         {interp?.summary && (
           <article
             id="summary"
@@ -141,15 +141,15 @@ export async function ChartSection({
           </article>
         )}
 
-        {/* SECTION 02 — Big three (open by default) */}
+        {/* SECTION 02, Big three (open by default) */}
         <CollapsibleSection
           id="big-three"
           icon={<Sparkles className="size-5" />}
           title={en ? "The big three" : "დიდი სამეული"}
           subtitle={
             en
-              ? "Sun, Moon and Ascendant—your core pattern"
-              : "მზე, მთვარე და ამომავალი — შენი ბირთვი"
+              ? "Sun, Moon and Ascendant, your core pattern"
+              : "მზე, მთვარე და ამომავალი, შენი ბირთვი"
           }
           defaultOpen
         >
@@ -179,7 +179,7 @@ export async function ChartSection({
           </div>
         </CollapsibleSection>
 
-        {/* SECTION 03 — Elements (open by default) */}
+        {/* SECTION 03, Elements (open by default) */}
         <CollapsibleSection
           id="elements"
           icon={<Flame className="size-5" />}
@@ -225,7 +225,7 @@ export async function ChartSection({
           </CollapsibleSection>
         )}
 
-        {/* SECTION 05 — Planets */}
+        {/* SECTION 05, Planets */}
         <CollapsibleSection
           id="planets"
           icon={<Globe2 className="size-5" />}
@@ -233,7 +233,7 @@ export async function ChartSection({
           subtitle={
             en
               ? "Eight distinct functions working as one system"
-              : "რვა პლანეტა, რვა ხასიათი — ერთად შენ ხარ"
+              : "რვა პლანეტა, რვა ხასიათი, ერთად შენ ხარ"
           }
           defaultOpen
         >
@@ -244,7 +244,7 @@ export async function ChartSection({
           />
         </CollapsibleSection>
 
-        {/* SECTION 06 — Houses */}
+        {/* SECTION 06, Houses */}
         <CollapsibleSection
           id="houses"
           icon={<Home className="size-5" />}
@@ -263,7 +263,7 @@ export async function ChartSection({
           />
         </CollapsibleSection>
 
-        {/* SECTION 07 — Aspects */}
+        {/* SECTION 07, Aspects */}
         <CollapsibleSection
           id="aspects"
           icon={<Triangle className="size-5" />}

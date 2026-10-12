@@ -5,7 +5,7 @@ import { isEnglishHost } from "@/lib/seo/locales";
 import { readFontBuffer } from "./_fonts/load";
 
 // Static URL literals so Webpack copies the .ttf into the function
-// bundle. Don't move these into a helper — a parameterised path makes
+// bundle. Don't move these into a helper, a parameterised path makes
 // the asset reference invisible to the bundler.
 const NOTO_REGULAR_URL = new URL(
   "./_fonts/NotoSansGeorgian-Regular.ttf",
@@ -20,7 +20,7 @@ const NOTO_BOLD_URL = new URL(
  * Default OG image for the entire site (1200×630). Pages that want a
  * tailored card can drop their own `opengraph-image.tsx` next to their
  * `page.tsx`. This file double-serves Twitter via the `twitter` metadata
- * fallback rules in app/layout.tsx — so we don't need a separate
+ * fallback rules in app/layout.tsx, so we don't need a separate
  * twitter-image.tsx unless we want different copy.
  *
  * Runs on the Node runtime so we can read the bundled Georgian font
@@ -31,14 +31,14 @@ const NOTO_BOLD_URL = new URL(
 
 export const runtime = "nodejs";
 
-export const alt = "Vivida — შენი კოსმიური რუკა";
+export const alt = "Vivida, შენი კოსმიური რუკა";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OpengraphImage() {
   const requestHeaders = await headers();
   // Social shares of vividaastro.com URLs (including paid-ad link posts)
-  // must not render a Georgian-text card — the image copy follows the host.
+  // must not render a Georgian-text card, the image copy follows the host.
   const en = isEnglishHost(
     requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host"),
   );
@@ -71,7 +71,7 @@ export default async function OpengraphImage() {
         position: "relative",
       }}
     >
-      {/* Star sparkles for cosmic feel — tiny solid circles. */}
+      {/* Star sparkles for cosmic feel, tiny solid circles. */}
       {[
         { top: 90, left: 140, size: 6 },
         { top: 140, left: 1050, size: 8 },
@@ -98,7 +98,7 @@ export default async function OpengraphImage() {
       ))}
 
       {/* Brand sparkle + wordmark. The sparkle is an inline SVG (not the
-            ✦ glyph) because NotoSansGeorgian doesn't ship that codepoint —
+            ✦ glyph) because NotoSansGeorgian doesn't ship that codepoint,
             satori would otherwise try to fetch a dynamic fallback font from
             Google Fonts and fail with a 400. */}
       <div

@@ -79,7 +79,7 @@ export function SuggestedPeopleRail({
         el.classList.add("is-dragging");
       }
       if (didDrag) {
-        // Direct write — auto behavior + no scroll-snap means the rail
+        // Direct write, auto behavior + no scroll-snap means the rail
         // tracks the cursor 1:1 without the browser fighting us.
         el.scrollLeft = startScroll - dx;
       }
@@ -107,7 +107,7 @@ export function SuggestedPeopleRail({
       if (e.deltaY === 0) return;
       const max = el.scrollWidth - el.clientWidth;
       const next = el.scrollLeft + e.deltaY;
-      // Only intercept if we can actually consume the scroll — otherwise
+      // Only intercept if we can actually consume the scroll, otherwise
       // let the page scroll vertically as the user expects.
       if ((e.deltaY > 0 && el.scrollLeft >= max) || (e.deltaY < 0 && el.scrollLeft <= 0)) {
         return;
@@ -117,7 +117,7 @@ export function SuggestedPeopleRail({
     };
 
     // Without this, mousedown on a card's <img> triggers HTML5
-    // image-drag and on a card's text triggers text selection — both
+    // image-drag and on a card's text triggers text selection, both
     // hijack the cursor and our scroll-drag never runs.
     const onDragStart = (e: DragEvent) => e.preventDefault();
     const onSelectStart = (e: Event) => {
@@ -203,7 +203,7 @@ export function SuggestedPeopleRail({
         />
 
         {/* Negative margin lets the rail bleed to the screen edge on mobile.
-            No scroll-snap on desktop — it fights mouse drag. The
+            No scroll-snap on desktop, it fights mouse drag. The
             `is-dragging` class disables pointer-events on children so the
             drag can't accidentally start a Link/Button click mid-drag. */}
         <div

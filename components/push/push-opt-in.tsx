@@ -70,7 +70,7 @@ export function PushOptIn({
         return;
       }
       // Browser can do push, but our public key isn't in the bundle (env not
-      // set at build time) — a config/deploy issue, not the user's browser.
+      // set at build time), a config/deploy issue, not the user's browser.
       if (!VAPID) {
         if (!cancelled) setState("unconfigured");
         return;
@@ -182,7 +182,7 @@ export function PushOptIn({
         <p className="min-w-0 flex-1 text-sm text-foreground/90">
           {en
             ? "Enable notifications to receive your daily horoscope each morning."
-            : "ჩართე შეტყობინებები — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."}
+            : "ჩართე შეტყობინებები, ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."}
         </p>
         <Button type="button" variant="mystic" size="sm" onClick={enable}>
           {en ? "Enable" : "ჩართვა"}
@@ -217,8 +217,8 @@ export function PushOptIn({
           <p className="mt-1 text-sm text-muted-foreground">
             {state === "on"
               ? en
-                ? "Enabled — your daily horoscope arrives each morning."
-                : "ჩართულია — ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."
+                ? "Enabled, your daily horoscope arrives each morning."
+                : "ჩართულია, ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს."
               : en
                 ? "Enable notifications to receive your daily horoscope on your phone each morning."
                 : "ჩართე და ყოველ დილით მიიღებ დღევანდელ ჰოროსკოპს პირდაპირ ტელეფონზე."}
@@ -246,7 +246,7 @@ export function PushOptIn({
             <p className="mt-3 text-sm text-[var(--vivida-pink)]">
               {en
                 ? "Notifications are blocked in your browser. Enable them in browser settings."
-                : "შეტყობინებები დაბლოკილია ბრაუზერში — ჩართე ბრაუზერის პარამეტრებიდან."}
+                : "შეტყობინებები დაბლოკილია ბრაუზერში, ჩართე ბრაუზერის პარამეტრებიდან."}
             </p>
           )}
 

@@ -25,7 +25,7 @@ html[lang="hy"] .locale-ka-only {
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Vivida light fallback — app forces dark by default */
+  /* Vivida light fallback, app forces dark by default */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -117,7 +117,7 @@ html[lang="hy"] .locale-ka-only {
    * Bump the root font size from the browser default (16px) to 18px on
    * tablet/desktop. Tailwind's spacing/sizing/padding/font scales are all
    * rem-based, so this proportionally enlarges every layout token in one
-   * place. Mobile keeps the 16px default — at 360px-wide phones, 18px
+   * place. Mobile keeps the 16px default, at 360px-wide phones, 18px
    * crushes layouts and forces horizontal scroll.
    */
   html {
@@ -136,11 +136,11 @@ html[lang="hy"] .locale-ka-only {
   }
   /*
    * Hard-clip horizontal overflow on the body. Mobile is the sensitive
-   * surface — a single overflowing child (long un-wrappable token,
+   * surface, a single overflowing child (long un-wrappable token,
    * transform-translated decoration, edge-bleed rail under a narrow
    * parent) used to surface a horizontal scrollbar on phones. `clip`
    * is preferred over `hidden` so it doesn't establish a new scrolling
-   * context — sticky/anchored descendants keep working — and applying
+   * context, sticky/anchored descendants keep working, and applying
    * it to body (not html) leaves vertical viewport scrolling untouched.
    */
   body {
@@ -156,8 +156,8 @@ html[lang="hy"] .locale-ka-only {
     -webkit-font-smoothing: antialiased;
   }
   /*
-   * Editorial serif for the English site (vividaastro.com). A plain class —
-   * not a Tailwind theme token — so it resolves deterministically everywhere.
+   * Editorial serif for the English site (vividaastro.com). A plain class,
+   * not a Tailwind theme token, so it resolves deterministically everywhere.
    * Only EN components opt in; Georgian-host markup never references it.
    */
   .font-display {
@@ -170,11 +170,11 @@ html[lang="hy"] .locale-ka-only {
   /*
    * When the mobile bottom tab bar is mounted (authed pages on phones),
    * reserve space at the bottom of the viewport so page content isn't
-   * hidden behind it. Uses :has() so the rule is automatic — landing
+   * hidden behind it. Uses :has() so the rule is automatic, landing
    * pages and desktop don't pay the cost.
    *
    * Full-bleed pages (currently only /messages) opt out by rendering a
-   * [data-no-body-bottom-pad] element — those pages own their own tab-bar
+   * [data-no-body-bottom-pad] element, those pages own their own tab-bar
    * compensation so they can use the full viewport for their layout.
    */
   @media (max-width: 1023px) {
@@ -204,7 +204,7 @@ html[lang="hy"] .locale-ka-only {
      *     entire layout 252px to the left.
      *   - adds margin-right:<scrollbar>px !important to compensate for
      *     the disappearing scrollbar, which our scrollbar-gutter:stable
-     *     already handles — so it just shoves things another 17px left.
+     *     already handles, so it just shoves things another 17px left.
      *
      * Higher specificity (body[data-scroll-locked]:has(...)) plus
      * !important on every property the lib touches keeps the layout
@@ -223,7 +223,7 @@ html[lang="hy"] .locale-ka-only {
 }
 
 /*
- * Floating bottom-corner affordances — the privacy re-open pill (left) and the
+ * Floating bottom-corner affordances, the privacy re-open pill (left) and the
  * chat launcher (right). Both sit a few px off the bottom and both outrank or
  * tie the mobile tab bar in z-order, so on phones they covered its outermost
  * items and swallowed those taps. Lift them clear whenever the bar is mounted,
@@ -231,7 +231,7 @@ html[lang="hy"] .locale-ka-only {
  * two can't drift apart.
  *
  * Deliberately OUTSIDE @layer base: these override Tailwind's `bottom-3` /
- * `bottom-4` utilities, and layer order beats specificity — anything inside
+ * `bottom-4` utilities, and layer order beats specificity, anything inside
  * `base` loses to the utilities layer no matter how specific it is.
  */
 @media (max-width: 1023px) {
@@ -366,7 +366,7 @@ html[lang="hy"] .locale-ka-only {
   }
 }
 
-/* Shooting-star sweep — fades in, slides diagonally across, fades out */
+/* Shooting-star sweep, fades in, slides diagonally across, fades out */
 @keyframes vivida-shoot {
   0% {
     transform: translate3d(0, 0, 0) rotate(-25deg) scaleX(0);
@@ -415,7 +415,7 @@ html[lang="hy"] .locale-ka-only {
   animation: vivida-float 4s ease-in-out infinite;
 }
 
-/* Tarot card reveal — fade + rise + settle, staggered per card. */
+/* Tarot card reveal, fade + rise + settle, staggered per card. */
 @keyframes tarot-card-in {
   0% {
     opacity: 0;
@@ -481,7 +481,7 @@ html[lang="hy"] .locale-ka-only {
   animation: vivida-music-pulse 2.4s ease-out infinite;
 }
 
-/* Focus mode — a slow, breathing violet↔cyan glow around the quiz card so it
+/* Focus mode, a slow, breathing violet↔cyan glow around the quiz card so it
  * reads as the spotlit focal point while the surroundings are dimmed. */
 @keyframes vivida-focus-breathe {
   0%,
@@ -541,7 +541,7 @@ html[lang="hy"] .locale-ka-only {
   will-change: transform;
 }
 
-/* Chat message entrance — quick fade + rise for newly arrived bubbles.
+/* Chat message entrance, quick fade + rise for newly arrived bubbles.
    History already on screen stays static; only new turns animate. */
 @keyframes chat-msg-in {
   from {
@@ -557,7 +557,7 @@ html[lang="hy"] .locale-ka-only {
   animation: chat-msg-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Chat panel entrance — the whole thread fades up once on open instead of
+/* Chat panel entrance, the whole thread fades up once on open instead of
    scrolling through the full history top-to-bottom. */
 @keyframes chat-panel-in {
   from {
@@ -581,7 +581,7 @@ html[lang="hy"] .locale-ka-only {
 }
 
 /*
- * Scroll-reveal (see components/landing/reveal.tsx) — the CSS replacement for
+ * Scroll-reveal (see components/landing/reveal.tsx), the CSS replacement for
  * framer-motion's fade-up on landing sections. Hidden until the shared
  * IntersectionObserver flips data-revealed; the transition is compositor-only
  * (opacity + transform), so it doesn't contend with interaction handling the
@@ -610,7 +610,7 @@ html[lang="hy"] .locale-ka-only {
 }
 
 /* Slow background rotations for the final-CTA aura (were framer-motion
- * infinite-rotate motion.divs — now pure compositor animations). */
+ * infinite-rotate motion.divs, now pure compositor animations). */
 @keyframes vivida-spin-60 {
   to {
     transform: rotate(360deg);
@@ -635,7 +635,7 @@ html[lang="hy"] .locale-ka-only {
 }
 
 /*
- * Mobile compositing hack — `backdrop-filter` is among the most expensive
+ * Mobile compositing hack, `backdrop-filter` is among the most expensive
  * GPU operations on mobile browsers (especially Safari iOS, where it can
  * tank scroll FPS). Below 640px we strip every `backdrop-blur-*` utility
  * site-wide. The cards and overlays still read fine over the dark, layered
@@ -643,7 +643,7 @@ html[lang="hy"] .locale-ka-only {
  *
  * Targeting `[class*="backdrop-blur"]` catches all of Tailwind's blur sizes
  * (sm/md/lg/xl/2xl/3xl) without us having to enumerate them. The `&:not(...)`
- * exception keeps the dialog overlay frosted — it's a single fixed element,
+ * exception keeps the dialog overlay frosted, it's a single fixed element,
  * cheap to blur, and the focus-on-modal UX really benefits.
  */
 @media (max-width: 640px) {

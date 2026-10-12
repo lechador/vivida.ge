@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Compact sex selector for Account — instant-save (no Save button), mirrors
+ * Compact sex selector for Account, instant-save (no Save button), mirrors
  * the discoverability toggle. Only used for aggregate audience analytics.
  */
 export function GenderCard({
