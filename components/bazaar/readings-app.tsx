@@ -265,17 +265,40 @@ export function ReadingsApp() {
           <h1 className="mt-3 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
             A human reading,{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] bg-clip-text text-transparent">
-              commissioned like art
+              delivered in 24–48h
             </span>
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Tarot spreads, birth-chart interpretations, and compatibility
-            sessions from vetted readers. Pay by card — straight to your
-            reader&apos;s wallet. Birth details stay private and off-chain,
-            always.
+            Pick a vetted reader, pay by card in USD — your reader receives USDC
+            on Solana, verified on-chain before the reading begins. Birth
+            details stay private and off-chain, always.
           </p>
+          <ol className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs font-medium text-foreground/75">
+            <li>
+              <span className="mr-1.5 text-[var(--vivida-pink)]">01</span>Choose
+              a reading
+            </li>
+            <li>
+              <span className="mr-1.5 text-[var(--vivida-pink)]">02</span>Pay by
+              card
+            </li>
+            <li>
+              <span className="mr-1.5 text-[var(--vivida-pink)]">03</span>Get
+              your written reading
+            </li>
+          </ol>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
+          <button
+            onClick={() =>
+              document
+                .getElementById("readings-list")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+            className="rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-950/30"
+          >
+            Book a reading
+          </button>
           <button
             onClick={() =>
               go({ view: "bookings", service: null, provider: null })
@@ -286,7 +309,7 @@ export function ReadingsApp() {
           </button>
           <button
             onClick={() => go({ view: "apply", service: null, provider: null })}
-            className="rounded-full bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-950/30"
+            className="rounded-full border border-border/60 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
           >
             Become a reader
           </button>
@@ -322,7 +345,10 @@ export function ReadingsApp() {
       ) : (
         <>
           {/* Filter rail */}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div
+            id="readings-list"
+            className="mt-8 flex scroll-mt-24 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+          >
             <div
               className="flex flex-wrap gap-2"
               role="tablist"
@@ -510,6 +536,10 @@ export function ReadingsApp() {
                                 : ""}
                             </p>
                           </div>
+                          <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[var(--vivida-cyan)]">
+                            Book — {price(s.priceUsdcCents)} USDC{" "}
+                            <span aria-hidden>→</span>
+                          </span>
                         </div>
                       </button>
                     </li>
@@ -530,8 +560,8 @@ export function ReadingsApp() {
             <div>
               <p className="font-semibold">Direct payment to your reader</p>
               <p className="mt-1 text-muted-foreground">
-                Pay by card — your reader&apos;s wallet is paid directly,
-                verified on-chain before the reading begins.
+                You pay by card in USD — your reader&apos;s wallet receives USDC
+                on Solana, verified on-chain before the reading begins.
               </p>
             </div>
             <div>

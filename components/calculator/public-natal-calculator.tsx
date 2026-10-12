@@ -56,6 +56,19 @@ const ERRORS_EN: Record<string, string> = {
 
 const CALCULATOR_ONBOARDING_PATH = "/onboarding?next=/report";
 
+/** One-click demo persona for the English demo video: no typing, no typos. */
+const SAMPLE_PLACE: GeocodeResult = {
+  id: -1,
+  name: "London",
+  displayName: "London, United Kingdom",
+  country: "United Kingdom",
+  countryCode: "GB",
+  admin1: "England",
+  latitude: 51.5074,
+  longitude: -0.1278,
+  timezone: "Europe/London",
+};
+
 export function PublicNatalCalculator({
   locale = "ka",
   acquisitionMode = false,
@@ -77,6 +90,21 @@ export function PublicNatalCalculator({
   const [minute, setMinute] = useState("");
   const [unknownTime, setUnknownTime] = useState(false);
   const [place, setPlace] = useState<GeocodeResult | null>(null);
+  // Remounts PlacePicker so its internal query text picks up the sample city
+  // (it only reads `value` on mount). EN-only button, KA flow untouched.
+  const [sampleNonce, setSampleNonce] = useState(0);
+
+  function fillSample() {
+    setDay("14");
+    setMonth("02");
+    setYear("1990");
+    setHour("09");
+    setMinute("30");
+    setUnknownTime(false);
+    setPlace(SAMPLE_PLACE);
+    setSampleNonce((n) => n + 1);
+    setError(null);
+  }
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -281,10 +309,25 @@ export function PublicNatalCalculator({
           </div>
 
           {/* Place */}
-          <PlacePicker value={place} onChange={setPlace} locale={locale} />
+          <PlacePicker
+            key={sampleNonce}
+            value={place}
+            onChange={setPlace}
+            locale={locale}
+          />
 
           {error && (
             <p className="text-sm text-[var(--vivida-pink)]">{error}</p>
+          )}
+
+          {en && !chart && (
+            <button
+              type="button"
+              onClick={fillSample}
+              className="w-full rounded-xl border border-dashed border-border/70 px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:border-[var(--vivida-cyan)]/50 hover:text-foreground"
+            >
+              Try a sample — 14 Feb 1990, 09:30, London
+            </button>
           )}
 
           <Button
