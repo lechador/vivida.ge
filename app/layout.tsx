@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
-import { Noto_Sans_Georgian } from "next/font/google";
+import { Fraunces, Noto_Sans_Georgian } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import Script from "next/script";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
@@ -25,6 +25,20 @@ const notoGeorgian = Noto_Sans_Georgian({
   // as possible to Noto's metrics across cold and cached visits.
   adjustFontFallback: true,
   fallback: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+});
+
+/**
+ * Editorial serif for the English site only (vividaastro.com). The variable
+ * is declared globally but no Georgian-host markup references it, so the
+ * Georgian experience is byte-identical — only EN components opt in via the
+ * `font-display` utility or `@/components/en/editorial` primitives.
+ */
+const fraunces = Fraunces({
+  variable: "--font-display-serif",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  display: "optional",
 });
 
 // Vercel routes vivida.ge → www.vivida.ge with a 307. Using www as the
@@ -159,7 +173,7 @@ export default async function RootLayout({
     <html
       lang={HTML_LANG[locale]}
       data-scroll-behavior="smooth"
-      className={`dark scroll-smooth ${notoGeorgian.variable} h-full antialiased`}
+      className={`dark scroll-smooth ${notoGeorgian.variable} ${fraunces.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">

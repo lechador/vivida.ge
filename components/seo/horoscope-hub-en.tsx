@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PopularTools } from "@/components/nav/popular-tools";
+import { Accent } from "@/components/en/editorial";
 import {
   ALL_SLUGS,
   ZODIAC_DATES,
@@ -113,11 +114,8 @@ export function HoroscopeHubEn() {
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             {today}
           </div>
-          <h1 className="mt-2 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-            Today&apos;s{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              horoscope
-            </span>
+          <h1 className="font-display mt-2 text-balance text-4xl font-medium tracking-tight sm:text-5xl">
+            Today&apos;s <Accent>horoscope</Accent>
           </h1>
           <p className="mt-4 text-pretty text-base text-foreground/85 sm:text-lg">
             A practical snapshot of today&apos;s energy for all 12 zodiac signs.

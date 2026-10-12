@@ -1,4 +1,5 @@
 import { EnglishLink as Link } from "@/components/i18n/international-link";
+import { Accent } from "@/components/en/editorial";
 import { Calendar, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -122,11 +123,8 @@ export function ZodiacHubEn() {
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           Astrology guide
         </div>
-        <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-          The 12{" "}
-          <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            zodiac signs
-          </span>
+        <h1 className="font-display mb-4 text-balance text-3xl font-medium tracking-tight sm:text-5xl">
+          The 12 <Accent>zodiac signs</Accent>
         </h1>
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
           Explore every zodiac sign—dates, symbols, elements, modalities,

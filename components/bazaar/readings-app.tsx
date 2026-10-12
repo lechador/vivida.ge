@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 import { PayBookingByCard } from "@/components/crypto/crypto-pay";
+import { Accent } from "@/components/en/editorial";
 import { serviceCover } from "@/lib/bazaar-pure";
 
 /**
@@ -262,11 +263,8 @@ export function ReadingsApp() {
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--vivida-cyan)]">
             Insight Bazaar
           </p>
-          <h1 className="mt-3 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            A human reading,{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] bg-clip-text text-transparent">
-              delivered in 24–48h
-            </span>
+          <h1 className="mt-3 text-balance font-display text-3xl font-medium leading-tight tracking-tight sm:text-5xl">
+            A human reading, <Accent>delivered in 24–48h</Accent>
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Pick a vetted reader, pay by card in USD — your reader receives USDC

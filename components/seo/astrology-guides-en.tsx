@@ -7,6 +7,7 @@ import {
   GuideShell,
   NatalCta,
 } from "@/components/seo/astrology-guide-shell";
+import { Accent } from "@/components/en/editorial";
 import {
   HOUSE_GUIDES_EN,
   PLANET_GUIDES_EN,
@@ -74,11 +75,8 @@ export function AstrologyHousesHubEn() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--vivida-violet)]">
             Birth chart guide
           </p>
-          <h1 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
-            The 12 houses in astrology:{" "}
-            <span className="bg-gradient-to-r from-[var(--vivida-violet)] via-[var(--vivida-pink)] to-[var(--vivida-cyan)] bg-clip-text text-transparent">
-              your areas of life
-            </span>
+          <h1 className="font-display mt-3 text-balance text-4xl font-medium tracking-tight sm:text-6xl">
+            The 12 houses in astrology: <Accent>your areas of life</Accent>
           </h1>
           <p className="mt-5 text-pretty text-lg leading-8 text-foreground/80">
             The 12 houses answer the question “where?” Where does a planet’s
@@ -343,11 +341,8 @@ export function PlanetsHubEn() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
             Birth chart guide
           </p>
-          <h1 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
-            Planets{" "}
-            <span className="bg-gradient-to-r from-[var(--vivida-violet)] via-[var(--vivida-pink)] to-[var(--vivida-cyan)] bg-clip-text text-transparent">
-              in astrology
-            </span>
+          <h1 className="font-display mt-3 text-balance text-4xl font-medium tracking-tight sm:text-6xl">
+            Planets <Accent>in astrology</Accent>
           </h1>
           <p className="mt-5 text-lg leading-8 text-foreground/80">
             A planet answers “what is acting?” The Sun represents identity, the

@@ -1,4 +1,5 @@
 import { EnglishLink as Link } from "@/components/i18n/international-link";
+import { Accent } from "@/components/en/editorial";
 
 import { ChineseYearFinder } from "@/components/calculator/chinese-year-finder";
 import { Starfield } from "@/components/landing/starfield";
@@ -75,7 +76,10 @@ export function ChineseZodiacHubEn() {
   ];
 
   return (
-    <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang="en"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <PageBackground />
       <Starfield count={140} shooting={3} />
       <SmartHeader locale="en" georgianPath="/chinuri-horoskopi" />
@@ -92,11 +96,8 @@ export function ChineseZodiacHubEn() {
         </nav>
 
         <header className="text-center">
-          <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-            Chinese zodiac: your animal sign by{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              birth year
-            </span>
+          <h1 className="font-display text-balance text-3xl font-medium tracking-tight sm:text-5xl">
+            Chinese zodiac: your animal sign by <Accent>birth year</Accent>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-foreground/80 sm:text-lg">
             Find your sign in the twelve-year animal cycle, then explore its
@@ -118,7 +119,9 @@ export function ChineseZodiacHubEn() {
               <span className="text-4xl" aria-hidden>
                 {animal.emoji}
               </span>
-              <span className="font-semibold tracking-tight">{animal.nameEn}</span>
+              <span className="font-semibold tracking-tight">
+                {animal.nameEn}
+              </span>
               <span className="text-[11px] tabular-nums text-muted-foreground">
                 {yearsForAnimal(animal.slug).slice(0, 3).join(" · ")}
               </span>
@@ -134,13 +137,14 @@ export function ChineseZodiacHubEn() {
             The Chinese zodiac assigns one of twelve animals to each lunar year:
             Rat, Ox, Tiger, Rabbit, Dragon, Snake, Horse, Goat, Monkey, Rooster,
             Dog, and Pig. The sequence repeats every twelve years, while a wider
-            sixty-year cycle combines those animals with five elements and Yin or
-            Yang polarity.
+            sixty-year cycle combines those animals with five elements and Yin
+            or Yang polarity.
           </p>
           <p>
             The zodiac year does not change on January 1. Chinese New Year moves
-            between late January and mid-February, so people born near that window
-            should verify the exact date for their birth year before choosing a sign.
+            between late January and mid-February, so people born near that
+            window should verify the exact date for their birth year before
+            choosing a sign.
           </p>
         </article>
 
@@ -150,8 +154,13 @@ export function ChineseZodiacHubEn() {
           </h2>
           <div className="space-y-3">
             {HUB_FAQ.map((item) => (
-              <details key={item.q} className="rounded-2xl border border-border bg-card/55 p-5">
-                <summary className="cursor-pointer font-medium">{item.q}</summary>
+              <details
+                key={item.q}
+                className="rounded-2xl border border-border bg-card/55 p-5"
+              >
+                <summary className="cursor-pointer font-medium">
+                  {item.q}
+                </summary>
                 <p className="mt-3 text-sm leading-relaxed text-foreground/85 sm:text-base">
                   {item.a}
                 </p>
@@ -226,10 +235,16 @@ export function ChineseAnimalPageEn({
   ];
 
   return (
-    <main lang="en" className="relative isolate flex min-h-screen flex-col overflow-hidden">
+    <main
+      lang="en"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+    >
       <PageBackground />
       <Starfield count={120} shooting={3} />
-      <SmartHeader locale="en" georgianPath={`/chinuri-horoskopi/${animal.slug}`} />
+      <SmartHeader
+        locale="en"
+        georgianPath={`/chinuri-horoskopi/${animal.slug}`}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -267,23 +282,37 @@ export function ChineseAnimalPageEn({
           </h2>
           <div className="flex flex-wrap gap-2">
             {years.map((year) => (
-              <span key={year} className="rounded-full border border-border bg-card/55 px-3 py-1 text-sm tabular-nums">
+              <span
+                key={year}
+                className="rounded-full border border-border bg-card/55 px-3 py-1 text-sm tabular-nums"
+              >
                 {year}
               </span>
             ))}
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            Born in January or early February? Confirm the Chinese New Year date,
-            because you may belong to the previous animal year.
+            Born in January or early February? Confirm the Chinese New Year
+            date, because you may belong to the previous animal year.
           </p>
         </section>
 
         <Prose className="mt-8" body={content.intro} />
-        <TextSection title={`${animal.nameEn} personality`} body={content.personality} />
+        <TextSection
+          title={`${animal.nameEn} personality`}
+          body={content.personality}
+        />
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          <Traits title="Natural strengths" items={content.strengths} color="var(--vivida-cyan)" />
-          <Traits title="Growth challenges" items={content.challenges} color="var(--vivida-pink)" />
+          <Traits
+            title="Natural strengths"
+            items={content.strengths}
+            color="var(--vivida-cyan)"
+          />
+          <Traits
+            title="Growth challenges"
+            items={content.challenges}
+            color="var(--vivida-pink)"
+          />
         </div>
 
         <TextSection title="Love and relationships" body={content.love} />
@@ -293,13 +322,22 @@ export function ChineseAnimalPageEn({
           <h2 className="mb-4 text-2xl font-semibold tracking-tight sm:text-3xl">
             Compatibility
           </h2>
-          <CompatibilityGroup label="Traditionally harmonious" slugs={content.compatible} color="var(--vivida-cyan)" />
+          <CompatibilityGroup
+            label="Traditionally harmonious"
+            slugs={content.compatible}
+            color="var(--vivida-cyan)"
+          />
           <div className="mt-5">
-            <CompatibilityGroup label="Potentially challenging" slugs={content.challenging} color="var(--vivida-pink)" />
+            <CompatibilityGroup
+              label="Potentially challenging"
+              slugs={content.challenging}
+              color="var(--vivida-pink)"
+            />
           </div>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
             These pairings describe broad traditional patterns. Communication,
-            values, timing, and individual character matter more than animal signs alone.
+            values, timing, and individual character matter more than animal
+            signs alone.
           </p>
         </section>
 
@@ -309,9 +347,16 @@ export function ChineseAnimalPageEn({
           </h2>
           <div className="space-y-3">
             {faq.map((item) => (
-              <details key={item.q} className="rounded-2xl border border-border bg-card/55 p-5">
-                <summary className="cursor-pointer font-medium">{item.q}</summary>
-                <p className="mt-3 text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p>
+              <details
+                key={item.q}
+                className="rounded-2xl border border-border bg-card/55 p-5"
+              >
+                <summary className="cursor-pointer font-medium">
+                  {item.q}
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-foreground/85 sm:text-base">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>
@@ -335,12 +380,18 @@ export function ChineseAnimalPageEn({
             Other animal signs
           </h2>
           <div className="flex flex-wrap gap-2">
-            {CHINESE_ANIMALS.filter((other) => other.slug !== animal.slug).map((other) => (
-              <Link key={other.slug} href={`/chinuri-horoskopi/${other.slug}`} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm">
-                <span aria-hidden>{other.emoji}</span>
-                {other.nameEn}
-              </Link>
-            ))}
+            {CHINESE_ANIMALS.filter((other) => other.slug !== animal.slug).map(
+              (other) => (
+                <Link
+                  key={other.slug}
+                  href={`/chinuri-horoskopi/${other.slug}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm"
+                >
+                  <span aria-hidden>{other.emoji}</span>
+                  {other.nameEn}
+                </Link>
+              ),
+            )}
           </div>
         </section>
       </section>
@@ -360,26 +411,49 @@ function PageBackground() {
 }
 
 function Prose({ body, className }: { body: string; className?: string }) {
-  return <p className={`max-w-3xl text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg ${className ?? ""}`}>{body}</p>;
+  return (
+    <p
+      className={`max-w-3xl text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg ${className ?? ""}`}
+    >
+      {body}
+    </p>
+  );
 }
 
 function TextSection({ title, body }: { title: string; body: string }) {
   return (
     <section className="mt-12 max-w-3xl">
-      <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
+      <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+        {title}
+      </h2>
       <Prose body={body} />
     </section>
   );
 }
 
-function Traits({ title, items, color }: { title: string; items: string[]; color: string }) {
+function Traits({
+  title,
+  items,
+  color,
+}: {
+  title: string;
+  items: string[];
+  color: string;
+}) {
   return (
     <article className="rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5">
-      <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">{title}</h3>
+      <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        {title}
+      </h3>
       <ul className="mt-3 space-y-2">
         {items.map((item) => (
-          <li key={item} className="flex items-start gap-2 text-sm text-foreground/85">
-            <span aria-hidden style={{ color }}>◆</span>
+          <li
+            key={item}
+            className="flex items-start gap-2 text-sm text-foreground/85"
+          >
+            <span aria-hidden style={{ color }}>
+              ◆
+            </span>
             {item}
           </li>
         ))}
@@ -388,18 +462,36 @@ function Traits({ title, items, color }: { title: string; items: string[]; color
   );
 }
 
-function CompatibilityGroup({ label, slugs, color }: { label: string; slugs: string[]; color: string }) {
+function CompatibilityGroup({
+  label,
+  slugs,
+  color,
+}: {
+  label: string;
+  slugs: string[];
+  color: string;
+}) {
   return (
     <div>
-      <h3 className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">{label}</h3>
+      <h3 className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </h3>
       <div className="grid gap-3 sm:grid-cols-3">
         {slugs.map((slug) => {
           const animal = chineseAnimalBySlug(slug);
           if (!animal) return null;
           return (
-            <Link key={slug} href={`/chinuri-horoskopi/${slug}`} className="flex items-center gap-3 rounded-2xl border border-border bg-card/55 p-4">
-              <span className="text-2xl" aria-hidden>{animal.emoji}</span>
-              <span className="font-semibold" style={{ color }}>{animal.nameEn}</span>
+            <Link
+              key={slug}
+              href={`/chinuri-horoskopi/${slug}`}
+              className="flex items-center gap-3 rounded-2xl border border-border bg-card/55 p-4"
+            >
+              <span className="text-2xl" aria-hidden>
+                {animal.emoji}
+              </span>
+              <span className="font-semibold" style={{ color }}>
+                {animal.nameEn}
+              </span>
             </Link>
           );
         })}

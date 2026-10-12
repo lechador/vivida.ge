@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
+import { Accent } from "@/components/en/editorial";
 import { SmartHeader } from "@/components/smart-header";
 import { SiteFooter } from "@/components/site-footer";
 import { TESTS, type TestCatalogEntry } from "@/lib/tests-catalog";
@@ -124,11 +125,8 @@ export default function EnglishTestsPage() {
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Tests and quizzes
           </div>
-          <h1 className="mt-2 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            Discover more about{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              how you think and feel
-            </span>
+          <h1 className="mt-2 text-balance font-display text-3xl font-medium leading-tight tracking-tight sm:text-5xl">
+            Discover more about <Accent>how you think and feel</Accent>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
             Thoughtful assessments for intelligence, personality and emotional

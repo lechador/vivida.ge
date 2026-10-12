@@ -1,4 +1,5 @@
 import { EnglishLink as Link } from "@/components/i18n/international-link";
+import { Accent } from "@/components/en/editorial";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
@@ -107,11 +108,8 @@ export function DreamsHubEn({ authed = false }: { authed?: boolean } = {}) {
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Dream symbols
           </div>
-          <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            Dream dictionary{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              A–Z
-            </span>
+          <h1 className="font-display mt-1 text-balance text-3xl font-medium leading-tight tracking-tight sm:text-5xl">
+            Dream dictionary <Accent>A–Z</Accent>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-foreground/80 sm:text-lg">
             Find the image you remember and explore both its traditional

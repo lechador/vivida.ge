@@ -16,9 +16,9 @@ export function EnglishShell({
     >
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_40%_at_50%_-5%,oklch(0.30_0.16_305/0.48),transparent_70%),radial-gradient(45%_30%_at_90%_35%,oklch(0.28_0.14_220/0.35),transparent_70%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_32%_at_50%_-5%,oklch(0.26_0.12_305/0.32),transparent_70%)]"
       />
-      <Starfield count={110} shooting={2} />
+      <Starfield count={70} shooting={1} />
       <EnglishHeader georgianPath={georgianPath} />
       <main className="relative z-10 flex-1">{children}</main>
       <EnglishFooter />

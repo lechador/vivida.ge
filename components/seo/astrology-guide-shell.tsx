@@ -19,6 +19,7 @@ export function GuideShell({
   locale?: GuideLocale;
   georgianPath?: string;
 }) {
+  const en = locale === "en";
   return (
     <main
       lang={locale}
@@ -26,9 +27,13 @@ export function GuideShell({
     >
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_38%_at_50%_-5%,oklch(0.31_0.17_300/0.5),transparent_75%),radial-gradient(38%_28%_at_90%_24%,oklch(0.27_0.13_220/0.38),transparent_75%)]"
+        className={
+          en
+            ? "absolute inset-0 -z-10 bg-[radial-gradient(50%_30%_at_50%_-5%,oklch(0.26_0.12_305/0.30),transparent_70%)]"
+            : "absolute inset-0 -z-10 bg-[radial-gradient(55%_38%_at_50%_-5%,oklch(0.31_0.17_300/0.5),transparent_75%),radial-gradient(38%_28%_at_90%_24%,oklch(0.27_0.13_220/0.38),transparent_75%)]"
+        }
       />
-      <Starfield count={90} shooting={1} />
+      <Starfield count={en ? 70 : 90} shooting={1} />
       <SmartHeader locale={locale} georgianPath={georgianPath} />
       {children}
       <SiteFooter locale={locale} />
@@ -86,14 +91,43 @@ export function NatalCta({
   const ctaHref = locale === "en" ? "/natal-chart" : "/nataluri-ruka";
   const ctaLabel =
     locale === "en" ? "Calculate your birth chart" : "ნატალური რუკის გამოთვლა";
+  const en = locale === "en";
 
   return (
-    <section className="mt-12 rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/70 to-[var(--vivida-cyan)]/10 p-7 text-center ring-1 ring-foreground/5 sm:p-10">
-      <Sparkles className="mx-auto size-6 text-[var(--vivida-violet)]" />
-      <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight">
+    <section
+      className={
+        en
+          ? "mt-12 rounded-3xl border border-border bg-card/40 p-7 sm:p-10"
+          : "mt-12 rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/70 to-[var(--vivida-cyan)]/10 p-7 text-center ring-1 ring-foreground/5 sm:p-10"
+      }
+    >
+      {en ? (
+        <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--vivida-cyan)]">
+          <span
+            aria-hidden
+            className="inline-block h-px w-8 bg-[var(--vivida-cyan)]/60"
+          />
+          Free calculator
+        </p>
+      ) : (
+        <Sparkles className="mx-auto size-6 text-[var(--vivida-violet)]" />
+      )}
+      <h2
+        className={
+          en
+            ? "font-display mt-3 max-w-xl text-balance text-3xl font-medium tracking-[-0.01em] sm:text-4xl"
+            : "mt-3 text-balance text-2xl font-semibold tracking-tight"
+        }
+      >
         {heading}
       </h2>
-      <p className="mx-auto mt-3 max-w-xl leading-7 text-foreground/75">
+      <p
+        className={
+          en
+            ? "mt-3 max-w-xl leading-7 text-foreground/75"
+            : "mx-auto mt-3 max-w-xl leading-7 text-foreground/75"
+        }
+      >
         {desc}
       </p>
       <Button asChild variant="mystic" size="lg" className="mt-6">
@@ -114,9 +148,18 @@ export function FaqList({
 }) {
   const heading =
     locale === "en" ? "Frequently asked questions" : "ხშირად დასმული კითხვები";
+  const en = locale === "en";
   return (
     <section className="mt-12">
-      <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
+      <h2
+        className={
+          en
+            ? "font-display text-3xl font-medium tracking-[-0.01em]"
+            : "text-2xl font-semibold tracking-tight"
+        }
+      >
+        {heading}
+      </h2>
       <div className="mt-5 space-y-3">
         {items.map((item) => (
           <details

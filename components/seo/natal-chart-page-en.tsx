@@ -4,6 +4,7 @@ import { PublicNatalCalculator } from "@/components/calculator/public-natal-calc
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import { Accent } from "@/components/en/editorial";
 
 const SITE_URL = "https://www.vividaastro.com";
 const PAGE_URL = `${SITE_URL}/natal-chart`;
@@ -85,12 +86,8 @@ export function NatalChartPageEn() {
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <header className="text-center">
-          <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-            Free{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              birth chart
-            </span>{" "}
-            calculator
+          <h1 className="font-display text-balance text-3xl font-medium tracking-tight sm:text-5xl">
+            Free <Accent>birth chart</Accent> calculator
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-pretty text-base text-foreground/80 sm:text-lg">
             Enter your birth date, time, and place to calculate your planets,
@@ -230,7 +227,6 @@ export function NatalChartPageEn() {
             ))}
           </section>
         </article>
-
       </section>
       <SiteFooter locale="en" />
     </main>

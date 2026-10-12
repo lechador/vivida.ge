@@ -156,6 +156,18 @@ html[lang="hy"] .locale-ka-only {
     -webkit-font-smoothing: antialiased;
   }
   /*
+   * Editorial serif for the English site (vividaastro.com). A plain class —
+   * not a Tailwind theme token — so it resolves deterministically everywhere.
+   * Only EN components opt in; Georgian-host markup never references it.
+   */
+  .font-display {
+    font-family:
+      var(--font-display-serif),
+      Georgia,
+      "Times New Roman",
+      serif;
+  }
+  /*
    * When the mobile bottom tab bar is mounted (authed pages on phones),
    * reserve space at the bottom of the viewport so page content isn't
    * hidden behind it. Uses :has() so the rule is automatic — landing

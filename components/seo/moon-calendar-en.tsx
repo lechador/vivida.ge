@@ -1,4 +1,5 @@
 import { EnglishLink as Link } from "@/components/i18n/international-link";
+import { Accent } from "@/components/en/editorial";
 import { unstable_cache } from "next/cache";
 import { ArrowRight, Moon, Sparkles } from "lucide-react";
 
@@ -228,11 +229,8 @@ export async function MoonCalendarPageEn() {
             <Moon className="size-3.5" />
             Lunar rhythm
           </div>
-          <h1 className="mt-2 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-            Moon Calendar{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {year}
-            </span>
+          <h1 className="font-display mt-2 text-balance text-4xl font-medium tracking-tight sm:text-5xl">
+            Moon Calendar <Accent>{year}</Accent>
           </h1>
           <p className="mt-4 text-pretty text-base leading-7 text-foreground/85 sm:text-lg">
             Today’s Moon phase and zodiac sign, upcoming New and Full Moon

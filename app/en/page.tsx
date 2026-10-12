@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Compass,
-  Heart,
-  Languages,
-  Orbit,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, Compass, Heart, Orbit, Sparkles } from "lucide-react";
 
 import { EnglishShell } from "@/components/en/english-shell";
+import { Accent, Kicker } from "@/components/en/editorial";
 import { LatestArticlesSection } from "@/components/articles/latest-articles-section";
 import {
   DEFAULT_OG_IMAGE,
@@ -113,15 +107,9 @@ export default function EnglishHomePage() {
 
       <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
-            <Languages className="size-3.5 text-[var(--vivida-cyan)]" /> AI
-            tarot · AI astrologer · Human readings
-          </span>
-          <h1 className="mt-7 max-w-xl text-balance text-4xl font-semibold leading-[1.06] tracking-tight sm:text-6xl">
-            Birth data in. A chart you can{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              actually read
-            </span>
+          <Kicker>AI tarot · AI astrologer · Human readings</Kicker>
+          <h1 className="font-display mt-7 max-w-xl text-balance text-5xl font-medium leading-[1.04] tracking-[-0.015em] sm:text-6xl">
+            Birth data in. A chart you can <Accent>actually read.</Accent>
           </h1>
           <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-foreground/80 sm:text-xl">
             Free birth-chart calculator, AI tarot and an AI astrologer that
