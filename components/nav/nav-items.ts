@@ -261,6 +261,8 @@ export function navItems(locale: UserLocale = "ka"): NavItem[] {
 export const EN_COMPACT_PRIMARY_KEYS: readonly NavActiveKey[] = [
   "today",
   "tarot",
+  "ask",
+  "report",
   "readings",
 ];
 

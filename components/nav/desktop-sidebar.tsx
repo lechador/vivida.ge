@@ -35,7 +35,7 @@ export function DesktopSidebar({
   /** English host: a few primary destinations + an "Others" dialog. */
   compact?: boolean;
 }) {
-  // Compact (vividaastro.com): only Today/Tarot/Readings stay visible and
+  // Compact (vividaastro.com): Today/Tarot/Ask/My chart/Readings stay visible and
   // everything else moves into the Others dialog. Otherwise the full rail.
   const { primary, others } = compact
     ? splitCompactNav(locale)
