@@ -33,8 +33,8 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
   const verified = params.get("verified") === "1";
   const verifyError = params.get("verify_error");
   // Post-login destination, only same-origin relative paths (no open redirect).
-  // Defaults to the intent-aware resolver: incomplete profiles land on
-  // onboarding, complete ones on their destination (or dashboard).
+  // Defaults to the resolver: straight to the requested destination (or
+  // dashboard), birth details are optional and added later via onboarding.
   const nextParam = params.get("next");
   const safeNext = nextParam
     ? normalizeReturnPath(nextParam, "") || null

@@ -47,9 +47,9 @@ async function clientIpFromHeaders(): Promise<string> {
 // ─── OAuth (existing) ────────────────────────────────────────────────────
 
 /**
- * After OAuth, land on /post-login, the intent-aware resolver that sends
- * incomplete profiles to /onboarding (preserving their destination as
- * ?next=) and complete ones straight to their goal or /dashboard.
+ * After OAuth, land on /post-login, which resolves straight to the
+ * requested goal or /dashboard. Birth details are optional at signup,
+ * chart-gated features prompt for them later via /onboarding?next=.
  */
 export async function signInWithGoogle(callbackUrl: string = "/post-login") {
   await signIn("google", { redirectTo: callbackUrl });

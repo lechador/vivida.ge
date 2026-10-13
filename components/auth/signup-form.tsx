@@ -76,8 +76,8 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           return;
         }
         if (res.signedIn) {
-          // Intent-aware landing: incomplete profiles go to onboarding first,
-          // complete ones straight to their destination (or dashboard).
+          // Straight to their destination (or dashboard), birth details
+          // are optional and can be added later via onboarding.
           router.push(
             safeNext
               ? `/post-login?next=${encodeURIComponent(safeNext)}`

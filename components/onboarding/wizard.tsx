@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 
@@ -452,6 +453,19 @@ export function OnboardingWizard({
             )}
           </Button>
         </div>
+
+        {!dateLocked && (
+          <p className="mt-6 text-center">
+            <Link
+              href={next ?? "/dashboard"}
+              className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+            >
+              {en
+                ? "Skip for now, I'll add this later"
+                : "გამოტოვე, მოგვიანებით შევავსებ"}
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );

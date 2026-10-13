@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -41,7 +40,6 @@ export function DailyDashboard({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const router = useRouter();
   const [core, setCore] = useState<DashboardCore | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,11 +57,9 @@ export function DailyDashboard({
     };
   }, [userId]);
 
-  useEffect(() => {
-    if (core?.kind === "no-chart") {
-      router.replace("/onboarding");
-    }
-  }, [core, router]);
+  // No-chart accounts never reach this component (the dashboard renders
+  // NoChartDashboard instead), and birth data is optional, so there is no
+  // forced redirect to onboarding here.
 
   if (error) {
     return (

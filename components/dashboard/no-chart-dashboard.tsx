@@ -13,9 +13,9 @@ import type { ArticlePreview } from "@/lib/articles";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * English-host dashboard for accounts without birth details: a slim birth-data
+ * Dashboard for accounts without birth details: a slim birth-data
  * CTA plus chart-free content (today's moon, quick tools, article picks, a
- * test promo) instead of the locked full-page wall the Georgian host keeps.
+ * test promo) instead of a locked full-page wall, on both hosts.
  */
 export function NoChartDashboard({
   locale,

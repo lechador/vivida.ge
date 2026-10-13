@@ -14,7 +14,6 @@ import { isAccountRestricted } from "@/lib/restriction";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { PopularTools } from "@/components/nav/popular-tools";
-import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { NoChartDashboard } from "@/components/dashboard/no-chart-dashboard";
 import { PushOptIn } from "@/components/push/push-opt-in";
@@ -28,10 +27,7 @@ import {
   type ArticlePreview,
 } from "@/lib/articles";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
-import {
-  getRequestLocale,
-  requestIsEnglishHost,
-} from "@/lib/i18n/request-locale";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ensureMoonPhase } from "@/actions/moon-phase";
 import { getBalance } from "@/lib/credits";
 import { shouldShowPurchasePromotion } from "@/lib/billing-config";
@@ -109,31 +105,10 @@ export default async function DashboardPage() {
   const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
   const en = locale !== "ka";
 
-  // English host: an account without birth details still gets a filled
-  // dashboard (chart-free data + prompts) instead of a full-page wall. The
-  // Georgian host keeps the original locked shell.
-  const englishHost = await requestIsEnglishHost();
+  // An account without birth details gets a filled, chart-free dashboard
+  // (birth-data banner + moon, tools, articles, test promo) on both hosts
+  // instead of a full-page wall, birth data stays optional after signup.
   const noChart = !profile?.dateOfBirth;
-
-  if (noChart && !englishHost) {
-    return (
-      <AstroLockedMain
-        active="today"
-        title={
-          en
-            ? "Your daily horoscope needs a natal chart"
-            : "დღიური ჰოროსკოპი ნატალურ რუკას საჭიროებს"
-        }
-        description={
-          en
-            ? "Add your birth details to receive a personalized horoscope and sky overview every day."
-            : "შეავსე დაბადების მონაცემები და ყოველ დღე მიიღებ პერსონალურ ჰოროსკოპსა და ცის მიმოხილვას."
-        }
-        next="/dashboard"
-        locale={locale}
-      />
-    );
-  }
 
   const [restricted, publishedArticles, moonPhase] = await Promise.all([
     isAccountRestricted(user.id),
