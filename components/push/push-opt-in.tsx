@@ -1,14 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Bell, BellOff, Check, Loader2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import {
+  clearPushPromptDismissal,
+  PUSH_VALUE_MOMENT_EVENT,
+  PWA_INSTALL_ACCEPTED_EVENT,
+  PWA_VALUE_ACTION_EVENT,
+  readPushPromptState,
+  recordPushPromptDismissal,
+} from "@/lib/push-prompt";
 
 const VAPID = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-const DISMISS_KEY = "vivida_push_prompt_dismissed";
 
 /** VAPID public key (base64url) → Uint8Array for pushManager.subscribe. */
 function urlBase64ToUint8Array(base64: string): Uint8Array {
@@ -34,8 +41,15 @@ const isIOS =
   /iphone|ipad|ipod/i.test(navigator.userAgent);
 
 /**
- * Web-push opt-in. `card` = a settings block (Account); `banner` = a compact
- * dismissible dashboard prompt shown only when notifications aren't enabled.
+ * Web-push opt-in.
+ *
+ * `card`   — settings block on the Account page.
+ * `banner` — compact dismissible prompt, event-driven. It appears when it is
+ *            the natural moment to ask: after the user receives value, or right
+ *            after they install the app.
+ *
+ * Dismissal is an escalating, expiring quiet period (see lib/push-prompt.ts),
+ * never permanent.
  */
 export function PushOptIn({
   variant = "card",
@@ -48,14 +62,22 @@ export function PushOptIn({
   const [state, setState] = useState<State>("loading");
   const [error, setError] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const promptTracked = useRef(false);
+  /** Mirrors `state` so event listeners can read the live value. */
+  const stateRef = useRef<State>("loading");
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         if (typeof window !== "undefined") {
-          setDismissed(localStorage.getItem(DISMISS_KEY) === "1");
+          // Expiring, escalating dismissal rather than a permanent flag.
+          setDismissed(!readPushPromptState().canPrompt);
         }
       } catch {
         /* ignore */
@@ -92,17 +114,65 @@ export function PushOptIn({
     };
   }, []);
 
+  /** Show the banner, respecting the current quiet period. */
+  const reveal = useCallback((reason: "install" | "value" | "surface") => {
+    if (stateRef.current !== "off") return;
+    if (reason === "install") clearPushPromptDismissal();
+    else if (!readPushPromptState().canPrompt) return;
+
+    setRevealed(true);
+    setDismissed(false);
+  }, []);
+
+  /**
+   * Show the prompt in response to a real value moment, or right after install.
+   *
+   * Push grows 13 subscriptions against 728 signups mostly because it is only
+   * ever asked as a static banner, never at a moment when the user has just
+   * received something. Installing the app is the strongest such moment, so a
+   * previous dismissal is cleared there: the reason to want notifications is
+   * concrete and new.
+   *
+   * Listeners read live state through `stateRef` and keep side effects out of
+   * state updaters, so React's double-invocation cannot double-count a view.
+   */
   useEffect(() => {
-    if (
-      variant === "banner" &&
-      state === "off" &&
-      !dismissed &&
-      !promptTracked.current
-    ) {
-      promptTracked.current = true;
-      trackEvent(ANALYTICS_EVENT.pushPromptViewed, { surface: variant });
-    }
-  }, [dismissed, state, variant]);
+    if (variant !== "banner") return;
+    const onEvent = (event: Event) => {
+      const isInstall =
+        event.type === "appinstalled" ||
+        event.type === PWA_INSTALL_ACCEPTED_EVENT;
+      reveal(isInstall ? "install" : "value");
+    };
+
+    window.addEventListener(PUSH_VALUE_MOMENT_EVENT, onEvent);
+    window.addEventListener(PWA_VALUE_ACTION_EVENT, onEvent);
+    window.addEventListener(PWA_INSTALL_ACCEPTED_EVENT, onEvent);
+    window.addEventListener("appinstalled", onEvent);
+    return () => {
+      window.removeEventListener(PUSH_VALUE_MOMENT_EVENT, onEvent);
+      window.removeEventListener(PWA_VALUE_ACTION_EVENT, onEvent);
+      window.removeEventListener(PWA_INSTALL_ACCEPTED_EVENT, onEvent);
+      window.removeEventListener("appinstalled", onEvent);
+    };
+  }, [variant, reveal]);
+
+  /**
+   * Report the view once the prompt is actually on screen.
+   *
+   * Derived rather than set from an effect, so React's double-invocation
+   * cannot double-count an impression.
+   */
+  useEffect(() => {
+    if (variant !== "banner") return;
+    if (!revealed || dismissed || state !== "off" || promptTracked.current)
+      return;
+    promptTracked.current = true;
+    trackEvent(ANALYTICS_EVENT.pushPromptViewed, {
+      surface: variant,
+      trigger: "event",
+    });
+  }, [variant, revealed, dismissed, state]);
 
   async function enable() {
     setError(null);
@@ -164,18 +234,15 @@ export function PushOptIn({
   }
 
   function dismiss() {
-    try {
-      localStorage.setItem(DISMISS_KEY, "1");
-    } catch {
-      /* ignore */
-    }
+    // Escalating quiet period, so a "no" is respected but never permanent.
+    recordPushPromptDismissal();
     trackEvent(ANALYTICS_EVENT.pushDismissed, { surface: variant });
     setDismissed(true);
   }
 
-  // ── Banner (dashboard) ── only when actionable & not dismissed.
+  // ── Banner ── only when it is the right moment, actionable, and not snoozed.
   if (variant === "banner") {
-    if (dismissed || state !== "off") return null;
+    if (!revealed || dismissed || state !== "off") return null;
     return (
       <div className="mb-6 flex items-center gap-3 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 to-[var(--vivida-cyan)]/8 p-4 ring-1 ring-foreground/5 backdrop-blur-xl">
         <Bell className="size-5 shrink-0 text-[var(--vivida-violet)]" />

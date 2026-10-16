@@ -16,7 +16,6 @@ import { AppHeader } from "@/components/nav/app-header";
 import { PopularTools } from "@/components/nav/popular-tools";
 import { DailyDashboard } from "@/components/dashboard/daily-dashboard";
 import { NoChartDashboard } from "@/components/dashboard/no-chart-dashboard";
-import { PushOptIn } from "@/components/push/push-opt-in";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
 import { DashboardArticleRecommendations } from "@/components/dashboard/article-recommendations";
@@ -194,10 +193,6 @@ export default async function DashboardPage() {
         <div className="mt-8">
           <PopularTools locale={locale} placement="dashboard_top" />
         </div>
-
-        {/* Soft prompt to enable daily push, hides itself once enabled,
-            unsupported, or dismissed. */}
-        <PushOptIn variant="banner" locale={locale} />
 
         {shouldShowPurchasePromotion({
           isPremium: userRow?.isPremium ?? false,

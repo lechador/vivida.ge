@@ -5,7 +5,7 @@ import { unstable_cache } from "next/cache";
 import { ArrowRight, Moon, Sparkles } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
-import { ReportPromo } from "@/components/report/report-promo";
+import { PaidNextStep } from "@/components/seo/paid-next-step";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,16 @@ import {
   type MoonPhaseSnapshot,
   type PhaseKey,
 } from "@/lib/moon-phase";
-import { LUNAR_DAY_NOTES, PHASE_GUIDE, lunarDayFromAge } from "@/lib/seo/moon-reference";
+import {
+  creditPacksForCountry,
+  formatBillingAmount,
+} from "@/lib/billing-config";
+import { CREDIT_COST } from "@/lib/credits-config";
+import {
+  LUNAR_DAY_NOTES,
+  PHASE_GUIDE,
+  lunarDayFromAge,
+} from "@/lib/seo/moon-reference";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   moonCalendarEnCopy,
@@ -470,6 +479,18 @@ export default async function MoonCalendarPage() {
           </section>
         )}
 
+        {/* Single paid continuation after today's free moon answer: the
+            visitor's own forecast, not another generic calendar. */}
+        <div className="mb-10">
+          <PaidNextStep
+            title="კალენდარი ყველასია, პროგნოზი კი შენი"
+            body="ფაზა და მთვარის დღე საერთო ცაა. პირადი პროგნოზი მას შენს ნატალურ რუკას ადარებს და გეუბნება, ეს კვირა შენთვის რას ნიშნავს."
+            ctaHref="/signup?next=%2Fdashboard"
+            ctaLabel="მიიღე პირადი პროგნოზი"
+            priceNote={`7-დღიანი პროგნოზი ${CREDIT_COST.weeklyForecast} კრედიტი · კრედიტები ${formatBillingAmount(creditPacksForCountry("GE")[0].amountMinor, "gel", "ka")}-დან, ერთჯერადად`}
+          />
+        </div>
+
         <div className="mb-10">
           <PopularTools placement="moon_after_today" publicEntry />
         </div>
@@ -755,8 +776,6 @@ export default async function MoonCalendarPage() {
           </div>
         </section>
 
-
-        <ReportPromo className="mt-16" />
         <div className="mt-6 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10">
           <Sparkles
             aria-hidden

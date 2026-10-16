@@ -22,6 +22,28 @@ export type PremiumPlan = {
 };
 
 /**
+ * Whether monthly PRO may still be *sold* in a market.
+ *
+ * Georgia retired it (owner decision, 2026-10-16). The monthly plan stays in
+ * `PREMIUM_PLANS_BY_COUNTRY.GE` because it remains the **price anchor** the
+ * discounted quarterly saving is computed against, and one grandfathered
+ * subscriber is still on it. It is simply no longer offered or enrollable.
+ */
+const MONTHLY_RETIRED_MARKETS = new Set<string>(["GE"]);
+
+export function monthlyPlanOffered(
+  countryCode: string | null | undefined,
+): boolean {
+  // Mirrors `premiumPlanForCountry`'s Georgian fallback: an unknown or missing
+  // market is priced from the Georgian catalogue, so it must inherit Georgian
+  // rules too. Returning true here would let a caller resolve the Georgian
+  // monthly plan for a market that has retired it.
+  const code = normalizeCountryCode(countryCode);
+  const market = code && PREMIUM_PLANS_BY_COUNTRY[code] ? code : "GE";
+  return !MONTHLY_RETIRED_MARKETS.has(market);
+}
+
+/**
  * Acquisition prompts stop once a user has enough balance for a substantial
  * paid action. Dedicated billing pages remain available when they deliberately
  * choose to visit them.
@@ -296,7 +318,17 @@ export function premiumPlanByKeyForCountry(
   if (typeof planKey !== "string") return null;
   const standard = premiumPlanForCountry(countryCode);
   const discounted = discountedPremiumPlanForCountry(countryCode);
-  return [standard, discounted].find((plan) => plan?.key === planKey) ?? null;
+  const match =
+    [standard, discounted].find((plan) => plan?.key === planKey) ?? null;
+  if (!match) return null;
+
+  // A retired monthly plan must not be newly enrolled, even if a client posts
+  // its key directly. Grandfathered subscribers keep their existing Stripe
+  // subscription; this gate only blocks a fresh checkout.
+  if ((match.intervalCount ?? 1) === 1 && !monthlyPlanOffered(countryCode)) {
+    return null;
+  }
+  return match;
 }
 
 /** Prefer the discounted multi-month plan anywhere a single PRO price is shown. */
@@ -320,6 +352,52 @@ export function premiumPlanSavingsPercent(
     0,
     Math.round((1 - discounted.amountMinor / regularTotal) * 100),
   );
+}
+
+/**
+ * Monthly cost of a plan, spreading a multi-month cycle across its interval.
+ *
+ * Needed because the catalogue mixes cadences: the Georgian quarterly promo is
+ * ₾29 per 3 months, which is ₾9.67/month and cheaper than the ₾19.90 monthly —
+ * a comparison that raw `amountMinor` gets backwards.
+ */
+export function monthlyAmountMinor(plan: {
+  amountMinor: number;
+  intervalCount?: number;
+}): number {
+  const months = plan.intervalCount ?? 1;
+  return plan.amountMinor / (months > 0 ? months : 1);
+}
+
+/**
+ * The cheaper alternative worth offering at cancellation, or null.
+ *
+ * Only returns a plan when it is genuinely cheaper per month than what the user
+ * already pays (a 5% margin, so a rounding-level difference is not dressed up as
+ * a saving) and in the same currency. This keeps a retention offer from ever
+ * upselling someone who is already on the best rate.
+ */
+export function cheaperAlternativePlan({
+  candidate,
+  currentAmountMinor,
+  currentIntervalMonths = 1,
+  currentCurrency,
+}: {
+  candidate: PremiumPlan | null;
+  currentAmountMinor: number;
+  currentIntervalMonths?: number;
+  currentCurrency: string;
+}): PremiumPlan | null {
+  if (!candidate) return null;
+  if (candidate.currency !== currentCurrency) return null;
+
+  const months = currentIntervalMonths > 0 ? currentIntervalMonths : 1;
+  const currentMonthly = currentAmountMinor / months;
+  if (currentMonthly <= 0) return null;
+
+  if (monthlyAmountMinor(candidate) >= currentMonthly * 0.95) return null;
+
+  return candidate;
 }
 
 const CURRENCY_SYMBOL: Record<string, string> = {

@@ -8,6 +8,7 @@ import { sendVerificationEmail } from "@/lib/email";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { acquireResendSlot } from "@/lib/resend-throttle";
+import { PER_JOB_SEND_CAP, type SendBudget } from "@/lib/email-send-budget";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
@@ -55,7 +56,7 @@ function absUrlForLocale(p: string, locale: UserLocale): string {
 /** Prior sends of a given kind for a user, count + most-recent timestamp. */
 async function priorSends(
   userId: string,
-  kind: string
+  kind: string,
 ): Promise<{ count: number; last: Date | null }> {
   const rows = await db
     .select({ sentAt: emailSendLog.sentAt })
@@ -71,10 +72,16 @@ export type RenudgeResult = { candidates: number; sent: number };
  * Re-email credential sign-ups that never verified. Cohort: passwordHash set,
  * still unverified, signed up 1–7 days ago. Cadence: max 2, ≥ 20h apart.
  */
-export async function sendVerificationRenudges(): Promise<RenudgeResult> {
+export async function sendVerificationRenudges(
+  budget?: SendBudget,
+): Promise<RenudgeResult> {
   const now = Date.now();
   const candidates = await db
-    .select({ id: users.id, email: users.email, locale: users.interfaceLanguage })
+    .select({
+      id: users.id,
+      email: users.email,
+      locale: users.interfaceLanguage,
+    })
     .from(users)
     .where(
       and(
@@ -82,12 +89,23 @@ export async function sendVerificationRenudges(): Promise<RenudgeResult> {
         isNotNull(users.passwordHash),
         isNotNull(users.email),
         gte(users.createdAt, new Date(now - 7 * DAY)),
-        lt(users.createdAt, new Date(now - 1 * DAY))
-      )
+        lt(users.createdAt, new Date(now - 1 * DAY)),
+      ),
     );
 
   let sent = 0;
+  // Bound this run's sends. Without a budget the loop drains the entire cohort,
+  // which measured ~642 sends for profile_incomplete alone — far beyond the 300s
+  // invocation budget, and an uncontrolled burst for users who have had nothing
+  // for weeks. Capping spreads the drain over more runs; cohorts are recomputed
+  // each time and progress is persisted per recipient, so this is idempotent.
+  const allowance = budget
+    ? budget.reserve(candidates.length, PER_JOB_SEND_CAP)
+    : PER_JOB_SEND_CAP;
+  let sentThisRun = 0;
+
   for (const u of candidates) {
+    if (sentThisRun >= allowance) break;
     if (!u.email) continue;
     const { count, last } = await priorSends(u.id, "verify_reminder");
     if (count >= 2) continue;
@@ -97,9 +115,10 @@ export async function sendVerificationRenudges(): Promise<RenudgeResult> {
     const dispatch = await prepareVerificationResend(u.email);
     if (!dispatch.send) continue;
     const locale = normalizeUserLocale(u.locale);
-    const subject = locale === "en"
-      ? "Complete your registration, verify your email"
-      : "დაასრულე რეგისტრაცია, დაადასტურე ელფოსტა";
+    const subject =
+      locale === "en"
+        ? "Complete your registration, verify your email"
+        : "დაასრულე რეგისტრაცია, დაადასტურე ელფოსტა";
     try {
       await sendVerificationEmail({
         to: dispatch.email,
@@ -116,6 +135,7 @@ export async function sendVerificationRenudges(): Promise<RenudgeResult> {
         status: "sent",
       });
       sent++;
+      sentThisRun++;
     } catch (err) {
       console.warn("[renudge] verify send failed:", (err as Error).message);
     }
@@ -128,7 +148,9 @@ export async function sendVerificationRenudges(): Promise<RenudgeResult> {
  * they enter the personalized daily-horoscope audience. Cohort: emailNudges on,
  * no dateOfBirth. Cadence: 1st at ≥ T+2d, 2nd at ≥ T+7d, max 2, ≥ 20h apart.
  */
-export async function sendProfileIncompleteRenudges(): Promise<RenudgeResult> {
+export async function sendProfileIncompleteRenudges(
+  budget?: SendBudget,
+): Promise<RenudgeResult> {
   const c = client();
   const now = Date.now();
   const candidates = await db
@@ -146,29 +168,47 @@ export async function sendProfileIncompleteRenudges(): Promise<RenudgeResult> {
         eq(users.emailNudges, true),
         isNull(profiles.dateOfBirth),
         isNotNull(users.email),
-        lt(users.createdAt, new Date(now - 2 * DAY))
-      )
+        lt(users.createdAt, new Date(now - 2 * DAY)),
+      ),
     );
 
   if (!c) return { candidates: candidates.length, sent: 0 };
 
   let sent = 0;
+  // Bound this run's sends. Without a budget the loop drains the entire cohort,
+  // which measured ~642 sends for profile_incomplete alone — far beyond the 300s
+  // invocation budget, and an uncontrolled burst for users who have had nothing
+  // for weeks. Capping spreads the drain over more runs; cohorts are recomputed
+  // each time and progress is persisted per recipient, so this is idempotent.
+  const allowance = budget
+    ? budget.reserve(candidates.length, PER_JOB_SEND_CAP)
+    : PER_JOB_SEND_CAP;
+  let sentThisRun = 0;
+
   for (const u of candidates) {
+    if (sentThisRun >= allowance) break;
     if (!u.email) continue;
     const ageMs = now - new Date(u.createdAt).getTime();
     const { count, last } = await priorSends(u.id, "profile_incomplete");
     if (count >= 2) continue;
     // 1st nudge: ≥ T+2d (already filtered). 2nd: ≥ T+7d and ≥ 20h after the 1st.
-    if (count === 1 && (ageMs < 7 * DAY || (last && now - last.getTime() < 20 * HOUR))) {
+    if (
+      count === 1 &&
+      (ageMs < 7 * DAY || (last && now - last.getTime() < 20 * HOUR))
+    ) {
       continue;
     }
 
     const token = await getOrCreateUnsubscribeToken(u.id);
     const locale = normalizeUserLocale(u.locale);
-    const unsubUrl = absUrlForLocale(`/unsubscribe?token=${token}&type=nudges`, locale);
-    const subject = locale === "en"
-      ? "Your birth chart is waiting, complete your profile"
-      : "შენი ნატალური რუკა გელოდება, დაასრულე პროფილი";
+    const unsubUrl = absUrlForLocale(
+      `/unsubscribe?token=${token}&type=nudges`,
+      locale,
+    );
+    const subject =
+      locale === "en"
+        ? "Your birth chart is waiting, complete your profile"
+        : "შენი ნატალური რუკა გელოდება, დაასრულე პროფილი";
     try {
       await acquireResendSlot();
       const res = await c.emails.send({
@@ -194,11 +234,14 @@ export async function sendProfileIncompleteRenudges(): Promise<RenudgeResult> {
         status: res.error ? "failed" : "sent",
         error: res.error?.message ?? null,
       });
-      if (!res.error) sent++;
+      if (!res.error) {
+        sent++;
+        sentThisRun++;
+      }
     } catch (err) {
       console.warn(
         "[renudge] profile_incomplete send failed:",
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }

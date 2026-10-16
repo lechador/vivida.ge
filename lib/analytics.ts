@@ -70,6 +70,15 @@ export const ANALYTICS_EVENT = {
   purchaseCompleted: "purchase_completed",
   entitlementActivated: "entitlement_activated",
   subscriptionStarted: "subscription_started",
+  /**
+   * Cancellation flow. The cancel step is the highest-intent churn moment we
+   * have, and it previously produced no signal at all beyond a bare
+   * window.confirm(), so there was nothing to learn from or act on.
+   */
+  cancelFlowViewed: "cancel_flow_viewed",
+  cancelReasonSelected: "cancel_reason_selected",
+  cancelRetained: "cancel_retained",
+  cancelConfirmed: "cancel_confirmed",
   aiAnswerCompleted: "ai_answer_completed",
   libraryItemOpened: "library_item_opened",
   libraryItemFavorited: "library_item_favorited",

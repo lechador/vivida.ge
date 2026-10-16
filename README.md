@@ -42,6 +42,8 @@ npm run check:env   # fails when code reads a key missing from .env.example
 | `npm run test:e2e`                                             | Playwright smoke + accessibility sweep                                                          |
 | `npm run perf:ci`                                              | Lighthouse budgets (/, /horoskopi, /nataluri-ruka, /en), CLS ≤ 0.1 hard gate, LCP/perf warnings |
 | `npm run audit:prod`                                           | `npm audit` for prod deps, high+                                                                |
+| `node scripts/check-staged-imports.mjs`                        | pre-commit guard: refuses a commit whose staged files import untracked modules                  |
+| `node scripts/check-staged-imports.mjs --all`                  | same check across the whole repo; run before committing a large batch of mixed changes          |
 | `npm run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle schema workflow                                                                         |
 
 ## Database

@@ -15,6 +15,12 @@
  */
 
 const ENDPOINT = "https://geocoding-api.open-meteo.com/v1/search";
+/**
+ * Open-Meteo resolves a timezone from coordinates. Used by the manual
+ * coordinate fallback in onboarding, because a birth chart needs a timezone and
+ * there is no way to derive one correctly in the browser.
+ */
+const TIMEZONE_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
 
 export type GeocodeResult = {
   id: number;
@@ -62,186 +68,186 @@ export function hasArmenianScript(s: string): boolean {
 
 const KA_TO_EN_CITY: Record<string, string> = {
   // Georgia, major
-  "თბილისი": "Tbilisi",
-  "ბათუმი": "Batumi",
-  "ქუთაისი": "Kutaisi",
-  "რუსთავი": "Rustavi",
-  "გორი": "Gori",
-  "ზუგდიდი": "Zugdidi",
-  "ფოთი": "Poti",
-  "სამტრედია": "Samtredia",
-  "ხაშური": "Khashuri",
-  "სენაკი": "Senaki",
-  "ზესტაფონი": "Zestaponi",
-  "მარნეული": "Marneuli",
-  "ახალციხე": "Akhaltsikhe",
-  "თელავი": "Telavi",
-  "ქობულეთი": "Kobuleti",
-  "ოზურგეთი": "Ozurgeti",
-  "კასპი": "Kaspi",
-  "ჭიათურა": "Chiatura",
-  "წყალტუბო": "Tskaltubo",
-  "სიღნაღი": "Sighnaghi",
-  "ბორჯომი": "Borjomi",
-  "ბაკურიანი": "Bakuriani",
-  "მცხეთა": "Mtskheta",
-  "გუდაური": "Gudauri",
-  "სტეფანწმინდა": "Stepantsminda",
-  "ყაზბეგი": "Kazbegi",
-  "ყვარელი": "Kvareli",
-  "ლაგოდეხი": "Lagodekhi",
-  "ცაგერი": "Tsageri",
-  "ამბროლაური": "Ambrolauri",
-  "მესტია": "Mestia",
-  "ხონი": "Khoni",
-  "ხობი": "Khobi",
-  "აბაშა": "Abasha",
-  "ახალქალაქი": "Akhalkalaki",
-  "ნინოწმინდა": "Ninotsminda",
-  "დმანისი": "Dmanisi",
-  "ბოლნისი": "Bolnisi",
-  "გარდაბანი": "Gardabani",
-  "თეთრიწყარო": "Tetritskaro",
-  "წალკა": "Tsalka",
-  "დუშეთი": "Dusheti",
-  "თიანეთი": "Tianeti",
-  "ცხინვალი": "Tskhinvali",
-  "სოხუმი": "Sukhumi",
+  თბილისი: "Tbilisi",
+  ბათუმი: "Batumi",
+  ქუთაისი: "Kutaisi",
+  რუსთავი: "Rustavi",
+  გორი: "Gori",
+  ზუგდიდი: "Zugdidi",
+  ფოთი: "Poti",
+  სამტრედია: "Samtredia",
+  ხაშური: "Khashuri",
+  სენაკი: "Senaki",
+  ზესტაფონი: "Zestaponi",
+  მარნეული: "Marneuli",
+  ახალციხე: "Akhaltsikhe",
+  თელავი: "Telavi",
+  ქობულეთი: "Kobuleti",
+  ოზურგეთი: "Ozurgeti",
+  კასპი: "Kaspi",
+  ჭიათურა: "Chiatura",
+  წყალტუბო: "Tskaltubo",
+  სიღნაღი: "Sighnaghi",
+  ბორჯომი: "Borjomi",
+  ბაკურიანი: "Bakuriani",
+  მცხეთა: "Mtskheta",
+  გუდაური: "Gudauri",
+  სტეფანწმინდა: "Stepantsminda",
+  ყაზბეგი: "Kazbegi",
+  ყვარელი: "Kvareli",
+  ლაგოდეხი: "Lagodekhi",
+  ცაგერი: "Tsageri",
+  ამბროლაური: "Ambrolauri",
+  მესტია: "Mestia",
+  ხონი: "Khoni",
+  ხობი: "Khobi",
+  აბაშა: "Abasha",
+  ახალქალაქი: "Akhalkalaki",
+  ნინოწმინდა: "Ninotsminda",
+  დმანისი: "Dmanisi",
+  ბოლნისი: "Bolnisi",
+  გარდაბანი: "Gardabani",
+  თეთრიწყარო: "Tetritskaro",
+  წალკა: "Tsalka",
+  დუშეთი: "Dusheti",
+  თიანეთი: "Tianeti",
+  ცხინვალი: "Tskhinvali",
+  სოხუმი: "Sukhumi",
   // International, frequently typed
-  "მოსკოვი": "Moscow",
+  მოსკოვი: "Moscow",
   "სანქტ-პეტერბურგი": "Saint Petersburg",
-  "ერევანი": "Yerevan",
-  "ბაქო": "Baku",
-  "სტამბული": "Istanbul",
-  "ანკარა": "Ankara",
-  "კიევი": "Kyiv",
-  "მინსკი": "Minsk",
+  ერევანი: "Yerevan",
+  ბაქო: "Baku",
+  სტამბული: "Istanbul",
+  ანკარა: "Ankara",
+  კიევი: "Kyiv",
+  მინსკი: "Minsk",
   "ნიუ-იორკი": "New York",
   "ლოს-ანჯელესი": "Los Angeles",
-  "ჩიკაგო": "Chicago",
-  "ვაშინგტონი": "Washington",
-  "ლონდონი": "London",
-  "პარიზი": "Paris",
-  "ბერლინი": "Berlin",
-  "მიუნხენი": "Munich",
-  "მადრიდი": "Madrid",
-  "ბარსელონა": "Barcelona",
-  "რომი": "Rome",
-  "მილანი": "Milan",
-  "ვენა": "Vienna",
-  "ამსტერდამი": "Amsterdam",
-  "ბრიუსელი": "Brussels",
-  "სტოკჰოლმი": "Stockholm",
-  "ჰელსინკი": "Helsinki",
-  "კოპენჰაგენი": "Copenhagen",
-  "ოსლო": "Oslo",
-  "ვარშავა": "Warsaw",
-  "პრაღა": "Prague",
-  "ბუდაპეშტი": "Budapest",
-  "ბუქარესტი": "Bucharest",
-  "სოფია": "Sofia",
-  "ათენი": "Athens",
+  ჩიკაგო: "Chicago",
+  ვაშინგტონი: "Washington",
+  ლონდონი: "London",
+  პარიზი: "Paris",
+  ბერლინი: "Berlin",
+  მიუნხენი: "Munich",
+  მადრიდი: "Madrid",
+  ბარსელონა: "Barcelona",
+  რომი: "Rome",
+  მილანი: "Milan",
+  ვენა: "Vienna",
+  ამსტერდამი: "Amsterdam",
+  ბრიუსელი: "Brussels",
+  სტოკჰოლმი: "Stockholm",
+  ჰელსინკი: "Helsinki",
+  კოპენჰაგენი: "Copenhagen",
+  ოსლო: "Oslo",
+  ვარშავა: "Warsaw",
+  პრაღა: "Prague",
+  ბუდაპეშტი: "Budapest",
+  ბუქარესტი: "Bucharest",
+  სოფია: "Sofia",
+  ათენი: "Athens",
   "თელ-ავივი": "Tel Aviv",
-  "იერუსალიმი": "Jerusalem",
-  "კაირო": "Cairo",
-  "დუბაი": "Dubai",
-  "დოჰა": "Doha",
-  "ტოკიო": "Tokyo",
-  "სეული": "Seoul",
-  "პეკინი": "Beijing",
-  "შანხაი": "Shanghai",
+  იერუსალიმი: "Jerusalem",
+  კაირო: "Cairo",
+  დუბაი: "Dubai",
+  დოჰა: "Doha",
+  ტოკიო: "Tokyo",
+  სეული: "Seoul",
+  პეკინი: "Beijing",
+  შანხაი: "Shanghai",
   "ჰონგ-კონგი": "Hong Kong",
-  "სინგაპური": "Singapore",
-  "ბანგკოკი": "Bangkok",
-  "მუმბაი": "Mumbai",
-  "დელი": "Delhi",
-  "ტორონტო": "Toronto",
-  "მონრეალი": "Montreal",
-  "მექსიკო": "Mexico City",
+  სინგაპური: "Singapore",
+  ბანგკოკი: "Bangkok",
+  მუმბაი: "Mumbai",
+  დელი: "Delhi",
+  ტორონტო: "Toronto",
+  მონრეალი: "Montreal",
+  მექსიკო: "Mexico City",
   "ბუენოს-აირესი": "Buenos Aires",
   "სან-პაულუ": "São Paulo",
   "რიო-დე-ჟანეირო": "Rio de Janeiro",
-  "სიდნეი": "Sydney",
-  "მელბურნი": "Melbourne",
+  სიდნეი: "Sydney",
+  მელბურნი: "Melbourne",
 };
 
 /** Armenian city mapping */
 const AM_TO_EN_CITY: Record<string, string> = {
   // Armenia, major
-  "երևան": "Yerevan",
-  "գյումրի": "Gyumri",
-  "վանաձոր": "Vanadzor",
-  "վաղարշապատ": "Vagharshapat",
-  "էջմիածին": "Echmiadzin",
-  "աբովյան": "Abovyan",
-  "հրազդան": "Hrazdan",
-  "կապան": "Kapan",
-  "արմավիր": "Armavir",
-  "գավառ": "Gavar",
-  "արտաշատ": "Artashat",
-  "իջևան": "Ijevan",
-  "դիլիջան": "Dilijan",
-  "գորիս": "Goris",
-  "սևան": "Sevan",
-  "չարենցավան": "Charentsavan",
-  "սիսիան": "Sisian",
-  "աշտարակ": "Ashtarak",
-  "արարատ": "Ararat",
-  "մասիս": "Masis",
-  "սպիտակ": "Spitak",
-  "ստեփանավան": "Stepanavan",
-  "ալավերդի": "Alaverdi",
-  "ջերմուկ": "Jermuk",
-  "քաջարան": "Kajaran",
-  "մարտունի": "Martuni",
-  "վարդենիս": "Vardenis",
-  "եղեգնաձոր": "Yeghegnadzor",
-  "բերդ": "Berd",
-  "նոյեմբերյան": "Noyemberyan",
-  "մեղրի": "Meghri",
-  "ծաղկաձոր": "Tsaghkadzor",
+  երևան: "Yerevan",
+  գյումրի: "Gyumri",
+  վանաձոր: "Vanadzor",
+  վաղարշապատ: "Vagharshapat",
+  էջմիածին: "Echmiadzin",
+  աբովյան: "Abovyan",
+  հրազդան: "Hrazdan",
+  կապան: "Kapan",
+  արմավիր: "Armavir",
+  գավառ: "Gavar",
+  արտաշատ: "Artashat",
+  իջևան: "Ijevan",
+  դիլիջան: "Dilijan",
+  գորիս: "Goris",
+  սևան: "Sevan",
+  չարենցավան: "Charentsavan",
+  սիսիան: "Sisian",
+  աշտարակ: "Ashtarak",
+  արարատ: "Ararat",
+  մասիս: "Masis",
+  սպիտակ: "Spitak",
+  ստեփանավան: "Stepanavan",
+  ալավերդի: "Alaverdi",
+  ջերմուկ: "Jermuk",
+  քաջարան: "Kajaran",
+  մարտունի: "Martuni",
+  վարդենիս: "Vardenis",
+  եղեգնաձոր: "Yeghegnadzor",
+  բերդ: "Berd",
+  նոյեմբերյան: "Noyemberyan",
+  մեղրի: "Meghri",
+  ծաղկաձոր: "Tsaghkadzor",
   // International & Diaspora
-  "թբիլիսի": "Tbilisi",
-  "բաթումի": "Batumi",
-  "քութայիսի": "Kutaisi",
-  "ახալქალაქի": "Akhalkalaki",
-  "ախալքալաք": "Akhalkalaki",
-  "նինոծմինդա": "Ninotsminda",
-  "մոսկվա": "Moscow",
+  թբիլիսի: "Tbilisi",
+  բաթումի: "Batumi",
+  քութայիսի: "Kutaisi",
+  ახալქალაქի: "Akhalkalaki",
+  ախալքալաք: "Akhalkalaki",
+  նինոծմինդա: "Ninotsminda",
+  մոսկվա: "Moscow",
   "սանկտ պետերբուրգ": "Saint Petersburg",
-  "կրասնոդար": "Krasnodar",
-  "սոչի": "Sochi",
+  կրասնոդար: "Krasnodar",
+  սոչի: "Sochi",
   "դոնի ռոստով": "Rostov-on-Don",
   "լոս անջելես": "Los Angeles",
-  "գլենդել": "Glendale",
-  "բըրբանք": "Burbank",
-  "փարիզ": "Paris",
-  "մարսել": "Marseille",
-  "լիոն": "Lyon",
-  "լոնդոն": "London",
-  "բեյրութ": "Beirut",
-  "թեհրան": "Tehran",
-  "ստամբուլ": "Istanbul",
-  "դուբայ": "Dubai",
+  գլենդել: "Glendale",
+  բըրբանք: "Burbank",
+  փարիզ: "Paris",
+  մարսել: "Marseille",
+  լիոն: "Lyon",
+  լոնդոն: "London",
+  բեյրութ: "Beirut",
+  թեհրան: "Tehran",
+  ստամբուլ: "Istanbul",
+  դուբայ: "Dubai",
   "նյու յորք": "New York",
-  "բոստոն": "Boston",
-  "տորոնտո": "Toronto",
-  "մոնրեալ": "Montreal",
+  բոստոն: "Boston",
+  տորոնտո: "Toronto",
+  մոնրեալ: "Montreal",
   "բուենոս այրես": "Buenos Aires",
-  "սիդնեյ": "Sydney",
-  "բեռլին": "Berlin",
-  "վիեննա": "Vienna",
-  "հռոմ": "Rome",
-  "աթենք": "Athens",
-  "կիև": "Kyiv",
+  սիդնեյ: "Sydney",
+  բեռլին: "Berlin",
+  վիեննա: "Vienna",
+  հռոմ: "Rome",
+  աթենք: "Athens",
+  կիև: "Kyiv",
 };
 
 const EN_TO_KA_CITY: Record<string, string> = Object.fromEntries(
-  Object.entries(KA_TO_EN_CITY).map(([ka, en]) => [en.toLowerCase(), ka])
+  Object.entries(KA_TO_EN_CITY).map(([ka, en]) => [en.toLowerCase(), ka]),
 );
 
 const EN_TO_AM_CITY: Record<string, string> = Object.fromEntries(
-  Object.entries(AM_TO_EN_CITY).map(([am, en]) => [en.toLowerCase(), am])
+  Object.entries(AM_TO_EN_CITY).map(([am, en]) => [en.toLowerCase(), am]),
 );
 
 const EN_TO_KA_COUNTRY: Record<string, string> = {
@@ -288,25 +294,87 @@ const EN_TO_AM_COUNTRY: Record<string, string> = {
 };
 
 const KA_LETTER_TO_LATIN: Record<string, string> = {
-  "ა": "a",  "ბ": "b",  "გ": "g",  "დ": "d",  "ე": "e",
-  "ვ": "v",  "ზ": "z",  "თ": "t",  "ი": "i",  "კ": "k",
-  "ლ": "l",  "მ": "m",  "ნ": "n",  "ო": "o",  "პ": "p",
-  "ჟ": "zh", "რ": "r",  "ს": "s",  "ტ": "t",  "უ": "u",
-  "ფ": "p",  "ქ": "k",  "ღ": "gh", "ყ": "q",  "შ": "sh",
-  "ჩ": "ch", "ც": "ts", "ძ": "dz", "წ": "ts", "ჭ": "ch",
-  "ხ": "kh", "ჯ": "j",  "ჰ": "h",
-  "ჱ": "e",  "ჲ": "y",  "ჳ": "w",  "ჴ": "kh", "ჵ": "h",  "ჶ": "f",
+  ა: "a",
+  ბ: "b",
+  გ: "g",
+  დ: "d",
+  ე: "e",
+  ვ: "v",
+  ზ: "z",
+  თ: "t",
+  ი: "i",
+  კ: "k",
+  ლ: "l",
+  მ: "m",
+  ნ: "n",
+  ო: "o",
+  პ: "p",
+  ჟ: "zh",
+  რ: "r",
+  ს: "s",
+  ტ: "t",
+  უ: "u",
+  ფ: "p",
+  ქ: "k",
+  ღ: "gh",
+  ყ: "q",
+  შ: "sh",
+  ჩ: "ch",
+  ც: "ts",
+  ძ: "dz",
+  წ: "ts",
+  ჭ: "ch",
+  ხ: "kh",
+  ჯ: "j",
+  ჰ: "h",
+  ჱ: "e",
+  ჲ: "y",
+  ჳ: "w",
+  ჴ: "kh",
+  ჵ: "h",
+  ჶ: "f",
 };
 
 const AM_LETTER_TO_LATIN: Record<string, string> = {
-  "ա": "a",  "բ": "b",  "գ": "g",  "դ": "d",  "ե": "e",
-  "զ": "z",  "է": "e",  "ը": "y",  "թ": "t",  "ժ": "zh",
-  "ի": "i",  "լ": "l",  "խ": "kh", "ծ": "ts", "կ": "k",
-  "հ": "h",  "ձ": "dz", "ղ": "gh", "ճ": "ch", "մ": "m",
-  "յ": "y",  "ն": "n",  "շ": "sh", "ո": "o",  "չ": "ch",
-  "պ": "p",  "ջ": "j",  "ռ": "r",  "ս": "s",  "վ": "v",
-  "տ": "t",  "ր": "r",  "ց": "ts", "ու": "u", "փ": "p",
-  "ք": "k",  "և": "ev", "օ": "o",  "ֆ": "f",
+  ա: "a",
+  բ: "b",
+  գ: "g",
+  դ: "d",
+  ե: "e",
+  զ: "z",
+  է: "e",
+  ը: "y",
+  թ: "t",
+  ժ: "zh",
+  ի: "i",
+  լ: "l",
+  խ: "kh",
+  ծ: "ts",
+  կ: "k",
+  հ: "h",
+  ձ: "dz",
+  ղ: "gh",
+  ճ: "ch",
+  մ: "m",
+  յ: "y",
+  ն: "n",
+  շ: "sh",
+  ո: "o",
+  չ: "ch",
+  պ: "p",
+  ջ: "j",
+  ռ: "r",
+  ս: "s",
+  վ: "v",
+  տ: "t",
+  ր: "r",
+  ց: "ts",
+  ու: "u",
+  փ: "p",
+  ք: "k",
+  և: "ev",
+  օ: "o",
+  ֆ: "f",
 };
 
 /** Letter-by-letter Georgian → Latin */
@@ -340,7 +408,10 @@ function toSearchQuery(input: string): string {
   return trimmed;
 }
 
-function localizeForKa(name: string, country: string): { name: string; country: string } {
+function localizeForKa(
+  name: string,
+  country: string,
+): { name: string; country: string } {
   const ka = EN_TO_KA_CITY[name.toLowerCase()];
   const kaCountry = EN_TO_KA_COUNTRY[country.toLowerCase()];
   return {
@@ -349,7 +420,10 @@ function localizeForKa(name: string, country: string): { name: string; country: 
   };
 }
 
-function localizeForAm(name: string, country: string): { name: string; country: string } {
+function localizeForAm(
+  name: string,
+  country: string,
+): { name: string; country: string } {
   const am = EN_TO_AM_CITY[name.toLowerCase()];
   const amCountry = EN_TO_AM_COUNTRY[country.toLowerCase()];
   return {
@@ -362,7 +436,7 @@ function localizeForAm(name: string, country: string): { name: string; country: 
 
 export async function searchPlaces(
   query: string,
-  { count = 6, language = "en" }: { count?: number; language?: string } = {}
+  { count = 6, language = "en" }: { count?: number; language?: string } = {},
 ): Promise<GeocodeResult[]> {
   const original = query.trim();
   if (original.length < 2) return [];
@@ -416,3 +490,78 @@ export async function searchPlaces(
   });
 }
 
+/**
+ * Validate manually entered coordinates.
+ *
+ * Pure and total so the onboarding fallback can run it on every keystroke
+ * without a network round trip. Returns a normalised value or a reason code,
+ * never throws.
+ */
+export type CoordinateCheck =
+  | { ok: true; latitude: number; longitude: number }
+  | { ok: false; reason: "empty" | "not_a_number" | "out_of_range" };
+
+export function validateCoordinates(
+  rawLat: string,
+  rawLon: string,
+): CoordinateCheck {
+  const latText = rawLat.trim();
+  const lonText = rawLon.trim();
+  if (!latText || !lonText) return { ok: false, reason: "empty" };
+
+  // Accept a comma decimal separator, which Georgian/Russian/European users
+  // type by habit ("41,69").
+  const parse = (v: string) => Number(v.replace(",", "."));
+  const latitude = parse(latText);
+  const longitude = parse(lonText);
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return { ok: false, reason: "not_a_number" };
+  }
+  if (latitude < -90 || latitude > 90)
+    return { ok: false, reason: "out_of_range" };
+  if (longitude < -180 || longitude > 180) {
+    return { ok: false, reason: "out_of_range" };
+  }
+  return { ok: true, latitude, longitude };
+}
+
+interface OpenMeteoTimezoneRaw {
+  timezone?: string;
+  utc_offset_seconds?: number;
+}
+
+/**
+ * Resolve a timezone for coordinates the user typed by hand.
+ *
+ * This is the safety valve for onboarding: the primary path is a geocoded
+ * birthplace search, but that is a network dependency, and a birthplace that
+ * simply is not in the geocoder used to be a hard dead end on the last step
+ * before the user would see their chart. A birth chart needs a real timezone,
+ * so the fallback asks Open-Meteo rather than guessing an offset.
+ *
+ * Returns null when the lookup fails; the caller surfaces a retry.
+ */
+export async function timezoneForCoordinates(
+  latitude: number,
+  longitude: number,
+): Promise<string | null> {
+  const url = new URL(TIMEZONE_ENDPOINT);
+  url.searchParams.set("latitude", String(latitude));
+  url.searchParams.set("longitude", String(longitude));
+  // No forecast variables: this call exists only to resolve `timezone`.
+  url.searchParams.set("current", "temperature_2m");
+  url.searchParams.set("timezone", "auto");
+
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "vivida.ge/0.1" },
+      next: { revalidate: 60 * 60 * 24 },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as OpenMeteoTimezoneRaw;
+    const tz = data.timezone?.trim();
+    return tz ? tz : null;
+  } catch {
+    return null;
+  }
+}

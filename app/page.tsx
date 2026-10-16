@@ -13,6 +13,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteSearch } from "@/components/search/site-search";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { LatestArticlesSection } from "@/components/articles/latest-articles-section";
+import { PricingAnchor } from "@/components/landing/pricing-anchor";
 import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
 import { localizedAlternates } from "@/lib/seo/locales";
 
@@ -180,6 +181,8 @@ export default async function Home() {
           </div>
           <CompatibilityCalculator signs={signs} pairs={pairs} />
         </section>
+
+        <PricingAnchor />
 
         {/* Explore rail, internal links to popular public tools. The homepage is
             high-traffic + high-bounce and previously linked to nothing

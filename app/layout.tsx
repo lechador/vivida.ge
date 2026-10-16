@@ -8,6 +8,7 @@ import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
 import { PwaInstallTracker } from "@/components/pwa/install-tracker";
 import { PwaServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 import { InstallNudge } from "@/components/pwa/install-nudge";
+import { PushOptIn } from "@/components/push/push-opt-in";
 import { RefCapture } from "@/components/ref-capture";
 import { TrackingConsentManager } from "@/components/privacy/tracking-consent-manager";
 import { localAnalyticsDebugRequested } from "@/lib/analytics-debug";
@@ -212,6 +213,15 @@ export default async function RootLayout({
         <PwaServiceWorkerRegister />
         <PwaInstallTracker locale={locale} />
         <InstallNudge locale={locale} />
+        {/*
+          One global push prompt instead of the per-page banners that used to
+          live on /dashboard and /feed. It is event-driven: it appears after the
+          user receives value (the dashboard dispatches a value moment once its
+          content renders), and immediately after a PWA install, where a
+          previous dismissal is cleared because the reason to want notifications
+          is concrete and new.
+        */}
+        <PushOptIn variant="banner" locale={locale} />
         <RefCapture />
         <div
           id="main-content"

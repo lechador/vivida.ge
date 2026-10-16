@@ -7,7 +7,7 @@ import { Loader2, MapPin, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import type { GeocodeResult } from "@/lib/geocoding";
+import { validateCoordinates, type GeocodeResult } from "@/lib/geocoding";
 import type { PlaceValue } from "./types";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -30,6 +30,19 @@ export function StepPlace({
     "idle",
   );
   const [retryKey, setRetryKey] = useState(0);
+  /**
+   * Manual coordinate fallback.
+   *
+   * The geocoded search is the happy path, but it is a network dependency and a
+   * birthplace missing from the geocoder was previously a hard dead end on the
+   * last step before the user would see their chart. This lets them type
+   * coordinates directly; the server resolves the timezone.
+   */
+  const [manualOpen, setManualOpen] = useState(false);
+  const [manualLat, setManualLat] = useState("");
+  const [manualLon, setManualLon] = useState("");
+  const [manualPending, setManualPending] = useState(false);
+  const [manualError, setManualError] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const trimmed = query.trim();
@@ -83,6 +96,68 @@ export function StepPlace({
   }, []);
 
   const headingText = en ? "Where were you born?" : "სად დაიბადე?";
+
+  /**
+   * Resolve manually entered coordinates into a usable place.
+   *
+   * Validation runs locally first so an obvious typo doesn't cost a round trip;
+   * the timezone must come from the server, because a chart needs a real one and
+   * an offset guessed in the browser would silently corrupt the rising sign.
+   */
+  async function submitManual() {
+    setManualError(null);
+    const checked = validateCoordinates(manualLat, manualLon);
+    if (!checked.ok) {
+      setManualError(
+        checked.reason === "out_of_range"
+          ? en
+            ? "Latitude must be between -90 and 90, longitude between -180 and 180."
+            : "განედი უნდა იყოს -90-დან 90-მდე, გრძედი -180-დან 180-მდე."
+          : en
+            ? "Enter both coordinates as numbers, for example 41.69 and 44.80."
+            : "შეიყვანე ორივე კოორდინატი რიცხვად, მაგალითად 41.69 და 44.80.",
+      );
+      return;
+    }
+
+    setManualPending(true);
+    try {
+      const res = await fetch(
+        `/api/geocode/coords?lat=${checked.latitude}&lon=${checked.longitude}`,
+      );
+      if (!res.ok) throw new Error("failed");
+      const data = (await res.json()) as {
+        latitude: number;
+        longitude: number;
+        timezone: string;
+      };
+      const label =
+        (query.trim() ||
+          `${data.latitude.toFixed(2)}, ${data.longitude.toFixed(2)}`) +
+        (en ? " (manual)" : " (ხელით)");
+      onChange({
+        id: -1,
+        name: label,
+        displayName: label,
+        country: "",
+        countryCode: "",
+        latitude: data.latitude,
+        longitude: data.longitude,
+        timezone: data.timezone,
+      });
+      setQuery(label);
+      setManualOpen(false);
+    } catch {
+      setManualError(
+        en
+          ? "Could not resolve that location. Check the coordinates and try again."
+          : "მდებარეობა ვერ დადგინდა. შეამოწმე კოორდინატები და სცადე ხელახლა.",
+      );
+    } finally {
+      setManualPending(false);
+    }
+  }
+
   const descText = en
     ? "Your birthplace connects your chart to the sky at that exact moment."
     : "დაბადების ადგილი შენს რუკას იმ მომენტის ცასთან აკავშირებს.";
@@ -245,6 +320,96 @@ export function StepPlace({
             </span>
           </motion.div>
         )}
+
+        {/*
+          Manual coordinate fallback. Offered unconditionally rather than only
+          after a failure, so a birthplace the geocoder simply does not know is
+          never a dead end (and users who know their coordinates can go direct).
+        */}
+        <div className="pt-1">
+          {!manualOpen ? (
+            <button
+              type="button"
+              onClick={() => setManualOpen(true)}
+              className="text-xs text-muted-foreground underline decoration-dotted underline-offset-4 transition-colors hover:text-foreground"
+            >
+              {en
+                ? "Can't find it? Enter coordinates manually"
+                : "ვერ იპოვე? შეიყვანე კოორდინატები ხელით"}
+            </button>
+          ) : (
+            <div className="rounded-lg border border-border bg-card/60 p-3">
+              <div className="flex flex-wrap items-end gap-2">
+                <div className="min-w-0 flex-1">
+                  <Label htmlFor="manual-lat" className="text-xs">
+                    {en ? "Latitude" : "განედი"}
+                  </Label>
+                  <Input
+                    id="manual-lat"
+                    inputMode="decimal"
+                    placeholder="41.69"
+                    value={manualLat}
+                    onChange={(e) => {
+                      setManualLat(e.target.value);
+                      setManualError(null);
+                    }}
+                    className="mt-1 h-9 text-sm"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <Label htmlFor="manual-lon" className="text-xs">
+                    {en ? "Longitude" : "გრძედი"}
+                  </Label>
+                  <Input
+                    id="manual-lon"
+                    inputMode="decimal"
+                    placeholder="44.80"
+                    value={manualLon}
+                    onChange={(e) => {
+                      setManualLon(e.target.value);
+                      setManualError(null);
+                    }}
+                    className="mt-1 h-9 text-sm"
+                  />
+                </div>
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={submitManual}
+                  disabled={manualPending}
+                  className="rounded-full border border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/15 px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-[var(--vivida-violet)]/25 disabled:opacity-50"
+                >
+                  {manualPending
+                    ? en
+                      ? "Looking up…"
+                      : "მოძიება…"
+                    : en
+                      ? "Use these coordinates"
+                      : "გამოიყენე ეს კოორდინატები"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setManualOpen(false);
+                    setManualError(null);
+                  }}
+                  className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {en ? "Cancel" : "გაუქმება"}
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {en
+                  ? "We resolve the timezone from your coordinates, which your chart needs to be accurate."
+                  : "დროის სარტყელს კოორდინატებიდან განვსაზღვრავთ, რუკის სიზუსტისთვის აუცილებელია."}
+              </p>
+              {manualError && (
+                <p className="mt-2 text-xs text-destructive">{manualError}</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,40 +1,33 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { type NextRequest } from "next/server";
 
-import { sendBirthdayGifts } from "@/lib/birthday";
-import { sendDailyHoroscopeBlast, utcDateKey } from "@/lib/email-marketing";
-import { pruneGenerationLocks } from "@/lib/generation-lock";
-import { sendDailyHoroscopeToLeads } from "@/lib/horoscope-leads";
-import { sendDailyPushBlast } from "@/lib/push";
-import { pruneRateLimits } from "@/lib/rate-limit";
-import { prunePwaInstallations } from "@/lib/pwa-installations";
+import { cronAuthed } from "@/lib/cron/auth";
+import { checkEmailHealth } from "@/lib/email-health";
 import {
-  sendProfileIncompleteRenudges,
-  sendVerificationRenudges,
-} from "@/lib/renudge";
-import { sendWinbackNudges } from "@/lib/winback";
-
-function authed(req: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-  const adminToken = process.env.ADMIN_API_TOKEN;
-
-  const authHeader = req.headers.get("authorization");
-  if (cronSecret && authHeader === `Bearer ${cronSecret}`) return true;
-
-  const adminHeader = req.headers.get("x-admin-token");
-  if (adminToken && adminHeader === adminToken) return true;
-
-  return false;
-}
+  expireStaleDailyRows,
+  sendDailyHoroscopeBlast,
+  utcDateKey,
+} from "@/lib/email-marketing";
 
 /**
- * Runs the daily marketing workload. The retry invocation drains only
- * pending/failed email rows; it does not repeat every other daily job.
+ * Daily-horoscope email blast.
+ *
+ * This used to also run push, birthday gifts, winback, lead horoscopes and the
+ * verification/profile re-nudges. Because they were sequenced *after* the blast
+ * in the same invocation, and the blast grew to consume the entire 300s
+ * `maxDuration`, all of them silently stopped executing: winback and
+ * verify_reminder last sent 2026-08-04, birthday 2026-08-07, profile_incomplete
+ * 2026-08-18, each with zero sends for the following nine weeks.
+ *
+ * They now live in lib/cron/lifecycle.ts on their own schedule. The rule that
+ * came out of that incident: a scheduled job must never depend on an unrelated
+ * heavier job finishing first.
  */
 export async function runDailyHoroscopeCron(
   req: NextRequest,
   retryOnly: boolean,
 ) {
-  if (!authed(req)) {
+  if (!cronAuthed(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -45,74 +38,38 @@ export async function runDailyHoroscopeCron(
     : 8;
 
   const sendDate = utcDateKey();
+
+  // Expire rows that missed their send window before draining. Without this the
+  // table accumulates orphaned `pending` rows forever (28,449 of them by
+  // 2026-10-16, dating back to 2026-08-09), and a late retry risks mailing a
+  // stale horoscope.
+  let expired = 0;
+  try {
+    expired = await expireStaleDailyRows({ today: sendDate });
+  } catch (err) {
+    // Never let housekeeping block the day's real send.
+    console.warn(
+      "[cron] stale daily row expiry failed:",
+      (err as Error).message,
+    );
+  }
+
   const result = await sendDailyHoroscopeBlast({
     sendDate,
     concurrency,
     enqueue: !retryOnly,
   });
 
-  if (retryOnly) {
-    return NextResponse.json({
-      sendDate,
-      concurrency,
-      retryOnly: true,
-      ...result,
-    });
-  }
-
-  let push = { recipients: 0, sent: 0 };
-  try {
-    push = await sendDailyPushBlast({ sendDate });
-  } catch (err) {
-    console.warn("[cron] daily push blast failed:", (err as Error).message);
-  }
-
-  let birthdays = { birthdays: 0, gifted: 0, emailed: 0, failed: 0 };
-  try {
-    birthdays = await sendBirthdayGifts();
-  } catch (err) {
-    console.warn("[cron] birthday gifts failed:", (err as Error).message);
-  }
-
-  let winback = { dormant: 0, emailed: 0, pushed: 0, skipped: 0, failed: 0 };
-  try {
-    winback = await sendWinbackNudges();
-  } catch (err) {
-    console.warn("[cron] winback nudges failed:", (err as Error).message);
-  }
-
-  let leads = { audience: 0, sent: 0, skipped: 0, failed: 0 };
-  try {
-    leads = await sendDailyHoroscopeToLeads({ sendDate });
-  } catch (err) {
-    console.warn("[cron] lead horoscope send failed:", (err as Error).message);
-  }
-
-  const renudge = {
-    verify: { candidates: 0, sent: 0 },
-    profile: { candidates: 0, sent: 0 },
-  };
-  try {
-    renudge.verify = await sendVerificationRenudges();
-    renudge.profile = await sendProfileIncompleteRenudges();
-  } catch (err) {
-    console.warn("[cron] re-nudge failed:", (err as Error).message);
-  }
-
-  await Promise.all([
-    pruneRateLimits(),
-    pruneGenerationLocks(),
-    prunePwaInstallations(),
-  ]);
+  // Surface silent degradation. This blast ran at 41% delivery for two months
+  // without anyone noticing, because nothing was watching.
+  const health = await checkEmailHealth({ today: sendDate });
 
   return NextResponse.json({
     sendDate,
     concurrency,
+    retryOnly,
+    expired,
     ...result,
-    push,
-    birthdays,
-    winback,
-    leads,
-    renudge,
+    health,
   });
 }

@@ -77,6 +77,12 @@ export type DailyTransitsJson = {
  *   - sent    : Resend accepted the request
  *   - failed  : Resend or pre-flight threw, eligible for retry
  *   - skipped : dispatch returned false (no chart, opted out, etc.), terminal
+ *   - expired : still undelivered 48h after enqueue, terminal. The drain only
+ *               ever reads the current `sendDate`, so a shortfall used to be
+ *               orphaned in `pending` forever (28,449 such rows by 2026-10-16,
+ *               dating back to 2026-08-09). `expireStaleDailyRows` retires them
+ *               so the backlog stays honest and bounded, and a late retry can
+ *               never mail a stale horoscope.
  */
 export const dailyEmailLog = pgTable(
   "daily_email_log",

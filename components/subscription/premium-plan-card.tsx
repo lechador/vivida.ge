@@ -7,6 +7,7 @@ import { Check, Crown, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   discountedPremiumPlanForCountry,
+  monthlyPlanOffered,
   formatBillingAmount,
   premiumPlanSavingsPercent,
   type PremiumPlan,
@@ -52,6 +53,12 @@ export function PremiumPlanCard({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
   const discountedPlan = discountedPremiumPlanForCountry(plan.countryCode);
+  // Georgia retired monthly PRO: the discounted multi-month plan is the only
+  // choice, so the toggle is not rendered and `plan` stays as the price anchor.
+  const offerMonthly = monthlyPlanOffered(plan.countryCode);
+  // Preselect the discounted multi-month plan when one exists. In a
+  // retired-monthly market that is also the only choice, so this is correct
+  // there too; `plan` remains the label anchor for the saving.
   const [selectedKey, setSelectedKey] = useState(
     () => discountedPlan?.key ?? plan.key,
   );
@@ -213,7 +220,9 @@ export function PremiumPlanCard({
         </div>
         <div className="shrink-0 rounded-2xl border border-[var(--vivida-gold)]/25 bg-background/35 p-4 text-center sm:min-w-56">
           {discountedPlan && !active && (
-            <div className="mb-4 grid grid-cols-2 rounded-xl border border-border/60 bg-background/45 p-1 text-xs">
+            <div
+              className={`mb-4 grid rounded-xl border border-border/60 bg-background/45 p-1 text-xs ${offerMonthly ? "grid-cols-2" : "grid-cols-1"}`}
+            >
               <button
                 type="button"
                 onClick={() => setSelectedKey(discountedPlan.key)}
@@ -222,14 +231,16 @@ export function PremiumPlanCard({
               >
                 {en ? "3 months" : "3 თვე"}
               </button>
-              <button
-                type="button"
-                onClick={() => setSelectedKey(plan.key)}
-                className={`rounded-lg px-2 py-2 font-semibold transition-colors ${!isDiscounted ? "bg-card text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                aria-pressed={!isDiscounted}
-              >
-                {en ? "Monthly" : "თვიური"}
-              </button>
+              {offerMonthly && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedKey(plan.key)}
+                  className={`rounded-lg px-2 py-2 font-semibold transition-colors ${!isDiscounted ? "bg-card text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                  aria-pressed={!isDiscounted}
+                >
+                  {en ? "Monthly" : "თვიური"}
+                </button>
+              )}
             </div>
           )}
           {isDiscounted && (

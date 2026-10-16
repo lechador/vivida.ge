@@ -13,11 +13,8 @@ import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import { EXPERIMENTS } from "@/lib/experiment-catalog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { trackExperimentOutcome, useExperiment } from "@/lib/use-experiment";
-import {
-  creditPacksForCountry,
-  formatBillingAmount,
-} from "@/lib/billing-config";
-import { CREDIT_COST } from "@/lib/credits-config";
+import { showSingleOffer } from "@/lib/first-purchase-experiment-config";
+import { paywallPrimaryOffer } from "@/lib/paywall-offer";
 
 export function ContextualPaywallActions({
   locale,
@@ -39,16 +36,27 @@ export function ContextualPaywallActions({
   const en = locale === "en";
   const missing = Math.max(1, cost - balance);
   const next = normalizeReturnPath(returnTo);
-  const starterPack = creditPacksForCountry(countryCode)[0];
-  const isTarot = product === "tarot";
+  // One primary one-time offer naming the locked outcome and its price for
+  // every product, not only tarot; PRO stays the secondary, frequent-use path.
+  const offer = paywallPrimaryOffer({ product, countryCode, locale });
+  const variant = useExperiment(EXPERIMENTS.contextualPaywall, placement);
+  // Controlled first-purchase test (never-payers, assigned server-side):
+  // control keeps the legacy generic choice, treatment leads with the single
+  // priced outcome. Payers are never enrolled and keep the treatment framing.
+  const firstPurchaseVariant = useExperiment(
+    EXPERIMENTS.firstPurchaseOffer,
+    placement,
+  );
+  const singleOffer = showSingleOffer(firstPurchaseVariant);
   const creditsHref = contextualCreditsHref({
     returnTo: next,
     need: cost,
     product,
-    packId: isTarot ? starterPack.id : null,
+    // Control arm keeps the legacy un-preselected hub for non-tarot gates so
+    // the experiment isolates offer framing, not pack preselection.
+    packId: singleOffer || product === "tarot" ? offer.pack.id : null,
   });
   const proHref = `/subscription?${new URLSearchParams({ next, product }).toString()}`;
-  const variant = useExperiment(EXPERIMENTS.contextualPaywall, placement);
 
   useEffect(() => {
     trackEvent(ANALYTICS_EVENT.paywallViewed, {
@@ -70,6 +78,11 @@ export function ContextualPaywallActions({
       placement,
       destination === "pro" ? "choice_pro" : "choice_credits",
     );
+    trackExperimentOutcome(
+      EXPERIMENTS.firstPurchaseOffer,
+      placement,
+      destination === "pro" ? "choice_pro" : "choice_credits",
+    );
   }
 
   return (
@@ -87,10 +100,8 @@ export function ContextualPaywallActions({
         <Button asChild variant="mystic">
           <Link href={creditsHref} onClick={() => trackChoice("credits")}>
             <CreditCard className="size-4" />
-            {isTarot
-              ? en
-                ? `${Math.floor(starterPack.credits / CREDIT_COST.tarot)} more readings, ${formatBillingAmount(starterPack.amountMinor, starterPack.currency, locale)}`
-                : `${Math.floor(starterPack.credits / CREDIT_COST.tarot)} დამატებითი კითხვა, ${formatBillingAmount(starterPack.amountMinor, starterPack.currency, locale)}`
+            {singleOffer
+              ? offer.label
               : en
                 ? "Top up and return"
                 : "შეავსე და დაბრუნდი"}
@@ -104,13 +115,11 @@ export function ContextualPaywallActions({
         </Button>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        {isTarot
-          ? en
-            ? `${starterPack.credits} credits · one-time payment · no auto-renewal`
-            : `${starterPack.credits} კრედიტი · ერთჯერადი გადახდა · ავტოგანახლების გარეშე`
+        {singleOffer
+          ? `${offer.detail}${en ? " PRO is for frequent use." : " PRO ხშირი გამოყენებისთვისაა."}`
           : en
             ? "Credits are one-time; PRO is for frequent use."
-            : "კრედიტები ერთჯერადია, PRO, ხშირი გამოყენებისთვის."}
+            : "კრედიტები ერთჯერადია, PRO ხშირი გამოყენებისთვისაა."}
       </p>
     </div>
   );

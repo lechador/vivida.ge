@@ -5,6 +5,12 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { PublicNatalCalculator } from "@/components/calculator/public-natal-calculator";
+import { PaidNextStep } from "@/components/seo/paid-next-step";
+import {
+  creditPacksForCountry,
+  formatBillingAmount,
+} from "@/lib/billing-config";
+import { CREDIT_COST } from "@/lib/credits-config";
 import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -186,6 +192,16 @@ export default function PiradiRukaPage() {
           <PublicNatalCalculator />
         </div>
 
+        {/* Single paid continuation after the free calculation: the full
+            interpreted PDF report, priced before signup is asked for. */}
+        <PaidNextStep
+          title="მონაცემები გაქვს, ახლა სრული პასუხი"
+          body="უფასო კალკულატორი პლანეტების პოზიციებს გაჩვენებს. სრული ანგარიში მათ შენს ხასიათს, ძლიერ მხარეებსა და ზრდის ზონებს უკავშირებს და ჩამოსატვირთ PDF-ად გაძლევს."
+          ctaHref="/signup?next=%2Freport"
+          ctaLabel="შექმენი ანგარიში უფასოდ"
+          priceNote={`სრული PDF ანგარიში ${CREDIT_COST.pdfReport} კრედიტი · კრედიტები ${formatBillingAmount(creditPacksForCountry("GE")[0].amountMinor, "gel", "ka")}-დან, ერთჯერადად`}
+        />
+
         {/* SEO content */}
         <article className="mt-16 space-y-10">
           <section>
@@ -201,9 +217,9 @@ export default function PiradiRukaPage() {
                 ნატალური რუკა
               </Link>{" "}
               ან დაბადების რუკა) არის ცის ზუსტი სურათი იმ წამში, როცა დაიბადე.
-              ის მხოლოდ შენია, რადგან შენს უნიკალურ დროსა და ადგილს ეფუძნება,
-              და სწორედ ამიტომ აჩვენებს შენს პიროვნებას უფრო ღრმად, ვიდრე
-              მხოლოდ მზის ნიშანი.
+              ის მხოლოდ შენია, რადგან შენს უნიკალურ დროსა და ადგილს ეფუძნება, და
+              სწორედ ამიტომ აჩვენებს შენს პიროვნებას უფრო ღრმად, ვიდრე მხოლოდ
+              მზის ნიშანი.
             </p>
           </section>
 
@@ -216,8 +232,8 @@ export default function PiradiRukaPage() {
               აჩვენებდნენ. ზუსტი ონლაინ კალკულატორი დაბადების ქალაქის მიხედვით
               ადგენს გეოგრაფიულ კოორდინატებსა და დროის სარტყელს, შემდეგ კი
               ითვლის პლანეტებს, ასცენდენტს, 12 სახლსა და ასპექტებს. Vivida ამ
-              მონაცემებს ქართულად გაჩვენებს და საბაზისო შედეგისთვის
-              რეგისტრაციას არ მოითხოვს.
+              მონაცემებს ქართულად გაჩვენებს და საბაზისო შედეგისთვის რეგისტრაციას
+              არ მოითხოვს.
             </p>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85">
               თუ პირველად ქმნი რუკას, ნახე დეტალური ინსტრუქცია,{" "}
@@ -236,8 +252,8 @@ export default function PiradiRukaPage() {
               პირადი ასტროლოგიური რუკა და პირადი ჰოროსკოპი
             </h2>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
-              პირადი ასტროლოგიური რუკა დაბადების მომენტის უცვლელი საფუძველია:
-              ის აღწერს პლანეტების საწყის განლაგებას. პირადი ჰოროსკოპი კი ამ
+              პირადი ასტროლოგიური რუკა დაბადების მომენტის უცვლელი საფუძველია: ის
+              აღწერს პლანეტების საწყის განლაგებას. პირადი ჰოროსკოპი კი ამ
               საფუძველს დღევანდელ ან მომავალი პერიოდის ტრანზიტებს ადარებს.
               ამიტომ ზოგადი ზოდიაქოს პროგნოზისგან განსხვავებით, პერსონალური
               პროგნოზი შენს დაბადების დროსა და ადგილს ითვალისწინებს.
@@ -259,8 +275,10 @@ export default function PiradiRukaPage() {
             </p>
             <ol className="mt-4 space-y-3 text-base leading-relaxed text-foreground/85">
               <li>
-                <strong className="text-foreground">1. შეიყვანე მონაცემები</strong>{" "},
-                დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ
+                <strong className="text-foreground">
+                  1. შეიყვანე მონაცემები
+                </strong>{" "}
+                , დაბადების თარიღი, ზუსტი დრო და ქალაქი ზემოთ მოცემულ
                 კალკულატორში.
               </li>
               <li>
@@ -298,8 +316,8 @@ export default function PiradiRukaPage() {
               </li>
             </ul>
             <p className="mt-4 text-pretty text-base leading-relaxed text-foreground/85">
-              კალკულატორი გაძლევს სუფთა მონაცემებს. პერსონალური
-              ინტერპრეტაციისა და AI ანალიზისთვის{" "}
+              კალკულატორი გაძლევს სუფთა მონაცემებს. პერსონალური ინტერპრეტაციისა
+              და AI ანალიზისთვის{" "}
               <Link
                 href="/signup"
                 className="text-[var(--vivida-violet)] underline-offset-4 hover:underline"
@@ -321,18 +339,17 @@ export default function PiradiRukaPage() {
               რუკა და ყოველდღიური პროგნოზი, როგორ უკავშირდება
             </h2>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
-              პირადი რუკა შენს მუდმივ სურათს ხატავს: სად იდგა თითოეული
-              პლანეტა შენი დაბადების წუთს. ის არ იცვლება. რაც იცვლება, ის
-              პლანეტების დღევანდელი მდებარეობაა, და სწორედ ამ მოძრაობას
-              აღწერს{" "}
+              პირადი რუკა შენს მუდმივ სურათს ხატავს: სად იდგა თითოეული პლანეტა
+              შენი დაბადების წუთს. ის არ იცვლება. რაც იცვლება, ის პლანეტების
+              დღევანდელი მდებარეობაა, და სწორედ ამ მოძრაობას აღწერს{" "}
               <Link
                 href="/horoskopi"
                 className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
               >
                 დღის ჰოროსკოპი
               </Link>
-              . ორივე ერთად ბევრად მეტს ამბობს, ვიდრე ცალ-ცალკე: რუკა
-              გეუბნება, <em>ვინ ხარ</em>, ჰოროსკოპი კი, <em>რა ხდება ახლა</em>.
+              . ორივე ერთად ბევრად მეტს ამბობს, ვიდრე ცალ-ცალკე: რუკა გეუბნება,{" "}
+              <em>ვინ ხარ</em>, ჰოროსკოპი კი, <em>რა ხდება ახლა</em>.
             </p>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
               თუ მხოლოდ დღევანდელი პროგნოზი გაინტერესებს, გადადი{" "}
@@ -434,7 +451,6 @@ export default function PiradiRukaPage() {
             </Link>
           </section>
         </article>
-
       </section>
 
       <SiteFooter />

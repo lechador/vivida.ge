@@ -10,10 +10,14 @@ export function CreditProgressCard({
   balance,
   nextMonthlyDate,
   locale,
+  monthlyPaused = false,
 }: {
   balance: number;
   nextMonthlyDate: string;
   locale: UserLocale;
+  /** Welcome bonus received but no payment yet: the monthly drop is paused
+   *  until the first purchase, so the card must not promise a date. */
+  monthlyPaused?: boolean;
 }) {
   const en = locale === "en";
   const progress = nextUnlockProgress(balance);
@@ -68,9 +72,13 @@ export function CreditProgressCard({
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-background/35 p-3 text-xs text-muted-foreground">
           <CalendarDays className="size-4 shrink-0 text-[var(--vivida-violet)]" />
-          {en
-            ? `Next free +${MONTHLY_BONUS}: ${dateLabel}`
-            : `შემდეგი უფასო +${MONTHLY_BONUS}: ${dateLabel}`}
+          {monthlyPaused
+            ? en
+              ? "Monthly bonus resumes after your first purchase"
+              : "თვის ბონუსი პირველი შენაძენის შემდეგ განახლდება"
+            : en
+              ? `Next free +${MONTHLY_BONUS}: ${dateLabel}`
+              : `შემდეგი უფასო +${MONTHLY_BONUS}: ${dateLabel}`}
         </div>
         <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-background/35 p-3 text-xs text-muted-foreground">
           <MessageCircle className="size-4 shrink-0 text-[var(--vivida-cyan)]" />

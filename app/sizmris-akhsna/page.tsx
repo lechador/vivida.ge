@@ -7,11 +7,17 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { DREAMS_HUB_EN, DreamsHubEn } from "@/components/seo/dreams-en";
 import { DreamInterpreter } from "@/components/seo/dream-interpreter";
+import { PaidNextStep } from "@/components/seo/paid-next-step";
 import { DreamSymbolFilter } from "@/components/seo/dream-symbol-filter";
 import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
 
 import { auth } from "@/auth";
 
+import {
+  creditPacksForCountry,
+  formatBillingAmount,
+} from "@/lib/billing-config";
+import { CREDIT_COST } from "@/lib/credits-config";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { DREAMS_FAQ, DREAM_SYMBOLS, dreamsByLetter } from "@/lib/seo/dreams";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
@@ -216,6 +222,16 @@ export default async function DreamsHubPage() {
           ))}
         </div>
 
+        {/* Single paid continuation after the free dictionary: a personal
+            reading of the visitor's own dream, priced up front. */}
+        <PaidNextStep
+          title="ლექსიკონი სიმბოლოს ხსნის, შენს სიზმარს კი შენი ცხოვრება"
+          body="ზოგადი მნიშვნელობა ამოსავალი წერტილია. პერსონალური AI ახსნა შენს სიზმარს შენს რუკასა და ამჟამინდელ სიტუაციას უკავშირებს."
+          ctaHref="#dream-interpreter"
+          ctaLabel="ახსენი ჩემი სიზმარი"
+          priceNote={`თითო ახსნა ${CREDIT_COST.dream} კრედიტი · კრედიტები ${formatBillingAmount(creditPacksForCountry("GE")[0].amountMinor, "gel", "ka")}-დან, ერთჯერადად`}
+        />
+
         {/* Editorial */}
         <section className="mt-12 rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
@@ -304,7 +320,6 @@ export default async function DreamsHubPage() {
             <ArrowRight className="size-4" />
           </TrackedPublicLink>
         </div>
-
       </section>
 
       <SiteFooter />

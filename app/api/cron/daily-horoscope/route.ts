@@ -16,17 +16,18 @@ import { runDailyHoroscopeCron } from "@/lib/cron/daily-horoscope";
  *   - `x-admin-token: ${ADMIN_API_TOKEN}` for manual reruns from the
  *     admin panel ("re-fire today's blast").
  *
- * Idempotency, every Resend call carries `Idempotency-Key=daily:<userId>:<date>`,
- * so even an at-least-once retry on our side never produces a duplicate
- * email on Resend's side.
+ * Idempotency, rows are enqueued once per (user, sendDate) and the drain only
+ * ever sends a row that is still pending, so a normal re-run cannot double-send.
+ * Note the batch endpoint cannot carry per-email idempotency keys, so a batch
+ * that succeeds at Resend but whose response we lose can resend on the next
+ * tick. See the DURABILITY TRADE-OFF note in sendDailyHoroscopeBlast.
  *
- * Concurrency, defaults to 8, but this only parallelizes per-user prep
- * (horoscope lookup, unsubscribe tokens). The Resend calls themselves
- * serialize through lib/resend-throttle.ts at ~1.7/s, under the account's
- * 2 req/s limit. Tunable via `?concurrency=N` query param.
- *
- * Date, uses today's UTC date (YYYY-MM-DD) as the send-log partition
- * key, matching what `sendDailyHoroscopeBlast` does internally.
+ * This endpoint now does ONE thing: the daily horoscope blast. Push,
+ * birthday gifts, winback, lead horoscopes and the verification/profile
+ * re-nudges moved to /api/cron/lifecycle. They used to run after the blast
+ * in this same invocation, and once the blast grew to fill the 300s
+ * maxDuration it silently starved every one of them for nine weeks. See
+ * lib/cron/lifecycle.ts for the full post-mortem.
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

@@ -1,6 +1,8 @@
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { MONTHLY_BONUS, grantCreditsOnce } from "@/lib/credits";
+import { monthlyBonusEligible } from "@/lib/monthly-bonus-eligibility";
+import { usersWhoHavePaid, usersWithWelcomeBonus } from "@/lib/payer";
 import { localDateString } from "@/lib/transits";
 
 /**
@@ -24,24 +26,37 @@ export function currentMonthKey(now: Date = new Date()): string {
 }
 
 export async function grantMonthlyCredits(
-  monthKey?: string
+  monthKey?: string,
 ): Promise<{ month: string; granted: number; skipped: number }> {
   const key = monthKey ?? currentMonthKey();
   const rows = await db.select({ id: users.id }).from(users);
+  const allIds = rows.map((r) => r.id);
+  // Free-economy gate: the drop no longer stacks on an unspent welcome bonus
+  // for users who have never paid. One batch lookup each, not per-user queries.
+  const [welcomeBonusUsers, paidUsers] = await Promise.all([
+    usersWithWelcomeBonus(allIds),
+    usersWhoHavePaid(allIds),
+  ]);
+  const eligible = rows.filter((u) =>
+    monthlyBonusEligible({
+      receivedWelcomeBonus: welcomeBonusUsers.has(u.id),
+      hasEverPaid: paidUsers.has(u.id),
+    }),
+  );
+  let skipped = rows.length - eligible.length;
 
   let granted = 0;
-  let skipped = 0;
   // Small concurrency pool, keeps the job well within the cron timeout while
   // not hammering the pooled connection.
   const CHUNK = 20;
-  for (let i = 0; i < rows.length; i += CHUNK) {
-    const batch = rows.slice(i, i + CHUNK);
+  for (let i = 0; i < eligible.length; i += CHUNK) {
+    const batch = eligible.slice(i, i + CHUNK);
     const results = await Promise.all(
       batch.map(async (u) =>
         (await grantCreditsOnce(u.id, MONTHLY_BONUS, "monthly_bonus", key))
           ? "grant"
-          : "skip"
-      )
+          : "skip",
+      ),
     );
     for (const r of results) {
       if (r === "grant") granted++;

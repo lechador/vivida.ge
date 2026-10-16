@@ -21,6 +21,7 @@ Conventions:
 | ------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | `check-env.mjs`          | Fails when code reads a `process.env.*` key missing from `.env.example`. Runs in CI (`npm run check:env`). |
 | `grammar-check-home.mjs` | Copy check for the home page.                                                                              |
+| `retention-metrics.mjs`  | Read-only retention + monetization scoreboard (`npm run metrics`). Exits 1 on a guardrail breach.          |
 
 ## Infra setup (run once per environment)
 
@@ -45,9 +46,11 @@ Conventions:
 
 ## Safety (read-only)
 
-| Script              | Purpose                                                  |
-| ------------------- | -------------------------------------------------------- |
-| `scan-underage.mjs` | Scans for under-age accounts. Takes no action by itself. |
+| Script                     | Purpose                                                                                                        |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `scan-underage.mjs`        | Scans for under-age accounts. Takes no action by itself.                                                       |
+| `retention-metrics.mjs`    | Retention + monetization scoreboard. Every query is inside a READ ONLY transaction; writes nothing. See above. |
+| `check-staged-imports.mjs` | Refuses a commit whose staged files import untracked modules. Also runs in the pre-commit hook.                |
 
 ## Campaigns (idempotent, preflight first, `--execute` to send)
 

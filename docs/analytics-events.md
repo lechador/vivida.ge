@@ -39,20 +39,29 @@ device. A consented first-party `/api/pwa/open` call also records a random
 browser-storage profile ID in `pwa_installation`, with first and latest open
 dates; the admin PWA page displays both sources separately.
 
-| event                                                               | when                                                                                            | key params                        |
-| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------- |
-| `onboarding_started/step_viewed/step_completed/submitted/abandoned` | wizard lifecycle; abandoned = unmount without submit + last `step_name`                         | `flow`, `step_name`               |
-| `search_opened/result_selected/no_result`                           | authed header people-search; no query text, `no_result` once per distinct query                 | `result_type: people`             |
-| `nav_item_selected`                                                 | sidebar / drawer / tab-bar taps                                                                 | `item` (nav key)                  |
-| `library_item_favorited`                                            | favorite toggle succeeds                                                                        | `outcome: favorited/unfavorited`  |
-| `library_note_saved`                                                | non-empty private note saved                                                                    | `outcome: saved`                  |
-| `report_downloaded`                                                 | PDF download click                                                                              | `report_type: natal`              |
-| `checkout_failed`                                                   | credit top-up could not start (no URL / HTTP / network)                                         | `reason: no_url/http_NNN/network` |
-| `checkout_cancel_return`                                            | Stripe `?status=canceled` return                                                                | `outcome: canceled_at_stripe`     |
-| `checkout_started/success`                                          | session created / Stripe success return                                                         | product, value, currency          |
-| `purchase_completed` + `entitlement_activated`                      | **only after** `/api/billing/session` confirms the server grant, canonical paid-delivery signal | `kind: credits/premium`           |
-| `report_ready`                                                      | server marks PDF ready                                                                          | server-side (worker log → W10)    |
-| `empty_state_seen`                                                  | empty history / no-result states                                                                | `empty_kind` (wired per surface)  |
+| event                                                               | when                                                                                            | key params                          |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `onboarding_started/step_viewed/step_completed/submitted/abandoned` | wizard lifecycle; abandoned = unmount without submit + last `step_name`                         | `flow`, `step_name`                 |
+| `search_opened/result_selected/no_result`                           | authed header people-search; no query text, `no_result` once per distinct query                 | `result_type: people`               |
+| `nav_item_selected`                                                 | sidebar / drawer / tab-bar taps                                                                 | `item` (nav key)                    |
+| `library_item_favorited`                                            | favorite toggle succeeds                                                                        | `outcome: favorited/unfavorited`    |
+| `library_note_saved`                                                | non-empty private note saved                                                                    | `outcome: saved`                    |
+| `report_downloaded`                                                 | PDF download click                                                                              | `report_type: natal`                |
+| `checkout_failed`                                                   | credit top-up could not start (no URL / HTTP / network)                                         | `reason: no_url/http_NNN/network`   |
+| `checkout_cancel_return`                                            | Stripe `?status=canceled` return                                                                | `outcome: canceled_at_stripe`       |
+| `checkout_started/success`                                          | session created / Stripe success return                                                         | product, value, currency            |
+| `purchase_completed` + `entitlement_activated`                      | **only after** `/api/billing/session` confirms the server grant, canonical paid-delivery signal | `kind: credits/premium`             |
+| `report_ready`                                                      | server marks PDF ready                                                                          | server-side (worker log → W10)      |
+| `empty_state_seen`                                                  | empty history / no-result states                                                                | `empty_kind` (wired per surface)    |
+| `cancel_flow_viewed`                                                | the cancellation dialog opens on `/account`                                                     | `has_alternative`                   |
+| `cancel_reason_selected`                                            | a churn reason is chosen                                                                        | `reason` (fixed enum, no free text) |
+| `cancel_retained`                                                   | the user keeps PRO, or takes the cheaper-plan offer                                             | `action: downgrade_offer`           |
+| `cancel_confirmed`                                                  | cancellation actually submitted                                                                 | `reason`                            |
+
+Cancellation is the highest-intent churn moment in the product. It previously
+emitted nothing at all — the flow was a bare `window.confirm()` — so churn was
+completely unmeasurable. `reason` is a fixed enum (`too_expensive`, `not_using`,
+`missing_feature`, `unexpected_charge`, `other`); no free text is ever sent.
 
 ## Canonical vs directional
 

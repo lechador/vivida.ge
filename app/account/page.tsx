@@ -33,7 +33,12 @@ import { countryDisplayName } from "@/lib/residence";
 import type { Metadata } from "next";
 import { getReminderPreferences } from "@/lib/reminder-settings";
 import { getPremiumSubscription } from "@/lib/premium";
-import { SubscriptionCancelLink } from "@/components/subscription/subscription-cancel-link";
+import { SubscriptionCancelFlow } from "@/components/subscription/subscription-cancel-flow";
+import {
+  cheaperAlternativePlan,
+  discountedPremiumPlanForCountry,
+  formatBillingAmount,
+} from "@/lib/billing-config";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -90,6 +95,21 @@ export default async function AccountPage() {
   );
   const en = locale !== "ka";
   const onEnglishHost = await requestIsEnglishHost();
+
+  /**
+   * The cheaper alternative offered in the cancellation flow. Returns null when
+   * the user is already on the best rate, so the offer never upsells.
+   */
+  const discountedPlan =
+    subscription && subscription.source === "stripe"
+      ? cheaperAlternativePlan({
+          candidate: discountedPremiumPlanForCountry(
+            subscription.countryCode ?? emailPrefs?.countryCode ?? null,
+          ),
+          currentAmountMinor: subscription.amountMinor,
+          currentCurrency: subscription.currency,
+        })
+      : null;
 
   return (
     <main
@@ -231,9 +251,30 @@ export default async function AccountPage() {
                     : en
                       ? `Vivida PRO · renews ${formatAccountDate(subscription.currentPeriodEnd, locale)} · `
                       : `Vivida PRO · განახლდება ${formatAccountDate(subscription.currentPeriodEnd, locale)} · `}
-                  <SubscriptionCancelLink
+                  <SubscriptionCancelFlow
                     locale={locale}
                     cancelAtPeriodEnd={subscription.cancelAtPeriodEnd}
+                    currentPriceLabel={formatBillingAmount(
+                      subscription.amountMinor,
+                      subscription.currency,
+                      locale,
+                    )}
+                    discountedPriceLabel={
+                      discountedPlan
+                        ? formatBillingAmount(
+                            discountedPlan.amountMinor,
+                            discountedPlan.currency,
+                            locale,
+                          )
+                        : null
+                    }
+                    discountedPeriodLabel={
+                      discountedPlan
+                        ? en
+                          ? `${discountedPlan.intervalCount ?? 1} months`
+                          : `${discountedPlan.intervalCount ?? 1} თვე`
+                        : null
+                    }
                   />
                 </>
               ) : subscription.rcStore === "PLAY_STORE" ? (

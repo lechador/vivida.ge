@@ -47,6 +47,8 @@ import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 import { getPhoneGiftState } from "@/lib/phone-gift";
 import { phoneGiftCardEligible } from "@/lib/phone-gift-pure";
 import { nextMonthlyBonusDate } from "@/lib/credit-progress";
+import { monthlyBonusEligible } from "@/lib/monthly-bonus-eligibility";
+import { monthlyGateFor } from "@/lib/payer";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -137,6 +139,7 @@ export default async function CreditsPage({
     history,
     recentSpend,
     giftState,
+    monthlyGate,
   ] = await Promise.all([
     getBalance(user.id),
     getReferralStats(user.id),
@@ -154,6 +157,8 @@ export default async function CreditsPage({
     getRecentSpend(user.id),
     // Phone-gift campaign eligibility for the verify-your-number card.
     getPhoneGiftState(user.id),
+    // Monthly-drop gate, so the progress card never promises a paused bonus.
+    monthlyGateFor(user.id),
   ]);
   // Accounts created before residence tracking have no country, which would
   // hide PRO and fall the packs back to GEL by luck rather than by geo. Same
@@ -220,6 +225,7 @@ export default async function CreditsPage({
               balance={balance}
               nextMonthlyDate={nextMonthlyBonusDate()}
               locale={locale}
+              monthlyPaused={!monthlyBonusEligible(monthlyGate)}
             />
           </div>
 

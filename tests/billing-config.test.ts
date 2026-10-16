@@ -12,6 +12,7 @@ import {
   featuredPremiumPlanForCountry,
   premiumPlanByKeyForCountry,
   premiumPlanSavingsPercent,
+  monthlyPlanOffered,
   premiumPlanForCountry,
   PURCHASE_PROMOTION_CREDIT_THRESHOLD,
   shouldShowPurchasePromotion,
@@ -335,5 +336,53 @@ describe("formatBillingAmount", () => {
     } finally {
       Intl.NumberFormat = full;
     }
+  });
+});
+
+describe("monthly PRO retirement (Georgia, owner decision 2026-10-16)", () => {
+  it("no longer offers monthly PRO in Georgia", () => {
+    expect(monthlyPlanOffered("GE")).toBe(false);
+  });
+
+  it("still offers monthly PRO in markets that did not retire it", () => {
+    expect(monthlyPlanOffered("GB")).toBe(true);
+    expect(monthlyPlanOffered("US")).toBe(true);
+    // Unknown/missing country falls back to the Georgian catalogue for pricing,
+    // so it must inherit the retirement too — otherwise a caller could resolve
+    // the Georgian monthly plan for a market that has retired it.
+    expect(monthlyPlanOffered(null)).toBe(false);
+    expect(monthlyPlanOffered("ZZ")).toBe(false);
+  });
+
+  it("refuses to enrol anyone in the retired Georgian monthly plan", () => {
+    // The server-side gate matters because a client can post any planKey.
+    expect(premiumPlanByKeyForCountry("GE", "premium_ge_monthly")).toBeNull();
+  });
+
+  it("keeps the quarterly plan purchasable in Georgia", () => {
+    expect(
+      premiumPlanByKeyForCountry("GE", LOW_CREDIT_PROMO_PLAN.key)?.key,
+    ).toBe(LOW_CREDIT_PROMO_PLAN.key);
+    expect(featuredPremiumPlanForCountry("GE").key).toBe(
+      LOW_CREDIT_PROMO_PLAN.key,
+    );
+  });
+
+  it("keeps the monthly plan in the catalogue as the price anchor", () => {
+    // The discounted saving is computed against it, and one grandfathered
+    // subscriber is still on it. Removing the entry would break both.
+    const anchor = premiumPlanForCountry("GE");
+    expect(anchor.key).toBe("premium_ge_monthly");
+    expect(anchor.stripeLookupKey).toBe("vivida_premium_ge_monthly_1990_v1");
+    // And the saving is still derived, not hard-coded.
+    expect(
+      premiumPlanSavingsPercent(anchor, LOW_CREDIT_PROMO_PLAN),
+    ).toBeGreaterThan(40);
+  });
+
+  it("does not block monthly enrolment in other markets", () => {
+    expect(premiumPlanByKeyForCountry("GB", "premium_gb_monthly")?.key).toBe(
+      "premium_gb_monthly",
+    );
   });
 });

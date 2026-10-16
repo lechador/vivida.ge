@@ -22,6 +22,7 @@ import { CREDIT_COST } from "@/lib/credits-config";
 import { WeeklyForecastCard } from "./weekly-forecast-card";
 import { WeeklyForecastLocked } from "./weekly-forecast-locked";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { PUSH_VALUE_MOMENT_EVENT } from "@/lib/push-prompt";
 import { DailyRitual } from "./daily-ritual";
 import { ProDailyBrief } from "./pro-daily-brief";
 
@@ -47,7 +48,13 @@ export function DailyDashboard({
     let cancelled = false;
     loadDashboardCore(userId)
       .then((c) => {
-        if (!cancelled) setCore(c);
+        if (cancelled) return;
+        setCore(c);
+        // The chart just rendered — the user has received value, which is the
+        // right moment to offer daily notifications rather than a static banner.
+        if (c) {
+          window.dispatchEvent(new Event(PUSH_VALUE_MOMENT_EVENT));
+        }
       })
       .catch((err) => {
         if (!cancelled) setError((err as Error).message);

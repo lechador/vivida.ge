@@ -18,6 +18,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "check:env": "node scripts/check-env.mjs",
+    "metrics": "node scripts/retention-metrics.mjs",
     "check": "npm run check:env && npm run lint && npm run typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

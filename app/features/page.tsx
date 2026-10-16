@@ -17,6 +17,10 @@ import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import {
+  creditPacksForCountry,
+  formatBillingAmount,
+} from "@/lib/billing-config";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { localizedAlternates } from "@/lib/seo/locales";
 
@@ -162,6 +166,7 @@ export default async function FeaturesPage() {
   const locale = await getRequestLocale();
   const en = locale === "en";
   const features = en ? FEATURES_EN : FEATURES;
+  const starterPack = creditPacksForCountry("GE")[0];
   return (
     <main
       lang={locale}
@@ -251,8 +256,19 @@ export default async function FeaturesPage() {
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
             {en
               ? "Start with Vivida for free and keep your personal sky within reach."
-              : "ყველა ფუნქცია სრულად უფასოა, შენი კოსმოსი ერთ დაკლიკვაზე."}
+              : "დაიწყე უფასოდ: ნატალური რუკა და საწყისი კრედიტები საჩუქრად. სიღრმისეული პასუხები ერთჯერადი კრედიტებით იხსნება, ხშირი გამოყენებისთვის კი PROა."}
           </p>
+          {!en && (
+            <p className="mx-auto mt-2 text-sm text-foreground/75">
+              პირველი შენაძენი{" "}
+              {formatBillingAmount(
+                starterPack.amountMinor,
+                starterPack.currency,
+                "ka",
+              )}
+              -დან, ერთჯერადად, ავტოგანახლების გარეშე.
+            </p>
+          )}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="mystic" size="lg">
               <Link href="/signup">

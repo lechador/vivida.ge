@@ -15,7 +15,6 @@ import { AstroProfileBanner } from "@/components/astro/astro-profile-banner";
 import { SuggestedPeopleRail } from "@/components/dashboard/suggested-people-rail";
 import { FeedList } from "@/components/feed/feed-list";
 import { PostComposer } from "@/components/feed/post-composer";
-import { PushOptIn } from "@/components/push/push-opt-in";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { Metadata } from "next";
@@ -84,10 +83,6 @@ export default async function FeedPage() {
             </span>
           </h1>
         </div>
-
-        {/* Soft daily-push prompt, hides itself once enabled/dismissed.
-            Strongest same-day return trigger; also fires for feed visitors. */}
-        <PushOptIn variant="banner" locale={locale} />
 
         {!hasBirthData && (
           <div className="mb-6">

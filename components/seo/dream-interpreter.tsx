@@ -141,6 +141,7 @@ export function DreamInterpreter({
 
   return (
     <section
+      id="dream-interpreter"
       aria-label={en ? "AI dream interpretation" : "სიზმრის AI ახსნა"}
       className="relative mb-10 overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/14 via-card/60 to-[var(--vivida-cyan)]/10 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8"
     >

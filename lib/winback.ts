@@ -28,6 +28,7 @@ import { getBalance } from "@/lib/credits";
 import { WinbackEmail } from "@/lib/email-templates/winback";
 import { isPushConfigured, sendPushToUser } from "@/lib/push";
 import { acquireResendSlot } from "@/lib/resend-throttle";
+import { PER_JOB_SEND_CAP, type SendBudget } from "@/lib/email-send-budget";
 import { localDateString } from "@/lib/transits";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { signMetaBySlug, signSlugByDate } from "@/lib/seo/zodiac-dates";
@@ -46,7 +47,10 @@ function resolveFrom(envVal: string | undefined, fallback: string): string {
   if (!envVal) return fallback;
   return envVal.includes("<") ? envVal : `Vivida <${envVal}>`;
 }
-const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <onboarding@resend.dev>");
+const FROM = resolveFrom(
+  process.env.RESEND_FROM,
+  "Vivida <onboarding@resend.dev>",
+);
 
 export const WINBACK_SUBJECT = "ვარსკვლავები ისევ შენზე საუბრობენ ✨";
 export const WINBACK_SUBJECT_EN = "The stars are still speaking to you ✨";
@@ -109,8 +113,8 @@ async function recentlyNudged(userId: string): Promise<boolean> {
       and(
         eq(emailSendLog.userId, userId),
         eq(emailSendLog.kind, "winback"),
-        gte(emailSendLog.sentAt, cutoff)
-      )
+        gte(emailSendLog.sentAt, cutoff),
+      ),
     )
     .limit(1);
   return !!row;
@@ -138,7 +142,9 @@ export type WinbackResult = {
 };
 
 /** Cron entrypoint, one personal nudge per user per dormancy spell. */
-export async function sendWinbackNudges(): Promise<WinbackResult> {
+export async function sendWinbackNudges(
+  budget?: SendBudget,
+): Promise<WinbackResult> {
   const found = await findDormantUsers();
   const result: WinbackResult = {
     dormant: found.length,
@@ -167,7 +173,16 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
     return headline;
   }
 
+  // Bound this run's sends. The 7-14 day dormancy window held 219 candidates in
+  // production, and every send costs 1.1s, so an uncapped loop competes with the
+  // other lifecycle jobs for a 300s invocation budget.
+  const allowance = budget
+    ? budget.reserve(found.length, PER_JOB_SEND_CAP)
+    : PER_JOB_SEND_CAP;
+  let sentThisRun = 0;
+
   for (const u of found) {
+    if (sentThisRun >= allowance) break;
     try {
       const locale = normalizeUserLocale(u.locale);
       const en = locale === "en";
@@ -194,12 +209,16 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
       // Personalization (best-effort).
       const slug = sunSlugFromDob(u.dateOfBirth);
       const signMeta = slug ? signMetaBySlug(slug) : null;
-      const signLabel = en ? (signMeta?.labelEn ?? null) : (signMeta?.labelKa ?? null);
+      const signLabel = en
+        ? (signMeta?.labelEn ?? null)
+        : (signMeta?.labelKa ?? null);
       let headline: string | null = null;
       try {
         headline = en
-          ? (await ensureDailyFor(u.userId, "en"))?.headline ?? null
-          : slug ? await headlineFor(slug) : null;
+          ? ((await ensureDailyFor(u.userId, "en"))?.headline ?? null)
+          : slug
+            ? await headlineFor(slug)
+            : null;
       } catch {
         /* horoscope is garnish, never block the nudge */
       }
@@ -284,12 +303,10 @@ export async function sendWinbackNudges(): Promise<WinbackResult> {
           .set({ status: "sent" })
           .where(eq(emailSendLog.id, claim.id));
         result.emailed++;
+        sentThisRun++;
       }
     } catch (err) {
-      console.warn(
-        `[winback] failed for ${u.userId}:`,
-        (err as Error).message
-      );
+      console.warn(`[winback] failed for ${u.userId}:`, (err as Error).message);
       result.failed++;
     }
   }
