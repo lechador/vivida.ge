@@ -15,8 +15,12 @@ export const STAGED_SIGNUP_BONUS = 10;
 /** signup_credits_v1: staged cohort receives this on its first 24h+ return. */
 export const STAGED_RETURN_BONUS = 5;
 export const REFERRAL_REWARD = 10;
-/** Free credits granted to every user on the first day of each month. */
-export const MONTHLY_BONUS = 5;
+/**
+ * Free credits granted to recently active users on the first of each month.
+ * Reduced 5 -> 3 and re-targeted at active accounts on 2026-10-17; see
+ * lib/monthly-bonus-eligibility.ts for the measurement behind it.
+ */
+export const MONTHLY_BONUS = 3;
 /** Phone-gift campaign: one-time reward for verifying a mobile number. */
 export const PHONE_VERIFY_GIFT = 10;
 /** …granted on top of the above when promotional-SMS consent first turns on. */

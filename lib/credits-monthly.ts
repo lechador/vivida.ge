@@ -2,12 +2,13 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { MONTHLY_BONUS, grantCreditsOnce } from "@/lib/credits";
 import { monthlyBonusEligible } from "@/lib/monthly-bonus-eligibility";
-import { usersWhoHavePaid, usersWithWelcomeBonus } from "@/lib/payer";
+import { activityCutoffKey, usersActiveSince } from "@/lib/payer";
 import { localDateString } from "@/lib/transits";
 
 /**
- * Monthly free-credit drop. On the first of each month every user is gifted
- * MONTHLY_BONUS credits. Idempotent per month: the grant is keyed by the
+ * Monthly free-credit drop. On the first of each month every *recently active*
+ * eligible user is gifted MONTHLY_BONUS credits (see
+ * `monthlyBonusEligible`). Idempotent per month: the grant is keyed by the
  * `YYYY-MM` ref under the `monthly_bonus` reason, so re-running the cron (or a
  * safety-retry tick) never double-grants, grantCreditsOnce checks the ledger
  * and increments the balance inside one advisory-locked statement, so even two
@@ -31,17 +32,12 @@ export async function grantMonthlyCredits(
   const key = monthKey ?? currentMonthKey();
   const rows = await db.select({ id: users.id }).from(users);
   const allIds = rows.map((r) => r.id);
-  // Free-economy gate: the drop no longer stacks on an unspent welcome bonus
-  // for users who have never paid. One batch lookup each, not per-user queries.
-  const [welcomeBonusUsers, paidUsers] = await Promise.all([
-    usersWithWelcomeBonus(allIds),
-    usersWhoHavePaid(allIds),
-  ]);
+  // Free-economy gate: a habit reward for accounts that are actually in use.
+  // One batch lookup, not per-user queries. Resolving this from a single query
+  // also keeps the job inside the cron timeout as the table grows.
+  const activeUsers = await usersActiveSince(allIds, activityCutoffKey());
   const eligible = rows.filter((u) =>
-    monthlyBonusEligible({
-      receivedWelcomeBonus: welcomeBonusUsers.has(u.id),
-      hasEverPaid: paidUsers.has(u.id),
-    }),
+    monthlyBonusEligible({ activeRecently: activeUsers.has(u.id) }),
   );
   let skipped = rows.length - eligible.length;
 

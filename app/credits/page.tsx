@@ -225,7 +225,9 @@ export default async function CreditsPage({
               balance={balance}
               nextMonthlyDate={nextMonthlyBonusDate()}
               locale={locale}
-              monthlyPaused={!monthlyBonusEligible(monthlyGate)}
+              monthlyPausedReason={
+                monthlyBonusEligible(monthlyGate) ? null : "inactivity"
+              }
             />
           </div>
 

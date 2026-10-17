@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { maxLifetimeRitualReward, nextRitualMilestone, rewardWeekKey, ritualMilestoneAt } from "@/lib/credit-economy";
+import {
+  maxLifetimeRitualReward,
+  nextRitualMilestone,
+  rewardWeekKey,
+  ritualMilestoneAt,
+} from "@/lib/credit-economy";
 import { CREDIT_REWARD, MONTHLY_BONUS } from "@/lib/credits-config";
 
 describe("credit economy guardrails", () => {
@@ -18,6 +23,11 @@ describe("credit economy guardrails", () => {
   });
 
   it("does not increase the monthly recurring grant", () => {
-    expect(MONTHLY_BONUS).toBe(5);
+    // Reduced 5 -> 3 on 2026-10-17 and re-targeted at recently active accounts,
+    // because it was 43.4% of free issuance and reached 281 accounts that had
+    // never been active. The guard intent is unchanged: this must never go up
+    // without an explicit economy decision.
+    expect(MONTHLY_BONUS).toBe(3);
+    expect(MONTHLY_BONUS).toBeLessThanOrEqual(3);
   });
 });

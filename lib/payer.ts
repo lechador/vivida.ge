@@ -1,9 +1,13 @@
 import "server-only";
 
-import { and, eq, inArray, like, or } from "drizzle-orm";
+import { and, eq, gt, inArray, like, or } from "drizzle-orm";
 
 import { db } from "@/db";
-import { creditTransactions, premiumSubscriptions } from "@/db/schema";
+import {
+  creditTransactions,
+  premiumSubscriptions,
+  userActivityDays,
+} from "@/db/schema";
 
 /**
  * Server truth for "has this user ever paid money", shared by the monthly
@@ -75,27 +79,52 @@ export async function usersWhoHavePaid(
   return paid;
 }
 
-/** Single-user monthly-gate inputs for account surfaces that explain the drop. */
+/** Single-user monthly-gate input for surfaces that explain the drop. */
 export async function monthlyGateFor(
   userId: string,
-): Promise<{ receivedWelcomeBonus: boolean; hasEverPaid: boolean }> {
-  const [paid, welcome] = await Promise.all([
-    hasEverPaid(userId),
-    db
-      .select({ id: creditTransactions.id })
-      .from(creditTransactions)
-      .where(
-        and(
-          eq(creditTransactions.userId, userId),
-          or(
-            eq(creditTransactions.reason, "signup_bonus"),
-            eq(creditTransactions.reason, "first_return_bonus"),
-          ),
-        ),
-      )
-      .limit(1),
-  ]);
-  return { receivedWelcomeBonus: welcome.length > 0, hasEverPaid: paid };
+): Promise<{ activeRecently: boolean }> {
+  const active = await usersActiveSince([userId], activityCutoffKey());
+  return { activeRecently: active.has(userId) };
+}
+
+/**
+ * Users with at least one recorded activity day on/after `sinceDateKey`
+ * (`YYYY-MM-DD`, matching `user_activity_day.date_local`, which is text).
+ *
+ * Why: the monthly free-credit drop used to reach every account regardless of
+ * whether it had ever been opened — 281 of 1,944 recipients in the 28 days to
+ * 2026-10-16 had never been active at all. Rewards tied to a live habit are both
+ * fairer and worth ~1.2x on the free-issuance guardrail.
+ */
+export async function usersActiveSince(
+  userIds: readonly string[],
+  sinceDateKey: string,
+): Promise<Set<string>> {
+  const active = new Set<string>();
+  if (userIds.length === 0) return active;
+  const rows = await db
+    .select({ userId: userActivityDays.userId })
+    .from(userActivityDays)
+    .where(
+      and(
+        inArray(userActivityDays.userId, [...userIds]),
+        gt(userActivityDays.dateLocal, sinceDateKey),
+      ),
+    );
+  for (const row of rows) active.add(row.userId);
+  return active;
+}
+
+/** Days of continuous activity that keep a user eligible for the monthly drop. */
+export const MONTHLY_BONUS_ACTIVITY_DAYS = 28;
+
+/** ISO date key `days` ago, for `user_activity_day.date_local` comparisons. */
+export function activityCutoffKey(
+  days: number = MONTHLY_BONUS_ACTIVITY_DAYS,
+  now: Date = new Date(),
+): string {
+  const d = new Date(now.getTime() - days * 86_400_000);
+  return d.toISOString().slice(0, 10);
 }
 
 /** Users who received the welcome (signup) bonus, for free-economy gates. */
