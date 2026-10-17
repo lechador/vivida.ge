@@ -42,7 +42,7 @@ export async function submitMbtiFor(input: {
 }): Promise<MbtiSubmission> {
   const { userId, answers, locale } = input;
   // Matches the website action: only the English locale swaps the deterministic
-  // fallback copy; Armenian keeps the Georgian floor text.
+  // fallback copy; non-English locales keep the Georgian floor text.
   const en = locale === "en";
 
   // ≤6 generations/hour per account, so an anonymous-turned-signed-in taker

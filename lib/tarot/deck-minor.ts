@@ -1,7 +1,7 @@
 /**
  * The Minor Arcana, four suits of fourteen. Same editorial shape as the
  * majors (hand-written meanings, no AI at read time), plus suit + rank so the
- * reader and future detail pages can group them. No Armenian file: Armenian
+ * reader and future detail pages can group them.
  * is being removed, so new content ships in Georgian and English only.
  */
 export type MinorSuit = "swords" | "cups" | "wands" | "pentacles";

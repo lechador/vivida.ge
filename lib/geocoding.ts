@@ -50,20 +50,13 @@ interface OpenMeteoRaw {
   }>;
 }
 
-// ─── Georgian & Armenian script support ─────────────────────────────────
+// ─── Georgian script support ────────────────────────────────────────────
 
 /** Range covers Mkhedruli (U+10A0–U+10FF) and extensions. */
 const GEORGIAN_RE = /[Ⴀ-ჿⴀ-⴯Ა-Ჿ]/;
 
-/** Range covers Armenian (U+0530–U+058F, U+FB13–U+FB17). */
-const ARMENIAN_RE = /[\u0530-\u058F\uFB13-\uFB17]/;
-
 export function hasGeorgianScript(s: string): boolean {
   return GEORGIAN_RE.test(s);
-}
-
-export function hasArmenianScript(s: string): boolean {
-  return ARMENIAN_RE.test(s);
 }
 
 const KA_TO_EN_CITY: Record<string, string> = {
@@ -171,83 +164,8 @@ const KA_TO_EN_CITY: Record<string, string> = {
   მელბურნი: "Melbourne",
 };
 
-/** Armenian city mapping */
-const AM_TO_EN_CITY: Record<string, string> = {
-  // Armenia, major
-  երևան: "Yerevan",
-  գյումրի: "Gyumri",
-  վանաձոր: "Vanadzor",
-  վաղարշապատ: "Vagharshapat",
-  էջմիածին: "Echmiadzin",
-  աբովյան: "Abovyan",
-  հրազդան: "Hrazdan",
-  կապան: "Kapan",
-  արմավիր: "Armavir",
-  գավառ: "Gavar",
-  արտաշատ: "Artashat",
-  իջևան: "Ijevan",
-  դիլիջան: "Dilijan",
-  գորիս: "Goris",
-  սևան: "Sevan",
-  չարենցավան: "Charentsavan",
-  սիսիան: "Sisian",
-  աշտարակ: "Ashtarak",
-  արարատ: "Ararat",
-  մասիս: "Masis",
-  սպիտակ: "Spitak",
-  ստեփանավան: "Stepanavan",
-  ալավերդի: "Alaverdi",
-  ջերմուկ: "Jermuk",
-  քաջարան: "Kajaran",
-  մարտունի: "Martuni",
-  վարդենիս: "Vardenis",
-  եղեգնաձոր: "Yeghegnadzor",
-  բերդ: "Berd",
-  նոյեմբերյան: "Noyemberyan",
-  մեղրի: "Meghri",
-  ծաղկաձոր: "Tsaghkadzor",
-  // International & Diaspora
-  թբիլիսի: "Tbilisi",
-  բաթումի: "Batumi",
-  քութայիսի: "Kutaisi",
-  ახալქალაქի: "Akhalkalaki",
-  ախալքալաք: "Akhalkalaki",
-  նինոծմինդա: "Ninotsminda",
-  մոսկվա: "Moscow",
-  "սանկտ պետերբուրգ": "Saint Petersburg",
-  կրասնոդար: "Krasnodar",
-  սոչի: "Sochi",
-  "դոնի ռոստով": "Rostov-on-Don",
-  "լոս անջելես": "Los Angeles",
-  գլենդել: "Glendale",
-  բըրբանք: "Burbank",
-  փարիզ: "Paris",
-  մարսել: "Marseille",
-  լիոն: "Lyon",
-  լոնդոն: "London",
-  բեյրութ: "Beirut",
-  թեհրան: "Tehran",
-  ստամբուլ: "Istanbul",
-  դուբայ: "Dubai",
-  "նյու յորք": "New York",
-  բոստոն: "Boston",
-  տորոնտո: "Toronto",
-  մոնրեալ: "Montreal",
-  "բուենոս այրես": "Buenos Aires",
-  սիդնեյ: "Sydney",
-  բեռլին: "Berlin",
-  վիեննա: "Vienna",
-  հռոմ: "Rome",
-  աթենք: "Athens",
-  կիև: "Kyiv",
-};
-
 const EN_TO_KA_CITY: Record<string, string> = Object.fromEntries(
   Object.entries(KA_TO_EN_CITY).map(([ka, en]) => [en.toLowerCase(), ka]),
-);
-
-const EN_TO_AM_CITY: Record<string, string> = Object.fromEntries(
-  Object.entries(AM_TO_EN_CITY).map(([am, en]) => [en.toLowerCase(), am]),
 );
 
 const EN_TO_KA_COUNTRY: Record<string, string> = {
@@ -267,30 +185,6 @@ const EN_TO_KA_COUNTRY: Record<string, string> = {
   israel: "ისრაელი",
   japan: "იაპონია",
   china: "ჩინეთი",
-};
-
-const EN_TO_AM_COUNTRY: Record<string, string> = {
-  armenia: "Հայաստան",
-  georgia: "Վրաստան",
-  russia: "Ռուսաստան",
-  "united states": "ԱՄՆ",
-  "united kingdom": "Միացյալ Թագավորություն",
-  france: "Ֆրանսիա",
-  germany: "Գերմանիա",
-  italy: "Իտալիա",
-  spain: "Իսպանիա",
-  greece: "Հունաստան",
-  iran: "Իրան",
-  lebanon: "Լիբանան",
-  turkey: "Թուրքիա",
-  ukraine: "Ուկրաինա",
-  israel: "Իսրայել",
-  canada: "Կանադա",
-  australia: "Ավստրալիա",
-  argentina: "Արգենտինա",
-  cyprus: "Կիպրոս",
-  uae: "ԱՄԷ",
-  "united arab emirates": "Արաբական Միացյալ Էմիրություններ",
 };
 
 const KA_LETTER_TO_LATIN: Record<string, string> = {
@@ -335,68 +229,13 @@ const KA_LETTER_TO_LATIN: Record<string, string> = {
   ჶ: "f",
 };
 
-const AM_LETTER_TO_LATIN: Record<string, string> = {
-  ա: "a",
-  բ: "b",
-  գ: "g",
-  դ: "d",
-  ե: "e",
-  զ: "z",
-  է: "e",
-  ը: "y",
-  թ: "t",
-  ժ: "zh",
-  ի: "i",
-  լ: "l",
-  խ: "kh",
-  ծ: "ts",
-  կ: "k",
-  հ: "h",
-  ձ: "dz",
-  ղ: "gh",
-  ճ: "ch",
-  մ: "m",
-  յ: "y",
-  ն: "n",
-  շ: "sh",
-  ո: "o",
-  չ: "ch",
-  պ: "p",
-  ջ: "j",
-  ռ: "r",
-  ս: "s",
-  վ: "v",
-  տ: "t",
-  ր: "r",
-  ց: "ts",
-  ու: "u",
-  փ: "p",
-  ք: "k",
-  և: "ev",
-  օ: "o",
-  ֆ: "f",
-};
-
 /** Letter-by-letter Georgian → Latin */
 function transliterateKa(s: string): string {
   return s.replace(/./gu, (c) => KA_LETTER_TO_LATIN[c.toLowerCase()] ?? c);
 }
 
-/** Letter-by-letter Armenian → Latin */
-function transliterateAm(s: string): string {
-  return s.replace(/./gu, (c) => AM_LETTER_TO_LATIN[c.toLowerCase()] ?? c);
-}
-
 function toSearchQuery(input: string): string {
   const trimmed = input.trim();
-  if (hasArmenianScript(trimmed)) {
-    const lower = trimmed.toLowerCase();
-    if (AM_TO_EN_CITY[lower]) return AM_TO_EN_CITY[lower];
-    const head = lower.split(/[,،]/)[0]?.trim();
-    if (head && AM_TO_EN_CITY[head]) return AM_TO_EN_CITY[head];
-    return transliterateAm(trimmed);
-  }
-
   if (hasGeorgianScript(trimmed)) {
     const lower = trimmed.toLowerCase();
     if (KA_TO_EN_CITY[lower]) return KA_TO_EN_CITY[lower];
@@ -420,18 +259,6 @@ function localizeForKa(
   };
 }
 
-function localizeForAm(
-  name: string,
-  country: string,
-): { name: string; country: string } {
-  const am = EN_TO_AM_CITY[name.toLowerCase()];
-  const amCountry = EN_TO_AM_COUNTRY[country.toLowerCase()];
-  return {
-    name: am ? am.charAt(0).toUpperCase() + am.slice(1) : name,
-    country: amCountry ?? country,
-  };
-}
-
 // ─── API ────────────────────────────────────────────────────────────────
 
 export async function searchPlaces(
@@ -442,7 +269,6 @@ export async function searchPlaces(
   if (original.length < 2) return [];
 
   const wasGeorgian = hasGeorgianScript(original);
-  const wasArmenian = hasArmenianScript(original);
   const searchQuery = toSearchQuery(original);
 
   const url = new URL(ENDPOINT);
@@ -465,9 +291,7 @@ export async function searchPlaces(
 
   return data.results.map((r) => {
     let localized: { name: string; country: string };
-    if (wasArmenian) {
-      localized = localizeForAm(r.name, r.country);
-    } else if (wasGeorgian) {
+    if (wasGeorgian) {
       localized = localizeForKa(r.name, r.country);
     } else {
       localized = { name: r.name, country: r.country };

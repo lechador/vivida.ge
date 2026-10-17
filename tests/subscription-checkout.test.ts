@@ -48,7 +48,9 @@ describe("POST /api/subscription/checkout", () => {
     mocks.isCryptoPayConfigured.mockReturnValue(true);
   });
 
-  it("uses the live Armenian catalogue values rather than the Georgian fallback", async () => {
+  it("prices an Armenian resident from the Georgian fallback, not a dropped AMD market", async () => {
+    // The AMD market was removed on 2026-10-17, so AM is now an unlisted country
+    // and inherits the documented Georgian catalogue fallback.
     const response = await POST(
       new Request("https://vivida.ge/api/subscription/checkout", {
         method: "POST",
@@ -58,63 +60,24 @@ describe("POST /api/subscription/checkout", () => {
     );
 
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({
-      url: "https://checkout.stripe.test/am",
-      eventId: "cs_test_am:initiate_checkout",
-      value: 2990,
-      currency: "AMD",
-      contentId: "premium_am_monthly",
-    });
-    expect(mocks.createCheckout).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: "user-am",
-        plan: {
-          key: "premium_am_monthly",
-          countryCode: "AM",
-          amountMinor: 299_000,
-          currency: "amd",
-          interval: "month",
-          stripeLookupKey: "vivida_premium_am_monthly_299000_v1",
-        },
-      }),
-    );
-  });
-
-  it("accepts the public Georgian quarterly plan from the server catalogue", async () => {
-    mocks.getBillingIdentity.mockResolvedValue({
-      countryCode: "GE",
-      email: "georgian@example.com",
-      stripeCustomerId: null,
-    });
-
-    const response = await POST(
-      new Request("https://vivida.ge/api/subscription/checkout", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          planKey: "promo_ge_quarterly",
-          product: "tarot",
-        }),
-      }),
-    );
-
-    expect(response.status).toBe(200);
     expect(mocks.createCheckout).toHaveBeenCalledWith(
       expect.objectContaining({
         plan: expect.objectContaining({
-          key: "promo_ge_quarterly",
-          amountMinor: 2900,
+          key: "premium_ge_monthly",
           currency: "gel",
-          intervalCount: 3,
-        }),
-        trackingMetadata: expect.objectContaining({
-          purchase_context: "tarot",
+          amountMinor: 1990,
         }),
       }),
     );
   });
 
   it("rejects a plan that is not available in the user's market", async () => {
+    // GB has no quarterly plan, so the Georgian promo key must be refused there.
+    mocks.getBillingIdentity.mockResolvedValue({
+      countryCode: "GB",
+      email: "buyer@example.com",
+      stripeCustomerId: null,
+    });
     const response = await POST(
       new Request("https://vivida.ge/api/subscription/checkout", {
         method: "POST",

@@ -37,18 +37,18 @@ describe("proAnchorFor", () => {
     expect(anchor?.spendCashMinor).toBe(565);
   });
 
-  it("handles GB and AM catalogues with their currencies", () => {
+  it("handles the GB catalogue with its currency", () => {
     const gb = proAnchorFor(200, "GB");
     expect(gb?.currency).toBe("gbp");
     // 200 * (1199/180) = 1332.2 → 1332 vs 999 PRO → saves 333.
     expect(gb?.kind).toBe("saves");
     expect(gb?.saveMinor).toBe(333);
+  });
 
+  it("treats a dropped AMD market as an unlisted country", () => {
+    // AMD was removed on 2026-10-17; AM must now behave like any unknown market.
     const am = proAnchorFor(200, "AM");
-    expect(am?.currency).toBe("amd");
-    // 200 * (429000/180) = 476666.7 → 476667 vs 299000 PRO → saves.
-    expect(am?.kind).toBe("saves");
-    expect(am?.saveMinor).toBe(177667);
+    expect(am?.currency).toBe("gel");
   });
 
   it("falls back to the GE catalogue for unknown countries", () => {

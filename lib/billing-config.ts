@@ -1,7 +1,6 @@
 /** Client-safe, country-aware product catalogue. Stripe IDs never come from clients. */
 
-export type BillingCurrency =
-  "gel" | "gbp" | "amd" | "usd" | "cad" | "aud" | "nzd";
+export type BillingCurrency = "gel" | "gbp" | "usd" | "cad" | "aud" | "nzd";
 
 export type CreditPack = {
   id: "s" | "m" | "l";
@@ -83,25 +82,6 @@ const GB_CREDIT_PACKS: readonly CreditPack[] = [
 ];
 
 /**
- * Armenian one-time alternatives to the ֏2,990/month unlimited plan.
- *
- * The Georgian ladder converted at parity (~142 AMD to the lari) rather than
- * discounted, Armenia and Georgia sit within a few percent of each other on
- * GDP per capita, so the same real price is the right starting point. Shape is
- * preserved from GE and GB: credits per dram rises with pack size, and PRO
- * undercuts the largest pack.
- *
- * CAUTION: Stripe treats AMD as a two-decimal currency (it is absent from the
- * zero-decimal list), so these minor units are luma, 100 to the dram. ֏990 is
- * 99_000 here, not 990. Getting this wrong is a 100x pricing error.
- */
-const AM_CREDIT_PACKS: readonly CreditPack[] = [
-  { id: "s", credits: 30, amountMinor: 99_000, currency: "amd" },
-  { id: "m", credits: 75, amountMinor: 219_000, currency: "amd" },
-  { id: "l", credits: 180, amountMinor: 429_000, currency: "amd" },
-];
-
-/**
  * US one-time alternatives to the $9.99/month unlimited plan.
  *
  * Same shape as GB: credits per dollar rises with pack size, and PRO
@@ -136,7 +116,6 @@ const NZ_CREDIT_PACKS: readonly CreditPack[] = [
 ];
 
 const CREDIT_PACKS_BY_COUNTRY: Record<string, readonly CreditPack[]> = {
-  AM: AM_CREDIT_PACKS,
   AU: AU_CREDIT_PACKS,
   CA: CA_CREDIT_PACKS,
   GB: GB_CREDIT_PACKS,
@@ -146,15 +125,6 @@ const CREDIT_PACKS_BY_COUNTRY: Record<string, readonly CreditPack[]> = {
 };
 
 export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
-  AM: {
-    key: "premium_am_monthly",
-    countryCode: "AM",
-    // ֏2,990/month, see AM_CREDIT_PACKS on the luma minor unit.
-    amountMinor: 299_000,
-    currency: "amd",
-    interval: "month",
-    stripeLookupKey: "vivida_premium_am_monthly_299000_v1",
-  },
   GB: {
     key: "premium_gb_monthly",
     countryCode: "GB",
@@ -403,7 +373,6 @@ export function cheaperAlternativePlan({
 const CURRENCY_SYMBOL: Record<string, string> = {
   gel: "₾",
   gbp: "£",
-  amd: "֏",
   usd: "$",
   cad: "CA$",
   aud: "A$",
@@ -418,7 +387,7 @@ const CURRENCY_SYMBOL: Record<string, string> = {
  * as a machine artefact. The minor unit stays 1/100 everywhere in the
  * catalogue; only the display drops the decimals.
  */
-const WHOLE_UNIT_DISPLAY_CURRENCIES = new Set(["amd"]);
+const WHOLE_UNIT_DISPLAY_CURRENCIES = new Set<string>();
 
 /**
  * Georgian prices that do not depend on the runtime's ICU data, the same
@@ -465,8 +434,7 @@ export function formatBillingAmount(
       minimumFractionDigits: fractionDigits,
       maximumFractionDigits: fractionDigits,
     }).format(amount);
-    // The dram sign follows the amount in Armenian usage; ₾ precedes it.
-    return code === "amd" ? `${digits} ${symbol}` : `${symbol}${digits}`;
+    return `${symbol}${digits}`;
   }
 
   return new Intl.NumberFormat("en-GB", {

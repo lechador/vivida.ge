@@ -43,11 +43,7 @@ const MONTHS_EN = [
 const DAYS_IN_MONTH = (m: number) =>
   m === 2 ? 29 : [4, 6, 9, 11].includes(m) ? 30 : 31;
 
-export function SignByDatePicker({
-  locale = "ka",
-}: {
-  locale?: "ka" | "en" | "am";
-}) {
+export function SignByDatePicker({ locale = "ka" }: { locale?: "ka" | "en" }) {
   const en = locale === "en";
   const [month, setMonth] = useState<number | null>(null);
   const [day, setDay] = useState<number | null>(null);

@@ -46,7 +46,7 @@ export async function POST(req: Request) {
   }
 
   const locale =
-    body.locale === "am" || body.locale === "en" || body.locale === "ka"
+    body.locale === "en" || body.locale === "ka"
       ? normalizeUserLocale(body.locale)
       : await getRequestLocale();
   const result = await performFollowup(userId, libraryId, question, locale);

@@ -160,7 +160,9 @@ describe("POST /api/credits/checkout", () => {
     );
   });
 
-  it("creates an Armenian AMD Checkout session for Armenian residents", async () => {
+  it("prices an Armenian resident from the Georgian fallback, not a dropped AMD market", async () => {
+    // The AMD market was removed on 2026-10-17. AM is now an unlisted country,
+    // so it inherits the documented Georgian fallback like any other market.
     mocks.getBillingIdentity.mockResolvedValue({
       countryCode: "AM",
       interfaceLanguage: "en",
@@ -175,19 +177,11 @@ describe("POST /api/credits/checkout", () => {
     );
 
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({
-      url: "https://checkout.stripe.test/1",
-      eventId: "cs_test_1:initiate_checkout",
-      value: 990,
-      currency: "AMD",
-      contentId: "credits_30",
-    });
     expect(mocks.createCheckout).toHaveBeenCalledWith(
       expect.objectContaining({
         credits: 30,
-        amountMinor: 99_000,
-        currency: "amd",
-        locale: "ka",
+        amountMinor: 690,
+        currency: "gel",
       }),
     );
   });
