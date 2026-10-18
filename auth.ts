@@ -168,12 +168,16 @@ const phoneProvider = Credentials({
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
+  ...(process.env.DATABASE_URL?.trim()
+    ? {
+        adapter: DrizzleAdapter(db, {
+          usersTable: users,
+          accountsTable: accounts,
+          sessionsTable: sessions,
+          verificationTokensTable: verificationTokens,
+        }),
+      }
+    : {}),
   providers: [...authConfig.providers, credentialsProvider, phoneProvider],
   callbacks: {
     ...authConfig.callbacks,

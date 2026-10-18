@@ -68,13 +68,9 @@ export function NatalChartPageEn() {
   return (
     <main
       lang="en"
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
-      />
-      <Starfield count={150} shooting={3} />
+      <Starfield count={48} />
       <SmartHeader locale="en" georgianPath="/nataluri-ruka" />
       {ld.map((item, index) => (
         <script
@@ -85,13 +81,16 @@ export function NatalChartPageEn() {
       ))}
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-        <header className="text-center">
-          <h1 className="font-display text-balance text-3xl font-medium tracking-tight sm:text-5xl">
+        <header className="border-b border-border pb-6">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+            NATAL CHART EPHEMERIS · FREE CALCULATOR
+          </p>
+          <h1 className="font-display mt-2 text-balance text-4xl font-normal tracking-tight text-foreground sm:text-5xl">
             Free <Accent>birth chart</Accent> calculator
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-base text-foreground/80 sm:text-lg">
+          <p className="mt-3 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg">
             Enter your birth date, time, and place to calculate your planets,
-            rising sign, 12 houses, and major aspects, free, with no
+            rising sign, 12 houses, and major aspects — free, with no
             registration required.
           </p>
         </header>
@@ -102,7 +101,7 @@ export function NatalChartPageEn() {
 
         <article className="mt-16 space-y-10">
           <section>
-            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-normal tracking-tight text-foreground sm:text-3xl">
               What is a birth chart?
             </h2>
             <p className="mt-3 text-pretty text-base leading-relaxed text-foreground/85 sm:text-lg">
@@ -116,7 +115,7 @@ export function NatalChartPageEn() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-normal tracking-tight text-foreground sm:text-3xl">
               How to read your chart
             </h2>
             <ul className="mt-4 space-y-3 text-base leading-relaxed text-foreground/85">
@@ -144,7 +143,7 @@ export function NatalChartPageEn() {
               The calculator gives you the complete placement data.{" "}
               <Link
                 href="/signup"
-                className="text-[var(--vivida-violet)] underline-offset-4 hover:underline"
+                className="text-primary underline-offset-4 hover:underline"
               >
                 Create a free account
               </Link>{" "}
@@ -153,7 +152,7 @@ export function NatalChartPageEn() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-normal tracking-tight text-foreground sm:text-3xl">
               Why birth time matters
             </h2>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
@@ -165,8 +164,8 @@ export function NatalChartPageEn() {
             </p>
           </section>
 
-          <section className="rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
-            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
+          <section className="rounded-md border border-border bg-card p-5 sm:p-6">
+            <h2 className="font-display text-2xl font-normal tracking-tight text-foreground sm:text-3xl">
               After the chart: your changing sky
             </h2>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
@@ -174,7 +173,7 @@ export function NatalChartPageEn() {
               current movements are called transits. Explore the{" "}
               <Link
                 href="/horoscope"
-                className="font-medium text-[var(--vivida-violet)] underline underline-offset-4 hover:no-underline"
+                className="font-medium text-primary underline underline-offset-4 hover:no-underline"
               >
                 daily horoscope
               </Link>{" "}
@@ -184,25 +183,22 @@ export function NatalChartPageEn() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
+            <h2 className="font-display text-2xl font-normal tracking-tight text-foreground sm:text-3xl">
               Frequently asked questions
             </h2>
-            <div className="mt-5 space-y-3">
+            <div className="mt-5 divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
               {FAQ.map((item) => (
-                <details
-                  key={item.q}
-                  className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl open:bg-card/80 sm:p-5"
-                >
-                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-medium">
+                <details key={item.q} className="group">
+                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                     <span>{item.q}</span>
                     <span
                       aria-hidden
-                      className="text-muted-foreground transition-transform group-open:rotate-45"
+                      className="font-mono text-muted-foreground transition-transform group-open:rotate-45"
                     >
-                      ✦
+                      +
                     </span>
                   </summary>
-                  <p className="mt-3 text-sm leading-relaxed text-foreground/85 sm:text-base">
+                  <p className="px-5 pb-5 text-sm leading-relaxed text-foreground/85 sm:text-base">
                     {item.a}
                   </p>
                 </details>
@@ -210,21 +206,28 @@ export function NatalChartPageEn() {
             </div>
           </section>
 
-          <section className="flex flex-wrap gap-2">
-            {[
-              { href: "/zodiac", label: "Zodiac signs" },
-              { href: "/compatibility", label: "Compatibility" },
-              { href: "/horoscope", label: "Daily horoscope" },
-              { href: "/tests", label: "Personality tests" },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
-              >
-                {item.label}
-              </Link>
-            ))}
+          <section className="border-t border-border pt-6">
+            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              Related guides
+            </p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
+              {[
+                { href: "/zodiac", label: "Zodiac signs" },
+                { href: "/compatibility", label: "Compatibility" },
+                { href: "/horoscope", label: "Daily horoscope" },
+                { href: "/tests", label: "Personality tests" },
+              ].map((item, idx) => (
+                <span key={item.href} className="inline-flex items-center gap-3">
+                  {idx > 0 && <span aria-hidden>·</span>}
+                  <Link
+                    href={item.href}
+                    className="hover:text-foreground hover:underline"
+                  >
+                    {item.label}
+                  </Link>
+                </span>
+              ))}
+            </div>
           </section>
         </article>
       </section>

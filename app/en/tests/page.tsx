@@ -15,6 +15,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { Accent } from "@/components/en/editorial";
 import { SmartHeader } from "@/components/smart-header";
 import { SiteFooter } from "@/components/site-footer";
+import { Button } from "@/components/ui/button";
 import { TESTS, type TestCatalogEntry } from "@/lib/tests-catalog";
 import {
   DEFAULT_OG_IMAGE,
@@ -51,13 +52,13 @@ export const metadata: Metadata = {
   },
 };
 
-const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
-  iq: { Icon: Brain, accent: "var(--vivida-cyan)" },
-  eq: { Icon: HeartHandshake, accent: "var(--vivida-pink)" },
-  "big-five": { Icon: Layers, accent: "var(--vivida-violet)" },
-  "astro-mbti": { Icon: Fingerprint, accent: "var(--vivida-violet)" },
-  "true-sign": { Icon: Sparkles, accent: "var(--vivida-cyan)" },
-  "famous-zodiac": { Icon: Sparkles, accent: "var(--vivida-pink)" },
+const THEME: Record<string, { Icon: LucideIcon }> = {
+  iq: { Icon: Brain },
+  eq: { Icon: HeartHandshake },
+  "big-five": { Icon: Layers },
+  "astro-mbti": { Icon: Fingerprint },
+  "true-sign": { Icon: Sparkles },
+  "famous-zodiac": { Icon: Sparkles },
 };
 
 const FAQ = [
@@ -106,13 +107,9 @@ export default function EnglishTestsPage() {
   return (
     <main
       lang="en"
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
-      />
-      <Starfield count={120} shooting={2} />
+      <Starfield count={48} />
       <SmartHeader active="tests" locale="en" georgianPath="/tests" />
 
       <script
@@ -120,22 +117,22 @@ export default function EnglishTestsPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
-        <header className="mb-10 text-center">
-          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Tests and quizzes
+      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
+        <header className="mb-10 border-b border-border pb-8">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+            PSYCHOMETRICS & ARCHETYPES · TESTS AND QUIZZES
           </div>
-          <h1 className="mt-2 text-balance font-display text-3xl font-medium leading-tight tracking-tight sm:text-5xl">
+          <h1 className="mt-2 max-w-2xl text-balance font-display text-3xl font-medium leading-tight tracking-tight text-foreground sm:text-5xl">
             Discover more about <Accent>how you think and feel</Accent>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
+          <p className="mt-3 max-w-2xl text-pretty text-[15px] leading-relaxed text-muted-foreground sm:text-base">
             Thoughtful assessments for intelligence, personality and emotional
             habits, plus quick zodiac quizzes when you want something lighter.
           </p>
         </header>
 
         <TestSection
-          eyebrow="Start here"
+          eyebrow="01 · Start here"
           title="Core assessments"
           tests={TESTS.filter(
             (test) =>
@@ -144,9 +141,9 @@ export default function EnglishTestsPage() {
           )}
         />
 
-        <div className="mt-10">
+        <div className="mt-12">
           <TestSection
-            eyebrow="Quick and playful"
+            eyebrow="02 · Quick and playful"
             title="Zodiac quizzes"
             tests={TESTS.filter(
               (test) =>
@@ -157,18 +154,15 @@ export default function EnglishTestsPage() {
         </div>
 
         <section className="mt-12">
-          <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Frequently asked questions
+          <h2 className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            03 · Frequently asked questions
           </h2>
-          <div className="space-y-3">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
             {FAQ.map((item) => (
-              <details
-                key={item.q}
-                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium [&::-webkit-details-marker]:hidden">
+              <details key={item.q} className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-sm font-medium text-foreground transition-colors hover:bg-secondary/40 [&::-webkit-details-marker]:hidden">
                   {item.q}
-                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                  <span className="font-mono text-muted-foreground transition-transform group-open:rotate-45">
                     +
                   </span>
                 </summary>
@@ -198,55 +192,49 @@ function TestSection({
   return (
     <section>
       <div className="mb-4">
-        <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
           {eyebrow}
         </div>
-        <h2 className="mt-1 text-xl font-semibold tracking-tight">{title}</h2>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight text-foreground">
+          {title}
+        </h2>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
         {tests.map((test) => {
-          const { Icon, accent } = THEME[test.slug] ?? THEME.iq;
+          const { Icon } = THEME[test.slug] ?? THEME.iq;
           return (
             <article
               key={test.slug}
-              className="flex flex-col rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20"
-              style={{
-                borderTopColor: `color-mix(in oklch, ${accent} 45%, transparent)`,
-              }}
+              className="flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary/30 sm:p-7"
             >
-              <div className="flex items-start gap-3">
-                <span
-                  className="grid size-11 shrink-0 place-items-center rounded-2xl"
-                  style={{
-                    background: `color-mix(in oklch, ${accent} 15%, transparent)`,
-                    color: accent,
-                  }}
-                >
-                  <Icon className="size-5" />
-                </span>
-                <div>
-                  <h3 className="text-lg font-semibold tracking-tight">
-                    {test.titleEn}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {test.taglineEn}
-                  </p>
+              <div>
+                <div className="flex items-start gap-3">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+                    <Icon className="size-4.5" />
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                      {test.titleEn}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {test.taglineEn}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-4 text-[15px] leading-relaxed text-foreground/85">
+                  {test.descEn}
+                </p>
+                <div className="mt-4 flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                  <Clock className="size-3.5" />
+                  {test.metaEn}
                 </div>
               </div>
-              <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground/85">
-                {test.descEn}
-              </p>
-              <div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Clock className="size-3.5" />
-                {test.metaEn}
-              </div>
-              <Link
-                href={internationalPublicPath(test.href)}
-                className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm font-semibold text-white"
-              >
-                {test.kind === "quiz" ? "Play quiz" : "Start test"}
-                <ArrowRight className="size-4" />
-              </Link>
+              <Button asChild className="mt-6 w-full">
+                <Link href={internationalPublicPath(test.href)}>
+                  {test.kind === "quiz" ? "Play quiz" : "Start test"}
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
             </article>
           );
         })}

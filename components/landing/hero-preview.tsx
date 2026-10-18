@@ -1,97 +1,366 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { useState } from "react";
 
 import { ZodiacWheel } from "./zodiac-wheel";
 
-const EASE_OUT_EXPO = [0.22, 1, 0.36, 1] as const;
+type DialMode = "natal" | "transit" | "synastry";
+
+type PlacementSpec = {
+  key: string;
+  glyph: string;
+  bodyKa: string;
+  bodyEn: string;
+  signKa: string;
+  signEn: string;
+  signGlyph: string;
+  deg: string;
+  houseKa: string;
+  houseEn: string;
+  elementKa: string;
+  elementEn: string;
+  noteKa: Record<DialMode, string>;
+  noteEn: Record<DialMode, string>;
+};
+
+const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
+  {
+    key: "sun",
+    glyph: "☉",
+    bodyKa: "მზე",
+    bodyEn: "Sun",
+    signKa: "ლომი",
+    signEn: "Leo",
+    signGlyph: "♌",
+    deg: "14°28′",
+    houseKa: "X სახლი",
+    houseEn: "House X",
+    elementKa: "ცეცხლი · ფიქსირებული",
+    elementEn: "Fire · Fixed",
+    noteKa: {
+      natal:
+        "მზე მე-10 სახლში (ზენიტი) მიუთითებს მკაფიო პროფესიულ ავტორიტეტსა და შემოქმედებით ლიდერობაზე.",
+      transit:
+        "დღის ტრანზიტი: მზე ქმნის ტრიгонს ნატალურ იუპიტერთან — ხელსაყრელი დროა სტრატეგიული გადაწყვეტილებებისთვის.",
+      synastry:
+        "სინასტრიული ღერძი: პარტნიორის მთვარე ეხება შენს მზეს (ორბისი 1°12′) — ძლიერი ურთიერთნდობის კავშირი.",
+    },
+    noteEn: {
+      natal:
+        "Sun culminating in the 10th House (Midheaven) indicates visible vocation, creative authority, and purposeful direction.",
+      transit:
+        "Active Transit: Solar trine to natal Jupiter (orb 0°44′) opens a high-clarity window for long-term commitments.",
+      synastry:
+        "Synastry Axis: Partner's Moon conjuncts your natal Sun (orb 1°12′), forming a classic harmonic bond of mutual recognition.",
+    },
+  },
+  {
+    key: "moon",
+    glyph: "☽",
+    bodyKa: "მთვარე",
+    bodyEn: "Moon",
+    signKa: "თევზები",
+    signEn: "Pisces",
+    signGlyph: "♓",
+    deg: "08°12′",
+    houseKa: "VII სახლი",
+    houseEn: "House VII",
+    elementKa: "წყალი · ცვალებადი",
+    elementEn: "Water · Mutable",
+    noteKa: {
+      natal:
+        "მთვარე მე-7 სახლში აძლიერებს ემპათიას, ინტუიციურ აღქმასა და ღრმა ემოციურ კავშირს პარტნიორობაში.",
+      transit:
+        "დღის ტრანზიტი: მთვარე გადის დესცენდენტის ღერძს — იდეალური საღამოა გულწრფელი საუბრისა და შეთანხმებისთვის.",
+      synastry:
+        "სინასტრიული ღერძი: ვენერა-მთვარის სექსტილი ქმნის რბილ, უსაფრთხო ემოციურ გარემოს ორივე მხარისთვის.",
+    },
+    noteEn: {
+      natal:
+        "Moon in Pisces in the 7th House heightens emotional receptivity, artistic intuition, and relational depth.",
+      transit:
+        "Active Transit: Lunar passage across the Descendant favors candid dialogue and emotional alignment.",
+      synastry:
+        "Synastry Axis: Venus–Moon sextile (orb 0°52′) establishes effortless domestic warmth and intuitive understanding.",
+    },
+  },
+  {
+    key: "ascendant",
+    glyph: "↑",
+    bodyKa: "ასცენდენტი",
+    bodyEn: "Ascendant",
+    signKa: "ქალწული",
+    signEn: "Virgo",
+    signGlyph: "♍",
+    deg: "22°45′",
+    houseKa: "I სახლი",
+    houseEn: "House I",
+    elementKa: "მიწა · ცვალებადი",
+    elementEn: "Earth · Mutable",
+    noteKa: {
+      natal:
+        "ქალწულის ასცენდენტი განსაზღვრავს ანალიტიკურ სიზუსტეს, დაკვირვებულობასა და სტრუქტურულ მიდგომას.",
+      transit:
+        "დღის ტრანზიტი: მერკური ააქტიურებს პირველ სახლს — მაღალია კონცენტრაცია და დეტალების ხედვა.",
+      synastry:
+        "სინასტრიული ღერძი: პარტნიორის მზე ხვდება შენს მე-7 სახლში — ბუნებრივი მიზიდულობა და პოლარობის ბალანსი.",
+    },
+    noteEn: {
+      natal:
+        "Virgo Rising shapes an observant, articulate presence governed by Mercury's analytical precision.",
+      transit:
+        "Active Transit: Mercury activating the 1st House sharpens discernment, writing, and structural planning.",
+      synastry:
+        "Synastry Axis: Partner's Sun falls directly on your 7th House cusp, creating magnetic complementarity.",
+    },
+  },
+  {
+    key: "mercury",
+    glyph: "☿",
+    bodyKa: "მერკური",
+    bodyEn: "Mercury",
+    signKa: "ქალწული",
+    signEn: "Virgo",
+    signGlyph: "♍",
+    deg: "03°19′",
+    houseKa: "I სახლი",
+    houseEn: "House I",
+    elementKa: "მიწა · დომიცილი",
+    elementEn: "Earth · Domicile",
+    noteKa: {
+      natal:
+        "მერკური საკუთარ ნიშანში (დომიცილი) იძლევა მკაფიო ლოგიკას, სისტემურ აზროვნებასა და ზუსტ კომუნიკაციას.",
+      transit:
+        "დღის ტრანზიტი: ზუსტი ასპექტი ურანთან ხელს უწყობს ახალ იდეებს, კვლევასა და სწრაფ გადაწყვეტებს.",
+      synastry:
+        "სინასტრიული ღერძი: მერკურის ტრიგონი უზრუნველყოფს ინტელექტუალურ თანხვედრას და მარტივ დიალოგს.",
+    },
+    noteEn: {
+      natal:
+        "Mercury dignified in Virgo bestows lucid synthesis, editorial discernment, and methodical problem-solving.",
+      transit:
+        "Active Transit: Earth trine to Uranus sparks sudden intellectual breakthroughs and clean technical execution.",
+      synastry:
+        "Synastry Axis: Mercury–Mercury trine ensures frictionless communication and shared intellectual curiosity.",
+    },
+  },
+  {
+    key: "venus",
+    glyph: "♀",
+    bodyKa: "ვენერა",
+    bodyEn: "Venus",
+    signKa: "სასწორი",
+    signEn: "Libra",
+    signGlyph: "♎",
+    deg: "19°04′",
+    houseKa: "II სახლი",
+    houseEn: "House II",
+    elementKa: "ჰაერი · კარდინალური",
+    elementEn: "Air · Cardinal",
+    noteKa: {
+      natal:
+        "ვენერა სასწორში აყალიბებს დახვეწილ ესთეტიკურ გემოვნებას, დიპლომატიურობასა და ჰარმონიის მოთხოვნილებას.",
+      transit:
+        "დღის ტრანზიტი: ვენერა აძლიერებს მე-2 სახლის რესურსებს — კარგი პერიოდია ფინანსური და შემოქმედებითი ნაბიჯებისთვის.",
+      synastry:
+        "სინასტრიული ღერძი: ვენერა-მარსის კონიუნქცია ქმნის ძლიერ რომანტიკულ დინამიკასა და შემოქმედებით მუხტს.",
+    },
+    noteEn: {
+      natal:
+        "Venus in domicile in Libra refines aesthetic judgment, relational fairness, and diplomatic grace.",
+      transit:
+        "Active Transit: Venus transiting the 2nd House supports material stability and creative acquisitions.",
+      synastry:
+        "Synastry Axis: Exact Venus–Mars conjunction (orb 0°38′) generates unmistakable romantic chemistry.",
+    },
+  },
+  {
+    key: "mars",
+    glyph: "♂",
+    bodyKa: "მარსი",
+    bodyEn: "Mars",
+    signKa: "მორიელი",
+    signEn: "Scorpio",
+    signGlyph: "♏",
+    deg: "27°51′",
+    houseKa: "III სახლი",
+    houseEn: "House III",
+    elementKa: "წყალი · ფიქსირებული",
+    elementEn: "Water · Fixed",
+    noteKa: {
+      natal:
+        "მარსი მორიელში გამოირჩევა სტრატეგიული ნებისყოფით, სიღრმისეული კვლევის უნარითა და მიზანდასახულობით.",
+      transit:
+        "დღის ტრანზიტი: მარსი-სატურნის სექსტილი გეხმარება რთული ამოცანების ბოლომდე მიყვანაში.",
+      synastry:
+        "სინასტრიული ღერძი: მარსის ჰარმონიული ასპექტი აძლიერებს საერთო მიზნებისკენ სწრაფვას.",
+    },
+    noteEn: {
+      natal:
+        "Mars in traditional rulership in Scorpio channels unwavering focus, strategic endurance, and investigative depth.",
+      transit:
+        "Active Transit: Mars sextile Saturn provides disciplined stamina for completing demanding projects.",
+      synastry:
+        "Synastry Axis: Constructive Mars–Sun trine fuels shared ambition and decisive mutual support.",
+    },
+  },
+];
 
 /**
- * Hero centerpiece, the spinning zodiac wheel flanked by two floating
- * product-snippet cards that mimic real dashboard UI ("Big Three" and
- * "Today's horoscope"). Cold visitors see what they'll get instead of
- * a decorative animation. Cards hide below `sm` to avoid mobile clutter.
+ * Interactive Astronomical Astrolabe & Live Sky Dial Console.
+ * Visitors can switch between Natal Specimen, Live Sky Transits, and Synastry Axis,
+ * and click any planet on the wheel or ephemeris table to inspect its telemetry.
  */
-export function HeroPreview() {
+export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
+  const en = locale === "en";
+  const [mode, setMode] = useState<DialMode>("natal");
+  const [selectedKey, setSelectedKey] = useState<string>("sun");
+
+  const activePlacement =
+    SPECIMEN_PLACEMENTS.find((p) => p.key === selectedKey) ??
+    SPECIMEN_PLACEMENTS[0];
+
+  const modes: Array<{ id: DialMode; label: string }> = en
+    ? [
+        { id: "natal", label: "01 · Natal Chart" },
+        { id: "transit", label: "02 · Live Sky" },
+        { id: "synastry", label: "03 · Synastry" },
+      ]
+    : [
+        { id: "natal", label: "01 · ნატალური" },
+        { id: "transit", label: "02 · დღის ცა" },
+        { id: "synastry", label: "03 · სინასტრია" },
+      ];
+
   return (
-    <div className="relative mx-auto grid w-full place-items-center sm:mb-10">
-      {/* Soft glow halo behind the wheel */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 mx-auto size-[300px] rounded-full bg-[radial-gradient(closest-side,oklch(0.32_0.18_305/0.25),transparent_70%)] sm:size-[420px]"
-      />
-
-      {/* Centerpiece zodiac wheel */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.4, ease: EASE_OUT_EXPO }}
-      >
-        <ZodiacWheel size={180} />
-      </motion.div>
-
-      {/* "Big Three", floats above-left of the wheel */}
-      <motion.div
-        initial={{ opacity: 0, y: -8, x: -12 }}
-        animate={{ opacity: 1, y: 0, x: 0 }}
-        transition={{ delay: 0.5, duration: 0.9, ease: EASE_OUT_EXPO }}
-        className="pointer-events-none absolute left-1/2 top-0 -translate-x-[180%] -translate-y-2 hidden sm:block"
-      >
-        <div className="rounded-2xl border border-border/60 bg-card/85 px-4 py-3 text-left shadow-2xl shadow-[var(--vivida-violet)]/20 backdrop-blur-xl">
-          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            შენი სამეული
-          </div>
-          <div className="mt-1.5 space-y-1 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="text-[var(--vivida-gold)]">☉</span>
-              <span className="text-foreground/90">მზე ლომში</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[var(--vivida-cyan)]">☾</span>
-              <span className="text-foreground/90">მთვარე თევზებში</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[var(--vivida-pink)]">↑</span>
-              <span className="text-foreground/90">ასცენდენტი ქალწულში</span>
-            </div>
-          </div>
+    <div className="flex h-full w-full flex-col justify-between bg-card p-5 sm:p-6">
+      {/* Top Specimen Header + Mode Selector */}
+      <div>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3 text-xs text-muted-foreground">
+          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+            {en
+              ? "Interactive Astrolabe · Specimen"
+              : "ინტერაქტიული ასტროლაბი · ეფემერიდა"}
+          </span>
+          <span className="font-mono text-[11px] tabular-nums text-foreground/80">
+            41°43′N · 44°47′E · UTC+4
+          </span>
         </div>
-      </motion.div>
 
-      {/* "Today's horoscope", floats below-right of the wheel */}
-      <motion.div
-        initial={{ opacity: 0, y: 8, x: 12 }}
-        animate={{ opacity: 1, y: 0, x: 0 }}
-        transition={{ delay: 0.7, duration: 0.9, ease: EASE_OUT_EXPO }}
-        className="pointer-events-none absolute left-1/2 bottom-0 max-w-[230px] translate-x-[40%] translate-y-2 hidden sm:block"
-      >
-        <div className="rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 to-card/80 px-4 py-3 text-left shadow-2xl shadow-[var(--vivida-violet)]/30 backdrop-blur-xl">
-          <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            <Sparkles className="size-3 text-[var(--vivida-cyan)]" />
-            დღევანდელი დღე
-          </div>
-          <div className="mt-1.5 text-sm font-medium leading-snug text-foreground/95">
-            მთვარე შენს მე-7 სახლში გადადის, საუკეთესო დღე ახლო ადამიანებთან
-            გულწრფელი საუბრისთვის.
-          </div>
+        {/* Interactive Mode Switcher */}
+        <div
+          role="tablist"
+          aria-label={en ? "Observatory mode" : "ობსერვატორიის რეჟიმი"}
+          className="mt-3 grid grid-cols-3 gap-px border border-border bg-border"
+        >
+          {modes.map((m) => {
+            const active = mode === m.id;
+            return (
+              <button
+                key={m.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setMode(m.id)}
+                className={`whitespace-nowrap px-2 py-1.5 font-mono text-[11px] transition-colors ${
+                  active
+                    ? "bg-secondary font-semibold text-primary"
+                    : "bg-background/60 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {m.label}
+              </button>
+            );
+          })}
         </div>
-      </motion.div>
+      </div>
 
-      {/* Mobile-only condensed snippet shown directly below the wheel */}
-      <motion.div
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.8, ease: EASE_OUT_EXPO }}
-        className="mt-4 rounded-2xl border border-[var(--vivida-violet)]/40 bg-card/70 px-4 py-2.5 text-center backdrop-blur-xl sm:hidden"
-      >
-        <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          ნახე შენი
+      {/* Interactive Astrolabe Wheel Stage */}
+      <div className="my-4 flex flex-col items-center justify-center py-1">
+        <ZodiacWheel
+          size={224}
+          selectedBodyKey={selectedKey}
+          onSelectBody={setSelectedKey}
+          activeMode={mode}
+        />
+        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+          {en
+            ? "Select any planetary node or row to inspect coordinates"
+            : "დააჭირე პლანეტას ან ცხრილის სტრიქონს დეტალური გრადუსისთვის"}
+        </p>
+      </div>
+
+      {/* Interactive 6-Body Ephemeris Ledger */}
+      <div className="border-t border-border pt-3">
+        <div className="mb-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+          <span>
+            {en ? "Planetary Ephemeris (Click to inspect)" : "პლანეტარული ეფემერიდა"}
+          </span>
+          <span>{en ? "Longitude · House" : "გრადუსი · სახლი"}</span>
         </div>
-        <div className="mt-0.5 text-sm font-medium text-foreground">
-          ☉ მზე · ☾ მთვარე · ↑ ასცენდენტი + ყოველდღიური ჰოროსკოპი
+        <div className="grid grid-cols-1 divide-y divide-border/70 border border-border bg-background/40 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          {[SPECIMEN_PLACEMENTS.slice(0, 3), SPECIMEN_PLACEMENTS.slice(3, 6)].map(
+            (group, colIdx) => (
+              <div key={colIdx} className="divide-y divide-border/70">
+                {group.map((row) => {
+                  const isSelected = row.key === activePlacement.key;
+                  return (
+                    <button
+                      key={row.key}
+                      type="button"
+                      onClick={() => setSelectedKey(row.key)}
+                      className={`flex w-full items-center justify-between px-3 py-2 text-left text-xs transition-colors ${
+                        isSelected
+                          ? "bg-secondary text-foreground"
+                          : "text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+                      }`}
+                    >
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span
+                          className={`w-4 text-center font-mono ${
+                            isSelected ? "font-semibold text-primary" : "text-primary/80"
+                          }`}
+                        >
+                          {row.glyph}
+                        </span>
+                        <span className="truncate font-medium text-foreground">
+                          {en ? row.bodyEn : row.bodyKa}
+                        </span>
+                        <span className="truncate text-muted-foreground">
+                          · {row.signGlyph} {en ? row.signEn : row.signKa}
+                        </span>
+                      </div>
+                      <div className="shrink-0 font-mono text-[11px] tabular-nums">
+                        <span className="text-foreground/90">{row.deg}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ),
+          )}
         </div>
-      </motion.div>
+      </div>
+
+      {/* Live Selected Node Telemetry Readout */}
+      <div className="mt-3 border border-border bg-background/60 p-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-2 font-mono text-[11px]">
+          <span className="font-semibold text-primary">
+            {activePlacement.glyph}{" "}
+            {en ? activePlacement.bodyEn : activePlacement.bodyKa} ·{" "}
+            {activePlacement.signGlyph}{" "}
+            {en ? activePlacement.signEn : activePlacement.signKa}{" "}
+            {activePlacement.deg}
+          </span>
+          <span className="text-muted-foreground">
+            {en ? activePlacement.houseEn : activePlacement.houseKa} ·{" "}
+            {en ? activePlacement.elementEn : activePlacement.elementKa}
+          </span>
+        </div>
+        <p className="mt-2 text-xs leading-relaxed text-foreground/90">
+          {en ? activePlacement.noteEn[mode] : activePlacement.noteKa[mode]}
+        </p>
+      </div>
     </div>
   );
 }

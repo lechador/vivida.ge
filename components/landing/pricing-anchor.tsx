@@ -1,121 +1,149 @@
 import Link from "next/link";
-import { Check, Coins, Crown, Sparkles } from "lucide-react";
+import { Check } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  creditPacksForCountry,
-  featuredPremiumPlanForCountry,
-  formatBillingAmount,
-} from "@/lib/billing-config";
-import { CREDIT_COST } from "@/lib/credits-config";
+import { SignInButton } from "./sign-in-button";
+import { CornerCrosshair } from "@/components/brand/celestial-icons";
 
-/**
- * Georgian homepage price anchor. The hero promises free starter credits but
- * named no price, so a first-time visitor had to hit a paywall before learning
- * what continuing costs. This states the ladder up front, free start, one
- * one-time starter pack, then PRO for frequent use, with every amount read
- * from the billing catalogue rather than hard-coded copy.
- */
+const FREE_ITEMS_KA = [
+  "სრული ნატალური რუკა (მზე, მთვარე, ასცენდენტი, პლანეტები, 12 სახლი)",
+  "ყოველდღიური პერსონალური ჰოროსკოპი შენი რუკის ტრანზიტებით",
+  "პირველი სინასტრია (პარტნიორთან თავსებადობა) უფასოდ",
+  "საწყისი კრედიტების ბონუსი ტაროსა და ასტროლოგთან კითხვისთვის",
+];
+
+const PRO_ITEMS_KA = [
+  "ულიმიტო კითხვები პირად ასტროლოგთან და ტაროს გაშლები",
+  "ყოველკვირეული პროგნოზი და კრიტიკული დღეების კალენდარი",
+  "ღრმა სინასტრიის ანგარიში და ურთიერთობის დინამიკა",
+  "სრული PDF ნატალური წიგნაკი ჩამოსატვირთად",
+];
+
 export function PricingAnchor() {
-  const starter = creditPacksForCountry("GE")[0];
-  const pro = featuredPremiumPlanForCountry("GE");
-  const proMonths = pro.intervalCount ?? 1;
-  const tarotReadings = Math.floor(starter.credits / CREDIT_COST.tarot);
-
   return (
-    <section className="relative z-10 mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
-      <div className="mb-8 text-center">
-        <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-          დაიწყე უფასოდ,{" "}
-          <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            გააგრძელე როცა გინდა
-          </span>
-        </h2>
-        <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-muted-foreground sm:text-base">
-          ფასი გადახდამდე ჩანს. კრედიტები ერთჯერადი შენაძენია, გამოწერის გარეშე.
-        </p>
-      </div>
+    <section
+      aria-labelledby="pricing-anchor-heading"
+      className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-20"
+    >
+      <div className="relative overflow-hidden rounded-sm border border-border bg-card">
+        <CornerCrosshair position="tl" />
+        <CornerCrosshair position="tr" />
+        <CornerCrosshair position="bl" />
+        <CornerCrosshair position="br" />
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <article className="flex flex-col rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            <Sparkles className="size-4" /> უფასო დაწყება
+        <div className="border-b border-border bg-background/50 px-5 py-6 sm:px-8 sm:py-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-primary">
+                <span className="inline-block h-px w-5 bg-primary/70" />
+                პირობები · გამჭვირვალე მოდელი
+              </div>
+              <h2
+                id="pricing-anchor-heading"
+                className="mt-2.5 text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-4xl"
+              >
+                დაიწყე უფასოდ, გადაიხადე მხოლოდ სიღრმისეულ ანალიზში
+              </h2>
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              ACCESS TIERS · 02 EDITIONS
+            </span>
           </div>
-          <div className="mt-3 text-2xl font-bold tracking-tight">₾0</div>
-          <ul className="mt-4 flex-1 space-y-2 text-sm text-foreground/75">
-            {[
-              "ნატალური რუკა და დიდი სამეული",
-              "საწყისი კრედიტები საჩუქრად",
-              "პირველი ტარო კითხვა უფასოდ",
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2">
-                <Check className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
-                {item}
-              </li>
-            ))}
-          </ul>
-          <Button asChild variant="outline" className="mt-5 w-full">
-            <Link href="/signup">შექმენი რუკა უფასოდ</Link>
-          </Button>
-        </article>
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground sm:text-base">
+            ძირითადი ნატალური რუკა და ყოველდღიური პროგნოზი ყველასთვის ღიაა.
+            დამატებითი ინსტრუმენტები ხელმისაწვდომია კრედიტებით ან PRO
+            გამოწერით.
+          </p>
+        </div>
 
-        <article className="flex flex-col rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/7 p-5">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--vivida-cyan)]">
-            <Coins className="size-4" /> კრედიტები
-          </div>
-          <div className="mt-3 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold tracking-tight">
-              {formatBillingAmount(starter.amountMinor, starter.currency, "ka")}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              / {starter.credits} კრედიტი
-            </span>
-          </div>
-          <ul className="mt-4 flex-1 space-y-2 text-sm text-foreground/75">
-            {[
-              `${tarotReadings} დამატებითი ტარო კითხვა`,
-              "ერთჯერადი გადახდა, ავტოგანახლების გარეშე",
-              "დარჩენილი კრედიტები ბალანსზე რჩება",
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2">
-                <Check className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
-                {item}
-              </li>
-            ))}
-          </ul>
-          <Button asChild variant="mystic" className="mt-5 w-full">
-            <Link href="/taro">სცადე ტარო</Link>
-          </Button>
-        </article>
+        <div className="grid gap-px bg-border lg:grid-cols-2">
+          {/* Free tier */}
+          <div className="flex flex-col justify-between bg-card p-6 sm:p-8">
+            <div>
+              <div className="flex items-baseline justify-between gap-4 border-b border-border pb-4">
+                <div>
+                  <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                    TIER 01 · საბაზისო წვდომა
+                  </div>
+                  <h3 className="mt-1 text-xl font-semibold text-foreground">
+                    პირადი რუკა და დღის რიტმი
+                  </h3>
+                </div>
+                <div className="text-right font-mono">
+                  <span className="text-2xl font-semibold tabular-nums text-foreground">
+                    0 ₾
+                  </span>
+                  <span className="block text-[11px] text-muted-foreground">
+                    სამუდამოდ
+                  </span>
+                </div>
+              </div>
 
-        <article className="flex flex-col rounded-2xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-gold)]/12 to-[var(--vivida-violet)]/10 p-5">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--vivida-gold)]">
-            <Crown className="size-4" /> Vivida PRO
+              <ul className="mt-5 space-y-3 text-sm text-foreground/85">
+                {FREE_ITEMS_KA.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5">
+                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-8 border-t border-border pt-5">
+              <SignInButton
+                size="default"
+                label="შექმენი უფასო რუკა"
+                source="landing_pricing_free"
+              />
+            </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold tracking-tight">
-              {formatBillingAmount(pro.amountMinor, pro.currency, "ka")}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              / {proMonths} თვე
-            </span>
+
+          {/* Pro / Credits tier */}
+          <div className="flex flex-col justify-between bg-background/40 p-6 sm:p-8">
+            <div>
+              <div className="flex items-baseline justify-between gap-4 border-b border-border pb-4">
+                <div>
+                  <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+                    TIER 02 · VIVIDA PRO და კრედიტები
+                  </div>
+                  <h3 className="mt-1 text-xl font-semibold text-foreground">
+                    სრული ასტროლოგიური ლაბორატორია
+                  </h3>
+                </div>
+                <div className="text-right font-mono">
+                  <span className="text-2xl font-semibold tabular-nums text-primary">
+                    9 ₾-დან
+                  </span>
+                  <span className="block text-[11px] text-muted-foreground">
+                    ერთჯერადი ან თვიური
+                  </span>
+                </div>
+              </div>
+
+              <ul className="mt-5 space-y-3 text-sm text-foreground/85">
+                {PRO_ITEMS_KA.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5">
+                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-border pt-5">
+              <SignInButton
+                size="default"
+                label="დაიწყე უფასოდ"
+                source="landing_pricing_pro"
+              />
+              <Link
+                href="/nataluri-ruka"
+                className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-primary"
+              >
+                ნახე რუკის ნიმუში →
+              </Link>
+            </div>
           </div>
-          <ul className="mt-4 flex-1 space-y-2 text-sm text-foreground/75">
-            {[
-              "ყველა ფუნქცია ულიმიტოდ",
-              "საუკეთესოა ხშირი კითხვებისთვის",
-              "გააუქმე ნებისმიერ დროს",
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2">
-                <Check className="mt-0.5 size-4 shrink-0 text-[var(--vivida-gold)]" />
-                {item}
-              </li>
-            ))}
-          </ul>
-          <Button asChild variant="outline" className="mt-5 w-full">
-            <Link href="/subscription">ნახე PRO</Link>
-          </Button>
-        </article>
+        </div>
       </div>
     </section>
   );

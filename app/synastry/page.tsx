@@ -34,30 +34,36 @@ export default async function SynastryPage() {
   return (
     <main
       lang={locale}
-      className="relative isolate flex flex-1 flex-col overflow-hidden"
+      className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.18_350/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_305/0.3),transparent_70%)]"
-      />
-      <Starfield count={120} shooting={3} />
+      <Starfield count={48} />
 
       <AppHeader authed active="synastry" />
 
-      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-10">
+        <header className="mb-8 flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-              <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
+            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              RELATIONAL SYNASTRY · თავსებადობა
+            </div>
+            <h1
+              className={
+                en
+                  ? "mt-2 text-balance font-display text-3xl font-medium tracking-tight text-foreground sm:text-5xl"
+                  : "mt-2 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl"
+              }
+            >
+              {en ? "Chart " : "რუკების "}
+              <span className="text-primary">
                 {en ? "Compatibility" : "თავსებადობა"}
               </span>
             </h1>
-            <p className="mt-2 max-w-xl text-sm text-foreground/75 sm:text-base">
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
               {en
-                ? "Add someone who matters to you and explore how your birth charts connect."
+                ? "Add someone who matters to you and explore how your birth charts connect across planets, houses, and aspects."
                 : "დაამატე ადამიანი, რომელიც შენთვის მნიშვნელოვანია, ნახე, როგორ ერთვით ცაში ერთმანეთს."}
             </p>
-            <div className="mt-2">
+            <div className="mt-3">
               <CreditHint>
                 {en
                   ? "Your first compatibility reading is free, then 5 credits"
@@ -67,29 +73,27 @@ export default async function SynastryPage() {
           </div>
           <div className="flex shrink-0 items-center gap-3">
             {remaining > 0 ? (
-              <Button asChild variant="mystic" size="lg">
+              <Button asChild size="lg">
                 <Link href="/synastry/new">
                   <Plus className="size-4" />
                   {en ? "Add partner" : "ახალი პარტნიორი"}
                 </Link>
               </Button>
             ) : (
-              // Monthly cap hit, render a disabled button so the click
-              // can't navigate anywhere unhelpful.
               <Button variant="outline" size="lg" disabled>
                 <Plus className="size-4" />
                 {en ? "Available next month" : "შემდეგი თვიდან"}
               </Button>
             )}
           </div>
-        </div>
+        </header>
 
         {partners.length === 0 ? (
           <EmptyState canAdd={remaining > 0} locale={locale} />
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
             {partners.map((p) => (
-              <li key={p.id}>
+              <li key={p.id} className="bg-card">
                 <PartnerCard
                   id={p.id}
                   name={p.displayName}
@@ -117,12 +121,11 @@ function EmptyState({
 }) {
   const en = locale !== "ka";
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/50 p-10 text-center backdrop-blur-xl">
-      <Heart
-        className="mx-auto size-10 text-[var(--vivida-pink)]"
-        aria-hidden
-      />
-      <h2 className="mt-4 text-balance text-xl font-semibold tracking-tight">
+    <div className="rounded-md border border-border bg-card p-10 text-center">
+      <div className="mx-auto grid size-12 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+        <Heart className="size-5" aria-hidden />
+      </div>
+      <h2 className="mt-4 text-balance text-xl font-semibold tracking-tight text-foreground">
         {en ? "You haven't added anyone yet" : "ჯერ პარტნიორი არ დაგიმატებია"}
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
@@ -131,7 +134,7 @@ function EmptyState({
           : "დაამატე ახლო ადამიანი, ძველი მეგობარი, თუ ვინც გაინტერესებს, ნახე თქვენი ცის რუკების ერთობლივი თავსებადობა."}
       </p>
       {canAdd && (
-        <Button asChild className="mt-6" variant="mystic" size="lg">
+        <Button asChild className="mt-6" size="lg">
           <Link href="/synastry/new">
             <Plus className="size-4" />
             {en ? "Add your first person" : "დაამატე პირველი"}

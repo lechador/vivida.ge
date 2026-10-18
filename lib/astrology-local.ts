@@ -6,12 +6,16 @@
 
 import { Origin, Horoscope } from "circular-natal-horoscope-js";
 
-import { signByLabelEn, signFromLongitude } from "./zodiac";
+import { BODIES, signByIndex, signByLabelEn, signFromLongitude } from "./zodiac";
 import type {
   HouseJson,
   NatalChartJson,
   PointJson,
 } from "@/db/schema";
+
+export { BODIES, signByIndex };
+export type NatalChartData = NatalChartJson;
+export type HouseCusp = HouseJson;
 
 export type NatalInput = {
   /** ISO-style YYYY-MM-DD */
@@ -124,3 +128,18 @@ export function computeNatalLocally(input: NatalInput): NatalChartJson {
     houses,
   };
 }
+
+export function computePositions(date: Date): Record<string, PointJson> {
+  const iso = date.toISOString().slice(0, 10);
+  const hh = String(date.getUTCHours()).padStart(2, "0");
+  const mm = String(date.getUTCMinutes()).padStart(2, "0");
+  const chart = computeNatalLocally({
+    date: iso,
+    time: `${hh}:${mm}`,
+    latitude: 41.7151,
+    longitude: 44.8271,
+    timezone: "Asia/Tbilisi",
+  });
+  return chart.bodies;
+}
+

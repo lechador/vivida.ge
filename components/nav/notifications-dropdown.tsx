@@ -266,23 +266,23 @@ export function NotificationsDropdown({
         <button
           type="button"
           aria-label={en ? "Notifications" : "შეტყობინებები"}
-          className="relative grid size-12 place-items-center rounded-full border border-border bg-card/50 text-foreground/80 transition-all hover:border-foreground/20 hover:bg-card/80 hover:text-foreground"
+          className="relative grid size-10 place-items-center rounded-md border border-border bg-card text-foreground/85 transition-colors hover:border-primary/60 hover:bg-secondary hover:text-foreground"
         >
-          <Bell className="size-5" />
+          <Bell className="size-4.5" />
           {totalUnread > 0 && (
-            <span className="absolute -right-1 -top-1 grid size-5 min-w-5 place-items-center rounded-full bg-[var(--vivida-pink)] px-1 text-[10px] font-semibold leading-none text-background ring-2 ring-background">
+            <span className="absolute -right-1 -top-1 grid size-4 min-w-4 place-items-center rounded-sm bg-primary px-1 font-mono text-[10px] font-semibold leading-none text-primary-foreground">
               {totalUnread > 9 ? "9+" : totalUnread}
             </span>
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 sm:w-96 p-0">
-        <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-          <span className="text-sm font-semibold">
+      <DropdownMenuContent align="end" className="w-80 rounded-md border-border bg-card p-0 sm:w-96">
+        <header className="flex items-center justify-between border-b border-border/80 px-4 py-3">
+          <span className="text-xs font-semibold uppercase tracking-widest text-foreground">
             {en ? "Notifications" : "შეტყობინებები"}
           </span>
           {sortedItems.length > 0 && (
-            <span className="text-xs text-muted-foreground">
+            <span className="font-mono text-xs tabular-nums text-muted-foreground">
               {sortedItems.length}
             </span>
           )}

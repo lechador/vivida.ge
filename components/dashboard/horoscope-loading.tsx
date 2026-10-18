@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Sparkles } from "lucide-react";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const MESSAGES = [
@@ -17,12 +16,6 @@ const MESSAGES_EN = [
   "Writing your personal horoscope…",
 ];
 
-/**
- * Live "your horoscope is being written" loader, an eased progress crawl with
- * rotating status messages. Replaces the pulsing skeleton so the wait feels
- * like something is actually happening. Generation is opaque (AI), so the bar
- * eases toward ~92% and the parent swaps in the real card when ready.
- */
 export function HoroscopeLoading({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
   const messages = en ? MESSAGES_EN : MESSAGES;
@@ -43,30 +36,30 @@ export function HoroscopeLoading({ locale = "ka" }: { locale?: UserLocale }) {
   }, [messages.length]);
 
   return (
-    <article className="relative min-h-[220px] overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-7 backdrop-blur-xl sm:p-9">
-      <div
-        aria-hidden
-        className="absolute -right-20 -top-20 size-72 rounded-full bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-25 blur-3xl"
-      />
-      <div className="relative flex items-center gap-2.5 text-sm font-medium text-[var(--vivida-violet)]">
-        <Sparkles className="size-4 animate-pulse" />
-        {en
-          ? "Creating your horoscope for today"
-          : "ვქმნით შენს დღევანდელ ჰოროსკოპს"}
+    <article className="min-h-[220px] rounded-md border border-border bg-card p-6 sm:p-8">
+      <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-primary">
+        <span>
+          {en
+            ? "Calculating Ephemeris"
+            : "მიმდინარეობს ეფემერიდის გამოთვლა"}
+        </span>
+        <span className="font-mono tabular-nums text-muted-foreground">
+          {Math.round(progress)}%
+        </span>
       </div>
 
-      <p className="relative mt-6 h-5 text-base text-foreground/85 transition-opacity">
+      <p className="mt-6 h-5 text-base font-medium text-foreground transition-opacity">
         {messages[stage]}
       </p>
 
-      <div className="relative mt-3 h-2 w-full overflow-hidden rounded-full bg-foreground/10">
+      <div className="mt-4 h-1 w-full overflow-hidden bg-border">
         <div
-          className="h-full rounded-full bg-[linear-gradient(90deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] transition-[width] duration-300 ease-out"
+          className="h-full bg-primary transition-[width] duration-300 ease-out"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      <p className="relative mt-3 text-xs text-muted-foreground">
+      <p className="mt-3 text-xs text-muted-foreground">
         {en
           ? "Chart calculations usually take a few seconds."
           : "ცის რუკის გაანგარიშებას ჩვეულებრივ რამდენიმე წამი სჭირდება."}

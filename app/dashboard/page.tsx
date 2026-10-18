@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
@@ -164,32 +165,66 @@ export default async function DashboardPage() {
   return (
     <main
       lang={locale}
-      className="relative isolate flex flex-1 flex-col overflow-hidden"
+      className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_350/0.3),transparent_70%)]"
-      />
-      <div
-        aria-hidden
-        className="vivida-nebula-drift absolute inset-0 -z-10 opacity-50 bg-[radial-gradient(45%_35%_at_30%_50%,oklch(0.40_0.18_305/0.15),transparent_70%)]"
-      />
-      <Starfield count={120} shooting={3} />
+      <Starfield count={48} />
 
       <AppHeader authed active="today" />
 
-      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
+      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         {restricted && <RestrictedNotice locale={locale} />}
-        <h1 className="mb-5 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-          {en ? "Hello," : "სალამი,"}{" "}
-          <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {firstName}
-          </span>
-        </h1>
+        <header className="mb-8 overflow-hidden rounded-sm border border-border bg-card">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/60 px-5 py-2.5 sm:px-6">
+            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+              <span className="inline-block size-1.5 rounded-full bg-primary" />
+              {en
+                ? "PERSONAL OBSERVATORY · EPHEMERIS WORKSPACE"
+                : "პირადი ობსერვატორია · ეფემერიდების სივრცე"}
+            </div>
+            <div className="font-mono text-xs tabular-nums text-muted-foreground">
+              {new Date().toISOString().slice(0, 10)} · UTC+4
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-6">
+            <div>
+              <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                {en ? "Welcome," : "სალამი,"}{" "}
+                <span className="text-primary">{firstName}</span>
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {en
+                  ? "Today's sky transits calibrated against your natal coordinates."
+                  : "დღევანდელი ცის ტრანზიტები შენი ნატალური რუკის კოორდინატებით."}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/report"
+                className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/10 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-primary transition-colors hover:bg-primary/20"
+              >
+                {en ? "Natal Chart" : "ჩემი რუკა"} →
+              </Link>
+              <Link
+                href="/synastry"
+                className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-border bg-background/60 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-foreground/85 transition-colors hover:border-primary/40 hover:text-primary"
+              >
+                {en ? "Synastry" : "თავსებადობა"}
+              </Link>
+              <Link
+                href="/taro"
+                className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-border bg-background/60 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-foreground/85 transition-colors hover:border-primary/40 hover:text-primary"
+              >
+                {en ? "Tarot" : "ტარო"}
+              </Link>
+            </div>
+          </div>
+        </header>
 
         <DailyDashboard userId={user.id} locale={locale} />
 
-        {/* Tarot + AI stay one tap away, below the delivered daily value. */}
+        {/* Tarot + Ask Astrologer stay one tap away below the daily briefing */}
         <div className="mt-8">
           <PopularTools locale={locale} placement="dashboard_top" />
         </div>

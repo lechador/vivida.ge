@@ -59,13 +59,13 @@ export default async function AskPage({
         active="ask"
         title={
           en
-            ? "Your AI astrologer needs a natal chart"
-            : "AI ასტროლოგი ნატალურ რუკას საჭიროებს"
+            ? "Your astrologer needs a natal chart"
+            : "ასტროლოგი ნატალურ რუკას საჭიროებს"
         }
         description={
           en
-            ? "Add your birth details to talk to an AI astrologer who knows your chart."
-            : "შეავსე დაბადების მონაცემები, რომ ესაუბრო AI ასტროლოგს, რომელიც შენს რუკას იცნობს."
+            ? "Add your birth details to consult an astrologer grounded in your natal chart."
+            : "შეავსე დაბადების მონაცემები, რომ ესაუბრო ასტროლოგს, რომელიც შენს რუკას იცნობს."
         }
         next="/ask"
         locale={locale}
@@ -79,11 +79,7 @@ export default async function AskPage({
   }));
   const premium = await isPremiumUser(user.id);
 
-  // Personalization from long-term memory: proactive follow-up from the
-  // first open loop, topic chips from recurring interests, and the
-  // transparency snapshot. A failed read hides the extras, never the chat.
   const storedMemory = await getAskMemory(user.id).catch(() => null);
-  // Visiting ask clears the nudge badge (single UPDATE, no-op when none).
   await markAskNudgesOpened(user.id).catch(() => {});
   const followUp = storedMemory?.traits?.openLoops?.[0]?.trim()
     ? buildFollowUpQuestion(storedMemory.traits.openLoops[0], locale)
@@ -108,28 +104,33 @@ export default async function AskPage({
   return (
     <main
       lang={locale}
-      className="relative isolate flex h-dvh flex-col overflow-hidden"
+      className="relative isolate flex h-dvh flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_350/0.3),transparent_70%)]"
-      />
-      <Starfield count={110} shooting={3} />
+      <Starfield count={48} />
 
       <AppHeader authed active="ask" />
 
-      <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col px-4 pb-[calc(4.75rem_+_env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8 lg:pb-6">
-        <header className="mb-5 shrink-0">
-          <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            {en ? "Ask your" : "ჰკითხე"}{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "chart" : "ვარსკვლავებს"}
+      <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-4 pb-[calc(4.75rem_+_env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8 lg:pb-6">
+        <header className="mb-4 shrink-0 border-b border-border pb-4">
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+            OBSERVATORY CONSULTATION · პირადი კონსულტაცია
+          </div>
+          <h1
+            className={
+              en
+                ? "mt-1 text-balance font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl"
+                : "mt-1 text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
+            }
+          >
+            {en ? "Ask your " : "ჰკითხე "}
+            <span className="text-primary">
+              {en ? "natal chart" : "ვარსკვლავებს"}
             </span>
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
             {en
-              ? "A personal AI astrologer grounded in your real planets, houses and aspects."
-              : "შენი ნატალური რუკის პერსონალური AI ასტროლოგი, ეფუძნება შენს რეალურ პლანეტებსა და სახლებს."}
+              ? "Personal astrological consultation grounded in your exact planets, houses, and aspects."
+              : "შენი ნატალური რუკის პერსონალური ასტროლოგი, ეფუძნება შენს რეალურ პლანეტებსა და სახლებს."}
           </p>
         </header>
 

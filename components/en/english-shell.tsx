@@ -12,13 +12,9 @@ export function EnglishShell({
   return (
     <div
       lang="en"
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_32%_at_50%_-5%,oklch(0.26_0.12_305/0.32),transparent_70%)]"
-      />
-      <Starfield count={70} shooting={1} />
+      <Starfield count={48} />
       <EnglishHeader georgianPath={georgianPath} />
       <main className="relative z-10 flex-1">{children}</main>
       <EnglishFooter />

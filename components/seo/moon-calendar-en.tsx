@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { ArrowRight, Moon, Sparkles } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
+import { LunarPhaseDisc } from "@/components/brand/celestial-icons";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { PopularTools } from "@/components/nav/popular-tools";
@@ -44,16 +45,6 @@ export const moonCalendarEnCopy = (year: number) => ({
   title: `Moon Calendar ${year}: Today's Phase and Zodiac Sign`,
   description: `Moon calendar for ${year}: today's phase, illumination and zodiac sign, upcoming New and Full Moon dates, and a daily 30-day lunar forecast.`,
 });
-const SYMBOL: Record<PhaseKey, string> = {
-  new_moon: "🌑",
-  waxing_crescent: "🌒",
-  first_quarter: "🌓",
-  waxing_gibbous: "🌔",
-  full_moon: "🌕",
-  waning_gibbous: "🌖",
-  last_quarter: "🌗",
-  waning_crescent: "🌘",
-};
 const PHASES: Array<{ key: PhaseKey; range: string; meaning: string }> = [
   {
     key: "new_moon",
@@ -115,19 +106,27 @@ function dateEn(date: Date) {
 }
 function EventList({ events, label }: { events: MoonEvent[]; label: string }) {
   return (
-    <ul aria-label={label} className="mt-5 grid gap-3 sm:grid-cols-2">
+    <ul
+      aria-label={label}
+      className="mt-4 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2"
+    >
       {events.map((event) => (
         <li
           key={event.iso}
-          className="rounded-2xl border border-border bg-card/50 p-4 ring-1 ring-foreground/5"
+          className="bg-card p-4"
         >
           <div className="flex items-start gap-3">
-            <span className="text-3xl">
-              {event.kind === "new" ? "🌑" : "🌕"}
+            <span className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-background/60">
+              <LunarPhaseDisc
+                phaseKey={event.kind === "new" ? "new_moon" : "full_moon"}
+                size={26}
+              />
             </span>
             <div>
-              <p className="font-semibold">{dateEn(event.date)}</p>
-              <p className="mt-1 text-sm text-foreground/70">
+              <p className="font-mono text-sm font-semibold tabular-nums text-foreground">
+                {dateEn(event.date)}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
                 {event.snapshot.signSymbol} {event.snapshot.signEn} · Tbilisi
                 date
               </p>
@@ -206,58 +205,64 @@ export async function MoonCalendarPageEn() {
   return (
     <main
       lang="en"
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
-      />
-      <Starfield count={120} shooting={3} />
+      <Starfield count={48} />
       <SmartHeader locale="en" georgianPath={PATH} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
-      <article className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-        <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/">Home</Link>
+      <article className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
+        <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+          <Link href="/" className="hover:text-foreground">
+            Home
+          </Link>
           <span>/</span>
           <span className="text-foreground/80">Moon calendar</span>
         </nav>
-        <header className="mb-8 max-w-3xl">
-          <div className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <header className="mb-8 border-b border-border pb-8">
+          <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
             <Moon className="size-3.5" />
-            Lunar rhythm
+            Lunar Rhythm · Ephemeris
           </div>
-          <h1 className="font-display mt-2 text-balance text-4xl font-medium tracking-tight sm:text-5xl">
+          <h1 className="font-display mt-2 text-balance text-4xl font-normal tracking-[-0.02em] sm:text-5xl">
             Moon Calendar <Accent>{year}</Accent>
           </h1>
-          <p className="mt-4 text-pretty text-base leading-7 text-foreground/85 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-pretty text-[15px] leading-relaxed text-muted-foreground sm:text-base">
             Today’s Moon phase and zodiac sign, upcoming New and Full Moon
             dates, and a daily 30-day lunar overview.
           </p>
         </header>
         {today && (
-          <section className="mb-10 rounded-3xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/10 p-5 ring-1 ring-foreground/5 sm:p-7">
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-              Updated daily
-            </p>
-            <h2 className="font-display mt-2 text-2xl font-medium sm:text-3xl">
-              What Moon phase is it today?
-            </h2>
-            <p className="mt-3 text-lg leading-8 text-foreground/90">
-              Today, <strong>{dateEn(now)}</strong>, the Moon is in its{" "}
-              <strong>{PHASE_LABEL_EN[today.phaseKey]}</strong> phase. It is{" "}
-              <strong>
-                {Math.round(today.illumination * 100)}% illuminated
-              </strong>{" "}
-              in{" "}
-              <strong>
-                {today.signSymbol} {today.signEn}
-              </strong>
-              .
-            </p>
-            <dl className="mt-5 grid gap-3 sm:grid-cols-3">
+          <section className="mb-10 rounded-md border border-border bg-card p-6 sm:p-8">
+            <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+                  Daily Telemetry · Updated Daily
+                </p>
+                <h2 className="font-display mt-2 text-2xl font-normal sm:text-3xl">
+                  What Moon phase is it today?
+                </h2>
+                <p className="mt-3 text-base leading-relaxed text-foreground/90 sm:text-lg">
+                  Today, <strong className="font-mono">{dateEn(now)}</strong>, the
+                  Moon is in its <strong>{PHASE_LABEL_EN[today.phaseKey]}</strong>{" "}
+                  phase. It is{" "}
+                  <strong className="font-mono tabular-nums text-primary">
+                    {Math.round(today.illumination * 100)}% illuminated
+                  </strong>{" "}
+                  in{" "}
+                  <strong>
+                    {today.signSymbol} {today.signEn}
+                  </strong>
+                  .
+                </p>
+              </div>
+              <div className="shrink-0">
+                <LunarPhaseDisc phaseAngle={today.phaseAngle} size={72} />
+              </div>
+            </div>
+            <dl className="mt-6 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
               <Stat
                 label="Lunar day"
                 value={`${lunarDayFromAge(today.ageDays)}`}
@@ -276,69 +281,73 @@ export async function MoonCalendarPageEn() {
             </dl>
           </section>
         )}
-        <div className="mb-10">
+        <div className="mb-12">
           <PopularTools locale="en" placement="moon_after_today" publicEntry />
         </div>
-        <section className="mb-14">
-          <h2 className="font-display text-3xl font-medium">
+        <section className="mb-16">
+          <h2 className="font-display text-3xl font-normal">
             Upcoming New and Full Moons
           </h2>
-          <p className="mt-3 max-w-3xl leading-7 text-foreground/80">
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Dates are calculated from the project’s ephemeris and shown for
             Tbilisi. Open an event for its exact time, illumination, zodiac
             sign, and practical guide.
           </p>
           <div className="mt-8 grid gap-10 lg:grid-cols-2">
             <section>
-              <h3 className="text-2xl font-semibold">New Moon dates</h3>
+              <h3 className="text-xl font-semibold">New Moon dates</h3>
               <EventList
                 events={upcomingNew.slice(0, 12)}
                 label="Upcoming New Moons"
               />
               <Link
                 href="/akhali-mtvare"
-                className="mt-4 inline-flex items-center gap-2 text-sm text-[var(--vivida-violet)]"
+                className="mt-4 inline-flex items-center gap-2 text-sm text-primary hover:underline"
               >
                 Complete New Moon calendar <ArrowRight className="size-4" />
               </Link>
             </section>
             <section>
-              <h3 className="text-2xl font-semibold">Full Moon dates</h3>
+              <h3 className="text-xl font-semibold">Full Moon dates</h3>
               <EventList
                 events={upcomingFull.slice(0, 12)}
                 label="Upcoming Full Moons"
               />
               <Link
                 href="/savse-mtvare"
-                className="mt-4 inline-flex items-center gap-2 text-sm text-[var(--vivida-violet)]"
+                className="mt-4 inline-flex items-center gap-2 text-sm text-primary hover:underline"
               >
                 Complete Full Moon calendar <ArrowRight className="size-4" />
               </Link>
             </section>
           </div>
         </section>
-        <section className="mb-14">
-          <h2 className="font-display text-3xl font-medium">
+        <section className="mb-16">
+          <h2 className="font-display text-3xl font-normal">
             The next 30 days
           </h2>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-5 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
             {days.map(
               ({ date, snapshot }) =>
                 snapshot && (
                   <div
                     key={date.toISOString()}
-                    className="rounded-2xl border border-border bg-card/50 p-4"
+                    className="bg-card p-4"
                   >
-                    <div className="flex items-start gap-3">
-                      <span className="text-2xl">
-                        {SYMBOL[snapshot.phaseKey]}
-                      </span>
+                    <div className="flex items-start gap-3.5">
+                      <LunarPhaseDisc
+                        phaseAngle={snapshot.phaseAngle}
+                        size={28}
+                        className="mt-0.5"
+                      />
                       <div>
-                        <p className="font-semibold">{dateEn(date)}</p>
-                        <p className="text-sm text-foreground/75">
+                        <p className="font-mono text-sm font-semibold tabular-nums text-foreground">
+                          {dateEn(date)}
+                        </p>
+                        <p className="mt-0.5 text-sm text-foreground/85">
                           {PHASE_LABEL_EN[snapshot.phaseKey]}
                         </p>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="mt-1 font-mono text-xs tabular-nums text-muted-foreground">
                           Lunar day {lunarDayFromAge(snapshot.ageDays)} ·{" "}
                           {snapshot.signSymbol} {snapshot.signEn} ·{" "}
                           {Math.round(snapshot.illumination * 100)}%
@@ -350,62 +359,68 @@ export async function MoonCalendarPageEn() {
             )}
           </div>
         </section>
-        <section className="mb-14">
-          <h2 className="font-display text-3xl font-medium">
+        <section className="mb-16">
+          <h2 className="font-display text-3xl font-normal">
             The eight Moon phases
           </h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
             {PHASES.map((phase) => (
               <div
                 key={phase.key}
-                className="rounded-2xl border border-border bg-card/50 p-5"
+                className="bg-card p-5"
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{SYMBOL[phase.key]}</span>
+                <div className="flex items-center gap-3.5">
+                  <LunarPhaseDisc phaseKey={phase.key} size={32} />
                   <div>
-                    <h3 className="font-semibold">
+                    <h3 className="font-semibold text-foreground">
                       {PHASE_LABEL_EN[phase.key]}
                     </h3>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="font-mono text-xs tabular-nums text-muted-foreground">
                       {phase.range} illuminated
                     </p>
                   </div>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-foreground/78">
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                   {phase.meaning}
                 </p>
               </div>
             ))}
           </div>
         </section>
-        <section className="mb-14 max-w-3xl">
-          <h2 className="font-display text-3xl font-medium">
+        <section className="mb-16 max-w-3xl">
+          <h2 className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
             Frequently asked questions
           </h2>
-          <div className="mt-5 space-y-4">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
             {faq.map((item) => (
-              <details
-                key={item.q}
-                className="rounded-2xl border border-border bg-card/45 p-5"
-              >
-                <summary className="cursor-pointer font-semibold">
+              <details key={item.q} className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                   {item.q}
+                  <span className="font-mono text-sm text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
                 </summary>
-                <p className="mt-3 leading-7 text-foreground/80">{item.a}</p>
+                <p className="border-t border-border/60 bg-background/40 px-5 py-4 text-sm leading-relaxed text-muted-foreground">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>
         </section>
-        <div className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center sm:p-10">
-          <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="font-display text-balance text-2xl font-medium sm:text-3xl">
-            Find your Moon sign
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-            Your birth date, exact time, and location reveal the zodiac sign
-            occupied by the Moon when you were born.
-          </p>
-          <Button asChild variant="mystic" size="lg" className="mt-6">
+        <div className="flex flex-col justify-between gap-6 rounded-md border border-border bg-card p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="max-w-xl">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              Natal Chart
+            </p>
+            <h2 className="font-display mt-2 text-balance text-2xl font-normal sm:text-3xl">
+              Find your Moon sign
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Your birth date, exact time, and location reveal the zodiac sign
+              occupied by the Moon when you were born.
+            </p>
+          </div>
+          <Button asChild size="lg" className="shrink-0">
             <Link href="/natal-chart">Calculate my birth chart</Link>
           </Button>
         </div>
@@ -425,10 +440,14 @@ function Stat({
   note: string;
 }) {
   return (
-    <div className="rounded-xl border border-border/70 bg-background/25 p-4">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-1 font-semibold tabular-nums">{value}</dd>
-      <dd className="text-xs text-muted-foreground">{note}</dd>
+    <div className="bg-background/60 p-4">
+      <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="mt-1.5 font-mono text-lg font-semibold tabular-nums text-foreground">
+        {value}
+      </dd>
+      <dd className="mt-0.5 text-xs text-muted-foreground">{note}</dd>
     </div>
   );
 }

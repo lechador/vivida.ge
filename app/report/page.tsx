@@ -58,10 +58,7 @@ export default async function ReportPage({
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userPrefs?.locale));
   const en = locale !== "ka";
-  // English host pays by card (Stripe checkout is off there); the Georgian
-  // site keeps its Stripe surfaces untouched.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
-  // Only pay the balance-query cost on the explicit campaign landing path.
   const offerBalance =
     offer === "uk" && !premium ? await getBalance(user.id) : null;
   const showUkOffer =
@@ -97,51 +94,52 @@ export default async function ReportPage({
     <CryptoPayHost>
       <main
         lang={locale}
-        className="relative isolate flex flex-1 flex-col overflow-hidden"
+        className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
       >
         <ClearPendingNatalProfile />
-        {/* Layered nebula glows, three radial gradients at different points,
-          one slowly drifting for life. Together they lift the page out of
-          a flat dark, evoking deep cosmos rather than a black screen. */}
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%),radial-gradient(35%_25%_at_70%_85%,oklch(0.30_0.18_280/0.4),transparent_70%)]"
-        />
-        <div
-          aria-hidden
-          className="vivida-nebula-drift absolute inset-0 -z-10 opacity-60 bg-[radial-gradient(50%_40%_at_30%_40%,oklch(0.40_0.18_305/0.18),transparent_70%),radial-gradient(40%_35%_at_75%_60%,oklch(0.42_0.16_200/0.18),transparent_70%)]"
-        />
-        <Starfield count={160} shooting={3} />
+        <Starfield count={48} />
 
         <AppHeader authed active="report" />
 
-        <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
-          <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-            {en
-              ? firstName
-                ? `${firstName}'s `
-                : "Your "
-              : `${firstName ?? "ვარსკვლავო"}-ის `}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "cosmic chart" : "კოსმიური რუკა"}
-            </span>
-          </h1>
-          <p className="mb-6 max-w-xl text-sm text-foreground/75 sm:text-base">
-            {en
-              ? "The sky at your birth moment, explored one layer at a time."
-              : "ცა შენი დაბადების წამში, ნელ-ნელა, ერთი ნაბიჯი მერე მეორე."}
-          </p>
+        <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-10">
+          <header className="mb-8 border-b border-border pb-6">
+            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              NATAL EPHEMERIS RECORD · ნატალური რუკა
+            </div>
+            <div className="mt-2 flex flex-wrap items-baseline justify-between gap-4">
+              <h1
+                className={
+                  en
+                    ? "text-balance font-display text-3xl font-medium tracking-tight text-foreground sm:text-5xl"
+                    : "text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl"
+                }
+              >
+                {en
+                  ? firstName
+                    ? `${firstName}'s `
+                    : "Your "
+                  : `${firstName ?? "ვარსკვლავო"}-ის `}
+                <span className="text-primary">
+                  {en ? "natal chart" : "კოსმიური რუკა"}
+                </span>
+              </h1>
+              <a
+                href="#pdf-report"
+                className="font-mono text-xs uppercase tracking-wider text-muted-foreground underline underline-offset-4 transition-colors hover:text-primary"
+              >
+                {en ? "PDF dossier & downloads ↓" : "PDF ანგარიში და ჩამოტვირთვა ↓"}
+              </a>
+            </div>
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
+              {en
+                ? "The sky at your birth moment, calculated and interpreted layer by layer."
+                : "ცა შენი დაბადების წამში, დეტალურად გათვლილი და ახსნილი."}
+            </p>
+          </header>
 
-          <div className="mb-6">
+          <div className="mb-8">
             <PopularTools locale={locale} placement="report_top" />
           </div>
-
-          <a
-            href="#pdf-report"
-            className="mb-6 inline-flex text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-          >
-            {en ? "PDF report and downloads" : "PDF ანგარიში და ჩამოტვირთვა"}
-          </a>
 
           <Suspense
             fallback={
@@ -153,8 +151,11 @@ export default async function ReportPage({
             <ChartSection userId={user.id} locale={locale} />
           </Suspense>
 
-          <section id="pdf-report" className="mt-10 scroll-mt-24">
-            <h2 className="mb-4 text-xl font-semibold">
+          <section id="pdf-report" className="mt-12 scroll-mt-24">
+            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              ARCHIVE & PRINT · PDF DOSSIER
+            </div>
+            <h2 className="mb-4 text-xl font-semibold text-foreground">
               {en ? "Your PDF report" : "შენი PDF ანგარიში"}
             </h2>
             <Suspense fallback={null}>
@@ -170,7 +171,7 @@ export default async function ReportPage({
 
           {showUkOffer && (
             <div className="mt-6">
-              <div className="mb-3 rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 px-5 py-4 text-sm text-foreground/80">
+              <div className="mb-3 rounded-md border border-primary/30 bg-primary/8 px-5 py-4 text-sm text-foreground/85">
                 <strong className="text-foreground">
                   Explore more with PRO.
                 </strong>{" "}
@@ -184,22 +185,28 @@ export default async function ReportPage({
             </div>
           )}
 
-          <div className="mt-12 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">
-                {en ? "Your birth details" : "შენი დაბადების მონაცემები"}
-              </h2>
-              <Button asChild variant="ghost" size="sm">
+          <div className="mt-12 rounded-md border border-border bg-card p-6">
+            <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  OBSERVATORY COORDINATES
+                </div>
+                <h2 className="mt-0.5 text-lg font-semibold text-foreground">
+                  {en ? "Your birth details" : "შენი დაბადების მონაცემები"}
+                </h2>
+              </div>
+              <Button asChild variant="outline" size="sm">
                 <Link href="/onboarding">
                   <Pencil className="size-3.5" />
                   {en ? "Edit" : "რედაქტირება"}
                 </Link>
               </Button>
             </div>
-            <dl className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+            <dl className="grid grid-cols-1 gap-x-8 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
               <Field
                 label={en ? "Date of birth" : "დაბადების თარიღი"}
                 value={profile.dateOfBirth}
+                mono
               />
               <Field
                 label={en ? "Time of birth" : "დაბადების დრო"}
@@ -210,6 +217,7 @@ export default async function ReportPage({
                       ? "Unknown (12:00 used)"
                       : "უცნობია (გამოყენებულია 12:00)"
                 }
+                mono
               />
               <Field
                 label={en ? "Place of birth" : "დაბადების ადგილი"}
@@ -218,24 +226,23 @@ export default async function ReportPage({
               <Field
                 label={en ? "Time zone" : "დროის სარტყელი"}
                 value={profile.timezone}
+                mono
               />
             </dl>
             {(profile.latitude != null || profile.longitude != null) && (
-              <details className="group mt-4 text-xs text-muted-foreground">
-                <summary className="cursor-pointer select-none transition-colors hover:text-foreground">
-                  {en ? "Technical details" : "ტექნიკური დეტალები"}
+              <details className="group mt-5 border-t border-border pt-4 text-xs text-muted-foreground">
+                <summary className="cursor-pointer select-none font-mono uppercase tracking-wider transition-colors hover:text-foreground">
+                  {en ? "Geodetic coordinates" : "ტექნიკური კოორდინატები"}
                 </summary>
-                <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 tabular-nums">
+                <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 font-mono tabular-nums">
                   {profile.latitude != null && (
                     <span>
-                      {en ? "Latitude" : "განედი"}:{" "}
-                      {profile.latitude.toFixed(4)}
+                      {en ? "LAT" : "განედი"}: {profile.latitude.toFixed(4)}°
                     </span>
                   )}
                   {profile.longitude != null && (
                     <span>
-                      {en ? "Longitude" : "გრძედი"}:{" "}
-                      {profile.longitude.toFixed(4)}
+                      {en ? "LON" : "გრძედი"}: {profile.longitude.toFixed(4)}°
                     </span>
                   )}
                 </div>
@@ -251,14 +258,22 @@ export default async function ReportPage({
 function Field({
   label,
   value,
+  mono = false,
 }: {
   label: string;
   value: string | null | undefined;
+  mono?: boolean;
 }) {
   return (
     <div>
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5 text-foreground">{value ?? "—"}</dd>
+      <dt className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+        {label}
+      </dt>
+      <dd
+        className={`mt-1 text-foreground ${mono ? "font-mono tabular-nums" : ""}`}
+      >
+        {value ?? "—"}
+      </dd>
     </div>
   );
 }

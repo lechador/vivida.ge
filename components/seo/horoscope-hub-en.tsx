@@ -1,5 +1,5 @@
 import { EnglishLink as Link } from "@/components/i18n/international-link";
-import { Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
@@ -90,50 +90,47 @@ export function HoroscopeHubEn() {
   return (
     <main
       lang="en"
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
-      />
-      <Starfield count={120} shooting={3} />
+      <Starfield count={48} />
       <SmartHeader locale="en" georgianPath="/horoskopi" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
-      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-        <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
+      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
+        <nav className="mb-6 flex items-center gap-2 font-mono text-xs text-muted-foreground">
           <Link href="/" className="hover:text-foreground">
             Home
           </Link>
           <span>/</span>
           <span className="text-foreground/80">Horoscope</span>
         </nav>
-        <header className="mb-10 max-w-3xl">
-          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+
+        <header className="mb-8 border-b border-border pb-6">
+          <div className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
             {today}
           </div>
-          <h1 className="font-display mt-2 text-balance text-4xl font-medium tracking-tight sm:text-5xl">
+          <h1 className="font-display mt-2 text-balance text-4xl font-normal tracking-tight text-foreground sm:text-5xl">
             Today&apos;s <Accent>horoscope</Accent>
           </h1>
-          <p className="mt-4 text-pretty text-base text-foreground/85 sm:text-lg">
-            A practical snapshot of today&apos;s energy for all 12 zodiac signs.
-            Choose your sign for a closer reading.
+          <p className="mt-3 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+            A practical snapshot of today&apos;s planetary transits for all 12
+            zodiac signs. Choose your sign for a closer reading.
           </p>
         </header>
 
-        <div className="mb-10 flex flex-wrap gap-2">
+        <div className="mb-8 flex flex-wrap items-center gap-px overflow-hidden rounded-md border border-border bg-border sm:w-fit">
           {[
             {
               href: "/daily-horoscope",
-              label: "Daily horoscope",
+              label: "Daily",
               active: true,
             },
-            { href: "/weekly-horoscope", label: "Weekly horoscope" },
-            { href: "/monthly-horoscope", label: "Monthly horoscope" },
-            { href: "/love-horoscope", label: "Love horoscope" },
-            { href: "/money-horoscope", label: "Money horoscope" },
+            { href: "/weekly-horoscope", label: "Weekly" },
+            { href: "/monthly-horoscope", label: "Monthly" },
+            { href: "/love-horoscope", label: "Love" },
+            { href: "/money-horoscope", label: "Money" },
             { href: "/moon-calendar", label: "Moon calendar" },
             { href: "/mercury-retrograde", label: "Mercury retrograde" },
           ].map((item) => (
@@ -142,8 +139,8 @@ export function HoroscopeHubEn() {
               href={item.href}
               className={
                 item.active
-                  ? "rounded-full border border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/15 px-4 py-1.5 text-sm"
-                  : "rounded-full border border-border bg-card/55 px-4 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+                  ? "bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground sm:text-sm"
+                  : "bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground sm:text-sm"
               }
             >
               {item.label}
@@ -159,48 +156,43 @@ export function HoroscopeHubEn() {
           />
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
           {ALL_SLUGS.map((slug) => {
             const content = SIGNS_CONTENT[slug];
             const meta = signMetaBySlug(slug);
-            const accent = meta ? signColor(meta) : "var(--vivida-violet)";
+            const accent = meta ? signColor(meta) : "var(--primary)";
             return (
               <Link
                 key={slug}
                 href={internationalPublicPath(
                   `/zodiac/${slug}/${VIEW_PATH.today}`,
                 )}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-card/80"
+                className="group flex flex-col justify-between bg-card p-5 transition-colors duration-150 hover:bg-secondary/40"
               >
-                <div
-                  aria-hidden
-                  className="absolute -right-10 -top-10 size-36 rounded-full opacity-20 blur-3xl transition-opacity group-hover:opacity-30"
-                  style={{
-                    background: `radial-gradient(circle, ${accent} 0%, transparent 70%)`,
-                  }}
-                />
-                <div className="relative flex items-start gap-3">
-                  <div
-                    className="grid size-12 shrink-0 place-items-center rounded-xl text-2xl"
-                    style={{
-                      color: accent,
-                      background: `color-mix(in oklch, ${accent} 18%, transparent)`,
-                    }}
-                  >
-                    {content.symbol}
-                  </div>
-                  <div>
-                    <h2 className="font-semibold">{meta?.labelEn ?? slug}</h2>
-                    <div className="text-[11px] text-muted-foreground">
-                      {ZODIAC_DATES[slug].rangeEn}
+                <div>
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="grid size-11 shrink-0 place-items-center rounded-sm border border-border bg-background text-xl"
+                      style={{ color: accent }}
+                    >
+                      {content.symbol}
+                    </div>
+                    <div>
+                      <h2 className="font-semibold text-foreground group-hover:text-primary">
+                        {meta?.labelEn ?? slug}
+                      </h2>
+                      <div className="font-mono text-[11px] tabular-nums text-muted-foreground">
+                        {ZODIAC_DATES[slug].rangeEn}
+                      </div>
                     </div>
                   </div>
+                  <p className="mt-3.5 line-clamp-3 text-sm leading-relaxed text-foreground/85">
+                    {SIGN_SUMMARY[slug]}
+                  </p>
                 </div>
-                <p className="relative mt-3 line-clamp-3 text-sm leading-relaxed text-foreground/85">
-                  {SIGN_SUMMARY[slug]}
-                </p>
-                <div className="relative mt-3 text-xs text-muted-foreground group-hover:text-foreground">
-                  Full horoscope →
+                <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3 font-mono text-[11px] text-muted-foreground group-hover:text-foreground">
+                  <span>Full horoscope</span>
+                  <span aria-hidden>→</span>
                 </div>
               </Link>
             );
@@ -208,18 +200,15 @@ export function HoroscopeHubEn() {
         </div>
 
         <section className="mt-12">
-          <h2 className="text-xl font-semibold tracking-tight">
+          <h2 className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
             Frequently asked questions
           </h2>
-          <div className="mt-4 space-y-3">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
             {FAQ.map((item) => (
-              <details
-                key={item.q}
-                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium">
+              <details key={item.q} className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                   {item.q}
-                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                  <span className="font-mono text-muted-foreground transition-transform group-open:rotate-45">
                     +
                   </span>
                 </summary>
@@ -231,18 +220,27 @@ export function HoroscopeHubEn() {
           </div>
         </section>
 
-        <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-10">
-          <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="font-display text-balance text-2xl font-medium tracking-tight sm:text-3xl">
-            Your Sun sign is only the beginning
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            A personal forecast includes your Moon, rising sign, houses, and
-            every natal planet. Calculate your complete chart for free.
-          </p>
-          <Button asChild variant="mystic" size="lg" className="mt-6">
-            <Link href="/natal-chart">Calculate my birth chart</Link>
-          </Button>
+        <div className="mt-14 rounded-md border border-border bg-card p-7 sm:p-10">
+          <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+            <div className="max-w-xl">
+              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+                PERSONAL NATAL CHART
+              </p>
+              <h2 className="font-display mt-2 text-balance text-2xl font-normal tracking-tight text-foreground sm:text-3xl">
+                Your Sun sign is only the beginning
+              </h2>
+              <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
+                A personal forecast includes your Moon, rising sign, houses, and
+                every natal planet. Calculate your complete chart for free.
+              </p>
+            </div>
+            <Button asChild size="lg" className="shrink-0">
+              <Link href="/natal-chart">
+                Calculate my birth chart
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
       <SiteFooter locale="en" />

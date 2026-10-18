@@ -37,17 +37,16 @@ import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
-/** Per-test visual identity, icon + accent colour, keyed by catalog slug. */
-const THEME: Record<string, { Icon: LucideIcon; accent: string }> = {
-  iq: { Icon: Brain, accent: "var(--vivida-cyan)" },
-  eq: { Icon: HeartHandshake, accent: "var(--vivida-pink)" },
-  "self-esteem": { Icon: Heart, accent: "var(--vivida-pink)" },
-  "big-five": { Icon: Layers, accent: "var(--vivida-violet)" },
-  "astro-mbti": { Icon: Fingerprint, accent: "var(--vivida-violet)" },
-  "true-sign": { Icon: Sparkles, accent: "var(--vivida-cyan)" },
-  "famous-zodiac": { Icon: Sparkles, accent: "var(--vivida-pink)" },
+const THEME: Record<string, { Icon: LucideIcon }> = {
+  iq: { Icon: Brain },
+  eq: { Icon: HeartHandshake },
+  "self-esteem": { Icon: Heart },
+  "big-five": { Icon: Layers },
+  "astro-mbti": { Icon: Fingerprint },
+  "true-sign": { Icon: Sparkles },
+  "famous-zodiac": { Icon: Sparkles },
 };
-const FALLBACK_THEME = { Icon: Brain, accent: "var(--vivida-violet)" };
+const FALLBACK_THEME = { Icon: Brain };
 
 const TITLE = "ტესტები და ქვიზები ქართულად, IQ, პიროვნების ტესტი და ზოდიაქო";
 const DESCRIPTION =
@@ -95,7 +94,7 @@ const FAQ = [
   },
   {
     q: "რა არის პიროვნების ტესტი?",
-    a: "პიროვნების ტესტი (MBTI / 16Personalities) განსაზღვრავს შენს ფსიქოლოგიურ ტიპს 16-დან, როგორ იღებ ენერგიას, აღიქვამ ინფორმაციას, იღებ გადაწყვეტილებებს და აწყობ ცხოვრებას.",
+    a: "პიროვნების ტესტი (MBTI / 16Personalities) განსაზღვვრავს შენს ფსიქოლოგიურ ტიპს 16-დან, როგორ იღებ ენერგიას, აღიქვამ ინფორმაციას, იღებ გადაწყვეტილებებს და აწყობ ცხოვრებას.",
   },
   {
     q: "ტესტი უფასოა?",
@@ -107,17 +106,10 @@ const FAQ = [
   },
 ];
 
-/**
- * The tests hub, one card per test from the catalog. A dedicated page (rather
- * than one nav slot per test) so new tests are added without crowding the nav.
- * Public: works signed-out (SmartHeader) and signed-in (AppHeader).
- */
 export default async function TestsPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
 
-  // Latest result per test, keyed by catalog slug, shown inline on the card
-  // (the score itself, not just a "my result" link).
   type TestResult = { href: string; value: string; sub: string };
   const myResults: Record<string, TestResult> = {};
   if (authed) {
@@ -178,12 +170,8 @@ export default async function TestsPage() {
   ];
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
-      />
-      <Starfield count={120} shooting={2} />
+    <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background">
+      <Starfield count={48} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
@@ -191,61 +179,106 @@ export default async function TestsPage() {
 
       {authed ? <AppHeader authed active="tests" /> : <SmartHeader />}
 
-      <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        <header className="mb-8 text-center sm:mb-10">
-          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            ტესტები და ქვიზები
+      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
+        <header className="mb-10 border-b border-border pb-8">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+            PSYCHOMETRICS & ARCHETYPES · ტესტები და ქვიზები
           </div>
-          <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="mt-2 max-w-2xl text-balance text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl">
             აღმოაჩინე მეტი{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              საკუთარი თავის შესახებ
-            </span>
+            <span className="text-primary">საკუთარი თავის შესახებ</span>
           </h1>
-          <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-foreground/80 sm:text-base">
+          <p className="mt-3 max-w-2xl text-pretty text-[15px] leading-relaxed text-muted-foreground sm:text-base">
             სიღრმისეული ტესტები შენს ინტელექტსა და პიროვნებაზე, და სწრაფი
             ქვიზები, როცა ცოტა თამაში გინდა.
           </p>
         </header>
 
         <section aria-labelledby="featured-tests">
-          <div className="mb-4 flex items-end justify-between gap-4"><div><div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">დაიწყე აქ</div><h2 id="featured-tests" className="mt-1 text-xl font-semibold tracking-tight">მთავარი ტესტები</h2></div><p className="hidden max-w-xs text-right text-xs text-muted-foreground sm:block">ღრმა შედეგი და პერსონალური ანალიზი</p></div>
-          <div className="grid gap-4 sm:grid-cols-2">{TESTS.filter((test) => test.kind === "featured").map((test) => <TestCard key={test.slug} test={test} done={test.available ? myResults[test.slug] : undefined} />)}</div>
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                01 · დაიწყე აქ
+              </div>
+              <h2
+                id="featured-tests"
+                className="mt-1 text-xl font-semibold tracking-tight text-foreground"
+              >
+                მთავარი ტესტები
+              </h2>
+            </div>
+            <p className="hidden max-w-xs text-right text-xs text-muted-foreground sm:block">
+              ღრმა შედეგი და პერსონალური ანალიზი
+            </p>
+          </div>
+          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
+            {TESTS.filter((test) => test.kind === "featured").map((test) => (
+              <TestCard
+                key={test.slug}
+                test={test}
+                done={test.available ? myResults[test.slug] : undefined}
+              />
+            ))}
+          </div>
         </section>
 
-        <section className="mt-9" aria-labelledby="quick-quizzes">
-          <div className="mb-4"><div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">მსუბუქი და სწრაფი</div><h2 id="quick-quizzes" className="mt-1 text-xl font-semibold tracking-tight">ქვიზები</h2><p className="mt-1 text-sm text-muted-foreground">რამდენიმე წუთი, 20 კითხვა და შედეგი მყისიერად.</p></div>
-          <div className="grid gap-4 sm:grid-cols-2">{TESTS.filter((test) => test.kind === "quiz").map((test) => <TestCard key={test.slug} test={test} done={test.available ? myResults[test.slug] : undefined} />)}</div>
+        <section className="mt-12" aria-labelledby="quick-quizzes">
+          <div className="mb-4">
+            <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              02 · მსუბუქი და სწრაფი
+            </div>
+            <h2
+              id="quick-quizzes"
+              className="mt-1 text-xl font-semibold tracking-tight text-foreground"
+            >
+              ქვიზები
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              რამდენიმე წუთი, 20 კითხვა და შედეგი მყისიერად.
+            </p>
+          </div>
+          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
+            {TESTS.filter((test) => test.kind === "quiz").map((test) => (
+              <TestCard
+                key={test.slug}
+                test={test}
+                done={test.available ? myResults[test.slug] : undefined}
+              />
+            ))}
+          </div>
         </section>
 
         {/* Browse the 16 types (internal linking + SEO cluster) */}
-        <div className="mt-6 rounded-2xl border border-border bg-card/40 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
-          <h2 className="text-base font-semibold tracking-tight">16 პიროვნების ტიპი</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            დაათვალიერე ყველა ტიპის სრული აღწერა ქართულად, ტესტის გავლის გარეშეც.
-          </p>
+        <div className="mt-8 flex flex-col justify-between gap-4 rounded-md border border-border bg-card p-6 sm:flex-row sm:items-center">
+          <div>
+            <h2 className="text-base font-semibold tracking-tight text-foreground">
+              16 პიროვნების ტიპი
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              დაათვალიერე ყველა ტიპის სრული აღწერა ქართულად, ტესტის გავლის გარეშეც.
+            </p>
+          </div>
           <Link
             href="/mbti"
-            className="mt-3 inline-flex items-center gap-1 text-sm text-[var(--vivida-cyan)] hover:underline"
+            className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary hover:underline"
           >
             ყველა ტიპი <ArrowRight className="size-3.5" />
           </Link>
         </div>
 
         {/* FAQ */}
-        <section className="mt-10">
-          <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            ხშირად დასმული კითხვები
+        <section className="mt-12">
+          <h2 className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            03 · ხშირად დასმული კითხვები
           </h2>
-          <div className="space-y-3">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
             {FAQ.map((item) => (
-              <details
-                key={item.q}
-                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium [&::-webkit-details-marker]:hidden">
+              <details key={item.q} className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-sm font-medium text-foreground transition-colors hover:bg-secondary/40 [&::-webkit-details-marker]:hidden">
                   {item.q}
-                  <span className="text-muted-foreground transition-transform group-open:rotate-45">+</span>
+                  <span className="font-mono text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
                 </summary>
                 <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
                   {item.a}
@@ -268,10 +301,82 @@ function TestCard({
   test: TestCatalogEntry;
   done?: { href: string; value: string; sub: string };
 }) {
-  const { Icon, accent } = THEME[test.slug] ?? FALLBACK_THEME;
-  return <article className="flex flex-col rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 sm:p-7" style={{ borderTopColor: `color-mix(in oklch, ${accent} 45%, transparent)` }}>
-    <div className="mb-4 flex items-center gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl" style={{ background: `color-mix(in oklch, ${accent} 15%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${accent} 40%, transparent)` }}><Icon className="size-5" style={{ color: accent }} /></span><div className="min-w-0"><h3 className="truncate text-lg font-semibold tracking-tight">{test.titleKa}</h3><p className="truncate text-sm text-muted-foreground">{test.taglineKa}</p></div></div>
-    {done ? <div className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5" style={{ background: `color-mix(in oklch, ${accent} 10%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${accent} 30%, transparent)` }}><div className="min-w-0"><div className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">შენი შედეგი</div><div className="mt-0.5 text-2xl font-bold tracking-tight" style={{ color: accent }}>{done.value}</div></div><div className="shrink-0 text-right text-xs text-foreground/70">{done.sub}</div></div> : <><p className="text-[15px] leading-relaxed text-foreground/85">{test.descKa}</p><div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground"><Clock className="size-3.5" /><span>{test.metaKa}</span></div></>}
-    <div className="mt-5 flex flex-wrap items-center gap-3">{!test.available ? <span className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">მალე</span> : done ? <><Button asChild variant="mystic" className="w-full sm:flex-1"><Link href={done.href}>სრული ანალიზი <ArrowRight className="size-4" /></Link></Button><Button asChild variant="ghost" size="icon" title="ტესტის თავიდან გავლა" aria-label="ტესტის თავიდან გავლა"><Link href={test.href}><RotateCcw className="size-4" /></Link></Button></> : <Button asChild variant="mystic" className="w-full"><Link href={test.href}>{test.kind === "quiz" ? "თამაში" : "დაწყება"} <ArrowRight className="size-4" /></Link></Button>}</div>
-  </article>;
+  const { Icon } = THEME[test.slug] ?? FALLBACK_THEME;
+  return (
+    <article className="flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary/30 sm:p-7">
+      <div>
+        <div className="mb-4 flex items-center gap-3">
+          <span className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+            <Icon className="size-4.5" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="truncate text-lg font-semibold tracking-tight text-foreground">
+              {test.titleKa}
+            </h3>
+            <p className="truncate text-xs text-muted-foreground">
+              {test.taglineKa}
+            </p>
+          </div>
+        </div>
+        {done ? (
+          <div className="flex items-center justify-between gap-3 rounded-sm border border-primary/30 bg-primary/8 px-4 py-3.5">
+            <div className="min-w-0">
+              <div className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                შენი შედეგი
+              </div>
+              <div className="mt-0.5 font-mono text-2xl font-semibold tracking-tight tabular-nums text-primary">
+                {done.value}
+              </div>
+            </div>
+            <div className="shrink-0 text-right text-xs text-foreground/75">
+              {done.sub}
+            </div>
+          </div>
+        ) : (
+          <>
+            <p className="text-[15px] leading-relaxed text-foreground/85">
+              {test.descKa}
+            </p>
+            <div className="mt-4 flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+              <Clock className="size-3.5" />
+              <span>{test.metaKa}</span>
+            </div>
+          </>
+        )}
+      </div>
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        {!test.available ? (
+          <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            მალე
+          </span>
+        ) : done ? (
+          <>
+            <Button asChild className="w-full sm:flex-1">
+              <Link href={done.href}>
+                სრული ანალიზი <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="icon"
+              title="ტესტის თავიდან გავლა"
+              aria-label="ტესტის თავიდან გავლა"
+            >
+              <Link href={test.href}>
+                <RotateCcw className="size-4" />
+              </Link>
+            </Button>
+          </>
+        ) : (
+          <Button asChild className="w-full">
+            <Link href={test.href}>
+              {test.kind === "quiz" ? "თამაში" : "დაწყება"}{" "}
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        )}
+      </div>
+    </article>
+  );
 }

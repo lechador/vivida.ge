@@ -1,76 +1,48 @@
 import { signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
-import { YEARLY_CONTENT_EN, type YearlyContentEn } from "@/lib/seo/zodiac-content-en";
 
-export type YearlyHoroscopeEnglish = {
-  title: string;
-  description: string;
-  tagline: string;
-  overview: string[];
-  supportiveMonths: string[];
-  reflectiveMonths: string[];
-  sections: Array<{ title: string; body: string }>;
-  keyDates?: Array<{ date: string; note: string }>;
-  advice: string;
-  faq: Array<{ q: string; a: string }>;
-};
-
-export function yearlyHoroscopeEnglish(sign: ZodiacSlug, year: number): YearlyHoroscopeEnglish {
-  const name = signMetaBySlug(sign)!.labelEn;
-  const yearlyData: YearlyContentEn | undefined = YEARLY_CONTENT_EN[String(year)]?.[sign];
-
-  if (yearlyData) {
-    const overviewParagraphs = (yearlyData.overview || "")
-      .split("\n\n")
-      .map((p) => p.trim())
-      .filter(Boolean);
-
-    const sections = [
-      {
-        title: yearlyData.love?.title || "Love and Relationships",
-        body: yearlyData.love?.body || "",
-      },
-      {
-        title: yearlyData.career?.title || "Career and Direction",
-        body: yearlyData.career?.body || "",
-      },
-      {
-        title: yearlyData.money?.title || "Money and Resources",
-        body: yearlyData.money?.body || "",
-      },
-      {
-        title: yearlyData.health?.title || "Wellbeing and Energy",
-        body: yearlyData.health?.body || "",
-      },
-      {
-        title: yearlyData.growth?.title || "Personal Growth",
-        body: yearlyData.growth?.body || "",
-      },
-    ].filter((s) => Boolean(s.body));
-
-    return {
-      title: yearlyData.pageTitle || `${name} Horoscope ${year}: Love, Career and Year Ahead`,
-      description: yearlyData.metaDescription || `${name} ${year} horoscope: explore the year's central themes.`,
-      tagline: yearlyData.tagline || `${year} forecast for ${name}`,
-      overview: overviewParagraphs.length > 0 ? overviewParagraphs : [yearlyData.overview],
-      supportiveMonths: yearlyData.bestMonths || ["April", "July", "October"],
-      reflectiveMonths: yearlyData.hardMonths || ["February", "August"],
-      sections,
-      keyDates: yearlyData.keyDates || [],
-      advice: yearlyData.growth?.body || `Trust your steady growth and align actions with your core values throughout ${year}.`,
-      faq: yearlyData.faq || [],
-    };
-  }
-
-  // Fallback
+export function yearlyHoroscopeEnglish(sign: ZodiacSlug, year: number) {
+  const meta = signMetaBySlug(sign);
+  const name = meta?.labelEn ?? sign;
   return {
-    title: `${name} Horoscope ${year}`,
-    description: `${name} ${year} horoscope`,
-    tagline: `${year} is a year of growth for ${name}.`,
-    overview: [`${year} forecast for ${name}.`],
-    supportiveMonths: ["April", "July", "October"],
-    reflectiveMonths: ["February", "August"],
-    sections: [],
-    advice: `Focus on consistent daily habits in ${year}.`,
-    faq: [],
+    title: `${name} ${year} Horoscope: Yearly Astrology Forecast`,
+    description: `${name} ${year} horoscope for love, career, finances, and personal growth.`,
+    tagline: `${year} invites ${name} to align daily habits with long-term vision.`,
+    overview: [
+      `Throughout ${year}, major planetary transits highlight renewal, purposeful relationships, and steady career momentum for ${name}.`,
+    ],
+    supportiveMonths: ["March", "July", "November"],
+    reflectiveMonths: ["May", "September"],
+    sections: [
+      {
+        title: "Love & Relationships",
+        body: `Relationships deepen through honest dialogue and shared goals in ${year}.`,
+      },
+      {
+        title: "Career & Finances",
+        body: `Professional projects gain traction when you focus on sustainable priorities.`,
+      },
+      {
+        title: "Wellbeing & Energy",
+        body: `Consistent rest and mindful pacing keep your energy strong all year.`,
+      },
+    ],
+    love: [`Relationships deepen through honest dialogue and shared goals in ${year}.`],
+    career: [`Professional projects gain traction when you focus on sustainable priorities.`],
+    healthAndEnergy: [`Consistent rest and mindful pacing keep your energy strong all year.`],
+    keyMonths: [
+      { month: "Spring", note: "Fresh momentum for personal initiatives and creative plans." },
+      { month: "Autumn", note: "Clarity in partnerships and long-term commitments." },
+    ],
+    keyDates: [
+      { date: `Spring ${year}`, note: "Fresh momentum for personal initiatives and creative plans." },
+      { date: `Autumn ${year}`, note: "Clarity in partnerships and long-term commitments." },
+    ],
+    advice: `Focus on steady, authentic progress in ${year} and let your long-term priorities guide daily choices.`,
+    faq: [
+      {
+        q: `What is the main theme for ${name} in ${year}?`,
+        a: `${year} focuses on intentional growth, authentic relationships, and grounded progress for ${name}.`,
+      },
+    ],
   };
 }

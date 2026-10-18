@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { Loader2, Lock, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { CornerCrosshair } from "@/components/brand/celestial-icons";
 import type { SynastryDeepReportJson } from "@/db/schema";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 
 const ERRORS: Record<string, string> = {
   rate_limited: "დღევანდელი ლიმიტი ამოიწურა. სცადე ხვალ.",
@@ -32,50 +34,22 @@ const GEN_MESSAGES_EN = [
 
 const SECTIONS: {
   key: keyof SynastryDeepReportJson;
+  code: string;
   title: string;
-  color: string;
 }[] = [
-  { key: "love", title: "სიყვარული და რომანტიკა", color: "var(--vivida-pink)" },
-  {
-    key: "communication",
-    title: "კომუნიკაცია და გონებრივი კავშირი",
-    color: "var(--vivida-cyan)",
-  },
-  {
-    key: "trust",
-    title: "ნდობა და ემოციური უსაფრთხოება",
-    color: "var(--vivida-violet)",
-  },
-  { key: "friction", title: "ხახუნი და ზრდა", color: "var(--vivida-gold)" },
-  {
-    key: "longTerm",
-    title: "გრძელვადიანი პოტენციალი",
-    color: "var(--vivida-cyan)",
-  },
+  { key: "love", code: "01", title: "სიყვარული და რომანტიკა" },
+  { key: "communication", code: "02", title: "კომუნიკაცია და გონებრივი კავშირი" },
+  { key: "trust", code: "03", title: "ნდობა და ემოციური უსაფრთხოება" },
+  { key: "friction", code: "04", title: "ხახუნი და ზრდა" },
+  { key: "longTerm", code: "05", title: "გრძელვადიანი პოტენციალი" },
 ];
 
 const SECTIONS_EN: typeof SECTIONS = [
-  { key: "love", title: "Love and romance", color: "var(--vivida-pink)" },
-  {
-    key: "communication",
-    title: "Communication and mental connection",
-    color: "var(--vivida-cyan)",
-  },
-  {
-    key: "trust",
-    title: "Trust and emotional safety",
-    color: "var(--vivida-violet)",
-  },
-  {
-    key: "friction",
-    title: "Friction and growth",
-    color: "var(--vivida-gold)",
-  },
-  {
-    key: "longTerm",
-    title: "Long-term potential",
-    color: "var(--vivida-cyan)",
-  },
+  { key: "love", code: "01", title: "Love and romance" },
+  { key: "communication", code: "02", title: "Communication and mental connection" },
+  { key: "trust", code: "03", title: "Trust and emotional safety" },
+  { key: "friction", code: "04", title: "Friction and growth" },
+  { key: "longTerm", code: "05", title: "Long-term potential" },
 ];
 
 function paras(s: string): string[] {
@@ -84,8 +58,6 @@ function paras(s: string): string[] {
     .map((p) => p.trim())
     .filter(Boolean);
 }
-
-import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function SynastryDeepReport({
   partnerId,
@@ -154,103 +126,115 @@ export function SynastryDeepReport({
     }
   }
 
-  // Rendered report
   if (report) {
     return (
-      <article className="mt-8 rounded-2xl border border-[var(--vivida-violet)]/30 bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
-        <div className="mb-4 flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)]">
-          <Sparkles className="size-4" />
-          {en ? "In-depth report" : "ღრმა ანგარიში"}
-        </div>
-        <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
-          {paras(report.intro).map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
+      <article className="relative mt-10 overflow-hidden rounded-sm border border-border bg-card">
+        <CornerCrosshair position="tl" />
+        <CornerCrosshair position="tr" />
+        <CornerCrosshair position="bl" />
+        <CornerCrosshair position="br" />
+
+        <div className="border-b border-border bg-background/50 px-5 py-3.5 sm:px-8">
+          <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+            <Sparkles className="size-3.5" />
+            {en ? "MONOGRAPH · IN-DEPTH SYNASTRY REPORT" : "მონოგრაფია · ღრმა ანგარიში"}
+          </div>
         </div>
 
-        {sections.map((s) => {
-          const body = report[s.key];
-          if (typeof body !== "string" || !body.trim()) return null;
-          return (
-            <section key={s.key} className="mt-8">
-              <h3
-                className="mb-3 text-lg font-semibold tracking-tight"
-                style={{ color: s.color }}
-              >
-                {s.title}
+        <div className="p-6 sm:p-8">
+          <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
+            {paras(report.intro).map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
+          </div>
+
+          <div className="mt-8 divide-y divide-border border-t border-border">
+            {sections.map((s) => {
+              const body = report[s.key];
+              if (typeof body !== "string" || !body.trim()) return null;
+              return (
+                <section key={s.key} className="py-6">
+                  <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+                    CHAPTER {s.code}
+                  </div>
+                  <h3 className="mb-3 text-lg font-semibold tracking-tight text-foreground">
+                    {s.title}
+                  </h3>
+                  <div className="space-y-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                    {paras(body).map((p, i) => (
+                      <p key={i}>{p}</p>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+
+          {report.advice.length > 0 && (
+            <section className="mt-6 rounded-sm border border-primary/30 bg-primary/5 p-5">
+              <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                {en ? "PRACTICAL PROTOCOL · ADVICE" : "პრაქტიკული რეკომენდაციები"}
               </h3>
-              <div className="space-y-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
-                {paras(body).map((p, i) => (
-                  <p key={i}>{p}</p>
+              <ul className="space-y-2 text-sm leading-relaxed text-foreground/90">
+                {report.advice.map((a, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span
+                      aria-hidden
+                      className="mt-1.5 inline-block size-1.5 shrink-0 bg-primary"
+                    />
+                    <span>{a}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </section>
-          );
-        })}
-
-        {report.advice.length > 0 && (
-          <section className="mt-8 rounded-xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/5 p-5">
-            <h3 className="mb-3 text-sm font-medium uppercase tracking-[0.16em] text-[var(--vivida-cyan)]">
-              {en ? "Practical advice" : "რჩევები"}
-            </h3>
-            <ul className="space-y-2 text-sm leading-relaxed text-foreground/90">
-              {report.advice.map((a, i) => (
-                <li key={i} className="flex gap-2">
-                  <span
-                    aria-hidden
-                    className="mt-0.5 text-[var(--vivida-cyan)]"
-                  >
-                    ◆
-                  </span>
-                  {a}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+          )}
+        </div>
       </article>
     );
   }
 
-  // Generating
   if (status === "generating") {
     return (
-      <div className="mt-8 rounded-2xl border border-[var(--vivida-violet)]/30 bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
-        <Loader2 className="mx-auto mb-3 size-6 animate-spin text-[var(--vivida-violet)]" />
+      <div className="mt-10 rounded-sm border border-border bg-card p-6 text-center sm:p-8">
+        <Loader2 className="mx-auto mb-3 size-6 animate-spin text-primary" />
         <p className="text-sm text-foreground/85">{messages[stage]}</p>
-        <div className="mx-auto mt-4 h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-foreground/10">
+        <div className="mx-auto mt-4 h-1 w-full max-w-sm overflow-hidden bg-secondary">
           <div
-            className="h-full rounded-full bg-[linear-gradient(90deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] transition-[width] duration-300 ease-out"
+            className="h-full bg-primary transition-[width] duration-300 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          {en ? "This may take up to a minute." : "ერთ წუთამდე სჭირდება."}
+        <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+          {en ? "COMPUTING EPHEMERIS SYNTHESIS…" : "მიმდინარეობს ანგარიშის შედგენა…"}
         </p>
       </div>
     );
   }
 
-  // CTA
   return (
-    <div className="mt-8 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-pink)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-9">
-      <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
-        <Lock className="size-5" />
+    <div className="relative mt-10 overflow-hidden rounded-sm border border-primary/35 bg-card p-7 text-center sm:p-9">
+      <CornerCrosshair position="tl" />
+      <CornerCrosshair position="tr" />
+      <CornerCrosshair position="bl" />
+      <CornerCrosshair position="br" />
+
+      <div className="mx-auto mb-3 grid size-11 place-items-center rounded-sm border border-primary/40 bg-primary/10 text-primary">
+        <Lock className="size-4.5" />
       </div>
-      <h3 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-        {en ? "In-depth compatibility report" : "ღრმა თავსებადობის ანგარიში"}
+      <h3 className="text-balance text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+        {en ? "In-depth compatibility monograph" : "ღრმა თავსებადობის ანგარიში"}
       </h3>
       <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground">
         {en
-          ? `A complete reading of your connection with ${partnerName}, love, communication, trust, friction, long-term potential, and practical advice.`
-          : `${partnerName}-თან თქვენი კავშირის სრული წაკითხვა, სიყვარული, კომუნიკაცია, ნდობა, ხახუნი, გრძელვადიანი პოტენციალი და პრაქტიკული რჩევები.`}
+          ? `A complete reading of your connection with ${partnerName}: love, communication, trust, friction, long-term potential, and practical advice.`
+          : `${partnerName}-თან თქვენი კავშირის სრული წაკითხვა: სიყვარული, კომუნიკაცია, ნდობა, ხახუნი, გრძელვადიანი პოტენციალი და პრაქტიკული რჩევები.`}
       </p>
-      <Button variant="mystic" size="lg" className="mt-5" onClick={generate}>
+      <Button size="lg" className="mt-5" onClick={generate}>
         <Sparkles className="size-4" />
         {en ? "Create in-depth report" : "შექმენი ღრმა ანგარიში"}
       </Button>
       {status === "error" && error && (
-        <p className="mt-3 text-sm text-[var(--vivida-pink)]">{error}</p>
+        <p className="mt-3 text-sm text-destructive">{error}</p>
       )}
     </div>
   );

@@ -1,21 +1,19 @@
 import Link from "next/link";
 
-import {
-  GEORGIAN_SITE_URL,
-  englishSiteHref,
-  resolveEnglishPath,
-} from "@/lib/seo/locales";
+import { Button } from "@/components/ui/button";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { LunarPhaseDisc } from "@/components/brand/celestial-icons";
+import { computeMoonPhase, PHASE_LABEL_EN } from "@/lib/moon-phase";
+import { ObservatoryDrawer } from "@/components/nav/observatory-drawer";
+import { GEORGIAN_SITE_URL, englishSiteHref } from "@/lib/seo/locales";
 import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
-import { LanguageSelector } from "@/components/i18n/language-selector";
 
-const NAV = [
-  { href: "/natal-chart", label: "Natal chart" },
-  { href: "/horoscope", label: "Horoscope" },
-  { href: "/zodiac", label: "Zodiac" },
-  { href: "/tests", label: "Tests" },
-  { href: "/articles", label: "Articles" },
-  { href: "/readings", label: "Readings" },
+const NAV_ITEMS = [
+  { path: "/horoskopi", label: "Daily Horoscope" },
+  { path: "/natal-chart", label: "Natal Chart" },
+  { path: "/zodiac", label: "Zodiac Signs" },
+  { path: "/compatibility", label: "Compatibility" },
+  { path: "/tests", label: "Tests" },
 ];
 
 export async function EnglishHeader({
@@ -23,76 +21,104 @@ export async function EnglishHeader({
 }: {
   georgianPath?: string;
 }) {
-  // Also rendered on the Georgian host (signed-in user reading English), where
-  // /natal-chart, /horoscope and /compatibility are hard 404s. `/login` is
-  // deliberately left relative, the session cookie is per-domain.
   const onEnglishHost = await requestIsEnglishHost();
   const href = (path: string) => englishSiteHref(path, onEnglishHost);
-  const georgianHref = `${GEORGIAN_SITE_URL}${georgianPath === "/" ? "" : georgianPath}`;
+  const kaUrl = `${GEORGIAN_SITE_URL}${georgianPath === "/" ? "" : georgianPath}`;
+  const moonSnapshot = computeMoonPhase(new Date());
+  const illumPct = moonSnapshot
+    ? Math.round(moonSnapshot.illumination * 100)
+    : 50;
+
   return (
-    <header className="relative z-20 border-b border-border/30 bg-background/45 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md">
+      {/* Row 1: Strict 3-Zone Top Bar Contract */}
+      <div className="mx-auto flex h-15 w-full max-w-7xl items-center justify-between gap-8 px-4 sm:px-6">
+        {/* Zone 1: Single-line Brand Wordmark */}
         <Link
           href={href("/")}
-          className="flex shrink-0 items-center gap-2.5"
-          aria-label="Vivida English home"
+          className="inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap"
         >
-          <VividaMark size={38} id="english-header" />
-          <span
-            className="bg-clip-text text-lg font-semibold tracking-tight text-transparent sm:text-xl"
-            style={{
-              backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-            }}
-          >
-            vivida
+          <VividaMark size={28} id="english-header" />
+          <span className="font-display text-2xl font-medium tracking-tight text-foreground">
+            Vivida
           </span>
         </Link>
 
+        {/* Zone 2: 5 concise single-line text navigation links */}
         <nav
-          className="hidden items-center gap-5 text-sm text-muted-foreground lg:flex"
-          aria-label="English navigation"
+          aria-label="Primary navigation"
+          className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex"
         >
-          {NAV.map((item) => (
+          {NAV_ITEMS.map((item) => (
             <Link
-              key={item.href}
-              href={href(item.href)}
-              className="transition-colors hover:text-foreground"
+              key={item.path}
+              href={href(item.path)}
+              className="shrink-0 whitespace-nowrap transition-colors duration-150 hover:text-foreground"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <LanguageSelector
-            currentLocale="en"
-            englishHref={href(resolveEnglishPath(georgianPath))}
-            georgianHref={georgianHref}
-          />
+        {/* Zone 3: Primary CTA */}
+        <div className="flex shrink-0 items-center gap-3">
           <Link
-            href="/login"
-            className="rounded-full border border-[var(--vivida-cyan)]/45 bg-[var(--vivida-cyan)]/8 px-3.5 py-1.5 text-sm font-medium text-[var(--vivida-cyan)] transition-colors hover:bg-[var(--vivida-cyan)]/14 hover:text-foreground"
+            href={href("/login")}
+            className="hidden whitespace-nowrap text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
           >
             Sign in
           </Link>
+          <Button asChild size="sm" className="shrink-0 whitespace-nowrap">
+            <Link href={href("/signup")}>Create chart</Link>
+          </Button>
         </div>
       </div>
 
-      <nav
-        className="mx-auto flex w-full max-w-7xl gap-4 overflow-x-auto px-4 pb-3 text-xs text-muted-foreground lg:hidden"
-        aria-label="English mobile navigation"
-      >
-        {NAV.map((item) => (
-          <Link
-            key={item.href}
-            href={href(item.href)}
-            className="shrink-0 hover:text-foreground"
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+      {/* Row 2: Persistent Celestial Context Strip + Slide-Over Drawer */}
+      <div className="border-t border-border/70 bg-card/75">
+        <div className="mx-auto flex h-9 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
+            <span className="uppercase tracking-[0.16em] text-primary">
+              Ephemeris · UTC+4
+            </span>
+            {moonSnapshot && (
+              <Link
+                href={href("/mtvaris-kalendari")}
+                className="inline-flex items-center gap-2 truncate border-l border-border pl-3 transition-colors hover:text-foreground"
+              >
+                <LunarPhaseDisc
+                  phaseAngle={moonSnapshot.phaseAngle}
+                  size={15}
+                />
+                <span className="truncate">
+                  {PHASE_LABEL_EN[moonSnapshot.phaseKey]}
+                </span>
+                <span aria-hidden className="hidden sm:inline">
+                  ·
+                </span>
+                <span className="hidden text-primary sm:inline">
+                  {moonSnapshot.signSymbol} {moonSnapshot.signEn}
+                </span>
+                <span aria-hidden className="hidden sm:inline">
+                  ·
+                </span>
+                <span className="hidden sm:inline">{illumPct}%</span>
+              </Link>
+            )}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-3">
+            <a
+              href={kaUrl}
+              hrefLang="ka-GE"
+              className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+            >
+              KA
+            </a>
+            <ObservatoryDrawer authed={false} locale="en" />
+          </div>
+        </div>
+      </div>
     </header>
   );
 }

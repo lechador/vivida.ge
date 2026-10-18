@@ -1,1 +1,0 @@
-Generated from the existing Vivida star mark. Run `node scripts/generate-pwa-icons.mjs` after changing the SVG geometry in that script. The maskable mark is scaled to the central safe zone and every PNG has an opaque dark background.

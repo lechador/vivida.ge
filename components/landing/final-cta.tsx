@@ -1,46 +1,45 @@
-import { Sparkles } from "lucide-react";
-
 import { SignInButton } from "./sign-in-button";
 import { HOME_CONTENT } from "@/lib/seo/home-content";
-import { Reveal } from "@/components/landing/reveal";
+import { CornerCrosshair } from "@/components/brand/celestial-icons";
 
 export function FinalCta() {
-  const c = HOME_CONTENT.finalCta;
+  const cta = HOME_CONTENT.finalCta;
 
   return (
-    <section className="relative z-10 mx-auto w-full max-w-4xl px-4 py-24 sm:px-6 sm:py-32">
-      <Reveal
-        y={24}
-        durationMs={800}
-        className="relative overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/65 to-[var(--vivida-cyan)]/12 p-8 text-center ring-1 ring-foreground/10 backdrop-blur-xl sm:p-14"
-      >
-        {/* Animated conic glow, compositor CSS spins (was framer-motion). */}
-        <div
-          aria-hidden
-          className="vivida-spin-60 absolute -right-32 -top-32 size-96 rounded-full bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-20 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="vivida-spin-80 absolute -bottom-32 -left-32 size-96 rounded-full bg-[conic-gradient(from_180deg,var(--vivida-cyan),var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] opacity-20 blur-3xl"
-        />
+    <section
+      aria-labelledby="final-cta-heading"
+      className="relative mx-auto max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pb-28"
+    >
+      <div className="relative overflow-hidden rounded-sm border border-primary/35 bg-card p-8 sm:p-12">
+        <CornerCrosshair position="tl" />
+        <CornerCrosshair position="tr" />
+        <CornerCrosshair position="bl" />
+        <CornerCrosshair position="br" />
 
-        <Sparkles className="relative mx-auto mb-4 size-8 text-[var(--vivida-violet)]" />
-
-        <h2 className="relative text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-          <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {c.title}
-          </span>
-        </h2>
-
-        <p className="relative mx-auto mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg">
-          {c.body}
-        </p>
-
-        <div className="relative mt-10 flex flex-col items-center gap-3">
-          <SignInButton label={c.ctaText} />
-          <p className="text-xs text-muted-foreground/80">{c.subtext}</p>
+        <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-primary">
+              <span className="inline-block h-px w-5 bg-primary/70" />
+              პერსონალური ობსერვატორია
+            </div>
+            <h2
+              id="final-cta-heading"
+              className="mt-3 max-w-2xl text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-4xl"
+            >
+              {cta.title}
+            </h2>
+            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-base">
+              {cta.body}
+            </p>
+          </div>
+          <div className="flex flex-col items-start gap-2.5 lg:items-end">
+            <SignInButton label={cta.ctaText} source="final_cta" />
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+              {cta.subtext}
+            </p>
+          </div>
         </div>
-      </Reveal>
+      </div>
     </section>
   );
 }

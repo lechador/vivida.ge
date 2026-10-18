@@ -19,11 +19,6 @@ const KIND_GLYPH: Record<"sun" | "moon" | "ascendant", string> = {
   ascendant: "AC",
 };
 
-/**
- * One flat Big-Three row (Sun / Moon / Ascendant), same shape as the planet
- * list rows: glyph · name · sign · degree, with the interpretation inline.
- * The positions table scrolls here via #planet-<kind>.
- */
 export function BigThreeCard({
   kind,
   point,
@@ -42,20 +37,20 @@ export function BigThreeCard({
   return (
     <div
       id={`planet-${kind}`}
-      className="scroll-mt-20 border-t border-border/50 px-4 py-3.5 first:border-t-0 sm:px-5"
+      className="scroll-mt-20 border-t border-border px-4 py-4 first:border-t-0 sm:px-5"
     >
       <div className="flex items-center gap-3 text-sm">
         <span
           aria-hidden
           style={{ color }}
-          className="w-6 shrink-0 text-center text-base leading-none"
+          className="w-6 shrink-0 text-center font-mono text-base leading-none"
         >
           {KIND_GLYPH[kind]}
         </span>
-        <span className="w-24 shrink-0 font-medium sm:w-28">
+        <span className="w-24 shrink-0 font-semibold text-foreground sm:w-28">
           {en ? KIND_LABEL_EN[kind] : KIND_LABEL[kind]}
         </span>
-        <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
+        <span className="flex min-w-0 items-center gap-1.5 text-foreground/85">
           <span
             aria-hidden
             style={{ color }}
@@ -65,13 +60,13 @@ export function BigThreeCard({
           </span>
           <span className="truncate">{en ? sign.labelEn : sign.labelKa}</span>
         </span>
-        <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
+        <span className="ml-auto shrink-0 whitespace-nowrap font-mono text-xs tabular-nums text-muted-foreground">
           {formatDegree(point.signDegree)}
           {point.house ? ` · ${point.house} ${en ? "house" : "სახ."}` : ""}
         </span>
       </div>
       {interpretation && (
-        <p className="mt-2 pl-9 text-sm leading-relaxed text-foreground/85">
+        <p className="mt-2.5 pl-9 text-sm leading-relaxed text-foreground/85">
           {interpretation}
         </p>
       )}

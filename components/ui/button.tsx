@@ -5,36 +5,37 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.98]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-[0_8px_30px_-12px_oklch(0.78_0.18_305/0.6)] hover:brightness-110",
+          "bg-primary text-primary-foreground hover:bg-primary/90",
         mystic:
-          "relative text-white shadow-[0_10px_40px_-10px_oklch(0.65_0.24_305/0.6)] bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-[length:200%_200%] hover:bg-[position:100%_50%] transition-[background-position] duration-700",
+          "bg-primary text-primary-foreground hover:bg-primary/90",
         outline:
-          "border border-border bg-transparent text-foreground hover:bg-accent/10 hover:text-foreground",
-        ghost: "hover:bg-accent/10 text-foreground",
+          "border border-border bg-transparent text-foreground hover:bg-secondary/60 hover:text-foreground",
+        ghost:
+          "text-foreground/85 hover:bg-secondary/50 hover:text-foreground",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "border border-border/80 bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-12 rounded-xl px-7 text-base",
-        xl: "h-14 rounded-2xl px-9 text-lg",
-        icon: "h-11 w-11",
+        sm: "h-9 rounded-md px-3.5 text-xs",
+        lg: "h-11 rounded-md px-6 text-sm",
+        xl: "h-12 rounded-md px-7 text-base",
+        icon: "h-10 w-10",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 export interface ButtonProps
@@ -53,7 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 Button.displayName = "Button";
 

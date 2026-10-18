@@ -16,6 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { CreditHint } from "@/components/credits/credit-hint";
+import { TarotCardBackIllustration } from "@/components/brand/celestial-icons";
 import { CREDIT_COST } from "@/lib/credits-config";
 import {
   ANALYTICS_EVENT,
@@ -471,7 +472,7 @@ export function TarotReader({
       reading.followups.map((followup) => followup.question),
     );
     return (
-      <div className="rounded-2xl border border-border bg-background/35 p-4 sm:p-5">
+      <div className="rounded-md border border-border bg-background/50 p-4 sm:p-5">
         <div className="text-sm font-semibold text-foreground">
           {en ? "Go deeper into this spread" : "ჩაუღრმავდი ამ გაშლას"}
         </div>
@@ -492,31 +493,31 @@ export function TarotReader({
         {reading.followups.map((followup, index) => (
           <div
             key={index}
-            className="mt-3 rounded-xl border border-border/60 bg-background/40 p-3"
+            className="mt-3 rounded-sm border border-border bg-card p-3"
           >
-            <p className="text-xs font-medium text-[var(--vivida-violet)]">
+            <p className="font-mono text-xs text-primary">
               {followup.question}
             </p>
-            <p className="mt-1 text-sm leading-relaxed text-foreground/90">
+            <p className="mt-1.5 text-sm leading-relaxed text-foreground/90">
               {followup.answer}
             </p>
           </div>
         ))}
 
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {followupSuggestions.map((suggestion) => (
             <button
               key={suggestion}
               type="button"
               onClick={() => askFollowup(suggestion)}
               disabled={followupStatus === "sending"}
-              className="rounded-full border border-border bg-card/55 px-3 py-1.5 text-xs text-foreground/85 transition-colors hover:bg-card/80 disabled:opacity-50"
+              className="rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground disabled:opacity-50"
             >
               {suggestion}
             </button>
           ))}
         </div>
-        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-3 flex flex-col gap-2.5 sm:flex-row">
           <input
             id={inputId}
             type="text"
@@ -532,7 +533,7 @@ export function TarotReader({
                 ? "For example: How does this connect to my situation?"
                 : "მაგ: ეს ჩემს სიტუაციას როგორ უკავშირდება?"
             }
-            className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+            className="h-10 w-full rounded-md border border-border bg-background px-3.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
           />
           <Button
             type="button"
@@ -553,7 +554,7 @@ export function TarotReader({
         </div>
 
         {followupStatus === "short" && (
-          <div className="mt-3 rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
+          <div className="mt-3 rounded-md border border-border bg-card p-4 text-center text-sm">
             <ContextualPaywallActions
               locale={locale}
               balance={followupShort.balance}
@@ -566,7 +567,7 @@ export function TarotReader({
           </div>
         )}
         {followupStatus === "error" && (
-          <p className="mt-2 text-sm text-[var(--vivida-pink)]">
+          <p className="mt-2 text-sm text-destructive">
             {en
               ? "Something went wrong. Please try again."
               : "რაღაც ვერ მოხერხდა, სცადე ხელახლა."}
@@ -577,19 +578,19 @@ export function TarotReader({
   }
 
   return (
-    <div className="rounded-3xl border border-[var(--vivida-violet)]/50 bg-gradient-to-br from-[var(--vivida-violet)]/16 via-card/70 to-[var(--vivida-cyan)]/12 p-5 shadow-[0_28px_90px_-48px_rgba(141,103,255,0.9)] ring-1 ring-white/10 backdrop-blur-xl sm:p-8">
+    <div className="rounded-md border border-border bg-card p-5 sm:p-8">
       {/* Previous questions, reopen a spread (reply) or start fresh. */}
       {authed && history !== null && history.length > 0 && (
-        <div className="mb-4 rounded-2xl border border-border/60 bg-background/35">
+        <div className="mb-5 rounded-md border border-border bg-background/50">
           <button
             type="button"
             onClick={() => setHistoryOpen((open) => !open)}
             aria-expanded={historyOpen}
-            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-foreground/85"
+            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-foreground"
           >
-            <History className="size-4 text-[var(--vivida-violet)]" />
+            <History className="size-4 text-primary" />
             {en ? "Previous questions" : "წინა კითხვები"}
-            <span className="text-xs text-muted-foreground">
+            <span className="font-mono text-xs text-muted-foreground">
               · {history.length}
             </span>
             <ChevronDown
@@ -597,7 +598,7 @@ export function TarotReader({
             />
           </button>
           {historyOpen && (
-            <ul className="max-h-56 space-y-1 overflow-y-auto px-2 pb-2">
+            <ul className="max-h-56 divide-y divide-border overflow-y-auto border-t border-border">
               {history.map((item) => {
                 const active = item.id === activeHistoryId;
                 return (
@@ -605,16 +606,16 @@ export function TarotReader({
                     <button
                       type="button"
                       onClick={() => loadHistoryItem(item)}
-                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                      className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
                         active
-                          ? "bg-[var(--vivida-violet)]/15 text-foreground"
-                          : "text-foreground/80 hover:bg-card/70"
+                          ? "bg-primary/10 text-foreground"
+                          : "text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
                       }`}
                     >
                       <span className="min-w-0 flex-1 truncate">
                         {item.question}
                       </span>
-                      <span className="shrink-0 text-[11px] text-muted-foreground">
+                      <span className="shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground">
                         {new Date(item.createdAt).toLocaleDateString(
                           en ? "en-US" : "ka-GE",
                           { month: "short", day: "numeric" },
@@ -627,11 +628,11 @@ export function TarotReader({
             </ul>
           )}
           {activeHistoryId && (
-            <div className="px-4 pb-3">
+            <div className="border-t border-border px-4 py-2.5">
               <button
                 type="button"
                 onClick={reset}
-                className="text-xs font-medium text-[var(--vivida-violet)] hover:underline"
+                className="font-mono text-xs text-primary hover:underline"
               >
                 {en ? "＋ New question" : "＋ ახალი კითხვა"}
               </button>
@@ -641,7 +642,7 @@ export function TarotReader({
       )}
       {/* Spread picker */}
       <div
-        className="mb-3 flex flex-wrap gap-2"
+        className="mb-4 inline-flex flex-wrap rounded-md border border-border bg-background/60 p-1"
         role="group"
         aria-label={en ? "Spread type" : "გაშლის ტიპი"}
       >
@@ -652,10 +653,10 @@ export function TarotReader({
             onClick={() => setSpreadId(spread.id)}
             disabled={status === "drawing" || !!reading?.fromHistory}
             aria-pressed={spreadId === spread.id}
-            className={`rounded-full border px-3.5 py-2 text-sm transition-colors disabled:opacity-50 ${
+            className={`rounded-sm px-3.5 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
               spreadId === spread.id
-                ? "border-[var(--vivida-violet)]/60 bg-[var(--vivida-violet)]/15 text-foreground"
-                : "border-border bg-card/55 text-foreground/70 hover:bg-card/80"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {spread.name[locale]}
@@ -665,10 +666,10 @@ export function TarotReader({
       {/* Question box */}
       {reading?.fromHistory ? (
         <>
-          <div className="block text-sm font-medium text-foreground/90">
+          <div className="block font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
             {en ? "Question" : "კითხვა"}
           </div>
-          <div className="mt-2 rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground/85">
+          <div className="mt-2 rounded-md border border-border bg-background/60 px-4 py-3 text-sm text-foreground">
             {question}
           </div>
           <div className="mt-4">{renderFollowup("tarot-followup-top")}</div>
@@ -677,7 +678,7 @@ export function TarotReader({
         <>
           <label
             htmlFor="tarot-question"
-            className="block text-base font-semibold text-foreground"
+            className="block font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground"
           >
             {en ? "Your question" : "შენი კითხვა"}
           </label>
@@ -697,14 +698,13 @@ export function TarotReader({
                   ? "For example: What should I understand about this relationship?"
                   : "მაგ: რას მიპირებს ეს ურთიერთობა?"
               }
-              className="min-h-14 w-full rounded-2xl border border-[var(--vivida-violet)]/55 bg-[#09091a]/90 px-5 py-4 text-base text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_35px_-24px_rgba(141,103,255,0.9)] outline-none ring-1 ring-white/5 transition placeholder:text-muted-foreground/65 focus:border-[#c4adff] focus:ring-4 focus:ring-[var(--vivida-violet)]/15"
+              className="min-h-12 w-full rounded-md border border-border bg-background px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
             />
             <Button
               type="button"
-              variant="mystic"
               onClick={ask}
               disabled={status === "drawing" || question.trim().length < 3}
-              className="min-h-14 shrink-0 gap-2 rounded-2xl px-6 text-base shadow-[0_16px_36px_-20px_rgba(201,88,164,0.9)]"
+              className="min-h-12 shrink-0 gap-2 px-6 text-sm"
             >
               {status === "drawing" ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -726,7 +726,7 @@ export function TarotReader({
             disabled={status === "drawing"}
             maxLength={100}
             placeholder={en ? "Option A" : "ვარიანტი A"}
-            className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+            className="h-10 w-full rounded-md border border-border bg-background px-3.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
           />
           <input
             id="tarot-option-b"
@@ -736,11 +736,11 @@ export function TarotReader({
             disabled={status === "drawing"}
             maxLength={100}
             placeholder={en ? "Option B" : "ვარიანტი B"}
-            className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-[var(--vivida-violet)]/60"
+            className="h-10 w-full rounded-md border border-border bg-background px-3.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
           />
         </div>
       )}
-      <div className="mt-2">
+      <div className="mt-2.5">
         {!premium && (
           <CreditHint>
             {en
@@ -750,14 +750,13 @@ export function TarotReader({
         )}
       </div>
 
-      {/* Short-balance prompt, with the drawn spread as a teaser when the
-          server dealt one (same cards the paid retry will interpret). */}
+      {/* Short-balance prompt */}
       {status === "short" && (
         <div className="mt-8 space-y-5">
           {teaserPreview && (
             <TarotTeaserPreview preview={teaserPreview} locale={locale} />
           )}
-          <div className="rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center text-sm">
+          <div className="rounded-md border border-border bg-background/50 p-4 text-center text-sm">
             <ContextualPaywallActions
               locale={locale}
               balance={shortBalance}
@@ -771,21 +770,23 @@ export function TarotReader({
         </div>
       )}
       {status === "error" && (
-        <p className="mt-4 text-sm text-[var(--vivida-pink)]">
+        <p className="mt-4 text-sm text-destructive">
           {en
             ? "Something went wrong. Please try again."
             : "რაღაც ვერ მოხერხდა, სცადე ხელახლა."}
         </p>
       )}
 
-      {/* Drawing shimmer */}
+      {/* Drawing shimmer with bespoke engraved SVG card backs */}
       {status === "drawing" && (
         <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="vivida-pulse-soft aspect-[2/3] rounded-2xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10"
-            />
+              className="vivida-pulse-soft aspect-[2/3] overflow-hidden rounded-md border border-primary/40 bg-card"
+            >
+              <TarotCardBackIllustration />
+            </div>
           ))}
         </div>
       )}
@@ -799,8 +800,8 @@ export function TarotReader({
             ))}
           </div>
 
-          <div className="text-center">
-            <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <div className="border-b border-border pb-4 text-center">
+            <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
               {
                 (tarotSpreadById(reading.spreadId)?.name ?? {
                   ka: "ტარო",
@@ -808,27 +809,24 @@ export function TarotReader({
                 })[locale]
               }
             </div>
-            <h3 className="mt-1 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
+            <h3 className="mt-1.5 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
               {reading.headline}
             </h3>
           </div>
 
           {reading.degraded && (
-            <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-center text-sm leading-relaxed text-foreground/90">
+            <p className="rounded-md border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-center text-sm leading-relaxed text-foreground/90">
               {en
                 ? "The personalized AI interpretation was temporarily unavailable, so this reading is built from the cards' core meanings."
                 : "პერსონალური AI განმარტება დროებით მიუწვდომელი იყო, ამიტომ ეს პასუხი კარტების ძირითად მნიშვნელობებზეა აგებული."}
             </p>
           )}
 
-          <div className="space-y-2.5">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-background/40">
             {reading.cards.map((c, i) => (
-              <div
-                key={i}
-                className="rounded-2xl border border-border bg-background/35 px-4 py-3"
-              >
-                <div className="text-xs font-medium text-[var(--vivida-violet)]">
-                  {c.position} · {c.name}
+              <div key={i} className="px-4 py-3.5">
+                <div className="font-mono text-xs font-medium text-primary">
+                  0{i + 1} · {c.position} · {c.name}
                   {c.reversed && (en ? " (reversed)" : " (შებრუნებული)")}
                 </div>
                 <p className="mt-1 text-sm leading-relaxed text-foreground/90">
@@ -838,13 +836,13 @@ export function TarotReader({
             ))}
           </div>
 
-          <div className="rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 p-5">
+          <div className="rounded-md border border-primary/35 bg-primary/[0.06] p-5">
             <p className="text-[15px] leading-relaxed text-foreground/90">
               {reading.reading}
             </p>
             {reading.advice && (
-              <p className="mt-3 flex gap-2 text-sm font-medium text-[var(--vivida-cyan)]">
-                <Sparkles className="size-4 shrink-0" />
+              <p className="mt-3 flex gap-2 border-t border-border/60 pt-3 text-sm font-medium text-primary">
+                <Sparkles className="mt-0.5 size-4 shrink-0" />
                 {reading.advice}
               </p>
             )}
@@ -857,11 +855,11 @@ export function TarotReader({
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             {!reading.fromHistory && (
-              <span className="text-xs text-muted-foreground">
+              <span className="font-mono text-xs tabular-nums text-muted-foreground">
                 {reading.free
                   ? en
-                    ? "First reading, free ✦"
-                    : "პირველი კითხვა, უფასო ✦"
+                    ? "First reading · free"
+                    : "პირველი კითხვა · უფასო"
                   : en
                     ? `−${reading.charged} credits · ${reading.balance} remaining`
                     : `−${reading.charged} კრედიტი · ბალანსი ${reading.balance}`}
@@ -869,9 +867,9 @@ export function TarotReader({
             )}
             <div className="flex flex-wrap gap-2">
               {reading.libraryId && (
-                <Button asChild variant="outline" className="gap-1.5">
+                <Button asChild variant="outline" size="sm" className="gap-1.5">
                   <Link href={`/library/${reading.libraryId}`}>
-                    <BookOpen className="size-4" />
+                    <BookOpen className="size-3.5" />
                     {en ? "Saved" : "შენახულია"}
                   </Link>
                 </Button>
@@ -879,10 +877,11 @@ export function TarotReader({
               <Button
                 type="button"
                 variant="outline"
+                size="sm"
                 onClick={reset}
                 className="gap-1.5"
               >
-                <RotateCcw className="size-4" />
+                <RotateCcw className="size-3.5" />
                 {en ? "New question" : "ახალი კითხვა"}
               </Button>
             </div>
@@ -892,7 +891,7 @@ export function TarotReader({
             !premium &&
             !reading.fromHistory &&
             (reading.balance >= cost ? (
-              <div className="rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 p-4 text-center">
+              <div className="rounded-md border border-border bg-background/50 p-4 text-center">
                 <p className="text-sm font-medium text-foreground/90">
                   {en
                     ? `You have ${reading.balance} credits, enough for ${Math.floor(reading.balance / cost)} more reading${Math.floor(reading.balance / cost) === 1 ? "" : "s"}.`
@@ -900,7 +899,6 @@ export function TarotReader({
                 </p>
                 <Button
                   type="button"
-                  variant="mystic"
                   onClick={reset}
                   className="mt-3 gap-1.5"
                 >
@@ -909,7 +907,7 @@ export function TarotReader({
                 </Button>
               </div>
             ) : (
-              <div className="rounded-2xl border border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/8 p-4 text-center">
+              <div className="rounded-md border border-border bg-background/50 p-4 text-center">
                 <ContextualPaywallActions
                   locale={locale}
                   balance={reading.balance}
@@ -922,28 +920,33 @@ export function TarotReader({
               </div>
             ))}
 
-          {/* Free second-action rail, a next step at the peak-engagement
-              moment, instead of dead-ending at the credit-gated new question. */}
-          <div className="border-t border-border/40 pt-5 text-center">
-            <p className="text-xs text-muted-foreground">
+          {/* Free second-action rail */}
+          <div className="border-t border-border pt-5 text-center">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
               {en ? "Or keep exploring" : "ან განაგრძე"}
             </p>
-            <div className="mt-3 flex flex-wrap justify-center gap-2">
+            <div className="mt-3 flex flex-wrap justify-center gap-4 text-sm">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
                 {en ? "Daily horoscope" : "დღის ჰოროსკოპი"}
               </Link>
+              <span aria-hidden className="text-border">
+                ·
+              </span>
               <Link
                 href="/report"
-                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
                 {en ? "My natal chart" : "ჩემი ნატალური რუკა"}
               </Link>
+              <span aria-hidden className="text-border">
+                ·
+              </span>
               <Link
                 href="/tests"
-                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-2 text-sm transition-colors hover:bg-card/80"
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
                 {en ? "Tests" : "ტესტები"}
               </Link>
@@ -966,7 +969,7 @@ function TarotCardFace({
   const [imgOk, setImgOk] = useState(true);
   return (
     <figure
-      className="tarot-card-in overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/40 bg-[oklch(0.18_0.05_285)] ring-1 ring-foreground/10"
+      className="tarot-card-in overflow-hidden rounded-md border border-border bg-background"
       style={{ animationDelay: `${delayMs}ms` }}
     >
       <div
@@ -982,19 +985,15 @@ function TarotCardFace({
             className="size-full object-cover"
           />
         ) : (
-          <div className="flex size-full flex-col items-center justify-center gap-2 bg-[radial-gradient(70%_60%_at_50%_30%,oklch(0.32_0.14_300/0.6),transparent_70%)] p-2 text-center">
-            <span className="text-3xl">{card.glyph}</span>
+          <div className="flex size-full flex-col items-center justify-center gap-2 bg-secondary/40 p-2 text-center">
+            <span className="text-3xl text-primary">{card.glyph}</span>
             <span className="text-[10px] font-medium leading-tight text-foreground/80">
               {card.name}
             </span>
           </div>
         )}
       </div>
-      <figcaption
-        className={`px-2 py-1.5 text-center text-[10px] font-medium text-foreground/85 ${
-          card.reversed ? "" : ""
-        }`}
-      >
+      <figcaption className="border-t border-border px-2 py-1.5 text-center font-mono text-[10px] text-foreground/85">
         {card.name}
       </figcaption>
     </figure>
@@ -1026,7 +1025,7 @@ export function TarotTeaserPreview({
   return (
     <div>
       <div className="text-center">
-        <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
           {en ? "Your spread is ready" : "შენი გაშლა მზადაა"}
         </div>
         <h3 className="mt-1 text-balance text-xl font-semibold tracking-tight">
@@ -1038,7 +1037,7 @@ export function TarotTeaserPreview({
       <div className="mt-4 grid grid-cols-3 gap-3 sm:gap-4">
         {first && (
           <div>
-            <p className="mb-1.5 text-center text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <p className="mb-1.5 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
               {first.position}
             </p>
             <TarotCardFace
@@ -1049,7 +1048,7 @@ export function TarotTeaserPreview({
         )}
         {rest.map((card, i) => (
           <div key={i}>
-            <p className="mb-1.5 text-center text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <p className="mb-1.5 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
               {card.position}
             </p>
             <TarotCardBack delayMs={(i + 1) * 140} />
@@ -1057,7 +1056,7 @@ export function TarotTeaserPreview({
         ))}
       </div>
       <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-        <Lock className="size-3.5 text-[var(--vivida-gold)]" />
+        <Lock className="size-3.5 text-primary" />
         {en
           ? "Card meanings and your personal answer unlock below"
           : "კარტების მნიშვნელობები და პირადი პასუხი ქვემოთ გაიხსნება"}
@@ -1066,22 +1065,14 @@ export function TarotTeaserPreview({
   );
 }
 
-/** Face-down card, hides identity, keeps the spread's shape. */
+/** Face-down card with bespoke engraved astrolabe SVG back. */
 function TarotCardBack({ delayMs }: { delayMs: number }) {
   return (
     <div
-      className="tarot-card-in overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/40 bg-[oklch(0.18_0.05_285)] ring-1 ring-foreground/10"
+      className="tarot-card-in aspect-[2/3] overflow-hidden rounded-md border border-primary/40 bg-card"
       style={{ animationDelay: `${delayMs}ms` }}
     >
-      <div className="flex aspect-[2/3] flex-col items-center justify-center gap-2 bg-[radial-gradient(70%_60%_at_50%_30%,oklch(0.35_0.16_300/0.65),transparent_70%)] p-2">
-        <Sparkles className="size-7 text-[var(--vivida-violet)]" aria-hidden />
-        <span
-          aria-hidden
-          className="text-[10px] font-medium uppercase tracking-[0.3em] text-foreground/40"
-        >
-          ✦ ✦ ✦
-        </span>
-      </div>
+      <TarotCardBackIllustration />
     </div>
   );
 }

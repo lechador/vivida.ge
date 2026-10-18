@@ -13,9 +13,9 @@ import type { ArticlePreview } from "@/lib/articles";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Dashboard for accounts without birth details: a slim birth-data
- * CTA plus chart-free content (today's moon, quick tools, article picks, a
- * test promo) instead of a locked full-page wall, on both hosts.
+ * Editorial Celestial Dashboard for accounts without birth details:
+ * presents a clean astronomical almanac invitation alongside today's lunar
+ * telemetry, observatory tools, and curated essays.
  */
 export function NoChartDashboard({
   locale,
@@ -38,44 +38,28 @@ export function NoChartDashboard({
   return (
     <main
       lang={locale}
-      className="relative isolate flex flex-1 flex-col overflow-hidden"
+      className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className={
-          en
-            ? "absolute inset-0 -z-10 bg-[radial-gradient(50%_30%_at_50%_-5%,oklch(0.26_0.12_305/0.30),transparent_70%)]"
-            : "absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.16_305/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_350/0.3),transparent_70%)]"
-        }
-      />
-      {en ? null : (
-        <div
-          aria-hidden
-          className="vivida-nebula-drift absolute inset-0 -z-10 opacity-50 bg-[radial-gradient(45%_35%_at_30%_50%,oklch(0.40_0.18_305/0.15),transparent_70%)]"
-        />
-      )}
-      <Starfield count={en ? 70 : 120} shooting={en ? 1 : 3} />
+      <Starfield count={48} />
 
       <AppHeader authed active="today" />
 
-      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
+      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         {restricted && <RestrictedNotice locale={locale} />}
-        <h1
-          className={
-            en
-              ? "font-display mb-5 text-balance text-3xl font-medium tracking-[-0.01em] sm:text-4xl"
-              : "mb-5 text-balance text-xl font-semibold tracking-tight sm:text-2xl"
-          }
-        >
-          {en ? "Hello," : "სალამი,"}{" "}
-          {en ? (
-            firstName
-          ) : (
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {firstName}
-            </span>
-          )}
-        </h1>
+        <div className="mb-6 flex flex-col gap-1 border-b border-border/80 pb-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
+              {en ? "Personal Observatory" : "პირადი ობსერვატორია"}
+            </div>
+            <h1 className="mt-1 text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+              {en ? "Welcome," : "სალამი,"}{" "}
+              <span className="text-primary">{firstName}</span>
+            </h1>
+          </div>
+          <div className="font-mono text-xs tabular-nums text-muted-foreground">
+            {new Date().toISOString().slice(0, 10)} · UTC+4
+          </div>
+        </div>
 
         <BirthDataBanner locale={locale} />
 

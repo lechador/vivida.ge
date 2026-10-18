@@ -1,61 +1,39 @@
-import type { UserLocale } from "@/lib/i18n/locale";
-import { SPREAD_POSITIONS_KA } from "@/lib/tarot/deck";
-import { SPREAD_POSITIONS_EN } from "@/lib/tarot/deck-en";
-
-export type TarotSpreadId = "situation" | "relationship" | "choice";
+export type TarotSpreadId = "situation" | "love" | "choice";
 
 export type TarotSpread = {
   id: TarotSpreadId;
-  /** Short picker label per locale. */
-  name: Record<UserLocale, string>;
-  /** Card positions in draw order, per locale. */
-  positions: Record<UserLocale, readonly [string, string, string]>;
-  /**
-   * One clause describing the spread logic for the AI prompt, per locale.
-   * The "situation" clause matches the long-standing default prompt exactly.
-   */
-  readingLogic: Record<UserLocale, string>;
+  name: { ka: string; en: string };
+  positions: { ka: [string, string, string]; en: [string, string, string] };
 };
 
 export const TAROT_SPREADS: readonly TarotSpread[] = [
   {
     id: "situation",
-    name: { ka: "სიტუაცია", en: "Situation" },
+    name: { ka: "სიტუაციის გაშლა", en: "Situation Spread" },
     positions: {
-      ka: SPREAD_POSITIONS_KA,
-      en: SPREAD_POSITIONS_EN,
-    },
-    readingLogic: {
-      ka: "წარსული/ფესვი, აწმყო/ბირთვი, მომავალი/გზა",
-      en: "past/root, present/core, future/path",
+      ka: ["ფესვი", "ახლა", "მიმართულება"],
+      en: ["Root", "Present", "Direction"],
     },
   },
   {
-    id: "relationship",
+    id: "love",
     name: { ka: "ურთიერთობა", en: "Relationship" },
     positions: {
-      ka: ["ჩემი საჭიროება", "დაძაბულობა", "შესაძლო ნაბიჯი"],
-      en: ["My need", "The tension", "A possible step"],
-    },
-    readingLogic: {
-      ka: "ურთიერთობის დინამიკა: ჩემი საჭიროება, დაძაბულობა, შესაძლო ნაბიჯი",
-      en: "relationship dynamic: my need, the tension, a possible step",
+      ka: ["შენ", "პარტნიორი", "კავშირის დინამიკა"],
+      en: ["You", "Partner", "Connection"],
     },
   },
   {
     id: "choice",
-    name: { ka: "ორი გზა", en: "Two paths" },
+    name: { ka: "არჩევანი (A / B)", en: "Two Paths (A / B)" },
     positions: {
-      ka: ["პირველი გზა", "მეორე გზა", "საერთო რჩევა"],
-      en: ["First path", "Second path", "Shared counsel"],
-    },
-    readingLogic: {
-      ka: "ორი გზის შედარება: პირველი გზა, მეორე გზა, საერთო რჩევა",
-      en: "comparing two paths: first path, second path, shared counsel",
+      ka: ["გზა A", "გზა B", "მთავარი გასაღები"],
+      en: ["Path A", "Path B", "Key Insight"],
     },
   },
-];
+] as const;
 
-export function tarotSpreadById(id: unknown): TarotSpread | undefined {
-  return TAROT_SPREADS.find((spread) => spread.id === id);
+export function tarotSpreadById(id: unknown): TarotSpread | null {
+  if (typeof id !== "string") return null;
+  return TAROT_SPREADS.find((s) => s.id === id) ?? null;
 }

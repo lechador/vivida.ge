@@ -1,58 +1,78 @@
-import { Map, Sparkles, Users } from "lucide-react";
-
 import { HOME_CONTENT } from "@/lib/seo/home-content";
 import { Reveal } from "@/components/landing/reveal";
+import { CornerCrosshair } from "@/components/brand/celestial-icons";
 
-const ICONS = [Map, Sparkles, Users];
-const ACCENTS = [
-  "oklch(0.78 0.18 305)",
-  "oklch(0.78 0.18 200)",
-  "oklch(0.72 0.22 350)",
+const PILLAR_KICKERS = [
+  "AXIS 01 · NATAL EPHEMERIS",
+  "AXIS 02 · DAILY TRANSITS",
+  "AXIS 03 · RELATIONAL SYNASTRY",
 ];
 
 export function PillarsSection() {
   const pillars = HOME_CONTENT.pillars;
 
   return (
-    <section className="relative z-10 mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-24">
-      <div className="grid gap-4 sm:grid-cols-3 sm:gap-5">
-        {pillars.map((p, i) => {
-          const Icon = ICONS[i] ?? Sparkles;
-          const accent = ACCENTS[i] ?? "oklch(0.78 0.18 305)";
-          return (
-            <Reveal
-              as="article"
-              key={p.title}
-              y={30}
-              delayMs={i * 120}
-              className="group relative overflow-hidden rounded-3xl border border-border bg-card/55 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-1 hover:bg-card/75 hover:ring-foreground/15 sm:p-8"
-            >
-              <div
-                aria-hidden
-                className="absolute -right-12 -top-12 size-40 rounded-full opacity-30 blur-3xl transition-opacity group-hover:opacity-60"
-                style={{
-                  background: `radial-gradient(circle, ${accent} 0%, transparent 70%)`,
-                }}
-              />
-              <div
-                className="relative grid size-12 place-items-center rounded-2xl"
-                style={{
-                  background: `color-mix(in oklch, ${accent} 18%, transparent)`,
-                  boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${accent} 35%, transparent)`,
-                  color: accent,
-                }}
-              >
-                <Icon className="size-5" />
+    <section
+      id="about"
+      aria-labelledby="pillars-heading"
+      className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20"
+    >
+      <div className="relative overflow-hidden rounded-sm border border-border bg-card">
+        <CornerCrosshair position="tl" />
+        <CornerCrosshair position="tr" />
+        <CornerCrosshair position="bl" />
+        <CornerCrosshair position="br" />
+
+        <div className="border-b border-border bg-background/50 px-6 py-6 sm:px-10 sm:py-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-primary">
+                <span className="inline-block h-px w-5 bg-primary/70" />
+                სამი საყრდენი · მეთოდოლოგია
               </div>
-              <h3 className="relative mt-5 text-xl font-semibold tracking-tight sm:text-2xl">
-                {p.title}
-              </h3>
-              <p className="relative mt-2 text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
-                {p.body}
-              </p>
+              <h2
+                id="pillars-heading"
+                className="mt-2.5 max-w-2xl text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-4xl"
+              >
+                ასტრონომიული სიზუსტე, ნათარგმნი ადამიანურ ენაზე
+              </h2>
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              ARCHITECTURAL PILLARS · 0{pillars.length} AXES
+            </span>
+          </div>
+        </div>
+
+        <div className="grid gap-px bg-border lg:grid-cols-3">
+          {pillars.map((pillar, i) => (
+            <Reveal
+              key={pillar.title}
+              delayMs={i * 60}
+              className="flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary/20 sm:p-8"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-3">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+                    {PILLAR_KICKERS[i] ?? `AXIS 0${i + 1}`}
+                  </span>
+                  <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                    0{i + 1} / 0{pillars.length}
+                  </span>
+                </div>
+                <h3 className="mt-5 text-balance text-xl font-semibold tracking-tight text-foreground">
+                  {pillar.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {pillar.body}
+                </p>
+              </div>
+
+              <div className="mt-6 border-t border-border/60 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                SWISS EPHEMERIS · CALIBRATED
+              </div>
             </Reveal>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </section>
   );

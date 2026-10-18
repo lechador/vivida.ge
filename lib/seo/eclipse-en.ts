@@ -1,25 +1,65 @@
-import type { Eclipse } from "@/lib/seo/moon-events";
-
-export type EnglishEclipse = Pick<Eclipse, "slug" | "date" | "type" | "source"> & {
-  title: string;
+export type EnglishEclipse = {
+  slug: string;
+  date: string;
+  type: "solar" | "lunar";
   subtype: string;
-  visibility: string;
+  title: string;
   description: string;
+  visibility: string;
+  source: string;
 };
 
 export const ECLIPSES_EN: EnglishEclipse[] = [
-  { slug: "2026-08-12-mzis-sruli-dabneleba", date: "2026-08-12", title: "Total Solar Eclipse, August 12, 2026", type: "solar", subtype: "Total", visibility: "Totality crosses Greenland, Iceland, Spain, Russia, and a small part of Portugal; a partial eclipse is visible across much of Europe and other regions.", description: "The Moon completely covers the Sun within the narrow path of totality.", source: "https://science.nasa.gov/eclipses/future-eclipses/total-solar-eclipse-on-august-12-2026/" },
-  { slug: "2026-08-28-mtvaris-nawilobrivi-dabneleba", date: "2026-08-28", title: "Partial Lunar Eclipse, August 28, 2026", type: "lunar", subtype: "Partial", visibility: "Visible from the eastern Pacific, the Americas, Europe, and Africa.", description: "Part of the Moon enters Earth's darker umbral shadow.", source: "https://science.nasa.gov/moon/eclipses/" },
-  { slug: "2027-02-06-mzis-rgolisebri-dabneleba", date: "2027-02-06", title: "Annular Solar Eclipse, February 6, 2027", type: "solar", subtype: "Annular", visibility: "The annular path crosses Chile, Argentina, and the Atlantic; a partial eclipse is visible in parts of South America and Africa.", description: "The Moon covers the center of the Sun while a bright ring remains visible.", source: "https://science.nasa.gov/eclipses/future-eclipses/" },
-  { slug: "2027-02-20-mtvaris-naxevarchrdilovani-dabneleba", date: "2027-02-20", title: "Penumbral Lunar Eclipse, February 20, 2027", type: "lunar", subtype: "Penumbral", visibility: "Visible from the Americas, Europe, Africa, Asia, western Australia, and Antarctica.", description: "The Moon passes through Earth's faint outer shadow and dims subtly.", source: "https://science.nasa.gov/moon/eclipses/" },
-  { slug: "2027-07-18-mtvaris-naxevarchrdilovani-dabneleba", date: "2027-07-18", title: "Penumbral Lunar Eclipse, July 18, 2027", type: "lunar", subtype: "Penumbral", visibility: "Visible from Antarctica, Australia, and the Indian Ocean region.", description: "A very subtle penumbral eclipse that may be difficult to notice.", source: "https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html" },
-  { slug: "2027-08-02-mzis-sruli-dabneleba", date: "2027-08-02", title: "Total Solar Eclipse, August 2, 2027", type: "solar", subtype: "Total", visibility: "Totality crosses southern Spain, North Africa, the Middle East, and part of the Arabian Peninsula.", description: "A long total solar eclipse with broad partial visibility outside the path of totality.", source: "https://science.nasa.gov/eclipses/future-eclipses/" },
-  { slug: "2027-08-17-mtvaris-naxevarchrdilovani-dabneleba", date: "2027-08-17", title: "Penumbral Lunar Eclipse, August 17, 2027", type: "lunar", subtype: "Penumbral", visibility: "Visible around the Pacific Ocean and neighboring regions.", description: "The Moon's brightness changes slightly as it passes through Earth's penumbra.", source: "https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html" },
-  { slug: "2028-01-12-mtvaris-nawilobrivi-dabneleba", date: "2028-01-12", title: "Partial Lunar Eclipse, January 12, 2028", type: "lunar", subtype: "Partial", visibility: "Visible from the Americas, Europe, and Africa.", description: "A small portion of the Moon enters Earth's darker umbral shadow.", source: "https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html" },
-  { slug: "2028-01-26-mzis-rgolisebri-dabneleba", date: "2028-01-26", title: "Annular Solar Eclipse, January 26, 2028", type: "solar", subtype: "Annular", visibility: "The annular path crosses Ecuador, Peru, Brazil, Suriname, Spain, and Portugal; a partial eclipse is visible more widely.", description: "A bright ring of sunlight remains visible around the Moon.", source: "https://eclipse.gsfc.nasa.gov/SEdecade/SEdecade2021.html" },
-  { slug: "2028-07-06-mtvaris-nawilobrivi-dabneleba", date: "2028-07-06", title: "Partial Lunar Eclipse, July 6, 2028", type: "lunar", subtype: "Partial", visibility: "Visible from Europe, Africa, Asia, and Australia.", description: "Earth's umbral shadow covers part of the lunar disk.", source: "https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html" },
-  { slug: "2028-07-22-mzis-sruli-dabneleba", date: "2028-07-22", title: "Total Solar Eclipse, July 22, 2028", type: "solar", subtype: "Total", visibility: "Totality crosses Australia and New Zealand; a partial eclipse is visible in parts of Southeast Asia and the Pacific.", description: "The Sun's corona becomes visible inside the path of totality.", source: "https://eclipse.gsfc.nasa.gov/SEgoogle/SEgoogle2001/SE2028Jul22Tgoogle.html" },
-  { slug: "2028-12-31-mtvaris-sruli-dabneleba", date: "2028-12-31", title: "Total Lunar Eclipse, December 31, 2028", type: "lunar", subtype: "Total", visibility: "Visible from Europe, Africa, Asia, Australia, and the Pacific Ocean.", description: "The Moon moves fully into Earth's umbral shadow and may take on a reddish color.", source: "https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html" },
+  {
+    slug: "2026-08-12-mzis-dabneleba",
+    date: "2026-08-12",
+    type: "solar",
+    subtype: "Total",
+    title: "August 12, 2026 Total Solar Eclipse",
+    description:
+      "A total solar eclipse visible across the Arctic, Greenland, Iceland, and northern Spain, with a partial eclipse across Europe.",
+    visibility:
+      "Totality crosses Greenland, western Iceland, and northern Spain; partial phases are visible across much of Europe and North America.",
+    source: "https://science.nasa.gov/eclipses/",
+  },
+  {
+    slug: "2026-08-28-mtvaris-dabneleba",
+    date: "2026-08-28",
+    type: "lunar",
+    subtype: "Partial",
+    title: "August 28, 2026 Partial Lunar Eclipse",
+    description:
+      "A deep partial lunar eclipse visible across the Americas, Europe, Africa, and western Asia.",
+    visibility:
+      "Visible across North and South America, Europe, Africa, and parts of western Asia.",
+    source: "https://science.nasa.gov/eclipses/",
+  },
+  {
+    slug: "2027-02-06-mzis-dabneleba",
+    date: "2027-02-06",
+    type: "solar",
+    subtype: "Annular",
+    title: "February 6, 2027 Annular Solar Eclipse",
+    description:
+      "An annular solar eclipse tracking across South America, the Atlantic Ocean, and western Africa.",
+    visibility:
+      "Annularity is visible in Chile, Argentina, and parts of West Africa.",
+    source: "https://science.nasa.gov/eclipses/",
+  },
+  {
+    slug: "2027-08-02-mzis-dabneleba",
+    date: "2027-08-02",
+    type: "solar",
+    subtype: "Total",
+    title: "August 2, 2027 Total Solar Eclipse",
+    description:
+      "One of the longest total solar eclipses of the century, crossing southern Spain, North Africa, and the Middle East, with partial visibility in Georgia.",
+    visibility:
+      "Totality passes through Spain, Morocco, Algeria, Tunisia, Libya, Egypt, and Saudi Arabia; partial phases are visible across Europe and the Caucasus.",
+    source: "https://science.nasa.gov/eclipses/",
+  },
 ];
 
-export const eclipseEnBySlug = (slug: string) => ECLIPSES_EN.find((eclipse) => eclipse.slug === slug);
+export function eclipseEnBySlug(slug: string): EnglishEclipse | undefined {
+  return ECLIPSES_EN.find((e) => e.slug === slug);
+}

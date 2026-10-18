@@ -1,7 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -11,44 +10,38 @@ import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 export function SignInButton({
   label,
   loadingLabel,
+  size = "xl",
+  source = "home_hero",
 }: {
   label?: string;
   loadingLabel?: string;
+  size?: "default" | "sm" | "lg" | "xl";
+  source?: string;
 } = {}) {
   const [isPending, startTransition] = useTransition();
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className="relative inline-block"
+    <Button
+      variant="default"
+      size={size}
+      disabled={isPending}
+      onClick={() =>
+        startTransition(async () => {
+          trackEvent(ANALYTICS_EVENT.homePrimaryCtaClick, {
+            surface: source,
+            method: "google",
+          });
+          await signInWithGoogle("/post-login");
+        })
+      }
+      className="px-7 font-semibold tracking-tight"
     >
-      <motion.div
-        aria-hidden
-        className="absolute -inset-1 rounded-2xl bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-60 blur-xl"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-      />
-      <Button
-        variant="mystic"
-        size="xl"
-        disabled={isPending}
-        onClick={() =>
-          startTransition(async () => {
-            trackEvent(ANALYTICS_EVENT.homePrimaryCtaClick, {
-              surface: "home_hero",
-              method: "google",
-            });
-            await signInWithGoogle("/post-login");
-          })
-        }
-        className="relative bg-[linear-gradient(120deg,var(--vivida-cyan),var(--vivida-pink))] shadow-[0_14px_44px_-10px_oklch(0.78_0.18_200/0.55)]"
-      >
-        <Sparkles className="size-5" />
+      <span>
         {isPending
-          ? (loadingLabel ?? "ვარსკვლავებს ვალაგებთ…")
-          : (label ?? "შექმენი შენი რუკა ახლავე")}
-      </Button>
-    </motion.div>
+          ? (loadingLabel ?? "რუკა მზადდება…")
+          : (label ?? "შექმენი შენი რუკა უფასოდ")}
+      </span>
+      <ArrowRight className="size-4" />
+    </Button>
   );
 }

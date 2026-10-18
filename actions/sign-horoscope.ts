@@ -102,17 +102,22 @@ async function ensureSignHoroscopeUncached(
   if (!(ALL_SLUGS as string[]).includes(slug)) return null;
   const periodKey = signHoroscopePeriodKey(now, period);
 
-  const [existing] = await db
-    .select()
-    .from(signHoroscopes)
-    .where(
-      and(
-        eq(signHoroscopes.sign, slug),
-        eq(signHoroscopes.period, period),
-        eq(signHoroscopes.periodKey, periodKey)
+  let existing: SignHoroscope | undefined;
+  try {
+    [existing] = await db
+      .select()
+      .from(signHoroscopes)
+      .where(
+        and(
+          eq(signHoroscopes.sign, slug),
+          eq(signHoroscopes.period, period),
+          eq(signHoroscopes.periodKey, periodKey)
+        )
       )
-    )
-    .limit(1);
+      .limit(1);
+  } catch {
+    return null;
+  }
   if (existing && existing.promptVersion === SIGN_HOROSCOPE_PROMPT_VERSION) {
     return existing;
   }

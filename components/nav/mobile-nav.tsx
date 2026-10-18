@@ -16,12 +16,8 @@ import { navItems, navLabel, type NavActiveKey } from "./nav-items";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Mobile-only slide-in nav drawer. The desktop NavLinks is `hidden lg:flex`,
- * so phones/tablets need a hamburger entry point. Renders nothing above lg.
- *
- * The `tab` variant renders a bottom-tab-bar-styled "More" trigger instead
- * of the header hamburger, so the fifth tab opens this same drawer, no
- * dead links, no parallel menu to drift.
+ * Editorial Celestial Mobile Slide-In Navigation Drawer.
+ * Flat matte charcoal surface with crisp 1px hairline rows.
  */
 export function MobileNav({
   active,
@@ -34,7 +30,6 @@ export function MobileNav({
   locale?: UserLocale;
   variant?: "menu" | "tab";
   unreadMessages?: number;
-  /** Unopened proactive astrologer nudges, dot on the ask row. */
   pendingAskNudges?: number;
 }) {
   const [open, setOpen] = useState(false);
@@ -49,7 +44,7 @@ export function MobileNav({
             aria-label={moreLabel}
             aria-expanded={open}
             className={cn(
-              "group flex w-full flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[10px] font-medium transition-colors",
+              "group flex w-full flex-col items-center gap-0.5 rounded-md px-1 py-1.5 text-[10px] font-medium transition-colors",
               open
                 ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground",
@@ -57,14 +52,13 @@ export function MobileNav({
           >
             <span
               className={cn(
-                "relative grid size-9 place-items-center rounded-xl transition-all",
+                "relative grid size-8 place-items-center rounded-md transition-colors",
                 open
-                  ? "bg-[var(--vivida-violet)]/25 ring-1 ring-[var(--vivida-violet)]/60 shadow-[0_0_18px_-4px_oklch(0.65_0.24_305/0.6)]"
-                  : "group-active:scale-95",
+                  ? "bg-secondary text-primary"
+                  : "text-muted-foreground group-hover:text-foreground",
               )}
-              style={open ? { color: "oklch(0.78 0.18 305)" } : undefined}
             >
-              <Ellipsis className="size-5" />
+              <Ellipsis className="size-4.5" />
             </span>
             <span className="truncate">{moreLabel}</span>
           </button>
@@ -72,9 +66,9 @@ export function MobileNav({
           <button
             type="button"
             aria-label={locale !== "ka" ? "Menu" : "მენიუ"}
-            className="grid size-11 shrink-0 place-items-center rounded-full text-foreground/85 transition-colors hover:bg-card/60 hover:text-foreground lg:hidden"
+            className="grid size-10 shrink-0 place-items-center rounded-md border border-border bg-card text-foreground/85 transition-colors hover:bg-secondary hover:text-foreground lg:hidden"
           >
-            <Menu className="size-5" />
+            <Menu className="size-4.5" />
           </button>
         )}
       </DialogPrimitive.Trigger>
@@ -87,8 +81,8 @@ export function MobileNav({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.18 }}
-                className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
+                transition={{ duration: 0.15 }}
+                className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
               />
             </DialogPrimitive.Overlay>
 
@@ -97,42 +91,35 @@ export function MobileNav({
                 initial={{ x: "-100%" }}
                 animate={{ x: 0 }}
                 exit={{ x: "-100%" }}
-                transition={{ type: "spring", stiffness: 320, damping: 34 }}
-                className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col gap-6 border-r border-border bg-card/95 p-6 shadow-2xl ring-1 ring-foreground/10 backdrop-blur-xl"
+                transition={{ type: "spring", stiffness: 340, damping: 34 }}
+                className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col border-r border-border bg-card p-5"
               >
-                {/* Header, logo + close */}
-                <div className="flex items-center justify-between">
+                {/* Header: Brand Lockup + Close */}
+                <div className="flex items-center justify-between border-b border-border/80 pb-4">
                   <Link
                     href="/dashboard"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-2.5"
                   >
-                    <VividaMark size={36} id="mobile-nav" />
-                    <span
-                      className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
-                      style={{
-                        backgroundImage:
-                          "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-                      }}
-                    >
-                      vivida
+                    <VividaMark size={30} id="mobile-nav" />
+                    <span className="font-display text-2xl font-medium tracking-tight text-foreground">
+                      Vivida
                     </span>
                   </Link>
                   <DialogPrimitive.Close
                     aria-label={locale !== "ka" ? "Close" : "დახურვა"}
-                    className="grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-card/60 hover:text-foreground"
+                    className="grid size-9 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                   >
-                    <X className="size-5" />
+                    <X className="size-4" />
                   </DialogPrimitive.Close>
                 </div>
 
-                {/* For accessibility, Radix requires DialogTitle inside content. */}
                 <DialogPrimitive.Title className="sr-only">
                   {locale !== "ka" ? "Navigation" : "ნავიგაცია"}
                 </DialogPrimitive.Title>
 
                 {/* Nav items */}
-                <nav className="mb-2 flex flex-col gap-1 overflow-y-auto">
+                <nav className="my-4 flex flex-col gap-0.5 overflow-y-auto">
                   {navItems(locale).map((item) => {
                     const { Icon } = item;
                     const isActive = item.key === active;
@@ -146,47 +133,25 @@ export function MobileNav({
                         onNavigate={() => setOpen(false)}
                         aria-current={isActive ? "page" : undefined}
                         className={cn(
-                          "group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium transition-colors",
+                          "group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                           isActive
-                            ? "text-foreground"
-                            : "text-muted-foreground hover:text-foreground",
+                            ? "bg-secondary text-foreground"
+                            : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
                         )}
-                        style={
-                          {
-                            ["--nav-hue" as string]: item.hue,
-                          } as React.CSSProperties
-                        }
                       >
                         {isActive && (
                           <span
                             aria-hidden
-                            className="absolute inset-0 rounded-2xl"
-                            style={{
-                              background:
-                                "linear-gradient(135deg, color-mix(in oklch, var(--nav-hue) 22%, transparent), color-mix(in oklch, var(--nav-hue) 10%, transparent))",
-                              boxShadow:
-                                "inset 0 0 0 1px color-mix(in oklch, var(--nav-hue) 30%, transparent)",
-                            }}
+                            className="absolute inset-y-1.5 left-0 w-0.5 bg-primary"
                           />
                         )}
-                        {!isActive && (
-                          <span
-                            aria-hidden
-                            className="absolute inset-0 rounded-2xl bg-card/40 opacity-0 ring-1 ring-foreground/5 transition-opacity duration-150 group-hover:opacity-100"
-                          />
-                        )}
-                        <span className="relative z-10 grid place-items-center">
-                          <Icon
-                            className="size-5 transition-transform duration-200 group-hover:-rotate-6"
-                            style={
-                              isActive
-                                ? {
-                                    color: item.hue,
-                                    filter: `drop-shadow(0 0 6px ${item.hue})`,
-                                  }
-                                : undefined
-                            }
-                          />
+                        <span
+                          className={cn(
+                            "relative grid size-5 place-items-center",
+                            isActive ? "text-primary" : "text-muted-foreground",
+                          )}
+                        >
+                          <Icon className="size-4.5" />
                           {item.key === "messages" && (
                             <MessagesTabBadge
                               initial={unreadMessages}
@@ -200,21 +165,20 @@ export function MobileNav({
                             />
                           )}
                         </span>
-                        <span className="relative z-10">
-                          {navLabel(item, locale)}
-                        </span>
+                        <span>{navLabel(item, locale)}</span>
                       </NavItemLink>
                     );
                   })}
                 </nav>
-                <div className="mt-auto space-y-3 border-t border-border/60 pt-4">
+
+                <div className="mt-auto space-y-3 border-t border-border/80 pt-4">
                   <NavItemLink
                     href="/account"
                     itemKey="account"
                     surface="mobile_nav"
                     locale={locale}
                     onNavigate={() => setOpen(false)}
-                    className="block text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="block text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {locale === "en"
                       ? "Account & settings →"
@@ -223,7 +187,7 @@ export function MobileNav({
                   <InstallAppButton
                     locale={locale}
                     surface="mobile_nav"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-3 py-2.5 text-sm font-medium text-foreground"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-border bg-secondary/40 px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
                   />
                 </div>
               </motion.aside>

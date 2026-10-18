@@ -40,17 +40,17 @@ const FAMILY_META: Record<
   { color: string; labelKa: string; labelEn: string }
 > = {
   harmonic: {
-    color: "oklch(0.78 0.18 200)",
+    color: "oklch(0.80 0.12 80)",
     labelKa: "ჰარმონიული",
     labelEn: "Harmonious",
   },
   tense: {
-    color: "oklch(0.72 0.22 350)",
+    color: "oklch(0.68 0.12 35)",
     labelKa: "დაძაბული",
     labelEn: "Dynamic",
   },
   neutral: {
-    color: "oklch(0.85 0.16 85)",
+    color: "oklch(0.76 0.06 235)",
     labelKa: "შერწყმული",
     labelEn: "Concentrated",
   },
@@ -63,11 +63,6 @@ function bodyLabel(key: string, locale: UserLocale): string {
   return locale !== "ka" ? (meta?.labelEn ?? key) : (meta?.labelKa ?? key);
 }
 
-/**
- * Flat aspects list, grouped by family (harmonic / tense / neutral), tightest
- * orb first. One scannable row per aspect, glyph · A · kind · B · orb, with
- * the interpretation expanding inline. Replaces the old big aspect cards.
- */
 export function AspectCards({
   chart,
   interpretations,
@@ -79,6 +74,7 @@ export function AspectCards({
 }) {
   const en = locale !== "ka";
   const [openKey, setOpenKey] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<"all" | Family>("all");
   const aspects = chart.aspects ?? [];
 
   if (aspects.length === 0) {
@@ -101,9 +97,62 @@ export function AspectCards({
     byFamily[fam].push(a);
   }
 
+  const visibleFamilies =
+    activeFilter === "all" ? FAMILY_ORDER : ([activeFilter] as const);
+
   return (
-    <div className="space-y-6">
-      {FAMILY_ORDER.map((family) => {
+    <div className="space-y-5">
+      {/* Segmented control bar (Zero-Pill discipline) */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
+        <div
+          role="tablist"
+          aria-label={en ? "Filter aspects by family" : "ასპექტების ფილტრი"}
+          className="inline-flex divide-x divide-border overflow-hidden rounded-sm border border-border bg-background"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeFilter === "all"}
+            onClick={() => setActiveFilter("all")}
+            className={cn(
+              "px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-colors",
+              activeFilter === "all"
+                ? "bg-primary/15 font-medium text-primary"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {en ? "All" : "ყველა"} ({aspects.length})
+          </button>
+          {FAMILY_ORDER.map((fam) => {
+            const count = byFamily[fam].length;
+            if (count === 0) return null;
+            const meta = FAMILY_META[fam];
+            const isSelected = activeFilter === fam;
+            return (
+              <button
+                key={fam}
+                type="button"
+                role="tab"
+                aria-selected={isSelected}
+                onClick={() => setActiveFilter(fam)}
+                className={cn(
+                  "px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-colors",
+                  isSelected
+                    ? "bg-primary/15 font-medium text-primary"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {en ? meta.labelEn : meta.labelKa} ({count})
+              </button>
+            );
+          })}
+        </div>
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          {en ? "SORTED BY TIGHTEST ORB (0.0° →)" : "დალაგებულია უმცირესი ორბით"}
+        </span>
+      </div>
+
+      {visibleFamilies.map((family) => {
         const items = [...byFamily[family]].sort((a, b) => a.orb - b.orb);
         if (items.length === 0) return null;
         const meta = FAMILY_META[family];
@@ -111,30 +160,27 @@ export function AspectCards({
         return (
           <div key={family}>
             <div
-              className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider"
+              className="mb-2 flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em]"
               style={{ color: meta.color }}
             >
               {en ? meta.labelEn : meta.labelKa}
               <span className="text-muted-foreground">· {items.length}</span>
             </div>
-            <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
+            <div className="divide-y divide-border overflow-hidden rounded-sm border border-border bg-card">
               {items.map((a) => {
                 const k = aspectKey(a.a, a.b, a.kind);
                 const text = interpretations?.[k];
                 const open = openKey === k;
                 return (
-                  <div
-                    key={k}
-                    className="border-t border-border/50 first:border-t-0"
-                  >
+                  <div key={k}>
                     <button
                       type="button"
                       onClick={() => text && setOpenKey(open ? null : k)}
                       disabled={!text}
                       aria-expanded={open}
                       className={cn(
-                        "flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors sm:px-5",
-                        text && "cursor-pointer hover:bg-card/70",
+                        "flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm transition-colors sm:px-5",
+                        text && "cursor-pointer hover:bg-secondary/40",
                       )}
                     >
                       <span
@@ -144,31 +190,31 @@ export function AspectCards({
                       >
                         {ASPECT_SYMBOL[a.kind] ?? "·"}
                       </span>
-                      <span className="font-medium">
+                      <span className="font-medium text-foreground">
                         {bodyLabel(a.a, locale)}
                       </span>
                       <span className="text-muted-foreground">
                         {(en ? ASPECT_LABEL_EN : ASPECT_LABEL_KA)[a.kind] ??
                           a.kind}
                       </span>
-                      <span className="font-medium">
+                      <span className="font-medium text-foreground">
                         {bodyLabel(a.b, locale)}
                       </span>
-                      <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
+                      <span className="ml-auto shrink-0 whitespace-nowrap font-mono text-xs tabular-nums text-muted-foreground">
                         {a.orb.toFixed(1)}°
                       </span>
                       {text && (
                         <ChevronDown
                           aria-hidden
                           className={cn(
-                            "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
+                            "size-4 shrink-0 text-muted-foreground transition-transform duration-150",
                             open && "rotate-180",
                           )}
                         />
                       )}
                     </button>
                     {open && text && (
-                      <div className="border-t border-border/40 px-4 pb-3 pt-2 text-sm leading-relaxed text-foreground/90 sm:px-5">
+                      <div className="border-t border-border bg-secondary/20 px-4 pb-3.5 pt-2.5 text-sm leading-relaxed text-foreground/90 sm:px-5">
                         {text}
                       </div>
                     )}

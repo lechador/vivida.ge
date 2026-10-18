@@ -292,29 +292,29 @@ export function ChartChat({
 
   return (
     <div className="chat-panel-in flex min-h-0 flex-1 flex-col">
-      {/* Messages, the only scrolling region, so the header and composer
-          stay put no matter how long the answer gets. */}
+      {/* Messages, the only scrolling region */}
       <div
         ref={listRef}
         onScroll={handleListScroll}
         className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1"
       >
         {empty && (
-          <div className="relative overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/25 bg-card/55 p-6 text-center shadow-[0_8px_40px_-16px_var(--vivida-violet)] ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--vivida-violet),var(--vivida-pink),transparent)]"
-            />
-            <div className="mx-auto mb-4 grid size-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] text-white shadow-lg shadow-[var(--vivida-violet)]/30">
-              <Sparkles className="size-5" />
+          <div className="rounded-md border border-border bg-card p-6 sm:p-8">
+            <div className="mb-3 flex items-center gap-2.5">
+              <div className="grid size-9 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+                <Sparkles className="size-4" />
+              </div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                {en ? "EPHEMERIS DIALOGUE" : "ასტროლოგიური დიალოგი"}
+              </div>
             </div>
-            <p className="text-pretty text-[15px] leading-relaxed text-foreground/85">
+            <p className="text-pretty text-[15px] leading-relaxed text-foreground/90">
               {firstName ? `${firstName}, ` : ""}
               {en
-                ? "ask me anything about your chart, personality, emotions, relationships, career or timing."
-                : "დამისვი შეკითხვა შენი რუკის შესახებ, ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო."}
+                ? "ask anything about your natal chart, personality, emotional patterns, relationships, career, or transit timing."
+                : "დამისვი შეკითხვა შენი რუკის შესახებ: ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო."}
             </p>
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
               {starters.map((starter) => (
                 <button
                   key={starter.id}
@@ -328,7 +328,7 @@ export function ChartChat({
                     });
                     void send(starter.text);
                   }}
-                  className="rounded-full border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-3.5 py-1.5 text-[13px] text-foreground/85 shadow-sm transition-all hover:-translate-y-px hover:bg-[var(--vivida-violet)]/20 hover:shadow"
+                  className="rounded-sm border border-border bg-secondary/30 px-3.5 py-2.5 text-left text-[13px] text-foreground/85 transition-colors hover:border-primary/40 hover:bg-secondary/60 hover:text-foreground"
                 >
                   {starter.text}
                 </button>
@@ -346,7 +346,7 @@ export function ChartChat({
                     });
                     void send(topic.prompt);
                   }}
-                  className="rounded-full border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/10 px-3.5 py-1.5 text-[13px] text-foreground/85 shadow-sm transition-all hover:-translate-y-px hover:bg-[var(--vivida-cyan)]/20 hover:shadow"
+                  className="rounded-sm border border-primary/30 bg-primary/8 px-3.5 py-2.5 text-left text-[13px] text-foreground/90 transition-colors hover:bg-primary/15"
                 >
                   {topic.label}
                 </button>
@@ -361,19 +361,19 @@ export function ChartChat({
               key={i}
               className={`flex justify-end ${i >= initialCount ? "chat-msg-in" : ""}`}
             >
-              <div className="max-w-[85%] rounded-2xl rounded-br-md border border-white/15 bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap text-white shadow-lg shadow-[var(--vivida-violet)]/20">
+              <div className="max-w-[85%] rounded-md border border-primary/35 bg-primary/14 px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
                 {m.content}
               </div>
             </div>
           ) : (
             <div
               key={i}
-              className={`flex items-start gap-2.5 ${i >= initialCount ? "chat-msg-in" : ""}`}
+              className={`flex items-start gap-3 ${i >= initialCount ? "chat-msg-in" : ""}`}
             >
-              <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-cyan))] text-white shadow-md shadow-[var(--vivida-violet)]/25">
+              <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-sm border border-border bg-secondary/60 text-primary">
                 <Sparkles className="size-3.5" />
               </div>
-              <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-[var(--vivida-violet)]/15 bg-card/70 px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap text-foreground/90 shadow-sm ring-1 ring-foreground/5 backdrop-blur-xl">
+              <div className="max-w-[85%] rounded-md border border-border bg-card px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
                 {m.content || <TypingDots />}
               </div>
             </div>
@@ -383,7 +383,7 @@ export function ChartChat({
 
       {error && (
         <div className="mt-3 shrink-0">
-          <p className="text-sm text-[var(--vivida-pink)]">{error}</p>
+          <p className="text-sm text-destructive">{error}</p>
           {needsCredits && (
             <div className="mt-2">
               <ContextualPaywallActions
@@ -401,7 +401,7 @@ export function ChartChat({
 
       {/* Composer, pinned at the bottom of the chat panel */}
       {followUp && !followUpDismissed && (
-        <div className="mb-2 flex shrink-0 items-center gap-2 rounded-2xl border border-[var(--vivida-pink)]/25 bg-[var(--vivida-pink)]/8 px-3 py-2">
+        <div className="mb-2 flex shrink-0 items-center gap-2 rounded-sm border border-primary/30 bg-primary/8 px-3 py-2">
           <button
             type="button"
             onClick={() => {
@@ -423,7 +423,7 @@ export function ChartChat({
             type="button"
             aria-label={en ? "Dismiss" : "დახურვა"}
             onClick={() => setFollowUpDismissed(true)}
-            className="grid size-6 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/10"
+            className="grid size-6 shrink-0 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-secondary"
           >
             <X className="size-3.5" />
           </button>
@@ -434,7 +434,7 @@ export function ChartChat({
         <div
           role="group"
           aria-label={en ? "Answer length" : "პასუხის სიგრძე"}
-          className="flex rounded-full border border-border bg-card/70 p-0.5 text-[12px] backdrop-blur-xl"
+          className="inline-flex rounded-sm border border-border bg-card p-0.5 text-[12px]"
         >
           {DEPTHS.map((d) => (
             <button
@@ -442,9 +442,9 @@ export function ChartChat({
               type="button"
               onClick={() => pickDepth(d)}
               aria-pressed={depth === d}
-              className={`rounded-full px-3 py-1 transition-all ${
+              className={`rounded-xs px-3 py-1 transition-colors ${
                 depth === d
-                  ? "bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink))] font-medium text-white shadow"
+                  ? "bg-primary font-medium text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -459,7 +459,7 @@ export function ChartChat({
             setMemoryOpen((v) => !v);
           }}
           aria-expanded={memoryOpen}
-          className="flex items-center gap-1.5 rounded-full border border-border bg-card/70 px-3 py-1.5 text-[12px] text-muted-foreground backdrop-blur-xl transition-colors hover:text-foreground"
+          className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-[12px] text-muted-foreground transition-colors hover:text-foreground"
         >
           <Brain className="size-3.5" />
           {en ? "Memory" : "მეხსიერება"}
@@ -467,7 +467,7 @@ export function ChartChat({
       </div>
 
       {memoryOpen && (
-        <div className="mb-2 shrink-0 rounded-2xl border border-border bg-card/80 p-3.5 text-[13px] leading-relaxed backdrop-blur-xl">
+        <div className="mb-2 shrink-0 rounded-md border border-border bg-card p-3.5 text-[13px] leading-relaxed">
           <p className="mb-1.5 font-medium text-foreground/90">
             {en ? "What I remember about you" : "რა მახსოვს შენზე"}
           </p>
@@ -496,9 +496,9 @@ export function ChartChat({
                 type="button"
                 onClick={() => void forgetMemory()}
                 disabled={forgetting}
-                className={`mt-2.5 rounded-full border px-3 py-1 text-[12px] transition-colors disabled:opacity-50 ${
+                className={`mt-2.5 rounded-sm border px-3 py-1 text-[12px] transition-colors disabled:opacity-50 ${
                   forgetArmed
-                    ? "border-[var(--vivida-pink)]/50 bg-[var(--vivida-pink)]/15 text-foreground"
+                    ? "border-destructive/50 bg-destructive/15 text-foreground"
                     : "border-border text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -512,7 +512,7 @@ export function ChartChat({
                       ? "Forget everything about me"
                       : "დაავიწყე ჩემ შესახებ ყველაფერი"}
               </button>
-              <div className="mt-3 flex items-center justify-between gap-2 border-t border-border/60 pt-2.5">
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-2.5">
                 <span className="text-muted-foreground">
                   {en ? "Proactive check-ins" : "პროაქტიული შეხსენებები"}
                 </span>
@@ -526,13 +526,13 @@ export function ChartChat({
                   onClick={() => void toggleNudges()}
                   className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
                     memory.nudgesEnabled
-                      ? "bg-[var(--vivida-violet)]"
-                      : "bg-foreground/15"
+                      ? "bg-primary"
+                      : "bg-secondary"
                   }`}
                 >
                   <span
                     aria-hidden
-                    className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-all ${
+                    className={`absolute top-0.5 size-5 rounded-full bg-background shadow transition-all ${
                       memory.nudgesEnabled ? "left-[22px]" : "left-0.5"
                     }`}
                   />
@@ -554,9 +554,9 @@ export function ChartChat({
           e.preventDefault();
           send(input);
         }}
-        className="mt-4 shrink-0"
+        className="mt-3 shrink-0"
       >
-        <div className="rounded-2xl border border-border bg-card/80 shadow-xl ring-1 ring-foreground/5 backdrop-blur-xl transition-shadow focus-within:border-[var(--vivida-violet)]/50 focus-within:shadow-[0_0_0_3px_var(--vivida-violet)/15,0_8px_40px_-16px_var(--vivida-violet)]">
+        <div className="rounded-md border border-border bg-card transition-colors focus-within:border-primary/60">
           <div className="flex items-end gap-2 p-2">
             <textarea
               ref={composerRef}
@@ -579,7 +579,7 @@ export function ChartChat({
               type="submit"
               disabled={sending || !input.trim() || overLimit}
               aria-label={en ? "Send" : "გაგზავნა"}
-              className="grid size-10 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] text-white shadow-md transition-all hover:scale-105 hover:shadow-lg active:scale-95 disabled:scale-100 disabled:opacity-40"
+              className="grid size-9 shrink-0 place-items-center rounded-sm bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
             >
               <Send className="size-4" />
             </button>
@@ -588,7 +588,7 @@ export function ChartChat({
             <div className="flex justify-end px-3 pb-1.5">
               <span
                 id="chat-char-counter"
-                className={`text-[11px] tabular-nums ${remaining < 0 || overLimit ? "text-[var(--vivida-pink)]" : remaining < 500 ? "text-muted-foreground" : "text-muted-foreground/70"}`}
+                className={`font-mono text-[11px] tabular-nums ${remaining < 0 || overLimit ? "text-destructive" : remaining < 500 ? "text-muted-foreground" : "text-muted-foreground/70"}`}
               >
                 {en
                   ? `${input.length.toLocaleString("en-US")} / ${CHAT_MAX_INPUT_LEN.toLocaleString("en-US")}`
@@ -608,8 +608,8 @@ export function ChartChat({
         </div>
         <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
           {en
-            ? "AI astrologers can be wrong, use this for reflection, not decisions."
-            : "AI ასტროლოგი ცდება, გამოიყენე რეფლექსიისთვის, არა გადაწყვეტილებებისთვის."}
+            ? "Astrological interpretations are for reflection, not high-stakes decisions."
+            : "ასტროლოგიური ანალიზი განკუთვნილია რეფლექსიისთვის, არა გადაწყვეტილებებისთვის."}
         </p>
       </form>
     </div>
@@ -622,7 +622,7 @@ function TypingDots() {
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="size-1.5 rounded-full bg-[var(--vivida-violet)]"
+          className="size-1.5 rounded-full bg-primary"
           style={{
             animation: "vivida-typing-bounce 1.2s infinite",
             animationDelay: `${i * 0.15}s`,

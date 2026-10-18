@@ -8,11 +8,6 @@ import { softDeletePartner } from "@/actions/partners";
 import { cn } from "@/lib/utils";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
-/**
- * Saved-partner row on /synastry. Click → /synastry/[id]; trash → soft delete.
- * Soft delete is intentional, the row stays in the DB so the monthly
- * creation cap remains non-gameable, but the user sees the partner gone.
- */
 export function PartnerCard({
   id,
   name,
@@ -48,28 +43,26 @@ export function PartnerCard({
     <Link
       href={`/synastry/${id}`}
       className={cn(
-        "group relative flex items-start gap-3 overflow-hidden rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:border-foreground/15 hover:bg-card/80",
-        isPending && "opacity-50 pointer-events-none",
+        "group relative flex h-full items-start gap-3.5 bg-card p-5 transition-colors hover:bg-secondary/40",
+        isPending && "pointer-events-none opacity-50",
       )}
     >
-      <div
-        aria-hidden
-        className="absolute -right-10 -top-10 size-32 rounded-full bg-[radial-gradient(circle,var(--vivida-pink)_0%,transparent_70%)] opacity-25 blur-2xl transition-opacity group-hover:opacity-40"
-      />
-      <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[var(--vivida-violet)]/30 to-[var(--vivida-pink)]/30 text-base font-semibold text-foreground/90 ring-1 ring-foreground/10">
+      <div className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 font-mono text-sm font-semibold text-primary">
         {name.slice(0, 1).toUpperCase()}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <div className="truncate text-base font-semibold tracking-tight">{name}</div>
+          <div className="truncate text-base font-semibold tracking-tight text-foreground group-hover:text-primary">
+            {name}
+          </div>
           {connected && (
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--vivida-cyan)]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--vivida-cyan)]">
+            <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[10px] font-medium uppercase tracking-wider text-primary">
               <Link2 className="size-2.5" aria-hidden />
               {locale !== "ka" ? "Connected" : "ერთად"}
             </span>
           )}
         </div>
-        <div className="mt-0.5 truncate text-xs text-muted-foreground">
+        <div className="mt-1 truncate font-mono text-xs tabular-nums text-muted-foreground">
           {dateOfBirth} · {cityName}
         </div>
       </div>
@@ -78,7 +71,7 @@ export function PartnerCard({
           type="button"
           onClick={onDelete}
           disabled={isPending}
-          className="relative grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
+          className="relative grid size-8 shrink-0 place-items-center rounded-sm text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
           aria-label={locale !== "ka" ? `Remove ${name}` : `წაშლა, ${name}`}
           title={locale !== "ka" ? "Remove" : "წაშლა"}
         >

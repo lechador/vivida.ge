@@ -1,64 +1,118 @@
-"use client";
-
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
-import { signByIndex } from "@/lib/zodiac";
-import type { NatalChartJson } from "@/db/schema";
+import { formatDegree, signByIndex, signColor } from "@/lib/zodiac";
+import { CornerCrosshair } from "@/components/brand/celestial-icons";
+import type { NatalChartJson, PointJson } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
-const ITEMS: Array<{
-  kind: "sun" | "moon" | "ascendant";
-  label: string;
-  labelEn: string;
-  glyph: string;
-}> = [
-  { kind: "sun", label: "მზე", labelEn: "Sun", glyph: "☉" },
-  { kind: "moon", label: "მთვარე", labelEn: "Moon", glyph: "☽" },
-  { kind: "ascendant", label: "ამომავალი", labelEn: "Rising", glyph: "AC" },
-];
-
-/**
- * Compact glance at the user's Sun / Moon / Ascendant, three small tiles,
- * no interpretations. Lives on the home page; click-through goes to the
- * full /report.
- */
-export function MiniBigThree({ chart, locale = "ka" }: { chart: NatalChartJson; locale?: UserLocale }) {
+export function MiniBigThree({
+  chart,
+  locale = "ka",
+}: {
+  chart: NatalChartJson;
+  locale?: UserLocale;
+}) {
   const en = locale !== "ka";
+  if (!chart?.bodies) return null;
+
+  const sun: PointJson | undefined = chart.bodies.sun;
+  const moon: PointJson | undefined = chart.bodies.moon;
+  const asc: PointJson = chart.ascendant;
+  if (!sun || !moon || !asc) return null;
+
+  const items: {
+    code: string;
+    label: string;
+    role: string;
+    glyph: string;
+    point: PointJson;
+  }[] = [
+    {
+      code: "01 · SOLAR",
+      label: en ? "Sun" : "მზე",
+      role: en ? "Core identity" : "არსი",
+      glyph: "☉",
+      point: sun,
+    },
+    {
+      code: "02 · LUNAR",
+      label: en ? "Moon" : "მთვარე",
+      role: en ? "Inner world" : "შინაგანი",
+      glyph: "☽",
+      point: moon,
+    },
+    {
+      code: "03 · HORIZON",
+      label: en ? "Ascendant" : "ამომავალი",
+      role: en ? "First impression" : "გარეგანი",
+      glyph: "↑",
+      point: asc,
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {ITEMS.map((item) => {
-        const point =
-          item.kind === "ascendant"
-            ? chart.ascendant
-            : chart.bodies[item.kind];
-        if (!point) return null;
-        const sign = signByIndex(point.signIndex);
-        return (
-          <Link
-            key={item.kind}
-            href="/report"
-            className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/40 px-4 py-4 backdrop-blur-xl transition-colors hover:border-[var(--vivida-violet)]/40"
-          >
-            <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {en ? item.labelEn : item.label}
-            </div>
-            <div className="mt-1 flex items-baseline gap-1.5">
-              <span className="text-lg font-semibold tracking-tight">
-                {en ? sign.labelEn : sign.labelKa}
-              </span>
-              <span className="text-base text-muted-foreground">
-                {sign.symbol}
-              </span>
-            </div>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute right-3 top-3 text-2xl text-muted-foreground/30 transition-colors group-hover:text-[var(--vivida-violet)]/50"
+    <div className="relative overflow-hidden rounded-sm border border-border bg-card">
+      <CornerCrosshair position="tl" />
+      <CornerCrosshair position="tr" />
+      <CornerCrosshair position="bl" />
+      <CornerCrosshair position="br" />
+
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/50 px-4 py-2.5 sm:px-5">
+        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+          <span className="inline-block size-1.5 rounded-full bg-primary" />
+          {en ? "PRIMARY NATAL AXIS · BIG THREE" : "ნატალური ღერძი · დიდი სამეული"}
+        </div>
+        <Link
+          href="/report"
+          className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-primary"
+        >
+          {en ? "Full Natal Ephemeris" : "სრული ნატალური რუკა"}
+          <ArrowUpRight className="size-3" />
+        </Link>
+      </div>
+
+      <div className="grid gap-px bg-border sm:grid-cols-3">
+        {items.map(({ code, label, role, glyph, point }) => {
+          const sign = signByIndex(point.signIndex);
+          const color = signColor(sign);
+          const signLabel = en ? sign.labelEn : sign.labelKa;
+          return (
+            <Link
+              key={label}
+              href="/report#big-three"
+              className="group relative flex flex-col justify-between bg-card px-4 py-4 transition-colors hover:bg-secondary/35 sm:px-5"
             >
-              {item.glyph}
-            </span>
-          </Link>
-        );
-      })}
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                  {code} · {label}
+                </span>
+                <span className="font-mono text-[10px] text-muted-foreground/80">
+                  {role}
+                </span>
+              </div>
+
+              <div className="mt-2.5 flex items-baseline justify-between gap-2">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span
+                    aria-hidden
+                    style={{ color }}
+                    className="text-lg leading-none"
+                  >
+                    {glyph}
+                  </span>
+                  <span className="truncate text-base font-semibold tracking-tight text-foreground group-hover:text-primary">
+                    {signLabel}
+                  </span>
+                </div>
+                <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+                  {formatDegree(point.signDegree)}
+                </span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

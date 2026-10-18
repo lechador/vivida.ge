@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Sparkles, Sparkle } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import type { WeeklyForecastDay } from "@/db/schema";
 import { BODIES } from "@/lib/zodiac";
@@ -45,11 +45,9 @@ const WEEKDAY_SHORT_KA: Record<string, string> = {
 };
 
 /**
- * 7-day forecast card. Each day shows a stacked harmony/challenge bar and
- * a one-line headline; click to expand the per-day breakdown (why it's
- * harmonic, why it's challenging, one piece of advice, and the top driving
- * aspects). All rows start collapsed so the week reads as a glanceable
- * list, users open the days they care about.
+ * Editorial Celestial 7-Day Ephemeris Forecast Ledger.
+ * Renders a flat hairline table of daily transit scores and expandable
+ * supportive/challenging aspect breakdowns.
  */
 export function WeeklyForecastCard({
   days,
@@ -62,28 +60,22 @@ export function WeeklyForecastCard({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-border bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
-      <div
-        aria-hidden
-        className="absolute -right-16 -top-16 size-48 rounded-full bg-[radial-gradient(circle,var(--vivida-cyan)/0.3_0%,transparent_70%)] opacity-60 blur-3xl"
-      />
-
-      <header className="relative mb-5 flex items-baseline justify-between gap-3">
+    <article className="rounded-md border border-border bg-card p-6 sm:p-7">
+      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-border/80 pb-4">
         <div>
-          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Next 7 days" : "შემდეგი 7 დღე"}
+          <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
+            {en ? "7-Day Ephemeris Forecast" : "შემდეგი 7 დღის ეფემერიდა"}
           </div>
-          <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight sm:text-xl">
+          <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight text-foreground sm:text-xl">
             {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
-        <Sparkles
-          className="size-5 shrink-0 text-[var(--vivida-cyan)]"
-          aria-hidden
-        />
+        <span className="font-mono text-xs tabular-nums text-muted-foreground">
+          {days.length} {en ? "days" : "დღე"}
+        </span>
       </header>
 
-      <ol className="relative space-y-3.5">
+      <ol className="divide-y divide-border border border-border bg-card">
         {days.map((day, i) => (
           <DayRow
             key={day.dateIso}
@@ -95,13 +87,10 @@ export function WeeklyForecastCard({
         ))}
       </ol>
 
-      <p className="relative mt-5 flex items-center gap-1.5 border-t border-border/40 pt-4 text-[11px] text-muted-foreground">
-        <Sparkle className="size-3" aria-hidden />
-        <span>
-          {en
-            ? "Scores reflect each day's transit-to-natal aspects. Select a day to see why."
-            : "ქულები ეფუძნება ამ დღის ტრანზიტ-ნატალურ ასპექტებს. დააჭირე დღეს, რომ ნახო რატომ."}
-        </span>
+      <p className="mt-4 text-xs text-muted-foreground">
+        {en
+          ? "Scores reflect each day's transit-to-natal aspects. Select a day to see why."
+          : "ქულები ეფუძნება ამ დღის ტრანზიტ-ნატალურ ასპექტებს. დააჭირე დღეს დეტალების სანახავად."}
       </p>
     </article>
   );
@@ -118,10 +107,6 @@ export function DayRow({
   open: boolean;
   onToggle: () => void;
   locale: UserLocale;
-  /**
-   * Locked teaser row: the button is disabled (out of the tab order) so the
-   * parent can blur it as a pure visual tease with no interaction.
-   */
   locked?: boolean;
 }) {
   const en = locale !== "ka";
@@ -135,14 +120,10 @@ export function DayRow({
   const total = day.harmonyScore + day.challengeScore;
   const harmonicPct = total > 0 ? (day.harmonyScore / total) * 100 : 50;
   const challengePct = total > 0 ? (day.challengeScore / total) * 100 : 50;
-  // Overall "intensity", quiet days get a faded bar so the eye sees them as low-energy.
   const intensity = Math.min(
     1,
     Math.max(day.harmonyScore, day.challengeScore) / 70,
   );
-  // Threshold tuned to the post-amplification curve: tilted days now
-  // produce wider gaps, so 18 keeps "შერეული" honest for genuinely
-  // mixed days instead of every-other-day getting a directional label.
   const tilt: "harmonic" | "challenging" | "balanced" =
     day.harmonyScore - day.challengeScore > 18
       ? "harmonic"
@@ -150,75 +131,36 @@ export function DayRow({
         ? "challenging"
         : "balanced";
 
-  // Tilt-driven palette so each row carries the day's mood as its own
-  // outline color + a saturated left accent stripe. Helps the eye chunk
-  // the list into "this day vs. that day" at a glance.
-  const tone =
+  const stripeClass =
     tilt === "harmonic"
-      ? {
-          stripe: "bg-[var(--vivida-cyan)]",
-          border: "border-[var(--vivida-cyan)]/45",
-          borderHover: "hover:border-[var(--vivida-cyan)]/75",
-          bg: "bg-[oklch(0.24_0.05_220/0.85)]",
-          bgHover: "hover:bg-[oklch(0.27_0.06_220/0.92)]",
-          glow: "shadow-[0_0_24px_-10px_oklch(0.78_0.18_200/0.55)]",
-        }
+      ? "bg-primary"
       : tilt === "challenging"
-        ? {
-            stripe: "bg-[var(--vivida-pink)]",
-            border: "border-[var(--vivida-pink)]/45",
-            borderHover: "hover:border-[var(--vivida-pink)]/75",
-            bg: "bg-[oklch(0.24_0.06_350/0.85)]",
-            bgHover: "hover:bg-[oklch(0.27_0.07_350/0.92)]",
-            glow: "shadow-[0_0_24px_-10px_oklch(0.72_0.22_350/0.55)]",
-          }
-        : {
-            stripe: "bg-[var(--vivida-violet)]/70",
-            border: "border-[var(--vivida-violet)]/35",
-            borderHover: "hover:border-[var(--vivida-violet)]/60",
-            bg: "bg-[oklch(0.22_0.04_290/0.85)]",
-            bgHover: "hover:bg-[oklch(0.25_0.05_290/0.92)]",
-            glow: "shadow-[0_0_24px_-10px_oklch(0.65_0.24_305/0.45)]",
-          };
+        ? "bg-[var(--vivida-pink)]"
+        : "bg-accent";
 
   return (
-    <li>
+    <li className="bg-card">
       <button
         type="button"
         onClick={onToggle}
         disabled={locked}
         className={cn(
-          "group relative w-full overflow-hidden rounded-xl border-2 p-3 pl-5 text-left transition-all sm:p-4 sm:pl-6",
-          tone.bg,
-          tone.bgHover,
-          tone.border,
-          tone.borderHover,
-          open && [tone.glow, "ring-1 ring-foreground/10"],
+          "group relative w-full p-4 pl-5 text-left transition-colors hover:bg-secondary/50",
+          open && "bg-secondary/40",
         )}
         aria-expanded={open}
       >
         <span
           aria-hidden
-          className={cn(
-            "absolute inset-y-0 left-0 w-1.5",
-            tone.stripe,
-            open && "shadow-[0_0_14px_oklch(0.65_0.24_305/0.7)]",
-          )}
+          className={cn("absolute inset-y-0 left-0 w-1", stripeClass)}
         />
-        <div className="flex items-start gap-3 sm:gap-4">
-          {/* Date pill */}
-          <div
-            className={cn(
-              "flex shrink-0 flex-col items-center justify-center rounded-lg border px-2.5 py-1.5 transition-colors sm:px-3 sm:py-2",
-              open
-                ? "border-[var(--vivida-violet)]/50 bg-[var(--vivida-violet)]/15"
-                : "border-border bg-[oklch(0.27_0.05_285/0.7)]",
-            )}
-          >
-            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+        <div className="flex items-start gap-4">
+          {/* Date tile */}
+          <div className="flex w-12 shrink-0 flex-col items-center justify-center rounded-sm border border-border bg-secondary/40 py-1.5 font-mono tabular-nums">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               {weekShort}
             </span>
-            <span className="text-base font-semibold leading-none text-foreground sm:text-lg">
+            <span className="text-base font-semibold leading-none text-foreground">
               {dayNum}
             </span>
           </div>
@@ -227,28 +169,36 @@ export function DayRow({
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground/95 sm:text-[15px]">
+                <p className="truncate text-sm font-semibold text-foreground sm:text-base">
                   {day.headline || "—"}
                 </p>
-                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   {en ? "Moon" : "მთვარე"}{" "}
                   {en ? day.moonSignEn : day.moonSignKa} ·{" "}
                   {labelForTilt(tilt, locale)}
                 </p>
               </div>
-              <ChevronDown
-                aria-hidden
-                className={cn(
-                  "mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform",
-                  open && "rotate-180",
-                )}
-              />
+              <div className="flex shrink-0 items-center gap-3">
+                <span className="hidden font-mono text-xs tabular-nums text-muted-foreground sm:inline">
+                  <span className="text-primary">+{day.harmonyScore}</span> /{" "}
+                  <span className="text-[var(--vivida-pink)]">
+                    −{day.challengeScore}
+                  </span>
+                </span>
+                <ChevronDown
+                  aria-hidden
+                  className={cn(
+                    "mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform",
+                    open && "rotate-180",
+                  )}
+                />
+              </div>
             </div>
 
-            {/* Stacked harmony / challenge bar */}
+            {/* Calibrated harmony / challenge bar */}
             <div
-              className="relative mt-2.5 h-2 overflow-hidden rounded-full bg-foreground/[0.06]"
-              style={{ opacity: 0.55 + intensity * 0.45 }}
+              className="relative mt-2.5 h-1.5 overflow-hidden bg-border"
+              style={{ opacity: 0.6 + intensity * 0.4 }}
               role="img"
               aria-label={
                 en
@@ -257,35 +207,16 @@ export function DayRow({
               }
             >
               <div
-                className="absolute inset-y-0 left-0 rounded-l-full bg-[var(--vivida-cyan)]"
-                style={{ width: `${harmonicPct}%`, opacity: 0.85 }}
+                className="absolute inset-y-0 left-0 bg-primary"
+                style={{ width: `${harmonicPct}%` }}
               />
               <div
-                className="absolute inset-y-0 rounded-r-full bg-[var(--vivida-pink)]"
+                className="absolute inset-y-0 bg-[var(--vivida-pink)]"
                 style={{
                   left: `${harmonicPct}%`,
                   width: `${challengePct}%`,
-                  opacity: 0.85,
                 }}
               />
-            </div>
-
-            <div className="mt-1.5 flex items-center gap-2 text-[10px] tabular-nums">
-              <span
-                className="inline-flex items-center gap-1 text-[var(--vivida-cyan)]"
-                aria-label="harmonic score"
-              >
-                <Sparkle className="size-3" />
-                {day.harmonyScore}
-              </span>
-              <span className="text-muted-foreground/50">·</span>
-              <span
-                className="inline-flex items-center gap-1 text-[var(--vivida-pink)]"
-                aria-label="challenging score"
-              >
-                <Sparkle className="size-3" />
-                {day.challengeScore}
-              </span>
             </div>
           </div>
         </div>
@@ -293,24 +224,22 @@ export function DayRow({
 
       {/* Expanded breakdown */}
       {open && (
-        <div className="mt-2 grid gap-3 rounded-xl border border-[var(--vivida-violet)]/30 bg-[oklch(0.20_0.04_283/0.7)] p-3 sm:p-4">
-          <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-3 border-t border-border/70 bg-secondary/20 p-4 pl-5">
+          <div className="grid gap-px border border-border bg-border sm:grid-cols-2">
             <Block
               label={en ? "Supportive" : "ჰარმონიული"}
-              dotClass="bg-[var(--vivida-cyan)]"
-              borderClass="border-[var(--vivida-cyan)]/45"
+              toneClass="text-primary"
               text={day.harmonicReason || "—"}
             />
             <Block
               label={en ? "Challenging" : "დაძაბული"}
-              dotClass="bg-[var(--vivida-pink)]"
-              borderClass="border-[var(--vivida-pink)]/45"
+              toneClass="text-[var(--vivida-pink)]"
               text={day.challengingReason || "—"}
             />
           </div>
           {day.advice && (
-            <div className="rounded-lg border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-3 py-2 text-sm leading-relaxed text-foreground/90">
-              <span className="mr-1 text-[var(--vivida-violet)]">→</span>
+            <div className="rounded-sm border border-border bg-card px-3.5 py-2.5 text-sm leading-relaxed text-foreground/90">
+              <span className="mr-1.5 font-mono text-primary">→</span>
               {day.advice}
             </div>
           )}
@@ -319,28 +248,22 @@ export function DayRow({
               <div className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
                 {en ? "Active aspects" : "მოქმედი ასპექტები"}
               </div>
-              <ul className="flex flex-wrap gap-1.5">
+              <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted-foreground">
                 {day.drivers.slice(0, 4).map((dr, j) => (
                   <li
                     key={j}
-                    className={cn(
-                      "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px]",
-                      dr.family === "harmonic"
-                        ? "border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/10 text-foreground/90"
-                        : dr.family === "tense"
-                          ? "border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/10 text-foreground/90"
-                          : "border-border/60 bg-background/40 text-foreground/80",
-                    )}
+                    className="inline-flex items-center gap-1"
                     title={`${(en ? FAMILY_HINT_EN : FAMILY_HINT_KA)[dr.family] ?? ""} · orb ${dr.orb.toFixed(1)}°`}
                   >
-                    <span className="font-medium">
+                    {j > 0 && <span aria-hidden>·</span>}
+                    <span className="text-foreground">
                       {bodyLabel(dr.transit, locale)}
                     </span>
-                    <span className="text-muted-foreground">
+                    <span className="text-primary">
                       {(en ? ASPECT_LABEL_EN : ASPECT_LABEL_KA)[dr.kind] ??
                         dr.kind}
                     </span>
-                    <span className="font-medium">
+                    <span className="text-foreground">
                       {bodyLabel(dr.natal, locale)}
                     </span>
                   </li>
@@ -357,28 +280,23 @@ export function DayRow({
 function Block({
   label,
   text,
-  dotClass,
-  borderClass,
+  toneClass,
 }: {
   label: string;
   text: string;
-  dotClass: string;
-  borderClass: string;
+  toneClass: string;
 }) {
   return (
-    <div
-      className={cn(
-        "rounded-lg border bg-[oklch(0.25_0.05_285/0.85)] px-3 py-2.5 ring-1 ring-foreground/5",
-        borderClass,
-      )}
-    >
-      <div className="mb-1 flex items-center gap-1.5">
-        <span className={cn("size-1.5 rounded-full", dotClass)} aria-hidden />
-        <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-          {label}
-        </span>
+    <div className="bg-card p-3.5">
+      <div
+        className={cn(
+          "mb-1 text-[10px] font-semibold uppercase tracking-[0.18em]",
+          toneClass,
+        )}
+      >
+        {label}
       </div>
-      <p className="text-sm leading-relaxed text-foreground/95">{text}</p>
+      <p className="text-sm leading-relaxed text-foreground/90">{text}</p>
     </div>
   );
 }
@@ -403,7 +321,6 @@ function bodyLabel(key: string, locale: UserLocale): string {
 }
 
 function parseDateNum(iso: string): string {
-  // Avoid timezone drift on the day number, slice the YYYY-MM-DD part directly.
   const [, , dd] = iso.split("-");
   return dd ? String(parseInt(dd, 10)) : iso;
 }

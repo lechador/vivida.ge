@@ -34,9 +34,9 @@ export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
         <button
           type="button"
           aria-label={locale !== "ka" ? "Search" : "ძებნა"}
-          className="grid size-11 shrink-0 place-items-center rounded-full text-foreground/85 transition-colors hover:bg-card/60 hover:text-foreground md:hidden"
+          className="grid size-10 shrink-0 place-items-center rounded-md border border-border bg-card text-foreground/85 transition-colors hover:border-primary/60 hover:bg-secondary hover:text-foreground md:hidden"
         >
-          <Search className="size-5" />
+          <Search className="size-4.5" />
         </button>
       </DialogPrimitive.Trigger>
 
@@ -48,8 +48,8 @@ export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.18 }}
-                className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
+                transition={{ duration: 0.15 }}
+                className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
               />
             </DialogPrimitive.Overlay>
             <DialogPrimitive.Content asChild aria-describedby={undefined}>
@@ -57,8 +57,8 @@ export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
                 initial={{ opacity: 0, y: -12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="fixed inset-x-2 top-2 z-50 flex max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card/95 shadow-2xl ring-1 ring-foreground/10 backdrop-blur-xl"
+                transition={{ duration: 0.15 }}
+                className="fixed inset-x-3 top-3 z-50 flex max-h-[calc(100dvh-1.5rem)] flex-col overflow-hidden rounded-md border border-border bg-card shadow-2xl"
               >
                 <DialogPrimitive.Title className="sr-only">
                   {locale !== "ka" ? "Search" : "ძებნა"}

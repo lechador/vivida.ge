@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Check, Flame, Gift, Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 
 import { completeDailyRitual } from "@/actions/daily-ritual";
 import { DailyCard } from "@/components/dashboard/daily-card";
@@ -112,26 +112,22 @@ export function DailyRitual({
     >
       <section
         data-daily-ritual={completed ? "complete" : "pending"}
-        className="rounded-2xl border border-[var(--vivida-violet)]/35 bg-card/65 p-4 backdrop-blur-xl sm:p-5"
+        className="rounded-md border border-border bg-secondary/35 p-4 sm:p-5"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Flame className="size-5 text-[var(--vivida-pink)]" />
-            <div>
-              <h3 className="text-sm font-semibold">
-                {en ? "Today's small ritual" : "დღის პატარა რიტუალი"}
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                {progress.current} {en ? "day streak" : "დღიანი სერია"}
-              </p>
+          <div>
+            <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+              {en ? "Daily Intention" : "დღის პატარა რიტუალი"}
             </div>
+            <p className="mt-0.5 font-mono text-xs tabular-nums text-muted-foreground">
+              {progress.current} {en ? "day streak" : "დღიანი სერია"}
+            </p>
           </div>
           {progress.next ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/50 px-2.5 py-1 text-xs text-muted-foreground">
-              <Gift className="size-3.5 text-[var(--vivida-cyan)]" />
+            <span className="font-mono text-xs tabular-nums text-muted-foreground">
               {en
-                ? `+${progress.next.credits} in ${progress.next.daysLeft} days`
-                : `${progress.next.daysLeft} დღეში +${progress.next.credits}`}
+                ? `+${progress.next.credits} credits in ${progress.next.daysLeft}d`
+                : `${progress.next.daysLeft} დღეში +${progress.next.credits} კრედიტი`}
             </span>
           ) : (
             <span className="text-xs text-muted-foreground">
@@ -140,15 +136,16 @@ export function DailyRitual({
           )}
         </div>
 
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-foreground/10">
+        {/* Hairline progress bar in solid warm brass */}
+        <div className="mt-3 h-1 overflow-hidden bg-border">
           <div
-            className="h-full rounded-full bg-[linear-gradient(90deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] transition-[width]"
+            className="h-full bg-primary transition-[width] duration-300"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
 
         <div className="mt-4">
-          <p className="text-xs font-medium text-foreground/80">
+          <p className="text-xs font-medium text-foreground/85">
             {completed
               ? en
                 ? "Today's ritual is complete"
@@ -162,7 +159,7 @@ export function DailyRitual({
                   : "ჩაიკითხე ჰოროსკოპი ბოლომდე და აირჩიე ფოკუსი"}
           </p>
           {!completed && (
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-2.5 flex flex-wrap gap-2">
               {focuses.map((focus) => (
                 <button
                   key={focus}
@@ -174,10 +171,10 @@ export function DailyRitual({
                       option_index: focuses.indexOf(focus),
                     });
                   }}
-                  className="rounded-full border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/10 px-3 py-1.5 text-xs transition-colors hover:bg-[var(--vivida-violet)]/20 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-primary/60 hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {pending && state.focus === focus ? (
-                    <Loader2 className="mr-1 inline size-3 animate-spin" />
+                    <Loader2 className="mr-1 inline size-3 animate-spin text-primary" />
                   ) : null}
                   {focus}
                 </button>
@@ -185,9 +182,9 @@ export function DailyRitual({
             </div>
           )}
           {completed && (
-            <div className="mt-2 space-y-2">
-              <p className="flex items-center gap-1.5 text-xs text-[var(--vivida-cyan)]">
-                <Check className="size-4" />
+            <div className="mt-2.5 space-y-1.5">
+              <p className="flex items-center gap-1.5 text-xs font-medium text-primary">
+                <Check className="size-3.5" />
                 {earned > 0
                   ? en
                     ? `Milestone: +${earned} credits`

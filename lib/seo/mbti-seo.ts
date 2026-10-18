@@ -1,261 +1,209 @@
-/**
- * SEO data for the 16 MBTI personality-type landing pages (/mbti/[type]).
- * Slugs are the lowercase 4-letter codes (e.g. "infp"), they double as the
- * search term ("infp ქართულად") and the URL. Titles/descriptions/FAQ are
- * templated from the archetype so all 16 stay consistent; the rich body copy
- * comes from the pre-generated library at render time.
- */
+import { MBTI_TYPES, type MbtiType } from "@/lib/mbti-library";
 
-import { mbtiArchetypeKa } from "@/lib/mbti-questions";
-import { mbtiFamousFor } from "@/lib/mbti-characters";
-import { mbtiEnglishContent } from "@/lib/mbti-content-en";
+export type MbtiGroupKey = "analysts" | "diplomats" | "sentinels" | "explorers";
 
-export const ALL_MBTI_TYPES = [
-  "ISTJ",
-  "ISFJ",
-  "INFJ",
-  "INTJ",
-  "ISTP",
-  "ISFP",
-  "INFP",
-  "INTP",
-  "ESTP",
-  "ESFP",
-  "ENFP",
-  "ENTP",
-  "ESTJ",
-  "ESFJ",
-  "ENFJ",
-  "ENTJ",
-] as const;
+export type MbtiGroupInfo = {
+  key: MbtiGroupKey;
+  labelKa: string;
+  labelEn: string;
+};
 
-export const ALL_MBTI_SLUGS: string[] = ALL_MBTI_TYPES.map((t) =>
+export const MBTI_GROUP: Record<string, MbtiGroupInfo> = {
+  INTJ: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts" },
+  INTP: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts" },
+  ENTJ: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts" },
+  ENTP: { key: "analysts", labelKa: "ანალიტიკოსები", labelEn: "Analysts" },
+  INFJ: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats" },
+  INFP: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats" },
+  ENFJ: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats" },
+  ENFP: { key: "diplomats", labelKa: "დიპლომატები", labelEn: "Diplomats" },
+  ISTJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels" },
+  ISFJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels" },
+  ESTJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels" },
+  ESFJ: { key: "sentinels", labelKa: "მცველები", labelEn: "Sentinels" },
+  ISTP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers" },
+  ISFP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers" },
+  ESTP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers" },
+  ESFP: { key: "explorers", labelKa: "მკვლევრები", labelEn: "Explorers" },
+};
+
+const ARCHETYPE_META: Record<
+  string,
+  { archetypeKa: string; archetypeEn: string; taglineKa: string; taglineEn: string }
+> = {
+  INTJ: {
+    archetypeKa: "არქიტექტორი",
+    archetypeEn: "The Architect",
+    taglineKa: "სტრატეგიული, დამოუკიდებელი და შორსმჭვრეტელი მოაზროვნე, რომელსაც ყველაფრისთვის გეგმა აქვს.",
+    taglineEn: "Strategic, independent thinkers with a long-range plan for complex systems.",
+  },
+  INTP: {
+    archetypeKa: "ლოგიკოსი",
+    archetypeEn: "The Logician",
+    taglineKa: "ცნობისმოყვარე ნოვატორი, რომელიც მუდმივად ეძებს სამყაროს მუშაობის ფარულ კანონზომიერებებს.",
+    taglineEn: "Inventive, analytical minds drawn to patterns, ideas, and underlying principles.",
+  },
+  ENTJ: {
+    archetypeKa: "მეთაური",
+    archetypeEn: "The Commander",
+    taglineKa: "გაბედული, მიზანდასახული ლიდერი, რომელიც სირთულეებშიც პოულობს ან თავად ქმნის გზას.",
+    taglineEn: "Decisive, goal-focused organizers who turn ambitious visions into structured action.",
+  },
+  ENTP: {
+    archetypeKa: "პოლემისტი",
+    archetypeEn: "The Debater",
+    taglineKa: "გონებამახვილი და მოუსვენარი მოაზროვნე, რომელსაც უყვარს იდეების გამოცდა.",
+    taglineEn: "Quick-thinking, curious innovators energized by intellectual challenge and new possibilities.",
+  },
+  INFJ: {
+    archetypeKa: "ადვოკატი",
+    archetypeEn: "The Advocate",
+    taglineKa: "მშვიდი, ღრმა და პრინციპული იდეალისტი, რომელიც ადამიანებში პოტენციალს ხედავს.",
+    taglineEn: "Insightful, values-driven idealists who seek meaning and deep human connection.",
+  },
+  INFP: {
+    archetypeKa: "მედიატორი",
+    archetypeEn: "The Mediator",
+    taglineKa: "ემპათიური, შემოქმედებითი და ღირებულებების ერთგული ადამიანი ღრმა შინაგანი სამყაროთი.",
+    taglineEn: "Empathetic, imaginative personalities guided by inner values and authenticity.",
+  },
+  ENFJ: {
+    archetypeKa: "პროტაგონისტი",
+    archetypeEn: "The Protagonist",
+    taglineKa: "ქარიზმატული და შთამაგონებელი ლიდერი, რომელიც აერთიანებს და აძლიერებს გარშემომყოფებს.",
+    taglineEn: "Warm, inspiring communicators who help people grow and work together.",
+  },
+  ENFP: {
+    archetypeKa: "კამპანიის ავტორი",
+    archetypeEn: "The Campaigner",
+    taglineKa: "ენთუზიაზმით სავსე, თავისუფალი და კომუნიკაბელური სული, რომელიც ყველგან შესაძლებლობას ხედავს.",
+    taglineEn: "Enthusiastic, creative connectors who bring warmth and curiosity to every idea.",
+  },
+  ISTJ: {
+    archetypeKa: "ლოგისტიკოსი",
+    archetypeEn: "The Logistician",
+    taglineKa: "პრაქტიკული, ფაქტებზე დაფუძნებული და უაღრესად სანდო ადამიანი.",
+    taglineEn: "Practical, dependable organizers who value accuracy, duty, and follow-through.",
+  },
+  ISFJ: {
+    archetypeKa: "დამცველი",
+    archetypeEn: "The Defender",
+    taglineKa: "ერთგული, თბილი და ყურადღებიანი მზრუნველი, რომელიც სიმშვიდესა და სტაბილურობას ქმნის.",
+    taglineEn: "Supportive, observant caretakers who remember details and protect what matters.",
+  },
+  ESTJ: {
+    archetypeKa: "აღმასრულებელი",
+    archetypeEn: "The Executive",
+    taglineKa: "ძლიერი ორგანიზატორი, რომელიც აფასებს წესრიგს, სიცხადესა და რეალურ შედეგს.",
+    taglineEn: "Clear-headed, structured leaders who coordinate people and projects efficiently.",
+  },
+  ESFJ: {
+    archetypeKa: "კონსული",
+    archetypeEn: "The Consul",
+    taglineKa: "გულისხმიერი, სოციალური და ყურადღებიანი ადამიანი, რომელიც გუნდში ჰარმონიას ქმნის.",
+    taglineEn: "Caring, community-minded connectors who notice needs and build belonging.",
+  },
+  ISTP: {
+    archetypeKa: "ვირტუოზი",
+    archetypeEn: "The Virtuoso",
+    taglineKa: "გაბედული და პრაქტიკული ექსპერიმენტატორი, რომელიც რთულ მექანიზმებსა და სიტუაციებს მარტივად უღებს ალღოს.",
+    taglineEn: "Hands-on, adaptable problem-solvers who stay calm when action is needed.",
+  },
+  ISFP: {
+    archetypeKa: "ავანტიურისტი",
+    archetypeEn: "The Adventurer",
+    taglineKa: "მოქნილი და მგრძნობიარე ხელოვანი, რომელიც აწმყოთი და სილამაზით ცხოვრობს.",
+    taglineEn: "Flexible, expressive explorers who value freedom, aesthetics, and lived experience.",
+  },
+  ESTP: {
+    archetypeKa: "მეწარმე",
+    archetypeEn: "The Entrepreneur",
+    taglineKa: "ენერგიული, გამჭრიახი და მოქმედებაზე ორიენტირებული ადამიანი, რომელსაც უყვარს დინამიკა.",
+    taglineEn: "Energetic, perceptive doers who read the room quickly and thrive in motion.",
+  },
+  ESFP: {
+    archetypeKa: "გამრთობი",
+    archetypeEn: "The Entertainer",
+    taglineKa: "სპონტანური, ხალისიანი და გადამდები ენერგიის მქონე ადამიანი.",
+    taglineEn: "Spontaneous, warm-hearted performers who bring joy and immediacy to life.",
+  },
+};
+
+export const ALL_MBTI_SLUGS: string[] = (MBTI_TYPES as readonly string[]).map((t) =>
   t.toLowerCase(),
 );
 
-/** "infp" → "INFP"; returns null for anything not one of the 16. */
-export function mbtiCodeFromSlug(slug: string): string | null {
-  const code = slug.toUpperCase();
-  return (ALL_MBTI_TYPES as readonly string[]).includes(code) ? code : null;
+export function mbtiCodeFromSlug(slug: string): MbtiType | null {
+  const upper = slug.trim().toUpperCase();
+  if ((MBTI_TYPES as readonly string[]).includes(upper)) {
+    return upper as MbtiType;
+  }
+  return null;
 }
 
-/** The four 16Personalities groups, with localized labels. */
-export const MBTI_GROUP: Record<
-  string,
-  { key: string; labelKa: string; labelEn: string }
-> = {
-  INTJ: {
-    key: "analysts",
-    labelKa: "ანალიტიკოსები",
-    labelEn: "Analysts",
-  },
-  INTP: {
-    key: "analysts",
-    labelKa: "ანალიტიკოსები",
-    labelEn: "Analysts",
-  },
-  ENTJ: {
-    key: "analysts",
-    labelKa: "ანალიტიკოსები",
-    labelEn: "Analysts",
-  },
-  ENTP: {
-    key: "analysts",
-    labelKa: "ანალიტიკოსები",
-    labelEn: "Analysts",
-  },
-  INFJ: {
-    key: "diplomats",
-    labelKa: "დიპლომატები",
-    labelEn: "Diplomats",
-  },
-  INFP: {
-    key: "diplomats",
-    labelKa: "დიპლომატები",
-    labelEn: "Diplomats",
-  },
-  ENFJ: {
-    key: "diplomats",
-    labelKa: "დიპლომატები",
-    labelEn: "Diplomats",
-  },
-  ENFP: {
-    key: "diplomats",
-    labelKa: "დიპლომატები",
-    labelEn: "Diplomats",
-  },
-  ISTJ: {
-    key: "sentinels",
-    labelKa: "მცველები",
-    labelEn: "Sentinels",
-  },
-  ISFJ: {
-    key: "sentinels",
-    labelKa: "მცველები",
-    labelEn: "Sentinels",
-  },
-  ESTJ: {
-    key: "sentinels",
-    labelKa: "მცველები",
-    labelEn: "Sentinels",
-  },
-  ESFJ: {
-    key: "sentinels",
-    labelKa: "მცველები",
-    labelEn: "Sentinels",
-  },
-  ISTP: {
-    key: "explorers",
-    labelKa: "მკვლევრები",
-    labelEn: "Explorers",
-  },
-  ISFP: {
-    key: "explorers",
-    labelKa: "მკვლევრები",
-    labelEn: "Explorers",
-  },
-  ESTP: {
-    key: "explorers",
-    labelKa: "მკვლევრები",
-    labelEn: "Explorers",
-  },
-  ESFP: {
-    key: "explorers",
-    labelKa: "მკვლევრები",
-    labelEn: "Explorers",
-  },
-};
-
-/** Short evocative tagline per type, used in hero + meta. */
-export const MBTI_TAGLINE_KA: Record<string, string> = {
-  INTJ: "სტრატეგი მოაზროვნე, რომელიც ყველაფერს წინასწარ გეგმავს.",
-  INTP: "ცნობისმოყვარე ანალიტიკოსი იდეებისა და თეორიების მიღმა.",
-  ENTJ: "თამამი ლიდერი, რომელიც გზას იკვლევს და ხალხს უძღვება.",
-  ENTP: "მახვილგონივრული მოკამათე და იდეების დაუშრეტელი წყარო.",
-  INFJ: "იდეალისტი, რომელსაც სამყაროს შეცვლა სურს.",
-  INFP: "პოეტური სული, საკუთარი ღირებულებებით ხელმძღვანელი.",
-  ENFJ: "ქარიზმატული შთამაგონებელი, რომელიც სხვებს ზრდაში ეხმარება.",
-  ENFP: "თავისუფალი, ენერგიული მეოცნებე უსაზღვრო ენთუზიაზმით.",
-  ISTJ: "საიმედო, პრაქტიკული და ურყევად ორგანიზებული.",
-  ISFJ: "თბილი მზრუნველი და ერთგული მცველი.",
-  ESTJ: "ორგანიზატორი და წესრიგის შემქმნელი.",
-  ESFJ: "მზრუნველი, რომელიც ხალხს აერთიანებს და ზრუნავს.",
-  ISTP: "პრაქტიკული ოსტატი და უშიშარი ექსპერიმენტატორი.",
-  ISFP: "მგრძნობიარე შემოქმედი და თავისუფალი სული.",
-  ESTP: "ენერგიული, გაბედული და სპონტანური მოქმედი.",
-  ESFP: "ცხოვრების ხალისი და ყურადღების ბუნებრივი ცენტრი.",
-};
-
-export type MbtiSeo = {
-  code: string;
-  slug: string;
-  archetypeKa: string;
-  taglineKa: string;
-  group: { key: string; labelKa: string };
-  pageTitle: string;
-  metaDescription: string;
-  faq: { q: string; a: string }[];
-  /** Query variants (Georgian + Latin) used in metadata. */
-  queries: string[];
-};
-
-export function buildMbtiSeo(code: string): MbtiSeo {
-  const archetypeKa = mbtiArchetypeKa(code);
-  const taglineKa = MBTI_TAGLINE_KA[code] ?? "";
-  const group = MBTI_GROUP[code] ?? { key: "", labelKa: "", labelEn: "" };
-  const famous = mbtiFamousFor(code).slice(0, 3).join(", ");
-
+export function buildMbtiSeo(code: string) {
+  const upper = code.toUpperCase();
+  const slug = upper.toLowerCase();
+  const meta = ARCHETYPE_META[upper] ?? ARCHETYPE_META.INFJ;
+  const group = MBTI_GROUP[upper] ?? MBTI_GROUP.INFJ;
   return {
-    code,
-    slug: code.toLowerCase(),
-    archetypeKa,
-    taglineKa,
+    code: upper,
+    slug,
+    archetypeKa: meta.archetypeKa,
+    taglineKa: meta.taglineKa,
     group,
-    pageTitle: `${code}, ${archetypeKa} | პიროვნების ტიპი`,
-    metaDescription:
-      `${code} (${archetypeKa}) პიროვნების ტიპის სრული აღწერა ქართულად: ` +
-      `ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ცნობილი ${code}-ები. ` +
-      `გაიარე უფასო პიროვნების ტესტი Vivida-ზე.`,
+    pageTitle: `${upper} (${meta.archetypeKa}) — პიროვნების ტიპი ქართულად`,
+    metaDescription: `${upper} პიროვნების ტიპი (${meta.archetypeKa}): ხასიათი, ძლიერი და სუსტი მხარეები, სიყვარული, მეგობრობა და კარიერა. ${meta.taglineKa}`,
+    queries: [
+      upper,
+      `${upper} ქართულად`,
+      `${upper} პიროვნების ტიპი`,
+      meta.archetypeKa,
+      "16 პიროვნების ტიპი",
+      "MBTI ქართულად",
+    ],
     faq: [
       {
-        q: `რას ნიშნავს ${code} ტიპი?`,
-        a: `${code} ანუ „${archetypeKa}“, 16 პიროვნების ტიპიდან ერთ-ერთი. ${taglineKa} ეს ტიპი აღწერს, როგორ იღებ ენერგიას, აღიქვამ ინფორმაციას, იღებ გადაწყვეტილებებს და აწყობ ცხოვრებას.`,
+        q: `რას ნიშნავს ${upper} პიროვნების ტიპი?`,
+        a: `${upper} (${meta.archetypeKa}) მიეკუთვნება „${group.labelKa}“ ჯგუფს. ${meta.taglineKa}`,
       },
       {
-        q: `როგორ გავიგო, ${code} ვარ თუ არა?`,
-        a: `გაიარე უფასო Astro-MBTI ტესტი, 60 კითხვა, დაახლოებით 7 წუთი. ტესტი განსაზღვრავს შენს ზუსტ ტიპს და მოგცემს დეტალურ, პერსონალურ ანალიზს.`,
+        q: `როგორ გავიგო, ვარ თუ არა ${upper}?`,
+        a: "გაიარე Vivida-ს უფასო 60-კითხვიანი პიროვნების ტესტი, რომელიც ზომავს ოთხივე განზომილებას და გაჩვენებს ზუსტ პროცენტულ თანაფარდობას.",
       },
-      {
-        q: `ცნობილი ${code}-ები?`,
-        a: famous
-          ? `ამ ტიპს ხშირად მიაწერენ ისეთ ცნობილ ადამიანებს, როგორებიც არიან ${famous} და სხვები.`
-          : `Astro-MBTI-ის სრულ პროფილში ნახავ, რომელ ცნობილ ადამიანებს მიაწერენ ამ ტიპს.`,
-      },
-    ],
-    queries: [
-      code,
-      `${code} ქართულად`,
-      `${code} პიროვნების ტიპი`,
-      `mbti ${code}`,
-      `${archetypeKa} პიროვნება`,
-      "პიროვნების ტესტი",
-      "16 personalities ქართულად",
     ],
   };
 }
 
-export type MbtiSeoEn = {
-  code: string;
-  slug: string;
-  archetype: string;
-  tagline: string;
-  group: { key: string; labelEn: string };
-  pageTitle: string;
-  metaDescription: string;
-  faq: { q: string; a: string }[];
-  queries: string[];
-};
-
-export function buildMbtiSeoEn(code: string): MbtiSeoEn {
-  const content = mbtiEnglishContent(code);
-  const group = MBTI_GROUP[code] ?? {
-    key: "",
-    labelKa: "",
-    labelEn: "",
-  };
-  const famous = mbtiFamousFor(code).slice(0, 3).join(", ");
+export function buildMbtiSeoEn(code: string) {
+  const upper = code.toUpperCase();
+  const slug = upper.toLowerCase();
+  const meta = ARCHETYPE_META[upper] ?? ARCHETYPE_META.INFJ;
+  const group = MBTI_GROUP[upper] ?? MBTI_GROUP.INFJ;
   return {
-    code,
-    slug: code.toLowerCase(),
-    archetype: content.archetype,
-    tagline: content.tagline,
-    group: { key: group.key, labelEn: group.labelEn },
-    pageTitle: `${code}, ${content.archetype} Personality Type`,
-    metaDescription: `Explore the ${code} (${content.archetype}) personality type: core preferences, strengths, challenges, relationships, career patterns and practical growth ideas.`,
+    code: upper,
+    slug,
+    archetype: meta.archetypeEn,
+    tagline: meta.taglineEn,
+    group,
+    pageTitle: `${upper} Personality Type (${meta.archetypeEn}): Traits, Relationships & Career`,
+    metaDescription: `${upper} (${meta.archetypeEn}) personality profile: core preferences, strengths, blind spots, relationships, and career paths. ${meta.taglineEn}`,
+    queries: [
+      `${upper} personality`,
+      `${upper} type`,
+      meta.archetypeEn.toLowerCase(),
+      `${upper} relationships`,
+      `${upper} career`,
+    ],
     faq: [
       {
-        q: `What does the ${code} personality type mean?`,
-        a: `${code}, often called the ${content.archetype}, is one of sixteen MBTI-style preference patterns. ${content.tagline} It describes common tendencies, not fixed ability or a diagnosis.`,
+        q: `What does the ${upper} personality type mean?`,
+        a: `${upper} (${meta.archetypeEn}) is part of the ${group.labelEn} group. ${meta.taglineEn}`,
       },
       {
-        q: `How can I find out whether I am ${code}?`,
-        a: "Take Vivida’s free 60-question personality test. You will receive a type, dimension percentages and a personalized profile in about seven minutes.",
+        q: `How do I know if I am an ${upper}?`,
+        a: "Take Vivida's free 60-question personality test to see your preferences across all four dimensions.",
       },
-      {
-        q: `Which famous people are commonly typed as ${code}?`,
-        a: famous
-          ? `${famous} are among the public figures often associated with ${code}. These typings are informal interpretations, not verified facts.`
-          : `Public-figure personality typings are informal interpretations rather than verified facts.`,
-      },
-    ],
-    queries: [
-      code,
-      `${code} personality type`,
-      `${code} strengths`,
-      `${code} relationships`,
-      `MBTI ${code}`,
-      "16 personality types",
-      "personality test",
     ],
   };
 }

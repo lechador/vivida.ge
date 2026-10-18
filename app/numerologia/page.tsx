@@ -129,12 +129,8 @@ export default async function NumerologiaHubPage() {
   ];
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
-      />
-      <Starfield count={120} shooting={2} />
+    <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background">
+      <Starfield count={48} />
       <SmartHeader />
 
       <script
@@ -142,8 +138,8 @@ export default async function NumerologiaHubPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-        <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
+      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
+        <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
           <Link href="/" className="hover:text-foreground">
             მთავარი
           </Link>
@@ -151,14 +147,15 @@ export default async function NumerologiaHubPage() {
           <span className="text-foreground/80">ნუმეროლოგია</span>
         </nav>
 
-        <header className="mb-8 max-w-3xl">
-          <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+        <header className="mb-8 border-b border-border pb-8">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+            ნუმეროლოგიური ალმანახი · 1–33
+          </div>
+          <h1 className="mt-2 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             ნუმეროლოგია,{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              ბედის რიცხვი
-            </span>
+            <span className="text-primary">ბედის რიცხვი</span>
           </h1>
-          <p className="mt-4 text-pretty text-base text-foreground/85 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-pretty text-[15px] leading-relaxed text-muted-foreground sm:text-base">
             ბედის რიცხვი დაბადების თარიღიდან ითვლება და შენი ცხოვრების მთავარ
             თემას აღწერს, ძლიერ მხარეებს, გამოწვევებსა და მიმართულებას.
             გამოთვალე შენი და წაიკითხე, რას ნიშნავს.
@@ -168,11 +165,16 @@ export default async function NumerologiaHubPage() {
         <LifePathCalculator archetypes={archetypes} />
 
         {/* All numbers grid */}
-        <section className="mt-12">
-          <h2 className="text-xl font-semibold tracking-tight">
-            რიცხვების მნიშვნელობა, 1-დან 33-მდე
-          </h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="mt-16">
+          <div className="mb-4 flex items-baseline justify-between gap-4">
+            <h2 className="text-2xl font-semibold tracking-tight">
+              რიცხვების მნიშვნელობა · 1-დან 33-მდე
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+              12 Archetypes
+            </span>
+          </div>
+          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
             {LIFE_PATH_NUMBERS.map((n) => {
               const c = LIFE_PATH_CONTENT[n];
               const master = n.length > 1;
@@ -180,32 +182,35 @@ export default async function NumerologiaHubPage() {
                 <Link
                   key={n}
                   href={`/numerologia/${n}`}
-                  className="group relative overflow-hidden rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:border-foreground/20 hover:bg-card/80"
+                  className="group relative flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary/45"
                 >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`grid size-12 shrink-0 place-items-center rounded-xl text-xl font-bold ${
-                        master
-                          ? "bg-[var(--vivida-gold,#eac358)]/15 text-[var(--vivida-gold,#eac358)] ring-1 ring-[var(--vivida-gold,#eac358)]/40"
-                          : "bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)] ring-1 ring-[var(--vivida-violet)]/40"
-                      }`}
-                    >
-                      {n}
-                    </span>
-                    <div className="min-w-0">
-                      <h3 className="font-semibold tracking-tight">
-                        {c.archetypeKa}
-                      </h3>
-                      <div className="text-[11px] text-muted-foreground">
-                        {master ? "მასტერ-რიცხვი" : `ბედის რიცხვი ${n}`}
+                  <div>
+                    <div className="flex items-center gap-3.5">
+                      <span
+                        className={`grid size-11 shrink-0 place-items-center rounded-sm border font-mono text-lg font-semibold tabular-nums ${
+                          master
+                            ? "border-primary/50 bg-primary/10 text-primary"
+                            : "border-border bg-background/60 text-foreground"
+                        }`}
+                      >
+                        {n}
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="font-semibold tracking-tight text-foreground">
+                          {c.archetypeKa}
+                        </h3>
+                        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                          {master ? "მასტერ-რიცხვი" : `ბედის რიცხვი ${n}`}
+                        </div>
                       </div>
                     </div>
+                    <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                      {c.essenceKa}
+                    </p>
                   </div>
-                  <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-foreground/85">
-                    {c.essenceKa}
-                  </p>
-                  <div className="mt-3 text-xs text-muted-foreground transition-colors group-hover:text-foreground">
-                    სრული აღწერა →
+                  <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground transition-colors group-hover:text-primary">
+                    <span>სრული აღწერა</span>
+                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </Link>
               );
@@ -214,23 +219,20 @@ export default async function NumerologiaHubPage() {
         </section>
 
         {/* FAQ */}
-        <section className="mt-12">
-          <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <section className="mt-16">
+          <h2 className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
             ხშირად დასმული კითხვები
           </h2>
-          <div className="space-y-3">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
             {NUMEROLOGY_FAQ.map((item) => (
-              <details
-                key={item.q}
-                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium [&::-webkit-details-marker]:hidden">
+              <details key={item.q} className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                   {item.q}
-                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                  <span className="font-mono text-sm text-muted-foreground transition-transform group-open:rotate-45">
                     +
                   </span>
                 </summary>
-                <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
+                <p className="border-t border-border/60 bg-background/40 px-5 py-4 text-[15px] leading-relaxed text-muted-foreground">
                   {item.a}
                 </p>
               </details>
@@ -239,23 +241,26 @@ export default async function NumerologiaHubPage() {
         </section>
 
         {/* CTA → natal chart */}
-        <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
-          <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            რიცხვები დასაწყისია, ცა გრძელდება
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            შენი დაბადების თარიღი ბევრად მეტს ამბობს: მთვარე, ვენერა, ამომავალი
-            ნიშანი და ცის 12 სახლი. შექმენი უფასო ნატალური რუკა Vivida-ზე.
-          </p>
-          <Button asChild variant="mystic" size="lg" className="mt-6">
+        <div className="mt-16 flex flex-col justify-between gap-6 rounded-md border border-border bg-card p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="max-w-xl">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              ნატალური რუკა
+            </p>
+            <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+              რიცხვები დასაწყისია, ცა გრძელდება
+            </h2>
+            <p className="mt-2 text-pretty text-sm text-muted-foreground">
+              შენი დაბადების თარიღი ბევრად მეტს ამბობს: მთვარე, ვენერა, ამომავალი
+              ნიშანი და ცის 12 სახლი. შექმენი უფასო ნატალური რუკა Vivida-ზე.
+            </p>
+          </div>
+          <Button asChild size="lg" className="shrink-0">
             <Link href="/nataluri-ruka">
               ჩემი ნატალური რუკა
               <ArrowRight className="size-4" />
             </Link>
           </Button>
         </div>
-
       </section>
 
       <SiteFooter />

@@ -1,0 +1,8 @@
+{
+  "name": "Vivida — Personal Astrology & Natal Chart",
+  "description": "Personal astrology, daily horoscopes, compatibility readings, and a free natal chart built from your exact birth moment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -7,61 +7,34 @@ interface Star {
   top: number;
   size: number;
   opacity: number;
-  delay: number;
-  duration: number;
-  glow: boolean;
-  hue: number;
-}
-
-interface ShootingStar {
-  top: number;     // %
-  left: number;    // %
-  delay: number;   // s
-  duration: number; // s
+  warm: boolean;
 }
 
 /**
- * Layered starfield. Many tiny pinpoints + a sprinkling of larger glowing
- * "feature" stars + occasional shooting stars sweeping across.
- * Deterministic via a seeded PRNG so SSR markup matches client.
+ * Quiet astronomical star chart dust layer.
+ * Replaces neon pulsing violet/cyan orbs and shooting stars with subtle,
+ * stationary or near-stationary ivory and brass pinpoints so the canvas
+ * feels like an observatory sky atlas without competing with typography.
  */
 export function Starfield({
-  count = 120,
-  shooting = 3,
+  count = 72,
+  shooting = 0,
 }: {
   count?: number;
   shooting?: number;
 }) {
-  // Purely decorative (aria-hidden, position:absolute), so we keep it OUT of
-  // the server HTML and first paint and mount it after hydration. That frees
-  // the mobile main thread to paint the LCP text first, and since it never
-  // affects layout, deferring it can't cause CLS. We also thin the field and
-  // drop animations on small screens / reduced-motion to cut paint cost.
-  const [env, setEnv] = useState<{
-    count: number;
-    shooting: number;
-    animate: boolean;
-  } | null>(null);
+  void shooting;
+  const [mountedCount, setMountedCount] = useState<number | null>(null);
 
   useEffect(() => {
     const mobile = window.matchMedia("(max-width: 640px)").matches;
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    // Legitimate one-shot environment read (matchMedia is client-only and
-    // unavailable during render/SSR), so the setState here is intentional.
+    const effective = Math.min(count, 80);
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setEnv({
-      count: mobile ? Math.max(24, Math.round(count * 0.4)) : count,
-      shooting: reduced ? 0 : mobile ? Math.min(shooting, 1) : shooting,
-      animate: !reduced,
-    });
-  }, [count, shooting]);
+    setMountedCount(mobile ? Math.max(20, Math.round(effective * 0.45)) : effective);
+  }, [count]);
 
-  const data = useMemo(() => {
-    if (!env) return null;
-    const count = env.count;
-    const shooting = env.shooting;
+  const stars = useMemo(() => {
+    if (!mountedCount) return null;
     let s = 0x9e3779b9;
     const rand = () => {
       s |= 0;
@@ -71,92 +44,39 @@ export function Starfield({
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
 
-    const stars: Star[] = Array.from({ length: count }).map(() => {
+    const list: Star[] = Array.from({ length: mountedCount }).map(() => {
       const r = rand();
-      const isFeature = r > 0.94; // ~6% glowy feature stars
+      const isFeature = r > 0.92;
       return {
         left: rand() * 100,
         top: rand() * 100,
-        size: isFeature ? rand() * 1.6 + 1.8 : rand() * 1.4 + 0.4,
-        opacity: isFeature
-          ? rand() * 0.3 + 0.65
-          : rand() * 0.55 + 0.2,
-        delay: rand() * 8,
-        duration: rand() * 4 + 3,
-        glow: isFeature,
-        // Vary hue subtly between violet, cyan, white (280-220deg range)
-        hue: rand() < 0.6 ? 280 : rand() < 0.85 ? 220 : 0,
+        size: isFeature ? 1.75 : 1,
+        opacity: isFeature ? rand() * 0.25 + 0.35 : rand() * 0.22 + 0.08,
+        warm: rand() > 0.65,
       };
     });
 
-    const shootingStars: ShootingStar[] = Array.from({ length: shooting }).map(
-      (_, i) => ({
-        top: rand() * 60 + 5,
-        left: rand() * 50 + 5,
-        delay: i * 7 + rand() * 5,
-        duration: rand() * 1.5 + 2,
-      })
-    );
+    return list;
+  }, [mountedCount]);
 
-    return { stars, shootingStars };
-  }, [env]);
-
-  if (!env || !data) return null;
-  const { stars, shootingStars } = data;
+  if (!stars) return null;
 
   return (
     <div
       aria-hidden
-      className="vivida-stars pointer-events-none absolute inset-0 overflow-hidden"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      {stars.map((star, i) => {
-        // Only the brightest stars (feature + larger pinpoints) get the
-        // pulse animation, the field reads as alive without paying for
-        // 200+ simultaneously animating elements. Reduced-motion drops it.
-        const animate = env.animate && (star.glow || star.size > 1.4);
-        return (
-          <span
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              left: `${star.left}%`,
-              top: `${star.top}%`,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              opacity: star.opacity,
-              background:
-                star.hue === 0
-                  ? "white"
-                  : star.hue === 280
-                    ? "oklch(0.92 0.05 280)"
-                    : "oklch(0.92 0.06 220)",
-              boxShadow: star.glow
-                ? `0 0 ${star.size * 4}px ${star.hue === 0
-                    ? "oklch(0.95 0.02 280 / 0.7)"
-                    : `oklch(0.85 0.12 ${star.hue} / 0.7)`}, 0 0 ${star.size * 8}px ${star.hue === 0
-                    ? "oklch(0.95 0.02 280 / 0.3)"
-                    : `oklch(0.85 0.12 ${star.hue} / 0.3)`}`
-                : star.size > 1.4
-                  ? `0 0 ${star.size * 2}px oklch(0.85 0.05 280 / 0.4)`
-                  : undefined,
-              animation: animate
-                ? `vivida-pulse ${star.duration}s ease-in-out ${star.delay}s infinite`
-                : undefined,
-            }}
-          />
-        );
-      })}
-      {shootingStars.map((s, i) => (
+      {stars.map((star, i) => (
         <span
-          key={`shoot-${i}`}
-          className="absolute h-px w-24 origin-left"
+          key={i}
+          className="absolute rounded-full"
           style={{
-            top: `${s.top}%`,
-            left: `${s.left}%`,
-            background:
-              "linear-gradient(90deg, transparent, oklch(0.95 0.05 280 / 0.85), transparent)",
-            animation: `vivida-shoot ${s.duration}s ease-out ${s.delay}s infinite`,
-            opacity: 0,
+            left: `${star.left}%`,
+            top: `${star.top}%`,
+            width: `${star.size}px`,
+            height: `${star.size}px`,
+            opacity: star.opacity,
+            background: star.warm ? "#D4AF37" : "#F4F0EA",
           }}
         />
       ))}

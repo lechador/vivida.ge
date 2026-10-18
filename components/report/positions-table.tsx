@@ -2,14 +2,6 @@ import { bodyMeta, formatDegree, signByIndex, signColor } from "@/lib/zodiac";
 import type { NatalChartJson, PointJson } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
-/**
- * Compact, scannable planet-positions table, the at-a-glance data layer of
- * the report. Each whole row is a single in-page anchor that scrolls down to
- * that point's interpretation (#planet-<key>), no navigation away. Glyphs sit
- * in fixed-width boxes so the names line up on a straight vertical edge.
- * Server component (native anchors, no client JS).
- */
-
 const ROW_KEYS = [
   "sun",
   "moon",
@@ -25,7 +17,6 @@ const ROW_KEYS = [
 ] as const;
 
 const GRID = "grid grid-cols-[1.3fr_1.3fr_auto_2.5rem] items-center gap-x-3";
-// Fixed-width, centered glyph box → every name starts at the same x.
 const GLYPH = "w-6 shrink-0 text-center text-base leading-none";
 
 function pointFor(chart: NatalChartJson, key: string): PointJson | null {
@@ -47,16 +38,16 @@ export function PositionsTable({
   const houseHeader = en ? "House" : "სახლი";
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
+    <div className="overflow-hidden rounded-md border border-border bg-card">
       <div
-        className={`${GRID} px-4 py-2.5 text-[11px] uppercase tracking-wider text-muted-foreground sm:px-5`}
+        className={`${GRID} border-b border-border bg-secondary/40 px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:px-5`}
       >
         <span>{planetHeader}</span>
         <span>{signHeader}</span>
         <span className="text-right">{degreeHeader}</span>
         <span className="text-right">{houseHeader}</span>
       </div>
-      <ul>
+      <ul className="divide-y divide-border">
         {ROW_KEYS.map((key) => {
           const point = pointFor(chart, key);
           if (!point) return null;
@@ -70,12 +61,12 @@ export function PositionsTable({
           const signLabel = en ? sign.labelEn : sign.labelKa;
 
           return (
-            <li key={key} className="border-t border-border/50">
+            <li key={key}>
               <a
                 href={`#planet-${key}`}
-                className={`${GRID} px-4 py-2.5 text-sm transition-colors hover:bg-card/70 sm:px-5`}
+                className={`${GRID} px-4 py-2.5 text-sm transition-colors hover:bg-secondary/40 sm:px-5`}
               >
-                <span className="flex min-w-0 items-center gap-2 font-medium">
+                <span className="flex min-w-0 items-center gap-2 font-medium text-foreground">
                   <span aria-hidden style={{ color }} className={GLYPH}>
                     {meta?.symbol ?? "?"}
                   </span>
@@ -89,16 +80,14 @@ export function PositionsTable({
                   <span className="truncate">{signLabel}</span>
                 </span>
 
-                <span className="whitespace-nowrap text-right tabular-nums text-foreground/80">
+                <span className="whitespace-nowrap text-right font-mono text-xs tabular-nums text-foreground/85">
                   {formatDegree(point.signDegree)}
                   {point.retrograde && (
-                    <span className="ml-1 text-[11px] text-muted-foreground">
-                      ℞
-                    </span>
+                    <span className="ml-1 text-[11px] text-primary">℞</span>
                   )}
                 </span>
 
-                <span className="text-right tabular-nums text-muted-foreground">
+                <span className="text-right font-mono text-xs tabular-nums text-muted-foreground">
                   {house ?? "—"}
                 </span>
               </a>
@@ -117,10 +106,6 @@ const HOUSE_LABEL: Record<number, string> = {
   10: "MC",
 };
 
-/**
- * Compact two-column houses list (cusps). Each row scrolls in-page to that
- * house's interpretation (#house-<n>).
- */
 export function HousesTable({
   chart,
   locale = "ka",
@@ -139,15 +124,15 @@ export function HousesTable({
           <a
             key={h.number}
             href={`#house-${h.number}`}
-            className="flex items-center gap-3 border-b border-border/50 py-2 text-sm transition-colors hover:text-[var(--vivida-violet)]"
+            className="flex items-center gap-3 border-b border-border py-2.5 text-sm transition-colors last:border-b-0 hover:text-primary"
           >
-            <span className="w-7 shrink-0 font-medium tabular-nums text-muted-foreground">
+            <span className="w-7 shrink-0 font-mono text-xs font-medium tabular-nums text-muted-foreground">
               {HOUSE_LABEL[h.number] ?? h.number}
             </span>
             <span aria-hidden style={{ color }} className={GLYPH}>
               {`${sign.symbol}︎`}
             </span>
-            <span className="truncate">{signLabel}</span>
+            <span className="truncate text-foreground">{signLabel}</span>
           </a>
         );
       })}

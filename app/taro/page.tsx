@@ -11,6 +11,7 @@ import { TarotReader } from "@/components/tarot/tarot-reader";
 import { TarotConversionLanding } from "@/components/tarot/tarot-conversion-landing";
 import { SiteFooter } from "@/components/site-footer";
 import { Accent } from "@/components/en/editorial";
+import { Button } from "@/components/ui/button";
 import { tarotDetailDeck, type TarotDetailCard } from "@/lib/tarot/detail";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -173,13 +174,9 @@ export default async function TaroHubPage() {
   return (
     <main
       lang={locale}
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(50%_30%_at_50%_-5%,oklch(0.26_0.12_305/0.30),transparent_70%)]"
-      />
-      <Starfield count={70} shooting={1} />
+      <Starfield count={48} />
       {authed ? (
         <AppHeader authed active="tarot" />
       ) : (
@@ -191,8 +188,8 @@ export default async function TaroHubPage() {
         dangerouslySetInnerHTML={{ __html: serializeLd(ld) }}
       />
 
-      <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-        <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
+      <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
+        <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
           <Link href="/" className="hover:text-foreground">
             {en ? "Home" : "მთავარი"}
           </Link>
@@ -200,17 +197,17 @@ export default async function TaroHubPage() {
           <span className="text-foreground/80">{en ? "Tarot" : "ტარო"}</span>
         </nav>
 
-        <header className="mb-6 text-center">
-          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <header className="mb-8 border-b border-border pb-8">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
             {en
-              ? "Online tarot · three-card reading"
+              ? "Online Tarot · Three-Card Spread"
               : "ონლაინ ტარო · ტაროზე მკითხაობა"}
           </div>
-          <h1 className="font-display mt-1 text-balance text-4xl font-medium leading-[1.05] tracking-[-0.015em] sm:text-5xl">
+          <h1 className="font-display mt-2 text-balance text-4xl font-normal leading-[1.06] tracking-[-0.02em] sm:text-5xl">
             {en ? "Read the " : "ტარო"}{" "}
             <Accent>{en ? "cards" : "ქართულად"}</Accent>
           </h1>
-          <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-base">
             {en ? (
               <>
                 Ask a question and receive a thoughtful, personal three-card
@@ -234,18 +231,23 @@ export default async function TaroHubPage() {
         />
 
         {/* All cards, internal linking + SEO cluster */}
-        <section className="mt-12">
-          <h2 className="text-xl font-semibold tracking-tight">
-            {en
-              ? "The full tarot deck, 78 cards"
-              : "ტაროს სრული დასტა, 78 კარტი"}
-          </h2>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+        <section className="mt-16">
+          <div className="mb-4 flex items-baseline justify-between gap-4">
+            <h2 className="font-display text-2xl font-normal tracking-tight">
+              {en
+                ? "The full tarot deck · 78 cards"
+                : "ტაროს სრული დასტა · 78 კარტი"}
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+              78 Cards
+            </span>
+          </div>
+          <p className="mb-5 text-sm text-muted-foreground">
             {en
               ? "Explore the upright and reversed meaning of every card."
               : "აღმოაჩინე თითო კარტის მნიშვნელობა, პირდაპირი და შებრუნებული."}
           </p>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
             {tarotDetailDeck(en ? "en" : "ka").map((c: TarotDetailCard) => {
               const name = c.name;
               const keywords = c.keywords;
@@ -253,14 +255,16 @@ export default async function TaroHubPage() {
                 <Link
                   key={c.slug}
                   href={localizedHref(`/taro/${c.slug}`, locale)}
-                  className="flex items-center gap-3 rounded-xl border border-border/60 bg-card/40 px-3.5 py-2.5 text-sm transition-colors hover:bg-card/70"
+                  className="flex items-center gap-3 bg-card px-4 py-3 text-sm transition-colors hover:bg-secondary/45"
                 >
-                  <span className="text-lg">{c.glyph}</span>
+                  <span className="grid size-8 shrink-0 place-items-center rounded-sm border border-border bg-background/60 text-base">
+                    {c.glyph}
+                  </span>
                   <span className="min-w-0">
-                    <span className="block truncate font-medium text-foreground/90">
+                    <span className="block truncate font-medium text-foreground">
                       {name}
                     </span>
-                    <span className="block truncate text-[11px] text-muted-foreground">
+                    <span className="block truncate font-mono text-[11px] text-muted-foreground">
                       {keywords.slice(0, 2).join(" · ")}
                     </span>
                   </span>
@@ -271,23 +275,20 @@ export default async function TaroHubPage() {
         </section>
 
         {/* FAQ */}
-        <section className="mt-12">
-          <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <section className="mt-16">
+          <h2 className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
             {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
-          <div className="space-y-3">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
             {faq.map((item) => (
-              <details
-                key={item.q}
-                className="group rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium [&::-webkit-details-marker]:hidden">
+              <details key={item.q} className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                   {item.q}
-                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                  <span className="font-mono text-sm text-muted-foreground transition-transform group-open:rotate-45">
                     +
                   </span>
                 </summary>
-                <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
+                <p className="border-t border-border/60 bg-background/40 px-5 py-4 text-[15px] leading-relaxed text-muted-foreground">
                   {item.a}
                 </p>
               </details>
@@ -297,29 +298,26 @@ export default async function TaroHubPage() {
 
         {/* CTA → natal chart (logged-out visitors only) */}
         {!authed && (
-          <div className="mt-14 rounded-3xl border border-border bg-card/40 p-7 sm:p-10">
-            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--vivida-cyan)]">
-              <span
-                aria-hidden
-                className="inline-block h-px w-8 bg-[var(--vivida-cyan)]/60"
-              />
-              {en ? "Go deeper" : "უფრო ღრმად"}
-            </p>
-            <h2 className="font-display mt-3 max-w-xl text-balance text-3xl font-medium tracking-[-0.01em] sm:text-4xl">
-              {en ? "Cards and stars, together" : "ტაროც და ვარსკვლავებიც"}
-            </h2>
-            <p className="mt-3 max-w-md text-pretty text-base text-muted-foreground">
-              {en
-                ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
-                : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს, მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
-            </p>
-            <Link
-              href={en ? "/natal-chart" : "/nataluri-ruka"}
-              className="mt-6 inline-flex items-center gap-1.5 rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] px-5 py-2.5 text-sm font-semibold text-white"
-            >
-              {en ? "Create my natal chart" : "ჩემი ნატალური რუკა"}
-              <ArrowRight className="size-4" />
-            </Link>
+          <div className="mt-16 flex flex-col justify-between gap-6 rounded-md border border-border bg-card p-6 sm:flex-row sm:items-center sm:p-8">
+            <div className="max-w-xl">
+              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+                {en ? "Natal Ephemeris" : "ნატალური ასტროლოგია"}
+              </p>
+              <h2 className="font-display mt-2 text-balance text-2xl font-normal tracking-tight sm:text-3xl">
+                {en ? "Cards and stars, together" : "ტაროც და ვარსკვლავებიც"}
+              </h2>
+              <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
+                {en
+                  ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
+                  : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს, მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
+              </p>
+            </div>
+            <Button asChild size="lg" className="shrink-0">
+              <Link href={en ? "/natal-chart" : "/nataluri-ruka"}>
+                {en ? "Create my natal chart" : "ჩემი ნატალური რუკა"}
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
           </div>
         )}
       </section>

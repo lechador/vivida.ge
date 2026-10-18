@@ -13,11 +13,6 @@ const PLANETS_TO_SHOW = [
   "pluto",
 ] as const;
 
-/**
- * Flat planet list, one tight, aligned row per planet (glyph · name · sign ·
- * degree · house) with the interpretation shown inline beneath it (open by
- * default). The positions table links here via #planet-<key> anchors.
- */
 export function PlanetCards({
   chart,
   interpretations,
@@ -29,7 +24,7 @@ export function PlanetCards({
 }) {
   const en = locale !== "ka";
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
+    <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
       {PLANETS_TO_SHOW.map((key) => {
         const body = chart.bodies[key];
         if (!body) return null;
@@ -42,7 +37,7 @@ export function PlanetCards({
           <div
             key={key}
             id={`planet-${key}`}
-            className="scroll-mt-20 border-t border-border/50 px-4 py-3.5 first:border-t-0 sm:px-5"
+            className="scroll-mt-20 px-4 py-4 sm:px-5"
           >
             <div className="flex items-center gap-3 text-sm">
               <span
@@ -52,10 +47,10 @@ export function PlanetCards({
               >
                 {meta?.symbol ?? "?"}
               </span>
-              <span className="w-24 shrink-0 font-medium sm:w-28">
+              <span className="w-24 shrink-0 font-semibold text-foreground sm:w-28">
                 {en ? (meta?.labelEn ?? key) : (meta?.labelKa ?? key)}
               </span>
-              <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
+              <span className="flex min-w-0 items-center gap-1.5 text-foreground/85">
                 <span
                   aria-hidden
                   style={{ color }}
@@ -67,14 +62,14 @@ export function PlanetCards({
                   {en ? sign.labelEn : sign.labelKa}
                 </span>
               </span>
-              <span className="ml-auto shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
+              <span className="ml-auto shrink-0 whitespace-nowrap font-mono text-xs tabular-nums text-muted-foreground">
                 {formatDegree(body.signDegree)}
                 {body.retrograde ? " ℞" : ""}
                 {body.house ? ` · ${body.house} ${en ? "house" : "სახ."}` : ""}
               </span>
             </div>
             {text && (
-              <p className="mt-2 pl-8 text-sm leading-relaxed text-foreground/85">
+              <p className="mt-2.5 pl-8 text-sm leading-relaxed text-foreground/85">
                 {text}
               </p>
             )}

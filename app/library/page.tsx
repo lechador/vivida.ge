@@ -20,6 +20,7 @@ import {
   LibraryCard,
   libraryKindLabel,
 } from "@/components/library/library-card";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -95,53 +96,57 @@ export default async function LibraryPage({
   return (
     <main
       lang={locale}
-      className="relative isolate min-h-screen overflow-hidden"
+      className="relative isolate min-h-screen overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_38%_at_50%_-5%,oklch(0.32_0.17_305/0.5),transparent_72%),radial-gradient(38%_30%_at_88%_45%,oklch(0.28_0.14_220/0.35),transparent_72%)]"
-      />
-      <Starfield count={120} shooting={2} />
+      <Starfield count={48} />
       <AppHeader authed active="library" />
 
-      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 sm:pt-10 lg:pb-16">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-28 pt-8 sm:px-6 sm:pt-10 lg:pb-16">
+        <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
-              <BookOpen className="size-4" />
-              {en ? "Personal archive" : "პირადი არქივი"}
+            <div className="flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
+              <BookOpen className="size-3.5" />
+              {en ? "PERSONAL ARCHIVE" : "პირადი არქივი"}
             </div>
-            <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
+            <h1
+              className={
+                en
+                  ? "mt-2 text-balance font-display text-3xl font-medium tracking-tight text-foreground sm:text-5xl"
+                  : "mt-2 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl"
+              }
+            >
               {en ? "My library" : "ჩემი ბიბლიოთეკა"}
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-foreground/70 sm:text-base">
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
               {en
-                ? "Your horoscopes, forecasts, tarot readings, AI insights and reports, kept together in one private place."
-                : "შენი ჰოროსკოპები, პროგნოზები, ტაროს კითხვები, AI რჩევები და რეპორტები, ერთ პირად სივრცეში."}
+                ? "Your horoscopes, forecasts, tarot readings, consultations and reports, preserved in one private archive."
+                : "შენი ჰოროსკოპები, პროგნოზები, ტაროს კითხვები, კონსულტაციები და რეპორტები, ერთ პირად არქივში."}
             </p>
           </div>
           <Link
             href={hrefFor({ filter, favorites: !favorites, query: search })}
             className={cn(
-              "inline-flex shrink-0 items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-colors",
+              "inline-flex shrink-0 items-center justify-center gap-2 rounded-sm border px-4 py-2 text-xs font-medium transition-colors",
               favorites
-                ? "border-[var(--vivida-gold)]/45 bg-[var(--vivida-gold)]/12 text-[var(--vivida-gold)]"
-                : "border-border bg-card/50 text-muted-foreground hover:text-foreground",
+                ? "border-primary/50 bg-primary/12 text-primary"
+                : "border-border bg-card text-muted-foreground hover:text-foreground",
             )}
           >
-            <Star className={cn("size-4", favorites && "fill-current")} />
+            <Star className={cn("size-3.5", favorites && "fill-current")} />
             {en ? "Favorites" : "რჩეულები"}
-            <span className="tabular-nums">{library.counts.favorites}</span>
+            <span className="font-mono tabular-nums">
+              {library.counts.favorites}
+            </span>
           </Link>
         </header>
 
-        <div className="mt-7 rounded-3xl border border-border bg-card/45 p-3 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-4">
+        <div className="mt-6 rounded-md border border-border bg-card p-3 sm:p-4">
           <form method="get" action="/library" className="flex gap-2">
             {filter !== "all" && (
               <input type="hidden" name="type" value={filter} />
             )}
             {favorites && <input type="hidden" name="favorites" value="1" />}
-            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-border bg-background/30 px-4 focus-within:border-[var(--vivida-violet)]/55">
+            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-sm border border-border bg-background px-3.5 focus-within:border-primary/60">
               <Search className="size-4 shrink-0 text-muted-foreground" />
               <span className="sr-only">
                 {en ? "Search library" : "ბიბლიოთეკაში ძიება"}
@@ -151,22 +156,19 @@ export default async function LibraryPage({
                 defaultValue={search}
                 maxLength={100}
                 placeholder={
-                  en ? "Search your library…" : "მოძებნე ბიბლიოთეკაში…"
+                  en ? "Search your archive…" : "მოძებნე ბიბლიოთეკაში…"
                 }
-                className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </label>
-            <button
-              type="submit"
-              className="rounded-2xl bg-[var(--vivida-violet)] px-4 text-sm font-medium text-white transition-opacity hover:opacity-90"
-            >
+            <Button type="submit" size="default">
               {en ? "Search" : "ძიება"}
-            </button>
+            </Button>
           </form>
 
           <nav
             aria-label={en ? "Library types" : "ბიბლიოთეკის ტიპები"}
-            className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="mt-3 flex gap-1 overflow-x-auto border-t border-border pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {FILTERS.map((item) => {
               const active = filter === item;
@@ -182,13 +184,16 @@ export default async function LibraryPage({
                   href={hrefFor({ filter: item, favorites, query: search })}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "shrink-0 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors",
+                    "shrink-0 rounded-xs border px-3 py-1.5 text-xs font-medium transition-colors",
                     active
-                      ? "border-[var(--vivida-violet)]/45 bg-[var(--vivida-violet)]/15 text-foreground"
-                      : "border-border bg-background/20 text-muted-foreground hover:text-foreground",
+                      ? "border-primary/45 bg-primary/14 text-primary"
+                      : "border-transparent text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
                   )}
                 >
-                  {label} · {library.counts[item]}
+                  {label}{" "}
+                  <span className="font-mono tabular-nums opacity-75">
+                    · {library.counts[item]}
+                  </span>
                 </Link>
               );
             })}
@@ -198,7 +203,7 @@ export default async function LibraryPage({
         {library.items.length > 0 ? (
           <div className="mt-6 space-y-6">
             {dailyItems.length > 0 && (
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border md:grid-cols-2 xl:grid-cols-3">
                 {dailyItems.map((entry) => (
                   <DailyLibraryCard
                     key={entry.id}
@@ -209,7 +214,7 @@ export default async function LibraryPage({
               </div>
             )}
             {otherItems.length > 0 && (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border md:grid-cols-2 xl:grid-cols-3">
                 {otherItems.map((entry) => (
                   <LibraryCard key={entry.id} entry={entry} locale={locale} />
                 ))}
@@ -217,9 +222,11 @@ export default async function LibraryPage({
             )}
           </div>
         ) : (
-          <div className="mt-6 rounded-3xl border border-dashed border-border bg-card/35 px-6 py-16 text-center">
-            <BookOpen className="mx-auto size-9 text-[var(--vivida-violet)]" />
-            <h2 className="mt-4 text-xl font-semibold">
+          <div className="mt-6 rounded-md border border-border bg-card px-6 py-16 text-center">
+            <div className="mx-auto grid size-11 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+              <BookOpen className="size-5" />
+            </div>
+            <h2 className="mt-4 text-xl font-semibold text-foreground">
               {en ? "Nothing here yet" : "აქ ჯერ არაფერია"}
             </h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
@@ -232,12 +239,11 @@ export default async function LibraryPage({
                   : "შემდეგი პერსონალური კითხვა აქ ავტომატურად შეინახება."}
             </p>
             {!search && !favorites && filter === "all" && (
-              <Link
-                href="/taro"
-                className="mt-5 inline-flex rounded-full bg-[var(--vivida-violet)] px-5 py-2.5 text-sm font-medium text-white"
-              >
-                {en ? "Ask your first question" : "დასვი პირველი კითხვა"}
-              </Link>
+              <Button asChild className="mt-5">
+                <Link href="/taro">
+                  {en ? "Ask your first question" : "დასვი პირველი კითხვა"}
+                </Link>
+              </Button>
             )}
           </div>
         )}
@@ -255,15 +261,15 @@ export default async function LibraryPage({
                   query: search,
                   page: library.page - 1,
                 })}
-                className="grid size-10 place-items-center rounded-full border border-border bg-card/50 hover:bg-card"
+                className="grid size-9 place-items-center rounded-sm border border-border bg-card hover:bg-secondary"
                 aria-label={en ? "Previous page" : "წინა გვერდი"}
               >
                 <ChevronLeft className="size-4" />
               </Link>
             ) : (
-              <span className="size-10" />
+              <span className="size-9" />
             )}
-            <span className="text-sm tabular-nums text-muted-foreground">
+            <span className="font-mono text-xs tabular-nums text-muted-foreground">
               {library.page} / {library.totalPages}
             </span>
             {library.page < library.totalPages ? (
@@ -274,13 +280,13 @@ export default async function LibraryPage({
                   query: search,
                   page: library.page + 1,
                 })}
-                className="grid size-10 place-items-center rounded-full border border-border bg-card/50 hover:bg-card"
+                className="grid size-9 place-items-center rounded-sm border border-border bg-card hover:bg-secondary"
                 aria-label={en ? "Next page" : "შემდეგი გვერდი"}
               >
                 <ChevronRight className="size-4" />
               </Link>
             ) : (
-              <span className="size-10" />
+              <span className="size-9" />
             )}
           </nav>
         )}

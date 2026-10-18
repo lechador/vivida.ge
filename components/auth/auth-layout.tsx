@@ -5,9 +5,8 @@ import { Starfield } from "@/components/landing/starfield";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Shared chrome for /login, /signup, /forgot-password, /reset-password,
- * /verify-email. Centered card on the cosmic backdrop, brand mark above.
- * Pages provide the form/content as `children`.
+ * Editorial Celestial chrome for /login, /signup, /forgot-password,
+ * /reset-password, /verify-email.
  */
 export function AuthLayout({
   title,
@@ -23,33 +22,28 @@ export function AuthLayout({
   locale?: UserLocale;
 }) {
   return (
-    <main lang={locale} className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.5),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.4),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.35),transparent_70%)]"
-      />
-      <Starfield count={100} shooting={2} />
+    <main
+      lang={locale}
+      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
+    >
+      <Starfield count={48} />
 
       <div className="relative z-10 flex flex-1 flex-col">
-        <header className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <VividaMark size={36} id="auth-header" />
-            <span
-              className="bg-clip-text text-transparent text-lg font-semibold tracking-tight"
-              style={{
-                backgroundImage:
-                  "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-              }}
-            >
-              vivida
-            </span>
-          </Link>
+        <header className="border-b border-border/70">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+            <Link href="/" className="inline-flex items-center gap-2.5">
+              <VividaMark size={30} id="auth-header" />
+              <span className="font-display text-2xl font-medium tracking-tight text-foreground">
+                Vivida
+              </span>
+            </Link>
+          </div>
         </header>
 
-        <section className="flex flex-1 items-center justify-center px-4 pb-16 pt-2 sm:px-6">
+        <section className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
           <div className="w-full max-w-md">
             <div className="text-center">
-              <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+              <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                 {title}
               </h1>
               {subtitle && (
@@ -59,7 +53,7 @@ export function AuthLayout({
               )}
             </div>
 
-            <div className="mt-8 rounded-2xl border border-border/60 bg-card/65 p-6 shadow-[0_30px_120px_-40px_oklch(0.65_0.24_305/0.45)] ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+            <div className="mt-8 rounded-md border border-border bg-card p-6 sm:p-8">
               {children}
             </div>
 
@@ -75,13 +69,13 @@ export function AuthLayout({
   );
 }
 
-/** Branded "or continue with" divider used between Google and email forms. */
+/** Editorial "or" divider used between OAuth and email forms. */
 export function AuthDivider({ locale = "ka" }: { locale?: UserLocale }) {
   return (
-    <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-muted-foreground/70">
-      <span className="h-px flex-1 bg-border/60" />
+    <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+      <span className="h-px flex-1 bg-border" />
       {locale !== "ka" ? "or" : "ან"}
-      <span className="h-px flex-1 bg-border/60" />
+      <span className="h-px flex-1 bg-border" />
     </div>
   );
 }

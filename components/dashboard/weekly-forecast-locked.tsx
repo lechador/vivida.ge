@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Lock, Sparkles } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,20 +14,6 @@ import type { WeeklyForecastDay } from "@/db/schema";
 import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
 import { DayRow } from "./weekly-forecast-card";
 
-/**
- * Locked state for the 7-day forecast. The forecast is a one-time credit
- * unlock (CREDIT_COST.weeklyForecast), pay once and it stays unlocked
- * forever.
- *
- * Tease, don't block: with real `teaserDays` the first day renders fully
- * (headline, reasons, advice) and the remaining days show their real
- * weekday/date/score rows blurred behind the lock. Locked narrative never
- * reaches the client, the server strips it (see stripWeeklyTeaser). Without
- * teaser data it falls back to the generic blurred skeleton.
- *
- * A successful unlock does a full reload so the now-unlocked forecast
- * streams in from the server.
- */
 export function WeeklyForecastLocked({
   cost,
   balance,
@@ -91,42 +77,33 @@ export function WeeklyForecastLocked({
             outcome: "unlocked",
           });
         }
-        // Reload so the dashboard re-fetches with the forecast unlocked.
         window.location.reload();
         return;
       }
       if (r.status === 402) setShort(true);
     } catch {
-      /* ignore, button re-enables */
+      /* ignore */
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/35 bg-card/65 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
-      <div
-        aria-hidden
-        className="absolute -right-16 -top-16 size-48 rounded-full bg-[radial-gradient(circle,var(--vivida-cyan)/0.3_0%,transparent_70%)] opacity-60 blur-3xl"
-      />
-
-      <header className="relative mb-5 flex items-baseline justify-between gap-3">
+    <article className="rounded-md border border-border bg-card p-6 sm:p-7">
+      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-border/80 pb-4">
         <div>
-          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Next 7 days" : "შემდეგი 7 დღე"}
+          <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
+            {en ? "7-Day Ephemeris Forecast" : "შემდეგი 7 დღის ეფემერიდა"}
           </div>
-          <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight sm:text-xl">
+          <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight text-foreground sm:text-xl">
             {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
-        <Sparkles
-          className="size-5 shrink-0 text-[var(--vivida-cyan)]"
-          aria-hidden
-        />
+        <Lock className="size-4 shrink-0 text-primary" aria-hidden />
       </header>
 
       {teaser ? (
-        <ol className="relative space-y-3.5">
+        <ol className="divide-y divide-border border border-border bg-card">
           <DayRow
             key={teaser[0].dateIso}
             day={teaser[0]}
@@ -135,12 +112,12 @@ export function WeeklyForecastLocked({
             locale={locale}
           />
           {teaser.slice(1).length > 0 && (
-            <div className="relative">
+            <div className="relative divide-y divide-border">
               {teaser.slice(1).map((day) => (
                 <div
                   key={day.dateIso}
                   aria-hidden
-                  className="select-none blur-[5px] [&:not(:first-child)]:mt-3.5"
+                  className="select-none blur-[5px]"
                 >
                   <DayRow
                     day={day}
@@ -155,8 +132,8 @@ export function WeeklyForecastLocked({
                 aria-hidden
                 className="pointer-events-none absolute inset-0 flex items-center justify-center"
               >
-                <div className="grid size-12 place-items-center rounded-full border border-[var(--vivida-violet)]/50 bg-card/90 shadow-xl ring-1 ring-foreground/10">
-                  <Lock className="size-5 text-[var(--vivida-violet)]" />
+                <div className="grid size-10 place-items-center rounded-sm border border-border bg-card shadow-lg">
+                  <Lock className="size-4 text-primary" />
                 </div>
               </div>
             </div>
@@ -164,13 +141,13 @@ export function WeeklyForecastLocked({
         </ol>
       ) : (
         <div className="relative">
-          <ol aria-hidden className="space-y-3.5 select-none blur-[6px]">
+          <ol aria-hidden className="divide-y divide-border border border-border select-none blur-[6px]">
             {[0, 1, 2, 3].map((i) => (
               <li
                 key={i}
-                className="flex items-center gap-3 rounded-xl border-2 border-border/50 bg-[oklch(0.23_0.04_285/0.7)] p-3 pl-5 sm:p-4"
+                className="flex items-center gap-4 bg-card p-4"
               >
-                <div className="flex flex-col items-center rounded-lg border border-border bg-[oklch(0.27_0.05_285/0.7)] px-3 py-2">
+                <div className="flex w-12 flex-col items-center rounded-sm border border-border bg-secondary/40 py-1.5 font-mono">
                   <span className="text-[10px] uppercase text-muted-foreground">
                     {
                       (en
@@ -178,12 +155,12 @@ export function WeeklyForecastLocked({
                         : ["ორშ", "სამ", "ოთხ", "ხუთ"])[i]
                     }
                   </span>
-                  <span className="text-lg font-semibold">{12 + i}</span>
+                  <span className="text-base font-semibold">{12 + i}</span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="h-3 w-3/4 rounded bg-foreground/15" />
-                  <div className="mt-2 h-2 w-1/2 rounded bg-foreground/10" />
-                  <div className="mt-2.5 h-2 w-full rounded-full bg-foreground/[0.08]" />
+                  <div className="h-3 w-3/4 bg-foreground/15" />
+                  <div className="mt-2 h-2 w-1/2 bg-foreground/10" />
+                  <div className="mt-2.5 h-1.5 w-full bg-border" />
                 </div>
               </li>
             ))}
@@ -191,38 +168,32 @@ export function WeeklyForecastLocked({
         </div>
       )}
 
-      {/* Lock CTA, in flow below the teaser, not an overlay. */}
-      <div className="relative mt-5 flex flex-col items-center gap-3 rounded-xl border border-[var(--vivida-violet)]/25 bg-background/30 px-4 py-5 text-center">
-        <div className="grid size-11 place-items-center rounded-full bg-[var(--vivida-violet)]/15 ring-1 ring-[var(--vivida-violet)]/40">
-          <Lock className="size-5 text-[var(--vivida-violet)]" />
+      {/* Lock CTA */}
+      <div className="mt-5 flex flex-col items-center gap-3 rounded-sm border border-border bg-secondary/25 px-4 py-6 text-center">
+        <div className="font-mono text-xs uppercase tracking-widest text-primary">
+          {cost} {en ? "credits" : "კრედიტი"} ·{" "}
+          <span className="text-muted-foreground">
+            {en ? "balance" : "ბალანსი"} {balance}
+          </span>
         </div>
-        <p className="max-w-xs text-sm text-foreground/85">
+        <p className="max-w-md text-sm text-foreground/85">
           {teaser
             ? en
-              ? "That was just the first day, unlock the full seven with reasons and guidance for each."
-              : "ეს მხოლოდ პირველი დღე იყო, გახსენი სრული შვიდეული: მიზეზები და რჩევები ყოველ დღეს."
+              ? "That was just the first day — unlock the full seven with reasons and guidance for each."
+              : "ეს მხოლოდ პირველი დღე იყო — გახსენი სრული შვიდეული მიზეზებითა და რჩევებით ყოველ დღეს."
             : en
               ? "Unlock a detailed seven-day forecast with daily harmony and challenge scores, reasons, and guidance."
-              : "გახსენი მომდევნო 7 დღის დეტალური პროგნოზი, ჰარმონიისა და დაძაბულობის ქულები ყოველ დღეს, მიზეზებით და რჩევებით."}
+              : "გახსენი მომდევნო 7 დღის დეტალური პროგნოზი ჰარმონიისა და დაძაბულობის ქულებით, მიზეზებითა და რჩევებით."}
         </p>
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-3 py-1 text-sm">
-          <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
-          <span className="font-semibold">
-            {cost} {en ? "credits" : "კრედიტი"}
-          </span>
-          <span className="text-muted-foreground">
-            · {en ? "one time · balance" : "ერთჯერადად · ბალანსი"} {balance}
-          </span>
-        </div>
 
         {!short ? (
           <Button
             type="button"
-            variant="mystic"
+            variant="default"
             size="lg"
             disabled={pending}
             onClick={unlock}
-            className="gap-1.5"
+            className="mt-1 gap-1.5"
           >
             {pending ? (
               <Loader2 className="size-4 animate-spin" />

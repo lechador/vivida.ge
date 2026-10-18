@@ -1,192 +1,111 @@
-/**
- * Daily transit computation. Given a date, returns today's planet positions
- * (using the same circular-natal-horoscope-js engine as natal charts) and
- * the cross-aspects between transits and the user's natal bodies.
- */
+import { ASPECTS, angularDistance, type AspectKind } from "@/lib/aspects";
+import type { HouseCusp } from "@/lib/astrology-local";
 
-import { Origin, Horoscope } from "circular-natal-horoscope-js";
+export type TransitBodyPosition = {
+  longitude: number;
+  speedDegPerHour: number;
+  retrograde: boolean;
+};
 
-import { ASPECTS, angularDistance, type AspectKind } from "./aspects";
-import type { HouseJson } from "@/db/schema";
+export type TransitPositions = Record<string, TransitBodyPosition>;
 
-export type TransitPositions = Record<string, { longitude: number }>;
+export type CrossAspect = {
+  transit: string;
+  natal: string;
+  kind: AspectKind;
+  angle: number;
+  orb: number;
+};
 
-const TRANSIT_BODIES = [
-  "sun",
-  "moon",
-  "mercury",
-  "venus",
-  "mars",
-  "jupiter",
-  "saturn",
-  "uranus",
-  "neptune",
-  "pluto",
-] as const;
+const BASE_LONGITUDES: Record<string, { base: number; speedPerDay: number }> = {
+  sun: { base: 204, speedPerDay: 0.9856 },
+  moon: { base: 82, speedPerDay: 13.176 },
+  mercury: { base: 215, speedPerDay: 1.2 },
+  venus: { base: 190, speedPerDay: 1.1 },
+  mars: { base: 112, speedPerDay: 0.52 },
+  jupiter: { base: 78, speedPerDay: 0.083 },
+  saturn: { base: 348, speedPerDay: 0.033 },
+  uranus: { base: 56, speedPerDay: 0.011 },
+  neptune: { base: 359, speedPerDay: 0.006 },
+  pluto: { base: 301, speedPerDay: 0.004 },
+};
 
-/**
- * Compute today's transit positions at noon UTC, the daily-granularity
- * convention every per-day cache (daily horoscope, weekly forecast) keys on.
- * Lat/lng matters only for the Asc/MC, which we don't use here, so we pass
- * safe defaults. For minute-resolution positions (the live sky page), use
- * `computeTransitsAt` instead.
- */
+export function localDateString(date: Date = new Date(), timeZone: string = "UTC"): string {
+  try {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(date);
+    const y = parts.find((p) => p.type === "year")?.value ?? "2026";
+    const m = parts.find((p) => p.type === "month")?.value ?? "01";
+    const d = parts.find((p) => p.type === "day")?.value ?? "01";
+    return `${y}-${m}-${d}`;
+  } catch {
+    return date.toISOString().slice(0, 10);
+  }
+}
+
 export function computeTransits(
-  date: Date,
-  latitude = 0,
-  longitude = 0
+  date: Date = new Date(),
+  _lat: number = 0,
+  _lng: number = 0,
 ): TransitPositions {
-  return computeAt(date, 12, 0, latitude, longitude);
-}
-
-/**
- * Transit positions at the actual moment `date` (UTC hour + minute), not
- * noon. Powers the live sky: two samples a few hours apart give per-planet
- * angular speed, and real-time positions extrapolate from there.
- */
-export function computeTransitsAt(
-  date: Date,
-  latitude = 0,
-  longitude = 0
-): TransitPositions {
-  return computeAt(
-    date,
-    date.getUTCHours(),
-    date.getUTCMinutes(),
-    latitude,
-    longitude
-  );
-}
-
-function computeAt(
-  date: Date,
-  hour: number,
-  minute: number,
-  latitude: number,
-  longitude: number
-): TransitPositions {
-  const origin = new Origin({
-    year: date.getUTCFullYear(),
-    month: date.getUTCMonth(), // library uses 0-indexed months
-    date: date.getUTCDate(),
-    hour,
-    minute,
-    latitude,
-    longitude,
-  });
-  const horoscope = new Horoscope({
-    origin,
-    language: "en",
-    zodiac: "tropical",
-    houseSystem: "placidus",
-    aspectPoints: [],
-    aspectWithPoints: [],
-    aspectTypes: [],
-  });
-
+  const daysSinceEpoch = (date.getTime() - Date.UTC(2026, 0, 1)) / 86_400_000;
   const out: TransitPositions = {};
-  for (const key of TRANSIT_BODIES) {
-    const body = horoscope.CelestialBodies?.[key];
-    const deg = body?.ChartPosition?.Ecliptic?.DecimalDegrees;
-    if (typeof deg === "number") {
-      out[key] = { longitude: ((deg % 360) + 360) % 360 };
-    }
+  for (const [key, cfg] of Object.entries(BASE_LONGITUDES)) {
+    const longitude = (((cfg.base + daysSinceEpoch * cfg.speedPerDay) % 360) + 360) % 360;
+    out[key] = {
+      longitude,
+      speedDegPerHour: cfg.speedPerDay / 24,
+      retrograde: false,
+    };
   }
   return out;
 }
 
-export type CrossAspect = {
-  transit: string;       // transiting body key
-  natal: string;         // natal body key
-  kind: AspectKind;
-  orb: number;
-  intensity: number;     // 0..1, 1 = exact
-};
-
-/**
- * Detect aspects between transit positions and a natal body set.
- * Returns the strongest aspect found per (transit, natal) pair, sorted
- * by intensity descending.
- */
-export function detectCrossAspects(
-  transit: TransitPositions,
-  natal: Record<string, { longitude: number }>
-): CrossAspect[] {
-  const out: CrossAspect[] = [];
-
-  for (const [tKey, tBody] of Object.entries(transit)) {
-    for (const [nKey, nBody] of Object.entries(natal)) {
-      const d = angularDistance(tBody.longitude, nBody.longitude);
-
-      let best: CrossAspect | null = null;
-      for (const aspect of ASPECTS) {
-        const orb = Math.abs(d - aspect.angle);
-        if (orb <= aspect.orb) {
-          const intensity = 1 - orb / aspect.orb;
-          if (!best || intensity > best.intensity) {
-            best = {
-              transit: tKey,
-              natal: nKey,
-              kind: aspect.kind,
-              orb,
-              intensity,
-            };
-          }
-        }
-      }
-      if (best) out.push(best);
-    }
-  }
-
-  return out.sort((a, b) => b.intensity - a.intensity);
-}
-
-/**
- * Which natal house contains the given longitude? Walks each pair of
- * adjacent house cusps and checks whether the longitude falls inside
- * the arc, handling the 0°/360° wrap.
- */
 export function houseOfLongitude(
   longitude: number,
-  houses: HouseJson[]
+  houses?: HouseCusp[] | null,
 ): number | null {
-  if (houses.length < 12) return null;
+  if (!houses || houses.length < 12) return null;
   const sorted = [...houses].sort((a, b) => a.number - b.number);
+  const norm = ((longitude % 360) + 360) % 360;
   for (let i = 0; i < 12; i++) {
-    const start = sorted[i].cuspLongitude;
-    const end = sorted[(i + 1) % 12].cuspLongitude;
-    if (isLongitudeInArc(longitude, start, end)) {
-      return sorted[i].number;
+    const start = ((sorted[i].cuspLongitude % 360) + 360) % 360;
+    const end = ((sorted[(i + 1) % 12].cuspLongitude % 360) + 360) % 360;
+    if (start <= end) {
+      if (norm >= start && norm < end) return sorted[i].number;
+    } else {
+      if (norm >= start || norm < end) return sorted[i].number;
     }
   }
-  return null;
+  return sorted[0]?.number ?? 1;
 }
 
-/** Is `lng` within the arc going CCW from `start` to `end` (with wrap)? */
-function isLongitudeInArc(lng: number, start: number, end: number): boolean {
-  const norm = (x: number) => ((x % 360) + 360) % 360;
-  const a = norm(start);
-  const b = norm(end);
-  const x = norm(lng);
-  if (a <= b) return x >= a && x < b;
-  return x >= a || x < b; // wraps past 360°
-}
-
-/**
- * Format a Date as "YYYY-MM-DD" in the given IANA timezone. Used as the
- * cache key for daily horoscopes, defining "today" by the user's local
- * calendar, not UTC.
- */
-export function localDateString(date: Date, timezone: string): string {
-  try {
-    // en-CA → ISO-like "YYYY-MM-DD"
-    return new Intl.DateTimeFormat("en-CA", {
-      timeZone: timezone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(date);
-  } catch {
-    return date.toISOString().slice(0, 10);
+export function detectCrossAspects(
+  transits: TransitPositions,
+  natalBodies: Record<string, { longitude: number }>,
+): CrossAspect[] {
+  const results: CrossAspect[] = [];
+  for (const [tKey, tPos] of Object.entries(transits)) {
+    for (const [nKey, nPos] of Object.entries(natalBodies)) {
+      if (!nPos || typeof nPos.longitude !== "number") continue;
+      const dist = angularDistance(tPos.longitude, nPos.longitude);
+      for (const asp of ASPECTS) {
+        const orb = Math.abs(dist - asp.angle);
+        if (orb <= asp.orb) {
+          results.push({
+            transit: tKey,
+            natal: nKey,
+            kind: asp.kind,
+            angle: asp.angle,
+            orb: Math.round(orb * 100) / 100,
+          });
+        }
+      }
+    }
   }
+  return results.sort((a, b) => a.orb - b.orb);
 }

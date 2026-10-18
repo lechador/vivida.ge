@@ -26,13 +26,6 @@ import { PUSH_VALUE_MOMENT_EVENT } from "@/lib/push-prompt";
 import { DailyRitual } from "./daily-ritual";
 import { ProDailyBrief } from "./pro-daily-brief";
 
-/**
- * Dashboard content loaded after first paint via server actions. The page
- * shell ships immediately; this loads in two waves so the user never waits
- * on AI latency:
- *   - core (chart positions + suggestions) renders as soon as it's ready
- *   - the AI cards (daily / weekly / moon) stream in behind skeletons
- */
 export function DailyDashboard({
   userId,
   locale = "ka",
@@ -50,8 +43,6 @@ export function DailyDashboard({
       .then((c) => {
         if (cancelled) return;
         setCore(c);
-        // The chart just rendered — the user has received value, which is the
-        // right moment to offer daily notifications rather than a static banner.
         if (c) {
           window.dispatchEvent(new Event(PUSH_VALUE_MOMENT_EVENT));
         }
@@ -64,14 +55,10 @@ export function DailyDashboard({
     };
   }, [userId]);
 
-  // No-chart accounts never reach this component (the dashboard renders
-  // NoChartDashboard instead), and birth data is optional, so there is no
-  // forced redirect to onboarding here.
-
   if (error) {
     return (
       <div className="space-y-6">
-        <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border border-border bg-card p-6 text-center text-sm text-muted-foreground">
           {en
             ? "Could not load. Please refresh the page."
             : "ვერ ჩაიტვირთა, გთხოვ, გადატვირთო გვერდი."}
@@ -83,7 +70,7 @@ export function DailyDashboard({
   if (!core || core.kind === "no-chart") {
     return (
       <div className="space-y-6">
-        <div className="flex min-h-[240px] items-center justify-center">
+        <div className="flex min-h-[240px] items-center justify-center rounded-md border border-border bg-card">
           <CosmicLoader embedded progressive locale={locale} />
         </div>
       </div>
@@ -102,8 +89,24 @@ export function DailyDashboard({
 
   return (
     <div className="space-y-8">
-      {/* AI cards stream in here behind skeletons so the page never blocks
-          on generation latency. */}
+      {/* Big Three Ephemeris Strip at Top of Observatory */}
+      <section>
+        <header className="mb-3 flex items-baseline justify-between">
+          <div className="flex items-center gap-2.5 text-xs font-medium uppercase tracking-[0.2em] text-primary">
+            <span aria-hidden className="inline-block h-px w-6 bg-primary/70" />
+            <span>{en ? "Primary Natal Axis (Big Three)" : "შენი დიდი სამეული"}</span>
+          </div>
+          <Link
+            href="/report"
+            className="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {en ? "Full Ephemeris & Chart →" : "სრული ნატალური რუკა →"}
+          </Link>
+        </header>
+        <MiniBigThree chart={chart.data} locale={locale} />
+      </section>
+
+      {/* AI cards stream in behind structured hairline skeletons */}
       <DashboardExtrasSection
         userId={userId}
         canDaily={canDaily}
@@ -114,36 +117,25 @@ export function DailyDashboard({
         ritualProgress={ritualProgress}
       />
 
-      <section>
-        <header className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Your big three" : "შენი დიდი სამეული"}
-          </h2>
-          <Link
-            href="/report"
-            className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-          >
-            {en ? "Full chart →" : "სრული რუკა →"}
-          </Link>
-        </header>
-        <MiniBigThree chart={chart.data} locale={locale} />
-      </section>
-
-      <section className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/10 to-transparent p-6 backdrop-blur-xl">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Complete Natal Chart Callout */}
+      <section className="rounded-md border border-border bg-card p-6 sm:p-7">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-lg font-semibold tracking-tight">
+            <div className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              {en ? "Astronomical Natal Chart" : "პერსონალური ეფემერიდა"}
+            </div>
+            <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
               {en ? "Your complete natal chart" : "შენი სრული ნატალური რუკა"}
             </h3>
-            <p className="mt-1 max-w-md text-sm text-muted-foreground">
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
               {en
                 ? "Chart wheel, personal analysis, twelve houses, aspects and every planet in one place, with complete English interpretations."
-                : "ცის რუკის ბორბალი, AI ანალიზი, 12 სახლი, ასპექტები და ყველა პლანეტა, დეტალურად, ერთად."}
+                : "ცის რუკის ბორბალი, ღრმა ანალიზი, 12 სახლი, ასპექტები და ყველა პლანეტის გრადუსული მდებარეობა ერთ სივრცეში."}
             </p>
           </div>
-          <Button asChild variant="mystic" size="lg" className="shrink-0">
+          <Button asChild variant="default" size="lg" className="shrink-0">
             <Link href="/report">
-              {en ? "View chart" : "ნახე რუკა"}
+              {en ? "Open natal chart" : "ნახე სრული რუკა"}
               <ArrowRight className="size-4" />
             </Link>
           </Button>
@@ -157,11 +149,6 @@ export function DailyDashboard({
   );
 }
 
-/**
- * Loads + renders the AI-generated cards (daily, moon, weekly) as a second
- * wave. Shows skeletons in the meantime so the layout is stable and the
- * page feels finished while generation runs in the background.
- */
 function DashboardExtrasSection({
   userId,
   canDaily,
@@ -189,7 +176,6 @@ function DashboardExtrasSection({
         if (!cancelled) setExtras(e);
       })
       .catch(() => {
-        // Degrade silently, the rest of the dashboard is already useful.
         if (!cancelled) {
           setExtras({
             daily: null,
@@ -210,7 +196,7 @@ function DashboardExtrasSection({
   const dailySlot = loading ? (
     <HoroscopeLoading locale={locale} />
   ) : extras.daily ? null : canDaily ? (
-    <div className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground">
+    <div className="rounded-md border border-border bg-card p-6 text-center text-sm text-muted-foreground">
       {en
         ? "Today's horoscope is being prepared. Try again shortly."
         : "დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში."}
@@ -228,7 +214,7 @@ function DashboardExtrasSection({
       {(!loading && extras.daily) || dailySlot || moonSlot ? (
         <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
           {!loading && extras.daily ? (
-            <div className="min-w-0 xl:col-span-7">
+            <div className="min-w-0 xl:col-span-8">
               <DailyRitual
                 userId={userId}
                 horoscope={extras.daily}
@@ -238,18 +224,16 @@ function DashboardExtrasSection({
               />
             </div>
           ) : dailySlot ? (
-            <div className="min-w-0 xl:col-span-7">{dailySlot}</div>
+            <div className="min-w-0 xl:col-span-8">{dailySlot}</div>
           ) : null}
           {moonSlot && (
-            <div className="min-w-0 xl:col-span-5 xl:sticky xl:top-20">
+            <div className="min-w-0 xl:col-span-4 xl:sticky xl:top-20">
               {moonSlot}
             </div>
           )}
         </div>
       ) : null}
 
-      {/* PRO layer sits below the delivered free insight, premium answers
-          stay fully unlocked, free viewers get the score tease + CTA. */}
       {!loading && extras.daily ? (
         <ProDailyBrief
           userId={userId}
@@ -284,11 +268,10 @@ function DashboardExtrasSection({
   );
 }
 
-/** Generic shimmering card placeholder matching the dashboard card chrome. */
 function CardSkeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`vivida-pulse-soft rounded-2xl border border-border/60 bg-card/40 ${className}`}
+      className={`vivida-pulse-soft rounded-md border border-border bg-card ${className}`}
       aria-hidden
     />
   );

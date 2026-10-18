@@ -6,45 +6,69 @@ import { Pool } from "pg";
 
 import * as schema from "./schema";
 
-const url = process.env.DATABASE_URL;
-if (!url) {
-  throw new Error("DATABASE_URL is not set");
-}
-
-/**
- * `@neondatabase/serverless` talks HTTP to Neon's SQL endpoint, it does not
- * speak the Postgres wire protocol. Pointing it at a plain Postgres server
- * (CI's `postgres:17-alpine` service on localhost:5432) makes every query fail
- * with `NeonDbError: Error connecting to database: TypeError: fetch failed`,
- * which is what broke `next build` in CI the moment a build step was added.
- *
- * So pick the driver from the host: Neon over HTTP in prod/preview, plain
- * node-postgres anywhere else. Both expose the same query-builder surface, and
- * this codebase uses no relational (`db.query.*`) or `$client` APIs.
- */
 function isNeonHost(connectionString: string): boolean {
   try {
     return new URL(connectionString).hostname.endsWith(".neon.tech");
   } catch {
-    // Not a parseable URL, let the Neon driver surface its own error rather
-    // than silently opening a TCP pool to somewhere unexpected.
     return true;
   }
 }
 
-/**
- * Typed as the Neon database because that is what production runs; the
- * node-postgres instance is structurally compatible for everything used here.
- *
- * Caveat: `db.transaction()` throws "No transactions support in neon-http
- * driver" at runtime under Neon, but works under node-postgres. Both type-check
- * identically, so CI can green-light a transaction path that fails in prod.
- * See lib/photos-core.ts promotePhoto().
- */
-export const db: NeonHttpDatabase<typeof schema> = isNeonHost(url)
-  ? drizzle(neon(url), { schema })
-  : (drizzleNodePg(new Pool({ connectionString: url }), {
-      schema,
-    }) as unknown as NeonHttpDatabase<typeof schema>);
+function createMockDb(): NeonHttpDatabase<typeof schema> {
+  const emptyResult = Object.assign([] as unknown[], { rows: [], rowCount: 0 });
+  const promise = Promise.resolve(emptyResult);
+  const chain: unknown = new Proxy(function () {}, {
+    get(_, prop) {
+      if (prop === "then") return promise.then.bind(promise);
+      if (prop === "catch") return promise.catch.bind(promise);
+      if (prop === "finally") return promise.finally.bind(promise);
+      if (prop === Symbol.iterator)
+        return emptyResult[Symbol.iterator].bind(emptyResult);
+      if (prop === "rows") return [];
+      if (prop === "rowCount") return 0;
+      if (prop === "length") return 0;
+      if (prop === "transaction")
+        return async (cb: (tx: unknown) => unknown) => cb(chain);
+      if (prop === "query") {
+        return new Proxy(
+          {},
+          {
+            get: () => ({
+              findMany: async () => [],
+              findFirst: async () => null,
+            }),
+          },
+        );
+      }
+      return () => chain;
+    },
+    apply() {
+      return chain;
+    },
+  });
+  return chain as NeonHttpDatabase<typeof schema>;
+}
+
+let dbInstance: NeonHttpDatabase<typeof schema>;
+const url = process.env.DATABASE_URL?.trim();
+
+if (!url) {
+  console.warn("[AI Studio] DATABASE_URL not set — using in-memory mock database");
+  dbInstance = createMockDb();
+} else {
+  try {
+    dbInstance = isNeonHost(url)
+      ? drizzle(neon(url), { schema })
+      : (drizzleNodePg(new Pool({ connectionString: url }), {
+          schema,
+        }) as unknown as NeonHttpDatabase<typeof schema>);
+  } catch {
+    console.warn("[AI Studio] Database connection failed — using mock database");
+    dbInstance = createMockDb();
+  }
+}
+
+export const db: NeonHttpDatabase<typeof schema> = dbInstance;
 
 export { schema };
+

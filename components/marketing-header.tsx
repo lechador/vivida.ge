@@ -1,114 +1,138 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { Button } from "@/components/ui/button";
 import { VividaMark } from "@/components/brand/vivida-mark";
-import { MarketingCta } from "@/components/marketing-cta";
-import { SiteSearch } from "@/components/search/site-search";
-import { CORE_LANGUAGE_PAIRS, ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import { LunarPhaseDisc } from "@/components/brand/celestial-icons";
+import { computeMoonPhase } from "@/lib/moon-phase";
+import { ObservatoryDrawer } from "@/components/nav/observatory-drawer";
+import { englishSiteHref, resolveEnglishPath } from "@/lib/seo/locales";
 
-/** Only these few routes change slug across languages; every other public page
- * is published at the same path on the English domain (see englishSitemap()). */
-const EN_PATH_BY_KA = new Map(
-  CORE_LANGUAGE_PAIRS.map(({ ka, en }) => [ka, en as string]),
-);
+const NAV_LINKS = [
+  { href: "/horoskopi", label: "ჰოროსკოპი" },
+  { href: "/nataluri-ruka", label: "ნატალური რუკა" },
+  { href: "/zodiac", label: "ზოდიაქო" },
+  { href: "/taro", label: "ტარო" },
+  { href: "/tests", label: "ტესტები" },
+];
 
-/**
- * English counterpart of the page currently being viewed. Absolute on purpose,
- * mirroring EnglishHeader's ქართული switch: the /en/* internal paths only
- * 301-redirect to this domain anyway.
- */
-function englishHrefFor(pathname: string, override?: string): string {
-  if (override) {
-    return `${ENGLISH_SITE_URL}${override === "/" ? "" : override}`;
-  }
-  const kaPath = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
-  const enPath = EN_PATH_BY_KA.get(kaPath) ?? kaPath;
-  return `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
-}
-
-/**
- * Lightweight header for public marketing pages (/how-it-works, /features,
- * /terms, /privacy). The authed AppHeader is over-featured for these, we
- * just need brand + a few nav links + a CTA.
- *
- * Client-side only because of usePathname: the EN switcher has to point at the
- * English version of the current page, and most call sites pass no `active`.
- */
 export function MarketingHeader({
   active,
   englishPath,
 }: {
-  active?:
-    | "features"
-    | "how-it-works"
-    | "nataluri-ruka"
-    | "zodiac"
-    | "horoskopi"
-    | "taro"
-    | "tests"
-    | "articles";
+  active?: string;
   englishPath?: string;
-}) {
-  const englishHref = englishHrefFor(usePathname() || "/", englishPath);
-
-  const link = (href: string, label: string, key: typeof active) => (
-    <Link
-      href={href}
-      className={
-        active === key
-          ? "text-foreground transition-colors"
-          : "text-muted-foreground transition-colors hover:text-foreground"
-      }
-    >
-      {label}
-    </Link>
+} = {}) {
+  const pathname = usePathname() || "/";
+  const enHref = englishSiteHref(
+    englishPath ?? resolveEnglishPath(pathname),
+    true,
   );
+  const moonSnapshot = useMemo(() => computeMoonPhase(new Date()), []);
+  const illumPct = moonSnapshot
+    ? Math.round(moonSnapshot.illumination * 100)
+    : 50;
 
   return (
-    <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
-      <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-4">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <VividaMark size={40} id="marketing-header" />
-          <span
-            className="bg-clip-text text-transparent text-lg font-semibold tracking-tight sm:text-xl"
-            style={{
-              backgroundImage:
-                "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-            }}
-          >
-            vivida
+    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md">
+      {/* Row 1: Strict 3-Zone Top Bar Contract */}
+      <div className="mx-auto flex h-15 w-full max-w-7xl items-center justify-between gap-8 px-4 sm:px-6">
+        {/* Zone 1: Single-line Brand Wordmark */}
+        <Link
+          href="/"
+          className="inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap"
+        >
+          <VividaMark size={28} id="marketing-header" />
+          <span className="font-display text-2xl font-medium tracking-tight text-foreground">
+            Vivida
           </span>
         </Link>
 
-        <SiteSearch
-          compact
-          placeholder="ძებნა…"
-          className="min-w-0 flex-1 sm:max-w-xs"
-        />
-      </div>
-
-      <div className="flex shrink-0 items-center gap-6 sm:gap-7">
-        <nav className="hidden items-center gap-5 text-sm lg:flex">
-          {link("/nataluri-ruka", "ნატალური რუკა", "nataluri-ruka")}
-          {link("/horoskopi", "ჰოროსკოპი", "horoskopi")}
-          {link("/taro", "ტარო", "taro")}
-          {link("/tests", "ტესტები", "tests")}
-          {link("/articles", "სტატიები", "articles")}
-          {link("/zodiac", "ზოდიაქო", "zodiac")}
+        {/* Zone 2: 5 concise single-line text navigation links */}
+        <nav
+          aria-label="მთავარი ნავიგაცია"
+          className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex"
+        >
+          {NAV_LINKS.map((item) => {
+            const isCurrent =
+              active === item.href.slice(1) ||
+              pathname === item.href ||
+              pathname.startsWith(`${item.href}/`);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`shrink-0 whitespace-nowrap transition-colors duration-150 hover:text-foreground ${
+                  isCurrent
+                    ? "text-foreground underline decoration-primary decoration-1 underline-offset-8"
+                    : ""
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <Link
-          href={englishHref}
-          hrefLang="en"
-          className="rounded-full border border-border/70 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-          aria-label="English version"
-        >
-          EN
-        </Link>
+        {/* Zone 3: Primary action */}
+        <div className="flex shrink-0 items-center gap-3">
+          <Link
+            href="/login"
+            className="hidden whitespace-nowrap text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
+          >
+            შესვლა
+          </Link>
+          <Button asChild size="sm" className="shrink-0 whitespace-nowrap">
+            <Link href="/signup">რუკის შექმნა</Link>
+          </Button>
+        </div>
+      </div>
 
-        <MarketingCta />
+      {/* Row 2: Persistent Celestial Context Strip + Slide-Over Almanac Drawer */}
+      <div className="border-t border-border/70 bg-card/75">
+        <div className="mx-auto flex h-9 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
+            <span className="uppercase tracking-[0.16em] text-primary">
+              41°43′N · 44°47′E
+            </span>
+            {moonSnapshot && (
+              <Link
+                href="/mtvaris-kalendari"
+                className="inline-flex items-center gap-2 truncate border-l border-border pl-3 transition-colors hover:text-foreground"
+              >
+                <LunarPhaseDisc
+                  phaseAngle={moonSnapshot.phaseAngle}
+                  size={15}
+                />
+                <span className="truncate">{moonSnapshot.phaseLabelKa}</span>
+                <span aria-hidden className="hidden sm:inline">
+                  ·
+                </span>
+                <span className="hidden text-primary sm:inline">
+                  {moonSnapshot.signSymbol} {moonSnapshot.signKa}
+                </span>
+                <span aria-hidden className="hidden sm:inline">
+                  ·
+                </span>
+                <span className="hidden sm:inline">{illumPct}%</span>
+              </Link>
+            )}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-3">
+            <a
+              href={enHref}
+              hrefLang="en"
+              className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+            >
+              EN
+            </a>
+            <ObservatoryDrawer authed={false} locale="ka" />
+          </div>
+        </div>
       </div>
     </header>
   );

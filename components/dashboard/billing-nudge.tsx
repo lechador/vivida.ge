@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Crown, Sparkles } from "lucide-react";
+import { ArrowRight, Crown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,11 +12,6 @@ import {
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
-/**
- * A quiet, in-flow commerce reminder for the highest-frequency signed-in page.
- * It appears after the user's daily value, never overlays content, and offers
- * both payment models instead of forcing a subscription-only decision.
- */
 export function DashboardBillingNudge({
   locale,
   countryCode,
@@ -49,26 +44,24 @@ export function DashboardBillingNudge({
   }
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-[var(--vivida-gold)]/25 bg-gradient-to-r from-[var(--vivida-gold)]/8 via-card/55 to-[var(--vivida-violet)]/8 p-5 ring-1 ring-foreground/5">
-      <div
-        aria-hidden
-        className="absolute -right-12 -top-16 size-40 rounded-full bg-[var(--vivida-gold)]/12 blur-3xl"
-      />
-      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 items-start gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--vivida-gold)]/14 text-[var(--vivida-gold)]">
-            <Crown className="size-5" />
+    <section className="rounded-md border border-border bg-card p-5 sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3.5">
+          <span className="grid size-10 shrink-0 place-items-center rounded-sm border border-primary/30 bg-primary/10 text-primary">
+            <Crown className="size-4.5" />
           </span>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="font-semibold tracking-tight">Vivida PRO</h2>
+              <h2 className="text-base font-semibold tracking-tight text-foreground">
+                Vivida PRO
+              </h2>
               {months > 1 && (
-                <span className="rounded-full bg-[var(--vivida-gold)]/14 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--vivida-gold)]">
-                  {en ? "Special price" : "სპეციალური ფასი"}
+                <span className="font-mono text-xs font-medium uppercase tracking-wider text-primary">
+                  · {en ? "Special price" : "სპეციალური ფასი"}
                 </span>
               )}
             </div>
-            <p className="mt-1 max-w-xl text-sm text-foreground/70">
+            <p className="mt-1 max-w-xl text-sm text-muted-foreground">
               {months > 1
                 ? en
                   ? `Unlock everything for ${months} months for ${formatBillingAmount(pro.amountMinor, pro.currency, locale)}.`
@@ -80,17 +73,16 @@ export function DashboardBillingNudge({
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-wrap gap-2">
-          <Button asChild variant="ghost" size="sm">
+        <div className="flex shrink-0 flex-wrap gap-2.5">
+          <Button asChild variant="outline" size="sm">
             <Link
               href="/credits?next=%2Fdashboard"
               onClick={() => track("credits")}
             >
-              <Sparkles className="size-4" />
               {en ? "Credits" : "კრედიტები"}
             </Link>
           </Button>
-          <Button asChild variant="mystic" size="sm">
+          <Button asChild variant="default" size="sm">
             <Link
               href="/subscription?next=%2Fdashboard"
               onClick={() => track("subscription")}

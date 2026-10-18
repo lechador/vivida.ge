@@ -25,6 +25,7 @@ import {
 } from "@/lib/credits";
 import { SYNASTRY_DEEP_PROMPT_VERSION } from "@/lib/openrouter";
 import { Starfield } from "@/components/landing/starfield";
+import { CornerCrosshair } from "@/components/brand/celestial-icons";
 import { AppHeader } from "@/components/nav/app-header";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { SynastryTeaser } from "@/components/synastry/synastry-teaser";
@@ -64,14 +65,14 @@ export default async function SynastryDetailPage({
     return (
       <main
         lang={locale}
-        className="relative isolate flex flex-1 flex-col overflow-hidden"
+        className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
       >
         <AppHeader authed active="synastry" />
         <section className="mx-auto w-full max-w-xl p-8 text-center text-sm text-muted-foreground">
           {en
             ? "Your chart hasn't been created yet. "
             : "შენი რუკა ჯერ შედგენილი არ არის. ჯერ "}
-          <Link href="/onboarding" className="underline">
+          <Link href="/onboarding" className="text-primary underline">
             {en ? "Add your birth details" : "შეავსე დაბადების მონაცემები"}
           </Link>
           .
@@ -80,11 +81,6 @@ export default async function SynastryDetailPage({
     );
   }
 
-  // ── Credit gate ────────────────────────────────────────────────────────
-  // The first partner's synastry is free; each one after costs credits, paid
-  // once and then permanently unlocked for that partner. Free unlocks are
-  // recorded as zero-cost ledger rows so the allowance is stable across
-  // partners and can't be re-farmed by re-opening the same one.
   let unlocked = await isUnlocked(partner.userId, partner.id, "spend_synastry");
   if (!unlocked && isOwner) {
     const used = await countUnlocks(partner.userId, "spend_synastry");
@@ -96,41 +92,45 @@ export default async function SynastryDetailPage({
 
   if (!unlocked) {
     const balance = isOwner ? await getBalance(partner.userId) : 0;
-    // Tease, don't block: the overall score is cheap deterministic compute,
-    // so owners see their number + blurred breakdown before paying. The AI
-    // narrative and weekly updates below stay behind the unlock.
     const teaserScores = isOwner
       ? computeSynastry(viewerChart.data, partner.chart)
       : null;
     return (
       <main
         lang={locale}
-        className="relative isolate flex flex-1 flex-col overflow-hidden"
+        className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
       >
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.18_350/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_305/0.3),transparent_70%)]"
-        />
-        <Starfield count={120} shooting={3} />
+        <Starfield count={48} />
         <AppHeader authed active="synastry" />
-        <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
+        <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
           <Link
             href="/synastry"
-            className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="mb-4 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-primary"
           >
             <ArrowLeft className="size-3.5" />
             {en ? "All partners" : "ყველა პარტნიორი"}
           </Link>
-          <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            {viewerName ?? (en ? "You" : "შენ")}{" "}
-            <span className="text-muted-foreground">{en ? "and" : "და"}</span>{" "}
-            <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {partner.name}
-            </span>
-          </h1>
-          <p className="mb-6 text-sm text-muted-foreground">
-            {partner.dateOfBirth} · {partner.cityName}
-          </p>
+
+          <header className="mb-6 border-b border-border pb-5">
+            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              SYNASTRY SPECIMEN · LOCKED DOSSIER
+            </div>
+            <h1
+              className={
+                en
+                  ? "mt-2 text-balance font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl"
+                  : "mt-2 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
+              }
+            >
+              {viewerName ?? (en ? "You" : "შენ")}{" "}
+              <span className="text-muted-foreground">×</span>{" "}
+              <span className="text-primary">{partner.name}</span>
+            </h1>
+            <p className="mt-1.5 font-mono text-xs tabular-nums text-muted-foreground">
+              {partner.dateOfBirth} · {partner.cityName}
+            </p>
+          </header>
+
           {isOwner ? (
             <>
               {teaserScores && (
@@ -155,7 +155,7 @@ export default async function SynastryDetailPage({
               />
             </>
           ) : (
-            <div className="rounded-2xl border border-border bg-card/70 p-6 text-sm text-muted-foreground">
+            <div className="rounded-sm border border-border bg-card p-6 text-sm text-muted-foreground">
               {en
                 ? "The relationship owner needs to unlock this reading first."
                 : "ამ თავსებადობის შედეგი ჯერ ურთიერთობის მფლობელმა უნდა გახსნას."}
@@ -166,13 +166,8 @@ export default async function SynastryDetailPage({
     );
   }
 
-  // Cheap deterministic compute on every visit, keeps the result fresh
-  // without a cache while we tune scoring.
   const synastry = computeSynastry(viewerChart.data, partner.chart);
   const synastryTexts = await getSynastryInterpretationsFor(synastry, locale);
-
-  // Ensure AI interpretation exists (lazy generation, first visit pays
-  // the Gemini call, subsequent visits read the cached row).
   const partnerWithAi = await ensureSynastryInterpretation(partner, locale);
   const ai = partnerWithAi.aiInterpretation;
 
@@ -184,8 +179,6 @@ export default async function SynastryDetailPage({
     ? await listRelationshipAnswers(partner.id, user.id, weekly.weekStart)
     : [];
 
-  // Deep report is cached on the partner row; show it if it's fresh for this
-  // viewer + prompt version, otherwise the component offers to generate it.
   const deepStamp = `${viewerChart.inputHash}:${locale}:v${SYNASTRY_DEEP_PROMPT_VERSION}`;
   const initialDeep =
     partnerWithAi.deepReport && partnerWithAi.deepViewerHash === deepStamp
@@ -195,35 +188,40 @@ export default async function SynastryDetailPage({
   return (
     <main
       lang={locale}
-      className="relative isolate flex flex-1 flex-col overflow-hidden"
+      className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_-5%,oklch(0.32_0.18_350/0.5),transparent_70%),radial-gradient(40%_30%_at_85%_60%,oklch(0.28_0.13_220/0.35),transparent_70%),radial-gradient(35%_25%_at_15%_75%,oklch(0.30_0.15_305/0.3),transparent_70%)]"
-      />
-      <Starfield count={120} shooting={3} />
+      <Starfield count={48} />
 
       <AppHeader authed active="synastry" />
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <Link
           href="/synastry"
-          className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="mb-4 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-primary"
         >
           <ArrowLeft className="size-3.5" />
           {en ? "All partners" : "ყველა პარტნიორი"}
         </Link>
 
-        <h1 className="mb-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-          {viewerName ?? (en ? "You" : "შენ")}{" "}
-          <span className="text-muted-foreground">{en ? "and" : "და"}</span>{" "}
-          <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {partner.name}
-          </span>
-        </h1>
-        <p className="mb-8 text-sm text-muted-foreground">
-          {partner.dateOfBirth} · {partner.cityName}
-        </p>
+        <header className="mb-8 border-b border-border pb-6">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+            RELATIONAL EPHEMERIS · SYNASTRY DOSSIER
+          </div>
+          <h1
+            className={
+              en
+                ? "mt-2 text-balance font-display text-3xl font-medium tracking-tight text-foreground sm:text-5xl"
+                : "mt-2 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl"
+            }
+          >
+            {viewerName ?? (en ? "You" : "შენ")}{" "}
+            <span className="text-muted-foreground">×</span>{" "}
+            <span className="text-primary">{partner.name}</span>
+          </h1>
+          <p className="mt-2 font-mono text-xs tabular-nums text-muted-foreground">
+            {partner.dateOfBirth} · {partner.cityName}
+          </p>
+        </header>
 
         <RelationshipControls
           partnerId={partner.id}
@@ -246,66 +244,73 @@ export default async function SynastryDetailPage({
         )}
 
         {ai && (
-          <article className="mb-8 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-pink)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
-            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-[var(--vivida-violet)]">
-              <Sparkles className="size-4" aria-hidden />
-              <span>
-                {en ? "Personalized chart narrative" : "AI-ს მცირე ნარატივი"}
-              </span>
-            </div>
-            <p className="text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
-              {ai.summary}
-            </p>
-            {(ai.strengths.length > 0 || ai.growth.length > 0) && (
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {ai.strengths.length > 0 && (
-                  <div className="rounded-xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/5 p-4">
-                    <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-[var(--vivida-cyan)]">
-                      <span aria-hidden>✨</span>
-                      <span>
-                        {en ? "What brings you together" : "რას გაერთიანებთ"}
-                      </span>
-                    </div>
-                    <ul className="space-y-1.5 text-sm leading-relaxed text-foreground/90">
-                      {ai.strengths.map((s, i) => (
-                        <li key={i} className="flex gap-2">
-                          <span
-                            aria-hidden
-                            className="mt-0.5 text-[var(--vivida-cyan)]"
-                          >
-                            ◆
-                          </span>
-                          {s}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {ai.growth.length > 0 && (
-                  <div className="rounded-xl border border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/5 p-4">
-                    <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-[var(--vivida-pink)]">
-                      <span aria-hidden>⚡</span>
-                      <span>
-                        {en ? "Where friction appears" : "სად არის ხახუნი"}
-                      </span>
-                    </div>
-                    <ul className="space-y-1.5 text-sm leading-relaxed text-foreground/90">
-                      {ai.growth.map((g, i) => (
-                        <li key={i} className="flex gap-2">
-                          <span
-                            aria-hidden
-                            className="mt-0.5 text-[var(--vivida-pink)]"
-                          >
-                            ◆
-                          </span>
-                          {g}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+          <article className="relative mb-8 overflow-hidden rounded-sm border border-border bg-card">
+            <CornerCrosshair position="tl" />
+            <CornerCrosshair position="tr" />
+            <CornerCrosshair position="bl" />
+            <CornerCrosshair position="br" />
+
+            <div className="border-b border-border bg-background/50 px-5 py-3 sm:px-6">
+              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+                <Sparkles className="size-3.5" aria-hidden />
+                <span>
+                  {en
+                    ? "SYNTHESIS · RELATIONAL NARRATIVE"
+                    : "სინთეზი · ურთიერთობის ნარატივი"}
+                </span>
               </div>
-            )}
+            </div>
+
+            <div className="p-5 sm:p-6">
+              <p className="text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
+                {ai.summary}
+              </p>
+
+              {(ai.strengths.length > 0 || ai.growth.length > 0) && (
+                <div className="mt-6 grid gap-px overflow-hidden rounded-sm border border-border bg-border sm:grid-cols-2">
+                  {ai.strengths.length > 0 && (
+                    <div className="bg-background/50 p-4 sm:p-5">
+                      <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+                        {en
+                          ? "HARMONIC CONVERGENCE · STRENGTHS"
+                          : "ჰარმონიული გადაკვეთა · რას გაერთიანებთ"}
+                      </div>
+                      <ul className="space-y-2 text-sm leading-relaxed text-foreground/90">
+                        {ai.strengths.map((s, i) => (
+                          <li key={i} className="flex items-start gap-2.5">
+                            <span
+                              aria-hidden
+                              className="mt-1.5 inline-block size-1.5 shrink-0 bg-primary"
+                            />
+                            <span>{s}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {ai.growth.length > 0 && (
+                    <div className="bg-background/50 p-4 sm:p-5">
+                      <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                        {en
+                          ? "DYNAMIC TENSION · GROWTH POINTS"
+                          : "დინამიკური კვანძი · სად არის ხახუნი"}
+                      </div>
+                      <ul className="space-y-2 text-sm leading-relaxed text-foreground/90">
+                        {ai.growth.map((g, i) => (
+                          <li key={i} className="flex items-start gap-2.5">
+                            <span
+                              aria-hidden
+                              className="mt-1.5 inline-block size-1.5 shrink-0 bg-muted-foreground"
+                            />
+                            <span>{g}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </article>
         )}
 

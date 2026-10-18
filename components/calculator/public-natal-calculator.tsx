@@ -226,7 +226,7 @@ export function PublicNatalCalculator({
   return (
     <div>
       {/* Form */}
-      <div className="rounded-3xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+      <div className="rounded-md border border-border bg-card p-6 sm:p-8">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -271,7 +271,7 @@ export function PublicNatalCalculator({
                 onClick={() => setUnknownTime((v) => !v)}
                 className={`text-xs transition-colors ${
                   unknownTime
-                    ? "text-[var(--vivida-cyan)]"
+                    ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -324,15 +324,14 @@ export function PublicNatalCalculator({
             <button
               type="button"
               onClick={fillSample}
-              className="w-full rounded-xl border border-dashed border-border/70 px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:border-[var(--vivida-cyan)]/50 hover:text-foreground"
+              className="w-full rounded-md border border-dashed border-border px-4 py-2.5 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
             >
-              Try a sample, 14 Feb 1990, 09:30, London
+              Try a sample · 14 Feb 1990 · 09:30 · London
             </button>
           )}
 
           <Button
             type="submit"
-            variant="mystic"
             size="lg"
             disabled={loading}
             className="w-full"
@@ -375,24 +374,24 @@ export function PublicNatalCalculator({
             </Button>
           </div>
 
-          <div className="mx-auto max-w-xl">
+          <div className="mx-auto max-w-xl rounded-md border border-border bg-card p-4 sm:p-6">
             <ChartWheel chart={chart} locale={locale} />
           </div>
 
           {acquisitionMode && (
-            <div className="relative overflow-hidden rounded-3xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-violet)]/16 via-card/70 to-[var(--vivida-gold)]/12 p-7 text-center ring-1 ring-foreground/5 sm:p-9">
-              <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
-                <Lock className="size-5" />
+            <div className="rounded-md border border-border bg-card p-7 text-center sm:p-9">
+              <div className="mx-auto mb-3 grid size-10 place-items-center rounded-sm border border-primary/30 bg-primary/10 text-primary">
+                <Lock className="size-4" />
               </div>
-              <h3 className="text-balance text-2xl font-semibold sm:text-3xl">
+              <h3 className="text-balance text-2xl font-semibold text-foreground sm:text-3xl">
                 Save your chart & unlock personal readings
               </h3>
-              <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
+              <p className="mx-auto mt-3 max-w-lg text-sm text-muted-foreground">
                 Create a free account to reveal what every placement means for
                 you, then choose PRO unlimited or pay-as-you-go credits.
               </p>
               <div className="mt-5 flex flex-wrap justify-center gap-3">
-                <Button asChild variant="mystic" size="lg">
+                <Button asChild size="lg">
                   <Link
                     href={signupHref}
                     onClick={() =>
@@ -408,30 +407,30 @@ export function PublicNatalCalculator({
                   <Link href={loginHref}>Log in</Link>
                 </Button>
               </div>
-              <p className="mt-3 text-xs text-muted-foreground">
+              <p className="mt-3 font-mono text-xs text-muted-foreground">
                 Free account · No card required
               </p>
             </div>
           )}
 
           <section>
-            <h3 className="mb-3 text-lg font-semibold tracking-tight">
+            <h3 className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
               {en ? "Planet positions" : "პლანეტების პოზიციები"}
             </h3>
             <PositionsTable chart={chart} locale={locale} />
           </section>
 
           <section>
-            <h3 className="mb-3 text-lg font-semibold tracking-tight">
+            <h3 className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
               {en ? "12 houses" : "12 სახლი"}
             </h3>
-            <div className="rounded-2xl border border-border bg-card/50 px-4 py-3 ring-1 ring-foreground/5 backdrop-blur-xl sm:px-5">
+            <div className="rounded-md border border-border bg-card px-4 py-3 sm:px-5">
               <HousesTable chart={chart} locale={locale} />
             </div>
           </section>
 
           <section>
-            <h3 className="mb-3 text-lg font-semibold tracking-tight">
+            <h3 className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
               {en ? "Aspects" : "ასპექტები"}
             </h3>
             <AspectCards chart={chart} locale={locale} />
@@ -439,22 +438,22 @@ export function PublicNatalCalculator({
 
           {/* Unlock CTA */}
           {!acquisitionMode && (
-            <div className="relative overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/14 via-card/65 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
-              <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)]">
-                <Lock className="size-5" />
+            <div className="rounded-md border border-border bg-card p-7 text-center sm:p-10">
+              <div className="mx-auto mb-3 grid size-10 place-items-center rounded-sm border border-primary/30 bg-primary/10 text-primary">
+                <Lock className="size-4" />
               </div>
-              <h3 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+              <h3 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                 {en
                   ? "What does this mean for you?"
                   : "რას ნიშნავს ეს შენთვის?"}
               </h3>
-              <p className="mx-auto mt-3 max-w-lg text-pretty text-base text-muted-foreground">
+              <p className="mx-auto mt-3 max-w-lg text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
                 {en
                   ? "These are the precise placements in your chart. Create a free account to unlock personal interpretations for every planet, house, and aspect, plus AI insights and a complete PDF report."
                   : "ეს არის შენი რუკის სუფთა მონაცემები. დარეგისტრირდი უფასოდ და ნახე თითოეული პლანეტის, სახლისა და ასპექტის პერსონალური ინტერპრეტაცია, AI ანალიზი და სრული PDF ანგარიში."}
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
-                <Button asChild variant="mystic" size="lg">
+                <Button asChild size="lg">
                   <Link
                     href={signupHref}
                     onClick={() =>
@@ -473,42 +472,40 @@ export function PublicNatalCalculator({
             </div>
           )}
 
-          {/* Lower-friction return hook, get the daily horoscope by email
-              without a full signup (the biggest lever on "nobody returns"). */}
           <HoroscopeEmailCapture
             sunSign={sunIdx}
             big={bigParam}
             locale={locale}
           />
 
-          {/* Second-action rail, a free next step so a visitor who isn't ready
-              to register still takes a 2nd action (a 2nd pageview is an engaged,
-              non-bounce session) and discovers a reason to return. Personalized
-              to their sun sign for relevance. */}
-          <div className="text-center">
-            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="border-t border-border pt-6 text-center">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
               {en ? "Or keep exploring for free" : "ან განაგრძე უფასოდ"}
             </p>
-            <div className="mt-3 flex flex-wrap justify-center gap-2">
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
               {sunSlug && sunSign && (
-                <Link
-                  href={localizedHref(`/zodiac/${sunSlug}`, locale)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
-                >
-                  <span aria-hidden>{sunSign.symbol}</span>
-                  {en ? sunSign.labelEn : sunSign.labelKa},{" "}
-                  {en ? "your sign" : "შენი ნიშანი"}
-                </Link>
+                <>
+                  <Link
+                    href={localizedHref(`/zodiac/${sunSlug}`, locale)}
+                    className="inline-flex items-center gap-1.5 font-medium text-foreground hover:text-primary hover:underline"
+                  >
+                    <span aria-hidden>{sunSign.symbol}</span>
+                    {en ? sunSign.labelEn : sunSign.labelKa},{" "}
+                    {en ? "your sign" : "შენი ნიშანი"}
+                  </Link>
+                  <span aria-hidden>·</span>
+                </>
               )}
               <Link
                 href={localizedHref("/horoskopi", locale)}
-                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+                className="hover:text-foreground hover:underline"
               >
                 {en ? "Daily horoscope" : "დღის ჰოროსკოპი"}
               </Link>
+              <span aria-hidden>·</span>
               <Link
                 href={localizedHref("/zodiac/tavsebadoba", locale)}
-                className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+                className="hover:text-foreground hover:underline"
               >
                 {en ? "Compatibility" : "თავსებადობა"}
               </Link>
@@ -580,8 +577,8 @@ function HoroscopeEmailCapture({
 
   if (status === "done") {
     return (
-      <div className="flex items-center justify-center gap-2 rounded-2xl border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/8 px-5 py-4 text-center text-sm text-foreground/90 ring-1 ring-foreground/5">
-        <Check className="size-4 shrink-0 text-[var(--vivida-cyan)]" />
+      <div className="flex items-center justify-center gap-2 rounded-md border border-border bg-card px-5 py-4 text-center text-sm text-foreground/90">
+        <Check className="size-4 shrink-0 text-primary" />
         {en
           ? "Subscribed! Your first horoscope is on its way."
           : "გამოწერილია! პირველი ჰოროსკოპი უკვე იგზავნება ელფოსტაზე."}
@@ -595,10 +592,10 @@ function HoroscopeEmailCapture({
         e.preventDefault();
         submit();
       }}
-      className="rounded-3xl border border-border/80 bg-card/60 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6"
+      className="rounded-md border border-border bg-card p-5 sm:p-6"
     >
-      <div className="flex items-center gap-2 text-sm font-semibold">
-        <Mail className="size-4 text-[var(--vivida-violet)]" />
+      <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+        <Mail className="size-4 text-primary" />
         <span>
           {en
             ? "Get your daily horoscope in your inbox"
@@ -623,7 +620,6 @@ function HoroscopeEmailCapture({
         />
         <Button
           type="submit"
-          variant="mystic"
           size="default"
           disabled={status === "loading"}
           className="shrink-0"
@@ -676,7 +672,7 @@ function NumField({
       onChange={(e) =>
         onChange(e.target.value.replace(/\D/g, "").slice(0, max))
       }
-      className="text-center text-base tabular-nums"
+      className="text-center font-mono text-base tabular-nums"
     />
   );
 }
@@ -711,7 +707,7 @@ function BigThree({
     },
   ];
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
+    <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
       {items.map(({ label, glyph, point }) => {
         if (!point) return null;
         const sign = signByIndex(point.signIndex);
@@ -719,20 +715,20 @@ function BigThree({
         return (
           <div
             key={label}
-            className="rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl"
+            className="bg-card p-4"
           >
-            <div className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
               {glyph} {label}
             </div>
-            <div className="mt-1 flex items-baseline gap-2">
+            <div className="mt-1.5 flex items-baseline gap-2">
               <span className="text-xl" style={{ color }} aria-hidden>
                 {sign.symbol}
               </span>
-              <span className="text-lg font-semibold tracking-tight">
+              <span className="text-lg font-semibold tracking-tight text-foreground">
                 {en ? sign.labelEn : sign.labelKa}
               </span>
             </div>
-            <div className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+            <div className="mt-1 font-mono text-xs tabular-nums text-muted-foreground">
               {formatDegree(point.signDegree)}
             </div>
           </div>

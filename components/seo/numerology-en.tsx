@@ -1,5 +1,5 @@
 import { EnglishLink as Link } from "@/components/i18n/international-link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
 import { LifePathCalculator } from "@/components/seo/life-path-calculator";
@@ -65,26 +65,30 @@ export function NumerologyHubEn() {
   return (
     <main
       lang="en"
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
     >
-      <Background />
-      <Starfield count={120} shooting={2} />
+      <Starfield count={48} />
       <SmartHeader locale="en" georgianPath="/numerologia" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-        <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/">Home</Link>
+      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
+        <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+          <Link href="/" className="hover:text-foreground">
+            Home
+          </Link>
           <span>/</span>
           <span className="text-foreground/80">Numerology</span>
         </nav>
-        <header className="mb-8 max-w-3xl">
-          <h1 className="font-display text-balance text-4xl font-medium tracking-tight sm:text-5xl">
+        <header className="mb-8 border-b border-border pb-8">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+            Numerological Almanac · 1–33
+          </div>
+          <h1 className="font-display mt-2 text-balance text-4xl font-normal tracking-[-0.02em] sm:text-5xl">
             Numerology and your <Accent>life path number</Accent>
           </h1>
-          <p className="mt-4 text-pretty text-base text-foreground/85 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-pretty text-[15px] leading-relaxed text-muted-foreground sm:text-base">
             Calculate your number from your birth date, then explore the
             archetypal strengths, challenges, relationship style, and career
             themes traditionally associated with it.
@@ -93,14 +97,16 @@ export function NumerologyHubEn() {
 
         <LifePathCalculator archetypes={archetypes} locale="en" />
 
-        <section className="mt-12">
-          <h2 className="font-display text-2xl font-medium tracking-tight">
-            Life path number meanings
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Numbers 1–9 plus Master Numbers 11, 22, and 33.
-          </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="mt-16">
+          <div className="mb-4 flex items-baseline justify-between gap-4">
+            <h2 className="font-display text-2xl font-normal tracking-tight">
+              Life path number meanings
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+              Numbers 1–9 · 11, 22, 33
+            </span>
+          </div>
+          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
             {LIFE_PATH_NUMBERS.map((number) => {
               const content = LIFE_PATH_CONTENT_EN[number];
               const master = number.length > 1;
@@ -108,24 +114,27 @@ export function NumerologyHubEn() {
                 <Link
                   key={number}
                   href={`/numerologia/${number}`}
-                  className="group relative overflow-hidden rounded-2xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 transition-colors hover:bg-card/80"
+                  className="group relative flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary/45"
                 >
-                  <div className="flex items-center gap-3">
-                    <NumberBadge number={number} master={master} />
-                    <div>
-                      <h3 className="font-semibold tracking-tight">
-                        {content.archetype}
-                      </h3>
-                      <div className="text-[11px] text-muted-foreground">
-                        {master ? "Master Number" : `Life Path ${number}`}
+                  <div>
+                    <div className="flex items-center gap-3.5">
+                      <NumberBadge number={number} master={master} />
+                      <div>
+                        <h3 className="font-semibold tracking-tight text-foreground">
+                          {content.archetype}
+                        </h3>
+                        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                          {master ? "Master Number" : `Life Path ${number}`}
+                        </div>
                       </div>
                     </div>
+                    <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                      {content.essence}
+                    </p>
                   </div>
-                  <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-foreground/85">
-                    {content.essence}
-                  </p>
-                  <div className="mt-3 text-xs text-muted-foreground group-hover:text-foreground">
-                    Read the full meaning →
+                  <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground transition-colors group-hover:text-primary">
+                    <span>Read full meaning</span>
+                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </Link>
               );
@@ -133,20 +142,20 @@ export function NumerologyHubEn() {
           </div>
         </section>
 
-        <section className="mt-12">
-          <h2 className="font-display mb-4 text-2xl font-medium tracking-tight">
+        <section className="mt-16">
+          <h2 className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
             Frequently asked questions
           </h2>
-          <div className="space-y-3">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
             {NUMEROLOGY_FAQ_EN.map((item) => (
-              <details
-                key={item.q}
-                className="rounded-2xl border border-border bg-card/50 p-5"
-              >
-                <summary className="cursor-pointer font-medium">
+              <details key={item.q} className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                   {item.q}
+                  <span className="font-mono text-sm text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
                 </summary>
-                <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
+                <p className="border-t border-border/60 bg-background/40 px-5 py-4 text-[15px] leading-relaxed text-muted-foreground">
                   {item.a}
                 </p>
               </details>
@@ -154,16 +163,20 @@ export function NumerologyHubEn() {
           </div>
         </section>
 
-        <div className="mt-14 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center sm:p-10">
-          <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="font-display text-balance text-2xl font-medium tracking-tight sm:text-3xl">
-            Numbers are one lens; the sky adds another
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            A birth chart maps the Moon, rising sign, planets, houses, and
-            aspects for your exact birth time and place.
-          </p>
-          <Button asChild variant="mystic" size="lg" className="mt-6">
+        <div className="mt-16 flex flex-col justify-between gap-6 rounded-md border border-border bg-card p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="max-w-xl">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              Natal Chart
+            </p>
+            <h2 className="font-display mt-2 text-balance text-2xl font-normal tracking-tight sm:text-3xl">
+              Numbers are one lens; the sky adds another
+            </h2>
+            <p className="mt-2 text-pretty text-sm text-muted-foreground">
+              A birth chart maps the Moon, rising sign, planets, houses, and
+              aspects for your exact birth time and place.
+            </p>
+          </div>
+          <Button asChild size="lg" className="shrink-0">
             <Link href="/natal-chart">
               Explore my natal chart
               <ArrowRight className="size-4" />
@@ -194,22 +207,18 @@ export function LifePathNumberPageEn({
     {
       title: "Natural strengths",
       body: content.strengths,
-      accent: "var(--vivida-cyan)",
     },
     {
       title: "Growth challenges",
       body: content.challenges,
-      accent: "var(--vivida-pink)",
     },
     {
       title: "Love and relationships",
       body: content.love,
-      accent: "var(--vivida-violet)",
     },
     {
       title: "Career and work style",
       body: content.career,
-      accent: "var(--vivida-gold, #eac358)",
     },
   ];
   const structuredData = [
@@ -247,62 +256,52 @@ export function LifePathNumberPageEn({
   return (
     <main
       lang="en"
-      className="relative isolate flex min-h-screen flex-col overflow-hidden"
+      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
     >
-      <Background />
-      <Starfield count={110} shooting={2} />
+      <Starfield count={48} />
       <SmartHeader locale="en" georgianPath={`/numerologia/${number}`} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-        <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/">Home</Link>
+      <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
+        <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+          <Link href="/" className="hover:text-foreground">
+            Home
+          </Link>
           <span>/</span>
-          <Link href="/numerologia">Numerology</Link>
+          <Link href="/numerologia" className="hover:text-foreground">
+            Numerology
+          </Link>
           <span>/</span>
           <span className="text-foreground/80">Life Path {number}</span>
         </nav>
-        <header className="mb-8">
+        <header className="mb-8 border-b border-border pb-8">
           <div className="flex items-center gap-4">
             <NumberBadge number={number} master={master} large />
             <div>
-              <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h1 className="font-display text-balance text-3xl font-normal tracking-tight sm:text-4xl">
                 {content.title}
               </h1>
               {master && (
-                <div className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-[var(--vivida-gold,#eac358)]">
+                <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
                   Master Number
                 </div>
               )}
             </div>
           </div>
-          <p className="mt-4 text-pretty text-lg leading-relaxed text-foreground/90">
+          <p className="mt-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
             {content.essence}
           </p>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {content.traits.map((trait) => (
-              <li
-                key={trait}
-                className="rounded-full border border-border bg-card/55 px-3 py-1 text-sm text-foreground/85"
-              >
-                {trait}
-              </li>
-            ))}
-          </ul>
+          <p className="mt-4 font-mono text-xs text-muted-foreground">
+            {content.traits.join(" · ")}
+          </p>
         </header>
 
-        <div className="space-y-4">
+        <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
           {sections.map((section) => (
-            <section
-              key={section.title}
-              className="rounded-2xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 sm:p-6"
-            >
-              <h2
-                className="text-sm font-semibold uppercase tracking-[0.14em]"
-                style={{ color: section.accent }}
-              >
+            <section key={section.title} className="p-5 sm:p-6">
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-primary">
                 {section.title}
               </h2>
               <p className="mt-2 text-[15px] leading-relaxed text-foreground/90">
@@ -310,8 +309,8 @@ export function LifePathNumberPageEn({
               </p>
             </section>
           ))}
-          <section className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/8 p-5 sm:p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--vivida-violet)]">
+          <section className="bg-secondary/35 p-5 sm:p-6">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-primary">
               Advice for Life Path {number}
             </h2>
             <p className="mt-2 text-[15px] leading-relaxed text-foreground/90">
@@ -321,15 +320,15 @@ export function LifePathNumberPageEn({
         </div>
 
         <section className="mt-10">
-          <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <h2 className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
             Other life path numbers
           </h2>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {LIFE_PATH_NUMBERS.filter((item) => item !== number).map((item) => (
               <Link
                 key={item}
                 href={`/numerologia/${item}`}
-                className="grid size-11 place-items-center rounded-xl border border-border bg-card/55 text-sm font-semibold transition-colors hover:bg-card/80"
+                className="grid size-10 place-items-center rounded-sm border border-border bg-card font-mono text-sm font-semibold tabular-nums transition-colors hover:border-primary/40 hover:bg-secondary/45"
               >
                 {item}
               </Link>
@@ -337,16 +336,17 @@ export function LifePathNumberPageEn({
           </div>
         </section>
 
-        <div className="mt-12 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center sm:p-9">
-          <Sparkles className="mx-auto mb-3 size-6 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-            One number is one part of the picture
-          </h2>
-          <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground sm:text-base">
-            Explore a Western birth chart calculated from your exact birth time
-            and place.
-          </p>
-          <Button asChild variant="mystic" size="lg" className="mt-5">
+        <div className="mt-12 flex flex-col justify-between gap-6 rounded-md border border-border bg-card p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="max-w-md">
+            <h2 className="font-display text-balance text-2xl font-normal tracking-tight">
+              One number is one part of the picture
+            </h2>
+            <p className="mt-2 text-pretty text-sm text-muted-foreground">
+              Explore a Western birth chart calculated from your exact birth time
+              and place.
+            </p>
+          </div>
+          <Button asChild size="lg" className="shrink-0">
             <Link href="/natal-chart">
               Explore my natal chart
               <ArrowRight className="size-4" />
@@ -375,18 +375,9 @@ function NumberBadge({
 }) {
   return (
     <span
-      className={`grid shrink-0 place-items-center rounded-2xl font-bold ${large ? "size-16 text-3xl" : "size-12 text-xl"} ${master ? "bg-[var(--vivida-gold,#eac358)]/15 text-[var(--vivida-gold,#eac358)] ring-1 ring-[var(--vivida-gold,#eac358)]/40" : "bg-[var(--vivida-violet)]/15 text-[var(--vivida-violet)] ring-1 ring-[var(--vivida-violet)]/40"}`}
+      className={`grid shrink-0 place-items-center rounded-sm border font-mono font-semibold tabular-nums ${large ? "size-14 text-2xl" : "size-11 text-lg"} ${master ? "border-primary/50 bg-primary/10 text-primary" : "border-border bg-background/60 text-foreground"}`}
     >
       {number}
     </span>
-  );
-}
-
-function Background() {
-  return (
-    <div
-      aria-hidden
-      className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%)]"
-    />
   );
 }

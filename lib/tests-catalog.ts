@@ -1,156 +1,137 @@
-/**
- * The catalog of tests and light quizzes shown on /tests. Featured assessments
- * remain pinned above the quick, replayable quiz section.
- */
 export type TestCatalogEntry = {
   slug: string;
   kind: "featured" | "quiz";
-  /** Where "start" links to. */
   href: string;
+  available: boolean;
+  locales?: readonly ("ka" | "en")[];
   titleKa: string;
   titleEn: string;
   taglineKa: string;
   taglineEn: string;
   descKa: string;
   descEn: string;
-  /** Short meta line, e.g. "60 კითხვა · ~7 წუთი · უფასო". */
   metaKa: string;
   metaEn: string;
-  /** True while the test is live; false renders a "მალე" (soon) card. */
-  available: boolean;
-  /** Omit for all locales; use this while an assessment has one translation. */
-  locales?: ("ka" | "en")[];
 };
 
 export const TESTS: TestCatalogEntry[] = [
   {
-    slug: "iq",
+    slug: "astro-mbti",
     kind: "featured",
-    href: "/iq-testi",
-    titleKa: "IQ ტესტი",
-    titleEn: "IQ Test",
-    taglineKa: "შენი ინტელექტის კოეფიციენტი",
-    taglineEn: "Estimate your reasoning ability",
-    descKa:
-      "კულტურულად ნეიტრალური, დროზე გათვლილი ტესტი, ლოგიკური, რიცხვითი და სივრცითი აზროვნება. მიიღე შენი IQ ქულა, პროცენტილი და აზროვნების რუკა.",
-    descEn:
-      "A timed, culture-fair adaptive assessment of logical, numerical and spatial reasoning. Receive an estimated IQ score, percentile and reasoning profile.",
-    metaKa: "25 დავალება · ~25 წუთი · ადაპტიური",
-    metaEn: "25 tasks · about 25 minutes · adaptive",
+    href: "/pirovnebis-testi",
     available: true,
-  },
-  {
-    slug: "eq",
-    kind: "featured",
-    href: "/eq-testi",
-    titleKa: "EQ ტესტი",
-    titleEn: "EQ Test",
-    taglineKa: "შენი ემოციური ინტელექტი",
-    taglineEn: "Explore your emotional intelligence",
+    locales: ["ka", "en"],
+    titleKa: "Astro-MBTI პიროვნების ტესტი",
+    titleEn: "Astro-MBTI Personality Assessment",
+    taglineKa: "16 ფსიქოლოგიური ტიპი და კოსმიური არქეტიპი",
+    taglineEn: "16 psychological types paired with your cosmic archetype",
     descKa:
-      "თვითშეფასების ტესტი ხუთ სფეროში, თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები. მიიღე EQ ქულა და შენი ემოციური რუკა.",
+      "გაიგე შენი 4-ასოიანი MBTI კოდი, ძლიერი მხარეები, ურთიერთობის სტილი და კარიერული მიმართულება.",
     descEn:
-      "A self-report assessment across self-awareness, self-regulation, motivation, empathy and social skills, with a clear emotional profile.",
-    metaKa: "40 კითხვა · ~7 წუთი · უფასო",
-    metaEn: "40 questions · about 7 minutes · free",
-    available: true,
-  },
-  {
-    slug: "self-esteem",
-    kind: "featured",
-    href: "/tvit-shepasebis-testi",
-    titleKa: "თვითშეფასების ტესტი",
-    titleEn: "Self-Esteem Test",
-    taglineKa: "როგორ უყურებ საკუთარ თავს?",
-    taglineEn: "How do you see yourself?",
-    descKa:
-      "Rosenberg-ის 10-კითხვიანი სკალა ზომავს საკუთარი ღირებულების, შესაძლებლობებისა და თავის პატივისცემის საერთო განცდას. შედეგი და რეფლექსიის პერსონალური თემები მყისიერად.",
-    descEn:
-      "The ten-item Rosenberg scale explores your overall sense of self-worth and self-respect.",
-    metaKa: "10 კითხვა · ~2 წუთი · უფასო",
-    metaEn: "10 questions · about 2 minutes · free",
-    available: true,
-    locales: ["ka"],
+      "Discover your 4-letter personality code, cognitive preferences, relationship style, and natural strengths.",
+    metaKa: "36 კითხვა · ~5 წუთი",
+    metaEn: "36 questions · ~5 min",
   },
   {
     slug: "big-five",
     kind: "featured",
     href: "/big-five",
+    available: true,
+    locales: ["ka", "en"],
     titleKa: "Big Five (დიდი ხუთეული)",
-    titleEn: "Big Five Personality Test",
-    taglineKa: "პიროვნების 5 თვისება",
-    taglineEn: "Five broad personality traits",
+    titleEn: "Big Five Personality Traits",
+    taglineKa: "პიროვნების 5 ფუნდამენტური განზომილება",
+    taglineEn: "The five core dimensions of human personality",
     descKa:
-      "პიროვნების ყველაზე მეცნიერულად სანდო ტესტი, ღიაობა, კეთილსინდისიერება, ექსტრავერსია, კეთილგანწყობა და ნევროტიზმი. მიიღე შენი პროფილი და რადარი.",
+      "მეცნიერულად ყველაზე აღიარებული პიროვნების მოდელი: ღიაობა, კეთილსინდისიერება, ექსტრავერსია, კეთილგანწყობა და ნეიროტიციზმი.",
     descEn:
-      "Explore openness, conscientiousness, extraversion, agreeableness and neuroticism through the most widely researched personality framework.",
-    metaKa: "40 კითხვა · ~7 წუთი · უფასო",
-    metaEn: "40 questions · about 7 minutes · free",
-    available: true,
+      "Measure Openness, Conscientiousness, Extraversion, Agreeableness, and Emotional Sensitivity with clear percentile scores.",
+    metaKa: "50 კითხვა · ~6 წუთი",
+    metaEn: "50 questions · ~6 min",
   },
   {
-    slug: "astro-mbti",
+    slug: "eq",
     kind: "featured",
-    href: "/pirovnebis-testi",
-    titleKa: "Astro-MBTI",
-    titleEn: "Astro-MBTI",
-    taglineKa: "შენი ფსიქოლოგიური ტიპი",
-    taglineEn: "Discover your psychological type",
-    descKa:
-      "აღმოაჩინე შენი პიროვნების ტიპი 16 ტიპიდან, ძლიერი და სუსტი მხარეები, ურთიერთობები, კარიერა და ზრდის გზა.",
-    descEn:
-      "Discover your personality among sixteen types, including strengths, challenges, relationships, career patterns and avenues for growth.",
-    metaKa: "60 კითხვა · ~7 წუთი · უფასო",
-    metaEn: "60 questions · about 7 minutes · free",
+    href: "/eq-testi",
     available: true,
+    locales: ["ka", "en"],
+    titleKa: "ემოციური ინტელექტის (EQ) ტესტი",
+    titleEn: "Emotional Intelligence (EQ) Test",
+    taglineKa: "ემპათია, თვითრეგულაცია და სოციალური უნარები",
+    taglineEn: "Self-awareness, regulation, empathy, and social skill",
+    descKa:
+      "შეაფასე როგორ კითხულობ საკუთარ და სხვების ემოციებს და როგორ მართავ რთულ სიტუაციებს.",
+    descEn:
+      "Explore how you recognize, regulate, and respond to emotions in yourself and others.",
+    metaKa: "32 კითხვა · ~4 წუთი",
+    metaEn: "32 questions · ~4 min",
   },
   {
-    slug: "attachment",
+    slug: "iq",
     kind: "featured",
-    href: "/mijachvulobis-testi",
-    titleKa: "მიჯაჭვულობის სტილის ტესტი",
-    titleEn: "Attachment Style Test",
-    taglineKa: "როგორ გიყვარს?",
-    taglineEn: "How do you attach?",
+    href: "/iq-testi",
+    available: true,
+    locales: ["ka", "en"],
+    titleKa: "IQ და ლოგიკის ტესტი",
+    titleEn: "IQ & Pattern Reasoning Test",
+    taglineKa: "ვიზუალური მატრიცები და ლოგიკური აზროვნება",
+    taglineEn: "Visual matrices, sequences, and abstract logic",
     descKa:
-      "24-კითხვიანი ტესტი შფოთისა და აცილების ორ ღერძზე, გაიგე, ხარ თუ არა უსაფრთხო, შფოთიანი, აცილებადი თუ შიშით-აცილებადი და რა სჭირდება შენს ურთიერთობას.",
+      "გამოსცადე ანალიტიკური სისწრაფე და კანონზომიერებების აღმოჩენის უნარი დროში გათვლილ ამოცანებში.",
     descEn:
-      "A 24-item assessment across the anxiety and avoidance axes, secure, anxious, avoidant or fearful-avoidant.",
-    metaKa: "24 კითხვა · ~5 წუთი · უფასო",
-    metaEn: "24 questions · about 5 minutes · free",
+      "Test your pattern recognition and abstract reasoning across progressive logic matrices.",
+    metaKa: "25 ამოცანა · ~12 წუთი",
+    metaEn: "25 problems · ~12 min",
+  },
+  {
+    slug: "self-esteem",
+    kind: "featured",
+    href: "/tvit-shepasebis-testi",
     available: true,
     locales: ["ka"],
+    titleKa: "თვითშეფასების ტესტი",
+    titleEn: "Rosenberg Self-Esteem Scale",
+    taglineKa: "როზენბერგის კლასიკური შკალა ქართულად",
+    taglineEn: "The classic 10-item self-worth reflection scale",
+    descKa:
+      "სწრაფი და ზუსტი თვითშეფასების კითხვარი შინაგანი საყრდენისა და თვითკრიტიკის დონის გასაზომად.",
+    descEn:
+      "A brief, research-backed reflection on self-worth and inner confidence.",
+    metaKa: "10 კითხვა · ~2 წუთი",
+    metaEn: "10 questions · ~2 min",
   },
   {
     slug: "true-sign",
     kind: "quiz",
     href: "/quiz/namdvili-nishani",
-    titleKa: "რომელი ნიშანი ხარ სინამდვილეში?",
-    titleEn: "Which Zodiac Sign Are You Really?",
-    taglineKa: "შენი ზოდიაქო ხასიათით",
-    taglineEn: "Your sign, based on personality",
-    descKa:
-      "12-კითხვიანი ტესტი, რომელიც შენს ხასიათს ზოდიაქოს ერთ-ერთ ნიშანს შეუსაბამებს, შედეგი შეიძლება დაბადების ნიშანს არ ემთხვეოდეს. სახალისო და გასაზიარებელი.",
-    descEn:
-      "A playful twelve-question quiz that matches your personality to a zodiac sign, which may be different from your birth sign.",
-    metaKa: "12 კითხვა · ~3 წუთი · უფასო",
-    metaEn: "12 questions · about 3 minutes · free",
     available: true,
+    locales: ["ka", "en"],
+    titleKa: "შენი ნამდვილი ზოდიაქოს ნიშანი",
+    titleEn: "Your True Zodiac Sign Quiz",
+    taglineKa: "რომელ ნიშანს ჰგავხარ ხასიათით სინამდვილეში?",
+    taglineEn: "Which sign matches your real temperament?",
+    descKa:
+      "უპასუხე სიტუაციურ კითხვებს და გაიგე, რომელი სტიქია და ნიშანი მართავს შენს ყოველდღიურ გადაწყვეტილებებს.",
+    descEn:
+      "Answer situational prompts to see which element and zodiac sign best match how you actually act.",
+    metaKa: "12 კითხვა · ~2 წუთი",
+    metaEn: "12 questions · ~2 min",
   },
   {
     slug: "famous-zodiac",
     kind: "quiz",
     href: "/quiz/varskvlavebis-zodiaqo",
-    titleKa: "ვარსკვლავების ზოდიაქო",
-    titleEn: "Celebrity Zodiac Challenge",
-    taglineKa: "გამოიცანი ცნობილი ადამიანების ნიშანი",
-    taglineEn: "Guess the signs of famous people",
-    descKa:
-      "20-კითხვიანი სწრაფი ქვიზი, რამდენად კარგად იცნობ მსახიობების, მომღერლებისა და სპორტსმენების ზოდიაქოს ნიშნებს?",
-    descEn:
-      "A fast twenty-question challenge: how well do you know the zodiac signs of actors, musicians and athletes?",
-    metaKa: "20 კითხვა · ~4 წუთი · უფასო",
-    metaEn: "20 questions · about 4 minutes · free",
     available: true,
+    locales: ["ka", "en"],
+    titleKa: "გამოიცანი ვარსკვლავის ზოდიაქო",
+    titleEn: "Guess the Celebrity's Sign",
+    taglineKa: "რამდენად კარგად ცნობ ნიშნების ენერგიას?",
+    taglineEn: "How well can you spot zodiac energy in famous figures?",
+    descKa:
+      "სწრაფი ქვიზი ცნობილი ადამიანების ზოდიაქოს გამოსაცნობად.",
+    descEn:
+      "A fast, playful challenge matching iconic personalities to their sun signs.",
+    metaKa: "10 რაუნდი · ~2 წუთი",
+    metaEn: "10 rounds · ~2 min",
   },
 ];

@@ -64,28 +64,30 @@ export function UserMenu({
         <button
           type="button"
           aria-label={en ? "User menu" : "მენიუ"}
-          className="relative grid size-12 shrink-0 place-items-center rounded-full border border-border bg-card/50 text-foreground/80 transition-all hover:border-foreground/30 hover:bg-card/80"
+          className="relative grid size-10 shrink-0 place-items-center rounded-md border border-border bg-card text-foreground/85 transition-colors hover:border-primary/60 hover:bg-secondary"
         >
           <Image
             src={image || DEFAULT_AVATAR}
             alt=""
-            width={44}
-            height={44}
-            className="size-11 rounded-full object-cover"
+            width={36}
+            height={36}
+            referrerPolicy="no-referrer"
+            className="size-8 rounded-sm object-cover"
           />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 p-2">
+      <DropdownMenuContent align="end" className="w-64 rounded-md border-border bg-card p-2">
         <div className="flex items-center gap-3 px-2 py-2">
           <Image
             src={image || DEFAULT_AVATAR}
             alt=""
-            width={40}
-            height={40}
-            className="size-10 shrink-0 rounded-full border border-border/60 object-cover"
+            width={36}
+            height={36}
+            referrerPolicy="no-referrer"
+            className="size-9 shrink-0 rounded-sm border border-border object-cover"
           />
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-semibold">
+            <div className="truncate text-sm font-semibold text-foreground">
               {name ?? (en ? "You" : "შენ")}
             </div>
             {email && (
@@ -101,17 +103,17 @@ export function UserMenu({
         {username && (
           <DropdownMenuItem asChild>
             <Link href={`/u/${username}`} className="cursor-pointer">
-              <User className="size-4" />
+              <User className="size-4 text-muted-foreground" />
               {en ? "Public profile" : "საჯარო პროფილი"}
             </Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild>
           <Link href="/credits" className="cursor-pointer">
-            <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
+            <Sparkles className="size-4 text-primary" />
             {en ? "Credits" : "კრედიტები"}
             {typeof balance === "number" && (
-              <span className="ml-auto rounded-full bg-[var(--vivida-cyan)]/15 px-2 py-0.5 text-xs font-semibold tabular-nums text-[var(--vivida-cyan)]">
+              <span className="ml-auto font-mono text-xs font-medium tabular-nums text-primary">
                 {balance}
               </span>
             )}
@@ -119,14 +121,14 @@ export function UserMenu({
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/library" className="cursor-pointer">
-            <BookOpen className="size-4 text-[var(--vivida-violet)]" />
+            <BookOpen className="size-4 text-muted-foreground" />
             {en ? "My library" : "ჩემი ბიბლიოთეკა"}
           </Link>
         </DropdownMenuItem>
         {showProEntry && (
           <DropdownMenuItem asChild>
             <Link href="/subscription" className="cursor-pointer">
-              <Crown className="size-4 text-[var(--vivida-gold)]" />
+              <Crown className="size-4 text-primary" />
               {isPremium
                 ? en
                   ? "Manage PRO"
@@ -139,7 +141,7 @@ export function UserMenu({
                     ? "Get PRO"
                     : "გახდი PRO"}
               {!isPremium && (
-                <span className="ml-auto text-xs font-semibold text-[var(--vivida-gold)]">
+                <span className="ml-auto font-mono text-xs font-medium tabular-nums text-primary">
                   {formatBillingAmount(
                     featuredPro.amountMinor,
                     featuredPro.currency,
@@ -152,7 +154,7 @@ export function UserMenu({
         )}
         <DropdownMenuItem asChild>
           <Link href="/account" className="cursor-pointer">
-            <Settings className="size-4" />
+            <Settings className="size-4 text-muted-foreground" />
             {en ? "Account" : "ანგარიში"}
           </Link>
         </DropdownMenuItem>

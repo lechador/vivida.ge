@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Calendar, Sparkles } from "lucide-react";
+import { ArrowRight, Calendar } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ReportPromo } from "@/components/report/report-promo";
@@ -86,16 +86,8 @@ const FAQ_LD = {
 export default async function ZodiacHubPage() {
   if ((await getRequestLocale()) !== "ka") return <ZodiacHubEn />;
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_45%_at_50%_-5%,oklch(0.32_0.18_305/0.55),transparent_70%),radial-gradient(45%_30%_at_85%_30%,oklch(0.30_0.15_220/0.45),transparent_70%),radial-gradient(40%_30%_at_15%_70%,oklch(0.34_0.16_350/0.4),transparent_70%)]"
-      />
-      <div
-        aria-hidden
-        className="vivida-nebula-drift absolute inset-0 -z-10 opacity-50 bg-[radial-gradient(50%_40%_at_30%_40%,oklch(0.40_0.18_305/0.18),transparent_70%)]"
-      />
-      <Starfield count={140} shooting={3} />
+    <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background">
+      <Starfield count={48} />
 
       <SmartHeader />
 
@@ -109,78 +101,80 @@ export default async function ZodiacHubPage() {
       />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-        <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          ცის ნიშნები
-        </div>
-        <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-          {HUB_CONTENT.h1.split(":")[0]}
-          {HUB_CONTENT.h1.includes(":") ? ":" : ""}{" "}
-          <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {HUB_CONTENT.h1.split(":").slice(1).join(":").trim() ||
-              HUB_CONTENT.h1}
-          </span>
-        </h1>
-        <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
-          {HUB_CONTENT.tagline}
-        </p>
+        <header className="border-b border-border pb-8">
+          <div className="mb-2 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
+            ცის ნიშნები · ZODIAC ALMANAC
+          </div>
+          <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+            {HUB_CONTENT.h1.split(":")[0]}
+            {HUB_CONTENT.h1.includes(":") ? ":" : ""}{" "}
+            <span className="text-primary">
+              {HUB_CONTENT.h1.split(":").slice(1).join(":").trim() ||
+                HUB_CONTENT.h1}
+            </span>
+          </h1>
+          <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
+            {HUB_CONTENT.tagline}
+          </p>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Button asChild variant="mystic" size="lg">
-            <Link href="/zodiac/datit">
-              <Calendar className="size-4" />
-              იპოვე შენი ნიშანი
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="lg">
-            <Link href="/nataluri-ruka">
-              <Sparkles className="size-4" />
-              ნატალური რუკა ონლაინ
-            </Link>
-          </Button>
-        </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button asChild size="lg">
+              <Link href="/zodiac/datit">
+                <Calendar className="size-4" />
+                იპოვე შენი ნიშანი
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/nataluri-ruka">
+                ნატალური რუკა ონლაინ
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
+        </header>
 
         {/* Intro */}
-        <div className="mt-12 max-w-3xl space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
+        <div className="mt-10 max-w-3xl space-y-4 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
           {paragraphs(HUB_CONTENT.intro).map((p, i) => (
             <p key={i}>{p}</p>
           ))}
         </div>
 
-        {/* 12-sign grid */}
-        <h2 className="mb-5 mt-16 text-2xl font-semibold tracking-tight sm:text-3xl">
+        {/* 12-sign almanac hairline grid */}
+        <h2 className="mb-4 mt-14 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
           12 ცის ნიშანი
         </h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3 lg:grid-cols-4">
           {ALL_SLUGS.map((slug) => {
             const c = SIGNS_CONTENT[slug];
             const meta = signMetaBySlug(slug);
-            const accent = meta ? signColor(meta) : "var(--vivida-violet)";
+            const accent = meta ? signColor(meta) : "var(--primary)";
             return (
               <Link
                 key={slug}
                 href={`/zodiac/${slug}`}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80 hover:ring-foreground/15 sm:p-5"
+                className="group flex flex-col justify-between bg-card p-5 transition-colors duration-150 hover:bg-secondary/40"
               >
-                <div
-                  aria-hidden
-                  className="absolute -right-10 -top-10 size-28 rounded-full opacity-25 blur-2xl transition-opacity group-hover:opacity-50"
-                  style={{
-                    background: `radial-gradient(circle, ${accent} 0%, transparent 70%)`,
-                  }}
-                />
-                <div
-                  className="relative text-3xl sm:text-4xl"
-                  style={{ color: accent }}
-                >
-                  {c.symbol}
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="grid size-10 place-items-center rounded-sm border border-border bg-background text-2xl"
+                      style={{ color: accent }}
+                    >
+                      {c.symbol}
+                    </span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                      {c.element}
+                    </span>
+                  </div>
+                  <div className="mt-4 text-base font-semibold tracking-tight text-foreground group-hover:text-primary sm:text-lg">
+                    {c.labelKa}
+                  </div>
+                  <div className="mt-0.5 font-mono text-xs tabular-nums text-muted-foreground">
+                    {ZODIAC_DATES[slug].rangeKa}
+                  </div>
                 </div>
-                <div className="relative mt-2 text-base font-semibold tracking-tight sm:text-lg">
-                  {c.labelKa}
-                </div>
-                <div className="relative mt-0.5 text-xs text-muted-foreground">
-                  {ZODIAC_DATES[slug].rangeKa}
-                </div>
-                <div className="relative mt-2 text-xs text-muted-foreground/80">
+                <div className="mt-4 border-t border-border/60 pt-2.5 text-[11px] text-muted-foreground">
                   {c.element} · {c.modality}
                 </div>
               </Link>
@@ -188,246 +182,218 @@ export default async function ZodiacHubPage() {
           })}
         </div>
 
-        {/* What is the zodiac */}
-        <article className="mt-16 max-w-3xl">
-          <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-            {HUB_CONTENT.whatIsZodiac.title}
-          </h2>
-          <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
-            {paragraphs(HUB_CONTENT.whatIsZodiac.body).map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
-        </article>
+        {/* Editorial Reference Columns */}
+        <div className="mt-16 grid gap-px overflow-hidden rounded-md border border-border bg-border lg:grid-cols-3">
+          <article className="bg-card p-6 sm:p-7">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              01 · საფუძველი
+            </p>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground">
+              {HUB_CONTENT.whatIsZodiac.title}
+            </h2>
+            <div className="mt-3 space-y-3 text-pretty text-sm leading-relaxed text-foreground/85">
+              {paragraphs(HUB_CONTENT.whatIsZodiac.body).map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+          </article>
 
-        {/* Elements */}
-        <article className="mt-12 max-w-3xl">
-          <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-            {HUB_CONTENT.elements.title}
-          </h2>
-          <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
-            {paragraphs(HUB_CONTENT.elements.body).map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
-        </article>
+          <article className="bg-card p-6 sm:p-7">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              02 · სტიქიები
+            </p>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground">
+              {HUB_CONTENT.elements.title}
+            </h2>
+            <div className="mt-3 space-y-3 text-pretty text-sm leading-relaxed text-foreground/85">
+              {paragraphs(HUB_CONTENT.elements.body).map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+          </article>
 
-        {/* Modalities */}
-        <article className="mt-12 max-w-3xl">
-          <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-            {HUB_CONTENT.modalities.title}
-          </h2>
-          <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
-            {paragraphs(HUB_CONTENT.modalities.body).map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
-        </article>
+          <article className="bg-card p-6 sm:p-7">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              03 · მოდალობა
+            </p>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground">
+              {HUB_CONTENT.modalities.title}
+            </h2>
+            <div className="mt-3 space-y-3 text-pretty text-sm leading-relaxed text-foreground/85">
+              {paragraphs(HUB_CONTENT.modalities.body).map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+          </article>
+        </div>
 
         {/* More to explore */}
         <section className="mt-16">
-          <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="mb-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             ჩაუღრმავდი
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Link
-              href="/zodiac/mtvare"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80"
-            >
-              <div
-                aria-hidden
-                className="absolute -right-12 -top-12 size-40 rounded-full bg-[radial-gradient(circle,var(--vivida-cyan)_0%,transparent_70%)] opacity-30 blur-3xl"
-              />
-              <div className="relative text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                მთვარის ნიშანი
-              </div>
-              <h3 className="relative mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                შენი ემოციური ბირთვი
-              </h3>
-              <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
-                მზის ნიშნის ქვეშ მდებარე შინაგანი სამყარო.
-              </p>
-            </Link>
-            <Link
-              href="/zodiac/amomavali"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80"
-            >
-              <div
-                aria-hidden
-                className="absolute -right-12 -top-12 size-40 rounded-full bg-[radial-gradient(circle,oklch(0.78_0.18_60/0.4)_0%,transparent_70%)] blur-3xl"
-              />
-              <div className="relative text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                ამომავალი
-              </div>
-              <h3 className="relative mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                ნიღაბი, რომელსაც სამყარო ხედავს
-              </h3>
-              <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
-                ასცენდენტი, როგორ შედიხარ ოთახში.
-              </p>
-            </Link>
-            <Link
-              href="/zodiac/elementebi"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80"
-            >
-              <div
-                aria-hidden
-                className="absolute -right-12 -top-12 size-40 rounded-full bg-[radial-gradient(circle,oklch(0.72_0.22_30/0.4)_0%,transparent_70%)] blur-3xl"
-              />
-              <div className="relative text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                ცის ელემენტები
-              </div>
-              <h3 className="relative mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                ცეცხლი · მიწა · ჰაერი · წყალი
-              </h3>
-              <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
-                გაიგე, როგორ აყალიბებს ოთხი ელემენტი ცის ნიშნების ხასიათს.
-              </p>
-            </Link>
-            <Link
-              href="/zodiac/tavsebadoba"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-card/80"
-            >
-              <div
-                aria-hidden
-                className="absolute -right-12 -top-12 size-40 rounded-full bg-[radial-gradient(circle,var(--vivida-pink)_0%,transparent_70%)] opacity-30 blur-3xl"
-              />
-              <div className="relative text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                თავსებადობა
-              </div>
-              <h3 className="relative mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                ყველა წყვილი, 78 კავშირი
-              </h3>
-              <p className="relative mt-2 text-sm leading-relaxed text-foreground/85">
-                ნახე სრული ცხრილი, ვერძი ლომთან, ქალწული თხის რქასთან, ყველა
-                შესაძლო კომბინაცია.
-              </p>
-            </Link>
+          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                href: "/zodiac/mtvare",
+                eyebrow: "მთვარის ნიშანი",
+                title: "შენი ემოციური ბირთვი",
+                body: "მზის ნიშნის ქვეშ მდებარე შინაგანი სამყარო.",
+              },
+              {
+                href: "/zodiac/amomavali",
+                eyebrow: "ამომავალი",
+                title: "ნიღაბი, რომელსაც სამყარო ხედავს",
+                body: "ასცენდენტი, როგორ შედიხარ ოთახში.",
+              },
+              {
+                href: "/zodiac/elementebi",
+                eyebrow: "ცის ელემენტები",
+                title: "ცეცხლი · მიწა · ჰაერი · წყალი",
+                body: "გაიგე, როგორ აყალიბებს ოთხი ელემენტი ცის ნიშნების ხასიათს.",
+              },
+              {
+                href: "/zodiac/tavsebadoba",
+                eyebrow: "თავსებადობა",
+                title: "ყველა წყვილი · 78 კავშირი",
+                body: "ნახე სრული ცხრილი, ვერძი ლომთან, ქალწული თხის რქასთან.",
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex flex-col justify-between bg-card p-6 transition-colors duration-150 hover:bg-secondary/40"
+              >
+                <div>
+                  <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                    {item.eyebrow}
+                  </div>
+                  <h3 className="mt-2 text-lg font-semibold tracking-tight text-foreground group-hover:text-primary">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {item.body}
+                  </p>
+                </div>
+                <span className="mt-4 font-mono text-xs text-muted-foreground group-hover:text-foreground">
+                  გადასვლა →
+                </span>
+              </Link>
+            ))}
           </div>
         </section>
 
-        {/* FAQ */}
+        {/* FAQ & Additional Guides */}
         <section className="mt-16 max-w-3xl">
-          <h2 className="mb-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="mb-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             ხშირად დასმული კითხვები
           </h2>
-          <div className="space-y-3">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
             {HUB_CONTENT.faq.map((item, i) => (
-              <details
-                key={i}
-                className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors open:bg-card/80 sm:p-5"
-              >
-                <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
+              <details key={i} className="group">
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-4 p-5 text-base font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                   <span>{item.q}</span>
                   <span
                     aria-hidden
-                    className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45"
+                    className="mt-0.5 shrink-0 font-mono text-sm text-muted-foreground transition-transform group-open:rotate-45"
                   >
-                    ✦
+                    +
                   </span>
                 </summary>
-                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                <p className="px-5 pb-5 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
                   {item.a}
                 </p>
               </details>
             ))}
           </div>
 
-          <Link
-            href="/zodiac/reitingebi"
-            className="group relative mt-4 flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-[var(--vivida-pink)]/30 bg-gradient-to-br from-[var(--vivida-pink)]/12 via-card/65 to-[var(--vivida-violet)]/12 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5"
-          >
-            <div className="min-w-0">
-              <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                რეიტინგები
-              </div>
-              <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                ყველაზე ჭკვიანი, ეჭვიანი, რომანტიული ნიშნები
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-                12-ვე ნიშანი დალაგებული თვისებების მიხედვით, ნახე, სად დგას
-                შენი.
-              </p>
-            </div>
-            <span
-              aria-hidden
-              className="hidden shrink-0 text-3xl transition-transform group-hover:translate-x-1 sm:block"
+          <div className="mt-8 grid gap-px overflow-hidden rounded-md border border-border bg-border">
+            <Link
+              href="/zodiac/reitingebi"
+              className="group flex items-center justify-between gap-4 bg-card p-6 transition-colors hover:bg-secondary/40"
             >
-              →
-            </span>
-          </Link>
+              <div className="min-w-0">
+                <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                  რეიტინგები
+                </div>
+                <h3 className="mt-1 text-lg font-semibold tracking-tight text-foreground group-hover:text-primary sm:text-xl">
+                  ყველაზე ჭკვიანი, ეჭვიანი, რომანტიული ნიშნები
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                  12-ვე ნიშანი დალაგებული თვისებების მიხედვით — ნახე, სად დგას
+                  შენი.
+                </p>
+              </div>
+              <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
+            </Link>
 
-          <Link
-            href="/chinuri-horoskopi"
-            className="group relative mt-4 flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-[var(--vivida-gold)]/30 bg-gradient-to-br from-[var(--vivida-gold)]/10 via-card/65 to-[var(--vivida-cyan)]/12 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5"
-          >
-            <div className="min-w-0">
-              <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                ჩინური ჰოროსკოპი
-              </div>
-              <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                ზოდიაქოს ნიშნები წლების მიხედვით
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-                გაიგე შენი ჩინური ცხოველი დაბადების წლით, ვირთხა, დრაკონი,
-                ვეფხვი…
-              </p>
-            </div>
-            <span
-              aria-hidden
-              className="hidden shrink-0 text-3xl transition-transform group-hover:translate-x-1 sm:block"
+            <Link
+              href="/chinuri-horoskopi"
+              className="group flex items-center justify-between gap-4 bg-card p-6 transition-colors hover:bg-secondary/40"
             >
-              →
-            </span>
-          </Link>
+              <div className="min-w-0">
+                <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                  ჩინური ჰოროსკოპი
+                </div>
+                <h3 className="mt-1 text-lg font-semibold tracking-tight text-foreground group-hover:text-primary sm:text-xl">
+                  ზოდიაქოს ნიშნები წლების მიხედვით
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                  გაიგე შენი ჩინური ცხოველი დაბადების წლით — ვირთხა, დრაკონი,
+                  ვეფხვი…
+                </p>
+              </div>
+              <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
+            </Link>
 
-          <Link
-            href="/taro"
-            className="group relative mt-4 flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/65 to-[var(--vivida-pink)]/12 p-6 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5"
-          >
-            <div className="min-w-0">
-              <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                ონლაინ ტარო
-              </div>
-              <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                ტარო ქართულად, დაუსვი კითხვა კარტებს
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-                გაშალე 3-კარტიანი განლაგება და მიიღე ცოცხალი პასუხი. პირველი
-                კითხვა უფასოა.
-              </p>
-            </div>
-            <span
-              aria-hidden
-              className="hidden shrink-0 text-3xl transition-transform group-hover:translate-x-1 sm:block"
+            <Link
+              href="/taro"
+              className="group flex items-center justify-between gap-4 bg-card p-6 transition-colors hover:bg-secondary/40"
             >
-              →
-            </span>
-          </Link>
+              <div className="min-w-0">
+                <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                  ონლაინ ტარო
+                </div>
+                <h3 className="mt-1 text-lg font-semibold tracking-tight text-foreground group-hover:text-primary sm:text-xl">
+                  ტარო ქართულად — დაუსვი კითხვა კარტებს
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                  გაშალე 3-კარტიანი განლაგება და მიიღე ცოცხალი პასუხი. პირველი
+                  კითხვა უფასოა.
+                </p>
+              </div>
+              <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
+            </Link>
+          </div>
         </section>
 
         <ReportPromo className="mt-16" />
 
         {/* CTA */}
-        <div className="mt-16 rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/12 via-card/60 to-[var(--vivida-cyan)]/12 p-7 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
-          <Sparkles className="mx-auto mb-3 size-7 text-[var(--vivida-violet)]" />
-          <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            შენი ნიშანი ცის რუკის მცირე ნაწილია
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            მთვარე, ამომავალი, 12 სახლი, ყველა პლანეტა, ცოცხალ რუკაში. დაიწყე
-            უფასოდ.
-          </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Button asChild variant="mystic" size="lg">
-              <Link href="/signup">დაიწყე უფასოდ</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/zodiac/datit">იპოვე ნიშანი თარიღით</Link>
-            </Button>
+        <div className="mt-16 rounded-md border border-border bg-card p-7 sm:p-10">
+          <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+            <div className="max-w-xl">
+              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+                ნატალური რუკა
+              </p>
+              <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                შენი ნიშანი ცის რუკის მცირე ნაწილია
+              </h2>
+              <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
+                მთვარე, ამომავალი, 12 სახლი და ყველა პლანეტა — ერთ ცოცხალ რუკაში.
+                დაიწყე უფასოდ.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild size="lg">
+                <Link href="/signup">დაიწყე უფასოდ</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/zodiac/datit">იპოვე ნიშანი თარიღით</Link>
+              </Button>
+            </div>
           </div>
         </div>
-
       </section>
 
       <SiteFooter />

@@ -21,21 +21,21 @@ const R_ASPECT = 100;       // aspect lines drawn from this radius inward
 const R_TICK = 200;         // small tick marks at 5° intervals
 
 const ELEMENT_FILL: Record<string, string> = {
-  ცეცხლი: "oklch(0.55 0.2 25 / 0.08)",
-  მიწა:   "oklch(0.5 0.12 130 / 0.07)",
-  ჰაერი:  "oklch(0.55 0.16 220 / 0.08)",
-  წყალი:  "oklch(0.5 0.18 280 / 0.10)",
+  ცეცხლი: "oklch(0.76 0.12 75 / 0.06)",
+  მიწა:   "oklch(0.68 0.08 145 / 0.05)",
+  ჰაერი:  "oklch(0.75 0.05 240 / 0.06)",
+  წყალი:  "oklch(0.62 0.08 255 / 0.07)",
 };
 
 const ASPECT_STYLE: Record<
   string,
   { stroke: string; dash?: string }
 > = {
-  conjunction: { stroke: "oklch(0.85 0.16 85 / 0.55)" },
-  sextile:     { stroke: "oklch(0.78 0.18 200 / 0.45)" },
-  trine:       { stroke: "oklch(0.78 0.18 200 / 0.55)" },
-  square:      { stroke: "oklch(0.72 0.22 350 / 0.45)", dash: "3 3" },
-  opposition:  { stroke: "oklch(0.72 0.22 350 / 0.55)", dash: "5 4" },
+  conjunction: { stroke: "oklch(0.80 0.12 80 / 0.65)" },
+  sextile:     { stroke: "oklch(0.76 0.06 235 / 0.45)" },
+  trine:       { stroke: "oklch(0.80 0.12 80 / 0.50)" },
+  square:      { stroke: "oklch(0.68 0.12 35 / 0.45)", dash: "3 3" },
+  opposition:  { stroke: "oklch(0.68 0.12 35 / 0.55)", dash: "5 4" },
 };
 
 const PLANET_ORDER = [

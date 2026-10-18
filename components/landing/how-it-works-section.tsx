@@ -1,62 +1,74 @@
 import { HOME_CONTENT } from "@/lib/seo/home-content";
 import { Reveal } from "@/components/landing/reveal";
+import { CornerCrosshair } from "@/components/brand/celestial-icons";
 
 export function HowItWorksSection() {
-  const c = HOME_CONTENT.howItWorks;
+  const how = HOME_CONTENT.howItWorks;
 
   return (
-    <section className="relative z-10 mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-24">
-      <Reveal
-        as="h2"
-        y={16}
-        durationMs={600}
-        className="mb-10 text-balance text-center text-3xl font-semibold tracking-tight sm:mb-14 sm:text-5xl"
-      >
-        {c.title}
-      </Reveal>
+    <section
+      id="how-it-works"
+      aria-labelledby="how-heading"
+      className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20"
+    >
+      <div className="relative overflow-hidden rounded-sm border border-border bg-card">
+        <CornerCrosshair position="tl" />
+        <CornerCrosshair position="tr" />
+        <CornerCrosshair position="bl" />
+        <CornerCrosshair position="br" />
 
-      <div className="relative">
-        {/* Connecting line behind the steps (desktop only) */}
-        <div
-          aria-hidden
-          className="absolute left-[10%] right-[10%] top-7 hidden h-px bg-gradient-to-r from-transparent via-[var(--vivida-violet)]/30 to-transparent md:block"
-        />
-
-        <div className="grid gap-8 md:grid-cols-3 md:gap-6">
-          {c.steps.map((step, i) => (
-            <Reveal
-              key={step.n}
-              y={24}
-              delayMs={i * 180}
-              className="relative flex flex-col items-center text-center"
-            >
-              <div className="relative mb-5">
-                {/* Conic gradient halo */}
-                <div
-                  aria-hidden
-                  className="absolute inset-0 -m-2 rounded-full bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-40 blur-md"
-                />
-                <div
-                  className="relative grid size-14 place-items-center rounded-full border border-border bg-card/85 text-base font-semibold tabular-nums backdrop-blur-xl"
-                  style={{
-                    boxShadow:
-                      "inset 0 0 0 1px oklch(1 0 0 / 0.08), 0 0 24px -8px var(--vivida-violet)",
-                  }}
-                >
-                  <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-                    {String(step.n).padStart(2, "0")}
-                  </span>
-                </div>
+        <div className="border-b border-border bg-background/50 px-6 py-6 sm:px-10 sm:py-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-primary">
+                <span className="inline-block h-px w-5 bg-primary/70" />
+                პროცესი · 3 მარტივი ნაბიჯი
               </div>
-              <h3 className="text-lg font-semibold tracking-tight sm:text-xl">
-                {step.title}
-              </h3>
-              <p className="mt-2 max-w-xs text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
-                {step.body}
-              </p>
-            </Reveal>
-          ))}
+              <h2
+                id="how-heading"
+                className="mt-2.5 max-w-2xl text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-4xl"
+              >
+                {how.title}
+              </h2>
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              COMPUTATION PROTOCOL · 0{how.steps.length} STAGES
+            </span>
+          </div>
         </div>
+
+        <ol className="grid gap-px bg-border sm:grid-cols-3">
+          {how.steps.map((s, i) => {
+            const num = String(s.n).padStart(2, "0");
+            return (
+              <Reveal
+                key={s.n}
+                delayMs={i * 60}
+                className="flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary/20 sm:p-8"
+              >
+                <div>
+                  <div className="flex items-baseline justify-between border-b border-border/60 pb-3">
+                    <span className="font-mono text-2xl font-medium tabular-nums text-primary">
+                      {num}
+                    </span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                      STAGE {num}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold tracking-tight text-foreground sm:text-lg">
+                    {s.title}
+                  </h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+                    {s.body}
+                  </p>
+                </div>
+                <div className="mt-6 border-t border-border/50 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  SWISS EPHEMERIS · VERIFIED
+                </div>
+              </Reveal>
+            );
+          })}
+        </ol>
       </div>
     </section>
   );

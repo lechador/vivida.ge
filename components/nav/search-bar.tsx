@@ -130,17 +130,17 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
   }, []);
 
   return (
-    <div ref={wrapperRef} className="relative w-full max-w-md">
+    <div ref={wrapperRef} className="relative w-full max-w-sm">
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <input
           ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder={en ? "Name or @" : "სახელი ან @"}
-          className="h-12 w-full rounded-full border border-border bg-card/50 pl-11 pr-10 text-base outline-none ring-offset-background backdrop-blur transition-colors placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-ring"
+          placeholder={en ? "Search profiles (@username)…" : "ძებნა სახელით ან @…"}
+          className="h-9 w-full rounded-md border border-border bg-card pl-9 pr-9 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary/70"
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
               e.preventDefault();
@@ -159,7 +159,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
           autoComplete="off"
         />
         {loading ? (
-          <Loader2 className="absolute right-3.5 top-1/2 size-[18px] -translate-y-1/2 animate-spin text-muted-foreground" />
+          <Loader2 className="absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted-foreground" />
         ) : (
           <button
             type="button"
@@ -173,15 +173,15 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
                 inputRef.current?.focus();
               }
             }}
-            className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-card/60 text-foreground/80 ring-1 ring-foreground/10 transition-colors hover:bg-card hover:text-foreground"
+            className="absolute right-1.5 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
-            <CornerDownLeft className="size-[16px]" />
+            <CornerDownLeft className="size-3.5" />
           </button>
         )}
       </div>
 
       {open && hasQuery && results.length > 0 && (
-        <ul className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 max-h-80 overflow-auto rounded-xl border border-border bg-popover/95 p-1 shadow-2xl backdrop-blur-md">
+        <ul className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 max-h-80 overflow-auto rounded-md border border-border bg-card p-1 shadow-xl">
           {results.map((r, i) => (
             <li key={r.userId}>
               <Link
@@ -197,22 +197,23 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
                 }}
                 onMouseEnter={() => setHighlight(i)}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors",
-                  i === highlight ? "bg-accent/15" : "hover:bg-accent/10",
+                  "flex items-center gap-3 rounded-sm px-2.5 py-2 transition-colors",
+                  i === highlight ? "bg-secondary" : "hover:bg-secondary/60",
                 )}
               >
                 <Image
                   src={r.image || DEFAULT_AVATAR}
                   alt=""
-                  width={36}
-                  height={36}
-                  className="size-9 shrink-0 rounded-full border border-border/60 object-cover"
+                  width={32}
+                  height={32}
+                  referrerPolicy="no-referrer"
+                  className="size-8 shrink-0 rounded-sm border border-border object-cover"
                 />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-foreground">
                     {r.displayName}
                   </div>
-                  <div className="truncate text-xs text-muted-foreground">
+                  <div className="truncate font-mono text-xs text-muted-foreground">
                     @{r.username}
                   </div>
                 </div>
@@ -223,7 +224,7 @@ export function SearchBar({ locale = "ka" }: { locale?: UserLocale }) {
       )}
 
       {open && hasQuery && !loading && results.length === 0 && (
-        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 rounded-xl border border-border bg-popover/95 p-4 text-center text-sm text-muted-foreground shadow-2xl backdrop-blur-md">
+        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 rounded-md border border-border bg-card p-4 text-center text-xs text-muted-foreground shadow-xl">
           {en
             ? "No public profiles found"
             : "არცერთი საჯარო პროფილი არ მოიძებნა"}

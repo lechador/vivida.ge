@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
-import { Fraunces, Noto_Sans_Georgian } from "next/font/google";
+import { Fraunces, JetBrains_Mono, Noto_Sans_Georgian } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import Script from "next/script";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
@@ -18,22 +18,18 @@ import "./globals.css";
 const notoGeorgian = Noto_Sans_Georgian({
   variable: "--font-sans",
   subsets: ["georgian", "latin"],
-  // Keep the first paint stable on slow connections instead of swapping a
-  // late font into an already visible form. Cached fonts still render normally.
   display: "optional",
-  // Metric-adjusted fallback (size-adjust/ascent-override) so the system font
-  // used when the web font misses its initial display window stays as close
-  // as possible to Noto's metrics across cold and cached visits.
   adjustFontFallback: true,
   fallback: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
 });
 
-/**
- * Editorial serif for the English site only (vividaastro.com). The variable
- * is declared globally but no Georgian-host markup references it, so the
- * Georgian experience is byte-identical, only EN components opt in via the
- * `font-display` utility or `@/components/en/editorial` primitives.
- */
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "optional",
+});
+
 const fraunces = Fraunces({
   variable: "--font-display-serif",
   subsets: ["latin"],
@@ -140,8 +136,8 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0b0814" },
-    { media: "(prefers-color-scheme: light)", color: "#0b0814" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0c10" },
+    { media: "(prefers-color-scheme: light)", color: "#0b0c10" },
   ],
   colorScheme: "dark",
 };
@@ -163,18 +159,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // The same deployment serves two language domains, and Armenian off a path
-  // prefix on one of them. Resolving the locale on the server puts the correct
-  // `lang` in the delivered HTML, an inline script only patches it after
-  // parse, so crawlers that don't run JS (and every social/AI scraper) saw the
-  // English domain declared Georgian.
   const locale = await getRequestLocale();
 
   return (
     <html
       lang={HTML_LANG[locale]}
       data-scroll-behavior="smooth"
-      className={`dark scroll-smooth ${notoGeorgian.variable} ${fraunces.variable} h-full antialiased`}
+      className={`dark scroll-smooth ${notoGeorgian.variable} ${jetbrainsMono.variable} ${fraunces.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
@@ -188,26 +179,24 @@ export default async function RootLayout({
             window.dispatchEvent(new Event('vivida:pwa-prompt-ready'));
           });
         `}</Script>
-        {/* Scroll-reveal sections start opacity:0 and are shown by JS. With
-            JS disabled, force them visible so content is never hidden. */}
         <noscript>
           <style>{`.reveal{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
         <a
           href="#main-content"
-          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-xl border border-[var(--vivida-violet)]/60 bg-background px-4 py-2.5 text-sm font-semibold text-foreground shadow-xl transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[var(--vivida-violet)] focus:ring-offset-2 focus:ring-offset-background"
+          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
         >
           {locale === "en"
             ? "Skip to main content"
             : "მთავარ კონტენტზე გადასვლა"}
         </a>
         <NextTopLoader
-          color="oklch(0.78 0.18 305)"
-          height={2.5}
+          color="#D4AF37"
+          height={2}
           showSpinner={false}
-          shadow="0 0 12px oklch(0.78 0.18 305 / 0.6), 0 0 6px oklch(0.78 0.18 305 / 0.4)"
+          shadow={false}
           easing="cubic-bezier(0.22, 1, 0.36, 1)"
-          speed={400}
+          speed={300}
         />
         <BfcacheRefresher />
         <PwaServiceWorkerRegister />

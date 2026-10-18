@@ -54,25 +54,19 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
 
   const year = new Date().getFullYear();
   return (
-    <footer className="relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 sm:py-14 md:flex-row md:items-start md:justify-between">
+    <footer className="relative z-10 border-t border-border bg-background">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 sm:py-16 md:flex-row md:items-start md:justify-between">
         {/* Brand block */}
         <div className="max-w-sm">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <VividaMark size={36} id="footer" />
-            <span
-              className="bg-clip-text text-transparent text-xl font-semibold tracking-tight"
-              style={{
-                backgroundImage:
-                  "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #22d3ee 100%)",
-              }}
-            >
-              vivida
+            <VividaMark size={32} id="footer" />
+            <span className="font-display text-2xl font-medium tracking-tight text-foreground">
+              Vivida
             </span>
           </Link>
-          <p className="mt-3 text-sm text-muted-foreground">
-            შენი კოსმიური რუკა, ცოცხალი და პერსონალური. ყოველდღიური პროგნოზები,
-            ნატალური რუკა და თავსებადობა.
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            შენი პირადი ასტრონომიული და ასტროლოგიური ალმანახი. ზუსტი ეფემერიდები,
+            ნატალური რუკა, ყოველდღიური ტრანზიტები და თავსებადობა.
           </p>
         </div>
 

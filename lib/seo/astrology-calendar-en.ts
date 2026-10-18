@@ -1,75 +1,134 @@
 import type { AstrologyCalendarDay, CalendarTone } from "@/lib/seo/astrology-calendar";
+import { signByIndex } from "@/lib/zodiac";
 
-const PLANET_EN: Record<string, string> = {
-  მზე: "Sun", მთვარე: "Moon", მერკური: "Mercury", ვენერა: "Venus", მარსი: "Mars",
-  იუპიტერი: "Jupiter", სატურნი: "Saturn", ურანი: "Uranus", ნეპტუნი: "Neptune", პლუტონი: "Pluto",
-};
-
-const ASPECT_EN: Record<string, string> = {
-  შეერთება: "conjunction", სექსტილი: "sextile", კვადრატი: "square", ტრიგონი: "trine", ოპოზიცია: "opposition",
-};
-
-export const TONE_EN: Record<CalendarTone, { label: string; color: string; icon: string }> = {
+export const TONE_EN: Record<
+  CalendarTone,
+  { label: string; color: string; icon: string }
+> = {
   lucky: { label: "Supportive", color: "var(--vivida-cyan)", icon: "✦" },
   balanced: { label: "Balanced", color: "var(--vivida-violet)", icon: "◐" },
-  careful: { label: "Use extra care", color: "var(--vivida-pink)", icon: "△" },
+  careful: { label: "Extra care", color: "var(--vivida-pink)", icon: "△" },
 };
 
-export function calendarDateLabelEn(date: Date, short = false) {
+const PLANET_EN_MAP: Record<string, string> = {
+  მზე: "Sun",
+  მთვარე: "Moon",
+  მერკური: "Mercury",
+  ვენერა: "Venus",
+  მარსი: "Mars",
+  იუპიტერი: "Jupiter",
+  სატურნი: "Saturn",
+  ურანი: "Uranus",
+  ნეპტუნი: "Neptune",
+  პლუტონი: "Pluto",
+};
+
+const ASPECT_EN_MAP: Record<string, string> = {
+  შეერთება: "Conjunction",
+  სექსტილი: "Sextile",
+  კვადრატი: "Square",
+  ტრინი: "Trine",
+  ოპოზიცია: "Opposition",
+};
+
+export function planetEn(kaLabel: string): string {
+  return PLANET_EN_MAP[kaLabel] ?? kaLabel;
+}
+
+export function aspectEn(kaKind: string): string {
+  return ASPECT_EN_MAP[kaKind] ?? kaKind;
+}
+
+export function weekdayEn(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "long",
-    ...(short ? {} : { year: "numeric" as const }),
+    weekday: "long",
     timeZone: "UTC",
   }).format(date);
 }
 
-/**
- * Keep the search snippet and the visible English calendar page aligned.
- * Search Console shows that date-led queries use both "astrology" and
- * "ephemeris / planetary positions", so each day should answer that intent
- * explicitly instead of presenting itself as only a generic forecast.
- */
-export function calendarDaySeoEn(date: Date) {
-  const label = calendarDateLabelEn(date);
+export function calendarDateLabelEn(date: Date, short = false): string {
+  return new Intl.DateTimeFormat("en-US", {
+    month: short ? "short" : "long",
+    day: "numeric",
+    ...(short ? {} : { year: "numeric" }),
+    timeZone: "UTC",
+  }).format(date);
+}
+
+export function calendarDaySeoEn(date: Date): {
+  label: string;
+  title: string;
+  description: string;
+} {
+  const label = calendarDateLabelEn(date, false);
   return {
     label,
-    title: `${label} Astrology: Planetary Positions & Aspects`,
-    description: `${label} astrology and ephemeris: see planetary positions by zodiac sign, major aspects, the daily energy index, and practical guidance.`,
+    title: `${label} Astrology: Planetary Positions & Daily Aspects`,
+    description: `Explore the planetary positions, Moon sign, major transiting aspects, and practical astrology guidance for ${label}.`,
   };
 }
 
-export function weekdayEn(date: Date) {
-  return new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: "UTC" }).format(date);
+export function dayLeadEn(day: AstrologyCalendarDay): string {
+  const moon = day.sky.planets.find((p) => p.key === "moon");
+  const moonSign = moon ? signByIndex(moon.signIndex).labelEn : "the zodiac";
+  if (day.tone === "lucky") {
+    return `Harmonious planetary aspects set a cooperative tone today while the Moon moves through ${moonSign}.`;
+  }
+  if (day.tone === "careful") {
+    return `Tighter tense aspects call for patience and careful review today as the Moon transits ${moonSign}.`;
+  }
+  return `A balanced collective sky with the Moon in ${moonSign}, well suited for steady progress and grounded planning.`;
 }
 
-export function planetEn(labelKa: string) { return PLANET_EN[labelKa] ?? labelKa; }
-export function aspectEn(kindKa: string) { return ASPECT_EN[kindKa] ?? kindKa; }
-
-export function dayLeadEn(day: AstrologyCalendarDay) {
-  const strongest = day.sky.aspects[0];
-  return strongest
-    ? `${planetEn(strongest.aKa)}–${planetEn(strongest.bKa)} ${aspectEn(strongest.kindKa)} sets the day's strongest astrological tone.`
-    : "With no tight major aspects, the day's overall rhythm is relatively calm and flexible.";
-}
-
-export function dayAdviceEn(day: AstrologyCalendarDay) {
-  if (day.tone === "lucky") return {
-    title: "Supportive day",
-    summary: "Harmonious aspects outweigh tense ones. The collective sky supports initiative, useful conversations, and steady progress, though outcomes still depend on your choices and preparation.",
-    do: ["Take one concrete step toward an important goal", "Use opportunities for cooperation and honest conversation", "Record ideas and proposals that emerge naturally"],
-    avoid: ["Do not rely on luck alone", "Avoid making financial or personal promises without thinking them through"],
-  };
-  if (day.tone === "careful") return {
-    title: "Day for extra care",
-    summary: "Tense aspects call for closer attention. Double-check decisions, give emotional reactions time to settle, and avoid escalating conflict unnecessarily.",
-    do: ["Verify facts and deadlines before deciding", "Leave extra time for travel and important tasks", "Respond after strong emotions have settled"],
-    avoid: ["Avoid impulsive confrontation", "Do not treat an astrological rating as an inevitable prediction"],
-  };
+export function dayAdviceEn(day: AstrologyCalendarDay): {
+  title: string;
+  summary: string;
+  do: string[];
+  avoid: string[];
+} {
+  if (day.tone === "lucky") {
+    return {
+      title: "Supportive day",
+      summary:
+        "Harmonious aspects create a constructive backdrop for conversations, planning, and steady initiative.",
+      do: [
+        "Schedule important conversations or creative work",
+        "Take a practical first step on a new plan",
+        "Collaborate and share ideas openly",
+      ],
+      avoid: [
+        "Overcommitting your schedule",
+        "Skipping basic due diligence",
+      ],
+    };
+  }
+  if (day.tone === "careful") {
+    return {
+      title: "Day for extra care",
+      summary:
+        "Tense aspects favor slower pacing, double-checking details, and pausing before reacting.",
+      do: [
+        "Review agreements and details carefully",
+        "Leave buffer time between commitments",
+        "Focus on completing existing tasks",
+      ],
+      avoid: [
+        "Impulsive financial or relationship decisions",
+        "Escalating minor disagreements",
+      ],
+    };
+  }
   return {
     title: "Balanced day",
-    summary: "Harmonious and tense influences are fairly even. A moderate pace, clear priorities, and attention to changing circumstances will serve you best.",
-    do: ["Finish work already in progress", "Keep your plan flexible", "Separate essential tasks from distractions"],
-    avoid: ["Do not rush only because of external pressure", "Avoid scattering energy across too many directions"],
+    summary:
+      "A steady astrological backdrop where consistent effort and clear priorities work best.",
+    do: [
+      "Follow your core priorities step by step",
+      "Balance focused work with rest",
+    ],
+    avoid: [
+      "Procrastinating on key tasks",
+      "Scattering attention across too many tabs",
+    ],
   };
 }

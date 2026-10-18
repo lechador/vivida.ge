@@ -1,26 +1,27 @@
+import type { TarotSpreadId } from "@/lib/tarot/spreads";
+
 export type TarotAttempt = {
   question: string;
-  spreadId: string;
+  spreadId: TarotSpreadId;
   requestId: string;
 };
 
-/**
- * Keep one stable request id per logical tarot attempt (question + spread).
- * Network retries reuse the id (so the server replays instead of charging
- * again); editing the question or switching the spread starts a new attempt.
- */
 export function nextTarotAttempt(
-  previous: TarotAttempt | null,
+  current: TarotAttempt | null,
   question: string,
-  spreadId: string = "situation",
-  createId: () => string = () => crypto.randomUUID(),
+  spreadId: TarotSpreadId,
 ): TarotAttempt {
-  const normalized = question.trim();
   if (
-    previous &&
-    previous.question === normalized &&
-    previous.spreadId === spreadId
-  )
-    return previous;
-  return { question: normalized, spreadId, requestId: createId() };
+    current &&
+    current.question === question &&
+    current.spreadId === spreadId
+  ) {
+    return current;
+  }
+  const randomPart = Math.random().toString(36).slice(2, 12);
+  return {
+    question,
+    spreadId,
+    requestId: `req_${Date.now()}_${randomPart}`,
+  };
 }

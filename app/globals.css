@@ -25,56 +25,56 @@ html[lang="hy"] .locale-ka-only {
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Vivida light fallback, app forces dark by default */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* Vivida Editorial Almanac light fallback */
+  --background: oklch(0.98 0.008 85);
+  --foreground: oklch(0.15 0.01 265);
+  --card: oklch(0.96 0.01 85);
+  --card-foreground: oklch(0.15 0.01 265);
+  --popover: oklch(0.98 0.008 85);
+  --popover-foreground: oklch(0.15 0.01 265);
+  --primary: oklch(0.45 0.10 75);
+  --primary-foreground: oklch(0.98 0.008 85);
+  --secondary: oklch(0.93 0.012 85);
+  --secondary-foreground: oklch(0.18 0.01 265);
+  --muted: oklch(0.93 0.01 85);
+  --muted-foreground: oklch(0.46 0.015 265);
+  --accent: oklch(0.92 0.015 85);
+  --accent-foreground: oklch(0.18 0.01 265);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --radius: 0.75rem;
+  --border: oklch(0.86 0.012 85);
+  --input: oklch(0.86 0.012 85);
+  --ring: oklch(0.45 0.10 75);
+  --radius: 0.5rem;
 }
 
 .dark {
-  /* Mystical, deep-cosmos palette */
-  --background: oklch(0.13 0.03 280); /* near-black violet */
-  --foreground: oklch(0.97 0.01 280); /* moonlight white */
-  --card: oklch(0.17 0.04 280);
-  --card-foreground: oklch(0.97 0.01 280);
-  --popover: oklch(0.17 0.04 280);
-  --popover-foreground: oklch(0.97 0.01 280);
-  --primary: oklch(0.78 0.18 305); /* vibrant magenta-violet */
-  --primary-foreground: oklch(0.13 0.03 280);
-  --secondary: oklch(0.22 0.05 280);
-  --secondary-foreground: oklch(0.97 0.01 280);
-  --muted: oklch(0.22 0.04 280);
-  --muted-foreground: oklch(0.72 0.04 280);
-  --accent: oklch(0.72 0.18 200); /* electric cyan */
-  --accent-foreground: oklch(0.13 0.03 280);
-  --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.97 0.01 280);
-  --border: oklch(0.27 0.04 280 / 60%);
-  --input: oklch(0.27 0.04 280 / 80%);
-  --ring: oklch(0.78 0.18 305 / 70%);
+  /* Editorial Celestial & Astronomical Observatory Palette (60-30-10) */
+  --background: oklch(0.115 0.008 265); /* Deep Obsidian Ink (#0B0C10) */
+  --foreground: oklch(0.95 0.012 85); /* Warm Parchment Ivory (#F4F0EA) */
+  --card: oklch(0.15 0.01 265); /* Flat Matte Charcoal (#12141C) */
+  --card-foreground: oklch(0.95 0.012 85);
+  --popover: oklch(0.15 0.01 265);
+  --popover-foreground: oklch(0.95 0.012 85);
+  --primary: oklch(0.80 0.12 80); /* Calibrated Warm Brass / Astrolabe Gold (#D4AF37) */
+  --primary-foreground: oklch(0.12 0.01 265);
+  --secondary: oklch(0.19 0.012 265); /* Elevated Slate */
+  --secondary-foreground: oklch(0.95 0.012 85);
+  --muted: oklch(0.18 0.01 265);
+  --muted-foreground: oklch(0.68 0.014 80); /* Muted Warm Stone */
+  --accent: oklch(0.78 0.05 235); /* Celestial Silver-Slate */
+  --accent-foreground: oklch(0.12 0.01 265);
+  --destructive: oklch(0.65 0.18 25);
+  --destructive-foreground: oklch(0.95 0.012 85);
+  --border: oklch(0.25 0.012 265); /* Crisp 1px architectural hairline */
+  --input: oklch(0.25 0.012 265);
+  --ring: oklch(0.80 0.12 80 / 65%);
 
-  /* Brand-only mystic accents (used in gradients, glows) */
-  --vivida-violet: oklch(0.65 0.24 305);
-  --vivida-pink: oklch(0.72 0.22 350);
-  --vivida-cyan: oklch(0.78 0.18 200);
-  --vivida-gold: oklch(0.85 0.16 85);
+  /* Harmonized Celestial Brand Accents (replaces neon purple/pink/cyan) */
+  --vivida-violet: oklch(0.80 0.12 80); /* Warm Brass */
+  --vivida-pink: oklch(0.74 0.10 55); /* Antique Terracotta Bronze */
+  --vivida-cyan: oklch(0.78 0.06 230); /* Celestial Silver-Blue */
+  --vivida-gold: oklch(0.83 0.12 85); /* Astrolabe Champagne Gold */
 }
 
 @theme inline {
@@ -183,42 +183,8 @@ html[lang="hy"] .locale-ka-only {
     }
   }
 
-  /*
-   * Desktop left sidebar: when DesktopSidebar is mounted, push the body
-   * content right by the sidebar width so the fixed-position rail
-   * doesn't overlap page content. Same automatic-via-:has() pattern as
-   * the mobile rule above.
-   */
-  @media (min-width: 1024px) {
-    body:has([data-desktop-sidebar]) {
-      padding-left: 15rem; /* matches the always-expanded sidebar width */
-    }
-
-    /*
-     * Radix dropdowns / dialogs use react-remove-scroll for scroll lock,
-     * which injects a runtime <style> rule keyed on
-     * body[data-scroll-locked] that:
-     *   - sets padding-left/right/top to whatever the body's MARGIN
-     *     values were (default gapMode='margin'). Body has 0 margin,
-     *     so this *resets* our padding-left:14rem to 0px, jamming the
-     *     entire layout 252px to the left.
-     *   - adds margin-right:<scrollbar>px !important to compensate for
-     *     the disappearing scrollbar, which our scrollbar-gutter:stable
-     *     already handles, so it just shoves things another 17px left.
-     *
-     * Higher specificity (body[data-scroll-locked]:has(...)) plus
-     * !important on every property the lib touches keeps the layout
-     * stable across open/close.
-     */
-    body[data-scroll-locked]:has([data-desktop-sidebar]) {
-      padding-left: 15rem !important;
-      padding-right: 0 !important;
-      margin-right: 0 !important;
-      margin-left: 0 !important;
-    }
-  }
   ::selection {
-    background-color: oklch(0.78 0.18 305 / 35%);
+    background-color: oklch(0.80 0.12 80 / 30%);
   }
 }
 
@@ -238,16 +204,6 @@ html[lang="hy"] .locale-ka-only {
   body:has([data-mobile-tab-bar]) [data-privacy-reopen],
   body:has([data-mobile-tab-bar]) [data-chat-launcher] {
     bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 0px) + 0.75rem);
-  }
-}
-
-/* Keep the privacy control on the right side on desktop, clear of the
- * always-expanded navigation rail and its account/settings link. */
-@media (min-width: 1024px) {
-  body:has([data-desktop-sidebar]) [data-privacy-reopen] {
-    left: auto;
-    right: 0.75rem;
-    z-index: 30;
   }
 }
 
@@ -288,9 +244,9 @@ html[lang="hy"] .locale-ka-only {
 /* Editorial article body. Kept outside a typography plugin so Georgian and
  * Armenian line-height, anchor offsets and emphasis stay under our control. */
 .article-prose {
-  color: color-mix(in oklch, var(--foreground) 86%, transparent);
+  color: color-mix(in oklch, var(--foreground) 88%, transparent);
   font-size: 1.0625rem;
-  line-height: 1.9;
+  line-height: 1.85;
 }
 .article-prose > * + * {
   margin-top: 1.45rem;
@@ -299,9 +255,9 @@ html[lang="hy"] .locale-ka-only {
 .article-prose h3 {
   scroll-margin-top: 6rem;
   color: var(--foreground);
-  font-weight: 650;
+  font-weight: 600;
   line-height: 1.24;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
 }
 .article-prose h2 {
   margin-top: 3.3rem;
@@ -313,27 +269,27 @@ html[lang="hy"] .locale-ka-only {
 }
 .article-prose strong {
   color: var(--foreground);
-  font-weight: 700;
+  font-weight: 600;
 }
 .article-prose a {
-  color: var(--vivida-cyan);
+  color: var(--primary);
   text-decoration: underline;
   text-decoration-color: color-mix(
     in oklch,
-    var(--vivida-cyan) 45%,
+    var(--primary) 45%,
     transparent
   );
   text-underline-offset: 0.22em;
 }
 .article-prose blockquote {
   margin-block: 2.25rem;
-  border-left: 3px solid var(--vivida-pink);
-  border-radius: 0 1rem 1rem 0;
-  background: color-mix(in oklch, var(--card) 72%, transparent);
-  padding: 1.2rem 1.35rem;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card) 65%, transparent);
+  padding: 1.5rem 1.5rem;
   color: var(--foreground);
-  font-size: 1.1em;
-  font-weight: 550;
+  font-size: 1.08em;
+  font-weight: 500;
   line-height: 1.7;
 }
 .article-prose ul,
