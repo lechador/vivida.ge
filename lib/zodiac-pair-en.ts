@@ -1,68 +1,88 @@
-import { signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
+import { pairSlug, signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
+import { PAIRS_CONTENT_EN, type PairContentEn } from "@/lib/seo/zodiac-content-en";
 
-export type ZodiacPairEn = {
+export type PairRating = "Strong" | "Harmonious" | "Challenging" | "Natural flow" | "Growth-oriented" | "Powerful mirror";
+
+export type ZodiacPairEnglish = {
   title: string;
   description: string;
-  rating: string;
-  scoreLabel: string;
   tagline: string;
+  rating: PairRating;
   overall: string;
-  intro: string[];
   love: string;
   friendship: string;
-  communication: string[];
-  trust: string[];
-  verdict: string;
+  communication: string;
   strengths: string[];
   challenges: string[];
-  advice: string;
+  verdict: string;
   faq: Array<{ q: string; a: string }>;
 };
 
-export function zodiacPairEnglish(a: ZodiacSlug, b: ZodiacSlug): ZodiacPairEn {
-  const ma = signMetaBySlug(a);
-  const mb = signMetaBySlug(b);
-  const nameA = ma?.labelEn ?? a;
-  const nameB = mb?.labelEn ?? b;
-  const sameEl = ma?.elementEn === mb?.elementEn;
-  const rating = sameEl ? "Strong" : "Harmonious";
-  const overall = `When ${nameA} and ${nameB} connect, their ${ma?.elementEn?.toLowerCase() ?? "elemental"} and ${mb?.elementEn?.toLowerCase() ?? "elemental"} temperaments create an engaging interplay of strengths.`;
-  const love = `In romance, ${nameA} and ${nameB} balance personal expression with mutual care and shared curiosity.`;
-  const friendship = `As friends, ${nameA} and ${nameB} offer steady encouragement, candid perspective, and lasting loyalty.`;
-  const advice = `Give both ${nameA} and ${nameB} room to express their natural style while keeping communication direct and warm.`;
+export function zodiacPairEnglish(a: ZodiacSlug, b: ZodiacSlug): ZodiacPairEnglish {
+  const aMeta = signMetaBySlug(a)!;
+  const bMeta = signMetaBySlug(b)!;
+  const aName = aMeta.labelEn;
+  const bName = bMeta.labelEn;
+  const slug = pairSlug(a, b);
+  const pair: PairContentEn | undefined = PAIRS_CONTENT_EN[slug];
 
-  return {
-    title: `${nameA} and ${nameB} Compatibility: Love, Friendship and Synastry`,
-    description: `Explore ${nameA} and ${nameB} compatibility in love, communication, emotional rhythm, and long-term partnership.`,
-    rating,
-    scoreLabel: rating,
-    tagline: `${nameA} and ${nameB} bring together ${ma?.elementEn ?? "Fire"} and ${mb?.elementEn ?? "Air"} perspectives in a dynamic, growth-oriented bond.`,
-    overall,
-    intro: [overall],
-    love,
-    friendship,
-    communication: [
-      `Open dialogue helps ${nameA} and ${nameB} translate their natural rhythms into lasting understanding.`,
-    ],
-    trust: [
-      `Shared values and consistent follow-through build a resilient foundation between ${nameA} and ${nameB}.`,
-    ],
-    verdict: advice,
-    strengths: [
-      "Complementary perspectives that spark growth",
-      "Strong mutual curiosity and emotional honesty",
-      "Resilience when working toward shared goals",
-    ],
-    challenges: [
-      "Different pacing when processing emotions",
-      "Balancing independence with togetherness",
-    ],
-    advice,
-    faq: [
+  if (pair) {
+    const rawRating = String(pair.overallScore || "Harmonious");
+    const rating: PairRating =
+      rawRating === "ძლიერი" || rawRating === "Strong"
+        ? "Strong"
+        : rawRating === "ჰარმონიული" || rawRating === "Harmonious"
+          ? "Harmonious"
+          : "Challenging";
+
+    const defaultFaq = [
       {
-        q: `Are ${nameA} and ${nameB} compatible?`,
-        a: `${nameA} and ${nameB} have a ${rating.toLowerCase()} connection that thrives on honest communication and full-chart synastry.`,
+        q: `Are ${aName} and ${bName} compatible?`,
+        a: pair.verdict || `${aName} and ${bName} can build a meaningful relationship when they respect each other's differences.`,
       },
-    ],
+      {
+        q: `How do ${aName} and ${bName} connect in love?`,
+        a: pair.love || `${aName} and ${bName} explore love through their respective Air/Water/Fire/Earth styles.`,
+      },
+      {
+        q: `What is the main challenge between ${aName} and ${bName}?`,
+        a: (pair.challenges && pair.challenges[0]) || `Navigating different emotional and conversational rhythms requires patience and clarity.`,
+      },
+      {
+        q: "Can Sun signs alone determine relationship outcome?",
+        a: "No. While Sun signs offer a valuable archetypal baseline, deep compatibility is shaped by Moon signs, Venus, Mars, Ascendants, houses, and mutual commitment.",
+      },
+    ];
+
+    return {
+      title: pair.pageTitle || `${aName} and ${bName} Compatibility: Love, Friendship and Communication`,
+      description: pair.metaDescription || `${aName} and ${bName} compatibility in love, friendship, and communication.`,
+      tagline: pair.tagline || `${aName} × ${bName} relationship dynamic`,
+      rating,
+      overall: pair.overall,
+      love: pair.love,
+      friendship: pair.friendship,
+      communication: pair.communication,
+      strengths: pair.strengths || [],
+      challenges: pair.challenges || [],
+      verdict: pair.verdict,
+      faq: pair.faq && pair.faq.length >= 3 ? pair.faq : defaultFaq,
+    };
+  }
+
+  // Fallback
+  return {
+    title: `${aName} and ${bName} Compatibility: Love, Friendship and Communication`,
+    description: `${aName} and ${bName} compatibility in love, friendship, and communication.`,
+    tagline: `${aName} × ${bName}`,
+    rating: "Harmonious",
+    overall: `${aName} and ${bName} dynamic.`,
+    love: `Love between ${aName} and ${bName}.`,
+    friendship: `Friendship between ${aName} and ${bName}.`,
+    communication: `Communication between ${aName} and ${bName}.`,
+    strengths: [],
+    challenges: [],
+    verdict: `Verdict for ${aName} and ${bName}.`,
+    faq: [],
   };
 }

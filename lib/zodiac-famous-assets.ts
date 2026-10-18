@@ -1,31 +1,39 @@
+/**
+ * Fixed, reviewed source set for the famous-zodiac quiz. The seed endpoint is
+ * deliberately limited to these URLs, rather than accepting an arbitrary URL
+ * from a request. Every source is Wikimedia Commons with a reusable licence.
+ */
 export type FamousZodiacAsset = {
   id: string;
-  r2Key: string;
+  key: string;
   sourceUrl: string;
   sourcePage: string;
   license: string;
 };
 
 export const FAMOUS_ZODIAC_ASSETS: FamousZodiacAsset[] = [
-  {
-    id: "albert-einstein",
-    r2Key: "quiz/famous/albert-einstein.jpg",
-    sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Albert_Einstein_Head.jpg",
-    sourcePage: "https://commons.wikimedia.org/wiki/File:Albert_Einstein_Head.jpg",
-    license: "Public Domain",
-  },
-  {
-    id: "marilyn-monroe",
-    r2Key: "quiz/famous/marilyn-monroe.jpg",
-    sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Marilyn_Monroe_photo_pose_Seven_Year_Itch.jpg",
-    sourcePage: "https://commons.wikimedia.org/wiki/File:Marilyn_Monroe_photo_pose_Seven_Year_Itch.jpg",
-    license: "Public Domain",
-  },
-  {
-    id: "david-bowie",
-    r2Key: "quiz/famous/david-bowie.jpg",
-    sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e8/David-Bowie_Chicago_2002-08-08_photoby_Adam-Bielawski-cropped.jpg",
-    sourcePage: "https://commons.wikimedia.org/wiki/File:David-Bowie_Chicago_2002-08-08_photoby_Adam-Bielawski-cropped.jpg",
-    license: "CC BY-SA 3.0",
-  },
+  { id: "taylor-swift", key: "quiz/zodiac-famous/taylor-swift.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/8/81/Cierre_del_Eras_Tour_de_Taylor_Swift%2C_Buenos_Aires_noche_1.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Cierre_del_Eras_Tour_de_Taylor_Swift,_Buenos_Aires_noche_1.jpg", license: "CC BY-SA 4.0" },
+  { id: "leonardo-dicaprio", key: "quiz/zodiac-famous/leonardo-dicaprio.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Leonardo_DiCaprio_from_J._Edgar_by_Rajasekharan_2020.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Leonardo_DiCaprio_from_J._Edgar_by_Rajasekharan_2020.jpg", license: "CC BY-SA 4.0" },
+  { id: "cristiano-ronaldo", key: "quiz/zodiac-famous/cristiano-ronaldo.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/1/17/C.Ronaldo.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:C.Ronaldo.jpg", license: "CC BY-SA 3.0" },
+  { id: "rihanna", key: "quiz/zodiac-famous/rihanna.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e9/Rihanna_by_Rajasekharan_2019.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Rihanna_by_Rajasekharan_2019.jpg", license: "CC BY-SA 4.0" },
+  { id: "brad-pitt", key: "quiz/zodiac-famous/brad-pitt.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/7/75/Brad_Pitt-69924.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Brad_Pitt-69924.jpg", license: "CC BY-SA 4.0" },
+  { id: "lady-gaga", key: "quiz/zodiac-famous/lady-gaga.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/b/bf/LG_%EC%98%AC%EB%A0%88%EB%93%9C_TV%2C_%EB%89%B4%EC%9A%95_%ED%95%9C%EB%B3%B5%ED%8C%90%EC%97%90%EC%84%9C_%EC%84%B8%EA%B3%84%EC%A0%81_%ED%8C%9D%EC%8A%A4%ED%83%80_%EB%A0%88%EC%9D%B4%EB%94%94_%EA%B0%80%EA%B0%80%28Lady_GaGa%29%EC%99%80_%EC%9D%B4%EC%83%89_%EB%A7%88%EC%BC%80%ED%8C%85_-_50618132748_%28cropped%29.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:LG_%EC%98%AC%EB%A0%88%EB%93%9C_TV,_%EB%89%B4%EC%9A%95_%ED%95%9C%EB%B3%B5%ED%8C%90%EC%97%90%EC%84%9C_%EC%84%B8%EA%B3%84%EC%A0%81_%ED%8C%9D%EC%8A%A4%ED%83%80_%EB%A0%88%EC%9D%B4%EB%94%94_%EA%B0%80%EA%B0%80(Lady_GaGa)%EC%99%80_%EC%9D%B4%EC%83%89_%EB%A7%88%EC%BC%80%ED%8C%85_-_50618132748_(cropped).jpg", license: "CC BY 2.0" },
+  { id: "michael-jordan", key: "quiz/zodiac-famous/michael-jordan.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Michael_Jordan_dunk_contest_February_1985.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Michael_Jordan_dunk_contest_February_1985.jpg", license: "Public domain" },
+  { id: "arnold-schwarzenegger", key: "quiz/zodiac-famous/arnold-schwarzenegger.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Gov._Arnold_Schwarzenegger.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Gov._Arnold_Schwarzenegger.jpg", license: "Public domain" },
+  { id: "dolly-parton", key: "quiz/zodiac-famous/dolly-parton.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/c/cc/Dolly_Parton_2023.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Dolly_Parton_2023.jpg", license: "CC BY 3.0" },
+  { id: "keanu-reeves", key: "quiz/zodiac-famous/keanu-reeves.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/5/59/Keanu_Reeves_2019_%28cropped%29.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Keanu_Reeves_2019_(cropped).jpg", license: "CC BY 2.0" },
+  { id: "beyonce", key: "quiz/zodiac-famous/beyonce.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b7/Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_%2810_of_118%29_%2852946364598%29_%28best_crop%29.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_(10_of_118)_(52946364598)_(best_crop).jpg", license: "CC BY 2.0" },
+  { id: "lionel-messi", key: "quiz/zodiac-famous/lionel-messi.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Leo_Messi_Argentina_v_Egypt_7_July_2026-1.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Leo_Messi_Argentina_v_Egypt_7_July_2026-1.jpg", license: "CC BY-SA 4.0" },
+  { id: "ariana-grande", key: "quiz/zodiac-famous/ariana-grande.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Ariana_Grande_promoting_Wicked_%282024%29.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Ariana_Grande_promoting_Wicked_(2024).jpg", license: "CC BY 3.0" },
+  { id: "barack-obama", key: "quiz/zodiac-famous/barack-obama.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/8/8d/President_Barack_Obama.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:President_Barack_Obama.jpg", license: "Public domain" },
+  { id: "angelina-jolie", key: "quiz/zodiac-famous/angelina-jolie.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/1/12/Angelina_Jolie-643531_%28cropped%29.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Angelina_Jolie-643531_(cropped).jpg", license: "CC BY-SA 4.0" },
+  { id: "kim-kardashian", key: "quiz/zodiac-famous/kim-kardashian.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/d/df/Kim_Kardashian_West_2014.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Kim_Kardashian_West_2014.jpg", license: "CC BY-SA 2.0" },
+  { id: "adele", key: "quiz/zodiac-famous/adele.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Adele_2016.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Adele_2016.jpg", license: "CC BY 2.0" },
+  { id: "justin-bieber", key: "quiz/zodiac-famous/justin-bieber.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/d/da/Justin_Bieber_in_2015.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Justin_Bieber_in_2015.jpg", license: "CC BY 2.0" },
+  { id: "emma-watson", key: "quiz/zodiac-famous/emma-watson.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Emma_Watson_2013.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:Emma_Watson_2013.jpg", license: "CC BY-SA 3.0" },
+  { id: "billie-eilish", key: "quiz/zodiac-famous/billie-eilish.jpg", sourceUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c7/BillieEilishO2140725-39_-_54665577407_%28cropped%29.jpg", sourcePage: "https://commons.wikimedia.org/wiki/File:BillieEilishO2140725-39_-_54665577407_(cropped).jpg", license: "CC BY 4.0" },
 ];
+
+export const FAMOUS_ZODIAC_ASSET_BY_ID = Object.fromEntries(
+  FAMOUS_ZODIAC_ASSETS.map((asset) => [asset.id, asset])
+);

@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
-import { Fraunces, JetBrains_Mono, Noto_Sans_Georgian } from "next/font/google";
+import { Fraunces, Noto_Sans_Georgian } from "next/font/google";
+import localFont from "next/font/local";
 import NextTopLoader from "nextjs-toploader";
 import Script from "next/script";
 import { BfcacheRefresher } from "@/components/system/bfcache-refresher";
@@ -23,11 +24,24 @@ const notoGeorgian = Noto_Sans_Georgian({
   fallback: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+/**
+ * Telemetry monospace. Self-hosted from the latin subset of the variable
+ * JetBrains Mono so production builds never depend on fonts.googleapis.com
+ * for this family. See ./fonts/OFL-JetBrainsMono.txt.
+ */
+const jetbrainsMono = localFont({
+  src: "./fonts/jetbrains-mono-latin.woff2",
+  variable: "--font-jetbrains-mono",
+  weight: "100 800",
+  style: "normal",
   display: "optional",
+  fallback: [
+    "ui-monospace",
+    "SFMono-Regular",
+    "Menlo",
+    "Consolas",
+    "monospace",
+  ],
 });
 
 const fraunces = Fraunces({

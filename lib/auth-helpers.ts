@@ -73,5 +73,5 @@ export async function requireUser(loginDestination?: string) {
   if (shouldRecordVisit(userId)) {
     after(() => recordVisit(userId, pendingSignupCredits));
   }
-  return { ...session.user, id: userId };
+  return session.user;
 }

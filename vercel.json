@@ -1,0 +1,42 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["fra1"],
+  "crons": [
+    {
+      "path": "/api/cron/daily-horoscope",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/daily-horoscope-retry",
+      "schedule": "30 5 * * *"
+    },
+    {
+      "path": "/api/cron/lifecycle",
+      "schedule": "15 6 * * *"
+    },
+    {
+      "path": "/api/cron/lifecycle",
+      "schedule": "15 9 * * *"
+    },
+    {
+      "path": "/api/cron/lifecycle",
+      "schedule": "15 12 * * *"
+    },
+    {
+      "path": "/api/cron/monthly-credits",
+      "schedule": "0 6 1 * *"
+    },
+    {
+      "path": "/api/cron/feed-notification-emails",
+      "schedule": "15 * * * *"
+    },
+    {
+      "path": "/api/cron/personal-reminders",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/ask-nudges",
+      "schedule": "30 6 * * *"
+    }
+  ]
+}

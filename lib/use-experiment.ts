@@ -1,18 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import type { ExperimentName } from "@/lib/experiment-catalog";
 
 export function useExperiment(
-  _experiment: string,
-  _surface: string = "default",
+  experiment: ExperimentName,
+  surface: string,
+  enabled = true,
 ): string | null {
-  const [variant] = useState<string | null>("control");
-  return variant;
+  const [variant, setVariant] = useState<string | null>(null);
+  useEffect(() => {
+    if (!enabled) return;
+    const controller = new AbortController();
+    void fetch(
+      `/api/experiments/${experiment}?surface=${encodeURIComponent(surface)}`,
+      {
+        credentials: "same-origin",
+        signal: controller.signal,
+      },
+    )
+      .then(async (response) => {
+        if (!response.ok) return;
+        const body = (await response.json()) as { variant?: unknown };
+        if (typeof body.variant === "string") setVariant(body.variant);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [experiment, surface, enabled]);
+  return enabled ? variant : null;
 }
 
-export async function trackExperimentOutcome(
-  _experiment: string,
-  _eventName: string,
-  _surface: string = "default",
-  _eventKey?: string,
-): Promise<void> {}
+export function trackExperimentOutcome(
+  experiment: ExperimentName,
+  surface: string,
+  eventName: string,
+  eventKey = crypto.randomUUID(),
+): void {
+  void fetch(`/api/experiments/${experiment}`, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ eventName, surface, eventKey }),
+    keepalive: true,
+  }).catch(() => undefined);
+}

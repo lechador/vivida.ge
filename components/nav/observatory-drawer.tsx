@@ -4,14 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowUpRight,
-  Compass,
-  Layers,
-  Moon,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { ArrowUpRight, Compass, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { VividaMark } from "@/components/brand/vivida-mark";

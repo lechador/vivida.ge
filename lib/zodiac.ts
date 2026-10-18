@@ -1,286 +1,344 @@
-export type ZodiacElementKa = "ცეცხლი" | "მიწა" | "ჰაერი" | "წყალი";
-export type ZodiacModalityKa = "კარდინალური" | "ფიქსირებული" | "მუტაბელური";
+/**
+ * Zodiac signs in canonical order (Aries = 0 ... Pisces = 11).
+ * Names are stored in Georgian for direct rendering.
+ */
 
 export type ZodiacSign = {
   index: number;
-  key:
-    | "aries"
-    | "taurus"
-    | "gemini"
-    | "cancer"
-    | "leo"
-    | "virgo"
-    | "libra"
-    | "scorpio"
-    | "sagittarius"
-    | "capricorn"
-    | "aquarius"
-    | "pisces";
-  slug:
-    | "aries"
-    | "taurus"
-    | "gemini"
-    | "cancer"
-    | "leo"
-    | "virgo"
-    | "libra"
-    | "scorpio"
-    | "sagittarius"
-    | "capricorn"
-    | "aquarius"
-    | "pisces";
-  labelKa: string;
+  key: string; // canonical English key (lowercase)
   labelEn: string;
-  symbol: string;
-  element: ZodiacElementKa;
-  elementEn: "Fire" | "Earth" | "Air" | "Water";
-  modality: ZodiacModalityKa;
-  modalityEn: "Cardinal" | "Fixed" | "Mutable";
-  rulerKa: string;
-  rulerEn: string;
-  ruler?: string;
-  emoji?: string;
+  labelKa: string;
+  symbol: string; // unicode glyph
+  element: "ცეცხლი" | "მიწა" | "ჰაერი" | "წყალი";
+  modality: "კარდინალური" | "ფიქსირებული" | "მუტაბელური";
+  ruler: string; // ruling planet (Georgian)
+  emoji: string;
 };
 
 export const SIGNS: ZodiacSign[] = [
   {
     index: 0,
     key: "aries",
-    slug: "aries",
-    labelKa: "ვერძი",
     labelEn: "Aries",
+    labelKa: "ვერძი",
     symbol: "♈",
     element: "ცეცხლი",
-    elementEn: "Fire",
     modality: "კარდინალური",
-    modalityEn: "Cardinal",
-    rulerKa: "მარსი",
-    rulerEn: "Mars",
+    ruler: "მარსი",
+    emoji: "🐏",
   },
   {
     index: 1,
     key: "taurus",
-    slug: "taurus",
-    labelKa: "კურო",
     labelEn: "Taurus",
+    labelKa: "კურო",
     symbol: "♉",
     element: "მიწა",
-    elementEn: "Earth",
     modality: "ფიქსირებული",
-    modalityEn: "Fixed",
-    rulerKa: "ვენერა",
-    rulerEn: "Venus",
+    ruler: "ვენერა",
+    emoji: "🐂",
   },
   {
     index: 2,
     key: "gemini",
-    slug: "gemini",
-    labelKa: "ტყუპები",
     labelEn: "Gemini",
+    labelKa: "ტყუპები",
     symbol: "♊",
     element: "ჰაერი",
-    elementEn: "Air",
     modality: "მუტაბელური",
-    modalityEn: "Mutable",
-    rulerKa: "მერკური",
-    rulerEn: "Mercury",
+    ruler: "მერკური",
+    emoji: "👯",
   },
   {
     index: 3,
     key: "cancer",
-    slug: "cancer",
-    labelKa: "კირჩხიბი",
     labelEn: "Cancer",
+    labelKa: "კირჩხიბი",
     symbol: "♋",
     element: "წყალი",
-    elementEn: "Water",
     modality: "კარდინალური",
-    modalityEn: "Cardinal",
-    rulerKa: "მთვარე",
-    rulerEn: "Moon",
+    ruler: "მთვარე",
+    emoji: "🦀",
   },
   {
     index: 4,
     key: "leo",
-    slug: "leo",
-    labelKa: "ლომი",
     labelEn: "Leo",
+    labelKa: "ლომი",
     symbol: "♌",
     element: "ცეცხლი",
-    elementEn: "Fire",
     modality: "ფიქსირებული",
-    modalityEn: "Fixed",
-    rulerKa: "მზე",
-    rulerEn: "Sun",
+    ruler: "მზე",
+    emoji: "🦁",
   },
   {
     index: 5,
     key: "virgo",
-    slug: "virgo",
-    labelKa: "ქალწული",
     labelEn: "Virgo",
+    labelKa: "ქალწული",
     symbol: "♍",
     element: "მიწა",
-    elementEn: "Earth",
     modality: "მუტაბელური",
-    modalityEn: "Mutable",
-    rulerKa: "მერკური",
-    rulerEn: "Mercury",
+    ruler: "მერკური",
+    emoji: "🌾",
   },
   {
     index: 6,
     key: "libra",
-    slug: "libra",
-    labelKa: "სასწორი",
     labelEn: "Libra",
+    labelKa: "სასწორი",
     symbol: "♎",
     element: "ჰაერი",
-    elementEn: "Air",
     modality: "კარდინალური",
-    modalityEn: "Cardinal",
-    rulerKa: "ვენერა",
-    rulerEn: "Venus",
+    ruler: "ვენერა",
+    emoji: "⚖️",
   },
   {
     index: 7,
     key: "scorpio",
-    slug: "scorpio",
-    labelKa: "მორიელი",
     labelEn: "Scorpio",
+    labelKa: "მორიელი",
     symbol: "♏",
     element: "წყალი",
-    elementEn: "Water",
     modality: "ფიქსირებული",
-    modalityEn: "Fixed",
-    rulerKa: "პლუტონი",
-    rulerEn: "Pluto",
+    ruler: "პლუტონი",
+    emoji: "🦂",
   },
   {
     index: 8,
     key: "sagittarius",
-    slug: "sagittarius",
-    labelKa: "მშვილდოსანი",
     labelEn: "Sagittarius",
+    labelKa: "მშვილდოსანი",
     symbol: "♐",
     element: "ცეცხლი",
-    elementEn: "Fire",
     modality: "მუტაბელური",
-    modalityEn: "Mutable",
-    rulerKa: "იუპიტერი",
-    rulerEn: "Jupiter",
+    ruler: "იუპიტერი",
+    emoji: "🏹",
   },
   {
     index: 9,
     key: "capricorn",
-    slug: "capricorn",
-    labelKa: "თხის რქა",
     labelEn: "Capricorn",
+    labelKa: "თხის რქა",
     symbol: "♑",
     element: "მიწა",
-    elementEn: "Earth",
     modality: "კარდინალური",
-    modalityEn: "Cardinal",
-    rulerKa: "სატურნი",
-    rulerEn: "Saturn",
+    ruler: "სატურნი",
+    emoji: "🐐",
   },
   {
     index: 10,
     key: "aquarius",
-    slug: "aquarius",
-    labelKa: "მერწყული",
     labelEn: "Aquarius",
+    labelKa: "მერწყული",
     symbol: "♒",
     element: "ჰაერი",
-    elementEn: "Air",
     modality: "ფიქსირებული",
-    modalityEn: "Fixed",
-    rulerKa: "ურანი",
-    rulerEn: "Uranus",
+    ruler: "ურანი",
+    emoji: "🏺",
   },
   {
     index: 11,
     key: "pisces",
-    slug: "pisces",
-    labelKa: "თევზები",
     labelEn: "Pisces",
+    labelKa: "თევზები",
     symbol: "♓",
     element: "წყალი",
-    elementEn: "Water",
     modality: "მუტაბელური",
-    modalityEn: "Mutable",
-    rulerKa: "ნეპტუნი",
-    rulerEn: "Neptune",
+    ruler: "ნეპტუნი",
+    emoji: "🐟",
   },
 ];
 
-export type BodyMeta = {
+export function signFromLongitude(longitude: number): ZodiacSign {
+  const norm = ((longitude % 360) + 360) % 360;
+  return SIGNS[Math.floor(norm / 30)];
+}
+
+export function signByLabelEn(label: string): ZodiacSign | undefined {
+  const k = label.toLowerCase();
+  return SIGNS.find((s) => s.key === k);
+}
+
+export function signByIndex(i: number): ZodiacSign {
+  return SIGNS[((i % 12) + 12) % 12];
+}
+
+/**
+ * Element-keyed accent color for visual treatments. Mirrors ELEMENT_META
+ * in components/dashboard/elements-card.tsx but lives here so unrelated
+ * components (sign badge, etc.) can pull it without depending on the
+ * elements card module.
+ */
+const ELEMENT_COLOR: Record<ZodiacSign["element"], string> = {
+  ცეცხლი: "oklch(0.72 0.22 30)",
+  მიწა: "oklch(0.65 0.13 130)",
+  ჰაერი: "oklch(0.78 0.16 220)",
+  წყალი: "oklch(0.65 0.20 285)",
+};
+
+export function signColor(sign: ZodiacSign): string {
+  return ELEMENT_COLOR[sign.element];
+}
+
+/**
+ * Planet / luminary metadata.
+ * Keys match the canonical lowercase names used by the chart engine.
+ */
+export type CelestialBody = {
   key: string;
   labelKa: string;
   labelEn: string;
   symbol: string;
+  emoji: string;
+  /** display order on the dashboard */
+  order: number;
   meaningKa: string;
   meaningEn: string;
 };
 
-const BODIES_LIST: BodyMeta[] = [
-  { key: "sun", labelKa: "მზე", labelEn: "Sun", symbol: "☉", meaningKa: "ბირთვი და იდენტობა", meaningEn: "Core identity" },
-  { key: "moon", labelKa: "მთვარე", labelEn: "Moon", symbol: "☽", meaningKa: "ემოციური სამყარო", meaningEn: "Emotional inner world" },
-  { key: "ascendant", labelKa: "ასცენდენტი", labelEn: "Ascendant", symbol: "↑", meaningKa: "გარეგანი ხატი", meaningEn: "Rising sign & persona" },
-  { key: "mercury", labelKa: "მერკური", labelEn: "Mercury", symbol: "☿", meaningKa: "აზროვნება და კომუნიკაცია", meaningEn: "Mind & communication" },
-  { key: "venus", labelKa: "ვენერა", labelEn: "Venus", symbol: "♀", meaningKa: "სიყვარული და ღირებულებები", meaningEn: "Love & values" },
-  { key: "mars", labelKa: "მარსი", labelEn: "Mars", symbol: "♂", meaningKa: "ენერგია და ნება", meaningEn: "Drive & action" },
-  { key: "jupiter", labelKa: "იუპიტერი", labelEn: "Jupiter", symbol: "♃", meaningKa: "ზრდა და იღბალი", meaningEn: "Growth & wisdom" },
-  { key: "saturn", labelKa: "სატურნი", labelEn: "Saturn", symbol: "♄", meaningKa: "სტრუქტურა და დისციპლინა", meaningEn: "Structure & mastery" },
-  { key: "uranus", labelKa: "ურანი", labelEn: "Uranus", symbol: "♅", meaningKa: "ცვლილება და თავისუფლება", meaningEn: "Innovation & change" },
-  { key: "neptune", labelKa: "ნეპტუნი", labelEn: "Neptune", symbol: "♆", meaningKa: "ინტუიცია და ოცნებები", meaningEn: "Intuition & dreams" },
-  { key: "pluto", labelKa: "პლუტონი", labelEn: "Pluto", symbol: "♇", meaningKa: "ტრანსფორმაცია და ძალა", meaningEn: "Transformation & depth" },
-  { key: "midheaven", labelKa: "მედიუმ ცელი", labelEn: "Midheaven", symbol: "MC", meaningKa: "მოწოდება და კარიერა", meaningEn: "Public path & vocation" },
-  { key: "chiron", labelKa: "ქირონი", labelEn: "Chiron", symbol: "⚷", meaningKa: "განკურნება და სიბრძნე", meaningEn: "Wound & healing" },
-];
+export const BODIES: Record<string, CelestialBody> = {
+  sun: {
+    key: "sun",
+    labelKa: "მზე",
+    labelEn: "Sun",
+    symbol: "☉",
+    emoji: "☀️",
+    order: 0,
+    meaningKa: "ბირთვი, იდენტობა, სიცოცხლის ცეცხლი",
+    meaningEn: "core identity, vitality and purpose",
+  },
+  moon: {
+    key: "moon",
+    labelKa: "მთვარე",
+    labelEn: "Moon",
+    symbol: "☽",
+    emoji: "🌙",
+    order: 1,
+    meaningKa: "ემოციები, შინაგანი სამყარო, ინსტინქტები",
+    meaningEn: "emotions, instincts and inner life",
+  },
+  ascendant: {
+    key: "ascendant",
+    labelKa: "ამომავალი",
+    labelEn: "Ascendant",
+    symbol: "AC",
+    emoji: "⬆️",
+    order: 2,
+    meaningKa: "სოციალური ნიღაბი, პირველი შთაბეჭდილება",
+    meaningEn: "first impressions and outward style",
+  },
+  mercury: {
+    key: "mercury",
+    labelKa: "მერკური",
+    labelEn: "Mercury",
+    symbol: "☿",
+    emoji: "☿",
+    order: 3,
+    meaningKa: "გონება, აზროვნება, კომუნიკაცია",
+    meaningEn: "thinking, learning and communication",
+  },
+  venus: {
+    key: "venus",
+    labelKa: "ვენერა",
+    labelEn: "Venus",
+    symbol: "♀",
+    emoji: "♀",
+    order: 4,
+    meaningKa: "სიყვარული, სილამაზე, ღირებულებები",
+    meaningEn: "love, attraction, beauty and values",
+  },
+  mars: {
+    key: "mars",
+    labelKa: "მარსი",
+    labelEn: "Mars",
+    symbol: "♂",
+    emoji: "♂",
+    order: 5,
+    meaningKa: "მოქმედება, ენერგია, ვნება",
+    meaningEn: "action, drive, energy and desire",
+  },
+  jupiter: {
+    key: "jupiter",
+    labelKa: "იუპიტერი",
+    labelEn: "Jupiter",
+    symbol: "♃",
+    emoji: "♃",
+    order: 6,
+    meaningKa: "ზრდა, შესაძლებლობები, ფილოსოფია",
+    meaningEn: "growth, opportunity and perspective",
+  },
+  saturn: {
+    key: "saturn",
+    labelKa: "სატურნი",
+    labelEn: "Saturn",
+    symbol: "♄",
+    emoji: "♄",
+    order: 7,
+    meaningKa: "დისციპლინა, საზღვრები, ხანგრძლივი მიზანი",
+    meaningEn: "discipline, boundaries and long-term growth",
+  },
+  uranus: {
+    key: "uranus",
+    labelKa: "ურანი",
+    labelEn: "Uranus",
+    symbol: "♅",
+    emoji: "♅",
+    order: 8,
+    meaningKa: "ცვლილება, თავისუფლება, უცხო",
+    meaningEn: "change, freedom and innovation",
+  },
+  neptune: {
+    key: "neptune",
+    labelKa: "ნეპტუნი",
+    labelEn: "Neptune",
+    symbol: "♆",
+    emoji: "♆",
+    order: 9,
+    meaningKa: "ოცნება, ინტუიცია, წარმოსახვა",
+    meaningEn: "dreams, intuition and imagination",
+  },
+  pluto: {
+    key: "pluto",
+    labelKa: "პლუტონი",
+    labelEn: "Pluto",
+    symbol: "♇",
+    emoji: "♇",
+    order: 10,
+    meaningKa: "ტრანსფორმაცია, ძალა, განახლება",
+    meaningEn: "transformation, power and renewal",
+  },
+  midheaven: {
+    key: "midheaven",
+    labelKa: "ზენიტი",
+    labelEn: "Midheaven",
+    symbol: "MC",
+    emoji: "⬆️",
+    order: 11,
+    meaningKa: "კარიერა, საზოგადოებრივი იმიჯი",
+    meaningEn: "career, reputation and public direction",
+  },
+  chiron: {
+    key: "chiron",
+    labelKa: "ქირონი",
+    labelEn: "Chiron",
+    symbol: "⚷",
+    emoji: "⚷",
+    order: 12,
+    meaningKa: "შინაგანი ჭრილობა, განკურნება, სიბრძნე ტკივილიდან",
+    meaningEn: "wounds, healing and hard-won wisdom",
+  },
+};
 
-for (const item of BODIES_LIST) {
-  Object.defineProperty(BODIES_LIST, item.key, {
-    value: item,
-    enumerable: false,
-    configurable: true,
-  });
+export function bodyMeta(key: string): CelestialBody | undefined {
+  return BODIES[key.toLowerCase()];
 }
 
-export const BODIES = BODIES_LIST as BodyMeta[] & Record<string, BodyMeta>;
-
-export function signByIndex(index: number): ZodiacSign {
-  const normalized = ((Math.floor(index) % 12) + 12) % 12;
-  return SIGNS[normalized] ?? SIGNS[0];
+/**
+ * Format a degree-within-sign as 24° 35′ for display.
+ */
+export function formatDegree(degreeWithinSign: number): string {
+  const d = Math.floor(degreeWithinSign);
+  const m = Math.floor((degreeWithinSign - d) * 60);
+  return `${d}° ${m.toString().padStart(2, "0")}′`;
 }
-
-export function signFromLongitude(longitude: number): ZodiacSign {
-  const norm = ((longitude % 360) + 360) % 360;
-  return signByIndex(Math.floor(norm / 30));
-}
-
-export function signByLabelEn(label: string): ZodiacSign | undefined {
-  const lower = label?.toLowerCase?.() ?? "";
-  return SIGNS.find((s) => s.labelEn.toLowerCase() === lower || s.key === lower);
-}
-
-export function bodyMeta(key: string): BodyMeta | undefined {
-  return BODIES.find((b) => b.key === key);
-}
-
-export function signColor(sign: { element?: string } | ZodiacSign | undefined): string {
-  const el = sign?.element;
-  if (el === "ცეცხლი" || el === "Fire") return "oklch(0.75 0.19 35)";
-  if (el === "მიწა" || el === "Earth") return "oklch(0.76 0.16 145)";
-  if (el === "ჰაერი" || el === "Air") return "oklch(0.78 0.16 210)";
-  if (el === "წყალი" || el === "Water") return "oklch(0.72 0.20 295)";
-  return "var(--vivida-violet)";
-}
-
-export function formatDegree(deg: number): string {
-  const d = Math.floor(deg);
-  const m = Math.round((deg - d) * 60);
-  return `${d}°${String(m).padStart(2, "0")}′`;
-}
-
-export const ZODIAC_SIGNS = SIGNS;
-

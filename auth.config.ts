@@ -13,10 +13,6 @@ export const authConfig = {
   // Vercel supplies a trusted Host header. Keeping Auth.js request-aware is
   // required because the same deployment serves vivida.ge and vividaastro.com.
   trustHost: true,
-  secret:
-    process.env.AUTH_SECRET ||
-    process.env.NEXTAUTH_SECRET ||
-    "vivida-dev-secret-key-for-local-preview-32chars",
   session: { strategy: "jwt" },
   pages: {
     signIn: "/",

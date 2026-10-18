@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { unstable_cache } from "next/cache";
-import { ArrowRight, Moon, Sparkles } from "lucide-react";
+import { ArrowRight, Moon } from "lucide-react";
 
 import { Starfield } from "@/components/landing/starfield";
 import { LunarPhaseDisc } from "@/components/brand/celestial-icons";
@@ -15,7 +15,6 @@ import { PopularTools } from "@/components/nav/popular-tools";
 import {
   computeMoonPhase,
   type MoonPhaseSnapshot,
-  type PhaseKey,
 } from "@/lib/moon-phase";
 import {
   creditPacksForCountry,
@@ -149,16 +148,6 @@ const MONTHS_KA = [
   "დეკემბერი",
 ];
 const WEEKDAYS_KA = ["კვ", "ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ"];
-const PHASE_SYMBOL: Record<PhaseKey, string> = {
-  new_moon: "🌑",
-  waxing_crescent: "🌒",
-  first_quarter: "🌓",
-  waxing_gibbous: "🌔",
-  full_moon: "🌕",
-  waning_gibbous: "🌖",
-  last_quarter: "🌗",
-  waning_crescent: "🌘",
-};
 
 type Day = { date: Date; snapshot: MoonPhaseSnapshot | null };
 type MajorEvent = {

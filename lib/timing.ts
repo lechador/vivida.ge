@@ -1,74 +1,288 @@
-import type { NatalChartData } from "@/lib/astrology-local";
-import type { UserLocale } from "@/lib/i18n/user-locale";
-import { localDateString } from "@/lib/transits";
+/**
+ * "Know-when" timing engine, scores the next N days for the user and surfaces
+ * notable upcoming transits. Fully deterministic (reuses the transit + cross-
+ * aspect machinery), so it's instant, free, and consistent with the weekly
+ * forecast's scoring philosophy.
+ */
+import type { NatalChartJson } from "@/db/schema";
+import {
+  computeTransits,
+  detectCrossAspects,
+  localDateString,
+} from "./transits";
+import { ASPECTS, type AspectFamily } from "./aspects";
+import type { UserLocale } from "./i18n/user-locale";
+
+const ASPECT_FAMILY: Record<string, AspectFamily> = Object.fromEntries(
+  ASPECTS.map((a) => [a.kind, a.family]),
+);
+const TENSE_CONJ = new Set(["mars", "saturn", "pluto"]);
+const HARMONIC_CONJ = new Set(["venus", "jupiter", "sun", "moon"]);
+
+const POINT_WEIGHT: Record<string, number> = {
+  sun: 1.6,
+  moon: 1.6,
+  ascendant: 1.4,
+  midheaven: 1.3,
+  mercury: 1.2,
+  venus: 1.2,
+  mars: 1.2,
+};
+
+/**
+ * Transit-planet weight for the DAILY score. Fast movers (esp. the Moon) drive
+ * day-to-day variation so the calendar isn't a monochrome block; slow heavy
+ * transits (Saturn/Pluto) are de-emphasized here, they get their due in the
+ * "notable transits" list instead of painting every day the same color.
+ */
+const TRANSIT_WEIGHT: Record<string, number> = {
+  moon: 1.3,
+  sun: 1.0,
+  mercury: 1.0,
+  venus: 1.0,
+  mars: 0.9,
+  jupiter: 0.6,
+  saturn: 0.5,
+  uranus: 0.4,
+  neptune: 0.4,
+  pluto: 0.4,
+};
+
+const WEEKDAYS_KA = ["კვ", "ორ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ"];
+const WEEKDAYS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTHS_KA = [
+  "იანვარი",
+  "თებერვალი",
+  "მარტი",
+  "აპრილი",
+  "მაისი",
+  "ივნისი",
+  "ივლისი",
+  "აგვისტო",
+  "სექტემბერი",
+  "ოქტომბერი",
+  "ნოემბერი",
+  "დეკემბერი",
+];
+const MONTHS_EN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 export type DayTier = "great" | "good" | "calm" | "tough";
 
 export type TimingDay = {
-  dateIso: string;
-  dom: number;
+  dateIso: string; // YYYY-MM-DD (user TZ)
+  dom: number; // day of month
   weekdayKa: string;
-  score: number;
+  score: number; // -100..100
   tier: DayTier;
 };
 
-export type TimingNotable = {
+export type NotableTransit = {
   dateIso: string;
-  dateLabelKa: string;
-  title: string;
+  dateLabelKa: string; // "12 ივლისი"
+  transit: string;
+  natal: string;
+  kind: string;
+  family: AspectFamily;
+  title: string; // "ვენერა ტრინი მთვარესთან"
   meaning: string;
-  family: "harmonic" | "tense" | "neutral";
 };
 
+const TRANSIT_KA: Record<string, string> = {
+  venus: "ვენერა",
+  mars: "მარსი",
+  jupiter: "იუპიტერი",
+  saturn: "სატურნი",
+};
+const NATAL_KA: Record<string, string> = {
+  sun: "მზე",
+  moon: "მთვარე",
+  mercury: "მერკური",
+  venus: "ვენერა",
+  mars: "მარსი",
+  ascendant: "ამომავალი",
+  midheaven: "MC",
+};
+const KIND_KA: Record<string, string> = {
+  conjunction: "კონიუნქცია",
+  sextile: "სექსტილი",
+  square: "კვადრატი",
+  trine: "ტრინი",
+  opposition: "ოპოზიცია",
+};
+const PLANET_MEANING: Record<string, string> = {
+  venus: "სიყვარულის, ჰარმონიისა და სიამოვნების ენერგია",
+  mars: "ენერგიის, ინიციატივისა და მოქმედების ბიძგი",
+  jupiter: "ზრდის, შესაძლებლობებისა და იღბლის ტალღა",
+  saturn: "პასუხისმგებლობის, სტრუქტურისა და გამოცდის პერიოდი",
+};
+const NATAL_AREA: Record<string, string> = {
+  sun: "შენს ვინაობასა და სასიცოცხლო ენერგიას",
+  moon: "შენს ემოციებსა და შინაგან სამყაროს",
+  mercury: "შენს აზროვნებასა და კომუნიკაციას",
+  venus: "შენს სიყვარულსა და ფასეულობებს",
+  mars: "შენს მოქმედებასა და ენერგიას",
+  ascendant: "შენს იმიჯსა და თვითგამოხატვას",
+  midheaven: "შენს კარიერასა და საზოგადოებრივ როლს",
+};
+const FAMILY_TONE: Record<AspectFamily, string> = {
+  harmonic: "ხელშემწყობი მომენტია, ისარგებლე.",
+  tense: "შესაძლო დაძაბულობა, იყავი მოქნილი და მომთმენი.",
+  neutral: "მნიშვნელოვანი აქცენტი, მიაქციე ყურადღება.",
+};
+const PLANET_MEANING_EN: Record<string, string> = {
+  venus: "Love, harmony and pleasure",
+  mars: "Energy, initiative and action",
+  jupiter: "Growth, opportunity and confidence",
+  saturn: "Responsibility, structure and sustained effort",
+};
+const NATAL_AREA_EN: Record<string, string> = {
+  sun: "your identity and vitality",
+  moon: "your emotions and inner world",
+  mercury: "your thinking and communication",
+  venus: "your relationships and values",
+  mars: "your drive and actions",
+  ascendant: "your self-expression and outward style",
+  midheaven: "your career and public direction",
+};
+const FAMILY_TONE_EN: Record<AspectFamily, string> = {
+  harmonic: "This is a supportive opening, use it consciously.",
+  tense: "This can bring friction; stay flexible and patient.",
+  neutral: "This is a meaningful emphasis worth noticing.",
+};
+
+const NOTABLE_TRANSITS = new Set(["venus", "mars", "jupiter", "saturn"]);
+const NOTABLE_NATALS = new Set([
+  "sun",
+  "moon",
+  "mercury",
+  "venus",
+  "mars",
+  "ascendant",
+  "midheaven",
+]);
+
+function familyOf(transit: string, kind: string): AspectFamily {
+  if (kind === "conjunction") {
+    if (TENSE_CONJ.has(transit)) return "tense";
+    if (HARMONIC_CONJ.has(transit)) return "harmonic";
+    return "neutral";
+  }
+  return ASPECT_FAMILY[kind] ?? "neutral";
+}
+
+function tierFor(score: number): DayTier {
+  if (score >= 35) return "great";
+  if (score >= 14) return "good";
+  if (score > -28) return "calm"; // mild swings read as calm/neutral, not "bad"
+  return "tough"; // reserved for genuinely tense days
+}
+
 export function computeTiming(
-  _chart: NatalChartData,
-  startDate: Date = new Date(),
-  timezone: string = "Asia/Tbilisi",
-  numDays: number = 28,
+  natal: NatalChartJson,
+  startDate: Date,
+  timezone: string,
+  days = 28,
   locale: UserLocale = "ka",
-): { days: TimingDay[]; notable: TimingNotable[] } {
-  const en = locale !== "ka";
-  const scores = [28, 12, 5, -10, 32, 18, 0, -24, 15, 22, 8, -5, 30, 14];
-  const days: TimingDay[] = Array.from({ length: numDays }, (_, i) => {
-    const d = new Date(startDate.getTime() + i * 86_400_000);
-    const dateIso = localDateString(d, timezone);
-    const dom = Number(dateIso.slice(-2));
-    const weekdayKa = new Intl.DateTimeFormat(en ? "en-US" : "ka-GE", {
-      timeZone: timezone,
-      weekday: "short",
-    }).format(d);
-    const score = scores[i % scores.length];
-    const tier: DayTier =
-      score >= 25
-        ? "great"
-        : score >= 10
-          ? "good"
-          : score <= -20
-            ? "tough"
-            : "calm";
-    return { dateIso, dom, weekdayKa, score, tier };
-  });
+): { days: TimingDay[]; notable: NotableTransit[] } {
+  const en = locale === "en";
+  const natalPoints: Record<string, { longitude: number }> = {};
+  for (const [k, v] of Object.entries(natal.bodies)) {
+    natalPoints[k] = { longitude: v.longitude };
+  }
+  if (natal.ascendant)
+    natalPoints.ascendant = { longitude: natal.ascendant.longitude };
+  if (natal.midheaven)
+    natalPoints.midheaven = { longitude: natal.midheaven.longitude };
 
-  const notable: TimingNotable[] = [
-    {
-      dateIso: days[1]?.dateIso ?? "",
-      dateLabelKa: `${days[1]?.dom ?? 1} ${days[1]?.weekdayKa ?? ""}`,
-      title: en ? "Venus Trine Natal Sun" : "ვენერა ტრინში ნატალურ მზესთან",
-      meaning: en
-        ? "Warmth in relationships, creative flow, and easier social connection."
-        : "სითბო ურთიერთობებში, შემოქმედებითი ენერგია და ჰარმონიული კომუნიკაცია.",
-      family: "harmonic",
-    },
-    {
-      dateIso: days[4]?.dateIso ?? "",
-      dateLabelKa: `${days[4]?.dom ?? 5} ${days[4]?.weekdayKa ?? ""}`,
-      title: en ? "Jupiter Sextile Natal Moon" : "იუპიტერი სექსტილში ნატალურ მთვარესთან",
-      meaning: en
-        ? "Emotional generosity and supportive momentum for personal plans."
-        : "ემოციური სიმშვიდე და ხელსაყრელი ტალღა პირადი გეგმების წინსვლისთვის.",
-      family: "harmonic",
-    },
-  ];
+  const out: TimingDay[] = [];
+  // (transit,natal,kind) → tightest occurrence in the window
+  const notableMap = new Map<string, { item: NotableTransit; orb: number }>();
 
-  return { days, notable };
+  for (let i = 0; i < days; i++) {
+    const at = new Date(startDate);
+    at.setUTCHours(12, 0, 0, 0);
+    at.setUTCDate(at.getUTCDate() + i);
+
+    const transits = computeTransits(at);
+    const aspects = detectCrossAspects(transits, natalPoints).filter(
+      (a) => a.orb <= 5,
+    );
+
+    let harmony = 0;
+    let challenge = 0;
+    for (const a of aspects.slice(0, 12)) {
+      const fam = familyOf(a.transit, a.kind);
+      const w =
+        a.intensity *
+        (POINT_WEIGHT[a.natal] ?? 1) *
+        (TRANSIT_WEIGHT[a.transit] ?? 0.6);
+      if (fam === "harmonic") harmony += w;
+      else if (fam === "tense") challenge += w;
+      else {
+        harmony += w * 0.5;
+        challenge += w * 0.5;
+      }
+    }
+    const total = harmony + challenge;
+    const score =
+      total > 0 ? Math.round(((harmony - challenge) / total) * 100) : 0;
+
+    const dateIso = localDateString(at, timezone);
+    const local = new Date(`${dateIso}T12:00:00Z`);
+    out.push({
+      dateIso,
+      dom: local.getUTCDate(),
+      weekdayKa: (en ? WEEKDAYS_EN : WEEKDAYS_KA)[local.getUTCDay()],
+      score,
+      tier: tierFor(score),
+    });
+
+    // Collect near-exact notable transits.
+    for (const a of aspects) {
+      if (a.orb > 1.3) continue;
+      if (!NOTABLE_TRANSITS.has(a.transit) || !NOTABLE_NATALS.has(a.natal))
+        continue;
+      const key = `${a.transit}-${a.natal}-${a.kind}`;
+      const prev = notableMap.get(key);
+      if (prev && prev.orb <= a.orb) continue;
+      const fam = familyOf(a.transit, a.kind);
+      notableMap.set(key, {
+        orb: a.orb,
+        item: {
+          dateIso,
+          dateLabelKa: `${local.getUTCDate()} ${(en ? MONTHS_EN : MONTHS_KA)[local.getUTCMonth()]}`,
+          transit: a.transit,
+          natal: a.natal,
+          kind: a.kind,
+          family: fam,
+          title: en
+            ? `${a.transit[0].toUpperCase() + a.transit.slice(1)} ${a.kind} natal ${a.natal[0].toUpperCase() + a.natal.slice(1)}`
+            : `${TRANSIT_KA[a.transit]} ${KIND_KA[a.kind]} ${NATAL_KA[a.natal]}-თან`,
+          meaning: en
+            ? `${PLANET_MEANING_EN[a.transit]} meets ${NATAL_AREA_EN[a.natal]}. ${FAMILY_TONE_EN[fam]}`
+            : `${PLANET_MEANING[a.transit]} ხვდება ${NATAL_AREA[a.natal]}. ${FAMILY_TONE[fam]}`,
+        },
+      });
+    }
+  }
+
+  const notable = [...notableMap.values()]
+    .sort((a, b) => a.item.dateIso.localeCompare(b.item.dateIso))
+    .slice(0, 8)
+    .map((e) => e.item);
+
+  return { days: out, notable };
 }
