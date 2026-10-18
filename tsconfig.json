@@ -1,19 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
-    "strictNullChecks": true,
-    "noImplicitAny": false,
+    "strict": true,
     "noEmit": true,
+    "noUnusedLocals": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -21,24 +20,16 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@aws-sdk/client-s3": ["./lib/stubs/external-sdks.tsx"],
-      "@aws-sdk/s3-request-presigner": ["./lib/stubs/external-sdks.tsx"],
-      "@marsidev/react-turnstile": ["./lib/stubs/external-sdks.tsx"],
-      "@next/third-parties/google": ["./lib/stubs/external-sdks.tsx"],
-      "@privy-io/react-auth": ["./lib/stubs/external-sdks.tsx"],
-      "@privy-io/react-auth/solana": ["./lib/stubs/external-sdks.tsx"],
-      "@react-email/components": ["./lib/stubs/external-sdks.tsx"],
-      "@react-email/render": ["./lib/stubs/external-sdks.tsx"],
-      "@react-pdf/renderer": ["./lib/stubs/external-sdks.tsx"],
-      "@sentry/nextjs": ["./lib/stubs/external-sdks.tsx"],
-      "@solana-program/token": ["./lib/stubs/external-sdks.tsx"],
-      "@solana/kit": ["./lib/stubs/external-sdks.tsx"],
-      "resend": ["./lib/stubs/external-sdks.tsx"],
-      "stripe": ["./lib/stubs/stripe.ts"],
-      "web-push": ["./lib/stubs/web-push.ts"]
+      "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "e2e", "drizzle", "drizzle.config.ts"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
 }

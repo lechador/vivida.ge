@@ -9,6 +9,16 @@ import type { CalcPair, CalcSign } from "@/lib/compatibility-calculator-data";
 import { SignInButton } from "./sign-in-button";
 import { CornerCrosshair } from "@/components/brand/celestial-icons";
 
+type ElementEn = "fire" | "earth" | "air" | "water";
+
+/** The zodiac catalogue stores elements in Georgian; pairKey works in English. */
+const ELEMENT_EN: Record<ZodiacSign["element"], ElementEn> = {
+  "ცეცხლი": "fire",
+  "მიწა": "earth",
+  "ჰაერი": "air",
+  "წყალი": "water",
+};
+
 type ElementPairKey =
   | "fire-fire"
   | "earth-earth"
@@ -21,10 +31,7 @@ type ElementPairKey =
   | "earth-air"
   | "air-water";
 
-function pairKey(
-  a: ZodiacSign["elementEn"],
-  b: ZodiacSign["elementEn"],
-): ElementPairKey {
+function pairKey(a: ElementEn, b: ElementEn): ElementPairKey {
   const normA = a.toLowerCase() as "fire" | "earth" | "air" | "water";
   const normB = b.toLowerCase() as "fire" | "earth" | "air" | "water";
   if (normA === normB) return `${normA}-${normB}` as ElementPairKey;
@@ -153,7 +160,7 @@ export function CompatibilityCalculator({
 
   const a = SIGNS[signA] ?? SIGNS[0];
   const b = SIGNS[signB] ?? SIGNS[6];
-  const key = pairKey(a.elementEn, b.elementEn);
+  const key = pairKey(ELEMENT_EN[a.element], ELEMENT_EN[b.element]);
   const summary = ELEMENT_SUMMARIES[key];
   const sameSignBonus = signA === signB ? 2 : 0;
   const oppositionBonus = Math.abs(signA - signB) === 6 ? 3 : 0;

@@ -1,4 +1,4 @@
-export type BeforeSendEvent = { url: string; [key: string]: unknown };
+import type { BeforeSendEvent } from "@vercel/analytics/next";
 import { isSensitiveTokenPath } from "@/lib/privacy/sensitive-routes";
 
 const PRIVATE_DYNAMIC_PATHS: Array<[RegExp, string]> = [

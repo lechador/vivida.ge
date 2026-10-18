@@ -1,5 +1,3 @@
-import { CHINESE_ANIMALS } from "@/lib/seo/chinese-zodiac";
-
 export type ChineseAnimalContentEn = {
   slug: string;
   headline: string;
@@ -13,40 +11,155 @@ export type ChineseAnimalContentEn = {
   challenging: string[];
 };
 
-const CONTENT_BY_SLUG: Record<string, ChineseAnimalContentEn> = Object.fromEntries(
-  CHINESE_ANIMALS.map((animal, idx) => {
-    const comp1 = CHINESE_ANIMALS[(idx + 4) % 12].slug;
-    const comp2 = CHINESE_ANIMALS[(idx + 8) % 12].slug;
-    const chal1 = CHINESE_ANIMALS[(idx + 6) % 12].slug;
-    const chal2 = CHINESE_ANIMALS[(idx + 3) % 12].slug;
-    return [
-      animal.slug,
-      {
-        slug: animal.slug,
-        headline: `Quick-minded, observant, and grounded in ${animal.elementEn} energy`,
-        intro: `In the twelve-year Chinese zodiac cycle, the ${animal.nameEn} represents a distinct approach to timing, relationships, and resourcefulness. Associated with the ${animal.elementEn} element and ${animal.polarityEn} polarity, this sign combines practical awareness with enduring character.`,
-        personality: `People born in the Year of the ${animal.nameEn} are traditionally described as attentive, purposeful, and resilient. They notice subtle shifts in their environment and prefer meaningful progress over empty display.`,
-        strengths: [
-          "Adaptable and observant under pressure",
-          "Loyal to trusted friends and family",
-          "Resourceful problem-solving style",
-        ],
-        challenges: [
-          "Taking on too much responsibility alone",
-          "Hesitating to share vulnerability early",
-          "Impatience when plans lack structure",
-        ],
-        love: `In relationships, the ${animal.nameEn} values sincerity, emotional reliability, and mutual respect. Trust deepens when both partners honor each other's independence and shared commitments.`,
-        career: `At work, the ${animal.nameEn} thrives where clear goals meet room for initiative. Strategic planning, research, leadership, and creative craftsmanship all suit this archetype.`,
-        compatible: [comp1, comp2],
-        challenging: [chal1, chal2],
-      },
-    ];
-  }),
-);
+export const CHINESE_ZODIAC_CONTENT_EN: ChineseAnimalContentEn[] = [
+  {
+    slug: "rat",
+    headline: "Quick-minded, resourceful, and alert to opportunity",
+    intro: "The Rat opens the twelve-year Chinese zodiac cycle. Its traditional archetype combines curiosity, social intelligence, and a talent for finding useful paths through complicated situations.",
+    personality: "Rat people are often described as observant, adaptable, and persuasive. They tend to notice details others miss and can turn limited resources into practical advantages. When unsettled, that same alertness may become worry or over-calculation.",
+    strengths: ["Adaptable and resourceful", "Observant and quick-thinking", "Socially perceptive", "Good with opportunities"],
+    challenges: ["Can become anxious", "May guard information too closely", "Sometimes overly strategic"],
+    love: "In relationships, the Rat is attentive, playful, and protective of the people it trusts. Emotional security matters, so clear communication helps prevent suspicion or overthinking.",
+    career: "The Rat often thrives where strategy, communication, trade, data, or fast problem-solving matter. It works best with enough variety to stay curious and a clear goal for its resourcefulness.",
+    compatible: ["dragon", "monkey", "ox"],
+    challenging: ["horse", "goat"],
+  },
+  {
+    slug: "ox",
+    headline: "Dependable, patient, and built for lasting progress",
+    intro: "The Ox represents steady effort, responsibility, and strength that does not need constant display. Its archetype favors patience, structure, and results earned through consistent work.",
+    personality: "Ox people are traditionally considered calm, reliable, and grounded. They prefer clear commitments and may keep moving long after others lose interest. Their determination is powerful, although it can harden into rigidity when change arrives unexpectedly.",
+    strengths: ["Reliable and disciplined", "Patient under pressure", "Practical and organized", "Loyal to commitments"],
+    challenges: ["Can resist change", "May be overly reserved", "Sometimes uncompromising"],
+    love: "The Ox usually shows love through loyalty, consistency, and practical care. Trust develops slowly but deeply; rushed emotional demands are less effective than honest, dependable behavior.",
+    career: "Operations, finance, engineering, agriculture, administration, and other long-horizon work can suit the Ox. It excels when quality and endurance matter more than constant novelty.",
+    compatible: ["rat", "snake", "rooster"],
+    challenging: ["goat", "horse"],
+  },
+  {
+    slug: "tiger",
+    headline: "Bold, independent, and ready to move first",
+    intro: "The Tiger symbolizes courage, vitality, and an instinct to challenge limits. Its archetype is drawn to action, personal freedom, and situations that call for confident leadership.",
+    personality: "Tiger people are often described as magnetic, competitive, and emotionally direct. They can inspire others by acting decisively and defending what they believe is right. Impatience or unnecessary risk becomes the shadow side of this fearless style.",
+    strengths: ["Courageous and energetic", "Independent thinker", "Protective of others", "Natural initiator"],
+    challenges: ["Can be impulsive", "Dislikes being controlled", "May overestimate a risk"],
+    love: "The Tiger loves with enthusiasm and expects a relationship to stay alive and honest. A partner who respects independence while offering emotional steadiness brings out its most generous side.",
+    career: "Leadership, entrepreneurship, advocacy, sport, emergency work, and competitive fields can channel the Tiger's initiative. Autonomy and a meaningful challenge are strong motivators.",
+    compatible: ["horse", "dog", "pig"],
+    challenging: ["monkey", "snake"],
+  },
+  {
+    slug: "rabbit",
+    headline: "Diplomatic, perceptive, and quietly resilient",
+    intro: "The Rabbit represents grace, sensitivity, and the ability to create safety through tact. Its archetype values harmony, thoughtful choices, and environments where subtle intelligence can flourish.",
+    personality: "Rabbit people are traditionally seen as considerate, refined, and skilled at reading a room. They often resolve tension without force and notice the emotional tone around them. Avoiding necessary conflict can become a limitation when boundaries need to be direct.",
+    strengths: ["Diplomatic and considerate", "Creative and refined", "Emotionally perceptive", "Calm in social settings"],
+    challenges: ["May avoid confrontation", "Can worry about criticism", "Sometimes overly cautious"],
+    love: "The Rabbit brings tenderness, good listening, and thoughtful affection to love. Peace matters, but lasting intimacy grows when difficult feelings are discussed instead of politely hidden.",
+    career: "Design, counseling, diplomacy, education, hospitality, and careful client work can suit the Rabbit. It performs well in supportive settings that reward judgment and attention to detail.",
+    compatible: ["goat", "pig", "dog"],
+    challenging: ["rooster", "dragon"],
+  },
+  {
+    slug: "dragon",
+    headline: "Charismatic, ambitious, and larger than life",
+    intro: "The Dragon is the Chinese zodiac's mythical animal and a traditional symbol of power, vitality, and good fortune. Its archetype seeks meaningful scale and rarely feels satisfied by a timid vision.",
+    personality: "Dragon people are often described as confident, imaginative, and naturally visible. They can rally others around an idea and recover quickly from setbacks. Pride or unrealistic expectations may appear when enthusiasm outruns patience and listening.",
+    strengths: ["Charismatic and confident", "Visionary and ambitious", "Energetic under pressure", "Generous with encouragement"],
+    challenges: ["Can become proud", "May expect too much", "Sometimes impatient with detail"],
+    love: "The Dragon is expressive, protective, and generous in relationships. Admiration feels important, yet mutual respect and room for two strong identities make affection more sustainable.",
+    career: "The Dragon often enjoys leadership, public roles, creative direction, business development, and ambitious ventures. It benefits from collaborators who can translate a broad vision into steady execution.",
+    compatible: ["rat", "monkey", "rooster"],
+    challenging: ["dog", "rabbit"],
+  },
+  {
+    slug: "snake",
+    headline: "Intuitive, strategic, and composed beneath the surface",
+    intro: "The Snake symbolizes insight, transformation, and quiet concentration. Its archetype prefers depth over display and often studies a situation carefully before revealing an intention.",
+    personality: "Snake people are traditionally viewed as perceptive, elegant, and self-contained. They can identify motives and patterns with unusual precision. Privacy is a strength, although too much secrecy or suspicion can make cooperation harder than necessary.",
+    strengths: ["Strategic and intuitive", "Calm and self-possessed", "Focused on quality", "Good at reading motives"],
+    challenges: ["Can be secretive", "May hold grudges", "Sometimes overly suspicious"],
+    love: "The Snake is selective in love and tends to prefer depth, loyalty, and strong private chemistry. Honest reassurance helps soften possessiveness and makes vulnerability feel safer.",
+    career: "Research, psychology, finance, investigation, writing, and strategic advisory work can fit the Snake. Quiet authority and time to think usually produce its best decisions.",
+    compatible: ["ox", "rooster", "monkey"],
+    challenging: ["pig", "tiger"],
+  },
+  {
+    slug: "horse",
+    headline: "Energetic, sociable, and fiercely freedom-loving",
+    intro: "The Horse represents movement, enthusiasm, and independence. Its archetype learns through experience and comes alive when life offers variety, open space, and a fresh challenge.",
+    personality: "Horse people are often described as animated, warm, and quick to act. They bring momentum to groups and communicate with infectious energy. Restlessness may make consistency difficult when excitement fades or obligations feel restrictive.",
+    strengths: ["Energetic and optimistic", "Independent and direct", "Socially engaging", "Fast to take action"],
+    challenges: ["Can be impatient", "May lose interest quickly", "Resists restrictive routines"],
+    love: "The Horse wants warmth, spontaneity, and enough freedom to remain fully itself. Relationships work best when closeness is paired with trust rather than control.",
+    career: "Travel, sales, events, media, sport, entrepreneurship, and public-facing roles can suit the Horse. Flexible goals and visible progress keep motivation high.",
+    compatible: ["tiger", "goat", "dog"],
+    challenging: ["rat", "ox"],
+  },
+  {
+    slug: "goat",
+    headline: "Creative, empathetic, and guided by feeling",
+    intro: "The Goat represents compassion, imagination, and appreciation for beauty. Its archetype seeks emotional harmony and often contributes a gentler, more human perspective to shared life.",
+    personality: "Goat people are traditionally considered caring, artistic, and receptive. They understand atmosphere and can support others with genuine sensitivity. Uncertainty may lead to worry or dependence when confidence and practical structure are missing.",
+    strengths: ["Empathetic and kind", "Creative and imaginative", "Cooperative by nature", "Sensitive to beauty"],
+    challenges: ["Can worry excessively", "May avoid hard decisions", "Sometimes too dependent on reassurance"],
+    love: "The Goat offers tenderness, romance, and emotional understanding. A calm partner who respects sensitivity while encouraging self-trust helps the relationship feel secure rather than fragile.",
+    career: "Art, design, wellness, care, education, and collaborative creative work can suit the Goat. A supportive environment and clear practical boundaries make talent easier to sustain.",
+    compatible: ["rabbit", "horse", "pig"],
+    challenging: ["ox", "rat"],
+  },
+  {
+    slug: "monkey",
+    headline: "Inventive, witty, and endlessly curious",
+    intro: "The Monkey symbolizes intelligence, improvisation, and playful experimentation. Its archetype enjoys solving puzzles, testing possibilities, and finding an unexpected shortcut.",
+    personality: "Monkey people are often described as clever, sociable, and versatile. They learn quickly and can make difficult tasks feel lighter through humor. The challenge is following through once novelty disappears or cleverness tempts them to bend trust.",
+    strengths: ["Inventive problem-solver", "Quick learner", "Witty and adaptable", "Comfortable with change"],
+    challenges: ["Can be inconsistent", "May become competitive", "Sometimes tests boundaries"],
+    love: "The Monkey brings laughter, curiosity, and mental stimulation to relationships. Consistency and emotional honesty prevent playfulness from being mistaken for unreliability.",
+    career: "Technology, media, marketing, product work, consulting, and entrepreneurship can reward the Monkey's agility. Complex problems and freedom to experiment are especially motivating.",
+    compatible: ["rat", "dragon", "snake"],
+    challenging: ["tiger", "pig"],
+  },
+  {
+    slug: "rooster",
+    headline: "Precise, candid, and proud of doing things well",
+    intro: "The Rooster represents order, confidence, and careful presentation. Its archetype notices what can be improved and is willing to name a standard clearly.",
+    personality: "Rooster people are traditionally considered observant, organized, and direct. They often combine practical competence with a distinctive personal style. Their eye for flaws is useful, but criticism can become sharp when patience and tact are forgotten.",
+    strengths: ["Precise and organized", "Honest and articulate", "Confident in presentation", "Strong quality standards"],
+    challenges: ["Can be overly critical", "May seek recognition", "Sometimes too blunt"],
+    love: "The Rooster is loyal and attentive, often expressing care by improving practical life. Appreciation matters, while gentler delivery helps prevent useful observations from sounding like constant judgment.",
+    career: "Analysis, quality control, management, finance, communication, and performance can suit the Rooster. It thrives where preparation and visible excellence are rewarded.",
+    compatible: ["ox", "snake", "dragon"],
+    challenging: ["rabbit", "dog"],
+  },
+  {
+    slug: "dog",
+    headline: "Loyal, principled, and protective of what is fair",
+    intro: "The Dog symbolizes loyalty, justice, and trustworthy companionship. Its archetype takes promises seriously and is often most courageous when another person needs protection.",
+    personality: "Dog people are often described as sincere, vigilant, and ethically minded. They build trust through consistency and notice when a situation feels unfair. Concern for possible problems can become worry, skepticism, or a habit of expecting disappointment.",
+    strengths: ["Loyal and trustworthy", "Fair-minded and sincere", "Protective of others", "Dependable in a crisis"],
+    challenges: ["Can worry too much", "May become cynical", "Sometimes slow to forgive"],
+    love: "The Dog seeks honesty, emotional safety, and a partnership that feels like a team. Once trust is established, devotion is deep; regular reassurance helps quiet unnecessary doubt.",
+    career: "Law, public service, healthcare, community work, security, and mission-led organizations can suit the Dog. Purpose and ethical alignment matter as much as status.",
+    compatible: ["tiger", "rabbit", "horse"],
+    challenging: ["dragon", "rooster"],
+  },
+  {
+    slug: "pig",
+    headline: "Generous, sincere, and open to life's pleasures",
+    intro: "The Pig closes the Chinese zodiac cycle with an archetype of generosity, honesty, and enjoyment. It values warmth, good faith, and the ability to share comfort with others.",
+    personality: "Pig people are traditionally considered kind, tolerant, and straightforward. They tend to give others a fair chance and appreciate quality without unnecessary pretension. Over-trusting or overindulging can create problems when discernment and limits are needed.",
+    strengths: ["Generous and sincere", "Warm and tolerant", "Patient with people", "Appreciates quality"],
+    challenges: ["Can be too trusting", "May avoid unpleasant truths", "Sometimes overindulgent"],
+    love: "The Pig brings affection, acceptance, and sensual warmth to relationships. Clear boundaries protect its generous nature and help ensure that kindness is reciprocated.",
+    career: "Hospitality, wellness, food, nonprofit work, creative business, and people-centered roles can fit the Pig. It does best where cooperation and humane values are genuine.",
+    compatible: ["rabbit", "goat", "tiger"],
+    challenging: ["snake", "monkey"],
+  },
+];
 
 export function chineseZodiacContentEnBySlug(
   slug: string,
 ): ChineseAnimalContentEn | undefined {
-  return CONTENT_BY_SLUG[slug];
+  return CHINESE_ZODIAC_CONTENT_EN.find((animal) => animal.slug === slug);
 }

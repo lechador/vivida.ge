@@ -1,72 +1,119 @@
-export type SiteSearchPageHit = {
-  title: string;
-  sub: string;
-  url: string;
-  category: string;
-  icon?: string | null;
-};
+import { and, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 
-export type SiteSearchUserHit = {
-  id: string;
+import { db } from "@/db";
+import { profiles, users } from "@/db/schema";
+import { resolveAvatar, firstReadyPhotoByUser } from "@/lib/avatars";
+import { SEARCH_CATALOG, type SearchEntry } from "@/lib/search/catalog";
+
+export type PageHit = SearchEntry & { score: number };
+export type UserHit = {
   username: string;
   displayName: string | null;
   name: string | null;
   image: string | null;
-  sunSign: string | null;
 };
 
-const STATIC_PAGES: SiteSearchPageHit[] = [
-  {
-    title: "ნატალური რუკა",
-    sub: "პირადი ასტროლოგიური რუკის კალკულატორი",
-    url: "/nataluri-ruka",
-    category: "ასტროლოგია",
-    icon: "✦",
-  },
-  {
-    title: "დღის ჰოროსკოპი",
-    sub: "12 ზოდიაქოს ნიშნის დღიური პროგნოზი",
-    url: "/horoskopi",
-    category: "ჰოროსკოპი",
-    icon: "☀️",
-  },
-  {
-    title: "ზოდიაქოს თავსებადობა",
-    sub: "წყვილების სინასტრია და თავსებადობა",
-    url: "/tavsebadoba",
-    category: "თავსებადობა",
-    icon: "💞",
-  },
-  {
-    title: "ტარო ონლაინ",
-    sub: "3-კარტიანი გაშლა და 78 კარტის მნიშვნელობა",
-    url: "/taro",
-    category: "ტარო",
-    icon: "🃏",
-  },
-  {
-    title: "ტესტები და ქვიზები",
-    sub: "IQ, EQ, Big Five და პიროვნების ტესტები",
-    url: "/tests",
-    category: "ტესტები",
-    icon: "🧠",
-  },
-];
+/**
+ * Rank catalog pages against `q`. Scoring favours, in order: exact title,
+ * title prefix, title substring, then a token (term) prefix/substring. Shorter
+ * titles win ties so "ლომი" beats "ლომის თავსებადობა" for the query "ლომი".
+ */
+export function searchPages(q: string, limit = 8): PageHit[] {
+  const needle = q.trim().toLowerCase();
+  if (needle.length < 2) return [];
 
-export function searchPages(query: string, limit: number = 8): SiteSearchPageHit[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return [];
-  return STATIC_PAGES.filter(
-    (p) =>
-      p.title.toLowerCase().includes(q) ||
-      p.sub.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q),
-  ).slice(0, limit);
+  const hits: PageHit[] = [];
+  for (const e of SEARCH_CATALOG) {
+    const title = e.title.toLowerCase();
+    let score = 0;
+    if (title === needle) score = 100;
+    else if (title.startsWith(needle)) score = 80;
+    else if (title.includes(needle)) score = 60;
+    else {
+      for (const t of e.terms) {
+        if (t === needle) {
+          score = Math.max(score, 70);
+          break;
+        }
+        if (t.startsWith(needle)) score = Math.max(score, 45);
+        else if (t.includes(needle)) score = Math.max(score, 30);
+      }
+    }
+    if (score > 0) {
+      // Tie-breaker: shorter titles first (more specific match).
+      score -= Math.min(title.length, 40) * 0.1;
+      hits.push({ ...e, score });
+    }
+  }
+  hits.sort((a, b) => b.score - a.score);
+  return hits.slice(0, limit);
 }
 
+/**
+ * Public-profile user search, only users who claimed a username AND opted
+ * into discovery (`discoverable`). No viewer needed; safe for the signed-out
+ * homepage since these profiles are public by the user's own choice.
+ */
+async function searchPublicUsersUncached(
+  q: string,
+  limit = 5
+): Promise<UserHit[]> {
+  const trimmed = q.trim();
+  if (trimmed.length < 2) return [];
+  const pattern = `%${trimmed.replace(/[%_\\]/g, (m) => `\\${m}`)}%`;
+
+  const rows = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      image: users.image,
+      username: profiles.username,
+      displayName: profiles.displayName,
+    })
+    .from(profiles)
+    .innerJoin(users, eq(users.id, profiles.userId))
+    .where(
+      and(
+        isNotNull(profiles.username),
+        // Usernames are assigned at signup, so they no longer imply an
+        // onboarded profile, gate on birth data to keep registered-but-never-
+        // onboarded accounts out of search results. Same rule as lib/people.ts.
+        isNotNull(profiles.dateOfBirth),
+        eq(profiles.discoverable, true),
+        or(
+          ilike(profiles.username, pattern),
+          ilike(profiles.displayName, pattern),
+          ilike(users.name, pattern)
+        )
+      )
+    )
+    // Prefix matches first (they're the intended target), then by activity.
+    .orderBy(sql`(${profiles.username} ILIKE ${trimmed + "%"}) DESC`, sql`${users.lastLoginAt} DESC NULLS LAST`)
+    .limit(limit);
+
+  if (rows.length === 0) return [];
+
+  // Resolve avatars (uploaded photo → OAuth image), same as the people
+  // directory, so results look consistent.
+  const photos = await firstReadyPhotoByUser(rows.map((r) => r.id));
+  return rows.map((r) => ({
+    username: r.username as string,
+    displayName: r.displayName,
+    name: r.name,
+    image: resolveAvatar(r.id, r.image, photos),
+  }));
+}
+
+const cachedPublicUserSearch = unstable_cache(
+  searchPublicUsersUncached,
+  ["public-user-search-v1"],
+  { revalidate: 60 },
+);
+
 export async function searchPublicUsers(
-  _query: string,
-  _limit: number = 5,
-): Promise<SiteSearchUserHit[]> {
-  return [];
+  q: string,
+  limit = 5,
+): Promise<UserHit[]> {
+  return cachedPublicUserSearch(q.trim().toLowerCase(), limit);
 }
