@@ -145,7 +145,11 @@ export function TrackingConsentManager({
 
       {trackingEnabled && locale === "ka" && !sensitivePath && (
         <>
-          <div id="top-ge-counter-container" data-site-id="118976" />
+          <div
+            id="top-ge-counter-container"
+            data-site-id="118976"
+            className="max-lg:hidden"
+          />
           <Script
             src="https://counter.top.ge/counter.js"
             strategy="afterInteractive"
