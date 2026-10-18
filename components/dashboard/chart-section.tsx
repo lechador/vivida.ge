@@ -64,10 +64,10 @@ export async function ChartSection({
       <div className="mt-10 space-y-10">
         {/* SECTION 01, Chart wheel hero (always expanded) */}
         <section id="wheel" className="scroll-mt-16 sm:scroll-mt-24">
-          <article className="relative overflow-hidden rounded-md border border-border bg-card p-5 sm:p-8">
+          <article className="relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm sm:p-8">
             <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_480px] lg:items-center">
               <div className="order-2 lg:order-1">
-                <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+                <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
                   01 · CELESTIAL HEMISPHERE
                 </div>
                 <h2
@@ -91,11 +91,13 @@ export async function ChartSection({
                 </p>
 
                 {interp?.summary && (
-                  <div className="mt-6 border-t border-border pt-5">
-                    <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
-                      {en ? "SYNTHESIS · ABOUT YOUR CHART" : "სინთეზი · შენი რუკის შესახებ"}
+                  <div className="mt-6 rounded-lg border border-border/80 bg-background/60 p-4">
+                    <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
+                      {en
+                        ? "SYNTHESIS · ABOUT YOUR CHART"
+                        : "სინთეზი · შენი რუკის შესახებ"}
                     </div>
-                    <p className="text-sm leading-relaxed text-foreground/85">
+                    <p className="text-sm leading-relaxed text-foreground/90">
                       {interp.summary}
                     </p>
                   </div>
@@ -112,16 +114,16 @@ export async function ChartSection({
         <section id="positions" className="scroll-mt-16 sm:scroll-mt-24">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start">
             <div>
-              <h2 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              <h2 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
                 02 · {en ? "Planetary Positions" : "პლანეტარული პოზიციები"}
               </h2>
               <PositionsTable chart={data} locale={locale} />
             </div>
             <div>
-              <h2 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              <h2 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
                 03 · {en ? "House Cusps" : "სახლების კუსპიდები"}
               </h2>
-              <div className="rounded-md border border-border bg-card px-4 py-2 sm:px-5">
+              <div className="rounded-xl border border-border bg-card px-4 py-2 shadow-sm sm:px-5">
                 <HousesTable chart={data} locale={locale} />
               </div>
             </div>
@@ -140,7 +142,7 @@ export async function ChartSection({
           }
           defaultOpen
         >
-          <div className="overflow-hidden rounded-md border border-border bg-card">
+          <div className="grid gap-3.5 lg:grid-cols-3">
             {sun && (
               <BigThreeCard
                 kind="sun"
@@ -194,13 +196,13 @@ export async function ChartSection({
             }
             defaultOpen
           >
-            <div className="overflow-hidden rounded-md border border-border bg-card">
+            <div className="grid gap-3.5 sm:grid-cols-2">
               {interp.highlights.map((h, i) => (
                 <div
                   key={i}
-                  className="border-t border-border px-4 py-4 first:border-t-0 sm:px-5"
+                  className="rounded-xl border border-border bg-card px-4 py-4 shadow-sm sm:px-5"
                 >
-                  <h3 className="mb-1 text-sm font-semibold tracking-tight text-primary">
+                  <h3 className="mb-1.5 text-sm font-semibold tracking-tight text-[var(--vivida-gold)]">
                     {h.title}
                   </h3>
                   <p className="text-sm leading-relaxed text-foreground/85">

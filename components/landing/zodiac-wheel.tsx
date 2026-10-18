@@ -113,15 +113,18 @@ export function ZodiacWheel({
       className="relative grid select-none place-items-center"
       style={{ width: size, height: size }}
     >
-      <svg viewBox="-60 -60 120 120" className="relative size-full overflow-visible">
+      <svg
+        viewBox="-60 -60 120 120"
+        className="relative size-full overflow-visible"
+      >
         {/* Outer degree boundary ring */}
         <circle
           cx="0"
           cy="0"
           r={r + 4}
           fill="none"
-          stroke="#D4AF37"
-          strokeOpacity="0.28"
+          stroke="#a78bfa"
+          strokeOpacity="0.35"
           strokeWidth="0.35"
         />
         {/* Primary ecliptic ring */}
@@ -130,8 +133,8 @@ export function ZodiacWheel({
           cy="0"
           r={r}
           fill="none"
-          stroke="#D4AF37"
-          strokeOpacity="0.7"
+          stroke="#a78bfa"
+          strokeOpacity="0.75"
           strokeWidth="0.55"
         />
         {/* Inner zodiac band ring */}
@@ -140,8 +143,8 @@ export function ZodiacWheel({
           cy="0"
           r={innerR}
           fill="none"
-          stroke="#F4F0EA"
-          strokeOpacity="0.25"
+          stroke="#38bdf8"
+          strokeOpacity="0.35"
           strokeWidth="0.45"
         />
         {/* Planetary orbital track */}
@@ -150,8 +153,8 @@ export function ZodiacWheel({
           cy="0"
           r="30"
           fill="none"
-          stroke="#D4AF37"
-          strokeOpacity="0.2"
+          stroke="#c4b5fd"
+          strokeOpacity="0.28"
           strokeWidth="0.35"
           strokeDasharray="1 1.5"
         />
@@ -161,8 +164,8 @@ export function ZodiacWheel({
           cy="0"
           r={coreR}
           fill="none"
-          stroke="#D4AF37"
-          strokeOpacity="0.4"
+          stroke="#f5d061"
+          strokeOpacity="0.45"
           strokeWidth="0.4"
         />
 
@@ -172,8 +175,8 @@ export function ZodiacWheel({
           y1="0"
           x2={r + 5}
           y2="0"
-          stroke="#D4AF37"
-          strokeOpacity="0.35"
+          stroke="#a78bfa"
+          strokeOpacity="0.38"
           strokeWidth="0.4"
         />
         <line
@@ -181,8 +184,8 @@ export function ZodiacWheel({
           y1={-(r + 5)}
           x2="0"
           y2={r + 5}
-          stroke="#D4AF37"
-          strokeOpacity="0.35"
+          stroke="#a78bfa"
+          strokeOpacity="0.38"
           strokeWidth="0.4"
         />
 
@@ -208,8 +211,8 @@ export function ZodiacWheel({
                 y1={y1}
                 x2={x2}
                 y2={y2}
-                stroke="#D4AF37"
-                strokeOpacity={major ? "0.75" : mid ? "0.4" : "0.2"}
+                stroke={major ? "#f5d061" : "#a78bfa"}
+                strokeOpacity={major ? "0.8" : mid ? "0.45" : "0.24"}
                 strokeWidth={major ? "0.45" : "0.3"}
               />
             );
@@ -229,8 +232,8 @@ export function ZodiacWheel({
                 y1={y1}
                 x2={x2}
                 y2={y2}
-                stroke="#F4F0EA"
-                strokeOpacity="0.16"
+                stroke="#e2d9f3"
+                strokeOpacity="0.2"
                 strokeWidth="0.35"
               />
             );
@@ -242,12 +245,20 @@ export function ZodiacWheel({
             const rad = (angle * Math.PI) / 180;
             const x = round(Math.cos(rad) * symbolR);
             const y = round(Math.sin(rad) * symbolR);
+            const signColor =
+              i % 4 === 0
+                ? "#f5d061"
+                : i % 4 === 1
+                  ? "#38bdf8"
+                  : i % 4 === 2
+                    ? "#c4b5fd"
+                    : "#f472b6";
             return (
               <g key={sign.key} transform={`translate(${x}, ${y})`}>
                 <motion.text
                   fontSize="5.8"
-                  fill={i % 2 === 0 ? "#D4AF37" : "#F4F0EA"}
-                  fillOpacity={i % 2 === 0 ? "0.95" : "0.8"}
+                  fill={signColor}
+                  fillOpacity="0.92"
                   textAnchor="middle"
                   dominantBaseline="central"
                   animate={{ rotate: -360 }}
@@ -275,8 +286,8 @@ export function ZodiacWheel({
               y1={activeNode.y}
               x2={target.x}
               y2={target.y}
-              stroke={idx % 2 === 0 ? "#D4AF37" : "#94A3B8"}
-              strokeOpacity={idx < 3 ? "0.55" : "0.22"}
+              stroke={idx % 2 === 0 ? "#a78bfa" : "#38bdf8"}
+              strokeOpacity={idx < 3 ? "0.6" : "0.28"}
               strokeWidth={idx < 2 ? "0.5" : "0.35"}
               strokeDasharray={idx % 2 === 1 ? "1.5 1.5" : undefined}
             />
@@ -288,7 +299,7 @@ export function ZodiacWheel({
           y1="0"
           x2={activeNode.x}
           y2={activeNode.y}
-          stroke="#D4AF37"
+          stroke="#f5d061"
           strokeOpacity="0.85"
           strokeWidth="0.6"
         />
@@ -318,7 +329,7 @@ export function ZodiacWheel({
                   cy="0"
                   r="6.4"
                   fill="none"
-                  stroke="#D4AF37"
+                  stroke="#f5d061"
                   strokeOpacity="0.9"
                   strokeWidth="0.55"
                 />
@@ -327,14 +338,14 @@ export function ZodiacWheel({
                 cx="0"
                 cy="0"
                 r={isSelected ? "4.4" : "3.6"}
-                fill={isSelected ? "#D4AF37" : "#12141C"}
-                stroke="#D4AF37"
-                strokeOpacity={isSelected ? "1" : "0.65"}
+                fill={isSelected ? "#a78bfa" : "#161129"}
+                stroke={isSelected ? "#f5d061" : "#a78bfa"}
+                strokeOpacity={isSelected ? "1" : "0.75"}
                 strokeWidth="0.55"
               />
               <text
                 fontSize={isSelected ? "4.6" : "4.1"}
-                fill={isSelected ? "#0B0C10" : "#F4F0EA"}
+                fill={isSelected ? "#0a0714" : "#f8f7ff"}
                 textAnchor="middle"
                 dominantBaseline="central"
                 fontWeight="600"
@@ -346,14 +357,14 @@ export function ZodiacWheel({
         })}
 
         {/* Center astrolabe axis */}
-        <circle cx="0" cy="0" r="2.2" fill="#D4AF37" />
+        <circle cx="0" cy="0" r="2.2" fill="#f5d061" />
         <circle
           cx="0"
           cy="0"
           r="5.5"
           fill="none"
-          stroke="#F4F0EA"
-          strokeOpacity="0.3"
+          stroke="#a78bfa"
+          strokeOpacity="0.45"
           strokeWidth="0.4"
         />
       </svg>

@@ -34,7 +34,7 @@ export default async function SynastryPage() {
   return (
     <main
       lang={locale}
-      className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
+      className="relative isolate flex flex-1 flex-col overflow-x-clip bg-background"
     >
       <Starfield count={48} />
 
@@ -43,7 +43,7 @@ export default async function SynastryPage() {
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-10">
         <header className="mb-8 flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--vivida-pink)]">
               RELATIONAL SYNASTRY · თავსებადობა
             </div>
             <h1
@@ -54,7 +54,7 @@ export default async function SynastryPage() {
               }
             >
               {en ? "Chart " : "რუკების "}
-              <span className="text-primary">
+              <span className="text-[var(--vivida-pink)]">
                 {en ? "Compatibility" : "თავსებადობა"}
               </span>
             </h1>
@@ -91,9 +91,9 @@ export default async function SynastryPage() {
         {partners.length === 0 ? (
           <EmptyState canAdd={remaining > 0} locale={locale} />
         ) : (
-          <ul className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {partners.map((p) => (
-              <li key={p.id} className="bg-card">
+              <li key={p.id}>
                 <PartnerCard
                   id={p.id}
                   name={p.displayName}
@@ -121,8 +121,8 @@ function EmptyState({
 }) {
   const en = locale !== "ka";
   return (
-    <div className="rounded-md border border-border bg-card p-10 text-center">
-      <div className="mx-auto grid size-12 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+    <div className="rounded-xl border border-border bg-card p-10 text-center shadow-sm">
+      <div className="mx-auto grid size-12 place-items-center rounded-lg border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/15 text-[var(--vivida-pink)]">
         <Heart className="size-5" aria-hidden />
       </div>
       <h2 className="mt-4 text-balance text-xl font-semibold tracking-tight text-foreground">

@@ -176,7 +176,7 @@ export async function AppHeader({
                   {en ? "Horoscope" : "ჰოროსკოპი"}
                 </Link>
                 <Link
-                  href={en ? "/birth-chart" : "/nataluri-ruka"}
+                  href={en ? "/natal-chart" : "/nataluri-ruka"}
                   className="shrink-0 whitespace-nowrap transition-colors hover:text-foreground"
                 >
                   {en ? "Birth Chart" : "ნატალური რუკა"}
@@ -188,7 +188,7 @@ export async function AppHeader({
                   {en ? "Compatibility" : "თავსებადობა"}
                 </Link>
                 <Link
-                  href="/taro"
+                  href={en ? "/tarot" : "/taro"}
                   className="shrink-0 whitespace-nowrap transition-colors hover:text-foreground"
                 >
                   {en ? "Tarot" : "ტარო"}
@@ -232,7 +232,12 @@ export async function AppHeader({
                 />
               </>
             ) : (
-              <Button asChild variant="outline" size="sm" className="shrink-0 whitespace-nowrap">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="shrink-0 whitespace-nowrap"
+              >
                 <Link href="/login">{en ? "Sign in" : "შესვლა"}</Link>
               </Button>
             )}
@@ -240,7 +245,7 @@ export async function AppHeader({
         </div>
 
         {/* Row 2: Persistent Celestial Context Strip & Slide-Over Drawer Trigger */}
-        <div className="border-t border-border/70 bg-card/75">
+        <div className="border-t border-border bg-[oklch(0.15_0.038_280)]">
           <div className="mx-auto flex h-9 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
             {/* Left: Active Breadcrumb + Live Lunar Telemetry */}
             <div className="flex min-w-0 items-center gap-3 text-xs text-muted-foreground">
@@ -256,7 +261,7 @@ export async function AppHeader({
 
               {moonSnapshot && (
                 <Link
-                  href="/mtvaris-kalendari"
+                  href={en ? "/moon-calendar" : "/mtvaris-kalendari"}
                   className="hidden items-center gap-2 border-l border-border pl-3 font-mono text-[11px] tabular-nums text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
                 >
                   <LunarPhaseDisc
@@ -269,7 +274,7 @@ export async function AppHeader({
                       : moonSnapshot.phaseLabelKa}
                   </span>
                   <span aria-hidden>·</span>
-                  <span className="text-primary">
+                  <span className="text-[var(--vivida-gold)]">
                     {moonSnapshot.signSymbol}{" "}
                     {en ? moonSnapshot.signEn : moonSnapshot.signKa}
                   </span>

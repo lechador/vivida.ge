@@ -44,7 +44,7 @@ export function MobileNav({
             aria-label={moreLabel}
             aria-expanded={open}
             className={cn(
-              "group flex w-full flex-col items-center gap-0.5 rounded-md px-1 py-1.5 text-[10px] font-medium transition-colors",
+              "group flex w-full flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[10px] font-medium transition-colors",
               open
                 ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground",
@@ -52,10 +52,10 @@ export function MobileNav({
           >
             <span
               className={cn(
-                "relative grid size-8 place-items-center rounded-md transition-colors",
+                "relative grid size-8.5 place-items-center rounded-xl transition-all",
                 open
-                  ? "bg-secondary text-primary"
-                  : "text-muted-foreground group-hover:text-foreground",
+                  ? "bg-[var(--vivida-violet)]/25 text-primary ring-1 ring-[var(--vivida-violet)]/60"
+                  : "text-muted-foreground group-hover:text-foreground group-active:scale-95",
               )}
             >
               <Ellipsis className="size-4.5" />
@@ -66,7 +66,7 @@ export function MobileNav({
           <button
             type="button"
             aria-label={locale !== "ka" ? "Menu" : "მენიუ"}
-            className="grid size-10 shrink-0 place-items-center rounded-md border border-border bg-card text-foreground/85 transition-colors hover:bg-secondary hover:text-foreground lg:hidden"
+            className="grid size-10 shrink-0 place-items-center rounded-lg border border-border bg-card text-foreground/90 shadow-xs transition-colors hover:border-primary/50 hover:bg-secondary hover:text-foreground lg:hidden"
           >
             <Menu className="size-4.5" />
           </button>
@@ -92,23 +92,29 @@ export function MobileNav({
                 animate={{ x: 0 }}
                 exit={{ x: "-100%" }}
                 transition={{ type: "spring", stiffness: 340, damping: 34 }}
-                className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col border-r border-border bg-card p-5"
+                className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col border-r border-border bg-card p-5 shadow-2xl"
               >
                 {/* Header: Brand Lockup + Close */}
-                <div className="flex items-center justify-between border-b border-border/80 pb-4">
+                <div className="flex items-center justify-between border-b border-border pb-4">
                   <Link
                     href="/dashboard"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-2.5"
                   >
                     <VividaMark size={30} id="mobile-nav" />
-                    <span className="font-display text-2xl font-medium tracking-tight text-foreground">
+                    <span
+                      className="bg-clip-text font-display text-2xl font-semibold tracking-tight text-transparent"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(135deg, #f8f7ff 0%, #c4b5fd 45%, #f472b6 80%, #22d3ee 100%)",
+                      }}
+                    >
                       Vivida
                     </span>
                   </Link>
                   <DialogPrimitive.Close
                     aria-label={locale !== "ka" ? "Close" : "დახურვა"}
-                    className="grid size-9 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    className="grid size-9 place-items-center rounded-lg border border-border bg-secondary/50 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-secondary hover:text-foreground"
                   >
                     <X className="size-4" />
                   </DialogPrimitive.Close>
@@ -119,7 +125,7 @@ export function MobileNav({
                 </DialogPrimitive.Title>
 
                 {/* Nav items */}
-                <nav className="my-4 flex flex-col gap-0.5 overflow-y-auto">
+                <nav className="my-4 flex flex-col gap-1.5 overflow-y-auto">
                   {navItems(locale).map((item) => {
                     const { Icon } = item;
                     const isActive = item.key === active;
@@ -133,23 +139,22 @@ export function MobileNav({
                         onNavigate={() => setOpen(false)}
                         aria-current={isActive ? "page" : undefined}
                         className={cn(
-                          "group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+                          "group relative flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all",
                           isActive
-                            ? "bg-secondary text-foreground"
-                            : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
+                            ? "border-primary/50 bg-secondary text-foreground shadow-xs"
+                            : "border-transparent text-muted-foreground hover:border-border hover:bg-secondary/50 hover:text-foreground",
                         )}
                       >
                         {isActive && (
                           <span
                             aria-hidden
-                            className="absolute inset-y-1.5 left-0 w-0.5 bg-primary"
+                            className="absolute inset-y-2 left-0 w-1 rounded-r-full"
+                            style={{ backgroundColor: item.hue }}
                           />
                         )}
                         <span
-                          className={cn(
-                            "relative grid size-5 place-items-center",
-                            isActive ? "text-primary" : "text-muted-foreground",
-                          )}
+                          className="relative grid size-6 place-items-center rounded-md"
+                          style={{ color: item.hue }}
                         >
                           <Icon className="size-4.5" />
                           {item.key === "messages" && (
@@ -171,7 +176,7 @@ export function MobileNav({
                   })}
                 </nav>
 
-                <div className="mt-auto space-y-3 border-t border-border/80 pt-4">
+                <div className="mt-auto space-y-3 border-t border-border pt-4">
                   <NavItemLink
                     href="/account"
                     itemKey="account"
@@ -187,7 +192,7 @@ export function MobileNav({
                   <InstallAppButton
                     locale={locale}
                     surface="mobile_nav"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-border bg-secondary/40 px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-secondary"
                   />
                 </div>
               </motion.aside>

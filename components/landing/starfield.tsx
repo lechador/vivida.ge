@@ -7,14 +7,15 @@ interface Star {
   top: number;
   size: number;
   opacity: number;
-  warm: boolean;
+  color: string;
 }
+
+const STAR_COLORS = ["#f8f7ff", "#c4b5fd", "#67e8f9", "#fde68a"] as const;
 
 /**
  * Quiet astronomical star chart dust layer.
- * Replaces neon pulsing violet/cyan orbs and shooting stars with subtle,
- * stationary or near-stationary ivory and brass pinpoints so the canvas
- * feels like an observatory sky atlas without competing with typography.
+ * Uses subtle cosmic moonlight, lavender, cyan, and gold pinpoints so the
+ * canvas feels like a living night sky without competing with typography.
  */
 export function Starfield({
   count = 72,
@@ -30,7 +31,9 @@ export function Starfield({
     const mobile = window.matchMedia("(max-width: 640px)").matches;
     const effective = Math.min(count, 80);
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMountedCount(mobile ? Math.max(20, Math.round(effective * 0.45)) : effective);
+    setMountedCount(
+      mobile ? Math.max(20, Math.round(effective * 0.45)) : effective,
+    );
   }, [count]);
 
   const stars = useMemo(() => {
@@ -46,13 +49,22 @@ export function Starfield({
 
     const list: Star[] = Array.from({ length: mountedCount }).map(() => {
       const r = rand();
-      const isFeature = r > 0.92;
+      const isFeature = r > 0.9;
+      const colorRoll = rand();
+      const color =
+        colorRoll > 0.82
+          ? STAR_COLORS[1]
+          : colorRoll > 0.68
+            ? STAR_COLORS[2]
+            : colorRoll > 0.56
+              ? STAR_COLORS[3]
+              : STAR_COLORS[0];
       return {
         left: rand() * 100,
         top: rand() * 100,
-        size: isFeature ? 1.75 : 1,
-        opacity: isFeature ? rand() * 0.25 + 0.35 : rand() * 0.22 + 0.08,
-        warm: rand() > 0.65,
+        size: isFeature ? 2 : 1.15,
+        opacity: isFeature ? rand() * 0.3 + 0.45 : rand() * 0.25 + 0.12,
+        color,
       };
     });
 
@@ -76,7 +88,7 @@ export function Starfield({
             width: `${star.size}px`,
             height: `${star.size}px`,
             opacity: star.opacity,
-            background: star.warm ? "#D4AF37" : "#F4F0EA",
+            background: star.color,
           }}
         />
       ))}

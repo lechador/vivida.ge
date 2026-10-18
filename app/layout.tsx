@@ -150,8 +150,8 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0b0c10" },
-    { media: "(prefers-color-scheme: light)", color: "#0b0c10" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0714" },
+    { media: "(prefers-color-scheme: light)", color: "#0a0714" },
   ],
   colorScheme: "dark",
 };
@@ -205,10 +205,10 @@ export default async function RootLayout({
             : "მთავარ კონტენტზე გადასვლა"}
         </a>
         <NextTopLoader
-          color="#D4AF37"
+          color="#a78bfa"
           height={2}
           showSpinner={false}
-          shadow={false}
+          shadow="0 0 10px #a78bfa,0 0 5px #a78bfa"
           easing="cubic-bezier(0.22, 1, 0.36, 1)"
           speed={300}
         />

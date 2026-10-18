@@ -2,6 +2,12 @@ import { HOME_CONTENT } from "@/lib/seo/home-content";
 import { Reveal } from "@/components/landing/reveal";
 import { CornerCrosshair } from "@/components/brand/celestial-icons";
 
+const STEP_ACCENTS = [
+  "text-[var(--vivida-gold)]",
+  "text-[var(--vivida-cyan)]",
+  "text-primary",
+] as const;
+
 export function HowItWorksSection() {
   const how = HOME_CONTENT.howItWorks;
 
@@ -11,17 +17,17 @@ export function HowItWorksSection() {
       aria-labelledby="how-heading"
       className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20"
     >
-      <div className="relative overflow-hidden rounded-sm border border-border bg-card">
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-[oklch(0.145_0.036_280)] shadow-md">
         <CornerCrosshair position="tl" />
         <CornerCrosshair position="tr" />
         <CornerCrosshair position="bl" />
         <CornerCrosshair position="br" />
 
-        <div className="border-b border-border bg-background/50 px-6 py-6 sm:px-10 sm:py-8">
+        <div className="border-b border-border bg-background/70 px-6 py-6 sm:px-10 sm:py-8">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-primary">
-                <span className="inline-block h-px w-5 bg-primary/70" />
+              <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--vivida-cyan)]">
+                <span className="inline-block h-px w-5 bg-[var(--vivida-cyan)]/70" />
                 პროცესი · 3 მარტივი ნაბიჯი
               </div>
               <h2
@@ -37,18 +43,21 @@ export function HowItWorksSection() {
           </div>
         </div>
 
-        <ol className="grid gap-px bg-border sm:grid-cols-3">
+        <ol className="grid gap-4 p-4 sm:grid-cols-3 sm:p-6">
           {how.steps.map((s, i) => {
             const num = String(s.n).padStart(2, "0");
+            const accent = STEP_ACCENTS[i % STEP_ACCENTS.length];
             return (
               <Reveal
                 key={s.n}
                 delayMs={i * 60}
-                className="flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary/20 sm:p-8"
+                className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm transition-colors hover:border-primary/40 hover:bg-secondary/40 sm:p-7"
               >
                 <div>
-                  <div className="flex items-baseline justify-between border-b border-border/60 pb-3">
-                    <span className="font-mono text-2xl font-medium tabular-nums text-primary">
+                  <div className="flex items-baseline justify-between border-b border-border/70 pb-3">
+                    <span
+                      className={`font-mono text-2xl font-semibold tabular-nums ${accent}`}
+                    >
                       {num}
                     </span>
                     <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
@@ -62,7 +71,7 @@ export function HowItWorksSection() {
                     {s.body}
                   </p>
                 </div>
-                <div className="mt-6 border-t border-border/50 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                <div className="mt-6 border-t border-border/70 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   SWISS EPHEMERIS · VERIFIED
                 </div>
               </Reveal>

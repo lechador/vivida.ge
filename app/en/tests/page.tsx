@@ -52,13 +52,36 @@ export const metadata: Metadata = {
   },
 };
 
-const THEME: Record<string, { Icon: LucideIcon }> = {
-  iq: { Icon: Brain },
-  eq: { Icon: HeartHandshake },
-  "big-five": { Icon: Layers },
-  "astro-mbti": { Icon: Fingerprint },
-  "true-sign": { Icon: Sparkles },
-  "famous-zodiac": { Icon: Sparkles },
+const THEME: Record<string, { Icon: LucideIcon; color: string }> = {
+  iq: {
+    Icon: Brain,
+    color:
+      "text-[var(--vivida-cyan)] border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/12",
+  },
+  eq: {
+    Icon: HeartHandshake,
+    color:
+      "text-[var(--vivida-gold)] border-[var(--vivida-gold)]/35 bg-[var(--vivida-gold)]/12",
+  },
+  "big-five": {
+    Icon: Layers,
+    color: "text-primary border-primary/35 bg-primary/12",
+  },
+  "astro-mbti": {
+    Icon: Fingerprint,
+    color:
+      "text-[var(--vivida-pink)] border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/12",
+  },
+  "true-sign": {
+    Icon: Sparkles,
+    color:
+      "text-[var(--vivida-gold)] border-[var(--vivida-gold)]/35 bg-[var(--vivida-gold)]/12",
+  },
+  "famous-zodiac": {
+    Icon: Sparkles,
+    color:
+      "text-[var(--vivida-cyan)] border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/12",
+  },
 };
 
 const FAQ = [
@@ -107,7 +130,7 @@ export default function EnglishTestsPage() {
   return (
     <main
       lang="en"
-      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
+      className="relative isolate flex min-h-screen flex-col overflow-x-clip bg-background"
     >
       <Starfield count={48} />
       <SmartHeader active="tests" locale="en" georgianPath="/tests" />
@@ -119,7 +142,7 @@ export default function EnglishTestsPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
         <header className="mb-10 border-b border-border pb-8">
-          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
             PSYCHOMETRICS & ARCHETYPES · TESTS AND QUIZZES
           </div>
           <h1 className="mt-2 max-w-2xl text-balance font-display text-3xl font-medium leading-tight tracking-tight text-foreground sm:text-5xl">
@@ -157,16 +180,19 @@ export default function EnglishTestsPage() {
           <h2 className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             03 · Frequently asked questions
           </h2>
-          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
+          <div className="space-y-3">
             {FAQ.map((item) => (
-              <details key={item.q} className="group">
+              <details
+                key={item.q}
+                className="group overflow-hidden rounded-xl border border-border bg-card shadow-2xs open:border-primary/45"
+              >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-sm font-medium text-foreground transition-colors hover:bg-secondary/40 [&::-webkit-details-marker]:hidden">
                   {item.q}
                   <span className="font-mono text-muted-foreground transition-transform group-open:rotate-45">
                     +
                   </span>
                 </summary>
-                <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
+                <p className="border-t border-border/70 bg-background/55 px-5 py-4 text-[15px] leading-relaxed text-foreground/85">
                   {item.a}
                 </p>
               </details>
@@ -192,24 +218,26 @@ function TestSection({
   return (
     <section>
       <div className="mb-4">
-        <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+        <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
           {eyebrow}
         </div>
         <h2 className="mt-1 text-xl font-semibold tracking-tight text-foreground">
           {title}
         </h2>
       </div>
-      <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         {tests.map((test) => {
-          const { Icon } = THEME[test.slug] ?? THEME.iq;
+          const { Icon, color } = THEME[test.slug] ?? THEME.iq;
           return (
             <article
               key={test.slug}
-              className="flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary/30 sm:p-7"
+              className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/45 hover:bg-secondary/40 sm:p-7"
             >
               <div>
                 <div className="flex items-start gap-3">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+                  <span
+                    className={`grid size-10 shrink-0 place-items-center rounded-lg border ${color}`}
+                  >
                     <Icon className="size-4.5" />
                   </span>
                   <div>

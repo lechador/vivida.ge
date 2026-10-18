@@ -184,7 +184,7 @@ export default async function NataluriRukaPage() {
   };
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background">
+    <main className="relative isolate flex min-h-screen flex-col overflow-x-clip bg-background">
       <Starfield count={48} />
       <SmartHeader />
 
@@ -295,14 +295,14 @@ export default async function NataluriRukaPage() {
             </p>
           </section>
 
-          <section className="rounded-md border border-border bg-card p-5 sm:p-6">
+          <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
             <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
               რუკის შემდეგ, ყოველდღიური ცა
             </h2>
             <p className="mt-3 text-pretty leading-relaxed text-foreground/85">
               ნატალური რუკა ერთხელ იქმნება და აღარ იცვლება. პლანეტები კი
-              დღეს-დღეზე მოძრაობენ და შენს რუკას სხვადასხვა კუთხით ეხებიან,
-              ამას ტრანზიტი ჰქვია და სწორედ ამაზეა აგებული{" "}
+              დღეს-დღეზე მოძრაობენ და შენს რუკას სხვადასხვა კუთხით ეხებიან, ამას
+              ტრანზიტი ჰქვია და სწორედ ამაზეა აგებული{" "}
               <Link
                 href="/horoskopi"
                 className="font-medium text-primary underline underline-offset-4 hover:no-underline"
@@ -325,7 +325,7 @@ export default async function NataluriRukaPage() {
             <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
               ხშირად დასმული კითხვები
             </h2>
-            <div className="mt-5 divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
+            <div className="mt-5 divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-sm">
               {FAQ.map((item, i) => (
                 <details key={i} className="group">
                   <summary className="flex cursor-pointer list-none items-start justify-between gap-4 p-5 text-base font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
@@ -337,7 +337,7 @@ export default async function NataluriRukaPage() {
                       +
                     </span>
                   </summary>
-                  <p className="px-5 pb-5 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                  <p className="border-t border-border/60 bg-background/50 px-5 py-4 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
                     {item.a}
                   </p>
                 </details>
@@ -351,43 +351,73 @@ export default async function NataluriRukaPage() {
               დაკავშირებული გზამკვლევები
             </p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
-              <Link href="/piradi-ruka" className="hover:text-foreground hover:underline">
+              <Link
+                href="/piradi-ruka"
+                className="hover:text-foreground hover:underline"
+              >
                 პირადი რუკა
               </Link>
               <span aria-hidden>·</span>
-              <Link href="/zodiac" className="hover:text-foreground hover:underline">
+              <Link
+                href="/zodiac"
+                className="hover:text-foreground hover:underline"
+              >
                 ზოდიაქოს ნიშნები
               </Link>
               <span aria-hidden>·</span>
-              <Link href="/zodiac/tavsebadoba" className="hover:text-foreground hover:underline">
+              <Link
+                href="/zodiac/tavsebadoba"
+                className="hover:text-foreground hover:underline"
+              >
                 თავსებადობა
               </Link>
               <span aria-hidden>·</span>
-              <Link href="/horoskopi" className="hover:text-foreground hover:underline">
+              <Link
+                href="/horoskopi"
+                className="hover:text-foreground hover:underline"
+              >
                 დღის ჰოროსკოპი
               </Link>
               <span aria-hidden>·</span>
-              <Link href="/piradi-horoskopi" className="hover:text-foreground hover:underline">
+              <Link
+                href="/piradi-horoskopi"
+                className="hover:text-foreground hover:underline"
+              >
                 პირადი ჰოროსკოპი
               </Link>
               <span aria-hidden>·</span>
-              <Link href="/taro" className="hover:text-foreground hover:underline">
+              <Link
+                href="/taro"
+                className="hover:text-foreground hover:underline"
+              >
                 ტარო
               </Link>
               <span aria-hidden>·</span>
-              <Link href="/tests" className="hover:text-foreground hover:underline">
+              <Link
+                href="/tests"
+                className="hover:text-foreground hover:underline"
+              >
                 ტესტები
               </Link>
               <span aria-hidden>·</span>
-              <Link href="/numerologia" className="hover:text-foreground hover:underline">
+              <Link
+                href="/numerologia"
+                className="hover:text-foreground hover:underline"
+              >
                 ნუმეროლოგია
               </Link>
               <span aria-hidden>·</span>
-              <Link href="/chinuri-horoskopi" className="hover:text-foreground hover:underline">
+              <Link
+                href="/chinuri-horoskopi"
+                className="hover:text-foreground hover:underline"
+              >
                 ჩინური ჰოროსკოპი
               </Link>
               <span aria-hidden>·</span>
-              <Link href="/astrologiuri-kalendari" className="hover:text-foreground hover:underline">
+              <Link
+                href="/astrologiuri-kalendari"
+                className="hover:text-foreground hover:underline"
+              >
                 ასტროლოგიური კალენდარი
               </Link>
             </div>

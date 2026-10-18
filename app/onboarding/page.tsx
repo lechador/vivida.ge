@@ -51,7 +51,7 @@ export default async function OnboardingPage({
   return (
     <main
       lang={locale}
-      className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
+      className="relative isolate flex flex-1 flex-col overflow-x-clip bg-background"
     >
       {assignment && (
         <ExperimentAssignmentTracker

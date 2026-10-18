@@ -32,16 +32,16 @@ export function ArticleCard({
 
   return (
     <article
-      className={`group overflow-hidden bg-card transition-colors duration-150 hover:bg-secondary/40 ${
-        featured
-          ? "border border-border sm:grid sm:grid-cols-[1.2fr_1fr]"
-          : "flex h-full flex-col"
+      className={`group overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-150 hover:border-primary/50 hover:bg-secondary/40 ${
+        featured ? "sm:grid sm:grid-cols-[1.2fr_1fr]" : "flex h-full flex-col"
       }`}
     >
       <Link
         href={articlePath(locale, article.slug)}
         className={`relative block overflow-hidden bg-muted ${
-          featured ? "min-h-64 sm:min-h-full" : "aspect-[16/10] border-b border-border/70"
+          featured
+            ? "min-h-64 sm:min-h-full sm:border-r sm:border-border"
+            : "aspect-[16/10] border-b border-border"
         }`}
         aria-label={article.title}
       >

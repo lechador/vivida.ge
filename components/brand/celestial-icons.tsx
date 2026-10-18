@@ -56,7 +56,7 @@ export function LunarPhaseDisc({
         ? PHASE_KEY_TO_ANGLE[phaseKey]
         : 135;
   const r = 42;
-  const phase = ((angle % 360) + 360) % 360 / 360;
+  const phase = (((angle % 360) + 360) % 360) / 360;
   const xRadius = Number(
     (Math.abs(Math.cos((angle * Math.PI) / 180)) * r).toFixed(3),
   );
@@ -76,27 +76,57 @@ export function LunarPhaseDisc({
         cy="0"
         r="50"
         fill="none"
-        stroke="#D4AF37"
-        strokeOpacity="0.28"
+        stroke="#a78bfa"
+        strokeOpacity="0.4"
         strokeWidth="1.2"
       />
       {/* 4 cardinal calibration ticks */}
-      <line x1="0" y1="-50" x2="0" y2="-46" stroke="#D4AF37" strokeOpacity="0.55" strokeWidth="1.2" />
-      <line x1="0" y1="46" x2="0" y2="50" stroke="#D4AF37" strokeOpacity="0.55" strokeWidth="1.2" />
-      <line x1="-50" y1="0" x2="-46" y2="0" stroke="#D4AF37" strokeOpacity="0.55" strokeWidth="1.2" />
-      <line x1="46" y1="0" x2="50" y2="0" stroke="#D4AF37" strokeOpacity="0.55" strokeWidth="1.2" />
+      <line
+        x1="0"
+        y1="-50"
+        x2="0"
+        y2="-46"
+        stroke="#38bdf8"
+        strokeOpacity="0.65"
+        strokeWidth="1.2"
+      />
+      <line
+        x1="0"
+        y1="46"
+        x2="0"
+        y2="50"
+        stroke="#38bdf8"
+        strokeOpacity="0.65"
+        strokeWidth="1.2"
+      />
+      <line
+        x1="-50"
+        y1="0"
+        x2="-46"
+        y2="0"
+        stroke="#a78bfa"
+        strokeOpacity="0.65"
+        strokeWidth="1.2"
+      />
+      <line
+        x1="46"
+        y1="0"
+        x2="50"
+        y2="0"
+        stroke="#a78bfa"
+        strokeOpacity="0.65"
+        strokeWidth="1.2"
+      />
 
       {/* Illuminated lunar surface */}
-      <circle cx="0" cy="0" r={r} fill="#F4F0EA" fillOpacity="0.92" />
+      <circle cx="0" cy="0" r={r} fill="#f5f3ff" fillOpacity="0.95" />
       {/* Subtle lunar mare geometry */}
-      <circle cx="-12" cy="-10" r="9" fill="#D4AF37" fillOpacity="0.18" />
-      <circle cx="10" cy="12" r="12" fill="#D4AF37" fillOpacity="0.14" />
-      <circle cx="14" cy="-14" r="6" fill="#D4AF37" fillOpacity="0.16" />
+      <circle cx="-12" cy="-10" r="9" fill="#a78bfa" fillOpacity="0.22" />
+      <circle cx="10" cy="12" r="12" fill="#818cf8" fillOpacity="0.18" />
+      <circle cx="14" cy="-14" r="6" fill="#a78bfa" fillOpacity="0.2" />
 
       {/* Terminator shadow */}
-      {shadowPath && (
-        <path d={shadowPath} fill="#0B0C10" fillOpacity="0.92" />
-      )}
+      {shadowPath && <path d={shadowPath} fill="#0a0714" fillOpacity="0.92" />}
 
       {/* Crisp lunar limb border */}
       <circle
@@ -104,8 +134,8 @@ export function LunarPhaseDisc({
         cy="0"
         r={r}
         fill="none"
-        stroke="#D4AF37"
-        strokeOpacity="0.65"
+        stroke="#c4b5fd"
+        strokeOpacity="0.75"
         strokeWidth="1.5"
       />
     </svg>
@@ -127,7 +157,7 @@ export function TarotCardBackIllustration({
       className={cn("size-full", className)}
       aria-hidden
     >
-      <rect width="200" height="300" fill="#0E1017" />
+      <rect width="200" height="300" fill="#130e26" />
       {/* Outer & inner architectural borders */}
       <rect
         x="10"
@@ -135,8 +165,8 @@ export function TarotCardBackIllustration({
         width="180"
         height="280"
         fill="none"
-        stroke="#D4AF37"
-        strokeOpacity="0.45"
+        stroke="#a78bfa"
+        strokeOpacity="0.55"
         strokeWidth="1"
       />
       <rect
@@ -145,8 +175,8 @@ export function TarotCardBackIllustration({
         width="168"
         height="268"
         fill="none"
-        stroke="#F4F0EA"
-        strokeOpacity="0.16"
+        stroke="#38bdf8"
+        strokeOpacity="0.28"
         strokeWidth="0.75"
       />
       {/* Corner geometric rosettes */}
@@ -162,11 +192,11 @@ export function TarotCardBackIllustration({
             cy="0"
             r="5"
             fill="none"
-            stroke="#D4AF37"
-            strokeOpacity="0.55"
+            stroke="#f5d061"
+            strokeOpacity="0.65"
             strokeWidth="0.8"
           />
-          <circle cx="0" cy="0" r="1.5" fill="#D4AF37" fillOpacity="0.75" />
+          <circle cx="0" cy="0" r="1.5" fill="#f5d061" fillOpacity="0.85" />
         </g>
       ))}
       {/* Central astrolabe geometry */}
@@ -176,8 +206,8 @@ export function TarotCardBackIllustration({
           cy="0"
           r="64"
           fill="none"
-          stroke="#D4AF37"
-          strokeOpacity="0.35"
+          stroke="#a78bfa"
+          strokeOpacity="0.45"
           strokeWidth="0.8"
           strokeDasharray="2 2"
         />
@@ -186,8 +216,8 @@ export function TarotCardBackIllustration({
           cy="0"
           r="54"
           fill="none"
-          stroke="#D4AF37"
-          strokeOpacity="0.6"
+          stroke="#c4b5fd"
+          strokeOpacity="0.65"
           strokeWidth="1"
         />
         <circle
@@ -195,23 +225,23 @@ export function TarotCardBackIllustration({
           cy="0"
           r="36"
           fill="none"
-          stroke="#F4F0EA"
-          strokeOpacity="0.22"
+          stroke="#38bdf8"
+          strokeOpacity="0.35"
           strokeWidth="0.8"
         />
         {/* Sacred 8-pointed compass star */}
         <polygon
           points="0,-52 12,-12 52,0 12,12 0,52 -12,12 -52,0 -12,-12"
           fill="none"
-          stroke="#D4AF37"
-          strokeOpacity="0.65"
+          stroke="#f5d061"
+          strokeOpacity="0.75"
           strokeWidth="0.9"
         />
         <polygon
           points="0,-38 9,-9 38,0 9,9 0,38 -9,9 -38,0 -9,-9"
           fill="none"
-          stroke="#F4F0EA"
-          strokeOpacity="0.3"
+          stroke="#a78bfa"
+          strokeOpacity="0.45"
           strokeWidth="0.75"
           transform="rotate(45)"
         />
@@ -221,8 +251,8 @@ export function TarotCardBackIllustration({
           y1="-96"
           x2="0"
           y2="96"
-          stroke="#D4AF37"
-          strokeOpacity="0.25"
+          stroke="#a78bfa"
+          strokeOpacity="0.3"
           strokeWidth="0.75"
         />
         <line
@@ -230,11 +260,11 @@ export function TarotCardBackIllustration({
           y1="0"
           x2="68"
           y2="0"
-          stroke="#D4AF37"
-          strokeOpacity="0.25"
+          stroke="#a78bfa"
+          strokeOpacity="0.3"
           strokeWidth="0.75"
         />
-        <circle cx="0" cy="0" r="4" fill="#D4AF37" />
+        <circle cx="0" cy="0" r="4" fill="#f5d061" />
       </g>
     </svg>
   );

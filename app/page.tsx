@@ -76,7 +76,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_LD) }}
       />
 
-      <main className="relative isolate flex-1 overflow-hidden bg-background">
+      <main className="relative isolate flex-1 overflow-x-clip bg-background">
         <Starfield count={56} />
 
         {/* Unified 3-Zone Top Bar + Persistent Celestial Context Strip + Slide-Over Observatory Drawer */}
@@ -88,18 +88,21 @@ export default async function Home() {
         {/* Interactive Synastry & Solar Resonance Calculator */}
         <CompatibilityCalculator signs={signs} pairs={pairs} locale="ka" />
 
-        {/* Explore Almanac Directory: 1px Swiss-grid architectural ledger */}
+        {/* Explore Almanac Directory: Outlined cards inside recessed architectural frame */}
         <section className="relative z-10 mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-          <div className="relative overflow-hidden rounded-sm border border-border bg-card">
+          <div className="relative overflow-hidden rounded-2xl border border-border bg-[oklch(0.145_0.036_280)] shadow-md">
             <CornerCrosshair position="tl" />
             <CornerCrosshair position="tr" />
             <CornerCrosshair position="bl" />
             <CornerCrosshair position="br" />
 
-            <div className="flex flex-col justify-between gap-2 border-b border-border bg-background/50 px-5 py-6 sm:flex-row sm:items-end sm:px-8">
+            <div className="flex flex-col justify-between gap-2 border-b border-border bg-background/70 px-5 py-6 sm:flex-row sm:items-end sm:px-8">
               <div>
-                <div className="mb-2 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-primary">
-                  <span aria-hidden className="inline-block h-px w-5 bg-primary/70" />
+                <div className="mb-2 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--vivida-gold)]">
+                  <span
+                    aria-hidden
+                    className="inline-block h-px w-5 bg-[var(--vivida-gold)]/70"
+                  />
                   <span>ასტროლოგიური ალმანახი · ცნობარი</span>
                 </div>
                 <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
@@ -111,18 +114,78 @@ export default async function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-5">
               {[
-                { href: "/nataluri-ruka", label: "ნატალური რუკა", glyph: "☉", code: "01" },
-                { href: "/horoskopi", label: "დღის ჰოროსკოპი", glyph: "☽", code: "02" },
-                { href: "/zodiac/tavsebadoba", label: "თავსებადობა", glyph: "♀", code: "03" },
-                { href: "/taro", label: "ტაროს არკანები", glyph: "✦", code: "04" },
-                { href: "/sizmris-akhsna", label: "სიზმრის ახსნა", glyph: "♆", code: "05" },
-                { href: "/mtvaris-kalendari", label: "მთვარის კალენდარი", glyph: "◐", code: "06" },
-                { href: "/tests", label: "ფსიქოლოგიური ტესტები", glyph: "Ψ", code: "07" },
-                { href: "/numerologia", label: "ნუმეროლოგია", glyph: "∑", code: "08" },
-                { href: "/chinuri-horoskopi", label: "ჩინური ჰოროსკოპი", glyph: "辰", code: "09" },
-                { href: "/zodiac", label: "ზოდიაქოს ნიშნები", glyph: "♈", code: "10" },
+                {
+                  href: "/nataluri-ruka",
+                  label: "ნატალური რუკა",
+                  glyph: "☉",
+                  code: "01",
+                  accent: "text-[var(--vivida-gold)]",
+                },
+                {
+                  href: "/horoskopi",
+                  label: "დღის ჰოროსკოპი",
+                  glyph: "☽",
+                  code: "02",
+                  accent: "text-[var(--vivida-cyan)]",
+                },
+                {
+                  href: "/zodiac/tavsebadoba",
+                  label: "თავსებადობა",
+                  glyph: "♀",
+                  code: "03",
+                  accent: "text-[var(--vivida-pink)]",
+                },
+                {
+                  href: "/taro",
+                  label: "ტაროს არკანები",
+                  glyph: "✦",
+                  code: "04",
+                  accent: "text-primary",
+                },
+                {
+                  href: "/sizmris-akhsna",
+                  label: "სიზმრის ახსნა",
+                  glyph: "♆",
+                  code: "05",
+                  accent: "text-[var(--vivida-cyan)]",
+                },
+                {
+                  href: "/mtvaris-kalendari",
+                  label: "მთვარის კალენდარი",
+                  glyph: "◐",
+                  code: "06",
+                  accent: "text-[var(--vivida-gold)]",
+                },
+                {
+                  href: "/tests",
+                  label: "ფსიქოლოგიური ტესტები",
+                  glyph: "Ψ",
+                  code: "07",
+                  accent: "text-[var(--vivida-pink)]",
+                },
+                {
+                  href: "/numerologia",
+                  label: "ნუმეროლოგია",
+                  glyph: "∑",
+                  code: "08",
+                  accent: "text-primary",
+                },
+                {
+                  href: "/chinuri-horoskopi",
+                  label: "ჩინური ჰოროსკოპი",
+                  glyph: "辰",
+                  code: "09",
+                  accent: "text-[var(--vivida-gold)]",
+                },
+                {
+                  href: "/zodiac",
+                  label: "ზოდიაქოს ნიშნები",
+                  glyph: "♈",
+                  code: "10",
+                  accent: "text-[var(--vivida-cyan)]",
+                },
               ].map((item) => (
                 <TrackedPublicLink
                   key={item.href}
@@ -131,16 +194,16 @@ export default async function Home() {
                   target={item.href}
                   feature="home"
                   surface="explore_rail"
-                  className="group flex flex-col justify-between bg-card p-5 transition-colors hover:bg-secondary/40"
+                  className="group flex flex-col justify-between rounded-xl border border-border bg-card p-4 shadow-2xs transition-all hover:border-primary/45 hover:bg-secondary/50"
                 >
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span className="font-mono tabular-nums">{item.code}</span>
-                    <span className="font-mono text-base text-primary">
+                    <span className={`font-mono text-base ${item.accent}`}>
                       {item.glyph}
                     </span>
                   </div>
-                  <div className="mt-5 flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-foreground group-hover:text-primary">
+                  <div className="mt-4 flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold text-foreground group-hover:text-primary">
                       {item.label}
                     </span>
                     <span

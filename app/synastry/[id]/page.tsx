@@ -65,7 +65,7 @@ export default async function SynastryDetailPage({
     return (
       <main
         lang={locale}
-        className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
+        className="relative isolate flex flex-1 flex-col overflow-x-clip bg-background"
       >
         <AppHeader authed active="synastry" />
         <section className="mx-auto w-full max-w-xl p-8 text-center text-sm text-muted-foreground">
@@ -98,7 +98,7 @@ export default async function SynastryDetailPage({
     return (
       <main
         lang={locale}
-        className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
+        className="relative isolate flex flex-1 flex-col overflow-x-clip bg-background"
       >
         <Starfield count={48} />
         <AppHeader authed active="synastry" />
@@ -112,7 +112,7 @@ export default async function SynastryDetailPage({
           </Link>
 
           <header className="mb-6 border-b border-border pb-5">
-            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--vivida-pink)]">
               SYNASTRY SPECIMEN · LOCKED DOSSIER
             </div>
             <h1
@@ -124,7 +124,7 @@ export default async function SynastryDetailPage({
             >
               {viewerName ?? (en ? "You" : "შენ")}{" "}
               <span className="text-muted-foreground">×</span>{" "}
-              <span className="text-primary">{partner.name}</span>
+              <span className="text-[var(--vivida-pink)]">{partner.name}</span>
             </h1>
             <p className="mt-1.5 font-mono text-xs tabular-nums text-muted-foreground">
               {partner.dateOfBirth} · {partner.cityName}
@@ -155,7 +155,7 @@ export default async function SynastryDetailPage({
               />
             </>
           ) : (
-            <div className="rounded-sm border border-border bg-card p-6 text-sm text-muted-foreground">
+            <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground shadow-sm">
               {en
                 ? "The relationship owner needs to unlock this reading first."
                 : "ამ თავსებადობის შედეგი ჯერ ურთიერთობის მფლობელმა უნდა გახსნას."}
@@ -188,7 +188,7 @@ export default async function SynastryDetailPage({
   return (
     <main
       lang={locale}
-      className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
+      className="relative isolate flex flex-1 flex-col overflow-x-clip bg-background"
     >
       <Starfield count={48} />
 
@@ -204,7 +204,7 @@ export default async function SynastryDetailPage({
         </Link>
 
         <header className="mb-8 border-b border-border pb-6">
-          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--vivida-pink)]">
             RELATIONAL EPHEMERIS · SYNASTRY DOSSIER
           </div>
           <h1
@@ -216,7 +216,7 @@ export default async function SynastryDetailPage({
           >
             {viewerName ?? (en ? "You" : "შენ")}{" "}
             <span className="text-muted-foreground">×</span>{" "}
-            <span className="text-primary">{partner.name}</span>
+            <span className="text-[var(--vivida-pink)]">{partner.name}</span>
           </h1>
           <p className="mt-2 font-mono text-xs tabular-nums text-muted-foreground">
             {partner.dateOfBirth} · {partner.cityName}
@@ -244,14 +244,14 @@ export default async function SynastryDetailPage({
         )}
 
         {ai && (
-          <article className="relative mb-8 overflow-hidden rounded-sm border border-border bg-card">
+          <article className="relative mb-8 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             <CornerCrosshair position="tl" />
             <CornerCrosshair position="tr" />
             <CornerCrosshair position="bl" />
             <CornerCrosshair position="br" />
 
-            <div className="border-b border-border bg-background/50 px-5 py-3 sm:px-6">
-              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+            <div className="border-b border-border bg-background/70 px-5 py-3 sm:px-6">
+              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--vivida-pink)]">
                 <Sparkles className="size-3.5" aria-hidden />
                 <span>
                   {en
@@ -267,10 +267,10 @@ export default async function SynastryDetailPage({
               </p>
 
               {(ai.strengths.length > 0 || ai.growth.length > 0) && (
-                <div className="mt-6 grid gap-px overflow-hidden rounded-sm border border-border bg-border sm:grid-cols-2">
+                <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   {ai.strengths.length > 0 && (
-                    <div className="bg-background/50 p-4 sm:p-5">
-                      <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+                    <div className="rounded-lg border border-border bg-background/75 p-4 sm:p-5">
+                      <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
                         {en
                           ? "HARMONIC CONVERGENCE · STRENGTHS"
                           : "ჰარმონიული გადაკვეთა · რას გაერთიანებთ"}
@@ -280,7 +280,7 @@ export default async function SynastryDetailPage({
                           <li key={i} className="flex items-start gap-2.5">
                             <span
                               aria-hidden
-                              className="mt-1.5 inline-block size-1.5 shrink-0 bg-primary"
+                              className="mt-1.5 inline-block size-1.5 shrink-0 rounded-full bg-[var(--vivida-cyan)]"
                             />
                             <span>{s}</span>
                           </li>
@@ -289,8 +289,8 @@ export default async function SynastryDetailPage({
                     </div>
                   )}
                   {ai.growth.length > 0 && (
-                    <div className="bg-background/50 p-4 sm:p-5">
-                      <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    <div className="rounded-lg border border-border bg-background/75 p-4 sm:p-5">
+                      <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
                         {en
                           ? "DYNAMIC TENSION · GROWTH POINTS"
                           : "დინამიკური კვანძი · სად არის ხახუნი"}
@@ -300,7 +300,7 @@ export default async function SynastryDetailPage({
                           <li key={i} className="flex items-start gap-2.5">
                             <span
                               aria-hidden
-                              className="mt-1.5 inline-block size-1.5 shrink-0 bg-muted-foreground"
+                              className="mt-1.5 inline-block size-1.5 shrink-0 rounded-full bg-[var(--vivida-gold)]"
                             />
                             <span>{g}</span>
                           </li>

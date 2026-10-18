@@ -37,16 +37,46 @@ import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
-const THEME: Record<string, { Icon: LucideIcon }> = {
-  iq: { Icon: Brain },
-  eq: { Icon: HeartHandshake },
-  "self-esteem": { Icon: Heart },
-  "big-five": { Icon: Layers },
-  "astro-mbti": { Icon: Fingerprint },
-  "true-sign": { Icon: Sparkles },
-  "famous-zodiac": { Icon: Sparkles },
+const THEME: Record<string, { Icon: LucideIcon; color: string }> = {
+  iq: {
+    Icon: Brain,
+    color:
+      "text-[var(--vivida-cyan)] border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/12",
+  },
+  eq: {
+    Icon: HeartHandshake,
+    color:
+      "text-[var(--vivida-gold)] border-[var(--vivida-gold)]/35 bg-[var(--vivida-gold)]/12",
+  },
+  "self-esteem": {
+    Icon: Heart,
+    color:
+      "text-[var(--vivida-pink)] border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/12",
+  },
+  "big-five": {
+    Icon: Layers,
+    color: "text-primary border-primary/35 bg-primary/12",
+  },
+  "astro-mbti": {
+    Icon: Fingerprint,
+    color:
+      "text-[var(--vivida-pink)] border-[var(--vivida-pink)]/35 bg-[var(--vivida-pink)]/12",
+  },
+  "true-sign": {
+    Icon: Sparkles,
+    color:
+      "text-[var(--vivida-gold)] border-[var(--vivida-gold)]/35 bg-[var(--vivida-gold)]/12",
+  },
+  "famous-zodiac": {
+    Icon: Sparkles,
+    color:
+      "text-[var(--vivida-cyan)] border-[var(--vivida-cyan)]/35 bg-[var(--vivida-cyan)]/12",
+  },
 };
-const FALLBACK_THEME = { Icon: Brain };
+const FALLBACK_THEME = {
+  Icon: Brain,
+  color: "text-primary border-primary/35 bg-primary/12",
+};
 
 const TITLE = "ტესტები და ქვიზები ქართულად, IQ, პიროვნების ტესტი და ზოდიაქო";
 const DESCRIPTION =
@@ -84,7 +114,11 @@ export const metadata: Metadata = {
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 const FAQ = [
@@ -141,7 +175,7 @@ export default async function TestsPage() {
     if (bigFive) {
       const scores = bigFive.traitScores as Record<string, number>;
       const topKey = Object.keys(scores).reduce((a, b) =>
-        scores[b] > scores[a] ? b : a
+        scores[b] > scores[a] ? b : a,
       ) as BigFiveTraitKey;
       myResults["big-five"] = {
         href: `/big-five/shedegi/${bigFive.id}`,
@@ -170,7 +204,7 @@ export default async function TestsPage() {
   ];
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background">
+    <main className="relative isolate flex min-h-screen flex-col overflow-x-clip bg-background">
       <Starfield count={48} />
       <script
         type="application/ld+json"
@@ -181,7 +215,7 @@ export default async function TestsPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
         <header className="mb-10 border-b border-border pb-8">
-          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
             PSYCHOMETRICS & ARCHETYPES · ტესტები და ქვიზები
           </div>
           <h1 className="mt-2 max-w-2xl text-balance text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl">
@@ -197,7 +231,7 @@ export default async function TestsPage() {
         <section aria-labelledby="featured-tests">
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
-              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
                 01 · დაიწყე აქ
               </div>
               <h2
@@ -211,7 +245,7 @@ export default async function TestsPage() {
               ღრმა შედეგი და პერსონალური ანალიზი
             </p>
           </div>
-          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {TESTS.filter((test) => test.kind === "featured").map((test) => (
               <TestCard
                 key={test.slug}
@@ -224,7 +258,7 @@ export default async function TestsPage() {
 
         <section className="mt-12" aria-labelledby="quick-quizzes">
           <div className="mb-4">
-            <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
               02 · მსუბუქი და სწრაფი
             </div>
             <h2
@@ -237,7 +271,7 @@ export default async function TestsPage() {
               რამდენიმე წუთი, 20 კითხვა და შედეგი მყისიერად.
             </p>
           </div>
-          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {TESTS.filter((test) => test.kind === "quiz").map((test) => (
               <TestCard
                 key={test.slug}
@@ -249,13 +283,14 @@ export default async function TestsPage() {
         </section>
 
         {/* Browse the 16 types (internal linking + SEO cluster) */}
-        <div className="mt-8 flex flex-col justify-between gap-4 rounded-md border border-border bg-card p-6 sm:flex-row sm:items-center">
+        <div className="mt-8 flex flex-col justify-between gap-4 rounded-xl border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center">
           <div>
             <h2 className="text-base font-semibold tracking-tight text-foreground">
               16 პიროვნების ტიპი
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              დაათვალიერე ყველა ტიპის სრული აღწერა ქართულად, ტესტის გავლის გარეშეც.
+              დაათვალიერე ყველა ტიპის სრული აღწერა ქართულად, ტესტის გავლის
+              გარეშეც.
             </p>
           </div>
           <Link
@@ -271,16 +306,19 @@ export default async function TestsPage() {
           <h2 className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             03 · ხშირად დასმული კითხვები
           </h2>
-          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
+          <div className="space-y-3">
             {FAQ.map((item) => (
-              <details key={item.q} className="group">
+              <details
+                key={item.q}
+                className="group overflow-hidden rounded-xl border border-border bg-card shadow-2xs open:border-primary/45"
+              >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-sm font-medium text-foreground transition-colors hover:bg-secondary/40 [&::-webkit-details-marker]:hidden">
                   {item.q}
                   <span className="font-mono text-muted-foreground transition-transform group-open:rotate-45">
                     +
                   </span>
                 </summary>
-                <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
+                <p className="border-t border-border/70 bg-background/55 px-5 py-4 text-[15px] leading-relaxed text-foreground/85">
                   {item.a}
                 </p>
               </details>
@@ -301,12 +339,14 @@ function TestCard({
   test: TestCatalogEntry;
   done?: { href: string; value: string; sub: string };
 }) {
-  const { Icon } = THEME[test.slug] ?? FALLBACK_THEME;
+  const { Icon, color } = THEME[test.slug] ?? FALLBACK_THEME;
   return (
-    <article className="flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary/30 sm:p-7">
+    <article className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/45 hover:bg-secondary/40 sm:p-7">
       <div>
         <div className="mb-4 flex items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+          <span
+            className={`grid size-10 shrink-0 place-items-center rounded-lg border ${color}`}
+          >
             <Icon className="size-4.5" />
           </span>
           <div className="min-w-0">
@@ -319,7 +359,7 @@ function TestCard({
           </div>
         </div>
         {done ? (
-          <div className="flex items-center justify-between gap-3 rounded-sm border border-primary/30 bg-primary/8 px-4 py-3.5">
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-primary/35 bg-primary/10 px-4 py-3.5">
             <div className="min-w-0">
               <div className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
                 შენი შედეგი
@@ -328,7 +368,7 @@ function TestCard({
                 {done.value}
               </div>
             </div>
-            <div className="shrink-0 text-right text-xs text-foreground/75">
+            <div className="shrink-0 text-right text-xs text-foreground/80">
               {done.sub}
             </div>
           </div>

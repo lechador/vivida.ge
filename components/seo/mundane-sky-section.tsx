@@ -25,8 +25,8 @@ export function MundaneSkySection({
   };
 
   return (
-    <section className="mt-12 rounded-md border border-border bg-card">
-      <div className="flex flex-col justify-between gap-2 border-b border-border px-5 py-4 sm:flex-row sm:items-end sm:px-6">
+    <section className="mt-12 rounded-xl border border-border bg-[oklch(0.145_0.036_280)] shadow-sm">
+      <div className="flex flex-col justify-between gap-2 border-b border-border bg-card px-5 py-4 sm:flex-row sm:items-end sm:px-6">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
             EPHEMERIS TELEMETRY
@@ -47,20 +47,17 @@ export function MundaneSkySection({
       </div>
 
       {/* Calibrated Planet-in-Sign Telemetry Grid */}
-      <ul className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3 lg:grid-cols-5">
+      <ul className="grid grid-cols-2 gap-2.5 p-4 sm:grid-cols-3 lg:grid-cols-5">
         {sky.planets.map((p) => (
           <li
             key={p.key}
-            className="flex flex-col justify-between bg-card px-4 py-3"
+            className="flex flex-col justify-between rounded-lg border border-border bg-card px-4 py-3 shadow-2xs"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-medium text-foreground">
                 {p.labelKa}
               </span>
-              <span
-                aria-hidden
-                className="font-mono text-sm text-primary"
-              >
+              <span aria-hidden className="font-mono text-sm text-primary">
                 {p.symbol}
               </span>
             </div>
@@ -76,19 +73,19 @@ export function MundaneSkySection({
 
       {/* Day's tightest aspects */}
       {sky.aspects.length > 0 && (
-        <div className="border-t border-border px-5 py-4 sm:px-6">
+        <div className="border-t border-border bg-card/60 px-5 py-4 sm:px-6">
           <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             დღის მთავარი ასპექტები
           </h3>
-          <ul className="mt-3 grid gap-px overflow-hidden rounded-sm border border-border bg-border sm:grid-cols-2">
+          <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
             {sky.aspects.map((a, i) => (
               <li
                 key={i}
-                className="flex items-center gap-2.5 bg-background/60 px-3.5 py-2.5 text-xs sm:text-sm"
+                className="flex items-center gap-2.5 rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs shadow-2xs sm:text-sm"
               >
                 <span
                   aria-hidden
-                  className="size-1.5 shrink-0 rounded-none"
+                  className="size-2 shrink-0 rounded-full"
                   style={{ background: FAMILY_TONE[a.family] }}
                 />
                 <span className="min-w-0 truncate text-foreground/90">

@@ -40,17 +40,17 @@ const FAMILY_META: Record<
   { color: string; labelKa: string; labelEn: string }
 > = {
   harmonic: {
-    color: "oklch(0.80 0.12 80)",
+    color: "var(--vivida-cyan)",
     labelKa: "ჰარმონიული",
     labelEn: "Harmonious",
   },
   tense: {
-    color: "oklch(0.68 0.12 35)",
+    color: "var(--vivida-pink)",
     labelKa: "დაძაბული",
     labelEn: "Dynamic",
   },
   neutral: {
-    color: "oklch(0.76 0.06 235)",
+    color: "var(--vivida-gold)",
     labelKa: "შერწყმული",
     labelEn: "Concentrated",
   },
@@ -148,7 +148,9 @@ export function AspectCards({
           })}
         </div>
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "SORTED BY TIGHTEST ORB (0.0° →)" : "დალაგებულია უმცირესი ორბით"}
+          {en
+            ? "SORTED BY TIGHTEST ORB (0.0° →)"
+            : "დალაგებულია უმცირესი ორბით"}
         </span>
       </div>
 
@@ -166,7 +168,7 @@ export function AspectCards({
               {en ? meta.labelEn : meta.labelKa}
               <span className="text-muted-foreground">· {items.length}</span>
             </div>
-            <div className="divide-y divide-border overflow-hidden rounded-sm border border-border bg-card">
+            <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-sm">
               {items.map((a) => {
                 const k = aspectKey(a.a, a.b, a.kind);
                 const text = interpretations?.[k];

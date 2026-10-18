@@ -94,7 +94,9 @@ export function DailyDashboard({
         <header className="mb-3 flex items-baseline justify-between">
           <div className="flex items-center gap-2.5 text-xs font-medium uppercase tracking-[0.2em] text-primary">
             <span aria-hidden className="inline-block h-px w-6 bg-primary/70" />
-            <span>{en ? "Primary Natal Axis (Big Three)" : "შენი დიდი სამეული"}</span>
+            <span>
+              {en ? "Primary Natal Axis (Big Three)" : "შენი დიდი სამეული"}
+            </span>
           </div>
           <Link
             href="/report"
@@ -118,7 +120,7 @@ export function DailyDashboard({
       />
 
       {/* Complete Natal Chart Callout */}
-      <section className="rounded-md border border-border bg-card p-6 sm:p-7">
+      <section className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-7">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
@@ -196,7 +198,7 @@ function DashboardExtrasSection({
   const dailySlot = loading ? (
     <HoroscopeLoading locale={locale} />
   ) : extras.daily ? null : canDaily ? (
-    <div className="rounded-md border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+    <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground shadow-sm">
       {en
         ? "Today's horoscope is being prepared. Try again shortly."
         : "დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში."}
@@ -227,7 +229,7 @@ function DashboardExtrasSection({
             <div className="min-w-0 xl:col-span-8">{dailySlot}</div>
           ) : null}
           {moonSlot && (
-            <div className="min-w-0 xl:col-span-4 xl:sticky xl:top-20">
+            <div className="min-w-0 xl:col-span-4 xl:sticky xl:top-28">
               {moonSlot}
             </div>
           )}
@@ -271,7 +273,7 @@ function DashboardExtrasSection({
 function CardSkeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`vivida-pulse-soft rounded-md border border-border bg-card ${className}`}
+      className={`vivida-pulse-soft rounded-xl border border-border bg-card ${className}`}
       aria-hidden
     />
   );

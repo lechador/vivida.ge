@@ -42,15 +42,15 @@ export function DashboardArticleRecommendations({
         </Link>
       </header>
 
-      <div className="grid gap-px border border-border bg-border sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         {articles.map((article) => (
           <Link
             key={article.id}
             href={articlePath(locale, article.slug)}
-            className="group flex min-h-24 overflow-hidden bg-card transition-colors hover:bg-secondary/60"
+            className="group flex min-h-24 overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:border-primary/45 hover:bg-secondary/50"
             aria-label={article.title}
           >
-            <span className="relative w-24 shrink-0 overflow-hidden border-r border-border/70 bg-muted">
+            <span className="relative w-24 shrink-0 overflow-hidden border-r border-border bg-muted">
               <Image
                 src={article.imageUrl}
                 alt={article.imageAlt}
@@ -63,14 +63,14 @@ export function DashboardArticleRecommendations({
             </span>
 
             <span className="flex min-w-0 flex-1 flex-col justify-center p-3.5">
-              <span className="mb-1 text-[10px] font-medium uppercase tracking-[0.14em] text-primary">
+              <span className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--vivida-cyan)]">
                 {
                   ARTICLE_CATEGORY_LABELS[locale][
                     article.category as ArticleCategory
                   ]
                 }
               </span>
-              <span className="line-clamp-3 text-sm font-semibold leading-snug tracking-tight text-foreground">
+              <span className="line-clamp-3 text-sm font-semibold leading-snug tracking-tight text-foreground group-hover:text-primary">
                 {article.title}
               </span>
             </span>

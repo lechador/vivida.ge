@@ -26,11 +26,11 @@ const PUBLIC_ALMANAC_LINKS_KA = [
 ];
 
 const PUBLIC_ALMANAC_LINKS_EN = [
-  { href: "/horoskopi", label: "Daily Horoscope", code: "01" },
+  { href: "/daily-horoscope", label: "Daily Horoscope", code: "01" },
   { href: "/natal-chart", label: "Natal Chart Calculator", code: "02" },
-  { href: "/taro", label: "Three-Card Tarot Studio", code: "03" },
-  { href: "/mtvaris-kalendari", label: "Lunar Ephemeris Calendar", code: "04" },
-  { href: "/numerologia", label: "Numerology & Life Path", code: "05" },
+  { href: "/tarot", label: "Three-Card Tarot Studio", code: "03" },
+  { href: "/moon-calendar", label: "Lunar Ephemeris Calendar", code: "04" },
+  { href: "/numerology", label: "Numerology & Life Path", code: "05" },
   { href: "/compatibility", label: "Synastry & Compatibility", code: "06" },
   { href: "/tests", label: "Psychometric Assessments", code: "07" },
   { href: "/articles", label: "Editorial Archive", code: "08" },
@@ -67,12 +67,11 @@ export function ObservatoryDrawer({
         <button
           type="button"
           aria-expanded={open}
-          className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-sm border border-border bg-card px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+          className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-secondary/70 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground shadow-2xs transition-colors hover:border-primary/60 hover:bg-secondary hover:text-primary"
         >
           <Compass className="size-3.5 text-primary" />
           <span>
-            {triggerLabel ??
-              (en ? "All Instruments" : "ყველა ინსტრუმენტი")}
+            {triggerLabel ?? (en ? "All Instruments" : "ყველა ინსტრუმენტი")}
           </span>
         </button>
       </DialogPrimitive.Trigger>
@@ -96,10 +95,10 @@ export function ObservatoryDrawer({
                 animate={{ x: 0 }}
                 exit={{ x: "100%" }}
                 transition={{ type: "spring", stiffness: 360, damping: 36 }}
-                className="fixed inset-y-0 right-0 z-50 flex w-[min(24rem,92vw)] flex-col border-l border-border bg-card"
+                className="fixed inset-y-0 right-0 z-50 flex w-[min(24rem,92vw)] flex-col border-l border-border bg-card shadow-2xl"
               >
                 {/* Top Architectural Header */}
-                <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-5">
+                <div className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/60 px-5">
                   <Link
                     href={authed ? "/dashboard" : "/"}
                     onClick={() => setOpen(false)}
@@ -115,7 +114,7 @@ export function ObservatoryDrawer({
                   </Link>
                   <DialogPrimitive.Close
                     aria-label={en ? "Close drawer" : "დახურვა"}
-                    className="grid size-8 place-items-center rounded-sm border border-border bg-background/60 text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
+                    className="grid size-8 place-items-center rounded-md border border-border bg-secondary/50 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
                   >
                     <X className="size-4" />
                   </DialogPrimitive.Close>
@@ -131,11 +130,13 @@ export function ObservatoryDrawer({
                     <div className="mb-6">
                       <div className="mb-2.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
                         <span>
-                          {en ? "01 · Personal Workspace" : "01 · პირადი სივრცე"}
+                          {en
+                            ? "01 · Personal Workspace"
+                            : "01 · პირადი სივრცე"}
                         </span>
                         <span>{items.length}</span>
                       </div>
-                      <div className="divide-y divide-border border border-border bg-background/40">
+                      <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/70">
                         {items.map((item, idx) => {
                           const isActive = item.key === active;
                           const Icon = item.Icon;
@@ -158,7 +159,8 @@ export function ObservatoryDrawer({
                               {isActive && (
                                 <span
                                   aria-hidden
-                                  className="absolute inset-y-0 left-0 w-0.5 bg-primary"
+                                  className="absolute inset-y-0 left-0 w-1"
+                                  style={{ backgroundColor: item.hue }}
                                 />
                               )}
                               <div className="flex min-w-0 items-center gap-3">
@@ -166,12 +168,8 @@ export function ObservatoryDrawer({
                                   {String(idx + 1).padStart(2, "0")}
                                 </span>
                                 <span
-                                  className={cn(
-                                    "relative grid size-5 shrink-0 place-items-center",
-                                    isActive
-                                      ? "text-primary"
-                                      : "text-muted-foreground group-hover:text-foreground",
-                                  )}
+                                  className="relative grid size-5 shrink-0 place-items-center"
+                                  style={{ color: item.hue }}
                                 >
                                   <Icon className="size-4" />
                                   {item.key === "messages" && (
@@ -201,7 +199,7 @@ export function ObservatoryDrawer({
 
                   {/* Section 2: Public Astronomical Almanac & Ephemeris Directory */}
                   <div>
-                    <div className="mb-2.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+                    <div className="mb-2.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
                       <span>
                         {en
                           ? `${authed ? "02" : "01"} · Celestial Almanac`
@@ -209,7 +207,7 @@ export function ObservatoryDrawer({
                       </span>
                       <span>{almanacLinks.length}</span>
                     </div>
-                    <div className="divide-y divide-border border border-border bg-background/40">
+                    <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/70">
                       {almanacLinks.map((link) => (
                         <Link
                           key={link.href}
@@ -218,14 +216,14 @@ export function ObservatoryDrawer({
                           className="group flex items-center justify-between px-3.5 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary/50 hover:text-foreground"
                         >
                           <div className="flex min-w-0 items-center gap-3">
-                            <span className="font-mono text-[11px] tabular-nums text-primary/80">
+                            <span className="font-mono text-[11px] tabular-nums text-[var(--vivida-cyan)]">
                               {link.code}
                             </span>
                             <span className="truncate font-medium text-foreground/90">
                               {link.label}
                             </span>
                           </div>
-                          <ArrowUpRight className="size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary" />
+                          <ArrowUpRight className="size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--vivida-cyan)]" />
                         </Link>
                       ))}
                     </div>

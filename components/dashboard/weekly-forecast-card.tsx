@@ -60,10 +60,10 @@ export function WeeklyForecastCard({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <article className="rounded-md border border-border bg-card p-6 sm:p-7">
-      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-border/80 pb-4">
+    <article className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-7">
+      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-border pb-4">
         <div>
-          <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
+          <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
             {en ? "7-Day Ephemeris Forecast" : "შემდეგი 7 დღის ეფემერიდა"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight text-foreground sm:text-xl">
@@ -75,7 +75,7 @@ export function WeeklyForecastCard({
         </span>
       </header>
 
-      <ol className="divide-y divide-border border border-border bg-card">
+      <ol className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/60">
         {days.map((day, i) => (
           <DayRow
             key={day.dateIso}
@@ -133,13 +133,13 @@ export function DayRow({
 
   const stripeClass =
     tilt === "harmonic"
-      ? "bg-primary"
+      ? "bg-[var(--vivida-cyan)]"
       : tilt === "challenging"
         ? "bg-[var(--vivida-pink)]"
-        : "bg-accent";
+        : "bg-primary";
 
   return (
-    <li className="bg-card">
+    <li className="bg-transparent">
       <button
         type="button"
         onClick={onToggle}
@@ -156,7 +156,7 @@ export function DayRow({
         />
         <div className="flex items-start gap-4">
           {/* Date tile */}
-          <div className="flex w-12 shrink-0 flex-col items-center justify-center rounded-sm border border-border bg-secondary/40 py-1.5 font-mono tabular-nums">
+          <div className="flex w-12 shrink-0 flex-col items-center justify-center rounded-md border border-border bg-card py-1.5 font-mono tabular-nums">
             <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               {weekShort}
             </span>
@@ -180,7 +180,10 @@ export function DayRow({
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 <span className="hidden font-mono text-xs tabular-nums text-muted-foreground sm:inline">
-                  <span className="text-primary">+{day.harmonyScore}</span> /{" "}
+                  <span className="text-[var(--vivida-cyan)]">
+                    +{day.harmonyScore}
+                  </span>{" "}
+                  /{" "}
                   <span className="text-[var(--vivida-pink)]">
                     −{day.challengeScore}
                   </span>
@@ -197,8 +200,8 @@ export function DayRow({
 
             {/* Calibrated harmony / challenge bar */}
             <div
-              className="relative mt-2.5 h-1.5 overflow-hidden bg-border"
-              style={{ opacity: 0.6 + intensity * 0.4 }}
+              className="relative mt-2.5 h-1.5 overflow-hidden rounded-full bg-border"
+              style={{ opacity: 0.65 + intensity * 0.35 }}
               role="img"
               aria-label={
                 en
@@ -207,7 +210,7 @@ export function DayRow({
               }
             >
               <div
-                className="absolute inset-y-0 left-0 bg-primary"
+                className="absolute inset-y-0 left-0 bg-[var(--vivida-cyan)]"
                 style={{ width: `${harmonicPct}%` }}
               />
               <div
@@ -224,11 +227,11 @@ export function DayRow({
 
       {/* Expanded breakdown */}
       {open && (
-        <div className="space-y-3 border-t border-border/70 bg-secondary/20 p-4 pl-5">
-          <div className="grid gap-px border border-border bg-border sm:grid-cols-2">
+        <div className="space-y-3 border-t border-border bg-secondary/20 p-4 pl-5">
+          <div className="grid gap-3 sm:grid-cols-2">
             <Block
               label={en ? "Supportive" : "ჰარმონიული"}
-              toneClass="text-primary"
+              toneClass="text-[var(--vivida-cyan)]"
               text={day.harmonicReason || "—"}
             />
             <Block
@@ -238,7 +241,7 @@ export function DayRow({
             />
           </div>
           {day.advice && (
-            <div className="rounded-sm border border-border bg-card px-3.5 py-2.5 text-sm leading-relaxed text-foreground/90">
+            <div className="rounded-lg border border-border bg-card px-3.5 py-2.5 text-sm leading-relaxed text-foreground/90">
               <span className="mr-1.5 font-mono text-primary">→</span>
               {day.advice}
             </div>
@@ -287,7 +290,7 @@ function Block({
   toneClass: string;
 }) {
   return (
-    <div className="bg-card p-3.5">
+    <div className="rounded-lg border border-border bg-card p-3.5">
       <div
         className={cn(
           "mb-1 text-[10px] font-semibold uppercase tracking-[0.18em]",

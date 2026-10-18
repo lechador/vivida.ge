@@ -48,7 +48,7 @@ export function DashboardTestPromo({
   const accent = ACCENTS[test.slug] ?? "var(--vivida-violet)";
 
   return (
-    <aside className="mt-7 overflow-hidden rounded-2xl border border-border bg-card/50 ring-1 ring-foreground/5 backdrop-blur-xl">
+    <aside className="mt-7 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
       <Link
         href={test.href}
         onClick={() =>
@@ -58,7 +58,7 @@ export function DashboardTestPromo({
             product: "test",
           })
         }
-        className="group flex items-center gap-4 p-4 transition-colors hover:bg-card/75 sm:p-5"
+        className="group flex items-center gap-4 p-4 transition-colors hover:bg-secondary/50 sm:p-5"
       >
         <span
           className="grid size-11 shrink-0 place-items-center rounded-2xl"

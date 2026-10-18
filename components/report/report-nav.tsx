@@ -33,16 +33,26 @@ type Section = {
 
 const SECTIONS: Section[] = [
   { id: "wheel", label: "რუკა", labelEn: "Chart", Icon: Compass },
-  { id: "positions", label: "პოზიციები", labelEn: "Positions", Icon: LayoutList },
-  { id: "big-three", label: "დიდი სამეული", labelEn: "Big three", Icon: Sparkles },
+  {
+    id: "positions",
+    label: "პოზიციები",
+    labelEn: "Positions",
+    Icon: LayoutList,
+  },
+  {
+    id: "big-three",
+    label: "დიდი სამეული",
+    labelEn: "Big three",
+    Icon: Sparkles,
+  },
   { id: "elements", label: "ელემენტები", labelEn: "Elements", Icon: Flame },
   { id: "planets", label: "პლანეტები", labelEn: "Planets", Icon: Globe2 },
   { id: "houses", label: "სახლები", labelEn: "Houses", Icon: Home },
   { id: "aspects", label: "ასპექტები", labelEn: "Aspects", Icon: Triangle },
 ];
 
-const SCROLL_OFFSET_DESKTOP = 96;
-const SCROLL_OFFSET_MOBILE = 72;
+const SCROLL_OFFSET_DESKTOP = 156;
+const SCROLL_OFFSET_MOBILE = 140;
 
 export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
   const [active, setActive] = useState<SectionId>("wheel");
@@ -65,7 +75,7 @@ export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
       {
         rootMargin: "-25% 0px -65% 0px",
         threshold: 0,
-      }
+      },
     );
     SECTIONS.forEach(({ id }) => {
       const el = document.getElementById(id);
@@ -106,7 +116,7 @@ export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
   return (
     <nav
       aria-label={locale !== "ka" ? "Chart navigation" : "რუკის ნავიგაცია"}
-      className="sticky top-0 z-30 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur-md sm:-mx-6 sm:px-6"
+      className="sticky top-24 z-20 -mx-4 border-b border-border bg-[oklch(0.14_0.035_280/0.95)] px-4 backdrop-blur-md sm:-mx-6 sm:px-6"
     >
       <div className="relative mx-auto max-w-6xl">
         <div
@@ -130,13 +140,11 @@ export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
                   "group relative inline-flex shrink-0 items-center gap-2 border-b-2 px-3.5 py-3 text-xs font-medium transition-colors",
                   isActive
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
                 <Icon className="size-3.5" />
-                <span>
-                  {locale !== "ka" ? section.labelEn : section.label}
-                </span>
+                <span>{locale !== "ka" ? section.labelEn : section.label}</span>
               </a>
             );
           })}

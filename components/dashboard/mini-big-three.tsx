@@ -26,6 +26,7 @@ export function MiniBigThree({
     label: string;
     role: string;
     glyph: string;
+    accentColor: string;
     point: PointJson;
   }[] = [
     {
@@ -33,6 +34,7 @@ export function MiniBigThree({
       label: en ? "Sun" : "მზე",
       role: en ? "Core identity" : "არსი",
       glyph: "☉",
+      accentColor: "var(--vivida-gold)",
       point: sun,
     },
     {
@@ -40,6 +42,7 @@ export function MiniBigThree({
       label: en ? "Moon" : "მთვარე",
       role: en ? "Inner world" : "შინაგანი",
       glyph: "☽",
+      accentColor: "var(--vivida-cyan)",
       point: moon,
     },
     {
@@ -47,21 +50,24 @@ export function MiniBigThree({
       label: en ? "Ascendant" : "ამომავალი",
       role: en ? "First impression" : "გარეგანი",
       glyph: "↑",
+      accentColor: "var(--primary)",
       point: asc,
     },
   ];
 
   return (
-    <div className="relative overflow-hidden rounded-sm border border-border bg-card">
+    <div className="relative overflow-hidden rounded-xl border border-border bg-[oklch(0.145_0.036_280)] shadow-sm">
       <CornerCrosshair position="tl" />
       <CornerCrosshair position="tr" />
       <CornerCrosshair position="bl" />
       <CornerCrosshair position="br" />
 
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/50 px-4 py-2.5 sm:px-5">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/70 px-4 py-2.5 sm:px-5">
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
           <span className="inline-block size-1.5 rounded-full bg-primary" />
-          {en ? "PRIMARY NATAL AXIS · BIG THREE" : "ნატალური ღერძი · დიდი სამეული"}
+          {en
+            ? "PRIMARY NATAL AXIS · BIG THREE"
+            : "ნატალური ღერძი · დიდი სამეული"}
         </div>
         <Link
           href="/report"
@@ -72,8 +78,8 @@ export function MiniBigThree({
         </Link>
       </div>
 
-      <div className="grid gap-px bg-border sm:grid-cols-3">
-        {items.map(({ code, label, role, glyph, point }) => {
+      <div className="grid gap-3 p-3 sm:grid-cols-3 sm:p-4">
+        {items.map(({ code, label, role, glyph, accentColor, point }) => {
           const sign = signByIndex(point.signIndex);
           const color = signColor(sign);
           const signLabel = en ? sign.labelEn : sign.labelKa;
@@ -81,23 +87,26 @@ export function MiniBigThree({
             <Link
               key={label}
               href="/report#big-three"
-              className="group relative flex flex-col justify-between bg-card px-4 py-4 transition-colors hover:bg-secondary/35 sm:px-5"
+              className="group relative flex flex-col justify-between rounded-lg border border-border bg-card px-4 py-4 shadow-2xs transition-all hover:border-primary/60 hover:bg-secondary/55 sm:px-5"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                <span
+                  className="font-mono text-[10px] font-medium uppercase tracking-[0.16em]"
+                  style={{ color: accentColor }}
+                >
                   {code} · {label}
                 </span>
-                <span className="font-mono text-[10px] text-muted-foreground/80">
+                <span className="font-mono text-[10px] text-muted-foreground">
                   {role}
                 </span>
               </div>
 
-              <div className="mt-2.5 flex items-baseline justify-between gap-2">
-                <div className="flex items-baseline gap-2 min-w-0">
+              <div className="mt-3 flex items-baseline justify-between gap-2">
+                <div className="flex min-w-0 items-baseline gap-2.5">
                   <span
                     aria-hidden
                     style={{ color }}
-                    className="text-lg leading-none"
+                    className="text-xl leading-none"
                   >
                     {glyph}
                   </span>
@@ -105,7 +114,7 @@ export function MiniBigThree({
                     {signLabel}
                   </span>
                 </div>
-                <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+                <span className="shrink-0 rounded-sm border border-border/80 bg-background/60 px-1.5 py-0.5 font-mono text-xs tabular-nums text-muted-foreground">
                   {formatDegree(point.signDegree)}
                 </span>
               </div>

@@ -92,7 +92,7 @@ export function MarketingHeader({
       </div>
 
       {/* Row 2: Persistent Celestial Context Strip + Slide-Over Almanac Drawer */}
-      <div className="border-t border-border/70 bg-card/75">
+      <div className="border-t border-border bg-[oklch(0.15_0.038_280)]">
         <div className="mx-auto flex h-9 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
             <span className="uppercase tracking-[0.16em] text-primary">
@@ -111,7 +111,7 @@ export function MarketingHeader({
                 <span aria-hidden className="hidden sm:inline">
                   ·
                 </span>
-                <span className="hidden text-primary sm:inline">
+                <span className="hidden text-[var(--vivida-gold)] sm:inline">
                   {moonSnapshot.signSymbol} {moonSnapshot.signKa}
                 </span>
                 <span aria-hidden className="hidden sm:inline">

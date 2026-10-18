@@ -9,7 +9,7 @@ import { GEORGIAN_SITE_URL, englishSiteHref } from "@/lib/seo/locales";
 import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
 
 const NAV_ITEMS = [
-  { path: "/horoskopi", label: "Daily Horoscope" },
+  { path: "/horoscope", label: "Daily Horoscope" },
   { path: "/natal-chart", label: "Natal Chart" },
   { path: "/zodiac", label: "Zodiac Signs" },
   { path: "/compatibility", label: "Compatibility" },
@@ -63,19 +63,19 @@ export async function EnglishHeader({
         {/* Zone 3: Primary CTA */}
         <div className="flex shrink-0 items-center gap-3">
           <Link
-            href={href("/login")}
+            href="/login"
             className="hidden whitespace-nowrap text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
           >
             Sign in
           </Link>
           <Button asChild size="sm" className="shrink-0 whitespace-nowrap">
-            <Link href={href("/signup")}>Create chart</Link>
+            <Link href="/signup">Create chart</Link>
           </Button>
         </div>
       </div>
 
       {/* Row 2: Persistent Celestial Context Strip + Slide-Over Drawer */}
-      <div className="border-t border-border/70 bg-card/75">
+      <div className="border-t border-border bg-[oklch(0.15_0.038_280)]">
         <div className="mx-auto flex h-9 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
             <span className="uppercase tracking-[0.16em] text-primary">
@@ -83,7 +83,7 @@ export async function EnglishHeader({
             </span>
             {moonSnapshot && (
               <Link
-                href={href("/mtvaris-kalendari")}
+                href={href("/moon-calendar")}
                 className="inline-flex items-center gap-2 truncate border-l border-border pl-3 transition-colors hover:text-foreground"
               >
                 <LunarPhaseDisc
@@ -96,7 +96,7 @@ export async function EnglishHeader({
                 <span aria-hidden className="hidden sm:inline">
                   ·
                 </span>
-                <span className="hidden text-primary sm:inline">
+                <span className="hidden text-[var(--vivida-gold)] sm:inline">
                   {moonSnapshot.signSymbol} {moonSnapshot.signEn}
                 </span>
                 <span aria-hidden className="hidden sm:inline">

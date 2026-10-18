@@ -13,10 +13,10 @@ type ElementEn = "fire" | "earth" | "air" | "water";
 
 /** The zodiac catalogue stores elements in Georgian; pairKey works in English. */
 const ELEMENT_EN: Record<ZodiacSign["element"], ElementEn> = {
-  "ცეცხლი": "fire",
-  "მიწა": "earth",
-  "ჰაერი": "air",
-  "წყალი": "water",
+  ცეცხლი: "fire",
+  მიწა: "earth",
+  ჰაერი: "air",
+  წყალი: "water",
 };
 
 type ElementPairKey =
@@ -184,18 +184,18 @@ export function CompatibilityCalculator({
       aria-labelledby="compat-calc-heading"
       className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16"
     >
-      <div className="relative overflow-hidden rounded-sm border border-border bg-card">
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-[oklch(0.145_0.036_280)] p-4 shadow-md sm:p-6">
         <CornerCrosshair position="tl" />
         <CornerCrosshair position="tr" />
         <CornerCrosshair position="bl" />
         <CornerCrosshair position="br" />
 
-        <div className="grid gap-px bg-border lg:grid-cols-12">
+        <div className="grid gap-5 lg:grid-cols-12">
           {/* Left 5 cols: Controls */}
-          <div className="flex flex-col justify-between bg-card p-6 sm:p-8 lg:col-span-5">
+          <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8 lg:col-span-5">
             <div>
-              <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-primary">
-                <span className="inline-block h-px w-5 bg-primary/70" />
+              <div className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--vivida-pink)]">
+                <span className="inline-block h-px w-5 bg-[var(--vivida-pink)]/70" />
                 {en
                   ? "SYNASTRY INSTRUMENT · LIVE PREVIEW"
                   : "სინასტრიის ინსტრუმენტი · სწრაფი ტესტი"}
@@ -230,7 +230,7 @@ export function CompatibilityCalculator({
                     id="compat-sign-a"
                     value={signA}
                     onChange={(e) => setSignA(Number(e.target.value))}
-                    className="mt-1.5 h-10 w-full rounded-sm border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
+                    className="mt-1.5 h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
                   >
                     {SIGNS.map((s) => (
                       <option key={s.index} value={s.index}>
@@ -251,7 +251,7 @@ export function CompatibilityCalculator({
                     id="compat-sign-b"
                     value={signB}
                     onChange={(e) => setSignB(Number(e.target.value))}
-                    className="mt-1.5 h-10 w-full rounded-sm border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
+                    className="mt-1.5 h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
                   >
                     {SIGNS.map((s) => (
                       <option key={s.index} value={s.index}>
@@ -269,21 +269,21 @@ export function CompatibilityCalculator({
           </div>
 
           {/* Right 7 cols: Readout */}
-          <div className="flex flex-col justify-between bg-background/60 p-6 sm:p-8 lg:col-span-7">
+          <div className="flex flex-col justify-between rounded-xl border border-[var(--vivida-pink)]/35 bg-gradient-to-br from-[var(--vivida-pink)]/10 via-card to-primary/10 p-6 shadow-sm sm:p-8 lg:col-span-7">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-5">
                 <div className="flex items-center gap-3">
                   <span
-                    className="grid size-11 place-items-center rounded-sm border border-border bg-card text-xl"
+                    className="grid size-11 place-items-center rounded-lg border border-border bg-background/80 text-xl"
                     style={{ color: signColor(a) }}
                   >
                     {`${a.symbol}︎`}
                   </span>
-                  <span className="font-mono text-xs text-muted-foreground">
+                  <span className="font-mono text-xs text-[var(--vivida-pink)]">
                     ×
                   </span>
                   <span
-                    className="grid size-11 place-items-center rounded-sm border border-border bg-card text-xl"
+                    className="grid size-11 place-items-center rounded-lg border border-border bg-background/80 text-xl"
                     style={{ color: signColor(b) }}
                   >
                     {`${b.symbol}︎`}
@@ -309,7 +309,7 @@ export function CompatibilityCalculator({
                         ? "HARMONIC INDEX"
                         : "ჰარმონიული ინდექსი"}
                   </div>
-                  <div className="font-mono text-3xl font-semibold tabular-nums text-primary">
+                  <div className="font-mono text-3xl font-semibold tabular-nums text-[var(--vivida-pink)]">
                     {score}%
                   </div>
                 </div>
@@ -318,7 +318,7 @@ export function CompatibilityCalculator({
               <h3 className="mt-5 text-lg font-semibold text-foreground">
                 {en ? summary.headlineEn : summary.headlineKa}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
                 {matchedPair
                   ? matchedPair.tagline
                   : en
@@ -332,7 +332,7 @@ export function CompatibilityCalculator({
                     <li key={str} className="flex items-start gap-2">
                       <span
                         aria-hidden
-                        className="mt-1.5 inline-block size-1 shrink-0 bg-primary"
+                        className="mt-1.5 inline-block size-1.5 shrink-0 rounded-full bg-[var(--vivida-pink)]"
                       />
                       <span>{str}</span>
                     </li>

@@ -96,7 +96,7 @@ export default async function LibraryPage({
   return (
     <main
       lang={locale}
-      className="relative isolate min-h-screen overflow-hidden bg-background"
+      className="relative isolate min-h-screen overflow-x-clip bg-background"
     >
       <Starfield count={48} />
       <AppHeader authed active="library" />
@@ -126,10 +126,10 @@ export default async function LibraryPage({
           <Link
             href={hrefFor({ filter, favorites: !favorites, query: search })}
             className={cn(
-              "inline-flex shrink-0 items-center justify-center gap-2 rounded-sm border px-4 py-2 text-xs font-medium transition-colors",
+              "inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-medium shadow-2xs transition-colors",
               favorites
-                ? "border-primary/50 bg-primary/12 text-primary"
-                : "border-border bg-card text-muted-foreground hover:text-foreground",
+                ? "border-[var(--vivida-gold)]/50 bg-[var(--vivida-gold)]/15 text-[var(--vivida-gold)]"
+                : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground",
             )}
           >
             <Star className={cn("size-3.5", favorites && "fill-current")} />
@@ -140,13 +140,13 @@ export default async function LibraryPage({
           </Link>
         </header>
 
-        <div className="mt-6 rounded-md border border-border bg-card p-3 sm:p-4">
+        <div className="mt-6 rounded-xl border border-border bg-card p-3 shadow-sm sm:p-4">
           <form method="get" action="/library" className="flex gap-2">
             {filter !== "all" && (
               <input type="hidden" name="type" value={filter} />
             )}
             {favorites && <input type="hidden" name="favorites" value="1" />}
-            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-sm border border-border bg-background px-3.5 focus-within:border-primary/60">
+            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-background px-3.5 focus-within:border-primary/60">
               <Search className="size-4 shrink-0 text-muted-foreground" />
               <span className="sr-only">
                 {en ? "Search library" : "ბიბლიოთეკაში ძიება"}
@@ -168,7 +168,7 @@ export default async function LibraryPage({
 
           <nav
             aria-label={en ? "Library types" : "ბიბლიოთეკის ტიპები"}
-            className="mt-3 flex gap-1 overflow-x-auto border-t border-border pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="mt-3 flex gap-1.5 overflow-x-auto border-t border-border pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {FILTERS.map((item) => {
               const active = filter === item;
@@ -184,10 +184,10 @@ export default async function LibraryPage({
                   href={hrefFor({ filter: item, favorites, query: search })}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "shrink-0 rounded-xs border px-3 py-1.5 text-xs font-medium transition-colors",
+                    "shrink-0 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
                     active
-                      ? "border-primary/45 bg-primary/14 text-primary"
-                      : "border-transparent text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
+                      ? "border-primary/50 bg-primary/15 text-primary"
+                      : "border-transparent text-muted-foreground hover:border-border hover:bg-secondary/50 hover:text-foreground",
                   )}
                 >
                   {label}{" "}
@@ -203,7 +203,7 @@ export default async function LibraryPage({
         {library.items.length > 0 ? (
           <div className="mt-6 space-y-6">
             {dailyItems.length > 0 && (
-              <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {dailyItems.map((entry) => (
                   <DailyLibraryCard
                     key={entry.id}
@@ -214,7 +214,7 @@ export default async function LibraryPage({
               </div>
             )}
             {otherItems.length > 0 && (
-              <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {otherItems.map((entry) => (
                   <LibraryCard key={entry.id} entry={entry} locale={locale} />
                 ))}
@@ -222,7 +222,7 @@ export default async function LibraryPage({
             )}
           </div>
         ) : (
-          <div className="mt-6 rounded-md border border-border bg-card px-6 py-16 text-center">
+          <div className="mt-6 rounded-xl border border-border bg-card px-6 py-16 text-center shadow-sm">
             <div className="mx-auto grid size-11 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
               <BookOpen className="size-5" />
             </div>

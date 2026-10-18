@@ -89,21 +89,24 @@ export function WeeklyForecastLocked({
   }
 
   return (
-    <article className="rounded-md border border-border bg-card p-6 sm:p-7">
-      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-border/80 pb-4">
+    <article className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-7">
+      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-border pb-4">
         <div>
-          <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
+          <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
             {en ? "7-Day Ephemeris Forecast" : "შემდეგი 7 დღის ეფემერიდა"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight text-foreground sm:text-xl">
             {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
-        <Lock className="size-4 shrink-0 text-primary" aria-hidden />
+        <Lock
+          className="size-4 shrink-0 text-[var(--vivida-cyan)]"
+          aria-hidden
+        />
       </header>
 
       {teaser ? (
-        <ol className="divide-y divide-border border border-border bg-card">
+        <ol className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/60">
           <DayRow
             key={teaser[0].dateIso}
             day={teaser[0]}
@@ -132,7 +135,7 @@ export function WeeklyForecastLocked({
                 aria-hidden
                 className="pointer-events-none absolute inset-0 flex items-center justify-center"
               >
-                <div className="grid size-10 place-items-center rounded-sm border border-border bg-card shadow-lg">
+                <div className="grid size-10 place-items-center rounded-lg border border-border bg-card shadow-lg">
                   <Lock className="size-4 text-primary" />
                 </div>
               </div>
@@ -141,13 +144,13 @@ export function WeeklyForecastLocked({
         </ol>
       ) : (
         <div className="relative">
-          <ol aria-hidden className="divide-y divide-border border border-border select-none blur-[6px]">
+          <ol
+            aria-hidden
+            className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/60 select-none blur-[6px]"
+          >
             {[0, 1, 2, 3].map((i) => (
-              <li
-                key={i}
-                className="flex items-center gap-4 bg-card p-4"
-              >
-                <div className="flex w-12 flex-col items-center rounded-sm border border-border bg-secondary/40 py-1.5 font-mono">
+              <li key={i} className="flex items-center gap-4 p-4">
+                <div className="flex w-12 flex-col items-center rounded-md border border-border bg-card py-1.5 font-mono">
                   <span className="text-[10px] uppercase text-muted-foreground">
                     {
                       (en
@@ -169,7 +172,7 @@ export function WeeklyForecastLocked({
       )}
 
       {/* Lock CTA */}
-      <div className="mt-5 flex flex-col items-center gap-3 rounded-sm border border-border bg-secondary/25 px-4 py-6 text-center">
+      <div className="mt-5 flex flex-col items-center gap-3 rounded-lg border border-border bg-background/70 px-4 py-6 text-center">
         <div className="font-mono text-xs uppercase tracking-widest text-primary">
           {cost} {en ? "credits" : "კრედიტი"} ·{" "}
           <span className="text-muted-foreground">

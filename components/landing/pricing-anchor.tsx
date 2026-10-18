@@ -24,17 +24,17 @@ export function PricingAnchor() {
       aria-labelledby="pricing-anchor-heading"
       className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-20"
     >
-      <div className="relative overflow-hidden rounded-sm border border-border bg-card">
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-[oklch(0.145_0.036_280)] shadow-md">
         <CornerCrosshair position="tl" />
         <CornerCrosshair position="tr" />
         <CornerCrosshair position="bl" />
         <CornerCrosshair position="br" />
 
-        <div className="border-b border-border bg-background/50 px-5 py-6 sm:px-8 sm:py-8">
+        <div className="border-b border-border bg-background/70 px-5 py-6 sm:px-8 sm:py-8">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-primary">
-                <span className="inline-block h-px w-5 bg-primary/70" />
+              <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--vivida-gold)]">
+                <span className="inline-block h-px w-5 bg-[var(--vivida-gold)]/70" />
                 პირობები · გამჭვირვალე მოდელი
               </div>
               <h2
@@ -50,18 +50,17 @@ export function PricingAnchor() {
           </div>
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground sm:text-base">
             ძირითადი ნატალური რუკა და ყოველდღიური პროგნოზი ყველასთვის ღიაა.
-            დამატებითი ინსტრუმენტები ხელმისაწვდომია კრედიტებით ან PRO
-            გამოწერით.
+            დამატებითი ინსტრუმენტები ხელმისაწვდომია კრედიტებით ან PRO გამოწერით.
           </p>
         </div>
 
-        <div className="grid gap-px bg-border lg:grid-cols-2">
+        <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-2">
           {/* Free tier */}
-          <div className="flex flex-col justify-between bg-card p-6 sm:p-8">
+          <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
             <div>
               <div className="flex items-baseline justify-between gap-4 border-b border-border pb-4">
                 <div>
-                  <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
                     TIER 01 · საბაზისო წვდომა
                   </div>
                   <h3 className="mt-1 text-xl font-semibold text-foreground">
@@ -81,7 +80,7 @@ export function PricingAnchor() {
               <ul className="mt-5 space-y-3 text-sm text-foreground/85">
                 {FREE_ITEMS_KA.map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
-                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                    <Check className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -98,11 +97,11 @@ export function PricingAnchor() {
           </div>
 
           {/* Pro / Credits tier */}
-          <div className="flex flex-col justify-between bg-background/40 p-6 sm:p-8">
+          <div className="flex flex-col justify-between rounded-xl border border-primary/50 bg-gradient-to-br from-primary/15 via-card to-[var(--vivida-cyan)]/10 p-6 shadow-md sm:p-8">
             <div>
               <div className="flex items-baseline justify-between gap-4 border-b border-border pb-4">
                 <div>
-                  <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+                  <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
                     TIER 02 · VIVIDA PRO და კრედიტები
                   </div>
                   <h3 className="mt-1 text-xl font-semibold text-foreground">
@@ -110,7 +109,7 @@ export function PricingAnchor() {
                   </h3>
                 </div>
                 <div className="text-right font-mono">
-                  <span className="text-2xl font-semibold tabular-nums text-primary">
+                  <span className="text-2xl font-semibold tabular-nums text-[var(--vivida-gold)]">
                     9 ₾-დან
                   </span>
                   <span className="block text-[11px] text-muted-foreground">
@@ -119,10 +118,10 @@ export function PricingAnchor() {
                 </div>
               </div>
 
-              <ul className="mt-5 space-y-3 text-sm text-foreground/85">
+              <ul className="mt-5 space-y-3 text-sm text-foreground/90">
                 {PRO_ITEMS_KA.map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
-                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                    <Check className="mt-0.5 size-4 shrink-0 text-[var(--vivida-gold)]" />
                     <span>{item}</span>
                   </li>
                 ))}

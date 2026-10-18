@@ -29,13 +29,13 @@ export function HouseCards({
     const meta = bodyMeta(key);
     (occupants[body.house] ??= []).push({
       key,
-      label: en ? meta?.labelEn ?? key : meta?.labelKa ?? key,
+      label: en ? (meta?.labelEn ?? key) : (meta?.labelKa ?? key),
       symbol: meta?.symbol ?? "?",
     });
   }
 
   return (
-    <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
+    <div className="grid gap-3.5 sm:grid-cols-2">
       {HOUSE_NUMBERS.map((n) => {
         const def = houseDef(n);
         const cusp = chart.houses.find((h) => h.number === n);
@@ -48,28 +48,28 @@ export function HouseCards({
           <div
             key={n}
             id={`house-${n}`}
-            className="scroll-mt-20 px-4 py-4 sm:px-5"
+            className="scroll-mt-20 rounded-xl border border-border bg-card px-4 py-4 shadow-sm sm:px-5"
           >
-            <div className="flex items-center gap-3 text-sm">
+            <div className="flex items-center gap-2.5 border-b border-border/70 pb-3 text-sm">
               <span
                 style={{ color }}
-                className="w-6 shrink-0 text-center font-mono text-xs font-semibold tabular-nums"
+                className="grid size-7 shrink-0 place-items-center rounded-md border border-border/80 bg-background/70 font-mono text-xs font-semibold tabular-nums"
               >
                 {HOUSE_LABEL[n] ?? n}
               </span>
-              <span className="w-32 shrink-0 font-semibold text-foreground sm:w-44">
+              <span className="truncate font-semibold text-foreground">
                 {en ? def.themeEn : def.themeKa}
               </span>
               {cuspSign && (
-                <span className="flex min-w-0 items-center gap-1.5 text-foreground/85">
+                <span className="flex shrink-0 items-center gap-1 text-foreground/85">
                   <span
                     aria-hidden
                     style={{ color }}
-                    className="w-5 shrink-0 text-center leading-none"
+                    className="w-4 shrink-0 text-center leading-none"
                   >
                     {`${cuspSign.symbol}︎`}
                   </span>
-                  <span className="truncate">
+                  <span className="text-xs text-muted-foreground">
                     {en ? cuspSign.labelEn : cuspSign.labelKa}
                   </span>
                 </span>
@@ -77,7 +77,7 @@ export function HouseCards({
               {planets.length > 0 && (
                 <span
                   aria-hidden
-                  className="ml-auto flex shrink-0 items-center gap-1.5 font-mono text-xs text-primary"
+                  className="ml-auto flex shrink-0 items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 font-mono text-xs text-primary"
                 >
                   {planets.map((p) => (
                     <span key={p.key} title={p.label}>
@@ -88,7 +88,7 @@ export function HouseCards({
               )}
             </div>
             {text && (
-              <div className="mt-2.5 space-y-2 pl-9 text-sm leading-relaxed text-foreground/85">
+              <div className="mt-3 space-y-2 text-sm leading-relaxed text-foreground/85">
                 {text
                   .split(/\n{2,}/)
                   .filter(Boolean)

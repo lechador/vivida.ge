@@ -151,7 +151,7 @@ export default async function HoroskopiHubPage() {
   ];
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background">
+    <main className="relative isolate flex min-h-screen flex-col overflow-x-clip bg-background">
       <Starfield count={48} />
       <SmartHeader />
 
@@ -170,7 +170,7 @@ export default async function HoroskopiHubPage() {
         </nav>
 
         <header className="mb-8 border-b border-border pb-6">
-          <div className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
+          <div className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
             {todayLabel}
           </div>
           <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
@@ -184,67 +184,85 @@ export default async function HoroskopiHubPage() {
 
         {/* Segmented Period & Topic Navigation */}
         <div className="mb-8 space-y-3">
-          <div className="flex flex-wrap items-center gap-px overflow-hidden rounded-md border border-border bg-border sm:w-fit">
-            <span className="bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground sm:text-sm">
+          <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-border bg-[oklch(0.145_0.036_280)] p-1.5 sm:w-fit">
+            <span className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-2xs sm:text-sm">
               დღიური
             </span>
             <Link
               href="/horoskopi/kvireuli"
-              className="bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground sm:text-sm"
+              className="rounded-lg border border-transparent bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:bg-secondary/60 hover:text-foreground sm:text-sm"
             >
               კვირის
             </Link>
             <Link
               href="/horoskopi/tviuri"
-              className="bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground sm:text-sm"
+              className="rounded-lg border border-transparent bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:bg-secondary/60 hover:text-foreground sm:text-sm"
             >
               თვის
             </Link>
             <Link
               href="/siyvarulis-horoskopi"
-              className="bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground sm:text-sm"
+              className="rounded-lg border border-transparent bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:bg-secondary/60 hover:text-foreground sm:text-sm"
             >
               სიყვარულის
             </Link>
             <Link
               href="/finansuri-horoskopi"
-              className="bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground sm:text-sm"
+              className="rounded-lg border border-transparent bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:bg-secondary/60 hover:text-foreground sm:text-sm"
             >
               ფინანსური
             </Link>
             <Link
               href="/karieris-horoskopi"
-              className="bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground sm:text-sm"
+              className="rounded-lg border border-transparent bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:bg-secondary/60 hover:text-foreground sm:text-sm"
             >
               კარიერის
             </Link>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-foreground/60">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
               ალმანახი:
             </span>
-            <Link href="/astrologiuri-kalendari" className="hover:text-foreground hover:underline">
+            <Link
+              href="/astrologiuri-kalendari"
+              className="hover:text-foreground hover:underline"
+            >
               ასტროლოგიური კალენდარი
             </Link>
             <span aria-hidden>·</span>
-            <Link href="/ighbliani-dgheebi" className="hover:text-foreground hover:underline">
+            <Link
+              href="/ighbliani-dgheebi"
+              className="hover:text-foreground hover:underline"
+            >
               იღბლიანი დღეები
             </Link>
             <span aria-hidden>·</span>
-            <Link href="/savse-mtvare" className="hover:text-foreground hover:underline">
+            <Link
+              href="/savse-mtvare"
+              className="hover:text-foreground hover:underline"
+            >
               სავსე და ახალი მთვარე
             </Link>
             <span aria-hidden>·</span>
-            <Link href="/dabnelebebi" className="hover:text-foreground hover:underline">
+            <Link
+              href="/dabnelebebi"
+              className="hover:text-foreground hover:underline"
+            >
               დაბნელებები
             </Link>
             <span aria-hidden>·</span>
-            <Link href="/merkuri-retrogradi" className="hover:text-foreground hover:underline">
+            <Link
+              href="/merkuri-retrogradi"
+              className="hover:text-foreground hover:underline"
+            >
               მერკური რეტროგრადში
             </Link>
             <span aria-hidden>·</span>
-            <Link href="/mtvaris-kalendari" className="hover:text-foreground hover:underline">
+            <Link
+              href="/mtvaris-kalendari"
+              className="hover:text-foreground hover:underline"
+            >
               მთვარის კალენდარი
             </Link>
           </div>
@@ -254,8 +272,8 @@ export default async function HoroskopiHubPage() {
           <PopularTools placement="horoscope_before_signs" publicEntry />
         </div>
 
-        {/* 12 Zodiac Sign Almanac Hairline Grid */}
-        <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+        {/* 12 Zodiac Sign Outlined Cards Grid */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {horoscopes.map(({ slug, row }) => {
             const sc = SIGNS_CONTENT[slug];
             const meta = signMetaBySlug(slug);
@@ -268,12 +286,12 @@ export default async function HoroskopiHubPage() {
               <Link
                 key={slug}
                 href={`/zodiac/${slug}/${VIEW_PATH.today}`}
-                className="group flex flex-col justify-between bg-card p-5 transition-colors duration-150 hover:bg-secondary/40"
+                className="group flex flex-col justify-between rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-150 hover:border-primary/45 hover:bg-secondary/50"
               >
                 <div>
                   <div className="flex items-start gap-3">
                     <div
-                      className="grid size-11 shrink-0 place-items-center rounded-sm border border-border bg-background text-xl"
+                      className="grid size-11 shrink-0 place-items-center rounded-lg border border-border bg-background/80 text-xl"
                       style={{ color: accent }}
                     >
                       {sc.symbol}
@@ -288,7 +306,7 @@ export default async function HoroskopiHubPage() {
                     </div>
                   </div>
                   {row?.headline && (
-                    <p className="mt-3.5 text-sm font-medium text-primary">
+                    <p className="mt-3.5 text-sm font-medium text-[var(--vivida-gold)]">
                       {row.headline}
                     </p>
                   )}
@@ -296,7 +314,7 @@ export default async function HoroskopiHubPage() {
                     {summary}
                   </p>
                 </div>
-                <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3 font-mono text-[11px] text-muted-foreground transition-colors group-hover:text-foreground">
+                <div className="mt-4 flex items-center justify-between border-t border-border/70 pt-3 font-mono text-[11px] text-muted-foreground transition-colors group-hover:text-primary">
                   <span>სრული ჰოროსკოპი</span>
                   <span aria-hidden>→</span>
                 </div>
@@ -317,13 +335,13 @@ export default async function HoroskopiHubPage() {
             აირჩიე შენი ნიშანი — დღევანდელი და ხვალინდელი ჰოროსკოპი ცალ-ცალკე
             გვერდებზე.
           </p>
-          <div className="mt-4 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {ALL_SLUGS.map((slug) => {
               const sc = SIGNS_CONTENT[slug];
               return (
                 <div
                   key={slug}
-                  className="flex items-center justify-between gap-2 bg-card px-4 py-3 text-sm"
+                  className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm shadow-2xs"
                 >
                   <Link
                     href={`/zodiac/${slug}/${VIEW_PATH.today}`}
@@ -333,7 +351,7 @@ export default async function HoroskopiHubPage() {
                   </Link>
                   <Link
                     href={`/zodiac/${slug}/${VIEW_PATH.tomorrow}`}
-                    className="shrink-0 font-mono text-xs text-primary hover:underline"
+                    className="shrink-0 font-mono text-xs text-[var(--vivida-cyan)] hover:underline"
                   >
                     ხვალ →
                   </Link>
@@ -348,16 +366,19 @@ export default async function HoroskopiHubPage() {
           <h2 className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
             ხშირად დასმული კითხვები
           </h2>
-          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
+          <div className="space-y-3">
             {FAQ.map((item) => (
-              <details key={item.q} className="group">
+              <details
+                key={item.q}
+                className="group overflow-hidden rounded-xl border border-border bg-card shadow-2xs open:border-primary/45"
+              >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                   {item.q}
                   <span className="font-mono text-muted-foreground transition-transform group-open:rotate-45">
                     +
                   </span>
                 </summary>
-                <p className="px-5 pb-5 text-[15px] leading-relaxed text-foreground/85">
+                <p className="border-t border-border/70 bg-background/55 px-5 py-4 text-[15px] leading-relaxed text-foreground/85">
                   {item.a}
                 </p>
               </details>
@@ -366,18 +387,19 @@ export default async function HoroskopiHubPage() {
         </section>
 
         {/* CTA */}
-        <div className="mt-14 rounded-md border border-border bg-card p-7 sm:p-10">
+        <div className="mt-14 rounded-2xl border border-primary/45 bg-gradient-to-br from-primary/15 via-card to-[var(--vivida-cyan)]/10 p-7 shadow-md sm:p-10">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
             <div className="max-w-xl">
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
                 პერსონალური ასტროლოგია
               </p>
               <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                 მზის ნიშანი მხოლოდ დასაწყისია
               </h2>
               <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
-                ნამდვილი ჰოროსკოპი მთლიან ნატალურ რუკას უყურებს — მთვარე, ვენერა,
-                მარსი და ცის 12 სახლი. Vivida უფასოდ ანგარიშობს ყველაფერს.
+                ნამდვილი ჰოროსკოპი მთლიან ნატალურ რუკას უყურებს — მთვარე,
+                ვენერა, მარსი და ცის 12 სახლი. Vivida უფასოდ ანგარიშობს
+                ყველაფერს.
               </p>
             </div>
             <Button asChild size="lg" className="shrink-0">

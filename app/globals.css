@@ -25,56 +25,55 @@ html[lang="hy"] .locale-ka-only {
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Vivida Editorial Almanac light fallback */
-  --background: oklch(0.98 0.008 85);
-  --foreground: oklch(0.15 0.01 265);
-  --card: oklch(0.96 0.01 85);
-  --card-foreground: oklch(0.15 0.01 265);
-  --popover: oklch(0.98 0.008 85);
-  --popover-foreground: oklch(0.15 0.01 265);
-  --primary: oklch(0.45 0.10 75);
-  --primary-foreground: oklch(0.98 0.008 85);
-  --secondary: oklch(0.93 0.012 85);
-  --secondary-foreground: oklch(0.18 0.01 265);
-  --muted: oklch(0.93 0.01 85);
-  --muted-foreground: oklch(0.46 0.015 265);
-  --accent: oklch(0.92 0.015 85);
-  --accent-foreground: oklch(0.18 0.01 265);
+  --background: oklch(0.985 0.006 280);
+  --foreground: oklch(0.145 0.02 280);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0.02 280);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0.02 280);
+  --primary: oklch(0.55 0.22 305);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.95 0.015 280);
+  --secondary-foreground: oklch(0.205 0.02 280);
+  --muted: oklch(0.95 0.012 280);
+  --muted-foreground: oklch(0.48 0.02 280);
+  --accent: oklch(0.94 0.02 280);
+  --accent-foreground: oklch(0.205 0.02 280);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.86 0.012 85);
-  --input: oklch(0.86 0.012 85);
-  --ring: oklch(0.45 0.10 75);
-  --radius: 0.5rem;
+  --border: oklch(0.86 0.02 280);
+  --input: oklch(0.86 0.02 280);
+  --ring: oklch(0.55 0.22 305);
+  --radius: 0.625rem;
 }
 
 .dark {
-  /* Editorial Celestial & Astronomical Observatory Palette (60-30-10) */
-  --background: oklch(0.115 0.008 265); /* Deep Obsidian Ink (#0B0C10) */
-  --foreground: oklch(0.95 0.012 85); /* Warm Parchment Ivory (#F4F0EA) */
-  --card: oklch(0.15 0.01 265); /* Flat Matte Charcoal (#12141C) */
-  --card-foreground: oklch(0.95 0.012 85);
-  --popover: oklch(0.15 0.01 265);
-  --popover-foreground: oklch(0.95 0.012 85);
-  --primary: oklch(0.80 0.12 80); /* Calibrated Warm Brass / Astrolabe Gold (#D4AF37) */
-  --primary-foreground: oklch(0.12 0.01 265);
-  --secondary: oklch(0.19 0.012 265); /* Elevated Slate */
-  --secondary-foreground: oklch(0.95 0.012 85);
-  --muted: oklch(0.18 0.01 265);
-  --muted-foreground: oklch(0.68 0.014 80); /* Muted Warm Stone */
-  --accent: oklch(0.78 0.05 235); /* Celestial Silver-Slate */
-  --accent-foreground: oklch(0.12 0.01 265);
-  --destructive: oklch(0.65 0.18 25);
-  --destructive-foreground: oklch(0.95 0.012 85);
-  --border: oklch(0.25 0.012 265); /* Crisp 1px architectural hairline */
-  --input: oklch(0.25 0.012 265);
-  --ring: oklch(0.80 0.12 80 / 65%);
+  /* Cosmic Observatory & Deep-Cosmos Palette with high surface & border contrast */
+  --background: oklch(0.115 0.028 280); /* Deep Cosmic Night (#0a0714) */
+  --foreground: oklch(0.97 0.01 280); /* Crisp Moonlight White */
+  --card: oklch(0.185 0.042 280); /* Elevated Cosmic Slate-Indigo (#161129) */
+  --card-foreground: oklch(0.97 0.01 280);
+  --popover: oklch(0.195 0.045 280);
+  --popover-foreground: oklch(0.97 0.01 280);
+  --primary: oklch(0.77 0.18 305); /* Vibrant Cosmic Magenta-Violet */
+  --primary-foreground: oklch(0.12 0.03 280);
+  --secondary: oklch(0.24 0.052 280); /* Distinctly Elevated Interactive Surface */
+  --secondary-foreground: oklch(0.97 0.01 280);
+  --muted: oklch(0.22 0.042 280);
+  --muted-foreground: oklch(0.74 0.035 280); /* Clear Lavender-Slate */
+  --accent: oklch(0.75 0.17 200); /* Celestial Cyan */
+  --accent-foreground: oklch(0.12 0.03 280);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.97 0.01 280);
+  --border: oklch(0.34 0.06 280); /* Crisp Cosmic Structural Outline */
+  --input: oklch(0.34 0.06 280);
+  --ring: oklch(0.77 0.18 305 / 70%);
 
-  /* Harmonized Celestial Brand Accents (replaces neon purple/pink/cyan) */
-  --vivida-violet: oklch(0.80 0.12 80); /* Warm Brass */
-  --vivida-pink: oklch(0.74 0.10 55); /* Antique Terracotta Bronze */
-  --vivida-cyan: oklch(0.78 0.06 230); /* Celestial Silver-Blue */
-  --vivida-gold: oklch(0.83 0.12 85); /* Astrolabe Champagne Gold */
+  /* Distinct Celestial Brand Accents */
+  --vivida-violet: oklch(0.65 0.24 305); /* Deep Luminous Violet */
+  --vivida-pink: oklch(0.72 0.22 350); /* Rose Nebula Pink */
+  --vivida-cyan: oklch(0.78 0.18 200); /* Electric Starlight Cyan */
+  --vivida-gold: oklch(0.85 0.16 85); /* Solar Astrolabe Gold */
 }
 
 @theme inline {
@@ -183,8 +182,27 @@ html[lang="hy"] .locale-ka-only {
     }
   }
 
+  /*
+   * Desktop left sidebar: when DesktopSidebar is mounted, push the body
+   * content right by the sidebar width so the fixed-position rail
+   * doesn't overlap page content. Same automatic-via-:has() pattern as
+   * the mobile rule above.
+   */
+  @media (min-width: 1024px) {
+    body:has([data-desktop-sidebar]) {
+      padding-left: 15rem; /* matches the always-expanded sidebar width */
+    }
+
+    body[data-scroll-locked]:has([data-desktop-sidebar]) {
+      padding-left: 15rem !important;
+      padding-right: 0 !important;
+      margin-right: 0 !important;
+      margin-left: 0 !important;
+    }
+  }
+
   ::selection {
-    background-color: oklch(0.80 0.12 80 / 30%);
+    background-color: oklch(0.77 0.18 305 / 35%);
   }
 }
 
@@ -204,6 +222,16 @@ html[lang="hy"] .locale-ka-only {
   body:has([data-mobile-tab-bar]) [data-privacy-reopen],
   body:has([data-mobile-tab-bar]) [data-chat-launcher] {
     bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 0px) + 0.75rem);
+  }
+}
+
+/* Keep the privacy control on the right side on desktop, clear of the
+ * always-expanded navigation rail and its account/settings link. */
+@media (min-width: 1024px) {
+  body:has([data-desktop-sidebar]) [data-privacy-reopen] {
+    left: auto;
+    right: 0.75rem;
+    z-index: 30;
   }
 }
 

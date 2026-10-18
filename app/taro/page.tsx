@@ -174,7 +174,7 @@ export default async function TaroHubPage() {
   return (
     <main
       lang={locale}
-      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
+      className="relative isolate flex min-h-screen flex-col overflow-x-clip bg-background"
     >
       <Starfield count={48} />
       {authed ? (
@@ -247,7 +247,7 @@ export default async function TaroHubPage() {
               ? "Explore the upright and reversed meaning of every card."
               : "აღმოაჩინე თითო კარტის მნიშვნელობა, პირდაპირი და შებრუნებული."}
           </p>
-          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
             {tarotDetailDeck(en ? "en" : "ka").map((c: TarotDetailCard) => {
               const name = c.name;
               const keywords = c.keywords;
@@ -255,9 +255,9 @@ export default async function TaroHubPage() {
                 <Link
                   key={c.slug}
                   href={localizedHref(`/taro/${c.slug}`, locale)}
-                  className="flex items-center gap-3 bg-card px-4 py-3 text-sm transition-colors hover:bg-secondary/45"
+                  className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-sm shadow-2xs transition-colors hover:border-primary/45 hover:bg-secondary/45"
                 >
-                  <span className="grid size-8 shrink-0 place-items-center rounded-sm border border-border bg-background/60 text-base">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-md border border-primary/25 bg-primary/10 text-base text-primary">
                     {c.glyph}
                   </span>
                   <span className="min-w-0">
@@ -279,7 +279,7 @@ export default async function TaroHubPage() {
           <h2 className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
             {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
-          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
+          <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             {faq.map((item) => (
               <details key={item.q} className="group">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
@@ -288,7 +288,7 @@ export default async function TaroHubPage() {
                     +
                   </span>
                 </summary>
-                <p className="border-t border-border/60 bg-background/40 px-5 py-4 text-[15px] leading-relaxed text-muted-foreground">
+                <p className="border-t border-border/60 bg-background/50 px-5 py-4 text-[15px] leading-relaxed text-muted-foreground">
                   {item.a}
                 </p>
               </details>
@@ -298,7 +298,7 @@ export default async function TaroHubPage() {
 
         {/* CTA → natal chart (logged-out visitors only) */}
         {!authed && (
-          <div className="mt-16 flex flex-col justify-between gap-6 rounded-md border border-border bg-card p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="mt-16 flex flex-col justify-between gap-6 rounded-xl border border-primary/35 bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:p-8">
             <div className="max-w-xl">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
                 {en ? "Natal Ephemeris" : "ნატალური ასტროლოგია"}

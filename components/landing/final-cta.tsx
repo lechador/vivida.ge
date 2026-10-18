@@ -10,7 +10,7 @@ export function FinalCta() {
       aria-labelledby="final-cta-heading"
       className="relative mx-auto max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pb-28"
     >
-      <div className="relative overflow-hidden rounded-sm border border-primary/35 bg-card p-8 sm:p-12">
+      <div className="relative overflow-hidden rounded-2xl border border-primary/45 bg-gradient-to-br from-primary/15 via-card to-[var(--vivida-cyan)]/10 p-8 shadow-md sm:p-12">
         <CornerCrosshair position="tl" />
         <CornerCrosshair position="tr" />
         <CornerCrosshair position="bl" />
@@ -18,8 +18,8 @@ export function FinalCta() {
 
         <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-primary">
-              <span className="inline-block h-px w-5 bg-primary/70" />
+            <div className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--vivida-gold)]">
+              <span className="inline-block h-px w-5 bg-[var(--vivida-gold)]/70" />
               პერსონალური ობსერვატორია
             </div>
             <h2

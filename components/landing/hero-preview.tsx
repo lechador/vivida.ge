@@ -251,7 +251,7 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
         <div
           role="tablist"
           aria-label={en ? "Observatory mode" : "ობსერვატორიის რეჟიმი"}
-          className="mt-3 grid grid-cols-3 gap-px border border-border bg-border"
+          className="mt-3 grid grid-cols-3 gap-1.5 rounded-lg border border-border bg-background/70 p-1"
         >
           {modes.map((m) => {
             const active = mode === m.id;
@@ -262,10 +262,10 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
                 role="tab"
                 aria-selected={active}
                 onClick={() => setMode(m.id)}
-                className={`whitespace-nowrap px-2 py-1.5 font-mono text-[11px] transition-colors ${
+                className={`whitespace-nowrap rounded-md px-2 py-1.5 font-mono text-[11px] transition-colors ${
                   active
-                    ? "bg-secondary font-semibold text-primary"
-                    : "bg-background/60 text-muted-foreground hover:text-foreground"
+                    ? "border border-primary/40 bg-secondary font-semibold text-primary shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {m.label}
@@ -294,65 +294,70 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
       <div className="border-t border-border pt-3">
         <div className="mb-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
           <span>
-            {en ? "Planetary Ephemeris (Click to inspect)" : "პლანეტარული ეფემერიდა"}
+            {en
+              ? "Planetary Ephemeris (Click to inspect)"
+              : "პლანეტარული ეფემერიდა"}
           </span>
           <span>{en ? "Longitude · House" : "გრადუსი · სახლი"}</span>
         </div>
-        <div className="grid grid-cols-1 divide-y divide-border/70 border border-border bg-background/40 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-          {[SPECIMEN_PLACEMENTS.slice(0, 3), SPECIMEN_PLACEMENTS.slice(3, 6)].map(
-            (group, colIdx) => (
-              <div key={colIdx} className="divide-y divide-border/70">
-                {group.map((row) => {
-                  const isSelected = row.key === activePlacement.key;
-                  return (
-                    <button
-                      key={row.key}
-                      type="button"
-                      onClick={() => setSelectedKey(row.key)}
-                      className={`flex w-full items-center justify-between px-3 py-2 text-left text-xs transition-colors ${
-                        isSelected
-                          ? "bg-secondary text-foreground"
-                          : "text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
-                      }`}
-                    >
-                      <div className="flex min-w-0 items-center gap-2">
-                        <span
-                          className={`w-4 text-center font-mono ${
-                            isSelected ? "font-semibold text-primary" : "text-primary/80"
-                          }`}
-                        >
-                          {row.glyph}
-                        </span>
-                        <span className="truncate font-medium text-foreground">
-                          {en ? row.bodyEn : row.bodyKa}
-                        </span>
-                        <span className="truncate text-muted-foreground">
-                          · {row.signGlyph} {en ? row.signEn : row.signKa}
-                        </span>
-                      </div>
-                      <div className="shrink-0 font-mono text-[11px] tabular-nums">
-                        <span className="text-foreground/90">{row.deg}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            ),
-          )}
+        <div className="grid grid-cols-1 divide-y divide-border/70 overflow-hidden rounded-lg border border-border bg-background/65 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          {[
+            SPECIMEN_PLACEMENTS.slice(0, 3),
+            SPECIMEN_PLACEMENTS.slice(3, 6),
+          ].map((group, colIdx) => (
+            <div key={colIdx} className="divide-y divide-border/70">
+              {group.map((row) => {
+                const isSelected = row.key === activePlacement.key;
+                return (
+                  <button
+                    key={row.key}
+                    type="button"
+                    onClick={() => setSelectedKey(row.key)}
+                    className={`flex w-full items-center justify-between px-3 py-2 text-left text-xs transition-colors ${
+                      isSelected
+                        ? "bg-secondary text-foreground"
+                        : "text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+                    }`}
+                  >
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span
+                        className={`w-4 text-center font-mono ${
+                          isSelected
+                            ? "font-semibold text-[var(--vivida-gold)]"
+                            : "text-primary/85"
+                        }`}
+                      >
+                        {row.glyph}
+                      </span>
+                      <span className="truncate font-medium text-foreground">
+                        {en ? row.bodyEn : row.bodyKa}
+                      </span>
+                      <span className="truncate text-muted-foreground">
+                        · {row.signGlyph} {en ? row.signEn : row.signKa}
+                      </span>
+                    </div>
+                    <div className="shrink-0 font-mono text-[11px] tabular-nums">
+                      <span className="text-foreground/90">{row.deg}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Live Selected Node Telemetry Readout */}
-      <div className="mt-3 border border-border bg-background/60 p-3.5">
+      <div className="mt-3 rounded-lg border border-border bg-background/75 p-3.5">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-2 font-mono text-[11px]">
-          <span className="font-semibold text-primary">
+          <span className="font-semibold text-[var(--vivida-gold)]">
             {activePlacement.glyph}{" "}
             {en ? activePlacement.bodyEn : activePlacement.bodyKa} ·{" "}
             {activePlacement.signGlyph}{" "}
             {en ? activePlacement.signEn : activePlacement.signKa}{" "}
             {activePlacement.deg}
           </span>
-          <span className="text-muted-foreground">
+          <span className="text-[var(--vivida-cyan)]">
             {en ? activePlacement.houseEn : activePlacement.houseKa} ·{" "}
             {en ? activePlacement.elementEn : activePlacement.elementKa}
           </span>

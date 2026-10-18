@@ -33,32 +33,41 @@ export function dailyLibraryDate(entry: LibraryEntry, locale: UserLocale) {
 
 const KIND: Record<
   LibraryEntryKind,
-  { Icon: LucideIcon; ka: string; en: string }
+  { Icon: LucideIcon; ka: string; en: string; badgeClass: string }
 > = {
   daily: {
     Icon: Sparkles,
     ka: "დღიური ჰოროსკოპი",
     en: "Daily horoscope",
+    badgeClass:
+      "border-[var(--vivida-gold)]/40 bg-[var(--vivida-gold)]/15 text-[var(--vivida-gold)]",
   },
   weekly: {
     Icon: CalendarDays,
     ka: "7-დღიანი პროგნოზი",
     en: "7-day forecast",
+    badgeClass:
+      "border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/15 text-[var(--vivida-cyan)]",
   },
   tarot: {
     Icon: Wand2,
     ka: "ტარო კითხვა",
     en: "Tarot reading",
+    badgeClass: "border-primary/40 bg-primary/15 text-primary",
   },
   ai: {
     Icon: Bot,
     ka: "კონსულტაცია",
     en: "Chart insight",
+    badgeClass:
+      "border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/15 text-[var(--vivida-cyan)]",
   },
   report: {
     Icon: FileText,
     ka: "PDF რეპორტი",
     en: "PDF report",
+    badgeClass:
+      "border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/15 text-[var(--vivida-pink)]",
   },
 };
 
@@ -82,10 +91,12 @@ export function LibraryCard({
   }).format(entry.occurredAt);
 
   return (
-    <article className="group relative flex min-h-60 flex-col bg-card p-5 transition-colors hover:bg-secondary/35">
+    <article className="group relative flex min-h-60 flex-col rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/50 hover:bg-secondary/40">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-          <span className="grid size-8 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+        <div className="flex min-w-0 items-center gap-2.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+          <span
+            className={`grid size-8 shrink-0 place-items-center rounded-lg border ${meta.badgeClass}`}
+          >
             <meta.Icon className="size-4" />
           </span>
           <span className="truncate">
@@ -107,11 +118,11 @@ export function LibraryCard({
           {entry.title}
         </h2>
         {entry.summary && (
-          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-foreground/75">
+          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-foreground/80">
             {entry.summary}
           </p>
         )}
-        <div className="mt-auto flex items-center justify-between gap-3 pt-5 font-mono text-xs tabular-nums text-muted-foreground">
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/60 pt-4 mt-4 font-mono text-xs tabular-nums text-muted-foreground">
           <time dateTime={entry.occurredAt.toISOString()}>{date}</time>
           {entry.note && (
             <span className="inline-flex items-center gap-1 text-primary">
@@ -135,16 +146,16 @@ export function DailyLibraryCard({
   const date = dailyLibraryDate(entry, locale);
 
   return (
-    <article className="group flex min-h-28 items-center gap-3.5 bg-card p-4 transition-colors hover:bg-secondary/35">
+    <article className="group flex min-h-28 items-center gap-3.5 rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:border-[var(--vivida-gold)]/50 hover:bg-secondary/40">
       <Link
         href={`/library/${entry.id}`}
         className="flex min-w-0 flex-1 items-center gap-3.5 focus:outline-none"
       >
-        <span className="grid size-9 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+        <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[var(--vivida-gold)]/40 bg-[var(--vivida-gold)]/15 text-[var(--vivida-gold)]">
           <Sparkles className="size-4" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--vivida-gold)]">
             {libraryKindLabel("daily", locale)}
           </span>
           <span className="mt-1 block truncate text-sm font-semibold capitalize tracking-tight text-foreground group-hover:text-primary sm:text-base">

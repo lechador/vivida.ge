@@ -12,7 +12,7 @@ export function EnglishShell({
   return (
     <div
       lang="en"
-      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background"
+      className="relative isolate flex min-h-screen flex-col overflow-x-clip bg-background"
     >
       <Starfield count={48} />
       <EnglishHeader georgianPath={georgianPath} />

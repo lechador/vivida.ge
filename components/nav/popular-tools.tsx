@@ -18,7 +18,7 @@ export function PopularTools({
   return (
     <nav
       aria-label={en ? "Most used" : "ყველაზე გამოყენებადი"}
-      className="grid gap-px border border-border bg-border sm:grid-cols-2"
+      className="grid gap-4 sm:grid-cols-2"
     >
       <TrackedPublicLink
         href={localizedHref("/taro", locale)}
@@ -27,9 +27,9 @@ export function PopularTools({
         feature="popular_tools"
         surface={placement}
         locale={locale}
-        className="group flex items-center gap-4 bg-card p-5 transition-colors hover:bg-secondary/60"
+        className="group flex items-center gap-4 rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/60 hover:bg-secondary/60"
       >
-        <span className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+        <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-primary/40 bg-primary/15 text-primary">
           <Wand2 aria-hidden="true" className="size-4.5" />
         </span>
         <span className="min-w-0 flex-1">
@@ -55,14 +55,14 @@ export function PopularTools({
         feature="popular_tools"
         surface={placement}
         locale={locale}
-        className="group flex items-center gap-4 bg-card p-5 transition-colors hover:bg-secondary/60"
+        className="group flex items-center gap-4 rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-[var(--vivida-cyan)]/60 hover:bg-secondary/60"
       >
-        <span className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 text-primary">
+        <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/15 text-[var(--vivida-cyan)]">
           <Stars aria-hidden="true" className="size-4.5" />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold tracking-tight text-foreground">
-            {en ? "Ask your chart" : "ჰკითხე ასტროლოგს"}
+            {en ? "Ask your chart" : "ჰკითხე ვარსკვლავებს"}
           </span>
           <span className="mt-0.5 block text-xs text-muted-foreground">
             {publicEntry
@@ -76,7 +76,7 @@ export function PopularTools({
         </span>
         <ArrowRight
           aria-hidden="true"
-          className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
+          className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--vivida-cyan)]"
         />
       </TrackedPublicLink>
     </nav>

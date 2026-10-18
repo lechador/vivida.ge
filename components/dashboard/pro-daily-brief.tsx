@@ -110,13 +110,15 @@ export function ProDailyBrief({
   return (
     <section
       aria-label={en ? "Your PRO day" : "შენი PRO დღე"}
-      className="rounded-md border border-border bg-card p-6 sm:p-7"
+      className="rounded-xl border border-[var(--vivida-gold)]/40 bg-card p-6 shadow-sm sm:p-7"
     >
-      <header className="flex items-center justify-between gap-4 border-b border-border/80 pb-4">
+      <header className="flex items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex items-center gap-2.5">
-          <Crown className="size-4.5 text-primary" aria-hidden />
+          <span className="grid size-8 place-items-center rounded-lg border border-[var(--vivida-gold)]/40 bg-[var(--vivida-gold)]/15 text-[var(--vivida-gold)]">
+            <Crown className="size-4" aria-hidden />
+          </span>
           <div>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
               {en ? "Your PRO Day" : "შენი PRO დღე"}
             </h2>
             <p className="mt-0.5 font-mono text-xs tabular-nums text-muted-foreground">
@@ -125,7 +127,7 @@ export function ProDailyBrief({
           </div>
         </div>
         <div className="text-right font-mono tabular-nums">
-          <div className="text-2xl font-semibold text-primary">
+          <div className="text-2xl font-semibold text-[var(--vivida-gold)]">
             {score}
             <span className="text-xs font-normal text-muted-foreground">
               /10
@@ -139,9 +141,9 @@ export function ProDailyBrief({
 
       {/* Day score bar */}
       <div className="mt-4">
-        <div className="h-1.5 overflow-hidden bg-border">
+        <div className="h-2 overflow-hidden rounded-full bg-background/80 ring-1 ring-border">
           <div
-            className="h-full bg-primary transition-[width] duration-700 ease-out"
+            className="h-full rounded-full bg-[var(--vivida-gold)] transition-[width] duration-700 ease-out"
             style={{ width: mounted ? `${score * 10}%` : "0%" }}
           />
         </div>
@@ -157,7 +159,7 @@ export function ProDailyBrief({
           <h3 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             {en ? "Today's Transits" : "დღის ტრანზიტები"}
           </h3>
-          <ul className="mt-2.5 divide-y divide-border/70 border border-border bg-secondary/20">
+          <ul className="mt-2.5 divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/70">
             {top.map((t, i) => {
               const transitBody = BODIES[t.transit];
               const natalBody = BODIES[t.natal];
@@ -198,7 +200,7 @@ export function ProDailyBrief({
                   )}
                   {!isPremium && (
                     <Lock
-                      className="absolute right-4 top-4 size-4 text-primary"
+                      className="absolute right-4 top-4 size-4 text-[var(--vivida-gold)]"
                       aria-hidden
                     />
                   )}
@@ -210,8 +212,8 @@ export function ProDailyBrief({
       )}
 
       {/* PRO-only ritual question */}
-      <div className="mt-5 border-t border-border/80 pt-4">
-        <h3 className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+      <div className="mt-5 border-t border-border pt-4">
+        <h3 className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
           {en ? "PRO Reflection" : "PRO რეფლექსია"}
         </h3>
         <p className="mt-1.5 text-sm font-medium leading-relaxed text-foreground">
@@ -230,7 +232,7 @@ export function ProDailyBrief({
               placeholder={
                 en ? "A sentence is enough…" : "ერთი წინადადებაც საკმარისია…"
               }
-              className="w-full resize-none rounded-md border border-border bg-secondary/30 px-3.5 py-2.5 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:border-primary/70 focus:outline-none"
+              className="w-full resize-none rounded-lg border border-border bg-background/80 px-3.5 py-2.5 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:border-primary/70 focus:outline-none"
             />
             <div className="mt-2 flex items-center justify-between gap-3">
               <span className="text-[11px] text-muted-foreground">

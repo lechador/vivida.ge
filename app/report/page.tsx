@@ -94,7 +94,7 @@ export default async function ReportPage({
     <CryptoPayHost>
       <main
         lang={locale}
-        className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
+        className="relative isolate flex flex-1 flex-col overflow-x-clip bg-background"
       >
         <ClearPendingNatalProfile />
         <Starfield count={48} />
@@ -127,7 +127,9 @@ export default async function ReportPage({
                 href="#pdf-report"
                 className="font-mono text-xs uppercase tracking-wider text-muted-foreground underline underline-offset-4 transition-colors hover:text-primary"
               >
-                {en ? "PDF dossier & downloads ↓" : "PDF ანგარიში და ჩამოტვირთვა ↓"}
+                {en
+                  ? "PDF dossier & downloads ↓"
+                  : "PDF ანგარიში და ჩამოტვირთვა ↓"}
               </a>
             </div>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
@@ -171,7 +173,7 @@ export default async function ReportPage({
 
           {showUkOffer && (
             <div className="mt-6">
-              <div className="mb-3 rounded-md border border-primary/30 bg-primary/8 px-5 py-4 text-sm text-foreground/85">
+              <div className="mb-3 rounded-xl border border-primary/35 bg-primary/10 px-5 py-4 text-sm text-foreground/85">
                 <strong className="text-foreground">
                   Explore more with PRO.
                 </strong>{" "}
@@ -185,7 +187,7 @@ export default async function ReportPage({
             </div>
           )}
 
-          <div className="mt-12 rounded-md border border-border bg-card p-6">
+          <div className="mt-12 rounded-xl border border-border bg-card p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">

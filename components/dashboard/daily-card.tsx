@@ -108,10 +108,10 @@ export function DailyCard({
     : kaLongDate(horoscope.date);
 
   return (
-    <article className="rounded-md border border-border bg-card p-6 sm:p-8">
-      <header className="border-b border-border/80 pb-5">
+    <article className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
+      <header className="border-b border-border pb-5">
         <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
-          <span className="font-medium uppercase tracking-[0.2em] text-primary">
+          <span className="font-medium uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
             {en ? "Daily Transit Briefing" : "დღევანდელი პროგნოზი"}
           </span>
           <span className="font-mono tabular-nums">{date}</span>
@@ -154,9 +154,11 @@ export function DailyCard({
       {children != null && <div className="mt-6">{children}</div>}
 
       {hasDetails && (
-        <details className="group mt-6 border-t border-border/80 pt-4">
+        <details className="group mt-6 border-t border-border pt-4">
           <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
-            <span>{en ? "Details and transits" : "დეტალები და ტრანზიტები"}</span>
+            <span>
+              {en ? "Details and transits" : "დეტალები და ტრანზიტები"}
+            </span>
             <span
               aria-hidden
               className="font-mono text-sm transition-transform group-open:rotate-45"
@@ -171,18 +173,18 @@ export function DailyCard({
               </p>
             ))}
             {transits.length > 0 && (
-              <section className="border-t border-border/70 pt-4">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              <section className="border-t border-border pt-4">
+                <h3 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
                   {en ? "Today's Transits" : "დღის ტრანზიტები"}
                 </h3>
-                <ul className="divide-y divide-border/70 border border-border bg-secondary/20">
+                <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/70">
                   {transits.map((t, i) => {
                     const transitBody = BODIES[t.transit];
                     const natalBody = BODIES[t.natal];
                     return (
                       <li key={i} className="p-4">
                         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                          <span className="font-mono font-medium text-primary">
+                          <span className="font-mono font-medium text-[var(--vivida-cyan)]">
                             {transitBody?.symbol}{" "}
                             {(en
                               ? transitBody?.labelEn
@@ -214,7 +216,7 @@ export function DailyCard({
         </details>
       )}
 
-      <p className="mt-6 border-t border-border/70 pt-4 text-xs text-muted-foreground">
+      <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
         {en
           ? "A new reading will be waiting tomorrow."
           : "ხვალ ახალი წინასწარმეტყველება გელოდება."}

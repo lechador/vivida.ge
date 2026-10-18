@@ -165,7 +165,7 @@ export default async function DashboardPage() {
   return (
     <main
       lang={locale}
-      className="relative isolate flex flex-1 flex-col overflow-hidden bg-background"
+      className="relative isolate flex flex-1 flex-col overflow-x-clip bg-background"
     >
       <Starfield count={48} />
 
@@ -173,10 +173,10 @@ export default async function DashboardPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         {restricted && <RestrictedNotice locale={locale} />}
-        <header className="mb-8 overflow-hidden rounded-sm border border-border bg-card">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/60 px-5 py-2.5 sm:px-6">
-            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
-              <span className="inline-block size-1.5 rounded-full bg-primary" />
+        <header className="mb-8 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/70 px-5 py-2.5 sm:px-6">
+            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
+              <span className="inline-block size-1.5 rounded-full bg-[var(--vivida-gold)]" />
               {en
                 ? "PERSONAL OBSERVATORY · EPHEMERIS WORKSPACE"
                 : "პირადი ობსერვატორია · ეფემერიდების სივრცე"}
@@ -202,19 +202,19 @@ export default async function DashboardPage() {
             <div className="flex flex-wrap items-center gap-2">
               <Link
                 href="/report"
-                className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/10 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-primary transition-colors hover:bg-primary/20"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-primary/50 bg-primary/15 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-primary transition-colors hover:bg-primary/25"
               >
                 {en ? "Natal Chart" : "ჩემი რუკა"} →
               </Link>
               <Link
                 href="/synastry"
-                className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-border bg-background/60 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-foreground/85 transition-colors hover:border-primary/40 hover:text-primary"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/10 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--vivida-pink)] transition-colors hover:border-[var(--vivida-pink)]/60 hover:bg-[var(--vivida-pink)]/20"
               >
                 {en ? "Synastry" : "თავსებადობა"}
               </Link>
               <Link
                 href="/taro"
-                className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-border bg-background/60 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-foreground/85 transition-colors hover:border-primary/40 hover:text-primary"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--vivida-cyan)] transition-colors hover:border-[var(--vivida-cyan)]/60 hover:bg-[var(--vivida-cyan)]/20"
               >
                 {en ? "Tarot" : "ტარო"}
               </Link>

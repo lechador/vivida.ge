@@ -12,10 +12,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Button } from "@/components/ui/button";
 import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
 import { PopularTools } from "@/components/nav/popular-tools";
-import {
-  computeMoonPhase,
-  type MoonPhaseSnapshot,
-} from "@/lib/moon-phase";
+import { computeMoonPhase, type MoonPhaseSnapshot } from "@/lib/moon-phase";
 import {
   creditPacksForCountry,
   formatBillingAmount,
@@ -225,19 +222,16 @@ const cachedAnnualEvents = unstable_cache(
 
 function EventList({ events, label }: { events: MajorEvent[]; label: string }) {
   return (
-    <ul
-      aria-label={label}
-      className="mt-4 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2"
-    >
+    <ul aria-label={label} className="mt-4 grid gap-3 sm:grid-cols-2">
       {events.map((event) => (
         <li
           key={`${event.kind}-${event.date.toISOString()}`}
-          className="bg-card p-4"
+          className="rounded-lg border border-border bg-card p-4 shadow-2xs"
         >
           <div className="flex items-start gap-3">
             <span
               aria-hidden
-              className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-background/60"
+              className="grid size-10 shrink-0 place-items-center rounded-md border border-border bg-background/70"
             >
               <LunarPhaseDisc
                 phaseKey={event.kind === "new" ? "new_moon" : "full_moon"}
@@ -351,7 +345,7 @@ export default async function MoonCalendarPage() {
   ];
 
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background">
+    <main className="relative isolate flex min-h-screen flex-col overflow-x-clip bg-background">
       <Starfield count={48} />
       <SmartHeader />
       <script
@@ -391,7 +385,7 @@ export default async function MoonCalendarPage() {
 
         <nav
           aria-label="მთვარის კალენდრის სექციები"
-          className="mb-8 inline-flex flex-wrap rounded-md border border-border bg-card p-1"
+          className="mb-8 inline-flex flex-wrap rounded-lg border border-border bg-card p-1 shadow-2xs"
         >
           {[
             ["#moon-today", "დღეს"],
@@ -405,7 +399,7 @@ export default async function MoonCalendarPage() {
               target={href.slice(1)}
               feature="moon_calendar"
               surface="section_nav"
-              className="rounded-sm px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/50 hover:text-foreground"
+              className="rounded-md px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/50 hover:text-foreground"
             >
               {label}
             </TrackedPublicLink>
@@ -415,7 +409,7 @@ export default async function MoonCalendarPage() {
         {todaySnapshot && (
           <section
             aria-labelledby="moon-today"
-            className="mb-10 rounded-md border border-border bg-card p-6 sm:p-8"
+            className="mb-10 rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8"
           >
             <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
               <div>
@@ -429,7 +423,8 @@ export default async function MoonCalendarPage() {
                   მთვარის რომელი ფაზაა დღეს?
                 </h2>
                 <p className="mt-3 text-base leading-relaxed text-foreground/90 sm:text-lg">
-                  დღეს, <strong className="font-mono">{formatDateKa(now)}</strong>,
+                  დღეს,{" "}
+                  <strong className="font-mono">{formatDateKa(now)}</strong>,
                   მთვარის ფაზაა <strong>{todaySnapshot.phaseLabelKa}</strong>.
                   განათებულია{" "}
                   <strong className="font-mono tabular-nums text-primary">
@@ -449,8 +444,8 @@ export default async function MoonCalendarPage() {
                 />
               </div>
             </div>
-            <dl className="mt-6 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
-              <div className="bg-background/60 p-4">
+            <dl className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border border-border bg-background/70 p-4">
                 <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
                   დღეს მთვარის დღეა
                 </dt>
@@ -461,7 +456,7 @@ export default async function MoonCalendarPage() {
                   ახალი მთვარიდან დათვლილი
                 </dd>
               </div>
-              <div className="bg-background/60 p-4">
+              <div className="rounded-lg border border-border bg-background/70 p-4">
                 <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
                   უახლოესი ახალი მთვარე
                 </dt>
@@ -472,7 +467,7 @@ export default async function MoonCalendarPage() {
                   საქართველოს კალენდარული თარიღი
                 </dd>
               </div>
-              <div className="bg-background/60 p-4">
+              <div className="rounded-lg border border-border bg-background/70 p-4">
                 <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
                   უახლოესი სავსე მთვარე
                 </dt>
@@ -561,14 +556,14 @@ export default async function MoonCalendarPage() {
             ნიშანს. ფაზის ზუსტი პიკებისთვის გამოიყენე ზემოთ მოცემული წლიური
             თარიღები.
           </p>
-          <ul className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3 md:grid-cols-5">
+          <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
             {days.map((day) => {
               const p = tbilisiCalendarParts(day.date);
               const snapshot = day.snapshot;
               return (
                 <li
                   key={day.date.toISOString()}
-                  className="bg-card p-3.5"
+                  className="rounded-lg border border-border bg-card p-3.5 shadow-2xs"
                 >
                   <div className="flex items-baseline justify-between gap-1.5 border-b border-border/60 pb-2">
                     <time
@@ -588,7 +583,9 @@ export default async function MoonCalendarPage() {
                           phaseAngle={snapshot.phaseAngle}
                           size={18}
                         />
-                        <span className="truncate">{snapshot.phaseLabelKa}</span>
+                        <span className="truncate">
+                          {snapshot.phaseLabelKa}
+                        </span>
                       </div>
                       <p className="text-[11px] text-primary">
                         {snapshot.signSymbol} {snapshot.signKa}
@@ -619,11 +616,15 @@ export default async function MoonCalendarPage() {
             თითოეულთან მითითებულია განათების დიაპაზონი, ციკლის რომელ დღეებზე
             მოდის და რას ნიშნავს ტრადიციულად.
           </p>
-          <div className="mt-6 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
+          <div className="mt-6 grid gap-3.5 sm:grid-cols-2">
             {PHASE_GUIDE.map((p) => (
               <article
                 key={p.key}
-                className={`p-5 ${todaySnapshot?.phaseKey === p.key ? "bg-secondary/45" : "bg-card"}`}
+                className={`rounded-xl border p-5 shadow-sm ${
+                  todaySnapshot?.phaseKey === p.key
+                    ? "border-primary/50 bg-secondary/45"
+                    : "border-border bg-card"
+                }`}
               >
                 <div className="flex items-center gap-3.5">
                   <LunarPhaseDisc phaseKey={p.key} size={32} />
@@ -662,11 +663,14 @@ export default async function MoonCalendarPage() {
             დღეების ათვლაა: ახალი მთვარის დღეს იწყება პირველი მთვარის დღე და
             ციკლი 29-ე ან 30-ე დღეს სრულდება.
           </p>
-          <div className="mt-6 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
+          <div className="mt-6 grid gap-3.5 sm:grid-cols-2">
             {LUNAR_DAY_NOTES.map((d) => (
-              <article key={d.range} className="bg-card p-5">
+              <article
+                key={d.range}
+                className="rounded-xl border border-border bg-card p-5 shadow-sm"
+              >
                 <div className="flex items-baseline gap-2.5">
-                  <span className="rounded-sm border border-border bg-background/60 px-2 py-0.5 font-mono text-xs font-semibold tabular-nums text-primary">
+                  <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 font-mono text-xs font-semibold tabular-nums text-primary">
                     {d.range}
                   </span>
                   <h3 className="font-semibold tracking-tight text-foreground">
@@ -681,8 +685,8 @@ export default async function MoonCalendarPage() {
           </div>
         </section>
 
-        <section className="mb-16 grid gap-px overflow-hidden rounded-md border border-border bg-border md:grid-cols-2">
-          <div className="bg-card p-6 sm:p-8">
+        <section className="mb-16 grid gap-4 md:grid-cols-2">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
             <h2 className="text-xl font-semibold text-foreground">
               რას ნიშნავს მთვარის ფაზები
             </h2>
@@ -694,7 +698,7 @@ export default async function MoonCalendarPage() {
               მთვარეს უბრუნდება.
             </p>
           </div>
-          <div className="bg-card p-6 sm:p-8">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
             <h2 className="text-xl font-semibold text-foreground">
               როგორ გამოვიყენოთ მთვარის კალენდარი
             </h2>
@@ -708,7 +712,7 @@ export default async function MoonCalendarPage() {
           </div>
         </section>
 
-        <section className="mb-16 rounded-md border border-border bg-card p-6 sm:p-8">
+        <section className="mb-16 rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
           <h2 className="text-xl font-semibold text-foreground">
             ასტრონომიული მონაცემი და ასტროლოგიური ინტერპრეტაცია
           </h2>
@@ -726,16 +730,13 @@ export default async function MoonCalendarPage() {
           </p>
         </section>
 
-        <aside
-          aria-labelledby="related-guides"
-          className="mb-16"
-        >
+        <aside aria-labelledby="related-guides" className="mb-16">
           <h2 id="related-guides" className="mb-4 text-xl font-semibold">
             დაკავშირებული კალენდრები და გზამკვლევები
           </h2>
           <nav
             aria-label="მთვარესთან დაკავშირებული გვერდები"
-            className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3"
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
           >
             {[
               ["/akhali-mtvare", "ახალი მთვარის კალენდარი"],
@@ -748,10 +749,13 @@ export default async function MoonCalendarPage() {
               <Link
                 key={href}
                 href={href}
-                className="flex items-center justify-between bg-card px-4 py-3.5 text-sm text-foreground transition-colors hover:bg-secondary/45"
+                className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3.5 text-sm text-foreground shadow-2xs transition-colors hover:border-primary/45 hover:bg-secondary/45"
               >
                 <span>{label}</span>
-                <ArrowRight aria-hidden className="size-4 text-muted-foreground" />
+                <ArrowRight
+                  aria-hidden
+                  className="size-4 text-muted-foreground"
+                />
               </Link>
             ))}
           </nav>
@@ -764,7 +768,7 @@ export default async function MoonCalendarPage() {
           >
             ხშირად დასმული კითხვები
           </h2>
-          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
+          <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             {faq.map((item) => (
               <details key={item.q} className="group">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
@@ -773,7 +777,7 @@ export default async function MoonCalendarPage() {
                     +
                   </span>
                 </summary>
-                <p className="border-t border-border/60 bg-background/40 px-5 py-4 text-sm leading-relaxed text-muted-foreground">
+                <p className="border-t border-border/60 bg-background/50 px-5 py-4 text-sm leading-relaxed text-muted-foreground">
                   {item.a}
                 </p>
               </details>
@@ -781,7 +785,7 @@ export default async function MoonCalendarPage() {
           </div>
         </section>
 
-        <div className="flex flex-col justify-between gap-6 rounded-md border border-border bg-card p-6 sm:flex-row sm:items-center sm:p-8">
+        <div className="flex flex-col justify-between gap-6 rounded-xl border border-primary/35 bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:p-8">
           <div className="max-w-xl">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
               ნატალური რუკა
@@ -790,8 +794,8 @@ export default async function MoonCalendarPage() {
               იპოვე შენი მთვარის ნიშანი
             </h2>
             <p className="mt-2 text-pretty text-sm text-muted-foreground">
-              დაბადების თარიღი, ზუსტი დრო და ადგილი გვიჩვენებს, რომელ ნიშანში იყო
-              მთვარე შენი დაბადებისას.
+              დაბადების თარიღი, ზუსტი დრო და ადგილი გვიჩვენებს, რომელ ნიშანში
+              იყო მთვარე შენი დაბადებისას.
             </p>
           </div>
           <Button asChild size="lg" className="shrink-0">

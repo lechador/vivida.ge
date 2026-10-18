@@ -26,17 +26,19 @@ export function MoonPhaseCard({
   const illumPct = Math.round(snapshot.illumination * 100);
 
   return (
-    <article className="rounded-md border border-border bg-card p-5 sm:p-6">
+    <article className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
       {/* Top Telemetry Header */}
-      <div className="flex items-start justify-between gap-3 border-b border-border/80 pb-4">
+      <div className="flex items-start justify-between gap-3 border-b border-border pb-4">
         <div className="min-w-0">
-          <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
             {en ? "Lunar Telemetry" : "დღევანდელი მთვარე"}
           </div>
           <div className="mt-1.5 text-sm font-medium text-foreground">
             {en ? PHASE_LABEL_EN[data.snapshot.phaseKey] : data.phaseLabelKa}{" "}
             <span className="text-muted-foreground">·</span>{" "}
-            <span className="font-mono text-primary">{sign.symbol}</span>{" "}
+            <span className="font-mono text-[var(--vivida-gold)]">
+              {sign.symbol}
+            </span>{" "}
             <span>{en ? sign.labelEn : data.signKa}</span>
           </div>
           {/* Unboxed tabular lunar metrics */}
@@ -67,7 +69,7 @@ export function MoonPhaseCard({
 
       {/* Unboxed inline themes separated by middle dots */}
       {data.themes && data.themes.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-primary">
+        <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-[var(--vivida-cyan)]">
           {data.themes.map((theme, i) => (
             <span key={i} className="inline-flex items-center gap-2">
               {i > 0 && (
@@ -82,7 +84,7 @@ export function MoonPhaseCard({
       )}
 
       <details
-        className="group mt-4 border-t border-border/70 pt-3"
+        className="group mt-4 border-t border-border pt-3"
         onToggle={(event) => {
           if (event.currentTarget.open) onRead?.();
         }}

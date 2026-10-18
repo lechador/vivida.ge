@@ -86,7 +86,7 @@ const FAQ_LD = {
 export default async function ZodiacHubPage() {
   if ((await getRequestLocale()) !== "ka") return <ZodiacHubEn />;
   return (
-    <main className="relative isolate flex min-h-screen flex-col overflow-hidden bg-background">
+    <main className="relative isolate flex min-h-screen flex-col overflow-x-clip bg-background">
       <Starfield count={48} />
 
       <SmartHeader />
@@ -102,7 +102,7 @@ export default async function ZodiacHubPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <header className="border-b border-border pb-8">
-          <div className="mb-2 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
+          <div className="mb-2 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
             ცის ნიშნები · ZODIAC ALMANAC
           </div>
           <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
@@ -140,11 +140,11 @@ export default async function ZodiacHubPage() {
           ))}
         </div>
 
-        {/* 12-sign almanac hairline grid */}
+        {/* 12-sign outlined cards grid */}
         <h2 className="mb-4 mt-14 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
           12 ცის ნიშანი
         </h2>
-        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {ALL_SLUGS.map((slug) => {
             const c = SIGNS_CONTENT[slug];
             const meta = signMetaBySlug(slug);
@@ -153,12 +153,12 @@ export default async function ZodiacHubPage() {
               <Link
                 key={slug}
                 href={`/zodiac/${slug}`}
-                className="group flex flex-col justify-between bg-card p-5 transition-colors duration-150 hover:bg-secondary/40"
+                className="group flex flex-col justify-between rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-150 hover:border-primary/45 hover:bg-secondary/50"
               >
                 <div>
                   <div className="flex items-center justify-between">
                     <span
-                      className="grid size-10 place-items-center rounded-sm border border-border bg-background text-2xl"
+                      className="grid size-10 place-items-center rounded-lg border border-border bg-background/80 text-2xl"
                       style={{ color: accent }}
                     >
                       {c.symbol}
@@ -174,7 +174,7 @@ export default async function ZodiacHubPage() {
                     {ZODIAC_DATES[slug].rangeKa}
                   </div>
                 </div>
-                <div className="mt-4 border-t border-border/60 pt-2.5 text-[11px] text-muted-foreground">
+                <div className="mt-4 border-t border-border/70 pt-2.5 text-[11px] text-muted-foreground">
                   {c.element} · {c.modality}
                 </div>
               </Link>
@@ -183,9 +183,9 @@ export default async function ZodiacHubPage() {
         </div>
 
         {/* Editorial Reference Columns */}
-        <div className="mt-16 grid gap-px overflow-hidden rounded-md border border-border bg-border lg:grid-cols-3">
-          <article className="bg-card p-6 sm:p-7">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+        <div className="mt-16 grid gap-4 lg:grid-cols-3">
+          <article className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-7">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
               01 · საფუძველი
             </p>
             <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground">
@@ -198,8 +198,8 @@ export default async function ZodiacHubPage() {
             </div>
           </article>
 
-          <article className="bg-card p-6 sm:p-7">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+          <article className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-7">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
               02 · სტიქიები
             </p>
             <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground">
@@ -212,8 +212,8 @@ export default async function ZodiacHubPage() {
             </div>
           </article>
 
-          <article className="bg-card p-6 sm:p-7">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+          <article className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-7">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
               03 · მოდალობა
             </p>
             <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground">
@@ -232,40 +232,46 @@ export default async function ZodiacHubPage() {
           <h2 className="mb-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             ჩაუღრმავდი
           </h2>
-          <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 href: "/zodiac/mtvare",
                 eyebrow: "მთვარის ნიშანი",
                 title: "შენი ემოციური ბირთვი",
                 body: "მზის ნიშნის ქვეშ მდებარე შინაგანი სამყარო.",
+                accent: "text-[var(--vivida-cyan)]",
               },
               {
                 href: "/zodiac/amomavali",
                 eyebrow: "ამომავალი",
                 title: "ნიღაბი, რომელსაც სამყარო ხედავს",
                 body: "ასცენდენტი, როგორ შედიხარ ოთახში.",
+                accent: "text-primary",
               },
               {
                 href: "/zodiac/elementebi",
                 eyebrow: "ცის ელემენტები",
                 title: "ცეცხლი · მიწა · ჰაერი · წყალი",
                 body: "გაიგე, როგორ აყალიბებს ოთხი ელემენტი ცის ნიშნების ხასიათს.",
+                accent: "text-[var(--vivida-gold)]",
               },
               {
                 href: "/zodiac/tavsebadoba",
                 eyebrow: "თავსებადობა",
                 title: "ყველა წყვილი · 78 კავშირი",
                 body: "ნახე სრული ცხრილი, ვერძი ლომთან, ქალწული თხის რქასთან.",
+                accent: "text-[var(--vivida-pink)]",
               },
             ].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="group flex flex-col justify-between bg-card p-6 transition-colors duration-150 hover:bg-secondary/40"
+                className="group flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-150 hover:border-primary/45 hover:bg-secondary/50"
               >
                 <div>
-                  <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                  <div
+                    className={`font-mono text-[11px] font-semibold uppercase tracking-[0.18em] ${item.accent}`}
+                  >
                     {item.eyebrow}
                   </div>
                   <h3 className="mt-2 text-lg font-semibold tracking-tight text-foreground group-hover:text-primary">
@@ -275,7 +281,7 @@ export default async function ZodiacHubPage() {
                     {item.body}
                   </p>
                 </div>
-                <span className="mt-4 font-mono text-xs text-muted-foreground group-hover:text-foreground">
+                <span className="mt-4 font-mono text-xs text-muted-foreground group-hover:text-primary">
                   გადასვლა →
                 </span>
               </Link>
@@ -288,9 +294,12 @@ export default async function ZodiacHubPage() {
           <h2 className="mb-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             ხშირად დასმული კითხვები
           </h2>
-          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
+          <div className="space-y-3">
             {HUB_CONTENT.faq.map((item, i) => (
-              <details key={i} className="group">
+              <details
+                key={i}
+                className="group overflow-hidden rounded-xl border border-border bg-card shadow-2xs open:border-primary/45"
+              >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4 p-5 text-base font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                   <span>{item.q}</span>
                   <span
@@ -300,20 +309,20 @@ export default async function ZodiacHubPage() {
                     +
                   </span>
                 </summary>
-                <p className="px-5 pb-5 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                <p className="border-t border-border/70 bg-background/55 px-5 py-4 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
                   {item.a}
                 </p>
               </details>
             ))}
           </div>
 
-          <div className="mt-8 grid gap-px overflow-hidden rounded-md border border-border bg-border">
+          <div className="mt-8 space-y-3.5">
             <Link
               href="/zodiac/reitingebi"
-              className="group flex items-center justify-between gap-4 bg-card p-6 transition-colors hover:bg-secondary/40"
+              className="group flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/45 hover:bg-secondary/45"
             >
               <div className="min-w-0">
-                <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
                   რეიტინგები
                 </div>
                 <h3 className="mt-1 text-lg font-semibold tracking-tight text-foreground group-hover:text-primary sm:text-xl">
@@ -329,10 +338,10 @@ export default async function ZodiacHubPage() {
 
             <Link
               href="/chinuri-horoskopi"
-              className="group flex items-center justify-between gap-4 bg-card p-6 transition-colors hover:bg-secondary/40"
+              className="group flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/45 hover:bg-secondary/45"
             >
               <div className="min-w-0">
-                <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
                   ჩინური ჰოროსკოპი
                 </div>
                 <h3 className="mt-1 text-lg font-semibold tracking-tight text-foreground group-hover:text-primary sm:text-xl">
@@ -348,10 +357,10 @@ export default async function ZodiacHubPage() {
 
             <Link
               href="/taro"
-              className="group flex items-center justify-between gap-4 bg-card p-6 transition-colors hover:bg-secondary/40"
+              className="group flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/45 hover:bg-secondary/45"
             >
               <div className="min-w-0">
-                <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
                   ონლაინ ტარო
                 </div>
                 <h3 className="mt-1 text-lg font-semibold tracking-tight text-foreground group-hover:text-primary sm:text-xl">
@@ -370,18 +379,18 @@ export default async function ZodiacHubPage() {
         <ReportPromo className="mt-16" />
 
         {/* CTA */}
-        <div className="mt-16 rounded-md border border-border bg-card p-7 sm:p-10">
+        <div className="mt-16 rounded-2xl border border-primary/45 bg-gradient-to-br from-primary/15 via-card to-[var(--vivida-cyan)]/10 p-7 shadow-md sm:p-10">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
             <div className="max-w-xl">
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
                 ნატალური რუკა
               </p>
               <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                 შენი ნიშანი ცის რუკის მცირე ნაწილია
               </h2>
               <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-                მთვარე, ამომავალი, 12 სახლი და ყველა პლანეტა — ერთ ცოცხალ რუკაში.
-                დაიწყე უფასოდ.
+                მთვარე, ამომავალი, 12 სახლი და ყველა პლანეტა — ერთ ცოცხალ
+                რუკაში. დაიწყე უფასოდ.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

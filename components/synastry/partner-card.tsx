@@ -43,20 +43,20 @@ export function PartnerCard({
     <Link
       href={`/synastry/${id}`}
       className={cn(
-        "group relative flex h-full items-start gap-3.5 bg-card p-5 transition-colors hover:bg-secondary/40",
+        "group relative flex h-full items-start gap-3.5 rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-[var(--vivida-pink)]/60 hover:bg-secondary/40",
         isPending && "pointer-events-none opacity-50",
       )}
     >
-      <div className="grid size-10 shrink-0 place-items-center rounded-sm border border-border bg-secondary/50 font-mono text-sm font-semibold text-primary">
+      <div className="grid size-10 shrink-0 place-items-center rounded-lg border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/15 font-mono text-sm font-semibold text-[var(--vivida-pink)]">
         {name.slice(0, 1).toUpperCase()}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <div className="truncate text-base font-semibold tracking-tight text-foreground group-hover:text-primary">
+          <div className="truncate text-base font-semibold tracking-tight text-foreground group-hover:text-[var(--vivida-pink)]">
             {name}
           </div>
           {connected && (
-            <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[10px] font-medium uppercase tracking-wider text-primary">
+            <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[10px] font-medium uppercase tracking-wider text-[var(--vivida-cyan)]">
               <Link2 className="size-2.5" aria-hidden />
               {locale !== "ka" ? "Connected" : "ერთად"}
             </span>

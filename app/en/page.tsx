@@ -128,25 +128,25 @@ export default function EnglishHomePage() {
 
       {/* Swiss-Grid Architectural Hero Ledger */}
       <section className="mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 sm:pt-10">
-        <div className="relative border border-border bg-card/40">
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-[oklch(0.145_0.036_280)] shadow-lg">
           <CornerCrosshair position="top-left" />
           <CornerCrosshair position="top-right" />
           <CornerCrosshair position="bottom-left" />
           <CornerCrosshair position="bottom-right" />
 
           {/* Top Meta Index Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/70 px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground sm:px-8">
-            <span className="text-primary">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/80 px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground sm:px-8">
+            <span className="text-[var(--vivida-gold)]">
               VOL. IV · Astronomical Almanac & Personal Observatory
             </span>
-            <span className="tabular-nums">
+            <span className="tabular-nums text-[var(--vivida-cyan)]">
               Ephemeris Meridian · 41°43′N 44°47′E
             </span>
           </div>
 
           <div className="grid items-stretch divide-y divide-border lg:grid-cols-[1.12fr_0.88fr] lg:divide-x lg:divide-y-0">
             {/* Left Column: Proposition & Action */}
-            <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-12">
+            <div className="flex flex-col justify-between bg-[oklch(0.155_0.038_280)] p-6 sm:p-10 lg:p-12">
               <div>
                 <Kicker>Astronomical Ephemeris · Tarot · Personal Chart</Kicker>
                 <h1 className="font-display mt-6 max-w-xl text-balance text-5xl font-normal leading-[1.04] tracking-[-0.015em] sm:text-6xl">
@@ -160,13 +160,13 @@ export default function EnglishHomePage() {
                 <div className="mt-8 flex flex-wrap gap-3.5">
                   <Link
                     href="/natal-chart"
-                    className="inline-flex h-12 items-center gap-2 whitespace-nowrap rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                    className="inline-flex h-12 items-center gap-2 whitespace-nowrap rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
                   >
                     Calculate my chart, free <ArrowRight className="size-4" />
                   </Link>
                   <Link
                     href="/tarot"
-                    className="inline-flex h-12 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-card px-6 text-sm font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-secondary"
+                    className="inline-flex h-12 items-center gap-2 whitespace-nowrap rounded-lg border border-border bg-card px-6 text-sm font-medium text-foreground shadow-2xs transition-colors hover:border-primary/50 hover:bg-secondary"
                   >
                     Open Tarot Studio
                   </Link>
@@ -181,19 +181,19 @@ export default function EnglishHomePage() {
                 <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em]">
                   <Link
                     href="/natal-chart"
-                    className="text-foreground/85 transition-colors hover:text-primary"
+                    className="text-[var(--vivida-gold)] transition-colors hover:text-primary"
                   >
                     01. Natal Chart →
                   </Link>
                   <Link
                     href="/compatibility"
-                    className="text-foreground/85 transition-colors hover:text-primary"
+                    className="text-[var(--vivida-pink)] transition-colors hover:text-primary"
                   >
                     02. Synastry →
                   </Link>
                   <Link
-                    href="/mtvaris-kalendari"
-                    className="text-foreground/85 transition-colors hover:text-primary"
+                    href="/moon-calendar"
+                    className="text-[var(--vivida-cyan)] transition-colors hover:text-primary"
                   >
                     03. Moon Calendar →
                   </Link>
@@ -208,13 +208,13 @@ export default function EnglishHomePage() {
           </div>
 
           {/* 4-Column Astronomical Telemetry Strip */}
-          <div className="grid grid-cols-2 gap-px border-t border-border bg-border lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 border-t border-border bg-background/75 p-3.5 sm:p-5 lg:grid-cols-4">
             {TELEMETRY_SPEC_EN.map((item) => (
               <div
                 key={item.index}
-                className="bg-background/85 px-5 py-4 sm:px-6 sm:py-5"
+                className="rounded-xl border border-border bg-card px-4 py-3.5 shadow-2xs sm:px-5 sm:py-4"
               >
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
                   {item.index}
                 </div>
                 <div className="mt-1 font-mono text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-lg">
@@ -231,8 +231,8 @@ export default function EnglishHomePage() {
 
       {/* Architectural Almanac Directory */}
       <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <div className="border border-border bg-card/30">
-          <div className="grid gap-8 border-b border-border p-6 sm:p-10 lg:grid-cols-[0.9fr_1.1fr] lg:divide-x lg:divide-border lg:p-0">
+        <div className="overflow-hidden rounded-2xl border border-border bg-[oklch(0.145_0.036_280)] shadow-md">
+          <div className="grid gap-8 border-b border-border bg-[oklch(0.155_0.038_280)] p-6 sm:p-10 lg:grid-cols-[0.9fr_1.1fr] lg:divide-x lg:divide-border lg:p-0">
             <div className="lg:p-10">
               <Kicker>A thoughtful starting point</Kicker>
               <h2 className="font-display mt-3 text-balance text-3xl font-normal tracking-[-0.01em] sm:text-5xl">
@@ -255,18 +255,18 @@ export default function EnglishHomePage() {
             </div>
           </div>
 
-          <ol className="divide-y divide-border">
+          <ol className="grid gap-4 p-4 sm:grid-cols-2 sm:p-6">
             {GUIDES.map(({ href, title, text }, i) => (
               <li key={href}>
                 <Link
                   href={href}
-                  className="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-5 bg-card px-6 py-6 transition-colors hover:bg-secondary/45 sm:gap-8 sm:px-10 sm:py-7"
+                  className="group flex h-full items-center justify-between gap-5 rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/45 hover:bg-secondary/45 sm:p-7"
                 >
-                  <span className="font-mono text-xs tabular-nums text-primary">
-                    0{i + 1}
-                  </span>
                   <span className="min-w-0">
-                    <span className="font-display block text-balance text-2xl font-normal tracking-[-0.01em] text-foreground sm:text-3xl">
+                    <span className="font-mono text-xs font-semibold tabular-nums text-[var(--vivida-cyan)]">
+                      0{i + 1}
+                    </span>
+                    <span className="font-display mt-1.5 block text-balance text-2xl font-normal tracking-[-0.01em] text-foreground group-hover:text-primary sm:text-3xl">
                       {title}
                     </span>
                     <span className="mt-1.5 block max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
@@ -291,7 +291,7 @@ export default function EnglishHomePage() {
             From astronomical coordinates to personal synthesis
           </h2>
         </div>
-        <div className="grid gap-px border border-border bg-border sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-3">
           {[
             [
               "01",
@@ -309,8 +309,11 @@ export default function EnglishHomePage() {
               "Use recurring themes as questions and perspectives rather than fixed outcomes.",
             ],
           ].map(([n, title, text]) => (
-            <article key={n} className="bg-card p-6 sm:p-8">
-              <span className="font-mono text-xs font-semibold tabular-nums text-primary">
+            <article
+              key={n}
+              className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8"
+            >
+              <span className="font-mono text-xs font-semibold tabular-nums text-[var(--vivida-gold)]">
                 {n}.
               </span>
               <h3 className="font-display mt-3 text-2xl font-normal tracking-[-0.01em] text-foreground">
@@ -330,16 +333,19 @@ export default function EnglishHomePage() {
         <h2 className="font-display mt-3 text-3xl font-normal tracking-[-0.01em] sm:text-4xl">
           Frequently asked questions
         </h2>
-        <div className="mt-8 divide-y divide-border border border-border bg-card">
+        <div className="mt-8 space-y-3">
           {FAQ.map((item) => (
-            <details key={item.q} className="group">
+            <details
+              key={item.q}
+              className="group overflow-hidden rounded-xl border border-border bg-card shadow-2xs open:border-primary/45"
+            >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 font-medium text-foreground transition-colors hover:bg-secondary/30 [&::-webkit-details-marker]:hidden">
                 <span>{item.q}</span>
                 <span className="font-mono text-sm text-muted-foreground transition-transform group-open:rotate-45">
                   +
                 </span>
               </summary>
-              <p className="border-t border-border/60 bg-background/40 px-5 py-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
+              <p className="border-t border-border/70 bg-background/55 px-5 py-4 text-sm leading-relaxed text-foreground/85 sm:text-base">
                 {item.a}
               </p>
             </details>

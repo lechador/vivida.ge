@@ -39,7 +39,10 @@ export async function LatestArticlesSection({
             <Kicker>{copy.eyebrow}</Kicker>
           ) : (
             <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              <span aria-hidden className="inline-block h-px w-8 bg-primary/70" />
+              <span
+                aria-hidden
+                className="inline-block h-px w-8 bg-primary/70"
+              />
               <span>{copy.eyebrow}</span>
             </div>
           )}
@@ -64,7 +67,7 @@ export async function LatestArticlesSection({
         </Link>
       </div>
 
-      <div className="grid gap-px border border-border bg-border md:grid-cols-3">
+      <div className="grid gap-5 md:grid-cols-3">
         {articles.map((article) => (
           <ArticleCard key={article.id} article={article} locale={locale} />
         ))}

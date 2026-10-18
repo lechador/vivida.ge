@@ -38,9 +38,9 @@ export function PositionsTable({
   const houseHeader = en ? "House" : "სახლი";
 
   return (
-    <div className="overflow-hidden rounded-md border border-border bg-card">
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
       <div
-        className={`${GRID} border-b border-border bg-secondary/40 px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:px-5`}
+        className={`${GRID} border-b border-border bg-background/60 px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:px-5`}
       >
         <span>{planetHeader}</span>
         <span>{signHeader}</span>
