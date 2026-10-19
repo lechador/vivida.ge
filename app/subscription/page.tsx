@@ -15,9 +15,11 @@ import { PremiumPlanCard } from "@/components/subscription/premium-plan-card";
 import { SubscriptionActions } from "@/components/subscription/subscription-actions";
 import {
   billingPeriodMonths,
+  featuredPremiumPlanForCountry,
   formatBillingAmount,
   premiumPlanForCountry,
 } from "@/lib/billing-config";
+import { productLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   getBillingIdentity,
   getPremiumSubscription,
@@ -40,6 +42,27 @@ import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export const dynamic = "force-dynamic";
+
+const SITE_URL = "https://www.vivida.ge";
+
+const PRO_PLAN = featuredPremiumPlanForCountry("GE");
+const PRO_MONTHS = PRO_PLAN.intervalCount ?? 1;
+
+const SUBSCRIPTION_LD = productLd({
+  name: "Vivida PRO",
+  url: `${SITE_URL}/subscription`,
+  offers: [
+    {
+      name:
+        PRO_MONTHS > 1
+          ? `Vivida PRO — ${PRO_MONTHS} თვე`
+          : "Vivida PRO — თვიური",
+      price: PRO_PLAN.amountMinor / 100,
+      priceCurrency: PRO_PLAN.currency.toUpperCase(),
+      url: `${SITE_URL}/subscription`,
+    },
+  ],
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -128,6 +151,10 @@ export default async function SubscriptionPage({
 
   return (
     <CryptoPayHost>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(SUBSCRIPTION_LD) }}
+      />
       <main
         lang={locale}
         className="relative isolate flex min-h-screen flex-col overflow-hidden"
