@@ -57,7 +57,7 @@ export default async function LoginPage({
           {en ? "New to Vivida?" : "ჯერ არ გაქვს ანგარიში?"}{" "}
           <Link
             href={dest ? `/signup?next=${encodeURIComponent(dest)}` : "/signup"}
-            className="text-foreground underline-offset-2 hover:underline"
+            className="text-foreground underline underline-offset-2 hover:underline"
           >
             {en ? "Create an account" : "დარეგისტრირდი"}
           </Link>

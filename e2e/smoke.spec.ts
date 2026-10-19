@@ -18,7 +18,7 @@ test.describe("public smoke flows", () => {
     expect(response?.ok()).toBe(true);
     await expect(page).toHaveTitle(/ნატალური რუკა.*Vivida/i);
     await expect(
-      page.getByRole("heading", { level: 1, name: /გაიგე, ვინ ხარ/i })
+      page.getByRole("heading", { level: 1, name: /გაიგე, ვინ ხარ/i }),
     ).toBeVisible();
 
     const signUpLink = page.getByRole("link", { name: "ან ელფოსტით" });
@@ -26,7 +26,7 @@ test.describe("public smoke flows", () => {
     await signUpLink.click();
     await page.waitForURL("**/signup");
     await expect(
-      page.getByRole("heading", { level: 1, name: "შექმენი შენი ანგარიში" })
+      page.getByRole("heading", { level: 1, name: "შექმენი შენი ანგარიში" }),
     ).toBeVisible();
     await expect(page.getByLabel("სახელი")).toBeVisible();
     await expect(page.getByLabel("ელფოსტა")).toBeVisible();
@@ -39,7 +39,10 @@ test.describe("public smoke flows", () => {
     await page.goto("/login?next=/timing");
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "კეთილი იყოს შენი დაბრუნება" })
+      page.getByRole("heading", {
+        level: 1,
+        name: "კეთილი იყოს შენი დაბრუნება",
+      }),
     ).toBeVisible();
     await page.getByRole("link", { name: "დარეგისტრირდი" }).click();
     await expect(page).toHaveURL(/\/signup\?next=%2Ftiming$/);
@@ -52,7 +55,7 @@ test.describe("public smoke flows", () => {
 
     await expect(page).toHaveURL(/\/\?from=%2Fdashboard$/);
     await expect(
-      page.getByRole("heading", { level: 1, name: /გაიგე, ვინ ხარ/i })
+      page.getByRole("heading", { level: 1, name: /გაიგე, ვინ ხარ/i }),
     ).toBeVisible();
   });
 
@@ -65,8 +68,8 @@ test.describe("public smoke flows", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: /Your birth chart, made more understandable/i,
-      })
+        name: /Birth data in/i,
+      }),
     ).toBeVisible();
     // Since vividaastro.com launched, the public English URL is the clean
     // /natal-chart; next.config.ts rewrites it onto the internal /en tree on
@@ -74,7 +77,7 @@ test.describe("public smoke flows", () => {
     // a regression to an internal /en/* link would ship the wrong URL into
     // every English page's markup.
     const natalGuideLink = page.getByRole("link", {
-      name: /Start with your natal chart/i,
+      name: /Calculate my chart, free/i,
     });
     await expect(natalGuideLink).toHaveAttribute("href", "/natal-chart");
 

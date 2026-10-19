@@ -259,7 +259,10 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           {en
             ? "Can't find the email? Check spam or request it again from the "
             : "ვერ ნახავ წერილს? ნახე spam-ში ან "}
-          <Link href="/login" className="underline-offset-2 hover:underline">
+          <Link
+            href="/login"
+            className="underline underline-offset-2 hover:underline"
+          >
             {en ? "sign-in page" : "შესვლის გვერდიდან"}
           </Link>{" "}
           {en ? "." : " მოითხოვე ხელახლა."}

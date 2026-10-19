@@ -63,7 +63,7 @@ export default async function SignupPage({
           {en ? "Already have an account?" : "უკვე გაქვს ანგარიში?"}{" "}
           <Link
             href={loginHref}
-            className="text-foreground underline-offset-2 hover:underline"
+            className="text-foreground underline underline-offset-2 hover:underline"
           >
             {en ? "Sign in" : "შესვლა"}
           </Link>
