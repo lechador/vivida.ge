@@ -11,7 +11,7 @@ import {
   formatBillingAmount,
 } from "@/lib/billing-config";
 import { CREDIT_COST } from "@/lib/credits-config";
-import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/piradi-ruka`;
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   description:
     "პირადი რუკის (ნატალური რუკის) შედგენა და გამოთვლა ონლაინ, უფასოდ და ქართულად. შეიყვანე დაბადების თარიღი, დრო და ადგილი, ნახე პლანეტები, ასცენდენტი, 12 სახლი და ასპექტები რეგისტრაციის გარეშე.",
   keywords: KEYWORDS,
-  alternates: { canonical: URL },
+  alternates: localizedAlternates("/piradi-ruka", "/natal-chart", "ka"),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     type: "website",

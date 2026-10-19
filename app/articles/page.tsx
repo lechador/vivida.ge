@@ -53,7 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
       languages: {
         "ka-GE": articleUrl("ka"),
         en: articleUrl("en"),
-        "x-default": articleUrl("en"),
+        "x-default": articleUrl("ka"),
       },
       types: { "application/rss+xml": `${canonical}/feed.xml` },
     },

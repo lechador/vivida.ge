@@ -4,9 +4,12 @@ import {
   ENGLISH_SITE_URL,
   ENGLISH_PUBLIC_ROUTES,
   GEORGIAN_SITE_URL,
+  englishOnlyAlternates,
+  georgianOnlyAlternates,
   isEnglishHost,
   localizedAlternates,
   publicEnglishPath,
+  samePathAlternates,
   siteOriginForHost,
 } from "@/lib/seo/locales";
 
@@ -19,7 +22,7 @@ describe("international SEO locale helpers", () => {
       languages: {
         "ka-GE": `${GEORGIAN_SITE_URL}/nataluri-ruka`,
         en: `${ENGLISH_SITE_URL}/natal-chart`,
-        "x-default": `${ENGLISH_SITE_URL}/natal-chart`,
+        "x-default": `${GEORGIAN_SITE_URL}/nataluri-ruka`,
       },
     });
   });
@@ -30,7 +33,38 @@ describe("international SEO locale helpers", () => {
       languages: {
         "ka-GE": GEORGIAN_SITE_URL,
         en: ENGLISH_SITE_URL,
-        "x-default": ENGLISH_SITE_URL,
+        "x-default": GEORGIAN_SITE_URL,
+      },
+    });
+  });
+
+  it("keeps Georgian-only pages honest by omitting an English alternate", () => {
+    expect(georgianOnlyAlternates("/tvit-shepasebis-testi")).toEqual({
+      canonical: `${GEORGIAN_SITE_URL}/tvit-shepasebis-testi`,
+      languages: {
+        "ka-GE": `${GEORGIAN_SITE_URL}/tvit-shepasebis-testi`,
+        "x-default": `${GEORGIAN_SITE_URL}/tvit-shepasebis-testi`,
+      },
+    });
+  });
+
+  it("points English-only pages at their English canonical", () => {
+    expect(englishOnlyAlternates("/about")).toEqual({
+      canonical: `${ENGLISH_SITE_URL}/about`,
+      languages: {
+        en: `${ENGLISH_SITE_URL}/about`,
+        "x-default": `${ENGLISH_SITE_URL}/about`,
+      },
+    });
+  });
+
+  it("supports same-path pages that sit outside the /en rewrites", () => {
+    expect(samePathAlternates("/tavsebadoba", "ka")).toEqual({
+      canonical: `${GEORGIAN_SITE_URL}/tavsebadoba`,
+      languages: {
+        "ka-GE": `${GEORGIAN_SITE_URL}/tavsebadoba`,
+        en: `${ENGLISH_SITE_URL}/tavsebadoba`,
+        "x-default": `${GEORGIAN_SITE_URL}/tavsebadoba`,
       },
     });
   });

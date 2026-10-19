@@ -5,9 +5,13 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { FORTUNE_METHODS, MKITXAOBA_FAQ, MKITXAOBA_KEYWORDS_KA } from "@/lib/seo/fortune-telling";
+import {
+  FORTUNE_METHODS,
+  MKITXAOBA_FAQ,
+  MKITXAOBA_KEYWORDS_KA,
+} from "@/lib/seo/fortune-telling";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
-import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -19,7 +23,7 @@ export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: MKITXAOBA_KEYWORDS_KA,
-  alternates: { canonical: `${SITE_URL}/mkitxaoba` },
+  alternates: localizedAlternates("/mkitxaoba", "/tarot", "ka"),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     type: "website",
@@ -29,7 +33,11 @@ export const metadata: Metadata = {
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 /**
@@ -103,8 +111,8 @@ export default function MkitxaobaPage() {
           </h1>
           <p className="mx-auto mt-3.5 max-w-xl text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
             ტაროზე მკითხაობა, ჰოროსკოპი, ნატალური რუკა და ბედის რიცხვი, ერთ
-            ადგილას, ქართულად. აირჩიე მეთოდი, დაუსვი კითხვა და პასუხს იმავე
-            წუთს მიიღებ. დასაწყებად რეგისტრაცია არ გჭირდება.
+            ადგილას, ქართულად. აირჩიე მეთოდი, დაუსვი კითხვა და პასუხს იმავე წუთს
+            მიიღებ. დასაწყებად რეგისტრაცია არ გჭირდება.
           </p>
         </header>
 
@@ -189,8 +197,8 @@ export default function MkitxaobaPage() {
                 სუსტი კითხვა
               </div>
               <p className="mt-1 text-[13px] leading-relaxed text-foreground/85">
-                „დამირეკავს თუ არა ხვალ?“, დახურულია და მხოლოდ დიახ/არას
-                ითხოვს; პასუხიც ისეთივე ცარიელი დაბრუნდება.
+                „დამირეკავს თუ არა ხვალ?“, დახურულია და მხოლოდ დიახ/არას ითხოვს;
+                პასუხიც ისეთივე ცარიელი დაბრუნდება.
               </p>
             </div>
           </div>
@@ -243,7 +251,6 @@ export default function MkitxaobaPage() {
             <ArrowRight className="size-4" />
           </Link>
         </div>
-
       </section>
 
       <SiteFooter />

@@ -69,7 +69,10 @@ function metadataAlternates(
     const key = language === "ka" ? "ka-GE" : "en";
     languages[key] = articleUrl(language, item.slug);
   }
-  languages["x-default"] = languages.en ?? articleUrl(locale, currentSlug);
+  // x-default falls back to Georgian when a Georgian translation exists,
+  // otherwise to whichever language actually has a published page.
+  languages["x-default"] =
+    languages["ka-GE"] ?? languages.en ?? articleUrl(locale, currentSlug);
   return { canonical: articleUrl(locale, currentSlug), languages };
 }
 

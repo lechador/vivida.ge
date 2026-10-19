@@ -5,7 +5,11 @@ import { EnglishGuide } from "@/components/en/english-guide";
 import { SIGNS } from "@/lib/zodiac";
 import { VIEW_PATH } from "@/lib/sign-horoscope";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  englishOnlyAlternates,
+} from "@/lib/seo/locales";
 import { articleLd, breadcrumbLd, faqLd } from "@/lib/seo/jsonld";
 
 const TITLE = "How Daily Horoscopes Work, Vivida";
@@ -18,13 +22,7 @@ export const metadata: Metadata = {
   // English-only explainer, like /about. The Georgian /horoskopi is a daily
   // hub, not an equivalent of this page, it now pairs with the English
   // /horoskopi instead.
-  alternates: {
-    canonical: `${ENGLISH_SITE_URL}/horoscope`,
-    languages: {
-      en: `${ENGLISH_SITE_URL}/horoscope`,
-      "x-default": `${ENGLISH_SITE_URL}/horoscope`,
-    },
-  },
+  alternates: englishOnlyAlternates("/horoscope"),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     title: TITLE,

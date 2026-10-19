@@ -7,7 +7,11 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ReadingsApp } from "@/components/bazaar/readings-app";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  englishOnlyAlternates,
+} from "@/lib/seo/locales";
 
 export const dynamic = "force-dynamic";
 
@@ -19,10 +23,7 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: { absolute: `${TITLE}, Vivida` },
   description: DESCRIPTION,
-  alternates: {
-    canonical: URL,
-    languages: { en: URL, "x-default": URL },
-  },
+  alternates: englishOnlyAlternates("/readings"),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     title: TITLE,

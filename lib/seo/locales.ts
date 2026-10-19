@@ -102,6 +102,72 @@ export function resolveEnglishPath(path: string): string {
   return internationalPublicPath(normalized);
 }
 
+function absoluteUrl(origin: string, path: string): string {
+  if (!path || path === "/") return origin;
+  return `${origin}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/**
+ * Georgian-only pages (for example the Rosenberg self-esteem test) have no
+ * English twin. Advertising an `en` alternate would point search engines at a
+ * Georgian page on the English host, so these pages publish only `ka-GE` and
+ * `x-default`, both on the Georgian host.
+ */
+export function georgianOnlyAlternates(
+  canonicalPath: string,
+): NonNullable<Metadata["alternates"]> {
+  const url = absoluteUrl(GEORGIAN_SITE_URL, canonicalPath || "/");
+  return {
+    canonical: url,
+    languages: {
+      "ka-GE": url,
+      "x-default": url,
+    },
+  };
+}
+
+/**
+ * English-only pages (for example /about) have no Georgian twin, so both
+ * `en` and `x-default` point at the English page. `x-default` only falls back
+ * to English when no Georgian counterpart exists.
+ */
+export function englishOnlyAlternates(
+  canonicalPath: string,
+): NonNullable<Metadata["alternates"]> {
+  const url = absoluteUrl(
+    ENGLISH_SITE_URL,
+    internationalPublicPath(canonicalPath || "/"),
+  );
+  return {
+    canonical: url,
+    languages: {
+      en: url,
+      "x-default": url,
+    },
+  };
+}
+
+/**
+ * Cross-domain alternates for a page whose English version keeps the same
+ * path on the English host. Used by ad landings that sit outside the `/en`
+ * rewrite tree, so `/compatibility`-style aliases must not be inferred.
+ */
+export function samePathAlternates(
+  path: string,
+  locale: "ka" | "en" | string,
+): NonNullable<Metadata["alternates"]> {
+  const kaUrl = absoluteUrl(GEORGIAN_SITE_URL, path);
+  const enUrl = absoluteUrl(ENGLISH_SITE_URL, path);
+  return {
+    canonical: locale === "en" ? enUrl : kaUrl,
+    languages: {
+      "ka-GE": kaUrl,
+      en: enUrl,
+      "x-default": kaUrl,
+    },
+  };
+}
+
 export function localizedAlternates(
   canonicalPath: string,
   pairedPath: string,
@@ -123,19 +189,18 @@ export function localizedAlternates(
       : resolveEnglishPath(pairedPath);
   const enPath = internationalPublicPath(rawEnPath);
 
-  const canonical =
-    locale === "en"
-      ? `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`
-      : `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
-  const englishUrl = `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
-  const georgianUrl = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
+  const englishUrl = absoluteUrl(ENGLISH_SITE_URL, enPath);
+  const georgianUrl = absoluteUrl(GEORGIAN_SITE_URL, kaPath);
+  const canonical = locale === "en" ? englishUrl : georgianUrl;
 
   return {
     canonical,
     languages: {
       "ka-GE": georgianUrl,
       en: englishUrl,
-      "x-default": englishUrl,
+      // Georgian is the brand default: unmatched languages land on the
+      // Georgian page, which is the canonical entry point for the product.
+      "x-default": georgianUrl,
     },
   };
 }

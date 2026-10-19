@@ -3,7 +3,11 @@ import Link from "next/link";
 import { Mail, MapPin, ShieldCheck } from "lucide-react";
 
 import { EnglishGuide } from "@/components/en/english-guide";
-import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  englishOnlyAlternates,
+} from "@/lib/seo/locales";
 import { breadcrumbLd } from "@/lib/seo/jsonld";
 
 const TITLE = "About Vivida";
@@ -13,13 +17,7 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: { absolute: `${TITLE}, Astrology and Self-Discovery` },
   description: DESCRIPTION,
-  alternates: {
-    canonical: `${ENGLISH_SITE_URL}/about`,
-    languages: {
-      en: `${ENGLISH_SITE_URL}/about`,
-      "x-default": `${ENGLISH_SITE_URL}/about`,
-    },
-  },
+  alternates: englishOnlyAlternates("/about"),
   openGraph: {
     images: [DEFAULT_OG_IMAGE],
     title: TITLE,

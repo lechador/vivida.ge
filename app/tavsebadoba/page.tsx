@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { buildCalculatorData } from "@/lib/compatibility-calculator-data";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
+import { DEFAULT_OG_IMAGE, samePathAlternates } from "@/lib/seo/locales";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/tavsebadoba";
@@ -50,10 +50,9 @@ export async function generateMetadata(): Promise<Metadata> {
           "tavsebadoba",
         ],
     // Keep the ad landing self-canonical on each host. /compatibility is
-    // already paired with the separate Georgian hub /zodiac/tavsebadoba.
-    alternates: {
-      canonical: `${en ? "https://www.vividaastro.com" : SITE_URL}${PATH}`,
-    },
+    // already paired with the separate Georgian hub /zodiac/tavsebadoba, so
+    // its English twin is the same path on the English host, not the alias.
+    alternates: samePathAlternates(PATH, en ? "en" : "ka"),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "website",

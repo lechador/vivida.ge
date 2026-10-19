@@ -8,6 +8,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { RosenbergTest } from "@/components/rosenberg/rosenberg-test";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
+import { georgianOnlyAlternates } from "@/lib/seo/locales";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     "ფსიქოლოგიური ტესტი ქართულად",
     "დაბალი თვითშეფასება",
   ],
-  alternates: { canonical: SITE_URL + PATH },
+  alternates: georgianOnlyAlternates(PATH),
   openGraph: {
     type: "website",
     url: SITE_URL + PATH,
@@ -35,7 +36,11 @@ export const metadata: Metadata = {
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 const FAQ = [
