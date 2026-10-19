@@ -7,6 +7,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
+import { georgianOnlyAlternates } from "@/lib/seo/locales";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     "ფსიქოლოგიური ტესტი ქართულად",
     "ურთიერთობის ტესტი",
   ],
-  alternates: { canonical: SITE_URL + PATH },
+  alternates: georgianOnlyAlternates(PATH),
   openGraph: {
     type: "website",
     url: SITE_URL + PATH,

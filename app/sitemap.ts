@@ -99,11 +99,12 @@ function alternatesFor(
   const publicEnPath = internationalPublicPath(enPath);
   const englishUrl = `${ENGLISH_SITE_URL}${publicEnPath === "/" ? "" : publicEnPath}`;
   const languages: Record<string, string> = {};
-  if (kaPath) {
-    languages["ka-GE"] = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
-  }
+  const georgianUrl = kaPath
+    ? `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`
+    : null;
+  if (georgianUrl) languages["ka-GE"] = georgianUrl;
   languages.en = englishUrl;
-  languages["x-default"] = englishUrl;
+  languages["x-default"] = georgianUrl ?? englishUrl;
   return { languages };
 }
 
@@ -126,7 +127,9 @@ function articleAlternates(
       languages.en = articleUrl("en", sibling.slug);
   }
   languages["x-default"] =
-    languages.en ?? articleUrl(current.language as "ka" | "en", current.slug);
+    languages["ka-GE"] ??
+    languages.en ??
+    articleUrl(current.language as "ka" | "en", current.slug);
   return { languages };
 }
 
@@ -165,7 +168,7 @@ function articleHubEntry(
       languages: {
         "ka-GE": articleUrl("ka"),
         en: articleUrl("en"),
-        "x-default": articleUrl("en"),
+        "x-default": articleUrl("ka"),
       },
     },
   };
