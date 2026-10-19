@@ -15,6 +15,12 @@ import { PricingAnchor } from "@/components/landing/pricing-anchor";
 import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
 import { CornerCrosshair } from "@/components/brand/celestial-icons";
 import { localizedAlternates } from "@/lib/seo/locales";
+import {
+  creditPacksForCountry,
+  featuredPremiumPlanForCountry,
+} from "@/lib/billing-config";
+import { HOME_CONTENT } from "@/lib/seo/home-content";
+import { faqLd, productLd, serializeLd } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -63,6 +69,32 @@ const WEBSITE_LD = {
   inLanguage: "ka-GE",
 };
 
+const FAQ_LD = faqLd(HOME_CONTENT.faq);
+
+const PRO_PLAN = featuredPremiumPlanForCountry("GE");
+const PRO_MONTHS = PRO_PLAN.intervalCount ?? 1;
+
+const PRODUCT_LD = productLd({
+  name: "Vivida PRO / Credits",
+  url: SITE_URL,
+  description:
+    "დამატებითი ინსტრუმენტები ხელმისაწვდომია კრედიტებით ან PRO გამოწერით.",
+  offers: [
+    {
+      name: PRO_MONTHS > 1 ? `Vivida PRO — ${PRO_MONTHS} თვე` : "Vivida PRO",
+      price: PRO_PLAN.amountMinor / 100,
+      priceCurrency: PRO_PLAN.currency.toUpperCase(),
+      url: `${SITE_URL}/subscription`,
+    },
+    ...creditPacksForCountry("GE").map((pack) => ({
+      name: `Vivida Credits — ${pack.credits} კრედიტი`,
+      price: pack.amountMinor / 100,
+      priceCurrency: pack.currency.toUpperCase(),
+      url: `${SITE_URL}/credits`,
+    })),
+  ],
+});
+
 export default async function Home() {
   const { signs, pairs } = buildCalculatorData("ka");
   return (
@@ -74,6 +106,14 @@ export default async function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(FAQ_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(PRODUCT_LD) }}
       />
 
       <main className="relative isolate flex-1 overflow-x-clip bg-background">

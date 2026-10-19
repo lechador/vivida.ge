@@ -116,6 +116,43 @@ export function faqLd(entries: FaqEntry[]): JsonLd {
   };
 }
 
+export interface ProductOfferInput {
+  name: string;
+  price: number;
+  priceCurrency: string;
+  url?: string;
+}
+
+export interface ProductInput {
+  name: string;
+  url: string;
+  description?: string;
+  offers: ProductOfferInput[];
+}
+
+/**
+ * Product with one Offer per purchasable SKU (PRO cycle, credit packs).
+ * Prices come from the billing catalogue at the call site, never from this
+ * module, so structured data cannot drift from what checkout charges.
+ */
+export function productLd(input: ProductInput): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: input.name,
+    url: input.url,
+    ...(input.description && { description: input.description }),
+    offers: input.offers.map((offer) => ({
+      "@type": "Offer",
+      name: offer.name,
+      price: offer.price.toFixed(2),
+      priceCurrency: offer.priceCurrency,
+      availability: "https://schema.org/InStock",
+      ...(offer.url && { url: offer.url }),
+    })),
+  };
+}
+
 /** WebSite identity, emitted once on the home page. */
 export function websiteLd(): JsonLd {
   return {

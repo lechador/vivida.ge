@@ -24,9 +24,11 @@ import { getUserLocale } from "@/lib/i18n/user-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 import {
+  creditPacksForCountry,
   premiumPlanForCountry,
   shouldShowPurchasePromotion,
 } from "@/lib/billing-config";
+import { productLd, serializeLd } from "@/lib/seo/jsonld";
 import {
   countryCodeFromHeaders,
   setResidenceCountryIfMissing,
@@ -62,6 +64,19 @@ const SITE_URL: Record<UserLocale, string> = {
   ka: "https://www.vivida.ge",
   en: "https://www.vividaastro.com",
 };
+
+const CREDITS_LD = productLd({
+  name: "Vivida Credits",
+  url: `${SITE_URL.ka}/credits`,
+  description:
+    "კრედიტებით ხსნი ტესტების სრულ შედეგებს, სინასტრიებს, AI-ჩატს, პროგნოზებსა და რეპორტებს.",
+  offers: creditPacksForCountry("GE").map((pack) => ({
+    name: `Vivida Credits — ${pack.credits} კრედიტი`,
+    price: pack.amountMinor / 100,
+    priceCurrency: pack.currency.toUpperCase(),
+    url: `${SITE_URL.ka}/credits`,
+  })),
+});
 
 /**
  * Credits hub, balance, the invite/earn loop, and (Phase 3) Stripe top-up.
@@ -178,6 +193,10 @@ export default async function CreditsPage({
 
   return (
     <CryptoPayHost>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(CREDITS_LD) }}
+      />
       <main
         lang={locale}
         className="relative isolate flex min-h-screen flex-col overflow-hidden"
