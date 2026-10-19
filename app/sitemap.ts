@@ -933,14 +933,53 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
     ...SAME_PATH_PAIRS.map((path) => [path, { ka: path, en: path }] as const),
   ]);
+
+  /**
+   * Mirror the English sitemap's pairing table.
+   *
+   * The English sitemap already declares which international URLs exist and
+   * which Georgian URL each one pairs with. Reusing those annotations means the
+   * Georgian side can never advertise an English twin that the English side
+   * does not also claim, so every hreflang cluster stays reciprocal. This picks
+   * up the long-tail same-path pages (zodiac, tarot, MBTI, calendars, tests,
+   * planets, dreams, EQ articles, …) that were previously annotated only from
+   * the English host.
+   */
+  const englishAlternatesByKaPath = new Map<
+    string,
+    NonNullable<MetadataRoute.Sitemap[number]["alternates"]>
+  >();
+  for (const entry of englishSitemap(articleItems)) {
+    const languages = entry.alternates?.languages;
+    const kaUrl = languages?.["ka-GE"];
+    if (!languages || !kaUrl) continue;
+    englishAlternatesByKaPath.set(new URL(kaUrl).pathname, { languages });
+  }
+
+  /**
+   * Cross-domain pages that keep the same path on both hosts. They bypass
+   * `internationalPublicPath`, which deliberately maps /tavsebadoba to the
+   * separate /compatibility guide (that guide is already paired with the
+   * Georgian hub /zodiac/tavsebadoba).
+   */
+  const samePathCrossDomain = new Set(["/tavsebadoba"]);
+
   const georgianWithAlternates = georgianPages.map((entry) => {
     const path = new URL(entry.url).pathname;
     const pair = pairByKaPath.get(path);
-    if (!pair) return entry;
-    return {
-      ...entry,
-      alternates: alternatesFor(pair?.ka ?? path, pair?.en ?? path),
-    };
+    const alternates = pair
+      ? alternatesFor(pair.ka, pair.en)
+      : samePathCrossDomain.has(path)
+        ? {
+            languages: {
+              "ka-GE": `${GEORGIAN_SITE_URL}${path}`,
+              en: `${ENGLISH_SITE_URL}${path}`,
+              "x-default": `${GEORGIAN_SITE_URL}${path}`,
+            },
+          }
+        : englishAlternatesByKaPath.get(path);
+    if (!alternates) return entry;
+    return { ...entry, alternates };
   });
 
   return georgianWithAlternates;
