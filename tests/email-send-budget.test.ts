@@ -100,4 +100,15 @@ describe("SendBudget", () => {
     budget.reserve(30);
     expect(budget.left).toBe(70);
   });
+
+  it("shares one reservation across all three win-back steps per run", () => {
+    // The sequence is one job, not three: enrolling 219 dormant users must not
+    // grant 3 x 60 sends in a single invocation.
+    const budget = new SendBudget(150);
+    const dormantCandidates = 219;
+    const winback = budget.reserve(dormantCandidates);
+
+    expect(winback).toBe(PER_JOB_SEND_CAP);
+    expect(budget.left).toBe(150 - PER_JOB_SEND_CAP);
+  });
 });

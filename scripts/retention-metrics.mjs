@@ -165,12 +165,14 @@ async function main() {
         (select count(distinct user_id) from e where event_name = 'viewed')::int as exposed,
         (select count(distinct user_id) from e where event_name = 'checkout_started')::int as started,
         (select count(distinct user_id) from e where event_name = 'purchase_completed')::int as purchased`,
-    // Lifecycle email silence. These three are the sequences that went silent
-    // for nine weeks in Aug-Oct 2026.
+    // Lifecycle email silence. These are the sequences that went silent for
+    // nine weeks in Aug-Oct 2026; win-back v1 replaced the single `winback`
+    // kind with three steps.
     txn`
       select kind, max(sent_at) as last_sent
       from email_send_log
-      where kind in ('profile_incomplete', 'winback', 'verify_reminder')
+      where kind in ('profile_incomplete', 'winback_v1_s1', 'winback_v1_s2',
+                     'winback_v1_s3', 'verify_reminder')
       group by 1 order by 1`,
     // Daily blast delivery for today, and the orphaned backlog.
     txn`

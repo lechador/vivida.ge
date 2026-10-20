@@ -1,45 +1,82 @@
 /**
- * Winback nudges, the daily cron calls `sendWinbackNudges()`, which finds
- * users who WERE active but have now been quiet for 7+ days and sends one
- * personal "the sky kept moving" email (+ web push when they have push subs).
+ * Dormant win-back sequence v1 (3 steps), run from the daily lifecycle cron.
  *
- * Audience: last authed visit (user_activity_day) between 7 and 14 days ago.
- * The 14-day upper bound means long-dormant users aren't nagged forever,
- * each dormancy spell gets exactly one shot, in its second week.
+ * Audience: registered, email-verified users with nudges on whose most recent
+ * `user_activity_day.date_local` is between 8 and 21 days old. Steps are
+ * anchored on that last visit:
  *
- * Idempotency: an email_send_log claim row (kind='winback') is inserted
- * before sending, and anyone with a winback in the last 30 days is skipped,
- * so the 05:30 retry tick can't double-send, and a user who returns then
- * lapses again isn't nudged more than monthly.
+ *   step 1  >= 8 days   winback_v1_s1   daily horoscope
+ *   step 2  >= 11 days  winback_v1_s2   moon phase / weekly transit
+ *   step 3  >= 14 days  winback_v1_s3   tarot for a decision
  *
- * Personalization (all best-effort): today's cached horoscope headline for
- * their sun sign (from date_of_birth, no chart needed) and their credit
- * balance. Missing pieces degrade to the generic copy, never block the send.
+ * One step per user per run. The sequence exits on return (`lastVisit` leaves
+ * the dormant window), purchase, or a nudges unsubscribe. A user who already
+ * received part of a sequence keeps that spell: claims younger than the current
+ * anchor are the previous spell and impose a 30-day re-enrollment cooldown.
+ *
+ * Hard rules:
+ *  - `email_send_log` is the idempotency/throttle source. Insert the claim
+ *    (`pending`) BEFORE sending, then update it to `sent` / `failed` /
+ *    `skipped`. Resend gets an Idempotency-Key per (user, step, spell).
+ *  - Campaign rows and recipient rows are created in the existing
+ *    `email_campaign` / `email_campaign_recipient` tables with
+ *    `reward_credits = 0`. No credits are granted for a win-back.
+ *  - The shared lifecycle frequency cap (`lib/email-frequency-cap.ts`) runs
+ *    before every send. A capped step is recorded as `skipped` and retried on
+ *    a later day, unless its dormancy window closed meanwhile.
+ *  - Send budget is the shared `SendBudget`/`PER_JOB_SEND_CAP` path, and the
+ *    whole sequence (all three steps) shares one reservation per run.
  */
 
 import { Resend } from "resend";
-import { and, eq, gte, inArray, sql as dsql } from "drizzle-orm";
+import {
+  and,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  isNull,
+  or,
+  sql as dsql,
+} from "drizzle-orm";
 
 import { db } from "@/db";
-import { emailSendLog, profiles, userActivityDays, users } from "@/db/schema";
-import { ensureSignHoroscope } from "@/actions/sign-horoscope";
-import { ensureDailyFor } from "@/actions/daily";
-import { getBalance } from "@/lib/credits";
-import { WinbackEmail } from "@/lib/email-templates/winback";
+import {
+  emailCampaignRecipients,
+  emailCampaigns,
+  emailSendLog,
+  userActivityDays,
+  users,
+} from "@/db/schema";
+import { WinbackSequenceEmail } from "@/lib/email-templates/winback-sequence";
 import { isPushConfigured, sendPushToUser } from "@/lib/push";
 import { acquireResendSlot } from "@/lib/resend-throttle";
 import { PER_JOB_SEND_CAP, type SendBudget } from "@/lib/email-send-budget";
+import {
+  isLifecycleFrequencyCapped,
+  lifecycleCapSkipReason,
+} from "@/lib/email-frequency-cap";
 import { localDateString } from "@/lib/transits";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
-import { signMetaBySlug, signSlugByDate } from "@/lib/seo/zodiac-dates";
-import type { ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import {
+  WINBACK_KINDS,
+  WINBACK_SEQUENCE_MAX_DAYS,
+  WINBACK_SLUGS,
+  WINBACK_SPELL_COOLDOWN_DAYS,
+  WINBACK_STEPS,
+  dayDifference,
+  selectWinbackStep,
+  type WinbackKind,
+  type WinbackStep,
+} from "@/lib/winback-sequence";
 
 const TZ = "Asia/Tbilisi";
-const DORMANT_MIN_DAYS = 7;
-const DORMANT_MAX_DAYS = 14;
-const COOLDOWN_DAYS = 30;
+const DAY = 86_400_000;
+
+/** First day a user can qualify: the sequence is 7-day dormant. */
+const ENROLLMENT_MIN_DAYS = 7;
 
 const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
 
@@ -52,29 +89,116 @@ const FROM = resolveFrom(
   "Vivida <onboarding@resend.dev>",
 );
 
-export const WINBACK_SUBJECT = "ვარსკვლავები ისევ შენზე საუბრობენ ✨";
-export const WINBACK_SUBJECT_EN = "The stars are still speaking to you ✨";
+const STEP_NUMBER_BY_KIND = new Map<string, number>(
+  WINBACK_STEPS.map((s) => [s.kind, s.step]),
+);
 
 function dateKey(daysAgo: number): string {
-  return localDateString(new Date(Date.now() - daysAgo * 86_400_000), TZ);
+  return localDateString(new Date(Date.now() - daysAgo * DAY), TZ);
 }
 
-type DormantUser = {
-  userId: string;
-  email: string | null;
-  name: string | null;
-  emailNudges: boolean | null;
-  dateOfBirth: string | null;
-  locale: string;
+export type WinbackStepResult = {
+  candidates: number;
+  emailed: number;
+  pushed: number;
+  skipped: number;
+  capped: number;
+  failed: number;
 };
 
-/** Users whose most recent visit falls inside the dormancy window. */
-async function findDormantUsers(): Promise<DormantUser[]> {
-  const newest = dateKey(DORMANT_MIN_DAYS); // e.g. 7 days ago
-  const oldest = dateKey(DORMANT_MAX_DAYS); // e.g. 14 days ago
+export type WinbackResult = {
+  dormant: number;
+  emailed: number;
+  pushed: number;
+  skipped: number;
+  capped: number;
+  failed: number;
+  /** Per-step counts, keyed by `email_send_log.kind`. */
+  steps: Record<WinbackKind, WinbackStepResult>;
+};
 
-  // Per-user last-visit day. date_local is a YYYY-MM-DD string, so max()
-  // and string comparison order correctly.
+function emptyStepResult(): WinbackStepResult {
+  return {
+    candidates: 0,
+    emailed: 0,
+    pushed: 0,
+    skipped: 0,
+    capped: 0,
+    failed: 0,
+  };
+}
+
+export function emptyWinbackResult(): WinbackResult {
+  const steps = {} as Record<WinbackKind, WinbackStepResult>;
+  for (const step of WINBACK_STEPS) steps[step.kind] = emptyStepResult();
+  return {
+    dormant: 0,
+    emailed: 0,
+    pushed: 0,
+    skipped: 0,
+    capped: 0,
+    failed: 0,
+    steps,
+  };
+}
+
+type Candidate = {
+  userId: string;
+  email: string;
+  name: string | null;
+  locale: string;
+  lastVisit: string;
+  daysSinceLastVisit: number;
+};
+
+type ClaimRow = { userId: string; kind: string; sentAt: Date };
+type ConversionRow = { userId: string; completedAt: Date };
+
+/**
+ * Create/refresh the three campaign rows. `reward_credits` is pinned to 0 on
+ * every write, including updates, so a stray admin edit cannot turn win-back
+ * into a credit grant.
+ */
+async function ensureWinbackCampaigns(): Promise<Map<WinbackKind, string>> {
+  const ids = new Map<WinbackKind, string>();
+  for (const step of WINBACK_STEPS) {
+    const [row] = await db
+      .insert(emailCampaigns)
+      .values({
+        slug: step.slug,
+        name: `Dormant win-back v1 — step ${step.step}`,
+        template: step.template,
+        subject: step.subjectKa,
+        body: step.bodyKa.join("\n\n"),
+        ctaLabel: step.ctaKa,
+        ctaUrl: step.path,
+        rewardCredits: 0,
+        status: "active",
+        launchedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: emailCampaigns.slug,
+        set: {
+          name: `Dormant win-back v1 — step ${step.step}`,
+          template: step.template,
+          subject: step.subjectKa,
+          body: step.bodyKa.join("\n\n"),
+          ctaLabel: step.ctaKa,
+          ctaUrl: step.path,
+          rewardCredits: 0,
+          status: "active",
+          launchedAt: dsql`coalesce(${emailCampaigns.launchedAt}, now())`,
+        },
+      })
+      .returning({ id: emailCampaigns.id });
+    if (row) ids.set(step.kind, row.id);
+  }
+  return ids;
+}
+
+/** Users whose last visit is inside the sequence's dormancy window. */
+async function findCandidates(): Promise<Candidate[]> {
+  const today = dateKey(0);
   const lastVisits = await db
     .select({
       userId: userActivityDays.userId,
@@ -83,233 +207,377 @@ async function findDormantUsers(): Promise<DormantUser[]> {
     .from(userActivityDays)
     .groupBy(userActivityDays.userId);
 
-  const targetIds = lastVisits
-    .filter((r) => r.last >= oldest && r.last <= newest)
-    .map((r) => r.userId);
-  if (targetIds.length === 0) return [];
+  const lastByUser = new Map<string, { last: string; days: number }>();
+  for (const row of lastVisits) {
+    if (!row.last) continue;
+    const days = dayDifference(row.last, today);
+    if (days >= ENROLLMENT_MIN_DAYS && days <= WINBACK_SEQUENCE_MAX_DAYS) {
+      lastByUser.set(row.userId, { last: row.last, days });
+    }
+  }
+  if (lastByUser.size === 0) return [];
 
-  return db
+  const rows = await db
     .select({
       userId: users.id,
       email: users.email,
       name: users.name,
-      emailNudges: users.emailNudges,
-      dateOfBirth: profiles.dateOfBirth,
       locale: users.interfaceLanguage,
+      emailNudges: users.emailNudges,
     })
     .from(users)
-    .leftJoin(profiles, eq(profiles.userId, users.id))
-    .where(inArray(users.id, targetIds));
+    .where(
+      and(
+        inArray(users.id, [...lastByUser.keys()]),
+        eq(users.emailNudges, true),
+        isNotNull(users.email),
+        isNotNull(users.emailVerified),
+      ),
+    );
+
+  return rows
+    .filter((u) => !!u.email && u.emailNudges === true)
+    .map((u) => {
+      const visit = lastByUser.get(u.userId)!;
+      return {
+        userId: u.userId,
+        email: u.email as string,
+        name: u.name,
+        locale: u.locale,
+        lastVisit: visit.last,
+        daysSinceLastVisit: visit.days,
+      };
+    });
 }
 
-/** Already nudged within the cooldown window? (sentAt defaults to now() on
- *  the claim insert, so it doubles as the claim timestamp.) */
-async function recentlyNudged(userId: string): Promise<boolean> {
-  const cutoff = new Date(Date.now() - COOLDOWN_DAYS * 86_400_000);
-  const [row] = await db
-    .select({ id: emailSendLog.id })
+/** Sequence claims inside the cooldown window; older spells are irrelevant. */
+async function findSequenceClaims(userIds: string[]): Promise<ClaimRow[]> {
+  if (userIds.length === 0) return [];
+  const cutoff = new Date(Date.now() - WINBACK_SPELL_COOLDOWN_DAYS * DAY);
+  const rows = await db
+    .select({
+      userId: emailSendLog.userId,
+      kind: emailSendLog.kind,
+      sentAt: emailSendLog.sentAt,
+    })
     .from(emailSendLog)
     .where(
       and(
-        eq(emailSendLog.userId, userId),
-        eq(emailSendLog.kind, "winback"),
+        inArray(emailSendLog.userId, userIds),
+        inArray(emailSendLog.kind, [...WINBACK_KINDS]),
         gte(emailSendLog.sentAt, cutoff),
+        // failed/skipped are retryable non-deliveries, not part of the spell.
+        or(
+          isNull(emailSendLog.status),
+          eq(emailSendLog.status, "sent"),
+          eq(emailSendLog.status, "pending"),
+        ),
       ),
-    )
-    .limit(1);
-  return !!row;
+    );
+  return rows;
 }
 
-/** Sun-sign slug from a YYYY-MM-DD date of birth. */
-function sunSlugFromDob(dob: string | null): ZodiacSlug | null {
-  if (!dob) return null;
-  const m = Number(dob.slice(5, 7));
-  const d = Number(dob.slice(8, 10));
-  if (!m || !d) return null;
-  try {
-    return signSlugByDate(m, d);
-  } catch {
-    return null;
+/** Converted win-back recipients (return or purchase) inside the cooldown. */
+async function findSequenceConversions(
+  userIds: string[],
+): Promise<ConversionRow[]> {
+  if (userIds.length === 0) return [];
+  const cutoff = new Date(Date.now() - WINBACK_SPELL_COOLDOWN_DAYS * DAY);
+  const rows = await db
+    .select({
+      userId: emailCampaignRecipients.userId,
+      completedAt: emailCampaignRecipients.completedAt,
+    })
+    .from(emailCampaignRecipients)
+    .innerJoin(
+      emailCampaigns,
+      eq(emailCampaigns.id, emailCampaignRecipients.campaignId),
+    )
+    .where(
+      and(
+        inArray(emailCampaignRecipients.userId, userIds),
+        inArray(emailCampaigns.slug, [...WINBACK_SLUGS]),
+        isNotNull(emailCampaignRecipients.completedAt),
+        gte(emailCampaignRecipients.completedAt, cutoff),
+      ),
+    );
+  return rows.flatMap((r) =>
+    r.completedAt ? [{ userId: r.userId, completedAt: r.completedAt }] : [],
+  );
+}
+
+/**
+ * Decide this run's step for one user, scoping claims to the current spell.
+ * Claims before the anchor belong to an earlier spell and impose the cooldown.
+ */
+function pickStep(
+  candidate: Candidate,
+  claims: ClaimRow[],
+  conversions: ConversionRow[],
+): WinbackStep | null {
+  const anchor = new Date(`${candidate.lastVisit}T00:00:00Z`);
+  const mine = claims.filter((c) => c.userId === candidate.userId);
+  const hadEarlierSpell = mine.some((c) => c.sentAt < anchor);
+  if (hadEarlierSpell) return null;
+
+  const spellClaims = mine.filter((c) => c.sentAt >= anchor);
+  const sentSteps = spellClaims
+    .map((c) => STEP_NUMBER_BY_KIND.get(c.kind))
+    .filter((n): n is number => n != null);
+  const lastStepAt = spellClaims.reduce<Date | null>(
+    (latest, c) => (!latest || c.sentAt > latest ? c.sentAt : latest),
+    null,
+  );
+  const daysSinceLastStep = lastStepAt
+    ? Math.floor((Date.now() - lastStepAt.getTime()) / DAY)
+    : null;
+
+  const converted = conversions
+    .filter((c) => c.userId === candidate.userId && c.completedAt >= anchor)
+    .reduce<Date | null>(
+      (latest, c) =>
+        !latest || c.completedAt > latest ? c.completedAt : latest,
+      null,
+    );
+
+  return selectWinbackStep({
+    daysSinceLastVisit: candidate.daysSinceLastVisit,
+    sentSteps,
+    daysSinceLastStep,
+    convertedAt: converted,
+  });
+}
+
+function tally(
+  result: WinbackResult,
+  step: WinbackStep,
+  key: keyof WinbackStepResult,
+): void {
+  result.steps[step.kind][key]++;
+  switch (key) {
+    case "candidates":
+      break;
+    case "emailed":
+      result.emailed++;
+      break;
+    case "pushed":
+      result.pushed++;
+      break;
+    case "skipped":
+      result.skipped++;
+      break;
+    case "capped":
+      result.capped++;
+      break;
+    case "failed":
+      result.failed++;
+      break;
   }
 }
 
-export type WinbackResult = {
-  dormant: number;
-  emailed: number;
-  pushed: number;
-  skipped: number;
-  failed: number;
-};
-
-/** Cron entrypoint, one personal nudge per user per dormancy spell. */
+/** Cron entrypoint: enroll, select one step, claim, send. */
 export async function sendWinbackNudges(
   budget?: SendBudget,
 ): Promise<WinbackResult> {
-  const found = await findDormantUsers();
-  const result: WinbackResult = {
-    dormant: found.length,
-    emailed: 0,
-    pushed: 0,
-    skipped: 0,
-    failed: 0,
-  };
-  if (found.length === 0) return result;
+  const result = emptyWinbackResult();
+  const candidates = await findCandidates();
+  result.dormant = candidates.length;
+
+  // Campaign rows exist even on quiet days, so conversion measurement and the
+  // admin surface are ready before the first send.
+  const campaignIds = await ensureWinbackCampaigns();
+  if (candidates.length === 0) return result;
+
+  const ids = candidates.map((c) => c.userId);
+  const [claims, conversions] = await Promise.all([
+    findSequenceClaims(ids),
+    findSequenceConversions(ids),
+  ]);
 
   const resendKey = process.env.RESEND_API_KEY;
   const resend = resendKey ? new Resend(resendKey) : null;
 
-  // Per-run cache: 12 signs max, so repeated lookups are free.
-  const headlineBySlug = new Map<ZodiacSlug, string | null>();
-  async function headlineFor(slug: ZodiacSlug): Promise<string | null> {
-    if (headlineBySlug.has(slug)) return headlineBySlug.get(slug) ?? null;
-    let headline: string | null = null;
-    try {
-      const row = await ensureSignHoroscope(slug, "day");
-      headline = row?.headline ?? null;
-    } catch {
-      /* horoscope is garnish, never block the nudge */
-    }
-    headlineBySlug.set(slug, headline);
-    return headline;
-  }
-
-  // Bound this run's sends. The 7-14 day dormancy window held 219 candidates in
-  // production, and every send costs 1.1s, so an uncapped loop competes with the
-  // other lifecycle jobs for a 300s invocation budget.
+  // The whole 3-step sequence shares one per-run reservation so it cannot
+  // starve the other lifecycle jobs, and later steps drain on later runs.
   const allowance = budget
-    ? budget.reserve(found.length, PER_JOB_SEND_CAP)
+    ? budget.reserve(candidates.length, PER_JOB_SEND_CAP)
     : PER_JOB_SEND_CAP;
   let sentThisRun = 0;
 
-  for (const u of found) {
+  for (const candidate of candidates) {
     if (sentThisRun >= allowance) break;
-    try {
-      const locale = normalizeUserLocale(u.locale);
-      const en = locale === "en";
-      const origin = en ? ENGLISH_SITE_URL : ORIGIN;
-      const subject = en ? WINBACK_SUBJECT_EN : WINBACK_SUBJECT;
-      if (await recentlyNudged(u.userId)) {
-        result.skipped++;
-        continue;
-      }
 
-      // Claim first, the once-per-spell guard, so the 05:30 retry tick
-      // can't double-send even if this run dies mid-loop.
-      const [claim] = await db
-        .insert(emailSendLog)
+    const step = pickStep(candidate, claims, conversions);
+    if (!step) continue;
+    tally(result, step, "candidates");
+
+    const locale = normalizeUserLocale(candidate.locale);
+    const en = locale === "en";
+    const subject = en ? step.subjectEn : step.subjectKa;
+    const origin = en ? ENGLISH_SITE_URL : ORIGIN;
+    const ctaUrl = `${origin.replace(/\/$/, "")}${step.path}`;
+
+    if (!resend) {
+      console.warn("[winback] RESEND_API_KEY missing, cannot send sequence");
+      tally(result, step, "skipped");
+      continue;
+    }
+
+    // Shared company cap, before any claim or send. Recorded as `skipped` so
+    // this day's attempt is terminal and the next run can retry the step.
+    if (await isLifecycleFrequencyCapped(candidate.userId)) {
+      await db.insert(emailSendLog).values({
+        userId: candidate.userId,
+        kind: step.kind,
+        email: candidate.email,
+        subject,
+        status: "skipped",
+        error: lifecycleCapSkipReason(),
+      });
+      tally(result, step, "capped");
+      tally(result, step, "skipped");
+      continue;
+    }
+
+    // Claim first: even a crashed run cannot double-send this step.
+    const [claim] = await db
+      .insert(emailSendLog)
+      .values({
+        userId: candidate.userId,
+        kind: step.kind,
+        email: candidate.email,
+        subject,
+        status: "pending",
+      })
+      .returning({ id: emailSendLog.id });
+
+    const campaignId = campaignIds.get(step.kind);
+    if (campaignId) {
+      await db
+        .insert(emailCampaignRecipients)
         .values({
-          userId: u.userId,
-          kind: "winback",
-          email: u.email,
-          subject,
+          campaignId,
+          userId: candidate.userId,
+          email: candidate.email,
           status: "pending",
         })
-        .returning({ id: emailSendLog.id });
+        .onConflictDoUpdate({
+          target: [
+            emailCampaignRecipients.campaignId,
+            emailCampaignRecipients.userId,
+          ],
+          set: {
+            email: candidate.email,
+            status: "pending",
+            error: null,
+          },
+        });
+    }
 
-      // Personalization (best-effort).
-      const slug = sunSlugFromDob(u.dateOfBirth);
-      const signMeta = slug ? signMetaBySlug(slug) : null;
-      const signLabel = en
-        ? (signMeta?.labelEn ?? null)
-        : (signMeta?.labelKa ?? null);
-      let headline: string | null = null;
-      try {
-        headline = en
-          ? ((await ensureDailyFor(u.userId, "en"))?.headline ?? null)
-          : slug
-            ? await headlineFor(slug)
-            : null;
-      } catch {
-        /* horoscope is garnish, never block the nudge */
-      }
-      let balance = 0;
-      try {
-        balance = await getBalance(u.userId);
-      } catch {
-        /* balance line just disappears */
-      }
-      const firstName = u.name?.split(" ")[0] ?? null;
-
-      // Web push (independent of email prefs, its own opt-in channel).
-      if (isPushConfigured()) {
-        try {
-          const sent = await sendPushToUser(u.userId, {
-            title: en ? "We miss you ✨" : "შენ გვაკლიხარ ✨",
-            body: headline
-              ? en
-                ? `Today for ${signLabel ?? "you"}: ${headline}`
-                : `დღეს ${signLabel ?? "შენთვის"}: ${headline}`
-              : en
-                ? "Your daily horoscope is waiting"
-                : "შენი დღევანდელი ჰოროსკოპი გელოდება",
-            url: "/dashboard",
-            tag: "winback",
-          });
-          if (sent > 0) result.pushed++;
-        } catch (err) {
-          console.warn("[winback] push failed:", (err as Error).message);
-        }
-      }
-
-      // Email, only with an address and nudges not opted out.
-      if (!resend || !u.email || u.emailNudges === false) {
-        await db
-          .update(emailSendLog)
-          .set({
-            status: "failed",
-            error: !resend
-              ? "resend not configured"
-              : !u.email
-                ? "no email address"
-                : "nudges opted out (push-only)",
-          })
-          .where(eq(emailSendLog.id, claim.id));
-        result.skipped++;
-        continue;
-      }
-
-      const token = await getOrCreateUnsubscribeToken(u.userId);
+    try {
+      const token = await getOrCreateUnsubscribeToken(candidate.userId);
       const unsubUrl = `${origin}/unsubscribe?token=${token}&type=nudges`;
 
       await acquireResendSlot();
-      const sendResult = await resend.emails.send({
-        from: FROM,
-        to: u.email,
-        subject,
-        react: WinbackEmail({
-          name: firstName,
-          signLabel,
-          horoscopeHeadline: headline,
-          balance,
-          dashboardUrl: `${origin}/dashboard`,
-          unsubscribeUrl: unsubUrl,
-          locale,
-        }),
-        headers: {
-          "List-Unsubscribe": `<${unsubUrl}>`,
-          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      const sendResult = await resend.emails.send(
+        {
+          from: FROM,
+          to: candidate.email,
+          subject,
+          react: WinbackSequenceEmail({
+            step,
+            ctaUrl,
+            unsubscribeUrl: unsubUrl,
+            locale,
+          }),
+          headers: {
+            "List-Unsubscribe": `<${unsubUrl}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         },
-      });
+        {
+          // Per (user, step, spell). Resend dedupes a retried request; the
+          // anchor lets a future spell legitimately send the same step again.
+          idempotencyKey: `${step.kind}:${candidate.userId}:${candidate.lastVisit}`,
+        },
+      );
 
       if (sendResult.error) {
         await db
           .update(emailSendLog)
           .set({ status: "failed", error: sendResult.error.message })
           .where(eq(emailSendLog.id, claim.id));
-        result.failed++;
-      } else {
+        if (campaignId) {
+          await db
+            .update(emailCampaignRecipients)
+            .set({ status: "failed", error: sendResult.error.message })
+            .where(
+              and(
+                eq(emailCampaignRecipients.campaignId, campaignId),
+                eq(emailCampaignRecipients.userId, candidate.userId),
+              ),
+            );
+        }
+        tally(result, step, "failed");
+        continue;
+      }
+
+      await db
+        .update(emailSendLog)
+        .set({ status: "sent" })
+        .where(eq(emailSendLog.id, claim.id));
+      if (campaignId) {
         await db
-          .update(emailSendLog)
-          .set({ status: "sent" })
-          .where(eq(emailSendLog.id, claim.id));
-        result.emailed++;
-        sentThisRun++;
+          .update(emailCampaignRecipients)
+          .set({ status: "sent", sentAt: new Date(), error: null })
+          .where(
+            and(
+              eq(emailCampaignRecipients.campaignId, campaignId),
+              eq(emailCampaignRecipients.userId, candidate.userId),
+            ),
+          );
+      }
+      tally(result, step, "emailed");
+      sentThisRun++;
+
+      // Push after the email succeeds, so a failed send does not leave a
+      // push pointing at an inbox that never received the sequence email.
+      if (isPushConfigured()) {
+        try {
+          const sent = await sendPushToUser(candidate.userId, {
+            title: en ? step.pushTitleEn : step.pushTitleKa,
+            body: en ? step.pushBodyEn : step.pushBodyKa,
+            url: step.path,
+            tag: step.kind,
+          });
+          if (sent > 0) tally(result, step, "pushed");
+        } catch (err) {
+          console.warn("[winback] push failed:", (err as Error).message);
+        }
       }
     } catch (err) {
-      console.warn(`[winback] failed for ${u.userId}:`, (err as Error).message);
-      result.failed++;
+      console.warn(
+        `[winback] ${step.kind} failed for ${candidate.userId}:`,
+        (err as Error).message,
+      );
+      try {
+        await db
+          .update(emailSendLog)
+          .set({ status: "failed", error: (err as Error).message })
+          .where(eq(emailSendLog.id, claim.id));
+      } catch {
+        /* claim row will age out; the send itself already failed */
+      }
+      tally(result, step, "failed");
     }
   }
 
   return result;
 }
+
+/** Exposed for the cron JSON and tests: the anchor-relative thresholds. */
+export const WINBACK_STEP_THRESHOLDS = WINBACK_STEPS.map((s) => ({
+  kind: s.kind,
+  dueAfterDays: s.dueAfterDays,
+  slug: s.slug,
+}));

@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { and, desc, eq, gte, isNotNull, isNull, lt } from "drizzle-orm";
+import { and, desc, eq, gte, isNotNull, isNull, lt, or } from "drizzle-orm";
 
 import { db } from "@/db";
 import { emailSendLog, profiles, users } from "@/db/schema";
@@ -9,6 +9,10 @@ import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { acquireResendSlot } from "@/lib/resend-throttle";
 import { PER_JOB_SEND_CAP, type SendBudget } from "@/lib/email-send-budget";
+import {
+  isLifecycleFrequencyCapped,
+  lifecycleCapSkipReason,
+} from "@/lib/email-frequency-cap";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
@@ -53,7 +57,7 @@ function absUrlForLocale(p: string, locale: UserLocale): string {
   return `${origin.replace(/\/$/, "")}${p.startsWith("/") ? p : `/${p}`}`;
 }
 
-/** Prior sends of a given kind for a user, count + most-recent timestamp. */
+/** Prior delivered sends of a given kind for a user, count + most recent time. */
 async function priorSends(
   userId: string,
   kind: string,
@@ -61,7 +65,15 @@ async function priorSends(
   const rows = await db
     .select({ sentAt: emailSendLog.sentAt })
     .from(emailSendLog)
-    .where(and(eq(emailSendLog.userId, userId), eq(emailSendLog.kind, kind)))
+    .where(
+      and(
+        eq(emailSendLog.userId, userId),
+        eq(emailSendLog.kind, kind),
+        // `skipped` (cap) and `failed` rows are retryable non-deliveries and
+        // must not consume the sequence's 2-send allowance.
+        or(isNull(emailSendLog.status), eq(emailSendLog.status, "sent")),
+      ),
+    )
     .orderBy(desc(emailSendLog.sentAt));
   return { count: rows.length, last: rows[0]?.sentAt ?? null };
 }
@@ -110,6 +122,19 @@ export async function sendVerificationRenudges(
     const { count, last } = await priorSends(u.id, "verify_reminder");
     if (count >= 2) continue;
     if (last && now - last.getTime() < 20 * HOUR) continue;
+
+    // Company-wide lifecycle cap. A win-back step may already have used this
+    // user's 14-day slots; record the attempt as skipped and move on.
+    if (await isLifecycleFrequencyCapped(u.id)) {
+      await db.insert(emailSendLog).values({
+        userId: u.id,
+        kind: "verify_reminder",
+        email: u.email,
+        status: "skipped",
+        error: lifecycleCapSkipReason(),
+      });
+      continue;
+    }
 
     // Re-issues a fresh verify token; returns send:false if already verified.
     const dispatch = await prepareVerificationResend(u.email);
@@ -196,6 +221,19 @@ export async function sendProfileIncompleteRenudges(
       count === 1 &&
       (ageMs < 7 * DAY || (last && now - last.getTime() < 20 * HOUR))
     ) {
+      continue;
+    }
+
+    // Shared lifecycle cap: win-back steps and this re-nudge compete for the
+    // same 3-per-14-days inbox budget, so a dormant user is never hit by both.
+    if (await isLifecycleFrequencyCapped(u.id)) {
+      await db.insert(emailSendLog).values({
+        userId: u.id,
+        kind: "profile_incomplete",
+        email: u.email,
+        status: "skipped",
+        error: lifecycleCapSkipReason(),
+      });
       continue;
     }
 
