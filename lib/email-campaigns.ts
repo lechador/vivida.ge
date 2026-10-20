@@ -1,20 +1,42 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNotNull, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
 import { emailCampaignRecipients, emailCampaigns } from "@/db/schema";
 import { grantCredits } from "@/lib/credits";
 
-/** Mark all campaigns addressed to this user as converted and pay each reward once. */
-export async function completeEligibleEmailCampaigns(userId: string): Promise<void> {
+/**
+ * Mark all campaigns addressed to this user as converted and pay each reward
+ * once.
+ *
+ * Only rows that were actually sent can convert: a recipient inserted but not
+ * yet mailed (e.g. the win-back claim inserted seconds before the Resend call)
+ * must not be completed by an unrelated page view.
+ *
+ * Called from profile completion, the activity path (`recordVisit`) and the
+ * purchase path. Win-back campaigns carry `reward_credits = 0`, so "conversion"
+ * there means only the `completed_at` stamp; no credits are granted.
+ */
+export async function completeEligibleEmailCampaigns(
+  userId: string,
+): Promise<void> {
   const eligible = await db
-    .select({ campaignId: emailCampaignRecipients.campaignId, reward: emailCampaigns.rewardCredits })
+    .select({
+      campaignId: emailCampaignRecipients.campaignId,
+      reward: emailCampaigns.rewardCredits,
+    })
     .from(emailCampaignRecipients)
-    .innerJoin(emailCampaigns, eq(emailCampaigns.id, emailCampaignRecipients.campaignId))
-    .where(and(
-      eq(emailCampaignRecipients.userId, userId),
-      eq(emailCampaignRecipients.isTest, false),
-      isNull(emailCampaignRecipients.completedAt)
-    ));
+    .innerJoin(
+      emailCampaigns,
+      eq(emailCampaigns.id, emailCampaignRecipients.campaignId),
+    )
+    .where(
+      and(
+        eq(emailCampaignRecipients.userId, userId),
+        eq(emailCampaignRecipients.isTest, false),
+        isNull(emailCampaignRecipients.completedAt),
+        isNotNull(emailCampaignRecipients.sentAt),
+      ),
+    );
 
   for (const row of eligible) {
     const [claimed] = await db
@@ -24,16 +46,26 @@ export async function completeEligibleEmailCampaigns(userId: string): Promise<vo
         and(
           eq(emailCampaignRecipients.campaignId, row.campaignId),
           eq(emailCampaignRecipients.userId, userId),
-          isNull(emailCampaignRecipients.completedAt)
-        )
+          isNull(emailCampaignRecipients.completedAt),
+        ),
       )
       .returning({ campaignId: emailCampaignRecipients.campaignId });
     if (claimed && row.reward > 0) {
-      await grantCredits(userId, row.reward, "campaign_reward", `email-campaign:${row.campaignId}`);
-      await db.update(emailCampaignRecipients).set({ rewardedAt: new Date() }).where(and(
-        eq(emailCampaignRecipients.campaignId, row.campaignId),
-        eq(emailCampaignRecipients.userId, userId)
-      ));
+      await grantCredits(
+        userId,
+        row.reward,
+        "campaign_reward",
+        `email-campaign:${row.campaignId}`,
+      );
+      await db
+        .update(emailCampaignRecipients)
+        .set({ rewardedAt: new Date() })
+        .where(
+          and(
+            eq(emailCampaignRecipients.campaignId, row.campaignId),
+            eq(emailCampaignRecipients.userId, userId),
+          ),
+        );
     }
   }
 }

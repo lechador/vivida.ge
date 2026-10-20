@@ -222,6 +222,21 @@ export async function grantPurchaseCredits(
   const row = result.rows[0];
   if (row?.was_granted) {
     await notifyCredit(userId, amount, "purchase", row.resulting_balance);
+    // A purchase is a win-back conversion too. Dynamic import avoids a module
+    // cycle (email-campaigns imports grantCredits from this file). Rewards are
+    // 0 on win-back campaigns, so this only stamps `completed_at`.
+    try {
+      const { completeEligibleEmailCampaigns } =
+        await import("@/lib/email-campaigns");
+      await completeEligibleEmailCampaigns(userId);
+    } catch (err) {
+      console.warn(
+        "[credits.campaignConversion] failed for",
+        userId,
+        ":",
+        (err as Error).message,
+      );
+    }
   }
 }
 

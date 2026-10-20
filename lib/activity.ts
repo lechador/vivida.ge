@@ -1,9 +1,8 @@
 import { sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import {
-  processPendingSignupCredits,
-} from "@/lib/signup-credit-experiment";
+import { completeEligibleEmailCampaigns } from "@/lib/email-campaigns";
+import { processPendingSignupCredits } from "@/lib/signup-credit-experiment";
 import type { PendingSignupCreditAssignment } from "@/lib/signup-credit-experiment-config";
 
 const VISIT_THROTTLE_MS = 5 * 60 * 1000;
@@ -81,7 +80,7 @@ export async function recordVisit(
       "[activity.recordVisit] failed for",
       userId,
       ":",
-      (err as Error).message
+      (err as Error).message,
     );
   }
 
@@ -96,6 +95,21 @@ export async function recordVisit(
         (err as Error).message,
       );
     }
+  }
+
+  // Returning to the app is the win-back conversion event. Best-effort, and
+  // `completeEligibleEmailCampaigns` only touches campaigns whose send already
+  // happened, so this cannot complete an in-flight recipient. Rewards are 0 for
+  // win-back, so this stamps `completed_at` without granting credits.
+  try {
+    await completeEligibleEmailCampaigns(userId);
+  } catch (err) {
+    console.warn(
+      "[activity.campaignConversion] failed for",
+      userId,
+      ":",
+      (err as Error).message,
+    );
   }
 }
 

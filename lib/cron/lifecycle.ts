@@ -18,7 +18,11 @@ import {
   sendProfileIncompleteRenudges,
   sendVerificationRenudges,
 } from "@/lib/renudge";
-import { sendWinbackNudges, type WinbackResult } from "@/lib/winback";
+import {
+  emptyWinbackResult,
+  sendWinbackNudges,
+  type WinbackResult,
+} from "@/lib/winback";
 
 /**
  * Daily lifecycle workload: push, birthday gifts, winback, lead horoscopes and
@@ -81,18 +85,12 @@ export async function runLifecycleCron(req: NextRequest) {
     );
   }
 
-  let winback: WinbackResult = {
-    dormant: 0,
-    emailed: 0,
-    pushed: 0,
-    skipped: 0,
-    failed: 0,
-  };
+  let winback: WinbackResult = emptyWinbackResult();
   try {
     winback = await sendWinbackNudges(budget);
   } catch (err) {
     console.warn(
-      "[cron:lifecycle] winback nudges failed:",
+      "[cron:lifecycle] winback sequence failed:",
       (err as Error).message,
     );
   }
