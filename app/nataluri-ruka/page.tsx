@@ -263,7 +263,7 @@ export default async function NataluriRukaPage() {
               პერსონალური ინტერპრეტაციისა და AI ანალიზისთვის{" "}
               <Link
                 href="/signup"
-                className="text-primary underline-offset-4 hover:underline"
+                className="text-primary underline underline-offset-4 hover:underline"
               >
                 დარეგისტრირდი უფასოდ
               </Link>
@@ -287,7 +287,7 @@ export default async function NataluriRukaPage() {
               ყოველდღიური ნაბიჯების სანახავად გამოიყენე{" "}
               <Link
                 href="/piradi-ruka/rogor-shevadginot"
-                className="text-primary underline-offset-4 hover:underline"
+                className="text-primary underline underline-offset-4 hover:underline"
               >
                 პირადი რუკის შედგენის სრული ინსტრუქცია
               </Link>

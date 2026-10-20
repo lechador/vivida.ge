@@ -49,6 +49,7 @@ export function HowItWorksSection() {
             const accent = STEP_ACCENTS[i % STEP_ACCENTS.length];
             return (
               <Reveal
+                as="li"
                 key={s.n}
                 delayMs={i * 60}
                 className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm transition-colors hover:border-primary/40 hover:bg-secondary/40 sm:p-7"
