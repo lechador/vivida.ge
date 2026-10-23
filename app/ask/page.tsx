@@ -102,24 +102,34 @@ export default async function AskPage({
       : null;
 
   return (
+    /*
+     * The section below reserves the mobile tab-bar height itself, the same
+     * contract as /messages. Without the data-no-body-bottom-pad opt-out the
+     * global body padding adds 4.5rem *below* a 100dvh page, which produced a
+     * page-level scrollbar and pushed the composer around on phones.
+     */
     <main
+      data-no-body-bottom-pad
       lang={locale}
-      className="relative isolate flex h-dvh flex-col overflow-hidden bg-background"
+      className="relative isolate flex h-[100dvh] flex-col overflow-hidden bg-background"
     >
       <Starfield count={48} />
 
       <AppHeader authed active="ask" />
 
-      <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-4 pb-[calc(4.75rem_+_env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8 lg:pb-6">
-        <header className="mb-4 shrink-0 border-b border-border pb-4">
-          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+      <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-3 pb-[calc(4.5rem_+_max(env(safe-area-inset-bottom),0.25rem))] pt-3 sm:px-6 sm:pt-8 lg:pb-6">
+        <header className="mb-3 shrink-0 border-b border-border pb-3 sm:mb-4 sm:pb-4">
+          {/* Bilingual eyebrow wraps to two lines on phones and just eats
+              thread height; the app header breadcrumb already names the
+              section, so it stays a desktop flourish. */}
+          <div className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-primary sm:block">
             OBSERVATORY CONSULTATION · პირადი კონსულტაცია
           </div>
           <h1
             className={
               en
-                ? "mt-1 text-balance font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl"
-                : "mt-1 text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
+                ? "mt-1 text-balance font-display text-xl font-medium tracking-tight text-foreground sm:text-3xl"
+                : "mt-1 text-balance text-xl font-semibold tracking-tight text-foreground sm:text-3xl"
             }
           >
             {en ? "Ask your " : "ჰკითხე "}
@@ -127,7 +137,9 @@ export default async function AskPage({
               {en ? "natal chart" : "ვარსკვლავებს"}
             </span>
           </h1>
-          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+          {/* The transcript's own intro explains the tool on phones; the
+              long subtitle is only worth its vertical space on desktop. */}
+          <p className="mt-1 hidden text-xs text-muted-foreground sm:block sm:text-sm">
             {en
               ? "Personal astrological consultation grounded in your exact planets, houses, and aspects."
               : "შენი ნატალური რუკის პერსონალური ასტროლოგი, ეფუძნება შენს რეალურ პლანეტებსა და სახლებს."}

@@ -172,7 +172,7 @@ html[lang="hy"] .locale-ka-only {
    * hidden behind it. Uses :has() so the rule is automatic, landing
    * pages and desktop don't pay the cost.
    *
-   * Full-bleed pages (currently only /messages) opt out by rendering a
+   * Full-bleed pages (/messages, /discover, /ask) opt out by rendering a
    * [data-no-body-bottom-pad] element, those pages own their own tab-bar
    * compensation so they can use the full viewport for their layout.
    */
@@ -555,6 +555,20 @@ html[lang="hy"] .locale-ka-only {
 }
 .chat-panel-in {
   animation: chat-panel-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/*
+ * Ask-the-stars transcript. On phones a desktop-style vertical scrollbar
+ * eats width and reads as "a page inside a page"; the thread should feel
+ * like a native chat surface. Scrolling, keyboard paging and assistive
+ * tech all keep working, only the visual track is removed.
+ */
+.chat-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.chat-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
