@@ -1,11 +1,12 @@
 import { asc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { charts, chartChatMessages } from "@/db/schema";
+import { charts, chartChatMessages, profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { AstroLockedMain } from "@/components/astro/astro-locked-main";
+import { InlineBirthDatePrompt } from "@/components/astro/inline-birth-date-prompt";
 import { ChartChat } from "@/components/ask/chart-chat";
 import type { AskMemoryView } from "@/components/ask/chart-chat";
 import { getAskMemory } from "@/lib/ask-memory";
@@ -36,11 +37,16 @@ export default async function AskPage({
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
 
-  const [[chart], history] = await Promise.all([
+  const [[chart], [profile], history] = await Promise.all([
     db
       .select({ userId: charts.userId })
       .from(charts)
       .where(eq(charts.userId, user.id))
+      .limit(1),
+    db
+      .select({ dateOfBirth: profiles.dateOfBirth })
+      .from(profiles)
+      .where(eq(profiles.userId, user.id))
       .limit(1),
     db
       .select({
@@ -69,6 +75,11 @@ export default async function AskPage({
         }
         next="/ask"
         locale={locale}
+        topBanner={
+          !profile?.dateOfBirth ? (
+            <InlineBirthDatePrompt locale={locale} />
+          ) : null
+        }
       />
     );
 

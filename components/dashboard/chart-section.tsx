@@ -3,9 +3,18 @@ import {
   Globe2,
   Home,
   Lightbulb,
+  Lock,
   Sparkles,
   Triangle,
 } from "lucide-react";
+
+import { and, eq, inArray } from "drizzle-orm";
+
+import { db } from "@/db";
+import { pdfReports } from "@/db/schema";
+import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
+import { isPremiumUser } from "@/lib/premium";
+import { BuyReportCta } from "@/components/report/buy-report-cta";
 
 import { ensureChartFor } from "@/actions/chart";
 import { ContentFeedback } from "@/components/analytics/content-feedback";
@@ -35,7 +44,30 @@ export async function ChartSection({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
-  const chart = await ensureChartFor(userId);
+  const [chart, premium, unlockedByLedger, [natalPdfRow], balance] =
+    await Promise.all([
+      ensureChartFor(userId),
+      isPremiumUser(userId),
+      isUnlocked(userId, "natal_report", "spend_report"),
+      db
+        .select({ id: pdfReports.id })
+        .from(pdfReports)
+        .where(
+          and(
+            eq(pdfReports.userId, userId),
+            eq(pdfReports.type, "natal"),
+            inArray(pdfReports.status, [
+              "paid",
+              "generating",
+              "ready",
+              "failed",
+            ]),
+          ),
+        )
+        .limit(1),
+      getBalance(userId),
+    ]);
+  const unlocked = premium || unlockedByLedger || Boolean(natalPdfRow);
 
   if (!chart) {
     return (
@@ -183,93 +215,197 @@ export async function ChartSection({
           <ElementsCard chart={data} locale={locale} />
         </CollapsibleSection>
 
-        {/* Highlights */}
-        {interp?.highlights && interp.highlights.length > 0 && (
-          <CollapsibleSection
-            id="highlights"
-            icon={<Lightbulb className="size-4.5" />}
-            title={en ? "What stands out" : "რა ვამჩნევთ შენს რუკაში"}
-            subtitle={
-              en
-                ? "The patterns that carry special emphasis"
-                : "ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"
-            }
-            defaultOpen
-          >
-            <div className="grid gap-3.5 sm:grid-cols-2">
-              {interp.highlights.map((h, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl border border-border bg-card px-4 py-4 shadow-sm sm:px-5"
-                >
-                  <h3 className="mb-1.5 text-sm font-semibold tracking-tight text-[var(--vivida-gold)]">
-                    {h.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-foreground/85">
-                    {h.body}
-                  </p>
+        {unlocked ? (
+          <>
+            {/* Highlights */}
+            {interp?.highlights && interp.highlights.length > 0 && (
+              <CollapsibleSection
+                id="highlights"
+                icon={<Lightbulb className="size-4.5" />}
+                title={en ? "What stands out" : "რა ვამჩნევთ შენს რუკაში"}
+                subtitle={
+                  en
+                    ? "The patterns that carry special emphasis"
+                    : "ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"
+                }
+                defaultOpen
+              >
+                <div className="grid gap-3.5 sm:grid-cols-2">
+                  {interp.highlights.map((h, i) => (
+                    <div
+                      key={i}
+                      className="rounded-xl border border-border bg-card px-4 py-4 shadow-sm sm:px-5"
+                    >
+                      <h3 className="mb-1.5 text-sm font-semibold tracking-tight text-[var(--vivida-gold)]">
+                        {h.title}
+                      </h3>
+                      <p className="text-sm leading-relaxed text-foreground/85">
+                        {h.body}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </CollapsibleSection>
+              </CollapsibleSection>
+            )}
+
+            {/* SECTION 05, Planets */}
+            <CollapsibleSection
+              id="planets"
+              icon={<Globe2 className="size-4.5" />}
+              title={en ? "Planets" : "პლანეტები"}
+              subtitle={
+                en
+                  ? "Eight distinct functions working as one system"
+                  : "რვა პლანეტა, რვა ხასიათი, ერთად შენ ხარ"
+              }
+              defaultOpen
+            >
+              <PlanetCards
+                chart={data}
+                interpretations={interp?.planets}
+                locale={locale}
+              />
+            </CollapsibleSection>
+
+            {/* SECTION 06, Houses */}
+            <CollapsibleSection
+              id="houses"
+              icon={<Home className="size-4.5" />}
+              title={en ? "The 12 areas of life" : "ცხოვრების 12 სფერო"}
+              subtitle={
+                en
+                  ? "Where each part of your chart tends to show up"
+                  : "სად რა ენერგია ვლინდება შენს ცხოვრებაში"
+              }
+              defaultOpen
+            >
+              <HouseCards
+                chart={data}
+                interpretations={interp?.houses}
+                locale={locale}
+              />
+            </CollapsibleSection>
+
+            {/* SECTION 07, Aspects */}
+            <CollapsibleSection
+              id="aspects"
+              icon={<Triangle className="size-4.5" />}
+              title={en ? "Aspects" : "ასპექტები"}
+              subtitle={
+                en
+                  ? "How the planets in your chart interact"
+                  : "როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
+              }
+              defaultOpen
+            >
+              <AspectCards
+                chart={data}
+                interpretations={interp?.aspects}
+                locale={locale}
+              />
+            </CollapsibleSection>
+          </>
+        ) : (
+          <section className="scroll-mt-16 sm:scroll-mt-24">
+            <article className="relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/30 bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-[radial-gradient(circle,var(--vivida-violet)/0.25,transparent_70%)]"
+              />
+              <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-2.5 py-0.5 text-xs font-medium text-[var(--vivida-violet)]">
+                <Lock className="size-3" />
+                {en ? "Deep dossier locked" : "ღრმა დოსიე დახურულია"}
+              </div>
+              <h2 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+                {en
+                  ? "Your deep chart reading is waiting inside"
+                  : "შენი ღრმა ანალიზი აქ გელოდება"}
+              </h2>
+              <p className="mt-1.5 max-w-xl text-sm text-foreground/75">
+                {en
+                  ? "Unlock the planets, houses, aspects and the full PDF dossier in one step."
+                  : "გახსენი პლანეტები, სახლები, ასპექტები და სრული PDF დოსიე ერთი ნაბიჯით."}
+              </p>
+
+              <div className="mt-6 grid gap-3.5 sm:grid-cols-3">
+                <div
+                  id="planets"
+                  className="scroll-mt-16 rounded-xl border border-border bg-background/50 px-4 py-4 sm:scroll-mt-24"
+                >
+                  <div className="flex items-center gap-2">
+                    <Lock className="size-4 text-[var(--vivida-violet)]" />
+                    <h3 className="text-sm font-semibold text-foreground">
+                      {en
+                        ? "Karmic mission & soul direction"
+                        : "კარმული მისია და სულის მიმართულება"}
+                    </h3>
+                  </div>
+                  <div aria-hidden className="mt-3 space-y-1.5 select-none">
+                    <div className="h-2.5 w-11/12 rounded bg-foreground/10 blur-[2px]" />
+                    <div className="h-2.5 w-4/5 rounded bg-foreground/10 blur-[2px]" />
+                    <div className="h-2.5 w-3/5 rounded bg-foreground/10 blur-[2px]" />
+                  </div>
+                </div>
+                <div
+                  id="houses"
+                  className="scroll-mt-16 rounded-xl border border-border bg-background/50 px-4 py-4 sm:scroll-mt-24"
+                >
+                  <div className="flex items-center gap-2">
+                    <Lock className="size-4 text-[var(--vivida-violet)]" />
+                    <h3 className="text-sm font-semibold text-foreground">
+                      {en
+                        ? "7th house of love & marriage"
+                        : "სიყვარულისა და ქორწინების მე-7 სახლი"}
+                    </h3>
+                  </div>
+                  <div aria-hidden className="mt-3 space-y-1.5 select-none">
+                    <div className="h-2.5 w-10/12 rounded bg-foreground/10 blur-[2px]" />
+                    <div className="h-2.5 w-3/4 rounded bg-foreground/10 blur-[2px]" />
+                    <div className="h-2.5 w-1/2 rounded bg-foreground/10 blur-[2px]" />
+                  </div>
+                  <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
+                    <Lock className="size-4 text-[var(--vivida-violet)]" />
+                    <h3 className="text-sm font-semibold text-foreground">
+                      {en
+                        ? "2nd & 8th houses of finances & resources"
+                        : "ფინანსებისა და რესურსების მე-2 და მე-8 სახლები"}
+                    </h3>
+                  </div>
+                  <div aria-hidden className="mt-3 space-y-1.5 select-none">
+                    <div className="h-2.5 w-11/12 rounded bg-foreground/10 blur-[2px]" />
+                    <div className="h-2.5 w-2/3 rounded bg-foreground/10 blur-[2px]" />
+                  </div>
+                </div>
+                <div
+                  id="aspects"
+                  className="scroll-mt-16 rounded-xl border border-border bg-background/50 px-4 py-4 sm:scroll-mt-24"
+                >
+                  <div className="flex items-center gap-2">
+                    <Lock className="size-4 text-[var(--vivida-violet)]" />
+                    <h3 className="text-sm font-semibold text-foreground">
+                      {en
+                        ? "All planets, 12 houses, aspects & full PDF dossier"
+                        : "ყველა პლანეტა, 12 სახლი, ასპექტები და სრული PDF დოსიე"}
+                    </h3>
+                  </div>
+                  <div aria-hidden className="mt-3 space-y-1.5 select-none">
+                    <div className="h-2.5 w-4/5 rounded bg-foreground/10 blur-[2px]" />
+                    <div className="h-2.5 w-3/5 rounded bg-foreground/10 blur-[2px]" />
+                    <div className="h-2.5 w-2/3 rounded bg-foreground/10 blur-[2px]" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <BuyReportCta
+                  cost={CREDIT_COST.pdfReport}
+                  balance={balance}
+                  locale={locale}
+                />
+              </div>
+            </article>
+          </section>
         )}
-
-        {/* SECTION 05, Planets */}
-        <CollapsibleSection
-          id="planets"
-          icon={<Globe2 className="size-4.5" />}
-          title={en ? "Planets" : "პლანეტები"}
-          subtitle={
-            en
-              ? "Eight distinct functions working as one system"
-              : "რვა პლანეტა, რვა ხასიათი, ერთად შენ ხარ"
-          }
-          defaultOpen
-        >
-          <PlanetCards
-            chart={data}
-            interpretations={interp?.planets}
-            locale={locale}
-          />
-        </CollapsibleSection>
-
-        {/* SECTION 06, Houses */}
-        <CollapsibleSection
-          id="houses"
-          icon={<Home className="size-4.5" />}
-          title={en ? "The 12 areas of life" : "ცხოვრების 12 სფერო"}
-          subtitle={
-            en
-              ? "Where each part of your chart tends to show up"
-              : "სად რა ენერგია ვლინდება შენს ცხოვრებაში"
-          }
-          defaultOpen
-        >
-          <HouseCards
-            chart={data}
-            interpretations={interp?.houses}
-            locale={locale}
-          />
-        </CollapsibleSection>
-
-        {/* SECTION 07, Aspects */}
-        <CollapsibleSection
-          id="aspects"
-          icon={<Triangle className="size-4.5" />}
-          title={en ? "Aspects" : "ასპექტები"}
-          subtitle={
-            en
-              ? "How the planets in your chart interact"
-              : "როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
-          }
-          defaultOpen
-        >
-          <AspectCards
-            chart={data}
-            interpretations={interp?.aspects}
-            locale={locale}
-          />
-        </CollapsibleSection>
       </div>
       <ContentFeedback surface="natal_report" locale={locale} />
     </div>

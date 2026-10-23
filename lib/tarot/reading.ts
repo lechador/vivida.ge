@@ -17,7 +17,11 @@ import {
   tarotImageUrl,
   type DeckCard,
 } from "@/lib/tarot/deck-full";
-import { tarotSpreadById, type TarotSpreadId } from "@/lib/tarot/spreads";
+import {
+  tarotSpreadById,
+  tarotSpreadCost,
+  type TarotSpreadId,
+} from "@/lib/tarot/spreads";
 import {
   normalizeTarotFollowupSuggestions,
   tarotFollowupFallback,
@@ -128,18 +132,20 @@ function mulberry32(seed: number): () => number {
 }
 
 /**
- * Draw 3 distinct cards from the full 78-card deck, each independently
+ * Draw `count` distinct cards from the full 78-card deck, each independently
  * upright or reversed. Seeded by the client request id when present, so a
  * free teaser preview and its paid retry draw the identical spread;
  * unseeded (legacy callers) draws stay fully random.
  */
 export function drawSpread(
   seed?: string,
+  count = 3,
 ): Array<{ card: DeckCard; reversed: boolean }> {
   const rand = seed ? mulberry32(hashSeed(seed)) : Math.random;
   const pool = [...FULL_DECK_KA];
   const out: Array<{ card: DeckCard; reversed: boolean }> = [];
-  for (let i = 0; i < 3; i++) {
+  const total = Math.max(1, Math.min(Math.floor(count) || 3, pool.length));
+  for (let i = 0; i < total; i++) {
     const idx = Math.floor(rand() * pool.length);
     const [card] = pool.splice(idx, 1);
     out.push({ card: card!, reversed: rand() < 0.35 });
@@ -159,7 +165,7 @@ export function previewSpread(
 ): TarotPreview {
   const spread = tarotSpreadById(spreadId) ?? tarotSpreadById("situation")!;
   const positions = spread.positions[locale];
-  const cards = drawSpread(requestKey).map((d, i) => ({
+  const cards = drawSpread(requestKey, positions.length).map((d, i) => ({
     slug: d.card.slug,
     name: cardCopy(d, locale).name,
     glyph: d.card.glyph,
@@ -306,12 +312,17 @@ export async function performReading(
     }
   }
 
-  // ── Gate: first reading free, then CREDIT_COST.tarot each ────────────────
+  // ── Gate: first reading free, then spread cost each ─────────────────────
+  // Standard spreads (including yes/no) use FREE_ALLOWANCE.tarot once; the
+  // 5-card love spread always requires paid credits (or PRO).
+  const spreadCost = tarotSpreadCost(spread.id);
+  const freeEligible =
+    spread.id !== "love_5" && spreadCost <= CREDIT_COST.tarot;
   let charged = 0;
   let free = false;
   if (unlockRef) {
     if (await isPremiumUser(userId)) {
-      charged = CREDIT_COST.tarot;
+      charged = spreadCost;
     } else {
       const prior = await getUnlockAmount(userId, "spend_tarot", unlockRef);
       if (prior !== null) {
@@ -319,13 +330,13 @@ export async function performReading(
         charged = prior < 0 ? -prior : 0;
       } else {
         const used = await countUnlocks(userId, "spend_tarot");
-        if (used < FREE_ALLOWANCE.tarot) {
+        if (freeEligible && used < FREE_ALLOWANCE.tarot) {
           await spendOnce(userId, 0, "spend_tarot", unlockRef);
           free = true;
         } else {
           const outcome = await spendOnce(
             userId,
-            CREDIT_COST.tarot,
+            spreadCost,
             "spend_tarot",
             unlockRef,
           );
@@ -334,7 +345,7 @@ export async function performReading(
             return {
               ok: false,
               error: "insufficient",
-              cost: CREDIT_COST.tarot,
+              cost: spreadCost,
               balance,
               // The teaser draws the exact spread the paid retry will
               // interpret (seeded by request id), art only, no meanings.
@@ -343,35 +354,35 @@ export async function performReading(
                 : undefined,
             };
           }
-          charged = outcome === "unlocked" ? CREDIT_COST.tarot : 0;
+          charged = outcome === "unlocked" ? spreadCost : 0;
         }
       }
     }
   } else {
     const used = await countUnlocks(userId, "spend_tarot");
-    if (used < FREE_ALLOWANCE.tarot) {
+    if (freeEligible && used < FREE_ALLOWANCE.tarot) {
       await recordFreeUse(userId, "spend_tarot");
       free = true;
     } else {
-      const paid = await spendCredits(userId, CREDIT_COST.tarot, "spend_tarot");
+      const paid = await spendCredits(userId, spreadCost, "spend_tarot");
       if (!paid) {
         const balance = await getBalance(userId);
         return {
           ok: false,
           error: "insufficient",
-          cost: CREDIT_COST.tarot,
+          cost: spreadCost,
           balance,
         };
       }
-      charged = CREDIT_COST.tarot;
+      charged = spreadCost;
     }
   }
 
   // ── Draw + interpret ─────────────────────────────────────────────────────
   // Seeded by the client request id when present, so the paid retry draws
   // the identical spread the free teaser previewed.
-  const drawn = drawSpread(requestKey);
   const positions = spread.positions[locale];
+  const drawn = drawSpread(requestKey, positions.length);
   const aiInput = {
     question: q,
     cards: drawn.map((d, i) => ({

@@ -4,7 +4,10 @@ import { useRouter } from "next/navigation";
 import { Gift } from "lucide-react";
 
 import { PhoneGiftForm } from "@/components/phone-gift/phone-gift-form";
+import { PHONE_VERIFY_GIFT, SMS_CONSENT_GIFT } from "@/lib/credits-config";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+
+const TOTAL_PHONE_GIFT = PHONE_VERIFY_GIFT + SMS_CONSENT_GIFT;
 
 /**
  * Credits-page surface of the phone-gift campaign: the same offer as the
@@ -24,13 +27,13 @@ export function PhoneGiftCard({ locale }: { locale: UserLocale }) {
         <div>
           <h2 className="text-base font-semibold tracking-tight">
             {en
-              ? "Verify your number and get 20 credits"
-              : "დაადასტურე ნომერი და მიიღე 20 კრედიტი"}
+              ? `Verify your number and get ${TOTAL_PHONE_GIFT} credits`
+              : `დაადასტურე ნომერი და მიიღე ${TOTAL_PHONE_GIFT} კრედიტი`}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {en
-              ? "Add your mobile number and verify it with an SMS code. Verification gives you 10 credits; opting in to promotional SMS makes it 20."
-              : "შეიყვანე მობილურის ნომერი და დაადასტურე SMS კოდით. ნომრის დადასტურება გაძლევს 10 კრედიტს, მარკეტინგულ SMS-ებზე თანხმობა კი სულ 20 კრედიტს."}
+              ? `Add your mobile number and verify it with an SMS code. Verification gives you ${PHONE_VERIFY_GIFT} credits; opting in to promotional SMS makes it ${TOTAL_PHONE_GIFT}.`
+              : `შეიყვანე მობილურის ნომერი და დაადასტურე SMS კოდით. ნომრის დადასტურება გაძლევს ${PHONE_VERIFY_GIFT} კრედიტს, მარკეტინგულ SMS-ებზე თანხმობა კი სულ ${TOTAL_PHONE_GIFT} კრედიტს.`}
           </p>
         </div>
       </div>

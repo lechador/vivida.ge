@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
-import { CreditCard, Crown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CreditCard, Crown, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +10,7 @@ import {
   normalizeReturnPath,
 } from "@/lib/safe-return-path";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+import { fbTrack } from "@/lib/fb-pixel";
 import { EXPERIMENTS } from "@/lib/experiment-catalog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { trackExperimentOutcome, useExperiment } from "@/lib/use-experiment";
@@ -34,6 +35,7 @@ export function ContextualPaywallActions({
   countryCode?: string | null;
 }) {
   const en = locale === "en";
+  const [pending, setPending] = useState(false);
   const missing = Math.max(1, cost - balance);
   const next = normalizeReturnPath(returnTo);
   // One primary one-time offer naming the locked outcome and its price for
@@ -56,7 +58,6 @@ export function ContextualPaywallActions({
     // the experiment isolates offer framing, not pack preselection.
     packId: singleOffer || product === "tarot" ? offer.pack.id : null,
   });
-  const proHref = `/subscription?${new URLSearchParams({ next, product }).toString()}`;
 
   useEffect(() => {
     trackEvent(ANALYTICS_EVENT.paywallViewed, {
@@ -67,10 +68,18 @@ export function ContextualPaywallActions({
     });
   }, [balance, cost, placement, product]);
 
-  function trackChoice(destination: "credits" | "pro") {
+  // "pro" is the experiment's alternative branch: the secondary action now
+  // lands on the credits hub (other packs and PRO sit at its top), so the GA4
+  // destination is passed explicitly instead of claiming /subscription.
+  function trackChoice(
+    destination: "credits" | "pro",
+    analyticsDestination?: string,
+  ) {
     trackEvent(ANALYTICS_EVENT.recommendationClicked, {
       placement,
-      destination: destination === "pro" ? "subscription" : destination,
+      destination:
+        analyticsDestination ??
+        (destination === "pro" ? "subscription" : destination),
       product,
     });
     trackExperimentOutcome(
@@ -85,6 +94,68 @@ export function ContextualPaywallActions({
     );
   }
 
+  /**
+   * One-tap Stripe Checkout for the priced pack, so the paywall no longer
+   * detours through the credits hub (that hop was where most buyers left).
+   * Any refusal or failure falls back to the hub with the pack preselected,
+   * never a dead button: `crypto_only` on the English host, a failed session,
+   * or no URL all land the user on a working payment surface.
+   */
+  async function startDirectCheckout() {
+    if (pending) return;
+    trackChoice("credits");
+    trackEvent(ANALYTICS_EVENT.productSelected, {
+      product: offer.pack.id,
+      surface: placement,
+      payment_model: "one_time",
+      credits: offer.pack.credits,
+      value: offer.pack.amountMinor / 100,
+      currency: offer.pack.currency,
+    });
+    setPending(true);
+    try {
+      const res = await fetch("/api/credits/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          packId: offer.pack.id,
+          returnTo: next,
+          product,
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        url?: string;
+        eventId?: string;
+        value?: number;
+        currency?: string;
+        contentId?: string;
+        error?: string;
+      };
+      if (!res.ok || !data.url) {
+        window.location.assign(creditsHref);
+        return;
+      }
+      fbTrack(
+        "InitiateCheckout",
+        {
+          value: data.value,
+          currency: data.currency,
+          content_ids: [data.contentId],
+          content_type: "product",
+        },
+        data.eventId,
+      );
+      trackEvent(ANALYTICS_EVENT.checkoutStarted, {
+        product: data.contentId,
+        value: data.value,
+        currency: data.currency,
+      });
+      window.location.assign(data.url);
+    } catch {
+      window.location.assign(creditsHref);
+    }
+  }
+
   return (
     <div className="space-y-2.5">
       <p className="text-sm text-[var(--vivida-pink)]">
@@ -97,29 +168,31 @@ export function ContextualPaywallActions({
             : `გაკლია ${missing} კრედიტი.`}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-2">
-        <Button asChild variant="mystic">
-          <Link href={creditsHref} onClick={() => trackChoice("credits")}>
+        <Button
+          type="button"
+          variant="mystic"
+          disabled={pending}
+          onClick={startDirectCheckout}
+        >
+          {pending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
             <CreditCard className="size-4" />
-            {singleOffer
-              ? offer.label
-              : en
-                ? "Top up and return"
-                : "შეავსე და დაბრუნდი"}
-          </Link>
+          )}
+          {offer.label}
         </Button>
         <Button asChild variant="outline">
-          <Link href={proHref} onClick={() => trackChoice("pro")}>
+          <Link
+            href={creditsHref}
+            onClick={() => trackChoice("pro", "credits_hub")}
+          >
             <Crown className="size-4" />
-            {en ? "See PRO" : "ნახე PRO"}
+            {en ? "Other packs / Unlimited PRO" : "სხვა პაკეტები / ულიმიტო PRO"}
           </Link>
         </Button>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        {singleOffer
-          ? `${offer.detail}${en ? " PRO is for frequent use." : " PRO ხშირი გამოყენებისთვისაა."}`
-          : en
-            ? "Credits are one-time; PRO is for frequent use."
-            : "კრედიტები ერთჯერადია, PRO ხშირი გამოყენებისთვისაა."}
+        {`${offer.detail}${en ? " PRO is for frequent use." : " PRO ხშირი გამოყენებისთვისაა."}`}
       </p>
     </div>
   );

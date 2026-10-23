@@ -17,14 +17,16 @@ describe("signup credit experiment", () => {
     const variants = Array.from({ length: 1_000 }, (_, i) =>
       signupCreditVariantFor(`user-${i}`),
     );
-    const control = variants.filter((variant) => variant === "control_20").length;
+    const control = variants.filter(
+      (variant) => variant === "control_20",
+    ).length;
     expect(control).toBeGreaterThan(450);
     expect(control).toBeLessThan(550);
   });
 
-  it("gives control 20 immediately and staged 10 immediately", () => {
-    expect(initialSignupCredits("control_20")).toBe(20);
-    expect(initialSignupCredits("staged_10_plus_5")).toBe(10);
+  it("gives both variants the 5-credit welcome bonus", () => {
+    expect(initialSignupCredits("control_20")).toBe(5);
+    expect(initialSignupCredits("staged_10_plus_5")).toBe(5);
   });
 
   it("does not qualify the return bonus until 24 hours have elapsed", () => {

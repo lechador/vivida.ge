@@ -17,6 +17,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { SiteFooter } from "@/components/site-footer";
+import { InlineBirthDatePrompt } from "@/components/astro/inline-birth-date-prompt";
 import { TarotReader } from "@/components/tarot/tarot-reader";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,10 +77,12 @@ export function TarotConversionLanding({
   authed,
   countryCode,
   premium = false,
+  showBirthDatePrompt = false,
 }: {
   authed: boolean;
   countryCode?: string | null;
   premium?: boolean;
+  showBirthDatePrompt?: boolean;
 }) {
   const packs = creditPacksForCountry(countryCode);
   const pro = featuredPremiumPlanForCountry(countryCode);
@@ -181,6 +184,7 @@ export function TarotConversionLanding({
       >
         <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
           {authed && <h1 className="sr-only">ტაროს კითხვა</h1>}
+          {showBirthDatePrompt && <InlineBirthDatePrompt locale="ka" />}
           <TarotReader
             authed={authed}
             cost={CREDIT_COST.tarot}

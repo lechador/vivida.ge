@@ -23,6 +23,8 @@ function starterPackUses(product: string, pack: CreditPack): number | null {
   const costByProduct: Record<string, number> = {
     tarot: CREDIT_COST.tarot,
     tarot_followup: CREDIT_COST.tarotFollowup,
+    tarot_love_5: CREDIT_COST.tarotLove5,
+    tarot_yes_no: CREDIT_COST.tarotYesNo,
     dream: CREDIT_COST.dream,
     chat: CREDIT_COST.chat,
     ai_chart_chat: CREDIT_COST.chat,
@@ -36,6 +38,8 @@ function starterPackUses(product: string, pack: CreditPack): number | null {
 const OUTCOME: Record<string, { ka: string; en: string }> = {
   tarot: { ka: "დამატებითი ტარო კითხვა", en: "more tarot readings" },
   tarot_followup: { ka: "პასუხის დაზუსტება", en: "follow-up answers" },
+  tarot_love_5: { ka: "სიყვარულის ტარო განლაგება", en: "love tarot spread" },
+  tarot_yes_no: { ka: "დიახ/არა ტარო განლაგება", en: "yes/no tarot readings" },
   natal_pdf: { ka: "სრული PDF ანგარიში", en: "the full PDF report" },
   synastry: {
     ka: "თავსებადობის სრული გახსნა",

@@ -62,16 +62,17 @@ export function shouldShowPurchasePromotion({
 /**
  * Georgian one-time alternatives to the ₾19.90/month unlimited plan.
  *
- * Priced for the local market rather than converted from the UK sheet: the
- * previous ladder charged ₾50 for 130 credits (more, in absolute terms, than
- * the UK paid for 180) and got *worse* per credit as the pack grew, ₾20/45
- * was the weakest rung of the three. Credits per lari now rises with pack
- * size, and PRO undercuts the largest pack, same shape as GB.
+ * Re-cut for the 2026-10 credit economy (signup bonus 5, a tarot reading 10,
+ * the PDF report 15) so the cheapest rung still buys a real action: the ₾7.90
+ * starter pack covers two tarot readings, where the old ₾6.90/30 rung was
+ * priced against a 20-credit signup bonus that no longer exists. Credits per
+ * lari rises with pack size (3.16, 4.03, 4.82 per lari), and the ₾19.90
+ * monthly plan still undercuts the largest pack, same shape as GB.
  */
 const GE_CREDIT_PACKS: readonly CreditPack[] = [
-  { id: "s", credits: 30, amountMinor: 690, currency: "gel" },
-  { id: "m", credits: 75, amountMinor: 1490, currency: "gel" },
-  { id: "l", credits: 180, amountMinor: 2990, currency: "gel" },
+  { id: "s", credits: 25, amountMinor: 790, currency: "gel" },
+  { id: "m", credits: 60, amountMinor: 1490, currency: "gel" },
+  { id: "l", credits: 120, amountMinor: 2490, currency: "gel" },
 ];
 
 /** UK one-time alternatives to the £9.99/month unlimited plan. */

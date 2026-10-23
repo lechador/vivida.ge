@@ -9,11 +9,11 @@ describe("proAnchorFor", () => {
     expect(proAnchorFor(Number.NaN, "GE")).toBeNull();
   });
 
-  it("values GE spend at the best pack rate (L: 2990/180)", () => {
+  it("values GE spend at the best pack rate (L: 2490/120)", () => {
     const anchor = proAnchorFor(60, "GE");
     expect(anchor).not.toBeNull();
-    // 60 * (2990/180) = 996.67 → 997 minor.
-    expect(anchor?.spendCashMinor).toBe(997);
+    // 60 * (2490/120) = 1245 minor.
+    expect(anchor?.spendCashMinor).toBe(1245);
     expect(anchor?.currency).toBe("gel");
   });
 
@@ -23,18 +23,18 @@ describe("proAnchorFor", () => {
   });
 
   it("reports saves above breakeven with the exact savings", () => {
-    // 997 value vs 967 PRO → saves 30.
+    // 1245 value vs 967 PRO → saves 278.
     const anchor = proAnchorFor(60, "GE");
     expect(anchor?.kind).toBe("saves");
-    expect(anchor?.saveMinor).toBe(30);
+    expect(anchor?.saveMinor).toBe(278);
   });
 
   it("reports pace below breakeven with zero savings", () => {
-    // 34 credits → 565 value vs 967 PRO.
+    // 34 credits → 706 value vs 967 PRO.
     const anchor = proAnchorFor(34, "GE");
     expect(anchor?.kind).toBe("pace");
     expect(anchor?.saveMinor).toBe(0);
-    expect(anchor?.spendCashMinor).toBe(565);
+    expect(anchor?.spendCashMinor).toBe(706);
   });
 
   it("handles the GB catalogue with its currency", () => {

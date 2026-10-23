@@ -9,11 +9,15 @@
  * Tuning the economy is a one-line change in this file.
  */
 
-export const SIGNUP_BONUS = 20;
+export const SIGNUP_BONUS = 5;
 /** signup_credits_v1: staged cohort receives this immediately. */
-export const STAGED_SIGNUP_BONUS = 10;
-/** signup_credits_v1: staged cohort receives this on its first 24h+ return. */
-export const STAGED_RETURN_BONUS = 5;
+export const STAGED_SIGNUP_BONUS = 5;
+/**
+ * signup_credits_v1: staged cohort receives this on its first 24h+ return.
+ * Retired to 0 (2026-10-24): the welcome grant is now a single 5-credit bonus,
+ * and returning is rewarded through the monthly bonus instead.
+ */
+export const STAGED_RETURN_BONUS = 0;
 export const REFERRAL_REWARD = 10;
 /**
  * Free credits granted to recently active users on the first of each month.
@@ -22,9 +26,9 @@ export const REFERRAL_REWARD = 10;
  */
 export const MONTHLY_BONUS = 3;
 /** Phone-gift campaign: one-time reward for verifying a mobile number. */
-export const PHONE_VERIFY_GIFT = 10;
+export const PHONE_VERIFY_GIFT = 3;
 /** …granted on top of the above when promotional-SMS consent first turns on. */
-export const SMS_CONSENT_GIFT = 10;
+export const SMS_CONSENT_GIFT = 3;
 
 export {
   creditPackForCountry,
@@ -62,7 +66,7 @@ export const RITUAL_STREAK_MILESTONES = [
 
 /** What each gated action costs (beyond its free allowance). */
 export const CREDIT_COST = {
-  synastry: 5,
+  synastry: 10,
   chat: 2,
   /** One AI dream interpretation. No free allowance, every reading costs. */
   dream: 2,
@@ -70,19 +74,25 @@ export const CREDIT_COST = {
   iqTest: 5,
   eqTest: 5,
   bigFiveTest: 5,
-  pdfReport: 5,
+  /** The full written chart report, the deepest single deliverable we sell. */
+  pdfReport: 15,
   weeklyForecast: 10,
   tarot: 10,
   /** A follow-up question on an already-drawn tarot spread. */
   tarotFollowup: 5,
+  /** Five-card love spread, a bigger draw than the standard three cards. */
+  tarotLove5: 15,
+  /** Yes/No question with a timing card, a single-card spread. */
+  tarotYesNo: 5,
 } as const;
 
 /** Free before credits are needed. */
 export const FREE_ALLOWANCE = {
-  /** Lifetime free compatibility charts. */
-  synastry: 1,
+  /** Lifetime free compatibility charts. None: every compatibility reading is
+   *  paid, so the free unlock branch in app/synastry never fires. */
+  synastry: 0,
   /** Free AI-chat messages per day. */
-  chatPerDay: 2,
+  chatPerDay: 1,
   /** Lifetime free tarot readings before each costs credits. */
   tarot: 1,
 } as const;

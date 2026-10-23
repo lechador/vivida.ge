@@ -143,13 +143,13 @@ export default async function SynastryDetailPage({
                 balance={balance}
                 title={
                   en
-                    ? "Unlock your compatibility reading"
-                    : "თქვენი თავსებადობის გახსნა"
+                    ? `Unlock full synastry (${CREDIT_COST.synastry} credits)`
+                    : `გახსენი სრული სინასტრია (${CREDIT_COST.synastry} კრედიტი / 7.90 ₾)`
                 }
                 blurb={
                   en
-                    ? "See the complete synastry reading, key aspects, strengths, and points of friction. Pay once and this partner remains unlocked."
-                    : "ნახე სრული სინასტრია, ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები. გადაიხდი ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
+                    ? "Unlock Venus–Mars attraction, main conflict points, karmic bond, and all aspect interpretations. One-time unlock for this partner."
+                    : "გახსენი ვენერა–მარსის მიზიდულობა, მთავარი კონფლიქტის წერტილი, კარმული კავშირი და ყველა ასპექტის სრული ანალიზი. გადაიხადე ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
                 }
                 locale={locale}
               />

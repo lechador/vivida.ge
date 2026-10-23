@@ -32,6 +32,7 @@ import {
 import {
   TAROT_SPREADS,
   tarotSpreadById,
+  tarotSpreadCost,
   type TarotSpreadId,
 } from "@/lib/tarot/spreads";
 import {
@@ -152,6 +153,13 @@ export function TarotReader({
   const [spreadId, setSpreadId] = useState<TarotSpreadId>(
     () => tarotSpreadById(pending?.spreadId)?.id ?? "situation",
   );
+  const activeCost = tarotSpreadCost(spreadId) || cost;
+  const activePaywallProduct =
+    spreadId === "love_5"
+      ? "tarot_love_5"
+      : spreadId === "yes_no"
+        ? "tarot_yes_no"
+        : "tarot";
   const [optionA, setOptionA] = useState("");
   const [optionB, setOptionB] = useState("");
   const [attempt, setAttempt] = useState<TarotAttempt | null>(
@@ -295,7 +303,9 @@ export function TarotReader({
         };
         setShortBalance(typeof data.balance === "number" ? data.balance : 0);
         setTeaserPreview(
-          data.preview && data.preview.cards?.length === 3
+          data.preview &&
+            Array.isArray(data.preview.cards) &&
+            data.preview.cards.length > 0
             ? data.preview
             : null,
         );
@@ -305,7 +315,7 @@ export function TarotReader({
         trackEvent(ANALYTICS_EVENT.insufficientCredits, {
           product: "tarot",
           surface: "tarot_reader",
-          cost,
+          cost: activeCost,
         });
         setStatus("short");
         // The top-up flow leaves this page; restore the question (and its
@@ -471,8 +481,20 @@ export function TarotReader({
       locale,
       reading.followups.map((followup) => followup.question),
     );
+    const followupBadge =
+      reading.followups.length === 0
+        ? en
+          ? "Free"
+          : "უფასო"
+        : `${CREDIT_COST.tarotFollowup} ${en ? "cr" : "კრ"}`;
+    const thirtyDayLabel = en
+      ? "🔮 See what unfolds in the next 30 days in this situation"
+      : "🔮 გინდა ვნახოთ, რა მოხდება უახლოეს 30 დღეში ამ სიტუაციაში?";
+    const thirtyDayQuestion = en
+      ? "What unfolds in the next 30 days in this situation?"
+      : "რა მოხდება უახლოეს 30 დღეში ამ სიტუაციაში?";
     return (
-      <div className="rounded-md border border-border bg-background/50 p-4 sm:p-5">
+      <div className="rounded-md border border-[var(--vivida-violet)]/45 bg-[var(--vivida-violet)]/[0.08] p-5">
         <div className="text-sm font-semibold text-foreground">
           {en ? "Go deeper into this spread" : "ჩაუღრმავდი ამ გაშლას"}
         </div>
@@ -504,16 +526,31 @@ export function TarotReader({
           </div>
         ))}
 
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-4 flex flex-col gap-2">
+          <button
+            key="thirty-day"
+            type="button"
+            onClick={() => askFollowup(thirtyDayQuestion)}
+            disabled={followupStatus === "sending"}
+            className="flex w-full items-center justify-between gap-3 rounded-md border border-[var(--vivida-violet)]/60 bg-[var(--vivida-violet)]/[0.12] px-3.5 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:border-[var(--vivida-violet)] hover:bg-[var(--vivida-violet)]/[0.18] disabled:opacity-50"
+          >
+            <span>{thirtyDayLabel}</span>
+            <span className="shrink-0 rounded-full bg-[var(--vivida-violet)]/15 px-2.5 py-0.5 font-mono text-[11px] font-medium text-primary">
+              {followupBadge}
+            </span>
+          </button>
           {followupSuggestions.map((suggestion) => (
             <button
               key={suggestion}
               type="button"
               onClick={() => askFollowup(suggestion)}
               disabled={followupStatus === "sending"}
-              className="rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground disabled:opacity-50"
+              className="flex w-full items-center justify-between gap-3 rounded-md border border-[var(--vivida-violet)]/40 bg-card px-3.5 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:border-[var(--vivida-violet)] hover:bg-[var(--vivida-violet)]/10 disabled:opacity-50"
             >
-              {suggestion}
+              <span>{suggestion}</span>
+              <span className="shrink-0 rounded-full bg-[var(--vivida-violet)]/15 px-2.5 py-0.5 font-mono text-[11px] font-medium text-primary">
+                {followupBadge}
+              </span>
             </button>
           ))}
         </div>
@@ -660,6 +697,11 @@ export function TarotReader({
             }`}
           >
             {spread.name[locale]}
+            {!premium && (
+              <span className="ml-1.5 font-mono text-[10px] tabular-nums opacity-70">
+                · {tarotSpreadCost(spread.id)} {en ? "cr" : "კრ"}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -743,9 +785,13 @@ export function TarotReader({
       <div className="mt-2.5">
         {!premium && (
           <CreditHint>
-            {en
-              ? `Your first question is free, then ${cost} credits`
-              : `პირველი კითხვა უფასოა, შემდეგ −${cost} კრედიტი`}
+            {spreadId === "love_5"
+              ? en
+                ? `5-card love spread · ${activeCost} credits`
+                : `5-კარტიანი სასიყვარულო გაშლა · −${activeCost} კრედიტი`
+              : en
+                ? `Your first question is free, then ${activeCost} credits`
+                : `პირველი კითხვა უფასოა, შემდეგ −${activeCost} კრედიტი`}
           </CreditHint>
         )}
       </div>
@@ -760,8 +806,8 @@ export function TarotReader({
             <ContextualPaywallActions
               locale={locale}
               balance={shortBalance}
-              cost={cost}
-              product="tarot"
+              cost={activeCost}
+              product={activePaywallProduct}
               returnTo="/taro"
               placement="tarot_shortfall"
               countryCode={countryCode}
@@ -778,23 +824,40 @@ export function TarotReader({
       )}
 
       {/* Drawing shimmer with bespoke engraved SVG card backs */}
-      {status === "drawing" && (
-        <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4">
-          {[0, 1, 2].map((i) => (
+      {status === "drawing" &&
+        (() => {
+          const drawingCount =
+            tarotSpreadById(spreadId)?.positions[locale].length ?? 3;
+          return (
             <div
-              key={i}
-              className="vivida-pulse-soft aspect-[2/3] overflow-hidden rounded-md border border-primary/40 bg-card"
+              className={`mt-8 grid gap-3 sm:gap-4 ${
+                drawingCount === 5
+                  ? "grid-cols-2 sm:grid-cols-5"
+                  : "grid-cols-3"
+              }`}
             >
-              <TarotCardBackIllustration />
+              {Array.from({ length: drawingCount }).map((_, i) => (
+                <div
+                  key={i}
+                  className="vivida-pulse-soft aspect-[2/3] overflow-hidden rounded-md border border-primary/40 bg-card"
+                >
+                  <TarotCardBackIllustration />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          );
+        })()}
 
       {/* Reading */}
       {reading && status === "idle" && (
         <div className="mt-8 space-y-6">
-          <div className="grid grid-cols-3 gap-3 sm:gap-4">
+          <div
+            className={`grid gap-3 sm:gap-4 ${
+              reading.cards.length === 5
+                ? "grid-cols-2 sm:grid-cols-5"
+                : "grid-cols-3"
+            }`}
+          >
             {reading.cards.map((c, i) => (
               <TarotCardFace key={i} card={c} delayMs={i * 140} />
             ))}
@@ -890,18 +953,14 @@ export function TarotReader({
           {authed &&
             !premium &&
             !reading.fromHistory &&
-            (reading.balance >= cost ? (
+            (reading.balance >= activeCost ? (
               <div className="rounded-md border border-border bg-background/50 p-4 text-center">
                 <p className="text-sm font-medium text-foreground/90">
                   {en
-                    ? `You have ${reading.balance} credits, enough for ${Math.floor(reading.balance / cost)} more reading${Math.floor(reading.balance / cost) === 1 ? "" : "s"}.`
-                    : `შენ გაქვს ${reading.balance} კრედიტი, კიდევ ${Math.floor(reading.balance / cost)} კითხვა შეგიძლია.`}
+                    ? `You have ${reading.balance} credits, enough for ${Math.floor(reading.balance / activeCost)} more reading${Math.floor(reading.balance / activeCost) === 1 ? "" : "s"}.`
+                    : `შენ გაქვს ${reading.balance} კრედიტი, კიდევ ${Math.floor(reading.balance / activeCost)} კითხვა შეგიძლია.`}
                 </p>
-                <Button
-                  type="button"
-                  onClick={reset}
-                  className="mt-3 gap-1.5"
-                >
+                <Button type="button" onClick={reset} className="mt-3 gap-1.5">
                   <RotateCcw className="size-4" />
                   {en ? "Ask another question" : "დასვი ახალი კითხვა"}
                 </Button>
@@ -911,7 +970,7 @@ export function TarotReader({
                 <ContextualPaywallActions
                   locale={locale}
                   balance={reading.balance}
-                  cost={cost}
+                  cost={activeCost}
                   product="tarot"
                   returnTo="/taro"
                   placement="tarot_result_next_step"
@@ -1034,7 +1093,13 @@ export function TarotTeaserPreview({
             : "პირველი კარტი ღიაა, დანარჩენი პასუხთან ერთად გაიხსნება"}
         </h3>
       </div>
-      <div className="mt-4 grid grid-cols-3 gap-3 sm:gap-4">
+      <div
+        className={`mt-4 grid gap-3 sm:gap-4 ${
+          preview.cards.length === 5
+            ? "grid-cols-2 sm:grid-cols-5"
+            : "grid-cols-3"
+        }`}
+      >
         {first && (
           <div>
             <p className="mb-1.5 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">

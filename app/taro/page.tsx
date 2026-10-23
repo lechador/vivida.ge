@@ -3,6 +3,10 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { auth } from "@/auth";
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
+import { InlineBirthDatePrompt } from "@/components/astro/inline-birth-date-prompt";
 import { CREDIT_COST } from "@/lib/credits-config";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
@@ -127,6 +131,14 @@ export default async function TaroHubPage() {
   const title = en ? TITLE_EN : TITLE_KA;
   const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
   const faq = en ? FAQ_EN : FAQ_KA;
+  const [profile] = userId
+    ? await db
+        .select({ dateOfBirth: profiles.dateOfBirth })
+        .from(profiles)
+        .where(eq(profiles.userId, userId))
+        .limit(1)
+    : [null];
+  const showBirthDatePrompt = authed && !profile?.dateOfBirth;
 
   const ld = [
     articleLd({
@@ -166,6 +178,7 @@ export default async function TaroHubPage() {
           authed={authed}
           countryCode={billingIdentity?.countryCode ?? "GE"}
           premium={premium}
+          showBirthDatePrompt={showBirthDatePrompt}
         />
       </>
     );
@@ -222,6 +235,7 @@ export default async function TaroHubPage() {
           </p>
         </header>
 
+        {showBirthDatePrompt && <InlineBirthDatePrompt locale={locale} />}
         <TarotReader
           authed={authed}
           cost={CREDIT_COST.tarot}

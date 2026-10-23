@@ -11,6 +11,8 @@ import { partnerCreationsThisMonth } from "@/lib/partners-core";
 import { listRelationshipsForViewer } from "@/lib/relationship-core";
 import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
 import { PartnerCard } from "@/components/synastry/partner-card";
+import { CREDIT_COST } from "@/lib/credits-config";
+import { isPremiumUser } from "@/lib/premium";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -30,6 +32,7 @@ export default async function SynastryPage() {
   ]);
   const cap = PARTNER_CAP_PER_MONTH;
   const remaining = Math.max(0, cap - used);
+  const premium = await isPremiumUser(user.id);
 
   return (
     <main
@@ -63,13 +66,15 @@ export default async function SynastryPage() {
                 ? "Add someone who matters to you and explore how your birth charts connect across planets, houses, and aspects."
                 : "დაამატე ადამიანი, რომელიც შენთვის მნიშვნელოვანია, ნახე, როგორ ერთვით ცაში ერთმანეთს."}
             </p>
-            <div className="mt-3">
-              <CreditHint>
-                {en
-                  ? "Your first compatibility reading is free, then 5 credits"
-                  : "პირველი თავსებადობა უფასოა, შემდეგ −5 კრედიტი"}
-              </CreditHint>
-            </div>
+            {!premium && (
+              <div className="mt-3">
+                <CreditHint>
+                  {en
+                    ? `Free compatibility preview · full reading ${CREDIT_COST.synastry} credits`
+                    : `თავსებადობის მიმოხილვა უფასოა · სრული ანალიზი −${CREDIT_COST.synastry} კრედიტი`}
+                </CreditHint>
+              </div>
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-3">
             {remaining > 0 ? (

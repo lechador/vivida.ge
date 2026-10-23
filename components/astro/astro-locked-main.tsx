@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { AppHeader } from "@/components/nav/app-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -11,12 +11,14 @@ export function AstroLockedMain({
   description,
   next,
   locale = "ka",
+  topBanner,
 }: {
   active?: ComponentProps<typeof AppHeader>["active"];
   title?: string;
   description?: string;
   next?: string;
   locale?: UserLocale;
+  topBanner?: ReactNode;
 }) {
   return (
     <main
@@ -27,7 +29,8 @@ export function AstroLockedMain({
 
       <AppHeader authed active={active} />
 
-      <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 items-center justify-center px-4 pb-20 pt-10 sm:px-6">
+      <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-4 px-4 pb-20 pt-10 sm:px-6">
+        {topBanner && <div className="w-full">{topBanner}</div>}
         <AstroGate
           title={title}
           description={description}

@@ -1952,6 +1952,7 @@ export async function generateTarotReading(input: {
 
   const loc = input.locale ?? "ka";
   const en = loc === "en";
+  const expectedCards = Math.max(1, input.cards.length || 3);
 
   const cardLines = input.cards
     .map(
@@ -1974,6 +1975,25 @@ export async function generateTarotReading(input: {
       : "დააბრუნე გაშლის განმარტება ვალიდურ JSON-ად.",
   ].join("\n");
 
+  const tarotReadingResponseFormat = {
+    ...TAROT_READING_RESPONSE_FORMAT,
+    json_schema: {
+      ...TAROT_READING_RESPONSE_FORMAT.json_schema,
+      schema: {
+        ...TAROT_READING_RESPONSE_FORMAT.json_schema.schema,
+        properties: {
+          ...TAROT_READING_RESPONSE_FORMAT.json_schema.schema.properties,
+          cards: {
+            ...TAROT_READING_RESPONSE_FORMAT.json_schema.schema.properties
+              .cards,
+            minItems: expectedCards,
+            maxItems: expectedCards,
+          },
+        },
+      },
+    },
+  };
+
   const res = await fetch(OPENROUTER_URL, {
     method: "POST",
     headers: {
@@ -1992,7 +2012,7 @@ export async function generateTarotReading(input: {
         },
         { role: "user", content: userMessage },
       ],
-      response_format: TAROT_READING_RESPONSE_FORMAT,
+      response_format: tarotReadingResponseFormat,
       provider: { require_parameters: true },
       temperature: 0.7,
       max_tokens: 1600,
@@ -2020,7 +2040,7 @@ export async function generateTarotReading(input: {
     typeof parsed.headline !== "string" ||
     !parsed.headline.trim() ||
     !Array.isArray(parsed.cards) ||
-    parsed.cards.length !== 3 ||
+    parsed.cards.length !== expectedCards ||
     parsed.cards.some((card) => typeof card !== "string" || !card.trim()) ||
     typeof parsed.reading !== "string" ||
     !parsed.reading.trim() ||

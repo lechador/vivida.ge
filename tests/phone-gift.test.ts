@@ -20,10 +20,10 @@ const viewer: PhoneGiftViewer = {
 };
 
 describe("phone-gift campaign amounts", () => {
-  it("pays the verification 10 and the consent 10 more (20 combined)", () => {
-    expect(PHONE_VERIFY_GIFT).toBe(10);
-    expect(SMS_CONSENT_GIFT).toBe(10);
-    expect(PHONE_VERIFY_GIFT + SMS_CONSENT_GIFT).toBe(20);
+  it("pays the verification 3 and the consent 3 more (6 combined)", () => {
+    expect(PHONE_VERIFY_GIFT).toBe(3);
+    expect(SMS_CONSENT_GIFT).toBe(3);
+    expect(PHONE_VERIFY_GIFT + SMS_CONSENT_GIFT).toBe(6);
   });
 
   it("ships labels for both new ledger reasons in both locales", () => {

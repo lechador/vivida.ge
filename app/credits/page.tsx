@@ -175,6 +175,9 @@ export default async function CreditsPage({
     isPremium: premium,
     balance,
   });
+  // need/product/pack only come from a paywall, where the buyer already chose:
+  // the phone-gift campaign must not push the paid options any further down.
+  const fromPaywall = Boolean(neededCredits || product || selectedPackId);
 
   return (
     <CryptoPayHost>
@@ -193,67 +196,19 @@ export default async function CreditsPage({
         </Suspense>
 
         <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
-          {/* Balance */}
-          <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
-            <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {en ? "Your balance" : "შენი ბალანსი"}
-            </div>
-            <div className="mt-2 flex items-center justify-center gap-2">
-              <Sparkles className="size-7 text-[var(--vivida-cyan)]" />
-              <span className="text-6xl font-bold tabular-nums tracking-tight">
-                {balance}
-              </span>
-            </div>
-            <div className="mt-1 text-sm text-muted-foreground">
-              {en ? "credits" : "კრედიტი"}
-            </div>
-            <p className="mx-auto mt-3 max-w-md text-sm text-foreground/75">
-              {en
-                ? "Use credits to unlock full test results, compatibility readings, AI chat, forecasts, and reports. Invite friends or top up your balance."
-                : "კრედიტებით ხსნი ტესტების სრულ შედეგებს, სინასტრიებს, AI-ჩატს, პროგნოზებსა და რეპორტებს. მოიწვიე მეგობრები ან შეავსე ბალანსი."}
-            </p>
-          </div>
-
-          {!hostEn && phoneGiftCardEligible(giftState) && (
-            <div className="mt-4">
-              <PhoneGiftCard locale={locale} />
-            </div>
-          )}
-
-          <div className="mt-4">
-            <CreditProgressCard
-              balance={balance}
-              nextMonthlyDate={nextMonthlyBonusDate()}
+          {/* Payment options open the page: a paywall bounce has no scroll to spare. */}
+          <div id="credit-packs" className="scroll-mt-20">
+            <TopUpCard
               locale={locale}
-              monthlyPausedReason={
-                monthlyBonusEligible(monthlyGate) ? null : "inactivity"
-              }
+              countryCode={identity?.countryCode}
+              balance={balance}
+              neededCredits={neededCredits}
+              returnTo={returnTo}
+              product={product}
+              selectedPackId={selectedPackId}
+              crypto={cryptoPay}
             />
           </div>
-
-          {!premium && (
-            <div className="mt-4">
-              <SpendAnchor
-                spend={recentSpend}
-                countryCode={identity?.countryCode}
-                locale={locale}
-              />
-            </div>
-          )}
-
-          {showPurchasePromotions && !offer && (
-            <div className="mt-4">
-              <CreditsVsPro
-                locale={locale}
-                countryCode={identity?.countryCode}
-                placement="credits_hub_comparison"
-                creditHref="#credit-packs"
-                proHref="#pro-plan"
-                balance={balance}
-                crypto={cryptoPay}
-              />
-            </div>
-          )}
 
           {premium ? (
             <Link
@@ -306,19 +261,69 @@ export default async function CreditsPage({
             </div>
           ) : null}
 
-          {/* Top-up is kept directly below the balance so there is no hunt or scroll. */}
-          <div id="credit-packs" className="mt-4 scroll-mt-20">
-            <TopUpCard
-              locale={locale}
-              countryCode={identity?.countryCode}
+          {showPurchasePromotions && !offer && (
+            <div className="mt-4">
+              <CreditsVsPro
+                locale={locale}
+                countryCode={identity?.countryCode}
+                placement="credits_hub_comparison"
+                creditHref="#credit-packs"
+                proHref="#pro-plan"
+                balance={balance}
+                crypto={cryptoPay}
+              />
+            </div>
+          )}
+
+          {/* Balance */}
+          <div className="mt-4">
+            <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
+              <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                {en ? "Your balance" : "შენი ბალანსი"}
+              </div>
+              <div className="mt-2 flex items-center justify-center gap-2">
+                <Sparkles className="size-7 text-[var(--vivida-cyan)]" />
+                <span className="text-6xl font-bold tabular-nums tracking-tight">
+                  {balance}
+                </span>
+              </div>
+              <div className="mt-1 text-sm text-muted-foreground">
+                {en ? "credits" : "კრედიტი"}
+              </div>
+              <p className="mx-auto mt-3 max-w-md text-sm text-foreground/75">
+                {en
+                  ? "Use credits to unlock full test results, compatibility readings, AI chat, forecasts, and reports. Invite friends or top up your balance."
+                  : "კრედიტებით ხსნი ტესტების სრულ შედეგებს, სინასტრიებს, AI-ჩატს, პროგნოზებსა და რეპორტებს. მოიწვიე მეგობრები ან შეავსე ბალანსი."}
+              </p>
+            </div>
+          </div>
+
+          {!premium && (
+            <div className="mt-4">
+              <SpendAnchor
+                spend={recentSpend}
+                countryCode={identity?.countryCode}
+                locale={locale}
+              />
+            </div>
+          )}
+
+          <div className="mt-4">
+            <CreditProgressCard
               balance={balance}
-              neededCredits={neededCredits}
-              returnTo={returnTo}
-              product={product}
-              selectedPackId={selectedPackId}
-              crypto={cryptoPay}
+              nextMonthlyDate={nextMonthlyBonusDate()}
+              locale={locale}
+              monthlyPausedReason={
+                monthlyBonusEligible(monthlyGate) ? null : "inactivity"
+              }
             />
           </div>
+
+          {!hostEn && !fromPaywall && phoneGiftCardEligible(giftState) && (
+            <div className="mt-4">
+              <PhoneGiftCard locale={locale} />
+            </div>
+          )}
 
           <div className="mt-4">
             <CreditHistory

@@ -63,9 +63,9 @@ describe("country billing catalogue", () => {
 
   it("uses Georgian-local credit packs for GE residents", () => {
     expect(creditPacksForCountry("GE")).toEqual([
-      { id: "s", credits: 30, amountMinor: 690, currency: "gel" },
-      { id: "m", credits: 75, amountMinor: 1490, currency: "gel" },
-      { id: "l", credits: 180, amountMinor: 2990, currency: "gel" },
+      { id: "s", credits: 25, amountMinor: 790, currency: "gel" },
+      { id: "m", credits: 60, amountMinor: 1490, currency: "gel" },
+      { id: "l", credits: 120, amountMinor: 2490, currency: "gel" },
     ]);
   });
 
@@ -134,8 +134,8 @@ describe("country billing catalogue", () => {
   it("keeps the Georgian catalogue as the rollout fallback", () => {
     expect(creditPackForCountry("DE", "s")).toEqual({
       id: "s",
-      credits: 30,
-      amountMinor: 690,
+      credits: 25,
+      amountMinor: 790,
       currency: "gel",
     });
     expect(premiumPlanForCountry("DE")).toEqual(PREMIUM_PLANS_BY_COUNTRY.GE);
@@ -290,7 +290,7 @@ describe("billingPeriodMonths", () => {
 describe("formatBillingAmount", () => {
   it("writes Georgian prices with the lari symbol", () => {
     expect(formatBillingAmount(1990, "gel", "ka")).toBe("₾19.90");
-    expect(formatBillingAmount(690, "gel", "ka")).toBe("₾6.90");
+    expect(formatBillingAmount(790, "gel", "ka")).toBe("₾7.90");
   });
 
   it("leaves the English catalogue as it was", () => {
