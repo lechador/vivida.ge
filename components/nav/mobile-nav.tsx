@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import Link from "next/link";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { motion, AnimatePresence } from "framer-motion";
 import { Ellipsis, Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -34,6 +33,12 @@ export function MobileNav({
 }) {
   const [open, setOpen] = useState(false);
   const moreLabel = locale !== "ka" ? "More" : "მეტი";
+
+  function closeDrawer() {
+    startTransition(() => {
+      setOpen(false);
+    });
+  }
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
@@ -73,133 +78,120 @@ export function MobileNav({
         )}
       </DialogPrimitive.Trigger>
 
-      <AnimatePresence>
-        {open && (
-          <DialogPrimitive.Portal forceMount>
-            <DialogPrimitive.Overlay asChild>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
-              />
-            </DialogPrimitive.Overlay>
+      {open && (
+        <DialogPrimitive.Portal forceMount>
+          <DialogPrimitive.Overlay
+            data-radix-dialog-overlay
+            className="vivida-drawer-overlay fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+          />
 
-            <DialogPrimitive.Content asChild aria-describedby={undefined}>
-              <motion.aside
-                initial={{ x: "-100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "-100%" }}
-                transition={{ type: "spring", stiffness: 340, damping: 34 }}
-                className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col border-r border-border bg-card p-5 shadow-2xl"
-              >
-                {/* Header: Brand Lockup + Close */}
-                <div className="flex items-center justify-between border-b border-border pb-4">
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-2.5"
+          <DialogPrimitive.Content asChild aria-describedby={undefined}>
+            <aside className="vivida-drawer-left fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col border-r border-border bg-card p-5 shadow-2xl">
+              {/* Header: Brand Lockup + Close */}
+              <div className="flex items-center justify-between border-b border-border pb-4">
+                <Link
+                  href="/dashboard"
+                  onClick={closeDrawer}
+                  className="flex items-center gap-2.5"
+                >
+                  <VividaMark size={30} id="mobile-nav" />
+                  <span
+                    className="bg-clip-text font-display text-2xl font-semibold tracking-tight text-transparent"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(135deg, #f8f7ff 0%, #c4b5fd 45%, #f472b6 80%, #22d3ee 100%)",
+                    }}
                   >
-                    <VividaMark size={30} id="mobile-nav" />
-                    <span
-                      className="bg-clip-text font-display text-2xl font-semibold tracking-tight text-transparent"
-                      style={{
-                        backgroundImage:
-                          "linear-gradient(135deg, #f8f7ff 0%, #c4b5fd 45%, #f472b6 80%, #22d3ee 100%)",
-                      }}
+                    Vivida
+                  </span>
+                </Link>
+                <DialogPrimitive.Close
+                  aria-label={locale !== "ka" ? "Close" : "დახურვა"}
+                  className="grid size-9 place-items-center rounded-lg border border-border bg-secondary/50 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-secondary hover:text-foreground"
+                >
+                  <X className="size-4" />
+                </DialogPrimitive.Close>
+              </div>
+
+              <DialogPrimitive.Title className="sr-only">
+                {locale !== "ka" ? "Navigation" : "ნავიგაცია"}
+              </DialogPrimitive.Title>
+
+              {/* Nav items */}
+              <nav className="my-4 flex flex-col gap-1.5 overflow-y-auto">
+                {navItems(locale).map((item) => {
+                  const { Icon } = item;
+                  const isActive = item.key === active;
+                  return (
+                    <NavItemLink
+                      key={item.key}
+                      href={item.href}
+                      itemKey={item.key}
+                      surface="mobile_nav"
+                      locale={locale}
+                      onNavigate={closeDrawer}
+                      aria-current={isActive ? "page" : undefined}
+                      className={cn(
+                        "group relative flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all",
+                        isActive
+                          ? "border-primary/50 bg-secondary text-foreground shadow-xs"
+                          : "border-transparent text-muted-foreground hover:border-border hover:bg-secondary/50 hover:text-foreground",
+                      )}
                     >
-                      Vivida
-                    </span>
-                  </Link>
-                  <DialogPrimitive.Close
-                    aria-label={locale !== "ka" ? "Close" : "დახურვა"}
-                    className="grid size-9 place-items-center rounded-lg border border-border bg-secondary/50 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-secondary hover:text-foreground"
-                  >
-                    <X className="size-4" />
-                  </DialogPrimitive.Close>
-                </div>
-
-                <DialogPrimitive.Title className="sr-only">
-                  {locale !== "ka" ? "Navigation" : "ნავიგაცია"}
-                </DialogPrimitive.Title>
-
-                {/* Nav items */}
-                <nav className="my-4 flex flex-col gap-1.5 overflow-y-auto">
-                  {navItems(locale).map((item) => {
-                    const { Icon } = item;
-                    const isActive = item.key === active;
-                    return (
-                      <NavItemLink
-                        key={item.key}
-                        href={item.href}
-                        itemKey={item.key}
-                        surface="mobile_nav"
-                        locale={locale}
-                        onNavigate={() => setOpen(false)}
-                        aria-current={isActive ? "page" : undefined}
-                        className={cn(
-                          "group relative flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all",
-                          isActive
-                            ? "border-primary/50 bg-secondary text-foreground shadow-xs"
-                            : "border-transparent text-muted-foreground hover:border-border hover:bg-secondary/50 hover:text-foreground",
-                        )}
+                      {isActive && (
+                        <span
+                          aria-hidden
+                          className="absolute inset-y-2 left-0 w-1 rounded-r-full"
+                          style={{ backgroundColor: item.hue }}
+                        />
+                      )}
+                      <span
+                        className="relative grid size-6 place-items-center rounded-md"
+                        style={{ color: item.hue }}
                       >
-                        {isActive && (
-                          <span
-                            aria-hidden
-                            className="absolute inset-y-2 left-0 w-1 rounded-r-full"
-                            style={{ backgroundColor: item.hue }}
+                        <Icon className="size-4.5" />
+                        {item.key === "messages" && (
+                          <MessagesTabBadge
+                            initial={unreadMessages}
+                            locale={locale}
                           />
                         )}
-                        <span
-                          className="relative grid size-6 place-items-center rounded-md"
-                          style={{ color: item.hue }}
-                        >
-                          <Icon className="size-4.5" />
-                          {item.key === "messages" && (
-                            <MessagesTabBadge
-                              initial={unreadMessages}
-                              locale={locale}
-                            />
-                          )}
-                          {item.key === "ask" && (
-                            <AskTabBadge
-                              pending={pendingAskNudges}
-                              locale={locale}
-                            />
-                          )}
-                        </span>
-                        <span>{navLabel(item, locale)}</span>
-                      </NavItemLink>
-                    );
-                  })}
-                </nav>
+                        {item.key === "ask" && (
+                          <AskTabBadge
+                            pending={pendingAskNudges}
+                            locale={locale}
+                          />
+                        )}
+                      </span>
+                      <span>{navLabel(item, locale)}</span>
+                    </NavItemLink>
+                  );
+                })}
+              </nav>
 
-                <div className="mt-auto space-y-3 border-t border-border pt-4">
-                  <NavItemLink
-                    href="/account"
-                    itemKey="account"
-                    surface="mobile_nav"
-                    locale={locale}
-                    onNavigate={() => setOpen(false)}
-                    className="block text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {locale === "en"
-                      ? "Account & settings →"
-                      : "ანგარიში და პარამეტრები →"}
-                  </NavItemLink>
-                  <InstallAppButton
-                    locale={locale}
-                    surface="mobile_nav"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-secondary"
-                  />
-                </div>
-              </motion.aside>
-            </DialogPrimitive.Content>
-          </DialogPrimitive.Portal>
-        )}
-      </AnimatePresence>
+              <div className="mt-auto space-y-3 border-t border-border pt-4">
+                <NavItemLink
+                  href="/account"
+                  itemKey="account"
+                  surface="mobile_nav"
+                  locale={locale}
+                  onNavigate={closeDrawer}
+                  className="block text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {locale === "en"
+                    ? "Account & settings →"
+                    : "ანგარიში და პარამეტრები →"}
+                </NavItemLink>
+                <InstallAppButton
+                  locale={locale}
+                  surface="mobile_nav"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-secondary"
+                />
+              </div>
+            </aside>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      )}
     </DialogPrimitive.Root>
   );
 }

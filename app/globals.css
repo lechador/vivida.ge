@@ -633,6 +633,54 @@ html[lang="hy"] .locale-ka-only {
 }
 
 /*
+ * Compositor-only slide-over drawer animations (replaces Framer Motion in
+ * ObservatoryDrawer and MobileNav so shared headers don't ship framer-motion
+ * or run spring physics on the main thread during mobile interactions).
+ */
+@keyframes vivida-drawer-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes vivida-drawer-right-in {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes vivida-drawer-left-in {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+.vivida-drawer-overlay {
+  animation: vivida-drawer-overlay-in 150ms ease-out both;
+}
+.vivida-drawer-right {
+  animation: vivida-drawer-right-in 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+}
+.vivida-drawer-left {
+  animation: vivida-drawer-left-in 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vivida-drawer-overlay,
+  .vivida-drawer-right,
+  .vivida-drawer-left {
+    animation: none;
+  }
+}
+
+/*
  * Mobile compositing hack, `backdrop-filter` is among the most expensive
  * GPU operations on mobile browsers (especially Safari iOS, where it can
  * tank scroll FPS). Below 640px we strip every `backdrop-blur-*` utility
