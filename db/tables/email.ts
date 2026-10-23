@@ -134,7 +134,8 @@ export const emailSendLog = pgTable(
     email: text("email"),
     /** Subject line as sent, makes the admin log self-explanatory. */
     subject: text("subject"),
-    /** 'sent' | 'failed'. Historical rows predate the column → null = sent. */
+    /** 'pending' | 'sent' | 'failed' | 'skipped'.
+     *  Historical rows predate the column → null = sent. */
     status: text("status").default("sent"),
     /** Error message when status='failed'. */
     error: text("error"),

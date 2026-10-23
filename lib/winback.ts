@@ -396,6 +396,9 @@ export async function sendWinbackNudges(
 
   const resendKey = process.env.RESEND_API_KEY;
   const resend = resendKey ? new Resend(resendKey) : null;
+  if (!resend) {
+    console.warn("[winback] RESEND_API_KEY missing, cannot send sequence");
+  }
 
   // The whole 3-step sequence shares one per-run reservation so it cannot
   // starve the other lifecycle jobs, and later steps drain on later runs.
@@ -418,7 +421,6 @@ export async function sendWinbackNudges(
     const ctaUrl = `${origin.replace(/\/$/, "")}${step.path}`;
 
     if (!resend) {
-      console.warn("[winback] RESEND_API_KEY missing, cannot send sequence");
       tally(result, step, "skipped");
       continue;
     }
@@ -574,10 +576,3 @@ export async function sendWinbackNudges(
 
   return result;
 }
-
-/** Exposed for the cron JSON and tests: the anchor-relative thresholds. */
-export const WINBACK_STEP_THRESHOLDS = WINBACK_STEPS.map((s) => ({
-  kind: s.kind,
-  dueAfterDays: s.dueAfterDays,
-  slug: s.slug,
-}));
