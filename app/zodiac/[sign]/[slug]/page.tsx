@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Calendar, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ReportPromo } from "@/components/report/report-promo";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
@@ -21,6 +22,14 @@ import {
   type ZodiacSlug,
 } from "@/lib/seo/zodiac-dates";
 import { genitiveKa } from "@/lib/georgian";
+import { ELEMENT_COLOR } from "@/lib/pdf/theme";
+import {
+  articleLd as buildArticleLd,
+  breadcrumbLd as buildBreadcrumbLd,
+  faqLd as buildFaqLd,
+  serializeLd,
+} from "@/lib/seo/jsonld";
+import { SIGN_LATIN_NAMES } from "@/lib/seo/transliteration";
 import { signColor } from "@/lib/zodiac";
 import {
   anchorForView,
@@ -39,7 +48,11 @@ import { YearlyHoroscopePageEn } from "@/components/seo/yearly-horoscope-page-en
 
 import { yearlyHoroscopeEnglish } from "@/lib/yearly-horoscope-en";
 
-import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
 
 const SITE_URL = "https://www.vivida.ge";
@@ -163,19 +176,29 @@ export async function generateMetadata({
   if (yearNum == null) return {};
   const c = yearlyContentFor(sign, yearNum);
   if (!c) return {};
+  const meta = signMetaBySlug(sign);
+  const accentHex = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
   if (en) {
     const english = yearlyHoroscopeEnglish(sign, yearNum);
-    const url = `https://www.vividaastro.com/zodiac/${sign}/${slug}`;
+    const nameEn = meta?.labelEn ?? sign;
+    const url = `${ENGLISH_SITE_URL}/zodiac/${sign}/${slug}`;
+    const ogEn = `${ENGLISH_SITE_URL}/api/og/page?t=${encodeURIComponent(`${nameEn} ${yearNum}`)}&k=${encodeURIComponent("Yearly Horoscope")}&a=${encodeURIComponent(accentHex)}`;
     return {
       title: { absolute: english.title },
       description: english.description,
+      keywords: [
+        `${nameEn} ${yearNum} horoscope`,
+        `${nameEn} yearly horoscope ${yearNum}`,
+        `${nameEn} ${yearNum} astrology`,
+        `${nameEn} love career money ${yearNum}`,
+      ],
       alternates: localizedAlternates(
         `/zodiac/${sign}/${slug}`,
         `/zodiac/${sign}/${slug}`,
         "en",
       ),
       openGraph: {
-        images: [DEFAULT_OG_IMAGE],
+        images: [{ url: ogEn, width: 1200, height: 630 }],
         type: "article",
         url,
         title: english.title,
@@ -187,19 +210,33 @@ export async function generateMetadata({
         card: "summary_large_image",
         title: english.title,
         description: english.description,
+        images: [ogEn],
       },
     };
   }
+  const og = `${SITE_URL}/api/og/page?t=${encodeURIComponent(`${c.labelKa} ${yearNum}`)}&k=${encodeURIComponent("წლიური ჰოროსკოპი")}&a=${encodeURIComponent(accentHex)}`;
+  const genLabel = genitiveKa(c.labelKa);
+  const latins = SIGN_LATIN_NAMES[sign] ?? [];
   return {
     title: { absolute: c.pageTitle },
     description: c.metaDescription,
+    keywords: [
+      `${c.labelKa} ${yearNum}`,
+      `${c.labelKa} ${yearNum} წლის ჰოროსკოპი`,
+      `${genLabel} ${yearNum} წლის ჰოროსკოპი`,
+      `${c.labelKa} წლიური ჰოროსკოპი ${yearNum}`,
+      `${yearNum} წლის ჰოროსკოპი`,
+      `${c.labelKa} სიყვარული კარიერა ფინანსები ${yearNum}`,
+      ...latins.map((l) => `${l} ${yearNum} horoskopi`),
+      ...latins.map((l) => `${l} ${yearNum}`),
+    ],
     alternates: localizedAlternates(
       `/zodiac/${sign}/${slug}`,
       `/zodiac/${sign}/${slug}`,
       "ka",
     ),
     openGraph: {
-      images: [DEFAULT_OG_IMAGE],
+      images: [{ url: og, width: 1200, height: 630 }],
       type: "article",
       url: `${SITE_URL}/zodiac/${sign}/${slug}`,
       title: c.pageTitle,
@@ -211,6 +248,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: c.pageTitle,
       description: c.metaDescription,
+      images: [og],
     },
   };
 }
@@ -242,61 +280,37 @@ export default async function ZodiacSignSlugPage({
   const sc = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign);
   const accent = meta ? signColor(meta) : "var(--vivida-violet)";
+  const accentHex = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
   const dates = ZODIAC_DATES[sign];
+  const availableYears = ALL_YEARLY_YEARS.filter((y) =>
+    yearlyContentFor(sign, y),
+  );
+  const ogImage = `${SITE_URL}/api/og/page?t=${encodeURIComponent(`${c.labelKa} ${yearNum}`)}&k=${encodeURIComponent("წლიური ჰოროსკოპი")}&a=${encodeURIComponent(accentHex)}`;
 
-  const articleLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
+  const articleJsonLd = buildArticleLd({
     headline: c.pageTitle,
     description: c.metaDescription,
-    inLanguage: "ka-GE",
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `${SITE_URL}/zodiac/${sign}/${year}`,
-    },
-    author: { "@type": "Organization", name: "Vivida", url: SITE_URL },
-    publisher: { "@type": "Organization", name: "Vivida", url: SITE_URL },
+    url: `${SITE_URL}/zodiac/${sign}/${year}`,
+    datePublished: yearNum >= 2027 ? "2026-10-01" : `${yearNum}-01-01`,
+    dateModified: "2026-10-27",
+    image: ogImage,
     about: {
       "@type": "Thing",
-      name: `${c.labelKa} ${yearNum}`,
+      name: `${c.labelKa} — ${yearNum} წლის ჰოროსკოპი`,
     },
-    datePublished: `${yearNum}-01-01`,
-  };
+  });
 
-  const faqLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: c.faq.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
-  };
+  const faqJsonLd = buildFaqLd(c.faq);
 
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "ცის ნიშნები",
-        item: `${SITE_URL}/zodiac`,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: c.labelKa,
-        item: `${SITE_URL}/zodiac/${sign}`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: `${yearNum} წლიური ჰოროსკოპი`,
-        item: `${SITE_URL}/zodiac/${sign}/${year}`,
-      },
-    ],
-  };
+  const breadcrumbJsonLd = buildBreadcrumbLd([
+    { name: "მთავარი", url: SITE_URL },
+    { name: "ცის ნიშნები", url: `${SITE_URL}/zodiac` },
+    { name: c.labelKa, url: `${SITE_URL}/zodiac/${sign}` },
+    {
+      name: `${yearNum} წლის ჰოროსკოპი`,
+      url: `${SITE_URL}/zodiac/${sign}/${year}`,
+    },
+  ]);
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">
@@ -309,29 +323,68 @@ export default async function ZodiacSignSlugPage({
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeLd(articleJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeLd(faqJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeLd(breadcrumbJsonLd) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
-        <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/zodiac" className="hover:text-foreground">
-            ცის ნიშნები
-          </Link>
-          <span>/</span>
-          <Link href={`/zodiac/${sign}`} className="hover:text-foreground">
-            {c.labelKa}
-          </Link>
-          <span>/</span>
-          <span className="text-foreground/80">{yearNum}</span>
-        </nav>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-2 text-xs text-muted-foreground"
+          >
+            <Link href="/zodiac" className="hover:text-foreground">
+              ცის ნიშნები
+            </Link>
+            <span>/</span>
+            <Link href={`/zodiac/${sign}`} className="hover:text-foreground">
+              {c.labelKa}
+            </Link>
+            <span>/</span>
+            <span className="text-foreground/80">{yearNum} წლის ჰოროსკოპი</span>
+          </nav>
+
+          {availableYears.length > 1 && (
+            <nav
+              aria-label="წლების გადამრთველი"
+              className="flex items-center gap-1.5"
+            >
+              {availableYears.map((y) => {
+                const active = y === yearNum;
+                return (
+                  <Link
+                    key={y}
+                    href={`/zodiac/${sign}/${y}`}
+                    aria-current={active ? "page" : undefined}
+                    className={
+                      active
+                        ? "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold"
+                        : "inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-card/80 hover:text-foreground"
+                    }
+                    style={
+                      active
+                        ? {
+                            borderColor: `color-mix(in oklch, ${accent} 45%, transparent)`,
+                            background: `color-mix(in oklch, ${accent} 16%, transparent)`,
+                            color: accent,
+                          }
+                        : undefined
+                    }
+                  >
+                    {y} წელი
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
+        </div>
 
         {/* Hero */}
         <article className="relative overflow-hidden rounded-3xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-10">
@@ -514,10 +567,101 @@ export default async function ZodiacSignSlugPage({
           </Button>
         </div>
 
-        {/* Other signs same year */}
+        <div className="mt-10">
+          <ReportPromo />
+        </div>
+
+        {/* Same sign related horoscopes & almanac */}
         <section className="mt-14">
           <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            სხვა ნიშნების {yearNum} ჰოროსკოპი
+            {c.labelKa} · სხვა ჰოროსკოპები და გზამკვლევები
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/zodiac/${sign}`}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              <span style={{ color: accent }}>{sc.symbol}</span>
+              {c.labelKa} — ნიშნის დახასიათება
+            </Link>
+            {availableYears
+              .filter((y) => y !== yearNum)
+              .map((y) => (
+                <Link
+                  key={y}
+                  href={`/zodiac/${sign}/${y}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+                >
+                  {c.labelKa} — {y} წლის ჰოროსკოპი
+                </Link>
+              ))}
+            <Link
+              href={`/zodiac/${sign}/dghes`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              დღის ჰოროსკოპი
+            </Link>
+            <Link
+              href={`/zodiac/${sign}/kviris-horoskopi`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              კვირის ჰოროსკოპი
+            </Link>
+            <Link
+              href={`/zodiac/${sign}/tvis-horoskopi`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              თვის ჰოროსკოპი
+            </Link>
+            <Link
+              href={`/siyvarulis-horoskopi/${sign}`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              სიყვარულის ჰოროსკოპი
+            </Link>
+            <Link
+              href={`/finansuri-horoskopi/${sign}`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              ფინანსური ჰოროსკოპი
+            </Link>
+            <Link
+              href={`/karieris-horoskopi/${sign}`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              კარიერის ჰოროსკოპი
+            </Link>
+            <Link
+              href={`/moon/${sign}`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              მთვარე {c.labelKa}-ში
+            </Link>
+            <Link
+              href={`/rising/${sign}`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              {c.labelKa} ამომავალი
+            </Link>
+            <Link
+              href="/dabnelebebi"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              დაბნელებების კალენდარი
+            </Link>
+            <Link
+              href="/merkuri-retrogradi"
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
+              მერკური რეტროგრადში
+            </Link>
+          </div>
+        </section>
+
+        {/* Other signs same year */}
+        <section className="mt-12">
+          <h2 className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            სხვა ნიშნების {yearNum} წლის ჰოროსკოპი
           </h2>
           <div className="flex flex-wrap gap-2">
             {ALL_SLUGS.filter((s) => s !== sign).map((s) => {
@@ -541,7 +685,6 @@ export default async function ZodiacSignSlugPage({
             })}
           </div>
         </section>
-
       </section>
 
       <SiteFooter />

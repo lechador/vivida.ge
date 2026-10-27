@@ -15,7 +15,11 @@ import {
   signHoroscopePeriodLabel,
   type HoroscopeView as HoroscopeViewKind,
 } from "@/lib/sign-horoscope";
-import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
+import {
+  ALL_YEARLY_YEARS,
+  SIGNS_CONTENT,
+  yearlyContentFor,
+} from "@/lib/seo/zodiac-content";
 import {
   ALL_SLUGS,
   ZODIAC_DATES,
@@ -229,13 +233,33 @@ export async function HoroscopeView({
             >
               {sc.labelKa}, სრული პროფილი
             </Link>
-            <Link href={`/siyvarulis-horoskopi/${sign}`} className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80">
+            {ALL_YEARLY_YEARS.filter((y) => yearlyContentFor(sign, y)).map(
+              (y) => (
+                <Link
+                  key={y}
+                  href={`/zodiac/${sign}/${y}`}
+                  className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+                >
+                  {y} წლის ჰოროსკოპი
+                </Link>
+              ),
+            )}
+            <Link
+              href={`/siyvarulis-horoskopi/${sign}`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
               სიყვარულის ჰოროსკოპი
             </Link>
-            <Link href={`/finansuri-horoskopi/${sign}`} className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80">
+            <Link
+              href={`/finansuri-horoskopi/${sign}`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
               ფინანსური ჰოროსკოპი
             </Link>
-            <Link href={`/karieris-horoskopi/${sign}`} className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80">
+            <Link
+              href={`/karieris-horoskopi/${sign}`}
+              className="inline-flex items-center rounded-full border border-border bg-card/55 px-3 py-1.5 text-sm transition-colors hover:bg-card/80"
+            >
               კარიერის ჰოროსკოპი
             </Link>
           </div>
@@ -281,7 +305,6 @@ export async function HoroscopeView({
             <Link href="/signup">ჩემი სრული რუკა</Link>
           </Button>
         </div>
-
       </section>
 
       <SiteFooter />

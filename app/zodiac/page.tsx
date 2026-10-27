@@ -182,6 +182,40 @@ export default async function ZodiacHubPage() {
           })}
         </div>
 
+        {/* 2027 Yearly Horoscope Strip */}
+        <section className="mt-14 rounded-2xl border border-border bg-card/70 p-6 shadow-sm sm:p-7">
+          <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+            <div>
+              <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
+                წლიური პროგნოზი · 2027
+              </div>
+              <h2 className="mt-1 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+                2027 წლის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის
+              </h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              სიყვარული, კარიერა, ფინანსები და წლის მთავარი თარიღები
+            </p>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {ALL_SLUGS.map((slug) => {
+              const c = SIGNS_CONTENT[slug];
+              const meta = signMetaBySlug(slug);
+              const accent = meta ? signColor(meta) : "var(--primary)";
+              return (
+                <Link
+                  key={slug}
+                  href={`/zodiac/${slug}/2027`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3.5 py-1.5 text-sm transition-colors hover:border-primary/45 hover:bg-secondary/60"
+                >
+                  <span style={{ color: accent }}>{c.symbol}</span>
+                  <span>{c.labelKa} 2027</span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
         {/* Editorial Reference Columns */}
         <div className="mt-16 grid gap-4 lg:grid-cols-3">
           <article className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-7">

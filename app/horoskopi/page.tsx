@@ -361,6 +361,40 @@ export default async function HoroskopiHubPage() {
           </div>
         </section>
 
+        {/* Yearly Horoscopes 2027 & 2026 */}
+        <section className="mt-12 rounded-2xl border border-border bg-card/70 p-6 shadow-sm sm:p-7">
+          <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+            <div>
+              <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
+                წლიური ჰოროსკოპი · 2027
+              </div>
+              <h2 className="mt-1 text-xl font-semibold tracking-tight text-foreground">
+                2027 წლის ჰოროსკოპი ზოდიაქოს ნიშნების მიხედვით
+              </h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              სრული წლიური პროგნოზი: სიყვარული, კარიერა, ფული, ჯანმრთელობა
+            </p>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {ALL_SLUGS.map((slug) => {
+              const sc = SIGNS_CONTENT[slug];
+              const meta = signMetaBySlug(slug);
+              const accent = meta ? signColor(meta) : "var(--primary)";
+              return (
+                <Link
+                  key={slug}
+                  href={`/zodiac/${slug}/2027`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3.5 py-1.5 text-sm transition-colors hover:border-primary/45 hover:bg-secondary/60"
+                >
+                  <span style={{ color: accent }}>{sc.symbol}</span>
+                  <span>{sc.labelKa} — 2027 წლის ჰოროსკოპი</span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
         {/* FAQ */}
         <section className="mt-12">
           <h2 className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
