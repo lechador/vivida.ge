@@ -13,7 +13,12 @@ import {
   ELEMENT_LABEL_EN,
   overallVerdictEn,
 } from "@/lib/synastry-en";
-import { overallNarrative } from "@/lib/synastry-interpretation";
+import {
+  aspectGlyph,
+  aspectValence,
+  bodyLabel,
+  overallNarrative,
+} from "@/lib/synastry-interpretation";
 import { CornerCrosshair } from "@/components/brand/celestial-icons";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -30,13 +35,13 @@ const LOCKED_PLACEHOLDER_KA =
 const LOCKED_TITLES_EN = [
   "Emotional & intimate attraction (Venus–Mars aspect)",
   "Your main friction point: what could pull you apart?",
-  "Karmic bond & 2026 forecast for this relationship",
+  "Karmic bond & 2026–2027 forecast for this relationship",
 ] as const;
 
 const LOCKED_TITLES_KA = [
   "ემოციური და ინტიმური მიზიდულობა (ვენერა–მარსის ასპექტი)",
   "თქვენი მთავარი კონფლიქტის წერტილი: რამ შეიძლება დაგაშოროთ?",
-  "კარმული კავშირი და 2026 წლის პროგნოზი ამ ურთიერთობისთვის",
+  "კარმული კავშირი და 2026–2027 წლების პროგნოზი ამ ურთიერთობისთვის",
 ] as const;
 
 /** Same element, or the two elements that share a polarity (fire/air, earth/water). */
@@ -163,7 +168,31 @@ export function SynastryTeaser({
     ? moonLineEn(moonA, moonB, elementLabel, MOON_NEED_EN)
     : moonLineKa(moonA, moonB, ELEMENT_GENITIVE_KA, MOON_NEED_KA);
   const overallLine = overallNarrative(result.overall, locale);
-  const lockedTitles = en ? LOCKED_TITLES_EN : LOCKED_TITLES_KA;
+  const topHarmonious = result.topAspects.find(
+    (asp) => aspectValence(asp.kind) !== "tense",
+  );
+  const topTension = result.topAspects.find(
+    (asp) => aspectValence(asp.kind) === "tense",
+  );
+  const formatAspectBadge = (asp: (typeof result.topAspects)[number]) =>
+    `${bodyLabel(asp.a, locale)} ${aspectGlyph(asp.kind)} ${bodyLabel(asp.b, locale)} · ${asp.orb.toFixed(1)}°`;
+  const dynamicLockedTitles = [
+    topHarmonious
+      ? en
+        ? `Strongest attraction contact: ${formatAspectBadge(topHarmonious)}`
+        : `მთავარი მიზიდულობის ასპექტი: ${formatAspectBadge(topHarmonious)}`
+      : en
+        ? LOCKED_TITLES_EN[0]
+        : LOCKED_TITLES_KA[0],
+    topTension
+      ? en
+        ? `Main friction point (${formatAspectBadge(topTension)}): what could pull you apart?`
+        : `მთავარი კონფლიქტის წერტილი (${formatAspectBadge(topTension)}): რამ შეიძლება დაგაშოროთ?`
+      : en
+        ? LOCKED_TITLES_EN[1]
+        : LOCKED_TITLES_KA[1],
+    en ? LOCKED_TITLES_EN[2] : LOCKED_TITLES_KA[2],
+  ];
   const lockedPlaceholder = en ? LOCKED_PLACEHOLDER_EN : LOCKED_PLACEHOLDER_KA;
 
   return (
@@ -241,7 +270,7 @@ export function SynastryTeaser({
       </p>
 
       <ul className="mt-3 space-y-2">
-        {lockedTitles.map((title) => (
+        {dynamicLockedTitles.map((title) => (
           <li
             key={title}
             className="rounded-sm border border-border/80 bg-background/40 px-3 py-2.5"

@@ -18,6 +18,7 @@ import { and, eq, gt, sql as dsql } from "drizzle-orm";
 import { db } from "@/db";
 import { emailSendLog } from "@/db/schema";
 import { grantCredits } from "@/lib/credits";
+import { BIRTHDAY_CREDITS } from "@/lib/credits-config";
 import { BirthdayEmail } from "@/lib/email-templates/birthday";
 import { acquireResendSlot } from "@/lib/resend-throttle";
 import { signByIndex } from "@/lib/zodiac";
@@ -42,8 +43,8 @@ const ORIGIN = process.env.APP_ORIGIN ?? "https://www.vivida.ge";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-/** Credits gifted on a user's birthday. */
-export const BIRTHDAY_CREDITS = 30;
+/** Credits gifted on a user's birthday (covers one full tarot reading). */
+export { BIRTHDAY_CREDITS };
 
 // Celebration-first subject, deliberately no gift mention (the gift is a
 // P.S. inside, not the reason for the email).

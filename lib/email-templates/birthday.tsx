@@ -128,9 +128,7 @@ export function BirthdayEmail({
         }}
       >
         P.S. პატარა საჩუქარი ჩვენგან: შენს ბალანსს დაბადების დღის საპატივცემულოდ{" "}
-        <span style={{ color: "#eac358", fontWeight: 600 }}>
-          30 კრედიტი
-        </span>{" "}
+        <span style={{ color: "#eac358", fontWeight: 600 }}>10 კრედიტი</span>{" "}
         დაემატა, უკვე შენია, არაფერი გჭირდება. 🎁
       </Text>
     </EmailLayout>

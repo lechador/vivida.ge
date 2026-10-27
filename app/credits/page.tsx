@@ -100,7 +100,9 @@ export default async function CreditsPage({
   if (product) loginQuery.set("product", product);
   const rawPack = Array.isArray(query.pack) ? query.pack[0] : query.pack;
   const selectedPackId =
-    rawPack === "s" || rawPack === "m" || rawPack === "l" ? rawPack : null;
+    rawPack === "xs" || rawPack === "s" || rawPack === "m" || rawPack === "l"
+      ? rawPack
+      : null;
   if (selectedPackId) loginQuery.set("pack", selectedPackId);
   const loginReturn =
     loginQuery.size > 0 ? `/credits?${loginQuery.toString()}` : "/credits";

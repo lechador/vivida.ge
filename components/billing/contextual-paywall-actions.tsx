@@ -15,7 +15,8 @@ import { EXPERIMENTS } from "@/lib/experiment-catalog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { trackExperimentOutcome, useExperiment } from "@/lib/use-experiment";
 import { showSingleOffer } from "@/lib/first-purchase-experiment-config";
-import { paywallPrimaryOffer } from "@/lib/paywall-offer";
+import { paywallImpulseOffer, paywallPrimaryOffer } from "@/lib/paywall-offer";
+import type { CreditPack } from "@/lib/billing-config";
 
 export function ContextualPaywallActions({
   locale,
@@ -35,12 +36,18 @@ export function ContextualPaywallActions({
   countryCode?: string | null;
 }) {
   const en = locale === "en";
-  const [pending, setPending] = useState(false);
+  const [pendingPackId, setPendingPackId] = useState<string | null>(null);
   const missing = Math.max(1, cost - balance);
   const next = normalizeReturnPath(returnTo);
   // One primary one-time offer naming the locked outcome and its price for
   // every product, not only tarot; PRO stays the secondary, frequent-use path.
   const offer = paywallPrimaryOffer({ product, countryCode, locale });
+  const impulse = paywallImpulseOffer({
+    product,
+    countryCode,
+    locale,
+    missing,
+  });
   const variant = useExperiment(EXPERIMENTS.contextualPaywall, placement);
   // Controlled first-purchase test (never-payers, assigned server-side):
   // control keeps the legacy generic choice, treatment leads with the single
@@ -101,24 +108,24 @@ export function ContextualPaywallActions({
    * never a dead button: `crypto_only` on the English host, a failed session,
    * or no URL all land the user on a working payment surface.
    */
-  async function startDirectCheckout() {
-    if (pending) return;
+  async function startDirectCheckout(chosenPack: CreditPack = offer.pack) {
+    if (pendingPackId) return;
     trackChoice("credits");
     trackEvent(ANALYTICS_EVENT.productSelected, {
-      product: offer.pack.id,
+      product: chosenPack.id,
       surface: placement,
       payment_model: "one_time",
-      credits: offer.pack.credits,
-      value: offer.pack.amountMinor / 100,
-      currency: offer.pack.currency,
+      credits: chosenPack.credits,
+      value: chosenPack.amountMinor / 100,
+      currency: chosenPack.currency,
     });
-    setPending(true);
+    setPendingPackId(chosenPack.id);
     try {
       const res = await fetch("/api/credits/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          packId: offer.pack.id,
+          packId: chosenPack.id,
           returnTo: next,
           product,
         }),
@@ -159,22 +166,41 @@ export function ContextualPaywallActions({
   return (
     <div className="space-y-2.5">
       <p className="text-sm text-[var(--vivida-pink)]">
-        {variant === "value_message"
+        {balance > 0
           ? en
-            ? `Unlock this result by adding ${missing} more credit${missing === 1 ? "" : "s"}.`
-            : `გახსენი ეს შედეგი კიდევ ${missing} კრედიტის დამატებით.`
-          : en
-            ? `You need ${missing} more credit${missing === 1 ? "" : "s"}.`
-            : `გაკლია ${missing} კრედიტი.`}
+            ? `You already have ${balance} credit${balance === 1 ? "" : "s"} — you only need ${missing} more.`
+            : `ბალანსზე უკვე გაქვს ${balance} კრედიტი — გაკლია მხოლოდ ${missing} კრედიტი.`
+          : variant === "value_message"
+            ? en
+              ? `Unlock this result by adding ${missing} more credit${missing === 1 ? "" : "s"}.`
+              : `გახსენი ეს შედეგი კიდევ ${missing} კრედიტის დამატებით.`
+            : en
+              ? `You need ${missing} more credit${missing === 1 ? "" : "s"}.`
+              : `გაკლია ${missing} კრედიტი.`}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-2">
+        {impulse && (
+          <Button
+            type="button"
+            variant="mystic"
+            disabled={pendingPackId !== null}
+            onClick={() => startDirectCheckout(impulse.pack)}
+          >
+            {pendingPackId === impulse.pack.id ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <CreditCard className="size-4" />
+            )}
+            {impulse.label}
+          </Button>
+        )}
         <Button
           type="button"
-          variant="mystic"
-          disabled={pending}
-          onClick={startDirectCheckout}
+          variant={impulse ? "secondary" : "mystic"}
+          disabled={pendingPackId !== null}
+          onClick={() => startDirectCheckout(offer.pack)}
         >
-          {pending ? (
+          {pendingPackId === offer.pack.id ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (
             <CreditCard className="size-4" />
@@ -192,7 +218,7 @@ export function ContextualPaywallActions({
         </Button>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        {`${offer.detail}${en ? " PRO is for frequent use." : " PRO ხშირი გამოყენებისთვისაა."}`}
+        {`${impulse ? impulse.detail : offer.detail}${en ? " PRO is for frequent use." : " PRO ხშირი გამოყენებისთვისაა."}`}
       </p>
     </div>
   );

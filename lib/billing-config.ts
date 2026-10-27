@@ -3,10 +3,14 @@
 export type BillingCurrency = "gel" | "gbp" | "usd" | "cad" | "aud" | "nzd";
 
 export type CreditPack = {
-  id: "s" | "m" | "l";
+  id: "xs" | "s" | "m" | "l";
   credits: number;
   amountMinor: number;
   currency: BillingCurrency;
+};
+
+export type StandardCreditPack = CreditPack & {
+  id: "s" | "m" | "l";
 };
 
 export type PremiumPlan = {
@@ -69,14 +73,14 @@ export function shouldShowPurchasePromotion({
  * lari rises with pack size (3.16, 4.03, 4.82 per lari), and the ₾19.90
  * monthly plan still undercuts the largest pack, same shape as GB.
  */
-const GE_CREDIT_PACKS: readonly CreditPack[] = [
+const GE_CREDIT_PACKS: readonly StandardCreditPack[] = [
   { id: "s", credits: 25, amountMinor: 790, currency: "gel" },
   { id: "m", credits: 60, amountMinor: 1490, currency: "gel" },
   { id: "l", credits: 120, amountMinor: 2490, currency: "gel" },
 ];
 
 /** UK one-time alternatives to the £9.99/month unlimited plan. */
-const GB_CREDIT_PACKS: readonly CreditPack[] = [
+const GB_CREDIT_PACKS: readonly StandardCreditPack[] = [
   { id: "s", credits: 30, amountMinor: 299, currency: "gbp" },
   { id: "m", credits: 75, amountMinor: 599, currency: "gbp" },
   { id: "l", credits: 180, amountMinor: 1199, currency: "gbp" },
@@ -89,34 +93,34 @@ const GB_CREDIT_PACKS: readonly CreditPack[] = [
  * undercuts the largest pack. All four dollar markets are standard
  * two-decimal Stripe currencies, amounts here are plain cents.
  */
-const US_CREDIT_PACKS: readonly CreditPack[] = [
+const US_CREDIT_PACKS: readonly StandardCreditPack[] = [
   { id: "s", credits: 30, amountMinor: 299, currency: "usd" },
   { id: "m", credits: 75, amountMinor: 599, currency: "usd" },
   { id: "l", credits: 180, amountMinor: 1199, currency: "usd" },
 ];
 
 /** Canadian one-time alternatives to the CA$13.99/month unlimited plan. */
-const CA_CREDIT_PACKS: readonly CreditPack[] = [
+const CA_CREDIT_PACKS: readonly StandardCreditPack[] = [
   { id: "s", credits: 30, amountMinor: 399, currency: "cad" },
   { id: "m", credits: 75, amountMinor: 799, currency: "cad" },
   { id: "l", credits: 180, amountMinor: 1599, currency: "cad" },
 ];
 
 /** Australian one-time alternatives to the A$14.99/month unlimited plan. */
-const AU_CREDIT_PACKS: readonly CreditPack[] = [
+const AU_CREDIT_PACKS: readonly StandardCreditPack[] = [
   { id: "s", credits: 30, amountMinor: 499, currency: "aud" },
   { id: "m", credits: 75, amountMinor: 899, currency: "aud" },
   { id: "l", credits: 180, amountMinor: 1699, currency: "aud" },
 ];
 
 /** New Zealand one-time alternatives to the NZ$16.99/month unlimited plan. */
-const NZ_CREDIT_PACKS: readonly CreditPack[] = [
+const NZ_CREDIT_PACKS: readonly StandardCreditPack[] = [
   { id: "s", credits: 30, amountMinor: 599, currency: "nzd" },
   { id: "m", credits: 75, amountMinor: 999, currency: "nzd" },
   { id: "l", credits: 180, amountMinor: 1899, currency: "nzd" },
 ];
 
-const CREDIT_PACKS_BY_COUNTRY: Record<string, readonly CreditPack[]> = {
+const CREDIT_PACKS_BY_COUNTRY: Record<string, readonly StandardCreditPack[]> = {
   AU: AU_CREDIT_PACKS,
   CA: CA_CREDIT_PACKS,
   GB: GB_CREDIT_PACKS,
@@ -124,6 +128,31 @@ const CREDIT_PACKS_BY_COUNTRY: Record<string, readonly CreditPack[]> = {
   NZ: NZ_CREDIT_PACKS,
   US: US_CREDIT_PACKS,
 };
+
+/**
+ * Low-barrier impulse pack (12 credits) for small credit shortfalls (e.g. a
+ * 2-credit chat message, 5-credit tarot follow-up, or 10-credit tarot reading /
+ * synastry unlock when the user already has 3 signup credits).
+ *
+ * Kept separate from the 3-column `creditPacksForCountry` grid so the main
+ * catalogue stays [s, m, l] while contextual paywalls and the quick-topup bar
+ * can offer a ₾3.90 / $1.99 entry point.
+ */
+const IMPULSE_PACK_BY_COUNTRY: Record<string, CreditPack> = {
+  GE: { id: "xs", credits: 12, amountMinor: 390, currency: "gel" },
+  GB: { id: "xs", credits: 12, amountMinor: 199, currency: "gbp" },
+  US: { id: "xs", credits: 12, amountMinor: 199, currency: "usd" },
+  CA: { id: "xs", credits: 12, amountMinor: 249, currency: "cad" },
+  AU: { id: "xs", credits: 12, amountMinor: 299, currency: "aud" },
+  NZ: { id: "xs", credits: 12, amountMinor: 349, currency: "nzd" },
+};
+
+export function impulsePackForCountry(
+  countryCode: string | null | undefined,
+): CreditPack {
+  const code = normalizeCountryCode(countryCode);
+  return (code && IMPULSE_PACK_BY_COUNTRY[code]) || IMPULSE_PACK_BY_COUNTRY.GE;
+}
 
 export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
   GB: {
@@ -242,7 +271,7 @@ export function normalizeCountryCode(
 /** Preserve the Georgian catalogue as the fallback while markets roll out. */
 export function creditPacksForCountry(
   countryCode: string | null | undefined,
-): readonly CreditPack[] {
+): readonly StandardCreditPack[] {
   const code = normalizeCountryCode(countryCode);
   return (code && CREDIT_PACKS_BY_COUNTRY[code]) || GE_CREDIT_PACKS;
 }
@@ -251,6 +280,7 @@ export function creditPackForCountry(
   countryCode: string | null | undefined,
   packId: unknown,
 ): CreditPack | null {
+  if (packId === "xs") return impulsePackForCountry(countryCode);
   return (
     creditPacksForCountry(countryCode).find((pack) => pack.id === packId) ??
     null

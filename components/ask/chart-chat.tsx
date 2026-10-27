@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Brain, Send, Sparkles, X } from "lucide-react";
+import { Brain, Lock, Send, Sparkles, X } from "lucide-react";
 
 import { CreditHint } from "@/components/credits/credit-hint";
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -50,6 +50,8 @@ export type AskMemoryView = {
 
 /** Device-level answer-depth preference (mirrors the server default "auto"). */
 const DEPTH_KEY = "vivida_ask_depth_v1";
+/** Preserves an unanswered question across checkout when a user hits 402. */
+const PENDING_QUESTION_KEY = "vivida_pending_ask_q";
 
 const DEPTHS: AskDepth[] = ["auto", "short", "detailed"];
 
@@ -82,9 +84,15 @@ export function ChartChat({
     ? { auto: "Auto", short: "Brief", detailed: "Detailed" }
     : { auto: "ავტო", short: "მოკლედ", detailed: "დეტალურად" };
   const [messages, setMessages] = useState<Msg[]>(initialMessages);
-  const [input, setInput] = useState(() =>
-    initialStarter ? chartStarterText(initialStarter, locale) : "",
-  );
+  const [input, setInput] = useState(() => {
+    if (initialStarter) return chartStarterText(initialStarter, locale);
+    if (typeof window === "undefined") return "";
+    try {
+      return window.sessionStorage.getItem(PENDING_QUESTION_KEY) ?? "";
+    } catch {
+      return "";
+    }
+  });
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Tracked separately from the message so the 402 branch can also offer
@@ -165,6 +173,11 @@ export function ChartChat({
       openedRef.current = true;
       el.scrollTop = el.scrollHeight;
     }
+    try {
+      window.sessionStorage.removeItem(PENDING_QUESTION_KEY);
+    } catch {
+      /* sessionStorage unavailable */
+    }
   }, []);
 
   // New turns glide to the bottom, unless the reader scrolled up to read.
@@ -230,9 +243,14 @@ export function ChartChat({
         const short = data.error === "needs_credits";
         setNeedsCredits(short);
         if (short) {
+          try {
+            window.sessionStorage.setItem(PENDING_QUESTION_KEY, msg);
+          } catch {
+            /* ignore storage quota */
+          }
           setCreditShortfall({
             balance: typeof data.balance === "number" ? data.balance : 0,
-            cost: typeof data.cost === "number" ? data.cost : 1,
+            cost: typeof data.cost === "number" ? data.cost : 2,
           });
           trackEvent(ANALYTICS_EVENT.insufficientCredits, {
             product: "ai_chart_chat",
@@ -386,23 +404,57 @@ export function ChartChat({
             </div>
           ),
         )}
+
+        {needsCredits && (
+          <div className="chat-msg-in flex items-start gap-2.5">
+            <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-sm border border-primary/40 bg-primary/15 text-primary">
+              <Lock className="size-3.5" />
+            </div>
+            <div className="max-w-[92%] rounded-md border border-primary/35 bg-card p-3.5 sm:max-w-[85%] sm:p-4">
+              <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-primary">
+                {en
+                  ? "NATAL SYNTHESIS READY · LOCKED ANSWER"
+                  : "ასტროლოგიური პასუხი მზად არის · ჩაკეტილი ანალიზი"}
+              </div>
+              <p className="mt-1.5 text-[15px] leading-relaxed text-foreground/90 sm:text-base">
+                {firstName ? `${firstName}, ` : ""}
+                {en
+                  ? "your natal placements and active transits point to a clear pattern around this question. Here is how your chart responds:"
+                  : "შენს ნატალურ რუკასა და მიმდინარე ტრანზიტებში ამ შეკითხვაზე მკაფიო ასტროლოგიური სურათი იკვეთება:"}
+              </p>
+              <div
+                aria-hidden
+                className="mt-2 space-y-1.5 select-none text-sm leading-relaxed text-foreground/70 blur-[5px]"
+              >
+                <p>
+                  {en
+                    ? "The primary house ruler and current aspect show why this dynamic is surfacing right now and which planetary window brings resolution."
+                    : "მთავარი სახლის მმართველი და მიმდინარე ასპექტი აჩვენებს, რატომ გააქტიურდა ეს თემა ახლა და რომელი პერიოდი მოიტანს კვანძის გახსნას."}
+                </p>
+                <p>
+                  {en
+                    ? "Pay special attention to the exact degree contact in your chart and the practical step that shifts the outcome in your favor."
+                    : "განსაკუთრებული ყურადღება მიაქციე ზუსტ გრადუსულ კავშირს შენს რუკაში და იმ კონკრეტულ ნაბიჯს, რომელიც შედეგს შენს სასარგებლოდ შეცვლის."}
+                </p>
+              </div>
+              <div className="mt-3.5 border-t border-border pt-3">
+                <ContextualPaywallActions
+                  locale={locale}
+                  balance={creditShortfall.balance}
+                  cost={creditShortfall.cost}
+                  product="ai_chart_chat"
+                  returnTo="/ask"
+                  placement="chart_chat_shortfall"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {error && (
+      {error && !needsCredits && (
         <div className="mt-3 shrink-0">
           <p className="text-sm text-destructive">{error}</p>
-          {needsCredits && (
-            <div className="mt-2">
-              <ContextualPaywallActions
-                locale={locale}
-                balance={creditShortfall.balance}
-                cost={creditShortfall.cost}
-                product="ai_chart_chat"
-                returnTo="/ask"
-                placement="chart_chat_shortfall"
-              />
-            </div>
-          )}
         </div>
       )}
 

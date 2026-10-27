@@ -6,7 +6,12 @@ import {
   rewardWeekKey,
   ritualMilestoneAt,
 } from "@/lib/credit-economy";
-import { CREDIT_REWARD, MONTHLY_BONUS } from "@/lib/credits-config";
+import {
+  BIRTHDAY_CREDITS,
+  CREDIT_REWARD,
+  MONTHLY_BONUS,
+  SIGNUP_BONUS,
+} from "@/lib/credits-config";
 
 describe("credit economy guardrails", () => {
   it("caps repeatable feed earning at one credit per week", () => {
@@ -29,5 +34,10 @@ describe("credit economy guardrails", () => {
     // without an explicit economy decision.
     expect(MONTHLY_BONUS).toBe(3);
     expect(MONTHLY_BONUS).toBeLessThanOrEqual(3);
+  });
+
+  it("keeps signup and birthday grants calibrated to the 2.5x free/spend guardrail", () => {
+    expect(SIGNUP_BONUS).toBe(3);
+    expect(BIRTHDAY_CREDITS).toBe(10);
   });
 });

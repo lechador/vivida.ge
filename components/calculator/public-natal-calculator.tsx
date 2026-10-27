@@ -330,12 +330,7 @@ export function PublicNatalCalculator({
             </button>
           )}
 
-          <Button
-            type="submit"
-            size="lg"
-            disabled={loading}
-            className="w-full"
-          >
+          <Button type="submit" size="lg" disabled={loading} className="w-full">
             {loading ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
@@ -356,6 +351,14 @@ export function PublicNatalCalculator({
       {chart && (
         <div ref={resultRef} className="mt-10 scroll-mt-24 space-y-8">
           <BigThree chart={chart} locale={locale} />
+
+          {!acquisitionMode && (
+            <BigThreeSynthesisTeaser
+              chart={chart}
+              locale={locale}
+              signupHref={signupHref}
+            />
+          )}
 
           <div className="flex justify-center">
             <Button type="button" variant="outline" size="lg" onClick={share}>
@@ -713,10 +716,7 @@ function BigThree({
         const sign = signByIndex(point.signIndex);
         const color = signColor(sign);
         return (
-          <div
-            key={label}
-            className="bg-card p-4"
-          >
+          <div key={label} className="bg-card p-4">
             <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
               {glyph} {label}
             </div>
@@ -734,6 +734,97 @@ function BigThree({
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function BigThreeSynthesisTeaser({
+  chart,
+  locale,
+  signupHref,
+}: {
+  chart: NatalChartJson;
+  locale?: UserLocale;
+  signupHref: string;
+}) {
+  const en = locale === "en";
+  const sun =
+    chart.bodies.sun != null ? signByIndex(chart.bodies.sun.signIndex) : null;
+  const moon =
+    chart.bodies.moon != null ? signByIndex(chart.bodies.moon.signIndex) : null;
+  const asc =
+    chart.ascendant != null ? signByIndex(chart.ascendant.signIndex) : null;
+  if (!sun || !moon || !asc) return null;
+
+  const sunName = en ? sun.labelEn : sun.labelKa;
+  const moonName = en ? moon.labelEn : moon.labelKa;
+  const ascName = en ? asc.labelEn : asc.labelKa;
+  const chartSignupHref = `/signup?next=${encodeURIComponent("/onboarding?next=/chart")}`;
+
+  return (
+    <div className="rounded-md border border-primary/35 bg-card p-5 sm:p-6">
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+          {en
+            ? "YOUR BIG THREE SYNTHESIS · PREVIEW"
+            : "შენი დიდი სამეულის სინთეზი · წინასწარი მიმოხილვა"}
+        </span>
+        <span className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground">
+          <Lock className="size-3 text-primary" />
+          {en ? "Personal reading" : "პირადი ინტერპრეტაცია"}
+        </span>
+      </div>
+      <p className="mt-2.5 text-pretty text-sm leading-relaxed text-foreground/90 sm:text-base">
+        {en
+          ? `Your chart combines a ${sunName} Sun, ${moonName} Moon, and ${ascName} Rising — a rare signature where your outer presence (${ascName}) and inner emotional world (${moonName}) pull your core ${sunName} drive in two distinct directions.`
+          : `შენს რუკაში ერთიანდება მზე — ${sunName}, მთვარე — ${moonName} და ამომავალი — ${ascName}: ეს კომბინაცია ქმნის უნიკალურ დინამიკას შენს გარეგან იმიჯსა (${ascName}) და შინაგან ემოციურ სამყაროს (${moonName}) შორის.`}
+      </p>
+      <div
+        aria-hidden
+        className="mt-2.5 space-y-1.5 select-none text-xs leading-relaxed text-foreground/70 blur-[5px] sm:text-sm"
+      >
+        <p>
+          {en
+            ? "In relationships and career decisions, this specific Sun–Moon angle explains why you crave both emotional certainty and personal autonomy at pivotal turning points."
+            : "ურთიერთობებსა და კარიერულ გადაწყვეტილებებში მზე–მთვარის ეს კონფიგურაცია ხსნის, თუ რატომ გჭირდება ერთდროულად ემოციური სიმყარე და სრული დამოუკიდებლობა."}
+        </p>
+        <p>
+          {en
+            ? "Your dominant house placements and 2026–2027 transits reveal the exact months when your personal and financial potential reaches its peak."
+            : "შენი დომინანტური სახლები და 2026–2027 წლების ტრანზიტები აჩვენებს ზუსტ პერიოდებს, როდის აღწევს პიკს შენი პირადი და ფინანსური პოტენციალი."}
+        </p>
+      </div>
+      <div className="mt-4 flex flex-wrap items-center gap-2.5 border-t border-border pt-4">
+        <Button asChild size="default">
+          <Link
+            href={chartSignupHref}
+            onClick={() =>
+              trackEvent(ANALYTICS_EVENT.registerClick, {
+                widget: "natal_calculator_big_three_teaser",
+              })
+            }
+          >
+            <Sparkles className="size-4" />
+            {en
+              ? "Unlock full chart & AI astrologer"
+              : "გახსენი სრული ანალიზი და AI ასტროლოგი"}
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="default">
+          <Link
+            href={signupHref}
+            onClick={() =>
+              trackEvent(ANALYTICS_EVENT.registerClick, {
+                widget: "natal_calculator_pdf_teaser",
+              })
+            }
+          >
+            {en
+              ? "Get 10+ page personal PDF book"
+              : "მიიღე 10+ გვერდიანი პირადი PDF წიგნი"}
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }

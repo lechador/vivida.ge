@@ -9,9 +9,9 @@
  * Tuning the economy is a one-line change in this file.
  */
 
-export const SIGNUP_BONUS = 5;
+export const SIGNUP_BONUS = 3;
 /** signup_credits_v1: staged cohort receives this immediately. */
-export const STAGED_SIGNUP_BONUS = 5;
+export const STAGED_SIGNUP_BONUS = 3;
 /**
  * signup_credits_v1: staged cohort receives this on its first 24h+ return.
  * Retired to 0 (2026-10-24): the welcome grant is now a single 5-credit bonus,
@@ -29,12 +29,15 @@ export const MONTHLY_BONUS = 3;
 export const PHONE_VERIFY_GIFT = 3;
 /** …granted on top of the above when promotional-SMS consent first turns on. */
 export const SMS_CONSENT_GIFT = 3;
+/** Credits gifted on a user's birthday (covers one full tarot reading). */
+export const BIRTHDAY_CREDITS = 10;
 
 export {
   creditPackForCountry,
   creditPacksForCountry,
   featuredPremiumPlanForCountry,
   formatBillingAmount,
+  impulsePackForCountry,
   premiumPlanForCountry,
   PURCHASE_PROMOTION_CREDIT_THRESHOLD,
   shouldShowPurchasePromotion,

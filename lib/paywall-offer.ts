@@ -12,6 +12,7 @@
 import {
   creditPacksForCountry,
   formatBillingAmount,
+  impulsePackForCountry,
   type CreditPack,
 } from "@/lib/billing-config";
 import { CREDIT_COST } from "@/lib/credits-config";
@@ -97,6 +98,41 @@ export function paywallPrimaryOffer({
   const detail = en
     ? `${pack.credits} credits · one-time payment · no auto-renewal`
     : `${pack.credits} კრედიტი · ერთჯერადი გადახდა · ავტოგანახლების გარეშე`;
+
+  return { pack, label, detail };
+}
+
+/**
+ * Low-friction impulse offer (12 credits — ₾3.90 / £1.99 / $1.99) shown when
+ * the user's credit shortfall is small enough (≤ 12 credits) to be covered by
+ * the micro pack. Returns null when the shortfall exceeds the impulse pack.
+ */
+export function paywallImpulseOffer({
+  product,
+  countryCode,
+  locale,
+  missing,
+}: {
+  product: string;
+  countryCode?: string | null;
+  locale: UserLocale;
+  missing: number;
+}): PaywallPrimaryOffer | null {
+  const pack = impulsePackForCountry(countryCode);
+  if (missing > pack.credits) return null;
+  const en = locale === "en";
+  const price = formatBillingAmount(pack.amountMinor, pack.currency, locale);
+  const outcome =
+    OUTCOME[product] ??
+    (en ? { ka: "", en: "this result" } : { ka: "ეს შედეგი", en: "" });
+
+  const label = en
+    ? `Quick unlock ${outcome.en} (${pack.credits} cr), ${price}`
+    : `სწრაფი გახსნა (${pack.credits} კრ.), ${price}`;
+
+  const detail = en
+    ? `${pack.credits} credits · one-time · instant unlock`
+    : `${pack.credits} კრედიტი · ერთჯერადი გადახდა · მყისიერი გახსნა`;
 
   return { pack, label, detail };
 }

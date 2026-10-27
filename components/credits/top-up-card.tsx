@@ -8,6 +8,7 @@ import {
   creditPacksForCountry,
   CREDIT_COST,
   formatBillingAmount,
+  impulsePackForCountry,
 } from "@/lib/credits-config";
 import { USDC_CREDIT_PACKS } from "@/lib/crypto-config";
 import { PayByCardButton } from "@/components/crypto/crypto-pay";
@@ -37,7 +38,7 @@ export function TopUpCard({
   neededCredits?: number | null;
   returnTo?: string | null;
   product?: string | null;
-  selectedPackId?: "s" | "m" | "l" | null;
+  selectedPackId?: "xs" | "s" | "m" | "l" | null;
   /** English site: pay by card (Stripe is off there). */
   crypto?: boolean;
 }) {
@@ -50,19 +51,28 @@ export function TopUpCard({
   }[] = crypto
     ? USDC_CREDIT_PACKS.map((pack) => ({ ...pack, currency: "usdc" }))
     : creditPacksForCountry(countryCode);
+  const impulsePack = crypto ? null : impulsePackForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const deficit =
     neededCredits && neededCredits > balance ? neededCredits - balance : null;
   const selectedPack = packs.find((pack) => pack.id === selectedPackId);
-  const recommendedId = selectedPack
-    ? selectedPack.id
-    : deficit
-      ? (
-          packs.find((pack) => pack.credits >= deficit) ??
-          packs[packs.length - 1]
-        ).id
-      : (packs[1]?.id ?? packs[0].id);
+  const showImpulse =
+    impulsePack !== null && (!deficit || deficit <= impulsePack.credits);
+  const impulseFeatured =
+    showImpulse &&
+    (selectedPackId === "xs" ||
+      (!selectedPack && deficit !== null && deficit <= impulsePack.credits));
+  const recommendedId = impulseFeatured
+    ? "xs"
+    : selectedPack
+      ? selectedPack.id
+      : deficit
+        ? (
+            packs.find((pack) => pack.credits >= deficit) ??
+            packs[packs.length - 1]
+          ).id
+        : (packs[1]?.id ?? packs[0].id);
   const isTarot = product === "tarot";
 
   useEffect(() => {
@@ -74,7 +84,10 @@ export function TopUpCard({
   }, [countryCode]);
 
   async function buy(packId: string) {
-    const selected = packs.find((pack) => pack.id === packId);
+    const selected =
+      packId === "xs" && impulsePack
+        ? impulsePack
+        : packs.find((pack) => pack.id === packId);
     trackEvent(ANALYTICS_EVENT.productSelected, {
       product: packId,
       surface: "credits_hub",
@@ -173,10 +186,60 @@ export function TopUpCard({
       </h2>
       {deficit && (
         <p className="mt-2 rounded-xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 px-3 py-2 text-sm text-foreground/80">
-          {en
-            ? `You need ${deficit} more credit${deficit === 1 ? "" : "s"} for this unlock.`
-            : `ამ გახსნისთვის გაკლია ${deficit} კრედიტი.`}
+          {balance > 0
+            ? en
+              ? `You already have ${balance} credit${balance === 1 ? "" : "s"} in your wallet — only ${deficit} more needed for this unlock.`
+              : `ბალანსზე უკვე გაქვს ${balance} კრედიტი — ამ გახსნისთვის გაკლია მხოლოდ ${deficit} კრედიტი.`
+            : en
+              ? `You need ${deficit} more credit${deficit === 1 ? "" : "s"} for this unlock.`
+              : `ამ გახსნისთვის გაკლია ${deficit} კრედიტი.`}
         </p>
+      )}
+
+      {showImpulse && impulsePack && (
+        <button
+          type="button"
+          disabled={pending !== null}
+          onClick={() => buy("xs")}
+          className={cn(
+            "mt-4 flex w-full items-center justify-between gap-3 rounded-2xl border-2 px-4 py-3 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60",
+            impulseFeatured
+              ? "border-[var(--vivida-cyan)] bg-[var(--vivida-cyan)]/10 shadow-[0_0_24px_-10px_var(--vivida-cyan)]"
+              : "border-border bg-background/45 hover:border-[var(--vivida-cyan)]/50",
+          )}
+        >
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1 text-sm font-semibold text-foreground">
+                {pending === "xs" ? (
+                  <Loader2 className="size-4 animate-spin text-[var(--vivida-cyan)]" />
+                ) : (
+                  <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
+                )}
+                {en
+                  ? `Quick unlock · ${impulsePack.credits} credits`
+                  : `სწრაფი შევსება · ${impulsePack.credits} კრედიტი`}
+              </span>
+              {impulseFeatured && (
+                <span className="rounded-full bg-[var(--vivida-cyan)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.14_0.02_260)]">
+                  {en ? "Fastest unlock" : "სწრაფი გახსნა"}
+                </span>
+              )}
+            </div>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {en
+                ? "1-click instant top-up · no subscription"
+                : "მყისიერი ერთჯერადი შევსება · გამოწერის გარეშე"}
+            </p>
+          </div>
+          <span className="shrink-0 rounded-xl bg-primary px-3.5 py-1.5 text-sm font-semibold tabular-nums text-primary-foreground">
+            {formatBillingAmount(
+              impulsePack.amountMinor,
+              impulsePack.currency,
+              locale,
+            )}
+          </span>
+        </button>
       )}
 
       <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">

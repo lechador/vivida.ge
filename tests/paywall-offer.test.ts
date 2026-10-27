@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { paywallPrimaryOffer } from "@/lib/paywall-offer";
+import { paywallImpulseOffer, paywallPrimaryOffer } from "@/lib/paywall-offer";
 
 describe("paywallPrimaryOffer", () => {
   it("names 2 more tarot readings at the Georgian starter price", () => {
@@ -93,5 +93,30 @@ describe("paywallPrimaryOffer", () => {
     });
     expect(offer.pack).toMatchObject({ amountMinor: 299, currency: "gbp" });
     expect(offer.label).toContain("£2.99");
+  });
+
+  it("offers the 12-credit impulse pack when the deficit is within 12 credits", () => {
+    const offer = paywallImpulseOffer({
+      product: "tarot_followup",
+      countryCode: "GE",
+      locale: "ka",
+      missing: 2,
+    });
+    expect(offer).not.toBeNull();
+    expect(offer?.pack).toMatchObject({
+      id: "xs",
+      credits: 12,
+      amountMinor: 390,
+    });
+    expect(offer?.label).toContain("₾3.90");
+
+    expect(
+      paywallImpulseOffer({
+        product: "natal_pdf",
+        countryCode: "GE",
+        locale: "ka",
+        missing: 15,
+      }),
+    ).toBeNull();
   });
 });

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   creditPackForCountry,
   creditPacksForCountry,
+  impulsePackForCountry,
   billingPeriodMonths,
   formatBillingAmount,
   LOW_CREDIT_PROMO_MONTHS,
@@ -129,6 +130,27 @@ describe("country billing catalogue", () => {
 
   it("never trusts a client-supplied pack", () => {
     expect(creditPackForCountry("GB", "custom")).toBeNull();
+  });
+
+  it("resolves the low-friction xs impulse pack across markets", () => {
+    expect(impulsePackForCountry("GE")).toEqual({
+      id: "xs",
+      credits: 12,
+      amountMinor: 390,
+      currency: "gel",
+    });
+    expect(creditPackForCountry("GE", "xs")).toEqual({
+      id: "xs",
+      credits: 12,
+      amountMinor: 390,
+      currency: "gel",
+    });
+    expect(creditPackForCountry("GB", "xs")).toEqual({
+      id: "xs",
+      credits: 12,
+      amountMinor: 199,
+      currency: "gbp",
+    });
   });
 
   it("keeps the Georgian catalogue as the rollout fallback", () => {
